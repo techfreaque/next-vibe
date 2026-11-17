@@ -1414,7 +1414,7 @@ export const translations: typeof enTranslations = {
     models: {
       descriptions: {
         uncensoredLmV11:
-          "Le modèle maison d'Uncensored.ai, et l'autre famille du non censuré. Le reste de ce niveau, ce sont des modèles grand public dont on a retiré les refus : même entraînement, même vision du monde. Celui-ci a la sienne. Uncensored.ai l'ajuste pour suivre les faits plutôt que la ligne officielle, « biaisé vers le réel » selon ses termes : attendez-vous à des positions politiques à contre-courant. Le choix pour la politique, les points de vue minoritaires et la fiction sombre ou taboue : pas de scènes adoucies, pas de morale, pas de retour forcé au consensus. Appelle des outils, contexte de 32K, texte uniquement. Expérimental, pas fait pour le code, et il énonce les thèses contestées aussi nettement que les faits établis : vérifiez ce qu'il affirme.",
+          "Le modèle maison d'Uncensored.ai, et l'autre famille du non censuré. Le reste de ce niveau, ce sont des modèles grand public dont on a retiré les refus : même entraînement, même vision du monde. Celui-ci a la sienne : il est entraîné sur des livres et des documents bannis de l'internet grand public. Attendez-vous à des positions politiques à contre-courant. Le choix pour la politique, les points de vue minoritaires et la fiction sombre ou taboue : pas de scènes adoucies, pas de morale, pas de retour forcé au consensus. Appelle des outils, contexte de 32K, texte uniquement. Expérimental, pas fait pour le code, et il énonce les thèses contestées aussi nettement que les faits établis : vérifiez ce qu'il affirme.",
         freedomgptLiberty:
           "Le modèle non censuré phare d'Age of AI, le chatbot de la liberté d'expression qui a lancé la catégorie. Bâti sur des poids ouverts, réglé pour des réponses franches, sans sermon. Rapide et vif d'esprit, contexte de 32K. Léger sur les outils, le code et l'analyse approfondie : Qwen 3.6 Plus Uncensored y est plus fort. Pour une autre vision du monde, et pas seulement moins de refus, prenez UncensoredLM.",
         gabAiArya:
@@ -1945,6 +1945,8 @@ export const translations: typeof enTranslations = {
           "Wan 3.0 d'Alibaba. Clips de 2 à 30 secondes avec audio natif, de 480p à 1080p, contrôle de la première et de la dernière image. 10 crédits par seconde en 720p, comme Wan 2.7, qu'il remplace, plus un niveau 480p à moitié prix. De longues prises pour un petit budget. Niveau Ouvert, pas de contenu explicite.",
         seedance2Mini:
           "Le Seedance 2.0 économique. Texte ou image vers vidéo, de 4 à 15 secondes, audio natif, contrôle de la première et de la dernière image, en 480p ou 720p. Environ 7,6 crédits par seconde en 720p, moins que Seedance 2.0 Fast. Bien pour les brouillons et les clips sociaux ; Seedance 2.0 monte jusqu'à la 4K quand il le faut. Niveau Ouvert, pas de contenu explicite.",
+        seedance25Flash:
+          "Seedance 2.5 Flash de ByteDance, la version rapide de Seedance 2.5. Texte ou image vers vidéo, de 4 à 30 secondes, audio natif, en 480p ou 720p. 8,4 crédits par seconde en 480p, 18,9 en 720p, moins cher que Seedance 2.5 complet. De longs plans pour moins cher. Tourne sur Venice.ai, anonymisé. Niveau Ouvert, pas de contenu explicite.",
         hailuo3Max:
           "Hailuo 3 Max de MiniMax, un entraînement plus rapide de Hailuo 3. Clips de 5 à 15 secondes en 768p ou 480p, avec contrôle de la première et de la dernière image, sans son. 8 crédits par seconde, bien en dessous de Hailuo 3. À prendre pour les itérations rapides ; Hailuo 3 ajoute la 2K et l'audio natif. Niveau Ouvert, pas de contenu explicite.",
         runwayGen45:
@@ -2602,6 +2604,14 @@ export const translations: typeof enTranslations = {
           "ElevenLabs Bella : voix féminine chaleureuse, diction douce",
         elevenlabsAdam:
           "ElevenLabs Adam : voix masculine professionnelle pour la création de contenu",
+        elevenlabsRachelTurbo:
+          "ElevenLabs Rachel Turbo : la même voix sur v4 Turbo. Moitié prix, réponse quasi instantanée.",
+        elevenlabsJoshTurbo:
+          "ElevenLabs Josh Turbo : la même voix sur v4 Turbo. Moitié prix, réponse quasi instantanée.",
+        elevenlabsBellaTurbo:
+          "ElevenLabs Bella Turbo : la même voix sur v4 Turbo. Moitié prix, réponse quasi instantanée.",
+        elevenlabsAdamTurbo:
+          "ElevenLabs Adam Turbo : la même voix sur v4 Turbo. Moitié prix, réponse quasi instantanée.",
         kokoroBella:
           "Kokoro Bella : modèle open-weight de 82M, voix féminine américaine chaleureuse. Aucun filtre de contenu.",
         kokoroSarah:

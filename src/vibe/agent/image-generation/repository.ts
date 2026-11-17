@@ -43,6 +43,7 @@ import {
 } from "../models/models";
 import { UncensoredConsentRepository } from "../models/uncensored-consent/repository";
 import {
+  chargeMediaGeneration,
   checkMediaBalance,
   deductMediaCredits,
   keepsExplicitMediaModel,
@@ -388,7 +389,10 @@ export class ImageGenerationRepository {
 
     let generationResult: ResponseType<{
       imageUrl: string;
+      /** Final credits already charged by a remote instance (UNBOTTLED). */
       creditCost?: number;
+      /** Real upstream USD charge (no markup), when the provider reports one. */
+      upstreamCostUsd?: number;
     }>;
     switch (imageModel.apiProvider) {
       case ApiProvider.MODELSLAB:
@@ -569,7 +573,18 @@ export class ImageGenerationRepository {
       });
     }
 
-    const finalCreditCost = generationResult.data.creditCost ?? creditCost;
+    // Remote instance: what it charged. Otherwise the provider's real cost x
+    // markup when reported (OpenRouter usage.cost), else the listed price.
+    const finalCreditCost =
+      generationResult.data.creditCost ??
+      chargeMediaGeneration({
+        upstreamCostUsd: generationResult.data.upstreamCostUsd,
+        listedCredits: creditCost,
+        reportsUpstreamCost: imageModel.apiProvider === ApiProvider.OPENROUTER,
+        model: imageModel.id,
+        logTag: "ImageGen",
+        logger,
+      });
 
     if (imageModel.apiProvider !== ApiProvider.UNBOTTLED) {
       const deductResult = await deductMediaCredits(

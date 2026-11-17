@@ -75,7 +75,23 @@ export const SKILL_ID_ALIASES: Record<string, string> = {
   cheapSmart: "cheap-smart",
   // Legacy merged skill+variant IDs stored with hyphen instead of __ separator
   "researcher-budget": "researcher__budget",
+  // March 2026 forum bots: the science bot maps cleanly onto Scientist
+  "science-bot": "scientist",
 };
+
+/**
+ * Skills that once existed and were removed without an obvious successor
+ * (March 2026 forum bots). Old messages, threads and cron rows still store
+ * these ids; readers show a "skill removed" state instead of a 404.
+ */
+export const REMOVED_SKILL_IDS: readonly string[] = [
+  "gaming-bot",
+  "politics-bot",
+];
+
+export function isRemovedSkillId(id: string): boolean {
+  return REMOVED_SKILL_IDS.includes(id);
+}
 
 /**
  * Resolve a stored skill or variant ID to its canonical slug form.

@@ -24,6 +24,7 @@ import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "../chat/storage/index";
 import { ApiProvider, calculateCreditCost } from "../models/models";
 import {
+  chargeMediaGeneration,
   checkMediaBalance,
   deductMediaCredits,
   keepsExplicitMediaModel,
@@ -154,7 +155,10 @@ export class MusicGenerationRepository {
 
     let generationResult: ResponseType<{
       audioUrl: string;
+      /** Final credits already charged by a remote instance (UNBOTTLED). */
       creditCost?: number;
+      /** Real upstream USD charge (no markup), when the provider reports one. */
+      upstreamCostUsd?: number;
       durationSeconds?: number;
     }>;
     switch (audioModel.apiProvider) {
@@ -238,7 +242,18 @@ export class MusicGenerationRepository {
     let { audioUrl } = generationResult.data;
     const finalDurationSeconds =
       generationResult.data.durationSeconds ?? durationSeconds;
-    const finalCreditCost = generationResult.data.creditCost ?? creditCost;
+    // Remote instance: what it charged. Otherwise the provider's real cost x
+    // markup when reported (OpenRouter usage.cost), else the listed price.
+    const finalCreditCost =
+      generationResult.data.creditCost ??
+      chargeMediaGeneration({
+        upstreamCostUsd: generationResult.data.upstreamCostUsd,
+        listedCredits: creditCost,
+        reportsUpstreamCost: audioModel.apiProvider === ApiProvider.OPENROUTER,
+        model: audioModel.id,
+        logTag: "MusicGen",
+        logger,
+      });
 
     // Upload to our storage so the URL is persistent and access-controlled.
     // Incognito threads have no server-side thread row — the file is owned by

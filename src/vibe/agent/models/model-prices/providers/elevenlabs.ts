@@ -1,14 +1,14 @@
 /**
  * ElevenLabs TTS price fetcher.
  *
- * ElevenLabs API usage is billed in USD per 1K characters at one flat rate
- * across plans (2026-11), published on the keyless, server-rendered page
- * https://elevenlabs.io/pricing/api. Its FAQ (also in JSON-LD) states:
- *   "Text to Speech $0.08 per 1,000 characters (multilingual models) or $0.04 (Flash/Turbo)."
+ * ElevenLabs API usage is billed in USD per 1K characters, one rate per model
+ * (2026-11), published on the keyless, server-rendered page
+ * https://elevenlabs.io/pricing/api as model cards:
+ *   "v4 Text to Speech New $0.08 Price per 1K characters"
+ *   "v4 Turbo Text to Speech New $0.04 Price per 1K characters"
  *
- * Our runtime synthesizes every ElevenLabs voice with a standard (non-Flash)
- * model (`model_id` in text-to-speech/repository.ts and
- * ai-stream/.../streaming-tts.ts), so the multilingual rate applies.
+ * Each ElevenLabs route's providerModel is "<model_id>:<voice_id>"
+ * (text-to-speech/elevenlabs.ts), so every route gets its own model's rate.
  *
  * Voice IDs can't be checked keylessly (the voices API needs xi-api-key), so
  * this fetcher only verifies the price.
@@ -19,6 +19,10 @@ import "server-only";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import {
+  ElevenLabsTtsModel,
+  parseElevenLabsProviderModel,
+} from "../../../text-to-speech/elevenlabs";
 import { ttsModelDefinitions } from "../../../text-to-speech/models";
 import { ApiProvider } from "../../models";
 import type { ProviderPriceResult } from "./base";
@@ -26,11 +30,24 @@ import { PriceFetcher } from "./base";
 
 const PRICING_URL = "https://elevenlabs.io/pricing/api";
 
-/** Standard-model rate, FAQ wording first, model card as fallback. */
-const STANDARD_RATE_REGEXES = [
-  /Text to Speech \$(\d+(?:\.\d+)?) per 1,000 characters \(multilingual models\)/i,
-  /v2 Multilingual Text to Speech \$(\d+(?:\.\d+)?) Price per 1K characters/i,
-];
+/** Model card label on the pricing page for each model we route to. */
+const MODEL_CARD_LABELS: Record<ElevenLabsTtsModel, string> = {
+  [ElevenLabsTtsModel.V4]: "v4",
+  [ElevenLabsTtsModel.V4_TURBO]: "v4 Turbo",
+};
+
+function isKnownModel(modelId: string): modelId is ElevenLabsTtsModel {
+  return modelId in MODEL_CARD_LABELS;
+}
+
+/** "v4 Text to Speech New $0.08 Price per 1K characters" ("New" is optional). */
+function modelRateRegex(label: string): RegExp {
+  const escaped = label.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(
+    `(?:^|\\s)${escaped} Text to Speech (?:New )?\\$(\\d+(?:\\.\\d+)?) Price per 1K characters`,
+    "i",
+  );
+}
 
 function htmlToText(html: string): string {
   return html
@@ -40,9 +57,11 @@ function htmlToText(html: string): string {
     .replaceAll(/\s+/g, " ");
 }
 
-async function fetchUsdPerChar(
+async function fetchUsdPerCharByModel(
   logger: EndpointLogger,
-): Promise<{ usdPerChar: number } | { error: string }> {
+): Promise<
+  { rates: Partial<Record<ElevenLabsTtsModel, number>> } | { error: string }
+> {
   try {
     // oxlint-disable-next-line restricted/no-raw-fetch -- external API
     const response = await fetch(PRICING_URL, {
@@ -54,17 +73,21 @@ async function fetchUsdPerChar(
       };
     }
     const text = htmlToText(await response.text());
-    for (const regex of STANDARD_RATE_REGEXES) {
-      const match = regex.exec(text);
+    const rates: Partial<Record<ElevenLabsTtsModel, number>> = {};
+    for (const model of Object.values(ElevenLabsTtsModel)) {
+      const match = modelRateRegex(MODEL_CARD_LABELS[model]).exec(text);
       const usdPer1k = match ? parseFloat(match[1]) : NaN;
       if (!isNaN(usdPer1k) && usdPer1k > 0) {
-        logger.debug("ElevenLabs API rate parsed", { usdPer1k });
-        return { usdPerChar: usdPer1k / 1000 };
+        rates[model] = usdPer1k / 1000;
       }
     }
-    return {
-      error: `No Text to Speech rate found on ${PRICING_URL} - page layout changed? Update STANDARD_RATE_REGEXES in elevenlabs.ts`,
-    };
+    if (Object.keys(rates).length === 0) {
+      return {
+        error: `No Text to Speech model rate found on ${PRICING_URL} - page layout changed? Update modelRateRegex in elevenlabs.ts`,
+      };
+    }
+    logger.debug("ElevenLabs API rates parsed", rates);
+    return { rates };
   } catch (err) {
     return { error: parseError(err).message };
   }
@@ -77,15 +100,15 @@ export class ElevenLabsPriceFetcher extends PriceFetcher {
     const updates: ProviderPriceResult["updates"] = [];
     const failures: ProviderPriceResult["failures"] = [];
 
-    const rate = await fetchUsdPerChar(logger);
-    if ("error" in rate) {
+    const parsed = await fetchUsdPerCharByModel(logger);
+    if ("error" in parsed) {
       return {
         provider: this.providerName,
         modelsFound: 0,
         modelsUpdated: 0,
         updates,
         failures,
-        error: rate.error,
+        error: parsed.error,
         // Could not check: keep prior verified state instead of disabling.
         failedApiProviders: [ApiProvider.ELEVENLABS],
       };
@@ -99,12 +122,26 @@ export class ElevenLabsPriceFetcher extends PriceFetcher {
         ) {
           continue;
         }
+        const { modelId } = parseElevenLabsProviderModel(
+          providerConfig.providerModel,
+        );
+        const usdPerChar = isKnownModel(modelId)
+          ? parsed.rates[modelId]
+          : undefined;
+        if (usdPerChar === undefined) {
+          failures.push({
+            modelId: providerConfig.id,
+            provider: ApiProvider.ELEVENLABS,
+            reason: `No ${PRICING_URL} rate for ElevenLabs model "${modelId}"`,
+          });
+          continue;
+        }
         updates.push({
           modelId: providerConfig.id,
           name: def.name,
           provider: ApiProvider.ELEVENLABS,
           field: "creditCostPerCharacter",
-          value: this.usdToCreditsPrecise(rate.usdPerChar),
+          value: this.usdToCreditsPrecise(usdPerChar),
           source: PRICING_URL,
           providerModel: providerConfig.providerModel,
         });
@@ -113,7 +150,7 @@ export class ElevenLabsPriceFetcher extends PriceFetcher {
 
     logger.debug("ElevenLabs TTS prices set", {
       count: updates.length,
-      usdPerChar: rate.usdPerChar,
+      failures: failures.length,
     });
 
     return {

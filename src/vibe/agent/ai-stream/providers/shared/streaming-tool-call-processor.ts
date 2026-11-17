@@ -35,7 +35,7 @@ interface OpenAIChoice {
   finish_reason?: string;
 }
 
-interface OpenAIResponse {
+export interface OpenAIResponse {
   id?: string;
   object?: string;
   created?: number;
@@ -97,6 +97,9 @@ export async function processStreamingResponseWithToolCalls(
   logger: EndpointLogger,
   providerName: string,
   waitForUsage = false,
+  /** Sees every parsed upstream chunk as received (e.g. to read a cost field
+   *  the re-emitted chunks drop). */
+  onUpstreamChunk?: (chunk: OpenAIResponse) => void,
 ): Promise<Response> {
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
@@ -285,6 +288,7 @@ export async function processStreamingResponseWithToolCalls(
             const jsonStr = line.slice(6);
             try {
               const data = JSON.parse(jsonStr) as OpenAIResponse;
+              onUpstreamChunk?.(data);
 
               // Store metadata
               if (data.id) {

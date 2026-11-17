@@ -26,6 +26,7 @@ import type {
   LanguageModel,
   ModelMessage,
   ProviderMetadata,
+  StepResult,
   TextStreamPart,
   ToolSet,
 } from "ai";
@@ -39,14 +40,23 @@ import type { WidgetData } from "next-vibe/core/utils/json";
 import { WidgetDataSchema } from "next-vibe/core/utils/json";
 import { CallbackMode } from "next-vibe/execute-tool/constants";
 
-import { calculateCreditCost } from "../../../models/models";
+import { ApiProvider, calculateCreditCost } from "../../../models/models";
+import {
+  GARBLED_REPLACE_HEADER,
+  garbledRetryMarkerSchema,
+} from "../../providers/openrouter/garbled-guard";
 import {
   AbortReason,
   MAX_TOOL_CALLS,
   StreamAbortError,
 } from "../core/constants";
 import type { InlineThinkEvent } from "../core/inline-think-splitter";
+import {
+  computeOutputCap,
+  MIN_AFFORDABLE_OUTPUT_TOKENS,
+} from "../core/output-cost-cap";
 import { claimResultToolCallId, type PendingToolData } from "../core/stream";
+import { estimateInputTokens } from "../core/token-estimator";
 import { isTransientErrorText } from "../errors/transient";
 import {
   deregisterActiveLoop,
@@ -77,6 +87,7 @@ import {
   onTextDelta,
   type ReasoningProviderMetadata,
 } from "./text-parts";
+import { TokenAccumulator } from "./token-accumulator";
 import {
   onToolCall,
   onToolError,
@@ -88,9 +99,119 @@ import { FirstPartWatchdog } from "./watchdog";
 export class StreamLoop implements StreamLoopState {
   constructor(readonly p: StreamLoopParams) {}
 
+  /**
+   * Assistant state at the current step's start, restored when a garbled
+   * OpenRouter attempt is replaced by its retry (see onGarbledRetry).
+   */
+  private stepStart: { content: string; messageId: string | null } = {
+    content: "",
+    messageId: null,
+  };
+  /** The provider's text part started this step (its reasoning is closed). */
+  private stepSawText = false;
+
   /** Messages of the most recent model request (initial, then each
    *  prepareStep result) - sized in the log on a context-length overflow. */
   private lastPromptMessages: readonly ModelMessage[] = [];
+
+  /** Credits left for the next step: turn-start balance minus what this turn
+   *  already spent (tools + compacting are deducted as they run; model steps
+   *  are billed at turn end, so their charge so far is added here). */
+  private remainingCredits(): number {
+    const { ctx, creditBalance, modelConfig } = this.p;
+    return (
+      creditBalance -
+      ctx.dbWriter.totalCreditsDeducted -
+      TokenAccumulator.spentCredits(ctx, modelConfig)
+    );
+  }
+
+  /** Estimated input of a step that sends `messages` (system + tools included). */
+  private estimateStepInput(messages: ModelMessage[]): number {
+    return estimateInputTokens(messages, this.p.systemPrompt, this.p.tools);
+  }
+
+  /**
+   * maxOutputTokens for a step sending `messages`: what the remaining balance
+   * can pay after the step's worst-case input. undefined = uncapped (wallet
+   * covers any output the model can write, or flat/free model). A step that
+   * cannot even pay the minimum still gets the minimum: setup refuses such
+   * turns up-front and stopWhen ends the loop before such a step, so this is
+   * only reached on estimate drift (bounded to MIN_AFFORDABLE_OUTPUT_TOKENS).
+   */
+  private stepOutputCap(
+    messages: ModelMessage[],
+    stepNumber: number,
+  ): number | undefined {
+    const { modelConfig, modelCost, ctx, logger } = this.p;
+    const remainingCredits = this.remainingCredits();
+    const inputTokens = this.estimateStepInput(messages);
+    const cap = computeOutputCap({
+      model: modelConfig,
+      modelCost,
+      remainingCredits,
+      inputTokens,
+    });
+    if (cap.kind === "uncapped") {
+      return undefined;
+    }
+    const maxOutputTokens =
+      cap.kind === "capped"
+        ? cap.maxOutputTokens
+        : MIN_AFFORDABLE_OUTPUT_TOKENS;
+    ctx.creditBudgetCapped = true;
+    logger.debug("[AI Stream] Output capped by remaining balance", {
+      model: modelConfig.id,
+      stepNumber,
+      remainingCredits,
+      inputTokens,
+      maxOutputTokens,
+    });
+    return maxOutputTokens;
+  }
+
+  /**
+   * stopWhen: stop the tool loop when the remaining balance cannot pay the
+   * next step's input (last prompt + last output + tool results) plus the
+   * minimum output. Without it each step re-sends the whole context and the
+   * turn's cost grew past the wallet (billing deducts partially to 0).
+   */
+  private creditBudgetExhausted(steps: Array<StepResult<ToolSet>>): boolean {
+    const { modelConfig, modelCost, ctx, logger } = this.p;
+    const lastStep = steps.at(-1);
+    if (!lastStep) {
+      return false;
+    }
+    const lastPrompt = Math.max(
+      ctx.lastStepInputTokens,
+      this.estimateStepInput([...this.lastPromptMessages]),
+    );
+    const toolResultTokens = Math.ceil(
+      JSON.stringify(lastStep.toolResults).length / 2.5,
+    );
+    const nextInputTokens =
+      lastPrompt + (lastStep.usage.outputTokens ?? 0) + toolResultTokens;
+    const remainingCredits = this.remainingCredits();
+    const cap = computeOutputCap({
+      model: modelConfig,
+      modelCost,
+      remainingCredits,
+      inputTokens: nextInputTokens,
+    });
+    if (cap.kind !== "unaffordable") {
+      return false;
+    }
+    ctx.creditBudgetStopped = true;
+    logger.info("[AI Stream] Balance cannot pay another step - ending loop", {
+      model: modelConfig.id,
+      threadId: this.p.threadId,
+      steps: steps.length,
+      remainingCredits,
+      nextInputTokens,
+      requiredCredits: cap.requiredCredits,
+    });
+    return true;
+  }
 
   /** First-part watchdog timeout: a dead provider connection sent no output
    *  within the window — log and abort the stream. Shared by every arm site. */
@@ -221,10 +342,26 @@ export class StreamLoop implements StreamLoopState {
       JSON.stringify(messages),
     ) as typeof messages;
     this.lastPromptMessages = messagesClean;
+    // First step's output, bounded by the wallet (tool steps re-cap in
+    // prepareStep). Unset for wallets that cover the whole context window.
+    const initialMaxOutputTokens = this.stepOutputCap(messagesClean, 0);
+    // OpenRouter: the garbled-output guard may replace a broken attempt with
+    // a retry mid-step; its in-band marker arrives as a `raw` part.
+    const garbledGuardParams =
+      modelConfig.apiProvider === ApiProvider.OPENROUTER
+        ? {
+            includeRawChunks: true,
+            headers: { [GARBLED_REPLACE_HEADER]: "1" },
+          }
+        : {};
     const streamResult = aiStreamText({
       model: provider.chat(modelConfig.providerModel) as LanguageModel,
       messages: messagesClean,
+      ...garbledGuardParams,
       ...temperatureParam,
+      ...(initialMaxOutputTokens !== undefined
+        ? { maxOutputTokens: initialMaxOutputTokens }
+        : {}),
       abortSignal: streamAbortController.signal,
       system: systemWithCacheControl,
       allowSystemInMessages: true,
@@ -255,6 +392,8 @@ export class StreamLoop implements StreamLoopState {
                     .stepHasToolsAwaitingConfirmation === true ||
                   this.p.toolExecutionContext.waitingForRemoteResult === true
               )(),
+              // The wallet cannot pay another step.
+              ({ steps }): boolean => this.creditBudgetExhausted(steps),
             ],
             // Per-step message-list override — the official AI SDK hook.
             // Pipeline: mid-stream compacting → wakeUp result injection →
@@ -268,10 +407,15 @@ export class StreamLoop implements StreamLoopState {
             }): Promise<{
               messages?: ModelMessage[];
               toolChoice?: "none";
+              maxOutputTokens?: number;
             }> => {
               const prepared = await this.prepareStep(stepMessages, stepNumber);
-              this.lastPromptMessages = prepared.messages ?? stepMessages;
-              return prepared;
+              const sent = prepared.messages ?? stepMessages;
+              this.lastPromptMessages = sent;
+              const maxOutputTokens = this.stepOutputCap(sent, stepNumber);
+              return maxOutputTokens !== undefined
+                ? { ...prepared, maxOutputTokens }
+                : prepared;
             },
             onStepFinish: (stepResult): void => {
               // Read here (SDK-typed) so steps.ts stays free of the SDK's
@@ -415,6 +559,24 @@ export class StreamLoop implements StreamLoopState {
       logger,
       toolExecutionContext,
     } = this.p;
+
+    // Raw provider chunks (OpenRouter only): nothing but the garbled-retry
+    // marker is acted on; they must not reach the inline-think flush below.
+    if (part.type === "raw") {
+      if (garbledRetryMarkerSchema.safeParse(part.rawValue).success) {
+        this.onGarbledRetry();
+      }
+      return { shouldAbort: false };
+    }
+    if (part.type === "start-step") {
+      this.stepStart = {
+        content: ctx.currentAssistantContent,
+        messageId: ctx.currentAssistantMessageId,
+      };
+      this.stepSawText = false;
+    } else if (part.type === "text-start" || part.type === "text-delta") {
+      this.stepSawText = true;
+    }
 
     // A text block ended: release a held-back partial "<think" as content.
     // Any other non-text part ends the text run: also close an inline block
@@ -846,6 +1008,37 @@ export class StreamLoop implements StreamLoopState {
     opts: { clearPendingQueueParent: boolean },
   ): void {
     return advanceTip(this, messageId, opts);
+  }
+
+  /**
+   * The garbled-output guard threw away this step's provider attempt (text
+   * was already shown) and the retry on another host follows. Drop what the
+   * attempt added to the assistant message and show the step-start content
+   * again; the retry's parts then stream in on top. Provider reasoning that
+   * was still open stays open (the retry continues it without a new
+   * reasoning-start); after text started the provider drops retry reasoning.
+   */
+  private onGarbledRetry(): void {
+    const { ctx, logger } = this.p;
+    // Discard a half-parsed inline <think> of the dropped attempt.
+    ctx.inlineThink.flush();
+    const messageId = ctx.currentAssistantMessageId;
+    if (!messageId) {
+      return;
+    }
+    const sameMessage = this.stepStart.messageId === messageId;
+    const base = sameMessage ? this.stepStart.content : "";
+    const providerReasoningOpen = ctx.isInReasoningBlock && !this.stepSawText;
+    ctx.currentAssistantContent = providerReasoningOpen
+      ? `${base}<think>`
+      : base;
+    ctx.isInReasoningBlock = providerReasoningOpen;
+    ctx.lastEstimatedTokenEmitLength = 0;
+    ctx.dbWriter.emitContentReplaced(messageId, ctx.currentAssistantContent);
+    logger.info("[AI Stream] Garbled provider attempt replaced by retry", {
+      messageId,
+      keptChars: ctx.currentAssistantContent.length,
+    });
   }
 
   /** Dispatch the events the inline <think> splitter resolved. */

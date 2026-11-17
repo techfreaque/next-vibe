@@ -71,7 +71,7 @@ export const translations = {
       mainstreamHelp: "Big-lab safety filters. Declines sensitive topics.",
       openHelp: "Light filters. Takes on most edgy topics.",
       uncensoredHelp:
-        "Two kinds. Refusals removed: mainstream models that stop dodging, same worldview. UncensoredLM: its own tuning and worldview, political takes against the mainstream.",
+        "Two kinds. Refusals removed: mainstream models that stop dodging, same worldview. UncensoredLM: trained on books and documents banned from the mainstream internet, political takes against the mainstream.",
     },
   },
   sort: {
@@ -305,6 +305,10 @@ export const translations = {
     ELEVENLABS_JOSH: "Josh",
     ELEVENLABS_BELLA: "Bella",
     ELEVENLABS_ADAM: "Adam",
+    ELEVENLABS_RACHEL_TURBO: "Rachel (Turbo)",
+    ELEVENLABS_JOSH_TURBO: "Josh (Turbo)",
+    ELEVENLABS_BELLA_TURBO: "Bella (Turbo)",
+    ELEVENLABS_ADAM_TURBO: "Adam (Turbo)",
     KOKORO_BELLA: "Bella (Kokoro)",
     KOKORO_SARAH: "Sarah (Kokoro)",
     KOKORO_NICOLE: "Nicole (Kokoro)",

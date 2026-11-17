@@ -100,7 +100,8 @@ export async function generateVideoWithOpenRouter(params: {
 }): Promise<
   ResponseType<{
     videoUrl: string;
-    creditCost?: number;
+    /** Real charge of the job in USD (no markup), when reported. */
+    upstreamCostUsd?: number;
     downloadHeaders?: Record<string, string>;
   }>
 > {
@@ -297,10 +298,7 @@ export async function generateVideoWithOpenRouter(params: {
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
-        const creditCost =
-          statusData.usage?.cost !== undefined
-            ? statusData.usage.cost * 100
-            : undefined;
+        const upstreamCostUsd = statusData.usage?.cost;
         logger.debug("[OpenRouter Video] Generation complete", { videoUrl });
         // The completed video URL is an OpenRouter /videos/<id>/content endpoint
         // that STILL requires the Bearer auth header — a bare GET returns 401 and
@@ -308,7 +306,7 @@ export async function generateVideoWithOpenRouter(params: {
         // Hand the caller the headers it must use to fetch the bytes.
         return success({
           videoUrl,
-          creditCost,
+          upstreamCostUsd,
           downloadHeaders: {
             Authorization: headers.Authorization,
           },

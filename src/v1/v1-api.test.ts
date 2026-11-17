@@ -23,6 +23,7 @@ import type {
   JWTPublicPayloadType,
 } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -131,11 +132,10 @@ async function completionsCall(
   return out.response;
 }
 
-/** The 402 paid_plan_required message names the fix: plan or pack, price, absolute buy URL. */
+/** The 402 paid_plan_required message names the fix: any plan, its entry price, absolute buy URL. */
 function expectPaidGuidance(message: string): void {
-  const { packPrice } = getApiAccessPrices(defaultLocale);
-  expect(message).toContain("any plan or a one-time credit pack");
-  expect(message).toContain(`(${packPrice})`);
+  const { subPrice } = getApiAccessPrices(defaultLocale);
+  expect(message).toContain(`any plan, from ${subPrice} a month`);
   expect(message).toContain(`http://localhost/${defaultLocale}/${API_UNLOCK_PATH}`);
 }
 
@@ -249,6 +249,21 @@ describe("OpenAI-compatible API", () => {
       expect(
         await ApiKeyAuth.authenticateRequest(other, defaultLocale, logger),
       ).toBeUndefined();
+    });
+  });
+
+  describe("suspended accounts", () => {
+    it("a banned account's key stops resolving, unbanning brings it back", async () => {
+      const { key } = await createKey(bob.user, "suspend");
+      expect(await findActiveKey(key)).toBeDefined();
+      await db.update(users).set({ isBanned: true }).where(eq(users.id, bob.user.id));
+      try {
+        expect(await findActiveKey(key)).toBeUndefined();
+        expect(await authed(v1Request("/models", key))).toBeUndefined();
+      } finally {
+        await db.update(users).set({ isBanned: false }).where(eq(users.id, bob.user.id));
+      }
+      expect(await findActiveKey(key)).toBeDefined();
     });
   });
 
@@ -388,7 +403,7 @@ describe("OpenAI-compatible API", () => {
   });
 
   describe("paid-plan gate", () => {
-    it("a free-tier account can create a key ahead of its first purchase", async () => {
+    it("a free-tier account cannot create a key: 402 says what to buy and where", async () => {
       resetPaidCache(free.user.id);
       const list = await sendTestRequest({
         endpoint: apiKeysEndpoints.GET,
@@ -396,8 +411,17 @@ describe("OpenAI-compatible API", () => {
         toolExecutionContext: undefined,
       });
       expect(list.success && list.data.isPaid).toBe(false);
-      const { key } = await createKey(free.user, "ready");
-      expect(key.startsWith("sk-unb-")).toBe(true);
+      const res = await sendTestRequest({
+        endpoint: apiKeysEndpoints.POST,
+        data: { name: "ready" },
+        user: free.user,
+        toolExecutionContext: undefined,
+      });
+      expect(res.success).toBe(false);
+      if (!res.success) {
+        expect(res.message).toContain("any plan or a one-time credit pack");
+        expect(res.message).toContain(`/${defaultLocale}/${API_UNLOCK_PATH}`);
+      }
     });
 
     it("a free-tier key gets 402 paid_plan_required with what to buy and where", async () => {

@@ -12,6 +12,7 @@ import "server-only";
 
 import type { ModelMessage, ProviderMetadata } from "ai";
 import type { ChatModelOption } from "next-vibe/agent/ai-stream/models";
+import { computeOutputCap } from "next-vibe/agent/ai-stream/repository/core/output-cost-cap";
 import { TokenAccumulator } from "next-vibe/agent/ai-stream/repository/loop/token-accumulator";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { calculateCreditCost } from "next-vibe/agent/models/models";
@@ -200,16 +201,16 @@ export async function prepareV1Call(
     };
   }
 
-  const maxOutputTokens =
+  const requestedMaxOutputTokens =
     input.maxOutputTokens === undefined
       ? undefined
       : Math.min(input.maxOutputTokens, V1_MAX_OUTPUT_TOKENS);
   const estimatedCost = calculateCreditCost(
     model,
     input.estimatedInputTokens,
-    maxOutputTokens ?? DEFAULT_ESTIMATED_OUTPUT_TOKENS,
+    requestedMaxOutputTokens ?? DEFAULT_ESTIMATED_OUTPUT_TOKENS,
   );
-  const preflightError = await preflight({
+  const preflightResult = await preflight({
     user: payer,
     model,
     estimatedCost,
@@ -218,9 +219,38 @@ export async function prepareV1Call(
     logger,
     t,
   });
-  if (preflightError) {
-    return { ok: false, error: preflightError };
+  if ("error" in preflightResult) {
+    return { ok: false, error: preflightResult.error };
   }
+  // Billing deducts model usage partially (to 0), so output past the wallet
+  // was free. Bound it to what the balance pays after the worst-case input.
+  const outputCap = computeOutputCap({
+    model,
+    modelCost: estimatedCost,
+    remainingCredits: preflightResult.balance,
+    inputTokens: input.estimatedInputTokens,
+  });
+  if (outputCap.kind === "unaffordable") {
+    return {
+      ok: false,
+      error: v1Error(
+        402,
+        t("openai.insufficientCredits", {
+          cost: outputCap.requiredCredits,
+          balance: preflightResult.balance,
+        }),
+        "insufficient_quota",
+        "insufficient_credits",
+      ),
+    };
+  }
+  const maxOutputTokens =
+    outputCap.kind === "capped"
+      ? Math.min(
+          requestedMaxOutputTokens ?? outputCap.maxOutputTokens,
+          outputCap.maxOutputTokens,
+        )
+      : requestedMaxOutputTokens;
 
   const inference: InferenceRequest = {
     model,
@@ -260,7 +290,7 @@ export async function prepareV1Call(
   };
 }
 
-/** Returns a V1Error when the call must not run, undefined to proceed. */
+/** A V1Error when the call must not run, else the spendable balance. */
 async function preflight(params: {
   user: JwtPrivatePayloadType;
   model: ChatModelOption;
@@ -269,7 +299,7 @@ async function preflight(params: {
   locale: CountryLanguage;
   logger: EndpointLogger;
   t: V1T;
-}): Promise<V1Error | undefined> {
+}): Promise<{ error: V1Error } | { balance: number }> {
   const { user, model, estimatedCost, ip, locale, logger, t } = params;
   const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
   const validation = await creditValidator.validateUserCredits(
@@ -282,23 +312,27 @@ async function preflight(params: {
   );
   if (!validation.success) {
     // Fail closed: cannot read the balance -> do not run.
-    return v1Error(
-      503,
-      t("openai.balanceCheckFailed"),
-      "server_error",
-      "balance_unavailable",
-    );
+    return {
+      error: v1Error(
+        503,
+        t("openai.balanceCheckFailed"),
+        "server_error",
+        "balance_unavailable",
+      ),
+    };
   }
   if (!validation.data.canUseModel) {
-    return v1Error(
-      402,
-      t("openai.insufficientCredits", {
-        cost: estimatedCost,
-        balance: validation.data.balance,
-      }),
-      "insufficient_quota",
-      "insufficient_credits",
-    );
+    return {
+      error: v1Error(
+        402,
+        t("openai.insufficientCredits", {
+          cost: estimatedCost,
+          balance: validation.data.balance,
+        }),
+        "insufficient_quota",
+        "insufficient_credits",
+      ),
+    };
   }
   const cap = await CreditRepository.gateFreeTierCap(
     user,
@@ -310,14 +344,16 @@ async function preflight(params: {
     locale,
   );
   if (!cap.success) {
-    return v1Error(
-      402,
-      cap.message,
-      "insufficient_quota",
-      "free_tier_cap_reached",
-    );
+    return {
+      error: v1Error(
+        402,
+        cap.message,
+        "insufficient_quota",
+        "free_tier_cap_reached",
+      ),
+    };
   }
-  return undefined;
+  return { balance: validation.data.balance };
 }
 
 async function bill(params: {

@@ -1405,7 +1405,7 @@ export const translations = {
     models: {
       descriptions: {
         uncensoredLmV11:
-          "Uncensored.ai's own model, and the other kind of uncensored. The rest of this tier are mainstream models with the refusals cut out: same training, same worldview. This one has its own. Uncensored.ai tunes it to follow the evidence over the official line, “biased to reality” in their words, so expect political takes that run against the mainstream. The pick for politics, other viewpoints and dark, taboo fiction: no softened scenes, no moralizing, no steer back to the consensus line. Calls tools, 32K context, text only. Experimental, not for code, and it states contested claims as plainly as settled ones, so check its facts.",
+          "Uncensored.ai's own model, and the other kind of uncensored. The rest of this tier are mainstream models with the refusals cut out: same training, same worldview. This one has its own: it is trained on books and documents banned from the mainstream internet, so expect political opinions that run against the mainstream. The pick for politics, other viewpoints and dark, taboo fiction: no softened scenes, no moralizing, no steer back to the consensus line. Calls tools, 32K context, text only. Experimental, not for code, and it states contested claims as plainly as settled ones, so check its facts.",
         freedomgptLiberty:
           "Age of AI's flagship uncensored model, the free-speech chatbot that started the category. Built on open weights, tuned for blunt answers with no lecture. Fast and quick-witted, 32K context. Light on tools, coding and deep analysis: Qwen 3.6 Plus Uncensored is stronger there. For a different worldview, not just fewer refusals, take UncensoredLM.",
         gabAiArya:
@@ -1935,6 +1935,8 @@ export const translations = {
           "Alibaba's Wan 3.0. Clips from 2 to 30 seconds with native audio, 480p to 1080p, first and last frame control. 10 credits per second at 720p, same as Wan 2.7, which it replaces, plus a 480p tier at half that. Long takes on a budget. Open tier, not explicit.",
         seedance2Mini:
           "The budget Seedance 2.0. Text or image to video, 4 to 15 seconds, native audio, first and last frame control, at 480p or 720p. About 7.6 credits per second at 720p, below Seedance 2.0 Fast. Good for drafts and social clips; Seedance 2.0 reaches 4K when you need it. Open tier, not explicit.",
+        seedance25Flash:
+          "ByteDance's Seedance 2.5 Flash, the fast Seedance 2.5. Text or image to video, 4 to 30 seconds, native audio, at 480p or 720p. 8.4 credits per second at 480p, 18.9 at 720p, below full Seedance 2.5. Long takes for less. Runs on Venice.ai, anonymized. Open tier, not explicit.",
         hailuo3Max:
           "MiniMax's Hailuo 3 Max, a faster training of Hailuo 3. Clips of 5 to 15 seconds at 768p or 480p with first and last frame control, no sound. 8 credits per second, well below Hailuo 3. Pick it for quick iterations; Hailuo 3 adds 2K and native audio. Open tier, not explicit.",
         runwayGen45:
@@ -2587,6 +2589,14 @@ export const translations = {
           "ElevenLabs Bella - Warm female voice with soft delivery",
         elevenlabsAdam:
           "ElevenLabs Adam - Professional male voice for content creation",
+        elevenlabsRachelTurbo:
+          "ElevenLabs Rachel Turbo - Same voice on v4 Turbo. Half the price, near-instant replies.",
+        elevenlabsJoshTurbo:
+          "ElevenLabs Josh Turbo - Same voice on v4 Turbo. Half the price, near-instant replies.",
+        elevenlabsBellaTurbo:
+          "ElevenLabs Bella Turbo - Same voice on v4 Turbo. Half the price, near-instant replies.",
+        elevenlabsAdamTurbo:
+          "ElevenLabs Adam Turbo - Same voice on v4 Turbo. Half the price, near-instant replies.",
         kokoroBella:
           "Kokoro Bella - Open-weight 82M model, warm American female voice. No content filter.",
         kokoroSarah:

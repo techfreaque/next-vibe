@@ -101,7 +101,7 @@ export async function gateApiKeyRequest(
       error: v1Error(
         402,
         t("openai.paidRequired", {
-          packPrice: getApiAccessPrices(locale).packPrice,
+          subPrice: getApiAccessPrices(locale).subPrice,
           url: buildApiUnlockUrl(buildPublicOrigin(request), locale),
         }),
         "insufficient_quota",

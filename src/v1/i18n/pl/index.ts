@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
     modelNotFound:
       "Model '{{model}}' nie istnieje lub nie jest dla Ciebie dostępny. Lista Twoich modeli: GET /v1/models.",
     paidRequired:
-      "API wymaga płatnego konta: dowolnego planu albo jednorazowego pakietu kredytów ({{packPrice}}). Kupisz je na {{url}}.",
+      "API wymaga płatnego konta: dowolnego planu, od {{subPrice}} miesięcznie. Wybierzesz go na {{url}}.",
     toolsUnsupportedByModel:
       "Ten model nie obsługuje wywoływania narzędzi. Wybierz model z obsługą narzędzi albo usuń 'tools'.",
     badToolArguments:

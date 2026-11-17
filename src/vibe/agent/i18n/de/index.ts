@@ -1400,7 +1400,7 @@ export const translations: typeof enTranslations = {
     models: {
       descriptions: {
         uncensoredLmV11:
-          "Das eigene Modell von Uncensored.ai und die andere Sorte unzensiert. Der Rest dieser Stufe sind Mainstream-Modelle ohne Verweigerungen: gleiches Training, gleiches Weltbild. Dieses hat ein eigenes. Uncensored.ai stimmt es darauf ab, der Beweislage statt der offiziellen Linie zu folgen, nach eigenen Worten „biased to reality“. Politische Positionen gegen den Mainstream sind hier die Regel. Die Wahl für Politik, andere Perspektiven und düstere, tabuisierte Fiktion: keine entschärften Szenen, keine Moralpredigt, keine Rücklenkung auf die Konsenslinie. Ruft Tools auf, 32K Kontext, nur Text. Experimentell, nichts für Code, und umstrittene Behauptungen klingen bei ihm so sicher wie belegte, also Fakten prüfen.",
+          "Das eigene Modell von Uncensored.ai und die andere Sorte unzensiert. Der Rest dieser Stufe sind Mainstream-Modelle ohne Verweigerungen: gleiches Training, gleiches Weltbild. Dieses hat ein eigenes: Es ist mit Büchern und Dokumenten trainiert, die im Mainstream-Internet verbannt sind. Politische Positionen gegen den Mainstream sind hier die Regel. Die Wahl für Politik, andere Perspektiven und düstere, tabuisierte Fiktion: keine entschärften Szenen, keine Moralpredigt, keine Rücklenkung auf die Konsenslinie. Ruft Tools auf, 32K Kontext, nur Text. Experimentell, nichts für Code, und umstrittene Behauptungen klingen bei ihm so sicher wie belegte, also Fakten prüfen.",
         freedomgptLiberty:
           "Das unzensierte Flaggschiff von Age of AI und der Free-Speech-Chatbot, mit dem die Kategorie begann. Basiert auf offenen Gewichten, abgestimmt auf direkte Antworten ohne Belehrung. Schnell und schlagfertig, 32K Kontext. Schwach bei Tools, Code und tiefer Analyse: Dort ist Qwen 3.6 Plus Uncensored stärker. Für ein anderes Weltbild statt nur weniger Verweigerungen: UncensoredLM.",
         gabAiArya:
@@ -1930,6 +1930,8 @@ export const translations: typeof enTranslations = {
           "Wan 3.0 von Alibaba. Clips von 2 bis 30 Sekunden mit Ton aus dem Modell, 480p bis 1080p, Steuerung über Start- und Endbild. 10 Credits pro Sekunde in 720p, so viel wie Wan 2.7, das es ablöst, dazu eine 480p-Stufe zum halben Preis. Lange Einstellungen mit kleinem Budget. Open-Stufe, nicht explizit.",
         seedance2Mini:
           "Das Sparmodell von Seedance 2.0. Text oder Bild zu Video, 4 bis 15 Sekunden, Ton aus dem Modell, Start- und Endbild-Steuerung, in 480p oder 720p. Rund 7,6 Credits pro Sekunde in 720p, unter Seedance 2.0 Fast. Gut für Entwürfe und Social-Clips; bei Bedarf liefert Seedance 2.0 bis 4K. Open-Stufe, nicht explizit.",
+        seedance25Flash:
+          "Seedance 2.5 Flash von ByteDance, die schnelle Fassung von Seedance 2.5. Text oder Bild zu Video, 4 bis 30 Sekunden, Ton aus dem Modell, in 480p oder 720p. 8,4 Credits pro Sekunde in 480p, 18,9 in 720p, günstiger als das volle Seedance 2.5. Lange Einstellungen zum kleineren Preis. Läuft anonymisiert über Venice.ai. Open-Stufe, nicht explizit.",
         hailuo3Max:
           "Hailuo 3 Max von MiniMax, eine auf Tempo nachtrainierte Fassung von Hailuo 3. Clips von 5 bis 15 Sekunden in 768p oder 480p mit Start- und Endbild-Steuerung, ohne Ton. 8 Credits pro Sekunde, deutlich unter Hailuo 3. Ideal für schnelle Iterationen; Hailuo 3 bringt 2K und Ton. Open-Stufe, nicht explizit.",
         runwayGen45:
@@ -2591,6 +2593,10 @@ export const translations: typeof enTranslations = {
         elevenlabsJosh: "ElevenLabs Josh",
         elevenlabsBella: "ElevenLabs Bella",
         elevenlabsAdam: "ElevenLabs Adam",
+        elevenlabsRachelTurbo: "ElevenLabs Rachel Turbo",
+        elevenlabsJoshTurbo: "ElevenLabs Josh Turbo",
+        elevenlabsBellaTurbo: "ElevenLabs Bella Turbo",
+        elevenlabsAdamTurbo: "ElevenLabs Adam Turbo",
         kokoroBella:
           "Kokoro Bella - Open-Weight-Modell, warme amerikanische Frauenstimme. Kein Inhaltsfilter.",
         kokoroSarah:

@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
     modelNotFound:
       "Das Modell '{{model}}' existiert nicht oder steht dir nicht zur Verfügung. Deine Modelle: GET /v1/models.",
     paidRequired:
-      "Die API braucht ein bezahltes Konto: einen beliebigen Tarif oder ein einmaliges Credit-Paket ({{packPrice}}). Hol es dir unter {{url}}.",
+      "Die API braucht ein bezahltes Konto: einen beliebigen Tarif, ab {{subPrice}} im Monat. Hol ihn dir unter {{url}}.",
     toolsUnsupportedByModel:
       "Dieses Modell unterstützt keine Tool-Aufrufe. Wähle ein Modell mit Tool-Unterstützung oder entferne 'tools'.",
     badToolArguments:

@@ -135,6 +135,14 @@ export const translations: typeof enTranslations = {
         "ElevenLabs Bella - Warme Frauenstimme mit sanftem Vortrag",
       elevenlabsAdam:
         "ElevenLabs Adam - Professionelle Männerstimme für Content-Produktion",
+      elevenlabsRachelTurbo:
+        "ElevenLabs Rachel Turbo - Dieselbe Stimme auf v4 Turbo. Halber Preis, Antwort fast ohne Verzögerung.",
+      elevenlabsJoshTurbo:
+        "ElevenLabs Josh Turbo - Dieselbe Stimme auf v4 Turbo. Halber Preis, Antwort fast ohne Verzögerung.",
+      elevenlabsBellaTurbo:
+        "ElevenLabs Bella Turbo - Dieselbe Stimme auf v4 Turbo. Halber Preis, Antwort fast ohne Verzögerung.",
+      elevenlabsAdamTurbo:
+        "ElevenLabs Adam Turbo - Dieselbe Stimme auf v4 Turbo. Halber Preis, Antwort fast ohne Verzögerung.",
       kokoroBella:
         "Kokoro Bella - Open-Weight-Modell, warme amerikanische Frauenstimme. Kein Inhaltsfilter.",
       kokoroSarah:

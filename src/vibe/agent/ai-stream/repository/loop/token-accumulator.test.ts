@@ -9,6 +9,7 @@ import {
   estimateTurnCredits,
   getEstimatedImageOutputTokens,
   getModelPrice,
+  resolveMediaCharge,
   roundMediaCost,
   upstreamCostToCredits,
 } from "../../../models/models";
@@ -58,8 +59,15 @@ function freshCounters(): TokenCounters {
 }
 
 /** Same prices, served by a provider that returns no reliable real cost. */
-function nanoGptModel(): ChatModelOption {
-  return { ...pricedModel(), apiProvider: ApiProvider.NANO_GPT };
+function unreportedCostModel(): ChatModelOption {
+  return { ...pricedModel(), apiProvider: ApiProvider.CLAUDE_CODE };
+}
+
+/** Same prices, served by NanoGPT / Venice (real cost via provider metadata). */
+function costReportingModel(
+  apiProvider: ApiProvider.NANO_GPT | ApiProvider.VENICE_AI,
+): ChatModelOption {
+  return { ...pricedModel(), apiProvider };
 }
 
 const logger = createEndpointLogger(false, defaultLocale);
@@ -368,14 +376,14 @@ describe("TokenAccumulator actual upstream cost billing", () => {
     expect(charge.upstreamCost).toBeUndefined();
   });
 
-  it("ignores reported cost for non-OpenRouter providers", () => {
+  it("ignores reported cost for providers without a reliable cost", () => {
     const warn = spyOn(logger, "warn");
     const ctx = freshCounters();
-    runSteps(ctx, nanoGptModel(), [0.05, 0.03, 0.04]);
+    runSteps(ctx, unreportedCostModel(), [0.05, 0.03, 0.04]);
     expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
     expect(ctx.upstreamCostSteps).toBe(0);
-    const charge = TokenAccumulator.resolveCharge(ctx, nanoGptModel(), {
+    const charge = TokenAccumulator.resolveCharge(ctx, unreportedCostModel(), {
       inputTokens: 66_000,
       outputTokens: 1_400,
       cachedInputTokens: 42_000,
@@ -700,5 +708,136 @@ describe("image output tokens", () => {
       completionTokens: 200,
       imageOutputTokens: 0,
     });
+  });
+});
+
+describe("TokenAccumulator.spentCredits (mid-turn balance check)", () => {
+  it("is 0 before any step and grows with each finished step", () => {
+    const model = pricedModel();
+    const ctx = freshCounters();
+    expect(TokenAccumulator.spentCredits(ctx, model)).toBe(0);
+    const step = {
+      inputTokens: 100_000,
+      outputTokens: 10_000,
+      cachedInputTokens: 0,
+      cacheWriteTokens: 0,
+    };
+    TokenAccumulator.accumulate(ctx, step);
+    TokenAccumulator.recordUpstreamCost(
+      ctx,
+      model,
+      step,
+      { costUsd: 0.3, provider: "x", reportedUsage: null },
+      logger,
+    );
+    const afterOne = TokenAccumulator.spentCredits(ctx, model);
+    expect(afterOne).toBe(upstreamCostToCredits(0.3));
+    TokenAccumulator.accumulate(ctx, step);
+    TokenAccumulator.recordUpstreamCost(
+      ctx,
+      model,
+      step,
+      { costUsd: 0.3, provider: "x", reportedUsage: null },
+      logger,
+    );
+    expect(TokenAccumulator.spentCredits(ctx, model)).toBe(
+      upstreamCostToCredits(0.6),
+    );
+  });
+});
+
+describe("real upstream cost of NanoGPT / Venice chat", () => {
+  for (const apiProvider of [
+    ApiProvider.NANO_GPT,
+    ApiProvider.VENICE_AI,
+  ] as const) {
+    it(`${apiProvider}: reads the cost from its provider-metadata key`, () => {
+      expect(
+        readStepUpstreamCost({ [apiProvider]: { usage: { cost: 0.0123 } } }),
+      ).toEqual({
+        costUsd: 0.0123,
+        provider: null,
+        reportedUsage: { cost: 0.0123 },
+      });
+    });
+
+    it(`${apiProvider}: bills the summed real cost x markup`, () => {
+      const model = costReportingModel(apiProvider);
+      const ctx = freshCounters();
+      [0.05, 0.03, 0.04].forEach((cost, i) => {
+        const step = STEPS[i];
+        TokenAccumulator.accumulate(ctx, step);
+        TokenAccumulator.recordUpstreamCost(
+          ctx,
+          model,
+          step,
+          readStepUpstreamCost({ [apiProvider]: { usage: { cost } } }),
+          logger,
+        );
+      });
+      const charge = TokenAccumulator.resolveCharge(ctx, model, {
+        inputTokens: 66_000,
+        outputTokens: 1_400,
+        cachedInputTokens: 42_000,
+        cacheWriteTokens: 0,
+      });
+      // $0.12 x 1.3 / 0.01 = 15.6
+      expect(charge.credits).toBe(15.6);
+      expect(charge.upstreamCost?.billingBasis).toBe("upstream_cost");
+    });
+
+    it(`${apiProvider}: a call without cost bills the listed price and warns`, () => {
+      const warn = spyOn(logger, "warn");
+      const model = costReportingModel(apiProvider);
+      const tokens = {
+        inputTokens: 100_000,
+        outputTokens: 10_000,
+        cachedInputTokens: 0,
+        cacheWriteTokens: 0,
+      };
+      const charge = TokenAccumulator.chargeSingleCall(
+        model,
+        tokens,
+        undefined,
+        logger,
+      );
+      expect(warn).toHaveBeenCalledTimes(1);
+      warn.mockRestore();
+      expect(charge.upstreamCost).toBeUndefined();
+      expect(charge.credits).toBe(calculateCreditCost(model, 100_000, 10_000));
+    });
+  }
+
+  it("prefers OpenRouter's cost when several keys are present", () => {
+    expect(
+      readStepUpstreamCost({
+        openrouter: { provider: "Modal", usage: { cost: 0.02 } },
+        [ApiProvider.NANO_GPT]: { usage: { cost: 0.5 } },
+      }).costUsd,
+    ).toBe(0.02);
+  });
+});
+
+describe("resolveMediaCharge (image / video / music)", () => {
+  it("bills a reported real cost x markup, rounded up to 0.1", () => {
+    // $0.014 x 1.3 / 0.01 = 1.82 -> 1.9
+    expect(resolveMediaCharge(0.014, 4)).toEqual({
+      credits: 1.9,
+      fromUpstreamCost: true,
+    });
+    // $0.5 x 1.3 / 0.01 = 65
+    expect(resolveMediaCharge(0.5, 40)).toEqual({
+      credits: 65,
+      fromUpstreamCost: true,
+    });
+  });
+
+  it("falls back to the listed price for a missing, zero or invalid cost", () => {
+    for (const cost of [undefined, 0, -1, Number.NaN, Infinity]) {
+      expect(resolveMediaCharge(cost, 4)).toEqual({
+        credits: 4,
+        fromUpstreamCost: false,
+      });
+    }
   });
 });

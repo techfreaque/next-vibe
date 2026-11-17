@@ -28,6 +28,15 @@ import {
   PROVIDER_SETUP_INSTRUCTIONS,
 } from "../env-availability";
 import { getEnvAvailability } from "../env-availability";
+import {
+  EDEN_AI_URLS,
+  type EdenAiSttJob,
+  edenAiErrorMessage,
+  edenAiSttJobSchema,
+  edenAiSttModel,
+  edenAiUploadResponseSchema,
+  parseEdenAiCost,
+} from "../models/eden-ai";
 import { ApiProvider, calculateSttCreditCost } from "../models/models";
 import { pollDelay } from "../shared/poll-delay";
 import { ModelSelectionType } from "../skills/enum";
@@ -624,8 +633,10 @@ export class SpeechToTextRepository {
   }
 
   /**
-   * Attempt transcription with a single Eden AI provider.
-   * Returns success or a typed failure - never throws.
+   * Transcribe with one Eden AI provider (API v3): upload the audio
+   * (POST /v3/upload), start the job (POST /v3/universal-ai/async), and poll
+   * it when it did not finish inline. Returns success or a typed failure -
+   * never throws.
    */
   private static async tryEdenAIProvider(
     blob: Blob,
@@ -644,38 +655,84 @@ export class SpeechToTextRepository {
       providerCostUsd: number | undefined;
     }>
   > {
+    const model = edenAiSttModel(edenProvider);
     const formData = new FormData();
     formData.append("file", blob, fileName);
-    formData.append("providers", edenProvider);
-    formData.append("language", language);
+    // Only kept until the job ran; 1 day is the shortest Eden allows.
+    formData.append("expires_in_days", "1");
+    // eslint-disable-next-line i18next/no-literal-string
+    formData.append("purpose", "speech-to-text");
 
-    logger.debug("[STT] Sending to Eden AI", {
-      edenProvider,
+    logger.debug("[STT] Uploading to Eden AI", {
+      model,
       fileName,
       mimeType,
       fileSize: blob.size,
       language,
     });
 
-    const response = await fetchImpl(
-      "https://api.edenai.run/v2/audio/speech_to_text_async",
-      {
-        method: "POST",
-        headers: {
-          // eslint-disable-next-line i18next/no-literal-string
-          Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
-        },
-        body: formData,
-        signal: AbortSignal.timeout(SpeechToTextRepository.FETCH_TIMEOUT_MS),
+    const uploadResponse = await fetchImpl(EDEN_AI_URLS.upload, {
+      method: "POST",
+      headers: {
+        // eslint-disable-next-line i18next/no-literal-string
+        Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
       },
+      body: formData,
+      signal: AbortSignal.timeout(SpeechToTextRepository.FETCH_TIMEOUT_MS),
+    });
+
+    if (!uploadResponse.ok) {
+      const errorText = await uploadResponse.text();
+      logger.error("[STT] Eden AI upload error", {
+        status: uploadResponse.status,
+        error: errorText,
+        model,
+        mimeType,
+        fileSize: blob.size,
+      });
+      return fail({
+        message: t("post.errors.transcriptionFailed", { error: errorText }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    const upload = edenAiUploadResponseSchema.safeParse(
+      await uploadResponse.json(),
     );
+    if (!upload.success) {
+      logger.error("[STT] Unexpected Eden AI upload response", {
+        model,
+        error: upload.error.message,
+      });
+      return fail({
+        message: t("post.errors.transcriptionFailed", {
+          error: upload.error.message,
+        }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+    const fileId = upload.data.file_id;
+    /** Eden measures the audio on upload; the STT output has no duration. */
+    const uploadDuration = upload.data.metadata?.duration ?? undefined;
+
+    const response = await fetchImpl(EDEN_AI_URLS.universalAiAsync, {
+      method: "POST",
+      headers: {
+        // eslint-disable-next-line i18next/no-literal-string
+        Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ model, input: { file: fileId, language } }),
+      signal: AbortSignal.timeout(SpeechToTextRepository.FETCH_TIMEOUT_MS),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
       logger.error("[STT] Eden AI API error", {
         status: response.status,
         error: errorText,
-        edenProvider,
+        model,
+        fileId,
         mimeType,
         language,
       });
@@ -685,42 +742,124 @@ export class SpeechToTextRepository {
       });
     }
 
-    const responseData = (await response.json()) as { public_id?: string };
-    const publicId = responseData.public_id;
-
-    if (!publicId) {
+    const created = edenAiSttJobSchema.safeParse(await response.json());
+    if (!created.success || !created.data.public_id) {
       logger.error("[STT] No public ID from Eden AI", {
-        edenProvider,
-        responseData: JSON.stringify(responseData),
+        model,
+        fileId,
+        error: created.success ? undefined : created.error.message,
       });
       return fail({
         message: t("post.errors.noPublicId"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
+    const publicId = created.data.public_id;
 
-    const pollResult = await SpeechToTextRepository.pollForResults(
-      publicId,
-      edenProvider,
-      logger,
-      t,
-      fetchImpl,
-      response,
-    );
-    if (!pollResult.success) {
-      // Poll errors don't know the input - attach it so format problems
+    // Short audio usually finishes inline: the create response already holds
+    // the result. Poll only while the job is still processing.
+    const result =
+      created.data.status === "processing"
+        ? await SpeechToTextRepository.pollForResults(
+            publicId,
+            model,
+            uploadDuration,
+            logger,
+            t,
+            fetchImpl,
+            response,
+          )
+        : SpeechToTextRepository.edenAiJobResult(
+            created.data,
+            publicId,
+            model,
+            uploadDuration,
+            logger,
+            t,
+          );
+    if (!result.success) {
+      // Job errors don't know the input - attach it so format problems
       // (e.g. Safari mp4) are diagnosable from the error log alone.
       logger.error("[STT] Eden AI transcription failed for input", {
-        edenProvider,
+        model,
         publicId,
+        fileId,
         fileName,
         mimeType,
         fileSize: blob.size,
         language,
-        message: pollResult.message,
+        message: result.message,
       });
     }
-    return pollResult;
+    return result;
+  }
+
+  /**
+   * Turn a settled (non-processing) Eden AI v3 STT job into our result.
+   */
+  private static edenAiJobResult(
+    job: EdenAiSttJob,
+    publicId: string,
+    model: string,
+    uploadDuration: number | undefined,
+    logger: EndpointLogger,
+    t: SpeechToTextT,
+  ): ResponseType<{
+    text: string;
+    confidence: number | undefined;
+    duration: number;
+    providerCostUsd: number | undefined;
+  }> {
+    if (job.status !== "success") {
+      logger.error("[STT] Provider returned error", {
+        model,
+        publicId,
+        status: job.status,
+        error: edenAiErrorMessage(job.error),
+      });
+      return fail({
+        message: t("post.errors.providerError"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    const transcription = job.output?.text ?? "";
+    const entries = job.output?.diarization?.entries ?? [];
+    const confidences = entries.flatMap((e) =>
+      typeof e.confidence === "number" ? [e.confidence] : [],
+    );
+    const confidence =
+      confidences.length > 0
+        ? confidences.reduce((sum, c) => sum + c, 0) / confidences.length
+        : undefined;
+    // Duration: measured on upload; else the last diarized segment's end.
+    const lastEnd = entries.reduce((max, e) => {
+      const end =
+        typeof e.end_time === "number"
+          ? e.end_time
+          : Number.parseFloat(e.end_time ?? "");
+      return Number.isFinite(end) && end > max ? end : max;
+    }, 0);
+    const duration = uploadDuration ?? lastEnd;
+    const providerCostUsd = parseEdenAiCost(job.cost);
+
+    logger.debug("[STT] Transcription completed", {
+      textLength: transcription.length,
+      confidence,
+      duration,
+      providerCostUsd,
+    });
+
+    if (!transcription) {
+      logger.warn("[STT] Empty transcription received", { duration });
+    }
+
+    return success({
+      text: transcription,
+      confidence,
+      duration,
+      providerCostUsd,
+    });
   }
 
   /**
@@ -808,11 +947,13 @@ export class SpeechToTextRepository {
   }
 
   /**
-   * Poll for transcription results from Eden AI
+   * Poll an Eden AI v3 async job (GET /v3/universal-ai/async/{public_id})
+   * until it leaves "processing".
    */
   private static async pollForResults(
     publicId: string,
-    provider: string,
+    model: string,
+    uploadDuration: number | undefined,
     logger: EndpointLogger,
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
@@ -833,7 +974,7 @@ export class SpeechToTextRepository {
 
       try {
         const response = await fetchImpl(
-          `https://api.edenai.run/v2/audio/speech_to_text_async/${publicId}`,
+          `${EDEN_AI_URLS.universalAiAsync}/${publicId}`,
           {
             headers: {
               // eslint-disable-next-line i18next/no-literal-string
@@ -857,103 +998,36 @@ export class SpeechToTextRepository {
           });
         }
 
-        const resultData = (await response.json()) as {
-          status: "pending" | "processing" | "finished" | "failed";
-          results: {
-            [providerKey: string]: {
-              id?: string;
-              text?: string;
-              confidence?: number;
-              diarization?: { total_speakers?: number };
-              audio_duration?: number;
-              error?: string | { message?: string; type?: string };
-              final_status?: string;
-              cost?: number;
-            };
-          };
-        };
-
-        logger.debug("[STT] Polling response received", {
-          status: resultData.status,
-          hasResults: !!resultData.results,
-          provider,
-          providerResultKeys: resultData.results?.[provider]
-            ? Object.keys(resultData.results[provider])
-            : [],
-        });
-
-        if (resultData.status === "finished") {
-          const providerResult = resultData.results[provider];
-
-          if (!providerResult) {
-            logger.error("[STT] Provider result not found in response", {
-              provider,
-              availableProviders: Object.keys(resultData.results || {}),
-            });
-            return fail({
-              message: t("post.errors.providerResultMissing", { provider }),
-              errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-            });
-          }
-
-          if (
-            providerResult.error ||
-            providerResult.final_status === "failed"
-          ) {
-            const errorMessage =
-              typeof providerResult.error === "string"
-                ? providerResult.error
-                : providerResult.error?.message || "Unknown provider error";
-
-            logger.error("[STT] Provider returned error", {
-              provider,
-              error: errorMessage,
-              finalStatus: providerResult.final_status,
-            });
-
-            return fail({
-              message: t("post.errors.providerError"),
-              errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-            });
-          }
-
-          const transcription = providerResult?.text ?? "";
-          const confidence = providerResult?.confidence;
-          const duration = providerResult?.audio_duration ?? 0;
-          const providerCostUsd = providerResult?.cost;
-
-          logger.debug("[STT] Transcription completed", {
-            textLength: transcription.length,
-            attempts,
-            confidence,
-            duration,
-            providerCostUsd,
+        const parsed = edenAiSttJobSchema.safeParse(await response.json());
+        if (!parsed.success) {
+          logger.error("[STT] Unexpected Eden AI poll response", {
+            publicId,
+            error: parsed.error.message,
           });
-
-          if (!transcription || transcription.length === 0) {
-            logger.warn("[STT] Empty transcription received", { duration });
-          }
-
-          return success({
-            text: transcription,
-            confidence,
-            duration,
-            providerCostUsd,
-          });
-        } else if (resultData.status === "failed") {
-          logger.error("[STT] Transcription failed", { publicId, provider });
           return fail({
-            message: t("post.errors.failed"),
+            message: t("post.errors.pollFailed"),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
 
-        attempts++;
-        logger.debug("[STT] Polling for transcription results", {
+        logger.debug("[STT] Polling response received", {
+          status: parsed.data.status,
+          model,
           attempts,
-          publicId,
-          status: resultData.status,
         });
+
+        if (parsed.data.status !== "processing") {
+          return SpeechToTextRepository.edenAiJobResult(
+            parsed.data,
+            publicId,
+            model,
+            uploadDuration,
+            logger,
+            t,
+          );
+        }
+
+        attempts++;
       } catch (error) {
         const errorMessage = parseError(error).message;
         logger.error("[STT] Error while polling", {
@@ -969,7 +1043,7 @@ export class SpeechToTextRepository {
       }
     }
 
-    logger.error("[STT] Transcription timeout", { publicId, provider });
+    logger.error("[STT] Transcription timeout", { publicId, model });
     return fail({
       message: t("post.errors.timeout"),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,

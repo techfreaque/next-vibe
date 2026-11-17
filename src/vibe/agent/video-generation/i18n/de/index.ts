@@ -137,6 +137,14 @@ export const translations: typeof enTranslations = {
       jobFailedStatus: "Video-Auftrag endete mit Status: {{status}}",
       requestAborted: "Videogenerierung abgebrochen",
       requestTimedOut: "Zeitüberschreitung bei der Videogenerierung",
+      contentRejected:
+        "Vom Inhaltsfilter des Videoanbieters abgelehnt: {{error}}. Das ist eine Ablehnung, keine Störung. Formuliere den Prompt um oder wähle ein weniger gefiltertes Modell. Es wurden keine Credits berechnet.",
+      providerOutage:
+        "Der Videoanbieter ist gerade gestört oder überlastet: {{error}}. Das ist eine Störung, keine Ablehnung. Versuch es in einer Minute erneut oder wähle ein anderes Modell. Es wurden keine Credits berechnet.",
+      consentRequired:
+        "Der Videoanbieter verlangt eine Einwilligung für echte Gesichter im Eingabebild: {{error}}. Nimm ein Bild ohne echtes Gesicht oder wähle ein anderes Videomodell. Es wurden keine Credits berechnet.",
+      storageFailed:
+        "Das Video wurde erzeugt, ließ sich aber nicht speichern. Es wurden keine Credits berechnet. Versuch es erneut.",
       creditsFailed:
         "Credits für Videogenerierung konnten nicht abgezogen werden",
       inputMediaRequired:

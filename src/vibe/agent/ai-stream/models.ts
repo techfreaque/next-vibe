@@ -46,6 +46,7 @@ export const FEATURED_MODELS = {
   ],
   // Enabled + servable only (Venice / NanoGPT), strongest abliterated first.
   uncensored: [
+    chatModelDefinitions[ChatModelId.KIMI_K3_1_PRO_UNCENSORED].name,
     chatModelDefinitions[ChatModelId.GLM_5_3_UNCENSORED].name,
     chatModelDefinitions[ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED]
       .name,

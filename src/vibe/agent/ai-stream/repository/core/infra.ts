@@ -18,6 +18,15 @@ import { createClaudeCode } from "../../providers/claude-code";
 import { createFreedomGPT } from "../../providers/freedomgpt";
 import { createGabAI } from "../../providers/gab-ai";
 import { createNanoGPT } from "../../providers/nano-gpt";
+import {
+  fetchWithGarbledGuard,
+  GARBLED_REPLACE_HEADER,
+} from "../../providers/openrouter/garbled-guard";
+import {
+  applyPriceRouting,
+  isChatCompletionBody,
+  isJsonRecord,
+} from "../../providers/openrouter/routing";
 import { logProviderRequest } from "../../providers/shared/debug-file-logger";
 import { createUncensoredAI } from "../../providers/uncensored-ai";
 import { createVeniceAI } from "../../providers/venice-ai";
@@ -142,6 +151,33 @@ export class ProviderFactory {
               if (lastMessage && typeof lastMessage === "object") {
                 lastMessage.cache_control = cacheControl;
               }
+            }
+
+            // 3. Chat completions: route by price + garbled-output guard.
+            if (isJsonRecord(parsed) && isChatCompletionBody(parsed)) {
+              applyPriceRouting(parsed);
+              logProviderRequest(
+                "openrouter",
+                JSON.stringify(sortObjectKeysPreservingStrings(parsed)),
+              );
+              // The chat loop opts in to the replace marker per call via a
+              // header; it is stripped here and never reaches OpenRouter.
+              const headers = new Headers(options?.headers);
+              const replaceAfterRelease =
+                headers.get(GARBLED_REPLACE_HEADER) === "1";
+              headers.delete(GARBLED_REPLACE_HEADER);
+              return fetchWithGarbledGuard(
+                url,
+                { ...options, headers },
+                parsed,
+                {
+                  fetchImpl,
+                  logger,
+                  serialize: (body) =>
+                    JSON.stringify(sortObjectKeysPreservingStrings(body)),
+                  replaceAfterRelease,
+                },
+              );
             }
 
             const sorted = sortObjectKeysPreservingStrings(parsed);

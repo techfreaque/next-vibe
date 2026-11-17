@@ -595,6 +595,11 @@ export class MessageDbWriter {
     textWrites.emitDelta(this, messageId, delta);
   }
 
+  /** SET a streaming message's content (garbled attempt replaced by a retry). */
+  emitContentReplaced(messageId: string, content: string): void {
+    textWrites.emitContentReplaced(this, messageId, content);
+  }
+
   /** Schedule a throttled DB write. */
   scheduleUpdate(messageId: string, content: string): void {
     this.engine.scheduleUpdate(messageId, content);

@@ -201,10 +201,14 @@ export function normalizeCompactingBodyForHash(bodyStr: string): string {
   if (!parsed.success) {
     return normalizeEmbeddingBodyForHash(bodyStr);
   }
+  // OpenRouter routing preferences (`provider`: sort by price, ignored hosts)
+  // pick WHO serves the call, not what it says: never part of its identity.
+  // (JSON.stringify drops the undefined key.)
   return normalizeEmbeddingBodyForHash(
     JSON.stringify({
       ...parsed.data,
       messages: parsed.data.messages.filter((m) => m.role !== "system"),
+      provider: undefined,
     }),
   );
 }

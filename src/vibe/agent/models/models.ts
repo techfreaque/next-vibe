@@ -847,6 +847,29 @@ export function chargeForProviderCredits(providerCredits: number): number {
 }
 
 /**
+ * What a media call (image / video / music) is charged: the provider's REAL
+ * reported USD cost x markup when it gave a finite cost > 0, otherwise the
+ * listed price (`listedCredits`, markup already applied). `fromUpstreamCost`
+ * tells the caller which one it got, so a missing cost can be logged.
+ */
+export function resolveMediaCharge(
+  upstreamCostUsd: number | undefined,
+  listedCredits: number,
+): { credits: number; fromUpstreamCost: boolean } {
+  if (
+    upstreamCostUsd !== undefined &&
+    Number.isFinite(upstreamCostUsd) &&
+    upstreamCostUsd > 0
+  ) {
+    return {
+      credits: chargeForProviderCredits(upstreamCostUsd / CREDIT_VALUE_USD),
+      fromUpstreamCost: true,
+    };
+  }
+  return { credits: listedCredits, fromUpstreamCost: false };
+}
+
+/**
  * Credits billed for speaking `characterCount` characters with a voice route:
  * that route's own per-character rate x standard markup, rounded up to 0.1.
  * Single source for billing, pre-flight checks and price hints.

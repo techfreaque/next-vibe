@@ -207,7 +207,6 @@ export const translations: typeof enTranslations = {
         "Nie skonfigurowano żadnego dostawcy transkrypcji mowy. Dodaj OPENAI_API_KEY, EDEN_AI_API_KEY albo DEEPGRAM_API_KEY. Możesz też podłączyć systemowego dostawcę inferencji.",
       notConfigured:
         "{{label}} nie jest skonfigurowany. Dodaj {{envKey}} do pliku .env. Pobierz klucz pod adresem {{url}}",
-      providerResultMissing: "Dostawca {{provider}} nie zwrócił żadnego wyniku",
       audioTooShort:
         "Nagranie zbyt krótkie. Przytrzymaj przycisk dłużej i mów wyraźnie.",
       noAudioFile: "Nie podano pliku audio",

@@ -75,7 +75,7 @@ export const translations: typeof enTranslations = {
         "Filtres de sécurité des grands labos. Refuse les sujets sensibles.",
       openHelp: "Filtres légers. Aborde la plupart des sujets délicats.",
       uncensoredHelp:
-        "Deux familles. Refus retirés : des modèles grand public qui n'esquivent plus, même vision du monde. UncensoredLM : son propre entraînement, sa propre vision du monde, des positions politiques à contre-courant.",
+        "Deux familles. Refus retirés : des modèles grand public qui n'esquivent plus, même vision du monde. UncensoredLM : entraîné sur des livres et des documents bannis de l'internet grand public, des positions politiques à contre-courant.",
     },
   },
   sort: {
@@ -311,6 +311,10 @@ export const translations: typeof enTranslations = {
     ELEVENLABS_JOSH: "Josh",
     ELEVENLABS_BELLA: "Bella",
     ELEVENLABS_ADAM: "Adam",
+    ELEVENLABS_RACHEL_TURBO: "Rachel (Turbo)",
+    ELEVENLABS_JOSH_TURBO: "Josh (Turbo)",
+    ELEVENLABS_BELLA_TURBO: "Bella (Turbo)",
+    ELEVENLABS_ADAM_TURBO: "Adam (Turbo)",
     KOKORO_BELLA: "Bella (Kokoro)",
     KOKORO_SARAH: "Sarah (Kokoro)",
     KOKORO_NICOLE: "Nicole (Kokoro)",

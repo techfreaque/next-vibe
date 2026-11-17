@@ -1388,7 +1388,7 @@ export const translations: typeof enTranslations = {
     models: {
       descriptions: {
         uncensoredLmV11:
-          "Własny model Uncensored.ai i drugi rodzaj braku cenzury. Reszta tego poziomu to modele z głównego nurtu z wyciętymi odmowami: ten sam trening, ten sam światopogląd. Ten ma własny. Uncensored.ai dostraja go tak, by szedł za dowodami, a nie za oficjalną linią, według nich „biased to reality”. Spodziewaj się poglądów politycznych pod prąd mainstreamu. Wybór do polityki, innych poglądów oraz mrocznej fikcji i tematów tabu: bez łagodzenia scen, bez moralizowania, bez zawracania do linii konsensusu. Wywołuje narzędzia, 32K kontekstu, tylko tekst. Eksperymentalny, nie do kodu, a sporne twierdzenia podaje tak pewnie jak ustalone, więc sprawdzaj fakty.",
+          "Własny model Uncensored.ai i drugi rodzaj braku cenzury. Reszta tego poziomu to modele z głównego nurtu z wyciętymi odmowami: ten sam trening, ten sam światopogląd. Ten ma własny: trenowano go na książkach i dokumentach zakazanych w mainstreamowym internecie. Spodziewaj się poglądów politycznych pod prąd mainstreamu. Wybór do polityki, innych poglądów oraz mrocznej fikcji i tematów tabu: bez łagodzenia scen, bez moralizowania, bez zawracania do linii konsensusu. Wywołuje narzędzia, 32K kontekstu, tylko tekst. Eksperymentalny, nie do kodu, a sporne twierdzenia podaje tak pewnie jak ustalone, więc sprawdzaj fakty.",
         freedomgptLiberty:
           "Flagowy model bez cenzury od Age of AI, czatbot wolności słowa, od którego zaczęła się cała kategoria. Zbudowany na otwartych wagach, nastawiony na dosadne odpowiedzi bez moralizowania. Szybki i błyskotliwy, 32K kontekstu. Słabszy w narzędziach, kodzie i głębokiej analizie: tam mocniejszy jest Qwen 3.6 Plus Uncensored. Po inny światopogląd, a nie tylko mniej odmów, sięgnij po UncensoredLM.",
         gabAiArya:
@@ -1914,6 +1914,8 @@ export const translations: typeof enTranslations = {
           "Wan 3.0 od Alibaby. Klipy od 2 do 30 sekund z natywnym dźwiękiem, od 480p do 1080p, z kontrolą pierwszej i ostatniej klatki. 10 kredytów za sekundę w 720p, tyle co Wan 2.7, który zastępuje, plus poziom 480p za połowę tej ceny. Długie ujęcia przy małym budżecie. Poziom open, bez treści dosadnych.",
         seedance2Mini:
           "Budżetowy Seedance 2.0. Tekst albo obraz na wideo, od 4 do 15 sekund, natywny dźwięk, kontrola pierwszej i ostatniej klatki, w 480p albo 720p. Około 7,6 kredytu za sekundę w 720p, taniej niż Seedance 2.0 Fast. Dobry do szkiców i klipów na social media; gdy potrzebujesz 4K, masz Seedance 2.0. Poziom open, bez treści dosadnych.",
+        seedance25Flash:
+          "Seedance 2.5 Flash od ByteDance, szybka wersja Seedance 2.5. Tekst albo obraz na wideo, od 4 do 30 sekund, natywny dźwięk, w 480p albo 720p. 8,4 kredytu za sekundę w 480p, 18,9 w 720p, taniej niż pełny Seedance 2.5. Długie ujęcia za mniej. Działa anonimowo przez Venice.ai. Poziom open, bez treści dosadnych.",
         hailuo3Max:
           "Hailuo 3 Max od MiniMax, szybsza, dotrenowana wersja Hailuo 3. Klipy od 5 do 15 sekund w 768p albo 480p, z kontrolą pierwszej i ostatniej klatki, bez dźwięku. 8 kredytów za sekundę, wyraźnie poniżej Hailuo 3. Świetny do szybkich iteracji; Hailuo 3 dokłada 2K i dźwięk. Poziom open, bez treści dosadnych.",
         runwayGen45:
@@ -2563,6 +2565,10 @@ export const translations: typeof enTranslations = {
         elevenlabsJosh: "ElevenLabs Josh",
         elevenlabsBella: "ElevenLabs Bella",
         elevenlabsAdam: "ElevenLabs Adam",
+        elevenlabsRachelTurbo: "ElevenLabs Rachel Turbo",
+        elevenlabsJoshTurbo: "ElevenLabs Josh Turbo",
+        elevenlabsBellaTurbo: "ElevenLabs Bella Turbo",
+        elevenlabsAdamTurbo: "ElevenLabs Adam Turbo",
         kokoroBella:
           "Kokoro Bella - Otwarty model 82M, ciepły amerykański głos kobiecy. Bez filtra treści.",
         kokoroSarah:

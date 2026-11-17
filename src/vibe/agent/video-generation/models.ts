@@ -68,6 +68,8 @@ export enum VideoGenModelId {
   SEEDANCE_2_MINI = "seedance-2-mini",
   HAILUO_3_MAX = "hailuo-3-max",
   RUNWAY_GEN_4_5 = "runway-gen-4-5",
+  // Venice video 2026-11-17
+  SEEDANCE_2_5_FLASH = "seedance-2-5-flash",
   // BEGIN:llm-generated - do not edit manually, updated by price updater
   // END:llm-generated
 }
@@ -2744,6 +2746,76 @@ export const videoGenModelDefinitions: Record<
     ],
     supportsTools: false,
     intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.OPEN,
+    features: { ...defaultFeatures, streaming: false },
+  },
+
+  [VideoGenModelId.SEEDANCE_2_5_FLASH]: {
+    name: "Seedance 2.5 Flash",
+    by: "byteDanceSeed",
+    description: "chat.models.descriptions.seedance25Flash",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "video",
+    inputs: ["text", "image"], // updated: 2026-11-17 from video-gen-provider-routes
+    outputs: ["video"], // updated: 2026-11-17 from venice.ai
+    providers: [
+      {
+        id: VideoGenModelId.SEEDANCE_2_5_FLASH,
+        apiProvider: ApiProvider.VENICE_AI,
+        // Text-to-video id; the provider swaps in
+        // seedance-2-5-flash-image-to-video-basic when a seed image is sent
+        // (same price, Venice /video/quote 2026-11-17).
+        providerModel: "seedance-2-5-flash-text-to-video-basic",
+        // Venice bills linearly per second, audio on or off: 480p $0.084/s,
+        // 720p $0.189/s (720p is Venice's default when no resolution is sent).
+        creditCostPerSecond: 18.9, // updated: 2026-11-17 from venice.ai
+        pricingByResolution: { "480p": 8.4, "720p": 18.9 }, // updated: 2026-11-17 from venice.ai
+        generateAudio: true, // updated: 2026-11-17 from venice.ai
+        supportedFrameImages: ["first_frame"], // updated: 2026-11-17 from venice.ai
+        supportedResolutions: ["480p", "720p"], // updated: 2026-11-17 from venice.ai
+        supportedAspectRatios: ["21:9", "16:9", "4:3", "1:1", "3:4", "9:16"], // updated: 2026-11-17 from venice.ai
+        defaultDurationSeconds: 5,
+        minDurationSeconds: 4, // updated: 2026-11-17 from venice.ai
+        maxDurationSeconds: 30, // updated: 2026-11-17 from venice.ai
+        supportedDurations: [
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "13",
+          "14",
+          "15",
+          "16",
+          "17",
+          "18",
+          "19",
+          "20",
+          "21",
+          "22",
+          "23",
+          "24",
+          "25",
+          "26",
+          "27",
+          "28",
+          "29",
+          "30",
+        ], // updated: 2026-11-17 from venice.ai
+      },
+    ],
+    utilities: [
+      ModelUtility.VIDEO_GEN,
+      ModelUtility.CREATIVE,
+      ModelUtility.FAST,
+    ],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,
     features: { ...defaultFeatures, streaming: false },
   },

@@ -143,6 +143,14 @@ export const translations: typeof enTranslations = {
         "La tâche vidéo s'est terminée avec le statut : {{status}}",
       requestAborted: "La génération vidéo a été interrompue",
       requestTimedOut: "Délai dépassé en attendant la génération vidéo",
+      contentRejected:
+        "Refusé par le filtre de contenu du fournisseur vidéo : {{error}}. C'est un refus, pas une panne. Reformulez le prompt ou choisissez un modèle moins filtré. Rien ne vous a été facturé.",
+      providerOutage:
+        "Le fournisseur vidéo est en panne ou surchargé en ce moment : {{error}}. C'est une panne, pas un refus. Réessayez dans une minute ou choisissez un autre modèle. Rien ne vous a été facturé.",
+      consentRequired:
+        "Le fournisseur vidéo exige un consentement pour les visages réels de l'image : {{error}}. Utilisez une image sans visage réel ou choisissez un autre modèle vidéo. Rien ne vous a été facturé.",
+      storageFailed:
+        "La vidéo a été générée mais n'a pas pu être enregistrée. Rien ne vous a été facturé. Réessayez.",
       creditsFailed: "Impossible de déduire les crédits de la génération vidéo",
       inputMediaRequired:
         "Ce modèle exige une URL d'image en entrée. Collez le lien d'une image pour l'animer.",

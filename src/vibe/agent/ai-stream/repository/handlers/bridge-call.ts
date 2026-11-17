@@ -29,6 +29,7 @@ import {
   type MessageVariant,
   ModalityResolver,
 } from "../core/modality-resolver";
+import { detectVisionRefusal, isModerationError } from "./vision-refusal";
 
 const BRIDGE_PROMPTS = {
   image: `You are a vision bridge. Your output will be the ONLY representation of this image that another AI model will ever receive - it cannot see the image itself.
@@ -162,10 +163,148 @@ export function getBridgeFailReason(result: string): string {
   return result.slice(BRIDGE_FAIL_PREFIX.length);
 }
 
+/** A bridge-capable model option (any vision pool or a chat model). */
+type BridgeModelOption = ModelOptionTokenBased & { id: BridgeModelId };
+
+/** Outcome of running ONE model (with its single timeout retry). */
+type BridgeAttemptOutcome =
+  | {
+      kind: "ok";
+      result: Awaited<ReturnType<typeof aiGenerateText>>;
+      output: string;
+    }
+  | { kind: "fail"; reason: string }
+  | { kind: "aborted" };
+
+/**
+ * Run one bridge model: bounded attempts, moderation/refusal detection.
+ * Refusals are deterministic, so they are never retried on the same model.
+ */
+async function attemptBridgeModel(params: {
+  model: BridgeModelOption;
+  toolExecutionContext: ToolExecutionContext;
+  contentPart: ImagePart | FilePart;
+  promptText: string;
+  abortSignal: AbortSignal;
+  bridgeType: "stt" | "vision" | "translation" | "tts";
+  modality: Modality;
+  logger: EndpointLogger;
+  errorLabel: string;
+}): Promise<BridgeAttemptOutcome> {
+  const {
+    model,
+    contentPart,
+    promptText,
+    abortSignal,
+    bridgeType,
+    modality,
+    logger,
+    errorLabel,
+  } = params;
+  const provider = ProviderFactory.getProviderForModel(
+    model,
+    logger,
+    params.toolExecutionContext,
+  );
+
+  // Bridge calls are auxiliary (a description, not the turn itself) and
+  // upload large inline payloads (base64 video/audio) - a hung provider
+  // connection must never stall the whole stream for the 15-min stream
+  // budget. Bound each attempt and retry once.
+  const BRIDGE_ATTEMPT_TIMEOUT_MS = 150_000;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const result = await aiGenerateText({
+        model: provider.chat(model.providerModel) as LanguageModel,
+        abortSignal: AbortSignal.any([
+          abortSignal,
+          AbortSignal.timeout(BRIDGE_ATTEMPT_TIMEOUT_MS),
+        ]),
+        messages: [
+          {
+            role: "user" as const,
+            content: [contentPart, { type: "text" as const, text: promptText }],
+          },
+        ],
+      });
+      const output = result.text.trim();
+      const refusal = detectVisionRefusal(output, result.finishReason);
+      if (refusal) {
+        logger.warn(`[GapFill] ${errorLabel} bridge refused`, {
+          reason: refusal,
+          finishReason: result.finishReason,
+          modality,
+          bridgeType,
+          modelId: model.id,
+        });
+        return { kind: "fail", reason: refusal };
+      }
+      return { kind: "ok", result, output };
+    } catch (attemptErr) {
+      const parsedAttemptErr = parseError(attemptErr);
+      // Parent stream cancelled -> stop immediately.
+      if (abortSignal.aborted) {
+        logger.warn(`[GapFill] ${errorLabel} bridge call aborted`, {
+          error: parsedAttemptErr.message,
+          modality,
+          bridgeType,
+          aborted: true,
+        });
+        return { kind: "aborted" };
+      }
+      // A provider moderation block (Gemini PROHIBITED_CONTENT / SAFETY,
+      // content-filter refusals) is deterministic: retrying the same payload
+      // on the same model only bills a second refusal.
+      if (isModerationError(parsedAttemptErr.message)) {
+        logger.warn(
+          `[GapFill] ${errorLabel} bridge refused by provider moderation`,
+          {
+            error: parsedAttemptErr.message,
+            modality,
+            bridgeType,
+            modelId: model.id,
+          },
+        );
+        return {
+          kind: "fail",
+          reason: `refused by provider moderation: ${parsedAttemptErr.message}`,
+        };
+      }
+      if (attempt === 1) {
+        logger.warn(`[GapFill] ${errorLabel} bridge call failed`, {
+          error: parsedAttemptErr.message,
+          errorStack: parsedAttemptErr.stack,
+          modality,
+          bridgeType,
+          modelId: model.id,
+        });
+        return { kind: "fail", reason: parsedAttemptErr.message };
+      }
+      logger.warn(
+        `[GapFill] ${errorLabel} bridge attempt failed - retrying once`,
+        {
+          modality,
+          modelId: model.id,
+          error: parsedAttemptErr.message,
+          errorStack: parsedAttemptErr.stack,
+        },
+      );
+    }
+  }
+  return { kind: "fail", reason: "no attempt completed" };
+}
+
+/**
+ * Shared tail for all bridge calls: run the resolved model, fall back ONCE to
+ * a second model when it refuses or fails, emit completion, deduct credits.
+ * A failure is always returned as an explicit bridgeFail (never as text that
+ * could pass for a description).
+ */
 async function runBridgeCall(params: {
-  model: ModelOptionTokenBased;
-  modelId: BridgeModelId;
-  provider: ReturnType<typeof ProviderFactory.getProviderForModel>;
+  model: BridgeModelOption;
+  /** Second-chance model after `failedId` refused/failed; null = none. */
+  resolveFallback: (failedId: string) => BridgeModelOption | null;
+  toolExecutionContext: ToolExecutionContext;
   contentPart: ImagePart | FilePart;
   promptText: string;
   abortSignal: AbortSignal;
@@ -174,7 +313,10 @@ async function runBridgeCall(params: {
   attachmentId: string | undefined;
   bridgeType: "stt" | "vision" | "translation" | "tts";
   modality: Modality;
-  creditFeature: string;
+  /** Credit feature label; the model id that produced the output is appended. */
+  creditFeaturePrefix: string;
+  /** Bill the call even when there is no chat message to attach it to. */
+  billWithoutMessage?: boolean;
   dbWriter: MessageDbWriter;
   user: JwtPayloadType;
   logger: EndpointLogger;
@@ -182,16 +324,13 @@ async function runBridgeCall(params: {
 }): Promise<BridgeCallResult> {
   const {
     model,
-    modelId,
-    provider,
-    contentPart,
-    promptText,
-    abortSignal,
+    resolveFallback,
     chatMessageId,
     attachmentId,
     bridgeType,
     modality,
-    creditFeature,
+    creditFeaturePrefix,
+    billWithoutMessage,
     dbWriter,
     user,
     logger,
@@ -199,101 +338,67 @@ async function runBridgeCall(params: {
   } = params;
 
   try {
-    // Bridge calls are auxiliary (a description, not the turn itself) and
-    // upload large inline payloads (base64 video/audio) — a hung provider
-    // connection must never stall the whole stream for the 15-min stream
-    // budget. Bound each attempt and retry once; a second timeout falls
-    // through to the caller's "could not be processed" placeholder.
-    const BRIDGE_ATTEMPT_TIMEOUT_MS = 150_000;
-    let result: Awaited<ReturnType<typeof aiGenerateText>> | undefined;
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        result = await aiGenerateText({
-          model: provider.chat(model.providerModel) as LanguageModel,
-          abortSignal: AbortSignal.any([
-            abortSignal,
-            AbortSignal.timeout(BRIDGE_ATTEMPT_TIMEOUT_MS),
-          ]),
-          messages: [
-            {
-              role: "user" as const,
-              content: [
-                contentPart,
-                { type: "text" as const, text: promptText },
-              ],
-            },
-          ],
-        });
-        break;
-      } catch (attemptErr) {
-        // Parent stream cancelled → stop immediately; per-attempt timeout →
-        // retry once, then give up (caller substitutes the placeholder text).
-        const parsedAttemptErr = parseError(attemptErr);
-        if (abortSignal.aborted) {
-          logger.warn(`[GapFill] ${errorLabel} bridge call aborted`, {
-            error: parsedAttemptErr.message,
-            modality,
-            bridgeType,
-            aborted: true,
-          });
-          return null;
-        }
-        // A provider moderation block (Gemini PROHIBITED_CONTENT / SAFETY,
-        // content-filter refusals) is deterministic - retrying the same
-        // payload only bills a second refusal. It is the provider's policy,
-        // not a failure of ours: warn (no retry), fall through to the placeholder.
-        const isModerationBlock =
-          /PROHIBITED_CONTENT|\bSAFETY\b|blocked the request|content.?filter|content.?policy/i.test(
-            parsedAttemptErr.message,
-          );
-        if (isModerationBlock) {
-          logger.warn(
-            `[GapFill] ${errorLabel} bridge refused by provider moderation`,
-            {
-              error: parsedAttemptErr.message,
-              modality,
-              bridgeType,
-              modelId,
-            },
-          );
-          return bridgeFail(parsedAttemptErr.message);
-        }
-        if (attempt === 1) {
-          logger.warn(`[GapFill] ${errorLabel} bridge call failed`, {
-            error: parsedAttemptErr.message,
-            errorStack: parsedAttemptErr.stack,
-            modality,
-            bridgeType,
-          });
-          return bridgeFail(parsedAttemptErr.message);
-        }
-        logger.warn(
-          `[GapFill] ${errorLabel} bridge attempt failed - retrying once`,
-          {
-            modality,
-            modelId,
-            error: parsedAttemptErr.message,
-            errorStack: parsedAttemptErr.stack,
-          },
-        );
-      }
-    }
-    if (!result) {
+    let usedModel = model;
+    let outcome = await attemptBridgeModel({ ...params, model });
+    if (outcome.kind === "aborted") {
       return null;
     }
+    if (outcome.kind === "fail") {
+      const firstReason = outcome.reason;
+      const fallback = resolveFallback(model.id);
+      if (!fallback) {
+        logger.warn(
+          `[GapFill] ${errorLabel} bridge failed, no fallback model`,
+          {
+            modelId: model.id,
+            reason: firstReason,
+            modality,
+          },
+        );
+        return bridgeFail(firstReason);
+      }
+      logger.warn(
+        `[GapFill] ${errorLabel} bridge falling back to another model`,
+        {
+          failedModelId: model.id,
+          fallbackModelId: fallback.id,
+          reason: firstReason,
+          modality,
+          bridgeType,
+        },
+      );
+      outcome = await attemptBridgeModel({ ...params, model: fallback });
+      if (outcome.kind === "aborted") {
+        return null;
+      }
+      if (outcome.kind === "fail") {
+        logger.error(`[GapFill] ${errorLabel} bridge failed on both models`, {
+          modelId: model.id,
+          reason: firstReason,
+          fallbackModelId: fallback.id,
+          fallbackReason: outcome.reason,
+          modality,
+          bridgeType,
+        });
+        return bridgeFail(
+          `${model.id}: ${firstReason}; fallback ${fallback.id}: ${outcome.reason}`,
+        );
+      }
+      usedModel = fallback;
+    }
 
-    const output = result.text.trim();
+    const { result, output } = outcome;
     const creditCost = calculateCreditCost(
-      model,
+      usedModel,
       result.usage.inputTokens ?? 0,
       result.usage.outputTokens ?? 0,
     );
 
-    if (chatMessageId && output) {
+    if (chatMessageId) {
       const variant: MessageVariant = {
         modality: "text" as Modality,
         content: output,
-        modelId,
+        modelId: usedModel.id,
         creditCost,
         createdAt: new Date().toISOString(),
         bridgeType,
@@ -306,19 +411,19 @@ async function runBridgeCall(params: {
         modality,
         variant,
       });
-
-      if (creditCost > 0) {
-        await dbWriter.deductAndEmitCredits({
-          user,
-          amount: creditCost,
-          feature: creditFeature,
-          type: "model",
-          model: modelId,
-        });
-      }
     }
 
-    return output || null;
+    if (creditCost > 0 && (chatMessageId || billWithoutMessage)) {
+      await dbWriter.deductAndEmitCredits({
+        user,
+        amount: creditCost,
+        feature: `${creditFeaturePrefix}:${usedModel.id}`,
+        type: "model",
+        model: usedModel.id,
+      });
+    }
+
+    return output;
   } catch (err) {
     const parsed = parseError(err);
     logger.warn(`[GapFill] ${errorLabel} bridge call failed`, {
@@ -480,12 +585,13 @@ export class BridgeCall {
 
     return runBridgeCall({
       model: visionModel,
-      modelId: visionModel.id,
-      provider: ProviderFactory.getProviderForModel(
-        visionModel,
-        logger,
-        params.toolExecutionContext,
-      ),
+      resolveFallback: (failedId) =>
+        ModalityResolver.resolveImageVisionFallback(
+          failedId,
+          user,
+          availability,
+        ),
+      toolExecutionContext: params.toolExecutionContext,
       contentPart: {
         type: "image" as const,
         image: part.image,
@@ -499,7 +605,7 @@ export class BridgeCall {
       attachmentId: attachmentIdOfPart(part),
       bridgeType,
       modality,
-      creditFeature: `vision-bridge:${visionModel.id}`,
+      creditFeaturePrefix: "vision-bridge",
       dbWriter,
       user,
       logger,
@@ -561,12 +667,13 @@ export class BridgeCall {
 
     return runBridgeCall({
       model: audioVisionModel,
-      modelId: audioVisionModel.id,
-      provider: ProviderFactory.getProviderForModel(
-        audioVisionModel,
-        logger,
-        params.toolExecutionContext,
-      ),
+      resolveFallback: (failedId) =>
+        ModalityResolver.resolveAudioVisionFallback(
+          failedId,
+          user,
+          availability,
+        ),
+      toolExecutionContext: params.toolExecutionContext,
       contentPart: fileData,
       promptText: BRIDGE_PROMPTS.audio,
       abortSignal: params.abortSignal,
@@ -574,7 +681,7 @@ export class BridgeCall {
       attachmentId: attachmentIdOfPart(part),
       bridgeType,
       modality,
-      creditFeature: `audio-vision-bridge:${audioVisionModel.id}`,
+      creditFeaturePrefix: "audio-vision-bridge",
       dbWriter,
       user,
       logger,
@@ -636,12 +743,13 @@ export class BridgeCall {
 
     return runBridgeCall({
       model: videoVisionModel,
-      modelId: videoVisionModel.id,
-      provider: ProviderFactory.getProviderForModel(
-        videoVisionModel,
-        logger,
-        params.toolExecutionContext,
-      ),
+      resolveFallback: (failedId) =>
+        ModalityResolver.resolveVideoVisionFallback(
+          failedId,
+          user,
+          availability,
+        ),
+      toolExecutionContext: params.toolExecutionContext,
       contentPart: fileData,
       promptText: BRIDGE_PROMPTS.video,
       abortSignal: params.abortSignal,
@@ -649,7 +757,7 @@ export class BridgeCall {
       attachmentId: attachmentIdOfPart(part),
       bridgeType,
       modality,
-      creditFeature: `video-vision-bridge:${videoVisionModel.id}`,
+      creditFeaturePrefix: "video-vision-bridge",
       dbWriter,
       user,
       logger,
@@ -716,12 +824,6 @@ export class BridgeCall {
       );
     }
 
-    const visionProvider = ProviderFactory.getProviderForModel(
-      visionModel,
-      logger,
-      params.toolExecutionContext,
-    );
-
     const promptText =
       modality === "video"
         ? BRIDGE_PROMPTS.video
@@ -765,69 +867,42 @@ export class BridgeCall {
       });
     }
 
-    try {
-      const result = await aiGenerateText({
-        model: visionProvider.chat(visionModel.providerModel) as LanguageModel,
-        abortSignal,
-        messages: [
-          {
-            role: "user" as const,
-            content: [
-              contentParts,
-              { type: "text" as const, text: promptText },
-            ],
-          },
-        ],
-      });
+    const resolveFallback = (failedId: string): BridgeModelOption | null =>
+      modality === "video"
+        ? ModalityResolver.resolveVideoVisionFallback(
+            failedId,
+            user,
+            availability,
+          )
+        : modality === "audio"
+          ? ModalityResolver.resolveAudioVisionFallback(
+              failedId,
+              user,
+              availability,
+            )
+          : ModalityResolver.resolveImageVisionFallback(
+              failedId,
+              user,
+              availability,
+            );
 
-      // Deduct credits for the vision bridge call using actual token usage
-      const creditCost = calculateCreditCost(
-        visionModel,
-        result.usage.inputTokens ?? 0,
-        result.usage.outputTokens ?? 0,
-      );
-      if (creditCost > 0) {
-        await dbWriter.deductAndEmitCredits({
-          user,
-          amount: creditCost,
-          feature: `vision-bridge:${visionModel.id}`,
-          type: "model",
-          model: visionModel.id,
-        });
-      }
-
-      const description = result.text.trim();
-
-      // Emit GAP_FILL_COMPLETED + persist variant to DB
-      if (chatMessageId && description) {
-        const variant = {
-          modality: "text" as Modality,
-          content: description,
-          modelId: visionModel.id,
-          creditCost,
-          createdAt: new Date().toISOString(),
-          bridgeType: "vision" as const,
-        };
-
-        await dbWriter.emitGapFillCompleted({
-          messageId: chatMessageId,
-          bridgeType: "vision",
-          modality,
-          variant,
-        });
-      }
-
-      return description || null;
-    } catch (err) {
-      const errMsg = err instanceof Error ? err.message : String(err);
-      logger.warn(
-        `[GapFill] ${modality} vision bridge for tool result failed`,
-        {
-          error: errMsg,
-          mediaUrl: mediaUrl.slice(0, 80),
-        },
-      );
-      return bridgeFail(errMsg);
-    }
+    return runBridgeCall({
+      model: visionModel,
+      resolveFallback,
+      toolExecutionContext: params.toolExecutionContext,
+      contentPart: contentParts,
+      promptText,
+      abortSignal,
+      chatMessageId,
+      attachmentId: undefined,
+      bridgeType: "vision",
+      modality,
+      creditFeaturePrefix: "vision-bridge",
+      billWithoutMessage: true,
+      dbWriter,
+      user,
+      logger,
+      errorLabel: `${modality} tool-result vision`,
+    });
   }
 }

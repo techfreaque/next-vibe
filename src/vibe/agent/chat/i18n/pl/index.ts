@@ -967,6 +967,8 @@ export const translations: typeof enTranslations = {
         "Wan 3.0 - Model wideo Alibaby z dźwiękiem i klipami do 30 sekund.",
       seedance2Mini:
         "Seedance 2.0 Mini - Budżetowy model wideo ByteDance z dźwiękiem w 480p i 720p.",
+      seedance25Flash:
+        "Seedance 2.5 Flash - Szybki Seedance 2.5 od ByteDance z dźwiękiem, klipy do 30 sekund w 480p i 720p.",
       hailuo3Max:
         "Hailuo 3 Max - Szybsza i tańsza odmiana Hailuo 3 od MiniMax w 768p, bez dźwięku.",
       runwayGen45:

@@ -74,7 +74,7 @@ export const translations: typeof enTranslations = {
         "Sicherheitsfilter der großen Anbieter. Weicht heiklen Themen aus.",
       openHelp: "Leichte Filter. Geht auf die meisten heiklen Themen ein.",
       uncensoredHelp:
-        "Zwei Sorten. Verweigerung entfernt: Mainstream-Modelle, die nicht mehr ausweichen, gleiches Weltbild. UncensoredLM: eigenes Tuning, eigenes Weltbild, politisch gegen den Mainstream.",
+        "Zwei Sorten. Verweigerung entfernt: Mainstream-Modelle, die nicht mehr ausweichen, gleiches Weltbild. UncensoredLM: trainiert mit Büchern und Dokumenten, die im Mainstream-Internet verbannt sind, politisch gegen den Mainstream.",
     },
   },
   sort: {
@@ -312,6 +312,10 @@ export const translations: typeof enTranslations = {
     ELEVENLABS_JOSH: "Josh",
     ELEVENLABS_BELLA: "Bella",
     ELEVENLABS_ADAM: "Adam",
+    ELEVENLABS_RACHEL_TURBO: "Rachel (Turbo)",
+    ELEVENLABS_JOSH_TURBO: "Josh (Turbo)",
+    ELEVENLABS_BELLA_TURBO: "Bella (Turbo)",
+    ELEVENLABS_ADAM_TURBO: "Adam (Turbo)",
     KOKORO_BELLA: "Bella (Kokoro)",
     KOKORO_SARAH: "Sarah (Kokoro)",
     KOKORO_NICOLE: "Nicole (Kokoro)",

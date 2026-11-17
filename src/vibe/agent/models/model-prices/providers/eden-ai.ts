@@ -1,159 +1,144 @@
 /**
- * Eden AI price fetcher.
+ * Eden AI price fetcher (API v3).
  *
- * Uses the Eden AI public API at https://api.edenai.run/v2/info/provider_subfeatures
- * to fetch real pricing data for TTS and STT providers.
+ * Reads the public catalog at GET /v3/info/audio/tts and
+ * GET /v3/info/audio/speech_to_text_async (no auth). Each entry is
+ * { model: "audio/tts/openai/tts-1", pricing: { price, price_unit_quantity,
+ * price_unit_type: "character" | "second" | "minute" | ... } }.
+ * (v2 /v2/info/provider_subfeatures shuts down on 2026-12-31.)
  *
  * Eden AI charges a 5.5% platform fee on top of provider prices.
- * The API returns exact per-unit pricing with unit type and quantity.
  *
- * Relevant entries:
- *   openai.audio.text_to_speech → $0.015/1K chars (default model)
- *   openai.audio.speech_to_text_async → $0.006/60 sec
+ * Keys match our route encoding (../../eden-ai.ts):
+ *   TTS providerModel "openai/tts-1:nova" → key "openai/tts-1" ($15/1M chars)
+ *   STT providerModel "openai"            → key "openai"       ($0.006/60 sec)
  */
 
 import "server-only";
 
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import { z } from "zod";
 
 import { sttModelDefinitions } from "../../../speech-to-text/models";
 import { ttsModelDefinitions } from "../../../text-to-speech/models";
+import {
+  EDEN_AI_STT_MODEL_PREFIX,
+  EDEN_AI_TTS_MODEL_PREFIX,
+  EDEN_AI_URLS,
+  edenAiInfoModelSchema,
+  edenAiInfoSchema,
+  parseEdenAiTtsProviderModel,
+} from "../../eden-ai";
 import { ApiProvider } from "../../models";
 import type { ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";
 
-const API_URL = "https://api.edenai.run/v2/info/provider_subfeatures";
-
 /** Eden AI platform fee (5.5%) applied on top of provider prices */
 const PLATFORM_FEE_MULTIPLIER = 1.055;
 
-const edenAiSubfeatureSchema = z.object({
-  provider: z.object({ name: z.string() }),
-  feature: z.object({ name: z.string() }),
-  subfeature: z.object({ name: z.string() }),
-  pricings: z.array(
-    z.object({
-      model_name: z.string().nullish(),
-      price: z.string(),
-      price_unit_quantity: z.number(),
-      price_unit_type: z.string(),
-    }),
-  ),
-});
-
-/** Items are validated one by one so a single odd entry can't sink the run. */
-const edenAiResponseSchema = z.array(z.looseObject({}));
+/** Seconds per pricing unit for duration-priced STT entries. */
+const STT_UNIT_SECONDS: Record<string, number> = {
+  second: 1,
+  seconde: 1,
+  minute: 60,
+};
 
 /**
- * Fetch TTS/STT pricing from Eden AI's public provider_subfeatures API.
- * Returns maps of providerModel → USD per unit (per char for TTS, per second for STT).
+ * Fetch one subfeature's catalog: model key (model string minus prefix) →
+ * USD per base unit. `unitMultipliers` maps an accepted price_unit_type to
+ * base units (TTS: character → 1; STT: second → 1, minute → 60); entries in
+ * any other unit (e.g. per-minute TTS) are skipped.
+ */
+async function fetchEdenAiCatalog(
+  url: string,
+  prefix: string,
+  unitMultipliers: Record<string, number>,
+  logger: EndpointLogger,
+): Promise<{ prices: Map<string, number>; error?: string }> {
+  const prices = new Map<string, number>();
+  try {
+    // oxlint-disable-next-line restricted/no-raw-fetch -- external API
+    const response = await fetch(url, {
+      headers: { Accept: "application/json" },
+    });
+    if (!response.ok) {
+      logger.debug("Eden AI API returned non-OK", {
+        url,
+        status: response.status,
+      });
+      return {
+        prices,
+        error: `Eden AI API returned ${response.status.toString()} for ${url}`,
+      };
+    }
+
+    const parsedList = edenAiInfoSchema.safeParse(await response.json());
+    if (!parsedList.success) {
+      return {
+        prices,
+        error: `Eden AI API returned an unexpected shape: ${parsedList.error.message}`,
+      };
+    }
+
+    // Items are validated one by one so a single odd entry can't sink the run.
+    for (const rawItem of parsedList.data.models) {
+      const parsedItem = edenAiInfoModelSchema.safeParse(rawItem);
+      if (!parsedItem.success || !parsedItem.data.model.startsWith(prefix)) {
+        continue;
+      }
+      const { model, pricing } = parsedItem.data;
+      const unitMultiplier = unitMultipliers[pricing.price_unit_type];
+      const price =
+        typeof pricing.price === "number"
+          ? pricing.price
+          : Number.parseFloat(pricing.price);
+      const qty = pricing.price_unit_quantity * (unitMultiplier ?? 0);
+      if (!Number.isFinite(price) || price <= 0 || qty <= 0) {
+        continue;
+      }
+      const key = model.slice(prefix.length);
+      // USD per character (TTS) or per second (STT), plus platform fee
+      const usdPerUnit = (price / qty) * PLATFORM_FEE_MULTIPLIER;
+      prices.set(key, usdPerUnit);
+      logger.debug("Eden AI price", { model, usdPerUnit });
+    }
+  } catch (err) {
+    const error = parseError(err).message;
+    logger.debug("Eden AI pricing fetch failed", { url, error });
+    return { prices, error };
+  }
+  return { prices };
+}
+
+/**
+ * Fetch TTS/STT pricing from Eden AI's public v3 catalog.
+ * Returns maps of model key → USD per unit (per char for TTS, per second for STT).
  */
 async function fetchEdenAiPricing(logger: EndpointLogger): Promise<{
   tts: Map<string, number>;
   stt: Map<string, number>;
   error?: string;
 }> {
-  const tts = new Map<string, number>();
-  const stt = new Map<string, number>();
-
-  try {
-    // oxlint-disable-next-line restricted/no-raw-fetch
-    const response = await fetch(API_URL, {
-      headers: { Accept: "application/json" },
-    });
-    if (!response.ok) {
-      logger.debug("Eden AI API returned non-OK", {
-        status: response.status,
-      });
-      return {
-        tts,
-        stt,
-        error: `Eden AI API returned ${response.status.toString()}`,
-      };
-    }
-
-    const parsedList = edenAiResponseSchema.safeParse(await response.json());
-    if (!parsedList.success) {
-      return {
-        tts,
-        stt,
-        error: `Eden AI API returned an unexpected shape: ${parsedList.error.message}`,
-      };
-    }
-
-    for (const rawItem of parsedList.data) {
-      const parsedItem = edenAiSubfeatureSchema.safeParse(rawItem);
-      if (!parsedItem.success) {
-        continue;
-      }
-      const item = parsedItem.data;
-      const provider = item.provider.name;
-      const subfeature = item.subfeature.name;
-
-      // TTS: look for audio.text_to_speech entries with char-based pricing
-      if (
-        item.feature.name === "audio" &&
-        (subfeature === "text_to_speech" || subfeature === "tts")
-      ) {
-        for (const pricing of item.pricings) {
-          if (pricing.price_unit_type === "char") {
-            const price = parseFloat(pricing.price);
-            const qty = pricing.price_unit_quantity;
-            if (!isNaN(price) && price > 0 && qty > 0) {
-              // Convert to USD per character, add platform fee
-              const usdPerChar = (price / qty) * PLATFORM_FEE_MULTIPLIER;
-              // Use "default" model pricing, keyed by provider name
-              if (!tts.has(provider)) {
-                tts.set(provider, usdPerChar);
-                logger.debug("Eden AI TTS price", {
-                  provider,
-                  model: pricing.model_name ?? "default",
-                  usdPerChar,
-                });
-              }
-            }
-          }
-        }
-      }
-
-      // STT: look for audio.speech_to_text entries with second-based pricing
-      if (
-        item.feature.name === "audio" &&
-        (subfeature === "speech_to_text_async" ||
-          subfeature === "speech_to_text")
-      ) {
-        for (const pricing of item.pricings) {
-          if (
-            pricing.price_unit_type === "seconde" ||
-            pricing.price_unit_type === "second"
-          ) {
-            const price = parseFloat(pricing.price);
-            const qty = pricing.price_unit_quantity;
-            if (!isNaN(price) && price > 0 && qty > 0) {
-              // Convert to USD per second, add platform fee
-              const usdPerSec = (price / qty) * PLATFORM_FEE_MULTIPLIER;
-              if (!stt.has(provider)) {
-                stt.set(provider, usdPerSec);
-                logger.debug("Eden AI STT price", {
-                  provider,
-                  model: pricing.model_name ?? "default",
-                  usdPerSec,
-                });
-              }
-            }
-          }
-        }
-      }
-    }
-  } catch (err) {
-    const error = parseError(err).message;
-    logger.debug("Eden AI pricing fetch failed", { error });
-    return { tts, stt, error };
-  }
-
-  return { tts, stt };
+  const [tts, stt] = await Promise.all([
+    fetchEdenAiCatalog(
+      EDEN_AI_URLS.ttsInfo,
+      EDEN_AI_TTS_MODEL_PREFIX,
+      { character: 1, char: 1 },
+      logger,
+    ),
+    fetchEdenAiCatalog(
+      EDEN_AI_URLS.sttInfo,
+      EDEN_AI_STT_MODEL_PREFIX,
+      STT_UNIT_SECONDS,
+      logger,
+    ),
+  ]);
+  const error = [tts.error, stt.error].filter(Boolean).join("; ");
+  return {
+    tts: tts.prices,
+    stt: stt.prices,
+    error: error || undefined,
+  };
 }
 
 export class EdenAiPriceFetcher extends PriceFetcher {
@@ -186,7 +171,9 @@ export class EdenAiPriceFetcher extends PriceFetcher {
           providerConfig.apiProvider === ApiProvider.EDEN_AI_TTS &&
           "creditCostPerCharacter" in providerConfig
         ) {
-          const usd = tts.get(providerConfig.providerModel);
+          const usd = tts.get(
+            parseEdenAiTtsProviderModel(providerConfig.providerModel).modelKey,
+          );
           if (usd === undefined) {
             failures.push({
               modelId: providerConfig.id,
@@ -201,7 +188,7 @@ export class EdenAiPriceFetcher extends PriceFetcher {
             provider: ApiProvider.EDEN_AI_TTS,
             field: "creditCostPerCharacter",
             value: this.usdToCredits(usd),
-            source: API_URL,
+            source: EDEN_AI_URLS.ttsInfo,
             providerModel: providerConfig.providerModel,
           });
         } else if (
@@ -223,7 +210,7 @@ export class EdenAiPriceFetcher extends PriceFetcher {
             provider: ApiProvider.EDEN_AI_STT,
             field: "creditCostPerSecond",
             value: this.usdToCredits(usd),
-            source: API_URL,
+            source: EDEN_AI_URLS.sttInfo,
             providerModel: providerConfig.providerModel,
           });
         }

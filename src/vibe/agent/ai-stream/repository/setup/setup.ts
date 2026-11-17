@@ -78,6 +78,7 @@ import {
   type BridgeContext,
   ModalityResolver,
 } from "../core/modality-resolver";
+import { computeOutputCap } from "../core/output-cost-cap";
 import { AbortControllerSetup } from "../core/stream";
 import { StreamControl } from "../core/stream-control";
 import { transitionStreamingState } from "../core/streaming-state";
@@ -424,6 +425,8 @@ export interface StreamSetupResult {
   effectiveLeadId: string | undefined;
   isIncognito: boolean;
   modelCost: number;
+  /** Spendable credits (free + paid) at validation time */
+  creditBalance: number;
   effectiveThreadId: string | null | undefined;
   effectiveParentMessageId: string | null | undefined;
   effectiveContent: string;
@@ -1246,11 +1249,25 @@ export async function setupAiStream(params: {
     tools,
     compactTrigger: effectiveCompactTrigger,
   });
-  if (!inputGate.allowed) {
+  // ...and leave room for a minimal answer: the output is capped per step
+  // by the remaining balance (output-cost-cap.ts), so a wallet that pays the
+  // input but not MIN_AFFORDABLE_OUTPUT_TOKENS would only buy a cut-off reply.
+  const outputCap = computeOutputCap({
+    model: modelConfig,
+    modelCost,
+    remainingCredits: creditBalance,
+    inputTokens: inputGate.inputTokens,
+  });
+  if (!inputGate.allowed || outputCap.kind === "unaffordable") {
+    const requiredCredits =
+      outputCap.kind === "unaffordable"
+        ? Math.max(outputCap.requiredCredits, inputGate.inputCredits)
+        : inputGate.inputCredits;
     logger.debug("[Setup] Input cost exceeds balance", {
       model: modelConfig.id,
       inputTokens: inputGate.inputTokens,
       inputCredits: inputGate.inputCredits,
+      requiredCredits,
       balance: creditBalance,
     });
     // A refused turn leaves nothing behind, like the flat check that runs
@@ -1274,7 +1291,7 @@ export async function setupAiStream(params: {
     }
     return fail({
       message: aiStreamT("route.errors.insufficientCredits", {
-        cost: inputGate.inputCredits.toString(),
+        cost: requiredCredits.toString(),
         balance: creditBalance.toString(),
       }),
       errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
@@ -1385,6 +1402,7 @@ export async function setupAiStream(params: {
       effectiveLeadId,
       isIncognito,
       modelCost,
+      creditBalance,
       effectiveThreadId,
       effectiveParentMessageId,
       effectiveContent,

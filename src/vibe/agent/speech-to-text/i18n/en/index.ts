@@ -203,7 +203,6 @@ export const translations = {
         "No speech-to-text provider is configured. Add OPENAI_API_KEY, EDEN_AI_API_KEY, or DEEPGRAM_API_KEY, or connect a system inference provider.",
       notConfigured:
         "{{label}} is not configured. Add {{envKey}} to your .env file. Get your key at {{url}}",
-      providerResultMissing: "Provider {{provider}} returned no result",
       audioTooShort:
         "Recording too short. Hold the button longer and speak clearly.",
       noAudioFile: "No audio file provided",

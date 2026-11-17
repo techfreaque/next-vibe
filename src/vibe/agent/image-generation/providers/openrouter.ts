@@ -45,6 +45,8 @@ interface OpenRouterImageData {
 interface OpenRouterImagesResponse {
   data?: OpenRouterImageData[];
   error?: { message?: string; code?: number };
+  /** Real charge of the call in USD (no markup). */
+  usage?: { cost?: number };
 }
 
 /** Coerce the provider-reported media type to a safe image mime. */
@@ -71,7 +73,7 @@ export async function generateWithOpenRouter(params: {
   inputMediaUrl?: string | null;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ imageUrl: string }>> {
+}): Promise<ResponseType<{ imageUrl: string; upstreamCostUsd?: number }>> {
   const {
     providerModel,
     prompt,
@@ -191,8 +193,11 @@ export async function generateWithOpenRouter(params: {
       });
     }
 
-    logger.debug("[OpenRouter Image] Image generated successfully");
-    return success({ imageUrl });
+    logger.debug("[OpenRouter Image] Image generated successfully", {
+      upstreamCostUsd: data.usage?.cost ?? null,
+    });
+    // The real charge (usage.cost) is billed x markup by the repository.
+    return success({ imageUrl, upstreamCostUsd: data.usage?.cost });
   } catch (error) {
     const errorMessage = parseError(error).message;
     logger.error("[OpenRouter Image] Request failed", { error: errorMessage });

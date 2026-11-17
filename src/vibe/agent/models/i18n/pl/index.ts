@@ -74,7 +74,7 @@ export const translations: typeof enTranslations = {
         "Filtry bezpieczeństwa dużych firm. Omija drażliwe tematy.",
       openHelp: "Lekkie filtry. Podejmie większość drażliwych tematów.",
       uncensoredHelp:
-        "Dwa rodzaje. Z usuniętymi odmowami: modele z głównego nurtu, które przestały się wykręcać, ten sam światopogląd. UncensoredLM: własny tuning i światopogląd, polityka pod prąd mainstreamu.",
+        "Dwa rodzaje. Z usuniętymi odmowami: modele z głównego nurtu, które przestały się wykręcać, ten sam światopogląd. UncensoredLM: trenowany na książkach i dokumentach zakazanych w mainstreamowym internecie, polityka pod prąd mainstreamu.",
     },
   },
   sort: {
@@ -309,6 +309,10 @@ export const translations: typeof enTranslations = {
     ELEVENLABS_JOSH: "Josh",
     ELEVENLABS_BELLA: "Bella",
     ELEVENLABS_ADAM: "Adam",
+    ELEVENLABS_RACHEL_TURBO: "Rachel (Turbo)",
+    ELEVENLABS_JOSH_TURBO: "Josh (Turbo)",
+    ELEVENLABS_BELLA_TURBO: "Bella (Turbo)",
+    ELEVENLABS_ADAM_TURBO: "Adam (Turbo)",
     KOKORO_BELLA: "Bella (Kokoro)",
     KOKORO_SARAH: "Sarah (Kokoro)",
     KOKORO_NICOLE: "Nicole (Kokoro)",

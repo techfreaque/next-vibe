@@ -970,6 +970,8 @@ export const translations = {
         "Wan 3.0 - Alibaba's video model with native audio and clips up to 30 seconds.",
       seedance2Mini:
         "Seedance 2.0 Mini - ByteDance's budget video model with native audio at 480p and 720p.",
+      seedance25Flash:
+        "Seedance 2.5 Flash - ByteDance's fast Seedance 2.5 with native audio, clips up to 30 seconds at 480p and 720p.",
       hailuo3Max:
         "Hailuo 3 Max - MiniMax's faster, cheaper Hailuo 3 variant at 768p, no audio.",
       runwayGen45:

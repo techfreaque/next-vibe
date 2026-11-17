@@ -30,7 +30,7 @@ import { API_UNLOCK_PATH, getApiAccessPrices } from "@/api-keys/access";
 import { ApiKeyAuth } from "@/api-keys/auth";
 import { userApiKeys } from "@/api-keys/db";
 import apiKeysEndpoints from "@/api-keys/definition";
-import { resetRateLimit } from "@/api-keys/keys";
+import { generateApiKey, resetRateLimit } from "@/api-keys/keys";
 import { resetPaidCache } from "@/api-keys/paid";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
@@ -144,6 +144,18 @@ async function createKey(user: JwtPrivatePayloadType, name: string): Promise<{ i
   });
   expect(res.success, JSON.stringify(res)).toBe(true);
   return res.success ? { id: res.data.id, key: res.data.key } : { id: "", key: "" };
+}
+
+/** A key a free account holds from before keys became paid-only */
+async function legacyKey(user: JwtPrivatePayloadType, name: string): Promise<string> {
+  const generated = generateApiKey();
+  await db.insert(userApiKeys).values({
+    userId: user.id,
+    name,
+    keyPrefix: generated.keyPrefix,
+    hashedKey: generated.hashedKey,
+  });
+  return generated.plaintext;
 }
 
 function anonymous(): JWTPublicPayloadType {
@@ -525,7 +537,6 @@ describe("coding-agent formats", () => {
         const request = v1Request("/messages/count_tokens", { "x-api-key": key }, {});
         const out = await V1CountTokensRepository.count({
           data: {
-            action: "count_tokens",
             model: "claude-sonnet-4-5",
             system: "You are a coding agent.",
             messages: [{ role: "user", content: "Read notes.txt and summarize it." }],
@@ -566,15 +577,14 @@ describe("coding-agent formats", () => {
   });
   describe("402 paid_plan_required (free account)", () => {
     function expectGuidance(message: string): void {
-      const { packPrice } = getApiAccessPrices(defaultLocale);
-      expect(message).toContain("any plan or a one-time credit pack");
-      expect(message).toContain(`(${packPrice})`);
+      const { subPrice } = getApiAccessPrices(defaultLocale);
+      expect(message).toContain(`any plan, from ${subPrice} a month`);
       expect(message).toContain(`http://localhost/${defaultLocale}/${API_UNLOCK_PATH}`);
     }
 
     it("Responses format: OpenAI envelope, stable code, message says what to buy and where", async () => {
       resetPaidCache(free.user.id);
-      const { key } = await createKey(free.user, "free-responses");
+      const key = await legacyKey(free.user, "free-responses");
       const res = await responsesCall({ Authorization: `Bearer ${key}` }, { model: toolModelId }, textRunner);
       expect(res.status).toBe(402);
       const body = (await res.json()) as { error: { code: string; type: string; message: string } };
@@ -584,7 +594,7 @@ describe("coding-agent formats", () => {
 
     it("Anthropic format: billing_error, no retry, message says what to buy and where", async () => {
       resetPaidCache(free.user.id);
-      const { key } = await createKey(free.user, "free-messages");
+      const key = await legacyKey(free.user, "free-messages");
       const res = await messagesCall({ "x-api-key": key }, { model: toolModelId }, textRunner);
       expect(res.status).toBe(402);
       expect(res.headers.get("x-should-retry")).toBe("false");

@@ -52,6 +52,14 @@ export interface StreamLoopParams {
   logger: EndpointLogger;
   t: AiStreamT;
   toolExecutionContext: ToolExecutionContext;
+  /**
+   * Spendable credits (free + paid) when the turn started. Each step's
+   * maxOutputTokens and the stop-before-next-step check are bounded by this
+   * minus what the turn already spent (core/output-cost-cap.ts).
+   */
+  creditBalance: number;
+  /** Flat pre-check cost of the model (0 = free model: never capped). */
+  modelCost: number;
   /** Cap on tool-call rounds for this stream (ai-run maxTurns). Defaults to MAX_TOOL_CALLS. */
   maxToolCalls?: number;
   imageSize?: string;

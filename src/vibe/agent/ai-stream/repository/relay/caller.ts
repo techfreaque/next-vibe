@@ -25,6 +25,7 @@ import { remoteConnections } from "next-vibe/remote-connection/db";
 import { z } from "zod";
 
 import { getEndpoint } from "@/generated/endpoints/endpoint";
+import { CREDIT_VALUE_USD } from "@/products/constants";
 
 import { DefaultFolderId } from "../../../../core/execution-context";
 import { getDefaultToolIdsForUser } from "../../../chat/constants";
@@ -35,7 +36,7 @@ import {
 } from "../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
 import { getEnvAvailability } from "../../../env-availability";
-import { ApiProvider } from "../../../models/models";
+import { ApiProvider, chargeForProviderCredits } from "../../../models/models";
 import { getChatModelForUser } from "../../models";
 import type {
   AiStreamPostRequestOutput,
@@ -580,18 +581,47 @@ export async function runRelayBranch(
   //    the relayed turn succeeded.
   //  - remote-folder relay: the thread belongs to the receiver and the loop runs
   //    there — only that instance bills. The originator does NOT deduct.
-  if (!isRemoteFolderRelay && originatorModelCost && originatorModelCost > 0) {
+  // The originator's real cost is what the provider charged it for the turn
+  // (totalCreditsDeducted, credits at the same value): billed x markup. A
+  // provider that reports no charge falls back to the listed estimate.
+  const providerChargedCredits = relayResult.data.totalCreditsDeducted ?? 0;
+  const originatorCharge =
+    originatorModelCost === null
+      ? 0
+      : providerChargedCredits > 0
+        ? chargeForProviderCredits(providerChargedCredits)
+        : originatorModelCost;
+  if (
+    !isRemoteFolderRelay &&
+    originatorModelCost !== null &&
+    originatorModelCost > 0 &&
+    !(providerChargedCredits > 0)
+  ) {
+    logger.warn(
+      "[Relay] Provider reported no charge - billing listed estimate",
+      { model: data.model, originatorModelCost },
+    );
+  }
+  if (!isRemoteFolderRelay && originatorCharge > 0) {
     const { CreditRepository } = await import("@/credits/repository");
     const { scopedTranslation: creditsScopedT } =
       await import("@/credits/i18n");
     const { t: creditsT } = creditsScopedT.scopedT(locale);
     await CreditRepository.deductCreditsForModelUsage(
       user,
-      originatorModelCost,
+      originatorCharge,
       data.model,
       logger,
       creditsT,
       locale,
+      providerChargedCredits > 0
+        ? {
+            upstreamCostUsd: providerChargedCredits * CREDIT_VALUE_USD,
+            fallbackCostUsd: 0,
+            upstreamProvider: remoteTarget.instanceId,
+            billingBasis: "upstream_cost",
+          }
+        : undefined,
     ).catch((err: Error) => {
       logger.error("[Relay] originator inference-provider deduction failed", {
         error: err.message,

@@ -13,9 +13,12 @@
 
 import "server-only";
 
+import { AsyncLocalStorage } from "node:async_hooks";
+
 import { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import type { ApiProvider } from "../../../models/models";
 import { logProviderRequest } from "./debug-file-logger";
 import { processStreamingResponseWithToolCalls } from "./streaming-tool-call-processor";
 import {
@@ -25,6 +28,7 @@ import {
   type OpenAIMessage,
   type OpenAITool,
 } from "./tool-calling-prompt-engineering";
+import { readVeniceCostUsd, upstreamCostMetadata } from "./upstream-cost";
 
 export type JSONValue =
   | string
@@ -64,6 +68,102 @@ export interface PromptEngineeredProviderConfig {
   extraBodyFields?: (
     parsedBody: OpenAIRequestBody,
   ) => Record<string, JSONValue>;
+  /**
+   * Set when the provider reports the real cost of each call (Venice
+   * `cost.usd`): the cost is attached to the call's provider metadata under
+   * this key, so the call bills real cost x markup (see upstream-cost.ts).
+   */
+  upstreamCostProvider?: ApiProvider.VENICE_AI;
+}
+
+/** The real cost one model call reported, filled in by the custom fetch. */
+interface UpstreamCostCapture {
+  costUsd: number | null;
+}
+
+/**
+ * Per-call cost capture: each doGenerate/doStream runs its fetch inside its
+ * own store, so concurrent calls on one model never mix their costs.
+ */
+const upstreamCostCalls = new AsyncLocalStorage<UpstreamCostCapture>();
+
+type ChatConfig = ConstructorParameters<typeof OpenAIChatLanguageModel>[1];
+type CallOptions = Parameters<OpenAIChatLanguageModel["doStream"]>[0];
+type GenerateResult = Awaited<
+  ReturnType<OpenAIChatLanguageModel["doGenerate"]>
+>;
+type StreamResult = Awaited<ReturnType<OpenAIChatLanguageModel["doStream"]>>;
+type StreamPart =
+  StreamResult["stream"] extends ReadableStream<infer Part> ? Part : never;
+
+/**
+ * OpenAI chat model that attaches the call's reported upstream cost to the
+ * result / finish part provider metadata. The OpenAI chat model's response
+ * schema strips unknown fields (like Venice's `cost`), so the custom fetch
+ * captures it on the side.
+ */
+class UpstreamCostChatModel extends OpenAIChatLanguageModel {
+  private readonly costProvider: ApiProvider.VENICE_AI;
+
+  constructor(
+    modelId: string,
+    chatConfig: ChatConfig,
+    costProvider: ApiProvider.VENICE_AI,
+  ) {
+    super(modelId, chatConfig);
+    this.costProvider = costProvider;
+  }
+
+  override async doGenerate(options: CallOptions): Promise<GenerateResult> {
+    const capture: UpstreamCostCapture = { costUsd: null };
+    const result = await upstreamCostCalls.run(capture, () =>
+      super.doGenerate(options),
+    );
+    const costMetadata = upstreamCostMetadata(
+      this.costProvider,
+      capture.costUsd,
+    );
+    return costMetadata
+      ? {
+          ...result,
+          providerMetadata: { ...result.providerMetadata, ...costMetadata },
+        }
+      : result;
+  }
+
+  override async doStream(options: CallOptions): Promise<StreamResult> {
+    const capture: UpstreamCostCapture = { costUsd: null };
+    const result = await upstreamCostCalls.run(capture, () =>
+      super.doStream(options),
+    );
+    const costProvider = this.costProvider;
+    return {
+      ...result,
+      stream: result.stream.pipeThrough(
+        new TransformStream<StreamPart, StreamPart>({
+          transform(part, controller): void {
+            // The cost chunk precedes the finish part (the tool-call
+            // processor holds the finish until usage arrives).
+            const costMetadata =
+              part.type === "finish"
+                ? upstreamCostMetadata(costProvider, capture.costUsd)
+                : undefined;
+            controller.enqueue(
+              costMetadata && part.type === "finish"
+                ? {
+                    ...part,
+                    providerMetadata: {
+                      ...part.providerMetadata,
+                      ...costMetadata,
+                    },
+                  }
+                : part,
+            );
+          },
+        }),
+      ),
+    };
+  }
 }
 
 /**
@@ -110,6 +210,11 @@ export function createPromptEngineeredProvider(
     const bodyString = JSON.stringify(requestBody);
     logProviderRequest(config.logTag, bodyString);
 
+    // Read here (inside the calling doGenerate/doStream), before any await.
+    const costCapture = config.upstreamCostProvider
+      ? upstreamCostCalls.getStore()
+      : undefined;
+
     const response = await fetchImpl(input, { ...init, body: bodyString });
 
     if (!response.ok) {
@@ -129,6 +234,9 @@ export function createPromptEngineeredProvider(
     if (parsedBody.stream !== true) {
       // Non-streaming: pass the JSON body through unchanged.
       const jsonResponse = await response.json();
+      if (costCapture) {
+        costCapture.costUsd = readVeniceCostUsd(jsonResponse);
+      }
       return new Response(JSON.stringify(jsonResponse), {
         status: response.status,
         statusText: response.statusText,
@@ -141,20 +249,30 @@ export function createPromptEngineeredProvider(
       logger,
       config.label,
       config.waitForUsage,
+      costCapture
+        ? (chunk): void => {
+            costCapture.costUsd =
+              readVeniceCostUsd(chunk) ?? costCapture.costUsd;
+          }
+        : undefined,
     );
   };
 
+  const chatConfig: ChatConfig = {
+    provider: config.provider,
+    headers: (): Record<string, string> => ({
+      "Content-Type": "application/json",
+      // eslint-disable-next-line i18next/no-literal-string
+      Authorization: `Bearer ${config.apiKey}`,
+    }),
+    url: config.url,
+    fetch: customFetch as typeof fetch,
+  };
+  const costProvider = config.upstreamCostProvider;
   return {
     chat: (modelId: string): OpenAIChatLanguageModel =>
-      new OpenAIChatLanguageModel(modelId, {
-        provider: config.provider,
-        headers: (): Record<string, string> => ({
-          "Content-Type": "application/json",
-          // eslint-disable-next-line i18next/no-literal-string
-          Authorization: `Bearer ${config.apiKey}`,
-        }),
-        url: config.url,
-        fetch: customFetch as typeof fetch,
-      }),
+      costProvider
+        ? new UpstreamCostChatModel(modelId, chatConfig, costProvider)
+        : new OpenAIChatLanguageModel(modelId, chatConfig),
   };
 }

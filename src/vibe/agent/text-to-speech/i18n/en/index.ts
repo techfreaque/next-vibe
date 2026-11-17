@@ -128,6 +128,14 @@ export const translations = {
         "ElevenLabs Bella - Warm female voice with soft delivery",
       elevenlabsAdam:
         "ElevenLabs Adam - Professional male voice for content creation",
+      elevenlabsRachelTurbo:
+        "ElevenLabs Rachel Turbo - Same voice on v4 Turbo. Half the price, near-instant replies.",
+      elevenlabsJoshTurbo:
+        "ElevenLabs Josh Turbo - Same voice on v4 Turbo. Half the price, near-instant replies.",
+      elevenlabsBellaTurbo:
+        "ElevenLabs Bella Turbo - Same voice on v4 Turbo. Half the price, near-instant replies.",
+      elevenlabsAdamTurbo:
+        "ElevenLabs Adam Turbo - Same voice on v4 Turbo. Half the price, near-instant replies.",
       kokoroBella:
         "Kokoro Bella - Open-weight 82M model, warm American female voice. No content filter.",
       kokoroSarah:

@@ -30,6 +30,26 @@ export function emitDelta(
 }
 
 /**
+ * Replace a still-streaming message's content (SET, not append) and schedule
+ * the DB write. Used when a garbled provider attempt is thrown away mid-stream
+ * and a retry's answer takes its place. `content-done` is the only event that
+ * SETs content; `isStreaming: true` keeps the message in its streaming state.
+ */
+export function emitContentReplaced(
+  w: DbWriterState,
+  messageId: string,
+  content: string,
+): void {
+  w.deps.wsEmit("content-done", {
+    urlPathParams: { threadId: w.lastThreadId ?? "" },
+    responseData: {
+      messages: [{ id: messageId, content, metadata: { isStreaming: true } }],
+    },
+  });
+  w.engine.scheduleUpdate(messageId, content);
+}
+
+/**
  * Create a new ASSISTANT message: emit MESSAGE_CREATED + CONTENT_DELTA SSE,
  * then insert into DB.
  */

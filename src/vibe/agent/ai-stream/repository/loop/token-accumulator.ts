@@ -21,6 +21,10 @@ import {
   upstreamCostToCredits,
 } from "../../../models/models";
 import type { ChatModelOption } from "../../models";
+import type {
+  ImageVisionModelOption,
+  VideoVisionModelOption,
+} from "../../vision-models";
 import type { ToolExecutionContextImpl } from "../core/stream";
 
 /** The per-step token counters these ops read and write on the stream context. */
@@ -71,17 +75,35 @@ export interface TurnCharge {
 }
 
 /**
+ * Token-priced models whose provider reports the REAL charge of every call:
+ * OpenRouter (`usage.cost`; it load-balances a model across endpoints up to
+ * ~5x pricier than the cheapest one we list), NanoGPT (`usage.cost` /
+ * `x_nanogpt_pricing`) and Venice (`cost.usd`). The NanoGPT and Venice
+ * providers surface it as provider metadata `{ <apiProvider>: { usage: { cost } } }`,
+ * the same shape OpenRouter uses.
+ */
+const UPSTREAM_COST_PROVIDERS: ReadonlySet<ApiProvider> = new Set([
+  ApiProvider.OPENROUTER,
+  ApiProvider.NANO_GPT,
+  ApiProvider.VENICE_AI,
+]);
+
+/** Model shapes the actual-cost rules bill (chat + vision bridge models). */
+export type UpstreamBilledModel =
+  | ChatModelOption
+  | ImageVisionModelOption
+  | VideoVisionModelOption;
+
+/**
  * Models billed by the provider's REAL per-step cost x markup instead of the
- * listed token price. OpenRouter load-balances a model across endpoints up to
- * ~5x pricier than the cheapest one we list, and returns the real charge as
- * usage.cost on every step. Other providers return no reliable cost.
- * Media / per-message priced models keep their fixed price.
+ * listed token price (see UPSTREAM_COST_PROVIDERS). Other providers return no
+ * reliable cost. Media / per-message priced models keep their fixed price.
  */
 export function billsUpstreamCost(
   modelConfig: Pick<ChatModelOption, "apiProvider" | "creditCost">,
 ): boolean {
   return (
-    modelConfig.apiProvider === ApiProvider.OPENROUTER &&
+    UPSTREAM_COST_PROVIDERS.has(modelConfig.apiProvider) &&
     typeof modelConfig.creditCost === "function"
   );
 }
@@ -173,16 +195,23 @@ export function estimateCutOffStepCost(
   };
 }
 
-/** OpenRouter's per-step usage.cost + serving endpoint from provider metadata. */
+/**
+ * A step's real upstream usage.cost + serving endpoint from provider metadata
+ * (OpenRouter, or the NanoGPT / Venice cost the providers attach under their
+ * ApiProvider key). OpenRouter wins when several are present.
+ */
 export function readStepUpstreamCost(
   providerMetadata: ProviderMetadata | undefined,
 ): StepUpstreamCost {
-  const openrouter = providerMetadata?.openrouter;
+  const costKey = [...UPSTREAM_COST_PROVIDERS].find(
+    (key) => providerMetadata?.[key]?.usage !== undefined,
+  );
+  const entry = costKey ? providerMetadata?.[costKey] : undefined;
   const provider =
-    typeof openrouter?.provider === "string" && openrouter.provider !== ""
-      ? openrouter.provider
+    typeof entry?.provider === "string" && entry.provider !== ""
+      ? entry.provider
       : null;
-  const usage = openrouter?.usage;
+  const usage = entry?.usage;
   const reportedUsage = usage ?? null;
   if (
     usage === null ||
@@ -281,7 +310,7 @@ export class TokenAccumulator {
    */
   static recordUpstreamCost(
     ctx: TokenCounters,
-    modelConfig: ChatModelOption,
+    modelConfig: UpstreamBilledModel,
     step: StepTokens,
     upstream: StepUpstreamCost,
     logger: EndpointLogger,
@@ -330,7 +359,7 @@ export class TokenAccumulator {
    */
   static resolveCharge(
     ctx: TokenCounters,
-    modelConfig: ChatModelOption,
+    modelConfig: UpstreamBilledModel,
     tokens: StepTokens,
   ): TurnCharge {
     if (billsUpstreamCost(modelConfig) && ctx.upstreamCostSteps > 0) {
@@ -361,11 +390,31 @@ export class TokenAccumulator {
   }
 
   /**
-   * Charge for ONE standalone model call outside the turn loop (compacting):
-   * same actual-cost rules, with throwaway counters.
+   * Credits the finished steps of this turn will be charged (not yet
+   * deducted: model usage is billed once at turn end). 0 before any step.
+   */
+  static spentCredits(
+    ctx: TokenCounters,
+    modelConfig: ChatModelOption,
+  ): number {
+    if (ctx.tokenStepCount === 0) {
+      return 0;
+    }
+    return TokenAccumulator.resolveCharge(ctx, modelConfig, {
+      inputTokens: ctx.tokenUncachedInput + ctx.tokenCachedInput,
+      outputTokens: ctx.tokenOutput,
+      cachedInputTokens: ctx.tokenCachedInput,
+      cacheWriteTokens: ctx.tokenCacheWrite,
+      imageOutputTokens: ctx.tokenImageOutput,
+    }).credits;
+  }
+
+  /**
+   * Charge for ONE standalone model call outside the turn loop (compacting,
+   * /v1, describe-image/video): same actual-cost rules, with throwaway counters.
    */
   static chargeSingleCall(
-    modelConfig: ChatModelOption,
+    modelConfig: UpstreamBilledModel,
     tokens: StepTokens,
     providerMetadata: ProviderMetadata | undefined,
     logger: EndpointLogger,

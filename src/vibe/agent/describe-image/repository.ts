@@ -29,10 +29,11 @@ import {
   type BridgeContext,
   ModalityResolver,
 } from "../ai-stream/repository/core/modality-resolver";
+import { describeWithVisionFallback } from "../ai-stream/repository/handlers/vision-describe";
+import { TokenAccumulator } from "../ai-stream/repository/loop/token-accumulator";
 import { chatSettings } from "../chat/settings/db";
 import { mimeFromUrl } from "../chat/storage/url-utils";
 import { getEnvAvailability } from "../env-availability";
-import { calculateCreditCost } from "../models/models";
 import { VISION_MINIMUM_BALANCE } from "../shared/constants";
 import { createFixtureDownload } from "../shared/fixture-download";
 import {
@@ -74,10 +75,11 @@ export class DescribeImageRepository {
       : await DescribeImageRepository.buildBridgeContext(userId);
 
     // Resolve vision model
+    const availability = await getEnvAvailability();
     const visionModel = ModalityResolver.resolveImageVisionModel(
       bridgeContext,
       user,
-      await getEnvAvailability(),
+      availability,
     );
     if (!visionModel) {
       return fail({
@@ -129,51 +131,81 @@ export class DescribeImageRepository {
     }
 
     try {
-      const visionProvider = ProviderFactory.getProviderForModel(
-        visionModel,
+      const outcome = await describeWithVisionFallback({
+        model: visionModel,
+        resolveFallback: (failedId) =>
+          ModalityResolver.resolveImageVisionFallback(
+            failedId,
+            user,
+            availability,
+          ),
         logger,
-        toolExecutionContext,
-      );
-
-      const result = await aiGenerateText({
-        model: visionProvider.chat(visionModel.providerModel) as LanguageModel,
-        // Media the model can't take by URL is downloaded through the
-        // fixture chain, never the AI SDK's global fetch.
-        experimental_download: createFixtureDownload(
-          toolExecutionContext,
-          logger,
-        ),
-        messages: [
-          {
-            role: "user" as const,
-            content: [
-              // An explicit image media type: a bare image part reaches
-              // OpenRouter as a generic "file" the model can't see.
+        logTag: "[DescribeImage]",
+        run: (model) =>
+          aiGenerateText({
+            model: ProviderFactory.getProviderForModel(
+              model,
+              logger,
+              toolExecutionContext,
+            ).chat(model.providerModel) as LanguageModel,
+            // Media the model can't take by URL is downloaded through the
+            // fixture chain, never the AI SDK's global fetch.
+            experimental_download: createFixtureDownload(
+              toolExecutionContext,
+              logger,
+            ),
+            messages: [
               {
-                type: "file" as const,
-                data: inlineFile ? inlineFile.base64 : new URL(fileReference),
-                mediaType: inlineFile?.mimeType ?? mimeFromUrl(data.fileUrl),
-              },
-              {
-                type: "text" as const,
-                text: data.context
-                  ? `${data.context}\n\nDescribe this image in detail.`
-                  : "Describe this image in detail. Be comprehensive - include colors, objects, text, layout, and any notable features.",
+                role: "user" as const,
+                content: [
+                  // An explicit image media type: a bare image part reaches
+                  // OpenRouter as a generic "file" the model can't see.
+                  {
+                    type: "file" as const,
+                    data: inlineFile
+                      ? inlineFile.base64
+                      : new URL(fileReference),
+                    mediaType:
+                      inlineFile?.mimeType ?? mimeFromUrl(data.fileUrl),
+                  },
+                  {
+                    type: "text" as const,
+                    text: data.context
+                      ? `${data.context}\n\nDescribe this image in detail.`
+                      : "Describe this image in detail. Be comprehensive - include colors, objects, text, layout, and any notable features.",
+                  },
+                ],
               },
             ],
-          },
-        ],
+          }),
       });
-
-      const description = result.text.trim();
-      const creditCost = calculateCreditCost(
-        visionModel,
-        result.usage.inputTokens ?? 0,
-        result.usage.outputTokens ?? 0,
-      );
+      if (!outcome.ok) {
+        return fail({
+          message: t("post.errors.descriptionFailed", {
+            error: outcome.reason,
+          }),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
+      }
+      const { result, model: usedModel, text: description } = outcome;
+      // Same rule as chat turns: providers that report the call's real cost
+      // (OpenRouter, NanoGPT, Venice) bill it x markup; others (or a missing
+      // cost, logged) bill the listed token price.
+      const { credits: creditCost, upstreamCost } =
+        TokenAccumulator.chargeSingleCall(
+          usedModel,
+          {
+            inputTokens: result.usage.inputTokens ?? 0,
+            outputTokens: result.usage.outputTokens ?? 0,
+            cachedInputTokens: 0,
+            cacheWriteTokens: 0,
+          },
+          result.providerMetadata,
+          logger,
+        );
 
       logger.debug("[DescribeImage] Description generated", {
-        modelId: visionModel.id,
+        modelId: usedModel.id,
         textLength: description.length,
         creditCost,
       });
@@ -183,10 +215,11 @@ export class DescribeImageRepository {
         const deductResult = await CreditRepository.deductCreditsForModelUsage(
           user,
           creditCost,
-          visionModel.id,
+          usedModel.id,
           logger,
           tCredits,
           locale,
+          upstreamCost,
         );
         if (!deductResult.success) {
           logger.error("[DescribeImage] Failed to deduct credits", {
@@ -201,7 +234,7 @@ export class DescribeImageRepository {
 
       return success({
         text: description,
-        model: visionModel.id,
+        model: usedModel.id,
         creditCost,
       });
     } catch (error) {

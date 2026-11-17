@@ -44,9 +44,12 @@ import {
 import { DEFAULT_VIDEO_GEN_MODEL_SELECTION } from "../../../video-generation/constants";
 import type { VideoGenModelSelection } from "../../../video-generation/models";
 import {
+  AUDIO_VISION_FALLBACK_MODEL_IDS,
   DEFAULT_AUDIO_VISION_MODEL_SELECTION,
   DEFAULT_IMAGE_VISION_MODEL_SELECTION,
   DEFAULT_VIDEO_VISION_MODEL_SELECTION,
+  IMAGE_VISION_FALLBACK_MODEL_IDS,
+  VIDEO_VISION_FALLBACK_MODEL_IDS,
 } from "../../constants";
 import {
   type ChatModelId,
@@ -58,6 +61,9 @@ import type { AiStreamT } from "../../stream/i18n";
 import {
   type AudioVisionModelId,
   type AudioVisionModelOption,
+  filterAudioVisionModels,
+  filterImageVisionModels,
+  filterVideoVisionModels,
   getBestAudioVisionModel,
   getBestImageVisionModel,
   getBestVideoVisionModel,
@@ -402,6 +408,66 @@ export class ModalityResolver {
       (sel, u, avail) => getBestSttModel(sel, u, avail),
       user,
       availability,
+    );
+  }
+
+  /**
+   * First available fallback model (by priority list) that is not the model
+   * that just failed. Null when no other candidate is servable.
+   */
+  private static pickFallback<TId extends string, TOption extends { id: TId }>(
+    priority: readonly TId[],
+    available: TOption[],
+    failedId: string,
+  ): TOption | null {
+    for (const id of priority) {
+      if (id === failedId) {
+        continue;
+      }
+      const option = available.find((m) => m.id === id);
+      if (option) {
+        return option;
+      }
+    }
+    return null;
+  }
+
+  /** Second-chance image vision model after `failedId` refused or failed. */
+  static resolveImageVisionFallback(
+    failedId: string,
+    user: JwtPayloadType,
+    availability: AgentEnvAvailability,
+  ): ImageVisionModelOption | null {
+    return this.pickFallback(
+      IMAGE_VISION_FALLBACK_MODEL_IDS,
+      filterImageVisionModels(null, user, availability),
+      failedId,
+    );
+  }
+
+  /** Second-chance video vision model after `failedId` refused or failed. */
+  static resolveVideoVisionFallback(
+    failedId: string,
+    user: JwtPayloadType,
+    availability: AgentEnvAvailability,
+  ): VideoVisionModelOption | null {
+    return this.pickFallback(
+      VIDEO_VISION_FALLBACK_MODEL_IDS,
+      filterVideoVisionModels(null, user, availability),
+      failedId,
+    );
+  }
+
+  /** Second-chance audio vision model after `failedId` refused or failed. */
+  static resolveAudioVisionFallback(
+    failedId: string,
+    user: JwtPayloadType,
+    availability: AgentEnvAvailability,
+  ): AudioVisionModelOption | null {
+    return this.pickFallback(
+      AUDIO_VISION_FALLBACK_MODEL_IDS,
+      filterAudioVisionModels(null, user, availability),
+      failedId,
     );
   }
 

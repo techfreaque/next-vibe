@@ -384,11 +384,17 @@ export class GapFillExecutor {
               return part;
             }
 
+            // Never hand the bridge's failure sentinel to the model as if it
+            // were the description: say plainly that the media was not seen.
+            const text = isBridgeFail(description)
+              ? `[${modality} could not be described: ${getBridgeFailReason(description)}. You have not seen this ${modality}; do not guess its content.]`
+              : description;
+
             return {
               ...p,
               output: {
                 type: "json" as const,
-                value: { ...outputValue, text: description },
+                value: { ...outputValue, text },
               },
             };
           }),
@@ -432,7 +438,7 @@ export class GapFillExecutor {
       fallbackText = `[${args.label} attachment: processing cancelled]`;
     } else if (isBridgeFail(bridgeResult)) {
       const reason = getBridgeFailReason(bridgeResult);
-      fallbackText = `[${args.label} attachment: ${args.failDescriptor} model failed to process this file (${reason}). Try switching to a different vision model in settings, or describe the image manually.]`;
+      fallbackText = `[${args.label} attachment: ${args.failDescriptor} model failed to process this file (${reason}). You have not seen this ${args.label}: tell the user it could not be described and do not guess its content. They can switch the vision model in settings or describe it manually.]`;
     } else {
       return {
         type: "text" as const,

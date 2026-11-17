@@ -38,6 +38,20 @@ describe("TTS charge per voice", () => {
     expect(calculateTtsCharge(rate, 1000, undefined)).toBe(10.4);
   });
 
+  it("bills the same ElevenLabs voice on v4 Turbo at half the v4 rate", () => {
+    const v4 = ttsModelOptions.find(
+      (o) => o.id === TtsModelId.ELEVENLABS_RACHEL && o.apiProvider === ApiProvider.ELEVENLABS,
+    );
+    const turbo = ttsModelOptions.find(
+      (o) => o.id === TtsModelId.ELEVENLABS_RACHEL_TURBO && o.apiProvider === ApiProvider.ELEVENLABS,
+    );
+    expect(v4?.providerModel).toBe("eleven_v4:21m00Tcm4TlvDq8ikWAM");
+    expect(turbo?.providerModel).toBe("eleven_v4_turbo:21m00Tcm4TlvDq8ikWAM");
+    const rate = ttsRate(TtsModelId.ELEVENLABS_RACHEL_TURBO, ApiProvider.ELEVENLABS);
+    expect(rate.creditCostPerCharacter).toBe(0.004);
+    expect(calculateTtsCharge(rate, 1000, undefined)).toBe(5.2);
+  });
+
   it("bills a cheap Kokoro voice at its own rate, rounded up to 0.1", () => {
     const rate = ttsRate(TtsModelId.KOKORO_BELLA, ApiProvider.NANO_GPT);
     // 1000 x 0.00017 x 1.3 = 0.221 -> 0.3

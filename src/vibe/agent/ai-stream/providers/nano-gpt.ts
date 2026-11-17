@@ -23,6 +23,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { agentEnv } from "../../env";
 import { ApiProvider } from "../../models/models";
 import { logProviderRequest } from "./shared/debug-file-logger";
+import { nanoGptCostExtractor } from "./shared/upstream-cost";
 
 const NANO_GPT_BASE_URL = "https://api.nano-gpt.com/api/v1";
 
@@ -83,6 +84,9 @@ export function createNanoGPT(
           Authorization: `Bearer ${agentEnv.NANO_GPT_API_KEY}`,
         }),
         includeUsage: true,
+        // Real per-call cost (x_nanogpt_pricing / usage.cost) -> provider
+        // metadata, so the call bills real cost x markup.
+        metadataExtractor: nanoGptCostExtractor,
         url: ({ path }) => `${NANO_GPT_BASE_URL}${path}`,
         fetch: customFetch as typeof fetch,
       }),

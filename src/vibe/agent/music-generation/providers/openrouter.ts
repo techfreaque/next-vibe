@@ -19,6 +19,8 @@ interface OpenRouterAudioChunk {
     delta?: { content?: string | null; audio?: { data?: string } };
   }>;
   error?: { message: string; code?: number };
+  /** Final chunk: real charge of the call in USD (no markup). */
+  usage?: { cost?: number };
 }
 
 /**
@@ -34,7 +36,7 @@ export async function generateMusicWithOpenRouter(params: {
   locale: CountryLanguage;
   /** Fixture-aware fetch bound once per generation (see createFixtureFetch). */
   fetchImpl: typeof globalThis.fetch;
-}): Promise<ResponseType<{ audioUrl: string }>> {
+}): Promise<ResponseType<{ audioUrl: string; upstreamCostUsd?: number }>> {
   const { providerModel, prompt, durationSeconds, logger, locale, fetchImpl } =
     params;
   const { t } = scopedTranslation.scopedT(locale);
@@ -92,6 +94,7 @@ export async function generateMusicWithOpenRouter(params: {
     }
 
     let audioBase64 = "";
+    let upstreamCostUsd: number | undefined;
     for (const line of rawText.split("\n")) {
       if (!line.startsWith("data: {")) {
         continue;
@@ -109,6 +112,7 @@ export async function generateMusicWithOpenRouter(params: {
         });
       }
       audioBase64 += chunk.choices?.[0]?.delta?.audio?.data ?? "";
+      upstreamCostUsd = chunk.usage?.cost ?? upstreamCostUsd;
     }
 
     if (!audioBase64) {
@@ -121,10 +125,15 @@ export async function generateMusicWithOpenRouter(params: {
 
     logger.debug("[OpenRouter Music] Clip generated", {
       bytes: Math.floor((audioBase64.length * 3) / 4),
+      upstreamCostUsd: upstreamCostUsd ?? null,
     });
     // Lyria returns MP3 (ID3). The repository re-uploads to storage when the
     // call belongs to a thread; standalone calls play the inline clip.
-    return success({ audioUrl: `data:audio/mpeg;base64,${audioBase64}` });
+    // The real charge (usage.cost) is billed x markup by the repository.
+    return success({
+      audioUrl: `data:audio/mpeg;base64,${audioBase64}`,
+      upstreamCostUsd,
+    });
   } catch (error) {
     const errorMessage = parseError(error).message;
     logger.error("[OpenRouter Music] Request failed", { error: errorMessage });

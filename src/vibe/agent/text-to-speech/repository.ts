@@ -29,26 +29,22 @@ import { getStorageAdapter } from "../chat/storage/index";
 import { agentEnv } from "../env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "../env-availability";
 import { getEnvAvailability } from "../env-availability";
+import {
+  EDEN_AI_URLS,
+  edenAiErrorMessage,
+  edenAiTtsResponseSchema,
+  parseEdenAiCost,
+  parseEdenAiTtsProviderModel,
+} from "../models/eden-ai";
 import { ApiProvider, calculateTtsCreditCost } from "../models/models";
 import { ModelSelectionType } from "../skills/enum";
 import type {
   TextToSpeechPostRequestOutput,
   TextToSpeechPostResponseOutput,
 } from "./definition";
+import { parseElevenLabsProviderModel } from "./elevenlabs";
 import type { TextToSpeechT } from "./i18n";
 import { calculateTtsCharge, getBestTtsModel } from "./models";
-
-interface EdenAITTSResponse {
-  [provider: string]: {
-    audio_resource_url?: string;
-    cost?: number;
-    error?: {
-      message?: string;
-      type?: string;
-    };
-    status?: string;
-  };
-}
 
 /**
  * Text-to-Speech Repository - Static class pattern
@@ -221,15 +217,12 @@ export class TextToSpeechRepository {
   }
 
   /**
-   * Convert text to speech via Eden AI TTS API
-   * providerModel = "openai" (the Eden AI provider name)
-   * voiceGender = "MALE" | "FEMALE" based on voiceMeta
+   * Convert text to speech via Eden AI TTS (API v3, POST /v3/universal-ai).
+   * providerModel = "<provider>/<model>:<voice>" (e.g. "openai/tts-1:nova").
    */
   private static async callEdenAITTS(
     text: string,
     providerModel: string,
-    voiceGender: "MALE" | "FEMALE",
-    language: string,
     logger: EndpointLogger,
     t: TextToSpeechT,
     fetchImpl: typeof globalThis.fetch,
@@ -242,35 +235,25 @@ export class TextToSpeechRepository {
       });
     }
 
-    logger.debug("[TTS] Calling Eden AI TTS API", {
-      provider: providerModel,
-      gender: voiceGender,
-      language,
-    });
+    const { model, voice } = parseEdenAiTtsProviderModel(providerModel);
+    logger.debug("[TTS] Calling Eden AI TTS API", { model, voice });
 
-    const response = await fetchImpl(
-      "https://api.edenai.run/v2/audio/text_to_speech",
-      {
-        method: "POST",
-        headers: {
-          // eslint-disable-next-line i18next/no-literal-string
-          Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          providers: providerModel,
-          text,
-          language: language.toLowerCase(),
-          option: voiceGender,
-        }),
+    const response = await fetchImpl(EDEN_AI_URLS.universalAi, {
+      method: "POST",
+      headers: {
+        // eslint-disable-next-line i18next/no-literal-string
+        Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({ model, input: { text, voice } }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
       logger.error("[TTS] Eden AI TTS API error", {
         status: response.status,
         error: errorText,
+        model,
       });
       return fail({
         message: t("post.errors.conversionFailed", { error: errorText }),
@@ -278,14 +261,27 @@ export class TextToSpeechRepository {
       });
     }
 
-    const responseData = (await response.json()) as EdenAITTSResponse;
-    const providerResult = responseData[providerModel];
+    const parsed = edenAiTtsResponseSchema.safeParse(await response.json());
+    if (!parsed.success) {
+      logger.error("[TTS] Unexpected Eden AI TTS response", {
+        model,
+        error: parsed.error.message,
+      });
+      return fail({
+        message: t("post.errors.providerError", {
+          error: parsed.error.message,
+        }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+    const result = parsed.data;
 
-    if (providerResult?.error || providerResult?.status === "fail") {
+    if (result.status !== "success") {
       const errorMessage =
-        providerResult?.error?.message ?? "Unknown provider error";
+        edenAiErrorMessage(result.error) ?? "Unknown provider error";
       logger.error("[TTS] Eden AI provider error", {
-        provider: providerModel,
+        model,
+        status: result.status,
         error: errorMessage,
       });
       return fail({
@@ -294,9 +290,9 @@ export class TextToSpeechRepository {
       });
     }
 
-    const audioResourceUrl = providerResult?.audio_resource_url;
+    const audioResourceUrl = result.output?.audio_resource_url;
     if (!audioResourceUrl) {
-      logger.error("[TTS] No audio URL in Eden AI response", { providerModel });
+      logger.error("[TTS] No audio URL in Eden AI response", { model });
       return fail({
         message: t("post.errors.noAudioUrl"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
@@ -315,13 +311,13 @@ export class TextToSpeechRepository {
     // Eden AI reports what it charged us; billing prefers it over the list rate.
     return success({
       audioUrl: audioResult.data,
-      costUsd: providerResult?.cost,
+      costUsd: parseEdenAiCost(result.cost),
     });
   }
 
   /**
    * Convert text to speech via ElevenLabs API
-   * providerModel = voice ID (e.g., "21m00Tcm4TlvDq8ikWAM")
+   * providerModel = "<model_id>:<voice_id>" (e.g. "eleven_v4:21m00Tcm4TlvDq8ikWAM")
    */
   private static async callElevenLabsTTS(
     text: string,
@@ -338,12 +334,11 @@ export class TextToSpeechRepository {
       });
     }
 
-    logger.debug("[TTS] Calling ElevenLabs TTS API", {
-      voiceId: providerModel,
-    });
+    const { modelId, voiceId } = parseElevenLabsProviderModel(providerModel);
+    logger.debug("[TTS] Calling ElevenLabs TTS API", { modelId, voiceId });
 
     const response = await fetchImpl(
-      `https://api.elevenlabs.io/v1/text-to-speech/${providerModel}`,
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
       {
         method: "POST",
         headers: {
@@ -353,7 +348,7 @@ export class TextToSpeechRepository {
         },
         body: JSON.stringify({
           text,
-          model_id: "eleven_monolingual_v1",
+          model_id: modelId,
         }),
       },
     );
@@ -495,13 +490,9 @@ export class TextToSpeechRepository {
           break;
 
         case ApiProvider.EDEN_AI_TTS: {
-          const gender =
-            modelOption.voiceMeta?.gender === "male" ? "MALE" : "FEMALE";
           const edenResult = await TextToSpeechRepository.callEdenAITTS(
             data.text,
             modelOption.providerModel,
-            gender,
-            language,
             logger,
             t,
             fetchImpl,

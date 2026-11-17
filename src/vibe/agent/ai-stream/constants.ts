@@ -37,10 +37,14 @@ export const DEFAULT_CHAT_MODEL_SELECTION: ChatModelSelection = {
 
 /**
  * Default image vision model selection - for bridging image attachments to text.
+ * Uncensored on purpose: a mainstream vision model refuses (or silently
+ * sanitizes) images the user's chosen model would happily discuss. DeepSeek
+ * V4.1 Flash Uncensored: native image input, 4 provider routes (NanoGPT +
+ * Venice), ~$0.001-0.002 per description (smoke-tested 2026-11-17).
  */
 export const DEFAULT_IMAGE_VISION_MODEL_SELECTION: ImageVisionModelSelection = {
   selectionType: ModelSelectionType.MANUAL,
-  manualModelId: ImageVisionModelId.GEMINI_3_PRO_IMAGE_PREVIEW,
+  manualModelId: ImageVisionModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
   sortBy: ModelSortField.INTELLIGENCE,
   sortDirection: ModelSortDirection.DESC,
   sortBy2: ModelSortField.PRICE,
@@ -70,3 +74,32 @@ export const DEFAULT_AUDIO_VISION_MODEL_SELECTION: AudioVisionModelSelection = {
   sortBy2: ModelSortField.PRICE,
   sortDirection2: ModelSortDirection.ASC,
 };
+
+/**
+ * Second-chance vision models, in priority order. When the resolved vision
+ * model refuses (provider moderation, content filter, a refusal reply) or
+ * fails, the bridge retries ONCE with the first entry that is available and
+ * differs from the model that just failed. Image prefers uncensored models
+ * (a different base model than the default, so a refusal is not repeated),
+ * then a mainstream one as the last resort. Video/audio have no uncensored
+ * model our transports can send those modalities to, so they fall back to
+ * other mainstream multimodal models.
+ */
+export const IMAGE_VISION_FALLBACK_MODEL_IDS: readonly ImageVisionModelId[] = [
+  ImageVisionModelId.GLM_5_3_FLASH_UNCENSORED,
+  ImageVisionModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
+  ImageVisionModelId.GEMMA_4_UNCENSORED,
+  ImageVisionModelId.GEMINI_3_5_FLASH_LITE,
+];
+
+export const VIDEO_VISION_FALLBACK_MODEL_IDS: readonly VideoVisionModelId[] = [
+  VideoVisionModelId.QWEN_3_8_FLASH,
+  VideoVisionModelId.GEMINI_3_5_FLASH_LITE,
+  VideoVisionModelId.GEMINI_3_8_FLASH,
+];
+
+export const AUDIO_VISION_FALLBACK_MODEL_IDS: readonly AudioVisionModelId[] = [
+  AudioVisionModelId.MIMO_V2_6_FLASH,
+  AudioVisionModelId.GEMINI_3_5_FLASH_LITE,
+  AudioVisionModelId.GEMINI_3_8_FLASH,
+];

@@ -1094,6 +1094,8 @@ export class AiStreamRepository {
 
     const {
       isIncognito,
+      modelCost,
+      creditBalance,
       effectiveParentMessageId,
       effectiveContent,
       effectiveRole,
@@ -1807,6 +1809,8 @@ export class AiStreamRepository {
             logger,
             t: aiStreamT,
             toolExecutionContext,
+            creditBalance,
+            modelCost,
             maxToolCalls,
             imageSize: data.imageSize ?? undefined,
             imageQuality: data.imageQuality ?? undefined,

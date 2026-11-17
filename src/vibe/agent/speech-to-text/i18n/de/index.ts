@@ -209,7 +209,6 @@ export const translations: typeof enTranslations = {
         "Kein Spracherkennungs-Anbieter konfiguriert. Hinterlege OPENAI_API_KEY, EDEN_AI_API_KEY oder DEEPGRAM_API_KEY oder verbinde einen System-Inferenzanbieter.",
       notConfigured:
         "{{label}} ist nicht konfiguriert. Füge {{envKey}} zu deiner .env-Datei hinzu. Hol dir deinen Schlüssel unter {{url}}",
-      providerResultMissing: "Anbieter {{provider}} lieferte kein Ergebnis",
       audioTooShort:
         "Aufnahme zu kurz. Halte die Taste länger gedrückt und sprich deutlich.",
       noAudioFile: "Keine Audiodatei bereitgestellt",

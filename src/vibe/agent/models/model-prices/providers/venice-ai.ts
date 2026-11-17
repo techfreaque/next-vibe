@@ -3,6 +3,9 @@
  * Public, keyless model lists:
  * GET https://api.venice.ai/api/v1/models?type=text  (per-1M-token USD)
  * GET https://api.venice.ai/api/v1/models?type=image (USD per generation)
+ * POST https://api.venice.ai/api/v1/video/quote (USD per clip; the video
+ *   list carries no prices, so each Venice video route is quoted per
+ *   resolution at its longest clip and divided back to $/s)
  */
 
 import "server-only";
@@ -11,9 +14,14 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { imageGenModelDefinitions } from "../../../image-generation/models";
+import { videoGenModelDefinitions } from "../../../video-generation/models";
 import type { Modality } from "../../enum";
-import { ApiProvider } from "../../models";
-import type { ProviderPriceResult } from "./base";
+import {
+  ApiProvider,
+  type ModelProviderConfig,
+  type ModelProviderConfigVideoBased,
+} from "../../models";
+import type { ProviderPriceResult, SettingsUpdate } from "./base";
 import { PriceFetcher } from "./base";
 import {
   collectTokenPriceUpdates,
@@ -22,6 +30,7 @@ import {
 
 const MODELS_API_URL = "https://api.venice.ai/api/v1/models?type=text";
 const IMAGE_MODELS_API_URL = "https://api.venice.ai/api/v1/models?type=image";
+const VIDEO_QUOTE_API_URL = "https://api.venice.ai/api/v1/video/quote";
 
 interface VeniceUsdPrice {
   usd?: number;
@@ -71,6 +80,13 @@ function toEntry(model: VeniceModel): TokenPriceEntry | undefined {
     inputs,
     outputs: ["text"],
   };
+}
+
+/** Per-second priced (video) route: only video configs carry this field. */
+function isVideoRoute(
+  config: ModelProviderConfig,
+): config is ModelProviderConfigVideoBased {
+  return config.creditCostPerSecond !== undefined;
 }
 
 export class VenicePriceFetcher extends PriceFetcher {
@@ -150,14 +166,125 @@ export class VenicePriceFetcher extends PriceFetcher {
       }
     }
 
+    const settingsUpdates: SettingsUpdate[] = [];
+    await this.collectVideoPrices(updates, settingsUpdates, failures);
+
     return {
       provider: this.providerName,
       modelsFound: models.length + imageModels.length,
       modelsUpdated: updates.filter((u) => u.field === "inputTokenCost").length,
       updates,
       modalityUpdates,
+      settingsUpdates,
       failures,
     };
+  }
+
+  /**
+   * Venice video routes: quote the longest clip per resolution (quotes are
+   * rounded to the cent, a long clip keeps $/s exact) plus one quote without
+   * a resolution, which is what Venice bills when none is sent (the base
+   * creditCostPerSecond).
+   */
+  private async collectVideoPrices(
+    updates: ProviderPriceResult["updates"],
+    settingsUpdates: SettingsUpdate[],
+    failures: ProviderPriceResult["failures"],
+  ): Promise<void> {
+    for (const def of Object.values(videoGenModelDefinitions)) {
+      for (const providerConfig of def.providers) {
+        if (
+          providerConfig.apiProvider !== ApiProvider.VENICE_AI ||
+          !isVideoRoute(providerConfig)
+        ) {
+          continue;
+        }
+        const seconds = Math.max(
+          ...(providerConfig.supportedDurations?.map(Number) ?? []),
+          providerConfig.maxDurationSeconds ?? 0,
+          providerConfig.defaultDurationSeconds,
+        );
+        const base = await this.quoteVideo(
+          providerConfig.providerModel,
+          seconds,
+          undefined,
+        );
+        if (base === undefined) {
+          failures.push({
+            modelId: providerConfig.id,
+            provider: ApiProvider.VENICE_AI,
+            reason: `No Venice.ai video quote (${providerConfig.providerModel})`,
+          });
+          continue;
+        }
+        updates.push({
+          modelId: providerConfig.id,
+          name: def.name,
+          provider: ApiProvider.VENICE_AI,
+          field: "creditCostPerSecond",
+          value: this.usdToCredits(base / seconds),
+          source: "venice-api",
+          providerModel: providerConfig.providerModel,
+        });
+        const resolutions = providerConfig.supportedResolutions ?? [];
+        if (resolutions.length < 2) {
+          continue;
+        }
+        const creditsByRes: Record<string, number> = {};
+        for (const resolution of resolutions) {
+          const usd = await this.quoteVideo(
+            providerConfig.providerModel,
+            seconds,
+            resolution,
+          );
+          if (usd === undefined) {
+            break;
+          }
+          creditsByRes[resolution] = this.usdToCredits(usd / seconds);
+        }
+        // All or nothing: a partial map would bill missing tiers the base rate.
+        if (Object.keys(creditsByRes).length === resolutions.length) {
+          settingsUpdates.push({
+            providerModel: providerConfig.providerModel,
+            field: "pricingByResolution",
+            tsLiteral: JSON.stringify(creditsByRes),
+            source: "venice-api",
+          });
+        }
+      }
+    }
+  }
+
+  /** USD for one clip, or undefined when Venice gives no usable quote. */
+  private async quoteVideo(
+    model: string,
+    seconds: number,
+    resolution: string | undefined,
+  ): Promise<number | undefined> {
+    try {
+      // oxlint-disable-next-line restricted/no-raw-fetch -- external API
+      const response = await fetch(VIDEO_QUOTE_API_URL, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          duration: `${String(seconds)}s`,
+          ...(resolution ? { resolution } : {}),
+        }),
+      });
+      if (!response.ok) {
+        return undefined;
+      }
+      const data = (await response.json()) as { quote?: number };
+      return typeof data.quote === "number" && data.quote > 0
+        ? data.quote
+        : undefined;
+    } catch {
+      return undefined;
+    }
   }
 
   /** Image list failures only cost the image prices — never the text ones. */

@@ -40,6 +40,10 @@ export enum TtsModelId {
   ELEVENLABS_JOSH = "elevenlabs-josh",
   ELEVENLABS_BELLA = "elevenlabs-bella",
   ELEVENLABS_ADAM = "elevenlabs-adam",
+  ELEVENLABS_RACHEL_TURBO = "elevenlabs-rachel-turbo",
+  ELEVENLABS_JOSH_TURBO = "elevenlabs-josh-turbo",
+  ELEVENLABS_BELLA_TURBO = "elevenlabs-bella-turbo",
+  ELEVENLABS_ADAM_TURBO = "elevenlabs-adam-turbo",
   KOKORO_BELLA = "kokoro-bella",
   KOKORO_SARAH = "kokoro-sarah",
   KOKORO_NICOLE = "kokoro-nicole",
@@ -84,7 +88,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
       {
         id: TtsModelId.OPENAI_ALLOY,
         apiProvider: ApiProvider.EDEN_AI_TTS,
-        providerModel: "openai",
+        providerModel: "openai/tts-1:alloy",
         creditCostPerCharacter: 0.0016, // updated: 2026-11-13 from api.edenai.run
       },
       {
@@ -124,7 +128,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
       {
         id: TtsModelId.OPENAI_NOVA,
         apiProvider: ApiProvider.EDEN_AI_TTS,
-        providerModel: "openai",
+        providerModel: "openai/tts-1:nova",
         creditCostPerCharacter: 0.0016, // updated: 2026-11-13 from api.edenai.run
       },
       {
@@ -164,7 +168,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
       {
         id: TtsModelId.OPENAI_ONYX,
         apiProvider: ApiProvider.EDEN_AI_TTS,
-        providerModel: "openai",
+        providerModel: "openai/tts-1:onyx",
         creditCostPerCharacter: 0.0016, // updated: 2026-11-13 from api.edenai.run
       },
       {
@@ -300,14 +304,14 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
       {
         id: TtsModelId.ELEVENLABS_RACHEL,
         apiProvider: ApiProvider.ELEVENLABS,
-        providerModel: "21m00Tcm4TlvDq8ikWAM",
-        creditCostPerCharacter: 0.008, // updated: 2026-11-13 from elevenlabs.io/pricing/api ($0.08/1K chars)
+        providerModel: "eleven_v4:21m00Tcm4TlvDq8ikWAM",
+        creditCostPerCharacter: 0.008, // updated: 2026-11-17 from elevenlabs.io/pricing/api (v4, $0.08/1K chars)
       },
       {
         id: TtsModelId.ELEVENLABS_RACHEL,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-rachel",
-        creditCostPerCharacter: 0.039, // updated: 2026-11-09 from unbottled.ai
+        creditCostPerCharacter: 0.0104, // updated: 2026-11-17 from unbottled.ai
       },
     ],
   },
@@ -334,14 +338,14 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
       {
         id: TtsModelId.ELEVENLABS_JOSH,
         apiProvider: ApiProvider.ELEVENLABS,
-        providerModel: "TxGEqnHWrfWFTfGW9XjX",
-        creditCostPerCharacter: 0.008, // updated: 2026-11-13 from elevenlabs.io/pricing/api ($0.08/1K chars)
+        providerModel: "eleven_v4:TxGEqnHWrfWFTfGW9XjX",
+        creditCostPerCharacter: 0.008, // updated: 2026-11-17 from elevenlabs.io/pricing/api (v4, $0.08/1K chars)
       },
       {
         id: TtsModelId.ELEVENLABS_JOSH,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-josh",
-        creditCostPerCharacter: 0.039, // updated: 2026-11-09 from unbottled.ai
+        creditCostPerCharacter: 0.0104, // updated: 2026-11-17 from unbottled.ai
       },
     ],
   },
@@ -368,14 +372,14 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
       {
         id: TtsModelId.ELEVENLABS_BELLA,
         apiProvider: ApiProvider.ELEVENLABS,
-        providerModel: "EXAVITQu4vr4xnSDxMaL",
-        creditCostPerCharacter: 0.008, // updated: 2026-11-13 from elevenlabs.io/pricing/api ($0.08/1K chars)
+        providerModel: "eleven_v4:EXAVITQu4vr4xnSDxMaL",
+        creditCostPerCharacter: 0.008, // updated: 2026-11-17 from elevenlabs.io/pricing/api (v4, $0.08/1K chars)
       },
       {
         id: TtsModelId.ELEVENLABS_BELLA,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-bella",
-        creditCostPerCharacter: 0.039, // updated: 2026-11-09 from unbottled.ai
+        creditCostPerCharacter: 0.0104, // updated: 2026-11-17 from unbottled.ai
       },
     ],
   },
@@ -402,14 +406,150 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
       {
         id: TtsModelId.ELEVENLABS_ADAM,
         apiProvider: ApiProvider.ELEVENLABS,
-        providerModel: "pNInz6obpgDQGcFmaJgB",
-        creditCostPerCharacter: 0.008, // updated: 2026-11-13 from elevenlabs.io/pricing/api ($0.08/1K chars)
+        providerModel: "eleven_v4:pNInz6obpgDQGcFmaJgB",
+        creditCostPerCharacter: 0.008, // updated: 2026-11-17 from elevenlabs.io/pricing/api (v4, $0.08/1K chars)
       },
       {
         id: TtsModelId.ELEVENLABS_ADAM,
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "elevenlabs-adam",
-        creditCostPerCharacter: 0.039, // updated: 2026-11-09 from unbottled.ai
+        creditCostPerCharacter: 0.0104, // updated: 2026-11-17 from unbottled.ai
+      },
+    ],
+  },
+  [TtsModelId.ELEVENLABS_RACHEL_TURBO]: {
+    name: "Rachel (Turbo)",
+    by: "elevenlabs",
+    description: "textToSpeech.models.descriptions.elevenlabsRachelTurbo",
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2",
+    inputs: ["text"], // updated: 2026-04-03 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-04-03 from tts-deterministic
+    voiceMeta: { gender: "female", style: "calm", language: "en" },
+    utilities: [ModelUtility.TTS, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: TtsModelId.ELEVENLABS_RACHEL_TURBO,
+        apiProvider: ApiProvider.ELEVENLABS,
+        providerModel: "eleven_v4_turbo:21m00Tcm4TlvDq8ikWAM",
+        creditCostPerCharacter: 0.004, // updated: 2026-11-17 from elevenlabs.io/pricing/api (v4 Turbo, $0.04/1K chars)
+      },
+      {
+        id: TtsModelId.ELEVENLABS_RACHEL_TURBO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "elevenlabs-rachel-turbo",
+        creditCostPerCharacter: 0.0052, // updated: 2026-11-17 from unbottled.ai
+      },
+    ],
+  },
+  [TtsModelId.ELEVENLABS_JOSH_TURBO]: {
+    name: "Josh (Turbo)",
+    by: "elevenlabs",
+    description: "textToSpeech.models.descriptions.elevenlabsJoshTurbo",
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2",
+    inputs: ["text"], // updated: 2026-04-03 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-04-03 from tts-deterministic
+    voiceMeta: { gender: "male", style: "deep", language: "en" },
+    utilities: [ModelUtility.TTS, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: TtsModelId.ELEVENLABS_JOSH_TURBO,
+        apiProvider: ApiProvider.ELEVENLABS,
+        providerModel: "eleven_v4_turbo:TxGEqnHWrfWFTfGW9XjX",
+        creditCostPerCharacter: 0.004, // updated: 2026-11-17 from elevenlabs.io/pricing/api (v4 Turbo, $0.04/1K chars)
+      },
+      {
+        id: TtsModelId.ELEVENLABS_JOSH_TURBO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "elevenlabs-josh-turbo",
+        creditCostPerCharacter: 0.0052, // updated: 2026-11-17 from unbottled.ai
+      },
+    ],
+  },
+  [TtsModelId.ELEVENLABS_BELLA_TURBO]: {
+    name: "Bella (Turbo)",
+    by: "elevenlabs",
+    description: "textToSpeech.models.descriptions.elevenlabsBellaTurbo",
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2",
+    inputs: ["text"], // updated: 2026-04-03 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-04-03 from tts-deterministic
+    voiceMeta: { gender: "female", style: "friendly", language: "en" },
+    utilities: [ModelUtility.TTS, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: TtsModelId.ELEVENLABS_BELLA_TURBO,
+        apiProvider: ApiProvider.ELEVENLABS,
+        providerModel: "eleven_v4_turbo:EXAVITQu4vr4xnSDxMaL",
+        creditCostPerCharacter: 0.004, // updated: 2026-11-17 from elevenlabs.io/pricing/api (v4 Turbo, $0.04/1K chars)
+      },
+      {
+        id: TtsModelId.ELEVENLABS_BELLA_TURBO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "elevenlabs-bella-turbo",
+        creditCostPerCharacter: 0.0052, // updated: 2026-11-17 from unbottled.ai
+      },
+    ],
+  },
+  [TtsModelId.ELEVENLABS_ADAM_TURBO]: {
+    name: "Adam (Turbo)",
+    by: "elevenlabs",
+    description: "textToSpeech.models.descriptions.elevenlabsAdamTurbo",
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2",
+    inputs: ["text"], // updated: 2026-04-03 from tts-deterministic
+    outputs: ["audio"], // updated: 2026-04-03 from tts-deterministic
+    voiceMeta: { gender: "male", style: "authoritative", language: "en" },
+    utilities: [ModelUtility.TTS, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: TtsModelId.ELEVENLABS_ADAM_TURBO,
+        apiProvider: ApiProvider.ELEVENLABS,
+        providerModel: "eleven_v4_turbo:pNInz6obpgDQGcFmaJgB",
+        creditCostPerCharacter: 0.004, // updated: 2026-11-17 from elevenlabs.io/pricing/api (v4 Turbo, $0.04/1K chars)
+      },
+      {
+        id: TtsModelId.ELEVENLABS_ADAM_TURBO,
+        apiProvider: ApiProvider.UNBOTTLED,
+        providerModel: "elevenlabs-adam-turbo",
+        creditCostPerCharacter: 0.0052, // updated: 2026-11-17 from unbottled.ai
       },
     ],
   },

@@ -134,6 +134,14 @@ export const translations: typeof enTranslations = {
       jobFailedStatus: "Zadanie wideo zakończyło się ze statusem: {{status}}",
       requestAborted: "Generowanie wideo zostało przerwane",
       requestTimedOut: "Przekroczono czas oczekiwania na generowanie wideo",
+      contentRejected:
+        "Filtr treści dostawcy wideo odrzucił ten prompt: {{error}}. To odmowa, nie awaria. Przeredaguj prompt albo wybierz model z mniejszą cenzurą. Nie pobrano kredytów.",
+      providerOutage:
+        "Dostawca wideo ma teraz awarię lub jest przeciążony: {{error}}. To awaria, nie odmowa. Spróbuj ponownie za minutę albo wybierz inny model. Nie pobrano kredytów.",
+      consentRequired:
+        "Dostawca wideo wymaga zgody na użycie prawdziwej twarzy z obrazu: {{error}}. Użyj obrazu bez twarzy prawdziwej osoby albo wybierz inny model wideo. Nie pobrano kredytów.",
+      storageFailed:
+        "Wideo powstało, ale nie udało się go zapisać. Nie pobrano kredytów. Spróbuj ponownie.",
       creditsFailed: "Nie udało się odjąć kredytów za generowanie wideo",
       inputMediaRequired:
         "Ten model wymaga URL obrazu wejściowego. Wklej link do obrazu, który chcesz animować.",

@@ -427,10 +427,38 @@ export async function complete(
       creditCost: actualCreditCost,
     });
 
-    // The turn created a message but never answered (reasoning-only, or tool
-    // calls with no reply): without this the user sees a blank/thinking-only
-    // bubble with a charge. content-filter already showed its own message.
-    if (isEmptyAnswer && finishReason !== "content-filter") {
+    // The wallet ran out: the output hit its balance cap, or the tool loop
+    // stopped before a step it could not pay. Say so instead of leaving a
+    // cut-off (or blank) reply unexplained.
+    const budgetCut =
+      ctx.creditBudgetStopped ||
+      (ctx.creditBudgetCapped && finishReason === "length");
+    if (budgetCut) {
+      logger.info("[AI Stream] Turn cut short by the remaining balance", {
+        threadId,
+        model,
+        finishReason: finishReason ?? null,
+        loopStopped: ctx.creditBudgetStopped,
+        steps: ctx.tokenStepCount,
+        creditCost: actualCreditCost,
+      });
+      await ctx.dbWriter.emitErrorMessage({
+        threadId,
+        errorType: StreamErrorType.STREAM_ERROR,
+        error: fail({
+          message: t("errors.creditBudgetReached"),
+          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+        }),
+        content: t("errors.creditBudgetReached"),
+        parentId: ctx.lastParentId,
+        sequenceId: ctx.lastSequenceId,
+        user,
+      });
+    } else if (isEmptyAnswer && finishReason !== "content-filter") {
+      // The turn created a message but never answered (reasoning-only, or
+      // tool calls with no reply): without this the user sees a
+      // blank/thinking-only bubble with a charge. content-filter already
+      // showed its own message.
       logger.warn("[AI Stream] Turn ended without answer text", {
         threadId,
         model,

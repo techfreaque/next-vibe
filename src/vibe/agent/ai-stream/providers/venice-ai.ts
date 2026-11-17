@@ -2,7 +2,8 @@
  * Venice.ai Provider
  * OpenAI-compatible endpoint that emulates tool calling via prompt engineering
  * (native tool calling unsupported for uncensored models). Token-billed, so the
- * streaming processor waits for usage. See the shared factory.
+ * streaming processor waits for usage; the real per-call cost it reports
+ * (`cost.usd`) is billed x markup. See the shared factory.
  */
 
 import "server-only";
@@ -35,6 +36,8 @@ export function createVeniceAI(
     logTag: "venice-ai",
     url: ({ path }) => `https://api.venice.ai/api/v1${path}`,
     waitForUsage: true, // token-based model
+    // Venice reports each call's real cost (cost.usd): bill it x markup.
+    upstreamCostProvider: ApiProvider.VENICE_AI,
     extraBodyFields: (parsedBody): Record<string, JSONValue> => ({
       // Request usage data in streaming responses (omit the key otherwise, to
       // match the prior wire format where `undefined` was dropped by stringify).

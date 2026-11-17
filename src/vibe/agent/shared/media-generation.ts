@@ -23,6 +23,7 @@ import { CreditRepository } from "@/credits/repository";
 import { parseStorageFileRef } from "../chat/storage/storage-url";
 import { mimeFromUrl } from "../chat/storage/url-utils";
 import { ChatFileRepository } from "../chat/threads/files/[threadId]/[filename]/repository";
+import { resolveMediaCharge } from "../models/models";
 
 /** `data:<type>/<subtype>[;params];base64,<payload>` */
 const BASE64_DATA_URI =
@@ -119,6 +120,37 @@ export async function checkMediaBalance(
   }
 
   return success({ tCredits });
+}
+
+/**
+ * Credits a finished media generation is billed: the provider's real
+ * reported cost x markup, else the listed price. A provider that reports its
+ * cost on every call (`reportsUpstreamCost`) but did not this time is logged,
+ * so a missing cost is visible instead of silently billing the list price.
+ */
+export function chargeMediaGeneration(params: {
+  upstreamCostUsd: number | undefined;
+  listedCredits: number;
+  reportsUpstreamCost: boolean;
+  model: string;
+  logTag: string;
+  logger: EndpointLogger;
+}): number {
+  const charge = resolveMediaCharge(
+    params.upstreamCostUsd,
+    params.listedCredits,
+  );
+  if (!charge.fromUpstreamCost && params.reportsUpstreamCost) {
+    params.logger.warn(
+      `[${params.logTag}] Upstream cost missing - billing listed price`,
+      {
+        model: params.model,
+        reportedCostUsd: params.upstreamCostUsd ?? null,
+        listedCredits: params.listedCredits,
+      },
+    );
+  }
+  return charge.credits;
 }
 
 /**

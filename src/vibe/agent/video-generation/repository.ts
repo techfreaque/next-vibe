@@ -24,8 +24,13 @@ import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "../chat/storage/index";
+import {
+  classifyImageProviderError,
+  ImageProviderFailureKind,
+} from "../image-generation/provider-error";
 import { ApiProvider, roundMediaCost } from "../models/models";
 import {
+  chargeMediaGeneration,
   checkMediaBalance,
   deductMediaCredits,
   keepsExplicitMediaModel,
@@ -48,6 +53,56 @@ import {
 import { generateVideoWithModelsLab } from "./providers/modelslab";
 import { generateVideoWithOpenRouter } from "./providers/openrouter";
 import { generateVideoWithUnbottled } from "./providers/unbottled";
+import { generateVideoWithVenice } from "./providers/venice";
+
+/**
+ * What a provider hands back: a URL to download (OpenRouter, ModelsLab,
+ * remote instance) or the finished bytes (Venice: its result is a POST
+ * response / a one-time link, never a URL worth keeping).
+ */
+type GeneratedVideo = {
+  /** Final credits already charged by a remote instance (UNBOTTLED). */
+  creditCost?: number;
+  /** Real upstream USD charge (no markup), when the provider reports one. */
+  upstreamCostUsd?: number;
+  durationSeconds?: number;
+} & (
+  | {
+      videoUrl: string;
+      /** Headers required to download videoUrl (e.g. OpenRouter Bearer auth). */
+      downloadHeaders?: Record<string, string>;
+      videoBytes?: never;
+    }
+  | { videoBytes: Uint8Array; mimeType: string; videoUrl?: never }
+);
+
+/**
+ * A provider failure the user can act on: a content-filter refusal reads
+ * differently from an outage (same classifier as image generation; providers
+ * carry the upstream English reason in the message).
+ */
+function providerFailure(
+  message: string,
+  t: VideoGenerationT,
+): ResponseType<never> {
+  const kind = classifyImageProviderError(message);
+  if (kind === ImageProviderFailureKind.CONTENT_POLICY) {
+    return fail({
+      message: t("post.errors.contentRejected", { error: message }),
+      errorType: ErrorResponseTypes.BAD_REQUEST,
+    });
+  }
+  if (kind === ImageProviderFailureKind.OUTAGE) {
+    return fail({
+      message: t("post.errors.providerOutage", { error: message }),
+      errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+    });
+  }
+  return fail({
+    message: t("post.errors.generationFailed", { error: message }),
+    errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+  });
+}
 
 function parseAspectRatio(r: string): number {
   const [w, h] = r.split(":").map(Number);
@@ -262,13 +317,7 @@ export class VideoGenerationRepository {
       resolvedSeedImageUrl = url;
     }
 
-    let generationResult: ResponseType<{
-      videoUrl: string;
-      creditCost?: number;
-      durationSeconds?: number;
-      /** Headers required to download videoUrl (e.g. OpenRouter Bearer auth). */
-      downloadHeaders?: Record<string, string>;
-    }>;
+    let generationResult: ResponseType<GeneratedVideo>;
     switch (videoModel.apiProvider) {
       case ApiProvider.MODELSLAB:
         generationResult = await generateVideoWithModelsLab({
@@ -319,6 +368,22 @@ export class VideoGenerationRepository {
         });
         break;
 
+      case ApiProvider.VENICE_AI:
+        generationResult = await generateVideoWithVenice({
+          providerModel: videoModel.providerModel,
+          prompt: data.prompt,
+          durationSeconds,
+          aspectRatio,
+          resolution: data.resolution,
+          negativePrompt: data.negativePrompt,
+          generateAudio: videoModel.generateAudio ?? true,
+          inputImageUrl: resolvedSeedImageUrl,
+          logger,
+          locale,
+          fetchImpl,
+        });
+        break;
+
       default:
         return fail({
           message: t("post.errors.providerUnsupported", {
@@ -329,24 +394,24 @@ export class VideoGenerationRepository {
     }
 
     if (!generationResult.success) {
-      return fail({
-        message: t("post.errors.generationFailed", {
-          error: generationResult.message,
-        }),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-      });
+      return providerFailure(generationResult.message, t);
     }
 
-    let { videoUrl } = generationResult.data;
-    const finalDurationSeconds =
-      generationResult.data.durationSeconds ?? durationSeconds;
-    // Provider-reported cost (OpenRouter usage.cost) is raw upstream USD - apply
-    // the standard markup. A 0/missing report falls back to the priced estimate.
-    const reportedCost = generationResult.data.creditCost;
+    const generated = generationResult.data;
+    const finalDurationSeconds = generated.durationSeconds ?? durationSeconds;
+    // Remote instance: what it charged (never marked up twice). Otherwise the
+    // provider's real cost x markup when reported (OpenRouter usage.cost),
+    // else the priced estimate.
     const finalCreditCost =
-      reportedCost !== undefined && reportedCost > 0
-        ? roundMediaCost(reportedCost * (1 + STANDARD_MARKUP_PERCENTAGE))
-        : creditCost;
+      generated.creditCost ??
+      chargeMediaGeneration({
+        upstreamCostUsd: generated.upstreamCostUsd,
+        listedCredits: creditCost,
+        reportsUpstreamCost: videoModel.apiProvider === ApiProvider.OPENROUTER,
+        model: videoModel.id,
+        logTag: "VideoGen",
+        logger,
+      });
 
     // Upload to our storage so the URL is persistent and access-controlled.
     // Incognito threads have no server-side thread row — the file is owned by
@@ -359,23 +424,32 @@ export class VideoGenerationRepository {
     const isLeadOwned = toolExecutionContext.threadId
       ? toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO
       : user.isPublic;
+    // Provider URL fallback for a failed upload; byte results have none.
+    let videoUrl: string | undefined = generated.videoUrl;
     try {
       const storage = getStorageAdapter();
-      // Some providers (OpenRouter) serve the finished video from an authed
-      // endpoint — download WITH the provider's headers, else it 401s and we
-      // store a tiny error JSON as a broken .mp4.
-      const downloadRes = await fetchImpl(videoUrl, {
-        headers: generationResult.data.downloadHeaders,
-      });
-      if (!downloadRes.ok) {
-        // oxlint-disable-next-line restricted/restricted-syntax -- intentional throw to fall through to catch
-        throw new Error(
-          `Video download failed: HTTP ${String(downloadRes.status)}`,
-        );
+      let videoBuffer: Buffer;
+      let ext: string;
+      if (generated.videoBytes) {
+        videoBuffer = Buffer.from(generated.videoBytes);
+        ext = generated.mimeType.includes("webm") ? "webm" : "mp4";
+      } else {
+        // Some providers (OpenRouter) serve the finished video from an authed
+        // endpoint — download WITH the provider's headers, else it 401s and we
+        // store a tiny error JSON as a broken .mp4.
+        const downloadRes = await fetchImpl(generated.videoUrl, {
+          headers: generated.downloadHeaders,
+        });
+        if (!downloadRes.ok) {
+          // oxlint-disable-next-line restricted/restricted-syntax -- intentional throw to fall through to catch
+          throw new Error(
+            `Video download failed: HTTP ${String(downloadRes.status)}`,
+          );
+        }
+        const arrayBuf = await downloadRes.arrayBuffer();
+        videoBuffer = Buffer.from(new Uint8Array(arrayBuf));
+        ext = generated.videoUrl.includes("webm") ? "webm" : "mp4";
       }
-      const arrayBuf = await downloadRes.arrayBuffer();
-      const videoBuffer = Buffer.from(new Uint8Array(arrayBuf));
-      const ext = videoUrl.includes("webm") ? "webm" : "mp4";
       const uploadResult = await storage.uploadFile(videoBuffer, {
         filename: `generated-video-${Date.now()}.${ext}`,
         mimeType: `video/${ext}`,
@@ -390,8 +464,17 @@ export class VideoGenerationRepository {
         {
           error:
             uploadErr instanceof Error ? uploadErr.message : String(uploadErr),
+          hasProviderUrl: generated.videoUrl !== undefined,
         },
       );
+    }
+    // Byte results (Venice) have no URL to fall back to: never bill for a
+    // video the user cannot open, never inline the bytes as a data: URI.
+    if (!videoUrl) {
+      return fail({
+        message: t("post.errors.storageFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
     }
 
     if (videoModel.apiProvider !== ApiProvider.UNBOTTLED) {

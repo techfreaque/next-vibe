@@ -25,7 +25,15 @@ import {
   type AgentEnvAvailability,
   buildMissingKeyMessage,
 } from "../../../env-availability";
+import {
+  EDEN_AI_URLS,
+  edenAiErrorMessage,
+  edenAiTtsResponseSchema,
+  parseEdenAiCost,
+  parseEdenAiTtsProviderModel,
+} from "../../../models/eden-ai";
 import { ApiProvider } from "../../../models/models";
+import { parseElevenLabsProviderModel } from "../../../text-to-speech/elevenlabs";
 import {
   getBestTtsModel,
   TtsChargeMeter,
@@ -458,13 +466,9 @@ export class StreamingTTSHandler {
           return priced(await this.callOpenAITTS(text, modelOption));
 
         case ApiProvider.EDEN_AI_TTS: {
-          const gender =
-            modelOption.voiceMeta?.gender === "male" ? "MALE" : "FEMALE";
           const eden = await this.callEdenAITTS(
             text,
             modelOption.providerModel,
-            gender,
-            language,
           );
           return eden ? priced(eden.audioUrl, eden.costUsd) : null;
         }
@@ -544,67 +548,62 @@ export class StreamingTTSHandler {
   }
 
   /**
-   * Call Eden AI TTS API
+   * Call Eden AI TTS (API v3, POST /v3/universal-ai).
+   * providerModel = "<provider>/<model>:<voice>" (e.g. "openai/tts-1:nova").
    */
   private async callEdenAITTS(
     text: string,
     providerModel: string,
-    voiceGender: "MALE" | "FEMALE",
-    language: string,
   ): Promise<{ audioUrl: string; costUsd: number | undefined } | null> {
-    interface EdenAITTSResponse {
-      [provider: string]: {
-        audio_resource_url?: string;
-        cost?: number;
-        error?: { message?: string };
-        status?: string;
-      };
-    }
-
-    const response = await this.fetchImpl(
-      "https://api.edenai.run/v2/audio/text_to_speech",
-      {
-        method: "POST",
-        headers: {
-          // eslint-disable-next-line i18next/no-literal-string
-          Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          providers: providerModel,
-          text,
-          language: language.toLowerCase(),
-          option: voiceGender,
-        }),
-        signal: AbortSignal.timeout(StreamingTTSHandler.TTS_FETCH_TIMEOUT_MS),
+    const { model, voice } = parseEdenAiTtsProviderModel(providerModel);
+    const response = await this.fetchImpl(EDEN_AI_URLS.universalAi, {
+      method: "POST",
+      headers: {
+        // eslint-disable-next-line i18next/no-literal-string
+        Authorization: `Bearer ${agentEnv.EDEN_AI_API_KEY}`,
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({ model, input: { text, voice } }),
+      signal: AbortSignal.timeout(StreamingTTSHandler.TTS_FETCH_TIMEOUT_MS),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
       this.logger.error("[Streaming TTS] Eden AI TTS API error", {
         status: response.status,
         error: errorText,
+        model,
       });
       return null;
     }
 
-    const responseData = (await response.json()) as EdenAITTSResponse;
-    const providerResult = responseData[providerModel];
+    const parsed = edenAiTtsResponseSchema.safeParse(await response.json());
+    if (!parsed.success) {
+      this.logger.error("[Streaming TTS] Unexpected Eden AI TTS response", {
+        model,
+        error: parsed.error.message,
+      });
+      return null;
+    }
+    const result = parsed.data;
 
-    if (providerResult?.error || providerResult?.status === "fail") {
+    if (result.status !== "success") {
       this.logger.error("[Streaming TTS] Eden AI provider error", {
-        provider: providerModel,
-        error: providerResult?.error?.message,
+        model,
+        status: result.status,
+        error: edenAiErrorMessage(result.error),
       });
       return null;
     }
 
-    const audioResourceUrl = providerResult?.audio_resource_url;
+    const audioResourceUrl = result.output?.audio_resource_url;
     if (!audioResourceUrl) {
-      this.logger.error("[Streaming TTS] No audio URL in Eden AI response");
+      this.logger.error("[Streaming TTS] No audio URL in Eden AI response", {
+        model,
+      });
       return null;
     }
+    const costUsd = parseEdenAiCost(result.cost);
 
     const audioResponse = await this.fetchImpl(audioResourceUrl, {
       signal: AbortSignal.timeout(StreamingTTSHandler.TTS_FETCH_TIMEOUT_MS),
@@ -629,12 +628,12 @@ export class StreamingTTSHandler {
     const base64Audio = Buffer.from(audioBuffer).toString("base64");
     this.logger.debug("[Streaming TTS] Eden AI TTS succeeded", {
       audioSizeBytes: audioBuffer.byteLength,
-      costUsd: providerResult?.cost,
+      costUsd,
     });
     return {
       // eslint-disable-next-line i18next/no-literal-string
       audioUrl: `data:${contentType};base64,${base64Audio}`,
-      costUsd: providerResult?.cost,
+      costUsd,
     };
   }
 
@@ -692,8 +691,9 @@ export class StreamingTTSHandler {
     text: string,
     providerModel: string,
   ): Promise<string | null> {
+    const { modelId, voiceId } = parseElevenLabsProviderModel(providerModel);
     const response = await this.fetchImpl(
-      `https://api.elevenlabs.io/v1/text-to-speech/${providerModel}`,
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
       {
         method: "POST",
         headers: {
@@ -703,7 +703,7 @@ export class StreamingTTSHandler {
         },
         body: JSON.stringify({
           text,
-          model_id: "eleven_monolingual_v1",
+          model_id: modelId,
         }),
         signal: AbortSignal.timeout(StreamingTTSHandler.TTS_FETCH_TIMEOUT_MS),
       },

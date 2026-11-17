@@ -135,6 +135,14 @@ export const translations = {
       jobFailedStatus: "Video job ended with status: {{status}}",
       requestAborted: "Video generation was aborted",
       requestTimedOut: "Timed out waiting for video generation",
+      contentRejected:
+        "Refused by the video provider's content filter: {{error}}. This is a refusal, not an outage. Rephrase the prompt or pick a less filtered model. You were not charged.",
+      providerOutage:
+        "The video provider is down or overloaded right now: {{error}}. This is an outage, not a refusal. Try again in a minute or pick another model. You were not charged.",
+      consentRequired:
+        "The video provider wants a consent confirmation for real faces in the input: {{error}}. Use an image without a real person's face, or pick another video model. You were not charged.",
+      storageFailed:
+        "The video was generated but could not be saved. You were not charged. Try again.",
       creditsFailed: "Failed to deduct credits for video generation",
       inputMediaRequired:
         "This model requires an input image URL. Paste an image link to animate it.",

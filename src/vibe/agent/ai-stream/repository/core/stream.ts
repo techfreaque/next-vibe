@@ -143,6 +143,10 @@ export class ToolExecutionContextImpl {
   forceAnswerNextStep = false;
   /** SDK side: the forced answer step was already granted once this turn. */
   forcedAnswerStepUsed = false;
+  /** A step ran with maxOutputTokens bounded by the wallet (output-cost-cap). */
+  creditBudgetCapped = false;
+  /** stopWhen ended the tool loop: the wallet cannot pay another step. */
+  creditBudgetStopped = false;
 
   /** Text of the last provider `error` stream part (already logged, classified
    *  transient/real, where it arrived). finalize uses it to avoid re-logging a
