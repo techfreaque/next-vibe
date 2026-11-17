@@ -20,15 +20,13 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { Platform } from "next-vibe/platforms/platforms";
 
-import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
-
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "../chat/storage/index";
 import {
   classifyImageProviderError,
   ImageProviderFailureKind,
 } from "../image-generation/provider-error";
-import { ApiProvider, roundMediaCost } from "../models/models";
+import { ApiProvider } from "../models/models";
 import {
   chargeMediaGeneration,
   checkMediaBalance,
@@ -47,6 +45,7 @@ import {
   getVideoGenModelById,
   resolveVideoClipSeconds,
   resolveVideoGenRouteForImageInput,
+  videoClipCredits,
   videoGenModelOptions,
   type VideoGenModelSelection,
 } from "./models";
@@ -235,15 +234,12 @@ export class VideoGenerationRepository {
       });
     }
 
-    // Calculate credit cost - use pricingByResolution override when resolution is selected
-    const perSecondCost =
-      (data.resolution
-        ? videoModel.pricingByResolution?.[data.resolution]
-        : undefined) ?? videoModel.creditCostPerSecond;
-
-    // Rounded UP to 0.1 credit (never under-bills).
-    const creditCost = roundMediaCost(
-      perSecondCost * durationSeconds * (1 + STANDARD_MARKUP_PERCENTAGE),
+    // Per-second rate (resolution override first) x seconds x markup,
+    // rounded UP to 0.1 credit (never under-bills).
+    const creditCost = videoClipCredits(
+      videoModel,
+      durationSeconds,
+      data.resolution,
     );
 
     logger.debug("[VideoGen] Starting video generation", {

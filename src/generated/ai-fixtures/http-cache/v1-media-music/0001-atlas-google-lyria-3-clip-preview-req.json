@@ -1,0 +1,24 @@
+{
+  "url": "https://openrouter.ai/api/v1/chat/completions",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "google/lyria-3-clip-preview",
+    "modalities": [
+      "text",
+      "audio"
+    ],
+    "stream": true,
+    "messages": [
+      {
+        "role": "user",
+        "content": "Short calm piano melody"
+      }
+    ]
+  }
+}

@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
     planItem: "{{name}} {{price}} im Monat für {{credits}} Credits",
     credit:
       "1 Credit = {{creditValue}}. Jede Modellseite nennt den Preis pro Nachricht.",
-    api: "API: OpenAI Chat Completions, OpenAI Responses und Anthropic Messages auf einer Basis-URL ({{apiBaseUrl}}). Voraussetzung ist ein bezahltes Konto: ein beliebiger Tarif, ab {{subPrice}} im Monat. Kostenlose Konten erhalten HTTP 402.",
+    api: "API: OpenAI Chat Completions, OpenAI Responses und Anthropic Messages auf einer Basis-URL ({{apiBaseUrl}}). Derselbe Schlüssel ruft {{mediaCount}} Medienmodelle über Endpunkte im OpenAI-Format auf: /v1/images/generations, /v1/images/edits, /v1/audio/speech, /v1/audio/transcriptions, /v1/audio/translations, /v1/videos, /v1/music (Video und Musik laufen als asynchrone Jobs). Voraussetzung ist ein bezahltes Konto: ein beliebiger Tarif, ab {{subPrice}} im Monat. Kostenlose Konten erhalten HTTP 402.",
     uncensored:
       "Unzensierte Stufe: zwei Arten von Modellen. Abliterierte Modelle sind Mainstream-Modelle, die so verändert wurden, dass sie Fragen nicht mehr ausweichen. Echt unzensierte Modelle wie UncensoredLM sind mit Büchern und Dokumenten trainiert, die im Mainstream-Internet verbannt sind, und vertreten deshalb politische Gegenpositionen. Die unzensierte Stufe erfordert eine einmalige Bestätigung, dass du volljährig bist.",
     openSource:
@@ -33,7 +33,8 @@ export const translations: typeof enTranslations = {
     pricingDesc:
       "Gratis-Credits, die vier Tarife und das Credit-Paket zum Aufstocken",
     api: "API-Dokumentation",
-    apiDesc: "Basis-URL, Authentifizierung, Anfrageformate und Codebeispiele",
+    apiDesc:
+      "Basis-URL, Authentifizierung, Chat- und Medienendpunkte, Codebeispiele",
     blog: "Blog",
     blogDesc: "Anleitungen, Modellvergleiche und Entwicklungsnotizen",
     partners: "Partner",

@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "{{modelCount}} modeli, jedno API: zgodne z OpenAI i Anthropic | {{appName}}",
     description:
-      "Jeden klucz {{appName}} do {{modelCount}} modeli. OpenAI chat completions, Responses API i Anthropic Messages pod jednym endpointem. Działa z Claude Code i Codex CLI.",
+      "Jeden klucz {{appName}} do {{modelCount}} modeli. OpenAI chat completions, Responses API i Anthropic Messages pod jednym endpointem. Działa z Claude Code i Codex CLI. Do tego {{mediaModelCount}} modeli obrazu, głosu, wideo i muzyki w formacie OpenAI.",
     category: "Przewodnik dla programistów",
     imageAlt: "{{appName}}: jeden endpoint API dla każdego modelu",
     keywords:
@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
     readTime: "11 min czytania",
     title: "Jeden klucz API. {{modelCount}} modeli. Trzy formaty.",
     subtitle:
-      "{{appName}} mówi OpenAI chat completions, OpenAI Responses API i Anthropic Messages API pod jednym endpointem. Twoje SDK zostaje. Twoje narzędzia zostają. Zmieniasz tylko adres bazowy.",
+      "{{appName}} mówi OpenAI chat completions, OpenAI Responses API i Anthropic Messages API pod jednym endpointem. Twoje SDK zostaje. Twoje narzędzia zostają. Zmieniasz tylko adres bazowy. Ten sam klucz obsługuje też {{mediaModelCount}} modeli obrazu, głosu, wideo i muzyki.",
   },
   intro: {
     lead: "GPT od OpenAI, Claude od Anthropic, Gemini od Google. Trzy SDK, trzy klucze, trzy rachunki, trzy panele. Albo gorzej: twoje ulubione narzędzie mówi tylko jednym formatem, więc dostaje modele tylko jednego dostawcy.",
@@ -27,9 +27,9 @@ export const translations: typeof enTranslations = {
     accessLink: "Odblokuj API",
   },
   endpoints: {
-    title: "Pięć endpointów, jeden klucz",
+    title: "Wszystkie endpointy, jeden klucz",
     intro:
-      "Każdy endpoint przyjmuje ten sam klucz, pobiera z tego samego salda i obsługuje te same modele.",
+      "Każdy endpoint przyjmuje ten sam klucz i pobiera z tego samego salda. Trzy formaty czatu obsługują te same modele.",
     chat: "POST /v1/chat/completions: OpenAI Chat Completions. Streaming przez SSE zakończony data: [DONE], stream_options.include_usage, wywołania narzędzi. Format, którym mówi prawie każdy klient zgodny z OpenAI.",
     responses:
       "POST /v1/responses: OpenAI Responses API, format, którym mówi Codex CLI. Streaming i narzędzia. Bezstanowe: store ma wartość false, a previous_response_id kończy się błędem 400. Wysyłaj więc pełny input w każdej turze.",
@@ -39,6 +39,8 @@ export const translations: typeof enTranslations = {
       "POST /v1/messages/count_tokens: nie zużywa kredytów. Lokalne oszacowanie bez wywołania modelu, które nie zjada limitu zapytań na minutę. Claude Code woła go non stop, żeby mierzyć swój kontekst.",
     models:
       "GET /v1/models: każdy model, który twój klucz może teraz wywołać, z długością kontekstu, obsługą narzędzi i cenami. Jedna odpowiedź, którą parsują zarówno SDK OpenAI, jak i Anthropic.",
+    media:
+      "Multimedia w formacie OpenAI, {{mediaModelCount}} modeli: POST /v1/images/generations i /v1/images/edits, /v1/audio/speech, /v1/audio/transcriptions i /v1/audio/translations. Wideo (POST /v1/videos) i muzyka (POST /v1/music) działają jako zadania asynchroniczne: start, sprawdzanie, pobranie. GET /v1/models oznacza każdy model jego modality.",
     auth: "Uwierzytelnianie działa na dwa sposoby, na każdym endpoincie. Authorization: Bearer sk-unb-... dla klientów OpenAI i dla Claude Code z ANTHROPIC_AUTH_TOKEN. x-api-key: sk-unb-... dla SDK Anthropic. Klucze zaczynają się od sk-unb-, widzisz je tylko raz, a my przechowujemy wyłącznie hash. Tworzysz je w Ustawienia > Klucze API, do 20 aktywnych kluczy na konto.",
     baseUrlLabel: "Adres bazowy",
     baseUrlNote:
@@ -76,6 +78,15 @@ export const translations: typeof enTranslations = {
       title: "Lista modeli",
       body: "GET /v1/models to źródło prawdy. Pokazuje dokładnie, które ID może wywołać twój klucz, z długością kontekstu, obsługą narzędzi i ceną za token.",
       caption: "Lista modeli przez curl",
+    },
+    media: {
+      title: "Obrazy, głos, wideo, muzyka",
+      body: "Ten sam klucz, ten sam adres bazowy, formaty multimediów OpenAI. Klienci images i audio z SDK OpenAI działają bez zmian. Wybierz w GET /v1/models model z pasującą modality.",
+      imageCaption: "Obraz przez curl",
+      async:
+        "Wideo i muzyka trwają minuty, więc działają jako zadania. POST od razu zwraca ID. Sprawdzaj status za darmo, potem pobierz plik. Nieudane zadanie nic nie kosztuje.",
+      videoCaption: "Start zadania wideo",
+      pollCaption: "Sprawdź status, potem pobierz MP4",
     },
   },
   ids: {
@@ -136,7 +147,9 @@ export const translations: typeof enTranslations = {
     abort:
       "Przy streamingu zamknięcie połączenia zatrzymuje generowanie. Płacisz tylko za to, co się wykonało. Tak samo, gdy dostawca padnie w trakcie streamu.",
     chat: "Czat i API rozliczają się tak samo. OpenRouter rozkłada model na kilku dostawców, a niektórzy biorą więcej niż najtańszy, którego podajemy. Dlatego przy tych modelach cena na liście to szacunek, a usage.credits_charged to prawdziwa kwota. Gdy OpenRouter nie poda kosztu wywołania, liczymy cenę z listy.",
-    paid: "To samo saldo kredytów co w aplikacji czatu, które pokrywa tam też obrazy, wideo, muzykę, głos i wyszukiwanie w sieci. Samo API wymaga płatnego konta: dowolnego planu. Darmowe kredyty go nie odblokowują.",
+    media:
+      "Multimedia rozliczają się tak samo: realny koszt dostawcy plus nasza marża, gdy dostawca go podaje, w innym wypadku cena z listy. Obrazy za sztukę, głos za znaki, transkrypcja za sekundę nagrania, wideo i muzyka dopiero, gdy plik jest gotowy.",
+    paid: "To samo saldo kredytów co w aplikacji czatu. Samo API wymaga płatnego konta: dowolnego planu. Darmowe kredyty go nie odblokowują.",
     sub: "Plany miesięczne: cztery rozmiary, od {{subCredits}} kredytów za {{subPrice}}.",
     pack: "Pakiety kredytów: doładowanie dla subskrybentów, {{packCredits}} kredytów za {{packPrice}}. Nigdy nie wygasają. Karta, PayPal albo krypto.",
     link: "Zobacz plany i ceny",
@@ -214,7 +227,7 @@ export const translations: typeof enTranslations = {
     },
     models: {
       q: "Jakie modele mogę wywołać?",
-      a: "Obecnie {{modelCount}} modeli czatu: Claude, GPT, Gemini, DeepSeek, Kimi, GLM, Qwen i modele niecenzurowane. GET /v1/models wypisuje dokładnie to, co może wywołać twój klucz, z cenami.",
+      a: "Obecnie {{modelCount}} modeli czatu: Claude, GPT, Gemini, DeepSeek, Kimi, GLM, Qwen i modele niecenzurowane. Do tego {{mediaModelCount}} modeli obrazu, wideo, muzyki, głosu i transkrypcji. GET /v1/models wypisuje dokładnie to, co może wywołać twój klucz, z cenami.",
     },
     data: {
       q: "Czy {{appName}} przechowuje moje prompty?",

@@ -1,0 +1,17 @@
+{
+  "url": "https://openrouter.ai/api/v1/videos",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "x-ai/grok-imagine-video-1.5-lite",
+    "prompt": "A red ball bouncing once on a white floor",
+    "duration": 1,
+    "aspect_ratio": "16:9",
+    "resolution": "720p"
+  }
+}

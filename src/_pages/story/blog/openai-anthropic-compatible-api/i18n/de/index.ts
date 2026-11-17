@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "{{modelCount}} Modelle, eine API: OpenAI- und Anthropic-kompatibel | {{appName}}",
     description:
-      "Ein {{appName}}-Key für {{modelCount}} Modelle. OpenAI Chat Completions, Responses API und Anthropic Messages an einem Endpoint. Läuft mit Claude Code und Codex CLI.",
+      "Ein {{appName}}-Key für {{modelCount}} Modelle. OpenAI Chat Completions, Responses API und Anthropic Messages an einem Endpoint. Läuft mit Claude Code und Codex CLI. Dazu {{mediaModelCount}} Bild-, Sprach-, Video- und Musikmodelle im OpenAI-Format.",
     category: "Entwickler-Guide",
     imageAlt: "{{appName}}: ein API-Endpoint für jedes Modell",
     keywords:
@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
     readTime: "11 Min. Lesezeit",
     title: "Ein API-Key. {{modelCount}} Modelle. Drei Wire-Formate.",
     subtitle:
-      "{{appName}} spricht OpenAI Chat Completions, die OpenAI Responses API und die Anthropic Messages API an einem Endpoint. Dein SDK bleibt. Deine Tools bleiben. Nur die Basis-URL ändert sich.",
+      "{{appName}} spricht OpenAI Chat Completions, die OpenAI Responses API und die Anthropic Messages API an einem Endpoint. Dein SDK bleibt. Deine Tools bleiben. Nur die Basis-URL ändert sich. Derselbe Key steuert auch {{mediaModelCount}} Bild-, Sprach-, Video- und Musikmodelle.",
   },
   intro: {
     lead: "GPT bei OpenAI, Claude bei Anthropic, Gemini bei Google. Drei SDKs, drei Keys, drei Rechnungen, drei Dashboards. Oder schlimmer: Dein Lieblingstool spricht nur ein Format und bekommt damit nur die Modelle eines Anbieters.",
@@ -27,9 +27,9 @@ export const translations: typeof enTranslations = {
     accessLink: "API freischalten",
   },
   endpoints: {
-    title: "Fünf Endpoints, ein Key",
+    title: "Alle Endpoints, ein Key",
     intro:
-      "Jeder Endpoint nimmt denselben Key, belastet dasselbe Guthaben und bedient dieselben Modelle.",
+      "Jeder Endpoint nimmt denselben Key und belastet dasselbe Guthaben. Die drei Chat-Formate bedienen dieselben Modelle.",
     chat: "POST /v1/chat/completions: OpenAI Chat Completions. Streaming per SSE mit data: [DONE] am Ende, stream_options.include_usage, Tool Calling. Das Format, das fast jeder OpenAI-kompatible Client spricht.",
     responses:
       "POST /v1/responses: die OpenAI Responses API, das Format von Codex CLI. Streaming und Tools. Zustandslos: store ist false, previous_response_id wird mit 400 abgelehnt. Schick also in jedem Turn den vollständigen Input.",
@@ -39,6 +39,8 @@ export const translations: typeof enTranslations = {
       "POST /v1/messages/count_tokens: kostet keine Credits. Eine lokale Schätzung ohne Modellaufruf, die nicht auf dein Rate-Limit pro Minute zählt. Claude Code ruft das ständig auf, um seinen Kontext zu bemessen.",
     models:
       "GET /v1/models: jedes Modell, das dein Key gerade aufrufen darf, mit Kontextlänge, Tool-Support und Preisen. Ein Response-Body, den die OpenAI- und die Anthropic-SDKs gleichermaßen parsen.",
+    media:
+      "Medien im OpenAI-Format, {{mediaModelCount}} Modelle: POST /v1/images/generations und /v1/images/edits, /v1/audio/speech, /v1/audio/transcriptions und /v1/audio/translations. Video (POST /v1/videos) und Musik (POST /v1/music) laufen als asynchrone Jobs: starten, abfragen, herunterladen. GET /v1/models kennzeichnet jedes Modell mit seiner modality.",
     auth: "Authentifizierung geht auf zwei Arten, an jedem Endpoint. Authorization: Bearer sk-unb-... für OpenAI-Clients und für Claude Code mit ANTHROPIC_AUTH_TOKEN. x-api-key: sk-unb-... für die Anthropic-SDKs. Keys beginnen mit sk-unb-, werden genau einmal angezeigt und nur als Hash gespeichert. Du erstellst sie unter Einstellungen > API-Keys, bis zu 20 aktive Keys pro Konto.",
     baseUrlLabel: "Basis-URL",
     baseUrlNote:
@@ -76,6 +78,15 @@ export const translations: typeof enTranslations = {
       title: "Modelle auflisten",
       body: "GET /v1/models ist die maßgebliche Quelle. Hier siehst du genau, welche IDs dein Key aufrufen darf, mit Kontextlänge, Tool-Support und Preis pro Token.",
       caption: "Modelle auflisten mit curl",
+    },
+    media: {
+      title: "Bilder, Stimme, Video, Musik",
+      body: "Gleicher Key, gleiche Basis-URL, die Medienformate von OpenAI. Die Images- und Audio-Clients des OpenAI-SDKs laufen unverändert. Wähl in GET /v1/models ein Modell mit der passenden modality.",
+      imageCaption: "Bild erzeugen mit curl",
+      async:
+        "Video und Musik brauchen Minuten, deshalb laufen sie als Jobs. POST antwortet sofort mit einer ID. Status kostenlos abfragen, dann die Datei laden. Ein fehlgeschlagener Job kostet nichts.",
+      videoCaption: "Videojob starten",
+      pollCaption: "Status abfragen, dann das MP4 laden",
     },
   },
   ids: {
@@ -136,7 +147,9 @@ export const translations: typeof enTranslations = {
     abort:
       "Beim Streaming gilt: Verbindung schließen stoppt die Generierung. Du zahlst nur, was gelaufen ist. Dasselbe gilt, wenn der Provider mitten im Stream ausfällt.",
     chat: "Chat und API rechnen identisch ab. OpenRouter verteilt ein Modell auf mehrere Hoster, und manche sind teurer als der günstigste, den wir listen. Bei diesen Modellen ist der gelistete Preis deshalb eine Schätzung, usage.credits_charged der echte Betrag. Meldet OpenRouter für einen Aufruf keine Kosten, gilt der gelistete Preis.",
-    paid: "Dasselbe Credit-Guthaben wie in der Chat-App, das dort auch Bild, Video, Musik, Sprache und Websuche abdeckt. Die API selbst braucht ein bezahltes Konto: einen beliebigen Tarif. Gratis-Credits schalten sie nicht frei.",
+    media:
+      "Medien rechnen genauso ab: echte Anbieterkosten plus unser Aufschlag, wo der Anbieter sie meldet, sonst der gelistete Modellpreis. Bilder pro Bild, Sprachausgabe pro Zeichen, Transkription pro Audiosekunde, Video und Musik erst, wenn die Datei fertig ist.",
+    paid: "Dasselbe Credit-Guthaben wie in der Chat-App. Die API selbst braucht ein bezahltes Konto: einen beliebigen Tarif. Gratis-Credits schalten sie nicht frei.",
     sub: "Monatstarife: vier Größen, ab {{subCredits}} Credits für {{subPrice}}.",
     pack: "Credit-Pakete: Aufstockung für Abonnenten, {{packCredits}} Credits für {{packPrice}}. Sie verfallen nie. Karte, PayPal oder Krypto.",
     link: "Tarife und Preise ansehen",
@@ -213,7 +226,7 @@ export const translations: typeof enTranslations = {
     },
     models: {
       q: "Welche Modelle kann ich aufrufen?",
-      a: "Aktuell {{modelCount}} Chat-Modelle: Claude, GPT, Gemini, DeepSeek, Kimi, GLM, Qwen und unzensierte Modelle. GET /v1/models listet genau, was dein Key aufrufen darf, mit Preisen.",
+      a: "Aktuell {{modelCount}} Chat-Modelle: Claude, GPT, Gemini, DeepSeek, Kimi, GLM, Qwen und unzensierte Modelle. Dazu {{mediaModelCount}} Bild-, Video-, Musik-, Sprach- und Transkriptionsmodelle. GET /v1/models listet genau, was dein Key aufrufen darf, mit Preisen.",
     },
     data: {
       q: "Speichert {{appName}} meine Prompts?",

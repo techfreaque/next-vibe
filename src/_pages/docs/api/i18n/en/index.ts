@@ -2,11 +2,11 @@ export const translations = {
   meta: {
     title: "{{appName}} API Docs - OpenAI and Anthropic compatible",
     description:
-      "One base URL, {{modelCount}} models. OpenAI chat completions and Responses API, Anthropic Messages API, streaming, tool calling. Codex CLI and Claude Code connect directly. Pay per token in credits.",
+      "One base URL, {{modelCount}} chat models. OpenAI chat completions and Responses API, Anthropic Messages API, streaming, tool calling. Plus images, speech, transcription, video and music in OpenAI format. Codex CLI and Claude Code connect directly. Pay in credits.",
     category: "API",
     imageAlt: "{{appName}} OpenAI-compatible API docs",
     keywords:
-      "api, openai compatible, anthropic compatible, chat completions, responses api, messages api, codex cli, claude code, streaming, function calling, {{appName}}",
+      "api, openai compatible, anthropic compatible, chat completions, responses api, messages api, codex cli, claude code, streaming, function calling, image generation api, text to speech api, whisper api, video generation api, music generation api, {{appName}}",
   },
   nav: {
     quickstart: "Quickstart",
@@ -20,13 +20,19 @@ export const translations = {
     limits: "Rate limits",
     errors: "Errors",
     codingTools: "Coding tools",
+    images: "Images",
+    speech: "Text to speech",
+    transcriptions: "Transcription",
+    videos: "Video",
+    music: "Music",
+    mediaFiles: "Media files",
   },
   hero: {
     badge: "OpenAI and Anthropic compatible",
     title: "One base URL.",
     titleHighlight: "Every model.",
     subtitle:
-      "Point any OpenAI or Anthropic SDK at {{appName}}. Codex CLI and Claude Code too. {{modelCount}} models, streaming, tool calling. Your key, your credits, no new client to learn.",
+      "Point any OpenAI or Anthropic SDK at {{appName}}. Codex CLI and Claude Code too. {{modelCount}} chat models, streaming, tool calling. Images, voice, video and music on the same key. No new client to learn.",
     ctaKey: "Get an API key",
     ctaPricing: "See plans",
   },
@@ -70,7 +76,7 @@ export const translations = {
     points: {
       hash: "We store a hash, not the key. Lose it and you create a new one.",
       scope:
-        "A key works on the API only: /v1/models, /v1/chat/completions, /v1/responses and /v1/messages. It cannot touch your account, payments or settings.",
+        "A key works on the API only: /v1/models, chat (/v1/chat/completions, /v1/responses, /v1/messages) and media (/v1/images, /v1/audio, /v1/videos, /v1/music, /v1/media). It cannot touch your account, payments or settings.",
       limit:
         "Up to 20 active keys per account. Revoke any key at any time: it stops working at once.",
       missing:
@@ -82,6 +88,19 @@ export const translations = {
     intro:
       "Lists the models your key can call right now, with context size, tool support and credit prices per million tokens. Use the id as the model field in requests.",
     note: "The list depends on your account. Unknown or unavailable ids return 404 model_not_found. The one mapping: on /v1/messages, Claude ids that Claude Code sends by default go to our newest Claude of the same family.",
+    media: {
+      title: "Media models in the same list",
+      body: "Image, video, music, voice and transcription models sit in the same list. Each entry says what it does and where to call it.",
+      filename: "media entry",
+      points: {
+        modality:
+          "modality is chat, image, video, music, speech or transcription. endpoints lists the paths that take the model.",
+        pricing:
+          "Media pricing is per unit: credits_per_image, credits_per_second (video), credits_per_clip (music), credits_per_1k_characters (speech), credits_per_minute (transcription).",
+        anthropic:
+          "Anthropic clients (anthropic-version header) get chat models only. Models whose provider is not set up on our side are not listed and answer 404 model_not_found.",
+      },
+    },
   },
   chat: {
     title: "POST /v1/chat/completions",
@@ -157,6 +176,8 @@ export const translations = {
       preflight:
         "Before a call runs we check your balance against a worst-case estimate. Not enough: HTTP 402 insufficient_credits, nothing runs, nothing is charged.",
       real: "After the call you pay real usage, not the estimate: the token count the provider reports, or the provider's real cost for OpenRouter models. If a provider reports no cost, the call falls back to the listed price.",
+      media:
+        "Media calls bill the same way: the provider's real cost plus our markup where the provider reports it, the listed per-model price otherwise. Images bill per image, speech per character, transcription per second of audio, video when the clip is ready, music per clip.",
       topup:
         "Out of credits? Top up with a pack, renew or upgrade your plan. The next call works immediately.",
     },
@@ -180,6 +201,10 @@ export const translations = {
       notFound: "Model does not exist or is not available to you.",
       invalid:
         "Bad request: unsupported parameter, bad tool_choice, bad image URL.",
+      contentPolicy:
+        "The media provider refused the prompt. Nothing is charged. Rephrase or pick another model.",
+      consent:
+        "Uncensored models need a one-time 18+ confirmation on your account. Confirm it in the app once, then retry.",
       rate: "Over 60 requests per minute for this key. Read Retry-After.",
       upstream:
         "The model provider failed. Safe to retry. Streams end with an error event.",
@@ -235,6 +260,90 @@ export const translations = {
       body: "Counts the input tokens of a Messages request without running the model. Claude Code calls it to manage its context.",
     },
     sdkTitle: "With the Anthropic Python SDK",
+  },
+  images: {
+    title: "POST /v1/images/generations",
+    intro:
+      "OpenAI images format. Any model with modality image from GET /v1/models. Works with the images client of every OpenAI SDK.",
+    generate: {
+      title: "Generate",
+      body: "model, prompt, n (1 to 4), size as WIDTHxHEIGHT or auto, quality. aspect_ratio is our extension and wins over size. response_format url (default) or b64_json.",
+    },
+    edit: {
+      title: "POST /v1/images/edits",
+      body: "One input image plus a prompt. Upload it as multipart field image, or send image_url (https or base64 data URL) in JSON. The model must take image input: input_modalities contains image. Masks are not supported; describe the change in the prompt.",
+    },
+    points: {
+      size: "We pick the closest size and ratio the model renders.",
+      format:
+        "url is a signed link to the stored file, valid 7 days without a key. b64_json returns the bytes inline.",
+      billing:
+        "Billed per image. credits_charged in the response says what the call cost.",
+    },
+  },
+  speech: {
+    title: "POST /v1/audio/speech",
+    intro:
+      "Text in, audio bytes out. model is a voice id from GET /v1/models (modality speech), like openai-nova. OpenAI style also works: model tts-1 with voice nova.",
+    points: {
+      voices:
+        "input up to 4096 characters. speed 0.25 to 4 on OpenAI, NanoGPT and ElevenLabs voices.",
+      formats:
+        "response_format mp3 (default), opus, aac, flac, wav or pcm. Which ones a voice delivers depends on its provider; others answer 400 with the list.",
+      billing:
+        "Billed per character. The X-Credits-Charged header says what the call cost.",
+    },
+  },
+  transcriptions: {
+    title: "POST /v1/audio/transcriptions",
+    intro:
+      "Speech to text, OpenAI Whisper format. Multipart upload, same SDK call you already use.",
+    transcribe: {
+      title: "Transcribe",
+      body: "file up to 25 MB (mp3, mp4, m4a, wav, webm, ogg, flac), model like whisper-1, optional language. response_format json, text, srt, verbose_json or vtt.",
+    },
+    translate: {
+      title: "POST /v1/audio/translations",
+      body: "Any spoken language in, English text out. Runs on whisper-1. Same formats as transcriptions.",
+    },
+    points: {
+      billing: "Billed per second of audio.",
+    },
+  },
+  videos: {
+    title: "POST /v1/videos",
+    intro:
+      "Async, in the shape of OpenAI's video API. The call answers at once with a job. Poll it, then download the MP4.",
+    create: {
+      title: "Start a job",
+      body: "model, prompt, seconds, size or aspect_ratio, resolution, negative_prompt. The answer is a video object with status queued. Below: the same object once it is done.",
+    },
+    poll: {
+      title: "Poll and download",
+      body: "GET /v1/videos/{id} returns status (queued, in_progress, completed, failed), progress and, when done, a signed url. Polling is free and skips the rate limit. GET /v1/videos/{id}/content streams the MP4.",
+    },
+    points: {
+      image:
+        "Image to video: send image_url in JSON or input_reference as a multipart upload. It becomes the first frame.",
+      billing:
+        "Billed when the video is ready, per second of video. credits_charged shows the cost.",
+      failed: "A failed job costs nothing. error says why.",
+    },
+  },
+  music: {
+    title: "POST /v1/music",
+    intro:
+      "Async like video. Start a job, poll GET /v1/music/{id}, download GET /v1/music/{id}/content.",
+    points: {
+      seconds:
+        "seconds: about 8, 20 or 30. The model may round it. Describe style, mood, instruments and tempo in prompt.",
+      billing: "Billed per clip once it is ready. A failed job costs nothing.",
+    },
+  },
+  mediaFiles: {
+    title: "GET /v1/media/{folder}/{file}",
+    intro:
+      "Every url in a media response points here. The signed link works without a key for 7 days, so you can hand it to a browser or a user. With your API key the same path works any time.",
   },
   codingTools: {
     title: "Use it in your coding agent",

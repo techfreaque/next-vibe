@@ -74,6 +74,46 @@ const MIME_TO_EXT: Record<string, string> = {
   "video/mp4": "mp4",
 };
 
+/** One timed piece of a transcript (seconds from the start of the audio). */
+export interface SttSegment {
+  start: number;
+  end: number;
+  text: string;
+}
+
+/**
+ * Per-call options (the /v1/audio API). Absent = the chat tool's behaviour:
+ * transcribe in the caller's locale language.
+ */
+export interface SttCallOptions {
+  /** ISO-639-1 language of the audio; default: the request locale's */
+  language?: string;
+  /** "translate" = English translation (Whisper on OpenAI only) */
+  task?: "transcribe" | "translate";
+}
+
+/** A finished transcription with everything a caller may render. */
+export interface SttTranscription {
+  text: string;
+  creditCost: number;
+  provider: ApiProvider;
+  sttModelId: SttModelId;
+  confidence: number | undefined;
+  /** seconds of audio, when the provider reports it (else 0) */
+  duration: number;
+  language: string;
+  /** timed segments where the provider returns them (OpenAI Whisper) */
+  segments: SttSegment[] | undefined;
+}
+
+interface SttChunkResult {
+  text: string;
+  confidence: number | undefined;
+  duration: number;
+  providerCostUsd: number | undefined;
+  segments?: SttSegment[];
+}
+
 /**
  * Speech-to-Text Repository
  */
@@ -102,18 +142,20 @@ export class SpeechToTextRepository {
     logger: EndpointLogger,
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
-  ): Promise<
-    ResponseType<{
-      text: string;
-      confidence: number | undefined;
-      duration: number;
-      providerCostUsd: number | undefined;
-    }>
-  > {
+    task: SttCallOptions["task"],
+  ): Promise<ResponseType<SttChunkResult>> {
     if (!modelOption) {
       return fail({
         message: t("post.errors.noSttProvider"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+    if (task === "translate" && modelOption.apiProvider !== ApiProvider.OPENAI_STT) {
+      return fail({
+        message: t("post.errors.unsupportedProvider", {
+          provider: modelOption.apiProvider,
+        }),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
 
@@ -126,6 +168,8 @@ export class SpeechToTextRepository {
           logger,
           t,
           fetchImpl,
+          "openAi",
+          task,
         );
       case ApiProvider.NANO_GPT:
         return SpeechToTextRepository.transcribeWithOpenAI(
@@ -182,8 +226,44 @@ export class SpeechToTextRepository {
     /** Fixture chain of the calling stream — provider calls bind it. */
     toolExecutionContext: ToolExecutionContext,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
+    const result = await SpeechToTextRepository.transcribe(
+      files,
+      user,
+      locale,
+      logger,
+      sttModelSelection,
+      toolExecutionContext,
+    );
+    if (!result.success) {
+      return result;
+    }
+    return success({
+      creditCost: result.data.creditCost,
+      response: {
+        success: true,
+        text: result.data.text,
+        provider: result.data.provider,
+        confidence: result.data.confidence,
+      },
+    });
+  }
+
+  /**
+   * transcribeAudio with the full result (duration, timed segments) and
+   * per-call options. Same routing, credit check and billing.
+   */
+  static async transcribe(
+    files: File[],
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    sttModelSelection: SttModelSelection | SttModelId | null,
+    /** Fixture chain of the calling stream — provider calls bind it. */
+    toolExecutionContext: ToolExecutionContext,
+    options: SttCallOptions = {},
+  ): Promise<ResponseType<SttTranscription>> {
     const t = sttScopedTranslation.scopedT(locale).t;
-    const language = getLanguageFromLocale(locale);
+    const language = options.language ?? getLanguageFromLocale(locale);
 
     // Accept raw SttModelId string or full selection object; fall back to default
     const selection: SttModelSelection =
@@ -269,14 +349,9 @@ export class SpeechToTextRepository {
 
     try {
       // Fan out chunks up to CHUNK_CONCURRENCY in parallel, preserve order
-      const results: Array<
-        ResponseType<{
-          text: string;
-          confidence: number | undefined;
-          duration: number;
-          providerCostUsd: number | undefined;
-        }>
-      > = Array.from({ length: files.length });
+      const results: Array<ResponseType<SttChunkResult>> = Array.from({
+        length: files.length,
+      });
 
       let idx = 0;
       const runNext = async (): Promise<void> => {
@@ -289,6 +364,7 @@ export class SpeechToTextRepository {
             logger,
             t,
             fetchImpl,
+            options.task,
           );
           if (!results[i].success) {
             return;
@@ -411,14 +487,36 @@ export class SpeechToTextRepository {
         });
       }
 
+      // Segments of later chunks start where the earlier chunks ended.
+      let offset = 0;
+      let segments: SttSegment[] | undefined = [];
+      for (const r of results) {
+        if (!r.success) {
+          continue;
+        }
+        if (!r.data.segments) {
+          segments = undefined;
+          break;
+        }
+        for (const segment of r.data.segments) {
+          segments.push({
+            start: segment.start + offset,
+            end: segment.end + offset,
+            text: segment.text,
+          });
+        }
+        offset += r.data.duration;
+      }
+
       return success({
         creditCost: creditsNeeded,
-        response: {
-          success: true,
-          text,
-          provider: modelOption.apiProvider,
-          confidence,
-        },
+        text,
+        provider: modelOption.apiProvider,
+        sttModelId: modelOption.id,
+        confidence,
+        duration,
+        language,
+        segments,
       });
     } catch (error) {
       const errorMessage = parseError(error).message;
@@ -446,14 +544,8 @@ export class SpeechToTextRepository {
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
     target: "openAi" | "nanoGPT" = "openAi",
-  ): Promise<
-    ResponseType<{
-      text: string;
-      confidence: number | undefined;
-      duration: number;
-      providerCostUsd: number | undefined;
-    }>
-  > {
+    task: SttCallOptions["task"] = "transcribe",
+  ): Promise<ResponseType<SttChunkResult>> {
     // NanoGPT exposes an OpenAI-compatible /audio/transcriptions endpoint
     const apiKey =
       target === "nanoGPT"
@@ -462,7 +554,9 @@ export class SpeechToTextRepository {
     const endpoint =
       target === "nanoGPT"
         ? "https://api.nano-gpt.com/api/v1/audio/transcriptions"
-        : "https://api.openai.com/v1/audio/transcriptions";
+        : task === "translate"
+          ? "https://api.openai.com/v1/audio/translations"
+          : "https://api.openai.com/v1/audio/transcriptions";
     if (!apiKey) {
       const { envKey, url, label } =
         target === "nanoGPT"
@@ -493,7 +587,10 @@ export class SpeechToTextRepository {
     const formData = new FormData();
     formData.append("file", normalizedFile, normalizedFile.name);
     formData.append("model", providerModel);
-    formData.append("language", language);
+    // Translations always produce English; the endpoint takes no language.
+    if (task !== "translate") {
+      formData.append("language", language);
+    }
     // NanoGPT models differ in supported formats; plain json works for all
     formData.append(
       "response_format",
@@ -537,7 +634,12 @@ export class SpeechToTextRepository {
     const data = (await response.json()) as {
       text?: string;
       duration?: number;
-      segments?: Array<{ avg_logprob?: number }>;
+      segments?: Array<{
+        avg_logprob?: number;
+        start?: number;
+        end?: number;
+        text?: string;
+      }>;
       /** NanoGPT only: what the call cost us, e.g. { cost: 0.001, currency: "USD" } */
       usage?: { cost?: number; currency?: string };
     };
@@ -559,7 +661,17 @@ export class SpeechToTextRepository {
         ? data.usage.cost
         : undefined;
 
-    return success({ text, confidence, duration, providerCostUsd });
+    const segments = data.segments?.every(
+      (s) => typeof s.start === "number" && typeof s.end === "number",
+    )
+      ? data.segments.map((s) => ({
+          start: s.start ?? 0,
+          end: s.end ?? 0,
+          text: (s.text ?? "").trim(),
+        }))
+      : undefined;
+
+    return success({ text, confidence, duration, providerCostUsd, segments });
   }
 
   /**

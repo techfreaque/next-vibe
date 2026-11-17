@@ -277,6 +277,291 @@ export const translations = {
     },
   },
 
+  media: {
+    images: {
+      generations: {
+        title: "OpenAI-compatible image generation",
+        titleShort: "v1 images",
+        description:
+          "Generate images with any image model from GET /v1/models. OpenAI images format: url (signed, valid 7 days) or b64_json. Billed per image.",
+        success: {
+          title: "Images generated",
+          description: "The images are stored and linked",
+        },
+      },
+      edits: {
+        title: "OpenAI-compatible image edit",
+        titleShort: "v1 image edits",
+        description:
+          "Edit one image with a prompt, on a model that takes image input. Upload it as multipart 'image' or send 'image_url'. Billed per image.",
+        success: {
+          title: "Image edited",
+          description: "The edited image is stored and linked",
+        },
+      },
+    },
+    speech: {
+      title: "OpenAI-compatible text to speech",
+      titleShort: "v1 speech",
+      description:
+        "Turn text into speech. Answers with the audio bytes (mp3 by default). Billed per character.",
+      success: { title: "Speech generated", description: "The audio file" },
+    },
+    transcriptions: {
+      title: "OpenAI-compatible transcription",
+      titleShort: "v1 transcriptions",
+      description:
+        "Transcribe an audio file (multipart 'file', up to 25 MB). JSON, text, SRT, WebVTT or verbose JSON with segments. Billed per second of audio.",
+      success: { title: "Audio transcribed", description: "The transcript" },
+    },
+    translations: {
+      title: "OpenAI-compatible audio translation",
+      titleShort: "v1 translations",
+      description:
+        "Transcribe an audio file straight into English text with Whisper. Same formats and billing as transcriptions.",
+      success: {
+        title: "Audio translated",
+        description: "The English transcript",
+      },
+    },
+    videos: {
+      create: {
+        title: "Video generation (async)",
+        titleShort: "v1 videos",
+        description:
+          "Start a video job in the shape of OpenAI's video API. Answers at once with the job; poll GET /v1/videos/{id}, download GET /v1/videos/{id}/content. Billed when the video is ready.",
+        success: { title: "Video job queued", description: "Poll it by id" },
+      },
+      get: {
+        title: "Video job status",
+        titleShort: "v1 video status",
+        description:
+          "Status, progress and result URL of a video job. Polling is free and does not count against the rate limit.",
+        success: { title: "Video job", description: "Current job state" },
+      },
+      content: {
+        title: "Video download",
+        titleShort: "v1 video content",
+        description: "The finished video file of a completed job.",
+        success: { title: "Video file", description: "The MP4 bytes" },
+      },
+    },
+    music: {
+      create: {
+        title: "Music generation (async)",
+        titleShort: "v1 music",
+        description:
+          "Start a music job. Answers at once with the job; poll GET /v1/music/{id}, download GET /v1/music/{id}/content. Billed per clip when it is ready.",
+        success: { title: "Music job queued", description: "Poll it by id" },
+      },
+      get: {
+        title: "Music job status",
+        titleShort: "v1 music status",
+        description:
+          "Status and result URL of a music job. Polling is free and does not count against the rate limit.",
+        success: { title: "Music job", description: "Current job state" },
+      },
+      content: {
+        title: "Music download",
+        titleShort: "v1 music content",
+        description: "The finished audio file of a completed music job.",
+        success: { title: "Music file", description: "The audio bytes" },
+      },
+    },
+    file: {
+      title: "Media file download",
+      titleShort: "v1 media file",
+      description:
+        "Download a file a media call produced. The signed URL works without a key for 7 days; your API key works any time.",
+      success: { title: "File", description: "The file bytes" },
+    },
+    fields: {
+      model: {
+        label: "Model",
+        imageDescription:
+          "Image model ID from GET /v1/models (modality: image)",
+        speechDescription:
+          "A voice ID from GET /v1/models (modality: speech), e.g. openai-nova. Or tts-1 plus a voice.",
+        transcriptionDescription:
+          "Transcription model ID from GET /v1/models (modality: transcription). whisper-1 works.",
+        translationDescription:
+          "A Whisper model served by OpenAI: whisper-1 or openai-whisper",
+        videoDescription:
+          "Video model ID from GET /v1/models (modality: video)",
+        musicDescription:
+          "Music model ID from GET /v1/models (modality: music)",
+      },
+      prompt: {
+        label: "Prompt",
+        imageDescription: "What to draw, up to 2000 characters",
+        editDescription: "What to change in the image",
+        transcriptionDescription:
+          "Accepted for compatibility; not passed to every provider",
+        videoDescription: "What happens in the clip, up to 2000 characters",
+        musicDescription: "Style, mood, instruments, tempo",
+      },
+      n: {
+        label: "Images",
+        description: "How many images, 1 to 4. Each one is billed.",
+      },
+      size: {
+        label: "Size",
+        imageDescription:
+          "WIDTHxHEIGHT like 1024x1024 or 1536x1024, or auto. Picks the closest size and ratio the model supports.",
+        videoDescription:
+          "WIDTHxHEIGHT like 1280x720. Sets the aspect ratio and, where the model offers it, the resolution.",
+      },
+      aspectRatio: {
+        label: "Aspect ratio",
+        imageDescription:
+          "1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3 or 21:9. Wins over size.",
+        videoDescription:
+          "16:9, 9:16, 1:1, 4:3, 3:4, 3:2, 2:3, 21:9 or 9:21. Wins over size.",
+      },
+      quality: {
+        label: "Quality",
+        description:
+          "standard, hd, low, medium, high or auto. hd and high ask for the detailed tier where the model has one.",
+      },
+      style: {
+        label: "Style",
+        description: "Accepted for compatibility. Put the style in the prompt.",
+      },
+      responseFormat: {
+        label: "Response format",
+        imageDescription:
+          "url (default, a signed link valid 7 days) or b64_json",
+        speechDescription:
+          "mp3 (default), opus, aac, flac, wav or pcm. Which ones a voice can deliver depends on its provider.",
+        transcriptionDescription:
+          "json (default), text, srt, verbose_json or vtt",
+      },
+      user: {
+        label: "User",
+        description: "Your end-user ID. Accepted for compatibility.",
+      },
+      image: {
+        label: "Image",
+        description: "The image to edit, as a multipart file upload",
+      },
+      imageUrl: {
+        label: "Image URL",
+        description:
+          "The image to edit as an http(s) URL or base64 data: URL, for JSON requests",
+        videoDescription:
+          "First frame as an http(s) URL or base64 data: URL (image-to-video)",
+      },
+      mask: {
+        label: "Mask",
+        description: "Not supported. Describe the edit in the prompt.",
+      },
+      input: {
+        label: "Input",
+        description: "The text to speak, up to 4096 characters",
+      },
+      voice: {
+        label: "Voice",
+        description:
+          "With an OpenAI model name (tts-1): alloy, nova, onyx, echo, shimmer or fable. Or any voice ID from GET /v1/models.",
+      },
+      speed: {
+        label: "Speed",
+        description:
+          "0.25 to 4.0. Applied by OpenAI, NanoGPT and ElevenLabs voices.",
+      },
+      instructions: {
+        label: "Instructions",
+        description:
+          "Accepted for compatibility; voices read the input as written",
+      },
+      file: {
+        label: "File",
+        description:
+          "The audio file: mp3, mp4, m4a, wav, webm, ogg or flac, up to 25 MB",
+      },
+      language: {
+        label: "Language",
+        description:
+          "ISO-639-1 code of the spoken language, e.g. en or de. Default: the locale in the URL.",
+      },
+      temperature: {
+        label: "Temperature",
+        description: "Accepted for compatibility",
+      },
+      seconds: {
+        label: "Seconds",
+        videoDescription:
+          "Clip length. Snapped to the lengths the model offers.",
+        musicDescription:
+          "Wanted length: about 8, 20 or 30 seconds. The model may round it.",
+      },
+      resolution: {
+        label: "Resolution",
+        description: "e.g. 720p or 1080p, where the model offers a choice",
+      },
+      negativePrompt: {
+        label: "Negative prompt",
+        description:
+          "What to keep out of the clip, where the model supports it",
+      },
+      inputReference: {
+        label: "Input reference",
+        description: "First frame as a multipart image upload (image-to-video)",
+      },
+      jobId: { label: "Job ID", description: "The id POST returned" },
+      threadId: { label: "Folder", description: "Storage folder of the file" },
+      filename: { label: "File name", description: "Stored file name" },
+      expires: {
+        label: "Expires",
+        description: "Unix time the signed link stops working",
+      },
+      sig: { label: "Signature", description: "Signature of the link" },
+    },
+    response: {
+      created: "Created",
+      object: "Object type",
+      text: "Text",
+      id: "Job ID",
+      status: "Status",
+    },
+    errors: {
+      badSize: "size '{{size}}' is not WIDTHxHEIGHT (like 1024x1024) or auto.",
+      maskUnsupported:
+        "Masks are not supported. Describe the change in the prompt instead.",
+      oneImageOnly: "One image per edit. Send a single 'image'.",
+      imageTooLarge: "The image is larger than {{max}} MB.",
+      imageRequired:
+        "Send the image to edit: multipart field 'image', or 'image_url' in JSON.",
+      modelCannotEdit:
+        "{{model}} does not take an input image. Pick an image-to-image model from GET /v1/models (input_modalities contains image).",
+      storageFailed:
+        "The file was generated but could not be stored. Try again.",
+      voiceNotFound:
+        "No voice '{{voice}}' available to you. List voices with GET /v1/models (modality: speech), or use model tts-1 with voice nova.",
+      formatUnsupported:
+        "{{voice}} delivers {{supported}}. Ask for one of those as response_format.",
+      audioTooLarge: "The audio file is larger than 25 MB.",
+      fileRequired: "Upload the audio as multipart field 'file'.",
+      translationUnsupported:
+        "{{model}} cannot translate. Translation to English runs on whisper-1.",
+      jobNotFound: "No {{kind}} job '{{id}}' on this account.",
+      jobNotReady:
+        "The {{kind}} job '{{id}}' is {{status}}. Download it once its status is completed.",
+      jobInterrupted:
+        "The job stopped when its server restarted. Nothing was charged. Submit it again.",
+      jobNotCreated:
+        "The job could not be saved. Nothing was charged. Try again.",
+      mediaNotFound:
+        "File not found, or the link expired. Get a fresh link from the job, or send your API key.",
+      modelNoImageInput:
+        "{{model}} does not take a first-frame image. Pick an image-to-video model from GET /v1/models, or drop the image.",
+      modelNeedsImage:
+        "{{model}} animates an image. Send input_reference or image_url.",
+      resolutionUnsupported:
+        "{{model}} renders {{supported}}. Ask for one of those as resolution.",
+    },
+  },
+
   errors: {
     validation: { title: "Validation error", description: "Invalid request" },
     unauthorized: {

@@ -4,11 +4,11 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "{{appName}} API-Doku - OpenAI- und Anthropic-kompatibel",
     description:
-      "Eine Base-URL, {{modelCount}} Modelle. OpenAI Chat Completions und Responses API, Anthropic Messages API, Streaming, Tool-Aufrufe. Codex CLI und Claude Code verbinden sich direkt. Pro Token in Credits zahlen.",
+      "Eine Base-URL, {{modelCount}} Chatmodelle. OpenAI Chat Completions und Responses API, Anthropic Messages API, Streaming, Tool-Aufrufe. Dazu Bilder, Sprachausgabe, Transkription, Video und Musik im OpenAI-Format. Codex CLI und Claude Code verbinden sich direkt. Bezahlt wird in Credits.",
     category: "API",
     imageAlt: "{{appName}} OpenAI-kompatible API-Doku",
     keywords:
-      "api, openai-kompatibel, anthropic-kompatibel, chat completions, responses api, messages api, codex cli, claude code, streaming, function calling, {{appName}}",
+      "api, openai-kompatibel, anthropic-kompatibel, chat completions, responses api, messages api, codex cli, claude code, streaming, function calling, bildgenerierung api, text-to-speech api, whisper api, videogenerierung api, musikgenerierung api, {{appName}}",
   },
   nav: {
     quickstart: "Schnellstart",
@@ -22,13 +22,19 @@ export const translations: typeof enTranslations = {
     limits: "Rate Limits",
     errors: "Fehler",
     codingTools: "Coding-Tools",
+    images: "Bilder",
+    speech: "Sprachausgabe",
+    transcriptions: "Transkription",
+    videos: "Video",
+    music: "Musik",
+    mediaFiles: "Mediendateien",
   },
   hero: {
     badge: "OpenAI- und Anthropic-kompatibel",
     title: "Eine Base-URL.",
     titleHighlight: "Jedes Modell.",
     subtitle:
-      "Richte ein beliebiges OpenAI- oder Anthropic-SDK auf {{appName}}. Codex CLI und Claude Code ebenso. {{modelCount}} Modelle, Streaming, Tool-Aufrufe. Dein Schlüssel, deine Credits, kein neuer Client.",
+      "Richte ein beliebiges OpenAI- oder Anthropic-SDK auf {{appName}}. Codex CLI und Claude Code ebenso. {{modelCount}} Chatmodelle, Streaming, Tool-Aufrufe. Bilder, Stimme, Video und Musik über denselben Schlüssel. Kein neuer Client.",
     ctaKey: "API-Schlüssel holen",
     ctaPricing: "Tarife ansehen",
   },
@@ -72,7 +78,7 @@ export const translations: typeof enTranslations = {
     points: {
       hash: "Wir speichern einen Hash, nicht den Schlüssel. Verloren heißt: neuen erstellen.",
       scope:
-        "Ein Schlüssel gilt nur für die API: /v1/models, /v1/chat/completions, /v1/responses und /v1/messages. Auf Konto, Zahlungen oder Einstellungen kommt er nicht.",
+        "Ein Schlüssel gilt nur für die API: /v1/models, Chat (/v1/chat/completions, /v1/responses, /v1/messages) und Medien (/v1/images, /v1/audio, /v1/videos, /v1/music, /v1/media). Auf Konto, Zahlungen oder Einstellungen kommt er nicht.",
       limit:
         "Bis zu 20 aktive Schlüssel pro Konto. Jeden Schlüssel kannst du jederzeit widerrufen: Er stoppt sofort.",
       missing:
@@ -84,6 +90,19 @@ export const translations: typeof enTranslations = {
     intro:
       "Listet die Modelle, die dein Schlüssel jetzt aufrufen kann, mit Kontextgröße, Tool-Unterstützung und Credit-Preisen pro Million Token. Die id nutzt du als model-Feld.",
     note: "Die Liste hängt von deinem Konto ab. Unbekannte oder nicht verfügbare IDs liefern 404 model_not_found. Einzige Zuordnung: Auf /v1/messages landen die Claude-IDs, die Claude Code standardmäßig schickt, beim neuesten Claude derselben Familie.",
+    media: {
+      title: "Medienmodelle in derselben Liste",
+      body: "Bild-, Video-, Musik-, Stimm- und Transkriptionsmodelle stehen in derselben Liste. Jeder Eintrag sagt, was das Modell kann und wo es aufgerufen wird.",
+      filename: "Medieneintrag",
+      points: {
+        modality:
+          "modality ist chat, image, video, music, speech oder transcription. endpoints nennt die Pfade, die das Modell annehmen.",
+        pricing:
+          "Medienpreise gelten pro Einheit: credits_per_image, credits_per_second (Video), credits_per_clip (Musik), credits_per_1k_characters (Sprachausgabe), credits_per_minute (Transkription).",
+        anthropic:
+          "Anthropic-Clients (Header anthropic-version) bekommen nur Chatmodelle. Modelle, deren Anbieter bei uns nicht eingerichtet ist, fehlen in der Liste und antworten mit 404 model_not_found.",
+      },
+    },
   },
   chat: {
     title: "POST /v1/chat/completions",
@@ -161,6 +180,8 @@ export const translations: typeof enTranslations = {
       preflight:
         "Vor jedem Aufruf prüfen wir dein Guthaben gegen eine Worst-Case-Schätzung. Reicht es nicht: HTTP 402 insufficient_credits, nichts läuft, nichts wird berechnet.",
       real: "Nach dem Aufruf zahlst du die echte Nutzung, nicht die Schätzung: die gemeldete Token-Zahl, bei OpenRouter-Modellen die echten Anbieterkosten. Meldet ein Anbieter keine Kosten, gilt der gelistete Preis.",
+      media:
+        "Medienaufrufe rechnen genauso ab: echte Anbieterkosten plus unser Aufschlag, wo der Anbieter sie meldet, sonst der gelistete Modellpreis. Bilder pro Bild, Sprachausgabe pro Zeichen, Transkription pro Audiosekunde, Video sobald der Clip fertig ist, Musik pro Clip.",
       topup:
         "Credits leer? Leg ein Paket nach, verlängere oder erweitere deinen Tarif. Der nächste Aufruf läuft sofort.",
     },
@@ -185,6 +206,10 @@ export const translations: typeof enTranslations = {
         "Das Modell existiert nicht oder steht dir nicht zur Verfügung.",
       invalid:
         "Ungültige Anfrage: nicht unterstützter Parameter, falsche tool_choice, falsche Bild-URL.",
+      contentPolicy:
+        "Der Medienanbieter hat den Prompt abgelehnt. Nichts wird berechnet. Formuliere um oder nimm ein anderes Modell.",
+      consent:
+        "Unzensierte Modelle brauchen eine einmalige Ü18-Bestätigung im Konto. Einmal in der App bestätigen, dann erneut senden.",
       rate: "Über 60 Anfragen pro Minute für diesen Schlüssel. Lies Retry-After.",
       upstream:
         "Der Modellanbieter ist ausgefallen. Wiederholen ist sicher. Streams enden mit einem Fehler-Event.",
@@ -241,6 +266,91 @@ export const translations: typeof enTranslations = {
       body: "Zählt die Input-Tokens einer Messages-Anfrage, ohne das Modell laufen zu lassen. Claude Code nutzt das, um seinen Kontext zu steuern.",
     },
     sdkTitle: "Mit dem Anthropic-Python-SDK",
+  },
+  images: {
+    title: "POST /v1/images/generations",
+    intro:
+      "OpenAI-Bildformat. Jedes Modell mit modality image aus GET /v1/models. Läuft mit dem Images-Client jedes OpenAI-SDKs.",
+    generate: {
+      title: "Erzeugen",
+      body: "model, prompt, n (1 bis 4), size als BREITExHÖHE oder auto, quality. aspect_ratio ist unsere Erweiterung und hat Vorrang vor size. response_format url (Standard) oder b64_json.",
+    },
+    edit: {
+      title: "POST /v1/images/edits",
+      body: "Ein Eingabebild plus Prompt. Als Multipart-Feld image hochladen oder image_url (https oder base64-data-URL) im JSON senden. Das Modell muss Bildeingabe können: input_modalities enthält image. Masken werden nicht unterstützt; beschreib die Änderung im Prompt.",
+    },
+    points: {
+      size: "Wir wählen die nächstliegende Größe und das Seitenverhältnis, das das Modell rendert.",
+      format:
+        "url ist ein signierter Link auf die gespeicherte Datei, 7 Tage ohne Schlüssel gültig. b64_json liefert die Bytes direkt in der Antwort.",
+      billing:
+        "Abrechnung pro Bild. credits_charged in der Antwort zeigt die Kosten des Aufrufs.",
+    },
+  },
+  speech: {
+    title: "POST /v1/audio/speech",
+    intro:
+      "Text rein, Audiodaten raus. model ist eine Stimmen-ID aus GET /v1/models (modality speech), etwa openai-nova. Der OpenAI-Weg geht auch: model tts-1 mit voice nova.",
+    points: {
+      voices:
+        "input bis 4096 Zeichen. speed 0.25 bis 4 bei Stimmen von OpenAI, NanoGPT und ElevenLabs.",
+      formats:
+        "response_format mp3 (Standard), opus, aac, flac, wav oder pcm. Welche eine Stimme liefert, hängt vom Anbieter ab; alles andere antwortet mit 400 und der Liste.",
+      billing:
+        "Abrechnung pro Zeichen. Der Header X-Credits-Charged zeigt die Kosten des Aufrufs.",
+    },
+  },
+  transcriptions: {
+    title: "POST /v1/audio/transcriptions",
+    intro:
+      "Sprache zu Text im OpenAI-Whisper-Format. Multipart-Upload, derselbe SDK-Aufruf, den du schon nutzt.",
+    transcribe: {
+      title: "Transkribieren",
+      body: "file bis 25 MB (mp3, mp4, m4a, wav, webm, ogg, flac), model wie whisper-1, optional language. response_format json, text, srt, verbose_json oder vtt.",
+    },
+    translate: {
+      title: "POST /v1/audio/translations",
+      body: "Beliebige gesprochene Sprache rein, englischer Text raus. Läuft auf whisper-1. Gleiche Formate wie bei Transkriptionen.",
+    },
+    points: {
+      billing: "Abrechnung pro Audiosekunde.",
+    },
+  },
+  videos: {
+    title: "POST /v1/videos",
+    intro:
+      "Asynchron, im Format der OpenAI-Video-API. Der Aufruf antwortet sofort mit einem Job. Status abfragen, dann das MP4 laden.",
+    create: {
+      title: "Job starten",
+      body: "model, prompt, seconds, size oder aspect_ratio, resolution, negative_prompt. Die Antwort ist ein Videoobjekt mit status queued. Darunter: dasselbe Objekt, wenn es fertig ist.",
+    },
+    poll: {
+      title: "Abfragen und herunterladen",
+      body: "GET /v1/videos/{id} liefert status (queued, in_progress, completed, failed), progress und am Ende eine signierte url. Abfragen ist kostenlos und zählt nicht gegen das Ratenlimit. GET /v1/videos/{id}/content streamt das MP4.",
+    },
+    points: {
+      image:
+        "Bild zu Video: image_url im JSON oder input_reference als Multipart-Upload senden. Es wird zum ersten Frame.",
+      billing:
+        "Abrechnung erst, wenn das Video fertig ist, pro Videosekunde. credits_charged zeigt die Kosten.",
+      failed: "Ein fehlgeschlagener Job kostet nichts. error nennt den Grund.",
+    },
+  },
+  music: {
+    title: "POST /v1/music",
+    intro:
+      "Asynchron wie Video. Job starten, GET /v1/music/{id} abfragen, GET /v1/music/{id}/content herunterladen.",
+    points: {
+      seconds:
+        "seconds: etwa 8, 20 oder 30. Das Modell kann runden. Stil, Stimmung, Instrumente und Tempo gehören in prompt.",
+      billing:
+        "Abrechnung pro Clip, sobald er fertig ist. Ein fehlgeschlagener Job kostet nichts.",
+    },
+  },
+  mediaFiles: {
+    title: "GET /v1/media/{folder}/{file}",
+    intro:
+      "Jede url in einer Medienantwort zeigt hierher. Der signierte Link funktioniert 7 Tage ohne Schlüssel, also direkt im Browser oder beim Endnutzer. Mit deinem API-Schlüssel klappt derselbe Pfad jederzeit.",
   },
   codingTools: {
     title: "Direkt im Coding-Agent nutzen",

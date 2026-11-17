@@ -167,6 +167,7 @@ export async function buildLlmsTxt(
     }),
     t("facts.api", {
       apiBaseUrl: buildPublicApiBaseUrl(base, locale),
+      mediaCount: mediaModels.length,
       subPrice: price(subscription.price, subscription.currency),
     }),
     t("facts.uncensored"),

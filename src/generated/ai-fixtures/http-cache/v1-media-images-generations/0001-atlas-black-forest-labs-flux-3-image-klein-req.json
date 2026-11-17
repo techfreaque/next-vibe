@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/images",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "black-forest-labs/flux-3-image-klein",
+    "prompt": "A small red circle on a white background",
+    "aspect_ratio": "1:1"
+  }
+}

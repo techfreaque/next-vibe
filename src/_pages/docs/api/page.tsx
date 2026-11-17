@@ -112,6 +112,8 @@ const ERROR_ROWS = [
     "invalid_value / unsupported_parameter / tools_not_supported",
     "invalid",
   ],
+  [400, "content_policy_violation", "contentPolicy"],
+  [403, "uncensored_consent_required", "consent"],
   [429, "rate_limit_exceeded", "rate"],
   [502, "upstream_error", "upstream"],
   [503, "balance_unavailable", "balance"],
@@ -358,6 +360,21 @@ export function TanstackPage({
           <Code code={snippets.models} filename="request" />
           <Code code={snippets.modelsResponse} language="json" filename="200" />
           <Prose>{t("models.note")}</Prose>
+          <Block title={t("models.media.title")}>
+            <Prose>{t("models.media.body")}</Prose>
+            <Code
+              code={snippets.mediaModelsResponse}
+              language="json"
+              filename={t("models.media.filename")}
+            />
+            <Bullets
+              items={[
+                t("models.media.points.modality"),
+                t("models.media.points.pricing"),
+                t("models.media.points.anthropic"),
+              ]}
+            />
+          </Block>
         </Div>
       </PageSection>
 
@@ -568,6 +585,141 @@ export function TanstackPage({
       </PageSection>
 
       <PageSection
+        id="images"
+        tone="muted"
+        label={t("nav.images")}
+        title={t("images.title")}
+        intro={t("images.intro")}
+      >
+        <Div className="flex flex-col gap-10">
+          <Block title={t("images.generate.title")}>
+            <Prose>{t("images.generate.body")}</Prose>
+            <Code code={snippets.images} filename="request" />
+            <Code
+              code={snippets.imagesResponse}
+              language="json"
+              filename="200"
+            />
+            <Code
+              code={snippets.imagesPython}
+              language="python"
+              filename={t("quickstart.step3.python")}
+            />
+          </Block>
+          <Block title={t("images.edit.title")}>
+            <Prose>{t("images.edit.body")}</Prose>
+            <Code code={snippets.imagesEdit} filename="request" />
+          </Block>
+          <Bullets
+            items={[
+              t("images.points.size"),
+              t("images.points.format"),
+              t("images.points.billing"),
+            ]}
+          />
+        </Div>
+      </PageSection>
+
+      <PageSection
+        id="speech"
+        label={t("nav.speech")}
+        title={t("speech.title")}
+        intro={t("speech.intro")}
+      >
+        <Div className="flex flex-col gap-6">
+          <Code code={snippets.speech} filename="request" />
+          <Code
+            code={snippets.speechPython}
+            language="python"
+            filename={t("quickstart.step3.python")}
+          />
+          <Bullets
+            items={[
+              t("speech.points.voices"),
+              t("speech.points.formats"),
+              t("speech.points.billing"),
+            ]}
+          />
+        </Div>
+      </PageSection>
+
+      <PageSection
+        id="transcriptions"
+        tone="muted"
+        label={t("nav.transcriptions")}
+        title={t("transcriptions.title")}
+        intro={t("transcriptions.intro")}
+      >
+        <Div className="flex flex-col gap-10">
+          <Block title={t("transcriptions.transcribe.title")}>
+            <Prose>{t("transcriptions.transcribe.body")}</Prose>
+            <Code code={snippets.transcription} filename="request" />
+            <Code
+              code={snippets.transcriptionResponse}
+              language="json"
+              filename="200"
+            />
+          </Block>
+          <Block title={t("transcriptions.translate.title")}>
+            <Prose>{t("transcriptions.translate.body")}</Prose>
+            <Code code={snippets.translation} filename="request" />
+          </Block>
+          <Bullets items={[t("transcriptions.points.billing")]} />
+        </Div>
+      </PageSection>
+
+      <PageSection
+        id="videos"
+        label={t("nav.videos")}
+        title={t("videos.title")}
+        intro={t("videos.intro")}
+      >
+        <Div className="flex flex-col gap-10">
+          <Block title={t("videos.create.title")}>
+            <Prose>{t("videos.create.body")}</Prose>
+            <Code code={snippets.videoCreate} filename="request" />
+            <Code code={snippets.videoObject} language="json" filename="200" />
+          </Block>
+          <Block title={t("videos.poll.title")}>
+            <Prose>{t("videos.poll.body")}</Prose>
+            <Code code={snippets.videoPoll} filename="request" />
+          </Block>
+          <Bullets
+            items={[
+              t("videos.points.image"),
+              t("videos.points.billing"),
+              t("videos.points.failed"),
+            ]}
+          />
+        </Div>
+      </PageSection>
+
+      <PageSection
+        id="music"
+        tone="muted"
+        label={t("nav.music")}
+        title={t("music.title")}
+        intro={t("music.intro")}
+      >
+        <Div className="flex flex-col gap-6">
+          <Code code={snippets.musicCreate} filename="request" />
+          <Code code={snippets.musicPoll} filename="request" />
+          <Bullets
+            items={[t("music.points.seconds"), t("music.points.billing")]}
+          />
+        </Div>
+      </PageSection>
+
+      <PageSection
+        id="media-files"
+        label={t("nav.mediaFiles")}
+        title={t("mediaFiles.title")}
+        intro={t("mediaFiles.intro")}
+      >
+        <Code code={snippets.mediaFile} filename="request" />
+      </PageSection>
+
+      <PageSection
         id="billing"
         tone="muted"
         label={t("nav.billing")}
@@ -581,6 +733,7 @@ export function TanstackPage({
               t("billing.points.usage"),
               t("billing.points.preflight"),
               t("billing.points.real"),
+              t("billing.points.media"),
               t("billing.points.topup"),
             ]}
           />

@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
     planItem: "{{name}} {{price}} miesięcznie za {{credits}} kredytów",
     credit:
       "1 kredyt = {{creditValue}}. Każda strona modelu podaje cenę za wiadomość.",
-    api: "API: OpenAI Chat Completions, OpenAI Responses i Anthropic Messages pod jednym adresem bazowym ({{apiBaseUrl}}). Wymaga płatnego konta: dowolnego planu, od {{subPrice}} miesięcznie. Darmowe konta dostają HTTP 402.",
+    api: "API: OpenAI Chat Completions, OpenAI Responses i Anthropic Messages pod jednym adresem bazowym ({{apiBaseUrl}}). Ten sam klucz wywołuje {{mediaCount}} modeli multimedialnych przez endpointy w formacie OpenAI: /v1/images/generations, /v1/images/edits, /v1/audio/speech, /v1/audio/transcriptions, /v1/audio/translations, /v1/videos, /v1/music (wideo i muzyka działają jako zadania asynchroniczne). Wymaga płatnego konta: dowolnego planu, od {{subPrice}} miesięcznie. Darmowe konta dostają HTTP 402.",
     uncensored:
       "Poziom bez cenzury: dwa rodzaje modeli. Modele abliterowane to modele mainstreamowe zmienione tak, by nie unikały pytań. Modele naprawdę bez cenzury, takie jak UncensoredLM, są trenowane na książkach i dokumentach zakazanych w mainstreamowym internecie, więc mają przeciwne poglądy polityczne. Poziom bez cenzury wymaga jednorazowego potwierdzenia, że masz 18 lat.",
     openSource:
@@ -33,7 +33,8 @@ export const translations: typeof enTranslations = {
     pricingDesc:
       "darmowe kredyty, cztery plany i pakiet kredytów do doładowania",
     api: "Dokumentacja API",
-    apiDesc: "adres bazowy, uwierzytelnianie, formaty zapytań i przykłady kodu",
+    apiDesc:
+      "adres bazowy, uwierzytelnianie, endpointy czatu i multimediów, przykłady kodu",
     blog: "Blog",
     blogDesc: "poradniki, porównania modeli i notatki z budowy",
     partners: "Partnerzy",

@@ -40,6 +40,8 @@ describe("llms.txt", () => {
     expect(text).toContain(`${FREE_CREDIT_SIGNED_IN_TOTAL} with a free account`);
     expect(text).toContain(`${FREE_CREDIT_MAX_TOTAL} with a free account and`);
     expect(text).toContain("HTTP 402");
+    expect(text).toContain("/v1/images/generations");
+    expect(text).toContain("/v1/videos");
     expect(text).toContain("/llms-full.txt");
     for (const slug of slugs) {
       expect(text).toContain(`/${locale}/story/blog/${slug})`);

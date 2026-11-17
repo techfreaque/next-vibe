@@ -1,0 +1,25 @@
+{
+  "type": "json",
+  "url": "https://api.edenai.run/v3/universal-ai",
+  "status": 200,
+  "headers": {
+    "connection": "keep-alive",
+    "content-length": "674",
+    "content-type": "application/json",
+    "date": "Tue, 17 Nov 2026 13:19:10 GMT",
+    "server": "uvicorn"
+  },
+  "body": {
+    "status": "success",
+    "cost": "0.000660000",
+    "provider": "openai",
+    "feature": "audio",
+    "subfeature": "tts",
+    "output_format": "full",
+    "output": {
+      "audio_resource_url": "https://d14uq1pz7dzsdq.cloudfront.net/3caf9c62-1db1-46db-8ddf-0d1b9b6bc0ca_.mp3?Expires=1795526349&Signature=dVGlIT5T1egW2p2foRK7Spxcl4P7w6~11JCn5ndOBil1k1wr2RNObD9Za7aEnP8E4Akkp0DcqTFC1c-I6PxhMWEO1UcAxevxmRvwCSYf-q-VCxxYoaX7xnSILdTWl7UrTOlBC66xniVZSbEl6gFSkCMRE19zGvVyjiXgjR6VO~-MjQwP1a9hTY97miYNLdFDqewvDDeUuykC7J9TALRktSDZfqobS9~glRE-7~8R33MmG8jqNODzP6I14gFa~o5ABD0xyiAFtQnKyDCOjxGR9jQwW49M~bZ9rMzsgDxsImtvhfWf5nmTkh9CfHK4m9icToJEMLlDTFfiArwg7hKYCA__&Key-Pair-Id=K1F55BTI9AHGIK"
+    },
+    "error": null,
+    "original_response": null
+  }
+}

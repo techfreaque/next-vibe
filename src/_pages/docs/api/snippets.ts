@@ -8,6 +8,10 @@ import {
   chatModelDefinitions,
   ChatModelId,
 } from "next-vibe/agent/ai-stream/models";
+import { ImageGenModelId } from "next-vibe/agent/image-generation/models";
+import { MusicGenModelId } from "next-vibe/agent/music-generation/models";
+import { TtsModelId } from "next-vibe/agent/text-to-speech/models";
+import { VideoGenModelId } from "next-vibe/agent/video-generation/models";
 
 import {
   API_KEY_PLACEHOLDER,
@@ -16,6 +20,14 @@ import {
 
 /** Must be callable via GET /v1/models, or every example 404s. */
 export const DOCS_EXAMPLE_MODEL = ChatModelId.KIMI_K3_1_PRO;
+/** Media examples: ids as GET /v1/models lists them. */
+/** Takes text and image input, so it serves both generations and edits. */
+const DOCS_IMAGE_MODEL = ImageGenModelId.FLUX_3_KLEIN;
+const DOCS_VIDEO_MODEL = VideoGenModelId.WAN_2_7_T2V;
+const DOCS_MUSIC_MODEL = MusicGenModelId.MUSICGEN_STEREO;
+const DOCS_VOICE = TtsModelId.OPENAI_NOVA;
+const DOCS_VIDEO_ID = "video_8f2c0e5a7b1d4c3e9a6f0b2d4e6a8c1f";
+const DOCS_MUSIC_ID = "music_3b7d1f9a2c4e6a8b0d2f4a6c8e0b1d3f";
 /** Anthropic id as Claude Code sends it by default; maps to our matching Claude model. */
 const ANTHROPIC_DEFAULT_ID = "claude-sonnet-4-5-20250929";
 
@@ -48,6 +60,22 @@ export interface DocsSnippets {
   countTokens: string;
   countTokensResponse: string;
   messagesPython: string;
+  mediaModelsResponse: string;
+  images: string;
+  imagesResponse: string;
+  imagesEdit: string;
+  imagesPython: string;
+  speech: string;
+  speechPython: string;
+  transcription: string;
+  transcriptionResponse: string;
+  translation: string;
+  videoCreate: string;
+  videoObject: string;
+  videoPoll: string;
+  musicCreate: string;
+  musicPoll: string;
+  mediaFile: string;
 }
 
 export function buildDocsSnippets(baseUrl: string): DocsSnippets {
@@ -363,5 +391,118 @@ reply = client.messages.create(
 )
 # Reasoning models put a thinking block first: print the text block.
 print(next(block.text for block in reply.content if block.type == "text"))`,
+    mediaModelsResponse: `{
+  "id": "${DOCS_IMAGE_MODEL}",
+  "object": "model",
+  "owned_by": "blackForestLabs",
+  "modality": "image",
+  "endpoints": ["/v1/images/generations", "/v1/images/edits"],
+  "input_modalities": ["text", "image"],
+  "output_modalities": ["image"],
+  "pricing": { "credits_per_image": 1.17 }
+}`,
+    images: `curl ${baseUrl}/images/generations \\
+  ${auth} \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "${DOCS_IMAGE_MODEL}",
+    "prompt": "A lighthouse on a cliff at dawn, oil painting",
+    "size": "1024x1024",
+    "n": 1
+  }'`,
+    imagesResponse: `{
+  "created": 1767225600,
+  "model": "${DOCS_IMAGE_MODEL}",
+  "data": [
+    { "url": "${baseUrl}/media/3f9c.../image-1.png?expires=1767830400&sig=..." }
+  ],
+  "credits_charged": 1.17
+}`,
+    imagesEdit: `curl ${baseUrl}/images/edits \\
+  ${auth} \\
+  -F model=${DOCS_IMAGE_MODEL} \\
+  -F prompt="Make it night, add a full moon" \\
+  -F image=@lighthouse.png`,
+    imagesPython: `import base64
+
+img = client.images.generate(
+    model="${DOCS_IMAGE_MODEL}",
+    prompt="A lighthouse on a cliff at dawn, oil painting",
+    response_format="b64_json",
+)
+open("lighthouse.png", "wb").write(base64.b64decode(img.data[0].b64_json))`,
+    speech: `curl ${baseUrl}/audio/speech \\
+  ${auth} \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "${DOCS_VOICE}",
+    "input": "Your build finished. All tests are green.",
+    "response_format": "mp3"
+  }' \\
+  -o speech.mp3`,
+    speechPython: `# OpenAI names work too: model tts-1 plus voice nova is ${DOCS_VOICE}.
+audio = client.audio.speech.create(
+    model="tts-1", voice="nova", input="Your build finished."
+)
+audio.write_to_file("speech.mp3")`,
+    transcription: `curl ${baseUrl}/audio/transcriptions \\
+  ${auth} \\
+  -F model=whisper-1 \\
+  -F file=@meeting.mp3 \\
+  -F response_format=json`,
+    transcriptionResponse: `{ "text": "Let's ship the release on Friday." }`,
+    translation: `curl ${baseUrl}/audio/translations \\
+  ${auth} \\
+  -F model=whisper-1 \\
+  -F file=@interview-de.mp3`,
+    videoCreate: `curl ${baseUrl}/videos \\
+  ${auth} \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "${DOCS_VIDEO_MODEL}",
+    "prompt": "A paper boat drifting down a rainy street, cinematic",
+    "seconds": 5,
+    "size": "1280x720"
+  }'`,
+    videoObject: `{
+  "id": "${DOCS_VIDEO_ID}",
+  "object": "video",
+  "model": "${DOCS_VIDEO_MODEL}",
+  "status": "completed",
+  "progress": 100,
+  "seconds": "5",
+  "size": "1280x720",
+  "url": "${baseUrl}/media/7a1e.../video.mp4?expires=1767830400&sig=...",
+  "credits_charged": 42,
+  "error": null
+}`,
+    videoPoll: `# Poll until status is completed or failed (free, no rate budget)
+curl ${baseUrl}/videos/${DOCS_VIDEO_ID} \\
+  ${auth}
+
+# Download the MP4
+curl ${baseUrl}/videos/${DOCS_VIDEO_ID}/content \\
+  ${auth} \\
+  -o boat.mp4`,
+    musicCreate: `curl ${baseUrl}/music \\
+  ${auth} \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "${DOCS_MUSIC_MODEL}",
+    "prompt": "Lo-fi hip hop, warm piano, slow vinyl crackle",
+    "seconds": 20
+  }'`,
+    musicPoll: `curl ${baseUrl}/music/${DOCS_MUSIC_ID} \\
+  ${auth}
+
+curl ${baseUrl}/music/${DOCS_MUSIC_ID}/content \\
+  ${auth} \\
+  -o track.mp3`,
+    mediaFile: `# Signed link from a response: works without a key for 7 days
+curl -o image.png "${baseUrl}/media/3f9c.../image-1.png?expires=1767830400&sig=..."
+
+# Same file with your key, any time
+curl -o image.png ${baseUrl}/media/3f9c.../image-1.png \\
+  ${auth}`,
   };
 }

@@ -38,6 +38,7 @@ import {
 } from "../models/eden-ai";
 import { ApiProvider, calculateTtsCreditCost } from "../models/models";
 import { ModelSelectionType } from "../skills/enum";
+import { TTS_OUTPUT_FORMATS, type TtsOutputFormat } from "./constants";
 import type {
   TextToSpeechPostRequestOutput,
   TextToSpeechPostResponseOutput,
@@ -45,6 +46,43 @@ import type {
 import { parseElevenLabsProviderModel } from "./elevenlabs";
 import type { TextToSpeechT } from "./i18n";
 import { calculateTtsCharge, getBestTtsModel } from "./models";
+
+/**
+ * Formats each TTS provider can deliver. OpenAI-compatible providers take
+ * OpenAI's response_format; ElevenLabs maps a subset onto its output_format;
+ * Eden AI always returns mp3.
+ */
+export const TTS_FORMATS_BY_PROVIDER: Partial<
+  Record<ApiProvider, readonly TtsOutputFormat[]>
+> = {
+  [ApiProvider.OPENAI_TTS]: TTS_OUTPUT_FORMATS,
+  [ApiProvider.NANO_GPT]: TTS_OUTPUT_FORMATS,
+  [ApiProvider.ELEVENLABS]: ["mp3", "opus", "pcm"],
+  [ApiProvider.EDEN_AI_TTS]: ["mp3"],
+};
+
+/** Providers that honour a speed multiplier. */
+export const TTS_SPEED_PROVIDERS: readonly ApiProvider[] = [
+  ApiProvider.OPENAI_TTS,
+  ApiProvider.NANO_GPT,
+  ApiProvider.ELEVENLABS,
+];
+
+/**
+ * Output options of one TTS call (the /v1/audio/speech API). Absent = the
+ * provider default (mp3, normal speed), which is what the chat tool uses.
+ */
+export interface TtsOutputOptions {
+  format?: TtsOutputFormat;
+  /** 0.25 - 4.0 (ElevenLabs clamps to its own 0.7 - 1.2) */
+  speed?: number;
+}
+
+const ELEVENLABS_OUTPUT_FORMAT: Partial<Record<TtsOutputFormat, string>> = {
+  mp3: "mp3_44100_128",
+  opus: "opus_48000_64",
+  pcm: "pcm_24000",
+};
 
 /**
  * Text-to-Speech Repository - Static class pattern
@@ -107,6 +145,7 @@ export class TextToSpeechRepository {
     logger: EndpointLogger,
     t: TextToSpeechT,
     fetchImpl: typeof globalThis.fetch,
+    output: TtsOutputOptions,
   ): Promise<ResponseType<string>> {
     if (!agentEnv.OPENAI_API_KEY) {
       const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.openAiTts;
@@ -133,6 +172,8 @@ export class TextToSpeechRepository {
         model: "tts-1",
         input: text,
         voice: providerModel,
+        response_format: output.format,
+        speed: output.speed,
       }),
     });
 
@@ -165,6 +206,7 @@ export class TextToSpeechRepository {
     logger: EndpointLogger,
     t: TextToSpeechT,
     fetchImpl: typeof globalThis.fetch,
+    output: TtsOutputOptions,
   ): Promise<ResponseType<string>> {
     if (!agentEnv.NANO_GPT_API_KEY) {
       const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.nanoGPT;
@@ -193,6 +235,8 @@ export class TextToSpeechRepository {
           model,
           input: text,
           voice,
+          response_format: output.format,
+          speed: output.speed,
         }),
       },
     );
@@ -325,6 +369,7 @@ export class TextToSpeechRepository {
     logger: EndpointLogger,
     t: TextToSpeechT,
     fetchImpl: typeof globalThis.fetch,
+    output: TtsOutputOptions,
   ): Promise<ResponseType<string>> {
     if (!agentEnv.ELEVENLABS_API_KEY) {
       const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.elevenlabs;
@@ -337,8 +382,12 @@ export class TextToSpeechRepository {
     const { modelId, voiceId } = parseElevenLabsProviderModel(providerModel);
     logger.debug("[TTS] Calling ElevenLabs TTS API", { modelId, voiceId });
 
+    const outputFormat = output.format
+      ? ELEVENLABS_OUTPUT_FORMAT[output.format]
+      : undefined;
+    const query = outputFormat ? `?output_format=${outputFormat}` : "";
     const response = await fetchImpl(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}${query}`,
       {
         method: "POST",
         headers: {
@@ -349,6 +398,13 @@ export class TextToSpeechRepository {
         body: JSON.stringify({
           text,
           model_id: modelId,
+          ...(output.speed === undefined
+            ? {}
+            : {
+                voice_settings: {
+                  speed: Math.min(1.2, Math.max(0.7, output.speed)),
+                },
+              }),
         }),
       },
     );
@@ -383,6 +439,8 @@ export class TextToSpeechRepository {
     t: TextToSpeechT,
     /** Fixture chain of the calling stream — provider calls bind it. */
     toolExecutionContext: ToolExecutionContext,
+    /** Audio format + speed (the /v1/audio/speech API); default mp3, 1x. */
+    output: TtsOutputOptions = {},
   ): Promise<ResponseType<TextToSpeechPostResponseOutput>> {
     // voiceId is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.voiceId) {
@@ -486,6 +544,7 @@ export class TextToSpeechRepository {
             logger,
             t,
             fetchImpl,
+            output,
           );
           break;
 
@@ -512,6 +571,7 @@ export class TextToSpeechRepository {
             logger,
             t,
             fetchImpl,
+            output,
           );
           break;
 
@@ -522,6 +582,7 @@ export class TextToSpeechRepository {
             logger,
             t,
             fetchImpl,
+            output,
           );
           break;
 

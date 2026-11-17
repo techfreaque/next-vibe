@@ -172,7 +172,9 @@ import { Route as ApiLocaleUsersStatsRouteImport } from './routes/api.$locale.us
 import { Route as ApiLocaleUsersViewRouteImport } from './routes/api.$locale.users.view'
 import { Route as ApiLocaleV1MessagesRouteImport } from './routes/api.$locale.v1.messages'
 import { Route as ApiLocaleV1ModelsRouteImport } from './routes/api.$locale.v1.models'
+import { Route as ApiLocaleV1MusicRouteImport } from './routes/api.$locale.v1.music'
 import { Route as ApiLocaleV1ResponsesRouteImport } from './routes/api.$locale.v1.responses'
+import { Route as ApiLocaleV1VideosRouteImport } from './routes/api.$locale.v1.videos'
 import { Route as ApiLocaleVibeExecuteToolRouteImport } from './routes/api.$locale.vibe.execute-tool'
 import { Route as ApiLocaleVibeHelpToolRouteImport } from './routes/api.$locale.vibe.help-tool'
 import { Route as LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRouteImport } from './routes/$locale.story.blog.ai-music-and-voice-generators.index'
@@ -428,8 +430,15 @@ import { Route as ApiLocaleUserPublicLoginRouteImport } from './routes/api.$loca
 import { Route as ApiLocaleUserPublicSignupRouteImport } from './routes/api.$locale.user.public.signup'
 import { Route as ApiLocaleUserPublicVerifyEmailRouteImport } from './routes/api.$locale.user.public.verify-email'
 import { Route as ApiLocaleUsersUserIdRouteImport } from './routes/api.$locale.users.user.$id'
+import { Route as ApiLocaleV1AudioSpeechRouteImport } from './routes/api.$locale.v1.audio.speech'
+import { Route as ApiLocaleV1AudioTranscriptionsRouteImport } from './routes/api.$locale.v1.audio.transcriptions'
+import { Route as ApiLocaleV1AudioTranslationsRouteImport } from './routes/api.$locale.v1.audio.translations'
 import { Route as ApiLocaleV1ChatCompletionsRouteImport } from './routes/api.$locale.v1.chat.completions'
+import { Route as ApiLocaleV1ImagesEditsRouteImport } from './routes/api.$locale.v1.images.edits'
+import { Route as ApiLocaleV1ImagesGenerationsRouteImport } from './routes/api.$locale.v1.images.generations'
 import { Route as ApiLocaleV1MessagesActionRouteImport } from './routes/api.$locale.v1.messages.$action'
+import { Route as ApiLocaleV1MusicIdRouteImport } from './routes/api.$locale.v1.music.$id'
+import { Route as ApiLocaleV1VideosIdRouteImport } from './routes/api.$locale.v1.videos.$id'
 import { Route as ApiLocaleVibeAgentCodingAgentRouteImport } from './routes/api.$locale.vibe.agent.coding-agent'
 import { Route as ApiLocaleVibeAgentDescribeImageRouteImport } from './routes/api.$locale.vibe.agent.describe-image'
 import { Route as ApiLocaleVibeAgentDescribeVideoRouteImport } from './routes/api.$locale.vibe.agent.describe-video'
@@ -546,6 +555,9 @@ import { Route as ApiLocaleUserPublicResetPasswordConfirmRouteImport } from './r
 import { Route as ApiLocaleUserPublicResetPasswordRequestRouteImport } from './routes/api.$locale.user.public.reset-password.request'
 import { Route as ApiLocaleUserPublicResetPasswordValidateRouteImport } from './routes/api.$locale.user.public.reset-password.validate'
 import { Route as ApiLocaleUsersUserIdRolesRouteImport } from './routes/api.$locale.users.user.$id.roles'
+import { Route as ApiLocaleV1MediaThreadIdFilenameRouteImport } from './routes/api.$locale.v1.media.$threadId.$filename'
+import { Route as ApiLocaleV1MusicIdContentRouteImport } from './routes/api.$locale.v1.music.$id.content'
+import { Route as ApiLocaleV1VideosIdContentRouteImport } from './routes/api.$locale.v1.videos.$id.content'
 import { Route as ApiLocaleVibeAgentAiStreamCancelRouteImport } from './routes/api.$locale.vibe.agent.ai-stream.cancel'
 import { Route as ApiLocaleVibeAgentAiStreamRunRouteImport } from './routes/api.$locale.vibe.agent.ai-stream.run'
 import { Route as ApiLocaleVibeAgentAiStreamStaleRunsRouteImport } from './routes/api.$locale.vibe.agent.ai-stream.stale-runs'
@@ -1591,9 +1603,19 @@ const ApiLocaleV1ModelsRoute = ApiLocaleV1ModelsRouteImport.update({
   path: '/api/$locale/v1/models',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiLocaleV1MusicRoute = ApiLocaleV1MusicRouteImport.update({
+  id: '/api/$locale/v1/music',
+  path: '/api/$locale/v1/music',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiLocaleV1ResponsesRoute = ApiLocaleV1ResponsesRouteImport.update({
   id: '/api/$locale/v1/responses',
   path: '/api/$locale/v1/responses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLocaleV1VideosRoute = ApiLocaleV1VideosRouteImport.update({
+  id: '/api/$locale/v1/videos',
+  path: '/api/$locale/v1/videos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiLocaleVibeExecuteToolRoute =
@@ -3118,10 +3140,38 @@ const ApiLocaleUsersUserIdRoute = ApiLocaleUsersUserIdRouteImport.update({
   path: '/api/$locale/users/user/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiLocaleV1AudioSpeechRoute = ApiLocaleV1AudioSpeechRouteImport.update({
+  id: '/api/$locale/v1/audio/speech',
+  path: '/api/$locale/v1/audio/speech',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLocaleV1AudioTranscriptionsRoute =
+  ApiLocaleV1AudioTranscriptionsRouteImport.update({
+    id: '/api/$locale/v1/audio/transcriptions',
+    path: '/api/$locale/v1/audio/transcriptions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleV1AudioTranslationsRoute =
+  ApiLocaleV1AudioTranslationsRouteImport.update({
+    id: '/api/$locale/v1/audio/translations',
+    path: '/api/$locale/v1/audio/translations',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleV1ChatCompletionsRoute =
   ApiLocaleV1ChatCompletionsRouteImport.update({
     id: '/api/$locale/v1/chat/completions',
     path: '/api/$locale/v1/chat/completions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleV1ImagesEditsRoute = ApiLocaleV1ImagesEditsRouteImport.update({
+  id: '/api/$locale/v1/images/edits',
+  path: '/api/$locale/v1/images/edits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLocaleV1ImagesGenerationsRoute =
+  ApiLocaleV1ImagesGenerationsRouteImport.update({
+    id: '/api/$locale/v1/images/generations',
+    path: '/api/$locale/v1/images/generations',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleV1MessagesActionRoute =
@@ -3130,6 +3180,16 @@ const ApiLocaleV1MessagesActionRoute =
     path: '/$action',
     getParentRoute: () => ApiLocaleV1MessagesRoute,
   } as any)
+const ApiLocaleV1MusicIdRoute = ApiLocaleV1MusicIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiLocaleV1MusicRoute,
+} as any)
+const ApiLocaleV1VideosIdRoute = ApiLocaleV1VideosIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiLocaleV1VideosRoute,
+} as any)
 const ApiLocaleVibeAgentCodingAgentRoute =
   ApiLocaleVibeAgentCodingAgentRouteImport.update({
     id: '/api/$locale/vibe/agent/coding-agent',
@@ -3825,6 +3885,24 @@ const ApiLocaleUsersUserIdRolesRoute =
     id: '/roles',
     path: '/roles',
     getParentRoute: () => ApiLocaleUsersUserIdRoute,
+  } as any)
+const ApiLocaleV1MediaThreadIdFilenameRoute =
+  ApiLocaleV1MediaThreadIdFilenameRouteImport.update({
+    id: '/api/$locale/v1/media/$threadId/$filename',
+    path: '/api/$locale/v1/media/$threadId/$filename',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleV1MusicIdContentRoute =
+  ApiLocaleV1MusicIdContentRouteImport.update({
+    id: '/content',
+    path: '/content',
+    getParentRoute: () => ApiLocaleV1MusicIdRoute,
+  } as any)
+const ApiLocaleV1VideosIdContentRoute =
+  ApiLocaleV1VideosIdContentRouteImport.update({
+    id: '/content',
+    path: '/content',
+    getParentRoute: () => ApiLocaleV1VideosIdRoute,
   } as any)
 const ApiLocaleVibeAgentAiStreamCancelRoute =
   ApiLocaleVibeAgentAiStreamCancelRouteImport.update({
@@ -4902,7 +4980,9 @@ export interface FileRoutesByFullPath {
   '/api/$locale/users/view': typeof ApiLocaleUsersViewRoute
   '/api/$locale/v1/messages': typeof ApiLocaleV1MessagesRouteWithChildren
   '/api/$locale/v1/models': typeof ApiLocaleV1ModelsRoute
+  '/api/$locale/v1/music': typeof ApiLocaleV1MusicRouteWithChildren
   '/api/$locale/v1/responses': typeof ApiLocaleV1ResponsesRoute
+  '/api/$locale/v1/videos': typeof ApiLocaleV1VideosRouteWithChildren
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId/': typeof LocaleCreatorUserIdIndexRoute
@@ -5152,8 +5232,15 @@ export interface FileRoutesByFullPath {
   '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRoute
   '/api/$locale/user/public/verify-email': typeof ApiLocaleUserPublicVerifyEmailRoute
   '/api/$locale/users/user/$id': typeof ApiLocaleUsersUserIdRouteWithChildren
+  '/api/$locale/v1/audio/speech': typeof ApiLocaleV1AudioSpeechRoute
+  '/api/$locale/v1/audio/transcriptions': typeof ApiLocaleV1AudioTranscriptionsRoute
+  '/api/$locale/v1/audio/translations': typeof ApiLocaleV1AudioTranslationsRoute
   '/api/$locale/v1/chat/completions': typeof ApiLocaleV1ChatCompletionsRoute
+  '/api/$locale/v1/images/edits': typeof ApiLocaleV1ImagesEditsRoute
+  '/api/$locale/v1/images/generations': typeof ApiLocaleV1ImagesGenerationsRoute
   '/api/$locale/v1/messages/$action': typeof ApiLocaleV1MessagesActionRoute
+  '/api/$locale/v1/music/$id': typeof ApiLocaleV1MusicIdRouteWithChildren
+  '/api/$locale/v1/videos/$id': typeof ApiLocaleV1VideosIdRouteWithChildren
   '/api/$locale/vibe/agent/coding-agent': typeof ApiLocaleVibeAgentCodingAgentRoute
   '/api/$locale/vibe/agent/describe-image': typeof ApiLocaleVibeAgentDescribeImageRoute
   '/api/$locale/vibe/agent/describe-video': typeof ApiLocaleVibeAgentDescribeVideoRoute
@@ -5295,6 +5382,9 @@ export interface FileRoutesByFullPath {
   '/api/$locale/user/public/reset-password/request': typeof ApiLocaleUserPublicResetPasswordRequestRoute
   '/api/$locale/user/public/reset-password/validate': typeof ApiLocaleUserPublicResetPasswordValidateRoute
   '/api/$locale/users/user/$id/roles': typeof ApiLocaleUsersUserIdRolesRoute
+  '/api/$locale/v1/media/$threadId/$filename': typeof ApiLocaleV1MediaThreadIdFilenameRoute
+  '/api/$locale/v1/music/$id/content': typeof ApiLocaleV1MusicIdContentRoute
+  '/api/$locale/v1/videos/$id/content': typeof ApiLocaleV1VideosIdContentRoute
   '/api/$locale/vibe/agent/ai-stream/cancel': typeof ApiLocaleVibeAgentAiStreamCancelRoute
   '/api/$locale/vibe/agent/ai-stream/run': typeof ApiLocaleVibeAgentAiStreamRunRoute
   '/api/$locale/vibe/agent/ai-stream/stale-runs': typeof ApiLocaleVibeAgentAiStreamStaleRunsRoute
@@ -5587,7 +5677,9 @@ export interface FileRoutesByTo {
   '/api/$locale/users/view': typeof ApiLocaleUsersViewRoute
   '/api/$locale/v1/messages': typeof ApiLocaleV1MessagesRouteWithChildren
   '/api/$locale/v1/models': typeof ApiLocaleV1ModelsRoute
+  '/api/$locale/v1/music': typeof ApiLocaleV1MusicRouteWithChildren
   '/api/$locale/v1/responses': typeof ApiLocaleV1ResponsesRoute
+  '/api/$locale/v1/videos': typeof ApiLocaleV1VideosRouteWithChildren
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId': typeof LocaleCreatorUserIdIndexRoute
@@ -5837,8 +5929,15 @@ export interface FileRoutesByTo {
   '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRoute
   '/api/$locale/user/public/verify-email': typeof ApiLocaleUserPublicVerifyEmailRoute
   '/api/$locale/users/user/$id': typeof ApiLocaleUsersUserIdRouteWithChildren
+  '/api/$locale/v1/audio/speech': typeof ApiLocaleV1AudioSpeechRoute
+  '/api/$locale/v1/audio/transcriptions': typeof ApiLocaleV1AudioTranscriptionsRoute
+  '/api/$locale/v1/audio/translations': typeof ApiLocaleV1AudioTranslationsRoute
   '/api/$locale/v1/chat/completions': typeof ApiLocaleV1ChatCompletionsRoute
+  '/api/$locale/v1/images/edits': typeof ApiLocaleV1ImagesEditsRoute
+  '/api/$locale/v1/images/generations': typeof ApiLocaleV1ImagesGenerationsRoute
   '/api/$locale/v1/messages/$action': typeof ApiLocaleV1MessagesActionRoute
+  '/api/$locale/v1/music/$id': typeof ApiLocaleV1MusicIdRouteWithChildren
+  '/api/$locale/v1/videos/$id': typeof ApiLocaleV1VideosIdRouteWithChildren
   '/api/$locale/vibe/agent/coding-agent': typeof ApiLocaleVibeAgentCodingAgentRoute
   '/api/$locale/vibe/agent/describe-image': typeof ApiLocaleVibeAgentDescribeImageRoute
   '/api/$locale/vibe/agent/describe-video': typeof ApiLocaleVibeAgentDescribeVideoRoute
@@ -5980,6 +6079,9 @@ export interface FileRoutesByTo {
   '/api/$locale/user/public/reset-password/request': typeof ApiLocaleUserPublicResetPasswordRequestRoute
   '/api/$locale/user/public/reset-password/validate': typeof ApiLocaleUserPublicResetPasswordValidateRoute
   '/api/$locale/users/user/$id/roles': typeof ApiLocaleUsersUserIdRolesRoute
+  '/api/$locale/v1/media/$threadId/$filename': typeof ApiLocaleV1MediaThreadIdFilenameRoute
+  '/api/$locale/v1/music/$id/content': typeof ApiLocaleV1MusicIdContentRoute
+  '/api/$locale/v1/videos/$id/content': typeof ApiLocaleV1VideosIdContentRoute
   '/api/$locale/vibe/agent/ai-stream/cancel': typeof ApiLocaleVibeAgentAiStreamCancelRoute
   '/api/$locale/vibe/agent/ai-stream/run': typeof ApiLocaleVibeAgentAiStreamRunRoute
   '/api/$locale/vibe/agent/ai-stream/stale-runs': typeof ApiLocaleVibeAgentAiStreamStaleRunsRoute
@@ -6280,7 +6382,9 @@ export interface FileRoutesById {
   '/api/$locale/users/view': typeof ApiLocaleUsersViewRoute
   '/api/$locale/v1/messages': typeof ApiLocaleV1MessagesRouteWithChildren
   '/api/$locale/v1/models': typeof ApiLocaleV1ModelsRoute
+  '/api/$locale/v1/music': typeof ApiLocaleV1MusicRouteWithChildren
   '/api/$locale/v1/responses': typeof ApiLocaleV1ResponsesRoute
+  '/api/$locale/v1/videos': typeof ApiLocaleV1VideosRouteWithChildren
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
   '/$locale/creator/$userId/': typeof LocaleCreatorUserIdIndexRoute
@@ -6530,8 +6634,15 @@ export interface FileRoutesById {
   '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRoute
   '/api/$locale/user/public/verify-email': typeof ApiLocaleUserPublicVerifyEmailRoute
   '/api/$locale/users/user/$id': typeof ApiLocaleUsersUserIdRouteWithChildren
+  '/api/$locale/v1/audio/speech': typeof ApiLocaleV1AudioSpeechRoute
+  '/api/$locale/v1/audio/transcriptions': typeof ApiLocaleV1AudioTranscriptionsRoute
+  '/api/$locale/v1/audio/translations': typeof ApiLocaleV1AudioTranslationsRoute
   '/api/$locale/v1/chat/completions': typeof ApiLocaleV1ChatCompletionsRoute
+  '/api/$locale/v1/images/edits': typeof ApiLocaleV1ImagesEditsRoute
+  '/api/$locale/v1/images/generations': typeof ApiLocaleV1ImagesGenerationsRoute
   '/api/$locale/v1/messages/$action': typeof ApiLocaleV1MessagesActionRoute
+  '/api/$locale/v1/music/$id': typeof ApiLocaleV1MusicIdRouteWithChildren
+  '/api/$locale/v1/videos/$id': typeof ApiLocaleV1VideosIdRouteWithChildren
   '/api/$locale/vibe/agent/coding-agent': typeof ApiLocaleVibeAgentCodingAgentRoute
   '/api/$locale/vibe/agent/describe-image': typeof ApiLocaleVibeAgentDescribeImageRoute
   '/api/$locale/vibe/agent/describe-video': typeof ApiLocaleVibeAgentDescribeVideoRoute
@@ -6673,6 +6784,9 @@ export interface FileRoutesById {
   '/api/$locale/user/public/reset-password/request': typeof ApiLocaleUserPublicResetPasswordRequestRoute
   '/api/$locale/user/public/reset-password/validate': typeof ApiLocaleUserPublicResetPasswordValidateRoute
   '/api/$locale/users/user/$id/roles': typeof ApiLocaleUsersUserIdRolesRoute
+  '/api/$locale/v1/media/$threadId/$filename': typeof ApiLocaleV1MediaThreadIdFilenameRoute
+  '/api/$locale/v1/music/$id/content': typeof ApiLocaleV1MusicIdContentRoute
+  '/api/$locale/v1/videos/$id/content': typeof ApiLocaleV1VideosIdContentRoute
   '/api/$locale/vibe/agent/ai-stream/cancel': typeof ApiLocaleVibeAgentAiStreamCancelRoute
   '/api/$locale/vibe/agent/ai-stream/run': typeof ApiLocaleVibeAgentAiStreamRunRoute
   '/api/$locale/vibe/agent/ai-stream/stale-runs': typeof ApiLocaleVibeAgentAiStreamStaleRunsRoute
@@ -6973,7 +7087,9 @@ export interface FileRouteTypes {
     | '/api/$locale/users/view'
     | '/api/$locale/v1/messages'
     | '/api/$locale/v1/models'
+    | '/api/$locale/v1/music'
     | '/api/$locale/v1/responses'
+    | '/api/$locale/v1/videos'
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId/'
@@ -7223,8 +7339,15 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/signup'
     | '/api/$locale/user/public/verify-email'
     | '/api/$locale/users/user/$id'
+    | '/api/$locale/v1/audio/speech'
+    | '/api/$locale/v1/audio/transcriptions'
+    | '/api/$locale/v1/audio/translations'
     | '/api/$locale/v1/chat/completions'
+    | '/api/$locale/v1/images/edits'
+    | '/api/$locale/v1/images/generations'
     | '/api/$locale/v1/messages/$action'
+    | '/api/$locale/v1/music/$id'
+    | '/api/$locale/v1/videos/$id'
     | '/api/$locale/vibe/agent/coding-agent'
     | '/api/$locale/vibe/agent/describe-image'
     | '/api/$locale/vibe/agent/describe-video'
@@ -7366,6 +7489,9 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/reset-password/request'
     | '/api/$locale/user/public/reset-password/validate'
     | '/api/$locale/users/user/$id/roles'
+    | '/api/$locale/v1/media/$threadId/$filename'
+    | '/api/$locale/v1/music/$id/content'
+    | '/api/$locale/v1/videos/$id/content'
     | '/api/$locale/vibe/agent/ai-stream/cancel'
     | '/api/$locale/vibe/agent/ai-stream/run'
     | '/api/$locale/vibe/agent/ai-stream/stale-runs'
@@ -7658,7 +7784,9 @@ export interface FileRouteTypes {
     | '/api/$locale/users/view'
     | '/api/$locale/v1/messages'
     | '/api/$locale/v1/models'
+    | '/api/$locale/v1/music'
     | '/api/$locale/v1/responses'
+    | '/api/$locale/v1/videos'
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId'
@@ -7908,8 +8036,15 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/signup'
     | '/api/$locale/user/public/verify-email'
     | '/api/$locale/users/user/$id'
+    | '/api/$locale/v1/audio/speech'
+    | '/api/$locale/v1/audio/transcriptions'
+    | '/api/$locale/v1/audio/translations'
     | '/api/$locale/v1/chat/completions'
+    | '/api/$locale/v1/images/edits'
+    | '/api/$locale/v1/images/generations'
     | '/api/$locale/v1/messages/$action'
+    | '/api/$locale/v1/music/$id'
+    | '/api/$locale/v1/videos/$id'
     | '/api/$locale/vibe/agent/coding-agent'
     | '/api/$locale/vibe/agent/describe-image'
     | '/api/$locale/vibe/agent/describe-video'
@@ -8051,6 +8186,9 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/reset-password/request'
     | '/api/$locale/user/public/reset-password/validate'
     | '/api/$locale/users/user/$id/roles'
+    | '/api/$locale/v1/media/$threadId/$filename'
+    | '/api/$locale/v1/music/$id/content'
+    | '/api/$locale/v1/videos/$id/content'
     | '/api/$locale/vibe/agent/ai-stream/cancel'
     | '/api/$locale/vibe/agent/ai-stream/run'
     | '/api/$locale/vibe/agent/ai-stream/stale-runs'
@@ -8350,7 +8488,9 @@ export interface FileRouteTypes {
     | '/api/$locale/users/view'
     | '/api/$locale/v1/messages'
     | '/api/$locale/v1/models'
+    | '/api/$locale/v1/music'
     | '/api/$locale/v1/responses'
+    | '/api/$locale/v1/videos'
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
     | '/$locale/creator/$userId/'
@@ -8600,8 +8740,15 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/signup'
     | '/api/$locale/user/public/verify-email'
     | '/api/$locale/users/user/$id'
+    | '/api/$locale/v1/audio/speech'
+    | '/api/$locale/v1/audio/transcriptions'
+    | '/api/$locale/v1/audio/translations'
     | '/api/$locale/v1/chat/completions'
+    | '/api/$locale/v1/images/edits'
+    | '/api/$locale/v1/images/generations'
     | '/api/$locale/v1/messages/$action'
+    | '/api/$locale/v1/music/$id'
+    | '/api/$locale/v1/videos/$id'
     | '/api/$locale/vibe/agent/coding-agent'
     | '/api/$locale/vibe/agent/describe-image'
     | '/api/$locale/vibe/agent/describe-video'
@@ -8743,6 +8890,9 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/reset-password/request'
     | '/api/$locale/user/public/reset-password/validate'
     | '/api/$locale/users/user/$id/roles'
+    | '/api/$locale/v1/media/$threadId/$filename'
+    | '/api/$locale/v1/music/$id/content'
+    | '/api/$locale/v1/videos/$id/content'
     | '/api/$locale/vibe/agent/ai-stream/cancel'
     | '/api/$locale/vibe/agent/ai-stream/run'
     | '/api/$locale/vibe/agent/ai-stream/stale-runs'
@@ -9016,7 +9166,9 @@ export interface RootRouteChildren {
   ApiLocaleUsersViewRoute: typeof ApiLocaleUsersViewRoute
   ApiLocaleV1MessagesRoute: typeof ApiLocaleV1MessagesRouteWithChildren
   ApiLocaleV1ModelsRoute: typeof ApiLocaleV1ModelsRoute
+  ApiLocaleV1MusicRoute: typeof ApiLocaleV1MusicRouteWithChildren
   ApiLocaleV1ResponsesRoute: typeof ApiLocaleV1ResponsesRoute
+  ApiLocaleV1VideosRoute: typeof ApiLocaleV1VideosRouteWithChildren
   ApiLocaleVibeExecuteToolRoute: typeof ApiLocaleVibeExecuteToolRouteWithChildren
   ApiLocaleVibeHelpToolRoute: typeof ApiLocaleVibeHelpToolRoute
   LocaleCreatorUserIdIndexRoute: typeof LocaleCreatorUserIdIndexRoute
@@ -9182,7 +9334,12 @@ export interface RootRouteChildren {
   ApiLocaleUserPublicSignupRoute: typeof ApiLocaleUserPublicSignupRoute
   ApiLocaleUserPublicVerifyEmailRoute: typeof ApiLocaleUserPublicVerifyEmailRoute
   ApiLocaleUsersUserIdRoute: typeof ApiLocaleUsersUserIdRouteWithChildren
+  ApiLocaleV1AudioSpeechRoute: typeof ApiLocaleV1AudioSpeechRoute
+  ApiLocaleV1AudioTranscriptionsRoute: typeof ApiLocaleV1AudioTranscriptionsRoute
+  ApiLocaleV1AudioTranslationsRoute: typeof ApiLocaleV1AudioTranslationsRoute
   ApiLocaleV1ChatCompletionsRoute: typeof ApiLocaleV1ChatCompletionsRoute
+  ApiLocaleV1ImagesEditsRoute: typeof ApiLocaleV1ImagesEditsRoute
+  ApiLocaleV1ImagesGenerationsRoute: typeof ApiLocaleV1ImagesGenerationsRoute
   ApiLocaleVibeAgentCodingAgentRoute: typeof ApiLocaleVibeAgentCodingAgentRoute
   ApiLocaleVibeAgentDescribeImageRoute: typeof ApiLocaleVibeAgentDescribeImageRoute
   ApiLocaleVibeAgentDescribeVideoRoute: typeof ApiLocaleVibeAgentDescribeVideoRoute
@@ -9257,6 +9414,7 @@ export interface RootRouteChildren {
   ApiLocaleUserPublicResetPasswordConfirmRoute: typeof ApiLocaleUserPublicResetPasswordConfirmRoute
   ApiLocaleUserPublicResetPasswordRequestRoute: typeof ApiLocaleUserPublicResetPasswordRequestRoute
   ApiLocaleUserPublicResetPasswordValidateRoute: typeof ApiLocaleUserPublicResetPasswordValidateRoute
+  ApiLocaleV1MediaThreadIdFilenameRoute: typeof ApiLocaleV1MediaThreadIdFilenameRoute
   ApiLocaleVibeAgentAiStreamCancelRoute: typeof ApiLocaleVibeAgentAiStreamCancelRoute
   ApiLocaleVibeAgentAiStreamRunRoute: typeof ApiLocaleVibeAgentAiStreamRunRoute
   ApiLocaleVibeAgentAiStreamStaleRunsRoute: typeof ApiLocaleVibeAgentAiStreamStaleRunsRoute
@@ -10490,11 +10648,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleV1ModelsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/v1/music': {
+      id: '/api/$locale/v1/music'
+      path: '/api/$locale/v1/music'
+      fullPath: '/api/$locale/v1/music'
+      preLoaderRoute: typeof ApiLocaleV1MusicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/v1/responses': {
       id: '/api/$locale/v1/responses'
       path: '/api/$locale/v1/responses'
       fullPath: '/api/$locale/v1/responses'
       preLoaderRoute: typeof ApiLocaleV1ResponsesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/v1/videos': {
+      id: '/api/$locale/v1/videos'
+      path: '/api/$locale/v1/videos'
+      fullPath: '/api/$locale/v1/videos'
+      preLoaderRoute: typeof ApiLocaleV1VideosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/vibe/execute-tool': {
@@ -12282,11 +12454,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleUsersUserIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/v1/audio/speech': {
+      id: '/api/$locale/v1/audio/speech'
+      path: '/api/$locale/v1/audio/speech'
+      fullPath: '/api/$locale/v1/audio/speech'
+      preLoaderRoute: typeof ApiLocaleV1AudioSpeechRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/v1/audio/transcriptions': {
+      id: '/api/$locale/v1/audio/transcriptions'
+      path: '/api/$locale/v1/audio/transcriptions'
+      fullPath: '/api/$locale/v1/audio/transcriptions'
+      preLoaderRoute: typeof ApiLocaleV1AudioTranscriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/v1/audio/translations': {
+      id: '/api/$locale/v1/audio/translations'
+      path: '/api/$locale/v1/audio/translations'
+      fullPath: '/api/$locale/v1/audio/translations'
+      preLoaderRoute: typeof ApiLocaleV1AudioTranslationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/v1/chat/completions': {
       id: '/api/$locale/v1/chat/completions'
       path: '/api/$locale/v1/chat/completions'
       fullPath: '/api/$locale/v1/chat/completions'
       preLoaderRoute: typeof ApiLocaleV1ChatCompletionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/v1/images/edits': {
+      id: '/api/$locale/v1/images/edits'
+      path: '/api/$locale/v1/images/edits'
+      fullPath: '/api/$locale/v1/images/edits'
+      preLoaderRoute: typeof ApiLocaleV1ImagesEditsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/v1/images/generations': {
+      id: '/api/$locale/v1/images/generations'
+      path: '/api/$locale/v1/images/generations'
+      fullPath: '/api/$locale/v1/images/generations'
+      preLoaderRoute: typeof ApiLocaleV1ImagesGenerationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/v1/messages/$action': {
@@ -12295,6 +12502,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/v1/messages/$action'
       preLoaderRoute: typeof ApiLocaleV1MessagesActionRouteImport
       parentRoute: typeof ApiLocaleV1MessagesRoute
+    }
+    '/api/$locale/v1/music/$id': {
+      id: '/api/$locale/v1/music/$id'
+      path: '/$id'
+      fullPath: '/api/$locale/v1/music/$id'
+      preLoaderRoute: typeof ApiLocaleV1MusicIdRouteImport
+      parentRoute: typeof ApiLocaleV1MusicRoute
+    }
+    '/api/$locale/v1/videos/$id': {
+      id: '/api/$locale/v1/videos/$id'
+      path: '/$id'
+      fullPath: '/api/$locale/v1/videos/$id'
+      preLoaderRoute: typeof ApiLocaleV1VideosIdRouteImport
+      parentRoute: typeof ApiLocaleV1VideosRoute
     }
     '/api/$locale/vibe/agent/coding-agent': {
       id: '/api/$locale/vibe/agent/coding-agent'
@@ -13107,6 +13328,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/users/user/$id/roles'
       preLoaderRoute: typeof ApiLocaleUsersUserIdRolesRouteImport
       parentRoute: typeof ApiLocaleUsersUserIdRoute
+    }
+    '/api/$locale/v1/media/$threadId/$filename': {
+      id: '/api/$locale/v1/media/$threadId/$filename'
+      path: '/api/$locale/v1/media/$threadId/$filename'
+      fullPath: '/api/$locale/v1/media/$threadId/$filename'
+      preLoaderRoute: typeof ApiLocaleV1MediaThreadIdFilenameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/v1/music/$id/content': {
+      id: '/api/$locale/v1/music/$id/content'
+      path: '/content'
+      fullPath: '/api/$locale/v1/music/$id/content'
+      preLoaderRoute: typeof ApiLocaleV1MusicIdContentRouteImport
+      parentRoute: typeof ApiLocaleV1MusicIdRoute
+    }
+    '/api/$locale/v1/videos/$id/content': {
+      id: '/api/$locale/v1/videos/$id/content'
+      path: '/content'
+      fullPath: '/api/$locale/v1/videos/$id/content'
+      preLoaderRoute: typeof ApiLocaleV1VideosIdContentRouteImport
+      parentRoute: typeof ApiLocaleV1VideosIdRoute
     }
     '/api/$locale/vibe/agent/ai-stream/cancel': {
       id: '/api/$locale/vibe/agent/ai-stream/cancel'
@@ -14845,6 +15087,50 @@ const ApiLocaleV1MessagesRouteChildren: ApiLocaleV1MessagesRouteChildren = {
 const ApiLocaleV1MessagesRouteWithChildren =
   ApiLocaleV1MessagesRoute._addFileChildren(ApiLocaleV1MessagesRouteChildren)
 
+interface ApiLocaleV1MusicIdRouteChildren {
+  ApiLocaleV1MusicIdContentRoute: typeof ApiLocaleV1MusicIdContentRoute
+}
+
+const ApiLocaleV1MusicIdRouteChildren: ApiLocaleV1MusicIdRouteChildren = {
+  ApiLocaleV1MusicIdContentRoute: ApiLocaleV1MusicIdContentRoute,
+}
+
+const ApiLocaleV1MusicIdRouteWithChildren =
+  ApiLocaleV1MusicIdRoute._addFileChildren(ApiLocaleV1MusicIdRouteChildren)
+
+interface ApiLocaleV1MusicRouteChildren {
+  ApiLocaleV1MusicIdRoute: typeof ApiLocaleV1MusicIdRouteWithChildren
+}
+
+const ApiLocaleV1MusicRouteChildren: ApiLocaleV1MusicRouteChildren = {
+  ApiLocaleV1MusicIdRoute: ApiLocaleV1MusicIdRouteWithChildren,
+}
+
+const ApiLocaleV1MusicRouteWithChildren =
+  ApiLocaleV1MusicRoute._addFileChildren(ApiLocaleV1MusicRouteChildren)
+
+interface ApiLocaleV1VideosIdRouteChildren {
+  ApiLocaleV1VideosIdContentRoute: typeof ApiLocaleV1VideosIdContentRoute
+}
+
+const ApiLocaleV1VideosIdRouteChildren: ApiLocaleV1VideosIdRouteChildren = {
+  ApiLocaleV1VideosIdContentRoute: ApiLocaleV1VideosIdContentRoute,
+}
+
+const ApiLocaleV1VideosIdRouteWithChildren =
+  ApiLocaleV1VideosIdRoute._addFileChildren(ApiLocaleV1VideosIdRouteChildren)
+
+interface ApiLocaleV1VideosRouteChildren {
+  ApiLocaleV1VideosIdRoute: typeof ApiLocaleV1VideosIdRouteWithChildren
+}
+
+const ApiLocaleV1VideosRouteChildren: ApiLocaleV1VideosRouteChildren = {
+  ApiLocaleV1VideosIdRoute: ApiLocaleV1VideosIdRouteWithChildren,
+}
+
+const ApiLocaleV1VideosRouteWithChildren =
+  ApiLocaleV1VideosRoute._addFileChildren(ApiLocaleV1VideosRouteChildren)
+
 interface ApiLocaleVibeExecuteToolRouteChildren {
   ApiLocaleVibeExecuteToolAwaitTaskRoute: typeof ApiLocaleVibeExecuteToolAwaitTaskRoute
   ApiLocaleVibeExecuteToolCompleteRoute: typeof ApiLocaleVibeExecuteToolCompleteRoute
@@ -15511,7 +15797,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleUsersViewRoute: ApiLocaleUsersViewRoute,
   ApiLocaleV1MessagesRoute: ApiLocaleV1MessagesRouteWithChildren,
   ApiLocaleV1ModelsRoute: ApiLocaleV1ModelsRoute,
+  ApiLocaleV1MusicRoute: ApiLocaleV1MusicRouteWithChildren,
   ApiLocaleV1ResponsesRoute: ApiLocaleV1ResponsesRoute,
+  ApiLocaleV1VideosRoute: ApiLocaleV1VideosRouteWithChildren,
   ApiLocaleVibeExecuteToolRoute: ApiLocaleVibeExecuteToolRouteWithChildren,
   ApiLocaleVibeHelpToolRoute: ApiLocaleVibeHelpToolRoute,
   LocaleCreatorUserIdIndexRoute: LocaleCreatorUserIdIndexRoute,
@@ -15772,7 +16060,12 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleUserPublicSignupRoute: ApiLocaleUserPublicSignupRoute,
   ApiLocaleUserPublicVerifyEmailRoute: ApiLocaleUserPublicVerifyEmailRoute,
   ApiLocaleUsersUserIdRoute: ApiLocaleUsersUserIdRouteWithChildren,
+  ApiLocaleV1AudioSpeechRoute: ApiLocaleV1AudioSpeechRoute,
+  ApiLocaleV1AudioTranscriptionsRoute: ApiLocaleV1AudioTranscriptionsRoute,
+  ApiLocaleV1AudioTranslationsRoute: ApiLocaleV1AudioTranslationsRoute,
   ApiLocaleV1ChatCompletionsRoute: ApiLocaleV1ChatCompletionsRoute,
+  ApiLocaleV1ImagesEditsRoute: ApiLocaleV1ImagesEditsRoute,
+  ApiLocaleV1ImagesGenerationsRoute: ApiLocaleV1ImagesGenerationsRoute,
   ApiLocaleVibeAgentCodingAgentRoute: ApiLocaleVibeAgentCodingAgentRoute,
   ApiLocaleVibeAgentDescribeImageRoute: ApiLocaleVibeAgentDescribeImageRoute,
   ApiLocaleVibeAgentDescribeVideoRoute: ApiLocaleVibeAgentDescribeVideoRoute,
@@ -15894,6 +16187,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleUserPublicResetPasswordRequestRoute,
   ApiLocaleUserPublicResetPasswordValidateRoute:
     ApiLocaleUserPublicResetPasswordValidateRoute,
+  ApiLocaleV1MediaThreadIdFilenameRoute: ApiLocaleV1MediaThreadIdFilenameRoute,
   ApiLocaleVibeAgentAiStreamCancelRoute: ApiLocaleVibeAgentAiStreamCancelRoute,
   ApiLocaleVibeAgentAiStreamRunRoute: ApiLocaleVibeAgentAiStreamRunRoute,
   ApiLocaleVibeAgentAiStreamStaleRunsRoute:

@@ -19,3 +19,14 @@ export const DEFAULT_TTS_MODEL_SELECTION: VoiceModelSelection = {
   sortBy2: ModelSortField.PRICE,
   sortDirection2: ModelSortDirection.ASC,
 };
+
+/** Audio formats a TTS call can ask for (OpenAI's response_format values). */
+export const TTS_OUTPUT_FORMATS = [
+  "mp3",
+  "opus",
+  "aac",
+  "flac",
+  "wav",
+  "pcm",
+] as const;
+export type TtsOutputFormat = (typeof TTS_OUTPUT_FORMATS)[number];

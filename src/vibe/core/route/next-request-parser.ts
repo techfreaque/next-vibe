@@ -184,9 +184,16 @@ function parseFormData(
     | MergedObject[]
   > = {};
 
-  // First pass: collect all values for each key
+  // First pass: collect all values for each key. `key[]` (the array
+  // convention OpenAI's SDKs and most form libraries use, e.g. `image[]`)
+  // collects under `key`; file uploads under it always become an array.
   const keyValues: Map<string, Array<string | File>> = new Map();
-  for (const [key, value] of formData.entries()) {
+  const bracketArrayKeys = new Set<string>();
+  for (const [rawKey, value] of formData.entries()) {
+    const key = rawKey.endsWith("[]") ? rawKey.slice(0, -2) : rawKey;
+    if (key !== rawKey) {
+      bracketArrayKeys.add(key);
+    }
     if (!keyValues.has(key)) {
       keyValues.set(key, []);
     }
@@ -200,7 +207,10 @@ function parseFormData(
     const allFiles = values.every((v) => v instanceof File);
 
     let value: string | File | File[];
-    if (key === "attachments" || (allFiles && values.length > 1)) {
+    if (
+      key === "attachments" ||
+      (allFiles && (values.length > 1 || bracketArrayKeys.has(key)))
+    ) {
       value = values.filter((v): v is File => v instanceof File);
     } else {
       value = values[0];

@@ -1,0 +1,38 @@
+{
+  "type": "json",
+  "url": "https://openrouter.ai/api/v1/videos/gen-vid-1794921311-YcqxGYRHWCZ2BRm6yg90",
+  "status": 200,
+  "headers": {
+    "access-control-allow-origin": "*",
+    "access-control-expose-headers": "WWW-Authenticate,PAYMENT-REQUIRED,Payment-Receipt,PAYMENT-RESPONSE,Location,X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+    "alt-svc": "h3=\":443\"; ma=86400",
+    "cf-ray": "a5bf01642ee1b716-FRA",
+    "connection": "keep-alive",
+    "content-encoding": "gzip",
+    "content-type": "application/json",
+    "date": "Tue, 17 Nov 2026 13:15:39 GMT",
+    "permissions-policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+    "referrer-policy": "no-referrer, strict-origin-when-cross-origin",
+    "server": "cloudflare",
+    "transfer-encoding": "chunked",
+    "x-content-type-options": "nosniff",
+    "set-cookie": "__cf_bm=4u_1oy90bhEJcvGUMAhZm87rFxzKWbEw.4g5zw4VC5s-1794921339.5501728-1.0.1.1-qlEmbIPwixFzl8oA64OuhKx8jggENjtodi2QvPIE.LbD0y94Qy_e.S4hJtO4SdftFsXpPq9T1LH_L3k7jSh.ZcZR1i1bhesV7uLpjCwWfw8jWPli3g.YMahBFJY9D7fu; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=openrouter.ai; Expires=Tue, 17 Nov 2026 13:45:39 GMT"
+  },
+  "body": {
+    "id": "gen-vid-1794921311-YcqxGYRHWCZ2BRm6yg90",
+    "generation_id": "gen-vid-1794921311-YcqxGYRHWCZ2BRm6yg90",
+    "polling_url": "https://openrouter.ai/api/v1/videos/gen-vid-1794921311-YcqxGYRHWCZ2BRm6yg90",
+    "status": "completed",
+    "unsigned_urls": [
+      "https://openrouter.ai/api/v1/videos/gen-vid-1794921311-YcqxGYRHWCZ2BRm6yg90/content?index=0"
+    ],
+    "urls": [
+      "https://storage.googleapis.com/openrouter-generated-media-us/v1/user_2xa4RltcnuVIYLYSeWPhnk4qIjt/gen-vid-1794921311-YcqxGYRHWCZ2BRm6yg90/0?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=generated-media-writer%40openrouter-core.iam.gserviceaccount.com%2F20261117%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20261117T131539Z&X-Goog-Expires=86395&X-Goog-SignedHeaders=host&X-Goog-Signature=4f4744b8a4b5c7a2e00f8ad5c74c5f455b478f6b3221cf7baadd7bf496b4738fad19e2d6e97d3fbeda0ec164b33fc16b4b20e9ede3cecb791dc354e8c341e41693e9e6c4d869496cce136930fa910ec9ee575781cdd35c526f6b43ea8d311e650d0a240c0918cd80576d8f03416ecabb7c1f02deb7b8b1b70bdbb5810b1c3715208fe2bbece20101df1462472305ab53cc329d5834d3ae507df254cf3eec319710e529777bc803dca9190328da48969b1e18f202086e837ccfff881fdee44efb32144a6a232bfd2e65d47150b7783333131008df719dcd479c37285cc8d2509facc728940c65940173faf95b59d91bef42756bd81b137d1d657847ebaa881ff3"
+    ],
+    "usage": {
+      "cost": 0.03,
+      "is_byok": false
+    },
+    "expires_at": 1795007734
+  }
+}

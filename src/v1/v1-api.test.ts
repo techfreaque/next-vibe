@@ -419,7 +419,8 @@ describe("OpenAI-compatible API", () => {
       });
       expect(res.success).toBe(false);
       if (!res.success) {
-        expect(res.message).toContain("any plan or a one-time credit pack");
+        const { subPrice } = getApiAccessPrices(defaultLocale);
+        expect(res.message).toContain(`any plan, from ${subPrice} a month`);
         expect(res.message).toContain(`/${defaultLocale}/${API_UNLOCK_PATH}`);
       }
     });

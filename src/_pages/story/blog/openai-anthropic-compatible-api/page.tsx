@@ -1,6 +1,7 @@
 /**
  * Blog post: one API key for every model, in OpenAI chat completions, OpenAI
- * Responses and Anthropic Messages format.
+ * Responses and Anthropic Messages format, plus the OpenAI-format media
+ * endpoints (images, speech, transcription, video, music).
  * /[locale]/story/blog/openai-anthropic-compatible-api
  *
  * Code samples come from the API reference (src/_pages/docs/api/snippets.ts)
@@ -14,7 +15,10 @@ import {
   chatModelDefinitions,
   ChatModelId,
 } from "next-vibe/agent/ai-stream/models";
-import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import {
+  type AgentEnvAvailability,
+  getEnvAvailability,
+} from "next-vibe/agent/env-availability";
 import {
   getAvailableChatModelCount,
   getAvailableChatProviderCount,
@@ -38,6 +42,7 @@ import type { JSX } from "react";
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
 import { buildDocsSnippets } from "@/_pages/docs/api/snippets";
 import { toModelSlug } from "@/_pages/models/_shared/model-facts";
+import { listMediaFacts } from "@/_pages/models/_shared/model-media-facts";
 import { API_UNLOCK_PATH, getApiAccessPrices } from "@/api-keys/access";
 import {
   buildCodingToolSnippets,
@@ -81,21 +86,29 @@ export const generateMetadata = async ({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const modelCount = getAvailableChatModelCount(
-    false,
-    await getEnvAvailability(),
-  );
+  const availability = await getEnvAvailability();
+  const modelCount = getAvailableChatModelCount(false, availability);
+  const mediaModelCount = countMediaModels(availability);
   return metadataGenerator(locale, {
     path: `story/blog/${SLUG}`,
     title: t("meta.title", { appName, modelCount }),
     category: t("meta.category"),
-    description: t("meta.description", { appName, modelCount }),
+    description: t("meta.description", {
+      appName,
+      modelCount,
+      mediaModelCount,
+    }),
     image:
       "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2070",
     imageAlt: t("meta.imageAlt", { appName }),
     keywords: [t("meta.keywords", { appName })],
   });
 };
+
+/** Current (non-legacy) image, video, music, speech and transcription models. */
+function countMediaModels(availability: AgentEnvAvailability): number {
+  return listMediaFacts(availability).filter((model) => !model.isLegacy).length;
+}
 
 type PickGroup = "frontier" | "cheap" | "uncensored";
 
@@ -152,6 +165,7 @@ export interface CompatibleApiPostPageData {
   locale: CountryLanguage;
   baseUrl: string;
   modelCount: number;
+  mediaModelCount: number;
   providerCount: number;
   subPrice: string;
   subCredits: number;
@@ -171,6 +185,7 @@ export async function tanstackLoader({
     locale,
     baseUrl: buildPublicApiBaseUrl(envClient.NEXT_PUBLIC_APP_URL, locale),
     modelCount: getAvailableChatModelCount(false, availability),
+    mediaModelCount: countMediaModels(availability),
     providerCount: getAvailableChatProviderCount(false, availability),
     ...getApiAccessPrices(locale),
     subCredits: subscription.credits,
@@ -251,6 +266,7 @@ export function TanstackPage({
   locale,
   baseUrl,
   modelCount,
+  mediaModelCount,
   providerCount,
   subPrice,
   subCredits,
@@ -277,7 +293,7 @@ export function TanstackPage({
         readTime={t("hero.readTime")}
         post={{ slug: SLUG, locale }}
         title={t("hero.title", { modelCount })}
-        subtitle={t("hero.subtitle", { appName })}
+        subtitle={t("hero.subtitle", { appName, mediaModelCount })}
       />
 
       <ArticleBody>
@@ -309,6 +325,7 @@ export function TanstackPage({
               t("endpoints.messages"),
               t("endpoints.countTokens"),
               t("endpoints.models"),
+              t("endpoints.media", { mediaModelCount }),
             ]}
           />
           <ArticleP>{t("endpoints.auth")}</ArticleP>
@@ -387,6 +404,28 @@ export function TanstackPage({
           <Sample
             caption={t("samples.models.caption")}
             code={docs.models}
+            language="bash"
+            filename="terminal"
+          />
+
+          <ArticleH3>{t("samples.media.title")}</ArticleH3>
+          <ArticleP>{t("samples.media.body")}</ArticleP>
+          <Sample
+            caption={t("samples.media.imageCaption")}
+            code={docs.images}
+            language="bash"
+            filename="terminal"
+          />
+          <ArticleP>{t("samples.media.async")}</ArticleP>
+          <Sample
+            caption={t("samples.media.videoCaption")}
+            code={docs.videoCreate}
+            language="bash"
+            filename="terminal"
+          />
+          <Sample
+            caption={t("samples.media.pollCaption")}
+            code={docs.videoPoll}
             language="bash"
             filename="terminal"
           />
@@ -471,6 +510,7 @@ export function TanstackPage({
               t("billing.preflight"),
               t("billing.abort"),
               t("billing.chat"),
+              t("billing.media"),
               t("billing.paid"),
             ]}
           />
@@ -548,7 +588,12 @@ export function TanstackPage({
             data={buildFaqStructuredData(
               FAQ_KEYS.map((key) => ({
                 question: t(`faq.${key}.q`, { appName }),
-                answer: t(`faq.${key}.a`, { appName, modelCount, ...prices }),
+                answer: t(`faq.${key}.a`, {
+                  appName,
+                  modelCount,
+                  mediaModelCount,
+                  ...prices,
+                }),
               })),
             )}
           />
@@ -556,7 +601,12 @@ export function TanstackPage({
             <Div key={key} className="flex flex-col gap-2">
               <ArticleH3>{t(`faq.${key}.q`, { appName })}</ArticleH3>
               <ArticleP>
-                {t(`faq.${key}.a`, { appName, modelCount, ...prices })}
+                {t(`faq.${key}.a`, {
+                  appName,
+                  modelCount,
+                  mediaModelCount,
+                  ...prices,
+                })}
               </ArticleP>
             </Div>
           ))}

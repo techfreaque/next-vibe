@@ -6,6 +6,7 @@ import { type Modality, ModelUtility } from "../models/enum";
 import {
   ApiProvider,
   buildModelOptionsIndex,
+  chargeForProviderCredits,
   defaultFeatures,
   filterRoleModels,
   getProviderPrice,
@@ -3179,4 +3180,23 @@ export function resolveVideoClipSeconds(
   return supported.reduce((prev, curr) =>
     Math.abs(curr - clamped) < Math.abs(prev - clamped) ? curr : prev,
   );
+}
+
+/**
+ * Listed credits of one clip on a route: its per-second rate (a resolution
+ * override first) x clip seconds x standard markup, rounded up to 0.1.
+ * Single source for the generator's pre-flight and the /v1/videos estimate.
+ */
+export function videoClipCredits(
+  route: Pick<
+    VideoGenModelOption,
+    "creditCostPerSecond" | "pricingByResolution"
+  >,
+  durationSeconds: number,
+  resolution: string | undefined,
+): number {
+  const perSecond =
+    (resolution ? route.pricingByResolution?.[resolution] : undefined) ??
+    route.creditCostPerSecond;
+  return chargeForProviderCredits(perSecond * durationSeconds);
 }

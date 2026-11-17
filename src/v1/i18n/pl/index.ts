@@ -285,6 +285,303 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  media: {
+    images: {
+      generations: {
+        title: "Generowanie obrazów zgodne z OpenAI",
+        titleShort: "v1 obrazy",
+        description:
+          "Twórz obrazy dowolnym modelem graficznym z GET /v1/models. Format obrazów OpenAI: url (podpisany, ważny 7 dni) lub b64_json. Płacisz za każdy obraz.",
+        success: {
+          title: "Obrazy gotowe",
+          description: "Obrazy są zapisane i podlinkowane",
+        },
+      },
+      edits: {
+        title: "Edycja obrazów zgodna z OpenAI",
+        titleShort: "v1 edycja obrazów",
+        description:
+          "Edytuj jeden obraz promptem, na modelu, który przyjmuje obraz na wejściu. Wyślij go jako pole multipart 'image' albo podaj 'image_url'. Płacisz za każdy obraz.",
+        success: {
+          title: "Obraz zmieniony",
+          description: "Edytowany obraz jest zapisany i podlinkowany",
+        },
+      },
+    },
+    speech: {
+      title: "Zamiana tekstu na mowę zgodna z OpenAI",
+      titleShort: "v1 mowa",
+      description:
+        "Zamień tekst na mowę. Odpowiada bajtami audio (domyślnie mp3). Płacisz za znaki.",
+      success: { title: "Mowa gotowa", description: "Plik audio" },
+    },
+    transcriptions: {
+      title: "Transkrypcja zgodna z OpenAI",
+      titleShort: "v1 transkrypcje",
+      description:
+        "Transkrybuj plik audio (pole multipart 'file', do 25 MB). JSON, tekst, SRT, WebVTT albo szczegółowy JSON z segmentami. Płacisz za sekundę nagrania.",
+      success: { title: "Audio przepisane", description: "Transkrypcja" },
+    },
+    translations: {
+      title: "Tłumaczenie audio zgodne z OpenAI",
+      titleShort: "v1 tłumaczenia",
+      description:
+        "Zamień plik audio od razu na angielski tekst przez Whisper. Te same formaty i rozliczenie co przy transkrypcji.",
+      success: {
+        title: "Audio przetłumaczone",
+        description: "Angielska transkrypcja",
+      },
+    },
+    videos: {
+      create: {
+        title: "Generowanie wideo (asynchronicznie)",
+        titleShort: "v1 wideo",
+        description:
+          "Uruchom zadanie wideo w formacie API wideo OpenAI. Od razu zwraca zadanie; status przez GET /v1/videos/{id}, pobieranie przez GET /v1/videos/{id}/content. Płacisz dopiero, gdy wideo jest gotowe.",
+        success: {
+          title: "Zadanie wideo w kolejce",
+          description: "Sprawdzaj je po ID",
+        },
+      },
+      get: {
+        title: "Status zadania wideo",
+        titleShort: "v1 status wideo",
+        description:
+          "Status, postęp i URL wyniku zadania wideo. Sprawdzanie jest darmowe i nie wlicza się do limitu zapytań.",
+        success: {
+          title: "Zadanie wideo",
+          description: "Aktualny stan zadania",
+        },
+      },
+      content: {
+        title: "Pobieranie wideo",
+        titleShort: "v1 plik wideo",
+        description: "Gotowy plik wideo z zakończonego zadania.",
+        success: { title: "Plik wideo", description: "Bajty MP4" },
+      },
+    },
+    music: {
+      create: {
+        title: "Generowanie muzyki (asynchronicznie)",
+        titleShort: "v1 muzyka",
+        description:
+          "Uruchom zadanie muzyczne. Od razu zwraca zadanie; status przez GET /v1/music/{id}, pobieranie przez GET /v1/music/{id}/content. Płacisz za klip, gdy jest gotowy.",
+        success: {
+          title: "Zadanie muzyczne w kolejce",
+          description: "Sprawdzaj je po ID",
+        },
+      },
+      get: {
+        title: "Status zadania muzycznego",
+        titleShort: "v1 status muzyki",
+        description:
+          "Status i URL wyniku zadania muzycznego. Sprawdzanie jest darmowe i nie wlicza się do limitu zapytań.",
+        success: {
+          title: "Zadanie muzyczne",
+          description: "Aktualny stan zadania",
+        },
+      },
+      content: {
+        title: "Pobieranie muzyki",
+        titleShort: "v1 plik muzyczny",
+        description: "Gotowy plik audio z zakończonego zadania muzycznego.",
+        success: { title: "Plik muzyczny", description: "Bajty audio" },
+      },
+    },
+    file: {
+      title: "Pobieranie pliku multimedialnego",
+      titleShort: "v1 plik multimedialny",
+      description:
+        "Pobierz plik wygenerowany przez wywołanie multimedialne. Podpisany URL działa bez klucza przez 7 dni; z Twoim kluczem API zawsze.",
+      success: { title: "Plik", description: "Bajty pliku" },
+    },
+    fields: {
+      model: {
+        label: "Model",
+        imageDescription:
+          "ID modelu graficznego z GET /v1/models (modality: image)",
+        speechDescription:
+          "ID głosu z GET /v1/models (modality: speech), np. openai-nova. Albo tts-1 plus głos.",
+        transcriptionDescription:
+          "ID modelu transkrypcji z GET /v1/models (modality: transcription). whisper-1 działa.",
+        translationDescription:
+          "Model Whisper od OpenAI: whisper-1 lub openai-whisper",
+        videoDescription: "ID modelu wideo z GET /v1/models (modality: video)",
+        musicDescription:
+          "ID modelu muzycznego z GET /v1/models (modality: music)",
+      },
+      prompt: {
+        label: "Prompt",
+        imageDescription: "Co narysować, do 2000 znaków",
+        editDescription: "Co zmienić na obrazie",
+        transcriptionDescription:
+          "Przyjmowany dla zgodności; nie trafia do każdego dostawcy",
+        videoDescription: "Co dzieje się w klipie, do 2000 znaków",
+        musicDescription: "Styl, nastrój, instrumenty, tempo",
+      },
+      n: {
+        label: "Obrazy",
+        description: "Ile obrazów, od 1 do 4. Każdy jest płatny.",
+      },
+      size: {
+        label: "Rozmiar",
+        imageDescription:
+          "SZEROKOŚĆxWYSOKOŚĆ, np. 1024x1024 lub 1536x1024, albo auto. Wybiera najbliższy rozmiar i proporcje, które obsługuje model.",
+        videoDescription:
+          "SZEROKOŚĆxWYSOKOŚĆ, np. 1280x720. Ustala proporcje i, jeśli model na to pozwala, rozdzielczość.",
+      },
+      aspectRatio: {
+        label: "Proporcje",
+        imageDescription:
+          "1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3 lub 21:9. Ma pierwszeństwo przed size.",
+        videoDescription:
+          "16:9, 9:16, 1:1, 4:3, 3:4, 3:2, 2:3, 21:9 lub 9:21. Ma pierwszeństwo przed size.",
+      },
+      quality: {
+        label: "Jakość",
+        description:
+          "standard, hd, low, medium, high lub auto. hd i high wybierają tryb szczegółowy, jeśli model go ma.",
+      },
+      style: {
+        label: "Styl",
+        description: "Przyjmowany dla zgodności. Styl opisz w prompcie.",
+      },
+      responseFormat: {
+        label: "Format odpowiedzi",
+        imageDescription:
+          "url (domyślnie, podpisany link ważny 7 dni) lub b64_json",
+        speechDescription:
+          "mp3 (domyślnie), opus, aac, flac, wav lub pcm. Dostępne formaty zależą od dostawcy głosu.",
+        transcriptionDescription:
+          "json (domyślnie), text, srt, verbose_json lub vtt",
+      },
+      user: {
+        label: "Użytkownik",
+        description:
+          "ID Twojego użytkownika końcowego. Przyjmowany dla zgodności.",
+      },
+      image: {
+        label: "Obraz",
+        description: "Obraz do edycji, jako plik multipart",
+      },
+      imageUrl: {
+        label: "URL obrazu",
+        description:
+          "Obraz do edycji jako URL http(s) lub base64 data: URL, dla zapytań JSON",
+        videoDescription:
+          "Pierwsza klatka jako URL http(s) lub base64 data: URL (obraz na wideo)",
+      },
+      mask: {
+        label: "Maska",
+        description: "Nieobsługiwana. Opisz zmianę w prompcie.",
+      },
+      input: {
+        label: "Tekst",
+        description: "Tekst do przeczytania, do 4096 znaków",
+      },
+      voice: {
+        label: "Głos",
+        description:
+          "Z nazwą modelu OpenAI (tts-1): alloy, nova, onyx, echo, shimmer lub fable. Albo dowolne ID głosu z GET /v1/models.",
+      },
+      speed: {
+        label: "Tempo",
+        description:
+          "Od 0.25 do 4.0. Działa dla głosów OpenAI, NanoGPT i ElevenLabs.",
+      },
+      instructions: {
+        label: "Instrukcje",
+        description:
+          "Przyjmowane dla zgodności; głosy czytają tekst dokładnie tak, jak jest",
+      },
+      file: {
+        label: "Plik",
+        description:
+          "Plik audio: mp3, mp4, m4a, wav, webm, ogg lub flac, do 25 MB",
+      },
+      language: {
+        label: "Język",
+        description:
+          "Kod ISO-639-1 języka nagrania, np. en lub pl. Domyślnie język z URL.",
+      },
+      temperature: {
+        label: "Temperatura",
+        description: "Przyjmowana dla zgodności",
+      },
+      seconds: {
+        label: "Sekundy",
+        videoDescription:
+          "Długość klipu. Dopasowana do długości, które oferuje model.",
+        musicDescription:
+          "Docelowa długość: około 8, 20 lub 30 sekund. Model może ją zaokrąglić.",
+      },
+      resolution: {
+        label: "Rozdzielczość",
+        description: "np. 720p lub 1080p, jeśli model daje wybór",
+      },
+      negativePrompt: {
+        label: "Prompt negatywny",
+        description: "Czego ma nie być w klipie, jeśli model to obsługuje",
+      },
+      inputReference: {
+        label: "Obraz referencyjny",
+        description:
+          "Pierwsza klatka jako obraz wysłany przez multipart (obraz na wideo)",
+      },
+      jobId: { label: "ID zadania", description: "ID zwrócone przez POST" },
+      threadId: { label: "Folder", description: "Folder, w którym leży plik" },
+      filename: { label: "Nazwa pliku", description: "Zapisana nazwa pliku" },
+      expires: {
+        label: "Wygasa",
+        description: "Czas Unix, po którym podpisany link przestaje działać",
+      },
+      sig: { label: "Podpis", description: "Podpis linku" },
+    },
+    response: {
+      created: "Utworzono",
+      object: "Typ obiektu",
+      text: "Tekst",
+      id: "ID zadania",
+      status: "Status",
+    },
+    errors: {
+      badSize:
+        "size '{{size}}' to nie SZEROKOŚĆxWYSOKOŚĆ (np. 1024x1024) ani auto.",
+      maskUnsupported: "Maski nie są obsługiwane. Opisz zmianę w prompcie.",
+      oneImageOnly: "Jeden obraz na edycję. Wyślij pojedyncze 'image'.",
+      imageTooLarge: "Obraz jest większy niż {{max}} MB.",
+      imageRequired:
+        "Wyślij obraz do edycji: pole multipart 'image' albo 'image_url' w JSON.",
+      modelCannotEdit:
+        "{{model}} nie przyjmuje obrazu na wejściu. Wybierz model obraz na obraz z GET /v1/models (input_modalities zawiera image).",
+      storageFailed:
+        "Plik powstał, ale nie udało się go zapisać. Spróbuj ponownie.",
+      voiceNotFound:
+        "Głos '{{voice}}' nie jest dla Ciebie dostępny. Listę głosów daje GET /v1/models (modality: speech), albo użyj modelu tts-1 z głosem nova.",
+      formatUnsupported:
+        "{{voice}} obsługuje {{supported}}. Wybierz jeden z nich jako response_format.",
+      audioTooLarge: "Plik audio jest większy niż 25 MB.",
+      fileRequired: "Wyślij audio jako pole multipart 'file'.",
+      translationUnsupported:
+        "{{model}} nie tłumaczy. Tłumaczenie na angielski działa na whisper-1.",
+      jobNotFound: "Brak zadania {{kind}} '{{id}}' na tym koncie.",
+      jobNotReady:
+        "Zadanie {{kind}} '{{id}}' ma status {{status}}. Pobierz je, gdy status będzie completed.",
+      jobInterrupted:
+        "Zadanie przerwał restart serwera. Nic nie zostało pobrane z konta. Wyślij je ponownie.",
+      jobNotCreated:
+        "Nie udało się zapisać zadania. Nic nie zostało pobrane z konta. Spróbuj ponownie.",
+      mediaNotFound:
+        "Nie znaleziono pliku albo link wygasł. Weź świeży link z zadania albo wyślij swój klucz API.",
+      modelNoImageInput:
+        "{{model}} nie przyjmuje pierwszej klatki. Wybierz model obraz na wideo z GET /v1/models albo usuń obraz.",
+      modelNeedsImage:
+        "{{model}} animuje obraz. Wyślij input_reference lub image_url.",
+      resolutionUnsupported:
+        "{{model}} generuje {{supported}}. Wybierz jedną z nich jako resolution.",
+    },
+  },
+
   errors: {
     validation: {
       title: "Błąd walidacji",

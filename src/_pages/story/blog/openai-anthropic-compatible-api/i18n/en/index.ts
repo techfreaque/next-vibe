@@ -3,11 +3,11 @@ export const translations = {
     title:
       "{{modelCount}} models, one API: OpenAI and Anthropic compatible | {{appName}}",
     description:
-      "One {{appName}} key for {{modelCount}} models. OpenAI chat completions, Responses API and Anthropic Messages on one endpoint. Works with Claude Code and Codex CLI.",
+      "One {{appName}} key for {{modelCount}} models. OpenAI chat completions, Responses API and Anthropic Messages on one endpoint. Works with Claude Code and Codex CLI. Plus {{mediaModelCount}} image, voice, video and music models in OpenAI format.",
     category: "Developer Guide",
     imageAlt: "{{appName}}: one API endpoint for every model",
     keywords:
-      "{{appName}}, OpenRouter alternative, one API for GPT Claude Gemini, OpenAI compatible API, OpenAI compatible API many models, Anthropic API compatible endpoint, Anthropic Messages API, Responses API, use Claude Code with other models, Codex CLI custom provider, LLM API gateway, uncensored models API",
+      "{{appName}}, OpenRouter alternative, one API for GPT Claude Gemini, OpenAI compatible API, OpenAI compatible API many models, Anthropic API compatible endpoint, Anthropic Messages API, Responses API, use Claude Code with other models, Codex CLI custom provider, LLM API gateway, uncensored models API, OpenAI compatible image API, text to speech API, Whisper API, video generation API, music generation API",
   },
   hero: {
     backToBlog: "Back to Blog",
@@ -15,7 +15,7 @@ export const translations = {
     readTime: "11 min read",
     title: "One API key. {{modelCount}} models. Three wire formats.",
     subtitle:
-      "{{appName}} speaks OpenAI chat completions, the OpenAI Responses API and the Anthropic Messages API on one endpoint. Your SDK stays. Your tools stay. Only the base URL changes.",
+      "{{appName}} speaks OpenAI chat completions, the OpenAI Responses API and the Anthropic Messages API on one endpoint. Your SDK stays. Your tools stay. Only the base URL changes. The same key also runs {{mediaModelCount}} image, voice, video and music models.",
   },
   intro: {
     lead: "GPT from OpenAI, Claude from Anthropic, Gemini from Google. Three SDKs, three keys, three bills, three dashboards. Or worse: the tool you like only speaks one format, so it only gets one vendor's models.",
@@ -25,9 +25,9 @@ export const translations = {
     accessLink: "Unlock the API",
   },
   endpoints: {
-    title: "Five endpoints, one key",
+    title: "Every endpoint, one key",
     intro:
-      "Every endpoint takes the same key, bills the same balance and serves the same models.",
+      "Every endpoint takes the same key and bills the same balance. The three chat formats serve the same models.",
     chat: "POST /v1/chat/completions: OpenAI Chat Completions. Streaming over SSE that ends with data: [DONE], stream_options.include_usage, tool calling. The format almost every OpenAI compatible client speaks.",
     responses:
       "POST /v1/responses: the OpenAI Responses API, the format Codex CLI speaks. Streaming and tools. Stateless: store is false and previous_response_id is rejected with 400, so send the full input each turn.",
@@ -37,6 +37,8 @@ export const translations = {
       "POST /v1/messages/count_tokens: costs no credits. A local estimate, no model call, and it does not count against your per-minute rate limit. Claude Code calls it constantly to size its context.",
     models:
       "GET /v1/models: every model your key can call right now, with context length, tool support and prices. One response body that both the OpenAI and the Anthropic SDKs parse.",
+    media:
+      "Media in OpenAI format, {{mediaModelCount}} models: POST /v1/images/generations and /v1/images/edits, /v1/audio/speech, /v1/audio/transcriptions and /v1/audio/translations. Video (POST /v1/videos) and music (POST /v1/music) run as async jobs: start, poll, download. GET /v1/models marks each model with its modality.",
     auth: "Auth works two ways, on every endpoint. Authorization: Bearer sk-unb-... for OpenAI clients and for Claude Code with ANTHROPIC_AUTH_TOKEN. x-api-key: sk-unb-... for the Anthropic SDKs. Keys start with sk-unb-, are shown once and stored only as a hash. Create them under Settings > API keys, up to 20 active keys per account.",
     baseUrlLabel: "Base URL",
     baseUrlNote:
@@ -74,6 +76,15 @@ export const translations = {
       title: "List the models",
       body: "GET /v1/models is the source of truth. It shows exactly which ids your key can call, with context length, tool support and price per token.",
       caption: "List models with curl",
+    },
+    media: {
+      title: "Images, voice, video, music",
+      body: "Same key, same base URL, OpenAI's media shapes. The OpenAI SDK's images and audio clients work unchanged. Pick a model with the matching modality from GET /v1/models.",
+      imageCaption: "Generate an image with curl",
+      async:
+        "Video and music take minutes, so they run as jobs. POST answers at once with an id. Poll it for free, then download the file. A failed job costs nothing.",
+      videoCaption: "Start a video job",
+      pollCaption: "Poll it, then download the MP4",
     },
   },
   ids: {
@@ -134,7 +145,9 @@ export const translations = {
     abort:
       "Streaming: close the connection and generation stops. You pay only for what ran. Same if the provider fails mid-stream.",
     chat: "Chat and API bill the same way. OpenRouter spreads a model across several hosts, and some charge more than the cheapest one we list. So for those models the listed price is an estimate, and usage.credits_charged is the real number. If OpenRouter reports no cost for a call, it bills at the listed price.",
-    paid: "Same credit balance as the chat app, which also covers image, video, music, voice and web search there. The API itself needs a paid account: any plan. Free credits do not unlock it.",
+    media:
+      "Media bills the same way: the provider's real cost plus our markup where the provider reports it, the listed per-model price otherwise. Images per image, voice per character, transcription per second of audio, video and music once the file is ready.",
+    paid: "Same credit balance as the chat app. The API itself needs a paid account: any plan. Free credits do not unlock it.",
     sub: "Monthly plans: four sizes, starting at {{subCredits}} credits for {{subPrice}}.",
     pack: "Credit packs: a top-up for subscribers, {{packCredits}} credits for {{packPrice}}. They never expire. Card, PayPal or crypto.",
     link: "See plans and pricing",
@@ -211,7 +224,7 @@ export const translations = {
     },
     models: {
       q: "Which models can I call?",
-      a: "{{modelCount}} chat models right now: Claude, GPT, Gemini, DeepSeek, Kimi, GLM, Qwen and uncensored models. GET /v1/models lists exactly what your key can call, with prices.",
+      a: "{{modelCount}} chat models right now: Claude, GPT, Gemini, DeepSeek, Kimi, GLM, Qwen and uncensored models. Plus {{mediaModelCount}} image, video, music, voice and transcription models. GET /v1/models lists exactly what your key can call, with prices.",
     },
     data: {
       q: "Does {{appName}} store my prompts?",
