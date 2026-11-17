@@ -14,6 +14,7 @@ import "server-only";
 import {
   and,
   eq,
+  gt,
   gte,
   inArray,
   isNotNull,
@@ -331,6 +332,13 @@ export async function isGuestPoolBlocked(leadIds: string[]): Promise<boolean> {
  * the account was created, on leads outside the account's pool. Counted once
  * against the new account (a signed-in user cannot start fresh after burning
  * an incognito guest pool).
+ *
+ * Only real guest spend counts, and each guest row only once per IP:
+ * - carryover rows are bookkeeping, never spend (counting them doubled the
+ *   charge with every signup from one browser, 2026-11-16)
+ * - leads linked to an account are that account's spend, not guest spend
+ * - rows up to the last carryover's `carriedUntil` at this IP were already
+ *   counted against an earlier account
  */
 export async function signupGuestCarryover({
   userId,
@@ -338,23 +346,48 @@ export async function signupGuestCarryover({
 }: {
   userId: string;
   poolLeadIds: string[];
-}): Promise<number> {
+}): Promise<{ amount: number; carriedUntil: Date } | null> {
   const [user] = await db
     .select({ createdAt: users.createdAt })
     .from(users)
     .where(eq(users.id, userId))
     .limit(1);
   if (!user) {
-    return 0;
+    return null;
   }
   const ip = await accountSignupIp(userId);
   const key = ipPoolKey(ip);
   if (!ip || !key) {
-    return 0;
+    return null;
   }
-  const from = new Date(
+  const sameIp = or(sql`${leads.metadata}->>'ipKey' = ${key}`, eq(leadIp, ip));
+  const isCarryover = sql`(${creditTransactions.metadata}->>'signupCarryover') = 'true'`;
+  const lookbackFrom = new Date(
     user.createdAt.getTime() - SIGNUP_GUEST_SPEND_LOOKBACK_HOURS * 3_600_000,
   );
+  const [watermark] = await db
+    .select({
+      until: sql<
+        string | null
+      >`max(COALESCE((${creditTransactions.metadata}->>'carriedUntil')::timestamptz, ${creditTransactions.createdAt}))`,
+    })
+    .from(creditTransactions)
+    .innerJoin(creditWallets, eq(creditWallets.id, creditTransactions.walletId))
+    .innerJoin(leads, eq(leads.id, creditWallets.leadId))
+    .where(
+      and(
+        sameIp,
+        isCarryover,
+        eq(creditTransactions.type, CreditTransactionType.USAGE),
+        gte(creditTransactions.createdAt, lookbackFrom),
+        sql`${creditTransactions.metadata}->>'grantKey' <> ${signupCarryoverGrantKey(userId)}`,
+      ),
+    );
+  const carriedBefore = watermark?.until ? new Date(watermark.until) : null;
+  const from =
+    carriedBefore && carriedBefore > lookbackFrom
+      ? carriedBefore
+      : lookbackFrom;
   // One query: the guest leads of that IP are a join, not a materialised id
   // list. A shared IP (CGNAT, VPN exit, localhost in dev) has thousands of
   // guest leads; loading them and binding each as an IN parameter cost
@@ -368,14 +401,26 @@ export async function signupGuestCarryover({
     .innerJoin(leads, eq(leads.id, creditWallets.leadId))
     .where(
       and(
-        or(sql`${leads.metadata}->>'ipKey' = ${key}`, eq(leadIp, ip)),
+        sameIp,
         poolLeadIds.length > 0
           ? notInArray(creditWallets.leadId, poolLeadIds)
           : undefined,
+        sql`NOT EXISTS (SELECT 1 FROM ${userLeadLinks} WHERE ${userLeadLinks.leadId} = ${leads.id})`,
+        sql`COALESCE((${creditTransactions.metadata}->>'signupCarryover') = 'true', false) = false`,
         eq(creditTransactions.type, CreditTransactionType.USAGE),
-        gte(creditTransactions.createdAt, from),
+        carriedBefore && carriedBefore > lookbackFrom
+          ? gt(creditTransactions.createdAt, from)
+          : gte(creditTransactions.createdAt, from),
         lte(creditTransactions.createdAt, user.createdAt),
       ),
     );
-  return Math.round(Number(row?.spent ?? 0) * 1_000_000) / 1_000_000;
+  return {
+    amount: Math.round(Number(row?.spent ?? 0) * 1_000_000) / 1_000_000,
+    carriedUntil: user.createdAt,
+  };
+}
+
+/** Idempotency key of the account's one carryover row */
+export function signupCarryoverGrantKey(userId: string): string {
+  return `free:user:${userId}:signup-carryover`;
 }

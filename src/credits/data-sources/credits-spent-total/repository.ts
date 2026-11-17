@@ -22,6 +22,7 @@ import { fillGaps } from "next-vibe/dataflow/shared/range";
 
 import { creditTransactions } from "../../db";
 import { CreditTransactionType } from "../../enum";
+import { notSignupCarryover } from "../../usage-filter";
 
 export class QueryCreditsSpentTotalRepository {
   static async queryCreditsSpentTotal(data: {
@@ -47,6 +48,7 @@ export class QueryCreditsSpentTotalRepository {
       .where(
         and(
           eq(creditTransactions.type, CreditTransactionType.USAGE),
+          notSignupCarryover,
           gte(creditTransactions.createdAt, range.from),
           lte(creditTransactions.createdAt, range.to),
         ),

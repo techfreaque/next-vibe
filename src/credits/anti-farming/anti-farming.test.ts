@@ -40,6 +40,7 @@ import {
   GUEST_POOLS_PER_SUBNET_PER_DAY,
 } from "./config";
 import { antiFarmingEvents, freePoolClaims } from "./db";
+import { signupCarryoverGrantKey } from "./quota";
 import { ipPoolKey, ipSubnetKey } from "./ip";
 
 const logger = createEndpointLogger(false, defaultLocale);
@@ -298,6 +299,66 @@ describe("accounts", () => {
               r.amount === -guest,
           ),
       ).toBe(true);
+    },
+    TIMEOUT_MS,
+  );
+
+  it(
+    "chained signups from one browser: each guest spend counts once, carryovers never compound",
+    async () => {
+      const ip = `${freshNet()}.21`;
+      const carryRow = async (
+        userId: string,
+      ): Promise<{ amount: number; balanceAfter: number } | undefined> => {
+        const [row] = await db
+          .select({
+            amount: creditTransactions.amount,
+            balanceAfter: creditTransactions.balanceAfter,
+          })
+          .from(creditTransactions)
+          .where(
+            sql`${creditTransactions.metadata}->>'grantKey' = ${signupCarryoverGrantKey(userId)}`,
+          );
+        return row;
+      };
+
+      const guestA = await visit(ip, "sweep-a");
+      await spend(guestUser(guestA), 7);
+      const first = await account("chain-1", ip);
+      if (!first || first.isPublic) {
+        return;
+      }
+      expect((await balance(first)).free).toBe(accountBase - 7);
+      expect(await carryRow(first.id)).toEqual({
+        amount: -7,
+        balanceAfter: accountBase - 7,
+      });
+
+      // Next guest on the same IP spends 5, then signs up: only those 5 carry
+      // (the 7 were carried already; the first carry row is no guest spend)
+      const guestB = await visit(ip, "sweep-b");
+      await spend(guestUser(guestB), 5);
+      const second = await account("chain-2", ip);
+      if (!second || second.isPublic) {
+        return;
+      }
+      expect((await balance(second)).free).toBe(accountBase - 5);
+      expect(await carryRow(second.id)).toEqual({
+        amount: -5,
+        balanceAfter: accountBase - 5,
+      });
+
+      // A signed-in account's own spend is never another signup's guest spend
+      await spend(second, 3);
+
+      // No new guest spend: no carryover at all (used to double every time).
+      // Third account = the subnet's monthly account budget, so stop here.
+      const third = await account("chain-3", ip);
+      if (!third || third.isPublic) {
+        return;
+      }
+      expect((await balance(third)).free).toBe(accountBase);
+      expect(await carryRow(third.id)).toBeUndefined();
     },
     TIMEOUT_MS,
   );

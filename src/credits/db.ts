@@ -136,6 +136,8 @@ export interface UsageMetadata extends Partial<UsageUpstreamCost> {
   actorLeadId?: string;
   /** Guest spend from the signup IP before signup, counted once against the account */
   signupCarryover?: boolean;
+  /** ISO time up to which guest spend at the IP was carried (the account's createdAt) */
+  carriedUntil?: string;
   /** Idempotency key (uq_transactions_grant_key), e.g. free:user:<id>:signup-carryover */
   grantKey?: string;
 }

@@ -96,6 +96,7 @@ import {
   grandfatheredUnverifiedCap,
   isGuestPoolBlocked,
   resolveAccountFreeAccess,
+  signupCarryoverGrantKey,
   signupGuestCarryover,
 } from "./anti-farming/quota";
 import {
@@ -1348,6 +1349,7 @@ export class CreditRepository {
    */
   private static async applySignupGuestCarryover(
     pool: CreditPool,
+    allowance: number,
     logger: EndpointLogger,
   ): Promise<void> {
     const userWallet = pool.userWallet;
@@ -1359,7 +1361,7 @@ export class CreditRepository {
     if (Date.now() - userWallet.createdAt.getTime() > youngForMs) {
       return;
     }
-    const grantKey = `free:user:${userId}:signup-carryover`;
+    const grantKey = signupCarryoverGrantKey(userId);
     const [done] = await db
       .select({ id: creditTransactions.id })
       .from(creditTransactions)
@@ -1368,26 +1370,49 @@ export class CreditRepository {
     if (done) {
       return;
     }
-    const carry = await signupGuestCarryover({
-      userId,
-      poolLeadIds: pool.leadWallets
-        .map((w) => w.leadId)
-        .filter((id): id is string => id !== null),
-    });
+    const poolLeadIds = pool.leadWallets
+      .map((w) => w.leadId)
+      .filter((id): id is string => id !== null);
+    const carryover = await signupGuestCarryover({ userId, poolLeadIds });
+    const carry = carryover?.amount ?? 0;
     const target = pool.leadWallets.toSorted(
       (a, b) => a.freePeriodStart.getTime() - b.freePeriodStart.getTime(),
     )[0];
-    if (carry <= 0 || !target) {
+    if (!carryover || carry <= 0 || !target) {
       return;
     }
     const now = new Date();
     const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    // balance_after = what the pool can still spend once the carry counts.
+    // The carry moves no wallet balance: free credits are capped by
+    // allowance - spent this period, and the top-up that runs right after
+    // this brings the wallets to exactly that.
+    const leadWalletIds = pool.leadWallets.map((w) => w.id);
+    const periodUsage = await db
+      .select({ metadata: creditTransactions.metadata })
+      .from(creditTransactions)
+      .where(
+        and(
+          inArray(creditTransactions.walletId, leadWalletIds),
+          eq(creditTransactions.freePeriodId, periodId),
+          eq(creditTransactions.type, CreditTransactionType.USAGE),
+        ),
+      );
+    const spentThisPeriod = periodUsage.reduce(
+      (sum, r) =>
+        sum +
+        ("freeCreditsUsed" in r.metadata
+          ? (r.metadata.freeCreditsUsed ?? 0)
+          : 0),
+      0,
+    );
+    const freeAfter = Math.max(0, allowance - spentThisPeriod - carry);
     await db
       .insert(creditTransactions)
       .values({
         walletId: target.id,
         amount: -carry,
-        balanceAfter: target.freeCreditsRemaining + userWallet.balance,
+        balanceAfter: freeAfter + userWallet.balance,
         type: CreditTransactionType.USAGE,
         freePeriodId: periodId,
         metadata: {
@@ -1395,6 +1420,7 @@ export class CreditRepository {
           freeCreditsUsed: carry,
           packCreditsUsed: 0,
           signupCarryover: true,
+          carriedUntil: carryover.carriedUntil.toISOString(),
           grantKey,
         },
       })
@@ -1467,7 +1493,7 @@ export class CreditRepository {
   ): Promise<{ cap: number; access: FreeCreditsAccess }> {
     const { allowance, legacyAllowance, tier, access } =
       await CreditRepository.resolvePoolFreeAllowance(pool, logger);
-    await CreditRepository.applySignupGuestCarryover(pool, logger);
+    await CreditRepository.applySignupGuestCarryover(pool, allowance, logger);
     await CreditRepository.resetMonthlyFreeCreditsIfNeeded(
       pool,
       allowance,

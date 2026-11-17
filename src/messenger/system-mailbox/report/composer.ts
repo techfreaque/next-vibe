@@ -6,6 +6,7 @@
  */
 
 import { CreditTransactionType } from "@/credits/enum";
+import { notSignupCarryoverRaw } from "@/credits/usage-filter";
 import { collectFinanceDigestLines } from "@/finance/digest";
 import { SubscriptionStatus } from "@/subscription/enum";
 
@@ -119,7 +120,7 @@ const SECTION_SPECS: SectionSpec[] = [
     tables: ["credit_transactions"],
     collect: async (run, since) => {
       const [row] = await run.rows(
-        `SELECT coalesce(-sum(amount) FILTER (WHERE type = '${CreditTransactionType.USAGE}'), 0) AS spent, coalesce(sum(amount) FILTER (WHERE type = '${CreditTransactionType.PURCHASE}'), 0) AS bought, count(*) FILTER (WHERE type = '${CreditTransactionType.USAGE}') AS usage_events FROM credit_transactions WHERE created_at >= '{{since}}'`,
+        `SELECT coalesce(-sum(amount) FILTER (WHERE type = '${CreditTransactionType.USAGE}' AND ${notSignupCarryoverRaw()}), 0) AS spent, coalesce(sum(amount) FILTER (WHERE type = '${CreditTransactionType.PURCHASE}'), 0) AS bought, count(*) FILTER (WHERE type = '${CreditTransactionType.USAGE}' AND ${notSignupCarryoverRaw()}) AS usage_events FROM credit_transactions WHERE created_at >= '{{since}}'`,
         since,
       );
       return [

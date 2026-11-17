@@ -32,6 +32,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type { QueryResultRow } from "pg";
 
 import { CreditTransactionType } from "@/credits/enum";
+import { notSignupCarryoverRaw } from "@/credits/usage-filter";
 import { FINANCE_CONFIG } from "@/finance/config";
 import { CheckoutMode, PaymentStatus, RefundStatus } from "@/payment/enum";
 import { BillingInterval, SubscriptionStatus } from "@/subscription/enum";
@@ -209,6 +210,7 @@ export class UsersStatsRepository {
       const prevFrom = ts(w.prevFrom);
       const now = ts(new Date());
       const usage = CreditTransactionType.USAGE;
+      const realUsage = sql.raw(notSignupCarryoverRaw("t"));
       const succeeded = PaymentStatus.SUCCEEDED;
       const unit = sql.raw(`'${w.granularity}'`);
       const step = sql.raw(`'1 ${w.granularity}'::interval`);
@@ -258,14 +260,14 @@ export class UsersStatsRepository {
             count(DISTINCT o.user_id) FILTER (WHERE t.created_at < ${from}) AS prev
           FROM credit_transactions t
           JOIN owners o ON o.wallet_id = t.wallet_id
-          WHERE t.type = ${usage} AND t.created_at >= ${prevFrom} AND t.created_at <= ${to}
+          WHERE t.type = ${usage} AND ${realUsage} AND t.created_at >= ${prevFrom} AND t.created_at <= ${to}
             AND ${notInternal("o.user_id")}`),
 
         db.execute<QueryResultRow & { current: NumLike }>(sql`
           SELECT count(DISTINCT t.wallet_id) AS current
           FROM credit_transactions t
           JOIN credit_wallets w ON w.id = t.wallet_id
-          WHERE t.type = ${usage} AND t.created_at >= ${from} AND t.created_at <= ${to}
+          WHERE t.type = ${usage} AND ${realUsage} AND t.created_at >= ${from} AND t.created_at <= ${to}
             AND w.user_id IS NULL
             AND NOT EXISTS (SELECT 1 FROM user_lead_links ul WHERE ul.lead_id = w.lead_id)`),
 
@@ -275,7 +277,7 @@ export class UsersStatsRepository {
             coalesce(sum(-t.amount) FILTER (WHERE t.created_at >= ${from}), 0) AS current,
             coalesce(sum(-t.amount) FILTER (WHERE t.created_at < ${from}), 0) AS prev
           FROM credit_transactions t
-          WHERE t.type = ${usage} AND t.created_at >= ${prevFrom} AND t.created_at <= ${to}
+          WHERE t.type = ${usage} AND ${realUsage} AND t.created_at >= ${prevFrom} AND t.created_at <= ${to}
             AND t.wallet_id NOT IN (${internalWallets})`),
 
         db.execute<
@@ -355,7 +357,7 @@ export class UsersStatsRepository {
             count(*) AS cohort,
             count(*) FILTER (WHERE EXISTS (
               SELECT 1 FROM credit_transactions t JOIN owners o ON o.wallet_id = t.wallet_id
-              WHERE o.user_id = u.id AND t.type = ${usage}
+              WHERE o.user_id = u.id AND t.type = ${usage} AND ${realUsage}
                 AND t.created_at >= u.created_at + interval '7 days'
             )) AS converted
           FROM users u
@@ -391,14 +393,14 @@ export class UsersStatsRepository {
             SELECT date_trunc(${unit}, t.created_at) AS b,
               count(DISTINCT o.user_id) AS n
             FROM credit_transactions t JOIN owners o ON o.wallet_id = t.wallet_id
-            WHERE t.type = ${usage} AND t.created_at >= ${from} AND t.created_at <= ${to}
+            WHERE t.type = ${usage} AND ${realUsage} AND t.created_at >= ${from} AND t.created_at <= ${to}
               AND ${notInternal("o.user_id")}
             GROUP BY 1
           ),
           c AS (
             SELECT date_trunc(${unit}, t.created_at) AS b, sum(-t.amount) AS n
             FROM credit_transactions t
-            WHERE t.type = ${usage} AND t.created_at >= ${from} AND t.created_at <= ${to}
+            WHERE t.type = ${usage} AND ${realUsage} AND t.created_at >= ${from} AND t.created_at <= ${to}
               AND t.wallet_id NOT IN (${internalWallets})
             GROUP BY 1
           ),
@@ -470,7 +472,7 @@ export class UsersStatsRepository {
           spend AS (
             SELECT o.user_id, sum(-t.amount) AS spent
             FROM credit_transactions t JOIN owners o ON o.wallet_id = t.wallet_id
-            WHERE t.type = ${usage} AND t.created_at >= ${from} AND t.created_at <= ${to}
+            WHERE t.type = ${usage} AND ${realUsage} AND t.created_at >= ${from} AND t.created_at <= ${to}
               AND ${notInternal("o.user_id")}
             GROUP BY o.user_id ORDER BY 2 DESC LIMIT 10
           )

@@ -143,6 +143,13 @@ export interface ModelProviderConfigTokenBased {
   cacheWriteTokenCost?: number;
   /** USD per 1M IMAGE output tokens (image-output chat models). Unset = outputTokenCost. */
   imageOutputTokenCost?: number;
+  /**
+   * USD per 1M input tokens on the most expensive endpoint a router
+   * (OpenRouter) may pick for this model. The listed inputTokenCost is the
+   * cheapest endpoint; the pre-flight input-cost gate prices the prompt at
+   * this. Unset = inputTokenCost.
+   */
+  maxInputTokenCost?: number;
   adminOnly?: boolean;
   creditCostPerImage?: never;
   creditCostPerSecond?: never;
@@ -388,6 +395,13 @@ export interface ModelOptionBase {
 export interface ModelOptionTokenBased extends ModelOptionBase {
   creditCost: typeof calculateCreditCost;
   inputTokenCost: number;
+  /**
+   * USD per 1M input tokens on the most expensive endpoint a router
+   * (OpenRouter) may pick for this model. The listed inputTokenCost is the
+   * cheapest endpoint; the pre-flight input-cost gate prices the prompt at
+   * this. Unset = inputTokenCost.
+   */
+  maxInputTokenCost?: number;
   outputTokenCost: number;
   cacheReadTokenCost?: number;
   cacheWriteTokenCost?: number;
@@ -406,6 +420,7 @@ export interface ModelOptionCreditBased extends ModelOptionBase {
   id: ChatModelId;
   creditCost: number;
   inputTokenCost?: never;
+  maxInputTokenCost?: never;
   outputTokenCost?: never;
   creditCostPerImage?: never;
   creditCostPerSecond?: never;

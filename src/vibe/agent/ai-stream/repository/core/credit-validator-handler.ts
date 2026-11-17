@@ -33,6 +33,8 @@ export class CreditValidatorHandler {
     ResponseType<{
       effectiveLeadId: string;
       modelCost: number;
+      /** Spendable credits at validation time (free + paid) */
+      balance: number;
     }>
   > {
     const { user, ipAddress, modelInfo, locale, logger, t } = params;
@@ -150,6 +152,7 @@ export class CreditValidatorHandler {
       data: {
         effectiveLeadId,
         modelCost,
+        balance: validationResult.data.balance,
       },
     };
   }

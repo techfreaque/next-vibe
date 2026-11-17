@@ -30,6 +30,8 @@ interface ModelCreditPhaseResult {
   modelConfig: ChatModelOption;
   effectiveLeadId: string;
   modelCost: number;
+  /** Spendable credits at validation time (free + paid) */
+  balance: number;
 }
 
 /**
@@ -191,8 +193,11 @@ export async function runModelCreditPhase(params: {
     return creditValidation;
   }
 
-  const { effectiveLeadId, modelCost } = creditValidation.data;
-  return { success: true, data: { modelConfig, effectiveLeadId, modelCost } };
+  const { effectiveLeadId, modelCost, balance } = creditValidation.data;
+  return {
+    success: true,
+    data: { modelConfig, effectiveLeadId, modelCost, balance },
+  };
 }
 /**
  * Headless Intake Phase

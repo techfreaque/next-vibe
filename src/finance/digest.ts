@@ -10,6 +10,7 @@
 /* eslint-disable i18next/no-literal-string */
 
 import { CreditTransactionType } from "@/credits/enum";
+import { notSignupCarryoverRaw } from "@/credits/usage-filter";
 import { CREDIT_VALUE_USD } from "@/products/constants";
 
 import { FINANCE_CONFIG } from "./config";
@@ -232,7 +233,7 @@ export async function collectFinanceDigestLines(
     (await run.tableExists("credit_wallets"))
   ) {
     const [active] = await run.rows(
-      `SELECT count(DISTINCT w.user_id) AS users, count(DISTINCT w.id) AS wallets, coalesce(-sum(t.amount), 0) AS spent FROM credit_transactions t JOIN credit_wallets w ON w.id = t.wallet_id WHERE t.type = '${CreditTransactionType.USAGE}' AND t.created_at >= '{{since}}'`,
+      `SELECT count(DISTINCT w.user_id) AS users, count(DISTINCT w.id) AS wallets, coalesce(-sum(t.amount), 0) AS spent FROM credit_transactions t JOIN credit_wallets w ON w.id = t.wallet_id WHERE t.type = '${CreditTransactionType.USAGE}' AND ${notSignupCarryoverRaw("t")} AND t.created_at >= '{{since}}'`,
       since,
     );
     lines.push(

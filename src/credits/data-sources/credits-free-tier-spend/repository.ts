@@ -23,6 +23,7 @@ import type {
 
 import { creditTransactions } from "../../db";
 import { CreditTransactionType } from "../../enum";
+import { notSignupCarryover } from "../../usage-filter";
 import { bucketStart, sumIntoBuckets } from "../free-tier-series";
 
 const CALENDAR_RESOLUTIONS: Resolution[] = [
@@ -60,6 +61,7 @@ export class QueryCreditsFreeTierSpendRepository {
       .where(
         and(
           eq(creditTransactions.type, CreditTransactionType.USAGE),
+          notSignupCarryover,
           gte(
             creditTransactions.createdAt,
             bucketStart(range.from, resolution),

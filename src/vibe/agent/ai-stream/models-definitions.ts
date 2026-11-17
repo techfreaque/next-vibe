@@ -4355,6 +4355,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         providerModel: "moonshotai/kimi-k3",
         creditCost: calculateCreditCost,
         inputTokenCost: 0.2, // updated: 2026-11-15 from openrouter-api
+        // Listed price is the cheapest endpoint (Wafer); most of the 27
+        // endpoints charge $3/M, the "fast" ones $4.50/M (2026-11-17).
+        maxInputTokenCost: 4.5,
         outputTokenCost: 16, // updated: 2026-11-07 from openrouter-api
         cacheReadTokenCost: 0.19, // updated: 2026-11-15 from openrouter-api
       },

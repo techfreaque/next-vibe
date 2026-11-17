@@ -26,7 +26,7 @@ import {
   makeHeadlessContext,
   type ToolExecutionContext,
 } from "../../../../core/execution-context";
-import { type ToolCall } from "../../../chat/db";
+import { chatMessages, chatThreads, type ToolCall } from "../../../chat/db";
 import type { ChatMessageRole } from "../../../chat/enum";
 import { ThreadStreamingState } from "../../../chat/enum";
 import { chatSettings } from "../../../chat/settings/db";
@@ -73,6 +73,7 @@ import {
 } from "../core/constants";
 import { wireEscalateToTask } from "../core/escalation-handler";
 import { ProviderFactory as ProviderFactoryClass } from "../core/infra";
+import { checkInputCost } from "../core/input-cost-gate";
 import {
   type BridgeContext,
   ModalityResolver,
@@ -675,7 +676,12 @@ export async function setupAiStream(params: {
   if (!modelCreditResult.success) {
     return modelCreditResult;
   }
-  const { modelConfig, effectiveLeadId, modelCost } = modelCreditResult.data;
+  const {
+    modelConfig,
+    effectiveLeadId,
+    modelCost,
+    balance: creditBalance,
+  } = modelCreditResult.data;
 
   // Process operation and handle audio transcription
   const operationResult = await processOperation({
@@ -1226,6 +1232,54 @@ export async function setupAiStream(params: {
         toolConfirmationResults,
         toolExecutionContext,
       });
+
+  // Pre-flight: the wallet must cover the INPUT of this prompt at the most
+  // expensive endpoint the router may pick. The flat check above prices a
+  // fixed 16k-token turn at the cheapest listed price; a huge prompt routed
+  // to a $3/M endpoint cost a 20-credit guest 251.7 credits (2026-11-16).
+  const inputGate = checkInputCost({
+    model: modelConfig,
+    modelCost,
+    balance: creditBalance,
+    messages,
+    systemPrompt: updatedSystemPrompt,
+    tools,
+    compactTrigger: effectiveCompactTrigger,
+  });
+  if (!inputGate.allowed) {
+    logger.debug("[Setup] Input cost exceeds balance", {
+      model: modelConfig.id,
+      inputTokens: inputGate.inputTokens,
+      inputCredits: inputGate.inputCredits,
+      balance: creditBalance,
+    });
+    // A refused turn leaves nothing behind, like the flat check that runs
+    // before any row is written: drop this request's user message and the
+    // thread it created.
+    if (!isIncognito) {
+      if (threadResult.data.isNew) {
+        await db
+          .delete(chatThreads)
+          .where(eq(chatThreads.id, threadResult.data.threadId))
+          .catch(() => undefined);
+      } else if (
+        !hasToolConfirmations &&
+        userMessageResult.data.userMessageId
+      ) {
+        await db
+          .delete(chatMessages)
+          .where(eq(chatMessages.id, userMessageResult.data.userMessageId))
+          .catch(() => undefined);
+      }
+    }
+    return fail({
+      message: aiStreamT("route.errors.insufficientCredits", {
+        cost: inputGate.inputCredits.toString(),
+        balance: creditBalance.toString(),
+      }),
+      errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+    });
+  }
 
   const provider = ProviderFactoryClass.getProviderForModel(
     modelConfig,

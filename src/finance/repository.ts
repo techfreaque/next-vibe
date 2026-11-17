@@ -26,6 +26,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { creditTransactions, creditWallets } from "@/credits/db";
 import { CreditTransactionType } from "@/credits/enum";
+import { notSignupCarryover } from "@/credits/usage-filter";
 import { systemMailboxEnv } from "@/messenger/system-mailbox/env";
 import { scopedTranslation as mailScopedTranslation } from "@/messenger/system-mailbox/i18n";
 import { SystemMailboxRepository } from "@/messenger/system-mailbox/repository";
@@ -1371,6 +1372,7 @@ export class FinanceRepository {
       .where(
         and(
           eq(creditTransactions.type, CreditTransactionType.USAGE),
+          notSignupCarryover,
           gte(creditTransactions.createdAt, from),
           lt(creditTransactions.createdAt, to),
         ),
