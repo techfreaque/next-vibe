@@ -938,6 +938,9 @@ export async function setupAiStream(params: {
     relayCallerInstanceId: params.relayCallerInstanceId ?? null,
     subAgentDepth: params.subAgentDepth,
     excludeMemories: params.excludeMemories,
+    toolsDisabled:
+      params.toolsOverride !== undefined &&
+      Object.keys(params.toolsOverride).length === 0,
     memoryLimit: resolvedToolConfig.memoryLimit,
     mediaCapabilities: {
       nativeOutputs: modelConfig.outputs ?? [],

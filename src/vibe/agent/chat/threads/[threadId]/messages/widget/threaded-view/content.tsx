@@ -18,6 +18,7 @@ import { getChatModelById } from "../../../../../../ai-stream/models";
 import type { ChatMessage } from "../../../../../db";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { scopedTranslation } from "../../i18n";
+import { AiBadge } from "../ai-badge";
 import { useMessageGroupName } from "../embedded-context";
 import { ErrorMessageBubble } from "../error-message-bubble";
 import type { groupMessagesBySequence } from "../message-grouping";
@@ -137,6 +138,11 @@ export function ThreadedMessageContent({
                   : t("widget.threadedView.assistantFallback")}
             </Button>
           </Span>
+
+          {message.isAI &&
+            (rootFolderId === "public" || rootFolderId === "shared") && (
+              <AiBadge locale={locale} />
+            )}
 
           {/* Skill - only for AI messages */}
           {message.role === "assistant" && characterName && (

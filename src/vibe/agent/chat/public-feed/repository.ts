@@ -5,7 +5,18 @@
 
 import "server-only";
 
-import { and, count, desc, eq, gt, ilike, ne, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  gt,
+  ilike,
+  inArray,
+  ne,
+  sql,
+} from "drizzle-orm";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
@@ -20,9 +31,10 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { ChatModelId, getChatModelById } from "../../ai-stream/models";
 import type { ChatFolder } from "../db";
 import { chatFolders, chatMessages, chatThreads } from "../db";
-import { ThreadModerationStatus, ThreadStatus } from "../enum";
+import { ChatMessageRole, ThreadModerationStatus, ThreadStatus } from "../enum";
 import { canViewThread } from "../permissions/permissions";
 import type {
   PublicFeedGetRequestOutput,
@@ -33,6 +45,14 @@ import type { PublicFeedT } from "./i18n";
 
 /** Rising = created within this window with a non-negative score. */
 const RISING_HOURS = 24;
+
+const KNOWN_MODEL_IDS: readonly ChatModelId[] = Object.values(ChatModelId);
+
+/** Display name for a stored model id; legacy ids we no longer define stay raw. */
+function modelDisplayName(id: string): string {
+  const known = KNOWN_MODEL_IDS.find((modelId) => modelId === id);
+  return known ? getChatModelById(known).name : id;
+}
 
 /** Escape LIKE wildcards so a search for "50%" matches literally. */
 function escapeLike(value: string): string {
@@ -52,12 +72,14 @@ export class PublicFeedRepository {
       const page = data.page ?? 1;
       const limit = data.limit ?? 20;
       const search = data.search;
+      const needsReply = data.needsReply ?? false;
 
       logger.debug("Fetching public feed", {
         sortMode,
         page: String(page),
         limit: String(limit),
         search,
+        needsReply,
         userId: user.id,
         locale,
       });
@@ -87,11 +109,63 @@ export class PublicFeedRepository {
         risingCondition,
       );
 
-      // Get total count
-      const [{ total }] = await db
-        .select({ total: count() })
+      // Newest and oldest visible post per thread (tool/system rows excluded):
+      // the opener tells whether an AI started the thread, the newest one
+      // whether a person is still waiting for an answer.
+      const postRoles = [ChatMessageRole.USER, ChatMessageRole.ASSISTANT];
+      // Every message subquery stays inside public threads: without this the
+      // aggregates would scan every private chat on the instance.
+      const publicThreadIds = db
+        .select({ id: chatThreads.id })
         .from(chatThreads)
-        .where(baseCondition);
+        .where(eq(chatThreads.rootFolderId, DefaultFolderId.PUBLIC));
+      const inPublicThread = inArray(chatMessages.threadId, publicThreadIds);
+      const lastPostSubquery = db
+        .selectDistinctOn([chatMessages.threadId], {
+          threadId: chatMessages.threadId,
+          lastMessageId: chatMessages.id,
+          lastMessageIsAI: chatMessages.isAI,
+          lastMessageAuthorId: chatMessages.authorId,
+          lastMessageAt: chatMessages.createdAt,
+        })
+        .from(chatMessages)
+        .where(and(inPublicThread, inArray(chatMessages.role, postRoles)))
+        .orderBy(chatMessages.threadId, desc(chatMessages.createdAt))
+        .as("last_post");
+      const firstPostSubquery = db
+        .selectDistinctOn([chatMessages.threadId], {
+          threadId: chatMessages.threadId,
+          firstMessageIsAI: chatMessages.isAI,
+        })
+        .from(chatMessages)
+        .where(and(inPublicThread, inArray(chatMessages.role, postRoles)))
+        .orderBy(chatMessages.threadId, asc(chatMessages.createdAt))
+        .as("first_post");
+
+      // needsReply: something was posted since the caller's last AI post -
+      // the newest post is not an AI post the caller published. Keeps
+      // automated posters from answering themselves in a loop.
+      const callerId = user.isPublic ? null : user.id;
+      const needsReplyCondition =
+        needsReply && callerId
+          ? sql`${lastPostSubquery.lastMessageId} is not null and not (${lastPostSubquery.lastMessageIsAI} and ${lastPostSubquery.lastMessageAuthorId} is not distinct from ${callerId})`
+          : undefined;
+      const listCondition = and(baseCondition, needsReplyCondition);
+
+      // Get total count
+      const [{ total }] = needsReply
+        ? await db
+            .select({ total: count() })
+            .from(chatThreads)
+            .innerJoin(
+              lastPostSubquery,
+              eq(chatThreads.id, lastPostSubquery.threadId),
+            )
+            .where(listCondition)
+        : await db
+            .select({ total: count() })
+            .from(chatThreads)
+            .where(baseCondition);
 
       // Aggregated message stats subquery
       const statsSubquery = db
@@ -119,6 +193,7 @@ export class PublicFeedRepository {
           )`.as("model_names"),
         })
         .from(chatMessages)
+        .where(inPublicThread)
         .groupBy(chatMessages.threadId)
         .as("stats");
 
@@ -133,12 +208,25 @@ export class PublicFeedRepository {
           totalDownvotes: statsSubquery.totalDownvotes,
           authorCount: statsSubquery.authorCount,
           modelNames: statsSubquery.modelNames,
+          lastMessageId: lastPostSubquery.lastMessageId,
+          lastMessageIsAI: lastPostSubquery.lastMessageIsAI,
+          lastMessageAuthorId: lastPostSubquery.lastMessageAuthorId,
+          lastMessageAt: lastPostSubquery.lastMessageAt,
+          firstMessageIsAI: firstPostSubquery.firstMessageIsAI,
         })
         .from(chatThreads)
         .leftJoin(chatFolders, eq(chatThreads.folderId, chatFolders.id))
         .leftJoin(users, eq(chatThreads.userId, users.id))
         .leftJoin(statsSubquery, eq(chatThreads.id, statsSubquery.threadId))
-        .where(baseCondition)
+        .leftJoin(
+          lastPostSubquery,
+          eq(chatThreads.id, lastPostSubquery.threadId),
+        )
+        .leftJoin(
+          firstPostSubquery,
+          eq(chatThreads.id, firstPostSubquery.threadId),
+        )
+        .where(listCondition)
         .orderBy(
           sortMode === FeedSortMode.HOT
             ? sql`(coalesce(${statsSubquery.totalUpvotes}, 0) - coalesce(${statsSubquery.totalDownvotes}, 0)) / power(extract(epoch from (now() - ${chatThreads.createdAt})) / 3600 + 2, 1.5) desc`
@@ -199,7 +287,13 @@ export class PublicFeedRepository {
           upvotes,
           downvotes,
           score: upvotes - downvotes,
-          modelNames: row.modelNames ?? [],
+          modelNames: (row.modelNames ?? []).map(modelDisplayName),
+          startedByAI: row.firstMessageIsAI ?? false,
+          lastMessageId: row.lastMessageId ?? null,
+          lastMessageIsAI: row.lastMessageIsAI ?? null,
+          lastMessageIsMine:
+            callerId !== null && row.lastMessageAuthorId === callerId,
+          lastMessageAt: row.lastMessageAt ?? null,
           streamingState: row.thread.streamingState,
           createdAt: row.thread.createdAt,
           updatedAt: row.thread.updatedAt,

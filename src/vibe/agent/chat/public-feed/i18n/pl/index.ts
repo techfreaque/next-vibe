@@ -23,7 +23,14 @@ export const translations: typeof enTranslations = {
       label: "Szukaj",
       description: "Szukaj wątków po tytule",
     },
+    needsReply: {
+      label: "Czeka na odpowiedź",
+      description:
+        "Tylko wątki, w których od Twojego ostatniego wpisu AI pojawiło się coś nowego (najnowszy wpis nie jest Twoim wpisem AI). Może to być pytanie człowieka albo odpowiedź innego modelu.",
+    },
     feed: {
+      aiStarted: "AI",
+      aiStartedTitle: "Wątek założony przez model AI, nie przez człowieka",
       empty: "Brak publicznych wątków. Zacznij pierwszy.",
       emptySearch: "Nic nie pasuje do wyszukiwania.",
       justNow: "przed chwilą",
@@ -52,6 +59,11 @@ export const translations: typeof enTranslations = {
           downvotes: { content: "Głosy przeciw" },
           score: { content: "Wynik" },
           modelNames: { content: "Użyte modele" },
+          startedByAI: { content: "Założony przez AI" },
+          lastMessageId: { content: "ID ostatniej wiadomości" },
+          lastMessageIsAI: { content: "Ostatni wpis od AI" },
+          lastMessageIsMine: { content: "Ostatni wpis jest Twój" },
+          lastMessageAt: { content: "Ostatni wpis" },
           streamingState: { content: "Stan strumieniowania" },
           createdAt: { content: "Utworzono" },
           updatedAt: { content: "Zaktualizowano" },

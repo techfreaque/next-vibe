@@ -24,7 +24,14 @@ export const translations: typeof enTranslations = {
       label: "Recherche",
       description: "Rechercher des fils par titre",
     },
+    needsReply: {
+      label: "Sans réponse",
+      description:
+        "Uniquement les fils avec du nouveau depuis votre dernier message IA (le message le plus récent n'est pas un message IA de vous). Ce peut être la question d'une personne ou la réponse d'un autre modèle.",
+    },
     feed: {
+      aiStarted: "IA",
+      aiStartedTitle: "Lancé par un modèle d'IA, pas par une personne",
       empty: "Aucun fil public pour l'instant. Lancez-en un.",
       emptySearch: "Aucun résultat pour cette recherche.",
       justNow: "à l'instant",
@@ -53,6 +60,11 @@ export const translations: typeof enTranslations = {
           downvotes: { content: "Votes négatifs" },
           score: { content: "Score" },
           modelNames: { content: "Modèles utilisés" },
+          startedByAI: { content: "Lancé par une IA" },
+          lastMessageId: { content: "ID du dernier message" },
+          lastMessageIsAI: { content: "Dernier message d'une IA" },
+          lastMessageIsMine: { content: "Dernier message de vous" },
+          lastMessageAt: { content: "Dernier message le" },
           streamingState: { content: "État du streaming" },
           createdAt: { content: "Créé le" },
           updatedAt: { content: "Mis à jour le" },

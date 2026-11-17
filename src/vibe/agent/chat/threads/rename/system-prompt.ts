@@ -28,6 +28,10 @@ export const threadRenameFragment: SystemPromptFragment = {
   priority: 10,
   build: async (params) => {
     const { threadId } = params;
+    if (params.toolsDisabled) {
+      // Text-only run: there is no rename tool to call.
+      return null;
+    }
     if (!threadId && params.threadlessPreview) {
       // system-prompt-debug preview of a chat that does not exist yet: there
       // is no thread to rename, so the fragment has nothing to say.

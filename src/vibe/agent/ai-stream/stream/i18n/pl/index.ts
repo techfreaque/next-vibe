@@ -76,7 +76,7 @@ export const translations: typeof enTranslations = {
         availableTools: {
           label: "Może wykonywać",
           description:
-            "Które narzędzia AI może uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione. Standard: [{toolId:'execute-tool'},{toolId:'tool-help'}].",
+            "Narzędzia dla tego uruchomienia. [] = tylko tekst: bez narzędzi, model tylko pisze (do szkiców). Pomiń, aby użyć narzędzi skilla lub ulubionego. Inne listy nie są jeszcze stosowane.",
           toolId: {
             label: "ID narzędzia",
             description:

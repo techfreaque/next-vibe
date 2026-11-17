@@ -658,6 +658,13 @@ export class AiStreamRepository {
         onThreadCreated,
         parentAbortSignal,
         maxToolCalls,
+        // availableTools: [] = a text-only run (e.g. a writer drafting a post):
+        // no tool schemas reach the model, so it cannot spend its one turn on
+        // housekeeping like rename-thread instead of the answer.
+        toolsOverride:
+          data.availableTools && data.availableTools.length === 0
+            ? {}
+            : undefined,
         // Sub-agent child: link to the spawning thread for provenance + fixture
         // root walk. The `data.appendThreadId ?? random` id above stays the
         // child's own identity.

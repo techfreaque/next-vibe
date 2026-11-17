@@ -120,6 +120,8 @@ export interface SystemPromptParams {
   headless?: boolean;
   subAgentDepth: number;
   excludeMemories?: boolean;
+  /** Text-only stream (see SystemPromptServerParams.toolsDisabled). */
+  toolsDisabled?: boolean;
   memoryLimit?: number | null;
   mediaCapabilities?: MediaCapabilitiesParams;
   /** Fired user-message embed — awaited by the cortex search (see server params). */
@@ -180,6 +182,7 @@ export async function buildSystemPrompt(
     isIncognito,
     isExposedFolder,
     excludeMemories,
+    toolsDisabled: params.toolsDisabled,
     headless: headless ?? false,
     suppressSelfIdentity: suppressSelfIdentity ?? false,
     relayCallerInstanceId: params.relayCallerInstanceId ?? null,

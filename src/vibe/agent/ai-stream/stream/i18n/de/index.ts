@@ -76,7 +76,7 @@ export const translations: typeof enTranslations = {
         availableTools: {
           label: "Ausführbar",
           description:
-            "Welche Tools die KI ausführen darf. null = alle erlaubt. Array = nur aufgelistete Tools. Standard: [{toolId:'execute-tool'},{toolId:'tool-help'}].",
+            "Tools für diesen Lauf. [] = nur Text: keine Tools, das Modell schreibt nur (ideal für Entwürfe). Weglassen = Tools des Skills oder Favoriten. Andere Listen werden noch nicht angewendet.",
           toolId: {
             label: "Tool-ID",
             description:

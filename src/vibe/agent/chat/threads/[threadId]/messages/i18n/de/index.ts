@@ -397,6 +397,8 @@ export const translations: typeof enTranslations = {
         next: "Nächste Verzweigung",
       },
       authorWithId: "{{name}} ({{id}})",
+      aiBadge: "KI",
+      aiBadgeTitle: "Von einem KI-Modell geschrieben, nicht von einem Menschen",
     },
     linearView: {
       answerModal: {

@@ -13,6 +13,7 @@ import { formatRelativeTime } from "@/_pages/chat/lib/utils/formatting";
 import type { ChatModelId } from "../../../../../ai-stream/models";
 import { getChatModelById } from "../../../../../ai-stream/models";
 import { scopedTranslation } from "../i18n";
+import { AiBadge } from "./ai-badge";
 
 function noopSubscribe(): () => void {
   return (): void => undefined;
@@ -117,6 +118,10 @@ export function MessageAuthorInfo({
           )}
           {displayName}
         </Span>
+
+        {isAI && (rootFolderId === "public" || rootFolderId === "shared") && (
+          <AiBadge locale={locale} />
+        )}
 
         {/* Show character for both AI and user messages */}
         {characterName && (

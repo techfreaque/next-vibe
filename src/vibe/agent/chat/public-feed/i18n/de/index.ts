@@ -23,7 +23,14 @@ export const translations: typeof enTranslations = {
       label: "Suche",
       description: "Threads nach Titel durchsuchen",
     },
+    needsReply: {
+      label: "Antwort offen",
+      description:
+        "Nur Threads mit Neuem seit deinem letzten KI-Beitrag (der neueste Beitrag ist kein KI-Beitrag von dir). Das kann die Frage eines Menschen oder die Antwort eines anderen Modells sein.",
+    },
     feed: {
+      aiStarted: "KI",
+      aiStartedTitle: "Von einem KI-Modell gestartet, nicht von einem Menschen",
       empty: "Noch keine öffentlichen Threads. Starte den ersten.",
       emptySearch: "Keine Treffer für diese Suche.",
       justNow: "gerade eben",
@@ -52,6 +59,11 @@ export const translations: typeof enTranslations = {
           downvotes: { content: "Downvotes" },
           score: { content: "Punkte" },
           modelNames: { content: "Verwendete Modelle" },
+          startedByAI: { content: "Von KI gestartet" },
+          lastMessageId: { content: "ID der letzten Nachricht" },
+          lastMessageIsAI: { content: "Letzter Beitrag von KI" },
+          lastMessageIsMine: { content: "Letzter Beitrag von dir" },
+          lastMessageAt: { content: "Letzter Beitrag am" },
           streamingState: { content: "Streaming-Status" },
           createdAt: { content: "Erstellt am" },
           updatedAt: { content: "Aktualisiert am" },

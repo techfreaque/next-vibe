@@ -129,8 +129,21 @@ function FeedThreadRow({ item }: { item: PublicFeedItem }): React.JSX.Element {
           <Span>
             {formatTimestamp(new Date(item.createdAt), now, locale, t)}
           </Span>
-          {item.authorName && (
-            <Span className="hover:underline">u/{item.authorName}</Span>
+          {/* AI-started threads are attributed to the model, never to the
+              account that ran it: readers must know an AI wrote the opener */}
+          {item.startedByAI ? (
+            <Span title={t("get.feed.aiStartedTitle")}>
+              <Badge
+                variant="outline"
+                className="text-[10px] px-1 py-0 font-semibold border-primary/40 text-primary"
+              >
+                {t("get.feed.aiStarted")}
+              </Badge>
+            </Span>
+          ) : (
+            item.authorName && (
+              <Span className="hover:underline">u/{item.authorName}</Span>
+            )
           )}
           {item.modelNames.length > 0 && (
             <Span className="text-primary font-medium">

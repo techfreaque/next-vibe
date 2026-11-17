@@ -22,7 +22,14 @@ export const translations = {
       label: "Search",
       description: "Search threads by title",
     },
+    needsReply: {
+      label: "Needs reply",
+      description:
+        "Only threads with something new since your last AI post (newest post is not an AI post from you). The newest post may be a person's question or another model's answer.",
+    },
     feed: {
+      aiStarted: "AI",
+      aiStartedTitle: "Started by an AI model, not a person",
       empty: "No public threads yet. Start one.",
       emptySearch: "Nothing matches that search.",
       justNow: "just now",
@@ -51,6 +58,11 @@ export const translations = {
           downvotes: { content: "Downvotes" },
           score: { content: "Score" },
           modelNames: { content: "Models Used" },
+          startedByAI: { content: "Started by AI" },
+          lastMessageId: { content: "Last Message ID" },
+          lastMessageIsAI: { content: "Last Post Is AI" },
+          lastMessageIsMine: { content: "Last Post Is Yours" },
+          lastMessageAt: { content: "Last Post At" },
           streamingState: { content: "Streaming State" },
           createdAt: { content: "Created At" },
           updatedAt: { content: "Updated At" },

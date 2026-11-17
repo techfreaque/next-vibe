@@ -25,6 +25,7 @@ import {
 import { z } from "zod";
 
 import { ThreadStreamingStateDB } from "../enum";
+import { PUBLIC_FEED_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
 const PublicFeedContainer = lazyWidget(() =>
@@ -51,6 +52,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["vibe", "agent", "chat", "public-feed"],
+  aliases: [PUBLIC_FEED_ALIAS] as const,
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
   defaultWebPinned: [
     UserRole.PUBLIC,
@@ -102,6 +104,14 @@ const { GET } = createEndpoint({
         description: "get.search.description" as const,
         columns: 12,
         schema: z.string().optional(),
+      }),
+      needsReply: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "get.needsReply.label" as const,
+        description: "get.needsReply.description" as const,
+        columns: 6,
+        schema: z.boolean().optional(),
       }),
 
       // === RESPONSE FIELDS ===
@@ -178,6 +188,32 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               label: "get.response.items.item.modelNames.content" as const,
               schema: z.array(z.string()),
+            }),
+            startedByAI: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.items.item.startedByAI.content" as const,
+              schema: z.boolean(),
+            }),
+            lastMessageId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.items.item.lastMessageId.content" as const,
+              schema: z.uuid().nullable(),
+            }),
+            lastMessageIsAI: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.items.item.lastMessageIsAI.content" as const,
+              schema: z.boolean().nullable(),
+            }),
+            lastMessageIsMine: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label:
+                "get.response.items.item.lastMessageIsMine.content" as const,
+              schema: z.boolean(),
+            }),
+            lastMessageAt: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.items.item.lastMessageAt.content" as const,
+              schema: dateSchema.nullable(),
             }),
             streamingState: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -275,6 +311,12 @@ const { GET } = createEndpoint({
   examples: {
     requests: {
       default: { sortMode: FeedSortMode.HOT, page: 1, limit: 20 },
+      needsReply: {
+        sortMode: FeedSortMode.NEW,
+        page: 1,
+        limit: 20,
+        needsReply: true,
+      },
     },
     responses: {
       default: {

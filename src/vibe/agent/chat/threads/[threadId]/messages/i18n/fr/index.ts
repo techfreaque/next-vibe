@@ -398,6 +398,8 @@ export const translations: typeof enTranslations = {
         next: "Branche suivante",
       },
       authorWithId: "{{name}} ({{id}})",
+      aiBadge: "IA",
+      aiBadgeTitle: "Écrit par un modèle d'IA, pas par une personne",
     },
     linearView: {
       answerModal: {

@@ -74,7 +74,7 @@ export const translations = {
         availableTools: {
           label: "Allowed to Execute",
           description:
-            "Which tools the AI may run. null = all permitted. Array = restrict to listed tools only. Standard: [{toolId:'execute-tool'},{toolId:'tool-help'}].",
+            "Tools for this run. [] = text only: no tools, the model just writes (use it for drafting). Omit to use the skill or favorite's tools. Other lists are not applied yet.",
           toolId: {
             label: "Tool ID",
             description:

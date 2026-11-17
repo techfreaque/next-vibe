@@ -55,6 +55,9 @@ export interface SystemPromptServerParams {
    */
   relayCallerInstanceId?: string | null;
   excludeMemories?: boolean;
+  /** Text-only stream (ai-run availableTools: []): no tools reach the model,
+   *  so tool-driven fragments (rename-thread) must stay out of the prompt. */
+  toolsDisabled?: boolean;
   /** Whether running in headless mode (no human present) */
   headless?: boolean;
   /** Sub-agent nesting depth (0 = top-level, 1+ = sub-agent) */

@@ -31,6 +31,7 @@ import { loadMessageAttachments } from "../../hooks/load-message-attachments";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
 import { scopedTranslation } from "../../i18n";
+import { AiBadge } from "../ai-badge";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";
 import { ModelSkillSelectorModal } from "../model-skill-selector-modal";
@@ -388,6 +389,11 @@ export const FlatMessage = memo(function FlatMessage({
           )}
           {displayName}
         </Span>
+
+        {message.isAI &&
+          (rootFolderId === "public" || rootFolderId === "shared") && (
+            <AiBadge locale={locale} />
+          )}
 
         {/* ID Badge - Hoverable */}
         <Div

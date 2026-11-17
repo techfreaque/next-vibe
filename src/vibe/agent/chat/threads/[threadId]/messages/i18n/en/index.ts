@@ -395,6 +395,8 @@ export const translations = {
         next: "Next branch",
       },
       authorWithId: "{{name}} ({{id}})",
+      aiBadge: "AI",
+      aiBadgeTitle: "Written by an AI model, not a person",
     },
     linearView: {
       answerModal: {

@@ -76,7 +76,7 @@ export const translations: typeof enTranslations = {
         availableTools: {
           label: "Autorisés à l'exécution",
           description:
-            "Outils que l'IA peut exécuter. null = tous ceux autorisés. Tableau = limité aux outils listés. Standard : [{toolId:'execute-tool'},{toolId:'tool-help'}].",
+            "Outils pour cette exécution. [] = texte seul : aucun outil, le modèle écrit seulement (idéal pour des brouillons). Omettre = outils du skill ou du favori. Les autres listes ne sont pas encore appliquées.",
           toolId: {
             label: "ID de l'outil",
             description:

@@ -398,6 +398,8 @@ export const translations: typeof enTranslations = {
         next: "Następne rozgałęzienie",
       },
       authorWithId: "{{name}} ({{id}})",
+      aiBadge: "AI",
+      aiBadgeTitle: "Napisane przez model AI, nie przez człowieka",
     },
     linearView: {
       answerModal: {
