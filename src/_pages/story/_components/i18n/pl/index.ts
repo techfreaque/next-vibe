@@ -45,7 +45,6 @@ export const translations: typeof enTranslations = {
     getStarted: "Zacznij za darmo",
     signIn: "Zaloguj się",
     goToApp: "Otwórz aplikację",
-    backToChat: "Wróć do czatu",
     unbottledHome: "Artykuły",
     subscription: "Subskrypcja",
     referral: "Polecenia",

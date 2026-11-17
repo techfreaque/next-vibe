@@ -44,7 +44,6 @@ export const translations = {
     getStarted: "Get Started Free",
     signIn: "Sign In",
     goToApp: "Open App",
-    backToChat: "Back to Chat",
     unbottledHome: "Stories",
     subscription: "Subscription",
     referral: "Referral",

@@ -1,4 +1,3 @@
-import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
 import { Settings } from "next-vibe/ui/components/icons/Settings";
 import { ShoppingCart } from "next-vibe/ui/components/icons/ShoppingCart";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
@@ -7,11 +6,6 @@ import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import type { NavItemType } from "@/_pages/story/_components/nav/nav-constants";
 
 export const accountNavItems: NavItemType[] = [
-  {
-    icon: <ArrowLeft className="h-4 w-4" />,
-    title: "nav.backToChat",
-    href: "/threads",
-  },
   {
     icon: <Sparkles className="h-4 w-4" />,
     title: "nav.unbottledHome",

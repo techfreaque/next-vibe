@@ -16,6 +16,7 @@ import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Globe } from "next-vibe/ui/components/icons/Globe";
 import { Handshake } from "next-vibe/ui/components/icons/Handshake";
 import { HelpCircle } from "next-vibe/ui/components/icons/HelpCircle";
+import { Key } from "next-vibe/ui/components/icons/Key";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Settings } from "next-vibe/ui/components/icons/Settings";
 import { ShoppingCart } from "next-vibe/ui/components/icons/ShoppingCart";
@@ -79,6 +80,18 @@ export function SidebarFooter({
 
   return (
     <Div className="border-t border-border bg-background">
+      {/* API: always visible, outside the collapsible account section */}
+      <Link href={`/${locale}/tools/api-keys`}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-full justify-start gap-2 rounded-none px-3 text-xs text-muted-foreground hover:text-foreground border-b border-border/50"
+          aria-label={t("components.navigation.api")}
+        >
+          <Key className="h-4 w-4 shrink-0" />
+          {t("components.navigation.api")}
+        </Button>
+      </Link>
       <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
         {/* Sticky Header: Credits · Account - Always Visible */}
         <CollapsibleTrigger asChild>
@@ -225,6 +238,19 @@ export function SidebarFooter({
                 >
                   <Handshake className="h-3.5 w-3.5 mr-2" />
                   {t("components.navigation.partnerDashboard")}
+                </Button>
+              </Link>
+
+              {/* API keys: create keys, see what unlocks API access */}
+              <Link href={`/${locale}/tools/api-keys`}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-full justify-start"
+                  aria-label={t("components.navigation.apiKeys")}
+                >
+                  <Key className="h-3.5 w-3.5 mr-2" />
+                  {t("components.navigation.apiKeys")}
                 </Button>
               </Link>
 
