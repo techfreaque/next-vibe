@@ -62,7 +62,15 @@ const { POST } = createEndpoint({
         label: "post.draftMessageId.label" as const,
         description: "post.draftMessageId.description" as const,
         columns: 12,
-        schema: z.uuid(),
+        schema: z.uuid().optional(),
+      }),
+      draftThreadId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "post.draftThreadId.label" as const,
+        description: "post.draftThreadId.description" as const,
+        columns: 12,
+        schema: z.uuid().optional(),
       }),
       threadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

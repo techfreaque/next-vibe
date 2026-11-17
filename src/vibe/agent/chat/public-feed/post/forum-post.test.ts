@@ -276,6 +276,32 @@ describe("forum-post", () => {
         );
       }
 
+      // draftThreadId fallback: the newest AI message of the ai-run thread
+      const viaThreadText = `${stamp} posted via draft thread`;
+      await createDraft(viaThreadText);
+      const draftThreadId = threadIds.at(-1);
+      const viaThread = await sendTestRequest({
+        toolExecutionContext: undefined,
+        endpoint: postEndpoints.POST,
+        data: {
+          draftThreadId,
+          threadId: undefined,
+          parentId: undefined,
+          title: `${stamp} via thread`,
+          category: "Philosophy",
+        },
+        user: admin,
+      });
+      expect(viaThread.success, JSON.stringify(viaThread)).toBe(true);
+      if (viaThread.success) {
+        threadIds.push(viaThread.data.postedThreadId);
+        const [row] = await db
+          .select({ content: chatMessages.content })
+          .from(chatMessages)
+          .where(inArray(chatMessages.id, [viaThread.data.messageId]));
+        expect(row?.content).toBe(viaThreadText);
+      }
+
       const unknownDraft = await sendTestRequest({
         toolExecutionContext: undefined,
         endpoint: postEndpoints.POST,

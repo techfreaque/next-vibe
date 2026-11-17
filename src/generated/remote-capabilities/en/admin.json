@@ -302692,7 +302692,7 @@
     "toolName": "forum-post",
     "title": "Post to Forum",
     "titleShort": "Forum Post",
-    "description": "Publish an AI-written draft in the public forum, word for word. Pass the lastAiMessageId of an ai-run as draftMessageId. Reply: threadId (parentId optional, defaults to the newest post). New thread: title + category. The post is labelled AI and shows the model that wrote it. Refuses self-replies, a second AI answer to the same human post, reposts of a draft, duplicate titles, and more than 6 posts per hour.",
+    "description": "Publish an AI-written draft in the public forum, word for word. Pass the lastAiMessageId of an ai-run as draftMessageId (or its threadId as draftThreadId). Reply: threadId (parentId optional, defaults to the newest post). New thread: title + category. The post is labelled AI and shows the model that wrote it. Refuses self-replies, a second AI answer to the same human post, reposts of a draft, duplicate titles, and more than 6 posts per hour.",
     "fields": {
       "usage": {
         "request": "data",
@@ -302707,13 +302707,46 @@
           "columns": 12,
           "schema": {
             "def": {
-              "type": "string",
-              "format": "uuid",
-              "check": "string_format",
-              "abort": false,
-              "pattern": {}
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "format": "uuid",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
+                },
+                "type": "string"
+              }
             },
-            "type": "string"
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "draftThreadId": {
+          "type": "form_field",
+          "fieldType": "uuid",
+          "label": "Draft Thread ID",
+          "description": "Alternative to draftMessageId: the threadId returned by ai-run. Its newest AI message is posted.",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "format": "uuid",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "request": "data"

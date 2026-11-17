@@ -66,6 +66,10 @@ export function ForumPostContainer({ field }: CustomWidgetProps): JSX.Element {
         fieldName="draftMessageId"
         field={children.draftMessageId}
       />
+      <UuidFieldWidget
+        fieldName="draftThreadId"
+        field={children.draftThreadId}
+      />
       <Div className="grid grid-cols-1 @md:grid-cols-2 gap-3">
         <UuidFieldWidget fieldName="threadId" field={children.threadId} />
         <UuidFieldWidget fieldName="parentId" field={children.parentId} />

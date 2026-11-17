@@ -118,6 +118,11 @@ export class TaskExecuteRepository {
         .update(cronTasks)
         .set({
           lastExecutionStatus: CronTaskStatus.RUNNING,
+          // The watchdog measures run age and per-run spend from here (same
+          // as the pulse). Without it a manual run inherited a stale start:
+          // spend and age piled up across "Run now" executions until the
+          // per-run budget cap or the duration ceiling killed a fresh run.
+          runStartedAt: new Date(),
           ...(task.runOnce ? { enabled: false } : {}),
           updatedAt: new Date(),
         })
@@ -161,6 +166,7 @@ export class TaskExecuteRepository {
         .update(cronTasks)
         .set({
           lastExecutionStatus: CronTaskStatus.FAILED,
+          runStartedAt: null,
           updatedAt: new Date(),
         })
         .where(eq(cronTasks.id, task.id));
@@ -187,6 +193,7 @@ export class TaskExecuteRepository {
         .update(cronTasks)
         .set({
           lastExecutionStatus: CronTaskStatus.FAILED,
+          runStartedAt: null,
           updatedAt: new Date(),
         })
         .where(eq(cronTasks.id, task.id));
@@ -344,6 +351,7 @@ export class TaskExecuteRepository {
         lastExecutedAt: startedAt,
         lastExecutionStatus: finalStatus,
         lastExecutionDuration: finalDurationMs,
+        runStartedAt: null,
         executionCount: sql`${cronTasks.executionCount} + 1`,
         consecutiveFailures: newConsecutiveFailures,
         ...(taskSucceeded

@@ -7,7 +7,7 @@
 
 import "server-only";
 
-import { and, asc, count, eq, gt, inArray, ne, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, inArray, ne, sql } from "drizzle-orm";
 import { coreEnv } from "next-vibe/core/env";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -62,6 +62,15 @@ export class ForumPostRepository {
       }
 
       // ── 1. The draft: an AI message in one of the caller's own threads ──
+      // By message id, or the newest AI message of the ai-run thread (callers
+      // copying a long uuid by hand mistype it; the thread id is the fallback).
+      if (!data.draftMessageId && !data.draftThreadId) {
+        return fail({
+          message: t("post.guard.draftMissing"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
+      const draftRef = data.draftMessageId ?? data.draftThreadId ?? "";
       const [draft] = await db
         .select({
           content: chatMessages.content,
@@ -72,18 +81,21 @@ export class ForumPostRepository {
         .innerJoin(chatThreads, eq(chatMessages.threadId, chatThreads.id))
         .where(
           and(
-            eq(chatMessages.id, data.draftMessageId),
+            data.draftMessageId
+              ? eq(chatMessages.id, data.draftMessageId)
+              : eq(chatMessages.threadId, draftRef),
             eq(chatMessages.role, ChatMessageRole.ASSISTANT),
             eq(chatMessages.isAI, true),
             eq(chatThreads.userId, user.id),
           ),
         )
+        .orderBy(desc(chatMessages.createdAt))
         .limit(1);
 
       if (!draft?.model) {
         return fail({
           message: t("post.guard.draftNotFound", {
-            draftMessageId: data.draftMessageId,
+            draftMessageId: draftRef,
           }),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
@@ -107,7 +119,7 @@ export class ForumPostRepository {
       if (!content) {
         return fail({
           message: t("post.guard.draftEmpty", {
-            draftMessageId: data.draftMessageId,
+            draftMessageId: draftRef,
           }),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });

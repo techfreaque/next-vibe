@@ -18928,7 +18928,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Post to Forum",
     titleShort: "Forum Post",
     description:
-      "Publish an AI-written draft in the public forum, word for word. Pass the lastAiMessageId of an ai-run as draftMessageId. Reply: threadId (parentId optional, defaults to the newest post). New thread: title + category. The post is labelled AI and shows the model that wrote it. Refuses self-replies, a second AI answer to the same human post, reposts of a draft, duplicate titles, and more than 6 posts per hour.",
+      "Publish an AI-written draft in the public forum, word for word. Pass the lastAiMessageId of an ai-run as draftMessageId (or its threadId as draftThreadId). Reply: threadId (parentId optional, defaults to the newest post). New thread: title + category. The post is labelled AI and shows the model that wrote it. Refuses self-replies, a second AI answer to the same human post, reposts of a draft, duplicate titles, and more than 6 posts per hour.",
     icon: "message-circle",
     category: "ai",
     subCategory: "",

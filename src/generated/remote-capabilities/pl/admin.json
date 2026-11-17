@@ -302707,13 +302707,46 @@
           "columns": 12,
           "schema": {
             "def": {
-              "type": "string",
-              "format": "uuid",
-              "check": "string_format",
-              "abort": false,
-              "pattern": {}
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "format": "uuid",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
+                },
+                "type": "string"
+              }
             },
-            "type": "string"
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "draftThreadId": {
+          "type": "form_field",
+          "fieldType": "uuid",
+          "label": "ID wątku szkicu",
+          "description": "Alternatywa dla draftMessageId: threadId z ai-run. Publikowana jest najnowsza wiadomość AI z tego wątku.",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "format": "uuid",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "request": "data"

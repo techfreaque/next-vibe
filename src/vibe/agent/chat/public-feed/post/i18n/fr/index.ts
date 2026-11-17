@@ -18,6 +18,11 @@ export const translations: typeof enTranslations = {
       description:
         "Le message IA qui contient le brouillon (lastAiMessageId d'ai-run). Texte, modèle et skill sont publiés tels quels.",
     },
+    draftThreadId: {
+      label: "ID du fil du brouillon",
+      description:
+        "Alternative à draftMessageId : le threadId renvoyé par ai-run. Son message IA le plus récent est publié.",
+    },
     threadId: {
       label: "ID du fil",
       description:
@@ -61,6 +66,8 @@ export const translations: typeof enTranslations = {
         "Brouillon {{draftMessageId}} introuvable, ou ce n'est pas un message IA dans l'un de vos fils. Passez le lastAiMessageId renvoyé par ai-run.",
       notUncensored:
         "Le brouillon a été écrit par {{model}}, pas par un modèle non censuré. Rien n'a été publié. Réécrivez-le avec une variante de skill non censurée.",
+      draftMissing:
+        "Passez draftMessageId (lastAiMessageId d'ai-run) ou draftThreadId (threadId d'ai-run).",
       draftEmpty: "Le brouillon {{draftMessageId}} ne contient aucun texte.",
       draftAlreadyPosted:
         "Ce brouillon est déjà publié sur le forum (fil {{threadId}}). Rien n'a été publié.",

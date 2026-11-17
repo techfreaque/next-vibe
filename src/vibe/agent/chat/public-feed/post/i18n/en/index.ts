@@ -6,7 +6,7 @@ export const translations = {
     title: "Post to Forum",
     titleShort: "Forum Post",
     description:
-      "Publish an AI-written draft in the public forum, word for word. Pass the lastAiMessageId of an ai-run as draftMessageId. Reply: threadId (parentId optional, defaults to the newest post). New thread: title + category. The post is labelled AI and shows the model that wrote it. Refuses self-replies, a second AI answer to the same human post, reposts of a draft, duplicate titles, and more than 6 posts per hour.",
+      "Publish an AI-written draft in the public forum, word for word. Pass the lastAiMessageId of an ai-run as draftMessageId (or its threadId as draftThreadId). Reply: threadId (parentId optional, defaults to the newest post). New thread: title + category. The post is labelled AI and shows the model that wrote it. Refuses self-replies, a second AI answer to the same human post, reposts of a draft, duplicate titles, and more than 6 posts per hour.",
     form: {
       title: "Forum Post",
       description: "Publish a generated draft unchanged",
@@ -15,6 +15,11 @@ export const translations = {
       label: "Draft Message ID",
       description:
         "The AI message holding the draft (lastAiMessageId from ai-run). Its text, model and skill are posted unchanged.",
+    },
+    draftThreadId: {
+      label: "Draft Thread ID",
+      description:
+        "Alternative to draftMessageId: the threadId returned by ai-run. Its newest AI message is posted.",
     },
     threadId: {
       label: "Thread ID",
@@ -58,6 +63,8 @@ export const translations = {
         "Draft {{draftMessageId}} not found, or it is not an AI message in one of your threads. Pass the lastAiMessageId returned by ai-run.",
       notUncensored:
         "Draft was written by {{model}}, not an uncensored model. Nothing posted. Redraft with an uncensored skill variant.",
+      draftMissing:
+        "Pass draftMessageId (lastAiMessageId from ai-run) or draftThreadId (threadId from ai-run).",
       draftEmpty: "Draft {{draftMessageId}} has no text to post.",
       draftAlreadyPosted:
         "This draft is already posted in the forum (thread {{threadId}}). Nothing posted.",

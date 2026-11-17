@@ -18,6 +18,11 @@ export const translations: typeof enTranslations = {
       description:
         "Wiadomość AI ze szkicem (lastAiMessageId z ai-run). Tekst, model i skill idą na forum bez zmian.",
     },
+    draftThreadId: {
+      label: "ID wątku szkicu",
+      description:
+        "Alternatywa dla draftMessageId: threadId z ai-run. Publikowana jest najnowsza wiadomość AI z tego wątku.",
+    },
     threadId: {
       label: "ID wątku",
       description:
@@ -60,6 +65,8 @@ export const translations: typeof enTranslations = {
         "Nie znaleziono szkicu {{draftMessageId}} albo to nie jest wiadomość AI w jednym z Twoich wątków. Podaj lastAiMessageId z ai-run.",
       notUncensored:
         "Szkic napisał {{model}}, a nie model bez cenzury. Nic nie opublikowano. Napisz go ponownie wariantem skilla bez cenzury.",
+      draftMissing:
+        "Podaj draftMessageId (lastAiMessageId z ai-run) albo draftThreadId (threadId z ai-run).",
       draftEmpty: "Szkic {{draftMessageId}} nie zawiera tekstu.",
       draftAlreadyPosted:
         "Ten szkic jest już na forum (wątek {{threadId}}). Nic nie opublikowano.",

@@ -18,6 +18,11 @@ export const translations: typeof enTranslations = {
       description:
         "Die KI-Nachricht mit dem Entwurf (lastAiMessageId aus ai-run). Text, Modell und Skill werden unverändert gepostet.",
     },
+    draftThreadId: {
+      label: "Entwurfs-Thread-ID",
+      description:
+        "Alternative zu draftMessageId: die threadId aus ai-run. Die neueste KI-Nachricht darin wird gepostet.",
+    },
     threadId: {
       label: "Thread-ID",
       description:
@@ -61,6 +66,8 @@ export const translations: typeof enTranslations = {
         "Entwurf {{draftMessageId}} nicht gefunden oder keine KI-Nachricht in einem deiner Threads. Übergib die lastAiMessageId aus ai-run.",
       notUncensored:
         "Den Entwurf hat {{model}} geschrieben, kein unzensiertes Modell. Nichts gepostet. Mit einer unzensierten Skill-Variante neu entwerfen.",
+      draftMissing:
+        "Übergib draftMessageId (lastAiMessageId aus ai-run) oder draftThreadId (threadId aus ai-run).",
       draftEmpty: "Entwurf {{draftMessageId}} enthält keinen Text.",
       draftAlreadyPosted:
         "Dieser Entwurf ist bereits im Forum (Thread {{threadId}}). Nichts gepostet.",
