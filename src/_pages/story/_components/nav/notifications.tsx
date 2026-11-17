@@ -176,7 +176,7 @@ export function Notifications({
             })
           )}
           <DropdownMenuSeparator />
-          <Link href={`/${locale}/tools/notifications`} className="w-full">
+          <Link href={`/${locale}/user/notifications`} className="w-full">
             <DropdownMenuItem className="justify-center text-sm cursor-pointer">
               {t("bell.viewAll")}
             </DropdownMenuItem>

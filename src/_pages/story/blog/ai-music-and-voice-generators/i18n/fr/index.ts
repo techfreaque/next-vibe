@@ -179,7 +179,7 @@ export const translations: typeof enTranslations = {
       },
       transcribe: {
         title: "Transcrivez des fichiers entiers",
-        body: "Réunions, interviews, mémos vocaux : déposez jusqu'à {{sttMaxFiles}} fichiers sur la page de l'outil de reconnaissance vocale et choisissez le modèle.",
+        body: "Réunions, interviews, mémos vocaux : déposez jusqu'à {{sttMaxFiles}} fichiers sur la page de transcription audio et choisissez le modèle.",
       },
       call: {
         title: "Mode appel",
@@ -187,7 +187,7 @@ export const translations: typeof enTranslations = {
       },
     },
     toolPages:
-      "Vous voulez tout contrôler ? Chaque usage a sa propre page d'outil : choisissez le modèle ou la voix, réglez la durée du clip, collez un long script.",
+      "Vous voulez tout contrôler ? Chaque usage a sa propre page : choisissez le modèle ou la voix, réglez la durée du clip, collez un long script.",
   },
   pricing: {
     title: "Ce que coûtent la musique et la voix IA ici",

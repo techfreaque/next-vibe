@@ -390,7 +390,7 @@ export const translations: typeof enTranslations = {
       "Der Preis gilt pro Einheit - Bild, Clip, Sekunde oder Zeichen - und ändert sich mit Größe, Länge und Optionen. 1 Credit = {{value}}.",
     ctaTitle: "{{model}} jetzt ausprobieren.",
     ctaSubtitle:
-      "Start-Credits gratis, keine Karte nötig. Das Werkzeug öffnet sich startbereit.",
+      "Start-Credits gratis, keine Karte nötig. Der Generator öffnet mit {{model}} vorausgewählt.",
   },
   compare: {
     back: "Alle Modelle",

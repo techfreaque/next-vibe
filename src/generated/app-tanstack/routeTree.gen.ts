@@ -15,6 +15,7 @@ import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as LocaleIndexRouteImport } from './routes/$locale.index'
 import { Route as LocaleSplatRouteImport } from './routes/$locale.$'
+import { Route as LocaleCreateRouteImport } from './routes/$locale.create'
 import { Route as LocaleDocsRouteImport } from './routes/$locale.docs'
 import { Route as LocaleHelpRouteImport } from './routes/$locale.help'
 import { Route as LocaleModelsRouteImport } from './routes/$locale.models'
@@ -45,6 +46,7 @@ import { Route as ApiLocaleManifestRouteImport } from './routes/api.$locale.mani
 import { Route as ApiLocalePaymentRouteImport } from './routes/api.$locale.payment'
 import { Route as ApiLocaleReferralRouteImport } from './routes/api.$locale.referral'
 import { Route as ApiLocaleSubscriptionRouteImport } from './routes/api.$locale.subscription'
+import { Route as LocaleCreateKindIndexRouteImport } from './routes/$locale.create.$kind.index'
 import { Route as LocaleCreatorUserIdIndexRouteImport } from './routes/$locale.creator.$userId.index'
 import { Route as LocaleDocsApiIndexRouteImport } from './routes/$locale.docs.api.index'
 import { Route as LocaleInvoiceInvoiceIdIndexRouteImport } from './routes/$locale.invoice.$invoiceId.index'
@@ -208,6 +210,8 @@ import { Route as LocaleStoryCompareUnbottledVsVeniceIndexRouteImport } from './
 import { Route as LocaleStoryCompareUncensoredAiPlatformsIndexRouteImport } from './routes/$locale.story.compare.uncensored-ai-platforms.index'
 import { Route as LocaleStoryNewsletterEmailIndexRouteImport } from './routes/$locale.story.newsletter.$email.index'
 import { Route as LocaleStoryNewsletterUnsubscribeIndexRouteImport } from './routes/$locale.story.newsletter.unsubscribe.index'
+import { Route as LocaleUserAccountApiKeysIndexRouteImport } from './routes/$locale.user._account.api-keys.index'
+import { Route as LocaleUserAccountNotificationsIndexRouteImport } from './routes/$locale.user._account.notifications.index'
 import { Route as LocaleUserAccountReferralIndexRouteImport } from './routes/$locale.user._account.referral.index'
 import { Route as LocaleUserAccountSettingsIndexRouteImport } from './routes/$locale.user._account.settings.index'
 import { Route as LocaleUserAuthLoginIndexRouteImport } from './routes/$locale.user._auth.login.index'
@@ -749,6 +753,11 @@ const LocaleSplatRoute = LocaleSplatRouteImport.update({
   path: '/$locale/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocaleCreateRoute = LocaleCreateRouteImport.update({
+  id: '/$locale/create',
+  path: '/$locale/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LocaleDocsRoute = LocaleDocsRouteImport.update({
   id: '/$locale/docs',
   path: '/$locale/docs',
@@ -898,6 +907,11 @@ const ApiLocaleSubscriptionRoute = ApiLocaleSubscriptionRouteImport.update({
   id: '/api/$locale/subscription',
   path: '/api/$locale/subscription',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LocaleCreateKindIndexRoute = LocaleCreateKindIndexRouteImport.update({
+  id: '/$kind/',
+  path: '/$kind/',
+  getParentRoute: () => LocaleCreateRoute,
 } as any)
 const LocaleCreatorUserIdIndexRoute =
   LocaleCreatorUserIdIndexRouteImport.update({
@@ -1821,6 +1835,18 @@ const LocaleStoryNewsletterUnsubscribeIndexRoute =
     id: '/newsletter/unsubscribe/',
     path: '/newsletter/unsubscribe/',
     getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleUserAccountApiKeysIndexRoute =
+  LocaleUserAccountApiKeysIndexRouteImport.update({
+    id: '/api-keys/',
+    path: '/api-keys/',
+    getParentRoute: () => LocaleUserAccountRoute,
+  } as any)
+const LocaleUserAccountNotificationsIndexRoute =
+  LocaleUserAccountNotificationsIndexRouteImport.update({
+    id: '/notifications/',
+    path: '/notifications/',
+    getParentRoute: () => LocaleUserAccountRoute,
   } as any)
 const LocaleUserAccountReferralIndexRoute =
   LocaleUserAccountReferralIndexRouteImport.update({
@@ -4896,6 +4922,7 @@ export interface FileRoutesByFullPath {
   '/llms.txt': typeof LlmsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$locale/$': typeof LocaleSplatRoute
+  '/$locale/create': typeof LocaleCreateRouteWithChildren
   '/$locale/docs': typeof LocaleDocsRouteWithChildren
   '/$locale/help': typeof LocaleHelpRouteWithChildren
   '/$locale/models': typeof LocaleModelsRouteWithChildren
@@ -5034,6 +5061,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/v1/videos': typeof ApiLocaleV1VideosRouteWithChildren
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
+  '/$locale/create/$kind/': typeof LocaleCreateKindIndexRoute
   '/$locale/creator/$userId/': typeof LocaleCreatorUserIdIndexRoute
   '/$locale/docs/api/': typeof LocaleDocsApiIndexRoute
   '/$locale/invoice/$invoiceId/': typeof LocaleInvoiceInvoiceIdIndexRoute
@@ -5348,6 +5376,8 @@ export interface FileRoutesByFullPath {
   '/$locale/story/compare/uncensored-ai-platforms/': typeof LocaleStoryCompareUncensoredAiPlatformsIndexRoute
   '/$locale/story/newsletter/$email/': typeof LocaleStoryNewsletterEmailIndexRoute
   '/$locale/story/newsletter/unsubscribe/': typeof LocaleStoryNewsletterUnsubscribeIndexRoute
+  '/$locale/user/api-keys/': typeof LocaleUserAccountApiKeysIndexRoute
+  '/$locale/user/notifications/': typeof LocaleUserAccountNotificationsIndexRoute
   '/$locale/user/referral/': typeof LocaleUserAccountReferralIndexRoute
   '/$locale/user/settings/': typeof LocaleUserAccountSettingsIndexRoute
   '/$locale/user/login/': typeof LocaleUserAuthLoginIndexRoute
@@ -5606,6 +5636,7 @@ export interface FileRoutesByTo {
   '/llms.txt': typeof LlmsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$locale/$': typeof LocaleSplatRoute
+  '/$locale/create': typeof LocaleCreateRouteWithChildren
   '/$locale/docs': typeof LocaleDocsRouteWithChildren
   '/$locale': typeof LocaleIndexRoute
   '/$locale/frame/$': typeof LocaleFrameSplatRoute
@@ -5738,6 +5769,7 @@ export interface FileRoutesByTo {
   '/api/$locale/v1/videos': typeof ApiLocaleV1VideosRouteWithChildren
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
+  '/$locale/create/$kind': typeof LocaleCreateKindIndexRoute
   '/$locale/creator/$userId': typeof LocaleCreatorUserIdIndexRoute
   '/$locale/docs/api': typeof LocaleDocsApiIndexRoute
   '/$locale/invoice/$invoiceId': typeof LocaleInvoiceInvoiceIdIndexRoute
@@ -6052,6 +6084,8 @@ export interface FileRoutesByTo {
   '/$locale/story/compare/uncensored-ai-platforms': typeof LocaleStoryCompareUncensoredAiPlatformsIndexRoute
   '/$locale/story/newsletter/$email': typeof LocaleStoryNewsletterEmailIndexRoute
   '/$locale/story/newsletter/unsubscribe': typeof LocaleStoryNewsletterUnsubscribeIndexRoute
+  '/$locale/user/api-keys': typeof LocaleUserAccountApiKeysIndexRoute
+  '/$locale/user/notifications': typeof LocaleUserAccountNotificationsIndexRoute
   '/$locale/user/referral': typeof LocaleUserAccountReferralIndexRoute
   '/$locale/user/settings': typeof LocaleUserAccountSettingsIndexRoute
   '/$locale/user/login': typeof LocaleUserAuthLoginIndexRoute
@@ -6311,6 +6345,7 @@ export interface FileRoutesById {
   '/llms.txt': typeof LlmsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$locale/$': typeof LocaleSplatRoute
+  '/$locale/create': typeof LocaleCreateRouteWithChildren
   '/$locale/docs': typeof LocaleDocsRouteWithChildren
   '/$locale/help': typeof LocaleHelpRouteWithChildren
   '/$locale/models': typeof LocaleModelsRouteWithChildren
@@ -6450,6 +6485,7 @@ export interface FileRoutesById {
   '/api/$locale/v1/videos': typeof ApiLocaleV1VideosRouteWithChildren
   '/api/$locale/vibe/execute-tool': typeof ApiLocaleVibeExecuteToolRouteWithChildren
   '/api/$locale/vibe/help-tool': typeof ApiLocaleVibeHelpToolRoute
+  '/$locale/create/$kind/': typeof LocaleCreateKindIndexRoute
   '/$locale/creator/$userId/': typeof LocaleCreatorUserIdIndexRoute
   '/$locale/docs/api/': typeof LocaleDocsApiIndexRoute
   '/$locale/invoice/$invoiceId/': typeof LocaleInvoiceInvoiceIdIndexRoute
@@ -6764,6 +6800,8 @@ export interface FileRoutesById {
   '/$locale/story/compare/uncensored-ai-platforms/': typeof LocaleStoryCompareUncensoredAiPlatformsIndexRoute
   '/$locale/story/newsletter/$email/': typeof LocaleStoryNewsletterEmailIndexRoute
   '/$locale/story/newsletter/unsubscribe/': typeof LocaleStoryNewsletterUnsubscribeIndexRoute
+  '/$locale/user/_account/api-keys/': typeof LocaleUserAccountApiKeysIndexRoute
+  '/$locale/user/_account/notifications/': typeof LocaleUserAccountNotificationsIndexRoute
   '/$locale/user/_account/referral/': typeof LocaleUserAccountReferralIndexRoute
   '/$locale/user/_account/settings/': typeof LocaleUserAccountSettingsIndexRoute
   '/$locale/user/_auth/login/': typeof LocaleUserAuthLoginIndexRoute
@@ -7024,6 +7062,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/sitemap.xml'
     | '/$locale/$'
+    | '/$locale/create'
     | '/$locale/docs'
     | '/$locale/help'
     | '/$locale/models'
@@ -7162,6 +7201,7 @@ export interface FileRouteTypes {
     | '/api/$locale/v1/videos'
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
+    | '/$locale/create/$kind/'
     | '/$locale/creator/$userId/'
     | '/$locale/docs/api/'
     | '/$locale/invoice/$invoiceId/'
@@ -7476,6 +7516,8 @@ export interface FileRouteTypes {
     | '/$locale/story/compare/uncensored-ai-platforms/'
     | '/$locale/story/newsletter/$email/'
     | '/$locale/story/newsletter/unsubscribe/'
+    | '/$locale/user/api-keys/'
+    | '/$locale/user/notifications/'
     | '/$locale/user/referral/'
     | '/$locale/user/settings/'
     | '/$locale/user/login/'
@@ -7734,6 +7776,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/sitemap.xml'
     | '/$locale/$'
+    | '/$locale/create'
     | '/$locale/docs'
     | '/$locale'
     | '/$locale/frame/$'
@@ -7866,6 +7909,7 @@ export interface FileRouteTypes {
     | '/api/$locale/v1/videos'
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
+    | '/$locale/create/$kind'
     | '/$locale/creator/$userId'
     | '/$locale/docs/api'
     | '/$locale/invoice/$invoiceId'
@@ -8180,6 +8224,8 @@ export interface FileRouteTypes {
     | '/$locale/story/compare/uncensored-ai-platforms'
     | '/$locale/story/newsletter/$email'
     | '/$locale/story/newsletter/unsubscribe'
+    | '/$locale/user/api-keys'
+    | '/$locale/user/notifications'
     | '/$locale/user/referral'
     | '/$locale/user/settings'
     | '/$locale/user/login'
@@ -8438,6 +8484,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/sitemap.xml'
     | '/$locale/$'
+    | '/$locale/create'
     | '/$locale/docs'
     | '/$locale/help'
     | '/$locale/models'
@@ -8577,6 +8624,7 @@ export interface FileRouteTypes {
     | '/api/$locale/v1/videos'
     | '/api/$locale/vibe/execute-tool'
     | '/api/$locale/vibe/help-tool'
+    | '/$locale/create/$kind/'
     | '/$locale/creator/$userId/'
     | '/$locale/docs/api/'
     | '/$locale/invoice/$invoiceId/'
@@ -8891,6 +8939,8 @@ export interface FileRouteTypes {
     | '/$locale/story/compare/uncensored-ai-platforms/'
     | '/$locale/story/newsletter/$email/'
     | '/$locale/story/newsletter/unsubscribe/'
+    | '/$locale/user/_account/api-keys/'
+    | '/$locale/user/_account/notifications/'
     | '/$locale/user/_account/referral/'
     | '/$locale/user/_account/settings/'
     | '/$locale/user/_auth/login/'
@@ -9150,6 +9200,7 @@ export interface RootRouteChildren {
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   LocaleSplatRoute: typeof LocaleSplatRoute
+  LocaleCreateRoute: typeof LocaleCreateRouteWithChildren
   LocaleDocsRoute: typeof LocaleDocsRouteWithChildren
   LocaleHelpRoute: typeof LocaleHelpRouteWithChildren
   LocaleModelsRoute: typeof LocaleModelsRouteWithChildren
@@ -9640,6 +9691,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$locale/create': {
+      id: '/$locale/create'
+      path: '/$locale/create'
+      fullPath: '/$locale/create'
+      preLoaderRoute: typeof LocaleCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$locale/docs': {
       id: '/$locale/docs'
       path: '/$locale/docs'
@@ -9849,6 +9907,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/subscription'
       preLoaderRoute: typeof ApiLocaleSubscriptionRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/$locale/create/$kind/': {
+      id: '/$locale/create/$kind/'
+      path: '/$kind'
+      fullPath: '/$locale/create/$kind/'
+      preLoaderRoute: typeof LocaleCreateKindIndexRouteImport
+      parentRoute: typeof LocaleCreateRoute
     }
     '/$locale/creator/$userId/': {
       id: '/$locale/creator/$userId/'
@@ -10990,6 +11055,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/$locale/story/newsletter/unsubscribe/'
       preLoaderRoute: typeof LocaleStoryNewsletterUnsubscribeIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/user/_account/api-keys/': {
+      id: '/$locale/user/_account/api-keys/'
+      path: '/api-keys'
+      fullPath: '/$locale/user/api-keys/'
+      preLoaderRoute: typeof LocaleUserAccountApiKeysIndexRouteImport
+      parentRoute: typeof LocaleUserAccountRoute
+    }
+    '/$locale/user/_account/notifications/': {
+      id: '/$locale/user/_account/notifications/'
+      path: '/notifications'
+      fullPath: '/$locale/user/notifications/'
+      preLoaderRoute: typeof LocaleUserAccountNotificationsIndexRouteImport
+      parentRoute: typeof LocaleUserAccountRoute
     }
     '/$locale/user/_account/referral/': {
       id: '/$locale/user/_account/referral/'
@@ -14564,6 +14643,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface LocaleCreateRouteChildren {
+  LocaleCreateKindIndexRoute: typeof LocaleCreateKindIndexRoute
+}
+
+const LocaleCreateRouteChildren: LocaleCreateRouteChildren = {
+  LocaleCreateKindIndexRoute: LocaleCreateKindIndexRoute,
+}
+
+const LocaleCreateRouteWithChildren = LocaleCreateRoute._addFileChildren(
+  LocaleCreateRouteChildren,
+)
+
 interface LocaleDocsRouteChildren {
   LocaleDocsApiIndexRoute: typeof LocaleDocsApiIndexRoute
 }
@@ -14776,11 +14867,16 @@ const LocaleThreadsRouteWithChildren = LocaleThreadsRoute._addFileChildren(
 )
 
 interface LocaleUserAccountRouteChildren {
+  LocaleUserAccountApiKeysIndexRoute: typeof LocaleUserAccountApiKeysIndexRoute
+  LocaleUserAccountNotificationsIndexRoute: typeof LocaleUserAccountNotificationsIndexRoute
   LocaleUserAccountReferralIndexRoute: typeof LocaleUserAccountReferralIndexRoute
   LocaleUserAccountSettingsIndexRoute: typeof LocaleUserAccountSettingsIndexRoute
 }
 
 const LocaleUserAccountRouteChildren: LocaleUserAccountRouteChildren = {
+  LocaleUserAccountApiKeysIndexRoute: LocaleUserAccountApiKeysIndexRoute,
+  LocaleUserAccountNotificationsIndexRoute:
+    LocaleUserAccountNotificationsIndexRoute,
   LocaleUserAccountReferralIndexRoute: LocaleUserAccountReferralIndexRoute,
   LocaleUserAccountSettingsIndexRoute: LocaleUserAccountSettingsIndexRoute,
 }
@@ -15838,6 +15934,7 @@ const rootRouteChildren: RootRouteChildren = {
   LlmsDottxtRoute: LlmsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   LocaleSplatRoute: LocaleSplatRoute,
+  LocaleCreateRoute: LocaleCreateRouteWithChildren,
   LocaleDocsRoute: LocaleDocsRouteWithChildren,
   LocaleHelpRoute: LocaleHelpRouteWithChildren,
   LocaleModelsRoute: LocaleModelsRouteWithChildren,

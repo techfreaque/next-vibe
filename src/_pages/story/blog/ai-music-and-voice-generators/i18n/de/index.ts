@@ -179,7 +179,7 @@ export const translations: typeof enTranslations = {
       },
       transcribe: {
         title: "Ganze Dateien transkribieren",
-        body: "Meetings, Interviews, Sprachmemos: Zieh bis zu {{sttMaxFiles}} Dateien auf die Tool-Seite für Sprache zu Text und wähl das Modell.",
+        body: "Meetings, Interviews, Sprachmemos: Zieh bis zu {{sttMaxFiles}} Dateien auf die Seite für Sprache zu Text und wähl das Modell.",
       },
       call: {
         title: "Anrufmodus",
@@ -187,7 +187,7 @@ export const translations: typeof enTranslations = {
       },
     },
     toolPages:
-      "Volle Kontrolle? Jeder Job hat seine eigene Tool-Seite: Modell oder Stimme wählen, Cliplänge einstellen, ein langes Skript einfügen.",
+      "Volle Kontrolle? Jeder Job hat seine eigene Seite: Modell oder Stimme wählen, Cliplänge einstellen, ein langes Skript einfügen.",
   },
   pricing: {
     title: "Was KI-Musik und KI-Stimmen hier kosten",

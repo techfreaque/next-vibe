@@ -21,7 +21,10 @@ import {
   tierLine,
   tierName,
 } from "../_shared/model-format";
-import { type MediaModelFacts, toolHref } from "../_shared/model-media-facts";
+import {
+  createPageHref,
+  type MediaModelFacts,
+} from "../_shared/model-media-facts";
 import { ModelIcon, TierBadge } from "../_shared/model-ui";
 import { scopedTranslation } from "../i18n";
 
@@ -51,7 +54,7 @@ export function MediaModelPageClient({
     facts.type === "tts" || facts.type === "stt"
       ? t("media.useCta", { model: facts.name })
       : t("media.generateCta", { model: facts.name });
-  const href = toolHref(locale, facts);
+  const href = createPageHref(locale, facts);
 
   const rows: MediaFactRow[] = [
     { key: "type", label: t("facts.type"), value: typeLabel, hint: null },

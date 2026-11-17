@@ -32,7 +32,9 @@ export type NavPaths =
   | "/admin"
   | "/threads"
   | "/user/settings"
-  | "/user/referral";
+  | "/user/referral"
+  | "/user/api-keys"
+  | "/user/notifications";
 
 export type NavItemType = NavSingleItemType | NavParentItemType;
 

@@ -397,7 +397,7 @@ export const translations: typeof enTranslations = {
       "Le prix s'entend par unité (image, clip, seconde ou caractère) et varie selon la taille, la durée et les options. 1 crédit = {{value}}.",
     ctaTitle: "Essayez {{model}} maintenant.",
     ctaSubtitle:
-      "Des crédits offerts pour commencer, sans carte. L'outil s'ouvre prêt à l'emploi.",
+      "Des crédits offerts pour commencer, sans carte. Le générateur s'ouvre avec {{model}} déjà choisi.",
   },
   compare: {
     back: "Tous les modèles",

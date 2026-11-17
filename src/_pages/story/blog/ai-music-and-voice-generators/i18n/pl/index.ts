@@ -180,7 +180,7 @@ export const translations: typeof enTranslations = {
       },
       transcribe: {
         title: "Transkrybuj całe pliki",
-        body: "Spotkania, wywiady, notatki głosowe: wrzuć do {{sttMaxFiles}} plików na stronę narzędzia do zamiany mowy na tekst i wybierz model.",
+        body: "Spotkania, wywiady, notatki głosowe: wrzuć do {{sttMaxFiles}} plików na stronę zamiany mowy na tekst i wybierz model.",
       },
       call: {
         title: "Tryb rozmowy",
@@ -188,7 +188,7 @@ export const translations: typeof enTranslations = {
       },
     },
     toolPages:
-      "Chcesz pełnej kontroli? Każde zadanie ma własną stronę narzędzia: wybierz model albo głos, ustaw długość klipu, wklej długi scenariusz.",
+      "Chcesz pełnej kontroli? Każde zadanie ma własną stronę: wybierz model albo głos, ustaw długość klipu, wklej długi scenariusz.",
   },
   pricing: {
     title: "Ile kosztuje tu muzyka i głos AI",

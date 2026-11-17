@@ -393,7 +393,7 @@ export const translations: typeof enTranslations = {
       "Cena jest za jednostkę - obraz, klip, sekundę lub znak - i zależy od rozmiaru, długości i opcji. 1 kredyt = {{value}}.",
     ctaTitle: "Wypróbuj {{model}} teraz.",
     ctaSubtitle:
-      "Darmowe kredyty na start, bez karty. Narzędzie otwiera się gotowe do pracy.",
+      "Darmowe kredyty na start, bez karty. Generator otwiera się z wybranym {{model}}.",
   },
   compare: {
     back: "Wszystkie modele",

@@ -1,3 +1,4 @@
+import { Key } from "next-vibe/ui/components/icons/Key";
 import { Settings } from "next-vibe/ui/components/icons/Settings";
 import { ShoppingCart } from "next-vibe/ui/components/icons/ShoppingCart";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
@@ -25,5 +26,10 @@ export const accountNavItems: NavItemType[] = [
     icon: <TrendingUp className="h-4 w-4" />,
     title: "nav.referral",
     href: "/user/referral",
+  },
+  {
+    icon: <Key className="h-4 w-4" />,
+    title: "nav.apiKeys",
+    href: "/user/api-keys",
   },
 ];

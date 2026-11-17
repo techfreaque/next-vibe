@@ -176,7 +176,7 @@ export const translations = {
       },
       transcribe: {
         title: "Transcribe whole files",
-        body: "Meetings, interviews, voice memos: drop up to {{sttMaxFiles}} files on the speech to text tool page and pick the model.",
+        body: "Meetings, interviews, voice memos: drop up to {{sttMaxFiles}} files on the speech to text page and pick the model.",
       },
       call: {
         title: "Call mode",
@@ -184,7 +184,7 @@ export const translations = {
       },
     },
     toolPages:
-      "Want full control? Each job has its own tool page: pick the model or voice, set the clip length, paste a long script.",
+      "Want full control? Each job has its own page: pick the model or voice, set the clip length, paste a long script.",
   },
   pricing: {
     title: "What AI music and voice cost here",

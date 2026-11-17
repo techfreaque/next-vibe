@@ -69,7 +69,7 @@ export const translations: typeof enTranslations = {
     },
     long: {
       title: "Najdłuższe klipy: jedno ciągłe ujęcie",
-      body: "Do {{longestSeconds}} sekund w jednym klipie. Mniej cięć, mniej widocznych szwów. Długość ustawiasz na stronie narzędzia; zapytanie z czatu prosi o {{seconds}} s.",
+      body: "Do {{longestSeconds}} sekund w jednym klipie. Mniej cięć, mniej widocznych szwów. Długość ustawiasz na stronie generatora wideo; zapytanie z czatu prosi o {{seconds}} s.",
     },
     frames: {
       title: "Kontrola pierwszej i ostatniej klatki",
@@ -127,7 +127,7 @@ export const translations: typeof enTranslations = {
       },
     },
     toolPage:
-      "Jeden kompromis. W czacie AI nie ustawi długości, rozdzielczości ani proporcji obrazu: każdy klip z czatu prosi o {{seconds}} s w domyślnej rozdzielczości modelu. Potrzebujesz pełnej kontroli? Na stronie narzędzia ustawiasz model, czas trwania, proporcje, rozdzielczość, pierwszą i ostatnią klatkę oraz prompt negatywny.",
+      "Jeden kompromis. W czacie AI nie ustawi długości, rozdzielczości ani proporcji obrazu: każdy klip z czatu prosi o {{seconds}} s w domyślnej rozdzielczości modelu. Potrzebujesz pełnej kontroli? Na stronie generatora wideo ustawiasz model, czas trwania, proporcje, rozdzielczość, pierwszą i ostatnią klatkę oraz prompt negatywny.",
     toolLink: "Otwórz generator wideo",
   },
   pricing: {
@@ -169,7 +169,7 @@ export const translations: typeof enTranslations = {
     filters:
       "Każdy model wideo tutaj pochodzi z laboratorium głównego nurtu i działa za moderacją swojego dostawcy. Treści seksualne wprost, prawdziwe osoby publiczne, nieletni albo drastyczna przemoc mogą zostać odrzucone już u dostawcy. To odmowa dostawcy, nie nasza, i nic cię nie kosztuje.",
     chatControls:
-      "W czacie długość, rozdzielczość i proporcje zostają domyślne. Strona narzędzia odblokowuje je wszystkie.",
+      "W czacie długość, rozdzielczość i proporcje zostają domyślne. Generator wideo odblokowuje je wszystkie.",
     snap: "Każdy model obsługuje własny zestaw długości. Zapytanie przeskakuje do najbliższej, więc część klipów z czatu jest odrobinę krótsza lub dłuższa niż {{seconds}} s.",
     legacy:
       "Starsze modele ({{legacyCount}}) nie trafiły do tej tabeli. Wciąż są na pełnej liście modeli.",
@@ -204,7 +204,7 @@ export const translations: typeof enTranslations = {
     },
     length: {
       q: "Jak długie może być wideo AI?",
-      a: "Do {{longestSeconds}} sekund w jednym klipie, w modelu {{longestName}}. Większość modeli kończy dużo wcześniej. Zapytanie z czatu prosi o {{seconds}} s; dłuższy czas ustawisz na stronie narzędzia.",
+      a: "Do {{longestSeconds}} sekund w jednym klipie, w modelu {{longestName}}. Większość modeli kończy dużo wcześniej. Zapytanie z czatu prosi o {{seconds}} s; dłuższy czas ustawisz na stronie generatora wideo.",
     },
     uncensored: {
       q: "Czy jest generator wideo AI bez cenzury?",
@@ -220,7 +220,7 @@ export const translations: typeof enTranslations = {
   cta: {
     title: "Wybierz model. Nakręć ujęcie.",
     subtitle:
-      "Pełna kontrola na stronie narzędzia: model, długość, proporcje, rozdzielczość, klatki. Albo po prostu napisz w dowolnym czacie na {{appName}}.",
+      "Pełna kontrola w generatorze wideo: model, długość, proporcje, rozdzielczość, klatki. Albo po prostu napisz w dowolnym czacie na {{appName}}.",
     generate: "Wygeneruj wideo",
     models: "Przeglądaj wszystkie modele",
   },

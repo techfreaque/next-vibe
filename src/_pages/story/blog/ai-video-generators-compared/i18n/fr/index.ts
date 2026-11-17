@@ -69,7 +69,7 @@ export const translations: typeof enTranslations = {
     },
     long: {
       title: "Clips les plus longs : une seule prise continue",
-      body: "Jusqu'à {{longestSeconds}} secondes en un seul clip. Moins de coupes, moins de raccords visibles. Réglez la durée sur la page de l'outil ; une requête depuis le chat demande {{seconds}} secondes.",
+      body: "Jusqu'à {{longestSeconds}} secondes en un seul clip. Moins de coupes, moins de raccords visibles. Réglez la durée sur la page du générateur vidéo ; une requête depuis le chat demande {{seconds}} secondes.",
     },
     frames: {
       title: "Contrôle de la première et de la dernière image",
@@ -127,7 +127,7 @@ export const translations: typeof enTranslations = {
       },
     },
     toolPage:
-      "Un compromis. Dans le chat, l'IA ne peut pas régler la durée, la résolution ni le format : chaque clip demandé depuis le chat dure {{seconds}} secondes à la résolution par défaut du modèle. Besoin de tout contrôler ? La page de l'outil vidéo règle le modèle, la durée, le format, la résolution, la première et la dernière image, et un prompt négatif.",
+      "Un compromis. Dans le chat, l'IA ne peut pas régler la durée, la résolution ni le format : chaque clip demandé depuis le chat dure {{seconds}} secondes à la résolution par défaut du modèle. Besoin de tout contrôler ? La page du générateur vidéo règle le modèle, la durée, le format, la résolution, la première et la dernière image, et un prompt négatif.",
     toolLink: "Ouvrir le générateur de vidéo",
   },
   pricing: {
@@ -169,7 +169,7 @@ export const translations: typeof enTranslations = {
     filters:
       "Tous les modèles vidéo ici viennent de labos grand public et passent par la modération de leur fournisseur. Contenu sexuel explicite, personnalités publiques réelles, mineurs ou violence graphique peuvent être refusés en amont. Ce refus vient du fournisseur, pas de nous, et il ne vous coûte rien.",
     chatControls:
-      "Dans le chat, la durée, la résolution et le format restent par défaut. La page de l'outil les débloque tous.",
+      "Dans le chat, la durée, la résolution et le format restent par défaut. Le générateur vidéo les débloque tous.",
     snap: "Chaque modèle prend en charge ses propres durées. Une requête est arrondie à la plus proche, donc certains clips via le chat durent un peu moins ou un peu plus de {{seconds}} secondes.",
     legacy:
       "{{legacyCount}} modèles plus anciens ne figurent pas dans ce tableau. Ils restent dans la liste complète des modèles.",
@@ -204,7 +204,7 @@ export const translations: typeof enTranslations = {
     },
     length: {
       q: "Quelle durée peut faire une vidéo IA ?",
-      a: "Jusqu'à {{longestSeconds}} secondes en un seul clip, sur {{longestName}}. La plupart des modèles s'arrêtent bien avant. Une requête depuis le chat demande {{seconds}} secondes ; réglez une durée plus longue sur la page de l'outil.",
+      a: "Jusqu'à {{longestSeconds}} secondes en un seul clip, sur {{longestName}}. La plupart des modèles s'arrêtent bien avant. Une requête depuis le chat demande {{seconds}} secondes ; réglez une durée plus longue sur la page du générateur vidéo.",
     },
     uncensored: {
       q: "Existe-t-il un générateur de vidéo IA non censuré ?",
@@ -220,7 +220,7 @@ export const translations: typeof enTranslations = {
   cta: {
     title: "Choisissez un modèle. Tournez le plan.",
     subtitle:
-      "Contrôle total sur la page de l'outil : modèle, durée, format, résolution, images clés. Ou demandez simplement dans n'importe quelle discussion sur {{appName}}.",
+      "Contrôle total dans le générateur vidéo : modèle, durée, format, résolution, images clés. Ou demandez simplement dans n'importe quelle discussion sur {{appName}}.",
     generate: "Générer une vidéo",
     models: "Parcourir tous les modèles",
   },

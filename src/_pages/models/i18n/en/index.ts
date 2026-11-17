@@ -386,7 +386,7 @@ export const translations = {
       "Price is per unit - image, clip, second or character - and shifts with size, length and options. 1 credit = {{value}}.",
     ctaTitle: "Try {{model}} now.",
     ctaSubtitle:
-      "Free credits to start, no card needed. The tool opens ready to run.",
+      "Free credits to start, no card needed. The generator opens with {{model}} selected.",
   },
   compare: {
     back: "All models",

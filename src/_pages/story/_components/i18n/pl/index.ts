@@ -48,6 +48,7 @@ export const translations: typeof enTranslations = {
     unbottledHome: "Artykuły",
     subscription: "Subskrypcja",
     referral: "Polecenia",
+    apiKeys: "Klucze API",
   },
   newsletter: {
     title: "Bądź na bieżąco",
@@ -736,9 +737,9 @@ export const translations: typeof enTranslations = {
       subtitle:
         "Nowe nieocenzurowane modele i nowości prosto na Twoją skrzynkę.",
     },
-    tagline: "Rozmawiaj, twórz i łącz się - tekst, obrazy, wideo i muzyka",
+    tagline: "Rozmawiaj, twórz, łącz się. Tekst, obrazy, wideo i muzyka.",
     privacyTagline:
-      "Prywatna AI z {{modelCount}} modelami - czat, obrazy, wideo i muzyka",
+      "Prywatna AI z {{modelCount}} modelami do czatu, obrazów, wideo i muzyki.",
     platform: {
       title: "Platforma",
       features: "Funkcje",

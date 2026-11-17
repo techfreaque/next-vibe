@@ -49,6 +49,7 @@ export const translations: typeof enTranslations = {
     unbottledHome: "Articles",
     subscription: "Abonnement",
     referral: "Parrainage",
+    apiKeys: "Clés API",
   },
   newsletter: {
     title: "Restez informé",

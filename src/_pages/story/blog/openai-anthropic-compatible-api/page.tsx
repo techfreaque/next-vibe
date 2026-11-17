@@ -50,7 +50,10 @@ import {
   CODING_TOOL_MODEL,
   type CodingToolSetup,
 } from "@/api-keys/coding-tools";
-import { API_KEY_DEFAULT_RATE_LIMIT_PER_MINUTE } from "@/api-keys/constants";
+import {
+  API_KEY_DEFAULT_RATE_LIMIT_PER_MINUTE,
+  API_KEYS_PAGE_PATH,
+} from "@/api-keys/constants";
 import { scopedTranslation as apiKeysScopedTranslation } from "@/api-keys/i18n";
 import { configScopedTranslation } from "@/env/i18n";
 import { ProductIds, productsRepository } from "@/products/platform-products";
@@ -636,7 +639,7 @@ export function TanstackPage({
           actions={
             <>
               <Cta
-                href={`/${locale}/tools/api-keys`}
+                href={`/${locale}/${API_KEYS_PAGE_PATH}`}
                 label={t("cta.key")}
                 icon={Key}
               />

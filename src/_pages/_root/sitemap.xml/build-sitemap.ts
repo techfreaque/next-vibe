@@ -17,6 +17,7 @@ import {
 
 import { configScopedTranslation } from "@/env/i18n";
 
+import { CREATE_KINDS } from "../../create/_shared/create-kinds";
 import {
   listModelFacts,
   suggestComparisons,
@@ -50,6 +51,7 @@ export const SITEMAP_STATIC_PATHS: readonly string[] = [
   "/help",
   "/skills",
   "/models",
+  ...CREATE_KINDS.map((kind) => `/create/${kind}`),
 ];
 
 /** Comparison pages per model: its suggested "compare with" set, deduped. */

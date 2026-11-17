@@ -76,6 +76,13 @@ export interface DocsSnippets {
   musicCreate: string;
   musicPoll: string;
   mediaFile: string;
+  responsesNode: string;
+  messagesNode: string;
+  imagesNode: string;
+  speechNode: string;
+  transcriptionPython: string;
+  transcriptionNode: string;
+  envSetup: string;
 }
 
 export function buildDocsSnippets(baseUrl: string): DocsSnippets {
@@ -504,5 +511,48 @@ curl -o image.png "${baseUrl}/media/3f9c.../image-1.png?expires=1767830400&sig=.
 # Same file with your key, any time
 curl -o image.png ${baseUrl}/media/3f9c.../image-1.png \\
   ${auth}`,
+    responsesNode: `const reply = await client.responses.create({
+  model: "${DOCS_EXAMPLE_MODEL}",
+  input: "Why is the sky blue?",
+});
+console.log(reply.output_text);`,
+    messagesNode: `import Anthropic from "@anthropic-ai/sdk";
+
+const client = new Anthropic({
+  baseURL: "${anthropicBaseUrl}",
+  apiKey: process.env.UNBOTTLED_API_KEY, // ${API_KEY_PLACEHOLDER}
+});
+
+const reply = await client.messages.create({
+  model: "${DOCS_EXAMPLE_MODEL}",
+  max_tokens: 1024,
+  messages: [{ role: "user", content: "Why is the sky blue?" }],
+});
+const text = reply.content.find((block) => block.type === "text");
+console.log(text?.type === "text" ? text.text : "");`,
+    imagesNode: `const img = await client.images.generate({
+  model: "${DOCS_IMAGE_MODEL}",
+  prompt: "A lighthouse on a cliff at dawn, oil painting",
+});
+console.log(img.data?.[0]?.url);`,
+    speechNode: `import { writeFile } from "node:fs/promises";
+
+const audio = await client.audio.speech.create({
+  model: "${DOCS_VOICE}",
+  input: "Your build finished.",
+});
+await writeFile("speech.mp3", Buffer.from(await audio.arrayBuffer()));`,
+    transcriptionPython: `with open("meeting.mp3", "rb") as f:
+    result = client.audio.transcriptions.create(model="whisper-1", file=f)
+print(result.text)`,
+    transcriptionNode: `import { createReadStream } from "node:fs";
+
+const result = await client.audio.transcriptions.create({
+  model: "whisper-1",
+  file: createReadStream("meeting.mp3"),
+});
+console.log(result.text);`,
+    envSetup: `export OPENAI_BASE_URL="${baseUrl}"
+export OPENAI_API_KEY="${API_KEY_PLACEHOLDER}"`,
   };
 }

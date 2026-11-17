@@ -3,6 +3,9 @@ import { V1_API_PATH_REGEX } from "next-vibe/platforms/web/middleware/utils";
 /** Public docs path (relative to /<locale>). */
 export const API_DOCS_PATH = "docs/api" as const;
 
+/** Account page where users manage their keys (relative to /<locale>). */
+export const API_KEYS_PAGE_PATH = "user/api-keys" as const;
+
 export const API_KEYS_ALIAS = "api-keys" as const;
 
 /** Every key starts with this - lets auth reject non-key bearers cheaply. */

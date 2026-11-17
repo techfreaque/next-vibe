@@ -67,7 +67,7 @@ export const translations = {
     },
     long: {
       title: "Longest clips: one continuous take",
-      body: "Up to {{longestSeconds}} seconds in a single clip. Fewer cuts, fewer stitched seams. Set the length on the tool page; a chat request asks for {{seconds}} seconds.",
+      body: "Up to {{longestSeconds}} seconds in a single clip. Fewer cuts, fewer stitched seams. Set the length on the video generator page; a chat request asks for {{seconds}} seconds.",
     },
     frames: {
       title: "Start and end frame control",
@@ -125,7 +125,7 @@ export const translations = {
       },
     },
     toolPage:
-      "One trade-off. In chat the AI can't set length, resolution or aspect ratio: every chat clip asks for {{seconds}} seconds at the model's default resolution. Need full control? The video tool page sets model, duration, aspect ratio, resolution, first and last frame, and a negative prompt.",
+      "One trade-off. In chat the AI can't set length, resolution or aspect ratio: every chat clip asks for {{seconds}} seconds at the model's default resolution. Need full control? The video generator page sets model, duration, aspect ratio, resolution, first and last frame, and a negative prompt.",
     toolLink: "Open the video generator",
   },
   pricing: {
@@ -166,7 +166,7 @@ export const translations = {
     filters:
       "Every video model here comes from a mainstream lab and runs behind its provider's moderation. Explicit sexual content, real public figures, minors or gore can be refused upstream. That refusal is the provider's, not ours, and it costs you nothing.",
     chatControls:
-      "In chat, length, resolution and aspect ratio stay at their defaults. The tool page unlocks all of them.",
+      "In chat, length, resolution and aspect ratio stay at their defaults. The video generator page unlocks all of them.",
     snap: "Each model supports its own set of lengths. A request snaps to the nearest one, so some chat clips run a little shorter or longer than {{seconds}} seconds.",
     legacy:
       "{{legacyCount}} older models are left out of this table. They still sit in the full model list.",
@@ -201,7 +201,7 @@ export const translations = {
     },
     length: {
       q: "How long can an AI video be?",
-      a: "Up to {{longestSeconds}} seconds in one clip, on {{longestName}}. Most models stop well before that. A chat request asks for {{seconds}} seconds; set a longer duration on the tool page.",
+      a: "Up to {{longestSeconds}} seconds in one clip, on {{longestName}}. Most models stop well before that. A chat request asks for {{seconds}} seconds; set a longer duration on the video generator page.",
     },
     uncensored: {
       q: "Is there an uncensored AI video generator?",
@@ -217,7 +217,7 @@ export const translations = {
   cta: {
     title: "Pick a model. Make the shot.",
     subtitle:
-      "Full control on the tool page: model, length, aspect ratio, resolution, frames. Or just ask in any chat on {{appName}}.",
+      "Full control on the video generator page: model, length, aspect ratio, resolution, frames. Or just ask in any chat on {{appName}}.",
     generate: "Generate a video",
     models: "Browse all models",
   },

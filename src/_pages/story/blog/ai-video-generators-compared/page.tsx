@@ -24,7 +24,6 @@ import { ModelSelectionType } from "next-vibe/agent/skills/enum";
 import {
   DEFAULT_VIDEO_DURATION_SECONDS,
   DEFAULT_VIDEO_GEN_MODEL_SELECTION,
-  VIDEO_GEN_ALIAS,
 } from "next-vibe/agent/video-generation/constants";
 import {
   getVideoGenModelById,
@@ -61,6 +60,7 @@ import {
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { createHref } from "@/_pages/create/_shared/create-kinds";
 import {
   creditValueText,
   formatNumber,
@@ -741,7 +741,7 @@ export function TanstackPage({
           </StepList>
           <ArticleP>{t("chat.toolPage", stats)}</ArticleP>
           <CardLink
-            href={`/${locale}/tools/${VIDEO_GEN_ALIAS}`}
+            href={createHref(locale, "video")}
             label={t("chat.toolLink")}
           />
         </ArticleSection>
@@ -846,7 +846,7 @@ export function TanstackPage({
           actions={
             <>
               <Cta
-                href={`/${locale}/tools/${VIDEO_GEN_ALIAS}`}
+                href={createHref(locale, "video")}
                 label={t("cta.generate")}
                 icon={Video}
               />

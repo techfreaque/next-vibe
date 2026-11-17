@@ -14,10 +14,7 @@ import {
   type AgentEnvAvailability,
   getEnvAvailability,
 } from "next-vibe/agent/env-availability";
-import {
-  DEFAULT_IMAGE_GEN_MODEL_SELECTION,
-  IMAGE_GEN_ALIAS,
-} from "next-vibe/agent/image-generation/constants";
+import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "next-vibe/agent/image-generation/constants";
 import {
   getImageGenModelById,
   ImageGenModelId,
@@ -58,6 +55,7 @@ import {
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { createHref } from "@/_pages/create/_shared/create-kinds";
 import {
   creditValueText,
   formatNumber,
@@ -600,7 +598,7 @@ export function TanstackPage({
           <ArticleP>{t("chat.toolPage")}</ArticleP>
           <Div className="flex flex-col">
             <CardLink
-              href={`/${locale}/tools/${IMAGE_GEN_ALIAS}`}
+              href={createHref(locale, "image")}
               label={t("chat.toolLink")}
             />
             <CardLink
@@ -693,7 +691,7 @@ export function TanstackPage({
           actions={
             <>
               <Cta
-                href={`/${locale}/tools/${IMAGE_GEN_ALIAS}`}
+                href={createHref(locale, "image")}
                 label={t("cta.generate")}
                 icon={ImageIcon}
               />

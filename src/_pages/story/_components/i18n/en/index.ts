@@ -47,6 +47,7 @@ export const translations = {
     unbottledHome: "Stories",
     subscription: "Subscription",
     referral: "Referral",
+    apiKeys: "API Keys",
   },
   newsletter: {
     title: "Stay Updated",
@@ -728,9 +729,9 @@ export const translations = {
       subtitle:
         "New uncensored models and product drops, straight to your inbox.",
     },
-    tagline: "Chat, create, and connect - text, images, video, and music",
+    tagline: "Chat, create, connect. Text, images, video and music.",
     privacyTagline:
-      "Privacy-first AI with {{modelCount}} models - chat, images, video & music",
+      "Privacy-first AI with {{modelCount}} models for chat, images, video and music.",
     platform: {
       title: "Platform",
       features: "Features",

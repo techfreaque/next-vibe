@@ -377,7 +377,7 @@ export function TanstackPage({
                 icon={MessageSquare}
               />
               <Cta
-                href={`/${locale}/tools/models`}
+                href={`/${locale}/models`}
                 label={t("cta.models")}
                 icon={RefreshCw}
                 variant="secondary"

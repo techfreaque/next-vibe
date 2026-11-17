@@ -10,8 +10,8 @@
 
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { TOUR_SKIPPED_KEY } from "next-vibe/agent/ai-stream/stream/widget/chat-ui/welcome-tour/tour-config";
 import { until } from "next-vibe/agent/ai-stream/testing/e2e-chat";
+import { STORAGE_KEYS } from "next-vibe/agent/chat/constants";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import type { Locator, Page } from "playwright";
@@ -198,9 +198,7 @@ describe("E2E: model pages", () => {
       name: t("media.generateCta", { model: media.name }),
     });
     expect(await cta.first().getAttribute("href")).toMatch(
-      new RegExp(
-        `/tools/${media.toolAlias}\\?(model|modelId|voiceId)=${media.modelId}$`,
-      ),
+      new RegExp(`/create/image\\?model=${media.modelId}$`),
     );
     await expectNoOverflow(page, "media model page");
   });
@@ -217,7 +215,7 @@ describe("E2E: model pages", () => {
     async ({ page, context, gotoReady }) => {
       await context.addInitScript((key: string) => {
         localStorage.setItem(key, "true");
-      }, TOUR_SKIPPED_KEY);
+      }, STORAGE_KEYS.COMPANION_ONBOARDING_DONE);
       const prompt = `prefill check ${Date.now()}`;
       const composer = page.locator('[data-hydrated] textarea[name="prompt"]');
       await gotoReady(
@@ -244,7 +242,7 @@ describe("E2E: model pages", () => {
     async ({ page, context, gotoReady }) => {
       await context.addInitScript((key: string) => {
         localStorage.setItem(key, "true");
-      }, TOUR_SKIPPED_KEY);
+      }, STORAGE_KEYS.COMPANION_ONBOARDING_DONE);
       const facts = getModelFacts(LINKED, availability);
       expect(facts).not.toBeNull();
       if (facts === null) {
@@ -271,7 +269,7 @@ describe("E2E: model pages", () => {
     async ({ page, context, gotoReady }) => {
       await context.addInitScript((key: string) => {
         localStorage.setItem(key, "true");
-      }, TOUR_SKIPPED_KEY);
+      }, STORAGE_KEYS.COMPANION_ONBOARDING_DONE);
       const trigger = selectorTrigger(page);
       const label = trigger.locator("span.truncate + span").first();
       await gotoReady("/threads/incognito/new", async () => {

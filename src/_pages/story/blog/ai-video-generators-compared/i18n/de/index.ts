@@ -69,7 +69,7 @@ export const translations: typeof enTranslations = {
     },
     long: {
       title: "Längste Clips: eine durchgehende Einstellung",
-      body: "Bis zu {{longestSeconds}} Sekunden in einem einzigen Clip. Weniger Schnitte, weniger sichtbare Nahtstellen. Die Länge stellst du auf der Tool-Seite ein; eine Chat-Anfrage fragt {{seconds}} Sekunden an.",
+      body: "Bis zu {{longestSeconds}} Sekunden in einem einzigen Clip. Weniger Schnitte, weniger sichtbare Nahtstellen. Die Länge stellst du auf der Seite des Videogenerators ein; eine Chat-Anfrage fragt {{seconds}} Sekunden an.",
     },
     frames: {
       title: "Start- und Endframe festlegen",
@@ -127,7 +127,7 @@ export const translations: typeof enTranslations = {
       },
     },
     toolPage:
-      "Ein Kompromiss bleibt. Im Chat kann die KI weder Länge noch Auflösung noch Seitenverhältnis setzen: Jeder Chat-Clip fragt {{seconds}} Sekunden in der Standardauflösung des Modells an. Volle Kontrolle? Auf der Tool-Seite stellst du Modell, Dauer, Seitenverhältnis, Auflösung, Start- und Endframe sowie einen Negativ-Prompt ein.",
+      "Ein Kompromiss bleibt. Im Chat kann die KI weder Länge noch Auflösung noch Seitenverhältnis setzen: Jeder Chat-Clip fragt {{seconds}} Sekunden in der Standardauflösung des Modells an. Volle Kontrolle? Auf der Seite des Videogenerators stellst du Modell, Dauer, Seitenverhältnis, Auflösung, Start- und Endframe sowie einen Negativ-Prompt ein.",
     toolLink: "Videogenerator öffnen",
   },
   pricing: {
@@ -169,7 +169,7 @@ export const translations: typeof enTranslations = {
     filters:
       "Jedes Videomodell hier stammt von einem Mainstream-Lab und läuft hinter der Moderation seines Anbieters. Explizite sexuelle Inhalte, reale Personen des öffentlichen Lebens, Minderjährige oder Gewaltdarstellungen können schon beim Anbieter abgelehnt werden. Diese Ablehnung kommt vom Anbieter, nicht von uns, und kostet dich nichts.",
     chatControls:
-      "Im Chat bleiben Länge, Auflösung und Seitenverhältnis auf Standard. Die Tool-Seite schaltet alles frei.",
+      "Im Chat bleiben Länge, Auflösung und Seitenverhältnis auf Standard. Der Videogenerator schaltet alles frei.",
     snap: "Jedes Modell unterstützt eigene Längen. Eine Anfrage rastet auf die nächstgelegene ein, deshalb laufen manche Chat-Clips etwas kürzer oder länger als {{seconds}} Sekunden.",
     legacy:
       "Ältere Modelle ({{legacyCount}}) fehlen in dieser Tabelle. In der vollständigen Modellliste stehen sie weiterhin.",
@@ -204,7 +204,7 @@ export const translations: typeof enTranslations = {
     },
     length: {
       q: "Wie lang kann ein KI-Video sein?",
-      a: "Bis zu {{longestSeconds}} Sekunden in einem Clip, mit {{longestName}}. Die meisten Modelle hören deutlich früher auf. Eine Chat-Anfrage fragt {{seconds}} Sekunden an; eine längere Dauer stellst du auf der Tool-Seite ein.",
+      a: "Bis zu {{longestSeconds}} Sekunden in einem Clip, mit {{longestName}}. Die meisten Modelle hören deutlich früher auf. Eine Chat-Anfrage fragt {{seconds}} Sekunden an; eine längere Dauer stellst du auf der Seite des Videogenerators ein.",
     },
     uncensored: {
       q: "Gibt es einen unzensierten KI-Videogenerator?",
@@ -220,7 +220,7 @@ export const translations: typeof enTranslations = {
   cta: {
     title: "Modell wählen. Szene drehen.",
     subtitle:
-      "Volle Kontrolle auf der Tool-Seite: Modell, Länge, Seitenverhältnis, Auflösung, Frames. Oder frag einfach in einem beliebigen Chat auf {{appName}}.",
+      "Volle Kontrolle im Videogenerator: Modell, Länge, Seitenverhältnis, Auflösung, Frames. Oder frag einfach in einem beliebigen Chat auf {{appName}}.",
     generate: "Video generieren",
     models: "Alle Modelle ansehen",
   },

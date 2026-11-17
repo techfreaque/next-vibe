@@ -34,6 +34,7 @@ import {
   type CodingToolId,
   type CodingToolSetup,
 } from "@/api-keys/coding-tools";
+import { API_KEYS_PAGE_PATH } from "@/api-keys/constants";
 import { scopedTranslation as apiKeysScopedTranslation } from "@/api-keys/i18n";
 import { configScopedTranslation } from "@/env/i18n";
 
@@ -383,7 +384,7 @@ export function TanstackPage({
           actions={
             <>
               <Cta
-                href={`/${locale}/tools/api-keys`}
+                href={`/${locale}/${API_KEYS_PAGE_PATH}`}
                 label={t("cta.key")}
                 icon={Key}
               />

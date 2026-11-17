@@ -119,7 +119,7 @@ export const translations = {
       },
     },
     toolPage:
-      "Want full control? The image tool page sets model, size, aspect ratio and quality directly.",
+      "Want full control? The image generator page sets model, size, aspect ratio and quality directly.",
     toolLink: "Open the image generator",
     roleplayLink:
       "Character art for your roleplay: the unfiltered roleplay guide",
@@ -181,7 +181,7 @@ export const translations = {
     },
     api: {
       q: "Can I generate images through the API?",
-      a: "The {{appName}} API covers chat models in the OpenAI and Anthropic formats. Image generation runs in the chat and on the image tool page.",
+      a: "The {{appName}} API covers chat models in the OpenAI and Anthropic formats. Image generation runs in the chat and on the image generator page.",
     },
     videoLink: "Compare the AI video generators",
     chatLink: "Read the guide to every uncensored chat model",

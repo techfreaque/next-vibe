@@ -48,6 +48,7 @@ export const translations: typeof enTranslations = {
     unbottledHome: "Geschichten",
     subscription: "Abonnement",
     referral: "Empfehlungsprogramm",
+    apiKeys: "API-Schlüssel",
   },
   newsletter: {
     title: "Bleib auf dem Laufenden",
@@ -735,9 +736,9 @@ export const translations: typeof enTranslations = {
       subtitle:
         "Neue unzensierte Modelle und Produkt-Updates direkt in dein Postfach.",
     },
-    tagline: "Chatten, erschaffen, verbinden - Text, Bilder, Videos und Musik",
+    tagline: "Chatten, erschaffen, verbinden. Text, Bilder, Videos und Musik.",
     privacyTagline:
-      "Datenschutzorientierte KI mit {{modelCount}} Modellen - Chat, Bilder, Videos & Musik",
+      "Datenschutzorientierte KI mit {{modelCount}} Modellen für Chat, Bilder, Videos und Musik.",
     platform: {
       title: "Plattform",
       features: "Funktionen",

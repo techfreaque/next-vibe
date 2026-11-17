@@ -16,10 +16,7 @@ import {
   getEnvAvailability,
 } from "next-vibe/agent/env-availability";
 import { roundMediaCost } from "next-vibe/agent/models/models";
-import {
-  DEFAULT_MUSIC_GEN_MODEL_SELECTION,
-  MUSIC_GEN_ALIAS,
-} from "next-vibe/agent/music-generation/constants";
+import { DEFAULT_MUSIC_GEN_MODEL_SELECTION } from "next-vibe/agent/music-generation/constants";
 import { MUSIC_DURATION_SECONDS } from "next-vibe/agent/music-generation/enum";
 import {
   getMusicGenModelById,
@@ -27,19 +24,13 @@ import {
   MusicGenModelId,
 } from "next-vibe/agent/music-generation/models";
 import { ContentLevel, ModelSelectionType } from "next-vibe/agent/skills/enum";
-import {
-  DEFAULT_STT_MODEL_ID,
-  TRANSCRIBE_AUDIO_ALIAS,
-} from "next-vibe/agent/speech-to-text/constants";
+import { DEFAULT_STT_MODEL_ID } from "next-vibe/agent/speech-to-text/constants";
 import {
   sttModelDefinitions,
   SttModelId,
   sttModelOptions,
 } from "next-vibe/agent/speech-to-text/models";
-import {
-  DEFAULT_TTS_VOICE_ID,
-  TEXT_TO_SPEECH_ALIAS,
-} from "next-vibe/agent/text-to-speech/constants";
+import { DEFAULT_TTS_VOICE_ID } from "next-vibe/agent/text-to-speech/constants";
 import {
   getTtsModelById,
   ttsModelDefinitions,
@@ -74,6 +65,7 @@ import {
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { createHref } from "@/_pages/create/_shared/create-kinds";
 import {
   creditValueText,
   formatNumber,
@@ -837,7 +829,7 @@ export function TanstackPage({
             {t("music.suno", stats)}
           </Callout>
           <CardLink
-            href={`/${locale}/tools/${MUSIC_GEN_ALIAS}`}
+            href={createHref(locale, "music")}
             label={t("music.toolLink")}
           />
         </ArticleSection>
@@ -930,7 +922,7 @@ export function TanstackPage({
           })}
           <ArticleP>{t("voices.languages", stats)}</ArticleP>
           <CardLink
-            href={`/${locale}/tools/${TEXT_TO_SPEECH_ALIAS}`}
+            href={createHref(locale, "speech")}
             label={t("voices.toolLink")}
           />
         </ArticleSection>
@@ -1015,7 +1007,7 @@ export function TanstackPage({
             );
           })}
           <CardLink
-            href={`/${locale}/tools/${TRANSCRIBE_AUDIO_ALIAS}`}
+            href={createHref(locale, "transcribe")}
             label={t("stt.toolLink")}
           />
         </ArticleSection>
@@ -1039,15 +1031,15 @@ export function TanstackPage({
           <ArticleP>{t("chat.toolPages", stats)}</ArticleP>
           <Div className="flex flex-col">
             <CardLink
-              href={`/${locale}/tools/${MUSIC_GEN_ALIAS}`}
+              href={createHref(locale, "music")}
               label={t("music.toolLink")}
             />
             <CardLink
-              href={`/${locale}/tools/${TEXT_TO_SPEECH_ALIAS}`}
+              href={createHref(locale, "speech")}
               label={t("voices.toolLink")}
             />
             <CardLink
-              href={`/${locale}/tools/${TRANSCRIBE_AUDIO_ALIAS}`}
+              href={createHref(locale, "transcribe")}
               label={t("stt.toolLink")}
             />
           </Div>
@@ -1149,18 +1141,18 @@ export function TanstackPage({
           actions={
             <>
               <Cta
-                href={`/${locale}/tools/${MUSIC_GEN_ALIAS}`}
+                href={createHref(locale, "music")}
                 label={t("cta.music")}
                 icon={Music}
               />
               <Cta
-                href={`/${locale}/tools/${TEXT_TO_SPEECH_ALIAS}`}
+                href={createHref(locale, "speech")}
                 label={t("cta.voice")}
                 icon={Volume2}
                 variant="secondary"
               />
               <Cta
-                href={`/${locale}/tools/${TRANSCRIBE_AUDIO_ALIAS}`}
+                href={createHref(locale, "transcribe")}
                 label={t("cta.transcribe")}
                 icon={Mic}
                 variant="secondary"

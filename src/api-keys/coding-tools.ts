@@ -182,7 +182,10 @@ export function buildCodingToolSnippets({
           filename: "terminal",
           language: "bash",
           code: `${API_KEY_ENV}="${key}" codex \\
-  -c 'model_providers.unbottled={name="unbottled.ai",base_url="${url}",env_key="${API_KEY_ENV}",wire_api="responses"}' \\
+  -c 'model_providers.unbottled.name="unbottled.ai"' \\
+  -c 'model_providers.unbottled.base_url="${url}"' \\
+  -c 'model_providers.unbottled.env_key="${API_KEY_ENV}"' \\
+  -c 'model_providers.unbottled.wire_api="responses"' \\
   -c model_provider=unbottled \\
   -m ${model}`,
         },

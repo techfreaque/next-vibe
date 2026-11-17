@@ -367,6 +367,55 @@ export function ApiKeysContainer(): JSX.Element {
         </Div>
       ) : undefined}
 
+      <Span className="px-1 text-sm font-semibold">
+        {t("widget.keysTitle")}
+      </Span>
+      {data.keys.length === 0 ? (
+        <EmptyBlock
+          icon={<Key />}
+          title={t("widget.empty")}
+          message={t("widget.emptyHint")}
+        />
+      ) : (
+        <Div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">
+          {data.keys.map((k) => (
+            <Div
+              key={k.id}
+              className="flex min-h-16 items-center gap-3 px-4 py-3"
+            >
+              <Span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                <Key className="h-4 w-4" />
+              </Span>
+              <Div className="min-w-0 flex-1">
+                <Span className="block truncate text-sm font-medium">
+                  {k.name}
+                </Span>
+                <Span className="block truncate font-mono text-xs text-muted-foreground">
+                  {t("widget.maskedKey", { prefix: k.keyPrefix })}
+                </Span>
+                <Span className="block text-xs text-muted-foreground">
+                  {t("widget.meta", {
+                    lastUsed: k.lastUsedAt
+                      ? `${t("widget.lastUsed")} ${new Date(k.lastUsedAt).toLocaleString(locale)}`
+                      : t("widget.neverUsed"),
+                    created: new Date(k.createdAt).toLocaleDateString(locale),
+                    rate: t("widget.rateLimit", { n: k.rateLimitPerMinute }),
+                  })}
+                </Span>
+              </Div>
+              <Button
+                variant="outline"
+                disabled={revoking === k.id}
+                className="h-10 shrink-0 border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                onClick={(): void => handleRevoke(k.id)}
+              >
+                {revoking === k.id ? t("widget.revoking") : t("widget.revoke")}
+              </Button>
+            </Div>
+          ))}
+        </Div>
+      )}
+
       <Div className="flex min-w-0 flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm">
         <Div className="grid min-w-0 gap-3 @lg:grid-cols-2">
           <Div className="flex min-w-0 flex-col gap-1.5">
@@ -467,55 +516,6 @@ export function ApiKeysContainer(): JSX.Element {
           {t("widget.docsLink")}
         </Link>
       </Div>
-
-      <Span className="px-1 text-sm font-semibold">
-        {t("widget.keysTitle")}
-      </Span>
-      {data.keys.length === 0 ? (
-        <EmptyBlock
-          icon={<Key />}
-          title={t("widget.empty")}
-          message={t("widget.emptyHint")}
-        />
-      ) : (
-        <Div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">
-          {data.keys.map((k) => (
-            <Div
-              key={k.id}
-              className="flex min-h-16 items-center gap-3 px-4 py-3"
-            >
-              <Span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                <Key className="h-4 w-4" />
-              </Span>
-              <Div className="min-w-0 flex-1">
-                <Span className="block truncate text-sm font-medium">
-                  {k.name}
-                </Span>
-                <Span className="block truncate font-mono text-xs text-muted-foreground">
-                  {t("widget.maskedKey", { prefix: k.keyPrefix })}
-                </Span>
-                <Span className="block text-xs text-muted-foreground">
-                  {t("widget.meta", {
-                    lastUsed: k.lastUsedAt
-                      ? `${t("widget.lastUsed")} ${new Date(k.lastUsedAt).toLocaleString(locale)}`
-                      : t("widget.neverUsed"),
-                    created: new Date(k.createdAt).toLocaleDateString(locale),
-                    rate: t("widget.rateLimit", { n: k.rateLimitPerMinute }),
-                  })}
-                </Span>
-              </Div>
-              <Button
-                variant="outline"
-                disabled={revoking === k.id}
-                className="h-10 shrink-0 border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                onClick={(): void => handleRevoke(k.id)}
-              >
-                {revoking === k.id ? t("widget.revoking") : t("widget.revoke")}
-              </Button>
-            </Div>
-          ))}
-        </Div>
-      )}
     </WidgetShell>
   );
 }
