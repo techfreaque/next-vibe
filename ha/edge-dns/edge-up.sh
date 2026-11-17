@@ -24,7 +24,8 @@ case "$ROLE" in
   s2) NODE_PUBLIC_IP=179.198.214.41; NODE_WG_IP=10.88.0.2 ;;
   *) echo "role must be s1 or s2" >&2; exit 2 ;;
 esac
-export NODE_PUBLIC_IP NODE_WG_IP
+EDGE_SELF_NODE="$ROLE"
+export NODE_PUBLIC_IP NODE_WG_IP EDGE_SELF_NODE
 EDGE_ZONE_DIR="${EDGE_ZONE_DIR:-/srv/ha-edge/zones}"
 export EDGE_ZONE_DIR
 HERE="$(cd "$(dirname "$0")" && pwd)"

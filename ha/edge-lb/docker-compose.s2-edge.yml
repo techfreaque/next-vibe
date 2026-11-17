@@ -19,6 +19,9 @@
 #                             own go once to Server 1's Caddy (loop guard
 #                             header), so either box can renew no matter which
 #                             IP Let's Encrypt resolves. Rest redirects to https.
+# X-HA-Upstream (2026-11-17) on app responses names the upstream that served
+# them (unbottled-app:3000 = this box, 10.88.0.1:3000 = S1 fallback). The edge
+# DNS health daemon keeps S2 in DNS only while that is unbottled-app:3000.
 # Certs: Caddy-managed (HTTP-01 only; TLS-ALPN-01 disabled because it cannot be
 # relayed). Server 1's Caddyfile carries the mirror-image config.
 # ============================================================================
@@ -64,6 +67,7 @@ services:
       caddy_internal_10.handle_1.0_reverse_proxy.health_interval: "5s"
       caddy_internal_10.handle_1.0_reverse_proxy.health_timeout: "3s"
       caddy_internal_10.handle_1.0_reverse_proxy.health_status: "200"
+      caddy_internal_10.handle_1.0_reverse_proxy.header_down: "X-HA-Upstream {upstream_hostport}"
       caddy_internal_10.handle_1.1_reverse_proxy: "unbottled-app:3000 10.88.0.1:3000"
       caddy_internal_10.handle_1.1_reverse_proxy.lb_policy: "first"
       caddy_internal_10.handle_1.1_reverse_proxy.lb_try_duration: "20s"
@@ -74,6 +78,7 @@ services:
       caddy_internal_10.handle_1.1_reverse_proxy.health_interval: "5s"
       caddy_internal_10.handle_1.1_reverse_proxy.health_timeout: "3s"
       caddy_internal_10.handle_1.1_reverse_proxy.health_status: "200"
+      caddy_internal_10.handle_1.1_reverse_proxy.header_down: "X-HA-Upstream {upstream_hostport}"
 
       caddy_internal_11: "https://www.unbottled.ai"
       caddy_internal_11.tls.issuer: "acme"

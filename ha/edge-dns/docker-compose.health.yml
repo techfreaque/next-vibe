@@ -33,6 +33,21 @@ services:
       HEALTH_PATH: "${EDGE_HEALTH_PATH:-/api/en-US/credits}"
       HEALTH_EXPECT: '${EDGE_HEALTH_EXPECT:-"success":true}'
       PROBE_COOKIE_FILE: "/probe-cookie"
+      # Own-app check (2026-11-17, see the daemon header): each Caddy falls
+      # back to the peer's app, so the public probe must also prove the node's
+      # OWN app served it. Both Caddys stamp X-HA-Upstream: {upstream_hostport};
+      # it must equal the node's local upstream below. Empty = old behaviour.
+      SERVED_BY: "${EDGE_SERVED_BY:-s1=next-vibe-app:3000 s2=unbottled-app:3000}"
+      SERVED_BY_HEADER: "${EDGE_SERVED_BY_HEADER:-X-HA-Upstream}"
+      # Plus the DB-backed probe straight to this box's app port over WG
+      # (bypassing Caddy). self = only this box's own node (a peer's direct
+      # probe would also fail on a WG outage and drop a healthy peer).
+      DIRECT_URLS: "${EDGE_DIRECT_URLS:-s1=http://10.88.0.1:3000 s2=http://10.88.0.2:3100}"
+      DIRECT_SCOPE: "${EDGE_DIRECT_SCOPE:-self}"
+      # This box's node: from NODE_PUBLIC_IP (edge-up.sh / the same env as
+      # edge-dns), or EDGE_SELF_NODE=s1|s2 explicitly.
+      SELF_IP: "${NODE_PUBLIC_IP:-}"
+      SELF_NODE: "${EDGE_SELF_NODE:-}"
       ZONE_FILE: "/etc/powerdns/zones/unbottled.ai.zone"
       ZONE_TMPL: "/zone.tmpl"
       CHECK_INTERVAL: "${EDGE_CHECK_INTERVAL:-10}"

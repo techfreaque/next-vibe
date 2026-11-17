@@ -20,7 +20,14 @@
 #
 # stream_close_delay keeps upgraded WebSockets open across a config reload
 # (Caddy would otherwise close them all on every reload).
+#
+# X-HA-Upstream (2026-11-17): names the upstream that actually served the
+# response (next-vibe-app:3000 = this box, 10.88.0.2:3100 = S2 fallback;
+# header_down overwrites anything the app sets). The edge DNS health daemon
+# keeps S1 in DNS only while its probe through this Caddy is served by
+# next-vibe-app:3000, so a dead local app masked by the fallback leaves DNS.
 (unbottled_app_upstreams) {
+	header_down X-HA-Upstream {upstream_hostport}
 	lb_policy first
 	lb_try_duration 20s
 	lb_try_interval 250ms

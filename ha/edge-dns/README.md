@@ -50,6 +50,18 @@ apex A set locally in sub-second.
   `bind-check-interval`). A box must pass 2 consecutive probes to be re-added
   (flap damping). Never-dark guard: if the computed set is empty (both probes
   fail — almost always a local egress fault) it publishes BOTH.
+- **Own-app check (2026-11-17).** Each box's Caddy falls back to the PEER's
+  app, so "the public probe passed" alone does not mean the box's own app is
+  alive (S2's app was dead ~30 min on 2026-11-17 while its probe passed via
+  S1). Both Caddys stamp `X-HA-Upstream: {upstream_hostport}` on app
+  responses; a public probe of a node passes only if it names that node's
+  local upstream (`SERVED_BY`: s1=`next-vibe-app:3000`, s2=`unbottled-app:3000`).
+  Each daemon also probes its OWN box's app directly over WG (`DIRECT_URLS`,
+  s1=`10.88.0.1:3000`, s2=`10.88.0.2:3100`, `DIRECT_SCOPE=self`; the peer is
+  not probed directly, a WG outage would drop a healthy peer). A Caddy deploy
+  drain (`/data/ha-drain/<node>`) now also drops the node from DNS, which is
+  what the deploy flow does anyway. Failing probes log their reason once.
+  Offline test: `docker run --rm -v "$PWD/ha/edge-dns/health:/t:ro" alpine:3.20 sh /t/test-ha-dns-health.sh`.
 
 ### The "a box dies → it loses an app AND a nameserver" risk — handled
 
