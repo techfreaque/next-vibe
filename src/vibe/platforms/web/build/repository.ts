@@ -239,7 +239,12 @@ export class BuildRepository {
             ...process.env,
             NODE_ENV: "production",
             NEXT_DIST_DIR: ".next-prod",
-            NODE_OPTIONS: "--max-old-space-size=10000",
+            // Caller's NODE_OPTIONS wins (Dockerfile sets it); 10 GB OOMed with the fr locale.
+            NODE_OPTIONS: process.env.NODE_OPTIONS?.includes(
+              "max-old-space-size",
+            )
+              ? process.env.NODE_OPTIONS
+              : "--max-old-space-size=16384",
             ...(data.vibeMode ? { NEXT_PUBLIC_VIBE_MODE: data.vibeMode } : {}),
           }),
         });
