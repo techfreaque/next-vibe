@@ -277,7 +277,7 @@ export class MessageDbWriter {
 
   /**
    * Update tool message in DB with result/error, emit MESSAGE_CREATED (with result)
-   * and TOOL_RESULT SSE events. Also emits CREDITS_DEDUCTED if tool had credits.
+   * and TOOL_RESULT SSE events. Never bills: the tool's handler already did.
    */
   emitToolResult(params: {
     toolMessageId: string;
@@ -289,11 +289,9 @@ export class MessageDbWriter {
     sequenceId: string | null;
     toolCall: ToolCall; // updated with result/error
     toolName: string;
-    toolLabel?: string;
     result: WidgetData | undefined;
     error: ErrorResponseType | undefined;
     skipSseEmit?: boolean; // skip TOOL_RESULT SSE if already emitted in batch handler
-    user: JwtPayloadType;
   }): Promise<void> {
     return toolWrites.emitToolResult(this, params);
   }

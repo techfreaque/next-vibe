@@ -37,7 +37,16 @@ import { parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import { Platform } from "../../platforms/platforms";
+import {
+  createPaidCallDedupe,
+  paidCallKey,
+  withZeroCreditCost,
+} from "./paid-call-dedupe";
 import { toAiToolResult } from "./result-ai-parts";
+
+/** Identical paid calls in one thread/turn run once (see ./paid-call-dedupe). */
+const paidCalls =
+  createPaidCallDedupe<Awaited<ReturnType<GenericHandlerBase>>>();
 
 export class RouteExecutionExecutor {
   /**
@@ -164,16 +173,35 @@ export class RouteExecutionExecutor {
         resolvedUrlPathParams = split.urlPathParams;
       }
 
-      // Execute handler
-      const result = await handlerResult({
-        data: resolvedData,
-        urlPathParams: resolvedUrlPathParams,
-        user: params.user,
-        locale: params.locale,
+      // Execute handler - once per identical paid call in this thread/turn.
+      // The handler owns billing, so a joined/reused duplicate is free.
+      const handler = handlerResult;
+      const { result, duplicate } = await paidCalls.run({
+        key: await paidCallKey({
+          toolName: effectiveToolName,
+          data: resolvedData,
+          urlPathParams: resolvedUrlPathParams,
+          user: params.user,
+          toolExecutionContext: params.toolExecutionContext,
+        }),
+        runId: params.toolExecutionContext.streamRunId,
+        execute: () =>
+          handler({
+            data: resolvedData,
+            urlPathParams: resolvedUrlPathParams,
+            user: params.user,
+            locale: params.locale,
+            logger: params.logger,
+            platform: params.platform,
+            cronTaskId: params.cronTaskId,
+            toolExecutionContext: params.toolExecutionContext,
+          }),
+        isReusable: (r) =>
+          !isStreamingResponse(r) &&
+          !isFileResponse(r) &&
+          (isContentResponse(r) || r.success),
         logger: params.logger,
-        platform: params.platform,
-        cronTaskId: params.cronTaskId,
-        toolExecutionContext: params.toolExecutionContext,
+        toolName: effectiveToolName,
       });
 
       // Streaming responses are not supported in CLI/AI/MCP platforms
@@ -203,10 +231,13 @@ export class RouteExecutionExecutor {
       }
 
       if (result.success) {
-        return success(result.data, {
-          ...(result.isErrorResponse && { isErrorResponse: true }),
-          ...(result.performance && { performance: result.performance }),
-        });
+        return success(
+          duplicate ? withZeroCreditCost(result.data) : result.data,
+          {
+            ...(result.isErrorResponse && { isErrorResponse: true }),
+            ...(result.performance && { performance: result.performance }),
+          },
+        );
       }
 
       // Return the original error from the handler

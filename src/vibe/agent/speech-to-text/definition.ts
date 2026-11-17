@@ -39,6 +39,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["vibe", "agent", "speech-to-text"],
   aliases: [TRANSCRIBE_AUDIO_ALIAS],
+  dynamicCredits: ({ response }) => response?.creditCost,
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.CUSTOMER,

@@ -13,13 +13,11 @@ import {
 } from "next-vibe/core/route/response.schema";
 import type { WidgetData } from "next-vibe/core/utils/json";
 import { db } from "next-vibe/database";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 
 import { chatMessages, chatThreads, type ToolCall } from "../../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../../chat/enum";
 import { MessagesRepository } from "../../../../chat/threads/[threadId]/messages/repository";
 import type { ChatModelId } from "../../../models";
-import { deductAndEmitCredits } from "./credits";
 import { type DbWriterState, noteThreadGoneWrite } from "./shared";
 import { buildSseMessageRow } from "./sse-row";
 
@@ -141,11 +139,9 @@ export async function emitToolResult(
     sequenceId: string | null;
     toolCall: ToolCall; // updated with result/error
     toolName: string;
-    toolLabel?: string;
     result: WidgetData | undefined;
     error: ErrorResponseType | undefined;
     skipSseEmit?: boolean; // skip TOOL_RESULT SSE if already emitted in batch handler
-    user: JwtPayloadType;
   },
 ): Promise<void> {
   const {
@@ -157,10 +153,7 @@ export async function emitToolResult(
     sequenceId,
     toolCall,
     toolName,
-    toolLabel,
-    error,
     skipSseEmit,
-    user,
   } = params;
 
   // SSE: MESSAGE_CREATED with updated toolCall (result/error)
@@ -266,16 +259,10 @@ export async function emitToolResult(
     });
   }
 
-  // SSE + DB: CREDITS_DEDUCTED if tool consumed credits and succeeded
-  if (toolCall.creditsUsed && toolCall.creditsUsed > 0 && !error) {
-    await deductAndEmitCredits(w, {
-      user,
-      amount: toolCall.creditsUsed,
-      feature: toolLabel ?? toolName,
-      type: "tool",
-      model,
-    });
-  }
+  // No billing here: the tool's own handler already charged it (static
+  // `credits` in the generic handler, variable costs in the repository).
+  // toolCall.creditsUsed is display-only. Charging it again billed every
+  // tool the model called by its own name (not via execute-tool) twice.
 }
 
 /**

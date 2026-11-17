@@ -313,10 +313,6 @@ export class AbortErrorHandler {
     trailingSystemMessage?: string;
     messages?: ModelMessage[];
     tools?: Record<string, CoreTool>;
-    toolsConfig?: Map<
-      string,
-      { requiresConfirmation?: boolean; credits: number; label: string }
-    >;
     user: JwtPayloadType;
     t: AiStreamT;
   }): Promise<{ wasHandled: boolean }> {
@@ -332,7 +328,6 @@ export class AbortErrorHandler {
       trailingSystemMessage,
       messages,
       tools,
-      toolsConfig,
       user,
       t,
     } = params;
@@ -573,24 +568,8 @@ export class AbortErrorHandler {
                 metadata: { toolCall: toolCall },
               });
 
-              if (toolCall.creditsUsed && toolCall.creditsUsed > 0) {
-                totalCredits += toolCall.creditsUsed;
-
-                await ctx.dbWriter.deductAndEmitCredits({
-                  user,
-                  amount: toolCall.creditsUsed,
-                  feature:
-                    toolsConfig?.get(toolCall.toolName)?.label ??
-                    toolCall.toolName,
-                  type: "tool",
-                  model,
-                });
-
-                logger.debug("[AI Stream] Deducted and emitted tool credits", {
-                  toolName: toolCall.toolName,
-                  amount: toolCall.creditsUsed,
-                });
-              }
+              // No tool billing here: a tool that ran was charged by its
+              // own handler; one that never ran must not be charged.
 
               logger.debug("[AI Stream] Saved pending tool message", {
                 messageId,

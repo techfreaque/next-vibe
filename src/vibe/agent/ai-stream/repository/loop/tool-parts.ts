@@ -316,8 +316,6 @@ export async function onToolResult(
     threadId,
     isIncognito,
     userId,
-    user,
-    toolsConfig,
     emittedToolResultIds,
     logger,
     t,
@@ -564,11 +562,9 @@ export async function onToolResult(
       sequenceId,
       toolCall: toolCallWithResult,
       toolName: part.toolName,
-      toolLabel: toolsConfig.get(part.toolName)?.label,
       result: validatedOutput,
       error: toolError,
       skipSseEmit: emittedToolResultIds?.has(toolMessageId),
-      user,
     });
   } catch (e) {
     logger.error("[AI Stream] Failed to process tool result", parseError(e));
@@ -627,7 +623,6 @@ export async function onToolError(
     ctx,
     threadId,
     userId,
-    user,
     activeToolNames,
     toolsConfig,
     logger,
@@ -730,7 +725,6 @@ export async function onToolError(
       result: undefined,
       error: disabledError,
       skipSseEmit: false,
-      user,
     });
 
     return { currentParentId: toolMessageId };
@@ -778,7 +772,6 @@ export async function onToolError(
       result: undefined,
       error: undefined,
       skipSseEmit: false,
-      user,
     });
 
     return {
@@ -820,11 +813,9 @@ export async function onToolError(
       sequenceId,
       toolCall: toolCallWithResult,
       toolName: part.toolName,
-      toolLabel: toolsConfig.get(part.toolName)?.label,
       result: fallbackResult.data,
       error: undefined,
       skipSseEmit: false,
-      user,
     });
 
     logger.debug("[AI Stream] TOOL_RESULT event sent (fallback)", {
@@ -873,7 +864,6 @@ export async function onToolError(
       result: undefined,
       error: toolCallWithError.error,
       skipSseEmit: false,
-      user,
     });
 
     return {
@@ -997,7 +987,7 @@ async function emitOriginalToolError(
 ): Promise<{
   currentParentId: string | null;
 }> {
-  const { ctx, threadId, isIncognito, userId, user, logger, t, model, skill } =
+  const { ctx, threadId, isIncognito, userId, logger, t, model, skill } =
     state.p;
   const { sequenceId, dbWriter } = ctx;
 
@@ -1057,7 +1047,6 @@ async function emitOriginalToolError(
     result: undefined,
     error,
     skipSseEmit: false,
-    user,
   });
 
   logger.debug("[AI Stream] TOOL_RESULT event sent (error)", {

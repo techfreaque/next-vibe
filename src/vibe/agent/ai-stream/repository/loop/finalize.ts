@@ -169,7 +169,6 @@ export async function runAbortHandler(
     trailingSystemMessage: state.p.trailingSystemMessage,
     messages: state.p.messages,
     tools: state.p.tools,
-    toolsConfig: state.p.toolsConfig,
     user: state.p.user,
     t: state.p.t,
   });

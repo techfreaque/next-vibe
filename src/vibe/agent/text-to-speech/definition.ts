@@ -67,6 +67,7 @@ const { POST } = createEndpoint({
   category: "ai",
   subCategory: "Generation",
   tags: ["tags.speech", "tags.tts", "tags.ai"],
+  dynamicCredits: ({ response }) => response?.creditCost,
 
   fields: customWidgetObject({
     render: TextToSpeechContainer,

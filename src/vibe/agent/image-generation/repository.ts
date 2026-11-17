@@ -70,7 +70,6 @@ import {
 } from "./enum";
 import type { ImageGenerationT } from "./i18n";
 import { type ImageDimensions, readImageDimensions } from "./image-dimensions";
-import { imageGenerationKey, runOncePerKey } from "./in-flight";
 import {
   filterImageGenModels,
   getImageGenModelById,
@@ -211,57 +210,10 @@ function providerFailure(
 
 export class ImageGenerationRepository {
   /**
-   * Generate an image from a text prompt. An identical request that arrives
-   * while the same one is still generating in this thread joins it instead
-   * of paying for a second copy (see in-flight.ts).
+   * Generate an image from a text prompt. Identical paid calls in one thread
+   * run once (execute-tool/repository/paid-call-dedupe.ts).
    */
   static async generateImage(
-    data: ImageGenerationPostRequestOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-    t: ImageGenerationT,
-    toolExecutionContext: ToolExecutionContext,
-    platform: Platform,
-  ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
-    const key = data.model
-      ? imageGenerationKey({
-          threadId: toolExecutionContext.threadId,
-          callerId: user.isPublic ? user.leadId : user.id,
-          model: data.model,
-          prompt: data.prompt,
-          size: data.size,
-          aspectRatio: data.aspectRatio,
-          inputMediaUrl: data.inputMediaUrl ?? undefined,
-        })
-      : null;
-    return runOncePerKey(
-      key,
-      () =>
-        ImageGenerationRepository.generateImageOnce(
-          data,
-          user,
-          locale,
-          logger,
-          t,
-          toolExecutionContext,
-          platform,
-        ),
-      (shared) => {
-        if (!shared.success) {
-          return shared;
-        }
-        logger.info("[ImageGen] Joined an identical in-flight generation", {
-          model: data.model,
-          threadId: toolExecutionContext.threadId,
-        });
-        // Same file, billed once: the joining call costs nothing.
-        return success({ ...shared.data, creditCost: 0 });
-      },
-    );
-  }
-
-  private static async generateImageOnce(
     data: ImageGenerationPostRequestOutput,
     user: JwtPayloadType,
     locale: CountryLanguage,
