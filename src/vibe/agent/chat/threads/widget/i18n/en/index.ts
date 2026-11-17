@@ -71,6 +71,7 @@ export const translations = {
     },
     navigation: {
       subscription: "Subscription & Credits",
+      partnerDashboard: "Partner Dashboard",
       referral: "Referral Program",
       settings: "My Profile & Settings",
       leadMagnet: "Lead Magnet",

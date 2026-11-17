@@ -40,6 +40,7 @@ import {
   ProductIds,
   productsRepository,
 } from "@/products/repository-client";
+import { CreditOffers } from "@/subscription/create/credit-offers";
 import { useSubscription } from "@/subscription/hooks";
 import { VerifyEmailCreditsPrompt } from "@/user/public/verify-email/credits-prompt";
 
@@ -225,6 +226,120 @@ export function CreditsTabHeader({
         )}
       </Div>
 
+      {/* State first: what this account needs right now sits above the numbers. */}
+      {/* Free credits held back: say why, and what lifts it */}
+      {!isAdmin && data?.freeStatus === FreeCreditsStatus.VERIFY_EMAIL && (
+        <Div className="px-5 pb-5 sm:px-6">
+          <VerifyEmailCreditsPrompt locale={locale} />
+        </Div>
+      )}
+      {!isAdmin && data?.freeStatus === FreeCreditsStatus.SUBNET_LIMIT && (
+        <Div className="px-5 pb-5 sm:px-6">
+          <Div
+            className="rounded-lg border border-warning/30 bg-warning/5 px-4 py-3.5 text-sm"
+            data-testid="free-credits-status"
+          >
+            <Span className="font-semibold">{t(data.freeStatus)}</Span>
+            <P className="m-0 mt-1 text-muted-foreground">
+              {t("get.freeStatus.subnetLimit")}
+            </P>
+          </Div>
+        </Div>
+      )}
+
+      {/* Guests: what they get now and the free step up */}
+      {!isAuthenticated && (
+        <Div className="px-5 pb-5 sm:px-6">
+          <Div className="flex flex-col gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+            <Div className="flex flex-col gap-0.5">
+              <Span className="text-sm font-semibold">
+                {isEmptyBalance
+                  ? t("get.balance.lowBalance.emptyTitle")
+                  : t("get.balance.guestPlan")}
+              </Span>
+              <Span className="text-sm text-muted-foreground">
+                {t("get.balance.free.descriptionGuest", freeTiers)}
+              </Span>
+            </Div>
+            <Link
+              href={`/${locale}/user/signup`}
+              className="inline-flex h-11 shrink-0 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground no-underline transition-colors hover:bg-primary/90 sm:h-10"
+            >
+              {t("get.balance.signUp")}
+            </Link>
+          </Div>
+        </Div>
+      )}
+
+      {/* Low or empty balance: the moment to top up, with the real pack. */}
+      {isAuthenticated && !isAdmin && isLowBalance && (
+        <Div className="px-5 pb-5 sm:px-6">
+          <Div
+            data-testid="credits-low-balance"
+            className="rounded-lg border border-warning/40 bg-warning/10 px-4 py-3.5"
+          >
+            <Div className="flex flex-col gap-0.5">
+              <Span className="text-sm font-semibold">
+                {isEmptyBalance
+                  ? t("get.balance.lowBalance.emptyTitle")
+                  : t("get.balance.lowBalance.title", {
+                      count: totalFormatted,
+                    })}
+              </Span>
+              <Span className="text-sm text-muted-foreground">
+                {activeTab === "buy"
+                  ? t("get.balance.lowBalance.hint", {
+                      packCredits: packProduct.credits,
+                      packPrice: pricing.packPrice,
+                    })
+                  : t("get.balance.lowBalance.offersHint")}
+              </Span>
+            </Div>
+            {/* One tap to card checkout; the buy tab below already has it all. */}
+            {activeTab !== "buy" && (
+              <CreditOffers
+                locale={locale}
+                hasSubscription={currentSubscription?.hasSubscription === true}
+                className="mt-3"
+              />
+            )}
+          </Div>
+        </Div>
+      )}
+
+      {/* No plan yet: what they're on and the one step up */}
+      {isAuthenticated &&
+        !isAdmin &&
+        !isLowBalance &&
+        currentSubscription !== undefined &&
+        !currentSubscription.hasSubscription && (
+          <Div className="px-5 pb-5 sm:px-6">
+            <Div className="flex flex-col gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+              <Div className="flex flex-col gap-0.5">
+                <Span className="text-sm font-semibold">
+                  {t("get.balance.freePlan")}
+                </Span>
+                <Span className="text-sm text-muted-foreground">
+                  {t("get.balance.freePlanHint", {
+                    count: freeTiers.signedIn,
+                    max: freeTiers.max,
+                    subCredits: subProduct.credits,
+                  })}
+                </Span>
+              </Div>
+              {activeTab !== "buy" && (
+                <Button
+                  type="button"
+                  className="h-11 shrink-0 sm:h-10"
+                  onClick={() => handleTabClick("buy")}
+                >
+                  {t("get.balance.subscribe")}
+                </Button>
+              )}
+            </Div>
+          </Div>
+        )}
+
       {/* Metric cards */}
       <Div className="px-5 pb-5 sm:px-6">
         {data ? (
@@ -299,113 +414,6 @@ export function CreditsTabHeader({
           />
         </Div>
       )}
-
-      {/* Free credits held back: say why, and what lifts it */}
-      {!isAdmin && data?.freeStatus === FreeCreditsStatus.VERIFY_EMAIL && (
-        <Div className="px-5 pb-5 sm:px-6">
-          <VerifyEmailCreditsPrompt locale={locale} />
-        </Div>
-      )}
-      {!isAdmin && data?.freeStatus === FreeCreditsStatus.SUBNET_LIMIT && (
-        <Div className="px-5 pb-5 sm:px-6">
-          <Div
-            className="rounded-lg border border-warning/30 bg-warning/5 px-4 py-3.5 text-sm"
-            data-testid="free-credits-status"
-          >
-            <Span className="font-semibold">{t(data.freeStatus)}</Span>
-            <P className="m-0 mt-1 text-muted-foreground">
-              {t("get.freeStatus.subnetLimit")}
-            </P>
-          </Div>
-        </Div>
-      )}
-
-      {/* Guests: what they get now and the free step up */}
-      {!isAuthenticated && (
-        <Div className="px-5 pb-5 sm:px-6">
-          <Div className="flex flex-col gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
-            <Div className="flex flex-col gap-0.5">
-              <Span className="text-sm font-semibold">
-                {t("get.balance.guestPlan")}
-              </Span>
-              <Span className="text-sm text-muted-foreground">
-                {t("get.balance.free.descriptionGuest", freeTiers)}
-              </Span>
-            </Div>
-            <Link
-              href={`/${locale}/user/signup`}
-              className="inline-flex h-11 shrink-0 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground no-underline transition-colors hover:bg-primary/90 sm:h-10"
-            >
-              {t("get.balance.signUp")}
-            </Link>
-          </Div>
-        </Div>
-      )}
-
-      {/* Low or empty balance: the moment to top up, with the real pack. */}
-      {isAuthenticated && !isAdmin && isLowBalance && (
-        <Div className="px-5 pb-5 sm:px-6">
-          <Div className="flex flex-col gap-3 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
-            <Div className="flex flex-col gap-0.5">
-              <Span className="text-sm font-semibold">
-                {isEmptyBalance
-                  ? t("get.balance.lowBalance.emptyTitle")
-                  : t("get.balance.lowBalance.title", {
-                      count: totalFormatted,
-                    })}
-              </Span>
-              <Span className="text-sm text-muted-foreground">
-                {t("get.balance.lowBalance.hint", {
-                  packCredits: packProduct.credits,
-                  packPrice: pricing.packPrice,
-                })}
-              </Span>
-            </Div>
-            {activeTab !== "buy" && (
-              <Button
-                type="button"
-                className="h-11 shrink-0 sm:h-10"
-                onClick={() => handleTabClick("buy")}
-              >
-                {t("get.balance.lowBalance.cta")}
-              </Button>
-            )}
-          </Div>
-        </Div>
-      )}
-
-      {/* No plan yet: what they're on and the one step up */}
-      {isAuthenticated &&
-        !isAdmin &&
-        !isLowBalance &&
-        currentSubscription !== undefined &&
-        !currentSubscription.hasSubscription && (
-          <Div className="px-5 pb-5 sm:px-6">
-            <Div className="flex flex-col gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
-              <Div className="flex flex-col gap-0.5">
-                <Span className="text-sm font-semibold">
-                  {t("get.balance.freePlan")}
-                </Span>
-                <Span className="text-sm text-muted-foreground">
-                  {t("get.balance.freePlanHint", {
-                    count: freeTiers.signedIn,
-                    max: freeTiers.max,
-                    subCredits: subProduct.credits,
-                  })}
-                </Span>
-              </Div>
-              {activeTab !== "buy" && (
-                <Button
-                  type="button"
-                  className="h-11 shrink-0 sm:h-10"
-                  onClick={() => handleTabClick("buy")}
-                >
-                  {t("get.balance.subscribe")}
-                </Button>
-              )}
-            </Div>
-          </Div>
-        )}
 
       {/* Tabs: 2×2 on phones, one row from sm up */}
       <Div className="border-t bg-muted/30 p-2">

@@ -759,6 +759,23 @@ export const translations: typeof enTranslations = {
   },
 
   // Buy / pricing page translations
+  quickCheckout: {
+    pack: {
+      title: "{{credits}} Credits",
+      note: "Einmalig. Verfallen nie.",
+      aria: "{{credits}} Credits für {{price}} kaufen, einmalig",
+    },
+    plan: {
+      title: "{{credits}} Credits jeden Monat",
+      note: "Monatsabo. Jederzeit kündbar.",
+      perMonth: "/Monat",
+      aria: "Abonnieren: {{credits}} Credits jeden Monat für {{price}}",
+    },
+    opening: "Checkout wird geöffnet...",
+    secure: "Kartenzahlung über Stripe.",
+    moreOptions: "Krypto und weitere Optionen",
+    error: "Checkout ließ sich nicht öffnen. Bitte erneut versuchen.",
+  },
   buy: {
     provider: {
       stripe: "Kredit- / Debitkarte",

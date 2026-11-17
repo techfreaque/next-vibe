@@ -745,6 +745,23 @@ export const translations: typeof enTranslations = {
   },
 
   // Buy / pricing page translations
+  quickCheckout: {
+    pack: {
+      title: "{{credits}} crédits",
+      note: "Paiement unique. N'expirent jamais.",
+      aria: "Acheter {{credits}} crédits pour {{price}}, paiement unique",
+    },
+    plan: {
+      title: "{{credits}} crédits chaque mois",
+      note: "Mensuel, sans engagement.",
+      perMonth: "/mois",
+      aria: "S'abonner : {{credits}} crédits chaque mois pour {{price}}",
+    },
+    opening: "Ouverture du paiement...",
+    secure: "Paiement par carte via Stripe.",
+    moreOptions: "Crypto et autres options",
+    error: "Le paiement ne s'est pas ouvert. Réessayez.",
+  },
   buy: {
     provider: {
       stripe: "Carte bancaire",

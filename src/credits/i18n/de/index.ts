@@ -248,7 +248,7 @@ export const translations: typeof enTranslations = {
         title: "Noch {{count}} Credits",
         emptyTitle: "Deine Credits sind aufgebraucht",
         hint: "Lad {{packCredits}} Credits für {{packPrice}} auf. Sie verfallen nie. Kein Abo nötig.",
-        cta: "Credits aufladen",
+        offersHint: "Eins wählen, in Sekunden geht es weiter. Paket-Credits verfallen nie.",
       },
       freePlan: "Du nutzt den Gratis-Plan",
       guestPlan: "Gast-Guthaben",

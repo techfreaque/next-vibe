@@ -733,6 +733,23 @@ export const translations = {
   },
 
   // Buy / pricing page translations
+  quickCheckout: {
+    pack: {
+      title: "{{credits}} credits",
+      note: "One-time. Never expire.",
+      aria: "Buy {{credits}} credits for {{price}}, one-time",
+    },
+    plan: {
+      title: "{{credits}} credits every month",
+      note: "Monthly plan. Cancel anytime.",
+      perMonth: "/mo",
+      aria: "Subscribe: {{credits}} credits every month for {{price}}",
+    },
+    opening: "Opening checkout...",
+    secure: "Card checkout by Stripe.",
+    moreOptions: "Crypto and more options",
+    error: "Checkout didn't open. Try again.",
+  },
   buy: {
     provider: {
       stripe: "Credit / Debit Card",

@@ -27,7 +27,7 @@ export const translations = {
     continue: "Continue",
   },
   creditsPrompt: {
-    title: "Confirm your email to get your free credits",
+    title: "Confirm your email to unlock your free credits",
     description:
       "Click the link we emailed you and your account gets {{credits}} free credits every month.",
     resend: "Resend link",

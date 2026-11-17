@@ -29,7 +29,7 @@ export const translations: typeof enTranslations = {
     continue: "Continuer",
   },
   creditsPrompt: {
-    title: "Confirmez votre e-mail pour recevoir vos crédits gratuits",
+    title: "Confirmez votre e-mail pour débloquer vos crédits gratuits",
     description:
       "Cliquez sur le lien que nous vous avons envoyé et votre compte recevra {{credits}} crédits gratuits chaque mois.",
     resend: "Renvoyer le lien",

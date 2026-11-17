@@ -184,18 +184,18 @@ describe("E2E: chat stream", () => {
     await drainCredits(buyer.user);
 
     // The open page picks the new balance up on its own: the out-of-credits
-    // card replaces the textarea and tells the customer where to top up.
+    // card replaces the textarea and puts the real offers one tap away (a
+    // fresh signup leads with "confirm your email", the offers stay below).
     const card = page.getByTestId("out-of-credits-card").first();
     await card.waitFor({ state: "visible" });
     await composer.waitFor({ state: "detached" });
-    await card
-      .getByText(t("outOfCredits.member.title"), { exact: true })
-      .waitFor({ state: "visible" });
+    await card.getByTestId("credit-offer-pack").waitFor({ state: "visible" });
+    await card.getByTestId("credit-offer-plan").waitFor({ state: "visible" });
     expect(
       await card
-        .getByRole("link", { name: t("outOfCredits.member.getCredits") })
-        .getAttribute("href"),
-    ).toBe(`/${defaultLocale}/subscription/buy`);
+        .locator(`a[href="/${defaultLocale}/subscription/buy"]`)
+        .count(),
+    ).toBe(1);
     // Send-time guard: a send with an empty balance never reaches the AI
     const send = page.getByTitle(t("actions.sendMessage"), { exact: true });
     if (await send.isEnabled()) {

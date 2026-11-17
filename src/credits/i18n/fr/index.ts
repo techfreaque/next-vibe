@@ -177,7 +177,7 @@ export const translations: typeof enTranslations = {
         title: "Plus que {{count}} crédits",
         emptyTitle: "Vous n'avez plus de crédits",
         hint: "Rechargez {{packCredits}} crédits pour {{packPrice}}. Ils n'expirent jamais. Aucun abonnement nécessaire.",
-        cta: "Recharger des crédits",
+        offersHint: "Choisissez une offre, vous repartez en quelques secondes. Les crédits du pack n'expirent jamais.",
       },
       freePlan: "Vous êtes sur la formule gratuite",
       guestPlan: "Solde invité",

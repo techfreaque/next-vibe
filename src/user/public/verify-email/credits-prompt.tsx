@@ -40,9 +40,10 @@ interface VerifyEmailCreditsPromptProps {
   locale: CountryLanguage;
   /**
    * "banner": standalone warning box (credits / subscription pages).
-   * "row": a section inside another card (out-of-credits card).
+   * "lead": the headline of the chat's out-of-credits card (sits in its
+   *   `@container/ooc`), for an unverified account that ran dry.
    */
-  variant?: "banner" | "row";
+  variant?: "banner" | "lead";
   className?: string;
 }
 
@@ -74,14 +75,85 @@ export function VerifyEmailCreditsPrompt({
     );
   };
 
+  const feedback =
+    state.kind === "sent" ? (
+      <Div
+        aria-live="polite"
+        className="mt-1 flex items-start gap-1.5 text-xs text-success"
+      >
+        <CheckCircle className="mt-px h-3.5 w-3.5 flex-shrink-0" />
+        <Span>{t("creditsPrompt.sent", { email: state.email })}</Span>
+      </Div>
+    ) : state.kind === "error" ? (
+      <Div
+        role="alert"
+        className="mt-1 flex items-start gap-1.5 text-xs text-destructive"
+      >
+        <AlertCircle className="mt-px h-3.5 w-3.5 flex-shrink-0" />
+        <Span>{state.message}</Span>
+      </Div>
+    ) : null;
+
+  const resendButton = (buttonClassName: string): JSX.Element => (
+    <Button
+      type="button"
+      size="sm"
+      variant={variant === "lead" ? "default" : "outline"}
+      disabled={sending}
+      onClick={(): void => {
+        void resend();
+      }}
+      className={buttonClassName}
+    >
+      {sending ? (
+        <>
+          <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+          {t("creditsPrompt.sending")}
+        </>
+      ) : (
+        <>
+          <Mail className="mr-1.5 h-4 w-4" />
+          {t("creditsPrompt.resend")}
+        </>
+      )}
+    </Button>
+  );
+
+  if (variant === "lead") {
+    return (
+      <Div
+        data-testid="verify-email-credits-prompt"
+        className={cn(
+          "flex flex-col gap-3 @2xl/ooc:flex-row @2xl/ooc:items-center @2xl/ooc:gap-6",
+          className,
+        )}
+      >
+        <Div className="flex min-w-0 flex-1 items-start gap-3">
+          <Div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-warning/10 text-warning ring-1 ring-inset ring-warning/25">
+            <Mail className="h-4 w-4" />
+          </Div>
+          <Div className="flex min-w-0 flex-col gap-0.5 pt-px">
+            <P className="m-0 text-sm font-semibold leading-tight text-foreground">
+              {t("creditsPrompt.title")}
+            </P>
+            <P className="m-0 text-sm leading-snug text-muted-foreground">
+              {t("creditsPrompt.description", { credits })}
+            </P>
+            {feedback}
+          </Div>
+        </Div>
+        {resendButton(
+          "w-full flex-shrink-0 @md/ooc:ml-11 @md/ooc:w-auto @md/ooc:self-start @2xl/ooc:ml-0 @2xl/ooc:self-center",
+        )}
+      </Div>
+    );
+  }
+
   return (
     <Div
       data-testid="verify-email-credits-prompt"
       className={cn(
-        "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",
-        variant === "banner"
-          ? "rounded-lg border border-warning/30 bg-warning/5 px-4 py-3.5"
-          : "mt-3 border-t border-dashed border-border/70 pt-3",
+        "flex flex-col gap-3 rounded-lg border border-warning/30 bg-warning/5 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between",
         className,
       )}
     >
@@ -94,48 +166,10 @@ export function VerifyEmailCreditsPrompt({
           <P className="m-0 text-sm leading-snug text-muted-foreground">
             {t("creditsPrompt.description", { credits })}
           </P>
-          {state.kind === "sent" && (
-            <Div
-              aria-live="polite"
-              className="mt-1 flex items-start gap-1.5 text-xs text-success"
-            >
-              <CheckCircle className="mt-px h-3.5 w-3.5 flex-shrink-0" />
-              <Span>{t("creditsPrompt.sent", { email: state.email })}</Span>
-            </Div>
-          )}
-          {state.kind === "error" && (
-            <Div
-              role="alert"
-              className="mt-1 flex items-start gap-1.5 text-xs text-destructive"
-            >
-              <AlertCircle className="mt-px h-3.5 w-3.5 flex-shrink-0" />
-              <Span>{state.message}</Span>
-            </Div>
-          )}
+          {feedback}
         </Div>
       </Div>
-      <Button
-        type="button"
-        size="sm"
-        variant="outline"
-        disabled={sending}
-        onClick={(): void => {
-          void resend();
-        }}
-        className="h-10 w-full flex-shrink-0 sm:h-9 sm:w-auto"
-      >
-        {sending ? (
-          <>
-            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
-            {t("creditsPrompt.sending")}
-          </>
-        ) : (
-          <>
-            <Mail className="mr-1.5 h-4 w-4" />
-            {t("creditsPrompt.resend")}
-          </>
-        )}
-      </Button>
+      {resendButton("h-10 w-full flex-shrink-0 sm:h-9 sm:w-auto")}
     </Div>
   );
 }

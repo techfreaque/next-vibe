@@ -548,6 +548,8 @@ export const translations: typeof enTranslations = {
     timeout:
       "AI zajęło zbyt dużo czasu na odpowiedź (przekroczono limit po {{maxDuration}} sekundach). Spróbuj ponownie z krótszą wiadomością.",
     noResponse: "AI nie wygenerowało odpowiedzi. Spróbuj ponownie.",
+    creditBudgetReached:
+      "Kredyty się skończyły. Odpowiedź urwała się tam, gdzie zabrakło salda. Doładuj konto, żeby kontynuować.",
     emptyAnswer:
       "Model zakończył bez odpowiedzi. Płacisz tylko koszt dostawcy, bez opłaty platformy. Spróbuj ponownie albo wybierz inny model.",
     contentFiltered:
@@ -719,16 +721,19 @@ export const translations: typeof enTranslations = {
     dismiss: "Zamknij",
     guest: {
       title: "Darmowe kredyty się skończyły",
-      description: "Załóż darmowe konto i pisz dalej w tym czacie.",
-      signUp: "Załóż konto: {{signedIn}} kredytów/mies. za darmo",
+      description:
+        "Darmowe konto: {{signedIn}} kredytów co miesiąc, {{max}} z newsletterem. Wrócisz prosto do tego czatu.",
+      signUp: "Załóż darmowe konto",
       haveAccount: "Masz już konto?",
       logIn: "Zaloguj się",
     },
     member: {
       title: "Skończyły Ci się kredyty",
       description:
-        "Darmowe kredyty odnowią się {{date}}. Potrzebujesz teraz? Doładuj.",
-      getCredits: "Doładuj kredyty",
+        "Darmowe kredyty odnowią się {{date}}. Pisz dalej już teraz:",
+      subscriberDescription:
+        "Kredyty z planu odnowią się {{date}}. Potrzebujesz więcej wcześniej? Doładuj:",
+      orTopUp: "Albo nie czekaj:",
       newsletter: {
         title: "+{{bonus}} darmowych kredytów co miesiąc",
         consent:

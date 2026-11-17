@@ -566,6 +566,8 @@ export const translations = {
     timeout:
       "The AI took too long to respond (timeout after {{maxDuration}} seconds). Please try again with a shorter message.",
     noResponse: "The AI did not generate a response. Please try again.",
+    creditBudgetReached:
+      "Out of credits. The reply stopped where your balance ran out. Top up to keep going.",
     emptyAnswer:
       "The model ended without writing an answer. You paid only what the provider charged, no platform fee. Try again or pick another model.",
     contentFiltered:
@@ -726,15 +728,18 @@ export const translations = {
     dismiss: "Dismiss",
     guest: {
       title: "Out of free credits",
-      description: "Sign up free and keep this chat going.",
-      signUp: "Sign up free: {{signedIn}} credits/month",
+      description:
+        "Free account: {{signedIn}} credits every month, {{max}} with the newsletter. You land right back in this chat.",
+      signUp: "Sign up free",
       haveAccount: "Have an account?",
       logIn: "Log in",
     },
     member: {
       title: "You're out of credits",
-      description: "Free credits refill on {{date}}. Need more now? Top up.",
-      getCredits: "Get credits",
+      description: "Free credits refill on {{date}}. Keep going now:",
+      subscriberDescription:
+        "Plan credits renew on {{date}}. Need more before then? Top up:",
+      orTopUp: "Or skip the wait:",
       newsletter: {
         title: "+{{bonus}} free credits every month",
         consent:

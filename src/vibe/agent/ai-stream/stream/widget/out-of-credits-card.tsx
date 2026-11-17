@@ -27,6 +27,8 @@ import { useFreeCreditsStatus } from "@/credits/hooks";
 import { NewsletterCreditOffer } from "@/newsletter/credit-bonus/enum";
 import { useNewsletterCreditBonus } from "@/newsletter/credit-bonus/hooks";
 import { getPricingParams } from "@/products/repository-client";
+import { CreditOffers } from "@/subscription/create/credit-offers";
+import { useSubscription } from "@/subscription/hooks";
 import { VerifyEmailCreditsPrompt } from "@/user/public/verify-email/credits-prompt";
 
 import { scopedTranslation } from "../i18n";
@@ -53,10 +55,12 @@ function nextFreeRefill(): Date {
 
 /**
  * Shown instead of a raw error when a turn is refused for lack of credits
- * (402) or the balance is empty.
- * - Guests: account first. Sign up (primary) or log in, back to this thread.
- * - Members: top up + when free credits refill. Accounts that never joined the
- *   newsletter also get a one-click, explicit opt-in for the monthly bonus.
+ * (402) or the balance is empty. Every state ends one tap from more credits:
+ * - Guests: free account first (what it gives, from config), back to this chat.
+ * - Unverified accounts: confirm the email (unlocks the free credits), paid
+ *   offers below for anyone who won't wait.
+ * - Members: real pack / plan prices with one-tap checkout, when the free
+ *   credits refill, and the newsletter bonus for accounts not on the list.
  */
 export function OutOfCreditsCard({
   locale,
@@ -66,11 +70,6 @@ export function OutOfCreditsCard({
   className,
 }: OutOfCreditsCardProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const Icon = isGuest ? Gift : Coins;
-  const refillDate = nextFreeRefill().toLocaleDateString(locale, {
-    month: "long",
-    day: "numeric",
-  });
 
   return (
     <Div
@@ -96,99 +95,142 @@ export function OutOfCreditsCard({
           <X className="h-4 w-4" />
         </Button>
       )}
-      <Div
-        className={cn(
-          "flex flex-col gap-3 @2xl/ooc:flex-row @2xl/ooc:items-center @2xl/ooc:gap-6",
-          onDismiss && "pr-8",
-        )}
-      >
-        <Div className="flex min-w-0 flex-1 items-start gap-3">
-          <Div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary ring-1 ring-inset ring-primary/20">
-            <Icon className="h-4 w-4" />
-          </Div>
-          <Div className="flex min-w-0 flex-col gap-0.5 pt-px">
-            <P className="m-0 text-sm font-semibold leading-tight text-foreground">
-              {isGuest
-                ? t("outOfCredits.guest.title")
-                : t("outOfCredits.member.title")}
-            </P>
-            <P className="m-0 text-sm leading-snug text-muted-foreground">
-              {isGuest
-                ? t("outOfCredits.guest.description")
-                : t("outOfCredits.member.description", { date: refillDate })}
-            </P>
-          </Div>
-        </Div>
+      <Div className={cn(onDismiss && "pr-8")}>
         {isGuest ? (
-          <GuestActions locale={locale} />
+          <GuestBody locale={locale} />
         ) : (
-          <Button
-            asChild
-            size="sm"
-            className="w-full flex-shrink-0 @md/ooc:ml-11 @md/ooc:w-auto @md/ooc:self-start @2xl/ooc:ml-0 @2xl/ooc:self-center"
-          >
-            <Link href={`/${locale}/subscription/buy`}>
-              <Coins className="mr-1.5 h-4 w-4" />
-              {t("outOfCredits.member.getCredits")}
-            </Link>
-          </Button>
+          <MemberBody locale={locale} />
         )}
       </Div>
-      {!isGuest && <MemberFreeCreditsRow locale={locale} />}
+    </Div>
+  );
+}
+
+/** Icon tile + title + one line: the shared head of every state. */
+function CardHead({
+  icon,
+  title,
+  description,
+}: {
+  icon: JSX.Element;
+  title: string;
+  description: string;
+}): JSX.Element {
+  return (
+    <Div className="flex min-w-0 flex-1 items-start gap-3">
+      <Div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary ring-1 ring-inset ring-primary/20">
+        {icon}
+      </Div>
+      <Div className="flex min-w-0 flex-col gap-0.5 pt-px">
+        <P className="m-0 text-sm font-semibold leading-tight text-foreground">
+          {title}
+        </P>
+        <P className="m-0 text-sm leading-snug text-muted-foreground">
+          {description}
+        </P>
+      </Div>
+    </Div>
+  );
+}
+
+/** Account first: what a free account gives, sign up, back to this chat. */
+function GuestBody({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const pathname = usePathname();
+  const pricing = getPricingParams(locale);
+  // Signup and login both return to this exact chat.
+  const callback = `callbackUrl=${encodeURIComponent(pathname)}`;
+
+  return (
+    <Div className="flex flex-col gap-3 @2xl/ooc:flex-row @2xl/ooc:items-center @2xl/ooc:gap-6">
+      <CardHead
+        icon={<Gift className="h-4 w-4" />}
+        title={t("outOfCredits.guest.title")}
+        description={t("outOfCredits.guest.description", {
+          signedIn: pricing.freeCreditsSignedIn,
+          max: pricing.freeCreditsMax,
+        })}
+      />
+      <Div className="flex flex-shrink-0 flex-col gap-2 @md/ooc:ml-11 @md/ooc:flex-row @md/ooc:flex-wrap @md/ooc:items-center @md/ooc:gap-x-4 @md/ooc:gap-y-2 @2xl/ooc:ml-0">
+        <Button asChild size="sm" className="w-full @md/ooc:w-auto">
+          <Link
+            href={`/${locale}/user/signup?${callback}`}
+            data-testid="out-of-credits-signup"
+          >
+            <Gift className="mr-1.5 h-4 w-4" />
+            {t("outOfCredits.guest.signUp")}
+          </Link>
+        </Button>
+        <P className="m-0 whitespace-nowrap text-center text-xs text-muted-foreground @md/ooc:text-left">
+          {t("outOfCredits.guest.haveAccount")}{" "}
+          <Link
+            href={`/${locale}/user/login?${callback}`}
+            className="font-medium text-primary underline-offset-2 hover:underline"
+          >
+            {t("outOfCredits.guest.logIn")}
+          </Link>
+        </P>
+      </Div>
     </Div>
   );
 }
 
 /**
- * Unverified account: confirm the email first (it unlocks the account's free
- * credits and confirms a signup newsletter opt-in too). Otherwise the
- * newsletter bonus row.
+ * Signed in. Unverified accounts lead with "confirm your email" (that is what
+ * unlocks their free credits); everyone gets the real offers one tap away.
  */
-function MemberFreeCreditsRow({
-  locale,
-}: {
-  locale: CountryLanguage;
-}): JSX.Element | null {
+function MemberBody({ locale }: { locale: CountryLanguage }): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const freeStatus = useFreeCreditsStatus(user, logger, !user.isPublic);
+  const subscription = useSubscription(logger, user).read?.data;
+  const hasSubscription = subscription?.hasSubscription === true;
+
   if (freeStatus === FreeCreditsStatus.VERIFY_EMAIL) {
     return (
-      <VerifyEmailCreditsPrompt
-        locale={locale}
-        variant="row"
-        className="@md/ooc:pl-11"
-      />
+      <Div className="flex flex-col">
+        <VerifyEmailCreditsPrompt locale={locale} variant="lead" />
+        <Div className="mt-3 flex flex-col gap-2 border-t border-dashed border-border/70 pt-3 @md/ooc:pl-11">
+          <P className="m-0 text-xs font-medium text-muted-foreground">
+            {t("outOfCredits.member.orTopUp")}
+          </P>
+          <CreditOffers locale={locale} hasSubscription={hasSubscription} />
+        </Div>
+      </Div>
     );
   }
-  return <NewsletterBonus locale={locale} />;
-}
 
-/** Account first: sign up (primary) and log in back to this thread. */
-function GuestActions({ locale }: { locale: CountryLanguage }): JSX.Element {
-  const { t } = scopedTranslation.scopedT(locale);
-  const pathname = usePathname();
-  const signedInParams = {
-    signedIn: getPricingParams(locale).freeCreditsSignedIn,
+  const dateFormat: Intl.DateTimeFormatOptions = {
+    month: "long",
+    day: "numeric",
   };
+  const renewsAt =
+    hasSubscription && subscription?.currentPeriodEnd
+      ? new Date(subscription.currentPeriodEnd)
+      : null;
 
   return (
-    <Div className="flex flex-shrink-0 flex-col gap-2 @md/ooc:ml-11 @md/ooc:flex-row @md/ooc:flex-wrap @md/ooc:items-center @md/ooc:gap-x-4 @md/ooc:gap-y-2 @2xl/ooc:ml-0">
-      <Button asChild size="sm" className="w-full @md/ooc:w-auto">
-        <Link href={`/${locale}/user/signup`}>
-          <Gift className="mr-1.5 h-4 w-4" />
-          {t("outOfCredits.guest.signUp", signedInParams)}
-        </Link>
-      </Button>
-      <P className="m-0 whitespace-nowrap text-center text-xs text-muted-foreground @md/ooc:text-left">
-        {t("outOfCredits.guest.haveAccount")}{" "}
-        <Link
-          href={`/${locale}/user/login?callbackUrl=${encodeURIComponent(pathname)}`}
-          className="font-medium text-primary underline-offset-2 hover:underline"
-        >
-          {t("outOfCredits.guest.logIn")}
-        </Link>
-      </P>
+    <Div className="flex flex-col">
+      <CardHead
+        icon={<Coins className="h-4 w-4" />}
+        title={t("outOfCredits.member.title")}
+        description={
+          renewsAt
+            ? t("outOfCredits.member.subscriberDescription", {
+                date: renewsAt.toLocaleDateString(locale, dateFormat),
+              })
+            : t("outOfCredits.member.description", {
+                date: nextFreeRefill().toLocaleDateString(locale, dateFormat),
+              })
+        }
+      />
+      <CreditOffers
+        locale={locale}
+        hasSubscription={hasSubscription}
+        className="mt-3 @md/ooc:pl-11"
+      />
+      <NewsletterBonus locale={locale} />
     </Div>
   );
 }

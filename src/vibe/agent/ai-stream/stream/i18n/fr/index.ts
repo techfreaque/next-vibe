@@ -575,6 +575,8 @@ export const translations: typeof enTranslations = {
     timeout:
       "L'IA a mis trop de temps à répondre (délai dépassé après {{maxDuration}} secondes). Réessayez avec un message plus court.",
     noResponse: "L'IA n'a généré aucune réponse. Veuillez réessayer.",
+    creditBudgetReached:
+      "Crédits épuisés. La réponse s'arrête là où votre solde s'est vidé. Rechargez pour continuer.",
     emptyAnswer:
       "Le modèle s'est arrêté sans écrire de réponse. Vous n'avez payé que ce que le fournisseur a facturé, sans frais de plateforme. Réessayez ou choisissez un autre modèle.",
     contentFiltered:
@@ -737,16 +739,18 @@ export const translations: typeof enTranslations = {
     guest: {
       title: "Plus de crédits gratuits",
       description:
-        "Inscrivez-vous gratuitement et poursuivez cette discussion.",
-      signUp: "Inscription gratuite : {{signedIn}} crédits/mois",
+        "Compte gratuit : {{signedIn}} crédits chaque mois, {{max}} avec la newsletter. Vous revenez directement dans cette discussion.",
+      signUp: "Inscription gratuite",
       haveAccount: "Vous avez un compte ?",
       logIn: "Se connecter",
     },
     member: {
       title: "Vous n'avez plus de crédits",
       description:
-        "Vos crédits gratuits se rechargent le {{date}}. Besoin de plus tout de suite ? Rechargez.",
-      getCredits: "Obtenir des crédits",
+        "Vos crédits gratuits se rechargent le {{date}}. Continuez dès maintenant :",
+      subscriberDescription:
+        "Les crédits de votre abonnement se renouvellent le {{date}}. Besoin de plus avant ? Rechargez :",
+      orTopUp: "Ou sans attendre :",
       newsletter: {
         title: "+{{bonus}} crédits gratuits chaque mois",
         consent:

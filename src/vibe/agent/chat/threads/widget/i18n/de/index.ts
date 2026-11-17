@@ -73,6 +73,7 @@ export const translations: typeof enTranslations = {
     },
     navigation: {
       subscription: "Abonnement & Credits",
+      partnerDashboard: "Partner-Dashboard",
       referral: "Empfehlungsprogramm",
       settings: "Mein Profil & Einstellungen",
       leadMagnet: "Lead Magnet",

@@ -736,6 +736,23 @@ export const translations: typeof enTranslations = {
   },
 
   // Buy / pricing page translations
+  quickCheckout: {
+    pack: {
+      title: "{{credits}} kredytów",
+      note: "Jednorazowo. Nigdy nie wygasają.",
+      aria: "Kup {{credits}} kredytów za {{price}}, jednorazowo",
+    },
+    plan: {
+      title: "{{credits}} kredytów co miesiąc",
+      note: "Plan miesięczny. Anulujesz kiedy chcesz.",
+      perMonth: "/mies.",
+      aria: "Subskrybuj: {{credits}} kredytów co miesiąc za {{price}}",
+    },
+    opening: "Otwieram płatność...",
+    secure: "Płatność kartą przez Stripe.",
+    moreOptions: "Krypto i inne opcje",
+    error: "Nie udało się otworzyć płatności. Spróbuj ponownie.",
+  },
   buy: {
     provider: {
       stripe: "Karta kredytowa / debetowa",

@@ -556,6 +556,8 @@ export const translations: typeof enTranslations = {
       "Die KI brauchte zu lange für eine Antwort (Zeitüberschreitung nach {{maxDuration}} Sekunden). Bitte versuchen Sie es mit einer kürzeren Nachricht erneut.",
     noResponse:
       "Die KI hat keine Antwort generiert. Bitte versuchen Sie es erneut.",
+    creditBudgetReached:
+      "Guthaben aufgebraucht. Die Antwort endet dort, wo Ihre Credits ausgingen. Laden Sie auf, um weiterzumachen.",
     emptyAnswer:
       "Das Modell hat ohne Antwort beendet. Berechnet wurden nur die Kosten des Anbieters, keine Plattformgebühr. Versuchen Sie es erneut oder wählen Sie ein anderes Modell.",
     contentFiltered:
@@ -727,16 +729,19 @@ export const translations: typeof enTranslations = {
     dismiss: "Schließen",
     guest: {
       title: "Gratis-Credits aufgebraucht",
-      description: "Kostenlos registrieren und genau hier weiterchatten.",
-      signUp: "Gratis registrieren: {{signedIn}} Credits/Monat",
+      description:
+        "Gratis-Konto: {{signedIn}} Credits jeden Monat, {{max}} mit Newsletter. Danach geht es genau hier weiter.",
+      signUp: "Gratis registrieren",
       haveAccount: "Schon ein Konto?",
       logIn: "Anmelden",
     },
     member: {
       title: "Keine Credits mehr",
       description:
-        "Gratis-Credits kommen am {{date}} wieder. Jetzt schon mehr? Aufladen.",
-      getCredits: "Credits aufladen",
+        "Gratis-Credits kommen am {{date}} wieder. Sofort weitermachen:",
+      subscriberDescription:
+        "Abo-Credits kommen am {{date}} wieder. Vorher mehr nötig? Aufladen:",
+      orTopUp: "Oder ohne Warten weiter:",
       newsletter: {
         title: "+{{bonus}} Gratis-Credits jeden Monat",
         consent:

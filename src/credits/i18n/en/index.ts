@@ -163,7 +163,7 @@ export const translations = {
         title: "{{count}} credits left",
         emptyTitle: "You're out of credits",
         hint: "Top up with {{packCredits}} credits for {{packPrice}}. They never expire. No subscription needed.",
-        cta: "Top up credits",
+        offersHint: "Pick one and you're back in seconds. Pack credits never expire.",
       },
       freePlan: "You're on the free plan",
       guestPlan: "Guest balance",

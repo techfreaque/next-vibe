@@ -14,6 +14,7 @@ import { Div } from "next-vibe/ui/components/div";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Globe } from "next-vibe/ui/components/icons/Globe";
+import { Handshake } from "next-vibe/ui/components/icons/Handshake";
 import { HelpCircle } from "next-vibe/ui/components/icons/HelpCircle";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Settings } from "next-vibe/ui/components/icons/Settings";
@@ -211,6 +212,19 @@ export function SidebarFooter({
                 >
                   <ShoppingCart className="h-3.5 w-3.5 mr-2" />
                   {t("components.navigation.subscription")}
+                </Button>
+              </Link>
+
+              {/* Partner dashboard: referral links, earnings, payouts */}
+              <Link href={`/${locale}/user/referral`}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-full justify-start"
+                  aria-label={t("components.navigation.partnerDashboard")}
+                >
+                  <Handshake className="h-3.5 w-3.5 mr-2" />
+                  {t("components.navigation.partnerDashboard")}
                 </Button>
               </Link>
 
