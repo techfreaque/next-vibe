@@ -28,6 +28,13 @@ import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
 import { instanceIdentities, remoteConnections, SyncScopeSchema } from "../db";
 import { RemoteConnectionRepository } from "../repository";
+import {
+  checkRemoteCustomerAccess,
+  CUSTOMER_TRANSPORT,
+  isRemoteAdmin,
+  recordRemoteAudit,
+  validateCustomerInstanceUrl,
+} from "../customer-access/access";
 import { RemoteTransport } from "../transport";
 import type { RemoteRegisterPostRequestInput } from "./definition";
 import type { RemoteRegisterT } from "./i18n";
@@ -75,7 +82,9 @@ export class RemoteConnectionRegisterRepository {
     if (networkError) {
       logger.debug(
         "[REGISTER] Accessibility ping failed (expected for NAT/private networks)",
-        { localUrl },
+        {
+          localUrl,
+        },
       );
       return false;
     }
@@ -108,7 +117,52 @@ export class RemoteConnectionRegisterRepository {
     // The initiator's own transport toward us → our reverse entry's
     // remoteTransportMode (how the peer reaches us). Undefined for older
     // initiators → the column default (direct-http) applies.
-    const remoteTransportMode = data.remoteTransportMode;
+    const remoteTransportMode =
+      // Customers: how they reach us is plain HTTPS, whatever they claim.
+      !isRemoteAdmin(user) ? undefined : data.remoteTransportMode;
+
+    // ── Customer gate (non-admins) ───────────────────────────────────────────
+    // Paid account, connection cap, register rate limit. A customer's reverse
+    // entry gets PINNED transports: we reach their instance only over the
+    // connector socket it opens to us, never by dialing the URL it supplied.
+    const isCustomer = !isRemoteAdmin(user);
+    if (isCustomer) {
+      const urlError = validateCustomerInstanceUrl(localUrl, locale);
+      if (urlError) {
+        return fail({
+          message: urlError,
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+      const access = await checkRemoteCustomerAccess({
+        user,
+        purpose: "register",
+        instanceId,
+        locale,
+        logger,
+      });
+      if (!access.allowed) {
+        return fail({
+          message: access.message,
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+    }
+    const wasRegistered = isCustomer
+      ? (
+          await db
+            .select({ id: remoteConnections.id })
+            .from(remoteConnections)
+            .where(
+              and(
+                eq(remoteConnections.userId, user.id),
+                eq(remoteConnections.instanceId, instanceId),
+              ),
+            )
+            .limit(1)
+        ).length > 0
+      : false;
+    const pinnedTransport = isCustomer ? CUSTOMER_TRANSPORT : null;
 
     const selfInstanceId = await RemoteConnectionRepository.getLocalInstanceId(
       user.id,
@@ -159,6 +213,7 @@ export class RemoteConnectionRegisterRepository {
         // How the initiator reaches us (its own transport leg). Omitted → column
         // default (direct-http).
         ...(remoteTransportMode ? { remoteTransportMode } : {}),
+        ...(pinnedTransport ?? {}),
         updatedAt: new Date(),
       })
       .onConflictDoUpdate({
@@ -177,6 +232,7 @@ export class RemoteConnectionRegisterRepository {
           ...(scopeProvided ? { syncScope } : {}),
           // Re-register refreshes how the initiator reaches us.
           ...(remoteTransportMode ? { remoteTransportMode } : {}),
+          ...(pinnedTransport ?? {}),
           updatedAt: new Date(),
         },
       });
@@ -196,15 +252,26 @@ export class RemoteConnectionRegisterRepository {
     // initiator, which records it as its remoteTransportMode. Unreachable (NAT /
     // loopback) means the only way to reach the initiator is its reverse-ws
     // connector. Bounded by the 5s probe timeout so register stays prompt.
-    const reachable =
-      await RemoteConnectionRegisterRepository.checkDirectAccessibility(
-        localUrl,
+    // Customers: no probe at all — the URL is theirs, the network is ours.
+    const detectedTransportMode: "reverse-ws" | "direct-http" = pinnedTransport
+      ? pinnedTransport.transportMode
+      : (await RemoteConnectionRegisterRepository.checkDirectAccessibility(
+            localUrl,
+            logger,
+            locale,
+            reverseToken,
+            reverseLeadId,
+          ))
+        ? "direct-http"
+        : "reverse-ws";
+    if (isCustomer) {
+      recordRemoteAudit({
+        userId: user.id,
+        instanceId,
+        action: wasRegistered ? "reregistered" : "registered",
         logger,
-        locale,
-        reverseToken,
-        reverseLeadId,
-      );
-    const detectedTransportMode = reachable ? "direct-http" : "reverse-ws";
+      });
+    }
     try {
       await db
         .update(remoteConnections)

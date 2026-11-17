@@ -21,6 +21,8 @@ import {
 import { db } from "../../../database";
 import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
+import { cronTaskOwnerScope } from "../../cron-scope";
+import { isRemoteAdmin } from "../../customer-access/access";
 import { remoteConnections } from "../../db";
 import type { ReverseUpdatePatchRequestOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -72,13 +74,22 @@ export class ReverseConnectionUpdateRepository {
       updatedAt: new Date(),
     };
 
+    // Customers' transports are pinned (customer-access): a peer may mirror
+    // its scope and name, never steer how we reach it.
+    const isAdmin = isRemoteAdmin(user);
+    if (!isAdmin && (remoteTransportMode ?? transportMode) !== undefined) {
+      logger.debug("[ReverseUpdate] Ignoring transport change (pinned)", {
+        userId: user.id,
+        instanceId,
+      });
+    }
     if (syncScope !== undefined) {
       patch.syncScope = syncScope;
     }
-    if (remoteTransportMode !== undefined) {
+    if (isAdmin && remoteTransportMode !== undefined) {
       patch.remoteTransportMode = remoteTransportMode;
     }
-    if (transportMode !== undefined) {
+    if (isAdmin && transportMode !== undefined) {
       patch.transportMode = transportMode;
     }
     // The caller renamed itself: our row's instanceId is OUR label for the
@@ -103,14 +114,23 @@ export class ReverseConnectionUpdateRepository {
       await db
         .update(cronTasks)
         .set({ targetInstance: patch.instanceId })
-        .where(eq(cronTasks.targetInstance, localInstanceId));
+        .where(
+          and(
+            eq(cronTasks.targetInstance, localInstanceId),
+            cronTaskOwnerScope(user, cronTasks.userId),
+          ),
+        );
       // Rekey the live connector (registry + reconnect state are keyed by
       // instanceId). restartConnection reloads the row under the new id.
-      const { getWsConnection, closeConnection, restartConnection } =
-        await import("../../../realtime/server/connector");
-      if (getWsConnection(localInstanceId)) {
-        closeConnection(localInstanceId);
-        await restartConnection(patch.instanceId);
+      // Customers never own a connector here (pinned transports), and the
+      // registry is keyed by instanceId alone — never touch it for them.
+      if (isAdmin) {
+        const { getWsConnection, closeConnection, restartConnection } =
+          await import("../../../realtime/server/connector");
+        if (getWsConnection(localInstanceId)) {
+          closeConnection(localInstanceId);
+          await restartConnection(patch.instanceId);
+        }
       }
     }
 
@@ -137,9 +157,10 @@ export class ReverseConnectionUpdateRepository {
     // closes, or restarts to match the new mode pair.
     const effectiveInstanceId = patch.instanceId ?? localInstanceId;
     if (
-      reconnectNow === true ||
-      remoteTransportMode !== undefined ||
-      transportMode !== undefined
+      isAdmin &&
+      (reconnectNow === true ||
+        remoteTransportMode !== undefined ||
+        transportMode !== undefined)
     ) {
       const { restartConnection } =
         await import("../../../realtime/server/connector");

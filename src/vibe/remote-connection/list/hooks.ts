@@ -15,15 +15,20 @@ import definitions from "./definition";
 /**
  * Hook for listing the current user's remote connections (GET).
  * Used to detect the system inference provider and drive connection UI.
+ * Signed-in accounts only: customers read their own rows + whether they may
+ * connect (access.canConnect), which decides the Cloud Sync tab.
  */
 export function useRemoteConnections(
   logger: EndpointLogger,
   user: JwtPayloadType,
 ): EndpointReturn<typeof definitions> {
-  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
+  const canRead =
+    !user.isPublic &&
+    (user.roles.includes(UserRole.ADMIN) ||
+      user.roles.includes(UserRole.CUSTOMER));
   return useEndpoint(
     definitions,
-    { read: { queryOptions: { enabled: isAdmin } } },
+    { read: { queryOptions: { enabled: canRead, staleTime: 60_000 } } },
     logger,
     user,
   );

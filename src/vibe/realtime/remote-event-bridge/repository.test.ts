@@ -2,7 +2,7 @@
 /**
  * Remote Event Bridge Repository — unit tests
  *
- * REB-REPO-RECEIVE-* : receive() HTTP entry — eventName routing + success
+ * REB-REPO-RECEIVE-* : receive() HTTP entry — customer gate, eventName routing
  * REB-REPO-HANDLE-*  : handleRemoteEvent() — guards, echo-drop, dispatch
  *
  * dispatchRemoteEvent and RemoteConnectionRepository.getLocalInstanceId are
@@ -35,6 +35,20 @@ vi.mock("../../remote-connection/repository", () => ({
     getLocalInstanceId: (...args: unknown[]): Promise<string> =>
       getLocalInstanceId(...(args as [])),
   },
+}));
+
+// Customer gate (paid + active connection + rate): stubbed so receive() is
+// tested for routing; the gate itself has its own DB-backed suite.
+const checkRemoteCustomerAccess = vi.fn(
+  async (): Promise<
+    { allowed: true } | { allowed: false; reason: string; message: string }
+  > => ({
+    allowed: true,
+  }),
+);
+vi.mock("../../remote-connection/customer-access/access", () => ({
+  checkRemoteCustomerAccess: (...args: unknown[]): Promise<unknown> =>
+    checkRemoteCustomerAccess(...(args as [])),
 }));
 
 // Import AFTER the mocks so the repository binds to the stubbed modules.
@@ -78,6 +92,30 @@ describe("RemoteEventBridgeRepository", () => {
   beforeEach(() => {
     dispatchRemoteEvent.mockClear();
     getLocalInstanceId.mockClear();
+    checkRemoteCustomerAccess.mockClear();
+  });
+
+  it("REB-REPO-RECEIVE-GATED: a denied account gets 403 and nothing dispatches", async () => {
+    checkRemoteCustomerAccess.mockResolvedValueOnce({
+      allowed: false,
+      reason: "noConnection",
+      message: "denied",
+    });
+    const result = await RemoteEventBridgeRepository.receive(
+      {
+        eventName: "remote-event",
+        payload: {
+          originInstanceId: "hermes",
+          syncDomain: "cache",
+          envelope: makeEnvelope(),
+        },
+      },
+      user,
+      makeLogger(),
+      defaultLocale,
+    );
+    expect(result.success).toBe(false);
+    expect(dispatchRemoteEvent).not.toHaveBeenCalled();
   });
 
   // ── receive() ───────────────────────────────────────────────────────────
@@ -94,6 +132,7 @@ describe("RemoteEventBridgeRepository", () => {
       },
       user,
       makeLogger(),
+      defaultLocale,
     );
     expect(result.success).toBe(true);
     expect(dispatchRemoteEvent).toHaveBeenCalledTimes(1);
@@ -107,6 +146,7 @@ describe("RemoteEventBridgeRepository", () => {
       },
       user,
       makeLogger(),
+      defaultLocale,
     );
     expect(result.success).toBe(true);
     expect(dispatchRemoteEvent).not.toHaveBeenCalled();

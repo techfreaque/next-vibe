@@ -1,14 +1,16 @@
 /**
  * Remote Connection Database Schema
  *
- * Two tables:
- * - `instance_identities` - per-user self-identity records (who am I?)
- * - `remote_connections`  - actual outbound connections with tokens (who do I talk to?)
+ * Three tables:
+ * - `instance_identities`     - per-user self-identity records (who am I?)
+ * - `remote_connections`      - actual outbound connections with tokens (who do I talk to?)
+ * - `remote_connection_audit` - append-only lifecycle/denial trail (serving side)
  */
 
 import { relations, sql } from "drizzle-orm";
 import {
   boolean,
+  index,
   jsonb,
   pgTable,
   text,
@@ -388,6 +390,47 @@ export const remoteConnectionsRelations = relations(
       references: [users.id],
     }),
   }),
+);
+
+/**
+ * Audit trail for connection lifecycle and denials on the serving side
+ * (register, disconnect, eligibility/limit/rate denials). Append-only.
+ * `instanceId` is our label for the peer at the time of the event; the row
+ * outlives the connection on purpose (no FK to remote_connections).
+ */
+export const RemoteConnectionAuditActionDB = [
+  "registered",
+  "reregistered",
+  "disconnected",
+  "denied",
+  "rate_limited",
+] as const;
+export const RemoteConnectionAuditActionSchema = z.enum(
+  RemoteConnectionAuditActionDB,
+);
+export type RemoteConnectionAuditAction = z.infer<
+  typeof RemoteConnectionAuditActionSchema
+>;
+
+export const remoteConnectionAudit = pgTable(
+  "remote_connection_audit",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    instanceId: text("instance_id"),
+    action: text("action", { enum: RemoteConnectionAuditActionDB }).notNull(),
+    /** Short machine-readable reason (e.g. "notPaid", "bridge"). */
+    reason: text("reason"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("remote_connection_audit_user_created_idx").on(
+      t.userId,
+      t.createdAt,
+    ),
+  ],
 );
 
 export const selectRemoteConnectionSchema =

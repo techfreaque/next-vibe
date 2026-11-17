@@ -1001,6 +1001,16 @@ export class FolderContentsRepository {
 
     // Find the direct parent of the deleted folder for channel targeting.
     const mirrorMeta = allRemoteFolders.find((f) => f.id === mirrorId);
+    // Ownership guard: the peer controls the folder id. Only the caller's own
+    // REMOTE mirror folder may be deleted — any other id (another user's
+    // folder, a PUBLIC/PRIVATE folder) is dropped before touching threads.
+    if (!mirrorMeta) {
+      logger.warn(
+        "[applyRemoteFolderDeleted] folder is not a REMOTE mirror of this user — dropped",
+        { userId, folderId: mirrorId },
+      );
+      return;
+    }
 
     // Threads use folderId FK with onDelete:"set null" — must delete explicitly.
     // Collect threads before deletion so we can emit per-folder removal events.
@@ -1014,13 +1024,23 @@ export class FolderContentsRepository {
               userId: chatThreads.userId,
             })
             .from(chatThreads)
-            .where(inArray(chatThreads.folderId, descendantIds))
+            .where(
+              and(
+                inArray(chatThreads.folderId, descendantIds),
+                eq(chatThreads.userId, userId),
+              ),
+            )
         : [];
 
     if (affectedThreads.length > 0) {
       await db
         .delete(chatThreads)
-        .where(inArray(chatThreads.folderId, descendantIds));
+        .where(
+          and(
+            inArray(chatThreads.folderId, descendantIds),
+            eq(chatThreads.userId, userId),
+          ),
+        );
     }
 
     // Delete the top folder — FK cascade removes all descendant folders.
@@ -1132,16 +1152,26 @@ export class FolderContentsRepository {
       "thread-title-updated"
     >,
   ): Promise<void> {
-    const { responseData, urlPathParams, user, logger } = props;
+    const { responseData, user, logger } = props;
     const item = responseData.items?.[0];
     if (!item?.id || !item.title) {
       return;
     }
+    const userId = user.isPublic ? null : user.id;
+    if (!userId) {
+      return;
+    }
+    // Ownership guard: the peer controls the thread id — only the caller's own
+    // thread is retitled; the re-emit channel comes from the DB row, never the
+    // wire rootFolderId.
     const updatedRows = await db
       .update(chatThreads)
       .set({ title: item.title, updatedAt: new Date() })
-      .where(eq(chatThreads.id, item.id))
-      .returning({ folderId: chatThreads.folderId })
+      .where(and(eq(chatThreads.id, item.id), eq(chatThreads.userId, userId)))
+      .returning({
+        folderId: chatThreads.folderId,
+        rootFolderId: chatThreads.rootFolderId,
+      })
       .catch((err: Error) => {
         logger.warn(
           "[folder-contents/repository] thread-title-updated: DB update failed",
@@ -1149,19 +1179,24 @@ export class FolderContentsRepository {
         );
         return [];
       });
-    if (!updatedRows[0]) {
+    const updatedRow = updatedRows[0];
+    if (!updatedRow) {
+      logger.warn(
+        "[folder-contents/repository] thread-title-updated: thread not owned by user — dropped",
+        { userId, threadId: item.id },
+      );
       return;
     }
     const { createEndpointEmitter } =
       await import("next-vibe/realtime/core/emitter");
     createEndpointEmitter(definitions.GET, logger, user, {
-      urlPathParams: { rootFolderId: urlPathParams.rootFolderId },
+      urlPathParams: { rootFolderId: updatedRow.rootFolderId },
       requestData: {
-        subFolderId: updatedRows[0]?.folderId ?? undefined,
+        subFolderId: updatedRow.folderId ?? undefined,
         threadIds: undefined,
       },
       kindOverride: FolderContentsRepository.emitChannelForFolder(
-        urlPathParams.rootFolderId,
+        updatedRow.rootFolderId,
       ).kind,
       fanOut: false,
     })("thread-title-updated", {

@@ -88,7 +88,9 @@ export type CompletePendingCallOutcome =
       toolMessageId: string | null;
     }
   | { kind: "duplicate" }
-  | { kind: "unknown" };
+  | { kind: "unknown" }
+  /** Registered for ANOTHER user than the one reporting it — left untouched. */
+  | { kind: "foreign" };
 
 export interface TaskCompletionSignal {
   status: string;

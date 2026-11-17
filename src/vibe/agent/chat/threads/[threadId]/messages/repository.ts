@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, desc, eq, ne, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, ne, sql } from "drizzle-orm";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -1311,6 +1311,116 @@ export class MessagesRepository {
 }
 
 /**
+ * Ownership guard shared by EVERY relayed message applier. The peer fully
+ * controls the envelope ids (threadId, message ids, parent ids), so before any
+ * write we prove that everything it names belongs to the authenticated user:
+ *  - each named thread either does not exist yet (the applier's stub insert
+ *    then creates it for `user.id`) or is owned by `user.id`;
+ *  - each named message id either does not exist yet or already lives in one
+ *    of those threads (or, when no thread id is known, in a thread owned by
+ *    `user.id`) — an upsert on a foreign message id would overwrite it.
+ * Returns the owning userId when the write may proceed, null (after a warn)
+ * when it must be dropped. Own non-mirror threads are allowed: loop-on-remote
+ * relays stream events back into the caller's own (origin) thread.
+ */
+async function guardRemoteMessageWrite(params: {
+  user: JwtPayloadType;
+  logger: EndpointLogger;
+  event: string;
+  threadIds: ReadonlyArray<WidgetData>;
+  messageIds: ReadonlyArray<string | null | undefined>;
+}): Promise<string | null> {
+  const { user, logger, event } = params;
+  const userId = user.isPublic ? null : user.id;
+  if (!userId) {
+    logger.warn("[MessagesRemote] relayed event without user — dropped", {
+      event,
+    });
+    return null;
+  }
+  const threadIds = [
+    ...new Set(
+      params.threadIds.filter(
+        (t): t is string => typeof t === "string" && t.length > 0,
+      ),
+    ),
+  ];
+  const messageIds = [
+    ...new Set(
+      params.messageIds.filter(
+        (m): m is string => typeof m === "string" && m.length > 0,
+      ),
+    ),
+  ];
+  try {
+    if (threadIds.length > 0) {
+      const threadRows = await db
+        .select({ id: chatThreads.id, userId: chatThreads.userId })
+        .from(chatThreads)
+        .where(inArray(chatThreads.id, threadIds));
+      const foreignThread = threadRows.find((r) => r.userId !== userId);
+      if (foreignThread) {
+        logger.warn(
+          "[MessagesRemote] relayed event targets a thread not owned by the user — dropped",
+          { event, userId, threadId: foreignThread.id },
+        );
+        return null;
+      }
+    }
+    if (messageIds.length === 0) {
+      return userId;
+    }
+    const messageRows = await db
+      .select({ id: chatMessages.id, threadId: chatMessages.threadId })
+      .from(chatMessages)
+      .where(inArray(chatMessages.id, messageIds));
+    if (messageRows.length === 0) {
+      return userId;
+    }
+    if (threadIds.length > 0) {
+      const foreignMessage = messageRows.find(
+        (r) => !threadIds.includes(r.threadId),
+      );
+      if (foreignMessage) {
+        logger.warn(
+          "[MessagesRemote] relayed event names a message from another thread — dropped",
+          { event, userId, messageId: foreignMessage.id },
+        );
+        return null;
+      }
+      return userId;
+    }
+    // No thread id on the wire: every existing message must sit in a thread
+    // owned by the user.
+    const ownerRows = await db
+      .select({ id: chatThreads.id, userId: chatThreads.userId })
+      .from(chatThreads)
+      .where(
+        inArray(
+          chatThreads.id,
+          messageRows.map((r) => r.threadId),
+        ),
+      );
+    const foreignOwner = ownerRows.find((r) => r.userId !== userId);
+    if (foreignOwner) {
+      logger.warn(
+        "[MessagesRemote] relayed event names a message not owned by the user — dropped",
+        { event, userId, threadId: foreignOwner.id },
+      );
+      return null;
+    }
+    return userId;
+  } catch (err) {
+    logger.warn("[MessagesRemote] ownership check failed — dropped", {
+      event,
+      userId,
+      error: parseError(err).message,
+    });
+    return null;
+  }
+}
+
+/**
  * Upsert relayed toolCall metadata onto a message row. Relayed events arrive
  * as independent posts with NO ordering guarantee: a tool-result can land
  * BEFORE the tool message's message-created insert. When the thread id is
@@ -1362,6 +1472,7 @@ async function upsertRemoteToolCallMetadata(
         role: ChatMessageRole.TOOL,
         isAI: true,
       },
+      setWhere: eq(chatMessages.threadId, threadId),
     })
     .catch(() => undefined);
 }
@@ -1427,10 +1538,25 @@ export class MessagesRemoteRepository {
       });
       return;
     }
+    // Ownership guard: the thread(s), this message and its parent must all be
+    // the caller's (or not exist yet).
+    const ownerId = await guardRemoteMessageWrite({
+      user,
+      logger,
+      event: "message-created",
+      threadIds: [msgThreadId, urlPathParams.threadId],
+      messageIds: [msgId, raw.parentId],
+    });
+    if (!ownerId) {
+      return;
+    }
     const role = raw.role;
     const content = raw.content ?? "";
     const metadata = raw.metadata ?? {};
     const updatedAt = raw.updatedAt ? new Date(raw.updatedAt) : new Date();
+    // Never trust a wire authorId: a mirrored thread is the caller's own, so
+    // any authored message is attributed to the authenticated user.
+    const authorId = raw.authorId ? ownerId : null;
     // The thread row itself may not exist yet (live mirroring of a brand-new
     // thread: message events can beat the thread-updated event). Upsert a
     // minimal REMOTE stub — thread-updated / pull-sync places and backfills it.
@@ -1438,7 +1564,7 @@ export class MessagesRemoteRepository {
       .insert(chatThreads)
       .values({
         id: msgThreadId,
-        userId: "id" in user && typeof user.id === "string" ? user.id : null,
+        userId: ownerId,
         rootFolderId: DefaultFolderId.REMOTE,
         title: "",
         // Ownership is a COLUMN: the stub's origin is the SENDING instance
@@ -1533,7 +1659,7 @@ export class MessagesRemoteRepository {
         isAI: raw.isAI ?? false,
         content,
         parentId: raw.parentId ?? null,
-        authorId: raw.authorId ?? null,
+        authorId,
         model: raw.model ?? null,
         skill: raw.skill ?? null,
         metadata,
@@ -1568,7 +1694,7 @@ export class MessagesRemoteRepository {
                 role,
                 isAI: raw.isAI ?? false,
                 parentId: raw.parentId ?? null,
-                authorId: raw.authorId ?? null,
+                authorId,
                 model: raw.model ?? null,
                 skill: raw.skill ?? null,
                 sequenceId: raw.sequenceId ?? null,
@@ -1577,6 +1703,9 @@ export class MessagesRemoteRepository {
                 createdAt: healCreatedAt,
                 updatedAt,
               },
+        // Never rewrite a row that lives in another thread (race-safe twin of
+        // the ownership guard above).
+        setWhere: eq(chatMessages.threadId, msgThreadId),
       })
       .catch((err: Error) => {
         logger.warn(
@@ -1598,6 +1727,7 @@ export class MessagesRemoteRepository {
         .where(
           and(
             eq(chatThreads.id, msgThreadId),
+            eq(chatThreads.userId, ownerId),
             ne(chatThreads.streamingState, ThreadStreamingState.IDLE),
           ),
         )
@@ -1606,7 +1736,9 @@ export class MessagesRemoteRepository {
       await db
         .update(chatThreads)
         .set({ streamingState: state, updatedAt: new Date() })
-        .where(eq(chatThreads.id, msgThreadId))
+        .where(
+          and(eq(chatThreads.id, msgThreadId), eq(chatThreads.userId, ownerId)),
+        )
         .catch(() => undefined);
     }
     (
@@ -1628,6 +1760,18 @@ export class MessagesRemoteRepository {
     if (!msg?.id) {
       return;
     }
+    if (
+      !(await guardRemoteMessageWrite({
+        user,
+        logger,
+        event: "error",
+        threadIds: [urlPathParams.threadId],
+        messageIds: [msg.id],
+      }))
+    ) {
+      return;
+    }
+    const errorThreadId = urlPathParams.threadId;
     await db
       .update(chatMessages)
       .set({
@@ -1637,7 +1781,14 @@ export class MessagesRemoteRepository {
           : sql`metadata`,
         updatedAt: new Date(),
       })
-      .where(eq(chatMessages.id, msg.id))
+      .where(
+        typeof errorThreadId === "string" && errorThreadId.length > 0
+          ? and(
+              eq(chatMessages.id, msg.id),
+              eq(chatMessages.threadId, errorThreadId),
+            )
+          : eq(chatMessages.id, msg.id),
+      )
       .catch(() => undefined);
     (
       await MessagesRemoteRepository.mirrorEmitter(
@@ -1666,6 +1817,17 @@ export class MessagesRemoteRepository {
       creditCost: msg?.metadata?.creditCost ?? null,
     });
     if (!msg?.id || !msg.content || typeof threadId !== "string") {
+      return;
+    }
+    if (
+      !(await guardRemoteMessageWrite({
+        user,
+        logger,
+        event: "content-done",
+        threadIds: [threadId],
+        messageIds: [msg.id],
+      }))
+    ) {
       return;
     }
     const tokenMetadata = JSON.stringify({
@@ -1697,6 +1859,7 @@ export class MessagesRemoteRepository {
           content: msg.content,
           metadata: sql`COALESCE(${chatMessages.metadata}, '{}'::jsonb) || jsonb_strip_nulls(${tokenMetadata}::jsonb)`,
         },
+        setWhere: eq(chatMessages.threadId, threadId),
       })
       .catch(() => undefined);
     (
@@ -1728,6 +1891,17 @@ export class MessagesRemoteRepository {
     if (!msg?.id || !msg.content || typeof threadId !== "string") {
       return;
     }
+    if (
+      !(await guardRemoteMessageWrite({
+        user,
+        logger,
+        event: "content-delta",
+        threadIds: [threadId],
+        messageIds: [msg.id],
+      }))
+    ) {
+      return;
+    }
     await db
       .insert(chatMessages)
       .values({
@@ -1743,6 +1917,7 @@ export class MessagesRemoteRepository {
       .onConflictDoUpdate({
         target: chatMessages.id,
         set: { content: sql`${chatMessages.content} || excluded.content` },
+        setWhere: eq(chatMessages.threadId, threadId),
       })
       .catch(() => undefined);
     (await MessagesRemoteRepository.mirrorEmitter(threadId, logger, user))(
@@ -1769,6 +1944,17 @@ export class MessagesRemoteRepository {
     if (!msg?.id || !msg.content || typeof threadId !== "string") {
       return;
     }
+    if (
+      !(await guardRemoteMessageWrite({
+        user,
+        logger,
+        event: "reasoning-delta",
+        threadIds: [threadId],
+        messageIds: [msg.id],
+      }))
+    ) {
+      return;
+    }
     await db
       .insert(chatMessages)
       .values({
@@ -1784,6 +1970,7 @@ export class MessagesRemoteRepository {
       .onConflictDoUpdate({
         target: chatMessages.id,
         set: { content: sql`${chatMessages.content} || excluded.content` },
+        setWhere: eq(chatMessages.threadId, threadId),
       })
       .catch(() => undefined);
     (await MessagesRemoteRepository.mirrorEmitter(threadId, logger, user))(
@@ -1810,6 +1997,17 @@ export class MessagesRemoteRepository {
     if (!msg?.id || typeof threadId !== "string") {
       return;
     }
+    if (
+      !(await guardRemoteMessageWrite({
+        user,
+        logger,
+        event: "reasoning-done",
+        threadIds: [threadId],
+        messageIds: [msg.id],
+      }))
+    ) {
+      return;
+    }
     if (msg.content) {
       await db
         .insert(chatMessages)
@@ -1824,6 +2022,7 @@ export class MessagesRemoteRepository {
         .onConflictDoUpdate({
           target: chatMessages.id,
           set: { content: msg.content },
+          setWhere: eq(chatMessages.threadId, threadId),
         })
         .catch(() => undefined);
     }
@@ -1846,6 +2045,17 @@ export class MessagesRemoteRepository {
     const msg = responseData.messages?.[0];
     const toolCall = msg?.metadata?.toolCall;
     if (!msg?.id || !toolCall) {
+      return;
+    }
+    if (
+      !(await guardRemoteMessageWrite({
+        user,
+        logger,
+        event: "tool-result",
+        threadIds: [urlPathParams.threadId],
+        messageIds: [msg.id],
+      }))
+    ) {
       return;
     }
     const resultObj =
@@ -1902,6 +2112,17 @@ export class MessagesRemoteRepository {
     if (!msg?.id || !toolCall) {
       return;
     }
+    if (
+      !(await guardRemoteMessageWrite({
+        user,
+        logger,
+        event: "tool-result-updated",
+        threadIds: [urlPathParams.threadId],
+        messageIds: [msg.id],
+      }))
+    ) {
+      return;
+    }
     const taggedToolCall = instanceId
       ? { ...toolCall, remoteInstanceId: instanceId }
       : toolCall;
@@ -1938,6 +2159,17 @@ export class MessagesRemoteRepository {
     if (!msg?.id) {
       return;
     }
+    if (
+      !(await guardRemoteMessageWrite({
+        user,
+        logger,
+        event: "tokens-updated",
+        threadIds: [threadId],
+        messageIds: [msg.id],
+      }))
+    ) {
+      return;
+    }
     const tokenMetadata = {
       promptTokens: msg.metadata?.promptTokens ?? null,
       completionTokens: msg.metadata?.completionTokens ?? null,
@@ -1963,6 +2195,7 @@ export class MessagesRemoteRepository {
         .onConflictDoUpdate({
           target: chatMessages.id,
           set: { metadata: mergedTokenMetadata },
+          setWhere: eq(chatMessages.threadId, threadId),
         })
         .catch(() => undefined);
     } else {
@@ -1990,10 +2223,20 @@ export class MessagesRemoteRepository {
     "stream-finished"
   >): Promise<void> {
     const threadId = urlPathParams.threadId;
+    const ownerId = await guardRemoteMessageWrite({
+      user,
+      logger,
+      event: "stream-finished",
+      threadIds: [threadId],
+      messageIds: [],
+    });
+    if (!ownerId) {
+      return;
+    }
     await db
       .update(chatThreads)
       .set({ streamingState: ThreadStreamingState.IDLE, updatedAt: new Date() })
-      .where(eq(chatThreads.id, threadId))
+      .where(and(eq(chatThreads.id, threadId), eq(chatThreads.userId, ownerId)))
       .catch((err: Error) => {
         logger.warn(
           "[messages/repository] stream-finished: failed to mark thread idle",
@@ -2021,6 +2264,16 @@ export class MessagesRemoteRepository {
     "streaming-state-changed"
   >): Promise<void> {
     const threadId = urlPathParams.threadId;
+    const ownerId = await guardRemoteMessageWrite({
+      user,
+      logger,
+      event: "streaming-state-changed",
+      threadIds: [threadId],
+      messageIds: [],
+    });
+    if (!ownerId) {
+      return;
+    }
 
     // Idle is ABSORBING for remote state writes (see applyRemoteMessageCreated):
     // relayed events are unordered, so a late "streaming"/"waiting" must never
@@ -2034,9 +2287,10 @@ export class MessagesRemoteRepository {
       })
       .where(
         responseData.streamingState === ThreadStreamingState.IDLE
-          ? eq(chatThreads.id, threadId)
+          ? and(eq(chatThreads.id, threadId), eq(chatThreads.userId, ownerId))
           : and(
               eq(chatThreads.id, threadId),
+              eq(chatThreads.userId, ownerId),
               ne(chatThreads.streamingState, ThreadStreamingState.IDLE),
             ),
       )

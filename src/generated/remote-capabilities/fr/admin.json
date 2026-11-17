@@ -567797,6 +567797,54 @@
           },
           "schemaType": "primitive"
         },
+        "GOOGLE_SITE_VERIFICATION": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Google Search Console HTML-tag verification token (content of the google-site-verification meta tag). Rendered on every page when set.",
+          "description": "Google Search Console HTML-tag verification token (content of the google-site-verification meta tag). Rendered on every page when set.",
+          "placeholder": "abc123-token-from-search-console",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "BING_SITE_VERIFICATION": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Bing Webmaster Tools verification token (content of the msvalidate.01 meta tag). Rendered on every page when set.",
+          "description": "Bing Webmaster Tools verification token (content of the msvalidate.01 meta tag). Rendered on every page when set.",
+          "placeholder": "0123456789ABCDEF0123456789ABCDEF",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "DATABASE_URL": {
           "type": "form_field",
           "fieldType": "text",
@@ -568691,6 +568739,30 @@
           "label": "Password for SSH_SERVER (or an explicit --sshTarget). If unset, `vibe image-push` falls back to the system ssh client (key/agent auth). Only used for the image transfer - never logged.",
           "description": "Password for SSH_SERVER (or an explicit --sshTarget). If unset, `vibe image-push` falls back to the system ssh client (key/agent auth). Only used for the image transfer - never logged.",
           "placeholder": "REPLACE_WITH_your_ssh_password",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "SSH_SERVER_KEY": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Private key file (ed25519) for every image-push SSH call to SSH_SERVER and SSH_SERVER2. Tried first; SSH_SERVER_PWD / SSH_SERVER2_PWD stay as the sshpass fallback when the key is refused. A leading ~ expands to the home directory. Unset or missing file = the ssh client's default identities/agent.",
+          "description": "Private key file (ed25519) for every image-push SSH call to SSH_SERVER and SSH_SERVER2. Tried first; SSH_SERVER_PWD / SSH_SERVER2_PWD stay as the sshpass fallback when the key is refused. A leading ~ expands to the home directory. Unset or missing file = the ssh client's default identities/agent.",
+          "placeholder": "~/.ssh/deploy_ed25519",
           "columns": 12,
           "schema": {
             "def": {
@@ -580683,6 +580755,41 @@
               "type": "boolean"
             },
             "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "access": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "object",
+              "shape": {
+                "canConnect": {
+                  "def": {
+                    "type": "boolean"
+                  },
+                  "type": "boolean"
+                },
+                "maxConnections": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  },
+                  "type": "nullable"
+                }
+              }
+            },
+            "type": "object"
           },
           "usage": {
             "response": true

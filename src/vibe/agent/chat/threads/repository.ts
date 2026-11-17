@@ -954,10 +954,16 @@ export class ThreadsRepository {
     if (!thread?.id || !thread.title) {
       return;
     }
+    const userId = user.isPublic ? null : user.id;
+    if (!userId) {
+      return;
+    }
+    // Ownership guard: the peer controls the thread id — only ever retitle the
+    // authenticated user's own thread (no row → dropped below).
     const updatedRows = await db
       .update(chatThreads)
       .set({ title: thread.title, updatedAt: new Date() })
-      .where(eq(chatThreads.id, thread.id))
+      .where(and(eq(chatThreads.id, thread.id), eq(chatThreads.userId, userId)))
       .returning({
         rootFolderId: chatThreads.rootFolderId,
         folderId: chatThreads.folderId,
@@ -974,6 +980,10 @@ export class ThreadsRepository {
       });
     const updatedRow = updatedRows[0];
     if (!updatedRow) {
+      logger.warn(
+        "[threads/repository] thread-title-updated: thread not owned by user — dropped",
+        { userId, threadId: thread.id },
+      );
       return;
     }
     const { createEndpointEmitter } =
@@ -1021,10 +1031,17 @@ export class ThreadsRepository {
     // the correct instance subtree rather than at the REMOTE root.
     let mirrorFolderId: string | null = null;
     if (requestData.subFolderId) {
+      // Only the caller's own folder may host the mirror — a wire id pointing
+      // at anyone else's folder falls back to the scaffold.
       const [folderRow] = await db
         .select({ id: chatFolders.id })
         .from(chatFolders)
-        .where(eq(chatFolders.id, requestData.subFolderId))
+        .where(
+          and(
+            eq(chatFolders.id, requestData.subFolderId),
+            eq(chatFolders.userId, userId),
+          ),
+        )
         .limit(1);
       mirrorFolderId = folderRow ? requestData.subFolderId : null;
     }
@@ -1038,7 +1055,7 @@ export class ThreadsRepository {
         senderRootFolderId,
       );
     }
-    await db
+    const appliedRows = await db
       .insert(chatThreads)
       .values({
         id: requestData.id,
@@ -1061,13 +1078,29 @@ export class ThreadsRepository {
           rootFolderId: DefaultFolderId.REMOTE,
           ...(mirrorFolderId !== null && { folderId: mirrorFolderId }),
         },
-        setWhere: sql`${chatThreads.originInstanceId} IS NOT NULL`,
+        // userId: the peer controls the id — never backfill another user's
+        // thread (a foreign id simply no-ops).
+        setWhere: and(
+          sql`${chatThreads.originInstanceId} IS NOT NULL`,
+          eq(chatThreads.userId, userId),
+        ),
       })
-      .catch((err: Error) => {
+      .returning({ id: chatThreads.id })
+      .catch((err: Error): Array<{ id: string }> => {
         logger.error("Failed to apply remote thread create", {
           message: err.message,
         });
+        return [];
       });
+    if (appliedRows.length === 0) {
+      // Conflict on a row the setWhere refused (another user's thread, or the
+      // caller's own local original): nothing to surface.
+      logger.warn(
+        "[threads/repository] thread-created: existing thread not a mirror of this user — dropped",
+        { userId, threadId: requestData.id },
+      );
+      return;
+    }
     // Surface the mirror in open sidebars (REMOTE root) — local WS
     // subscribers insert it into the folder-contents list cache.
     const { createFolderContentsEmitter } =

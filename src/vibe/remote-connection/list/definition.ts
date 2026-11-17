@@ -40,7 +40,9 @@ export const { GET } = createEndpoint({
   icon: "link",
   category: "devTools",
   subCategory: "remoteInstances",
-  allowedRoles: [UserRole.ADMIN] as const,
+  // Customers list their own connections (user-scoped) and learn whether
+  // their account may connect one (canConnect).
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   defaultWebPinned: [UserRole.ADMIN] as const,
   tags: ["tags.remoteConnection" as const],
   aliases: [REMOTE_CONNECTIONS_ALIAS] as const,
@@ -90,6 +92,15 @@ export const { GET } = createEndpoint({
       hasInferenceProvider: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.boolean(),
+      }),
+      // Whether THIS account may connect its own instance here (admins:
+      // always; customers: paid account) and how many it may connect.
+      access: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.object({
+          canConnect: z.boolean(),
+          maxConnections: z.number().nullable(),
+        }),
       }),
     },
   }),
@@ -159,6 +170,7 @@ export const { GET } = createEndpoint({
         selfInstanceId: "atlas",
         syncEnabled: false,
         hasInferenceProvider: false,
+        access: { canConnect: true, maxConnections: 3 },
       },
     },
   },

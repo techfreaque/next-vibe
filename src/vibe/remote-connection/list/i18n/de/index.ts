@@ -63,8 +63,7 @@ export const translations: typeof enTranslations = {
     addButton: "Verbindung hinzufügen",
     emptyState:
       "Verknüpfe eine weitere Instanz – Erinnerungen und Tools synchronisieren sich jede Minute in beide Richtungen.",
-    emptyStateCloud:
-      "Verknüpfe deine lokale Installation hier, sobald sie läuft. Deine Erinnerungen und Tools synchronisieren sich automatisch.",
+    emptyStateCloud: "Noch keine Instanz verknüpft.",
     connectedBadge: "Verbunden",
     registeredBadge: "Registriert",
     selfBadge: "Selbst",
@@ -101,30 +100,37 @@ export const translations: typeof enTranslations = {
     editButton: "Bearbeiten",
     deleteButton: "Trennen",
     cloud: {
-      heroTitle: "Deine KI. Überall.",
+      heroTitle: "Deine eigene Instanz",
       heroSubtitle:
-        "unbottled.ai ist dein Cloud-Gehirn. Füge eine lokale Instanz hinzu und deine KI arbeitet auf beiden - Erinnerungen synchronisieren sich, Tools laufen auf deinem Rechner.",
-      benefit1: "Erinnerungen synchronisieren sich bidirektional, automatisch",
-      benefit2: "Cloud-KI entdeckt und führt deine lokalen Tools aus",
-      benefit3: "Delegiere Aufgaben von der Cloud an deinen Rechner",
-      feature1Title: "Deine Tools, dein Rechner",
-      feature1Body:
-        "SSH, lokale Dateien, Code-Ausführung - die Cloud-KI entdeckt und führt deine lokalen Tools automatisch aus. Kein Port-Forwarding. Kein VPN.",
-      feature2Title: "Geteiltes Gedächtnis",
-      feature2Body:
-        "Alles, was du der KI hier sagst, synchronisiert sich mit deiner lokalen Instanz. Kontext reist mit dir.",
-      feature3Title: "Kein Lock-in",
-      feature3Body:
-        "Es ist Open Source. Fork es, hoste es selbst, besitze jede Zeile. Keine Black Box.",
-      feature4Title: "Ein Befehl zum Starten",
-      feature4Body:
-        "Klone das Repo, füge deinen API-Schlüssel hinzu, führe vibe dev aus. Dein persönlicher KI-Stack läuft in unter einer Minute.",
-      githubCta: "Auf GitHub ansehen →",
-      quickstartCta: "Quickstart-Anleitung",
-      alreadyHaveLocal: "Hast du bereits eine lokale Instanz?",
+        "Betreibe next-vibe auf eigener Hardware und verknüpfe es mit diesem Konto. Chats, Erinnerungen und Skills ziehen mit. Deine Tools laufen auf deinem Rechner.",
+      stepsTitle: "In drei Schritten verbunden",
+      step1Title: "next-vibe installieren",
+      step1Body: "Open Source. Läuft auf Laptop, Heimserver oder VPS.",
+      step2Title: "Von deiner Instanz aus verknüpfen",
+      step2Body:
+        "Öffne auf deiner Instanz Abonnement, dann Cloud-Sync, dann Mit Cloud verbinden. Gib {{appUrl}} und die Zugangsdaten dieses Kontos ein. Im Terminal auf dem Rechner:",
+      step2Command: "vibe remote-connect -i",
+      step3Title: "Sync-Umfang festlegen",
+      step3Body:
+        "Erinnerungen, Dokumente, Skills, Favoriten, Chats. Je ein Schalter, jederzeit auf deiner Instanz änderbar.",
+      githubCta: "Auf GitHub ansehen",
+      quickstartCta: "Schnellstart",
+      trustTitle: "Was eine verknüpfte Instanz darf",
+      trust1:
+        "Sie handelt als du. Sie liest und schreibt deine eigenen Chats, Erinnerungen und Skills. Nichts aus fremden Konten.",
+      trust2:
+        "Admin-Werkzeuge bleiben gesperrt. Deine Instanz hat exakt die Rechte deines Kontos.",
+      trust3:
+        "KI-Läufe, die sie hierher schickt, kosten Credits zum normalen Satz: Anbieterkosten plus 30 %.",
+      trust4:
+        "Bis zu {{max}} Instanzen. Trennst du eine unten, endet ihre Verbindung sofort.",
+      paidTitle: "Nur für zahlende Konten",
+      paidBody:
+        "Eigene Instanzen verknüpfen setzt ein bezahltes Konto voraus. Jedes Credit-Paket oder Abo schaltet es frei.",
+      paidCta: "Freischalten",
+      alreadyHaveLocal: "Deine verknüpften Instanzen",
       alreadyHaveLocalSub:
-        "Verbinde dich von deinem lokalen Rechner - öffne dort Fernverbindungen und verknüpfe sie mit dieser Cloud-Instanz.",
-      connectSectionTitle: "Lokale Instanz verknüpfen",
+        "Jede handelt als dieses Konto. Öffne eine für Status oder Trennung.",
     },
     local: {
       cloudTitle: "Mit Cloud verbinden",

@@ -32,7 +32,9 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["vibe", "remote-connection", "connect-reverse"],
-  allowedRoles: [UserRole.ADMIN] as const,
+  // Customers register their own self-hosted instance; the repository gates
+  // them (paid account, connection cap, rate limit, pinned transports).
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "post.title" as const,
   titleShort: "post.titleShort" as const,

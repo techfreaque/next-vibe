@@ -24,6 +24,7 @@ import {
   max,
   ne,
   notInArray,
+  or,
   sql,
 } from "drizzle-orm";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
@@ -446,17 +447,34 @@ export async function ensureMirrorFolders(
     // originals; the id resolves as-is.
     const [existingRow]: Array<{
       id: string;
+      userId: string | null;
       rootFolderId: string;
       parentId: string | null;
     }> = await db
       .select({
         id: chatFolders.id,
+        userId: chatFolders.userId,
         rootFolderId: chatFolders.rootFolderId,
         parentId: chatFolders.parentId,
       })
       .from(chatFolders)
       .where(eq(chatFolders.id, row.id))
       .limit(1);
+    // Ownership guard: the peer controls folder ids. An id that already
+    // belongs to ANOTHER user is never resolved, re-parented or overwritten —
+    // the chain stops at the last own folder.
+    if (existingRow && existingRow.userId !== userId) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        "[MirrorFolders] folder id owned by another user — dropped",
+        {
+          userId,
+          folderId: row.id,
+          originInstanceId,
+        },
+      );
+      continue;
+    }
     if (existingRow && existingRow.rootFolderId !== DefaultFolderId.REMOTE) {
       leafId = existingRow.id;
       continue;
@@ -494,10 +512,19 @@ export async function ensureMirrorFolders(
     if (row.parentId) {
       // Out-of-order tolerance: a parent that has not synced yet falls back
       // to the scaffold; a later chain upsert re-parents it (upsert-by-id).
+      // Only the caller's own REMOTE-rooted folder may be the parent — a wire
+      // parent id pointing at another user's (or a non-mirror) folder falls
+      // back to the scaffold.
       const [parentRow]: Array<{ id: string }> = await db
         .select({ id: chatFolders.id })
         .from(chatFolders)
-        .where(eq(chatFolders.id, row.parentId))
+        .where(
+          and(
+            eq(chatFolders.id, row.parentId),
+            eq(chatFolders.userId, userId),
+            eq(chatFolders.rootFolderId, DefaultFolderId.REMOTE),
+          ),
+        )
         .limit(1);
       if (!parentRow) {
         parentId = scaffoldId;
@@ -559,6 +586,8 @@ export async function ensureMirrorFolders(
             icon: row.icon ?? null,
             color: row.color ?? null,
           },
+          // Race-safe twin of the ownership guard above.
+          setWhere: eq(chatFolders.userId, userId),
         });
       leafId = row.id;
     } catch {
@@ -1261,22 +1290,63 @@ export const threadsSyncProvider: SyncProvider = {
     const existingThreadById = new Map(
       existingThreadRows.map((t) => [t.id, t]),
     );
+    // Ownership guard: the peer controls every id on the wire. Thread ids that
+    // already belong to ANOTHER user (or no user) are skipped entirely — the
+    // insert below would no-op on conflict, but its messages would still land
+    // in (and overwrite) that user's thread.
+    const foreignThreadIds = new Set<string>();
+    if (remoteThreadIds.length > 0) {
+      const foreignRows = await db
+        .select({ id: chatThreads.id })
+        .from(chatThreads)
+        .where(
+          and(
+            inArray(chatThreads.id, remoteThreadIds),
+            or(isNull(chatThreads.userId), ne(chatThreads.userId, userId)),
+          ),
+        );
+      for (const row of foreignRows) {
+        foreignThreadIds.add(row.id);
+        logger.warn(
+          "[ThreadsSync] synced thread id owned by another user — dropped",
+          { userId, threadId: row.id },
+        );
+      }
+    }
 
     const remoteMessageIds = remoteThreads.flatMap((t) =>
       t.messages.map((m) => m.id),
     );
+    // Only the user's OWN messages count as existing; a wire message id that
+    // already lives in someone else's thread is never updated, re-inserted or
+    // used as a parent reference.
     const existingMessageById = new Map<
       string,
-      { id: string; updatedAt: Date }
+      { id: string; updatedAt: Date; threadId: string }
     >();
+    const foreignMessageIds = new Set<string>();
     for (let i = 0; i < remoteMessageIds.length; i += 5000) {
       const idBatch = remoteMessageIds.slice(i, i + 5000);
       const rows = await db
-        .select({ id: chatMessages.id, updatedAt: chatMessages.updatedAt })
+        .select({
+          id: chatMessages.id,
+          updatedAt: chatMessages.updatedAt,
+          threadId: chatMessages.threadId,
+          ownerId: chatThreads.userId,
+        })
         .from(chatMessages)
+        .innerJoin(chatThreads, eq(chatThreads.id, chatMessages.threadId))
         .where(inArray(chatMessages.id, idBatch));
       for (const row of rows) {
-        existingMessageById.set(row.id, row);
+        if (row.ownerId === userId) {
+          existingMessageById.set(row.id, {
+            id: row.id,
+            updatedAt: row.updatedAt,
+            threadId: row.threadId,
+          });
+        } else {
+          foreignMessageIds.add(row.id);
+        }
       }
     }
 
@@ -1286,6 +1356,9 @@ export const threadsSyncProvider: SyncProvider = {
     const messageInsertRows: (typeof chatMessages.$inferInsert)[] = [];
 
     for (const remoteThread of remoteThreads) {
+      if (foreignThreadIds.has(remoteThread.id)) {
+        continue;
+      }
       try {
         // We are the MIRROR for every foreign-origin thread — the owner's copy
         // is authoritative and it lands under REMOTE/<origin>/<folderPath>.
@@ -1393,9 +1466,16 @@ export const threadsSyncProvider: SyncProvider = {
           threadInsertRows.push({
             id: remoteThread.id,
             userId,
+            // Own-origin restores only ever land in PRIVATE/BACKGROUND; any
+            // other wire root (PUBLIC, SHARED, ...) is never trusted and falls
+            // back to REMOTE.
             rootFolderId: isForeignOrigin
               ? DefaultFolderId.REMOTE
-              : (remoteThread.originRootFolderId as (typeof chatThreads.$inferInsert)["rootFolderId"]),
+              : remoteThread.originRootFolderId === DefaultFolderId.PRIVATE
+                ? DefaultFolderId.PRIVATE
+                : remoteThread.originRootFolderId === DefaultFolderId.BACKGROUND
+                  ? DefaultFolderId.BACKGROUND
+                  : DefaultFolderId.REMOTE,
             folderId: folderId ?? undefined,
             // Ownership is a COLUMN — mirrors carry their origin label, own
             // restores stay NULL (ours). Never decoded from folders again.
@@ -1440,6 +1520,20 @@ export const threadsSyncProvider: SyncProvider = {
         for (const remoteMsg of remoteThread.messages) {
           try {
             const existingMsg = existingMessageById.get(remoteMsg.id);
+            // Ownership guard: a message id that lives in another user's
+            // thread, or in another of the user's threads, is never touched.
+            if (
+              foreignMessageIds.has(remoteMsg.id) ||
+              (existingMsg && existingMsg.threadId !== remoteThread.id)
+            ) {
+              logger.warn(
+                "[ThreadsSync] synced message id belongs to another thread — dropped",
+                { userId, messageId: remoteMsg.id, threadId: remoteThread.id },
+              );
+              continue;
+            }
+            // Never trust a wire authorId: synced threads are the user's own.
+            const authorId = remoteMsg.authorId ? userId : null;
 
             const msgRemoteTime = new Date(remoteMsg.updatedAt).getTime();
 
@@ -1481,7 +1575,7 @@ export const threadsSyncProvider: SyncProvider = {
                       createdAt: new Date(remoteMsg.createdAt),
                     }),
                     sequenceId: remoteMsg.sequenceId,
-                    authorId: remoteMsg.authorId,
+                    authorId,
                     authorName: remoteMsg.authorName,
                     isAI: remoteMsg.isAI,
                     model: remoteMsg.model as ChatModelId | null,
@@ -1489,7 +1583,12 @@ export const threadsSyncProvider: SyncProvider = {
                     metadata: (remoteMsg.metadata ?? {}) as MessageMetadata,
                     updatedAt: new Date(remoteMsg.updatedAt),
                   })
-                  .where(eq(chatMessages.id, remoteMsg.id));
+                  .where(
+                    and(
+                      eq(chatMessages.id, remoteMsg.id),
+                      eq(chatMessages.threadId, remoteThread.id),
+                    ),
+                  );
               }
             } else {
               // For owner-authoritative (mirrored) threads, skip empty assistant
@@ -1511,7 +1610,7 @@ export const threadsSyncProvider: SyncProvider = {
                 content: remoteMsg.content,
                 parentId: remoteMsg.parentId,
                 sequenceId: remoteMsg.sequenceId,
-                authorId: remoteMsg.authorId,
+                authorId,
                 authorName: remoteMsg.authorName,
                 isAI: remoteMsg.isAI,
                 model: remoteMsg.model as ChatModelId | null,
@@ -1556,6 +1655,40 @@ export const threadsSyncProvider: SyncProvider = {
           .onConflictDoNothing();
       } catch (error) {
         logger.error("Failed to upsert synced thread", parseError(error));
+      }
+    }
+
+    // Race-safe twin of the foreign-thread guard: only insert messages into
+    // threads that (now) belong to this user.
+    const insertThreadIds = [
+      ...new Set(
+        messageInsertRows.flatMap((m) =>
+          typeof m.threadId === "string" ? [m.threadId] : [],
+        ),
+      ),
+    ];
+    const ownedInsertThreadIds = new Set<string>();
+    for (let i = 0; i < insertThreadIds.length; i += 5000) {
+      const rows = await db
+        .select({ id: chatThreads.id })
+        .from(chatThreads)
+        .where(
+          and(
+            inArray(chatThreads.id, insertThreadIds.slice(i, i + 5000)),
+            eq(chatThreads.userId, userId),
+          ),
+        );
+      for (const row of rows) {
+        ownedInsertThreadIds.add(row.id);
+      }
+    }
+    for (let i = messageInsertRows.length - 1; i >= 0; i--) {
+      const row = messageInsertRows[i];
+      if (
+        typeof row?.threadId !== "string" ||
+        !ownedInsertThreadIds.has(row.threadId)
+      ) {
+        messageInsertRows.splice(i, 1);
       }
     }
 

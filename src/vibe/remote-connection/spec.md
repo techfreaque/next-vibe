@@ -2,7 +2,7 @@
 
 Connects two next-vibe instances for one user. Any topology: local↔local, local↔remote, remote↔remote.
 
-**Only ADMIN can create a connection.** The target instance auto-creates a reverse entry — system-managed, no UI, never user-initiated. Cloud instances (`NEXT_PUBLIC_VIBE_IS_CLOUD`) never open outbound sockets.
+**Only ADMIN initiates a connection** (on the instance they run). The target instance auto-creates a reverse entry — system-managed, never user-initiated. On a multi-tenant target, a non-admin (paying customer) may be the account the initiator registers under; see "Customer accounts" below. Cloud instances (`NEXT_PUBLIC_VIBE_IS_CLOUD`) never open outbound sockets.
 
 This spec owns the connection rows, lifecycle, transport negotiation, and routing. Two systems it rides on, specced elsewhere:
 
@@ -68,7 +68,7 @@ Only `isActive = true` rows with a token are candidates. `forceSystemProvider` /
 
 ## DB Schema
 
-Two tables.
+Three tables: the two below plus `remote_connection_audit` (append-only lifecycle/denial trail, serving side).
 
 **`instance_identities`** — per-user self-id (who am I?). `(userId, instanceId)` unique, one `isDefault`. Self-id falls back to `hermes` (preview) / `thea` (non-localhost URL) / `atlas`.
 
@@ -107,7 +107,8 @@ Two tables.
 
 ## Security
 
-- Only ADMIN creates connections; reverse entries are system-created.
+- Only ADMIN initiates connections; reverse entries are system-created.
+- **Customer accounts (serving side, `customer-access/access.ts`):** non-admins may register (`connect-reverse`), mirror (`connect-reverse/update`), list, view and DELETE their own reverse entries; PATCH stays admin. Every bridge/sync/register call from a non-admin requires a paid account (`isPaidUser`), an active connection (bridge/sync), a per-account rate budget and at most `REMOTE_CUSTOMER_LIMITS.maxConnections` rows. Their transports are PINNED (`transportMode = reverse-ws`, `remoteTransportMode = direct-http`): the serving side never probes or dials a customer URL, and never touches the instanceId-keyed connector registries for them. Lifecycle and denials land in `remote_connection_audit`. Every `onRemoteEvent` applier and sync provider scopes writes to the authenticated user; inbound tool requests from non-admins run as `AI`/`MCP`/`NEXT_API` only. Threat model: `.tmp/proposals/remote-for-customers.md`.
 - The opening side is decided by `remoteTransportMode`; cloud never opens an outbound socket.
 - JWT encrypted AES-256-GCM per connection.
 - Capability snapshots validated fail-closed before every remote AI tool dispatch — see [`../system/unified-interface/execute-tool/spec.md`](../system/unified-interface/execute-tool/spec.md).

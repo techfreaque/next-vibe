@@ -133,14 +133,23 @@ export class PendingCalls {
    * "duplicate" — the call already has a result (late duplicate report; skip revival).
    * "unknown"   — never registered here (other process / restart; the caller
    *               should fall back to the wire context for revival).
+   * "foreign"   — `expectedUserId` given and the entry belongs to someone else.
+   *
+   * `expectedUserId`: set by WIRE-driven completions (tool-execute-result). A
+   * connected peer chooses the callId, so without it any account's peer could
+   * resolve another account's pending call with forged output.
    */
   static complete(
     callId: string,
     result: PendingCallResult,
+    expectedUserId?: string,
   ): CompletePendingCallOutcome {
     const entry = PendingCalls.registry.get(callId);
     if (!entry) {
       return { kind: "unknown" };
+    }
+    if (expectedUserId !== undefined && entry.userId !== expectedUserId) {
+      return { kind: "foreign" };
     }
     if (entry.result !== null) {
       return { kind: "duplicate" };
@@ -370,18 +379,22 @@ export class PendingCalls {
       // fired; nothing will ever revive the waiter).
       {
         const { pendingCallResults } = await import("../db");
+        const { pendingResultKey } = await import("./inbound-guards");
+        // User-namespaced key (see pendingResultKey): only the dispatching
+        // user's own result row can complete this entry.
+        const resultKey = pendingResultKey(entry.userId, entry.callId);
         const [row] = await db
           .select({
             status: pendingCallResults.status,
             output: pendingCallResults.output,
           })
           .from(pendingCallResults)
-          .where(eq(pendingCallResults.callId, entry.callId))
+          .where(eq(pendingCallResults.callId, resultKey))
           .limit(1);
         if (row) {
           await db
             .delete(pendingCallResults)
-            .where(eq(pendingCallResults.callId, entry.callId))
+            .where(eq(pendingCallResults.callId, resultKey))
             .catch(() => undefined);
           PendingCalls.complete(entry.callId, {
             status: row.status,

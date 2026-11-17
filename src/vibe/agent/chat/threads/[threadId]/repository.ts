@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import {
   type CountryLanguage,
@@ -507,12 +507,23 @@ export class ThreadByIdRepository {
     const [existingThread] = await db
       .select({
         id: chatThreads.id,
+        userId: chatThreads.userId,
         rootFolderId: chatThreads.rootFolderId,
         originInstanceId: chatThreads.originInstanceId,
       })
       .from(chatThreads)
       .where(eq(chatThreads.id, urlPathParams.threadId))
       .limit(1);
+    // Ownership guard: the peer controls the thread id — a relayed update may
+    // only ever touch the authenticated user's own thread (never rely on
+    // role-based permissions for relayed writes).
+    if (!userId || (existingThread && existingThread.userId !== userId)) {
+      logger.warn(
+        "[threads/[threadId]] thread-updated: thread not owned by user — dropped",
+        { userId, threadId: urlPathParams.threadId },
+      );
+      return;
+    }
     let data: typeof parsed.data = {
       ...parsed.data,
       folderId: undefined,
@@ -526,10 +537,17 @@ export class ThreadByIdRepository {
       // before thread-updated on the same socket (ordered on the WS leg);
       // when a leg reorders them, the NEXT push re-attempts placement — the
       // sender re-sends chain + thread-updated at every turn end.
+      // Scoped to the caller's own folders: a wire folder id pointing at
+      // anyone else's folder is never used for placement.
       const [folderRow] = await db
         .select({ id: chatFolders.id })
         .from(chatFolders)
-        .where(eq(chatFolders.id, parsed.data.folderId))
+        .where(
+          and(
+            eq(chatFolders.id, parsed.data.folderId),
+            eq(chatFolders.userId, userId),
+          ),
+        )
         .limit(1);
       return Boolean(folderRow);
     };
@@ -645,6 +663,21 @@ export class ThreadByIdRepository {
     typeof threadsByIdDefinitions.DELETE,
     "thread-deleted"
   >): Promise<void> {
+    // Ownership guard: only the authenticated user's own thread may be deleted
+    // by a relayed event (no role-based override for peers).
+    const userId = user.isPublic ? null : user.id;
+    const [target] = await db
+      .select({ userId: chatThreads.userId })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, urlPathParams.threadId))
+      .limit(1);
+    if (!userId || !target || target.userId !== userId) {
+      logger.warn(
+        "[threads/[threadId]] thread-deleted: thread not owned by user — dropped",
+        { userId, threadId: urlPathParams.threadId },
+      );
+      return;
+    }
     const result = await this.deleteThread(
       urlPathParams.threadId,
       user,

@@ -39,22 +39,48 @@ type SyncedNode = z.infer<typeof syncedNodeSchema>;
 
 // ─── Factory ─────────────────────────────────────────────────────────────────
 
+/** Rows at `pathPrefix` itself or anywhere below it. */
+function pathPrefixCondition(pathPrefix: string): ReturnType<typeof or> {
+  return or(
+    eq(cortexNodes.path, pathPrefix),
+    sql`${cortexNodes.path} LIKE ${`${pathPrefix}/%`}`,
+  );
+}
+
 function nodeFilter(
   userId: string,
   pathPrefix: string,
 ): ReturnType<typeof and> {
   return and(
     eq(cortexNodes.userId, userId),
-    or(
-      eq(cortexNodes.path, pathPrefix),
-      sql`${cortexNodes.path} LIKE ${`${pathPrefix}/%`}`,
-    ),
+    pathPrefixCondition(pathPrefix),
     or(
       sql`${cortexNodes.syncPolicy} IS NULL`,
       eq(cortexNodes.syncPolicy, CortexSyncPolicy.SYNC),
     ),
     sql`${cortexNodes.syncId} IS NOT NULL`,
   );
+}
+
+/**
+ * Wire paths are peer-controlled: accept only the provider's own subtree
+ * (prefix itself or prefix/...), with no "." / ".." / empty segments that
+ * could escape it once normalised.
+ */
+function isPathUnderPrefix(path: string, pathPrefix: string): boolean {
+  if (path !== pathPrefix && !path.startsWith(`${pathPrefix}/`)) {
+    return false;
+  }
+  const rest = path.slice(pathPrefix.length + 1);
+  return (
+    rest === "" ||
+    rest.split("/").every((seg) => seg !== "" && seg !== "." && seg !== "..")
+  );
+}
+
+/** Byte length of node content, recomputed locally (never trust wire size). */
+function contentSize(content: string | null): number {
+  return content === null ? 0 : Buffer.byteLength(content, "utf8");
 }
 
 function makeCortexNodeSyncProvider(
@@ -138,7 +164,23 @@ function makeCortexNodeSyncProvider(
     },
 
     async upsertFromJson(json, userId, logger) {
-      const remoteNodes = z.array(syncedNodeSchema).parse(JSON.parse(json));
+      const remoteNodes = z
+        .array(syncedNodeSchema)
+        .parse(JSON.parse(json))
+        .filter((n) => {
+          if (isPathUnderPrefix(n.path, pathPrefix)) {
+            return true;
+          }
+          logger.warn(
+            `Synced ${key} node dropped: path outside ${pathPrefix}`,
+            {
+              userId,
+              syncId: n.syncId,
+              path: n.path,
+            },
+          );
+          return false;
+        });
       let synced = 0;
 
       const existingRows =
@@ -154,6 +196,9 @@ function makeCortexNodeSyncProvider(
               .where(
                 and(
                   eq(cortexNodes.userId, userId),
+                  // Only match rows inside this provider's subtree, so a
+                  // syncId collision can't move/overwrite a node elsewhere.
+                  pathPrefixCondition(pathPrefix),
                   or(
                     inArray(
                       cortexNodes.syncId,
@@ -188,14 +233,14 @@ function makeCortexNodeSyncProvider(
       for (const remoteNode of remoteNodes) {
         try {
           if (remoteNode.isDeleted) {
-            await db
-              .delete(cortexNodes)
-              .where(
-                and(
-                  eq(cortexNodes.userId, userId),
-                  eq(cortexNodes.syncId, remoteNode.syncId),
-                ),
-              );
+            await db.delete(cortexNodes).where(
+              and(
+                eq(cortexNodes.userId, userId),
+                eq(cortexNodes.syncId, remoteNode.syncId),
+                // Tombstones only reach this provider's subtree.
+                pathPrefixCondition(pathPrefix),
+              ),
+            );
             const deleted = existingBySyncId.get(remoteNode.syncId);
             if (deleted) {
               existingBySyncId.delete(remoteNode.syncId);
@@ -220,7 +265,7 @@ function makeCortexNodeSyncProvider(
                   syncId: remoteNode.syncId,
                   path: remoteNode.path,
                   content: remoteNode.content,
-                  size: remoteNode.size,
+                  size: contentSize(remoteNode.content),
                   frontmatter: remoteNode.frontmatter,
                   tags: remoteNode.tags,
                   nodeType: remoteNode.nodeType,
@@ -236,7 +281,7 @@ function makeCortexNodeSyncProvider(
               syncId: remoteNode.syncId,
               path: remoteNode.path,
               content: remoteNode.content,
-              size: remoteNode.size,
+              size: contentSize(remoteNode.content),
               frontmatter: remoteNode.frontmatter,
               tags: remoteNode.tags,
               nodeType: remoteNode.nodeType,

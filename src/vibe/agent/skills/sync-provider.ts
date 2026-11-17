@@ -5,7 +5,7 @@ import "server-only";
  * Registers custom skills for cross-instance sync via the unified SyncProvider interface.
  *
  * Lossless upsert: all columns are serialized and written back to `customSkills` directly.
- * This preserves variants, trustLevel, availableTools, model selections, etc.
+ * This preserves variants, availableTools, model selections, etc.
  * Community metrics (voteCount, reportCount) are NOT synced — they are instance-local.
  */
 import { and, asc, eq, inArray, sql } from "drizzle-orm";
@@ -21,7 +21,7 @@ import { z } from "zod";
 import type { ToolConfigItem } from "../chat/settings/definition";
 import type { VideoGenModelId } from "../video-generation/models";
 import { customSkills, type NewCustomSkill } from "./db";
-import { SkillTrustLevel } from "./enum";
+import { SkillOwnershipType, SkillTrustLevel } from "./enum";
 import { type SyncedSkill, syncedSkillSchema } from "./full-event.schema";
 
 export type { SyncedSkill };
@@ -172,14 +172,24 @@ export const skillsSyncProvider: SyncProvider = {
 
         // Build the full lossless update/insert payload.
         // Community metrics (voteCount, reportCount) are NOT synced — instance-local.
-        const skillPayload: Omit<NewCustomSkill, "id" | "slug" | "userId"> = {
+        // Privileged fields are clamped: the peer is only the user, so the
+        // result can never exceed what that user could set themselves via
+        // create/publish (USER or PUBLIC ownership, never SYSTEM). trustLevel
+        // is instance-local (vote-driven): kept on update, COMMUNITY on insert.
+        const skillPayload: Omit<
+          NewCustomSkill,
+          "id" | "slug" | "userId" | "trustLevel"
+        > = {
           name: remoteSkill.name,
           description: remoteSkill.description,
           tagline: remoteSkill.tagline,
           icon: remoteSkill.icon,
           systemPrompt: remoteSkill.systemPrompt ?? null,
           category: remoteSkill.category,
-          ownershipType: remoteSkill.ownershipType,
+          ownershipType:
+            remoteSkill.ownershipType === SkillOwnershipType.PUBLIC
+              ? SkillOwnershipType.PUBLIC
+              : SkillOwnershipType.USER,
           voiceModelSelection: remoteSkill.voiceModelSelection ?? null,
           sttModelSelection: remoteSkill.sttModelSelection ?? null,
           imageVisionModelSelection:
@@ -207,7 +217,6 @@ export const skillsSyncProvider: SyncProvider = {
           skillType: remoteSkill.skillType ?? null,
           status: remoteSkill.status ?? null,
           companionPrompt: remoteSkill.companionPrompt ?? null,
-          trustLevel: remoteSkill.trustLevel ?? SkillTrustLevel.COMMUNITY,
           longContent: remoteSkill.longContent ?? null,
           publishedAt: remoteSkill.publishedAt
             ? new Date(remoteSkill.publishedAt)
@@ -222,7 +231,12 @@ export const skillsSyncProvider: SyncProvider = {
             await db
               .update(customSkills)
               .set(skillPayload)
-              .where(eq(customSkills.id, remoteSkill.id));
+              .where(
+                and(
+                  eq(customSkills.id, remoteSkill.id),
+                  eq(customSkills.userId, userId),
+                ),
+              );
           }
         } else {
           // New skill — collected for batch insert below
@@ -231,6 +245,7 @@ export const skillsSyncProvider: SyncProvider = {
             slug: remoteSkill.slug,
             userId,
             ...skillPayload,
+            trustLevel: SkillTrustLevel.COMMUNITY,
           });
         }
 

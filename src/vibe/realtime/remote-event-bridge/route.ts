@@ -15,7 +15,7 @@ import { RemoteEventBridgeRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, logger }) =>
-      RemoteEventBridgeRepository.receive(data, user, logger),
+    handler: ({ data, user, logger, locale }) =>
+      RemoteEventBridgeRepository.receive(data, user, logger, locale),
   },
 });

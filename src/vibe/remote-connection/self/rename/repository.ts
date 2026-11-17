@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import {
@@ -20,6 +20,7 @@ import type { JwtPrivatePayloadType } from "../../../identity/auth/types";
 import type { EndpointLogger } from "../../../logger/types";
 import type { Platform } from "../../../platforms/platforms";
 import { cronTasks } from "../../../tasks/cron/db";
+import { cronTaskOwnerScope } from "../../cron-scope";
 import { instanceIdentities } from "../../db";
 import { RemoteConnectionRepository } from "../../repository";
 import type { RemoteConnectionSelfRenamePatchResponseOutput } from "./definition";
@@ -74,7 +75,12 @@ export class RemoteConnectionSelfRenameRepository {
     await db
       .update(cronTasks)
       .set({ targetInstance: newInstanceId })
-      .where(eq(cronTasks.targetInstance, oldInstanceId));
+      .where(
+        and(
+          eq(cronTasks.targetInstance, oldInstanceId),
+          cronTaskOwnerScope(user, cronTasks.userId),
+        ),
+      );
 
     if (!propagate) {
       logger.info("Renamed self instance", {

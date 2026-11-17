@@ -63,8 +63,7 @@ export const translations: typeof enTranslations = {
     addButton: "Dodaj połączenie",
     emptyState:
       "Połącz kolejną instancję, a wspomnienia i narzędzia będą synchronizować się w obie strony co minutę.",
-    emptyStateCloud:
-      "Połącz swoją lokalną instalację tutaj, gdy będzie gotowa. Wspomnienia i narzędzia synchronizują się automatycznie.",
+    emptyStateCloud: "Brak połączonych instancji.",
     connectedBadge: "Połączono",
     registeredBadge: "Zarejestrowano",
     selfBadge: "Własne",
@@ -101,30 +100,37 @@ export const translations: typeof enTranslations = {
     editButton: "Edytuj",
     deleteButton: "Rozłącz",
     cloud: {
-      heroTitle: "Twoja AI. Wszędzie.",
+      heroTitle: "Twoja własna instancja",
       heroSubtitle:
-        "unbottled.ai to twój mózg w chmurze. Dodaj lokalną instancję, a twoja AI działa na obu - wspomnienia synchronizują się, narzędzia działają na twoim komputerze.",
-      benefit1: "Wspomnienia synchronizują się dwukierunkowo, automatycznie",
-      benefit2: "AI w chmurze odkrywa i uruchamia twoje lokalne narzędzia",
-      benefit3: "Deleguj zadania z chmury do swojego komputera",
-      feature1Title: "Twoje narzędzia, twój komputer",
-      feature1Body:
-        "SSH, lokalne pliki, wykonywanie kodu - AI w chmurze automatycznie odkrywa i uruchamia twoje lokalne narzędzia. Bez przekierowania portów. Bez VPN.",
-      feature2Title: "Wspólna pamięć",
-      feature2Body:
-        "Wszystko, co mówisz AI tutaj, synchronizuje się z twoją lokalną instancją. Kontekst podróżuje razem z tobą.",
-      feature3Title: "Zero uzależnienia od dostawcy",
-      feature3Body:
-        "To jest open source. Zforkuj, hostuj sam, posiadaj każdą linię. Brak czarnej skrzynki.",
-      feature4Title: "Jedno polecenie do startu",
-      feature4Body:
-        "Sklonuj repozytorium, dodaj klucz API, uruchom vibe dev. Twój osobisty stos AI działa w mniej niż minutę.",
-      githubCta: "Zobacz na GitHub →",
-      quickstartCta: "Przewodnik Quickstart",
-      alreadyHaveLocal: "Masz już lokalną instancję?",
+        "Uruchom next-vibe na własnym sprzęcie i połącz z tym kontem. Czaty, wspomnienia i skille idą za Tobą. Narzędzia działają na Twojej maszynie.",
+      stepsTitle: "Połączenie w trzech krokach",
+      step1Title: "Zainstaluj next-vibe",
+      step1Body: "Open source. Działa na laptopie, domowym serwerze albo VPS.",
+      step2Title: "Połącz ze swojej instancji",
+      step2Body:
+        "Na swojej instancji otwórz Subskrypcja, potem Synchronizacja, potem Połącz z chmurą. Podaj {{appUrl}} i dane logowania tego konta. W terminalu na tej maszynie:",
+      step2Command: "vibe remote-connect -i",
+      step3Title: "Wybierz, co się synchronizuje",
+      step3Body:
+        "Wspomnienia, dokumenty, skille, ulubione, czaty. Każde ma swój przełącznik, zmienisz go w dowolnej chwili na swojej instancji.",
+      githubCta: "Zobacz na GitHubie",
+      quickstartCta: "Szybki start",
+      trustTitle: "Co może połączona instancja",
+      trust1:
+        "Działa jako Ty. Czyta i zapisuje Twoje własne czaty, wspomnienia i skille. Nic z cudzych kont.",
+      trust2:
+        "Narzędzia administratora pozostają zablokowane. Instancja ma dokładnie te uprawnienia, co Twoje konto.",
+      trust3:
+        "Zapytania AI, które tu wysyła, zużywają Twoje kredyty po zwykłej stawce: koszt dostawcy plus 30%.",
+      trust4:
+        "Do {{max}} instancji. Odłącz jedną poniżej, a jej połączenie od razu wygaśnie.",
+      paidTitle: "Tylko dla płatnych kont",
+      paidBody:
+        "Podłączenie własnej instancji wymaga płatnego konta. Odblokuje je dowolny pakiet kredytów lub subskrypcja.",
+      paidCta: "Odblokuj",
+      alreadyHaveLocal: "Twoje połączone instancje",
       alreadyHaveLocalSub:
-        "Połącz się ze swojego lokalnego komputera - otwórz tam Połączenia zdalne i połącz z tą instancją w chmurze.",
-      connectSectionTitle: "Połącz lokalną instancję",
+        "Każda działa jako to konto. Otwórz jedną, aby sprawdzić status albo ją odłączyć.",
     },
     local: {
       cloudTitle: "Połącz z chmurą",

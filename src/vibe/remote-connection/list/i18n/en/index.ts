@@ -55,8 +55,7 @@ export const translations = {
     addButton: "Add Connection",
     emptyState:
       "Link another instance and your memories and tools sync both ways, every minute.",
-    emptyStateCloud:
-      "Link your local install here once it's running. Your memories and tools will sync automatically.",
+    emptyStateCloud: "No instance linked yet.",
     connectedBadge: "Connected",
     registeredBadge: "Registered",
     selfBadge: "Self",
@@ -96,30 +95,37 @@ export const translations = {
     },
     // Cloud marketing panel
     cloud: {
-      heroTitle: "Own Your AI. Run It Anywhere.",
+      heroTitle: "Bring your own instance",
       heroSubtitle:
-        "unbottled.ai is your cloud brain. Add a local instance and your AI operates across both - memories sync, tools run on your machine, Claude Code executes on your hardware.",
-      benefit1: "Memories sync bidirectionally, automatically",
-      benefit2: "Cloud AI discovers and runs your local tools",
-      benefit3: "Delegate tasks from cloud to your machine",
-      feature1Title: "Your tools, your machine",
-      feature1Body:
-        "SSH, local files, code execution - the cloud AI discovers and runs your local tools automatically. No port forwarding. No VPN.",
-      feature2Title: "Shared memory",
-      feature2Body:
-        "Everything you tell the AI here syncs to your local instance. Context travels with you.",
-      feature3Title: "Zero lock-in",
-      feature3Body:
-        "It's open source. Fork it, self-host it, own every line. No black box.",
-      feature4Title: "One command to start",
-      feature4Body:
-        "Clone the repo, add your API key, run vibe dev. Your personal AI stack is live in under a minute.",
-      githubCta: "View on GitHub →",
-      quickstartCta: "Quickstart Guide",
-      alreadyHaveLocal: "Already running a local instance?",
+        "Run next-vibe on your own hardware and link it to this account. Your chats, memories and skills follow you. Your tools run on your machine.",
+      stepsTitle: "Connect in three steps",
+      step1Title: "Install next-vibe",
+      step1Body: "Open source. Runs on a laptop, a home server or a VPS.",
+      step2Title: "Link it from your instance",
+      step2Body:
+        "On your instance open Subscription, then Cloud Sync, then Connect to Cloud. Enter {{appUrl}} and the login of this account. In a terminal on that machine:",
+      step2Command: "vibe remote-connect -i",
+      step3Title: "Pick what syncs",
+      step3Body:
+        "Memories, documents, skills, favorites, chats. One switch each, changed any time on your instance.",
+      githubCta: "View on GitHub",
+      quickstartCta: "Quick start",
+      trustTitle: "What a linked instance can do",
+      trust1:
+        "It acts as you. It reads and writes your own chats, memories and skills. Nothing from any other account.",
+      trust2:
+        "Admin tools stay locked. Your instance gets exactly the rights your account has.",
+      trust3:
+        "AI runs it sends here bill your credits at the normal rate: provider cost plus 30%.",
+      trust4:
+        "Up to {{max}} instances. Disconnect one below and its link stops at once.",
+      paidTitle: "Paid accounts only",
+      paidBody:
+        "Linking your own instance needs a paid account. Any credit pack or subscription unlocks it.",
+      paidCta: "Unlock it",
+      alreadyHaveLocal: "Your linked instances",
       alreadyHaveLocalSub:
-        "Connect from your local machine - open Remote Connections there and link it to this cloud instance.",
-      connectSectionTitle: "Link Your Local Instance",
+        "Each one acts as this account. Open one to check its status or disconnect it.",
     },
     // Local panel
     local: {

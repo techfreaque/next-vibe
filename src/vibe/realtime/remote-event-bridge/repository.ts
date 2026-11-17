@@ -23,9 +23,16 @@ import "server-only";
 
 import { and, eq } from "drizzle-orm";
 
-import { defaultLocale } from "../../core/i18n/core/config";
+import {
+  type CountryLanguage,
+  defaultLocale,
+} from "../../core/i18n/core/config";
 import type { ResponseType } from "../../core/route/response.schema";
-import { success } from "../../core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "../../core/route/response.schema";
 import { db } from "../../database";
 import type {
   JwtPayloadType,
@@ -543,8 +550,27 @@ export class RemoteEventBridgeRepository {
     data: RemoteEventBridgeRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<RemoteEventBridgeResponseOutput>> {
     const userId = "id" in user && typeof user.id === "string" ? user.id : null;
+
+    // Non-admins: only a paid account with an active connection may relay
+    // events here, within its rate budget. Without this, any signed-in
+    // account could drive every onRemoteEvent applier on this instance.
+    const { checkRemoteCustomerAccess } =
+      await import("../../remote-connection/customer-access/access");
+    const access = await checkRemoteCustomerAccess({
+      user,
+      purpose: "bridge",
+      locale,
+      logger,
+    });
+    if (!access.allowed) {
+      return fail({
+        message: access.message,
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
 
     if (data.eventName === BRIDGE_TRANSPORT_EVENT) {
       await RemoteEventBridgeRepository.handleRemoteEvent(
@@ -629,7 +655,10 @@ export class RemoteEventBridgeRepository {
       if (!rolesResult.success) {
         logger.error(
           "[RemoteEventBridge] Failed to resolve user roles for relayed event",
-          { userId, eventName: envelope.eventName },
+          {
+            userId,
+            eventName: envelope.eventName,
+          },
         );
         return;
       }

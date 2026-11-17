@@ -54,6 +54,7 @@ import {
   type VideoGenModelSelection,
   videoGenModelSelectionSchema,
 } from "../../video-generation/models";
+import { isSkillVisibleToUser } from "../resolver";
 import { chatFavorites } from "./db";
 import type { VariantsModeValue } from "./enum";
 import { VariantsModeDB } from "./enum";
@@ -335,6 +336,17 @@ export const favoritesSyncProvider: SyncProvider = {
               .where(eq(chatFavorites.id, existing.id));
           }
         } else {
+          // skillId is peer-controlled: only accept a pointer to a skill this
+          // user could favorite locally (built-in, own, or PUBLIC) so a peer
+          // can't reference (and later resolve) another user's private skill.
+          if (!(await isSkillVisibleToUser(remoteFav.skillId, userId))) {
+            logger.warn("Synced favorite dropped: skill not visible to user", {
+              userId,
+              id: remoteFav.id,
+              skillId: remoteFav.skillId,
+            });
+            continue;
+          }
           // New favorite — insert with remote's UUID for stable dedup
           insertRows.push({
             id: remoteFav.id,

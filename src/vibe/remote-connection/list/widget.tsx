@@ -1,8 +1,9 @@
 /**
  * Remote Connections Widget
  *
- * Cloud context:  Marketing panel (sell local install) + read-only connection
- *                 list. Connecting is done from the local side, not from cloud.
+ * Cloud context:  Connect guide (paid gate for unpaid customers), what a linked
+ *                 instance may do, and the account's linked instances (view +
+ *                 disconnect). Connecting is done from the instance, not here.
  * Local context:  "Connect to cloud" pitch + existing connection list.
  */
 
@@ -25,17 +26,20 @@ import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Link2 } from "next-vibe/ui/components/icons/Link2";
+import { Lock } from "next-vibe/ui/components/icons/Lock";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Shield } from "next-vibe/ui/components/icons/Shield";
 import { SiGithub } from "next-vibe/ui/components/icons/SiGithub";
+import { Terminal } from "next-vibe/ui/components/icons/Terminal";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { WifiOff } from "next-vibe/ui/components/icons/WifiOff";
 import { Link } from "next-vibe/ui/components/link";
 import { Separator } from "next-vibe/ui/components/separator";
 import { Span } from "next-vibe/ui/components/span";
-import { H3, P } from "next-vibe/ui/components/typography";
+import { Code, H3, P } from "next-vibe/ui/components/typography";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import type { JSX } from "react";
 import { useState } from "react";
@@ -360,12 +364,15 @@ function ConnectionRow({
   t,
   onPick,
   isPickerMode,
+  canManage,
 }: {
   conn: RemoteConnection;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
   onPick: ((conn: RemoteConnection) => void) | undefined;
   isPickerMode: boolean;
+  /** Settings (PATCH) are admin-only; customers view and disconnect. */
+  canManage: boolean;
 }): JSX.Element {
   const isSelf = !conn.hasToken && conn.remoteUrl === "";
   const health = conn.healthStatus;
@@ -471,10 +478,10 @@ function ConnectionRow({
 
       {!isPickerMode && (
         <Div className="flex items-center gap-1 flex-shrink-0">
-          {!isSelf && conn.hasToken && !isIncoming && (
+          {canManage && !isSelf && conn.hasToken && !isIncoming && (
             <ReconnectButton conn={conn} t={t} />
           )}
-          <EditButton conn={conn} navigate={navigate} t={t} />
+          {canManage && <EditButton conn={conn} navigate={navigate} t={t} />}
           {!isSelf && (
             <DisconnectButton conn={conn} navigate={navigate} t={t} />
           )}
@@ -488,112 +495,194 @@ function ConnectionRow({
   );
 }
 
-// ─── Feature card (cloud marketing) ──────────────────────────────────────────
+// ─── Cloud view: connect guide + the account's linked instances ──────────────
 
-function FeatureCard({
+function GuideStep({
+  index,
   title,
   body,
+  children,
 }: {
+  index: number;
   title: string;
   body: string;
+  children?: JSX.Element;
 }): JSX.Element {
   return (
-    <Div className="flex flex-col gap-1.5 p-4 rounded-lg border bg-card">
-      <Div className="flex items-center gap-2">
-        <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0" />
+    <Div className="flex gap-3">
+      <Span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+        {index}
+      </Span>
+      <Div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <Span className="text-sm font-semibold">{title}</Span>
+        <P className="m-0 text-sm leading-relaxed text-muted-foreground">
+          {body}
+        </P>
+        {children}
       </Div>
-      <P className="text-xs text-muted-foreground leading-relaxed">{body}</P>
     </Div>
   );
 }
 
-// ─── Cloud view: marketing + read-only connection list ────────────────────────
+function TrustLine({ text }: { text: string }): JSX.Element {
+  return (
+    <Div className="flex items-start gap-2">
+      <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+      <P className="m-0 text-sm text-muted-foreground">{text}</P>
+    </Div>
+  );
+}
 
 function CloudView({
   connections,
+  access,
   navigate,
   t,
   onPick,
   isPickerMode,
+  isAdmin,
 }: {
   connections: RemoteConnection[];
+  access: { canConnect: boolean; maxConnections: number | null };
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
   onPick: ((conn: RemoteConnection) => void) | undefined;
   isPickerMode: boolean;
+  isAdmin: boolean;
 }): JSX.Element {
+  const appUrl = envClient.NEXT_PUBLIC_APP_URL ?? "";
+  const openBuy = (): void => {
+    void (async (): Promise<void> => {
+      const def = await import("@/subscription/create/definition");
+      navigate(def.default.POST, {});
+    })();
+  };
+
   return (
     <Div className="flex flex-col gap-6 p-4">
-      {/* Hero + features + CTA — full mode only */}
       {!isPickerMode && (
         <>
           <Div className="flex flex-col gap-2">
             <H3 className="text-xl font-bold tracking-tight">
               {t("widget.cloud.heroTitle")}
             </H3>
-            <P className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
+            <P className="m-0 max-w-2xl text-sm leading-relaxed text-muted-foreground">
               {t("widget.cloud.heroSubtitle")}
             </P>
           </Div>
 
-          <Div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <FeatureCard
-              title={t("widget.cloud.feature1Title")}
-              body={t("widget.cloud.feature1Body")}
-            />
-            <FeatureCard
-              title={t("widget.cloud.feature2Title")}
-              body={t("widget.cloud.feature2Body")}
-            />
-            <FeatureCard
-              title={t("widget.cloud.feature3Title")}
-              body={t("widget.cloud.feature3Body")}
-            />
-            <FeatureCard
-              title={t("widget.cloud.feature4Title")}
-              body={t("widget.cloud.feature4Body")}
-            />
-          </Div>
+          {!access.canConnect ? (
+            <Div
+              data-testid="remote-paid-gate"
+              className="flex flex-col gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <Div className="flex items-start gap-3">
+                <Lock className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+                <Div className="flex flex-col gap-0.5">
+                  <Span className="text-sm font-semibold">
+                    {t("widget.cloud.paidTitle")}
+                  </Span>
+                  <Span className="text-sm text-muted-foreground">
+                    {t("widget.cloud.paidBody")}
+                  </Span>
+                </Div>
+              </Div>
+              <Button
+                type="button"
+                className="h-11 shrink-0 sm:h-10"
+                onClick={openBuy}
+              >
+                {t("widget.cloud.paidCta")}
+              </Button>
+            </Div>
+          ) : (
+            <Div
+              data-testid="remote-connect-guide"
+              className="flex flex-col gap-5 rounded-lg border bg-card p-4 sm:p-5"
+            >
+              <Span className="text-sm font-semibold">
+                {t("widget.cloud.stepsTitle")}
+              </Span>
+              <GuideStep
+                index={1}
+                title={t("widget.cloud.step1Title")}
+                body={t("widget.cloud.step1Body")}
+              >
+                <Div className="flex flex-wrap gap-2 pt-1">
+                  <Link
+                    href={GITHUB_REPO_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-9 items-center gap-2 rounded-md bg-foreground px-3 text-sm font-medium text-background no-underline transition-opacity hover:opacity-90"
+                  >
+                    <SiGithub className="h-4 w-4" />
+                    {t("widget.cloud.githubCta")}
+                  </Link>
+                  <Link
+                    href={`${GITHUB_REPO_URL}#quick-start`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm font-medium no-underline transition-colors hover:bg-muted"
+                  >
+                    {t("widget.cloud.quickstartCta")}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Div>
+              </GuideStep>
+              <GuideStep
+                index={2}
+                title={t("widget.cloud.step2Title")}
+                body={t("widget.cloud.step2Body", { appUrl })}
+              >
+                <Div className="flex items-center gap-2 overflow-x-auto rounded-md border bg-muted/50 px-3 py-2">
+                  <Terminal className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                  <Code className="whitespace-nowrap bg-transparent p-0 text-xs">
+                    {t("widget.cloud.step2Command")}
+                  </Code>
+                </Div>
+              </GuideStep>
+              <GuideStep
+                index={3}
+                title={t("widget.cloud.step3Title")}
+                body={t("widget.cloud.step3Body")}
+              />
+            </Div>
+          )}
 
-          <Div className="flex flex-wrap gap-3">
-            <Link
-              href={GITHUB_REPO_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-foreground text-background text-sm font-medium hover:opacity-90 transition-opacity"
-            >
-              <SiGithub className="h-4 w-4" />
-              {t("widget.cloud.githubCta")}
-            </Link>
-            <Link
-              href={`${GITHUB_REPO_URL}#quick-start`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-md border text-sm font-medium hover:bg-muted transition-colors"
-            >
-              {t("widget.cloud.quickstartCta")}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+          <Div className="flex flex-col gap-2.5">
+            <Div className="flex items-center gap-2">
+              <Shield className="h-4 w-4 text-muted-foreground" />
+              <Span className="text-sm font-semibold">
+                {t("widget.cloud.trustTitle")}
+              </Span>
+            </Div>
+            <TrustLine text={t("widget.cloud.trust1")} />
+            <TrustLine text={t("widget.cloud.trust2")} />
+            <TrustLine text={t("widget.cloud.trust3")} />
+            {access.maxConnections !== null && (
+              <TrustLine
+                text={t("widget.cloud.trust4", { max: access.maxConnections })}
+              />
+            )}
           </Div>
 
           <Separator />
         </>
       )}
 
-      {/* Connected instances (read-only on cloud) */}
+      {/* Linked instances: view + disconnect (settings live on the instance) */}
       <Div className="flex flex-col gap-4">
         <Div className="flex flex-col gap-1">
           <Span className="text-sm font-semibold">
             {t("widget.cloud.alreadyHaveLocal")}
           </Span>
-          <P className="text-xs text-muted-foreground">
+          <P className="m-0 text-xs text-muted-foreground">
             {t("widget.cloud.alreadyHaveLocalSub")}
           </P>
         </Div>
 
         {connections.length > 0 ? (
-          <Div className="flex flex-col divide-y rounded-lg border overflow-hidden">
+          <Div className="flex flex-col divide-y overflow-hidden rounded-lg border">
             {connections.map((conn) => (
               <ConnectionRow
                 key={conn.instanceId}
@@ -602,14 +691,15 @@ function CloudView({
                 t={t}
                 onPick={onPick}
                 isPickerMode={isPickerMode}
+                canManage={isAdmin}
               />
             ))}
           </Div>
         ) : (
-          <Div className="flex flex-col items-start gap-3 p-4 rounded-lg border border-dashed bg-muted/30">
+          <Div className="flex flex-col items-start gap-3 rounded-lg border border-dashed bg-muted/30 p-4">
             <Div className="flex items-center gap-2 text-muted-foreground">
               <WifiOff className="h-4 w-4" />
-              <P className="text-sm">{t("widget.emptyStateCloud")}</P>
+              <P className="m-0 text-sm">{t("widget.emptyStateCloud")}</P>
             </Div>
           </Div>
         )}
@@ -730,6 +820,7 @@ function LocalView({
               t={t}
               onPick={onPick}
               isPickerMode={isPickerMode}
+              canManage={isAdmin}
             />
           ))}
         </Div>
@@ -768,16 +859,20 @@ export function RemoteConnectionsListContainer(): JSX.Element {
   const isAdmin =
     !user.isPublic && user.roles?.includes(UserPermissionRole.ADMIN) === true;
 
-  if (isCloud) {
+  // Non-admins can only ever be connected TO (connect is admin-only), so they
+  // get the connect guide on any instance, not the admin's local panel.
+  if (isCloud || !isAdmin) {
     return (
       <WidgetShell>
         <CreditsTabHeader activeTab="remote" />
         <CloudView
           connections={connections}
+          access={data?.access ?? { canConnect: isAdmin, maxConnections: null }}
           navigate={navigate}
           t={t}
           onPick={onPick}
           isPickerMode={isPickerMode}
+          isAdmin={isAdmin}
         />
       </WidgetShell>
     );

@@ -5,9 +5,9 @@
 
 import "server-only";
 
-import { desc, lt, sql as sqlFn } from "drizzle-orm";
+import { and, desc, eq, lt, sql as sqlFn } from "drizzle-orm";
 
-import { chatMessages } from "../../agent/chat/db";
+import { chatMessages, chatThreads } from "../../agent/chat/db";
 import { defaultLocale } from "../../core/i18n/core/config";
 import type { RemoteEventHandlerProps } from "../../core/route/handler-realtime";
 import type { WidgetData } from "../../core/utils/json";
@@ -19,6 +19,7 @@ import { CallbackMode } from "../constants";
 import { pendingCallResults } from "../db";
 import type executeDefinition from "../definition";
 import { TaskCompletion } from "./completion";
+import { pendingResultKey } from "./inbound-guards";
 import { PendingCalls } from "./pending-calls";
 import { ResultSignals } from "./result-signals";
 
@@ -37,25 +38,36 @@ import { ResultSignals } from "./result-signals";
  * PendingCalls.awaitResult): those are skipped — the durable handoff row
  * written by handleToolResult delivers the result to the live waiter, and
  * reviving would double-deliver.
+ *
+ * Scoped to `userId` (the account whose connection delivered the result):
+ * only tool messages in THAT user's threads are candidates, and the revival
+ * runs as the thread owner — never as the wire-influenced message authorId.
  */
 export async function reviveFromToolMessage(
   callId: string,
   status: "completed" | "failed",
   output: Record<string, WidgetData> | null,
   logger: EndpointLogger,
+  userId: string,
 ): Promise<void> {
   // Deterministic callIds (fixture mode strips the random tail) recur across
   // streams, so several historical tool messages can carry this pendingCallId.
   // Newest-first + skip already-settled messages targets the CURRENTLY parked
   // dispatch instead of no-op-reviving a stale thread from an earlier run.
-  const candidates = await db
-    .select()
-    .from(chatMessages)
-    .where(
-      sqlFn`${chatMessages.metadata}->'toolCall'->>'pendingCallId' = ${callId}`,
-    )
-    .orderBy(desc(chatMessages.createdAt))
-    .limit(5);
+  const candidates = (
+    await db
+      .select({ message: chatMessages })
+      .from(chatMessages)
+      .innerJoin(chatThreads, eq(chatThreads.id, chatMessages.threadId))
+      .where(
+        and(
+          eq(chatThreads.userId, userId),
+          sqlFn`${chatMessages.metadata}->'toolCall'->>'pendingCallId' = ${callId}`,
+        ),
+      )
+      .orderBy(desc(chatMessages.createdAt))
+      .limit(5)
+  ).map((r) => r.message);
   const msg =
     candidates.find((m) => {
       const s = m.metadata?.toolCall?.status;
@@ -76,8 +88,9 @@ export async function reviveFromToolMessage(
     return;
   }
 
+  // Owner = the thread owner (enforced by the join above), not authorId.
   const ownerCtx = await resolveTaskOwnerUser(
-    dbUserIdToOwner(msg.authorId),
+    dbUserIdToOwner(userId),
     defaultLocale,
     logger,
   );
@@ -139,7 +152,19 @@ export async function handleToolResult(
   // relying on the in-memory PendingCalls being in THIS process.
   ResultSignals.deliver(taskId, { status, output, hint }, props.user, logger);
 
-  const outcome = PendingCalls.complete(taskId, { status, output });
+  // User-scoped: a peer of account A must never resolve account B's call.
+  const outcome = PendingCalls.complete(
+    taskId,
+    { status, output },
+    props.user.id,
+  );
+  if (outcome.kind === "foreign") {
+    logger.warn(
+      "[RouteExecute] tool-execute-result: pending call belongs to another user — dropped",
+      { callId: taskId, userId: props.user.id },
+    );
+    return;
+  }
 
   // The receiver relays its execute() data ({ result: <tool output> }); the
   // WAIT path peels that wrapper in remote.ts. Parked/revived tool messages
@@ -159,6 +184,7 @@ export async function handleToolResult(
       locale: props.locale,
       logger,
       abortSignal: new AbortController().signal,
+      expectedUserId: props.user.id,
     });
     return;
   }
@@ -171,9 +197,16 @@ export async function handleToolResult(
     // retrieves it minutes later, so it needs a DURABLE store. Persist it for
     // PendingCalls.getReconciled (await-task's cross-process read). WAIT never
     // depends on this row — it is resolved live by the signal.
+    // Keyed by (user, callId) via pendingResultKey: the reader only consumes
+    // its own user's namespace, so a foreign peer can neither feed another
+    // account's call nor pre-empt its row (onConflictDoNothing).
     await db
       .insert(pendingCallResults)
-      .values({ callId: taskId, status, output })
+      .values({
+        callId: pendingResultKey(props.user.id, taskId),
+        status,
+        output,
+      })
       .onConflictDoNothing()
       .catch((err: Error) => {
         logger.warn("[RouteExecute] failed to persist detached tool result", {
@@ -188,6 +221,12 @@ export async function handleToolResult(
       .catch(() => undefined);
 
     // Parked-thread wakeUp: revive the thread from its tool message.
-    await reviveFromToolMessage(taskId, status, storedOutput, logger);
+    await reviveFromToolMessage(
+      taskId,
+      status,
+      storedOutput,
+      logger,
+      props.user.id,
+    );
   }
 }

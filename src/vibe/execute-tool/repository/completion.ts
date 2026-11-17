@@ -895,9 +895,30 @@ export class TaskCompletion {
     locale: CountryLanguage;
     logger: EndpointLogger;
     abortSignal: AbortSignal;
+    /** Wire-driven callers (remote tool-execute-result): only fire a parked
+     *  task owned by this user — the peer chooses taskId, and the task fires
+     *  as its owner. Checked BEFORE enabling/merging the result. */
+    expectedUserId?: string;
   }): Promise<boolean> {
     const { taskId, status, output, locale, logger, abortSignal } = params;
     const parkedId = `resume-stream-parked-${taskId}`;
+    if (params.expectedUserId !== undefined) {
+      const [ownerRow] = await db
+        .select({ userId: cronTasks.userId })
+        .from(cronTasks)
+        .where(eq(cronTasks.id, parkedId))
+        .limit(1);
+      if (!ownerRow) {
+        return false;
+      }
+      if (ownerRow.userId !== params.expectedUserId) {
+        logger.warn(
+          "[TaskCompletion] parked resume-stream belongs to another user — not fired",
+          { parkedId, expectedUserId: params.expectedUserId },
+        );
+        return false;
+      }
+    }
     const wakeUpStatus = status === "completed" ? "completed" : "failed";
     const wakeUpResult: Record<string, WidgetData> | undefined =
       output !== null && output !== undefined ? output : undefined;

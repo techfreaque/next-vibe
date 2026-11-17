@@ -1321,9 +1321,27 @@ export class SkillsRepository {
                 ownershipType: insertValues.ownershipType,
                 compactTrigger: insertValues.compactTrigger,
               },
+              // Slugs are globally unique and the relayed slug is peer-chosen:
+              // only refresh a row this user already owns. Another user's skill
+              // with the same slug is left untouched (no row returned).
+              setWhere: eq(customSkills.userId, userId),
             })
             .returning()
         : await db.insert(customSkills).values(insertValues).returning();
+
+      if (!skill) {
+        logger.warn(
+          "Relayed skill create rejected: slug owned by another user",
+          {
+            userId,
+            slug,
+          },
+        );
+        return fail({
+          message: t("post.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
 
       // Fire-and-forget: sync embedding for vector search
       if (skill) {
@@ -1953,13 +1971,24 @@ export class SkillsRepository {
     try {
       const { parseSkillId: parse } = await import("../chat/slugify");
       const { skillId: resolvedId } = parse(skillId);
-      const [{ eq: eqOp }, { db: database }, { customSkills: cs }] =
-        await Promise.all([
-          import("drizzle-orm"),
-          import("next-vibe/database"),
-          import("./db"),
-        ]);
-      await database.delete(cs).where(eqOp(cs.slug, resolvedId));
+      // Peer-controlled slug: only delete the caller's own non-system skill.
+      const deleted = await db
+        .delete(customSkills)
+        .where(
+          and(
+            eq(customSkills.slug, resolvedId),
+            eq(customSkills.userId, user.id),
+            ne(customSkills.ownershipType, SkillOwnershipType.SYSTEM),
+          ),
+        )
+        .returning({ id: customSkills.id });
+      if (deleted.length === 0) {
+        logger.warn("Relayed skill delete ignored: not owned by user", {
+          userId: user.id,
+          skillId,
+        });
+        return;
+      }
     } catch (err) {
       logger.error("applyRemoteSkillDeleteById failed", {
         skillId,
@@ -1992,14 +2021,9 @@ export class SkillsRepository {
     try {
       const { parseSkillId: parse } = await import("../chat/slugify");
       const { skillId: resolvedId } = parse(skillId);
-      const [{ eq: eqOp }, { db: database }, { customSkills: cs }] =
-        await Promise.all([
-          import("drizzle-orm"),
-          import("next-vibe/database"),
-          import("./db"),
-        ]);
-      await database
-        .update(cs)
+      // Peer-controlled slug: only update the caller's own skill.
+      const updated = await db
+        .update(customSkills)
         .set({
           name: requestData.name,
           tagline: requestData.tagline,
@@ -2007,7 +2031,20 @@ export class SkillsRepository {
           description: requestData.description,
           category: requestData.category,
         })
-        .where(eqOp(cs.slug, resolvedId));
+        .where(
+          and(
+            eq(customSkills.slug, resolvedId),
+            eq(customSkills.userId, user.id),
+          ),
+        )
+        .returning({ id: customSkills.id });
+      if (updated.length === 0) {
+        logger.warn("Relayed skill update ignored: not owned by user", {
+          userId: user.id,
+          skillId,
+        });
+        return;
+      }
     } catch (err) {
       logger.error("applyRemoteSkillPartialUpdate failed", {
         skillId,

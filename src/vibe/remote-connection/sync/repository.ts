@@ -162,6 +162,24 @@ export class TaskSyncRepository {
       });
     }
 
+    // Non-admins: paid account + active connection + rate budget. Without a
+    // row the scope below would fall back to "all domains" (null scope), so
+    // the gate also keeps unconnected accounts off the push/serve path.
+    const { checkRemoteCustomerAccess, isRemoteAdmin } =
+      await import("../customer-access/access");
+    const access = await checkRemoteCustomerAccess({
+      user,
+      purpose: "sync",
+      locale,
+      logger,
+    });
+    if (!access.allowed) {
+      return fail({
+        message: access.message,
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
+
     const { RemoteConnectionRepository: RemoteRepoReport } =
       await import("../repository");
     const { remoteConnections: connTable } = await import("../db");
@@ -175,11 +193,28 @@ export class TaskSyncRepository {
     if (data.instanceId) {
       conditions.push(eq(connTable.instanceId, data.instanceId));
     }
-    const [connRow] = await db
+    let [connRow] = await db
       .select()
       .from(connTable)
       .where(and(...conditions))
       .limit(1);
+
+    if (!connRow && !isRemoteAdmin(user)) {
+      // Peers send their DERIVED default id, which drifts from our label after
+      // a self-rename. A customer never syncs under the null "all domains"
+      // scope: fall back to one of THEIR rows, so a real scope always applies.
+      [connRow] = await db
+        .select()
+        .from(connTable)
+        .where(and(eq(connTable.userId, user.id), eq(connTable.isActive, true)))
+        .limit(1);
+      if (!connRow) {
+        return fail({
+          message: syncT("taskSync.post.errors.notFound.title"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+    }
 
     const instanceId = connRow?.instanceId ?? data.instanceId ?? "unknown";
 

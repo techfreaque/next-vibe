@@ -29,6 +29,11 @@ import { CallbackMode } from "../constants";
 import executeDefinition, {
   type RouteExecuteResponseOutput,
 } from "../definition";
+import {
+  isAdminUser,
+  isThreadOwnedByUser,
+  resolveInboundPlatform,
+} from "./inbound-guards";
 import { RouteExecuteRepository } from "./index";
 
 /**
@@ -42,6 +47,10 @@ import { RouteExecuteRepository } from "./index";
  * Lives here rather than on RouteExecuteRepository because this file is its only
  * producer AND its only consumer — it guards inbound WIRE deliveries, which is
  * precisely what a deployment without a wire protocol never has.
+ *
+ * Keyed `${userId}:${callId}`: callIds are peer-chosen (and deterministic in
+ * fixture mode), so a bare-callId key let one account's peer squat another
+ * account's in-flight id and suppress its delivery.
  */
 const inFlightIncomingCalls = new Set<string>();
 
@@ -117,15 +126,16 @@ export async function handleIncomingToolRequest(
 ): Promise<void> {
   const { requestData, payload: roundtrip, user, logger } = props;
   const localUserId = user.id;
+  const inFlightKey = `${localUserId}:${roundtrip.callId}`;
 
-  if (inFlightIncomingCalls.has(roundtrip.callId)) {
+  if (inFlightIncomingCalls.has(inFlightKey)) {
     logger.debug(
       "[RouteExecute] handleIncomingToolRequest: duplicate delivery — skipped",
       { callId: roundtrip.callId },
     );
     return;
   }
-  inFlightIncomingCalls.add(roundtrip.callId);
+  inFlightIncomingCalls.add(inFlightKey);
 
   const owner = dbUserIdToOwner(localUserId);
   const taskUserCtx = await resolveTaskOwnerUser(owner, defaultLocale, logger);
@@ -134,8 +144,57 @@ export async function handleIncomingToolRequest(
       "[RouteExecute] handleIncomingToolRequest: failed to resolve user",
       { localUserId },
     );
-    inFlightIncomingCalls.delete(roundtrip.callId);
+    inFlightIncomingCalls.delete(inFlightKey);
     return;
+  }
+
+  // The peer controls the whole roundtrip payload: reduce its caller-context
+  // claims to what THIS account may use. Admins keep them verbatim (their own
+  // instances, e.g. `vibe --remote=<id> <tool>`); non-admins get the platform
+  // clamped and foreign skills/threads dropped.
+  const isAdmin = isAdminUser(taskUserCtx.user);
+  const inboundPlatform = resolveInboundPlatform(
+    taskUserCtx.user,
+    roundtrip.callerPlatform,
+  );
+  // Dynamic: the skills resolver pulls the model catalog; keep it off this
+  // module's static graph (same reason as the i18n import below).
+  const { isSkillVisibleToUser } = await import("../../agent/skills/resolver");
+  const claimedSkillId = roundtrip.callerSkillId;
+  const callerSkillId =
+    claimedSkillId &&
+    (isAdmin ||
+      // DB failure fails closed (drop), never leaks the in-flight key.
+      (await isSkillVisibleToUser(claimedSkillId, localUserId).catch(
+        () => false,
+      )))
+      ? claimedSkillId
+      : undefined;
+  const claimedThreadId = roundtrip.toolExecutionContext;
+  const callerThreadId =
+    claimedThreadId &&
+    (isAdmin ||
+      (await isThreadOwnedByUser(claimedThreadId, localUserId).catch(
+        () => false,
+      )))
+      ? claimedThreadId
+      : undefined;
+  if (
+    inboundPlatform !== (roundtrip.callerPlatform ?? Platform.AI) ||
+    callerSkillId !== (claimedSkillId || undefined) ||
+    callerThreadId !== (claimedThreadId || undefined)
+  ) {
+    logger.warn(
+      "[RouteExecute] handleIncomingToolRequest: caller context narrowed",
+      {
+        callId: roundtrip.callId,
+        localUserId,
+        claimedPlatform: roundtrip.callerPlatform ?? null,
+        inboundPlatform,
+        skillDropped: callerSkillId === undefined && !!claimedSkillId,
+        threadDropped: callerThreadId === undefined && !!claimedThreadId,
+      },
+    );
   }
 
   const { scopedTranslation } = await import("../../platforms/ai/i18n");
@@ -163,7 +222,7 @@ export async function handleIncomingToolRequest(
       success: result.success,
       originInstanceId: props.originInstanceId ?? null,
     });
-    inFlightIncomingCalls.delete(roundtrip.callId);
+    inFlightIncomingCalls.delete(inFlightKey);
     // Fan the result back over the RECEIVER's local connections (keyed by
     // our local userId, NOT the requester's id — the bridge resolves the
     // back leg from our remoteConnections rows). The requester matches by
@@ -198,12 +257,8 @@ export async function handleIncomingToolRequest(
   const receiverCtx: ToolExecutionContext = {
     // no user context — UTC (dates not user-facing here); wire payload carries
     // only the fixture-scope threadId, not the caller's timezone.
-    ...makeHeadlessContext(
-      abortController.signal,
-      roundtrip.toolExecutionContext,
-      "UTC",
-    ),
-    skillId: roundtrip.callerSkillId ?? undefined,
+    ...makeHeadlessContext(abortController.signal, callerThreadId, "UTC"),
+    skillId: callerSkillId,
     favoriteId: roundtrip.callerFavoriteId ?? undefined,
     ...(isAsyncMode
       ? {
@@ -239,8 +294,10 @@ export async function handleIncomingToolRequest(
       receiverCtx,
       // Gate under the CALLER's original surface — the RELAY dispatches
       // ai-stream itself (AI_TOOL_OFF), which must not be gated as an AI
-      // tool call. AI-model calls arrive with callerPlatform=AI.
-      roundtrip.callerPlatform ?? Platform.AI,
+      // tool call. AI-model calls arrive with callerPlatform=AI. Non-admin
+      // claims are clamped (resolveInboundPlatform): CLI_PACKAGE would hit
+      // CLI_AUTH_BYPASS and run admin-only endpoints.
+      inboundPlatform,
     );
 
   if (isAsyncMode) {
@@ -263,7 +320,7 @@ export async function handleIncomingToolRequest(
   void (async (): Promise<void> => {
     await relayResult(await runExecute());
   })().catch((error: Error) => {
-    inFlightIncomingCalls.delete(roundtrip.callId);
+    inFlightIncomingCalls.delete(inFlightKey);
     logger.error(
       "[RouteExecute] handleIncomingToolRequest: WAIT execution failed",
       { callId: roundtrip.callId, error: error.message },

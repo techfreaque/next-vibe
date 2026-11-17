@@ -7,9 +7,9 @@
  *   CR1  — POST with missing instanceId fails validation
  *   CR2  — POST with missing localUrl fails validation
  *   CR3  — POST with invalid localUrl fails validation
- *   CR4  — POST is admin-only
+ *   CR4  — POST rejects an unpaid customer (customer-access gate)
  *   CRU1 — PATCH update with unknown instanceId returns not-found
- *   CRU2 — PATCH update is admin-only
+ *   CRU2 — PATCH update by a customer without that connection is rejected
  */
 
 import "server-only";
@@ -89,7 +89,7 @@ describe("Remote Connection connect-reverse", () => {
 
   // ── CR4 ────────────────────────────────────────────────────────────────────
 
-  it("CR4: POST register is admin-only", async () => {
+  it("CR4: POST register rejects an unpaid customer", async () => {
     const result = await sendTestRequest({
       toolExecutionContext: undefined,
       endpoint: definitions.POST,
@@ -133,7 +133,7 @@ describe("Remote Connection connect-reverse", () => {
 
   // ── CRU2 ───────────────────────────────────────────────────────────────────
 
-  it("CRU2: PATCH update is admin-only", async () => {
+  it("CRU2: PATCH update rejects a customer without that connection", async () => {
     const result = await sendTestRequest({
       toolExecutionContext: undefined,
       endpoint: updateDefinitions.PATCH,

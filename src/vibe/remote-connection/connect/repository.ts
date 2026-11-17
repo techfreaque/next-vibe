@@ -25,6 +25,7 @@ import type { CountryLanguage } from "../../core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
+  failInline,
   type ResponseType,
   success,
 } from "../../core/route/response.schema";
@@ -105,6 +106,8 @@ export class RemoteConnectionConnectRepository {
     ok: boolean;
     conflict: boolean;
     forbidden?: boolean;
+    /** The peer's own (localized) reason for a 403, e.g. "paid account needed". */
+    remoteMessage?: string;
     remoteInstanceId: string | null;
     remoteUserId: string | null;
     transportMode?: TransportMode;
@@ -178,6 +181,7 @@ export class RemoteConnectionConnectRepository {
         ok: false,
         conflict: false,
         forbidden: true,
+        remoteMessage: result.success ? undefined : result.message,
         remoteInstanceId: null,
         remoteUserId: null,
       };
@@ -404,6 +408,14 @@ export class RemoteConnectionConnectRepository {
         logger,
       });
 
+    if (!registerResult.ok && registerResult.remoteMessage) {
+      // The peer said why (paid account, connection limit, rate limit): show
+      // that instead of the generic "not accepting connections".
+      return failInline({
+        message: registerResult.remoteMessage,
+        errorType: ErrorResponseTypes.FORBIDDEN,
+      });
+    }
     if (!registerResult.ok) {
       return fail({
         message: registerResult.conflict

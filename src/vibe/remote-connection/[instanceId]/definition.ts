@@ -45,7 +45,10 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["vibe", "remote-connection", "[instanceId]"],
-  allowedRoles: [UserRole.ADMIN] as const,
+  // Customers see and revoke their own connected instances (rows are
+  // user-scoped). Settings stay admin-only: a customer manages its
+  // connection from its own instance, which mirrors changes here.
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "get.title" as const,
   titleShort: "get.titleShort" as const,
@@ -512,7 +515,7 @@ const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
   path: ["vibe", "remote-connection", "[instanceId]"],
-  allowedRoles: [UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "delete.title" as const,
   titleShort: "delete.titleShort" as const,

@@ -285567,6 +285567,1424 @@
     "credits": 0
   },
   {
+    "toolName": "remote-status",
+    "title": "État de la connexion distante",
+    "titleShort": "Connexion",
+    "description": "État complet et paramètres d'une connexion distante",
+    "fields": {
+      "usage": {
+        "response": true,
+        "request": "urlPathParams"
+      },
+      "children": {
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "response": true
+          },
+          "type": "navigate_button",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
+        "instanceId": {
+          "type": "form_field",
+          "fieldType": "entity_picker",
+          "labelField": "name",
+          "label": "ID d'instance",
+          "description": "L'instance de connexion à afficher",
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}]
+            },
+            "type": "string"
+          },
+          "hidden": true,
+          "usage": {
+            "request": "urlPathParams"
+          },
+          "schemaType": "primitive"
+        },
+        "isConnected": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "remoteUrl": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "isActive": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "lastSyncedAt": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "wsConnectedAt": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "capabilitiesVersion": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "transportMode": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "remoteTransportMode": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "isInferenceProvider": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "forceSystemProvider": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "syncScope": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "memories": {
+                      "def": {
+                        "type": "default",
+                        "innerType": {
+                          "def": {
+                            "type": "boolean"
+                          },
+                          "type": "boolean"
+                        },
+                        "defaultValue": true
+                      },
+                      "type": "default"
+                    },
+                    "documents": {
+                      "def": {
+                        "type": "default",
+                        "innerType": {
+                          "def": {
+                            "type": "boolean"
+                          },
+                          "type": "boolean"
+                        },
+                        "defaultValue": true
+                      },
+                      "type": "default"
+                    },
+                    "skills": {
+                      "def": {
+                        "type": "default",
+                        "innerType": {
+                          "def": {
+                            "type": "boolean"
+                          },
+                          "type": "boolean"
+                        },
+                        "defaultValue": true
+                      },
+                      "type": "default"
+                    },
+                    "favorites": {
+                      "def": {
+                        "type": "default",
+                        "innerType": {
+                          "def": {
+                            "type": "boolean"
+                          },
+                          "type": "boolean"
+                        },
+                        "defaultValue": true
+                      },
+                      "type": "default"
+                    },
+                    "threads": {
+                      "def": {
+                        "type": "default",
+                        "innerType": {
+                          "def": {
+                            "type": "boolean"
+                          },
+                          "type": "boolean"
+                        },
+                        "defaultValue": false
+                      },
+                      "type": "default"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "devTools",
+    "tags": ["Connexion distante"],
+    "aliases": ["remote-status", "connection-status"],
+    "credits": 0
+  },
+  {
+    "toolName": "vibe_remote-connection_instanceId_DELETE",
+    "title": "Déconnecter",
+    "titleShort": "Déconnecter",
+    "description": "Supprimer cette connexion distante et fermer le canal WebSocket",
+    "fields": {
+      "usage": {
+        "request": "urlPathParams",
+        "response": true
+      },
+      "children": {
+        "instanceId": {
+          "type": "form_field",
+          "fieldType": "entity_picker",
+          "labelField": "name",
+          "label": "ID d'instance",
+          "description": "L'instance de connexion à afficher",
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}]
+            },
+            "type": "string"
+          },
+          "hidden": true,
+          "usage": {
+            "request": "urlPathParams"
+          },
+          "schemaType": "primitive"
+        },
+        "disconnected": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "devTools",
+    "tags": ["Connexion distante"],
+    "credits": 0
+  },
+  {
+    "toolName": "vibe_remote-connection_connect-reverse_POST",
+    "title": "Enregistrer une instance locale",
+    "titleShort": "Enregistrer l'instance",
+    "description": "Appelé par une instance locale pendant la connexion pour s'enregistrer sur le cloud",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "instanceId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "ID d'instance",
+          "description": "L'identifiant unique de l'instance locale",
+          "placeholder": "hermes",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}, {}]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "localUrl": {
+          "type": "form_field",
+          "fieldType": "url",
+          "label": "URL locale",
+          "description": "L'URL de l'application de l'instance locale",
+          "placeholder": "http://localhost:3000",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "pipe",
+              "in": {
+                "def": {
+                  "type": "string",
+                  "checks": [
+                    {},
+                    {
+                      "def": {
+                        "type": "string",
+                        "format": "url",
+                        "check": "string_format",
+                        "abort": false
+                      },
+                      "type": "string"
+                    }
+                  ]
+                },
+                "type": "string"
+              },
+              "out": {
+                "def": {
+                  "type": "transform"
+                },
+                "type": "transform"
+              }
+            },
+            "type": "pipe",
+            "in": {
+              "def": {
+                "type": "string",
+                "checks": [
+                  {},
+                  {
+                    "def": {
+                      "type": "string",
+                      "format": "url",
+                      "check": "string_format",
+                      "abort": false
+                    },
+                    "type": "string"
+                  }
+                ]
+              },
+              "type": "string"
+            },
+            "out": {
+              "def": {
+                "type": "transform"
+              },
+              "type": "transform"
+            }
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "reverseToken": {
+          "type": "form_field",
+          "fieldType": "text",
+          "columns": 6,
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "reverseLeadId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "columns": 6,
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "selfUserId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "columns": 6,
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "syncScope": {
+          "type": "form_field",
+          "fieldType": "json",
+          "columns": 12,
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "object",
+              "shape": {
+                "memories": {
+                  "def": {
+                    "type": "default",
+                    "innerType": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
+                    "defaultValue": true
+                  },
+                  "type": "default"
+                },
+                "documents": {
+                  "def": {
+                    "type": "default",
+                    "innerType": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
+                    "defaultValue": true
+                  },
+                  "type": "default"
+                },
+                "skills": {
+                  "def": {
+                    "type": "default",
+                    "innerType": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
+                    "defaultValue": true
+                  },
+                  "type": "default"
+                },
+                "favorites": {
+                  "def": {
+                    "type": "default",
+                    "innerType": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
+                    "defaultValue": true
+                  },
+                  "type": "default"
+                },
+                "threads": {
+                  "def": {
+                    "type": "default",
+                    "innerType": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
+                    "defaultValue": false
+                  },
+                  "type": "default"
+                }
+              }
+            },
+            "type": "object"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "remoteTransportMode": {
+          "type": "form_field",
+          "fieldType": "text",
+          "columns": 6,
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "reverse-ws": "reverse-ws",
+                    "direct-http": "direct-http"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "reverse-ws": "reverse-ws",
+                  "direct-http": "direct-http"
+                },
+                "options": ["reverse-ws", "direct-http"]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "submitButton": {
+          "schemaType": "widget",
+          "type": "submit_button",
+          "text": "post.title",
+          "loadingText": "post.title",
+          "icon": "server",
+          "variant": "default",
+          "size": "default",
+          "order": 10,
+          "usage": {
+            "request": "data"
+          }
+        },
+        "registered": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "remoteInstanceId": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "remoteUserId": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "transportMode": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "reverse-ws": "reverse-ws",
+                    "direct-http": "direct-http"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "reverse-ws": "reverse-ws",
+                  "direct-http": "direct-http"
+                },
+                "options": ["reverse-ws", "direct-http"]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "devTools",
+    "tags": ["Connexion distante"],
+    "credits": 0
+  },
+  {
+    "toolName": "vibe_remote-connection_connect-reverse_update_PATCH",
+    "title": "Mettre à jour la connexion inverse",
+    "titleShort": "Mise à jour inverse",
+    "description": "Appelé par l'instance initiatrice pour synchroniser les paramètres de connexion de l'autre côté",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "instanceId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "syncScope": {
+          "type": "form_field",
+          "fieldType": "textarea",
+          "label": "Périmètre de synchro",
+          "description": "Les domaines de données à synchroniser via cette connexion",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "memories": {
+                      "def": {
+                        "type": "default",
+                        "innerType": {
+                          "def": {
+                            "type": "boolean"
+                          },
+                          "type": "boolean"
+                        },
+                        "defaultValue": true
+                      },
+                      "type": "default"
+                    },
+                    "documents": {
+                      "def": {
+                        "type": "default",
+                        "innerType": {
+                          "def": {
+                            "type": "boolean"
+                          },
+                          "type": "boolean"
+                        },
+                        "defaultValue": true
+                      },
+                      "type": "default"
+                    },
+                    "skills": {
+                      "def": {
+                        "type": "default",
+                        "innerType": {
+                          "def": {
+                            "type": "boolean"
+                          },
+                          "type": "boolean"
+                        },
+                        "defaultValue": true
+                      },
+                      "type": "default"
+                    },
+                    "favorites": {
+                      "def": {
+                        "type": "default",
+                        "innerType": {
+                          "def": {
+                            "type": "boolean"
+                          },
+                          "type": "boolean"
+                        },
+                        "defaultValue": true
+                      },
+                      "type": "default"
+                    },
+                    "threads": {
+                      "def": {
+                        "type": "default",
+                        "innerType": {
+                          "def": {
+                            "type": "boolean"
+                          },
+                          "type": "boolean"
+                        },
+                        "defaultValue": false
+                      },
+                      "type": "default"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "remoteTransportMode": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Périmètre de synchro",
+          "description": "Les domaines de données à synchroniser via cette connexion",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "reverse-ws": "reverse-ws",
+                    "direct-http": "direct-http"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "reverse-ws": "reverse-ws",
+                  "direct-http": "direct-http"
+                },
+                "options": ["reverse-ws", "direct-http"]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "transportMode": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Périmètre de synchro",
+          "description": "Les domaines de données à synchroniser via cette connexion",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "reverse-ws": "reverse-ws",
+                    "direct-http": "direct-http"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "reverse-ws": "reverse-ws",
+                  "direct-http": "direct-http"
+                },
+                "options": ["reverse-ws", "direct-http"]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "newInstanceId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Nouveau nom d'instance",
+          "description": "Le nouveau nom d'instance de l'appelant : met à jour notre libellé pour celle-ci",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "reconnectNow": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "hidden": true,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "updated": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "devTools",
+    "tags": ["Connexion distante"],
+    "credits": 0
+  },
+  {
+    "toolName": "remote-connections",
+    "title": "Connexions distantes",
+    "titleShort": "Connexions",
+    "description": "Lister toutes les connexions distantes de votre compte",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "activeOnly": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Actives uniquement",
+          "description": "Ne renvoyer que les connexions actives",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "connections": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "instanceId": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "remoteUrl": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "localUrl": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
+                    },
+                    "isActive": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
+                    "isInferenceProvider": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
+                    "lastSyncedAt": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
+                    },
+                    "hasToken": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
+                    "healthStatus": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "healthy": "healthy",
+                          "warning": "warning",
+                          "critical": "critical",
+                          "disconnected": "disconnected"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "healthy": "healthy",
+                        "warning": "warning",
+                        "critical": "critical",
+                        "disconnected": "disconnected"
+                      },
+                      "options": [
+                        "healthy",
+                        "warning",
+                        "critical",
+                        "disconnected"
+                      ]
+                    },
+                    "isReverseEntry": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
+                    "transportMode": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "enum",
+                            "entries": {
+                              "reverse-ws": "reverse-ws",
+                              "direct-http": "direct-http"
+                            }
+                          },
+                          "type": "enum",
+                          "enum": {
+                            "reverse-ws": "reverse-ws",
+                            "direct-http": "direct-http"
+                          },
+                          "options": ["reverse-ws", "direct-http"]
+                        }
+                      },
+                      "type": "nullable"
+                    },
+                    "remoteTransportMode": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "enum",
+                            "entries": {
+                              "reverse-ws": "reverse-ws",
+                              "direct-http": "direct-http"
+                            }
+                          },
+                          "type": "enum",
+                          "enum": {
+                            "reverse-ws": "reverse-ws",
+                            "direct-http": "direct-http"
+                          },
+                          "options": ["reverse-ws", "direct-http"]
+                        }
+                      },
+                      "type": "nullable"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "instanceId": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  "remoteUrl": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  "localUrl": {
+                    "def": {
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    },
+                    "type": "nullable"
+                  },
+                  "isActive": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  },
+                  "isInferenceProvider": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  },
+                  "lastSyncedAt": {
+                    "def": {
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    },
+                    "type": "nullable"
+                  },
+                  "hasToken": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  },
+                  "healthStatus": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "healthy": "healthy",
+                        "warning": "warning",
+                        "critical": "critical",
+                        "disconnected": "disconnected"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "healthy": "healthy",
+                      "warning": "warning",
+                      "critical": "critical",
+                      "disconnected": "disconnected"
+                    },
+                    "options": [
+                      "healthy",
+                      "warning",
+                      "critical",
+                      "disconnected"
+                    ]
+                  },
+                  "isReverseEntry": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  },
+                  "transportMode": {
+                    "def": {
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "enum",
+                          "entries": {
+                            "reverse-ws": "reverse-ws",
+                            "direct-http": "direct-http"
+                          }
+                        },
+                        "type": "enum",
+                        "enum": {
+                          "reverse-ws": "reverse-ws",
+                          "direct-http": "direct-http"
+                        },
+                        "options": ["reverse-ws", "direct-http"]
+                      }
+                    },
+                    "type": "nullable"
+                  },
+                  "remoteTransportMode": {
+                    "def": {
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "enum",
+                          "entries": {
+                            "reverse-ws": "reverse-ws",
+                            "direct-http": "direct-http"
+                          }
+                        },
+                        "type": "enum",
+                        "enum": {
+                          "reverse-ws": "reverse-ws",
+                          "direct-http": "direct-http"
+                        },
+                        "options": ["reverse-ws", "direct-http"]
+                      }
+                    },
+                    "type": "nullable"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "selfInstanceId": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "syncEnabled": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "hasInferenceProvider": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "access": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "object",
+              "shape": {
+                "canConnect": {
+                  "def": {
+                    "type": "boolean"
+                  },
+                  "type": "boolean"
+                },
+                "maxConnections": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  },
+                  "type": "nullable"
+                }
+              }
+            },
+            "type": "object"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "devTools",
+    "tags": ["Connexion distante"],
+    "aliases": ["remote-connections"],
+    "credits": 0
+  },
+  {
     "toolName": "self-instance-id",
     "title": "ID de cette instance",
     "titleShort": "ID d'instance",

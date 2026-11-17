@@ -21,6 +21,12 @@ import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
 import type { Platform } from "../../platforms/platforms";
+import { cronTaskOwnerScope } from "../cron-scope";
+import {
+  invalidateRemoteCustomerAccess,
+  isRemoteAdmin,
+  recordRemoteAudit,
+} from "../customer-access/access";
 import { remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
 import { ExecuteToolRouting } from "../routing";
@@ -411,6 +417,23 @@ export class RemoteConnectionInstanceRepository {
       instanceId,
     });
 
+    const isCustomer = !isRemoteAdmin(user);
+    if (isCustomer) {
+      // Revocation: bridge/sync gates see the row gone immediately.
+      invalidateRemoteCustomerAccess(user.id);
+      recordRemoteAudit({
+        userId: user.id,
+        instanceId,
+        action: "disconnected",
+        logger,
+      });
+      // Customers never own a connector here (pinned transports), and both
+      // connector registries are keyed by instanceId alone: closing by label
+      // would cut ANOTHER account's socket that uses the same name. Their
+      // instance drops its socket when the row is gone (401 on reconnect).
+      return success({ disconnected: true });
+    }
+
     // Hot-close both sides of the WS connection immediately:
     // - outbound connector (local → remote outbound WS, if any)
     // - inbound connector socket (remote → local inbound WS, if any)
@@ -725,7 +748,12 @@ export class RemoteConnectionInstanceRepository {
     await db
       .update(cronTasks)
       .set({ targetInstance: newInstanceId })
-      .where(eq(cronTasks.targetInstance, instanceId));
+      .where(
+        and(
+          eq(cronTasks.targetInstance, instanceId),
+          cronTaskOwnerScope(user, cronTasks.userId),
+        ),
+      );
 
     // Rename remote subfolder (non-fatal)
     void (async (): Promise<void> => {

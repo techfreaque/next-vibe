@@ -8,7 +8,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq, or, type SQL } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -25,6 +25,7 @@ import { NO_SKILL_ID } from "./constants";
 import { isFiltersSelection, isManualSelection } from "./create/definition";
 import type { CustomSkill } from "./db";
 import { customSkills } from "./db";
+import { SkillOwnershipType } from "./enum";
 import type { FavoriteConfig } from "./favorites/db";
 import { resolveFavoriteConfig } from "./favorites/repository";
 import { pickSkillVariant } from "./pick-variant";
@@ -54,9 +55,63 @@ type CustomSkillContextRow = CustomSkillConfig &
     | "variants"
   >;
 
-/** ONE customSkills fetch for all cascade needs - by UUID or slug. */
+/** customSkills where-clause for a UUID or slug identifier. */
+function customSkillIdCondition(skillIdOrSlug: string): SQL {
+  return isUuid(skillIdOrSlug)
+    ? eq(customSkills.id, skillIdOrSlug)
+    : eq(customSkills.slug, skillIdOrSlug);
+}
+
+/**
+ * Visibility rule shared with SkillsRepository.getSkillById: a custom skill is
+ * visible to a user when they own it or it is PUBLIC.
+ */
+function customSkillVisibleToCondition(userId: string): SQL | undefined {
+  return or(
+    eq(customSkills.userId, userId),
+    eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
+  );
+}
+
+/**
+ * Whether `userId` may reference a skill: built-in (config) skills and the
+ * no-skill sentinel are visible to everyone; custom skills only to their owner
+ * or when PUBLIC. Use it to gate peer-controlled skill ids (cross-instance
+ * events, sync payloads) before resolving or storing them. Accepts a UUID,
+ * slug or merged "slug__variant" id.
+ */
+export async function isSkillVisibleToUser(
+  skillIdOrSlug: string,
+  userId: string,
+): Promise<boolean> {
+  const { skillId } = parseSkillId(skillIdOrSlug);
+  if (!skillId) {
+    return false;
+  }
+  if (skillId === NO_SKILL_ID || DEFAULT_SKILLS.some((s) => s.id === skillId)) {
+    return true;
+  }
+  const [row] = await db
+    .select({ id: customSkills.id })
+    .from(customSkills)
+    .where(
+      and(
+        customSkillIdCondition(skillId),
+        customSkillVisibleToCondition(userId),
+      ),
+    )
+    .limit(1);
+  return row !== undefined;
+}
+
+/**
+ * ONE customSkills fetch for all cascade needs - by UUID or slug.
+ * `visibleToUserId` (optional) restricts the lookup to skills that user owns
+ * or that are PUBLIC; omitted = unrestricted (existing callers).
+ */
 async function fetchCustomSkillContextRow(
   skillIdOrSlug: string,
+  visibleToUserId?: string,
 ): Promise<CustomSkillContextRow | null> {
   const [row] = await db
     .select({
@@ -74,9 +129,12 @@ async function fetchCustomSkillContextRow(
     })
     .from(customSkills)
     .where(
-      isUuid(skillIdOrSlug)
-        ? eq(customSkills.id, skillIdOrSlug)
-        : eq(customSkills.slug, skillIdOrSlug),
+      visibleToUserId !== undefined
+        ? and(
+            customSkillIdCondition(skillIdOrSlug),
+            customSkillVisibleToCondition(visibleToUserId),
+          )
+        : customSkillIdCondition(skillIdOrSlug),
     )
     .limit(1);
   return row ?? null;
@@ -152,6 +210,7 @@ function buildDefaultBridgeSkill(
 async function resolveSkillInternal(
   rawSkillId: string,
   favoriteVariantId: string | null | undefined,
+  visibleToUserId?: string,
 ): Promise<{
   skill: BridgeSkill | null;
   customSkillRow: CustomSkillContextRow | null;
@@ -169,7 +228,7 @@ async function resolveSkillInternal(
   }
 
   // Custom skill: resolve variant-aware model selections from DB (UUID or slug)
-  const row = await fetchCustomSkillContextRow(skillId);
+  const row = await fetchCustomSkillContextRow(skillId, visibleToUserId);
   if (!row) {
     return { skill: null, customSkillRow: null };
   }
@@ -232,6 +291,12 @@ export async function resolveSkillFavoriteContext(params: {
    * (e.g. stream-setup's loadFavoriteOnce) resolve it exactly ONCE.
    */
   favorite?: FavoriteConfig | null;
+  /**
+   * When true, a custom skill only resolves if `userId` owns it or it is
+   * PUBLIC (see isSkillVisibleToUser). Set it when the skill id is
+   * peer-controlled. Default false keeps the unrestricted lookup.
+   */
+  restrictToVisible?: boolean;
 }): Promise<SkillFavoriteContext> {
   const favorite =
     params.favorite !== undefined
@@ -263,6 +328,8 @@ export async function resolveSkillFavoriteContext(params: {
   const { skill, customSkillRow } = await resolveSkillInternal(
     effectiveSkillId,
     favoriteVariantId,
+    // No userId + restricted → "" matches no owner, so only PUBLIC resolves.
+    params.restrictToVisible ? (params.userId ?? "") : undefined,
   );
 
   return {

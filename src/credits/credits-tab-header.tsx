@@ -3,6 +3,7 @@ import { useProviderAvailability } from "next-vibe/agent/env-availability-store"
 import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { useRemoteConnections } from "next-vibe/remote-connection/list/hooks";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Calendar } from "next-vibe/ui/components/icons/Calendar";
@@ -82,6 +83,14 @@ export function CreditsTabHeader({
 
   const subscriptionEndpoint = useSubscription(logger, widgetUser);
   const currentSubscription = subscriptionEndpoint.read?.data;
+  // Cloud Sync tab: admins, and customers who may link an instance (paid) or
+  // already have one linked. Unpaid accounts never see a dead-end tab.
+  const remoteConnections = useRemoteConnections(logger, widgetUser);
+  const remoteData = remoteConnections.read?.data;
+  const showRemoteTab =
+    isAdmin ||
+    (remoteData !== undefined &&
+      (remoteData.access.canConnect || remoteData.connections.length > 0));
 
   const endpoint = useEndpoint(
     creditsDefinition,
@@ -153,9 +162,9 @@ export function CreditsTabHeader({
     },
     { id: "buy", label: tSub("subscription.tabs.buy"), icon: ShoppingCart },
     { id: "history", label: tSub("subscription.tabs.history"), icon: History },
-    // remote-connection/list is ADMIN-only: for customers this tab only ever
-    // rendered a 403 (prod 2026-11-14 21:25, /subscription/buy on iPhone).
-    ...(isAdmin
+    // Hidden until the list says this account may use it (it used to render
+    // a 403 for customers: prod 2026-11-14 21:25, /subscription/buy on iPhone).
+    ...(showRemoteTab || activeTab === "remote"
       ? [
           {
             id: "remote" as TabId,

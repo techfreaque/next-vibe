@@ -6,12 +6,15 @@
 
 import { and, eq } from "drizzle-orm";
 
+import { isPaidUser } from "@/api-keys/paid";
+
 import { type ResponseType, success } from "../../core/route/response.schema";
 import { db } from "../../database";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
 import { cronTasks } from "../../tasks/cron/db";
+import { REMOTE_CUSTOMER_LIMITS } from "../customer-access/access";
 import { remoteConnections } from "../db";
 import { RemoteConnectionRepository } from "../repository";
 import type { RemoteConnectionsListResponseOutput } from "./definition";
@@ -25,43 +28,45 @@ export class RemoteConnectionListRepository {
   ): Promise<ResponseType<RemoteConnectionsListResponseOutput>> {
     const isAdmin = user.roles.includes(UserPermissionRole.ADMIN);
 
-    const [rows, syncRow, selfInstanceId, inferenceRows] = await Promise.all([
-      db
-        .select()
-        .from(remoteConnections)
-        .where(
-          activeOnly
-            ? and(
-                eq(remoteConnections.userId, user.id),
-                eq(remoteConnections.isActive, true),
+    const [rows, syncRow, selfInstanceId, inferenceRows, paid] =
+      await Promise.all([
+        db
+          .select()
+          .from(remoteConnections)
+          .where(
+            activeOnly
+              ? and(
+                  eq(remoteConnections.userId, user.id),
+                  eq(remoteConnections.isActive, true),
+                )
+              : eq(remoteConnections.userId, user.id),
+          )
+          .orderBy(remoteConnections.updatedAt),
+        isAdmin
+          ? db
+              .select({ id: cronTasks.id })
+              .from(cronTasks)
+              .where(
+                eq(
+                  cronTasks.id,
+                  RemoteConnectionListRepository.TASK_SYNC_PULL_ID,
+                ),
               )
-            : eq(remoteConnections.userId, user.id),
-        )
-        .orderBy(remoteConnections.updatedAt),
-      isAdmin
-        ? db
-            .select({ id: cronTasks.id })
-            .from(cronTasks)
-            .where(
-              eq(
-                cronTasks.id,
-                RemoteConnectionListRepository.TASK_SYNC_PULL_ID,
-              ),
-            )
-            .limit(1)
-        : Promise.resolve(null),
-      RemoteConnectionRepository.getLocalInstanceId(user.id),
-      // Admins see instance-wide inference providers; non-admins never do.
-      isAdmin
-        ? db
-            .select({
-              forceSystemProvider: remoteConnections.forceSystemProvider,
-              isInferenceProvider: remoteConnections.isInferenceProvider,
-            })
-            .from(remoteConnections)
-            .where(eq(remoteConnections.isActive, true))
-        : Promise.resolve([]),
-    ]);
+              .limit(1)
+          : Promise.resolve(null),
+        RemoteConnectionRepository.getLocalInstanceId(user.id),
+        // Admins see instance-wide inference providers; non-admins never do.
+        isAdmin
+          ? db
+              .select({
+                forceSystemProvider: remoteConnections.forceSystemProvider,
+                isInferenceProvider: remoteConnections.isInferenceProvider,
+              })
+              .from(remoteConnections)
+              .where(eq(remoteConnections.isActive, true))
+          : Promise.resolve([]),
+        isAdmin ? Promise.resolve(true) : isPaidUser(user.id),
+      ]);
 
     logger.debug("Listed remote connections", {
       userId: user.id,
@@ -93,6 +98,10 @@ export class RemoteConnectionListRepository {
       selfInstanceId,
       syncEnabled,
       hasInferenceProvider,
+      access: {
+        canConnect: paid,
+        maxConnections: isAdmin ? null : REMOTE_CUSTOMER_LIMITS.maxConnections,
+      },
     });
   }
 }

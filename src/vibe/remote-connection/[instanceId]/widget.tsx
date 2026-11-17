@@ -522,7 +522,9 @@ function ViewWidget({
         }
         actions={
           <Div className="flex items-center gap-2">
-            {isUnhealthy ? (
+            {/* Settings + reconnect are PATCH (admin-only); customers manage
+                the link from their own instance and can disconnect here. */}
+            {isAdmin && isUnhealthy ? (
               <Button
                 type="button"
                 variant="outline"
@@ -546,16 +548,18 @@ function ViewWidget({
                 {t("widget.connected.refresh")}
               </Button>
             )}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleEdit}
-              className="gap-1.5"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-              {t("widget.editButton")}
-            </Button>
+            {isAdmin && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleEdit}
+                className="gap-1.5"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                {t("widget.editButton")}
+              </Button>
+            )}
             <Button
               type="button"
               variant="destructive"
@@ -658,63 +662,67 @@ function ViewWidget({
         </SectionGroup>
       )}
 
-      {/* ── Cortex cross-reference ─────────────────────────────────────── */}
-      <SectionGroup title={t("widget.cortexSection")}>
-        <Card className="border shadow-none">
-          <CardHeader className="pb-2">
-            <Div className="flex items-center justify-between gap-3">
-              <Div className="flex items-center gap-2">
-                <FolderOpen className="h-4 w-4 text-muted-foreground" />
-                <CardTitle className="text-sm">
-                  {t("widget.cortexSection")}
-                </CardTitle>
+      {/* ── Cortex cross-reference (admin tooling) ─────────────────────── */}
+      {isAdmin && (
+        <SectionGroup title={t("widget.cortexSection")}>
+          <Card className="border shadow-none">
+            <CardHeader className="pb-2">
+              <Div className="flex items-center justify-between gap-3">
+                <Div className="flex items-center gap-2">
+                  <FolderOpen className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm">
+                    {t("widget.cortexSection")}
+                  </CardTitle>
+                </Div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleOpenCortex}
+                  className="gap-1.5 text-xs h-7"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  {t("widget.cortexLink")}
+                </Button>
               </Div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleOpenCortex}
-                className="gap-1.5 text-xs h-7"
-              >
-                <ExternalLink className="h-3 w-3" />
-                {t("widget.cortexLink")}
-              </Button>
-            </Div>
-            <CardDescription className="text-xs">
-              {t("widget.cortexDescription")}
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </SectionGroup>
+              <CardDescription className="text-xs">
+                {t("widget.cortexDescription")}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </SectionGroup>
+      )}
 
-      {/* ── SSH & Terminal cross-reference ─────────────────────────────── */}
-      <SectionGroup title={t("widget.sshSection")}>
-        <Card className="border shadow-none">
-          <CardHeader className="pb-2">
-            <Div className="flex items-center justify-between gap-3">
-              <Div className="flex items-center gap-2">
-                <Terminal className="h-4 w-4 text-muted-foreground" />
-                <CardTitle className="text-sm">
-                  {t("widget.sshSection")}
-                </CardTitle>
+      {/* ── SSH & Terminal cross-reference (admin tooling) ─────────────── */}
+      {isAdmin && (
+        <SectionGroup title={t("widget.sshSection")}>
+          <Card className="border shadow-none">
+            <CardHeader className="pb-2">
+              <Div className="flex items-center justify-between gap-3">
+                <Div className="flex items-center gap-2">
+                  <Terminal className="h-4 w-4 text-muted-foreground" />
+                  <CardTitle className="text-sm">
+                    {t("widget.sshSection")}
+                  </CardTitle>
+                </Div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleOpenTerminals}
+                  className="gap-1.5 text-xs h-7"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  {t("widget.sshLink")}
+                </Button>
               </Div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleOpenTerminals}
-                className="gap-1.5 text-xs h-7"
-              >
-                <ExternalLink className="h-3 w-3" />
-                {t("widget.sshLink")}
-              </Button>
-            </Div>
-            <CardDescription className="text-xs">
-              {t("widget.sshDescription")}
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </SectionGroup>
+              <CardDescription className="text-xs">
+                {t("widget.sshDescription")}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </SectionGroup>
+      )}
     </WidgetShell>
   );
 }
