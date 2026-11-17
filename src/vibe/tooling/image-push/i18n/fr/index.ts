@@ -45,7 +45,7 @@ export const translations: typeof enTranslations = {
       sshTarget: {
         title: "Cible SSH",
         description:
-          "user@host vers lequel transférer l'image directement par SSH au lieu d'un registre (ex. root@203.0.113.5). Par défaut : SSH_SERVER s'il est défini. Utilise SSH_SERVER_PWD pour l'authentification par mot de passe s'il est défini, sinon votre propre clé/config SSH. Laissez vide pour pousser vers le registre.",
+          "user@host vers lequel transférer l'image directement par SSH au lieu d'un registre (ex. root@203.0.113.5). Par défaut : SSH_SERVER s'il est défini. Essaie d'abord la clé SSH_SERVER_KEY, puis SSH_SERVER_PWD comme mot de passe de secours ; sans les deux, votre propre clé/config SSH. Laissez vide pour pousser vers le registre.",
       },
       secondary: {
         title: "Déployer le serveur 2",

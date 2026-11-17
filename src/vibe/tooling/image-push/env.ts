@@ -35,6 +35,13 @@ export const {
     commented: true,
     sensitive: true,
   },
+  SSH_SERVER_KEY: {
+    schema: z.string().optional(),
+    example: "~/.ssh/deploy_ed25519",
+    comment:
+      "Private key file (ed25519) for every image-push SSH call to SSH_SERVER and SSH_SERVER2. Tried first; SSH_SERVER_PWD / SSH_SERVER2_PWD stay as the sshpass fallback when the key is refused. A leading ~ expands to the home directory. Unset or missing file = the ssh client's default identities/agent.",
+    commented: true,
+  },
   SSH_SERVER2: {
     schema: z.string().optional(),
     example: "root@203.0.113.6",

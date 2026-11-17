@@ -105,7 +105,10 @@ pwd_for() {
 ## Creds are passed to sshpass via an env var (never on the command line / logs).
 ssh_exec() {   # ssh_exec <host> <pwd> <remote cmd...>
   local host="$1" pw="$2"; shift 2
-  SSHPASS="$pw" sshpass -e ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 "$host" "$@"
+  # SSH_SERVER_KEY (from .env) is offered first; the password stays the fallback.
+  local key; key="$(getenv SSH_SERVER_KEY)"; key="${key/#\~/$HOME}"
+  local keyopts=(); [ -n "$key" ] && [ -f "$key" ] && keyopts=(-i "$key" -o IdentitiesOnly=yes)
+  SSHPASS="$pw" sshpass -e ssh "${keyopts[@]}" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 "$host" "$@"
 }
 ## Mutating SSH — honours --dry-run. In dry-run it prints the REMOTE command
 ## only (never the host creds), so logs are safe to share.

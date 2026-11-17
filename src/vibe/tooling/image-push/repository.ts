@@ -14,9 +14,11 @@ import {
   createReadStream,
   existsSync,
   mkdirSync,
+  readFileSync,
   renameSync,
   writeFileSync,
 } from "node:fs";
+import { homedir } from "node:os";
 import { join } from "node:path";
 import type { Readable } from "node:stream";
 import { createGzip } from "node:zlib";
@@ -502,9 +504,13 @@ export class ImagePushRepository {
           .join(" && ")}`;
 
     // Only the shell pipeline survives a large unattended upload (see doc above).
-    // It needs a password (for `sshpass -e`) plus the `sshpass` and `gzip`
-    // binaries; otherwise fall back to the in-process pipe.
-    if (password && ImagePushRepository.shellPipelineAvailable()) {
+    // It needs a key (SSH_SERVER_KEY) or a password (for `sshpass -e`, which
+    // then also needs the `sshpass` binary) plus `gzip`; otherwise fall back
+    // to the in-process pipe.
+    if (
+      (password || ImagePushRepository.sshKeyPath()) &&
+      ImagePushRepository.shellPipelineAvailable(password)
+    ) {
       return ImagePushRepository.transferViaShellPipeline(
         shaRef,
         refs,
@@ -563,13 +569,41 @@ export class ImagePushRepository {
     return success(undefined);
   }
 
-  /** True when both `sshpass` and `gzip` system binaries are callable. */
-  private static shellPipelineAvailable(): boolean {
+  /**
+   * True when `gzip` is callable, plus `sshpass` when a password is in play
+   * (key-only auth runs plain `ssh`).
+   */
+  private static shellPipelineAvailable(password: string | undefined): boolean {
     const hasSshpass =
+      !password ||
       spawnSync("sshpass", ["-V"], { stdio: "ignore" }).status === 0;
     const hasGzip =
       spawnSync("gzip", ["--version"], { stdio: "ignore" }).status === 0;
     return hasSshpass && hasGzip;
+  }
+
+  /**
+   * SSH_SERVER_KEY with a leading `~` expanded, when that file exists.
+   * Undefined = the ssh client's default identities/agent.
+   */
+  private static sshKeyPath(): string | undefined {
+    const raw = imagePushEnv.SSH_SERVER_KEY;
+    if (!raw) {
+      return undefined;
+    }
+    const path =
+      raw === "~" || raw.startsWith("~/") ? join(homedir(), raw.slice(1)) : raw;
+    return existsSync(path) ? path : undefined;
+  }
+
+  /**
+   * ssh options that offer SSH_SERVER_KEY first. Publickey runs before
+   * password in ssh's default order, so wrapping the same call in
+   * `sshpass -e` keeps the password as the fallback when the key is refused.
+   */
+  private static sshKeyArgs(): string[] {
+    const key = ImagePushRepository.sshKeyPath();
+    return key ? [`-oIdentityFile=${key}`, "-oIdentitiesOnly=yes"] : [];
   }
 
   /** Single-quotes a value for safe embedding in a POSIX `sh -c` string. */
@@ -589,7 +623,7 @@ export class ImagePushRepository {
     shaRef: string,
     refs: string[],
     sshTarget: string,
-    password: string,
+    password: string | undefined,
     remoteCmd: string,
     logger: EndpointLogger,
     t: ImagePushT,
@@ -604,18 +638,19 @@ export class ImagePushRepository {
       "-oServerAliveCountMax=10000",
       "-oTCPKeepAlive=yes",
       `-oPort=${q(String(port))}`,
+      ...ImagePushRepository.sshKeyArgs().map(q),
     ].join(" ");
 
     const pipeline =
       `docker save ${q(shaRef)} | gzip -1 | ` +
-      `sshpass -e ssh ${sshOpts} ${q(`${username}@${host}`)} ${q(remoteCmd)}`;
+      `${password ? "sshpass -e " : ""}ssh ${sshOpts} ${q(`${username}@${host}`)} ${q(remoteCmd)}`;
 
     const exitCode = await new Promise<number>((resolve) => {
       const child = spawn("sh", ["-c", pipeline], {
         stdio: "inherit",
         cwd: process.cwd(),
         // SSHPASS reaches sshpass via the env only - never argv, never logs.
-        env: { ...process.env, SSHPASS: password },
+        env: { ...process.env, SSHPASS: password ?? "" },
       });
       child.on("error", () => resolve(-1));
       child.on("close", (code) => resolve(code ?? -1));
@@ -1165,7 +1200,10 @@ export class ImagePushRepository {
     ): string => {
       const { username, host, port } =
         ImagePushRepository.parseSshTarget(target);
-      const opts = `-oStrictHostKeyChecking=no -oPort=${q(String(port))} ${q(`${username}@${host}`)} ${q(cmd)}`;
+      const keyOpts = ImagePushRepository.sshKeyArgs()
+        .map((arg) => `${q(arg)} `)
+        .join("");
+      const opts = `-oStrictHostKeyChecking=no ${keyOpts}-oPort=${q(String(port))} ${q(`${username}@${host}`)} ${q(cmd)}`;
       return hasPassword
         ? `SSHPASS="$${passwordVar}" sshpass -e ssh ${opts}`
         : `ssh ${opts}`;
@@ -1323,8 +1361,9 @@ export class ImagePushRepository {
 
   /**
    * Runs a command on the SSH target, streaming its output to this terminal
-   * and optionally piping `stdin` into it. Authenticates with SSH_SERVER_PWD
-   * via ssh2 when set, otherwise uses the system `ssh` client (key/agent auth).
+   * and optionally piping `stdin` into it. Offers SSH_SERVER_KEY first, then
+   * the password (system `ssh` under `sshpass -e`; ssh2 only when the
+   * `sshpass` binary is missing). No password = key/agent auth only.
    * `captureStdout` collects stdout into the result instead of printing it.
    */
   private static async runRemote(
@@ -1354,6 +1393,7 @@ export class ImagePushRepository {
         "-oServerAliveCountMax=10000",
         "-oTCPKeepAlive=yes",
         "-oStrictHostKeyChecking=no",
+        ...ImagePushRepository.sshKeyArgs(),
         `-oPort=${String(port)}`,
         `${username}@${host}`,
         remoteCmd,
@@ -1426,11 +1466,13 @@ export class ImagePushRepository {
           }
         });
       });
+      const keyPath = ImagePushRepository.sshKeyPath();
       client.connect({
         host,
         port,
         username,
         password,
+        privateKey: keyPath ? readFileSync(keyPath) : undefined,
         keepaliveInterval: 30_000,
         // ssh2's keepalive counter is reset only by inbound SSH packets, not by
         // outbound upload bytes. A multi-GB `docker save | ssh docker load` push

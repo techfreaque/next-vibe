@@ -45,7 +45,7 @@ export const translations: typeof enTranslations = {
       sshTarget: {
         title: "Cel SSH",
         description:
-          "user@host do przesłania zbudowanego obrazu bezpośrednio przez SSH zamiast do rejestru (np. root@203.0.113.5) - domyślnie SSH_SERVER, jeśli ustawiony. Używa SSH_SERVER_PWD do uwierzytelniania hasłem, w przeciwnym razie Twojego własnego klucza/konfiguracji SSH. Zostaw puste, aby zamiast tego wysłać do rejestru.",
+          "user@host do przesłania zbudowanego obrazu bezpośrednio przez SSH zamiast do rejestru (np. root@203.0.113.5) - domyślnie SSH_SERVER, jeśli ustawiony. Najpierw próbuje klucza z SSH_SERVER_KEY, potem hasła z SSH_SERVER_PWD; bez obu używa Twojego własnego klucza/konfiguracji SSH. Zostaw puste, aby zamiast tego wysłać do rejestru.",
       },
       secondary: {
         title: "Zaktualizuj też Server 2",

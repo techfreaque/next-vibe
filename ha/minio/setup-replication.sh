@@ -27,7 +27,8 @@ PY
 S1="$(getenv SSH_SERVER)";  S1_PWD="$(getenv SSH_SERVER_PWD)"
 MUSER="$(getenv MINIO_ROOT_USER)"; MUSER="${MUSER:-minioadmin}"
 MPASS="$(getenv MINIO_ROOT_PASSWORD)"; MPASS="${MPASS:-minioadmin}"
-s1() { sshpass -p "$S1_PWD" ssh -o StrictHostKeyChecking=accept-new "$S1" "$@"; }
+KEY_="$(getenv SSH_SERVER_KEY)"; KEY_="${KEY_/#\~/$HOME}"; KO_=""; [ -n "$KEY_" ] && [ -f "$KEY_" ] && KO_="-i $KEY_ -o IdentitiesOnly=yes"  # key first, password fallback
+s1() { sshpass -p "$S1_PWD" ssh $KO_ -o StrictHostKeyChecking=accept-new "$S1" "$@"; }
 
 # Run a throwaway mc container ON SERVER 1 (it can reach both WG endpoints).
 # It configures aliases to both sites, enables versioning, and adds the two

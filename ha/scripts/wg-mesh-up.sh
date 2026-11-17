@@ -23,8 +23,9 @@ PY
 }
 S1="$(getenv SSH_SERVER)";  S1_PWD="$(getenv SSH_SERVER_PWD)"
 S2="$(getenv SSH_SERVER2)"; S2_PWD="$(getenv SSH_SERVER2_PWD)"
-s1() { sshpass -p "$S1_PWD" ssh -o StrictHostKeyChecking=accept-new "$S1" "$@"; }
-s2() { sshpass -p "$S2_PWD" ssh -o StrictHostKeyChecking=accept-new "$S2" "$@"; }
+KEY_="$(getenv SSH_SERVER_KEY)"; KEY_="${KEY_/#\~/$HOME}"; KO_=""; [ -n "$KEY_" ] && [ -f "$KEY_" ] && KO_="-i $KEY_ -o IdentitiesOnly=yes"  # key first, password fallback
+s1() { sshpass -p "$S1_PWD" ssh $KO_ -o StrictHostKeyChecking=accept-new "$S1" "$@"; }
+s2() { sshpass -p "$S2_PWD" ssh $KO_ -o StrictHostKeyChecking=accept-new "$S2" "$@"; }
 # Public endpoint = host portion after user@ (SSH_SERVER="root@host").
 EP1="${S1#*@}"; EP2="${S2#*@}"
 

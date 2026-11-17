@@ -35,7 +35,8 @@ case "$NODE" in
   server2) HOST="$(getenv SSH_SERVER2)"; PWD_="$(getenv SSH_SERVER2_PWD)"; WGIP=10.88.0.2; PEER=server1 ;;
   *) echo "unknown node $NODE" >&2; exit 1 ;;
 esac
-SSH="sshpass -p $PWD_ ssh -o StrictHostKeyChecking=accept-new $HOST"
+KEY_="$(getenv SSH_SERVER_KEY)"; KEY_="${KEY_/#\~/$HOME}"; KO_=""; [ -n "$KEY_" ] && [ -f "$KEY_" ] && KO_="-i $KEY_ -o IdentitiesOnly=yes"  # key first, password fallback
+SSH="sshpass -p $PWD_ ssh $KO_ -o StrictHostKeyChecking=accept-new $HOST"
 
 echo "== [$NODE] installing wireguard-tools + keepalived (additive) =="
 $SSH 'export DEBIAN_FRONTEND=noninteractive; apt-get update -qq && apt-get install -y -qq wireguard-tools keepalived curl >/dev/null && echo installed'
