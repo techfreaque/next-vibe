@@ -84,6 +84,7 @@ import {
   Step,
   StepList,
 } from "../../_shared/marketing";
+import { CompareInlineLinks } from "../../compare/_shared/compare-ui";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -647,6 +648,10 @@ export function TanstackPage({
             <CardLink
               href={`/${locale}/story/blog/chatgpt-alternative-without-filters`}
               label={t("faq.chatgptLink")}
+            />
+            <CompareInlineLinks
+              locale={locale}
+              versus={["characterAi", "janitorAi"]}
             />
           </Div>
         </ArticleSection>

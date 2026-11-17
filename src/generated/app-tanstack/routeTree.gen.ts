@@ -200,6 +200,12 @@ import { Route as LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRouteImpor
 import { Route as LocaleStoryBlogWhatsNewApril2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-april-2026.index'
 import { Route as LocaleStoryBlogWhatsNewMay2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-may-2026.index'
 import { Route as LocaleStoryBlogWhatsNewNovember2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-november-2026.index'
+import { Route as LocaleStoryCompareUnbottledVsCharacterAiIndexRouteImport } from './routes/$locale.story.compare.unbottled-vs-character-ai.index'
+import { Route as LocaleStoryCompareUnbottledVsFreedomgptIndexRouteImport } from './routes/$locale.story.compare.unbottled-vs-freedomgpt.index'
+import { Route as LocaleStoryCompareUnbottledVsJanitorAiIndexRouteImport } from './routes/$locale.story.compare.unbottled-vs-janitor-ai.index'
+import { Route as LocaleStoryCompareUnbottledVsNanogptIndexRouteImport } from './routes/$locale.story.compare.unbottled-vs-nanogpt.index'
+import { Route as LocaleStoryCompareUnbottledVsVeniceIndexRouteImport } from './routes/$locale.story.compare.unbottled-vs-venice.index'
+import { Route as LocaleStoryCompareUncensoredAiPlatformsIndexRouteImport } from './routes/$locale.story.compare.uncensored-ai-platforms.index'
 import { Route as LocaleStoryNewsletterEmailIndexRouteImport } from './routes/$locale.story.newsletter.$email.index'
 import { Route as LocaleStoryNewsletterUnsubscribeIndexRouteImport } from './routes/$locale.story.newsletter.unsubscribe.index'
 import { Route as LocaleUserAccountReferralIndexRouteImport } from './routes/$locale.user._account.referral.index'
@@ -1766,6 +1772,42 @@ const LocaleStoryBlogWhatsNewNovember2026IndexRoute =
   LocaleStoryBlogWhatsNewNovember2026IndexRouteImport.update({
     id: '/blog/whats-new-november-2026/',
     path: '/blog/whats-new-november-2026/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryCompareUnbottledVsCharacterAiIndexRoute =
+  LocaleStoryCompareUnbottledVsCharacterAiIndexRouteImport.update({
+    id: '/compare/unbottled-vs-character-ai/',
+    path: '/compare/unbottled-vs-character-ai/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryCompareUnbottledVsFreedomgptIndexRoute =
+  LocaleStoryCompareUnbottledVsFreedomgptIndexRouteImport.update({
+    id: '/compare/unbottled-vs-freedomgpt/',
+    path: '/compare/unbottled-vs-freedomgpt/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryCompareUnbottledVsJanitorAiIndexRoute =
+  LocaleStoryCompareUnbottledVsJanitorAiIndexRouteImport.update({
+    id: '/compare/unbottled-vs-janitor-ai/',
+    path: '/compare/unbottled-vs-janitor-ai/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryCompareUnbottledVsNanogptIndexRoute =
+  LocaleStoryCompareUnbottledVsNanogptIndexRouteImport.update({
+    id: '/compare/unbottled-vs-nanogpt/',
+    path: '/compare/unbottled-vs-nanogpt/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryCompareUnbottledVsVeniceIndexRoute =
+  LocaleStoryCompareUnbottledVsVeniceIndexRouteImport.update({
+    id: '/compare/unbottled-vs-venice/',
+    path: '/compare/unbottled-vs-venice/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryCompareUncensoredAiPlatformsIndexRoute =
+  LocaleStoryCompareUncensoredAiPlatformsIndexRouteImport.update({
+    id: '/compare/uncensored-ai-platforms/',
+    path: '/compare/uncensored-ai-platforms/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryNewsletterEmailIndexRoute =
@@ -5298,6 +5340,12 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/whats-new-april-2026/': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026/': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
   '/$locale/story/blog/whats-new-november-2026/': typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
+  '/$locale/story/compare/unbottled-vs-character-ai/': typeof LocaleStoryCompareUnbottledVsCharacterAiIndexRoute
+  '/$locale/story/compare/unbottled-vs-freedomgpt/': typeof LocaleStoryCompareUnbottledVsFreedomgptIndexRoute
+  '/$locale/story/compare/unbottled-vs-janitor-ai/': typeof LocaleStoryCompareUnbottledVsJanitorAiIndexRoute
+  '/$locale/story/compare/unbottled-vs-nanogpt/': typeof LocaleStoryCompareUnbottledVsNanogptIndexRoute
+  '/$locale/story/compare/unbottled-vs-venice/': typeof LocaleStoryCompareUnbottledVsVeniceIndexRoute
+  '/$locale/story/compare/uncensored-ai-platforms/': typeof LocaleStoryCompareUncensoredAiPlatformsIndexRoute
   '/$locale/story/newsletter/$email/': typeof LocaleStoryNewsletterEmailIndexRoute
   '/$locale/story/newsletter/unsubscribe/': typeof LocaleStoryNewsletterUnsubscribeIndexRoute
   '/$locale/user/referral/': typeof LocaleUserAccountReferralIndexRoute
@@ -5996,6 +6044,12 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/whats-new-april-2026': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
   '/$locale/story/blog/whats-new-november-2026': typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
+  '/$locale/story/compare/unbottled-vs-character-ai': typeof LocaleStoryCompareUnbottledVsCharacterAiIndexRoute
+  '/$locale/story/compare/unbottled-vs-freedomgpt': typeof LocaleStoryCompareUnbottledVsFreedomgptIndexRoute
+  '/$locale/story/compare/unbottled-vs-janitor-ai': typeof LocaleStoryCompareUnbottledVsJanitorAiIndexRoute
+  '/$locale/story/compare/unbottled-vs-nanogpt': typeof LocaleStoryCompareUnbottledVsNanogptIndexRoute
+  '/$locale/story/compare/unbottled-vs-venice': typeof LocaleStoryCompareUnbottledVsVeniceIndexRoute
+  '/$locale/story/compare/uncensored-ai-platforms': typeof LocaleStoryCompareUncensoredAiPlatformsIndexRoute
   '/$locale/story/newsletter/$email': typeof LocaleStoryNewsletterEmailIndexRoute
   '/$locale/story/newsletter/unsubscribe': typeof LocaleStoryNewsletterUnsubscribeIndexRoute
   '/$locale/user/referral': typeof LocaleUserAccountReferralIndexRoute
@@ -6702,6 +6756,12 @@ export interface FileRoutesById {
   '/$locale/story/blog/whats-new-april-2026/': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026/': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
   '/$locale/story/blog/whats-new-november-2026/': typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
+  '/$locale/story/compare/unbottled-vs-character-ai/': typeof LocaleStoryCompareUnbottledVsCharacterAiIndexRoute
+  '/$locale/story/compare/unbottled-vs-freedomgpt/': typeof LocaleStoryCompareUnbottledVsFreedomgptIndexRoute
+  '/$locale/story/compare/unbottled-vs-janitor-ai/': typeof LocaleStoryCompareUnbottledVsJanitorAiIndexRoute
+  '/$locale/story/compare/unbottled-vs-nanogpt/': typeof LocaleStoryCompareUnbottledVsNanogptIndexRoute
+  '/$locale/story/compare/unbottled-vs-venice/': typeof LocaleStoryCompareUnbottledVsVeniceIndexRoute
+  '/$locale/story/compare/uncensored-ai-platforms/': typeof LocaleStoryCompareUncensoredAiPlatformsIndexRoute
   '/$locale/story/newsletter/$email/': typeof LocaleStoryNewsletterEmailIndexRoute
   '/$locale/story/newsletter/unsubscribe/': typeof LocaleStoryNewsletterUnsubscribeIndexRoute
   '/$locale/user/_account/referral/': typeof LocaleUserAccountReferralIndexRoute
@@ -7408,6 +7468,12 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/whats-new-april-2026/'
     | '/$locale/story/blog/whats-new-may-2026/'
     | '/$locale/story/blog/whats-new-november-2026/'
+    | '/$locale/story/compare/unbottled-vs-character-ai/'
+    | '/$locale/story/compare/unbottled-vs-freedomgpt/'
+    | '/$locale/story/compare/unbottled-vs-janitor-ai/'
+    | '/$locale/story/compare/unbottled-vs-nanogpt/'
+    | '/$locale/story/compare/unbottled-vs-venice/'
+    | '/$locale/story/compare/uncensored-ai-platforms/'
     | '/$locale/story/newsletter/$email/'
     | '/$locale/story/newsletter/unsubscribe/'
     | '/$locale/user/referral/'
@@ -8106,6 +8172,12 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/whats-new-april-2026'
     | '/$locale/story/blog/whats-new-may-2026'
     | '/$locale/story/blog/whats-new-november-2026'
+    | '/$locale/story/compare/unbottled-vs-character-ai'
+    | '/$locale/story/compare/unbottled-vs-freedomgpt'
+    | '/$locale/story/compare/unbottled-vs-janitor-ai'
+    | '/$locale/story/compare/unbottled-vs-nanogpt'
+    | '/$locale/story/compare/unbottled-vs-venice'
+    | '/$locale/story/compare/uncensored-ai-platforms'
     | '/$locale/story/newsletter/$email'
     | '/$locale/story/newsletter/unsubscribe'
     | '/$locale/user/referral'
@@ -8811,6 +8883,12 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/whats-new-april-2026/'
     | '/$locale/story/blog/whats-new-may-2026/'
     | '/$locale/story/blog/whats-new-november-2026/'
+    | '/$locale/story/compare/unbottled-vs-character-ai/'
+    | '/$locale/story/compare/unbottled-vs-freedomgpt/'
+    | '/$locale/story/compare/unbottled-vs-janitor-ai/'
+    | '/$locale/story/compare/unbottled-vs-nanogpt/'
+    | '/$locale/story/compare/unbottled-vs-venice/'
+    | '/$locale/story/compare/uncensored-ai-platforms/'
     | '/$locale/story/newsletter/$email/'
     | '/$locale/story/newsletter/unsubscribe/'
     | '/$locale/user/_account/referral/'
@@ -10855,6 +10933,48 @@ declare module '@tanstack/react-router' {
       path: '/blog/whats-new-november-2026'
       fullPath: '/$locale/story/blog/whats-new-november-2026/'
       preLoaderRoute: typeof LocaleStoryBlogWhatsNewNovember2026IndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/compare/unbottled-vs-character-ai/': {
+      id: '/$locale/story/compare/unbottled-vs-character-ai/'
+      path: '/compare/unbottled-vs-character-ai'
+      fullPath: '/$locale/story/compare/unbottled-vs-character-ai/'
+      preLoaderRoute: typeof LocaleStoryCompareUnbottledVsCharacterAiIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/compare/unbottled-vs-freedomgpt/': {
+      id: '/$locale/story/compare/unbottled-vs-freedomgpt/'
+      path: '/compare/unbottled-vs-freedomgpt'
+      fullPath: '/$locale/story/compare/unbottled-vs-freedomgpt/'
+      preLoaderRoute: typeof LocaleStoryCompareUnbottledVsFreedomgptIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/compare/unbottled-vs-janitor-ai/': {
+      id: '/$locale/story/compare/unbottled-vs-janitor-ai/'
+      path: '/compare/unbottled-vs-janitor-ai'
+      fullPath: '/$locale/story/compare/unbottled-vs-janitor-ai/'
+      preLoaderRoute: typeof LocaleStoryCompareUnbottledVsJanitorAiIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/compare/unbottled-vs-nanogpt/': {
+      id: '/$locale/story/compare/unbottled-vs-nanogpt/'
+      path: '/compare/unbottled-vs-nanogpt'
+      fullPath: '/$locale/story/compare/unbottled-vs-nanogpt/'
+      preLoaderRoute: typeof LocaleStoryCompareUnbottledVsNanogptIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/compare/unbottled-vs-venice/': {
+      id: '/$locale/story/compare/unbottled-vs-venice/'
+      path: '/compare/unbottled-vs-venice'
+      fullPath: '/$locale/story/compare/unbottled-vs-venice/'
+      preLoaderRoute: typeof LocaleStoryCompareUnbottledVsVeniceIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/compare/uncensored-ai-platforms/': {
+      id: '/$locale/story/compare/uncensored-ai-platforms/'
+      path: '/compare/uncensored-ai-platforms'
+      fullPath: '/$locale/story/compare/uncensored-ai-platforms/'
+      preLoaderRoute: typeof LocaleStoryCompareUncensoredAiPlatformsIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/newsletter/$email/': {
@@ -14523,6 +14643,12 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogWhatsNewApril2026IndexRoute: typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   LocaleStoryBlogWhatsNewMay2026IndexRoute: typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
   LocaleStoryBlogWhatsNewNovember2026IndexRoute: typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
+  LocaleStoryCompareUnbottledVsCharacterAiIndexRoute: typeof LocaleStoryCompareUnbottledVsCharacterAiIndexRoute
+  LocaleStoryCompareUnbottledVsFreedomgptIndexRoute: typeof LocaleStoryCompareUnbottledVsFreedomgptIndexRoute
+  LocaleStoryCompareUnbottledVsJanitorAiIndexRoute: typeof LocaleStoryCompareUnbottledVsJanitorAiIndexRoute
+  LocaleStoryCompareUnbottledVsNanogptIndexRoute: typeof LocaleStoryCompareUnbottledVsNanogptIndexRoute
+  LocaleStoryCompareUnbottledVsVeniceIndexRoute: typeof LocaleStoryCompareUnbottledVsVeniceIndexRoute
+  LocaleStoryCompareUncensoredAiPlatformsIndexRoute: typeof LocaleStoryCompareUncensoredAiPlatformsIndexRoute
   LocaleStoryNewsletterEmailIndexRoute: typeof LocaleStoryNewsletterEmailIndexRoute
   LocaleStoryNewsletterUnsubscribeIndexRoute: typeof LocaleStoryNewsletterUnsubscribeIndexRoute
   LocaleStoryNewsletterConfirmTokenIndexRoute: typeof LocaleStoryNewsletterConfirmTokenIndexRoute
@@ -14591,6 +14717,18 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogWhatsNewMay2026IndexRoute,
   LocaleStoryBlogWhatsNewNovember2026IndexRoute:
     LocaleStoryBlogWhatsNewNovember2026IndexRoute,
+  LocaleStoryCompareUnbottledVsCharacterAiIndexRoute:
+    LocaleStoryCompareUnbottledVsCharacterAiIndexRoute,
+  LocaleStoryCompareUnbottledVsFreedomgptIndexRoute:
+    LocaleStoryCompareUnbottledVsFreedomgptIndexRoute,
+  LocaleStoryCompareUnbottledVsJanitorAiIndexRoute:
+    LocaleStoryCompareUnbottledVsJanitorAiIndexRoute,
+  LocaleStoryCompareUnbottledVsNanogptIndexRoute:
+    LocaleStoryCompareUnbottledVsNanogptIndexRoute,
+  LocaleStoryCompareUnbottledVsVeniceIndexRoute:
+    LocaleStoryCompareUnbottledVsVeniceIndexRoute,
+  LocaleStoryCompareUncensoredAiPlatformsIndexRoute:
+    LocaleStoryCompareUncensoredAiPlatformsIndexRoute,
   LocaleStoryNewsletterEmailIndexRoute: LocaleStoryNewsletterEmailIndexRoute,
   LocaleStoryNewsletterUnsubscribeIndexRoute:
     LocaleStoryNewsletterUnsubscribeIndexRoute,

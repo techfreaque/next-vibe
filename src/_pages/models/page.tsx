@@ -14,6 +14,7 @@ import type { JSX } from "react";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { buildBreadcrumbList } from "../_components/structured-data";
+import { CompareSection } from "../story/compare/_shared/compare-ui";
 import {
   type CatalogMediaModelCounts,
   getCatalogMediaModelCounts,
@@ -88,7 +89,10 @@ export function TanstackPage(data: ModelsIndexPageData): JSX.Element {
       <ModelsIndexClient
         {...data}
         directorySection={
-          <ModelDirectory locale={data.locale} groups={data.directory} />
+          <>
+            <ModelDirectory locale={data.locale} groups={data.directory} />
+            <CompareSection locale={data.locale} />
+          </>
         }
       />
     </>

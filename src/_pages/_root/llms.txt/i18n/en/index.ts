@@ -50,6 +50,9 @@ export const translations = {
     help: "Help",
     helpDesc: "FAQ and contact",
   },
+  compare: {
+    heading: "Comparisons",
+  },
   blog: {
     heading: "Blog posts",
   },

@@ -55,6 +55,9 @@ export const translations: typeof enTranslations = {
     help: "Aide",
     helpDesc: "FAQ et contact",
   },
+  compare: {
+    heading: "Comparatifs",
+  },
   blog: {
     heading: "Articles du blog",
   },

@@ -43,6 +43,13 @@ import {
 import { formatNumber, tierName } from "../../models/_shared/model-format";
 import { listMediaFacts } from "../../models/_shared/model-media-facts";
 import { listBlogPostCards } from "../../story/blog/posts-cards";
+import {
+  COMPARE_HUB_PATH,
+  PLATFORMS,
+  VERSUS_KEYS,
+  versusPath,
+} from "../../story/compare/_shared/platforms";
+import { scopedTranslation as compareScopedTranslation } from "../../story/compare/i18n";
 import { sitemapLocales } from "../sitemap.xml/build-sitemap";
 import { scopedTranslation } from "./i18n";
 
@@ -222,6 +229,21 @@ export async function buildLlmsTxt(
     link(card.title, page(card.path), card.excerpt),
   );
 
+  const { t: compareT } = compareScopedTranslation.scopedT(locale);
+  const comparisons = [
+    link(
+      compareT("links.hub"),
+      page(COMPARE_HUB_PATH),
+      compareT("links.hubDesc"),
+    ),
+    ...VERSUS_KEYS.map((key) =>
+      link(
+        compareT("links.versus", { appName, name: PLATFORMS[key].name }),
+        page(versusPath(key)),
+      ),
+    ),
+  ];
+
   const localeQuery = locale === defaultLlmsLocale() ? "" : `?locale=${locale}`;
   const optional = [
     ...(variant === "short"
@@ -252,6 +274,8 @@ export async function buildLlmsTxt(
     facts.map((fact) => `- ${fact}`).join("\n"),
     `## ${t("pages.heading")}`,
     pages.join("\n"),
+    `## ${t("compare.heading")}`,
+    comparisons.join("\n"),
     `## ${t("blog.heading")}`,
     posts.join("\n"),
   ];

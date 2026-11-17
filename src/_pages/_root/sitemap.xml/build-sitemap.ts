@@ -1,7 +1,7 @@
 /**
  * Sitemap builder - every public, indexable page, once per locale, with
- * hreflang alternates. Pure: model registry, blog registry, a fixed list of
- * marketing pages, plus the public skill pages the caller passes in (those
+ * hreflang alternates. Pure: model registry, blog registry, comparison
+ * pages, a fixed list of marketing pages, plus the public skill pages the caller passes in (those
  * live partly in the DB), so it is safe to build per request.
  *
  * App pages (threads, account, admin, tools) are deliberately absent.
@@ -23,6 +23,10 @@ import {
 } from "../../models/_shared/model-facts";
 import { listMediaFacts } from "../../models/_shared/model-media-facts";
 import { BLOG_POST_DATES } from "../../story/blog/posts-meta";
+import {
+  COMPARE_CHECKED_DATE,
+  listComparePaths,
+} from "../../story/compare/_shared/platforms";
 
 /** Public marketing pages (locale-less paths). */
 export const SITEMAP_STATIC_PATHS: readonly string[] = [
@@ -85,6 +89,10 @@ export function collectSitemapEntries(
 
   for (const [slug, date] of Object.entries(BLOG_POST_DATES)) {
     entries.push({ path: `/story/blog/${slug}`, lastmod: date });
+  }
+
+  for (const path of listComparePaths()) {
+    entries.push({ path, lastmod: COMPARE_CHECKED_DATE });
   }
 
   const seenSkills = new Set<string>();

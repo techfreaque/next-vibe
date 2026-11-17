@@ -21,6 +21,12 @@ import { configScopedTranslation } from "@/env/i18n";
 import { NewsletterStatusRepository } from "@/newsletter/status/repository";
 
 import { CONTAINER, Cta, CtaBand, PageHero } from "../_shared/marketing";
+import { formatCompareDate } from "../compare/_shared/compare-ui";
+import {
+  COMPARE_CHECKED_DATE,
+  COMPARE_HUB_PATH,
+} from "../compare/_shared/platforms";
+import { scopedTranslation as compareScopedTranslation } from "../compare/i18n";
 import { scopedTranslation } from "./i18n";
 import { listBlogPostCards } from "./posts-cards";
 
@@ -167,16 +173,33 @@ export function TanstackPage({
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
 
-  // Newest first; product updates lead, deep dives and referral guides follow.
-  const posts: BlogCardData[] = [
-    ...listBlogPostCards(locale).map((card) => ({
+  const { t: compareT } = compareScopedTranslation.scopedT(locale);
+  const [newest, ...older] = listBlogPostCards(locale).map(
+    (card): BlogCardData => ({
       href: `/${locale}${card.path}`,
       date: card.date,
       title: card.title,
       category: card.category,
       excerpt: card.excerpt,
       readTime: card.readTime,
-    })),
+    }),
+  );
+  // The platform comparison is a standing page, not a dated post: it sits
+  // first in the grid, right under the featured post.
+  const compareCard: BlogCardData = {
+    href: `/${locale}${COMPARE_HUB_PATH}`,
+    date: formatCompareDate(COMPARE_CHECKED_DATE, locale),
+    title: compareT("links.hub"),
+    category: compareT("common.category"),
+    excerpt: compareT("links.hubDesc"),
+    readTime: compareT("hub.hero.readTime"),
+  };
+
+  // Newest first; product updates lead, deep dives and referral guides follow.
+  const posts: BlogCardData[] = [
+    ...(newest === undefined ? [] : [newest]),
+    compareCard,
+    ...older,
     {
       href: `/${locale}/story/earn`,
       date: undefined,

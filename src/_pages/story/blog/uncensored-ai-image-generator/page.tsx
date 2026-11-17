@@ -92,6 +92,7 @@ import {
   Step,
   StepList,
 } from "../../_shared/marketing";
+import { CompareInlineLinks } from "../../compare/_shared/compare-ui";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -674,6 +675,7 @@ export function TanstackPage({
               href={`/${locale}/story/blog/uncensored-models-what-each-is-good-at`}
               label={t("faq.chatLink")}
             />
+            <CompareInlineLinks locale={locale} versus={["venice"]} />
           </Div>
         </ArticleSection>
 

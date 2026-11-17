@@ -54,6 +54,7 @@ import {
   InlineCode,
 } from "../../_shared/article";
 import { Callout, CardLink, Cta } from "../../_shared/marketing";
+import { CompareInlineLinks } from "../../compare/_shared/compare-ui";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -394,6 +395,10 @@ export function TanstackPage({
             <CardLink
               href={`/${locale}/story/self-host`}
               label={t("faq.selfHostLink")}
+            />
+            <CompareInlineLinks
+              locale={locale}
+              versus={["venice", "freedomGpt"]}
             />
           </Div>
         </ArticleSection>
