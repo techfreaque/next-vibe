@@ -48,7 +48,55 @@ export const translations: typeof enTranslations = {
       cancellation: {
         title: "Anulowanie",
         content:
-          "Możesz anulować subskrypcję w dowolnym momencie. Anulowanie wchodzi w życie na koniec bieżącego okresu rozliczeniowego. Pakiety kredytów nie podlegają zwrotowi.",
+          "Możesz anulować subskrypcję w dowolnym momencie. Anulowanie wchodzi w życie na koniec bieżącego okresu rozliczeniowego. Pakiety kredytów nie podlegają zwrotowi, chyba że przysługuje ci ustawowe prawo odstąpienia od umowy (zob. sekcja Prawo odstąpienia od umowy dla konsumentów).",
+      },
+    },
+    withdrawal: {
+      title: "Prawo odstąpienia od umowy dla konsumentów",
+      intro:
+        "Jeśli jesteś konsumentem (§ 13 niemieckiego kodeksu cywilnego, BGB), przy umowach dotyczących pakietów kredytów i subskrypcji zawieranych z nami za pośrednictwem {{appName}} przysługuje ci ustawowe prawo odstąpienia od umowy na zasadach opisanych w poniższym pouczeniu.",
+      notice: {
+        title: "Pouczenie o prawie odstąpienia od umowy",
+        right:
+          "Masz prawo odstąpić od niniejszej umowy w terminie czternastu dni bez podania jakiejkolwiek przyczyny. Termin do odstąpienia od umowy wynosi czternaście dni od dnia zawarcia umowy.",
+        exercise:
+          "Aby skorzystać z prawa odstąpienia od umowy, musisz poinformować nas ({{operator}}, {{address}}, e-mail: {{email}}) o swojej decyzji o odstąpieniu od niniejszej umowy w drodze jednoznacznego oświadczenia (na przykład pismo wysłane pocztą lub e-mail). Możesz skorzystać z poniższego wzoru formularza odstąpienia od umowy, jednak nie jest to obowiązkowe. Wystarczy zwykły e-mail.",
+        deadline:
+          "Aby zachować termin do odstąpienia od umowy, wystarczy, że wyślesz informację dotyczącą wykonania prawa odstąpienia od umowy przed upływem terminu do odstąpienia od umowy.",
+      },
+      effects: {
+        title: "Skutki odstąpienia od umowy",
+        refund:
+          "W przypadku odstąpienia od niniejszej umowy zwracamy ci wszystkie otrzymane od ciebie płatności niezwłocznie, a w każdym przypadku nie później niż czternaście dni od dnia, w którym otrzymaliśmy informację o twoim odstąpieniu od niniejszej umowy. Zwrotu płatności dokonamy przy użyciu takiego samego sposobu płatności, jakiego użyłeś w pierwotnej transakcji, chyba że wyraźnie uzgodniono z tobą inne rozwiązanie; w żadnym przypadku nie poniesiesz opłat w związku z tym zwrotem.",
+        compensation:
+          "Jeżeli zażądałeś rozpoczęcia świadczenia usług w trakcie terminu do odstąpienia od umowy, zapłacisz nam odpowiednią kwotę odpowiadającą udziałowi usług spełnionych do chwili, w której poinformowałeś nas o wykonaniu prawa odstąpienia od niniejszej umowy, w stosunku do pełnego zakresu usług przewidzianych w umowie.",
+        end: "Koniec pouczenia o prawie odstąpienia od umowy",
+      },
+      expiry: {
+        title: "Uwagi o wcześniejszym wygaśnięciu prawa odstąpienia",
+        digitalContent:
+          "W przypadku umowy o dostarczanie treści cyfrowych, które nie są zapisane na nośniku materialnym, prawo odstąpienia od umowy wygasa zgodnie z § 356 ust. 5 BGB, jeżeli rozpoczęliśmy wykonywanie umowy po tym, jak wyraźnie zgodziłeś się na rozpoczęcie wykonywania umowy przed upływem terminu do odstąpienia, potwierdziłeś, że wiesz, iż wraz z rozpoczęciem wykonywania umowy tracisz prawo odstąpienia, a my przekazaliśmy ci potwierdzenie zawarcia umowy.",
+        services:
+          "W przypadku umowy o świadczenie usług prawo odstąpienia od umowy wygasa zgodnie z § 356 ust. 4 BGB, jeżeli w pełni wykonaliśmy usługę, a jej wykonywanie rozpoczęliśmy dopiero po tym, jak wyraziłeś na to wyraźną zgodę i jednocześnie potwierdziłeś, że wiesz, iż twoje prawo odstąpienia wygasa z chwilą pełnego wykonania umowy przez nas.",
+        credits:
+          "Jeżeli twoje prawo odstąpienia nie wygasło na podstawie tych przepisów, w odniesieniu do kredytów obowiązują następujące zasady: cenę przypadającą na niewykorzystane kredyty z umowy, od której odstąpiono, zwracamy w całości, a kredyty te z chwilą odstąpienia są usuwane z twojego konta. Za kredyty już wykorzystane naliczamy, w zakresie dozwolonym przez prawo, kwotę proporcjonalną według stosunku kredytów wykorzystanych do kredytów nabytych w ramach umowy. Odstąpienie od subskrypcji kończy również subskrypcję.",
+      },
+      form: {
+        title: "Wzór formularza odstąpienia od umowy",
+        intro:
+          "(Jeśli chcesz odstąpić od umowy, wypełnij ten formularz i odeślij go do nas.)",
+        recipient: "Adresat: {{operator}}, {{address}}, e-mail: {{email}}",
+        statement:
+          "Ja/My (*) niniejszym odstępuję/odstępujemy (*) od zawartej przeze mnie/przez nas (*) umowy o dostarczanie następujących treści cyfrowych (*)/o świadczenie następującej usługi (*):",
+        orderedOn: "Data zamówienia (*)/data otrzymania (*)",
+        name: "Imię i nazwisko konsumenta(-ów)",
+        address: "Adres konsumenta(-ów)",
+        signature:
+          "Podpis konsumenta(-ów) (tylko jeżeli formularz jest przesyłany w wersji papierowej)",
+        date: "Data",
+        footnote: "(*) Niepotrzebne skreślić.",
+        accountHint:
+          "Abyśmy mogli szybko przypisać twój zakup, podaj adres e-mail swojego konta. Nie jest to warunek skutecznego odstąpienia od umowy.",
       },
     },
     userAccounts: {

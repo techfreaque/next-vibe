@@ -51,7 +51,56 @@ export const translations: typeof enTranslations = {
       cancellation: {
         title: "Résiliation",
         content:
-          "Vous pouvez résilier votre abonnement à tout moment. La résiliation prend effet à la fin de la période de facturation en cours. Les packs de crédits ne sont pas remboursables.",
+          "Vous pouvez résilier votre abonnement à tout moment. La résiliation prend effet à la fin de la période de facturation en cours. Les packs de crédits ne sont pas remboursables, sauf si le droit légal de rétractation s'applique (voir la section Droit de rétractation des consommateurs).",
+      },
+    },
+    withdrawal: {
+      title: "Droit de rétractation des consommateurs",
+      intro:
+        "Si vous êtes un consommateur (article 13 du Code civil allemand, BGB), vous disposez d'un droit légal de rétractation pour les contrats portant sur des packs de crédits et des abonnements que vous concluez avec nous via {{appName}}, dans les conditions prévues par les informations sur la rétractation ci-dessous.",
+      notice: {
+        title: "Informations sur le droit de rétractation",
+        right:
+          "Vous avez le droit de vous rétracter du présent contrat sans donner de motif dans un délai de quatorze jours. Le délai de rétractation est de quatorze jours à compter du jour de la conclusion du contrat.",
+        exercise:
+          "Pour exercer le droit de rétractation, vous devez nous notifier ({{operator}}, {{address}}, e-mail : {{email}}) votre décision de vous rétracter du présent contrat au moyen d'une déclaration dénuée d'ambiguïté (par exemple, une lettre envoyée par la poste ou un e-mail). Vous pouvez utiliser le modèle de formulaire de rétractation ci-dessous, mais ce n'est pas obligatoire. Un simple e-mail suffit.",
+        deadline:
+          "Pour que le délai de rétractation soit respecté, il suffit que vous transmettiez votre communication relative à l'exercice du droit de rétractation avant l'expiration du délai de rétractation.",
+      },
+      effects: {
+        title: "Effets de la rétractation",
+        refund:
+          "En cas de rétractation de votre part du présent contrat, nous vous rembourserons tous les paiements reçus de vous, sans retard excessif et au plus tard quatorze jours à compter du jour où nous avons reçu la notification de votre rétractation du présent contrat. Nous procéderons au remboursement en utilisant le même moyen de paiement que celui que vous avez utilisé pour la transaction initiale, sauf accord exprès contraire avec vous ; en aucun cas ce remboursement n'occasionnera de frais pour vous.",
+        compensation:
+          "Si vous avez demandé que la prestation de services commence pendant le délai de rétractation, vous devez nous payer un montant raisonnable correspondant à la part des services déjà fournis jusqu'au moment où vous nous informez de l'exercice du droit de rétractation pour ce contrat, par rapport à l'ensemble des services prévus par le contrat.",
+        end: "Fin des informations sur le droit de rétractation",
+      },
+      expiry: {
+        title: "Remarques sur l'expiration anticipée du droit de rétractation",
+        digitalContent:
+          "Pour un contrat de fourniture de contenu numérique non fourni sur un support matériel, le droit de rétractation expire en vertu de l'article 356, paragraphe 5, du BGB lorsque nous avons commencé l'exécution du contrat après que vous avez expressément consenti à ce que nous commencions l'exécution avant l'expiration du délai de rétractation, que vous avez confirmé avoir pris connaissance du fait que votre consentement entraîne la perte de votre droit de rétractation dès le début de l'exécution, et que nous vous avons remis une confirmation du contrat.",
+        services:
+          "Pour un contrat de prestation de services, le droit de rétractation expire en vertu de l'article 356, paragraphe 4, du BGB lorsque nous avons pleinement exécuté le service et n'en avons commencé l'exécution qu'après que vous y avez expressément consenti et avez confirmé en même temps avoir pris connaissance du fait que votre droit de rétractation expire dès que nous avons pleinement exécuté le contrat.",
+        credits:
+          "Lorsque votre droit de rétractation n'a pas expiré en vertu de ces dispositions, les règles suivantes s'appliquent aux crédits : nous remboursons intégralement le prix correspondant aux crédits non utilisés issus du contrat rétracté, et ces crédits sont retirés de votre compte lors de la rétractation. Pour les crédits déjà utilisés, nous facturons, dans la mesure permise par la loi, un montant proportionnel calculé selon le rapport entre les crédits utilisés et les crédits acquis au titre du contrat. La rétractation d'un abonnement met également fin à l'abonnement.",
+      },
+      form: {
+        title: "Modèle de formulaire de rétractation",
+        intro:
+          "(Veuillez compléter et renvoyer le présent formulaire uniquement si vous souhaitez vous rétracter du contrat.)",
+        recipient:
+          "À l'attention de {{operator}}, {{address}}, e-mail : {{email}}",
+        statement:
+          "Je/Nous (*) vous notifie/notifions (*) par la présente ma/notre (*) rétractation du contrat portant sur la fourniture du contenu numérique (*)/la prestation de services (*) ci-dessous :",
+        orderedOn: "Commandé le (*)/reçu le (*)",
+        name: "Nom du (des) consommateur(s)",
+        address: "Adresse du (des) consommateur(s)",
+        signature:
+          "Signature du (des) consommateur(s) (uniquement en cas de notification du présent formulaire sur papier)",
+        date: "Date",
+        footnote: "(*) Rayez la mention inutile.",
+        accountHint:
+          "Pour que nous puissions identifier rapidement votre achat, indiquez l'adresse e-mail de votre compte. Ce n'est pas une condition de validité de la rétractation.",
       },
     },
     userAccounts: {

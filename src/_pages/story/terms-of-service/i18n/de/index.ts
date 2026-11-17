@@ -51,7 +51,55 @@ export const translations: typeof enTranslations = {
       cancellation: {
         title: "Kündigung",
         content:
-          "Sie können Ihr Abonnement jederzeit kündigen. Kündigungen werden am Ende des aktuellen Abrechnungszeitraums wirksam. Kredit-Pakete sind nicht erstattungsfähig.",
+          "Sie können Ihr Abonnement jederzeit kündigen. Kündigungen werden am Ende des aktuellen Abrechnungszeitraums wirksam. Kredit-Pakete sind nicht erstattungsfähig, soweit nicht das gesetzliche Widerrufsrecht greift (siehe Abschnitt Widerrufsrecht für Verbraucher).",
+      },
+    },
+    withdrawal: {
+      title: "Widerrufsrecht für Verbraucher",
+      intro:
+        "Sind Sie Verbraucher (§ 13 BGB), steht Ihnen bei Verträgen über Kredit-Pakete und Abonnements, die Sie mit uns über {{appName}} schließen, ein gesetzliches Widerrufsrecht nach Maßgabe der folgenden Widerrufsbelehrung zu.",
+      notice: {
+        title: "Widerrufsbelehrung",
+        right:
+          "Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsabschlusses.",
+        exercise:
+          "Um Ihr Widerrufsrecht auszuüben, müssen Sie uns ({{operator}}, {{address}}, E-Mail: {{email}}) mittels einer eindeutigen Erklärung (z. B. ein mit der Post versandter Brief oder eine E-Mail) über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das unten stehende Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist. Eine formlose E-Mail genügt.",
+        deadline:
+          "Zur Wahrung der Widerrufsfrist reicht es aus, dass Sie die Mitteilung über die Ausübung des Widerrufsrechts vor Ablauf der Widerrufsfrist absenden.",
+      },
+      effects: {
+        title: "Folgen des Widerrufs",
+        refund:
+          "Wenn Sie diesen Vertrag widerrufen, haben wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurückzuzahlen, an dem die Mitteilung über Ihren Widerruf dieses Vertrags bei uns eingegangen ist. Für diese Rückzahlung verwenden wir dasselbe Zahlungsmittel, das Sie bei der ursprünglichen Transaktion eingesetzt haben, es sei denn, mit Ihnen wurde ausdrücklich etwas anderes vereinbart; in keinem Fall werden Ihnen wegen dieser Rückzahlung Entgelte berechnet.",
+        compensation:
+          "Haben Sie verlangt, dass die Dienstleistungen während der Widerrufsfrist beginnen sollen, so haben Sie uns einen angemessenen Betrag zu zahlen, der dem Anteil der bis zu dem Zeitpunkt, zu dem Sie uns von der Ausübung des Widerrufsrechts hinsichtlich dieses Vertrags unterrichten, bereits erbrachten Dienstleistungen im Vergleich zum Gesamtumfang der im Vertrag vorgesehenen Dienstleistungen entspricht.",
+        end: "Ende der Widerrufsbelehrung",
+      },
+      expiry: {
+        title: "Hinweise zum vorzeitigen Erlöschen des Widerrufsrechts",
+        digitalContent:
+          "Bei einem Vertrag über die Bereitstellung von nicht auf einem körperlichen Datenträger befindlichen digitalen Inhalten erlischt das Widerrufsrecht nach § 356 Abs. 5 BGB, wenn wir mit der Vertragserfüllung begonnen haben, nachdem Sie ausdrücklich zugestimmt haben, dass wir mit der Vertragserfüllung vor Ablauf der Widerrufsfrist beginnen, Sie Ihre Kenntnis davon bestätigt haben, dass Sie durch Ihre Zustimmung mit Beginn der Vertragserfüllung Ihr Widerrufsrecht verlieren, und wir Ihnen eine Bestätigung des Vertrags zur Verfügung gestellt haben.",
+        services:
+          "Bei einem Vertrag über die Erbringung von Dienstleistungen erlischt das Widerrufsrecht nach § 356 Abs. 4 BGB, wenn wir die Dienstleistung vollständig erbracht haben und mit der Ausführung erst begonnen haben, nachdem Sie dazu Ihre ausdrückliche Zustimmung gegeben und gleichzeitig Ihre Kenntnis davon bestätigt haben, dass Ihr Widerrufsrecht bei vollständiger Vertragserfüllung durch uns erlischt.",
+        credits:
+          "Soweit Ihr Widerrufsrecht nicht nach diesen Vorschriften erloschen ist, gilt für Kredite Folgendes: Den auf nicht verbrauchte Kredite aus dem widerrufenen Vertrag entfallenden Preis erstatten wir vollständig; diese Kredite werden mit dem Widerruf aus Ihrem Konto ausgebucht. Für bereits verbrauchte Kredite berechnen wir, soweit gesetzlich zulässig, einen anteiligen Betrag nach dem Verhältnis der verbrauchten zu den mit dem Vertrag erworbenen Krediten. Mit dem Widerruf eines Abonnements endet auch das Abonnement.",
+      },
+      form: {
+        title: "Muster-Widerrufsformular",
+        intro:
+          "(Wenn Sie den Vertrag widerrufen wollen, dann füllen Sie bitte dieses Formular aus und senden Sie es zurück.)",
+        recipient: "An {{operator}}, {{address}}, E-Mail: {{email}}",
+        statement:
+          "Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über die Bereitstellung der folgenden digitalen Inhalte (*)/die Erbringung der folgenden Dienstleistung (*):",
+        orderedOn: "Bestellt am (*)/erhalten am (*)",
+        name: "Name des/der Verbraucher(s)",
+        address: "Anschrift des/der Verbraucher(s)",
+        signature:
+          "Unterschrift des/der Verbraucher(s) (nur bei Mitteilung auf Papier)",
+        date: "Datum",
+        footnote: "(*) Unzutreffendes streichen.",
+        accountHint:
+          "Damit wir Ihren Kauf schnell zuordnen können, nennen Sie bitte die E-Mail-Adresse Ihres Kontos. Das ist keine Voraussetzung für einen wirksamen Widerruf.",
       },
     },
     userAccounts: {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { Div } from "next-vibe/ui/components/div";
 import { Scale } from "next-vibe/ui/components/icons/Scale";
 import { ExternalLink } from "next-vibe/ui/components/link";
 import type { JSX } from "react";
@@ -73,6 +74,11 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const operatorContact = {
+    operator: configT("group.responsiblePerson.name"),
+    address: configT("group.address.addressIn1Line"),
+    email: supportEmail,
+  };
 
   return (
     <LegalDocument
@@ -127,6 +133,48 @@ export function TanstackPage({
               <LegalP>
                 {t("sections.subscriptions.cancellation.content")}
               </LegalP>
+            </>
+          ),
+        },
+        {
+          id: "withdrawal",
+          title: t("sections.withdrawal.title"),
+          content: (
+            <>
+              <LegalP>{t("sections.withdrawal.intro", { appName })}</LegalP>
+              <LegalH3>{t("sections.withdrawal.notice.title")}</LegalH3>
+              <LegalP>{t("sections.withdrawal.notice.right")}</LegalP>
+              <LegalP>
+                {t("sections.withdrawal.notice.exercise", operatorContact)}
+              </LegalP>
+              <LegalP>{t("sections.withdrawal.notice.deadline")}</LegalP>
+              <LegalH3>{t("sections.withdrawal.effects.title")}</LegalH3>
+              <LegalP>{t("sections.withdrawal.effects.refund")}</LegalP>
+              <LegalP>{t("sections.withdrawal.effects.compensation")}</LegalP>
+              <LegalP className="text-sm text-muted-foreground">
+                {t("sections.withdrawal.effects.end")}
+              </LegalP>
+              <LegalH3>{t("sections.withdrawal.expiry.title")}</LegalH3>
+              <LegalP>{t("sections.withdrawal.expiry.digitalContent")}</LegalP>
+              <LegalP>{t("sections.withdrawal.expiry.services")}</LegalP>
+              <LegalP>{t("sections.withdrawal.expiry.credits")}</LegalP>
+              <LegalH3>{t("sections.withdrawal.form.title")}</LegalH3>
+              <Div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5">
+                <LegalP>{t("sections.withdrawal.form.intro")}</LegalP>
+                <LegalP>
+                  {t("sections.withdrawal.form.recipient", operatorContact)}
+                </LegalP>
+                <LegalP>{t("sections.withdrawal.form.statement")}</LegalP>
+                <LegalP>{t("sections.withdrawal.form.orderedOn")}</LegalP>
+                <LegalP>{t("sections.withdrawal.form.name")}</LegalP>
+                <LegalP>{t("sections.withdrawal.form.address")}</LegalP>
+                <LegalP>{t("sections.withdrawal.form.signature")}</LegalP>
+                <LegalP>{t("sections.withdrawal.form.date")}</LegalP>
+                <LegalP className="text-sm text-muted-foreground">
+                  {t("sections.withdrawal.form.footnote")}
+                </LegalP>
+              </Div>
+              <LegalP>{t("sections.withdrawal.form.accountHint")}</LegalP>
             </>
           ),
         },

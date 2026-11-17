@@ -24,11 +24,11 @@ import type { JSX, ReactNode } from "react";
 import { CONTAINER, Eyebrow } from "./marketing";
 
 /**
- * The German legal texts are the binding ones. French pages say so above the
- * introduction (other translations predate this notice and are unchanged).
+ * The German legal texts are the binding ones. Every translated page
+ * (en, pl, fr) says so above the introduction.
  */
 export function showBindingNotice(locale: CountryLanguage): boolean {
-  return locale.startsWith("fr-");
+  return !locale.startsWith("de-");
 }
 
 export interface LegalSection {
@@ -48,7 +48,7 @@ function TocLinks({
         <Li key={section.id}>
           <Link
             href={`#${section.id}`}
-            className="flex min-h-11 items-center gap-3 rounded-md px-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:min-h-9"
+            className="flex min-h-11 items-center gap-3 rounded-md px-2 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:min-h-9"
           >
             <Span className="w-5 shrink-0 text-xs font-medium text-muted-foreground/70 tabular-nums">
               {index + 1}

@@ -46,7 +46,54 @@ export const translations = {
       cancellation: {
         title: "Cancellation",
         content:
-          "You can cancel your subscription at any time. Cancellations take effect at the end of the current billing period. Credit packs are non-refundable.",
+          "You can cancel your subscription at any time. Cancellations take effect at the end of the current billing period. Credit packs are non-refundable unless the statutory right of withdrawal applies (see the section Right of Withdrawal for Consumers).",
+      },
+    },
+    withdrawal: {
+      title: "Right of Withdrawal for Consumers",
+      intro:
+        "If you are a consumer (Section 13 of the German Civil Code, BGB), you have a statutory right of withdrawal for contracts for credit packs and subscriptions that you conclude with us via {{appName}}, as set out in the following withdrawal notice.",
+      notice: {
+        title: "Withdrawal Notice",
+        right:
+          "You have the right to withdraw from this contract within fourteen days without giving any reason. The withdrawal period is fourteen days from the day the contract is concluded.",
+        exercise:
+          "To exercise your right of withdrawal, you must inform us ({{operator}}, {{address}}, email: {{email}}) of your decision to withdraw from this contract by an unequivocal statement (for example a letter sent by post or an email). You may use the model withdrawal form below, but it is not obligatory. A plain email is sufficient.",
+        deadline:
+          "To meet the withdrawal deadline, it is sufficient for you to send your communication concerning your exercise of the right of withdrawal before the withdrawal period has expired.",
+      },
+      effects: {
+        title: "Effects of Withdrawal",
+        refund:
+          "If you withdraw from this contract, we shall reimburse all payments received from you without undue delay and at the latest within fourteen days from the day on which we receive your notice of withdrawal from this contract. We will make this reimbursement using the same means of payment that you used for the original transaction, unless expressly agreed otherwise with you; in no case will you be charged any fees for this reimbursement.",
+        compensation:
+          "If you requested that the services begin during the withdrawal period, you shall pay us a reasonable amount corresponding to the proportion of the services already provided up to the time you inform us of the exercise of the right of withdrawal with respect to this contract, compared with the full scope of the services provided for in the contract.",
+        end: "End of withdrawal notice",
+      },
+      expiry: {
+        title: "Notes on Early Expiry of the Right of Withdrawal",
+        digitalContent:
+          "For a contract for the supply of digital content not on a tangible medium, the right of withdrawal expires under Section 356(5) BGB if we have begun performance of the contract after you have expressly consented to us beginning performance before the end of the withdrawal period, you have confirmed your knowledge that your consent causes you to lose your right of withdrawal once performance begins, and we have provided you with a confirmation of the contract.",
+        services:
+          "For a contract for services, the right of withdrawal expires under Section 356(4) BGB if we have fully performed the service and only began performance after you gave your express consent and at the same time confirmed your knowledge that your right of withdrawal expires once we have fully performed the contract.",
+        credits:
+          "Where your right of withdrawal has not expired under these provisions, the following applies to credits: we refund in full the price attributable to unused credits from the withdrawn contract, and these credits are removed from your account upon withdrawal. For credits already used, we charge a proportionate amount, to the extent permitted by law, based on the ratio of used credits to the credits acquired under the contract. Withdrawing from a subscription also ends the subscription.",
+      },
+      form: {
+        title: "Model Withdrawal Form",
+        intro:
+          "(If you want to withdraw from the contract, please complete this form and send it back.)",
+        recipient: "To {{operator}}, {{address}}, email: {{email}}",
+        statement:
+          "I/We (*) hereby withdraw from the contract concluded by me/us (*) for the supply of the following digital content (*)/the provision of the following service (*):",
+        orderedOn: "Ordered on (*)/received on (*)",
+        name: "Name of consumer(s)",
+        address: "Address of consumer(s)",
+        signature: "Signature of consumer(s) (only if this form is sent on paper)",
+        date: "Date",
+        footnote: "(*) Delete as appropriate.",
+        accountHint:
+          "To help us match your purchase quickly, please state the email address of your account. This is not a requirement for a valid withdrawal.",
       },
     },
     userAccounts: {
