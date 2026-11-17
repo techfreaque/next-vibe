@@ -16,6 +16,7 @@ export const translations = {
       locale: "Locale",
       isActive: "Active Status",
       emailVerified: "Email Verified",
+      pendingEmail: "Pending Email",
       requireTwoFactor: "Two-Factor Authentication Required",
       marketingConsent: "Marketing Consent",
       userRoles: "User Roles",
@@ -116,7 +117,8 @@ export const translations = {
     fields: {
       email: {
         label: "Email Address",
-        description: "Your email address",
+        description:
+          "Your login address. A new one only takes over after you click the link we send to it.",
         placeholder: "Enter your email address",
         help: "Your email address will be used for account notifications and communication",
         validation: {
@@ -281,6 +283,9 @@ export const translations = {
       locale: "Locale",
       isActive: "Active Status",
       emailVerified: "Email Verified",
+      pendingEmail: "Pending Email",
+      emailChangePending:
+        "Almost done. Click the link we sent to {{email}} to switch. Until then you keep logging in with {{current}}.",
       requireTwoFactor: "Two-Factor Authentication Required",
       marketingConsent: "Marketing Consent",
       userRoles: "User Roles",
@@ -320,6 +325,8 @@ export const translations = {
         title: "Validation Error",
         description: "Invalid request parameters",
         emailTaken: "That email address already belongs to another account",
+        disposableEmail:
+          "Throwaway inboxes are not allowed. Use a permanent email address.",
       },
       unauthorized: {
         title: "Unauthorized",
@@ -486,6 +493,11 @@ export const translations = {
       description:
         "We sent a link to {{email}}. Chat works either way. Confirming keeps your account recoverable.",
       action: "Resend link",
+    },
+    pendingEmail: {
+      title: "Email change waiting for you",
+      description:
+        "Click the link we sent to {{email}}. Until then you log in with {{current}}. Save again to resend the link, or save your current address to cancel.",
     },
     slugWarning:
       "Changing this URL will break any existing links to your profile.",
@@ -1072,6 +1084,25 @@ export const translations = {
         saved: "Address saved.",
         backToAddresses: "Back to Addresses",
       },
+    },
+  },
+  emailChange: {
+    subject: "Confirm your new email for {{appName}}",
+    title: "Confirm your new email",
+    previewText: "One click and {{appName}} uses this address.",
+    greeting: "Hi {{name}},",
+    body: "You asked to change your {{appName}} login to this address. Click below to confirm. Until you do, your account keeps using {{current}}.",
+    button: "Confirm new email",
+    expiry:
+      "This link works for {{days}} days. Didn't ask for this? Ignore this email and nothing changes.",
+    signoff: "The {{appName}} team",
+    errors: {
+      failed: "Could not build the confirmation email.",
+    },
+    template: {
+      name: "Email change confirmation",
+      description: "Sent to the new address when a user changes their email",
+      category: "Account",
     },
   },
 };

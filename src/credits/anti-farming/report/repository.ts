@@ -30,6 +30,7 @@ import {
   GUEST_POOLS_PER_SUBNET_PER_DAY,
   IP_SUBNET_PREFIX,
   SIGNUP_GUEST_SPEND_LOOKBACK_HOURS,
+  SIGNUPS_PER_SUBNET_PER_DAY,
 } from "../config";
 import type { AntiFarmingReportResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -129,6 +130,7 @@ export class AntiFarmingReportRepository {
             subnet_guest_limit: NumLike;
             duplicate_email: NumLike;
             disposable_email: NumLike;
+            subnet_signup_limit: NumLike;
           }
         >(sql`
           SELECT
@@ -136,7 +138,8 @@ export class AntiFarmingReportRepository {
             count(*) FILTER (WHERE kind = 'subnet_account_limit') AS subnet_account_limit,
             count(*) FILTER (WHERE kind = 'subnet_guest_limit') AS subnet_guest_limit,
             count(*) FILTER (WHERE kind = 'duplicate_email') AS duplicate_email,
-            count(*) FILTER (WHERE kind = 'disposable_email') AS disposable_email
+            count(*) FILTER (WHERE kind = 'disposable_email') AS disposable_email,
+            count(*) FILTER (WHERE kind = 'subnet_signup_limit') AS subnet_signup_limit
           FROM anti_farming_events
           WHERE created_at >= ${since}
         `),
@@ -188,6 +191,7 @@ export class AntiFarmingReportRepository {
           signupGuestSpendLookbackHours: SIGNUP_GUEST_SPEND_LOOKBACK_HOURS,
           subnetPrefixV4: IP_SUBNET_PREFIX.v4,
           subnetPrefixV6: IP_SUBNET_PREFIX.v6,
+          signupsPerSubnetPerDay: SIGNUPS_PER_SUBNET_PER_DAY,
         },
         totals: {
           total: num(t0?.total),
@@ -195,6 +199,7 @@ export class AntiFarmingReportRepository {
           subnetGuestLimit: num(t0?.subnet_guest_limit),
           duplicateEmail: num(t0?.duplicate_email),
           disposableEmail: num(t0?.disposable_email),
+          subnetSignupLimit: num(t0?.subnet_signup_limit),
         },
         subnetsByBlocked: byBlocked.rows.map(toSubnetRow),
         subnetsByClaims: byClaims.rows.map(toSubnetRow),

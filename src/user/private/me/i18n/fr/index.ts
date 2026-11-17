@@ -18,6 +18,7 @@ export const translations: typeof enTranslations = {
       locale: "Langue et région",
       isActive: "Statut actif",
       emailVerified: "E-mail vérifié",
+      pendingEmail: "E-mail en attente",
       requireTwoFactor: "Authentification à deux facteurs requise",
       marketingConsent: "Consentement marketing",
       userRoles: "Rôles de l'utilisateur",
@@ -121,7 +122,8 @@ export const translations: typeof enTranslations = {
     fields: {
       email: {
         label: "Adresse e-mail",
-        description: "Votre adresse e-mail",
+        description:
+          "Votre adresse de connexion. Une nouvelle adresse ne s'applique qu'après un clic sur le lien que nous lui envoyons.",
         placeholder: "Saisissez votre adresse e-mail",
         help: "Votre adresse e-mail sert aux notifications et aux échanges liés à votre compte",
         validation: {
@@ -290,6 +292,9 @@ export const translations: typeof enTranslations = {
       locale: "Langue et région",
       isActive: "Statut actif",
       emailVerified: "E-mail vérifié",
+      pendingEmail: "E-mail en attente",
+      emailChangePending:
+        "Presque fini. Cliquez sur le lien envoyé à {{email}} pour changer. D'ici là, vous vous connectez toujours avec {{current}}.",
       requireTwoFactor: "Authentification à deux facteurs requise",
       marketingConsent: "Consentement marketing",
       userRoles: "Rôles de l'utilisateur",
@@ -329,6 +334,8 @@ export const translations: typeof enTranslations = {
         title: "Erreur de validation",
         description: "Paramètres de requête invalides",
         emailTaken: "Cette adresse e-mail appartient déjà à un autre compte",
+        disposableEmail:
+          "Les adresses jetables ne sont pas acceptées. Utilisez une adresse e-mail permanente.",
       },
       unauthorized: {
         title: "Non autorisé",
@@ -502,6 +509,11 @@ export const translations: typeof enTranslations = {
       description:
         "Nous avons envoyé un lien à {{email}}. Le chat fonctionne dans tous les cas. La confirmation permet de récupérer votre compte.",
       action: "Renvoyer le lien",
+    },
+    pendingEmail: {
+      title: "Changement d'e-mail en attente",
+      description:
+        "Cliquez sur le lien envoyé à {{email}}. D'ici là, vous vous connectez avec {{current}}. Enregistrez à nouveau pour renvoyer le lien, ou enregistrez votre adresse actuelle pour annuler.",
     },
     slugWarning:
       "Modifier cette URL cassera tous les liens existants vers votre profil.",
@@ -1113,6 +1125,26 @@ export const translations: typeof enTranslations = {
         saved: "Adresse enregistrée.",
         backToAddresses: "Retour aux adresses",
       },
+    },
+  },
+  emailChange: {
+    subject: "Confirmez votre nouvel e-mail pour {{appName}}",
+    title: "Confirmez votre nouvel e-mail",
+    previewText: "Un clic et {{appName}} utilise cette adresse.",
+    greeting: "Bonjour {{name}},",
+    body: "Vous avez demandé à passer votre connexion {{appName}} sur cette adresse. Confirmez ci-dessous. D'ici là, votre compte reste sur {{current}}.",
+    button: "Confirmer le nouvel e-mail",
+    expiry:
+      "Ce lien est valable {{days}} jours. Vous n'avez rien demandé ? Ignorez cet e-mail, rien ne change.",
+    signoff: "L'équipe {{appName}}",
+    errors: {
+      failed: "Impossible de préparer l'e-mail de confirmation.",
+    },
+    template: {
+      name: "Confirmation de changement d'e-mail",
+      description:
+        "Envoyé à la nouvelle adresse quand un utilisateur change son e-mail",
+      category: "Compte",
     },
   },
 };

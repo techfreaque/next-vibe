@@ -65,6 +65,7 @@ export const translations = {
       subnetGuestLimit: "Guest limit hit",
       duplicateEmail: "Duplicate email",
       disposableEmail: "Disposable email",
+      subnetSignupLimit: "Signup limit hit",
     },
     col: {
       subnet: "Subnet",
@@ -91,6 +92,7 @@ export const translations = {
       guestIpWindow: "Guests on one IP share a pool for (hours)",
       signupLookback: "Guest spend carried into signup from (hours)",
       subnetPrefix: "Subnet size",
+      signupsPerSubnet: "New accounts per subnet per 24 h",
     },
   },
 };

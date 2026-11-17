@@ -35,6 +35,7 @@ import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { contacts } from "../../../contact/db";
+import { recordAntiFarmingEvent } from "../../../credits/anti-farming/events";
 import { creditWallets } from "../../../credits/db";
 import { growthJourneys } from "../../../leads/growth/db";
 import { csvImportJobs, importBatches } from "../../../leads/import/db";
@@ -46,7 +47,12 @@ import { SubscriptionStatus } from "../../../subscription/enum";
 import { SubscriptionRepository } from "../../../subscription/repository";
 import { withTransaction } from "../../../vibe/database/utils/repository-helpers";
 import { passwordResets } from "../../public/reset-password/db";
+import { isDisposableEmailByMx } from "../../public/signup/disposable-mx";
 import { findUserByNormalizedEmail } from "../../public/signup/email-guard";
+import {
+  emailDomain,
+  isDisposableEmail,
+} from "../../public/signup/email-identity";
 import type {
   MeDeleteResponseOutput,
   MeGetResponseOutput,
@@ -165,6 +171,16 @@ function sniffImageMime(base64: string): string {
   return "image/jpeg";
 }
 
+/** The requested new address still waiting for its confirm link, or null. */
+async function getPendingEmail(userId: string): Promise<string | null> {
+  const [row] = await db
+    .select({ pendingEmail: users.pendingEmail })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  return row?.pendingEmail ?? null;
+}
+
 /**
  * User Profile Repository - Static class pattern
  */
@@ -224,6 +240,7 @@ export class UserProfileRepository {
       return success({
         ...userResponse.data,
         isPublic: false as const,
+        pendingEmail: await getPendingEmail(userId),
         skills,
       } as MeGetResponseOutput);
     } catch (error) {
@@ -319,8 +336,31 @@ export class UserProfileRepository {
 
       const currentUser = userResponse.data;
 
-      // Verify email is not taken by another user
+      // A new email is never applied here: it waits in users.pendingEmail
+      // until the link mailed to it is clicked (verify-email completes the
+      // swap). The current address stays active until then, so an account
+      // can only move to an inbox it really controls.
+      let requestedEmail: string | null = null;
       if (data.basicInfo?.email && data.basicInfo.email !== currentUser.email) {
+        // Same throwaway-inbox block as signup (listed domain or temp-mail MX)
+        const newEmail = data.basicInfo.email;
+        if (
+          isDisposableEmail(newEmail) ||
+          (await isDisposableEmailByMx(newEmail))
+        ) {
+          logger.info("Email change blocked: disposable email", {
+            userId,
+            emailDomain: emailDomain(newEmail),
+          });
+          await recordAntiFarmingEvent(
+            { kind: "disposable_email", emailDomain: emailDomain(newEmail) },
+            logger,
+          );
+          return fail({
+            message: t("update.errors.validation.disposableEmail"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
         const emailExistsResponse = await UserRepository.emailExistsByOtherUser(
           data.basicInfo.email,
           userId,
@@ -342,6 +382,7 @@ export class UserProfileRepository {
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
+        requestedEmail = newEmail;
       }
 
       // Flatten the nested data structure for database update
@@ -359,8 +400,15 @@ export class UserProfileRepository {
         if (data.basicInfo.publicName !== undefined) {
           updateData.publicName = data.basicInfo.publicName;
         }
-        if (data.basicInfo.email !== undefined) {
-          updateData.email = data.basicInfo.email;
+        if (requestedEmail) {
+          // Saving again re-sends the link (route email template)
+          updateData.pendingEmail = requestedEmail;
+        } else if (
+          data.basicInfo.email !== undefined &&
+          data.basicInfo.email === currentUser.email
+        ) {
+          // Saving the current address again cancels a pending change
+          updateData.pendingEmail = null;
         }
       }
 
@@ -460,32 +508,6 @@ export class UserProfileRepository {
       // Update user in database
       await db.update(users).set(updateData).where(eq(users.id, userId));
 
-      // Cascade email change to linked lead record.
-      // Use onConflictDoNothing to handle the edge case where another lead row
-      // already has the same email (leads_email_unique constraint). The users table
-      // update already succeeded, so a conflict here is non-fatal - the lead email
-      // stays as-is rather than crashing the whole request.
-      if (updateData.email && currentUser.leadId) {
-        await db
-          .update(leads)
-          .set({ email: updateData.email, updatedAt: new Date() })
-          .where(eq(leads.id, currentUser.leadId))
-          .catch((leadUpdateErr) => {
-            const msg = parseError(leadUpdateErr).message;
-            if (msg.includes("leads_email_unique")) {
-              logger.warn(
-                "Lead email update skipped - email already claimed by another lead",
-                { leadId: currentUser.leadId, email: updateData.email },
-              );
-            } else {
-              logger.error("Failed to cascade email to lead", {
-                leadId: currentUser.leadId,
-                error: msg,
-              });
-            }
-          });
-      }
-
       logger.debug("Successfully updated user profile", { userId });
 
       // Get the updated user data
@@ -504,6 +526,7 @@ export class UserProfileRepository {
       const changedFields = Object.keys(updateData).filter(
         (key) => key !== "updatedAt",
       );
+      const pendingEmail = await getPendingEmail(userId);
 
       // Fetch user's public skills
       const skills = await fetchUserSkills(userId, user);
@@ -512,14 +535,20 @@ export class UserProfileRepository {
       return success({
         response: {
           success: true,
-          message: t("update.response.message"),
+          message: requestedEmail
+            ? t("update.response.emailChangePending", {
+                email: requestedEmail,
+                current: currentUser.email,
+              })
+            : t("update.response.message"),
           ...updatedUserResponse.data,
           leadId: updatedUserResponse.data.leadId ?? null,
+          pendingEmail,
           skills,
           changesSummary: {
             totalChanges: changedFields.length,
             changedFields: changedFields,
-            verificationRequired: false,
+            verificationRequired: requestedEmail !== null,
             lastUpdated: new Date().toISOString(),
           },
           nextSteps: [t("update.success.nextSteps") as string],

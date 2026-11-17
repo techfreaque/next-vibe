@@ -226,6 +226,11 @@ export const translations: typeof enTranslations = {
       title: "Wymagany stały adres e-mail",
       detail: "Tymczasowe skrzynki odpadają. Podaj stały adres e-mail.",
     },
+    subnetSignupLimit: {
+      title: "Za dużo rejestracji z Twojej sieci",
+      detail:
+        "Z Twojej sieci założono dziś już zbyt wiele kont. Spróbuj jutro albo zaloguj się na istniejące konto.",
+    },
     userNotFound: "Nie znaleziono konta dla {{email}}",
     forbidden: {
       title: "Dostęp Zabroniony",

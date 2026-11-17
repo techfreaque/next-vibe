@@ -67,6 +67,7 @@ export const translations: typeof enTranslations = {
       subnetGuestLimit: "Limite invités atteinte",
       duplicateEmail: "E-mail en double",
       disposableEmail: "E-mail jetable",
+      subnetSignupLimit: "Limite inscriptions atteinte",
     },
     col: {
       subnet: "Sous-réseau",
@@ -95,6 +96,7 @@ export const translations: typeof enTranslations = {
       signupLookback:
         "Dépenses invité reportées à l'inscription depuis (heures)",
       subnetPrefix: "Taille du sous-réseau",
+      signupsPerSubnet: "Nouveaux comptes par sous-réseau sur 24 h",
     },
   },
 };

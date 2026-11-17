@@ -9,6 +9,7 @@ import { createHash, randomBytes } from "node:crypto";
 
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "next-vibe/database";
+import { users } from "next-vibe/identity/user/db";
 
 import { API_KEY_DISPLAY_LENGTH, API_KEY_PREFIX } from "./constants";
 import { type UserApiKey, userApiKeys } from "./db";
@@ -35,7 +36,10 @@ export function looksLikeApiKey(token: string): boolean {
   return token.startsWith(API_KEY_PREFIX);
 }
 
-/** Active (not revoked) key for a plaintext bearer, or undefined. */
+/**
+ * Active (not revoked) key for a plaintext bearer, or undefined.
+ * Keys of a suspended (banned or deactivated) account never resolve.
+ */
 export async function findActiveKey(
   plaintext: string,
 ): Promise<UserApiKey | undefined> {
@@ -43,16 +47,19 @@ export async function findActiveKey(
     return undefined;
   }
   const [row] = await db
-    .select()
+    .select({ key: userApiKeys })
     .from(userApiKeys)
+    .innerJoin(users, eq(users.id, userApiKeys.userId))
     .where(
       and(
         eq(userApiKeys.hashedKey, hashApiKey(plaintext)),
         isNull(userApiKeys.revokedAt),
+        eq(users.isBanned, false),
+        eq(users.isActive, true),
       ),
     )
     .limit(1);
-  return row;
+  return row?.key;
 }
 
 const LAST_USED_THROTTLE_MS = 60_000;

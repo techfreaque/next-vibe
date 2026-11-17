@@ -169,8 +169,7 @@ export const translations: typeof enTranslations = {
       descriptionAnd: "et notre",
       descriptionSuffix: "respectent votre liberté et votre vie privée.",
       validation: {
-        required:
-          "Vous devez accepter les conditions générales pour continuer",
+        required: "Vous devez accepter les conditions générales pour continuer",
       },
     },
     referralCode: {
@@ -231,6 +230,11 @@ export const translations: typeof enTranslations = {
       title: "Adresse e-mail permanente requise",
       detail:
         "Les adresses jetables ne permettent pas de s'inscrire. Utilisez une adresse e-mail permanente.",
+    },
+    subnetSignupLimit: {
+      title: "Trop d'inscriptions depuis votre réseau",
+      detail:
+        "Trop de comptes ont été créés depuis votre réseau aujourd'hui. Réessayez demain ou connectez-vous à un compte existant.",
     },
     userNotFound: "Aucun compte trouvé pour {{email}}",
     forbidden: {
@@ -456,7 +460,8 @@ export const translations: typeof enTranslations = {
       credits:
         "{{freeCreditsSignedIn}} crédits gratuits chaque mois, +{{freeCreditsNewsletterBonus}} avec la newsletter. Sans carte bancaire",
       allModels: "Accès aux {{modelCount}} modèles d'IA",
-      uncensored: "Des modèles non censurés qui répondent vraiment à vos questions",
+      uncensored:
+        "Des modèles non censurés qui répondent vraiment à vos questions",
       chatModes: "Modes de chat Privé, Incognito, Partagé et Public",
       noCard: "Aucune carte bancaire requise. Jamais.",
     },

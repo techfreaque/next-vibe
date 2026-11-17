@@ -8,6 +8,7 @@ import {
   emailDomain,
   isDisposableEmail,
   isDisposableEmailDomain,
+  isDisposableMxHost,
   normalizeEmailForUniqueness,
 } from "./email-identity";
 
@@ -63,10 +64,59 @@ describe("disposable domains", () => {
     expect(isDisposableEmail("x@a.b.yopmail.com")).toBe(true);
   });
 
+  it("blocks the rotating temp-mail domains seen farming", () => {
+    expect(isDisposableEmail("pen1@fldubai.com")).toBe(true);
+    expect(isDisposableEmail("pen2@euploading.com")).toBe(true);
+  });
+
+  it("never lists a mainstream provider", () => {
+    for (const domain of [
+      "gmail.com",
+      "googlemail.com",
+      "outlook.com",
+      "hotmail.com",
+      "live.com",
+      "yahoo.com",
+      "icloud.com",
+      "proton.me",
+      "protonmail.com",
+      "gmx.de",
+      "gmx.net",
+      "gmx.com",
+      "web.de",
+      "t-online.de",
+      "mail.ru",
+      "yandex.ru",
+      "yandex.com",
+      "aol.com",
+      "wp.pl",
+      "orange.fr",
+    ]) {
+      expect(isDisposableEmailDomain(domain), domain).toBe(false);
+    }
+  });
+
   it("allows normal providers", () => {
     expect(isDisposableEmail("x@gmail.com")).toBe(false);
     expect(isDisposableEmail("x@example.org")).toBe(false);
     expect(isDisposableEmail("x@notmailinator.com.example.org")).toBe(false);
     expect(isDisposableEmailDomain("com")).toBe(false);
+  });
+});
+
+describe("disposable MX hosts", () => {
+  it("matches listed hosts and their subdomains", () => {
+    expect(isDisposableMxHost("mx.smtp.is")).toBe(true);
+    expect(isDisposableMxHost("MX.SMTP.IS.")).toBe(true);
+    expect(isDisposableMxHost("smtp.yopmail.com")).toBe(true);
+    expect(isDisposableMxHost("mx2.generator.email")).toBe(true);
+  });
+
+  it("does not match parents, look-alikes or mainstream MX", () => {
+    expect(isDisposableMxHost("smtp.is")).toBe(false);
+    expect(isDisposableMxHost("yopmail.com")).toBe(false);
+    expect(isDisposableMxHost("notmx.smtp.is.example.org")).toBe(false);
+    expect(isDisposableMxHost("gmail-smtp-in.l.google.com")).toBe(false);
+    expect(isDisposableMxHost("mx01.mail.icloud.com")).toBe(false);
   });
 });

@@ -188,6 +188,21 @@ export class LoginRepository {
         });
       }
 
+      // Suspended (banned) or deactivated accounts never get a session.
+      // Checked after the password so it reveals nothing to a guesser.
+      if (userRow.isBanned || !userRow.isActive) {
+        logger.warn("Login refused: account suspended", {
+          userId: userRow.id,
+          isBanned: userRow.isBanned,
+          isActive: userRow.isActive,
+        });
+        await this.recordAttemptDb(email, ipAddress, false, false);
+        return fail({
+          message: t("errors.account_suspended"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+
       // Re-fetch full user object (needed downstream)
       const userResponse = await UserRepository.getUserByEmail(
         email,

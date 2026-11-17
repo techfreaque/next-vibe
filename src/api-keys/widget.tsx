@@ -179,7 +179,7 @@ export function ApiKeysContainer(): JSX.Element {
 
   const handleCreate = (): void => {
     const trimmed = name.trim();
-    if (!trimmed) {
+    if (!trimmed || !data?.isPaid) {
       return;
     }
     setCreating(true);
@@ -273,10 +273,10 @@ export function ApiKeysContainer(): JSX.Element {
           className="flex flex-col gap-2 rounded-xl border border-primary/40 bg-primary/5 p-4"
         >
           <Span className="text-sm font-semibold">
-            {t("widget.upgradeTitle", { packPrice: prices.packPrice })}
+            {t("widget.upgradeTitle", { subPrice: prices.subPrice })}
           </Span>
           <P className="m-0 text-xs text-muted-foreground">
-            {t("widget.upgradeBody", { subPrice: prices.subPrice })}
+            {t("widget.upgradeBody")}
           </P>
           <Link
             href={`/${locale}/${API_UNLOCK_PATH}`}
@@ -302,13 +302,13 @@ export function ApiKeysContainer(): JSX.Element {
             }}
             placeholder={t("widget.namePlaceholder")}
             aria-label={t("widget.nameLabel")}
-            disabled={creating}
+            disabled={creating || !data.isPaid}
             className="h-10 flex-1"
           />
           <Button
             type="button"
             className="h-10 shrink-0"
-            disabled={creating || name.trim().length === 0}
+            disabled={creating || !data.isPaid || name.trim().length === 0}
             onClick={handleCreate}
           >
             {creating ? t("widget.creating") : t("widget.create")}

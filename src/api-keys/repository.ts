@@ -20,6 +20,7 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ApiKeyDeleteResponseOutput } from "./[id]/definition";
+import { buildApiUnlockUrl, getApiAccessPrices } from "./access";
 import { API_KEY_MAX_ACTIVE } from "./constants";
 import { userApiKeys } from "./db";
 import type {
@@ -95,12 +96,23 @@ export class ApiKeysRepository {
   static async create(
     user: JwtPrivatePayloadType,
     name: string,
+    locale: CountryLanguage,
     logger: EndpointLogger,
+    request: Request | undefined,
     t: ApiKeysT,
   ): Promise<ResponseType<ApiKeysPostResponseOutput>> {
     try {
-      // Free accounts may create keys so they are ready: /v1 itself answers 402
-      // (gate.ts) until the account has a plan or a credit purchase.
+      // Keys are for paying accounts only (any plan or any credit purchase),
+      // on every surface. /v1 also answers 402 for unpaid keys (gate.ts).
+      if (!(await isPaidUser(user.id))) {
+        return fail({
+          message: t("create.errors.paidRequired", {
+            subPrice: getApiAccessPrices(locale).subPrice,
+            url: buildApiUnlockUrl(buildPublicOrigin(request), locale),
+          }),
+          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+        });
+      }
       const [active] = await db
         .select({ n: count() })
         .from(userApiKeys)

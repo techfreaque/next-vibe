@@ -3,6 +3,10 @@
  * Format: base64url("<userId>.<expiresAtMs>") + "." + base64url(hmac)
  * The signature covers the CURRENT email address, so changing the email
  * invalidates old links. Verification is idempotent (flag flips once).
+ *
+ * Purpose "email-change" signs over the PENDING address with its own key, so a
+ * change link only confirms that exact pending address and can never pass as
+ * a plain verification link (or the other way round).
  */
 
 import "server-only";
@@ -14,12 +18,26 @@ import { identityEnv } from "next-vibe/identity/env";
 export const VERIFY_TOKEN_TTL_DAYS = 7;
 const TTL_MS = VERIFY_TOKEN_TTL_DAYS * 24 * 60 * 60 * 1000;
 
-function sign(userId: string, email: string, expiresAt: number): string | null {
+export type VerificationTokenPurpose = "verify" | "email-change";
+
+const KEY_LABEL: Record<VerificationTokenPurpose, string> = {
+  verify: "email-verify:v1",
+  "email-change": "email-change:v1",
+};
+
+function sign(
+  userId: string,
+  email: string,
+  expiresAt: number,
+  purpose: VerificationTokenPurpose,
+): string | null {
   const secret = identityEnv.JWT_SECRET_KEY;
   if (!secret) {
     return null;
   }
-  const key = createHash("sha256").update(`email-verify:v1:${secret}`).digest();
+  const key = createHash("sha256")
+    .update(`${KEY_LABEL[purpose]}:${secret}`)
+    .digest();
   return createHmac("sha256", key)
     .update(`${userId}\n${email.toLowerCase()}\n${expiresAt}`)
     .digest("base64url");
@@ -29,9 +47,10 @@ export function createVerificationToken(
   userId: string,
   email: string,
   nowMs: number = Date.now(),
+  purpose: VerificationTokenPurpose = "verify",
 ): string | null {
   const expiresAt = nowMs + TTL_MS;
-  const sig = sign(userId, email, expiresAt);
+  const sig = sign(userId, email, expiresAt, purpose);
   if (!sig) {
     return null;
   }
@@ -69,6 +88,7 @@ export function isValidVerificationToken(
   userId: string,
   email: string,
   nowMs: number = Date.now(),
+  purpose: VerificationTokenPurpose = "verify",
 ): boolean {
   const parts = token.split(".");
   if (parts.length !== 2) {
@@ -83,7 +103,7 @@ export function isValidVerificationToken(
   if (!Number.isFinite(expiresAt) || expiresAt < nowMs) {
     return false;
   }
-  const expected = sign(userId, email, expiresAt);
+  const expected = sign(userId, email, expiresAt, purpose);
   if (!expected) {
     return false;
   }

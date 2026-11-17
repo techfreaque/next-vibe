@@ -1,6 +1,7 @@
 /**
  * Free-credit access rules against farming (thresholds in ./config.ts):
- * - account tiers need a verified email
+ * - accounts created since FREE_POOL_CLAIMS_START get no free credits at all
+ *   until their email is verified; account tiers need a verified email
  * - each subnet (IPv4 /24, IPv6 /64) gets ACCOUNT_POOLS_PER_SUBNET_PER_MONTH
  *   new free account pools per month and GUEST_POOLS_PER_SUBNET_PER_DAY new
  *   guest pools per day; pools beyond that get no free credits (accounts keep
@@ -224,6 +225,20 @@ export async function resolveAccountFreeAccess(
     logger,
   );
   return granted ? "active" : "subnetLimit";
+}
+
+/**
+ * True when the account was created under the anti-farming rules
+ * (FREE_POOL_CLAIMS_START or later). Such accounts get no free credits at all
+ * until their email is verified. Unknown users count as budgeted.
+ */
+export async function isBudgetedAccount(userId: string): Promise<boolean> {
+  const [user] = await db
+    .select({ createdAt: users.createdAt })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  return !user || user.createdAt >= FREE_POOL_CLAIMS_START;
 }
 
 /**

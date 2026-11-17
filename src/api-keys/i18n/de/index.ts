@@ -4,12 +4,11 @@ export const translations: typeof enTranslations = {
   category: "Konto",
 
   widget: {
-    upgradeTitle:
-      "API-Zugang gibt es mit jedem Tarif oder einem einmaligen Credit-Paket für {{packPrice}}",
+    upgradeTitle: "API-Zugang steckt in jedem Tarif, ab {{subPrice}} im Monat",
     upgradeBody:
-      "Erstell deinen Schlüssel schon jetzt. Er wird mit deinem ersten Kauf aktiv: ein Tarif ({{subPrice}} im Monat) oder ein Credit-Paket. Bis dahin antwortet /v1 mit HTTP 402. Gratis- und Bonus-Credits schalten die API nicht frei.",
+      "Jeder Tarif schaltet API-Schlüssel frei. Gratis- und Bonus-Credits tun das nicht.",
     upgradeCta: "API freischalten",
-    createInactiveHint: "Der Schlüssel wird mit deinem ersten Kauf aktiv.",
+    createInactiveHint: "Mit einem Tarif kannst du Schlüssel erstellen.",
     docsLink: "API-Doku lesen",
     back: "Zurück",
     loading: "API-Schlüssel werden geladen…",
@@ -136,6 +135,8 @@ export const translations: typeof enTranslations = {
     errors: {
       limit:
         "Du hast bereits {{max}} aktive Schlüssel. Widerrufe zuerst einen.",
+      paidRequired:
+        "API-Schlüssel brauchen ein bezahltes Konto: einen beliebigen Tarif, ab {{subPrice}} im Monat. Hol ihn dir unter {{url}}.",
     },
   },
 

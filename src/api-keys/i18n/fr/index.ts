@@ -5,11 +5,11 @@ export const translations: typeof enTranslations = {
 
   widget: {
     upgradeTitle:
-      "L'accès à l'API est inclus dans toute formule ou avec un pack de crédits unique à {{packPrice}}",
+      "L'accès à l'API est inclus dans toutes les formules, dès {{subPrice}} par mois",
     upgradeBody:
-      "Créez votre clé dès maintenant. Elle s'active après votre premier achat : une formule ({{subPrice}} par mois) ou un pack de crédits. D'ici là, /v1 renvoie HTTP 402. Les crédits gratuits et bonus ne la débloquent pas.",
+      "Toute formule débloque les clés API. Les crédits gratuits et bonus, non.",
     upgradeCta: "Débloquer l'API",
-    createInactiveHint: "Cette clé s'active après votre premier achat.",
+    createInactiveHint: "Choisissez une formule pour créer des clés.",
     docsLink: "Lire la documentation de l'API",
     back: "Retour",
     loading: "Chargement des clés API…",
@@ -134,6 +134,8 @@ export const translations: typeof enTranslations = {
     },
     errors: {
       limit: "Vous avez déjà {{max}} clés actives. Révoquez-en une d'abord.",
+      paidRequired:
+        "Les clés API nécessitent un compte payant : n'importe quelle formule, dès {{subPrice}} par mois. Choisissez-la sur {{url}}.",
     },
   },
 

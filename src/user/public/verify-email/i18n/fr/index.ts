@@ -17,6 +17,7 @@ export const translations: typeof enTranslations = {
     verified: "Vérifié",
     message: "Statut",
     email: "E-mail",
+    emailChanged: "E-mail modifié",
   },
   widget: {
     heroTitle: "Confirmez votre e-mail",
@@ -27,6 +28,9 @@ export const translations: typeof enTranslations = {
     doneDescription: "Votre adresse est confirmée. Tout est prêt.",
     resend: "M'envoyer un nouveau lien",
     continue: "Continuer",
+    changedTitle: "E-mail modifié",
+    changedDescription:
+      "Vous vous connectez désormais avec {{email}}. L'ancienne adresse n'est plus utilisée.",
   },
   creditsPrompt: {
     title: "Confirmez votre e-mail pour débloquer vos crédits gratuits",
@@ -62,6 +66,8 @@ export const translations: typeof enTranslations = {
     category: "Compte",
   },
   errors: {
+    emailTaken:
+      "Un autre compte utilise maintenant cette adresse. Votre e-mail n'a pas été modifié.",
     invalidToken:
       "Ce lien de vérification est invalide ou a expiré. Demandez-en un nouveau depuis les paramètres.",
     userNotFound: "Compte introuvable.",
@@ -109,6 +115,7 @@ export const translations: typeof enTranslations = {
     description: "Vérification de l'e-mail mise à jour",
     verified: "Votre e-mail est vérifié.",
     alreadyVerified: "Votre e-mail est déjà vérifié.",
+    emailChanged: "C'est fait. Votre e-mail est maintenant {{email}}.",
     sent: "E-mail de vérification envoyé. Consultez votre boîte de réception.",
   },
 };

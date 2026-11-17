@@ -222,6 +222,11 @@ export const translations = {
       title: "Permanent Email Required",
       detail: "Throwaway inboxes can't sign up. Use a permanent email address.",
     },
+    subnetSignupLimit: {
+      title: "Too Many Signups From Your Network",
+      detail:
+        "Too many accounts were created from your network today. Try again tomorrow, or log in to an existing account.",
+    },
     userNotFound: "No account found for {{email}}",
     forbidden: {
       title: "Forbidden",

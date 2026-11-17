@@ -2,6 +2,8 @@
  * Signup anti-farming email guard (requires the dev DB; mails go to .invalid):
  * - an alias of an existing email (gmail dots, +tags) is rejected like a duplicate
  * - disposable domains (and their subdomains) are rejected
+ * - rotating temp-mail domains are rejected by their MX host (fake resolver,
+ *   no real DNS); DNS errors and timeouts fail open
  * - a normal distinct email still signs up
  */
 
@@ -17,11 +19,17 @@ import {
   createTestUser,
   deleteTestUser,
 } from "next-vibe/tooling/testing/testing-suite/test-users";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { antiFarmingEvents } from "@/credits/anti-farming/db";
 
 import signupEndpoints from "./definition";
+import {
+  hasDisposableMx,
+  MX_LOOKUP_TIMEOUT_MS,
+  type MxResolver,
+  setMxResolverForTests,
+} from "./disposable-mx";
 import { findUserByNormalizedEmail } from "./email-guard";
 import { scopedTranslation } from "./i18n";
 
@@ -35,7 +43,28 @@ const EVENT_DOMAINS = [
   "example-test.invalid",
   "mailinator.com",
   "inbox.yopmail.com",
+  "rotating-temp.invalid",
 ];
+
+/** Fake DNS: *.rotating-temp.invalid -> temp-mail MX, slow.invalid hangs, rest NXDOMAIN */
+let mxLookups: string[] = [];
+const fakeResolver: MxResolver = async (domain) => {
+  mxLookups.push(domain);
+  if (domain.endsWith("rotating-temp.invalid")) {
+    return ["mx.smtp.is"];
+  }
+  if (domain === "normal-mx.invalid") {
+    return ["mx1.mail.example.org"];
+  }
+  if (domain === "slow.invalid") {
+    return new Promise<string[]>(() => undefined);
+  }
+  return Promise.reject(new Error("ENOTFOUND"));
+};
+
+beforeAll(() => {
+  setMxResolverForTests(fakeResolver);
+});
 
 /** Events this file recorded (scoped to its run window + domains) */
 async function recordedEvents(): Promise<
@@ -113,6 +142,7 @@ async function seedUser(email: string): Promise<void> {
 }
 
 afterAll(async () => {
+  setMxResolverForTests(null);
   await db
     .delete(antiFarmingEvents)
     .where(
@@ -158,6 +188,12 @@ describe("signup email guard", () => {
     expect(sub.message).toBe(t("errors.disposableEmail.detail"));
   }, 60_000);
 
+  it("rejects a rotating temp-mail domain by its MX host", async () => {
+    const res = await signup(`pen${tag()}@rotating-temp.invalid`);
+    expect(res.success).toBe(false);
+    expect(res.message).toBe(t("errors.disposableEmail.detail"));
+  }, 60_000);
+
   it("still signs up a normal distinct email", async () => {
     const id = tag();
     await seedUser(`first${id}@example-test.invalid`);
@@ -174,5 +210,32 @@ describe("signup email guard", () => {
     expect(count("duplicate_email", "example-test.invalid")).toBe(1);
     expect(count("disposable_email", "mailinator.com")).toBe(1);
     expect(count("disposable_email", "inbox.yopmail.com")).toBe(1);
+    expect(count("disposable_email", "rotating-temp.invalid")).toBe(1);
   }, 60_000);
+});
+
+describe("disposable MX lookup", () => {
+  it("flags temp-mail MX hosts and caches per domain", async () => {
+    mxLookups = [];
+    expect(await hasDisposableMx("a.rotating-temp.invalid")).toBe(true);
+    expect(await hasDisposableMx("A.Rotating-Temp.invalid.")).toBe(true);
+    expect(await hasDisposableMx("normal-mx.invalid")).toBe(false);
+    expect(await hasDisposableMx("normal-mx.invalid")).toBe(false);
+    expect(mxLookups).toEqual(["a.rotating-temp.invalid", "normal-mx.invalid"]);
+  });
+
+  it("fails open on DNS errors without caching them", async () => {
+    mxLookups = [];
+    expect(await hasDisposableMx("nxdomain.invalid")).toBe(false);
+    expect(await hasDisposableMx("nxdomain.invalid")).toBe(false);
+    expect(mxLookups).toEqual(["nxdomain.invalid", "nxdomain.invalid"]);
+  });
+
+  it("fails open on a DNS timeout", async () => {
+    const started = Date.now();
+    expect(await hasDisposableMx("slow.invalid")).toBe(false);
+    const took = Date.now() - started;
+    expect(took).toBeGreaterThanOrEqual(MX_LOOKUP_TIMEOUT_MS - 50);
+    expect(took).toBeLessThan(MX_LOOKUP_TIMEOUT_MS + 2000);
+  }, 10_000);
 });

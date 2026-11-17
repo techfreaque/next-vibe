@@ -230,7 +230,8 @@ export const translations: typeof enTranslations = {
     },
     password: {
       label: "Votre mot de passe",
-      description: "Saisissez le mot de passe choisi lors de votre inscription.",
+      description:
+        "Saisissez le mot de passe choisi lors de votre inscription.",
       placeholder: "Saisissez votre mot de passe",
       help: "Saisissez le mot de passe de votre compte",
       validation: {
@@ -240,7 +241,8 @@ export const translations: typeof enTranslations = {
     },
     twoFactorCode: {
       label: "Code d'authentification",
-      description: "Utilisez le code de l'application ou un code de récupération.",
+      description:
+        "Utilisez le code de l'application ou un code de récupération.",
       placeholder: "Code à 6 chiffres",
     },
     rememberMe: {
@@ -314,6 +316,8 @@ export const translations: typeof enTranslations = {
   },
   errors: {
     title: "Erreur de connexion",
+    account_suspended:
+      "Compte suspendu. Une erreur selon vous ? Écrivez au support.",
     account_locked: "Le compte est verrouillé",
     accountLocked: "Le compte est verrouillé",
     accountLockedDescription:

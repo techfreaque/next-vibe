@@ -18,6 +18,7 @@ export const translations: typeof enTranslations = {
       locale: "Lokalizacja",
       isActive: "Status aktywny",
       emailVerified: "E-mail zweryfikowany",
+      pendingEmail: "Oczekujący e-mail",
       requireTwoFactor: "Wymagana autoryzacja dwuskładnikowa",
       marketingConsent: "Zgoda marketingowa",
       userRoles: "Role użytkownika",
@@ -120,7 +121,8 @@ export const translations: typeof enTranslations = {
     fields: {
       email: {
         label: "Adres e-mail",
-        description: "Twój adres e-mail",
+        description:
+          "Twój adres do logowania. Nowy zaczyna działać dopiero po kliknięciu linku, który na niego wyślemy.",
         placeholder: "Wprowadź swój adres e-mail",
         help: "Twój adres e-mail będzie używany do powiadomień o koncie i komunikacji",
         validation: {
@@ -285,6 +287,9 @@ export const translations: typeof enTranslations = {
       locale: "Lokalizacja",
       isActive: "Status aktywny",
       emailVerified: "E-mail zweryfikowany",
+      pendingEmail: "Oczekujący e-mail",
+      emailChangePending:
+        "Prawie gotowe. Kliknij link wysłany na {{email}}, żeby zmienić adres. Do tego czasu logujesz się przez {{current}}.",
       requireTwoFactor: "Wymagana autoryzacja dwuskładnikowa",
       marketingConsent: "Zgoda marketingowa",
       userRoles: "Role użytkownika",
@@ -324,6 +329,8 @@ export const translations: typeof enTranslations = {
         title: "Błąd walidacji",
         description: "Nieprawidłowe parametry żądania",
         emailTaken: "Ten adres e-mail należy już do innego konta",
+        disposableEmail:
+          "Tymczasowe skrzynki odpadają. Podaj stały adres e-mail.",
       },
       unauthorized: {
         title: "Brak autoryzacji",
@@ -493,6 +500,11 @@ export const translations: typeof enTranslations = {
       description:
         "Wysłaliśmy link na {{email}}. Czat działa i bez tego. Potwierdzenie pozwala odzyskać konto.",
       action: "Wyślij link ponownie",
+    },
+    pendingEmail: {
+      title: "Zmiana e-maila czeka na Ciebie",
+      description:
+        "Kliknij link wysłany na {{email}}. Do tego czasu logujesz się przez {{current}}. Zapisz ponownie, żeby wysłać link jeszcze raz, albo zapisz obecny adres, żeby anulować.",
     },
     slugWarning:
       "Zmiana tego adresu URL spowoduje, że wszystkie istniejące linki do Twojego profilu przestaną działać.",
@@ -1086,6 +1098,25 @@ export const translations: typeof enTranslations = {
         saved: "Adres zapisany.",
         backToAddresses: "Wróć do adresów",
       },
+    },
+  },
+  emailChange: {
+    subject: "Potwierdź nowy e-mail w {{appName}}",
+    title: "Potwierdź nowy e-mail",
+    previewText: "Jedno kliknięcie i {{appName}} używa tego adresu.",
+    greeting: "Cześć {{name}},",
+    body: "Chcesz przenieść logowanie do {{appName}} na ten adres. Potwierdź poniżej. Do tego czasu Twoje konto zostaje przy {{current}}.",
+    button: "Potwierdź nowy e-mail",
+    expiry:
+      "Link działa przez {{days}} dni. To nie Ty? Zignoruj tę wiadomość, nic się nie zmieni.",
+    signoff: "Zespół {{appName}}",
+    errors: {
+      failed: "Nie udało się przygotować e-maila z potwierdzeniem.",
+    },
+    template: {
+      name: "Potwierdzenie zmiany e-maila",
+      description: "Wysyłany na nowy adres, gdy użytkownik zmienia e-mail",
+      category: "Konto",
     },
   },
 };

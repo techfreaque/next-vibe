@@ -1,7 +1,8 @@
 /**
  * Verify Email widget (all platforms).
- * Web: landing for the mailed link (token prefilled -> verifies on open) and a
- * one-button resend when opened without a token. CLI/MCP: plain status line.
+ * Web: landing for the mailed link (token prefilled -> verifies on open, or
+ * completes a pending email change) and a one-button resend when opened
+ * without a token. CLI/MCP: plain status line.
  */
 
 "use client";
@@ -60,6 +61,7 @@ export function VerifyEmailWidget(): JSX.Element {
   }
 
   const done = res?.verified === true;
+  const changed = done && res?.emailChanged === true;
   return (
     <Div className="mx-auto flex w-full max-w-md flex-col items-center gap-4 rounded-xl border bg-card p-8 text-center shadow-sm">
       {done ? (
@@ -68,10 +70,18 @@ export function VerifyEmailWidget(): JSX.Element {
         <Mail className="h-10 w-10 text-primary" />
       )}
       <H1 className="m-0 text-2xl font-semibold tracking-tight">
-        {done ? t("widget.doneTitle") : t("widget.heroTitle")}
+        {changed
+          ? t("widget.changedTitle")
+          : done
+            ? t("widget.doneTitle")
+            : t("widget.heroTitle")}
       </H1>
       <P className="m-0 text-muted-foreground">
-        {done ? t("widget.doneDescription") : t("widget.heroDescription")}
+        {changed
+          ? t("widget.changedDescription", { email: res?.email ?? "" })
+          : done
+            ? t("widget.doneDescription")
+            : t("widget.heroDescription")}
       </P>
       <FormAlertWidget field={{}} />
       {done ? (

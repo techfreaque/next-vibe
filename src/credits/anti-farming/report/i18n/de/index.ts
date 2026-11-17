@@ -67,6 +67,7 @@ export const translations: typeof enTranslations = {
       subnetGuestLimit: "Gast-Limit erreicht",
       duplicateEmail: "Doppelte E-Mail",
       disposableEmail: "Wegwerf-E-Mail",
+      subnetSignupLimit: "Registrierungs-Limit erreicht",
     },
     col: {
       subnet: "Subnetz",
@@ -94,6 +95,7 @@ export const translations: typeof enTranslations = {
       signupLookback:
         "Gast-Verbrauch zählt bei Anmeldung rückwirkend (Stunden)",
       subnetPrefix: "Subnetzgröße",
+      signupsPerSubnet: "Neue Konten pro Subnetz in 24 h",
     },
   },
 };

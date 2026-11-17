@@ -32,6 +32,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { creditPacks, creditTransactions, creditWallets } from "@/credits/db";
 import { CreditPackType, CreditTransactionType } from "@/credits/enum";
+import { notSignupCarryover } from "@/credits/usage-filter";
 import { growthJourneys } from "@/leads/growth/db";
 import { newsletterSubscriptions } from "@/newsletter/db";
 import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
@@ -267,7 +268,7 @@ export class UserViewRepository {
       walletIds.length > 0
         ? db
             .select({
-              spent: sql<number>`coalesce(sum(-${creditTransactions.amount}) filter (where ${creditTransactions.type} = ${CreditTransactionType.USAGE}), 0)::float8`,
+              spent: sql<number>`coalesce(sum(-${creditTransactions.amount}) filter (where ${creditTransactions.type} = ${CreditTransactionType.USAGE} AND ${notSignupCarryover}), 0)::float8`,
               earned: sql<number>`coalesce(sum(${creditTransactions.amount}) filter (where ${creditTransactions.type} = ${CreditTransactionType.REFERRAL_EARNING}), 0)::float8`,
               purchased: sql<number>`coalesce(sum(${creditTransactions.amount}) filter (where ${creditTransactions.type} in (${CreditTransactionType.PURCHASE}, ${CreditTransactionType.SUBSCRIPTION})), 0)::float8`,
             })

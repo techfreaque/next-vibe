@@ -15,7 +15,7 @@ export const { GET, POST, tools } = endpointsHandler({
   },
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger, t }) =>
-      ApiKeysRepository.create(user, data.name, logger, t),
+    handler: ({ data, user, locale, logger, request, t }) =>
+      ApiKeysRepository.create(user, data.name, locale, logger, request, t),
   },
 });

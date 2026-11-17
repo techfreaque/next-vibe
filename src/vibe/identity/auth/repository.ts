@@ -56,6 +56,20 @@ import type {
 } from "./types";
 
 /**
+ * True when the account is banned or deactivated (or gone). Such accounts
+ * never authenticate, whatever token they hold. Module-level (not a static)
+ * so the native AuthRepository shape stays unchanged.
+ */
+export async function isAccountSuspended(userId: string): Promise<boolean> {
+  const [row] = await db
+    .select({ isBanned: users.isBanned, isActive: users.isActive })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  return !row || row.isBanned || !row.isActive;
+}
+
+/**
  * Contains all authentication business logic consolidated from handlers and core
  * Platform-agnostic - delegates to platform handlers for storage
  */
@@ -287,6 +301,10 @@ export class AuthRepository {
         logger.debug("User ID not found in database", {
           userId,
         });
+        return null;
+      }
+      if (await isAccountSuspended(userId)) {
+        logger.debug("Session of a suspended account", { userId });
         return null;
       }
 
@@ -1059,6 +1077,21 @@ export class AuthRepository {
             logger,
           );
         }
+        return success(AuthRepository.createPublicUser(leadId || ""));
+      }
+
+      // A suspended (banned) or deactivated account loses every live token
+      // at once, on every platform: its requests run as a guest.
+      if (await isAccountSuspended(verifyResult.data.id)) {
+        logger.debug("Suspended account token - treating as public", {
+          userId: verifyResult.data.id,
+        });
+        const { leadId } = await AuthRepository.getLeadIdFromDb(
+          undefined,
+          context.locale,
+          logger,
+          context.platform,
+        );
         return success(AuthRepository.createPublicUser(leadId || ""));
       }
 

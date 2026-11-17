@@ -1,6 +1,7 @@
 /**
  * Verify Email endpoint.
- * - with `token` (from the mailed link): marks the account email verified
+ * - with `token` (from the mailed link): marks the account email verified,
+ *   or completes a pending email change (link sent to the new address)
  * - without `token` (logged in): re-sends the verification email
  */
 
@@ -68,6 +69,12 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         label: "response.email",
         schema: z.string(),
+      }),
+      /** True when the link confirmed a pending email change */
+      emailChanged: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.emailChanged",
+        schema: z.boolean().optional(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

@@ -129,6 +129,15 @@ const { GET } = createEndpoint({
         text: "get.response.emailVerified" as const,
         schema: z.boolean().nullable(),
       }),
+      pendingEmail: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.pendingEmail" as const,
+        schema: z
+          .string()
+          .nullable()
+          .optional()
+          .describe("New address waiting for its confirm link, if any"),
+      }),
       requireTwoFactor: responseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "get.response.requireTwoFactor" as const,
@@ -860,6 +869,15 @@ const { POST } = createEndpoint({
             type: WidgetType.BADGE,
             text: "update.response.emailVerified" as const,
             schema: z.boolean().nullable(),
+          }),
+          pendingEmail: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "update.response.pendingEmail" as const,
+            schema: z
+              .string()
+              .nullable()
+              .optional()
+              .describe("New address waiting for its confirm link, if any"),
           }),
           requireTwoFactor: responseField(scopedTranslation, {
             type: WidgetType.BADGE,

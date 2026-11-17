@@ -67,6 +67,7 @@ export const translations: typeof enTranslations = {
       subnetGuestLimit: "Limit gości",
       duplicateEmail: "Powtórzony e-mail",
       disposableEmail: "Jednorazowy e-mail",
+      subnetSignupLimit: "Limit rejestracji",
     },
     col: {
       subnet: "Podsieć",
@@ -93,6 +94,7 @@ export const translations: typeof enTranslations = {
       guestIpWindow: "Goście z jednego IP dzielą pulę przez (godziny)",
       signupLookback: "Wydatki gościa wliczane przy rejestracji z (godzin)",
       subnetPrefix: "Rozmiar podsieci",
+      signupsPerSubnet: "Nowe konta na podsieć w 24 h",
     },
   },
 };

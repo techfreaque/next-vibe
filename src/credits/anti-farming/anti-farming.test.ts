@@ -3,7 +3,7 @@
  * - guests behind one IP share one guest pool (rolling 24 h)
  * - accounts never share through IP alone
  * - guest spend from the signup IP counts once against the new account
- * - account tiers need a verified email
+ * - new accounts get no free credits until their email is verified
  * - per-subnet budgets for new account and guest pools
  * Requires the dev DB, like the other credits repository tests.
  */
@@ -46,7 +46,8 @@ import { ipPoolKey, ipSubnetKey } from "./ip";
 const logger = createEndpointLogger(false, defaultLocale);
 const { t } = scopedTranslation.scopedT(defaultLocale);
 const { guest } = FREE_CREDIT_ALLOWANCE;
-const accountBase = FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn;
+const accountBase =
+  FREE_CREDIT_ALLOWANCE.guest + FREE_CREDIT_ALLOWANCE.signedIn;
 // Signups send real emails over SMTP; well past bun's 5s default
 const TIMEOUT_MS = 60_000;
 
@@ -396,15 +397,48 @@ describe("accounts", () => {
   );
 
   it(
-    "unverified account keeps the guest share and says why",
+    "unverified account gets no free credits until verified, and says why",
     async () => {
       const user = await account("unverified", null, false);
-      if (!user) {
+      if (!user || user.isPublic) {
         return;
       }
       const now = await balance(user);
-      expect(now.free).toBe(guest);
+      expect(now.free).toBe(0);
       expect(now.status).toBe(FreeCreditsStatus.VERIFY_EMAIL);
+      // Nothing to spend on any surface (chat, tools, API all deduct here)
+      const res = await CreditRepository.deductCreditsForFeature(
+        user,
+        1,
+        "anti-farming-test",
+        logger,
+        t,
+        defaultLocale,
+      );
+      expect(res.success).toBe(false);
+
+      await db
+        .update(users)
+        .set({ emailVerified: true })
+        .where(eq(users.id, user.id));
+      const verified = await balance(user);
+      expect(verified.free).toBe(accountBase);
+      expect(verified.status).toBe(FreeCreditsStatus.ACTIVE);
+    },
+    TIMEOUT_MS,
+  );
+
+  it(
+    "scripted unverified signups from one IP: none of them holds free credits",
+    async () => {
+      const ip = `${freshNet()}.40`;
+      for (let i = 0; i < 4; i++) {
+        const user = await account(`sweep-${String(i)}`, ip, false);
+        if (!user) {
+          return;
+        }
+        expect((await balance(user)).free).toBe(0);
+      }
     },
     TIMEOUT_MS,
   );
@@ -516,7 +550,10 @@ describe("subnet budgets", () => {
       const statuses: string[] = [];
       const frees: number[] = [];
       for (let i = 0; i <= ACCOUNT_POOLS_PER_SUBNET_PER_MONTH; i++) {
-        const user = await account(`subnet-${String(i)}`, `${net}.${String(40 + i)}`);
+        const user = await account(
+          `subnet-${String(i)}`,
+          `${net}.${String(40 + i)}`,
+        );
         if (!user) {
           return;
         }
@@ -525,7 +562,10 @@ describe("subnet budgets", () => {
         statuses.push(now.status ?? "");
       }
       expect(frees.slice(0, ACCOUNT_POOLS_PER_SUBNET_PER_MONTH)).toEqual(
-        Array.from({ length: ACCOUNT_POOLS_PER_SUBNET_PER_MONTH }, () => accountBase),
+        Array.from(
+          { length: ACCOUNT_POOLS_PER_SUBNET_PER_MONTH },
+          () => accountBase,
+        ),
       );
       expect(frees.at(-1)).toBe(0);
       expect(statuses.at(-1)).toBe(FreeCreditsStatus.SUBNET_LIMIT);
@@ -545,7 +585,10 @@ describe("subnet budgets", () => {
       const net = freshNet();
       const frees: number[] = [];
       for (let i = 0; i <= GUEST_POOLS_PER_SUBNET_PER_DAY; i++) {
-        const lead = await visit(`${net}.${String(100 + i)}`, `guest-${String(i)}`);
+        const lead = await visit(
+          `${net}.${String(100 + i)}`,
+          `guest-${String(i)}`,
+        );
         frees.push((await balance(guestUser(lead))).free);
       }
       expect(frees.slice(0, GUEST_POOLS_PER_SUBNET_PER_DAY)).toEqual(

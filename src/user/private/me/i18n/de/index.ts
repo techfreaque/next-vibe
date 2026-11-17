@@ -18,6 +18,7 @@ export const translations: typeof enTranslations = {
       locale: "Gebietsschema",
       isActive: "Aktiv-Status",
       emailVerified: "E-Mail verifiziert",
+      pendingEmail: "Ausstehende E-Mail",
       requireTwoFactor: "Zwei-Faktor-Authentifizierung erforderlich",
       marketingConsent: "Marketing-Zustimmung",
       userRoles: "Benutzerrollen",
@@ -119,7 +120,8 @@ export const translations: typeof enTranslations = {
     fields: {
       email: {
         label: "E-Mail-Adresse",
-        description: "Ihre E-Mail-Adresse",
+        description:
+          "Deine Login-Adresse. Eine neue gilt erst, wenn du den Link bestätigst, den wir an sie schicken.",
         placeholder: "Geben Sie Ihre E-Mail-Adresse ein",
         help: "Ihre E-Mail-Adresse wird für Kontobenachrichtigungen und Kommunikation verwendet",
         validation: {
@@ -287,6 +289,9 @@ export const translations: typeof enTranslations = {
       locale: "Gebietsschema",
       isActive: "Aktiv-Status",
       emailVerified: "E-Mail verifiziert",
+      pendingEmail: "Ausstehende E-Mail",
+      emailChangePending:
+        "Fast geschafft. Klick den Link, den wir an {{email}} geschickt haben. Bis dahin meldest du dich weiter mit {{current}} an.",
       requireTwoFactor: "Zwei-Faktor-Authentifizierung erforderlich",
       marketingConsent: "Marketing-Zustimmung",
       userRoles: "Benutzerrollen",
@@ -327,6 +332,8 @@ export const translations: typeof enTranslations = {
         description: "Ungültige Anfrageparameter",
         emailTaken:
           "Diese E-Mail-Adresse gehört bereits zu einem anderen Konto",
+        disposableEmail:
+          "Wegwerf-Postfächer sind ausgeschlossen. Nutzen Sie eine dauerhafte E-Mail-Adresse.",
       },
       unauthorized: {
         title: "Nicht autorisiert",
@@ -498,6 +505,11 @@ export const translations: typeof enTranslations = {
       description:
         "Wir haben einen Link an {{email}} geschickt. Chatten geht auch ohne. Mit Bestätigung bleibt dein Konto wiederherstellbar.",
       action: "Link erneut senden",
+    },
+    pendingEmail: {
+      title: "E-Mail-Wechsel wartet auf dich",
+      description:
+        "Klick den Link, den wir an {{email}} geschickt haben. Bis dahin meldest du dich mit {{current}} an. Erneut speichern schickt den Link nochmal, die aktuelle Adresse speichern bricht den Wechsel ab.",
     },
     slugWarning:
       "Wenn du diese URL änderst, werden alle bestehenden Links zu deinem Profil ungültig.",
@@ -1104,6 +1116,25 @@ export const translations: typeof enTranslations = {
         saved: "Adresse gespeichert.",
         backToAddresses: "Zurück zu Adressen",
       },
+    },
+  },
+  emailChange: {
+    subject: "Bestätige deine neue E-Mail für {{appName}}",
+    title: "Neue E-Mail bestätigen",
+    previewText: "Ein Klick und {{appName}} nutzt diese Adresse.",
+    greeting: "Hallo {{name}},",
+    body: "Du willst deinen {{appName}}-Login auf diese Adresse umstellen. Bestätige unten. Bis dahin bleibt dein Konto bei {{current}}.",
+    button: "Neue E-Mail bestätigen",
+    expiry:
+      "Der Link gilt {{days}} Tage. Du hast das nicht angefordert? Ignoriere diese E-Mail, dann ändert sich nichts.",
+    signoff: "Dein {{appName}}-Team",
+    errors: {
+      failed: "Die Bestätigungs-E-Mail konnte nicht erstellt werden.",
+    },
+    template: {
+      name: "Bestätigung E-Mail-Wechsel",
+      description: "Geht an die neue Adresse, wenn jemand seine E-Mail ändert",
+      category: "Konto",
     },
   },
 };

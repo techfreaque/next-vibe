@@ -2,12 +2,10 @@ export const translations = {
   category: "Account",
 
   widget: {
-    upgradeTitle:
-      "API access comes with any plan or a one-time {{packPrice}} credit pack",
-    upgradeBody:
-      "Create your key now. It activates after your first purchase: a plan ({{subPrice}} a month) or one credit pack. Until then /v1 answers HTTP 402. Free and bonus credits don't unlock it.",
+    upgradeTitle: "API access comes with every plan, from {{subPrice}} a month",
+    upgradeBody: "Any plan unlocks API keys. Free and bonus credits don't.",
     upgradeCta: "Unlock the API",
-    createInactiveHint: "This key activates after your first purchase.",
+    createInactiveHint: "Pick a plan to create keys.",
     docsLink: "Read the API docs",
     back: "Back",
     loading: "Loading API keys…",
@@ -132,6 +130,8 @@ export const translations = {
     },
     errors: {
       limit: "You already have {{max}} active keys. Revoke one first.",
+      paidRequired:
+        "API keys need a paid account: any plan, from {{subPrice}} a month. Add one at {{url}}.",
     },
   },
 

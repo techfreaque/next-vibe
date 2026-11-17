@@ -231,6 +231,11 @@ export const translations: typeof enTranslations = {
       detail:
         "Wegwerf-Postfächer sind ausgeschlossen. Nutzen Sie eine dauerhafte E-Mail-Adresse.",
     },
+    subnetSignupLimit: {
+      title: "Zu viele Registrierungen aus Ihrem Netzwerk",
+      detail:
+        "Aus Ihrem Netzwerk wurden heute bereits zu viele Konten angelegt. Versuchen Sie es morgen erneut oder melden Sie sich mit einem bestehenden Konto an.",
+    },
     userNotFound: "Kein Konto für {{email}} gefunden",
     forbidden: {
       title: "Zugriff verweigert",

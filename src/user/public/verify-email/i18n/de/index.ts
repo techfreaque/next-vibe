@@ -17,6 +17,7 @@ export const translations: typeof enTranslations = {
     verified: "Bestätigt",
     message: "Status",
     email: "E-Mail",
+    emailChanged: "E-Mail geändert",
   },
   widget: {
     heroTitle: "E-Mail bestätigen",
@@ -27,6 +28,9 @@ export const translations: typeof enTranslations = {
     doneDescription: "Deine Adresse ist bestätigt. Alles erledigt.",
     resend: "Neuen Link senden",
     continue: "Weiter",
+    changedTitle: "E-Mail geändert",
+    changedDescription:
+      "Du meldest dich ab jetzt mit {{email}} an. Die alte Adresse ist nicht mehr aktiv.",
   },
   creditsPrompt: {
     title: "E-Mail bestätigen, Gratis-Credits freischalten",
@@ -62,6 +66,8 @@ export const translations: typeof enTranslations = {
     category: "Konto",
   },
   errors: {
+    emailTaken:
+      "Diese Adresse gehört inzwischen zu einem anderen Konto. Deine E-Mail bleibt unverändert.",
     invalidToken:
       "Dieser Bestätigungslink ist ungültig oder abgelaufen. Fordere in den Einstellungen einen neuen an.",
     userNotFound: "Konto nicht gefunden.",
@@ -109,6 +115,7 @@ export const translations: typeof enTranslations = {
     description: "E-Mail-Bestätigung aktualisiert",
     verified: "Deine E-Mail ist bestätigt.",
     alreadyVerified: "Deine E-Mail ist bereits bestätigt.",
+    emailChanged: "Erledigt. Deine E-Mail lautet jetzt {{email}}.",
     sent: "Bestätigungs-E-Mail gesendet. Schau in dein Postfach.",
   },
 };

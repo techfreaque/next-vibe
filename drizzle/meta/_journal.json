@@ -1241,6 +1241,13 @@
       "when": 1794615378897,
       "tag": "20261114120000_signup_newsletter_legacy",
       "breakpoints": true
+    },
+    {
+      "idx": 177,
+      "version": "7",
+      "when": 1794915831786,
+      "tag": "20261117114351_user_pending_email",
+      "breakpoints": true
     }
   ]
 }

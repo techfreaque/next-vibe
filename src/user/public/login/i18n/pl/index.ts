@@ -311,6 +311,8 @@ export const translations: typeof enTranslations = {
   },
   errors: {
     title: "Błąd logowania",
+    account_suspended:
+      "Konto zawieszone. Uważasz, że to pomyłka? Napisz do supportu.",
     account_locked: "Konto jest zablokowane",
     accountLocked: "Konto jest zablokowane",
     accountLockedDescription:

@@ -16,6 +16,14 @@ export const SIGNUP_GUEST_SPEND_LOOKBACK_HOURS = 24;
 /** New free ACCOUNT pools per subnet (IPv4 /24, IPv6 /64) per calendar month */
 export const ACCOUNT_POOLS_PER_SUBNET_PER_MONTH = 3;
 
+/**
+ * New ACCOUNTS (not just free pools) per subnet (IPv4 /24, IPv6 /64) in a
+ * rolling SIGNUP_SUBNET_WINDOW_HOURS window; signups beyond it are refused.
+ * Loopback/private IPs are exempt (signup-limit.ts).
+ */
+export const SIGNUPS_PER_SUBNET_PER_DAY = 5;
+export const SIGNUP_SUBNET_WINDOW_HOURS = 24;
+
 /** New free GUEST pools per subnet (IPv4 /24, IPv6 /64) per day (UTC) */
 export const GUEST_POOLS_PER_SUBNET_PER_DAY = 5;
 

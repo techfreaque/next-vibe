@@ -3,7 +3,8 @@
  * - free_pool_claims: which free pools a subnet has used up this period
  *   (accounts per month, guests per day). One row per pool + period.
  * - anti_farming_events: blocked attempts (subnet budget hit, duplicate or
- *   disposable email) for the admin report and alerts.
+ *   disposable email, per-subnet signup rate limit) for the admin report and
+ *   alerts.
  */
 
 import {
@@ -22,6 +23,7 @@ export const AntiFarmingEventKindDB = [
   "subnet_guest_limit",
   "duplicate_email",
   "disposable_email",
+  "subnet_signup_limit",
 ] as const;
 
 export const freePoolClaims = pgTable(

@@ -133,7 +133,7 @@ function renderText(
   );
   lines.push("");
   lines.push(
-    `${t("widget.kpi.total")}: ${totals.total} | ${t("widget.kpi.subnetAccountLimit")}: ${totals.subnetAccountLimit} | ${t("widget.kpi.subnetGuestLimit")}: ${totals.subnetGuestLimit} | ${t("widget.kpi.duplicateEmail")}: ${totals.duplicateEmail} | ${t("widget.kpi.disposableEmail")}: ${totals.disposableEmail}`,
+    `${t("widget.kpi.total")}: ${totals.total} | ${t("widget.kpi.subnetAccountLimit")}: ${totals.subnetAccountLimit} | ${t("widget.kpi.subnetGuestLimit")}: ${totals.subnetGuestLimit} | ${t("widget.kpi.subnetSignupLimit")}: ${totals.subnetSignupLimit} | ${t("widget.kpi.duplicateEmail")}: ${totals.duplicateEmail} | ${t("widget.kpi.disposableEmail")}: ${totals.disposableEmail}`,
   );
 
   const subnetSection = (title: string, rows: SubnetRow[]): void => {
@@ -182,7 +182,7 @@ function renderText(
   lines.push("");
   lines.push(t("get.response.thresholds"));
   lines.push(
-    `  ${t("widget.limits.accountPerSubnet")}: ${th.accountPoolsPerSubnetPerMonth} | ${t("widget.limits.guestPerSubnet")}: ${th.guestPoolsPerSubnetPerDay}`,
+    `  ${t("widget.limits.accountPerSubnet")}: ${th.accountPoolsPerSubnetPerMonth} | ${t("widget.limits.guestPerSubnet")}: ${th.guestPoolsPerSubnetPerDay} | ${t("widget.limits.signupsPerSubnet")}: ${th.signupsPerSubnetPerDay}`,
   );
   lines.push(
     `  ${t("widget.limits.guestIpWindow")}: ${th.guestIpPoolWindowHours} | ${t("widget.limits.signupLookback")}: ${th.signupGuestSpendLookbackHours}`,
@@ -380,7 +380,7 @@ export function AntiFarmingReportWidget({
             })}
           </P>
 
-          <MetricGrid columns={4}>
+          <MetricGrid columns={3}>
             <MetricCard
               label={t("widget.kpi.total")}
               value={data.totals.total}
@@ -395,9 +395,16 @@ export function AntiFarmingReportWidget({
               value={data.totals.subnetGuestLimit}
             />
             <MetricCard
+              label={t("widget.kpi.subnetSignupLimit")}
+              value={data.totals.subnetSignupLimit}
+            />
+            <MetricCard
               label={t("widget.kpi.duplicateEmail")}
               value={data.totals.duplicateEmail}
-              description={`${t("widget.kpi.disposableEmail")}: ${data.totals.disposableEmail}`}
+            />
+            <MetricCard
+              label={t("widget.kpi.disposableEmail")}
+              value={data.totals.disposableEmail}
             />
           </MetricGrid>
 
@@ -425,6 +432,10 @@ export function AntiFarmingReportWidget({
               <DetailField
                 label={t("widget.limits.guestPerSubnet")}
                 value={String(data.thresholds.guestPoolsPerSubnetPerDay)}
+              />
+              <DetailField
+                label={t("widget.limits.signupsPerSubnet")}
+                value={String(data.thresholds.signupsPerSubnetPerDay)}
               />
               <DetailField
                 label={t("widget.limits.guestIpWindow")}

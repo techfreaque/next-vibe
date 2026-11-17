@@ -1095,6 +1095,24 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
         </Div>
       )}
 
+      {/* ── PENDING EMAIL CHANGE (active only after the new inbox confirms) ── */}
+      {profile?.pendingEmail && (
+        <Div className="flex min-w-0 items-start gap-2.5 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3">
+          <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+          <Div className="flex min-w-0 flex-col gap-0.5">
+            <Span className="text-sm font-medium text-foreground">
+              {t("widget.pendingEmail.title")}
+            </Span>
+            <Span className="break-words text-xs leading-relaxed text-foreground/80">
+              {t("widget.pendingEmail.description", {
+                email: profile.pendingEmail,
+                current: profile.email,
+              })}
+            </Span>
+          </Div>
+        </Div>
+      )}
+
       {/* ── IDENTITY HERO ── */}
       <Div className="overflow-hidden rounded-2xl border bg-card shadow-sm">
         <Form form={form} onSubmit={onSubmit}>

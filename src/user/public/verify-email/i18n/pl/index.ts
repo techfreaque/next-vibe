@@ -17,6 +17,7 @@ export const translations: typeof enTranslations = {
     verified: "Potwierdzono",
     message: "Status",
     email: "E-mail",
+    emailChanged: "E-mail zmieniony",
   },
   widget: {
     heroTitle: "Potwierdź e-mail",
@@ -27,6 +28,9 @@ export const translations: typeof enTranslations = {
     doneDescription: "Adres potwierdzony. Wszystko gotowe.",
     resend: "Wyślij nowy link",
     continue: "Dalej",
+    changedTitle: "E-mail zmieniony",
+    changedDescription:
+      "Od teraz logujesz się adresem {{email}}. Stary adres nie jest już używany.",
   },
   creditsPrompt: {
     title: "Potwierdź e-mail, by odblokować darmowe kredyty",
@@ -61,6 +65,8 @@ export const translations: typeof enTranslations = {
     category: "Konto",
   },
   errors: {
+    emailTaken:
+      "Ten adres należy już do innego konta. Twój e-mail się nie zmienił.",
     invalidToken:
       "Ten link jest nieprawidłowy lub wygasł. Poproś o nowy w Ustawieniach.",
     userNotFound: "Nie znaleziono konta.",
@@ -108,6 +114,7 @@ export const translations: typeof enTranslations = {
     description: "Potwierdzenie e-maila zaktualizowane",
     verified: "Twój e-mail jest potwierdzony.",
     alreadyVerified: "Twój e-mail jest już potwierdzony.",
+    emailChanged: "Gotowe. Twój e-mail to teraz {{email}}.",
     sent: "Wysłano e-mail potwierdzający. Sprawdź skrzynkę.",
   },
 };

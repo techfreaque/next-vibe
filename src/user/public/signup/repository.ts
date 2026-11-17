@@ -36,6 +36,7 @@ import type { NextRequest } from "next-vibe/ui/lib/request";
 
 import { recordAntiFarmingEvent } from "@/credits/anti-farming/events";
 import { ipSubnetKey } from "@/credits/anti-farming/ip";
+import { signupSubnetLimitHit } from "@/credits/anti-farming/signup-limit";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
 
@@ -43,6 +44,7 @@ import type {
   SignupPostRequestOutput,
   SignupPostResponseOutput,
 } from "./definition";
+import { isDisposableEmailByMx } from "./disposable-mx";
 import { findUserByNormalizedEmail } from "./email-guard";
 import {
   emailDomain,
@@ -96,10 +98,13 @@ export class SignupRepository {
         });
       }
 
-      // Throwaway inboxes never get an account (free-credit farming)
-      if (isDisposableEmail(email)) {
-        logger.info("Signup blocked: disposable email domain", {
+      // Throwaway inboxes never get an account (free-credit farming).
+      // Listed domains first, then the MX host (rotating temp-mail domains).
+      const disposableByDomain = isDisposableEmail(email);
+      if (disposableByDomain || (await isDisposableEmailByMx(email))) {
+        logger.info("Signup blocked: disposable email", {
           emailDomain: emailDomain(email),
+          by: disposableByDomain ? "domain" : "mx",
         });
         await recordAntiFarmingEvent(
           {
@@ -170,6 +175,29 @@ export class SignupRepository {
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
+      }
+
+      // Per-subnet signup rate limit (scripted account farms on one network)
+      const limitedSubnet = await signupSubnetLimitHit(
+        SignupRepository.requestIp(request),
+      );
+      if (limitedSubnet) {
+        logger.info("Signup blocked: subnet signup limit", {
+          subnet: limitedSubnet,
+          emailDomain: emailDomain(email),
+        });
+        await recordAntiFarmingEvent(
+          {
+            kind: "subnet_signup_limit",
+            emailDomain: emailDomain(email),
+            subnet: limitedSubnet,
+          },
+          logger,
+        );
+        return fail({
+          message: t("errors.subnetSignupLimit.detail"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
       }
 
       // Create the user account with extracted data
@@ -700,13 +728,18 @@ export class SignupRepository {
   }
 
   /** Client subnet key (IPv4 /24, IPv6 /64) from proxy headers, or null */
+  private static requestIp(request: NextRequest | undefined): string | null {
+    return (
+      request?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request?.headers.get("x-real-ip")?.trim() ||
+      null
+    );
+  }
+
   private static requestSubnet(
     request: NextRequest | undefined,
   ): string | null {
-    const ip =
-      request?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      request?.headers.get("x-real-ip")?.trim();
-    return ipSubnetKey(ip);
+    return ipSubnetKey(SignupRepository.requestIp(request));
   }
 
   /**

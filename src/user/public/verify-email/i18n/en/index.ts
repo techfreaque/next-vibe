@@ -15,6 +15,7 @@ export const translations = {
     verified: "Verified",
     message: "Status",
     email: "Email",
+    emailChanged: "Email changed",
   },
   widget: {
     heroTitle: "Confirm your email",
@@ -25,6 +26,9 @@ export const translations = {
     doneDescription: "Your address is confirmed. You're all set.",
     resend: "Send me a new link",
     continue: "Continue",
+    changedTitle: "Email changed",
+    changedDescription:
+      "You now log in with {{email}}. Your old address is no longer used.",
   },
   creditsPrompt: {
     title: "Confirm your email to unlock your free credits",
@@ -59,6 +63,8 @@ export const translations = {
     category: "Account",
   },
   errors: {
+    emailTaken:
+      "Another account uses this address now. Your email was not changed.",
     invalidToken:
       "This verification link is invalid or has expired. Request a new one from Settings.",
     userNotFound: "Account not found.",
@@ -106,6 +112,7 @@ export const translations = {
     description: "Email verification updated",
     verified: "Your email is verified.",
     alreadyVerified: "Your email is already verified.",
+    emailChanged: "Done. Your email is now {{email}}.",
     sent: "Verification email sent. Check your inbox.",
   },
 };

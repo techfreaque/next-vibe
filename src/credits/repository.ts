@@ -94,6 +94,7 @@ import {
   type AccountFreeAccess as FreeCreditsAccess,
   claimGuestPool,
   grandfatheredUnverifiedCap,
+  isBudgetedAccount,
   isGuestPoolBlocked,
   resolveAccountFreeAccess,
   signupCarryoverGrantKey,
@@ -1288,9 +1289,15 @@ export class CreditRepository {
       return { allowance: 0, legacyAllowance: 0, tier: "account", access };
     }
     if (access === "verifyEmail") {
-      // Unverified accounts keep the guest share only. Accounts from before
-      // the rule keep the account tier already granted this period (no
-      // upgrades) until the next refill.
+      // Accounts created under the anti-farming rules get NO free credits
+      // until the email is verified: every account is its own pool, so a
+      // guest share per unverified account let one IP script N x 20 credits
+      // past the guest subnet budget (sweep from one IP, 2026-11-16).
+      if (await isBudgetedAccount(userId)) {
+        return { allowance: 0, legacyAllowance: 0, tier: "guest", access };
+      }
+      // Accounts from before the rule keep the guest share, or the account
+      // tier already granted this period (no upgrades) until the next refill.
       const guestAllowance = computeFreeAllowance({
         isUserPool: false,
         hasConfirmedNewsletter: false,

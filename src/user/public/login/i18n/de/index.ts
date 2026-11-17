@@ -312,6 +312,8 @@ export const translations: typeof enTranslations = {
   },
   errors: {
     title: "Anmeldefehler",
+    account_suspended:
+      "Konto gesperrt. Halten Sie das für einen Fehler, schreiben Sie dem Support.",
     account_locked: "Konto ist gesperrt",
     accountLocked: "Konto ist gesperrt",
     accountLockedDescription:

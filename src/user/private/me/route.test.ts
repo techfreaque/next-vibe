@@ -1,11 +1,17 @@
+import { and, gte, inArray } from "drizzle-orm";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { antiFarmingEvents } from "@/credits/anti-farming/db";
+
 import meEndpoints from "./definition";
+import { scopedTranslation } from "./i18n";
 
 describe("GET /user/private/me", () => {
   let adminUser: JwtPrivatePayloadType;
@@ -141,6 +147,39 @@ describe("POST /user/private/me — update profile", () => {
     expect(res.errorType?.errorCode).toBe(
       ErrorResponseTypes.VALIDATION_ERROR.errorCode,
     );
+  });
+
+  it("rejects changing the email to a disposable inbox", async () => {
+    const { t } = scopedTranslation.scopedT(defaultLocale);
+    const startedAt = new Date();
+    for (const email of [
+      `farm${String(Date.now())}@mailinator.com`,
+      `pen${String(Date.now())}@fldubai.com`,
+    ]) {
+      const res = await sendTestRequest({
+        toolExecutionContext: undefined,
+        endpoint: meEndpoints.POST,
+        data: { basicInfo: { email } },
+        user: adminUser,
+      });
+      expect(res.success).toBe(false);
+      if (res.success) {
+        return;
+      }
+      expect(res.message).toBe(t("update.errors.validation.disposableEmail"));
+    }
+    // Each block is logged for the anti-farming report; drop this test's rows
+    await db
+      .delete(antiFarmingEvents)
+      .where(
+        and(
+          gte(antiFarmingEvents.createdAt, startedAt),
+          inArray(antiFarmingEvents.emailDomain, [
+            "mailinator.com",
+            "fldubai.com",
+          ]),
+        ),
+      );
   });
 
   it("rejects privateName shorter than 2 chars with VALIDATION_ERROR", async () => {

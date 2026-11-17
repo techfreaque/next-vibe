@@ -95,6 +95,7 @@ const { GET } = createEndpoint({
           signupGuestSpendLookbackHours: z.coerce.number(),
           subnetPrefixV4: z.coerce.number(),
           subnetPrefixV6: z.coerce.number(),
+          signupsPerSubnetPerDay: z.coerce.number(),
         }),
       }),
 
@@ -107,6 +108,7 @@ const { GET } = createEndpoint({
           subnetGuestLimit: z.coerce.number(),
           duplicateEmail: z.coerce.number(),
           disposableEmail: z.coerce.number(),
+          subnetSignupLimit: z.coerce.number(),
         }),
       }),
 
@@ -208,6 +210,7 @@ const { GET } = createEndpoint({
           signupGuestSpendLookbackHours: 24,
           subnetPrefixV4: 24,
           subnetPrefixV6: 64,
+          signupsPerSubnetPerDay: 5,
         },
         totals: {
           total: 12,
@@ -215,6 +218,7 @@ const { GET } = createEndpoint({
           subnetGuestLimit: 5,
           duplicateEmail: 2,
           disposableEmail: 1,
+          subnetSignupLimit: 0,
         },
         subnetsByBlocked: [
           {

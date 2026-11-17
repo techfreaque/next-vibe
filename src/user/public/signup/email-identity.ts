@@ -11,6 +11,7 @@
  */
 
 import { DISPOSABLE_EMAIL_DOMAINS } from "./disposable-domains";
+import { DISPOSABLE_MX_HOSTS } from "./disposable-mx-hosts";
 
 export const GMAIL_DOMAINS: readonly string[] = ["gmail.com", "googlemail.com"];
 export const GMAIL_CANONICAL_DOMAIN = "gmail.com";
@@ -54,4 +55,15 @@ export function isDisposableEmailDomain(domain: string): boolean {
 export function isDisposableEmail(email: string): boolean {
   const domain = emailDomain(email);
   return domain ? isDisposableEmailDomain(domain) : false;
+}
+
+/** True when the MX host equals, or is a subdomain of, a known temp-mail MX host */
+export function isDisposableMxHost(host: string): boolean {
+  const labels = host.toLowerCase().trim().replace(/\.$/, "").split(".");
+  for (let i = 0; i < labels.length - 1; i++) {
+    if (DISPOSABLE_MX_HOSTS.has(labels.slice(i).join("."))) {
+      return true;
+    }
+  }
+  return false;
 }

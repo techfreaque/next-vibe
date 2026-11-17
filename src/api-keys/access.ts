@@ -1,7 +1,9 @@
 /**
  * What unlocks the API, in one place: the /v1 402 message, the API key page,
  * /docs/api and the blog posts all read the page and the prices from here.
- * The rule itself lives in ./paid.ts (any plan or one credit purchase).
+ * The rule itself lives in ./paid.ts (any plan or any credit purchase). Copy
+ * names only the plans: a credit pack needs an active plan, so "any plan, from
+ * {{subPrice}} a month" is the whole offer.
  *
  * Client-safe: no server-only imports.
  */
@@ -11,14 +13,14 @@ import { formatCurrency } from "next-vibe/core/i18n/core/localization-utils";
 
 import { ProductIds, productsRepository } from "@/products/repository-client";
 
-/** Page that sells both the plan and the credit pack (relative to /<locale>). */
+/** Page that sells the plans (relative to /<locale>). */
 export const API_UNLOCK_PATH = "subscription/buy" as const;
 
 // A type alias (not an interface) so it passes straight in as i18n params.
 export interface ApiAccessPrices {
   /** One-time credit pack price, localized (e.g. "$5"). */
   packPrice: string;
-  /** Monthly plan price, localized. */
+  /** Cheapest monthly plan price, localized ("any plan, from $8 a month"). */
   subPrice: string;
 }
 

@@ -1,16 +1,20 @@
 /**
- * "Paid" test for the API: /v1 and key creation are for paying customers only.
- *
- * Same definition the lead lifecycle uses for `isPaid` (leads/lifecycle/snapshots):
+ * "Paid" test for the API: /v1 and key creation need credits that came from
+ * a purchase or an admin grant (Max, 2026-11-17):
  *  - a live subscription (ACTIVE / TRIALING / PAST_DUE grace), OR
- *  - a purchase history: a PURCHASE or SUBSCRIPTION credit transaction, OR
+ *  - a PURCHASE or SUBSCRIPTION credit transaction: bought packs, plan
+ *    credits and admin grants (credits admin-add writes a PURCHASE row with a
+ *    bonus pack, e.g. tester credits), OR
  *  - a succeeded payment.
- * Free grants, bonus and earned credits never count.
+ * The free tier never counts: monthly allowance, signup/newsletter bonuses
+ * (FREE_GRANT), signup carryover, referral-earned credits (REFERRAL_EARNING)
+ * and earned credits converted to permanent ones (PURCHASE row keyed
+ * `payout_<request>`).
  */
 
 import "server-only";
 
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "next-vibe/database";
 
 import { creditTransactions, creditWallets } from "@/credits/db";
@@ -73,6 +77,8 @@ async function queryIsPaid(userId: string): Promise<boolean> {
           CreditTransactionType.PURCHASE,
           CreditTransactionType.SUBSCRIPTION,
         ]),
+        // Referral earnings converted to credits are not a purchase
+        sql`COALESCE(${creditTransactions.metadata}->>'sessionId', '') NOT LIKE 'payout\\_%'`,
       ),
     )
     .limit(1);

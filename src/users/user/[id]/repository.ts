@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, eq, lt, sum } from "drizzle-orm";
+import { and, count, eq, isNull, lt, sum } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -18,9 +18,11 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
+import { sessions } from "next-vibe/identity/session/db";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { userApiKeys } from "@/api-keys/db";
 import { creditTransactions, creditWallets } from "@/credits/db";
 import {
   computeFreeAllowance,
@@ -306,6 +308,10 @@ export class UserByIdRepository {
       }
       if (data.email !== undefined) {
         updateData.email = data.email;
+        if (data.email !== existingUser.email) {
+          // Admin sets the address directly: the user's own pending change is void
+          updateData.pendingEmail = null;
+        }
       }
       if (data.isActive !== undefined) {
         updateData.isActive = data.isActive;
@@ -336,6 +342,28 @@ export class UserByIdRepository {
       }
 
       logger.debug("User updated successfully", { userId: urlPathParams.id });
+
+      // Suspending an account ends it everywhere right away: sessions are
+      // deleted and API keys revoked (auth also refuses suspended accounts).
+      const suspendedNow =
+        (updatedUser.isBanned && !existingUser.isBanned) ||
+        (!updatedUser.isActive && existingUser.isActive);
+      if (suspendedNow) {
+        await db.delete(sessions).where(eq(sessions.userId, updatedUser.id));
+        await db
+          .update(userApiKeys)
+          .set({ revokedAt: new Date() })
+          .where(
+            and(
+              eq(userApiKeys.userId, updatedUser.id),
+              isNull(userApiKeys.revokedAt),
+            ),
+          );
+        logger.info("Account suspended: sessions ended, API keys revoked", {
+          userId: updatedUser.id,
+          by: user.id,
+        });
+      }
 
       const userRolesResponse = await UserRolesRepository.findByUserId(
         updatedUser.id,

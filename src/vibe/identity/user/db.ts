@@ -34,6 +34,12 @@ export const users = pgTable("users", {
   locale: text("locale").$type<CountryLanguage>().notNull(),
 
   emailVerified: boolean("email_verified").default(false).notNull(),
+  /**
+   * Requested new address, not active yet. The change completes only when
+   * the link mailed to this address is clicked (then it replaces `email`).
+   * null = no change pending.
+   */
+  pendingEmail: text("pending_email"),
   isActive: boolean("is_active").default(true).notNull(),
   marketingConsent: boolean("marketing_consent").default(false).notNull(),
   isBanned: boolean("is_banned").default(false).notNull(),

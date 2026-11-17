@@ -42,6 +42,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { creditTransactions, creditWallets } from "@/credits/db";
 import { CreditTransactionType } from "@/credits/enum";
+import { notSignupCarryover } from "@/credits/usage-filter";
 import { growthJourneys } from "@/leads/growth/db";
 import { paymentTransactions } from "@/payment/db";
 import { PaymentStatus } from "@/payment/enum";
@@ -99,6 +100,7 @@ function buildEnrichedUsers() {
     .where(
       and(
         eq(creditTransactions.type, CreditTransactionType.USAGE),
+        notSignupCarryover,
         isNotNull(creditWallets.userId),
       ),
     )
@@ -119,7 +121,14 @@ function buildEnrichedUsers() {
     .from(creditTransactions)
     .innerJoin(creditWallets, eq(creditWallets.id, creditTransactions.walletId))
     .innerJoin(userLeadLinks, eq(userLeadLinks.leadId, creditWallets.leadId))
-    .where(eq(creditTransactions.type, CreditTransactionType.USAGE))
+    // Signup-carryover rows are bookkeeping (they mirror guest spend that is
+    // already a usage row elsewhere), never this account's spend.
+    .where(
+      and(
+        eq(creditTransactions.type, CreditTransactionType.USAGE),
+        notSignupCarryover,
+      ),
+    )
     .groupBy(userLeadLinks.userId)
     .as("lu");
 

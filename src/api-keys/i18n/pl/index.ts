@@ -4,12 +4,11 @@ export const translations: typeof enTranslations = {
   category: "Konto",
 
   widget: {
-    upgradeTitle:
-      "Dostęp do API daje każdy plan albo jednorazowy pakiet kredytów za {{packPrice}}",
+    upgradeTitle: "Dostęp do API daje każdy plan, od {{subPrice}} miesięcznie",
     upgradeBody:
-      "Utwórz klucz już teraz. Zadziała po pierwszym zakupie: planu ({{subPrice}} miesięcznie) albo pakietu kredytów. Do tego czasu /v1 zwraca HTTP 402. Darmowe i bonusowe kredyty nie odblokowują API.",
+      "Klucze API odblokowuje każdy plan. Darmowe i bonusowe kredyty tego nie robią.",
     upgradeCta: "Odblokuj API",
-    createInactiveHint: "Klucz zadziała po pierwszym zakupie.",
+    createInactiveHint: "Wybierz plan, żeby tworzyć klucze.",
     docsLink: "Czytaj dokumentację API",
     back: "Wstecz",
     loading: "Wczytywanie kluczy API…",
@@ -134,6 +133,8 @@ export const translations: typeof enTranslations = {
     },
     errors: {
       limit: "Masz już {{max}} aktywnych kluczy. Najpierw unieważnij jeden.",
+      paidRequired:
+        "Klucze API wymagają płatnego konta: dowolnego planu, od {{subPrice}} miesięcznie. Wybierzesz go na {{url}}.",
     },
   },
 
