@@ -1,21 +1,27 @@
 "use client";
 
 /**
- * The two ways to get credits right now, with real prices from the product
- * config: a one-time pack and the monthly plan. One tap opens card checkout
- * (Stripe). Crypto needs a yearly plan or 2500+ credits, so it lives on the
- * full buy page, linked below the tiles.
+ * The fastest way to more credits, with real prices from the product config.
+ * Packs top up a plan (Max, 2026-11-17), so what shows depends on the viewer:
+ * - No live plan: the cheapest plans, one tap to card checkout (Stripe), and
+ *   a link to every plan on the buy page.
+ * - Live plan: a pack (one tap to checkout) and the next tier up, switched in
+ *   place after an inline confirm (it charges the prorated difference).
+ * Crypto needs yearly billing or 2500+ credits, so it lives on the buy page.
  *
  * Used where a signed-in user runs dry: the chat's out-of-credits card and the
- * credits header on the subscription pages. Guests never see this (both
- * checkouts need an account).
+ * credits header on the subscription pages. Guests never see this (every
+ * checkout needs an account).
  */
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { ArrowUp } from "next-vibe/ui/components/icons/ArrowUp";
+import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { Coins } from "next-vibe/ui/components/icons/Coins";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
@@ -33,75 +39,232 @@ import { useState } from "react";
 
 import purchaseDefinitions from "@/credits/purchase/definition";
 import { PaymentProvider } from "@/payment/enum";
-import { getPricingParams, ProductIds } from "@/products/repository-client";
+import { scopedTranslation as productsScopedTranslation } from "@/products/i18n";
+import {
+  getPricingParams,
+  getSubscriptionTiers,
+  ProductIds,
+  type SubscriptionTier,
+  type SubscriptionTierProductId,
+} from "@/products/repository-client";
 
-import { BillingInterval, SubscriptionPlan } from "../enum";
+import { BillingInterval } from "../enum";
+import { useSubscription } from "../hooks";
 import { scopedTranslation } from "../i18n";
+import {
+  getCompactTiers,
+  getPlanOfferState,
+  getUpgradeTier,
+} from "../plan-offers";
+import updateDefinitions from "../update/definition";
+import { refreshAfterTierChange } from "../update/refresh";
 import subscriptionCreateDefinitions from "./definition";
 
-type Pending = "pack" | "plan" | null;
+type Pending = "pack" | "upgrade" | SubscriptionTierProductId | null;
+
+type Notice =
+  | { kind: "none" }
+  | { kind: "error"; message: string }
+  | { kind: "done"; message: string };
 
 interface CreditOffersProps {
   locale: CountryLanguage;
-  /** Already on the plan: only the pack makes sense. */
-  hasSubscription: boolean;
   /** Tiles side by side from this container width up. */
   className?: string;
 }
 
 export function CreditOffers({
   locale,
-  hasSubscription,
   className,
 }: CreditOffersProps): JSX.Element | null {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: productsT } = productsScopedTranslation.scopedT(locale);
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const subscriptionRead = useSubscription(logger, user).read;
   const packCheckout = useApiMutation(purchaseDefinitions.POST, logger, user);
   const planCheckout = useApiMutation(
     subscriptionCreateDefinitions.POST,
     logger,
     user,
   );
+  const tierChange = useApiMutation(updateDefinitions.PUT, logger, user);
   const [pending, setPending] = useState<Pending>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [confirmUpgrade, setConfirmUpgrade] = useState(false);
+  const [notice, setNotice] = useState<Notice>({ kind: "none" });
 
   if (user.isPublic) {
     return null;
   }
+  // Until the plan is known, showing either set would flip under the finger.
+  if (subscriptionRead?.isLoading && !subscriptionRead.data) {
+    return (
+      <Div
+        data-testid="credit-offers-loading"
+        className={cn("flex h-14 items-center justify-center", className)}
+      >
+        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+      </Div>
+    );
+  }
 
+  const state = getPlanOfferState({
+    isPublic: false,
+    subscription: subscriptionRead?.data,
+  });
   const pricing = getPricingParams(locale);
+  const tiers = getSubscriptionTiers(locale);
+  const upgradeTier =
+    state.mode === "topUp" && state.currentTier && state.canSwitchTier
+      ? getUpgradeTier(tiers, state.currentTier)
+      : null;
 
-  const openCheckout = async (offer: "pack" | "plan"): Promise<void> => {
-    setError(null);
-    setPending(offer);
-    // mutateAsync resolves with the ErrorResponseType on failure
-    const result =
-      offer === "pack"
-        ? await packCheckout.mutateAsync({
-            requestData: {
-              quantity: 1,
-              productId: ProductIds.CREDIT_PACK,
-              provider: PaymentProvider.STRIPE,
-            },
-          })
-        : await planCheckout.mutateAsync({
-            requestData: {
-              plan: SubscriptionPlan.SUBSCRIPTION,
-              billingInterval: BillingInterval.MONTHLY,
-              provider: PaymentProvider.STRIPE,
-            },
-          });
+  const leaveForCheckout = <TData extends { checkoutUrl?: string }>(
+    result: ResponseType<TData>,
+  ): void => {
     if (result.success && result.data.checkoutUrl) {
       // Keep the spinner up while the browser leaves for checkout.
       assignUrl(result.data.checkoutUrl);
       return;
     }
     setPending(null);
-    setError(result.success ? t("quickCheckout.error") : result.message);
+    setNotice({
+      kind: "error",
+      message: result.success ? t("quickCheckout.error") : result.message,
+    });
+  };
+
+  const buyPack = async (): Promise<void> => {
+    setNotice({ kind: "none" });
+    setPending("pack");
+    // mutateAsync resolves with the ErrorResponseType on failure
+    leaveForCheckout(
+      await packCheckout.mutateAsync({
+        requestData: {
+          quantity: 1,
+          productId: ProductIds.CREDIT_PACK,
+          provider: PaymentProvider.STRIPE,
+        },
+      }),
+    );
+  };
+
+  const startPlan = async (tier: SubscriptionTier): Promise<void> => {
+    setNotice({ kind: "none" });
+    setPending(tier.productId);
+    leaveForCheckout(
+      await planCheckout.mutateAsync({
+        requestData: {
+          plan: tier.planId,
+          billingInterval: BillingInterval.MONTHLY,
+          provider: PaymentProvider.STRIPE,
+        },
+      }),
+    );
+  };
+
+  const upgrade = async (tier: SubscriptionTier): Promise<void> => {
+    setNotice({ kind: "none" });
+    setPending("upgrade");
+    const result = await tierChange.mutateAsync({
+      requestData: {
+        plan: tier.planId,
+        billingInterval: BillingInterval.MONTHLY,
+      },
+    });
+    setPending(null);
+    setConfirmUpgrade(false);
+    if (result.success) {
+      setNotice({ kind: "done", message: result.data.message });
+      await refreshAfterTierChange(logger);
+      return;
+    }
+    setNotice({ kind: "error", message: result.message });
   };
 
   const busy = pending !== null;
+
+  const tiles: JSX.Element[] =
+    state.mode === "topUp"
+      ? [
+          <OfferTile
+            key="pack"
+            testId="credit-offer-pack"
+            icon={<Coins className="h-4 w-4" />}
+            title={t("quickCheckout.pack.title", {
+              credits: pricing.packCredits,
+            })}
+            note={t("quickCheckout.pack.note")}
+            price={pricing.packPrice}
+            priceSuffix={null}
+            loadingLabel={t("quickCheckout.opening")}
+            loading={pending === "pack"}
+            disabled={busy}
+            ariaLabel={t("quickCheckout.pack.aria", {
+              credits: pricing.packCredits,
+              price: pricing.packPrice,
+            })}
+            onSelect={(): void => {
+              void buyPack();
+            }}
+          />,
+          ...(upgradeTier
+            ? [
+                <OfferTile
+                  key="upgrade"
+                  testId="credit-offer-upgrade"
+                  icon={<ArrowUp className="h-4 w-4" />}
+                  title={t("quickCheckout.upgrade.title", {
+                    plan: productsT(upgradeTier.name),
+                  })}
+                  note={t("quickCheckout.upgrade.note", {
+                    credits: upgradeTier.creditsLabel,
+                  })}
+                  price={upgradeTier.priceLabel}
+                  priceSuffix={t("quickCheckout.plan.perMonth")}
+                  loadingLabel={t("quickCheckout.upgrade.working")}
+                  loading={pending === "upgrade"}
+                  disabled={busy}
+                  selected={confirmUpgrade}
+                  ariaLabel={t("quickCheckout.upgrade.aria", {
+                    plan: productsT(upgradeTier.name),
+                    credits: upgradeTier.creditsLabel,
+                    price: upgradeTier.priceLabel,
+                  })}
+                  onSelect={(): void => {
+                    setNotice({ kind: "none" });
+                    setConfirmUpgrade((open) => !open);
+                  }}
+                />,
+              ]
+            : []),
+        ]
+      : getCompactTiers(tiers).map((tier) => (
+          <OfferTile
+            key={tier.productId}
+            testId={`credit-offer-tier-${tier.productId}`}
+            icon={<RefreshCw className="h-4 w-4" />}
+            title={t("quickCheckout.plan.title", {
+              credits: tier.creditsLabel,
+            })}
+            note={t("quickCheckout.plan.note", {
+              plan: productsT(tier.name),
+            })}
+            price={tier.priceLabel}
+            priceSuffix={t("quickCheckout.plan.perMonth")}
+            loadingLabel={t("quickCheckout.opening")}
+            loading={pending === tier.productId}
+            disabled={busy}
+            ariaLabel={t("quickCheckout.plan.aria", {
+              plan: productsT(tier.name),
+              credits: tier.creditsLabel,
+              price: tier.priceLabel,
+            })}
+            onSelect={(): void => {
+              void startPlan(tier);
+            }}
+          />
+        ));
 
   return (
     <Div
@@ -111,59 +274,62 @@ export function CreditOffers({
       <Div
         className={cn(
           "grid grid-cols-1 gap-2",
-          !hasSubscription && "@md/offers:grid-cols-2",
+          tiles.length > 1 && "@md/offers:grid-cols-2",
         )}
       >
-        <OfferTile
-          testId="credit-offer-pack"
-          icon={<Coins className="h-4 w-4" />}
-          title={t("quickCheckout.pack.title", {
-            credits: pricing.packCredits,
-          })}
-          note={t("quickCheckout.pack.note")}
-          price={pricing.packPrice}
-          priceSuffix={null}
-          loadingLabel={t("quickCheckout.opening")}
-          loading={pending === "pack"}
-          disabled={busy}
-          ariaLabel={t("quickCheckout.pack.aria", {
-            credits: pricing.packCredits,
-            price: pricing.packPrice,
-          })}
-          onSelect={(): void => {
-            void openCheckout("pack");
-          }}
-        />
-        {!hasSubscription && (
-          <OfferTile
-            testId="credit-offer-plan"
-            icon={<RefreshCw className="h-4 w-4" />}
-            title={t("quickCheckout.plan.title", {
-              credits: pricing.subscriptionCredits,
-            })}
-            note={t("quickCheckout.plan.note")}
-            price={pricing.subscriptionPrice}
-            priceSuffix={t("quickCheckout.plan.perMonth")}
-            loadingLabel={t("quickCheckout.opening")}
-            loading={pending === "plan"}
-            disabled={busy}
-            ariaLabel={t("quickCheckout.plan.aria", {
-              credits: pricing.subscriptionCredits,
-              price: pricing.subscriptionPrice,
-            })}
-            onSelect={(): void => {
-              void openCheckout("plan");
-            }}
-          />
-        )}
+        {tiles}
       </Div>
-      {error && (
+      {confirmUpgrade && upgradeTier && (
+        <Div
+          data-testid="credit-offer-upgrade-confirm"
+          className="flex flex-col gap-2.5 rounded-xl border border-primary/30 bg-primary/5 px-3 py-2.5 @md/offers:flex-row @md/offers:items-center @md/offers:justify-between"
+        >
+          <Span className="text-xs leading-snug text-foreground">
+            {t("quickCheckout.upgrade.confirm")}
+          </Span>
+          <Div className="flex shrink-0 gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              disabled={busy}
+              onClick={(): void => setConfirmUpgrade(false)}
+            >
+              {t("quickCheckout.upgrade.cancel")}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              data-testid="credit-offer-upgrade-go"
+              disabled={busy}
+              onClick={(): void => {
+                void upgrade(upgradeTier);
+              }}
+            >
+              {pending === "upgrade" && (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              )}
+              {t("quickCheckout.upgrade.confirmButton")}
+            </Button>
+          </Div>
+        </Div>
+      )}
+      {notice.kind === "error" && (
         <Div
           role="alert"
           className="flex items-start gap-1.5 text-xs text-destructive"
         >
           <AlertCircle className="mt-px h-3.5 w-3.5 flex-shrink-0" />
-          <Span>{error}</Span>
+          <Span className="break-words">{notice.message}</Span>
+        </Div>
+      )}
+      {notice.kind === "done" && (
+        <Div
+          aria-live="polite"
+          className="flex items-start gap-1.5 text-xs text-success"
+        >
+          <CheckCircle className="mt-px h-3.5 w-3.5 flex-shrink-0" />
+          <Span>{notice.message}</Span>
         </Div>
       )}
       <Div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-muted-foreground">
@@ -172,7 +338,9 @@ export function CreditOffers({
           href={`/${locale}/subscription/buy`}
           className="inline-flex items-center gap-1 font-medium text-primary underline-offset-2 hover:underline"
         >
-          {t("quickCheckout.moreOptions")}
+          {state.mode === "topUp"
+            ? t("quickCheckout.moreOptions")
+            : t("quickCheckout.allPlans")}
           <ArrowRight className="h-3 w-3" />
         </Link>
       </Div>
@@ -190,6 +358,8 @@ interface OfferTileProps {
   loadingLabel: string;
   loading: boolean;
   disabled: boolean;
+  /** Tile is the open step of a two-step action (upgrade confirm). */
+  selected?: boolean;
   ariaLabel: string;
   onSelect: () => void;
 }
@@ -205,6 +375,7 @@ function OfferTile({
   loadingLabel,
   loading,
   disabled,
+  selected = false,
   ariaLabel,
   onSelect,
 }: OfferTileProps): JSX.Element {
@@ -216,8 +387,12 @@ function OfferTile({
       data-testid={testId}
       disabled={disabled}
       aria-label={ariaLabel}
+      aria-expanded={selected || undefined}
       onClick={onSelect}
-      className="group h-auto min-h-14 w-full justify-between gap-3 rounded-xl border-border bg-background px-3 py-2.5 text-left font-normal transition-colors hover:border-primary/50 hover:bg-primary/5 disabled:opacity-70"
+      className={cn(
+        "group h-auto min-h-14 w-full justify-between gap-3 rounded-xl bg-background px-3 py-2.5 text-left font-normal transition-colors hover:border-primary/50 hover:bg-primary/5 disabled:opacity-70",
+        selected ? "border-primary/60 bg-primary/5" : "border-border",
+      )}
     >
       <Span className="flex min-w-0 items-center gap-2.5">
         <Span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -227,7 +402,7 @@ function OfferTile({
           <Span className="truncate text-sm font-semibold leading-tight text-foreground">
             {title}
           </Span>
-          <Span className="text-xs leading-snug text-muted-foreground">
+          <Span className="truncate text-xs leading-snug text-muted-foreground">
             {loading ? loadingLabel : note}
           </Span>
         </Span>

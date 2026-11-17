@@ -38,12 +38,12 @@ export const translations = {
           q2: {
             question: "What payment methods do you accept?",
             answer:
-              "We accept credit cards via Stripe and cryptocurrency payments (Bitcoin, Ethereum, stablecoins) via NowPayments. The {{subPrice}}/month subscription includes {{subCredits}} credits/month. You can also purchase credit packs ({{packPrice}} for {{packCredits}} credits) if you need more credits. Credit packs never expire, even after subscription ends.",
+              "Card, PayPal, Apple Pay and Google Pay via Stripe, plus crypto (Bitcoin, Ethereum, stablecoins) via NOWPayments. Plans start at {{subscriptionPrice}} a month. Credit packs are a top-up for subscribers.",
           },
           q3: {
             question: "How does the credit system work?",
             answer:
-              "You need the {{subPrice}}/month subscription to access AI chat, which includes {{subCredits}} credits/month. If you need more credits, you can purchase credit packs ({{packPrice}} for {{packCredits}} credits). Credit packs never expire, even after your subscription ends, so they work across all {{modelCount}} AI models whenever you reactivate.",
+              "Every model costs credits per use. Free credits get you started. Every plan adds credits each month: {{subscriptionPrice}} for {{subscriptionCredits}}, {{plusPrice}} for {{plusCredits}}, {{proPrice}} for {{proCredits}}, {{ultraPrice}} for {{ultraCredits}}. Need more? Subscribers top up with credit packs ({{packPrice}} for {{packCredits}} credits). Pack credits never expire and work across all {{modelCount}} AI models.",
           },
           q4: {
             question: "Is my data private and secure?",

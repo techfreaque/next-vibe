@@ -6,6 +6,7 @@ export const translations = {
   response: {
     referralCode: "Referral Code",
     referralLabel: "Referral Label",
+    subscriptionBonusCredits: "Bonus credits with your first plan",
   },
   errors: {
     validation: { title: "Validation Error", description: "Invalid request" },

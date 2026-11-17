@@ -43,6 +43,7 @@ import {
 } from "@/products/repository-client";
 import { CreditOffers } from "@/subscription/create/credit-offers";
 import { useSubscription } from "@/subscription/hooks";
+import { getPlanOfferState } from "@/subscription/plan-offers";
 import { VerifyEmailCreditsPrompt } from "@/user/public/verify-email/credits-prompt";
 
 import creditsDefinition from "./definition";
@@ -82,7 +83,6 @@ export function CreditsTabHeader({
   const totalModelCount = getAvailableChatModelCount(isAdmin, availability);
 
   const subscriptionEndpoint = useSubscription(logger, widgetUser);
-  const currentSubscription = subscriptionEndpoint.read?.data;
   // Cloud Sync tab: admins, and customers who may link an instance (paid) or
   // already have one linked. Unpaid accounts never see a dead-end tab.
   const remoteConnections = useRemoteConnections(logger, widgetUser);
@@ -91,6 +91,12 @@ export function CreditsTabHeader({
     isAdmin ||
     (remoteData !== undefined &&
       (remoteData.access.canConnect || remoteData.connections.length > 0));
+  const currentSubscription = subscriptionEndpoint.read?.data;
+  const offerState = getPlanOfferState({
+    isPublic: widgetUser.isPublic,
+    subscription: currentSubscription,
+  });
+  const hasPlan = offerState.mode === "topUp";
 
   const endpoint = useEndpoint(
     creditsDefinition,
@@ -297,20 +303,20 @@ export function CreditsTabHeader({
               </Span>
               <Span className="text-sm text-muted-foreground">
                 {activeTab === "buy"
-                  ? t("get.balance.lowBalance.hint", {
-                      packCredits: packProduct.credits,
-                      packPrice: pricing.packPrice,
-                    })
-                  : t("get.balance.lowBalance.offersHint")}
+                  ? hasPlan
+                    ? t("get.balance.lowBalance.hint", {
+                        packCredits: packProduct.credits,
+                        packPrice: pricing.packPrice,
+                      })
+                    : t("get.balance.lowBalance.hintPlans")
+                  : hasPlan
+                    ? t("get.balance.lowBalance.offersHint")
+                    : t("get.balance.lowBalance.offersHintPlans")}
               </Span>
             </Div>
             {/* One tap to card checkout; the buy tab below already has it all. */}
             {activeTab !== "buy" && (
-              <CreditOffers
-                locale={locale}
-                hasSubscription={currentSubscription?.hasSubscription === true}
-                className="mt-3"
-              />
+              <CreditOffers locale={locale} className="mt-3" />
             )}
           </Div>
         </Div>
@@ -321,7 +327,7 @@ export function CreditsTabHeader({
         !isAdmin &&
         !isLowBalance &&
         currentSubscription !== undefined &&
-        !currentSubscription.hasSubscription && (
+        offerState.mode === "plans" && (
           <Div className="px-5 pb-5 sm:px-6">
             <Div className="flex flex-col gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
               <Div className="flex flex-col gap-0.5">
@@ -332,6 +338,7 @@ export function CreditsTabHeader({
                   {t("get.balance.freePlanHint", {
                     count: freeTiers.signedIn,
                     max: freeTiers.max,
+                    planPrice: pricing.planPriceMin,
                     subCredits: subProduct.credits,
                   })}
                 </Span>
@@ -359,9 +366,7 @@ export function CreditsTabHeader({
               description={
                 isAdmin
                   ? t("get.balance.expiring.adminDescription")
-                  : t("get.balance.expiring.description", {
-                      subCredits: subProduct.credits,
-                    })
+                  : t("get.balance.expiring.description")
               }
               icon={<Calendar className="h-4 w-4" />}
               variant="warning"

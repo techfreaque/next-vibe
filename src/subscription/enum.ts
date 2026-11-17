@@ -8,7 +8,9 @@ import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
 import { scopedTranslation } from "./i18n";
 
 /**
- * Subscription plans available in the system
+ * Subscription plans (tiers), cheapest first. SUBSCRIPTION is the Starter
+ * tier and keeps its original value so existing rows stay valid. Prices and
+ * credits per tier live in products/repository-client.ts.
  */
 export const {
   enum: SubscriptionPlan,
@@ -16,6 +18,9 @@ export const {
   Value: SubscriptionPlanValue,
 } = createEnumOptions(scopedTranslation, {
   SUBSCRIPTION: "enums.plan.subscription",
+  PLUS: "enums.plan.plus",
+  PRO: "enums.plan.pro",
+  ULTRA: "enums.plan.ultra",
 });
 
 /**
@@ -67,7 +72,12 @@ export const {
  * Database enum arrays for Drizzle ORM
  * Use the same const arrays everywhere - no separate Value types
  */
-export const SubscriptionPlanDB = [SubscriptionPlan.SUBSCRIPTION] as const;
+export const SubscriptionPlanDB = [
+  SubscriptionPlan.SUBSCRIPTION,
+  SubscriptionPlan.PLUS,
+  SubscriptionPlan.PRO,
+  SubscriptionPlan.ULTRA,
+] as const;
 
 export const SubscriptionStatusDB = [
   SubscriptionStatus.INCOMPLETE,

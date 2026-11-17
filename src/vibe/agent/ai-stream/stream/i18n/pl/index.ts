@@ -730,9 +730,9 @@ export const translations: typeof enTranslations = {
     member: {
       title: "Skończyły Ci się kredyty",
       description:
-        "Darmowe kredyty odnowią się {{date}}. Pisz dalej już teraz:",
+        "Darmowe kredyty odnowią się {{date}}. Albo wybierz plan i pisz dalej już teraz:",
       subscriberDescription:
-        "Kredyty z planu odnowią się {{date}}. Potrzebujesz więcej wcześniej? Doładuj:",
+        "Kredyty z planu odnowią się {{date}}. Potrzebujesz więcej wcześniej? Doładuj albo weź większy plan:",
       orTopUp: "Albo nie czekaj:",
       newsletter: {
         title: "+{{bonus}} darmowych kredytów co miesiąc",

@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     lead: "GPT chez OpenAI, Claude chez Anthropic, Gemini chez Google. Trois SDK, trois clés, trois factures, trois tableaux de bord. Ou pire : l'outil que vous aimez ne parle qu'un format, donc il n'a accès qu'aux modèles d'un seul fournisseur.",
     p2: "{{appName}} réunit {{modelCount}} modèles de chat de {{providerCount}} labos derrière une seule clé et un seul solde de crédits. Appelez-les au format OpenAI, au format Responses ou au format Anthropic. Les mêmes modèles sur chaque endpoint. Voici précisément comment ça marche, ce que ça coûte, et quand passer en direct ou par un routeur est le meilleur choix.",
     access:
-      "Disons-le d'emblée : l'API demande un compte payant. N'importe quelle formule ({{subPrice}} par mois) ou un pack de crédits unique ({{packPrice}}) la débloque. Les crédits gratuits et les crédits bonus, non.",
+      "Disons-le d'emblée : l'API demande un compte payant. N'importe quelle formule la débloque, dès {{subPrice}} par mois. Les crédits gratuits et les crédits bonus, non.",
     accessLink: "Débloquer l'API",
   },
   endpoints: {
@@ -136,9 +136,9 @@ export const translations: typeof enTranslations = {
     abort:
       "Streaming : fermez la connexion et la génération s'arrête. Vous ne payez que ce qui a tourné. Pareil si le fournisseur lâche en plein stream.",
     chat: "Le chat et l'API sont facturés de la même manière. OpenRouter répartit un modèle sur plusieurs hébergeurs, et certains sont plus chers que le moins cher que nous affichons. Pour ces modèles, le prix affiché est donc une estimation, et usage.credits_charged donne le vrai chiffre. Si OpenRouter ne remonte aucun coût pour un appel, il est facturé au prix affiché.",
-    paid: "Le même solde de crédits que l'application de chat, qui couvre aussi l'image, la vidéo, la musique, la voix et la recherche web. L'API elle-même demande un compte payant : un abonnement actif ou au moins un pack de crédits. Les crédits gratuits ne la débloquent pas.",
-    sub: "Abonnement : {{subCredits}} crédits par mois pour {{subPrice}}.",
-    pack: "Pack de crédits : {{packCredits}} crédits pour {{packPrice}}. Les packs n'expirent jamais. Paiement par carte ou en crypto.",
+    paid: "Le même solde de crédits que l'application de chat, qui couvre aussi l'image, la vidéo, la musique, la voix et la recherche web. L'API elle-même demande un compte payant : n'importe quelle formule. Les crédits gratuits ne la débloquent pas.",
+    sub: "Formules mensuelles : quatre tailles, dès {{subCredits}} crédits pour {{subPrice}}.",
+    pack: "Packs de crédits : une recharge pour les abonnés, {{packCredits}} crédits pour {{packPrice}}. Ils n'expirent jamais. Carte, PayPal ou crypto.",
     link: "Voir les formules et les prix",
   },
   versus: {
@@ -205,7 +205,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Existe-t-il une offre gratuite pour l'API ?",
-      a: "Non. L'application de chat offre des crédits gratuits, l'API non. Elle demande un abonnement ({{subCredits}} crédits par mois pour {{subPrice}}) ou un pack de crédits ({{packCredits}} crédits pour {{packPrice}}). Un pack acheté une fois garde l'API active jusqu'à épuisement du solde.",
+      a: "Non. L'application de chat offre des crédits gratuits, l'API non. Elle demande une formule, dès {{subCredits}} crédits par mois pour {{subPrice}}. Les abonnés rechargent avec des packs de crédits ({{packCredits}} crédits pour {{packPrice}}) qui n'expirent jamais.",
     },
     pricing: {
       q: "Le prix affiché est-il celui que je paie ?",

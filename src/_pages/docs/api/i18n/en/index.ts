@@ -58,7 +58,7 @@ export const translations = {
   },
   access: {
     title: "Needs a paid account",
-    body: "Keys and /v1 calls need a paid account: any plan ({{subPrice}} a month) or a one-time credit pack ({{packPrice}}). Free accounts can create keys and read these docs, but every call answers HTTP 402 paid_plan_required until the first purchase. Free and bonus credits do not unlock it. Buy a pack once and the API keeps working until the balance runs out.",
+    body: "Keys and /v1 calls need a paid account: any plan, from {{subPrice}} a month. Free accounts can create keys and read these docs, but every call answers HTTP 402 paid_plan_required until the first purchase. Free and bonus credits do not unlock it. Every plan comes with monthly credits. Need more? Subscribers top up with credit packs that never expire.",
     cta: "Unlock the API",
   },
   auth: {
@@ -158,7 +158,7 @@ export const translations = {
         "Before a call runs we check your balance against a worst-case estimate. Not enough: HTTP 402 insufficient_credits, nothing runs, nothing is charged.",
       real: "After the call you pay real usage, not the estimate: the token count the provider reports, or the provider's real cost for OpenRouter models. If a provider reports no cost, the call falls back to the listed price.",
       topup:
-        "Out of credits? Buy a pack or renew your plan. The next call works immediately.",
+        "Out of credits? Top up with a pack, renew or upgrade your plan. The next call works immediately.",
     },
   },
   limits: {
@@ -174,7 +174,7 @@ export const translations = {
       missingKey:
         "No key sent. Send Authorization: Bearer sk-unb-..., or x-api-key.",
       invalidKey: "Key is wrong or revoked.",
-      paid: "No plan and no credit purchase on the account yet. Any plan or one credit pack unlocks it.",
+      paid: "No plan and no credit purchase on the account yet. Any plan unlocks it.",
       credits: "Balance too low for this call. Top up.",
       cap: "Paid balance is empty and today's free-credit cap is hit. Top up.",
       notFound: "Model does not exist or is not available to you.",

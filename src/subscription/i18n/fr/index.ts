@@ -464,6 +464,21 @@ export const translations: typeof enTranslations = {
 
   // Error types
   errors: {
+    tierChange: {
+      notActive:
+        "Votre formule n'est pas active. Démarrez une nouvelle formule.",
+      cryptoNotSupported:
+        "Une formule payée en crypto ne change pas en cours de période. Choisissez la nouvelle quand celle-ci se termine.",
+      paymentRequired:
+        "Votre banque demande une confirmation pour la mise à niveau. Ouvrez la facture pour la terminer : {{url}}",
+      failed: "Le changement de formule a échoué : {{error}}",
+      upgraded:
+        "Passage à {{plan}}. {{credits}} crédits en plus pour cette période.",
+      changed: "Formule changée : {{plan}}.",
+      downgraded:
+        "Passage à {{plan}} au prochain renouvellement. Vous gardez vos crédits actuels jusque-là.",
+      unchanged: "Vous avez déjà cette formule.",
+    },
     validation: {
       title: "Erreur de validation",
       description: "Paramètres d'abonnement invalides",
@@ -583,7 +598,7 @@ export const translations: typeof enTranslations = {
       packs: {
         title: "Besoin de plus de crédits ?",
         description:
-          "Achetez des packs de crédits quand vous voulez, avec ou sans abonnement : {{packPrice}} les {{packCredits}} crédits. Ils n'expirent jamais et s'ajoutent à votre quota mensuel.",
+          "À court avant le renouvellement ? Rechargez quand vous voulez : {{packPrice}} les {{packCredits}} crédits. Les packs n'expirent jamais et s'ajoutent à vos crédits mensuels.",
         cta: "Acheter un pack de crédits",
       },
       manage: "Gérez ou résiliez votre abonnement à tout moment dans",
@@ -710,11 +725,10 @@ export const translations: typeof enTranslations = {
   // Enum translations
   enums: {
     plan: {
-      subscription: "Abonnement",
-      starter: "Starter",
-      professional: "Professional",
-      premium: "Premium",
-      enterprise: "Enterprise",
+      subscription: "Starter",
+      plus: "Plus",
+      pro: "Pro",
+      ultra: "Ultra",
     },
     status: {
       incomplete: "Incomplet",
@@ -748,43 +762,91 @@ export const translations: typeof enTranslations = {
   quickCheckout: {
     pack: {
       title: "{{credits}} crédits",
-      note: "Paiement unique. N'expirent jamais.",
+      note: "Recharge unique. N'expirent jamais.",
       aria: "Acheter {{credits}} crédits pour {{price}}, paiement unique",
     },
     plan: {
-      title: "{{credits}} crédits chaque mois",
-      note: "Mensuel, sans engagement.",
+      title: "{{credits}} crédits / mois",
+      note: "{{plan}}. Sans engagement.",
       perMonth: "/mois",
-      aria: "S'abonner : {{credits}} crédits chaque mois pour {{price}}",
+      aria: "Démarrer {{plan}} : {{credits}} crédits chaque mois pour {{price}}",
+    },
+    upgrade: {
+      title: "Passer à {{plan}}",
+      note: "{{credits}} crédits / mois",
+      aria: "Passer à {{plan}} : {{credits}} crédits chaque mois pour {{price}}",
+      confirm:
+        "Vous payez maintenant la différence pour le reste de la période. Les crédits en plus arrivent tout de suite.",
+      confirmButton: "Confirmer",
+      cancel: "Annuler",
+      working: "Changement en cours...",
     },
     opening: "Ouverture du paiement...",
-    secure: "Paiement par carte via Stripe.",
+    secure: "Carte, PayPal, Apple Pay, Google Pay via Stripe.",
+    allPlans: "Toutes les formules et la crypto",
     moreOptions: "Crypto et autres options",
     error: "Le paiement ne s'est pas ouvert. Réessayez.",
   },
+  tiers: {
+    heading: "Choisissez votre formule",
+    subheading:
+      "Des crédits neufs chaque mois pour les {{modelCount}} modèles. Sans engagement.",
+    changeHeading: "Changer de formule",
+    changeSubheading: "Vous êtes sur {{plan}} : {{credits}} crédits par mois.",
+    recommended: "Recommandé",
+    current: "Votre formule",
+    perMonth: "/ mois",
+    perYear: "/ an",
+    creditsPerMonth: "crédits / mois",
+    yearlyEquivalent: "{{monthlyPrice}} / mois en facturation annuelle",
+    picked: "{{plan}} : {{credits}} crédits chaque mois",
+    pickedNote:
+      "Les {{modelCount}} modèles. Crédits renouvelés chaque mois. Sans engagement.",
+    cta: {
+      start: "Choisir {{plan}}",
+      upgrade: "Passer à {{plan}}",
+      downgrade: "Passer à {{plan}} au renouvellement",
+      intervalYearly: "Passer en facturation annuelle",
+      intervalMonthly: "Passer à {{plan}} en mensuel",
+      current: "Votre formule actuelle",
+    },
+    signInHint: "Créez un compte gratuit pour démarrer une formule.",
+    cryptoHint:
+      "Payer en crypto ? Plus, Pro et Ultra au mois ou à l'année, Starter à l'année.",
+    confirm: {
+      upgradeTitle: "Passer à {{plan}} ?",
+      upgradeBody:
+        "Vous payez maintenant la différence pour le reste de la période, et les crédits en plus arrivent tout de suite. Dès le prochain renouvellement : {{price}} par mois pour {{credits}} crédits.",
+      upgradeButton: "Payer et changer",
+      downgradeTitle: "Passer à {{plan}} ?",
+      downgradeBody:
+        "Prend effet à votre prochain renouvellement, le {{date}}. D'ici là, vous gardez votre formule et vos crédits. Ensuite : {{price}} par mois pour {{credits}} crédits.",
+      downgradeButton: "Changer au renouvellement",
+      intervalTitle: "Changer de facturation ?",
+      intervalBody:
+        "Votre période de facturation repart aujourd'hui et Stripe règle la différence au prorata. Nouvelle formule : {{plan}}, {{price}}{{period}}, {{credits}} crédits par mois.",
+      intervalButton: "Changer la facturation",
+      cancel: "Pas maintenant",
+      working: "Changement en cours...",
+    },
+    packsLocked: {
+      title: "Packs de crédits : {{price}} les {{credits}} crédits",
+      body: "Les packs rechargent une formule active. Démarrez une formule, puis ajoutez des packs quand vous êtes à court. Ils n'expirent jamais.",
+    },
+    topUp: {
+      heading: "Recharger",
+      subheading:
+        "À court avant le renouvellement ? Les packs s'ajoutent à votre formule et n'expirent jamais.",
+    },
+  },
   buy: {
     provider: {
-      stripe: "Carte bancaire",
-      stripeDescription: "Paiement sécurisé avec Stripe",
+      stripe: "Carte, PayPal et portefeuilles",
+      stripeDescription: "Carte, PayPal, Apple Pay, Google Pay via Stripe",
       nowpayments: "Crypto (NowPayments)",
       nowpaymentsDescription: "Payez en Bitcoin, Ethereum et plus encore",
       cryptoMonthlyDisabled:
-        "Le paiement en crypto n'est disponible que pour les abonnements annuels",
-    },
-    subscription: {
-      title: "Abonnement",
-      description:
-        "{{subCredits}} crédits/mois sur {{modelCount}} modèles d'IA",
-      perYear: "/ an",
-      perMonth: "/ mois",
-      yearlyEquivalent: "{{monthlyPrice}} / mois en facturation annuelle",
-      button: "S'abonner",
-      buttonAlreadySubscribed: "Vous avez déjà un abonnement actif",
-      features: {
-        credits: "{{count}} crédits par mois",
-        expiry: "Accès à {{modelCount}} modèles d'IA",
-        bestFor: "Idéal pour un usage régulier",
-      },
+        "Starter se paie en crypto à l'année. Plus, Pro et Ultra se paient aussi en crypto au mois.",
     },
     login: "Se connecter",
     signup: "S'inscrire gratuitement",

@@ -45,25 +45,25 @@ export const translations: typeof enTranslations = {
     tableHeaderSkill: "Andere teilen deinen Skill (5 %)",
     rows: [
       {
-        profile: "Abonnent im Plan",
+        profile: "Starter-Abonnent",
         spend: "{{planPrice}}/Monat",
         direct: "{{planEarn}}/Monat",
         skill: "{{planSkillEarn}}/Monat",
       },
       {
-        profile: "Plan + 1 Credit-Paket",
+        profile: "Starter + 1 Credit-Paket",
         spend: "{{plusPackSpend}}/Monat",
         direct: "{{plusPackEarn}}/Monat",
         skill: "{{plusPackSkillEarn}}/Monat",
       },
       {
-        profile: "Vielnutzer: Plan + {{heavyPacks}} Pakete",
+        profile: "Vielnutzer: Starter + {{heavyPacks}} Pakete",
         spend: "{{heavySpend}}/Monat",
         direct: "{{heavyEarn}}/Monat",
         skill: "{{heavySkillEarn}}/Monat",
       },
       {
-        profile: "Power User: Plan + {{powerPacks}} Pakete",
+        profile: "Power User: Starter + {{powerPacks}} Pakete",
         spend: "{{powerSpend}}/Monat",
         direct: "{{powerEarn}}/Monat",
         skill: "{{powerSkillEarn}}/Monat",
@@ -88,7 +88,7 @@ export const translations: typeof enTranslations = {
   },
   crypto: {
     title: "Auszahlung in Krypto - kein Bankkonto nötig",
-    p1: "Auszahlung in BTC oder USDC. Verarbeitung innerhalb von 48 Stunden nach Genehmigung. Mindestbetrag: {{minPayout}}. Das sind etwa {{payoutPowerMonths}} Monate mit einem Power User oder {{payoutPlanMonths}} Abo-Monate im Plan.",
+    p1: "Auszahlung in BTC oder USDC. Verarbeitung innerhalb von 48 Stunden nach Genehmigung. Mindestbetrag: {{minPayout}}. Das sind etwa {{payoutPowerMonths}} Monate mit einem Power User oder {{payoutPlanMonths}} Abo-Monate mit Starter.",
     p2: "Alternativ sofort in Plattform-Credits umwandeln. Wenn du {{appName}} selbst nutzt, gleichen deine Empfehlungseinnahmen deine eigenen Nutzungskosten aus.",
   },
   close: {

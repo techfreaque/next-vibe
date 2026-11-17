@@ -118,8 +118,10 @@ export const translations: typeof enTranslations = {
         title: "Erreur de validation",
         description: "Paramètres de paiement invalides",
         reason: {
-          enterpriseCustomPricing:
-            "La formule ENTERPRISE nécessite une tarification sur mesure",
+          yearlyNotAvailable:
+            "La facturation annuelle existe uniquement pour la formule {{plan}}. Choisissez le mensuel.",
+          cryptoStarterYearly:
+            "Starter se paie en crypto à l'année. Choisissez l'annuel, ou Plus, Pro ou Ultra.",
         },
       },
       network: {
@@ -171,6 +173,15 @@ export const translations: typeof enTranslations = {
   plans: {
     starter: {
       title: "Starter",
+    },
+    plus: {
+      title: "Plus",
+    },
+    pro: {
+      title: "Pro",
+    },
+    ultra: {
+      title: "Ultra",
     },
   },
 

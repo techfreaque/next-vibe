@@ -10,10 +10,11 @@ export const translations: typeof enTranslations = {
     models:
       "Modèles : {{modelCount}} modèles de chat ({{mainstream}} grand public, {{open}} open source, {{uncensored}} non censurés) issus de {{providerCount}} laboratoires, plus {{mediaCount}} modèles d'image, de vidéo, de musique, de synthèse vocale et de transcription.",
     free: "Crédits gratuits chaque mois : {{guest}} sans compte, {{signedIn}} avec un compte gratuit, {{max}} avec un compte gratuit et un abonnement confirmé à la newsletter. Aucune carte requise.",
-    paid: "Payant : un abonnement à {{subPrice}} par mois ou {{subYearPrice}} par an avec {{subCredits}} crédits par mois, ou un pack de crédits unique à {{packPrice}} pour {{packCredits}} crédits. Les crédits des packs n'expirent jamais.",
+    paid: "Formules payantes : {{plans}}. Chaque formule existe aussi à l'année au prix de 11 mois (Starter : {{subYearPrice}} par an). Les abonnés rechargent avec un pack de crédits unique à {{packPrice}} pour {{packCredits}} crédits. Les crédits des packs n'expirent jamais.",
+    planItem: "{{name}} à {{price}} par mois pour {{credits}} crédits",
     credit:
       "1 crédit = {{creditValue}}. Chaque page de modèle indique son prix par message.",
-    api: "API : formats OpenAI chat completions, OpenAI Responses et Anthropic Messages sur une seule URL de base ({{apiBaseUrl}}). Elle nécessite un compte payant : n'importe quel abonnement ou un achat de crédits, par exemple le pack à {{packPrice}}. Les comptes gratuits reçoivent HTTP 402.",
+    api: "API : formats OpenAI chat completions, OpenAI Responses et Anthropic Messages sur une seule URL de base ({{apiBaseUrl}}). Elle nécessite un compte payant : n'importe quelle formule, dès {{subPrice}} par mois. Les comptes gratuits reçoivent HTTP 402.",
     uncensored:
       "Niveau non censuré : deux types de modèles. Les modèles abliterés sont des modèles grand public modifiés pour ne plus esquiver les questions. Les modèles véritablement non censurés, comme UncensoredLM, sont entraînés sur des livres et des documents bannis de l'internet grand public, d'où des opinions politiques à contre-courant. Le niveau non censuré demande une confirmation unique de majorité (18+).",
     openSource:
@@ -29,7 +30,8 @@ export const translations: typeof enTranslations = {
     modelsDesc:
       "chaque modèle avec son prix par message, sa fenêtre de contexte, son niveau de contenu et des comparaisons face à face",
     pricing: "Tarifs",
-    pricingDesc: "crédits gratuits, abonnement et pack de crédits",
+    pricingDesc:
+      "crédits gratuits, les quatre formules et le pack de crédits en recharge",
     api: "Documentation de l'API",
     apiDesc:
       "URL de base, authentification, formats de requête et exemples de code",

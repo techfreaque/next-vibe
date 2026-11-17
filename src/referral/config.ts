@@ -69,3 +69,11 @@ export function computeLevelPercentages(): number[] {
 
   return percentages;
 }
+
+/**
+ * Idempotency key of the one-time referral-code bonus a referred user gets on
+ * their first paid plan. One per user, ever.
+ */
+export function referralSubscriptionBonusKey(userId: string): string {
+  return `referral-subscription-bonus:${userId}`;
+}

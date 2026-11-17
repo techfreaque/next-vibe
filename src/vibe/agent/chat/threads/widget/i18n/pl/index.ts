@@ -205,9 +205,9 @@ export const translations: typeof enTranslations = {
         tip: "Rejestracja jest bezpłatna!",
       },
       subscriptionButton: {
-        title: "Kredyty i subskrypcja",
+        title: "Kredyty i plany",
         description:
-          "Otrzymuj {{credits}} kredytów/miesiąc z subskrypcją za jedyne {{price}}/miesiąc. Darmowe konta dostają {{freeCredits}} kredytów/miesiąc, z newsletterem {{freeCreditsMax}}.",
+          "Darmowe konta dostają {{freeCredits}} kredytów/miesiąc, z newsletterem {{freeCreditsMax}}. Potrzebujesz więcej? Plany od {{price}}/miesiąc za {{credits}} kredytów, aż do {{maxCredits}} miesięcznie.",
       },
       chatInput: {
         title: "Wpisz swoją wiadomość",

@@ -19,6 +19,7 @@ import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data
 import contactDefinitions from "@/contact/definition";
 import { contactClientRepository } from "@/contact/repository-client";
 import { configScopedTranslation } from "@/env/i18n";
+import { getPricingParams } from "@/products/repository-client";
 
 import { scopedTranslation as pageT } from "./i18n";
 
@@ -28,10 +29,6 @@ interface HelpPageClientProps {
   platform: Platform;
   userEmail?: string;
   modelCount: number;
-  subPrice: string;
-  subCredits: number;
-  packPrice: string;
-  packCredits: number;
 }
 
 export default function HelpPageClient({
@@ -40,15 +37,12 @@ export default function HelpPageClient({
   platform,
   userEmail,
   modelCount,
-  subPrice,
-  subCredits,
-  packPrice,
-  packCredits,
 }: HelpPageClientProps): JSX.Element {
   const logger = useLogger();
   const { t } = pageT.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const supportEmail = contactClientRepository.getSupportEmail(locale);
+  const pricing = getPricingParams(locale);
 
   return (
     <Div className="container max-w-6xl mx-auto py-8 px-4">
@@ -139,19 +133,13 @@ export default function HelpPageClient({
             {
               question: t("pages.help.faq.questions.q2.question"),
               answer: t("pages.help.faq.questions.q2.answer", {
-                subPrice,
-                subCredits,
-                packPrice,
-                packCredits,
+                ...pricing,
               }),
             },
             {
               question: t("pages.help.faq.questions.q3.question"),
               answer: t("pages.help.faq.questions.q3.answer", {
-                subPrice,
-                subCredits,
-                packPrice,
-                packCredits,
+                ...pricing,
                 modelCount,
               }),
             },
@@ -181,10 +169,7 @@ export default function HelpPageClient({
             </H3>
             <P className="text-gray-600 dark:text-gray-300">
               {t("pages.help.faq.questions.q2.answer", {
-                subPrice,
-                subCredits,
-                packPrice,
-                packCredits,
+                ...pricing,
               })}
             </P>
           </Div>
@@ -194,10 +179,7 @@ export default function HelpPageClient({
             </H3>
             <P className="text-gray-600 dark:text-gray-300">
               {t("pages.help.faq.questions.q3.answer", {
-                subPrice,
-                subCredits,
-                packPrice,
-                packCredits,
+                ...pricing,
                 modelCount,
               })}
             </P>

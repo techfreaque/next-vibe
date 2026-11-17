@@ -57,7 +57,7 @@ export const translations = {
   expectations: {
     title: "Realistic expectations - no hype",
     p1: "Here's the honest math:",
-    scenario1Label: "Plan subscriber",
+    scenario1Label: "Starter subscriber",
     scenario1Spend: "{{planPrice}}/mo plan",
     scenario1Earn: "= {{planEarn}}/mo per referral",
     scenario2Label: "Power user (agents, API, image and video)",
@@ -66,7 +66,7 @@ export const translations = {
     scenario2Earn: "= {{powerEarn}}/mo per referral",
     note: "One power user pays you as much as {{powerVsPlan}} plan subscribers. Developers running agents and the API burn through credits and rarely cancel. They're the high-value target.",
     example:
-      "Refer 10 plan subscribers: {{tenPlanEarn}}/mo for you. Not life-changing. But it's money you earned by saying something you'd say anyway.",
+      "Refer 10 Starter subscribers: {{tenPlanEarn}}/mo for you. Not life-changing. But it's money you earned by saying something you'd say anyway.",
   },
   firststeps: {
     title: "Your first steps (5 minutes)",

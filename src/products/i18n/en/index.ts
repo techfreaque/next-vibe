@@ -13,7 +13,7 @@ export const translations = {
 
   // Product summary (single source of truth)
   summary:
-    "We offer Free (no account: {{freeCredits}} credits/month, free account: {{freeCreditsSignedIn}}, account + newsletter: {{freeCreditsMax}}), Monthly Subscription ({{subCurrency}}{{subPrice}}/month for {{subCredits}} credits), and Credit Packs ({{packCurrency}}{{packPrice}} for {{packCredits}} credits) that anyone can buy without a subscription.",
+    "We offer Free (no account: {{freeCredits}} credits/month, free account: {{freeCreditsSignedIn}}, account + newsletter: {{freeCreditsMax}}) and four monthly plans: {{subPrice}} for {{subCredits}} credits, {{plusPrice}} for {{plusCredits}}, {{proPrice}} for {{proCredits}} and {{ultraPrice}} for {{ultraCredits}}. Subscribers can top up any time with credit packs ({{packPrice}} for {{packCredits}} credits) that never expire.",
 
   // Free tier product
   free: {
@@ -23,7 +23,7 @@ export const translations = {
 
   // Subscription product
   subscription: {
-    name: "Monthly Subscription",
+    name: "Starter",
     description:
       "{{subCredits}} credits per month with all {{modelCount}} AI models",
     longDescription:
@@ -38,12 +38,23 @@ export const translations = {
     },
   },
 
+  // Higher subscription tiers (credits and prices come from config)
+  subscriptionPlus: {
+    name: "Plus",
+  },
+  subscriptionPro: {
+    name: "Pro",
+  },
+  subscriptionUltra: {
+    name: "Ultra",
+  },
+
   // Credit pack product
   creditPack: {
     name: "Credit Pack",
-    description: "Pay as you go. No subscription. Credits never expire.",
+    description: "Top up your plan. Credits never expire.",
     longDescription:
-      "Buy credits when you need them. No subscription required. Stack packs on top of a plan or use them alone.",
+      "Run low before your plan renews? Add a pack. Packs stack on top of your monthly credits and never expire.",
     features: {
       credits: "{{packCredits}} credits per pack",
       allModels: "All {{modelCount}} AI models included",

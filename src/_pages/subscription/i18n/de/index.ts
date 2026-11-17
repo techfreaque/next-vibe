@@ -42,8 +42,7 @@ export const translations: typeof enTranslations = {
       nextExpiration: "Nächster Ablauf",
       expiring: {
         title: "Abonnement-Credits",
-        description:
-          "Aus monatlichem Abonnement ({{subCredits}} Credits/Monat)",
+        description: "Aus deinem Monatsplan",
       },
       permanent: {
         title: "Permanente Credits",
@@ -63,16 +62,16 @@ export const translations: typeof enTranslations = {
       howItWorks: {
         title: "So funktionieren Credits",
         description:
-          "Eine Währung für jedes Modell. Abonnieren, aufladen oder gratis starten.",
+          "Eine Währung für jedes Modell. Plan wählen, aufladen oder gratis starten.",
         expiring: {
-          title: "Monatsabo",
+          title: "Monatspläne",
           description:
-            "{{subPrice}}/Monat. {{subCredits}} Credits jeden Monat, alle {{modelCount}} Modelle.",
+            "Pläne von {{minPrice}} bis {{maxPrice}} im Monat, bis zu {{maxCredits}} Credits. Alle {{modelCount}} Modelle.",
         },
         permanent: {
           title: "Credit-Pakete",
           description:
-            "{{packPrice}} für {{packCredits}} Credits. Beliebig viele Pakete. Verfallen nie. Kein Abo nötig.",
+            "Lädt jeden Plan auf: {{packPrice}} für {{packCredits}} Credits. Beliebig viele Pakete. Verfallen nie.",
         },
         free: {
           title: "Gratis-Credits",
@@ -156,8 +155,8 @@ export const translations: typeof enTranslations = {
       },
       pack: {
         title: "Credit-Pakete",
-        description: "Zahlen, was du nutzt. Kein Abo. Credits verfallen nie.",
-        badge: "Ohne Abo",
+        description: "Lädt deinen Plan auf. Credits verfallen nie.",
+        badge: "Aufladung",
         perPack: "/Paket",
         quantity: "Menge",
         total: "{{count}} Credits",
@@ -260,15 +259,14 @@ export const translations: typeof enTranslations = {
     keywords:
       "KI-Chat Preise, unzensierte KI Preise, KI pro Nachricht bezahlen, KI-Credits, {{appName}}",
     overview: {
-      title:
-        "Preise - pro Nachricht zahlen, ohne Vertragsbindung | {{appName}}",
+      title: "Preise: pro Nachricht zahlen, ohne Vertragsbindung | {{appName}}",
       description:
-        "Bis zu {{freeCredits}} Gratis-Credits pro Monat. {{subCredits}} Credits für {{subPrice}} im Monat oder ein Paket, das nie verfällt. Ein Guthaben für {{modelCount}} Modelle, vom Mainstream bis unzensiert.",
+        "Bis zu {{freeCredits}} Gratis-Credits pro Monat. Pläne ab {{subPrice}} für {{subCredits}} Credits im Monat, bis zu {{maxCredits}}. Ein Guthaben für {{modelCount}} Modelle, vom Mainstream bis unzensiert.",
     },
     buyCredits: {
-      title: "Credits kaufen - Abo oder Pakete | {{appName}}",
+      title: "Pläne und Credit-Pakete | {{appName}}",
       description:
-        "{{subCredits}} Credits im Monat für {{subPrice}} oder Credit-Pakete ohne Ablaufdatum. Zahlung per Karte oder Krypto. Nutzbar für {{modelCount}} KI-Modelle.",
+        "Pläne ab {{subPrice}} für {{subCredits}} Credits im Monat, bis zu {{maxCredits}}. Pakete laden jeden Plan auf und verfallen nie. Karte, PayPal oder Krypto. {{modelCount}} KI-Modelle.",
     },
     history: {
       title: "Credit-Verlauf | {{appName}}",

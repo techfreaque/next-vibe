@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     pricing: {
       name: "{{appName}} Tarife und Credits",
       description:
-        "Gratis-Credits jeden Monat, ein Abo oder ein einmaliges Credit-Paket. Ein Guthaben für {{modelCount}} Chat-Modelle plus Bild-, Video-, Musik- und Stimmmodelle.",
+        "Gratis-Credits jeden Monat, vier Monatstarife und Credit-Pakete zum Aufstocken. Ein Guthaben für {{modelCount}} Chat-Modelle plus Bild-, Video-, Musik- und Stimmmodelle.",
     },
     organization: {
       types: {

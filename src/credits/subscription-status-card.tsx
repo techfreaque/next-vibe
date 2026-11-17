@@ -27,6 +27,11 @@ import type { PaymentProviderValue } from "@/payment/enum";
 import { PaymentProvider } from "@/payment/enum";
 import { scopedTranslation as paymentScopedTranslation } from "@/payment/i18n";
 import { useCustomerPortal } from "@/payment/portal/hooks";
+import { scopedTranslation as productsScopedTranslation } from "@/products/i18n";
+import {
+  getSubscriptionTiers,
+  getTierProductForPlan,
+} from "@/products/repository-client";
 import { type SubscriptionGetResponseOutput } from "@/subscription/definition";
 import { SubscriptionStatus } from "@/subscription/enum";
 import { scopedTranslation as subscriptionScopedTranslation } from "@/subscription/i18n";
@@ -57,6 +62,7 @@ export function SubscriptionStatusCard({
   const { t: appT } = appScopedTranslation.scopedT(locale);
   const { t: subscriptionT } = subscriptionScopedTranslation.scopedT(locale);
   const { t: paymentT } = paymentScopedTranslation.scopedT(locale);
+  const { t: productsT } = productsScopedTranslation.scopedT(locale);
   const portal = useCustomerPortal(logger, user);
 
   const { status, billingInterval, currentPeriodStart } = initialSubscription;
@@ -64,6 +70,15 @@ export function SubscriptionStatusCard({
   if (!initialSubscription.hasSubscription || !status || !billingInterval) {
     return <Div />;
   }
+
+  const tierProduct = initialSubscription.plan
+    ? getTierProductForPlan(initialSubscription.plan)
+    : null;
+  const tier = tierProduct
+    ? getSubscriptionTiers(locale).find(
+        (entry) => entry.productId === tierProduct,
+      )
+    : undefined;
 
   const isCanceled = status === SubscriptionStatus.CANCELED;
   const isCanceling = !isCanceled && initialSubscription.cancelAt;
@@ -108,7 +123,14 @@ export function SubscriptionStatusCard({
               </Div>
               {t("subscription.title")}
             </CardTitle>
-            <CardDescription>{t("subscription.description")}</CardDescription>
+            <CardDescription>
+              {tier
+                ? subscriptionT("tiers.picked", {
+                    plan: productsT(tier.name),
+                    credits: tier.creditsLabel,
+                  })
+                : t("subscription.description")}
+            </CardDescription>
           </Div>
           <Div className="flex gap-2">
             <Badge

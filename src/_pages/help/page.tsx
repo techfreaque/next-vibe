@@ -18,11 +18,6 @@ import { Main } from "next-vibe/ui/components/main";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
-import {
-  getPricingParams,
-  ProductIds,
-  productsRepository,
-} from "@/products/platform-products";
 
 import { scopedTranslation as pageT } from "./i18n";
 import HelpPageClient from "./page-client";
@@ -36,10 +31,6 @@ export interface HelpPageData {
   jwtUser: JwtPayloadType;
   platform: Platform;
   userEmail?: string;
-  subPrice: string;
-  subCredits: number;
-  packPrice: string;
-  packCredits: number;
   modelCount: number;
 }
 
@@ -80,11 +71,6 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
     logger,
   );
 
-  const products = productsRepository.getProducts(locale);
-  const pricing = getPricingParams(locale);
-  const subCredits = products[ProductIds.SUBSCRIPTION].credits;
-  const packCredits = products[ProductIds.CREDIT_PACK].credits;
-
   const isAdmin = !jwtUser.isPublic && jwtUser.roles.includes(UserRole.ADMIN);
   const modelCount = getAvailableChatModelCount(
     isAdmin,
@@ -109,10 +95,6 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
     jwtUser,
     platform: Platform.NEXT_PAGE,
     userEmail,
-    subPrice: pricing.subscriptionPrice,
-    subCredits,
-    packPrice: pricing.packPrice,
-    packCredits,
     modelCount,
   };
 }
@@ -122,10 +104,6 @@ export function TanstackPage({
   jwtUser,
   platform,
   userEmail,
-  subPrice,
-  subCredits,
-  packPrice,
-  packCredits,
   modelCount,
 }: HelpPageData): JSX.Element {
   const { t } = pageT.scopedT(locale);
@@ -147,10 +125,6 @@ export function TanstackPage({
         platform={platform}
         userEmail={userEmail}
         modelCount={modelCount}
-        subPrice={subPrice}
-        subCredits={subCredits}
-        packPrice={packPrice}
-        packCredits={packCredits}
       />
     </Main>
   );

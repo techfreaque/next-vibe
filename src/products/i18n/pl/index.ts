@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
 
   // Product summary (single source of truth)
   summary:
-    "Oferujemy plany Darmowy (bez konta: {{freeCredits}} kredytów/miesiąc, darmowe konto: {{freeCreditsSignedIn}}, konto z newsletterem: {{freeCreditsMax}}), Subskrypcja miesięczna ({{subCurrency}}{{subPrice}}/miesiąc za {{subCredits}} kredytów) i Pakiety kredytów ({{packCurrency}}{{packPrice}} za {{packCredits}} kredytów), które każdy kupi bez subskrypcji.",
+    "Oferujemy plan Darmowy (bez konta: {{freeCredits}} kredytów/miesiąc, darmowe konto: {{freeCreditsSignedIn}}, konto z newsletterem: {{freeCreditsMax}}) i cztery plany miesięczne: {{subPrice}} za {{subCredits}} kredytów, {{plusPrice}} za {{plusCredits}}, {{proPrice}} za {{proCredits}} i {{ultraPrice}} za {{ultraCredits}}. Subskrybenci doładują konto w każdej chwili pakietami kredytów ({{packPrice}} za {{packCredits}} kredytów), które nigdy nie wygasają.",
 
   // Free tier product
   free: {
@@ -25,7 +25,7 @@ export const translations: typeof enTranslations = {
 
   // Subscription product
   subscription: {
-    name: "Subskrypcja miesięczna",
+    name: "Starter",
     description:
       "{{subCredits}} kredytów miesięcznie ze wszystkimi {{modelCount}} modelami AI",
     longDescription:
@@ -40,13 +40,23 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  // Higher subscription tiers (credits and prices come from config)
+  subscriptionPlus: {
+    name: "Plus",
+  },
+  subscriptionPro: {
+    name: "Pro",
+  },
+  subscriptionUltra: {
+    name: "Ultra",
+  },
+
   // Credit pack product
   creditPack: {
     name: "Pakiet kredytów",
-    description:
-      "Płacisz za to, czego używasz. Bez subskrypcji. Kredyty nie wygasają.",
+    description: "Doładowanie do Twojego planu. Kredyty nie wygasają.",
     longDescription:
-      "Kup kredyty, gdy ich potrzebujesz. Bez subskrypcji. Dokładaj pakiety do planu albo używaj samych.",
+      "Kończą się kredyty przed odnowieniem? Dokup pakiet. Pakiety dochodzą do kredytów miesięcznych i nigdy nie wygasają.",
     features: {
       credits: "{{packCredits}} kredytów na pakiet",
       allModels: "Wszystkie {{modelCount}} modeli AI włączone",

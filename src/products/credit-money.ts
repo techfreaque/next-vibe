@@ -57,7 +57,7 @@ export function formatCreditsAsMoney(
   return `≈ ${formatMoney(value, currency, locale)}`;
 }
 
-/** Formatted price of one credit, e.g. "$0.01" / "0,08 zł". */
+/** Formatted price of one credit, e.g. "$0.01" / "0,04 zł". */
 export function formatCreditUnitPrice(locale: CountryLanguage): string {
   const { amount, currency } = getCreditUnitPrice(locale);
   return formatMoney(amount, currency, locale);

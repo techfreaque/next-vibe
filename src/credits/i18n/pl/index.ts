@@ -240,12 +240,16 @@ export const translations: typeof enTranslations = {
     balance: {
       subscribe: "Zobacz plany",
       freePlanHint:
-        "{{count}} darmowych kredytów miesięcznie, z newsletterem {{max}}. Z subskrypcją {{subCredits}}, albo po prostu kup pakiet. Subskrypcja niepotrzebna.",
+        "{{count}} darmowych kredytów miesięcznie, z newsletterem {{max}}. Plany od {{planPrice}} za {{subCredits}} kredytów miesięcznie.",
       lowBalance: {
         title: "Zostało {{count}} kredytów",
         emptyTitle: "Skończyły Ci się kredyty",
-        hint: "Doładuj {{packCredits}} kredytów za {{packPrice}}. Nigdy nie wygasają. Subskrypcja niepotrzebna.",
-        offersHint: "Wybierz jedno i za chwilę piszesz dalej. Kredyty z pakietu nigdy nie wygasają.",
+        hint: "Doładuj poniżej: {{packCredits}} kredytów za {{packPrice}}, nigdy nie wygasają.",
+        hintPlans:
+          "Wybierz plan poniżej. Kredyty wpadają od razu po płatności.",
+        offersHint:
+          "Doładuj i za chwilę piszesz dalej. Kredyty z pakietu nigdy nie wygasają.",
+        offersHintPlans: "Wybierz plan i za chwilę piszesz dalej.",
       },
       freePlan: "Korzystasz z planu darmowego",
       guestPlan: "Saldo gościa",
@@ -256,18 +260,18 @@ export const translations: typeof enTranslations = {
       adminTitle: "Limit wydatków",
       description: "Jedno saldo na wszystkie modele ({{modelCount}}).",
       adminDescription:
-        "Kredyty działają jako limit wydatków - kontroluj dozwolone użycie AI przez wszystkich użytkowników.",
+        "Kredyty działają jako limit wydatków. Kontrolujesz, ile AI mogą zużyć wszyscy użytkownicy.",
       credit: "{{count}} kredyt",
       credits: "{{count}} kredytów",
       expiring: {
         title: "Wygasające kredyty",
-        description: "{{subCredits}} nowych kredytów na cykl subskrypcji",
+        description: "Kredyty z planu, odnawiane co okres rozliczeniowy",
         adminDescription: "Kredyty z limitem czasowym (cykl subskrypcji)",
       },
       permanent: {
         title: "Stałe kredyty",
-        description: "Nie wygasają - należą do Ciebie",
-        adminDescription: "Stałe kredyty - nie wygasają",
+        description: "Nie wygasają. Należą do Ciebie",
+        adminDescription: "Stałe kredyty, nie wygasają",
       },
       free: {
         title: "Darmowe kredyty",
@@ -279,8 +283,7 @@ export const translations: typeof enTranslations = {
       },
       earned: {
         title: "Zarobione kredyty",
-        description:
-          "Zarobione przez polecenia - kliknij, aby zaprosić znajomych",
+        description: "Zarobione z poleceń. Kliknij, aby zaprosić znajomych",
       },
       spending: {
         title: "Twoje zarobione kredyty",

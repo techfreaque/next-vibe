@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     lead: "Twój agent kodujący jest przywiązany do modeli jednego dostawcy. Chcesz drugiej opinii z innego laboratorium, taniego modelu do czarnej roboty albo takiego, który nie odmawia? To kolejne konto, kolejny klucz, kolejny rachunek.",
     p2: "{{appName}} mówi wszystkimi trzema formatami, których używają agenci kodujący: OpenAI chat completions, OpenAI Responses API i Anthropic Messages API. Nic pośrodku, nic do instalowania. Podłączasz narzędzie raz i przełączasz się między Claude, GPT, DeepSeek, GLM, Kimi, Qwen i modelami niecenzurowanymi, zmieniając jedno ID modelu.",
     access:
-      "Zanim zaczniesz: API wymaga płatnego konta. Odblokuje je dowolny plan ({{subPrice}} miesięcznie) albo jednorazowy pakiet kredytów ({{packPrice}}). Darmowe i bonusowe kredyty nie wystarczą.",
+      "Zanim zaczniesz: API wymaga płatnego konta. Odblokuje je dowolny plan, od {{subPrice}} miesięcznie. Darmowe i bonusowe kredyty nie wystarczą.",
     accessLink: "Odblokuj API",
   },
   why: {
@@ -124,7 +124,7 @@ export const translations: typeof enTranslations = {
       "Claude Code dostaje adres bazowy bez /v1. Z /v1 wywoła /v1/v1/messages i trafi na 404.",
     modelId:
       "Używaj dokładnie ID z GET /v1/models, na przykład {{model}}. Aider chce openai/ z przodu. Wbudowane ID Claude z Claude Code trafiają same do naszego najnowszego Claude z tej samej rodziny. Każde inne nieznane ID zwraca 404 model_not_found.",
-    paid: "HTTP 402 z paid_plan_required znaczy, że konto nie ma jeszcze planu ani zakupu kredytów. Naprawi to dowolny plan albo jeden pakiet kredytów.",
+    paid: "HTTP 402 z paid_plan_required znaczy, że konto nie ma jeszcze planu ani zakupu kredytów. Naprawi to dowolny plan.",
     tools:
       "Model bez obsługi narzędzi zwraca 400 tools_not_supported, gdy tylko agent wyśle narzędzia. Sprawdź supports_tools w GET /v1/models.",
     rateLimit:

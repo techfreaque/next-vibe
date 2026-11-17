@@ -22,25 +22,25 @@ import {
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { Bitcoin } from "next-vibe/ui/components/icons/Bitcoin";
-import { Calendar } from "next-vibe/ui/components/icons/Calendar";
-import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { Coins } from "next-vibe/ui/components/icons/Coins";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { Database } from "next-vibe/ui/components/icons/Database";
 import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/components/icons/ExternalLink";
 import { Info } from "next-vibe/ui/components/icons/Info";
+import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Lock } from "next-vibe/ui/components/icons/Lock";
 import { Minus } from "next-vibe/ui/components/icons/Minus";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
-import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
-import { Zap } from "next-vibe/ui/components/icons/Zap";
-import { ExternalLink, Link } from "next-vibe/ui/components/link";
+import { ExternalLink } from "next-vibe/ui/components/link";
+import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
 import { H3 } from "next-vibe/ui/components/typography";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { assignUrl } from "next-vibe/ui/lib/location";
 import {
   useWidgetForm,
+  useWidgetIsSubmitting,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetOnSubmit,
@@ -63,11 +63,19 @@ import purchaseDefinitions from "@/credits/purchase/definition";
 import { scopedTranslation as purchaseScopedTranslation } from "@/credits/purchase/i18n";
 import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
 import { ProductIds, productsRepository } from "@/products/platform-products";
+import { getPricingParams } from "@/products/repository-client";
 
 import subscriptionDefinitions from "../definition";
-import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "../enum";
+import {
+  BillingInterval,
+  SubscriptionPlan,
+  type SubscriptionPlanValue,
+  SubscriptionStatus,
+} from "../enum";
 import { useSubscription } from "../hooks";
+import { getPlanOfferState } from "../plan-offers";
 import type definition from "./definition";
+import { type PlanInterval, PlanPicker } from "./plan-picker";
 
 const MIN_QTY = 1;
 // Crypto minimum is ~$25 of credits (5 packs).
@@ -94,6 +102,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
   const user = useWidgetUser();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
+  const subSubmitting = useWidgetIsSubmitting();
   const subValue = useWidgetValue<typeof definition.POST>();
 
   const { locale: currentLocale } = useTranslation();
@@ -109,38 +118,31 @@ export function SubscriptionCreateContainer(): JSX.Element {
   const subscriptionEndpoint = useSubscription(logger, user);
   const currentSubscription = subscriptionEndpoint.read?.data;
   const isLoadingSubscription = subscriptionEndpoint.read?.isLoading ?? false;
-  const hasActiveSubscription =
-    currentSubscription?.status === SubscriptionStatus.ACTIVE;
+
+  const offerState = getPlanOfferState({
+    isPublic: user.isPublic,
+    subscription: currentSubscription,
+  });
+  const pricing = getPricingParams(locale);
 
   const products = productsRepository.getProducts(locale);
-  const subscriptionProduct = products[ProductIds.SUBSCRIPTION];
-  const subscriptionPrice = subscriptionProduct.price;
-  const subscriptionCredits = subscriptionProduct.credits;
-  const yearlyProduct = productsRepository.getProduct(
-    ProductIds.SUBSCRIPTION,
-    locale,
-    "year",
-  );
-  const yearlySubscriptionPrice = yearlyProduct.price;
   const packProduct = products[ProductIds.CREDIT_PACK];
   const packPrice = packProduct.price;
   const packCredits = packProduct.credits;
 
-  const [billingInterval, setBillingInterval] = useState<
-    typeof BillingInterval.MONTHLY | typeof BillingInterval.YEARLY
-  >(BillingInterval.MONTHLY);
+  // The plan the user picked, waiting for a payment method.
+  const [pendingPlan, setPendingPlan] = useState<{
+    plan: typeof SubscriptionPlanValue;
+    interval: PlanInterval;
+  } | null>(null);
   const [isSubProviderModalOpen, setIsSubProviderModalOpen] = useState(false);
   const [isPackProviderModalOpen, setIsPackProviderModalOpen] = useState(false);
 
-  const currentSubscriptionPrice =
-    billingInterval === BillingInterval.YEARLY
-      ? yearlySubscriptionPrice
-      : subscriptionPrice;
-  const monthlyEquivalent =
-    billingInterval === BillingInterval.YEARLY
-      ? yearlySubscriptionPrice / 12
-      : subscriptionPrice;
-  const isCryptoSubDisabled = billingInterval !== BillingInterval.YEARLY;
+  // Crypto plans are one-off invoices. Starter monthly is below what crypto
+  // payments accept, so Starter takes crypto yearly; bigger plans monthly too.
+  const isCryptoSubDisabled =
+    pendingPlan?.interval !== BillingInterval.YEARLY &&
+    pendingPlan?.plan === SubscriptionPlan.SUBSCRIPTION;
 
   // Subscription submit — uses widget's own form/submit from context
   useEffect(() => {
@@ -149,7 +151,11 @@ export function SubscriptionCreateContainer(): JSX.Element {
     }
   }, [subValue?.checkoutUrl]);
 
-  const handleSubscribe = (): void => {
+  const handleSubscribe = (
+    plan: typeof SubscriptionPlanValue,
+    interval: PlanInterval,
+  ): void => {
+    setPendingPlan({ plan, interval });
     // The button only shows when the cached subscription read says "none",
     // but that read can be stale or failed (prod: a user subscribed on Nov 7,
     // got "already subscribed" from checkout on Nov 8). Re-check before
@@ -184,8 +190,13 @@ export function SubscriptionCreateContainer(): JSX.Element {
     provider: typeof PaymentProviderValue,
   ): void => {
     setIsSubProviderModalOpen(false);
-    form.setValue("plan", SubscriptionPlan.SUBSCRIPTION, { shouldDirty: true });
-    form.setValue("billingInterval", billingInterval, { shouldDirty: true });
+    if (!pendingPlan) {
+      return;
+    }
+    form.setValue("plan", pendingPlan.plan, { shouldDirty: true });
+    form.setValue("billingInterval", pendingPlan.interval, {
+      shouldDirty: true,
+    });
     form.setValue("provider", provider, { shouldDirty: true });
     onSubmit?.();
   };
@@ -296,6 +307,131 @@ export function SubscriptionCreateContainer(): JSX.Element {
       assignUrl(packValue.checkoutUrl);
     }
   }, [packValue?.checkoutUrl]);
+  const packError =
+    packResponse?.success === false ? packResponse.message : null;
+
+  const planPicker = (
+    <PlanPicker
+      key={`${offerState.currentTier ?? "none"}-${offerState.currentInterval ?? "none"}`}
+      locale={locale}
+      state={offerState}
+      subscription={currentSubscription}
+      modelCount={totalModelCount}
+      onStart={handleSubscribe}
+      startPending={subSubmitting === true || Boolean(subValue?.checkoutUrl)}
+      startError={<FormAlertWidget field={{}} />}
+    />
+  );
+
+  const packCard = (
+    <Card data-testid="pack-card" className="overflow-hidden rounded-xl">
+      <CardContent className="flex flex-col gap-5 p-5 sm:p-6 md:flex-row md:items-center md:justify-between md:gap-8">
+        <Div className="flex min-w-0 flex-col gap-4">
+          <Div className="flex items-start gap-3">
+            <Span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Coins className="h-5 w-5" />
+            </Span>
+            <Div className="flex min-w-0 flex-col gap-0.5">
+              <H3 className="m-0 text-lg font-semibold tracking-tight">
+                {t("tiers.topUp.heading")}
+              </H3>
+              <Span className="text-sm text-muted-foreground">
+                {t("tiers.topUp.subheading")}
+              </Span>
+            </Div>
+          </Div>
+          <Div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <Span className="text-3xl font-semibold tabular-nums tracking-tight">
+              {pricing.packPrice}
+            </Span>
+            <Span className="text-sm text-muted-foreground">
+              {tPurchase("post.pack.perPack")}
+            </Span>
+            <Span className="flex items-center gap-1.5 text-sm font-medium text-primary">
+              <Sparkles className="h-4 w-4" />
+              {tPurchase("post.pack.features.credits", {
+                count: packCredits.toLocaleString(locale),
+              })}
+            </Span>
+          </Div>
+        </Div>
+        <Div className="flex w-full flex-col gap-3 md:w-80 md:shrink-0">
+          <Div className="flex items-center overflow-hidden rounded-lg border border-border">
+            <Button
+              type="button"
+              variant="ghost"
+              size="lg"
+              className="h-12 w-12 shrink-0 rounded-none border-r border-border px-0"
+              onClick={() => setPackQty(packQty - 1)}
+              disabled={packQty <= MIN_QTY}
+            >
+              <Minus className="h-5 w-5" />
+            </Button>
+            <Div className="flex h-12 flex-1 select-none flex-col items-center justify-center">
+              <Span className="text-xl font-bold tabular-nums leading-tight">
+                {packQty}
+              </Span>
+              <Span className="text-xs text-muted-foreground">
+                {tPurchase("post.pack.qtyCredits", {
+                  count: totalCredits.toLocaleString(locale),
+                })}
+              </Span>
+            </Div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="lg"
+              className="h-12 w-12 shrink-0 rounded-none border-l border-border px-0"
+              onClick={() => setPackQty(packQty + 1)}
+            >
+              <Plus className="h-5 w-5" />
+            </Button>
+          </Div>
+          <Button
+            type="button"
+            className="h-11 w-full"
+            data-testid="pack-buy"
+            onClick={handlePackBuy}
+            disabled={packIsSubmitting || Boolean(packValue?.checkoutUrl)}
+          >
+            {packIsSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+            {packQty > 1
+              ? tPurchase("post.pack.totalSummary", {
+                  totalCredits: totalCredits.toLocaleString(locale),
+                  totalPrice: formatPrice(
+                    totalPrice,
+                    locale,
+                    packProduct.currency,
+                  ),
+                })
+              : tPurchase("post.submit.text")}
+          </Button>
+          {packError && (
+            <Div
+              role="alert"
+              className="flex items-start gap-1.5 text-sm text-destructive"
+            >
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              <Span>{packError}</Span>
+            </Div>
+          )}
+          {packValue?.checkoutUrl && (
+            <Button variant="outline" className="w-full" asChild>
+              <ExternalLink
+                href={packValue.checkoutUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2"
+              >
+                <ExternalLinkIcon className="h-4 w-4" />
+                {tPurchase("post.openCheckout")}
+              </ExternalLink>
+            </Button>
+          )}
+        </Div>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <WidgetShell className="gap-6">
@@ -633,274 +769,42 @@ export function SubscriptionCreateContainer(): JSX.Element {
         </>
       )}
 
-      {/* Subscription + Credit Pack grid */}
-      <Div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
-        {/* Subscription card */}
-        <Card className="relative flex flex-col overflow-hidden rounded-xl border-primary shadow-md ring-1 ring-primary">
-          <CardHeader className="gap-1 p-5 sm:p-6">
-            <CardTitle className="text-xl tracking-tight">
-              {t("buy.subscription.title")}
-            </CardTitle>
-            <CardDescription>
-              {t("buy.subscription.description", {
-                subPrice: formatPrice(
-                  currentSubscriptionPrice,
-                  locale,
-                  subscriptionProduct.currency,
-                ),
-                subCredits: subscriptionCredits,
-                modelCount: totalModelCount,
-              })}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-1 flex-col gap-6 p-5 pt-0 sm:p-6 sm:pt-0">
-            <Div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
-              <Button
-                type="button"
-                variant={
-                  billingInterval === BillingInterval.MONTHLY
-                    ? "default"
-                    : "ghost"
-                }
-                size="sm"
-                onClick={() => setBillingInterval(BillingInterval.MONTHLY)}
-                className="h-10"
-              >
-                {t("billing.monthly")}
-              </Button>
-              <Button
-                type="button"
-                variant={
-                  billingInterval === BillingInterval.YEARLY
-                    ? "default"
-                    : "ghost"
-                }
-                size="sm"
-                onClick={() => setBillingInterval(BillingInterval.YEARLY)}
-                className="h-10"
-              >
-                {t("billing.yearly")}
-              </Button>
+      {isAuthenticated && isLoadingSubscription ? (
+        <Div className="flex flex-col gap-3">
+          <Skeleton className="h-6 w-48 rounded-md" />
+          <Div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {[0, 1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-36 rounded-xl" />
+            ))}
+          </Div>
+        </Div>
+      ) : offerState.mode === "topUp" ? (
+        <>
+          {packCard}
+          {planPicker}
+        </>
+      ) : (
+        <>
+          {planPicker}
+          <Div
+            data-testid="packs-locked"
+            className="flex items-start gap-3 rounded-xl border border-dashed border-border px-4 py-3.5"
+          >
+            <Lock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+            <Div className="flex min-w-0 flex-col gap-0.5">
+              <Span className="text-sm font-medium">
+                {t("tiers.packsLocked.title", {
+                  price: pricing.packPrice,
+                  credits: pricing.packCredits,
+                })}
+              </Span>
+              <Span className="text-sm text-muted-foreground">
+                {t("tiers.packsLocked.body")}
+              </Span>
             </Div>
-            <Div className="flex flex-col gap-2">
-              <Div className="flex items-baseline gap-1">
-                <Div className="text-4xl font-semibold tracking-tight tabular-nums">
-                  {formatPrice(
-                    currentSubscriptionPrice,
-                    locale,
-                    subscriptionProduct.currency,
-                  )}
-                </Div>
-                <Div className="text-sm text-muted-foreground">
-                  {billingInterval === BillingInterval.YEARLY
-                    ? t("buy.subscription.perYear")
-                    : t("buy.subscription.perMonth")}
-                </Div>
-              </Div>
-              {billingInterval === BillingInterval.YEARLY && (
-                <Div className="text-sm text-success">
-                  {t("buy.subscription.yearlyEquivalent", {
-                    monthlyPrice: formatPrice(
-                      monthlyEquivalent,
-                      locale,
-                      subscriptionProduct.currency,
-                    ),
-                  })}
-                </Div>
-              )}
-            </Div>
-            <Div className="flex flex-1 flex-col gap-3 text-sm">
-              <Div className="flex items-center gap-2.5">
-                <Zap className="h-4 w-4 shrink-0 text-primary" />
-                <Span>
-                  {t("buy.subscription.features.credits", {
-                    count: subscriptionCredits,
-                  })}
-                </Span>
-              </Div>
-              <Div className="flex items-center gap-2.5">
-                <Calendar className="h-4 w-4 shrink-0 text-primary" />
-                <Span>
-                  {t("buy.subscription.features.expiry", {
-                    modelCount: totalModelCount,
-                  })}
-                </Span>
-              </Div>
-              <Div className="flex items-center gap-2.5">
-                <TrendingUp className="h-4 w-4 shrink-0 text-primary" />
-                <Span>{t("buy.subscription.features.bestFor")}</Span>
-              </Div>
-            </Div>
-            {!isAuthenticated ? (
-              <Div className="flex flex-col gap-2 sm:flex-row">
-                <Button variant="outline" asChild className="h-11 flex-1">
-                  <Link href={`/${locale}/user/login`}>{t("buy.login")}</Link>
-                </Button>
-                <Button asChild className="h-11 flex-1">
-                  <Link href={`/${locale}/user/signup`}>{t("buy.signup")}</Link>
-                </Button>
-              </Div>
-            ) : isLoadingSubscription ? null : hasActiveSubscription ? (
-              <Div className="flex items-center gap-2 rounded-lg border border-success/30 bg-success/10 px-3.5 py-3">
-                <CheckCircle className="h-4 w-4 shrink-0 text-success" />
-                <Div className="text-sm font-medium text-foreground">
-                  {t("buy.subscription.buttonAlreadySubscribed")}
-                </Div>
-              </Div>
-            ) : (
-              <>
-                <FormAlertWidget field={{}} />
-                <Button
-                  type="button"
-                  className="w-full"
-                  size="lg"
-                  onClick={handleSubscribe}
-                >
-                  {t("buy.subscription.button")}
-                </Button>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Credit pack card */}
-        <Card className="relative flex flex-col overflow-hidden rounded-xl">
-          <CardHeader className="gap-1 p-5 sm:p-6">
-            <CardTitle className="text-xl tracking-tight">
-              {tPurchase("post.pack.title")}
-            </CardTitle>
-            <CardDescription>
-              {tPurchase("post.pack.description")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-1 flex-col gap-6 p-5 pt-0 sm:p-6 sm:pt-0">
-            <Div className="flex items-baseline gap-1">
-              <Div className="text-4xl font-semibold tracking-tight tabular-nums">
-                {formatPrice(packPrice, locale, packProduct.currency)}
-              </Div>
-              <Div className="text-sm text-muted-foreground">
-                {tPurchase("post.pack.perPack")}
-              </Div>
-            </Div>
-            <Div className="flex flex-col gap-3 text-sm">
-              <Div className="flex items-center gap-2.5">
-                <Sparkles className="h-4 w-4 shrink-0 text-primary" />
-                <Span>
-                  {tPurchase("post.pack.features.credits", {
-                    count: packCredits,
-                  })}
-                </Span>
-              </Div>
-              <Div className="flex items-center gap-2.5">
-                <AlertCircle className="h-4 w-4 shrink-0 text-primary" />
-                <Span>{tPurchase("post.pack.features.expiry")}</Span>
-              </Div>
-              <Div className="flex items-center gap-2.5">
-                <TrendingUp className="h-4 w-4 shrink-0 text-primary" />
-                <Span>{tPurchase("post.pack.features.bestFor")}</Span>
-              </Div>
-            </Div>
-            {isAuthenticated ? (
-              <Div className="flex flex-col gap-4">
-                <FormAlertWidget field={{}} />
-                <Div className="flex flex-col gap-2">
-                  <Span className="text-sm font-medium text-muted-foreground">
-                    {tPurchase("post.quantity.label")}
-                  </Span>
-                  <Div className="flex items-center gap-0 rounded-lg border border-border overflow-hidden">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="lg"
-                      className="h-14 w-14 rounded-none border-r border-border flex-shrink-0"
-                      onClick={() => setPackQty(packQty - 1)}
-                      disabled={packQty <= MIN_QTY}
-                    >
-                      <Minus className="h-5 w-5" />
-                    </Button>
-                    <Div className="flex-1 flex flex-col items-center justify-center h-14 select-none">
-                      <Span className="text-2xl font-bold tabular-nums">
-                        {packQty}
-                      </Span>
-                      <Span className="text-xs text-muted-foreground">
-                        {tPurchase("post.pack.qtyCredits", {
-                          count: totalCredits.toLocaleString(locale),
-                        })}
-                      </Span>
-                    </Div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="lg"
-                      className="h-14 w-14 rounded-none border-l border-border flex-shrink-0"
-                      onClick={() => setPackQty(packQty + 1)}
-                    >
-                      <Plus className="h-5 w-5" />
-                    </Button>
-                  </Div>
-                  {packQty > 1 && (
-                    <Div className="text-sm text-muted-foreground px-1">
-                      {tPurchase("post.pack.totalSummary", {
-                        totalCredits: totalCredits.toLocaleString(locale),
-                        totalPrice: formatPrice(
-                          totalPrice,
-                          locale,
-                          packProduct.currency,
-                        ),
-                      })}
-                    </Div>
-                  )}
-                </Div>
-                <Button
-                  type="button"
-                  className="w-full"
-                  size="lg"
-                  onClick={handlePackBuy}
-                  disabled={packIsSubmitting}
-                >
-                  {tPurchase("post.submit.text")}
-                </Button>
-                {packValue?.checkoutUrl && (
-                  <Div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
-                    <Div className="text-sm font-medium mb-2">
-                      {tPurchase("post.redirecting")}
-                    </Div>
-                    <Button variant="outline" className="w-full" asChild>
-                      <ExternalLink
-                        href={packValue.checkoutUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2"
-                      >
-                        <ExternalLinkIcon className="h-4 w-4" />
-                        {tPurchase("post.openCheckout")}
-                      </ExternalLink>
-                    </Button>
-                  </Div>
-                )}
-              </Div>
-            ) : (
-              <Div className="mt-auto flex flex-col gap-3">
-                <Div className="text-sm text-muted-foreground">
-                  {tPurchase("post.pack.signInToBuy")}
-                </Div>
-                <Div className="flex flex-col gap-2 sm:flex-row">
-                  <Button variant="outline" asChild className="h-11 flex-1">
-                    <Link href={`/${locale}/user/login`}>
-                      {tPurchase("post.pack.logIn")}
-                    </Link>
-                  </Button>
-                  <Button asChild className="h-11 flex-1">
-                    <Link href={`/${locale}/user/signup`}>
-                      {tPurchase("post.pack.signUp")}
-                    </Link>
-                  </Button>
-                </Div>
-              </Div>
-            )}
-          </CardContent>
-        </Card>
-      </Div>
+          </Div>
+        </>
+      )}
     </WidgetShell>
   );
 }

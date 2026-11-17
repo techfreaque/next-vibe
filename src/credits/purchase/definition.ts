@@ -1,6 +1,6 @@
 /**
  * Credits Purchase API Route Definition
- * Defines endpoint for purchasing credit packs (Stripe or crypto). No subscription required.
+ * Defines endpoint for purchasing credit packs (Stripe or crypto). Requires a live plan.
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";

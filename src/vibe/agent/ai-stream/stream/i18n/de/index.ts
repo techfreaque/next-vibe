@@ -738,9 +738,9 @@ export const translations: typeof enTranslations = {
     member: {
       title: "Keine Credits mehr",
       description:
-        "Gratis-Credits kommen am {{date}} wieder. Sofort weitermachen:",
+        "Gratis-Credits kommen am {{date}} wieder. Oder Plan wählen und sofort weitermachen:",
       subscriberDescription:
-        "Abo-Credits kommen am {{date}} wieder. Vorher mehr nötig? Aufladen:",
+        "Plan-Credits kommen am {{date}} wieder. Vorher mehr nötig? Aufladen oder größeren Plan nehmen:",
       orTopUp: "Oder ohne Warten weiter:",
       newsletter: {
         title: "+{{bonus}} Gratis-Credits jeden Monat",

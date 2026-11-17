@@ -243,12 +243,16 @@ export const translations: typeof enTranslations = {
     balance: {
       subscribe: "Pläne ansehen",
       freePlanHint:
-        "{{count}} Gratis-Credits pro Monat, mit Newsletter {{max}}. Mit Abo {{subCredits}}, oder kauf einfach ein Paket. Kein Abo nötig.",
+        "{{count}} Gratis-Credits pro Monat, mit Newsletter {{max}}. Pläne ab {{planPrice}} für {{subCredits}} Credits im Monat.",
       lowBalance: {
         title: "Noch {{count}} Credits",
         emptyTitle: "Deine Credits sind aufgebraucht",
-        hint: "Lad {{packCredits}} Credits für {{packPrice}} auf. Sie verfallen nie. Kein Abo nötig.",
-        offersHint: "Eins wählen, in Sekunden geht es weiter. Paket-Credits verfallen nie.",
+        hint: "Unten aufladen: {{packCredits}} Credits für {{packPrice}}, verfallen nie.",
+        hintPlans:
+          "Wähl unten einen Plan. Die Credits sind sofort nach der Zahlung da.",
+        offersHint:
+          "Aufladen, in Sekunden geht es weiter. Paket-Credits verfallen nie.",
+        offersHintPlans: "Plan wählen, in Sekunden geht es weiter.",
       },
       freePlan: "Du nutzt den Gratis-Plan",
       guestPlan: "Gast-Guthaben",
@@ -259,18 +263,18 @@ export const translations: typeof enTranslations = {
       adminTitle: "Ausgabenlimit",
       description: "Ein Guthaben für alle {{modelCount}} Modelle.",
       adminDescription:
-        "Credits wirken als Ausgabenlimit - kontrollieren Sie die erlaubte KI-Nutzung aller Benutzer.",
+        "Credits wirken als Ausgabenlimit. Steuer, wie viel KI-Nutzung alle Nutzer bekommen.",
       credit: "{{count}} Credit",
       credits: "{{count}} Credits",
       expiring: {
         title: "Ablaufende Credits",
-        description: "{{subCredits}} neue Credits pro Abonnementzyklus",
+        description: "Plan-Credits, jeden Abrechnungszyklus neu",
         adminDescription: "Zeitlich begrenzte Credits (Abonnementzyklus)",
       },
       permanent: {
         title: "Permanente Credits",
-        description: "Laufen nie ab - gehören Ihnen",
-        adminDescription: "Permanente Credits - laufen nie ab",
+        description: "Verfallen nie. Gehören dir",
+        adminDescription: "Permanente Credits, verfallen nie",
       },
       free: {
         title: "Kostenlose Credits",
@@ -283,7 +287,7 @@ export const translations: typeof enTranslations = {
       earned: {
         title: "Verdiente Credits",
         description:
-          "Durch Empfehlungen verdient - klicken Sie, um Freunde einzuladen",
+          "Durch Empfehlungen verdient. Klick, um Freunde einzuladen",
       },
       spending: {
         title: "Eigene verdiente Credits",

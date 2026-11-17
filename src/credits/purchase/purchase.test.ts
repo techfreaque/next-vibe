@@ -1,16 +1,19 @@
 /**
- * Credit pack purchase without a subscription.
+ * Credit pack purchase: packs top up a live plan (Max, 2026-11-17).
  *
- * - A signed-in user with NO subscription can create a checkout session for both
- *   pack sizes and both providers (Stripe + NowPayments); the payment provider
- *   is mocked, the user/DB are real.
+ * - A signed-in user with NO subscription is refused (FORBIDDEN) for both
+ *   providers (Stripe + NowPayments); with a live plan the checkout is created.
+ *   The payment provider is mocked, the user/DB are real.
  * - Pack pricing params (standard + large) and per-country one-time prices.
  * - Credit grant on a confirmed payment is idempotent on webhook retries.
  */
 
 import { eq } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
-import { success } from "next-vibe/core/route/response.schema";
+import {
+  ErrorResponseTypes,
+  success,
+} from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import {
@@ -28,7 +31,12 @@ import {
   ProductIds,
   productsRepository,
 } from "../../products/repository-client";
+import { hasLivePlan } from "../../subscription/active-plan";
 import { subscriptions } from "../../subscription/db";
+import {
+  SubscriptionPlan,
+  SubscriptionStatus,
+} from "../../subscription/enum";
 import { scopedTranslation } from "../i18n";
 import { CreditRepository } from "../repository";
 import { scopedTranslation as purchaseScopedTranslation } from "./i18n";
@@ -100,13 +108,13 @@ describe("pack pricing", () => {
   });
 });
 
-describe("pack purchase without a subscription", () => {
+describe("pack purchase requires a live plan", () => {
   let testUser: TestUser;
   let userId: string;
 
   beforeAll(async () => {
     const created = await createTestUser(
-      `pack-nosub-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example-test.invalid`,
+      `pack-plan-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example-test.invalid`,
     );
     expect(created.success, JSON.stringify(created)).toBe(true);
     if (!created.success || created.data.user.isPublic) {
@@ -117,20 +125,64 @@ describe("pack purchase without a subscription", () => {
   });
 
   afterAll(async () => {
+    await db.delete(subscriptions).where(eq(subscriptions.userId, userId));
     await deleteTestUser(userId);
   });
 
-  it("user has no subscription", async () => {
-    const rows = await db
-      .select({ id: subscriptions.id })
-      .from(subscriptions)
+  for (const provider of [PaymentProvider.STRIPE, PaymentProvider.NOWPAYMENTS]) {
+    it(`refuses a ${provider} pack checkout without a plan`, async () => {
+      const before = capturedParams.length;
+      const res = await CreditPurchaseRepository.createCheckoutSession(
+        { quantity: 1, productId: ProductIds.CREDIT_PACK, provider },
+        userId,
+        "en-US",
+        logger,
+        purchaseT,
+      );
+      expect(res.success).toBe(false);
+      if (!res.success) {
+        expect(res.errorType.errorCode).toBe(
+          ErrorResponseTypes.FORBIDDEN.errorCode,
+        );
+      }
+      expect(capturedParams.length).toBe(before);
+    });
+  }
+
+  it("refuses when the plan is canceled or its crypto period ran out", async () => {
+    await db.insert(subscriptions).values({
+      userId,
+      planId: SubscriptionPlan.SUBSCRIPTION,
+      status: SubscriptionStatus.ACTIVE,
+      provider: PaymentProvider.NOWPAYMENTS,
+      currentPeriodStart: new Date(Date.now() - 40 * 86_400_000),
+      currentPeriodEnd: new Date(Date.now() - 5 * 86_400_000),
+    });
+    expect(await hasLivePlan(userId)).toBe(false);
+    await db
+      .update(subscriptions)
+      .set({
+        status: SubscriptionStatus.CANCELED,
+        currentPeriodEnd: new Date(Date.now() + 5 * 86_400_000),
+      })
       .where(eq(subscriptions.userId, userId));
-    expect(rows.length).toBe(0);
+    expect(await hasLivePlan(userId)).toBe(false);
+  });
+
+  it("allows packs once the plan is live", async () => {
+    await db
+      .update(subscriptions)
+      .set({
+        status: SubscriptionStatus.ACTIVE,
+        currentPeriodEnd: new Date(Date.now() + 20 * 86_400_000),
+      })
+      .where(eq(subscriptions.userId, userId));
+    expect(await hasLivePlan(userId)).toBe(true);
   });
 
   for (const provider of [PaymentProvider.STRIPE, PaymentProvider.NOWPAYMENTS]) {
     for (const productId of CREDIT_PACK_PRODUCT_IDS) {
-      it(`creates a ${provider} checkout for ${productId}`, async () => {
+      it(`creates a ${provider} checkout for ${productId} with a plan`, async () => {
         const before = capturedParams.length;
         const res = await CreditPurchaseRepository.createCheckoutSession(
           { quantity: 2, productId, provider },

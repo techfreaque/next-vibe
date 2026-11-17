@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
   },
   access: {
     title: "Braucht ein bezahltes Konto",
-    body: "Schlüssel und /v1-Aufrufe brauchen ein bezahltes Konto: einen beliebigen Tarif ({{subPrice}} im Monat) oder ein einmaliges Credit-Paket ({{packPrice}}). Kostenlose Konten können Schlüssel erstellen und die Doku lesen, jeder Aufruf antwortet bis zum ersten Kauf aber mit HTTP 402 paid_plan_required. Gratis- und Bonus-Credits schalten die API nicht frei. Einmal ein Paket kaufen, und die API läuft, bis das Guthaben aufgebraucht ist.",
+    body: "Schlüssel und /v1-Aufrufe brauchen ein bezahltes Konto: einen beliebigen Tarif, ab {{subPrice}} im Monat. Kostenlose Konten können Schlüssel erstellen und die Doku lesen, jeder Aufruf antwortet bis zum ersten Kauf aber mit HTTP 402 paid_plan_required. Gratis- und Bonus-Credits schalten die API nicht frei. Jeder Tarif bringt monatliche Credits mit. Reicht das nicht, legen Abonnenten Credit-Pakete nach, die nie verfallen.",
     cta: "API freischalten",
   },
   auth: {
@@ -162,7 +162,7 @@ export const translations: typeof enTranslations = {
         "Vor jedem Aufruf prüfen wir dein Guthaben gegen eine Worst-Case-Schätzung. Reicht es nicht: HTTP 402 insufficient_credits, nichts läuft, nichts wird berechnet.",
       real: "Nach dem Aufruf zahlst du die echte Nutzung, nicht die Schätzung: die gemeldete Token-Zahl, bei OpenRouter-Modellen die echten Anbieterkosten. Meldet ein Anbieter keine Kosten, gilt der gelistete Preis.",
       topup:
-        "Credits leer? Kaufe ein Paket oder verlängere deinen Tarif. Der nächste Aufruf läuft sofort.",
+        "Credits leer? Leg ein Paket nach, verlängere oder erweitere deinen Tarif. Der nächste Aufruf läuft sofort.",
     },
   },
   limits: {
@@ -178,7 +178,7 @@ export const translations: typeof enTranslations = {
       missingKey:
         "Kein Schlüssel gesendet. Sende Authorization: Bearer sk-unb-... oder x-api-key.",
       invalidKey: "Schlüssel ist falsch oder widerrufen.",
-      paid: "Auf dem Konto gibt es noch keinen Tarif und keinen Credit-Kauf. Jeder Tarif oder ein Credit-Paket schaltet die API frei.",
+      paid: "Auf dem Konto gibt es noch keinen Tarif und keinen Credit-Kauf. Jeder Tarif schaltet die API frei.",
       credits: "Guthaben reicht für diesen Aufruf nicht. Auffüllen.",
       cap: "Bezahltes Guthaben leer und Tageslimit für Gratis-Credits erreicht. Auffüllen.",
       notFound:

@@ -33,6 +33,11 @@ import type { JSX } from "react";
 
 import { PaymentProvider } from "@/payment/enum";
 import { useCustomerPortal } from "@/payment/portal/hooks";
+import { scopedTranslation as productsScopedTranslation } from "@/products/i18n";
+import {
+  getSubscriptionTiers,
+  getTierProductForPlan,
+} from "@/products/repository-client";
 
 import type definition from "./definition";
 import { SubscriptionStatus } from "./enum";
@@ -65,6 +70,7 @@ export function SubscriptionOverviewContainer(_props: {
   const logger = useWidgetLogger();
   const router = useRouter();
   const portal = useCustomerPortal(logger, user);
+  const { t: productsT } = productsScopedTranslation.scopedT(locale);
 
   if (!subscription) {
     return <Div />;
@@ -104,6 +110,15 @@ export function SubscriptionOverviewContainer(_props: {
       </MotionDiv>
     );
   }
+
+  const tierProduct = subscription.plan
+    ? getTierProductForPlan(subscription.plan)
+    : null;
+  const tier = tierProduct
+    ? getSubscriptionTiers(locale).find(
+        (entry) => entry.productId === tierProduct,
+      )
+    : undefined;
 
   const isCanceled = status === SubscriptionStatus.CANCELED;
   const isCanceling = !isCanceled && subscription.cancelAt;
@@ -161,7 +176,14 @@ export function SubscriptionOverviewContainer(_props: {
                 </Div>
                 {t("title")}
               </CardTitle>
-              <CardDescription>{t("description")}</CardDescription>
+              <CardDescription>
+                {tier
+                  ? t("tiers.picked", {
+                      plan: productsT(tier.name),
+                      credits: tier.creditsLabel,
+                    })
+                  : t("description")}
+              </CardDescription>
             </Div>
             <Div className="flex gap-2">
               <Badge

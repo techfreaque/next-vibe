@@ -116,7 +116,10 @@ export const translations = {
         title: "Validation Error",
         description: "Invalid checkout parameters",
         reason: {
-          enterpriseCustomPricing: "ENTERPRISE plan requires custom pricing",
+          yearlyNotAvailable:
+            "Yearly billing is only available for the {{plan}} plan. Pick monthly.",
+          cryptoStarterYearly:
+            "Starter takes crypto with yearly billing. Pick yearly, or Plus, Pro or Ultra.",
         },
       },
       network: {
@@ -168,6 +171,15 @@ export const translations = {
   plans: {
     starter: {
       title: "Starter",
+    },
+    plus: {
+      title: "Plus",
+    },
+    pro: {
+      title: "Pro",
+    },
+    ultra: {
+      title: "Ultra",
     },
   },
 

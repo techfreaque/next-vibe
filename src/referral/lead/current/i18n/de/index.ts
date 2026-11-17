@@ -8,6 +8,7 @@ export const translations: typeof enTranslations = {
   response: {
     referralCode: "Empfehlungscode",
     referralLabel: "Empfehlungsbezeichnung",
+    subscriptionBonusCredits: "Bonus-Credits mit deinem ersten Plan",
   },
   errors: {
     validation: {

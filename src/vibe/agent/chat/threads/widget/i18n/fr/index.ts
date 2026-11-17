@@ -206,9 +206,9 @@ export const translations: typeof enTranslations = {
         tip: "L'inscription est gratuite !",
       },
       subscriptionButton: {
-        title: "Crédits et abonnement",
+        title: "Crédits et formules",
         description:
-          "Obtenez {{credits}} crédits par mois avec un abonnement à seulement {{price}} par mois. Les comptes gratuits reçoivent {{freeCredits}} crédits par mois, {{freeCreditsMax}} avec la newsletter.",
+          "Les comptes gratuits reçoivent {{freeCredits}} crédits par mois, {{freeCreditsMax}} avec la newsletter. Besoin de plus ? Formules dès {{price}} par mois pour {{credits}} crédits, jusqu'à {{maxCredits}} par mois.",
       },
       chatInput: {
         title: "Écrivez votre message",

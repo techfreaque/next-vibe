@@ -41,12 +41,12 @@ export const translations: typeof enTranslations = {
           q2: {
             question: "Welche Zahlungsmethoden akzeptieren Sie?",
             answer:
-              "Wir akzeptieren Kreditkarten über Stripe und Kryptowährungszahlungen (Bitcoin, Ethereum, Stablecoins) über NowPayments. Das {{subPrice}}/Monat Abonnement beinhaltet {{subCredits}} Credits/Monat. Sie können auch Guthaben-Pakete ({{packPrice}} für {{packCredits}} Credits) kaufen, wenn Sie mehr Credits benötigen. Guthaben-Pakete verfallen nie, auch nach Beendigung des Abonnements nicht.",
+              "Karte, PayPal, Apple Pay und Google Pay über Stripe, dazu Krypto (Bitcoin, Ethereum, Stablecoins) über NOWPayments. Tarife gibt es ab {{subscriptionPrice}} im Monat. Credit-Pakete sind die Aufstockung für Abonnenten.",
           },
           q3: {
             question: "Wie funktioniert das Guthabensystem?",
             answer:
-              "Sie benötigen das {{subPrice}}/Monat Abonnement für den Zugang zum KI-Chat, welches {{subCredits}} Credits/Monat beinhaltet. Wenn Sie mehr Credits benötigen, können Sie Guthaben-Pakete kaufen ({{packPrice}} für {{packCredits}} Credits). Guthaben-Pakete verfallen nie, auch nach Beendigung Ihres Abonnements nicht, sodass sie mit allen {{modelCount}} KI-Modellen funktionieren, wann immer Sie reaktivieren.",
+              "Jedes Modell kostet Credits pro Nutzung. Zum Start gibt es Gratis-Credits. Jeder Tarif bringt jeden Monat neue Credits: {{subscriptionPrice}} für {{subscriptionCredits}}, {{plusPrice}} für {{plusCredits}}, {{proPrice}} für {{proCredits}}, {{ultraPrice}} für {{ultraCredits}}. Mehr gebraucht? Abonnenten stocken mit Credit-Paketen auf ({{packPrice}} für {{packCredits}} Credits). Paket-Credits verfallen nie und laufen mit allen {{modelCount}} KI-Modellen.",
           },
           q4: {
             question: "Sind meine Daten privat und sicher?",

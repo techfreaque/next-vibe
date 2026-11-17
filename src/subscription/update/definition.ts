@@ -54,6 +54,15 @@ const { PUT } = createEndpoint({
   ] as const,
   aliases: ["subscription-update", "update-subscription"] as const,
 
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { refreshAfterTierChange } = await import("./refresh");
+        await refreshAfterTierChange(data.logger);
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: SubscriptionUpdateContainer,
     usage: { request: "data", response: true } as const,

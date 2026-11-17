@@ -478,6 +478,21 @@ export const translations: typeof enTranslations = {
 
   // Error types
   errors: {
+    tierChange: {
+      notActive:
+        "Dein Plan ist nicht aktiv. Starte stattdessen einen neuen Plan.",
+      cryptoNotSupported:
+        "Krypto-Pläne lassen sich nicht mitten im Zeitraum wechseln. Wähle den neuen Plan, wenn dieser endet.",
+      paymentRequired:
+        "Deine Bank will das Upgrade bestätigen. Öffne die Rechnung, um es abzuschließen: {{url}}",
+      failed: "Planwechsel fehlgeschlagen: {{error}}",
+      upgraded:
+        "Upgrade auf {{plan}}. {{credits}} zusätzliche Credits für diesen Zeitraum gutgeschrieben.",
+      changed: "Gewechselt zu {{plan}}.",
+      downgraded:
+        "Wechsel zu {{plan}} ab der nächsten Verlängerung. Bis dahin behältst du deine Credits.",
+      unchanged: "Du nutzt diesen Plan bereits.",
+    },
     validation: {
       title: "Validierungsfehler",
       description: "Ungültige Abonnement-Parameter",
@@ -577,7 +592,7 @@ export const translations: typeof enTranslations = {
       activeBadge: "Aktiv",
       greeting: "Hey {{privateName}},",
       intro:
-        "Dein {{appName}} Abo ist bestätigt und bereit. Du hast jeden Monat {{subscriptionCredits}} Credits für alle Modelle - keine Tageslimits, keine Inhaltsfilter, keine Erklärungen nötig.",
+        "Dein {{appName}} Abo ist bestätigt und bereit. Du hast jeden Monat {{subscriptionCredits}} Credits für alle Modelle. Keine Tageslimits, keine Inhaltsfilter, keine Erklärungen nötig.",
       models: {
         title: "{{modelCount}} Modelle, 3 Kategorien",
         mainstream: "Mainstream",
@@ -589,7 +604,7 @@ export const translations: typeof enTranslations = {
         credits:
           "{{subscriptionCredits}} Credits pro Monat (automatisch erneuert)",
         models: "Zugriff auf alle {{modelCount}} KI-Modelle",
-        nolimits: "Keine Tageslimits - nutz alle Credits wann du willst",
+        nolimits: "Keine Tageslimits. Nutz deine Credits, wann du willst",
         uncensored: "Unzensierte Modelle ohne Inhaltsfilter",
         packs: "Extra Credit-Pakete kaufen, die niemals ablaufen",
         cancel: "Jederzeit kündbar, keine Fragen gestellt",
@@ -598,7 +613,7 @@ export const translations: typeof enTranslations = {
       packs: {
         title: "Mehr Credits benötigt?",
         description:
-          "Kaufe Credit-Pakete jederzeit, mit oder ohne Abo: {{packPrice}} für {{packCredits}} Credits. Sie verfallen nie und kommen zu jedem Monatskontingent obendrauf.",
+          "Vor der Verlängerung knapp? Lad jederzeit auf: {{packPrice}} für {{packCredits}} Credits. Pakete verfallen nie und kommen zu deinen Monats-Credits obendrauf.",
         cta: "Credit-Paket kaufen",
       },
       manage: "Abo jederzeit verwalten oder kündigen in",
@@ -724,11 +739,10 @@ export const translations: typeof enTranslations = {
   // Enum translations
   enums: {
     plan: {
-      subscription: "Abonnement",
-      starter: "Starter",
-      professional: "Professional",
-      premium: "Premium",
-      enterprise: "Enterprise",
+      subscription: "Starter",
+      plus: "Plus",
+      pro: "Pro",
+      ultra: "Ultra",
     },
     status: {
       incomplete: "Unvollständig",
@@ -762,42 +776,91 @@ export const translations: typeof enTranslations = {
   quickCheckout: {
     pack: {
       title: "{{credits}} Credits",
-      note: "Einmalig. Verfallen nie.",
+      note: "Einmal aufladen. Verfallen nie.",
       aria: "{{credits}} Credits für {{price}} kaufen, einmalig",
     },
     plan: {
-      title: "{{credits}} Credits jeden Monat",
-      note: "Monatsabo. Jederzeit kündbar.",
+      title: "{{credits}} Credits / Monat",
+      note: "{{plan}}. Jederzeit kündbar.",
       perMonth: "/Monat",
-      aria: "Abonnieren: {{credits}} Credits jeden Monat für {{price}}",
+      aria: "{{plan}} starten: {{credits}} Credits jeden Monat für {{price}}",
+    },
+    upgrade: {
+      title: "Upgrade auf {{plan}}",
+      note: "{{credits}} Credits / Monat",
+      aria: "Upgrade auf {{plan}}: {{credits}} Credits jeden Monat für {{price}}",
+      confirm:
+        "Du zahlst jetzt die Differenz für den Rest dieses Zeitraums. Die zusätzlichen Credits sind sofort da.",
+      confirmButton: "Jetzt upgraden",
+      cancel: "Abbrechen",
+      working: "Upgrade läuft...",
     },
     opening: "Checkout wird geöffnet...",
-    secure: "Kartenzahlung über Stripe.",
+    secure: "Karte, PayPal, Apple Pay, Google Pay über Stripe.",
+    allPlans: "Alle Pläne und Krypto",
     moreOptions: "Krypto und weitere Optionen",
     error: "Checkout ließ sich nicht öffnen. Bitte erneut versuchen.",
   },
+  tiers: {
+    heading: "Wähl deinen Plan",
+    subheading:
+      "Jeden Monat frische Credits für alle {{modelCount}} Modelle. Jederzeit kündbar.",
+    changeHeading: "Plan wechseln",
+    changeSubheading: "Du hast {{plan}}: {{credits}} Credits im Monat.",
+    recommended: "Empfohlen",
+    current: "Dein Plan",
+    perMonth: "/ Monat",
+    perYear: "/ Jahr",
+    creditsPerMonth: "Credits / Monat",
+    yearlyEquivalent: "{{monthlyPrice}} / Monat bei Jahreszahlung",
+    picked: "{{plan}}: {{credits}} Credits jeden Monat",
+    pickedNote:
+      "Alle {{modelCount}} Modelle. Credits jeden Monat neu. Jederzeit kündbar.",
+    cta: {
+      start: "{{plan}} starten",
+      upgrade: "Upgrade auf {{plan}}",
+      downgrade: "Zur Verlängerung auf {{plan}} wechseln",
+      intervalYearly: "Auf Jahreszahlung wechseln",
+      intervalMonthly: "Zu {{plan}} monatlich wechseln",
+      current: "Dein aktueller Plan",
+    },
+    signInHint: "Leg ein Gratis-Konto an, um einen Plan zu starten.",
+    cryptoHint:
+      "Mit Krypto zahlen? Plus, Pro und Ultra monatlich oder jährlich, Starter jährlich.",
+    confirm: {
+      upgradeTitle: "Upgrade auf {{plan}}?",
+      upgradeBody:
+        "Du zahlst jetzt die Differenz für den Rest dieses Zeitraums, die zusätzlichen Credits sind sofort da. Ab der nächsten Verlängerung: {{price}} im Monat für {{credits}} Credits.",
+      upgradeButton: "Zahlen und upgraden",
+      downgradeTitle: "Zu {{plan}} wechseln?",
+      downgradeBody:
+        "Gilt ab deiner nächsten Verlängerung am {{date}}. Bis dahin behältst du deinen Plan und deine Credits. Danach: {{price}} im Monat für {{credits}} Credits.",
+      downgradeButton: "Zur Verlängerung wechseln",
+      intervalTitle: "Abrechnung ändern?",
+      intervalBody:
+        "Dein Abrechnungszeitraum startet heute neu, Stripe verrechnet die Differenz anteilig. Neuer Plan: {{plan}}, {{price}}{{period}}, {{credits}} Credits im Monat.",
+      intervalButton: "Abrechnung wechseln",
+      cancel: "Jetzt nicht",
+      working: "Wird gewechselt...",
+    },
+    packsLocked: {
+      title: "Credit-Pakete: {{price}} für {{credits}} Credits",
+      body: "Pakete laden einen aktiven Plan auf. Erst Plan starten, dann jederzeit nachladen. Sie verfallen nie.",
+    },
+    topUp: {
+      heading: "Aufladen",
+      subheading:
+        "Vor der Verlängerung knapp? Pakete kommen auf deinen Plan obendrauf und verfallen nie.",
+    },
+  },
   buy: {
     provider: {
-      stripe: "Kredit- / Debitkarte",
-      stripeDescription: "Sicher mit Stripe bezahlen",
+      stripe: "Karte, PayPal & Wallets",
+      stripeDescription: "Karte, PayPal, Apple Pay, Google Pay über Stripe",
       nowpayments: "Krypto (NowPayments)",
       nowpaymentsDescription: "Mit Bitcoin, Ethereum u.v.m. bezahlen",
       cryptoMonthlyDisabled:
-        "Kryptowährungszahlungen sind nur für Jahresabonnements verfügbar",
-    },
-    subscription: {
-      title: "Abonnement",
-      description: "{{subCredits}} Credits/Monat für {{modelCount}} KI-Modelle",
-      perYear: "/ Jahr",
-      perMonth: "/ Monat",
-      yearlyEquivalent: "{{monthlyPrice}} / Monat bei jährlicher Abrechnung",
-      button: "Jetzt abonnieren",
-      buttonAlreadySubscribed: "Sie haben bereits ein aktives Abonnement",
-      features: {
-        credits: "{{count}} Credits pro Monat",
-        expiry: "Zugriff auf {{modelCount}} KI-Modelle",
-        bestFor: "Am besten für regelmäßige Nutzung",
-      },
+        "Starter mit Krypto nur jährlich. Plus, Pro und Ultra gehen mit Krypto auch monatlich.",
     },
     login: "Anmelden",
     signup: "Kostenlos registrieren",

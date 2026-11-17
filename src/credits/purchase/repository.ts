@@ -1,7 +1,7 @@
 /**
  * Credit Purchase Repository
  * Handles payment provider checkout session creation for credit packs.
- * Packs are pay-as-you-go: no subscription required.
+ * Packs top up a live plan (Max, 2026-11-17): no plan, no pack.
  */
 
 import "server-only";
@@ -77,6 +77,15 @@ export class CreditPurchaseRepository {
 
       const user = userResult.data;
 
+      // Packs are a top-up for subscribers only, card and crypto alike.
+      const { hasLivePlan } = await import("../../subscription/active-plan");
+      if (!(await hasLivePlan(userId))) {
+        return fail({
+          message: t("post.errors.planRequired.description"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+
       const provider = getPaymentProvider(data.provider);
 
       logger.debug("Using payment provider", {
@@ -110,7 +119,6 @@ export class CreditPurchaseRepository {
       // Get product and calculate totals based on quantity
       const { productsRepository } =
         await import("../../products/repository-client");
-      // No subscription required: any authenticated user may buy a pack.
       const packProductId = data.productId;
       if (!productsRepository.canPurchase(packProductId)) {
         return fail({

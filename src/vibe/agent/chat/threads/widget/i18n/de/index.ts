@@ -205,9 +205,9 @@ export const translations: typeof enTranslations = {
         tip: "Die Registrierung ist kostenlos!",
       },
       subscriptionButton: {
-        title: "Credits & Abonnement",
+        title: "Credits & Tarife",
         description:
-          "Erhalten Sie {{credits}} Credits/Monat mit einem Abonnement für nur {{price}}/Monat. Kostenlose Konten erhalten {{freeCredits}} Credits/Monat, mit Newsletter {{freeCreditsMax}}.",
+          "Kostenlose Konten bekommen {{freeCredits}} Credits im Monat, mit Newsletter {{freeCreditsMax}}. Mehr gebraucht? Tarife ab {{price}}/Monat für {{credits}} Credits, bis zu {{maxCredits}} im Monat.",
       },
       chatInput: {
         title: "Ihre Nachricht eingeben",

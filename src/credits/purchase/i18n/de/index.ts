@@ -29,8 +29,8 @@ export const translations: typeof enTranslations = {
       label: "Zahlungsmethode wählen",
       description: "Wählen Sie, wie Sie für Ihr Credit-Paket bezahlen möchten",
       placeholder: "Zahlungsanbieter auswählen",
-      stripe: "Kredit- / Debitkarte",
-      stripeDescription: "Sicher bezahlen mit Stripe",
+      stripe: "Karte, PayPal & Wallets",
+      stripeDescription: "Karte, PayPal, Apple Pay, Google Pay über Stripe",
       nowpayments: "Kryptowährung",
       nowpaymentsDescription: "Mit Bitcoin, Ethereum und mehr bezahlen",
       cryptoMinimumDisabled:
@@ -51,8 +51,7 @@ export const translations: typeof enTranslations = {
     pack: {
       qtyCredits: "{{count}} Credits",
       title: "Credit-Paket",
-      description:
-        "Zahlen, was du nutzt. Kein Abo. Karte oder Krypto. Credits laufen nie ab.",
+      description: "Lädt deinen Plan auf. Credits verfallen nie.",
       perPack: "/ Paket",
       features: {
         credits: "{{count}} Credits enthalten",
@@ -60,11 +59,15 @@ export const translations: typeof enTranslations = {
         bestFor: "Ergänzt dein monatliches Kontingent",
       },
       totalSummary: "{{totalCredits}} Credits gesamt · {{totalPrice}} gesamt",
-      noSubscriptionNeeded: "Zahlen, was du nutzt. Kein Abo nötig.",
+      planRequired: {
+        title: "Pakete laden einen Plan auf",
+        body: "Erst Plan starten, dann nachladen, wann immer es knapp wird. Pläne ab {{price}} im Monat.",
+        cta: "Pläne ansehen",
+      },
       logIn: "Anmelden",
       signUp: "Registrieren",
       signInToBuy:
-        "Kostenloses Konto anlegen, um Credits zu kaufen. Karte oder Krypto.",
+        "Pakete laden einen Plan auf. Leg ein Gratis-Konto an und starte zuerst einen Plan.",
     },
     submit: {
       text: "Credit-Paket kaufen",
@@ -84,6 +87,11 @@ export const translations: typeof enTranslations = {
       description: "Stripe-Checkout-Sitzung erfolgreich erstellt",
     },
     errors: {
+      planRequired: {
+        title: "Plan erforderlich",
+        description:
+          "Credit-Pakete laden einen aktiven Plan auf. Wähle zuerst einen Plan, dann jederzeit Pakete dazu.",
+      },
       validation: {
         title: "Validierungsfehler",
         description: "Ungültige Kaufmenge",

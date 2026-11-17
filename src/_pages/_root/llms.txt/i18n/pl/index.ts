@@ -10,10 +10,11 @@ export const translations: typeof enTranslations = {
     models:
       "Modele: {{modelCount}} modeli czatu ({{mainstream}} mainstreamowych, {{open}} otwartych, {{uncensored}} bez cenzury) od {{providerCount}} laboratoriów, plus {{mediaCount}} modeli do obrazu, wideo, muzyki, mowy i transkrypcji.",
     free: "Darmowe kredyty co miesiąc: {{guest}} bez konta, {{signedIn}} z darmowym kontem, {{max}} z darmowym kontem i potwierdzoną subskrypcją newslettera. Karta niepotrzebna.",
-    paid: "Płatnie: subskrypcja za {{subPrice}} miesięcznie lub {{subYearPrice}} rocznie z {{subCredits}} kredytami na miesiąc, albo jednorazowy pakiet za {{packPrice}} z {{packCredits}} kredytami. Kredyty z pakietu nigdy nie wygasają.",
+    paid: "Płatne plany: {{plans}}. Każdy plan także rocznie w cenie 11 miesięcy (Starter: {{subYearPrice}} za rok). Subskrybenci mogą dokupić jednorazowy pakiet za {{packPrice}} z {{packCredits}} kredytami. Kredyty z pakietu nigdy nie wygasają.",
+    planItem: "{{name}} {{price}} miesięcznie za {{credits}} kredytów",
     credit:
       "1 kredyt = {{creditValue}}. Każda strona modelu podaje cenę za wiadomość.",
-    api: "API: OpenAI Chat Completions, OpenAI Responses i Anthropic Messages pod jednym adresem bazowym ({{apiBaseUrl}}). Wymaga płatnego konta: dowolnej subskrypcji albo jednego zakupu kredytów, na przykład pakietu za {{packPrice}}. Darmowe konta dostają HTTP 402.",
+    api: "API: OpenAI Chat Completions, OpenAI Responses i Anthropic Messages pod jednym adresem bazowym ({{apiBaseUrl}}). Wymaga płatnego konta: dowolnego planu, od {{subPrice}} miesięcznie. Darmowe konta dostają HTTP 402.",
     uncensored:
       "Poziom bez cenzury: dwa rodzaje modeli. Modele abliterowane to modele mainstreamowe zmienione tak, by nie unikały pytań. Modele naprawdę bez cenzury, takie jak UncensoredLM, są trenowane na książkach i dokumentach zakazanych w mainstreamowym internecie, więc mają przeciwne poglądy polityczne. Poziom bez cenzury wymaga jednorazowego potwierdzenia, że masz 18 lat.",
     openSource:
@@ -29,7 +30,8 @@ export const translations: typeof enTranslations = {
     modelsDesc:
       "każdy model z ceną za wiadomość, oknem kontekstu, poziomem treści i porównaniami",
     pricing: "Cennik",
-    pricingDesc: "darmowe kredyty, subskrypcja i pakiet kredytów",
+    pricingDesc:
+      "darmowe kredyty, cztery plany i pakiet kredytów do doładowania",
     api: "Dokumentacja API",
     apiDesc: "adres bazowy, uwierzytelnianie, formaty zapytań i przykłady kodu",
     blog: "Blog",

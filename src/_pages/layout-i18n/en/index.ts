@@ -20,7 +20,7 @@ export const translations = {
     pricing: {
       name: "{{appName}} plans and credits",
       description:
-        "Free monthly credits, a subscription or a one-time credit pack. One balance for {{modelCount}} chat models plus image, video, music and voice models.",
+        "Free monthly credits, four monthly plans and credit packs to top up. One balance for {{modelCount}} chat models plus image, video, music and voice models.",
     },
     organization: {
       types: {

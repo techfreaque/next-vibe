@@ -20,7 +20,7 @@ export const translations = {
     lead: "Your coding agent is locked to one vendor's models. Want a second opinion from another lab, a cheaper model for grunt work, or a model that does not refuse? That means another account, another key, another bill.",
     p2: "{{appName}} speaks all three formats coding agents use: OpenAI chat completions, the OpenAI Responses API and the Anthropic Messages API. Nothing to install in between. Point a tool at us once, then switch between Claude, GPT, DeepSeek, GLM, Kimi, Qwen and the uncensored models by changing one model id.",
     access:
-      "Before you start: the API needs a paid account. Any plan ({{subPrice}} a month) or a one-time credit pack ({{packPrice}}) unlocks it. Free and bonus credits don't.",
+      "Before you start: the API needs a paid account. Any plan, from {{subPrice}} a month, unlocks it. Free and bonus credits don't.",
     accessLink: "Unlock the API",
   },
   why: {
@@ -122,7 +122,7 @@ export const translations = {
       "Claude Code gets the base URL without /v1. With /v1 it calls /v1/v1/messages and gets a 404.",
     modelId:
       "Use the exact id from GET /v1/models, like {{model}}. Aider wants openai/ in front. Claude Code's built-in Claude ids are mapped for you to our newest Claude of the same family. Any other unknown id returns 404 model_not_found.",
-    paid: "HTTP 402 with paid_plan_required means the account has no plan and no credit purchase yet. Any plan or one credit pack fixes it.",
+    paid: "HTTP 402 with paid_plan_required means the account has no plan and no credit purchase yet. Any plan fixes it.",
     tools:
       "A model without tool support returns 400 tools_not_supported once the agent sends tools. Check supports_tools in GET /v1/models.",
     rateLimit:

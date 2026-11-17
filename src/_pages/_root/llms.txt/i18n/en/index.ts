@@ -8,10 +8,11 @@ export const translations = {
     models:
       "Models: {{modelCount}} chat models ({{mainstream}} mainstream, {{open}} open, {{uncensored}} uncensored) from {{providerCount}} labs, plus {{mediaCount}} image, video, music, speech and transcription models.",
     free: "Free credits every month: {{guest}} without an account, {{signedIn}} with a free account, {{max}} with a free account and a confirmed newsletter subscription. No card needed.",
-    paid: "Paid: a subscription at {{subPrice}} per month or {{subYearPrice}} per year with {{subCredits}} credits a month, or a one-time credit pack at {{packPrice}} for {{packCredits}} credits. Pack credits never expire.",
+    paid: "Paid plans: {{plans}}. Every plan also bills yearly at 11 months' price (Starter: {{subYearPrice}} a year). Subscribers can top up with a one-time credit pack at {{packPrice}} for {{packCredits}} credits. Pack credits never expire.",
+    planItem: "{{name}} {{price}} a month for {{credits}} credits",
     credit:
       "1 credit = {{creditValue}}. Every model page lists its price per message.",
-    api: "API: OpenAI chat completions, OpenAI Responses and Anthropic Messages formats on one base URL ({{apiBaseUrl}}). It needs a paid account: any subscription or one credit purchase, for example the {{packPrice}} pack. Free accounts get HTTP 402.",
+    api: "API: OpenAI chat completions, OpenAI Responses and Anthropic Messages formats on one base URL ({{apiBaseUrl}}). It needs a paid account: any plan, from {{subPrice}} a month. Free accounts get HTTP 402.",
     uncensored:
       "Uncensored tier: two kinds of models. Abliterated models are mainstream models changed so they stop dodging questions. Truly uncensored models like UncensoredLM are trained on books and documents banned from the mainstream internet, which gives them contrary political opinions. The uncensored tier needs a one-time 18+ confirmation.",
     openSource:
@@ -27,7 +28,7 @@ export const translations = {
     modelsDesc:
       "every model with price per message, context window, content tier and head-to-head comparisons",
     pricing: "Pricing",
-    pricingDesc: "free credits, the subscription and the credit pack",
+    pricingDesc: "free credits, the four plans and the credit pack top-up",
     api: "API docs",
     apiDesc: "base URL, authentication, request formats and code samples",
     blog: "Blog",

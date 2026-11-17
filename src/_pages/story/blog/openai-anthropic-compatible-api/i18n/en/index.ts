@@ -21,7 +21,7 @@ export const translations = {
     lead: "GPT from OpenAI, Claude from Anthropic, Gemini from Google. Three SDKs, three keys, three bills, three dashboards. Or worse: the tool you like only speaks one format, so it only gets one vendor's models.",
     p2: "{{appName}} puts {{modelCount}} chat models from {{providerCount}} labs behind one key and one credit balance. Call them in the OpenAI format, the Responses format or the Anthropic format. Same models on every endpoint. Here is exactly how it works, what it costs, and where going direct or using a router is the better call.",
     access:
-      "Up front: the API needs a paid account. Any plan ({{subPrice}} a month) or a one-time credit pack ({{packPrice}}) unlocks it. Free and bonus credits don't.",
+      "Up front: the API needs a paid account. Any plan, from {{subPrice}} a month, unlocks it. Free and bonus credits don't.",
     accessLink: "Unlock the API",
   },
   endpoints: {
@@ -134,9 +134,9 @@ export const translations = {
     abort:
       "Streaming: close the connection and generation stops. You pay only for what ran. Same if the provider fails mid-stream.",
     chat: "Chat and API bill the same way. OpenRouter spreads a model across several hosts, and some charge more than the cheapest one we list. So for those models the listed price is an estimate, and usage.credits_charged is the real number. If OpenRouter reports no cost for a call, it bills at the listed price.",
-    paid: "Same credit balance as the chat app, which also covers image, video, music, voice and web search there. The API itself needs a paid account: an active subscription or at least one credit pack. Free credits do not unlock it.",
-    sub: "Subscription: {{subCredits}} credits a month for {{subPrice}}.",
-    pack: "Credit pack: {{packCredits}} credits for {{packPrice}}. Packs never expire. Pay by card or crypto.",
+    paid: "Same credit balance as the chat app, which also covers image, video, music, voice and web search there. The API itself needs a paid account: any plan. Free credits do not unlock it.",
+    sub: "Monthly plans: four sizes, starting at {{subCredits}} credits for {{subPrice}}.",
+    pack: "Credit packs: a top-up for subscribers, {{packCredits}} credits for {{packPrice}}. They never expire. Card, PayPal or crypto.",
     link: "See plans and pricing",
   },
   versus: {
@@ -203,7 +203,7 @@ export const translations = {
     },
     free: {
       q: "Is there a free tier for the API?",
-      a: "No. The chat app has free credits, the API does not. It needs a subscription ({{subCredits}} credits a month for {{subPrice}}) or one credit pack ({{packCredits}} credits for {{packPrice}}). A pack bought once keeps the API working until the balance runs out.",
+      a: "No. The chat app has free credits, the API does not. It needs a plan, from {{subCredits}} credits a month for {{subPrice}}. Subscribers can top up with credit packs ({{packCredits}} credits for {{packPrice}}) that never expire.",
     },
     pricing: {
       q: "Is the listed price what I pay?",

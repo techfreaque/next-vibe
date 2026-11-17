@@ -171,6 +171,8 @@ export const translations = {
       description: "Got a code from a friend? They earn when you subscribe.",
       placeholder: "Enter code",
       labelPrefilled: "Referral code",
+      subscriptionBonus:
+        "+{{credits}} bonus credits with your first subscription.",
       descriptionPrefilled:
         "Your friend gets rewarded when you create your account.",
       validation: {
@@ -458,8 +460,8 @@ export const translations = {
     ctaButton: "Start Chatting Now",
     upgrade: {
       title: "Want more?",
-      desc: "{{subscriptionPrice}}/month gets you {{subscriptionCredits}} credits every month. Or grab a pack: {{packCredits}} credits for {{packPrice}} that never expire.",
-      cta: "Upgrade to Pro",
+      desc: "Plans start at {{subscriptionPrice}}/month for {{subscriptionCredits}} credits and go up to {{ultraCredits}} credits for {{ultraPrice}}. Subscribers can top up with packs that never expire.",
+      cta: "See the plans",
     },
     signoff: "Happy chatting,\nThe {{appName}} Team",
     ps: "P.S. Use Incognito mode to keep conversations on your device only. We never store them on our servers (generated media is stored temporarily for technical reasons).",

@@ -74,6 +74,11 @@ export interface WebhookData {
   current_period_start?: number;
   current_period_end?: number;
   amount_total?: number | null;
+  /**
+   * Checkout session: "paid", "unpaid" (async method still settling, e.g. a
+   * delayed PayPal/bank payment) or "no_payment_required".
+   */
+  payment_status?: string;
   /** Checkout session / invoice: ISO currency of amount_total (lowercase on Stripe) */
   currency?: string;
   subscription?: string;

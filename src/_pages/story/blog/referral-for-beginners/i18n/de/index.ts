@@ -59,7 +59,7 @@ export const translations: typeof enTranslations = {
   expectations: {
     title: "Realistische Erwartungen - kein Hype",
     p1: "Hier die ehrliche Rechnung:",
-    scenario1Label: "Abonnent im Plan",
+    scenario1Label: "Starter-Abonnent",
     scenario1Spend: "{{planPrice}}/Monat Plan",
     scenario1Earn: "= {{planEarn}}/Monat pro Empfehlung",
     scenario2Label: "Power User (Agenten, API, Bild und Video)",
@@ -68,7 +68,7 @@ export const translations: typeof enTranslations = {
     scenario2Earn: "= {{powerEarn}}/Monat pro Empfehlung",
     note: "Ein Power User bringt dir so viel wie {{powerVsPlan}} Plan-Abonnenten. Entwickler mit Agenten und API verbrauchen Credits schnell und kündigen selten. Genau diese Zielgruppe zählt.",
     example:
-      "10 Plan-Abonnenten geworben: {{tenPlanEarn}}/Monat für dich. Kein Vermögen. Aber Geld für etwas, das du sowieso erzählt hättest.",
+      "10 Starter-Abonnenten geworben: {{tenPlanEarn}}/Monat für dich. Kein Vermögen. Aber Geld für etwas, das du sowieso erzählt hättest.",
   },
   firststeps: {
     title: "Deine ersten Schritte (5 Minuten)",

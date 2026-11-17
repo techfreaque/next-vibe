@@ -40,7 +40,7 @@ export const translations = {
       nextExpiration: "Next Expiration",
       expiring: {
         title: "Subscription Credits",
-        description: "From monthly subscription ({{subCredits}} credits/month)",
+        description: "From your monthly plan",
       },
       permanent: {
         title: "Permanent Credits",
@@ -60,16 +60,16 @@ export const translations = {
       howItWorks: {
         title: "How credits work",
         description:
-          "One currency for every model. Subscribe, top up, or start free.",
+          "One currency for every model. Pick a plan, top up, or start free.",
         expiring: {
-          title: "Monthly plan",
+          title: "Monthly plans",
           description:
-            "{{subPrice}}/month. {{subCredits}} credits every month, all {{modelCount}} models.",
+            "Plans from {{minPrice}} to {{maxPrice}} a month, up to {{maxCredits}} credits. All {{modelCount}} models.",
         },
         permanent: {
           title: "Credit packs",
           description:
-            "{{packPrice}} for {{packCredits}} credits. Buy as many as you need. Never expire. No subscription needed.",
+            "Top up any plan: {{packPrice}} for {{packCredits}} credits. Buy as many as you need. Never expire.",
         },
         free: {
           title: "Free credits",
@@ -152,8 +152,8 @@ export const translations = {
       },
       pack: {
         title: "Extra Credit Packs",
-        description: "Pay as you go. No subscription. Credits never expire.",
-        badge: "No Subscription",
+        description: "Top up your plan. Credits never expire.",
+        badge: "Top-up",
         perPack: "/pack",
         quantity: "Quantity",
         total: "{{count}} credits",
@@ -255,14 +255,14 @@ export const translations = {
     keywords:
       "AI chat pricing, uncensored AI pricing, pay per message AI, AI credits, {{appName}}",
     overview: {
-      title: "Pricing - pay per message, no lock-in | {{appName}}",
+      title: "Pricing: pay per message, no lock-in | {{appName}}",
       description:
-        "Up to {{freeCredits}} free credits a month. {{subCredits}} credits for {{subPrice}} a month, or buy a pack that never expires. One balance for {{modelCount}} models, mainstream to uncensored.",
+        "Up to {{freeCredits}} free credits a month. Plans from {{subPrice}} for {{subCredits}} credits a month, up to {{maxCredits}}. One balance for {{modelCount}} models, mainstream to uncensored.",
     },
     buyCredits: {
-      title: "Buy credits - subscription or packs | {{appName}}",
+      title: "Plans and credit packs | {{appName}}",
       description:
-        "{{subCredits}} credits a month for {{subPrice}}, or credit packs that never expire. Pay by card or crypto. Use them on {{modelCount}} AI models.",
+        "Plans from {{subPrice}} for {{subCredits}} credits a month, up to {{maxCredits}}. Packs top up any plan and never expire. Card, PayPal or crypto. {{modelCount}} AI models.",
     },
     history: {
       title: "Credit history | {{appName}}",

@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     lead: "Votre agent de code est verrouillé sur les modèles d'un seul fournisseur. Vous voulez un deuxième avis d'un autre labo, un modèle moins cher pour les tâches ingrates, ou un modèle qui ne refuse pas ? Il vous faut un autre compte, une autre clé, une autre facture.",
     p2: "{{appName}} parle les trois formats qu'utilisent les agents de code : les chat completions OpenAI, la Responses API d'OpenAI et l'Anthropic Messages API. Rien à installer entre les deux. Pointez un outil vers nous une fois, puis passez de Claude à GPT, DeepSeek, GLM, Kimi, Qwen ou aux modèles non censurés en changeant un seul id de modèle.",
     access:
-      "Avant de commencer : l'API demande un compte payant. N'importe quelle formule ({{subPrice}} par mois) ou un pack de crédits unique ({{packPrice}}) la débloque. Les crédits gratuits et les crédits bonus, non.",
+      "Avant de commencer : l'API demande un compte payant. N'importe quelle formule la débloque, dès {{subPrice}} par mois. Les crédits gratuits et les crédits bonus, non.",
     accessLink: "Débloquer l'API",
   },
   why: {
@@ -126,7 +126,7 @@ export const translations: typeof enTranslations = {
       "Claude Code reçoit l'URL de base sans /v1. Avec /v1, il appelle /v1/v1/messages et prend un 404.",
     modelId:
       "Utilisez l'id exact de GET /v1/models, comme {{model}}. Aider veut openai/ devant. Les ids Claude intégrés de Claude Code sont redirigés pour vous vers notre Claude le plus récent de la même famille. Tout autre id inconnu renvoie 404 model_not_found.",
-    paid: "Un HTTP 402 avec paid_plan_required signifie que le compte n'a encore ni formule ni achat de crédits. N'importe quelle formule ou un seul pack de crédits règle le problème.",
+    paid: "Un HTTP 402 avec paid_plan_required signifie que le compte n'a encore ni formule ni achat de crédits. N'importe quelle formule règle le problème.",
     tools:
       "Un modèle sans support des outils renvoie 400 tools_not_supported dès que l'agent envoie des outils. Vérifiez supports_tools dans GET /v1/models.",
     rateLimit:

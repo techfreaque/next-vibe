@@ -29,6 +29,7 @@ import { useNewsletterCreditBonus } from "@/newsletter/credit-bonus/hooks";
 import { getPricingParams } from "@/products/repository-client";
 import { CreditOffers } from "@/subscription/create/credit-offers";
 import { useSubscription } from "@/subscription/hooks";
+import { isLivePlan } from "@/subscription/plan-offers";
 import { VerifyEmailCreditsPrompt } from "@/user/public/verify-email/credits-prompt";
 
 import { scopedTranslation } from "../i18n";
@@ -59,8 +60,9 @@ function nextFreeRefill(): Date {
  * - Guests: free account first (what it gives, from config), back to this chat.
  * - Unverified accounts: confirm the email (unlocks the free credits), paid
  *   offers below for anyone who won't wait.
- * - Members: real pack / plan prices with one-tap checkout, when the free
- *   credits refill, and the newsletter bonus for accounts not on the list.
+ * - Members without a plan: the cheapest plans with one-tap checkout (packs
+ *   need a plan), when the free credits refill, and the newsletter bonus.
+ * - Subscribers: a pack and the next tier up, and when the plan renews.
  */
 export function OutOfCreditsCard({
   locale,
@@ -185,7 +187,8 @@ function MemberBody({ locale }: { locale: CountryLanguage }): JSX.Element {
   const logger = useWidgetLogger();
   const freeStatus = useFreeCreditsStatus(user, logger, !user.isPublic);
   const subscription = useSubscription(logger, user).read?.data;
-  const hasSubscription = subscription?.hasSubscription === true;
+  // A plan that ended renews nothing: those accounts get the free refill date.
+  const hasPlan = isLivePlan(subscription);
 
   if (freeStatus === FreeCreditsStatus.VERIFY_EMAIL) {
     return (
@@ -195,7 +198,7 @@ function MemberBody({ locale }: { locale: CountryLanguage }): JSX.Element {
           <P className="m-0 text-xs font-medium text-muted-foreground">
             {t("outOfCredits.member.orTopUp")}
           </P>
-          <CreditOffers locale={locale} hasSubscription={hasSubscription} />
+          <CreditOffers locale={locale} />
         </Div>
       </Div>
     );
@@ -206,7 +209,7 @@ function MemberBody({ locale }: { locale: CountryLanguage }): JSX.Element {
     day: "numeric",
   };
   const renewsAt =
-    hasSubscription && subscription?.currentPeriodEnd
+    hasPlan && subscription?.currentPeriodEnd
       ? new Date(subscription.currentPeriodEnd)
       : null;
 
@@ -225,11 +228,7 @@ function MemberBody({ locale }: { locale: CountryLanguage }): JSX.Element {
               })
         }
       />
-      <CreditOffers
-        locale={locale}
-        hasSubscription={hasSubscription}
-        className="mt-3 @md/ooc:pl-11"
-      />
+      <CreditOffers locale={locale} className="mt-3 @md/ooc:pl-11" />
       <NewsletterBonus locale={locale} />
     </Div>
   );

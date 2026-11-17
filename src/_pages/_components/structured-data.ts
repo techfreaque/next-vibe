@@ -21,6 +21,7 @@ import {
   type Product,
   ProductIds,
   productsRepository,
+  SUBSCRIPTION_TIER_PRODUCT_IDS,
 } from "@/products/platform-products";
 
 import { scopedTranslation } from "../layout-i18n";
@@ -113,8 +114,8 @@ function offer(
   };
 }
 
-/** Free tier, monthly + yearly subscription and the credit pack, at the
- * locale's real checkout prices. */
+/** Free tier, every monthly plan (+ Starter yearly) and the credit pack
+ * (a top-up for subscribers), at the locale's real checkout prices. */
 export function buildPlanOffers(
   locale: CountryLanguage,
   modelCount: number,
@@ -132,6 +133,9 @@ export function buildPlanOffers(
   );
   const url = pageUrl(locale, "/subscription/overview");
   const seller = { "@id": organizationId(locale) };
+  const higherTiers = SUBSCRIPTION_TIER_PRODUCT_IDS.filter(
+    (id) => id !== ProductIds.SUBSCRIPTION,
+  ).map((id) => products[id]);
   return [
     offer(free, {
       name: productT(free.name),
@@ -162,6 +166,18 @@ export function buildPlanOffers(
       seller,
       billingDuration: "P1Y",
     }),
+    ...higherTiers.map((tier) =>
+      offer(tier, {
+        name: productT(tier.name),
+        description: productT(subscription.description, {
+          subCredits: tier.credits,
+          modelCount,
+        }),
+        url,
+        seller,
+        billingDuration: "P1M",
+      }),
+    ),
     offer(pack, {
       name: productT(pack.name),
       description: productT(pack.description),

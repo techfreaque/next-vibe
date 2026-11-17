@@ -202,9 +202,9 @@ export const translations = {
         tip: "It's free to sign up!",
       },
       subscriptionButton: {
-        title: "Credits & Subscription",
+        title: "Credits & Plans",
         description:
-          "Get {{credits}} credits/month with a subscription for just {{price}}/month. Free accounts get {{freeCredits}} credits/month, {{freeCreditsMax}} with the newsletter.",
+          "Free accounts get {{freeCredits}} credits/month, {{freeCreditsMax}} with the newsletter. Want more? Plans start at {{price}}/month for {{credits}} credits and go up to {{maxCredits}}.",
       },
       chatInput: {
         title: "Type Your Message",

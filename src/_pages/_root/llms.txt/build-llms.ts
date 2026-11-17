@@ -25,7 +25,12 @@ import {
   FREE_CREDIT_MAX_TOTAL,
   FREE_CREDIT_SIGNED_IN_TOTAL,
 } from "@/products/constants";
-import { ProductIds, productsRepository } from "@/products/platform-products";
+import { scopedTranslation as productsScopedTranslation } from "@/products/i18n";
+import {
+  getSubscriptionTiers,
+  ProductIds,
+  productsRepository,
+} from "@/products/platform-products";
 import { REFERRAL_CONFIG } from "@/referral/config";
 
 import {
@@ -93,6 +98,7 @@ export async function buildLlmsTxt(
 ): Promise<string> {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
+  const { t: productT } = productsScopedTranslation.scopedT(locale);
   const appName = configT("appName");
   const base = configT("websiteUrl").replace(/\/+$/, "");
   const page = (path: string, pageLocale: CountryLanguage = locale): string =>
@@ -139,9 +145,16 @@ export async function buildLlmsTxt(
       max: FREE_CREDIT_MAX_TOTAL,
     }),
     t("facts.paid", {
-      subPrice: price(subscription.price, subscription.currency),
+      plans: getSubscriptionTiers(locale)
+        .map((tier) =>
+          t("facts.planItem", {
+            name: productT(tier.name),
+            price: tier.priceLabel,
+            credits: tier.creditsLabel,
+          }),
+        )
+        .join(", "),
       subYearPrice: price(yearly.price, yearly.currency),
-      subCredits: subscription.credits,
       packPrice: price(pack.price, pack.currency),
       packCredits: pack.credits,
     }),
@@ -154,7 +167,7 @@ export async function buildLlmsTxt(
     }),
     t("facts.api", {
       apiBaseUrl: buildPublicApiBaseUrl(base, locale),
-      packPrice: price(pack.price, pack.currency),
+      subPrice: price(subscription.price, subscription.currency),
     }),
     t("facts.uncensored"),
     t("facts.openSource", { repoUrl: GITHUB_REPO_URL }),

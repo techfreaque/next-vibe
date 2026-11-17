@@ -61,7 +61,7 @@ export const translations: typeof enTranslations = {
   },
   access: {
     title: "Compte payant requis",
-    body: "Les clés et les appels /v1 nécessitent un compte payant : n'importe quelle formule ({{subPrice}} par mois) ou un pack de crédits unique ({{packPrice}}). Les comptes gratuits peuvent créer des clés et lire cette documentation, mais chaque appel renvoie HTTP 402 paid_plan_required jusqu'au premier achat. Les crédits gratuits et les crédits bonus ne débloquent pas l'API. Achetez un pack une fois et l'API fonctionne jusqu'à épuisement du solde.",
+    body: "Les clés et les appels /v1 nécessitent un compte payant : n'importe quelle formule, dès {{subPrice}} par mois. Les comptes gratuits peuvent créer des clés et lire cette documentation, mais chaque appel renvoie HTTP 402 paid_plan_required jusqu'au premier achat. Les crédits gratuits et les crédits bonus ne débloquent pas l'API. Chaque formule inclut des crédits mensuels. Besoin de plus ? Les abonnés rechargent avec des packs de crédits qui n'expirent jamais.",
     cta: "Débloquer l'API",
   },
   auth: {
@@ -162,7 +162,7 @@ export const translations: typeof enTranslations = {
         "Avant chaque appel, nous comparons votre solde à une estimation du pire cas. Solde insuffisant : HTTP 402 insufficient_credits, rien ne tourne, rien n'est facturé.",
       real: "Après l'appel, vous payez l'usage réel, pas l'estimation : le nombre de tokens annoncé par le fournisseur, ou le coût réel du fournisseur pour les modèles OpenRouter. Si un fournisseur n'indique aucun coût, l'appel est facturé au prix affiché.",
       topup:
-        "Plus de crédits ? Achetez un pack ou renouvelez votre formule. L'appel suivant fonctionne immédiatement.",
+        "Plus de crédits ? Rechargez avec un pack, renouvelez ou passez à une formule supérieure. L'appel suivant fonctionne immédiatement.",
     },
   },
   limits: {
@@ -178,7 +178,7 @@ export const translations: typeof enTranslations = {
       missingKey:
         "Aucune clé envoyée. Envoyez Authorization: Bearer sk-unb-..., ou x-api-key.",
       invalidKey: "Clé erronée ou révoquée.",
-      paid: "Aucune formule ni aucun achat de crédits sur le compte pour l'instant. N'importe quelle formule ou un pack de crédits débloque l'accès.",
+      paid: "Aucune formule ni aucun achat de crédits sur le compte pour l'instant. N'importe quelle formule débloque l'accès.",
       credits: "Solde insuffisant pour cet appel. Rechargez.",
       cap: "Le solde payant est vide et le plafond quotidien de crédits gratuits est atteint. Rechargez.",
       notFound: "Le modèle n'existe pas ou ne vous est pas accessible.",

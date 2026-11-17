@@ -73,8 +73,20 @@ const { POST } = createEndpoint({
             value: SubscriptionPlan.SUBSCRIPTION,
             label: "plans.starter.title" as const,
           },
+          {
+            value: SubscriptionPlan.PLUS,
+            label: "plans.plus.title" as const,
+          },
+          {
+            value: SubscriptionPlan.PRO,
+            label: "plans.pro.title" as const,
+          },
+          {
+            value: SubscriptionPlan.ULTRA,
+            label: "plans.ultra.title" as const,
+          },
         ],
-        schema: z.literal(SubscriptionPlan.SUBSCRIPTION),
+        schema: z.enum(SubscriptionPlan),
       }),
 
       billingInterval: requestField(scopedTranslation, {

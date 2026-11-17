@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
       billing: {
         title: "Facturation",
         content:
-          "Les abonnements sont facturés mensuellement. Les packs de crédits sont des achats uniques qui n'expirent jamais. Nous acceptons les cartes bancaires via Stripe et les cryptomonnaies via NowPayments.",
+          "Les abonnements sont facturés au mois ou à l'année ; les formules annuelles reçoivent leurs crédits mensuels chaque mois. Les packs de crédits sont des recharges uniques réservées aux abonnés actifs et n'expirent jamais. Nous acceptons les cartes, PayPal, Apple Pay et Google Pay via Stripe ainsi que les cryptomonnaies via NowPayments.",
       },
       cancellation: {
         title: "Résiliation",

@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
   response: {
     referralCode: "Code de parrainage",
     referralLabel: "Libellé du parrainage",
+    subscriptionBonusCredits: "Crédits bonus avec votre première formule",
   },
   errors: {
     validation: {

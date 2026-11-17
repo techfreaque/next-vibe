@@ -36,6 +36,14 @@ export const referralCodes = pgTable("referral_codes", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   label: text("label"),
+  /**
+   * One-time bonus credits for a user referred by this code, granted when
+   * they start their first paid subscription (never on free signup). 0 = none.
+   * Admin-set per code (referral/admin/code-bonus).
+   */
+  subscriptionBonusCredits: integer("subscription_bonus_credits")
+    .notNull()
+    .default(0),
   currentUses: integer("current_uses").notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),

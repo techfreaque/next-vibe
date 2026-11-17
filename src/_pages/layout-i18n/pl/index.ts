@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     pricing: {
       name: "{{appName}}: plany i kredyty",
       description:
-        "Darmowe kredyty co miesiąc, subskrypcja albo jednorazowy pakiet kredytów. Jedno saldo na {{modelCount}} modeli czatu plus modele obrazu, wideo, muzyki i głosu.",
+        "Darmowe kredyty co miesiąc, cztery plany miesięczne i pakiety kredytów do doładowania. Jedno saldo na {{modelCount}} modeli czatu plus modele obrazu, wideo, muzyki i głosu.",
     },
     organization: {
       types: {

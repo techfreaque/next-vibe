@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
   },
   access: {
     title: "Wymaga płatnego konta",
-    body: "Klucze i wywołania /v1 wymagają płatnego konta: dowolnego planu ({{subPrice}} miesięcznie) albo jednorazowego pakietu kredytów ({{packPrice}}). Darmowe konto może tworzyć klucze i czytać tę dokumentację, ale do pierwszego zakupu każde wywołanie zwraca HTTP 402 paid_plan_required. Darmowe i bonusowe kredyty nie odblokowują API. Kupujesz pakiet raz, a API działa, dopóki saldo się nie wyczerpie.",
+    body: "Klucze i wywołania /v1 wymagają płatnego konta: dowolnego planu, od {{subPrice}} miesięcznie. Darmowe konto może tworzyć klucze i czytać tę dokumentację, ale do pierwszego zakupu każde wywołanie zwraca HTTP 402 paid_plan_required. Darmowe i bonusowe kredyty nie odblokowują API. Każdy plan daje kredyty co miesiąc. Brakuje? Subskrybenci dokupują pakiety kredytów, które nigdy nie wygasają.",
     cta: "Odblokuj API",
   },
   auth: {
@@ -162,7 +162,7 @@ export const translations: typeof enTranslations = {
         "Przed wywołaniem porównujemy saldo z oszacowaniem na najgorszy przypadek. Za mało: HTTP 402 insufficient_credits, nic się nie wykonuje, nic nie jest pobierane.",
       real: "Po wywołaniu płacisz za rzeczywiste zużycie, nie za oszacowanie: liczbę tokenów zgłoszoną przez dostawcę, a przy modelach OpenRouter jego prawdziwy koszt. Gdy dostawca nie poda kosztu, obowiązuje cena z listy.",
       topup:
-        "Skończyły się kredyty? Kup pakiet albo odnów plan. Następne wywołanie działa od razu.",
+        "Skończyły się kredyty? Dokup pakiet, odnów albo podnieś plan. Następne wywołanie działa od razu.",
     },
   },
   limits: {
@@ -178,7 +178,7 @@ export const translations: typeof enTranslations = {
       missingKey:
         "Nie wysłano klucza. Wyślij Authorization: Bearer sk-unb-... albo x-api-key.",
       invalidKey: "Klucz jest błędny albo unieważniony.",
-      paid: "Na koncie nie ma jeszcze planu ani zakupu kredytów. Odblokuje je dowolny plan albo jeden pakiet kredytów.",
+      paid: "Na koncie nie ma jeszcze planu ani zakupu kredytów. Odblokuje je dowolny plan.",
       credits: "Saldo za niskie na to wywołanie. Doładuj.",
       cap: "Płatne saldo puste i dzienny limit darmowych kredytów osiągnięty. Doładuj.",
       notFound: "Model nie istnieje albo nie jest dla ciebie dostępny.",

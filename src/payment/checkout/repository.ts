@@ -19,7 +19,12 @@ import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { ProductIds } from "../../products/repository-client";
+import {
+  getTierProductForPlan,
+  ProductIds,
+  productsRepository,
+  SUBSCRIPTION_TIER_PRODUCT_IDS,
+} from "../../products/repository-client";
 import { BillingInterval } from "../../subscription/enum";
 import { PaymentProvider } from "../enum";
 import { getPaymentProvider } from "../providers";
@@ -130,6 +135,50 @@ export class SubscriptionCheckoutRepository {
       const interval =
         data.billingInterval === BillingInterval.MONTHLY ? "month" : "year";
 
+      // The plan picks the tier product (price + monthly credits).
+      const tierProductId = getTierProductForPlan(data.planId);
+      if (!tierProductId || !productsRepository.canPurchase(tierProductId)) {
+        return fail({
+          message: t("post.errors.validation.description"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+      const tierProduct = productsRepository.getProduct(
+        tierProductId,
+        locale,
+        interval,
+      );
+      if (!tierProduct.allowedIntervals.includes(interval)) {
+        const { scopedTranslation: productsScopedTranslation } =
+          await import("../../products/i18n");
+        const definitions = productsRepository.getProductDefinitions();
+        const yearlyTier =
+          SUBSCRIPTION_TIER_PRODUCT_IDS.find((id) =>
+            definitions[id].allowedIntervals.includes("year"),
+          ) ?? ProductIds.SUBSCRIPTION;
+        return fail({
+          message: t("post.errors.validation.reason.yearlyNotAvailable", {
+            plan: productsScopedTranslation
+              .scopedT(locale)
+              .t(definitions[yearlyTier].name),
+          }),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      // Crypto plans are one-off invoices; Starter monthly is below what
+      // crypto payments accept, so Starter takes crypto yearly only.
+      if (
+        data.provider === PaymentProvider.NOWPAYMENTS &&
+        interval === "month" &&
+        tierProductId === ProductIds.SUBSCRIPTION
+      ) {
+        return fail({
+          message: t("post.errors.validation.reason.cryptoStarterYearly"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
       // Generate callback token for webhook verification
       const callbackToken = crypto.randomUUID();
 
@@ -137,7 +186,7 @@ export class SubscriptionCheckoutRepository {
       const session = await provider.createCheckoutSession(
         {
           userId: user.id,
-          productId: ProductIds.SUBSCRIPTION,
+          productId: tierProductId,
           interval,
           country,
           locale,
@@ -148,7 +197,7 @@ export class SubscriptionCheckoutRepository {
             userId: user.id,
             planId: data.planId,
             billingInterval: data.billingInterval,
-            productId: ProductIds.SUBSCRIPTION,
+            productId: tierProductId,
             interval,
             provider: data.provider || PaymentProvider.STRIPE,
           },

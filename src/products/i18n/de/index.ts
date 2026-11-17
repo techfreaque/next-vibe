@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
 
   // Product summary (single source of truth)
   summary:
-    "Wir bieten Kostenlos (ohne Konto: {{freeCredits}} Credits/Monat, Gratis-Konto: {{freeCreditsSignedIn}}, Konto plus Newsletter: {{freeCreditsMax}}), Monatsabonnement ({{subCurrency}}{{subPrice}}/Monat für {{subCredits}} Credits) und Credit-Pakete ({{packCurrency}}{{packPrice}} für {{packCredits}} Credits), die jeder ohne Abonnement kaufen kann, an.",
+    "Wir bieten Kostenlos (ohne Konto: {{freeCredits}} Credits/Monat, Gratis-Konto: {{freeCreditsSignedIn}}, Konto plus Newsletter: {{freeCreditsMax}}) und vier Monatspläne: {{subPrice}} für {{subCredits}} Credits, {{plusPrice}} für {{plusCredits}}, {{proPrice}} für {{proCredits}} und {{ultraPrice}} für {{ultraCredits}}. Abonnenten laden jederzeit mit Credit-Paketen nach ({{packPrice}} für {{packCredits}} Credits), die nie verfallen.",
 
   // Free tier product
   free: {
@@ -26,7 +26,7 @@ export const translations: typeof enTranslations = {
 
   // Subscription product
   subscription: {
-    name: "Monatsabonnement",
+    name: "Starter",
     description:
       "{{subCredits}} Credits pro Monat mit allen {{modelCount}} KI-Modellen",
     longDescription:
@@ -41,12 +41,23 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  // Higher subscription tiers (credits and prices come from config)
+  subscriptionPlus: {
+    name: "Plus",
+  },
+  subscriptionPro: {
+    name: "Pro",
+  },
+  subscriptionUltra: {
+    name: "Ultra",
+  },
+
   // Credit pack product
   creditPack: {
     name: "Credit-Paket",
-    description: "Zahlen, was du nutzt. Kein Abo. Credits laufen nie ab.",
+    description: "Dein Plan zum Nachladen. Credits laufen nie ab.",
     longDescription:
-      "Kaufen Sie Credits, wenn Sie sie brauchen. Kein Abonnement nötig. Pakete lassen sich zu einem Plan addieren oder allein nutzen.",
+      "Credits knapp vor der Verlängerung? Paket dazu. Pakete kommen zu deinen Monats-Credits hinzu und laufen nie ab.",
     features: {
       credits: "{{packCredits}} Credits pro Paket",
       allModels: "Alle {{modelCount}} KI-Modelle enthalten",

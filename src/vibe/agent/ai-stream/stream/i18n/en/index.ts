@@ -736,9 +736,10 @@ export const translations = {
     },
     member: {
       title: "You're out of credits",
-      description: "Free credits refill on {{date}}. Keep going now:",
+      description:
+        "Free credits refill on {{date}}. Or pick a plan and keep going now:",
       subscriberDescription:
-        "Plan credits renew on {{date}}. Need more before then? Top up:",
+        "Plan credits renew on {{date}}. Need more before then? Top up or move up a plan:",
       orTopUp: "Or skip the wait:",
       newsletter: {
         title: "+{{bonus}} free credits every month",

@@ -31,8 +31,8 @@ export const translations: typeof enTranslations = {
       label: "Choisissez un moyen de paiement",
       description: "Choisissez comment payer votre pack de crédits",
       placeholder: "Choisir un prestataire de paiement",
-      stripe: "Carte bancaire",
-      stripeDescription: "Paiement sécurisé avec Stripe",
+      stripe: "Carte, PayPal et portefeuilles",
+      stripeDescription: "Carte, PayPal, Apple Pay, Google Pay via Stripe",
       nowpayments: "Cryptomonnaie",
       nowpaymentsDescription: "Payez en Bitcoin, Ethereum et plus encore",
       cryptoMinimumDisabled:
@@ -53,19 +53,22 @@ export const translations: typeof enTranslations = {
     pack: {
       qtyCredits: "{{count}} crédits",
       title: "Pack de crédits",
-      description:
-        "Payez à l'usage. Sans abonnement. Carte ou crypto. Les crédits n'expirent jamais.",
+      description: "Rechargez votre formule. Les crédits n'expirent jamais.",
       perPack: "/ pack",
       features: {
         credits: "{{count}} crédits inclus",
         expiry: "Les crédits n'expirent jamais",
         bestFor: "S'ajoute à vos crédits mensuels",
       },
-      noSubscriptionNeeded: "Payez à l'usage. Aucun abonnement nécessaire.",
+      planRequired: {
+        title: "Les packs rechargent une formule",
+        body: "Démarrez d'abord une formule, puis ajoutez des packs quand vous êtes à court. Formules dès {{price}} par mois.",
+        cta: "Voir les formules",
+      },
       logIn: "Se connecter",
       signUp: "S'inscrire",
       signInToBuy:
-        "Créez un compte gratuit pour acheter des crédits. Carte ou crypto.",
+        "Les packs rechargent une formule. Créez un compte gratuit et démarrez d'abord une formule.",
       totalSummary:
         "{{totalCredits}} crédits au total · {{totalPrice}} au total",
     },
@@ -87,6 +90,11 @@ export const translations: typeof enTranslations = {
       description: "Session de paiement Stripe créée",
     },
     errors: {
+      planRequired: {
+        title: "Formule requise",
+        description:
+          "Les packs de crédits rechargent une formule active. Choisissez d'abord une formule, puis ajoutez des packs quand vous voulez.",
+      },
       validation: {
         title: "Erreur de validation",
         description: "Quantité d'achat invalide",

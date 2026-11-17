@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     lead: "GPT bei OpenAI, Claude bei Anthropic, Gemini bei Google. Drei SDKs, drei Keys, drei Rechnungen, drei Dashboards. Oder schlimmer: Dein Lieblingstool spricht nur ein Format und bekommt damit nur die Modelle eines Anbieters.",
     p2: "{{appName}} bündelt {{modelCount}} Chat-Modelle von {{providerCount}} Labs hinter einem Key und einem Credit-Guthaben. Du rufst sie im OpenAI-Format, im Responses-Format oder im Anthropic-Format auf. Dieselben Modelle an jedem Endpoint. Hier steht genau, wie es funktioniert, was es kostet und wann der direkte Weg oder ein Router die bessere Wahl ist.",
     access:
-      "Vorab: Die API braucht ein bezahltes Konto. Jeder Tarif ({{subPrice}} im Monat) oder ein einmaliges Credit-Paket ({{packPrice}}) schaltet sie frei. Gratis- und Bonus-Credits nicht.",
+      "Vorab: Die API braucht ein bezahltes Konto. Jeder Tarif schaltet sie frei, ab {{subPrice}} im Monat. Gratis- und Bonus-Credits nicht.",
     accessLink: "API freischalten",
   },
   endpoints: {
@@ -136,9 +136,9 @@ export const translations: typeof enTranslations = {
     abort:
       "Beim Streaming gilt: Verbindung schließen stoppt die Generierung. Du zahlst nur, was gelaufen ist. Dasselbe gilt, wenn der Provider mitten im Stream ausfällt.",
     chat: "Chat und API rechnen identisch ab. OpenRouter verteilt ein Modell auf mehrere Hoster, und manche sind teurer als der günstigste, den wir listen. Bei diesen Modellen ist der gelistete Preis deshalb eine Schätzung, usage.credits_charged der echte Betrag. Meldet OpenRouter für einen Aufruf keine Kosten, gilt der gelistete Preis.",
-    paid: "Dasselbe Credit-Guthaben wie in der Chat-App, das dort auch Bild, Video, Musik, Sprache und Websuche abdeckt. Die API selbst braucht ein bezahltes Konto: ein aktives Abo oder mindestens ein gekauftes Credit-Paket. Gratis-Credits schalten sie nicht frei.",
-    sub: "Abo: {{subCredits}} Credits im Monat für {{subPrice}}.",
-    pack: "Credit-Paket: {{packCredits}} Credits für {{packPrice}}. Pakete verfallen nie. Bezahlung per Karte oder Krypto.",
+    paid: "Dasselbe Credit-Guthaben wie in der Chat-App, das dort auch Bild, Video, Musik, Sprache und Websuche abdeckt. Die API selbst braucht ein bezahltes Konto: einen beliebigen Tarif. Gratis-Credits schalten sie nicht frei.",
+    sub: "Monatstarife: vier Größen, ab {{subCredits}} Credits für {{subPrice}}.",
+    pack: "Credit-Pakete: Aufstockung für Abonnenten, {{packCredits}} Credits für {{packPrice}}. Sie verfallen nie. Karte, PayPal oder Krypto.",
     link: "Tarife und Preise ansehen",
   },
   versus: {
@@ -205,7 +205,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Gibt es einen kostenlosen API-Tarif?",
-      a: "Nein. Die Chat-App hat Gratis-Credits, die API nicht. Sie braucht ein Abo ({{subCredits}} Credits im Monat für {{subPrice}}) oder ein Credit-Paket ({{packCredits}} Credits für {{packPrice}}). Ein einmal gekauftes Paket hält die API aktiv, bis das Guthaben aufgebraucht ist.",
+      a: "Nein. Die Chat-App hat Gratis-Credits, die API nicht. Sie braucht einen Tarif, ab {{subCredits}} Credits im Monat für {{subPrice}}. Abonnenten stocken mit Credit-Paketen auf ({{packCredits}} Credits für {{packPrice}}), die nie verfallen.",
     },
     pricing: {
       q: "Zahle ich den gelisteten Preis?",

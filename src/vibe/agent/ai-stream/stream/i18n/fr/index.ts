@@ -747,9 +747,9 @@ export const translations: typeof enTranslations = {
     member: {
       title: "Vous n'avez plus de crédits",
       description:
-        "Vos crédits gratuits se rechargent le {{date}}. Continuez dès maintenant :",
+        "Vos crédits gratuits se rechargent le {{date}}. Ou choisissez une formule et continuez dès maintenant :",
       subscriberDescription:
-        "Les crédits de votre abonnement se renouvellent le {{date}}. Besoin de plus avant ? Rechargez :",
+        "Les crédits de votre formule se renouvellent le {{date}}. Besoin de plus avant ? Rechargez ou passez à la formule supérieure :",
       orTopUp: "Ou sans attendre :",
       newsletter: {
         title: "+{{bonus}} crédits gratuits chaque mois",

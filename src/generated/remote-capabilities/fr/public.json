@@ -2337,14 +2337,25 @@
                 "def": {
                   "type": "enum",
                   "entries": {
-                    "SUBSCRIPTION": "enums.plan.subscription"
+                    "SUBSCRIPTION": "enums.plan.subscription",
+                    "PLUS": "enums.plan.plus",
+                    "PRO": "enums.plan.pro",
+                    "ULTRA": "enums.plan.ultra"
                   }
                 },
                 "type": "enum",
                 "enum": {
-                  "SUBSCRIPTION": "enums.plan.subscription"
+                  "SUBSCRIPTION": "enums.plan.subscription",
+                  "PLUS": "enums.plan.plus",
+                  "PRO": "enums.plan.pro",
+                  "ULTRA": "enums.plan.ultra"
                 },
-                "options": ["enums.plan.subscription"]
+                "options": [
+                  "enums.plan.subscription",
+                  "enums.plan.plus",
+                  "enums.plan.pro",
+                  "enums.plan.ultra"
+                ]
               }
             },
             "type": "optional"

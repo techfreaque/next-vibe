@@ -186654,15 +186654,43 @@
             {
               "value": "enums.plan.subscription",
               "label": "plans.starter.title"
+            },
+            {
+              "value": "enums.plan.plus",
+              "label": "plans.plus.title"
+            },
+            {
+              "value": "enums.plan.pro",
+              "label": "plans.pro.title"
+            },
+            {
+              "value": "enums.plan.ultra",
+              "label": "plans.ultra.title"
             }
           ],
           "schema": {
             "def": {
-              "type": "literal",
-              "values": ["enums.plan.subscription"]
+              "type": "enum",
+              "entries": {
+                "SUBSCRIPTION": "enums.plan.subscription",
+                "PLUS": "enums.plan.plus",
+                "PRO": "enums.plan.pro",
+                "ULTRA": "enums.plan.ultra"
+              }
             },
-            "type": "literal",
-            "values": {}
+            "type": "enum",
+            "enum": {
+              "SUBSCRIPTION": "enums.plan.subscription",
+              "PLUS": "enums.plan.plus",
+              "PRO": "enums.plan.pro",
+              "ULTRA": "enums.plan.ultra"
+            },
+            "options": [
+              "enums.plan.subscription",
+              "enums.plan.plus",
+              "enums.plan.pro",
+              "enums.plan.ultra"
+            ]
           },
           "usage": {
             "request": "data"
@@ -206371,6 +206399,254 @@
     "credits": 0
   },
   {
+    "toolName": "stripe-prices-ensure",
+    "title": "Utwórz ceny w Stripe",
+    "titleShort": "Ceny Stripe",
+    "description": "Tworzy każdą cenę planu i pakietu kredytów w podłączonym koncie Stripe (dla każdej waluty i języka), wyszukiwaną po kluczu lookup. Idempotentne, bez ID cen w .env. Próbny przebieg pokazuje, co istnieje, a czego brakuje.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "dryRun": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Próbny przebieg",
+          "description": "Tylko wypisz ceny, niczego nie twórz",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  }
+                },
+                "type": "optional"
+              },
+              "defaultValue": true
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "formAlert": {
+          "schemaType": "widget",
+          "type": "form_alert",
+          "usage": {
+            "request": "data"
+          }
+        },
+        "dryRunApplied": {
+          "type": "text",
+          "label": "Próbny przebieg",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "stripeMode": {
+          "type": "text",
+          "label": "Tryb Stripe",
+          "schema": {
+            "def": {
+              "type": "enum",
+              "entries": {
+                "test": "test",
+                "live": "live"
+              }
+            },
+            "type": "enum",
+            "enum": {
+              "test": "test",
+              "live": "live"
+            },
+            "options": ["test", "live"]
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "existing": {
+          "type": "text",
+          "label": "Już istnieją",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "created": {
+          "type": "text",
+          "label": "Utworzone teraz",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "missing": {
+          "type": "text",
+          "label": "Brakuje",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "prices": {
+          "type": "container",
+          "title": "Ceny",
+          "child": {
+            "type": "container",
+            "layoutType": "grid",
+            "columns": 12,
+            "usage": {
+              "response": true
+            },
+            "children": {
+              "lookupKey": {
+                "type": "text",
+                "label": "Klucz lookup",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "priceId": {
+                "type": "text",
+                "label": "ID ceny",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "productId": {
+                "type": "text",
+                "label": "ID produktu",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "amount": {
+                "type": "text",
+                "label": "Kwota",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "status": {
+                "type": "text",
+                "label": "Status",
+                "schema": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "existing": "existing",
+                      "created": "created",
+                      "missing": "missing"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "existing": "existing",
+                    "created": "created",
+                    "missing": "missing"
+                  },
+                  "options": ["existing", "created", "missing"]
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              }
+            },
+            "schemaType": "object"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "payments",
+    "tags": ["payment", "admin"],
+    "aliases": ["stripe-prices-ensure"],
+    "credits": 0
+  },
+  {
     "toolName": "pos-dashboard",
     "title": "Panel POS",
     "titleShort": "Pulpit POS",
@@ -217231,6 +217507,151 @@
     "category": "purchasing",
     "tags": ["Zakupy", "Dostawca", "Lista"],
     "aliases": ["purchasing-vendors"],
+    "credits": 0
+  },
+  {
+    "toolName": "referral-code-bonus",
+    "title": "Bonus kodu polecającego",
+    "titleShort": "Bonus kodu",
+    "description": "Ustaw jednorazowe kredyty bonusowe, które kod polecający daje nowym osobom. Wypłacane przy pierwszym płatnym planie, nigdy przy darmowej rejestracji. 0 usuwa bonus.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "code": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Kod polecający",
+          "description": "Kod do zmiany (wielkość liter bez znaczenia)",
+          "placeholder": "krysalid",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}, {}]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "bonusCredits": {
+          "type": "form_field",
+          "fieldType": "int",
+          "label": "Kredyty bonusowe",
+          "description": "Przyznawane raz z pierwszym płatnym planem. 0 = brak bonusu.",
+          "placeholder": "100",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": [
+                {
+                  "def": {
+                    "type": "number",
+                    "check": "number_format",
+                    "abort": false,
+                    "format": "safeint"
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                {},
+                {}
+              ]
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "formAlert": {
+          "schemaType": "widget",
+          "type": "form_alert",
+          "usage": {
+            "request": "data"
+          }
+        },
+        "updatedCode": {
+          "type": "text",
+          "label": "Kod",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "ownerEmail": {
+          "type": "text",
+          "label": "Właściciel kodu",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "previousBonusCredits": {
+          "type": "text",
+          "label": "Poprzedni bonus",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "subscriptionBonusCredits": {
+          "type": "text",
+          "label": "Kredyty bonusowe",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "referral",
+    "tags": ["referral", "admin"],
+    "aliases": ["referral-code-bonus"],
     "credits": 0
   },
   {
@@ -233799,14 +234220,25 @@
             "def": {
               "type": "enum",
               "entries": {
-                "SUBSCRIPTION": "enums.plan.subscription"
+                "SUBSCRIPTION": "enums.plan.subscription",
+                "PLUS": "enums.plan.plus",
+                "PRO": "enums.plan.pro",
+                "ULTRA": "enums.plan.ultra"
               }
             },
             "type": "enum",
             "enum": {
-              "SUBSCRIPTION": "enums.plan.subscription"
+              "SUBSCRIPTION": "enums.plan.subscription",
+              "PLUS": "enums.plan.plus",
+              "PRO": "enums.plan.pro",
+              "ULTRA": "enums.plan.ultra"
             },
-            "options": ["enums.plan.subscription"]
+            "options": [
+              "enums.plan.subscription",
+              "enums.plan.plus",
+              "enums.plan.pro",
+              "enums.plan.ultra"
+            ]
           },
           "usage": {
             "response": true
@@ -234591,14 +235023,25 @@
                   "def": {
                     "type": "enum",
                     "entries": {
-                      "SUBSCRIPTION": "enums.plan.subscription"
+                      "SUBSCRIPTION": "enums.plan.subscription",
+                      "PLUS": "enums.plan.plus",
+                      "PRO": "enums.plan.pro",
+                      "ULTRA": "enums.plan.ultra"
                     }
                   },
                   "type": "enum",
                   "enum": {
-                    "SUBSCRIPTION": "enums.plan.subscription"
+                    "SUBSCRIPTION": "enums.plan.subscription",
+                    "PLUS": "enums.plan.plus",
+                    "PRO": "enums.plan.pro",
+                    "ULTRA": "enums.plan.ultra"
                   },
-                  "options": ["enums.plan.subscription"]
+                  "options": [
+                    "enums.plan.subscription",
+                    "enums.plan.plus",
+                    "enums.plan.pro",
+                    "enums.plan.ultra"
+                  ]
                 },
                 "usage": {
                   "response": true
@@ -235690,6 +236133,18 @@
             {
               "value": "enums.plan.subscription",
               "label": "enums.plan.subscription"
+            },
+            {
+              "value": "enums.plan.plus",
+              "label": "enums.plan.plus"
+            },
+            {
+              "value": "enums.plan.pro",
+              "label": "enums.plan.pro"
+            },
+            {
+              "value": "enums.plan.ultra",
+              "label": "enums.plan.ultra"
             }
           ],
           "schema": {
@@ -235699,14 +236154,25 @@
                 "def": {
                   "type": "enum",
                   "entries": {
-                    "SUBSCRIPTION": "enums.plan.subscription"
+                    "SUBSCRIPTION": "enums.plan.subscription",
+                    "PLUS": "enums.plan.plus",
+                    "PRO": "enums.plan.pro",
+                    "ULTRA": "enums.plan.ultra"
                   }
                 },
                 "type": "enum",
                 "enum": {
-                  "SUBSCRIPTION": "enums.plan.subscription"
+                  "SUBSCRIPTION": "enums.plan.subscription",
+                  "PLUS": "enums.plan.plus",
+                  "PRO": "enums.plan.pro",
+                  "ULTRA": "enums.plan.ultra"
                 },
-                "options": ["enums.plan.subscription"]
+                "options": [
+                  "enums.plan.subscription",
+                  "enums.plan.plus",
+                  "enums.plan.pro",
+                  "enums.plan.ultra"
+                ]
               },
               "defaultValue": "enums.plan.subscription"
             },
@@ -242671,14 +243137,25 @@
                 "def": {
                   "type": "enum",
                   "entries": {
-                    "SUBSCRIPTION": "enums.plan.subscription"
+                    "SUBSCRIPTION": "enums.plan.subscription",
+                    "PLUS": "enums.plan.plus",
+                    "PRO": "enums.plan.pro",
+                    "ULTRA": "enums.plan.ultra"
                   }
                 },
                 "type": "enum",
                 "enum": {
-                  "SUBSCRIPTION": "enums.plan.subscription"
+                  "SUBSCRIPTION": "enums.plan.subscription",
+                  "PLUS": "enums.plan.plus",
+                  "PRO": "enums.plan.pro",
+                  "ULTRA": "enums.plan.ultra"
                 },
-                "options": ["enums.plan.subscription"]
+                "options": [
+                  "enums.plan.subscription",
+                  "enums.plan.plus",
+                  "enums.plan.pro",
+                  "enums.plan.ultra"
+                ]
               }
             },
             "type": "optional"
@@ -243474,20 +243951,43 @@
             {
               "value": "enums.plan.subscription",
               "label": "enums.plan.subscription"
+            },
+            {
+              "value": "enums.plan.plus",
+              "label": "enums.plan.plus"
+            },
+            {
+              "value": "enums.plan.pro",
+              "label": "enums.plan.pro"
+            },
+            {
+              "value": "enums.plan.ultra",
+              "label": "enums.plan.ultra"
             }
           ],
           "schema": {
             "def": {
               "type": "enum",
               "entries": {
-                "SUBSCRIPTION": "enums.plan.subscription"
+                "SUBSCRIPTION": "enums.plan.subscription",
+                "PLUS": "enums.plan.plus",
+                "PRO": "enums.plan.pro",
+                "ULTRA": "enums.plan.ultra"
               }
             },
             "type": "enum",
             "enum": {
-              "SUBSCRIPTION": "enums.plan.subscription"
+              "SUBSCRIPTION": "enums.plan.subscription",
+              "PLUS": "enums.plan.plus",
+              "PRO": "enums.plan.pro",
+              "ULTRA": "enums.plan.ultra"
             },
-            "options": ["enums.plan.subscription"]
+            "options": [
+              "enums.plan.subscription",
+              "enums.plan.plus",
+              "enums.plan.pro",
+              "enums.plan.ultra"
+            ]
           },
           "usage": {
             "request": "data",
@@ -244151,6 +244651,303 @@
     "category": "payments",
     "tags": ["subskrypcja", "aktualizuj"],
     "aliases": ["subscription-update", "update-subscription"],
+    "credits": 0
+  },
+  {
+    "toolName": "yearly-credits-backfill",
+    "title": "Plany roczne: uzupełnij pominięte miesiące",
+    "titleShort": "Uzupełnienie roczne",
+    "description": "Miesiące bieżącego okresu rocznego bez miesięcznych kredytów. Próbny przebieg je wypisuje; bez niego przyznaje je raz, jako jeden pakiet ważny do końca okresu.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "dryRun": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Próbny przebieg",
+          "description": "Tylko wypisz, nic nie przyznawaj",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  }
+                },
+                "type": "optional"
+              },
+              "defaultValue": true
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "formAlert": {
+          "schemaType": "widget",
+          "type": "form_alert",
+          "usage": {
+            "request": "data"
+          }
+        },
+        "dryRunApplied": {
+          "type": "text",
+          "label": "Próbny przebieg",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "subscriptions": {
+          "type": "text",
+          "label": "Subskrypcje",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "months": {
+          "type": "text",
+          "label": "Pominięte miesiące",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "credits": {
+          "type": "text",
+          "label": "Kredyty",
+          "schema": {
+            "def": {
+              "type": "number",
+              "coerce": true,
+              "checks": []
+            },
+            "type": "number",
+            "isFinite": true
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "rows": {
+          "type": "container",
+          "title": "Subskrypcje",
+          "child": {
+            "type": "container",
+            "layoutType": "grid",
+            "columns": 12,
+            "usage": {
+              "response": true
+            },
+            "children": {
+              "subscriptionId": {
+                "type": "text",
+                "label": "Subskrypcja",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "userEmail": {
+                "type": "text",
+                "label": "Użytkownik",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "plan": {
+                "type": "text",
+                "label": "Plan",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "periodStart": {
+                "type": "text",
+                "label": "Początek okresu",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "periodEnd": {
+                "type": "text",
+                "label": "Koniec okresu",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "currentMonth": {
+                "type": "text",
+                "label": "Bieżący miesiąc",
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "missedMonths": {
+                "type": "text",
+                "label": "Pominięte miesiące",
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "credits": {
+                "type": "text",
+                "label": "Kredyty",
+                "schema": {
+                  "def": {
+                    "type": "number",
+                    "coerce": true,
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "status": {
+                "type": "text",
+                "label": "Status",
+                "schema": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "pending": "pending",
+                      "granted": "granted",
+                      "alreadyGranted": "alreadyGranted",
+                      "nothingMissed": "nothingMissed"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "pending": "pending",
+                    "granted": "granted",
+                    "alreadyGranted": "alreadyGranted",
+                    "nothingMissed": "nothingMissed"
+                  },
+                  "options": [
+                    "pending",
+                    "granted",
+                    "alreadyGranted",
+                    "nothingMissed"
+                  ]
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              }
+            },
+            "schemaType": "object"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "subscriptions",
+    "tags": ["subscription", "admin"],
+    "aliases": ["yearly-credits-backfill"],
     "credits": 0
   },
   {

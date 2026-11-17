@@ -42,8 +42,7 @@ export const translations: typeof enTranslations = {
       nextExpiration: "Następne wygaśnięcie",
       expiring: {
         title: "Kredyty subskrypcyjne",
-        description:
-          "Z miesięcznej subskrypcji ({{subCredits}} kredytów/miesiąc)",
+        description: "Z Twojego planu miesięcznego",
       },
       permanent: {
         title: "Kredyty stałe",
@@ -63,16 +62,16 @@ export const translations: typeof enTranslations = {
       howItWorks: {
         title: "Jak działają kredyty",
         description:
-          "Jedna waluta dla każdego modelu. Subskrybuj, doładuj albo zacznij za darmo.",
+          "Jedna waluta dla każdego modelu. Wybierz plan, doładuj albo zacznij za darmo.",
         expiring: {
-          title: "Plan miesięczny",
+          title: "Plany miesięczne",
           description:
-            "{{subPrice}}/mies. {{subCredits}} kredytów co miesiąc i dostęp do {{modelCount}} modeli AI.",
+            "Plany od {{minPrice}} do {{maxPrice}} miesięcznie, do {{maxCredits}} kredytów. Dostęp do {{modelCount}} modeli AI.",
         },
         permanent: {
           title: "Pakiety kredytów",
           description:
-            "{{packPrice}} za {{packCredits}} kredytów. Kupujesz, ile chcesz. Nie wygasają. Bez subskrypcji.",
+            "Doładuj dowolny plan: {{packPrice}} za {{packCredits}} kredytów. Kupujesz, ile chcesz. Nie wygasają.",
         },
         free: {
           title: "Darmowe kredyty",
@@ -157,9 +156,8 @@ export const translations: typeof enTranslations = {
       },
       pack: {
         title: "Pakiety kredytów",
-        description:
-          "Płacisz za to, co zużyjesz. Bez subskrypcji. Kredyty nie wygasają.",
-        badge: "Bez subskrypcji",
+        description: "Doładowanie do planu. Kredyty nie wygasają.",
+        badge: "Doładowanie",
         perPack: "/pakiet",
         quantity: "Ilość",
         total: "{{count}} kredyty",
@@ -263,14 +261,14 @@ export const translations: typeof enTranslations = {
     keywords:
       "cennik czatu AI, AI bez cenzury cena, płatność za wiadomość AI, kredyty AI, {{appName}}",
     overview: {
-      title: "Cennik - płacisz za wiadomość, bez zobowiązań | {{appName}}",
+      title: "Cennik: płacisz za wiadomość, bez zobowiązań | {{appName}}",
       description:
-        "Do {{freeCredits}} darmowych kredytów co miesiąc. {{subCredits}} kredytów za {{subPrice}} miesięcznie albo pakiet, który nigdy nie wygasa. Jedno saldo na {{modelCount}} modeli, od mainstreamu po bez cenzury.",
+        "Do {{freeCredits}} darmowych kredytów co miesiąc. Plany od {{subPrice}} za {{subCredits}} kredytów miesięcznie, aż do {{maxCredits}}. Jedno saldo na {{modelCount}} modeli, od mainstreamu po bez cenzury.",
     },
     buyCredits: {
-      title: "Kup kredyty - subskrypcja lub pakiety | {{appName}}",
+      title: "Plany i pakiety kredytów | {{appName}}",
       description:
-        "{{subCredits}} kredytów miesięcznie za {{subPrice}} albo pakiety kredytów bez daty ważności. Płać kartą lub kryptowalutą. Do użycia z {{modelCount}} modelami AI.",
+        "Plany od {{subPrice}} za {{subCredits}} kredytów miesięcznie, aż do {{maxCredits}}. Pakiety doładowują dowolny plan i nigdy nie wygasają. Karta, PayPal lub krypto. {{modelCount}} modeli AI.",
     },
     history: {
       title: "Historia kredytów | {{appName}}",

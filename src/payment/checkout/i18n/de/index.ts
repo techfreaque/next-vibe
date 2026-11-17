@@ -118,8 +118,10 @@ export const translations: typeof enTranslations = {
         title: "Validierungsfehler",
         description: "Ungültige Checkout-Parameter",
         reason: {
-          enterpriseCustomPricing:
-            "ENTERPRISE-Plan erfordert individuelle Preisgestaltung",
+          yearlyNotAvailable:
+            "Jährliche Abrechnung gibt es nur für den Plan {{plan}}. Wähle monatlich.",
+          cryptoStarterYearly:
+            "Starter mit Krypto nur jährlich. Wähle jährlich, oder Plus, Pro oder Ultra.",
         },
       },
       network: {
@@ -171,6 +173,15 @@ export const translations: typeof enTranslations = {
   plans: {
     starter: {
       title: "Starter",
+    },
+    plus: {
+      title: "Plus",
+    },
+    pro: {
+      title: "Pro",
+    },
+    ultra: {
+      title: "Ultra",
     },
   },
 

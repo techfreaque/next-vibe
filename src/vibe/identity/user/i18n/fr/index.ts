@@ -2835,8 +2835,8 @@ export const translations: typeof enTranslations = {
         ctaButton: "Commencer à discuter",
         upgrade: {
           title: "Envie de plus ?",
-          desc: "Pour {{subscriptionPrice}}/mois, vous recevez {{subscriptionCredits}} crédits chaque mois. Ou prenez un pack : {{packCredits}} crédits pour {{packPrice}}, sans date d'expiration.",
-          cta: "Passer à Pro",
+          desc: "Formules dès {{subscriptionPrice}}/mois pour {{subscriptionCredits}} crédits, jusqu'à {{ultraCredits}} crédits pour {{ultraPrice}}. Les abonnés rechargent avec des packs qui n'expirent jamais.",
+          cta: "Voir les formules",
         },
         signoff: "Bonnes discussions,\nL'équipe {{appName}}",
         ps: "P.-S. Utilisez le mode Incognito pour garder vos conversations uniquement sur votre appareil. Nous ne les stockons jamais sur nos serveurs (les médias générés sont stockés temporairement pour des raisons techniques).",

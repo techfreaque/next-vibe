@@ -142,10 +142,7 @@ export function SignupFormContainer({
             onSuccess: ({
               responseData,
             }: {
-              responseData: {
-                referralCode: string | null;
-                referralLabel: string | null;
-              };
+              responseData: LeadCurrentReferralGetResponseOutput;
             }): void => {
               if (responseData.referralCode) {
                 form.setValue("referralCode", responseData.referralCode);
@@ -170,6 +167,7 @@ export function SignupFormContainer({
   const prefillCode = referralData?.referralCode ?? null;
   const prefillLabel = referralData?.referralLabel ?? null;
   const displayLabel = prefillLabel ?? prefillCode;
+  const subscriptionBonus = referralData?.subscriptionBonusCredits ?? 0;
 
   // UUID skills from localStorage for creator-support selector
   const [uuidSkills, setUuidSkills] = useState<
@@ -418,6 +416,13 @@ export function SignupFormContainer({
             <P className="m-0 text-sm text-muted-foreground">
               {t("fields.referralCode.descriptionPrefilled")}
             </P>
+            {subscriptionBonus > 0 && (
+              <P className="m-0 text-sm font-medium text-primary">
+                {t("fields.referralCode.subscriptionBonus", {
+                  credits: subscriptionBonus,
+                })}
+              </P>
+            )}
           </Div>
         ) : (
           <TextFieldWidget

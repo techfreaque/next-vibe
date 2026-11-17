@@ -83,6 +83,9 @@ describe("JSON-LD", () => {
         products[ProductIds.SUBSCRIPTION].price,
         productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale, "year")
           .price,
+        products[ProductIds.SUBSCRIPTION_PLUS].price,
+        products[ProductIds.SUBSCRIPTION_PRO].price,
+        products[ProductIds.SUBSCRIPTION_ULTRA].price,
         products[ProductIds.CREDIT_PACK].price,
       ]);
       for (const offer of offers) {

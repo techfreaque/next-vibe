@@ -62,6 +62,8 @@ const subscriptionSuccessPropsSchema = z.object({
   userId: z.string(),
   leadId: z.string(),
   planName: z.string(),
+  /** Monthly credits of the subscribed tier; omitted = Starter */
+  monthlyCredits: z.number().optional(),
   totalModelCount: z.number(),
 });
 
@@ -82,7 +84,17 @@ function SubscriptionSuccessEmail({
 }): ReactElement {
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const pricingParams = getPricingParams(locale);
+  // The email states the subscriber's own tier, not the Starter numbers.
+  const pricingParams = {
+    ...getPricingParams(locale),
+    ...(props.monthlyCredits !== undefined
+      ? {
+          subscriptionCredits: new Intl.NumberFormat(
+            locale.split("-")[0],
+          ).format(props.monthlyCredits),
+        }
+      : {}),
+  };
 
   const modelCategories = [
     {

@@ -172,12 +172,17 @@ export const translations: typeof enTranslations = {
     balance: {
       subscribe: "Voir les formules",
       freePlanHint:
-        "{{count}} crédits gratuits par mois, {{max}} avec la newsletter. Abonnez-vous pour en avoir {{subCredits}}, ou achetez simplement un pack. Aucun abonnement nécessaire.",
+        "{{count}} crédits gratuits par mois, {{max}} avec la newsletter. Formules dès {{planPrice}} pour {{subCredits}} crédits par mois.",
       lowBalance: {
         title: "Plus que {{count}} crédits",
         emptyTitle: "Vous n'avez plus de crédits",
-        hint: "Rechargez {{packCredits}} crédits pour {{packPrice}}. Ils n'expirent jamais. Aucun abonnement nécessaire.",
-        offersHint: "Choisissez une offre, vous repartez en quelques secondes. Les crédits du pack n'expirent jamais.",
+        hint: "Rechargez ci-dessous : {{packCredits}} crédits pour {{packPrice}}, sans expiration.",
+        hintPlans:
+          "Choisissez une formule ci-dessous. Les crédits arrivent dès le paiement.",
+        offersHint:
+          "Rechargez, vous repartez en quelques secondes. Les crédits du pack n'expirent jamais.",
+        offersHintPlans:
+          "Choisissez une formule, vous repartez en quelques secondes.",
       },
       freePlan: "Vous êtes sur la formule gratuite",
       guestPlan: "Solde invité",
@@ -194,7 +199,7 @@ export const translations: typeof enTranslations = {
       expiring: {
         title: "Crédits à durée limitée",
         description:
-          "{{subCredits}} nouveaux crédits à chaque cycle d'abonnement",
+          "Crédits du forfait, renouvelés à chaque cycle de facturation",
         adminDescription: "Crédits à durée limitée (cycle d'abonnement)",
       },
       permanent: {

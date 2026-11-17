@@ -40,12 +40,12 @@ export const translations: typeof enTranslations = {
           q2: {
             question: "Quels moyens de paiement acceptez-vous ?",
             answer:
-              "Nous acceptons les cartes bancaires via Stripe et les cryptomonnaies (Bitcoin, Ethereum, stablecoins) via NowPayments. L'abonnement à {{subPrice}}/mois inclut {{subCredits}} crédits par mois. Besoin de plus ? Achetez des packs de crédits ({{packPrice}} pour {{packCredits}} crédits). Les packs de crédits n'expirent jamais, même après la fin de l'abonnement.",
+              "Carte, PayPal, Apple Pay et Google Pay via Stripe, plus les cryptomonnaies (Bitcoin, Ethereum, stablecoins) via NOWPayments. Formules dès {{subscriptionPrice}} par mois. Les packs de crédits servent de recharge aux abonnés.",
           },
           q3: {
             question: "Comment fonctionne le système de crédits ?",
             answer:
-              "L'accès au chat IA passe par l'abonnement à {{subPrice}}/mois, qui inclut {{subCredits}} crédits par mois. Besoin de plus ? Achetez des packs de crédits ({{packPrice}} pour {{packCredits}} crédits). Les packs de crédits n'expirent jamais, même après la fin de votre abonnement : ils restent utilisables sur les {{modelCount}} modèles d'IA dès que vous le réactivez.",
+              "Chaque modèle coûte des crédits à l'usage. Des crédits gratuits pour démarrer. Chaque formule ajoute des crédits tous les mois : {{subscriptionPrice}} pour {{subscriptionCredits}}, {{plusPrice}} pour {{plusCredits}}, {{proPrice}} pour {{proCredits}}, {{ultraPrice}} pour {{ultraCredits}}. Besoin de plus ? Les abonnés rechargent avec des packs de crédits ({{packPrice}} pour {{packCredits}} crédits). Les crédits des packs n'expirent jamais et fonctionnent sur les {{modelCount}} modèles d'IA.",
           },
           q4: {
             question: "Mes données sont-elles privées et sécurisées ?",

@@ -457,6 +457,20 @@ export const translations = {
 
   // Error types
   errors: {
+    tierChange: {
+      notActive: "Your plan is not active. Start a new plan instead.",
+      cryptoNotSupported:
+        "Crypto plans can't switch mid-period. Pick your new plan when this one ends.",
+      paymentRequired:
+        "Your bank wants a confirmation for the upgrade. Open the invoice to finish it: {{url}}",
+      failed: "Plan change failed: {{error}}",
+      upgraded:
+        "Upgraded to {{plan}}. {{credits}} extra credits added for this period.",
+      changed: "Switched to {{plan}}.",
+      downgraded:
+        "Switching to {{plan}} at your next renewal. You keep your current credits until then.",
+      unchanged: "You are already on this plan.",
+    },
     validation: {
       title: "Validation Error",
       description: "Invalid subscription parameters",
@@ -552,7 +566,7 @@ export const translations = {
       activeBadge: "Active",
       greeting: "Hey {{privateName}},",
       intro:
-        "Your {{appName}} subscription is confirmed and ready. You have {{subscriptionCredits}} credits every month across all models - no daily caps, no content filters, no explanations required.",
+        "Your {{appName}} subscription is confirmed and ready. You have {{subscriptionCredits}} credits every month across all models. No daily caps, no content filters, no explanations required.",
       models: {
         title: "{{modelCount}} models, 3 categories",
         mainstream: "Mainstream",
@@ -563,7 +577,7 @@ export const translations = {
         title: "What you get every month:",
         credits: "{{subscriptionCredits}} credits per month (auto-renewed)",
         models: "Access to all {{modelCount}} AI models",
-        nolimits: "No daily limits - use all credits whenever you want",
+        nolimits: "No daily limits. Spend your credits whenever you want",
         uncensored: "Uncensored models with no content filters",
         packs: "Buy extra credit packs that never expire",
         cancel: "Cancel anytime, no questions asked",
@@ -572,7 +586,7 @@ export const translations = {
       packs: {
         title: "Need more credits?",
         description:
-          "Buy credit packs anytime, with or without a subscription: {{packPrice}} for {{packCredits}} credits. They never expire and stack on top of any monthly allowance.",
+          "Running low before your plan renews? Top up any time: {{packPrice}} for {{packCredits}} credits. Packs never expire and stack on top of your monthly credits.",
         cta: "Buy Credit Pack",
       },
       manage: "Manage or cancel your subscription anytime in",
@@ -698,11 +712,10 @@ export const translations = {
   // Enum translations
   enums: {
     plan: {
-      subscription: "Subscription",
-      starter: "Starter",
-      professional: "Professional",
-      premium: "Premium",
-      enterprise: "Enterprise",
+      subscription: "Starter",
+      plus: "Plus",
+      pro: "Pro",
+      ultra: "Ultra",
     },
     status: {
       incomplete: "Incomplete",
@@ -736,43 +749,91 @@ export const translations = {
   quickCheckout: {
     pack: {
       title: "{{credits}} credits",
-      note: "One-time. Never expire.",
+      note: "One-time top-up. Never expire.",
       aria: "Buy {{credits}} credits for {{price}}, one-time",
     },
     plan: {
-      title: "{{credits}} credits every month",
-      note: "Monthly plan. Cancel anytime.",
+      title: "{{credits}} credits / month",
+      note: "{{plan}}. Cancel anytime.",
       perMonth: "/mo",
-      aria: "Subscribe: {{credits}} credits every month for {{price}}",
+      aria: "Start {{plan}}: {{credits}} credits every month for {{price}}",
+    },
+    upgrade: {
+      title: "Upgrade to {{plan}}",
+      note: "{{credits}} credits / month",
+      aria: "Upgrade to {{plan}}: {{credits}} credits every month for {{price}}",
+      confirm:
+        "You pay the difference for the rest of this period now. The extra credits land right away.",
+      confirmButton: "Upgrade now",
+      cancel: "Cancel",
+      working: "Upgrading...",
     },
     opening: "Opening checkout...",
-    secure: "Card checkout by Stripe.",
+    secure: "Card, PayPal, Apple Pay, Google Pay via Stripe.",
+    allPlans: "All plans and crypto",
     moreOptions: "Crypto and more options",
     error: "Checkout didn't open. Try again.",
   },
+  tiers: {
+    heading: "Pick your plan",
+    subheading:
+      "Fresh credits every month for all {{modelCount}} models. Cancel anytime.",
+    changeHeading: "Change plan",
+    changeSubheading: "You're on {{plan}}: {{credits}} credits a month.",
+    recommended: "Recommended",
+    current: "Your plan",
+    perMonth: "/ month",
+    perYear: "/ year",
+    creditsPerMonth: "credits / month",
+    yearlyEquivalent: "{{monthlyPrice}} / month, billed yearly",
+    picked: "{{plan}}: {{credits}} credits every month",
+    pickedNote:
+      "All {{modelCount}} models. Credits renew every month. Cancel anytime.",
+    cta: {
+      start: "Get {{plan}}",
+      upgrade: "Upgrade to {{plan}}",
+      downgrade: "Switch to {{plan}} at renewal",
+      intervalYearly: "Switch to yearly billing",
+      intervalMonthly: "Switch to {{plan}} monthly",
+      current: "Your current plan",
+    },
+    signInHint: "Create a free account to start a plan.",
+    cryptoHint:
+      "Paying in crypto? Plus, Pro and Ultra take it monthly or yearly, Starter yearly.",
+    confirm: {
+      upgradeTitle: "Upgrade to {{plan}}?",
+      upgradeBody:
+        "You pay the difference for the rest of this period now, and the extra credits land right away. From your next renewal: {{price}} a month for {{credits}} credits.",
+      upgradeButton: "Pay and upgrade",
+      downgradeTitle: "Switch to {{plan}}?",
+      downgradeBody:
+        "Starts at your next renewal on {{date}}. Until then you keep your current plan and credits. After that: {{price}} a month for {{credits}} credits.",
+      downgradeButton: "Switch at renewal",
+      intervalTitle: "Change billing?",
+      intervalBody:
+        "Your billing period restarts today and Stripe settles the prorated difference. New plan: {{plan}}, {{price}}{{period}}, {{credits}} credits a month.",
+      intervalButton: "Switch billing",
+      cancel: "Not now",
+      working: "Switching...",
+    },
+    packsLocked: {
+      title: "Credit packs: {{price}} for {{credits}} credits",
+      body: "Packs top up an active plan. Start a plan, then add packs whenever you run low. They never expire.",
+    },
+    topUp: {
+      heading: "Top up",
+      subheading:
+        "Running low before renewal? Packs stack on your plan and never expire.",
+    },
+  },
   buy: {
     provider: {
-      stripe: "Credit / Debit Card",
-      stripeDescription: "Pay securely with Stripe",
+      stripe: "Card, PayPal & wallets",
+      stripeDescription: "Card, PayPal, Apple Pay, Google Pay via Stripe",
       nowpayments: "Crypto (NowPayments)",
       nowpaymentsDescription: "Pay with Bitcoin, Ethereum, and more",
       cryptoMonthlyDisabled:
-        "Crypto payments are only available for yearly subscriptions",
-    },
-    subscription: {
-      title: "Subscription",
-      description:
-        "{{subCredits}} credits/month across {{modelCount}} AI models",
-      perYear: "/ year",
-      perMonth: "/ month",
-      yearlyEquivalent: "{{monthlyPrice}} / month when billed yearly",
-      button: "Subscribe Now",
-      buttonAlreadySubscribed: "You already have an active subscription",
-      features: {
-        credits: "{{count}} credits per month",
-        expiry: "Access to {{modelCount}} AI models",
-        bestFor: "Best for regular use",
-      },
+        "Starter takes crypto with yearly billing. Plus, Pro and Ultra take crypto monthly too.",
     },
     login: "Sign In",
     signup: "Sign Up Free",

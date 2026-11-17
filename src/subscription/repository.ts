@@ -20,6 +20,16 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import type Stripe from "stripe";
 
 import { configScopedTranslation } from "@/env/i18n";
+import { scopedTranslation as productsScopedTranslation } from "@/products/i18n";
+import {
+  getPlanForTierProduct,
+  getTierCredits,
+  getTierProductForPlan,
+  isSubscriptionTierProductId,
+  ProductIds,
+  productsRepository,
+  type SubscriptionTierProductId,
+} from "@/products/repository-client";
 
 import { createTrackingContext } from "../messenger/providers/email/smtp-client/components/tracking_context.email";
 import { scopedTranslation as checkoutScopedTranslation } from "../payment/checkout/i18n";
@@ -38,22 +48,23 @@ import type {
   SubscriptionCreatePostRequestOutput,
   SubscriptionCreatePostResponseOutput,
 } from "./create/definition";
-import type { NewSubscription } from "./db";
+import type { NewSubscription, Subscription } from "./db";
 import { subscriptions } from "./db";
 import type { SubscriptionGetResponseOutput } from "./definition";
-import type {
+import type { SubscriptionPlanValue, SubscriptionStatusValue } from "./enum";
+import {
+  BillingInterval,
   BillingIntervalDB,
-  SubscriptionPlanDB,
-  SubscriptionPlanValue,
-  SubscriptionStatusValue,
+  SubscriptionPlan,
+  SubscriptionStatus,
 } from "./enum";
-import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
 import { subscriptionRenewalSessionKey } from "./renewal-key";
 import type {
   SubscriptionUpdatePutRequestOutput,
   SubscriptionUpdatePutResponseOutput,
 } from "./update/definition";
+import { currentMonthSlot, periodGrantExpiry } from "./yearly-credits/slots";
 
 interface SyncSubscriptionResult {
   message: string;
@@ -84,25 +95,101 @@ export class SubscriptionRepository {
   };
 
   /**
-   * Check if a plan ID matches the subscription plan.
-   * Handles both legacy prefixed values ('app.api.subscription.enums.plan.subscription')
-   * and current short values ('enums.plan.subscription') stored in the DB.
+   * Normalize a stored plan id to its canonical short form. Old rows hold
+   * legacy prefixed values ('app.api.subscription.enums.plan.subscription');
+   * unknown values fall back to the Starter plan so response validation passes.
    */
-  private static isSubscriptionPlan(planId: string): boolean {
-    return (
-      planId === SubscriptionPlan.SUBSCRIPTION ||
-      planId.endsWith(`.${SubscriptionPlan.SUBSCRIPTION}`)
-    );
+  private static normalizePlanId(planId: string): typeof SubscriptionPlanValue {
+    const tierProductId = getTierProductForPlan(planId);
+    return tierProductId
+      ? getPlanForTierProduct(tierProductId)
+      : SubscriptionPlan.SUBSCRIPTION;
   }
 
   /**
-   * Normalize legacy plan IDs stored in the DB to their canonical short form.
-   * Old values like 'app.api.subscription.enums.plan.subscription' are normalized
-   * to 'enums.plan.subscription' so response validation passes.
+   * Tier and interval of the price a Stripe subscription bills. Our prices
+   * (and the per-checkout prices from before lookup keys) carry
+   * metadata.internalProductId; foreign prices return null.
    */
-  private static normalizePlanId(): typeof SubscriptionPlanValue {
-    // Only one plan type exists. Legacy DB values with long prefix are normalized here.
-    return SubscriptionPlan.SUBSCRIPTION;
+  private static tierFromStripeSubscription(
+    subscription: Stripe.Subscription,
+  ): {
+    productId: SubscriptionTierProductId;
+    billingInterval: (typeof BillingIntervalDB)[number];
+  } | null {
+    const price = subscription.items.data[0]?.price;
+    const internalProductId = price?.metadata?.internalProductId;
+    if (!price || !internalProductId) {
+      return null;
+    }
+    if (!isSubscriptionTierProductId(internalProductId)) {
+      return null;
+    }
+    return {
+      productId: internalProductId,
+      billingInterval:
+        price.recurring?.interval === "year"
+          ? BillingInterval.YEARLY
+          : BillingInterval.MONTHLY,
+    };
+  }
+
+  /**
+   * Tier a renewal invoice pays for. On a Stripe cycle invoice the billed price
+   * wins (a downgrade scheduled last period takes effect now) and the row is
+   * switched to it; otherwise the row's plan.
+   */
+  private static async renewalTier(
+    subscription: Subscription,
+    providerSubscriptionId: string,
+    billingReason: string | undefined,
+    logger: EndpointLogger,
+  ): Promise<SubscriptionTierProductId | null> {
+    const rowTier = getTierProductForPlan(subscription.planId);
+    const stripe = StripeProvider.getStripe();
+    if (
+      billingReason !== "subscription_cycle" ||
+      subscription.provider !== PaymentProvider.STRIPE ||
+      !stripe
+    ) {
+      return rowTier;
+    }
+    try {
+      const stripeSub = await stripe.subscriptions.retrieve(
+        providerSubscriptionId,
+      );
+      const billed =
+        SubscriptionRepository.tierFromStripeSubscription(stripeSub);
+      if (!billed) {
+        return rowTier;
+      }
+      if (
+        billed.productId !== rowTier ||
+        billed.billingInterval !== subscription.billingInterval
+      ) {
+        await db
+          .update(subscriptions)
+          .set({
+            planId: getPlanForTierProduct(billed.productId),
+            productId: billed.productId,
+            billingInterval: billed.billingInterval,
+            updatedAt: new Date(),
+          })
+          .where(eq(subscriptions.id, subscription.id));
+        logger.info("Renewal switched the subscription tier", {
+          subscriptionId: subscription.id,
+          from: rowTier,
+          to: billed.productId,
+        });
+      }
+      return billed.productId;
+    } catch (error) {
+      logger.error("Could not read the billed tier for a renewal", {
+        error: parseError(error),
+        providerSubscriptionId,
+      });
+      return rowTier;
+    }
   }
 
   /**
@@ -221,6 +308,32 @@ export class SubscriptionRepository {
 
       let subscription = results[0];
 
+      // A crypto plan is a one-off invoice with no provider-side renewal:
+      // once its period is over it has ended (and a new checkout is allowed).
+      if (
+        subscription.provider === PaymentProvider.NOWPAYMENTS &&
+        subscription.status === SubscriptionStatus.ACTIVE &&
+        subscription.currentPeriodEnd &&
+        subscription.currentPeriodEnd.getTime() < Date.now()
+      ) {
+        const [ended] = await db
+          .update(subscriptions)
+          .set({
+            status: SubscriptionStatus.CANCELED,
+            endedAt: subscription.currentPeriodEnd,
+            updatedAt: new Date(),
+          })
+          .where(eq(subscriptions.id, subscription.id))
+          .returning();
+        if (ended) {
+          subscription = ended;
+          logger.info("Crypto plan period ended", {
+            userId,
+            subscriptionId: subscription.id,
+          });
+        }
+      }
+
       // AUTOMATIC SYNC: Verify subscription with Stripe if it has a provider ID.
       // Skip for NOWPayments - one-time payments have no recurring subscription to sync.
       if (
@@ -320,16 +433,12 @@ export class SubscriptionRepository {
                       await import("../credits/repository");
                     const { scopedTranslation: creditsScopedTranslation } =
                       await import("../credits/i18n");
-                    const { productsRepository, ProductIds } =
-                      await import("../products/repository-client");
                     const { t: creditsT } =
                       creditsScopedTranslation.scopedT(locale);
 
-                    const productId = SubscriptionRepository.isSubscriptionPlan(
+                    const productId = getTierProductForPlan(
                       subscription.planId,
-                    )
-                      ? ProductIds.SUBSCRIPTION
-                      : null;
+                    );
 
                     if (productId) {
                       const product = productsRepository.getProduct(
@@ -337,7 +446,11 @@ export class SubscriptionRepository {
                         locale,
                       );
                       // Credits expire at exact period end - new period credits are pre-granted via invoice.paid
-                      const expiresAt = new Date(currentPeriodEnd * 1000);
+                      const expiresAt = periodGrantExpiry(
+                        subscription.billingInterval === BillingInterval.YEARLY,
+                        new Date(currentPeriodStart * 1000),
+                        new Date(currentPeriodEnd * 1000),
+                      );
 
                       // Canonical idempotency key shared across all credit grant paths
                       // Prevents duplicate grants from invoice handler, subscription.updated, and auto-sync
@@ -451,22 +564,20 @@ export class SubscriptionRepository {
                 await import("../credits/repository");
               const { scopedTranslation: creditsScopedTranslation } =
                 await import("../credits/i18n");
-              const { productsRepository, ProductIds } =
-                await import("../products/repository-client");
               const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
-              const productId = SubscriptionRepository.isSubscriptionPlan(
-                subscription.planId,
-              )
-                ? ProductIds.SUBSCRIPTION
-                : null;
+              const productId = getTierProductForPlan(subscription.planId);
 
               if (productId) {
                 const product = productsRepository.getProduct(
                   productId,
                   locale,
                 );
-                const expiresAt = new Date(periodEndMs);
+                const expiresAt = periodGrantExpiry(
+                  subscription.billingInterval === BillingInterval.YEARLY,
+                  subscription.currentPeriodStart ?? new Date(periodEndMs),
+                  new Date(periodEndMs),
+                );
 
                 logger.info("Safety-net: granting missing renewal credits", {
                   userId,
@@ -508,7 +619,7 @@ export class SubscriptionRepository {
       return success({
         hasSubscription: true,
         id: subscription.id,
-        plan: SubscriptionRepository.normalizePlanId(),
+        plan: SubscriptionRepository.normalizePlanId(subscription.planId),
         billingInterval: subscription.billingInterval,
         status: subscription.status,
         currentPeriodStart: subscription.currentPeriodStart || new Date(),
@@ -657,44 +768,102 @@ export class SubscriptionRepository {
         });
       }
 
-      const updateData: Partial<NewSubscription> = {
-        updatedAt: new Date(),
-      };
-
-      if (data.plan) {
-        updateData.planId = data.plan;
-      }
-      if (data.billingInterval) {
-        updateData.billingInterval = data.billingInterval;
-      }
-
-      const results = await db
-        .update(subscriptions)
-        .set(updateData)
-        .where(eq(subscriptions.userId, userId))
-        .returning();
-
-      if (results.length === 0) {
+      const current = currentSubscription[0];
+      const currentTier =
+        getTierProductForPlan(current.planId) ?? ProductIds.SUBSCRIPTION;
+      const targetTier = getTierProductForPlan(data.plan);
+      if (!targetTier || !productsRepository.canPurchase(targetTier)) {
         return fail({
-          message: t("errors.not_found_description"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
+          message: t("errors.validation.description"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+      const targetInterval =
+        data.billingInterval === BillingInterval.YEARLY ? "year" : "month";
+      const currentInterval =
+        current.billingInterval === BillingInterval.YEARLY ? "year" : "month";
+      const definitions = productsRepository.getProductDefinitions();
+      if (!definitions[targetTier].allowedIntervals.includes(targetInterval)) {
+        return fail({
+          message: t("errors.validation.description"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
 
-      const updatedSubscription = results[0];
-      return success({
-        id: updatedSubscription.id,
-        plan: SubscriptionRepository.normalizePlanId(),
-        billingInterval: updatedSubscription.billingInterval,
-        status: updatedSubscription.status,
-        currentPeriodStart:
-          updatedSubscription.currentPeriodStart || new Date(),
-        currentPeriodEnd: updatedSubscription.currentPeriodEnd || new Date(),
-        cancelAtPeriodEnd: updatedSubscription.cancelAtPeriodEnd,
-        createdAt: updatedSubscription.createdAt,
-        updatedAt: updatedSubscription.updatedAt,
-        message: t("put.success.title"),
+      const respond = (
+        row: typeof current,
+        message: string,
+      ): ResponseType<SubscriptionUpdatePutResponseOutput> =>
+        success({
+          id: row.id,
+          plan: SubscriptionRepository.normalizePlanId(row.planId),
+          billingInterval: row.billingInterval,
+          status: row.status,
+          currentPeriodStart: row.currentPeriodStart || new Date(),
+          currentPeriodEnd: row.currentPeriodEnd || new Date(),
+          cancelAtPeriodEnd: row.cancelAtPeriodEnd,
+          createdAt: row.createdAt,
+          updatedAt: row.updatedAt,
+          message,
+        });
+
+      // Stripe plans decide "unchanged" against the price Stripe bills (a
+      // scheduled downgrade can be taken back), so that check runs inside
+      // changeStripeTier.
+      if (
+        targetTier === currentTier &&
+        targetInterval === currentInterval &&
+        current.provider !== PaymentProvider.STRIPE
+      ) {
+        return respond(current, t("errors.tierChange.unchanged"));
+      }
+
+      if (
+        current.status !== SubscriptionStatus.ACTIVE &&
+        current.status !== SubscriptionStatus.TRIALING
+      ) {
+        return fail({
+          message: t("errors.tierChange.notActive"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+      if (
+        current.provider !== PaymentProvider.STRIPE ||
+        !current.providerSubscriptionId
+      ) {
+        return fail({
+          message: t("errors.tierChange.cryptoNotSupported"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      const result = await SubscriptionRepository.changeStripeTier({
+        subscription: current,
+        providerSubscriptionId: current.providerSubscriptionId,
+        currentTier,
+        targetTier,
+        targetInterval,
+        locale,
+        logger,
       });
+      if (!result.success) {
+        return result;
+      }
+      const { row, kind, bonusCredits } = result.data;
+      const { t: productsT } = productsScopedTranslation.scopedT(locale);
+      const planName = productsT(definitions[targetTier].name);
+      const message =
+        kind === "unchanged"
+          ? t("errors.tierChange.unchanged")
+          : kind === "upgrade"
+            ? t("errors.tierChange.upgraded", {
+                plan: planName,
+                credits: bonusCredits,
+              })
+            : kind === "downgrade"
+              ? t("errors.tierChange.downgraded", { plan: planName })
+              : t("errors.tierChange.changed", { plan: planName });
+      return respond(row, message);
     } catch (error) {
       logger.error("Error updating subscription:", parseError(error));
       return fail({
@@ -702,6 +871,269 @@ export class SubscriptionRepository {
           error: parseError(error).message,
         }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
+      });
+    }
+  }
+
+  /**
+   * Switch a Stripe subscription to another tier or interval.
+   *
+   * - Upgrade (more monthly credits, same interval): Stripe invoices the
+   *   prorated difference right away and applies the change only once that
+   *   invoice is paid (pending_if_incomplete). The user gets the prorated
+   *   credit difference for the rest of the current month (monthly plan: the
+   *   period; yearly plan: the current month, later months come from the
+   *   yearly-credits task at the new tier).
+   * - Downgrade (fewer credits, same interval): no refund, no proration. Stripe
+   *   bills the new price from the next renewal; the row keeps the current
+   *   (higher) plan until then, and the renewal switches it.
+   * - Back to the current plan while a downgrade is pending: the downgrade is
+   *   taken back, nothing is charged.
+   * - Interval change: Stripe restarts the billing period now with proration.
+   *   The new period's credits come from the invoice webhooks, as on renewal.
+   *
+   * For upgrades and interval changes the row's plan is written before
+   * calling Stripe (webhooks for the change read it) and restored when Stripe
+   * refuses.
+   */
+  private static async changeStripeTier(params: {
+    subscription: Subscription;
+    providerSubscriptionId: string;
+    currentTier: SubscriptionTierProductId;
+    targetTier: SubscriptionTierProductId;
+    targetInterval: "month" | "year";
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+  }): Promise<
+    ResponseType<{
+      row: Subscription;
+      kind: "upgrade" | "downgrade" | "interval" | "changed" | "unchanged";
+      bonusCredits: number;
+    }>
+  > {
+    const {
+      subscription,
+      providerSubscriptionId,
+      currentTier,
+      targetTier,
+      targetInterval,
+      locale,
+      logger,
+    } = params;
+    const { t } = scopedTranslation.scopedT(locale);
+    const stripe = StripeProvider.getStripe();
+    if (!stripe) {
+      return fail({
+        message: t("errors.tierChange.failed", { error: "Stripe" }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+
+    const currentInterval =
+      subscription.billingInterval === BillingInterval.YEARLY
+        ? "year"
+        : "month";
+    const intervalChanged = currentInterval !== targetInterval;
+    const currentCredits = getTierCredits(currentTier);
+    const targetCredits = getTierCredits(targetTier);
+
+    const readRow = async (): Promise<Subscription> => {
+      const [row] = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.id, subscription.id))
+        .limit(1);
+      return row ?? subscription;
+    };
+
+    const previous = {
+      planId: subscription.planId,
+      productId: subscription.productId,
+      billingInterval: subscription.billingInterval,
+      providerPriceId: subscription.providerPriceId,
+      providerProductId: subscription.providerProductId,
+    };
+    const restore = async (): Promise<void> => {
+      await db
+        .update(subscriptions)
+        .set({ ...previous, updatedAt: new Date() })
+        .where(eq(subscriptions.id, subscription.id));
+    };
+
+    try {
+      const stripeSub = await stripe.subscriptions.retrieve(
+        providerSubscriptionId,
+      );
+      const item = stripeSub.items.data[0];
+      if (!item) {
+        return fail({
+          message: t("errors.tierChange.failed", {
+            error: "no subscription item",
+          }),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
+      }
+      const billedTier =
+        SubscriptionRepository.tierFromStripeSubscription(stripeSub)
+          ?.productId ?? currentTier;
+
+      const sameAsRow = targetTier === currentTier && !intervalChanged;
+      if (sameAsRow && billedTier === currentTier) {
+        return success({
+          row: subscription,
+          kind: "unchanged",
+          bonusCredits: 0,
+        });
+      }
+
+      const kind: "upgrade" | "downgrade" | "interval" | "changed" = sameAsRow
+        ? "changed"
+        : intervalChanged
+          ? "interval"
+          : targetCredits > currentCredits
+            ? "upgrade"
+            : "downgrade";
+
+      const { stripePriceManager } =
+        await import("../payment/providers/stripe/prices");
+      const price = await stripePriceManager.ensurePrice(
+        targetTier,
+        locale,
+        targetInterval,
+        logger,
+      );
+      if (!price.success) {
+        return price;
+      }
+
+      const writesPlanNow = kind === "upgrade" || kind === "interval";
+      if (writesPlanNow) {
+        await db
+          .update(subscriptions)
+          .set({
+            planId: getPlanForTierProduct(targetTier),
+            productId: targetTier,
+            billingInterval:
+              targetInterval === "year"
+                ? BillingInterval.YEARLY
+                : BillingInterval.MONTHLY,
+            providerPriceId: price.data.priceId,
+            providerProductId: price.data.productId,
+            updatedAt: new Date(),
+          })
+          .where(eq(subscriptions.id, subscription.id));
+      }
+
+      const updated = writesPlanNow
+        ? await stripe.subscriptions.update(providerSubscriptionId, {
+            items: [{ id: item.id, price: price.data.priceId }],
+            proration_behavior: "always_invoice",
+            payment_behavior: "pending_if_incomplete",
+          })
+        : // Downgrade, or taking a pending downgrade back: no charge, the
+          // price bills from the next renewal.
+          await stripe.subscriptions.update(providerSubscriptionId, {
+            items: [{ id: item.id, price: price.data.priceId }],
+            proration_behavior: "none",
+          });
+
+      if (updated.pending_update) {
+        // Payment needs the customer (3DS) or failed: Stripe kept the old
+        // price, so the row goes back too.
+        await restore();
+        const invoiceId =
+          typeof updated.latest_invoice === "string"
+            ? updated.latest_invoice
+            : updated.latest_invoice?.id;
+        const invoice = invoiceId
+          ? await stripe.invoices.retrieve(invoiceId)
+          : null;
+        return fail({
+          message: t("errors.tierChange.paymentRequired", {
+            url: invoice?.hosted_invoice_url ?? "",
+          }),
+          errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+        });
+      }
+
+      let bonusCredits = 0;
+      if (kind === "upgrade") {
+        const now = new Date();
+        const periodStart = new Date(item.current_period_start * 1000);
+        const periodEnd = new Date(item.current_period_end * 1000);
+        // Monthly plan: the rest of the period. Yearly plan: the rest of
+        // the current month (later months follow at the new tier).
+        const creditWindow =
+          currentInterval === "year"
+            ? currentMonthSlot(periodStart, periodEnd, now)
+            : { start: periodStart, end: periodEnd };
+        const span = creditWindow
+          ? creditWindow.end.getTime() - creditWindow.start.getTime()
+          : 0;
+        const fraction =
+          creditWindow && span > 0
+            ? Math.min(
+                1,
+                Math.max(
+                  0,
+                  (creditWindow.end.getTime() - now.getTime()) / span,
+                ),
+              )
+            : 0;
+        bonusCredits = Math.round((targetCredits - currentCredits) * fraction);
+        if (creditWindow && bonusCredits > 0) {
+          const { CreditRepository } = await import("../credits/repository");
+          const { scopedTranslation: creditsScopedTranslation } =
+            await import("../credits/i18n");
+          await CreditRepository.addUserCredits(
+            subscription.userId,
+            bonusCredits,
+            "subscription",
+            logger,
+            creditsScopedTranslation.scopedT(locale).t,
+            creditWindow.end,
+            `tier-upgrade:${providerSubscriptionId}:${creditWindow.end.getTime()}:${targetTier}`,
+          );
+        }
+      } else if (!writesPlanNow) {
+        // The row keeps the current plan until renewal; only the billed
+        // price is recorded.
+        await db
+          .update(subscriptions)
+          .set({
+            providerPriceId: price.data.priceId,
+            providerProductId: price.data.productId,
+            updatedAt: new Date(),
+          })
+          .where(eq(subscriptions.id, subscription.id));
+      }
+
+      logger.info("Changed subscription tier", {
+        userId: subscription.userId,
+        providerSubscriptionId,
+        from: currentTier,
+        billed: billedTier,
+        to: targetTier,
+        interval: targetInterval,
+        kind,
+        bonusCredits,
+      });
+
+      return success({ row: await readRow(), kind, bonusCredits });
+    } catch (error) {
+      await restore();
+      logger.error("Failed to change subscription tier", {
+        error: parseError(error),
+        userId: subscription.userId,
+        providerSubscriptionId,
+        from: currentTier,
+        to: targetTier,
+      });
+      return fail({
+        message: t("errors.tierChange.failed", {
+          error: parseError(error).message,
+        }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
   }
@@ -809,6 +1241,21 @@ export class SubscriptionRepository {
         return;
       }
 
+      const tierProductId = getTierProductForPlan(planId);
+      const billingIntervalValue = BillingIntervalDB.find(
+        (value) => value === billingInterval,
+      );
+      if (!tierProductId || !billingIntervalValue) {
+        logger.error("Unknown plan or billing interval in checkout session", {
+          sessionId: session.id,
+          userId,
+          planId,
+          billingInterval,
+        });
+        return;
+      }
+      const planValue = getPlanForTierProduct(tierProductId);
+
       const providerEnum =
         (session.metadata?.provider as typeof PaymentProviderValue) ||
         PaymentProvider.STRIPE;
@@ -875,9 +1322,9 @@ export class SubscriptionRepository {
         .insert(subscriptions)
         .values({
           userId: userId,
-          planId: planId as (typeof SubscriptionPlanDB)[number],
-          billingInterval:
-            billingInterval as (typeof BillingIntervalDB)[number],
+          planId: planValue,
+          billingInterval: billingIntervalValue,
+          productId: tierProductId,
           status: SubscriptionStatus.ACTIVE,
           provider: providerEnum,
           providerSubscriptionId,
@@ -887,6 +1334,17 @@ export class SubscriptionRepository {
         .onConflictDoUpdate({
           target: subscriptions.userId,
           set: {
+            // A returning subscriber may pick a different tier or interval.
+            planId: planValue,
+            billingInterval: billingIntervalValue,
+            productId: tierProductId,
+            provider: providerEnum,
+            cancelAtPeriodEnd: false,
+            cancelAt: null,
+            canceledAt: null,
+            endedAt: null,
+            paymentFailedAt: null,
+            gracePeriodEndsAt: null,
             status: SubscriptionStatus.ACTIVE,
             providerSubscriptionId,
             currentPeriodStart,
@@ -915,76 +1373,80 @@ export class SubscriptionRepository {
       const { CreditRepository } = await import("../credits/repository");
       const { scopedTranslation: creditsScopedTranslation } =
         await import("../credits/i18n");
-      const { productsRepository, ProductIds } =
-        await import("../products/repository-client");
       const { t: creditsT } = creditsScopedTranslation.scopedT(userLocale);
 
-      // Map subscription plan to product ID
-      const productId =
-        planId === SubscriptionPlan.SUBSCRIPTION
-          ? ProductIds.SUBSCRIPTION
-          : null;
-
-      if (productId) {
-        const product = productsRepository.getProduct(productId, userLocale);
-        // currentPeriodEnd is already extracted from Stripe or calculated for NOWPayments above
-        const expiresAt = currentPeriodEnd;
-
-        // Use canonical renewalSessionKey so the safety-net idempotency check
-        // recognises that credits were already granted on the initial checkout.
-        // providerSubscriptionId is set for both Stripe and NOWPayments paths.
-        const checkoutSessionId = providerSubscriptionId
-          ? SubscriptionRepository.renewalSessionKey(
-              providerSubscriptionId,
-              (currentPeriodEnd ?? new Date()).getTime(),
-            )
-          : session.id;
-
-        // IDEMPOTENCY CHECK: Verify credits haven't been added for this checkout session already
-        const { creditPacks } = await import("../credits/db");
-
-        const [existingPack] = await db
-          .select()
-          .from(creditPacks)
-          .where(
-            sql`${creditPacks.metadata}->>'sessionId' = ${checkoutSessionId}`,
+      const product = productsRepository.getProduct(tierProductId, userLocale);
+      // currentPeriodEnd is already extracted from Stripe or calculated for NOWPayments above
+      const expiresAt = currentPeriodEnd
+        ? periodGrantExpiry(
+            billingIntervalValue === BillingInterval.YEARLY,
+            currentPeriodStart,
+            currentPeriodEnd,
           )
-          .limit(1);
+        : null;
 
-        if (existingPack) {
-          logger.info("Subscription credits already processed for session", {
-            checkoutSessionId,
-            packId: existingPack.id,
-            userId,
-          });
-          return; // Idempotent - already processed
-        }
+      // Use canonical renewalSessionKey so the safety-net idempotency check
+      // recognises that credits were already granted on the initial checkout.
+      // providerSubscriptionId is set for both Stripe and NOWPayments paths.
+      const checkoutSessionId = providerSubscriptionId
+        ? SubscriptionRepository.renewalSessionKey(
+            providerSubscriptionId,
+            (currentPeriodEnd ?? new Date()).getTime(),
+          )
+        : session.id;
 
-        const grant = await CreditRepository.addUserCredits(
-          userId,
-          product.credits,
-          "subscription",
-          logger,
-          creditsT,
-          expiresAt ?? undefined,
+      // IDEMPOTENCY CHECK: Verify credits haven't been added for this checkout session already
+      const { creditPacks } = await import("../credits/db");
+
+      const [existingPack] = await db
+        .select()
+        .from(creditPacks)
+        .where(
+          sql`${creditPacks.metadata}->>'sessionId' = ${checkoutSessionId}`,
+        )
+        .limit(1);
+
+      if (existingPack) {
+        logger.info("Subscription credits already processed for session", {
           checkoutSessionId,
-        );
-        if (grant.success && !grant.data.granted) {
-          // Webhook and success redirect raced: the winner sends the emails.
-          logger.info("Subscription credits granted by a concurrent handler", {
-            checkoutSessionId,
-            packId: grant.data.packId,
-            userId,
-          });
-          return;
-        }
-        logger.debug("Added subscription credits", {
+          packId: existingPack.id,
           userId,
-          credits: product.credits,
-          expiresAt: expiresAt?.toISOString(),
-          checkoutSessionId,
         });
+        return; // Idempotent - already processed
       }
+
+      const grant = await CreditRepository.addUserCredits(
+        userId,
+        product.credits,
+        "subscription",
+        logger,
+        creditsT,
+        expiresAt ?? undefined,
+        checkoutSessionId,
+      );
+      if (grant.success && !grant.data.granted) {
+        // Webhook and success redirect raced: the winner sends the emails.
+        logger.info("Subscription credits granted by a concurrent handler", {
+          checkoutSessionId,
+          packId: grant.data.packId,
+          userId,
+        });
+        return;
+      }
+      logger.debug("Added subscription credits", {
+        userId,
+        credits: product.credits,
+        expiresAt: expiresAt?.toISOString(),
+        checkoutSessionId,
+      });
+
+      // Referral code bonus: one-time credits for the first paid plan.
+      const { ReferralRepository } = await import("../referral/repository");
+      await ReferralRepository.grantSubscriptionSignupBonus(
+        userId,
+        logger,
+        userLocale,
+      );
 
       // Send confirmation emails (user + admin)
       try {
@@ -1042,6 +1504,7 @@ export class SubscriptionRepository {
                     userId,
                     leadId,
                     planName: t(subRecord.planId),
+                    monthlyCredits: getTierCredits(tierProductId),
                     totalModelCount: getAvailableChatModelCount(
                       false,
                       await getEnvAvailability(),
@@ -1207,8 +1670,6 @@ export class SubscriptionRepository {
       const { CreditRepository } = await import("../credits/repository");
       const { scopedTranslation: creditsScopedTranslation } =
         await import("../credits/i18n");
-      const { productsRepository, ProductIds } =
-        await import("../products/repository-client");
 
       // Look up user's locale for translations
       let userLocale: CountryLanguage = locale;
@@ -1227,11 +1688,12 @@ export class SubscriptionRepository {
       }
       const { t: creditsT } = creditsScopedTranslation.scopedT(userLocale);
 
-      const productId = SubscriptionRepository.isSubscriptionPlan(
-        subscription.planId,
-      )
-        ? ProductIds.SUBSCRIPTION
-        : null;
+      const productId = await SubscriptionRepository.renewalTier(
+        subscription,
+        subscriptionId,
+        billingReason,
+        logger,
+      );
 
       if (!productId) {
         logger.warn("No product ID found for subscription plan", {
@@ -1254,7 +1716,13 @@ export class SubscriptionRepository {
         return;
       }
 
-      const expiresAt = periodEnd;
+      const expiresAt = periodGrantExpiry(
+        subscription.billingInterval === BillingInterval.YEARLY,
+        subscriptionResult.data.currentPeriodStart
+          ? new Date(subscriptionResult.data.currentPeriodStart)
+          : periodEnd,
+        periodEnd,
+      );
 
       // Canonical idempotency key - shared with invoice.paid and subscription.updated
       const renewalSessionId = SubscriptionRepository.renewalSessionKey(
@@ -1429,8 +1897,6 @@ export class SubscriptionRepository {
         const { CreditRepository } = await import("../credits/repository");
         const { scopedTranslation: creditsScopedTranslation } =
           await import("../credits/i18n");
-        const { productsRepository, ProductIds } =
-          await import("../products/repository-client");
 
         // Look up user's locale from DB for credit/product translations
         let userLocaleForInvoice: CountryLanguage = locale;
@@ -1450,11 +1916,12 @@ export class SubscriptionRepository {
         const { t: creditsT } =
           creditsScopedTranslation.scopedT(userLocaleForInvoice);
 
-        const productId = SubscriptionRepository.isSubscriptionPlan(
-          subscription.planId,
-        )
-          ? ProductIds.SUBSCRIPTION
-          : null;
+        const productId = await SubscriptionRepository.renewalTier(
+          subscription,
+          subscriptionId,
+          billingReason,
+          logger,
+        );
 
         if (productId) {
           const product = productsRepository.getProduct(
@@ -1477,7 +1944,13 @@ export class SubscriptionRepository {
           }
 
           // Credits expire at exact period end - no grace buffer needed
-          const expiresAt = periodEnd;
+          const expiresAt = periodGrantExpiry(
+            subscription.billingInterval === BillingInterval.YEARLY,
+            subscriptionResult.data.currentPeriodStart
+              ? new Date(subscriptionResult.data.currentPeriodStart)
+              : periodEnd,
+            periodEnd,
+          );
 
           // Canonical idempotency key shared across all credit grant paths
           const renewalSessionId = SubscriptionRepository.renewalSessionKey(
@@ -1784,12 +2257,45 @@ export class SubscriptionRepository {
       const periodRenewed =
         oldPeriodEnd && newPeriodEnd.getTime() > oldPeriodEnd.getTime();
 
+      // Tier follows the price Stripe bills (plan switches, dashboard edits),
+      // except a pending downgrade: the row keeps the higher plan the user
+      // paid for until the period renews.
+      const billedTier =
+        SubscriptionRepository.tierFromStripeSubscription(fullSubscription);
+      const rowTier =
+        getTierProductForPlan(subscription.planId) ?? ProductIds.SUBSCRIPTION;
+      const stripeTier =
+        billedTier &&
+        (periodRenewed ||
+          billedTier.billingInterval !== subscription.billingInterval ||
+          getTierCredits(billedTier.productId) >= getTierCredits(rowTier))
+          ? billedTier
+          : null;
+      const tierFields = stripeTier
+        ? {
+            planId: getPlanForTierProduct(stripeTier.productId),
+            productId: stripeTier.productId,
+            billingInterval: stripeTier.billingInterval,
+          }
+        : {};
+      if (stripeTier && stripeTier.productId !== subscription.productId) {
+        logger.info("Subscription tier changed on Stripe", {
+          subscriptionId,
+          from: subscription.productId,
+          to: stripeTier.productId,
+        });
+      }
+      const effectivePlanId = stripeTier
+        ? getPlanForTierProduct(stripeTier.productId)
+        : subscription.planId;
+
       // Update subscription with proper period information
       // Clear grace period fields when subscription is active again
       const isActive = status === SubscriptionStatus.ACTIVE;
       await db
         .update(subscriptions)
         .set({
+          ...tierFields,
           status,
           currentPeriodStart: new Date(currentPeriodStart * 1000),
           currentPeriodEnd: newPeriodEnd,
@@ -1816,8 +2322,6 @@ export class SubscriptionRepository {
         const { CreditRepository } = await import("../credits/repository");
         const { scopedTranslation: creditsScopedTranslation } =
           await import("../credits/i18n");
-        const { productsRepository, ProductIds } =
-          await import("../products/repository-client");
 
         // Look up user's locale from DB for credit/product translations
         let userLocaleForUpdate: CountryLanguage = locale;
@@ -1837,11 +2341,7 @@ export class SubscriptionRepository {
         const { t: creditsT } =
           creditsScopedTranslation.scopedT(userLocaleForUpdate);
 
-        const productId = SubscriptionRepository.isSubscriptionPlan(
-          subscription.planId,
-        )
-          ? ProductIds.SUBSCRIPTION
-          : null;
+        const productId = getTierProductForPlan(effectivePlanId);
 
         if (productId) {
           const product = productsRepository.getProduct(
@@ -1874,7 +2374,12 @@ export class SubscriptionRepository {
               "subscription",
               logger,
               creditsT,
-              newPeriodEnd,
+              periodGrantExpiry(
+                (stripeTier?.billingInterval ??
+                  subscription.billingInterval) === BillingInterval.YEARLY,
+                new Date(currentPeriodStart * 1000),
+                newPeriodEnd,
+              ),
               renewalSessionId,
             );
 
@@ -2040,13 +2545,8 @@ export class SubscriptionRepository {
         // Grant renewal credits if period advanced (with idempotency)
         if (periodChanged) {
           const newPeriodEndMs = currentPeriodEnd * 1000;
-          const { productsRepository, ProductIds } =
-            await import("../products/repository-client");
 
-          const productId =
-            localSubscription.planId === SubscriptionPlan.SUBSCRIPTION
-              ? ProductIds.SUBSCRIPTION
-              : null;
+          const productId = getTierProductForPlan(localSubscription.planId);
 
           if (productId) {
             const product = productsRepository.getProduct(productId, locale);
@@ -2078,7 +2578,11 @@ export class SubscriptionRepository {
                 "subscription",
                 logger,
                 cT,
-                new Date(newPeriodEndMs),
+                periodGrantExpiry(
+                  localSubscription.billingInterval === BillingInterval.YEARLY,
+                  new Date(currentPeriodStart * 1000),
+                  new Date(newPeriodEndMs),
+                ),
                 renewalSessionId,
               );
               changes.push(`Granted ${product.credits} renewal credits`);

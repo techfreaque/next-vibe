@@ -47,6 +47,11 @@ export const { GET } = createEndpoint({
         label: "response.referralLabel" as const,
         schema: z.string().nullable(),
       }),
+      subscriptionBonusCredits: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "response.subscriptionBonusCredits" as const,
+        schema: z.coerce.number().int().min(0),
+      }),
     },
   }),
 
@@ -99,10 +104,12 @@ export const { GET } = createEndpoint({
       withReferral: {
         referralCode: "FRIEND2024",
         referralLabel: "Friends & Family",
+        subscriptionBonusCredits: 100,
       },
       noReferral: {
         referralCode: null,
         referralLabel: null,
+        subscriptionBonusCredits: 0,
       },
     },
   },

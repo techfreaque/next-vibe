@@ -173,6 +173,7 @@ export const translations: typeof enTranslations = {
       description: "Code von Freunden? Sie verdienen mit, wenn du abonnierst.",
       placeholder: "Code eingeben",
       labelPrefilled: "Empfehlungscode",
+      subscriptionBonus: "+{{credits}} Bonus-Credits mit deinem ersten Abo.",
       descriptionPrefilled:
         "Dein Freund wird belohnt, wenn du ein Konto erstellst.",
       validation: {
@@ -468,8 +469,8 @@ export const translations: typeof enTranslations = {
     ctaButton: "Jetzt chatten",
     upgrade: {
       title: "Mehr haben?",
-      desc: "{{subscriptionPrice}}/Monat gibt dir jeden Monat {{subscriptionCredits}} Credits. Oder nimm ein Paket: {{packCredits}} Credits für {{packPrice}}, die nie verfallen.",
-      cta: "Auf Pro upgraden",
+      desc: "Tarife ab {{subscriptionPrice}}/Monat für {{subscriptionCredits}} Credits, bis hoch zu {{ultraCredits}} Credits für {{ultraPrice}}. Abonnenten stocken mit Paketen auf, die nie verfallen.",
+      cta: "Tarife ansehen",
     },
     signoff: "Viel Spaß beim Chatten,\nDas {{appName}} Team",
     ps: "P.S. Nutze den Inkognito-Modus, um Gespräche nur auf deinem Gerät zu behalten. Wir speichern sie niemals auf unseren Servern (generierte Medien speichern wir aus technischen Gründen vorübergehend).",

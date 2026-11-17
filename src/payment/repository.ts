@@ -472,7 +472,23 @@ export class PaymentRepository {
 
       switch (event.type) {
         case "checkout.session.completed":
+          // Async methods (delayed PayPal, bank debits) complete the session
+          // before the money settles: grant only once it is paid.
+          if (eventData.payment_status === "unpaid") {
+            logger.info("Checkout completed, payment still settling", {
+              sessionId: eventData.id,
+            });
+            break;
+          }
           await this.handleCheckoutSessionCompleted(eventData, logger);
+          break;
+        case "checkout.session.async_payment_succeeded":
+          // Same path as an instantly paid session; every grant in it is
+          // keyed by the session / subscription period, so a retry is a no-op.
+          await this.handleCheckoutSessionCompleted(eventData, logger);
+          break;
+        case "checkout.session.async_payment_failed":
+          await this.handleCheckoutSessionExpired(eventData, logger);
           break;
         case "payment_intent.succeeded":
           await this.handlePaymentSucceeded(eventData, logger);
@@ -1199,17 +1215,24 @@ export class PaymentRepository {
       // month of credits but pays for twelve). Stripe reports what was charged
       // (after promotion codes) in amount_total; NOWPayments invoices are fixed
       // fiat amounts, stored on the transaction at checkout.
-      const { productsRepository, ProductIds } =
-        await import("../products/repository-client");
+      const {
+        productsRepository,
+        ProductIds,
+        getTierCredits,
+        getTierProductForPlan,
+      } = await import("../products/repository-client");
       const { checkoutRevenueUsdCents } =
         await import("../referral/commission");
 
       let grantedCredits = 0;
       if (type === "subscription") {
-        grantedCredits = productsRepository.getProduct(
-          ProductIds.SUBSCRIPTION,
-          userLocale,
-        ).credits;
+        const metaPlanId =
+          metadata && typeof metadata === "object" && "planId" in metadata
+            ? String(metadata.planId)
+            : "";
+        grantedCredits = getTierCredits(
+          getTierProductForPlan(metaPlanId) ?? ProductIds.SUBSCRIPTION,
+        );
       } else if (type === "credit_pack") {
         const metaTotalCredits =
           metadata && typeof metadata === "object" && "totalCredits" in metadata

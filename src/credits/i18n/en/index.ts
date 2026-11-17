@@ -158,12 +158,15 @@ export const translations = {
     balance: {
       subscribe: "See plans",
       freePlanHint:
-        "{{count}} free credits a month, {{max}} with the newsletter. Subscribe for {{subCredits}}, or just buy a pack. No subscription needed.",
+        "{{count}} free credits a month, {{max}} with the newsletter. Plans start at {{planPrice}} for {{subCredits}} credits a month.",
       lowBalance: {
         title: "{{count}} credits left",
         emptyTitle: "You're out of credits",
-        hint: "Top up with {{packCredits}} credits for {{packPrice}}. They never expire. No subscription needed.",
-        offersHint: "Pick one and you're back in seconds. Pack credits never expire.",
+        hint: "Top up below: {{packCredits}} credits for {{packPrice}}, never expire.",
+        hintPlans: "Pick a plan below. Credits land the moment you pay.",
+        offersHint:
+          "Top up and you're back in seconds. Pack credits never expire.",
+        offersHintPlans: "Pick a plan and you're back in seconds.",
       },
       freePlan: "You're on the free plan",
       guestPlan: "Guest balance",
@@ -174,18 +177,18 @@ export const translations = {
       adminTitle: "Spending Limit",
       description: "One balance for all {{modelCount}} models.",
       adminDescription:
-        "Credits act as a spending cap - control how much AI usage is allowed across all users.",
+        "Credits act as a spending cap. Control how much AI usage all users get.",
       credit: "{{count}} credit",
       credits: "{{count}} credits",
       expiring: {
         title: "Expiring Credits",
-        description: "{{subCredits}} new credits per subscription cycle",
+        description: "Plan credits, refilled every billing cycle",
         adminDescription: "Time-limited credits (subscription cycle)",
       },
       permanent: {
         title: "Permanent Credits",
-        description: "Never expire - yours to keep",
-        adminDescription: "Permanent credits - never expire",
+        description: "Never expire. Yours to keep",
+        adminDescription: "Permanent credits, never expire",
       },
       free: {
         title: "Free Credits",
@@ -197,7 +200,7 @@ export const translations = {
       },
       earned: {
         title: "Earned Credits",
-        description: "Earned via referrals - click to invite friends",
+        description: "Earned via referrals. Click to invite friends",
       },
       spending: {
         title: "Your Earned Credits",

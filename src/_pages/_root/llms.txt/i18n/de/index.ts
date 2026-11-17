@@ -10,10 +10,11 @@ export const translations: typeof enTranslations = {
     models:
       "Modelle: {{modelCount}} Chat-Modelle ({{mainstream}} Mainstream, {{open}} offen, {{uncensored}} unzensiert) von {{providerCount}} Laboren, dazu {{mediaCount}} Modelle für Bild, Video, Musik, Sprachausgabe und Transkription.",
     free: "Gratis-Credits jeden Monat: {{guest}} ohne Konto, {{signedIn}} mit kostenlosem Konto, {{max}} mit kostenlosem Konto und bestätigtem Newsletter-Abo. Keine Karte nötig.",
-    paid: "Bezahlt: ein Abo für {{subPrice}} pro Monat oder {{subYearPrice}} pro Jahr mit {{subCredits}} Credits im Monat, oder ein einmaliges Credit-Paket für {{packPrice}} mit {{packCredits}} Credits. Paket-Credits verfallen nie.",
+    paid: "Bezahlte Tarife: {{plans}}. Jeder Plan geht auch jährlich zum Preis von 11 Monaten (Starter: {{subYearPrice}} im Jahr). Abonnenten stocken mit einem einmaligen Credit-Paket für {{packPrice}} um {{packCredits}} Credits auf. Paket-Credits verfallen nie.",
+    planItem: "{{name}} {{price}} im Monat für {{credits}} Credits",
     credit:
       "1 Credit = {{creditValue}}. Jede Modellseite nennt den Preis pro Nachricht.",
-    api: "API: OpenAI Chat Completions, OpenAI Responses und Anthropic Messages auf einer Basis-URL ({{apiBaseUrl}}). Voraussetzung ist ein bezahltes Konto: ein beliebiges Abo oder ein einziger Credit-Kauf, zum Beispiel das Paket für {{packPrice}}. Kostenlose Konten erhalten HTTP 402.",
+    api: "API: OpenAI Chat Completions, OpenAI Responses und Anthropic Messages auf einer Basis-URL ({{apiBaseUrl}}). Voraussetzung ist ein bezahltes Konto: ein beliebiger Tarif, ab {{subPrice}} im Monat. Kostenlose Konten erhalten HTTP 402.",
     uncensored:
       "Unzensierte Stufe: zwei Arten von Modellen. Abliterierte Modelle sind Mainstream-Modelle, die so verändert wurden, dass sie Fragen nicht mehr ausweichen. Echt unzensierte Modelle wie UncensoredLM sind mit Büchern und Dokumenten trainiert, die im Mainstream-Internet verbannt sind, und vertreten deshalb politische Gegenpositionen. Die unzensierte Stufe erfordert eine einmalige Bestätigung, dass du volljährig bist.",
     openSource:
@@ -29,7 +30,8 @@ export const translations: typeof enTranslations = {
     modelsDesc:
       "jedes Modell mit Preis pro Nachricht, Kontextfenster, Inhaltsstufe und Direktvergleichen",
     pricing: "Preise",
-    pricingDesc: "Gratis-Credits, das Abo und das Credit-Paket",
+    pricingDesc:
+      "Gratis-Credits, die vier Tarife und das Credit-Paket zum Aufstocken",
     api: "API-Dokumentation",
     apiDesc: "Basis-URL, Authentifizierung, Anfrageformate und Codebeispiele",
     blog: "Blog",

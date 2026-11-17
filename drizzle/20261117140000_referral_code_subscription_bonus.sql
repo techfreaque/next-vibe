@@ -1,0 +1,1 @@
+ALTER TABLE "referral_codes" ADD COLUMN IF NOT EXISTS "subscription_bonus_credits" integer DEFAULT 0 NOT NULL;

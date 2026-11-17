@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     pricing: {
       name: "Formules et crédits {{appName}}",
       description:
-        "Des crédits gratuits chaque mois, un abonnement ou un pack de crédits ponctuel. Un seul solde pour {{modelCount}} modèles de chat, plus des modèles d'image, de vidéo, de musique et de voix.",
+        "Des crédits gratuits chaque mois, quatre formules mensuelles et des packs de crédits en recharge. Un seul solde pour {{modelCount}} modèles de chat, plus des modèles d'image, de vidéo, de musique et de voix.",
     },
     organization: {
       types: {

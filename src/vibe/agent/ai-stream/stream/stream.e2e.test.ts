@@ -19,6 +19,8 @@ import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import type { Locator } from "playwright";
 import { describe, expect } from "vitest";
 
+import { ProductIds } from "@/products/repository-client";
+
 import { chatMessages, chatThreads } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
 import { scopedTranslation as settingsScopedTranslation } from "../../chat/settings/i18n";
@@ -186,11 +188,17 @@ describe("E2E: chat stream", () => {
     // The open page picks the new balance up on its own: the out-of-credits
     // card replaces the textarea and puts the real offers one tap away (a
     // fresh signup leads with "confirm your email", the offers stay below).
+    // No plan yet, so the two cheapest plans show; packs need a plan.
     const card = page.getByTestId("out-of-credits-card").first();
     await card.waitFor({ state: "visible" });
     await composer.waitFor({ state: "detached" });
-    await card.getByTestId("credit-offer-pack").waitFor({ state: "visible" });
-    await card.getByTestId("credit-offer-plan").waitFor({ state: "visible" });
+    await card
+      .getByTestId(`credit-offer-tier-${ProductIds.SUBSCRIPTION}`)
+      .waitFor({ state: "visible" });
+    await card
+      .getByTestId(`credit-offer-tier-${ProductIds.SUBSCRIPTION_PLUS}`)
+      .waitFor({ state: "visible" });
+    expect(await card.getByTestId("credit-offer-pack").count()).toBe(0);
     expect(
       await card
         .locator(`a[href="/${defaultLocale}/subscription/buy"]`)

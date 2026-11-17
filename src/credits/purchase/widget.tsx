@@ -27,6 +27,7 @@ import { Bitcoin } from "next-vibe/ui/components/icons/Bitcoin";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/components/icons/ExternalLink";
 import { Info } from "next-vibe/ui/components/icons/Info";
+import { Lock } from "next-vibe/ui/components/icons/Lock";
 import { Minus } from "next-vibe/ui/components/icons/Minus";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
@@ -36,6 +37,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { assignUrl } from "next-vibe/ui/lib/location";
 import {
   useWidgetForm,
+  useWidgetLogger,
   useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetUser,
@@ -47,7 +49,13 @@ import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
 import { PaymentProvider, type PaymentProviderValue } from "@/payment/enum";
-import { ProductIds, productsRepository } from "@/products/repository-client";
+import {
+  getPricingParams,
+  ProductIds,
+  productsRepository,
+} from "@/products/repository-client";
+import { useSubscription } from "@/subscription/hooks";
+import { getPlanOfferState } from "@/subscription/plan-offers";
 
 import type definition from "./definition";
 
@@ -87,6 +95,15 @@ export function CreditsPurchaseContainer({
   const onSubmit = useWidgetOnSubmit();
   const children = field.children;
 
+  const logger = useWidgetLogger();
+  const subscriptionRead = useSubscription(logger, user).read;
+  const subscription = subscriptionRead?.data;
+  const subscriptionLoading = subscriptionRead?.isLoading === true;
+  const offerState = getPlanOfferState({
+    isPublic: user.isPublic,
+    subscription,
+  });
+  const pricing = getPricingParams(locale);
   const products = productsRepository.getProducts(locale);
   const packProduct = products[ProductIds.CREDIT_PACK];
   const packPrice = packProduct.price;
@@ -215,8 +232,32 @@ export function CreditsPurchaseContainer({
             </Div>
           </Div>
 
-          {/* Purchase Form - any signed-in user, no subscription needed */}
-          {isAuthenticated ? (
+          {/* Packs top up a live plan; without one, point to the plans. */}
+          {offerState.mode === "plans" && !subscriptionLoading ? (
+            <Div
+              data-testid="pack-plan-required"
+              className="flex flex-col gap-3 rounded-lg border border-dashed border-border px-4 py-3.5"
+            >
+              <Div className="flex items-start gap-2.5">
+                <Lock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                <Div className="flex flex-col gap-0.5">
+                  <Span className="text-sm font-semibold">
+                    {t("post.pack.planRequired.title")}
+                  </Span>
+                  <Span className="text-sm text-muted-foreground">
+                    {t("post.pack.planRequired.body", {
+                      price: pricing.planPriceMin,
+                    })}
+                  </Span>
+                </Div>
+              </Div>
+              <Button asChild className="h-11 w-full sm:w-auto sm:self-start">
+                <Link href={`/${locale}/subscription/buy`}>
+                  {t("post.pack.planRequired.cta")}
+                </Link>
+              </Button>
+            </Div>
+          ) : isAuthenticated ? (
             <Div className="flex flex-col gap-4">
               <FormAlertWidget field={{}} />
 
@@ -241,7 +282,9 @@ export function CreditsPurchaseContainer({
                       {quantity}
                     </Span>
                     <Span className="text-xs text-muted-foreground">
-                      {quantity === 1 ? "pack" : "packs"}
+                      {t("post.pack.qtyCredits", {
+                        count: totalCredits.toLocaleString(locale),
+                      })}
                     </Span>
                   </Div>
                   <Button

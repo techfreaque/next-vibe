@@ -41,7 +41,7 @@ export const translations = {
       billing: {
         title: "Billing",
         content:
-          "Subscriptions are billed monthly. Credit packs are one-time purchases that never expire. We accept credit cards via Stripe and cryptocurrency via NowPayments.",
+          "Subscriptions are billed monthly or yearly; yearly plans get their monthly credits every month. Credit packs are one-time top-ups for active subscribers and never expire. We accept cards, PayPal, Apple Pay and Google Pay via Stripe and cryptocurrency via NowPayments.",
       },
       cancellation: {
         title: "Cancellation",
@@ -89,7 +89,8 @@ export const translations = {
         orderedOn: "Ordered on (*)/received on (*)",
         name: "Name of consumer(s)",
         address: "Address of consumer(s)",
-        signature: "Signature of consumer(s) (only if this form is sent on paper)",
+        signature:
+          "Signature of consumer(s) (only if this form is sent on paper)",
         date: "Date",
         footnote: "(*) Delete as appropriate.",
         accountHint:

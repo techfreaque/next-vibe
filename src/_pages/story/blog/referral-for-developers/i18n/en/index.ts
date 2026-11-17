@@ -42,25 +42,25 @@ export const translations = {
     tableHeaderSkill: "Others share your skill (5%)",
     rows: [
       {
-        profile: "Plan subscriber",
+        profile: "Starter subscriber",
         spend: "{{planPrice}}/mo",
         direct: "{{planEarn}}/mo",
         skill: "{{planSkillEarn}}/mo",
       },
       {
-        profile: "Plan + 1 credit pack",
+        profile: "Starter + 1 credit pack",
         spend: "{{plusPackSpend}}/mo",
         direct: "{{plusPackEarn}}/mo",
         skill: "{{plusPackSkillEarn}}/mo",
       },
       {
-        profile: "Heavy user: plan + {{heavyPacks}} packs",
+        profile: "Heavy user: Starter + {{heavyPacks}} packs",
         spend: "{{heavySpend}}/mo",
         direct: "{{heavyEarn}}/mo",
         skill: "{{heavySkillEarn}}/mo",
       },
       {
-        profile: "Power user: plan + {{powerPacks}} packs",
+        profile: "Power user: Starter + {{powerPacks}} packs",
         spend: "{{powerSpend}}/mo",
         direct: "{{powerEarn}}/mo",
         skill: "{{powerSkillEarn}}/mo",
@@ -85,7 +85,7 @@ export const translations = {
   },
   crypto: {
     title: "Payout in crypto - no bank account needed",
-    p1: "Earnings pay out in BTC or USDC. Processed within 48 hours after approval. Minimum payout is {{minPayout}}: about {{payoutPowerMonths}} months from one power user, or {{payoutPlanMonths}} subscriber-months on the plan.",
+    p1: "Earnings pay out in BTC or USDC. Processed within 48 hours after approval. Minimum payout is {{minPayout}}: about {{payoutPowerMonths}} months from one power user, or {{payoutPlanMonths}} subscriber-months on Starter.",
     p2: "Or convert earnings instantly to platform credits. If you're using {{appName}} yourself, your referral income offsets your own usage costs.",
   },
   close: {

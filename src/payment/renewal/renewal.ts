@@ -36,7 +36,11 @@ import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { ProductIds, productsRepository } from "@/products/repository-client";
+import {
+  getTierCredits,
+  getTierProductForPlan,
+  ProductIds,
+} from "@/products/repository-client";
 import { paidMinorToUsdCents } from "@/referral/commission";
 import { ReferralRepository } from "@/referral/repository";
 import { subscriptions } from "@/subscription/db";
@@ -134,6 +138,7 @@ export class PaymentRenewalRepository {
           userId: subscriptions.userId,
           provider: subscriptions.provider,
           currentPeriodEnd: subscriptions.currentPeriodEnd,
+          planId: subscriptions.planId,
         })
         .from(subscriptions)
         .where(eq(subscriptions.providerSubscriptionId, invoice.subscriptionId))
@@ -247,7 +252,10 @@ export class PaymentRenewalRepository {
         revenueUsdCents,
         logger,
         locale,
-        productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale).credits,
+        getTierCredits(
+          (subscription ? getTierProductForPlan(subscription.planId) : null) ??
+            ProductIds.SUBSCRIPTION,
+        ),
       );
       if (!payout.success) {
         return payout;

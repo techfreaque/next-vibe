@@ -460,6 +460,20 @@ export const translations: typeof enTranslations = {
 
   // Error types
   errors: {
+    tierChange: {
+      notActive: "Twój plan nie jest aktywny. Zacznij nowy plan.",
+      cryptoNotSupported:
+        "Planów opłaconych kryptowalutą nie da się zmienić w trakcie okresu. Wybierz nowy plan, gdy ten się skończy.",
+      paymentRequired:
+        "Bank chce potwierdzenia ulepszenia. Otwórz fakturę, żeby je dokończyć: {{url}}",
+      failed: "Zmiana planu nie powiodła się: {{error}}",
+      upgraded:
+        "Ulepszono do {{plan}}. Dodaliśmy {{credits}} kredytów na ten okres.",
+      changed: "Zmieniono na {{plan}}.",
+      downgraded:
+        "Przejście na {{plan}} od następnego odnowienia. Do tego czasu zachowujesz obecne kredyty.",
+      unchanged: "Masz już ten plan.",
+    },
     validation: {
       title: "Błąd walidacji",
       description: "Nieprawidłowe parametry subskrypcji",
@@ -551,11 +565,11 @@ export const translations: typeof enTranslations = {
       headline: "Jesteś w środku. Bez filtrów, bez wykładów.",
       subject: "Twoja subskrypcja {{appName}} jest aktywna",
       previewText:
-        "{{privateName}}, jesteś live. {{subscriptionCredits}} creditów/miesiąc, {{modelCount}} modeli, zero ograniczeń.",
+        "{{privateName}}, jesteś live. {{subscriptionCredits}} kredytów/miesiąc, {{modelCount}} modeli, zero ograniczeń.",
       activeBadge: "Aktywna",
       greeting: "Hej {{privateName}},",
       intro:
-        "Twoja subskrypcja {{appName}} jest potwierdzona i gotowa. Masz {{subscriptionCredits}} creditów każdego miesiąca na wszystkie modele - bez dziennych limitów, bez filtrów treści, bez tłumaczenia się.",
+        "Twoja subskrypcja {{appName}} jest potwierdzona i gotowa. Masz {{subscriptionCredits}} kredytów co miesiąc na wszystkie modele. Bez dziennych limitów, bez filtrów treści, bez tłumaczenia się.",
       models: {
         title: "{{modelCount}} modeli, 3 kategorie",
         mainstream: "Główny nurt",
@@ -565,19 +579,19 @@ export const translations: typeof enTranslations = {
       included: {
         title: "Co dostajesz każdego miesiąca:",
         credits:
-          "{{subscriptionCredits}} creditów miesięcznie (automatyczne odnowienie)",
+          "{{subscriptionCredits}} kredytów miesięcznie (automatyczne odnowienie)",
         models: "Dostęp do wszystkich {{modelCount}} modeli AI",
-        nolimits: "Brak dziennych limitów - używaj creditów kiedy chcesz",
+        nolimits: "Bez dziennych limitów. Używasz kredytów, kiedy chcesz",
         uncensored: "Niecenzurowane modele bez filtrów treści",
         packs: "Kupuj dodatkowe pakiety creditów, które nigdy nie wygasają",
         cancel: "Anuluj w dowolnym momencie, bez pytań",
       },
       cta: "Zacznij rozmawiać",
       packs: {
-        title: "Potrzebujesz więcej creditów?",
+        title: "Potrzebujesz więcej kredytów?",
         description:
-          "Kupuj pakiety kredytów kiedy chcesz, z subskrypcją lub bez: {{packPrice}} za {{packCredits}} kredytów. Nigdy nie wygasają i sumują się z miesięcznym przydziałem.",
-        cta: "Kup pakiet creditów",
+          "Kredyty kończą się przed odnowieniem? Doładuj kiedy chcesz: {{packPrice}} za {{packCredits}} kredytów. Pakiety nigdy nie wygasają i dochodzą do miesięcznych kredytów.",
+        cta: "Kup pakiet kredytów",
       },
       manage: "Zarządzaj lub anuluj subskrypcję w dowolnym momencie w",
       manageLink: "ustawieniach konta",
@@ -701,11 +715,10 @@ export const translations: typeof enTranslations = {
   // Enum translations
   enums: {
     plan: {
-      subscription: "Subskrypcja",
-      starter: "Starter",
-      professional: "Professional",
-      premium: "Premium",
-      enterprise: "Enterprise",
+      subscription: "Starter",
+      plus: "Plus",
+      pro: "Pro",
+      ultra: "Ultra",
     },
     status: {
       incomplete: "Niekompletny",
@@ -739,43 +752,91 @@ export const translations: typeof enTranslations = {
   quickCheckout: {
     pack: {
       title: "{{credits}} kredytów",
-      note: "Jednorazowo. Nigdy nie wygasają.",
+      note: "Jednorazowe doładowanie. Nigdy nie wygasają.",
       aria: "Kup {{credits}} kredytów za {{price}}, jednorazowo",
     },
     plan: {
-      title: "{{credits}} kredytów co miesiąc",
-      note: "Plan miesięczny. Anulujesz kiedy chcesz.",
+      title: "{{credits}} kredytów / mies.",
+      note: "{{plan}}. Anulujesz kiedy chcesz.",
       perMonth: "/mies.",
-      aria: "Subskrybuj: {{credits}} kredytów co miesiąc za {{price}}",
+      aria: "Włącz {{plan}}: {{credits}} kredytów co miesiąc za {{price}}",
+    },
+    upgrade: {
+      title: "Przejdź na {{plan}}",
+      note: "{{credits}} kredytów / mies.",
+      aria: "Przejdź na {{plan}}: {{credits}} kredytów co miesiąc za {{price}}",
+      confirm:
+        "Teraz płacisz różnicę za resztę tego okresu. Dodatkowe kredyty wpadają od razu.",
+      confirmButton: "Przejdź teraz",
+      cancel: "Anuluj",
+      working: "Zmieniam...",
     },
     opening: "Otwieram płatność...",
-    secure: "Płatność kartą przez Stripe.",
+    secure: "Karta, PayPal, Apple Pay, Google Pay przez Stripe.",
+    allPlans: "Wszystkie plany i krypto",
     moreOptions: "Krypto i inne opcje",
     error: "Nie udało się otworzyć płatności. Spróbuj ponownie.",
   },
+  tiers: {
+    heading: "Wybierz plan",
+    subheading:
+      "Świeże kredyty co miesiąc i dostęp do {{modelCount}} modeli AI. Anulujesz kiedy chcesz.",
+    changeHeading: "Zmień plan",
+    changeSubheading: "Masz plan {{plan}}: {{credits}} kredytów miesięcznie.",
+    recommended: "Polecany",
+    current: "Twój plan",
+    perMonth: "/ mies.",
+    perYear: "/ rok",
+    creditsPerMonth: "kredytów / mies.",
+    yearlyEquivalent: "{{monthlyPrice}} / mies. przy płatności rocznej",
+    picked: "{{plan}}: {{credits}} kredytów co miesiąc",
+    pickedNote:
+      "Dostęp do {{modelCount}} modeli AI. Kredyty odnawiane co miesiąc. Anulujesz kiedy chcesz.",
+    cta: {
+      start: "Włącz {{plan}}",
+      upgrade: "Przejdź na {{plan}}",
+      downgrade: "Przejdź na {{plan}} przy odnowieniu",
+      intervalYearly: "Przejdź na płatność roczną",
+      intervalMonthly: "Przejdź na {{plan}} miesięcznie",
+      current: "Twój obecny plan",
+    },
+    signInHint: "Załóż darmowe konto, żeby włączyć plan.",
+    cryptoHint:
+      "Płacisz krypto? Plus, Pro i Ultra co miesiąc lub rocznie, Starter rocznie.",
+    confirm: {
+      upgradeTitle: "Przejść na {{plan}}?",
+      upgradeBody:
+        "Teraz płacisz różnicę za resztę tego okresu, a dodatkowe kredyty wpadają od razu. Od następnego odnowienia: {{price}} miesięcznie za {{credits}} kredytów.",
+      upgradeButton: "Zapłać i przejdź",
+      downgradeTitle: "Przejść na {{plan}}?",
+      downgradeBody:
+        "Zmiana wchodzi przy następnym odnowieniu, {{date}}. Do tego czasu zostajesz przy obecnym planie i kredytach. Potem: {{price}} miesięcznie za {{credits}} kredytów.",
+      downgradeButton: "Zmień przy odnowieniu",
+      intervalTitle: "Zmienić rozliczenie?",
+      intervalBody:
+        "Okres rozliczeniowy zaczyna się dziś od nowa, a Stripe rozlicza proporcjonalną różnicę. Nowy plan: {{plan}}, {{price}}{{period}}, {{credits}} kredytów miesięcznie.",
+      intervalButton: "Zmień rozliczenie",
+      cancel: "Nie teraz",
+      working: "Zmieniam...",
+    },
+    packsLocked: {
+      title: "Pakiety kredytów: {{price}} za {{credits}} kredytów",
+      body: "Pakiety doładowują aktywny plan. Najpierw włącz plan, potem dokupuj pakiety, kiedy zabraknie. Nigdy nie wygasają.",
+    },
+    topUp: {
+      heading: "Doładuj",
+      subheading:
+        "Kredyty kończą się przed odnowieniem? Pakiety dochodzą do planu i nigdy nie wygasają.",
+    },
+  },
   buy: {
     provider: {
-      stripe: "Karta kredytowa / debetowa",
-      stripeDescription: "Zapłać bezpiecznie przez Stripe",
+      stripe: "Karta, PayPal i portfele",
+      stripeDescription: "Karta, PayPal, Apple Pay, Google Pay przez Stripe",
       nowpayments: "Krypto (NowPayments)",
       nowpaymentsDescription: "Zapłać Bitcoinem, Ethereum i innymi",
       cryptoMonthlyDisabled:
-        "Płatności krypto są dostępne tylko dla subskrypcji rocznych",
-    },
-    subscription: {
-      title: "Subskrypcja",
-      description:
-        "{{subCredits}} creditów/miesiąc dla {{modelCount}} modeli AI",
-      perYear: "/ rok",
-      perMonth: "/ miesiąc",
-      yearlyEquivalent: "{{monthlyPrice}} / miesiąc przy rozliczeniu rocznym",
-      button: "Subskrybuj teraz",
-      buttonAlreadySubscribed: "Masz już aktywną subskrypcję",
-      features: {
-        credits: "{{count}} creditów miesięcznie",
-        expiry: "Dostęp do {{modelCount}} modeli AI",
-        bestFor: "Najlepszy do regularnego użycia",
-      },
+        "Starter za krypto tylko rocznie. Plus, Pro i Ultra opłacisz krypto także co miesiąc.",
     },
     login: "Zaloguj się",
     signup: "Zarejestruj się za darmo",

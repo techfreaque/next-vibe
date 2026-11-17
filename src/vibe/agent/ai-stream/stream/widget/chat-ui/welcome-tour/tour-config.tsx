@@ -1,5 +1,4 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { formatCurrency } from "next-vibe/core/i18n/core/localization-utils";
 import { Div } from "next-vibe/ui/components/div";
 import type { Step } from "next-vibe/ui/components/joyride";
 import { Li } from "next-vibe/ui/components/li";
@@ -14,7 +13,7 @@ import {
   FREE_CREDIT_MAX_TOTAL,
   FREE_CREDIT_SIGNED_IN_TOTAL,
 } from "@/products/constants";
-import { ProductIds, productsRepository } from "@/products/repository-client";
+import { getPricingParams } from "@/products/repository-client";
 
 import { DEFAULT_FOLDER_CONFIGS } from "../../../../../chat/config";
 import type { ThreadsWidgetT } from "../../../../../chat/threads/widget/i18n";
@@ -141,7 +140,7 @@ export const getTourSteps = (
   totalModelCount = 0,
 ): TourStepConfig[] => {
   const appName = t("config.appName");
-  const sub = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale);
+  const pricing = getPricingParams(locale);
 
   return [
     // Step 1: Welcome
@@ -433,8 +432,9 @@ export const getTourSteps = (
           </H3>
           <P className="text-sm">
             {t("components.welcomeTour.subscriptionButton.description", {
-              credits: String(sub.credits),
-              price: formatCurrency(sub.price, sub.currency, locale),
+              credits: pricing.subscriptionCredits,
+              price: pricing.planPriceMin,
+              maxCredits: pricing.planCreditsMax,
               freeCredits: String(FREE_CREDIT_SIGNED_IN_TOTAL),
               freeCreditsMax: String(FREE_CREDIT_MAX_TOTAL),
             })}

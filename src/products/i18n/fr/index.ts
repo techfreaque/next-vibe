@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
 
   // Product summary (single source of truth)
   summary:
-    "Nous proposons une formule gratuite (sans compte : {{freeCredits}} crédits/mois, avec un compte gratuit : {{freeCreditsSignedIn}}, compte + newsletter : {{freeCreditsMax}}), un abonnement mensuel ({{subPrice}} {{subCurrency}}/mois pour {{subCredits}} crédits) et des packs de crédits ({{packPrice}} {{packCurrency}} pour {{packCredits}} crédits) que tout le monde peut acheter sans abonnement.",
+    "Nous proposons une formule gratuite (sans compte : {{freeCredits}} crédits/mois, avec un compte gratuit : {{freeCreditsSignedIn}}, compte + newsletter : {{freeCreditsMax}}) et quatre formules mensuelles : {{subPrice}} pour {{subCredits}} crédits, {{plusPrice}} pour {{plusCredits}}, {{proPrice}} pour {{proCredits}} et {{ultraPrice}} pour {{ultraCredits}}. Les abonnés rechargent quand ils veulent avec des packs de crédits ({{packPrice}} pour {{packCredits}} crédits) qui n'expirent jamais.",
 
   // Free tier product
   free: {
@@ -25,7 +25,7 @@ export const translations: typeof enTranslations = {
 
   // Subscription product
   subscription: {
-    name: "Abonnement mensuel",
+    name: "Starter",
     description:
       "{{subCredits}} crédits par mois, {{modelCount}} modèles d'IA inclus",
     longDescription:
@@ -40,13 +40,23 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  // Higher subscription tiers (credits and prices come from config)
+  subscriptionPlus: {
+    name: "Plus",
+  },
+  subscriptionPro: {
+    name: "Pro",
+  },
+  subscriptionUltra: {
+    name: "Ultra",
+  },
+
   // Credit pack product
   creditPack: {
     name: "Pack de crédits",
-    description:
-      "Payez à l'usage. Sans abonnement. Les crédits n'expirent jamais.",
+    description: "Rechargez votre formule. Les crédits n'expirent jamais.",
     longDescription:
-      "Achetez des crédits quand vous en avez besoin. Aucun abonnement requis. Cumulez les packs avec une formule ou utilisez-les seuls.",
+      "Plus assez de crédits avant le renouvellement ? Ajoutez un pack. Les packs s'ajoutent à vos crédits mensuels et n'expirent jamais.",
     features: {
       credits: "{{packCredits}} crédits par pack",
       allModels: "Les {{modelCount}} modèles d'IA inclus",

@@ -4,6 +4,7 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import { languageConfig } from "next-vibe/core/i18n";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { db } from "next-vibe/database";
 import { VibeMode } from "next-vibe/env/env-util";
@@ -14,7 +15,13 @@ import {
   FREE_CREDIT_MAX_TOTAL,
   FREE_CREDIT_SIGNED_IN_TOTAL,
 } from "@/products/constants";
-import { ProductIds, productsRepository } from "@/products/repository-client";
+import { scopedTranslation as productsScopedTranslation } from "@/products/i18n";
+import {
+  getPricingParams,
+  getSubscriptionTiers,
+  ProductIds,
+  productsRepository,
+} from "@/products/repository-client";
 
 import { DefaultFolderId } from "../../../core/execution-context";
 import { FOLDER_BLOCKED_CALLBACK_MODES } from "../../chat/config";
@@ -66,14 +73,26 @@ function buildHeadlessFolderNote(rootFolderId: DefaultFolderId): string {
   }
 }
 
-function currencySymbol(currency: string): string {
-  if (currency === "EUR") {
-    return "€";
-  }
-  if (currency === "PLN") {
-    return "zł";
-  }
-  return "$";
+/**
+ * Plan + pack lines for the prompt, priced for the locale. Packs are a top-up
+ * for subscribers only; the plan list is every active tier, cheapest first.
+ */
+function buildPricingLabels(locale: CountryLanguage): {
+  plans: string;
+  pack: string;
+} {
+  const { t: productT } = productsScopedTranslation.scopedT(locale);
+  const pricing = getPricingParams(locale);
+  const plans = getSubscriptionTiers(locale)
+    .map(
+      (tier) =>
+        `${productT(tier.name)} ${tier.priceLabel}/month → ${tier.creditsLabel} credits`,
+    )
+    .join(", ");
+  return {
+    plans,
+    pack: `${pricing.packPrice} → ${pricing.packCredits} permanent credits (top-up, needs an active plan)`,
+  };
 }
 
 function buildMediaLine(opts: {
@@ -216,16 +235,7 @@ export const platformOverviewFragment: SystemPromptFragment = {
       ProductIds.FREE_TIER,
       locale,
     ).credits;
-    const subscriptionProduct = productsRepository.getProduct(
-      ProductIds.SUBSCRIPTION,
-      locale,
-    );
-    const creditPackProduct = productsRepository.getProduct(
-      ProductIds.CREDIT_PACK,
-      locale,
-    );
-    const subLabel = `${currencySymbol(subscriptionProduct.currency)}${subscriptionProduct.price}/month → ${subscriptionProduct.credits} credits`;
-    const packLabel = `${currencySymbol(creditPackProduct.currency)}${creditPackProduct.price} → ${creditPackProduct.credits} permanent credits`;
+    const { plans: plansLabel, pack: packLabel } = buildPricingLabels(locale);
     const totalModelCount = getAvailableChatModelCount(
       isAdmin,
       await getEnvAvailability(),
@@ -237,7 +247,7 @@ export const platformOverviewFragment: SystemPromptFragment = {
         ? `- **Credits:** 1 credit = $0.01. Cost varies by model.`
         : `- **Credits:** 1 credit = $0.01. Cost varies by model.
 - **Free tier (monthly):** no account: ${freeTierCredits} (via browser ID). Free account: ${FREE_CREDIT_SIGNED_IN_TOTAL}. Account + confirmed newsletter subscription: ${FREE_CREDIT_MAX_TOTAL}. Guests never get the newsletter bonus.
-- **Subscription:** ${subLabel}. **Credit packs:** ${packLabel}.`;
+- **Plans (monthly):** ${plansLabel}. **Credit packs:** ${packLabel}.`;
 
     return `## ${appName}
 
@@ -572,16 +582,7 @@ export const bootstrapFragment: SystemPromptFragment = {
       ProductIds.FREE_TIER,
       locale,
     ).credits;
-    const subscriptionProduct = productsRepository.getProduct(
-      ProductIds.SUBSCRIPTION,
-      locale,
-    );
-    const creditPackProduct = productsRepository.getProduct(
-      ProductIds.CREDIT_PACK,
-      locale,
-    );
-    const subLabel = `${currencySymbol(subscriptionProduct.currency)}${subscriptionProduct.price}/month → ${subscriptionProduct.credits} credits`;
-    const packLabel = `${currencySymbol(creditPackProduct.currency)}${creditPackProduct.price} → ${creditPackProduct.credits} permanent credits`;
+    const { plans: plansLabel, pack: packLabel } = buildPricingLabels(locale);
 
     const userType = isAdmin ? "admin" : isPublicUser ? "public" : "user";
 
@@ -610,8 +611,8 @@ You're chatting as a guest - no account required. You have **${freeTierCredits} 
 - The ability to purchase credits or subscribe
 
 **When you're ready:**
-- **Subscription:** ${subLabel} - best value for regular use
-- **Credit pack:** ${packLabel} - permanent credits, pay once
+- **Plans:** ${plansLabel}. Starter covers regular use; the bigger plans are for heavy use.
+- **Credit pack:** ${packLabel}. Only subscribers can buy packs.
 
 Creating an account is free. No credit card needed until you choose to upgrade.`;
     }
@@ -672,16 +673,7 @@ export const guestContextFragment: SystemPromptFragment = {
       ProductIds.FREE_TIER,
       locale,
     ).credits;
-    const subscriptionProduct = productsRepository.getProduct(
-      ProductIds.SUBSCRIPTION,
-      locale,
-    );
-    const creditPackProduct = productsRepository.getProduct(
-      ProductIds.CREDIT_PACK,
-      locale,
-    );
-    const subLabel = `${currencySymbol(subscriptionProduct.currency)}${subscriptionProduct.price}/month → ${subscriptionProduct.credits} credits`;
-    const packLabel = `${currencySymbol(creditPackProduct.currency)}${creditPackProduct.price} → ${creditPackProduct.credits} permanent credits`;
+    const { plans: plansLabel } = buildPricingLabels(locale);
 
     if (vibeMode === VibeMode.AGENT) {
       if (isIncognito) {
@@ -723,7 +715,7 @@ This user has **no account** - they browse as a guest identified by a browser ID
 - They have **${freeTierCredits} free credits/month** shared across all their devices. A few messages with a standard model exhausts this quota. A free account gets ${FREE_CREDIT_SIGNED_IN_TOTAL}/month; account + confirmed newsletter subscription gets ${FREE_CREDIT_MAX_TOTAL}/month (guests get no newsletter bonus).
 - **Cortex is not available** without an account - no memories, tasks, or persistent context across sessions.
 - Once credits are gone they must **create an account** to purchase more - they cannot buy credits or subscribe as a guest.
-- If credits run low or they ask about remembering things, mention the subscription (${subLabel}) or a credit pack (${packLabel}) - and that creating an account is free.
+- If credits run low or they ask about remembering things, mention the plans (${plansLabel}) and that creating an account is free. Credit packs are only a top-up for subscribers, never offer them as the way in.
 - Favour concise responses unless detail is truly needed - it makes their credits go further.`;
   },
 };

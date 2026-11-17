@@ -59,7 +59,7 @@ export const translations: typeof enTranslations = {
   expectations: {
     title: "Des attentes réalistes, sans battage",
     p1: "Le calcul honnête :",
-    scenario1Label: "Abonné à la formule",
+    scenario1Label: "Abonné Starter",
     scenario1Spend: "Formule à {{planPrice}}/mois",
     scenario1Earn: "= {{planEarn}}/mois par filleul",
     scenario2Label: "Gros utilisateur (agents, API, image et vidéo)",
@@ -68,7 +68,7 @@ export const translations: typeof enTranslations = {
     scenario2Earn: "= {{powerEarn}}/mois par filleul",
     note: "Un seul gros utilisateur vous rapporte autant que {{powerVsPlan}} abonnés à la formule. Les développeurs qui font tourner des agents et l'API consomment beaucoup de crédits et résilient rarement. Ce sont eux, la cible à forte valeur.",
     example:
-      "Parrainez 10 abonnés à la formule : {{tenPlanEarn}}/mois pour vous. Ça ne change pas une vie. Mais c'est de l'argent gagné en disant ce que vous auriez dit de toute façon.",
+      "Parrainez 10 abonnés Starter : {{tenPlanEarn}}/mois pour vous. Ça ne change pas une vie. Mais c'est de l'argent gagné en disant ce que vous auriez dit de toute façon.",
   },
   firststeps: {
     title: "Vos premiers pas (5 minutes)",

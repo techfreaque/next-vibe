@@ -90,8 +90,9 @@ export function CreditsBalanceContainer(): JSX.Element {
       description: tSub(
         "subscription.overview.howItWorks.expiring.description",
         {
-          subPrice: pricing.subscriptionPrice,
-          subCredits: subscriptionProduct.credits,
+          minPrice: pricing.planPriceMin,
+          maxPrice: pricing.planPriceMax,
+          maxCredits: pricing.planCreditsMax,
           modelCount: totalModelCount,
         },
       ),
@@ -106,7 +107,6 @@ export function CreditsBalanceContainer(): JSX.Element {
         {
           packPrice: pricing.packPrice,
           packCredits: packProduct.credits,
-          subCredits: subscriptionProduct.credits,
         },
       ),
     },

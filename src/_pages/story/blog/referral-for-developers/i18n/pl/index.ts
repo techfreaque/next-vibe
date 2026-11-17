@@ -44,25 +44,25 @@ export const translations: typeof enTranslations = {
     tableHeaderSkill: "Inni udostępniają Twój skill (5%)",
     rows: [
       {
-        profile: "Subskrybent planu",
+        profile: "Subskrybent Startera",
         spend: "{{planPrice}}/mies.",
         direct: "{{planEarn}}/mies.",
         skill: "{{planSkillEarn}}/mies.",
       },
       {
-        profile: "Plan + 1 pakiet kredytów",
+        profile: "Starter + 1 pakiet kredytów",
         spend: "{{plusPackSpend}}/mies.",
         direct: "{{plusPackEarn}}/mies.",
         skill: "{{plusPackSkillEarn}}/mies.",
       },
       {
-        profile: "Intensywny użytkownik: plan + {{heavyPacks}} pakiety",
+        profile: "Intensywny użytkownik: Starter + {{heavyPacks}} pakiety",
         spend: "{{heavySpend}}/mies.",
         direct: "{{heavyEarn}}/mies.",
         skill: "{{heavySkillEarn}}/mies.",
       },
       {
-        profile: "Power user: plan + {{powerPacks}} pakietów",
+        profile: "Power user: Starter + {{powerPacks}} pakietów",
         spend: "{{powerSpend}}/mies.",
         direct: "{{powerEarn}}/mies.",
         skill: "{{powerSkillEarn}}/mies.",
@@ -86,7 +86,7 @@ export const translations: typeof enTranslations = {
   },
   crypto: {
     title: "Wypłata w krypto - nie potrzeba konta bankowego",
-    p1: "Wypłata w BTC lub USDC. Przetwarzanie w ciągu 48 godzin po zatwierdzeniu. Minimalna wypłata: {{minPayout}}. To około {{payoutPowerMonths}} miesiące z jednym power userem albo {{payoutPlanMonths}} miesięcy subskrypcji planu.",
+    p1: "Wypłata w BTC lub USDC. Przetwarzanie w ciągu 48 godzin po zatwierdzeniu. Minimalna wypłata: {{minPayout}}. To około {{payoutPowerMonths}} miesiące z jednym power userem albo {{payoutPlanMonths}} miesięcy subskrypcji Startera.",
     p2: "Albo natychmiast zamień zarobki na kredyty platformy. Jeśli sam/a używasz {{appName}}, zarobki z poleceń kompensują Twoje własne koszty.",
   },
   close: {

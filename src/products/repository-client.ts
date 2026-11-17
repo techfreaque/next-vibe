@@ -9,7 +9,6 @@ import type {
   Currencies,
 } from "next-vibe/core/i18n/core/config";
 import { getCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
-import type { JSX } from "react";
 
 import type { SubscriptionPlanValue } from "@/subscription/enum";
 import { SubscriptionPlan } from "@/subscription/enum";
@@ -31,7 +30,8 @@ import type { ProductsTranslationKey } from "./i18n";
 
 /**
  * Credit Value Definition
- * 1 credit = €0.01 = $0.01 (PL pack: 40 zł / 500 credits = 0.08 zł)
+ * 1 credit = €0.01 = $0.01. PLN converts every price at 3.75 zł per $/€
+ * (8 -> 30 zł, rounded to whole złoty): pack 19 zł / 500 credits.
  */
 export const CREDIT_VALUE_USD = 0.01;
 
@@ -173,17 +173,78 @@ export interface Product {
 
 export enum ProductIds {
   FREE_TIER = "free_tier",
+  /** Starter plan ($8/month). Keeps its original id: existing subscribers. */
   SUBSCRIPTION = "subscription",
+  SUBSCRIPTION_PLUS = "subscription_plus",
+  SUBSCRIPTION_PRO = "subscription_pro",
+  SUBSCRIPTION_ULTRA = "subscription_ultra",
   CREDIT_PACK = "credit_pack",
   CREDIT_PACK_LARGE = "credit_pack_large",
 }
 
 /**
- * Credit pack products a user can buy (one-time, no subscription required).
- * Ordered small to large. Retired packs stay in ProductIds (old purchases and
- * ledger rows reference them) but are left out of this list.
+ * Credit pack products a user can buy (one-time top-up, requires an active
+ * plan). Ordered small to large. Retired packs stay in ProductIds (old
+ * purchases and ledger rows reference them) but are left out of this list.
  */
 export const CREDIT_PACK_PRODUCT_IDS = [ProductIds.CREDIT_PACK] as const;
+
+/**
+ * Subscription tiers, cheapest first. Each tier is one product and one
+ * SubscriptionPlan value; the plan is what the subscription row stores.
+ * Higher tiers carry more credits per dollar; that bonus lives only in the
+ * credit numbers below and is never advertised as a percentage.
+ */
+export const SUBSCRIPTION_TIER_PRODUCT_IDS = [
+  ProductIds.SUBSCRIPTION,
+  ProductIds.SUBSCRIPTION_PLUS,
+  ProductIds.SUBSCRIPTION_PRO,
+  ProductIds.SUBSCRIPTION_ULTRA,
+] as const;
+
+export type SubscriptionTierProductId =
+  (typeof SUBSCRIPTION_TIER_PRODUCT_IDS)[number];
+
+/** Plan value stored on the subscription row, per tier product. */
+const TIER_PLAN_BY_PRODUCT: Record<
+  SubscriptionTierProductId,
+  typeof SubscriptionPlanValue
+> = {
+  [ProductIds.SUBSCRIPTION]: SubscriptionPlan.SUBSCRIPTION,
+  [ProductIds.SUBSCRIPTION_PLUS]: SubscriptionPlan.PLUS,
+  [ProductIds.SUBSCRIPTION_PRO]: SubscriptionPlan.PRO,
+  [ProductIds.SUBSCRIPTION_ULTRA]: SubscriptionPlan.ULTRA,
+};
+
+export function isSubscriptionTierProductId(
+  productId: string,
+): productId is SubscriptionTierProductId {
+  return SUBSCRIPTION_TIER_PRODUCT_IDS.some((id) => id === productId);
+}
+
+/** Plan value for a tier product. */
+export function getPlanForTierProduct(
+  productId: SubscriptionTierProductId,
+): typeof SubscriptionPlanValue {
+  return TIER_PLAN_BY_PRODUCT[productId];
+}
+
+/**
+ * Tier product for a stored plan id. Accepts the legacy prefixed values
+ * ('app.api.subscription.enums.plan.subscription') still found in old rows.
+ * Unknown plan ids return null.
+ */
+export function getTierProductForPlan(
+  planId: string,
+): SubscriptionTierProductId | null {
+  for (const productId of SUBSCRIPTION_TIER_PRODUCT_IDS) {
+    const plan = TIER_PLAN_BY_PRODUCT[productId];
+    if (planId === plan || planId.endsWith(`.${plan}`)) {
+      return productId;
+    }
+  }
+  return null;
+}
 
 /**
  * Internal product definitions with pricing for all countries
@@ -226,6 +287,73 @@ const productDefinitions: Record<ProductIds, ProductDefinition> = {
     allowedIntervals: ["month" as const, "year" as const],
     status: "active" as const,
   },
+  // PLN: every price x3.75 (8 USD = 30 zł), whole złoty. Yearly = 11 months.
+  subscription_plus: {
+    name: "subscriptionPlus.name",
+    description: "subscription.description",
+    priceByCountry: {
+      DE: { price: 20, currency: "EUR" as const },
+      FR: { price: 20, currency: "EUR" as const },
+      PL: { price: 75, currency: "PLN" as const },
+      US: { price: 20, currency: "USD" as const },
+      GLOBAL: { price: 20, currency: "USD" as const },
+    },
+    yearlyPriceByCountry: {
+      DE: { price: 220, currency: "EUR" as const },
+      FR: { price: 220, currency: "EUR" as const },
+      PL: { price: 825, currency: "PLN" as const },
+      US: { price: 220, currency: "USD" as const },
+      GLOBAL: { price: 220, currency: "USD" as const },
+    },
+    credits: 2050,
+    isSubscription: true,
+    allowedIntervals: ["month" as const, "year" as const],
+    status: "active" as const,
+  },
+  subscription_pro: {
+    name: "subscriptionPro.name",
+    description: "subscription.description",
+    priceByCountry: {
+      DE: { price: 100, currency: "EUR" as const },
+      FR: { price: 100, currency: "EUR" as const },
+      PL: { price: 375, currency: "PLN" as const },
+      US: { price: 100, currency: "USD" as const },
+      GLOBAL: { price: 100, currency: "USD" as const },
+    },
+    yearlyPriceByCountry: {
+      DE: { price: 1100, currency: "EUR" as const },
+      FR: { price: 1100, currency: "EUR" as const },
+      PL: { price: 4125, currency: "PLN" as const },
+      US: { price: 1100, currency: "USD" as const },
+      GLOBAL: { price: 1100, currency: "USD" as const },
+    },
+    credits: 10500,
+    isSubscription: true,
+    allowedIntervals: ["month" as const, "year" as const],
+    status: "active" as const,
+  },
+  subscription_ultra: {
+    name: "subscriptionUltra.name",
+    description: "subscription.description",
+    priceByCountry: {
+      DE: { price: 200, currency: "EUR" as const },
+      FR: { price: 200, currency: "EUR" as const },
+      PL: { price: 750, currency: "PLN" as const },
+      US: { price: 200, currency: "USD" as const },
+      GLOBAL: { price: 200, currency: "USD" as const },
+    },
+    yearlyPriceByCountry: {
+      DE: { price: 2200, currency: "EUR" as const },
+      FR: { price: 2200, currency: "EUR" as const },
+      PL: { price: 8250, currency: "PLN" as const },
+      US: { price: 2200, currency: "USD" as const },
+      GLOBAL: { price: 2200, currency: "USD" as const },
+    },
+    credits: 22000,
+    isSubscription: true,
+    allowedIntervals: ["month" as const, "year" as const],
+    status: "active" as const,
+  },
   credit_pack: {
     name: "creditPack.name",
     description: "creditPack.description",
@@ -234,14 +362,14 @@ const productDefinitions: Record<ProductIds, ProductDefinition> = {
     priceByCountry: {
       DE: { price: 5, currency: "EUR" as const },
       FR: { price: 5, currency: "EUR" as const },
-      PL: { price: 40, currency: "PLN" as const },
+      PL: { price: 19, currency: "PLN" as const },
       US: { price: 5, currency: "USD" as const },
       GLOBAL: { price: 5, currency: "USD" as const },
     },
     oneTimePriceByCountry: {
       DE: { price: 5, currency: "EUR" as const },
       FR: { price: 5, currency: "EUR" as const },
-      PL: { price: 40, currency: "PLN" as const },
+      PL: { price: 19, currency: "PLN" as const },
       US: { price: 5, currency: "USD" as const },
       GLOBAL: { price: 5, currency: "USD" as const },
     },
@@ -381,6 +509,18 @@ export class ProductsRepositoryImpl implements ProductsRepository {
         ProductIds.SUBSCRIPTION,
         locale,
       ),
+      [ProductIds.SUBSCRIPTION_PLUS]: this.getProduct(
+        ProductIds.SUBSCRIPTION_PLUS,
+        locale,
+      ),
+      [ProductIds.SUBSCRIPTION_PRO]: this.getProduct(
+        ProductIds.SUBSCRIPTION_PRO,
+        locale,
+      ),
+      [ProductIds.SUBSCRIPTION_ULTRA]: this.getProduct(
+        ProductIds.SUBSCRIPTION_ULTRA,
+        locale,
+      ),
       [ProductIds.CREDIT_PACK]: this.getProduct(
         ProductIds.CREDIT_PACK,
         locale,
@@ -426,42 +566,26 @@ export class ProductsRepositoryImpl implements ProductsRepository {
   /**
    * Get a summary of all products in a single sentence
    * Single source of truth for product summary text
-   * Example: "We offer Free (20/40/90 credits/month by tier), Credit Packs (€5/500 credits), and Unlimited (€10/month) plans."
    */
   getProductsSummary(
     locale: CountryLanguage,
     t: (key: string, params?: Record<string, string | number>) => string,
   ): string {
-    const country = getCountryFromLocale(locale);
-
-    const freeTier = productDefinitions[ProductIds.FREE_TIER];
-    const subscription = productDefinitions[ProductIds.SUBSCRIPTION];
-    const creditPack = productDefinitions[ProductIds.CREDIT_PACK];
-
-    const subPrice = subscription.priceByCountry[country].price;
-    const subCurrency = subscription.priceByCountry[country].currency;
-    // Packs are one-time purchases: checkout charges oneTimePriceByCountry
-    const packPriceData = (
-      creditPack.oneTimePriceByCountry ?? creditPack.priceByCountry
-    )[country];
-    const packPrice = packPriceData.price;
-    const packCurrency = packPriceData.currency;
-
-    const subCurrencySymbol =
-      subCurrency === "EUR" ? "€" : subCurrency === "PLN" ? "zł" : "$";
-    const packCurrencySymbol =
-      packCurrency === "EUR" ? "€" : packCurrency === "PLN" ? "zł" : "$";
-
+    const params = getPricingParams(locale);
     return t("summary", {
-      freeCredits: freeTier.credits,
-      freeCreditsSignedIn: FREE_CREDIT_SIGNED_IN_TOTAL,
-      freeCreditsMax: FREE_CREDIT_MAX_TOTAL,
-      packCurrency: packCurrencySymbol,
-      packPrice: packPrice,
-      packCredits: creditPack.credits,
-      subCredits: subscription.credits,
-      subCurrency: subCurrencySymbol,
-      subPrice: subPrice,
+      freeCredits: params.freeCredits,
+      freeCreditsSignedIn: params.freeCreditsSignedIn,
+      freeCreditsMax: params.freeCreditsMax,
+      subPrice: params.subscriptionPrice,
+      subCredits: params.subscriptionCredits,
+      plusPrice: params.plusPrice,
+      plusCredits: params.plusCredits,
+      proPrice: params.proPrice,
+      proCredits: params.proCredits,
+      ultraPrice: params.ultraPrice,
+      ultraCredits: params.ultraCredits,
+      packPrice: params.packPrice,
+      packCredits: params.packCredits,
     });
   }
 }
@@ -473,7 +597,7 @@ function currencySymbol(c: string): string {
 }
 
 /**
- * "$5", "€8", "40 zł": the złoty sign follows the amount, and so does the
+ * "$5", "€8", "19 zł": the złoty sign follows the amount, and so does the
  * euro sign on French pages ("8 €").
  */
 function formatPriceLabel(
@@ -509,6 +633,16 @@ export function getPricingParams(
     country
   ];
 
+  const tierParams = getSubscriptionTiers(locale);
+  const tierOf = (id: SubscriptionTierProductId): SubscriptionTier => {
+    const tier = tierParams.find((entry) => entry.productId === id);
+    // Every tier id is in SUBSCRIPTION_TIER_PRODUCT_IDS, so this always hits.
+    return tier ?? tierParams[0];
+  };
+  const plus = tierOf(ProductIds.SUBSCRIPTION_PLUS);
+  const pro = tierOf(ProductIds.SUBSCRIPTION_PRO);
+  const ultra = tierOf(ProductIds.SUBSCRIPTION_ULTRA);
+
   return {
     freeCredits: String(free.credits),
     freeCreditsGuest: String(FREE_CREDIT_ALLOWANCE.guest),
@@ -527,7 +661,84 @@ export function getPricingParams(
       packPriceData.currency,
       locale,
     ),
+    /** Cheapest plan price, e.g. "$8" (same as subscriptionPrice). */
+    planPriceMin: formatPriceLabel(
+      subPriceData.price,
+      subPriceData.currency,
+      locale,
+    ),
+    planPriceMax: ultra.priceLabel,
+    planCreditsMax: ultra.creditsLabel,
+    plusPrice: plus.priceLabel,
+    plusCredits: plus.creditsLabel,
+    proPrice: pro.priceLabel,
+    proCredits: pro.creditsLabel,
+    ultraPrice: ultra.priceLabel,
+    ultraCredits: ultra.creditsLabel,
   };
+}
+
+/**
+ * One subscription tier, priced for a locale. Every surface that lists plans
+ * (subscription page, out-of-credits card, pricing copy, llms.txt, JSON-LD)
+ * renders from this list.
+ */
+export interface SubscriptionTier {
+  productId: SubscriptionTierProductId;
+  planId: typeof SubscriptionPlanValue;
+  name: ProductsTranslationKey;
+  /** Monthly price in the locale's currency. */
+  price: number;
+  currency: Currencies;
+  /** "$8", "30 zł", "8 €" */
+  priceLabel: string;
+  /** Credits granted per month. */
+  credits: number;
+  /** "2,050" / "2.050" / "2 050" */
+  creditsLabel: string;
+  /** Yearly price where the tier sells yearly , else null. */
+  yearlyPrice: number | null;
+  yearlyPriceLabel: string | null;
+}
+
+function formatCreditsLabel(credits: number, locale: CountryLanguage): string {
+  return new Intl.NumberFormat(locale.split("-")[0]).format(credits);
+}
+
+/** All active subscription tiers for a locale, cheapest first. */
+export function getSubscriptionTiers(
+  locale: CountryLanguage,
+): SubscriptionTier[] {
+  const country = getCountryFromLocale(locale);
+  return SUBSCRIPTION_TIER_PRODUCT_IDS.filter(
+    (productId) => productDefinitions[productId].status === "active",
+  ).map((productId) => {
+    const def = productDefinitions[productId];
+    const monthly = def.priceByCountry[country];
+    const yearly =
+      def.allowedIntervals.includes("year") && def.yearlyPriceByCountry
+        ? def.yearlyPriceByCountry[country]
+        : null;
+    return {
+      productId,
+      planId: TIER_PLAN_BY_PRODUCT[productId],
+      name: def.name,
+      price: monthly.price,
+      currency: monthly.currency,
+      priceLabel: formatPriceLabel(monthly.price, monthly.currency, locale),
+      credits: def.credits,
+      creditsLabel: formatCreditsLabel(def.credits, locale),
+      yearlyPrice: yearly ? yearly.price : null,
+      yearlyPriceLabel: yearly
+        ? formatPriceLabel(yearly.price, yearly.currency, locale)
+        : null,
+    };
+  });
+}
+
+/** Monthly credits of a tier product. */
+export function getTierCredits(productId: SubscriptionTierProductId): number {
+  return productDefinitions[productId].credits;
 }
 
 /**
@@ -546,193 +757,3 @@ export function getUsdPriceCents(): {
     creditPack: Math.round(packPrices.US.price * 100),
   };
 }
-
-/**
- * ============================================================================
- * PRICING PLAN INTERFACES AND HELPERS
- * Replaces story/pricing/_components/pricing.tsx
- * ============================================================================
- */
-
-/**
- * Pricing plan interface for UI display
- * Contains all information needed to render pricing cards
- */
-export interface PricingPlan {
-  id: typeof SubscriptionPlanValue;
-  name: ProductsTranslationKey;
-  description: ProductsTranslationKey;
-  features: ProductsTranslationKey[];
-  premiumFeatures?: {
-    feature: ProductsTranslationKey;
-    className?: string;
-    icon: JSX.Element;
-  }[];
-  priceByCountry: {
-    [key in Countries]: {
-      monthly: number;
-      annual: number;
-      currency: Currencies;
-    };
-  };
-  pricing: ProductsTranslationKey;
-  cta: ProductsTranslationKey;
-  highlighted: boolean;
-  icon?: JSX.Element; // Optional - must be provided by client components
-  badge?: ProductsTranslationKey;
-}
-
-/**
- * Get price for a specific plan, country, and billing interval
- */
-export function getPlanPriceForCountry(
-  plan: PricingPlan,
-  country: Countries,
-  isAnnual: boolean,
-): number {
-  return isAnnual
-    ? plan.priceByCountry[country].annual
-    : plan.priceByCountry[country].monthly;
-}
-
-/**
- * Calculate average savings percentage when choosing annual over monthly billing
- */
-export function calculateSavingsPercent(locale: CountryLanguage): number {
-  const plans = getPricingPlansArray();
-  const country = getCountryFromLocale(locale);
-  let totalSavingsPercent = 0;
-  let validPlansCount = 0;
-
-  for (const plan of plans) {
-    const monthlyPrice = plan.priceByCountry[country].monthly;
-    const annualMonthlyPrice = plan.priceByCountry[country].annual;
-
-    if (monthlyPrice > 0 && annualMonthlyPrice > 0) {
-      const savings = monthlyPrice - annualMonthlyPrice;
-      const savingsPercent = (savings / monthlyPrice) * 100;
-
-      totalSavingsPercent += savingsPercent;
-      validPlansCount++;
-    }
-  }
-
-  return validPlansCount === 0
-    ? 0
-    : Math.round(totalSavingsPercent / validPlansCount);
-}
-
-/**
- * Build pricing plans with icon components
- * Note: Icons are lazy-loaded to avoid circular dependencies
- */
-function buildPricingPlans(
-  icon?: JSX.Element,
-): Record<typeof SubscriptionPlanValue, PricingPlan> {
-  const definitions = productsRepository.getProductDefinitions();
-  const subscriptionDef = definitions[ProductIds.SUBSCRIPTION];
-
-  // Helper to get price and currency for specific country and interval
-  const getPriceData = (
-    country: Countries,
-    interval: PaymentInterval,
-  ): { price: number; currency: Currencies } => {
-    if (interval === "year" && subscriptionDef.yearlyPriceByCountry) {
-      return subscriptionDef.yearlyPriceByCountry[country];
-    }
-    return subscriptionDef.priceByCountry[country];
-  };
-
-  return {
-    [SubscriptionPlan.SUBSCRIPTION]: {
-      id: SubscriptionPlan.SUBSCRIPTION,
-      name: subscriptionDef.name,
-      description: subscriptionDef.description,
-      features: [
-        "subscription.features.credits",
-        "subscription.features.allModels",
-        "subscription.features.allFeatures",
-        "subscription.features.cancel",
-      ],
-      priceByCountry: {
-        DE: {
-          monthly: getPriceData("DE", "month").price,
-          annual: getPriceData("DE", "year").price,
-          currency: getPriceData("DE", "month").currency,
-        },
-        FR: {
-          monthly: getPriceData("FR", "month").price,
-          annual: getPriceData("FR", "year").price,
-          currency: getPriceData("FR", "month").currency,
-        },
-        PL: {
-          monthly: getPriceData("PL", "month").price,
-          annual: getPriceData("PL", "year").price,
-          currency: getPriceData("PL", "month").currency,
-        },
-        US: {
-          monthly: getPriceData("US", "month").price,
-          annual: getPriceData("US", "year").price,
-          currency: getPriceData("US", "month").currency,
-        },
-        GLOBAL: {
-          monthly: getPriceData("GLOBAL", "month").price,
-          annual: getPriceData("GLOBAL", "year").price,
-          currency: getPriceData("GLOBAL", "month").currency,
-        },
-      },
-      pricing: "subscription.price",
-      cta: "subscription.cta",
-      highlighted: false,
-      icon: icon,
-    },
-  };
-}
-
-/**
- * Get all pricing plans for a locale as a record
- */
-export function getPricingPlans(
-  icon?: JSX.Element,
-): Record<typeof SubscriptionPlanValue, PricingPlan> {
-  return buildPricingPlans(icon);
-}
-
-/**
- * Get specific plan details by ID
- */
-export function getPlanDetails(
-  planId: typeof SubscriptionPlanValue,
-  icon?: JSX.Element,
-): PricingPlan {
-  return getPricingPlans(icon)[planId];
-}
-
-/**
- * Get all pricing plans as an array
- */
-export function getPricingPlansArray(icon?: JSX.Element): PricingPlan[] {
-  return Object.values(getPricingPlans(icon));
-}
-
-/**
- * Pricing comparison feature interfaces
- */
-export interface PricingFeature {
-  name: ProductsTranslationKey;
-  [SubscriptionPlan.SUBSCRIPTION]: boolean;
-}
-
-export interface PricingTextFeature {
-  name: ProductsTranslationKey;
-  type: "text";
-  [SubscriptionPlan.SUBSCRIPTION]: ProductsTranslationKey;
-}
-
-export type PricingComparisonFeature = PricingFeature | PricingTextFeature;
-
-/**
- * Pricing comparison features data
- * Currently empty - add features as needed
- */
-export const pricingComparisonFeatures: PricingComparisonFeature[] = [];

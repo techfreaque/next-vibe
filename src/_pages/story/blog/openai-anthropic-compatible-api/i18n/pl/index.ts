@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     lead: "GPT od OpenAI, Claude od Anthropic, Gemini od Google. Trzy SDK, trzy klucze, trzy rachunki, trzy panele. Albo gorzej: twoje ulubione narzędzie mówi tylko jednym formatem, więc dostaje modele tylko jednego dostawcy.",
     p2: "{{appName}} daje {{modelCount}} modeli czatu z {{providerCount}} laboratoriów pod jednym kluczem i jednym saldem kredytów. Wołasz je w formacie OpenAI, Responses albo Anthropic. Te same modele na każdym endpoincie. Poniżej dokładnie: jak to działa, ile kosztuje i kiedy lepiej iść bezpośrednio do dostawcy albo do routera.",
     access:
-      "Na start: API wymaga płatnego konta. Odblokuje je dowolny plan ({{subPrice}} miesięcznie) albo jednorazowy pakiet kredytów ({{packPrice}}). Darmowe i bonusowe kredyty nie wystarczą.",
+      "Na start: API wymaga płatnego konta. Odblokuje je dowolny plan, od {{subPrice}} miesięcznie. Darmowe i bonusowe kredyty nie wystarczą.",
     accessLink: "Odblokuj API",
   },
   endpoints: {
@@ -136,9 +136,9 @@ export const translations: typeof enTranslations = {
     abort:
       "Przy streamingu zamknięcie połączenia zatrzymuje generowanie. Płacisz tylko za to, co się wykonało. Tak samo, gdy dostawca padnie w trakcie streamu.",
     chat: "Czat i API rozliczają się tak samo. OpenRouter rozkłada model na kilku dostawców, a niektórzy biorą więcej niż najtańszy, którego podajemy. Dlatego przy tych modelach cena na liście to szacunek, a usage.credits_charged to prawdziwa kwota. Gdy OpenRouter nie poda kosztu wywołania, liczymy cenę z listy.",
-    paid: "To samo saldo kredytów co w aplikacji czatu, które pokrywa tam też obrazy, wideo, muzykę, głos i wyszukiwanie w sieci. Samo API wymaga płatnego konta: aktywnej subskrypcji albo co najmniej jednego kupionego pakietu kredytów. Darmowe kredyty go nie odblokowują.",
-    sub: "Subskrypcja: {{subCredits}} kredytów miesięcznie za {{subPrice}}.",
-    pack: "Pakiet kredytów: {{packCredits}} kredytów za {{packPrice}}. Pakiety nigdy nie wygasają. Płacisz kartą albo kryptowalutą.",
+    paid: "To samo saldo kredytów co w aplikacji czatu, które pokrywa tam też obrazy, wideo, muzykę, głos i wyszukiwanie w sieci. Samo API wymaga płatnego konta: dowolnego planu. Darmowe kredyty go nie odblokowują.",
+    sub: "Plany miesięczne: cztery rozmiary, od {{subCredits}} kredytów za {{subPrice}}.",
+    pack: "Pakiety kredytów: doładowanie dla subskrybentów, {{packCredits}} kredytów za {{packPrice}}. Nigdy nie wygasają. Karta, PayPal albo krypto.",
     link: "Zobacz plany i ceny",
   },
   versus: {
@@ -206,7 +206,7 @@ export const translations: typeof enTranslations = {
     },
     free: {
       q: "Czy API ma darmowy plan?",
-      a: "Nie. Aplikacja czatu ma darmowe kredyty, API nie. Potrzebuje subskrypcji ({{subCredits}} kredytów miesięcznie za {{subPrice}}) albo jednego pakietu kredytów ({{packCredits}} kredytów za {{packPrice}}). Raz kupiony pakiet utrzymuje API aktywne, dopóki starczy salda.",
+      a: "Nie. Aplikacja czatu ma darmowe kredyty, API nie. Potrzebuje planu, od {{subCredits}} kredytów miesięcznie za {{subPrice}}. Subskrybenci dokupują pakiety kredytów ({{packCredits}} kredytów za {{packPrice}}), które nigdy nie wygasają.",
     },
     pricing: {
       q: "Czy płacę cenę z listy?",

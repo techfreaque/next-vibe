@@ -28,8 +28,8 @@ export const translations: typeof enTranslations = {
       label: "Wybierz metodę płatności",
       description: "Wybierz sposób płatności za pakiet kredytów",
       placeholder: "Wybierz dostawcę płatności",
-      stripe: "Karta kredytowa / debetowa",
-      stripeDescription: "Zapłać bezpiecznie przez Stripe",
+      stripe: "Karta, PayPal i portfele",
+      stripeDescription: "Karta, PayPal, Apple Pay, Google Pay przez Stripe",
       nowpayments: "Kryptowaluta",
       nowpaymentsDescription: "Zapłać Bitcoinem, Ethereum i innymi",
       cryptoMinimumDisabled:
@@ -50,8 +50,7 @@ export const translations: typeof enTranslations = {
     pack: {
       qtyCredits: "{{count}} kredytów",
       title: "Pakiet kredytów",
-      description:
-        "Płacisz za to, co zużyjesz. Bez subskrypcji. Karta lub krypto. Kredyty nie wygasają.",
+      description: "Doładowanie do planu. Kredyty nigdy nie wygasają.",
       perPack: "/ pakiet",
       features: {
         credits: "{{count}} kredytów w zestawie",
@@ -60,10 +59,15 @@ export const translations: typeof enTranslations = {
       },
       totalSummary:
         "{{totalCredits}} kredytów łącznie · {{totalPrice}} łącznie",
-      noSubscriptionNeeded: "Płacisz za to, co zużyjesz. Bez subskrypcji.",
+      planRequired: {
+        title: "Pakiety doładowują plan",
+        body: "Najpierw włącz plan, potem dokupuj pakiety, kiedy zabraknie. Plany od {{price}} miesięcznie.",
+        cta: "Zobacz plany",
+      },
       logIn: "Zaloguj się",
       signUp: "Załóż konto",
-      signInToBuy: "Załóż darmowe konto, żeby kupić kredyty. Karta lub krypto.",
+      signInToBuy:
+        "Pakiety doładowują plan. Załóż darmowe konto i najpierw włącz plan.",
     },
     submit: {
       text: "Kup pakiet kredytów",
@@ -83,6 +87,11 @@ export const translations: typeof enTranslations = {
       description: "Sesja płatności Stripe została pomyślnie utworzona",
     },
     errors: {
+      planRequired: {
+        title: "Wymagany plan",
+        description:
+          "Pakiety kredytów doładowują aktywny plan. Najpierw wybierz plan, potem dokupuj pakiety kiedy chcesz.",
+      },
       validation: {
         title: "Błąd walidacji",
         description: "Nieprawidłowa ilość zakupu",

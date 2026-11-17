@@ -48,25 +48,25 @@ export const translations: typeof enTranslations = {
     tableHeaderSkill: "D'autres partagent votre compétence (5 %)",
     rows: [
       {
-        profile: "Abonné à la formule",
+        profile: "Abonné Starter",
         spend: "{{planPrice}}/mois",
         direct: "{{planEarn}}/mois",
         skill: "{{planSkillEarn}}/mois",
       },
       {
-        profile: "Formule + 1 pack de crédits",
+        profile: "Starter + 1 pack de crédits",
         spend: "{{plusPackSpend}}/mois",
         direct: "{{plusPackEarn}}/mois",
         skill: "{{plusPackSkillEarn}}/mois",
       },
       {
-        profile: "Utilisateur intensif : formule + {{heavyPacks}} packs",
+        profile: "Utilisateur intensif : Starter + {{heavyPacks}} packs",
         spend: "{{heavySpend}}/mois",
         direct: "{{heavyEarn}}/mois",
         skill: "{{heavySkillEarn}}/mois",
       },
       {
-        profile: "Gros utilisateur : formule + {{powerPacks}} packs",
+        profile: "Gros utilisateur : Starter + {{powerPacks}} packs",
         spend: "{{powerSpend}}/mois",
         direct: "{{powerEarn}}/mois",
         skill: "{{powerSkillEarn}}/mois",
@@ -91,7 +91,7 @@ export const translations: typeof enTranslations = {
   },
   crypto: {
     title: "Versement en crypto, sans compte bancaire",
-    p1: "Les gains sont versés en BTC ou en USDC. Traitement sous 48 heures après validation. Le versement minimum est de {{minPayout}} : environ {{payoutPowerMonths}} mois d'un seul gros utilisateur, ou {{payoutPlanMonths}} mois d'abonnés sur la formule.",
+    p1: "Les gains sont versés en BTC ou en USDC. Traitement sous 48 heures après validation. Le versement minimum est de {{minPayout}} : environ {{payoutPowerMonths}} mois d'un seul gros utilisateur, ou {{payoutPlanMonths}} mois d'abonnés sur Starter.",
     p2: "Ou convertissez instantanément vos gains en crédits sur la plateforme. Si vous utilisez vous-même {{appName}}, vos revenus de parrainage compensent votre propre consommation.",
   },
   close: {

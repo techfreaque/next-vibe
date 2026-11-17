@@ -27,8 +27,8 @@ export const translations = {
       label: "Choose Payment Method",
       description: "Select how you want to pay for your credit pack",
       placeholder: "Select payment provider",
-      stripe: "Credit / Debit Card",
-      stripeDescription: "Pay securely with Stripe",
+      stripe: "Card, PayPal & wallets",
+      stripeDescription: "Card, PayPal, Apple Pay, Google Pay via Stripe",
       nowpayments: "Cryptocurrency",
       nowpaymentsDescription: "Pay with Bitcoin, Ethereum, and more",
       cryptoMinimumDisabled:
@@ -49,18 +49,22 @@ export const translations = {
     pack: {
       qtyCredits: "{{count}} credits",
       title: "Credit Pack",
-      description:
-        "Pay as you go. No subscription. Card or crypto. Credits never expire.",
+      description: "Top up your plan. Credits never expire.",
       perPack: "/ pack",
       features: {
         credits: "{{count}} credits included",
         expiry: "Credits never expire",
         bestFor: "Stack on top of your monthly credits",
       },
-      noSubscriptionNeeded: "Pay as you go. No subscription needed.",
+      planRequired: {
+        title: "Packs top up a plan",
+        body: "Start a plan first, then add packs whenever you run low. Plans from {{price}} a month.",
+        cta: "See plans",
+      },
       logIn: "Log in",
       signUp: "Sign up",
-      signInToBuy: "Create a free account to buy credits. Card or crypto.",
+      signInToBuy:
+        "Packs top up a plan. Create a free account and start a plan first.",
       totalSummary: "{{totalCredits}} credits total · {{totalPrice}} total",
     },
     submit: {
@@ -81,6 +85,11 @@ export const translations = {
       description: "Stripe checkout session created successfully",
     },
     errors: {
+      planRequired: {
+        title: "Plan required",
+        description:
+          "Credit packs top up an active plan. Pick a plan first, then add packs any time.",
+      },
       validation: {
         title: "Validation Error",
         description: "Invalid purchase quantity",

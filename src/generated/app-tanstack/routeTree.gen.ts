@@ -151,6 +151,7 @@ import { Route as ApiLocalePaymentDashboardRouteImport } from './routes/api.$loc
 import { Route as ApiLocalePaymentInvoiceRouteImport } from './routes/api.$locale.payment.invoice'
 import { Route as ApiLocalePaymentPortalRouteImport } from './routes/api.$locale.payment.portal'
 import { Route as ApiLocalePaymentRefundRouteImport } from './routes/api.$locale.payment.refund'
+import { Route as ApiLocalePaymentStripePricesRouteImport } from './routes/api.$locale.payment.stripe-prices'
 import { Route as ApiLocalePosDashboardRouteImport } from './routes/api.$locale.pos.dashboard'
 import { Route as ApiLocalePosProductLookupRouteImport } from './routes/api.$locale.pos.product-lookup'
 import { Route as ApiLocalePurchasingDashboardRouteImport } from './routes/api.$locale.purchasing.dashboard'
@@ -161,6 +162,7 @@ import { Route as ApiLocaleSubscriptionCancelRouteImport } from './routes/api.$l
 import { Route as ApiLocaleSubscriptionCreateRouteImport } from './routes/api.$locale.subscription.create'
 import { Route as ApiLocaleSubscriptionDashboardRouteImport } from './routes/api.$locale.subscription.dashboard'
 import { Route as ApiLocaleSubscriptionUpdateRouteImport } from './routes/api.$locale.subscription.update'
+import { Route as ApiLocaleSubscriptionYearlyCreditsRouteImport } from './routes/api.$locale.subscription.yearly-credits'
 import { Route as ApiLocaleTaxReportRouteImport } from './routes/api.$locale.tax.report'
 import { Route as ApiLocaleUserSessionCleanupRouteImport } from './routes/api.$locale.user.session-cleanup'
 import { Route as ApiLocaleUserVerifyEmailReminderRouteImport } from './routes/api.$locale.user.verify-email-reminder'
@@ -380,6 +382,7 @@ import { Route as ApiLocalePurchasingOrderCreateRouteImport } from './routes/api
 import { Route as ApiLocalePurchasingOrderListRouteImport } from './routes/api.$locale.purchasing.order.list'
 import { Route as ApiLocalePurchasingVendorCreateRouteImport } from './routes/api.$locale.purchasing.vendor.create'
 import { Route as ApiLocalePurchasingVendorListRouteImport } from './routes/api.$locale.purchasing.vendor.list'
+import { Route as ApiLocaleReferralAdminCodeBonusRouteImport } from './routes/api.$locale.referral.admin.code-bonus'
 import { Route as ApiLocaleReferralAdminCodeReassignRouteImport } from './routes/api.$locale.referral.admin.code-reassign'
 import { Route as ApiLocaleReferralAdminPayoutsRouteImport } from './routes/api.$locale.referral.admin.payouts'
 import { Route as ApiLocaleReferralCodesListRouteImport } from './routes/api.$locale.referral.codes.list'
@@ -406,6 +409,7 @@ import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsChurnedRouteImpor
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsNewRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-new'
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-payment-failed'
 import { Route as ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRouteImport } from './routes/api.$locale.subscription.data-sources.subscriptions-trialing'
+import { Route as ApiLocaleSubscriptionYearlyCreditsBackfillRouteImport } from './routes/api.$locale.subscription.yearly-credits.backfill'
 import { Route as ApiLocaleTaxRateCreateRouteImport } from './routes/api.$locale.tax.rate.create'
 import { Route as ApiLocaleTaxRateListRouteImport } from './routes/api.$locale.tax.rate.list'
 import { Route as ApiLocaleUserDataSourcesUsersActiveTotalRouteImport } from './routes/api.$locale.user.data-sources.users-active-total'
@@ -1472,6 +1476,12 @@ const ApiLocalePaymentRefundRoute = ApiLocalePaymentRefundRouteImport.update({
   path: '/refund',
   getParentRoute: () => ApiLocalePaymentRoute,
 } as any)
+const ApiLocalePaymentStripePricesRoute =
+  ApiLocalePaymentStripePricesRouteImport.update({
+    id: '/stripe-prices',
+    path: '/stripe-prices',
+    getParentRoute: () => ApiLocalePaymentRoute,
+  } as any)
 const ApiLocalePosDashboardRoute = ApiLocalePosDashboardRouteImport.update({
   id: '/api/$locale/pos/dashboard',
   path: '/api/$locale/pos/dashboard',
@@ -1526,6 +1536,12 @@ const ApiLocaleSubscriptionUpdateRoute =
   ApiLocaleSubscriptionUpdateRouteImport.update({
     id: '/update',
     path: '/update',
+    getParentRoute: () => ApiLocaleSubscriptionRoute,
+  } as any)
+const ApiLocaleSubscriptionYearlyCreditsRoute =
+  ApiLocaleSubscriptionYearlyCreditsRouteImport.update({
+    id: '/yearly-credits',
+    path: '/yearly-credits',
     getParentRoute: () => ApiLocaleSubscriptionRoute,
   } as any)
 const ApiLocaleTaxReportRoute = ApiLocaleTaxReportRouteImport.update({
@@ -2830,6 +2846,12 @@ const ApiLocalePurchasingVendorListRoute =
     path: '/api/$locale/purchasing/vendor/list',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleReferralAdminCodeBonusRoute =
+  ApiLocaleReferralAdminCodeBonusRouteImport.update({
+    id: '/admin/code-bonus',
+    path: '/admin/code-bonus',
+    getParentRoute: () => ApiLocaleReferralRoute,
+  } as any)
 const ApiLocaleReferralAdminCodeReassignRoute =
   ApiLocaleReferralAdminCodeReassignRouteImport.update({
     id: '/admin/code-reassign',
@@ -2985,6 +3007,12 @@ const ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRoute =
     id: '/data-sources/subscriptions-trialing',
     path: '/data-sources/subscriptions-trialing',
     getParentRoute: () => ApiLocaleSubscriptionRoute,
+  } as any)
+const ApiLocaleSubscriptionYearlyCreditsBackfillRoute =
+  ApiLocaleSubscriptionYearlyCreditsBackfillRouteImport.update({
+    id: '/backfill',
+    path: '/backfill',
+    getParentRoute: () => ApiLocaleSubscriptionYearlyCreditsRoute,
   } as any)
 const ApiLocaleTaxRateCreateRoute = ApiLocaleTaxRateCreateRouteImport.update({
   id: '/api/$locale/tax/rate/create',
@@ -4853,6 +4881,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/payment/invoice': typeof ApiLocalePaymentInvoiceRouteWithChildren
   '/api/$locale/payment/portal': typeof ApiLocalePaymentPortalRoute
   '/api/$locale/payment/refund': typeof ApiLocalePaymentRefundRoute
+  '/api/$locale/payment/stripe-prices': typeof ApiLocalePaymentStripePricesRoute
   '/api/$locale/pos/dashboard': typeof ApiLocalePosDashboardRoute
   '/api/$locale/pos/product-lookup': typeof ApiLocalePosProductLookupRoute
   '/api/$locale/purchasing/dashboard': typeof ApiLocalePurchasingDashboardRoute
@@ -4863,6 +4892,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/subscription/create': typeof ApiLocaleSubscriptionCreateRoute
   '/api/$locale/subscription/dashboard': typeof ApiLocaleSubscriptionDashboardRoute
   '/api/$locale/subscription/update': typeof ApiLocaleSubscriptionUpdateRoute
+  '/api/$locale/subscription/yearly-credits': typeof ApiLocaleSubscriptionYearlyCreditsRouteWithChildren
   '/api/$locale/tax/report': typeof ApiLocaleTaxReportRoute
   '/api/$locale/user/session-cleanup': typeof ApiLocaleUserSessionCleanupRoute
   '/api/$locale/user/verify-email-reminder': typeof ApiLocaleUserVerifyEmailReminderRoute
@@ -5076,6 +5106,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/purchasing/order/list': typeof ApiLocalePurchasingOrderListRoute
   '/api/$locale/purchasing/vendor/create': typeof ApiLocalePurchasingVendorCreateRoute
   '/api/$locale/purchasing/vendor/list': typeof ApiLocalePurchasingVendorListRoute
+  '/api/$locale/referral/admin/code-bonus': typeof ApiLocaleReferralAdminCodeBonusRoute
   '/api/$locale/referral/admin/code-reassign': typeof ApiLocaleReferralAdminCodeReassignRoute
   '/api/$locale/referral/admin/payouts': typeof ApiLocaleReferralAdminPayoutsRoute
   '/api/$locale/referral/codes/list': typeof ApiLocaleReferralCodesListRoute
@@ -5102,6 +5133,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/subscription/data-sources/subscriptions-new': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsNewRoute
   '/api/$locale/subscription/data-sources/subscriptions-payment-failed': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRoute
   '/api/$locale/subscription/data-sources/subscriptions-trialing': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRoute
+  '/api/$locale/subscription/yearly-credits/backfill': typeof ApiLocaleSubscriptionYearlyCreditsBackfillRoute
   '/api/$locale/tax/rate/create': typeof ApiLocaleTaxRateCreateRoute
   '/api/$locale/tax/rate/list': typeof ApiLocaleTaxRateListRoute
   '/api/$locale/user/data-sources/users-active-total': typeof ApiLocaleUserDataSourcesUsersActiveTotalRoute
@@ -5534,6 +5566,7 @@ export interface FileRoutesByTo {
   '/api/$locale/payment/invoice': typeof ApiLocalePaymentInvoiceRouteWithChildren
   '/api/$locale/payment/portal': typeof ApiLocalePaymentPortalRoute
   '/api/$locale/payment/refund': typeof ApiLocalePaymentRefundRoute
+  '/api/$locale/payment/stripe-prices': typeof ApiLocalePaymentStripePricesRoute
   '/api/$locale/pos/dashboard': typeof ApiLocalePosDashboardRoute
   '/api/$locale/pos/product-lookup': typeof ApiLocalePosProductLookupRoute
   '/api/$locale/purchasing/dashboard': typeof ApiLocalePurchasingDashboardRoute
@@ -5544,6 +5577,7 @@ export interface FileRoutesByTo {
   '/api/$locale/subscription/create': typeof ApiLocaleSubscriptionCreateRoute
   '/api/$locale/subscription/dashboard': typeof ApiLocaleSubscriptionDashboardRoute
   '/api/$locale/subscription/update': typeof ApiLocaleSubscriptionUpdateRoute
+  '/api/$locale/subscription/yearly-credits': typeof ApiLocaleSubscriptionYearlyCreditsRouteWithChildren
   '/api/$locale/tax/report': typeof ApiLocaleTaxReportRoute
   '/api/$locale/user/session-cleanup': typeof ApiLocaleUserSessionCleanupRoute
   '/api/$locale/user/verify-email-reminder': typeof ApiLocaleUserVerifyEmailReminderRoute
@@ -5757,6 +5791,7 @@ export interface FileRoutesByTo {
   '/api/$locale/purchasing/order/list': typeof ApiLocalePurchasingOrderListRoute
   '/api/$locale/purchasing/vendor/create': typeof ApiLocalePurchasingVendorCreateRoute
   '/api/$locale/purchasing/vendor/list': typeof ApiLocalePurchasingVendorListRoute
+  '/api/$locale/referral/admin/code-bonus': typeof ApiLocaleReferralAdminCodeBonusRoute
   '/api/$locale/referral/admin/code-reassign': typeof ApiLocaleReferralAdminCodeReassignRoute
   '/api/$locale/referral/admin/payouts': typeof ApiLocaleReferralAdminPayoutsRoute
   '/api/$locale/referral/codes/list': typeof ApiLocaleReferralCodesListRoute
@@ -5783,6 +5818,7 @@ export interface FileRoutesByTo {
   '/api/$locale/subscription/data-sources/subscriptions-new': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsNewRoute
   '/api/$locale/subscription/data-sources/subscriptions-payment-failed': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRoute
   '/api/$locale/subscription/data-sources/subscriptions-trialing': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRoute
+  '/api/$locale/subscription/yearly-credits/backfill': typeof ApiLocaleSubscriptionYearlyCreditsBackfillRoute
   '/api/$locale/tax/rate/create': typeof ApiLocaleTaxRateCreateRoute
   '/api/$locale/tax/rate/list': typeof ApiLocaleTaxRateListRoute
   '/api/$locale/user/data-sources/users-active-total': typeof ApiLocaleUserDataSourcesUsersActiveTotalRoute
@@ -6223,6 +6259,7 @@ export interface FileRoutesById {
   '/api/$locale/payment/invoice': typeof ApiLocalePaymentInvoiceRouteWithChildren
   '/api/$locale/payment/portal': typeof ApiLocalePaymentPortalRoute
   '/api/$locale/payment/refund': typeof ApiLocalePaymentRefundRoute
+  '/api/$locale/payment/stripe-prices': typeof ApiLocalePaymentStripePricesRoute
   '/api/$locale/pos/dashboard': typeof ApiLocalePosDashboardRoute
   '/api/$locale/pos/product-lookup': typeof ApiLocalePosProductLookupRoute
   '/api/$locale/purchasing/dashboard': typeof ApiLocalePurchasingDashboardRoute
@@ -6233,6 +6270,7 @@ export interface FileRoutesById {
   '/api/$locale/subscription/create': typeof ApiLocaleSubscriptionCreateRoute
   '/api/$locale/subscription/dashboard': typeof ApiLocaleSubscriptionDashboardRoute
   '/api/$locale/subscription/update': typeof ApiLocaleSubscriptionUpdateRoute
+  '/api/$locale/subscription/yearly-credits': typeof ApiLocaleSubscriptionYearlyCreditsRouteWithChildren
   '/api/$locale/tax/report': typeof ApiLocaleTaxReportRoute
   '/api/$locale/user/session-cleanup': typeof ApiLocaleUserSessionCleanupRoute
   '/api/$locale/user/verify-email-reminder': typeof ApiLocaleUserVerifyEmailReminderRoute
@@ -6446,6 +6484,7 @@ export interface FileRoutesById {
   '/api/$locale/purchasing/order/list': typeof ApiLocalePurchasingOrderListRoute
   '/api/$locale/purchasing/vendor/create': typeof ApiLocalePurchasingVendorCreateRoute
   '/api/$locale/purchasing/vendor/list': typeof ApiLocalePurchasingVendorListRoute
+  '/api/$locale/referral/admin/code-bonus': typeof ApiLocaleReferralAdminCodeBonusRoute
   '/api/$locale/referral/admin/code-reassign': typeof ApiLocaleReferralAdminCodeReassignRoute
   '/api/$locale/referral/admin/payouts': typeof ApiLocaleReferralAdminPayoutsRoute
   '/api/$locale/referral/codes/list': typeof ApiLocaleReferralCodesListRoute
@@ -6472,6 +6511,7 @@ export interface FileRoutesById {
   '/api/$locale/subscription/data-sources/subscriptions-new': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsNewRoute
   '/api/$locale/subscription/data-sources/subscriptions-payment-failed': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsPaymentFailedRoute
   '/api/$locale/subscription/data-sources/subscriptions-trialing': typeof ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRoute
+  '/api/$locale/subscription/yearly-credits/backfill': typeof ApiLocaleSubscriptionYearlyCreditsBackfillRoute
   '/api/$locale/tax/rate/create': typeof ApiLocaleTaxRateCreateRoute
   '/api/$locale/tax/rate/list': typeof ApiLocaleTaxRateListRoute
   '/api/$locale/user/data-sources/users-active-total': typeof ApiLocaleUserDataSourcesUsersActiveTotalRoute
@@ -6912,6 +6952,7 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/invoice'
     | '/api/$locale/payment/portal'
     | '/api/$locale/payment/refund'
+    | '/api/$locale/payment/stripe-prices'
     | '/api/$locale/pos/dashboard'
     | '/api/$locale/pos/product-lookup'
     | '/api/$locale/purchasing/dashboard'
@@ -6922,6 +6963,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/create'
     | '/api/$locale/subscription/dashboard'
     | '/api/$locale/subscription/update'
+    | '/api/$locale/subscription/yearly-credits'
     | '/api/$locale/tax/report'
     | '/api/$locale/user/session-cleanup'
     | '/api/$locale/user/verify-email-reminder'
@@ -7135,6 +7177,7 @@ export interface FileRouteTypes {
     | '/api/$locale/purchasing/order/list'
     | '/api/$locale/purchasing/vendor/create'
     | '/api/$locale/purchasing/vendor/list'
+    | '/api/$locale/referral/admin/code-bonus'
     | '/api/$locale/referral/admin/code-reassign'
     | '/api/$locale/referral/admin/payouts'
     | '/api/$locale/referral/codes/list'
@@ -7161,6 +7204,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/data-sources/subscriptions-new'
     | '/api/$locale/subscription/data-sources/subscriptions-payment-failed'
     | '/api/$locale/subscription/data-sources/subscriptions-trialing'
+    | '/api/$locale/subscription/yearly-credits/backfill'
     | '/api/$locale/tax/rate/create'
     | '/api/$locale/tax/rate/list'
     | '/api/$locale/user/data-sources/users-active-total'
@@ -7593,6 +7637,7 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/invoice'
     | '/api/$locale/payment/portal'
     | '/api/$locale/payment/refund'
+    | '/api/$locale/payment/stripe-prices'
     | '/api/$locale/pos/dashboard'
     | '/api/$locale/pos/product-lookup'
     | '/api/$locale/purchasing/dashboard'
@@ -7603,6 +7648,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/create'
     | '/api/$locale/subscription/dashboard'
     | '/api/$locale/subscription/update'
+    | '/api/$locale/subscription/yearly-credits'
     | '/api/$locale/tax/report'
     | '/api/$locale/user/session-cleanup'
     | '/api/$locale/user/verify-email-reminder'
@@ -7816,6 +7862,7 @@ export interface FileRouteTypes {
     | '/api/$locale/purchasing/order/list'
     | '/api/$locale/purchasing/vendor/create'
     | '/api/$locale/purchasing/vendor/list'
+    | '/api/$locale/referral/admin/code-bonus'
     | '/api/$locale/referral/admin/code-reassign'
     | '/api/$locale/referral/admin/payouts'
     | '/api/$locale/referral/codes/list'
@@ -7842,6 +7889,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/data-sources/subscriptions-new'
     | '/api/$locale/subscription/data-sources/subscriptions-payment-failed'
     | '/api/$locale/subscription/data-sources/subscriptions-trialing'
+    | '/api/$locale/subscription/yearly-credits/backfill'
     | '/api/$locale/tax/rate/create'
     | '/api/$locale/tax/rate/list'
     | '/api/$locale/user/data-sources/users-active-total'
@@ -8281,6 +8329,7 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/invoice'
     | '/api/$locale/payment/portal'
     | '/api/$locale/payment/refund'
+    | '/api/$locale/payment/stripe-prices'
     | '/api/$locale/pos/dashboard'
     | '/api/$locale/pos/product-lookup'
     | '/api/$locale/purchasing/dashboard'
@@ -8291,6 +8340,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/create'
     | '/api/$locale/subscription/dashboard'
     | '/api/$locale/subscription/update'
+    | '/api/$locale/subscription/yearly-credits'
     | '/api/$locale/tax/report'
     | '/api/$locale/user/session-cleanup'
     | '/api/$locale/user/verify-email-reminder'
@@ -8504,6 +8554,7 @@ export interface FileRouteTypes {
     | '/api/$locale/purchasing/order/list'
     | '/api/$locale/purchasing/vendor/create'
     | '/api/$locale/purchasing/vendor/list'
+    | '/api/$locale/referral/admin/code-bonus'
     | '/api/$locale/referral/admin/code-reassign'
     | '/api/$locale/referral/admin/payouts'
     | '/api/$locale/referral/codes/list'
@@ -8530,6 +8581,7 @@ export interface FileRouteTypes {
     | '/api/$locale/subscription/data-sources/subscriptions-new'
     | '/api/$locale/subscription/data-sources/subscriptions-payment-failed'
     | '/api/$locale/subscription/data-sources/subscriptions-trialing'
+    | '/api/$locale/subscription/yearly-credits/backfill'
     | '/api/$locale/tax/rate/create'
     | '/api/$locale/tax/rate/list'
     | '/api/$locale/user/data-sources/users-active-total'
@@ -10291,6 +10343,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocalePaymentRefundRouteImport
       parentRoute: typeof ApiLocalePaymentRoute
     }
+    '/api/$locale/payment/stripe-prices': {
+      id: '/api/$locale/payment/stripe-prices'
+      path: '/stripe-prices'
+      fullPath: '/api/$locale/payment/stripe-prices'
+      preLoaderRoute: typeof ApiLocalePaymentStripePricesRouteImport
+      parentRoute: typeof ApiLocalePaymentRoute
+    }
     '/api/$locale/pos/dashboard': {
       id: '/api/$locale/pos/dashboard'
       path: '/api/$locale/pos/dashboard'
@@ -10359,6 +10418,13 @@ declare module '@tanstack/react-router' {
       path: '/update'
       fullPath: '/api/$locale/subscription/update'
       preLoaderRoute: typeof ApiLocaleSubscriptionUpdateRouteImport
+      parentRoute: typeof ApiLocaleSubscriptionRoute
+    }
+    '/api/$locale/subscription/yearly-credits': {
+      id: '/api/$locale/subscription/yearly-credits'
+      path: '/yearly-credits'
+      fullPath: '/api/$locale/subscription/yearly-credits'
+      preLoaderRoute: typeof ApiLocaleSubscriptionYearlyCreditsRouteImport
       parentRoute: typeof ApiLocaleSubscriptionRoute
     }
     '/api/$locale/tax/report': {
@@ -11894,6 +11960,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocalePurchasingVendorListRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/referral/admin/code-bonus': {
+      id: '/api/$locale/referral/admin/code-bonus'
+      path: '/admin/code-bonus'
+      fullPath: '/api/$locale/referral/admin/code-bonus'
+      preLoaderRoute: typeof ApiLocaleReferralAdminCodeBonusRouteImport
+      parentRoute: typeof ApiLocaleReferralRoute
+    }
     '/api/$locale/referral/admin/code-reassign': {
       id: '/api/$locale/referral/admin/code-reassign'
       path: '/admin/code-reassign'
@@ -12075,6 +12148,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/subscription/data-sources/subscriptions-trialing'
       preLoaderRoute: typeof ApiLocaleSubscriptionDataSourcesSubscriptionsTrialingRouteImport
       parentRoute: typeof ApiLocaleSubscriptionRoute
+    }
+    '/api/$locale/subscription/yearly-credits/backfill': {
+      id: '/api/$locale/subscription/yearly-credits/backfill'
+      path: '/backfill'
+      fullPath: '/api/$locale/subscription/yearly-credits/backfill'
+      preLoaderRoute: typeof ApiLocaleSubscriptionYearlyCreditsBackfillRouteImport
+      parentRoute: typeof ApiLocaleSubscriptionYearlyCreditsRoute
     }
     '/api/$locale/tax/rate/create': {
       id: '/api/$locale/tax/rate/create'
@@ -14479,6 +14559,7 @@ interface ApiLocalePaymentRouteChildren {
   ApiLocalePaymentInvoiceRoute: typeof ApiLocalePaymentInvoiceRouteWithChildren
   ApiLocalePaymentPortalRoute: typeof ApiLocalePaymentPortalRoute
   ApiLocalePaymentRefundRoute: typeof ApiLocalePaymentRefundRoute
+  ApiLocalePaymentStripePricesRoute: typeof ApiLocalePaymentStripePricesRoute
   ApiLocalePaymentBillCreateRoute: typeof ApiLocalePaymentBillCreateRoute
   ApiLocalePaymentBillListRoute: typeof ApiLocalePaymentBillListRoute
   ApiLocalePaymentCreditNoteCreateRoute: typeof ApiLocalePaymentCreditNoteCreateRoute
@@ -14514,6 +14595,7 @@ const ApiLocalePaymentRouteChildren: ApiLocalePaymentRouteChildren = {
   ApiLocalePaymentInvoiceRoute: ApiLocalePaymentInvoiceRouteWithChildren,
   ApiLocalePaymentPortalRoute: ApiLocalePaymentPortalRoute,
   ApiLocalePaymentRefundRoute: ApiLocalePaymentRefundRoute,
+  ApiLocalePaymentStripePricesRoute: ApiLocalePaymentStripePricesRoute,
   ApiLocalePaymentBillCreateRoute: ApiLocalePaymentBillCreateRoute,
   ApiLocalePaymentBillListRoute: ApiLocalePaymentBillListRoute,
   ApiLocalePaymentCreditNoteCreateRoute: ApiLocalePaymentCreditNoteCreateRoute,
@@ -14568,6 +14650,7 @@ interface ApiLocaleReferralRouteChildren {
   ApiLocaleReferralLinksRoute: typeof ApiLocaleReferralLinksRoute
   ApiLocaleReferralPayoutRoute: typeof ApiLocaleReferralPayoutRoute
   ApiLocaleReferralStatsRoute: typeof ApiLocaleReferralStatsRoute
+  ApiLocaleReferralAdminCodeBonusRoute: typeof ApiLocaleReferralAdminCodeBonusRoute
   ApiLocaleReferralAdminCodeReassignRoute: typeof ApiLocaleReferralAdminCodeReassignRoute
   ApiLocaleReferralAdminPayoutsRoute: typeof ApiLocaleReferralAdminPayoutsRoute
   ApiLocaleReferralCodesListRoute: typeof ApiLocaleReferralCodesListRoute
@@ -14586,6 +14669,7 @@ const ApiLocaleReferralRouteChildren: ApiLocaleReferralRouteChildren = {
   ApiLocaleReferralLinksRoute: ApiLocaleReferralLinksRoute,
   ApiLocaleReferralPayoutRoute: ApiLocaleReferralPayoutRoute,
   ApiLocaleReferralStatsRoute: ApiLocaleReferralStatsRoute,
+  ApiLocaleReferralAdminCodeBonusRoute: ApiLocaleReferralAdminCodeBonusRoute,
   ApiLocaleReferralAdminCodeReassignRoute:
     ApiLocaleReferralAdminCodeReassignRoute,
   ApiLocaleReferralAdminPayoutsRoute: ApiLocaleReferralAdminPayoutsRoute,
@@ -14610,11 +14694,27 @@ const ApiLocaleReferralRouteChildren: ApiLocaleReferralRouteChildren = {
 const ApiLocaleReferralRouteWithChildren =
   ApiLocaleReferralRoute._addFileChildren(ApiLocaleReferralRouteChildren)
 
+interface ApiLocaleSubscriptionYearlyCreditsRouteChildren {
+  ApiLocaleSubscriptionYearlyCreditsBackfillRoute: typeof ApiLocaleSubscriptionYearlyCreditsBackfillRoute
+}
+
+const ApiLocaleSubscriptionYearlyCreditsRouteChildren: ApiLocaleSubscriptionYearlyCreditsRouteChildren =
+  {
+    ApiLocaleSubscriptionYearlyCreditsBackfillRoute:
+      ApiLocaleSubscriptionYearlyCreditsBackfillRoute,
+  }
+
+const ApiLocaleSubscriptionYearlyCreditsRouteWithChildren =
+  ApiLocaleSubscriptionYearlyCreditsRoute._addFileChildren(
+    ApiLocaleSubscriptionYearlyCreditsRouteChildren,
+  )
+
 interface ApiLocaleSubscriptionRouteChildren {
   ApiLocaleSubscriptionCancelRoute: typeof ApiLocaleSubscriptionCancelRoute
   ApiLocaleSubscriptionCreateRoute: typeof ApiLocaleSubscriptionCreateRoute
   ApiLocaleSubscriptionDashboardRoute: typeof ApiLocaleSubscriptionDashboardRoute
   ApiLocaleSubscriptionUpdateRoute: typeof ApiLocaleSubscriptionUpdateRoute
+  ApiLocaleSubscriptionYearlyCreditsRoute: typeof ApiLocaleSubscriptionYearlyCreditsRouteWithChildren
   ApiLocaleSubscriptionAdminListRoute: typeof ApiLocaleSubscriptionAdminListRoute
   ApiLocaleSubscriptionAdminPurchasesRoute: typeof ApiLocaleSubscriptionAdminPurchasesRoute
   ApiLocaleSubscriptionAdminReferralsRoute: typeof ApiLocaleSubscriptionAdminReferralsRoute
@@ -14635,6 +14735,8 @@ const ApiLocaleSubscriptionRouteChildren: ApiLocaleSubscriptionRouteChildren = {
   ApiLocaleSubscriptionCreateRoute: ApiLocaleSubscriptionCreateRoute,
   ApiLocaleSubscriptionDashboardRoute: ApiLocaleSubscriptionDashboardRoute,
   ApiLocaleSubscriptionUpdateRoute: ApiLocaleSubscriptionUpdateRoute,
+  ApiLocaleSubscriptionYearlyCreditsRoute:
+    ApiLocaleSubscriptionYearlyCreditsRouteWithChildren,
   ApiLocaleSubscriptionAdminListRoute: ApiLocaleSubscriptionAdminListRoute,
   ApiLocaleSubscriptionAdminPurchasesRoute:
     ApiLocaleSubscriptionAdminPurchasesRoute,

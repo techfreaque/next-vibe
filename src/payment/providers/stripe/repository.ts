@@ -6,6 +6,7 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import {
   ErrorResponseTypes,
   fail,
@@ -37,6 +38,13 @@ import type {
   WebhookEvent,
 } from "../types";
 import { scopedTranslation } from "./i18n";
+
+/**
+ * Payment methods offered in Stripe Checkout (a filter over what the Stripe
+ * account has enabled). Wallets (Apple Pay, Google Pay) ride on "card".
+ */
+export const STRIPE_CHECKOUT_METHODS: Stripe.Checkout.SessionCreateParams.AllowedPaymentMethodType[] =
+  ["card", "paypal"];
 
 export class StripeProvider implements PaymentProvider {
   private static readonly _stripe = paymentEnv.STRIPE_SECRET_KEY
@@ -179,13 +187,10 @@ export class StripeProvider implements PaymentProvider {
         userId: params.userId,
       });
 
-      // Import dynamic price manager
+      // Resolve (or create on first use) the price by its lookup key
       const { stripePriceManager } = await import("./prices");
-
-      // Create Stripe price dynamically
-      const priceResult = await stripePriceManager.createPrice(
+      const priceResult = await stripePriceManager.ensurePrice(
         params.productId,
-        params.country,
         params.locale,
         params.interval,
         logger,
@@ -212,7 +217,10 @@ export class StripeProvider implements PaymentProvider {
       // Create checkout session
       const session = await stripeClient.checkout.sessions.create({
         customer: customerId,
-        allowed_payment_method_types: ["card"],
+        // Card covers Apple Pay / Google Pay wallets; PayPal shows where the
+        // account has it enabled and the currency allows it. Async methods
+        // settle via checkout.session.async_payment_succeeded.
+        allowed_payment_method_types: STRIPE_CHECKOUT_METHODS,
         mode: mode,
         line_items: [
           { price: priceResult.data.priceId, quantity: lineQuantity },
@@ -228,6 +236,8 @@ export class StripeProvider implements PaymentProvider {
         allow_promotion_codes: true,
         billing_address_collection: "auto",
         customer_update: { address: "auto" },
+        // Checkout UI in the visitor's language (de / pl / fr / en)
+        locale: getLanguageFromLocale(params.locale),
       });
 
       logger.debug("Created Stripe checkout session", {
@@ -345,7 +355,7 @@ export class StripeProvider implements PaymentProvider {
       });
     }
     try {
-      const event = stripeClient.webhooks.constructEvent(
+      const event = await stripeClient.webhooks.constructEventAsync(
         body,
         signature,
         paymentEnv.STRIPE_WEBHOOK_SECRET,
@@ -408,6 +418,12 @@ export class StripeProvider implements PaymentProvider {
         typeof eventData.amount_total === "number"
       ) {
         webhookData.amount_total = eventData.amount_total;
+      }
+      if (
+        "payment_status" in eventData &&
+        typeof eventData.payment_status === "string"
+      ) {
+        webhookData.payment_status = eventData.payment_status;
       }
       if ("currency" in eventData && typeof eventData.currency === "string") {
         webhookData.currency = eventData.currency;

@@ -43,7 +43,7 @@ export const translations: typeof enTranslations = {
       billing: {
         title: "Rozliczenia",
         content:
-          "Subskrypcje są rozliczane miesięcznie. Pakiety kredytów to jednorazowe zakupy, które nigdy nie wygasają. Akceptujemy karty kredytowe przez Stripe i kryptowaluty przez NowPayments.",
+          "Subskrypcje są rozliczane miesięcznie lub rocznie; plany roczne dostają miesięczne kredyty co miesiąc. Pakiety kredytów to jednorazowe doładowania dla aktywnych subskrybentów i nigdy nie wygasają. Akceptujemy karty, PayPal, Apple Pay i Google Pay przez Stripe oraz kryptowaluty przez NowPayments.",
       },
       cancellation: {
         title: "Anulowanie",

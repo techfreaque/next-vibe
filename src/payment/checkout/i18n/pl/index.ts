@@ -118,8 +118,10 @@ export const translations: typeof enTranslations = {
         title: "Błąd walidacji",
         description: "Nieprawidłowe parametry płatności",
         reason: {
-          enterpriseCustomPricing:
-            "Plan ENTERPRISE wymaga indywidualnej wyceny",
+          yearlyNotAvailable:
+            "Rozliczenie roczne jest dostępne tylko dla planu {{plan}}. Wybierz miesięczne.",
+          cryptoStarterYearly:
+            "Starter za krypto tylko rocznie. Wybierz rozliczenie roczne albo Plus, Pro lub Ultra.",
         },
       },
       network: {
@@ -171,6 +173,15 @@ export const translations: typeof enTranslations = {
   plans: {
     starter: {
       title: "Starter",
+    },
+    plus: {
+      title: "Plus",
+    },
+    pro: {
+      title: "Pro",
+    },
+    ultra: {
+      title: "Ultra",
     },
   },
 

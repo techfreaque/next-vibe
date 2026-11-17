@@ -258,10 +258,7 @@ export function TanstackPage({
       >
         <Callout icon={CreditCard} tone="warning" className="mb-8 max-w-3xl">
           <Span className="font-semibold">{t("access.title")}. </Span>
-          {t("access.body", {
-            subPrice: prices.subPrice,
-            packPrice: prices.packPrice,
-          })}
+          {t("access.body", { subPrice: prices.subPrice })}
           <P className="mt-3 mb-0">
             <Link
               href={`/${locale}/${API_UNLOCK_PATH}`}

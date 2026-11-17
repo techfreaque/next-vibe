@@ -46,7 +46,7 @@ export const translations: typeof enTranslations = {
       billing: {
         title: "Abrechnung",
         content:
-          "Abonnements werden monatlich abgerechnet. Kredit-Pakete sind Einmalkäufe, die nie ablaufen. Wir akzeptieren Kreditkarten über Stripe und Kryptowährung über NowPayments.",
+          "Abonnements werden monatlich oder jährlich abgerechnet; Jahrespläne erhalten ihre monatlichen Credits jeden Monat. Kredit-Pakete sind einmalige Aufstockungen für aktive Abonnenten und laufen nie ab. Wir akzeptieren Karten, PayPal, Apple Pay und Google Pay über Stripe sowie Kryptowährung über NowPayments.",
       },
       cancellation: {
         title: "Kündigung",

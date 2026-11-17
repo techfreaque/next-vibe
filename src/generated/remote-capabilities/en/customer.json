@@ -7901,15 +7901,43 @@
             {
               "value": "enums.plan.subscription",
               "label": "plans.starter.title"
+            },
+            {
+              "value": "enums.plan.plus",
+              "label": "plans.plus.title"
+            },
+            {
+              "value": "enums.plan.pro",
+              "label": "plans.pro.title"
+            },
+            {
+              "value": "enums.plan.ultra",
+              "label": "plans.ultra.title"
             }
           ],
           "schema": {
             "def": {
-              "type": "literal",
-              "values": ["enums.plan.subscription"]
+              "type": "enum",
+              "entries": {
+                "SUBSCRIPTION": "enums.plan.subscription",
+                "PLUS": "enums.plan.plus",
+                "PRO": "enums.plan.pro",
+                "ULTRA": "enums.plan.ultra"
+              }
             },
-            "type": "literal",
-            "values": {}
+            "type": "enum",
+            "enum": {
+              "SUBSCRIPTION": "enums.plan.subscription",
+              "PLUS": "enums.plan.plus",
+              "PRO": "enums.plan.pro",
+              "ULTRA": "enums.plan.ultra"
+            },
+            "options": [
+              "enums.plan.subscription",
+              "enums.plan.plus",
+              "enums.plan.pro",
+              "enums.plan.ultra"
+            ]
           },
           "usage": {
             "request": "data"
@@ -10762,6 +10790,18 @@
             {
               "value": "enums.plan.subscription",
               "label": "enums.plan.subscription"
+            },
+            {
+              "value": "enums.plan.plus",
+              "label": "enums.plan.plus"
+            },
+            {
+              "value": "enums.plan.pro",
+              "label": "enums.plan.pro"
+            },
+            {
+              "value": "enums.plan.ultra",
+              "label": "enums.plan.ultra"
             }
           ],
           "schema": {
@@ -10771,14 +10811,25 @@
                 "def": {
                   "type": "enum",
                   "entries": {
-                    "SUBSCRIPTION": "enums.plan.subscription"
+                    "SUBSCRIPTION": "enums.plan.subscription",
+                    "PLUS": "enums.plan.plus",
+                    "PRO": "enums.plan.pro",
+                    "ULTRA": "enums.plan.ultra"
                   }
                 },
                 "type": "enum",
                 "enum": {
-                  "SUBSCRIPTION": "enums.plan.subscription"
+                  "SUBSCRIPTION": "enums.plan.subscription",
+                  "PLUS": "enums.plan.plus",
+                  "PRO": "enums.plan.pro",
+                  "ULTRA": "enums.plan.ultra"
                 },
-                "options": ["enums.plan.subscription"]
+                "options": [
+                  "enums.plan.subscription",
+                  "enums.plan.plus",
+                  "enums.plan.pro",
+                  "enums.plan.ultra"
+                ]
               },
               "defaultValue": "enums.plan.subscription"
             },
@@ -11119,14 +11170,25 @@
                 "def": {
                   "type": "enum",
                   "entries": {
-                    "SUBSCRIPTION": "enums.plan.subscription"
+                    "SUBSCRIPTION": "enums.plan.subscription",
+                    "PLUS": "enums.plan.plus",
+                    "PRO": "enums.plan.pro",
+                    "ULTRA": "enums.plan.ultra"
                   }
                 },
                 "type": "enum",
                 "enum": {
-                  "SUBSCRIPTION": "enums.plan.subscription"
+                  "SUBSCRIPTION": "enums.plan.subscription",
+                  "PLUS": "enums.plan.plus",
+                  "PRO": "enums.plan.pro",
+                  "ULTRA": "enums.plan.ultra"
                 },
-                "options": ["enums.plan.subscription"]
+                "options": [
+                  "enums.plan.subscription",
+                  "enums.plan.plus",
+                  "enums.plan.pro",
+                  "enums.plan.ultra"
+                ]
               }
             },
             "type": "optional"
@@ -11922,20 +11984,43 @@
             {
               "value": "enums.plan.subscription",
               "label": "enums.plan.subscription"
+            },
+            {
+              "value": "enums.plan.plus",
+              "label": "enums.plan.plus"
+            },
+            {
+              "value": "enums.plan.pro",
+              "label": "enums.plan.pro"
+            },
+            {
+              "value": "enums.plan.ultra",
+              "label": "enums.plan.ultra"
             }
           ],
           "schema": {
             "def": {
               "type": "enum",
               "entries": {
-                "SUBSCRIPTION": "enums.plan.subscription"
+                "SUBSCRIPTION": "enums.plan.subscription",
+                "PLUS": "enums.plan.plus",
+                "PRO": "enums.plan.pro",
+                "ULTRA": "enums.plan.ultra"
               }
             },
             "type": "enum",
             "enum": {
-              "SUBSCRIPTION": "enums.plan.subscription"
+              "SUBSCRIPTION": "enums.plan.subscription",
+              "PLUS": "enums.plan.plus",
+              "PRO": "enums.plan.pro",
+              "ULTRA": "enums.plan.ultra"
             },
-            "options": ["enums.plan.subscription"]
+            "options": [
+              "enums.plan.subscription",
+              "enums.plan.plus",
+              "enums.plan.pro",
+              "enums.plan.ultra"
+            ]
           },
           "usage": {
             "request": "data",

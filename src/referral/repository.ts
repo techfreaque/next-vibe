@@ -34,7 +34,7 @@ import type {
   ReferralCode,
 } from "./codes/list/definition";
 import { commissionAfterReversal } from "./commission";
-import { REFERRAL_CONFIG } from "./config";
+import { REFERRAL_CONFIG, referralSubscriptionBonusKey } from "./config";
 import {
   leadReferrals,
   payoutRequests,
@@ -402,7 +402,11 @@ export class ReferralRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<
-    ResponseType<{ referralCode: string | null; referralLabel: string | null }>
+    ResponseType<{
+      referralCode: string | null;
+      referralLabel: string | null;
+      subscriptionBonusCredits: number;
+    }>
   > {
     try {
       logger.debug("Getting latest referral code with label for lead", {
@@ -413,6 +417,8 @@ export class ReferralRepository {
         .select({
           code: referralCodes.code,
           label: referralCodes.label,
+          bonus: referralCodes.subscriptionBonusCredits,
+          isActive: referralCodes.isActive,
         })
         .from(leadReferrals)
         .innerJoin(
@@ -426,6 +432,8 @@ export class ReferralRepository {
       return success({
         referralCode: latestReferral?.code ?? null,
         referralLabel: latestReferral?.label ?? null,
+        subscriptionBonusCredits:
+          latestReferral && latestReferral.isActive ? latestReferral.bonus : 0,
       });
     } catch (error) {
       logger.error(
@@ -439,6 +447,73 @@ export class ReferralRepository {
         }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
+    }
+  }
+
+  /**
+   * Referral code bonus: when a referred user starts their first paid plan,
+   * grant the bonus their code carries (admin-set, 0 = none). Once per user
+   * ever, keyed by user id, so re-subscribing or a webhook retry never grants
+   * it again. Never fails the checkout: errors are logged.
+   */
+  static async grantSubscriptionSignupBonus(
+    userId: string,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<{ granted: number }>> {
+    try {
+      const [row] = await db
+        .select({
+          code: referralCodes.code,
+          bonus: referralCodes.subscriptionBonusCredits,
+          ownerUserId: referralCodes.ownerUserId,
+        })
+        .from(userReferrals)
+        .innerJoin(
+          referralCodes,
+          eq(userReferrals.referralCodeId, referralCodes.id),
+        )
+        .where(eq(userReferrals.referredUserId, userId))
+        .limit(1);
+
+      if (!row || row.bonus <= 0 || row.ownerUserId === userId) {
+        return success({ granted: 0 });
+      }
+
+      const { scopedTranslation: creditsScopedTranslation } =
+        await import("@/credits/i18n");
+      const grant = await CreditRepository.addUserCredits(
+        userId,
+        row.bonus,
+        "free",
+        logger,
+        creditsScopedTranslation.scopedT(locale).t,
+        undefined,
+        referralSubscriptionBonusKey(userId),
+      );
+      if (!grant.success) {
+        logger.error("Referral subscription bonus grant failed", {
+          userId,
+          code: row.code,
+          error: grant.message,
+        });
+        return success({ granted: 0 });
+      }
+      const granted = grant.data.granted ? row.bonus : 0;
+      if (granted > 0) {
+        logger.info("Granted referral subscription bonus", {
+          userId,
+          code: row.code,
+          credits: granted,
+        });
+      }
+      return success({ granted });
+    } catch (error) {
+      logger.error("Referral subscription bonus failed", {
+        error: parseError(error),
+        userId,
+      });
+      return success({ granted: 0 });
     }
   }
 

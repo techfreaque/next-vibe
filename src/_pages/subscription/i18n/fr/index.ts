@@ -42,8 +42,7 @@ export const translations: typeof enTranslations = {
       nextExpiration: "Prochaine expiration",
       expiring: {
         title: "Crédits d'abonnement",
-        description:
-          "Issus de l'abonnement mensuel ({{subCredits}} crédits/mois)",
+        description: "Issus de votre formule mensuelle",
       },
       permanent: {
         title: "Crédits permanents",
@@ -63,16 +62,16 @@ export const translations: typeof enTranslations = {
       howItWorks: {
         title: "Comment fonctionnent les crédits",
         description:
-          "Une seule monnaie pour tous les modèles. Abonnez-vous, rechargez ou commencez gratuitement.",
+          "Une seule monnaie pour tous les modèles. Choisissez une formule, rechargez ou commencez gratuitement.",
         expiring: {
-          title: "Formule mensuelle",
+          title: "Formules mensuelles",
           description:
-            "{{subPrice}}/mois. {{subCredits}} crédits chaque mois, les {{modelCount}} modèles inclus.",
+            "Formules de {{minPrice}} à {{maxPrice}} par mois, jusqu'à {{maxCredits}} crédits. Les {{modelCount}} modèles inclus.",
         },
         permanent: {
           title: "Packs de crédits",
           description:
-            "{{packPrice}} les {{packCredits}} crédits. Achetez-en autant qu'il vous faut. Sans expiration. Sans abonnement.",
+            "Rechargez n'importe quelle formule : {{packPrice}} les {{packCredits}} crédits. Autant qu'il vous faut. Sans expiration.",
         },
         free: {
           title: "Crédits gratuits",
@@ -156,9 +155,8 @@ export const translations: typeof enTranslations = {
       },
       pack: {
         title: "Packs de crédits supplémentaires",
-        description:
-          "Payez à l'usage. Sans abonnement. Les crédits n'expirent jamais.",
-        badge: "Sans abonnement",
+        description: "Rechargez votre formule. Les crédits n'expirent jamais.",
+        badge: "Recharge",
         perPack: "/pack",
         quantity: "Quantité",
         total: "{{count}} crédits",
@@ -264,12 +262,12 @@ export const translations: typeof enTranslations = {
     overview: {
       title: "Tarifs : payez au message, sans engagement | {{appName}}",
       description:
-        "Jusqu'à {{freeCredits}} crédits gratuits par mois. {{subCredits}} crédits pour {{subPrice}} par mois, ou un pack qui n'expire jamais. Un seul solde pour {{modelCount}} modèles, des grands classiques aux non censurés.",
+        "Jusqu'à {{freeCredits}} crédits gratuits par mois. Formules dès {{subPrice}} pour {{subCredits}} crédits par mois, jusqu'à {{maxCredits}}. Un seul solde pour {{modelCount}} modèles, des grands classiques aux non censurés.",
     },
     buyCredits: {
-      title: "Acheter des crédits : abonnement ou packs | {{appName}}",
+      title: "Formules et packs de crédits | {{appName}}",
       description:
-        "{{subCredits}} crédits par mois pour {{subPrice}}, ou des packs de crédits qui n'expirent jamais. Paiement par carte ou en crypto. Valables sur {{modelCount}} modèles d'IA.",
+        "Formules dès {{subPrice}} pour {{subCredits}} crédits par mois, jusqu'à {{maxCredits}}. Les packs rechargent n'importe quelle formule et n'expirent jamais. Carte, PayPal ou crypto. {{modelCount}} modèles d'IA.",
     },
     history: {
       title: "Historique des crédits | {{appName}}",
