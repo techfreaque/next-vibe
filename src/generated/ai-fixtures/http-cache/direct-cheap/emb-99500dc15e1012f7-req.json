@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/uploads/video/hermes-tool-callback-mode-and-attachment-tests-09b5af19-eb17-4324-a894-c8fa67e188ec/test-video.mp4.md\n\n---\nfilename: \"test-video.mp4\"\nembedded: true\nmimeType: \"video/mp4\"\nsize: \"1.1 MB\"\nthreadId: \"09b5af19-eb17-4324-a894-c8fa67e188ec\"\nthreadTitle: \"Hermes tool, callback mode and attachment tests\"\nuploadedAt: \"2026-11-17T00:37:28.073Z\"\n---\n\n# test-video.mp4\n\n**Stored:** base64-embedded (no public URL)\n\n| Field | Value |\n| --- | --- |\n| Type | `video/mp4` |\n| Size | 1.1 MB |\n| Thread | Hermes tool, callback mode and attachment tests |\n| Uploaded | 2026-11-17 |\n\n## Message Context\n\n[T10d video-attach] A video file is attached. Describe what you see in it. End your reply with STEP_OK if you could process the video, or FAILED: <reason> if you could not.",
+    "encoding_format": "float"
+  }
+}

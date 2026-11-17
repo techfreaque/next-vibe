@@ -96,6 +96,7 @@ RULES:
 2. You may call MULTIPLE tools at once by adding more objects to the array.
 3. You may write text BEFORE the <tool_calls> block (e.g. "Let me look that up.").
 4. If you don't need tools, respond normally without <tool_calls>.
+5. Tool results only exist once a "[Tool Result for ...]" message arrives. Before that, never describe results ("according to the results..."): output the <tool_calls> block and stop.
 
 MULTI-STEP WORKFLOW:
 - You will receive tool results as follow-up messages. Read them carefully.

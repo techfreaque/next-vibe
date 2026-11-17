@@ -48,12 +48,48 @@ interface OpenAIResponse {
   };
 }
 
+const TOOL_CALLS_TAG = "<tool_calls>";
+
+/**
+ * Cap on the held-back `<tool_calls>` markup of one response. A real call is a
+ * few KB (a document-writing call a few tens of KB). Past this the model is
+ * looping inside the block: prod 2026-11-16, Venice Uncensored streamed ~110k
+ * hidden tokens for 5 minutes until the context ran out, and the user saw
+ * nothing but was billed for all of it.
+ */
+export const MAX_TOOL_CALL_MARKUP_CHARS = 80_000;
+
+/**
+ * How far `content` (from `from` on) can be forwarded as visible text.
+ * - `confirmed`: a `<tool_calls>` block starts at `end`; everything after it
+ *   is tool markup and is held back for parsing.
+ * - otherwise a trailing `<`, `<to`, ... that may still grow into the tag is
+ *   held back from `end`; text before it is safe. A `<` that can no longer
+ *   become the tag ("a < b", "<table>") is plain text and is forwarded.
+ */
+export function forwardableEnd(
+  content: string,
+  from: number,
+): { end: number; confirmed: boolean } {
+  const tagIndex = content.indexOf(TOOL_CALLS_TAG, from);
+  if (tagIndex !== -1) {
+    return { end: tagIndex, confirmed: true };
+  }
+  const lastLt = content.lastIndexOf("<");
+  if (lastLt >= from && TOOL_CALLS_TAG.startsWith(content.slice(lastLt))) {
+    return { end: lastLt, confirmed: false };
+  }
+  return { end: content.length, confirmed: false };
+}
+
 /**
  * Process streaming response from API that uses prompt engineering for tool calls
  * Handles:
  * - Real-time streaming of content
- * - Detection of <tool_calls> markup and stopping forward
+ * - Holding back <tool_calls> markup (and a possible partial tag) from the
+ *   visible stream; a false alarm ("a < b") is released as text
  * - Parsing tool calls at the end
+ * - Cutting a runaway tool-call block off at MAX_TOOL_CALL_MARKUP_CHARS
  * - Including usage data in final chunk (if available)
  */
 export async function processStreamingResponseWithToolCalls(
@@ -74,7 +110,28 @@ export async function processStreamingResponseWithToolCalls(
   let finishReason: string | null = null;
   let hasFinished = false;
   let hasSentFinalChunks = false;
+  /** A `<tool_calls>` tag was seen: the rest of the response is tool markup. */
   let hasDetectedToolCalls = false;
+  /** accumulatedContent[0, forwardedUpTo) has been streamed as visible text. */
+  let forwardedUpTo = 0;
+  /** Index of the `<tool_calls>` tag once detected. */
+  let toolMarkupStart = 0;
+  /** Set when the markup cap cut the upstream read short. */
+  let runawayCutOff = false;
+
+  const enqueueContent = (
+    controller: ReadableStreamDefaultController,
+    content: string,
+  ): void => {
+    const chunk: OpenAIResponse = {
+      id: baseId,
+      object: "chat.completion.chunk",
+      created,
+      model,
+      choices: [{ index: 0, delta: { content } }],
+    };
+    controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
+  };
 
   const sendFinalChunks = (
     controller: ReadableStreamDefaultController,
@@ -94,6 +151,30 @@ export async function processStreamingResponseWithToolCalls(
 
     // Parse accumulated content for tool calls
     const { toolCalls } = parseToolCalls(accumulatedContent, logger);
+
+    // Release visible text not streamed yet: a held-back partial tag that
+    // never became `<tool_calls>` ("... <" at the very end), or text that
+    // arrived in the finish chunk itself.
+    const releaseEnd = hasDetectedToolCalls
+      ? toolMarkupStart
+      : accumulatedContent.length;
+    if (releaseEnd > forwardedUpTo) {
+      enqueueContent(
+        controller,
+        accumulatedContent.slice(forwardedUpTo, releaseEnd),
+      );
+      forwardedUpTo = releaseEnd;
+    }
+    if (hasDetectedToolCalls && (!toolCalls || toolCalls.length === 0)) {
+      // Markup that never parsed: nothing reaches the user from it, so make
+      // the turn diagnosable (the loop reports it as an empty answer).
+      logger.warn(`[${providerName}] Tool-call markup did not parse`, {
+        markupChars: accumulatedContent.length - toolMarkupStart,
+        finishReason,
+        runawayCutOff,
+        head: accumulatedContent.slice(toolMarkupStart, toolMarkupStart + 300),
+      });
+    }
 
     // When we detect tool calls, we've already forwarded the content chunks
     // from the API (which includes role and text content before the <)
@@ -138,7 +219,11 @@ export async function processStreamingResponseWithToolCalls(
     // Send finish chunk with usage data
     // Use "tool_calls" if we have tool calls, otherwise use "stop"
     const effectiveFinishReason =
-      toolCalls && toolCalls.length > 0 ? "tool_calls" : finishReason || "stop";
+      toolCalls && toolCalls.length > 0
+        ? "tool_calls"
+        : runawayCutOff
+          ? "length"
+          : finishReason || "stop";
 
     const finishChunk: OpenAIResponse = {
       id: baseId,
@@ -226,33 +311,29 @@ export async function processStreamingResponseWithToolCalls(
               const delta = data.choices?.[0]?.delta;
               const hasContentInThisChunk = !!delta?.content;
 
+              // Visible text of this chunk: forwarded below unless this is the
+              // finish chunk (then sendFinalChunks releases it).
+              let visibleEnd = forwardedUpTo;
               if (delta?.content) {
-                const combined = accumulatedContent + delta.content;
-
-                // Check if we're starting to see potential tool call markup
-                // Stop forwarding at the FIRST sign of "<" that could be tool calls
-                const mightStartToolCalls =
-                  !hasDetectedToolCalls &&
-                  (combined.includes("<tool_calls>") ||
-                    // Check if we have a partial match that could complete later
-                    (combined.includes("<") &&
-                      "<tool_calls>".startsWith(
-                        combined.slice(combined.lastIndexOf("<")),
-                      )));
-
-                if (mightStartToolCalls) {
-                  hasDetectedToolCalls = true;
-                  logger.info(
-                    `[${providerName}] Potential tool calls detected, stopping forward`,
-                    {
-                      accumulatedLength: accumulatedContent.length,
-                      chunkLength: delta.content.length,
-                      lastChars: combined.slice(-20),
-                    },
-                  );
-                }
-
                 accumulatedContent += delta.content;
+                if (!hasDetectedToolCalls) {
+                  const { end, confirmed } = forwardableEnd(
+                    accumulatedContent,
+                    forwardedUpTo,
+                  );
+                  visibleEnd = end;
+                  if (confirmed) {
+                    hasDetectedToolCalls = true;
+                    toolMarkupStart = end;
+                    logger.info(
+                      `[${providerName}] Tool calls detected, stopping forward`,
+                      {
+                        accumulatedLength: accumulatedContent.length,
+                        visibleLength: end,
+                      },
+                    );
+                  }
+                }
               }
 
               // Check for finish but don't send finish chunk yet (wait for usage if needed)
@@ -266,15 +347,51 @@ export async function processStreamingResponseWithToolCalls(
                 if (!waitForUsage || usage) {
                   sendFinalChunks(controller);
                 }
-              } else if (
+              } else if (!hasFinished && !data.usage && hasContentInThisChunk) {
+                // Forward only visible text; tool markup and a partial tag
+                // that may still become one stay held back. A chunk that is
+                // all visible goes out raw (keeps any extra delta fields).
+                const chunkStart =
+                  accumulatedContent.length - (delta?.content?.length ?? 0);
+                if (
+                  forwardedUpTo === chunkStart &&
+                  visibleEnd === accumulatedContent.length
+                ) {
+                  controller.enqueue(encoder.encode(`data: ${jsonStr}\n\n`));
+                } else if (visibleEnd > forwardedUpTo) {
+                  enqueueContent(
+                    controller,
+                    accumulatedContent.slice(forwardedUpTo, visibleEnd),
+                  );
+                }
+                forwardedUpTo = Math.max(forwardedUpTo, visibleEnd);
+              }
+
+              // Runaway tool-call block: stop reading (closing the upstream
+              // stops the generation and its cost) and finish with what we
+              // have. A complete call already in the markup still runs.
+              if (
+                hasDetectedToolCalls &&
                 !hasFinished &&
-                !data.usage &&
-                !hasDetectedToolCalls &&
-                hasContentInThisChunk
+                accumulatedContent.length - toolMarkupStart >
+                  MAX_TOOL_CALL_MARKUP_CHARS
               ) {
-                // Only forward content chunks if we haven't detected tool calls yet
-                // Stop forwarding as soon as we detect potential tool call markup
-                controller.enqueue(encoder.encode(`data: ${jsonStr}\n\n`));
+                runawayCutOff = true;
+                hasFinished = true;
+                logger.warn(
+                  `[${providerName}] Tool-call markup exceeded cap, cutting the stream`,
+                  {
+                    markupChars: accumulatedContent.length - toolMarkupStart,
+                    cap: MAX_TOOL_CALL_MARKUP_CHARS,
+                    head: accumulatedContent.slice(
+                      toolMarkupStart,
+                      toolMarkupStart + 300,
+                    ),
+                  },
+                );
+                sendFinalChunks(controller);
+                await reader.cancel();
+                break;
               }
             } catch (error) {
               logger.error(
@@ -285,6 +402,9 @@ export async function processStreamingResponseWithToolCalls(
                 },
               );
             }
+          }
+          if (runawayCutOff) {
+            break;
           }
         }
       } catch (error) {

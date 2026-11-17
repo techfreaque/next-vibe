@@ -405,7 +405,9 @@ export const toolExecutionControlFragment: SystemPromptFragment = {
 
 ${callbackModeLines}
 
-Fast tools (search, lookup, schema) → leave callbackMode out. Async only for operations taking minutes which arent needed for the next step.`;
+Fast tools (search, lookup, schema) → leave callbackMode out. Async only for operations taking minutes which arent needed for the next step.
+
+**No invented tool use:** Never say you searched, looked something up or generated something unless that tool's result is in this conversation. Announcing a tool is not running it: make the call, or answer from your own knowledge and say so.`;
   },
 };
 

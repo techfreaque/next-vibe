@@ -35,7 +35,7 @@ import {
   ModelSelectorTrigger,
 } from "../models/widget/model-selector";
 import { ModelSelectionType } from "../skills/enum";
-import { isImageAspectRatio } from "./aspect-ratio";
+import { describeAspectRatio, isImageAspectRatio } from "./aspect-ratio";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "./constants";
 import type definition from "./definition";
 import { ImageSize } from "./enum";
@@ -176,6 +176,21 @@ export function ImageGenerationContainer({
 
   const activeSize =
     SIZE_PRESETS.find((p) => p.value === currentSize) ?? SIZE_PRESETS[0];
+
+  // The delivered file's real size wins over what was requested: providers
+  // snap ratios, and a 16:9 request must not show the "Square" default.
+  const resultWidth = result?.width;
+  const resultHeight = result?.height;
+  const realSize =
+    resultWidth !== undefined &&
+    resultHeight !== undefined &&
+    resultWidth > 0 &&
+    resultHeight > 0
+      ? { w: resultWidth, h: resultHeight }
+      : undefined;
+  const resultSizeLabel = realSize
+    ? `${result?.outputAspectRatio ?? describeAspectRatio(realSize.w, realSize.h)} · ${String(realSize.w)}×${String(realSize.h)}`
+    : (currentAspectRatio ?? activeSize.label);
 
   if (showModelSelector) {
     return (
@@ -379,8 +394,8 @@ export function ImageGenerationContainer({
                 src={resolveMediaSrc(result.imageUrl)}
                 alt={prompt}
                 unoptimized
-                width={activeSize?.w ?? 1024}
-                height={activeSize?.h ?? 1024}
+                width={realSize?.w ?? activeSize.w}
+                height={realSize?.h ?? activeSize.h}
                 className="w-full object-contain"
               />
               {/* Overlay actions */}
@@ -412,7 +427,7 @@ export function ImageGenerationContainer({
                 </Badge>
               )}
               <Badge variant="outline" className="text-[10px]">
-                {activeSize?.label ?? "Square"}
+                {resultSizeLabel}
               </Badge>
               {result.creditCost !== undefined && (
                 <Badge variant="outline" className="text-[10px]">

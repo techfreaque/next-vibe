@@ -1,0 +1,15 @@
+{
+  "url": "https://openrouter.ai/api/v1/embeddings",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://unbottled.ai",
+    "X-Title": "Unbottled AI"
+  },
+  "body": {
+    "model": "baai/bge-m3",
+    "input": "/uploads/audio/hermes-catalog-callback-modes-and-attachment-check-09b5af19-eb17-4324-a894-c8fa67e188ec/test-music.mp3.md\n\n---\nfilename: \"test-music.mp3\"\nembedded: true\nmimeType: \"audio/mpeg\"\nsize: \"1.1 MB\"\nthreadId: \"09b5af19-eb17-4324-a894-c8fa67e188ec\"\nthreadTitle: \"Hermes catalog, callback modes and attachment checks\"\nuploadedAt: \"2026-11-17T00:37:10.470Z\"\n---\n\n# test-music.mp3\n\n**Stored:** base64-embedded (no public URL)\n\n| Field | Value |\n| --- | --- |\n| Type | `audio/mpeg` |\n| Size | 1.1 MB |\n| Thread | Hermes catalog, callback modes and attachment checks |\n| Uploaded | 2026-11-17 |\n\n## Message Context\n\n[T10c_attach audio-attach] An audio file is attached. Describe or transcribe what you hear in it. End your reply with STEP_OK if you could process the audio, or FAILED: <reason> if you could not process it at all.",
+    "encoding_format": "float"
+  }
+}
