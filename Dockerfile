@@ -46,8 +46,9 @@ COPY . .
 # real ones. Real public config + the secrets behind NEXT_PUBLIC_AGENT_* never need to
 # reach the build; the container patches the compiled bundle with real values at start.
 # See runtime-env-placeholders.ts / server/server/start/runtime-env-patch.ts.
+# NODE_OPTIONS: the default V8 heap OOMed once the fr locale (~64k strings, 2026-11-17) was added.
 RUN --mount=type=cache,target=/app/.next-prod/cache,id=next-vibe-next-cache-v2,sharing=locked \
-    VIBE_BUILD_PLACEHOLDER_ENV=true bun src/vibe/platforms/cli/vibe-runtime.ts build --migrate=false --seed=false --db-setup=false --webpack=true && \
+    NODE_OPTIONS=--max-old-space-size=16384 VIBE_BUILD_PLACEHOLDER_ENV=true bun src/vibe/platforms/cli/vibe-runtime.ts build --migrate=false --seed=false --db-setup=false --webpack=true && \
     test -f .next-prod/BUILD_ID || (echo "ERROR: .next-prod/BUILD_ID missing - Next.js build failed" && exit 1)
 
 
