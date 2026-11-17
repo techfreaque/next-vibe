@@ -53,6 +53,24 @@ import { NewsletterSubscriptionStatus } from "../../../../newsletter/enum";
 import type { CampaignSchedulingOptions } from "../types";
 import { abTestingService } from "./ab-testing";
 
+/**
+ * Post-signup, retention, win-back and newsletter-nurture mail is owned by the
+ * lifecycle engine (src/leads/lifecycle): consent re-checked at send time, one
+ * journey at a time, 48 h cap across all marketing mail. This dispatcher only
+ * sends COLD lead campaigns and one-off newsletter blasts. Rows of the retired
+ * types that were enqueued before 2026-11-17 are never sent from here.
+ */
+const LIFECYCLE_OWNED_CAMPAIGN_TYPES = [
+  CampaignType.SIGNUP_NURTURE,
+  CampaignType.RETENTION,
+  CampaignType.WINBACK,
+] as const;
+/** NEWSLETTER rows with these variants are blasts; any other NEWSLETTER row is the retired nurture. */
+const NEWSLETTER_BLAST_VARIANTS = [
+  EmailJourneyVariant.NEWSLETTER_MAY_2026,
+  EmailJourneyVariant.NEWSLETTER_NOV_2026,
+] as const;
+
 /** A PENDING send-log claim older than this belongs to a crashed send. */
 const STALE_CLAIM_MS = 60 * 60 * 1000;
 
@@ -436,6 +454,16 @@ export class CampaignSchedulerService {
             isNull(emailCampaigns.sentAt),
             // Lead or linked user must have an email
             or(isNotNull(leads.email), isNotNull(users.email)),
+            // Lifecycle-owned mail never leaves through this dispatcher
+            notInArray(emailCampaigns.campaignType, [
+              ...LIFECYCLE_OWNED_CAMPAIGN_TYPES,
+            ]),
+            or(
+              ne(emailCampaigns.campaignType, CampaignType.NEWSLETTER),
+              inArray(emailCampaigns.journeyVariant, [
+                ...NEWSLETTER_BLAST_VARIANTS,
+              ]),
+            ),
             // Exclude converted leads from cold campaigns only;
             // post-conversion campaigns and newsletters target converted users
             or(
@@ -648,29 +676,8 @@ export class CampaignSchedulerService {
       });
     }
 
-    // Enqueue the next campaign per spec halting table
-    let nextCampaignType: typeof CampaignTypeValue | null = null;
-    switch (newStatus) {
-      case LeadStatus.NEWSLETTER_SUBSCRIBER:
-        nextCampaignType = CampaignType.NEWSLETTER;
-        break;
-      case LeadStatus.SIGNED_UP:
-        nextCampaignType = options.churn
-          ? CampaignType.WINBACK
-          : CampaignType.SIGNUP_NURTURE;
-        break;
-      case LeadStatus.SUBSCRIPTION_CONFIRMED:
-        nextCampaignType = CampaignType.RETENTION;
-        break;
-    }
-
-    if (nextCampaignType) {
-      await this.scheduleInitialCampaign(
-        leadId,
-        { campaignType: nextCampaignType },
-        logger,
-      );
-    }
+    // No follow-up campaign is enqueued here any more: the lifecycle engine
+    // picks the contact up from its current state (see LIFECYCLE_OWNED_CAMPAIGN_TYPES).
   }
 
   /**

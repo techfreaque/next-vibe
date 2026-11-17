@@ -4,8 +4,10 @@ export const translations: typeof enTranslations = {
   tag: "Lifecycle",
   enums: {
     journey: {
-      inactiveUser: "Zarejestrowany, bez czatu",
-      engagedFree: "Czatował, bez płatności",
+      firstChat: "Zarejestrowany, bez czatu",
+      outOfCredits: "Darmowe kredyty zużyte",
+      whatsNew: "7 dni bez aktywności",
+      winBack: "30 dni bez aktywności",
       newsletterInvite: "Newsletter, bez konta",
     },
     enrollmentStatus: {
@@ -25,12 +27,10 @@ export const translations: typeof enTranslations = {
       sent: "Wysłano",
     },
     template: {
-      inactiveNudge: "Impuls: zacznij czat",
-      inactiveModels: "Wybór modelu",
-      inactiveUpgrade: "Wzmianka o kredytach",
-      engagedValue: "Wartość: wyciśnij więcej",
-      engagedUpgrade: "Upgrade: nie czekaj na reset",
-      engagedLast: "Ostatnia wiadomość o kredytach",
+      firstChatPrompts: "Pierwszy czat: trzy prompty",
+      outOfCredits: "Brak kredytów: plany",
+      whatsNew: "Co nowego",
+      winBack: "Powrót: ostatni mail",
       inviteSignup: "Zaproszenie: załóż konto",
       inviteReminder: "Zaproszenie: przypomnienie",
     },
@@ -63,77 +63,135 @@ export const translations: typeof enTranslations = {
   },
   emails: {
     greeting: "Cześć,",
+    greetingNamed: "Cześć {{name}},",
+    signoff: "Max",
     signature: "unbottled.ai",
+    senderName: "Max z unbottled.ai",
     unsubscribeText: "Wypisz się:",
-    inactiveNudge: {
-      subject: "Konto masz. Pytania jeszcze nie.",
-      preview: "Darmowe kredyty czekają.",
-      body1:
-        "Twoje konto działa, a darmowe kredyty odnawiają się co miesiąc. Żadnego filtra narzuconego z góry.",
-      body2:
-        "Zadaj pytanie, którego nigdzie indziej nie mogłeś zadać. Wystarczy jedna wiadomość.",
-      cta: "Zacznij czat",
+    firstChatPrompts: {
+      subject: "Trzy pierwsze wiadomości do skopiowania",
+      preview:
+        "Jedna bez cenzury, jedna mainstream, jeden obraz. Wybierz i wyślij.",
+      intro:
+        "Konto masz gotowe, a czat wciąż stoi pusty. Oto trzy wiadomości na start. Skopiuj jedną, wklej, wyślij.",
+      uncensoredTitle: "Pytaj bez pouczania",
+      uncensoredPrompt:
+        "„Napisz mroczne opowiadanie kryminalne, w którym wygrywa zły. Bez happy endu, bez morału.” Wybierz jeden z {{uncensoredCount}} modeli bez cenzury. Raz potwierdzasz, że masz skończone 18 lat.",
+      mainstreamTitle: "Porównaj największych",
+      mainstreamPrompt:
+        "„Zaplanuj tani weekend w Lizbonie. Gdzie zjeść, co sobie odpuścić?” Zapytaj najpierw GPT. Potem w tym samym wątku przełącz na Claude albo Gemini i porównaj.",
+      mediaTitle: "Zrób obraz, wideo albo utwór",
+      mediaPrompt:
+        "„Lis w czerwonym szaliku na zaśnieżonej ulicy Tokio nocą, zdjęcie analogowe.” Jeden prompt i masz obraz. Krótkie wideo i muzyka działają tak samo.",
+      body: "Darmowe konto dostaje {{freeCreditsSignedIn}} kredytów co miesiąc, z newsletterem {{freeCreditsMax}}. Bez karty.",
+      cta: "Wyślij pierwszą wiadomość",
+      ps: "P.S. Nie wiesz, od czego zacząć? Odpisz na tego maila. Czytamy odpowiedzi.",
     },
-    inactiveModels: {
-      subject: "{{modelCount}} modeli. To ty decydujesz, co jest filtrowane.",
-      preview: "Mainstream, otwarte albo bez cenzury. Wybór należy do ciebie.",
-      body1:
-        "Większość AI sama decyduje, o co wolno ci pytać. Tutaj wybierasz ty: modele mainstreamowe, otwarte lub bez cenzury, obok siebie.",
-      body2:
-        "Wybierz model, ustaw własny poziom filtra, wyślij jeden prompt. To cała konfiguracja.",
-      cta: "Wybierz model",
+    outOfCredits: {
+      subject: "Darmowe kredyty na ten miesiąc się skończyły",
+      preview:
+        "Wrócą 1. dnia miesiąca. Albo działaj dalej już teraz, plany od {{subscriptionPrice}} miesięcznie.",
+      intro:
+        "Darmowe kredyty na ten miesiąc się skończyły. Wrócą 1. dnia miesiąca. Nie chcesz czekać? Wybierz plan. Ceny bez gwiazdek.",
+      starterTitle: "Starter: {{subscriptionPrice}}/mies.",
+      starterBody:
+        "{{subscriptionCredits}} kredytów co miesiąc, rezygnujesz, kiedy chcesz. Dobre, jeśli czatujesz prawie codziennie.",
+      moreTitle: "Potrzebujesz więcej? Trzy większe plany",
+      moreBody:
+        "Plus: {{plusCredits}} kredytów za {{plusPrice}}. Pro: {{proCredits}} za {{proPrice}}. Ultra: {{ultraCredits}} za {{ultraPrice}}. Do każdego planu dokupisz pakiety kredytów, które nigdy nie wygasają.",
+      body: "Płacisz kartą, PayPalem albo kryptowalutą. Te same modele, te same ustawienia filtra.",
+      cta: "{{subscriptionCredits}} kredytów za {{subscriptionPrice}}",
+      ps: "P.S. Poczekać do 1. też jest w porządku. Twoje wątki zostają na miejscu.",
     },
-    inactiveUpgrade: {
-      subject: "Darmowe kredyty na start. Kredyty na więcej.",
-      preview: "Większe modele, dłuższe rozmowy.",
-      body1:
-        "Darmowe kredyty wystarczą na wiele. Gdy chcesz większych modeli i dłuższych rozmów, doładuj i jedź dalej.",
-      body2:
-        "Płacisz za to, co uruchamiasz. Kredyty kupujesz, kiedy ich potrzebujesz.",
-      cta: "Zobacz opcje kredytów",
+    whatsNew: {
+      subject: "Co się zmieniło, kiedy cię nie było",
+      preview:
+        "{{modelCount}} modeli, wideo i muzyka w czacie, do tego francuski.",
+      intro: "Od twojego ostatniego czatu minął ponad tydzień. Oto co nowego.",
+      modelsTitle: "{{modelCount}} modeli czatu",
+      modelsBody:
+        "{{mainstreamCount}} mainstreamowych, {{openCount}} otwartych, {{uncensoredCount}} bez cenzury. Przełączasz się między nimi w środku wątku.",
+      mediaTitle: "Obrazy, wideo i muzyka",
+      mediaBody:
+        "Wpisujesz prompt w czacie, dostajesz obraz, krótki klip albo utwór.",
+      languagesTitle: "Teraz także po francusku",
+      languagesBody:
+        "Cała aplikacja działa po polsku, angielsku, niemiecku i francusku.",
+      body: "Twoje wątki są dokładnie tam, gdzie były.",
+      cta: "Zobacz wszystkie modele",
+      ps: "P.S. Znasz kogoś, komu by się przydało? Z twojego linku polecającego dostajesz {{referralPercent}}% wszystkiego, co ta osoba wyda, co miesiąc.",
     },
-    engagedValue: {
-      subject: "Już czatujesz. Oto jak wycisnąć z tego więcej.",
-      preview: "Ten sam prompt na drugim modelu.",
-      body1:
-        "Każdy model odpowiada inaczej. Wyślij ten sam prompt do drugiego i porównaj.",
-      body2:
-        "Darmowe kredyty odnawiają się co miesiąc. Gdy dobijesz do limitu, nie musisz czekać.",
-      cta: "Czatuj dalej",
-    },
-    engagedUpgrade: {
-      subject: "Skończyły się darmowe kredyty? Nie czekaj na reset.",
-      preview: "Doładowanie zajmuje minutę.",
-      body1:
-        "Darmowe kredyty odnawiają się co miesiąc. Płatne nie każą czekać: wybierz pakiet lub subskrypcję i nie przerywaj wątku.",
-      body2: "Płacisz za użycie. Nic więcej.",
-      cta: "Weź więcej kredytów",
-    },
-    engagedLast: {
-      subject: "Ostatnia wiadomość o kredytach",
-      preview: "Potem dajemy ci spokój.",
-      body1:
-        "To ostatni mail z tej serii. Jeśli darmowe kredyty ci wystarczają, zostań na darmowym. Jeśli chcesz więcej luzu, kredyty są o jedno kliknięcie stąd.",
-      body2: "Możesz się wypisać w stopce tego maila w dowolnej chwili.",
-      cta: "Sprawdź opcje kredytów",
+    winBack: {
+      subject: "Ostatnia wiadomość od nas",
+      preview: "Konto, wątki i darmowe kredyty wciąż na ciebie czekają.",
+      intro:
+        "Od twojego ostatniego czatu minął ponad miesiąc. To nasze ostatnie przypomnienie.",
+      body: "Konto, wątki i comiesięczne darmowe kredyty wciąż są na miejscu. Modeli jest więcej niż ostatnio, a filtr nadal ustawiasz ty.",
+      cta: "Wróć do swoich czatów",
+      ps: "P.S. Co cię zniechęciło? Odpisz i powiedz wprost. Czytamy każdą odpowiedź.",
     },
     inviteSignup: {
-      subject: "Jesteś na liście. Teraz czas na konto.",
-      preview: "Darmowe konto. Do {{freeCreditsMax}} kredytów miesięcznie.",
-      body1:
-        "Darmowe konto daje {{freeCreditsSignedIn}} kredytów miesięcznie i dostęp do {{modelCount}} modeli, z filtrem ustawianym przez ciebie.",
-      body2:
-        "Bez konta: {{freeCreditsGuest}} miesięcznie. Darmowe konto: {{freeCreditsSignedIn}}. Konto z newsletterem: {{freeCreditsMax}}.",
+      subject: "Czytasz newsletter. Czas sprawdzić aplikację.",
+      preview:
+        "Darmowe konto, do {{freeCreditsMax}} kredytów miesięcznie. Bez karty.",
+      intro:
+        "Dostajesz nasz newsletter. Od aplikacji dzieli cię jeden krok: {{modelCount}} modeli, a filtr ustawiasz ty.",
+      guestTitle: "Bez konta: {{freeCreditsGuest}} kredytów miesięcznie",
+      guestBody: "Wystarczy, żeby przetestować kilka modeli.",
+      accountTitle:
+        "Darmowe konto: {{freeCreditsSignedIn}} kredytów miesięcznie",
+      accountBody: "Twoje wątki zapisane, na każdym urządzeniu.",
+      newsletterTitle:
+        "Konto + newsletter: {{freeCreditsMax}} kredytów miesięcznie",
+      newsletterBody: "Zostaw newsletter włączony na koncie i bonus jest twój.",
+      body: "Bez karty. Darmowe kredyty włączają się po potwierdzeniu adresu e-mail.",
       cta: "Załóż darmowe konto",
     },
     inviteReminder: {
-      subject: "Wciąż bez konta? To minuta.",
-      preview: "Start jest darmowy.",
-      body1:
-        "Czytasz nas w mailu. Możesz korzystać z nas bezpośrednio: wybierz model, pytaj o wszystko, sam decyduj o filtrze.",
-      body2:
-        "Darmowe konta dostają {{freeCreditsSignedIn}} kredytów miesięcznie. Z newsletterem na koncie masz {{freeCreditsMax}}.",
+      subject: "Ostatnie przypomnienie: twoje darmowe konto",
+      preview:
+        "{{freeCreditsMax}} zamiast {{freeCreditsGuest}} kredytów miesięcznie. Bez karty.",
+      intro:
+        "Ostatnie przypomnienie. Darmowe konto z newsletterem dostaje {{freeCreditsMax}} kredytów co miesiąc. Bez konta: {{freeCreditsGuest}}.",
+      body: "Zajmie ci minutę. Bez karty.",
       cta: "Załóż darmowe konto",
+      ps: "P.S. Więcej przypomnień nie będzie. Newsletter przychodzi dalej jak zwykle.",
+    },
+  },
+  emailTemplates: {
+    category: "Journeys lifecycle",
+    preview: {
+      name: {
+        label: "Imię",
+        description: "Imię w powitaniu. Puste = ogólne powitanie.",
+      },
+    },
+    firstChatPrompts: {
+      name: "Lifecycle: pierwszy czat",
+      description:
+        "48 godz. po rejestracji, zweryfikowane konto, brak czatu. Trzy konkretne prompty.",
+    },
+    outOfCredits: {
+      name: "Lifecycle: brak kredytów",
+      description:
+        "Darmowe kredyty na miesiąc zużyte, nigdy nie płacił. Ceny planów.",
+    },
+    whatsNew: {
+      name: "Lifecycle: co nowego",
+      description: "7 dni bez czatu. Modele, media, języki.",
+    },
+    winBack: {
+      name: "Lifecycle: powrót",
+      description: "30 dni bez czatu. Ostatni mail journey.",
+    },
+    inviteSignup: {
+      name: "Lifecycle: zaproszenie z newslettera",
+      description:
+        "Potwierdzony subskrybent newslettera bez konta, 48 godz. po potwierdzeniu.",
+    },
+    inviteReminder: {
+      name: "Lifecycle: przypomnienie o zaproszeniu",
+      description: "Tydzień po zaproszeniu, nadal bez konta.",
     },
   },
   run: {
@@ -241,12 +299,14 @@ export const translations: typeof enTranslations = {
         eligible: "Kwalifikujący się",
         alreadyEnrolled: "Już zapisani",
         enrolled: "Zapisani",
+        autoEligible: "Zaplanowane uruchomienie by zapisało",
         heldSuppressed: "Wstrzymani: wypisani / bounce",
         heldPaid: "Wstrzymani: już płacący",
         heldNoConsent: "Wstrzymani: brak zgody marketingowej",
         heldUnverified: "Wstrzymani: niezweryfikowany e-mail",
         heldPendingNewsletter: "Wstrzymani: newsletter niepotwierdzony",
         heldInactiveAccount: "Wstrzymani: zablokowani / nieaktywni",
+        heldNothingDue: "Wstrzymani: nic do wysłania (aktywni, mają kredyty)",
       },
       success: {
         title: "Backfill zakończony",

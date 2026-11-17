@@ -12,14 +12,18 @@ export const {
   options: LifecycleJourneyOptions,
   Value: LifecycleJourneyValue,
 } = createEnumOptions(scopedTranslation, {
-  INACTIVE_USER: "enums.journey.inactiveUser",
-  ENGAGED_FREE: "enums.journey.engagedFree",
+  FIRST_CHAT: "enums.journey.firstChat",
+  OUT_OF_CREDITS: "enums.journey.outOfCredits",
+  WHATS_NEW: "enums.journey.whatsNew",
+  WIN_BACK: "enums.journey.winBack",
   NEWSLETTER_INVITE: "enums.journey.newsletterInvite",
 });
 
 export const LifecycleJourneyDB = [
-  LifecycleJourney.INACTIVE_USER,
-  LifecycleJourney.ENGAGED_FREE,
+  LifecycleJourney.FIRST_CHAT,
+  LifecycleJourney.OUT_OF_CREDITS,
+  LifecycleJourney.WHATS_NEW,
+  LifecycleJourney.WIN_BACK,
   LifecycleJourney.NEWSLETTER_INVITE,
 ] as const;
 
@@ -80,12 +84,19 @@ export const {
   options: LifecycleTemplateOptions,
   Value: LifecycleTemplateValue,
 } = createEnumOptions(scopedTranslation, {
-  INACTIVE_NUDGE: "enums.template.inactiveNudge",
-  INACTIVE_MODELS: "enums.template.inactiveModels",
-  INACTIVE_UPGRADE: "enums.template.inactiveUpgrade",
-  ENGAGED_VALUE: "enums.template.engagedValue",
-  ENGAGED_UPGRADE: "enums.template.engagedUpgrade",
-  ENGAGED_LAST: "enums.template.engagedLast",
+  FIRST_CHAT_PROMPTS: "enums.template.firstChatPrompts",
+  OUT_OF_CREDITS: "enums.template.outOfCredits",
+  WHATS_NEW: "enums.template.whatsNew",
+  WIN_BACK: "enums.template.winBack",
   INVITE_SIGNUP: "enums.template.inviteSignup",
   INVITE_REMINDER: "enums.template.inviteReminder",
 });
+
+export const LifecycleTemplateDB = [
+  LifecycleTemplate.FIRST_CHAT_PROMPTS,
+  LifecycleTemplate.OUT_OF_CREDITS,
+  LifecycleTemplate.WHATS_NEW,
+  LifecycleTemplate.WIN_BACK,
+  LifecycleTemplate.INVITE_SIGNUP,
+  LifecycleTemplate.INVITE_REMINDER,
+] as const;

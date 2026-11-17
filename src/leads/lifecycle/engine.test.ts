@@ -20,6 +20,8 @@ import { users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { creditTransactions, creditWallets } from "@/credits/db";
+import { CreditTransactionType } from "@/credits/enum";
 import { newsletterSubscriptions } from "@/newsletter/db";
 import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
 import { paymentTransactions } from "@/payment/db";
@@ -55,8 +57,12 @@ const E = {
   nlPending: addr("nl-pending"),
   nlUnsub: addr("nl-unsub"),
   capped: addr("capped"),
+  quiet: addr("quiet"),
+  gone: addr("gone"),
 };
 const ALL = Object.values(E);
+/** Contacts created inside single tests (not part of the segment counts). */
+const EXTRA = { goal: addr("goal"), unsubLater: addr("unsub-later") };
 
 const live: SettingsValues = {
   paused: false,
@@ -116,11 +122,32 @@ async function makeUser(
   return u.id;
 }
 
-async function makeChat(userId: string): Promise<void> {
+async function makeChat(userId: string, at: Date = new Date()): Promise<void> {
   await db.insert(chatThreads).values({
     userId,
     title: "t",
     rootFolderId: "private",
+    createdAt: at,
+    updatedAt: at,
+  });
+}
+
+/** Account wallet with nothing left this month and a usage row that drained it. */
+async function drainPool(userId: string): Promise<void> {
+  const [wallet] = await db
+    .insert(creditWallets)
+    .values({
+      userId,
+      balance: 0,
+      freeCreditsRemaining: 0,
+      freePeriodId: new Date().toISOString().slice(0, 7),
+    })
+    .returning({ id: creditWallets.id });
+  await db.insert(creditTransactions).values({
+    walletId: wallet.id,
+    amount: -3,
+    balanceAfter: 0,
+    type: CreditTransactionType.USAGE,
   });
 }
 
@@ -137,7 +164,9 @@ async function makeNewsletter(
   });
 }
 
-async function enrollmentFor(email: string): Promise<typeof lifecycleEnrollments.$inferSelect | undefined> {
+async function enrollmentFor(
+  email: string,
+): Promise<typeof lifecycleEnrollments.$inferSelect | undefined> {
   const [row] = await db
     .select()
     .from(lifecycleEnrollments)
@@ -149,6 +178,11 @@ beforeAll(async () => {
   await makeUser(E.inactive);
   const engaged = await makeUser(E.engaged);
   await makeChat(engaged);
+  await drainPool(engaged);
+  const quiet = await makeUser(E.quiet);
+  await makeChat(quiet, new Date(NOW.getTime() - 10 * 24 * HOUR));
+  const gone = await makeUser(E.gone);
+  await makeChat(gone, new Date(NOW.getTime() - 40 * 24 * HOUR));
   await makeUser(E.noConsent, { marketingConsent: false });
   const paid = await makeUser(E.paid);
   await makeChat(paid);
@@ -159,10 +193,26 @@ beforeAll(async () => {
     status: PaymentStatus.SUCCEEDED,
   });
   await makeUser(E.unsubUser);
-  await makeNewsletter(E.unsubUser, NewsletterSubscriptionStatus.UNSUBSCRIBED, true);
-  await makeNewsletter(E.nlConfirmed, NewsletterSubscriptionStatus.SUBSCRIBED, true);
-  await makeNewsletter(E.nlPending, NewsletterSubscriptionStatus.PENDING, false);
-  await makeNewsletter(E.nlUnsub, NewsletterSubscriptionStatus.UNSUBSCRIBED, true);
+  await makeNewsletter(
+    E.unsubUser,
+    NewsletterSubscriptionStatus.UNSUBSCRIBED,
+    true,
+  );
+  await makeNewsletter(
+    E.nlConfirmed,
+    NewsletterSubscriptionStatus.SUBSCRIBED,
+    true,
+  );
+  await makeNewsletter(
+    E.nlPending,
+    NewsletterSubscriptionStatus.PENDING,
+    false,
+  );
+  await makeNewsletter(
+    E.nlUnsub,
+    NewsletterSubscriptionStatus.UNSUBSCRIBED,
+    true,
+  );
   const cappedUser = await makeUser(E.capped);
   const [lead] = await db
     .insert(leads)
@@ -181,13 +231,20 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await db.delete(lifecycleEnrollments).where(inArray(lifecycleEnrollments.email, ALL));
-  await db.delete(newsletterSubscriptions).where(inArray(newsletterSubscriptions.email, ALL));
+  const everyone = [...ALL, ...Object.values(EXTRA)];
+  await db
+    .delete(lifecycleEnrollments)
+    .where(inArray(lifecycleEnrollments.email, everyone));
+  await db
+    .delete(newsletterSubscriptions)
+    .where(inArray(newsletterSubscriptions.email, everyone));
   if (leadIds.length > 0) {
     await db.delete(leads).where(inArray(leads.id, leadIds));
   }
   if (userIds.length > 0) {
-    await db.delete(paymentTransactions).where(inArray(paymentTransactions.userId, userIds));
+    await db
+      .delete(paymentTransactions)
+      .where(inArray(paymentTransactions.userId, userIds));
     await db.delete(chatThreads).where(inArray(chatThreads.userId, userIds));
     await db.delete(users).where(inArray(users.id, userIds));
   }
@@ -205,9 +262,18 @@ describe("lifecycle engine", () => {
     const count = (j: string): number =>
       result.perJourney.find((p) => p.journey === j)?.eligible ?? -1;
     // inactive + capped (capped is eligible; the cap only delays the send)
-    expect(count(LifecycleJourney.INACTIVE_USER)).toBe(2);
-    expect(count(LifecycleJourney.ENGAGED_FREE)).toBe(1);
+    expect(count(LifecycleJourney.FIRST_CHAT)).toBe(2);
+    expect(count(LifecycleJourney.OUT_OF_CREDITS)).toBe(1);
+    expect(count(LifecycleJourney.WHATS_NEW)).toBe(1);
+    expect(count(LifecycleJourney.WIN_BACK)).toBe(1);
     expect(count(LifecycleJourney.NEWSLETTER_INVITE)).toBe(1);
+    // The scheduled run only picks up contacts whose first email falls due
+    // inside the 14-day window: the 40-day-quiet one crossed 30 days 10 days ago
+    // (inside), and every other trigger is recent.
+    const auto = (j: string): number =>
+      result.perJourney.find((p) => p.journey === j)?.autoEligible ?? -1;
+    expect(auto(LifecycleJourney.WIN_BACK)).toBe(1);
+    expect(auto(LifecycleJourney.WHATS_NEW)).toBe(1);
     expect(result.held.noConsent).toBe(1);
     expect(result.held.paid).toBe(1);
     expect(result.held.suppressed).toBe(2); // unsubscribed user + unsubscribed newsletter
@@ -223,20 +289,26 @@ describe("lifecycle engine", () => {
       settings: live,
       onlyEmails: ALL,
     });
-    expect(first.perJourney.reduce((n, p) => n + p.enrolled, 0)).toBe(4);
+    expect(first.perJourney.reduce((n, p) => n + p.enrolled, 0)).toBe(6);
 
-    for (const excluded of [E.noConsent, E.paid, E.unsubUser, E.nlPending, E.nlUnsub]) {
+    for (const excluded of [
+      E.noConsent,
+      E.paid,
+      E.unsubUser,
+      E.nlPending,
+      E.nlUnsub,
+    ]) {
       expect(await enrollmentFor(excluded), excluded).toBeUndefined();
     }
     const rows = await db
       .select()
       .from(lifecycleEnrollments)
       .where(inArray(lifecycleEnrollments.email, ALL));
-    expect(rows).toHaveLength(4);
+    expect(rows).toHaveLength(6);
     expect(rows.every((r) => r.fromBackfill)).toBe(true);
     const dues = rows.map((r) => r.nextDueAt.getTime());
     expect(Math.max(...dues)).toBeLessThan(NOW.getTime() + 72 * HOUR);
-    expect(new Set(dues).size).toBe(4);
+    expect(new Set(dues).size).toBe(6);
 
     const second = await runBackfill({
       dryRun: false,
@@ -250,7 +322,7 @@ describe("lifecycle engine", () => {
       .select()
       .from(lifecycleEnrollments)
       .where(inArray(lifecycleEnrollments.email, ALL));
-    expect(again).toHaveLength(4);
+    expect(again).toHaveLength(6);
 
     // auto mode also never double-enrolls
     const plan = await planContacts({
@@ -294,17 +366,24 @@ describe("lifecycle engine", () => {
       logger,
       onlyEmails: ALL,
     });
-    // capped contact (lead.lastEmailSentAt = 1h before send time) is deferred, the other 3 go out
-    expect(first.sent).toBe(3);
+    // capped contact (lead.lastEmailSentAt = 1h before send time) is deferred, the other 5 go out
+    expect(first.sent).toBe(5);
     expect(first.deferred).toBe(1);
     expect(sent.map((m) => m.to).toSorted()).toEqual(
-      [E.inactive, E.engaged, E.nlConfirmed].toSorted(),
+      [E.inactive, E.engaged, E.nlConfirmed, E.quiet, E.gone].toSorted(),
     );
     expect(sent.find((m) => m.to === E.nlConfirmed)?.newsletterOnly).toBe(true);
     expect(sent.every((m) => m.html.includes("unsubscribe"))).toBe(true);
 
+    // Single-email journeys complete on send; the invite has a second step.
     const row = await enrollmentFor(E.inactive);
     expect(row?.nextStep).toBe(1);
+    expect(row?.status).toBe(LifecycleEnrollmentStatus.COMPLETED);
+    expect((await enrollmentFor(E.nlConfirmed))?.status).toBe(
+      LifecycleEnrollmentStatus.ACTIVE,
+    );
+    // Each journey got its own email (subjects differ)
+    expect(new Set(sent.map((m) => m.subject)).size).toBe(5);
 
     // Same instant again: nothing due / nothing re-sent.
     const second = await advanceDue({
@@ -315,13 +394,13 @@ describe("lifecycle engine", () => {
       onlyEmails: ALL,
     });
     expect(second.sent).toBe(0);
-    expect(sent).toHaveLength(3);
+    expect(sent).toHaveLength(5);
 
     const sendRows = await db
       .select()
       .from(lifecycleSends)
       .where(inArray(lifecycleSends.email, ALL));
-    expect(sendRows).toHaveLength(3);
+    expect(sendRows).toHaveLength(5);
   });
 
   it("a pre-existing send claim blocks a duplicate send of that step", async () => {
@@ -347,11 +426,18 @@ describe("lifecycle engine", () => {
   });
 
   it("exits quietly when the goal is met (first chat)", async () => {
-    const inactive = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.email, E.inactive));
-    await makeChat(inactive[0].id);
+    const goalUser = await makeUser(EXTRA.goal);
+    await runBackfill({
+      dryRun: false,
+      spreadHours: 1,
+      now: NOW,
+      settings: live,
+      onlyEmails: [EXTRA.goal],
+    });
+    expect((await enrollmentFor(EXTRA.goal))?.journey).toBe(
+      LifecycleJourney.FIRST_CHAT,
+    );
+    await makeChat(goalUser);
     const { transport, sent } = recordingTransport();
     const far = new Date(NOW.getTime() + 300 * HOUR);
     const r = await advanceDue({
@@ -359,25 +445,42 @@ describe("lifecycle engine", () => {
       settings: live,
       transport,
       logger,
-      onlyEmails: [E.inactive],
+      onlyEmails: [EXTRA.goal],
     });
     expect(r.exited).toBe(1);
     expect(sent).toHaveLength(0);
-    const row = await enrollmentFor(E.inactive);
+    const row = await enrollmentFor(EXTRA.goal);
     expect(row?.status).toBe(LifecycleEnrollmentStatus.EXITED);
     expect(row?.exitReason).toBe(LifecycleExitReason.GOAL_MET);
     expect(row?.convertedAt).not.toBeNull();
   });
 
   it("unsubscribe exits all active journeys immediately", async () => {
-    const exited = await exitAllForEmail(E.engaged, LifecycleExitReason.UNSUBSCRIBED);
+    await makeUser(EXTRA.unsubLater);
+    await runBackfill({
+      dryRun: false,
+      spreadHours: 1,
+      now: NOW,
+      settings: live,
+      onlyEmails: [EXTRA.unsubLater],
+    });
+    const exited = await exitAllForEmail(
+      EXTRA.unsubLater,
+      LifecycleExitReason.UNSUBSCRIBED,
+    );
     expect(exited).toBe(1);
-    const row = await enrollmentFor(E.engaged);
+    const row = await enrollmentFor(EXTRA.unsubLater);
     expect(row?.status).toBe(LifecycleEnrollmentStatus.EXITED);
     expect(row?.exitReason).toBe(LifecycleExitReason.UNSUBSCRIBED);
     const { transport, sent } = recordingTransport();
     const far = new Date(NOW.getTime() + 300 * HOUR);
-    await advanceDue({ now: far, settings: live, transport, logger, onlyEmails: [E.engaged] });
+    await advanceDue({
+      now: far,
+      settings: live,
+      transport,
+      logger,
+      onlyEmails: [EXTRA.unsubLater],
+    });
     expect(sent).toHaveLength(0);
   });
 

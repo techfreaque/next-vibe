@@ -16,7 +16,6 @@ import {
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { contactClientRepository } from "@/contact/repository-client";
-import { configScopedTranslation } from "@/env/i18n";
 import { CampaignType } from "@/messenger/accounts/enum";
 import { scopedTranslation as smtpScopedTranslation } from "@/messenger/providers/email/smtp-client/i18n";
 import { SmtpSendingRepository } from "@/messenger/providers/email/smtp-client/sending/repository";
@@ -32,6 +31,8 @@ export interface LifecycleMail {
   leadId: string | null;
   /** Human unsubscribe page; its presence adds the RFC 8058 one-click headers. */
   unsubscribeUrl: string;
+  /** Display name of the sender (personal voice, localized). */
+  senderName: string;
 }
 
 export interface LifecycleTransport {
@@ -45,7 +46,6 @@ export interface LifecycleTransport {
 export const smtpLifecycleTransport: LifecycleTransport = {
   async send(mail, logger) {
     const { language, country } = getLanguageAndCountryFromLocale(mail.locale);
-    const { t: configT } = configScopedTranslation.scopedT(mail.locale);
     const smtpT = smtpScopedTranslation.scopedT(mail.locale).t;
     const sent = await SmtpSendingRepository.sendEmail(
       {
@@ -53,7 +53,7 @@ export const smtpLifecycleTransport: LifecycleTransport = {
         subject: mail.subject,
         html: mail.html,
         text: mail.text,
-        senderName: configT("appName"),
+        senderName: mail.senderName,
         unsubscribeUrl: mail.unsubscribeUrl,
         replyTo: contactClientRepository.getSupportEmail(mail.locale),
         selectionCriteria: {

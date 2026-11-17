@@ -121,6 +121,7 @@ export class LifecycleRepository {
         heldUnverified: result.held.unverified,
         heldPendingNewsletter: result.held.pendingNewsletter,
         heldInactiveAccount: result.held.inactiveAccount,
+        heldNothingDue: result.held.nothingDue,
       });
     } catch (error) {
       logger.error("lifecycle.backfill.failed", parseError(error));

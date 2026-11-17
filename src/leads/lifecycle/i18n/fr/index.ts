@@ -4,8 +4,10 @@ export const translations: typeof enTranslations = {
   tag: "Cycle de vie",
   enums: {
     journey: {
-      inactiveUser: "Inscrit, jamais discuté",
-      engagedFree: "A discuté, jamais payé",
+      firstChat: "Inscrit, aucune discussion",
+      outOfCredits: "Crédits gratuits épuisés",
+      whatsNew: "Inactif depuis 7 jours",
+      winBack: "Inactif depuis 30 jours",
       newsletterInvite: "Newsletter, sans compte",
     },
     enrollmentStatus: {
@@ -25,12 +27,10 @@ export const translations: typeof enTranslations = {
       sent: "Envoyé",
     },
     template: {
-      inactiveNudge: "Relance : lancer une discussion",
-      inactiveModels: "Choix du modèle",
-      inactiveUpgrade: "Rappel crédits",
-      engagedValue: "Valeur : en tirer davantage",
-      engagedUpgrade: "Upgrade : ne pas attendre la réinitialisation",
-      engagedLast: "Dernier mot sur les crédits",
+      firstChatPrompts: "Première discussion : trois prompts",
+      outOfCredits: "Crédits épuisés : formules",
+      whatsNew: "Nouveautés",
+      winBack: "Reconquête : dernier e-mail",
       inviteSignup: "Invitation : créer un compte",
       inviteReminder: "Invitation : rappel",
     },
@@ -63,78 +63,137 @@ export const translations: typeof enTranslations = {
   },
   emails: {
     greeting: "Bonjour,",
+    greetingNamed: "Bonjour {{name}},",
+    signoff: "Max",
     signature: "unbottled.ai",
+    senderName: "Max d'unbottled.ai",
     unsubscribeText: "Se désabonner :",
-    inactiveNudge: {
-      subject: "Vous êtes inscrit. Vous n'avez encore rien demandé.",
-      preview: "Vos crédits gratuits vous attendent.",
-      body1:
-        "Votre compte est actif et vos crédits gratuits se renouvellent chaque mois. Aucun filtre que vous n'avez pas choisi.",
-      body2:
-        "Posez la question que vous ne pouviez poser nulle part ailleurs. Un seul message suffit.",
-      cta: "Lancer une discussion",
+    firstChatPrompts: {
+      subject: "Trois premiers messages, prêts à copier",
+      preview:
+        "Un non censuré, un grand public, une image. Choisissez, envoyez.",
+      intro:
+        "Votre compte est prêt et le chat est encore vide. Voici trois messages pour démarrer. Copiez-en un, collez-le, envoyez.",
+      uncensoredTitle: "Demander sans leçon de morale",
+      uncensoredPrompt:
+        "« Écris un polar bien noir où le méchant gagne. Pas de fin heureuse, pas de morale. » Choisissez l'un des {{uncensoredCount}} modèles non censurés. Vous confirmez une seule fois que vous avez 18 ans ou plus.",
+      mainstreamTitle: "Comparer les grands noms",
+      mainstreamPrompt:
+        "« Organise-moi un week-end pas cher à Lisbonne. Où manger, quoi éviter ? » Posez la question à GPT. Passez ensuite à Claude ou Gemini dans le même fil et comparez.",
+      mediaTitle: "Créer une image, une vidéo, un morceau",
+      mediaPrompt:
+        "« Un renard en écharpe rouge dans une rue enneigée de Tokyo, la nuit, photo argentique. » Un prompt, une image. Les vidéos courtes et la musique marchent pareil.",
+      body: "Votre compte gratuit reçoit {{freeCreditsSignedIn}} crédits chaque mois, {{freeCreditsMax}} avec la newsletter. Sans carte bancaire.",
+      cta: "Envoyer mon premier message",
+      ps: "P.-S. Vous ne savez pas par où commencer ? Répondez à cet e-mail. Nous lisons les réponses.",
     },
-    inactiveModels: {
-      subject: "{{modelCount}} modèles. Vous décidez de ce qui est filtré.",
-      preview: "Grand public, open source ou non censuré. À vous de choisir.",
-      body1:
-        "La plupart des IA décident à votre place de ce que vous pouvez demander. Ici, c'est vous qui choisissez : modèles grand public, open source ou non censurés, côte à côte.",
-      body2:
-        "Choisissez un modèle, réglez votre propre niveau de filtrage, envoyez un prompt. C'est tout.",
-      cta: "Choisir un modèle",
+    outOfCredits: {
+      subject: "Vos crédits gratuits du mois sont épuisés",
+      preview:
+        "Ils reviennent le 1er. Ou continuez dès maintenant, formules dès {{subscriptionPrice}} par mois.",
+      intro:
+        "Vous avez utilisé tous vos crédits gratuits du mois. Ils reviennent le 1er. Pas envie d'attendre ? Choisissez une formule. Prix affichés.",
+      starterTitle: "Starter : {{subscriptionPrice}}/mois",
+      starterBody:
+        "{{subscriptionCredits}} crédits chaque mois, résiliable à tout moment. Pour un usage presque quotidien.",
+      moreTitle: "Besoin de plus ? Trois formules plus grandes",
+      moreBody:
+        "Plus : {{plusCredits}} crédits pour {{plusPrice}}. Pro : {{proCredits}} pour {{proPrice}}. Ultra : {{ultraCredits}} pour {{ultraPrice}}. Chaque formule peut se recharger avec des packs qui n'expirent jamais.",
+      body: "Carte, PayPal ou crypto. Mêmes modèles, mêmes réglages de filtre.",
+      cta: "{{subscriptionCredits}} crédits pour {{subscriptionPrice}}",
+      ps: "P.-S. Attendre le 1er, c'est très bien aussi. Vos fils de discussion restent où ils sont.",
     },
-    inactiveUpgrade: {
-      subject:
-        "Les crédits gratuits pour démarrer. Les crédits payants pour aller plus loin.",
-      preview: "Des modèles plus puissants, des discussions plus longues.",
-      body1:
-        "Les crédits gratuits couvrent beaucoup. Pour les gros modèles et les longues conversations, rechargez et continuez.",
-      body2:
-        "Vous payez ce que vous utilisez. Achetez des crédits quand vous en avez besoin.",
-      cta: "Voir les options de crédits",
+    whatsNew: {
+      subject: "Ce qui a changé pendant votre absence",
+      preview:
+        "{{modelCount}} modèles, vidéo et musique dans le chat, et le français.",
+      intro:
+        "Votre dernière discussion date de plus d'une semaine. Voici les nouveautés.",
+      modelsTitle: "{{modelCount}} modèles de chat",
+      modelsBody:
+        "{{mainstreamCount}} grand public, {{openCount}} open source, {{uncensoredCount}} non censurés. Changez de modèle en plein fil.",
+      mediaTitle: "Images, vidéos et musique",
+      mediaBody:
+        "Un prompt dans le chat, et vous récupérez une image, un clip court ou un morceau.",
+      languagesTitle: "Maintenant en français",
+      languagesBody:
+        "Toute l'application existe en français, anglais, allemand et polonais.",
+      body: "Vos fils de discussion sont restés là où vous les avez laissés.",
+      cta: "Voir tous les modèles",
+      ps: "P.-S. Vous connaissez quelqu'un que ça intéresserait ? Votre lien de parrainage vous rapporte {{referralPercent}} % de tout ce que cette personne dépense, chaque mois.",
     },
-    engagedValue: {
-      subject: "Vous discutez déjà. Voici comment en tirer davantage.",
-      preview: "Essayez le même prompt sur un deuxième modèle.",
-      body1:
-        "Chaque modèle répond à sa manière. Lancez le même prompt sur un deuxième et comparez.",
-      body2:
-        "Vos crédits gratuits se renouvellent chaque mois. Quand vous atteignez la limite, inutile d'attendre.",
-      cta: "Continuer la discussion",
-    },
-    engagedUpgrade: {
-      subject: "Plus de crédits gratuits ? N'attendez pas la réinitialisation.",
-      preview: "Rechargez en une minute.",
-      body1:
-        "Les crédits gratuits se renouvellent chaque mois. Les crédits payants ne vous font pas attendre : choisissez un pack ou un abonnement et poursuivez votre fil.",
-      body2: "Vous payez à l'usage. Rien d'autre.",
-      cta: "Obtenir plus de crédits",
-    },
-    engagedLast: {
-      subject: "Notre dernier mot sur les crédits",
-      preview: "Ensuite, on vous laisse tranquille.",
-      body1:
-        "C'est le dernier e-mail de cette série. Si les crédits gratuits vous suffisent, restez en gratuit. Si vous voulez plus de marge, les crédits sont à un clic.",
-      body2: "Vous pouvez vous désabonner à tout moment en bas de cet e-mail.",
-      cta: "Voir les options de crédits",
+    winBack: {
+      subject: "Un dernier e-mail de notre part",
+      preview:
+        "Votre compte, vos fils et vos crédits gratuits sont toujours là.",
+      intro:
+        "Votre dernière discussion remonte à plus d'un mois. C'est notre dernier rappel.",
+      body: "Votre compte, vos fils de discussion et vos crédits gratuits mensuels sont toujours là. Plus de modèles qu'avant, et c'est toujours vous qui réglez le filtre.",
+      cta: "Reprendre où vous en étiez",
+      ps: "P.-S. Qu'est-ce qui vous a freiné ? Répondez et dites-le-nous. Nous lisons chaque réponse.",
     },
     inviteSignup: {
-      subject: "Vous êtes sur la liste. Passez maintenant au compte.",
-      preview: "Compte gratuit. Jusqu'à {{freeCreditsMax}} crédits par mois.",
-      body1:
-        "Un compte gratuit vous donne {{freeCreditsSignedIn}} crédits par mois et l'accès à {{modelCount}} modèles, avec le niveau de filtrage que vous fixez.",
-      body2:
-        "Sans compte : {{freeCreditsGuest}} par mois. Compte gratuit : {{freeCreditsSignedIn}}. Compte + newsletter : {{freeCreditsMax}}.",
-      cta: "Créer un compte gratuit",
+      subject: "Vous lisez la newsletter. Essayez l'application.",
+      preview:
+        "Compte gratuit, jusqu'à {{freeCreditsMax}} crédits par mois. Sans carte.",
+      intro:
+        "Vous recevez notre newsletter. L'application est à un pas : {{modelCount}} modèles, et c'est vous qui réglez le filtre.",
+      guestTitle: "Sans compte : {{freeCreditsGuest}} crédits par mois",
+      guestBody: "De quoi tester quelques modèles.",
+      accountTitle: "Compte gratuit : {{freeCreditsSignedIn}} crédits par mois",
+      accountBody: "Vos fils sauvegardés, sur tous vos appareils.",
+      newsletterTitle:
+        "Compte + newsletter : {{freeCreditsMax}} crédits par mois",
+      newsletterBody:
+        "Gardez la newsletter activée sur votre compte et le bonus est pour vous.",
+      body: "Sans carte. Les crédits gratuits s'activent dès que vous confirmez votre e-mail.",
+      cta: "Créer mon compte gratuit",
     },
     inviteReminder: {
-      subject: "Toujours pas de compte ? Ça prend une minute.",
-      preview: "Gratuit pour commencer.",
-      body1:
-        "Vous nous lisez par e-mail. Vous pouvez aussi nous utiliser directement : choisissez un modèle, demandez ce que vous voulez, fixez votre propre filtre.",
-      body2:
-        "Les comptes gratuits reçoivent {{freeCreditsSignedIn}} crédits par mois. Gardez la newsletter sur le compte et vous passez à {{freeCreditsMax}}.",
-      cta: "Créer un compte gratuit",
+      subject: "Dernier rappel : votre compte gratuit",
+      preview:
+        "{{freeCreditsMax}} crédits par mois au lieu de {{freeCreditsGuest}}. Sans carte.",
+      intro:
+        "Dernier rappel. Un compte gratuit avec la newsletter reçoit {{freeCreditsMax}} crédits chaque mois. Sans compte : {{freeCreditsGuest}}.",
+      body: "Une minute suffit. Sans carte.",
+      cta: "Créer mon compte gratuit",
+      ps: "P.-S. Plus aucun rappel après celui-ci. La newsletter continue comme d'habitude.",
+    },
+  },
+  emailTemplates: {
+    category: "Parcours de cycle de vie",
+    preview: {
+      name: {
+        label: "Prénom",
+        description: "Prénom de la salutation. Vide = salutation générique.",
+      },
+    },
+    firstChatPrompts: {
+      name: "Cycle de vie : première discussion",
+      description:
+        "48 h après l'inscription, compte vérifié, aucune discussion. Trois prompts concrets.",
+    },
+    outOfCredits: {
+      name: "Cycle de vie : crédits épuisés",
+      description:
+        "Crédits gratuits du mois épuisés, jamais payé. Prix des formules.",
+    },
+    whatsNew: {
+      name: "Cycle de vie : nouveautés",
+      description: "7 jours sans discussion. Modèles, médias, langues.",
+    },
+    winBack: {
+      name: "Cycle de vie : reconquête",
+      description: "30 jours sans discussion. Dernier e-mail du parcours.",
+    },
+    inviteSignup: {
+      name: "Cycle de vie : invitation newsletter",
+      description:
+        "Abonné newsletter confirmé sans compte, 48 h après confirmation.",
+    },
+    inviteReminder: {
+      name: "Cycle de vie : rappel d'invitation",
+      description: "Une semaine après l'invitation, toujours sans compte.",
     },
   },
   run: {
@@ -245,12 +304,14 @@ export const translations: typeof enTranslations = {
         eligible: "Éligibles",
         alreadyEnrolled: "Déjà inscrits",
         enrolled: "Inscrits",
+        autoEligible: "L'exécution planifiée inscrirait",
         heldSuppressed: "Retenus : désabonnés / rebonds",
         heldPaid: "Retenus : déjà payants",
         heldNoConsent: "Retenus : sans consentement marketing",
         heldUnverified: "Retenus : e-mail non vérifié",
         heldPendingNewsletter: "Retenus : newsletter non confirmée",
         heldInactiveAccount: "Retenus : bannis / inactifs",
+        heldNothingDue: "Retenus : rien à envoyer (actifs, ont des crédits)",
       },
       success: {
         title: "Rattrapage terminé",

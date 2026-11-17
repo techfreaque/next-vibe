@@ -90,6 +90,11 @@ const { POST } = createEndpoint({
               label: "backfill.post.response.eligible",
               schema: z.number(),
             }),
+            autoEligible: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "backfill.post.response.autoEligible",
+              schema: z.number(),
+            }),
             alreadyEnrolled: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "backfill.post.response.alreadyEnrolled",
@@ -133,6 +138,11 @@ const { POST } = createEndpoint({
         label: "backfill.post.response.heldInactiveAccount",
         schema: z.number(),
       }),
+      heldNothingDue: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "backfill.post.response.heldNothingDue",
+        schema: z.number(),
+      }),
     },
   }),
 
@@ -150,8 +160,9 @@ const { POST } = createEndpoint({
         dryRunResult: true,
         segments: [
           {
-            journey: LifecycleJourney.INACTIVE_USER,
+            journey: LifecycleJourney.FIRST_CHAT,
             eligible: 0,
+            autoEligible: 0,
             alreadyEnrolled: 0,
             enrolled: 0,
           },
@@ -162,6 +173,7 @@ const { POST } = createEndpoint({
         heldUnverified: 0,
         heldPendingNewsletter: 0,
         heldInactiveAccount: 0,
+        heldNothingDue: 0,
       },
     },
   },

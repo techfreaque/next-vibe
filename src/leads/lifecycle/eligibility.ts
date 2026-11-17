@@ -17,6 +17,7 @@ import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
 
 import type { LifecycleJourneyValue } from "./enum";
 import { LifecycleJourney } from "./enum";
+import { WHATS_NEW_AFTER_DAYS, WIN_BACK_AFTER_DAYS } from "./journeys";
 
 export interface ContactSnapshot {
   /** Lower-cased email. */
@@ -24,6 +25,8 @@ export interface ContactSnapshot {
   userId: string | null;
   leadId: string | null;
   locale: CountryLanguage | null;
+  /** Account first name for the greeting (privateName), null for newsletter-only. */
+  name: string | null;
   user: {
     emailVerified: boolean;
     isActive: boolean;
@@ -33,6 +36,13 @@ export interface ContactSnapshot {
   } | null;
   hasChatted: boolean;
   lastChatAt: Date | null;
+  /** Latest chat activity: newest thread or credit usage, whichever is later. */
+  lastActivityAt: Date | null;
+  /**
+   * Set when the account's pool (paid balance + this month's free credits) is
+   * below OUT_OF_CREDITS_THRESHOLD: time of the usage that drained it.
+   */
+  outOfCreditsAt: Date | null;
   isPaid: boolean;
   newsletter: {
     status: string;
@@ -55,6 +65,8 @@ export const HeldReason = {
   UNVERIFIED: "unverified",
   PENDING_NEWSLETTER: "pendingNewsletter",
   INACTIVE_ACCOUNT: "inactiveAccount",
+  /** Lawful to mail, but nothing is due: active, has credits, or never chatted while paid. */
+  NOTHING_DUE: "nothingDue",
 } as const;
 export type HeldReasonValue = (typeof HeldReason)[keyof typeof HeldReason];
 
@@ -102,10 +114,30 @@ export function hasConfirmedNewsletterOptIn(
   );
 }
 
-/** Decide which journey (if any) a contact belongs to, or why they are held back. */
+const HOUR_MS = 3_600_000;
+const DAY_MS = 24 * HOUR_MS;
+
+function journey(
+  key: typeof LifecycleJourneyValue,
+  triggerAt: Date,
+): Classification {
+  return { journey: key, triggerAt, held: null };
+}
+
+/**
+ * Decide which journey (if any) a contact belongs to right now, or why they are
+ * held back. States are mutually exclusive, checked in this order:
+ *   no account + confirmed newsletter -> NEWSLETTER_INVITE
+ *   account, never chatted, not paid  -> FIRST_CHAT
+ *   chatted, quiet >= 30 days         -> WIN_BACK   (paid users too)
+ *   chatted, quiet >= 7 days          -> WHATS_NEW  (paid users too)
+ *   chatted, not paid, pool drained   -> OUT_OF_CREDITS
+ * `triggerAt` is when the state began; the journey's first-step delay counts from it.
+ */
 export function classifyContact(
   snapshot: ContactSnapshot,
   settings: EligibilitySettings,
+  now: Date,
 ): Classification {
   if (isSuppressed(snapshot)) {
     return { journey: null, held: HeldReason.SUPPRESSED };
@@ -114,9 +146,6 @@ export function classifyContact(
   if (snapshot.user) {
     if (!snapshot.user.isActive || snapshot.user.isBanned) {
       return { journey: null, held: HeldReason.INACTIVE_ACCOUNT };
-    }
-    if (snapshot.isPaid) {
-      return { journey: null, held: HeldReason.PAID };
     }
     const optIn = hasConfirmedNewsletterOptIn(snapshot);
     if (!snapshot.user.emailVerified && !optIn) {
@@ -129,46 +158,60 @@ export function classifyContact(
     ) {
       return { journey: null, held: HeldReason.NO_CONSENT };
     }
-    if (snapshot.hasChatted) {
-      return {
-        journey: LifecycleJourney.ENGAGED_FREE,
-        triggerAt: snapshot.lastChatAt ?? snapshot.user.createdAt,
-        held: null,
-      };
+    if (!snapshot.hasChatted) {
+      return snapshot.isPaid
+        ? { journey: null, held: HeldReason.PAID }
+        : journey(LifecycleJourney.FIRST_CHAT, snapshot.user.createdAt);
+    }
+    const lastActive =
+      snapshot.lastActivityAt ?? snapshot.lastChatAt ?? snapshot.user.createdAt;
+    const quietMs = now.getTime() - lastActive.getTime();
+    if (quietMs >= WIN_BACK_AFTER_DAYS * DAY_MS) {
+      return journey(LifecycleJourney.WIN_BACK, lastActive);
+    }
+    if (quietMs >= WHATS_NEW_AFTER_DAYS * DAY_MS) {
+      return journey(LifecycleJourney.WHATS_NEW, lastActive);
+    }
+    if (!snapshot.isPaid && snapshot.outOfCreditsAt) {
+      return journey(LifecycleJourney.OUT_OF_CREDITS, snapshot.outOfCreditsAt);
     }
     return {
-      journey: LifecycleJourney.INACTIVE_USER,
-      triggerAt: snapshot.user.createdAt,
-      held: null,
+      journey: null,
+      held: snapshot.isPaid ? HeldReason.PAID : HeldReason.NOTHING_DUE,
     };
   }
 
   if (hasConfirmedNewsletterOptIn(snapshot)) {
-    return {
-      journey: LifecycleJourney.NEWSLETTER_INVITE,
-      triggerAt: snapshot.newsletter.confirmedAt,
-      held: null,
-    };
+    return journey(
+      LifecycleJourney.NEWSLETTER_INVITE,
+      snapshot.newsletter.confirmedAt,
+    );
   }
   return { journey: null, held: HeldReason.PENDING_NEWSLETTER };
 }
 
 /** Has the journey goal been reached? (exit quietly) */
 export function isGoalMet(
-  journey: typeof LifecycleJourneyValue,
+  key: typeof LifecycleJourneyValue,
   snapshot: ContactSnapshot,
+  enrolledAt: Date,
 ): boolean {
-  switch (journey) {
-    case LifecycleJourney.INACTIVE_USER:
+  switch (key) {
+    case LifecycleJourney.FIRST_CHAT:
       return snapshot.hasChatted || snapshot.isPaid;
-    case LifecycleJourney.ENGAGED_FREE:
+    case LifecycleJourney.OUT_OF_CREDITS:
       return snapshot.isPaid;
+    case LifecycleJourney.WHATS_NEW:
+    case LifecycleJourney.WIN_BACK:
+      // Came back after we enrolled them.
+      return (
+        snapshot.lastActivityAt !== null &&
+        snapshot.lastActivityAt.getTime() > enrolledAt.getTime()
+      );
     case LifecycleJourney.NEWSLETTER_INVITE:
       return snapshot.user !== null;
   }
 }
-
-const HOUR_MS = 3_600_000;
 
 /** Earliest moment the frequency cap lets another email go out. */
 export function capReleaseAt(

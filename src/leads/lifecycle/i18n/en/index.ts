@@ -2,8 +2,10 @@ export const translations = {
   tag: "Lifecycle",
   enums: {
     journey: {
-      inactiveUser: "Signed up, never chatted",
-      engagedFree: "Chatted, never paid",
+      firstChat: "Signed up, never chatted",
+      outOfCredits: "Free credits used up",
+      whatsNew: "Quiet for 7 days",
+      winBack: "Quiet for 30 days",
       newsletterInvite: "Newsletter, no account",
     },
     enrollmentStatus: {
@@ -23,12 +25,10 @@ export const translations = {
       sent: "Sent",
     },
     template: {
-      inactiveNudge: "Nudge: start a chat",
-      inactiveModels: "Model choice",
-      inactiveUpgrade: "Credits touch",
-      engagedValue: "Value: get more out of it",
-      engagedUpgrade: "Upgrade: do not wait for the reset",
-      engagedLast: "Last note on credits",
+      firstChatPrompts: "First chat: three prompts",
+      outOfCredits: "Out of credits: plans",
+      whatsNew: "What's new",
+      winBack: "Win-back: last email",
       inviteSignup: "Invite: create an account",
       inviteReminder: "Invite: reminder",
     },
@@ -61,76 +61,133 @@ export const translations = {
   },
   emails: {
     greeting: "Hi,",
+    greetingNamed: "Hi {{name}},",
+    signoff: "Max",
     signature: "unbottled.ai",
+    senderName: "Max from unbottled.ai",
     unsubscribeText: "Unsubscribe:",
-    inactiveNudge: {
-      subject: "You signed up. You haven't asked anything yet.",
-      preview: "Your free credits are waiting.",
-      body1:
-        "Your account is live and your free credits renew every month. No filter you didn't choose.",
-      body2:
-        "Ask the question you couldn't ask anywhere else. One message is enough.",
-      cta: "Start a chat",
+    firstChatPrompts: {
+      subject: "Three first messages, ready to paste",
+      preview: "One uncensored, one mainstream, one image. Pick one, hit send.",
+      intro:
+        "Your account is ready and the chat is still empty. Here are three messages to start with. Copy one, paste it, send.",
+      uncensoredTitle: "Ask without the lecture",
+      uncensoredPrompt:
+        '"Write a dark crime story where the villain wins. No happy ending, no moral." Pick one of the {{uncensoredCount}} uncensored models. You confirm once that you are 18 or older.',
+      mainstreamTitle: "Put the big names side by side",
+      mainstreamPrompt:
+        '"Plan a cheap weekend in Lisbon. Where to eat, what to skip." Ask GPT first. Then switch to Claude or Gemini in the same thread and compare.',
+      mediaTitle: "Make an image, a video or a song",
+      mediaPrompt:
+        '"A fox in a red scarf on a snowy Tokyo street at night, film photo." One prompt, one image. Short videos and music work the same way.',
+      body: "Your free account gets {{freeCreditsSignedIn}} credits every month, {{freeCreditsMax}} with the newsletter on. No card.",
+      cta: "Send your first message",
+      ps: "P.S. Not sure where to start? Reply to this email. We read replies.",
     },
-    inactiveModels: {
-      subject: "{{modelCount}} models. You decide how much gets filtered.",
-      preview: "Mainstream, open or uncensored. Your call.",
-      body1:
-        "Most AI decides for you what you may ask. Here you choose: mainstream, open or uncensored models, side by side.",
-      body2:
-        "Pick a model, set your own filter level, send one prompt. That is the whole setup.",
-      cta: "Choose a model",
+    outOfCredits: {
+      subject: "This month's free credits are used up",
+      preview:
+        "They come back on the 1st. Or keep going now, plans from {{subscriptionPrice}} a month.",
+      intro:
+        "You used all of this month's free credits. They come back on the 1st. Don't want to wait? Pick a plan. Plain prices.",
+      starterTitle: "Starter: {{subscriptionPrice}}/month",
+      starterBody:
+        "{{subscriptionCredits}} credits every month. Cancel anytime. Fits if you chat most days.",
+      moreTitle: "Need more? Three bigger plans",
+      moreBody:
+        "Plus: {{plusCredits}} credits for {{plusPrice}}. Pro: {{proCredits}} for {{proPrice}}. Ultra: {{ultraCredits}} for {{ultraPrice}}. Every plan can add top-up packs that never expire.",
+      body: "Pay by card, PayPal or crypto. Same models, same filter settings.",
+      cta: "Get {{subscriptionCredits}} credits for {{subscriptionPrice}}",
+      ps: "P.S. Waiting for the 1st is fine too. Your threads stay where they are.",
     },
-    inactiveUpgrade: {
-      subject: "Free credits get you started. Credits get you further.",
-      preview: "Bigger models, longer chats.",
-      body1:
-        "Free credits cover a lot. When you want the bigger models and longer conversations, top up and keep going.",
-      body2: "You pay for what you run. Buy credits when you need them.",
-      cta: "See credit options",
+    whatsNew: {
+      subject: "What changed while you were away",
+      preview: "{{modelCount}} models, video and music in chat, and French.",
+      intro: "Your last chat was over a week ago. Here is what's new.",
+      modelsTitle: "{{modelCount}} chat models",
+      modelsBody:
+        "{{mainstreamCount}} mainstream, {{openCount}} open, {{uncensoredCount}} uncensored. Switch between them mid-thread.",
+      mediaTitle: "Images, video and music",
+      mediaBody:
+        "Type a prompt in the chat. Get back a picture, a short clip or a track.",
+      languagesTitle: "Now in French",
+      languagesBody:
+        "The whole app runs in English, German, Polish and French.",
+      body: "Your threads are right where you left them.",
+      cta: "Browse all models",
+      ps: "P.S. Know someone who'd use this? Your referral link pays you {{referralPercent}}% of everything they spend, every month.",
     },
-    engagedValue: {
-      subject: "You're already chatting. Here's how to get more out of it.",
-      preview: "Try the same prompt on a second model.",
-      body1:
-        "Different models answer differently. Run the same prompt on a second one and compare.",
-      body2:
-        "Your free credits renew every month. When you hit the limit, you don't have to wait.",
-      cta: "Keep chatting",
-    },
-    engagedUpgrade: {
-      subject: "Out of free credits? Don't wait for the reset.",
-      preview: "Top up in a minute.",
-      body1:
-        "Free credits renew monthly. Paid credits don't make you wait: pick a pack or a subscription and keep your thread going.",
-      body2: "You pay per use. Nothing else.",
-      cta: "Get more credits",
-    },
-    engagedLast: {
-      subject: "Last note from us on credits",
-      preview: "Then we leave you alone.",
-      body1:
-        "This is the last email in this series. If free credits do the job, stay on free. If you want more room, credits are one click away.",
-      body2: "You can unsubscribe at the bottom of this email at any time.",
-      cta: "Review credit options",
+    winBack: {
+      subject: "One last email from us",
+      preview: "Your account, threads and free credits are still here.",
+      intro:
+        "Your last chat was over a month ago. This is the last nudge you get from us.",
+      body: "Your account, your threads and your monthly free credits are all still there. More models than last time, and the filter is still yours to set.",
+      cta: "Pick up where you left off",
+      ps: "P.S. What put you off? Hit reply and tell us. We read every reply.",
     },
     inviteSignup: {
-      subject: "You're on the list. Now get the account.",
-      preview: "Free account. Up to {{freeCreditsMax}} credits a month.",
-      body1:
-        "A free account gives you {{freeCreditsSignedIn}} credits every month and access to {{modelCount}} models, with the filter level set by you.",
-      body2:
-        "No account: {{freeCreditsGuest}} a month. Free account: {{freeCreditsSignedIn}}. Account + newsletter: {{freeCreditsMax}}.",
-      cta: "Create free account",
+      subject: "You read the newsletter. Now use the app.",
+      preview:
+        "Free account, up to {{freeCreditsMax}} credits a month. No card.",
+      intro:
+        "You get our newsletter. The app is one step away: {{modelCount}} models, and you set the filter.",
+      guestTitle: "No account: {{freeCreditsGuest}} credits a month",
+      guestBody: "Enough to test a few models.",
+      accountTitle: "Free account: {{freeCreditsSignedIn}} credits a month",
+      accountBody: "Your threads saved, on every device.",
+      newsletterTitle:
+        "Account + newsletter: {{freeCreditsMax}} credits a month",
+      newsletterBody:
+        "Keep the newsletter on in your account and the bonus is yours.",
+      body: "No card. Free credits switch on once you confirm your email.",
+      cta: "Create my free account",
     },
     inviteReminder: {
-      subject: "Still no account? It takes a minute.",
-      preview: "Free to start.",
-      body1:
-        "You read us by email. You can use us directly: pick a model, ask anything, decide your own filter.",
-      body2:
-        "Free accounts get {{freeCreditsSignedIn}} credits a month. Keep the newsletter on the account and it's {{freeCreditsMax}}.",
-      cta: "Create free account",
+      subject: "Last reminder: your free account",
+      preview:
+        "{{freeCreditsMax}} credits a month instead of {{freeCreditsGuest}}. No card.",
+      intro:
+        "Last reminder. A free account with the newsletter on gets {{freeCreditsMax}} credits every month. Without one: {{freeCreditsGuest}}.",
+      body: "Takes a minute. No card.",
+      cta: "Create my free account",
+      ps: "P.S. No more reminders after this one. The newsletter keeps coming as usual.",
+    },
+  },
+  emailTemplates: {
+    category: "Lifecycle journeys",
+    preview: {
+      name: {
+        label: "First name",
+        description: "Greeting name. Empty = generic greeting.",
+      },
+    },
+    firstChatPrompts: {
+      name: "Lifecycle: first chat",
+      description:
+        "48 h after signup, verified account, no chat yet. Three concrete prompts.",
+    },
+    outOfCredits: {
+      name: "Lifecycle: out of credits",
+      description:
+        "Free credits for the month used up, never paid. Plan prices.",
+    },
+    whatsNew: {
+      name: "Lifecycle: what's new",
+      description: "7 days without a chat. Models, media, languages.",
+    },
+    winBack: {
+      name: "Lifecycle: win-back",
+      description: "30 days without a chat. Last journey email.",
+    },
+    inviteSignup: {
+      name: "Lifecycle: newsletter invite",
+      description:
+        "Confirmed newsletter subscriber without an account, 48 h after confirming.",
+    },
+    inviteReminder: {
+      name: "Lifecycle: invite reminder",
+      description: "One week after the invite, still no account.",
     },
   },
   run: {
@@ -239,12 +296,14 @@ export const translations = {
         eligible: "Eligible",
         alreadyEnrolled: "Already enrolled",
         enrolled: "Enrolled",
+        autoEligible: "Scheduled run would enroll",
         heldSuppressed: "Held: unsubscribed / bounced",
         heldPaid: "Held: already paid",
         heldNoConsent: "Held: no marketing consent",
         heldUnverified: "Held: unverified email",
         heldPendingNewsletter: "Held: newsletter not confirmed",
         heldInactiveAccount: "Held: banned / inactive",
+        heldNothingDue: "Held: nothing due (active, has credits)",
       },
       success: {
         title: "Backfill finished",

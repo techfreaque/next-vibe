@@ -19,6 +19,8 @@ import {
 import { LifecycleJourney } from "./enum";
 
 const NOW = new Date("2026-11-07T12:00:00Z");
+const DAY = 24 * 3_600_000;
+const daysAgo = (d: number): Date => new Date(NOW.getTime() - d * DAY);
 const strict = { requireUserMarketingConsent: true };
 const relaxed = { requireUserMarketingConsent: false };
 
@@ -29,8 +31,11 @@ function snapshot(patch: Partial<ContactSnapshot>): ContactSnapshot {
     leadId: null,
     locale: null,
     user: null,
+    name: null,
     hasChatted: false,
     lastChatAt: null,
+    lastActivityAt: null,
+    outOfCreditsAt: null,
     isPaid: false,
     newsletter: null,
     leadStatus: null,
@@ -54,21 +59,112 @@ const confirmed = {
 };
 
 describe("classifyContact", () => {
-  it("registered user who never chatted -> INACTIVE_USER", () => {
-    const c = classifyContact(snapshot({ userId: "u", user: goodUser }), strict);
-    expect(c.journey).toBe(LifecycleJourney.INACTIVE_USER);
+  it("registered user who never chatted -> FIRST_CHAT anchored on signup", () => {
+    const c = classifyContact(
+      snapshot({ userId: "u", user: goodUser }),
+      strict,
+      NOW,
+    );
+    expect(c).toEqual({
+      journey: LifecycleJourney.FIRST_CHAT,
+      triggerAt: goodUser.createdAt,
+      held: null,
+    });
   });
 
-  it("registered user who chatted but never paid -> ENGAGED_FREE", () => {
+  it("active chatter with credits -> nothing due", () => {
     const c = classifyContact(
-      snapshot({ userId: "u", user: goodUser, hasChatted: true }),
+      snapshot({
+        userId: "u",
+        user: goodUser,
+        hasChatted: true,
+        lastActivityAt: daysAgo(1),
+      }),
       strict,
+      NOW,
     );
-    expect(c.journey).toBe(LifecycleJourney.ENGAGED_FREE);
+    expect(c).toEqual({ journey: null, held: HeldReason.NOTHING_DUE });
+  });
+
+  it("drained free pool, never paid -> OUT_OF_CREDITS anchored on the draining usage", () => {
+    const drainedAt = daysAgo(0.5);
+    const c = classifyContact(
+      snapshot({
+        userId: "u",
+        user: goodUser,
+        hasChatted: true,
+        lastActivityAt: drainedAt,
+        outOfCreditsAt: drainedAt,
+      }),
+      strict,
+      NOW,
+    );
+    expect(c).toEqual({
+      journey: LifecycleJourney.OUT_OF_CREDITS,
+      triggerAt: drainedAt,
+      held: null,
+    });
+    // Paid users never get the out-of-credits email
+    expect(
+      classifyContact(
+        snapshot({
+          userId: "u",
+          user: goodUser,
+          hasChatted: true,
+          isPaid: true,
+          lastActivityAt: drainedAt,
+          outOfCreditsAt: drainedAt,
+        }),
+        strict,
+        NOW,
+      ),
+    ).toEqual({ journey: null, held: HeldReason.PAID });
+  });
+
+  it("quiet 7-29 days -> WHATS_NEW, 30+ days -> WIN_BACK, paid users included", () => {
+    const quiet = (
+      days: number,
+      isPaid: boolean,
+    ): ReturnType<typeof classifyContact> =>
+      classifyContact(
+        snapshot({
+          userId: "u",
+          user: goodUser,
+          hasChatted: true,
+          isPaid,
+          lastActivityAt: daysAgo(days),
+        }),
+        strict,
+        NOW,
+      );
+    expect(quiet(6.9, false).journey).toBeNull();
+    expect(quiet(7, false)).toEqual({
+      journey: LifecycleJourney.WHATS_NEW,
+      triggerAt: daysAgo(7),
+      held: null,
+    });
+    expect(quiet(29, true).journey).toBe(LifecycleJourney.WHATS_NEW);
+    expect(quiet(30, false).journey).toBe(LifecycleJourney.WIN_BACK);
+    expect(quiet(200, true).journey).toBe(LifecycleJourney.WIN_BACK);
+  });
+
+  it("inactivity wins over a drained pool (they left, don't sell to them)", () => {
+    const c = classifyContact(
+      snapshot({
+        userId: "u",
+        user: goodUser,
+        hasChatted: true,
+        lastActivityAt: daysAgo(8),
+        outOfCreditsAt: daysAgo(8),
+      }),
+      strict,
+      NOW,
+    );
+    expect(c.journey).toBe(LifecycleJourney.WHATS_NEW);
   });
 
   it("confirmed newsletter subscriber without account -> NEWSLETTER_INVITE", () => {
-    const c = classifyContact(snapshot({ newsletter: confirmed }), strict);
+    const c = classifyContact(snapshot({ newsletter: confirmed }), strict, NOW);
     expect(c.journey).toBe(LifecycleJourney.NEWSLETTER_INVITE);
   });
 
@@ -78,14 +174,17 @@ describe("classifyContact", () => {
       confirmedAt: null,
       marketingConsent: true,
     };
-    expect(classifyContact(snapshot({ newsletter: pending }), strict)).toEqual({
+    expect(
+      classifyContact(snapshot({ newsletter: pending }), strict, NOW),
+    ).toEqual({
       journey: null,
       held: HeldReason.PENDING_NEWSLETTER,
     });
     // SUBSCRIBED without confirmation is not enough either
     const unconfirmed = { ...confirmed, confirmedAt: null };
     expect(
-      classifyContact(snapshot({ newsletter: unconfirmed }), strict).journey,
+      classifyContact(snapshot({ newsletter: unconfirmed }), strict, NOW)
+        .journey,
     ).toBeNull();
   });
 
@@ -93,6 +192,7 @@ describe("classifyContact", () => {
     const c = classifyContact(
       snapshot({ newsletter: { ...confirmed, marketingConsent: false } }),
       strict,
+      NOW,
     );
     expect(c.journey).toBeNull();
   });
@@ -104,8 +204,13 @@ describe("classifyContact", () => {
       NewsletterSubscriptionStatus.COMPLAINED,
     ]) {
       const c = classifyContact(
-        snapshot({ userId: "u", user: goodUser, newsletter: { ...confirmed, status } }),
+        snapshot({
+          userId: "u",
+          user: goodUser,
+          newsletter: { ...confirmed, status },
+        }),
         relaxed,
+        NOW,
       );
       expect(c).toEqual({ journey: null, held: HeldReason.SUPPRESSED });
     }
@@ -127,6 +232,7 @@ describe("classifyContact", () => {
     const c = classifyContact(
       snapshot({ userId: "u", user: goodUser, hasChatted: true, isPaid: true }),
       strict,
+      NOW,
     );
     expect(c).toEqual({ journey: null, held: HeldReason.PAID });
   });
@@ -134,12 +240,12 @@ describe("classifyContact", () => {
   it("users without marketing consent are held unless consent mode is relaxed", () => {
     const noConsent = { ...goodUser, marketingConsent: false };
     expect(
-      classifyContact(snapshot({ userId: "u", user: noConsent }), strict),
+      classifyContact(snapshot({ userId: "u", user: noConsent }), strict, NOW),
     ).toEqual({ journey: null, held: HeldReason.NO_CONSENT });
     expect(
-      classifyContact(snapshot({ userId: "u", user: noConsent }), relaxed)
+      classifyContact(snapshot({ userId: "u", user: noConsent }), relaxed, NOW)
         .journey,
-    ).toBe(LifecycleJourney.INACTIVE_USER);
+    ).toBe(LifecycleJourney.FIRST_CHAT);
   });
 
   it("a confirmed newsletter opt-in counts as consent for a registered user", () => {
@@ -148,8 +254,9 @@ describe("classifyContact", () => {
       classifyContact(
         snapshot({ userId: "u", user: noConsent, newsletter: confirmed }),
         strict,
+        NOW,
       ).journey,
-    ).toBe(LifecycleJourney.INACTIVE_USER);
+    ).toBe(LifecycleJourney.FIRST_CHAT);
   });
 
   it("unverified, banned and inactive users are held", () => {
@@ -157,51 +264,99 @@ describe("classifyContact", () => {
       classifyContact(
         snapshot({ userId: "u", user: { ...goodUser, emailVerified: false } }),
         strict,
+        NOW,
       ),
     ).toEqual({ journey: null, held: HeldReason.UNVERIFIED });
     expect(
       classifyContact(
         snapshot({ userId: "u", user: { ...goodUser, isBanned: true } }),
         strict,
+        NOW,
       ).held,
     ).toBe(HeldReason.INACTIVE_ACCOUNT);
     expect(
       classifyContact(
         snapshot({ userId: "u", user: { ...goodUser, isActive: false } }),
         strict,
+        NOW,
       ).held,
     ).toBe(HeldReason.INACTIVE_ACCOUNT);
   });
 });
 
 describe("isGoalMet", () => {
-  it("INACTIVE_USER exits on first chat or purchase", () => {
+  const enrolledAt = daysAgo(1);
+
+  it("FIRST_CHAT exits on first chat or purchase", () => {
     const base = snapshot({ userId: "u", user: goodUser });
-    expect(isGoalMet(LifecycleJourney.INACTIVE_USER, base)).toBe(false);
+    expect(isGoalMet(LifecycleJourney.FIRST_CHAT, base, enrolledAt)).toBe(
+      false,
+    );
     expect(
-      isGoalMet(LifecycleJourney.INACTIVE_USER, { ...base, hasChatted: true }),
+      isGoalMet(
+        LifecycleJourney.FIRST_CHAT,
+        { ...base, hasChatted: true },
+        enrolledAt,
+      ),
     ).toBe(true);
     expect(
-      isGoalMet(LifecycleJourney.INACTIVE_USER, { ...base, isPaid: true }),
+      isGoalMet(
+        LifecycleJourney.FIRST_CHAT,
+        { ...base, isPaid: true },
+        enrolledAt,
+      ),
     ).toBe(true);
   });
 
-  it("ENGAGED_FREE exits only on purchase", () => {
+  it("OUT_OF_CREDITS exits only on purchase", () => {
     const base = snapshot({ userId: "u", user: goodUser, hasChatted: true });
-    expect(isGoalMet(LifecycleJourney.ENGAGED_FREE, base)).toBe(false);
+    expect(isGoalMet(LifecycleJourney.OUT_OF_CREDITS, base, enrolledAt)).toBe(
+      false,
+    );
     expect(
-      isGoalMet(LifecycleJourney.ENGAGED_FREE, { ...base, isPaid: true }),
+      isGoalMet(
+        LifecycleJourney.OUT_OF_CREDITS,
+        { ...base, isPaid: true },
+        enrolledAt,
+      ),
     ).toBe(true);
+  });
+
+  it("WHATS_NEW / WIN_BACK exit when the contact comes back after enrollment", () => {
+    for (const journey of [
+      LifecycleJourney.WHATS_NEW,
+      LifecycleJourney.WIN_BACK,
+    ]) {
+      const before = snapshot({
+        userId: "u",
+        user: goodUser,
+        hasChatted: true,
+        lastActivityAt: daysAgo(10),
+      });
+      expect(isGoalMet(journey, before, enrolledAt)).toBe(false);
+      expect(
+        isGoalMet(
+          journey,
+          { ...before, lastActivityAt: daysAgo(0.1) },
+          enrolledAt,
+        ),
+      ).toBe(true);
+    }
   });
 
   it("NEWSLETTER_INVITE exits on signup", () => {
     expect(
-      isGoalMet(LifecycleJourney.NEWSLETTER_INVITE, snapshot({ newsletter: confirmed })),
+      isGoalMet(
+        LifecycleJourney.NEWSLETTER_INVITE,
+        snapshot({ newsletter: confirmed }),
+        enrolledAt,
+      ),
     ).toBe(false);
     expect(
       isGoalMet(
         LifecycleJourney.NEWSLETTER_INVITE,
         snapshot({ newsletter: confirmed, userId: "u", user: goodUser }),
+        enrolledAt,
       ),
     ).toBe(true);
   });
@@ -211,7 +366,9 @@ describe("frequency cap", () => {
   it("blocks within the window, allows after it", () => {
     const sentAt = new Date(NOW.getTime() - 47 * 3_600_000);
     expect(capAllows(sentAt, NOW, 48)).toBe(false);
-    expect(capAllows(new Date(NOW.getTime() - 48 * 3_600_000), NOW, 48)).toBe(true);
+    expect(capAllows(new Date(NOW.getTime() - 48 * 3_600_000), NOW, 48)).toBe(
+      true,
+    );
     expect(capAllows(null, NOW, 48)).toBe(true);
   });
 });

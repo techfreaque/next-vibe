@@ -5,6 +5,15 @@
  * previous step was sent; for step 0 from the trigger event or backfill start)
  * + email template. Entry and exit conditions live in eligibility.ts so they are
  * pure and unit tested.
+ *
+ * Design rules (2026-11-17 redesign):
+ *  - One clear job per email. Most journeys are ONE email.
+ *  - Day 0 is the transactional signup welcome (user/public/signup/email.tsx);
+ *    unverified accounts get the hourly verify reminder. Journeys never repeat
+ *    either of them.
+ *  - Each journey runs at most once per contact (unique email+journey), one
+ *    journey at a time, and the global cap keeps >= 48 h between any two
+ *    journey/campaign emails.
  */
 
 import type { LifecycleJourneyValue, LifecycleTemplateValue } from "./enum";
@@ -20,53 +29,75 @@ export interface JourneyConfig {
   steps: readonly JourneyStep[];
 }
 
+/** Days without chat activity before the "what's new" email. */
+export const WHATS_NEW_AFTER_DAYS = 7;
+/** Days without chat activity before the win-back email. */
+export const WIN_BACK_AFTER_DAYS = 30;
+/**
+ * A pool is "out of credits" when paid balance + this month's free credits left
+ * drop below this. Cheap models still run below it, but most do not.
+ */
+export const OUT_OF_CREDITS_THRESHOLD = 5;
+
+const DAY_HOURS = 24;
+
 export const LIFECYCLE_JOURNEYS: Record<
   typeof LifecycleJourneyValue,
   JourneyConfig
 > = {
-  // Signed up, never sent a chat. Exit: first chat or purchase.
-  [LifecycleJourney.INACTIVE_USER]: {
-    key: LifecycleJourney.INACTIVE_USER,
+  // Account (verified), never chatted. Trigger: signup. Exit: first chat or purchase.
+  [LifecycleJourney.FIRST_CHAT]: {
+    key: LifecycleJourney.FIRST_CHAT,
+    steps: [{ delayHours: 48, template: LifecycleTemplate.FIRST_CHAT_PROMPTS }],
+  },
+  // Chatted, never paid, free credits for this month used up.
+  // Trigger: last usage. Exit: purchase, or credits back (monthly reset).
+  [LifecycleJourney.OUT_OF_CREDITS]: {
+    key: LifecycleJourney.OUT_OF_CREDITS,
+    steps: [{ delayHours: 2, template: LifecycleTemplate.OUT_OF_CREDITS }],
+  },
+  // Chatted before, quiet for 7 days. Trigger: last activity. Exit: comes back.
+  [LifecycleJourney.WHATS_NEW]: {
+    key: LifecycleJourney.WHATS_NEW,
     steps: [
-      { delayHours: 24, template: LifecycleTemplate.INACTIVE_NUDGE },
-      { delayHours: 72, template: LifecycleTemplate.INACTIVE_MODELS },
-      { delayHours: 120, template: LifecycleTemplate.INACTIVE_UPGRADE },
+      {
+        delayHours: WHATS_NEW_AFTER_DAYS * DAY_HOURS,
+        template: LifecycleTemplate.WHATS_NEW,
+      },
     ],
   },
-  // Chatted, never paid. Exit: purchase.
-  [LifecycleJourney.ENGAGED_FREE]: {
-    key: LifecycleJourney.ENGAGED_FREE,
+  // Chatted before, quiet for 30 days. Last journey email. Exit: comes back.
+  [LifecycleJourney.WIN_BACK]: {
+    key: LifecycleJourney.WIN_BACK,
     steps: [
-      { delayHours: 24, template: LifecycleTemplate.ENGAGED_VALUE },
-      { delayHours: 96, template: LifecycleTemplate.ENGAGED_UPGRADE },
-      { delayHours: 168, template: LifecycleTemplate.ENGAGED_LAST },
+      {
+        delayHours: WIN_BACK_AFTER_DAYS * DAY_HOURS,
+        template: LifecycleTemplate.WIN_BACK,
+      },
     ],
   },
-  // Confirmed newsletter subscriber without an account. Exit: signup.
+  // Confirmed newsletter subscriber without an account. The newsletter welcome
+  // already went out on subscribe, so the invite waits 2 days. Exit: signup.
   [LifecycleJourney.NEWSLETTER_INVITE]: {
     key: LifecycleJourney.NEWSLETTER_INVITE,
     steps: [
-      { delayHours: 0, template: LifecycleTemplate.INVITE_SIGNUP },
-      { delayHours: 120, template: LifecycleTemplate.INVITE_REMINDER },
+      { delayHours: 48, template: LifecycleTemplate.INVITE_SIGNUP },
+      { delayHours: 168, template: LifecycleTemplate.INVITE_REMINDER },
     ],
   },
 };
 
 export const LIFECYCLE_JOURNEY_LIST: readonly JourneyConfig[] = [
-  LIFECYCLE_JOURNEYS[LifecycleJourney.INACTIVE_USER],
-  LIFECYCLE_JOURNEYS[LifecycleJourney.ENGAGED_FREE],
+  LIFECYCLE_JOURNEYS[LifecycleJourney.FIRST_CHAT],
+  LIFECYCLE_JOURNEYS[LifecycleJourney.OUT_OF_CREDITS],
+  LIFECYCLE_JOURNEYS[LifecycleJourney.WHATS_NEW],
+  LIFECYCLE_JOURNEYS[LifecycleJourney.WIN_BACK],
   LIFECYCLE_JOURNEYS[LifecycleJourney.NEWSLETTER_INVITE],
 ];
 
-/** Where each template's single CTA points (path after /{locale}). */
-export const TEMPLATE_CTA_PATH: Record<typeof LifecycleTemplateValue, string> =
-  {
-    [LifecycleTemplate.INACTIVE_NUDGE]: "/threads",
-    [LifecycleTemplate.INACTIVE_MODELS]: "/threads",
-    [LifecycleTemplate.INACTIVE_UPGRADE]: "/subscription/buy",
-    [LifecycleTemplate.ENGAGED_VALUE]: "/threads",
-    [LifecycleTemplate.ENGAGED_UPGRADE]: "/subscription/buy",
-    [LifecycleTemplate.ENGAGED_LAST]: "/subscription/buy",
-    [LifecycleTemplate.INVITE_SIGNUP]: "/user/signup",
-    [LifecycleTemplate.INVITE_REMINDER]: "/user/signup",
-  };
+/** First-step delay of a journey (hours from its trigger). */
+export function firstStepDelayHours(
+  journey: typeof LifecycleJourneyValue,
+): number {
+  return LIFECYCLE_JOURNEYS[journey].steps[0].delayHours;
+}

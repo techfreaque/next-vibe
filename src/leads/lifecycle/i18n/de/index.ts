@@ -4,8 +4,10 @@ export const translations: typeof enTranslations = {
   tag: "Lifecycle",
   enums: {
     journey: {
-      inactiveUser: "Angemeldet, nie gechattet",
-      engagedFree: "Gechattet, nie bezahlt",
+      firstChat: "Angemeldet, nie gechattet",
+      outOfCredits: "Gratis-Credits aufgebraucht",
+      whatsNew: "7 Tage inaktiv",
+      winBack: "30 Tage inaktiv",
       newsletterInvite: "Newsletter, kein Konto",
     },
     enrollmentStatus: {
@@ -25,12 +27,10 @@ export const translations: typeof enTranslations = {
       sent: "Gesendet",
     },
     template: {
-      inactiveNudge: "Anstoß: Chat starten",
-      inactiveModels: "Modellwahl",
-      inactiveUpgrade: "Credit-Hinweis",
-      engagedValue: "Mehrwert: mehr herausholen",
-      engagedUpgrade: "Upgrade: nicht auf den Reset warten",
-      engagedLast: "Letzte Notiz zu Credits",
+      firstChatPrompts: "Erster Chat: drei Prompts",
+      outOfCredits: "Credits leer: Tarife",
+      whatsNew: "Was ist neu",
+      winBack: "Rückholung: letzte Mail",
       inviteSignup: "Einladung: Konto erstellen",
       inviteReminder: "Einladung: Erinnerung",
     },
@@ -63,76 +63,135 @@ export const translations: typeof enTranslations = {
   },
   emails: {
     greeting: "Hallo,",
+    greetingNamed: "Hallo {{name}},",
+    signoff: "Max",
     signature: "unbottled.ai",
+    senderName: "Max von unbottled.ai",
     unsubscribeText: "Abmelden:",
-    inactiveNudge: {
-      subject: "Du hast dich angemeldet. Gefragt hast du noch nichts.",
-      preview: "Deine Gratis-Credits warten.",
-      body1:
-        "Dein Konto ist aktiv, deine Gratis-Credits erneuern sich jeden Monat. Kein Filter, den du nicht selbst gewählt hast.",
-      body2:
-        "Stell die Frage, die du sonst nirgends stellen konntest. Eine Nachricht reicht.",
-      cta: "Chat starten",
+    firstChatPrompts: {
+      subject: "Drei erste Nachrichten zum Kopieren",
+      preview:
+        "Eine unzensiert, eine Mainstream, ein Bild. Aussuchen, abschicken.",
+      intro:
+        "Dein Konto steht, der Chat ist noch leer. Hier sind drei Nachrichten für den Anfang. Kopieren, einfügen, abschicken.",
+      uncensoredTitle: "Fragen ohne Belehrung",
+      uncensoredPrompt:
+        "„Schreib eine düstere Krimigeschichte, in der der Täter gewinnt. Kein Happy End, keine Moral.“ Nimm eins der {{uncensoredCount}} unzensierten Modelle. Einmal bestätigen, dass du volljährig bist, fertig.",
+      mainstreamTitle: "Die Großen im direkten Vergleich",
+      mainstreamPrompt:
+        "„Plane ein günstiges Wochenende in Lissabon. Wo essen, was auslassen?“ Frag zuerst GPT. Wechsle dann im selben Thread zu Claude oder Gemini und vergleiche.",
+      mediaTitle: "Bild, Video oder Song erstellen",
+      mediaPrompt:
+        "„Ein Fuchs mit rotem Schal in einer verschneiten Straße in Tokio, nachts, analoges Foto.“ Ein Prompt, ein Bild. Kurze Videos und Musik funktionieren genauso.",
+      body: "Dein Gratis-Konto bekommt jeden Monat {{freeCreditsSignedIn}} Credits, mit Newsletter {{freeCreditsMax}}. Keine Karte nötig.",
+      cta: "Erste Nachricht senden",
+      ps: "P.S. Kein Plan, womit du anfangen sollst? Antworte einfach auf diese Mail. Wir lesen die Antworten.",
     },
-    inactiveModels: {
-      subject: "{{modelCount}} Modelle. Du bestimmst, was gefiltert wird.",
-      preview: "Mainstream, offen oder unzensiert. Deine Entscheidung.",
-      body1:
-        "Die meiste KI entscheidet für dich, was du fragen darfst. Hier wählst du: Mainstream-, offene oder unzensierte Modelle, direkt nebeneinander.",
-      body2:
-        "Modell wählen, eigenen Filter einstellen, einen Prompt senden. Mehr Setup gibt es nicht.",
-      cta: "Modell wählen",
+    outOfCredits: {
+      subject: "Deine Gratis-Credits für diesen Monat sind aufgebraucht",
+      preview:
+        "Am 1. kommen sie zurück. Oder du machst jetzt weiter, Tarife ab {{subscriptionPrice}} im Monat.",
+      intro:
+        "Deine Gratis-Credits für diesen Monat sind weg. Am 1. kommen sie zurück. Keine Lust zu warten? Such dir einen Tarif aus. Klare Preise.",
+      starterTitle: "Starter: {{subscriptionPrice}}/Monat",
+      starterBody:
+        "{{subscriptionCredits}} Credits jeden Monat, jederzeit kündbar. Passt, wenn du fast täglich chattest.",
+      moreTitle: "Mehr nötig? Drei größere Tarife",
+      moreBody:
+        "Plus: {{plusCredits}} Credits für {{plusPrice}}. Pro: {{proCredits}} für {{proPrice}}. Ultra: {{ultraCredits}} für {{ultraPrice}}. Zu jedem Tarif gibt es Credit-Pakete zum Aufstocken, ohne Ablaufdatum.",
+      body: "Zahlung per Karte, PayPal oder Krypto. Gleiche Modelle, gleiche Filtereinstellungen.",
+      cta: "{{subscriptionCredits}} Credits für {{subscriptionPrice}}",
+      ps: "P.S. Bis zum 1. warten ist völlig in Ordnung. Deine Threads bleiben, wo sie sind.",
     },
-    inactiveUpgrade: {
-      subject: "Gratis-Credits zum Start. Credits für mehr.",
-      preview: "Größere Modelle, längere Chats.",
-      body1:
-        "Gratis-Credits reichen weit. Wenn du größere Modelle und längere Gespräche willst, lade auf und mach weiter.",
-      body2: "Du zahlst nur, was du nutzt. Kauf Credits, wenn du sie brauchst.",
-      cta: "Credit-Optionen ansehen",
+    whatsNew: {
+      subject: "Das hat sich getan, seit du weg warst",
+      preview:
+        "{{modelCount}} Modelle, Video und Musik im Chat, dazu Französisch.",
+      intro: "Dein letzter Chat ist über eine Woche her. Das ist neu.",
+      modelsTitle: "{{modelCount}} Chat-Modelle",
+      modelsBody:
+        "{{mainstreamCount}} Mainstream, {{openCount}} offen, {{uncensoredCount}} unzensiert. Wechsel mitten im Thread, wann immer du willst.",
+      mediaTitle: "Bilder, Videos und Musik",
+      mediaBody:
+        "Prompt in den Chat, zurück kommt ein Bild, ein kurzer Clip oder ein Track.",
+      languagesTitle: "Jetzt auch auf Französisch",
+      languagesBody:
+        "Die ganze App läuft auf Deutsch, Englisch, Polnisch und Französisch.",
+      body: "Deine Threads liegen genau da, wo du aufgehört hast.",
+      cta: "Alle Modelle ansehen",
+      ps: "P.S. Kennst du jemanden, für den das passt? Über deinen Empfehlungslink bekommst du {{referralPercent}} % von allem, was diese Person ausgibt, jeden Monat.",
     },
-    engagedValue: {
-      subject: "Du chattest schon. So holst du mehr heraus.",
-      preview: "Derselbe Prompt, ein zweites Modell.",
-      body1:
-        "Jedes Modell antwortet anders. Schick denselben Prompt an ein zweites und vergleiche.",
-      body2:
-        "Deine Gratis-Credits erneuern sich monatlich. Ist das Limit erreicht, musst du nicht warten.",
-      cta: "Weiterchatten",
-    },
-    engagedUpgrade: {
-      subject: "Gratis-Credits aufgebraucht? Warte nicht auf den Reset.",
-      preview: "Aufladen dauert eine Minute.",
-      body1:
-        "Gratis-Credits erneuern sich monatlich. Bezahlte Credits lassen dich nicht warten: Paket oder Abo wählen und im Thread bleiben.",
-      body2: "Du zahlst pro Nutzung. Sonst nichts.",
-      cta: "Mehr Credits holen",
-    },
-    engagedLast: {
-      subject: "Unsere letzte Notiz zu Credits",
-      preview: "Danach lassen wir dich in Ruhe.",
-      body1:
-        "Das ist die letzte Mail dieser Reihe. Reichen dir die Gratis-Credits, bleib dabei. Brauchst du mehr Luft, sind Credits einen Klick entfernt.",
-      body2: "Du kannst dich jederzeit am Ende dieser E-Mail abmelden.",
-      cta: "Credit-Optionen prüfen",
+    winBack: {
+      subject: "Eine letzte Mail von uns",
+      preview: "Konto, Threads und Gratis-Credits sind noch da.",
+      intro:
+        "Dein letzter Chat ist über einen Monat her. Das ist unsere letzte Erinnerung.",
+      body: "Dein Konto, deine Threads und deine monatlichen Gratis-Credits sind alle noch da. Mehr Modelle als beim letzten Mal, und den Filter stellst immer noch du ein.",
+      cta: "Zurück zu deinen Chats",
+      ps: "P.S. Was hat dich gestört? Antworte und sag es uns. Wir lesen jede Antwort.",
     },
     inviteSignup: {
-      subject: "Du bist auf der Liste. Jetzt fehlt das Konto.",
-      preview: "Gratis-Konto. Bis zu {{freeCreditsMax}} Credits im Monat.",
-      body1:
-        "Ein kostenloses Konto bringt dir {{freeCreditsSignedIn}} Credits pro Monat und Zugriff auf {{modelCount}} Modelle, mit einem Filter, den du selbst setzt.",
-      body2:
-        "Ohne Konto: {{freeCreditsGuest}} im Monat. Gratis-Konto: {{freeCreditsSignedIn}}. Konto plus Newsletter: {{freeCreditsMax}}.",
+      subject: "Du liest den Newsletter. Jetzt probier die App.",
+      preview:
+        "Gratis-Konto, bis zu {{freeCreditsMax}} Credits im Monat. Ohne Karte.",
+      intro:
+        "Du bekommst unseren Newsletter. Die App ist nur einen Schritt entfernt: {{modelCount}} Modelle, und den Filter stellst du ein.",
+      guestTitle: "Ohne Konto: {{freeCreditsGuest}} Credits im Monat",
+      guestBody: "Reicht, um ein paar Modelle zu testen.",
+      accountTitle: "Gratis-Konto: {{freeCreditsSignedIn}} Credits im Monat",
+      accountBody: "Deine Threads gespeichert, auf jedem Gerät.",
+      newsletterTitle:
+        "Konto + Newsletter: {{freeCreditsMax}} Credits im Monat",
+      newsletterBody:
+        "Lass den Newsletter in deinem Konto aktiv, dann gehört der Bonus dir.",
+      body: "Keine Karte. Die Gratis-Credits starten, sobald du deine E-Mail-Adresse bestätigt hast.",
       cta: "Gratis-Konto erstellen",
     },
     inviteReminder: {
-      subject: "Noch kein Konto? Das dauert eine Minute.",
-      preview: "Der Start ist gratis.",
-      body1:
-        "Du liest uns per Mail. Du kannst uns direkt nutzen: Modell wählen, alles fragen, Filter selbst bestimmen.",
-      body2:
-        "Gratis-Konten bekommen {{freeCreditsSignedIn}} Credits pro Monat. Mit Newsletter auf dem Konto sind es {{freeCreditsMax}}.",
+      subject: "Letzte Erinnerung: dein Gratis-Konto",
+      preview:
+        "{{freeCreditsMax}} statt {{freeCreditsGuest}} Credits im Monat. Ohne Karte.",
+      intro:
+        "Letzte Erinnerung. Ein Gratis-Konto mit Newsletter bekommt jeden Monat {{freeCreditsMax}} Credits. Ohne Konto sind es {{freeCreditsGuest}}.",
+      body: "Dauert eine Minute. Keine Karte.",
       cta: "Gratis-Konto erstellen",
+      ps: "P.S. Danach kommt keine Erinnerung mehr. Der Newsletter läuft ganz normal weiter.",
+    },
+  },
+  emailTemplates: {
+    category: "Lifecycle-Journeys",
+    preview: {
+      name: {
+        label: "Vorname",
+        description: "Name für die Anrede. Leer = allgemeine Anrede.",
+      },
+    },
+    firstChatPrompts: {
+      name: "Lifecycle: erster Chat",
+      description:
+        "48 Std. nach Anmeldung, verifiziertes Konto, noch kein Chat. Drei konkrete Prompts.",
+    },
+    outOfCredits: {
+      name: "Lifecycle: Credits aufgebraucht",
+      description:
+        "Gratis-Credits des Monats verbraucht, nie bezahlt. Tarifpreise.",
+    },
+    whatsNew: {
+      name: "Lifecycle: Was ist neu",
+      description: "7 Tage ohne Chat. Modelle, Medien, Sprachen.",
+    },
+    winBack: {
+      name: "Lifecycle: Rückholung",
+      description: "30 Tage ohne Chat. Letzte Journey-Mail.",
+    },
+    inviteSignup: {
+      name: "Lifecycle: Newsletter-Einladung",
+      description:
+        "Bestätigter Newsletter-Abonnent ohne Konto, 48 Std. nach Bestätigung.",
+    },
+    inviteReminder: {
+      name: "Lifecycle: Einladungs-Erinnerung",
+      description: "Eine Woche nach der Einladung, immer noch kein Konto.",
     },
   },
   run: {
@@ -242,12 +301,14 @@ export const translations: typeof enTranslations = {
         eligible: "Berechtigt",
         alreadyEnrolled: "Bereits aufgenommen",
         enrolled: "Aufgenommen",
+        autoEligible: "Geplanter Lauf würde aufnehmen",
         heldSuppressed: "Zurückgehalten: abgemeldet / Bounce",
         heldPaid: "Zurückgehalten: bereits zahlend",
         heldNoConsent: "Zurückgehalten: keine Marketing-Einwilligung",
         heldUnverified: "Zurückgehalten: E-Mail nicht verifiziert",
         heldPendingNewsletter: "Zurückgehalten: Newsletter nicht bestätigt",
         heldInactiveAccount: "Zurückgehalten: gesperrt / inaktiv",
+        heldNothingDue: "Zurückgehalten: nichts fällig (aktiv, hat Credits)",
       },
       success: {
         title: "Backfill beendet",

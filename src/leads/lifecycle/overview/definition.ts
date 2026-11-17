@@ -158,7 +158,7 @@ const { GET } = createEndpoint({
         requireUserMarketingConsent: true,
         journeys: [
           {
-            journey: LifecycleJourney.INACTIVE_USER,
+            journey: LifecycleJourney.FIRST_CHAT,
             steps: 3,
             enrolled: 0,
             active: 0,

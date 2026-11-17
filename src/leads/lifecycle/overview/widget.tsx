@@ -37,10 +37,14 @@ function journeyLabel(
   journey: typeof LifecycleJourneyValue,
 ): string {
   switch (journey) {
-    case LifecycleJourney.INACTIVE_USER:
-      return t("enums.journey.inactiveUser");
-    case LifecycleJourney.ENGAGED_FREE:
-      return t("enums.journey.engagedFree");
+    case LifecycleJourney.FIRST_CHAT:
+      return t("enums.journey.firstChat");
+    case LifecycleJourney.OUT_OF_CREDITS:
+      return t("enums.journey.outOfCredits");
+    case LifecycleJourney.WHATS_NEW:
+      return t("enums.journey.whatsNew");
+    case LifecycleJourney.WIN_BACK:
+      return t("enums.journey.winBack");
     case LifecycleJourney.NEWSLETTER_INVITE:
       return t("enums.journey.newsletterInvite");
   }

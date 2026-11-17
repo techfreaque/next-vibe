@@ -42,7 +42,7 @@ import {
   LifecycleJourneyDB,
   LifecycleSendStatus,
 } from "./enum";
-import { LIFECYCLE_JOURNEYS } from "./journeys";
+import { firstStepDelayHours, LIFECYCLE_JOURNEYS } from "./journeys";
 import {
   listCandidateEmails,
   loadSnapshots,
@@ -127,7 +127,10 @@ export interface PlannedEnrollment {
 
 export interface JourneyPlanCount {
   journey: typeof LifecycleJourneyValue;
+  /** Would be enrolled in this mode (auto: within the window; backfill: all). */
   eligible: number;
+  /** Would be enrolled by the scheduled run (first step due inside the auto-enroll window). */
+  autoEligible: number;
   alreadyEnrolled: number;
 }
 
@@ -147,6 +150,7 @@ function emptyHeld(): Record<HeldReasonValue, number> {
     unverified: 0,
     pendingNewsletter: 0,
     inactiveAccount: 0,
+    nothingDue: 0,
   };
 }
 
@@ -177,7 +181,7 @@ export async function planContacts(opts: {
   const perJourney = new Map<typeof LifecycleJourneyValue, JourneyPlanCount>(
     LifecycleJourneyDB.map((journey) => [
       journey,
-      { journey, eligible: 0, alreadyEnrolled: 0 },
+      { journey, eligible: 0, autoEligible: 0, alreadyEnrolled: 0 },
     ]),
   );
   const held = emptyHeld();
@@ -188,7 +192,7 @@ export async function planContacts(opts: {
   );
 
   for (const snapshot of snapshots.values()) {
-    const cls = classifyContact(snapshot, opts.settings);
+    const cls = classifyContact(snapshot, opts.settings, opts.now);
     if (cls.journey === null) {
       held[cls.held] += 1;
       continue;
@@ -202,7 +206,16 @@ export async function planContacts(opts: {
       counts.alreadyEnrolled += 1;
       continue;
     }
-    if (opts.mode === "auto" && cls.triggerAt < windowStart) {
+    // The window applies to when the first email falls due, so threshold
+    // journeys (7 / 30 days quiet) are picked up when the contact crosses the line.
+    const firstDueAt = new Date(
+      cls.triggerAt.getTime() + firstStepDelayHours(cls.journey) * HOUR_MS,
+    );
+    const insideWindow = firstDueAt >= windowStart;
+    if (insideWindow) {
+      counts.autoEligible += 1;
+    }
+    if (opts.mode === "auto" && !insideWindow) {
       outsideWindow += 1;
       continue;
     }
@@ -289,8 +302,9 @@ export async function enrollNew(opts: {
   const enrolled = await enrollPlanned(
     plan.toEnroll,
     ({ item }) => {
-      const firstDelay = LIFECYCLE_JOURNEYS[item.journey].steps[0].delayHours;
-      const due = new Date(item.triggerAt.getTime() + firstDelay * HOUR_MS);
+      const due = new Date(
+        item.triggerAt.getTime() + firstStepDelayHours(item.journey) * HOUR_MS,
+      );
       return due < opts.now ? opts.now : due;
     },
     false,
@@ -469,12 +483,12 @@ async function processEnrollment(
     return "exited";
   }
   // 2. Goal reached => quiet exit.
-  if (isGoalMet(enrollment.journey, snapshot)) {
+  if (isGoalMet(enrollment.journey, snapshot, enrollment.enrolledAt)) {
     await exitEnrollment(enrollment.id, LifecycleExitReason.GOAL_MET);
     return "exited";
   }
   // 3. Still lawful + still the right journey?
-  const cls = classifyContact(snapshot, opts.settings);
+  const cls = classifyContact(snapshot, opts.settings, opts.now);
   if (cls.journey !== enrollment.journey) {
     await exitEnrollment(enrollment.id, LifecycleExitReason.INELIGIBLE);
     return "exited";
@@ -530,6 +544,7 @@ async function processEnrollment(
       email: enrollment.email,
       leadId: snapshot.leadId,
       userId: snapshot.userId,
+      name: snapshot.name,
       baseUrl: coreEnv.NEXT_PUBLIC_APP_URL,
     });
     const sent = await opts.transport.send(
@@ -542,6 +557,7 @@ async function processEnrollment(
         newsletterOnly: snapshot.user === null,
         leadId: snapshot.leadId,
         unsubscribeUrl: rendered.unsubscribeUrl,
+        senderName: rendered.senderName,
       },
       opts.logger,
     );
