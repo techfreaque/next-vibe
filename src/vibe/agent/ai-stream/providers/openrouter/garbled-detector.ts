@@ -193,19 +193,19 @@ const CLEAN: GarbledVerdict = { garbled: false };
  * open ``` block (repetition is legit there: byte arrays, test tables).
  */
 export function judgeGarbledWindow(
-  window: string,
+  text: string,
   prompt: GarbledPromptContext,
   insideCodeFence: boolean,
-  /** Skip the costly whole-window rules (repetition, token salad). */
+  /** Skip the costly whole-text rules (repetition, token salad). */
   cheapOnly = false,
 ): GarbledVerdict {
   if (!prompt.hasFullwidthBar) {
-    const special = SPECIAL_TOKEN_RE.exec(window);
+    const special = SPECIAL_TOKEN_RE.exec(text);
     if (special) {
       return {
         garbled: true,
         rule: "special-token",
-        sample: excerpt(window, special.index),
+        sample: excerpt(text, special.index),
       };
     }
   }
@@ -213,8 +213,8 @@ export function judgeGarbledWindow(
   if (!prompt.hasReplacementChar) {
     let count = 0;
     let first = -1;
-    for (let i = 0; i < window.length; i++) {
-      if (window.charCodeAt(i) === 0xfffd) {
+    for (let i = 0; i < text.length; i++) {
+      if (text.charCodeAt(i) === 0xfffd) {
         count++;
         if (first < 0) {
           first = i;
@@ -225,18 +225,18 @@ export function judgeGarbledWindow(
       return {
         garbled: true,
         rule: "replacement-chars",
-        sample: excerpt(window, first),
+        sample: excerpt(text, first),
       };
     }
   }
 
   if (!prompt.hasControlChars) {
-    const controls = window.match(CONTROL_CHAR_RE);
+    const controls = text.match(CONTROL_CHAR_RE);
     if (controls && controls.length >= CONTROL_CHAR_THRESHOLD) {
       return {
         garbled: true,
         rule: "control-chars",
-        sample: excerpt(window, window.search(CONTROL_CHAR_RE)),
+        sample: excerpt(text, text.search(CONTROL_CHAR_RE)),
       };
     }
   }
@@ -245,8 +245,8 @@ export function judgeGarbledWindow(
     return CLEAN;
   }
 
-  if (!insideCodeFence && !window.includes("```")) {
-    const loop = REPETITION_RE.exec(window);
+  if (!insideCodeFence && !text.includes("```")) {
+    const loop = REPETITION_RE.exec(text);
     if (loop?.[1] !== undefined) {
       const unit = loop[1];
       const trimmed = unit.trim().toLowerCase();
@@ -265,23 +265,23 @@ export function judgeGarbledWindow(
         return {
           garbled: true,
           rule: "repetition-loop",
-          sample: excerpt(window, loop.index),
+          sample: excerpt(text, loop.index),
         };
       }
     }
   }
 
   if (!prompt.hasChimeras) {
-    const chimeras = chimeraRuns(window);
+    const chimeras = chimeraRuns(text);
     if (
       chimeras.length >= SALAD_MIN_CHIMERAS &&
-      windowScripts(window).size >= SALAD_MIN_SCRIPTS
+      windowScripts(text).size >= SALAD_MIN_SCRIPTS
     ) {
       const first = chimeras[0] ?? "";
       return {
         garbled: true,
         rule: "token-salad",
-        sample: excerpt(window, Math.max(0, window.indexOf(first))),
+        sample: excerpt(text, Math.max(0, text.indexOf(first))),
       };
     }
   }
