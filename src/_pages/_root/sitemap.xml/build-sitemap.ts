@@ -1,7 +1,8 @@
 /**
  * Sitemap builder - every public, indexable page, once per locale, with
- * hreflang alternates. Pure + static (model registry, blog registry, a fixed
- * list of marketing pages), so it is safe to build per request.
+ * hreflang alternates. Pure: model registry, blog registry, a fixed list of
+ * marketing pages, plus the public skill pages the caller passes in (those
+ * live partly in the DB), so it is safe to build per request.
  *
  * App pages (threads, account, admin, tools) are deliberately absent.
  */
@@ -57,6 +58,13 @@ export interface SitemapEntry {
   lastmod: string | null;
 }
 
+/** A public skill landing page (/skill/<id>). */
+export interface SitemapSkillPage {
+  /** Built-in skill id or community skill slug. */
+  id: string;
+  updatedAt: Date | null;
+}
+
 /** Indexable locales - shared with page canonical/hreflang tags. */
 export function sitemapLocales(): readonly CountryLanguage[] {
   return SEO_LOCALES;
@@ -68,6 +76,7 @@ export function sitemapLocales(): readonly CountryLanguage[] {
  */
 export function collectSitemapEntries(
   availability: AgentEnvAvailability,
+  skillPages: readonly SitemapSkillPage[] = [],
 ): SitemapEntry[] {
   const entries: SitemapEntry[] = SITEMAP_STATIC_PATHS.map((path) => ({
     path,
@@ -76,6 +85,18 @@ export function collectSitemapEntries(
 
   for (const [slug, date] of Object.entries(BLOG_POST_DATES)) {
     entries.push({ path: `/story/blog/${slug}`, lastmod: date });
+  }
+
+  const seenSkills = new Set<string>();
+  for (const skill of skillPages) {
+    if (seenSkills.has(skill.id)) {
+      continue;
+    }
+    seenSkills.add(skill.id);
+    entries.push({
+      path: `/skill/${encodeURIComponent(skill.id)}`,
+      lastmod: skill.updatedAt?.toISOString().slice(0, 10) ?? null,
+    });
   }
 
   const models = listModelFacts(availability);
@@ -131,6 +152,7 @@ function publicBaseUrl(): string {
 
 export function buildSitemapXml(
   availability: AgentEnvAvailability,
+  skillPages: readonly SitemapSkillPage[] = [],
   baseUrl: string = publicBaseUrl(),
 ): string {
   const base = baseUrl.replace(/\/+$/, "");
@@ -141,7 +163,7 @@ export function buildSitemapXml(
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">`,
   ];
 
-  for (const entry of collectSitemapEntries(availability)) {
+  for (const entry of collectSitemapEntries(availability, skillPages)) {
     const alternates = locales.map(
       (locale) =>
         `    <xhtml:link rel="alternate" hreflang="${hreflangFor(locale)}" href="${escapeXml(`${base}/${locale}${entry.path}`)}"/>`,

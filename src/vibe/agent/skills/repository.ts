@@ -96,6 +96,7 @@ import {
   SkillOwnershipType,
   type SkillOwnershipTypeValue,
   SkillSourceFilter,
+  SkillStatus,
   type SkillTrustLevelValue,
 } from "./enum";
 import { chatFavorites } from "./favorites/db";
@@ -1219,6 +1220,63 @@ export class SkillsRepository {
       .limit(1);
 
     return row?.companionPrompt ?? null;
+  }
+
+  /**
+   * Built-in skills whose public landing page (/skill/<id>) is open to
+   * anonymous visitors. Static, no DB. Feeds the sitemap.
+   */
+  static listPublicDefaultSkillIds(): string[] {
+    return DEFAULT_SKILLS.filter((skill) => {
+      const allowedRoles = skill.userRole ?? [UserPermissionRole.PUBLIC];
+      return (
+        skill.id !== NO_SKILL_ID &&
+        allowedRoles.some((role) => role === UserPermissionRole.PUBLIC)
+      );
+    }).map((skill) => skill.id);
+  }
+
+  /**
+   * Community skills with an indexable landing page: PUBLIC + PUBLISHED and
+   * not deleted (UNLISTED is link-only, drafts are private). Id = slug, UUID
+   * for old rows without one. Feeds the sitemap.
+   */
+  static async listPublishedCommunitySkillPages(
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<{ id: string; updatedAt: Date }[]>> {
+    try {
+      const rows = await db
+        .select({
+          id: customSkills.id,
+          slug: customSkills.slug,
+          updatedAt: customSkills.updatedAt,
+        })
+        .from(customSkills)
+        .where(
+          and(
+            eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
+            eq(customSkills.status, SkillStatus.PUBLISHED),
+            eq(customSkills.isDeleted, false),
+          ),
+        );
+      return success(
+        rows.map((row) => ({
+          id: row.slug || row.id,
+          updatedAt: row.updatedAt,
+        })),
+      );
+    } catch (error) {
+      logger.error(
+        "Failed to list published community skill pages",
+        parseError(error),
+      );
+      const { t } = scopedTranslation.scopedT(locale);
+      return fail({
+        message: t("get.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
   }
 
   /**

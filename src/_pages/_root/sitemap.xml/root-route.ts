@@ -4,20 +4,48 @@
  */
 
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { SkillsRepository } from "next-vibe/agent/skills/repository";
+import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { createEndpointLogger } from "next-vibe/logger/server";
 
-import { buildSitemapXml } from "./build-sitemap";
+import { buildSitemapXml, type SitemapSkillPage } from "./build-sitemap";
 
 /**
- * Built once per availability state (which provider keys are configured):
- * registries are static, so in practice once per server process.
+ * Never prerender. This handler reads no request data, so `next build` would
+ * otherwise bake it into a static file. The Docker build runs with
+ * placeholder env (no provider keys) and no DB, so the baked sitemap had zero
+ * model, compare and skill pages, and the runtime env patch only rewrites JS,
+ * never prerendered bodies.
  */
+export const dynamic = "force-dynamic";
+
+/** Built once per (availability, public skill set) state. */
 let cached: { key: string; xml: string } | null = null;
 
+async function listSkillPages(): Promise<SitemapSkillPage[]> {
+  const pages: SitemapSkillPage[] =
+    SkillsRepository.listPublicDefaultSkillIds().map((id) => ({
+      id,
+      updatedAt: null,
+    }));
+  const community = await SkillsRepository.listPublishedCommunitySkillPages(
+    createEndpointLogger(false, defaultLocale),
+    defaultLocale,
+  );
+  if (community.success) {
+    pages.push(...community.data);
+  }
+  return pages;
+}
+
 export async function GET(): Promise<Response> {
-  const availability = await getEnvAvailability();
-  const key = JSON.stringify(availability);
+  const [availability, skillPages] = await Promise.all([
+    getEnvAvailability(),
+    listSkillPages(),
+  ]);
+  const key = JSON.stringify({ availability, skillPages });
   if (cached?.key !== key) {
-    cached = { key, xml: buildSitemapXml(availability) };
+    cached = { key, xml: buildSitemapXml(availability, skillPages) };
   }
   return new Response(cached.xml, {
     headers: {
