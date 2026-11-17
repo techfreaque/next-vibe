@@ -988,6 +988,7 @@ export class SkillsRepository {
           longContent: null,
           favoritesCount: 0,
           creatorProfile: null,
+          importedFrom: null,
           voteCount: null,
           userVote: null,
         });
@@ -1024,6 +1025,7 @@ export class SkillsRepository {
           longContent: null,
           favoritesCount: 0,
           creatorProfile: null,
+          importedFrom: null,
           voteCount: null,
           userVote: null,
         });
@@ -1175,6 +1177,15 @@ export class SkillsRepository {
         longContent: customSkill.longContent ?? null,
         favoritesCount,
         creatorProfile,
+        importedFrom: customSkill.importSource
+          ? {
+              platform: customSkill.importSource.platform,
+              sourceUrl: customSkill.importSource.sourceUrl,
+              creatorName: customSkill.importSource.creatorName,
+              creatorUrl: customSkill.importSource.creatorUrl,
+              avatarUrl: customSkill.avatarUrl ?? null,
+            }
+          : null,
         voteCount: customSkill.voteCount,
         userVote,
       });

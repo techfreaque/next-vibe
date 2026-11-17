@@ -1786,7 +1786,8 @@ export const translations = {
         dark: {
           description:
             "Horror, cruelty, taboo. The story goes where it has to and stays there.",
-          strength: "Uncensored LM: own training data, no refusals, no moralizing",
+          strength:
+            "Uncensored LM: own training data, no refusals, no moralizing",
           weakness: "32K context, text only, weak at tool calls",
         },
       },

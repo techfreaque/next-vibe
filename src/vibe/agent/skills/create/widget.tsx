@@ -4,12 +4,15 @@
 
 "use client";
 
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { Download } from "next-vibe/ui/components/icons/Download";
 import { Span } from "next-vibe/ui/components/span";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
   useWidgetForm,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -29,6 +32,7 @@ import { useProviderAvailability } from "../../env-availability-store";
 import { scopedTranslation as skillIdTranslation } from "../[id]/i18n";
 import { useVariantPlatformDefaults, VariantList } from "../[id]/widget";
 import type { SkillVariantData } from "../db";
+import { scopedTranslation as skillImportTranslation } from "../import/i18n";
 import type defintion from "./definition";
 
 /**
@@ -50,6 +54,24 @@ export function SkillCreateContainer({
   const user = useWidgetUser();
   const availability = useProviderAvailability();
   const { t: tId } = skillIdTranslation.scopedT(locale);
+  const { t: tImport } = skillImportTranslation.scopedT(locale);
+  const navigation = useWidgetNavigation();
+
+  // Import from a Character.AI / Talkie link instead of filling the form.
+  // On success the dialog is replaced by the new character's page.
+  const handleImport = useCallback(async (): Promise<void> => {
+    const [importDef, skillDef] = await Promise.all([
+      import("../import/definition"),
+      import("../[id]/definition"),
+    ]);
+    navigation.push(importDef.default.POST, {
+      renderInModal: true,
+      replaceOnSuccess: {
+        endpoint: skillDef.default.GET,
+        getUrlPathParams: (responseData) => ({ id: responseData.id }),
+      },
+    });
+  }, [navigation]);
   const fieldValue = useWidgetValue<typeof defintion.POST>();
   const emptyField = useMemo(() => ({}), []);
 
@@ -76,6 +98,11 @@ export function SkillCreateContainer({
       {/* Top Actions: Back Button + Submit Button */}
       <Div className="flex flex-row gap-2 px-4 pt-4 pb-4">
         <NavigateButtonWidget field={children.backButton} />
+
+        <Button type="button" variant="outline" onClick={handleImport}>
+          <Download className="mr-2 h-4 w-4" />
+          {tImport("post.titleShort")}
+        </Button>
 
         {/* Submit Button */}
         <SubmitButtonWidget<typeof defintion.POST>

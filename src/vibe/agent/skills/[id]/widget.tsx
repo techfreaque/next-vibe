@@ -120,6 +120,7 @@ import {
 } from "../../ai-stream/vision-models";
 import { CompactTriggerEdit } from "../../chat/settings/widget";
 import { formatSkillId, parseSkillId } from "../../chat/slugify";
+import { resolveMediaSrc } from "../../chat/storage/media-src";
 import type { AgentEnvAvailability } from "../../env-availability";
 import { useProviderAvailability } from "../../env-availability-store";
 import { DEFAULT_IMAGE_GEN_MODEL_SELECTION } from "../../image-generation/constants";
@@ -177,6 +178,7 @@ import {
 } from "../favorites/create/hooks";
 import type { FavoriteCard } from "../favorites/definition";
 import { useChatFavorites } from "../favorites/hooks/hooks";
+import { scopedTranslation as skillImportTranslation } from "../import/i18n";
 import type {
   default as definitionGet,
   default as definitionPatch,
@@ -1145,7 +1147,12 @@ export function SkillViewContainer({
                 boxShadow: `0 0 40px ${accent}20`,
               }}
             >
-              {skillData?.icon ? (
+              {skillData?.importedFrom?.avatarUrl ? (
+                <ImportedAvatar
+                  src={skillData.importedFrom.avatarUrl}
+                  alt={skillData.name ?? ""}
+                />
+              ) : skillData?.icon ? (
                 <Span style={{ color: `${accent}cc` }}>
                   <Icon icon={skillData.icon as IconKey} className="w-9 h-9" />
                 </Span>
@@ -1190,6 +1197,13 @@ export function SkillViewContainer({
             >
               {skillData.tagline}
             </Span>
+          )}
+
+          {/* Credit for imported characters */}
+          {skillData?.importedFrom && (
+            <Div style={{ marginBottom: 8 }}>
+              <ImportedFromCredit importedFrom={skillData.importedFrom} />
+            </Div>
           )}
 
           {/* Meta: favorites */}
@@ -1770,7 +1784,12 @@ export function SkillViewContainer({
                 boxShadow: `0 0 40px ${accent}20`,
               }}
             >
-              {skillData?.icon ? (
+              {skillData?.importedFrom?.avatarUrl ? (
+                <ImportedAvatar
+                  src={skillData.importedFrom.avatarUrl}
+                  alt={skillData.name ?? ""}
+                />
+              ) : skillData?.icon ? (
                 <Span style={{ color: `${accent}cc` }}>
                   <Icon icon={skillData.icon as IconKey} className="w-9 h-9" />
                 </Span>
@@ -1804,6 +1823,13 @@ export function SkillViewContainer({
             </Span>
           ) : (
             <Skeleton className="h-4 w-40 mx-auto mb-2" />
+          )}
+
+          {/* credit for imported characters */}
+          {skillData?.importedFrom && (
+            <Div style={{ marginBottom: 12 }}>
+              <ImportedFromCredit importedFrom={skillData.importedFrom} />
+            </Div>
           )}
 
           {/* description */}
@@ -2436,6 +2462,58 @@ const CREATOR_SOCIALS = [
 ] as const;
 
 type CreatorProfile = NonNullable<SkillGetResponseOutput["creatorProfile"]>;
+type ImportedFrom = NonNullable<SkillGetResponseOutput["importedFrom"]>;
+
+/** Character image copied in by a link import (fills the hero icon slot). */
+function ImportedAvatar({
+  src,
+  alt,
+}: {
+  src: string;
+  alt: string;
+}): React.JSX.Element {
+  return (
+    <Image
+      src={resolveMediaSrc(src)}
+      alt={alt}
+      width={72}
+      height={72}
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        borderRadius: 20,
+      }}
+    />
+  );
+}
+
+/** "Originally by X on Character.AI", linking back to the source page. */
+function ImportedFromCredit({
+  importedFrom,
+}: {
+  importedFrom: ImportedFrom;
+}): React.JSX.Element {
+  const locale = useWidgetLocale();
+  const { t } = skillImportTranslation.scopedT(locale);
+  const platform = t(importedFrom.platform);
+  return (
+    <Link
+      href={importedFrom.sourceUrl}
+      target="_blank"
+      rel="noopener noreferrer nofollow"
+      className="inline-flex items-center gap-1 text-xs text-muted-foreground no-underline hover:text-foreground transition-colors"
+    >
+      {importedFrom.creatorName
+        ? t("post.result.credit", {
+            creator: importedFrom.creatorName,
+            platform,
+          })
+        : t("post.result.creditUnknown", { platform })}
+      <ExternalLink className="h-3 w-3" />
+    </Link>
+  );
+}
 
 /** Extract display domain from a URL for social link display */
 function displayDomain(url: string): string {

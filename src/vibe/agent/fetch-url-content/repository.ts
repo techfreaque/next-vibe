@@ -340,6 +340,43 @@ class FetchUrlService {
     };
   }
 
+  /**
+   * Fetch a page's raw HTML through Scrappey (no cache, no Markdown). For
+   * callers that parse page data themselves (embedded JSON on anti-bot sites).
+   */
+  async fetchRawHtml(
+    url: string,
+    fetchImpl: typeof globalThis.fetch,
+  ): Promise<
+    FetchResult<{ html: string; statusCode: number; currentUrl: string }>
+  > {
+    const validateResult = this.validateUrl(url);
+    if (!validateResult.ok) {
+      return validateResult;
+    }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, this.TIMEOUT);
+    const result = await this.fetchFromScrappey(
+      url,
+      controller.signal,
+      fetchImpl,
+    );
+    clearTimeout(timeoutId);
+    if (!result.ok) {
+      return result;
+    }
+    return {
+      ok: true,
+      data: {
+        html: result.data.solution.response,
+        statusCode: result.data.solution.statusCode,
+        currentUrl: result.data.solution.currentUrl,
+      },
+    };
+  }
+
   private async fetchFromScrappey(
     url: string,
     signal: AbortSignal,

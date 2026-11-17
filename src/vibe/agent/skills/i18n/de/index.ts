@@ -978,7 +978,8 @@ export const translations: typeof enTranslations = {
         dark: {
           description:
             "Düstere Lyrik, grenzüberschreitende Kunst, unbequeme Ideen. Nichts wird glattgeschliffen.",
-          strength: "Uncensored LM: eigenes Trainingsmaterial, keine Verweigerung",
+          strength:
+            "Uncensored LM: eigenes Trainingsmaterial, keine Verweigerung",
           weakness: "32K Kontext, nur Text, schwach bei Tool-Aufrufen",
         },
       },
@@ -1797,7 +1798,8 @@ export const translations: typeof enTranslations = {
         dark: {
           description:
             "Horror, Grausamkeit, Tabus. Die Geschichte geht dorthin, wo sie hin muss, und bleibt dort.",
-          strength: "Uncensored LM: eigenes Trainingsmaterial, keine Verweigerung, keine Moralpredigt",
+          strength:
+            "Uncensored LM: eigenes Trainingsmaterial, keine Verweigerung, keine Moralpredigt",
           weakness: "32K Kontext, nur Text, schwach bei Tool-Aufrufen",
         },
       },

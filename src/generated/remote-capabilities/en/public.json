@@ -69662,6 +69662,88 @@
           },
           "schemaType": "primitive"
         },
+        "importedFrom": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "platform": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "enums.platform.characterAi": "enums.platform.characterAi",
+                          "enums.platform.talkie": "enums.platform.talkie"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "enums.platform.characterAi": "enums.platform.characterAi",
+                        "enums.platform.talkie": "enums.platform.talkie"
+                      },
+                      "options": [
+                        "enums.platform.characterAi",
+                        "enums.platform.talkie"
+                      ]
+                    },
+                    "sourceUrl": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "creatorName": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
+                    },
+                    "creatorUrl": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
+                    },
+                    "avatarUrl": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "backButton": {
           "schemaType": "widget",
           "usage": {

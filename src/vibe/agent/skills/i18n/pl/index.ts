@@ -1786,7 +1786,8 @@ export const translations: typeof enTranslations = {
         dark: {
           description:
             "Horror, okrucieństwo, tabu. Historia idzie tam, gdzie musi, i tam zostaje.",
-          strength: "Uncensored LM: własne dane treningowe, bez odmów, bez moralizowania",
+          strength:
+            "Uncensored LM: własne dane treningowe, bez odmów, bez moralizowania",
           weakness: "Kontekst 32K, tylko tekst, słaby w wywołaniach narzędzi",
         },
       },

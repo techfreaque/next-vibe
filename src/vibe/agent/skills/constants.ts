@@ -7,6 +7,16 @@ export const SKILL_VOTE_ALIAS = "skill-vote" as const;
 export const SKILL_REPORT_ALIAS = "skill-report" as const;
 export const SKILL_PUBLISH_ALIAS = "skill-publish" as const;
 export const SKILL_MODERATION_ALIAS = "skill-moderation" as const;
+export const SKILL_IMPORT_ALIAS = "skill-import" as const;
+
+/**
+ * Storage namespace (the thread-files `threadId` slot, so it must be a UUID)
+ * for character avatars copied in by link imports. Files here are public-read:
+ * they are copies of images the source platform already shows publicly, and
+ * public characters need their avatar visible to every viewer.
+ */
+export const SKILL_AVATAR_STORAGE_NAMESPACE =
+  "00000000-0000-4000-8000-00000000a7a1" as const;
 export const NO_SKILL_ID = "default";
 export const SKILL_CREATOR_ID = "skill-creator" as const;
 

@@ -53,6 +53,7 @@ import {
   SkillVoteDirection,
   SkillVoteDirectionDB,
 } from "../enum";
+import { SkillImportPlatformDB } from "../import/enum";
 import { scopedTranslation } from "./i18n";
 
 const SkillEditContainer = lazyWidget(() =>
@@ -1068,6 +1069,21 @@ const { GET } = createEndpoint({
           .nullable(),
       }),
 
+      // Credit for characters imported from another platform (link import)
+      importedFrom: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z
+          .object({
+            platform: z.enum(SkillImportPlatformDB),
+            sourceUrl: z.string(),
+            creatorName: z.string().nullable(),
+            creatorUrl: z.string().nullable(),
+            avatarUrl: z.string().nullable(),
+          })
+          .nullable(),
+      }),
+
       // === BUTTONS ===
       backButton: backButton(scopedTranslation, {
         label: "get.backButton.label" as const,
@@ -1141,6 +1157,7 @@ const { GET } = createEndpoint({
         longContent: null,
         favoritesCount: 0,
         creatorProfile: null,
+        importedFrom: null,
         variants: [
           {
             id: "default",
@@ -1178,6 +1195,7 @@ const { GET } = createEndpoint({
         longContent: null,
         favoritesCount: 42,
         creatorProfile: null,
+        importedFrom: null,
         voteCount: 12,
         userVote: SkillVoteDirection.UP,
         variants: [

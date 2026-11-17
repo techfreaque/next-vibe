@@ -19,6 +19,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../../../../env";
+import { SKILL_AVATAR_STORAGE_NAMESPACE } from "../../../../../skills/constants";
 import { chatFolders, chatThreads } from "../../../../db";
 import { canViewThread } from "../../../../permissions/permissions";
 import type { FileMetadata } from "../../../../storage/index";
@@ -133,7 +134,13 @@ export class ChatFileRepository {
             contentType: "text/plain",
           };
         }
-        if (!isStorageFileOwner(fileMetadata, user)) {
+        // Imported character avatars are public-read (copies of images the
+        // source platform shows publicly; public skills show them to everyone).
+        const isPublicSkillAvatar =
+          data.threadId === SKILL_AVATAR_STORAGE_NAMESPACE &&
+          fileMetadata.mimeType.startsWith("image/") &&
+          !fileMetadata.mimeType.includes("svg");
+        if (!isPublicSkillAvatar && !isStorageFileOwner(fileMetadata, user)) {
           logger.error("Lead does not have permission to access file", {
             leadId: user.leadId,
             hasFileLeadId: !!fileMetadata.leadId,

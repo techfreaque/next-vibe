@@ -95652,6 +95652,88 @@
           },
           "schemaType": "primitive"
         },
+        "importedFrom": {
+          "type": "text",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "platform": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "enums.platform.characterAi": "enums.platform.characterAi",
+                          "enums.platform.talkie": "enums.platform.talkie"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "enums.platform.characterAi": "enums.platform.characterAi",
+                        "enums.platform.talkie": "enums.platform.talkie"
+                      },
+                      "options": [
+                        "enums.platform.characterAi",
+                        "enums.platform.talkie"
+                      ]
+                    },
+                    "sourceUrl": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "creatorName": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
+                    },
+                    "creatorUrl": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
+                    },
+                    "avatarUrl": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "backButton": {
           "schemaType": "widget",
           "usage": {
@@ -281657,6 +281739,321 @@
     "category": "ai",
     "tags": ["Ulubione"],
     "aliases": ["favorites-reorder"],
+    "credits": 0
+  },
+  {
+    "toolName": "skill-import",
+    "title": "Importuj postać z linku",
+    "titleShort": "Import z linku",
+    "description": "Importuje postać z publicznego linku Character.AI (character.ai, c.ai) lub Talkie (talkie-ai.com). Kopiuje nazwę, awatar, powitanie, opis, definicję i tagi do nowej postaci, która należy do Ciebie, podaje oryginalnego twórcę i link do źródła. Ponowny import tego samego linku zwraca istniejącą postać.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "url": {
+          "type": "form_field",
+          "fieldType": "url",
+          "label": "Link do postaci",
+          "description": "Publiczny link do strony postaci",
+          "placeholder": "https://character.ai/character/...",
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "string",
+              "checks": [{}, {}, {}]
+            },
+            "type": "string"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "visibility": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Widoczność",
+          "description": "Prywatna: tylko Ty. Poza listą: nie widać jej na publicznej liście. Publiczna: widoczna dla wszystkich.",
+          "options": [
+            {
+              "value": "enums.visibility.private",
+              "label": "enums.visibility.private"
+            },
+            {
+              "value": "enums.visibility.unlisted",
+              "label": "enums.visibility.unlisted"
+            },
+            {
+              "value": "enums.visibility.public",
+              "label": "enums.visibility.public"
+            }
+          ],
+          "columns": 12,
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "enums.visibility.private": "enums.visibility.private",
+                    "enums.visibility.unlisted": "enums.visibility.unlisted",
+                    "enums.visibility.public": "enums.visibility.public"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "enums.visibility.private": "enums.visibility.private",
+                  "enums.visibility.unlisted": "enums.visibility.unlisted",
+                  "enums.visibility.public": "enums.visibility.public"
+                },
+                "options": [
+                  "enums.visibility.private",
+                  "enums.visibility.unlisted",
+                  "enums.visibility.public"
+                ]
+              },
+              "defaultValue": "enums.visibility.private"
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "id": {
+          "type": "text",
+          "label": "ID postaci",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "name": {
+          "type": "text",
+          "label": "Nazwa",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "platform": {
+          "type": "text",
+          "label": "Źródło",
+          "schema": {
+            "def": {
+              "type": "enum",
+              "entries": {
+                "enums.platform.characterAi": "enums.platform.characterAi",
+                "enums.platform.talkie": "enums.platform.talkie"
+              }
+            },
+            "type": "enum",
+            "enum": {
+              "enums.platform.characterAi": "enums.platform.characterAi",
+              "enums.platform.talkie": "enums.platform.talkie"
+            },
+            "options": ["enums.platform.characterAi", "enums.platform.talkie"]
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "creatorName": {
+          "type": "text",
+          "label": "Oryginalny twórca",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "sourceUrl": {
+          "type": "text",
+          "label": "Link źródłowy",
+          "schema": {
+            "def": {
+              "type": "string"
+            },
+            "type": "string"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "avatarUrl": {
+          "type": "text",
+          "label": "Awatar",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "alreadyImported": {
+          "type": "text",
+          "label": "Już zaimportowana",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "importedFields": {
+          "type": "text",
+          "label": "Zaimportowano",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "name": "name",
+                    "avatar": "avatar",
+                    "greeting": "greeting",
+                    "description": "description",
+                    "definition": "definition",
+                    "tags": "tags"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "name": "name",
+                  "avatar": "avatar",
+                  "greeting": "greeting",
+                  "description": "description",
+                  "definition": "definition",
+                  "tags": "tags"
+                },
+                "options": [
+                  "name",
+                  "avatar",
+                  "greeting",
+                  "description",
+                  "definition",
+                  "tags"
+                ]
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "enum",
+                "entries": {
+                  "name": "name",
+                  "avatar": "avatar",
+                  "greeting": "greeting",
+                  "description": "description",
+                  "definition": "definition",
+                  "tags": "tags"
+                }
+              },
+              "type": "enum",
+              "enum": {
+                "name": "name",
+                "avatar": "avatar",
+                "greeting": "greeting",
+                "description": "description",
+                "definition": "definition",
+                "tags": "tags"
+              },
+              "options": [
+                "name",
+                "avatar",
+                "greeting",
+                "description",
+                "definition",
+                "tags"
+              ]
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "backButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data"
+          },
+          "type": "navigate_button",
+          "label": "Wstecz",
+          "icon": "arrow-left",
+          "variant": "outline",
+          "prefillFromGet": false,
+          "renderInModal": false
+        },
+        "submitButton": {
+          "schemaType": "widget",
+          "usage": {
+            "request": "data"
+          },
+          "type": "submit_button",
+          "text": "post.submitButton.label",
+          "loadingText": "post.submitButton.loadingText",
+          "icon": "download",
+          "variant": "primary",
+          "size": "default",
+          "className": "ml-auto"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["skille"],
+    "aliases": ["skill-import"],
     "credits": 0
   },
   {

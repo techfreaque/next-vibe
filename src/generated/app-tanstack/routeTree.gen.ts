@@ -588,6 +588,7 @@ import { Route as ApiLocaleVibeAgentRefusalIndexSamplesRouteImport } from './rou
 import { Route as ApiLocaleVibeAgentSkillsIdRouteImport } from './routes/api.$locale.vibe.agent.skills.$id'
 import { Route as ApiLocaleVibeAgentSkillsCreateRouteImport } from './routes/api.$locale.vibe.agent.skills.create'
 import { Route as ApiLocaleVibeAgentSkillsFavoritesRouteImport } from './routes/api.$locale.vibe.agent.skills.favorites'
+import { Route as ApiLocaleVibeAgentSkillsImportRouteImport } from './routes/api.$locale.vibe.agent.skills.import'
 import { Route as ApiLocaleVibeAgentSkillsModerationRouteImport } from './routes/api.$locale.vibe.agent.skills.moderation'
 import { Route as ApiLocaleVibeAgentWebSearchBraveRouteImport } from './routes/api.$locale.vibe.agent.web-search.brave'
 import { Route as ApiLocaleVibeAgentWebSearchKagiRouteImport } from './routes/api.$locale.vibe.agent.web-search.kagi'
@@ -4084,6 +4085,12 @@ const ApiLocaleVibeAgentSkillsFavoritesRoute =
     path: '/favorites',
     getParentRoute: () => ApiLocaleVibeAgentSkillsRoute,
   } as any)
+const ApiLocaleVibeAgentSkillsImportRoute =
+  ApiLocaleVibeAgentSkillsImportRouteImport.update({
+    id: '/import',
+    path: '/import',
+    getParentRoute: () => ApiLocaleVibeAgentSkillsRoute,
+  } as any)
 const ApiLocaleVibeAgentSkillsModerationRoute =
   ApiLocaleVibeAgentSkillsModerationRouteImport.update({
     id: '/moderation',
@@ -5415,6 +5422,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/agent/skills/$id': typeof ApiLocaleVibeAgentSkillsIdRouteWithChildren
   '/api/$locale/vibe/agent/skills/create': typeof ApiLocaleVibeAgentSkillsCreateRoute
   '/api/$locale/vibe/agent/skills/favorites': typeof ApiLocaleVibeAgentSkillsFavoritesRouteWithChildren
+  '/api/$locale/vibe/agent/skills/import': typeof ApiLocaleVibeAgentSkillsImportRoute
   '/api/$locale/vibe/agent/skills/moderation': typeof ApiLocaleVibeAgentSkillsModerationRoute
   '/api/$locale/vibe/agent/web-search/brave': typeof ApiLocaleVibeAgentWebSearchBraveRoute
   '/api/$locale/vibe/agent/web-search/kagi': typeof ApiLocaleVibeAgentWebSearchKagiRoute
@@ -6112,6 +6120,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/agent/skills/$id': typeof ApiLocaleVibeAgentSkillsIdRouteWithChildren
   '/api/$locale/vibe/agent/skills/create': typeof ApiLocaleVibeAgentSkillsCreateRoute
   '/api/$locale/vibe/agent/skills/favorites': typeof ApiLocaleVibeAgentSkillsFavoritesRouteWithChildren
+  '/api/$locale/vibe/agent/skills/import': typeof ApiLocaleVibeAgentSkillsImportRoute
   '/api/$locale/vibe/agent/skills/moderation': typeof ApiLocaleVibeAgentSkillsModerationRoute
   '/api/$locale/vibe/agent/web-search/brave': typeof ApiLocaleVibeAgentWebSearchBraveRoute
   '/api/$locale/vibe/agent/web-search/kagi': typeof ApiLocaleVibeAgentWebSearchKagiRoute
@@ -6817,6 +6826,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/agent/skills/$id': typeof ApiLocaleVibeAgentSkillsIdRouteWithChildren
   '/api/$locale/vibe/agent/skills/create': typeof ApiLocaleVibeAgentSkillsCreateRoute
   '/api/$locale/vibe/agent/skills/favorites': typeof ApiLocaleVibeAgentSkillsFavoritesRouteWithChildren
+  '/api/$locale/vibe/agent/skills/import': typeof ApiLocaleVibeAgentSkillsImportRoute
   '/api/$locale/vibe/agent/skills/moderation': typeof ApiLocaleVibeAgentSkillsModerationRoute
   '/api/$locale/vibe/agent/web-search/brave': typeof ApiLocaleVibeAgentWebSearchBraveRoute
   '/api/$locale/vibe/agent/web-search/kagi': typeof ApiLocaleVibeAgentWebSearchKagiRoute
@@ -7522,6 +7532,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/skills/$id'
     | '/api/$locale/vibe/agent/skills/create'
     | '/api/$locale/vibe/agent/skills/favorites'
+    | '/api/$locale/vibe/agent/skills/import'
     | '/api/$locale/vibe/agent/skills/moderation'
     | '/api/$locale/vibe/agent/web-search/brave'
     | '/api/$locale/vibe/agent/web-search/kagi'
@@ -8219,6 +8230,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/skills/$id'
     | '/api/$locale/vibe/agent/skills/create'
     | '/api/$locale/vibe/agent/skills/favorites'
+    | '/api/$locale/vibe/agent/skills/import'
     | '/api/$locale/vibe/agent/skills/moderation'
     | '/api/$locale/vibe/agent/web-search/brave'
     | '/api/$locale/vibe/agent/web-search/kagi'
@@ -8923,6 +8935,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/skills/$id'
     | '/api/$locale/vibe/agent/skills/create'
     | '/api/$locale/vibe/agent/skills/favorites'
+    | '/api/$locale/vibe/agent/skills/import'
     | '/api/$locale/vibe/agent/skills/moderation'
     | '/api/$locale/vibe/agent/web-search/brave'
     | '/api/$locale/vibe/agent/web-search/kagi'
@@ -13560,6 +13573,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeAgentSkillsFavoritesRouteImport
       parentRoute: typeof ApiLocaleVibeAgentSkillsRoute
     }
+    '/api/$locale/vibe/agent/skills/import': {
+      id: '/api/$locale/vibe/agent/skills/import'
+      path: '/import'
+      fullPath: '/api/$locale/vibe/agent/skills/import'
+      preLoaderRoute: typeof ApiLocaleVibeAgentSkillsImportRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentSkillsRoute
+    }
     '/api/$locale/vibe/agent/skills/moderation': {
       id: '/api/$locale/vibe/agent/skills/moderation'
       path: '/moderation'
@@ -15342,6 +15362,7 @@ interface ApiLocaleVibeAgentSkillsRouteChildren {
   ApiLocaleVibeAgentSkillsIdRoute: typeof ApiLocaleVibeAgentSkillsIdRouteWithChildren
   ApiLocaleVibeAgentSkillsCreateRoute: typeof ApiLocaleVibeAgentSkillsCreateRoute
   ApiLocaleVibeAgentSkillsFavoritesRoute: typeof ApiLocaleVibeAgentSkillsFavoritesRouteWithChildren
+  ApiLocaleVibeAgentSkillsImportRoute: typeof ApiLocaleVibeAgentSkillsImportRoute
   ApiLocaleVibeAgentSkillsModerationRoute: typeof ApiLocaleVibeAgentSkillsModerationRoute
 }
 
@@ -15352,6 +15373,7 @@ const ApiLocaleVibeAgentSkillsRouteChildren: ApiLocaleVibeAgentSkillsRouteChildr
     ApiLocaleVibeAgentSkillsCreateRoute: ApiLocaleVibeAgentSkillsCreateRoute,
     ApiLocaleVibeAgentSkillsFavoritesRoute:
       ApiLocaleVibeAgentSkillsFavoritesRouteWithChildren,
+    ApiLocaleVibeAgentSkillsImportRoute: ApiLocaleVibeAgentSkillsImportRoute,
     ApiLocaleVibeAgentSkillsModerationRoute:
       ApiLocaleVibeAgentSkillsModerationRoute,
   }

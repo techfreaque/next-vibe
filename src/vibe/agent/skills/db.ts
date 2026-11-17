@@ -62,6 +62,7 @@ import {
   SkillVoteDirection,
   SkillVoteDirectionDB,
 } from "./enum";
+import type { SkillImportPlatformValue } from "./import/enum";
 
 /**
  * Custom Skills Table
@@ -160,6 +161,14 @@ export const customSkills = pgTable(
     // Creator long-form content (markdown, no length limit)
     longContent: text("long_content"),
 
+    // Character image (portable storage URL; set by link imports). null = icon only.
+    avatarUrl: text("avatar_url"),
+
+    // Credit for skills imported from another platform (Character.AI, Talkie).
+    importSource: jsonb("import_source").$type<SkillImportSource>(),
+    // Dedupe key "<platform>:<sourceId>": one import per source per user.
+    importSourceKey: text("import_source_key"),
+
     // Lightweight versioning - set when status transitions to PUBLISHED
     publishedAt: timestamp("published_at"),
     changeNote: text("change_note"),
@@ -173,8 +182,27 @@ export const customSkills = pgTable(
   },
   (table) => ({
     slugIdx: unique("custom_skills_slug_idx").on(table.slug),
+    importSourceIdx: uniqueIndex("custom_skills_user_import_source_idx").on(
+      table.userId,
+      table.importSourceKey,
+    ),
   }),
 );
+
+/**
+ * Where an imported skill came from. Stored so the original creator stays
+ * credited ("Originally by X on Character.AI") with a link back to the source.
+ */
+// eslint-disable-next-line typescript/consistent-type-definitions, @typescript-eslint/consistent-type-definitions -- Type alias (not interface) so it stays assignable to WidgetData on endpoint payloads, same as SkillVariantData.
+export type SkillImportSource = {
+  platform: typeof SkillImportPlatformValue;
+  sourceUrl: string;
+  sourceId: string;
+  creatorName: string | null;
+  creatorUrl: string | null;
+  tags: string[];
+  importedAt: string;
+};
 
 /**
  * Skill Votes Table

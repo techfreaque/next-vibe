@@ -993,7 +993,8 @@ export const translations: typeof enTranslations = {
         dark: {
           description:
             "Poésie noire, art transgressif, idées qui dérangent. Rien n'est arrondi.",
-          strength: "Uncensored LM : ses propres données d'entraînement, aucun refus",
+          strength:
+            "Uncensored LM : ses propres données d'entraînement, aucun refus",
           weakness: "Contexte 32K, texte seul, faible pour les appels d'outils",
         },
       },
@@ -1823,7 +1824,8 @@ export const translations: typeof enTranslations = {
         dark: {
           description:
             "Horreur, cruauté, tabous. L'histoire va là où elle doit aller, et y reste.",
-          strength: "Uncensored LM : ses propres données d'entraînement, aucun refus, aucune leçon de morale",
+          strength:
+            "Uncensored LM : ses propres données d'entraînement, aucun refus, aucune leçon de morale",
           weakness: "Contexte 32K, texte seul, faible pour les appels d'outils",
         },
       },
