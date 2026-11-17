@@ -1,0 +1,15 @@
+{
+  "url": "https://api.edenai.run/v3/universal-ai",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "model": "audio/tts/openai/tts-1",
+    "input": {
+      "text": "Hi.",
+      "voice": "nova"
+    }
+  }
+}

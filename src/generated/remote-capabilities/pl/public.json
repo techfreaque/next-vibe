@@ -3288,6 +3288,32 @@
           },
           "schemaType": "primitive"
         },
+        "pendingEmail": {
+          "type": "text",
+          "label": "Oczekujący e-mail",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "nullable",
+                  "innerType": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "nullable"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "requireTwoFactor": {
           "type": "badge",
           "text": "get.response.requireTwoFactor",
@@ -5191,7 +5217,7 @@
               "type": "form_field",
               "fieldType": "email",
               "label": "Adres e-mail",
-              "description": "Twój adres e-mail",
+              "description": "Twój adres do logowania. Nowy zaczyna działać dopiero po kliknięciu linku, który na niego wyślemy.",
               "placeholder": "Wprowadź swój adres e-mail",
               "columns": 12,
               "schema": {
@@ -6505,6 +6531,32 @@
                   }
                 },
                 "type": "nullable"
+              },
+              "usage": {
+                "response": true
+              },
+              "schemaType": "primitive"
+            },
+            "pendingEmail": {
+              "type": "text",
+              "label": "Oczekujący e-mail",
+              "schema": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    },
+                    "type": "nullable"
+                  }
+                },
+                "type": "optional"
               },
               "usage": {
                 "response": true
@@ -9576,7 +9628,7 @@
           "layoutType": "grid",
           "columns": 12,
           "title": "Może wykonywać",
-          "description": "Które narzędzia AI może uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione. Standard: [{toolId:'execute-tool'},{toolId:'tool-help'}].",
+          "description": "Narzędzia dla tego uruchomienia. [] = tylko tekst: bez narzędzi, model tylko pisze (do szkiców). Pomiń, aby użyć narzędzi skilla lub ulubionego. Inne listy nie są jeszcze stosowane.",
           "schemaType": "array-optional",
           "child": {
             "type": "container",
@@ -13751,7 +13803,8 @@
                                     "WAN_3_0": "wan-3-0",
                                     "SEEDANCE_2_MINI": "seedance-2-mini",
                                     "HAILUO_3_MAX": "hailuo-3-max",
-                                    "RUNWAY_GEN_4_5": "runway-gen-4-5"
+                                    "RUNWAY_GEN_4_5": "runway-gen-4-5",
+                                    "SEEDANCE_2_5_FLASH": "seedance-2-5-flash"
                                   }
                                 },
                                 "type": "enum",
@@ -13795,7 +13848,8 @@
                                   "WAN_3_0": "wan-3-0",
                                   "SEEDANCE_2_MINI": "seedance-2-mini",
                                   "HAILUO_3_MAX": "hailuo-3-max",
-                                  "RUNWAY_GEN_4_5": "runway-gen-4-5"
+                                  "RUNWAY_GEN_4_5": "runway-gen-4-5",
+                                  "SEEDANCE_2_5_FLASH": "seedance-2-5-flash"
                                 },
                                 "options": [
                                   "wan-2-7-t2v",
@@ -13837,7 +13891,8 @@
                                   "wan-3-0",
                                   "seedance-2-mini",
                                   "hailuo-3-max",
-                                  "runway-gen-4-5"
+                                  "runway-gen-4-5",
+                                  "seedance-2-5-flash"
                                 ]
                               },
                               "intelligenceRange": {
@@ -14535,7 +14590,8 @@
                                   "WAN_3_0": "wan-3-0",
                                   "SEEDANCE_2_MINI": "seedance-2-mini",
                                   "HAILUO_3_MAX": "hailuo-3-max",
-                                  "RUNWAY_GEN_4_5": "runway-gen-4-5"
+                                  "RUNWAY_GEN_4_5": "runway-gen-4-5",
+                                  "SEEDANCE_2_5_FLASH": "seedance-2-5-flash"
                                 }
                               },
                               "type": "enum",
@@ -14579,7 +14635,8 @@
                                 "WAN_3_0": "wan-3-0",
                                 "SEEDANCE_2_MINI": "seedance-2-mini",
                                 "HAILUO_3_MAX": "hailuo-3-max",
-                                "RUNWAY_GEN_4_5": "runway-gen-4-5"
+                                "RUNWAY_GEN_4_5": "runway-gen-4-5",
+                                "SEEDANCE_2_5_FLASH": "seedance-2-5-flash"
                               },
                               "options": [
                                 "wan-2-7-t2v",
@@ -14621,7 +14678,8 @@
                                 "wan-3-0",
                                 "seedance-2-mini",
                                 "hailuo-3-max",
-                                "runway-gen-4-5"
+                                "runway-gen-4-5",
+                                "seedance-2-5-flash"
                               ]
                             },
                             "intelligenceRange": {
@@ -18343,7 +18401,7 @@
     "credits": 0
   },
   {
-    "toolName": "vibe_agent_chat_public-feed_GET",
+    "toolName": "forum-threads",
     "title": "Feed społeczności",
     "titleShort": "Publiczny feed",
     "description": "Publiczne wątki udostępnione społeczności",
@@ -18492,6 +18550,29 @@
                   "type": "string"
                 },
                 "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "needsReply": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Czeka na odpowiedź",
+          "description": "Tylko wątki, w których od Twojego ostatniego wpisu AI pojawiło się coś nowego (najnowszy wpis nie jest Twoim wpisem AI). Może to być pytanie człowieka albo odpowiedź innego modelu.",
+          "columns": 6,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
               }
             },
             "type": "optional"
@@ -18811,6 +18892,214 @@
                     },
                     "type": "string"
                   }
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "startedByAI": {
+                "type": "text",
+                "label": "Założony przez AI",
+                "schema": {
+                  "def": {
+                    "type": "boolean"
+                  },
+                  "type": "boolean"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "lastMessageId": {
+                "type": "text",
+                "label": "ID ostatniej wiadomości",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string",
+                        "format": "uuid",
+                        "check": "string_format",
+                        "abort": false,
+                        "pattern": {}
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "lastMessageIsAI": {
+                "type": "text",
+                "label": "Ostatni wpis od AI",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "lastMessageIsMine": {
+                "type": "text",
+                "label": "Ostatni wpis jest Twój",
+                "schema": {
+                  "def": {
+                    "type": "boolean"
+                  },
+                  "type": "boolean"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "lastMessageAt": {
+                "type": "text",
+                "label": "Ostatni wpis",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "date"
+                                },
+                                "type": "date"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "coerce": true,
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            ]
+                          },
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    }
+                  },
+                  "type": "nullable"
                 },
                 "usage": {
                   "response": true
@@ -19233,6 +19522,7 @@
     "instanceId": "local",
     "category": "ai",
     "tags": ["Publiczny Feed"],
+    "aliases": ["forum-threads"],
     "credits": 0
   },
   {
@@ -41492,7 +41782,8 @@
                                                   "WAN_3_0": "wan-3-0",
                                                   "SEEDANCE_2_MINI": "seedance-2-mini",
                                                   "HAILUO_3_MAX": "hailuo-3-max",
-                                                  "RUNWAY_GEN_4_5": "runway-gen-4-5"
+                                                  "RUNWAY_GEN_4_5": "runway-gen-4-5",
+                                                  "SEEDANCE_2_5_FLASH": "seedance-2-5-flash"
                                                 }
                                               },
                                               "type": "enum",
@@ -41536,7 +41827,8 @@
                                                 "WAN_3_0": "wan-3-0",
                                                 "SEEDANCE_2_MINI": "seedance-2-mini",
                                                 "HAILUO_3_MAX": "hailuo-3-max",
-                                                "RUNWAY_GEN_4_5": "runway-gen-4-5"
+                                                "RUNWAY_GEN_4_5": "runway-gen-4-5",
+                                                "SEEDANCE_2_5_FLASH": "seedance-2-5-flash"
                                               },
                                               "options": [
                                                 "wan-2-7-t2v",
@@ -41578,7 +41870,8 @@
                                                 "wan-3-0",
                                                 "seedance-2-mini",
                                                 "hailuo-3-max",
-                                                "runway-gen-4-5"
+                                                "runway-gen-4-5",
+                                                "seedance-2-5-flash"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -42280,7 +42573,8 @@
                                                 "WAN_3_0": "wan-3-0",
                                                 "SEEDANCE_2_MINI": "seedance-2-mini",
                                                 "HAILUO_3_MAX": "hailuo-3-max",
-                                                "RUNWAY_GEN_4_5": "runway-gen-4-5"
+                                                "RUNWAY_GEN_4_5": "runway-gen-4-5",
+                                                "SEEDANCE_2_5_FLASH": "seedance-2-5-flash"
                                               }
                                             },
                                             "type": "enum",
@@ -42324,7 +42618,8 @@
                                               "WAN_3_0": "wan-3-0",
                                               "SEEDANCE_2_MINI": "seedance-2-mini",
                                               "HAILUO_3_MAX": "hailuo-3-max",
-                                              "RUNWAY_GEN_4_5": "runway-gen-4-5"
+                                              "RUNWAY_GEN_4_5": "runway-gen-4-5",
+                                              "SEEDANCE_2_5_FLASH": "seedance-2-5-flash"
                                             },
                                             "options": [
                                               "wan-2-7-t2v",
@@ -42366,7 +42661,8 @@
                                               "wan-3-0",
                                               "seedance-2-mini",
                                               "hailuo-3-max",
-                                              "runway-gen-4-5"
+                                              "runway-gen-4-5",
+                                              "seedance-2-5-flash"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -43057,6 +43353,10 @@
                                                   "ELEVENLABS_JOSH": "elevenlabs-josh",
                                                   "ELEVENLABS_BELLA": "elevenlabs-bella",
                                                   "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                                  "ELEVENLABS_RACHEL_TURBO": "elevenlabs-rachel-turbo",
+                                                  "ELEVENLABS_JOSH_TURBO": "elevenlabs-josh-turbo",
+                                                  "ELEVENLABS_BELLA_TURBO": "elevenlabs-bella-turbo",
+                                                  "ELEVENLABS_ADAM_TURBO": "elevenlabs-adam-turbo",
                                                   "KOKORO_BELLA": "kokoro-bella",
                                                   "KOKORO_SARAH": "kokoro-sarah",
                                                   "KOKORO_NICOLE": "kokoro-nicole",
@@ -43083,6 +43383,10 @@
                                                 "ELEVENLABS_JOSH": "elevenlabs-josh",
                                                 "ELEVENLABS_BELLA": "elevenlabs-bella",
                                                 "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                                "ELEVENLABS_RACHEL_TURBO": "elevenlabs-rachel-turbo",
+                                                "ELEVENLABS_JOSH_TURBO": "elevenlabs-josh-turbo",
+                                                "ELEVENLABS_BELLA_TURBO": "elevenlabs-bella-turbo",
+                                                "ELEVENLABS_ADAM_TURBO": "elevenlabs-adam-turbo",
                                                 "KOKORO_BELLA": "kokoro-bella",
                                                 "KOKORO_SARAH": "kokoro-sarah",
                                                 "KOKORO_NICOLE": "kokoro-nicole",
@@ -43107,6 +43411,10 @@
                                                 "elevenlabs-josh",
                                                 "elevenlabs-bella",
                                                 "elevenlabs-adam",
+                                                "elevenlabs-rachel-turbo",
+                                                "elevenlabs-josh-turbo",
+                                                "elevenlabs-bella-turbo",
+                                                "elevenlabs-adam-turbo",
                                                 "kokoro-bella",
                                                 "kokoro-sarah",
                                                 "kokoro-nicole",
@@ -43791,6 +44099,10 @@
                                                 "ELEVENLABS_JOSH": "elevenlabs-josh",
                                                 "ELEVENLABS_BELLA": "elevenlabs-bella",
                                                 "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                                "ELEVENLABS_RACHEL_TURBO": "elevenlabs-rachel-turbo",
+                                                "ELEVENLABS_JOSH_TURBO": "elevenlabs-josh-turbo",
+                                                "ELEVENLABS_BELLA_TURBO": "elevenlabs-bella-turbo",
+                                                "ELEVENLABS_ADAM_TURBO": "elevenlabs-adam-turbo",
                                                 "KOKORO_BELLA": "kokoro-bella",
                                                 "KOKORO_SARAH": "kokoro-sarah",
                                                 "KOKORO_NICOLE": "kokoro-nicole",
@@ -43817,6 +44129,10 @@
                                               "ELEVENLABS_JOSH": "elevenlabs-josh",
                                               "ELEVENLABS_BELLA": "elevenlabs-bella",
                                               "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                              "ELEVENLABS_RACHEL_TURBO": "elevenlabs-rachel-turbo",
+                                              "ELEVENLABS_JOSH_TURBO": "elevenlabs-josh-turbo",
+                                              "ELEVENLABS_BELLA_TURBO": "elevenlabs-bella-turbo",
+                                              "ELEVENLABS_ADAM_TURBO": "elevenlabs-adam-turbo",
                                               "KOKORO_BELLA": "kokoro-bella",
                                               "KOKORO_SARAH": "kokoro-sarah",
                                               "KOKORO_NICOLE": "kokoro-nicole",
@@ -43841,6 +44157,10 @@
                                               "elevenlabs-josh",
                                               "elevenlabs-bella",
                                               "elevenlabs-adam",
+                                              "elevenlabs-rachel-turbo",
+                                              "elevenlabs-josh-turbo",
+                                              "elevenlabs-bella-turbo",
+                                              "elevenlabs-adam-turbo",
                                               "kokoro-bella",
                                               "kokoro-sarah",
                                               "kokoro-nicole",
@@ -59642,7 +59962,8 @@
                                                 "WAN_3_0": "wan-3-0",
                                                 "SEEDANCE_2_MINI": "seedance-2-mini",
                                                 "HAILUO_3_MAX": "hailuo-3-max",
-                                                "RUNWAY_GEN_4_5": "runway-gen-4-5"
+                                                "RUNWAY_GEN_4_5": "runway-gen-4-5",
+                                                "SEEDANCE_2_5_FLASH": "seedance-2-5-flash"
                                               }
                                             },
                                             "type": "enum",
@@ -59686,7 +60007,8 @@
                                               "WAN_3_0": "wan-3-0",
                                               "SEEDANCE_2_MINI": "seedance-2-mini",
                                               "HAILUO_3_MAX": "hailuo-3-max",
-                                              "RUNWAY_GEN_4_5": "runway-gen-4-5"
+                                              "RUNWAY_GEN_4_5": "runway-gen-4-5",
+                                              "SEEDANCE_2_5_FLASH": "seedance-2-5-flash"
                                             },
                                             "options": [
                                               "wan-2-7-t2v",
@@ -59728,7 +60050,8 @@
                                               "wan-3-0",
                                               "seedance-2-mini",
                                               "hailuo-3-max",
-                                              "runway-gen-4-5"
+                                              "runway-gen-4-5",
+                                              "seedance-2-5-flash"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -60430,7 +60753,8 @@
                                               "WAN_3_0": "wan-3-0",
                                               "SEEDANCE_2_MINI": "seedance-2-mini",
                                               "HAILUO_3_MAX": "hailuo-3-max",
-                                              "RUNWAY_GEN_4_5": "runway-gen-4-5"
+                                              "RUNWAY_GEN_4_5": "runway-gen-4-5",
+                                              "SEEDANCE_2_5_FLASH": "seedance-2-5-flash"
                                             }
                                           },
                                           "type": "enum",
@@ -60474,7 +60798,8 @@
                                             "WAN_3_0": "wan-3-0",
                                             "SEEDANCE_2_MINI": "seedance-2-mini",
                                             "HAILUO_3_MAX": "hailuo-3-max",
-                                            "RUNWAY_GEN_4_5": "runway-gen-4-5"
+                                            "RUNWAY_GEN_4_5": "runway-gen-4-5",
+                                            "SEEDANCE_2_5_FLASH": "seedance-2-5-flash"
                                           },
                                           "options": [
                                             "wan-2-7-t2v",
@@ -60516,7 +60841,8 @@
                                             "wan-3-0",
                                             "seedance-2-mini",
                                             "hailuo-3-max",
-                                            "runway-gen-4-5"
+                                            "runway-gen-4-5",
+                                            "seedance-2-5-flash"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -61207,6 +61533,10 @@
                                                 "ELEVENLABS_JOSH": "elevenlabs-josh",
                                                 "ELEVENLABS_BELLA": "elevenlabs-bella",
                                                 "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                                "ELEVENLABS_RACHEL_TURBO": "elevenlabs-rachel-turbo",
+                                                "ELEVENLABS_JOSH_TURBO": "elevenlabs-josh-turbo",
+                                                "ELEVENLABS_BELLA_TURBO": "elevenlabs-bella-turbo",
+                                                "ELEVENLABS_ADAM_TURBO": "elevenlabs-adam-turbo",
                                                 "KOKORO_BELLA": "kokoro-bella",
                                                 "KOKORO_SARAH": "kokoro-sarah",
                                                 "KOKORO_NICOLE": "kokoro-nicole",
@@ -61233,6 +61563,10 @@
                                               "ELEVENLABS_JOSH": "elevenlabs-josh",
                                               "ELEVENLABS_BELLA": "elevenlabs-bella",
                                               "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                              "ELEVENLABS_RACHEL_TURBO": "elevenlabs-rachel-turbo",
+                                              "ELEVENLABS_JOSH_TURBO": "elevenlabs-josh-turbo",
+                                              "ELEVENLABS_BELLA_TURBO": "elevenlabs-bella-turbo",
+                                              "ELEVENLABS_ADAM_TURBO": "elevenlabs-adam-turbo",
                                               "KOKORO_BELLA": "kokoro-bella",
                                               "KOKORO_SARAH": "kokoro-sarah",
                                               "KOKORO_NICOLE": "kokoro-nicole",
@@ -61257,6 +61591,10 @@
                                               "elevenlabs-josh",
                                               "elevenlabs-bella",
                                               "elevenlabs-adam",
+                                              "elevenlabs-rachel-turbo",
+                                              "elevenlabs-josh-turbo",
+                                              "elevenlabs-bella-turbo",
+                                              "elevenlabs-adam-turbo",
                                               "kokoro-bella",
                                               "kokoro-sarah",
                                               "kokoro-nicole",
@@ -61941,6 +62279,10 @@
                                               "ELEVENLABS_JOSH": "elevenlabs-josh",
                                               "ELEVENLABS_BELLA": "elevenlabs-bella",
                                               "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                              "ELEVENLABS_RACHEL_TURBO": "elevenlabs-rachel-turbo",
+                                              "ELEVENLABS_JOSH_TURBO": "elevenlabs-josh-turbo",
+                                              "ELEVENLABS_BELLA_TURBO": "elevenlabs-bella-turbo",
+                                              "ELEVENLABS_ADAM_TURBO": "elevenlabs-adam-turbo",
                                               "KOKORO_BELLA": "kokoro-bella",
                                               "KOKORO_SARAH": "kokoro-sarah",
                                               "KOKORO_NICOLE": "kokoro-nicole",
@@ -61967,6 +62309,10 @@
                                             "ELEVENLABS_JOSH": "elevenlabs-josh",
                                             "ELEVENLABS_BELLA": "elevenlabs-bella",
                                             "ELEVENLABS_ADAM": "elevenlabs-adam",
+                                            "ELEVENLABS_RACHEL_TURBO": "elevenlabs-rachel-turbo",
+                                            "ELEVENLABS_JOSH_TURBO": "elevenlabs-josh-turbo",
+                                            "ELEVENLABS_BELLA_TURBO": "elevenlabs-bella-turbo",
+                                            "ELEVENLABS_ADAM_TURBO": "elevenlabs-adam-turbo",
                                             "KOKORO_BELLA": "kokoro-bella",
                                             "KOKORO_SARAH": "kokoro-sarah",
                                             "KOKORO_NICOLE": "kokoro-nicole",
@@ -61991,6 +62337,10 @@
                                             "elevenlabs-josh",
                                             "elevenlabs-bella",
                                             "elevenlabs-adam",
+                                            "elevenlabs-rachel-turbo",
+                                            "elevenlabs-josh-turbo",
+                                            "elevenlabs-bella-turbo",
+                                            "elevenlabs-adam-turbo",
                                             "kokoro-bella",
                                             "kokoro-sarah",
                                             "kokoro-nicole",
@@ -69666,7 +70016,7 @@
           "variant": "muted",
           "label": "Wybierz spośród {{count}} modeli z precyzyjną kontrolą inteligencji, szybkości i kosztów",
           "contentParams": {
-            "count": 248
+            "count": 253
           },
           "usage": {
             "response": true
@@ -70836,7 +71186,8 @@
                     "WAN_3_0": "wan-3-0",
                     "SEEDANCE_2_MINI": "seedance-2-mini",
                     "HAILUO_3_MAX": "hailuo-3-max",
-                    "RUNWAY_GEN_4_5": "runway-gen-4-5"
+                    "RUNWAY_GEN_4_5": "runway-gen-4-5",
+                    "SEEDANCE_2_5_FLASH": "seedance-2-5-flash"
                   }
                 },
                 "type": "enum",
@@ -70880,7 +71231,8 @@
                   "WAN_3_0": "wan-3-0",
                   "SEEDANCE_2_MINI": "seedance-2-mini",
                   "HAILUO_3_MAX": "hailuo-3-max",
-                  "RUNWAY_GEN_4_5": "runway-gen-4-5"
+                  "RUNWAY_GEN_4_5": "runway-gen-4-5",
+                  "SEEDANCE_2_5_FLASH": "seedance-2-5-flash"
                 },
                 "options": [
                   "wan-2-7-t2v",
@@ -70922,7 +71274,8 @@
                   "wan-3-0",
                   "seedance-2-mini",
                   "hailuo-3-max",
-                  "runway-gen-4-5"
+                  "runway-gen-4-5",
+                  "seedance-2-5-flash"
                 ]
               }
             },

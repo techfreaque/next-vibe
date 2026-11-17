@@ -26,6 +26,7 @@ import { Route as LocaleDesignTestIndexRouteImport } from './routes/$locale.desi
 import { Route as LocaleFrameSplatRouteImport } from './routes/$locale.frame.$'
 import { Route as LocaleHelpIndexRouteImport } from './routes/$locale.help.index'
 import { Route as LocaleModelsIndexRouteImport } from './routes/$locale.models.index'
+import { Route as LocalePricingIndexRouteImport } from './routes/$locale.pricing.index'
 import { Route as LocaleSkillsIndexRouteImport } from './routes/$locale.skills.index'
 import { Route as LocaleStoryIndexRouteImport } from './routes/$locale.story.index'
 import { Route as LocaleSubscriptionIndexRouteImport } from './routes/$locale.subscription.index'
@@ -173,6 +174,7 @@ import { Route as ApiLocaleV1ResponsesRouteImport } from './routes/api.$locale.v
 import { Route as ApiLocaleVibeExecuteToolRouteImport } from './routes/api.$locale.vibe.execute-tool'
 import { Route as ApiLocaleVibeHelpToolRouteImport } from './routes/api.$locale.vibe.help-tool'
 import { Route as LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRouteImport } from './routes/$locale.story.blog.ai-music-and-voice-generators.index'
+import { Route as LocaleStoryBlogAiRoleplayWithoutFilterIndexRouteImport } from './routes/$locale.story.blog.ai-roleplay-without-filter.index'
 import { Route as LocaleStoryBlogAiVideoGeneratorsComparedIndexRouteImport } from './routes/$locale.story.blog.ai-video-generators-compared.index'
 import { Route as LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRouteImport } from './routes/$locale.story.blog.chatgpt-alternative-without-filters.index'
 import { Route as LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport } from './routes/$locale.story.blog.dead-trading-bot-to-monitoring-engine.index'
@@ -189,6 +191,7 @@ import { Route as LocaleStoryBlogReferralForDevelopersIndexRouteImport } from '.
 import { Route as LocaleStoryBlogSkillSharingEconomyIndexRouteImport } from './routes/$locale.story.blog.skill-sharing-economy.index'
 import { Route as LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRouteImport } from './routes/$locale.story.blog.type-checker-made-ai-stop-lying.index'
 import { Route as LocaleStoryBlogUnbottledApiInCodingToolsIndexRouteImport } from './routes/$locale.story.blog.unbottled-api-in-coding-tools.index'
+import { Route as LocaleStoryBlogUncensoredAiImageGeneratorIndexRouteImport } from './routes/$locale.story.blog.uncensored-ai-image-generator.index'
 import { Route as LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRouteImport } from './routes/$locale.story.blog.uncensored-models-what-each-is-good-at.index'
 import { Route as LocaleStoryBlogWhatsNewApril2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-april-2026.index'
 import { Route as LocaleStoryBlogWhatsNewMay2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-may-2026.index'
@@ -632,6 +635,7 @@ import { Route as ApiLocaleVibeAgentChatDataSourcesChatUniqueUsersRouteImport } 
 import { Route as ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRouteImport } from './routes/api.$locale.vibe.agent.chat.data-sources.chat-upvotes-total'
 import { Route as ApiLocaleVibeAgentChatFolderContentsRootFolderIdRouteImport } from './routes/api.$locale.vibe.agent.chat.folder-contents.$rootFolderId'
 import { Route as ApiLocaleVibeAgentChatFoldersRootFolderIdRouteImport } from './routes/api.$locale.vibe.agent.chat.folders.$rootFolderId'
+import { Route as ApiLocaleVibeAgentChatPublicFeedPostRouteImport } from './routes/api.$locale.vibe.agent.chat.public-feed.post'
 import { Route as ApiLocaleVibeAgentChatStorageGuestMediaCleanupRouteImport } from './routes/api.$locale.vibe.agent.chat.storage.guest-media-cleanup'
 import { Route as ApiLocaleVibeAgentChatThreadsThreadIdRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.$threadId'
 import { Route as ApiLocaleVibeAgentChatThreadsRenameRouteImport } from './routes/api.$locale.vibe.agent.chat.threads.rename'
@@ -776,6 +780,11 @@ const LocaleModelsIndexRoute = LocaleModelsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => LocaleModelsRoute,
+} as any)
+const LocalePricingIndexRoute = LocalePricingIndexRouteImport.update({
+  id: '/$locale/pricing/',
+  path: '/$locale/pricing/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LocaleSkillsIndexRoute = LocaleSkillsIndexRouteImport.update({
   id: '/$locale/skills/',
@@ -1588,6 +1597,12 @@ const LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute =
     path: '/blog/ai-music-and-voice-generators/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
+const LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute =
+  LocaleStoryBlogAiRoleplayWithoutFilterIndexRouteImport.update({
+    id: '/blog/ai-roleplay-without-filter/',
+    path: '/blog/ai-roleplay-without-filter/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute =
   LocaleStoryBlogAiVideoGeneratorsComparedIndexRouteImport.update({
     id: '/blog/ai-video-generators-compared/',
@@ -1682,6 +1697,12 @@ const LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute =
   LocaleStoryBlogUnbottledApiInCodingToolsIndexRouteImport.update({
     id: '/blog/unbottled-api-in-coding-tools/',
     path: '/blog/unbottled-api-in-coding-tools/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute =
+  LocaleStoryBlogUncensoredAiImageGeneratorIndexRouteImport.update({
+    id: '/blog/uncensored-ai-image-generator/',
+    path: '/blog/uncensored-ai-image-generator/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute =
@@ -4337,6 +4358,12 @@ const ApiLocaleVibeAgentChatFoldersRootFolderIdRoute =
     path: '/api/$locale/vibe/agent/chat/folders/$rootFolderId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleVibeAgentChatPublicFeedPostRoute =
+  ApiLocaleVibeAgentChatPublicFeedPostRouteImport.update({
+    id: '/post',
+    path: '/post',
+    getParentRoute: () => ApiLocaleVibeAgentChatPublicFeedRoute,
+  } as any)
 const ApiLocaleVibeAgentChatStorageGuestMediaCleanupRoute =
   ApiLocaleVibeAgentChatStorageGuestMediaCleanupRouteImport.update({
     id: '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup',
@@ -4737,6 +4764,7 @@ export interface FileRoutesByFullPath {
   '/$locale/design-test/': typeof LocaleDesignTestIndexRoute
   '/$locale/help/': typeof LocaleHelpIndexRoute
   '/$locale/models/': typeof LocaleModelsIndexRoute
+  '/$locale/pricing/': typeof LocalePricingIndexRoute
   '/$locale/skills/': typeof LocaleSkillsIndexRoute
   '/$locale/story/': typeof LocaleStoryIndexRoute
   '/$locale/subscription/': typeof LocaleSubscriptionIndexRoute
@@ -5122,6 +5150,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
   '/$locale/story/blog/ai-music-and-voice-generators/': typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute
+  '/$locale/story/blog/ai-roleplay-without-filter/': typeof LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute
   '/$locale/story/blog/ai-video-generators-compared/': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters/': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
@@ -5138,6 +5167,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/skill-sharing-economy/': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying/': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   '/$locale/story/blog/unbottled-api-in-coding-tools/': typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
+  '/$locale/story/blog/uncensored-ai-image-generator/': typeof LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute
   '/$locale/story/blog/uncensored-models-what-each-is-good-at/': typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
   '/$locale/story/blog/whats-new-april-2026/': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026/': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
@@ -5238,7 +5268,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/agent/ai-stream/stale-runs': typeof ApiLocaleVibeAgentAiStreamStaleRunsRoute
   '/api/$locale/vibe/agent/ai-stream/stream': typeof ApiLocaleVibeAgentAiStreamStreamRoute
   '/api/$locale/vibe/agent/chat/moderation': typeof ApiLocaleVibeAgentChatModerationRoute
-  '/api/$locale/vibe/agent/chat/public-feed': typeof ApiLocaleVibeAgentChatPublicFeedRoute
+  '/api/$locale/vibe/agent/chat/public-feed': typeof ApiLocaleVibeAgentChatPublicFeedRouteWithChildren
   '/api/$locale/vibe/agent/chat/settings': typeof ApiLocaleVibeAgentChatSettingsRoute
   '/api/$locale/vibe/agent/chat/threads': typeof ApiLocaleVibeAgentChatThreadsRouteWithChildren
   '/api/$locale/vibe/agent/cortex/delete': typeof ApiLocaleVibeAgentCortexDeleteRoute
@@ -5331,6 +5361,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total': typeof ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute
   '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId': typeof ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/public-feed/post': typeof ApiLocaleVibeAgentChatPublicFeedPostRoute
   '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup': typeof ApiLocaleVibeAgentChatStorageGuestMediaCleanupRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId': typeof ApiLocaleVibeAgentChatThreadsThreadIdRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/rename': typeof ApiLocaleVibeAgentChatThreadsRenameRoute
@@ -5415,6 +5446,7 @@ export interface FileRoutesByTo {
   '/$locale/design-test': typeof LocaleDesignTestIndexRoute
   '/$locale/help': typeof LocaleHelpIndexRoute
   '/$locale/models': typeof LocaleModelsIndexRoute
+  '/$locale/pricing': typeof LocalePricingIndexRoute
   '/$locale/skills': typeof LocaleSkillsIndexRoute
   '/$locale/story': typeof LocaleStoryIndexRoute
   '/$locale/subscription': typeof LocaleSubscriptionIndexRoute
@@ -5799,6 +5831,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
   '/$locale/story/blog/ai-music-and-voice-generators': typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute
+  '/$locale/story/blog/ai-roleplay-without-filter': typeof LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute
   '/$locale/story/blog/ai-video-generators-compared': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
@@ -5815,6 +5848,7 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/skill-sharing-economy': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   '/$locale/story/blog/unbottled-api-in-coding-tools': typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
+  '/$locale/story/blog/uncensored-ai-image-generator': typeof LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute
   '/$locale/story/blog/uncensored-models-what-each-is-good-at': typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
   '/$locale/story/blog/whats-new-april-2026': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
@@ -5915,7 +5949,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/agent/ai-stream/stale-runs': typeof ApiLocaleVibeAgentAiStreamStaleRunsRoute
   '/api/$locale/vibe/agent/ai-stream/stream': typeof ApiLocaleVibeAgentAiStreamStreamRoute
   '/api/$locale/vibe/agent/chat/moderation': typeof ApiLocaleVibeAgentChatModerationRoute
-  '/api/$locale/vibe/agent/chat/public-feed': typeof ApiLocaleVibeAgentChatPublicFeedRoute
+  '/api/$locale/vibe/agent/chat/public-feed': typeof ApiLocaleVibeAgentChatPublicFeedRouteWithChildren
   '/api/$locale/vibe/agent/chat/settings': typeof ApiLocaleVibeAgentChatSettingsRoute
   '/api/$locale/vibe/agent/chat/threads': typeof ApiLocaleVibeAgentChatThreadsRouteWithChildren
   '/api/$locale/vibe/agent/cortex/delete': typeof ApiLocaleVibeAgentCortexDeleteRoute
@@ -6008,6 +6042,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total': typeof ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute
   '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId': typeof ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/public-feed/post': typeof ApiLocaleVibeAgentChatPublicFeedPostRoute
   '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup': typeof ApiLocaleVibeAgentChatStorageGuestMediaCleanupRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId': typeof ApiLocaleVibeAgentChatThreadsThreadIdRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/rename': typeof ApiLocaleVibeAgentChatThreadsRenameRoute
@@ -6099,6 +6134,7 @@ export interface FileRoutesById {
   '/$locale/design-test/': typeof LocaleDesignTestIndexRoute
   '/$locale/help/': typeof LocaleHelpIndexRoute
   '/$locale/models/': typeof LocaleModelsIndexRoute
+  '/$locale/pricing/': typeof LocalePricingIndexRoute
   '/$locale/skills/': typeof LocaleSkillsIndexRoute
   '/$locale/story/': typeof LocaleStoryIndexRoute
   '/$locale/subscription/': typeof LocaleSubscriptionIndexRoute
@@ -6484,6 +6520,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
   '/$locale/story/blog/ai-music-and-voice-generators/': typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute
+  '/$locale/story/blog/ai-roleplay-without-filter/': typeof LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute
   '/$locale/story/blog/ai-video-generators-compared/': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters/': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
@@ -6500,6 +6537,7 @@ export interface FileRoutesById {
   '/$locale/story/blog/skill-sharing-economy/': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying/': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   '/$locale/story/blog/unbottled-api-in-coding-tools/': typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
+  '/$locale/story/blog/uncensored-ai-image-generator/': typeof LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute
   '/$locale/story/blog/uncensored-models-what-each-is-good-at/': typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
   '/$locale/story/blog/whats-new-april-2026/': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026/': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
@@ -6600,7 +6638,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/agent/ai-stream/stale-runs': typeof ApiLocaleVibeAgentAiStreamStaleRunsRoute
   '/api/$locale/vibe/agent/ai-stream/stream': typeof ApiLocaleVibeAgentAiStreamStreamRoute
   '/api/$locale/vibe/agent/chat/moderation': typeof ApiLocaleVibeAgentChatModerationRoute
-  '/api/$locale/vibe/agent/chat/public-feed': typeof ApiLocaleVibeAgentChatPublicFeedRoute
+  '/api/$locale/vibe/agent/chat/public-feed': typeof ApiLocaleVibeAgentChatPublicFeedRouteWithChildren
   '/api/$locale/vibe/agent/chat/settings': typeof ApiLocaleVibeAgentChatSettingsRoute
   '/api/$locale/vibe/agent/chat/threads': typeof ApiLocaleVibeAgentChatThreadsRouteWithChildren
   '/api/$locale/vibe/agent/cortex/delete': typeof ApiLocaleVibeAgentCortexDeleteRoute
@@ -6693,6 +6731,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total': typeof ApiLocaleVibeAgentChatDataSourcesChatUpvotesTotalRoute
   '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId': typeof ApiLocaleVibeAgentChatFolderContentsRootFolderIdRoute
   '/api/$locale/vibe/agent/chat/folders/$rootFolderId': typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteWithChildren
+  '/api/$locale/vibe/agent/chat/public-feed/post': typeof ApiLocaleVibeAgentChatPublicFeedPostRoute
   '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup': typeof ApiLocaleVibeAgentChatStorageGuestMediaCleanupRoute
   '/api/$locale/vibe/agent/chat/threads/$threadId': typeof ApiLocaleVibeAgentChatThreadsThreadIdRouteWithChildren
   '/api/$locale/vibe/agent/chat/threads/rename': typeof ApiLocaleVibeAgentChatThreadsRenameRoute
@@ -6784,6 +6823,7 @@ export interface FileRouteTypes {
     | '/$locale/design-test/'
     | '/$locale/help/'
     | '/$locale/models/'
+    | '/$locale/pricing/'
     | '/$locale/skills/'
     | '/$locale/story/'
     | '/$locale/subscription/'
@@ -7169,6 +7209,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
     | '/$locale/story/blog/ai-music-and-voice-generators/'
+    | '/$locale/story/blog/ai-roleplay-without-filter/'
     | '/$locale/story/blog/ai-video-generators-compared/'
     | '/$locale/story/blog/chatgpt-alternative-without-filters/'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
@@ -7185,6 +7226,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/skill-sharing-economy/'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying/'
     | '/$locale/story/blog/unbottled-api-in-coding-tools/'
+    | '/$locale/story/blog/uncensored-ai-image-generator/'
     | '/$locale/story/blog/uncensored-models-what-each-is-good-at/'
     | '/$locale/story/blog/whats-new-april-2026/'
     | '/$locale/story/blog/whats-new-may-2026/'
@@ -7378,6 +7420,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total'
     | '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId'
+    | '/api/$locale/vibe/agent/chat/public-feed/post'
     | '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup'
     | '/api/$locale/vibe/agent/chat/threads/$threadId'
     | '/api/$locale/vibe/agent/chat/threads/rename'
@@ -7462,6 +7505,7 @@ export interface FileRouteTypes {
     | '/$locale/design-test'
     | '/$locale/help'
     | '/$locale/models'
+    | '/$locale/pricing'
     | '/$locale/skills'
     | '/$locale/story'
     | '/$locale/subscription'
@@ -7846,6 +7890,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
     | '/$locale/story/blog/ai-music-and-voice-generators'
+    | '/$locale/story/blog/ai-roleplay-without-filter'
     | '/$locale/story/blog/ai-video-generators-compared'
     | '/$locale/story/blog/chatgpt-alternative-without-filters'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine'
@@ -7862,6 +7907,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/skill-sharing-economy'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying'
     | '/$locale/story/blog/unbottled-api-in-coding-tools'
+    | '/$locale/story/blog/uncensored-ai-image-generator'
     | '/$locale/story/blog/uncensored-models-what-each-is-good-at'
     | '/$locale/story/blog/whats-new-april-2026'
     | '/$locale/story/blog/whats-new-may-2026'
@@ -8055,6 +8101,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total'
     | '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId'
+    | '/api/$locale/vibe/agent/chat/public-feed/post'
     | '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup'
     | '/api/$locale/vibe/agent/chat/threads/$threadId'
     | '/api/$locale/vibe/agent/chat/threads/rename'
@@ -8145,6 +8192,7 @@ export interface FileRouteTypes {
     | '/$locale/design-test/'
     | '/$locale/help/'
     | '/$locale/models/'
+    | '/$locale/pricing/'
     | '/$locale/skills/'
     | '/$locale/story/'
     | '/$locale/subscription/'
@@ -8530,6 +8578,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
     | '/$locale/story/blog/ai-music-and-voice-generators/'
+    | '/$locale/story/blog/ai-roleplay-without-filter/'
     | '/$locale/story/blog/ai-video-generators-compared/'
     | '/$locale/story/blog/chatgpt-alternative-without-filters/'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
@@ -8546,6 +8595,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/skill-sharing-economy/'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying/'
     | '/$locale/story/blog/unbottled-api-in-coding-tools/'
+    | '/$locale/story/blog/uncensored-ai-image-generator/'
     | '/$locale/story/blog/uncensored-models-what-each-is-good-at/'
     | '/$locale/story/blog/whats-new-april-2026/'
     | '/$locale/story/blog/whats-new-may-2026/'
@@ -8739,6 +8789,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/chat/data-sources/chat-upvotes-total'
     | '/api/$locale/vibe/agent/chat/folder-contents/$rootFolderId'
     | '/api/$locale/vibe/agent/chat/folders/$rootFolderId'
+    | '/api/$locale/vibe/agent/chat/public-feed/post'
     | '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup'
     | '/api/$locale/vibe/agent/chat/threads/$threadId'
     | '/api/$locale/vibe/agent/chat/threads/rename'
@@ -8827,6 +8878,7 @@ export interface RootRouteChildren {
   ApiLocaleSubscriptionRoute: typeof ApiLocaleSubscriptionRouteWithChildren
   LocaleCortexIndexRoute: typeof LocaleCortexIndexRoute
   LocaleDesignTestIndexRoute: typeof LocaleDesignTestIndexRoute
+  LocalePricingIndexRoute: typeof LocalePricingIndexRoute
   LocaleSkillsIndexRoute: typeof LocaleSkillsIndexRoute
   LocaleToolsIndexRoute: typeof LocaleToolsIndexRoute
   LocaleTrackIndexRoute: typeof LocaleTrackIndexRoute
@@ -9158,7 +9210,7 @@ export interface RootRouteChildren {
   ApiLocaleVibeAgentAiStreamStaleRunsRoute: typeof ApiLocaleVibeAgentAiStreamStaleRunsRoute
   ApiLocaleVibeAgentAiStreamStreamRoute: typeof ApiLocaleVibeAgentAiStreamStreamRoute
   ApiLocaleVibeAgentChatModerationRoute: typeof ApiLocaleVibeAgentChatModerationRoute
-  ApiLocaleVibeAgentChatPublicFeedRoute: typeof ApiLocaleVibeAgentChatPublicFeedRoute
+  ApiLocaleVibeAgentChatPublicFeedRoute: typeof ApiLocaleVibeAgentChatPublicFeedRouteWithChildren
   ApiLocaleVibeAgentChatSettingsRoute: typeof ApiLocaleVibeAgentChatSettingsRoute
   ApiLocaleVibeAgentChatThreadsRoute: typeof ApiLocaleVibeAgentChatThreadsRouteWithChildren
   ApiLocaleVibeAgentCortexDeleteRoute: typeof ApiLocaleVibeAgentCortexDeleteRoute
@@ -9363,6 +9415,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$locale/models/'
       preLoaderRoute: typeof LocaleModelsIndexRouteImport
       parentRoute: typeof LocaleModelsRoute
+    }
+    '/$locale/pricing/': {
+      id: '/$locale/pricing/'
+      path: '/$locale/pricing'
+      fullPath: '/$locale/pricing/'
+      preLoaderRoute: typeof LocalePricingIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/$locale/skills/': {
       id: '/$locale/skills/'
@@ -10393,6 +10452,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
+    '/$locale/story/blog/ai-roleplay-without-filter/': {
+      id: '/$locale/story/blog/ai-roleplay-without-filter/'
+      path: '/blog/ai-roleplay-without-filter'
+      fullPath: '/$locale/story/blog/ai-roleplay-without-filter/'
+      preLoaderRoute: typeof LocaleStoryBlogAiRoleplayWithoutFilterIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/blog/ai-video-generators-compared/': {
       id: '/$locale/story/blog/ai-video-generators-compared/'
       path: '/blog/ai-video-generators-compared'
@@ -10503,6 +10569,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/unbottled-api-in-coding-tools'
       fullPath: '/$locale/story/blog/unbottled-api-in-coding-tools/'
       preLoaderRoute: typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/uncensored-ai-image-generator/': {
+      id: '/$locale/story/blog/uncensored-ai-image-generator/'
+      path: '/blog/uncensored-ai-image-generator'
+      fullPath: '/$locale/story/blog/uncensored-ai-image-generator/'
+      preLoaderRoute: typeof LocaleStoryBlogUncensoredAiImageGeneratorIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/uncensored-models-what-each-is-good-at/': {
@@ -13606,6 +13679,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeAgentChatFoldersRootFolderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/vibe/agent/chat/public-feed/post': {
+      id: '/api/$locale/vibe/agent/chat/public-feed/post'
+      path: '/post'
+      fullPath: '/api/$locale/vibe/agent/chat/public-feed/post'
+      preLoaderRoute: typeof ApiLocaleVibeAgentChatPublicFeedPostRouteImport
+      parentRoute: typeof ApiLocaleVibeAgentChatPublicFeedRoute
+    }
     '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup': {
       id: '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup'
       path: '/api/$locale/vibe/agent/chat/storage/guest-media-cleanup'
@@ -14079,6 +14159,7 @@ interface LocaleStoryRouteChildren {
   LocaleStorySelfHostIndexRoute: typeof LocaleStorySelfHostIndexRoute
   LocaleStoryTermsOfServiceIndexRoute: typeof LocaleStoryTermsOfServiceIndexRoute
   LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute: typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute
+  LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute: typeof LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute
   LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute: typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute: typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute: typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
@@ -14095,6 +14176,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogSkillSharingEconomyIndexRoute: typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute: typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute: typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
+  LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute: typeof LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute
   LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute: typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
   LocaleStoryBlogWhatsNewApril2026IndexRoute: typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   LocaleStoryBlogWhatsNewMay2026IndexRoute: typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
@@ -14123,6 +14205,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
   LocaleStoryTermsOfServiceIndexRoute: LocaleStoryTermsOfServiceIndexRoute,
   LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute:
     LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute,
+  LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute:
+    LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute,
   LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute:
     LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute,
   LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute:
@@ -14155,6 +14239,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute,
   LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute:
     LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute,
+  LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute:
+    LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute,
   LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute:
     LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute,
   LocaleStoryBlogWhatsNewApril2026IndexRoute:
@@ -14988,6 +15074,21 @@ const ApiLocaleVibeRemoteConnectionSyncRouteWithChildren =
     ApiLocaleVibeRemoteConnectionSyncRouteChildren,
   )
 
+interface ApiLocaleVibeAgentChatPublicFeedRouteChildren {
+  ApiLocaleVibeAgentChatPublicFeedPostRoute: typeof ApiLocaleVibeAgentChatPublicFeedPostRoute
+}
+
+const ApiLocaleVibeAgentChatPublicFeedRouteChildren: ApiLocaleVibeAgentChatPublicFeedRouteChildren =
+  {
+    ApiLocaleVibeAgentChatPublicFeedPostRoute:
+      ApiLocaleVibeAgentChatPublicFeedPostRoute,
+  }
+
+const ApiLocaleVibeAgentChatPublicFeedRouteWithChildren =
+  ApiLocaleVibeAgentChatPublicFeedRoute._addFileChildren(
+    ApiLocaleVibeAgentChatPublicFeedRouteChildren,
+  )
+
 interface ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdRouteChildren {
   ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute: typeof ApiLocaleVibeAgentChatThreadsThreadIdMessagesMessageIdVoteRoute
 }
@@ -15210,6 +15311,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleSubscriptionRoute: ApiLocaleSubscriptionRouteWithChildren,
   LocaleCortexIndexRoute: LocaleCortexIndexRoute,
   LocaleDesignTestIndexRoute: LocaleDesignTestIndexRoute,
+  LocalePricingIndexRoute: LocalePricingIndexRoute,
   LocaleSkillsIndexRoute: LocaleSkillsIndexRoute,
   LocaleToolsIndexRoute: LocaleToolsIndexRoute,
   LocaleTrackIndexRoute: LocaleTrackIndexRoute,
@@ -15696,7 +15798,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleVibeAgentAiStreamStaleRunsRoute,
   ApiLocaleVibeAgentAiStreamStreamRoute: ApiLocaleVibeAgentAiStreamStreamRoute,
   ApiLocaleVibeAgentChatModerationRoute: ApiLocaleVibeAgentChatModerationRoute,
-  ApiLocaleVibeAgentChatPublicFeedRoute: ApiLocaleVibeAgentChatPublicFeedRoute,
+  ApiLocaleVibeAgentChatPublicFeedRoute:
+    ApiLocaleVibeAgentChatPublicFeedRouteWithChildren,
   ApiLocaleVibeAgentChatSettingsRoute: ApiLocaleVibeAgentChatSettingsRoute,
   ApiLocaleVibeAgentChatThreadsRoute:
     ApiLocaleVibeAgentChatThreadsRouteWithChildren,
