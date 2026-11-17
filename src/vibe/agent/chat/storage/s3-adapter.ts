@@ -37,6 +37,14 @@ export class S3StorageAdapter implements StorageAdapter {
         secretAccessKey: agentEnv.S3_SECRET_ACCESS_KEY,
       },
       forcePathStyle: true,
+      // HA S2 reaches MinIO over WireGuard: a black-holed connect must fail
+      // in seconds (the SDK then retries on a fresh socket, maxAttempts 3)
+      // instead of hanging for the OS TCP timeout; a stalled transfer is cut
+      // after a minute without bytes.
+      requestHandler: {
+        connectionTimeout: 5_000,
+        requestTimeout: 60_000,
+      },
     });
   }
 

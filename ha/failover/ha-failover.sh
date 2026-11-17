@@ -213,6 +213,7 @@ cmd_status() {
   echo "peer says: $(peer_ssh state || echo unreachable)"
   [ -f "$STATE_DIR/peer-down-since" ] && echo "peer down since $(date -u -d @"$(cat "$STATE_DIR/peer-down-since")" +%T) UTC"
   [ -d "$APP_DIR" ] && [ -f "$APP_DIR/.ha-overrides" ] && echo "app overrides: $(cut -d= -f1 "$APP_DIR/.ha-overrides" | tr '\n' ' ')"
+  echo "app self-heal: $( [ "$APP_HEAL" = 1 ] && echo on || echo off) ($HEAL_APP via $HEAL_URL)$( [ -f "$STATE_DIR/app-heal-hold" ] && echo ", HOLD set")$( [ -f "$STATE_DIR/app-bad-since" ] && echo ", failing since $(date -u -d @"$(cat "$STATE_DIR/app-bad-since")" +%T) UTC"), heals last 6h: $(awk -v c=$(( $(date +%s) - 21600 )) '$1 >= c' "$STATE_DIR/app-heal-log" 2>/dev/null | wc -l)"
   return 0
 }
 
@@ -394,11 +395,130 @@ wg_path_check() {
 While the link is down: S2 app has no DB (DNS probe pulls S2), the standby does not stream, MinIO replication queues."
 }
 
+# ---------------------------------------------------------------------------
+# App self-heal (added 2026-11-17). After the 06:10-07:30 WireGuard outage the
+# S2 app stayed broken for 30 min after the link was back (its Next.js server
+# crash-looped inside the container; proxy ECONNREFUSED, DB-backed probe
+# timing out) until a manual `docker restart unbottled-app`. The edge DNS
+# probe could not see it: it goes through this box's Caddy, which falls back
+# to S1's app. This check probes the app DIRECTLY (same DB-backed credits
+# probe as `ha-node-drain.sh local-probe`) and restarts ONLY this node's
+# unbottled app container when:
+#   - the probe has failed continuously for HA_APP_HEAL_AFTER s (default 300),
+#   - while the app's database answers (pg_isready over the same path the app
+#     uses), so a restart can actually help (a dead link is left alone),
+#   - the container is running and older than HA_APP_HEAL_GRACE s (240),
+#   - no deploy is in progress (app drain request / Caddy drain file) and no
+#     $STATE_DIR/app-heal-hold file exists,
+#   - rate limit: >= HA_APP_HEAL_GAP s (900) since the last heal and at most
+#     HA_APP_HEAL_MAX (3) heals per 6 h; beyond that it only alerts.
+# The container name is fixed per node and never configurable: S2 co-hosts
+# heilpraktiker, whose app is ALSO called next-vibe-app there.
+# Default on for s2, off for s1 (HA_APP_HEAL=1 enables it there).
+# ---------------------------------------------------------------------------
+APP_HEAL="${HA_APP_HEAL:-$([ "$NODE" = s2 ] && echo 1 || echo 0)}"
+case "$NODE" in
+s1) HEAL_APP=next-vibe-app; HEAL_URL="${HA_APP_LOCAL_URL:-http://127.0.0.1:3000}"; HEAL_DRAIN_DIR="${HA_CADDY_DRAIN_DIR:-/caddy/data/ha-drain}" ;;
+*) HEAL_APP=unbottled-app; HEAL_URL="${HA_APP_LOCAL_URL:-http://10.88.0.2:3100}"; HEAL_DRAIN_DIR="${HA_CADDY_DRAIN_DIR:-/root/caddy_data/ha-drain}" ;;
+esac
+HEAL_COOKIE_FILE="${HA_PROBE_COOKIE_FILE:-/root/ha-edge/edge-dns/probe-cookie}"
+HEAL_PROBE_PATH="${HA_PROBE_PATH:-/api/en-US/credits}"
+
+app_probe() {
+  local cookie body
+  cookie="$(head -1 "$HEAL_COOKIE_FILE" 2>/dev/null || true)"
+  body="$(curl -s --max-time 6 -A unbottled-ha-probe/1 ${cookie:+-H "Cookie: $cookie"} \
+    "${HEAL_URL}${HEAL_PROBE_PATH}" 2>/dev/null)"
+  printf '%s' "$body" | grep -qF '"success":true'
+}
+
+# Does the database the app is configured for answer the Postgres protocol?
+# S2 standby: S1's Postgres via 10.88.0.1:5432 (HAProxy over WG; a bare TCP
+# connect would succeed even with its backend down, so ask pg_isready from the
+# replica container, which shares the app's path). S2 primary / S1: local.
+app_db_ok() {
+  if [ "$NODE" = "s2" ] && [ "$(role)" != "primary" ]; then
+    if [ -n "$LOCAL_PG" ]; then
+      docker exec "$LOCAL_PG" pg_isready -q -t 3 -h "$PEER_WG" -p "${HA_PEER_PG_PORT:-5432}" >/dev/null 2>&1
+    else
+      tcp "$PEER_WG" "${HA_PEER_PG_PORT:-5432}"
+    fi
+    return
+  fi
+  [ -n "$LOCAL_PG" ] || return 0
+  docker exec "$LOCAL_PG" pg_isready -q -t 3 >/dev/null 2>&1
+}
+
+app_deploy_in_progress() {
+  [ -e "$HEAL_DRAIN_DIR/$NODE" ] && return 0
+  docker exec "$HEAL_APP" test -e /app/.tmp/drain/request >/dev/null 2>&1
+}
+
+app_heal_check() {
+  [ "$APP_HEAL" = 1 ] || return 0
+  local r now since started started_s up_s recent last
+  r="$(role)"
+  case "$r" in promoting|fenced) return 0 ;; esac
+  now=$(date +%s)
+  if app_probe; then
+    if [ -f "$STATE_DIR/app-bad-since" ]; then
+      since=$(cat "$STATE_DIR/app-bad-since"); rm -f "$STATE_DIR/app-bad-since"
+      log "app probe ok again after $((now - since))s"
+    fi
+    was_alerted app-healed && alert "$NODE app healthy again after self-heal" "$HEAL_APP answers the DB-backed probe ($HEAL_URL$HEAL_PROBE_PATH) again."
+    clear_once app-healed; clear_once app-heal-blocked
+    return 0
+  fi
+  [ "$(docker inspect -f '{{.State.Running}}' "$HEAL_APP" 2>/dev/null)" = "true" ] || { rm -f "$STATE_DIR/app-bad-since"; return 0; }
+  started="$(docker inspect -f '{{.State.StartedAt}}' "$HEAL_APP" 2>/dev/null)"
+  started_s="$(date -d "$started" +%s 2>/dev/null || echo "$now")"
+  up_s=$((now - started_s))
+  if [ "$up_s" -lt "${HA_APP_HEAL_GRACE:-240}" ]; then rm -f "$STATE_DIR/app-bad-since"; return 0; fi
+  if app_deploy_in_progress; then rm -f "$STATE_DIR/app-bad-since"; return 0; fi
+  if ! app_db_ok; then
+    # Link/DB problem: restarting the app cannot help; the clock restarts
+    # once the database answers again.
+    [ -f "$STATE_DIR/app-bad-since" ] && log "app probe failing but its database is unreachable: not counting towards self-heal"
+    rm -f "$STATE_DIR/app-bad-since"
+    return 0
+  fi
+  [ -f "$STATE_DIR/app-bad-since" ] || { echo "$now" > "$STATE_DIR/app-bad-since"; log "app probe failing while its database answers"; }
+  since=$(cat "$STATE_DIR/app-bad-since")
+  [ $((now - since)) -ge "${HA_APP_HEAL_AFTER:-300}" ] || return 0
+  [ -f "$STATE_DIR/app-heal-hold" ] && { log "app unhealthy $((now - since))s but app-heal-hold is set"; return 0; }
+
+  # Rate limit (heal timestamps of the last 6 h).
+  touch "$STATE_DIR/app-heal-log"
+  awk -v c=$((now - 21600)) '$1 >= c' "$STATE_DIR/app-heal-log" > "$STATE_DIR/app-heal-log.tmp" && mv "$STATE_DIR/app-heal-log.tmp" "$STATE_DIR/app-heal-log"
+  recent=$(wc -l < "$STATE_DIR/app-heal-log")
+  last=$(tail -1 "$STATE_DIR/app-heal-log" 2>/dev/null || echo 0); last=${last:-0}
+  if [ "$recent" -ge "${HA_APP_HEAL_MAX:-3}" ]; then
+    alert_once app-heal-blocked "$NODE app unhealthy, self-heal EXHAUSTED" "$HEAL_APP has failed the DB-backed probe for $((now - since))s while its database answers. Already restarted $recent time(s) in 6 h, so the watchdog stops restarting it.
+Look at: docker logs --tail 200 $HEAL_APP (on $NODE). Restart by hand: docker restart $HEAL_APP"
+    return 0
+  fi
+  [ $((now - last)) -ge "${HA_APP_HEAL_GAP:-900}" ] || return 0
+
+  # Hard guard: only ever this node's unbottled app (never heilpraktiker).
+  case "$NODE:$HEAL_APP" in s2:unbottled-app|s1:next-vibe-app) ;; *) log "refusing to heal unexpected container $HEAL_APP"; return 0 ;; esac
+  echo "$now" >> "$STATE_DIR/app-heal-log"
+  rm -f "$STATE_DIR/app-bad-since"
+  log "SELF-HEAL: $HEAL_APP failed the DB-backed probe for $((now - since))s while its database answers: docker restart $HEAL_APP"
+  # Background: the restart waits up to the stop timeout for the app's drain,
+  # the watchdog loop (failover, fencing) must keep running meanwhile.
+  nohup docker restart -t "${HA_APP_HEAL_STOP_TIMEOUT:-120}" "$HEAL_APP" >> "$STATE_DIR/app-heal.out" 2>&1 &
+  : > "$STATE_DIR/alerted.app-healed"
+  alert "$NODE app self-heal: restarted $HEAL_APP" "$HEAL_APP failed the DB-backed probe ($HEAL_URL$HEAL_PROBE_PATH) for $((now - since))s while its database answered (role=$r, container up ${up_s}s). The watchdog ran: docker restart $HEAL_APP.
+Heals in the last 6 h: $((recent + 1)) of ${HA_APP_HEAL_MAX:-3}. A follow-up mail says when the probe passes again.
+Disable: touch $STATE_DIR/app-heal-hold (rm to re-enable)."
+}
+
 cmd_watch() {
-  log "watchdog start: role=$(role) auto=$AUTO interval=${INTERVAL}s failover_after=${FAILOVER_AFTER}s"
+  log "watchdog start: role=$(role) auto=$AUTO interval=${INTERVAL}s failover_after=${FAILOVER_AFTER}s app_heal=$APP_HEAL"
   while :; do
     wg_path_check
     if [ "$NODE" = "s2" ]; then watch_s2; else watch_s1; fi
+    app_heal_check
     sleep "$INTERVAL"
   done
 }

@@ -65,6 +65,30 @@ export const {
     commented: true,
     fieldType: "number",
   },
+  DATABASE_CONNECT_RETRIES: {
+    schema: z.coerce.number().int().nonnegative().optional().default(3),
+    example: "3",
+    comment:
+      "Extra attempts for a new Postgres connection that failed with a transient network error (ECONNREFUSED, reset, unreachable, server starting up). Only the connect phase is retried, never a query. 0 = off.",
+    commented: true,
+    fieldType: "number",
+  },
+  DATABASE_CONNECT_RETRY_DELAY_MS: {
+    schema: z.coerce.number().int().nonnegative().optional().default(250),
+    example: "250",
+    comment:
+      "First backoff before a connect retry, in ms. Doubles per attempt (capped at 2 s), with jitter.",
+    commented: true,
+    fieldType: "number",
+  },
+  DATABASE_MAX_LIFETIME_S: {
+    schema: z.coerce.number().int().nonnegative().optional().default(1800),
+    example: "1800",
+    comment:
+      "Recycle pooled Postgres connections older than this, in seconds (0 = never). Old sockets through a proxy or tunnel (HA WireGuard + HAProxy) are replaced before they can go stale.",
+    commented: true,
+    fieldType: "number",
+  },
   DATABASE_IDLE_TIMEOUT_MS: {
     schema: z.coerce.number().int().nonnegative().optional().default(30_000),
     example: "30000",
