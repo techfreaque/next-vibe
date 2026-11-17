@@ -56,6 +56,10 @@ const { POST } = createEndpoint({
   category: "devTools",
   subCategory: "tasksCron",
   tags: ["tags.execute"],
+  // The repository races the run against the task's own timeout. The generic
+  // 90 s handler cap cut every AI task (Dreaming, Autopilot, forum runs) off
+  // mid-loop.
+  timeoutMs: 0,
 
   cli: {
     firstCliArgKey: "taskId",
