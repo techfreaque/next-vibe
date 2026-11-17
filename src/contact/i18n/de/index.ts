@@ -322,17 +322,16 @@ export const translations: typeof enTranslations = {
       greeting: "Hallo {{name}},",
       thankYou: "Vielen Dank, dass Sie sich an {{appName}} gewandt haben!",
       confirmation:
-        "Wir haben Ihre Nachricht erhalten und unser Team wird sie in Kürze prüfen. Wir antworten in der Regel innerhalb von 24 Stunden an Werktagen.",
+        "Ihre Nachricht ist angekommen. Jede liest ein Mensch, und wir antworten so schnell wie möglich.",
       yourMessage: "Ihre Nachricht",
       subject_label: "Betreff",
       message_label: "Nachricht",
       whatHappensNext: "Wie geht es weiter?",
-      step1: "Unser Team prüft Ihre Anfrage",
-      step2: "Wir antworten innerhalb von 24 Stunden",
+      step1: "Ein Mensch liest Ihre Anfrage",
+      step2: "Wir antworten so schnell wie möglich",
       step3: "Wir arbeiten gemeinsam an Ihrem Anliegen",
       needUrgentHelp: "Dringende Hilfe benötigt?",
-      urgentHelpInfo:
-        "Wenn Ihre Anfrage dringend ist, können Sie uns auch per Live-Chat auf unserer Website erreichen oder in unserem Hilfecenter nach sofortigen Antworten suchen.",
+      urgentHelpInfo: "Viele Fragen beantwortet unser Hilfecenter sofort.",
       helpCenterButton: "Hilfecenter besuchen",
       signoff:
         "Vielen Dank, dass Sie sich für {{appName}} entschieden haben,\nDas {{appName}} Support-Team",
@@ -357,7 +356,7 @@ export const translations: typeof enTranslations = {
       status: "Status",
       actionRequired: "Aktion erforderlich",
       actionInfo:
-        "Bitte prüfen und beantworten Sie diese Anfrage innerhalb von 24 Stunden.",
+        "Bitte prüfen und beantworten Sie diese Anfrage so schnell wie möglich.",
       viewInAdmin: "Im Admin-Panel anzeigen",
       replyToContact: "Auf Kontakt antworten",
       footer: "Dies ist eine automatische Benachrichtigung von {{appName}}",

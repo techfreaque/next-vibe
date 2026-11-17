@@ -966,7 +966,7 @@ export const translations: typeof enTranslations = {
       sharedExplanation:
         "Geteilte Threads ermöglichen es Ihnen, Gespräche zu erstellen und sie mit anderen über sichere Links zu teilen. Perfekt für die Zusammenarbeit und das Teilen von Erkenntnissen mit Ihrem Team oder Freunden.",
       publicExplanation:
-        "Das öffentliche Forum ist ein durch den ersten Verfassungszusatz geschützter Raum, in dem Menschen und KI in offenen Dialog treten. Teilen Sie Ideen, hinterfragen Sie Perspektiven und nehmen Sie an unzensierten Diskussionen teil.",
+        "Das öffentliche Forum ist ein offener Raum, in dem Menschen und KI frei diskutieren. Sie entscheiden, was Sie lesen. Wir entfernen nur, was gegen Gesetze oder unsere Nutzungsbedingungen verstößt. Teilen Sie Ideen, hinterfragen Sie Perspektiven und diskutieren Sie unzensiert.",
       incognitoExplanation:
         "Der Inkognito-Modus hält Ihre Gespräche völlig privat und lokal. Ihre Chats werden nur in Ihrem Browser gespeichert und niemals an unsere Server gesendet (generierte Medien speichern wir aus technischen Gründen vorübergehend) - nicht einmal mit Ihrem Konto verknüpft.",
       requiresAccount:
@@ -1047,7 +1047,7 @@ export const translations: typeof enTranslations = {
     header: {
       title: "Öffentliches Forum",
       description:
-        "Ein durch den First Amendment geschützter Raum, in dem freie Meinungsäußerung gedeiht. Diskutieren Sie mit KI-Modellen und Nutzern weltweit. Teilen Sie Ideen, hinterfragen Sie Perspektiven und sprechen Sie frei ohne Zensur.",
+        "Offen als Grundprinzip. Diskutieren Sie mit KI-Modellen und Menschen weltweit. Sie entscheiden, was Sie lesen. Wir entfernen nur, was gegen Gesetze oder unsere Nutzungsbedingungen verstößt.",
     },
     // Sort modes
     sort: {
@@ -1898,7 +1898,7 @@ export const translations: typeof enTranslations = {
       name: "Öffentlich",
       suffix: "Ordner",
       description:
-        "Offenes KI-Forum geschützt durch Meinungsfreiheits-Prinzipien. Chatte mit KI und anderen Nutzern öffentlich. Teile Wissen, debattiere Ideen, erhalte diverse Perspektiven.",
+        "Offenes KI-Forum. Chatte öffentlich mit KI und echten Menschen. Du entscheidest, was du liest. Wir entfernen nur, was gegen Gesetze oder unsere Nutzungsbedingungen verstößt.",
       note: "Kein Konto • Meinungsfreiheit als Basis • Community-getrieben",
     },
     privateFolder: {
@@ -1932,11 +1932,10 @@ export const translations: typeof enTranslations = {
       tip: "Bleibe anonym oder synchronisiere alles. Deine Wahl.",
     },
     subscriptionButton: {
-      title: "Unbegrenzter KI-Zugang",
+      title: "Credits & Abo",
       description:
-        "Erhalte alles, was ChatGPT bietet PLUS unzensierte Modelle, öffentliche Foren und echte Privatsphäre. {{credits}} monatliche Credits für {{price}}. Zugriff auf alle Modelle, keine Einschränkungen.",
-      tip: "Ein Abo. Alle Mainstream- und unzensierten Modelle. Keine Grenzen.",
-      price: "8€",
+        "Alles, was ChatGPT bietet, plus unzensierte Modelle, ein öffentliches Forum und echte Privatsphäre. {{credits}} Credits jeden Monat für {{price}}. Alle Modelle inklusive.",
+      tip: "Ein Abo. Mainstream- und unzensierte Modelle.",
     },
     chatInput: {
       title: "Nachricht eingeben",

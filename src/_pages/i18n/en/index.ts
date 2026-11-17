@@ -162,14 +162,14 @@ export const translations = {
       title: "Pricing - {{appName}}",
       category: "Pricing",
       description:
-        "Affordable AI chat plans for everyone. Start free with 10 daily messages.",
+        "AI chat for every budget. Start free: credits every month, no card needed.",
       imageAlt: "Pricing Plans",
       keywords:
         "pricing, plans, subscription, AI chat pricing, {{appName}} pricing",
       ogTitle: "Pricing Plans - {{appName}}",
       ogDescription: "Simple, transparent pricing for uncensored AI chat",
       twitterTitle: "Pricing - {{appName}}",
-      twitterDescription: "Start free with 10 daily messages",
+      twitterDescription: "Start free. Credits every month, no card.",
     },
     billing: {
       category: "Billing",

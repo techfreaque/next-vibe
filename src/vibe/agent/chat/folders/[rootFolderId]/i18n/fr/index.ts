@@ -76,7 +76,7 @@ export const translations: typeof enTranslations = {
       sharedExplanation:
         "Les fils partagés vous permettent de créer des discussions et de les partager via des liens sécurisés. Idéal pour collaborer et partager vos trouvailles avec votre équipe ou vos amis.",
       publicExplanation:
-        "Le forum public est un espace protégé par le Premier Amendement américain, où humains et IA dialoguent ouvertement. Partagez vos idées, remettez en question les points de vue et participez à des discussions non censurées.",
+        "Le forum public est un espace ouvert où humains et IA dialoguent librement. Vous choisissez ce que vous lisez. Nous ne retirons que ce qui enfreint la loi ou nos conditions d'utilisation. Partagez vos idées, confrontez les points de vue, participez à des discussions non censurées.",
       incognitoExplanation:
         "Le mode incognito garde vos discussions entièrement privées et locales. Vos discussions sont stockées uniquement dans votre navigateur et ne sont jamais envoyées à nos serveurs (les médias générés sont stockés temporairement pour des raisons techniques). Elles ne sont même pas liées à votre compte.",
       requiresAccount:

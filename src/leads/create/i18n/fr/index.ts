@@ -177,24 +177,22 @@ export const translations: typeof enTranslations = {
       title: "Bienvenue chez {{companyName}}, {{businessName}} !",
       preview: "Bienvenue : voici comment démarrer",
       greeting:
-        "Bienvenue chez {{companyName}}, {{businessName}} ! Nous sommes ravis de vous aider à développer votre activité.",
+        "Bienvenue chez {{companyName}}, {{businessName}} ! Ravis de vous compter parmi nous.",
       defaultName: "à vous",
       introduction:
-        "Merci de l'intérêt que vous portez à nos services. Nous avons bien reçu vos informations et notre équipe est prête à vous aider à atteindre vos objectifs.",
+        "Merci de votre intérêt. Vos informations nous sont bien parvenues, et c'est un humain qui les lit.",
       nextSteps: {
         title: "Et maintenant ?",
         step1Number: "1.",
         step1:
-          "Notre équipe examine le profil et les objectifs de votre entreprise",
+          "Lancez une discussion tout de suite. Sans configuration, sans carte bancaire.",
         step2Number: "2.",
-        step2:
-          "Vous recevez une proposition de consultation personnalisée sous 24 heures",
+        step2: "Une question ? Répondez à cet e-mail. Un humain le lit.",
         step3Number: "3.",
-        step3:
-          "Nous planifions un appel pour parler de vos besoins et objectifs précis",
+        step3: "Nous répondons dès que possible.",
       },
       cta: {
-        getStarted: "Planifier votre consultation",
+        getStarted: "Commencer à discuter",
       },
       support:
         "Des questions ? Répondez à cet e-mail ou contactez-nous à {{supportEmail}}",

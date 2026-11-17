@@ -460,7 +460,7 @@ export const translations: typeof enTranslations = {
     upgrade: {
       title: "Chcesz więcej?",
       desc: "{{subscriptionPrice}}/miesiąc daje Ci {{subscriptionCredits}} kredytów co miesiąc. Albo weź pakiet: {{packCredits}} kredytów za {{packPrice}}, które nigdy nie wygasają.",
-      cta: "Zobacz plan Unlimited",
+      cta: "Przejdź na Pro",
     },
     signoff: "Miłych rozmów,\nZespół {{appName}}",
     ps: "P.S. Użyj trybu Incognito, aby zachować rozmowy tylko na swoim urządzeniu. Nigdy nie przechowujemy ich na naszych serwerach (wygenerowane media przechowujemy tymczasowo ze względów technicznych).",

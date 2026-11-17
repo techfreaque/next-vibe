@@ -74,7 +74,7 @@ export const translations = {
       sharedExplanation:
         "Shared threads allow you to create conversations and share them with others via secure links. Perfect for collaboration and sharing insights with your team or friends.",
       publicExplanation:
-        "The Public Forum is a First Amendment protected space where people and AI engage in open dialogue. Share ideas, challenge perspectives, and participate in uncensored discussions.",
+        "The Public Forum is an open space where people and AI talk freely. You decide what you read. We only remove what breaks the law or our terms. Share ideas, challenge perspectives, join uncensored discussions.",
       incognitoExplanation:
         "Incognito mode keeps your conversations completely private and local. Your chats are stored only in your browser and never sent to our servers (generated media is stored temporarily for technical reasons) - not even tied to your account.",
       requiresAccount:

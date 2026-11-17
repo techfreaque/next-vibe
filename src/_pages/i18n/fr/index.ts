@@ -168,7 +168,7 @@ export const translations: typeof enTranslations = {
       title: "Tarifs - {{appName}}",
       category: "Tarifs",
       description:
-        "Des formules de chat IA abordables pour tous. Commencez gratuitement avec 10 messages par jour.",
+        "Le chat IA pour tous les budgets. Commencez gratuitement : des crédits chaque mois, sans carte bancaire.",
       imageAlt: "Formules et tarifs",
       keywords:
         "tarifs, formules, abonnement, prix chat IA, tarifs {{appName}}",
@@ -176,7 +176,8 @@ export const translations: typeof enTranslations = {
       ogDescription:
         "Des tarifs simples et transparents pour un chat IA non censuré",
       twitterTitle: "Tarifs - {{appName}}",
-      twitterDescription: "Commencez gratuitement avec 10 messages par jour",
+      twitterDescription:
+        "Commencez gratuitement. Des crédits chaque mois, sans carte.",
     },
     billing: {
       category: "Facturation",

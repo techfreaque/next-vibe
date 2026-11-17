@@ -165,14 +165,14 @@ export const translations: typeof enTranslations = {
       title: "Cennik - {{appName}}",
       category: "Cennik",
       description:
-        "Przystępne plany czatu AI dla każdego. Zacznij za darmo z 10 codziennymi wiadomościami.",
+        "Czat AI na każdą kieszeń. Zacznij za darmo: kredyty co miesiąc, bez karty.",
       imageAlt: "Plany cenowe",
       keywords:
         "cennik, plany, subskrypcja, cennik czatu AI, {{appName}} cennik",
       ogTitle: "Plany cenowe - {{appName}}",
       ogDescription: "Prosty, przejrzysty cennik dla niecenzurowanego czatu AI",
       twitterTitle: "Cennik - {{appName}}",
-      twitterDescription: "Zacznij za darmo z 10 codziennymi wiadomościami",
+      twitterDescription: "Zacznij za darmo. Kredyty co miesiąc, bez karty.",
     },
     billing: {
       category: "Rozliczenia",

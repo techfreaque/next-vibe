@@ -940,7 +940,7 @@ export const translations = {
       "Your private conversations are stored on our servers and synchronized across devices.",
     sharedDescription: "Conversations shared with others via links.",
     publicDescription:
-      "Public US First Amendment protected forum for people and AI.",
+      "Public forum for people and AI. We only remove what breaks the law or our terms.",
     incognitoDescription: "Conversations are only stored in your browser.",
     cronDescription: "Automated conversations created by background tasks.",
     backgroundDescription:
@@ -957,7 +957,7 @@ export const translations = {
       sharedExplanation:
         "Shared threads allow you to create conversations and share them with others via secure links. Perfect for collaboration and sharing insights with your team or friends.",
       publicExplanation:
-        "The Public Forum is a First Amendment protected space where people and AI engage in open dialogue. Share ideas, challenge perspectives, and participate in uncensored discussions.",
+        "The Public Forum is an open space where people and AI talk freely. You decide what you read. We only remove what breaks the law or our terms. Share ideas, challenge perspectives, join uncensored discussions.",
       incognitoExplanation:
         "Incognito mode keeps your conversations completely private and local. Your chats are stored only in your browser and never sent to our servers (generated media is stored temporarily for technical reasons) - not even tied to your account.",
       requiresAccount:
@@ -1032,7 +1032,7 @@ export const translations = {
     header: {
       title: "Public Forum",
       description:
-        "A First Amendment protected space where free speech thrives. Engage with AI models and users worldwide. Share ideas, challenge perspectives, and speak freely without censorship.",
+        "Open by default. Talk with AI models and people worldwide. You decide what you read. We only remove what breaks the law or our terms.",
     },
     // Sort modes
     sort: {
@@ -1864,7 +1864,7 @@ export const translations = {
       name: "Public",
       suffix: "Folder",
       description:
-        "Open AI forum with First Amendment protection. Chat with AI and real people. Share uncensored knowledge, debate freely, get diverse perspectives from the community.",
+        "Open AI forum. Chat with AI and real people. You decide what you read. We only remove what breaks the law or our terms.",
       note: "No account • Free speech • Community discussions",
     },
     privateFolder: {
@@ -1898,11 +1898,10 @@ export const translations = {
       tip: "Stay anonymous or sync everything. Your choice.",
     },
     subscriptionButton: {
-      title: "Unlimited AI Access",
+      title: "Credits & Subscription",
       description:
-        "Get everything ChatGPT offers PLUS uncensored models, public forums, and true privacy. {{credits}} monthly credits for {{price}}. Access all models, no restrictions.",
-      tip: "One subscription. All mainstream and uncensored models. No boundaries.",
-      price: "$8",
+        "Everything ChatGPT offers plus uncensored models, a public forum and real privacy. {{credits}} credits every month for {{price}}. Every model included.",
+      tip: "One subscription. Mainstream and uncensored models.",
     },
     chatInput: {
       title: "Type Your Message",

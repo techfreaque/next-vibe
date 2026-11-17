@@ -62,7 +62,7 @@ export const translations: typeof enTranslations = {
     longTime:
       "Minęło dużo czasu odkąd byłeś subskrybentem unbottled.ai. Nadal budujemy to samo: platformę AI, która szanuje twój intelekt i twój czas.",
     finalOffer:
-      "Jeśli kiedykolwiek zdecydujesz się znowu chcieć nieograniczonego dostępu do AI, będziemy tu. Bez presji, żadnych więcej maili po tym.",
+      "Jeśli kiedyś znów zechcesz AI bez filtrów, będziemy tu. Bez presji. To ostatni mail.",
     signature: "Zespół unbottled.ai",
   },
 };

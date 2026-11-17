@@ -2793,13 +2793,13 @@ export const translations: typeof enTranslations = {
         footer: "Dies ist eine automatische Benachrichtigung von {{appName}}",
       },
       email: {
-        subject: "Du bist dabei - {{appName}} wartet auf dich",
+        subject: "Du bist dabei. {{appName}} wartet auf dich",
         previewText:
-          "Hey {{privateName}}, dein Account ist bereit. Chatte mit Claude, GPT, Gemini, DeepSeek und {{modelCount}} weiteren - kostenlos, keine Kreditkarte nötig.",
+          "Hey {{privateName}}, dein Account ist bereit. Chatte mit Claude, GPT, Gemini, DeepSeek und {{modelCount}} weiteren. Kostenlos, ohne Kreditkarte.",
         headline: "Deine KI wartet.",
         greeting: "Hey {{privateName}},",
         intro:
-          "Willkommen bei {{appName}}. Du hast gerade Zugang zur umfassendsten KI-Chat-Plattform bekommen - alles, was du an ChatGPT liebst, plus Open-Source-Modelle und Modelle ohne Inhaltsfilter.",
+          "Willkommen bei {{appName}}. Alles, was du an ChatGPT magst, dazu Open-Source-Modelle und Modelle ohne Inhaltsfilter. Ein Konto, ein Ort.",
         models: {
           title: "{{modelCount}} Modelle in 3 Kategorien",
           mainstream: "Mainstream",
@@ -2812,18 +2812,18 @@ export const translations: typeof enTranslations = {
             "{{freeCreditsSignedIn}} Gratis-Credits jeden Monat, mit Newsletter {{freeCreditsMax}}. Ohne Karte.",
           allModels: "Zugriff auf alle {{modelCount}} KI-Modelle",
           uncensored:
-            "4 unzensierte Modelle, die deine Fragen wirklich beantworten",
+            "Unzensierte Modelle, die deine Fragen wirklich beantworten",
           chatModes: "Private, Inkognito-, Geteilte und Öffentliche Chat-Modi",
-          noCard: "Keine Kreditkarte erforderlich - niemals",
+          noCard: "Keine Kreditkarte nötig. Niemals.",
         },
         ctaButton: "Jetzt chatten",
         upgrade: {
           title: "Mehr haben?",
-          desc: "{{subscriptionPrice}}/Monat gibt dir {{subscriptionCredits}} Credits - das ist 40× mehr. Dazu kannst du extra Credit-Pakete kaufen, die niemals ablaufen. Perfekt für tägliche KI-Nutzung.",
+          desc: "{{subscriptionPrice}}/Monat gibt dir jeden Monat {{subscriptionCredits}} Credits. Oder nimm ein Paket: {{packCredits}} Credits für {{packPrice}}, die nie verfallen.",
           cta: "Auf Pro upgraden",
         },
         signoff: "Viel Spaß beim Chatten,\nDas {{appName}} Team",
-        ps: "P.S. Nutze den Inkognito-Modus, um Gespräche nur auf deinem Gerät zu behalten - wir speichern sie niemals auf unseren Servern (generierte Medien speichern wir aus technischen Gründen vorübergehend).",
+        ps: "P.S. Nutze den Inkognito-Modus, um Gespräche nur auf deinem Gerät zu behalten. Wir speichern sie niemals auf unseren Servern (generierte Medien speichern wir aus technischen Gründen vorübergehend).",
       },
       emailTemplates: {
         welcome: {

@@ -2741,13 +2741,13 @@ export const translations: typeof enTranslations = {
         footer: "To jest automatyczne powiadomienie z {{appName}}",
       },
       email: {
-        subject: "Jesteś z nami - {{appName}} jest gotowe na Ciebie",
+        subject: "Jesteś z nami. {{appName}} czeka na Ciebie",
         previewText:
-          "Hej {{privateName}}, Twoje konto jest gotowe. Rozmawiaj z Claude, GPT, Gemini, DeepSeek i {{modelCount}} innymi - za darmo, bez karty.",
+          "Hej {{privateName}}, Twoje konto jest gotowe. Rozmawiaj z Claude, GPT, Gemini, DeepSeek i {{modelCount}} innymi. Za darmo, bez karty.",
         headline: "Twoja AI czeka.",
         greeting: "Hej {{privateName}},",
         intro:
-          "Witamy w {{appName}}. Właśnie odblokowałeś dostęp do najbardziej kompletnej platformy do rozmów z AI - wszystko, co lubisz w ChatGPT, plus modele open-source i modele bez filtrów treści.",
+          "Witamy w {{appName}}. Wszystko, co lubisz w ChatGPT, do tego modele open-source i modele bez filtrów treści. Jedno konto, jedno miejsce.",
         models: {
           title: "{{modelCount}} modeli w 3 kategoriach",
           mainstream: "Główny nurt",
@@ -2760,19 +2760,19 @@ export const translations: typeof enTranslations = {
             "{{freeCreditsSignedIn}} darmowych kredytów co miesiąc, z newsletterem {{freeCreditsMax}}. Bez karty.",
           allModels: "Dostęp do wszystkich {{modelCount}} modeli AI",
           uncensored:
-            "4 niecenzurowane modele, które naprawdę odpowiadają na pytania",
+            "Niecenzurowane modele, które naprawdę odpowiadają na pytania",
           chatModes:
             "Tryby czatu: Prywatny, Incognito, Współdzielony i Publiczny",
-          noCard: "Karta kredytowa nie jest wymagana - nigdy",
+          noCard: "Karta kredytowa nie jest wymagana. Nigdy.",
         },
         ctaButton: "Zacznij rozmawiać",
         upgrade: {
           title: "Chcesz więcej?",
-          desc: "{{subscriptionPrice}}/miesiąc daje Ci {{subscriptionCredits}} creditów - to 40× więcej. Możesz też kupować dodatkowe pakiety creditów, które nigdy nie wygasają. Idealne do codziennego użytku AI.",
-          cta: "Zobacz plan Unlimited",
+          desc: "{{subscriptionPrice}}/miesiąc daje Ci {{subscriptionCredits}} kredytów co miesiąc. Albo weź pakiet: {{packCredits}} kredytów za {{packPrice}}, które nigdy nie wygasają.",
+          cta: "Przejdź na Pro",
         },
         signoff: "Miłych rozmów,\nZespół {{appName}}",
-        ps: "P.S. Użyj trybu Incognito, aby zachować rozmowy tylko na swoim urządzeniu - nigdy nie przechowujemy ich na naszych serwerach (wygenerowane media przechowujemy tymczasowo ze względów technicznych).",
+        ps: "P.S. Użyj trybu Incognito, aby zachować rozmowy tylko na swoim urządzeniu. Nigdy nie przechowujemy ich na naszych serwerach (wygenerowane media przechowujemy tymczasowo ze względów technicznych).",
       },
       emailTemplates: {
         welcome: {

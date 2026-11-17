@@ -961,7 +961,7 @@ export const translations: typeof enTranslations = {
       sharedExplanation:
         "Wątki udostępnione pozwalają tworzyć rozmowy i dzielić się nimi z innymi za pomocą bezpiecznych linków. Idealny do współpracy i dzielenia się spostrzeżeniami z zespołem lub przyjaciółmi.",
       publicExplanation:
-        "Forum publiczne to przestrzeń chroniona przez pierwszą poprawkę, gdzie ludzie i AI angażują się w otwarty dialog. Dziel się pomysłami, kwestionuj perspektywy i uczestniczą w niecenzurowanych dyskusjach.",
+        "Forum publiczne to otwarta przestrzeń, w której ludzie i AI rozmawiają swobodnie. Ty decydujesz, co czytasz. Usuwamy tylko to, co łamie prawo lub nasz regulamin. Dziel się pomysłami, kwestionuj perspektywy i bierz udział w niecenzurowanych dyskusjach.",
       incognitoExplanation:
         "Tryb incognito zachowuje Twoje rozmowy całkowicie prywatne i lokalne. Twoje czaty są przechowywane tylko w Twojej przeglądarce i nigdy nie są wysyłane na nasze serwery (wygenerowane media przechowujemy tymczasowo ze względów technicznych) - nawet nie są powiązane z Twoim kontem.",
       requiresAccount:
@@ -1039,7 +1039,7 @@ export const translations: typeof enTranslations = {
     header: {
       title: "Forum publiczne",
       description:
-        "Przestrzeń chroniona przez First Amendment, gdzie kwitnie wolność słowa. Rozmawiaj z modelami AI i użytkownikami z całego świata. Dziel się pomysłami, kwestionuj perspektywy i mów swobodnie bez censury.",
+        "Otwartość to zasada. Rozmawiaj z modelami AI i ludźmi z całego świata. Ty decydujesz, co czytasz. Usuwamy tylko to, co łamie prawo lub nasz regulamin.",
     },
     // Sort modes
     sort: {
@@ -1866,7 +1866,7 @@ export const translations: typeof enTranslations = {
       name: "Publiczny",
       suffix: "Folder",
       description:
-        "Otwarte forum AI chronione zasadami Pierwszej Poprawki. Rozmawiaj z AI i innymi użytkownikami publicznie. Dziel się wiedzą, debatuj nad pomysłami, uzyskuj różnorodne perspektywy.",
+        "Otwarte forum AI. Rozmawiaj publicznie z AI i innymi użytkownikami. Ty decydujesz, co czytasz. Usuwamy tylko to, co łamie prawo lub nasz regulamin.",
       note: "Bez konta • Wolność słowa jako podstawa • Napędzane przez społeczność",
     },
     privateFolder: {
@@ -1900,11 +1900,10 @@ export const translations: typeof enTranslations = {
       tip: "Pozostań anonimowy lub synchronizuj wszystko. Twój wybór.",
     },
     subscriptionButton: {
-      title: "Nieograniczony dostęp do AI",
+      title: "Kredyty i subskrypcja",
       description:
-        "Otrzymaj wszystko, co oferuje ChatGPT PLUS niecenzurowane modele, publiczne fora i prawdziwą prywatność. {{credits}} miesięcznych kredytów za {{price}}. Dostęp do wszystkich modeli, bez ograniczeń.",
-      tip: "Jedna subskrypcja. Wszystkie mainstreamowe i niecenzurowane modele. Bez granic.",
-      price: "30 PLN",
+        "Wszystko, co daje ChatGPT, plus niecenzurowane modele, forum publiczne i prawdziwa prywatność. {{credits}} kredytów co miesiąc za {{price}}. Wszystkie modele w cenie.",
+      tip: "Jedna subskrypcja. Modele mainstreamowe i niecenzurowane.",
     },
     chatInput: {
       title: "Wpisz wiadomość",

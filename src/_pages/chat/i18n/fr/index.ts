@@ -949,7 +949,7 @@ export const translations: typeof enTranslations = {
       "Vos conversations privées sont stockées sur nos serveurs et synchronisées entre vos appareils.",
     sharedDescription: "Conversations partagées avec d'autres via des liens.",
     publicDescription:
-      "Forum public protégé par le Premier Amendement américain, pour les humains et l'IA.",
+      "Forum public pour les humains et l'IA. Nous ne retirons que ce qui enfreint la loi ou nos conditions d'utilisation.",
     incognitoDescription:
       "Les conversations sont stockées uniquement dans votre navigateur.",
     cronDescription:
@@ -968,7 +968,7 @@ export const translations: typeof enTranslations = {
       sharedExplanation:
         "Les fils partagés vous permettent de créer des conversations et de les partager via des liens sécurisés. Idéal pour collaborer et partager vos idées avec votre équipe ou vos amis.",
       publicExplanation:
-        "Le Forum public est un espace protégé par le Premier Amendement, où humains et IA dialoguent ouvertement. Partagez vos idées, confrontez les points de vue, participez à des discussions non censurées.",
+        "Le forum public est un espace ouvert où humains et IA dialoguent librement. Vous choisissez ce que vous lisez. Nous ne retirons que ce qui enfreint la loi ou nos conditions d'utilisation. Partagez vos idées, confrontez les points de vue, participez à des discussions non censurées.",
       incognitoExplanation:
         "Le mode incognito garde vos conversations totalement privées et locales. Vos discussions sont stockées uniquement dans votre navigateur et ne sont jamais envoyées à nos serveurs (les médias générés sont conservés temporairement pour des raisons techniques). Elles ne sont même pas liées à votre compte.",
       requiresAccount:
@@ -1046,7 +1046,7 @@ export const translations: typeof enTranslations = {
     header: {
       title: "Forum public",
       description:
-        "Un espace protégé par le Premier Amendement, où la liberté d'expression a toute sa place. Échangez avec des modèles d'IA et des utilisateurs du monde entier. Partagez vos idées, confrontez les points de vue, parlez librement, sans censure.",
+        "Ouvert par principe. Échangez avec des modèles d'IA et des personnes du monde entier. Vous choisissez ce que vous lisez. Nous ne retirons que ce qui enfreint la loi ou nos conditions d'utilisation.",
     },
     // Sort modes
     sort: {
@@ -1888,7 +1888,7 @@ export const translations: typeof enTranslations = {
       name: "Public",
       suffix: "Dossier",
       description:
-        "Forum IA ouvert, protégé par le Premier Amendement. Discutez avec l'IA et avec de vraies personnes. Partagez un savoir non censuré, débattez librement, profitez des points de vue variés de la communauté.",
+        "Forum IA ouvert. Discutez avec l'IA et avec de vraies personnes. Vous choisissez ce que vous lisez. Nous ne retirons que ce qui enfreint la loi ou nos conditions d'utilisation.",
       note: "Sans compte • Liberté d'expression • Discussions communautaires",
     },
     privateFolder: {
@@ -1922,11 +1922,10 @@ export const translations: typeof enTranslations = {
       tip: "Restez anonyme ou synchronisez tout. À vous de choisir.",
     },
     subscriptionButton: {
-      title: "Accès IA illimité",
+      title: "Crédits et abonnement",
       description:
-        "Tout ce que propose ChatGPT, PLUS des modèles non censurés, des forums publics et une vraie confidentialité. {{credits}} crédits par mois pour {{price}}. Tous les modèles, sans restriction.",
-      tip: "Un seul abonnement. Tous les modèles, grand public et non censurés. Aucune limite.",
-      price: "8 €",
+        "Tout ce que propose ChatGPT, plus des modèles non censurés, un forum public et une vraie confidentialité. {{credits}} crédits par mois pour {{price}}. Tous les modèles inclus.",
+      tip: "Un seul abonnement. Modèles grand public et non censurés.",
     },
     chatInput: {
       title: "Écrivez votre message",

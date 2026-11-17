@@ -76,7 +76,7 @@ export const translations: typeof enTranslations = {
       sharedExplanation:
         "Wątki udostępnione pozwalają tworzyć rozmowy i dzielić się nimi z innymi za pomocą bezpiecznych linków. Idealny do współpracy i dzielenia się spostrzeżeniami z zespołem lub przyjaciółmi.",
       publicExplanation:
-        "Forum publiczne to przestrzeń chroniona przez pierwszą poprawkę, gdzie ludzie i AI angażują się w otwarty dialog. Dziel się pomysłami, kwestionuj perspektywy i uczestniczą w niecenzurowanych dyskusjach.",
+        "Forum publiczne to otwarta przestrzeń, w której ludzie i AI rozmawiają swobodnie. Ty decydujesz, co czytasz. Usuwamy tylko to, co łamie prawo lub nasz regulamin. Dziel się pomysłami, kwestionuj perspektywy i bierz udział w niecenzurowanych dyskusjach.",
       incognitoExplanation:
         "Tryb incognito zachowuje Twoje rozmowy całkowicie prywatne i lokalne. Twoje czaty są przechowywane tylko w Twojej przeglądarce i nigdy nie są wysyłane na nasze serwery (wygenerowane media przechowujemy tymczasowo ze względów technicznych) - nawet nie są powiązane z Twoim kontem.",
       requiresAccount:

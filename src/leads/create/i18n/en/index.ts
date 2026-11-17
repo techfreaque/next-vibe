@@ -168,25 +168,23 @@ export const translations = {
     welcome: {
       subject: "Welcome to {{companyName}}",
       title: "Welcome to {{companyName}}, {{businessName}}!",
-      preview: "Welcome to our service - let's get you started",
+      preview: "Welcome. Here is how to start.",
       greeting:
-        "Welcome to {{companyName}}, {{businessName}}! We're excited to help you grow your business.",
+        "Welcome to {{companyName}}, {{businessName}}! Good to have you.",
       defaultName: "there",
       introduction:
-        "Thank you for your interest in our services. We've received your information and our team is ready to help you achieve your business goals.",
+        "Thanks for your interest. Your details reached us, and a real person reads them.",
       nextSteps: {
         title: "What happens next?",
         step1Number: "1.",
-        step1: "Our team will review your business profile and goals",
+        step1: "Start chatting right away. No setup, no card.",
         step2Number: "2.",
-        step2:
-          "You'll receive a personalized consultation proposal within 24 hours",
+        step2: "Questions? Reply to this email. A human reads it.",
         step3Number: "3.",
-        step3:
-          "We'll schedule a call to discuss your specific needs and objectives",
+        step3: "We answer as soon as we can.",
       },
       cta: {
-        getStarted: "Schedule Your Consultation",
+        getStarted: "Start chatting",
       },
       support:
         "Have questions? Reply to this email or contact us at {{supportEmail}}",

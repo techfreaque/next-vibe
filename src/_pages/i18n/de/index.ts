@@ -167,13 +167,13 @@ export const translations: typeof enTranslations = {
       title: "Preise - {{appName}}",
       category: "Preise",
       description:
-        "Erschwingliche KI-Chat-Pläne für jeden. Starten Sie kostenlos mit 10 täglichen Nachrichten.",
+        "KI-Chat für jedes Budget. Kostenlos starten: jeden Monat Credits, ohne Karte.",
       imageAlt: "Preispläne",
       keywords: "preise, pläne, abonnement, KI-chat-preise, {{appName}} preise",
       ogTitle: "Preispläne - {{appName}}",
       ogDescription: "Einfache, transparente Preise für unzensierten KI-Chat",
       twitterTitle: "Preise - {{appName}}",
-      twitterDescription: "Kostenlos starten mit 10 täglichen Nachrichten",
+      twitterDescription: "Kostenlos starten. Jeden Monat Credits, ohne Karte.",
     },
     billing: {
       category: "Abrechnung",

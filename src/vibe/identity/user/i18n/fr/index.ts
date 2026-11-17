@@ -2815,7 +2815,7 @@ export const translations: typeof enTranslations = {
         headline: "Votre IA vous attend.",
         greeting: "Bonjour {{privateName}},",
         intro:
-          "Bienvenue sur {{appName}}. Vous venez d'accéder à la plateforme de chat IA la plus complète du moment : tout ce que vous aimez dans ChatGPT, plus des modèles open source et des modèles sans filtres de contenu.",
+          "Bienvenue sur {{appName}}. Tout ce que vous aimez dans ChatGPT, plus des modèles open source et des modèles sans filtres de contenu. Un seul compte, un seul endroit.",
         models: {
           title: "{{modelCount}} modèles dans 3 catégories",
           mainstream: "Grand public",
@@ -2828,14 +2828,14 @@ export const translations: typeof enTranslations = {
             "{{freeCreditsSignedIn}} crédits gratuits chaque mois, {{freeCreditsMax}} avec la newsletter. Sans carte bancaire.",
           allModels: "Accès aux {{modelCount}} modèles d'IA",
           uncensored:
-            "4 modèles non censurés qui répondent vraiment à vos questions",
+            "Des modèles non censurés qui répondent vraiment à vos questions",
           chatModes: "Modes de chat Privé, Incognito, Partagé et Public",
-          noCard: "Aucune carte bancaire requise, jamais",
+          noCard: "Aucune carte bancaire requise. Jamais.",
         },
         ctaButton: "Commencer à discuter",
         upgrade: {
           title: "Envie de plus ?",
-          desc: "Pour {{subscriptionPrice}}/mois, vous recevez {{subscriptionCredits}} crédits, soit 40 fois plus. Vous pouvez aussi acheter des packs de crédits supplémentaires qui n'expirent jamais. Idéal si vous utilisez l'IA tous les jours.",
+          desc: "Pour {{subscriptionPrice}}/mois, vous recevez {{subscriptionCredits}} crédits chaque mois. Ou prenez un pack : {{packCredits}} crédits pour {{packPrice}}, sans date d'expiration.",
           cta: "Passer à Pro",
         },
         signoff: "Bonnes discussions,\nL'équipe {{appName}}",

@@ -76,7 +76,7 @@ export const translations: typeof enTranslations = {
       sharedExplanation:
         "Geteilte Threads ermöglichen es Ihnen, Gespräche zu erstellen und sie mit anderen über sichere Links zu teilen. Perfekt für die Zusammenarbeit und das Teilen von Erkenntnissen mit Ihrem Team oder Freunden.",
       publicExplanation:
-        "Das öffentliche Forum ist ein durch den ersten Verfassungszusatz geschützter Raum, in dem Menschen und KI in offenen Dialog treten. Teilen Sie Ideen, hinterfragen Sie Perspektiven und nehmen Sie an unzensierten Diskussionen teil.",
+        "Das öffentliche Forum ist ein offener Raum, in dem Menschen und KI frei diskutieren. Sie entscheiden, was Sie lesen. Wir entfernen nur, was gegen Gesetze oder unsere Nutzungsbedingungen verstößt. Teilen Sie Ideen, hinterfragen Sie Perspektiven und diskutieren Sie unzensiert.",
       incognitoExplanation:
         "Der Inkognito-Modus hält Ihre Gespräche völlig privat und lokal. Ihre Chats werden nur in Ihrem Browser gespeichert und niemals an unsere Server gesendet (generierte Medien speichern wir aus technischen Gründen vorübergehend) - nicht einmal mit Ihrem Konto verknüpft.",
       requiresAccount:

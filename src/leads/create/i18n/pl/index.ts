@@ -170,24 +170,23 @@ export const translations: typeof enTranslations = {
     welcome: {
       subject: "Witamy w {{companyName}}",
       title: "Witamy w {{companyName}}, {{businessName}}!",
-      preview: "Witamy w naszym serwisie - zaczynajmy",
+      preview: "Witamy. Tak zaczniesz.",
       greeting:
-        "Witamy w {{companyName}}, {{businessName}}! Cieszymy się, że możemy pomóc w rozwoju Twojej firmy.",
+        "Witamy w {{companyName}}, {{businessName}}! Dobrze, że jesteś.",
       defaultName: "tam",
       introduction:
-        "Dziękujemy za zainteresowanie naszymi usługami. Otrzymaliśmy Twoje informacje i nasz zespół jest gotowy pomóc Ci osiągnąć cele biznesowe.",
+        "Dzięki za zainteresowanie. Twoje dane do nas dotarły i przeczyta je człowiek.",
       nextSteps: {
         title: "Co dalej?",
         step1Number: "1.",
-        step1: "Nasz zespół przejrzy profil i cele Twojej firmy",
+        step1: "Zacznij czatować od razu. Bez konfiguracji, bez karty.",
         step2Number: "2.",
-        step2:
-          "Otrzymasz spersonalizowaną propozycję konsultacji w ciągu 24 godzin",
+        step2: "Masz pytanie? Odpowiedz na ten e-mail. Czyta go człowiek.",
         step3Number: "3.",
-        step3: "Umówimy rozmowę, aby omówić Twoje konkretne potrzeby i cele",
+        step3: "Odpowiemy najszybciej, jak się da.",
       },
       cta: {
-        getStarted: "Zaplanuj konsultację",
+        getStarted: "Zacznij czatować",
       },
       support:
         "Masz pytania? Odpowiedz na ten e-mail lub skontaktuj się z nami pod adresem {{supportEmail}}",

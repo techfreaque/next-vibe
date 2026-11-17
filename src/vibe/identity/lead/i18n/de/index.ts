@@ -1588,26 +1588,24 @@ export const translations: typeof enTranslations = {
       welcome: {
         subject: "Willkommen bei {{companyName}}",
         title: "Willkommen bei {{companyName}}, {{businessName}}!",
-        preview: "Willkommen bei unserem Service - lassen Sie uns starten",
+        preview: "Willkommen. So legen Sie los.",
         greeting:
-          "Willkommen bei {{companyName}}, {{businessName}}! Wir freuen uns darauf, Ihrem Unternehmen beim Wachstum zu helfen.",
+          "Willkommen bei {{companyName}}, {{businessName}}! Schön, dass Sie da sind.",
         defaultName: "dort",
         introduction:
-          "Vielen Dank für Ihr Interesse an unseren Dienstleistungen. Wir haben Ihre Informationen erhalten und unser Team ist bereit, Ihnen bei der Erreichung Ihrer Geschäftsziele zu helfen.",
+          "Danke für Ihr Interesse. Ihre Angaben sind angekommen, und ein Mensch liest sie.",
         nextSteps: {
           title: "Was passiert als Nächstes?",
           step1Number: "1.",
-          step1:
-            "Unser Team wird Ihr Geschäftsprofil und Ihre Ziele überprüfen",
+          step1: "Sofort loslegen. Keine Einrichtung, keine Karte.",
           step2Number: "2.",
           step2:
-            "Sie erhalten innerhalb von 24 Stunden einen personalisierten Beratungsvorschlag",
+            "Fragen? Antworten Sie einfach auf diese E-Mail. Ein Mensch liest sie.",
           step3Number: "3.",
-          step3:
-            "Wir vereinbaren einen Termin, um Ihre spezifischen Bedürfnisse und Ziele zu besprechen",
+          step3: "Wir antworten, so schnell wir können.",
         },
         cta: {
-          getStarted: "Beratung planen",
+          getStarted: "Jetzt loschatten",
         },
         support:
           "Haben Sie Fragen? Antworten Sie auf diese E-Mail oder kontaktieren Sie uns unter {{supportEmail}}",
