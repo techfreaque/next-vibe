@@ -135,24 +135,143 @@ function computeFingerprint(
  */
 const MAX_INFLIGHT = 8;
 /**
- * Writes that arrive while MAX_INFLIGHT are busy wait here instead of being
- * dropped - a burst of distinct first occurrences (e.g. a broken release where
- * every page errors) must still land. Bounded so a storm can't become an OOM
- * vector; only beyond this cap is a write dropped.
+ * Distinct rows that arrive while MAX_INFLIGHT are busy wait here instead of
+ * being dropped - a burst of distinct first occurrences (e.g. a broken release
+ * where every page errors) must still land. Bounded so a storm can't become an
+ * OOM vector; only beyond this cap is a new row dropped (repeats of a row that
+ * is already waiting are always counted).
  */
 const MAX_QUEUED = 500;
-let inflightCount = 0;
-const pendingWrites: Array<() => Promise<void>> = [];
+/**
+ * A fingerprint written less than this long ago is not written again right
+ * away: repeats are summed in memory and land as ONE upsert when the window
+ * ends. A storm of the same error (2026-11-17: ~750 forged webhooks/s) then
+ * costs one row update per second instead of one per hit (CPU + table bloat).
+ */
+const COALESCE_MS = 1000;
+/**
+ * When one message (level + type + message prefix) produces more than this many
+ * distinct fingerprints inside VARIANT_WINDOW_MS, its metadata varies per
+ * occurrence (request ids, signatures, attacker input) and every further
+ * variant is counted on one collapsed row instead of inserting a new row each.
+ * The error class stays fully reported: occurrences keep counting and the
+ * latest metadata is kept as the sample.
+ */
+const MAX_VARIANTS = 50;
+const VARIANT_WINDOW_MS = 10 * 60 * 1000;
+/** Bound on tracked keys so the trackers can't grow without limit. */
+const MAX_TRACKED_KEYS = 5000;
 
-function runWrite(write: () => Promise<void>): void {
-  inflightCount++;
-  void write().finally(() => {
-    inflightCount--;
-    const next = pendingWrites.shift();
-    if (next) {
-      runWrite(next);
+type PendingRow = NewErrorLog & { occurrences: number };
+
+let inflightCount = 0;
+/** Rows waiting to be written, keyed by fingerprint (repeats merge here). */
+const pendingRows = new Map<string, PendingRow>();
+/** Fingerprints whose pending row may be written now, in arrival order. */
+const readyFingerprints = new Set<string>();
+const lastWriteAt = new Map<string, number>();
+const variantTracker = new Map<
+  string,
+  { windowStart: number; fingerprints: Set<string> }
+>();
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+
+function pump(): void {
+  while (inflightCount < MAX_INFLIGHT && readyFingerprints.size > 0) {
+    const fingerprint = readyFingerprints.values().next().value;
+    if (fingerprint === undefined) {
+      return;
     }
-  });
+    readyFingerprints.delete(fingerprint);
+    const row = pendingRows.get(fingerprint);
+    if (!row) {
+      continue;
+    }
+    pendingRows.delete(fingerprint);
+    const now = Date.now();
+    if (lastWriteAt.size >= MAX_TRACKED_KEYS) {
+      for (const [key, at] of lastWriteAt) {
+        if (now - at >= COALESCE_MS) {
+          lastWriteAt.delete(key);
+        }
+      }
+    }
+    lastWriteAt.set(fingerprint, now);
+    inflightCount++;
+    void upsertErrorLog(row).finally(() => {
+      inflightCount--;
+      pump();
+    });
+  }
+}
+
+function scheduleFlush(): void {
+  if (flushTimer !== null) {
+    return;
+  }
+  flushTimer = setTimeout(() => {
+    flushTimer = null;
+    for (const fingerprint of pendingRows.keys()) {
+      readyFingerprints.add(fingerprint);
+    }
+    pump();
+  }, COALESCE_MS);
+}
+
+function enqueueRow(row: PendingRow): void {
+  const existing = pendingRows.get(row.fingerprint);
+  if (existing) {
+    existing.occurrences += row.occurrences;
+    existing.metadata = row.metadata;
+    existing.stackTrace = row.stackTrace ?? existing.stackTrace;
+    return;
+  }
+  if (pendingRows.size >= MAX_QUEUED) {
+    // drop - best-effort logging must never become an OOM vector
+    return;
+  }
+  pendingRows.set(row.fingerprint, row);
+  const last = lastWriteAt.get(row.fingerprint);
+  if (last !== undefined && Date.now() - last < COALESCE_MS) {
+    scheduleFlush();
+    return;
+  }
+  readyFingerprints.add(row.fingerprint);
+  pump();
+}
+
+/**
+ * Returns the fingerprint to store under: the computed one, or the message's
+ * collapsed fingerprint once it has produced more than MAX_VARIANTS distinct
+ * ones in the current window.
+ */
+function resolveFingerprint(
+  baseKey: string,
+  fingerprint: string,
+): { fingerprint: string; collapsed: boolean } {
+  const now = Date.now();
+  let entry = variantTracker.get(baseKey);
+  if (!entry || now - entry.windowStart >= VARIANT_WINDOW_MS) {
+    if (!entry && variantTracker.size >= MAX_TRACKED_KEYS) {
+      variantTracker.clear();
+    }
+    entry = { windowStart: now, fingerprints: new Set() };
+    variantTracker.set(baseKey, entry);
+  }
+  if (
+    entry.fingerprints.has(fingerprint) ||
+    entry.fingerprints.size < MAX_VARIANTS
+  ) {
+    entry.fingerprints.add(fingerprint);
+    return { fingerprint, collapsed: false };
+  }
+  return {
+    fingerprint: createHash("sha256")
+      .update(`${baseKey}:variants-collapsed`)
+      .digest("base64url")
+      .slice(0, 16),
+    collapsed: true,
+  };
 }
 
 /** Optional overrides for rows whose error didn't originate in this process. */
@@ -173,7 +292,8 @@ export interface PersistErrorLogOptions {
 /**
  * Persist an error log to the database (fire-and-forget).
  * Never throws - all errors are silently caught.
- * Queues writes when MAX_INFLIGHT are in progress; drops only past MAX_QUEUED.
+ * Repeats of one fingerprint inside COALESCE_MS merge into one upsert; at most
+ * MAX_INFLIGHT writes run at once and at most MAX_QUEUED distinct rows wait.
  */
 export function persistErrorLog(
   level: ErrorLogLevel,
@@ -183,85 +303,88 @@ export function persistErrorLog(
   locale: CountryLanguage,
   options?: PersistErrorLogOptions,
 ): void {
-  const write = (): Promise<void> =>
-    writeErrorLog(level, message, error, extraMeta, locale, options);
-  if (inflightCount < MAX_INFLIGHT) {
-    runWrite(write);
-    return;
+  try {
+    enqueueRow(buildRow(level, message, error, extraMeta, locale, options));
+  } catch {
+    // Silently swallow - logging persistence must never cascade
   }
-  if (pendingWrites.length < MAX_QUEUED) {
-    pendingWrites.push(write);
-  }
-  // else: drop - best-effort logging must never become an OOM vector
 }
 
-async function writeErrorLog(
+function buildRow(
   level: ErrorLogLevel,
   message: string,
   error: LoggerMetadata | undefined,
   extraMeta: LoggerMetadata[],
   locale: CountryLanguage,
   options: PersistErrorLogOptions | undefined,
-): Promise<void> {
-  try {
-    // Dynamic import to avoid circular dependencies and module-level DB init
-    const { db } = await import("../database");
+): PendingRow {
+  const errorType = extractErrorType(error) ?? options?.errorType ?? null;
+  const truncatedMessage = extractMessage(message, error);
 
-    const { sql } = await import("drizzle-orm");
+  // Collect all metadata: include the error object itself when it's a plain
+  // object (not an Error instance) so structured context isn't lost.
+  // Error instances are captured via stackTrace/message - no need to duplicate.
+  const allMeta: LoggerMetadata[] = [{ locale }];
+  if (
+    error !== null &&
+    error !== undefined &&
+    !(error instanceof Error) &&
+    typeof error === "object" &&
+    !(error instanceof Date) &&
+    !Array.isArray(error)
+  ) {
+    allMeta.push(error);
+  }
+  allMeta.push(...extraMeta);
 
-    const errorType = extractErrorType(error) ?? options?.errorType ?? null;
-    const truncatedMessage = extractMessage(message, error);
-
-    // Collect all metadata: include the error object itself when it's a plain
-    // object (not an Error instance) so structured context isn't lost.
-    // Error instances are captured via stackTrace/message - no need to duplicate.
-    const allMeta: LoggerMetadata[] = [{ locale }];
-    if (
-      error !== null &&
-      error !== undefined &&
-      !(error instanceof Error) &&
-      typeof error === "object" &&
-      !(error instanceof Date) &&
-      !Array.isArray(error)
-    ) {
-      allMeta.push(error);
-    }
-    allMeta.push(...extraMeta);
-
-    // Fingerprint now includes stable context from metadata so the same error
-    // from different code paths (e.g. different endpoints) gets separate rows.
-    const fingerprint = computeFingerprint(
+  // Fingerprint includes stable context from metadata so the same error
+  // from different code paths (e.g. different endpoints) gets separate rows.
+  const { fingerprint, collapsed } = resolveFingerprint(
+    `${level}:${errorType ?? "unknown"}:${truncatedMessage.slice(0, 100)}`,
+    computeFingerprint(
       level,
       errorType,
       truncatedMessage,
       allMeta,
       options?.fingerprintIgnoreKeys,
-    );
+    ),
+  );
+  if (collapsed) {
+    allMeta.push({
+      fingerprintCollapsed: `metadata varied on more than ${String(MAX_VARIANTS)} occurrences within ${String(VARIANT_WINDOW_MS / 60_000)} min; further variants are counted on this row (latest sample kept)`,
+    });
+  }
 
-    const occurrences =
-      options?.occurrences !== undefined &&
-      Number.isInteger(options.occurrences) &&
-      options.occurrences > 0
-        ? options.occurrences
-        : 1;
+  const occurrences =
+    options?.occurrences !== undefined &&
+    Number.isInteger(options.occurrences) &&
+    options.occurrences > 0
+      ? options.occurrences
+      : 1;
 
+  return {
+    message: truncatedMessage,
+    errorType,
+    stackTrace:
+      extractStack(error) ??
+      (options?.stackTrace
+        ? truncate(options.stackTrace, MAX_STACK_LENGTH)
+        : null),
     // jsonb would store nested Errors as `{}` - keep message/stack/cause.
-    const serializedMeta = allMeta.map(serializeLogValue);
+    metadata: allMeta.map(serializeLogValue),
+    fingerprint,
+    occurrences,
+    resolved: false,
+    level,
+  };
+}
 
-    const row: NewErrorLog = {
-      message: truncatedMessage,
-      errorType,
-      stackTrace:
-        extractStack(error) ??
-        (options?.stackTrace
-          ? truncate(options.stackTrace, MAX_STACK_LENGTH)
-          : null),
-      metadata: serializedMeta,
-      fingerprint,
-      occurrences,
-      resolved: false,
-      level,
-    };
+async function upsertErrorLog(row: PendingRow): Promise<void> {
+  try {
+    // Dynamic import to avoid circular dependencies and module-level DB init
+    const { db } = await import("../database");
+
+    const { sql } = await import("drizzle-orm");
 
     // Upsert: if same fingerprint exists, increment occurrences and update timestamp
     await db
@@ -270,9 +393,9 @@ async function writeErrorLog(
       .onConflictDoUpdate({
         target: errorLogs.fingerprint,
         set: {
-          occurrences: sql`${errorLogs.occurrences} + ${occurrences}`,
+          occurrences: sql`${errorLogs.occurrences} + ${row.occurrences}`,
           stackTrace: row.stackTrace,
-          metadata: serializedMeta,
+          metadata: row.metadata,
           resolved: false,
           createdAt: sql`now()`,
         },

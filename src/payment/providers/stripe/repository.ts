@@ -572,8 +572,15 @@ export class StripeProvider implements PaymentProvider {
         data: webhookData,
       });
     } catch (error) {
+      const parsed = parseError(error);
+      // Log the message and a payload preview, never the error object itself:
+      // Stripe's signature error carries the stripe-signature header, which
+      // differs on every request, so a forged-webhook flood (2026-11-17) wrote
+      // one error_logs row per hit instead of counting occurrences.
       logger.error("Failed to verify Stripe webhook", {
-        error: parseError(error),
+        errorName: parsed.name,
+        errorMessage: parsed.message,
+        payloadPreview: body.slice(0, 200),
       });
       return fail({
         message: t("errors.webhookVerificationFailed.detail", {

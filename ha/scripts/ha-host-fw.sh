@@ -21,6 +21,11 @@
 #     (~DNS_UDP_QPS x <=500 bytes). DNS_OPEN=0 in /etc/default/ha-host-fw
 #     drops public :53 entirely again.
 #   - tcp/udp 5355 (systemd-resolved LLMNR)
+#   - every packet from the abusive sources in BLOCK_SRC (space-separated v4
+#     addresses/CIDRs in /etc/default/ha-host-fw). Added 2026-11-17: one
+#     residential IP flooded both edges with ~750 forged payment webhooks/s.
+#     v4-mapped v6 sockets (docker-proxy on [::]) are covered by the v4 rule
+#     in INPUT, v4 DNATed ports by the one in DOCKER-USER.
 #
 # Docker-published v4 ports are DNATed in PREROUTING and never hit INPUT, so
 # they are filtered in DOCKER-USER by their ORIGINAL dst port (conntrack).
@@ -54,6 +59,7 @@ DNS_UDP_QPS="${DNS_UDP_QPS:-30}"
 DNS_UDP_BURST="${DNS_UDP_BURST:-60}"
 DNS_UDP_TOTAL="${DNS_UDP_TOTAL:-1500}"
 DNS_TCP_CPS="${DNS_TCP_CPS:-5}"
+BLOCK_SRC="${BLOCK_SRC:-}"
 
 unhook() {
   iptables -D INPUT -j HA-INPUT 2>/dev/null
@@ -76,6 +82,10 @@ for t in iptables ip6tables; do
   $t -N HA-INPUT 2>/dev/null || $t -F HA-INPUT
 done
 
+for src in $BLOCK_SRC; do
+  iptables -A HA-INPUT -s "$src" -j DROP
+done
+
 iptables -A HA-INPUT -p udp --dport "$WG_PORT" -s "$PEER_V4" -j ACCEPT
 iptables -A HA-INPUT -p udp --dport "$WG_PORT" -j DROP
 if [ -n "$PEER_V6" ]; then
@@ -96,6 +106,9 @@ done
 # ---- DOCKER-USER (v4 docker-published ports, DNATed before INPUT) ----
 if iptables -n -L DOCKER-USER >/dev/null 2>&1; then
   iptables -N HA-DOCKER 2>/dev/null || iptables -F HA-DOCKER
+  for src in $BLOCK_SRC; do
+    iptables -A HA-DOCKER -s "$src" -j DROP
+  done
   iptables -A HA-DOCKER -i "$PUB_IF" -p tcp -m conntrack --ctdir ORIGINAL \
     --ctorigdstport 3000 -j DROP
   iptables -A HA-DOCKER -i "$PUB_IF" -p tcp -m conntrack --ctdir ORIGINAL \
@@ -126,4 +139,4 @@ else
   echo "ha-host-fw: DOCKER-USER chain missing (docker not up?); docker ports NOT filtered" >&2
   exit 1
 fi
-echo "ha-host-fw: applied (peer v4=$PEER_V4 v6=${PEER_V6:-none} if=$PUB_IF dns_open=$DNS_OPEN)"
+echo "ha-host-fw: applied (peer v4=$PEER_V4 v6=${PEER_V6:-none} if=$PUB_IF dns_open=$DNS_OPEN blocked=${BLOCK_SRC:-none})"

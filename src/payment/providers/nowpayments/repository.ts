@@ -478,9 +478,13 @@ export class NOWPaymentsProvider implements PaymentProvider {
           calculatedSignature.toLowerCase(),
         )
       ) {
+        // No received signature in the metadata: a forger sends a new one per
+        // request, which split a flood (2026-11-17) into one error_logs row per
+        // hit. The calculated prefix identifies the body, so repeats of one
+        // payload count as occurrences of one row.
         logger.error("NOWPayments webhook signature verification failed", {
-          receivedSignature: `${signature.slice(0, 10)}...`,
           calculatedSignature: `${calculatedSignature.slice(0, 10)}...`,
+          receivedSignatureLength: signature.length,
         });
         return fail({
           message: t("errors.webhookVerificationFailed.invalidSignature"),
