@@ -13,6 +13,7 @@ const DEFAULT_PASSWORD_SENTINEL = "change-me-now";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { SYSTEM_SETTINGS_ALIAS } from "next-vibe/env/settings/constants";
+import { broadcastAuthChange } from "next-vibe/identity/auth/tab-sync";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
@@ -64,6 +65,7 @@ function DevQuickLogin({
         },
       });
       if (result.success) {
+        broadcastAuthChange("login", logger);
         const target =
           devSeedPassword === DEFAULT_PASSWORD_SENTINEL
             ? `/${locale}/tools/${SYSTEM_SETTINGS_ALIAS}`
@@ -73,7 +75,7 @@ function DevQuickLogin({
         setLoadingEmail(null);
       }
     },
-    [locale, callbackUrl, devSeedPassword, loginMutation],
+    [locale, callbackUrl, devSeedPassword, loginMutation, logger],
   );
 
   return (

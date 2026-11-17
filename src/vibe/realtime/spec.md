@@ -226,10 +226,11 @@ interface WsWireMessage {
   channel: string; // routing key
   event: "__event__"; // every endpoint event rides one envelope shape
   data: AnyEndpointEventEnvelope; // the one wire payload type
-  seq: number; // monotonic — receivers dedupe by (channel, seq)
+  seq: number; // replay seq: strictly increasing per channel, shared by all nodes
 }
 // Batch frame:  { type: "batch", events: WsWireMessage[] }
-// Client→server: { type:"subscribe", channel, locale, descriptor? }
+// Subscribe ack (only for replay:true): { type:"subscribed", channel, cursor, complete }
+// Client→server: { type:"subscribe", channel, locale, descriptor?, replay?, since? }
 //              | { type:"unsubscribe", channel }
 //   For endpoint (ws-*) channels the subscribe frame carries a structured
 //   `descriptor` { endpointPath, method, urlPathParams, requestData }; the server
@@ -243,8 +244,9 @@ it is a normal remote call to the peer's own endpoint (`connect-reverse/update`,
 `self/rename`) via `runInProcessTyped({ instanceId })`, which resolves to the same
 relay legs — see [`../../../remote-connection/spec.md`](../../../remote-connection/spec.md).
 
-Batching: `createBatchingEmitter` accumulates for ~16ms or 50 events, then sends
-one batch frame; `flush()` drains at stream end.
+Batch frames carry replayed events (see Reconnect catch-up) and the
+`/ws/broadcast` batch body; the server publishes each event of a batch body
+individually so every event gets its replay seq.
 
 ---
 
@@ -287,7 +289,54 @@ never disagree.
 `client.ts` keeps one `WebSocket` per tab. `useEndpointSubscription(endpoint, opts)`
 derives the channel, subscribes to every declared event, and applies payloads to
 the React Query cache via `cache-merger.ts` per the event's `operation`. `onEvent`
-runs after the merge. Reconnect uses exponential backoff (1s→30s) and re-subscribes.
+runs after the merge. Reconnect uses exponential backoff (1s→30s; 100-500 ms
+after a 1012 drain) and re-subscribes with the last seq per channel.
+
+---
+
+## Reconnect catch-up (replay)
+
+Events published while a socket is down (network blip, deploy drain 1012,
+S1 <-> S2 switch) are replayed from a bounded per-channel buffer
+(`server/replay-buffer.ts`; defaults: 120 s window, 4000 events per channel).
+
+- **Seq.** Every publish goes through the pub/sub adapter, which assigns the
+  event's seq: `max(last + 1, nowMs * 1000)`, so it is strictly increasing per
+  channel and keeps increasing across restarts. `local`: in-memory
+  (`MemoryReplayBuffer`). `redis`: one Lua script assigns the seq from a shared
+  counter, records the event and PUBLISHes it atomically, so both HA nodes
+  share the seq space and the buffer.
+- **Replay state.** A channel's history is only trusted while it has replay
+  state: created by the first `replay:true` subscribe, kept alive while anyone
+  is subscribed (5 min touch) and for 1 h after the last unsubscribe. While it
+  exists every event is recorded (the emitter's presence gate keeps publishing:
+  `isChannelLive` = local sockets OR replay state OR redis). Whatever leaves the
+  buffer raises `evictedMax`.
+- **Protocol.** The client sends `replay: true` (+ `since` on resubscribe).
+  After auth admits the channel, the server waits for the relay subscription,
+  reads the buffer, sends the missed events as one batch frame, then the
+  `subscribed` ack `{ cursor, complete }`. Live events arriving meanwhile are
+  queued on that socket and flushed after the replay (deduped by seq). The
+  client drops `seq <= lastSeq` once acked on the current socket.
+- **Gap too old.** `since < evictedMax` or no state (expired, server restarted
+  in local mode) → `complete: false`, nothing replayed; the client calls the
+  channel's `onChannelResync` handlers, and `useEndpointSubscription`
+  invalidates the cache key (refetch of e.g. thread messages + streamingState).
+- **Auth.** Replay only runs for a socket that `authorizeWsChannel` just admitted
+  to that channel. Payloads are unchanged.
+- Older clients/sockets without `replay` get the plain live stream, no ack.
+  Reverse-ws connectors and keyed-signal sockets do not use replay.
+
+## Tab identity sync
+
+Login, signup and logout announce `auth-changed` on a `BroadcastChannel`
+(`identity/auth/tab-sync.ts`, localStorage `storage` event fallback).
+`TabIdentitySync` (mounted in RootProviders) in every other tab replaces the WS
+socket (`reconnectForIdentityChange`: its identity was fixed by the cookies at
+upgrade), re-runs the route loaders (`router.refresh()`, TanStack
+`router.invalidate()`) so the page's `user` prop is the new identity, and
+refetches all active queries (credits etc.). The old identity's subscriptions
+are released by their effect cleanups, so each cache key keeps one subscription.
 
 ---
 
@@ -359,7 +408,9 @@ the update — the re-emit uses the same channel kind a fresh local mutation wou
 
 ## Pub/Sub (multi-instance)
 
-`broadcastLocalToAll` fans out to sockets on this process. `PubSubAdapter`
-(`WS_PUBSUB_TYPE=redis`) relays publishes to other app instances, each calling
-`broadcastLocalToAll`. `local` (default) is a direct in-process call. The adapter
-choice is the only difference between single- and multi-instance deployments.
+`broadcastLocalToAll` fans out an already-sequenced event to sockets on this
+process. Every publish (in-process emitter, `/ws/broadcast` POST, keyed
+signals) goes through the `PubSubAdapter`, which assigns the replay seq:
+`local` (default) delivers in-process, `redis` (`WS_PUBSUB_TYPE=redis`) relays
+to every app instance, each calling `broadcastLocalToAll`. The adapter choice is
+the only difference between single- and multi-instance deployments.

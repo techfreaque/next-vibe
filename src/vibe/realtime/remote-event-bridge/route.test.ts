@@ -220,19 +220,17 @@ describe("Remote Event Bridge", () => {
       }, 60_000);
 
       it("prerequisites: hermes connected via direct-http", () => {
-        if (_remoteConnectError) {
-          throw new Error(
-            `Direct-HTTP connection failed — run: vibe --hermes dev\n${_remoteConnectError}`,
-          );
-        }
+        expect(
+          _remoteConnectError,
+          `Direct-HTTP connection failed — run: vibe --hermes dev\n${_remoteConnectError}`,
+        ).toBeFalsy();
       });
 
       function requireDirectHttp(): void {
-        if (_remoteConnectError) {
-          throw new Error(
-            `Skipped — fix prerequisites test first: ${_remoteConnectError}`,
-          );
-        }
+        expect(
+          _remoteConnectError,
+          `Skipped — fix prerequisites test first: ${_remoteConnectError}`,
+        ).toBeFalsy();
       }
 
       // ── REB-DIRECT-REMOTE-EVENT ───────────────────────────────────────────
@@ -299,19 +297,17 @@ describe("Remote Event Bridge", () => {
       }, 60_000);
 
       it("prerequisites: hermes connected via reverse-WS", () => {
-        if (_remoteConnectError) {
-          throw new Error(
-            `Reverse-WS connection failed — run: vibe --hermes dev\n${_remoteConnectError}`,
-          );
-        }
+        expect(
+          _remoteConnectError,
+          `Reverse-WS connection failed — run: vibe --hermes dev\n${_remoteConnectError}`,
+        ).toBeFalsy();
       });
 
       function requireReverseWs(): void {
-        if (_remoteConnectError) {
-          throw new Error(
-            `Skipped — fix prerequisites test first: ${_remoteConnectError}`,
-          );
-        }
+        expect(
+          _remoteConnectError,
+          `Skipped — fix prerequisites test first: ${_remoteConnectError}`,
+        ).toBeFalsy();
       }
 
       // ── REB-WS-REMOTE-EVENT ───────────────────────────────────────────────

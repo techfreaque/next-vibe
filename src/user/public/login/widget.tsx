@@ -5,6 +5,7 @@
 "use client";
 
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
+import { broadcastAuthChange } from "next-vibe/identity/auth/tab-sync";
 import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
@@ -32,6 +33,7 @@ import {
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetOnSubmit,
   useWidgetResponse,
   useWidgetTranslation,
@@ -64,6 +66,7 @@ export function LoginFormContainer({
   const response = useWidgetResponse();
   const isSubmitting = useWidgetIsSubmitting();
   const locale = useWidgetLocale();
+  const logger = useWidgetLogger();
   // Footer links keep locale + return path: "Sign up" from a login opened by
   // the referral page must still end on the referral dashboard.
   const searchParams = useSearchParams();
@@ -95,6 +98,14 @@ export function LoginFormContainer({
       setPhase("code");
     }
   }
+
+  // Logged in: the session cookie changed for every tab of this browser.
+  // Other open tabs switch to the new identity without a reload.
+  useEffect(() => {
+    if (response?.success) {
+      broadcastAuthChange("login", logger);
+    }
+  }, [response, logger]);
 
   useEffect(() => {
     if (phase !== "code") {

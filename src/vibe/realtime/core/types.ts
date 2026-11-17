@@ -42,8 +42,27 @@ export interface WsWireMessage<
   readonly event: string;
   /** Event payload */
   readonly data: T;
-  /** Monotonic sequence ID for ordering / resumability */
+  /**
+   * Replay sequence id. Strictly increasing per channel and shared by every
+   * server on the same pub/sub bus (time-based, so it also keeps increasing
+   * across restarts). A client resubscribing after a drop sends the last seq
+   * it saw as `since` and the server replays what it missed. 0 = unsequenced
+   * (published by an older build): deliver, never dedupe.
+   */
   readonly seq: number;
+}
+
+/**
+ * Server → client acknowledgement of a `replay: true` subscribe. Sent after
+ * the replayed events (if any) for that channel. `cursor` is the seq the client
+ * is now caught up to; `complete: false` means the requested gap is older than
+ * the server's replay buffer, so the client must refetch the channel's data.
+ */
+export interface WsSubscribedFrame {
+  readonly type: "subscribed";
+  readonly channel: string;
+  readonly cursor: number;
+  readonly complete: boolean;
 }
 
 /**
@@ -101,6 +120,32 @@ export function parseWsFrame(raw: string): WsWireFrame | null {
   }
 }
 
+const subscribedFrameSchema = z.object({
+  type: z.literal("subscribed"),
+  channel: z.string(),
+  cursor: z.number(),
+  complete: z.boolean(),
+});
+
+/**
+ * Browser-side frame parser: event/batch frames plus the subscribe ack, which
+ * only a client that asked for replay (`replay: true`) ever receives. Server
+ * consumers (connector, keyed-signal) keep using `parseWsFrame`.
+ */
+export function parseWsClientFrame(
+  raw: string,
+): WsWireFrame | WsSubscribedFrame | null {
+  if (raw.startsWith('{"type":"subscribed"')) {
+    try {
+      const result = subscribedFrameSchema.safeParse(JSON.parse(raw));
+      return result.success ? result.data : null;
+    } catch {
+      return null;
+    }
+  }
+  return parseWsFrame(raw);
+}
+
 /**
  * Structured descriptor for an ENDPOINT channel subscription. The client sends
  * this instead of trusting a raw channel string: the server rebuilds the
@@ -137,6 +182,14 @@ interface WsSubscribeMessage {
   readonly channel: string;
   readonly locale: CountryLanguage;
   readonly descriptor?: WsChannelDescriptor;
+  /**
+   * The client understands replay: the server answers with a `subscribed`
+   * ack (and replays missed events when `since` is set). Absent for older
+   * clients and server-side sockets, which get the plain live stream.
+   */
+  readonly replay?: boolean;
+  /** Last seq the client saw on this channel before its socket dropped. */
+  readonly since?: number;
 }
 
 interface WsUnsubscribeMessage {
@@ -171,6 +224,8 @@ const clientMessageSchema = z.discriminatedUnion("type", [
     channel: z.string(),
     locale: z.enum(CountryLanguageValues),
     descriptor: descriptorSchema.optional(),
+    replay: z.boolean().optional(),
+    since: z.number().int().nonnegative().optional(),
   }),
   z.object({
     type: z.literal("unsubscribe"),
@@ -220,6 +275,12 @@ export interface WsConnectionData {
    * can forcibly close it on disconnect without waiting for the client side.
    */
   connectorInstanceId?: string;
+  /**
+   * Channels whose subscribe ack is still being prepared (replay read in
+   * flight). Live events for such a channel are held here and flushed after
+   * the replayed events, so the socket sees one gap-free, ordered sequence.
+   */
+  replayQueues?: Map<string, WsWireMessage[]>;
 }
 
 // ============================================================================

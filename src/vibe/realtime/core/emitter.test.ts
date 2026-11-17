@@ -53,7 +53,7 @@ function installBroadcast(): void {
   const target: LocalBroadcastTarget = {
     broadcastToAll,
     broadcastBatch: vi.fn(),
-    getChannelSize: () => channelSize,
+    isChannelLive: () => channelSize > 0,
     closeConnectorSocket: vi.fn(),
   };
   registerLocalBroadcast(target);

@@ -160,8 +160,8 @@ describe("RedisPubSubAdapter reconnect (real Redis)", () => {
     const other = new RedisPubSubAdapter(REDIS_URL.href);
     const got: string[] = [];
     try {
-      adapter.subscribe("t:before", (_event, data) => {
-        got.push(`before:${JSON.stringify(data)}`);
+      adapter.subscribe("t:before", (event, data) => {
+        got.push(`${event}:before:${JSON.stringify(data)}`);
       });
       // Wait until the subscription is live.
       expect(
@@ -174,8 +174,8 @@ describe("RedisPubSubAdapter reconnect (real Redis)", () => {
 
       await proxy.down();
       // Subscribed while the link is down.
-      adapter.subscribe("t:during", (_event, data) => {
-        got.push(`during:${JSON.stringify(data)}`);
+      adapter.subscribe("t:during", (event, data) => {
+        got.push(`${event}:during:${JSON.stringify(data)}`);
       });
       // Publishing while down must not throw or reject unhandled.
       adapter.publish("t:before", "e", envelope(99));
@@ -189,8 +189,8 @@ describe("RedisPubSubAdapter reconnect (real Redis)", () => {
           other.publish("t:before", "e", envelope(1));
           other.publish("t:during", "e", envelope(2));
           return (
-            got.some((g) => g.startsWith("before:")) &&
-            got.some((g) => g.startsWith("during:"))
+            got.some((g) => g.includes(":before:")) &&
+            got.some((g) => g.includes(":during:"))
           );
         }, 15_000),
       ).toBe(true);

@@ -165,7 +165,7 @@ describe("startCliEventTap", () => {
     const previous: LocalBroadcastTarget = {
       broadcastToAll: vi.fn(),
       broadcastBatch: vi.fn(),
-      getChannelSize: (): number => 3,
+      isChannelLive: (): boolean => true,
       closeConnectorSocket: vi.fn(),
     };
     registerLocalBroadcast(previous);
@@ -184,7 +184,7 @@ describe("startCliEventTap", () => {
     const previous: LocalBroadcastTarget = {
       broadcastToAll: chained,
       broadcastBatch: vi.fn(),
-      getChannelSize: (): number => 1,
+      isChannelLive: (): boolean => true,
       closeConnectorSocket: vi.fn(),
     };
     registerLocalBroadcast(previous);

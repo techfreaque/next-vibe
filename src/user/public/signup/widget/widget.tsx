@@ -7,6 +7,7 @@
 import skillSingleDefinition from "next-vibe/agent/skills/[id]/definition";
 import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { broadcastAuthChange } from "next-vibe/identity/auth/tab-sync";
 import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
@@ -47,6 +48,7 @@ import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
@@ -110,6 +112,15 @@ export function SignupFormContainer({
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
   const data = useWidgetValue<typeof definition.POST>();
+  const response = useWidgetResponse();
+
+  // Signed up: the lead cookie became a session for every tab of this
+  // browser. Other open tabs switch to the new account without a reload.
+  useEffect(() => {
+    if (response?.success) {
+      broadcastAuthChange("signup", logger);
+    }
+  }, [response, logger]);
   // Keep the return path: a partner sent here from "Get your partner link"
   // who already has an account must still land on the referral dashboard.
   const searchParams = useSearchParams();
@@ -185,7 +196,7 @@ export function SignupFormContainer({
       const goneSkillIds = new Set<string>();
       const resolved = await Promise.allSettled(
         missing.map(async (s) => {
-          const response = await executeQuery({
+          const skillResponse = await executeQuery({
             endpoint: skillSingleDefinition.GET,
             logger,
             user,
@@ -193,13 +204,13 @@ export function SignupFormContainer({
             requestData: undefined,
             pathParams: { id: s.skillId },
           });
-          if (!response.success) {
-            if (response.errorType?.errorCode === 404) {
+          if (!skillResponse.success) {
+            if (skillResponse.errorType?.errorCode === 404) {
               goneSkillIds.add(s.skillId);
             }
             return s;
           }
-          return { skillId: s.skillId, name: response.data.name ?? null };
+          return { skillId: s.skillId, name: skillResponse.data.name ?? null };
         }),
       );
       const updates = new Map<string, string | null>();

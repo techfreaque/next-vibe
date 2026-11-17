@@ -374,12 +374,12 @@ export function createEndpointEmitter<TEndpoint extends CreateApiEndpointAny>(
       channel: pathChannel,
     };
 
-    // Presence gate — skip local delivery when we can SEE there are zero local
-    // subscribers. Only possible when the proxy runs in-process; across the
-    // loopback POST the count is unknowable, so we always attempt delivery.
+    // Presence gate — skip local delivery when we can SEE nobody can need it:
+    // no local subscriber, no replay buffer (no client mid-reconnect) and no
+    // other node on the bus. Only possible when the proxy runs in-process;
+    // across the loopback POST it is unknowable, so we always attempt delivery.
     const local = getLocalBroadcast();
-    const knownEmpty =
-      local !== null && local.getChannelSize(deliveryChannel) === 0;
+    const knownEmpty = local !== null && !local.isChannelLive(deliveryChannel);
 
     // Passive in-process taps (e.g. the CLI live renderer) see EVERY event, and
     // see it before delivery is decided. Deliberately above the presence gate

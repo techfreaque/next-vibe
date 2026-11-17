@@ -53,6 +53,10 @@ import {
 import { handleHttpProxy } from "./http-proxy";
 import { getPubSubAdapter } from "./pubsub/index";
 import {
+  REPLAY_TOUCH_INTERVAL_MS,
+  type ReplayPrepareResult,
+} from "./replay-buffer";
+import {
   authenticateWsRequest,
   authorizeWsChannel,
   describeSubscribeIdentity,
@@ -109,9 +113,6 @@ function isLoopbackAddress(addr: string): boolean {
   );
 }
 
-/** Global sequence counter for event ordering */
-let globalSeq = 0;
-
 /** Set to true during shutdown to suppress expected proxy errors */
 let shuttingDown = false;
 
@@ -135,92 +136,60 @@ function closeAllWsClients(reason: string): number {
 }
 
 /**
- * Broadcast to all subscribers on a channel (no user filter).
- * Used by pub/sub adapters that relay events from other processes.
+ * Deliver an already-sequenced event to this process's sockets on `channel`.
+ * Called by the pub/sub adapter (local publish, or the Redis relay
+ * subscription) — never directly by emitters, which go through `publish` so
+ * the event gets its replay seq and lands in the replay buffer.
+ * A socket whose subscribe ack is still being prepared gets the event queued
+ * (see syncSubscription) instead of sent.
  */
 export function broadcastLocalToAll(
   channel: string,
   event: string,
   data: AnyEndpointEventEnvelope,
+  seq: number,
 ): void {
   const subscribers = channels.get(channel);
   if (!subscribers || subscribers.size === 0) {
     return;
   }
 
-  globalSeq++;
-  const message: WsWireMessage = {
-    channel,
-    event,
-    data,
-    seq: globalSeq,
-  };
+  const message: WsWireMessage = { channel, event, data, seq };
 
   const sendStart = performance.now();
-  const payload = JSON.stringify(message);
+  let payload: string | null = null;
   for (const ws of subscribers) {
-    try {
-      ws.send(payload);
-    } catch {
-      // Socket may be closing - silently skip
-    }
-  }
-  recordWsBroadcast(channel, payload.length, performance.now() - sendStart);
-}
-
-/**
- * Broadcast multiple events to LOCAL subscribers in a single WS frame per socket.
- * More efficient than calling broadcastLocalToAll() N times when emitting a batch.
- * Access control is enforced at subscribe time (not at broadcast time).
- */
-export function broadcastLocalBatch(events: WsBatchEvent[]): void {
-  if (events.length === 0) {
-    return;
-  }
-
-  // Collect union of all channels referenced
-  const channelNames = [...new Set(events.map((e) => e.channel))];
-
-  // Find all sockets subscribed to at least one of those channels
-  const socketsToSend = new Set<ServerWebSocket<WsConnectionData>>();
-  for (const ch of channelNames) {
-    const subs = channels.get(ch);
-    if (!subs) {
+    const queue = ws.data.replayQueues?.get(channel);
+    if (queue) {
+      queue.push(message);
       continue;
     }
-    for (const ws of subs) {
-      socketsToSend.add(ws);
-    }
-  }
-
-  if (socketsToSend.size === 0) {
-    return;
-  }
-
-  // Assign seq numbers and build batch payload
-  const eventsWithSeq = events.map((e) => {
-    globalSeq++;
-    return { ...e, seq: globalSeq };
-  });
-  const sendStart = performance.now();
-  const payload = JSON.stringify({ type: "batch", events: eventsWithSeq });
-
-  for (const ws of socketsToSend) {
+    payload ??= JSON.stringify(message);
     try {
       ws.send(payload);
     } catch {
       // Socket may be closing - silently skip
     }
   }
-  recordWsBroadcast(
-    `batch:${channelNames[0] ?? ""}`,
-    payload.length,
-    performance.now() - sendStart,
-  );
+  if (payload !== null) {
+    recordWsBroadcast(channel, payload.length, performance.now() - sendStart);
+  }
 }
 
 /**
- * Publish an event through the pub/sub adapter.
+ * Publish several events (the /ws/broadcast batch body). Each goes through the
+ * adapter like a single publish, so every event gets its replay seq and
+ * reaches the other node in WS_PUBSUB_TYPE=redis.
+ */
+export function broadcastLocalBatch(events: WsBatchEvent[]): void {
+  for (const e of events) {
+    publish(e.channel, e.event, e.data);
+  }
+}
+
+/**
+ * Publish an event through the pub/sub adapter: assigns the replay seq,
+ * records it for catch-up, and delivers to every node's subscribers.
  * NOTE: Route handlers should use createEndpointEmitter() from emitter.ts instead.
  */
 export function publish(
@@ -236,6 +205,103 @@ export function publish(
  */
 export function getChannelSize(channel: string): number {
   return channels.get(channel)?.size ?? 0;
+}
+
+/**
+ * Whether an emit on `channel` has to be published at all: a local socket
+ * listens, the channel keeps a replay buffer (a client may be mid-reconnect),
+ * or (Redis) another node may hold its subscribers.
+ */
+export function isChannelLive(channel: string): boolean {
+  return getChannelSize(channel) > 0 || getPubSubAdapter().mustPublish(channel);
+}
+
+/**
+ * Answer a replay-aware subscribe: replay what the socket missed after
+ * `since` (or hand out the cursor on a first subscribe), then send the
+ * `subscribed` ack. Live events that arrive meanwhile are queued on the socket
+ * and flushed after the replay, skipping what the replay already covered, so
+ * the client sees one ordered, gap-free sequence. Authorization already ran:
+ * this only ever replays a channel the socket was just admitted to.
+ */
+async function syncSubscription(
+  ws: ServerWebSocket<WsConnectionData>,
+  channel: string,
+  since: number | undefined,
+  logger: EndpointLogger,
+): Promise<void> {
+  const queues = (ws.data.replayQueues ??= new Map());
+  if (queues.has(channel)) {
+    return; // a sync for this channel is already running
+  }
+  const queue: WsWireMessage[] = [];
+  queues.set(channel, queue);
+
+  const adapter = getPubSubAdapter();
+  let result: ReplayPrepareResult;
+  try {
+    // The relay subscription must be live before the buffer is read, or an
+    // event published in between is in neither.
+    await adapter.whenSubscribed(channel);
+    result = await adapter.prepareReplay(channel, since);
+  } catch (err) {
+    logger.warn("[WS] Replay read failed - client will refetch", {
+      channel,
+      since,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    result = { cursor: 0, complete: since === undefined, events: [] };
+  }
+  queues.delete(channel);
+  if (!ws.data.channels.has(channel)) {
+    return; // unsubscribed (or closed) while the replay was read
+  }
+
+  let last = since ?? 0;
+  const out: WsWireMessage[] = [];
+  for (const entry of result.events) {
+    if (entry.seq > last) {
+      out.push({
+        channel,
+        event: entry.event,
+        data: entry.data,
+        seq: entry.seq,
+      });
+      last = entry.seq;
+    }
+  }
+  for (const message of queue) {
+    // seq 0 = unsequenced (older publisher): always deliver.
+    if (message.seq === 0 || message.seq > last) {
+      out.push(message);
+      last = Math.max(last, message.seq);
+    }
+  }
+  try {
+    if (out.length > 0) {
+      ws.send(JSON.stringify({ type: "batch", events: out }));
+    }
+    // "type" first: the client recognizes the ack by its prefix.
+    ws.send(
+      JSON.stringify({
+        type: "subscribed",
+        channel,
+        cursor: Math.max(result.cursor, last),
+        complete: result.complete,
+      }),
+    );
+  } catch {
+    // Socket closing - the next reconnect replays again
+  }
+  if (since !== undefined) {
+    logger.debug("[WS] Resubscribe replay", {
+      channel,
+      since,
+      replayed: result.events.length,
+      queued: queue.length,
+      complete: result.complete,
+    });
+  }
 }
 
 // ============================================================================
@@ -261,8 +327,8 @@ function subscribeToChannel(
   // would deliver every published event twice to every socket.
   const adapter = getPubSubAdapter();
   if (isNewChannel && !adapter.deliversToLocalSockets) {
-    adapter.subscribe<AnyEndpointEventEnvelope>(channel, (event, data) => {
-      broadcastLocalToAll(channel, event, data);
+    adapter.subscribe<AnyEndpointEventEnvelope>(channel, (event, data, seq) => {
+      broadcastLocalToAll(channel, event, data, seq);
     });
   }
 }
@@ -276,6 +342,9 @@ function unsubscribeFromChannel(
     set.delete(ws);
     if (set.size === 0) {
       channels.delete(channel);
+      // Keep the replay state alive from the moment the last socket left: a
+      // client mid-reconnect resubscribes within the state TTL.
+      getPubSubAdapter().touchReplay([channel]);
       // Symmetric to subscribeToChannel: no relay subscription was registered
       // for a locally-delivering adapter, so don't tear one down either (it
       // could remove an unrelated server-side handler on the same channel).
@@ -286,6 +355,7 @@ function unsubscribeFromChannel(
     }
   }
   ws.data.channels.delete(channel);
+  ws.data.replayQueues?.delete(channel);
 }
 
 function unsubscribeFromAll(ws: ServerWebSocket<WsConnectionData>): void {
@@ -657,6 +727,14 @@ export function startWebSocketServer(
               ws as ServerWebSocket<WsConnectionData>,
               msg.channel,
             );
+            if (msg.replay) {
+              await syncSubscription(
+                ws as ServerWebSocket<WsConnectionData>,
+                msg.channel,
+                msg.since,
+                logger,
+              );
+            }
           } else if (msg.type === "unsubscribe") {
             unsubscribeFromChannel(
               ws as ServerWebSocket<WsConnectionData>,
@@ -719,15 +797,22 @@ export function startWebSocketServer(
   // Expose direct in-process delivery so emits originating in THIS process skip
   // the loopback /ws/broadcast POST. Separate-process callers still POST.
   registerLocalBroadcast({
-    broadcastToAll: broadcastLocalToAll,
+    broadcastToAll: publish,
     broadcastBatch: broadcastLocalBatch,
-    getChannelSize,
+    isChannelLive,
     closeConnectorSocket,
   });
+
+  // Replay state of channels that still have subscribers must not expire
+  // (Redis TTL / in-memory sweep); the last unsubscribe touches it once more.
+  const replayTouchTimer = setInterval(() => {
+    getPubSubAdapter().touchReplay([...channels.keys()]);
+  }, REPLAY_TOUCH_INTERVAL_MS);
 
   return {
     stop: (): void => {
       shuttingDown = true;
+      clearInterval(replayTouchTimer);
       clearLocalBroadcast();
       // Close every client socket with 1012 "Service Restart" + a reason
       // first, so the browser's "[WS Client] Connection lost" row says the

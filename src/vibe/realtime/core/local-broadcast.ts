@@ -17,6 +17,10 @@ import "server-only";
 import type { WsBatchEvent, WsWireMessage } from "./types";
 
 export interface LocalBroadcastTarget {
+  /**
+   * Publish one event through the pub/sub adapter: assigns its replay seq,
+   * records it for reconnect catch-up and delivers it to every node's sockets.
+   */
   broadcastToAll: (
     channel: string,
     event: string,
@@ -24,11 +28,14 @@ export interface LocalBroadcastTarget {
   ) => void;
   broadcastBatch: (events: WsBatchEvent[]) => void;
   /**
-   * Live local subscriber count for a channel. Only meaningful when the proxy
-   * runs in THIS process — across the loopback POST the emitter cannot know the
-   * count, so presence-gating only applies when this target is registered.
+   * Whether an emit on this channel must be published: a local socket
+   * listens, the channel keeps a replay buffer (a client may be
+   * mid-reconnect), or another node may hold subscribers (Redis). Only
+   * meaningful when the proxy runs in THIS process — across the loopback POST
+   * the emitter cannot know, so presence-gating only applies when this target
+   * is registered.
    */
-  getChannelSize: (channel: string) => number;
+  isChannelLive: (channel: string) => boolean;
   /**
    * Forcibly close the inbound WS socket for a reverse-ws connector.
    * Called on disconnect so both outbound connector and inbound socket tear

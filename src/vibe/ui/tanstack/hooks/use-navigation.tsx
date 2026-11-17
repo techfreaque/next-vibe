@@ -18,10 +18,15 @@ export function useRouter(): {
   push: (url: string) => void;
   replace: (url: string) => void;
   back: () => void;
+  refresh: () => Promise<void>;
 } {
   const navigate = useNavigate();
+  const router = useTanStackRouter();
 
   return {
+    // Next.js router.refresh(): re-run the current route's loaders (server
+    // fns read the CURRENT cookies) and re-render with the fresh data.
+    refresh: (): Promise<void> => router.invalidate(),
     push: (url: string): void => {
       void navigate({ href: url });
     },

@@ -8,6 +8,7 @@
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { scopedTranslation as authScopedTranslation } from "next-vibe/identity/auth/i18n";
 import { AuthClientRepository } from "next-vibe/identity/auth/repository-client";
+import { broadcastAuthChange } from "next-vibe/identity/auth/tab-sync";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { useToast } from "next-vibe/ui/hooks/use-toast";
@@ -55,6 +56,8 @@ export function useLogout(
 
       // remove react native token - web token is already cleared by server
       await AuthClientRepository.removeAuthToken(logger, authT);
+      // Other open tabs drop the session too, without a reload.
+      broadcastAuthChange("logout", logger);
       // Invalidate credits queries to trigger refetch with new auth state
       await apiClient.refetchEndpoint(definitions.GET, logger);
 
@@ -71,6 +74,7 @@ export function useLogout(
       });
       // remove react native token - web token is already cleared by server
       await AuthClientRepository.removeAuthToken(logger, authT);
+      broadcastAuthChange("logout", logger);
 
       // Invalidate credits queries to trigger refetch with new auth state
       await apiClient.refetchEndpoint(definitions.GET, logger);

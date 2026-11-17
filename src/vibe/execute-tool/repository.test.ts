@@ -39,7 +39,7 @@ type ResultProps = Parameters<typeof handleToolResult>[0];
 
 function makeIncomingProps(
   overrides: Pick<IncomingProps, "requestData" | "payload"> & {
-    logger: ReturnType<typeof createEndpointLogger>;
+    logger?: ReturnType<typeof createEndpointLogger>;
   },
 ): IncomingProps {
   return {
@@ -58,7 +58,7 @@ function makeIncomingProps(
 
 function makeResultProps(
   overrides: Pick<ResultProps, "responseData"> & {
-    logger: ReturnType<typeof createEndpointLogger>;
+    logger?: ReturnType<typeof createEndpointLogger>;
   },
 ): ResultProps {
   return {
@@ -101,7 +101,7 @@ describe("RouteExecuteRepository remote handlers", () => {
     registerLocalBroadcast({
       broadcastToAll,
       broadcastBatch: vi.fn(),
-      getChannelSize: vi.fn(() => 1),
+      isChannelLive: vi.fn(() => true),
       closeConnectorSocket: vi.fn(),
     });
 
@@ -136,7 +136,7 @@ describe("RouteExecuteRepository remote handlers", () => {
     registerLocalBroadcast({
       broadcastToAll,
       broadcastBatch: vi.fn(),
-      getChannelSize: vi.fn(() => 1),
+      isChannelLive: vi.fn(() => true),
       closeConnectorSocket: vi.fn(),
     });
 

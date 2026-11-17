@@ -7,6 +7,7 @@ import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import { AgentAvailabilityProvider } from "next-vibe/agent/env-availability-store";
 import { TranslationProvider } from "next-vibe/core/i18n/core/client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { TabIdentitySync } from "next-vibe/identity/auth/tab-identity-sync";
 import { ErrorBoundary } from "next-vibe/ui/components/error-boundary";
 import {
   type ThemePreference,
@@ -44,6 +45,7 @@ export function RootProviders({
             <AgentAvailabilityProvider availability={availability}>
               <ErrorBoundary locale={locale}>{children}</ErrorBoundary>
               <LeadTrackingProvider />
+              <TabIdentitySync />
               <Toaster />
             </AgentAvailabilityProvider>
           </TranslationProvider>

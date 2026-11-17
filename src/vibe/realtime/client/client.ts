@@ -15,6 +15,13 @@
  * from the endpoint definition and applies events to the React Query cache. This
  * module is the transport beneath it: `subscribeToChannel` registers a handler,
  * `preWarmChannel` opens the socket early (e.g. just before a stream POST).
+ *
+ * Catch-up after reconnect: every event carries a per-channel replay `seq`.
+ * The client remembers the last one per channel and, when the socket comes
+ * back (network blip, deploy drain 1012, the other HA node), resubscribes with
+ * `since`; the server replays what was published in the gap. When the gap is
+ * older than the server's buffer it answers `complete: false` and the
+ * channel's resync handlers refetch instead (`onChannelResync`).
  */
 
 import { addDocumentListener, addWindowListener } from "next-vibe/ui/lib/dom";
@@ -27,9 +34,10 @@ import type {
   EventHandler,
   WsChannelDescriptor,
   WsClientMessage,
+  WsSubscribedFrame,
   WsWireMessage,
 } from "../core/types";
-import { parseWsFrame } from "../core/types";
+import { parseWsClientFrame } from "../core/types";
 
 /**
  * Internal wire handler — accepts wire-protocol data (WsWireMessage["data"]).
@@ -53,10 +61,33 @@ interface ChannelState {
    * Stored so reconnect re-sends it with the subscription.
    */
   descriptor?: WsChannelDescriptor;
+  /**
+   * Last replay seq delivered on this channel (from any socket). Sent as
+   * `since` on resubscribe so the server replays the gap. null = nothing seen
+   * yet (first subscribe).
+   */
+  lastSeq: number | null;
+  /**
+   * The server acked this channel's subscribe on the CURRENT socket. Only then
+   * is `seq <= lastSeq` a duplicate: an older server build without replay
+   * numbers its frames differently, so dedupe stays off until it acks.
+   */
+  acked: boolean;
+  /**
+   * Subscribed before an identity change. The new socket defers it: the
+   * owning widgets re-subscribe for the new identity themselves (their user
+   * changed), and resending the old identity's channels would only be denied.
+   * Whatever is still mounted after the grace period is resubscribed.
+   */
+  identityStale: boolean;
 }
 
 /** RFC 6455 close code the server sends on a restart or deploy drain. */
 const WS_SERVICE_RESTART_CODE = 1012;
+/** Our own close code: the tab's identity changed, reconnect with new cookies. */
+const WS_IDENTITY_CHANGED_CODE = 4001;
+/** How long the new socket waits before resubscribing pre-switch channels. */
+const IDENTITY_RESUBSCRIBE_GRACE_MS = 3_000;
 
 // Shared connection state
 let sharedWs: WebSocket | null = null;
@@ -67,6 +98,10 @@ let reconnectPaused = false;
 
 // Virtual channel subscriptions: channel → ChannelState
 const channels = new Map<string, ChannelState>();
+
+// Gap-too-old handlers per channel (refetch the channel's data). Kept apart
+// from ChannelState so a handler can register before/after the subscription.
+const resyncHandlers = new Map<string, Set<() => void>>();
 
 // Last real logger handed to connect(): the visibility-restore reconnect has
 // no caller of its own, and a no-op logger there hid every failure after it.
@@ -89,6 +124,17 @@ function sendToServer(msg: WsClientMessage): void {
   }
 }
 
+function sendSubscribe(channel: string, state: ChannelState): void {
+  sendToServer({
+    type: "subscribe",
+    channel,
+    locale: state.locale,
+    descriptor: state.descriptor,
+    replay: true,
+    since: state.lastSeq ?? undefined,
+  });
+}
+
 function handleOpen(): void {
   openedAt = Date.now();
   lastFrameAt = null;
@@ -101,19 +147,77 @@ function handleOpen(): void {
   }
   disconnectedAt = null;
   reconnectAttempts = 0;
-  // Re-subscribe to all active channels after reconnect.
+  // Re-subscribe to all active channels after reconnect, each with the last
+  // seq it saw so the server replays the gap.
+  let deferred = false;
   for (const [channel, state] of channels.entries()) {
-    sendToServer({
-      type: "subscribe",
-      channel,
-      locale: state.locale,
-      descriptor: state.descriptor,
-    });
+    state.acked = false;
+    if (state.identityStale) {
+      deferred = true;
+      continue;
+    }
+    sendSubscribe(channel, state);
+  }
+  if (deferred) {
+    setTimeout(() => {
+      for (const [channel, state] of channels.entries()) {
+        if (state.identityStale) {
+          state.identityStale = false;
+          sendSubscribe(channel, state);
+        }
+      }
+    }, IDENTITY_RESUBSCRIBE_GRACE_MS);
+  }
+}
+
+function handleSubscribed(
+  frame: WsSubscribedFrame,
+  logger: EndpointLogger,
+): void {
+  const state = channels.get(frame.channel);
+  if (!state) {
+    return;
+  }
+  const since = state.lastSeq;
+  state.acked = true;
+  state.lastSeq = Math.max(state.lastSeq ?? 0, frame.cursor);
+  if (frame.complete) {
+    return;
+  }
+  // The gap is older than the server's replay buffer: events are missing for
+  // good, so the channel's data has to be refetched.
+  const handlers = resyncHandlers.get(frame.channel);
+  logger.info("[WS Client] Replay gap too old - refetching channel", {
+    channel: frame.channel,
+    since,
+    cursor: frame.cursor,
+    handlerCount: handlers?.size ?? 0,
+  });
+  if (!handlers) {
+    return;
+  }
+  for (const handler of handlers) {
+    try {
+      handler();
+    } catch (error) {
+      logger.error(
+        "[WS Client] Resync handler threw",
+        error instanceof Error ? error : String(error),
+        { channel: frame.channel },
+      );
+    }
   }
 }
 
 function dispatch(msg: WsWireMessage, logger: EndpointLogger): void {
-  const handlers = channels.get(msg.channel)?.listeners.get(msg.event);
+  const state = channels.get(msg.channel);
+  if (state && typeof msg.seq === "number" && msg.seq > 0) {
+    if (state.acked && state.lastSeq !== null && msg.seq <= state.lastSeq) {
+      return; // already delivered (replay overlap)
+    }
+    state.lastSeq = Math.max(state.lastSeq ?? 0, msg.seq);
+  }
+  const handlers = state?.listeners.get(msg.event);
   if (handlers) {
     for (const handler of handlers) {
       try {
@@ -156,28 +260,36 @@ function connect(logger: EndpointLogger): void {
   sharedWs = ws;
 
   const handleMessage = (event: MessageEvent): void => {
+    if (sharedWs !== ws) {
+      return; // a replaced socket (identity change) - its frames are stale
+    }
     lastFrameAt = Date.now();
     if (typeof event.data !== "string") {
       logger.error("[WS Client] Ignored non-string frame");
       return;
     }
-    const frame = parseWsFrame(event.data);
+    const frame = parseWsClientFrame(event.data);
     if (!frame) {
       logger.error("[WS Client] Failed to parse message", {
         dataPreview: event.data.slice(0, 500),
       });
       return;
     }
-    if ("type" in frame) {
+    if (!("type" in frame)) {
+      dispatch(frame, logger);
+    } else if (frame.type === "batch") {
       for (const msg of frame.events) {
         dispatch(msg, logger);
       }
     } else {
-      dispatch(frame, logger);
+      handleSubscribed(frame, logger);
     }
   };
 
   const handleClose = (event: CloseEvent): void => {
+    if (sharedWs !== ws) {
+      return; // replaced on purpose (identity change); the new socket owns state
+    }
     sharedWs = null;
     const closedAt = Date.now();
     const socketOpenedAt = openedAt;
@@ -222,7 +334,8 @@ function connect(logger: EndpointLogger): void {
     // 1012 "Service Restart" on the first drop = a deploy moved this node out
     // of rotation (or restarted it): the peer is already serving, so come
     // back fast, with jitter so every tab does not reconnect in the same tick.
-    // Events emitted during the gap are not replayed; keep it short.
+    // Events emitted during the gap are replayed on resubscribe (bounded
+    // buffer); an older gap makes the channel refetch.
     // Otherwise exponential backoff: 1s, 2s, 4s, 8s, 16s, 30s.
     const delay =
       event.code === WS_SERVICE_RESTART_CODE && reconnectAttempts === 0
@@ -297,14 +410,26 @@ function getOrCreateChannel(
     if (descriptor && !existing.descriptor) {
       existing.descriptor = descriptor;
     }
+    if (existing.identityStale) {
+      // A widget re-subscribed after the identity change: it is live again.
+      existing.identityStale = false;
+      sendSubscribe(channel, existing);
+    }
     return existing;
   }
 
-  const state: ChannelState = { listeners: new Map(), locale, descriptor };
+  const state: ChannelState = {
+    listeners: new Map(),
+    locale,
+    descriptor,
+    lastSeq: null,
+    acked: false,
+    identityStale: false,
+  };
   channels.set(channel, state);
 
   ensureConnected(logger);
-  sendToServer({ type: "subscribe", channel, locale, descriptor });
+  sendSubscribe(channel, state);
   return state;
 }
 
@@ -363,4 +488,59 @@ export function preWarmChannel(
   descriptor?: WsChannelDescriptor,
 ): void {
   getOrCreateChannel(channel, locale, logger, descriptor);
+}
+
+/**
+ * Register a handler for "the replay gap on this channel was too old": the
+ * events missed while the socket was down are gone, so the owner of the
+ * channel's data refetches it. Returns the unregister function.
+ */
+export function onChannelResync(
+  channel: string,
+  handler: () => void,
+): () => void {
+  let handlers = resyncHandlers.get(channel);
+  if (!handlers) {
+    handlers = new Set();
+    resyncHandlers.set(channel, handlers);
+  }
+  handlers.add(handler);
+  return (): void => {
+    handlers.delete(handler);
+    if (handlers.size === 0 && resyncHandlers.get(channel) === handlers) {
+      resyncHandlers.delete(channel);
+    }
+  };
+}
+
+/**
+ * The tab's identity changed (login, signup or logout in another tab). The
+ * socket's identity is fixed at upgrade from the cookies of that moment, so
+ * user-scoped channels of the new identity would be denied on it: replace the
+ * socket. The widgets re-subscribe for the new identity as their user prop
+ * changes; channels from before the switch that are still mounted after a
+ * short grace period resubscribe too (with `since`, so shared channels keep a
+ * gap-free stream). No-op without a socket.
+ */
+export function reconnectForIdentityChange(logger: EndpointLogger): void {
+  const old = sharedWs;
+  if (!old) {
+    return;
+  }
+  sharedWs = null;
+  openedAt = null;
+  lastFrameAt = null;
+  reconnectAttempts = 0;
+  reconnectPaused = false;
+  try {
+    old.close(WS_IDENTITY_CHANGED_CODE, "identity-changed");
+  } catch {
+    /* already closing */
+  }
+  for (const state of channels.values()) {
+    state.identityStale = true;
+  }
+  if (channels.size > 0) {
+    connect(logger);
+  }
 }

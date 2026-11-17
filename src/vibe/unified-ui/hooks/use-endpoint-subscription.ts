@@ -19,6 +19,10 @@
  *  - the shared path channel (kind:"resource" emits)
  *  - the user-scoped channel `user/{uid}/{pathChannel}` (kind:"user" emits)
  * Both carry only THIS endpoint instance's events — no cross-endpoint filtering.
+ *
+ * After a socket drop the client replays the missed events (see
+ * realtime/client.ts). When the gap is older than the server's replay buffer,
+ * the owner of the cache key refetches the endpoint's data instead.
  */
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -29,7 +33,10 @@ import type { ResponseType } from "../../core/route/response.schema";
 import type { WidgetData } from "../../core/utils/json";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
-import { subscribeToChannel } from "../../realtime/client/client";
+import {
+  onChannelResync,
+  subscribeToChannel,
+} from "../../realtime/client/client";
 import {
   buildUserWsChannel,
   buildWsChannel,
@@ -299,6 +306,29 @@ export function useEndpointSubscription(
           logger,
         ),
       );
+    }
+
+    // Replay gap too old (events missed for good): refetch this cache key.
+    // Only the applier owner does it, and both channels' resyncs of one
+    // reconnect coalesce into a single invalidation.
+    let resyncQueued = false;
+    const resync = (): void => {
+      if (
+        cacheKey === undefined ||
+        resyncQueued ||
+        !isEventApplierOwner(cacheKey, applierToken)
+      ) {
+        return;
+      }
+      resyncQueued = true;
+      queueMicrotask(() => {
+        resyncQueued = false;
+        void queryClient.invalidateQueries({ queryKey: [cacheKey] });
+      });
+    };
+    unsubscribers.push(onChannelResync(pathChannel, resync));
+    if (userChannel) {
+      unsubscribers.push(onChannelResync(userChannel, resync));
     }
 
     return (): void => {

@@ -23,10 +23,14 @@ export function useRouter(): {
   push: (href: string) => void;
   replace: (href: string) => void;
   back: () => void;
+  refresh: () => void;
 } {
   const router = useExpoRouter();
 
   return {
+    // No server-rendered route data on native: screens refetch through their
+    // own queries, so a refresh has nothing to re-run.
+    refresh: (): void => undefined,
     push: (href: string): void => {
       router.push(href);
     },

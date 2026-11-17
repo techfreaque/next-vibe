@@ -890,17 +890,17 @@ if (_remoteUrl) {
         // sender — a late retry of the forward rename can re-apply the renamed
         // id AFTER the direct restore above and break the next test's row
         // lookup. Wait until the row reads HERMES_INSTANCE_ID twice in a row.
+        const read = async (): Promise<string | undefined> => {
+          const [row] = await db
+            .select({ instanceId: remoteConnections.instanceId })
+            .from(remoteConnections)
+            .where(eq(remoteConnections.id, config.id))
+            .limit(1);
+          return row?.instanceId;
+        };
         await pollUntil(
           "CN7: connection row must settle on restored id",
           async () => {
-            const read = async (): Promise<string | undefined> => {
-              const [row] = await db
-                .select({ instanceId: remoteConnections.instanceId })
-                .from(remoteConnections)
-                .where(eq(remoteConnections.id, config.id))
-                .limit(1);
-              return row?.instanceId;
-            };
             if ((await read()) !== HERMES_INSTANCE_ID) {
               return false;
             }
