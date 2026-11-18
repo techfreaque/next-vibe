@@ -105,7 +105,7 @@ export const translations: typeof enTranslations = {
     title: "Nur für Erwachsene. Ohne Filter.",
     stance:
       "Was Menschen lesen, entscheiden Menschen. Kein Konzern. Darum fragen wir einmal, statt jede Antwort zu filtern.",
-    modelLine: "Gewählt: {{model}}.",
+    modelLine: "Dieser Chat läuft auf {{model}}.",
     pointAge: "Ich bin mindestens 18 Jahre alt.",
     pointContent:
       "Unzensierte Modelle können beleidigende, falsche, gefährliche, illegale oder bösartige Inhalte erzeugen.",

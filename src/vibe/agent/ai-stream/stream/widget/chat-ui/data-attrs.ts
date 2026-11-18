@@ -1,4 +1,4 @@
-// Data-tour attribute constants - no JSX/React imports so this is safe
+// Stable DOM hook attributes (data-tour, kept for e2e selectors) - no JSX/React imports so this is safe
 // to import from API-layer widgets without creating circular dependencies.
 
 export const TOUR_DATA_ATTRS = {

@@ -9,23 +9,30 @@ import { TanstackPage as Page } from "@/_pages/skill/[skillId]/page";
 import { runPageLoader, toNextParams } from "../nextjs-compat-wrapper";
 
 const loadData = createServerFn({ method: "GET" })
-  .validator((data: Record<string, string>) => data)
+  .validator(
+    (data: {
+      params: Record<string, string>;
+      search: Record<string, string>;
+    }) => data,
+  )
   .handler(async ({ data }) =>
     runPageLoader(async () => {
       const page = await import("@/_pages/skill/[skillId]/page");
       const layout0 = await import("@/_pages/layout");
       const [pageData, head] = await Promise.all([
         page.tanstackLoader({
-          params: Promise.resolve(toNextParams(data)),
+          params: Promise.resolve(toNextParams(data.params)),
+          searchParams: Promise.resolve(data.search),
         }),
         resolvePageHead([
           () =>
             layout0.generateMetadata({
-              params: Promise.resolve(toNextParams(data)),
+              params: Promise.resolve(toNextParams(data.params)),
             }),
           () =>
             page.generateMetadata({
-              params: Promise.resolve(toNextParams(data)),
+              params: Promise.resolve(toNextParams(data.params)),
+              searchParams: Promise.resolve(data.search),
             }),
         ]),
       ]);
@@ -39,7 +46,10 @@ function PageComponent(): JSX.Element {
 
 export const Route = createFileRoute("/$locale/skill/$skillId/")({
   staleTime: 0,
-  loader: ({ params }) => loadData({ data: params as Record<string, string> }),
+  validateSearch: (search: Record<string, string>) => search,
+  loaderDeps: ({ search }) => ({ search }),
+  loader: ({ params, deps: { search } }) =>
+    loadData({ data: { params: params as Record<string, string>, search } }),
   head: ({ loaderData }) => loaderData?.head ?? {},
   component: PageComponent,
 });

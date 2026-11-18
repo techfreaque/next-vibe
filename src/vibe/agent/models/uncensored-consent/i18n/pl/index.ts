@@ -103,7 +103,7 @@ export const translations: typeof enTranslations = {
     title: "Tylko dla dorosłych. Bez filtra.",
     stance:
       "To ludzie decydują, co czytają. Nie korporacja. Dlatego pytamy raz, zamiast filtrować każdą odpowiedź.",
-    modelLine: "Wybrany model: {{model}}.",
+    modelLine: "Ten czat działa na modelu {{model}}.",
     pointAge: "Mam ukończone 18 lat.",
     pointContent:
       "Modele bez cenzury mogą generować obraźliwe, fałszywe, niebezpieczne, nielegalne lub złośliwe treści.",

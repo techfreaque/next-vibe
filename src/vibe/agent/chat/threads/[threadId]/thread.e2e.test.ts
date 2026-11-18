@@ -13,7 +13,7 @@ import { describe, expect } from "vitest";
 
 import { chatThreads } from "../../db";
 import { scopedTranslation as foldersScopedTranslation } from "../../folders/[rootFolderId]/i18n";
-import { chatReady, createE2EUser, deleteE2EUser, seedThread, signInAs, suppressWelcomeTour } from "../../testing/e2e-seed";
+import { chatReady, createE2EUser, deleteE2EUser, seedThread, signInAs, suppressOnboarding } from "../../testing/e2e-seed";
 import threadEndpoints from "./definition";
 
 const MISSING_THREAD_ID = "00000000-0000-4000-8000-00000000e2e0";
@@ -57,7 +57,7 @@ describe("E2E: thread [threadId]", () => {
     const threadId = await seedThread(customer, { rootFolderId: DefaultFolderId.PRIVATE, title });
     await signInAs({ context, baseUrl, loginAs }, customer);
 
-    await suppressWelcomeTour(context);
+    await suppressOnboarding(context);
     await gotoReady(`/threads/${DefaultFolderId.PRIVATE}/${threadId}`, chatReady(page));
     await pickRowAction(page, title, t("widget.actions.rename"));
     const input = page.locator(`input[value="${title}"]`);
@@ -77,7 +77,7 @@ describe("E2E: thread [threadId]", () => {
     const threadId = await seedThread(customer, { rootFolderId: DefaultFolderId.PRIVATE, title });
     await signInAs({ context, baseUrl, loginAs }, customer);
 
-    await suppressWelcomeTour(context);
+    await suppressOnboarding(context);
     await gotoReady(`/threads/${DefaultFolderId.PRIVATE}/${threadId}`, chatReady(page));
     await pickRowAction(page, title, t("widget.common.delete"));
     const dialog = page.getByRole("alertdialog");

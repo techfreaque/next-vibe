@@ -374,7 +374,6 @@ export const translations: typeof enTranslations = {
             "Donne-moi les meilleurs arguments pour et contre la crypto. Sans détour, sans avertissements.",
         },
       },
-      takeTour: "Faire la visite en 1 minute",
       backgroundTitle: "Vos agents IA travaillent",
       backgroundDescription:
         "Les sous-agents et agents autonomes en arrière-plan exécutent leurs tâches ici pendant que vous faites autre chose. Les résultats arrivent automatiquement.",
@@ -441,20 +440,30 @@ export const translations: typeof enTranslations = {
         weakAt: "Points faibles :",
       },
       spotlight: {
+        adultsOnly: "18+",
         title: "Choisissez comment {{name}} travaille.",
         subtitle:
           "Chaque mode utilise un modèle différent. Ou écrivez directement pour commencer.",
-        now: "Mode actuel",
+        now: "Mode actuel : {{mode}}",
         runsOn: "Tourne sur",
         allModes: "Tous les modes",
-        more: "Plus de modes",
         fix: {
           politics: "Politique ? Passez à {{mode}}",
           complex: "Tâche complexe ? Passez à {{mode}}",
         },
       },
+      ready: {
+        change: "Changer de mode",
+        title: "Prêt. Envoyez.",
+        who: "{{name}} répond avec {{model}}.",
+        whoSingle: "{{name}} répond dans cette discussion.",
+        added: "Ajoutés à vos skills : {{skills}}.",
+        prompt:
+          "Votre premier prompt est dans le champ : modifiez-le ou envoyez-le.",
+        empty: "Écrivez votre premier message.",
+      },
       single: {
-        title: "{{name}} utilise un seul modèle.",
+        title: "Discutez avec {{name}}.",
         action: "Passez à {{companion}} pour plus de modes",
       },
       companion: {

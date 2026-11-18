@@ -30,8 +30,8 @@ import {
 import { getEnvAvailability } from "../env-availability";
 import {
   EDEN_AI_URLS,
-  type EdenAiSttJob,
   edenAiErrorMessage,
+  type EdenAiSttJob,
   edenAiSttJobSchema,
   edenAiSttModel,
   edenAiUploadResponseSchema,
@@ -150,7 +150,10 @@ export class SpeechToTextRepository {
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
-    if (task === "translate" && modelOption.apiProvider !== ApiProvider.OPENAI_STT) {
+    if (
+      task === "translate" &&
+      modelOption.apiProvider !== ApiProvider.OPENAI_STT
+    ) {
       return fail({
         message: t("post.errors.unsupportedProvider", {
           provider: modelOption.apiProvider,

@@ -10,19 +10,18 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 
 import {
   type ChatT,
   scopedTranslation as chatScopedTranslation,
 } from "../../../../chat/i18n";
-import { useTourState } from "../../../../chat/tour-state";
 import favoritesEndpoint from "../../../../skills/favorites/definition";
 import { useChatFavorites } from "../../../../skills/favorites/hooks/hooks";
 
-const SelectorOnboarding = lazy(() =>
-  import("./selector-onboarding").then((mod) => ({
-    default: mod.SelectorOnboarding,
+const SelectorCompanionSetup = lazy(() =>
+  import("../onboarding/selector-companion-setup").then((mod) => ({
+    default: mod.SelectorCompanionSetup,
   })),
 );
 
@@ -50,11 +49,6 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
   const logger = useWidgetLogger();
   const platform = useWidgetPlatform();
   const { t } = chatScopedTranslation.scopedT(locale);
-  const setOnboardingComplete = useTourState((s) => s.setOnboardingComplete);
-  const setOnboardingCompanionId = useTourState(
-    (s) => s.setOnboardingCompanionId,
-  );
-  const tourActive = useTourState((s) => s.isActive);
   const { favorites, isInitialLoading: favoritesLoading } = useChatFavorites(
     logger,
     {
@@ -77,24 +71,6 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
     }
   }
 
-  useEffect(() => {
-    // Tour is waiting for onboarding signal - fire it immediately when skipping onboarding
-    if (
-      !favoritesLoading &&
-      view !== "onboarding" &&
-      !needsOnboarding &&
-      tourActive
-    ) {
-      setOnboardingComplete(true);
-    }
-  }, [
-    favoritesLoading,
-    needsOnboarding,
-    tourActive,
-    setOnboardingComplete,
-    view,
-  ]);
-
   if (view === "loading") {
     return <LoadingSpinner t={t} />;
   }
@@ -102,13 +78,9 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
   if (view === "onboarding") {
     return (
       <Suspense fallback={<LoadingSpinner t={t} />}>
-        <SelectorOnboarding
+        <SelectorCompanionSetup
           locale={locale}
-          onDone={(firstCompanionId) => {
-            setView("favorites");
-            setOnboardingCompanionId(firstCompanionId);
-            setOnboardingComplete(true);
-          }}
+          onDone={() => setView("favorites")}
         />
       </Suspense>
     );

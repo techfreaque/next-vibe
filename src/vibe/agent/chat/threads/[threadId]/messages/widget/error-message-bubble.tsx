@@ -35,7 +35,7 @@ import {
   OutOfCreditsCard,
 } from "../../../../../ai-stream/stream/widget/out-of-credits-card";
 import type { ChatMessage } from "../../../../db";
-import { useTourState } from "../../../../tour-state";
+import { useModelSelectorState } from "../../../../model-selector-state";
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
@@ -80,7 +80,7 @@ export function ErrorMessageBubble({
   const [contactPrefill, setContactPrefill] =
     useState<Partial<ContactRequest> | null>(null);
   const retryMessage = useErrorRetry();
-  const setModelSelectorOpen = useTourState(
+  const setModelSelectorOpen = useModelSelectorState(
     (state) => state.setModelSelectorOpen,
   );
 

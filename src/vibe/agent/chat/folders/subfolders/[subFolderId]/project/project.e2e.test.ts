@@ -12,7 +12,7 @@ import {
   deleteE2EUser,
   seedFolder,
   signInAs,
-  suppressWelcomeTour,
+  suppressOnboarding,
 } from "../../../../testing/e2e-seed";
 import foldersEndpoints from "../../../[rootFolderId]/definition";
 
@@ -26,7 +26,7 @@ describe("E2E: folder project settings", () => {
     const folderName = `E2E Project ${Date.now()}`;
     await seedFolder(account, DefaultFolderId.PRIVATE, folderName);
     await signInAs(fixtures, account);
-    await suppressWelcomeTour(context);
+    await suppressOnboarding(context);
 
     await open(foldersEndpoints.GET, { path: "/threads/private" });
     const row = page.getByText(folderName, { exact: true }).first();

@@ -18,7 +18,7 @@ import {
   deleteE2EUser,
   rootFolderTab,
   seedThread,
-  suppressWelcomeTour,
+  suppressOnboarding,
 } from "../testing/e2e-seed";
 import publicFeedEndpoints, { FeedSortMode } from "./definition";
 import { scopedTranslation } from "./i18n";
@@ -48,7 +48,7 @@ describe("E2E: community feed", () => {
       rolesView: [UserPermissionRole.ADMIN],
     });
 
-    await suppressWelcomeTour(context);
+    await suppressOnboarding(context);
     await fixtures.gotoReady("/threads/incognito", chatReady(page));
 
     const opened = await capture(endpoint, () =>

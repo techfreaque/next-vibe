@@ -186,6 +186,28 @@ const { POST } = createEndpoint({
           },
         );
 
+        // Guests: the localStorage create also stores the default companion
+        // when the set had none (accounts get those cards via the server's
+        // `favorite-created` event). Re-read the local list so they show.
+        if (user.isPublic) {
+          const { isCompanionSkillId } = await import("../default-companion");
+          const cachedList = apiClient.getEndpointData(
+            favoritesDefinition.default.GET,
+            logger,
+          );
+          const listHasCompanion =
+            cachedList?.success === true &&
+            cachedList.data.favorites.some((f) =>
+              isCompanionSkillId(parseSkillId(f.skillId).skillId),
+            );
+          if (!listHasCompanion) {
+            void apiClient.refetchEndpoint(
+              favoritesDefinition.default.GET,
+              logger,
+            );
+          }
+        }
+
         // Optimistically update characters list addedToFav
         apiClient.updateEndpointData(
           charactersDefinition.default.GET,

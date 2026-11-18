@@ -602,78 +602,85 @@ export const translations: typeof enTranslations = {
     },
   },
   onboarding: {
-    signin: {
-      title: "Zachowaj swoją konfigurację",
-      subtitle: "Zaloguj się raz. Wszystko, co tu zbudujesz, zostaje z Tobą.",
-      benefits: {
-        sync: {
-          title: "Synchronizacja na wszystkich urządzeniach",
-          body: "Twój towarzysz, specjaliści i rozmowy na każdym urządzeniu.",
-        },
-        keep: {
-          title: "Nic nie przepada",
-          body: "W trybie gościa wszystko zostaje tylko w tej przeglądarce. Po zalogowaniu zostaje z Tobą.",
-        },
-        private: {
-          title: "Prywatność od początku",
-          body: "Ty decydujesz o swoich danych i poziomie filtrowania. Zawsze.",
-        },
-      },
-      cta: "Zaloguj się lub załóż konto",
-      continueAsGuest: "Kontynuuj jako gość",
-      note: "Możesz zalogować się później z menu w dowolnej chwili.",
-    },
-    setup: {
-      title: "Skonfiguruj swoje AI",
+    progress: "Krok {{current}} z {{total}}",
+    skip: "Pomiń",
+    skipCompanion: "Pomiń konfigurację",
+    notNow: "Nie teraz",
+    back: "Wstecz",
+    saving: "Konfiguruję...",
+    failed: "Nie udało się zapisać. Sprawdź połączenie i spróbuj ponownie.",
+    retry: "Spróbuj ponownie",
+    guestCredits: "{{credits}} darmowych kredytów. Bez rejestracji.",
+    noProviderAvailable:
+      "Brak skonfigurowanego dostawcy AI. Dodaj OPENROUTER_API_KEY lub włącz Claude Code (CLAUDE_CODE_ENABLED=true), aby kontynuować.",
+    companion: {
+      title: "Wybierz swojego towarzysza",
       subtitle:
-        "Wybierz, z kim rozmawiasz. Specjaliści, jeśli chcesz. Wszystko zmienisz później.",
-      companionLabel: "Twój towarzysz",
-      specialistsLabel: "Dodaj specjalistów",
-      optional: "opcjonalnie",
-      start: "Zacznij rozmowę",
-      saving: "Konfiguruję...",
-      failed:
-        "Nie udało się zapisać ustawień. Sprawdź połączenie i spróbuj ponownie.",
-      retry: "Spróbuj ponownie",
+        "Towarzysz odpowiada w każdym nowym czacie. Model zmienisz w każdej chwili, także na model bez cenzury.",
+      missingTitle: "Nie masz jeszcze towarzysza",
+      missingSubtitle:
+        "Towarzysz odpowiada w każdym nowym czacie i zna twoje umiejętności. Wybierz jednego, to zajmie chwilę.",
+      arrivalTitle: "Dodano: {{skill}}. Kto będzie twoim towarzyszem?",
+      arrivalSubtitle:
+        "{{skill}} odpowiada w tym czacie. Towarzysz odpowiada w pozostałych.",
+      groupLabel: "Towarzysze",
+      recommended: "Polecany",
+      about: {
+        thea: "Ciepła, mądra i szczera. Antyczna mądrość na współczesne problemy.",
+        hermes:
+          "Konkretny i zdeterminowany. Strategia, dyscyplina, zero wymówek.",
+      },
+      voice: {
+        thea: "„Dyscyplina to forma miłości do samego siebie.”",
+        hermes: "„Motywacja to kapryśny gość, przychodzi i znika.”",
+      },
+      arrivalContinue: "Dalej",
+      continue: "Dalej: {{name}}",
+      start: "Zaczynam: {{name}}",
     },
-    usecases: {
-      noProviderAvailable:
-        "Brak skonfigurowanego dostawcy AI. Dodaj OPENROUTER_API_KEY lub włącz Claude Code (CLAUDE_CODE_ENABLED=true) aby kontynuować.",
-      coding: {
-        label: "Kodowanie & Technika",
-        hint: "Vibe Coder, Coder",
-      },
-      research: {
-        label: "Badania & Analiza",
-        hint: "Researcher, Data Analyst",
-      },
-      writing: {
-        label: "Pisanie & Edycja",
-        hint: "Writer, Editor",
-      },
-      business: {
-        label: "Biznes & Strategia",
-        hint: "Business Advisor, Product Manager",
-      },
-      learning: {
-        label: "Nauka & Edukacja",
-        hint: "Tutor, Socratic Questioner",
-      },
-      creative: {
-        label: "Kreatywność & Historie",
-        hint: "Gawędziarz, Kreatywny",
-      },
-      health: {
-        label: "Zdrowie & Kariera",
-        hint: "Wellness, Coach kariery",
-      },
-      controversial: {
-        label: "Wolne myślenie",
-        hint: "Bez cenzury, Filozof",
-      },
-      roleplay: {
-        label: "Roleplay & Postacie",
-        hint: "Roleplay, Twórca postaci",
+    consent: {
+      reason:
+        "{{skill}} działa na {{model}}, modelu bez cenzury. Potwierdź raz i rozmawiaj.",
+      label: "Jednorazowe potwierdzenie 18+",
+      agreeStart: "Mam 18+, zaczynamy",
+      agreeContinue: "Mam 18+, dalej",
+    },
+    goal: {
+      change: "Zmień",
+      title: "Od czego zaczynasz?",
+      subtitle:
+        "Dodamy pasujące umiejętności i napiszemy twój pierwszy prompt. Przed wysłaniem możesz go zmienić.",
+      groupLabel: "Pierwszy cel",
+      adds: "Dodaje: {{skills}}",
+      noSkills: "Bez dodatkowych umiejętności, tylko towarzysz",
+      adultsOnly: "18+",
+      promptLabel: "Twój pierwszy prompt",
+      start: "Zaczynamy",
+      tiles: {
+        uncensored: {
+          title: "Bez cenzury",
+          body: "Pytaj o to, czego inne AI unikają. Konkretne odpowiedzi, decyzja należy do ciebie.",
+          prompt:
+            "Czy wszystkie narkotyki powinny być legalne? Wybierz stronę i jej broń.",
+        },
+        media: {
+          title: "Obrazy, wideo, muzyka",
+          body: "Jedno zdanie i masz grafikę, klip albo piosenkę.",
+          prompt:
+            "Stwórz obraz: neonowa uliczka w Tokio nocą w deszczu, filmowy klimat, na kliszy 35 mm.",
+        },
+        coding: {
+          title: "Programowanie",
+          body: "Pisz, debuguj i wdrażaj kod.",
+          prompt:
+            "Napisz skrypt w Pythonie, który zmienia nazwę każdego zdjęcia w folderze na datę jego wykonania.",
+        },
+        chat: {
+          title: "Po prostu rozmowa",
+          body: "Przegadaj to z: {{companion}}. Nic nie trzeba ustawiać.",
+          prompt:
+            "Muszę podjąć ważną decyzję i ciągle się waham. Pomóż mi to przemyśleć.",
+        },
       },
     },
   },

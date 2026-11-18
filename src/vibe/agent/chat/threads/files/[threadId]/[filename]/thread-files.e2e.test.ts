@@ -19,7 +19,7 @@ import {
   seedThread,
   seedThreadFile,
   signInAs,
-  suppressWelcomeTour,
+  suppressOnboarding,
   TINY_PNG,
 } from "../../../../testing/e2e-seed";
 import threadFileEndpoints from "./definition";
@@ -46,7 +46,7 @@ describe("E2E: chat file serving", () => {
     cleanup(file.remove);
     await seedMessage(owner, threadId, "Here is the image", { attachment: file });
     await signInAs(fixtures, owner);
-    await suppressWelcomeTour(context);
+    await suppressOnboarding(context);
 
     const served = await capture(endpoint, () =>
       fixtures.gotoReady(`/threads/${DefaultFolderId.PRIVATE}/${threadId}`, chatReady(page)),

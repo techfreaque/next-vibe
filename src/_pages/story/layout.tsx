@@ -40,6 +40,8 @@ export interface SiteLayoutData {
   /** Visitor's own newsletter status, so footer promos render right on SSR */
   newsletterStatus: StatusGetResponseOutput | undefined;
   isHomePage: boolean;
+  /** Hide the footer newsletter card (page has its own email form). */
+  hideNewsletter?: boolean;
   children?: ReactNode;
 }
 
@@ -117,6 +119,7 @@ export function TanstackPage({
   totalModelCount,
   isHomePage,
   newsletterStatus,
+  hideNewsletter,
   children,
 }: SiteLayoutData): JSX.Element {
   return (
@@ -143,6 +146,7 @@ export function TanstackPage({
               user={user}
               userEmail={userProfile?.email}
               newsletterStatus={newsletterStatus}
+              hideNewsletter={hideNewsletter}
             />
           </Div>
         </Main>

@@ -150,6 +150,54 @@ export class FavoritesCreateRepository {
     }
   }
 
+  /** First free `baseSlug`, `baseSlug-2`, ... within this user's favorites. */
+  static async nextFreeSlug(userId: string, baseSlug: string): Promise<string> {
+    const existingSlugs = await db
+      .select({ slug: chatFavorites.slug })
+      .from(chatFavorites)
+      .where(
+        and(
+          eq(chatFavorites.userId, userId),
+          sql`${chatFavorites.slug} LIKE ${`${baseSlug}%`}`,
+        ),
+      );
+    return ensureUniqueSlug(
+      baseSlug,
+      existingSlugs.map((r) => r.slug),
+    );
+  }
+
+  /**
+   * Insert a new favorite row. A concurrent create can claim the same free
+   * slug between the slug lookup and the insert (e.g. a double click on
+   * "add"); on that (userId, slug) conflict the next free slug is taken
+   * instead of failing the create.
+   */
+  private static async insertWithFreeSlug(
+    values: typeof chatFavorites.$inferInsert & { userId: string },
+    baseSlug: string,
+  ): Promise<(typeof chatFavorites.$inferSelect)[]> {
+    const maxAttempts = 5;
+    let slug = values.slug ?? baseSlug;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const inserted = await db
+        .insert(chatFavorites)
+        .values({ ...values, slug })
+        .onConflictDoNothing({
+          target: [chatFavorites.userId, chatFavorites.slug],
+        })
+        .returning();
+      if (inserted.length > 0 || attempt === maxAttempts) {
+        return inserted;
+      }
+      slug = await FavoritesCreateRepository.nextFreeSlug(
+        values.userId,
+        baseSlug,
+      );
+    }
+    return [];
+  }
+
   /**
    * Create a new favorite
    */
@@ -322,32 +370,16 @@ export class FavoritesCreateRepository {
 
       // Generate slug for this favorite — use the remote slug when relaying so
       // slugs stay identical across instances (required for cross-instance delete).
-      let slug: string;
-      if (forcedSlug) {
-        slug = forcedSlug;
-      } else {
-        const skillSlug =
-          FavoritesCreateRepository.resolveSkillSlug(resolvedSkillId);
-        const baseSlug = generateFavoriteSlug({
+      const baseSlug =
+        generateFavoriteSlug({
           customVariantName: data.customVariantName,
-          skillSlug,
+          skillSlug:
+            FavoritesCreateRepository.resolveSkillSlug(resolvedSkillId),
           variantId: effectiveVariantId,
-        });
-        // Ensure uniqueness within this user's favorites
-        const existingSlugs = await db
-          .select({ slug: chatFavorites.slug })
-          .from(chatFavorites)
-          .where(
-            and(
-              eq(chatFavorites.userId, userId),
-              sql`${chatFavorites.slug} LIKE ${`${baseSlug}%`}`,
-            ),
-          );
-        slug = ensureUniqueSlug(
-          baseSlug || "favorite",
-          existingSlugs.map((r) => r.slug),
-        );
-      }
+        }) || "favorite";
+      const slug =
+        forcedSlug ??
+        (await FavoritesCreateRepository.nextFreeSlug(userId, baseSlug));
 
       // Normalize skillId to its canonical slug form (never store UUIDs)
       const canonicalSkillId =
@@ -408,7 +440,10 @@ export class FavoritesCreateRepository {
               },
             })
             .returning()
-        : await db.insert(chatFavorites).values(insertValues).returning();
+        : await FavoritesCreateRepository.insertWithFreeSlug(
+            insertValues,
+            baseSlug,
+          );
 
       if (!favorite) {
         return fail({
@@ -472,6 +507,20 @@ export class FavoritesCreateRepository {
           skillId: canonicalSkillId,
           user,
           logger,
+          locale,
+        });
+        // 3. A non-companion favorite on a set without any companion also
+        //    gets the default companion (one create path: each companion
+        //    card relays and emits through this same function). Relayed
+        //    creates skip it: the origin instance relays its own companion
+        //    creates.
+        const { ensureDefaultCompanion } =
+          await import("../ensure-default-companion");
+        await ensureDefaultCompanion({
+          addedSkillId: canonicalSkillId,
+          user,
+          logger,
+          t,
           locale,
         });
       }

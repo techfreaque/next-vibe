@@ -44,7 +44,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   getFolderTourAttr,
   TOUR_DATA_ATTRS,
-} from "../../../../ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
+} from "../../../../ai-stream/stream/widget/chat-ui/data-attrs";
 import cortexSearchDefinitions from "../../../../cortex/search/definition";
 import { DEFAULT_FOLDER_CONFIGS, isDefaultFolderId } from "../../../config";
 import { NEW_MESSAGE_ID } from "../../../enum";

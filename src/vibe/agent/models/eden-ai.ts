@@ -87,18 +87,14 @@ export const edenAiTtsResponseSchema = z.looseObject({
   status: z.string(),
   cost: edenAiCostSchema,
   provider: z.string().nullish(),
-  output: z
-    .looseObject({ audio_resource_url: z.string().nullish() })
-    .nullish(),
+  output: z.looseObject({ audio_resource_url: z.string().nullish() }).nullish(),
   error: edenAiErrorSchema,
 });
 
 /** POST /v3/upload response. `metadata.duration` (seconds) for audio. */
 export const edenAiUploadResponseSchema = z.looseObject({
   file_id: z.string(),
-  metadata: z
-    .looseObject({ duration: z.number().nullish() })
-    .nullish(),
+  metadata: z.looseObject({ duration: z.number().nullish() }).nullish(),
 });
 
 /** POST + GET /v3/universal-ai/async response for `audio/speech_to_text_async/*`. */

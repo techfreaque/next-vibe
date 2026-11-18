@@ -12,7 +12,7 @@ import type { JSX } from "react";
 import { useLogout } from "@/user/private/logout/hooks";
 
 import { scopedTranslation } from "../../../../../../chat/threads/widget/i18n";
-import { TOUR_DATA_ATTRS } from "../../welcome-tour/tour-config";
+import { TOUR_DATA_ATTRS } from "../../data-attrs";
 
 interface UserMenuProps {
   user: JwtPayloadType;

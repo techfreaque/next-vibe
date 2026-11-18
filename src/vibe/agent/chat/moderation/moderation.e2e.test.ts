@@ -26,7 +26,7 @@ import {
   createE2EUser,
   deleteE2EUser,
   seedThread,
-  suppressWelcomeTour,
+  suppressOnboarding,
 } from "../testing/e2e-seed";
 import reportEndpoints from "../threads/[threadId]/report/definition";
 import { THREAD_AUTO_HIDE_REPORT_THRESHOLD } from "./constants";
@@ -53,7 +53,7 @@ describe("E2E: report + moderation queue", () => {
     });
 
     // The report button shows on a public thread, for a guest
-    await suppressWelcomeTour(context);
+    await suppressOnboarding(context);
     await fixtures.gotoReady(`/threads/public/${threadId}`, chatReady(page));
     await page.getByTestId("report-thread-button").waitFor();
 

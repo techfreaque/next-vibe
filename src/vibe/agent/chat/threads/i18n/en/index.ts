@@ -371,7 +371,6 @@ export const translations = {
             "Give me the strongest case for and against crypto. No hedging, no disclaimers.",
         },
       },
-      takeTour: "Take the 1-minute tour",
       backgroundTitle: "Your AI Agents Are Working",
       backgroundDescription:
         "Sub-agents and autonomous background agents run tasks here while you focus elsewhere. Results drop in automatically.",
@@ -429,19 +428,28 @@ export const translations = {
         weakAt: "Weak at:",
       },
       spotlight: {
+        adultsOnly: "18+",
         title: "Pick how {{name}} works.",
         subtitle: "Each mode runs a different model. Or just type to start.",
-        now: "Current mode",
+        now: "Current mode: {{mode}}",
         runsOn: "Runs on",
         allModes: "All modes",
-        more: "More modes",
         fix: {
           politics: "Politics? Switch to {{mode}}",
           complex: "Complex task? Switch to {{mode}}",
         },
       },
+      ready: {
+        change: "Change mode",
+        title: "Ready. Press send.",
+        who: "{{name}} answers on {{model}}.",
+        whoSingle: "{{name}} answers this chat.",
+        added: "Added to your skills: {{skills}}.",
+        prompt: "Your first prompt is in the box: edit it or send it.",
+        empty: "Type your first message.",
+      },
       single: {
-        title: "{{name}} runs one model.",
+        title: "Chat with {{name}}.",
         action: "Switch to {{companion}} for more modes",
       },
       companion: {

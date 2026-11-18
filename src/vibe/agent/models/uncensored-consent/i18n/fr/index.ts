@@ -107,7 +107,7 @@ export const translations: typeof enTranslations = {
     title: "Réservé aux adultes. Aucun filtre.",
     stance:
       "Ce que vous lisez, c'est à vous d'en décider. Pas à une entreprise. Alors on vous pose la question une fois, au lieu de filtrer chaque réponse.",
-    modelLine: "Vous avez choisi {{model}}.",
+    modelLine: "Cette discussion tourne sur {{model}}.",
     pointAge: "J'ai 18 ans ou plus.",
     pointContent:
       "Les modèles non censurés peuvent produire des contenus offensants, faux, dangereux, illégaux ou malveillants.",

@@ -610,77 +610,83 @@ export const translations = {
     },
   },
   onboarding: {
-    signin: {
-      title: "Keep your setup",
-      subtitle: "Sign in once. Everything you build here follows you.",
-      benefits: {
-        sync: {
-          title: "Synced across devices",
-          body: "Your companion, specialists, and chats on every device you use.",
-        },
-        keep: {
-          title: "Never lose your work",
-          body: "Guest setup lives only in this browser. Sign in and it stays.",
-        },
-        private: {
-          title: "Private by default",
-          body: "You control your data and your filtering level. Always.",
-        },
-      },
-      cta: "Sign in or create account",
-      continueAsGuest: "Continue as guest",
-      note: "You can sign in later from the menu anytime.",
-    },
-    setup: {
-      title: "Set up your AI",
+    progress: "Step {{current}} of {{total}}",
+    skip: "Skip",
+    skipCompanion: "Skip setup",
+    notNow: "Not now",
+    back: "Back",
+    saving: "Setting up...",
+    failed: "Couldn't save. Check your connection and try again.",
+    retry: "Try again",
+    guestCredits: "{{credits}} free credits. No signup needed.",
+    noProviderAvailable:
+      "No AI provider configured. Add OPENROUTER_API_KEY or enable Claude Code (CLAUDE_CODE_ENABLED=true) to continue.",
+    companion: {
+      title: "Pick your companion",
       subtitle:
-        "Pick who you talk to. Add specialists if you want. Change anything later.",
-      companionLabel: "Your companion",
-      specialistsLabel: "Add specialists",
-      optional: "optional",
-      start: "Start chatting",
-      saving: "Setting up...",
-      failed: "Couldn't save your setup. Check your connection and try again.",
-      retry: "Try again",
+        "Your companion answers every new chat. Switch models anytime, uncensored included.",
+      missingTitle: "Your setup has no companion",
+      missingSubtitle:
+        "A companion answers every new chat and knows your skills. Pick one, it takes a second.",
+      arrivalTitle: "{{skill}} added. Who should be your companion?",
+      arrivalSubtitle:
+        "{{skill}} answers this chat. Your companion answers the rest.",
+      groupLabel: "Companions",
+      recommended: "Recommended",
+      about: {
+        thea: "Warm, wise and honest. Ancient wisdom for modern problems.",
+        hermes: "Direct and driven. Strategy, discipline, no excuses.",
+      },
+      voice: {
+        thea: "“Motion defeats dread every time.”",
+        hermes: "“Motivation is weather; discipline is climate.”",
+      },
+      arrivalContinue: "Continue",
+      continue: "Continue with {{name}}",
+      start: "Start with {{name}}",
     },
-    usecases: {
-      noProviderAvailable:
-        "No AI provider configured. Add OPENROUTER_API_KEY or enable Claude Code (CLAUDE_CODE_ENABLED=true) to continue.",
-      coding: {
-        label: "Coding & Tech",
-        hint: "Vibe Coder, Coder",
-      },
-      research: {
-        label: "Research & Analysis",
-        hint: "Researcher, Data Analyst",
-      },
-      writing: {
-        label: "Writing & Editing",
-        hint: "Writer, Editor",
-      },
-      business: {
-        label: "Business & Strategy",
-        hint: "Business Advisor, Product Manager",
-      },
-      learning: {
-        label: "Learning & Study",
-        hint: "Tutor, Socratic Questioner",
-      },
-      creative: {
-        label: "Creative & Stories",
-        hint: "Storyteller, Creative",
-      },
-      health: {
-        label: "Health & Career",
-        hint: "Health Wellness, Career Coach",
-      },
-      controversial: {
-        label: "Free Thinking",
-        hint: "Uncensored, Philosopher",
-      },
-      roleplay: {
-        label: "Roleplay & Characters",
-        hint: "Roleplay, Character Creator",
+    consent: {
+      reason:
+        "{{skill}} runs on {{model}}, an uncensored model. Confirm once, then chat.",
+      label: "One-time 18+ confirmation",
+      agreeStart: "I'm 18+, start chatting",
+      agreeContinue: "I'm 18+, continue",
+    },
+    goal: {
+      change: "Change",
+      title: "What do you want to do first?",
+      subtitle:
+        "We add the right skills and write your first prompt. Edit it before you send.",
+      groupLabel: "First goal",
+      adds: "Adds {{skills}}",
+      noSkills: "No extra skills, just your companion",
+      adultsOnly: "18+",
+      promptLabel: "Your first prompt",
+      start: "Start chatting",
+      tiles: {
+        uncensored: {
+          title: "Uncensored",
+          body: "Ask what other AIs dodge. Straight answers, you decide.",
+          prompt: "Should all drugs be legal? Pick a side and defend it.",
+        },
+        media: {
+          title: "Images, video, music",
+          body: "One sentence in, art, clips or songs out.",
+          prompt:
+            "Create an image: a neon-lit Tokyo alley in the rain at night, cinematic, shot on 35mm film.",
+        },
+        coding: {
+          title: "Coding",
+          body: "Write, debug and ship code.",
+          prompt:
+            "Write a Python script that renames every photo in a folder to the date it was taken.",
+        },
+        chat: {
+          title: "Just chat",
+          body: "Talk it through with {{companion}}. Nothing to set up.",
+          prompt:
+            "I have a big decision to make and keep going back and forth. Help me think it through.",
+        },
       },
     },
   },

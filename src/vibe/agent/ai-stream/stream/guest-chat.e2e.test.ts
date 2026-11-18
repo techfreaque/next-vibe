@@ -41,7 +41,7 @@ import {
 import { createE2EFreeGuest } from "../testing/e2e-credit-user";
 import streamEndpoints from "./definition";
 import { scopedTranslation } from "./i18n";
-import { TOUR_SKIPPED_KEY } from "./widget/chat-ui/welcome-tour/tour-config";
+import { STORAGE_KEYS } from "../../chat/constants";
 
 const endpoint = streamEndpoints.POST;
 /** Where a guest lands: /threads redirects a visitor to a fresh incognito chat. */
@@ -110,7 +110,7 @@ async function becomeFreeGuest(
   // A returning-visitor nicety only: the tour overlay would swallow clicks
   await context.addInitScript((key: string) => {
     localStorage.setItem(key, "true");
-  }, TOUR_SKIPPED_KEY);
+  }, STORAGE_KEYS.COMPANION_ONBOARDING_DONE);
   return guest.leadId;
 }
 
@@ -304,14 +304,13 @@ describe("E2E: guest chat money path", () => {
         page.getByText(/\bpong\b/i).first(),
       );
 
-      // Switch in the composer: selector → guest → one-screen setup → Uncensored
+      // Switch in the composer: selector → companion setup → Uncensored
       await selectorTrigger(page).click();
       await page
-        .getByRole("button", { name: t("onboarding.signin.continueAsGuest") })
-        .click();
-      await page
         .getByTestId("selector-setup")
-        .getByRole("button", { name: t("onboarding.setup.start") })
+        .getByRole("button", {
+          name: t("onboarding.companion.start", { name: "Thea" }),
+        })
         .click();
       const uncensoredLabel = UNCENSORED_VARIANT
         ? tSkills(UNCENSORED_VARIANT.variantName)
@@ -326,15 +325,12 @@ describe("E2E: guest chat money path", () => {
         .getByRole("button")
         .filter({ has: page.getByText(uncensoredLabel, { exact: true }) })
         .click();
-      await until(
-        "uncensored row active",
-        async () =>
-          (await uncensoredRow
-            .locator('[aria-current="true"]')
-            .count()) === 1,
-      );
-      // First uncensored pick: the one-time 18+ consent dialog. Agreeing
-      // stores it on the guest's lead; the server refuses the model without it.
+      // First uncensored pick: the one-time 18+ consent dialog. It opens as
+      // soon as the selection lands and closes the selector popover, so the
+      // dialog (not the row's active state, which unmounts with the popover)
+      // is the signal; the request body below proves which model is used.
+      // Agreeing stores consent on the guest's lead; the server refuses the
+      // model without it.
       const consentDialog = page.getByTestId("uncensored-consent-dialog");
       await consentDialog.waitFor();
       await page.getByTestId("uncensored-consent-agree").click();

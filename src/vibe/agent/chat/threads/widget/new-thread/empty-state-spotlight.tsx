@@ -24,15 +24,14 @@ import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { Check } from "next-vibe/ui/components/icons/Check";
 import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { Coffee } from "next-vibe/ui/components/icons/Coffee";
-import { Compass } from "next-vibe/ui/components/icons/Compass";
 import { Flame } from "next-vibe/ui/components/icons/Flame";
 import { Image as ImageIcon } from "next-vibe/ui/components/icons/Image";
 import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
 import { Minus } from "next-vibe/ui/components/icons/Minus";
 import { PenTool } from "next-vibe/ui/components/icons/PenTool";
-import { Scale } from "next-vibe/ui/components/icons/Scale";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { Terminal } from "next-vibe/ui/components/icons/Terminal";
+import { Zap } from "next-vibe/ui/components/icons/Zap";
 import { Span } from "next-vibe/ui/components/span";
 import { H1, P } from "next-vibe/ui/components/typography";
 import type { IconComponent } from "next-vibe/ui/lib/helper";
@@ -44,7 +43,7 @@ import {
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX, ReactNode, RefObject } from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { DefaultFolderId } from "../../../../../core/execution-context";
 import {
@@ -54,6 +53,7 @@ import {
   getChatModelById,
 } from "../../../../ai-stream/models";
 import { useProviderAvailability } from "../../../../env-availability-store";
+import { isUncensoredContent } from "../../../../models/uncensored-consent/constants";
 import {
   COMPANION_SKILLS,
   DEFAULT_SKILLS,
@@ -68,10 +68,13 @@ import {
   type SkillsT,
 } from "../../../../skills/i18n";
 import { getDefaultFolderConfig } from "../../../config";
+import {
+  type OnboardingReady,
+  useModelSelectorState,
+} from "../../../model-selector-state";
 import { useChatSettings } from "../../../settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../../settings/repository-client";
 import { formatSkillId, parseSkillId } from "../../../slugify";
-import { useTourState } from "../../../tour-state";
 import { scopedTranslation, type ThreadsT } from "../../i18n";
 
 /* ========================================================================== *
@@ -117,14 +120,21 @@ const USE_BY_MODEL: Partial<Record<ChatModelId, Use>> = {
 
 const USE_ICON: Record<Use, IconComponent> = {
   everyday: Coffee,
-  politics: Scale,
+  // Same flame as the Uncensored skill everywhere else on the site
+  politics: Flame,
   security: Terminal,
   writing: PenTool,
   images: ImageIcon,
   classic: Sparkles,
-  bold: Flame,
+  bold: Zap,
   general: MessageSquare,
 };
+
+/** Good/weak lines read as sentences, like the mode descriptions. */
+function asSentence(text: string): string {
+  const trimmed = text.trim();
+  return /[.!?…]$/.test(trimmed) ? trimmed : `${trimmed}.`;
+}
 
 /** Use icons stay neutral; color is reserved for state (hover, focus, selected). */
 const USE_CHIP_CLASS = "bg-muted text-foreground/80 dark:bg-foreground/10";
@@ -353,7 +363,9 @@ function CompanionChip({
       variant="ghost"
       size="unset"
       aria-label={label}
-      onClick={() => useTourState.getState().setModelSelectorOpen(true)}
+      onClick={() =>
+        useModelSelectorState.getState().setModelSelectorOpen(true)
+      }
       className={cn(
         "h-8 max-w-full gap-2 rounded-full border border-foreground/20 bg-card pl-2.5 pr-2 text-sm font-semibold text-foreground shadow-xs hover:border-foreground/40 hover:bg-accent",
         INTERACTIVE,
@@ -436,7 +448,7 @@ function GoodWeak({
           <Span className="mr-1 font-semibold">
             {t("widget.emptyState.mode.goodAt")}
           </Span>
-          {mode.good}
+          {asSentence(mode.good)}
         </Span>
       </Span>
       <Span className="flex items-start gap-2">
@@ -445,8 +457,11 @@ function GoodWeak({
           <Span className="mr-1 font-semibold">
             {t("widget.emptyState.mode.weakAt")}
           </Span>
-          <Span className="mr-2">{mode.weak}</Span>
-          {weakAction}
+          <Span>{asSentence(mode.weak)}</Span>
+          {weakAction ? (
+            // Own line, aligned with the text above it
+            <Span className="-ml-1 mt-1.5 flex">{weakAction}</Span>
+          ) : null}
         </Span>
       </Span>
     </Div>
@@ -512,24 +527,34 @@ function SwitchCompanionLink({
 function Shell({
   bottomPadding,
   scrollRef,
+  centered = false,
   children,
 }: {
   bottomPadding: number;
   scrollRef: RefObject<DivRefObject | null>;
+  /** Short content (right after onboarding): sit mid-screen, not at the top */
+  centered?: boolean;
   children: ReactNode;
 }): JSX.Element {
   return (
     <Div
       ref={scrollRef}
-      className="h-full min-h-0 overflow-y-auto overscroll-contain [scrollbar-gutter:stable_both-edges]"
+      // Phone: the top bar floats over this area, so content fades out under
+      // it instead of colliding with the buttons when scrolled.
+      className="h-full min-h-0 overflow-y-auto overscroll-contain [scrollbar-gutter:stable_both-edges] max-sm:[-webkit-mask-image:linear-gradient(to_bottom,transparent_3.5rem,black_4.1rem)] max-sm:[mask-image:linear-gradient(to_bottom,transparent_3.5rem,black_4.1rem)]"
     >
       <Div className="flex min-h-full flex-col">
         {/* Gutters mirror the chat input wrapper so edges line up exactly. */}
-        <Div className="mx-auto w-full max-w-3xl px-3 pb-6 pt-[4.5rem] sm:px-4 sm:pb-10 sm:pt-[max(2.5rem,9vh)] md:px-8 lg:px-10 [@media(max-height:760px)]:pb-4 [@media(max-height:760px)]:pt-6">
+        <Div
+          className={cn(
+            "mx-auto w-full max-w-3xl px-3 pb-6 pt-[4.5rem] sm:px-4 sm:pb-10 sm:pt-[max(2.5rem,9vh)] md:px-8 lg:px-10 [@media(max-height:760px)]:pb-4 [@media(max-height:760px)]:pt-6",
+            centered && "my-auto",
+          )}
+        >
           {children}
         </Div>
         {/* Clears the floating chat input (height is dynamic). */}
-        <Div style={{ height: bottomPadding, flexShrink: 0 }} />
+        <Div style={{ height: bottomPadding + 16, flexShrink: 0 }} />
       </Div>
     </Div>
   );
@@ -687,26 +712,9 @@ interface SpotlightBodyProps {
   fallbackCompanion: CompanionOption | null;
   onSelectMode: (mode: ModeView) => void;
   onSelectCompanion: (skillId: string) => void;
-  /** Scroll so rows revealed by "more modes" clear the floating chat input. */
-  onRevealMore: () => void;
+  /** Just finished onboarding: say "ready", not "pick again" */
+  ready: OnboardingReady | null;
 }
-
-/** Rows past `limit` hide on these breakpoints until "show all" is pressed. */
-const COLLAPSE_RULES: readonly { limit: number; hide: string; show: string }[] =
-  [
-    // The current-mode card is taller (advantage + disadvantage), so phones keep two.
-    { limit: 2, hide: "max-sm:hidden", show: "max-sm:flex" },
-    {
-      limit: 4,
-      hide: "sm:[@media(max-height:900px)]:hidden",
-      show: "sm:[@media(max-height:900px)]:flex",
-    },
-    {
-      limit: 2,
-      hide: "[@media(max-height:700px)]:hidden",
-      show: "[@media(max-height:700px)]:flex",
-    },
-  ];
 
 function SpotlightBody({
   t,
@@ -714,9 +722,12 @@ function SpotlightBody({
   fallbackCompanion,
   onSelectMode,
   onSelectCompanion,
-  onRevealMore,
+  ready,
 }: SpotlightBodyProps): JSX.Element {
-  const [showAll, setShowAll] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const compact = ready !== null && !expanded;
+  // Same list the onboarding promised in step 2
+  const readySkills = ready?.addedSkills ?? [];
   const { active } = view;
   const single = view.modes.length === 1;
   // Stable order: switching modes never reshuffles the list.
@@ -726,17 +737,6 @@ function SpotlightBody({
       Number(b.isDefault) - Number(a.isDefault),
   );
   const fix = fixFor(view.modes, active);
-  const hideClass = (m: ModeView, index: number): string =>
-    showAll || m.isActive
-      ? ""
-      : COLLAPSE_RULES.filter((r) => index >= r.limit)
-          .map((r) => r.hide)
-          .join(" ");
-  const moreClass = showAll
-    ? ""
-    : COLLAPSE_RULES.filter((r) => all.length > r.limit + 1)
-        .map((r) => r.show)
-        .join(" ");
 
   return (
     <Div className="flex flex-col items-center">
@@ -744,16 +744,59 @@ function SpotlightBody({
         t={t}
         view={view}
         title={
-          single
-            ? t("widget.emptyState.single.title", { name: view.name })
-            : t("widget.emptyState.spotlight.title", { name: view.name })
+          ready
+            ? t("widget.emptyState.ready.title")
+            : single
+              ? t("widget.emptyState.single.title", { name: view.name })
+              : t("widget.emptyState.spotlight.title", { name: view.name })
         }
         subtitle={
-          single ? view.tagline : t("widget.emptyState.spotlight.subtitle")
+          ready
+            ? [
+                single
+                  ? t("widget.emptyState.ready.whoSingle", { name: view.name })
+                  : t("widget.emptyState.ready.who", {
+                      name: view.name,
+                      mode: active.name,
+                      model: active.modelName ?? active.name,
+                    }),
+                readySkills.length > 0
+                  ? t("widget.emptyState.ready.added", {
+                      skills: readySkills.join(", "),
+                    })
+                  : null,
+                ready.hasPrompt
+                  ? t("widget.emptyState.ready.prompt")
+                  : t("widget.emptyState.ready.empty"),
+              ]
+                .filter((part) => part !== null)
+                .join(" ")
+            : single
+              ? view.tagline
+              : t("widget.emptyState.spotlight.subtitle")
         }
       />
 
-      {single ? (
+      {compact ? (
+        // Just onboarded: the sentence above already says who answers and
+        // how; one quiet control reopens the mode list, nothing else competes
+        // with the prefilled prompt.
+        single ? null : (
+          <Button
+            type="button"
+            variant="ghost"
+            size="unset"
+            onClick={() => setExpanded(true)}
+            className={cn(
+              "mt-4 h-9 gap-1.5 rounded-lg px-3 text-sm font-semibold text-primary hover:bg-primary/[0.06]",
+              INTERACTIVE,
+            )}
+          >
+            {t("widget.emptyState.ready.change")}
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        )
+      ) : single ? (
         <Div className="mt-6 w-full sm:mt-7 [@media(max-height:760px)]:mt-4">
           <SingleModelCard
             t={t}
@@ -777,24 +820,12 @@ function SpotlightBody({
         <Div className="mt-6 w-full overflow-hidden rounded-2xl border border-border bg-card text-left shadow-sm sm:mt-7 [@media(max-height:760px)]:mt-4">
           {/* The mode that will answer, and what it is not for. */}
           <Div className="p-4 sm:p-5">
-            <Div className="flex items-center gap-3">
-              <UseChip use={active.use} size="lg" />
-              <Div className="flex min-w-0 flex-1 flex-col">
-                <Span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                  {t("widget.emptyState.spotlight.now")}
-                </Span>
-                <Span className="truncate text-base font-semibold text-foreground">
-                  {active.name}
-                </Span>
-                <ModelLine mode={active} t={t} />
-              </Div>
-            </Div>
-            {active.summary ? (
-              <P className="mt-3 text-sm text-muted-foreground max-sm:hidden">
-                {active.summary}
-              </P>
-            ) : null}
-            <Div className="mt-3 sm:mt-4">
+            {/* Name, model and summary sit on the selected row below; this
+                block only says what the current mode is good and weak at. */}
+            <Span className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+              {t("widget.emptyState.spotlight.now", { mode: active.name })}
+            </Span>
+            <Div className="mt-2.5">
               <GoodWeak
                 mode={active}
                 t={t}
@@ -850,11 +881,14 @@ function SpotlightBody({
                   }}
                   className={cn(
                     "group h-auto w-full items-center justify-start gap-3 whitespace-normal rounded-xl border px-2 py-1.5 text-left font-normal",
+                    // An odd last mode spans both columns: no empty cell
+                    index === all.length - 1 &&
+                      all.length % 2 === 1 &&
+                      "sm:col-span-2",
                     INTERACTIVE,
                     m.isActive
                       ? "cursor-default border-primary/50 bg-primary/[0.07] hover:bg-primary/[0.07] motion-safe:active:scale-100 dark:border-primary/60 dark:bg-primary/[0.12] dark:hover:bg-primary/[0.12]"
                       : "border-transparent hover:bg-foreground/[0.05] dark:hover:bg-foreground/[0.07]",
-                    hideClass(m, index),
                   )}
                 >
                   {/* Radio marker: this is a choice, not a link. */}
@@ -873,38 +907,32 @@ function SpotlightBody({
                   </Span>
                   <UseChip use={m.use} />
                   <Span className="flex min-w-0 flex-1 flex-col">
-                    <Span className="flex min-w-0 items-center gap-2">
+                    <Span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5">
                       <Span className="shrink-0 text-sm font-semibold text-foreground">
                         {m.name}
                       </Span>
-                      <ModelLine mode={m} t={t} className="text-[11px]" />
+                      {isUncensoredContent(
+                        getChatModelById(m.modelId)?.content,
+                      ) ? (
+                        <Span className="shrink-0 rounded-full bg-rose-500/12 px-1.5 py-px text-[10px] font-bold tracking-wide text-rose-700 dark:bg-rose-400/15 dark:text-rose-300">
+                          {t("widget.emptyState.spotlight.adultsOnly")}
+                        </Span>
+                      ) : null}
+                      {/* Phone: the model always sits on its own line, so
+                          every row has the same shape */}
+                      <ModelLine
+                        mode={m}
+                        t={t}
+                        className="text-[11px] max-sm:basis-full"
+                      />
                     </Span>
-                    <Span className="truncate text-xs text-muted-foreground sm:line-clamp-2 sm:whitespace-normal">
+                    <Span className="line-clamp-2 text-xs text-muted-foreground">
                       {m.summary ?? m.good}
                     </Span>
                   </Span>
                 </Button>
               ))}
             </Div>
-            {moreClass ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="unset"
-                onClick={() => {
-                  setShowAll(true);
-                  onRevealMore();
-                }}
-                className={cn(
-                  "mt-1 hidden h-9 w-full gap-1 rounded-xl text-xs font-semibold text-muted-foreground hover:bg-foreground/[0.05] hover:text-foreground",
-                  INTERACTIVE,
-                  moreClass,
-                )}
-              >
-                {t("widget.emptyState.spotlight.more")}
-                <ChevronDown className="h-3.5 w-3.5" />
-              </Button>
-            ) : null}
           </Div>
         </Div>
       )}
@@ -964,7 +992,15 @@ export function SpotlightEmptyState({
     logger,
   );
   const scrollRef = useRef<DivRefObject | null>(null);
-  const requestTour = useTourState((s) => s.requestTour);
+  const onboardingReady = useModelSelectorState((s) => s.onboardingReady);
+  const setOnboardingReady = useModelSelectorState((s) => s.setOnboardingReady);
+  // "Ready" belongs to this one empty chat; the next new chat is a normal one.
+  useEffect(
+    () => (): void => {
+      setOnboardingReady(null);
+    },
+    [setOnboardingReady],
+  );
 
   // Until settings say which skill is selected, show a placeholder instead of
   // guessing: guessing the default companion flashed Thea's card for people
@@ -1094,19 +1130,12 @@ export function SpotlightEmptyState({
     }
   };
 
-  // After "more modes" the list grows below the fold; bring its end into view
-  // above the chat input (the bottom spacer reserves exactly that space).
-  const revealMore = (): void => {
-    requestAnimationFrame(() => {
-      const el = scrollRef.current;
-      if (el) {
-        el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-      }
-    });
-  };
-
   return (
-    <Shell bottomPadding={bottomPadding} scrollRef={scrollRef}>
+    <Shell
+      bottomPadding={bottomPadding}
+      scrollRef={scrollRef}
+      centered={onboardingReady !== null}
+    >
       <Div className="flex flex-col items-center">
         <FolderPill folder={folder} />
         <Div className="mt-4 w-full [@media(max-height:760px)]:mt-3">
@@ -1117,7 +1146,7 @@ export function SpotlightEmptyState({
               fallbackCompanion={fallbackCompanion}
               onSelectMode={selectMode}
               onSelectCompanion={selectCompanion}
-              onRevealMore={revealMore}
+              ready={onboardingReady}
             />
           ) : view.kind === "none" ? (
             <CompanionPicker
@@ -1130,20 +1159,6 @@ export function SpotlightEmptyState({
             <CustomSkillNote t={t} />
           )}
         </Div>
-        {/* The guided tour stays one click away, never forced. */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="unset"
-          onClick={requestTour}
-          className={cn(
-            "mt-5 h-8 gap-1.5 rounded-md px-2 text-xs font-medium text-muted-foreground hover:bg-transparent hover:text-foreground [@media(max-height:760px)]:mt-3",
-            INTERACTIVE,
-          )}
-        >
-          <Compass className="h-3.5 w-3.5" />
-          {t("widget.suggestedPrompts.takeTour")}
-        </Button>
       </Div>
     </Shell>
   );

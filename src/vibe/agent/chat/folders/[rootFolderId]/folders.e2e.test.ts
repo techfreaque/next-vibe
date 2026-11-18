@@ -16,7 +16,7 @@ import {
   rootFolderTab,
   seedFolder,
   signInAs,
-  suppressWelcomeTour,
+  suppressOnboarding,
 } from "../../testing/e2e-seed";
 import foldersEndpoints from "./definition";
 
@@ -32,7 +32,7 @@ describe("E2E: chat folder list", () => {
     const folderName = `E2E Shared ${Date.now()}`;
     await seedFolder(account, DefaultFolderId.SHARED, folderName);
     await signInAs(fixtures, account);
-    await suppressWelcomeTour(context);
+    await suppressOnboarding(context);
 
     const form = await open(endpoint, { path: "/threads/private" });
     await rootFolderTab(page, DefaultFolderId.SHARED).click();
@@ -50,7 +50,7 @@ describe("E2E: chat folder list", () => {
 
   e2e.it("an anonymous visitor switching to Public sees the community folders", async (fixtures) => {
     const { open, page, context } = fixtures;
-    await suppressWelcomeTour(context);
+    await suppressOnboarding(context);
     // Anonymous visitors land in incognito (private redirects there)
     const form = await open(endpoint, { path: "/threads/incognito" });
     await rootFolderTab(page, DefaultFolderId.PUBLIC).click();

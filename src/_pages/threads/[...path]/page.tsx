@@ -59,6 +59,7 @@ import { isUUID, parseChatUrl } from "@/_pages/chat/lib/url-parser";
 import type { CreditsGetResponseOutput } from "@/credits/definition";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
+import { linkDeepLinkAttribution } from "@/referral/deep-link-attribution";
 
 import { ThreadsPageClient } from "./page-client";
 
@@ -72,6 +73,10 @@ interface ThreadsPathPageProps {
     /** Composer prefill + model (see use-query-prefill) - kept across redirects. */
     q?: string;
     model?: string;
+    /** Skill to start the chat with (skill landing page "Try it now"). */
+    skill?: string;
+    /** Referral code carried from a creator or skill link. */
+    ref?: string;
   }>;
 }
 
@@ -137,6 +142,12 @@ export async function tanstackLoader({
   if (resolvedSearchParams.model) {
     prefillParams.set("model", resolvedSearchParams.model);
   }
+  if (resolvedSearchParams.skill) {
+    prefillParams.set("skill", resolvedSearchParams.skill);
+  }
+  if (resolvedSearchParams.ref) {
+    prefillParams.set("ref", resolvedSearchParams.ref);
+  }
   const prefillQuery =
     prefillParams.size > 0 ? `?${prefillParams.toString()}` : "";
   const incognitoTarget = prefillQuery
@@ -188,6 +199,19 @@ export async function tanstackLoader({
     earlyRootFolderId !== DefaultFolderId.INCOGNITO
   ) {
     redirect(incognitoTarget);
+  }
+
+  // Deep links from skill/creator pages carry the referral code and the skill:
+  // attribute them to the lead like the signup page does (first touch wins
+  // for the skill, every distinct code is linked). Fire and forget.
+  if (user.leadId && (resolvedSearchParams.ref || resolvedSearchParams.skill)) {
+    void linkDeepLinkAttribution({
+      leadId: user.leadId,
+      refCode: resolvedSearchParams.ref ?? null,
+      skillId: resolvedSearchParams.skill ?? null,
+      locale,
+      logger,
+    });
   }
 
   // Fetch credit balance for all users (both authenticated and public)

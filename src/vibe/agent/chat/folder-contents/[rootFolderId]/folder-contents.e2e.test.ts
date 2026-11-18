@@ -19,7 +19,7 @@ import {
   seedFolder,
   seedThread,
   signInAs,
-  suppressWelcomeTour,
+  suppressOnboarding,
 } from "../../testing/e2e-seed";
 import folderContentsEndpoints from "./definition";
 
@@ -44,7 +44,7 @@ describe("E2E: chat folder contents", () => {
       folderId,
     });
     await signInAs(fixtures, account);
-    await suppressWelcomeTour(context);
+    await suppressOnboarding(context);
 
     // The sidebar renders its own UI (no request form) — drive it like a user
     await fixtures.gotoReady("/threads/private", chatReady(page));

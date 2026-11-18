@@ -46,6 +46,9 @@ export function LeadCaptureForm({
   const [state, setState] = useState<CaptureState>("idle");
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
+  // Set on a submit attempt with missing input: marks the fields instead of
+  // greying the button out, so the form never looks dead.
+  const [attempted, setAttempted] = useState(false);
 
   const trimmedName = firstName.trim();
   const trimmedEmail = email.trim();
@@ -54,8 +57,13 @@ export function LeadCaptureForm({
     trimmedName.length > 0 &&
     emailSchema.safeParse(trimmedEmail).success;
 
+  const nameInvalid = attempted && trimmedName.length === 0;
+  const emailInvalid =
+    attempted && !emailSchema.safeParse(trimmedEmail).success;
+
   const handleSubmit = useCallback((): void => {
     if (!canSubmit) {
+      setAttempted(true);
       return;
     }
     setState("submitting");
@@ -74,23 +82,11 @@ export function LeadCaptureForm({
 
   if (state === "done") {
     return (
-      <Div
-        style={{
-          padding: "24px 20px",
-          borderRadius: 12,
-          border: "1px solid rgba(139,92,246,0.25)",
-          background: "rgba(139,92,246,0.08)",
-          textAlign: "center",
-          display: "flex",
-          flexDirection: "column",
-          gap: 6,
-          alignItems: "center",
-        }}
-      >
-        <Span style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>
+      <Div className="flex flex-col items-center gap-1.5 rounded-xl border border-primary/25 bg-primary/5 px-5 py-6 text-center">
+        <Span className="text-base font-semibold text-foreground">
           {t("form.doneHeading")}
         </Span>
-        <Span style={{ color: "rgba(255,255,255,0.55)", fontSize: 13 }}>
+        <Span className="text-sm text-muted-foreground">
           {t("form.doneSub")}
         </Span>
       </Div>
@@ -98,31 +94,11 @@ export function LeadCaptureForm({
   }
 
   return (
-    <Div
-      style={{
-        padding: "20px 20px",
-        borderRadius: 12,
-        border: "1px solid rgba(255,255,255,0.08)",
-        background: "rgba(255,255,255,0.02)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 12,
-        alignItems: "center",
-        textAlign: "center",
-      }}
-    >
-      <Span style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>
+    <Div className="flex flex-col items-center gap-3 text-center">
+      <Span className="text-base font-semibold text-foreground">
         {headline ?? t("form.headline")}
       </Span>
-      <Div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          width: "100%",
-          maxWidth: 340,
-        }}
-      >
+      <Div className="flex w-full max-w-[340px] flex-col gap-2">
         <Input
           name="firstName"
           autoComplete="given-name"
@@ -130,8 +106,11 @@ export function LeadCaptureForm({
           onChange={(e): void => setFirstName(e.target.value)}
           placeholder={t("form.namePlaceholder")}
           aria-label={t("submit.fields.firstName.label")}
+          aria-invalid={nameInvalid}
           disabled={state === "submitting"}
-          className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-violet-500"
+          className={
+            nameInvalid ? "border-destructive bg-background" : "bg-background"
+          }
         />
         <Input<"email">
           type="email"
@@ -147,29 +126,28 @@ export function LeadCaptureForm({
           }}
           placeholder={t("form.emailPlaceholder")}
           aria-label={t("submit.fields.email.label")}
+          aria-invalid={emailInvalid}
           disabled={state === "submitting"}
-          className="bg-white/5 border-white/10 text-white placeholder:text-white/30 focus:border-violet-500"
+          className={
+            emailInvalid ? "border-destructive bg-background" : "bg-background"
+          }
         />
         <Button
           type="button"
           onClick={handleSubmit}
-          disabled={!canSubmit}
-          className="bg-violet-600 hover:bg-violet-700 text-white"
+          disabled={state === "submitting"}
         >
           {state === "submitting"
             ? t("form.sending")
             : (buttonText ?? t("form.send"))}
         </Button>
         {state === "error" && (
-          <Span
-            role="alert"
-            style={{ fontSize: 12, color: "rgba(255,100,100,0.8)" }}
-          >
+          <Span role="alert" className="text-xs text-destructive">
             {t("form.error")}
           </Span>
         )}
       </Div>
-      <Span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)" }}>
+      <Span className="text-[11px] text-muted-foreground">
         {t("form.finePrint")}
       </Span>
     </Div>

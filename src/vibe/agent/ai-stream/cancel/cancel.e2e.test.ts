@@ -20,7 +20,7 @@ import {
   getThreadStreamingState,
   seedThread,
   signInAs,
-  suppressWelcomeTour,
+  suppressOnboarding,
 } from "../../chat/testing/e2e-seed";
 import { scopedTranslation as streamScopedTranslation } from "../stream/i18n";
 import cancelEndpoints from "./definition";
@@ -41,7 +41,7 @@ describe("E2E: stop an AI response", () => {
       streamingState: ThreadStreamingState.STREAMING,
     });
     await signInAs(fixtures, owner);
-    await suppressWelcomeTour(context);
+    await suppressOnboarding(context);
     await fixtures.gotoReady(`/threads/${DefaultFolderId.PRIVATE}/${threadId}`, chatReady(page));
 
     const stop = page.getByRole("button", { name: tStream("actions.stopGeneration") });

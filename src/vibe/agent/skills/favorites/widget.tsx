@@ -73,10 +73,10 @@ import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-c
 import { type IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import React, { useCallback, useMemo, useState } from "react";
 
-import { TOUR_DATA_ATTRS } from "../../ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
+import { TOUR_DATA_ATTRS } from "../../ai-stream/stream/widget/chat-ui/data-attrs";
+import { useModelSelectorState } from "../../chat/model-selector-state";
 import { ChatSettingsRepositoryClient } from "../../chat/settings/repository-client";
 import { parseSkillId } from "../../chat/slugify";
-import { useTourState } from "../../chat/tour-state";
 import { ModelCreditDisplay } from "../../models/widget/model-credit-display";
 import { ShareSkillDialog } from "../[id]/share-skill";
 import { DEFAULT_SKILLS } from "../config";
@@ -1002,7 +1002,7 @@ export function FavoritesListContainer(): React.JSX.Element {
         favoriteSelectOverride.onSelectFavorite(item);
         // Only close the model selector when not embedded in another panel
         if (!hideChrome) {
-          useTourState.getState().setModelSelectorOpen(false);
+          useModelSelectorState.getState().setModelSelectorOpen(false);
         }
         return;
       }
@@ -1014,7 +1014,7 @@ export function FavoritesListContainer(): React.JSX.Element {
         locale,
         user,
       });
-      useTourState.getState().setModelSelectorOpen(false);
+      useModelSelectorState.getState().setModelSelectorOpen(false);
     },
     [onPickRaw, favoriteSelectOverride, hideChrome, logger, locale, user],
   );

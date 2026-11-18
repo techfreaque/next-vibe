@@ -16,6 +16,7 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import { type ChatModelId, getChatModelById } from "../../../ai-stream/models";
+import { useModelSelectorState } from "../../../chat/model-selector-state";
 import { isUncensoredContent } from "../constants";
 import { useUncensoredConsent, useUncensoredConsentGate } from "../hooks";
 import { UncensoredConsentDialog } from "./consent-dialog";
@@ -39,13 +40,16 @@ export function UncensoredConsentGate({
   const gate = useUncensoredConsentGate();
   const [dismissedFor, setDismissedFor] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // First-run onboarding is up: ask after it, never stack two dialogs.
+  const onboardingOpen = useModelSelectorState((s) => s.onboardingOpen);
 
   const model = getChatModelById(modelId);
   const selectionNeedsConsent =
     !!model &&
     isUncensoredContent(model.content) &&
     consent.consented === false &&
-    dismissedFor !== model.id;
+    dismissedFor !== model.id &&
+    !onboardingOpen;
   const open =
     (gate.open || selectionNeedsConsent) && consent.consented !== true;
 

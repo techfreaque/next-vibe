@@ -37,7 +37,7 @@ import {
 } from "../testing/e2e-credit-user";
 import streamEndpoints from "./definition";
 import { scopedTranslation } from "./i18n";
-import { TOUR_SKIPPED_KEY } from "./widget/chat-ui/welcome-tour/tour-config";
+import { STORAGE_KEYS } from "../../chat/constants";
 
 const endpoint = streamEndpoints.POST;
 const NEW_THREAD_PAGE = "/threads/private/new";
@@ -76,7 +76,7 @@ async function openComposer({
 }: Pick<E2EFixtures, "page" | "goto" | "context">): Promise<Locator> {
   await context.addInitScript((key: string) => {
     localStorage.setItem(key, "true");
-  }, TOUR_SKIPPED_KEY);
+  }, STORAGE_KEYS.COMPANION_ONBOARDING_DONE);
   const composer = page.locator('[data-hydrated] textarea[name="prompt"]');
   // `goto` (unlike `open`) does not ride out a dev-server HMR reload (503 on
   // the client entry → never hydrates); retry the navigation a few times.

@@ -85,7 +85,6 @@ function buildVoiceGroups(availability: AgentEnvAvailability): VoiceGroup[] {
   })).filter((g) => g.voices.length > 0);
 }
 
-
 function genderIcon(gender: string | undefined): string {
   if (gender === "female") {
     return "♀";

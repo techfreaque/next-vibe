@@ -18,7 +18,7 @@ import {
   deleteE2EUser,
   rootFolderTab,
   signInAs,
-  suppressWelcomeTour,
+  suppressOnboarding,
 } from "../../../testing/e2e-seed";
 import rootPermissionsEndpoints from "./definition";
 
@@ -33,7 +33,7 @@ describe("E2E: root folder permissions", () => {
     const account = await createE2EUser(uniqueEmail("root-perms"));
     cleanup(() => deleteE2EUser(account));
     await signInAs(fixtures, account);
-    await suppressWelcomeTour(context);
+    await suppressOnboarding(context);
 
     const form = await open(endpoint, { path: "/threads/private" });
     await rootFolderTab(page, DefaultFolderId.SHARED).click();

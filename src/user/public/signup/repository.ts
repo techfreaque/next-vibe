@@ -423,22 +423,33 @@ export class SignupRepository {
             roles,
             leadId: leadIdResult.leadId,
           };
-          await Promise.allSettled(
-            data.localFavorites.map((fav) =>
-              FavoritesCreateRepository.createFavorite(
-                {
-                  skillId: fav.skillId,
-                  customVariantName: fav.customVariantName ?? null,
-                  modelSelection: fav.modelSelection ?? null,
-                  voiceModelSelection: fav.voiceModelSelection ?? null,
-                },
-                userJwt,
-                logger,
-                favT,
-                locale,
-              ),
-            ),
+          const { isCompanionSkillId } =
+            await import("next-vibe/agent/skills/favorites/default-companion");
+          const { parseSkillId } = await import("next-vibe/agent/chat/slugify");
+          // Sequential, companions first (stable sort keeps the guest's order
+          // otherwise): createFavorite adds the default companion on a
+          // non-companion favorite only when no companion is stored yet, so a
+          // migrated set without one gets it exactly once and a set with one
+          // never gets a duplicate.
+          const orderedFavorites = data.localFavorites.toSorted(
+            (a, b) =>
+              Number(!isCompanionSkillId(parseSkillId(a.skillId).skillId)) -
+              Number(!isCompanionSkillId(parseSkillId(b.skillId).skillId)),
           );
+          for (const fav of orderedFavorites) {
+            await FavoritesCreateRepository.createFavorite(
+              {
+                skillId: fav.skillId,
+                customVariantName: fav.customVariantName ?? null,
+                modelSelection: fav.modelSelection ?? null,
+                voiceModelSelection: fav.voiceModelSelection ?? null,
+              },
+              userJwt,
+              logger,
+              favT,
+              locale,
+            );
+          }
           logger.debug("Local favorites migrated", {
             userId: userData.id,
             count: data.localFavorites.length,

@@ -16,7 +16,7 @@ import {
   deleteE2EUser,
   seedThread,
   signInAs,
-  suppressWelcomeTour,
+  suppressOnboarding,
 } from "../../testing/e2e-seed";
 import { scopedTranslation as threadsT } from "../i18n";
 import { scopedTranslation as chromeT } from "./i18n";
@@ -45,7 +45,7 @@ describe("E2E: thread menu on mobile", () => {
         rootFolderId: DefaultFolderId.PRIVATE,
         title,
       });
-      await suppressWelcomeTour(context);
+      await suppressOnboarding(context);
       // Behave like a phone: touch screens always show row actions (no hover)
       await context.addInitScript(() => {
         Object.defineProperty(navigator, "maxTouchPoints", { get: () => 5 });

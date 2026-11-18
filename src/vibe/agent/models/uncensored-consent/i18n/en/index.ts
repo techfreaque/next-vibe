@@ -101,7 +101,7 @@ export const translations = {
     title: "Adults only. No filter.",
     stance:
       "Humans decide what they read. Not a corporation. So we ask you once instead of filtering every answer.",
-    modelLine: "You picked {{model}}.",
+    modelLine: "This chat runs on {{model}}.",
     pointAge: "I am 18 or older.",
     pointContent:
       "Uncensored models can produce offensive, false, dangerous, illegal or malicious content.",

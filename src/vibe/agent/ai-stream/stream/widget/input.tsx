@@ -58,6 +58,7 @@ import rootPermissionsDefinition from "../../../chat/folders/[rootFolderId]/root
 import { useChatBootContext } from "../../../chat/hooks/context";
 import { useChatStore } from "../../../chat/hooks/store";
 import { useChatNavigationStore } from "../../../chat/hooks/use-chat-navigation-store";
+import { useModelSelectorState } from "../../../chat/model-selector-state";
 import { useChatSettings } from "../../../chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../../chat/settings/repository-client";
 import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
@@ -65,7 +66,6 @@ import {
   type MessageOperationsDeps,
   useMessageOperations,
 } from "../../../chat/threads/[threadId]/messages/hooks/use-operations";
-import { useTourState } from "../../../chat/tour-state";
 import { CortexButton } from "../../../cortex/widget/cortex-button";
 import { useProviderAvailability } from "../../../env-availability-store";
 import {
@@ -109,7 +109,7 @@ import {
 import { useVoiceRecording } from "../hooks/use-voice-recording";
 import { useVoiceRuntimeState } from "../hooks/voice-mode/store";
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
-import { TOUR_DATA_ATTRS } from "./chat-ui/welcome-tour/tour-attrs";
+import { TOUR_DATA_ATTRS } from "./chat-ui/data-attrs";
 import { OutOfCreditsCard } from "./out-of-credits-card";
 import { Selector } from "./selector";
 import { ToolsButton } from "./tools-button";
@@ -718,7 +718,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
           void handleSubmit();
         }}
         onPickAnother={(): void => {
-          useTourState.getState().setModelSelectorOpen(true);
+          useModelSelectorState.getState().setModelSelectorOpen(true);
         }}
       />
 

@@ -617,79 +617,85 @@ export const translations: typeof enTranslations = {
     },
   },
   onboarding: {
-    signin: {
-      title: "Gardez votre configuration",
+    progress: "Étape {{current}} sur {{total}}",
+    skip: "Passer",
+    skipCompanion: "Passer la configuration",
+    notNow: "Plus tard",
+    back: "Retour",
+    saving: "Configuration...",
+    failed: "Impossible d'enregistrer. Vérifiez votre connexion et réessayez.",
+    retry: "Réessayer",
+    guestCredits: "{{credits}} crédits offerts. Sans inscription.",
+    noProviderAvailable:
+      "Aucun fournisseur IA configuré. Ajoutez OPENROUTER_API_KEY ou activez Claude Code (CLAUDE_CODE_ENABLED=true) pour continuer.",
+    companion: {
+      title: "Choisissez votre compagnon",
       subtitle:
-        "Connectez-vous une fois. Tout ce que vous créez ici vous suit.",
-      benefits: {
-        sync: {
-          title: "Synchronisé sur tous vos appareils",
-          body: "Votre compagnon, vos spécialistes et vos discussions sur chaque appareil.",
-        },
-        keep: {
-          title: "Ne perdez jamais votre travail",
-          body: "En invité, votre configuration ne vit que dans ce navigateur. Connectez-vous et elle reste.",
-        },
-        private: {
-          title: "Privé par défaut",
-          body: "Vous contrôlez vos données et votre niveau de filtrage. Toujours.",
-        },
+        "Votre compagnon répond dans chaque nouvelle discussion. Changez de modèle quand vous voulez, sans censure compris.",
+      missingTitle: "Il vous manque un compagnon",
+      missingSubtitle:
+        "Un compagnon répond dans chaque nouvelle discussion et connaît vos skills. Choisissez-en un, c'est l'affaire d'une seconde.",
+      arrivalTitle: "{{skill}} est ajouté. Qui sera votre compagnon ?",
+      arrivalSubtitle:
+        "{{skill}} répond dans cette discussion. Votre compagnon répond aux autres.",
+      groupLabel: "Compagnons",
+      recommended: "Recommandé",
+      about: {
+        thea: "Chaleureuse, sage et franche. La sagesse antique pour les problèmes d'aujourd'hui.",
+        hermes: "Direct et déterminé. Stratégie, discipline, zéro excuse.",
       },
-      cta: "Se connecter ou créer un compte",
-      continueAsGuest: "Continuer en invité",
-      note: "Vous pourrez vous connecter plus tard depuis le menu.",
+      voice: {
+        thea: "« Le courage se construit en agissant, pas en attendant. »",
+        hermes:
+          "« La motivation vacille selon l'humeur ; la discipline agit malgré elle. »",
+      },
+      arrivalContinue: "Continuer",
+      continue: "Continuer avec {{name}}",
+      start: "Commencer avec {{name}}",
     },
-    setup: {
-      title: "Configurez votre IA",
+    consent: {
+      reason:
+        "{{skill}} tourne sur {{model}}, un modèle sans censure. Confirmez une fois, puis discutez.",
+      label: "Confirmation unique : 18 ans et plus",
+      agreeStart: "J'ai 18 ans ou plus, c'est parti",
+      agreeContinue: "J'ai 18 ans ou plus, continuer",
+    },
+    goal: {
+      change: "Changer",
+      title: "Par quoi voulez-vous commencer ?",
       subtitle:
-        "Choisissez à qui vous parlez. Ajoutez des spécialistes si vous voulez. Tout se change plus tard.",
-      companionLabel: "Votre compagnon",
-      specialistsLabel: "Ajouter des spécialistes",
-      optional: "facultatif",
-      start: "Commencer à discuter",
-      saving: "Configuration...",
-      failed:
-        "Impossible d'enregistrer votre configuration. Vérifiez votre connexion et réessayez.",
-      retry: "Réessayer",
-    },
-    usecases: {
-      noProviderAvailable:
-        "Aucun fournisseur IA configuré. Ajoutez OPENROUTER_API_KEY ou activez Claude Code (CLAUDE_CODE_ENABLED=true) pour continuer.",
-      coding: {
-        label: "Code et tech",
-        hint: "Vibe Coder, Coder",
-      },
-      research: {
-        label: "Recherche et analyse",
-        hint: "Chercheur, analyste de données",
-      },
-      writing: {
-        label: "Écriture et relecture",
-        hint: "Rédacteur, correcteur",
-      },
-      business: {
-        label: "Business et stratégie",
-        hint: "Conseiller business, chef de produit",
-      },
-      learning: {
-        label: "Apprentissage et études",
-        hint: "Tuteur, questionneur socratique",
-      },
-      creative: {
-        label: "Création et histoires",
-        hint: "Conteur, créatif",
-      },
-      health: {
-        label: "Santé et carrière",
-        hint: "Santé et bien-être, coach carrière",
-      },
-      controversial: {
-        label: "Pensée libre",
-        hint: "Non censuré, philosophe",
-      },
-      roleplay: {
-        label: "Jeu de rôle et personnages",
-        hint: "Jeu de rôle, créateur de personnages",
+        "On ajoute les bons skills et on écrit votre premier prompt. Modifiez-le avant d'envoyer.",
+      groupLabel: "Premier objectif",
+      adds: "Ajoute {{skills}}",
+      noSkills: "Aucun skill en plus, juste votre compagnon",
+      adultsOnly: "18+",
+      promptLabel: "Votre premier prompt",
+      start: "C'est parti",
+      tiles: {
+        uncensored: {
+          title: "Sans censure",
+          body: "Posez les questions que les autres IA esquivent. Des réponses nettes, vous jugez.",
+          prompt:
+            "Toutes les drogues devraient-elles être légales ? Choisis un camp et défends-le.",
+        },
+        media: {
+          title: "Images, vidéo, musique",
+          body: "Une phrase, et vous obtenez une image, un clip ou un morceau.",
+          prompt:
+            "Crée une image : une ruelle de Tokyo éclairée au néon, la nuit sous la pluie, ambiance cinéma, pellicule 35 mm.",
+        },
+        coding: {
+          title: "Code",
+          body: "Écrivez, déboguez, livrez.",
+          prompt:
+            "Écris un script Python qui renomme chaque photo d'un dossier avec sa date de prise de vue.",
+        },
+        chat: {
+          title: "Juste discuter",
+          body: "Réfléchissez avec {{companion}}. Rien à configurer.",
+          prompt:
+            "J'ai une grosse décision à prendre et je n'arrête pas d'hésiter. Aide-moi à y voir clair.",
+        },
       },
     },
   },

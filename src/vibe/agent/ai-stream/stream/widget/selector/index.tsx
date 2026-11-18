@@ -29,12 +29,12 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 
-import { useTourState } from "../../../../chat/tour-state";
+import { useModelSelectorState } from "../../../../chat/model-selector-state";
 import type { SkillGetResponseOutput } from "../../../../skills/[id]/definition";
 import { useSkill } from "../../../../skills/[id]/hooks";
 import { NO_SKILL_ID } from "../../../../skills/constants";
 import { type ChatModelId, getChatModelById } from "../../../models";
-import { TOUR_DATA_ATTRS } from "../chat-ui/welcome-tour/tour-attrs";
+import { TOUR_DATA_ATTRS } from "../chat-ui/data-attrs";
 import { SelectorContent } from "./selector-content";
 
 interface SelectorProps {
@@ -59,24 +59,14 @@ export function Selector({
   const user = useWidgetUser();
   const logger = useWidgetLogger();
 
-  const tourModelSelectorOpen = useTourState((s) => s.modelSelectorOpen);
-  const tourIsActive = useTourState((s) => s.isActive);
-  const setModelSelectorOpen = useTourState((s) => s.setModelSelectorOpen);
+  const sharedOpen = useModelSelectorState((s) => s.modelSelectorOpen);
+  const setModelSelectorOpen = useModelSelectorState(
+    (s) => s.setModelSelectorOpen,
+  );
 
-  // Use controlled state if provided, otherwise use tour state
-  const popoverOpen = controlledOnOpenChange
-    ? controlledOpen
-    : tourModelSelectorOpen;
-
-  // When tour controls the popover, block Radix close requests while tour is active
-  const setPopoverOpen = controlledOnOpenChange
-    ? controlledOnOpenChange
-    : (open: boolean): void => {
-        if (!open && tourIsActive && tourModelSelectorOpen) {
-          return;
-        }
-        setModelSelectorOpen(open);
-      };
+  // Controlled when the parent passes state, else the shared selector store
+  const popoverOpen = controlledOnOpenChange ? controlledOpen : sharedOpen;
+  const setPopoverOpen = controlledOnOpenChange ?? setModelSelectorOpen;
 
   const isClient = useIsClient();
   const isModelOnly = skillId === NO_SKILL_ID;

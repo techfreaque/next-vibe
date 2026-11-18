@@ -1,375 +1,55 @@
 /**
  * Public Skill Landing Page
- * Proper public shareable landing page for a skill.
- * URL: /[locale]/skill/[skillId]
+ * URL: /[locale]/skill/[skillId]   (variant URLs: /skill/<skill>__<variant>)
+ *
+ * Server-rendered landing: hero with real sample answers, the model that runs
+ * the skill, example prompts that open the chat, related skills. Everything a
+ * crawler needs is in the initial HTML. Data + metadata live in ./loader.ts;
+ * this file stays thin so the client bundle never sees server code.
  */
 
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
-import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
-import { getBestChatModel } from "next-vibe/agent/ai-stream/models";
-import { isRemovedSkillId, parseSkillId } from "next-vibe/agent/chat/slugify";
-import { getEnvAvailability } from "next-vibe/agent/env-availability";
-import { getBestImageGenModel } from "next-vibe/agent/image-generation/models";
-import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
-import { modelProviders } from "next-vibe/agent/models/models";
-import { getBestMusicGenModel } from "next-vibe/agent/music-generation/models";
-import type { SkillGetResponseOutput } from "next-vibe/agent/skills/[id]/definition";
-import { SkillsRepository } from "next-vibe/agent/skills/repository";
-import { getBestTtsModel } from "next-vibe/agent/text-to-speech/models";
-import { getBestVideoGenModel } from "next-vibe/agent/video-generation/models";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { UserDetailLevel } from "next-vibe/identity/user/enum";
-import { UserRepository } from "next-vibe/identity/user/repository";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
-import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX } from "react";
 
-import { configScopedTranslation } from "@/env/i18n";
+import { TanstackPage as SiteLayoutPage } from "../../story/layout";
+import type { SkillLandingPageData, SkillPageProps } from "./loader";
+import { loadSkillLandingPage, loadSkillPageMetadata } from "./loader";
+import { SkillLandingPage } from "./page-client";
 
-import { scopedTranslation } from "./i18n";
-import {
-  type LeadMagnetConfigData,
-  type ResolvedSkillModels,
-  SkillLandingPage,
-} from "./page-client";
+export type { SkillLandingPageData } from "./loader";
 
-interface Props {
-  params: Promise<{ locale: CountryLanguage; skillId: string }>;
+export async function generateMetadata({
+  params,
+}: SkillPageProps): Promise<Metadata> {
+  return loadSkillPageMetadata({ params });
 }
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale, skillId } = await params;
-  const { t } = scopedTranslation.scopedT(locale);
-  const { t: configT } = configScopedTranslation.scopedT(locale);
-  const appName = configT("appName");
-  const logger = createEndpointLogger(false, locale);
-
-  const userResponse = await UserRepository.getUserByAuth(
-    {
-      detailLevel: UserDetailLevel.MINIMAL,
-      roles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
-    },
-    locale,
-    logger,
-  );
-  const user = userResponse.success ? userResponse.data : null;
-
-  let name = "";
-  let tagline = "";
-  const modelCount = getAvailableChatModelCount(
-    false,
-    await getEnvAvailability(),
-  );
-  if (user) {
-    // Variant URLs (<skill>__<variant>) and legacy aliases resolve like the loader.
-    const skillResult = await SkillsRepository.getSkillById(
-      { id: parseSkillId(skillId).skillId },
-      user,
-      logger,
-      locale,
-    );
-    if (
-      !skillResult.success &&
-      skillResult.errorType === ErrorResponseTypes.NOT_FOUND
-    ) {
-      if (!isRemovedSkillId(parseSkillId(skillId).skillId)) {
-        notFound();
-      }
-      name = t("removed.title");
-    }
-    if (skillResult.success) {
-      name = skillResult.data.name ?? "";
-      tagline = skillResult.data.tagline ?? "";
-    }
-  }
-
-  return metadataGenerator(locale, {
-    path: `skill/${skillId}`,
-    title: t("meta.title", { appName, name }),
-    category: t("meta.category"),
-    description: t("meta.description", { appName, name, tagline, modelCount }),
-    image:
-      "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?q=80&w=2070",
-    imageAlt: t("meta.imageAlt", { appName, name }),
-    keywords: [t("meta.keywords", { appName, name })],
-  });
-}
-
-export interface SkillLandingPageData {
-  locale: CountryLanguage;
-  skillId: string;
-  user: JwtPayloadType;
-  platform: Platform;
-  signupUrl: string;
-  appName: string;
-  resolvedModels: ResolvedSkillModels;
-  leadMagnetConfig: LeadMagnetConfigData | null;
-  skillData: SkillGetResponseOutput | null;
-  /** The id points at a skill that was removed: render the retired state. */
-  removed: boolean;
-}
-
-// Reference token counts for "~X credits/msg" estimate (short message)
-const REF_INPUT_TOKENS = 200;
-const REF_OUTPUT_TOKENS = 400;
 
 export async function tanstackLoader({
   params,
-}: Props): Promise<SkillLandingPageData | null> {
-  const { locale, skillId } = await params;
-  const logger = createEndpointLogger(false, locale);
-
-  const userResponse = await UserRepository.getUserByAuth(
-    {
-      detailLevel: UserDetailLevel.MINIMAL,
-      roles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
-    },
-    locale,
-    logger,
-  );
-  const user = userResponse.success ? userResponse.data : null;
-  if (!user) {
-    logger.error("Failed to get identity on skills page");
-    return null;
-  }
-  const skillUser: JwtPayloadType = user;
-
-  const { skillId: baseSkillId, variantId } = parseSkillId(skillId);
-  const skillResult = await SkillsRepository.getSkillById(
-    { id: baseSkillId },
-    skillUser,
-    logger,
-    locale,
-  );
-  // Unknown or private skill: real 404 instead of an empty 200 landing page.
-  // A skill we removed on purpose (old messages still link it) gets a
-  // "retired" state instead.
-  if (
-    !skillResult.success &&
-    skillResult.errorType === ErrorResponseTypes.NOT_FOUND
-  ) {
-    if (!isRemovedSkillId(baseSkillId)) {
-      notFound();
-    }
-    const { t: configTRemoved } = configScopedTranslation.scopedT(locale);
-    return {
-      locale,
-      skillId,
-      user: skillUser,
-      platform: Platform.NEXT_PAGE,
-      signupUrl: `/${locale}/user/signup`,
-      appName: configTRemoved("appName"),
-      resolvedModels: {
-        variants: [],
-        voiceName: null,
-        imageGenName: null,
-        musicGenName: null,
-        videoGenName: null,
-        hasStt: false,
-      },
-      leadMagnetConfig: null,
-      skillData: null,
-      removed: true,
-    };
-  }
-  const initialSkillData = skillResult.success ? skillResult.data : null;
-
-  const { t: configT } = configScopedTranslation.scopedT(locale);
-  const appName = configT("appName");
-
-  const availability = await getEnvAvailability();
-
-  // Resolve per-variant model info server-side - avoids SSR circular dep in client bundle.
-  const resolvedVariants: ResolvedSkillModels["variants"] = [];
-  for (const v of initialSkillData?.variants ?? []) {
-    const chatSel = v.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION;
-    const chatModel = getBestChatModel(chatSel, skillUser, availability);
-    const provider = chatModel
-      ? (modelProviders[chatModel.provider] ?? null)
-      : null;
-
-    let chatCreditCost: string | null = null;
-    if (chatModel) {
-      const cost =
-        typeof chatModel.creditCost === "function"
-          ? chatModel.creditCost(
-              chatModel,
-              REF_INPUT_TOKENS,
-              REF_OUTPUT_TOKENS,
-              0,
-              0,
-            )
-          : ((chatModel.creditCost as number | undefined) ?? 0);
-      if (cost > 0) {
-        chatCreditCost = `~${Math.round(cost * 10) / 10} credits/msg`;
-      }
-    }
-
-    const voiceSel = v.voiceModelSelection ?? null;
-    const voiceName = voiceSel
-      ? (getBestTtsModel(voiceSel, skillUser, availability)?.name ?? null)
-      : null;
-
-    const imageGenSel = v.imageGenModelSelection ?? null;
-    const imageGenModel = imageGenSel
-      ? getBestImageGenModel(imageGenSel, skillUser, availability)
-      : null;
-    const imageGenName = imageGenModel?.name ?? null;
-    const imageGenCreditCost =
-      imageGenModel?.creditCostPerImage !== undefined
-        ? `${imageGenModel.creditCostPerImage} credits/img`
-        : null;
-
-    const musicGenSel = v.musicGenModelSelection ?? null;
-    const musicGenName = musicGenSel
-      ? (getBestMusicGenModel(musicGenSel, skillUser, availability)?.name ??
-        null)
-      : null;
-
-    const videoGenSel = v.videoGenModelSelection ?? null;
-    const videoGenName = videoGenSel
-      ? (getBestVideoGenModel(videoGenSel, skillUser, availability)?.name ??
-        null)
-      : null;
-
-    resolvedVariants.push({
-      id: v.id,
-      displayName: v.displayName ?? null,
-      chatModelName: chatModel?.name ?? null,
-      chatProviderName: provider?.name ?? null,
-      chatProviderIcon: provider?.icon ?? null,
-      chatCreditCost,
-      voiceModelName: voiceName,
-      imageGenModelName: imageGenName,
-      imageGenCreditCost,
-      musicGenModelName: musicGenName,
-      videoGenModelName: videoGenName,
-      hasStt: !!v.sttModelSelection,
-      hasImageVision: !!v.imageVisionModelSelection,
-      hasVideoVision: !!v.videoVisionModelSelection,
-      hasAudioVision: !!v.audioVisionModelSelection,
-      toolCount: 0,
-    });
-  }
-
-  const skillToolCount = (initialSkillData?.availableTools ?? []).length;
-  for (const rv of resolvedVariants) {
-    rv.toolCount = skillToolCount;
-  }
-
-  const allVariants = initialSkillData?.variants ?? [];
-  const defaultVariant =
-    (variantId ? allVariants.find((v) => v.id === variantId) : null) ??
-    allVariants.find((v) => v.isDefault) ??
-    allVariants[0] ??
-    null;
-
-  const voiceSel = defaultVariant?.voiceModelSelection ?? null;
-  const voiceName = voiceSel
-    ? (getBestTtsModel(voiceSel, skillUser, availability)?.name ?? null)
-    : null;
-
-  const imageGenSel = defaultVariant?.imageGenModelSelection ?? null;
-  const imageGenName = imageGenSel
-    ? (getBestImageGenModel(imageGenSel, skillUser, availability)?.name ?? null)
-    : null;
-
-  const musicGenSel = defaultVariant?.musicGenModelSelection ?? null;
-  const musicGenName = musicGenSel
-    ? (getBestMusicGenModel(musicGenSel, skillUser, availability)?.name ?? null)
-    : null;
-
-  const videoGenSel = defaultVariant?.videoGenModelSelection ?? null;
-  const videoGenName = videoGenSel
-    ? (getBestVideoGenModel(videoGenSel, skillUser, availability)?.name ?? null)
-    : null;
-
-  const hasStt = !!defaultVariant?.sttModelSelection;
-
-  const resolvedModels: ResolvedSkillModels = {
-    variants: resolvedVariants,
-    voiceName,
-    imageGenName,
-    musicGenName,
-    videoGenName,
-    hasStt,
-  };
-
-  const creator = initialSkillData?.creatorProfile ?? null;
-  const signupUrl = `/${locale}/user/signup${
-    creator?.referralCode
-      ? `?ref=${creator.referralCode}&skillId=${skillId}`
-      : `?skillId=${skillId}`
-  }`;
-
-  // Fetch creator's lead magnet config for the capture form
-  // NOTE: creatorProfile is only populated for USER-owned skills, so we do a
-  // direct DB lookup for the skill's userId to handle PUBLIC-owned skills too.
-  let leadMagnetConfig: LeadMagnetConfigData | null = null;
-  {
-    const { db } = await import("next-vibe/database");
-    const { leadMagnetConfigs } = await import("@/lead-magnet/db");
-    const { customSkills } = await import("next-vibe/agent/skills/db");
-    const { eq } = await import("drizzle-orm");
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    const [skillRow] = uuidRegex.test(baseSkillId)
-      ? await db
-          .select({ userId: customSkills.userId })
-          .from(customSkills)
-          .where(eq(customSkills.id, baseSkillId))
-          .limit(1)
-      : [];
-    if (skillRow) {
-      const configRows = await db
-        .select({
-          headline: leadMagnetConfigs.headline,
-          buttonText: leadMagnetConfigs.buttonText,
-          isActive: leadMagnetConfigs.isActive,
-        })
-        .from(leadMagnetConfigs)
-        .where(eq(leadMagnetConfigs.userId, skillRow.userId))
-        .limit(1);
-      const cfg = configRows[0];
-      if (cfg?.isActive) {
-        leadMagnetConfig = {
-          headline: cfg.headline,
-          buttonText: cfg.buttonText,
-        };
-      }
-    }
-  }
-
-  return {
-    locale,
-    skillId,
-    user: skillUser,
-    platform: Platform.NEXT_PAGE,
-    signupUrl,
-    appName,
-    resolvedModels,
-    leadMagnetConfig,
-    skillData: initialSkillData,
-    removed: false,
-  };
+  searchParams,
+}: SkillPageProps): Promise<SkillLandingPageData | null> {
+  return loadSkillLandingPage({ params, searchParams });
 }
 
 export function TanstackPage(data: SkillLandingPageData): JSX.Element {
-  return <SkillLandingPage {...data} />;
+  return (
+    <SiteLayoutPage
+      {...data.layout}
+      hideNewsletter={data.leadMagnetConfig !== null}
+    >
+      <SkillLandingPage {...data} />
+    </SiteLayoutPage>
+  );
 }
 
 export default async function SkillPage({
   params,
-}: Props): Promise<JSX.Element> {
-  const data = await tanstackLoader({ params });
+  searchParams,
+}: SkillPageProps): Promise<JSX.Element> {
+  const data = await tanstackLoader({ params, searchParams });
   if (!data) {
     return <Div />;
   }

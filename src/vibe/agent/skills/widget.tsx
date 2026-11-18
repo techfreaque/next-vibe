@@ -65,15 +65,13 @@ import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-c
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { useCallback, useMemo, useState } from "react";
 
-import { useSelectorOnboardingContext } from "../ai-stream/stream/widget/selector/selector-onboarding/context";
+import { useModelSelectorState } from "../chat/model-selector-state";
 import { useChatSettings } from "../chat/settings/hooks";
 import { parseSkillId } from "../chat/slugify";
-import { useTourState } from "../chat/tour-state";
 import { useProviderAvailability } from "../env-availability-store";
 import { getAvailableChatModelCount } from "../models/all-models";
 import { ModelCreditDisplay } from "../models/widget/model-credit-display";
 import skillDetailDefinitions from "./[id]/definition";
-import { COMPANION_SKILLS } from "./config";
 import type definition from "./definition";
 import type { SkillListItem } from "./definition";
 import { SkillOwnershipType, SkillSourceFilter, SkillTrustLevel } from "./enum";
@@ -124,10 +122,6 @@ export function SkillsListContainer({
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const searchQuery = form.watch("query") ?? "";
   const sourceFilter = form.watch("sourceFilter") ?? "";
-  const { isOnboarding, companionSkillId } = useSelectorOnboardingContext();
-  const setModelSelectorOpen = useTourState(
-    (state) => state.setModelSelectorOpen,
-  );
 
   // Read active favorite from settings so activate state reflects correctly
   const { settings } = useChatSettings(user, logger);
@@ -241,11 +235,6 @@ export function SkillsListContainer({
     );
   }
 
-  // Get companion skill name for onboarding banner
-  const companionSkill = companionSkillId
-    ? COMPANION_SKILLS.find((c) => c.id === companionSkillId)
-    : null;
-
   const handleCreateCustomClick = async (): Promise<void> => {
     if (isPublic) {
       // Show signup prompt for public users
@@ -328,58 +317,6 @@ export function SkillsListContainer({
     return (
       <Div className="flex flex-col gap-0">
         {/* Top Actions: Back + Create + Fullscreen */}
-        {!isOnboarding && (
-          <Div
-            className={cn(
-              "sticky top-0 z-10 flex flex-row items-center gap-2 border-b border-border px-3 py-2",
-              isFullPage ? "bg-card" : "bg-popover",
-            )}
-          >
-            <NavigateButtonWidget field={children.backButton} />
-            <Span className="truncate text-base font-semibold tracking-tight">
-              {t("get.titleShort")}
-            </Span>
-            <Div className="ml-auto flex items-center gap-1.5">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-9 gap-1.5"
-                onClick={handleCreateCustomClick}
-              >
-                <Plus className="h-4 w-4" />
-                <Span className="hidden min-[380px]:inline">
-                  {t("get.createButton.label")}
-                </Span>
-              </Button>
-              {!isFullPage && (
-                <Link
-                  href={`/${locale}/skills`}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  title={t("get.openFullPage")}
-                  aria-label={t("get.openFullPage")}
-                >
-                  <Maximize className="h-4 w-4" />
-                </Link>
-              )}
-            </Div>
-          </Div>
-        )}
-
-        {/* Loading Spinner */}
-        <Div className="flex items-center justify-center py-16">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </Div>
-      </Div>
-    );
-  }
-
-  // Both public and authenticated users see the same skill list
-  return (
-    <Div className="flex flex-col gap-0">
-      {/* Top Actions: Back + Create + Fullscreen - sticky so it stays visible
-          while the surrounding container (popover or page) scrolls */}
-      {!isOnboarding && (
         <Div
           className={cn(
             "sticky top-0 z-10 flex flex-row items-center gap-2 border-b border-border px-3 py-2",
@@ -415,31 +352,59 @@ export function SkillsListContainer({
             )}
           </Div>
         </Div>
-      )}
+
+        {/* Loading Spinner */}
+        <Div className="flex items-center justify-center py-16">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </Div>
+      </Div>
+    );
+  }
+
+  // Both public and authenticated users see the same skill list
+  return (
+    <Div className="flex flex-col gap-0">
+      {/* Top Actions: Back + Create + Fullscreen - sticky so it stays visible
+          while the surrounding container (popover or page) scrolls */}
+      <Div
+        className={cn(
+          "sticky top-0 z-10 flex flex-row items-center gap-2 border-b border-border px-3 py-2",
+          isFullPage ? "bg-card" : "bg-popover",
+        )}
+      >
+        <NavigateButtonWidget field={children.backButton} />
+        <Span className="truncate text-base font-semibold tracking-tight">
+          {t("get.titleShort")}
+        </Span>
+        <Div className="ml-auto flex items-center gap-1.5">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-9 gap-1.5"
+            onClick={handleCreateCustomClick}
+          >
+            <Plus className="h-4 w-4" />
+            <Span className="hidden min-[380px]:inline">
+              {t("get.createButton.label")}
+            </Span>
+          </Button>
+          {!isFullPage && (
+            <Link
+              href={`/${locale}/skills`}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              title={t("get.openFullPage")}
+              aria-label={t("get.openFullPage")}
+            >
+              <Maximize className="h-4 w-4" />
+            </Link>
+          )}
+        </Div>
+      </Div>
 
       {/* Content - scroll is owned by the surrounding container (popover or page) */}
       <Div>
         <Div className="p-3 sm:p-4">
-          {/* Onboarding Success Banner */}
-          {isOnboarding && companionSkill && (
-            <Div className="bg-gradient-to-r from-primary/15 to-primary/5 border border-primary/30 rounded-lg px-4 py-4 mb-6 shadow-sm">
-              <Div className="flex flex-col items-center text-center gap-3">
-                <Div className="rounded-full bg-primary/20 p-3">
-                  <CheckCircle2 className="h-6 w-6 text-primary" />
-                </Div>
-                <Div className="flex flex-col gap-1">
-                  <Div className="text-base font-semibold text-primary">
-                    {t("onboarding.success.title", {
-                      companion: t(companionSkill.name),
-                    })}
-                  </Div>
-                  <Div className="text-sm text-muted-foreground">
-                    {t("onboarding.success.subtitle")}
-                  </Div>
-                </Div>
-              </Div>
-            </Div>
-          )}
           {/* Search + source filter - first thing you see */}
           <Div className="mb-4 flex flex-wrap items-center gap-2">
             {/* Search bar */}
@@ -478,55 +443,53 @@ export function SkillsListContainer({
             </Div>
 
             {/* Source filter pills */}
-            {!isOnboarding && (
-              <Div className="flex rounded-lg bg-muted p-1">
-                {(
-                  [
-                    {
-                      value: SkillSourceFilter.BUILT_IN,
-                      label: "enums.source.builtIn" as const,
-                    },
-                    {
-                      value: SkillSourceFilter.COMMUNITY,
-                      label: "enums.source.community" as const,
-                    },
-                    ...(!isPublic
-                      ? [
-                          {
-                            value: SkillSourceFilter.MY,
-                            label: "enums.source.my" as const,
-                          },
-                        ]
-                      : []),
-                  ] as const
-                ).map((filter) => {
-                  const isActive = sourceFilter === filter.value;
-                  return (
-                    <Button
-                      key={filter.value}
-                      type="button"
-                      variant="ghost"
-                      size="unset"
-                      onClick={() =>
-                        form.setValue("sourceFilter", filter.value, {
-                          shouldValidate: true,
-                          shouldDirty: true,
-                          shouldTouch: true,
-                        })
-                      }
-                      className={cn(
-                        "h-8 rounded-md px-3 text-xs font-medium",
-                        isActive
-                          ? "bg-card text-foreground shadow-sm"
-                          : "text-muted-foreground hover:text-foreground",
-                      )}
-                    >
-                      {t(filter.label)}
-                    </Button>
-                  );
-                })}
-              </Div>
-            )}
+            <Div className="flex rounded-lg bg-muted p-1">
+              {(
+                [
+                  {
+                    value: SkillSourceFilter.BUILT_IN,
+                    label: "enums.source.builtIn" as const,
+                  },
+                  {
+                    value: SkillSourceFilter.COMMUNITY,
+                    label: "enums.source.community" as const,
+                  },
+                  ...(!isPublic
+                    ? [
+                        {
+                          value: SkillSourceFilter.MY,
+                          label: "enums.source.my" as const,
+                        },
+                      ]
+                    : []),
+                ] as const
+              ).map((filter) => {
+                const isActive = sourceFilter === filter.value;
+                return (
+                  <Button
+                    key={filter.value}
+                    type="button"
+                    variant="ghost"
+                    size="unset"
+                    onClick={() =>
+                      form.setValue("sourceFilter", filter.value, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                        shouldTouch: true,
+                      })
+                    }
+                    className={cn(
+                      "h-8 rounded-md px-3 text-xs font-medium",
+                      isActive
+                        ? "bg-card text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {t(filter.label)}
+                  </Button>
+                );
+              })}
+            </Div>
           </Div>
 
           {/* Direct model access - compact row, any model without a skill */}
@@ -608,34 +571,6 @@ export function SkillsListContainer({
           </Div>
         </Div>
       </Div>
-
-      {/* Onboarding Sticky Bottom Section */}
-      {isOnboarding && (
-        <Div className="flex flex-row gap-2 px-4 py-4 border-t sticky bottom-0 z-10 bg-popover">
-          <Button
-            type="button"
-            variant="outline"
-            size="default"
-            onClick={handleCreateCustomClick}
-            className="ml-auto"
-          >
-            {t("get.createButton.label")}
-          </Button>
-          <Button
-            type="button"
-            variant="default"
-            size="lg"
-            className="w-full"
-            onClick={() => {
-              // Close the selector modal
-              setModelSelectorOpen(false);
-              logger.info("Onboarding complete");
-            }}
-          >
-            {t("onboarding.bottom.button")}
-          </Button>
-        </Div>
-      )}
     </Div>
   );
 }
@@ -1926,7 +1861,7 @@ export function SkillFavoriteActions({
     activeFavoriteId !== null && favoriteIds.includes(activeFavoriteId);
   const pathname = usePathname();
   const isOnThreads = pathname?.includes("/threads/") ?? false;
-  const setModelSelectorOpen = useTourState(
+  const setModelSelectorOpen = useModelSelectorState(
     (state) => state.setModelSelectorOpen,
   );
   const availability = useProviderAvailability();

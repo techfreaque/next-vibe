@@ -373,7 +373,6 @@ export const translations: typeof enTranslations = {
             "Gib mir die stärksten Argumente für und gegen Krypto. Ohne Ausflüchte, ohne Disclaimer.",
         },
       },
-      takeTour: "Kurze Tour starten (1 Minute)",
       backgroundTitle: "Deine KI-Agenten arbeiten",
       backgroundDescription:
         "Subagenten und autonome Hintergrundagenten erledigen Aufgaben hier, während du dich um anderes kümmern kannst. Ergebnisse landen automatisch hier.",
@@ -437,20 +436,29 @@ export const translations: typeof enTranslations = {
         weakAt: "Schwach bei:",
       },
       spotlight: {
+        adultsOnly: "18+",
         title: "Wähl, wie {{name}} arbeitet.",
         subtitle:
           "Jeder Modus nutzt ein anderes Modell. Oder schreib einfach los.",
-        now: "Aktueller Modus",
+        now: "Aktueller Modus: {{mode}}",
         runsOn: "Läuft auf",
         allModes: "Alle Modi",
-        more: "Weitere Modi",
         fix: {
-          politics: "Politik? Wechsel zu {{mode}}",
-          complex: "Komplexe Aufgabe? Wechsel zu {{mode}}",
+          politics: "Politik? Wechsle zu {{mode}}",
+          complex: "Komplexe Aufgabe? Wechsle zu {{mode}}",
         },
       },
+      ready: {
+        change: "Modus ändern",
+        title: "Bereit. Einfach absenden.",
+        who: "{{name}} antwortet mit {{model}}.",
+        whoSingle: "{{name}} antwortet in diesem Chat.",
+        added: "Neu in deinen Skills: {{skills}}.",
+        prompt: "Dein erster Prompt steht im Feld: anpassen oder absenden.",
+        empty: "Schreib deine erste Nachricht.",
+      },
       single: {
-        title: "{{name}} nutzt ein einziges Modell.",
+        title: "Chatte mit {{name}}.",
         action: "Zu {{companion}} wechseln, für mehr Modi",
       },
       companion: {

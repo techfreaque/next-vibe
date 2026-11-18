@@ -11,7 +11,6 @@
 import { platform } from "next-vibe/core/env-client";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { UserRole } from "next-vibe/identity/roles/enum";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,13 +42,7 @@ import { apiClient } from "next-vibe/unified-ui/hooks/store";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
-import React, {
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 
 import { InputHeightProvider } from "@/_pages/chat/lib/config/constants";
 import { parseChatUrl } from "@/_pages/chat/lib/url-parser";
@@ -65,16 +58,14 @@ import { useDeleteDialogStore } from "../../../chat/threads/[threadId]/messages/
 import { scopedTranslation } from "../../../chat/threads/widget/i18n";
 import { ChatEmptyState } from "../../../chat/threads/widget/new-thread/empty-state";
 import { CortexModal } from "../../../cortex/widget/cortex-modal";
-import { useProviderAvailability } from "../../../env-availability-store";
-import { getAvailableChatModelCount } from "../../../models/all-models";
 import { AIToolsModal } from "../../../tools/widget/ai-tools-modal";
 import type definition from "../definition";
 import type { AiStreamPostResponseOutput } from "../definition";
 import { IncognitoStreamKeeper } from "../hooks/incognito-stream-keeper";
 import { SidebarWrapper } from "./chat-ui/sidebar/sidebar-wrapper";
 import { TopBar } from "./chat-ui/top-area/top-bar";
-import { WelcomeTour } from "./chat-ui/welcome-tour/welcome-tour";
 import { ChatInputContainer } from "./input-container";
+import { CompanionOnboarding } from "./onboarding/companion-onboarding";
 import { ChatToolbar } from "./toolbar";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -306,12 +297,6 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
 
   const isAuthenticated = !user.isPublic;
-  const isAdmin = isAuthenticated && user.roles.includes(UserRole.ADMIN);
-  const availability = useProviderAvailability();
-  const totalModelCount = getAvailableChatModelCount(isAdmin, availability);
-
-  // Auth dialog for welcome tour
-  const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   // Navigation hooks
   const router = useRouter();
@@ -439,45 +424,12 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
         </AlertDialog>
       </ErrorBoundary>
 
-      {/* Auth Dialog for Tour */}
-      <ErrorBoundary locale={locale}>
-        <AlertDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                {t("components.welcomeTour.authDialog.title")}
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                {t("components.welcomeTour.authDialog.description")}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setAuthDialogOpen(false)}>
-                {t("components.welcomeTour.authDialog.continueTour")}
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => {
-                  router.push(
-                    `/${locale}/user/login?callbackUrl=${encodeURIComponent(pathname)}`,
-                  );
-                }}
-              >
-                {t("components.welcomeTour.authDialog.signUp")}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </ErrorBoundary>
-
-      {/* Welcome Tour */}
-      <ErrorBoundary locale={locale}>
-        <WelcomeTour
-          isAuthenticated={isAuthenticated}
-          locale={locale}
-          autoStart={false}
-          totalModelCount={totalModelCount}
-        />
-      </ErrorBoundary>
+      {/* First-run companion onboarding */}
+      {!isPublicFeed && !showSignInGate ? (
+        <ErrorBoundary locale={locale}>
+          <CompanionOnboarding />
+        </ErrorBoundary>
+      ) : null}
     </>
   );
 }

@@ -24,6 +24,8 @@ import type { ChatModelSelection } from "../../ai-stream/models";
 import { STORAGE_KEYS } from "../../chat/constants";
 import { ChatSettingsRepositoryClient } from "../../chat/settings/repository-client";
 import {
+  ensureUniqueSlug,
+  formatSkillId,
   generateFavoriteSlug,
   generateSlug,
   parseSkillId,
@@ -53,6 +55,11 @@ import type {
   FavoriteCreateResponseOutput,
 } from "./create/definition";
 import type { FavoriteConfig } from "./db";
+import {
+  DEFAULT_COMPANION_SKILL_ID,
+  getDefaultCompanionVariants,
+  isCompanionSkillId,
+} from "./default-companion";
 import type { FavoriteCard, FavoritesListResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 import type { FavoritesReorderRequestOutput } from "./reorder/definition";
@@ -301,14 +308,8 @@ export class ChatFavoritesRepositoryClient {
       });
       const existingSlugs = currentConfigs.map((c) => c.id);
       // Ensure uniqueness: append -2, -3, etc. if needed
-      let id = baseSlug || "favorite";
-      if (existingSlugs.includes(id)) {
-        let counter = 2;
-        while (existingSlugs.includes(`${id}-${counter}`)) {
-          counter++;
-        }
-        id = `${id}-${counter}`;
-      }
+      const id = ensureUniqueSlug(baseSlug || "favorite", existingSlugs);
+      existingSlugs.push(id);
 
       const newConfig: StoredLocalFavorite = {
         id,
@@ -319,8 +320,43 @@ export class ChatFavoritesRepositoryClient {
         position: currentConfigs.length,
       };
 
-      await this.saveAllLocalFavorites([...currentConfigs, newConfig], logger);
-      logger.debug("Created favorite", { id });
+      // Mirrors the server's ensureDefaultCompanion: a non-companion favorite
+      // on a set without any companion also stores every variant of the
+      // default companion, positioned after the new favorite. Thin pointers:
+      // model selections resolve through the skill variant at read time.
+      const holdsCompanion = currentConfigs.some((c) =>
+        isCompanionSkillId(parseSkillId(c.skillId).skillId),
+      );
+      const companionConfigs: StoredLocalFavorite[] =
+        isCompanionSkillId(plainSkillId) || holdsCompanion
+          ? []
+          : getDefaultCompanionVariants().map((variant, index) => {
+              const companionId = ensureUniqueSlug(
+                generateFavoriteSlug({
+                  skillSlug: DEFAULT_COMPANION_SKILL_ID,
+                  variantId: variant.id,
+                }),
+                existingSlugs,
+              );
+              existingSlugs.push(companionId);
+              return {
+                id: companionId,
+                skillId: formatSkillId(DEFAULT_COMPANION_SKILL_ID, variant.id),
+                voiceModelSelection: null,
+                modelSelection: null,
+                customIcon: null,
+                position: currentConfigs.length + 1 + index,
+              };
+            });
+
+      await this.saveAllLocalFavorites(
+        [...currentConfigs, newConfig, ...companionConfigs],
+        logger,
+      );
+      logger.debug("Created favorite", {
+        id,
+        companionsAdded: companionConfigs.length,
+      });
 
       return success({
         success: t("post.success.title"),

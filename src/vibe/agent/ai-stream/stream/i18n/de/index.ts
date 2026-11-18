@@ -610,78 +610,85 @@ export const translations: typeof enTranslations = {
     },
   },
   onboarding: {
-    signin: {
-      title: "Sichere dein Setup",
-      subtitle: "Einmal anmelden. Alles, was du hier aufbaust, bleibt dir.",
-      benefits: {
-        sync: {
-          title: "Geräteübergreifend synchronisiert",
-          body: "Begleiter, Spezialisten und Chats auf jedem deiner Geräte.",
-        },
-        keep: {
-          title: "Nichts geht verloren",
-          body: "Als Gast bleibt alles nur in diesem Browser. Angemeldet bleibt es dir erhalten.",
-        },
-        private: {
-          title: "Standardmäßig privat",
-          body: "Du bestimmst über deine Daten und dein Filterlevel. Immer.",
-        },
-      },
-      cta: "Anmelden oder Konto erstellen",
-      continueAsGuest: "Als Gast fortfahren",
-      note: "Du kannst dich jederzeit später über das Menü anmelden.",
-    },
-    setup: {
-      title: "Richte deine KI ein",
+    progress: "Schritt {{current}} von {{total}}",
+    skip: "Überspringen",
+    skipCompanion: "Einrichtung überspringen",
+    notNow: "Später",
+    back: "Zurück",
+    saving: "Wird eingerichtet...",
+    failed:
+      "Speichern fehlgeschlagen. Prüfe deine Verbindung und versuch es nochmal.",
+    retry: "Nochmal versuchen",
+    guestCredits: "{{credits}} Gratis-Credits. Ohne Anmeldung.",
+    noProviderAvailable:
+      "Kein KI-Anbieter konfiguriert. Füge OPENROUTER_API_KEY hinzu oder aktiviere Claude Code (CLAUDE_CODE_ENABLED=true), um fortzufahren.",
+    companion: {
+      title: "Wähl deinen Begleiter",
       subtitle:
-        "Wähle deinen Gesprächspartner. Spezialisten nach Bedarf. Alles jederzeit änderbar.",
-      companionLabel: "Dein Begleiter",
-      specialistsLabel: "Spezialisten hinzufügen",
-      optional: "optional",
-      start: "Chat starten",
-      saving: "Wird eingerichtet...",
-      failed:
-        "Setup konnte nicht gespeichert werden. Prüfe die Verbindung und versuch es nochmal.",
-      retry: "Nochmal versuchen",
+        "Dein Begleiter antwortet in jedem neuen Chat. Das Modell wechselst du jederzeit, unzensiert inklusive.",
+      missingTitle: "Dir fehlt ein Begleiter",
+      missingSubtitle:
+        "Ein Begleiter antwortet in jedem neuen Chat und kennt deine Skills. Wähl einen, dauert eine Sekunde.",
+      arrivalTitle: "{{skill}} ist hinzugefügt. Wer wird dein Begleiter?",
+      arrivalSubtitle:
+        "{{skill}} antwortet in diesem Chat. Dein Begleiter übernimmt alle anderen.",
+      groupLabel: "Begleiter",
+      recommended: "Empfohlen",
+      about: {
+        thea: "Warmherzig, weise, ehrlich. Antike Weisheit für moderne Probleme.",
+        hermes: "Direkt und zielstrebig. Strategie, Disziplin, keine Ausreden.",
+      },
+      voice: {
+        thea: "„Wer anfängt, besiegt die Angst.“",
+        hermes: "„Motivation ist Wetter. Disziplin ist Klima.“",
+      },
+      arrivalContinue: "Weiter",
+      continue: "Weiter mit {{name}}",
+      start: "Mit {{name}} starten",
     },
-    usecases: {
-      noProviderAvailable:
-        "Kein KI-Anbieter konfiguriert. Füge OPENROUTER_API_KEY hinzu oder aktiviere Claude Code (CLAUDE_CODE_ENABLED=true) um fortzufahren.",
-      coding: {
-        label: "Coding & Technik",
-        hint: "Vibe Coder, Coder",
-      },
-      research: {
-        label: "Recherche & Analyse",
-        hint: "Researcher, Data Analyst",
-      },
-      writing: {
-        label: "Schreiben & Bearbeiten",
-        hint: "Writer, Editor",
-      },
-      business: {
-        label: "Business & Strategie",
-        hint: "Business Advisor, Product Manager",
-      },
-      learning: {
-        label: "Lernen & Studium",
-        hint: "Tutor, Socratic Questioner",
-      },
-      creative: {
-        label: "Kreativität & Geschichten",
-        hint: "Storyteller, Kreativ",
-      },
-      health: {
-        label: "Gesundheit & Karriere",
-        hint: "Wellness, Karriere-Coach",
-      },
-      controversial: {
-        label: "Freies Denken",
-        hint: "Ohne Zensur, Philosoph",
-      },
-      roleplay: {
-        label: "Rollenspiel & Charaktere",
-        hint: "Rollenspiel, Charakterersteller",
+    consent: {
+      reason:
+        "{{skill}} läuft auf {{model}}, einem unzensierten Modell. Einmal bestätigen, dann chatten.",
+      label: "Einmalige Bestätigung: ab 18",
+      agreeStart: "Ich bin 18+, loslegen",
+      agreeContinue: "Ich bin 18+, weiter",
+    },
+    goal: {
+      change: "Ändern",
+      title: "Womit willst du anfangen?",
+      subtitle:
+        "Wir fügen die passenden Skills hinzu und schreiben deinen ersten Prompt. Vor dem Senden kannst du ihn ändern.",
+      groupLabel: "Erstes Ziel",
+      adds: "Fügt hinzu: {{skills}}",
+      noSkills: "Keine Extra-Skills, nur dein Begleiter",
+      adultsOnly: "18+",
+      promptLabel: "Dein erster Prompt",
+      start: "Loslegen",
+      tiles: {
+        uncensored: {
+          title: "Unzensiert",
+          body: "Frag, was andere KIs abblocken. Klare Antworten, du entscheidest.",
+          prompt:
+            "Sollten alle Drogen legal sein? Bezieh Stellung und verteidige sie.",
+        },
+        media: {
+          title: "Bilder, Video, Musik",
+          body: "Ein Satz rein, Kunst, Clips oder Songs raus.",
+          prompt:
+            "Erstelle ein Bild: eine neonbeleuchtete Gasse in Tokio bei Nacht im Regen, cineastisch, auf 35-mm-Film.",
+        },
+        coding: {
+          title: "Coding",
+          body: "Code schreiben, debuggen, deployen.",
+          prompt:
+            "Schreib ein Python-Skript, das jedes Foto in einem Ordner nach seinem Aufnahmedatum umbenennt.",
+        },
+        chat: {
+          title: "Einfach reden",
+          body: "Denk es mit {{companion}} durch. Nichts einzurichten.",
+          prompt:
+            "Ich muss eine große Entscheidung treffen und schwanke ständig hin und her. Hilf mir, das durchzudenken.",
+        },
       },
     },
   },

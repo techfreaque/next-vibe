@@ -93,7 +93,11 @@ interface EmbeddingResponse {
  */
 function responseCostUsd(data: EmbeddingResponse, text: string): number {
   const reported = data.usage?.cost;
-  if (typeof reported === "number" && Number.isFinite(reported) && reported > 0) {
+  if (
+    typeof reported === "number" &&
+    Number.isFinite(reported) &&
+    reported > 0
+  ) {
     return reported;
   }
   const tokens = data.usage?.prompt_tokens ?? estimateEmbeddingTokens(text);

@@ -39,8 +39,8 @@ import {
   getFolderTourAttr,
   getTourSelector,
   TOUR_DATA_ATTRS,
-} from "../../ai-stream/stream/widget/chat-ui/welcome-tour/tour-attrs";
-import { TOUR_STORAGE_KEY } from "../../ai-stream/stream/widget/chat-ui/welcome-tour/tour-config";
+} from "../../ai-stream/stream/widget/chat-ui/data-attrs";
+import { STORAGE_KEYS } from "../constants";
 import { chatFolders, chatMessages, chatThreads } from "../db";
 import { ChatMessageRole, ThreadStreamingState } from "../enum";
 import { getStorageAdapter } from "../storage";
@@ -269,14 +269,14 @@ export const TINY_PNG = Buffer.from(
   "base64",
 );
 
-/** The welcome tour overlays the chat on first visit — mark it done for this context. */
-export async function suppressWelcomeTour(
+/** The first-run onboarding dialog overlays the chat - mark it done for this context. */
+export async function suppressOnboarding(
   context: BrowserContext,
 ): Promise<void> {
   await context.addInitScript((key) => {
     // eslint-disable-next-line restricted/no-browser-globals -- init script runs inside the browser page, not app code
     localStorage.setItem(key, "true");
-  }, TOUR_STORAGE_KEY);
+  }, STORAGE_KEYS.COMPANION_ONBOARDING_DONE);
 }
 
 /** A root folder tab in the chat sidebar (Private, Shared, Public…). */

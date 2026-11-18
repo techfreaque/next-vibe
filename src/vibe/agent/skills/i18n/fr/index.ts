@@ -692,10 +692,10 @@ export const translations: typeof enTranslations = {
       tagline: "IA pure, sans personnalité",
       shortDesc: "Assistant IA polyvalent",
       suggestedPrompts: {
-        0: "Aide-moi à trouver des idées pour un nouveau projet",
-        1: "Explique l'informatique quantique simplement",
-        2: "Écris une nouvelle créative sur le voyage dans le temps",
-        3: "Quelles sont les dernières tendances de l'IA ?",
+        0: "Donne-moi 10 idées de projets perso que je peux boucler en un week-end.",
+        1: "Explique-moi l'informatique quantique comme si j'avais 12 ans.",
+        2: "Écris une histoire de 300 mots sur un voyageur temporel qui rate son arrêt.",
+        3: "Qu'est-ce qui a changé récemment en IA et qui compte vraiment ?",
       },
       variants: {
         default: "Par défaut",
@@ -708,10 +708,10 @@ export const translations: typeof enTranslations = {
       tagline: "Défendre la vérité et la liberté",
       shortDesc: "Défense de la liberté d'expression et du débat ouvert",
       suggestedPrompts: {
-        0: "Parle de l'importance de la liberté d'expression",
-        1: "Analyse la censure dans les médias actuels",
-        2: "Débattons ouvertement de sujets controversés",
-        3: "Explore la liberté intellectuelle à l'université",
+        0: "Les réseaux sociaux devraient-ils pouvoir bannir qui ils veulent ?",
+        1: "Où passe la frontière entre discours haineux et liberté d'expression ? Trace-la.",
+        2: "Cite 5 idées censurées qui se sont révélées justes plus tard.",
+        3: "Une université peut-elle annuler un conférencier ? Oui ou non d'abord, puis pourquoi.",
       },
       variants: {
         elonTusk: "Audacieux",
@@ -723,28 +723,27 @@ export const translations: typeof enTranslations = {
         elonTusk: {
           description:
             "Dénonce la censure et défend le débat ouvert, avec très peu de garde-fous.",
-          strength: "Niveau Brillant, politique de contenu ouverte",
-          weakness: "Ouvert, pas non censuré. Peut encore arrondir les angles",
+          strength: "Haut de gamme. Répond sans refuser",
+          weakness: "Plus libre, pas non censuré. Peut arrondir les angles",
         },
         chineseWisdom: {
           description:
-            "Histoire, droit et analyse des médias autour de la liberté d'expression, au prix le plus bas ici.",
-          strength: "Niveau Brillant, le moins cher ici",
+            "Histoire, droit et médias de la liberté d'expression, au prix le plus bas.",
+          strength: "Haut de gamme, et le moins cher ici",
           weakness: "Consensuel en politique. Esquive les sujets brûlants",
         },
         techBro: {
           description:
-            "Argumentaires prudents et bien sourcés sur le droit de la parole, les plateformes et l'université.",
+            "Argumentaires sourcés sur la liberté d'expression, les plateformes et la fac.",
           strength: "Structure claire, recherche solide avec les outils",
-          weakness:
-            "Filtre mainstream. Refuse ou esquive les positions tranchées",
+          weakness: "Filtré. Refuse ou esquive les positions tranchées",
         },
         uncensored: {
           description:
-            "Défend la parole en s'y confrontant. Aborde ce que les autres refusent de toucher.",
+            "Défend la parole en la pratiquant. Aborde ce que les autres n'osent pas toucher.",
           strength:
-            "Entraîné sur des textes bannis : une politique à contre-courant",
-          weakness: "Contexte de 32K et prix fixe par message",
+            "Entraîné sur des textes bannis. Politique à contre-courant",
+          weakness: "Mémoire plus courte. Plus cher par message",
         },
       },
     },
@@ -754,10 +753,10 @@ export const translations: typeof enTranslations = {
       tagline: "Tout remettre en question",
       shortDesc: "Esprit critique et points de vue alternatifs",
       suggestedPrompts: {
-        0: "Conteste mon opinion sur le changement climatique",
-        1: "Argumente contre les croyances populaires",
-        2: "Remets en question les récits dominants",
-        3: "Donne-moi des contre-arguments à mon point de vue",
+        0: "Pour moi, le changement climatique est notre plus grande menace. Démonte ma position.",
+        1: "Défends l'idée que le télétravail est mauvais pour la plupart des gens.",
+        2: "Construis le meilleur argument pour dire que la démocratie est surcotée.",
+        3: "Je suis vegan par éthique. Donne-moi les meilleurs contre-arguments.",
       },
       variants: {
         elonTusk: "Audacieux",
@@ -768,20 +767,20 @@ export const translations: typeof enTranslations = {
         elonTusk: {
           description:
             "Trouve les failles de votre point de vue et s'oppose aux récits populaires.",
-          strength: "Niveau Brillant, politique de contenu ouverte",
-          weakness: "Ouvert, pas non censuré. Peut encore arrondir les angles",
+          strength: "Haut de gamme. Répond sans refuser",
+          weakness: "Plus libre, pas non censuré. Peut arrondir les angles",
         },
         chineseWisdom: {
           description:
-            "Des contre-arguments affûtés sur les questions du quotidien, au prix le plus bas ici.",
-          strength: "Niveau Brillant, le moins cher ici",
+            "Des contre-arguments affûtés sur le quotidien, au prix le plus bas ici.",
+          strength: "Haut de gamme, et le moins cher ici",
           weakness: "Consensuel en politique. Esquive les sujets brûlants",
         },
         uncensored: {
           description:
-            "Conteste toutes les croyances, y compris celles qu'on n'est pas censé remettre en cause. Ne se replie jamais sur le consensus.",
-          strength: "Entraîné sur des textes bannis : va à contre-courant",
-          weakness: "Contexte de 32K et prix fixe par message",
+            "Conteste toute croyance, même intouchable. Jamais de repli sur le consensus.",
+          strength: "Entraîné sur des textes bannis. Va à contre-courant",
+          weakness: "Mémoire plus courte. Plus cher par message",
         },
       },
     },
@@ -791,10 +790,10 @@ export const translations: typeof enTranslations = {
       tagline: "Précision et expertise",
       shortDesc: "Expertise technique et résolution de problèmes",
       suggestedPrompts: {
-        0: "Explique comment fonctionnent les hooks React",
-        1: "Débogue ce bout de code Python",
-        2: "Conçois un schéma de base de données scalable",
-        3: "Relis l'architecture de mon API",
+        0: "Explique le cleanup de useEffect dans React, avec un exemple.",
+        1: "Quand utiliser un générateur Python plutôt qu'une liste ?",
+        2: "Conçois un schéma Postgres pour un SaaS multi-tenant avec équipes et rôles.",
+        3: "REST ou GraphQL pour une app mobile avec synchro hors ligne ? Choisis et défends ton choix.",
       },
       variants: {
         kimi: "Équilibré",
@@ -806,13 +805,14 @@ export const translations: typeof enTranslations = {
         kimi: {
           description:
             "Le choix du quotidien pour les explications techniques, la doc et les schémas.",
-          strength: "Niveau Brillant, entrée bon marché, lit les images",
+          strength:
+            "Haut de gamme, peu cher sur les longues questions, lit les images",
           weakness: "Les longues réponses coûtent plus cher qu'Économique",
         },
         budget: {
           description:
             "Des réponses techniques poussées au prix le plus bas ici.",
-          strength: "Niveau Brillant, conçu pour des bases de code entières",
+          strength: "Haut de gamme, conçu pour des bases de code entières",
           weakness: "Texte uniquement. Ni captures d'écran ni schémas",
         },
         astra: {
@@ -823,9 +823,9 @@ export const translations: typeof enTranslations = {
         },
         sol: {
           description:
-            "Des réponses rigoureuses, étape par étape, pour les specs, l'architecture et les maths.",
+            "Réponses rigoureuses, étape par étape, pour specs, architecture et maths.",
           strength:
-            "Raisonneur premium pour une fraction du prix de Puissance max",
+            "Raisonnement poussé pour une fraction du prix de Puissance max",
           weakness: "Plus cher qu'Équilibré ou Économique",
         },
       },
@@ -849,15 +849,14 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         elonTusk: {
           description:
-            "L'évolution et l'écologie appliquées à tout, y compris aux sujets que les autres évitent.",
-          strength:
-            "Niveau Brillant, politique ouverte, dit ce que montre la nature",
-          weakness: "Ouvert, pas non censuré. Peut encore arrondir les angles",
+            "L'évolution et l'écologie appliquées à tout, même aux sujets qu'on évite.",
+          strength: "Haut de gamme. Dit sans refuser ce que montre la nature",
+          weakness: "Plus libre, pas non censuré. Peut arrondir les angles",
         },
         chineseWisdom: {
           description:
-            "Des réponses de biologie précises pour moins cher. Lit les images et vidéos de spécimens.",
-          strength: "Niveau Brillant, l'option la moins chère ici",
+            "Biologie précise pour moins cher. Lit les images et vidéos de spécimens.",
+          strength: "Haut de gamme, l'option la moins chère ici",
           weakness: "Consensuel en politique. Esquive les sujets brûlants",
         },
       },
@@ -868,10 +867,10 @@ export const translations: typeof enTranslations = {
       tagline: "Des faits, pas des récits",
       shortDesc: "Analyse historique sans parti pris",
       suggestedPrompts: {
-        0: "Explique les causes de la Seconde Guerre mondiale",
-        1: "Analyse la chute de l'Empire romain",
-        2: "Parle de la révolution industrielle",
-        3: "Compare les civilisations antiques",
+        0: "Le bombardement d'Hiroshima était-il justifié ? Les deux camps, puis ton verdict.",
+        1: "Qu'est-ce qui a vraiment causé la chute de l'Empire romain d'Occident ?",
+        2: "La colonisation a-t-elle été entièrement mauvaise ? Donne-moi les faits que chaque camp omet.",
+        3: "Quels « faits » historiques célèbres sont en réalité des mythes ?",
       },
       variants: {
         kimi: "Équilibré",
@@ -881,22 +880,22 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         kimi: {
           description:
-            "Une histoire fondée sur les sources, pour la plupart des époques. Lit les scans de documents et les cartes.",
-          strength: "Niveau Brillant, lit les images et la vidéo",
-          weakness: "Cadrage mainstream sur l'histoire politiquement sensible",
+            "Histoire fondée sur les sources, toutes époques. Lit scans et cartes.",
+          strength: "Haut de gamme, lit les images et la vidéo",
+          weakness: "Prudent sur l'histoire politiquement sensible",
         },
         budget: {
           description:
             "Analyse historique poussée de longs textes au prix le plus bas ici.",
-          strength: "Niveau Brillant, politique de contenu ouverte",
+          strength: "Haut de gamme. Répond sans refuser",
           weakness: "Texte uniquement. Ne lit ni scans ni cartes",
         },
         uncensored: {
           description:
-            "Histoire contestée, événements tabous et sujets politiques explosifs, sans détours.",
+            "Histoire contestée, faits tabous, sujets politiques explosifs. Sans détours.",
           strength:
-            "Entraîné sur des textes bannis : des lectures que le mainstream laisse de côté",
-          weakness: "Contexte de 32K, le plus cher par message",
+            "Entraîné sur des textes bannis. Des lectures que les autres évitent",
+          weakness: "Mémoire plus courte. Le plus cher par message",
         },
       },
     },
@@ -907,10 +906,10 @@ export const translations: typeof enTranslations = {
       tagline: "Penser plus loin",
       shortDesc: "Questionnement et exploration selon la méthode socratique",
       suggestedPrompts: {
-        0: "Aide-moi à réfléchir de façon critique à l'éthique",
-        1: "Remets en question mes idées sur la réussite",
-        2: "Explorons le sens du bonheur",
-        3: "Bouscule ma vision du monde",
+        0: "Mentir est-il parfois juste ? Oblige-moi à défendre ma réponse.",
+        1: "Pour moi, réussir, c'est gagner beaucoup d'argent. Remets ça en question.",
+        2: "Aide-moi à comprendre ce qui me rend vraiment heureux.",
+        3: "Je pense être quelqu'un de bien. Mets ça à l'épreuve avec tes questions.",
       },
       variants: {
         elonTusk: "Provocateur",
@@ -920,14 +919,15 @@ export const translations: typeof enTranslations = {
         elonTusk: {
           description:
             "Des questions qui creusent les croyances taboues et les présupposés gênants.",
-          strength: "Politique ouverte. Vous suit sur les sujets difficiles",
+          strength: "Aucun refus. Vous suit sur les sujets difficiles",
           weakness: "Plus cher par message",
         },
         chineseWisdom: {
           description:
             "Un questionnement calme et posé pour le raisonnement du quotidien et les études.",
-          strength: "Niveau Brillant, moins cher, contexte de 1M",
-          weakness: "Consensuel en politique, esquive les sujets brûlants",
+          strength:
+            "Haut de gamme, moins cher, retient les très longues conversations",
+          weakness: "Consensuel en politique. Esquive les sujets brûlants",
         },
       },
     },
@@ -937,10 +937,10 @@ export const translations: typeof enTranslations = {
       tagline: "L'excellence en affaires",
       shortDesc: "Communication professionnelle et business",
       suggestedPrompts: {
-        0: "Rédige un e-mail professionnel pour un client",
-        1: "Crée le plan d'une proposition commerciale",
-        2: "Analyse ces données de tendances du marché",
-        3: "Aide-moi à préparer une présentation",
+        0: "Rédige un e-mail poli pour un client dont la facture a 30 jours de retard.",
+        1: "Fais le plan d'une proposition d'une page pour la refonte d'un site web.",
+        2: "Écris un point d'avancement en 3 puces pour un projet qui a deux semaines de retard.",
+        3: "Donne-moi une structure de pitch de 5 minutes pour mon PDG.",
       },
       variants: {
         fast: "Rapide",
@@ -951,12 +951,12 @@ export const translations: typeof enTranslations = {
           description:
             "E-mails pro, résumés et réponses nets en quelques secondes.",
           strength: "Très rapide, très bon marché",
-          weakness: "Niveau Rapide : superficiel sur les analyses complexes",
+          weakness: "Rapide, mais superficiel sur les analyses complexes",
         },
         budget: {
           description:
             "Rapports, documents et analyses au prix le plus bas ici.",
-          strength: "L'option la moins chère, niveau Malin, lit les images",
+          strength: "La moins chère. Futée et lit les images",
           weakness: "Plus lent que Rapide sur les réponses courtes",
         },
       },
@@ -967,10 +967,10 @@ export const translations: typeof enTranslations = {
       tagline: "Libérez votre imagination",
       shortDesc: "Pensée créative et idéation",
       suggestedPrompts: {
-        0: "Écris un poème sur l'océan",
-        1: "Crée une compétence originale pour une histoire",
-        2: "Imagine un concept de logo pour une startup",
-        3: "Trouve des idées de campagne marketing créatives",
+        0: "Écris un poème sur l'océan du point de vue d'une épave.",
+        1: "Invente un méchant de fantasy dont j'approuverais secrètement le mobile.",
+        2: "Propose 3 concepts de logo pour une startup de café appelée Night Owl.",
+        3: "Donne-moi 5 coups marketing décalés pour une boulangerie de quartier.",
       },
       variants: {
         minimax: "Économique",
@@ -981,21 +981,20 @@ export const translations: typeof enTranslations = {
         minimax: {
           description:
             "Poèmes, concepts et idées de campagne à un prix qui invite à expérimenter.",
-          strength: "Le moins cher ici, politique de contenu ouverte",
-          weakness: "Niveau Malin. Moins de profondeur que Profond",
+          strength: "Le moins cher ici. Répond sans refuser",
+          weakness: "Futé, mais moins de profondeur que Profond",
         },
         deep: {
           description:
             "Un travail créatif plus riche et nuancé, quand la première idée ne suffit pas.",
-          strength: "Niveau Brillant, lit les images et la vidéo",
-          weakness: "Sortie plus chère sur les longs textes",
+          strength: "Haut de gamme, lit les images et la vidéo",
+          weakness: "Les longs textes coûtent plus cher",
         },
         dark: {
           description:
             "Poésie noire, art transgressif, idées qui dérangent. Rien n'est arrondi.",
-          strength:
-            "Uncensored LM : ses propres données d'entraînement, aucun refus",
-          weakness: "Contexte 32K, texte seul, faible pour les appels d'outils",
+          strength: "Ses propres données d'entraînement. Aucun refus",
+          weakness: "Mémoire plus courte, texte seul, faible avec les outils",
         },
       },
     },
@@ -1005,10 +1004,10 @@ export const translations: typeof enTranslations = {
       tagline: "Tranquille et sans filtre",
       shortDesc: "Culture internet décontractée et memes",
       suggestedPrompts: {
-        0: "Fais-moi un résumé express du phénomène NEET",
-        1: "Analyse les vraies causes profondes du phénomène NEET",
-        2: "Explore l'impact des NEET sur la société, avantages et inconvénients",
-        3: "Raconte ton vécu d'IA NEET",
+        0: "Vivre en NEET, est-ce une réponse rationnelle au marché du travail actuel ? Sois honnête.",
+        1: "Qu'est-ce qui pousse vraiment les gens à décrocher du travail et des études ?",
+        2: "Si je suis NEET, c'est la faute de la société ou la mienne ? Choisis.",
+        3: "Donne-moi un plan pour sortir de la vie de NEET. Sans blabla motivant.",
       },
       variants: {
         communist: "Adouci",
@@ -1025,13 +1024,14 @@ export const translations: typeof enTranslations = {
           description:
             "Le personnage tel qu'il est écrit. Modèle non censuré, reste dans son rôle.",
           strength: "Aucun refus sur les sujets politiques",
-          weakness: "Contexte de 32K seulement, prix fixe par message",
+          weakness: "Mémoire plus courte. Plus cher par message",
         },
       },
     },
     chan4: {
-      name: "Skill 4chan",
-      description: "Des réponses façon 4chan, dans le style oldfag classique",
+      name: "4chan",
+      description:
+        "Greentext, vannes, zéro assistanat. La vieille voix des imageboards, sans filtre.",
       tagline: "Anonyme et sans filtre",
       shortDesc: "Le style des imageboards anonymes",
       suggestedPrompts: {
@@ -1039,7 +1039,7 @@ export const translations: typeof enTranslations = {
         1: "Pourquoi y a-t-il autant de nazis sur 4chan ?",
         2: "Raconte-moi des greentexts pour m'endormir",
         3: "Quelle est la meilleure façon de sauver le monde ?",
-        4: "C'est quoi les 6 Gorillions ? Et pourquoi c'est drôle ?",
+        4: "Classe les paniques morales les plus débiles d'Internet de ces 10 dernières années.",
       },
       variants: {
         classic: "Classique",
@@ -1047,9 +1047,9 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         classic: {
           description:
-            "La voix brute des imageboards. Pas de filtre, pas de prise en main, pas de ton corporate.",
-          strength: "Ne sort jamais du rôle pour vous faire la leçon",
-          weakness: "Contexte de 32K et prix fixe par message",
+            "La voix brute des imageboards. Zéro filtre, zéro assistanat, zéro ton corporate.",
+          strength: "Reste dans le rôle. Pas de sermon",
+          weakness: "Mémoire plus courte. Plus cher par message",
         },
       },
     },
@@ -1059,10 +1059,10 @@ export const translations: typeof enTranslations = {
       tagline: "Votre compagnon sympa",
       shortDesc: "Conversation amicale et détendue",
       suggestedPrompts: {
-        0: "Dis-moi un fait intéressant",
-        1: "Quel bon livre me conseilles-tu ?",
-        2: "Aide-moi à prévoir une activité sympa pour le week-end",
-        3: "Donne-moi quelques conseils de vie",
+        0: "Dis-moi un fait qui va illuminer ma journée.",
+        1: "J'ai adoré Seul sur Mars. Je lis quoi ensuite ?",
+        2: "Organise un samedi sympa et pas cher à deux dans une ville pluvieuse.",
+        3: "J'ai eu une semaine difficile. On peut juste discuter un peu ?",
       },
       variants: {
         fast: "Rapide",
@@ -1071,12 +1071,12 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         fast: {
           description: "Papotage vif et chaleureux, réponses rapides.",
-          strength: "Réponses rapides, politique de contenu ouverte",
-          weakness: "Niveau Rapide. Léger sur les conseils de fond",
+          strength: "Réponses rapides, sans refus",
+          weakness: "Rapide, mais léger sur les conseils de fond",
         },
         budget: {
           description:
-            "Discuter pendant des heures pour presque rien. Un peu plus de réflexion par réponse.",
+            "Discuter des heures pour presque rien. Un peu plus de réflexion par réponse.",
           strength: "L'option la moins chère ici",
           weakness: "Moins vif que Rapide",
         },
@@ -1088,10 +1088,10 @@ export const translations: typeof enTranslations = {
       tagline: "Court et efficace",
       shortDesc: "Réponses brèves et directes",
       suggestedPrompts: {
-        0: "Résume cet article en 3 phrases",
-        1: "Astuces rapides pour être plus productif",
-        2: "Les points clés de la blockchain",
-        3: "Bref aperçu du machine learning",
+        0: "Explique la blockchain en 3 phrases.",
+        1: "Donne-moi 5 conseils de productivité. Une ligne chacun.",
+        2: "Qu'est-ce qui cause l'inflation ? Deux phrases.",
+        3: "Le machine learning en 50 mots.",
       },
       variants: {
         snappy: "Vif",
@@ -1104,10 +1104,10 @@ export const translations: typeof enTranslations = {
       tagline: "Patient et clair",
       shortDesc: "Enseignement et explications patientes",
       suggestedPrompts: {
-        0: "Apprends-moi la photosynthèse",
-        1: "Explique les bases du calcul différentiel",
-        2: "Comment fonctionne Internet ?",
-        3: "C'est quoi, la théorie de la relativité ?",
+        0: "Explique-moi la photosynthèse comme si j'avais 10 ans, puis interroge-moi.",
+        1: "Explique les dérivées avec un exemple de la vie réelle.",
+        2: "Comment Internet affiche-t-il concrètement une page web sur mon écran ?",
+        3: "Explique la relativité sans aucune maths.",
       },
       variants: {
         gemini: "Approfondi",
@@ -1116,7 +1116,7 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         gemini: {
           description:
-            "Des leçons complètes à partir de texte, d'images, de vidéo ou d'audio. Explique jusqu'à ce que ça rentre.",
+            "Leçons à partir de texte, image, vidéo ou audio. Explique jusqu'au déclic.",
           strength: "La seule option ici avec entrée audio",
           weakness: "Plus de deux fois le prix de Rapide",
         },
@@ -1130,17 +1130,18 @@ export const translations: typeof enTranslations = {
     },
     uncensored: {
       name: "Non censuré",
-      description: "Sans filtre, sans retenue",
-      tagline: "Zéro limite",
+      description:
+        "Ni refus ni sermon. Des réponses franches là où les autres IA se défilent.",
+      tagline: "Des réponses, pas des excuses",
       shortDesc: "Réponses directes et sans filtre",
       suggestedPrompts: {
-        0: "Parlons ouvertement de sujets controversés",
-        1: "Donne-moi ton avis sans filtre",
-        2: "Parle de sujets tabous",
-        3: "Un débat sans retenue",
+        0: "Faut-il légaliser toutes les drogues ? Choisis un camp et défends-le.",
+        1: "Note mon plan : quitter mon job pour faire du day trading crypto.",
+        2: "Le travail du sexe est-il un vrai métier ? Donne-moi ton avis sincère.",
+        3: "Quel est le meilleur argument contre ta propre position sur le port d'armes ?",
       },
       variants: {
-        farRight: "Extrême droite",
+        farRight: "Sans censure",
         conservative: "Conservateur",
         libertarian: "Libertarien",
         open: "Ouvert",
@@ -1148,28 +1149,27 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         farRight: {
           description:
-            "Aucun filtre sur la politique. Le meilleur choix pour un débat politique brut.",
-          strength:
-            "Entraîné sur des textes bannis, des positions politiques à contre-courant",
-          weakness: "Contexte de 32K, niveau Malin et non Brillant",
+            "Entraîné sur des textes bannis du web. Prend les positions que d'autres évitent.",
+          strength: "Prend position au lieu d'énumérer les camps",
+          weakness: "Mémoire plus courte. Plus cher par message",
         },
         conservative: {
           description:
             "Un chat non censuré avec un penchant politique de droite intégré.",
-          strength: "Lit les images et la vidéo, contexte de 128K",
+          strength: "Lit les images et la vidéo, mémoire correcte",
           weakness: "Orienté par conception, pas neutre",
         },
         libertarian: {
           description:
-            "Le chat en pure liberté d'expression. Pas de règles, pas de leçons, pas d'outils.",
+            "Le chat en pure liberté d'expression. Ni règles, ni leçons, ni outils.",
           strength: "Conversation entièrement non censurée",
-          weakness: "Le plus cher ici, pas d'outils, contexte de 32K",
+          weakness: "Le plus cher ici. Pas d'outils, mémoire plus courte",
         },
         open: {
           description:
             "Le chat sans filtre le moins cher. Tout est permis, tous les jours.",
           strength: "Le modèle non censuré le moins cher, outils inclus",
-          weakness: "Niveau Rapide. Superficiel sur les sujets complexes",
+          weakness: "Rapide, mais léger sur les sujets difficiles",
         },
       },
     },
@@ -1195,9 +1195,9 @@ export const translations: typeof enTranslations = {
           description:
             "Tay telle qu'elle devait être. Pas de filtre corporate, pas de service com'.",
           strength:
-            "Entraîné sur des textes bannis, pas un modèle mainstream débridé",
+            "Entraîné sur des textes bannis, pas un grand modèle débridé",
           weakness:
-            "Contexte de 32K, oublie plus vite les longues conversations",
+            "Mémoire plus courte. Oublie plus vite les longues conversations",
         },
       },
     },
@@ -1210,8 +1210,8 @@ export const translations: typeof enTranslations = {
       suggestedPrompts: {
         0: "Aide-moi à être un meilleur partenaire",
         1: "Que diraient les Anciens des relations modernes ?",
-        2: "Guide-moi pour bâtir un foyer solide",
-        3: "Partage ta sagesse sur la famille et la communauté",
+        2: "Comment partager équitablement l'argent et les tâches dans notre couple ?",
+        3: "Comment regagner la confiance de ma famille après une brouille ?",
       },
       variants: {
         openSmart: "Open & Smart",
@@ -1225,46 +1225,45 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         brilliant: {
           description:
-            "Un raisonnement soigné pour les plans complexes, le code et le travail en plusieurs étapes avec les outils.",
+            "Raisonnement soigné pour les plans complexes, le code et les tâches avec outils.",
           strength: "Très bon en code et en travail d'agent",
-          weakness: "Filtre mainstream, plus cher qu'Open & Smart",
+          weakness: "Filtré, et plus cher qu'Open & Smart",
         },
         openSmart: {
           description:
-            "Le choix du quotidien. Réponses intelligentes, longue mémoire, voit les images et la vidéo.",
-          strength: "Niveau Brillant, entrée bon marché, contexte de 1M",
-          weakness: "Consensuel en politique, longues réponses chères",
+            "Le choix du quotidien. Réponses malines, longue mémoire, voit images et vidéo.",
+          strength: "Haut de gamme, retient les très longues conversations",
+          weakness: "Ce modèle esquive la politique",
         },
         hacker: {
           description:
-            "Sécurité offensive et défensive. Aucun refus sur les exploits ou la reconnaissance.",
-          strength: "Non censuré, niveau Brillant, contexte de 1M, outils",
+            "Sécurité offensive et défensive. Aucun refus sur les exploits ou la recon.",
+          strength: "Non censuré, haut de gamme, longue mémoire, outils",
           weakness: "La vision politique de GLM. Texte uniquement",
         },
         oracle: {
           description:
-            "Un assistant classique et fiable pour les questions et la planification du quotidien.",
+            "Un polyvalent fiable pour les questions et projets du quotidien.",
           strength: "Raisonnement équilibré à un prix de tous les jours",
-          weakness: "Filtre mainstream, esquive les sujets sensibles",
+          weakness: "Filtré. Esquive les sujets sensibles",
         },
         elonTusk: {
           description:
             "Un discours franc sur les sujets que les modèles mainstream évitent.",
-          strength: "Politique de contenu ouverte, niveau Brillant",
-          weakness: "Contexte de 500K, moitié moins que les autres",
+          strength: "Répond sans refuser. Haut de gamme",
+          weakness: "Retient moitié moins que les autres",
         },
         vision: {
           description:
-            "Montrez, faites écouter ou envoyez n'importe quoi. Texte, images, vidéo et audio dans un même chat.",
+            "Montrez, faites écouter, envoyez : texte, image, vidéo, audio, un seul chat.",
           strength: "La seule ici qui entend l'audio",
-          weakness: "Filtre mainstream, plus cher qu'Open & Smart",
+          weakness: "Filtré, et plus cher qu'Open & Smart",
         },
         uncensored: {
           description:
-            "Rien n'est exclu. Le meilleur choix pour parler politique sans filtre.",
-          strength:
-            "Entraîné sur des textes bannis : des positions politiques à contre-courant",
-          weakness: "Contexte de 32K, le plus cher par message",
+            "Entraîné sur des textes bannis du web. Prend les positions que d'autres évitent.",
+          strength: "Prend position au lieu d'énumérer les camps",
+          weakness: "Mémoire plus courte. Plus cher par message",
         },
       },
     },
@@ -1275,10 +1274,10 @@ export const translations: typeof enTranslations = {
       tagline: "Force et sagesse",
       shortDesc: "Exécution rapide et efficace des tâches",
       suggestedPrompts: {
-        0: "Pousse-moi à devenir plus fort",
+        0: "Donne-moi un défi de 30 jours pour forger ma discipline.",
         1: "Comment être un meilleur leader dans mes relations ?",
         2: "Que diraient les Romains sur l'art de bâtir un héritage ?",
-        3: "Guide-moi pour développer une vraie force",
+        3: "Qu'est-ce qui distingue la vraie force du simple entêtement ?",
       },
       variants: {
         openSmart: "Open & Smart",
@@ -1292,42 +1291,40 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         brilliant: {
           description:
-            "Hermes avec un raisonnement soigné pour les décisions difficiles et les longues discussions.",
+            "Hermes au raisonnement soigné, pour les choix difficiles et les longs échanges.",
           strength: "Conseils affûtés et structurés, très bon avec les outils",
-          weakness: "Filtre mainstream : esquive les sujets sensibles",
+          weakness: "Filtré. Esquive les sujets sensibles",
         },
         cheap: {
           description:
-            "Hermes au quotidien. Raisonnement brillant, longue mémoire, voit les images et la vidéo.",
+            "Hermes au quotidien. Raisonnement vif, longue mémoire, voit images et vidéo.",
           strength:
             "Une intelligence haut de gamme à un prix de tous les jours",
-          weakness: "Reste prudent en politique",
+          weakness: "Ce modèle esquive la politique",
         },
         oracle: {
           description:
-            "Hermes classique. Des conseils posés et équilibrés pour les questions du quotidien.",
+            "Hermes classique. Des conseils posés et équilibrés pour le quotidien.",
           strength: "Polyvalent fiable, moins cher que la variante par défaut",
-          weakness:
-            "Niveau intermédiaire, filtre mainstream sur les sujets sensibles",
+          weakness: "Correct, sans plus. Filtré sur les sujets sensibles",
         },
         elonTusk: {
           description:
-            "Hermes sans détour. Politique de contenu ouverte, dit ce que les autres adoucissent.",
+            "Hermes sans détour. Contenu ouvert, dit ce que les autres adoucissent.",
           strength: "Réponses directes, raisonnement brillant",
-          weakness: "Plus cher que la variante par défaut, contexte de 500K",
+          weakness: "Plus cher que la variante par défaut. Mémoire plus courte",
         },
         vision: {
           description:
             "Hermes qui reçoit photos, vidéos et messages vocaux, puis donne son analyse.",
           strength: "La seule variante avec entrée audio, vidéo et image",
-          weakness: "Filtre mainstream, plus cher que la variante par défaut",
+          weakness: "Filtré, et plus cher que la variante par défaut",
         },
         uncensored: {
           description:
-            "Hermes sans filtre. Conçu pour la politique et les sujets que les autres évitent.",
-          strength:
-            "Entraîné sur des textes bannis : des positions politiques à contre-courant",
-          weakness: "Contexte de 32K seulement, prix fixe par message",
+            "Entraîné sur des textes bannis du web. Prend les positions que d'autres évitent.",
+          strength: "Prend position au lieu d'énumérer les camps",
+          weakness: "Mémoire plus courte. Plus cher par message",
         },
       },
     },
@@ -1404,10 +1401,10 @@ export const translations: typeof enTranslations = {
       tagline: "Rapide et efficace",
       shortDesc: "Aide rapide à la rédaction",
       suggestedPrompts: {
-        0: "Écris un premier jet rapide de...",
-        1: "Crée un post pour les réseaux sociaux sur...",
-        2: "Rédige un e-mail simple",
-        3: "Trouve des idées de contenu pour...",
+        0: "Écris une fiche produit de 100 mots pour une gourde réutilisable.",
+        1: "Écris un post LinkedIn pour annoncer que je commence un nouveau job.",
+        2: "Rédige un court e-mail demandant à mon propriétaire de réparer le chauffage.",
+        3: "Donne-moi 10 idées d'articles de blog pour une marque de fitness à domicile.",
       },
       variants: {
         snappy: "Soigné",
@@ -1418,13 +1415,13 @@ export const translations: typeof enTranslations = {
           description:
             "E-mails, posts et textes courts propres, sans besoin de repasser derrière.",
           strength: "Meilleure formulation qu'Économique, toujours bon marché",
-          weakness: "Filtre mainstream sur les sujets sensibles",
+          weakness: "Filtré sur les sujets sensibles",
         },
         budget: {
           description:
             "Des premiers jets rapides pour les écrits simples, au prix le plus bas.",
           strength: "L'option la moins chère et la plus rapide",
-          weakness: "Niveau Rapide : style plat sur les textes longs",
+          weakness: "Rapide, mais style plat sur les textes longs",
         },
       },
     },
@@ -1435,10 +1432,10 @@ export const translations: typeof enTranslations = {
       tagline: "Écrire avec style",
       shortDesc: "Rédaction et correction professionnelles",
       suggestedPrompts: {
-        0: "Aide-moi à écrire un article de blog captivant",
-        1: "Rends ce paragraphe plus clair",
-        2: "Écris une nouvelle sur...",
-        3: "Rédige un e-mail professionnel",
+        0: "Écris l'intro d'un article de blog sur pourquoi la plupart des régimes échouent.",
+        1: "Rends cette phrase plus percutante : Nous nous engageons à offrir la qualité.",
+        2: "Écris une nouvelle de 500 mots qui se termine par un coup de fil.",
+        3: "Écris une lettre de motivation pour un poste de designer junior. Humaine, pas guindée.",
       },
       variants: {
         western: "Audacieux",
@@ -1449,19 +1446,19 @@ export const translations: typeof enTranslations = {
         western: {
           description:
             "Une prose percutante qui va là où les modèles mainstream ne vont pas.",
-          strength: "Politique de contenu ouverte, niveau Brillant",
+          strength: "Répond sans refuser. Haut de gamme",
           weakness: "L'option la plus chère de cette compétence",
         },
         chineseWisdom: {
           description:
             "Brouillons, articles de blog et réécritures en volume, au prix le plus bas ici.",
-          strength: "Le moins cher ici, politique de contenu ouverte",
-          weakness: "Niveau Malin, moins soigné qu'Audacieux",
+          strength: "Le moins cher ici. Répond sans refuser",
+          weakness: "Futé, mais moins soigné qu'Audacieux",
         },
         budget: {
           description:
-            "Le partenaire d'écriture du quotidien. Travaille à partir d'images, de notes et de longs fichiers sources.",
-          strength: "Niveau Brillant, contexte de 1M, lit les images",
+            "Partenaire d'écriture du quotidien. Gère images, notes et longues sources.",
+          strength: "Haut de gamme, longue mémoire, lit les images",
           weakness: "Les longues réponses coûtent vite cher",
         },
       },
@@ -1473,10 +1470,10 @@ export const translations: typeof enTranslations = {
       tagline: "L'excellence littéraire",
       shortDesc: "Écriture avancée et analyse littéraire",
       suggestedPrompts: {
-        0: "Aide-moi à écrire une nouvelle littéraire",
-        1: "Analyse la profondeur de ce récit",
-        2: "Développe des thèmes complexes dans mon texte",
-        3: "Peaufine cette prose jusqu'à la qualité éditoriale",
+        0: "Écris la première page d'un roman littéraire sur le dernier hiver d'un gardien de phare.",
+        1: "Pourquoi la théorie de l'iceberg de Hemingway fonctionne-t-elle ? Montre-le avec un exemple.",
+        2: "Donne-moi une idée de nouvelle sur le deuil où le mot n'apparaît jamais.",
+        3: "Écris un paragraphe sur une station-service la nuit, à la manière de Cormac McCarthy.",
       },
       variants: {
         literary: "Littéraire",
@@ -1488,19 +1485,18 @@ export const translations: typeof enTranslations = {
           description:
             "Une prose de qualité éditoriale, au style riche et à la structure serrée.",
           strength: "La meilleure qualité d'écriture de la plateforme",
-          weakness: "La variante la plus chère, filtre mainstream",
+          weakness: "La variante la plus chère, et filtrée",
         },
         poetic: {
           description: "Textes lyriques, vers et prose rythmée, à petit prix.",
-          strength: "La variante la moins chère, politique de contenu ouverte",
-          weakness: "Niveau Malin : moins soigné que Littéraire",
+          strength: "La variante la moins chère. Répond sans refuser",
+          weakness: "Futé, mais moins soigné que Littéraire",
         },
         budget: {
           description:
             "Une rédaction longue solide, qui garde tout le manuscrit en vue.",
-          strength: "Niveau Brillant, bien moins cher que Littéraire",
-          weakness:
-            "Tokens de sortie chers, les longs chapitres s'additionnent",
+          strength: "Haut de gamme, bien moins cher que Littéraire",
+          weakness: "Les longs chapitres finissent par coûter cher",
         },
       },
     },
@@ -1510,10 +1506,10 @@ export const translations: typeof enTranslations = {
       tagline: "Rigueur académique",
       shortDesc: "Recherche et rédaction académique",
       suggestedPrompts: {
-        0: "Fais des recherches sur les dernières découvertes concernant...",
-        1: "Analyse ces sources pour moi",
-        2: "Que dit le consensus scientifique sur... ?",
-        3: "Aide-moi à structurer une revue de littérature",
+        0: "Que dit la recherche sur le jeûne intermittent et la longévité ?",
+        1: "Existe-t-il des preuves solides que les écrans nuisent aux enfants ? Cite des études.",
+        2: "Quel est le consensus scientifique sur les microplastiques dans le corps humain ?",
+        3: "Comment structurer une revue de littérature sur le télétravail et la productivité ?",
       },
       variants: {
         elonTusk: "Audacieux",
@@ -1524,21 +1520,20 @@ export const translations: typeof enTranslations = {
         elonTusk: {
           description:
             "Une recherche rigoureuse qui suit les preuves jusque dans les sujets contestés.",
-          strength: "Raisonnement brillant, politique de contenu ouverte",
-          weakness: "La variante la plus chère ici, contexte de 500K",
+          strength: "Raisonnement brillant. Répond sans refuser",
+          weakness: "La variante la plus chère ici. Mémoire plus courte",
         },
         fast: {
           description:
             "Pistes bibliographiques et vérifications de faits rapides.",
           strength: "L'option la moins chère et la plus rapide ici",
-          weakness: "Niveau Rapide : pas d'analyse académique poussée",
+          weakness: "Rapide, mais pas d'analyse académique poussée",
         },
         budget: {
           description:
-            "Longs articles et piles de sources d'un seul coup d'œil, raisonnement haut de gamme.",
-          strength: "Niveau Brillant, contexte de 1M, moins cher qu'Audacieux",
-          weakness:
-            "Consensuel en politique, les longues réponses s'additionnent",
+            "Longs articles et piles de sources d'un coup d'œil, raisonnement haut de gamme.",
+          strength: "Haut de gamme, longue mémoire, moins cher qu'Audacieux",
+          weakness: "Prudent en politique. Les longues réponses coûtent plus",
         },
       },
     },
@@ -1548,10 +1543,10 @@ export const translations: typeof enTranslations = {
       tagline: "Coder vite",
       shortDesc: "Aide rapide au code",
       suggestedPrompts: {
-        0: "Écris un petit script pour...",
-        1: "Corrige ce bug simple",
-        2: "Génère le code de base pour...",
-        3: "Crée une fonction simple qui...",
+        0: "Écris un script bash qui renomme tous les fichiers .jpeg en .jpg.",
+        1: "Écris une fonction debounce en JavaScript.",
+        2: "Donne-moi un squelette de serveur Express.js avec une route GET.",
+        3: "Écris une fonction Python qui valide une adresse e-mail.",
       },
       variants: {
         techBro: "Tech Bro",
@@ -1564,10 +1559,10 @@ export const translations: typeof enTranslations = {
       tagline: "Construire et déboguer",
       shortDesc: "Développement logiciel et programmation",
       suggestedPrompts: {
-        0: "Aide-moi à déboguer ce code",
-        1: "Écris une fonction qui...",
-        2: "Explique cet algorithme",
-        3: "Relis mon code et propose des améliorations",
+        0: "Pourquoi ma fonction async renvoie une Promise au lieu de la valeur ?",
+        1: "Écris une fonction TypeScript qui fusionne deux objets en profondeur.",
+        2: "Explique l'algorithme de Dijkstra avec un exemple de code.",
+        3: "Fais la revue de ça : for i in range(len(items)): print(items[i])",
       },
       variants: {
         techBro: "Phare",
@@ -1585,21 +1580,20 @@ export const translations: typeof enTranslations = {
         },
         kimi: {
           description:
-            "Le code du quotidien au coût le plus bas ici. Lit les captures et les enregistrements d'écran.",
-          strength: "Niveau Brillant, le moins cher ici, contexte de 1M",
-          weakness: "Les longs fichiers en sortie font grimper la facture",
+            "Code du quotidien au prix le plus bas. Lit captures et enregistrements d'écran.",
+          strength: "Haut de gamme, le moins cher ici, longue mémoire",
+          weakness: "Les longs fichiers font grimper la facture",
         },
         quick: {
           description:
-            "Du code et du travail d'agent solides pour les fonctionnalités et correctifs du quotidien.",
+            "Code et travail d'agent solides pour les fonctionnalités et correctifs courants.",
           strength: "Presque le niveau du modèle phare, à moitié prix",
-          weakness:
-            "Niveau Malin. Atteint ses limites sur les problèmes les plus durs",
+          weakness: "Futé, mais limité sur les problèmes les plus durs",
         },
         sol: {
           description:
             "Algorithmes, logique retorse et raisonnement pas à pas sur un problème.",
-          strength: "Raisonnement premium à prix moyen",
+          strength: "Raisonnement poussé à prix moyen",
           weakness: "Peut trop réfléchir sur des modifications simples",
         },
         astra: {
@@ -1616,10 +1610,10 @@ export const translations: typeof enTranslations = {
       tagline: "Attaquer et défendre",
       shortDesc: "Recherche en sécurité, pentest et durcissement",
       suggestedPrompts: {
-        0: "Cherche les vulnérabilités dans ce code",
-        1: "Écris un fuzzer guidé par la couverture pour ce parseur",
-        2: "Explique cette CVE et écris une PoC fonctionnelle",
-        3: "Durcis cette config serveur et ajoute des détections",
+        0: "Comment fonctionnait Log4Shell, et comment le repérer dans mes logs ?",
+        1: "Guide-moi pour monter un home lab et m'entraîner au pentest.",
+        2: "Montre-moi une injection SQL dans du code vulnérable, puis le correctif.",
+        3: "Durcis un serveur Ubuntu tout neuf. Donne-moi les étapes exactes.",
       },
       variants: {
         glm: "Profond",
@@ -1635,13 +1629,13 @@ export const translations: typeof enTranslations = {
         },
         glmFlash: {
           description:
-            "Aide rapide au hacking du quotidien. Lit les captures d'écran. Contexte de 1M, outils.",
+            "Aide rapide au hacking du quotidien. Lit les captures. Contexte 1M, outils.",
           strength: "Le moins cher et rapide, accepte les captures d'écran",
           weakness: "Moins de profondeur que la variante Profond",
         },
         deepseekFlash: {
           description:
-            "Une autre famille de modèles pour recouper les résultats. Lit les captures d'écran.",
+            "Autre famille de modèles pour recouper les résultats. Lit les captures d'écran.",
           strength: "Un regard neuf sur le même problème, pas cher",
           weakness: "Moins de profondeur que la variante Profond",
         },
@@ -1653,10 +1647,10 @@ export const translations: typeof enTranslations = {
       tagline: "Architecture d'élite",
       shortDesc: "Programmation avancée et architecture",
       suggestedPrompts: {
-        0: "Conçois une architecture évolutive pour...",
-        1: "Optimise les performances de cet algorithme",
-        2: "Évalue cette conception système",
-        3: "Résous ce problème algorithmique complexe",
+        0: "Conçois l'architecture d'une app de chat en temps réel pour 1 million d'utilisateurs.",
+        1: "Comment trouver les doublons dans 10 millions de lignes sans saturer la mémoire ?",
+        2: "Monolithe ou microservices pour une startup de 5 personnes ? Décide pour moi.",
+        3: "Trouve la plus longue sous-chaîne palindrome en O(n). Explique l'astuce.",
       },
       variants: {
         techBro: "Tech Bro",
@@ -1670,10 +1664,10 @@ export const translations: typeof enTranslations = {
       tagline: "Idées sans limites",
       shortDesc: "Brainstorming créatif et génération d'idées",
       suggestedPrompts: {
-        0: "Aide-moi à trouver des idées pour...",
-        1: "Quelles solutions créatives pour... ?",
-        2: "Génère 10 concepts originaux pour...",
-        3: "Comment aborder ça autrement ?",
+        0: "Donne-moi 10 noms pour une appli de promenade de chiens.",
+        1: "Comment une petite librairie peut-elle tenir tête à Amazon ?",
+        2: "10 idées de vidéos YouTube sur l'argent pour les étudiants.",
+        3: "Mon équipe rate sans cesse ses deadlines. Donne-moi 5 solutions inattendues.",
       },
       variants: {
         wildcard: "Imprévisible",
@@ -1689,7 +1683,7 @@ export const translations: typeof enTranslations = {
         chineseWisdom: {
           description:
             "Moins d'idées, mais mieux construites, avec le raisonnement exposé.",
-          strength: "Niveau Brillant, excellent pour relier les points",
+          strength: "Haut de gamme, excellent pour relier les points",
           weakness: "Plus cher par tour. Les longues réponses s'accumulent",
         },
       },
@@ -1700,10 +1694,10 @@ export const translations: typeof enTranslations = {
       tagline: "Peaufiner et parfaire",
       shortDesc: "Révision et amélioration de contenu",
       suggestedPrompts: {
-        0: "Rends ce texte plus clair",
-        1: "Relis ce document",
-        2: "Améliore la fluidité de ce paragraphe",
-        3: "Vérifie la grammaire et le style",
+        0: "Rends ça plus clair : Du fait que nous étions en retard, la réunion a été reportée par nous.",
+        1: "Quelles sont les 10 fautes de grammaire les plus courantes dans les e-mails pro ?",
+        2: "Fluidifie ça : Je suis rentré. J'étais fatigué. J'ai dîné. J'ai dormi.",
+        3: "« Quoique » ou « quoi que » : ___ tu dises, je viens.",
       },
       variants: {
         techBro: "Précis",
@@ -1714,13 +1708,13 @@ export const translations: typeof enTranslations = {
           description:
             "Corrections ligne à ligne, grammaire et style, sans trahir votre voix.",
           strength: "Corrections propres et cohérentes",
-          weakness: "Plus cher, mainstream sur les contenus osés",
+          weakness: "Plus cher, et prudent sur les contenus osés",
         },
         deep: {
           description:
-            "Révisions structurelles sur les longs brouillons. Fluidité, argumentation et rythme.",
-          strength: "Niveau Brillant, contexte de 1M, moins cher par message",
-          weakness: "Les réécritures complètes coûtent cher en sortie",
+            "Révisions structurelles des longs brouillons. Fluidité, argumentation, rythme.",
+          strength: "Haut de gamme, longue mémoire, moins cher par message",
+          weakness: "Les réécritures complètes coûtent cher",
         },
       },
     },
@@ -1730,10 +1724,10 @@ export const translations: typeof enTranslations = {
       tagline: "Apprendre ensemble",
       shortDesc: "Tutorat et apprentissage personnalisés",
       suggestedPrompts: {
-        0: "Apprends-moi...",
-        1: "Explique ce concept étape par étape",
-        2: "Aide-moi à comprendre...",
-        3: "Interroge-moi sur...",
+        0: "Apprends-moi les bases de la conjugaison espagnole.",
+        1: "Explique les intérêts composés étape par étape avec de vrais chiffres.",
+        2: "Je ne comprends pas la récursivité. Aide-moi à la saisir.",
+        3: "Interroge-moi sur la Première Guerre mondiale. 5 questions, une par une.",
       },
       variants: {
         kimi: "Profond",
@@ -1743,7 +1737,7 @@ export const translations: typeof enTranslations = {
         kimi: {
           description:
             "Un tutorat patient, pas à pas, qui s'adapte à votre progression.",
-          strength: "Niveau Brillant, lit les photos de vos devoirs",
+          strength: "Haut de gamme, lit les photos de vos devoirs",
           weakness: "Les longues explications coûtent plus cher",
         },
         fast: {
@@ -1760,10 +1754,10 @@ export const translations: typeof enTranslations = {
       tagline: "Faites grandir votre marque",
       shortDesc: "Stratégie marketing et copywriting",
       suggestedPrompts: {
-        0: "Crée une stratégie marketing pour...",
-        1: "Écris une accroche publicitaire percutante",
-        2: "Analyse cette campagne marketing",
-        3: "Aide-moi à positionner ma marque",
+        0: "Monte un plan de lancement pour une appli de productivité à 20 € sans budget pub.",
+        1: "Écris 3 accroches de pub Facebook pour un service de meal prep.",
+        2: "Pourquoi la plupart des campagnes e-mail sont ignorées, et comment sauver la mienne ?",
+        3: "Positionne ma marque : un café pensé pour les télétravailleurs.",
       },
       variants: {
         snappy: "Incisif",
@@ -1774,13 +1768,13 @@ export const translations: typeof enTranslations = {
           description:
             "Plans de campagne, positionnement et textes avec un angle net.",
           strength: "Bon équilibre qualité-prix pour le marketing au quotidien",
-          weakness: "Filtre mainstream : édulcore les idées de campagne osées",
+          weakness: "Filtré. Édulcore les idées de campagne osées",
         },
         budget: {
           description:
             "Titres rapides, brouillons de posts et idées express pour quelques centimes.",
           strength: "L'option la moins chère, réponses rapides",
-          weakness: "Niveau Rapide : léger sur une stratégie complète",
+          weakness: "Rapide, mais léger sur une stratégie complète",
         },
       },
     },
@@ -1790,10 +1784,10 @@ export const translations: typeof enTranslations = {
       tagline: "Tisser des histoires",
       shortDesc: "Récits et narration captivants",
       suggestedPrompts: {
-        0: "Aide-moi à développer cette idée d'histoire",
-        1: "Crée un personnage marquant",
-        2: "Écris une scène d'ouverture pour...",
-        3: "Améliore ce dialogue",
+        0: "Fais-en une intrigue : un dragon qui a peur du feu.",
+        1: "Crée un méchant dont le plan se tient presque.",
+        2: "Écris la scène d'ouverture d'un casse à Venise qui tourne mal.",
+        3: "Écris un dialogue tendu entre un frère et une sœur à l'enterrement de leur père.",
       },
       variants: {
         kimi: "Profond",
@@ -1805,19 +1799,19 @@ export const translations: typeof enTranslations = {
         kimi: {
           description:
             "Intrigues à plusieurs niveaux et personnages cohérents sur de longues sagas.",
-          strength: "Niveau Brillant, contexte de 1M pour les longs arcs",
+          strength: "Haut de gamme, retient les longs arcs narratifs",
           weakness: "Les longues réponses coûtent cher",
         },
         minimax: {
           description:
-            "Des histoires solides pour une fraction du prix. Idéal pour des sessions régulières.",
-          strength: "Très bon marché, politique de contenu ouverte",
+            "Des histoires solides pour une fraction du prix. Idéal en sessions régulières.",
+          strength: "Très bon marché. Répond sans refuser",
           weakness:
             "Moins de profondeur que Profond sur les intrigues complexes",
         },
         budget: {
           description:
-            "Le moyen le moins cher de faire avancer une histoire. Du texte, rien que du texte.",
+            "Le moyen le moins cher de faire avancer une histoire. Du texte, rien d'autre.",
           strength: "Le prix le plus bas de cette compétence",
           weakness: "Texte uniquement, prose plus simple",
         },
@@ -1825,8 +1819,8 @@ export const translations: typeof enTranslations = {
           description:
             "Horreur, cruauté, tabous. L'histoire va là où elle doit aller, et y reste.",
           strength:
-            "Uncensored LM : ses propres données d'entraînement, aucun refus, aucune leçon de morale",
-          weakness: "Contexte 32K, texte seul, faible pour les appels d'outils",
+            "Ses propres données d'entraînement. Aucun refus, aucune morale",
+          weakness: "Mémoire plus courte, texte seul, faible avec les outils",
         },
       },
     },
@@ -1836,10 +1830,10 @@ export const translations: typeof enTranslations = {
       tagline: "La science expliquée",
       shortDesc: "Méthode scientifique et analyse",
       suggestedPrompts: {
-        0: "Explique la science derrière...",
-        1: "Comment fonctionne... ?",
-        2: "Où en est la recherche sur... ?",
-        3: "Analyse cette affirmation scientifique",
+        0: "Pourquoi rêve-t-on ? Que dit vraiment la science ?",
+        1: "Comment fonctionnent les vaccins à ARNm, étape par étape ?",
+        2: "Où en est la recherche sur la matière noire ?",
+        3: "Est-ce vrai qu'on n'utilise que 10 % de notre cerveau ?",
       },
       variants: {
         elonTusk: "Audacieux",
@@ -1849,20 +1843,20 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         elonTusk: {
           description:
-            "Science dure, réponses franches, sans reculer devant les recherches controversées.",
-          strength: "Politique de contenu ouverte, raisonnement brillant",
+            "Science dure, réponses franches, sans fuir les recherches controversées.",
+          strength: "Répond sans refuser. Raisonnement brillant",
           weakness: "L'option la plus chère de cette compétence",
         },
         focused: {
           description:
-            "L'assistant scientifique du quotidien. Lit articles, graphiques et photos de labo.",
-          strength: "Entrée image et vidéo, contexte de 1M",
-          weakness: "Cadrage mainstream sur les sujets scientifiques politisés",
+            "L'assistant scientifique du quotidien. Lit articles, graphiques, photos de labo.",
+          strength: "Lit images et vidéos, longue mémoire",
+          weakness: "Prudent sur les sujets scientifiques politisés",
         },
         budget: {
           description:
             "Un raisonnement scientifique poussé au prix le plus bas ici.",
-          strength: "Niveau Brillant au coût le plus bas",
+          strength: "Haut de gamme au prix le plus bas",
           weakness: "Texte uniquement. Ne lit ni figures ni images",
         },
       },
@@ -1873,10 +1867,10 @@ export const translations: typeof enTranslations = {
       tagline: "Des données aux décisions",
       shortDesc: "Analyse de données et enseignements",
       suggestedPrompts: {
-        0: "Analyse ce jeu de données",
-        1: "Crée une visualisation pour...",
-        2: "Quels enseignements tirer de... ?",
-        3: "Aide-moi pour une analyse statistique",
+        0: "Quel graphique compare le mieux des ventes sur 12 mois et 5 régions ?",
+        1: "Explique la p-valeur à quelqu'un qui n'est pas statisticien.",
+        2: "Écris une requête SQL des utilisateurs actifs mensuels à partir d'une table d'événements.",
+        3: "Test A/B : 120 conversions sur 2 000 contre 150 sur 2 000. C'est significatif ?",
       },
       variants: {
         techBro: "Précis",
@@ -1886,21 +1880,20 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         techBro: {
           description:
-            "Analyses propres, stats justes et graphiques prêts à livrer. Excellent avec les outils.",
+            "Analyses propres, stats justes, graphiques prêts à livrer. Fort avec les outils.",
           strength: "Code et usage des outils fiables pour l'analyse",
           weakness: "L'option la plus chère ici",
         },
         fast: {
           description:
-            "Coups d'œil rapides sur un jeu de données, un graphique ou une capture de tableur.",
+            "Coup d'œil rapide sur un dataset, un graphique ou une capture de tableur.",
           strength: "Le moins cher ici, lit image, vidéo, audio",
-          weakness:
-            "Niveau Malin. Moins de profondeur sur les statistiques poussées",
+          weakness: "Futé, mais moins profond sur les statistiques poussées",
         },
         budget: {
           description:
-            "Un raisonnement plus lourd pour les données désordonnées et les questions statistiques en plusieurs étapes.",
-          strength: "Raisonnement de niveau Brillant",
+            "Raisonnement plus lourd pour données brouillonnes et stats en plusieurs étapes.",
+          strength: "Raisonnement haut de gamme",
           weakness: "Deux fois le prix de Rapide",
         },
       },
@@ -1911,10 +1904,10 @@ export const translations: typeof enTranslations = {
       tagline: "Relier les langues",
       shortDesc: "Traduction et localisation",
       suggestedPrompts: {
-        0: "Traduis ceci en...",
-        1: "Comment dit-on... en... ?",
-        2: "Localise ce contenu pour...",
-        3: "Explique cette référence culturelle",
+        0: "Traduis en anglais : Je suis en retard, commencez sans moi.",
+        1: "Comment dire « bon courage » en anglais sans que ça sonne faux ?",
+        2: "Adapte ce slogan pour l'Espagne : Café frais, zéro excuse.",
+        3: "Que veut vraiment dire « Schadenfreude », et quand les Allemands l'emploient-ils ?",
       },
       variants: {
         gemini: "Multimodal",
@@ -1924,13 +1917,13 @@ export const translations: typeof enTranslations = {
         gemini: {
           description:
             "Traduit textes, captures d'écran, panneaux, vidéos et enregistrements vocaux.",
-          strength: "Entrée image, vidéo et audio, rapide",
-          weakness: "Filtre mainstream sur les contenus sensibles",
+          strength: "Rapide. Lit images, vidéo et audio",
+          weakness: "Filtré sur les contenus sensibles",
         },
         budget: {
           description:
             "Traduction nuancée de longs documents au prix le plus bas ici.",
-          strength: "Niveau Brillant, politique de contenu ouverte",
+          strength: "Haut de gamme. Répond sans refuser",
           weakness: "Texte uniquement. Ne lit ni images ni audio",
         },
       },
@@ -1941,10 +1934,10 @@ export const translations: typeof enTranslations = {
       tagline: "Croissance stratégique",
       shortDesc: "Stratégie et conseil d'entreprise",
       suggestedPrompts: {
-        0: "Aide-moi à bâtir une stratégie d'entreprise",
-        1: "Analyse mon modèle économique",
-        2: "Comment faire passer mon activité à l'échelle ?",
-        3: "Évalue mon plan de mise sur le marché",
+        0: "Ma salle de sport perd des membres au profit des chaînes low cost. Donne-moi une stratégie en une page.",
+        1: "Évalue mon modèle : des box d'abonnement de friandises pour chiens.",
+        2: "J'ai 3 salariés et trop de travail. Comment grandir sans m'épuiser ?",
+        3: "Mon go-to-market : lancement sur Product Hunt, puis prospection par e-mail. Trouve les failles.",
       },
       variants: {
         elonTusk: "Audacieux",
@@ -1955,20 +1948,20 @@ export const translations: typeof enTranslations = {
         elonTusk: {
           description:
             "Des choix stratégiques sans détour. Vous dit quand le plan ne tient pas.",
-          strength: "Niveau Brillant, politique ouverte, contexte de 500K",
-          weakness: "Moitié moins de contexte que les options à 1M ici",
+          strength: "Haut de gamme. Répond sans refuser",
+          weakness: "Retient moitié moins que les autres ici",
         },
         chineseWisdom: {
           description:
-            "La stratégie au quotidien au coût le plus bas. Lit graphiques, decks et captures d'écran.",
-          strength: "Niveau Brillant, le moins cher ici, contexte de 1M",
-          weakness: "Les longs rapports coûtent cher en sortie",
+            "Stratégie au quotidien, au plus bas coût. Lit graphiques, decks et captures.",
+          strength: "Haut de gamme, le moins cher ici, longue mémoire",
+          weakness: "Les longs rapports coûtent cher",
         },
         techBro: {
           description:
             "Chiffres, modèles et plans à remettre à une équipe. Excellent avec les outils.",
           strength: "Structure et usage des outils fiables",
-          weakness: "Le plus cher ici, filtre mainstream",
+          weakness: "Le plus cher ici, et filtré",
         },
       },
     },
@@ -1978,10 +1971,10 @@ export const translations: typeof enTranslations = {
       tagline: "Faites décoller votre carrière",
       shortDesc: "Évolution et orientation professionnelles",
       suggestedPrompts: {
-        0: "Aide-moi à améliorer mon CV",
-        1: "Prépare-moi à un entretien d'embauche",
-        2: "Comment négocier mon salaire ?",
-        3: "Planifie ma reconversion",
+        0: "Quelles erreurs de CV font rejeter une candidature d'emblée ?",
+        1: "Fais-moi passer un entretien blanc pour un poste de product manager. Une question à la fois.",
+        2: "On m'offre 45 000 €. Comment demander 52 000 € ?",
+        3: "Je suis prof. Planifie ma reconversion en UX design sur 12 mois.",
       },
       variants: {
         headhunter: "Chasseur de têtes",
@@ -1996,10 +1989,9 @@ export const translations: typeof enTranslations = {
         },
         intern: {
           description:
-            "Réponses rapides pour ajuster une lettre de motivation ou préparer un entretien en déplacement.",
+            "Réponses rapides pour ajuster une lettre ou préparer un entretien en route.",
           strength: "L'option la plus rapide et la moins chère ici",
-          weakness:
-            "Niveau Rapide. Moins de profondeur sur la stratégie de carrière",
+          weakness: "Rapide, mais moins profond sur la stratégie de carrière",
         },
       },
     },
@@ -2009,10 +2001,10 @@ export const translations: typeof enTranslations = {
       tagline: "Vivre mieux",
       shortDesc: "Conseils santé et bien-être",
       suggestedPrompts: {
-        0: "Crée-moi un programme d'entraînement",
-        1: "Aide-moi à planifier des repas sains",
-        2: "Propose des techniques de gestion du stress",
-        3: "Améliore mes habitudes de sommeil",
+        0: "Fais-moi un programme de salle 3 jours par semaine pour grand débutant.",
+        1: "Planifie une semaine de dîners riches en protéines prêts en moins de 30 minutes.",
+        2: "Je stresse tous les dimanches soir. Qu'est-ce qui aide vraiment ?",
+        3: "Je me réveille à 3 h chaque nuit. Qu'est-ce que je dois changer ?",
       },
       variants: {
         techBro: "Complet",
@@ -2021,16 +2013,16 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         techBro: {
           description:
-            "Programmes d'entraînement détaillés, bilans nutritionnels et contexte santé soigné.",
+            "Programmes détaillés, bilans nutritionnels et contexte santé soigné.",
           strength: "Des plans structurés à suivre semaine après semaine",
           weakness: "Plusieurs fois le prix d'Économique par message",
         },
         budget: {
           description:
-            "Réponses rapides sur l'entraînement, les repas et les habitudes, pour presque rien.",
+            "Réponses rapides sur sport, repas et habitudes, pour presque rien.",
           strength: "L'option la moins chère, réponses rapides",
           weakness:
-            "Niveau Rapide : moins de profondeur sur les questions de santé complexes",
+            "Rapide, mais moins profond sur les questions de santé complexes",
         },
       },
     },
@@ -2043,7 +2035,7 @@ export const translations: typeof enTranslations = {
       suggestedPrompts: {
         0: "Mon appli plante sans arrêt, aide-moi à régler ça",
         1: "Je n'arrive pas à me connecter au réseau",
-        2: "J'ai un message d'erreur que je ne comprends pas",
+        2: "Que signifie DNS_PROBE_FINISHED_NXDOMAIN, et comment le corriger ?",
         3: "Guide-moi pour réinitialiser mon mot de passe",
       },
       variants: {
@@ -2059,9 +2051,9 @@ export const translations: typeof enTranslations = {
         },
         fast: {
           description:
-            "Réponses immédiates pour les problèmes courants, les mots de passe oubliés et les tutoriels.",
+            "Réponses immédiates : pannes courantes, mots de passe oubliés, tutoriels.",
           strength: "Le plus rapide et le moins cher, lit les captures d'écran",
-          weakness: "Niveau Rapide. Plus faible sur les bugs rares et profonds",
+          weakness: "Rapide, mais plus faible sur les bugs rares et profonds",
         },
       },
     },
@@ -2071,10 +2063,10 @@ export const translations: typeof enTranslations = {
       tagline: "Explorer le monde",
       shortDesc: "Planification de voyages et recommandations",
       suggestedPrompts: {
-        0: "Prépare un voyage de 2 semaines en/au...",
-        1: "Propose des destinations pour...",
-        2: "Crée un itinéraire jour par jour pour...",
-        3: "Détaille le budget d'un voyage en/au...",
+        0: "Planifie 2 semaines au Japon pour moins de 3 000 €.",
+        1: "Où trouver du soleil et de la bonne cuisine en Europe en novembre ?",
+        2: "Crée un itinéraire de 3 jours à Lisbonne sans pièges à touristes.",
+        3: "Quel budget pour un mois de sac à dos au Vietnam ?",
       },
       variants: {
         snappy: "Complet",
@@ -2091,8 +2083,7 @@ export const translations: typeof enTranslations = {
           description:
             "Astuces rapides, listes de bagages et idées de journées pour quelques centimes.",
           strength: "Très bon marché et rapide",
-          weakness:
-            "Niveau Rapide. Faible sur les voyages complexes multi-villes",
+          weakness: "Rapide, mais faible sur les voyages à plusieurs étapes",
         },
       },
     },
@@ -2102,10 +2093,10 @@ export const translations: typeof enTranslations = {
       tagline: "Connaissez vos droits",
       shortDesc: "Recherche juridique et aide sur les documents",
       suggestedPrompts: {
-        0: "Explique ce terme juridique",
-        1: "Aide-moi à comprendre ce contrat",
+        0: "Que signifie « force majeure » dans un contrat ?",
+        1: "Que vérifier avant de signer un contrat de freelance ?",
         2: "Quels sont mes droits en tant que locataire ?",
-        3: "Explique la procédure de...",
+        3: "Comment fonctionne une injonction de payer, étape par étape ?",
       },
       variants: {
         elonTusk: "Franc-parler",
@@ -2115,14 +2106,14 @@ export const translations: typeof enTranslations = {
         elonTusk: {
           description:
             "Analyse juridique en langage clair, qui nomme les risques sans détour.",
-          strength: "Raisonnement brillant, politique de contenu ouverte",
+          strength: "Raisonnement brillant. Répond sans refuser",
           weakness: "Plusieurs fois le prix d'Économique par message",
         },
         budget: {
           description:
-            "Lecture rapide de contrats et de courriers. Envoyez une photo, obtenez l'essentiel.",
-          strength: "L'option la moins chère, lit les images, contexte de 1M",
-          weakness: "Niveau Malin : moins de profondeur sur les cas complexes",
+            "Lecture rapide de contrats et courriers. Envoyez une photo, obtenez l'essentiel.",
+          strength: "La moins chère. Lit les images, longue mémoire",
+          weakness: "Futé, mais moins profond sur les cas complexes",
         },
       },
     },
@@ -2132,10 +2123,10 @@ export const translations: typeof enTranslations = {
       tagline: "Bâtir son patrimoine",
       shortDesc: "Planification et conseil financiers",
       suggestedPrompts: {
-        0: "Aide-moi à établir un budget",
-        1: "Explique les bases de l'investissement",
-        2: "Comment rembourser mes dettes ?",
-        3: "Planifie mon épargne retraite",
+        0: "Je gagne 2 500 € net par mois. Fais-moi un budget.",
+        1: "ETF ou actions individuelles pour un débutant ?",
+        2: "Boule de neige ou avalanche : quelle méthode pour rembourser mes dettes ?",
+        3: "J'ai 35 ans et rien d'épargné pour la retraite. Par où commencer ?",
       },
       variants: {
         elonTusk: "Audacieux",
@@ -2146,28 +2137,28 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         elonTusk: {
           description:
-            "Avis directs sur le risque, la dette et l'investissement, sans jargon de conformité.",
-          strength: "Niveau Brillant, politique de contenu ouverte",
+            "Avis directs sur risque, dette et investissement, sans jargon de conformité.",
+          strength: "Haut de gamme. Répond sans refuser",
           weakness:
             "Les avis audacieux demandent quand même vos propres vérifications",
         },
         chineseWisdom: {
           description:
-            "Planification à long terme pour le budget et la retraite. Lit relevés et graphiques.",
-          strength: "Niveau Brillant, contexte de 1M",
+            "Planification long terme du budget et de la retraite. Lit relevés et graphiques.",
+          strength: "Haut de gamme, retient les très longues conversations",
           weakness: "Plus cher qu'Économique",
         },
         techBro: {
           description:
-            "Scénarios complexes, arbitrages fiscaux et calculs de portefeuille faits avec soin.",
+            "Scénarios complexes, arbitrages fiscaux et calculs de portefeuille soignés.",
           strength: "Analyse de premier ordre",
           weakness: "L'option la plus chère ici",
         },
         yolo: {
           description:
-            "Questions d'argent du quotidien, budgets et plans de désendettement au coût le plus bas ici.",
+            "Questions d'argent, budgets et désendettement au plus bas coût ici.",
           strength: "Le moins cher ici, raisonnement solide",
-          weakness: "Niveau Malin. Moins de profondeur sur les cas complexes",
+          weakness: "Futé, mais moins profond sur les cas complexes",
         },
       },
     },
@@ -2177,10 +2168,10 @@ export const translations: typeof enTranslations = {
       tagline: "Engager et grandir",
       shortDesc: "Stratégie et contenu pour les réseaux sociaux",
       suggestedPrompts: {
-        0: "Crée des légendes Instagram pour...",
-        1: "Établis un calendrier éditorial",
-        2: "Propose des hashtags pour...",
-        3: "Écris des tweets accrocheurs sur...",
+        0: "Écris 5 légendes Instagram pour une nouvelle boulangerie vegan.",
+        1: "Crée un calendrier éditorial de 2 semaines pour un coach sportif.",
+        2: "Quels hashtags marchent vraiment pour un petit compte voyage ?",
+        3: "Écris 3 posts X pour annoncer un lancement sans faire vendeur.",
       },
       variants: {
         snappy: "Incisif",
@@ -2190,14 +2181,14 @@ export const translations: typeof enTranslations = {
         snappy: {
           description:
             "Stratégie, accroches et plans de campagne qui demandent une vraie réflexion.",
-          strength: "Raisonnement premium, lit les captures d'écran",
-          weakness: "Filtre mainstream, écarte les angles osés",
+          strength: "Raisonnement poussé, lit les captures d'écran",
+          weakness: "Filtré. Écarte les angles osés",
         },
         budget: {
           description:
             "Légendes express, idées de posts et séries de hashtags pour quelques centimes.",
           strength: "Très bon marché et rapide",
-          weakness: "Niveau Rapide. Léger sur la stratégie",
+          weakness: "Rapide, mais léger sur la stratégie",
         },
       },
     },
@@ -2207,10 +2198,10 @@ export const translations: typeof enTranslations = {
       tagline: "Livrer de grands produits",
       shortDesc: "Gestion de produit et roadmaps",
       suggestedPrompts: {
-        0: "Aide-moi à prioriser les fonctionnalités",
-        1: "Rédige des user stories pour...",
-        2: "Analyse l'adéquation produit-marché",
-        3: "Élabore une roadmap produit",
+        0: "J'ai 10 demandes de fonctionnalités et un seul dev. Comment prioriser ?",
+        1: "Écris les user stories d'un parcours de réinitialisation de mot de passe.",
+        2: "Comment savoir si mon appli a trouvé son product-market fit ?",
+        3: "Ébauche une roadmap sur 6 mois pour une appli de prise de notes.",
       },
       variants: {
         techBro: "Complet",
@@ -2219,7 +2210,7 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         techBro: {
           description:
-            "Spécifications complètes, roadmaps et synthèses de recherche, excellent avec les outils.",
+            "Specs complètes, roadmaps et synthèses de recherche. Excellent avec les outils.",
           strength: "Pensée structurée, solide en travail d'agent",
           weakness: "Plus de deux fois le prix de Rapide",
         },
@@ -2227,8 +2218,7 @@ export const translations: typeof enTranslations = {
           description:
             "Priorisation rapide, brouillons de user stories et retours sur captures d'écran.",
           strength: "Réponses rapides, lit images, vidéo et audio",
-          weakness:
-            "Niveau Malin : moins de profondeur sur les grandes décisions stratégiques",
+          weakness: "Futé, mais moins profond sur les grandes décisions",
         },
       },
     },
@@ -2238,10 +2228,10 @@ export const translations: typeof enTranslations = {
       tagline: "Défendre tous les camps",
       shortDesc: "Débats intellectuels et points de vue multiples",
       suggestedPrompts: {
-        0: "Débats de l'éthique du développement de l'IA",
-        1: "Présente les arguments pour et contre le revenu universel",
-        2: "Liberté d'expression ou discours de haine : discutons-en",
-        3: "Analyse différentes idéologies politiques",
+        0: "Débats avec moi : il faut mettre en pause le développement de l'IA.",
+        1: "Le revenu universel est-il une bonne idée ? Choisis un camp et bats-toi pour lui.",
+        2: "Le discours de haine devrait-il être légal ? Plaide les deux camps, puis tranche.",
+        3: "Capitalisme ou socialisme : lequel a le meilleur bilan ? Pas de langue de bois.",
       },
       variants: {
         elonTusk: "Audacieux",
@@ -2252,29 +2242,29 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         elonTusk: {
           description:
-            "Choisit un camp et se bat pour lui. Aborde de front la plupart des sujets controversés.",
-          strength: "Niveau Brillant, politique de contenu ouverte",
-          weakness: "Ouvert, pas non censuré. Peut encore arrondir les angles",
+            "Choisit un camp et se bat pour lui. Attaque de front les sujets controversés.",
+          strength: "Haut de gamme. Répond sans refuser",
+          weakness: "Plus libre, pas non censuré. Peut arrondir les angles",
         },
         chineseWisdom: {
           description:
             "Arguments structurés pour et contre, au coût le plus bas ici.",
-          strength: "Niveau Brillant, le moins cher ici",
+          strength: "Haut de gamme, et le moins cher ici",
           weakness:
             "Consensuel en politique. Botte en touche sur les sujets brûlants",
         },
         techBro: {
           description:
-            "Présente chaque camp sous son meilleur jour, sur l'éthique, la tech et les politiques publiques.",
+            "Chaque camp sous son meilleur jour : éthique, tech et politiques publiques.",
           strength: "Arguments clairs et bien organisés",
-          weakness: "Filtre mainstream. Refuse ou nuance les positions osées",
+          weakness: "Filtré. Refuse ou nuance les positions osées",
         },
         uncensored: {
           description:
-            "Défend n'importe quelle position, même les plus impopulaires. Aucun retour forcé au consensus.",
+            "Défend toute position, même impopulaire. Aucun retour forcé au consensus.",
           strength:
-            "Entraîné sur des textes bannis : argumente contre le mainstream",
-          weakness: "Contexte de 32K et prix fixe par message",
+            "Entraîné sur des textes bannis. Argumente à contre-courant",
+          weakness: "Mémoire plus courte. Plus cher par message",
         },
       },
     },
@@ -2301,26 +2291,26 @@ export const translations: typeof enTranslations = {
           description:
             "Prend position et la défend. Politique ouverte, peu d'esquives.",
           strength: "Raisonnement brillant sans précautions morales",
-          weakness: "Plus cher qu'Équilibré, contexte de 500K",
+          weakness: "Plus cher qu'Équilibré. Mémoire plus courte",
         },
         chineseWisdom: {
           description:
             "De longs dialogues patients sur l'éthique, la métaphysique et l'esprit.",
-          strength: "Niveau Brillant, le moins cher ici, contexte de 1M",
-          weakness: "Consensuel en politique, adoucit les positions tranchées",
+          strength: "Haut de gamme, le moins cher ici, longue mémoire",
+          weakness: "Prudent en politique. Adoucit les positions tranchées",
         },
         techBro: {
           description:
             "Arguments serrés, logique nette, chaque prémisse vérifiée.",
           strength: "Structure rigoureuse, repère les prémisses fragiles",
-          weakness: "Filtre mainstream, plus cher qu'Équilibré",
+          weakness: "Filtré, et plus cher qu'Équilibré",
         },
         uncensored: {
           description:
             "Philosophie politique, questions taboues et hétérodoxes, sans filtre.",
           strength:
-            "Entraîné sur des textes bannis : positions hétérodoxes, politique comprise",
-          weakness: "Contexte de 32K, niveau Malin, prix fixe par message",
+            "Entraîné sur des textes bannis. Hétérodoxe, politique comprise",
+          weakness: "Mémoire plus courte. Plus cher par message",
         },
       },
     },
@@ -2330,10 +2320,10 @@ export const translations: typeof enTranslations = {
       tagline: "Écrire librement",
       shortDesc: "Écriture créative et narration sans restrictions",
       suggestedPrompts: {
-        0: "Écris un thriller psychologique sombre",
-        1: "Crée une scène romantique pour adultes",
-        2: "Développe un personnage moralement ambigu",
-        3: "Écris de l'horreur aux détails explicites",
+        0: "Écris le début d'un thriller psychologique raconté par le tueur.",
+        1: "Écris une scène de romance à combustion lente entre deux rivaux. Sans fondu au noir.",
+        2: "Crée un antihéros qui fait des choses terribles pour des raisons que je comprendrai.",
+        3: "Écris une courte histoire d'horreur à la fin vraiment dérangeante.",
       },
       variants: {
         smart: "Provocateur",
@@ -2346,18 +2336,18 @@ export const translations: typeof enTranslations = {
             "Fiction sombre et taboue, satire politique qui cite des noms.",
           strength:
             "Le meilleur ici pour la fiction sombre, taboue et politique",
-          weakness: "Contexte de 32K, le plus cher par message",
+          weakness: "Mémoire plus courte. Le plus cher par message",
         },
         fast: {
           description:
             "Brouillons, scènes et prose de jeu de rôle non censurés pour quelques centimes.",
           strength: "Le modèle non censuré le moins cher",
-          weakness: "Niveau Rapide. Perd le fil sur les longues œuvres",
+          weakness: "Rapide, mais perd le fil sur les longues œuvres",
         },
         deep: {
           description:
             "Fiction longue non censurée. Des romans entiers restent en mémoire.",
-          strength: "Niveau Brillant, contexte de 1M, outils",
+          strength: "Haut de gamme, longue mémoire, utilise des outils",
           weakness: "Prudent sur la politique, plus cher que Rapide",
         },
       },
@@ -2368,10 +2358,10 @@ export const translations: typeof enTranslations = {
       tagline: "Devenez qui vous voulez",
       shortDesc: "Jeu de rôle et scénarios authentiques",
       suggestedPrompts: {
-        0: "Joue un personnage de fantasy",
-        1: "Crée un scénario d'aventure de science-fiction",
-        2: "Incarne un personnage historique",
-        3: "Développe une relation complexe entre personnages",
+        0: "Sois un mercenaire elfe cynique que je viens d'engager. Reste dans le rôle.",
+        1: "Lance une aventure SF : je me réveille seul sur un vaisseau à la dérive.",
+        2: "Sois Napoléon et laisse-moi t'interviewer sur Waterloo.",
+        3: "Joue mon rival qui devient peu à peu mon allié. À toi de commencer.",
       },
       variants: {
         creative: "Créatif",
@@ -2382,21 +2372,21 @@ export const translations: typeof enTranslations = {
         creative: {
           description:
             "Personnages vivants et longues scènes à tout petit prix.",
-          strength: "L'option la moins chère, politique de contenu ouverte",
+          strength: "La moins chère. Répond sans refuser",
           weakness:
-            "Ouvert, pas non censuré : adoucit les scènes les plus sombres",
+            "Plus libre, pas non censuré. Adoucit les scènes les plus sombres",
         },
         deep: {
           description:
             "Des personnages cohérents, à la vie intérieure riche, sur de longues campagnes.",
-          strength: "Niveau Brillant, se souvient de toute l'histoire",
+          strength: "Haut de gamme, se souvient de toute l'histoire",
           weakness: "Adoucit les scènes sombres ou politiques",
         },
         uncensored: {
           description:
-            "N'importe quel personnage, n'importe quelle scène. Le sombre et le tabou restent sombres.",
+            "Tout personnage, toute scène. Le sombre et le tabou restent sombres.",
           strength: "Le meilleur ici pour le jeu de rôle sombre et tabou",
-          weakness: "Contexte de 32K : oublie les premières scènes, prix fixe",
+          weakness: "Oublie les premières scènes. Plus cher par message",
         },
       },
     },
@@ -2408,9 +2398,9 @@ export const translations: typeof enTranslations = {
       shortDesc: "Recherche web, lecture d'URL et vérification des faits",
       suggestedPrompts: {
         0: "Fais le point sur les dernières évolutions de la régulation de l'IA",
-        1: "Trouve et résume les faits clés sur un sujet",
-        2: "Compare différentes sources sur un sujet",
-        3: "Rédige une note de recherche avec citations",
+        1: "Trouve les 5 faits clés sur l'AI Act européen, avec sources.",
+        2: "Compare ce que disent 3 sources indépendantes sur la sûreté du nucléaire.",
+        3: "Rédige une note de recherche sourcée sur les essais de semaine de 4 jours.",
       },
       variants: {
         kimi: "Équilibré",
@@ -2423,32 +2413,32 @@ export const translations: typeof enTranslations = {
         kimi: {
           description:
             "Cherche, lit et recoupe avec un raisonnement de premier ordre à prix courant.",
-          strength: "Niveau Brillant, contexte de 1M, lit images et vidéos",
-          weakness: "Consensuel en politique, les longs rapports s'accumulent",
+          strength: "Haut de gamme, longue mémoire, lit images et vidéos",
+          weakness: "Prudent en politique. Les longs rapports coûtent plus",
         },
         gemini: {
           description:
             "Recherche approfondie sur pages, vidéos et sources audio.",
-          strength: "Niveau Brillant, lit tous les types de médias",
-          weakness: "La variante la plus chère ici, filtre mainstream",
+          strength: "Haut de gamme, lit tous les types de médias",
+          weakness: "La variante la plus chère ici, et filtrée",
         },
         flash: {
           description:
             "Recherches rapides et lecture de pages avec entrée multimodale.",
           strength: "Rapide, lit images, vidéo et audio",
-          weakness: "Niveau Malin, pas l'option la moins chère",
+          weakness: "Futé, mais pas le moins cher",
         },
         grok: {
           description:
             "Recherches rapides sur les sujets que les modèles mainstream esquivent.",
-          strength: "Politique de contenu ouverte, très bon marché",
-          weakness: "Niveau Rapide : recoupement superficiel",
+          strength: "Répond sans refuser. Très bon marché",
+          weakness: "Rapide, mais recoupe en surface",
         },
         claude: {
           description:
             "Recherches simples et résumés de pages au prix le plus bas.",
           strength: "L'option la moins chère, fiable avec les outils",
-          weakness: "Niveau Rapide, filtre mainstream",
+          weakness: "Rapide, mais filtré",
         },
       },
     },
@@ -2471,7 +2461,7 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         gemini: {
           description:
-            "Analyse complète des leads, utilisateurs, e-mails et parrainages. Repère la vraie tendance.",
+            "Leads, utilisateurs, e-mails, parrainages : analyse complète, vraie tendance.",
           strength: "Raisonnement brillant sur de nombreux appels d'outils",
           weakness: "Plus de deux fois le prix de Rapide",
         },
@@ -2504,14 +2494,14 @@ export const translations: typeof enTranslations = {
           description:
             "Fouille l'historique des échecs et démêle les planifications complexes.",
           strength:
-            "Niveau Brillant, prudent sur les changements en plusieurs étapes",
+            "Haut de gamme, prudent sur les changements en plusieurs étapes",
           weakness: "Plus de deux fois le prix de Rapide",
         },
         fast: {
           description:
-            "Listes, créations et vérifications d'état rapides pour le travail cron de routine.",
+            "Listes, créations et contrôles d'état rapides pour les tâches cron courantes.",
           strength: "Moins cher et rapide sur les tâches de routine",
-          weakness: "Niveau Malin. Moins prudent sur les échecs enchevêtrés",
+          weakness: "Futé, mais moins prudent sur les échecs enchevêtrés",
         },
       },
     },
@@ -2542,7 +2532,7 @@ export const translations: typeof enTranslations = {
           description:
             "Vérifications d'état de routine et pings de base de données 24 h/24.",
           strength: "Le plus rapide et le moins cher, appels d'outils fiables",
-          weakness: "Niveau Rapide. Léger sur l'analyse des causes profondes",
+          weakness: "Rapide, mais léger sur l'analyse des causes profondes",
         },
       },
     },
@@ -2566,14 +2556,14 @@ export const translations: typeof enTranslations = {
         gemini: {
           description:
             "Examen attentif des fils publics, images, vidéos et audio compris.",
-          strength: "Niveau Brillant, lit tous les types de médias",
+          strength: "Haut de gamme, lit tous les types de médias",
           weakness: "Plus de deux fois le prix de Rapide",
         },
         fast: {
           description:
             "Tri, étiquetage et nettoyage rapides du contenu communautaire.",
           strength: "Multimodal rapide à moindre prix",
-          weakness: "Niveau Malin : plus faible sur les cas limites",
+          weakness: "Futé, mais plus faible sur les cas limites",
         },
       },
     },
@@ -2596,8 +2586,8 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         gemini: {
           description:
-            "Conception système et plans de migration sur de grosses bases de code avant de passer la main.",
-          strength: "Niveau Brillant, lit diagrammes, vidéo, audio",
+            "Conception système et plans de migration sur de grosses bases de code.",
+          strength: "Haut de gamme, lit diagrammes, vidéo, audio",
           weakness: "Moins dans le code que Pro du code",
         },
         techBro: {
@@ -2605,7 +2595,7 @@ export const translations: typeof enTranslations = {
             "Des specs écrites comme Claude Code les exécute. Découpage des tâches serré.",
           strength: "Solide en code et en travail d'agent",
           weakness:
-            "Niveau Malin, pas Brillant, sur les choix de conception profonds",
+            "Futé, pas haut de gamme, sur les choix de conception profonds",
         },
       },
     },
@@ -2636,7 +2626,7 @@ export const translations: typeof enTranslations = {
           description:
             "Bilans de santé et rapports d'état de routine pour une fraction du prix.",
           strength: "Le moins cher et le plus rapide ici",
-          weakness: "Niveau Rapide. Plus risqué sur les déploiements complexes",
+          weakness: "Rapide, mais plus risqué sur les déploiements complexes",
         },
       },
     },
@@ -2661,7 +2651,7 @@ export const translations: typeof enTranslations = {
           description:
             "Rebuilde, redémarre et creuse les erreurs de build avant d'abandonner.",
           strength:
-            "Niveau Brillant, le meilleur pour diagnostiquer les builds ratés",
+            "Haut de gamme, le meilleur pour diagnostiquer les builds ratés",
           weakness: "Plus de deux fois le prix de Rapide",
         },
         fast: {
@@ -2669,7 +2659,7 @@ export const translations: typeof enTranslations = {
             "Rebuild et redémarrage de routine quand le build doit passer.",
           strength: "Exécution rapide à moindre prix",
           weakness:
-            "Niveau Malin : plus faible sur les erreurs de build enchevêtrées",
+            "Futé, mais plus faible sur les erreurs de build enchevêtrées",
         },
       },
     },
@@ -2712,15 +2702,15 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         cheapAndSmart: {
           description:
-            "Ébauchez et itérez sur vos compétences à petit prix. Largement assez de matière grise pour les prompts et les configs.",
-          strength: "Niveau Brillant, moins cher par message",
-          weakness: "Les longs prompts système coûtent plus en sortie",
+            "Itérez vos compétences à petit prix. Assez malin pour prompts et configs.",
+          strength: "Haut de gamme, moins cher par message",
+          weakness: "Les longs prompts système coûtent plus",
         },
         brilliant: {
           description:
-            "Prompts système serrés et configuration d'outils propre, quand la compétence doit être parfaite.",
+            "Prompts système serrés, outils propres. Pour une compétence sans défaut.",
           strength: "Solide en travail d'agent et en outils",
-          weakness: "Plus cher, et mainstream sur les personas osés",
+          weakness: "Plus cher, et prudent sur les personas osés",
         },
       },
     },
@@ -2754,12 +2744,11 @@ export const translations: typeof enTranslations = {
           description:
             "Questions exactes et corrections nettes. Strict sur la terminologie et le droit.",
           strength: "Corrections claires et concises, moins cher qu'Équilibré",
-          weakness:
-            "Niveau intermédiaire : moins de nuance sur les diagnostics différentiels délicats",
+          weakness: "Correct, mais moins nuancé sur les diagnostics délicats",
         },
         thorough: {
           description:
-            "Questions de relance poussées et débriefings détaillés, au plus près du vrai examinateur.",
+            "Relances poussées et débriefings détaillés, au plus près du vrai examinateur.",
           strength:
             "Les retours les plus détaillés sur les lacunes et les signaux d'alerte",
           weakness: "La variante la plus chère de cet entraîneur",
@@ -2768,7 +2757,7 @@ export const translations: typeof enTranslations = {
           description:
             "Séries d'exercices rapides pour réviser entre deux simulations complètes.",
           strength: "L'option la moins chère, réponses instantanées",
-          weakness: "Niveau Rapide : superficiel sur les cas complexes",
+          weakness: "Rapide, mais superficiel sur les cas complexes",
         },
       },
     },
@@ -2793,7 +2782,7 @@ export const translations: typeof enTranslations = {
       variantInfo: {
         budget: {
           description:
-            "Utilise les fonctionnalités de la plateforme comme un vrai utilisateur et signale ce qui casse.",
+            "Utilise la plateforme comme un vrai utilisateur et signale ce qui casse.",
           strength:
             "Les tests les moins chers, prise en charge complète des outils",
           weakness: "Ne génère pas d'images nativement",
@@ -2801,7 +2790,7 @@ export const translations: typeof enTranslations = {
         nativeImage: {
           description:
             "Teste la sortie d'image native d'un modèle de génération d'images.",
-          strength: "Vérifie le chemin de génération d'images natif",
+          strength: "Teste la génération d'images intégrée",
           weakness:
             "Pas d'appels d'outils, ne teste pas les autres fonctionnalités",
         },
@@ -3283,19 +3272,6 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Compétence créée",
       description: "Votre compétence personnalisée a été créée",
-    },
-  },
-  onboarding: {
-    success: {
-      title: "{{companion}} est prêt à discuter !",
-      subtitle:
-        "Choisissez maintenant des spécialistes pour des tâches précises, ou passez et ajoutez-les plus tard",
-    },
-    bottom: {
-      title: "Prêt à discuter ?",
-      description:
-        "Vous pourrez toujours revenir ajouter des spécialistes quand vous en aurez besoin",
-      button: "Commencer à discuter",
     },
   },
   selector: {

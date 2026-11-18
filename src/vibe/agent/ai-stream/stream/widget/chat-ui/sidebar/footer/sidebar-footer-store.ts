@@ -1,7 +1,7 @@
 /**
  * Sidebar Footer Store
  * Manages sidebar footer state (bottom sheet expansion).
- * Lives here so both the welcome-tour (api layer) and sidebar-footer (page layer) can share it.
+ * Shared by the sidebar footer and anything that needs to expand or collapse it.
  */
 
 import { create } from "zustand";

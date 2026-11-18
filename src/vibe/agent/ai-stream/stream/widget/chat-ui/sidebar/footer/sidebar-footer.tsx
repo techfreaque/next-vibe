@@ -38,8 +38,8 @@ import { FREE_CREDIT_MAX_TOTAL } from "@/products/constants";
 
 import { useChatBootContext } from "../../../../../../chat/hooks/context";
 import { scopedTranslation } from "../../../../../../chat/threads/widget/i18n";
-import { useSidebarFooterStore } from "../../welcome-tour/sidebar-footer-store";
-import { TOUR_DATA_ATTRS } from "../../welcome-tour/tour-config";
+import { TOUR_DATA_ATTRS } from "../../data-attrs";
+import { useSidebarFooterStore } from "./sidebar-footer-store";
 import { UserMenu } from "./user-menu";
 
 interface SidebarFooterProps {

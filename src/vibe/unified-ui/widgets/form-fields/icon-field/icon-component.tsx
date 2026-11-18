@@ -45,6 +45,13 @@ const ErrorIconFallback: IconComponent = ({
 );
 
 /**
+ * Icons already loaded in this page session, by library export name. A remount
+ * (parent switching branches, popover triggers, list re-keys) renders the icon
+ * right away instead of starting over on the empty loading placeholder.
+ */
+const loadedIconCache = new Map<string, IconComponent>();
+
+/**
  * THE Icon component - use this everywhere
  * Handles lazy loading automatically
  *
@@ -57,15 +64,31 @@ const ErrorIconFallback: IconComponent = ({
 export const Icon: React.FC<{
   icon: IconKey;
   className?: string;
+}> = ({ icon, className }) => (
+  // Keyed by icon: a changed icon remounts and starts from the cache, never
+  // from the previous icon's state (hydration switched the composer avatar
+  // from the model icon to the skill icon and it stayed on the placeholder).
+  <LazyIcon key={icon} icon={icon} className={className} />
+);
+
+const LazyIcon: React.FC<{
+  icon: IconKey;
+  className?: string;
 }> = ({ icon, className }) => {
   // Loaded component tagged with the registry name it was loaded for, so a
   // stale result is never shown after the icon prop changes.
+  const registryValue = ICON_REGISTRY[icon];
+  // Remounts start from the cache instead of the empty loading placeholder
   const [loaded, setLoaded] = useState<{
     name: string;
     Component: IconComponent;
-  } | null>(null);
-
-  const registryValue = ICON_REGISTRY[icon];
+  } | null>(() => {
+    if (typeof registryValue !== "string") {
+      return null;
+    }
+    const cached = loadedIconCache.get(registryValue);
+    return cached ? { name: registryValue, Component: cached } : null;
+  });
   // Nullable on purpose: Icon also renders in shells mounted outside
   // LoggerProvider (root error pages), where useLogger() would throw.
   const logger = useLogger();
@@ -88,12 +111,13 @@ export const Icon: React.FC<{
             icon: registryValue,
           });
         }
-        setLoaded({
-          name: registryValue,
-          Component: IconComp
-            ? (IconComp as IconComponent)
-            : MissingIconFallback,
-        });
+        const Component = IconComp
+          ? (IconComp as IconComponent)
+          : MissingIconFallback;
+        if (IconComp) {
+          loadedIconCache.set(registryValue, Component);
+        }
+        setLoaded({ name: registryValue, Component });
       } catch (error) {
         logger.warn("Icon library chunk failed to load", {
           component: "Icon",
