@@ -16,6 +16,8 @@ import {
   type CostCoverageValue,
   FinanceAlertType,
   type FinanceAlertTypeValue,
+  FinanceSource,
+  type FinanceSourceValue,
   ThresholdKey,
   type ThresholdKeyValue,
 } from "./enum";
@@ -35,6 +37,12 @@ export interface Thresholds {
   alertDedupHours: number;
   minRevenueUsd: number;
   minCostUsd: number;
+  openrouterLowBalanceUsd: number;
+  openrouterLowBalanceDays: number;
+  nanoGptLowBalanceUsd: number;
+  nanoGptLowBalanceDays: number;
+  veniceLowBalanceUsd: number;
+  veniceLowBalanceDays: number;
 }
 
 export const DEFAULT_THRESHOLDS: Thresholds = {
@@ -57,6 +65,12 @@ export const THRESHOLD_FIELD: Readonly<
   [ThresholdKey.ALERT_DEDUP_HOURS]: "alertDedupHours",
   [ThresholdKey.MIN_REVENUE_USD]: "minRevenueUsd",
   [ThresholdKey.MIN_COST_USD]: "minCostUsd",
+  [ThresholdKey.OPENROUTER_LOW_BALANCE_USD]: "openrouterLowBalanceUsd",
+  [ThresholdKey.OPENROUTER_LOW_BALANCE_DAYS]: "openrouterLowBalanceDays",
+  [ThresholdKey.NANO_GPT_LOW_BALANCE_USD]: "nanoGptLowBalanceUsd",
+  [ThresholdKey.NANO_GPT_LOW_BALANCE_DAYS]: "nanoGptLowBalanceDays",
+  [ThresholdKey.VENICE_LOW_BALANCE_USD]: "veniceLowBalanceUsd",
+  [ThresholdKey.VENICE_LOW_BALANCE_DAYS]: "veniceLowBalanceDays",
 };
 
 export interface ThresholdOverride {
@@ -328,6 +342,73 @@ export interface AlertCandidate {
 }
 
 const money = (value: number): string => `$${value.toFixed(2)}`;
+
+export const LOW_BALANCE_THRESHOLDS: Partial<
+  Record<
+    typeof FinanceSourceValue,
+    { absoluteUsd: keyof Thresholds; daysOfSpend: keyof Thresholds }
+  >
+> = {
+  [FinanceSource.OPENROUTER]: {
+    absoluteUsd: "openrouterLowBalanceUsd",
+    daysOfSpend: "openrouterLowBalanceDays",
+  },
+  [FinanceSource.NANO_GPT]: {
+    absoluteUsd: "nanoGptLowBalanceUsd",
+    daysOfSpend: "nanoGptLowBalanceDays",
+  },
+  [FinanceSource.VENICE]: {
+    absoluteUsd: "veniceLowBalanceUsd",
+    daysOfSpend: "veniceLowBalanceDays",
+  },
+};
+
+export function detectLowBalance(input: {
+  provider: typeof FinanceSourceValue;
+  providerLabel: string;
+  balanceUsd: number;
+  absoluteUsd: number;
+  daysOfSpend: number;
+  dailySpendUsd: number | null;
+}): AlertCandidate | null {
+  const {
+    provider,
+    providerLabel,
+    balanceUsd,
+    absoluteUsd,
+    daysOfSpend,
+    dailySpendUsd,
+  } = input;
+  const warningUsd = Math.max(absoluteUsd, daysOfSpend * (dailySpendUsd ?? 0));
+  if (warningUsd <= 0 || balanceUsd >= warningUsd) {
+    return null;
+  }
+
+  const criticalUsd = warningUsd * FINANCE_CONFIG.lowBalanceCriticalFraction;
+  const critical = balanceUsd < criticalUsd;
+  const thresholdUsd = critical ? criticalUsd : warningUsd;
+  const remainingDays =
+    dailySpendUsd !== null && dailySpendUsd > 0
+      ? Math.max(balanceUsd, 0) / dailySpendUsd
+      : null;
+
+  return {
+    type: FinanceAlertType.LOW_BALANCE,
+    severity: critical ? AlertSeverity.CRITICAL : AlertSeverity.WARNING,
+    subject: provider,
+    dedupKey: `low-balance:${provider}:${critical ? "critical" : "warning"}`,
+    message: `Low prepaid balance for ${providerLabel}: ${money(balanceUsd)} remaining, below ${money(thresholdUsd)}. Top up the provider account.${remainingDays === null ? "" : ` Estimated runway: ${remainingDays.toFixed(1)} days.`}`,
+    metadata: {
+      balanceUsd: round2(balanceUsd),
+      thresholdUsd: round2(thresholdUsd),
+      absoluteUsd,
+      daysOfSpend,
+      trailingDays: FINANCE_CONFIG.baselineDays,
+      dailySpendUsd: dailySpendUsd === null ? null : round2(dailySpendUsd),
+      remainingDays: remainingDays === null ? null : round2(remainingDays),
+    },
+  };
+}
 
 /**
  * Where a provider's spend figure comes from:

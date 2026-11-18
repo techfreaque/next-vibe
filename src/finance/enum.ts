@@ -111,6 +111,7 @@ export const {
   NEGATIVE_MARGIN: "enums.alertType.negativeMargin",
   THIN_MARGIN: "enums.alertType.thinMargin",
   BALANCE_DRAIN: "enums.alertType.balanceDrain",
+  LOW_BALANCE: "enums.alertType.lowBalance",
   SPEND_SPIKE: "enums.alertType.spendSpike",
   REFUND_SPIKE: "enums.alertType.refundSpike",
   DISPUTE_SPIKE: "enums.alertType.disputeSpike",
@@ -122,6 +123,7 @@ export const FinanceAlertTypeDB = [
   FinanceAlertType.NEGATIVE_MARGIN,
   FinanceAlertType.THIN_MARGIN,
   FinanceAlertType.BALANCE_DRAIN,
+  FinanceAlertType.LOW_BALANCE,
   FinanceAlertType.SPEND_SPIKE,
   FinanceAlertType.REFUND_SPIKE,
   FinanceAlertType.DISPUTE_SPIKE,
@@ -161,6 +163,12 @@ export const {
   ALERT_DEDUP_HOURS: "enums.threshold.alertDedupHours",
   MIN_REVENUE_USD: "enums.threshold.minRevenueUsd",
   MIN_COST_USD: "enums.threshold.minCostUsd",
+  OPENROUTER_LOW_BALANCE_USD: "enums.threshold.openrouterLowBalanceUsd",
+  OPENROUTER_LOW_BALANCE_DAYS: "enums.threshold.openrouterLowBalanceDays",
+  NANO_GPT_LOW_BALANCE_USD: "enums.threshold.nanoGptLowBalanceUsd",
+  NANO_GPT_LOW_BALANCE_DAYS: "enums.threshold.nanoGptLowBalanceDays",
+  VENICE_LOW_BALANCE_USD: "enums.threshold.veniceLowBalanceUsd",
+  VENICE_LOW_BALANCE_DAYS: "enums.threshold.veniceLowBalanceDays",
 });
 
 export const ThresholdKeyDB = [
@@ -176,6 +184,12 @@ export const ThresholdKeyDB = [
   ThresholdKey.ALERT_DEDUP_HOURS,
   ThresholdKey.MIN_REVENUE_USD,
   ThresholdKey.MIN_COST_USD,
+  ThresholdKey.OPENROUTER_LOW_BALANCE_USD,
+  ThresholdKey.OPENROUTER_LOW_BALANCE_DAYS,
+  ThresholdKey.NANO_GPT_LOW_BALANCE_USD,
+  ThresholdKey.NANO_GPT_LOW_BALANCE_DAYS,
+  ThresholdKey.VENICE_LOW_BALANCE_USD,
+  ThresholdKey.VENICE_LOW_BALANCE_DAYS,
 ] as const;
 
 /** Which part of an ingest to run. */

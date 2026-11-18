@@ -34,6 +34,7 @@ export const translations: typeof enTranslations = {
       failed: "Fehlgeschlagen",
     },
     alertType: {
+      lowBalance: "Niedriges Prepaid-Guthaben",
       negativeMargin: "Negative Marge",
       thinMargin: "Dünne Marge",
       balanceDrain: "Guthaben-Abfluss",
@@ -48,6 +49,12 @@ export const translations: typeof enTranslations = {
       critical: "Kritisch",
     },
     threshold: {
+      openrouterLowBalanceUsd: "OpenRouter: Mindestguthaben (USD)",
+      openrouterLowBalanceDays: "OpenRouter: Guthabenreichweite (Tage)",
+      nanoGptLowBalanceUsd: "NanoGPT: Mindestguthaben (USD)",
+      nanoGptLowBalanceDays: "NanoGPT: Guthabenreichweite (Tage)",
+      veniceLowBalanceUsd: "Venice: Mindestguthaben (USD)",
+      veniceLowBalanceDays: "Venice: Guthabenreichweite (Tage)",
       marginFloorPct: "Margenuntergrenze (%)",
       drainMultiplier: "Abfluss-Faktor (x Durchschnitt)",
       hourlySpendCapUsd: "Stundenlimit pro Anbieter ($/h)",

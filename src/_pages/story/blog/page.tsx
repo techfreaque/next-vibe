@@ -11,6 +11,7 @@ import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { Calendar } from "next-vibe/ui/components/icons/Calendar";
 import { Clock } from "next-vibe/ui/components/icons/Clock";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
+import { JsonLd } from "next-vibe/ui/components/json-ld";
 import { Link } from "next-vibe/ui/components/link";
 import { Section } from "next-vibe/ui/components/section";
 import { Span } from "next-vibe/ui/components/span";
@@ -20,6 +21,10 @@ import type { JSX } from "react";
 import { configScopedTranslation } from "@/env/i18n";
 import { NewsletterStatusRepository } from "@/newsletter/status/repository";
 
+import {
+  buildBreadcrumbList,
+  buildItemList,
+} from "../../_components/structured-data";
 import { CONTAINER, Cta, CtaBand, PageHero } from "../_shared/marketing";
 import { formatCompareDate } from "../compare/_shared/compare-ui";
 import {
@@ -174,16 +179,15 @@ export function TanstackPage({
   const appName = configT("appName");
 
   const { t: compareT } = compareScopedTranslation.scopedT(locale);
-  const [newest, ...older] = listBlogPostCards(locale).map(
-    (card): BlogCardData => ({
-      href: `/${locale}${card.path}`,
-      date: card.date,
-      title: card.title,
-      category: card.category,
-      excerpt: card.excerpt,
-      readTime: card.readTime,
-    }),
-  );
+  const postCards = listBlogPostCards(locale);
+  const [newest, ...older] = postCards.map((card): BlogCardData => ({
+    href: `/${locale}${card.path}`,
+    date: card.date,
+    title: card.title,
+    category: card.category,
+    excerpt: card.excerpt,
+    readTime: card.readTime,
+  }));
   // The platform comparison is a standing page, not a dated post: it sits
   // first in the grid, right under the featured post.
   const compareCard: BlogCardData = {
@@ -215,6 +219,21 @@ export function TanstackPage({
 
   return (
     <Div className="min-h-screen bg-background">
+      <JsonLd
+        id="blog-index-structured-data"
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            buildBreadcrumbList(locale, [
+              { name: t("page.title"), path: "/story/blog" },
+            ]),
+            buildItemList(
+              locale,
+              postCards.map(({ title, path }) => ({ name: title, path })),
+            ),
+          ],
+        }}
+      />
       <PageHero
         eyebrow={t("labels.allPosts")}
         eyebrowIcon={BookOpen}

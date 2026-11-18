@@ -1224,16 +1224,31 @@ export class SkillsRepository {
 
   /**
    * Built-in skills whose public landing page (/skill/<id>) is open to
-   * anonymous visitors. Static, no DB. Feeds the sitemap.
+   * anonymous visitors. Static, no DB.
    */
-  static listPublicDefaultSkillIds(): string[] {
+  private static listPublicDefaultSkills(): Skill[] {
     return DEFAULT_SKILLS.filter((skill) => {
       const allowedRoles = skill.userRole ?? [UserPermissionRole.PUBLIC];
       return (
         skill.id !== NO_SKILL_ID &&
         allowedRoles.some((role) => role === UserPermissionRole.PUBLIC)
       );
-    }).map((skill) => skill.id);
+    });
+  }
+
+  static listPublicDefaultSkillIds(): string[] {
+    return SkillsRepository.listPublicDefaultSkills().map(({ id }) => id);
+  }
+
+  static listPublicDefaultSkillPages(
+    locale: CountryLanguage,
+  ): { id: string; name: string; tagline: string }[] {
+    const { t } = scopedTranslation.scopedT(locale);
+    return SkillsRepository.listPublicDefaultSkills().map((skill) => ({
+      id: skill.id,
+      name: t(skill.name),
+      tagline: t(skill.tagline),
+    }));
   }
 
   /**
@@ -1244,25 +1259,27 @@ export class SkillsRepository {
   static async listPublishedCommunitySkillPages(
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<ResponseType<{ id: string; updatedAt: Date }[]>> {
+  ): Promise<
+    ResponseType<
+      { id: string; name: string; tagline: string; updatedAt: Date }[]
+    >
+  > {
     try {
       const rows = await db
         .select({
           id: customSkills.id,
           slug: customSkills.slug,
+          name: customSkills.name,
+          tagline: customSkills.tagline,
           updatedAt: customSkills.updatedAt,
         })
         .from(customSkills)
-        .where(
-          and(
-            eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
-            eq(customSkills.status, SkillStatus.PUBLISHED),
-            eq(customSkills.isDeleted, false),
-          ),
-        );
+        .where(SkillsRepository.publishedCommunitySkillCondition());
       return success(
         rows.map((row) => ({
           id: row.slug || row.id,
+          name: row.name,
+          tagline: row.tagline,
           updatedAt: row.updatedAt,
         })),
       );
@@ -1276,6 +1293,40 @@ export class SkillsRepository {
         message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
+    }
+  }
+
+  private static publishedCommunitySkillCondition(): ReturnType<typeof and> {
+    return and(
+      eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
+      eq(customSkills.status, SkillStatus.PUBLISHED),
+      eq(customSkills.isDeleted, false),
+    );
+  }
+
+  /** Resolve an indexable community skill's public slug (or legacy UUID). */
+  static async resolvePublishedCommunitySkillPageId(
+    id: string,
+    logger: EndpointLogger,
+  ): Promise<string | null> {
+    try {
+      const [row] = await db
+        .select({ id: customSkills.id, slug: customSkills.slug })
+        .from(customSkills)
+        .where(
+          and(
+            SkillsRepository.resolveSkillIdCondition(id),
+            SkillsRepository.publishedCommunitySkillCondition(),
+          ),
+        )
+        .limit(1);
+      return row ? row.slug || row.id : null;
+    } catch (error) {
+      logger.error(
+        "Failed to resolve published community skill page",
+        parseError(error),
+      );
+      return null;
     }
   }
 

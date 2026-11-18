@@ -57,6 +57,9 @@ export const FINANCE_CONFIG = {
    */
   alertInbox: "hi@unbottled.ai",
 
+  /** The critical step is half the provider's warning threshold. */
+  lowBalanceCriticalFraction: 0.5,
+
   /**
    * USD value of one native unit for providers that report a non-USD balance.
    * null = no per-unit price: Gab credits come with the flat-rate plan below, so
@@ -104,5 +107,11 @@ export const FINANCE_CONFIG = {
     alertDedupHours: 12,
     minRevenueUsd: 5,
     minCostUsd: 1,
+    openrouterLowBalanceUsd: 50,
+    openrouterLowBalanceDays: 3,
+    nanoGptLowBalanceUsd: 50,
+    nanoGptLowBalanceDays: 3,
+    veniceLowBalanceUsd: 50,
+    veniceLowBalanceDays: 3,
   },
 } as const;

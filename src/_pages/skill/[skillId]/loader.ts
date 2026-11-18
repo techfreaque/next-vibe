@@ -36,6 +36,7 @@ import { getBestVideoGenModel } from "next-vibe/agent/video-generation/models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { hreflangFor } from "next-vibe/core/i18n/core/seo-locales";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -116,6 +117,25 @@ async function getVisitor(
   return userResponse.success ? userResponse.data : null;
 }
 
+async function indexableSkillPageId(
+  baseSkillId: string,
+  skill: SkillGetResponseOutput,
+  logger: EndpointLogger,
+): Promise<string | null> {
+  if (!skill.name) {
+    return null;
+  }
+  if (skill.skillOwnership === SkillOwnershipType.SYSTEM) {
+    return SkillsRepository.listPublicDefaultSkillIds().includes(baseSkillId)
+      ? baseSkillId
+      : null;
+  }
+  return SkillsRepository.resolvePublishedCommunitySkillPageId(
+    baseSkillId,
+    logger,
+  );
+}
+
 export async function loadSkillPageMetadata({
   params,
 }: SkillPageProps): Promise<Metadata> {
@@ -129,12 +149,9 @@ export async function loadSkillPageMetadata({
   let name = "";
   let tagline = "";
   let description = "";
-  const modelCount = getAvailableChatModelCount(
-    false,
-    await getEnvAvailability(),
-  );
+  const baseSkillId = parseSkillId(skillId).skillId;
+  let canonicalId: string | null = null;
   if (user) {
-    const baseSkillId = parseSkillId(skillId).skillId;
     const skillResult = await SkillsRepository.getSkillById(
       { id: baseSkillId },
       user,
@@ -149,30 +166,56 @@ export async function loadSkillPageMetadata({
         notFound();
       }
       name = t("removed.title");
+      description = t("removed.body");
     }
     if (skillResult.success) {
       name = skillResult.data.name ?? "";
       tagline = skillResult.data.tagline ?? "";
       description = skillResult.data.description ?? "";
+      canonicalId = await indexableSkillPageId(
+        baseSkillId,
+        skillResult.data,
+        logger,
+      );
     }
   }
 
+  const summary = asSentence(description || tagline || name);
+  const metaDescription = getSkillSamples(baseSkillId, locale)
+    ? t("meta.description", {
+        appName,
+        name,
+        summary,
+        modelCount: getAvailableChatModelCount(
+          false,
+          await getEnvAvailability(),
+        ),
+      })
+    : summary || t("hero.tryGeneric");
+
   return metadataGenerator(locale, {
-    path: `skill/${skillId}`,
+    path: `skill/${encodeURIComponent(canonicalId ?? baseSkillId)}`,
     title: tagline
       ? t("meta.title", { appName, name, tagline })
       : t("meta.titlePlain", { appName, name }),
     category: t("meta.category"),
-    description: t("meta.description", {
-      appName,
-      name,
-      summary: asSentence(description || tagline || name),
-      modelCount,
-    }),
+    description: metaDescription,
     image:
       "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?q=80&w=2070",
     imageAlt: t("meta.imageAlt", { appName, name }),
     keywords: [t("meta.keywords", { appName, name })],
+    ...(canonicalId === null
+      ? {
+          generateAlternates: false,
+          additionalMetadata: {
+            robots: {
+              index: false,
+              follow: true,
+              googleBot: { index: false, follow: true },
+            },
+          },
+        }
+      : {}),
   });
 }
 
@@ -531,6 +574,9 @@ export async function loadSkillLandingPage({
   const skillData = skillResult.success
     ? { ...skillResult.data, systemPrompt: null }
     : null;
+  const canonicalId = skillData
+    ? await indexableSkillPageId(baseSkillId, skillData, logger)
+    : null;
 
   // Per-variant model info, resolved server-side (keeps model registries
   // out of the client bundle).
@@ -659,14 +705,15 @@ export async function loadSkillLandingPage({
     }),
     creatorSkills,
     removed: false,
-    structuredData: skillData?.name
-      ? buildStructuredData(locale, skillId, skillData.name, {
-          description: skillData.description ?? skillData.tagline ?? "",
-          skillsLabel: t("breadcrumb.skills"),
-          modelName: activeVariant?.chatModelName ?? null,
-          appName,
-        })
-      : null,
+    structuredData:
+      canonicalId !== null && skillData?.name
+        ? buildStructuredData(locale, canonicalId, skillData.name, {
+            description: skillData.description ?? skillData.tagline ?? "",
+            skillsLabel: t("breadcrumb.skills"),
+            modelName: activeVariant?.chatModelName ?? null,
+            appName,
+          })
+        : null,
   };
 }
 
@@ -681,13 +728,14 @@ function buildStructuredData(
     appName: string;
   },
 ): JsonLdNode {
-  const url = pageUrl(locale, `/skill/${skillId}`);
+  const path = `/skill/${encodeURIComponent(skillId)}`;
+  const url = pageUrl(locale, path);
   return {
     "@context": "https://schema.org",
     "@graph": [
       buildBreadcrumbList(locale, [
         { name: info.skillsLabel, path: "/skills" },
-        { name, path: `/skill/${skillId}` },
+        { name, path },
       ]),
       {
         "@type": "WebPage",
@@ -695,7 +743,7 @@ function buildStructuredData(
         url,
         name,
         description: info.description,
-        inLanguage: locale,
+        inLanguage: hreflangFor(locale),
         isPartOf: { "@type": "WebSite", name: info.appName },
         about: {
           "@type": "SoftwareApplication",

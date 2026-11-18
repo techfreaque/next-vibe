@@ -32,6 +32,7 @@ export const translations = {
       failed: "Failed",
     },
     alertType: {
+      lowBalance: "Low prepaid balance",
       negativeMargin: "Negative margin",
       thinMargin: "Thin margin",
       balanceDrain: "Balance drain",
@@ -46,6 +47,12 @@ export const translations = {
       critical: "Critical",
     },
     threshold: {
+      openrouterLowBalanceUsd: "OpenRouter balance floor (USD)",
+      openrouterLowBalanceDays: "OpenRouter balance runway (days)",
+      nanoGptLowBalanceUsd: "NanoGPT balance floor (USD)",
+      nanoGptLowBalanceDays: "NanoGPT balance runway (days)",
+      veniceLowBalanceUsd: "Venice balance floor (USD)",
+      veniceLowBalanceDays: "Venice balance runway (days)",
       marginFloorPct: "Margin floor (%)",
       drainMultiplier: "Drain multiplier (x trailing average)",
       hourlySpendCapUsd: "Hourly spend cap per provider ($/h)",

@@ -6,21 +6,22 @@
 import type { Metadata } from "next";
 import type { JSX } from "react";
 
-import {
-  buildVersusMetadata,
-  loadVersusPage,
-  type VersusProps,
-} from "../_shared/versus-loader";
+import type { VersusProps } from "../_shared/versus-loader";
 import { VersusPage, type VersusPageData } from "../_shared/versus-page";
 
 export const revalidate = 3600;
 
 const VERSUS = "freedomGpt";
 
-export const generateMetadata = (props: VersusProps): Promise<Metadata> =>
-  buildVersusMetadata(VERSUS, props);
+export async function generateMetadata(props: VersusProps): Promise<Metadata> {
+  const { buildVersusMetadata } = await import("../_shared/versus-loader");
+  return buildVersusMetadata(VERSUS, props);
+}
 
-export function tanstackLoader(props: VersusProps): Promise<VersusPageData> {
+export async function tanstackLoader(
+  props: VersusProps,
+): Promise<VersusPageData> {
+  const { loadVersusPage } = await import("../_shared/versus-loader");
   return loadVersusPage(VERSUS, props);
 }
 

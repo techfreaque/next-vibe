@@ -345,6 +345,22 @@ export interface Breadcrumb {
   path: string;
 }
 
+/** Ordered public links shown by a directory or index page. */
+export function buildItemList(
+  locale: CountryLanguage,
+  entries: readonly Breadcrumb[],
+): JsonLdNode {
+  return {
+    "@type": "ItemList",
+    itemListElement: entries.map(({ name, path }, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name,
+      url: pageUrl(locale, path),
+    })),
+  };
+}
+
 /**
  * BreadcrumbList for a page under Home ({appName} → /story). `crumbs` lists
  * the levels below Home, the current page last.

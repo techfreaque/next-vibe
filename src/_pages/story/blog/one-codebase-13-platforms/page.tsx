@@ -29,6 +29,7 @@ import {
 } from "../../_shared/article";
 import { Callout, Cta } from "../../_shared/marketing";
 import { scopedTranslation } from "./i18n";
+import { ROUTE_CODE } from "./snippets";
 
 export const revalidate = 3600;
 
@@ -149,16 +150,6 @@ const DEFINITION_CODE = `const { POST } = createEndpoint({
   errorTypes: { /* ... all 9 required error types ... */ },
   successTypes: { title: "post.success.title", description: "post.success.description" },
   examples: { requests: { default: { decision: "Migrate to Bun" } }, responses: { default: { justification: "..." } } },
-});`;
-
-const ROUTE_CODE = `import { endpointsHandler } from "next-vibe/core/route/multi";
-import { Methods } from "next-vibe/core/definition/enums";
-import definitions from "./definition";
-import { explainToMyBoss } from "./repository";
-
-export const { POST, tools } = endpointsHandler({
-  endpoint: definitions,
-  [Methods.POST]: { handler: ({ data, logger }) => explainToMyBoss(data, logger) },
 });`;
 
 export function TanstackPage({ locale }: OneCodebasePageData): JSX.Element {

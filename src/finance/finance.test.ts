@@ -26,8 +26,7 @@ import {
 } from "@/payment/enum";
 import { ApiProvider } from "@/vibe/agent/models/models";
 
-type TestCurrency = "USD" | "EUR" | "PLN";
-
+import { FINANCE_CONFIG } from "./config";
 import {
   financeAlerts,
   financeDailyRollups,
@@ -47,8 +46,8 @@ import {
   SourceRunStatus,
   ThresholdKey,
 } from "./enum";
-import { scopedTranslation } from "./i18n";
 import { isFinanceProductionInstance } from "./env";
+import { scopedTranslation } from "./i18n";
 import type { FinanceIngestResponseOutput } from "./ingest/definition";
 import { tasks as financeTasks } from "./ingest/task";
 import {
@@ -64,10 +63,16 @@ import {
   spendBetween,
   trailingSpendRate,
 } from "./logic";
-import { defaultFinanceDeps,type FinanceDeps, FinanceRepository } from "./repository";
+import {
+  defaultFinanceDeps,
+  type FinanceDeps,
+  FinanceRepository,
+} from "./repository";
 import type { FinanceHttp, HttpRequest, HttpResult } from "./sources/http";
 import { usagePricing } from "./sources/providers";
 import type { StripeLedgerPort } from "./sources/revenue";
+
+type TestCurrency = "USD" | "EUR" | "PLN";
 
 const logger = createEndpointLogger(false, defaultLocale);
 const { t } = scopedTranslation.scopedT(defaultLocale);
@@ -589,6 +594,10 @@ const NOW = new Date(Date.UTC(2031, 2, 4, 12, 30));
 const FUTURE = new Date(Date.UTC(2031, 0, 1));
 
 let openRouterUsage = 100;
+let openRouterCredits = 500;
+let nanoGptBalance = 100;
+let veniceBalance: number | null = null;
+let observedAt = NOW;
 /** Billed calls the mocked usage log reports for uncensored.ai / FreedomGPT. */
 let billedCalls = 10;
 /** Who / what the mocked usage log reports for a ledger spike window. */
@@ -613,7 +622,10 @@ const mockHttp: FinanceHttp = async (
       status: 200,
       json: {
         // Account-wide usage includes other (dev) keys: never booked as spend.
-        data: { total_credits: 500, total_usage: openRouterUsage + 40 },
+        data: {
+          total_credits: openRouterCredits,
+          total_usage: openRouterUsage + 40,
+        },
       },
     };
   }
@@ -621,10 +633,12 @@ const mockHttp: FinanceHttp = async (
     return { status: 200, json: { data: { usage: openRouterUsage } } };
   }
   if (request.url.includes("nano-gpt.com")) {
-    return { status: 200, json: { usd_balance: "19.5" } };
+    return { status: 200, json: { usd_balance: String(nanoGptBalance) } };
   }
   if (request.url.includes("api.venice.ai")) {
-    return { status: 500, json: null };
+    return veniceBalance === null
+      ? { status: 500, json: null }
+      : { status: 200, json: { data: { balances: { USD: veniceBalance } } } };
   }
   return { status: 404, json: null };
 };
@@ -647,8 +661,9 @@ const stripePort: StripeLedgerPort = {
 
 const testDeps: FinanceDeps = {
   ...defaultFinanceDeps,
+  isProduction: true,
   http: mockHttp,
-  now: () => NOW,
+  now: () => observedAt,
   apiKey: (source) =>
     source === FinanceSource.OPENROUTER ||
     source === FinanceSource.NANO_GPT ||
@@ -762,9 +777,18 @@ describe("finance ingest (mocked externals)", () => {
 
   beforeEach(async () => {
     await purge();
+    await db.delete(financeThresholds);
+    await db
+      .update(financeSourceStatus)
+      .set({ lowBalanceSeverity: null, lowBalanceObservedAt: null })
+      .where(gte(financeSourceStatus.lastRunAt, FUTURE));
     httpCalls.length = 0;
     mails.length = 0;
     openRouterUsage = 100;
+    openRouterCredits = 500;
+    nanoGptBalance = 100;
+    veniceBalance = null;
+    observedAt = NOW;
     billedCalls = 10;
     ledgerWindows.length = 0;
   });
@@ -1279,6 +1303,169 @@ describe("finance ingest (mocked externals)", () => {
         (a) => a.type === FinanceAlertType.SPEND_SPIKE,
       );
       expect(spike?.delivery).toContain("skipped: no recipient");
+      expect(mails).toHaveLength(0);
+    } finally {
+      FinanceRepository.deps = testDeps;
+    }
+  });
+
+  it("reports a first low prepaid balance, including the $10.74 OpenRouter near-miss", async () => {
+    openRouterCredits = 150.74;
+    nanoGptBalance = 45;
+    veniceBalance = 30;
+    FinanceRepository.deps = {
+      ...testDeps,
+      recipients: () => ["hi@unbottled.ai", "thea@unbottled.ai"],
+    };
+    try {
+      const dryRun = await ingest(IngestScope.BALANCES, true);
+      expect(dryRun.alerts).toEqual([
+        expect.objectContaining({
+          type: FinanceAlertType.LOW_BALANCE,
+          subject: FinanceSource.OPENROUTER,
+          severity: AlertSeverity.CRITICAL,
+          message: expect.stringContaining("$10.74 remaining, below $25.00"),
+          delivery: "dry-run",
+        }),
+        expect.objectContaining({
+          type: FinanceAlertType.LOW_BALANCE,
+          subject: FinanceSource.NANO_GPT,
+          severity: AlertSeverity.WARNING,
+          delivery: "dry-run",
+        }),
+        expect.objectContaining({
+          type: FinanceAlertType.LOW_BALANCE,
+          subject: FinanceSource.VENICE,
+          severity: AlertSeverity.WARNING,
+          delivery: "dry-run",
+        }),
+      ]);
+      expect(mails).toHaveLength(0);
+
+      const live = await ingest(IngestScope.BALANCES);
+      expect(live.alerts.map((a) => a.delivery)).toEqual([
+        "sent",
+        "sent",
+        "sent",
+      ]);
+      expect(mails.map((mail) => mail.to)).toEqual([
+        "hi@unbottled.ai",
+        "thea@unbottled.ai",
+        "hi@unbottled.ai",
+        "thea@unbottled.ai",
+        "hi@unbottled.ai",
+        "thea@unbottled.ai",
+      ]);
+    } finally {
+      FinanceRepository.deps = testDeps;
+    }
+  });
+
+  it("mails once per downward crossing and rearms each step after recovery", async () => {
+    async function checkBalance(balance: number, hoursAfterStart: number) {
+      openRouterCredits = openRouterUsage + 40 + balance;
+      observedAt = new Date(
+        NOW.getTime() + hoursAfterStart * FINANCE_CONFIG.hourMs,
+      );
+      const data = await ingest(IngestScope.BALANCES);
+      const alert = data.alerts.find(
+        (a) => a.type === FinanceAlertType.LOW_BALANCE,
+      );
+      return alert && { severity: alert.severity, delivery: alert.delivery };
+    }
+
+    expect(await checkBalance(50, 0)).toBeUndefined();
+    expect(await checkBalance(45, 1)).toEqual({
+      severity: AlertSeverity.WARNING,
+      delivery: "sent",
+    });
+    expect(await checkBalance(40, 25)).toEqual({
+      severity: AlertSeverity.WARNING,
+      delivery: "suppressed",
+    });
+    expect(await checkBalance(20, 26)).toEqual({
+      severity: AlertSeverity.CRITICAL,
+      delivery: "sent",
+    });
+    expect(await checkBalance(10, 27)).toEqual({
+      severity: AlertSeverity.CRITICAL,
+      delivery: "suppressed",
+    });
+    expect(await checkBalance(25, 28)).toEqual({
+      severity: AlertSeverity.WARNING,
+      delivery: "suppressed",
+    });
+    expect(await checkBalance(20, 29)).toEqual({
+      severity: AlertSeverity.CRITICAL,
+      delivery: "sent",
+    });
+    expect(await checkBalance(50, 30)).toBeUndefined();
+    expect(await checkBalance(40, 31)).toEqual({
+      severity: AlertSeverity.WARNING,
+      delivery: "sent",
+    });
+    expect(mails).toHaveLength(4);
+  });
+
+  it("uses each provider's configured floor and seven-day spend runway", async () => {
+    openRouterCredits = 195; // $55 left, above the default $50 floor
+    nanoGptBalance = 35;
+    await db.insert(financeThresholds).values([
+      { key: ThresholdKey.OPENROUTER_LOW_BALANCE_DAYS, value: 4 },
+      { key: ThresholdKey.NANO_GPT_LOW_BALANCE_USD, value: 30 },
+    ]);
+    const hour = FINANCE_CONFIG.hourMs;
+    const weekStart =
+      Date.UTC(2031, 2, 4, 12) -
+      FINANCE_CONFIG.baselineDays * FINANCE_CONFIG.dayMs;
+    await db.insert(financeProviderSnapshots).values(
+      [
+        { at: weekStart - hour, spendUsd: 700, elapsedHours: 1 },
+        { at: weekStart + hour, spendUsd: 28, elapsedHours: 2 },
+        { at: weekStart + 2 * hour, spendUsd: 91, elapsedHours: 1 },
+      ].map(({ at, spendUsd, elapsedHours }) => ({
+        provider: FinanceSource.OPENROUTER,
+        bucketAt: new Date(at),
+        capturedAt: new Date(at),
+        cumulativeUsageUsd: openRouterUsage,
+        spendUsd,
+        elapsedHours,
+      })),
+    );
+
+    const data = await ingest(IngestScope.BALANCES);
+    expect(data.alerts).toEqual([
+      expect.objectContaining({
+        type: FinanceAlertType.LOW_BALANCE,
+        subject: FinanceSource.OPENROUTER,
+        severity: AlertSeverity.WARNING,
+        message: expect.stringContaining("$55.00 remaining, below $60.00"),
+      }),
+    ]);
+  });
+
+  it("claims one low balance crossing across concurrent ingests", async () => {
+    openRouterCredits = 180;
+    const outcomes = await Promise.all([
+      ingest(IngestScope.BALANCES),
+      ingest(IngestScope.BALANCES),
+    ]);
+    const deliveries = outcomes.flatMap((outcome) =>
+      outcome.alerts.map((alert) => alert.delivery),
+    );
+    expect(deliveries.toSorted()).toEqual(["sent", "suppressed"]);
+    expect(mails).toHaveLength(1);
+  });
+
+  it("does not send low balance mail from a non-production instance", async () => {
+    FinanceRepository.deps = { ...testDeps, isProduction: false };
+    try {
+      openRouterCredits = 150.74;
+      const data = await ingest(IngestScope.BALANCES);
+      expect(data.alerts[0]).toMatchObject({
+        type: FinanceAlertType.LOW_BALANCE,
+        delivery: "skipped: no recipient (non-production instance)",
+      });
       expect(mails).toHaveLength(0);
     } finally {
       FinanceRepository.deps = testDeps;

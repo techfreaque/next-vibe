@@ -17,7 +17,8 @@ interface GenerateMetadataOptions {
   path: string;
   title: TranslatedKeyType;
   category: TranslatedKeyType;
-  description: TranslatedKeyType;
+  /** Localized copy or the actual description from user-authored content. */
+  description: string;
   image: string;
   imageAlt: TranslatedKeyType;
   keywords: TranslatedKeyType[];

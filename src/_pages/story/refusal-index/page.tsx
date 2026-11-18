@@ -9,11 +9,17 @@ import { RefusalPublicRepository } from "next-vibe/agent/refusal-index/repositor
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { hreflangFor } from "next-vibe/core/i18n/core/seo-locales";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { JsonLd } from "next-vibe/ui/components/json-ld";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
+import {
+  buildBreadcrumbList,
+  pageUrl,
+} from "../../_components/structured-data";
 import { scopedTranslation } from "./i18n";
 import { RefusalIndexClient } from "./page-client";
 
@@ -54,7 +60,40 @@ export async function tanstackLoader({
 }
 
 export function TanstackPage(data: RefusalIndexPageData): JSX.Element {
-  return <RefusalIndexClient {...data} />;
+  const { locale, leaderboard } = data;
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const path = "/story/refusal-index";
+  return (
+    <>
+      <JsonLd
+        id="refusal-index-structured-data"
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            buildBreadcrumbList(locale, [{ name: t("hero.eyebrow"), path }]),
+            ...(leaderboard?.hasData
+              ? [
+                  {
+                    "@type": "Dataset",
+                    name: t("hero.eyebrow"),
+                    description: t("meta.description", {
+                      appName: configT("appName"),
+                    }),
+                    url: pageUrl(locale, path),
+                    inLanguage: hreflangFor(locale),
+                    ...(leaderboard.runFinishedAt
+                      ? { dateModified: leaderboard.runFinishedAt }
+                      : {}),
+                  },
+                ]
+              : []),
+          ],
+        }}
+      />
+      <RefusalIndexClient {...data} />
+    </>
+  );
 }
 
 export default async function RefusalIndexPage({

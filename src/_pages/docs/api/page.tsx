@@ -4,6 +4,7 @@ import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
+import { hreflangFor } from "next-vibe/core/i18n/core/seo-locales";
 import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
@@ -14,6 +15,7 @@ import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { Key } from "next-vibe/ui/components/icons/Key";
 import { Wrench } from "next-vibe/ui/components/icons/Wrench";
 import { X } from "next-vibe/ui/components/icons/X";
+import { JsonLd } from "next-vibe/ui/components/json-ld";
 import { ExternalLink, Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { H1, H2, P } from "next-vibe/ui/components/typography";
@@ -41,6 +43,10 @@ import {
   V1_MAX_SPEECH_CHARACTERS,
 } from "@/v1/shared/constants";
 
+import {
+  buildBreadcrumbList,
+  pageUrl,
+} from "../../_components/structured-data";
 import { Callout, Cta } from "../../story/_shared/marketing";
 import { type CodeTab, CodeTabs, CopyButton } from "./_components/code-tabs";
 import {
@@ -341,6 +347,24 @@ export function TanstackPage({
 
   return (
     <Div className="min-h-screen bg-background">
+      <JsonLd
+        id="api-docs-structured-data"
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            buildBreadcrumbList(locale, [
+              { name: t("hero.badge"), path: "/docs/api" },
+            ]),
+            {
+              "@type": "TechArticle",
+              headline: `${t("hero.title")} ${t("hero.titleHighlight")}`,
+              description: t("meta.description", { appName, modelCount }),
+              mainEntityOfPage: pageUrl(locale, "/docs/api"),
+              inLanguage: hreflangFor(locale),
+            },
+          ],
+        }}
+      />
       {/* ── Header ─────────────────────────────────────────────── */}
       <Div className="border-b border-border bg-gradient-to-b from-primary/[0.06] to-transparent">
         <Div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-10 sm:px-6 md:pt-14 md:pb-12 lg:grid lg:grid-cols-[minmax(0,1fr)_26rem] lg:items-center lg:gap-12">

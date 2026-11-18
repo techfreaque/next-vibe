@@ -33,7 +33,9 @@ async function listSkillPages(): Promise<SitemapSkillPage[]> {
     defaultLocale,
   );
   if (community.success) {
-    pages.push(...community.data);
+    pages.push(
+      ...community.data.map(({ id, updatedAt }) => ({ id, updatedAt })),
+    );
   }
   return pages;
 }

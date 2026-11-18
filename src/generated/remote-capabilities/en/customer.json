@@ -280870,6 +280870,26 @@
                 },
                 "schemaType": "primitive"
               },
+              "variantName": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "modelId": {
                 "type": "text",
                 "hidden": true,

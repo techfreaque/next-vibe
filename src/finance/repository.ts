@@ -45,6 +45,7 @@ import {
   financeThresholds,
 } from "./db";
 import {
+  AlertSeverity,
   CostCoverage,
   type CostCoverageValue,
   FinanceAlertType,
@@ -68,8 +69,10 @@ import {
   dayKey,
   DEFAULT_THRESHOLDS,
   detectDayAnomalies,
+  detectLowBalance,
   detectProviderAnomalies,
   isDuplicateAlert,
+  LOW_BALANCE_THRESHOLDS,
   resolveThresholds,
   round2,
   spendBetween,
@@ -113,6 +116,7 @@ export interface MailOutcome {
 }
 
 export interface FinanceDeps {
+  isProduction: boolean;
   http: FinanceHttp;
   now(): Date;
   apiKey(source: typeof FinanceSourceValue): string | undefined;
@@ -137,6 +141,7 @@ const nonEmpty = (value: string | undefined): string | undefined =>
   value && value.trim() !== "" ? value.trim() : undefined;
 
 export const defaultFinanceDeps: FinanceDeps = {
+  isProduction: isFinanceProductionInstance,
   http: liveHttp,
   now: () => new Date(),
   apiKey(source) {
@@ -283,6 +288,11 @@ export const defaultFinanceDeps: FinanceDeps = {
 type SourceReport = FinanceIngestResponseOutput["sources"][number];
 type DayReport = FinanceIngestResponseOutput["days"][number];
 type AlertReport = FinanceIngestResponseOutput["alerts"][number];
+
+interface LowBalanceObservation {
+  provider: typeof FinanceSourceValue;
+  candidate: AlertCandidate | null;
+}
 
 /** One recomputed day plus the pieces anomaly detection and the report need. */
 interface DayComputation {
@@ -444,6 +454,7 @@ export class FinanceRepository {
 
       const thresholds = await FinanceRepository.loadThresholds();
       const candidates: AlertCandidate[] = [];
+      const balances: LowBalanceObservation[] = [];
       const sources: SourceReport[] = [];
       /** USD spend measured by THIS run, keyed by provider (dry runs persist nothing). */
       const runSpend = new Map<string, number>();
@@ -458,6 +469,7 @@ export class FinanceRepository {
             data.dryRun,
             thresholds,
             candidates,
+            balances,
             runSpend,
             logger,
           );
@@ -507,6 +519,19 @@ export class FinanceRepository {
         logger,
         locale,
       );
+      for (const observation of balances) {
+        const alert = await FinanceRepository.raiseLowBalanceAlert(
+          observation,
+          data.dryRun,
+          now,
+          userId,
+          logger,
+          locale,
+        );
+        if (alert) {
+          raised.push(alert);
+        }
+      }
 
       return success({
         ranAt: now.toISOString(),
@@ -535,6 +560,7 @@ export class FinanceRepository {
     dryRun: boolean,
     thresholds: Thresholds,
     candidates: AlertCandidate[],
+    balances: LowBalanceObservation[],
     runSpend: Map<string, number>,
     logger: EndpointLogger,
   ): Promise<SourceReport> {
@@ -605,12 +631,17 @@ export class FinanceRepository {
           )
         : null;
 
-      if (delta) {
+      const lowBalance = LOW_BALANCE_THRESHOLDS[provider];
+      const balanceUsd = result.balanceUsd;
+      const hasPrepaidBalance =
+        lowBalance && balanceUsd !== null && Number.isFinite(balanceUsd);
+      const trailing =
+        delta || hasPrepaidBalance
+          ? await FinanceRepository.trailingProviderSpend(provider, bucketAt)
+          : null;
+
+      if (delta && trailing) {
         runSpend.set(provider, delta.spendUsd);
-        const trailing = await FinanceRepository.trailingProviderSpend(
-          provider,
-          bucketAt,
-        );
         // Ledger-estimated providers: who / what drove the window, so the
         // alert reads as a usage spike with its margin, not a key compromise.
         const ledgerUsage =
@@ -629,7 +660,7 @@ export class FinanceRepository {
             providerLabel: providerLabel(provider),
             spendUsd: delta.spendUsd,
             elapsedHours: delta.elapsedHours,
-            trailing,
+            trailing: trailing.rate,
             balanceUsd: result.balanceUsd,
             thresholds,
             spendBasis: adapter.spendBasis,
@@ -662,6 +693,20 @@ export class FinanceRepository {
           });
       }
 
+      if (hasPrepaidBalance) {
+        balances.push({
+          provider,
+          candidate: detectLowBalance({
+            provider,
+            providerLabel: providerLabel(provider),
+            balanceUsd,
+            absoluteUsd: thresholds[lowBalance.absoluteUsd],
+            daysOfSpend: thresholds[lowBalance.daysOfSpend],
+            dailySpendUsd: trailing?.dailySpendUsd ?? null,
+          }),
+        });
+      }
+
       return {
         ...base,
         status: SourceRunStatus.OK,
@@ -690,11 +735,12 @@ export class FinanceRepository {
    * interval is longer than the gap tolerance is a gap: its cost still counts,
    * its uncertain hours do not. trailingSpendRate turns too-little coverage into
    * an insufficient-data (null) rate rather than a falsely-tiny baseline.
+   * The runway estimate averages measured spend across all seven days.
    */
   private static async trailingProviderSpend(
     provider: (typeof ProviderSources)[number],
     bucketAt: Date,
-  ): Promise<TrailingRate> {
+  ): Promise<{ rate: TrailingRate; dailySpendUsd: number | null }> {
     const from = new Date(
       bucketAt.getTime() - FINANCE_CONFIG.baselineDays * DAY_MS,
     );
@@ -703,6 +749,12 @@ export class FinanceRepository {
       .select({
         spend: sql<number>`coalesce(sum(${financeProviderSnapshots.spendUsd}), 0)`,
         coveredHours: sql<number>`coalesce(sum(case when ${financeProviderSnapshots.elapsedHours} <= ${gapCutHours} then ${financeProviderSnapshots.elapsedHours} else 0 end), 0)`,
+        // Prorate an interval that began before the seven-day window.
+        windowSpend: sql<
+          number | null
+        >`sum(${financeProviderSnapshots.spendUsd} * least(1,
+          extract(epoch from (${financeProviderSnapshots.capturedAt} - ${from.toISOString()}::timestamp))
+          / 3600 / nullif(${financeProviderSnapshots.elapsedHours}, 0)))`,
       })
       .from(financeProviderSnapshots)
       .where(
@@ -712,10 +764,16 @@ export class FinanceRepository {
           lt(financeProviderSnapshots.bucketAt, bucketAt),
         ),
       );
-    return trailingSpendRate({
-      windowSpendUsd: Number(row?.spend ?? 0),
-      coveredHours: Number(row?.coveredHours ?? 0),
-    });
+    const windowSpend = Number(row?.windowSpend ?? Number.NaN);
+    return {
+      rate: trailingSpendRate({
+        windowSpendUsd: Number(row?.spend ?? 0),
+        coveredHours: Number(row?.coveredHours ?? 0),
+      }),
+      dailySpendUsd: Number.isFinite(windowSpend)
+        ? windowSpend / FINANCE_CONFIG.baselineDays
+        : null,
+    };
   }
 
   // ─── Revenue ───────────────────────────────────────────────────────────────
@@ -1435,6 +1493,134 @@ export class FinanceRepository {
 
   // ─── Alerts ────────────────────────────────────────────────────────────────
 
+  /** Claim a crossing and advance the provider's level together, before sending. */
+  private static async raiseLowBalanceAlert(
+    observation: LowBalanceObservation,
+    dryRun: boolean,
+    now: Date,
+    userId: string | undefined,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<AlertReport | null> {
+    const { provider, candidate } = observation;
+    const claim = await db.transaction(async (tx) => {
+      const query = tx
+        .select({
+          severity: financeSourceStatus.lowBalanceSeverity,
+          observedAt: financeSourceStatus.lowBalanceObservedAt,
+        })
+        .from(financeSourceStatus)
+        .where(eq(financeSourceStatus.source, provider));
+      const [state] = await (dryRun ? query : query.for("update"));
+      if (state?.observedAt && state.observedAt > now) {
+        return { delivery: "suppressed", id: null };
+      }
+
+      if (!dryRun) {
+        // Ingest records the source status before processing its alerts.
+        await tx
+          .update(financeSourceStatus)
+          .set({
+            lowBalanceSeverity: candidate?.severity ?? null,
+            lowBalanceObservedAt: now,
+          })
+          .where(eq(financeSourceStatus.source, provider));
+      }
+      if (!candidate) {
+        return null;
+      }
+      const previous = state?.severity;
+      const crossed =
+        !previous ||
+        (previous === AlertSeverity.WARNING &&
+          candidate.severity === AlertSeverity.CRITICAL);
+      if (!crossed) {
+        return { delivery: "suppressed", id: null };
+      }
+      if (dryRun) {
+        return { delivery: "dry-run", id: null };
+      }
+
+      const delivery = "pending";
+      const [row] = await tx
+        .insert(financeAlerts)
+        .values({ ...candidate, delivery, createdAt: now })
+        .returning({ id: financeAlerts.id });
+      return { delivery, id: row?.id ?? null };
+    });
+
+    if (!candidate || !claim) {
+      return null;
+    }
+    if (!claim.id) {
+      return FinanceRepository.alertReport(candidate, claim.delivery);
+    }
+    const delivery = await FinanceRepository.deliverAlert(
+      candidate,
+      userId,
+      logger,
+      locale,
+    );
+    await db
+      .update(financeAlerts)
+      .set({ delivery })
+      .where(eq(financeAlerts.id, claim.id));
+    return FinanceRepository.alertReport(candidate, delivery);
+  }
+
+  private static alertReport(c: AlertCandidate, delivery: string): AlertReport {
+    return {
+      type: c.type,
+      severity: c.severity,
+      subject: c.subject,
+      message: c.message,
+      delivery,
+    };
+  }
+
+  private static async deliverAlert(
+    c: AlertCandidate,
+    userId: string | undefined,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<string> {
+    const deps = FinanceRepository.deps;
+    let delivery: string;
+    const recipients = deps.isProduction ? deps.recipients() : [];
+    if (recipients.length === 0) {
+      delivery = deps.isProduction
+        ? "skipped: no recipient (set THEA_MAIL_ADDRESS)"
+        : "skipped: no recipient (non-production instance)";
+    } else {
+      const subject = `[finance] ${c.severity === AlertSeverity.CRITICAL ? "CRITICAL" : "WARNING"}: ${c.message.slice(0, 120)}`;
+      const text = `${c.message}\n\n${JSON.stringify(c.metadata, null, 2)}\n\nOpen Finance in the admin to review balances and thresholds.`;
+      const failures: string[] = [];
+      for (const to of recipients) {
+        try {
+          const mail = await deps.sendMail(
+            { to, subject, text },
+            userId,
+            logger,
+            locale,
+          );
+          if (!mail.ok) {
+            failures.push(`${to}: ${mail.detail}`);
+          }
+        } catch (error) {
+          failures.push(`${to}: ${parseError(error).message}`);
+        }
+      }
+      delivery =
+        failures.length === 0 ? "sent" : `failed: ${failures.join("; ")}`;
+    }
+    // Error level on purpose: lands in error_logs and the Thea error monitor.
+    logger.error(`[Finance] ALERT ${c.type}: ${c.message}`, {
+      subject: c.subject,
+      delivery,
+    });
+    return delivery;
+  }
+
   /**
    * Dedup each candidate against recent alerts with the same key, then log at
    * error level (reaches error_logs / the Thea error monitor) and mail the
@@ -1449,7 +1635,6 @@ export class FinanceRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<AlertReport[]> {
-    const deps = FinanceRepository.deps;
     const out: AlertReport[] = [];
     for (const c of candidates) {
       const [last] = await db
@@ -1458,13 +1643,6 @@ export class FinanceRepository {
         .where(eq(financeAlerts.dedupKey, c.dedupKey))
         .orderBy(desc(financeAlerts.createdAt))
         .limit(1);
-      const report = (delivery: string): AlertReport => ({
-        type: c.type,
-        severity: c.severity,
-        subject: c.subject,
-        message: c.message,
-        delivery,
-      });
       if (
         isDuplicateAlert(
           last?.createdAt ?? null,
@@ -1472,59 +1650,27 @@ export class FinanceRepository {
           thresholds.alertDedupHours,
         )
       ) {
-        out.push(report("suppressed"));
+        out.push(FinanceRepository.alertReport(c, "suppressed"));
         continue;
       }
       if (dryRun) {
-        out.push(report("dry-run"));
+        out.push(FinanceRepository.alertReport(c, "dry-run"));
         continue;
       }
 
-      let delivery: string;
-      const recipients = deps.recipients();
-      if (recipients.length === 0) {
-        delivery = isFinanceProductionInstance
-          ? "skipped: no recipient (set THEA_MAIL_ADDRESS)"
-          : "skipped: no recipient (non-production instance)";
-      } else {
-        const subject = `[finance] ${c.severity === "enums.severity.critical" ? "CRITICAL" : "WARNING"}: ${c.message.slice(0, 120)}`;
-        const text = `${c.message}\n\n${JSON.stringify(c.metadata, null, 2)}\n\nOpen Finance in the admin to review balances and thresholds.`;
-        const failures: string[] = [];
-        for (const to of recipients) {
-          try {
-            const mail = await deps.sendMail(
-              { to, subject, text },
-              userId,
-              logger,
-              locale,
-            );
-            if (!mail.ok) {
-              failures.push(`${to}: ${mail.detail}`);
-            }
-          } catch (error) {
-            failures.push(`${to}: ${parseError(error).message}`);
-          }
-        }
-        delivery =
-          failures.length === 0 ? "sent" : `failed: ${failures.join("; ")}`;
-      }
+      const delivery = await FinanceRepository.deliverAlert(
+        c,
+        userId,
+        logger,
+        locale,
+      );
 
       await db.insert(financeAlerts).values({
-        type: c.type,
-        severity: c.severity,
-        subject: c.subject,
-        dedupKey: c.dedupKey,
-        message: c.message,
-        metadata: c.metadata,
+        ...c,
         delivery,
         createdAt: now,
       });
-      // Error level on purpose: lands in error_logs and the Thea error monitor.
-      logger.error(`[Finance] ALERT ${c.type}: ${c.message}`, {
-        subject: c.subject,
-        delivery,
-      });
-      out.push(report(delivery));
+      out.push(FinanceRepository.alertReport(c, delivery));
     }
     return out;
   }

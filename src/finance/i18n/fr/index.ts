@@ -34,6 +34,7 @@ export const translations: typeof enTranslations = {
       failed: "Échec",
     },
     alertType: {
+      lowBalance: "Solde prépayé faible",
       negativeMargin: "Marge négative",
       thinMargin: "Marge faible",
       balanceDrain: "Solde qui fond",
@@ -48,6 +49,12 @@ export const translations: typeof enTranslations = {
       critical: "Critique",
     },
     threshold: {
+      openrouterLowBalanceUsd: "OpenRouter : solde minimum (USD)",
+      openrouterLowBalanceDays: "OpenRouter : réserve de dépenses (jours)",
+      nanoGptLowBalanceUsd: "NanoGPT : solde minimum (USD)",
+      nanoGptLowBalanceDays: "NanoGPT : réserve de dépenses (jours)",
+      veniceLowBalanceUsd: "Venice : solde minimum (USD)",
+      veniceLowBalanceDays: "Venice : réserve de dépenses (jours)",
       marginFloorPct: "Marge plancher (%)",
       drainMultiplier: "Multiplicateur de baisse (x moyenne glissante)",
       hourlySpendCapUsd: "Plafond de dépenses horaire par fournisseur ($/h)",

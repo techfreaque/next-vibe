@@ -167,6 +167,9 @@ export const financeSourceStatus = pgTable("finance_source_status", {
   /** True when the last run used our own records instead of the source API. */
   lastFallback: boolean("last_fallback").notNull().default(false),
   lastOkAt: timestamp("last_ok_at"),
+  /** Last classified prepaid balance, used to alert only on downward crossings. */
+  lowBalanceSeverity: text("low_balance_severity", { enum: AlertSeverityDB }),
+  lowBalanceObservedAt: timestamp("low_balance_observed_at"),
 });
 
 export const financeAlerts = pgTable(
@@ -180,7 +183,7 @@ export const financeAlerts = pgTable(
     dedupKey: text("dedup_key").notNull(),
     message: text("message").notNull(),
     metadata: jsonb("metadata").$type<AlertMetadata>().notNull().default({}),
-    /** "sent" | "skipped: <reason>" | "failed: <reason>" */
+    /** "pending" | "sent" | "skipped: <reason>" | "failed: <reason>" */
     delivery: text("delivery").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },

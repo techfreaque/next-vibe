@@ -34,6 +34,7 @@ export const translations: typeof enTranslations = {
       failed: "Błąd",
     },
     alertType: {
+      lowBalance: "Niskie saldo przedpłacone",
       negativeMargin: "Ujemna marża",
       thinMargin: "Niska marża",
       balanceDrain: "Wyciek salda",
@@ -48,6 +49,12 @@ export const translations: typeof enTranslations = {
       critical: "Krytyczny",
     },
     threshold: {
+      openrouterLowBalanceUsd: "OpenRouter: minimalne saldo (USD)",
+      openrouterLowBalanceDays: "OpenRouter: zapas środków (dni)",
+      nanoGptLowBalanceUsd: "NanoGPT: minimalne saldo (USD)",
+      nanoGptLowBalanceDays: "NanoGPT: zapas środków (dni)",
+      veniceLowBalanceUsd: "Venice: minimalne saldo (USD)",
+      veniceLowBalanceDays: "Venice: zapas środków (dni)",
       marginFloorPct: "Dolna granica marży (%)",
       drainMultiplier: "Mnożnik wycieku (x średnia)",
       hourlySpendCapUsd: "Limit godzinowy na dostawcę ($/h)",

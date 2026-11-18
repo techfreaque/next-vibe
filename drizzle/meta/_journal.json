@@ -1290,6 +1290,13 @@
       "when": 1795016462011,
       "tag": "20261118154101_unknown_kang",
       "breakpoints": true
+    },
+    {
+      "idx": 184,
+      "version": "7",
+      "when": 1795025204302,
+      "tag": "20261118180644_finance_low_balance",
+      "breakpoints": true
     }
   ]
 }

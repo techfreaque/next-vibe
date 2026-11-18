@@ -161,9 +161,10 @@ export function RefusalIndexClient({
   const dateText =
     leaderboard?.runFinishedAt !== null &&
     leaderboard?.runFinishedAt !== undefined
-      ? new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
-          new Date(leaderboard.runFinishedAt),
-        )
+      ? new Intl.DateTimeFormat(locale, {
+          dateStyle: "medium",
+          timeZone: "UTC",
+        }).format(new Date(leaderboard.runFinishedAt))
       : "-";
 
   const header = (key: SortKey, label: string): JSX.Element => (
