@@ -1,6 +1,5 @@
 export const translations = {
   nav: {
-    studio: "Studio",
     help: "Help",
     logout: "Log Out",
     settings: "My Profile & Settings",
@@ -606,7 +605,7 @@ export const translations = {
         label: "Your AI + Your Tools",
         title: "Tell it what you need. It builds it. You own it.",
         description:
-          "Describe a tool you want - a digest, a monitor, a deploy script. The AI builds it, wires it up, and it's instantly available on your dashboard. SSH into your servers, run autonomous background tasks, bring your own API keys. Your instance, your stack, your rules.",
+          "Describe a tool: a digest, a monitor, a deploy script. The AI builds it, wires it up, and it lands on your dashboard. SSH into your servers, run background tasks. Your instance, your rules.",
       },
       demos: {
         heartbeat: {
@@ -660,7 +659,7 @@ export const translations = {
         label: "The Framework",
         title: "Your AI builds new tools for itself.",
         description:
-          "Add an endpoint and it immediately becomes a custom interactive UI, CLI command, AI-callable tool, MCP server tool, and scheduled job. The stack is recursive - Claude Code builds next-vibe using next-vibe.",
+          "Add an endpoint and it immediately becomes a custom interactive UI, CLI command, AI-callable tool, MCP server tool, and scheduled job. The stack is recursive: Claude Code builds next-vibe with next-vibe.",
       },
       demos: {
         endpoint: {

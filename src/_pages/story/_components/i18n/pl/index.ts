@@ -2,7 +2,6 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   nav: {
-    studio: "Studio",
     help: "Pomoc",
     logout: "Wyloguj",
     settings: "Mój profil i ustawienia",
@@ -613,9 +612,9 @@ export const translations: typeof enTranslations = {
     personal: {
       theaAdmin: {
         label: "Twoje AI + Twoje Narzędzia",
-        title: "Powiedz co potrzebujesz. Zbuduje to. Ty to posiadasz.",
+        title: "Powiedz, czego potrzebujesz. AI to zbuduje. Należy do Ciebie.",
         description:
-          "Opisz narzędzie które chcesz - digest, monitor, skrypt deploy. AI tworzy szkielet, podłącza go i jest natychmiast dostępny w Twoim dashboardzie. SSH do serwerów, autonomiczne zadania w tle, własne klucze API. Twoja instancja, Twój stack, Twoje zasady.",
+          "Opisz narzędzie: digest, monitor, skrypt deploy. AI je buduje, podłącza i od razu masz je w swoim dashboardzie. SSH do serwerów, autonomiczne zadania w tle, własne klucze API. Twoja instancja, Twój stack, Twoje zasady.",
       },
       demos: {
         heartbeat: {
@@ -669,7 +668,7 @@ export const translations: typeof enTranslations = {
         label: "Framework",
         title: "Twoje AI buduje nowe narzędzia dla siebie.",
         description:
-          "Dodaj endpoint i od razu staje się customowym interfejsem web, poleceniem CLI, narzędziem wywoływanym przez AI, narzędziem serwera MCP i zaplanowanym jobem. Stack jest rekurencyjny - Claude Code buduje next-vibe używając next-vibe.",
+          "Dodaj endpoint i od razu staje się customowym interfejsem web, poleceniem CLI, narzędziem wywoływanym przez AI, narzędziem serwera MCP i zaplanowanym jobem. Stack jest rekurencyjny: Claude Code buduje next-vibe za pomocą next-vibe.",
       },
       demos: {
         endpoint: {

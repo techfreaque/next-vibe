@@ -2,7 +2,6 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   nav: {
-    studio: "Studio",
     help: "Hilfe",
     logout: "Abmelden",
     settings: "Mein Profil & Einstellungen",
@@ -612,9 +611,9 @@ export const translations: typeof enTranslations = {
     personal: {
       theaAdmin: {
         label: "Deine KI + Deine Tools",
-        title: "Sag ihr was du brauchst. Sie baut es. Du besitzt es.",
+        title: "Sag ihr, was du brauchst. Sie baut es. Es gehört dir.",
         description:
-          "Beschreib ein Tool das du willst - einen Digest, einen Monitor, ein Deploy-Skript. Die KI baut es, verdrahtet es, und es ist sofort in deinem Dashboard verfügbar. SSH zu deinen Servern, autonome Hintergrundtasks, eigene API-Keys. Deine Instanz, dein Stack, deine Regeln.",
+          "Beschreib ein Tool: einen Digest, einen Monitor, ein Deploy-Skript. Die KI baut es, verdrahtet es und legt es auf dein Dashboard. SSH zu deinen Servern, autonome Hintergrundtasks, eigene API-Keys. Deine Instanz, dein Stack, deine Regeln.",
       },
       demos: {
         heartbeat: {
@@ -668,7 +667,7 @@ export const translations: typeof enTranslations = {
         label: "Das Framework",
         title: "Deine KI baut neue Tools für sich selbst.",
         description:
-          "Einen Endpoint hinzufügen, und er wird sofort eine angepasste interaktive UI, CLI-Befehl, KI-aufrufbares Tool, MCP-Server-Tool und geplanter Job. Der Stack ist rekursiv - Claude Code baut next-vibe mit next-vibe.",
+          "Füg einen Endpoint hinzu, und er wird sofort zu interaktiver UI, CLI-Befehl, KI-Tool, MCP-Tool und geplantem Job. Der Stack ist rekursiv: Claude Code baut next-vibe mit next-vibe.",
       },
       demos: {
         endpoint: {

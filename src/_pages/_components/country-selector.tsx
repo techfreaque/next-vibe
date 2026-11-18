@@ -128,22 +128,19 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
           size="unset"
           className={cn(
             "flex items-center justify-center h-10",
-            isNavBar
-              ? "w-10 xl:w-auto xl:px-4 xl:py-2 xl:flex-wrap xl:content-center xl:gap-2"
-              : "px-3 rounded-md border",
+            isNavBar ? "w-10" : "px-3 rounded-md border",
           )}
+          aria-label={currentCountry.name}
+          title={currentCountry.name}
         >
           <Span className="text-lg flex items-center justify-center my-auto">
             {currentCountry.flag}
           </Span>
-          <Span
-            className={cn(
-              isNavBar ? "xl:flex hidden" : "flex",
-              "items-center text-sm font-medium",
-            )}
-          >
-            {currentCountry.name}
-          </Span>
+          {!isNavBar && (
+            <Span className="flex items-center text-sm font-medium">
+              {currentCountry.name}
+            </Span>
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72 p-2">
