@@ -1,46 +1,85 @@
 import type { Metadata } from "next";
+import { getMaxToolCountAllPlatforms } from "next-vibe/agent/chat/default-tool-counts";
+import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Button } from "next-vibe/ui/components/button";
+import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
+import { Activity } from "next-vibe/ui/components/icons/Activity";
 import { ArrowDown } from "next-vibe/ui/components/icons/ArrowDown";
+import { Bot } from "next-vibe/ui/components/icons/Bot";
+import { Box } from "next-vibe/ui/components/icons/Box";
+import { Cpu } from "next-vibe/ui/components/icons/Cpu";
+import { Database } from "next-vibe/ui/components/icons/Database";
 import { Github } from "next-vibe/ui/components/icons/Github";
+import { Layers } from "next-vibe/ui/components/icons/Layers";
 import { Lock } from "next-vibe/ui/components/icons/Lock";
-import { ExternalLink } from "next-vibe/ui/components/link";
+import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Search } from "next-vibe/ui/components/icons/Search";
+import { Server } from "next-vibe/ui/components/icons/Server";
+import { Terminal } from "next-vibe/ui/components/icons/Terminal";
 import { CodeSnippet } from "next-vibe/ui/components/markdown";
-import { H3, P } from "next-vibe/ui/components/typography";
+import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 import { GITHUB_REPO_URL } from "@/env/constants";
 import { configScopedTranslation } from "@/env/i18n";
 
+import { ContactFormSection } from "../_components/contact-form-section";
+import { PersonalShowcase } from "../_components/personal-showcase";
+import { SelfHostSection } from "../_components/self-host-section";
 import {
   Callout,
   Cta,
+  FeatureCard,
+  FeatureGrid,
   PageHero,
   PageSection,
   Step,
   StepList,
 } from "../_shared/marketing";
+import {
+  INSTANCE_COMPOSE,
+  INSTANCE_ENV,
+  INSTANCE_MODEL,
+} from "../_shared/surface-snippets";
 import { scopedTranslation } from "./i18n";
 
-interface Props {
-  params: Promise<{ locale: CountryLanguage }>;
-}
-
-interface SelfHostPageData {
+export interface SelfHostPageData {
   locale: CountryLanguage;
+  modelCount: number;
+  totalToolCount: number;
+  platform: Platform;
 }
 
 export async function tanstackLoader({
   params,
-}: Props): Promise<SelfHostPageData> {
+}: {
+  params: Promise<{ locale: CountryLanguage }>;
+}): Promise<SelfHostPageData> {
   const { locale } = await params;
-  return { locale };
+  const modelCount = getAvailableChatModelCount(
+    false,
+    await getEnvAvailability(),
+  );
+  return {
+    locale,
+    modelCount,
+    totalToolCount: getMaxToolCountAllPlatforms(),
+    platform: Platform.NEXT_PAGE,
+  };
 }
 
 export const revalidate = 3600;
+
+interface Props {
+  params: Promise<{ locale: CountryLanguage }>;
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
@@ -58,317 +97,276 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-const CLOUD_URL = "https://unbottled.ai";
-const BOOTSTRAP = "src/vibe/platforms/cli/bootstrap-vibe-runtime.mjs";
-const INSTALL = `git clone ${GITHUB_REPO_URL} && cd next-vibe && node ${BOOTSTRAP} setup`;
-const SECRET = `node -p "require('node:crypto').randomBytes(32).toString('hex')"`;
-const DEV = "vibe dev";
-const LIST_CONNECTIONS = "vibe remote-connections";
-const CONNECT = [
-  `vibe remote-connect --remote-url=${CLOUD_URL} --email="you@example.com" --password="YOUR_CLOUD_PASSWORD" --is-inference-provider=true`,
-  "--syncScope.memories=false --syncScope.documents=false --syncScope.skills=false --syncScope.favorites=false --syncScope.threads=false",
-].join(" ");
-const LOCAL_DB = 'DATABASE_URL="file:./data.db"';
-const PROVIDER = 'OPENROUTER_API_KEY="YOUR_OPENROUTER_KEY"';
-const COMPOSE =
-  "docker compose -f docker-compose.prod.yml -f docker-compose.standalone.yml";
-const DOCKER_START = `${COMPOSE} up -d --build`;
-const UPDATE_SOURCE = `git pull --ff-only && bun install && ${DEV}`;
-const UPDATE_DOCKER = `git pull --ff-only &&\n${DOCKER_START}`;
-const DOCKER_ENV = `NEXT_PUBLIC_APP_URL="http://localhost:3000"
-NEXT_PUBLIC_VIBE_MODE="dev"
-POSTGRES_PASSWORD="YOUR_DATABASE_PASSWORD"
-CHAT_STORAGE_PATH="/app/uploads/chat"
-PG_DATA_HOST_DIR="./docker-db-data"
-UPLOADS_HOST_DIR="./docker-uploads"`;
+const CLONE_SH = `git clone https://github.com/techfreaque/next-vibe
+cd next-vibe
+bun install`;
 
-function Snippet({
+const DEV_SH = "vibe dev";
+const ENV_FILENAME = ".env";
+
+const OPTION_A_SH = `# Claude Code - no API key needed
+# Requires Claude subscription + Claude Code CLI
+claude login   # sign in once
+# Then select any claude-code-* model in the model picker`;
+
+const OPTION_B_SH = `# OpenRouter - every model, pay per use
+# Paste your key in Settings → API Keys
+# Get yours at openrouter.ai/keys`;
+
+const VPS_DOCKER_SH = `bash scripts/install-docker.sh
+vibe build && vibe start
+# Point Caddy / nginx at port 3000`;
+
+const K8S_SH = `# Edit k8s/secret.yaml with your env vars
+kubectl apply -k k8s/`;
+
+const INCLUDES = [
+  { key: "models", icon: Cpu },
+  { key: "memory", icon: Lock },
+  { key: "search", icon: Search },
+  { key: "thea", icon: Bot },
+  { key: "admin", icon: Activity },
+  { key: "ssh", icon: Terminal },
+  { key: "sync", icon: RefreshCw },
+  { key: "free", icon: Github },
+] as const;
+
+function Shell({
   code,
-  language = "bash",
+  filename = "terminal",
 }: {
   code: string;
-  language?: string;
+  filename?: string;
 }): JSX.Element {
   return (
     <Div className="min-w-0 max-w-full">
-      <CodeSnippet code={code} language={language} />
+      <CodeSnippet
+        code={code}
+        language="bash"
+        filename={filename}
+        variant="file"
+      />
     </Div>
   );
 }
 
-export function TanstackPage({ locale }: SelfHostPageData): JSX.Element {
+export function TanstackPage({
+  locale,
+  modelCount,
+  totalToolCount,
+  platform,
+}: SelfHostPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const appName = configT("appName");
+
+  const publicUser: JWTPublicPayloadType = {
+    isPublic: true,
+    leadId: "00000000-0000-0000-0000-000000000000",
+    roles: [UserPermissionRole.PUBLIC],
+  };
 
   return (
     <Div className="min-h-screen bg-background">
       <PageHero
-        title={t("hero.title")}
-        subtitle={t("hero.subtitle")}
-        actions={
+        eyebrow={t("hero.badge")}
+        eyebrowIcon={Server}
+        title={
           <>
-            <Button
-              asChild
-              size="lg"
-              className="h-12 w-full gap-2 px-6 text-base sm:w-auto"
-            >
-              <ExternalLink href="#account">
-                <ArrowDown className="h-4 w-4" />
-                {t("account.title")}
-              </ExternalLink>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="h-12 w-full bg-card px-6 text-base sm:w-auto"
-            >
-              <ExternalLink href="#standalone">
-                {t("standalone.title")}
-              </ExternalLink>
-            </Button>
+            {t("hero.title")}{" "}
+            <Span className="text-primary">{t("hero.titleHighlight")}</Span>
           </>
         }
-      />
-
-      <PageSection
-        id="account"
-        title={t("account.title")}
-        intro={t("account.intro")}
-        narrow
-      >
-        <StepList>
-          <Step
-            number={1}
-            title={t("account.start.title")}
-            description={t("account.start.body")}
-          >
-            <Div className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-primary underline underline-offset-4">
-              <ExternalLink href="#install">{t("install.title")}</ExternalLink>
-              <ExternalLink href={`${CLOUD_URL}/${locale}/user/signup`}>
-                {t("account.start.signup")}
-              </ExternalLink>
-            </Div>
-          </Step>
-          <Step
-            number={2}
-            title={t("account.connect.title")}
-            description={t("account.connect.body")}
-          >
-            <Callout icon={Lock} tone="neutral">
-              {t("account.privacy")}
-            </Callout>
-          </Step>
-          <Step
-            number={3}
-            title={t("account.verify.title")}
-            description={t("account.verify.body")}
-          />
-        </StepList>
-        <Div className="mt-10 flex flex-col gap-3 rounded-xl border border-border bg-card p-5">
-          <H3 className="text-lg font-semibold">{t("account.cli.title")}</H3>
-          <P className="text-sm leading-relaxed text-muted-foreground">
-            {t("account.cli.body")}
-          </P>
-          <Snippet code={CONNECT} />
-          <P className="text-sm leading-relaxed text-muted-foreground">
-            {t("account.cli.diagnostics")}
-          </P>
-          <Snippet code={LIST_CONNECTIONS} />
-        </Div>
-      </PageSection>
-
-      <PageSection
-        id="standalone"
-        title={t("standalone.title")}
-        intro={t("standalone.intro")}
-        tone="muted"
-        narrow
-      >
-        <StepList>
-          <Step
-            number={1}
-            title={t("standalone.start.title")}
-            description={t("standalone.start.body")}
-          >
-            <ExternalLink
-              href="#install"
-              className="text-sm font-medium text-primary underline underline-offset-4"
-            >
-              {t("install.title")}
-            </ExternalLink>
-          </Step>
-          <Step
-            number={2}
-            title={t("standalone.provider.title")}
-            description={t("standalone.provider.body")}
-          >
-            <ExternalLink
-              href="https://openrouter.ai/keys"
-              className="mb-3 inline-block text-sm font-medium text-primary underline underline-offset-4"
-            >
-              {t("standalone.provider.key")}
-            </ExternalLink>
-            <Snippet code={PROVIDER} language="ini" />
-          </Step>
-          <Step
-            number={3}
-            title={t("standalone.verify.title")}
-            description={t("standalone.verify.body")}
-          />
-        </StepList>
-      </PageSection>
-
-      <PageSection
-        id="install"
-        title={t("install.title")}
-        intro={t("install.requirements")}
-        narrow
-      >
-        <StepList>
-          <Step
-            number={1}
-            title={t("install.checkout.title")}
-            description={t("install.checkout.body")}
-          >
-            <Snippet code={INSTALL} />
-            <P className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              {t("install.checkout.windows")}
-            </P>
-          </Step>
-          <Step
-            number={2}
-            title={t("install.config.title")}
-            description={t("install.config.body")}
-          >
-            <Snippet code={LOCAL_DB} language="ini" />
-            <P className="my-3 text-sm leading-relaxed text-muted-foreground">
-              {t("install.config.secrets")}
-            </P>
-            <Snippet code={SECRET} />
-          </Step>
-          <Step
-            number={3}
-            title={t("install.run.title")}
-            description={t("install.run.body")}
-          >
-            <Snippet code={DEV} />
-          </Step>
-        </StepList>
-      </PageSection>
-
-      <PageSection
-        id="docker"
-        title={t("docker.title")}
-        intro={t("docker.intro")}
-        tone="muted"
-        narrow
-      >
-        <StepList>
-          <Step
-            number={1}
-            title={t("docker.config.title")}
-            description={t("docker.config.body")}
-          >
-            <Snippet code={`git clone ${GITHUB_REPO_URL} && cd next-vibe`} />
-            <P className="my-3 text-sm leading-relaxed text-muted-foreground">
-              {t("docker.config.env")}
-            </P>
-            <Snippet code={DOCKER_ENV} language="ini" />
-          </Step>
-          <Step
-            number={2}
-            title={t("docker.run.title")}
-            description={t("docker.run.body")}
-          >
-            <Snippet code={DOCKER_START} />
-          </Step>
-        </StepList>
-      </PageSection>
-
-      <PageSection
-        id="update"
-        title={t("update.title")}
-        intro={t("update.intro")}
-        narrow
-      >
-        <Div className="flex flex-col gap-6">
-          <Div className="flex min-w-0 flex-col gap-3">
-            <H3 className="text-lg font-semibold">
-              {t("update.source.title")}
-            </H3>
-            <P className="text-sm leading-relaxed text-muted-foreground">
-              {t("update.source.body")}
-            </P>
-            <Snippet code={UPDATE_SOURCE} />
-          </Div>
-          <Div className="flex min-w-0 flex-col gap-3">
-            <H3 className="text-lg font-semibold">{t("docker.title")}</H3>
-            <P className="text-sm leading-relaxed text-muted-foreground">
-              {t("update.docker")}
-            </P>
-            <Snippet code={UPDATE_DOCKER} />
-          </Div>
-        </Div>
-      </PageSection>
-
-      <PageSection
-        id="troubleshooting"
-        title={t("troubleshoot.title")}
-        tone="muted"
-        narrow
-      >
-        <Div className="flex flex-col gap-6">
-          <Div className="flex min-w-0 flex-col gap-3">
-            <H3 className="text-lg font-semibold">
-              {t("troubleshoot.path.title")}
-            </H3>
-            <P className="text-sm leading-relaxed text-muted-foreground">
-              {t("troubleshoot.path.body")}
-            </P>
-            <Snippet code={`node ${BOOTSTRAP} dev`} />
-          </Div>
-          <Div>
-            <H3 className="text-lg font-semibold">
-              {t("troubleshoot.connect.title")}
-            </H3>
-            <P className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              {t("troubleshoot.connect.body")}
-            </P>
-          </Div>
-          <Div>
-            <H3 className="text-lg font-semibold">
-              {t("troubleshoot.models.title")}
-            </H3>
-            <P className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              {t("troubleshoot.models.body")}
-            </P>
-          </Div>
-          <Div>
-            <H3 className="text-lg font-semibold">
-              {t("troubleshoot.credits.title")}
-            </H3>
-            <P className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              {t("troubleshoot.credits.body")}
-            </P>
-          </Div>
-          <Div className="flex min-w-0 flex-col gap-3">
-            <H3 className="text-lg font-semibold">
-              {t("troubleshoot.docker.title")}
-            </H3>
-            <P className="text-sm leading-relaxed text-muted-foreground">
-              {t("troubleshoot.docker.body")}
-            </P>
-            <Snippet code={`${COMPOSE} logs --tail=100 app`} />
-          </Div>
-          <Div className="mt-2 self-start">
+        subtitle={t("hero.subtitle", { appName })}
+        actions={
+          <>
             <Cta
-              href={`${GITHUB_REPO_URL}/issues`}
-              label={t("troubleshoot.issue")}
+              href="#quickstart"
+              label={t("hero.ctaQuickstart")}
+              icon={ArrowDown}
+              arrow={false}
+            />
+            <Cta
+              href={GITHUB_REPO_URL}
+              label={t("hero.ctaGithub")}
               icon={Github}
               variant="secondary"
               external
             />
+          </>
+        }
+      />
+
+      <PersonalShowcase locale={locale} />
+
+      <PageSection
+        label={t("own.eyebrow")}
+        title={t("own.title")}
+        intro={t("own.subtitle")}
+      >
+        <FeatureGrid columns={3}>
+          <FeatureCard icon={Database} title={t("own.cards.data.title")}>
+            {t("own.cards.data.body")}
+          </FeatureCard>
+          <FeatureCard icon={Lock} title={t("own.cards.filter.title")}>
+            {t("own.cards.filter.body")}
+          </FeatureCard>
+          <FeatureCard icon={Cpu} title={t("own.cards.keys.title")}>
+            {t("own.cards.keys.body")}
+          </FeatureCard>
+        </FeatureGrid>
+      </PageSection>
+
+      <PageSection title={t("includes.title")}>
+        <FeatureGrid columns={4}>
+          {INCLUDES.map(({ key, icon: Icon }) => (
+            <Div
+              key={key}
+              className="flex gap-3 rounded-xl border border-border bg-card p-5 shadow-xs"
+            >
+              <Div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <Icon className="h-4 w-4" />
+              </Div>
+              <P className="text-sm leading-relaxed text-foreground/90">
+                {t(`includes.items.${key}`, { appName, modelCount })}
+              </P>
+            </Div>
+          ))}
+        </FeatureGrid>
+      </PageSection>
+
+      <SelfHostSection locale={locale} totalToolCount={totalToolCount} />
+
+      <PageSection
+        id="quickstart"
+        tone="muted"
+        title={t("quickstart.title")}
+        intro={t("quickstart.subtitle")}
+      >
+        <Div className="max-w-3xl">
+          <StepList>
+            <Step
+              number={1}
+              title={t("quickstart.step1.title")}
+              description={t("quickstart.step1.description")}
+            >
+              <Shell code={CLONE_SH} />
+            </Step>
+            <Step
+              number={2}
+              title={t("quickstart.step2.title")}
+              description={t("quickstart.step2.description")}
+            >
+              <Shell code={DEV_SH} />
+              <Callout icon={Database} tone="neutral" className="mt-4">
+                {t("quickstart.step2.noDocker")}
+              </Callout>
+            </Step>
+            <Step
+              number={3}
+              title={t("quickstart.step3.title")}
+              description={t("quickstart.step3.description")}
+            />
+            <Step number={4} title={t("quickstart.step4.title")}>
+              <Div className="flex min-w-0 flex-col gap-4">
+                <Div className="min-w-0 rounded-xl border border-primary/30 bg-card p-5">
+                  <P className="text-sm font-semibold text-primary">
+                    {t("quickstart.step4.optionA.label")}
+                  </P>
+                  <P className="mt-1 mb-4 text-sm leading-relaxed text-muted-foreground">
+                    {t("quickstart.step4.optionA.description")}
+                  </P>
+                  <Shell code={OPTION_A_SH} />
+                </Div>
+                <Div className="min-w-0 rounded-xl border border-border bg-card p-5">
+                  <P className="text-sm font-semibold">
+                    {t("quickstart.step4.optionB.label")}
+                  </P>
+                  <P className="mt-1 mb-4 text-sm leading-relaxed text-muted-foreground">
+                    {t("quickstart.step4.optionB.description")}
+                  </P>
+                  <Shell code={OPTION_B_SH} />
+                </Div>
+              </Div>
+            </Step>
+          </StepList>
+        </Div>
+      </PageSection>
+
+      <PageSection title={t("vps.title")} intro={t("vps.description")}>
+        <FeatureGrid columns={2}>
+          <FeatureCard icon={Box} title={t("vps.docker")}>
+            <Div className="mt-3">
+              <Shell code={VPS_DOCKER_SH} />
+            </Div>
+          </FeatureCard>
+          <FeatureCard icon={Layers} title={t("vps.kubernetes")}>
+            {t("vps.kubernetesDescription")}
+            <Div className="mt-4">
+              <Shell code={K8S_SH} />
+            </Div>
+          </FeatureCard>
+        </FeatureGrid>
+        <Callout icon={RefreshCw} tone="neutral" className="mt-6 md:mt-8">
+          <Span className="font-semibold text-foreground">
+            {t("localSync.title")}
+          </Span>{" "}
+          <Span className="text-muted-foreground">
+            {t("localSync.description")}
+          </Span>
+        </Callout>
+      </PageSection>
+
+      <PageSection tone="muted" title={t("env.title")} intro={t("env.intro")}>
+        <Div className="grid gap-6 lg:grid-cols-2">
+          <Div className="flex min-w-0 flex-col gap-2">
+            <P className="text-sm font-semibold">{t("env.envLabel")}</P>
+            <Shell code={INSTANCE_ENV} filename={ENV_FILENAME} />
           </Div>
+          <Div className="flex min-w-0 flex-col gap-2">
+            <P className="text-sm font-semibold">{t("env.composeLabel")}</P>
+            <Shell code={INSTANCE_COMPOSE} />
+          </Div>
+        </Div>
+      </PageSection>
+
+      <PageSection title={t("instances.title")} intro={t("instances.intro")}>
+        <FeatureGrid columns={3}>
+          <FeatureCard icon={Terminal} title={t("instances.atlas.name")}>
+            {t("instances.atlas.body")}
+          </FeatureCard>
+          <FeatureCard icon={Activity} title={t("instances.hermes.name")}>
+            {t("instances.hermes.body")}
+          </FeatureCard>
+          <FeatureCard icon={Server} title={t("instances.thea.name")}>
+            {t("instances.thea.body")}
+          </FeatureCard>
+        </FeatureGrid>
+        <Div className="mt-6">
+          <Shell code={INSTANCE_MODEL} />
+        </Div>
+        <Callout icon={RefreshCw} tone="neutral" className="mt-6">
+          {t("instances.note")}
+        </Callout>
+      </PageSection>
+
+      <PageSection tone="muted" title={t("fork.title")} narrow>
+        <P className="text-base leading-relaxed text-muted-foreground md:text-lg">
+          {t("fork.body")}
+        </P>
+      </PageSection>
+
+      <PageSection
+        title={t("enterprise.title")}
+        intro={t("enterprise.description")}
+        centeredHeader
+      >
+        <Div className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-5 shadow-xs md:p-10">
+          <ContactFormSection
+            locale={locale}
+            user={publicUser}
+            platform={platform}
+          />
         </Div>
       </PageSection>
     </Div>
