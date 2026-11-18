@@ -1,6 +1,41 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  confirmation: {
+    description:
+      "Terminez votre inscription avec le code ou le lien reçu par e-mail.",
+    title: "Consultez votre messagerie",
+    sent: "Saisissez le code envoyé à {{email}}. Il reste valable 30 minutes.",
+    code: "Code à 6 chiffres",
+    confirm: "Confirmer et se connecter",
+    change: "Adresse incorrecte ? Modifiez-la",
+    resend: "Renvoyer le code",
+    countdown: "Nouvel envoi dans {{seconds}} s",
+    save: "Envoyer à cette adresse",
+    cancel: "Annuler",
+    email: "Adresse e-mail",
+    hint: "Pour créer votre compte, saisissez ce code ou ouvrez le lien ci-dessous dans les 30 minutes.",
+    bounce:
+      "Le message envoyé à {{email}} nous est revenu. Corrigez votre adresse pour recevoir un nouveau code.",
+    invalid:
+      "Ce code ou ce lien est incorrect ou a expiré. Demandez un nouveau code.",
+    cooldown: "Trop de demandes. Patientez avant de demander un nouveau code.",
+    domain:
+      "Ce domaine ne peut pas recevoir de messages. Vérifiez votre adresse.",
+    sendFailed:
+      "L’envoi à {{email}} a échoué. Vérifiez votre adresse ou réessayez.",
+    done: "Votre adresse est confirmée. Vous êtes connecté.",
+    newsletter:
+      "Vous confirmez également votre inscription à la newsletter demandée.",
+    link: "Confirmer mon adresse",
+    pendingId: "Référence d’inscription",
+    token: "Jeton du lien de confirmation",
+    callback: "Chemin de retour",
+    suggestion: "Vouliez-vous écrire {{email}} ?",
+    expired:
+      "Cette inscription a expiré. Recommencez pour recevoir un nouveau code.",
+    retry: "Recommencer l’inscription",
+  },
   category: "Utilisateurs",
 
   _components: {
@@ -93,8 +128,8 @@ export const translations: typeof enTranslations = {
     description: "Tous les modèles. Vos règles. Gratuit pour commencer.",
   },
   actions: {
-    submit: "Créer un compte",
-    submitting: "Création du compte...",
+    submit: "Envoyer le code",
+    submitting: "Envoi du code…",
   },
   fields: {
     privateName: {
@@ -152,12 +187,12 @@ export const translations: typeof enTranslations = {
       label:
         "Abonnez-vous à la newsletter pour recevoir des crédits gratuits en bonus chaque mois",
       description:
-        "Inscrit l'e-mail du compte à la newsletter. Une fois le lien de l'e-mail de vérification cliqué, le compte reçoit des crédits gratuits en bonus chaque mois tant qu'il reste abonné. Un seul bonus par compte.",
+        "Confirmez votre adresse pour activer le bonus mensuel de la newsletter.",
       checkboxLabel:
         "S'abonner à la newsletter : +{{credits}} crédits gratuits chaque mois",
-      hint: "Nouveaux modèles et nouveautés produit toutes les quelques semaines. Votre e-mail de vérification le confirme. Désabonnement à tout moment.",
+      hint: "Les nouveaux modèles et les actualités du produit toutes les quelques semaines. Désabonnez-vous à tout moment.",
       tooltip:
-        "Cochez la case et nous vous inscrivons à la newsletter. Dès que vous cliquez sur le lien de votre e-mail de vérification, votre compte reçoit {{credits}} crédits gratuits supplémentaires chaque mois, {{total}} au total, tant que vous restez abonné. Un seul bonus par compte.",
+        "Après confirmation de votre adresse, vous recevez {{credits}} crédits supplémentaires par mois, soit {{total}} au total, tant que vous restez abonné.",
     },
     acceptTerms: {
       label: "J'accepte les conditions",
@@ -412,8 +447,8 @@ export const translations: typeof enTranslations = {
     nextSteps: "Prochaines étapes",
   },
   success: {
-    title: "Inscription réussie",
-    description: "Votre compte a bien été créé",
+    title: "Consultez votre messagerie",
+    description: "Saisissez le code reçu par e-mail.",
   },
   admin_notification: {
     title: "Nouvelle inscription",

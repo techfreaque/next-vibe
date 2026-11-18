@@ -70,7 +70,7 @@ export const translations: typeof enTranslations = {
       cleanup: {
         title: "Sprzątanie lokalne",
         description:
-          "Domyślnie włączone. Po udanym przebiegu TA maszyna budująca nie puchnie: lokalne buildy ghcr.io/techfreaque/next-vibe-app starsze niż 3 najnowsze tracą tagi (nigdy :latest, :rollback, :prod-current-good, właśnie wdrożony build ani obraz używany przez kontener), cache buildów Dockera starszy niż 48h jest usuwany, a stare eksporty z .tmp/image-build trafiają do .tmp/todelete/image-build/. Poniżej 40 GB wolnego miejsca w katalogu Dockera sprząta też przed buildem. Serwery produkcyjne mają osobny przełącznik (remoteCleanup). Wyłączone = tylko ostrzeżenie.",
+          "Domyślnie włączone. Po udanym wysłaniu obrazu lokalnie zostają tylko właśnie zbudowany i załadowany obraz oraz obrazy używane przez kontenery. Pozostałe lokalne tagi ghcr.io/techfreaque/next-vibe-app są usuwane. Starsze eksporty commitów wraz z plikami znaczników trafiają do .tmp/todelete/image-build/. Docker usuwa cache buildów nieużywany od 24 godzin i dąży do 30 GB. Gdy na dysku Dockera jest mniej niż 40 GB wolnego miejsca, sprzątanie rusza jeszcze przed buildem. Za serwery produkcyjne odpowiada remoteCleanup.",
       },
       remoteCleanup: {
         title: "Sprzątanie serwerów produkcyjnych",
@@ -200,11 +200,15 @@ export const translations: typeof enTranslations = {
           "🧹 Lokalne sprzątanie pominięte: {{image}} to nie {{allowed}}",
         cleanupListFailed:
           "Lokalne sprzątanie pominięte, nie można wylistować obrazów {{image}}: {{error}}",
+        cleanupCurrentMissing:
+          "Pominięto sprzątanie lokalnych obrazów, bo na liście brakuje właśnie załadowanego obrazu {{image}}.",
         cleanupTagFailed: "Nie można usunąć lokalnego {{ref}}: {{error}}",
         cleanupTagsRemoved:
-          "🧹 Usunięto {{count}} starych lokalnych ref(ów) {{image}}, zostaje {{keep}} najnowszych buildów: {{tags}}",
+          "🧹 Usunięte lokalne odwołania do {{image}} ({{count}}): {{tags}}",
         cleanupCachePruned:
-          "🧹 Usunięto cache buildów Dockera starszy niż {{hours}}h (odzyskano {{reclaimed}})",
+          "🧹 Usunięto cache buildów Dockera nieużywany od {{hours}} godz. (odzyskano {{reclaimed}})",
+        cleanupCacheCapped:
+          "🧹 Wyczyszczono cache buildów Dockera. Cel to {{size}} GB, odzyskano {{reclaimed}}.",
         cleanupCacheFailed:
           "Czyszczenie cache buildów Dockera nie powiodło się: {{error}}",
         cleanupExportsParked:

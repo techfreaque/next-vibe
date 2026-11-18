@@ -22,7 +22,13 @@ import type { Platform } from "next-vibe/platforms/platforms";
 
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "../chat/storage/index";
+import { isStorageUrl } from "../chat/storage/storage-url";
+import {
+  MediaStudioRepository,
+  type StudioProgress,
+} from "../media-studio/repository";
 import { ApiProvider, calculateCreditCost } from "../models/models";
+import { UncensoredConsentRepository } from "../models/uncensored-consent/repository";
 import {
   chargeMediaGeneration,
   checkMediaBalance,
@@ -53,6 +59,37 @@ export class MusicGenerationRepository {
   /**
    * Generate music from a text prompt
    */
+  static submit(
+    data: MusicGenerationPostRequestOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    t: MusicGenerationT,
+    toolExecutionContext: ToolExecutionContext,
+    platform: Platform,
+  ): Promise<ResponseType<MusicGenerationPostResponseOutput>> {
+    return MediaStudioRepository.run({
+      save: !toolExecutionContext.threadId && data.saveToStudio,
+      kind: "music",
+      model: data.model,
+      title: data.prompt,
+      user,
+      locale,
+      logger,
+      generate: (onProgress) =>
+        MusicGenerationRepository.generateMusic(
+          data,
+          user,
+          locale,
+          logger,
+          t,
+          toolExecutionContext,
+          platform,
+          onProgress,
+        ),
+    });
+  }
+
   static async generateMusic(
     data: MusicGenerationPostRequestOutput,
     user: JwtPayloadType,
@@ -61,6 +98,7 @@ export class MusicGenerationRepository {
     t: MusicGenerationT,
     toolExecutionContext: ToolExecutionContext,
     platform: Platform,
+    onProgress?: StudioProgress,
   ): Promise<ResponseType<MusicGenerationPostResponseOutput>> {
     // model is resolved via requestDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
@@ -76,6 +114,17 @@ export class MusicGenerationRepository {
         message: t("post.errors.not_found.description"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
+    }
+
+    const consent = await UncensoredConsentRepository.gate({
+      content: audioModel.content,
+      modelName: audioModel.name,
+      user,
+      locale,
+      logger,
+    });
+    if (!consent.success) {
+      return consent;
     }
 
     const creditCost = calculateCreditCost(audioModel, 0, 0);
@@ -161,6 +210,7 @@ export class MusicGenerationRepository {
       upstreamCostUsd?: number;
       durationSeconds?: number;
     }>;
+    await onProgress?.("running");
     switch (audioModel.apiProvider) {
       case ApiProvider.REPLICATE:
         generationResult = await generateMusicWithReplicate({
@@ -211,7 +261,11 @@ export class MusicGenerationRepository {
 
       case ApiProvider.UNBOTTLED:
         generationResult = await generateMusicWithUnbottled({
-          input: inputMediaUrl ? { ...data, inputMediaUrl } : data,
+          input: {
+            ...data,
+            inputMediaUrl: inputMediaUrl ?? undefined,
+            saveToStudio: undefined,
+          },
           user,
           locale,
           logger,
@@ -239,6 +293,7 @@ export class MusicGenerationRepository {
       });
     }
 
+    await onProgress?.("saving");
     let { audioUrl } = generationResult.data;
     const finalDurationSeconds =
       generationResult.data.durationSeconds ?? durationSeconds;
@@ -258,13 +313,23 @@ export class MusicGenerationRepository {
     // Upload to our storage so the URL is persistent and access-controlled.
     // Incognito threads have no server-side thread row — the file is owned by
     // the caller's leadId and served only to that lead (browser).
-    const scThreadId = toolExecutionContext?.threadId;
-    const isIncognito =
-      toolExecutionContext?.rootFolderId === DefaultFolderId.INCOGNITO;
+    const scThreadId =
+      toolExecutionContext.threadId ??
+      (data.saveToStudio ? crypto.randomUUID() : undefined);
+    const isIncognito = toolExecutionContext.threadId
+      ? toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO
+      : user.isPublic;
     if (scThreadId) {
       try {
         const storage = getStorageAdapter();
-        const arrayBuf = await fetchImpl(audioUrl).then((r) => r.arrayBuffer());
+        const media = await fetchImpl(audioUrl);
+        if (!media.ok) {
+          return fail({
+            message: t("post.errors.generationFailed"),
+            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+          });
+        }
+        const arrayBuf = await media.arrayBuffer();
         const audioBuffer = Buffer.from(new Uint8Array(arrayBuf));
         const uploadResult = await storage.uploadFile(audioBuffer, {
           filename: `generated-audio-${Date.now()}.mp3`,
@@ -287,6 +352,12 @@ export class MusicGenerationRepository {
       }
     }
 
+    if (data.saveToStudio && !isStorageUrl(audioUrl)) {
+      return fail({
+        message: t("post.errors.generationFailed"),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
     if (audioModel.apiProvider !== ApiProvider.UNBOTTLED) {
       const deductResult = await deductMediaCredits(
         user,

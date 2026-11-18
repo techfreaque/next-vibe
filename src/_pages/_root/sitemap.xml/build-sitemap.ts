@@ -51,6 +51,7 @@ export const SITEMAP_STATIC_PATHS: readonly string[] = [
   "/help",
   "/skills",
   "/models",
+  "/create",
   ...CREATE_KINDS.map((kind) => `/create/${kind}`),
 ];
 

@@ -10,7 +10,7 @@ class TestSocket extends EventTarget {
 
   readyState = TestSocket.CONNECTING;
 
-  constructor() {
+  constructor(readonly url: string) {
     super();
     TestSocket.sockets.push(this);
   }
@@ -83,10 +83,12 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
 
     jest.advanceTimersByTime(500);
     TestSocket.sockets[1]?.open();
+    const firstSocketUrl = TestSocket.sockets[0]?.url ?? "";
     expect(errors).toMatchObject([
       {
         message: "[WS Client] Connection lost",
         context: {
+          requestId: new URL(firstSocketUrl).searchParams.get("requestId"),
           code: 1012,
           reason: "server drain",
           attempts: 1,

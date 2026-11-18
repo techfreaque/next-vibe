@@ -47,6 +47,7 @@ const favoriteCardSchema = z.object({
   id: z.string(),
   skillId: z.string(),
   customVariantName: z.string().nullable(),
+  variantName: z.string().optional(),
   modelId: z.enum(ChatModelId).nullable(),
   voiceId: z.enum(TtsModelId).nullable(),
   position: z.number().int(),
@@ -216,6 +217,11 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               hidden: true,
               schema: favoriteCardSchema.shape.customVariantName,
+            }),
+            variantName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              hidden: true,
+              schema: favoriteCardSchema.shape.variantName,
             }),
             modelId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,

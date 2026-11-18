@@ -131,7 +131,9 @@ export async function generateWithOpenRouter(params: {
     let response = await request(true);
     let rawText = await response.text();
 
-    if (aspectRatio && isAspectRatioRejection(response.status, rawText)) {
+    const retriedWithoutAspectRatio =
+      Boolean(aspectRatio) && isAspectRatioRejection(response.status, rawText);
+    if (retriedWithoutAspectRatio) {
       logger.warn("[OpenRouter Image] Model rejected the aspect ratio", {
         model: providerModel,
         aspectRatio,
@@ -164,7 +166,11 @@ export async function generateWithOpenRouter(params: {
       logger.error("[OpenRouter Image] API error", {
         error: errorMsg,
         status: response.status,
+        providerErrorCode: data.error?.code ?? null,
         model: providerModel,
+        imageToImage: Boolean(inputMediaUrl),
+        requestedAspectRatio: aspectRatio ?? null,
+        retriedWithoutAspectRatio,
         // contentPolicy = the provider refused the prompt (user sees the
         // "refused by the content filter, not charged" message); outage /
         // other = ours or theirs to fix.

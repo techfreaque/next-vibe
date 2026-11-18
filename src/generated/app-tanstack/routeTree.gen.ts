@@ -23,6 +23,7 @@ import { Route as LocaleStoryRouteImport } from './routes/$locale.story'
 import { Route as LocaleSubscriptionRouteImport } from './routes/$locale.subscription'
 import { Route as LocaleThreadsRouteImport } from './routes/$locale.threads'
 import { Route as LocaleCortexIndexRouteImport } from './routes/$locale.cortex.index'
+import { Route as LocaleCreateIndexRouteImport } from './routes/$locale.create.index'
 import { Route as LocaleDesignTestIndexRouteImport } from './routes/$locale.design-test.index'
 import { Route as LocaleFrameSplatRouteImport } from './routes/$locale.frame.$'
 import { Route as LocaleHelpIndexRouteImport } from './routes/$locale.help.index'
@@ -792,6 +793,11 @@ const LocaleCortexIndexRoute = LocaleCortexIndexRouteImport.update({
   id: '/$locale/cortex/',
   path: '/$locale/cortex/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LocaleCreateIndexRoute = LocaleCreateIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LocaleCreateRoute,
 } as any)
 const LocaleDesignTestIndexRoute = LocaleDesignTestIndexRouteImport.update({
   id: '/$locale/design-test/',
@@ -4943,6 +4949,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/referral': typeof ApiLocaleReferralRouteWithChildren
   '/api/$locale/subscription': typeof ApiLocaleSubscriptionRouteWithChildren
   '/$locale/cortex/': typeof LocaleCortexIndexRoute
+  '/$locale/create/': typeof LocaleCreateIndexRoute
   '/$locale/design-test/': typeof LocaleDesignTestIndexRoute
   '/$locale/help/': typeof LocaleHelpIndexRoute
   '/$locale/models/': typeof LocaleModelsIndexRoute
@@ -5636,7 +5643,6 @@ export interface FileRoutesByTo {
   '/llms.txt': typeof LlmsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/$locale/$': typeof LocaleSplatRoute
-  '/$locale/create': typeof LocaleCreateRouteWithChildren
   '/$locale/docs': typeof LocaleDocsRouteWithChildren
   '/$locale': typeof LocaleIndexRoute
   '/$locale/frame/$': typeof LocaleFrameSplatRoute
@@ -5652,6 +5658,7 @@ export interface FileRoutesByTo {
   '/api/$locale/referral': typeof ApiLocaleReferralRouteWithChildren
   '/api/$locale/subscription': typeof ApiLocaleSubscriptionRouteWithChildren
   '/$locale/cortex': typeof LocaleCortexIndexRoute
+  '/$locale/create': typeof LocaleCreateIndexRoute
   '/$locale/design-test': typeof LocaleDesignTestIndexRoute
   '/$locale/help': typeof LocaleHelpIndexRoute
   '/$locale/models': typeof LocaleModelsIndexRoute
@@ -6367,6 +6374,7 @@ export interface FileRoutesById {
   '/api/$locale/referral': typeof ApiLocaleReferralRouteWithChildren
   '/api/$locale/subscription': typeof ApiLocaleSubscriptionRouteWithChildren
   '/$locale/cortex/': typeof LocaleCortexIndexRoute
+  '/$locale/create/': typeof LocaleCreateIndexRoute
   '/$locale/design-test/': typeof LocaleDesignTestIndexRoute
   '/$locale/help/': typeof LocaleHelpIndexRoute
   '/$locale/models/': typeof LocaleModelsIndexRoute
@@ -7083,6 +7091,7 @@ export interface FileRouteTypes {
     | '/api/$locale/referral'
     | '/api/$locale/subscription'
     | '/$locale/cortex/'
+    | '/$locale/create/'
     | '/$locale/design-test/'
     | '/$locale/help/'
     | '/$locale/models/'
@@ -7776,7 +7785,6 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/sitemap.xml'
     | '/$locale/$'
-    | '/$locale/create'
     | '/$locale/docs'
     | '/$locale'
     | '/$locale/frame/$'
@@ -7792,6 +7800,7 @@ export interface FileRouteTypes {
     | '/api/$locale/referral'
     | '/api/$locale/subscription'
     | '/$locale/cortex'
+    | '/$locale/create'
     | '/$locale/design-test'
     | '/$locale/help'
     | '/$locale/models'
@@ -8506,6 +8515,7 @@ export interface FileRouteTypes {
     | '/api/$locale/referral'
     | '/api/$locale/subscription'
     | '/$locale/cortex/'
+    | '/$locale/create/'
     | '/$locale/design-test/'
     | '/$locale/help/'
     | '/$locale/models/'
@@ -9746,6 +9756,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$locale/cortex/'
       preLoaderRoute: typeof LocaleCortexIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/$locale/create/': {
+      id: '/$locale/create/'
+      path: '/'
+      fullPath: '/$locale/create/'
+      preLoaderRoute: typeof LocaleCreateIndexRouteImport
+      parentRoute: typeof LocaleCreateRoute
     }
     '/$locale/design-test/': {
       id: '/$locale/design-test/'
@@ -14644,10 +14661,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface LocaleCreateRouteChildren {
+  LocaleCreateIndexRoute: typeof LocaleCreateIndexRoute
   LocaleCreateKindIndexRoute: typeof LocaleCreateKindIndexRoute
 }
 
 const LocaleCreateRouteChildren: LocaleCreateRouteChildren = {
+  LocaleCreateIndexRoute: LocaleCreateIndexRoute,
   LocaleCreateKindIndexRoute: LocaleCreateKindIndexRoute,
 }
 

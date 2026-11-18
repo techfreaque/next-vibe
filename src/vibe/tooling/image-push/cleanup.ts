@@ -13,28 +13,29 @@
 import "server-only";
 
 import { spawnSync } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import {
   existsSync,
   mkdirSync,
   readdirSync,
   renameSync,
   statfsSync,
-  statSync,
 } from "node:fs";
 import { join } from "node:path";
 
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
 import {
+  BUILD_CACHE_KEEP_GB,
   BUILD_CACHE_KEEP_HOURS,
   CLEANUP_IMAGE_REPO,
-  type ExportDirEntry,
   KEEP_BUILDS,
   type LocalImageEntry,
   MIN_FREE_GB,
   PINNED_TAGS,
-  selectExportDirsToPark,
+  selectExportEntriesToPark,
   selectImageRefsToRemove,
+  selectLocalImageRefsToRemove,
 } from "./cleanup-selection";
 import type { ImagePushT } from "./i18n";
 
@@ -42,14 +43,14 @@ const GB = 1024 ** 3;
 
 export class ImagePushCleanup {
   /**
-   * Post-deploy cleanup: old local tags of the app image, build cache older
-   * than BUILD_CACHE_KEEP_HOURS, and export dirs beyond the newest KEEP_BUILDS.
+   * After a successful push, keep the current export and the just-built
+   * local image, if loaded, plus any images used by containers.
    */
-  static afterDeploy(
+  static afterPush(
     params: {
       image: string;
-      /** Tags of the build just deployed (always kept). */
-      currentTags: string[];
+      /** Commit tag of the loaded image, absent for registry-only pushes. */
+      currentTag: string | undefined;
       buildRoot: string;
       repoRoot: string;
       currentSha: string;
@@ -59,7 +60,7 @@ export class ImagePushCleanup {
   ): void {
     ImagePushCleanup.removeOldImageTags(
       params.image,
-      params.currentTags,
+      { phase: "afterPush", currentTag: params.currentTag },
       logger,
       t,
     );
@@ -101,7 +102,12 @@ export class ImagePushCleanup {
     logger.warn(
       t("post.repository.messages.diskLow", { free, path, min: MIN_FREE_GB }),
     );
-    ImagePushCleanup.removeOldImageTags(params.image, [], logger, t);
+    ImagePushCleanup.removeOldImageTags(
+      params.image,
+      { phase: "beforeBuild" },
+      logger,
+      t,
+    );
     ImagePushCleanup.pruneBuildCache(logger, t);
     const after = ImagePushCleanup.freeGb(path, logger, t);
     if (after !== undefined) {
@@ -157,14 +163,15 @@ export class ImagePushCleanup {
   }
 
   /**
-   * Untags builds of CLEANUP_IMAGE_REPO older than the newest KEEP_BUILDS.
-   * Never `-f`: docker itself refuses to drop an image a container uses, on
-   * top of the container check in the selection. Aborts (removes nothing)
-   * when the image or container list cannot be read.
+   * Uses the existing low-disk retention before a build and the stricter
+   * local policy after a push. Uses plain docker rmi and requires both the
+   * image and container inventories before selecting refs.
    */
   private static removeOldImageTags(
     image: string,
-    currentTags: string[],
+    policy:
+      | { phase: "beforeBuild" }
+      | { phase: "afterPush"; currentTag: string | undefined },
     logger: EndpointLogger,
     t: ImagePushT,
   ): void {
@@ -204,13 +211,26 @@ export class ImagePushCleanup {
           line.split("\t");
         return { repository, tag, id, createdAt };
       });
-    const refs = selectImageRefsToRemove({
-      repository: CLEANUP_IMAGE_REPO,
-      entries,
-      keepBuilds: KEEP_BUILDS,
-      keepTags: [...PINNED_TAGS, ...currentTags],
-      containerImageIds: containers,
-    });
+    const refs =
+      policy.phase === "beforeBuild"
+        ? selectImageRefsToRemove({
+            repository: CLEANUP_IMAGE_REPO,
+            entries,
+            keepBuilds: KEEP_BUILDS,
+            keepTags: PINNED_TAGS,
+            containerImageIds: containers,
+          })
+        : selectLocalImageRefsToRemove({
+            entries,
+            currentTag: policy.currentTag,
+            containerImageIds: containers,
+          });
+    if (refs === undefined) {
+      logger.warn(
+        t("post.repository.messages.cleanupCurrentMissing", { image }),
+      );
+      return;
+    }
 
     const removed: string[] = [];
     for (const ref of refs) {
@@ -231,7 +251,6 @@ export class ImagePushCleanup {
         t("post.repository.messages.cleanupTagsRemoved", {
           count: removed.length,
           image,
-          keep: KEEP_BUILDS,
           tags: removed.join(", "),
         }),
       );
@@ -257,14 +276,50 @@ export class ImagePushCleanup {
     return images.ok ? images.stdout.split("\n").filter(Boolean) : undefined;
   }
 
-  /** Drops build cache older than BUILD_CACHE_KEEP_HOURS; keeps recent layers. */
+  /**
+   * Prune unused cache in two passes so the age filter cannot prevent Docker
+   * from meeting the size target when recent cache alone exceeds it.
+   */
   private static pruneBuildCache(logger: EndpointLogger, t: ImagePushT): void {
+    const aged = ImagePushCleanup.pruneBuilder(
+      ["--filter", `until=${String(BUILD_CACHE_KEEP_HOURS)}h`],
+      logger,
+      t,
+    );
+    if (aged !== undefined) {
+      logger.info(
+        t("post.repository.messages.cleanupCachePruned", {
+          hours: BUILD_CACHE_KEEP_HOURS,
+          reclaimed: aged,
+        }),
+      );
+    }
+    const excess = ImagePushCleanup.pruneBuilder(
+      ["--keep-storage", `${String(BUILD_CACHE_KEEP_GB)}GB`],
+      logger,
+      t,
+    );
+    if (excess !== undefined) {
+      logger.info(
+        t("post.repository.messages.cleanupCacheCapped", {
+          size: BUILD_CACHE_KEEP_GB,
+          reclaimed: excess,
+        }),
+      );
+    }
+  }
+
+  private static pruneBuilder(
+    args: string[],
+    logger: EndpointLogger,
+    t: ImagePushT,
+  ): string | undefined {
     const result = ImagePushCleanup.docker([
       "builder",
       "prune",
-      "-f",
-      "--filter",
-      `until=${String(BUILD_CACHE_KEEP_HOURS)}h`,
+      "--force",
+      "--all",
+      ...args,
     ]);
     if (!result.ok) {
       logger.warn(
@@ -272,20 +327,14 @@ export class ImagePushCleanup {
           error: result.stderr,
         }),
       );
-      return;
+      return undefined;
     }
-    const reclaimed = /Total:\s*(.+)$/m.exec(result.stdout)?.[1] ?? "0B";
-    logger.info(
-      t("post.repository.messages.cleanupCachePruned", {
-        hours: BUILD_CACHE_KEEP_HOURS,
-        reclaimed,
-      }),
-    );
+    return /Total:\s*(.+)$/m.exec(result.stdout)?.[1] ?? "0B";
   }
 
   /**
-   * Moves `.tmp/image-build/<sha>/` (+ its `<sha>.done` marker) beyond the
-   * newest KEEP_BUILDS to `.tmp/todelete/image-build/`. Never deletes.
+   * Moves old commit export dirs and completion markers to
+   * `.tmp/todelete/image-build/`, including markers left by interrupted cleanup.
    */
   private static parkOldExports(
     buildRoot: string,
@@ -298,21 +347,21 @@ export class ImagePushCleanup {
       return;
     }
     const parkRoot = join(repoRoot, ".tmp", "todelete", "image-build");
-    let entries: ExportDirEntry[];
+    let exportsToPark: Map<string, string[]>;
     try {
-      entries = readdirSync(buildRoot, { withFileTypes: true }).map(
-        (dirent) => {
-          const marker = join(buildRoot, `${dirent.name}.done`);
-          const statPath = existsSync(marker)
-            ? marker
-            : join(buildRoot, dirent.name);
-          return {
+      exportsToPark = selectExportEntriesToPark({
+        entries: readdirSync(buildRoot, { withFileTypes: true }).map(
+          (dirent) => ({
             name: dirent.name,
             isDirectory: dirent.isDirectory(),
-            mtimeMs: statSync(statPath).mtimeMs,
-          };
-        },
-      );
+            isFile: dirent.isFile(),
+          }),
+        ),
+        currentSha,
+      });
+      if (exportsToPark.size === 0) {
+        return;
+      }
       mkdirSync(parkRoot, { recursive: true });
     } catch (error) {
       logger.warn(
@@ -324,27 +373,24 @@ export class ImagePushCleanup {
       return;
     }
 
-    const names = selectExportDirsToPark({
-      entries,
-      keep: KEEP_BUILDS,
-      currentSha,
-    });
     let parked = 0;
-    for (const name of names) {
-      const source = join(buildRoot, name);
-      const taken = existsSync(join(parkRoot, name));
-      const destName = taken ? `${name}-${String(Date.now())}` : name;
+    for (const [sha, names] of exportsToPark) {
+      const taken =
+        existsSync(join(parkRoot, sha)) ||
+        existsSync(join(parkRoot, `${sha}.done`));
+      const destSha = taken ? `${sha}-${randomUUID()}` : sha;
       try {
-        renameSync(source, join(parkRoot, destName));
-        const marker = join(buildRoot, `${name}.done`);
-        if (existsSync(marker)) {
-          renameSync(marker, join(parkRoot, `${destName}.done`));
+        for (const name of names.toSorted()) {
+          renameSync(
+            join(buildRoot, name),
+            join(parkRoot, `${destSha}${name.slice(sha.length)}`),
+          );
         }
         parked += 1;
       } catch (error) {
         logger.warn(
           t("post.repository.messages.cleanupExportFailed", {
-            dir: source,
+            dir: join(buildRoot, sha),
             error: parseError(error).message,
           }),
         );

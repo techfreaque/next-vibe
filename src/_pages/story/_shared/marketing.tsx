@@ -98,8 +98,11 @@ export function Cta({
       {showArrow && <ArrowRight className="h-4 w-4" />}
     </>
   );
-  const isOffsite =
-    external || href.startsWith("http") || href.startsWith("mailto:");
+  const useAnchor =
+    external ||
+    href.startsWith("#") ||
+    href.startsWith("http") ||
+    href.startsWith("mailto:");
   return (
     <Button
       asChild
@@ -111,7 +114,7 @@ export function Cta({
         className,
       )}
     >
-      {isOffsite ? (
+      {useAnchor ? (
         <ExternalLink
           href={href}
           target={external ? "_blank" : undefined}

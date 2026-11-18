@@ -106,7 +106,7 @@ const GROUP_PREFIX = "group-";
 
 /**
  * Resolve the localized variant label for a favorite card.
- * Checks customVariantName first, then falls back to skill config.
+ * A favorite's custom name overrides the resolved skill variant name.
  * Returns null for non-variant favorites or unknown variants.
  */
 function getVariantLabel(
@@ -115,6 +115,9 @@ function getVariantLabel(
 ): string | null {
   if (item.customVariantName) {
     return item.customVariantName;
+  }
+  if (item.variantName) {
+    return item.variantName;
   }
   const { skillId: baseSkillId, variantId } = parseSkillId(item.skillId);
   if (!variantId) {

@@ -57,8 +57,8 @@ import { FEATURED_MODELS } from "../../../vibe/agent/ai-stream/models";
 import { createVerificationToken } from "../verify-email/token";
 import type signupDefinition from "./definition";
 import {
-  type SignupPostRequestOutput,
-  type SignupPostResponseOutput,
+  type SignupPatchRequestOutput,
+  type SignupPatchResponseOutput,
 } from "./definition";
 import {
   scopedTranslation as signupScopedTranslation,
@@ -397,10 +397,10 @@ function SignupWelcomeEmail({
 export const signupWelcomeEmailTemplate: EmailTemplateDefinition<
   SignupWelcomeProps,
   typeof signupScopedTranslation,
-  SignupPostRequestOutput,
-  SignupPostResponseOutput,
+  SignupPatchRequestOutput,
+  SignupPatchResponseOutput,
   never,
-  typeof signupDefinition.POST.allowedRoles
+  typeof signupDefinition.PATCH.allowedRoles
 > = {
   scopedTranslation: signupScopedTranslation,
   meta: {
@@ -443,8 +443,10 @@ export const signupWelcomeEmailTemplate: EmailTemplateDefinition<
     leadId: "example-lead-id-456",
     totalModelCount: 42,
   },
-  render: ({ requestData, locale, logger }) =>
-    renderWelcomeEmailByEmail(requestData.email, locale, logger),
+  render: ({ responseData, locale, logger }) =>
+    responseData.redirectTo
+      ? renderWelcomeEmailByEmail(responseData.address, locale, logger)
+      : success({ skip: true as const, reason: "Pending signup" }),
 };
 
 // ============================================================================
@@ -872,10 +874,10 @@ type AdminSignupProps = z.infer<typeof adminSignupPropsSchema>;
 export const adminSignupNotificationEmailTemplate: EmailTemplateDefinition<
   AdminSignupProps,
   typeof signupScopedTranslation,
-  SignupPostRequestOutput,
-  SignupPostResponseOutput,
+  SignupPatchRequestOutput,
+  SignupPatchResponseOutput,
   never,
-  typeof signupDefinition.POST.allowedRoles
+  typeof signupDefinition.PATCH.allowedRoles
 > = {
   scopedTranslation: signupScopedTranslation,
   meta: {
@@ -941,13 +943,15 @@ export const adminSignupNotificationEmailTemplate: EmailTemplateDefinition<
     userId: "example-user-id-123",
     subscribeToNewsletter: false,
   },
-  render: ({ requestData, locale, logger }) =>
-    renderAdminNotificationByEmail(
-      requestData.email,
-      requestData.subscribeToNewsletter,
-      locale,
-      logger,
-    ),
+  render: ({ responseData, locale, logger }) =>
+    responseData.redirectTo
+      ? renderAdminNotificationByEmail(
+          responseData.address,
+          undefined,
+          locale,
+          logger,
+        )
+      : success({ skip: true as const, reason: "Pending signup" }),
 };
 
 async function renderAdminNotificationByEmail(
@@ -1017,7 +1021,12 @@ async function renderAdminNotificationByEmail(
           ? leadBalanceResult.data.total
           : undefined,
       },
-      { subscribeToNewsletter },
+      {
+        subscribeToNewsletter:
+          subscribeToNewsletter === undefined
+            ? user.marketingConsent
+            : subscribeToNewsletter,
+      },
     ),
   });
 }

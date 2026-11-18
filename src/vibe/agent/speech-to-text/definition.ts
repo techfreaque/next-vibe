@@ -12,6 +12,7 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { Platform } from "next-vibe/platforms/platforms";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   objectField,
@@ -75,6 +76,14 @@ const { POST } = createEndpoint({
     render: SpeechToTextContainer,
     usage: { request: "data", response: true } as const,
     children: {
+      saveToStudio: requestField(scopedTranslation, {
+        hidden: true,
+        hiddenForPlatforms: [Platform.AI, Platform.MCP, Platform.CRON],
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        schema: z.boolean().optional(),
+      }),
+
       // === FILE UPLOAD SECTION ===
       fileUpload: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
@@ -122,6 +131,15 @@ const { POST } = createEndpoint({
       }),
 
       // === MODEL SELECTOR (managed by ModelSelectorTrigger in widget) ===
+      language: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "hotkey.post.language.label",
+        schema: z
+          .string()
+          .regex(/^[a-z]{2}$/)
+          .optional(),
+      }),
       modelId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,

@@ -15,6 +15,7 @@ import { NextResponse } from "next-vibe/ui/lib/request";
 
 import {
   CSRF_REJECTED_HEADER_NAME,
+  CSRF_RETRY_HEADER_NAME,
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
   LEAD_ID_COOKIE_NAME,
@@ -67,18 +68,18 @@ const MUTATING_METHODS = new Set([
 function validateCsrf(
   request: NextRequest,
   method: Methods,
-): { valid: true } | { valid: false; reason: string } {
+): { valid: true; checked: boolean } | { valid: false; reason: string } {
   if (!MUTATING_METHODS.has(method)) {
-    return { valid: true };
+    return { valid: true, checked: false };
   }
   // Bearer-token auth (React Native, server-to-server) - not vulnerable to CSRF
   if (request.headers.get("authorization")) {
-    return { valid: true };
+    return { valid: true, checked: false };
   }
   const cookieToken = request.cookies.get(CSRF_TOKEN_COOKIE_NAME)?.value;
   if (!cookieToken) {
     // No CSRF cookie - must be a non-browser client (CLI, MCP, server). Allow.
-    return { valid: true };
+    return { valid: true, checked: false };
   }
   const headerToken = request.headers.get(CSRF_TOKEN_HEADER_NAME);
   if (!headerToken) {
@@ -87,7 +88,7 @@ function validateCsrf(
   if (headerToken !== cookieToken) {
     return { valid: false, reason: "csrf_token_mismatch" };
   }
-  return { valid: true };
+  return { valid: true, checked: true };
 }
 
 /** How many cookies named `name` the raw Cookie header carries. */
@@ -172,6 +173,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
     try {
       // CSRF double-submit validation for mutating browser requests
       const csrfCheck = validateCsrf(request, endpoint.method as Methods);
+      const csrfRetry = request.headers.get(CSRF_RETRY_HEADER_NAME) === "1";
       if (!csrfCheck.valid) {
         // Our own client always echoes the cookie, so a rejection means the
         // page could not read it (duplicate cookie, foreign frame/webview)
@@ -187,6 +189,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           hasOrigin: request.headers.get("origin") !== null,
           hasRequestId: request.headers.get(REQUEST_ID_HEADER_NAME) !== null,
           hasLeadCookie: request.cookies.has(LEAD_ID_COOKIE_NAME),
+          csrfRetry,
         });
         const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
         const csrfResponse = wrapErrorResponse(
@@ -208,6 +211,12 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         // read and the send).
         csrfResponse.headers.set(CSRF_REJECTED_HEADER_NAME, csrfCheck.reason);
         return csrfResponse;
+      }
+      if (csrfRetry && csrfCheck.checked) {
+        logger.info("[CSRF] Retried request passed validation", {
+          endpoint: endpoint.path.join("/"),
+          method: endpoint.method,
+        });
       }
 
       // The proxy truncates bodies above MAX_REQUEST_BODY_BYTES, so parsing

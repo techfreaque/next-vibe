@@ -5,8 +5,8 @@
  * fresh lead of its own — never the admin's lead, which signup would link and
  * merge into the new account. deleteTestUser() removes the account and lead.
  */
-
 import { eq } from "drizzle-orm";
+import { confirmedTestSignup } from "next-vibe/tooling/testing/testing-suite/confirmed-signup";
 
 import userDeleteDefinitions from "@/users/user/[id]/definition";
 
@@ -58,11 +58,8 @@ export async function createTestUser(
     })
     .returning({ id: leads.id });
 
-  const { default: signupDefinitions } =
-    await import("@/user/public/signup/definition");
-  const signup = await sendTestRequest({
-    endpoint: signupDefinitions.POST,
-    data: {
+  const signup = await confirmedTestSignup(
+    {
       privateName: publicName,
       publicName,
       email,
@@ -71,13 +68,12 @@ export async function createTestUser(
       acceptTerms: true,
       subscribeToNewsletter: false,
     },
-    user: {
+    {
       isPublic: true,
       leadId: lead.id,
       roles: [UserPermissionRole.PUBLIC],
     },
-    toolExecutionContext: undefined,
-  });
+  );
   if (!signup.success) {
     return signup;
   }

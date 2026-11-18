@@ -28,8 +28,9 @@ const leadIp = sql<
 export async function countRecentSignupsInSubnet(
   subnet: string,
   since: Date,
+  reader: Pick<typeof db, "select"> = db,
 ): Promise<number> {
-  const rows = await db
+  const rows = await reader
     .select({
       userId: users.id,
       ip: leadIp,
@@ -66,6 +67,7 @@ export async function countRecentSignupsInSubnet(
 export async function signupSubnetLimitHit(
   ip: string | null | undefined,
   now: Date = new Date(),
+  reader: Pick<typeof db, "select"> = db,
 ): Promise<string | null> {
   if (!ip || isPrivateAddress(ip)) {
     return null;
@@ -77,6 +79,6 @@ export async function signupSubnetLimitHit(
   const since = new Date(
     now.getTime() - SIGNUP_SUBNET_WINDOW_HOURS * 60 * 60 * 1000,
   );
-  const count = await countRecentSignupsInSubnet(subnet, since);
+  const count = await countRecentSignupsInSubnet(subnet, since, reader);
   return count >= SIGNUPS_PER_SUBNET_PER_DAY ? subnet : null;
 }

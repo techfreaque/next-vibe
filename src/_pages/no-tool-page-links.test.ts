@@ -9,9 +9,10 @@
  * Only the tools framework itself and admin-only entry points are exempt.
  */
 
-import { describe, expect, test } from "bun:test";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
+
+import { describe, expect, test } from "bun:test";
 
 const SRC_ROOT = join(import.meta.dir, "..");
 
@@ -29,9 +30,6 @@ const ALLOWED_FILES: Record<string, string> = {
   // Admin-only redirect to system settings after the first admin login.
   [join("_pages", "user", "(auth)", "login", "_components", "login-form.tsx")]:
     "admin-only",
-  // Framework story page: shows the URL scheme of a tool as code, not a link.
-  [join("_pages", "story", "_shared", "surface-snippets.ts")]:
-    "framework code sample",
   // This guard.
   [join("_pages", "no-tool-page-links.test.ts")]: "this file",
   // AGENTS.md generator: tells coding agents how to test endpoints.
@@ -50,7 +48,10 @@ const TOOL_LINK_PATTERN =
 const SOURCE_EXTENSIONS = [".ts", ".tsx", ".md", ".txt", ".html"];
 
 function isTestFile(path: string): boolean {
-  return /\.(e2e\.)?test\.tsx?$/.test(path) && !path.endsWith("no-tool-page-links.test.ts");
+  return (
+    /\.(e2e\.)?test\.tsx?$/.test(path) &&
+    !path.endsWith("no-tool-page-links.test.ts")
+  );
 }
 
 function collectFiles(dir: string, out: string[]): void {
@@ -71,9 +72,11 @@ function collectFiles(dir: string, out: string[]): void {
 
 /** Import specifiers mention folders named "tools" - not links. */
 function isImportLine(line: string): boolean {
-  return /^\s*(?:import|export)\b.*from\s+["']/.test(line) ||
+  return (
+    /^\s*(?:import|export)\b.*from\s+["']/.test(line) ||
     /^\s*}\s*from\s+["']/.test(line) ||
-    /(?:import|require)\(\s*["']/.test(line);
+    /(?:import|require)\(\s*["']/.test(line)
+  );
 }
 
 function isCommentLine(line: string): boolean {
@@ -107,15 +110,15 @@ describe("no user-facing links to /tools/*", () => {
 
   test("pattern catches the shapes that slipped through before", () => {
     const bad = [
-      "href={`/${locale}/tools/api-keys`}",
-      "href={`/${locale}/tools/${IMAGE_GEN_ALIAS}`}",
+      `href={\`/\${locale}/tools/api-keys\`}`,
+      `href={\`/\${locale}/tools/\${IMAGE_GEN_ALIAS}\`}`,
       'link: "/tools/notifications"',
       "see https://unbottled.ai/en-US/tools/models",
       "web: /en-US/tools/desktop-get-focused-window",
     ];
     const good = [
       'href: "https://aitoolscapital.com/tools/unbottled-ai"',
-      "href={`/${locale}/user/api-keys`}",
+      `href={\`/\${locale}/user/api-keys\`}`,
       "Visitor pagination on /tools was broken.",
       "Plus a web page at /tools/<alias>",
     ];

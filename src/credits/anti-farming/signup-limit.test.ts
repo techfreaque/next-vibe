@@ -14,10 +14,7 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
-import {
-  createTestUser,
-  deleteTestUser,
-} from "next-vibe/tooling/testing/testing-suite/test-users";
+import { createTestUser, deleteTestUser } from "next-vibe/tooling/testing/testing-suite/test-users";
 import { NextRequest } from "next-vibe/ui/lib/request";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -85,9 +82,7 @@ afterAll(async () => {
     await deleteTestUser(userId);
   }
   if (subnets.length > 0) {
-    await db
-      .delete(antiFarmingEvents)
-      .where(inArray(antiFarmingEvents.subnet, subnets));
+    await db.delete(antiFarmingEvents).where(inArray(antiFarmingEvents.subnet, subnets));
   }
 });
 
@@ -146,6 +141,8 @@ describe("signup subnet limit", () => {
         new NextRequest("http://localhost/api/signup", {
           headers: { "x-forwarded-for": `${net}.77, 10.0.0.1` },
         }),
+        undefined,
+        async () => "ok",
       );
       expect(res.success).toBe(false);
       if (!res.success) {
@@ -188,10 +185,7 @@ describe("signup subnet limit", () => {
       const subnet = ipSubnetKey(`${prefix}::1`);
       expect(subnet).not.toBeNull();
       for (let i = 0; i < SIGNUPS_PER_SUBNET_PER_DAY; i++) {
-        const id = await account(
-          `v6-${String(i)}`,
-          `${prefix}::${String(i + 1)}`,
-        );
+        const id = await account(`v6-${String(i)}`, `${prefix}::${String(i + 1)}`);
         if (!id) {
           return;
         }

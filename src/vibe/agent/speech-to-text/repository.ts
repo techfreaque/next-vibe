@@ -29,6 +29,7 @@ import {
   PROVIDER_SETUP_INSTRUCTIONS,
 } from "../env-availability";
 import { getEnvAvailability } from "../env-availability";
+import { MediaStudioRepository } from "../media-studio/repository";
 import {
   EDEN_AI_URLS,
   edenAiErrorMessage,
@@ -42,7 +43,10 @@ import { ApiProvider, calculateSttCreditCost } from "../models/models";
 import { pollDelay } from "../shared/poll-delay";
 import { ModelSelectionType } from "../skills/enum";
 import { DEFAULT_STT_MODEL_SELECTION } from "./constants";
-import type { SpeechToTextPostResponseOutput } from "./definition";
+import type {
+  SpeechToTextPostRequestOutput,
+  SpeechToTextPostResponseOutput,
+} from "./definition";
 import {
   scopedTranslation as sttScopedTranslation,
   type SpeechToTextT,
@@ -232,6 +236,34 @@ export class SpeechToTextRepository {
    * Transcribe audio to text using model-based provider routing.
    * Accepts one or more chunks - fans out up to 4 in parallel, concatenates in order.
    */
+  static submit(
+    data: SpeechToTextPostRequestOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    toolExecutionContext: ToolExecutionContext,
+  ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
+    return MediaStudioRepository.run({
+      save: !toolExecutionContext.threadId && data.saveToStudio,
+      kind: "transcribe",
+      model: data.modelId,
+      title: data.fileUpload.files[0]?.name ?? "",
+      user,
+      locale,
+      logger,
+      generate: () =>
+        SpeechToTextRepository.transcribeAudio(
+          data.fileUpload.files,
+          user,
+          locale,
+          logger,
+          data.modelId,
+          toolExecutionContext,
+          data.language,
+        ),
+    });
+  }
+
   static async transcribeAudio(
     files: File[],
     user: JwtPayloadType,
@@ -240,6 +272,7 @@ export class SpeechToTextRepository {
     sttModelSelection: SttModelSelection | SttModelId | null,
     /** Fixture chain of the calling stream — provider calls bind it. */
     toolExecutionContext: ToolExecutionContext,
+    language?: string,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
     const result = await SpeechToTextRepository.transcribe(
       files,
@@ -248,6 +281,7 @@ export class SpeechToTextRepository {
       logger,
       sttModelSelection,
       toolExecutionContext,
+      { language },
     );
     if (!result.success) {
       return result;

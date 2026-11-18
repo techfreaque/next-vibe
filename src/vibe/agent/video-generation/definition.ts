@@ -70,6 +70,14 @@ const { POST } = createEndpoint({
     render: VideoGenerationContainer,
     usage: { request: "data", response: true } as const,
     children: {
+      saveToStudio: requestField(scopedTranslation, {
+        hidden: true,
+        hiddenForPlatforms: [Platform.AI, Platform.MCP, Platform.CRON],
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        schema: z.boolean().optional(),
+      }),
+
       // === REQUEST FIELDS ===
       prompt: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

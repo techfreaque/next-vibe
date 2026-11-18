@@ -19,6 +19,7 @@ import type { SkillVariantData } from "../../../../skills/db";
 import favoriteCreateDefinitions from "../../../../skills/favorites/create/definition";
 import favoritesDefinition from "../../../../skills/favorites/definition";
 import favoriteDeleteBatchDefinitions from "../../../../skills/favorites/delete-batch/definition";
+import type { ChatModelId } from "../../../models";
 
 /** Built-in variant config or a fetched (community) variant - both seed the same way. */
 type SeedVariant = SkillVariant | SkillVariantData;
@@ -218,14 +219,15 @@ export async function refreshFavorites(logger: EndpointLogger): Promise<void> {
   await apiClient.refetchEndpoint(favoritesDefinition.GET, logger);
 }
 
-/** Same write the chat input selector does; the model follows the variant. */
+/** Same write the chat input selector does; the model follows the favorite. */
 export async function activateFavorite(
   favorite: SeededFavorite,
   deps: SeedDeps,
+  modelId: ChatModelId | null = null,
 ): Promise<void> {
   await ChatSettingsRepositoryClient.selectFavorite({
     favoriteId: favorite.id,
-    modelId: null,
+    modelId,
     skillId: favorite.skillId,
     logger: deps.logger,
     locale: deps.locale,

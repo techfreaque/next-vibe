@@ -4,6 +4,8 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
+import { Palette } from "next-vibe/ui/components/icons/Palette";
+import { Link } from "next-vibe/ui/components/link";
 import { AnimatePresence, MotionDiv } from "next-vibe/ui/components/motion";
 import { ResizableContainer } from "next-vibe/ui/components/resizable";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
@@ -11,6 +13,8 @@ import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX, ReactNode } from "react";
 import { useMemo } from "react";
+
+import { scopedTranslation as studioTranslation } from "@/_pages/create/i18n";
 
 import foldersDefinition from "../../../../../chat/folders/[rootFolderId]/definition";
 import { useChatBootContext } from "../../../../../chat/hooks/context";
@@ -84,6 +88,13 @@ function WidgetSidebar({
         className="flex-1 h-full overflow-hidden"
         endpointOptions={foldersEndpointOptions}
       />
+      <Link
+        href={`/${locale}/create`}
+        className="mx-2 my-1 flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-medium hover:bg-accent"
+      >
+        <Palette className="h-4 w-4" />
+        {studioTranslation.scopedT(locale).t("navName")}
+      </Link>
       <SidebarFooter locale={locale} user={user} logger={logger} />
     </Div>
   );

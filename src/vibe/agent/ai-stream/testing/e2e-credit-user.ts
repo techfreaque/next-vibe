@@ -1,5 +1,4 @@
 // Testing infrastructure - messages are for test debugging, not end users
-
 /**
  * Throwaway customer for paid-endpoint E2E suites: signs up a fresh account
  * through the real signup endpoint ON ITS OWN anonymous lead (a lead shared
@@ -15,12 +14,11 @@
  * Never use the admin account for spend-bearing tests — its balance and
  * history are shared by every other agent/suite on the instance.
  */
-
 import { eq, or } from "drizzle-orm";
+import { confirmedTestSignup } from "next-vibe/tooling/testing/testing-suite/confirmed-signup";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
-import signupEndpoints from "@/user/public/signup/definition";
 import userDeleteDefinitions from "@/users/user/[id]/definition";
 
 import { defaultLocale } from "../../../core/i18n/core/config";
@@ -110,9 +108,8 @@ export async function createE2ECreditUser(
     logger,
   );
 
-  const signup = await sendTestRequest({
-    endpoint: signupEndpoints.POST,
-    data: {
+  const signup = await confirmedTestSignup(
+    {
       privateName: "E2E Buyer",
       publicName: `E2EBuyer${nonce}`,
       email,
@@ -121,9 +118,8 @@ export async function createE2ECreditUser(
       subscribeToNewsletter: false,
       acceptTerms: true,
     },
-    user: { isPublic: true, leadId, roles: [UserPermissionRole.PUBLIC] },
-    toolExecutionContext: undefined,
-  });
+    { isPublic: true, leadId, roles: [UserPermissionRole.PUBLIC] },
+  );
   if (!signup.success) {
     // eslint-disable-next-line restricted/restricted-syntax -- test setup failure
     throw new Error(`[e2e] signup failed: ${JSON.stringify(signup)}`);

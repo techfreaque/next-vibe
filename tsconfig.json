@@ -26,6 +26,7 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
+      "@root-layout/*": ["./src/_pages/*"],
       "next-vibe/*": ["./src/vibe/*"],
       "next-vibe/ui/*": ["./src/vibe/ui/web/*"],
       "@next-vibe/checker/oxlint-plugins/*": [

@@ -2,6 +2,7 @@ import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { Building } from "next-vibe/ui/components/icons/Building";
 import { Code } from "next-vibe/ui/components/icons/Code";
 import { Info } from "next-vibe/ui/components/icons/Info";
+import { Palette } from "next-vibe/ui/components/icons/Palette";
 import { Server } from "next-vibe/ui/components/icons/Server";
 import { Tag } from "next-vibe/ui/components/icons/Tag";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
@@ -28,6 +29,7 @@ export type NavPaths =
   | "/story/self-host"
   | "/story/earn"
   | "/story/invest"
+  | "/create"
   | "/help"
   | "/admin"
   | "/threads"
@@ -75,6 +77,11 @@ export interface NavParentItemType {
  * "Start chatting" lives in the auth buttons as the primary action.
  */
 export const navItems: NavItemType[] = [
+  {
+    icon: <Palette className="h-4 w-4" />,
+    title: "nav.studio",
+    href: "/create",
+  },
   {
     icon: <Tag className="h-4 w-4" />,
     title: "nav.pricing",

@@ -21,8 +21,6 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { Platform } from "next-vibe/platforms/platforms";
 
-import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
-
 import { DEFAULT_CHAT_MODEL_ID } from "../ai-stream/constants";
 import { chatModelOptionsIndex } from "../ai-stream/models";
 import { AiStreamRepository } from "../ai-stream/repository";
@@ -34,13 +32,12 @@ import { ChatMessageRole } from "../chat/enum";
 import { getStorageAdapter } from "../chat/storage/index";
 import { parseStorageUrl } from "../chat/storage/url-utils";
 import { getEnvAvailability } from "../env-availability";
+import { MediaStudioRepository } from "../media-studio/repository";
 import {
   ApiProvider,
   isModelOptionImageBased,
   isModelProviderAvailable,
-  type ModelOptionImageBased,
   type ModelOptionTokenBased,
-  roundMediaCost,
 } from "../models/models";
 import { UncensoredConsentRepository } from "../models/uncensored-consent/repository";
 import {
@@ -79,6 +76,7 @@ import {
   imageGenModelOptions,
   type ImageGenModelSelection,
 } from "./models";
+import { calculateImageCreditCost } from "./pricing";
 import {
   classifyImageProviderError,
   ImageProviderFailureKind,
@@ -90,36 +88,6 @@ import { generateWithOpenRouter } from "./providers/openrouter";
 import { generateWithReplicate } from "./providers/replicate";
 import { generateImageWithUnbottled } from "./providers/unbottled";
 import { generateWithVenice } from "./providers/venice";
-
-/**
- * Calculate image generation credit cost with option-aware pricing.
- * Uses pricingBySize/pricingByQuality overrides when available,
- * falls back to base creditCostPerImage.
- */
-function calculateImageCreditCost(
-  model: ModelOptionImageBased,
-  size: string,
-  quality: string,
-): number {
-  // Check for size-specific pricing override
-  const baseCost =
-    model.pricingBySize?.[size] ??
-    model.pricingByQuality?.[quality] ??
-    model.creditCostPerImage;
-
-  // If both size and quality have overrides, use the size price as base
-  // and apply quality as a multiplier or override
-  let finalCost = baseCost;
-  if (
-    model.pricingBySize?.[size] !== undefined &&
-    model.pricingByQuality?.[quality] !== undefined
-  ) {
-    finalCost = model.pricingByQuality[quality] ?? baseCost;
-  }
-
-  // Rounded UP to 0.1 credit (never under-bills).
-  return roundMediaCost(finalCost * (1 + STANDARD_MARKUP_PERCENTAGE));
-}
 
 /** Plain-language size hint for token-based (headless) image models. */
 const HEADLESS_SIZE_HINT: Record<typeof ImageSizeValue, string> = {
@@ -215,6 +183,36 @@ export class ImageGenerationRepository {
    * Generate an image from a text prompt. Identical paid calls in one thread
    * run once (execute-tool/repository/paid-call-dedupe.ts).
    */
+  static submit(
+    data: ImageGenerationPostRequestOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    t: ImageGenerationT,
+    toolExecutionContext: ToolExecutionContext,
+    platform: Platform,
+  ): Promise<ResponseType<ImageGenerationPostResponseOutput>> {
+    return MediaStudioRepository.run({
+      save: !toolExecutionContext.threadId && data.saveToStudio,
+      kind: "image",
+      model: data.model,
+      title: data.prompt,
+      user,
+      locale,
+      logger,
+      generate: () =>
+        ImageGenerationRepository.generateImage(
+          { ...data, saveToStudio: undefined },
+          user,
+          locale,
+          logger,
+          t,
+          toolExecutionContext,
+          platform,
+        ),
+    });
+  }
+
   static async generateImage(
     data: ImageGenerationPostRequestOutput,
     user: JwtPayloadType,

@@ -1,24 +1,23 @@
 /**
- * image-push local cleanup selection unit tests.
- * Pure-function coverage for which local image refs and commit export dirs
- * `vibe image-push` may drop after a deploy.
+ * Pure selection tests for local image and export cleanup and server retention.
  */
 
 import { describe, expect, it } from "bun:test";
 
 import {
   CLEANUP_IMAGE_REPO,
-  type ExportDirEntry,
-  type LocalImageEntry,
+  type ExportEntry,
   KEEP_BUILDS,
+  type LocalImageEntry,
   parseDockerCreatedAt,
   parseRemoteInventory,
   PINNED_TAGS,
   remoteInventoryScript,
   remotePinnedTags,
   remoteRetentionScript,
-  selectExportDirsToPark,
+  selectExportEntriesToPark,
   selectImageRefsToRemove,
+  selectLocalImageRefsToRemove,
 } from "./cleanup-selection";
 
 const REPO = CLEANUP_IMAGE_REPO;
@@ -29,7 +28,7 @@ function build(n: number, tags: string[]): LocalImageEntry[] {
   return tags.map((tag) => ({
     repository: REPO,
     tag,
-    id: `sha256:${String(n).repeat(4)}`,
+    id: id(n),
     createdAt: `2026-11-${day} 04:37:44 +0100 CET`,
   }));
 }
@@ -41,8 +40,8 @@ function select(
   return selectImageRefsToRemove({
     repository: REPO,
     entries,
-    keepBuilds: 3,
-    keepTags: overrides.keepTags ?? [...PINNED_TAGS],
+    keepBuilds: KEEP_BUILDS,
+    keepTags: overrides.keepTags ?? PINNED_TAGS,
     containerImageIds: overrides.containerImageIds ?? [],
   });
 }
@@ -102,9 +101,9 @@ describe("selectImageRefsToRemove", () => {
       ...build(3, ["c3"]),
       ...build(1, ["redeployed-old"]),
     ];
-    expect(select(entries, { keepTags: [...PINNED_TAGS, "redeployed-old"] })).toEqual(
-      [],
-    );
+    expect(
+      select(entries, { keepTags: [...PINNED_TAGS, "redeployed-old"] }),
+    ).toEqual([]);
   });
 
   it("never removes an image a container uses", () => {
@@ -115,9 +114,9 @@ describe("selectImageRefsToRemove", () => {
       ...build(2, ["b2"]),
       ...build(1, ["a1"]),
     ];
-    expect(
-      select(entries, { containerImageIds: [`sha256:${"2".repeat(4)}`] }),
-    ).toEqual([`${REPO}:a1`]);
+    expect(select(entries, { containerImageIds: [id(2)] })).toEqual([
+      `${REPO}:a1`,
+    ]);
   });
 
   it("ignores rows from any other repository", () => {
@@ -160,7 +159,7 @@ describe("selectImageRefsToRemove", () => {
       ...build(3, ["c3"]),
       ...build(1, ["<none>"]),
     ];
-    expect(select(entries)).toEqual([`sha256:${"1".repeat(4)}`]);
+    expect(select(entries)).toEqual([id(1)]);
   });
 
   it("keeps builds whose creation time cannot be parsed", () => {
@@ -176,47 +175,112 @@ describe("selectImageRefsToRemove", () => {
   });
 });
 
-describe("selectExportDirsToPark", () => {
-  const sha = (c: string): string => c.repeat(40);
-  const dir = (c: string, mtimeMs: number): ExportDirEntry => ({
-    name: sha(c),
-    isDirectory: true,
-    mtimeMs,
-  });
-
-  it("keeps the newest 3 and parks the rest", () => {
+describe("selectLocalImageRefsToRemove", () => {
+  it("keeps only the build identified by the commit tag and images used by containers", () => {
     const entries = [
-      dir("a", 1),
-      dir("b", 2),
-      dir("c", 3),
-      dir("d", 4),
-      dir("e", 5),
+      ...build(6, ["newer"]),
+      ...build(5, ["rollback", "old-custom"]),
+      ...build(4, ["prod-current-good"]),
+      ...build(3, ["unreadable-date"]).map((entry) => ({
+        ...entry,
+        createdAt: "",
+      })),
+      ...build(2, ["in-use", "in-use-alias"]),
+      ...build(1, ["current-sha", "custom-tag", "latest"]),
     ];
     expect(
-      selectExportDirsToPark({ entries, keep: 3, currentSha: sha("e") }).toSorted(),
-    ).toEqual([sha("a"), sha("b")]);
+      selectLocalImageRefsToRemove({
+        entries,
+        currentTag: "current-sha",
+        containerImageIds: [id(2)],
+      }),
+    ).toEqual(
+      [
+        "newer",
+        "rollback",
+        "old-custom",
+        "prod-current-good",
+        "unreadable-date",
+      ].map((tag) => `${REPO}:${tag}`),
+    );
   });
 
-  it("never parks the current commit's export", () => {
-    const entries = [dir("a", 1), dir("b", 2), dir("c", 3), dir("d", 4)];
-    expect(
-      selectExportDirsToPark({ entries, keep: 3, currentSha: sha("a") }),
-    ).toEqual([]);
-  });
-
-  it("ignores markers, files and non-sha names", () => {
-    const entries: ExportDirEntry[] = [
-      { name: `${sha("a")}.done`, isDirectory: false, mtimeMs: 0 },
-      { name: "notes", isDirectory: true, mtimeMs: 0 },
-      { name: sha("f"), isDirectory: false, mtimeMs: 0 },
-      dir("b", 2),
-      dir("c", 3),
-      dir("d", 4),
-      dir("e", 5),
+  it("untags stale latest after a registry-only push and scopes cleanup to named app refs", () => {
+    const entries = [
+      ...build(3, ["current-sha"]).map((entry) => ({
+        ...entry,
+        repository: "postgres",
+      })),
+      ...build(2, ["<none>"]),
+      ...build(1, ["current-sha", "latest"]),
     ];
     expect(
-      selectExportDirsToPark({ entries, keep: 3, currentSha: sha("e") }),
-    ).toEqual([sha("b")]);
+      selectLocalImageRefsToRemove({
+        entries,
+        currentTag: undefined,
+        containerImageIds: [],
+      }),
+    ).toEqual([`${REPO}:current-sha`, `${REPO}:latest`]);
+  });
+
+  it("skips image cleanup if the expected local commit tag is missing", () => {
+    expect(
+      selectLocalImageRefsToRemove({
+        entries: build(1, ["latest"]),
+        currentTag: "current-sha",
+        containerImageIds: [],
+      }),
+    ).toBeUndefined();
+  });
+});
+
+const exportSha = (character: string): string => character.repeat(40);
+const exportDir = (character: string): ExportEntry => ({
+  name: exportSha(character),
+  isDirectory: true,
+  isFile: false,
+});
+const exportFile = (name: string): ExportEntry => ({
+  name,
+  isDirectory: false,
+  isFile: true,
+});
+
+describe("selectExportEntriesToPark", () => {
+  it("parks every other export and its marker, including incomplete exports", () => {
+    const entries = [
+      exportDir("a"),
+      exportFile(`${exportSha("a")}.done`),
+      exportDir("b"),
+      exportFile(`${exportSha("b")}.done`),
+      exportDir("c"),
+      exportDir("d"),
+      exportFile(`${exportSha("d")}.done`),
+    ];
+    expect(
+      selectExportEntriesToPark({ entries, currentSha: exportSha("a") }),
+    ).toEqual(
+      new Map([
+        [exportSha("b"), [exportSha("b"), `${exportSha("b")}.done`]],
+        [exportSha("c"), [exportSha("c")]],
+        [exportSha("d"), [exportSha("d"), `${exportSha("d")}.done`]],
+      ]),
+    );
+  });
+
+  it("parks orphaned old markers and skips unrelated entries", () => {
+    const entries: ExportEntry[] = [
+      exportFile(`${exportSha("a")}.done`),
+      exportFile(`${exportSha("b")}.done`),
+      { name: "notes", isDirectory: true, isFile: false },
+      exportFile("notes.done"),
+      exportFile(exportSha("f")),
+      { name: `${exportSha("e")}.done`, isDirectory: true, isFile: false },
+      { name: exportSha("d"), isDirectory: false, isFile: false },
+    ];
+    expect(
+      selectExportEntriesToPark({ entries, currentSha: exportSha("a") }),
+    ).toEqual(new Map([[exportSha("b"), [`${exportSha("b")}.done`]]]));
   });
 });
 
@@ -231,7 +295,12 @@ describe("remotePinnedTags", () => {
 
   it("pins the node tag family on Server 2", () => {
     expect(remotePinnedTags("s2", "unbottled").toSorted()).toEqual(
-      ["latest", "unbottled", "unbottled-prev", "unbottled-rollback"].toSorted(),
+      [
+        "latest",
+        "unbottled",
+        "unbottled-prev",
+        "unbottled-rollback",
+      ].toSorted(),
     );
   });
 
@@ -300,7 +369,9 @@ describe("remoteRetentionScript", () => {
     expect(script).toContain(`docker rmi '${REPO}:old'`);
     expect(script).toContain(`docker rmi '${id(7)}'`);
     expect(script).toContain("docker image prune -f");
-    expect(script).not.toMatch(/rmi -f|rmi --force|prune -a|prune --all|system prune/);
+    expect(script).not.toMatch(
+      /rmi -f|rmi --force|prune -a|prune --all|system prune/,
+    );
   });
 
   it("drops refs outside the app repository or with shell metacharacters", () => {
@@ -322,7 +393,8 @@ function selectRemote(
 ): string[] {
   const inventory = parseRemoteInventory(stdout);
   if (!inventory) {
-    throw new Error("inventory");
+    expect(inventory).toBeDefined();
+    return [];
   }
   return selectImageRefsToRemove({
     repository: REPO,

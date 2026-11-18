@@ -121,6 +121,7 @@ const { POST } = createEndpoint({
         let characterTagline: string | null = null;
         let characterDescription: string | null = null;
         let characterModelSelection: ChatModelSelection | null = null;
+        let variantName: string | undefined;
         if (character?.success) {
           characterName = character.data.name ?? null;
           characterTagline = character.data.tagline ?? null;
@@ -130,6 +131,7 @@ const { POST } = createEndpoint({
           // the favorite names none), so the optimistic card matches it.
           const variant = pickSkillVariant(variants, resolvedVariantId);
           characterModelSelection = variant?.modelSelection ?? null;
+          variantName = variant?.displayName;
         } else {
           logger.error(
             "Failed to fetch character data in create favorite onSuccess",
@@ -171,6 +173,7 @@ const { POST } = createEndpoint({
                 locale,
                 user,
                 availability,
+                variantName,
               );
 
             if (oldData.data.favorites.some((f) => f.id === newFavorite.id)) {

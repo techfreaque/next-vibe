@@ -7,7 +7,7 @@
 
 import "server-only";
 
-import { and, eq, isNull, like, or, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, like, lte, or, sql } from "drizzle-orm";
 import Imap from "imap";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -31,6 +31,7 @@ import {
   messengerFolders as imapFolders,
 } from "@/messenger/messages/db";
 import { SpecialFolderType as ImapSpecialUseType } from "@/messenger/messages/enum";
+import { pendingSignups } from "@/user/public/signup/db";
 
 import { campaignSchedulerService } from "../emails/services/scheduler";
 import { BOUNCE_PROCESSOR_ALIAS } from "./constants";
@@ -55,6 +56,57 @@ function getDefaultConfig(): BounceProcessorConfigGetResponseOutput {
 }
 
 export class BounceProcessorRepository {
+  /** Match the current dispatch or its explicitly failed DSN recipient.
+   * Delayed reports and quoted addresses do not invalidate an address. */
+  static async markPendingSignupBounce(
+    body: string,
+    parentId: string | null | undefined,
+    reportedAt: Date,
+  ): Promise<void> {
+    const blocks = body.split(/\r?\n[ \t]*\r?\n/);
+    const recipients: string[] = [];
+    for (const block of blocks) {
+      if (/^(?:Action:[ \t]*failed|Status:[ \t]*5\.)/im.test(block)) {
+        const address =
+          /^Final-Recipient:[^;\n]+;[ \t]*<?([^\s<>]+@[^\s<>]+)>?/im.exec(
+            block,
+          )?.[1];
+        if (address) {
+          recipients.push(address.toLowerCase());
+        }
+      }
+    }
+    if (
+      !recipients.length &&
+      /^(?:Action:[ \t]*(?:delayed|delivered|relayed|expanded)|Status:[ \t]*[24]\.)/im.test(
+        body,
+      )
+    ) {
+      return;
+    }
+    const ids = [
+      ...body.matchAll(
+        /^(?:Original-Message-ID|Message-ID):[ \t]*(<[^>\s]+>)/gim,
+      ),
+    ].map((match) => match[1]);
+    if (parentId) {
+      ids.push(parentId);
+    }
+    if (ids.length || recipients.length) {
+      await db
+        .update(pendingSignups)
+        .set({ bounced: true })
+        .where(
+          and(
+            lte(pendingSignups.sentAt, reportedAt),
+            ids.length
+              ? inArray(pendingSignups.messageId, ids)
+              : inArray(pendingSignups.email, recipients),
+          ),
+        );
+    }
+  }
+
   /**
    * Sender patterns that indicate a bounce/DSN notification
    */
@@ -397,6 +449,10 @@ export class BounceProcessorRepository {
           senderEmail: emails.senderEmail,
           subject: emails.subject,
           bodyText: emails.bodyText,
+          inReplyTo: emails.inReplyTo,
+          headers: emails.headers,
+          sentAt: emails.sentAt,
+          createdAt: emails.createdAt,
           recipientEmail: emails.recipientEmail,
           uid: emails.uid,
           folderId: emails.folderId,
@@ -422,6 +478,10 @@ export class BounceProcessorRepository {
           senderEmail: emails.senderEmail,
           subject: emails.subject,
           bodyText: emails.bodyText,
+          inReplyTo: emails.inReplyTo,
+          headers: emails.headers,
+          sentAt: emails.sentAt,
+          createdAt: emails.createdAt,
           recipientEmail: emails.recipientEmail,
           uid: emails.uid,
           folderId: emails.folderId,
@@ -487,6 +547,11 @@ export class BounceProcessorRepository {
           continue;
         }
 
+        await BounceProcessorRepository.markPendingSignupBounce(
+          msg.bodyText ?? "",
+          msg.inReplyTo ?? msg.headers?.["in-reply-to"],
+          msg.sentAt ?? msg.createdAt,
+        );
         await BounceProcessorRepository.moveToImapTrash(
           msg.id,
           msg.uid,
@@ -534,7 +599,9 @@ export class BounceProcessorRepository {
           const cancelled = await campaignSchedulerService.haltCampaign(
             lead.id,
             logger,
-            { reason: "hard_bounce" },
+            {
+              reason: "hard_bounce",
+            },
           );
 
           campaignsCancelled += cancelled;

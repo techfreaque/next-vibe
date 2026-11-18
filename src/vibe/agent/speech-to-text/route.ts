@@ -15,12 +15,11 @@ export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, user, locale, logger, toolExecutionContext }) =>
-      SpeechToTextRepository.transcribeAudio(
-        data.fileUpload.files,
+      SpeechToTextRepository.submit(
+        data,
         user,
         locale,
         logger,
-        data.modelId,
         toolExecutionContext,
       ),
   },

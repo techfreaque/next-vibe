@@ -30,6 +30,7 @@ import { getStorageAdapter } from "../chat/storage/index";
 import { agentEnv } from "../env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "../env-availability";
 import { getEnvAvailability } from "../env-availability";
+import { MediaStudioRepository } from "../media-studio/repository";
 import {
   EDEN_AI_URLS,
   edenAiErrorMessage,
@@ -38,6 +39,7 @@ import {
   parseEdenAiTtsProviderModel,
 } from "../models/eden-ai";
 import { ApiProvider, calculateTtsCreditCost } from "../models/models";
+import { UncensoredConsentRepository } from "../models/uncensored-consent/repository";
 import { ModelSelectionType } from "../skills/enum";
 import { TTS_OUTPUT_FORMATS, type TtsOutputFormat } from "./constants";
 import type {
@@ -432,6 +434,34 @@ export class TextToSpeechRepository {
   /**
    * Convert text to speech using model-based provider routing
    */
+  static submit(
+    data: TextToSpeechPostRequestOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    t: TextToSpeechT,
+    toolExecutionContext: ToolExecutionContext,
+  ): Promise<ResponseType<TextToSpeechPostResponseOutput>> {
+    return MediaStudioRepository.run({
+      save: !toolExecutionContext.threadId && data.saveToStudio,
+      kind: "speech",
+      model: data.voiceId,
+      title: data.text,
+      user,
+      locale,
+      logger,
+      generate: () =>
+        TextToSpeechRepository.convertTextToSpeech(
+          data,
+          user,
+          locale,
+          logger,
+          t,
+          toolExecutionContext,
+        ),
+    });
+  }
+
   static async convertTextToSpeech(
     data: TextToSpeechPostRequestOutput,
     user: JwtPayloadType,
@@ -466,6 +496,16 @@ export class TextToSpeechRepository {
         message: t("post.errors.noTtsProviderConfigured"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
+    }
+    const consent = await UncensoredConsentRepository.gate({
+      content: modelOption.content,
+      modelName: modelOption.name,
+      user,
+      locale,
+      logger,
+    });
+    if (!consent.success) {
+      return consent;
     }
     const language = TextToSpeechRepository.mapLocaleToLanguage(locale);
 
@@ -606,9 +646,9 @@ export class TextToSpeechRepository {
       // URI in the tool result blows up the model context on later turns.
       // Incognito threads have no server-side thread row — the file is owned
       // by the caller's leadId and served only to that lead (browser).
-      // Without a thread (standalone tool call) keep the data URI for
-      // immediate playback.
-      const scThreadId = toolExecutionContext.threadId;
+      const scThreadId =
+        toolExecutionContext.threadId ??
+        (data.saveToStudio ? crypto.randomUUID() : undefined);
       if (scThreadId && audioUrl.startsWith("data:")) {
         try {
           const commaIdx = audioUrl.indexOf(",");
@@ -618,8 +658,9 @@ export class TextToSpeechRepository {
             audioUrl.slice(commaIdx + 1),
             "base64",
           );
-          const isIncognito =
-            toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO;
+          const isIncognito = toolExecutionContext.threadId
+            ? toolExecutionContext.rootFolderId === DefaultFolderId.INCOGNITO
+            : user.isPublic;
           const ext =
             mimeType === "audio/mpeg"
               ? "mp3"
@@ -644,6 +685,13 @@ export class TextToSpeechRepository {
             },
           );
         }
+      }
+
+      if (data.saveToStudio && (!audioUrl || audioUrl.startsWith("data:"))) {
+        return fail({
+          message: t("post.errors.audioFetchFailed"),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
       }
 
       logger.debug("[TTS] Text-to-speech conversion successful", {

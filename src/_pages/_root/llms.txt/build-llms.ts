@@ -17,6 +17,8 @@ import {
 } from "next-vibe/core/i18n/core/config";
 import { formatCurrency } from "next-vibe/core/i18n/core/localization-utils";
 
+import { CREATE_KINDS } from "@/_pages/create/_shared/create-kinds";
+import { scopedTranslation as studioTranslation } from "@/_pages/create/i18n";
 import { buildPublicApiBaseUrl } from "@/api-keys/coding-tools";
 import { GITHUB_REPO_URL } from "@/env/constants";
 import { configScopedTranslation } from "@/env/i18n";
@@ -195,7 +197,12 @@ export async function buildLlmsTxt(
     }),
   ];
 
+  const { t: studioT } = studioTranslation.scopedT(locale);
   const pages = [
+    link(studioT("studio"), page("/create")),
+    ...CREATE_KINDS.map((kind) =>
+      link(studioT(`kinds.${kind}.title`), page(`/create/${kind}`)),
+    ),
     link(t("pages.models"), page("/models"), t("pages.modelsDesc")),
     link(
       t("pages.pricing"),

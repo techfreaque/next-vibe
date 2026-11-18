@@ -1,3 +1,4 @@
+import { confirmedTestSignup } from "next-vibe/tooling/testing/testing-suite/confirmed-signup";
 /**
  * Two-factor integration: setup -> enable -> login gate -> recovery -> disable.
  * Real DB (test instance), no mail sent (signup mail failures are non-blocking).
@@ -20,7 +21,6 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import userDeleteDefinitions from "@/users/user/[id]/definition";
 
 import loginEndpoints from "../../../public/login/definition";
-import signupEndpoints from "../../../public/signup/definition";
 import twoFactorEndpoints from "./definition";
 import { TwoFactorAction } from "./enum";
 import { TwoFactorRepository } from "./repository";
@@ -70,10 +70,8 @@ describe("two-factor", () => {
   }> {
     const email = `test-2fa-${Date.now()}-${Math.floor(Math.random() * 100000)}@example-test.invalid`;
     emails.push(email);
-    const res = await sendTestRequest({
-      toolExecutionContext: undefined,
-      endpoint: signupEndpoints.POST,
-      data: {
+    const res = await confirmedTestSignup(
+      {
         privateName: "TwoFa Test",
         publicName: "TwoFaTest",
         email,
@@ -82,8 +80,8 @@ describe("two-factor", () => {
         acceptTerms: true,
         subscribeToNewsletter: false,
       },
-      user: publicUser(),
-    });
+      publicUser(),
+    );
     expect(res.success, JSON.stringify(res)).toBe(true);
     const found = await UserRepository.getUserByEmail(
       email,
@@ -108,7 +106,11 @@ describe("two-factor", () => {
 
   const call = (
     user: JwtPrivatePayloadType,
-    data: { action: (typeof TwoFactorAction)[keyof typeof TwoFactorAction]; code?: string; password?: string },
+    data: {
+      action: (typeof TwoFactorAction)[keyof typeof TwoFactorAction];
+      code?: string;
+      password?: string;
+    },
   ) =>
     sendTestRequest({
       toolExecutionContext: undefined,
@@ -238,7 +240,8 @@ describe("two-factor", () => {
 
     expect((await call(u.asUser, { action: TwoFactorAction.DISABLE })).success).toBe(false);
     expect(
-      (await call(u.asUser, { action: TwoFactorAction.DISABLE, password: "wrong-password" })).success,
+      (await call(u.asUser, { action: TwoFactorAction.DISABLE, password: "wrong-password" }))
+        .success,
     ).toBe(false);
     expect(
       (await call(u.asUser, { action: TwoFactorAction.REGENERATE, code: "000000" })).success,

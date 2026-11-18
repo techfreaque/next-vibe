@@ -323,6 +323,8 @@ export const translations: typeof enTranslations = {
     accountLocked: "Le compte est verrouillé",
     accountLockedDescription:
       "Votre compte a été verrouillé. Veuillez contacter le support.",
+    pendingEmail: "Confirmez votre adresse e-mail avant de vous connecter.",
+    resendPending: "Renvoyer le message de confirmation",
     invalid_credentials:
       "E-mail ou mot de passe incorrect. Pas encore de compte ? Inscrivez-vous d'abord.",
     two_factor_required: "Authentification à deux facteurs requise",

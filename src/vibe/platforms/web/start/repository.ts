@@ -175,6 +175,7 @@ const FREEZE_WATCHDOG_INTERVAL_MS = 30_000;
 
 /** Event loop lag thresholds for the child process (microseconds → ms conversion) */
 const EL_LAG_WARN_MS = 100;
+const EL_LAG_HISTOGRAM_RESOLUTION_MS = 20;
 const EL_LAG_ERROR_MS = 500;
 const EL_LAG_CRITICAL_MS = 2000;
 
@@ -727,7 +728,9 @@ export class ServerStartRepository {
     // Thresholds: ≥100ms warn, ≥500ms error, ≥2000ms critical.
     // Critical lag is what causes server "freezes" from the user's perspective.
     try {
-      const histogram = monitorEventLoopDelay({ resolution: 20 });
+      const histogram = monitorEventLoopDelay({
+        resolution: EL_LAG_HISTOGRAM_RESOLUTION_MS,
+      });
       histogram.enable();
       // Sample the JS thread all the time, so each lag row below names the
       // code that blocked the loop (most prod stalls ran outside any cron
@@ -740,6 +743,9 @@ export class ServerStartRepository {
       // tasks, recent proxied requests), so a lag row can be matched against
       // task executions, chat messages and access logs.
       const STALL_TICK_MS = 50;
+      // The histogram and ticker sample on different schedules. Capture
+      // nearby ticker delays so borderline warnings can include a profile.
+      const stallCaptureMs = EL_LAG_WARN_MS - EL_LAG_HISTOGRAM_RESOLUTION_MS;
       let lastTickAt = Date.now();
       let worstStall: {
         ms: number;
@@ -752,7 +758,7 @@ export class ServerStartRepository {
         const now = Date.now();
         const stallMs = now - lastTickAt - STALL_TICK_MS;
         lastTickAt = now;
-        if (stallMs >= EL_LAG_WARN_MS && stallMs > (worstStall?.ms ?? 0)) {
+        if (stallMs >= stallCaptureMs && stallMs > (worstStall?.ms ?? 0)) {
           const startedAt = now - stallMs;
           // Running now, or finished up to 1 s before the stall began: the
           // probe runs only after the stall, when its cause may be done.
@@ -821,7 +827,10 @@ export class ServerStartRepository {
           }
           const stallProfile = stall
             ? describeStallProfile(stall.ms, stall.startedAt)
-            : undefined;
+            : {
+                profiledHotFrames:
+                  "histogram delay had no matching timer sample in this window",
+              };
           // Taken every window (it resets), logged only with a lag row
           const wsActivity = takeWsActivitySummary();
           // Shared context for every lag level: when, how big the heap was

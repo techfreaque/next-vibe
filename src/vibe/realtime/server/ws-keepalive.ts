@@ -35,16 +35,18 @@ const QUIET_CLOSE_CODES: ReadonlySet<number> = new Set([
 
 export interface WsCloseDiagnosis {
   /**
-   * "idle-timeout": the server closed the socket because the client sent
-   * nothing (no message, no pong) for the whole idle window.
+   * "idle-timeout": Bun reported inactivity, or a reasonless close arrived
+   * after a full idle window without an inbound message or pong.
    * "dropped": the connection ended without a close frame from the client
    * (network cut, middlebox, crash, sleep); the server saw no reason.
    * "normal": an expected close, nothing to report.
    */
   kind: "idle-timeout" | "dropped" | "normal";
   meta: {
+    requestId?: string;
     code: number;
     reason: string;
+    idleEvidence: "bun-close-reason" | "silent-window" | null;
     connectedForMs: number;
     sinceLastInboundMs: number;
     pongCount: number;
@@ -62,12 +64,15 @@ export function diagnoseWsClose(
   now: number,
 ): WsCloseDiagnosis {
   const sinceLastInboundMs = now - data.lastInboundAt;
-  const idleTimedOut =
-    reason === BUN_IDLE_CLOSE_REASON ||
-    (code === 1006 &&
-      reason.length === 0 &&
-      sinceLastInboundMs >= (WS_IDLE_TIMEOUT_SECONDS - 1) * 1000);
-  const kind = idleTimedOut
+  const idleEvidence =
+    reason === BUN_IDLE_CLOSE_REASON
+      ? "bun-close-reason"
+      : code === 1006 &&
+          reason.length === 0 &&
+          sinceLastInboundMs >= (WS_IDLE_TIMEOUT_SECONDS - 1) * 1000
+        ? "silent-window"
+        : null;
+  const kind = idleEvidence
     ? "idle-timeout"
     : QUIET_CLOSE_CODES.has(code)
       ? "normal"
@@ -75,8 +80,10 @@ export function diagnoseWsClose(
   return {
     kind,
     meta: {
+      requestId: data.requestId,
       code,
       reason: reason.slice(0, 200),
+      idleEvidence,
       connectedForMs: now - data.connectedAt,
       sinceLastInboundMs,
       pongCount: data.pongCount,

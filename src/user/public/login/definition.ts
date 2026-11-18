@@ -92,6 +92,14 @@ const { POST } = createEndpoint({
           }),
       }),
 
+      resendPending: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        hidden: true,
+        label: "errors.resendPending",
+        schema: z.boolean().optional(),
+      }),
+
       twoFactorCode: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,

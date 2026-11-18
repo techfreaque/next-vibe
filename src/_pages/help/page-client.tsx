@@ -14,6 +14,7 @@ import { openUrl } from "next-vibe/ui/lib/location";
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { scopedTranslation as studioTranslation } from "@/_pages/create/i18n";
 import { ContactFormSection } from "@/_pages/story/_components/contact-form-section";
 import { configScopedTranslation } from "@/env/i18n";
 import { getPricingParams } from "@/products/repository-client";
@@ -153,6 +154,12 @@ export default function HelpPageClient({
                 modelCount,
               })}
             </P>
+            <Link
+              className="mt-2 inline-block text-primary underline underline-offset-4"
+              href={`/${locale}/create`}
+            >
+              {studioTranslation.scopedT(locale).t("studio")}
+            </Link>
           </Div>
           <Div>
             <H3 className="text-lg font-semibold mb-2">

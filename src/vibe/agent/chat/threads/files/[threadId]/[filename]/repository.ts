@@ -136,15 +136,20 @@ export class ChatFileRepository {
         }
         // Imported character avatars are public-read (copies of images the
         // source platform shows publicly; public skills show them to everyone).
+        const isSkillAvatarNamespace =
+          data.threadId === SKILL_AVATAR_STORAGE_NAMESPACE;
         const isPublicSkillAvatar =
-          data.threadId === SKILL_AVATAR_STORAGE_NAMESPACE &&
+          isSkillAvatarNamespace &&
           fileMetadata.mimeType.startsWith("image/") &&
           !fileMetadata.mimeType.includes("svg");
         if (!isPublicSkillAvatar && !isStorageFileOwner(fileMetadata, user)) {
-          logger.error("Lead does not have permission to access file", {
+          logger.error("Chat file owner mismatch without a server thread", {
             leadId: user.leadId,
+            isPublic: user.isPublic,
             hasFileLeadId: !!fileMetadata.leadId,
             hasFileUploadedBy: !!fileMetadata.uploadedBy,
+            isSkillAvatarNamespace,
+            fileMimeType: fileMetadata.mimeType,
             storageType: agentEnv.CHAT_STORAGE_TYPE,
             threadId: data.threadId,
             filename: data.filename,

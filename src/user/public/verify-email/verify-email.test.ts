@@ -1,5 +1,6 @@
+import { confirmedTestSignup } from "next-vibe/tooling/testing/testing-suite/confirmed-signup";
 /**
- * Verify-email integration: signup leaves the email unverified and builds a
+ * Verify-email integration: a legacy unverified account builds a
  * verification mail; the token verifies (idempotent); bad tokens are rejected.
  * Mail is never sent (the test instance has no SMTP account; we only render).
  */
@@ -19,7 +20,6 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import userDeleteDefinitions from "@/users/user/[id]/definition";
 
-import signupEndpoints from "../signup/definition";
 import definition from "./definition";
 import { verifyEmailSignupEmailTemplate } from "./email";
 import { createVerificationToken } from "./token";
@@ -43,10 +43,8 @@ describe("verify-email", () => {
   beforeAll(async () => {
     admin = await resolveTestAdminUser();
     email = `test-verify-${Date.now()}-${Math.floor(Math.random() * 100000)}@example-test.invalid`;
-    const res = await sendTestRequest({
-      toolExecutionContext: undefined,
-      endpoint: signupEndpoints.POST,
-      data: {
+    const res = await confirmedTestSignup(
+      {
         privateName: "Verify Test",
         publicName: "VerifyTest",
         email,
@@ -55,14 +53,21 @@ describe("verify-email", () => {
         acceptTerms: true,
         subscribeToNewsletter: false,
       },
-      user: publicUser(),
-    });
+      publicUser(),
+    );
     expect(res.success).toBe(true);
-    const found = await UserRepository.getUserByEmail(email, UserDetailLevel.STANDARD, defaultLocale, logger);
+    const found = await UserRepository.getUserByEmail(
+      email,
+      UserDetailLevel.STANDARD,
+      defaultLocale,
+      logger,
+    );
     if (!found.success) {
       throw new Error("user missing");
     }
     userId = found.data.id;
+    // This legacy account predates mandatory confirmation.
+    await db.update(users).set({ emailVerified: false }).where(eq(users.id, userId));
   }, 60_000);
 
   afterAll(async () => {
@@ -74,7 +79,7 @@ describe("verify-email", () => {
     });
   });
 
-  it("signup leaves the email unverified and builds a verification mail with a valid link", async () => {
+  it("a legacy unverified account builds a verification mail with a valid link", async () => {
     expect(await verifiedFlag()).toBe(false);
     const rendered = await verifyEmailSignupEmailTemplate.render({
       requestData: {
@@ -89,10 +94,16 @@ describe("verify-email", () => {
       urlPathParams: undefined as never,
       responseData: { message: "" } as never,
       user: publicUser() as never,
-      t: (k: string): string => k,
+      t: verifyEmailSignupEmailTemplate.scopedTranslation.scopedT(defaultLocale).t,
       locale: defaultLocale,
       logger,
-      tracking: { leadId: undefined, userId: undefined, campaignId: undefined, locale: defaultLocale, baseUrl: "http://x" },
+      tracking: {
+        leadId: undefined,
+        userId: undefined,
+        campaignId: undefined,
+        locale: defaultLocale,
+        baseUrl: "http://x",
+      },
     });
     expect(rendered.success).toBe(true);
     if (rendered.success && "toEmail" in rendered.data) {
@@ -111,18 +122,42 @@ describe("verify-email", () => {
     });
     expect(bad.success).toBe(false);
     const wrongUser = createVerificationToken("00000000-0000-4000-8000-000000000000", email) ?? "";
-    expect((await sendTestRequest({ toolExecutionContext: undefined, endpoint, data: { token: wrongUser }, user: publicUser() })).success).toBe(false);
+    expect(
+      (
+        await sendTestRequest({
+          toolExecutionContext: undefined,
+          endpoint,
+          data: { token: wrongUser },
+          user: publicUser(),
+        })
+      ).success,
+    ).toBe(false);
     expect(await verifiedFlag()).toBe(false);
-    const anon = await sendTestRequest({ toolExecutionContext: undefined, endpoint, data: {}, user: publicUser() });
+    const anon = await sendTestRequest({
+      toolExecutionContext: undefined,
+      endpoint,
+      data: {},
+      user: publicUser(),
+    });
     expect(anon.success).toBe(false);
   }, 60_000);
 
   it("verifies with a valid token, idempotently, and then skips the mail", async () => {
     const token = createVerificationToken(userId, email) ?? "";
-    const first = await sendTestRequest({ toolExecutionContext: undefined, endpoint, data: { token }, user: publicUser() });
+    const first = await sendTestRequest({
+      toolExecutionContext: undefined,
+      endpoint,
+      data: { token },
+      user: publicUser(),
+    });
     expect(first.success, JSON.stringify(first)).toBe(true);
     expect(await verifiedFlag()).toBe(true);
-    const second = await sendTestRequest({ toolExecutionContext: undefined, endpoint, data: { token }, user: publicUser() });
+    const second = await sendTestRequest({
+      toolExecutionContext: undefined,
+      endpoint,
+      data: { token },
+      user: publicUser(),
+    });
     expect(second.success && second.data.verified).toBe(true);
     expect(await verifiedFlag()).toBe(true);
 
@@ -130,7 +165,12 @@ describe("verify-email", () => {
       toolExecutionContext: undefined,
       endpoint,
       data: {},
-      user: { id: userId, leadId: admin.leadId, isPublic: false, roles: [UserPermissionRole.CUSTOMER] },
+      user: {
+        id: userId,
+        leadId: admin.leadId,
+        isPublic: false,
+        roles: [UserPermissionRole.CUSTOMER],
+      },
     });
     expect(resend.success && resend.data.verified).toBe(true);
   }, 60_000);

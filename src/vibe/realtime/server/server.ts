@@ -591,6 +591,7 @@ export function startWebSocketServer(
 
         const connectorInstanceId =
           url.searchParams.get("connectorInstanceId") ?? undefined;
+        const requestId = url.searchParams.get("requestId");
 
         const upgraded = bunServer.upgrade(req, {
           data: {
@@ -600,6 +601,10 @@ export function startWebSocketServer(
             lastInboundAt: Date.now(),
             pongCount: 0,
             connectorInstanceId,
+            requestId:
+              requestId && /^[a-z0-9-]{8,64}$/.test(requestId)
+                ? requestId
+                : undefined,
           } satisfies WsConnectionData,
         });
 
@@ -772,11 +777,12 @@ export function startWebSocketServer(
           : diagnoseWsClose(ws.data, code, reason, Date.now());
         unsubscribeFromAll(ws as ServerWebSocket<WsConnectionData>);
         if (diagnosis?.kind === "idle-timeout") {
-          // The server cut it: the client answered no keepalive ping within
-          // the idle window. Pairs with the browser's "[WS Client] Connection
-          // lost" 1006 row; pongCount 0 = pings never got through at all.
+          // A reasonless 1006 can indicate an idle timeout or a network drop.
+          // Keep that distinction and correlate with the browser close log.
           logger.warn(
-            "[WS] Closed idle socket - client stopped answering pings",
+            diagnosis.meta.idleEvidence === "bun-close-reason"
+              ? "[WS] Closed idle socket - client stopped answering pings"
+              : "[WS] Socket closed after inactivity without a close reason",
             diagnosis.meta,
           );
         } else if (diagnosis?.kind === "dropped") {

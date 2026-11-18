@@ -23,7 +23,7 @@ export const { POST, tools } = endpointsHandler({
       toolExecutionContext,
       platform,
     }) =>
-      ImageGenerationRepository.generateImage(
+      ImageGenerationRepository.submit(
         data,
         user,
         locale,

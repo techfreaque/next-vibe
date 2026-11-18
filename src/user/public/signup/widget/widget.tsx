@@ -7,7 +7,7 @@
 import skillSingleDefinition from "next-vibe/agent/skills/[id]/definition";
 import { ChatFavoritesRepositoryClient } from "next-vibe/agent/skills/favorites/repository-client";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { broadcastAuthChange } from "next-vibe/identity/auth/tab-sync";
+import { Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/components/button";
 import {
   Card,
@@ -48,7 +48,7 @@ import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
-  useWidgetResponse,
+  useWidgetPlatform,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
@@ -62,6 +62,7 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { useEffect, useMemo, useState } from "react";
+import { useWatch } from "react-hook-form";
 
 import { useNewsletterPromo } from "@/newsletter/hooks";
 import {
@@ -77,6 +78,8 @@ import {
 } from "@/user/public/login/callback-url";
 
 import type definition from "../definition";
+import { suggestSignupEmail } from "../email-suggestion";
+import { SignupConfirmationStep } from "./confirmation";
 import { PasswordMatchIndicator } from "./password-match-indicator";
 import { PasswordStrengthIndicator } from "./password-strength-indicator";
 
@@ -104,23 +107,43 @@ interface CustomWidgetProps {
 export function SignupFormContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
+  const platform = useWidgetPlatform();
+  const data = useWidgetValue<typeof definition.POST>();
+  const searchParams = useSearchParams();
+  const pendingId = data?.pendingId ?? searchParams.get("pending");
+  const magicLink = searchParams.get("confirm") === "1";
+  if (platform === Platform.CLI || platform === Platform.MCP) {
+    if (data?.pendingId) {
+      return (
+        <Div>
+          <P>{data.message}</P>
+          <P>{`vibe signup-confirm --pendingId=${data.pendingId} --code=XXXXXX`}</P>
+        </Div>
+      );
+    }
+  } else if (pendingId || magicLink) {
+    return (
+      <SignupConfirmationStep
+        pendingId={pendingId ?? undefined}
+        magicLink={magicLink}
+      />
+    );
+  }
+  return <SignupFields field={field} />;
+}
+
+function SignupFields({ field }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const form = useWidgetForm();
+  const form = useWidgetForm<typeof definition.POST>();
   const t = useWidgetTranslation<typeof definition.POST>();
   const user = useWidgetUser();
   const newsletterPromo = useNewsletterPromo(user);
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
   const data = useWidgetValue<typeof definition.POST>();
-  const response = useWidgetResponse();
-
-  // Signed up: the lead cookie became a session for every tab of this
-  // browser. Other open tabs switch to the new account without a reload.
-  useEffect(() => {
-    if (response?.success) {
-      broadcastAuthChange("signup", logger);
-    }
-  }, [response, logger]);
+  const email = useWatch({ control: form.control, name: "email" });
+  const suggested =
+    typeof email === "string" ? suggestSignupEmail(email) : null;
   // Keep the return path: a partner sent here from "Get your partner link"
   // who already has an account must still land on the referral dashboard.
   const searchParams = useSearchParams();
@@ -266,6 +289,22 @@ export function SignupFormContainer({
 
         {/* Email Field */}
         <EmailFieldWidget fieldName="email" field={children.email} />
+
+        {suggested && (
+          <Button
+            type="button"
+            variant="link"
+            className="h-auto justify-start p-0"
+            onClick={() =>
+              form.setValue("email", suggested, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+          >
+            {t("confirmation.suggestion", { email: suggested })}
+          </Button>
+        )}
 
         {/* Password Fields */}
         <PasswordFieldWidget fieldName="password" field={children.password} />

@@ -1,3 +1,4 @@
+import { confirmedTestSignup } from "next-vibe/tooling/testing/testing-suite/confirmed-signup";
 /**
  * Email change needs the NEW inbox: a profile save only parks the address in
  * users.pendingEmail; the link mailed to it swaps it in (verify-email,
@@ -20,15 +21,13 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import userDeleteDefinitions from "@/users/user/[id]/definition";
 
-import signupEndpoints from "../../public/signup/definition";
 import verifyEmailDefinition from "../../public/verify-email/definition";
 import { createVerificationToken } from "../../public/verify-email/token";
 import meEndpoints from "./definition";
 import { emailChangeConfirmEmailTemplate } from "./email";
 
 const logger = createEndpointLogger(false, defaultLocale);
-const tag = (): string =>
-  `${String(Date.now())}-${String(Math.floor(Math.random() * 100000))}`;
+const tag = (): string => `${String(Date.now())}-${String(Math.floor(Math.random() * 100000))}`;
 const address = (label: string): string =>
   `test-email-change-${label}-${tag()}@example-test.invalid`;
 
@@ -47,10 +46,8 @@ describe("email change via confirm link", () => {
   });
 
   async function signup(email: string): Promise<JwtPrivatePayloadType> {
-    const res = await sendTestRequest({
-      toolExecutionContext: undefined,
-      endpoint: signupEndpoints.POST,
-      data: {
+    const res = await confirmedTestSignup(
+      {
         privateName: "Change Test",
         publicName: "ChangeTest",
         email,
@@ -59,8 +56,8 @@ describe("email change via confirm link", () => {
         acceptTerms: true,
         subscribeToNewsletter: false,
       },
-      user: publicUser(),
-    });
+      publicUser(),
+    );
     expect(res.success, JSON.stringify(res)).toBe(true);
     const found = await UserRepository.getUserByEmail(
       email,
@@ -73,10 +70,7 @@ describe("email change via confirm link", () => {
     }
     created.push(found.data.id);
     // Verified accounts stay verified through a change
-    await db
-      .update(users)
-      .set({ emailVerified: true })
-      .where(eq(users.id, found.data.id));
+    await db.update(users).set({ emailVerified: true }).where(eq(users.id, found.data.id));
     return {
       id: found.data.id,
       leadId: found.data.leadId,
@@ -173,7 +167,7 @@ describe("email change via confirm link", () => {
       urlPathParams: undefined as never,
       responseData: res.data,
       user,
-      t: (k: string): string => k,
+      t: emailChangeConfirmEmailTemplate.scopedTranslation.scopedT(defaultLocale).t,
       locale: defaultLocale,
       logger,
       tracking: {
@@ -194,9 +188,7 @@ describe("email change via confirm link", () => {
     expect((await confirm(plain)).success).toBe(false);
     expect((await row(user.id)).email).toBe(oldEmail);
 
-    const token =
-      createVerificationToken(user.id, newEmail, Date.now(), "email-change") ??
-      "";
+    const token = createVerificationToken(user.id, newEmail, Date.now(), "email-change") ?? "";
     const done = await confirm(token);
     expect(done.success, JSON.stringify(done)).toBe(true);
     if (done.success) {
@@ -220,9 +212,7 @@ describe("email change via confirm link", () => {
     const second = address("second");
 
     expect((await requestChange(user, first)).success).toBe(true);
-    const firstToken =
-      createVerificationToken(user.id, first, Date.now(), "email-change") ??
-      "";
+    const firstToken = createVerificationToken(user.id, first, Date.now(), "email-change") ?? "";
     expect((await requestChange(user, second)).success).toBe(true);
     expect((await row(user.id)).pendingEmail).toBe(second);
     expect((await confirm(firstToken)).success).toBe(false);
@@ -244,24 +234,17 @@ describe("email change via confirm link", () => {
     const otherEmail = (await row(other.id)).email;
     await db.update(users).set({ email: wanted }).where(eq(users.id, other.id));
     try {
-      const token =
-        createVerificationToken(user.id, wanted, Date.now(), "email-change") ??
-        "";
+      const token = createVerificationToken(user.id, wanted, Date.now(), "email-change") ?? "";
       const res = await confirm(token);
       expect(res.success).toBe(false);
       if (!res.success) {
-        expect(res.errorType?.errorCode).toBe(
-          ErrorResponseTypes.CONFLICT.errorCode,
-        );
+        expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.CONFLICT.errorCode);
       }
       const after = await row(user.id);
       expect(after.email).not.toBe(wanted);
       expect(after.pendingEmail).toBeNull();
     } finally {
-      await db
-        .update(users)
-        .set({ email: otherEmail })
-        .where(eq(users.id, other.id));
+      await db.update(users).set({ email: otherEmail }).where(eq(users.id, other.id));
     }
   }, 90_000);
 });

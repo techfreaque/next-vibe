@@ -439,15 +439,6 @@ export const translations = {
           complex: "Complex task? Switch to {{mode}}",
         },
       },
-      ready: {
-        change: "Change mode",
-        title: "Ready. Press send.",
-        who: "{{name}} answers on {{model}}.",
-        whoSingle: "{{name}} answers this chat.",
-        added: "Added to your skills: {{skills}}.",
-        prompt: "Your first prompt is in the box: edit it or send it.",
-        empty: "Type your first message.",
-      },
       single: {
         title: "Chat with {{name}}.",
         action: "Switch to {{companion}} for more modes",

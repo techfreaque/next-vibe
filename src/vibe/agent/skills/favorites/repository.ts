@@ -288,6 +288,7 @@ export class ChatFavoritesRepository {
     let characterTagline = null;
     let characterDescription = null;
     let characterVoice: VoiceModelSelection | null = null;
+    let variantName: string | undefined;
 
     if (favorite.skillId && favorite.skillId.trim() !== "") {
       const skillResult = await SkillsRepository.getSkillById(
@@ -305,6 +306,7 @@ export class ChatFavoritesRepository {
         // If no variantId, use the default variant (mirrors headless.ts resolveFavorite logic)
         const variants = skillResult.data.variants;
         const variant = pickSkillVariant(variants, favorite.variantId);
+        variantName = variant?.displayName;
         characterModelSelection = variant?.modelSelection ?? null;
         // Derive voice from the resolved variant; fall back to skill-level top field
         characterVoice = variant?.voiceModelSelection ?? null;
@@ -347,6 +349,7 @@ export class ChatFavoritesRepository {
       locale,
       user,
       availability,
+      variantName,
     );
   }
 

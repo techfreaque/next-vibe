@@ -9,11 +9,6 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { AuthRepository } from "next-vibe/identity/auth/repository";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
-import { UserRole } from "next-vibe/identity/roles/enum";
-import { createEndpointLogger } from "next-vibe/logger/server";
-import { Platform } from "next-vibe/platforms/platforms";
 import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX } from "react";
 
@@ -21,6 +16,7 @@ import { MODELS_OG_IMAGE } from "@/_pages/models/constants";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { type CreateKind, isCreateKind } from "../_shared/create-kinds";
+import { studioData } from "../_shared/studio-data";
 import { scopedTranslation } from "../i18n";
 import { CreatePageClient } from "./page-client";
 
@@ -28,12 +24,9 @@ interface Props {
   params: Promise<{ locale: CountryLanguage; kind: string }>;
 }
 
-export interface CreatePageData {
-  locale: CountryLanguage;
+export type CreatePageData = Awaited<ReturnType<typeof studioData>> & {
   kind: CreateKind;
-  user: JwtPayloadType;
-  platform: Platform;
-}
+};
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, kind } = await params;
@@ -64,13 +57,7 @@ export async function tanstackLoader({
   if (!isCreateKind(kind)) {
     notFound();
   }
-  const logger = createEndpointLogger(false, locale);
-  const user = await AuthRepository.getAuthMinimalUser(
-    [UserRole.CUSTOMER, UserRole.PUBLIC, UserRole.ADMIN],
-    { platform: Platform.NEXT_PAGE, locale },
-    logger,
-  );
-  return { locale, kind, user, platform: Platform.NEXT_PAGE };
+  return { ...(await studioData(locale, kind)), kind };
 }
 
 export function TanstackPage(data: CreatePageData): JSX.Element {

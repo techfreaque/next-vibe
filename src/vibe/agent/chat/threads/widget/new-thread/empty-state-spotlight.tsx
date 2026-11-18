@@ -43,7 +43,7 @@ import {
 import { Icon } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX, ReactNode, RefObject } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 import type { DefaultFolderId } from "../../../../../core/execution-context";
 import {
@@ -68,10 +68,7 @@ import {
   type SkillsT,
 } from "../../../../skills/i18n";
 import { getDefaultFolderConfig } from "../../../config";
-import {
-  type OnboardingReady,
-  useModelSelectorState,
-} from "../../../model-selector-state";
+import { useModelSelectorState } from "../../../model-selector-state";
 import { useChatSettings } from "../../../settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../../settings/repository-client";
 import { formatSkillId, parseSkillId } from "../../../slugify";
@@ -527,13 +524,10 @@ function SwitchCompanionLink({
 function Shell({
   bottomPadding,
   scrollRef,
-  centered = false,
   children,
 }: {
   bottomPadding: number;
   scrollRef: RefObject<DivRefObject | null>;
-  /** Short content (right after onboarding): sit mid-screen, not at the top */
-  centered?: boolean;
   children: ReactNode;
 }): JSX.Element {
   return (
@@ -545,12 +539,7 @@ function Shell({
     >
       <Div className="flex min-h-full flex-col">
         {/* Gutters mirror the chat input wrapper so edges line up exactly. */}
-        <Div
-          className={cn(
-            "mx-auto w-full max-w-3xl px-3 pb-6 pt-[4.5rem] sm:px-4 sm:pb-10 sm:pt-[max(2.5rem,9vh)] md:px-8 lg:px-10 [@media(max-height:760px)]:pb-4 [@media(max-height:760px)]:pt-6",
-            centered && "my-auto",
-          )}
-        >
+        <Div className="mx-auto w-full max-w-3xl px-3 pb-6 pt-[4.5rem] sm:px-4 sm:pb-10 sm:pt-[max(2.5rem,9vh)] md:px-8 lg:px-10 [@media(max-height:760px)]:pb-4 [@media(max-height:760px)]:pt-6">
           {children}
         </Div>
         {/* Clears the floating chat input (height is dynamic). */}
@@ -712,8 +701,6 @@ interface SpotlightBodyProps {
   fallbackCompanion: CompanionOption | null;
   onSelectMode: (mode: ModeView) => void;
   onSelectCompanion: (skillId: string) => void;
-  /** Just finished onboarding: say "ready", not "pick again" */
-  ready: OnboardingReady | null;
 }
 
 function SpotlightBody({
@@ -722,12 +709,7 @@ function SpotlightBody({
   fallbackCompanion,
   onSelectMode,
   onSelectCompanion,
-  ready,
 }: SpotlightBodyProps): JSX.Element {
-  const [expanded, setExpanded] = useState(false);
-  const compact = ready !== null && !expanded;
-  // Same list the onboarding promised in step 2
-  const readySkills = ready?.addedSkills ?? [];
   const { active } = view;
   const single = view.modes.length === 1;
   // Stable order: switching modes never reshuffles the list.
@@ -744,59 +726,16 @@ function SpotlightBody({
         t={t}
         view={view}
         title={
-          ready
-            ? t("widget.emptyState.ready.title")
-            : single
-              ? t("widget.emptyState.single.title", { name: view.name })
-              : t("widget.emptyState.spotlight.title", { name: view.name })
+          single
+            ? t("widget.emptyState.single.title", { name: view.name })
+            : t("widget.emptyState.spotlight.title", { name: view.name })
         }
         subtitle={
-          ready
-            ? [
-                single
-                  ? t("widget.emptyState.ready.whoSingle", { name: view.name })
-                  : t("widget.emptyState.ready.who", {
-                      name: view.name,
-                      mode: active.name,
-                      model: active.modelName ?? active.name,
-                    }),
-                readySkills.length > 0
-                  ? t("widget.emptyState.ready.added", {
-                      skills: readySkills.join(", "),
-                    })
-                  : null,
-                ready.hasPrompt
-                  ? t("widget.emptyState.ready.prompt")
-                  : t("widget.emptyState.ready.empty"),
-              ]
-                .filter((part) => part !== null)
-                .join(" ")
-            : single
-              ? view.tagline
-              : t("widget.emptyState.spotlight.subtitle")
+          single ? view.tagline : t("widget.emptyState.spotlight.subtitle")
         }
       />
 
-      {compact ? (
-        // Just onboarded: the sentence above already says who answers and
-        // how; one quiet control reopens the mode list, nothing else competes
-        // with the prefilled prompt.
-        single ? null : (
-          <Button
-            type="button"
-            variant="ghost"
-            size="unset"
-            onClick={() => setExpanded(true)}
-            className={cn(
-              "mt-4 h-9 gap-1.5 rounded-lg px-3 text-sm font-semibold text-primary hover:bg-primary/[0.06]",
-              INTERACTIVE,
-            )}
-          >
-            {t("widget.emptyState.ready.change")}
-            <ChevronDown className="h-4 w-4" />
-          </Button>
-        )
-      ) : single ? (
+      {single ? (
         <Div className="mt-6 w-full sm:mt-7 [@media(max-height:760px)]:mt-4">
           <SingleModelCard
             t={t}
@@ -992,15 +931,6 @@ export function SpotlightEmptyState({
     logger,
   );
   const scrollRef = useRef<DivRefObject | null>(null);
-  const onboardingReady = useModelSelectorState((s) => s.onboardingReady);
-  const setOnboardingReady = useModelSelectorState((s) => s.setOnboardingReady);
-  // "Ready" belongs to this one empty chat; the next new chat is a normal one.
-  useEffect(
-    () => (): void => {
-      setOnboardingReady(null);
-    },
-    [setOnboardingReady],
-  );
 
   // Until settings say which skill is selected, show a placeholder instead of
   // guessing: guessing the default companion flashed Thea's card for people
@@ -1131,11 +1061,7 @@ export function SpotlightEmptyState({
   };
 
   return (
-    <Shell
-      bottomPadding={bottomPadding}
-      scrollRef={scrollRef}
-      centered={onboardingReady !== null}
-    >
+    <Shell bottomPadding={bottomPadding} scrollRef={scrollRef}>
       <Div className="flex flex-col items-center">
         <FolderPill folder={folder} />
         <Div className="mt-4 w-full [@media(max-height:760px)]:mt-3">
@@ -1146,7 +1072,6 @@ export function SpotlightEmptyState({
               fallbackCompanion={fallbackCompanion}
               onSelectMode={selectMode}
               onSelectCompanion={selectCompanion}
-              ready={onboardingReady}
             />
           ) : view.kind === "none" ? (
             <CompanionPicker

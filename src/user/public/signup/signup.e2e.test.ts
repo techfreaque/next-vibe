@@ -8,6 +8,7 @@ import { identityEnv } from "next-vibe/identity/env";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { submitAndConfirmSignup } from "next-vibe/tooling/testing/e2e/signup";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
@@ -46,41 +47,35 @@ describe("E2E: signup page", () => {
   const e2e = useE2E("user/public/signup");
   const { t } = scopedTranslation.scopedT(defaultLocale);
 
-  e2e.it("creates an account and signs the user in", async ({ open, page, uniqueEmail, cleanup }) => {
-    const email = uniqueEmail("signup");
-    cleanup(() => deleteUserByEmail(email));
+  e2e.it(
+    "creates an account and signs the user in",
+    async ({ open, page, uniqueEmail, cleanup }) => {
+      const email = uniqueEmail("signup");
+      cleanup(() => deleteUserByEmail(email));
 
-    const form = await open(endpoint, { path: SIGNUP_PAGE });
-    await form.fill({
-      privateName: "E2E Signup",
-      publicName: "E2ESignup",
-      email,
-      password: PASSWORD,
-      confirmPassword: PASSWORD,
-      subscribeToNewsletter: false,
-      acceptTerms: true,
-    });
+      const form = await open(endpoint, { path: SIGNUP_PAGE });
+      await form.fill({
+        privateName: "E2E Signup",
+        publicName: "E2ESignup",
+        email,
+        password: PASSWORD,
+        confirmPassword: PASSWORD,
+        subscribeToNewsletter: false,
+        acceptTerms: true,
+      });
 
-    const result = await form.submit();
-    expect(result.sent).toBe(true);
-    if (!result.sent) return;
-    expect(result.response.success, JSON.stringify(result.response)).toBe(true);
-
-    await page.waitForURL((url) => !url.pathname.endsWith(SIGNUP_PAGE));
-    const logger = createEndpointLogger(false, defaultLocale);
-    const created = await UserRepository.getUserByEmail(
-      email,
-      UserDetailLevel.STANDARD,
-      defaultLocale,
-      logger,
-    );
-    expect(created.success && created.data?.privateName).toBe("E2E Signup");
-    // Browser signup must leave the email UNVERIFIED — a verification mail is
-    // sent (wired in signup/route.ts) and the account stays unconfirmed until
-    // the mailed link is opened. This is what keeps unverified addresses out of
-    // marketing sends (lifecycle + consented blast gate on emailVerified).
-    expect(created.success && created.data?.emailVerified).toBe(false);
-  });
+      await submitAndConfirmSignup(page, form.submitButton);
+      const logger = createEndpointLogger(false, defaultLocale);
+      const created = await UserRepository.getUserByEmail(
+        email,
+        UserDetailLevel.STANDARD,
+        defaultLocale,
+        logger,
+      );
+      expect(created.success && created.data?.privateName).toBe("E2E Signup");
+      expect(created.success && created.data?.emailVerified).toBe(true);
+    },
+  );
 
   e2e.it("refuses to continue until the terms are accepted", async ({ open, uniqueEmail }) => {
     const form = await open(endpoint, { path: SIGNUP_PAGE });

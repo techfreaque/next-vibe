@@ -26,7 +26,12 @@ import {
   classifyImageProviderError,
   ImageProviderFailureKind,
 } from "../image-generation/provider-error";
+import {
+  MediaStudioRepository,
+  type StudioProgress,
+} from "../media-studio/repository";
 import { ApiProvider } from "../models/models";
+import { UncensoredConsentRepository } from "../models/uncensored-consent/repository";
 import {
   chargeMediaGeneration,
   checkMediaBalance,
@@ -127,6 +132,37 @@ export class VideoGenerationRepository {
   /**
    * Generate a video from a text prompt
    */
+  static submit(
+    data: VideoGenerationPostRequestOutput,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+    t: VideoGenerationT,
+    toolExecutionContext: ToolExecutionContext,
+    platform: Platform,
+  ): Promise<ResponseType<VideoGenerationPostResponseOutput>> {
+    return MediaStudioRepository.run({
+      save: !toolExecutionContext.threadId && data.saveToStudio,
+      kind: "video",
+      model: data.model,
+      title: data.prompt,
+      user,
+      locale,
+      logger,
+      generate: (onProgress) =>
+        VideoGenerationRepository.generateVideo(
+          { ...data, saveToStudio: undefined },
+          user,
+          locale,
+          logger,
+          t,
+          toolExecutionContext,
+          platform,
+          onProgress,
+        ),
+    });
+  }
+
   static async generateVideo(
     data: VideoGenerationPostRequestOutput,
     user: JwtPayloadType,
@@ -135,6 +171,7 @@ export class VideoGenerationRepository {
     t: VideoGenerationT,
     toolExecutionContext: ToolExecutionContext,
     platform: Platform,
+    onProgress?: StudioProgress,
   ): Promise<ResponseType<VideoGenerationPostResponseOutput>> {
     // model is resolved via fieldDefaults in route.ts (from favorites/skill config)
     if (!data.model) {
@@ -179,6 +216,17 @@ export class VideoGenerationRepository {
         );
         videoModel = imageRoute;
       }
+    }
+
+    const consent = await UncensoredConsentRepository.gate({
+      content: videoModel.content,
+      modelName: videoModel.name,
+      user,
+      locale,
+      logger,
+    });
+    if (!consent.success) {
+      return consent;
     }
 
     // If this model requires image input, validate it's provided
@@ -314,6 +362,7 @@ export class VideoGenerationRepository {
     }
 
     let generationResult: ResponseType<GeneratedVideo>;
+    await onProgress?.("running");
     switch (videoModel.apiProvider) {
       case ApiProvider.MODELSLAB:
         generationResult = await generateVideoWithModelsLab({
@@ -393,6 +442,7 @@ export class VideoGenerationRepository {
       return providerFailure(generationResult.message, t);
     }
 
+    await onProgress?.("saving");
     const generated = generationResult.data;
     const finalDurationSeconds = generated.durationSeconds ?? durationSeconds;
     // Remote instance: what it charged (never marked up twice). Otherwise the

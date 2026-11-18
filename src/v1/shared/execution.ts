@@ -453,10 +453,11 @@ export async function runV1Generate(
     );
     return { ok: true, result, totals };
   } catch (error) {
-    const message = parseError(error).message;
-    call.logger.error(`[${call.logTag}] Inference failed`, {
+    const parsedError = parseError(error);
+    const { message } = parsedError;
+    call.logger.error(`[${call.logTag}] Inference failed`, parsedError, {
       model: call.model.id,
-      error: message,
+      apiProvider: call.inference.model.apiProvider,
     });
     return {
       ok: false,

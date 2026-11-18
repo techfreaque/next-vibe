@@ -23,7 +23,7 @@ export const { POST, tools } = endpointsHandler({
       toolExecutionContext,
       platform,
     }) =>
-      VideoGenerationRepository.generateVideo(
+      VideoGenerationRepository.submit(
         data,
         user,
         locale,

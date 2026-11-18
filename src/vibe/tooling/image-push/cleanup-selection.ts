@@ -1,25 +1,24 @@
 /**
- * Local build-machine cleanup: pure selection logic.
- * Decides which local image refs and which `.tmp/image-build/<sha>/` export
- * dirs `vibe image-push` may drop after a deploy. No side effects here, so it
- * is unit-tested in cleanup-selection.test.ts; cleanup.ts runs the commands.
+ * Pure selection logic for build-machine cleanup and prod server retention.
+ * cleanup.ts and remote-retention.ts run the commands.
  */
 
 /** The only image repository local cleanup ever touches. */
 export const CLEANUP_IMAGE_REPO = "ghcr.io/techfreaque/next-vibe-app";
 
-/** Tags that are never removed locally, whatever their age. */
+/** Tags protected during the low-disk check before a local build. */
 export const PINNED_TAGS: readonly string[] = [
   "latest",
   "rollback",
   "prod-current-good",
 ];
 
-/** Builds (distinct image ids) and export dirs kept after a deploy. */
+/** Recent builds kept on prod servers and during the local pre-build check. */
 export const KEEP_BUILDS = 3;
 
-/** Build cache younger than this survives the prune (fast rebuilds). */
-export const BUILD_CACHE_KEEP_HOURS = 48;
+/** Age and size targets for unused local Docker build cache. */
+export const BUILD_CACHE_KEEP_HOURS = 24;
+export const BUILD_CACHE_KEEP_GB = 30;
 
 /** Below this many free GB on the docker root, prune before building. */
 export const MIN_FREE_GB = 40;
@@ -35,11 +34,10 @@ export interface LocalImageEntry {
 }
 
 /** One entry of `.tmp/image-build/`. */
-export interface ExportDirEntry {
+export interface ExportEntry {
   name: string;
   isDirectory: boolean;
-  /** mtime of the `<sha>.done` marker (or the dir itself when missing). */
-  mtimeMs: number;
+  isFile: boolean;
 }
 
 const DANGLING_TAG = "<none>";
@@ -62,9 +60,9 @@ export function parseDockerCreatedAt(value: string): number {
 }
 
 /**
- * Picks the local refs to remove: every tag of a build older than the newest
- * `keepBuilds` builds, unless the build carries a pinned/current tag or is
- * used by a container. A build only tagged `<none>` is returned by image id.
+ * Picks refs for prod retention and the pre-build disk check: every tag of
+ * a build older than the newest `keepBuilds`, unless it has a protected
+ * tag or a container uses it. A build tagged only `<none>` is returned by id.
  * Rows of any other repository are ignored, and so is every build whose
  * creation time cannot be read.
  */
@@ -127,27 +125,59 @@ export function selectImageRefsToRemove(params: {
 }
 
 /**
- * Picks the `.tmp/image-build/<sha>` export dirs to park: full-sha dirs older
- * than the newest `keep`, never the one just built. Anything else in the
- * folder (markers, stray files, odd names) is left alone.
+ * After a successful push, pick every local app tag except tags of the
+ * just-built image and images referenced by containers. A registry-only push
+ * has no local build to keep. An expected tag missing from the list means
+ * the current image could not be identified safely.
  */
-export function selectExportDirsToPark(params: {
-  entries: ExportDirEntry[];
-  keep: number;
+export function selectLocalImageRefsToRemove(params: {
+  entries: LocalImageEntry[];
+  currentTag: string | undefined;
+  containerImageIds: readonly string[];
+}): string[] | undefined {
+  const { entries, currentTag, containerImageIds } = params;
+  const appEntries = entries.filter(
+    ({ repository, id }) => repository === CLEANUP_IMAGE_REPO && id,
+  );
+  const currentImageId = appEntries.find(({ tag }) => tag === currentTag)?.id;
+  if (currentTag !== undefined && currentImageId === undefined) {
+    return undefined;
+  }
+  const protectedIds = new Set(containerImageIds);
+  if (currentImageId !== undefined) {
+    protectedIds.add(currentImageId);
+  }
+  return appEntries
+    .filter(
+      ({ tag, id }) => tag && tag !== DANGLING_TAG && !protectedIds.has(id),
+    )
+    .map(({ repository, tag }) => `${repository}:${tag}`);
+}
+
+/** Groups old full-SHA export dirs and completion markers by commit. */
+export function selectExportEntriesToPark(params: {
+  entries: ExportEntry[];
   currentSha: string;
-}): string[] {
-  const { entries, keep, currentSha } = params;
-  return entries
-    .filter((entry) => entry.isDirectory && FULL_SHA.test(entry.name))
-    .toSorted((a, b) => b.mtimeMs - a.mtimeMs)
-    .slice(Math.max(0, keep))
-    .filter((entry) => entry.name !== currentSha)
-    .map((entry) => entry.name);
+}): Map<string, string[]> {
+  const exportsToPark = new Map<string, string[]>();
+  for (const { name, isDirectory, isFile } of params.entries) {
+    const sha = isFile && name.endsWith(".done") ? name.slice(0, -5) : name;
+    if (
+      !(isDirectory || sha !== name) ||
+      !FULL_SHA.test(sha) ||
+      sha === params.currentSha
+    ) {
+      continue;
+    }
+    const names = exportsToPark.get(sha) ?? [];
+    names.push(name);
+    exportsToPark.set(sha, names);
+  }
+  return exportsToPark;
 }
 
 // ============================================================================
 // Prod server retention (Server 1 / Server 2), run by image-push over SSH.
-// Same build selection as the local cleanup, with per-node pinned tags.
 // ============================================================================
 
 /** Below this many free GB on a prod server, retention runs before a load. */

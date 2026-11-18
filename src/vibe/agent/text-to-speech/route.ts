@@ -18,7 +18,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: ({ data, user, locale, logger, t, toolExecutionContext }) =>
-      TextToSpeechRepository.convertTextToSpeech(
+      TextToSpeechRepository.submit(
         data,
         user,
         locale,

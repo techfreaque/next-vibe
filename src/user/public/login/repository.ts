@@ -4,7 +4,7 @@
  */
 import "server-only";
 
-import { and, count, eq, gt, isNull, or } from "drizzle-orm";
+import { and, count, desc, eq, gt, isNull, or } from "drizzle-orm";
 import { type CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -35,6 +35,9 @@ import type { NextRequest } from "next-vibe/ui/lib/request";
 import { AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS } from "@/env/constants";
 
 import { scopedTranslation as creditsScopedTranslation } from "../../../credits/i18n";
+import { pendingSignups } from "../signup/db";
+import { scopedTranslation as signupTranslation } from "../signup/i18n";
+import { issueSignupChallenge, pendingStatus } from "../signup/pending";
 import type {
   LoginPostRequestOutput,
   LoginPostResponseOutput,
@@ -154,12 +157,49 @@ export class LoginRepository {
         .where(eq(users.email, email))
         .then((rows) => rows[0]);
 
+      const [pending] = userRow
+        ? []
+        : await db
+            .select()
+            .from(pendingSignups)
+            .where(eq(pendingSignups.email, email))
+            .orderBy(
+              desc(eq(pendingSignups.leadId, leadId)),
+              desc(pendingSignups.sentAt),
+            )
+            .limit(1);
       const storedHash =
-        userRow?.password ?? (await LoginRepository.getDummyHash());
+        userRow?.password ??
+        pending?.passwordHash ??
+        (await LoginRepository.getDummyHash());
 
       // Always run Argon2 - constant-time regardless of whether user exists
       const isPasswordValid = await verifyPassword(password, storedHash);
 
+      if (!userRow && pending && isPasswordValid) {
+        if (!data.resendPending) {
+          return fail({
+            message: t("errors.pendingEmail"),
+            errorType: ErrorResponseTypes.CONFLICT,
+          });
+        }
+        const signupT = signupTranslation.scopedT(locale).t;
+        const issued = await issueSignupChallenge(
+          pending,
+          pending,
+          request?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+            request?.headers.get("x-real-ip") ||
+            null,
+          logger,
+          signupT,
+        );
+        return fail({
+          message: issued.success
+            ? pendingStatus(issued.data, signupT).message
+            : issued.message,
+          errorType: ErrorResponseTypes.CONFLICT,
+        });
+      }
       if (!userRow || !isPasswordValid) {
         logger.debug("Login failed: Invalid credentials", { email });
         // Server-side only (never in the response - that stays generic to
@@ -169,6 +209,7 @@ export class LoginRepository {
         const [emailLocal = "", emailDomain = ""] = email.split("@");
         logger.warn("Login failed: invalid credentials", {
           reason: userRow ? "wrong_password" : "no_account",
+          hasPendingSignup: Boolean(pending),
           email: `${emailLocal.slice(0, 2)}***@${emailDomain}`,
           emailVerified: userRow?.emailVerified ?? null,
           isBanned: userRow?.isBanned ?? null,

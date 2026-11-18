@@ -34,6 +34,7 @@ import { isOnline } from "next-vibe/ui/lib/media";
 
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { EndpointLogger } from "../../logger/types";
+import { mintRequestId } from "../../logger/with-log-context";
 import type {
   EventHandler,
   WsChannelDescriptor,
@@ -128,6 +129,7 @@ let lastFrameAt: number | null = null;
 
 /** Close details of the socket that started the current outage. */
 interface DropInfo {
+  requestId: string;
   code: number;
   reason: string;
   wasClean: boolean;
@@ -336,7 +338,8 @@ function connect(logger: EndpointLogger): void {
   }
 
   const protocol = getCurrentProtocol() === "https:" ? "wss:" : "ws:";
-  const url = `${protocol}//${getCurrentHost()}/ws`;
+  const requestId = mintRequestId();
+  const url = `${protocol}//${getCurrentHost()}/ws?requestId=${requestId}`;
 
   lastLogger = logger;
   const ws = new WebSocket(url);
@@ -393,6 +396,7 @@ function connect(logger: EndpointLogger): void {
       dropReconnectCount = 0;
       noticeableDownMs = 0;
       pendingDrop = {
+        requestId,
         code: event.code,
         reason: event.reason.slice(0, 200),
         wasClean: event.wasClean,
@@ -412,6 +416,7 @@ function connect(logger: EndpointLogger): void {
     if (reconnectAttempts >= 6) {
       reconnectPaused = true;
       logger.error("[WS Client] Reconnect gave up - live updates paused", {
+        requestId,
         attempts: reconnectAttempts,
         lastCode: event.code,
         lastReason: event.reason.slice(0, 200),

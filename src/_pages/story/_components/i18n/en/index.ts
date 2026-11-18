@@ -1,5 +1,6 @@
 export const translations = {
   nav: {
+    studio: "Studio",
     help: "Help",
     logout: "Log Out",
     settings: "My Profile & Settings",

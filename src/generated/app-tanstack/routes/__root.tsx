@@ -23,6 +23,10 @@ const loadLayout = createServerFn({ method: "GET" })
 
 export const Route = createRootRoute({
   staleTime: 0,
+  loader: ({ location }) => {
+    const locale = location.pathname.split("/")[1] ?? "";
+    return loadLayout({ data: { locale } });
+  },
   // Page-specific title/description/canonical/hreflang/OG/robots come from
   // each generated page route's head() (resolved from generateMetadata).
   head: ({ loaderData }) => ({
@@ -33,10 +37,6 @@ export const Route = createRootRoute({
       { rel: "apple-touch-icon", href: "/images/apple-icon.png" },
     ],
   }),
-  loader: ({ location }) => {
-    const locale = location.pathname.split("/")[1] ?? "";
-    return loadLayout({ data: { locale } });
-  },
   shellComponent: function ShellComponent({ children }) {
     return (
       <RootLayout {...Route.useLoaderData().layout}>{children}</RootLayout>

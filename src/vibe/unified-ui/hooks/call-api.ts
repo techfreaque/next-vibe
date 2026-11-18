@@ -6,6 +6,7 @@ import { isOnline } from "next-vibe/ui/lib/media";
 import {
   BEARER_LEAD_ID_SEPARATOR,
   CSRF_REJECTED_HEADER_NAME,
+  CSRF_RETRY_HEADER_NAME,
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
   REQUEST_ID_HEADER_NAME,
@@ -598,6 +599,7 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
       const freshCsrfToken = await getCsrfToken(logger);
       if (freshCsrfToken && freshCsrfToken !== sentCsrfToken) {
         headers[CSRF_TOKEN_HEADER_NAME] = freshCsrfToken;
+        headers[CSRF_RETRY_HEADER_NAME] = "1";
         diag.csrfHeaderSent = true;
         // oxlint-disable-next-line restricted/no-raw-fetch
         response = await fetch(url, options);

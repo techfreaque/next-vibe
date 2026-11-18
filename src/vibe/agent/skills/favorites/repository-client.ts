@@ -40,6 +40,7 @@ import type {
 } from "../../text-to-speech/models";
 import skillSingleDefinition from "../[id]/definition";
 import { DEFAULT_SKILLS, type SkillVariant } from "../config";
+import { NO_SKILL_ID } from "../constants";
 import type { SkillVariantData } from "../db";
 import { ModelSelectionType } from "../enum";
 import { scopedTranslation as charactersScopedTranslation } from "../i18n";
@@ -66,7 +67,7 @@ import type { FavoritesReorderRequestOutput } from "./reorder/definition";
 
 /**
  * Minimal favorite data stored in localStorage
- * Skill data is filled in from DEFAULT_SKILLS on read
+ * Skill data is resolved from the built-in config or skill endpoint on read
  */
 interface StoredLocalFavorite {
   id: string;
@@ -148,14 +149,17 @@ export class ChatFavoritesRepositoryClient {
       // Load stored minimal configs
       const allStoredConfigs = await this.loadAllLocalFavorites(logger);
 
-      // Batch-fetch UUID skills (custom/community) from the public API
-      const uuidRe =
-        /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i;
-      const uuidSkillIds = [
+      const defaultSkillsById = new Map(
+        DEFAULT_SKILLS.map((skill) => [skill.id, skill]),
+      );
+      // Community favorites may reference the skill's slug or its UUID.
+      const customSkillIds = [
         ...new Set(
           allStoredConfigs
             .map((c) => parseSkillId(c.skillId).skillId)
-            .filter((id) => uuidRe.test(id)),
+            .filter(
+              (id) => id && id !== NO_SKILL_ID && !defaultSkillsById.has(id),
+            ),
         ),
       ];
 
@@ -171,9 +175,9 @@ export class ChatFavoritesRepositoryClient {
       // Skills the server no longer serves to this user (deleted, unpublished
       // or made private) - their favorites are dead and get pruned below.
       const goneSkillIds = new Set<string>();
-      if (uuidSkillIds.length > 0) {
+      if (customSkillIds.length > 0) {
         const results = await Promise.allSettled(
-          uuidSkillIds.map(async (skillId) => {
+          customSkillIds.map(async (skillId) => {
             const response = await executeQuery({
               endpoint: skillSingleDefinition.GET,
               logger,
@@ -202,7 +206,7 @@ export class ChatFavoritesRepositoryClient {
         // Log failures for debugging but don't crash
         for (const result of results) {
           if (result.status === "rejected") {
-            logger.warn("Failed to fetch UUID skill", {
+            logger.warn("Failed to fetch favorite skill", {
               reason: String(result.reason),
             });
           }
@@ -219,24 +223,21 @@ export class ChatFavoritesRepositoryClient {
         (c) => !goneSkillIds.has(parseSkillId(c.skillId).skillId),
       );
 
-      // For PUBLIC users (localStorage), get character data from DEFAULT_SKILLS
       const { t: tChar } = charactersScopedTranslation.scopedT(locale);
       const cards = storedConfigs.map((config): FavoriteCard => {
-        // UUID skills: use fetched data; built-in skills: use DEFAULT_SKILLS
         // skillId is stored merged ("thea__brilliant") - look skills up by base id
         const { skillId: baseSkillId, variantId: configVariantId } =
           parseSkillId(config.skillId);
-        const isUuid = uuidRe.test(baseSkillId);
-        const fetchedSkill = isUuid
-          ? fetchedSkillMap.get(baseSkillId)
-          : undefined;
-        const character = isUuid
-          ? undefined
-          : DEFAULT_SKILLS.find((c) => c.id === baseSkillId);
+        const fetchedSkill = fetchedSkillMap.get(baseSkillId);
+        const character = defaultSkillsById.get(baseSkillId);
 
-        const variants: readonly (SkillVariant | SkillVariantData)[] =
-          fetchedSkill?.variants ?? character?.variants ?? [];
-        const variant = pickSkillVariant(variants, configVariantId);
+        const fetchedVariant = pickSkillVariant(
+          fetchedSkill?.variants,
+          configVariantId,
+        );
+        const variant: SkillVariantData | SkillVariant | null =
+          fetchedVariant ??
+          pickSkillVariant(character?.variants, configVariantId);
 
         const icon = fetchedSkill?.icon ?? character?.icon ?? null;
         const name =
@@ -261,6 +262,7 @@ export class ChatFavoritesRepositoryClient {
           locale,
           user,
           availability,
+          fetchedVariant?.displayName,
         );
       });
 
@@ -561,6 +563,7 @@ export class ChatFavoritesRepositoryClient {
     locale: CountryLanguage,
     user: JwtPayloadType,
     availability: AgentEnvAvailability,
+    variantName?: string,
   ): FavoriteCard {
     const { t } = scopedTranslation.scopedT(locale);
     const bestModel = getBestChatModelForFavorite(
@@ -581,6 +584,7 @@ export class ChatFavoritesRepositoryClient {
       id: stored.id,
       skillId: stored.skillId,
       customVariantName: stored.customVariantName ?? null,
+      variantName,
       modelId: bestModel?.id ?? null,
       voiceId: resolvedVoiceId,
       position: stored.position,

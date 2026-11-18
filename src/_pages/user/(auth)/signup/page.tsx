@@ -214,7 +214,8 @@ export function TanstackPage({
  */
 export default async function SignUpPage({
   params,
+  searchParams,
 }: Props): Promise<JSX.Element> {
-  const data = await tanstackLoader({ params });
+  const data = await tanstackLoader({ params, searchParams });
   return <TanstackPage {...data} />;
 }

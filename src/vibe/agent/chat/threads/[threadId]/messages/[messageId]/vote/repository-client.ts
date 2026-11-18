@@ -39,7 +39,11 @@ export class VoteRepositoryClient {
       const message = messages.find((m) => m.id === messageId);
 
       if (!message) {
-        logger.error("Vote client: message not found", { messageId, threadId });
+        logger.error("Vote client: message not found in incognito storage", {
+          messageId,
+          threadId,
+          storedMessageCount: messages.length,
+        });
         return fail({
           message: t("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,

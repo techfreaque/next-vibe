@@ -13,6 +13,7 @@ import { UserDetailLevel } from "next-vibe/identity/user/enum";
 import { UserRepository } from "next-vibe/identity/user/repository";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { E2E_LOCALE } from "next-vibe/tooling/testing/e2e/config";
+import { submitAndConfirmSignup } from "next-vibe/tooling/testing/e2e/signup";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
@@ -78,13 +79,7 @@ describe("E2E: growth attribution", () => {
         subscribeToNewsletter: false,
         acceptTerms: true,
       });
-      const result = await form.submit();
-      expect(result.sent).toBe(true);
-      if (!result.sent) return;
-      expect(result.response.success, JSON.stringify(result.response)).toBe(
-        true,
-      );
-      await page.waitForURL((url) => !url.pathname.endsWith("/user/signup"));
+      await submitAndConfirmSignup(page, form.submitButton);
 
       const userId = await findUserId(email);
       expect(userId).not.toBe(null);

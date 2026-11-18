@@ -2,6 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   nav: {
+    studio: "Studio",
     help: "Aide",
     logout: "Se déconnecter",
     settings: "Mon profil et paramètres",

@@ -16,6 +16,7 @@ import { Volume2 } from "next-vibe/ui/components/icons/Volume2";
 import { ExternalLink } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { H3 } from "next-vibe/ui/components/typography";
+import { getUserActivation } from "next-vibe/ui/lib/media";
 import {
   useWidgetDisabled,
   useWidgetForm,
@@ -179,6 +180,7 @@ export function TextToSpeechContainer({
       });
     });
 
+    const userActivation = getUserActivation();
     void audio
       .play()
       .then(() => {
@@ -196,6 +198,8 @@ export function TextToSpeechContainer({
           chunkIndex: 0,
           totalChunks: 1,
           phase: "autoplay",
+          userActivationActive: userActivation.isActive,
+          userActivationHasBeenActive: userActivation.hasBeenActive,
         };
         // Autoplay blocked is expected (user clicks play) - still recorded
         if (

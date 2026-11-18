@@ -14,6 +14,7 @@ export function safeCallbackPath(
   if (
     !value ||
     !value.startsWith("/") ||
+    /[\t\r\n]/.test(value) ||
     value.startsWith("//") ||
     value.includes("\\") ||
     value.includes("://")

@@ -28,6 +28,45 @@ const SignupFormContainer = lazyWidget(() =>
   import("./widget/widget").then((m) => ({ default: m.SignupFormContainer })),
 );
 
+const errorTypes = {
+  [EndpointErrorTypes.VALIDATION_FAILED]: {
+    title: "errors.validation.title",
+    description: "errors.validation.description",
+  },
+  [EndpointErrorTypes.UNAUTHORIZED]: {
+    title: "errors.unauthorized.title",
+    description: "errors.unauthorized.description",
+  },
+  [EndpointErrorTypes.SERVER_ERROR]: {
+    title: "errors.server.title",
+    description: "errors.server.description",
+  },
+  [EndpointErrorTypes.UNKNOWN_ERROR]: {
+    title: "errors.unknown.title",
+    description: "errors.unknown.description",
+  },
+  [EndpointErrorTypes.CONFLICT]: {
+    title: "errors.conflict.title",
+    description: "errors.conflict.description",
+  },
+  [EndpointErrorTypes.FORBIDDEN]: {
+    title: "errors.forbidden.title",
+    description: "errors.forbidden.description",
+  },
+  [EndpointErrorTypes.NETWORK_ERROR]: {
+    title: "errors.network.title",
+    description: "errors.network.description",
+  },
+  [EndpointErrorTypes.NOT_FOUND]: {
+    title: "errors.notFound.title",
+    description: "errors.notFound.description",
+  },
+  [EndpointErrorTypes.UNSAVED_CHANGES]: {
+    title: "errors.unsaved.title",
+    description: "errors.unsaved.description",
+  },
+} as const;
+
 /**
  * POST /signup - User registration
  */
@@ -230,6 +269,18 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
+      callbackUrl: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "confirmation.callback",
+        hidden: true,
+        schema: z.string().max(2048).optional(),
+      }),
+      pendingId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "confirmation.pendingId",
+        schema: z.uuid(),
+      }),
       // === SUPPORTED SKILL (hidden - set from localStorage last-attributed UUID skill) ===
       supportedSkillId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -304,44 +355,7 @@ const { POST } = createEndpoint({
   }),
 
   // === ERROR HANDLING ===
-  errorTypes: {
-    [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "errors.validation.title",
-      description: "errors.validation.description",
-    },
-    [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "errors.unauthorized.title",
-      description: "errors.unauthorized.description",
-    },
-    [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "errors.server.title",
-      description: "errors.server.description",
-    },
-    [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "errors.unknown.title",
-      description: "errors.unknown.description",
-    },
-    [EndpointErrorTypes.CONFLICT]: {
-      title: "errors.conflict.title",
-      description: "errors.conflict.description",
-    },
-    [EndpointErrorTypes.FORBIDDEN]: {
-      title: "errors.forbidden.title",
-      description: "errors.forbidden.description",
-    },
-    [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "errors.network.title",
-      description: "errors.network.description",
-    },
-    [EndpointErrorTypes.NOT_FOUND]: {
-      title: "errors.notFound.title",
-      description: "errors.notFound.description",
-    },
-    [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "errors.unsaved.title",
-      description: "errors.unsaved.description",
-    },
-  },
+  errorTypes,
 
   // === SUCCESS HANDLING ===
   successTypes: {
@@ -364,8 +378,8 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        message:
-          "Account created successfully! Please check your email to verify your account.",
+        message: "Enter the code sent to john.doe@example.com.",
+        pendingId: "59326fcc-8877-49ee-85cb-63b4195d35b0",
       },
     },
   },
@@ -380,6 +394,113 @@ export type SignupPostResponseOutput = typeof POST.types.ResponseOutput;
 /**
  * Signup API endpoints
  */
-const signupEndpoints = { POST };
+const { PATCH } = createEndpoint({
+  scopedTranslation,
+  method: Methods.PATCH,
+  path: ["user", "public", "signup"],
+  aliases: ["signup-confirm"],
+  titleShort: "confirmation.link",
+  title: "confirmation.title",
+  description: "confirmation.description",
+  icon: "mail",
+  category: "account",
+  tags: ["tag"],
+  allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
+  fields: customWidgetObject({
+    render: lazyWidget(() =>
+      import("./widget/confirmation").then((m) => ({
+        default: m.SignupConfirmationWidget,
+      })),
+    ),
+    usage: { request: "data", response: true } as const,
+    children: {
+      pendingId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "confirmation.pendingId",
+        schema: z.uuid().optional(),
+      }),
+      code: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "confirmation.code",
+        schema: z
+          .string()
+          .regex(/^\d{6}$/)
+          .optional(),
+      }),
+      token: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.PASSWORD,
+        label: "confirmation.token",
+        schema: z
+          .string()
+          .regex(/^[A-Za-z0-9_-]{43}$/)
+          .optional(),
+      }),
+      newEmail: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.EMAIL,
+        label: "confirmation.email",
+        schema: z.string().trim().toLowerCase().email().max(254).optional(),
+      }),
+      resend: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "confirmation.resend",
+        schema: z.boolean().optional(),
+      }),
+      address: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "confirmation.email",
+        schema: z.string(),
+      }),
+      message: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "confirmation.title",
+        schema: z.string(),
+      }),
+      bounced: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "confirmation.bounce",
+        schema: z.boolean().optional(),
+      }),
+      resendAt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "confirmation.resend",
+        schema: z.number().optional(),
+      }),
+      redirectTo: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "confirmation.callback",
+        schema: z.string().optional(),
+      }),
+    },
+  }),
+  errorTypes,
+  successTypes: {
+    title: "confirmation.title",
+    description: "success.description",
+  },
+  examples: {
+    requests: {
+      default: {
+        pendingId: "59326fcc-8877-49ee-85cb-63b4195d35b0",
+        code: "123456",
+      },
+    },
+    responses: {
+      default: {
+        address: "alex@example.com",
+        message: "Email confirmed.",
+        redirectTo: "/en-US",
+      },
+    },
+  },
+});
+export type SignupPatchRequestOutput = typeof PATCH.types.RequestOutput;
+export type SignupPatchResponseOutput = typeof PATCH.types.ResponseOutput;
+
+const signupEndpoints = { POST, PATCH };
 
 export default signupEndpoints;

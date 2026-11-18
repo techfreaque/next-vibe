@@ -318,6 +318,8 @@ export const translations: typeof enTranslations = {
     accountLocked: "Konto jest zablokowane",
     accountLockedDescription:
       "Twoje konto zostało zablokowane. Skontaktuj się z pomocą techniczną.",
+    pendingEmail: "Potwierdź adres e-mail, aby się zalogować.",
+    resendPending: "Wyślij wiadomość z potwierdzeniem ponownie",
     invalid_credentials:
       "Błędny e-mail lub hasło. Nie masz jeszcze konta? Najpierw się zarejestruj.",
     two_factor_required: "Wymagana dwuskładnikowa autoryzacja",

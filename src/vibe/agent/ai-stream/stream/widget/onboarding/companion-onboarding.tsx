@@ -46,7 +46,7 @@ import { useUncensoredConsent } from "../../../../models/uncensored-consent/hook
 import { UncensoredConsentTerms } from "../../../../models/uncensored-consent/widget/consent-terms";
 import skillSingleDefinition from "../../../../skills/[id]/definition";
 import { useChatFavorites } from "../../../../skills/favorites/hooks/hooks";
-import { getBestChatModel } from "../../../models";
+import { getBestChatModel, getChatModelById } from "../../../models";
 import { useChatInputStore } from "../../hooks/input-store";
 import { getDraftKey, saveDraft } from "../../hooks/use-input-autosave";
 import { scopedTranslation } from "../../i18n";
@@ -119,7 +119,6 @@ export function CompanionOnboarding(): JSX.Element | null {
   const storeArrival = useArrivalStore((s) => s.pendingSkillId);
   const setPendingSkillId = useArrivalStore((s) => s.setPendingSkillId);
   const setOnboardingOpen = useModelSelectorState((s) => s.setOnboardingOpen);
-  const setOnboardingReady = useModelSelectorState((s) => s.setOnboardingReady);
   const arrivalSkillParam = storeArrival ?? urlArrival;
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
   const currentRootFolderId = useChatNavigationStore(
@@ -243,16 +242,14 @@ export function CompanionOnboarding(): JSX.Element | null {
         if (!favorite) {
           return false;
         }
-        await activateFavorite(favorite, deps);
+        const arrivalModel = existing?.modelId
+          ? getChatModelById(existing.modelId)
+          : getBestChatModel(variant.modelSelection, user, availability);
+        await activateFavorite(favorite, deps, arrivalModel?.id ?? null);
         await refreshFavorites(logger);
         if (!mayAsk) {
           return false;
         }
-        const arrivalModel = getBestChatModel(
-          variant.modelSelection,
-          user,
-          availability,
-        );
         show({
           mode: "arrival",
           arrivalSkillName: skill.name ?? baseId,
@@ -463,19 +460,12 @@ export function CompanionOnboarding(): JSX.Element | null {
       step: "companion",
       companionId,
     });
-    if (plan.mode === "arrival") {
-      setOnboardingReady({
-        addedSkills: [],
-        hasPrompt: useChatInputStore.getState().input.trim().length > 0,
-      });
-    }
     finish();
   }, [
     plan,
     busy,
     confirmAdultsIfNeeded,
     applyCompanion,
-    setOnboardingReady,
     companionId,
     logger,
     finish,
@@ -507,10 +497,6 @@ export function CompanionOnboarding(): JSX.Element | null {
       await activateFavorite({ id: composite, skillId: composite }, deps);
     }
     prefillComposer(t(`onboarding.goal.tiles.${goal.id}.prompt`));
-    setOnboardingReady({
-      addedSkills: goalSkillNames(goal, locale),
-      hasPrompt: true,
-    });
     trackOnboarding(logger, "goal_picked", {
       mode: plan.mode,
       step: "goal",
@@ -529,8 +515,6 @@ export function CompanionOnboarding(): JSX.Element | null {
     busy,
     goalId,
     confirmAdultsIfNeeded,
-    setOnboardingReady,
-    locale,
     deps,
     prefillComposer,
     t,

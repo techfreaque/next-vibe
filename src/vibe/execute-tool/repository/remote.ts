@@ -145,10 +145,15 @@ export class RemoteDispatch {
 
     // A real connection row is required either way — it resolves the wire leg.
     if (connInfo === null) {
-      logger.warn("[RouteExecute] no connection for instance - rejecting", {
-        toolName,
-        instanceId,
-      });
+      logger.warn(
+        "[RouteExecute] caller has no active connection for instance",
+        {
+          toolName,
+          instanceId,
+          platform,
+          callbackMode: data.callbackMode ?? CallbackMode.WAIT,
+        },
+      );
       return {
         kind: "return",
         value: fail({

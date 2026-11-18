@@ -520,6 +520,7 @@ const { PATCH } = createEndpoint({
                       locale,
                       user,
                       availability,
+                      fav.variantName,
                     );
 
                   updatedFavorite.activeBadge = fav.activeBadge;
@@ -900,11 +901,13 @@ const { PATCH } = createEndpoint({
         let characterTagline: string | null = null;
         let characterDescription: string | null = null;
         let characterModelSelection = requestData.modelSelection ?? null;
+        let variantName: string | undefined;
         if (character?.success) {
           characterName = character.data.name ?? null;
           characterTagline = character.data.tagline ?? null;
           characterDescription = character.data.description ?? null;
           const variant = pickSkillVariant(character.data.variants, variantId);
+          variantName = variant?.displayName;
           characterModelSelection =
             requestData.modelSelection ?? variant?.modelSelection ?? null;
         }
@@ -943,6 +946,10 @@ const { PATCH } = createEndpoint({
                 locale,
                 user,
                 getClientAvailability(),
+                variantName ??
+                  (requestData.skillId === existing.skillId
+                    ? existing.variantName
+                    : undefined),
               );
             return {
               ...old,

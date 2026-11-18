@@ -452,16 +452,6 @@ export const translations: typeof enTranslations = {
           complex: "Tâche complexe ? Passez à {{mode}}",
         },
       },
-      ready: {
-        change: "Changer de mode",
-        title: "Prêt. Envoyez.",
-        who: "{{name}} répond avec {{model}}.",
-        whoSingle: "{{name}} répond dans cette discussion.",
-        added: "Ajoutés à vos skills : {{skills}}.",
-        prompt:
-          "Votre premier prompt est dans le champ : modifiez-le ou envoyez-le.",
-        empty: "Écrivez votre premier message.",
-      },
       single: {
         title: "Discutez avec {{name}}.",
         action: "Passez à {{companion}} pour plus de modes",

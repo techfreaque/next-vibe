@@ -70,7 +70,7 @@ export const translations: typeof enTranslations = {
       cleanup: {
         title: "Lokal aufräumen",
         description:
-          "Standardmäßig an. Nach einem erfolgreichen Lauf bleibt DIESE Build-Maschine schlank: lokale Builds von ghcr.io/techfreaque/next-vibe-app älter als die neuesten 3 verlieren ihre Tags (nie :latest, :rollback, :prod-current-good, der gerade deployte Build oder ein von einem Container genutztes Image), Docker-Build-Cache älter als 48h wird gelöscht, alte .tmp/image-build-Exporte wandern nach .tmp/todelete/image-build/. Unter 40 GB frei im Docker-Root wird schon vor dem Build aufgeräumt. Prod-Server haben einen eigenen Schalter (remoteCleanup). Aus = nur warnen.",
+          "Standardmäßig aktiv. Nach einem erfolgreichen Push bleiben lokal nur der gerade gebaute und geladene Build sowie Images, die Container nutzen. Die übrigen Tags von ghcr.io/techfreaque/next-vibe-app werden entfernt. Ältere Commit-Exporte samt Markierungsdateien wandern nach .tmp/todelete/image-build/. Docker räumt seit 24 Stunden ungenutzten Build-Cache auf und peilt 30 GB an. Unter 40 GB freiem Speicher auf dem Docker-Dateisystem greift die Bereinigung schon vor dem Build. Für die Produktivserver gilt remoteCleanup.",
       },
       remoteCleanup: {
         title: "Prod-Server aufräumen",
@@ -200,12 +200,16 @@ export const translations: typeof enTranslations = {
           "🧹 Lokales Aufräumen übersprungen: {{image}} ist nicht {{allowed}}",
         cleanupListFailed:
           "Lokales Aufräumen übersprungen, Images von {{image}} nicht auflistbar: {{error}}",
+        cleanupCurrentMissing:
+          "Der gerade geladene Build von {{image}} fehlt in der lokalen Image-Liste. Die Image-Bereinigung wurde übersprungen.",
         cleanupTagFailed:
           "Lokales {{ref}} konnte nicht entfernt werden: {{error}}",
         cleanupTagsRemoved:
-          "🧹 {{count}} alte lokale Ref(s) von {{image}} entfernt, die neuesten {{keep}} Builds bleiben: {{tags}}",
+          "🧹 {{count}} alte lokale Referenzen von {{image}} entfernt ({{tags}})",
         cleanupCachePruned:
-          "🧹 Docker-Build-Cache älter als {{hours}}h gelöscht ({{reclaimed}} frei)",
+          "🧹 Seit {{hours}} Stunden ungenutzten Docker-Build-Cache bereinigt ({{reclaimed}} frei)",
+        cleanupCacheCapped:
+          "🧹 Docker-Build-Cache bereinigt. Zielgröße {{size}} GB, {{reclaimed}} freigegeben.",
         cleanupCacheFailed:
           "Löschen des Docker-Build-Caches fehlgeschlagen: {{error}}",
         cleanupExportsParked:

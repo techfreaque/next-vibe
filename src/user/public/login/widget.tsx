@@ -294,6 +294,22 @@ export function LoginFormContainer({
 
         {!twoFactorRequired && <FormAlertWidget field={children.formAlert} />}
 
+        {response &&
+          !response.success &&
+          response.errorType.errorKey ===
+            ErrorResponseTypes.CONFLICT.errorKey && (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isSubmitting}
+              onClick={() => {
+                form?.setValue("resendPending", true);
+                onSubmit?.();
+              }}
+            >
+              {t("errors.resendPending")}
+            </Button>
+          )}
         {data?.message && (
           <AlertWidget
             fieldName="message"

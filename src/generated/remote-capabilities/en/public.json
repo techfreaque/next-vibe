@@ -29316,6 +29316,28 @@
         "response": true
       },
       "children": {
+        "saveToStudio": {
+          "hidden": true,
+          "hiddenForPlatforms": ["ai", "mcp", "cron"],
+          "type": "form_field",
+          "fieldType": "boolean",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "prompt": {
           "type": "form_field",
           "fieldType": "textarea",
@@ -30907,6 +30929,28 @@
         "response": true
       },
       "children": {
+        "saveToStudio": {
+          "hidden": true,
+          "hiddenForPlatforms": ["ai", "mcp", "cron"],
+          "type": "form_field",
+          "fieldType": "boolean",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "prompt": {
           "type": "form_field",
           "fieldType": "textarea",
@@ -71227,6 +71271,28 @@
         "response": true
       },
       "children": {
+        "saveToStudio": {
+          "hidden": true,
+          "hiddenForPlatforms": ["ai", "mcp", "cron"],
+          "type": "form_field",
+          "fieldType": "boolean",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "prompt": {
           "type": "form_field",
           "fieldType": "textarea",

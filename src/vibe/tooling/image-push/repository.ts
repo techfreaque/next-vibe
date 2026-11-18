@@ -73,22 +73,34 @@ export class ImagePushRepository {
     logger: EndpointLogger,
     t: ImagePushT,
   ): Promise<ResponseType<ImagePushResponseOutput>> {
-    const result = await ImagePushRepository.buildAndDeploy(data, logger, t);
-    // Keep the LOCAL build machine bounded once the run succeeded: old local
-    // tags, stale build cache, old export dirs. The prod servers get their own
-    // retention inside the deploy (--remoteCleanup, remote-retention.ts).
-    if (result.success && data.cleanup) {
+    const startTime = Date.now();
+    const commitResult = ImagePushRepository.resolveCommit(
+      data.commit,
+      logger,
+      t,
+    );
+    if (!commitResult.success) {
+      return commitResult;
+    }
+    const { sha, shortSha } = commitResult.data;
+    // Build-only runs never push to a registry or transfer to an SSH target.
+    const transferTarget = data.push
+      ? (data.sshTarget ?? imagePushEnv.SSH_SERVER)
+      : undefined;
+    const result = await ImagePushRepository.buildAndDeploy(
+      data,
+      { sha, shortSha, transferTarget, startTime },
+      logger,
+      t,
+    );
+    // A registry-only push leaves no new image in the local Docker store.
+    // Use the resolved commit for cleanup even if the input ref has moved.
+    if (result.success && data.push && data.cleanup) {
       const { buildRoot, repoRoot } = ImagePushRepository.buildPaths();
-      const sha = ImagePushRepository.git([
-        "rev-parse",
-        "--verify",
-        "--quiet",
-        `${data.commit}^{commit}`,
-      ]).stdout;
-      ImagePushCleanup.afterDeploy(
+      ImagePushCleanup.afterPush(
         {
           image: result.data.resolvedImage,
-          currentTags: result.data.tags,
+          currentTag: transferTarget ? shortSha : undefined,
           buildRoot,
           repoRoot,
           currentSha: sha,
@@ -102,28 +114,23 @@ export class ImagePushRepository {
 
   private static async buildAndDeploy(
     data: ImagePushRequestOutput,
+    build: {
+      sha: string;
+      shortSha: string;
+      transferTarget: string | undefined;
+      startTime: number;
+    },
     logger: EndpointLogger,
     t: ImagePushT,
   ): Promise<ResponseType<ImagePushResponseOutput>> {
-    const startTime = Date.now();
+    const { sha, shortSha, transferTarget, startTime } = build;
     const image = data.image ?? imagePushEnv.DOCKER_IMAGE_NAME;
-    const sshTarget = data.sshTarget ?? imagePushEnv.SSH_SERVER;
 
     // Build a COMMIT, never the working tree: resolve the ref, export that
     // commit's tree with `git archive` into .tmp/image-build/<sha>/ and use it
     // as the docker build context. The working tree is only read, never
     // touched (no stash/checkout/reset), and nothing uncommitted or ignored
     // (.env, data.db, .vibe.session, local WIP) can reach the image.
-    const commitResult = ImagePushRepository.resolveCommit(
-      data.commit,
-      logger,
-      t,
-    );
-    if (!commitResult.success) {
-      return commitResult;
-    }
-    const { sha, shortSha } = commitResult.data;
-
     ImagePushRepository.warnIfDirty(shortSha, logger, t);
 
     const exportResult = ImagePushRepository.exportCommit(
@@ -150,10 +157,6 @@ export class ImagePushRepository {
     // is always tagged too so every pushed image maps back to its commit.
     const tags = [...new Set([tag, shortSha, "latest"])];
     const refs = tags.map((tagName) => `${image}:${tagName}`);
-    // push=false means build-only: no registry push AND no ssh transfer or
-    // deploy, even when SSH_SERVER is set in .env.
-    const transferTarget = data.push ? sshTarget : undefined;
-
     logger.info(t("post.repository.messages.buildStart", { image, tag }));
 
     // ssh transfer needs the image loaded into this machine's local docker

@@ -1,3 +1,4 @@
+import { confirmedTestSignup } from "next-vibe/tooling/testing/testing-suite/confirmed-signup";
 /**
  * Default Companion Tests
  *
@@ -27,18 +28,13 @@ import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-te
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
-import signupDefinitions from "@/user/public/signup/definition";
-
 import { formatSkillId, parseSkillId } from "../../chat/slugify";
 import { STORAGE_KEYS } from "../../chat/constants";
 import { COMPANION_SKILLS } from "../config";
 import { FavoritesCreateRepository } from "./create/repository";
 import { scopedTranslation } from "./create/i18n";
 import { chatFavorites } from "./db";
-import {
-  DEFAULT_COMPANION_SKILL_ID,
-  getDefaultCompanionVariants,
-} from "./default-companion";
+import { DEFAULT_COMPANION_SKILL_ID, getDefaultCompanionVariants } from "./default-companion";
 import { VariantsMode } from "./enum";
 import { backfillDefaultCompanions } from "./ensure-default-companion";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
@@ -48,8 +44,7 @@ import { ChatFavoritesRepositoryClient } from "./repository-client";
 const memory = new Map<string, string>();
 vi.mock("next-vibe/ui/lib/storage", () => ({
   storage: {
-    getItem: (key: string): Promise<string | null> =>
-      Promise.resolve(memory.get(key) ?? null),
+    getItem: (key: string): Promise<string | null> => Promise.resolve(memory.get(key) ?? null),
     setItem: (key: string, value: string): Promise<void> => {
       memory.set(key, value);
       return Promise.resolve();
@@ -66,8 +61,7 @@ const TEST_TIMEOUT = 60_000;
 const logger = createEndpointLogger(false, defaultLocale);
 const { t } = scopedTranslation.scopedT(defaultLocale);
 const THEA_VARIANT_IDS = getDefaultCompanionVariants().map((v) => v.id);
-const HERMES_VARIANT_ID =
-  COMPANION_SKILLS.find((s) => s.id === "hermes")?.variants[0]?.id ?? null;
+const HERMES_VARIANT_ID = COMPANION_SKILLS.find((s) => s.id === "hermes")?.variants[0]?.id ?? null;
 
 interface Row {
   slug: string;
@@ -114,9 +108,10 @@ describe("default companion (accounts)", () => {
     await db.delete(chatFavorites).where(eq(chatFavorites.userId, user.id));
   });
 
-  function create(skillId: string, relayed = false): ReturnType<
-    typeof FavoritesCreateRepository.createFavorite
-  > {
+  function create(
+    skillId: string,
+    relayed = false,
+  ): ReturnType<typeof FavoritesCreateRepository.createFavorite> {
     return FavoritesCreateRepository.createFavorite(
       { skillId },
       user,
@@ -138,9 +133,7 @@ describe("default companion (accounts)", () => {
       const chan = rows.filter((r) => r.skillId === "4chan");
       const thea = rows.filter((r) => r.skillId === DEFAULT_COMPANION_SKILL_ID);
       expect(chan).toHaveLength(1);
-      expect(thea.map((r) => r.variantId).toSorted()).toEqual(
-        [...THEA_VARIANT_IDS].toSorted(),
-      );
+      expect(thea.map((r) => r.variantId).toSorted()).toEqual([...THEA_VARIANT_IDS].toSorted());
       // The added skill keeps its slug; companions sit after it.
       expect(result.success && result.data.id).toBe(chan[0]?.slug);
       for (const row of thea) {
@@ -157,9 +150,7 @@ describe("default companion (accounts)", () => {
     async () => {
       const results = await Promise.all([create("4chan"), create("4chan")]);
       expect(results.every((r) => r.success)).toBe(true);
-      const thea = (await rowsFor(user.id)).filter(
-        (r) => r.skillId === DEFAULT_COMPANION_SKILL_ID,
-      );
+      const thea = (await rowsFor(user.id)).filter((r) => r.skillId === DEFAULT_COMPANION_SKILL_ID);
       expect(thea).toHaveLength(THEA_VARIANT_IDS.length);
     },
     TEST_TIMEOUT,
@@ -172,9 +163,7 @@ describe("default companion (accounts)", () => {
       expect(hermes.success).toBe(true);
       expect((await create("4chan")).success).toBe(true);
       const rows = await rowsFor(user.id);
-      expect(rows.some((r) => r.skillId === DEFAULT_COMPANION_SKILL_ID)).toBe(
-        false,
-      );
+      expect(rows.some((r) => r.skillId === DEFAULT_COMPANION_SKILL_ID)).toBe(false);
       expect(rows.filter((r) => r.skillId === "4chan")).toHaveLength(1);
     },
     TEST_TIMEOUT,
@@ -184,9 +173,7 @@ describe("default companion (accounts)", () => {
     "adding Thea itself adds nothing extra",
     async () => {
       const variantId = THEA_VARIANT_IDS[0] ?? null;
-      const result = await create(
-        formatSkillId(DEFAULT_COMPANION_SKILL_ID, variantId),
-      );
+      const result = await create(formatSkillId(DEFAULT_COMPANION_SKILL_ID, variantId));
       expect(result.success).toBe(true);
       const rows = await rowsFor(user.id);
       expect(rows).toHaveLength(1);
@@ -208,8 +195,7 @@ describe("default companion (accounts)", () => {
         rowsInserted: THEA_VARIANT_IDS.length,
       });
       const rows = await rowsFor(user.id);
-      const chanPosition =
-        rows.find((r) => r.skillId === "4chan")?.position ?? 0;
+      const chanPosition = rows.find((r) => r.skillId === "4chan")?.position ?? 0;
       const thea = rows.filter((r) => r.skillId === DEFAULT_COMPANION_SKILL_ID);
       expect(thea).toHaveLength(THEA_VARIANT_IDS.length);
       expect(thea.every((r) => r.position > chanPosition)).toBe(true);
@@ -248,8 +234,7 @@ describe("default companion (signup migration)", () => {
     "migrated guest favorites without a companion get Thea",
     async () => {
       const email = `default-companion-signup-${Date.now()}@example.com`;
-      const { language, country } =
-        getLanguageAndCountryFromLocale(defaultLocale);
+      const { language, country } = getLanguageAndCountryFromLocale(defaultLocale);
       const [lead] = await db
         .insert(leads)
         .values({
@@ -261,9 +246,8 @@ describe("default companion (signup migration)", () => {
           language,
         })
         .returning({ id: leads.id });
-      const signup = await sendTestRequest({
-        endpoint: signupDefinitions.POST,
-        data: {
+      const signup = await confirmedTestSignup(
+        {
           privateName: "Companion Signup",
           publicName: "Companion Signup",
           email,
@@ -273,27 +257,23 @@ describe("default companion (signup migration)", () => {
           subscribeToNewsletter: false,
           localFavorites: [{ skillId: "4chan" }],
         },
-        user: {
+        {
           isPublic: true,
           leadId: lead?.id ?? "",
           roles: [UserPermissionRole.PUBLIC],
         },
-        toolExecutionContext: undefined,
-      });
+      );
       expect(signup.success).toBe(true);
 
-      const [created] = await db
-        .select({ id: users.id })
-        .from(users)
-        .where(eq(users.email, email));
+      const [created] = await db.select({ id: users.id }).from(users).where(eq(users.email, email));
       userId = created?.id ?? null;
       expect(userId).not.toBeNull();
 
       const rows = await rowsFor(userId ?? "");
       expect(rows.filter((r) => r.skillId === "4chan")).toHaveLength(1);
-      expect(
-        rows.filter((r) => r.skillId === DEFAULT_COMPANION_SKILL_ID),
-      ).toHaveLength(THEA_VARIANT_IDS.length);
+      expect(rows.filter((r) => r.skillId === DEFAULT_COMPANION_SKILL_ID)).toHaveLength(
+        THEA_VARIANT_IDS.length,
+      );
     },
     TEST_TIMEOUT,
   );
@@ -309,7 +289,7 @@ describe("default companion (guests, localStorage)", () => {
   });
 
   async function stored(): Promise<z.output<typeof storedSchema>> {
-    const raw = await storage.getItem(STORAGE_KEYS.FAVORITE_CHARACTERS);
+    const raw = await storage.getItem(STORAGE_KEYS.FAVORITE_CHARACTERS, logger);
     return raw ? storedSchema.parse(JSON.parse(raw)) : [];
   }
 
@@ -322,15 +302,9 @@ describe("default companion (guests, localStorage)", () => {
     expect(result.success).toBe(true);
     const rows = await stored();
     expect(rows[0]).toMatchObject({ id: "4chan", skillId: "4chan", position: 0 });
-    const thea = rows.filter(
-      (r) => parseSkillId(r.skillId).skillId === DEFAULT_COMPANION_SKILL_ID,
-    );
-    expect(thea.map((r) => parseSkillId(r.skillId).variantId)).toEqual(
-      THEA_VARIANT_IDS,
-    );
-    expect(thea.map((r) => r.position)).toEqual(
-      THEA_VARIANT_IDS.map((_, i) => i + 1),
-    );
+    const thea = rows.filter((r) => parseSkillId(r.skillId).skillId === DEFAULT_COMPANION_SKILL_ID);
+    expect(thea.map((r) => parseSkillId(r.skillId).variantId)).toEqual(THEA_VARIANT_IDS);
+    expect(thea.map((r) => r.position)).toEqual(THEA_VARIANT_IDS.map((_, i) => i + 1));
   });
 
   it("adding 4chan with Hermes stored adds no Thea", async () => {
@@ -339,27 +313,18 @@ describe("default companion (guests, localStorage)", () => {
       logger,
       defaultLocale,
     );
-    await ChatFavoritesRepositoryClient.createFavorite(
-      { skillId: "4chan" },
-      logger,
-      defaultLocale,
-    );
+    await ChatFavoritesRepositoryClient.createFavorite({ skillId: "4chan" }, logger, defaultLocale);
     const rows = await stored();
     expect(rows).toHaveLength(2);
-    expect(
-      rows.some(
-        (r) => parseSkillId(r.skillId).skillId === DEFAULT_COMPANION_SKILL_ID,
-      ),
-    ).toBe(false);
+    expect(rows.some((r) => parseSkillId(r.skillId).skillId === DEFAULT_COMPANION_SKILL_ID)).toBe(
+      false,
+    );
   });
 
   it("adding Thea itself stores only that favorite", async () => {
     await ChatFavoritesRepositoryClient.createFavorite(
       {
-        skillId: formatSkillId(
-          DEFAULT_COMPANION_SKILL_ID,
-          THEA_VARIANT_IDS[0] ?? null,
-        ),
+        skillId: formatSkillId(DEFAULT_COMPANION_SKILL_ID, THEA_VARIANT_IDS[0] ?? null),
       },
       logger,
       defaultLocale,

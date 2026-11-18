@@ -25,6 +25,7 @@ function socketData(
     },
     channels: new Set(["a", "b"]),
     connectedAt: NOW - connectedAgoMs,
+    requestId: "ws-test-123",
     lastInboundAt: NOW - silentForMs,
     pongCount,
   };
@@ -46,8 +47,10 @@ describe("WS keepalive", () => {
     );
     expect(d.kind).toBe("idle-timeout");
     expect(d.meta).toEqual({
+      requestId: "ws-test-123",
       code: 1006,
       reason: "WebSocket timed out from inactivity",
+      idleEvidence: "bun-close-reason",
       connectedForMs: 125_000,
       sinceLastInboundMs: 40_000,
       pongCount: 3,
@@ -58,9 +61,9 @@ describe("WS keepalive", () => {
   });
 
   it("treats a reasonless 1006 after a full idle window as idle-timeout", () => {
-    expect(
-      diagnoseWsClose(socketData(90_000, 40_500, 0), 1006, "", NOW).kind,
-    ).toBe("idle-timeout");
+    const d = diagnoseWsClose(socketData(90_000, 40_500, 0), 1006, "", NOW);
+    expect(d.kind).toBe("idle-timeout");
+    expect(d.meta.idleEvidence).toBe("silent-window");
   });
 
   it("reports a 1006 cut mid-window as a drop", () => {

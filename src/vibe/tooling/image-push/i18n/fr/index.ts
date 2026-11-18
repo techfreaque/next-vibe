@@ -70,7 +70,7 @@ export const translations: typeof enTranslations = {
       cleanup: {
         title: "Nettoyer en local",
         description:
-          "Activé par défaut. Après un run réussi, garde CETTE machine de build sous contrôle : retire les tags des builds locaux de ghcr.io/techfreaque/next-vibe-app plus anciens que les 3 plus récents (jamais :latest, :rollback, :prod-current-good, le build tout juste déployé ni une image utilisée par un conteneur), purge le cache de build Docker de plus de 48h et déplace les anciens exports .tmp/image-build vers .tmp/todelete/image-build/. Sous 40 Go libres sur la racine Docker, purge aussi avant le build. Les serveurs de prod ont leur propre option (remoteCleanup). Désactivé = avertissement uniquement.",
+          "Activé par défaut. Après l’envoi réussi d’une image, seuls restent en local le build qui vient d’être chargé et les images utilisées par des conteneurs. Les autres tags locaux de ghcr.io/techfreaque/next-vibe-app sont retirés. Les anciens exports de commits et leurs fichiers témoins sont déplacés dans .tmp/todelete/image-build/. Docker purge le cache de build inutilisé depuis 24 heures et vise 30 Go. S’il reste moins de 40 Go sur le disque de Docker, le nettoyage démarre avant le build. L’option remoteCleanup s’applique aux serveurs de production.",
       },
       remoteCleanup: {
         title: "Nettoyer les serveurs de prod",
@@ -206,12 +206,16 @@ export const translations: typeof enTranslations = {
           "🧹 Nettoyage local ignoré : {{image}} n'est pas {{allowed}}",
         cleanupListFailed:
           "Nettoyage local ignoré, impossible de lister les images de {{image}} : {{error}}",
+        cleanupCurrentMissing:
+          "Le build de {{image}} qui vient d’être chargé est introuvable. Le nettoyage des images locales a été ignoré.",
         cleanupTagFailed:
           "Impossible de supprimer {{ref}} en local : {{error}}",
         cleanupTagsRemoved:
-          "🧹 {{count}} ancienne(s) référence(s) locale(s) de {{image}} supprimée(s), {{keep}} builds les plus récents conservés : {{tags}}",
+          "🧹 Références locales de {{image}} supprimées ({{count}}) : {{tags}}",
         cleanupCachePruned:
-          "🧹 Cache de build Docker de plus de {{hours}}h purgé ({{reclaimed}} récupérés)",
+          "🧹 Cache de build Docker inutilisé depuis {{hours}} heures purgé ({{reclaimed}} récupérés)",
+        cleanupCacheCapped:
+          "🧹 Cache de build Docker purgé. Cible de {{size}} Go, {{reclaimed}} récupérés.",
         cleanupCacheFailed:
           "Échec de la purge du cache de build Docker : {{error}}",
         cleanupExportsParked:

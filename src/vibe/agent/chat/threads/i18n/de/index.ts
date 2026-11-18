@@ -448,15 +448,6 @@ export const translations: typeof enTranslations = {
           complex: "Komplexe Aufgabe? Wechsle zu {{mode}}",
         },
       },
-      ready: {
-        change: "Modus ändern",
-        title: "Bereit. Einfach absenden.",
-        who: "{{name}} antwortet mit {{model}}.",
-        whoSingle: "{{name}} antwortet in diesem Chat.",
-        added: "Neu in deinen Skills: {{skills}}.",
-        prompt: "Dein erster Prompt steht im Feld: anpassen oder absenden.",
-        empty: "Schreib deine erste Nachricht.",
-      },
       single: {
         title: "Chatte mit {{name}}.",
         action: "Zu {{companion}} wechseln, für mehr Modi",

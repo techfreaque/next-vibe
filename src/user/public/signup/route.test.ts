@@ -4,9 +4,10 @@ import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import signupEndpoints from "./definition";
+import { setMxResolverForTests } from "./disposable-mx";
 import { scopedTranslation } from "./i18n";
 
 const endpoint = signupEndpoints.POST;
@@ -15,8 +16,11 @@ describe("POST /user/public/signup", () => {
   let adminUser: JwtPrivatePayloadType;
 
   beforeAll(async () => {
+    setMxResolverForTests(async () => ["mx.fixture.invalid"]);
     adminUser = await resolveTestAdminUser();
   });
+
+  afterAll(() => setMxResolverForTests(null));
 
   const publicUser = () => ({
     isPublic: true as const,
@@ -27,7 +31,7 @@ describe("POST /user/public/signup", () => {
   const uniqueEmail = () =>
     `test-signup-${Date.now()}-${Math.floor(Math.random() * 10000)}@example-test.invalid`;
 
-  it("creates a new account successfully and returns a message", async () => {
+  it("starts a pending signup and returns the confirmation reference", async () => {
     const res = await sendTestRequest({
       toolExecutionContext: undefined,
       endpoint,
@@ -43,16 +47,16 @@ describe("POST /user/public/signup", () => {
       user: publicUser(),
     });
 
-    expect(
-      res.success,
-      `Signup failed: ${String(res.success === false && res.message)}`,
-    ).toBe(true);
+    expect(res.success, `Signup failed: ${String(res.success === false && res.message)}`).toBe(
+      true,
+    );
     if (!res.success) return;
+    expect(res.data.pendingId).toBeTypeOf("string");
     expect(res.data.message).toBeTypeOf("string");
     expect(res.data.message.length).toBeGreaterThan(0);
   });
 
-  it("rejects duplicate email with CONFLICT", async () => {
+  it("throttles repeated confirmation mail to the same address", async () => {
     const email = uniqueEmail();
 
     const first = await sendTestRequest({
@@ -93,9 +97,7 @@ describe("POST /user/public/signup", () => {
     expect(second.success).toBe(false);
     if (second.success) return;
     // Repository returns VALIDATION_ERROR for duplicate email (field-level error, not 409)
-    expect(second.errorType?.errorCode).toBe(
-      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
-    );
+    expect(second.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
   });
 
   it("rejects weak password (too short) with VALIDATION_ERROR", async () => {
@@ -116,9 +118,7 @@ describe("POST /user/public/signup", () => {
 
     expect(res.success).toBe(false);
     if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(
-      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
-    );
+    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
   });
 
   it("rejects password without uppercase with VALIDATION_ERROR", async () => {
@@ -139,9 +139,7 @@ describe("POST /user/public/signup", () => {
 
     expect(res.success).toBe(false);
     if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(
-      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
-    );
+    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
   });
 
   it("rejects invalid email format with VALIDATION_ERROR", async () => {
@@ -162,9 +160,7 @@ describe("POST /user/public/signup", () => {
 
     expect(res.success).toBe(false);
     if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(
-      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
-    );
+    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
   });
 
   it("rejects if acceptTerms is false with VALIDATION_ERROR", async () => {
@@ -185,9 +181,7 @@ describe("POST /user/public/signup", () => {
 
     expect(res.success).toBe(false);
     if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(
-      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
-    );
+    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
   });
 
   it("rejects privateName shorter than 2 chars with VALIDATION_ERROR", async () => {
@@ -208,9 +202,7 @@ describe("POST /user/public/signup", () => {
 
     expect(res.success).toBe(false);
     if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(
-      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
-    );
+    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
   });
 
   it("email is stored lowercase even if submitted with uppercase", async () => {
@@ -258,13 +250,9 @@ describe("POST /user/public/signup", () => {
 
     expect(res.success).toBe(false);
     if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(
-      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
-    );
+    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
     expect(res.message).toBe(
-      scopedTranslation
-        .scopedT(defaultLocale)
-        .t("fields.referralCode.validation.invalid"),
+      scopedTranslation.scopedT(defaultLocale).t("fields.referralCode.validation.invalid"),
     );
 
     // Nothing was created — the same email still signs up cleanly

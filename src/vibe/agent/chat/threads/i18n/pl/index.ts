@@ -443,15 +443,6 @@ export const translations: typeof enTranslations = {
           complex: "Złożone zadanie? Przełącz na: {{mode}}",
         },
       },
-      ready: {
-        change: "Zmień tryb",
-        title: "Gotowe. Wyślij.",
-        who: "{{name}} odpowiada na modelu {{model}}.",
-        whoSingle: "{{name}} odpowiada w tym czacie.",
-        added: "Dodano do twoich umiejętności: {{skills}}.",
-        prompt: "Pierwszy prompt jest już w polu: popraw go albo wyślij.",
-        empty: "Napisz pierwszą wiadomość.",
-      },
       single: {
         title: "Rozmawiasz z: {{name}}.",
         action: "Przełącz na {{companion}}, by mieć więcej trybów",

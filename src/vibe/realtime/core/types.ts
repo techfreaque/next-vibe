@@ -261,6 +261,8 @@ export interface WsConnectionData {
   channels: Set<string>;
   /** Connection timestamp */
   connectedAt: number;
+  /** Browser-generated id used only to correlate client and server logs. */
+  requestId?: string;
   /**
    * Last time the client proved it was alive: a message or a pong to the
    * server's keepalive ping. The close log reports the silence before a drop,

@@ -68,7 +68,7 @@ export const translations = {
       cleanup: {
         title: "Clean up locally",
         description:
-          "Default on. After a successful run, keep THIS build machine bounded: untag local builds of ghcr.io/techfreaque/next-vibe-app older than the newest 3 (never :latest, :rollback, :prod-current-good, the build just deployed, or an image a container uses), prune Docker build cache older than 48h, and move old .tmp/image-build exports to .tmp/todelete/image-build/. Below 40 GB free on the Docker root it also prunes before the build. Prod servers have their own switch (remoteCleanup). Off = warn only.",
+          "On by default. After a successful push, keep the newly loaded image and images used by containers. Remove other local ghcr.io/techfreaque/next-vibe-app tags. Move all other commit exports and their markers to .tmp/todelete/image-build/. Prune Docker build cache unused for at least 24 hours and target 30 GB. Below 40 GB free on the Docker filesystem, cleanup also runs before the build. Use remoteCleanup for the production servers.",
       },
       remoteCleanup: {
         title: "Clean up prod servers",
@@ -193,11 +193,15 @@ export const translations = {
           "🧹 Local cleanup skipped: {{image}} is not {{allowed}}",
         cleanupListFailed:
           "Local cleanup skipped, could not list images of {{image}}: {{error}}",
+        cleanupCurrentMissing:
+          "Skipped local image cleanup because the build just loaded for {{image}} could not be found.",
         cleanupTagFailed: "Could not remove local {{ref}}: {{error}}",
         cleanupTagsRemoved:
-          "🧹 Removed {{count}} old local ref(s) of {{image}}, kept the newest {{keep}} builds: {{tags}}",
+          "🧹 Removed {{count}} old local refs for {{image}} ({{tags}})",
         cleanupCachePruned:
-          "🧹 Pruned Docker build cache older than {{hours}}h ({{reclaimed}} reclaimed)",
+          "🧹 Pruned Docker build cache unused for at least {{hours}} hours ({{reclaimed}} reclaimed)",
+        cleanupCacheCapped:
+          "🧹 Pruned Docker build cache to target {{size}} GB ({{reclaimed}} reclaimed)",
         cleanupCacheFailed: "Pruning the Docker build cache failed: {{error}}",
         cleanupExportsParked:
           "🧹 Moved {{count}} old commit export(s) to {{dir}}",

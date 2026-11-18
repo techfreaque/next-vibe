@@ -1,4 +1,35 @@
 export const translations = {
+  confirmation: {
+    description: "Finish signup with the code or link from your email.",
+    title: "Check your inbox",
+    sent: "Enter the code we sent to {{email}}. It expires in 30 minutes.",
+    code: "6-digit code",
+    confirm: "Confirm and sign in",
+    change: "Wrong address? Change it",
+    resend: "Resend code",
+    countdown: "Resend in {{seconds}}s",
+    save: "Send to this address",
+    cancel: "Cancel",
+    email: "Email address",
+    hint: "Enter this code to finish creating your account, or use the link below within 30 minutes.",
+    bounce:
+      "The confirmation email to {{email}} bounced. Check the address and change it to get a new code.",
+    invalid: "This code or link is invalid or has expired. Request a new code.",
+    cooldown: "Too many requests. Wait before asking for another code.",
+    domain: "This domain cannot receive email. Check the address.",
+    sendFailed:
+      "We could not send the email to {{email}}. Check the address or try sending again.",
+    done: "Email confirmed. You are signed in.",
+    newsletter:
+      "Confirming also signs you up for the newsletter you requested.",
+    link: "Confirm my email",
+    pendingId: "Signup reference",
+    token: "Email confirmation link token",
+    callback: "Return path",
+    suggestion: "Did you mean {{email}}?",
+    expired: "This signup has expired. Start again to get a new code.",
+    retry: "Start signup again",
+  },
   category: "Users",
 
   _components: {
@@ -91,8 +122,8 @@ export const translations = {
     description: "Every model. Your rules. Free to start.",
   },
   actions: {
-    submit: "Create Account",
-    submitting: "Creating Account...",
+    submit: "Send confirmation code",
+    submitting: "Sending code…",
   },
   fields: {
     privateName: {
@@ -147,12 +178,12 @@ export const translations = {
     subscribeToNewsletter: {
       label: "Join the newsletter for bonus free credits every month",
       description:
-        "Adds the account email to the newsletter. Once the verification email link is clicked, the account gets bonus free credits every month while subscribed. One bonus per account.",
+        "Confirm your address to activate the monthly newsletter bonus.",
       checkboxLabel:
         "Join the newsletter: +{{credits}} free credits every month",
-      hint: "New models and product news every few weeks. Your verification email confirms it. Unsubscribe anytime.",
+      hint: "New models and product news every few weeks. Unsubscribe anytime.",
       tooltip:
-        "Tick it and we add you to the newsletter. Once you click the link in your verification email, your account gets {{credits}} extra free credits every month, {{total}} in total, for as long as you stay subscribed. One bonus per account.",
+        "Confirm your email to get {{credits}} extra credits each month, {{total}} in total, for as long as you stay subscribed.",
     },
     acceptTerms: {
       label: "I accept the terms",
@@ -400,8 +431,8 @@ export const translations = {
     nextSteps: "Next Steps",
   },
   success: {
-    title: "Signup Successful",
-    description: "Your account has been created successfully",
+    title: "Check your inbox",
+    description: "Enter the code from your email.",
   },
   admin_notification: {
     title: "New User Signup",

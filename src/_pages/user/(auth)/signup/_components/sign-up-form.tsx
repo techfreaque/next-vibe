@@ -5,7 +5,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
-import { assignUrl } from "next-vibe/ui/lib/location";
+import { replaceUrl } from "next-vibe/ui/lib/location";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import { useEffect, useState } from "react";
 
@@ -32,6 +32,7 @@ export default function SignUpForm({
   const [autoPrefillData, setAutoPrefillData] = useState<
     | {
         referralCode?: string;
+        callbackUrl?: string;
         localFavorites?: Awaited<
           ReturnType<
             typeof ChatFavoritesRepositoryClient.getLocalFavoritesForMigration
@@ -51,12 +52,13 @@ export default function SignUpForm({
       const supportedSkillId =
         await ChatFavoritesRepositoryClient.getLastAttributedSkillId(logger);
       setAutoPrefillData({
+        ...(callbackUrl ? { callbackUrl } : {}),
         ...(initialReferralCode ? { referralCode: initialReferralCode } : {}),
         ...(localFavorites.length > 0 ? { localFavorites } : {}),
         ...(supportedSkillId ? { supportedSkillId } : {}),
       });
     })();
-  }, [initialReferralCode, logger]);
+  }, [callbackUrl, initialReferralCode, logger]);
 
   return (
     <EndpointsPage
@@ -69,13 +71,10 @@ export default function SignUpForm({
         create: {
           autoPrefillData,
           mutationOptions: {
-            onSuccess: () => {
-              // Full page load, same as login: signup swaps the lead cookie
-              // for a session, and only a fresh load reconnects the shared
-              // WebSocket with it. A client push kept the guest socket, so
-              // every user channel (credits, folders, favorites, private
-              // threads) was denied until the next reload.
-              assignUrl(callbackUrl ?? `/${locale}`);
+            onSuccess: ({ responseData }) => {
+              replaceUrl(
+                `/${locale}/user/signup?pending=${encodeURIComponent(responseData.pendingId)}`,
+              );
             },
           },
         },

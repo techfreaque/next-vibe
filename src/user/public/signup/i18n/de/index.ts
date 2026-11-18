@@ -1,6 +1,40 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  confirmation: {
+    description:
+      "Schließe die Registrierung mit dem Code oder Link aus deiner E-Mail ab.",
+    title: "Schau in dein Postfach",
+    sent: "Gib den Code ein, den wir an {{email}} geschickt haben. Er gilt 30 Minuten.",
+    code: "6-stelliger Code",
+    confirm: "Bestätigen und anmelden",
+    change: "Falsche Adresse? Jetzt ändern",
+    resend: "Code erneut senden",
+    countdown: "Neuer Code in {{seconds}} s",
+    save: "An diese Adresse senden",
+    cancel: "Abbrechen",
+    email: "E-Mail-Adresse",
+    hint: "Gib diesen Code ein oder öffne den Link unten, um dein Konto zu erstellen. Beides gilt 30 Minuten.",
+    bounce:
+      "Die Bestätigungsmail an {{email}} kam zurück. Korrigiere deine Adresse, um einen neuen Code zu erhalten.",
+    invalid:
+      "Code oder Link ist ungültig oder abgelaufen. Fordere einen neuen Code an.",
+    cooldown:
+      "Zu viele Anfragen. Warte bitte, bevor du einen neuen Code anforderst.",
+    domain: "Diese Domain kann keine E-Mails empfangen. Prüfe die Adresse.",
+    sendFailed:
+      "Wir konnten die E-Mail an {{email}} nicht senden. Prüfe die Adresse oder versuche es erneut.",
+    done: "E-Mail bestätigt. Du bist angemeldet.",
+    newsletter: "Damit bestätigst du auch deine Anmeldung zum Newsletter.",
+    link: "E-Mail-Adresse bestätigen",
+    pendingId: "Registrierungskennung",
+    token: "Token aus dem Bestätigungslink",
+    callback: "Rücksprungpfad",
+    suggestion: "Meintest du {{email}}?",
+    expired:
+      "Diese Registrierung ist abgelaufen. Starte sie erneut, um einen neuen Code zu erhalten.",
+    retry: "Registrierung neu starten",
+  },
   category: "Benutzer",
 
   _components: {
@@ -89,8 +123,8 @@ export const translations: typeof enTranslations = {
   description: "Endpunkt zur Benutzerregistrierung",
   tag: "Authentifizierung",
   actions: {
-    submit: "Konto erstellen",
-    submitting: "Konto wird erstellt...",
+    submit: "Bestätigungscode senden",
+    submitting: "Code wird gesendet…",
   },
   fields: {
     privateName: {
@@ -160,12 +194,12 @@ export const translations: typeof enTranslations = {
     subscribeToNewsletter: {
       label: "Newsletter abonnieren für monatliche Bonus-Credits",
       description:
-        "Trägt die Konto-E-Mail in den Newsletter ein. Sobald der Link in der Verifizierungs-Mail geklickt ist, bekommt das Konto jeden Monat Bonus-Credits, solange das Abo läuft. Ein Bonus pro Konto.",
+        "Mit der E-Mail-Bestätigung wird auch dein monatlicher Newsletter-Bonus aktiv.",
       checkboxLabel:
         "Newsletter abonnieren: +{{credits}} Gratis-Credits jeden Monat",
-      hint: "Neue Modelle und Produkt-News alle paar Wochen. Bestätigt wird über deine Verifizierungs-Mail. Jederzeit abbestellbar.",
+      hint: "Alle paar Wochen neue Modelle und Produktnews. Jederzeit abbestellbar.",
       tooltip:
-        "Mit dem Häkchen trägst du dich in den Newsletter ein. Sobald du den Link in deiner Verifizierungs-Mail klickst, bekommt dein Konto jeden Monat {{credits}} zusätzliche Gratis-Credits, insgesamt {{total}}, solange du abonniert bleibst. Ein Bonus pro Konto.",
+        "Bestätige deine Adresse und du erhältst monatlich {{credits}} zusätzliche Credits, insgesamt {{total}}, solange du den Newsletter abonniert hast.",
     },
 
     referralCode: {
@@ -409,8 +443,8 @@ export const translations: typeof enTranslations = {
     nextSteps: "Nächste Schritte",
   },
   success: {
-    title: "Registrierung erfolgreich",
-    description: "Dein Konto wurde erfolgreich erstellt",
+    title: "Schau in dein Postfach",
+    description: "Gib den Code aus deiner Bestätigungsmail ein.",
   },
   admin_notification: {
     title: "Neue Benutzeranmeldung",

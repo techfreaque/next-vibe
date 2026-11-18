@@ -26,7 +26,7 @@ export const { POST, tools } = endpointsHandler({
       toolExecutionContext,
       platform,
     }) =>
-      MusicGenerationRepository.generateMusic(
+      MusicGenerationRepository.submit(
         data,
         user,
         locale,

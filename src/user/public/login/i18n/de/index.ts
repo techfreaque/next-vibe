@@ -319,6 +319,8 @@ export const translations: typeof enTranslations = {
     accountLocked: "Konto ist gesperrt",
     accountLockedDescription:
       "Ihr Konto wurde gesperrt. Bitte kontaktieren Sie den Support.",
+    pendingEmail: "Bestätige zuerst deine E-Mail-Adresse, um dich anzumelden.",
+    resendPending: "Bestätigungsmail erneut senden",
     invalid_credentials:
       "E-Mail oder Passwort falsch. Noch kein Konto? Erst registrieren.",
     two_factor_required: "Zwei-Faktor-Authentifizierung erforderlich",
