@@ -121,9 +121,13 @@ export interface DomGuardEvent {
   parentNode: string;
   targetNode: string;
   targetActualParent: string | null;
-  /** 1-based count of guard hits on this page load */
+  /** 1-based count of guard hits on this page load (summary: total so far) */
   occurrence: number;
   path: string;
+  /** Summary of the hits after the first one on this page load */
+  summary: boolean;
+  /** Summary only: "operation:resolution=count" list */
+  operations: string | null;
 }
 
 export type DomGuardReporter = (
@@ -131,12 +135,21 @@ export type DomGuardReporter = (
   hints: DomEnvironmentHints,
 ) => void;
 
-/** Only the first N hits per page load are reported (one translation pass can fire hundreds). */
-const MAX_REPORTED_PER_PAGE = 10;
-const MAX_BUFFERED = MAX_REPORTED_PER_PAGE;
+/**
+ * One translation pass fires dozens of hits, each naming a different text
+ * node (prod: 30 rows from 3 page loads). The FIRST hit per page load is
+ * reported with full context; later hits are counted and sent once as a
+ * summary SUMMARY_DELAY_MS after the first.
+ */
+const MAX_BUFFERED = 1;
+const SUMMARY_DELAY_MS = 30_000;
+const SUMMARY_SAMPLE_LIMIT = 5;
 
 let installed = false;
 let occurrences = 0;
+let summaryArmed = false;
+const laterOperations = new Map<string, number>();
+const laterSamples: string[] = [];
 let reporter: DomGuardReporter | null = null;
 const buffered: DomGuardEvent[] = [];
 
@@ -165,7 +178,13 @@ function record(
   target: Node,
 ): void {
   occurrences += 1;
-  if (occurrences > MAX_REPORTED_PER_PAGE) {
+  if (occurrences > 1) {
+    const kind = `${operation}:${resolution}`;
+    laterOperations.set(kind, (laterOperations.get(kind) ?? 0) + 1);
+    if (laterSamples.length < SUMMARY_SAMPLE_LIMIT) {
+      laterSamples.push(describeNode(target));
+    }
+    armSummary();
     return;
   }
   const event: DomGuardEvent = {
@@ -178,6 +197,8 @@ function record(
       : null,
     occurrence: occurrences,
     path: window.location.pathname,
+    summary: false,
+    operations: null,
   };
   if (reporter) {
     reporter(event, getDomEnvironmentHints());
@@ -190,6 +211,42 @@ function record(
   if (buffered.length < MAX_BUFFERED) {
     buffered.push(event);
   }
+}
+
+/** Send one summary of the hits after the first on this page load. */
+function armSummary(): void {
+  if (summaryArmed) {
+    return;
+  }
+  summaryArmed = true;
+  setTimeout(() => {
+    summaryArmed = false;
+    if (laterOperations.size === 0) {
+      return;
+    }
+    const event: DomGuardEvent = {
+      operation: "insertBefore",
+      resolution: "appended",
+      parentNode: "summary",
+      targetNode: laterSamples.join(" | ").slice(0, 300),
+      targetActualParent: null,
+      occurrence: occurrences,
+      path: window.location.pathname,
+      summary: true,
+      operations: [...laterOperations.entries()]
+        .map(([kind, count]) => `${kind}=${count}`)
+        .join(", "),
+    };
+    laterOperations.clear();
+    laterSamples.length = 0;
+    if (reporter) {
+      reporter(event, getDomEnvironmentHints());
+      return;
+    }
+    if (buffered.length < MAX_BUFFERED + 1) {
+      buffered.push(event);
+    }
+  }, SUMMARY_DELAY_MS);
 }
 
 /** Minimal tree shape the planners need - `Node` satisfies it. */

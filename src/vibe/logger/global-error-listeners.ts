@@ -5,32 +5,28 @@
  * by LoggerProvider. Client-only; a no-op outside a browser.
  */
 
-import { addDocumentListener, addWindowListener } from "next-vibe/ui/lib/dom";
+import {
+  addDocumentListener,
+  addWindowListener,
+  querySelector,
+} from "next-vibe/ui/lib/dom";
 import { getCurrentOrigin, getCurrentUrl } from "next-vibe/ui/lib/location";
 
-import { claimErrorReport, sanitizeRoutePath } from "./client-context";
+import {
+  handleChunkLoadFailure,
+  isChunkLoadError,
+  observeChunkReloadOutcome,
+} from "./chunk-reload";
+import { claimErrorReport } from "./client-context";
+import {
+  describeUrl,
+  resourceTiming,
+  urlExtension,
+} from "./resource-diagnostics";
 import type { EndpointLogger } from "./types";
 
 declare global {
   var __vibeGlobalErrorListeners: EndpointLogger | undefined;
-}
-
-/** Path of a resource URL without query/hash (may carry signed tokens). */
-function describeUrl(raw: string | null | undefined): string | null {
-  if (!raw) {
-    return null;
-  }
-  try {
-    const url = new URL(raw, getCurrentUrl());
-    // Non-http schemes (blob:, chrome-extension:, eval frames) have origin "null"
-    if (url.origin === "null") {
-      return raw.split(/[?#]/)[0]?.slice(0, 200) ?? null;
-    }
-    const sameOrigin = url.origin === getCurrentOrigin();
-    return `${sameOrigin ? "" : url.origin}${sanitizeRoutePath(url.pathname)}`;
-  } catch {
-    return raw.slice(0, 200);
-  }
 }
 
 function describeReason(
@@ -56,80 +52,46 @@ function describeReason(
   }
 }
 
-/** File extension of a URL's last path segment (null = none, e.g. a truncated URL). */
-function urlExtension(raw: string | null | undefined): string | null {
-  if (!raw) {
-    return null;
-  }
-  try {
-    const last = new URL(raw, getCurrentUrl()).pathname.split("/").pop() ?? "";
-    const dot = last.lastIndexOf(".");
-    return dot > 0 ? last.slice(dot + 1).slice(0, 10) : null;
-  } catch {
-    return null;
-  }
-}
-
 /**
- * What the network said about a failed resource: Resource Timing knows the
- * HTTP status (Chromium) and whether bytes arrived, which the error event
- * never carries. 0/null = blocked, aborted or a cross-origin opaque response.
+ * The browser extension that threw, when the top stack frame is extension
+ * code (chrome-extension://<id>/...): not our bundle, the fix (if any) is a
+ * guard on our side against what the extension injects. null = our code or
+ * unknown.
  */
-function resourceTiming(raw: string | null | undefined): {
-  responseStatus: number | null;
-  transferSize: number | null;
-  durationMs: number | null;
-} {
-  const empty = { responseStatus: null, transferSize: null, durationMs: null };
-  if (!raw || typeof performance === "undefined") {
-    return empty;
-  }
-  try {
-    const entries = performance.getEntriesByName(
-      new URL(raw, getCurrentUrl()).href,
-    );
-    const entry = entries.at(-1);
-    if (!(entry instanceof PerformanceResourceTiming)) {
-      return empty;
-    }
-    return {
-      responseStatus:
-        "responseStatus" in entry && typeof entry.responseStatus === "number"
-          ? entry.responseStatus
-          : null,
-      transferSize: entry.transferSize,
-      durationMs: Math.round(entry.duration),
-    };
-  } catch {
-    return empty;
-  }
-}
-
-/**
- * Webpack "Loading chunk N failed. (error|timeout|missing: URL)" => which
- * chunk, how it failed and what the network saw. Tells a stale client after a
- * deploy (404) from a slow/blocked network (timeout, status 0) and a scanner
- * that blocks subresources (Google-Safety). Empty when not a chunk error.
- */
-export function chunkLoadDiagnostics(message: string | undefined): {
-  chunkUrl?: string | null;
-  chunkFailKind?: string;
-  responseStatus?: number | null;
-  transferSize?: number | null;
-  durationMs?: number | null;
-} {
+function extensionOrigin(stack: string | undefined): string | null {
   const match =
-    /Loading (?:CSS )?chunk \S+ failed\.?\s*\((\w+): ([^)\s]+)\)/.exec(
-      message ?? "",
+    /((?:chrome|moz|safari|safari-web|ms-browser)-extension:\/\/[^/\s)]+)/.exec(
+      stack ?? "",
     );
-  if (!match) {
-    return {};
+  return match?.[1] ?? null;
+}
+
+/** Short CSS-ish description of an element: tag#id.class1.class2 */
+function describeElement(element: HTMLElement): string {
+  const id = element.id ? `#${element.id}` : "";
+  const classes =
+    typeof element.className === "string" && element.className.trim()
+      ? `.${element.className.trim().split(/\s+/).slice(0, 3).join(".")}`
+      : "";
+  const parent = element.parentElement;
+  const parentTag = parent ? `${parent.tagName.toLowerCase()} > ` : "";
+  return `${parentTag}${element.tagName.toLowerCase()}${id}${classes}`.slice(
+    0,
+    160,
+  );
+}
+
+/** The original file behind a next/image URL (`/_next/image?url=...`). */
+function nextImageSource(raw: string | null | undefined): string | null {
+  if (!raw || !raw.includes("/_next/image")) {
+    return null;
   }
-  return {
-    chunkFailKind: match[1],
-    chunkUrl: describeUrl(match[2]),
-    ...resourceTiming(match[2]),
-  };
+  try {
+    const inner = new URL(raw, getCurrentUrl()).searchParams.get("url");
+    return inner ? describeUrl(inner) : null;
+  } catch {
+    return null;
+  }
 }
 
 function handleWindowError(logger: EndpointLogger, event: Event): void {
@@ -148,16 +110,27 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
           : target instanceof HTMLLinkElement
             ? target.href
             : null;
-      logger.warn(`Resource failed to load: <${tag}>`, {
+      const resource = describeUrl(src);
+      const details = {
         source: "window.error.resource",
         tag,
-        resource: describeUrl(src),
+        resource,
         // ids are redacted from `resource`; a missing extension on a file URL
         // means the src was cut short (e.g. a markdown image mid-stream)
         resourceExt: urlExtension(src),
         isConnected: target.isConnected,
+        // Which element: ours carry our classes; an extension's or a
+        // translator's injected element does not
+        element: describeElement(target),
+        // src="" resolves to the page URL itself: an element rendered without
+        // a source (or one an extension injected), not a missing file
+        srcIsPageUrl:
+          resource !== null && resource === describeUrl(getCurrentUrl()),
+        // next/image hides the real file in ?url=: name it (path only)
+        imageUrl: nextImageSource(src),
         ...resourceTiming(src),
-      });
+      };
+      logger.warn(`Resource failed to load: <${tag}>`, details);
     }
     return;
   }
@@ -179,16 +152,81 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
       describeUrl(event.filename) === describeUrl(getCurrentUrl()),
   };
   if (error) {
-    logger.error(`Uncaught error: ${error.message}`, error, context);
+    if (isChunkLoadError(error)) {
+      handleChunkLoadFailure(logger, {
+        source: "window.onerror",
+        error,
+        context,
+      });
+      return;
+    }
+    logger.error(`Uncaught error: ${error.message}`, error, {
+      ...context,
+      extensionOrigin: extensionOrigin(error.stack),
+    });
     return;
   }
   // Cross-origin scripts surface only as "Script error." with no detail.
   // No file + line 0 = an opaque cross-origin script (extension or third-party
   // embed), never our bundle: our chunks are same-origin and report in full.
-  logger.error(`Uncaught error: ${event.message || "unknown"}`, {
+  const opaqueCrossOrigin = !event.filename && event.lineno === 0;
+  const message = event.message || "unknown";
+  logger.error(`Uncaught error: ${message}`, {
     ...context,
-    opaqueCrossOrigin: !event.filename && event.lineno === 0,
+    opaqueCrossOrigin,
+    // Which cross-origin scripts this page ran: the opaque error came from
+    // one of them (or from an extension when the list is empty)
+    ...(opaqueCrossOrigin
+      ? { crossOriginScripts: crossOriginScriptOrigins() }
+      : {}),
+    // Our own observers apply sizes on the next frame (use-resize-observer,
+    // chat input, messages list); a loop now points at a library observer.
+    // Radix poppers (tooltip/select/popover) and scroll areas set state
+    // inside their ResizeObserver callbacks.
+    ...(message.includes("ResizeObserver loop")
+      ? {
+          radixPopperOpen:
+            querySelector("[data-radix-popper-content-wrapper]") !== null,
+          radixScrollArea:
+            querySelector("[data-radix-scroll-area-viewport]") !== null,
+          activeElement: describeActiveElement(),
+        }
+      : {}),
   });
+}
+
+/** Origins of cross-origin scripts loaded by this page (max 8). */
+function crossOriginScriptOrigins(): string {
+  try {
+    const origins = new Set<string>();
+    for (const entry of performance.getEntriesByType("resource")) {
+      if (
+        !(entry instanceof PerformanceResourceTiming) ||
+        entry.initiatorType !== "script"
+      ) {
+        continue;
+      }
+      const origin = new URL(entry.name).origin;
+      if (origin !== getCurrentOrigin()) {
+        origins.add(origin);
+      }
+      if (origins.size >= 8) {
+        break;
+      }
+    }
+    return [...origins].join(", ");
+  } catch {
+    return "";
+  }
+}
+
+/** tag#id of the focused element (what the user was interacting with). */
+function describeActiveElement(): string | null {
+  const active = querySelector(":focus");
+  if (!(active instanceof HTMLElement)) {
+    return null;
+  }
+  return `${active.tagName.toLowerCase()}${active.id ? `#${active.id}` : ""}`;
 }
 
 function handleUnhandledRejection(
@@ -216,9 +254,16 @@ function handleUnhandledRejection(
       });
       return;
     }
+    if (isChunkLoadError(reason)) {
+      handleChunkLoadFailure(logger, {
+        source: "unhandledrejection",
+        error: reason,
+      });
+      return;
+    }
     logger.error(`Unhandled promise rejection: ${reason.message}`, reason, {
       source: "unhandledrejection",
-      ...chunkLoadDiagnostics(reason.message),
+      extensionOrigin: extensionOrigin(reason.stack),
     });
     return;
   }
@@ -285,4 +330,5 @@ export function installGlobalErrorListeners(logger: EndpointLogger): void {
       // reporting must never throw into the page
     }
   });
+  observeChunkReloadOutcome(logger);
 }

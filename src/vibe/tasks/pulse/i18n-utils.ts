@@ -19,3 +19,26 @@ export function resolveTaskDisplayName(
   const { t } = scopedTranslation.scopedT(locale);
   return t(nameOrKey as TasksTranslationKey);
 }
+
+/**
+ * Like resolveTaskDisplayName, but also tries the task endpoint's own scope:
+ * system tasks store the endpoint-scoped key (e.g. "start.cron.name"), which
+ * the tasks scope cannot resolve, so logs showed the raw key.
+ */
+export async function resolveTaskDisplayNameForRoute(
+  nameOrKey: string,
+  routeId: string,
+  locale: CountryLanguage,
+): Promise<string> {
+  const viaTasksScope = resolveTaskDisplayName(nameOrKey, locale);
+  if (viaTasksScope !== nameOrKey) {
+    return viaTasksScope;
+  }
+  const { getEndpoint } = await import("@/generated/endpoints/endpoint");
+  const endpoint = await getEndpoint(routeId);
+  if (!endpoint) {
+    return nameOrKey;
+  }
+  const { t } = endpoint.scopedTranslation.scopedT(locale);
+  return t(nameOrKey);
+}

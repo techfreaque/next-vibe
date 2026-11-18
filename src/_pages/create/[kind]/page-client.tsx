@@ -2,6 +2,7 @@
 
 import imageDefinitions from "next-vibe/agent/image-generation/definition";
 import { ImageGenModelId } from "next-vibe/agent/image-generation/models";
+import { ImageGenerationContainer } from "next-vibe/agent/image-generation/widget";
 import musicDefinitions from "next-vibe/agent/music-generation/definition";
 import { MusicGenModelId } from "next-vibe/agent/music-generation/models";
 import sttDefinitions from "next-vibe/agent/speech-to-text/definition";
@@ -63,6 +64,7 @@ function ImageForm({
     <EndpointsPage
       logger={logger}
       endpoint={imageDefinitions}
+      widget={<ImageGenerationContainer field={imageDefinitions.POST.fields} />}
       user={user}
       locale={locale}
       platform={platform}

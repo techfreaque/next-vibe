@@ -23,6 +23,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
+import { formatCreditAmount } from "@/products/credit-money";
 
 import { ProviderFactory } from "../ai-stream/repository/core/infra";
 import {
@@ -123,8 +124,8 @@ export class DescribeImageRepository {
     if (balanceResult.data.total < VISION_MINIMUM_BALANCE) {
       return fail({
         message: t("post.errors.insufficientCredits", {
-          balance: balanceResult.data.total.toString(),
-          minimum: VISION_MINIMUM_BALANCE.toString(),
+          balance: formatCreditAmount(balanceResult.data.total, locale),
+          minimum: formatCreditAmount(VISION_MINIMUM_BALANCE, locale),
         }),
         errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
       });

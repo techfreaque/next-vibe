@@ -58,6 +58,8 @@ export interface StorageFailure {
    * caller switched to an in-memory store and reports this once per page.
    */
   disabled?: boolean;
+  /** Extra diagnostic context (e.g. which fallback took over). */
+  extra?: Record<string, string | number | boolean | null>;
 }
 
 /** Error class name: QuotaExceededError, SecurityError, ENOENT, SyntaxError ... */
@@ -105,6 +107,7 @@ export function reportStorageFailure(
       quotaExceeded:
         /quota/i.test(name) || /quota/i.test(String(failure.error)),
       securityBlocked: name === "SecurityError",
+      ...failure.extra,
     };
     if (failure.disabled) {
       // Values only live for this page view: data is lost on reload

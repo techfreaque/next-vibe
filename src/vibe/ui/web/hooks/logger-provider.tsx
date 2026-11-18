@@ -79,7 +79,9 @@ export function LoggerProvider({
     }
     return setDomGuardReporter((event, hints) => {
       logger.warn(
-        `[dom-guard] Foreign DOM mutation tolerated: ${event.operation} (${event.resolution})`,
+        event.summary
+          ? "[dom-guard] More foreign DOM mutations tolerated on this page"
+          : `[dom-guard] Foreign DOM mutation tolerated: ${event.operation} (${event.resolution})`,
         { ...event, ...hints, pageLocale: locale },
       );
     });

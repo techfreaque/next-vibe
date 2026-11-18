@@ -479,7 +479,7 @@ audio.write_to_file("speech.mp3")`,
   "progress": 100,
   "seconds": "5",
   "size": "1280x720",
-  "url": "${baseUrl}/media/7a1e.../video.mp4?expires=1767830400&sig=...",
+  "url": "${baseUrl}/media/<threadId>/video.mp4?expires=1767830400&sig=<signature>",
   "credits_charged": 42,
   "error": null
 }`,

@@ -110,3 +110,29 @@ export function useFreeCreditsStatus(
   const response = endpoint.read?.response;
   return response?.success ? response.data.freeStatus : undefined;
 }
+
+/**
+ * The account's spendable balance from the shared cache (no WS subscription,
+ * the balance owner subscribes). undefined while loading or disabled.
+ */
+export function useCreditsTotal(
+  user: JwtPayloadType,
+  logger: EndpointLogger,
+  enabled: boolean,
+): number | undefined {
+  const endpoint = useEndpoint(
+    definitions,
+    {
+      read: {
+        queryOptions: {
+          enabled: enabled && !user.isPublic,
+          staleTime: 10 * 1000,
+        },
+      },
+    },
+    logger,
+    user,
+  );
+  const response = endpoint.read?.response;
+  return response?.success ? response.data.total : undefined;
+}

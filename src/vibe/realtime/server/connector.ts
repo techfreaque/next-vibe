@@ -348,11 +348,27 @@ class WsConnection {
           : "unknown";
       // duringHandshake separates "peer restarting/offline" (the reconnect
       // loop handles it) from an error on an established socket.
-      this.logger.warn("[WsConnection] WS error", {
+      // Reported ONCE per failure streak (the first failure, and once more
+      // when the backoff hits its cap = the peer stays unreachable); every
+      // other retry of the same streak is debug, so one dead peer is one row
+      // with its URL, not a warn per reconnect attempt.
+      const errorDetails = {
         instanceId: this.instanceId,
+        peer: remoteUrl,
         error: message,
         duringHandshake: !everOpened,
-      });
+        attempt: this.reconnectAttempt,
+      };
+      if (this.reconnectAttempt === 0) {
+        this.logger.warn("[WsConnection] WS error", errorDetails);
+      } else if (this.reconnectAttempt === BACKOFF_MS.length) {
+        this.logger.warn(
+          "[WsConnection] Peer still unreachable - retrying every 30s",
+          errorDetails,
+        );
+      } else {
+        this.logger.debug("[WsConnection] WS error (retry)", errorDetails);
+      }
       // A failed handshake (peer restarting) may never emit a close event in
       // every runtime — without this the retry loop would die silently.
       if (ws.readyState !== WebSocket.OPEN) {
@@ -497,9 +513,11 @@ class WsConnection {
       if (this.stopped) {
         return;
       }
-      if (!fresh) {
+      if (!fresh || fresh === "undialable") {
         this.logger.info(
-          "[WsConnection] Connection row gone or inactive — stopping reconnect",
+          fresh === "undialable"
+            ? "[WsConnection] Peer is reverse-ws only (never dialed) — stopping reconnect"
+            : "[WsConnection] Connection row gone or inactive — stopping reconnect",
           { instanceId: this.currentInstanceId },
         );
         closeConnection(this.currentInstanceId);
@@ -920,9 +938,33 @@ const IDLE_TIMEOUT_MS = 5 * 60 * 1000;
 
 const _logger: EndpointLogger = createEndpointLogger(false, defaultLocale);
 
+/** Reverse entries already reported as not dialable (once per process). */
+const _reportedUndialable = new Set<string>();
+
+/**
+ * A REVERSE entry (written by connect-reverse when a peer registered with us)
+ * whose transportMode is reverse-ws means register-time detection found the
+ * peer's URL unreachable from here (NAT / loopback, e.g. a local instance that
+ * registered as http://localhost:3000). The only path to that peer is the
+ * socket IT holds to us, so we must never dial its URL - neither a WS nor the
+ * HTTP pull. Dialing a loopback URL from a server hits the server itself, which
+ * rejects the peer's token (403 "User public") on every retry.
+ */
+function isUndialableReverseEntry(row: {
+  isReverseEntry: boolean;
+  transportMode: string | null;
+}): boolean {
+  return row.isReverseEntry && row.transportMode === "reverse-ws";
+}
+
+/**
+ * Load the active row for an outbound leg. Null when there is no active row
+ * with a token, or when the row is a reverse entry we must not dial (reported
+ * once per process with the reason, then debug).
+ */
 async function loadRowByInstanceId(
   instanceId: string,
-): Promise<ConnectionConfig | null> {
+): Promise<ConnectionConfig | "undialable" | null> {
   const [row] = await db
     .select()
     .from(remoteConnections)
@@ -935,6 +977,21 @@ async function loadRowByInstanceId(
     .limit(1);
   if (!row?.token) {
     return null;
+  }
+  if (isUndialableReverseEntry(row)) {
+    const details = {
+      instanceId,
+      peerUrl: row.remoteUrl,
+      reason:
+        "reverse entry with transportMode reverse-ws: the peer is only reachable through its own inbound socket, never by dialing its URL",
+    };
+    if (_reportedUndialable.has(row.id)) {
+      _logger.debug("[Connector] Not dialing reverse-ws peer", details);
+    } else {
+      _reportedUndialable.add(row.id);
+      _logger.info("[Connector] Not dialing reverse-ws peer", details);
+    }
+    return "undialable";
   }
   const decryptedToken = RemoteConnectionRepository.decryptToken(row.token);
   return {
@@ -1002,10 +1059,12 @@ export async function acquireConnection(
   // Lazy-open: if not connected, load config and open.
   if (!_connections.has(instanceId)) {
     const config = await loadRowByInstanceId(instanceId);
-    if (!config) {
-      _logger.warn("[Connector] acquireConnection: no DB row found", {
-        instanceId,
-      });
+    if (!config || config === "undialable") {
+      if (!config) {
+        _logger.warn("[Connector] acquireConnection: no DB row found", {
+          instanceId,
+        });
+      }
       // Return a no-op release so callers don't need to null-check.
       return () => {
         _logger.debug("[Connector] release called on failed acquire (noop)", {
@@ -1147,7 +1206,7 @@ export async function syncConnectionNow(instanceId: string): Promise<void> {
     return;
   }
   const config = await loadRowByInstanceId(instanceId);
-  if (config) {
+  if (config && config !== "undialable") {
     new WsConnection(config, _logger).doPullNow();
   }
 }
@@ -1161,6 +1220,10 @@ export async function syncConnectionNow(instanceId: string): Promise<void> {
 export async function restartConnection(instanceId: string): Promise<void> {
   closeConnection(instanceId);
   const config = await loadRowByInstanceId(instanceId);
+  if (config === "undialable") {
+    // Reported once by loadRowByInstanceId; the peer's own socket carries it.
+    return;
+  }
   if (!config) {
     _logger.warn(
       "[Connector] restartConnection: no active row — staying closed",

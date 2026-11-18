@@ -23,9 +23,10 @@ import type { JSX } from "react";
 import { useState } from "react";
 
 import { FreeCreditsStatus } from "@/credits/enum";
-import { useFreeCreditsStatus } from "@/credits/hooks";
+import { useCreditsTotal, useFreeCreditsStatus } from "@/credits/hooks";
 import { NewsletterCreditOffer } from "@/newsletter/credit-bonus/enum";
 import { useNewsletterCreditBonus } from "@/newsletter/credit-bonus/hooks";
+import { formatCreditAmount } from "@/products/credit-money";
 import { getPricingParams } from "@/products/repository-client";
 import { CreditOffers } from "@/subscription/create/credit-offers";
 import { useSubscription } from "@/subscription/hooks";
@@ -47,6 +48,9 @@ interface OutOfCreditsCardProps {
   variant?: "composer" | "card";
   className?: string;
 }
+
+/** Below this a member is "out of credits"; above it just short for this message. */
+const MIN_SHORT_OF_CREDITS_BALANCE = 1;
 
 /** First day of next month: when the free allowance refills (credits/free-allowance.ts). */
 function nextFreeRefill(): Date {
@@ -186,6 +190,7 @@ function MemberBody({ locale }: { locale: CountryLanguage }): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const freeStatus = useFreeCreditsStatus(user, logger, !user.isPublic);
+  const balance = useCreditsTotal(user, logger, !user.isPublic);
   const subscription = useSubscription(logger, user).read?.data;
   // A plan that ended renews nothing: those accounts get the free refill date.
   const hasPlan = isLivePlan(subscription);
@@ -213,19 +218,33 @@ function MemberBody({ locale }: { locale: CountryLanguage }): JSX.Element {
       ? new Date(subscription.currentPeriodEnd)
       : null;
 
+  // Credits left, just not enough for this message (long thread, pricey
+  // model): "you're out of credits" would be wrong (prod: 11.55 credits, a
+  // kimi-k3 turn needing 20.7). Point at the cheaper ways forward first.
+  const shortOfCredits =
+    balance !== undefined && balance >= MIN_SHORT_OF_CREDITS_BALANCE;
+
   return (
     <Div className="flex flex-col">
       <CardHead
         icon={<Coins className="h-4 w-4" />}
-        title={t("outOfCredits.member.title")}
+        title={
+          shortOfCredits
+            ? t("outOfCredits.member.shortTitle")
+            : t("outOfCredits.member.title")
+        }
         description={
-          renewsAt
-            ? t("outOfCredits.member.subscriberDescription", {
-                date: renewsAt.toLocaleDateString(locale, dateFormat),
+          shortOfCredits
+            ? t("outOfCredits.member.shortDescription", {
+                balance: formatCreditAmount(balance, locale),
               })
-            : t("outOfCredits.member.description", {
-                date: nextFreeRefill().toLocaleDateString(locale, dateFormat),
-              })
+            : renewsAt
+              ? t("outOfCredits.member.subscriberDescription", {
+                  date: renewsAt.toLocaleDateString(locale, dateFormat),
+                })
+              : t("outOfCredits.member.description", {
+                  date: nextFreeRefill().toLocaleDateString(locale, dateFormat),
+                })
         }
       />
       <CreditOffers locale={locale} className="mt-3 @md/ooc:pl-11" />

@@ -360,10 +360,18 @@ export async function processNextQueuedMessage(
   });
 
   if (!streamResult.success) {
-    logger.error("[Queue] Failed to start stream for queued message", {
-      messageId: queuedMessage.id,
-      error: streamResult.message,
-    });
+    // 4xx (e.g. 402 out of credits) was already reported by the stream's
+    // "Setup failed" and shown to the user as its error event; only server
+    // failures are errors of the queue itself.
+    const errorCode = streamResult.errorType?.errorCode ?? 500;
+    (errorCode >= 500 ? logger.error : logger.warn).bind(logger)(
+      "[Queue] Failed to start stream for queued message",
+      {
+        messageId: queuedMessage.id,
+        error: streamResult.message,
+        errorCode,
+      },
+    );
     return false;
   }
 

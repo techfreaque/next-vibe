@@ -59,7 +59,7 @@ import type {
   PulseHealth,
 } from "./db";
 import { pulseExecutions, pulseHealth } from "./db";
-import { resolveTaskDisplayName } from "./i18n-utils";
+import { resolveTaskDisplayNameForRoute } from "./i18n-utils";
 import type { PulseStatusResponseOutput } from "./status/definition";
 
 /**
@@ -453,8 +453,9 @@ export class PulseHealthRepository {
 
           const { user: cronUser, locale: userLocale } = taskUserContext;
           const { t: tTask } = scopedTranslation.scopedT(userLocale);
-          const resolvedTaskName = resolveTaskDisplayName(
+          const resolvedTaskName = await resolveTaskDisplayNameForRoute(
             dbTask.displayName,
+            dbTask.routeId,
             userLocale,
           );
           const startedAt = new Date();

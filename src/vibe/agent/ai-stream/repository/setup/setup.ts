@@ -21,6 +21,8 @@ import { Platform } from "next-vibe/platforms/platforms";
 import type { ResolvedRelayContext } from "next-vibe/realtime/core/relay-context";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
+import { formatCreditAmount } from "@/products/credit-money";
+
 import {
   DefaultFolderId,
   makeHeadlessContext,
@@ -43,6 +45,7 @@ import {
   type MusicGenModelSelection,
 } from "../../../music-generation/models";
 import { DEFAULT_SKILLS } from "../../../skills/config";
+import { NO_SKILL_ID } from "../../../skills/constants";
 import {
   chatFavorites,
   FAVORITE_CONFIG_COLUMNS,
@@ -518,6 +521,41 @@ export interface StreamSetupResult {
   // - no top-level duplicate needed.
 }
 
+/**
+ * `skill` is free text on the wire (API, MCP and AI-tool callers type it). An
+ * id no skill resolves to (seen: an API client sending the made-up
+ * "enums.skill.none") ran with the default persona but was stored on every
+ * message of the thread and re-logged per turn. Fall back to the no-skill
+ * default ONCE here, with the rejected id in the log, so the thread stores a
+ * real skill id. Same visibility rules as getSkillById (built-ins, own and
+ * public custom skills, merged `skill__variant` ids, legacy aliases).
+ */
+async function withResolvableSkill(
+  data: AiStreamPostRequestOutput,
+  user: JwtPayloadType,
+  logger: EndpointLogger,
+): Promise<AiStreamPostRequestOutput> {
+  if (!data.skill || data.skill === NO_SKILL_ID) {
+    return data;
+  }
+  const { SkillsRepository } = await import("../../../skills/repository");
+  const skill = data.skill;
+  // A failed lookup keeps the id as sent (the skill fragment logs it then).
+  const resolvable = await SkillsRepository.filterResolvableSkillIds(
+    [skill],
+    user,
+  ).catch((): Set<string> => new Set([skill]));
+  if (resolvable.has(skill)) {
+    return data;
+  }
+  logger.warn("[Setup] Unknown skill id - running with the default skill", {
+    skillId: data.skill.slice(0, 120),
+    isPublic: user.isPublic,
+    threadId: data.threadId ?? null,
+  });
+  return { ...data, skill: NO_SKILL_ID };
+}
+
 export async function setupAiStream(params: {
   data: AiStreamPostRequestOutput;
   locale: CountryLanguage;
@@ -569,7 +607,7 @@ export async function setupAiStream(params: {
   resolvedRelayContext?: ResolvedRelayContext;
 }): Promise<ResponseType<StreamSetupResult>> {
   const {
-    data,
+    data: requestData,
     locale,
     logger,
     user,
@@ -580,6 +618,7 @@ export async function setupAiStream(params: {
     mediaModelOverrides,
     resolvedRelayContext,
   } = params;
+  const data = await withResolvableSkill(requestData, user, logger);
   const availability = await getEnvAvailability();
   const isIncognito = data.rootFolderId === "incognito";
 
@@ -1294,8 +1333,8 @@ export async function setupAiStream(params: {
     }
     return fail({
       message: aiStreamT("route.errors.insufficientCredits", {
-        cost: requiredCredits.toString(),
-        balance: creditBalance.toString(),
+        cost: formatCreditAmount(requiredCredits, locale),
+        balance: formatCreditAmount(creditBalance, locale),
       }),
       errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
     });

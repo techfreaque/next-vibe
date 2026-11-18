@@ -13,6 +13,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
 import { parseBase64DataUri } from "../../shared/media-generation";
+import { parseAspectRatio } from "../aspect-ratio";
 import { ImageSize } from "../enum";
 import { scopedTranslation } from "../i18n";
 
@@ -37,7 +38,37 @@ interface VeniceEditErrorResponse {
   details?: string;
 }
 
-function mapSizeToVenice(size: string): string {
+/**
+ * Every `size` Venice's images/generations accepts above 512 px (the schema is
+ * a closed enum, no aspect_ratio / width / height). 3:2 and 2:3 are the only
+ * way to get near 4:3 / 3:4: mapping those to the 16:9 sizes delivered a 4:7
+ * image for a 3:4 request (prod 2026-11-16/18, lustify-v8 + chroma).
+ */
+const VENICE_SIZES = [
+  { size: "1024x1024", ratio: 1 },
+  { size: "1536x1024", ratio: 1.5 },
+  { size: "1024x1536", ratio: 1024 / 1536 },
+  { size: "1792x1024", ratio: 1.75 },
+  { size: "1024x1792", ratio: 1024 / 1792 },
+] as const;
+
+function mapSizeToVenice(
+  size: string,
+  aspectRatio: string | undefined,
+): string {
+  const target = aspectRatio ? parseAspectRatio(aspectRatio) : null;
+  if (target !== null) {
+    let best: string = VENICE_SIZES[0].size;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (const entry of VENICE_SIZES) {
+      const distance = Math.abs(Math.log(entry.ratio) - Math.log(target));
+      if (distance < bestDistance) {
+        best = entry.size;
+        bestDistance = distance;
+      }
+    }
+    return best;
+  }
   if (size === ImageSize.LANDSCAPE_1792) {
     return "1792x1024";
   }
@@ -58,6 +89,8 @@ export async function generateWithVenice(params: {
   providerModel: string;
   prompt: string;
   size: string;
+  /** Requested W:H ratio; picks the closest Venice size when set. */
+  aspectRatio?: string;
   /**
    * Reference image: a base64 data URI (own storage files, browser uploads;
    * see resolveMediaReference) or a public URL. When set, the Venice image
@@ -74,6 +107,7 @@ export async function generateWithVenice(params: {
     providerModel,
     prompt,
     size,
+    aspectRatio,
     inputMediaUrl,
     logger,
     locale,
@@ -99,7 +133,7 @@ export async function generateWithVenice(params: {
     });
   }
 
-  const apiSize = mapSizeToVenice(size);
+  const apiSize = mapSizeToVenice(size, aspectRatio);
   logger.debug("[Venice Images] Generating image", {
     model: providerModel,
     size: apiSize,

@@ -1,8 +1,11 @@
 import { getCookie } from "next-vibe/ui/lib/cookies";
+import { getVisibilityState } from "next-vibe/ui/lib/dom";
 import { getCurrentPathname } from "next-vibe/ui/lib/location";
+import { isOnline } from "next-vibe/ui/lib/media";
 
 import {
   BEARER_LEAD_ID_SEPARATOR,
+  CSRF_REJECTED_HEADER_NAME,
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
   REQUEST_ID_HEADER_NAME,
@@ -206,6 +209,78 @@ interface CallDiagnostics {
   requestBody?: { kind: "json" | "form-data"; size: number } | null;
   /** Edge `via` header of the response (Caddy) - which proxy chain answered. */
   via?: string | null;
+  /** Page visibility when the call started (network-failure diagnosis). */
+  visibilityAtStart?: string | null;
+  /**
+   * Mutating call: whether the page could read the CSRF cookie and sent the
+   * X-CSRF-Token header (a csrf_header_missing 403 with false here = the
+   * cookie is invisible to JS: duplicate/foreign-path cookie, webview).
+   */
+  csrfHeaderSent?: boolean | null;
+}
+
+/** Page visibility, null outside a browser document (SSR, workers). */
+function currentVisibility(): string | null {
+  try {
+    return getVisibilityState();
+  } catch {
+    return null;
+  }
+}
+
+function browserOnline(): boolean {
+  try {
+    return isOnline();
+  } catch {
+    return true;
+  }
+}
+
+/** Context for a fetch that threw (no HTTP response at all). */
+function networkFailureContext(
+  diag: CallDiagnostics,
+  durationMs: number,
+): Record<string, string | boolean | null> {
+  const visibilityAtFailure = currentVisibility();
+  const online = browserOnline();
+  return {
+    visibilityAtStart: diag.visibilityAtStart ?? null,
+    visibilityAtFailure,
+    online,
+    networkFailureKind: classifyNetworkFailure(
+      durationMs,
+      visibilityAtFailure,
+      online,
+    ),
+  };
+}
+
+/**
+ * Why a fetch threw before any response ("Failed to fetch" / "Load failed" /
+ * "NetworkError"): the error text is the same for every cause.
+ *  - page-hidden: the tab was hidden by the time it failed: the user navigated
+ *    away or backgrounded the app, and the browser cancelled the request
+ *  - offline: the browser reports no network
+ *  - refused-instantly: failed within 100 ms: blocked by an extension or
+ *    content blocker, or the connection was refused outright
+ *  - connection-dropped: failed after waiting: reset/timeout between the
+ *    browser and our edge (deploy restart, flaky mobile network)
+ */
+function classifyNetworkFailure(
+  durationMs: number,
+  visibilityAtFailure: string | null,
+  online: boolean,
+): string {
+  if (visibilityAtFailure === "hidden") {
+    return "page-hidden";
+  }
+  if (!online) {
+    return "offline";
+  }
+  if (durationMs < 100) {
+    return "refused-instantly";
+  }
+  return "connection-dropped";
 }
 
 /** Size of a request body without reading files (multipart = sum of parts). */
@@ -306,6 +381,8 @@ function reportApiFailure(
     isPublicUser: user.isPublic,
     // Match against the server's error_logs rows for the same request
     requestId: diag.requestId,
+    csrfHeaderSent: diag.csrfHeaderSent ?? null,
+    ...(diag.thrown && !isAbort ? networkFailureContext(diag, durationMs) : {}),
   };
   if (isServerSide) {
     logger.error(
@@ -331,7 +408,10 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   pathParams: TEndpoint["types"]["UrlVariablesOutput"],
 ): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
   const requestId = mintRequestId();
-  const diag: CallDiagnostics = { requestId };
+  const diag: CallDiagnostics = {
+    requestId,
+    visibilityAtStart: currentVisibility(),
+  };
   const startedAt = Date.now();
   // Every log line of this call (non-JSON body, schema mismatch, central
   // failure report, client-route handler logs) carries the request id.
@@ -467,12 +547,15 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
 
     headers[REQUEST_ID_HEADER_NAME] = diag.requestId;
 
-    if (MUTATING_METHODS.has(endpoint.method)) {
-      const csrfToken = await getCsrfToken(logger);
-      if (csrfToken) {
-        headers[CSRF_TOKEN_HEADER_NAME] = csrfToken;
-      }
+    const sentCsrfToken = MUTATING_METHODS.has(endpoint.method)
+      ? await getCsrfToken(logger)
+      : null;
+    if (sentCsrfToken) {
+      headers[CSRF_TOKEN_HEADER_NAME] = sentCsrfToken;
     }
+    diag.csrfHeaderSent = MUTATING_METHODS.has(endpoint.method)
+      ? sentCsrfToken !== null
+      : null;
 
     if (platform.isReactNative) {
       const { t: authT } = authScopedTranslation.scopedT(locale);
@@ -503,7 +586,23 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
     }
 
     // oxlint-disable-next-line restricted/no-raw-fetch
-    const response = await fetch(url, options);
+    let response = await fetch(url, options);
+    // CSRF race: a parallel response (first visit, or the 1-day cookie expired
+    // in an idle tab) stamped a new token after we read the cookie, so this
+    // request carried a token we did not echo. Re-read and retry once when the
+    // cookie changed; a real forgery has no readable cookie to retry with.
+    if (
+      response.status === 403 &&
+      response.headers.has(CSRF_REJECTED_HEADER_NAME)
+    ) {
+      const freshCsrfToken = await getCsrfToken(logger);
+      if (freshCsrfToken && freshCsrfToken !== sentCsrfToken) {
+        headers[CSRF_TOKEN_HEADER_NAME] = freshCsrfToken;
+        diag.csrfHeaderSent = true;
+        // oxlint-disable-next-line restricted/no-raw-fetch
+        response = await fetch(url, options);
+      }
+    }
     diag.status = response.status;
     diag.redirected = response.redirected;
     diag.via = response.headers.get("via");

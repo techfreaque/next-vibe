@@ -12,6 +12,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
 import { scopedTranslation } from "../i18n";
+import { classifyImageProviderError } from "../provider-error";
 
 /**
  * OpenRouter dedicated image generation via POST /api/v1/images.
@@ -164,6 +165,10 @@ export async function generateWithOpenRouter(params: {
         error: errorMsg,
         status: response.status,
         model: providerModel,
+        // contentPolicy = the provider refused the prompt (user sees the
+        // "refused by the content filter, not charged" message); outage /
+        // other = ours or theirs to fix.
+        failureKind: classifyImageProviderError(errorMsg),
       });
       return fail({
         // The status tells a refusal (400/403) from an outage (5xx/429).

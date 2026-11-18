@@ -12,6 +12,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 import { creditValidator } from "@/credits/validator";
+import { formatCreditAmount } from "@/products/credit-money";
 
 import {
   DEFAULT_INPUT_TOKENS,
@@ -116,8 +117,8 @@ export class CreditValidatorHandler {
 
       return fail({
         message: t("route.errors.insufficientCredits", {
-          cost: modelCost.toString(),
-          balance: validationResult.data.balance.toString(),
+          cost: formatCreditAmount(modelCost, locale),
+          balance: formatCreditAmount(validationResult.data.balance, locale),
         }),
         errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
       });

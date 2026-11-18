@@ -29,6 +29,10 @@ import {
   type OpenAITool,
 } from "./tool-calling-prompt-engineering";
 import { readVeniceCostUsd, upstreamCostMetadata } from "./upstream-cost";
+import {
+  summarizeUpstreamError,
+  upstreamErrorResponse,
+} from "./upstream-error";
 
 export type JSONValue =
   | string
@@ -218,17 +222,21 @@ export function createPromptEngineeredProvider(
     const response = await fetchImpl(input, { ...init, body: bodyString });
 
     if (!response.ok) {
-      const errorText = await response.text();
+      const upstreamError = summarizeUpstreamError(
+        config.label,
+        response.status,
+        response.headers,
+        await response.text(),
+      );
       logger.error(`[${config.label}] API Error`, {
         status: response.status,
         statusText: response.statusText,
-        body: errorText,
+        body: upstreamError.summary,
+        cfRay: upstreamError.cfRay,
+        model: parsedBody.model,
+        requestChars: bodyString.length,
       });
-      return new Response(errorText, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-      });
+      return upstreamErrorResponse(response, upstreamError);
     }
 
     if (parsedBody.stream !== true) {

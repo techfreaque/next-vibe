@@ -113,7 +113,8 @@ vibe mcp          # Start MCP server
 vibe mcp --verbose
 ```
 
-Configure `.mcp.json` for Claude Desktop or any MCP client.
+Run `vibe setup` to generate project MCP configs, including `.mcp.json` for Claude Code and
+`.codex/config.toml` for Codex CLI. Codex loads the project config after you trust the project.
 
 **Opt-in to tool discovery:** `UserRole.MCP_VISIBLE` | **Disable:** `UserRole.MCP_OFF`
 

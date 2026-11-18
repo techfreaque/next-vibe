@@ -23,6 +23,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
+import { formatCreditAmount } from "@/products/credit-money";
 
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "../chat/storage/index";
@@ -513,8 +514,8 @@ export class TextToSpeechRepository {
       });
       return fail({
         message: t("post.errors.insufficientCredits", {
-          balance: balanceResult.data.total.toString(),
-          minimum: estimatedCredits.toString(),
+          balance: formatCreditAmount(balanceResult.data.total, locale),
+          minimum: formatCreditAmount(estimatedCredits, locale),
         }),
         errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
       });

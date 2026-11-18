@@ -1094,6 +1094,9 @@ export class AiStreamRepository {
         errorType: errorCode,
         message: setupResult.message,
         threadId: data.threadId,
+        model: data.model,
+        userKind: user.isPublic ? "public" : "user",
+        isCron: Boolean(cronTaskId),
       });
       await emitSetupError({ setupResult, data, user, logger });
       return setupResult;
@@ -1745,6 +1748,7 @@ export class AiStreamRepository {
             logger,
             systemPrompt,
             tools,
+            data.model,
           );
           if (truncated.length !== messages.length) {
             messages.length = 0;

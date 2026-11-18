@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "next-vibe/ui/components/select";
 import { P } from "next-vibe/ui/components/typography";
-import { useMemo, useState } from "react";
+import { type ReactElement, useMemo, useState } from "react";
 
 import type { NavigationStackEntry } from "../../../core/definition/endpoint";
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
@@ -74,6 +74,8 @@ interface EndpointsPagePropsBase<
 > {
   /** Endpoint definitions (supports GET, POST, PUT, PATCH, DELETE) */
   endpoint: T;
+  /** Eager root widget for the base endpoint, rendered inside its form and widget context. */
+  widget?: ReactElement;
   /**
    * Optional pre-created endpoint instance from a parent's useEndpoint call.
    * When provided, EndpointsPage skips its own useEndpoint call and uses this
@@ -178,6 +180,7 @@ function EndpointsPageInternal<
   },
 >({
   endpoint,
+  widget,
   locale,
   description,
   endpointOptions,
@@ -726,6 +729,7 @@ function EndpointsPageInternal<
             {disabled && (
               <EndpointRenderer
                 endpoint={activeEndpoint}
+                widget={widget}
                 locale={locale}
                 isSubmitting={false}
                 data={
@@ -751,6 +755,7 @@ function EndpointsPageInternal<
             {!disabled && isGetEndpoint && endpointState.read && (
               <EndpointRenderer
                 endpoint={activeEndpoint}
+                widget={widget}
                 form={endpointState.create?.form ?? endpointState.read.form}
                 onSubmit={
                   endpointState.create
@@ -780,6 +785,7 @@ function EndpointsPageInternal<
               (endpointState.create || endpointState.update) && (
                 <EndpointRenderer
                   endpoint={activeEndpoint}
+                  widget={widget}
                   form={
                     endpointState.update?.form ?? endpointState.create?.form
                   }
@@ -809,6 +815,7 @@ function EndpointsPageInternal<
             {!disabled && isDeleteEndpoint && endpointState.delete && (
               <EndpointRenderer
                 endpoint={activeEndpoint}
+                widget={widget}
                 form={endpointState.delete.form}
                 onSubmit={(): void => {
                   void endpointState.delete?.submitForm();

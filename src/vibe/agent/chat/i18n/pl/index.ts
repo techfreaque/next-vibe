@@ -447,6 +447,10 @@ export const translations: typeof enTranslations = {
         "Mikrofon zablokowany. Dotknij ikony kłódki na pasku adresu → Ustawienia witryny → Mikrofon → Zezwól.",
       "permission-denied-mac":
         "Mikrofon zablokowany. Otwórz Ustawienia systemowe → Prywatność i ochrona → Mikrofon i włącz przeglądarkę.",
+      "permission-dismissed":
+        "Okno dostępu do mikrofonu zamknięte. Kliknij mikrofon jeszcze raz i wybierz Zezwól.",
+      "permission-denied-site":
+        "Mikrofon zablokowany dla tej strony. Kliknij ikonę po lewej stronie paska adresu → Mikrofon → Zezwól i spróbuj ponownie.",
       "permission-denied-windows":
         "Mikrofon zablokowany. Otwórz Ustawienia → Prywatność → Mikrofon i upewnij się, że przeglądarka ma dostęp.",
       "no-microphone":

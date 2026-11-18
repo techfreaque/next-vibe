@@ -8,6 +8,7 @@
  */
 
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { getUserActivation } from "next-vibe/ui/lib/media";
 
 import {
   classifyPlayRejection,
@@ -405,6 +406,12 @@ export class AudioQueueManager {
             chunkIndex,
             failureKind: classifyPlayRejection(e),
             stoppedByUs: cancelled,
+            // Autoplay rejections: was there a user gesture at all, and is it
+            // still transient-active? iOS needs play() inside the gesture;
+            // streamed chunks start later (fix: one element unlocked on the
+            // send/mic tap and reused for every chunk).
+            userActivationActive: getUserActivation().isActive,
+            userActivationHasBeenActive: getUserActivation().hasBeenActive,
           });
           if (cancelled) {
             // stop() already detached and settled this playback

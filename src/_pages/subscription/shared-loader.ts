@@ -6,14 +6,11 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
 import { notFound } from "next-vibe/ui/lib/not-found";
 
-import type { CreditsGetResponseOutput } from "@/credits/definition";
-import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 
 export interface SubscriptionPageData {
   locale: CountryLanguage;
   user: JwtPayloadType;
-  initialCredits: CreditsGetResponseOutput | null;
   platform: Platform;
 }
 
@@ -29,7 +26,6 @@ export async function subscriptionLoader({
   searchParams,
 }: LoaderInput): Promise<SubscriptionPageData> {
   const logger = createEndpointLogger(false, locale);
-  const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
   const userResponse = await UserRepository.getUserByAuth(
     {
@@ -78,16 +74,5 @@ export async function subscriptionLoader({
     }
   }
 
-  let initialCredits: CreditsGetResponseOutput | null = null;
-  if (isAuthenticated) {
-    const creditsResponse = await CreditRepository.getBalance(
-      user,
-      logger,
-      creditsT,
-      locale,
-    );
-    initialCredits = creditsResponse.success ? creditsResponse.data : null;
-  }
-
-  return { locale, user, initialCredits, platform: Platform.NEXT_PAGE };
+  return { locale, user, platform: Platform.NEXT_PAGE };
 }

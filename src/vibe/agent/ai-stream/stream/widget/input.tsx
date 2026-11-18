@@ -50,6 +50,8 @@ import {
   useRef,
 } from "react";
 
+import { formatCreditAmount } from "@/products/credit-money";
+
 import { isIncognitoFolder } from "../../../chat/config";
 import { getAgentMessageMaxLength } from "../../../chat/constants";
 import { NEW_MESSAGE_ID } from "../../../chat/enum";
@@ -856,8 +858,8 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
             <Div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 pointer-events-none rounded-t-md bg-background/95">
               <Div className="text-sm font-medium text-destructive">
                 {t("input.insufficientCredits.title", {
-                  cost: modelCost,
-                  balance: messageOps.creditsTotal,
+                  cost: formatCreditAmount(modelCost, locale),
+                  balance: formatCreditAmount(messageOps.creditsTotal, locale),
                 })}
               </Div>
               <Link

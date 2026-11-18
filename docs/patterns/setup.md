@@ -97,7 +97,7 @@ There is no context beyond the logger, on purpose: a setup resolves its own inpu
 ## Rules
 
 - **Self-contained.** A setup is one file plus whatever data sits beside it. Don't spread it over a `config.ts`, a `binary.ts` and a helpers directory — if it needs that much, it is doing too much.
-- **`install()` must be idempotent.** It runs on every `postinstall`. Overwrite unconditionally rather than merging: these are generated artifacts, so a stale one is a bug, not a customization worth preserving.
+- **`install()` must be idempotent.** It runs on every `postinstall`. Overwrite fully generated files. In shared files like `.codex/config.toml`, replace only the marked section owned by setup.
 - **Gitignore what you write.** If it embeds an absolute path or a resolved runtime, it is per-machine. Add it to `.gitignore` in the same change.
 
 ---
@@ -107,7 +107,7 @@ There is no context beyond the logger, on purpose: a setup resolves its own inpu
 ```
 src/vibe/core/generators/setup.ts   - regenerates all generated code
 src/vibe/platforms/cli/setup.ts     - the global command shim (+ PATH)
-src/vibe/platforms/mcp/setup.ts     - MCP config for Claude Code, Cursor, VS Code
+src/vibe/platforms/mcp/setup.ts     - MCP config for Claude Code, Cursor, VS Code, OpenCode, and Codex
 ```
 
 They run in registry order, which is file-path order — so `core/…` lands before `platforms/…` and generated code is fresh before anything reads it. That is convenient rather than load-bearing: no setup may depend on another having run.

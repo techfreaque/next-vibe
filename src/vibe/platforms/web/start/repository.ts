@@ -185,6 +185,45 @@ const EL_LAG_CRITICAL_MS = 2000;
  */
 const SUPERVISOR_MAX_HEAP_MB = 256;
 
+/**
+ * Sampled stack for a lag row: what JS ran during the stall. A stall without a
+ * matching JS streak while the profiler runs means no JS was running then (a
+ * GC pause, sync native IO or the process was not scheduled) - said explicitly
+ * so the row never looks unprofiled.
+ */
+function describeStallProfile(
+  stallMs: number,
+  stallStartedAt: number,
+):
+  | {
+      profiledHotFrames: string;
+      hotStacks?: string;
+      hotNative?: string;
+      phases?: string;
+      streakMs?: number;
+    }
+  | undefined {
+  const profile = PhaseProfiler.profileCovering(stallStartedAt);
+  if (profile && profile.streakMs >= stallMs / 2) {
+    return {
+      profiledHotFrames: profile.hotFrames || "(no app frames)",
+      hotStacks: profile.hotStacks || undefined,
+      hotNative: profile.hotNative || undefined,
+      phases: profile.phases || undefined,
+      streakMs: profile.streakMs,
+    };
+  }
+  if (!PhaseProfiler.isContinuous()) {
+    return undefined;
+  }
+  return {
+    profiledHotFrames: profile
+      ? `no JS streak matched the stall (GC, native IO or not scheduled); longest JS streak ${profile.streakMs} ms: ${profile.hotFrames}`
+      : "no JS ran during the stall (GC, native IO or not scheduled)",
+    hotNative: profile?.hotNative || undefined,
+  };
+}
+
 export class ServerStartRepository {
   private static taskRunnerStarted = false;
   /** Set once the in-process task runner is loaded; the lag monitor reads it. */
@@ -690,6 +729,10 @@ export class ServerStartRepository {
     try {
       const histogram = monitorEventLoopDelay({ resolution: 20 });
       histogram.enable();
+      // Sample the JS thread all the time, so each lag row below names the
+      // code that blocked the loop (most prod stalls ran outside any cron
+      // phase, where the phase-only profiler saw nothing).
+      PhaseProfiler.startContinuous(logger);
 
       // The histogram says HOW long the loop was blocked, not WHEN or by what.
       // A 50ms ticker records the longest stall of each 5s window with its
@@ -723,6 +766,9 @@ export class ServerStartRepository {
             taskTimings: probed?.timings ?? "",
             recentRequests: summarizeRecentRequests(),
           };
+          // Close the sampling window that covered the stall now, so its
+          // stack is summarized before the lag row below is written.
+          void PhaseProfiler.flush(startedAt);
         }
       }, STALL_TICK_MS);
       void stallTicker;
@@ -743,7 +789,7 @@ export class ServerStartRepository {
       // committed (heap growth / GC), major faults = pages read back from
       // disk, fs ops = sync file IO, involuntary switches = CPU contention.
       let lastRusage = process.resourceUsage();
-      const lagInterval = setInterval(() => {
+      const logLagWindow = async (): Promise<void> => {
         try {
           // histogram.mean is in nanoseconds
           const meanMs = histogram.mean / 1e6;
@@ -770,6 +816,12 @@ export class ServerStartRepository {
           lastHeapMb = heapMb;
           const stall = worstStall;
           worstStall = null;
+          if (stall) {
+            await PhaseProfiler.flush(stall.startedAt);
+          }
+          const stallProfile = stall
+            ? describeStallProfile(stall.ms, stall.startedAt)
+            : undefined;
           // Taken every window (it resets), logged only with a lag row
           const wsActivity = takeWsActivitySummary();
           // Shared context for every lag level: when, how big the heap was
@@ -794,11 +846,9 @@ export class ServerStartRepository {
             cpuSystemMs: Math.round(cpuDelta.system / 1000),
             loadAvg1m: Math.round(loadavg()[0] * 100) / 100,
             ...rusageDelta,
-            // Sampled stack of the stall when a profiled cron phase covered
-            // it (see PhaseProfiler); the profiler also logs its own row.
-            profiledHotFrames: stall
-              ? PhaseProfiler.profileCovering(stall.startedAt)?.hotFrames
-              : undefined,
+            // Sampled stack of the stall (PhaseProfiler samples continuously
+            // here); a profiled cron phase also logs its own row.
+            ...stallProfile,
           };
           // Dynamic values go in metadata, not the message text - see the
           // [Memory] logging above for why (fingerprint groups on message).
@@ -832,6 +882,9 @@ export class ServerStartRepository {
         } catch {
           // ignore
         }
+      };
+      const lagInterval = setInterval(() => {
+        void logLagWindow();
       }, 5_000);
       // Child exits only via process.exit() in signal handlers - no need to unref.
       void lagInterval;

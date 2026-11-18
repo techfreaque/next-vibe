@@ -99,10 +99,17 @@ export async function processOperation(params: {
           );
 
         if (!transcriptionResult.success) {
-          logger.error("[Setup] Audio transcription failed", {
-            error: transcriptionResult.message,
-            errorType: transcriptionResult.errorType?.errorCode,
-          });
+          // 4xx = the recording itself (empty / too short): the user gets a
+          // clear message and the STT layer already logged it. Provider and
+          // server failures (5xx) stay errors.
+          const sttErrorCode = transcriptionResult.errorType?.errorCode ?? 500;
+          (sttErrorCode >= 500 ? logger.error : logger.warn).bind(logger)(
+            "[Setup] Audio transcription failed",
+            {
+              error: transcriptionResult.message,
+              errorType: sttErrorCode,
+            },
+          );
           return transcriptionResult;
         }
 

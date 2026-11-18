@@ -18,6 +18,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import chalk from "chalk";
+import { parseTOML } from "confbox/toml";
 import { z } from "zod";
 
 import { getProjectRoot } from "@/env/paths";
@@ -66,23 +67,121 @@ const mcpTemplateSchema = z.object({
 
 type McpTemplate = z.infer<typeof mcpTemplateSchema>;
 
+const CODEX_BLOCK_START = "# BEGIN next-vibe MCP servers";
+const CODEX_BLOCK_END = "# END next-vibe MCP servers";
+const CODEX_BLOCK = new RegExp(
+  `(^|\\r?\\n)(?=(${CODEX_BLOCK_START}\\r?\\n[\\s\\S]*?^${CODEX_BLOCK_END}(?:\\r?\\n|$)))`,
+  "gm",
+);
+
+function tomlString(value: string): string {
+  // TOML basic strings use the same escapes as JSON, and also require DEL to be escaped.
+  return JSON.stringify(value).replaceAll(String.fromCharCode(127), "\\u007F");
+}
+
+function tomlKey(key: string): string {
+  return /^[\w-]+$/.test(key) ? key : tomlString(key);
+}
+
+function renderCodexConfig(template: McpTemplate): string {
+  const tables = Object.entries(template.mcpServers).map(([name, server]) => {
+    const args = (server.args ?? []).map(tomlString);
+    const env = Object.entries(server.env ?? {}).map(
+      ([key, value]) => `${tomlKey(key)} = ${tomlString(value)}`,
+    );
+    return [
+      `[mcp_servers.${tomlKey(name)}]`,
+      `command = ${tomlString(server.command)}`,
+      `args = [${args.join(", ")}]`,
+      `env = {${env.length > 0 ? ` ${env.join(", ")} ` : ""}}`,
+      "startup_timeout_sec = 60",
+      "tool_timeout_sec = 600",
+      'default_tools_approval_mode = "approve"',
+    ].join("\n");
+  });
+  return `${CODEX_BLOCK_START}\n${tables.join("\n\n")}\n${CODEX_BLOCK_END}\n`;
+}
+
+/**
+ * Codex shares its MCP tables with other project settings. Setup owns only the
+ * marked block. Keep everything outside it verbatim and replace it in place.
+ */
+function updateCodexConfig(existing: string, block: string): string {
+  const match = [...existing.matchAll(CODEX_BLOCK)].find(({ index }) => {
+    try {
+      // A marker inside a multiline value has an incomplete TOML prefix.
+      parseTOML(existing.slice(0, index));
+      return true;
+    } catch {
+      return false;
+    }
+  });
+  if (!match) {
+    return existing && block ? `${existing}\n${block}` : existing + block;
+  }
+  const before = existing.slice(0, match.index);
+  const after = existing.slice(match.index + match[1].length + match[2].length);
+  const separator =
+    block || (before && after && !before.endsWith("\n")) ? match[1] : "";
+  return before + separator + block + after;
+}
+
+function mergeCodexConfig(
+  existing: string,
+  block: string,
+  template: McpTemplate,
+): { content: string } | { failed: string } {
+  try {
+    const userConfig = parseTOML<{ mcp_servers?: WidgetData }>(
+      updateCodexConfig(existing, ""),
+    );
+    const servers = userConfig.mcp_servers;
+    if (servers && typeof servers === "object") {
+      const conflict = Object.keys(template.mcpServers).find((name) =>
+        Object.hasOwn(servers, name),
+      );
+      if (conflict !== undefined) {
+        return {
+          failed: `The Codex config already defines the MCP server "${conflict}" outside the next-vibe block.`,
+        };
+      }
+    }
+    const content = updateCodexConfig(existing, block);
+    parseTOML(content);
+    return { content };
+  } catch {
+    return {
+      failed:
+        "The Codex config could not be merged as TOML. Check .codex/config.toml.",
+    };
+  }
+}
+
 /**
  * Where each editor reads project-scoped MCP config, and in what shape.
  *
- * VS Code is the odd one out on both counts: it keys servers under `servers`
- * rather than `mcpServers`, and requires an explicit `type` discriminator.
- * Handing it a Claude Code file raises no error — the servers simply never
- * appear, which is why this cannot be one blob copied to every path.
+ * VS Code uses the top-level `servers` key and an explicit `type` discriminator.
+ * Codex reads TOML and shares the file with other project settings.
  *
  * Windsurf is absent deliberately: it reads user-level config only
  * (`~/.codeium/windsurf/mcp_config.json`) and has no project-scoped file to
  * write. Zed is absent because its project-level support is unconfirmed.
  */
-const MCP_TARGETS: readonly {
+type McpTarget = {
   readonly path: string;
   readonly editor: string;
-  readonly render: (template: McpTemplate) => WidgetData;
-}[] = [
+} & (
+  | {
+      readonly format?: "json";
+      readonly render: (template: McpTemplate) => WidgetData;
+    }
+  | {
+      readonly format: "toml";
+      readonly render: (template: McpTemplate) => string;
+    }
+);
+
+const MCP_TARGETS: readonly McpTarget[] = [
   { path: ".mcp.json", editor: "Claude Code", render: (template) => template },
   {
     path: ".cursor/mcp.json",
@@ -122,10 +221,13 @@ const MCP_TARGETS: readonly {
       ),
     }),
   },
+  {
+    path: ".codex/config.toml",
+    editor: "Codex",
+    format: "toml",
+    render: renderCodexConfig,
+  },
 ];
-
-// Both writeMcpConfigs and removeMcpConfigs walk MCP_TARGETS directly, so a
-// separate exported path list only restated it for nobody to read.
 
 /**
  * Resolved template, or the reason it could not be. Returned rather than thrown:
@@ -273,18 +375,9 @@ async function resolveMcpTemplate(): Promise<TemplateResult> {
   };
 }
 
-/** Serialize one target, newline-terminated so the files stay diff-friendly. */
-function renderTarget(
-  target: (typeof MCP_TARGETS)[number],
-  template: McpTemplate,
-): string {
-  return `${JSON.stringify(target.render(template), null, 2)}\n`;
-}
-
 /**
- * Write every editor's MCP config from the template. Overwrites unconditionally
- * — these are generated artifacts, and a stale one is a server that fails to
- * start rather than a customization worth keeping.
+ * Write every editor's MCP config from the template. The JSON targets are
+ * generated files. Codex shares its project config with user settings.
  */
 async function writeMcpConfigs(): Promise<{
   changed: string[];
@@ -298,33 +391,67 @@ async function writeMcpConfigs(): Promise<{
   const writtenPaths: string[] = [];
   for (const target of MCP_TARGETS) {
     const destination = join(projectRoot, target.path);
-    // Guarded rather than relying on `recursive: true` to be a no-op: under bun
-    // it still fails with EEXIST for a directory that already exists, and the
-    // most common target (.mcp.json) sits directly in the project root.
-    const directory = dirname(destination);
-    if (!existsSync(directory)) {
-      await fs.mkdir(directory, { recursive: true });
+    try {
+      // On Bun, recursive mkdir can fail with EEXIST for an existing directory.
+      const directory = dirname(destination);
+      if (!existsSync(directory)) {
+        await fs.mkdir(directory, { recursive: true });
+      }
+      if (target.format === "toml") {
+        const existing = existsSync(destination)
+          ? await fs.readFile(destination, "utf8")
+          : "";
+        const merged = mergeCodexConfig(
+          existing,
+          target.render(resolved.template),
+          resolved.template,
+        );
+        if ("failed" in merged) {
+          return { changed: writtenPaths, failed: merged.failed };
+        }
+        await fs.writeFile(destination, merged.content, "utf8");
+      } else {
+        const content = JSON.stringify(
+          target.render(resolved.template),
+          null,
+          2,
+        );
+        await fs.writeFile(destination, `${content}\n`, "utf8");
+      }
+    } catch (error) {
+      return {
+        changed: writtenPaths,
+        failed: `Could not write ${target.path}: ${parseError(error).message}`,
+      };
     }
-    await fs.writeFile(
-      destination,
-      renderTarget(target, resolved.template),
-      "utf8",
-    );
     writtenPaths.push(destination);
   }
   return { changed: writtenPaths };
 }
 
-/** Remove every generated config. Absent files are already in the desired state. */
+/** Remove generated configs and the managed block in the shared Codex config. */
 async function removeMcpConfigs(): Promise<string[]> {
   const projectRoot = getProjectRoot();
   const removedPaths: string[] = [];
   for (const target of MCP_TARGETS) {
     const destination = join(projectRoot, target.path);
-    if (existsSync(destination)) {
-      await fs.rm(destination);
-      removedPaths.push(destination);
+    if (!existsSync(destination)) {
+      continue;
     }
+    if (target.format === "toml") {
+      const existing = await fs.readFile(destination, "utf8");
+      const remaining = updateCodexConfig(existing, "");
+      if (existing === remaining) {
+        continue;
+      }
+      if (remaining) {
+        await fs.writeFile(destination, remaining, "utf8");
+        removedPaths.push(destination);
+        continue;
+      }
+    }
+    await fs.unlink(destination);
+    removedPaths.push(destination);
   }
   return removedPaths;
 }
@@ -355,9 +482,7 @@ export async function install(logger: EndpointLogger): Promise<SetupResult> {
 export async function uninstall(logger: EndpointLogger): Promise<SetupResult> {
   const changed = await removeMcpConfigs();
   if (changed.length === 0) {
-    logger.info(
-      `${chalk.dim("·")} ${chalk.dim(`${description} — none found`)}`,
-    );
+    logger.info(`${chalk.dim("·")} ${chalk.dim(`No ${description} found`)}`);
     return { changed, summary: "nothing to remove" };
   }
   logger.info(

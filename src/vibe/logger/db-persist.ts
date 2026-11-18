@@ -74,9 +74,54 @@ function extractMessage(
 }
 
 /**
+ * Metadata keys left out of every fingerprint (callers add their own on top).
+ * `locale` split one bug into one row per UI language; `payload` is the raw
+ * request input (attacker controlled on a sweep: one row per probe).
+ */
+const BASE_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
+  "locale",
+  "payload",
+]);
+
+/**
+ * Replace the per-occurrence parts of a string (ids, numbers, timestamps,
+ * addresses) with placeholders, so one error class gets one fingerprint.
+ * 2026-11-18: 2,499 unresolved rows on prod, most of them one class split by
+ * a user id in the message ("User <uuid> lacks required roles"), a thread id
+ * or a credit balance in metadata. Applied to the fingerprint input only: the
+ * stored message and metadata keep the full detail.
+ *
+ * Integers of up to 3 digits stay (status codes, error counts, small enums);
+ * longer integers and every decimal become `<n>`.
+ */
+export function normalizeForFingerprint(input: string): string {
+  return (
+    input
+      .replace(
+        /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
+        "<uuid>",
+      )
+      .replace(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g, "<email>")
+      .replace(
+        /\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})?/g,
+        "<ts>",
+      )
+      .replace(/\b\d{1,3}(?:\.\d{1,3}){3}\b/g, "<ip>")
+      // URL query strings carry tokens, cache busters and tracking ids
+      .replace(/\?[\w%.[\]-]+=[^\s"'\\)]*/g, "?<q>")
+      // Zod echoes the rejected value: `(received "...")`
+      .replace(/\(received [^)]*\)/g, "(received <v>)")
+      // decimals before hex: 0.30000000000000004 is a number, not an id
+      .replace(/\d+\.\d+/g, "<n>")
+      .replace(/\b(?=[0-9a-f]*\d)[0-9a-f]{12,}\b/gi, "<hex>")
+      .replace(/\d{4,}/g, "<n>")
+  );
+}
+
+/**
  * Serialize metadata to a stable string for fingerprinting.
- * Uses the full metadata content so errors with different context
- * (different endpoint, feature, schedule, etc.) get separate rows.
+ * Uses the metadata content (minus ignored keys, values normalized) so errors
+ * with different context (endpoint, feature, schedule, ...) get separate rows.
  */
 function serializeMetaForFingerprint(
   allMeta: LoggerMetadata[],
@@ -85,47 +130,55 @@ function serializeMetaForFingerprint(
   if (allMeta.length === 0) {
     return "";
   }
-  const stable =
-    ignoreKeys && ignoreKeys.size > 0
-      ? allMeta.flatMap((m): LoggerMetadata[] => {
-          if (
-            m === null ||
-            typeof m !== "object" ||
-            m instanceof Error ||
-            m instanceof Date ||
-            Array.isArray(m)
-          ) {
-            return [m];
-          }
-          const out: Record<string, LoggerMetadata> = {};
-          for (const [k, v] of Object.entries(m)) {
-            if (!ignoreKeys.has(k)) {
-              out[k] = v;
-            }
-          }
-          // A record made only of ignored keys (tabId, occurrences, ...) must
-          // vanish entirely, or its presence alone would split the row.
-          return Object.keys(out).length > 0 ? [out] : [];
-        })
-      : allMeta;
+  const isIgnored = (k: string): boolean =>
+    BASE_FINGERPRINT_IGNORE_KEYS.has(k) || (ignoreKeys?.has(k) ?? false);
+  const stable = allMeta.flatMap((m): LoggerMetadata[] => {
+    if (
+      m === null ||
+      typeof m !== "object" ||
+      m instanceof Error ||
+      m instanceof Date ||
+      Array.isArray(m)
+    ) {
+      return [m];
+    }
+    const out: Record<string, LoggerMetadata> = {};
+    for (const [k, v] of Object.entries(m)) {
+      if (!isIgnored(k)) {
+        out[k] = v;
+      }
+    }
+    // A record made only of ignored keys (tabId, occurrences, ...) must
+    // vanish entirely, or its presence alone would split the row.
+    return Object.keys(out).length > 0 ? [out] : [];
+  });
   try {
-    return JSON.stringify(stable);
+    return normalizeForFingerprint(JSON.stringify(stable));
   } catch {
     return String(allMeta.length);
   }
 }
 
-/** Compute a deterministic fingerprint for error grouping/deduplication */
-function computeFingerprint(
+/** Level + type + normalized message prefix: one error class. */
+function fingerprintBaseKey(
   level: ErrorLogLevel,
   errorType: string | null | undefined,
   message: string,
+): string {
+  return `${level}:${errorType ?? "unknown"}:${normalizeForFingerprint(message).slice(0, 100)}`;
+}
+
+/** Compute a deterministic fingerprint for error grouping/deduplication */
+function computeFingerprint(
+  baseKey: string,
   allMeta: LoggerMetadata[],
   ignoreKeys: ReadonlySet<string> | undefined,
 ): string {
   const metaStr = serializeMetaForFingerprint(allMeta, ignoreKeys);
-  const key = `${level}:${errorType ?? "unknown"}:${message.slice(0, 100)}:${metaStr}`;
-  return createHash("sha256").update(key).digest("base64url").slice(0, 16);
+  return createHash("sha256")
+    .update(`${baseKey}:${metaStr}`)
+    .digest("base64url")
+    .slice(0, 16);
 }
 
 /**
@@ -339,15 +392,10 @@ function buildRow(
 
   // Fingerprint includes stable context from metadata so the same error
   // from different code paths (e.g. different endpoints) gets separate rows.
+  const baseKey = fingerprintBaseKey(level, errorType, truncatedMessage);
   const { fingerprint, collapsed } = resolveFingerprint(
-    `${level}:${errorType ?? "unknown"}:${truncatedMessage.slice(0, 100)}`,
-    computeFingerprint(
-      level,
-      errorType,
-      truncatedMessage,
-      allMeta,
-      options?.fingerprintIgnoreKeys,
-    ),
+    baseKey,
+    computeFingerprint(baseKey, allMeta, options?.fingerprintIgnoreKeys),
   );
   if (collapsed) {
     allMeta.push({

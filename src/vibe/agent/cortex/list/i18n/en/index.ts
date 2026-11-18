@@ -52,6 +52,7 @@ export const translations = {
         updatedAt: { content: "Updated" },
       },
       total: { text: "Total" },
+      writable: { text: "Writable" },
     },
     errors: {
       validation: { title: "Bad Input", description: "Check the path" },

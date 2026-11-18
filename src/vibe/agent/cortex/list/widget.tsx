@@ -195,13 +195,13 @@ export function CortexListWidget(): React.JSX.Element {
       {/* Top nav */}
       <CortexNav
         path={currentPath !== "/" ? currentPath : undefined}
-        actions={["search", "tree", "write"]}
+        actions={
+          value?.writable ? ["search", "tree", "write"] : ["search", "tree"]
+        }
         actionData={{
           search: { path: currentPath },
           tree: { path: currentPath },
-          write: {
-            path: currentPath === "/" ? "/" : `${currentPath}/new-file.md`,
-          },
+          write: { path: `${currentPath}/new-file.md` },
         }}
       />
 

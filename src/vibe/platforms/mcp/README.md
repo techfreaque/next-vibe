@@ -1,7 +1,7 @@
 # MCP Server
 
 Exposes vibe endpoints as [Model Context Protocol](https://modelcontextprotocol.io/) tools over
-JSON-RPC on STDIO, for AI assistants (Claude Code, Claude Desktop, Cline, …).
+JSON-RPC on STDIO, for AI assistants such as Claude Code, Codex CLI, and Cline.
 
 MCP is one of this framework's surfaces. The closest sibling is the [CLI](../cli/README.md); both
 execute the same endpoints through the same handler.
@@ -21,8 +21,17 @@ execute the same endpoints through the same handler.
 }
 ```
 
-Editor configs are generated from [`mcp.template.json`](./mcp.template.json) by `vibe setup` — edit
-the template rather than the emitted `.mcp.json`, which is overwritten.
+`vibe setup` generates project MCP configs for Claude Code, Cursor, VS Code, OpenCode, and
+Codex CLI from [`mcp.template.json`](./mcp.template.json). Edit the template to change the
+generated servers.
+
+Codex reads `.codex/config.toml` in trusted projects. Run `codex mcp list` from the project root to
+check that `atlas` and `hermes` are enabled. Setup manages the marked MCP block and preserves
+settings outside it. If you previously configured either server by hand, move those settings
+out of the project config before running setup. Uninstall removes the managed block.
+
+Setup sets `default_tools_approval_mode = "approve"` for both servers. Codex can call their tools
+without prompting, including in `codex exec` sessions with an approval policy of `never`.
 
 Debug logging: add `--verbose` to `args`. Because stdout is the protocol channel, debug output goes
 to the **log file** (`.tmp/.vibe-mcp.log`), never the console — see [`logger/spec.md`](../../logger/spec.md).

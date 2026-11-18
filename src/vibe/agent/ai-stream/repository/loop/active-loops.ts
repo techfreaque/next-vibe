@@ -29,9 +29,38 @@ export interface DrainableLoop {
   abort: (reason: string) => void;
 }
 
-const activeLoops = new Set<DrainableLoop>();
+declare global {
+  /**
+   * Drain state shared by every copy of this module in the process. The
+   * Next.js build inlines it into several bundle layers (route handlers vs
+   * instrumentation.ts), each with its own module instance: with module-local
+   * sets the drain watcher and the SIGTERM drain in instrumentation.ts saw 0
+   * runs while route handlers were streaming (every 11-17 deploy drained with
+   * busy=0 and cut live streams). globalThis is the one thing they share.
+   */
+  var __vibeActiveLoops:
+    | {
+        loops: Set<DrainableLoop>;
+        runs: Set<Promise<void>>;
+        draining: boolean;
+      }
+    | undefined;
+}
 
-let draining = false;
+function loopState(): {
+  loops: Set<DrainableLoop>;
+  runs: Set<Promise<void>>;
+  draining: boolean;
+} {
+  globalThis.__vibeActiveLoops ??= {
+    loops: new Set(),
+    runs: new Set(),
+    draining: false,
+  };
+  return globalThis.__vibeActiveLoops;
+}
+
+const activeLoops = loopState().loops;
 
 /**
  * True once the drain has begun. Stream entrypoints check this and refuse to
@@ -39,7 +68,7 @@ let draining = false;
  * past LB deregistration is rejected cleanly instead of being killed mid-flight.
  */
 export function isDraining(): boolean {
-  return draining;
+  return loopState().draining;
 }
 
 /** Register a loop as active. Call once, at the very start of `run()`. */
@@ -64,7 +93,7 @@ export function activeLoopCount(): number {
  * from its HTTP request, so the loop registry alone lets a drain exit while a
  * turn is still settling.
  */
-const activeRuns = new Set<Promise<void>>();
+const activeRuns = loopState().runs;
 
 /** Track a detached or awaited AI run until it settles (resolve or reject). */
 export function trackActiveRun(run: Promise<void>): void {
@@ -101,7 +130,7 @@ export async function drainActiveLoops(
   onProgress?: (remaining: number) => void,
   extraBusy?: () => number,
 ): Promise<number> {
-  draining = true;
+  loopState().draining = true;
 
   const busy = (): number =>
     activeLoops.size + activeRuns.size + (extraBusy?.() ?? 0);

@@ -9,6 +9,7 @@ import "server-only";
  * Last-writer-wins on updatedAt; tie → remote wins.
  */
 import { and, asc, eq, sql } from "drizzle-orm";
+import { iconNullishSchema } from "next-vibe/core/definition/common.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { StandardSyncCursor } from "next-vibe/remote-connection/db";
@@ -16,10 +17,11 @@ import {
   type SyncProvider,
   toStandardCursor,
 } from "next-vibe/remote-connection/sync/provider";
-import {
-  type IconKey,
-  IconKeyDB,
-} from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
+// Type only: a value import of the icon registry module pulls the whole UI
+// icon graph (and, under the CLI widget plugin the prod server runs with, ink
+// + react-reconciler) into the server. Sync registration loads this file lazily
+// mid-run, so that cold import blocked the event loop for 0.3-2 s on prod.
+import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import { z } from "zod";
 
 import {
@@ -117,7 +119,7 @@ export const syncedFavoriteSchema: z.ZodType<SyncedFavorite> = z.object({
   variantId: z.string().nullable(),
   variantsMode: z.enum(VariantsModeDB),
   customVariantName: z.string().nullable(),
-  customIcon: z.enum(IconKeyDB).nullable(),
+  customIcon: iconNullishSchema,
   voiceModelSelection: voiceModelSelectionSchema.nullable().optional(),
   sttModelSelection: sttModelSelectionSchema.nullable().optional(),
   imageVisionModelSelection: imageVisionModelSelectionSchema

@@ -20317,6 +20317,7 @@ export const endpointsMeta: EndpointMeta[] = [
       responses: {
         root: {
           responsePath: "/",
+          writable: false,
           entries: [
             {
               name: "documents",
@@ -22804,9 +22805,8 @@ export const endpointsMeta: EndpointMeta[] = [
             },
             {
               key: "src/vibe/platforms/mcp",
-              description:
-                "MCP server config for Claude Code, Cursor and VS Code",
-              summary: "wrote 3 MCP config file(s)",
+              description: "MCP config",
+              summary: "wrote 5 MCP config file(s)",
               ok: true,
             },
           ],
@@ -22861,9 +22861,8 @@ export const endpointsMeta: EndpointMeta[] = [
             },
             {
               key: "src/vibe/platforms/mcp",
-              description:
-                "MCP server config for Claude Code, Cursor and VS Code",
-              summary: "removed 3 MCP config file(s)",
+              description: "MCP config",
+              summary: "removed 5 MCP config file(s)",
               ok: true,
             },
           ],

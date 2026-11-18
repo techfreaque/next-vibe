@@ -250,11 +250,14 @@ function tryParseToolCallsJson(
   return null;
 }
 
+const VALID_JSON_ESCAPES = '"\\/bfnrtu';
+
 /**
  * Best-effort structural repair of LLM-emitted JSON:
  * - raw newlines/tabs inside strings are escaped
  * - a `"` inside a string that isn't followed by a JSON delimiter is a literal quote
  * - an unterminated string and unclosed `{`/`[` (truncated output) are closed
+ * - invalid escapes (`\'`) lose their backslash
  */
 function repairToolCallsJson(input: string): string {
   const closers: string[] = [];
@@ -267,7 +270,11 @@ function repairToolCallsJson(input: string): string {
 
     if (inString) {
       if (escaped) {
-        out += ch;
+        // An escape JSON doesn't know (models write `\'`, prod 2026-11-16):
+        // drop the backslash, keep the character.
+        out = VALID_JSON_ESCAPES.includes(ch)
+          ? out + ch
+          : out.slice(0, -1) + ch;
         escaped = false;
       } else if (ch === "\\") {
         out += ch;

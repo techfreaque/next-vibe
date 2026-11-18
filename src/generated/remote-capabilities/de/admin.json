@@ -321697,6 +321697,20 @@
           },
           "schemaType": "primitive"
         },
+        "writable": {
+          "type": "badge",
+          "text": "get.response.writable.text",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "entries": {
           "type": "container",
           "child": {
@@ -578812,13 +578826,44 @@
           "type": "form_field",
           "fieldType": "text",
           "label": "Fingerprint",
-          "description": "Der Fingerprint des Fehlerprotokolls",
+          "description": "Der Fingerprint des Fehlerprotokolls (Spalte `fingerprint` in der Liste). Diesen oder die ID angeben.",
           "placeholder": "Fingerprint eingeben",
           "schema": {
             "def": {
-              "type": "string"
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
             },
-            "type": "string"
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "id": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Log-ID",
+          "description": "Die Zeilen-ID aus der Liste (volle UUID oder die ersten 8+ Zeichen). Alternative zum Fingerprint.",
+          "placeholder": "z. B. c21bd4c7",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "request": "data"

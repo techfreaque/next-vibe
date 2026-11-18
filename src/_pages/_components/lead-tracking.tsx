@@ -9,6 +9,7 @@ import { EngagementTypes } from "next-vibe/identity/lead/enum";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { getClientRoute } from "next-vibe/logger/client-context";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
+import { getCookie } from "next-vibe/ui/lib/cookies";
 import {
   addDocumentListener,
   addWindowListener,
@@ -20,6 +21,7 @@ import { getUserAgent, isOnline } from "next-vibe/ui/lib/media";
 import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { useEffect, useRef } from "react";
 
+import { CSRF_TOKEN_COOKIE_NAME } from "@/env/constants";
 import trackingEndpoints from "@/leads/tracking/definition";
 
 const TRACKING_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
@@ -157,7 +159,14 @@ export function LeadTracking(): null {
           }, NETWORK_RETRY_DELAY_MS);
           return;
         }
+        // A CSRF 403 means the page could not read (or echo) the csrf
+        // cookie the browser still sent: say whether JS sees it at all.
+        const csrfCookieReadable =
+          errorType.errorCode === 403
+            ? (await getCookie(CSRF_TOKEN_COOKIE_NAME, logger)) !== null
+            : null;
         logger.error("Lead tracking: failed to record website visit", {
+          csrfCookieReadable,
           error: errorMessage,
           errorKey: errorType.errorKey,
           errorCode: errorType.errorCode,

@@ -225,7 +225,7 @@ export const translations = {
       creditValidationFailed: "Failed to validate credit balance",
       noIdentifier: "No user or lead identifier provided",
       insufficientCredits:
-        "Insufficient credits to complete this request (cost: {{cost}}, balance: {{balance}})",
+        "Not enough credits: this request costs {{cost}}, your balance is {{balance}}. Top up or pick a cheaper model.",
       noResponseBody: "No response body received from stream",
       authenticationRequired:
         "Please log in to use persistent folders. Use incognito mode for anonymous chats.",
@@ -350,7 +350,8 @@ export const translations = {
     },
     skill: {
       label: "Skill",
-      description: "Optional skill to use for the AI",
+      description:
+        'Skill id or slug from the skills list (optionally slug__variant). Omit or use "default" for none. Unknown ids fall back to the default.',
     },
     systemPrompt: {
       label: "System Prompt",
@@ -572,6 +573,8 @@ export const translations = {
       "The model ended without writing an answer. You paid only what the provider charged, no platform fee. Try again or pick another model.",
     contentFiltered:
       "This response was blocked by the provider's content filter. Try a different model.",
+    providerBusy:
+      "This model is overloaded right now. Retry in a few seconds or pick another model.",
     modelUnavailable:
       "The selected AI model is currently unavailable. Please try a different model.",
     rateLimitExceeded: "Too many requests. Please wait a moment and try again.",
@@ -742,6 +745,9 @@ export const translations = {
     },
     member: {
       title: "You're out of credits",
+      shortTitle: "Not enough credits for this message",
+      shortDescription:
+        "You have {{balance}} credits. Long chats cost more per message: start a new chat or pick a cheaper model. Or top up:",
       description:
         "Free credits refill on {{date}}. Or pick a plan and keep going now:",
       subscriberDescription:

@@ -22,6 +22,7 @@ import {
   DOCUMENTS_PREFIX,
   getMountPrefix,
   isValidPath,
+  isVirtualWritable,
   isWritablePath,
   listChildren,
   MEMORIES_PREFIX,
@@ -50,6 +51,10 @@ export class CortexListRepository {
   }): Promise<ResponseType<CortexListResponseOutput>> {
     // Normalize locale-aware path to canonical for DB queries and template matching
     const path = normalizeToCanonicalPath(normalizePath(rawPath), locale);
+    // The UI offers "write" only where a write can succeed (virtual mounts like
+    // /threads are read-only; the root takes no files).
+    const writable =
+      path !== "/" && (isWritablePath(path, locale) || isVirtualWritable(path));
 
     if (!isValidPath(path)) {
       return fail({
@@ -90,7 +95,12 @@ export class CortexListRepository {
           },
         ];
 
-        return success({ responsePath: path, entries, total: entries.length });
+        return success({
+          responsePath: path,
+          writable,
+          entries,
+          total: entries.length,
+        });
       }
 
       const mountPrefix = getMountPrefix(path, locale);
@@ -115,7 +125,12 @@ export class CortexListRepository {
             updatedAt: new Date(e.updatedAt),
           }),
         );
-        return success({ responsePath: path, entries, total: entries.length });
+        return success({
+          responsePath: path,
+          writable,
+          entries,
+          total: entries.length,
+        });
       }
 
       // Document workspace listing
@@ -211,7 +226,12 @@ export class CortexListRepository {
         }
       }
 
-      return success({ responsePath: path, entries, total: entries.length });
+      return success({
+        responsePath: path,
+        writable,
+        entries,
+        total: entries.length,
+      });
     } catch (error) {
       logger.error("Cortex list failed", parseError(error), { path });
       return fail({

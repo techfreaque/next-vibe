@@ -103,6 +103,8 @@ export const RESET_TOKEN_EXPIRY = 4; // hours
  */
 export const CSRF_TOKEN_COOKIE_NAME = `csrf_token${PORT_SUFFIX}`;
 export const CSRF_TOKEN_HEADER_NAME = "x-csrf-token";
+/** Set on a 403 CSRF rejection (value = reason) so the client can retry once. */
+export const CSRF_REJECTED_HEADER_NAME = "x-csrf-rejected";
 
 /**
  * Per-call correlation id. The browser mints one per endpoint call

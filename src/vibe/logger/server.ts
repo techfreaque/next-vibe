@@ -63,6 +63,37 @@ export const SERVER_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "completionTokens",
   "imageOutputTokens",
   "modelCreditCost",
+  // 2026-11-18 triage: more per-occurrence values that split one class into
+  // hundreds of rows (event-loop profiler snapshots, per-call tool args and
+  // token counts, supervisor restart counters).
+  "hotStacks",
+  "hotFrames",
+  "hotNative",
+  "profiledHotFrames",
+  "phases",
+  "streakMs",
+  "fsReads",
+  "fsWrites",
+  "majorFaults",
+  "minorFaults",
+  "involuntarySwitches",
+  "runningTasks",
+  "args",
+  "totalTokens",
+  "inputTokens",
+  "outputTokens",
+  "cachedInputTokens",
+  "partialOutputChars",
+  "fallbackUsd",
+  "creditCost",
+  "creditCostBeforeMarkupWaiver",
+  "accountAgeDays",
+  "restartCount",
+  "nextDownForS",
+  // "[WS] Subscribe denied" / lead cookie rows: per-visitor identities
+  "socketUid",
+  "requestedUid",
+  "invalidLeadId",
 ]);
 
 /**

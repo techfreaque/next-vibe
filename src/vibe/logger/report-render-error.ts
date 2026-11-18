@@ -4,8 +4,8 @@
  * Client-safe: no React, no server imports.
  */
 
+import { handleChunkLoadFailure, isChunkLoadError } from "./chunk-reload";
 import { claimErrorReport } from "./client-context";
-import { chunkLoadDiagnostics } from "./global-error-listeners";
 import type { EndpointLogger, LoggerMetadata } from "./types";
 
 export function reportRenderError({
@@ -27,11 +27,23 @@ export function reportRenderError({
   }
   const digest =
     "digest" in error && typeof error.digest === "string" ? error.digest : null;
+  if (isChunkLoadError(error)) {
+    handleChunkLoadFailure(logger, {
+      source: `error-boundary:${boundary}`,
+      error,
+      context: {
+        boundary,
+        digest,
+        componentStack: componentStack ? componentStack.slice(0, 2000) : null,
+        ...extra,
+      },
+    });
+    return;
+  }
   logger.error(`React render error (${boundary}): ${error.message}`, error, {
     boundary,
     digest,
     componentStack: componentStack ? componentStack.slice(0, 2000) : null,
-    ...chunkLoadDiagnostics(error.message),
     ...extra,
   });
 }

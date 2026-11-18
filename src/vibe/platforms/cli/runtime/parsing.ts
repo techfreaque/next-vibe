@@ -11,6 +11,7 @@ import { isEmptySchema } from "../../../core/core-utils/validation";
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
 import { FieldDataType } from "../../../core/definition/enums";
 import type { WidgetData } from "../../../core/utils/json";
+import { WidgetDataSchema } from "../../../core/utils/json";
 import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
 import { hasChildren } from "../../../unified-ui/_shared/type-guards";
@@ -574,7 +575,7 @@ export class CliInputParser {
    */
   private static buildFieldNamesOfType(
     endpointDefinition: CreateApiEndpointAny | null,
-    type: "boolean" | "string",
+    type: "boolean" | "string" | "record" | "object",
   ): Set<string> {
     const names = new Set<string>();
     if (!endpointDefinition) {
@@ -704,6 +705,22 @@ export class CliInputParser {
   }
 
   /**
+   * A JSON-object string for a record/object field becomes that object; any
+   * other value is left for the schema to judge.
+   */
+  private static parseJsonObjectValue(value: WidgetData): WidgetData {
+    if (typeof value !== "string" || !value.trim().startsWith("{")) {
+      return value;
+    }
+    try {
+      const parsed = WidgetDataSchema.safeParse(JSON.parse(value));
+      return parsed.success ? parsed.data : value;
+    } catch {
+      return value;
+    }
+  }
+
+  /**
    * Build data object from CLI arguments
    */
   private static buildDataFromCliArgs(
@@ -733,6 +750,14 @@ export class CliInputParser {
       "preview",
     ]);
 
+    // Record/object fields given as one JSON flag (`--taskInput='{"a":1}'`)
+    // arrive as a string; the schema wants the object (2026-11-17: cron PUT
+    // over --remote failed "taskInput: expected record, received string").
+    const jsonFieldNames = new Set([
+      ...this.buildFieldNamesOfType(endpoint, "record"),
+      ...this.buildFieldNamesOfType(endpoint, "object"),
+    ]);
+
     for (const [key, value] of Object.entries(expandedNamedArgs)) {
       if (CLI_LEVEL_OPTIONS.has(key)) {
         continue;
@@ -740,7 +765,9 @@ export class CliInputParser {
 
       // Convert string boolean values to actual booleans (arrays pass through).
       // Cast is safe - Zod strips incompatible shapes at final parse.
-      const normalizedValue = this.normalizeCliValue(value);
+      const normalizedValue = jsonFieldNames.has(key)
+        ? this.parseJsonObjectValue(value)
+        : this.normalizeCliValue(value);
 
       // Use setNestedValue to expand dot-notation keys (e.g. response.output → { response: { output } })
       if (key.includes(".")) {

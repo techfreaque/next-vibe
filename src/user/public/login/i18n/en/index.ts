@@ -308,7 +308,8 @@ export const translations = {
     title: "Login Error",
     account_suspended:
       "Account suspended. Contact support if you think this is a mistake.",
-    account_locked: "Account is locked",
+    account_locked:
+      "Too many failed attempts. Wait 15 minutes, or reset your password. No account yet? Sign up.",
     accountLocked: "Account is locked",
     accountLockedDescription:
       "Your account has been locked. Please contact support.",

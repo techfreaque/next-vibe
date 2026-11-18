@@ -8,6 +8,10 @@
  */
 
 import { parseError } from "next-vibe/core/utils/parse-error";
+import {
+  handleChunkLoadFailure,
+  isChunkLoadError,
+} from "next-vibe/logger/chunk-reload";
 import { Span } from "next-vibe/ui/components/span";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import type { JSX } from "react";
@@ -119,12 +123,26 @@ const LazyIcon: React.FC<{
         }
         setLoaded({ name: registryValue, Component });
       } catch (error) {
-        logger.warn("Icon library chunk failed to load", {
-          component: "Icon",
-          operation: "loadIcon",
-          icon: registryValue,
-          error: parseError(error).message,
-        });
+        const parsed = parseError(error);
+        if (isChunkLoadError(parsed)) {
+          handleChunkLoadFailure(logger, {
+            source: "icon-loader",
+            error: parsed,
+            level: "warn",
+            context: {
+              component: "Icon",
+              operation: "loadIcon",
+              icon: registryValue,
+            },
+          });
+        } else {
+          logger.warn("Icon library failed to load", {
+            component: "Icon",
+            operation: "loadIcon",
+            icon: registryValue,
+            error: parsed.message,
+          });
+        }
         setLoaded({ name: registryValue, Component: ErrorIconFallback });
       }
     })();

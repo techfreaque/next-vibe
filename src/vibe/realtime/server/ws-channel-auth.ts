@@ -84,10 +84,8 @@ export async function authenticateWsRequest(
   const cookieHeader = req.headers.get("cookie") ?? "";
   const url = new URL(req.url);
 
-  const token =
-    parseCookieValue(cookieHeader, AUTH_TOKEN_COOKIE_NAME) ??
-    url.searchParams.get("token") ??
-    null;
+  const cookieToken = parseCookieValue(cookieHeader, AUTH_TOKEN_COOKIE_NAME);
+  const token = cookieToken ?? url.searchParams.get("token") ?? null;
   const leadId =
     parseCookieValue(cookieHeader, LEAD_ID_COOKIE_NAME) ||
     url.searchParams.get("leadId") ||
@@ -106,8 +104,36 @@ export async function authenticateWsRequest(
         defaultLocale,
       );
 
-      if (result.success) {
+      if (result.success && (result.data.isPublic || !cookieToken)) {
         return result.data;
+      }
+      if (result.success) {
+        // Browser cookie: the page treats a JWT whose session row is gone
+        // (logout elsewhere, deleted or suspended account) as a guest, so the
+        // socket must too. Otherwise the tab renders as guest and asks for
+        // user/{leadId}/… while the socket claims the user id, and every
+        // subscribe is denied ("client-guest-socket-user"; 2026-11-16/17 two
+        // deleted accounts kept a valid JWT cookie for a day).
+        const session = await AuthRepository.validateSession(
+          token,
+          result.data.id,
+          defaultLocale,
+          logger,
+        );
+        if (session) {
+          return result.data;
+        }
+        logger.debug("[WS] Cookie JWT has no live session - socket is public", {
+          userId: result.data.id,
+        });
+      } else if (!cookieToken) {
+        // Server-to-server connector token rejected: it will fall back to a
+        // guest socket whose user/{id} subscriptions all get denied. Say why.
+        logger.warn("[WS] Query token rejected - connecting as guest", {
+          connectorInstanceId:
+            url.searchParams.get("connectorInstanceId") ?? undefined,
+          reason: result.message,
+        });
       }
     } catch {
       logger.debug("[WS] JWT verification failed during upgrade");

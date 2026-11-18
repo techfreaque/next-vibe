@@ -7,6 +7,9 @@ export const translations: typeof enTranslations = {
     repositoryInternalError: "Wystąpił błąd wewnętrzny",
     fetchErrorLogs: "Nie udało się pobrać logów błędów: {{error}}",
     updateErrorLog: "Nie udało się zaktualizować statusu logu błędu: {{error}}",
+    missingTarget: "Podaj fingerprint albo id.",
+    idNotUnique:
+      "Prefiks id {{id}} pasuje do {{count}} wierszy. Użyj fingerprintu albo pełnego id.",
   },
 
   statusFilter: {
@@ -125,8 +128,15 @@ export const translations: typeof enTranslations = {
     fields: {
       fingerprint: {
         label: "Odcisk palca",
-        description: "Odcisk palca logu błędu",
+        description:
+          "Odcisk palca logu błędu (kolumna `fingerprint` na liście). Podaj go albo id.",
         placeholder: "Wprowadź odcisk palca",
+      },
+      id: {
+        label: "ID logu",
+        description:
+          "ID wiersza z listy (pełny uuid albo jego pierwsze 8+ znaków). Zamiast odcisku palca.",
+        placeholder: "np. c21bd4c7",
       },
       resolved: {
         label: "Rozwiązane",

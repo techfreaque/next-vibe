@@ -4,6 +4,7 @@
  */
 
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import { E2E_HYDRATION_TIMEOUT_MS } from "next-vibe/tooling/testing/e2e/config";
 import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import {
@@ -12,7 +13,10 @@ import {
 } from "next-vibe/tooling/testing/testing-suite/test-users";
 import { describe, expect } from "vitest";
 
+import { FREE_CREDIT_SIGNED_IN_TOTAL } from "@/products/constants";
+
 import { scopedTranslation } from "./i18n";
+import { CreditRepository } from "./repository";
 
 const OVERVIEW_PAGE = "/subscription/overview";
 /** Pixels the page sticks out sideways (evaluated in the browser). */
@@ -33,6 +37,15 @@ describe("E2E: credits overview", () => {
     }
     const account = created.data;
     fixtures.cleanup(() => deleteTestUser(account.user.id));
+    // Exercise the funded free-plan view. A fresh unverified account can have zero credits.
+    const grant = await CreditRepository.addUserCredits(
+      account.user.id,
+      FREE_CREDIT_SIGNED_IN_TOTAL,
+      "permanent",
+      createEndpointLogger(false, defaultLocale),
+      t,
+    );
+    expect(grant.success).toBe(true);
     await fixtures.loginAs(account.user);
     await page.setViewportSize(PHONE);
 

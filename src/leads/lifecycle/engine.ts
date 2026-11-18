@@ -592,10 +592,22 @@ async function processEnrollment(
       })
       .where(eq(lifecycleEnrollments.id, enrollment.id));
     if (snapshot.leadId) {
+      // The email is already out and recorded: a failure stamping the lead
+      // must not run failSend (that deleted the SENT row and counted a fail
+      // for a delivered email; prod 2026-11-17 leads_email_unique conflicts
+      // on this plain update = duplicate-email rows the unique index missed).
+      const leadId = snapshot.leadId;
       await db
         .update(leads)
         .set({ lastEmailSentAt: opts.now })
-        .where(eq(leads.id, snapshot.leadId));
+        .where(eq(leads.id, leadId))
+        .catch((error: Error) => {
+          opts.logger.error("lifecycle.send.leadStampFailed", {
+            enrollmentId: enrollment.id,
+            leadId,
+            message: parseError(error).message,
+          });
+        });
     }
     return "sent";
   } catch (error) {

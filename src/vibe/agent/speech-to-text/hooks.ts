@@ -102,11 +102,28 @@ function getDevicePlatform():
 /**
  * Map getUserMedia errors to device-specific, actionable i18n messages
  */
-function getMicrophoneErrorMessage(name: string, t: ChatT): string {
+function getMicrophoneErrorMessage(
+  name: string,
+  t: ChatT,
+  context: { errorMessage?: string | null; permissionState?: string | null },
+): string {
   switch (name) {
     case "NotAllowedError":
     case "PermissionDeniedError": {
+      // Chrome: the user closed the prompt without choosing. Nothing is
+      // blocked yet; asking again works.
+      if (/dismissed/i.test(context.errorMessage ?? "")) {
+        return t("hooks.stt.permission-dismissed");
+      }
       const platform = getDevicePlatform();
+      // Desktop with the SITE permission denied: the fix is the site
+      // settings next to the address bar, not the OS privacy settings.
+      if (
+        (platform === "windows" || platform === "mac") &&
+        context.permissionState === "denied"
+      ) {
+        return t("hooks.stt.permission-denied-site");
+      }
       const permissionKeys = {
         ios: "hooks.stt.permission-denied-ios",
         android: "hooks.stt.permission-denied-android",
@@ -477,7 +494,10 @@ export function useEdenAISpeech({
           isSecureContext: diagnostics.isSecureContext,
           hasMediaDevices: diagnostics.hasMediaDevices,
         });
-        const errorMsg = getMicrophoneErrorMessage(errorName, t);
+        const errorMsg = getMicrophoneErrorMessage(errorName, t, {
+          errorMessage: micResult.errorMessage,
+          permissionState: diagnostics.permissionState,
+        });
         setError(errorMsg);
         onError?.(errorMsg, {
           errorName,
@@ -640,7 +660,9 @@ export function useEdenAISpeech({
     } catch (err) {
       const errorMsg =
         err instanceof DOMException || err instanceof Error
-          ? getMicrophoneErrorMessage(err.name, t)
+          ? getMicrophoneErrorMessage(err.name, t, {
+              errorMessage: err.message,
+            })
           : t("hooks.stt.failed-to-start");
       const errorName =
         err instanceof DOMException || err instanceof Error ? err.name : null;

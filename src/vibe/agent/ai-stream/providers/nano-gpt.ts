@@ -24,6 +24,10 @@ import { agentEnv } from "../../env";
 import { ApiProvider } from "../../models/models";
 import { logProviderRequest } from "./shared/debug-file-logger";
 import { nanoGptCostExtractor } from "./shared/upstream-cost";
+import {
+  summarizeUpstreamError,
+  upstreamErrorResponse,
+} from "./shared/upstream-error";
 
 const NANO_GPT_BASE_URL = "https://api.nano-gpt.com/api/v1";
 
@@ -34,6 +38,30 @@ function requestModelOf(body: BodyInit | null | undefined): string | undefined {
   }
   const match = /"model"\s*:\s*"([^"]+)"/.exec(body);
   return match?.[1];
+}
+
+/**
+ * Which optional features a request carried (no content): tools, images,
+ * output cap, reasoning knobs, size. Enough to bisect a bare 400.
+ */
+function describeRequestShape(
+  body: BodyInit | null | undefined,
+): Record<string, string | number | boolean> | null {
+  if (typeof body !== "string") {
+    return null;
+  }
+  const maxTokens = /"max_(?:completion_)?tokens"\s*:\s*(\d+)/.exec(body);
+  return {
+    chars: body.length,
+    messages: (body.match(/"role"\s*:/g) ?? []).length,
+    tools: (body.match(/"type"\s*:\s*"function"/g) ?? []).length,
+    toolMessages: (body.match(/"role"\s*:\s*"tool"/g) ?? []).length,
+    images: (body.match(/"type"\s*:\s*"image_url"/g) ?? []).length,
+    maxTokens: maxTokens ? Number(maxTokens[1]) : "none",
+    toolChoice: /"tool_choice"/.test(body),
+    reasoning: /"reasoning(?:_effort)?"\s*:/.test(body),
+    temperature: /"temperature"\s*:/.test(body),
+  };
 }
 
 /**
@@ -56,20 +84,25 @@ export function createNanoGPT(
     }
     const response = await fetchImpl(input, init);
     if (!response.ok) {
-      const errorText = await response.text();
+      const upstreamError = summarizeUpstreamError(
+        "NanoGPT",
+        response.status,
+        response.headers,
+        await response.text(),
+      );
       logger.error("[NanoGPT] API Error", {
         status: response.status,
         statusText: response.statusText,
-        body: errorText,
+        body: upstreamError.summary,
+        cfRay: upstreamError.cfRay,
         // Which model failed: an upstream outage is usually per model
         // (e.g. 503 all_fallbacks_failed on one GLM variant).
         model: requestModelOf(init?.body),
+        // A 400 "Invalid request parameters" names no parameter: record
+        // which optional request features were sent so it can be bisected.
+        requestShape: describeRequestShape(init?.body),
       });
-      return new Response(errorText, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-      });
+      return upstreamErrorResponse(response, upstreamError);
     }
     return response;
   };

@@ -5,6 +5,7 @@
  */
 
 import { DefaultFolderId } from "next-vibe/core/execution-context";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { toast } from "next-vibe/ui/hooks/use-toast";
 import {
@@ -17,6 +18,7 @@ import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useCredits } from "@/credits/hooks";
+import { formatCreditAmount } from "@/products/credit-money";
 
 import type { ChatModelId } from "../../../../../ai-stream/models";
 import { getChatModelById } from "../../../../../ai-stream/models";
@@ -140,6 +142,7 @@ function passesCreditGuard(
   creditsTotal: number,
   modelId: ChatModelId,
   isGuest: boolean,
+  locale: CountryLanguage,
 ): boolean {
   if (creditsTotal <= 0) {
     toast({
@@ -165,8 +168,8 @@ function passesCreditGuard(
     if (creditsTotal < modelCost) {
       toast({
         title: t("input.insufficientCredits.title", {
-          cost: modelCost.toFixed(1),
-          balance: creditsTotal.toFixed(1),
+          cost: formatCreditAmount(modelCost, locale),
+          balance: formatCreditAmount(creditsTotal, locale),
         }),
         description: t("input.insufficientCredits.description"),
         variant: "destructive",
@@ -261,6 +264,7 @@ export function useMessageOperations(
           creditsTotal,
           d.settings.selectedModel,
           user.isPublic,
+          locale,
         )
       ) {
         return { success: false, createdThreadId: null };
@@ -317,6 +321,7 @@ export function useMessageOperations(
           creditsTotal,
           d.settings.selectedModel,
           user.isPublic,
+          locale,
         )
       ) {
         return;

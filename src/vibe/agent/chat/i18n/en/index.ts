@@ -442,6 +442,10 @@ export const translations = {
         "Microphone blocked. Tap the lock icon in the address bar → Site settings → Microphone → Allow.",
       "permission-denied-mac":
         "Microphone blocked. Open System Settings → Privacy & Security → Microphone and enable your browser.",
+      "permission-dismissed":
+        "Microphone prompt closed. Tap the mic again and choose Allow.",
+      "permission-denied-site":
+        "Microphone blocked for this site. Click the icon left of the address bar → Microphone → Allow, then try again.",
       "permission-denied-windows":
         "Microphone blocked. Open Settings → Privacy → Microphone and make sure your browser is allowed.",
       "no-microphone":

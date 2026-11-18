@@ -4,10 +4,14 @@ import type { Metadata } from "next";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import { JsonLd, type JsonLdNode } from "next-vibe/ui/components/json-ld";
 import type { JSX } from "react";
 
 import { buildPricingStructuredData } from "@/_pages/_components/structured-data";
+import type { CreditsGetResponseOutput } from "@/credits/definition";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
 
 import { generateSubscriptionMetadata } from "../metadata";
 import { subscriptionLoader } from "../shared-loader";
@@ -28,9 +32,7 @@ export async function generateMetadata({
 export interface OverviewPageData {
   locale: CountryLanguage;
   user: Awaited<ReturnType<typeof subscriptionLoader>>["user"];
-  initialCredits: Awaited<
-    ReturnType<typeof subscriptionLoader>
-  >["initialCredits"];
+  initialCredits: CreditsGetResponseOutput | null;
   platform: Awaited<ReturnType<typeof subscriptionLoader>>["platform"];
   /** Product + Offer JSON-LD for the public pricing page. */
   structuredData: JsonLdNode;
@@ -46,8 +48,16 @@ export async function tanstackLoader({
     subscriptionLoader({ locale, searchParams: query }),
     getEnvAvailability(),
   ]);
+  const { t } = creditsScopedTranslation.scopedT(locale);
+  const balance = await CreditRepository.getCreditBalanceForUser(
+    data.user,
+    locale,
+    createEndpointLogger(false, locale),
+    t,
+  );
   return {
     ...data,
+    initialCredits: balance.success ? balance.data : null,
     structuredData: buildPricingStructuredData({
       locale,
       modelCount: getAvailableChatModelCount(false, availability),

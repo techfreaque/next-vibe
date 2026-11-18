@@ -14,7 +14,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Div } from "next-vibe/ui/components/div";
 import { Form } from "next-vibe/ui/components/form/form";
-import type { JSX } from "react";
+import type { JSX, ReactElement } from "react";
 import { useCallback, useMemo } from "react";
 import type {
   DefaultValues,
@@ -93,6 +93,7 @@ export interface CancelButtonConfig<TKey extends string> {
 interface EndpointRendererProps<TEndpoint extends CreateApiEndpointAny> {
   /** The endpoint definition */
   endpoint: TEndpoint;
+  widget?: ReactElement;
   /** Current locale */
   locale: CountryLanguage;
   /** React Hook Form instance */
@@ -143,11 +144,20 @@ interface EndpointRendererProps<TEndpoint extends CreateApiEndpointAny> {
 }
 
 /**
+ * Blocked submits per endpoint on this page. Repeated attempts signal that
+ * the user may be stuck.
+ */
+const blockedSubmits = new Map<string, number>();
+const STUCK_SUBMIT_THRESHOLD = 3;
+
+/**
  * Endpoint Renderer Component
  * Renders ALL fields - widgets decide what to show based on data
  */
+
 export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   endpoint,
+  widget,
   locale,
   form: externalForm,
   onSubmit,
@@ -251,10 +261,11 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   const handleWidgetSubmit = useCallback((): void => {
     if (onSubmit) {
       void form.handleSubmit(onSubmit, (errors) => {
-        // The user sees field errors and nothing is sent - previously silent.
-        // Field name + rule + message only, never the entered values.
-        logger.warn("Form validation blocked submit", {
-          endpoint: `${endpoint.path.join("/")}/${endpoint.method}`,
+        // The user sees field errors and nothing is sent. Field name + rule +
+        // message only, never the entered values.
+        const endpointKey = `${endpoint.path.join("/")}/${endpoint.method}`;
+        const context = {
+          endpoint: endpointKey,
           alias: endpoint.aliases?.[0] ?? null,
           fields: Object.entries(errors)
             .map(
@@ -263,6 +274,19 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
             )
             .join("; ")
             .slice(0, 1000),
+        };
+        const blocked = (blockedSubmits.get(endpointKey) ?? 0) + 1;
+        blockedSubmits.set(endpointKey, blocked);
+        if (blocked < STUCK_SUBMIT_THRESHOLD) {
+          logger.warn("Form validation blocked submit", context);
+          return;
+        }
+        // Blocked again and again: the user is stuck on this form - a UX
+        // problem (unclear rule, hidden field, broken widget). Reported with
+        // the rules that keep failing.
+        logger.warn("Form validation blocked submit repeatedly", {
+          ...context,
+          blockedSubmits: blocked,
         });
       })();
     }
@@ -404,19 +428,21 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     const CustomRender: React.ComponentType<any> | undefined =
       resolved ?? lazyRender;
 
-    const rootWidget = CustomRender ? (
-      <CustomRender
-        fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}
-        field={withValueNonStrict(endpoint.fields, data, null)}
-        inlineButtonInfo={inlineButtonInfo}
-      />
-    ) : (
-      <LazyWidgetRenderer
-        fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}
-        field={withValueNonStrict(endpoint.fields, data, null)}
-        inlineButtonInfo={inlineButtonInfo}
-      />
-    );
+    const rootWidget =
+      widget ??
+      (CustomRender ? (
+        <CustomRender
+          fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}
+          field={withValueNonStrict(endpoint.fields, data, null)}
+          inlineButtonInfo={inlineButtonInfo}
+        />
+      ) : (
+        <LazyWidgetRenderer
+          fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}
+          field={withValueNonStrict(endpoint.fields, data, null)}
+          inlineButtonInfo={inlineButtonInfo}
+        />
+      ));
 
     // Always wrap in Form if we have form fields (request fields)
     if (hasRequest) {

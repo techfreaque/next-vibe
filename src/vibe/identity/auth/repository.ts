@@ -245,12 +245,19 @@ export class AuthRepository {
         existingLeadId,
         logger,
       );
-      if (isValid) {
+      // null = the lookup failed (DB timeout), not "lead is gone": keep the
+      // visitor's lead instead of rotating their cookie on a DB hiccup. The
+      // failure itself is logged by validateLeadId.
+      if (isValid !== false) {
         return { leadId: existingLeadId, shouldUpdateCookie: false };
       }
       logger.warn(
         "Invalid leadId in cookie (possibly after DB reset), creating new one",
-        { invalidLeadId: existingLeadId, platform },
+        {
+          invalidLeadId: existingLeadId,
+          platform,
+          leadIdSource: headerLeadId ? "bearer-suffix" : "cookie",
+        },
       );
     }
 

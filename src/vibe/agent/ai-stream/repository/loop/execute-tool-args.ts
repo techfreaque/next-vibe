@@ -7,6 +7,8 @@
  *     → { callbackMode: "wait", toolName: "cortex-write", input: {...} }
  *  2. An invented callbackMode ("omit", "none", ...) → dropped, so the default
  *     (wait) applies instead of rejecting the whole call.
+ *  3. `input` sent as a JSON-encoded string instead of an object
+ *     (kimi-k3 / glm-5.3, prod 2026-11-17) → parsed, when it is valid JSON.
  *
  * Anything else is returned unchanged so genuine mistakes (e.g. no toolName at
  * all) still produce the validation error the model learns from.
@@ -36,8 +38,31 @@ function isKnownCallbackMode(value: WidgetData): boolean {
   return CallbackModeDB.some((mode) => mode === value);
 }
 
+/** A JSON-encoded object string as a record; null when it is anything else. */
+function parseRecordString(value: string): ArgsRecord | null {
+  if (!value.trim().startsWith("{")) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(value) as WidgetData;
+    return isRecord(parsed) ? parsed : null;
+  } catch {
+    // Not valid JSON (truncated, or garbage like `<arg_value>`): leave it,
+    // the validation error tells the model what to fix.
+    return null;
+  }
+}
+
 export function normalizeExecuteToolArgs(args: ArgsRecord): ArgsRecord {
   let out: ArgsRecord = args;
+
+  const encodedInput = out["input"];
+  if (typeof encodedInput === "string") {
+    const decoded = parseRecordString(encodedInput);
+    if (decoded) {
+      out = { ...out, input: decoded };
+    }
+  }
 
   const nested = out["input"];
   if (

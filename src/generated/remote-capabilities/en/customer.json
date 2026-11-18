@@ -53261,6 +53261,20 @@
           },
           "schemaType": "primitive"
         },
+        "writable": {
+          "type": "badge",
+          "text": "get.response.writable.text",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "entries": {
           "type": "container",
           "child": {

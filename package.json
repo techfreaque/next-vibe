@@ -236,6 +236,7 @@
     "clsx": "2.1.1",
     "cmdk": "1.1.1",
     "commander": "15.0.0",
+    "confbox": "0.1.8",
     "cron-parser": "5.10.3",
     "date-fns": "4.4.0",
     "dotenv": "18.0.9",

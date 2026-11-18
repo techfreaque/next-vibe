@@ -30,6 +30,7 @@ import { z } from "zod";
 
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import { CountryLanguageValues } from "../../core/i18n/core/config";
+import { parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
@@ -747,7 +748,8 @@ export function startWebSocketServer(
           const rawStr =
             typeof raw === "string" ? raw : new TextDecoder().decode(raw);
           logger.error("[WS] Failed to process client message", {
-            error: err instanceof Error ? err.message : String(err),
+            // parseError keeps the driver cause (DB timeout, constraint).
+            error: parseError(err).message,
             rawPreview: rawStr.slice(0, 500),
             subscribedChannels: [...ws.data.channels],
           });

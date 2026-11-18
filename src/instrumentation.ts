@@ -103,6 +103,8 @@ export async function register(): Promise<void> {
   const { RunningTaskRegistry } =
     await import("@/vibe/tasks/watchdog/registry");
   const { startDrainWatcher } = await import("@/vibe/platforms/web/drain");
+  const { inFlightRequestCount } =
+    await import("@/vibe/platforms/web/in-flight-requests");
 
   startDrainWatcher({
     role: "next",
@@ -110,6 +112,9 @@ export async function register(): Promise<void> {
       loops: activeLoopCount(),
       runs: activeRunCount(),
       tasks: RunningTaskRegistry.size(),
+      // Long plain HTTP requests (image generation POST) are work too: a
+      // recreate while one runs hands the browser a bare 502.
+      http: inFlightRequestCount(),
     }),
   });
 
@@ -133,7 +138,7 @@ export async function register(): Promise<void> {
             // eslint-disable-next-line no-console
             console.log(`[shutdown] still draining: ${String(remaining)} busy`);
           },
-          () => RunningTaskRegistry.size(),
+          () => RunningTaskRegistry.size() + inFlightRequestCount(),
         );
       })
       .then(async (remaining) => {

@@ -9,6 +9,9 @@ export const translations: typeof enTranslations = {
       "Impossible de récupérer les journaux d'erreurs : {{error}}",
     updateErrorLog:
       "Impossible de mettre à jour le statut du journal d'erreurs : {{error}}",
+    missingTarget: "Passez fingerprint ou id.",
+    idNotUnique:
+      "Le préfixe d'id {{id}} correspond à {{count}} lignes. Utilisez l'empreinte ou l'id complet.",
   },
 
   statusFilter: {
@@ -128,8 +131,15 @@ export const translations: typeof enTranslations = {
     fields: {
       fingerprint: {
         label: "Empreinte",
-        description: "L'empreinte du journal d'erreurs",
+        description:
+          "L'empreinte du journal d'erreurs (colonne `fingerprint` de la liste). Passez-la, ou l'id.",
         placeholder: "Saisissez l'empreinte",
+      },
+      id: {
+        label: "ID du journal",
+        description:
+          "L'id de la ligne dans la liste (uuid complet ou ses 8+ premiers caractères). À la place de l'empreinte.",
+        placeholder: "ex. c21bd4c7",
       },
       resolved: {
         label: "Résolu",

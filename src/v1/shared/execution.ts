@@ -27,6 +27,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 import { creditValidator } from "@/credits/validator";
+import { formatCreditAmount } from "@/products/credit-money";
 
 import type { V1T } from "../i18n";
 import { V1_MAX_OUTPUT_TOKENS } from "./constants";
@@ -236,8 +237,8 @@ export async function prepareV1Call(
       error: v1Error(
         402,
         t("openai.insufficientCredits", {
-          cost: outputCap.requiredCredits,
-          balance: preflightResult.balance,
+          cost: formatCreditAmount(outputCap.requiredCredits, locale),
+          balance: formatCreditAmount(preflightResult.balance, locale),
         }),
         "insufficient_quota",
         "insufficient_credits",
@@ -326,8 +327,8 @@ async function preflight(params: {
       error: v1Error(
         402,
         t("openai.insufficientCredits", {
-          cost: estimatedCost,
-          balance: validation.data.balance,
+          cost: formatCreditAmount(estimatedCost, locale),
+          balance: formatCreditAmount(validation.data.balance, locale),
         }),
         "insufficient_quota",
         "insufficient_credits",

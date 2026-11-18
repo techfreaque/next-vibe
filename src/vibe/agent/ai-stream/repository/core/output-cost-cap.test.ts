@@ -12,6 +12,8 @@ import {
   affordableOutputTokens,
   computeOutputCap,
   MIN_AFFORDABLE_OUTPUT_TOKENS,
+  MIN_AFFORDABLE_REASONING_OUTPUT_TOKENS,
+  minAffordableOutputTokens,
   worstCaseOutputCredits,
   worstCaseOutputTokenCost,
 } from "./output-cost-cap";
@@ -83,15 +85,16 @@ describe("computeOutputCap", () => {
   });
 
   it("refuses when the input leaves less than the minimum output", () => {
-    // 10k tokens input = 5.9 credits; the 256-token floor adds ~0.5
+    // 10k tokens input = 5.9 credits; kimi-k3 reasons, so its 2048-token
+    // floor adds ~4.3
     const base = { model: kimi, modelCost: 2.5, inputTokens: 10_000 };
-    const refused = computeOutputCap({ ...base, remainingCredits: 6 });
+    const refused = computeOutputCap({ ...base, remainingCredits: 7 });
     expect(refused.kind).toBe("unaffordable");
     if (refused.kind === "unaffordable") {
-      expect(refused.requiredCredits).toBeGreaterThan(6);
-      expect(refused.requiredCredits).toBeLessThan(7);
+      expect(refused.requiredCredits).toBeGreaterThan(10);
+      expect(refused.requiredCredits).toBeLessThan(11);
     }
-    expect(computeOutputCap({ ...base, remainingCredits: 7 }).kind).toBe(
+    expect(computeOutputCap({ ...base, remainingCredits: 11 }).kind).toBe(
       "capped",
     );
   });
@@ -127,5 +130,27 @@ describe("computeOutputCap", () => {
         inputTokens: 50_000,
       }).kind,
     ).toBe("uncapped");
+  });
+
+  it("a reasoning model is refused when the balance buys only a few hundred tokens", () => {
+    const deepseek = getChatModelById(ChatModelId.DEEPSEEK_V4_PRO);
+    expect(minAffordableOutputTokens(deepseek)).toBe(
+      MIN_AFFORDABLE_REASONING_OUTPUT_TOKENS,
+    );
+    const inputTokens = 8_000;
+    // Enough for the input plus ~400 output tokens: reasoning-only, no answer
+    const remainingCredits =
+      worstCaseInputCredits(deepseek, inputTokens) +
+      worstCaseOutputCredits(deepseek, 400);
+    const cap = computeOutputCap({
+      model: deepseek,
+      modelCost: 1,
+      remainingCredits,
+      inputTokens,
+    });
+    expect(cap.kind).toBe("unaffordable");
+    if (cap.kind === "unaffordable") {
+      expect(cap.requiredCredits).toBeGreaterThan(remainingCredits);
+    }
   });
 });

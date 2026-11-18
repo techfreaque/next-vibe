@@ -230,7 +230,7 @@ export const translations: typeof enTranslations = {
       creditValidationFailed: "Impossible de vérifier le solde de crédits",
       noIdentifier: "Aucun identifiant d'utilisateur ou de lead fourni",
       insufficientCredits:
-        "Crédits insuffisants pour cette requête (coût : {{cost}}, solde : {{balance}})",
+        "Pas assez de crédits : cette requête coûte {{cost}}, votre solde est de {{balance}}. Rechargez ou choisissez un modèle moins cher.",
       noResponseBody: "Aucun corps de réponse reçu du flux",
       authenticationRequired:
         "Connectez-vous pour utiliser les dossiers persistants. Utilisez le mode incognito pour discuter anonymement.",
@@ -355,7 +355,8 @@ export const translations: typeof enTranslations = {
     },
     skill: {
       label: "Skill",
-      description: "Compétence facultative à utiliser pour l'IA",
+      description:
+        'ID ou slug d\'un skill de la liste des skills (option slug__variant). Laisser vide ou "default" pour aucun. Un ID inconnu bascule sur le skill par défaut.',
     },
     systemPrompt: {
       label: "Prompt système",
@@ -581,6 +582,8 @@ export const translations: typeof enTranslations = {
       "Le modèle s'est arrêté sans écrire de réponse. Vous n'avez payé que ce que le fournisseur a facturé, sans frais de plateforme. Réessayez ou choisissez un autre modèle.",
     contentFiltered:
       "Cette réponse a été bloquée par le filtre de contenu du fournisseur. Essayez un autre modèle.",
+    providerBusy:
+      "Ce modèle est surchargé en ce moment. Réessayez dans quelques secondes ou choisissez un autre modèle.",
     modelUnavailable:
       "Le modèle IA choisi est actuellement indisponible. Essayez un autre modèle.",
     rateLimitExceeded: "Trop de requêtes. Patientez un instant puis réessayez.",
@@ -752,6 +755,9 @@ export const translations: typeof enTranslations = {
     },
     member: {
       title: "Vous n'avez plus de crédits",
+      shortTitle: "Pas assez de crédits pour ce message",
+      shortDescription:
+        "Il vous reste {{balance}} crédits. Une longue conversation coûte plus cher par message : lancez une nouvelle conversation ou choisissez un modèle moins cher. Ou rechargez :",
       description:
         "Vos crédits gratuits se rechargent le {{date}}. Ou choisissez une formule et continuez dès maintenant :",
       subscriberDescription:

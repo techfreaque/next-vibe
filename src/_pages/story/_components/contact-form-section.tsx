@@ -1,17 +1,18 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
 import contactDefinitions from "@/contact/definition";
+import { ContactFormWidget } from "@/contact/widget";
 
 interface ContactFormSectionProps {
   locale: CountryLanguage;
-  user: JWTPublicPayloadType;
+  user: JwtPayloadType;
   platform: Platform;
   userEmail?: string;
 }
@@ -27,6 +28,7 @@ export function ContactFormSection({
     <EndpointsPage
       logger={logger}
       endpoint={contactDefinitions}
+      widget={<ContactFormWidget field={contactDefinitions.POST.fields} />}
       locale={locale}
       user={user}
       platform={platform}

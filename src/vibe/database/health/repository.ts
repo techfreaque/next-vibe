@@ -110,9 +110,24 @@ export class DbHealthRepository {
     }
 
     // --- Memory check ---
-    const nodeMem = process.memoryUsage();
-    const heapUsedMb = Math.round(nodeMem.heapUsed / 1024 / 1024);
-    const rssMb = Math.round(nodeMem.rss / 1024 / 1024);
+    // Bun's process.memoryUsage() can throw "Failed to get memory usage"
+    // (2026-11-16 20:23: it failed the whole db-health task). Report it as a
+    // warning and keep checking DB/disk instead.
+    const nodeMem = ((): { heapUsed: number; rss: number } | null => {
+      try {
+        return process.memoryUsage();
+      } catch (error) {
+        warnings.push(
+          `Process memory unavailable: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        if (status === "ok") {
+          status = "warning";
+        }
+        return null;
+      }
+    })();
+    const heapUsedMb = nodeMem ? Math.round(nodeMem.heapUsed / 1024 / 1024) : 0;
+    const rssMb = nodeMem ? Math.round(nodeMem.rss / 1024 / 1024) : 0;
 
     const procMem = readProcMeminfo();
     const memoryUsedPct = procMem

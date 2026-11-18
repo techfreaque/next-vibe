@@ -310,7 +310,8 @@ export const translations: typeof enTranslations = {
     },
     skill: {
       label: "Umiejętność",
-      description: "Opcjonalna umiejętność dla AI",
+      description:
+        'ID lub slug umiejętności z listy umiejętności (opcjonalnie slug__variant). Pomiń albo wpisz "default", jeśli bez umiejętności. Nieznane ID przechodzą na domyślną.',
     },
     systemPrompt: {
       label: "Prompt systemowy",
@@ -514,7 +515,7 @@ export const translations: typeof enTranslations = {
         "Zaloguj się, aby korzystać z trwałych folderów. Użyj trybu incognito dla anonimowych czatów.",
       noIdentifier: "Nie podano identyfikatora użytkownika lub leada",
       insufficientCredits:
-        "Niewystarczająca liczba kredytów do wykonania żądania (koszt: {{cost}}, saldo: {{balance}})",
+        "Za mało kredytów: to żądanie kosztuje {{cost}}, masz {{balance}}. Doładuj albo wybierz tańszy model.",
       noResponseBody: "Nie otrzymano treści odpowiedzi ze strumienia",
     },
   },
@@ -554,6 +555,8 @@ export const translations: typeof enTranslations = {
       "Model zakończył bez odpowiedzi. Płacisz tylko koszt dostawcy, bez opłaty platformy. Spróbuj ponownie albo wybierz inny model.",
     contentFiltered:
       "Ta odpowiedź została zablokowana przez filtr treści dostawcy. Spróbuj innego modelu.",
+    providerBusy:
+      "Ten model jest teraz przeciążony. Spróbuj ponownie za kilka sekund albo wybierz inny model.",
     modelUnavailable:
       "Wybrany model AI jest obecnie niedostępny. Spróbuj innego modelu.",
     rateLimitExceeded: "Zbyt wiele żądań. Poczekaj chwilę i spróbuj ponownie.",
@@ -736,6 +739,9 @@ export const translations: typeof enTranslations = {
     },
     member: {
       title: "Skończyły Ci się kredyty",
+      shortTitle: "Za mało kredytów na tę wiadomość",
+      shortDescription:
+        "Masz {{balance}} kredytów. Długi czat kosztuje więcej za wiadomość: zacznij nowy czat albo wybierz tańszy model. Albo doładuj:",
       description:
         "Darmowe kredyty odnowią się {{date}}. Albo wybierz plan i pisz dalej już teraz:",
       subscriberDescription:

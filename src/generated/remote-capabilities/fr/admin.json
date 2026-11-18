@@ -321703,6 +321703,20 @@
           },
           "schemaType": "primitive"
         },
+        "writable": {
+          "type": "badge",
+          "text": "get.response.writable.text",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "entries": {
           "type": "container",
           "child": {
@@ -578818,13 +578832,44 @@
           "type": "form_field",
           "fieldType": "text",
           "label": "Empreinte",
-          "description": "L'empreinte du journal d'erreurs",
+          "description": "L'empreinte du journal d'erreurs (colonne `fingerprint` de la liste). Passez-la, ou l'id.",
           "placeholder": "Saisissez l'empreinte",
           "schema": {
             "def": {
-              "type": "string"
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
             },
-            "type": "string"
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "id": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "ID du journal",
+          "description": "L'id de la ligne dans la liste (uuid complet ou ses 8+ premiers caractères). À la place de l'empreinte.",
+          "placeholder": "ex. c21bd4c7",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "request": "data"

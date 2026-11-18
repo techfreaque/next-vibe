@@ -60,6 +60,11 @@ function hubBasePort(appUrlPort: number): number {
     : appUrlPort;
 }
 
+/** Re-subscribe attempts after the hub closed a still-pending signal's socket. */
+const HUB_RESUBSCRIBE_MAX = 5;
+/** Linear backoff step between those attempts. */
+const HUB_RESUBSCRIBE_DELAY_MS = 500;
+
 /** A signal's payload as it rides the wire (`payload` on the event envelope). */
 export type SignalPayload = Record<string, WidgetData>;
 
@@ -273,15 +278,54 @@ export const KeyedRemoteSignal = {
         );
         return;
       }
-      void (async (): Promise<void> => {
+      // A hub close while the signal is still pending (deploy drain closes
+      // every socket with 1012 while this process keeps running the stream)
+      // would drop the subscription for good: a stop pressed afterwards never
+      // reached the stream. Re-open and re-subscribe, bounded.
+      const resubscribeLater = (attempt: number, why: string): void => {
+        if (settled || tornDown) {
+          return;
+        }
+        if (attempt > HUB_RESUBSCRIBE_MAX) {
+          logger.warn(
+            "[KeyedRemoteSignal] hub subscription lost - signal can no longer arrive",
+            { channel, wsBase, why, attempts: attempt - 1 },
+          );
+          return;
+        }
+        logger.debug("[KeyedRemoteSignal] re-subscribing to the hub", {
+          channel,
+          why,
+          attempt,
+        });
+        setTimeout((): void => {
+          void connectHub(attempt);
+        }, HUB_RESUBSCRIBE_DELAY_MS * attempt);
+      };
+      const connectHub = async (attempt: number): Promise<void> => {
+        if (settled || tornDown) {
+          return;
+        }
         let opened: WebSocket | null = null;
         try {
           opened = await openHubWs(user, logger);
         } catch (err) {
-          logger.warn("[KeyedRemoteSignal] failed to open hub WS", {
-            channel,
-            error: err instanceof Error ? err.message : String(err),
-          });
+          const error = err instanceof Error ? err.message : String(err);
+          if (attempt === 0) {
+            logger.warn("[KeyedRemoteSignal] failed to open hub WS", {
+              channel,
+              error,
+            });
+            return;
+          }
+          resubscribeLater(attempt + 1, `open failed: ${error}`);
+          return;
+        }
+        if (!settled && !opened && attempt > 0) {
+          logger.warn(
+            "[KeyedRemoteSignal] hub subscription lost - no hub WS on re-subscribe",
+            { channel, wsBase, attempt },
+          );
           return;
         }
         if (settled || !opened) {
@@ -349,11 +393,22 @@ export const KeyedRemoteSignal = {
             tornDown,
             wsBase,
           };
-          if (settled || tornDown) {
+          if (settled || tornDown || ws !== opened) {
             logger.debug("[KeyedRemoteSignal] hub WS closed", closeInfo);
-          } else {
-            logger.warn("[KeyedRemoteSignal] hub WS closed", closeInfo);
+            return;
           }
+          // Still waiting: re-subscribe on a fresh socket (the hub stays up
+          // through a deploy drain). Only a subscription that cannot be
+          // restored is reported (resubscribeLater warns once).
+          logger.debug(
+            "[KeyedRemoteSignal] hub WS closed while waiting",
+            closeInfo,
+          );
+          ws = null;
+          resubscribeLater(
+            attempt + 1,
+            `closed ${String(event.code)} ${event.reason}`,
+          );
         });
         ws.addEventListener("message", (event: MessageEvent) => {
           const raw =
@@ -392,7 +447,8 @@ export const KeyedRemoteSignal = {
             }
           }
         });
-      })();
+      };
+      void connectHub(0);
     });
 
     return { signal, cancel };

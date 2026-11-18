@@ -5,6 +5,9 @@ export const translations = {
     repositoryInternalError: "An internal error occurred",
     fetchErrorLogs: "Failed to fetch error logs: {{error}}",
     updateErrorLog: "Failed to update error log status: {{error}}",
+    missingTarget: "Pass fingerprint or id.",
+    idNotUnique:
+      "Id prefix {{id}} matches {{count}} rows. Use the fingerprint or the full id.",
   },
 
   statusFilter: {
@@ -123,8 +126,15 @@ export const translations = {
     fields: {
       fingerprint: {
         label: "Fingerprint",
-        description: "The fingerprint of the error log",
+        description:
+          "The fingerprint of the error log (column `fingerprint` in the list). Pass this or id.",
         placeholder: "Enter fingerprint",
+      },
+      id: {
+        label: "Log ID",
+        description:
+          "The row id from the list (full uuid or its first 8+ characters). Use instead of fingerprint.",
+        placeholder: "e.g. c21bd4c7",
       },
       resolved: {
         label: "Resolved",

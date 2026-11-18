@@ -314,7 +314,8 @@ export const translations: typeof enTranslations = {
     title: "Anmeldefehler",
     account_suspended:
       "Konto gesperrt. Halten Sie das für einen Fehler, schreiben Sie dem Support.",
-    account_locked: "Konto ist gesperrt",
+    account_locked:
+      "Zu viele Fehlversuche. 15 Minuten warten oder Passwort zurücksetzen. Noch kein Konto? Registrieren.",
     accountLocked: "Konto ist gesperrt",
     accountLockedDescription:
       "Ihr Konto wurde gesperrt. Bitte kontaktieren Sie den Support.",

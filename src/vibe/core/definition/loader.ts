@@ -1,8 +1,10 @@
-import { reloadPage } from "next-vibe/ui/lib/location";
-
 import { getEndpoint as globalGetEndpoint } from "@/generated/endpoints/endpoint";
 
 import type { JwtPayloadType } from "../../identity/auth/types";
+import {
+  handleChunkLoadFailure,
+  isChunkLoadError,
+} from "../../logger/chunk-reload";
 import type { EndpointLogger } from "../../logger/types";
 import type { Platform } from "../../platforms/platforms";
 import type { CountryLanguage } from "../i18n/core/config";
@@ -99,20 +101,26 @@ export class DefinitionLoader implements IDefinitionLoader {
     } catch (error) {
       const parsed = parseError(error);
       // Chunk load failures happen on the client after a deployment when the old
-      // JS bundle references a chunk hash that no longer exists on the CDN.
-      // Force a full page reload so the client fetches the new bundle.
-      const isChunkLoadError =
-        parsed.message.includes("Loading chunk") ||
-        parsed.name === "ChunkLoadError";
-      if (isChunkLoadError && typeof window !== "undefined") {
-        logger.warn(
-          `[Definition Loader] Stale chunk detected - reloading page (identifier: ${identifier})`,
-        );
-        reloadPage();
-        // Return a non-resolving promise - reload is in flight
-        return new Promise<ResponseType<TEndpoint>>((resolve) => {
+      // JS bundle references a chunk hash that no longer exists, or when a
+      // chunk never arrived. One guarded full reload fetches the current build.
+      if (typeof window !== "undefined" && isChunkLoadError(parsed)) {
+        const reloading = handleChunkLoadFailure(logger, {
+          source: `definition-loader:${identifier}`,
+          error: parsed,
+          level: "warn",
+        });
+        if (reloading) {
           // Never resolves - page reload is in flight
-          void resolve;
+          return new Promise<ResponseType<TEndpoint>>((resolve) => {
+            void resolve;
+          });
+        }
+        return fail({
+          message: t("shared.endpoints.definition.loader.errors.loadFailed", {
+            identifier,
+            error: parsed.message,
+          }),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
       logger.error(

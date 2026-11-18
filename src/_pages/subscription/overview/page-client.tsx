@@ -12,6 +12,7 @@ import {
 import { Container } from "next-vibe/ui/components/container";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
+import { H1 } from "next-vibe/ui/components/typography";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { useRouter, useSearchParams } from "next-vibe/ui/hooks/use-navigation";
 import type { UseNavigationStackReturn } from "next-vibe/unified-ui/hooks/use-navigation-stack";
@@ -21,6 +22,7 @@ import { useEffect, useMemo } from "react";
 
 import type { CreditsGetResponseOutput } from "@/credits/definition";
 import creditsDefinition from "@/credits/definition";
+import { CreditsBalanceContainer } from "@/credits/widget";
 
 import { scopedTranslation } from "../i18n";
 
@@ -92,6 +94,7 @@ export function OverviewPageClient({
 }: Props): JSX.Element {
   const logger = useLogger();
   const router = useRouter();
+  const { t } = scopedTranslation.scopedT(locale);
 
   const navigationOverride = useMemo(
     () => ({
@@ -114,10 +117,12 @@ export function OverviewPageClient({
 
   return (
     <Container className="max-w-6xl px-0 py-4 sm:px-2 sm:py-8 lg:px-2">
+      <H1 className="mx-4 mb-4 text-2xl font-semibold">{t("meta.category")}</H1>
       <PaymentResultBanner locale={locale} />
       <EndpointsPage
         logger={logger}
         endpoint={creditsDefinition}
+        widget={<CreditsBalanceContainer />}
         user={user}
         locale={locale}
         platform={platform}

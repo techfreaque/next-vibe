@@ -14,6 +14,7 @@ import type { NextRequest } from "next-vibe/ui/lib/request";
 import { NextResponse } from "next-vibe/ui/lib/request";
 
 import {
+  CSRF_REJECTED_HEADER_NAME,
   CSRF_TOKEN_COOKIE_NAME,
   CSRF_TOKEN_HEADER_NAME,
   LEAD_ID_COOKIE_NAME,
@@ -22,6 +23,7 @@ import {
 
 import { createEndpointLogger } from "../../logger/server";
 import { Platform } from "../../platforms/platforms";
+import { trackInFlightRequest } from "../../platforms/web/in-flight-requests";
 import type { CreateApiEndpointAny } from "../definition/endpoint-base";
 import { Methods } from "../definition/enums";
 import type { CountryLanguage } from "../i18n/core/config";
@@ -164,6 +166,9 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
     const requestId = resolveRequestId(request);
     const logger = createEndpointLogger(false, locale, { requestId });
 
+    // Counted until the handler returns: the deploy drain waits for these
+    // (a recreate mid image-generation POST used to answer a bare 502).
+    const endInFlight = trackInFlightRequest();
     try {
       // CSRF double-submit validation for mutating browser requests
       const csrfCheck = validateCsrf(request, endpoint.method as Methods);
@@ -184,7 +189,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           hasLeadCookie: request.cookies.has(LEAD_ID_COOKIE_NAME),
         });
         const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
-        return wrapErrorResponse(
+        const csrfResponse = wrapErrorResponse(
           // `errorTypes.forbidden` is the generic ErrorResponseTypes label and
           // renders param-free, so the CSRF reason gets its own key.
           fail({
@@ -198,6 +203,11 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           endpoint,
           request,
         );
+        // Machine-readable marker: callApi re-reads the cookie and retries
+        // once (a parallel response re-stamped the token between its cookie
+        // read and the send).
+        csrfResponse.headers.set(CSRF_REJECTED_HEADER_NAME, csrfCheck.reason);
+        return csrfResponse;
       }
 
       // The proxy truncates bodies above MAX_REQUEST_BODY_BYTES, so parsing
@@ -357,6 +367,8 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         endpoint,
         request,
       );
+    } finally {
+      endInFlight();
     }
   };
 }

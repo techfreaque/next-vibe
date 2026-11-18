@@ -242,7 +242,20 @@ export const { PATCH } = createEndpoint({
         label: "patch.fields.fingerprint.label",
         description: "patch.fields.fingerprint.description",
         placeholder: "patch.fields.fingerprint.placeholder",
-        schema: z.string(),
+        // Optional: callers (CLI, agents) often only hold the row id from the
+        // list; one of fingerprint / id is required (checked in repository).
+        schema: z.string().min(1).optional(),
+      }),
+      id: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.fields.id.label",
+        description: "patch.fields.id.description",
+        placeholder: "patch.fields.id.placeholder",
+        schema: z
+          .string()
+          .regex(/^[0-9a-f-]{8,36}$/i)
+          .optional(),
       }),
       resolved: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

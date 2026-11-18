@@ -64,6 +64,27 @@ export function formatCreditUnitPrice(locale: CountryLanguage): string {
 }
 
 /**
+ * A credit count for display: "0.04" (not "0.039999999999992"), "12", "1,250.5".
+ * At most 2 decimals; dust below 0.01 keeps 2 significant digits so a real
+ * non-zero cost never reads as "0".
+ */
+export function formatCreditAmount(
+  credits: number,
+  locale: CountryLanguage,
+): string {
+  const language = getLanguageFromLocale(locale);
+  const abs = Math.abs(credits);
+  if (abs > 0 && abs < 0.01) {
+    return new Intl.NumberFormat(language, {
+      maximumSignificantDigits: 2,
+    }).format(credits);
+  }
+  return new Intl.NumberFormat(language, {
+    maximumFractionDigits: 2,
+  }).format(credits);
+}
+
+/**
  * How many messages at this per-message cost the signed-in free allowance covers.
  * null when the cost is zero (unlimited) or the allowance can't cover one message.
  */

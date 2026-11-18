@@ -89,6 +89,11 @@ const { GET } = createEndpoint({
         schema: z.string(),
         fieldName: "path",
       }),
+      writable: responseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        text: "get.response.writable.text" as const,
+        schema: z.boolean(),
+      }),
       entries: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         child: objectField(scopedTranslation, {
@@ -187,6 +192,7 @@ const { GET } = createEndpoint({
     responses: {
       root: {
         responsePath: "/",
+        writable: false,
         entries: [
           {
             name: "documents",

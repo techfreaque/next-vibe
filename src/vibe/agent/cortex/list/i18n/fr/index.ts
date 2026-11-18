@@ -54,6 +54,7 @@ export const translations: typeof enTranslations = {
         updatedAt: { content: "Mis à jour" },
       },
       total: { text: "Total" },
+      writable: { text: "Modifiable" },
     },
     errors: {
       validation: {

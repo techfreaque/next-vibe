@@ -20,6 +20,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
+import { formatCreditAmount } from "@/products/credit-money";
 
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { agentEnv } from "../env";
@@ -125,6 +126,17 @@ export class SpeechToTextRepository {
   private static readonly FETCH_TIMEOUT_MS = 120_000;
   /** Timeout for each Eden AI poll fetch (ms) */
   private static readonly POLL_FETCH_TIMEOUT_MS = 15_000;
+
+  /**
+   * Below this a recording holds no audio: an empty mp4/webm container is
+   * ~0.7 KB (iOS Safari sent 772 bytes and 0 bytes, prod 2026-11-17, both
+   * rejected by Eden as "too short" / "failed to extract media metadata").
+   */
+  private static readonly MIN_AUDIO_BYTES = 1024;
+
+  /** Provider wording for an empty or sub-0.1 s recording. */
+  private static readonly TOO_SHORT_PATTERN =
+    /audio_too_short|too short|failed to extract media metadata/i;
 
   /** Max parallel transcription requests per user request */
   private static readonly CHUNK_CONCURRENCY = 4;
@@ -304,6 +316,23 @@ export class SpeechToTextRepository {
       })),
     });
 
+    // An empty / near-empty recording (tap instead of hold, mic permission
+    // race) has nothing to transcribe: tell the user, don't bill a provider
+    // call that can only fail.
+    const largestFileBytes = files.reduce((max, f) => Math.max(max, f.size), 0);
+    if (largestFileBytes < SpeechToTextRepository.MIN_AUDIO_BYTES) {
+      logger.warn("[STT] Recording empty or too short - not sent to provider", {
+        chunkCount: files.length,
+        largestFileBytes,
+        mimeTypes: files.map((f) => f.type).join(","),
+        sttModelId: modelOption.id,
+      });
+      return fail({
+        message: t("post.errors.audioTooShort"),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
     const tCredits = creditsScopedTranslation.scopedT(locale).t;
 
     // Check minimum balance upfront
@@ -339,8 +368,8 @@ export class SpeechToTextRepository {
       });
       return fail({
         message: t("post.errors.insufficientCredits", {
-          balance: balanceResult.data.total.toString(),
-          minimum: minimumCredits.toString(),
+          balance: formatCreditAmount(balanceResult.data.total, locale),
+          minimum: formatCreditAmount(minimumCredits, locale),
         }),
         errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
       });
@@ -805,6 +834,12 @@ export class SpeechToTextRepository {
         mimeType,
         fileSize: blob.size,
       });
+      if (SpeechToTextRepository.TOO_SHORT_PATTERN.test(errorText)) {
+        return fail({
+          message: t("post.errors.audioTooShort"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
       return fail({
         message: t("post.errors.transcriptionFailed", { error: errorText }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
@@ -926,12 +961,19 @@ export class SpeechToTextRepository {
     providerCostUsd: number | undefined;
   }> {
     if (job.status !== "success") {
+      const jobError = edenAiErrorMessage(job.error);
       logger.error("[STT] Provider returned error", {
         model,
         publicId,
         status: job.status,
-        error: edenAiErrorMessage(job.error),
+        error: jobError,
       });
+      if (SpeechToTextRepository.TOO_SHORT_PATTERN.test(jobError ?? "")) {
+        return fail({
+          message: t("post.errors.audioTooShort"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
       return fail({
         message: t("post.errors.providerError"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,

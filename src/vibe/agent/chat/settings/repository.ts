@@ -215,7 +215,14 @@ export class ChatSettingsRepository {
 
       return success(result);
     } catch (error) {
-      logger.error("Failed to fetch settings", parseError(error), { userId });
+      logger.error("Failed to fetch settings", parseError(error), {
+        userId,
+        // The message is truncated (long SQL first); keep the driver cause.
+        dbCause:
+          error instanceof Error && error.cause instanceof Error
+            ? error.cause.message
+            : undefined,
+      });
       return fail({
         message: t("get.errors.server.title") ?? "get.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -231,6 +238,8 @@ export class ChatSettingsRepository {
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
     t: SettingsT,
+    /** Internal: set on the re-run after losing a first-insert race. */
+    lostInsertRace = false,
   ): Promise<ResponseType<ChatSettingsUpdateResponseOutput>> {
     const userId = user.id;
 
@@ -425,7 +434,20 @@ export class ChatSettingsRepository {
             webPinnedTools:
               data.webPinnedTools !== undefined ? data.webPinnedTools : null,
           })
+          // Two saves of a brand-new user race (2026-11-17: both read "no
+          // row", the second insert hit the user_id unique key -> 500). The
+          // loser re-runs as an update on the row the winner created.
+          .onConflictDoNothing({ target: chatSettings.userId })
           .returning();
+        if (result.length === 0 && !lostInsertRace) {
+          return await ChatSettingsRepository.upsertSettings(
+            data,
+            user,
+            logger,
+            t,
+            true,
+          );
+        }
       }
 
       if (!result || result.length === 0) {
@@ -498,7 +520,14 @@ export class ChatSettingsRepository {
 
       return success();
     } catch (error) {
-      logger.error("Failed to upsert settings", parseError(error), { userId });
+      logger.error("Failed to upsert settings", parseError(error), {
+        userId,
+        // The message is truncated (long SQL first); keep the driver cause.
+        dbCause:
+          error instanceof Error && error.cause instanceof Error
+            ? error.cause.message
+            : undefined,
+      });
       return fail({
         message: t("post.errors.server.title") ?? "post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

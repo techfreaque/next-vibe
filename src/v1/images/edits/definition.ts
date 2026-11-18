@@ -81,8 +81,15 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.FILE,
         label: "media.fields.image.label",
         description: "media.fields.image.description",
+        // A JSON body may carry the image inline as a URL / data URI string
+        // (2026-11-18: a client sent `image: "data:image/jpeg;base64,..."`
+        // and got a bare "Invalid input"); treated exactly like image_url.
         schema: z
-          .union([z.instanceof(File), z.array(z.instanceof(File))])
+          .union([
+            z.instanceof(File),
+            z.array(z.instanceof(File)),
+            z.string().min(1),
+          ])
           .optional(),
       }),
       image_url: requestField(scopedTranslation, {

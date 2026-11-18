@@ -14,8 +14,14 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import { responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
 
+import { lazyWidget } from "../../../vibe/unified-ui/_shared/lazy-widget";
 import { scopedTranslation } from "./i18n";
-import { LogoutWidget } from "./widget";
+
+// Lazy: a static widget import made every server load of this definition pull
+// the CLI widget tree (ink, react-reconciler) onto the event loop (2026-11-18).
+const LogoutWidget = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.LogoutWidget })),
+);
 
 export const LOGOUT_ALIAS = "logout" as const;
 

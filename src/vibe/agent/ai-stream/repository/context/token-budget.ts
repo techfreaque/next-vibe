@@ -63,6 +63,8 @@ export function truncateToContextWindow(
   logger: EndpointLogger,
   systemPrompt: string,
   tools: Parameters<typeof streamText>[0]["tools"],
+  /** Model id, logged so an over-budget call can be matched to its provider. */
+  model: string,
   /** Tokens to reserve for model output. Default 4096 leaves headroom for responses. */
   reservedOutputTokens = 4096,
 ): ModelMessage[] {
@@ -78,7 +80,26 @@ export function truncateToContextWindow(
     return messages;
   }
 
+  // Which message is the big one (a pasted document / file text in the last
+  // user turn cannot be dropped and decides whether the call can fit at all).
+  let largestIndex = -1;
+  let largestTokens = 0;
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i];
+    if (!msg) {
+      continue;
+    }
+    const msgTokens = estimateModelMessageTokens([msg]);
+    if (msgTokens > largestTokens) {
+      largestTokens = msgTokens;
+      largestIndex = i;
+    }
+  }
+
   logger.warn("[Truncation] Messages exceed context window - truncating", {
+    model,
+    largestMessageRole: messages[largestIndex]?.role ?? null,
+    largestMessageTokens: largestTokens,
     estimatedTokens: currentTokens,
     systemTokens,
     toolsTokens,
@@ -135,6 +156,7 @@ export function truncateToContextWindow(
   }
 
   logger.warn("[Truncation] Truncation complete", {
+    model,
     droppedCount: dropped.size,
     remainingCount: truncated.length,
     estimatedTokensAfter: tokens,

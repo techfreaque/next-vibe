@@ -118,12 +118,16 @@ export class LeadAuthRepository {
   }
 
   /**
-   * Validate that leadId exists in database
+   * Validate that leadId exists in database.
+   * Returns `null` when the lookup itself failed (DB timeout / pool
+   * exhaustion): the caller must NOT treat that as "lead is gone", or a
+   * transient DB hiccup rotates every visitor's lead cookie (seen 2026-11-18
+   * 00:49 on the HA probe lead: "timeout exceeded when trying to connect").
    */
   static async validateLeadId(
     leadId: string,
     logger: EndpointLogger,
-  ): Promise<boolean> {
+  ): Promise<boolean | null> {
     try {
       const [lead] = await db
         .select({ id: leads.id })
@@ -134,7 +138,7 @@ export class LeadAuthRepository {
       return !!lead;
     } catch (error) {
       logger.error("Failed to validate leadId", parseError(error).message);
-      return false;
+      return null;
     }
   }
 

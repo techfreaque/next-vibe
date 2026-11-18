@@ -26,6 +26,7 @@ import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 import { DEFAULT_CHAT_MODEL_ID } from "../ai-stream/constants";
 import { chatModelOptionsIndex } from "../ai-stream/models";
 import { AiStreamRepository } from "../ai-stream/repository";
+import type { HeadlessAiStreamResult } from "../ai-stream/repository/setup/setup";
 import type { AiStreamPostRequestOutput } from "../ai-stream/stream/definition";
 import { scopedTranslation as aiStreamScopedTranslation } from "../ai-stream/stream/i18n";
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
@@ -463,6 +464,7 @@ export class ImageGenerationRepository {
           providerModel: imageModel.providerModel,
           prompt: data.prompt,
           size,
+          aspectRatio,
           inputMediaUrl,
           logger,
           locale,
@@ -749,27 +751,52 @@ export class ImageGenerationRepository {
       attachments: referenceAttachments,
       executionContext: { mode: "local" as const },
     };
-    const result = await AiStreamRepository.createAiStream({
-      data: syntheticData,
-      locale,
-      logger,
-      user,
-      request: undefined,
-      t: aiStreamT,
-      awaitResult: true,
-      subAgentDepth: toolExecutionContext.subAgentDepth,
-      extraInstructions:
-        "You are an image generator. Output exactly one image based on the user's prompt. Do not output any text - only the image.",
-      maxToolCalls: 1,
-      parentAbortSignal: toolExecutionContext.abortSignal,
-      // Link the sub-stream to the caller thread: provenance + the fixture
-      // engine walks child → parent → root to record/replay in the run's folder
-      // instead of going live under this fresh incognito id.
-      parentThreadId: toolExecutionContext.threadId,
-      // Browser E2E scope (no caller thread to walk to) — keeps the
-      // sub-stream's model call under record/replay.
-      fixtureScopeId: toolExecutionContext.fixtureScopeId,
-    });
+    const runHeadless = (
+      threadId: string,
+    ): Promise<ResponseType<HeadlessAiStreamResult>> =>
+      AiStreamRepository.createAiStream({
+        data: { ...syntheticData, threadId },
+        locale,
+        logger,
+        user,
+        request: undefined,
+        t: aiStreamT,
+        awaitResult: true,
+        subAgentDepth: toolExecutionContext.subAgentDepth,
+        extraInstructions:
+          "You are an image generator. Output exactly one image based on the user's prompt. Do not output any text - only the image.",
+        maxToolCalls: 1,
+        parentAbortSignal: toolExecutionContext.abortSignal,
+        // Link the sub-stream to the caller thread: provenance + the fixture
+        // engine walks child → parent → root to record/replay in the run's folder
+        // instead of going live under this fresh incognito id.
+        parentThreadId: toolExecutionContext.threadId,
+        // Browser E2E scope (no caller thread to walk to) — keeps the
+        // sub-stream's model call under record/replay.
+        fixtureScopeId: toolExecutionContext.fixtureScopeId,
+      });
+
+    let result = await runHeadless(syntheticData.threadId);
+    let attempts = 1;
+    // Thinking image models (gemini-3-pro-image-preview, prod 2026-11-18)
+    // sometimes end a turn with only their reasoning text and no image. One
+    // fresh attempt usually draws it; a second empty answer is reported below.
+    if (
+      result.success &&
+      !result.data.lastGeneratedMediaUrl &&
+      !result.data.providerErrorText &&
+      !toolExecutionContext.abortSignal.aborted
+    ) {
+      logger.info(
+        "[ImageGen] Headless model answered without an image - retrying once",
+        {
+          imageModel: data.model,
+          replyTextLength: result.data.lastAiMessageContent?.length ?? 0,
+        },
+      );
+      result = await runHeadless(crypto.randomUUID());
+      attempts = 2;
+    }
 
     if (!result.success) {
       return fail({
@@ -802,6 +829,7 @@ export class ImageGenerationRepository {
         replyTextLength: result.data.lastAiMessageContent?.length ?? 0,
         replyTextSample: result.data.lastAiMessageContent?.slice(0, 300),
         creditsDeducted: result.data.totalCreditsDeducted,
+        attempts,
       });
       return fail({
         message: t("post.errors.noImageGenerated"),

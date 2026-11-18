@@ -53,7 +53,7 @@ import {
 import type { InlineThinkEvent } from "../core/inline-think-splitter";
 import {
   computeOutputCap,
-  MIN_AFFORDABLE_OUTPUT_TOKENS,
+  minAffordableOutputTokens,
 } from "../core/output-cost-cap";
 import { claimResultToolCallId, type PendingToolData } from "../core/stream";
 import { estimateInputTokens } from "../core/token-estimator";
@@ -137,7 +137,7 @@ export class StreamLoop implements StreamLoopState {
    * covers any output the model can write, or flat/free model). A step that
    * cannot even pay the minimum still gets the minimum: setup refuses such
    * turns up-front and stopWhen ends the loop before such a step, so this is
-   * only reached on estimate drift (bounded to MIN_AFFORDABLE_OUTPUT_TOKENS).
+   * only reached on estimate drift (bounded to minAffordableOutputTokens).
    */
   private stepOutputCap(
     messages: ModelMessage[],
@@ -158,7 +158,7 @@ export class StreamLoop implements StreamLoopState {
     const maxOutputTokens =
       cap.kind === "capped"
         ? cap.maxOutputTokens
-        : MIN_AFFORDABLE_OUTPUT_TOKENS;
+        : minAffordableOutputTokens(modelConfig);
     ctx.creditBudgetCapped = true;
     logger.debug("[AI Stream] Output capped by remaining balance", {
       model: modelConfig.id,

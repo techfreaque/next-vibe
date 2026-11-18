@@ -128,6 +128,11 @@ export async function generateVideoWithModelsLab(params: {
         output_type: "mp4",
         num_frames: Math.min(Math.round(durationSeconds * 8), 25),
         ...(resolvedInitImage ? { init_image: resolvedInitImage } : {}),
+        // Own files reach us as data URIs (the provider cannot fetch our
+        // storage); without the flag ModelsLab rejects them: "init image must
+        // be a valid url when base64 is a representation of false" (prod
+        // 2026-11-18, kling-v2-5-turbo-i2v via /v1 video).
+        ...(resolvedInitImage?.startsWith("data:") ? { base64: true } : {}),
         ...(aspectRatio ? { aspect_ratio: aspectRatio } : {}),
         ...(resolution ? { resolution } : {}),
       }),

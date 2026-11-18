@@ -76,7 +76,17 @@ export class PublicCapRepository {
     },
     logger: EndpointLogger,
   ): Promise<void> {
-    logger.warn("[PublicCap] event", { ...event });
+    // Named per kind: "[PublicCap] event" said nothing about which guard
+    // fired. lead-cap / ip-cap / global-cap / single-request = a guest
+    // request was refused; threshold-80 = the shared pool is 80% spent,
+    // threshold-100 = it is used up; fail-closed = the cap check could not
+    // read the DB and refused.
+    logger.warn(
+      event.kind === "threshold-80" || event.kind === "threshold-100"
+        ? `[PublicCap] ${event.kind}: shared guest pool spend crossed`
+        : `[PublicCap] ${event.kind}: guest request refused`,
+      { ...event },
+    );
     try {
       await db.insert(publicCapEvents).values({
         kind: event.kind,

@@ -27,14 +27,24 @@ import type { EndpointLogger } from "../../logger/types";
 const TAIL_MS = 1500;
 /** Hard cap per session: a phase that never ends must not profile forever. */
 const MAX_SESSION_MS = 60_000;
-/** Sample every 1 ms (JSC default). */
+/**
+ * Continuous mode: one session per window, back to back. Short windows keep
+ * each result small (summarizing costs a few ms) and let a stall be matched to
+ * the session that covered it within the lag monitor's 5 s window.
+ */
+const CONTINUOUS_WINDOW_MS = 10_000;
+/** Sample every 1 ms (JSC default). Measured overhead: within noise. */
 const SAMPLE_INTERVAL_US = 1000;
 /** A gap above this between two samples ends a busy streak. */
 const STREAK_GAP_S = 0.005;
-/** Report a busy streak at least this long. Lag rows start at 100 ms. */
+/** Log a profiled cron phase stall as its own row from this long. */
 const STALL_REPORT_MS = 200;
+/** Keep a streak for the lag row from this long. Lag rows start at 100 ms. */
+const STALL_ATTACH_MS = 80;
 /** Stall profiles kept for the lag row to attach. */
 const RECENT_RING_SIZE = 10;
+/** The lag row waits at most this long for the covering session's summary. */
+const FLUSH_WAIT_MS = 2000;
 
 interface PhaseWindow {
   label: string;
@@ -43,13 +53,15 @@ interface PhaseWindow {
 }
 
 interface ProfileSession {
-  /** Set once the sampling window closed (tail or hard cap): start a new one */
+  /** Set once the sampling window closed (tail, window or hard cap) */
   released: boolean;
-  openPhases: number;
+  /** Phases that overlapped the session (open ones are carried over) */
   phases: PhaseWindow[];
   startedAt: number;
   release: () => void;
   tailTimer: ReturnType<typeof setTimeout> | null;
+  /** Resolves once the session is summarized (ring updated) */
+  done: Promise<void>;
 }
 
 export interface StallProfile {
@@ -58,7 +70,7 @@ export interface StallProfile {
   sessionEndedAt: number;
   /** Longest uninterrupted JS-busy stretch in the session */
   streakMs: number;
-  /** "label start..end" of every phase in the session */
+  /** "label start..end" of every phase in the session ("" outside phases) */
   phases: string;
   /** Most sampled innermost app frames in the streak: "fn file:line xN" */
   hotFrames: string;
@@ -71,6 +83,12 @@ export interface StallProfile {
 declare global {
   var __vibePhaseProfiler: ProfileSession | null | undefined;
   var __vibeStallProfiles: StallProfile[] | undefined;
+  /** Phases still running, carried into the next session on a cut */
+  var __vibeOpenPhases: Set<PhaseWindow> | undefined;
+  /** Set once continuous sampling runs (the server's lag monitor turns it on) */
+  var __vibeProfilerContinuous: EndpointLogger | null | undefined;
+  /** Summary of the most recently released session */
+  var __vibeProfilerPending: Promise<void> | undefined;
 }
 
 type BunJsc = typeof BunJscModule;
@@ -88,6 +106,11 @@ function loadJsc(): Promise<BunJsc | null> {
     }
   })();
   return jscModule;
+}
+
+function openPhases(): Set<PhaseWindow> {
+  globalThis.__vibeOpenPhases ??= new Set();
+  return globalThis.__vibeOpenPhases;
 }
 
 function recent(): StallProfile[] {
@@ -179,7 +202,7 @@ function summarize(
     (traces[end - 1].timestamp - traces[start].timestamp) * 1000 +
       result.stackTraces.interval * 1000,
   );
-  if (streakMs < STALL_REPORT_MS) {
+  if (streakMs < STALL_ATTACH_MS) {
     return null;
   }
 
@@ -228,23 +251,67 @@ function noop(): void {
   // replaced by the window's resolver
 }
 
+/** Most recent phase end, for the tail of a continuous window. */
+function lastPhaseEndedAt(session: ProfileSession): number {
+  let last = 0;
+  for (const phase of session.phases) {
+    if (phase.endedAt !== null && phase.endedAt > last) {
+      last = phase.endedAt;
+    }
+  }
+  return last;
+}
+
 function startSession(logger: EndpointLogger): ProfileSession {
   let resolveWindow: () => void = noop;
   const sessionWindow = new Promise<void>((resolve) => {
     resolveWindow = resolve;
   });
+  let resolveDone: () => void = noop;
+  const done = new Promise<void>((resolve) => {
+    resolveDone = resolve;
+  });
   const session: ProfileSession = {
     released: false,
-    openPhases: 0,
-    phases: [],
+    // Phases still open when the previous session was cut belong here too
+    phases: [...openPhases()],
     startedAt: Date.now(),
     release: (): void => {
+      if (session.released) {
+        return;
+      }
       session.released = true;
+      globalThis.__vibeProfilerPending = done;
       resolveWindow();
     },
     tailTimer: null,
+    done,
   };
   const hardStop = setTimeout(session.release, MAX_SESSION_MS);
+
+  // Continuous mode: close the window every CONTINUOUS_WINDOW_MS, but never
+  // while a phase is open or inside a phase's tail (keeps the phase labels on
+  // the stall that follows it).
+  let windowTimer: ReturnType<typeof setTimeout> | null = null;
+  const armWindow = (delayMs: number): void => {
+    windowTimer = setTimeout(() => {
+      windowTimer = null;
+      if (session.released) {
+        return;
+      }
+      const sinceLastPhase = Date.now() - lastPhaseEndedAt(session);
+      if (openPhases().size > 0) {
+        armWindow(TAIL_MS);
+      } else if (sinceLastPhase < TAIL_MS) {
+        armWindow(TAIL_MS - sinceLastPhase);
+      } else {
+        session.release();
+      }
+    }, delayMs);
+  };
+  if (globalThis.__vibeProfilerContinuous) {
+    armWindow(CONTINUOUS_WINDOW_MS);
+  }
 
   void (async (): Promise<void> => {
     try {
@@ -260,25 +327,47 @@ function startSession(logger: EndpointLogger): ProfileSession {
         if (ring.length > RECENT_RING_SIZE) {
           ring.splice(0, ring.length - RECENT_RING_SIZE);
         }
-        // Static message: the fingerprint groups on it; details in metadata.
-        logger.warn("[EventLoop] Stall profiled during cron bookkeeping", {
-          streakMs: stall.streakMs,
-          phases: stall.phases,
-          hotFrames: stall.hotFrames,
-          hotStacks: stall.hotStacks,
-          hotNative: stall.hotNative,
-        });
+        if (session.phases.length > 0 && stall.streakMs >= STALL_REPORT_MS) {
+          // Static message: the fingerprint groups on it; details in metadata.
+          logger.warn("[EventLoop] Stall profiled during cron bookkeeping", {
+            streakMs: stall.streakMs,
+            phases: stall.phases,
+            hotFrames: stall.hotFrames,
+            hotStacks: stall.hotStacks,
+            hotNative: stall.hotNative,
+          });
+        }
       }
     } catch {
       // Diagnostics only: a profiler failure must never touch the pulse.
     } finally {
       clearTimeout(hardStop);
+      if (windowTimer !== null) {
+        clearTimeout(windowTimer);
+      }
+      if (session.tailTimer !== null) {
+        clearTimeout(session.tailTimer);
+      }
       session.released = true;
       if (globalThis.__vibePhaseProfiler === session) {
         globalThis.__vibePhaseProfiler = null;
       }
+      resolveDone();
+      // Continuous: the next window starts right away (no unsampled gap
+      // beyond the summarizing above).
+      const continuousLogger = globalThis.__vibeProfilerContinuous;
+      if (continuousLogger && !globalThis.__vibePhaseProfiler) {
+        globalThis.__vibePhaseProfiler = startSession(continuousLogger);
+      }
     }
   })();
+  return session;
+}
+
+function currentSession(logger: EndpointLogger): ProfileSession {
+  const current = globalThis.__vibePhaseProfiler;
+  const session = current && !current.released ? current : startSession(logger);
+  globalThis.__vibePhaseProfiler = session;
   return session;
 }
 
@@ -291,17 +380,14 @@ export class PhaseProfiler {
     if (typeof Bun === "undefined") {
       return (): void => undefined;
     }
-    const current = globalThis.__vibePhaseProfiler;
-    const session =
-      current && !current.released ? current : startSession(logger);
-    globalThis.__vibePhaseProfiler = session;
+    const session = currentSession(logger);
     if (session.tailTimer !== null) {
       clearTimeout(session.tailTimer);
       session.tailTimer = null;
     }
-    session.openPhases++;
     const phase: PhaseWindow = { label, startedAt: Date.now(), endedAt: null };
     session.phases.push(phase);
+    openPhases().add(phase);
 
     let ended = false;
     return (): void => {
@@ -310,11 +396,79 @@ export class PhaseProfiler {
       }
       ended = true;
       phase.endedAt = Date.now();
-      session.openPhases--;
-      if (session.openPhases <= 0) {
-        session.tailTimer = setTimeout(session.release, TAIL_MS);
+      openPhases().delete(phase);
+      // Continuous sessions close on their window timer (which honours the
+      // tail); a phase-only session closes TAIL_MS after its last phase.
+      const live = globalThis.__vibePhaseProfiler;
+      if (
+        live &&
+        !live.released &&
+        openPhases().size === 0 &&
+        !globalThis.__vibeProfilerContinuous
+      ) {
+        if (live.tailTimer !== null) {
+          clearTimeout(live.tailTimer);
+        }
+        live.tailTimer = setTimeout(live.release, TAIL_MS);
       }
     };
+  }
+
+  /**
+   * Sample the JS thread all the time, in back-to-back windows, so every lag
+   * row can carry the stack that blocked the loop, not only stalls inside a
+   * cron phase. Prod 2026-11-15..18: ~80% of lag rows had no task running and
+   * no request in flight, so nothing named their cause. Idempotent.
+   */
+  static startContinuous(logger: EndpointLogger): void {
+    if (typeof Bun === "undefined" || globalThis.__vibeProfilerContinuous) {
+      return;
+    }
+    globalThis.__vibeProfilerContinuous = logger;
+    const current = globalThis.__vibePhaseProfiler;
+    if (!current || current.released) {
+      globalThis.__vibePhaseProfiler = startSession(logger);
+    }
+  }
+
+  /** Stop continuous sampling (tests); phase sessions keep working. */
+  static stopContinuous(): void {
+    globalThis.__vibeProfilerContinuous = null;
+    const current = globalThis.__vibePhaseProfiler;
+    if (current && !current.released && openPhases().size === 0) {
+      current.release();
+    }
+  }
+
+  /**
+   * Close the session that covers `at` now and wait (bounded) for its
+   * summary, so profileCovering(at) can answer. The lag monitor calls this
+   * right after it measured a stall. No-op without a session.
+   */
+  static async flush(at: number): Promise<void> {
+    const current = globalThis.__vibePhaseProfiler;
+    if (current && !current.released && current.startedAt <= at) {
+      current.release();
+    }
+    const pending = globalThis.__vibeProfilerPending;
+    if (!pending) {
+      return;
+    }
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    await Promise.race([
+      pending,
+      new Promise<void>((resolve) => {
+        timer = setTimeout(resolve, FLUSH_WAIT_MS);
+      }),
+    ]);
+    if (timer !== undefined) {
+      clearTimeout(timer);
+    }
+  }
+
+  /** True while continuous sampling runs (a lag row without a profile = no JS ran). */
+  static isContinuous(): boolean {
+    return Boolean(globalThis.__vibeProfilerContinuous);
   }
 
   /** Stall profile whose session covered this wall-clock instant, if any. */

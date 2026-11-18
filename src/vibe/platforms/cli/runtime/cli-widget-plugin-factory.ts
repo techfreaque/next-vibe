@@ -55,6 +55,16 @@ function rebaseRelativeImports(
   );
 }
 
+/**
+ * Sibling lookup per absolute target, null = no .cli sibling. The prod server
+ * runs under this plugin, so every relative import of a cold module graph
+ * (a lazily imported route or provider) runs this sync lookup on the event
+ * loop: up to five existsSync calls per import edge, the top sampled frame of
+ * prod stalls. Many importers share a target, and a module that already
+ * resolved is cached by the runtime anyway, so remembering the answer is safe.
+ */
+const cliSiblingCache = new Map<string, string | null>();
+
 function resolveCliSiblingPath(
   path: string,
   importer: string | undefined,
@@ -63,6 +73,16 @@ function resolveCliSiblingPath(
     return undefined;
   }
   const abs = resolve(dirname(importer), path);
+  const cached = cliSiblingCache.get(abs);
+  if (cached !== undefined) {
+    return cached === null ? undefined : { path: cached };
+  }
+  const found = lookupCliSibling(abs);
+  cliSiblingCache.set(abs, found ?? null);
+  return found === undefined ? undefined : { path: found };
+}
+
+function lookupCliSibling(abs: string): string | undefined {
   for (const srcExt of ["", ".ts", ".tsx"] as const) {
     const full = abs + srcExt;
     if (!existsSync(full)) {
@@ -75,7 +95,7 @@ function resolveCliSiblingPath(
         : full;
     for (const cliExt of [".cli.ts", ".cli.tsx"] as const) {
       if (existsSync(base + cliExt)) {
-        return { path: base + cliExt };
+        return base + cliExt;
       }
     }
     break;

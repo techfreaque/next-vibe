@@ -130,3 +130,17 @@ export function getGeolocation(): Promise<GeolocationCoordinates | null> {
 export function isOnline(): boolean {
   return navigator.onLine;
 }
+
+/**
+ * Transient / sticky user activation (null when the browser has no
+ * UserActivation API). Explains autoplay and permission rejections.
+ */
+export function getUserActivation(): {
+  isActive: boolean | null;
+  hasBeenActive: boolean | null;
+} {
+  return {
+    isActive: navigator.userActivation?.isActive ?? null,
+    hasBeenActive: navigator.userActivation?.hasBeenActive ?? null,
+  };
+}

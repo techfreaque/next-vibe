@@ -12,6 +12,7 @@ import { repairMangledStorageUrlsInText } from "../../../chat/storage/storage-ur
 import { creditsWithoutPlatformMarkup } from "../../../models/models";
 import { StreamErrorType } from "../core/constants";
 import { clearStreamingState } from "../core/stream";
+import { providerErrorTranslationKey } from "../errors/provider-error-key";
 import { endLoopNeedsAnswerStep } from "./helpers";
 import type { StreamLoopState } from "./state";
 import {
@@ -430,9 +431,14 @@ export async function complete(
     // The wallet ran out: the output hit its balance cap, or the tool loop
     // stopped before a step it could not pay. Say so instead of leaving a
     // cut-off (or blank) reply unexplained.
+    // A capped step that produced no answer was also cut by the balance:
+    // some providers report "stop" (not "length") when max_tokens runs out
+    // mid-reasoning (prod 2026-11-17, deepseek-v4-pro guests).
     const budgetCut =
       ctx.creditBudgetStopped ||
-      (ctx.creditBudgetCapped && finishReason === "length");
+      (ctx.creditBudgetCapped &&
+        (finishReason === "length" ||
+          (isEmptyAnswer && finishReason !== "content-filter")));
     if (budgetCut) {
       logger.info("[AI Stream] Turn cut short by the remaining balance", {
         threadId,
@@ -482,6 +488,25 @@ export async function complete(
         sequenceId: ctx.lastSequenceId,
         user,
       });
+    } else if (finishReason === "error") {
+      // The provider failed mid-answer (e.g. NanoGPT "final tool call was
+      // malformed"): the partial reply stays, but without a note it reads as
+      // a finished answer that just stops. Say it broke off, and why if known.
+      const errorKey =
+        providerErrorTranslationKey(ctx.lastProviderErrorText) ??
+        "errors.streamError";
+      await ctx.dbWriter.emitErrorMessage({
+        threadId,
+        errorType: StreamErrorType.STREAM_ERROR,
+        error: fail({
+          message: t(errorKey),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        }),
+        content: t(errorKey),
+        parentId: ctx.lastParentId,
+        sequenceId: ctx.lastSequenceId,
+        user,
+      });
     }
   } else {
     // Provider returned an empty stream - no text was generated.
@@ -520,16 +545,32 @@ export async function complete(
       totalTokens: null,
       finishReason: finishReason ?? null,
     });
-    // Tokens were charged (prompt read, maybe hidden output): say so, and
-    // that only the provider's cost was billed.
+    // The provider said why (overload, filter, unavailable): show that.
+    // A balance-capped step ran out of output: say so. Otherwise tokens
+    // were charged (prompt read, maybe hidden output): say so, and that
+    // only the provider's cost was billed.
+    const providerKey =
+      finishReason === "error"
+        ? providerErrorTranslationKey(ctx.lastProviderErrorText)
+        : null;
     const emptyKey =
-      actualCreditCost > 0 ? "errors.emptyAnswer" : "errors.noResponse";
+      providerKey ??
+      (ctx.creditBudgetCapped && finishReason !== "content-filter"
+        ? "errors.creditBudgetReached"
+        : actualCreditCost > 0
+          ? "errors.emptyAnswer"
+          : "errors.noResponse");
     await ctx.dbWriter.emitErrorMessage({
       threadId,
       errorType: StreamErrorType.STREAM_ERROR,
       error: fail({
         message: t(emptyKey),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        errorType:
+          emptyKey === "errors.creditBudgetReached"
+            ? ErrorResponseTypes.PAYMENT_REQUIRED
+            : providerKey
+              ? ErrorResponseTypes.EXTERNAL_SERVICE_ERROR
+              : ErrorResponseTypes.INTERNAL_ERROR,
       }),
       content: t(emptyKey),
       parentId: ctx.lastParentId,

@@ -9,15 +9,12 @@ import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { SiDiscord } from "next-vibe/ui/components/icons/SiDiscord";
 import { JsonLd } from "next-vibe/ui/components/json-ld";
 import { Link } from "next-vibe/ui/components/link";
-import { H2, H3, P } from "next-vibe/ui/components/typography";
-import { useLogger } from "next-vibe/ui/hooks/use-logger";
+import { H1, H2, H3, P } from "next-vibe/ui/components/typography";
 import { openUrl } from "next-vibe/ui/lib/location";
-import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
-import contactDefinitions from "@/contact/definition";
-import { contactClientRepository } from "@/contact/repository-client";
+import { ContactFormSection } from "@/_pages/story/_components/contact-form-section";
 import { configScopedTranslation } from "@/env/i18n";
 import { getPricingParams } from "@/products/repository-client";
 
@@ -28,6 +25,7 @@ interface HelpPageClientProps {
   user: JwtPayloadType;
   platform: Platform;
   userEmail?: string;
+  supportEmail: string;
   modelCount: number;
 }
 
@@ -36,37 +34,30 @@ export default function HelpPageClient({
   user,
   platform,
   userEmail,
+  supportEmail,
   modelCount,
 }: HelpPageClientProps): JSX.Element {
-  const logger = useLogger();
   const { t } = pageT.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
-  const supportEmail = contactClientRepository.getSupportEmail(locale);
   const pricing = getPricingParams(locale);
 
   return (
     <Div className="container max-w-6xl mx-auto py-8 px-4">
       <Div className="text-center mb-12">
-        <H2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600 text-center">
+        <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600 text-center">
           {t("pages.help.title")}
-        </H2>
+        </H1>
         <P className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto text-center">
           {t("pages.help.subtitle")}
         </P>
       </Div>
 
       <Div className="grid md:grid-cols-2 gap-12 mb-16">
-        <EndpointsPage
-          logger={logger}
-          endpoint={contactDefinitions}
+        <ContactFormSection
           locale={locale}
           user={user}
           platform={platform}
-          endpointOptions={
-            userEmail
-              ? { create: { autoPrefillData: { email: userEmail } } }
-              : undefined
-          }
+          userEmail={userEmail}
         />
 
         {/* Contact Info */}

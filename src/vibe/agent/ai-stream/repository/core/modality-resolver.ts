@@ -352,6 +352,15 @@ export async function resolveModelSkill(params: {
       hasModel: Boolean(model),
       favoriteId,
       skill,
+      // A favoriteConfig / skill that WAS passed but yields no servable model
+      // (env without that provider, model selection filtered out) reads very
+      // differently from a caller that sent nothing at all.
+      hasFavoriteConfig: Boolean(favoriteConfig),
+      favoriteConfigSkillId: favoriteConfig?.skillId,
+      reason:
+        skill || favoriteConfig
+          ? "no servable model for the given skill/favorite"
+          : "caller sent no model, favorite or skill",
       isPublic: user.isPublic,
     },
   );

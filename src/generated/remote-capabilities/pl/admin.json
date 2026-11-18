@@ -321697,6 +321697,20 @@
           },
           "schemaType": "primitive"
         },
+        "writable": {
+          "type": "badge",
+          "text": "get.response.writable.text",
+          "schema": {
+            "def": {
+              "type": "boolean"
+            },
+            "type": "boolean"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "entries": {
           "type": "container",
           "child": {
@@ -578812,13 +578826,44 @@
           "type": "form_field",
           "fieldType": "text",
           "label": "Odcisk palca",
-          "description": "Odcisk palca logu błędu",
+          "description": "Odcisk palca logu błędu (kolumna `fingerprint` na liście). Podaj go albo id.",
           "placeholder": "Wprowadź odcisk palca",
           "schema": {
             "def": {
-              "type": "string"
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
             },
-            "type": "string"
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "id": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "ID logu",
+          "description": "ID wiersza z listy (pełny uuid albo jego pierwsze 8+ znaków). Zamiast odcisku palca.",
+          "placeholder": "np. c21bd4c7",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
           },
           "usage": {
             "request": "data"

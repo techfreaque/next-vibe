@@ -24,7 +24,11 @@
  * channel's resync handlers refetch instead (`onChannelResync`).
  */
 
-import { addDocumentListener, addWindowListener } from "next-vibe/ui/lib/dom";
+import {
+  addDocumentListener,
+  addWindowListener,
+  getVisibilityState,
+} from "next-vibe/ui/lib/dom";
 import { getCurrentHost, getCurrentProtocol } from "next-vibe/ui/lib/location";
 import { isOnline } from "next-vibe/ui/lib/media";
 
@@ -88,6 +92,10 @@ const WS_SERVICE_RESTART_CODE = 1012;
 const WS_IDENTITY_CHANGED_CODE = 4001;
 /** How long the new socket waits before resubscribing pre-switch channels. */
 const IDENTITY_RESUBSCRIBE_GRACE_MS = 3_000;
+/** Report an ongoing drop after this much wall-clock time. */
+const DROP_REPORT_AFTER_MS = 20_000;
+/** How often an open outage samples visibility/online state. */
+const DROP_CHECK_INTERVAL_MS = 5_000;
 
 // Shared connection state
 let sharedWs: WebSocket | null = null;
@@ -118,6 +126,69 @@ let pageUnloading = false;
 let openedAt: number | null = null;
 let lastFrameAt: number | null = null;
 
+/** Close details of the socket that started the current outage. */
+interface DropInfo {
+  code: number;
+  reason: string;
+  wasClean: boolean;
+  online: boolean;
+  /** Tab was hidden when the socket closed (mobile background, frozen tab). */
+  hiddenAtClose: boolean;
+  channelCount: number;
+  /** null = the socket never opened (handshake/upgrade failed) */
+  connectedForMs: number | null;
+  sinceLastFrameMs: number | null;
+}
+// The current outage: its first close, whether it was reported, and how long
+// it lasted while the user could notice it (tab visible + browser online).
+let pendingDrop: DropInfo | null = null;
+let dropReported = false;
+let dropReconnectCount = 0;
+let noticeableDownMs = 0;
+let dropCheckTimer: ReturnType<typeof setInterval> | null = null;
+
+function isTabVisible(): boolean {
+  return typeof window === "undefined" || getVisibilityState() === "visible";
+}
+
+function stopDropCheck(): void {
+  if (dropCheckTimer !== null) {
+    clearInterval(dropCheckTimer);
+    dropCheckTimer = null;
+  }
+}
+
+function reportDrop(logger: EndpointLogger, recovered: boolean): void {
+  if (disconnectedAt === null || dropReported) {
+    return;
+  }
+  dropReported = true;
+  stopDropCheck();
+  logger.error("[WS Client] Connection lost", {
+    ...pendingDrop,
+    offlineMs: Date.now() - disconnectedAt,
+    noticeableDownMs,
+    attempts: dropReconnectCount,
+    reconnectPaused,
+    recovered,
+  });
+}
+
+function startDropCheck(logger: EndpointLogger): void {
+  dropCheckTimer = setInterval(() => {
+    if (disconnectedAt === null || dropReported) {
+      stopDropCheck();
+      return;
+    }
+    if (isTabVisible() && isOnline()) {
+      noticeableDownMs += DROP_CHECK_INTERVAL_MS;
+    }
+    if (Date.now() - disconnectedAt >= DROP_REPORT_AFTER_MS) {
+      reportDrop(logger, false);
+    }
+  }, DROP_CHECK_INTERVAL_MS);
+}
+
 function sendToServer(msg: WsClientMessage): void {
   if (sharedWs?.readyState === WebSocket.OPEN) {
     sharedWs.send(JSON.stringify(msg));
@@ -135,17 +206,29 @@ function sendSubscribe(channel: string, state: ChannelState): void {
   });
 }
 
-function handleOpen(): void {
+function handleOpen(logger: EndpointLogger): void {
   openedAt = Date.now();
   lastFrameAt = null;
-  if (disconnectedAt !== null && reconnectAttempts > 0) {
-    lastLogger?.warn("[WS Client] Reconnected after disconnect", {
-      attempts: reconnectAttempts,
-      offlineMs: Date.now() - disconnectedAt,
-      channelCount: channels.size,
-    });
+  if (disconnectedAt !== null) {
+    if (dropReported) {
+      logger.warn("[WS Client] Reconnected after disconnect", {
+        ...pendingDrop,
+        attempts: dropReconnectCount,
+        offlineMs: Date.now() - disconnectedAt,
+        noticeableDownMs,
+        channelCount: channels.size,
+        recovered: true,
+      });
+    } else {
+      reportDrop(logger, true);
+    }
   }
   disconnectedAt = null;
+  pendingDrop = null;
+  dropReported = false;
+  dropReconnectCount = 0;
+  noticeableDownMs = 0;
+  stopDropCheck();
   reconnectAttempts = 0;
   // Re-subscribe to all active channels after reconnect, each with the last
   // seq it saw so the server replays the gap.
@@ -258,6 +341,9 @@ function connect(logger: EndpointLogger): void {
   lastLogger = logger;
   const ws = new WebSocket(url);
   sharedWs = ws;
+  if (pendingDrop !== null) {
+    dropReconnectCount++;
+  }
 
   const handleMessage = (event: MessageEvent): void => {
     if (sharedWs !== ws) {
@@ -299,22 +385,26 @@ function connect(logger: EndpointLogger): void {
     if (channels.size === 0) {
       return;
     }
-    // Live updates (streaming tokens, task status, credits) stop for the user
-    // until a reconnect lands - report the drop once, not every retry.
+    // Keep the first close of the episode. Recovery, the report timer, or
+    // pagehide reports it once, even when several reconnects fail.
     if (disconnectedAt === null && !pageUnloading) {
-      disconnectedAt = Date.now();
-      logger.warn("[WS Client] Connection lost", {
+      disconnectedAt = closedAt;
+      dropReported = false;
+      dropReconnectCount = 0;
+      noticeableDownMs = 0;
+      pendingDrop = {
         code: event.code,
         reason: event.reason.slice(0, 200),
         wasClean: event.wasClean,
-        channelCount: channels.size,
         online: isOnline(),
-        // null = the socket never opened (handshake/upgrade failed)
+        hiddenAtClose: !isTabVisible(),
+        channelCount: channels.size,
         connectedForMs:
           socketOpenedAt === null ? null : closedAt - socketOpenedAt,
         sinceLastFrameMs:
           socketLastFrameAt === null ? null : closedAt - socketLastFrameAt,
-      });
+      };
+      startDropCheck(logger);
     }
     // After 6 consecutive failures (~63s total), pause the loop and wait for
     // a page focus/visibility event — persistent failures are likely a stale
@@ -326,8 +416,12 @@ function connect(logger: EndpointLogger): void {
         lastCode: event.code,
         lastReason: event.reason.slice(0, 200),
         offlineMs: disconnectedAt === null ? null : Date.now() - disconnectedAt,
+        noticeableDownMs,
+        firstDropCode: pendingDrop?.code ?? null,
+        hiddenAtClose: pendingDrop?.hiddenAtClose ?? null,
         channelCount: channels.size,
         online: isOnline(),
+        visible: isTabVisible(),
       });
       return;
     }
@@ -347,7 +441,11 @@ function connect(logger: EndpointLogger): void {
     }, delay);
   };
 
-  ws.addEventListener("open", handleOpen);
+  ws.addEventListener("open", () => {
+    if (sharedWs === ws) {
+      handleOpen(logger);
+    }
+  });
   ws.addEventListener("message", handleMessage);
   ws.addEventListener("close", handleClose);
   // onerror is followed by onclose, which triggers reconnect.
@@ -361,6 +459,9 @@ function connect(logger: EndpointLogger): void {
 if (typeof document !== "undefined") {
   addWindowListener("pagehide", () => {
     pageUnloading = true;
+    if (lastLogger) {
+      reportDrop(lastLogger, false);
+    }
   });
   addWindowListener("pageshow", () => {
     pageUnloading = false;

@@ -318,7 +318,8 @@ export const translations: typeof enTranslations = {
     title: "Erreur de connexion",
     account_suspended:
       "Compte suspendu. Une erreur selon vous ? Écrivez au support.",
-    account_locked: "Le compte est verrouillé",
+    account_locked:
+      "Trop de tentatives échouées. Attendez 15 minutes ou réinitialisez votre mot de passe. Pas encore de compte ? Inscrivez-vous.",
     accountLocked: "Le compte est verrouillé",
     accountLockedDescription:
       "Votre compte a été verrouillé. Veuillez contacter le support.",

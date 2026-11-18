@@ -53,6 +53,7 @@ export const translations: typeof enTranslations = {
         updatedAt: { content: "Aktualisiert" },
       },
       total: { text: "Gesamt" },
+      writable: { text: "Beschreibbar" },
     },
     errors: {
       validation: { title: "Ungültige Eingabe", description: "Pfad prüfen" },

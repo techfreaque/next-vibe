@@ -62,3 +62,11 @@ export async function getGeolocation(): Promise<{
 export function isOnline(): boolean {
   return true;
 }
+
+/** No browser user-activation concept on this platform. */
+export function getUserActivation(): {
+  isActive: boolean | null;
+  hasBeenActive: boolean | null;
+} {
+  return { isActive: null, hasBeenActive: null };
+}

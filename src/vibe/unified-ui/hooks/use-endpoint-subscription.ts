@@ -285,16 +285,24 @@ export function useEndpointSubscription(
     //     instance (`user/{uid}/{pathChannel}`).
     // Both channels are unique to this endpoint + params, so everything that
     // arrives is ours — no envelope filtering.
-    unsubscribers.push(
-      subscribeToChannel<AnyEndpointEventEnvelope>(
-        pathChannel,
-        "__event__",
-        handleEvent,
-        locale,
-        logger,
-        descriptor,
-      ),
-    );
+    //
+    // A static `channel: { scope: "user" }` endpoint never delivers on the path
+    // channel (the emitter always picks the owner's user channel), so skip it:
+    // for a guest on a customer-only list (skills favorites) the path channel
+    // fails the role check and every page view logged a denied subscribe.
+    const pathChannelLive = endpoint.channel?.scope !== "user";
+    if (pathChannelLive) {
+      unsubscribers.push(
+        subscribeToChannel<AnyEndpointEventEnvelope>(
+          pathChannel,
+          "__event__",
+          handleEvent,
+          locale,
+          logger,
+          descriptor,
+        ),
+      );
+    }
 
     if (userChannel) {
       unsubscribers.push(
@@ -326,7 +334,9 @@ export function useEndpointSubscription(
         void queryClient.invalidateQueries({ queryKey: [cacheKey] });
       });
     };
-    unsubscribers.push(onChannelResync(pathChannel, resync));
+    if (pathChannelLive) {
+      unsubscribers.push(onChannelResync(pathChannel, resync));
+    }
     if (userChannel) {
       unsubscribers.push(onChannelResync(userChannel, resync));
     }

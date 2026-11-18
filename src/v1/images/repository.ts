@@ -225,8 +225,11 @@ export class V1ImagesRepository {
         ),
       );
     }
+    const inlineImageUrl =
+      typeof data.image === "string" ? data.image : undefined;
+    const imageUrl = inlineImageUrl ?? data.image_url;
     const files =
-      data.image === undefined
+      data.image === undefined || typeof data.image === "string"
         ? []
         : Array.isArray(data.image)
           ? data.image
@@ -259,21 +262,19 @@ export class V1ImagesRepository {
         );
       }
       inputMediaUrl = await fileToDataUri(file);
-    } else if (data.image_url) {
-      if (
-        !/^(https?:\/\/|data:image\/[a-z0-9.+-]+;base64,)/i.test(data.image_url)
-      ) {
+    } else if (imageUrl) {
+      if (!/^(https?:\/\/|data:image\/[a-z0-9.+-]+;base64,)/i.test(imageUrl)) {
         return openAiErrorResponse(
           v1Error(
             400,
             t("openai.badImageUrl"),
             "invalid_request_error",
             "invalid_value",
-            "image_url",
+            inlineImageUrl ? "image" : "image_url",
           ),
         );
       }
-      inputMediaUrl = data.image_url;
+      inputMediaUrl = imageUrl;
     } else {
       return openAiErrorResponse(
         v1Error(

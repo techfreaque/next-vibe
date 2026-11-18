@@ -41,6 +41,7 @@ import {
   estimateCutOffStepCost,
 } from "../loop/token-accumulator";
 import { serializeError } from "./error-utils";
+import { providerErrorTranslationKey } from "./provider-error-key";
 
 /**
  * ErrorRouter — the one no-dbWriter error-emit path.
@@ -267,6 +268,8 @@ export class StreamErrorCatchHandler {
       } else {
         await StreamErrorHandler.handleStreamError({
           error: error instanceof Error ? error : (error as JSONValue),
+          model,
+          providerErrorText: ctx.lastProviderErrorText,
           threadId,
           user,
           lastParentId: ctx.lastParentId,
@@ -675,6 +678,9 @@ export class StreamErrorHandler {
    */
   static async handleStreamError(params: {
     error: Error | JSONValue;
+    model: ChatModelId;
+    /** The upstream error part that preceded the failure (if any) */
+    providerErrorText: string | null;
     threadId: string;
     user: JwtPayloadType;
     lastParentId: string | null;
@@ -685,6 +691,8 @@ export class StreamErrorHandler {
   }): Promise<void> {
     const {
       error,
+      model,
+      providerErrorText,
       threadId,
       user,
       lastParentId,
@@ -695,13 +703,18 @@ export class StreamErrorHandler {
     } = params;
 
     const errorMessage = error instanceof Error ? error.message : String(error);
-    const errorName =
-      error instanceof Error ? error.constructor.name : typeof error;
+    // error.name, not constructor.name: the prod build minifies class names
+    // (every row read errorType "p").
+    const errorName = error instanceof Error ? error.name : typeof error;
 
     // Pass the raw error: the logger serializes name/message/stack/cause plus
     // provider fields (statusCode, url, responseBody) - never `{}`.
+    // providerError = the upstream error part behind a generic
+    // "No output generated", so the row names its real cause.
     logger.error("Stream error", error, {
       errorType: errorName,
+      model,
+      providerError: providerErrorText,
       threadId,
       userId: user.isPublic ? null : user.id,
       leadId: user.leadId,
@@ -710,8 +723,14 @@ export class StreamErrorHandler {
     let translationKey: AiStreamTranslationKey;
     let errorType = ErrorResponseTypes.UNKNOWN_ERROR;
     let skipDb = false;
+    const providerKey = providerErrorTranslationKey(providerErrorText);
 
-    if (
+    if (providerKey) {
+      // The provider said why (overload, content filter, unavailable): tell
+      // the user that, not a generic "no response".
+      translationKey = providerKey;
+      errorType = ErrorResponseTypes.EXTERNAL_SERVICE_ERROR;
+    } else if (
       errorName === "AI_MissingToolResultsError" ||
       errorMessage.toLowerCase().includes("missing tool results")
     ) {

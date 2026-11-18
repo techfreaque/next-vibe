@@ -7,7 +7,9 @@ import {
   getLocalItem,
   type LargeStoreResult,
   removeLocalItem,
+  resetQuotaOverflowForTests,
   resetWebStorageFallbackForTests,
+  setIndexedDbBackendForTests,
   setLocalItem,
 } from "./storage";
 
@@ -203,16 +205,27 @@ describe("largeStorage (IndexedDB with localStorage migration)", () => {
 describe("setLocalItem quota failure", () => {
   afterEach(() => {
     installLocalStorage(undefined);
+    resetQuotaOverflowForTests();
+    setIndexedDbBackendForTests(undefined);
   });
 
-  it("still reports the failure, now naming the key hogging the quota", () => {
+  it("reports once per key, keeps the value in memory, stops retrying", async () => {
     const local = new FakeLocalStorage(100);
     local.items.set("hog", "y".repeat(90));
     installLocalStorage(local);
+    setIndexedDbBackendForTests(null);
     const calls: LoggedCall[] = [];
+    const logger = createCapturingLogger(calls);
 
-    setLocalItem("draft", "z".repeat(50), createCapturingLogger(calls));
+    setLocalItem("draft", "z".repeat(50), logger);
+    setLocalItem("draft", "z".repeat(51), logger);
+    setLocalItem("draft", "z".repeat(52), logger);
+    await Promise.resolve();
+    await Promise.resolve();
 
+    // The page keeps working with the latest value
+    expect(getLocalItem("draft", logger)).toBe("z".repeat(52));
+    expect(local.items.has("draft")).toBe(false);
     expect(calls).toHaveLength(1);
     expect(calls[0]?.level).toBe("error");
     expect(calls[0]?.message).toBe("[storage] localStorage.set failed");
@@ -224,6 +237,33 @@ describe("setLocalItem quota failure", () => {
       keyCount: 1,
       largestKey: "hog",
       largestChars: 93,
+      fallback: "memory",
+      recoveredAfterCleanup: false,
+    });
+  });
+
+  it("moves a stale large value to IndexedDB and restores the overflowed write", async () => {
+    const local = new FakeLocalStorage(100);
+    local.items.set("incognito_messages", "m".repeat(90));
+    installLocalStorage(local);
+    const { backend, data } = createMemoryBackend();
+    setIndexedDbBackendForTests(backend);
+    const calls: LoggedCall[] = [];
+    const logger = createCapturingLogger(calls);
+
+    setLocalItem("chat-draft:new", "hello there", logger);
+    for (let i = 0; i < 10; i++) {
+      await Promise.resolve();
+    }
+
+    expect(data.get("incognito_messages")).toBe("m".repeat(90));
+    expect(local.items.has("incognito_messages")).toBe(false);
+    expect(local.items.get("chat-draft:new")).toBe("hello there");
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.context).toMatchObject({
+      key: "chat-draft:new",
+      largestKey: "incognito_messages",
+      recoveredAfterCleanup: true,
     });
   });
 });

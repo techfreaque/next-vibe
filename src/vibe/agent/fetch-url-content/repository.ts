@@ -398,10 +398,17 @@ class FetchUrlService {
       });
 
       if (!response.ok) {
+        // Scrappey's body names the reason (blocked, login wall, proxy
+        // failure); the status line alone ("500 Internal Server Error") left
+        // every failed fetch undiagnosable.
+        const detail = (await response.text().catch(() => ""))
+          .replaceAll(/\s+/g, " ")
+          .trim()
+          .slice(0, 300);
         return {
           ok: false,
           // eslint-disable-next-line i18next/no-literal-string
-          error: `Scrappey API error: ${response.status} ${response.statusText}`,
+          error: `Scrappey API error: ${response.status} ${response.statusText}${detail ? ` - ${detail}` : ""}`,
           // Scrappey's status is about OUR API call, not the target page (a
           // page 404 comes back as 200 + solution.statusCode). Only a rejected
           // URL (400/422) is the caller's; 401/402/403/429 mean our key,

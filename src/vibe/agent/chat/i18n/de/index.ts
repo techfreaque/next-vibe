@@ -449,6 +449,10 @@ export const translations: typeof enTranslations = {
         "Mikrofon blockiert. Tippe auf das Schloss-Symbol in der Adressleiste → Website-Einstellungen → Mikrofon → Zulassen.",
       "permission-denied-mac":
         "Mikrofon blockiert. Öffne Systemeinstellungen → Datenschutz & Sicherheit → Mikrofon und aktiviere deinen Browser.",
+      "permission-dismissed":
+        "Mikrofon-Abfrage geschlossen. Tippe erneut aufs Mikrofon und wähle Zulassen.",
+      "permission-denied-site":
+        "Mikrofon für diese Seite blockiert. Klicke auf das Symbol links neben der Adressleiste → Mikrofon → Zulassen und versuch es erneut.",
       "permission-denied-windows":
         "Mikrofon blockiert. Öffne Einstellungen → Datenschutz → Mikrofon und stelle sicher, dass dein Browser zugelassen ist.",
       "no-microphone":

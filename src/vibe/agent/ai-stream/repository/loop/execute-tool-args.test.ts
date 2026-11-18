@@ -50,4 +50,24 @@ describe("normalizeExecuteToolArgs", () => {
     const noToolName = { callbackMode: "wait", input: { path: "/a.md" } };
     expect(normalizeExecuteToolArgs(noToolName)).toEqual(noToolName);
   });
+
+  it("parses an input sent as a JSON string", () => {
+    expect(
+      normalizeExecuteToolArgs({
+        toolName: "rename-thread",
+        input: '{"title":"Image Generation Inquiry"}',
+      }),
+    ).toEqual({
+      toolName: "rename-thread",
+      input: { title: "Image Generation Inquiry" },
+    });
+  });
+
+  it("leaves an unparseable input string for the validation error", () => {
+    const args = {
+      toolName: "rename-thread",
+      input: '{"description":<arg_value>broken',
+    };
+    expect(normalizeExecuteToolArgs(args)).toEqual(args);
+  });
 });

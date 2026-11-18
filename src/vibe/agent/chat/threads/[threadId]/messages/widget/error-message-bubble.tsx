@@ -100,11 +100,16 @@ export function ErrorMessageBubble({
     reportedErrorMessageIds.add(message.id);
     let structuredErrorCode: number | undefined;
     let structuredErrorKey: string | undefined;
+    // What the user actually reads - without it the report is undiagnosable
+    let errorText = message.content ?? "";
     try {
       const parsed = JSON.parse(message.content || "{}") as ErrorResponseType;
       if (parsed && typeof parsed === "object") {
         structuredErrorCode = parsed.errorType?.errorCode;
         structuredErrorKey = parsed.errorType?.errorKey;
+        if (typeof parsed.message === "string") {
+          errorText = parsed.message;
+        }
       }
     } catch {
       // Plain-text error content - no structured error type to extract
@@ -125,6 +130,7 @@ export function ErrorMessageBubble({
         errorCode: message.errorCode,
         structuredErrorCode,
         structuredErrorKey,
+        errorText: errorText.slice(0, 300),
         ageMs,
       },
     );

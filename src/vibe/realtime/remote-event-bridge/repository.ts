@@ -33,6 +33,7 @@ import {
   fail,
   success,
 } from "../../core/route/response.schema";
+import { parseError } from "../../core/utils/parse-error";
 import { db } from "../../database";
 import type {
   JwtPayloadType,
@@ -703,7 +704,9 @@ registerRemoteRelay((payload) => {
   void RemoteEventBridgeRepository.pushRemoteEvent(payload).catch((err) => {
     payload.logger.warn("[RemoteEventBridge] relay failed", {
       eventName: payload.envelope.eventName,
-      error: err instanceof Error ? err.message : String(err),
+      // parseError keeps the driver cause ("timeout exceeded when trying to
+      // connect"); err.message alone was just drizzle's "Failed query: ...".
+      error: parseError(err).message,
     });
   });
 });

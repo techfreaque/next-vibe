@@ -17,6 +17,7 @@ import { Link } from "next-vibe/ui/components/link";
 import { Main } from "next-vibe/ui/components/main";
 import type { JSX } from "react";
 
+import { contactClientRepository } from "@/contact/repository-client";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { scopedTranslation as pageT } from "./i18n";
@@ -31,6 +32,7 @@ export interface HelpPageData {
   jwtUser: JwtPayloadType;
   platform: Platform;
   userEmail?: string;
+  supportEmail: string;
   modelCount: number;
 }
 
@@ -95,6 +97,7 @@ export async function tanstackLoader({ params }: Props): Promise<HelpPageData> {
     jwtUser,
     platform: Platform.NEXT_PAGE,
     userEmail,
+    supportEmail: contactClientRepository.getSupportEmail(locale),
     modelCount,
   };
 }
@@ -104,6 +107,7 @@ export function TanstackPage({
   jwtUser,
   platform,
   userEmail,
+  supportEmail,
   modelCount,
 }: HelpPageData): JSX.Element {
   const { t } = pageT.scopedT(locale);
@@ -124,6 +128,7 @@ export function TanstackPage({
         user={jwtUser}
         platform={platform}
         userEmail={userEmail}
+        supportEmail={supportEmail}
         modelCount={modelCount}
       />
     </Main>

@@ -45,7 +45,7 @@ export async function generateMetadata({
     await getEnvAvailability(),
   );
   return metadataGenerator(locale, {
-    path: "",
+    path: "story",
     title: t("meta.title", { appName }),
     category: t("meta.category"),
     description: t("meta.description", { modelCount }),

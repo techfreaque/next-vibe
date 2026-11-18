@@ -9,6 +9,9 @@ export const translations: typeof enTranslations = {
       "Fehlerprotokolle konnten nicht abgerufen werden: {{error}}",
     updateErrorLog:
       "Status des Fehlerprotokolls konnte nicht aktualisiert werden: {{error}}",
+    missingTarget: "Fingerprint oder ID angeben.",
+    idNotUnique:
+      "ID-Präfix {{id}} trifft {{count}} Zeilen. Fingerprint oder volle ID nutzen.",
   },
 
   statusFilter: {
@@ -129,8 +132,15 @@ export const translations: typeof enTranslations = {
     fields: {
       fingerprint: {
         label: "Fingerprint",
-        description: "Der Fingerprint des Fehlerprotokolls",
+        description:
+          "Der Fingerprint des Fehlerprotokolls (Spalte `fingerprint` in der Liste). Diesen oder die ID angeben.",
         placeholder: "Fingerprint eingeben",
+      },
+      id: {
+        label: "Log-ID",
+        description:
+          "Die Zeilen-ID aus der Liste (volle UUID oder die ersten 8+ Zeichen). Alternative zum Fingerprint.",
+        placeholder: "z. B. c21bd4c7",
       },
       resolved: {
         label: "Gelöst",

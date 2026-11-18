@@ -135,10 +135,127 @@ export function resetWebStorageFallbackForTests(): void {
 // ─── Sync localStorage helpers ────────────────────────────────────────────────
 // Use these when synchronous access is required (e.g. event handlers, bridge protocols).
 
+/**
+ * Keys that are only ever read through `largeStorage` (IndexedDB first).
+ * Builds before 2026-11-13 wrote them to localStorage; a copy left there can
+ * fill the whole ~5 MB origin quota (prod 2026-11-17: `incognito_messages` at
+ * 5.2 MB made every draft/tour write fail, 425 failed writes from one tab).
+ */
+const LARGE_VALUE_KEY = /^incognito_|^chat-draft:.+-attachments$/;
+
+/**
+ * Values a full localStorage could not take, kept for this page view. Later
+ * writes of the same key go here directly (no repeated failing setItem) until
+ * freeing quota lets them move back.
+ */
+const quotaOverflow = new Map<string, string>();
+/** Keys whose quota failure was already reported on this page. */
+const quotaReported = new Set<string>();
+/** One quota cleanup per page: move stale large values to IndexedDB. */
+let quotaCleanup: Promise<void> | null = null;
+
+function isQuotaError(error: Error | string): boolean {
+  const text =
+    typeof error === "string" ? error : `${error.name} ${error.message}`;
+  return /quota/i.test(text);
+}
+
+/** Test hook: forget quota overflow state. */
+export function resetQuotaOverflowForTests(): void {
+  quotaOverflow.clear();
+  quotaReported.clear();
+  quotaCleanup = null;
+}
+
+/**
+ * Free localStorage quota: move stale large values (LARGE_VALUE_KEY) to
+ * IndexedDB, where `largeStorage` reads them, then write back the values that
+ * overflowed into memory. Runs once per page.
+ */
+function freeLocalQuota(
+  store: WebStorageLike,
+  logger: EndpointLogger,
+): Promise<void> {
+  if (quotaCleanup) {
+    return quotaCleanup;
+  }
+  quotaCleanup = (async (): Promise<void> => {
+    const backend = getIndexedDbBackend();
+    const candidates: string[] = [];
+    try {
+      for (let i = 0; i < store.length; i++) {
+        const storedKey = store.key(i);
+        if (storedKey !== null && LARGE_VALUE_KEY.test(storedKey)) {
+          candidates.push(storedKey);
+        }
+      }
+    } catch {
+      // Enumeration failing leaves nothing to move; overflow stays in memory
+    }
+    const moved: string[] = [];
+    let freedChars = 0;
+    if (backend) {
+      for (const largeKey of candidates) {
+        const legacy = store.getItem(largeKey);
+        if (legacy === null) {
+          continue;
+        }
+        // largeStorage reads IndexedDB first: an existing copy there is the
+        // live one and the localStorage copy is dead weight
+        const existing = await backend.get(largeKey);
+        if (!(existing.ok && existing.value !== null)) {
+          const put = await backend.put(largeKey, legacy);
+          if (!put.ok) {
+            await reportIdb(
+              backend,
+              "migrate",
+              largeKey,
+              put.error,
+              logger,
+              legacy.length,
+            );
+            continue;
+          }
+        }
+        try {
+          store.removeItem(largeKey);
+          moved.push(largeKey);
+          freedChars += largeKey.length + legacy.length;
+        } catch {
+          // Still readable from IndexedDB; the next cleanup retries
+        }
+      }
+    }
+    const restored: string[] = [];
+    for (const [overflowKey, value] of quotaOverflow) {
+      try {
+        store.setItem(overflowKey, value);
+        quotaOverflow.delete(overflowKey);
+        restored.push(overflowKey);
+      } catch {
+        break; // still full: the rest stays in memory for this page
+      }
+    }
+    logger.info("[storage] localStorage quota cleanup", {
+      hasIndexedDb: backend !== null,
+      candidates: candidates.join(", ").slice(0, 300),
+      movedToIndexedDb: moved.join(", ").slice(0, 300),
+      freedChars,
+      restoredKeys: restored.length,
+      stillInMemory: quotaOverflow.size,
+    });
+  })();
+  return quotaCleanup;
+}
+
 export function getLocalItem(
   key: string,
   logger: EndpointLogger,
 ): string | null {
+  const overflow = quotaOverflow.get(key);
+  if (overflow !== undefined) {
+    return overflow;
+  }
   const store = resolveWebStorage("localStorage", key, logger);
   if (!store) {
     return null;
@@ -162,6 +279,12 @@ export function setLocalItem(
   value: string,
   logger: EndpointLogger,
 ): void {
+  if (quotaOverflow.has(key)) {
+    // localStorage was full for this key: keep it in memory instead of
+    // failing (and reporting) the same write on every keystroke
+    quotaOverflow.set(key, value);
+    return;
+  }
   const store = resolveWebStorage("localStorage", key, logger);
   if (!store) {
     return;
@@ -169,14 +292,44 @@ export function setLocalItem(
   try {
     store.setItem(key, value);
   } catch (error) {
-    reportStorageFailure(logger, {
-      platform: "web",
-      area: "localStorage",
-      operation: "set",
-      key,
-      error: error instanceof Error ? error : String(error),
-      valueLength: value.length,
-      usage: storageUsage(store),
+    const failure = error instanceof Error ? error : String(error);
+    if (!isQuotaError(failure)) {
+      reportStorageFailure(logger, {
+        platform: "web",
+        area: "localStorage",
+        operation: "set",
+        key,
+        error: failure,
+        valueLength: value.length,
+        usage: storageUsage(store),
+      });
+      return;
+    }
+    quotaOverflow.set(key, value);
+    const usage = storageUsage(store);
+    const firstForKey = !quotaReported.has(key);
+    quotaReported.add(key);
+    if (!firstForKey) {
+      void freeLocalQuota(store, logger);
+      return;
+    }
+    void freeLocalQuota(store, logger).then(() => {
+      // Reported once per key and page, after the cleanup, so the row says
+      // whether the value is safe again or only lives until reload.
+      reportStorageFailure(logger, {
+        platform: "web",
+        area: "localStorage",
+        operation: "set",
+        key,
+        error: failure,
+        valueLength: value.length,
+        usage,
+        extra: {
+          fallback: "memory",
+          recoveredAfterCleanup: !quotaOverflow.has(key),
+        },
+      });
+      return undefined;
     });
   }
 }
@@ -215,6 +368,7 @@ function storageUsage(store: WebStorageLike): StorageUsage {
 }
 
 export function removeLocalItem(key: string, logger: EndpointLogger): void {
+  quotaOverflow.delete(key);
   const store = resolveWebStorage("localStorage", key, logger);
   if (!store) {
     return;
@@ -605,14 +759,28 @@ export function createLargeStorage(
 }
 
 let indexedDbBackend: LargeStoreBackend | null | undefined;
+/** Test hook: backend used instead of real IndexedDB (undefined = real). */
+let indexedDbBackendOverride: LargeStoreBackend | null | undefined;
+
+/** Test hook: swap the IndexedDB backend the quota cleanup uses. */
+export function setIndexedDbBackendForTests(
+  backend: LargeStoreBackend | null | undefined,
+): void {
+  indexedDbBackendOverride = backend;
+}
+
+function getIndexedDbBackend(): LargeStoreBackend | null {
+  if (indexedDbBackendOverride !== undefined) {
+    return indexedDbBackendOverride;
+  }
+  if (indexedDbBackend === undefined) {
+    indexedDbBackend = createIndexedDbBackend();
+  }
+  return indexedDbBackend;
+}
 
 /**
  * Storage for values that can outgrow localStorage (MBs): IndexedDB on web,
  * localStorage only where IndexedDB does not exist. Same API as `storage`.
  */
-export const largeStorage: Storage = createLargeStorage(() => {
-  if (indexedDbBackend === undefined) {
-    indexedDbBackend = createIndexedDbBackend();
-  }
-  return indexedDbBackend;
-});
+export const largeStorage: Storage = createLargeStorage(getIndexedDbBackend);

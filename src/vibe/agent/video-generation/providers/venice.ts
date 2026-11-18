@@ -35,6 +35,8 @@ import { scopedTranslation, type VideoGenerationT } from "../i18n";
 const VENICE_VIDEO_BASE_URL = "https://api.venice.ai/api/v1/video";
 const T2V_MARKER = "text-to-video";
 const I2V_MARKER = "image-to-video";
+/** Text-to-video needs an aspect ratio; every Venice t2v model lists 16:9. */
+const VENICE_DEFAULT_ASPECT_RATIO = "16:9";
 
 // Real interval always — pollDelay() collapses to 10ms on REPLAY.
 // Venice P80 for a 5s 720p clip is 1-3 min; 5s × 120 = 10 min ceiling.
@@ -191,9 +193,11 @@ export async function generateVideoWithVenice(params: {
     body.resolution = resolution;
   }
   // Image-to-video takes its framing from the seed image (Venice lists no
-  // aspect ratios for the i2v ids and rejects one).
-  if (aspectRatio && !isImageToVideo) {
-    body.aspect_ratio = aspectRatio;
+  // aspect ratios for the i2v ids and rejects one). Text-to-video requires
+  // one: a call without it was rejected 400 "aspect_ratio Required"
+  // (prod 2026-11-17), so default to landscape.
+  if (!isImageToVideo) {
+    body.aspect_ratio = aspectRatio ?? VENICE_DEFAULT_ASPECT_RATIO;
   }
   if (negativePrompt) {
     body.negative_prompt = negativePrompt;
@@ -221,6 +225,11 @@ export async function generateVideoWithVenice(params: {
       logger.error("[Venice Video] Queue failed", {
         status: queueRes.status,
         error: queueText.slice(0, 300),
+        model,
+        aspectRatio: body.aspect_ratio ?? null,
+        resolution: body.resolution ?? null,
+        duration: body.duration,
+        imageToVideo: isImageToVideo,
       });
       return veniceHttpFailure(queueText, queueRes.status, t);
     }

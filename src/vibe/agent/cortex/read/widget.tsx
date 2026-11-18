@@ -73,7 +73,13 @@ export function CortexReadWidget({
       {/* Top nav - always shown, back + context actions when we have a path */}
       <CortexNav
         path={value?.responsePath}
-        actions={value ? ["list", "edit", "write", "move", "delete"] : ["list"]}
+        actions={
+          // Read-only nodes (virtual mounts like /threads) reject edit/write/
+          // move/delete with 403 "Read-Only": never offer them there.
+          value && !value.readonly
+            ? ["list", "edit", "write", "move", "delete"]
+            : ["list"]
+        }
         actionData={
           value
             ? {

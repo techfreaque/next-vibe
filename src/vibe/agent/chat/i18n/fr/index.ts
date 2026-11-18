@@ -446,6 +446,10 @@ export const translations: typeof enTranslations = {
         "Micro bloqué. Touchez l'icône de cadenas dans la barre d'adresse → Paramètres du site → Micro → Autoriser.",
       "permission-denied-mac":
         "Micro bloqué. Ouvrez Réglages Système → Confidentialité et sécurité → Microphone et activez votre navigateur.",
+      "permission-dismissed":
+        "Demande d'accès au micro fermée. Touchez à nouveau le micro et choisissez Autoriser.",
+      "permission-denied-site":
+        "Micro bloqué pour ce site. Cliquez sur l'icône à gauche de la barre d'adresse → Microphone → Autoriser, puis réessayez.",
       "permission-denied-windows":
         "Micro bloqué. Ouvrez Paramètres → Confidentialité → Microphone et vérifiez que votre navigateur est autorisé.",
       "no-microphone":

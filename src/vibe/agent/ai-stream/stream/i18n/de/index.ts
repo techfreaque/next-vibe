@@ -314,7 +314,8 @@ export const translations: typeof enTranslations = {
     },
     skill: {
       label: "Skill",
-      description: "Optionaler Skill für die KI",
+      description:
+        'Skill-ID oder Slug aus der Skill-Liste (optional slug__variant). Weglassen oder "default" für keinen. Unbekannte IDs fallen auf den Standard zurück.',
     },
     systemPrompt: {
       label: "System-Prompt",
@@ -518,7 +519,7 @@ export const translations: typeof enTranslations = {
       creditValidationFailed: "Fehler bei der Validierung des Guthabens",
       noIdentifier: "Keine Benutzer- oder Lead-Kennung angegeben",
       insufficientCredits:
-        "Nicht genügend Guthaben für diese Anfrage (Kosten: {{cost}}, Guthaben: {{balance}})",
+        "Nicht genug Credits: Diese Anfrage kostet {{cost}}, Ihr Guthaben beträgt {{balance}}. Laden Sie auf oder wählen Sie ein günstigeres Modell.",
       authenticationRequired:
         "Bitte melden Sie sich an, um persistente Ordner zu verwenden. Verwenden Sie den Inkognito-Modus für anonyme Chats.",
       noResponseBody: "Kein Antworttext vom Stream erhalten",
@@ -562,6 +563,8 @@ export const translations: typeof enTranslations = {
       "Das Modell hat ohne Antwort beendet. Berechnet wurden nur die Kosten des Anbieters, keine Plattformgebühr. Versuchen Sie es erneut oder wählen Sie ein anderes Modell.",
     contentFiltered:
       "Diese Antwort wurde vom Inhaltsfilter des Anbieters blockiert. Versuche ein anderes Modell.",
+    providerBusy:
+      "Dieses Modell ist gerade überlastet. Versuchen Sie es in ein paar Sekunden erneut oder wählen Sie ein anderes Modell.",
     modelUnavailable:
       "Das ausgewählte KI-Modell ist derzeit nicht verfügbar. Bitte versuchen Sie ein anderes Modell.",
     rateLimitExceeded:
@@ -744,6 +747,9 @@ export const translations: typeof enTranslations = {
     },
     member: {
       title: "Keine Credits mehr",
+      shortTitle: "Zu wenig Credits für diese Nachricht",
+      shortDescription:
+        "Noch {{balance}} Credits. Lange Chats kosten pro Nachricht mehr: neuen Chat starten oder günstigeres Modell wählen. Oder aufladen:",
       description:
         "Gratis-Credits kommen am {{date}} wieder. Oder Plan wählen und sofort weitermachen:",
       subscriberDescription:

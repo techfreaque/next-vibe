@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { and, count, desc, eq, gte, ilike, lte } from "drizzle-orm";
+import { and, count, desc, eq, gte, ilike, lte, sql } from "drizzle-orm";
 
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
@@ -174,14 +174,49 @@ export class ErrorLogsRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ErrorLogsPatchResponseOutput>> {
     try {
+      let fingerprint = data.fingerprint;
+      if (!fingerprint && data.id) {
+        // Row id from the list: full uuid or a short prefix (the list and
+        // agents print the first 8 characters). Resolve to the fingerprint,
+        // refusing an ambiguous prefix.
+        const idPrefix = data.id.toLowerCase();
+        const matches = await db
+          .select({ fingerprint: errorLogs.fingerprint })
+          .from(errorLogs)
+          .where(sql`${errorLogs.id}::text LIKE ${`${idPrefix}%`}`)
+          .limit(2);
+        if (matches.length > 1) {
+          return fail({
+            message: t("errors.idNotUnique", {
+              id: data.id,
+              count: matches.length,
+            }),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+        fingerprint = matches[0]?.fingerprint;
+        if (!fingerprint) {
+          return fail({
+            message: t("patch.errors.notFound.title"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+      }
+      if (!fingerprint) {
+        return fail({
+          message: t("errors.missingTarget"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
+
       const result = await db
         .update(errorLogs)
         .set({ resolved: data.resolved })
-        .where(eq(errorLogs.fingerprint, data.fingerprint))
+        .where(eq(errorLogs.fingerprint, fingerprint))
         .returning({ id: errorLogs.id });
 
       logger.debug(
-        `Updated ${result.length.toString()} rows for fingerprint ${data.fingerprint}`,
+        `Updated ${result.length.toString()} rows for fingerprint ${fingerprint}`,
       );
 
       if (result.length === 0) {
@@ -195,7 +230,7 @@ export class ErrorLogsRepository {
       }
 
       return success({
-        responseFingerprint: data.fingerprint,
+        responseFingerprint: fingerprint,
         responseResolved: data.resolved,
         affectedRows: result.length,
       });

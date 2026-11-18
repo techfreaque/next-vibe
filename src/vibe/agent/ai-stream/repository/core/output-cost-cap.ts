@@ -19,6 +19,7 @@ import {
   STANDARD_MARKUP_PERCENTAGE,
 } from "@/products/constants";
 
+import { ModelUtility } from "../../../models/enum";
 import type { ChatModelOption } from "../../models";
 import { worstCaseInputCredits } from "./input-cost-gate";
 
@@ -27,6 +28,21 @@ import { worstCaseInputCredits } from "./input-cost-gate";
  * refused (402) up-front, or the tool loop stops before the next step.
  */
 export const MIN_AFFORDABLE_OUTPUT_TOKENS = 256;
+
+/**
+ * Reasoning models spend the first hundreds of output tokens thinking: a
+ * 256-400 token cap bought only reasoning and no answer, billed anyway
+ * (prod 2026-11-17: deepseek-v4-pro guests, "Turn ended without answer
+ * text" / empty streams). They need room for a short thought plus a reply.
+ */
+export const MIN_AFFORDABLE_REASONING_OUTPUT_TOKENS = 2048;
+
+/** Smallest output worth starting a step with on this model. */
+export function minAffordableOutputTokens(model: ChatModelOption): number {
+  return model.utilities.includes(ModelUtility.REASONING)
+    ? MIN_AFFORDABLE_REASONING_OUTPUT_TOKENS
+    : MIN_AFFORDABLE_OUTPUT_TOKENS;
+}
 
 /**
  * USD per 1M output tokens the step may be billed at. Image-output models
@@ -111,14 +127,13 @@ export function computeOutputCap(params: {
   if (affordable >= maxPossibleOutput) {
     return { kind: "uncapped" };
   }
-  if (affordable < MIN_AFFORDABLE_OUTPUT_TOKENS) {
+  const minOutput = minAffordableOutputTokens(model);
+  if (affordable < minOutput) {
     return {
       kind: "unaffordable",
       requiredCredits:
         Math.ceil(
-          (inputCredits +
-            worstCaseOutputCredits(model, MIN_AFFORDABLE_OUTPUT_TOKENS)) *
-            10,
+          (inputCredits + worstCaseOutputCredits(model, minOutput)) * 10,
         ) / 10,
     };
   }
