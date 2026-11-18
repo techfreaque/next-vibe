@@ -4,134 +4,100 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "{{appName}} selbst hosten - Deine Instanz, Deine Regeln",
     description:
-      "Betreibe den vollständigen {{appName}}-Stack auf deinem eigenen Server. Eigene API-Keys, Thea als KI-Admin, volle Kontrolle. Für immer kostenlos.",
+      "Der komplette {{appName}}-Stack auf deinem eigenen Rechner. Vier Befehle, danach ein Einrichtungsassistent im Browser. Mit deinem {{appName}}-Konto oder eigenen Schlüsseln.",
     category: "Self-Host",
-    imageAlt: "{{appName}} selbst hosten Schnellstart",
+    imageAlt: "{{appName}} selbst hosten: Schnellstart",
     keywords:
-      "self-host, next-vibe, {{appName}}, open-source, KI, VPS, Docker, Kubernetes",
+      "self-host, selbst hosten, next-vibe, {{appName}}, Open Source, private KI, lokale KI, OpenRouter",
   },
   hero: {
-    badge: "Für immer kostenlos - MIT + GPL v3",
+    badge: "Kostenlos und Open Source",
     title: "Selbst betreiben.",
     titleHighlight: "Alles besitzen.",
     subtitle:
-      "Der vollständige {{appName}}-Stack auf deinem eigenen Server. Jedes Modell, jedes Tool, jede Funktion - plus Thea als KI-Admin, die deine Instanz rund um die Uhr überwacht und selbst repariert.",
-    ctaQuickstart: "Zum Schnellstart",
-    ctaGithub: "Auf GitHub starten",
-  },
-  includes: {
-    title: "Alles was die Cloud hat. Und mehr.",
-    items: {
-      models:
-        "{{modelCount}} Modelle - eigene API-Keys, direkt bei Providern zahlen",
-      memory: "Persistentes Gedächtnis, Inkognito-Modus, 4 Datenschutzstufen",
-      search: "Live-Websuche + vollständiges Seitenabrufen",
-      thea: "Thea: KI-Admin, die überwacht, selbst repariert und Tools auf Befehl erstellt",
-      admin: "Admin-Dashboard, DB-Studio, Cron-Dashboard, Systemüberwachung",
-      ssh: "SSH, Browser-Automatisierung, E-Mail-Client - Theas Tools",
-      sync: "Lokale Instanz-Synchronisation mit {{appName}} Cloud (Beta)",
-      free: "Für immer kostenlos - MIT + GPL v3, kein Vendor-Lock-in",
-    },
+      "Der komplette {{appName}}-Stack auf deinem Rechner. Verbinde dein {{appName}}-Konto für alle Modelle oder nutze eigene Schlüssel. Vier Befehle, den Rest erledigt der Browser.",
+    ctaQuickstart: "In vier Befehlen starten",
+    ctaGithub: "Auf GitHub ansehen",
   },
   quickstart: {
-    title: "Schnellstart",
-    subtitle: "Drei Befehle. In 5 Minuten einsatzbereit.",
-    step1: {
-      title: "Klonen und installieren",
-      description: "Code holen und Abhängigkeiten installieren.",
-    },
-    step2: {
-      title: "Dev-Server starten",
-      description:
-        "Startet PostgreSQL in Docker, führt Migrationen durch, befüllt Daten und öffnet localhost:3000.",
-      noDocker:
-        'Kein Docker? DATABASE_URL="file:///absoluter/pfad/data.db" in die .env setzen - vibe dev läuft dann auf eingebettetem PGlite.',
-    },
-    step3: {
-      title: "Einloggen und konfigurieren",
-      description:
-        'Auf der Login-Seite auf "Als Admin einloggen" klicken - kein Passwort im Dev-Modus nötig. Der Einrichtungsassistent führt durch API-Key-Setup und Admin-Passwort.',
-    },
-    step4: {
-      title: "KI-Provider wählen",
-      optionA: {
-        label: "Option A: Claude Code (empfohlen)",
-        description:
-          "Kein API-Key nötig. Nutzt dein bestehendes Claude-Abonnement. Ein claude-code-* Modell in der Modellauswahl wählen.",
-      },
-      optionB: {
-        label: "Option B: OpenRouter",
-        description:
-          "Alle OpenRouter-Modelle, nutzungsbasierte Abrechnung. Key unter openrouter.ai/keys holen.",
-      },
-    },
+    eyebrow: "Schnellstart",
+    title: "Vier Befehle. Dann übernimmt der Browser.",
+    intro:
+      "Keine Konfigurationsdateien. Beim ersten Login startet ein Einrichtungsassistent und führt dich durch den Rest.",
   },
-  vps: {
-    title: "Auf einem VPS deployen?",
-    description:
-      "Funktioniert auf jedem Linux-VPS. nginx oder Caddy auf Port 3000 zeigen - fertig.",
-    docker: "Docker-Setup",
-    kubernetes: "Kubernetes",
-    kubernetesDescription:
-      "Enthält Vorlagen für Web, Task-Worker, Redis, Ingress und Namespace.",
-  },
-  localSync: {
-    title: "Lokalen Rechner verbinden (Beta)",
-    description:
-      "Thea kann Aufgaben an Claude Code auf deinem Entwicklungsrechner weiterleiten. Gehe zu Admin → Remote-Verbindungen im Dashboard und füge deine lokale Instanz-URL hinzu. Erinnerungen und Aufgaben synchronisieren alle 60 Sekunden - kein Port-Forwarding, kein VPN.",
+  paths: {
+    eyebrow: "KI wählen",
+    title: "Dein Rechner. Deine Modelle.",
+    intro:
+      "Beide Wege stecken im Schritt KI-Anbieter des Einrichtungsassistenten. Jederzeit umstellbar.",
+    account: {
+      badge: "Empfohlen",
+      title: "Dein {{appName}}-Konto verbinden",
+      body: "Einmal im Assistenten anmelden. Deine Instanz führt jeden Chat, die Modelle laufen auf {{appName}} und rechnen über dein Guthaben ab. Kein Schlüssel-Jonglieren.",
+      points: {
+        models:
+          "Alle {{modelCount}} Modelle, von Mainstream bis unzensiert, mit einem Login.",
+        local: "Chats bleiben in deiner lokalen Datenbank.",
+        sync: "Erinnerungen, Dokumente, Skills und Favoriten synchronisieren standardmäßig, Threads nicht. Ein Schalter pro Bereich.",
+        paid: "Setzt ein bezahltes Abo oder Guthabenpaket voraus. Bis zu drei Instanzen pro Konto.",
+      },
+      cta: "{{appName}}-Konto anlegen",
+    },
+    standalone: {
+      badge: "Ohne Konto",
+      title: "Eigenständig, mit eigenen Schlüsseln",
+      body: "Kein Konto bei uns. Im selben Schritt einen Anbieter-Schlüssel einfügen und direkt beim Anbieter zahlen.",
+      points: {
+        openrouter: "OpenRouter: Hunderte Modelle, ein Schlüssel.",
+        claude:
+          "Claude Code auf diesem Rechner angemeldet? Wird automatisch erkannt. Kein Schlüssel nötig.",
+        more: "Weitere Anbieter jederzeit unter Alle Einstellungen anzeigen.",
+        billing:
+          "Du zahlst direkt beim Anbieter. Keine Rechnung von {{appName}}.",
+      },
+      cta: "OpenRouter-Schlüssel holen",
+    },
   },
   own: {
     eyebrow: "Dein Server, deine Regeln",
-    title: "Dein Stack. Dein Filter.",
+    title: "Den Stack besitzen. Den Filter bestimmen.",
     subtitle:
-      "Kein Konto bei fremden Firmen. Deine Postgres, deine Schlüssel, deine Logs. Du wählst die Modelle und du bestimmst, wie viel Filter zwischen dir und ihnen sitzt.",
+      "Dein Postgres, deine Dateien, deine Logs. Du wählst die Modelle und wie viel Filter zwischen dir und ihnen sitzt.",
     cards: {
       data: {
-        title: "Deine Daten bleiben bei dir",
-        body: "Threads, Erinnerungen und Dateien liegen in deiner eigenen Postgres und deinem Speicherpfad. Nichts telefoniert nach Hause.",
+        title: "Deine Daten bleiben, wo sie sind",
+        body: "Threads, Erinnerungen und Dateien liegen in deiner eigenen Datenbank und deinem Speicherpfad.",
       },
       filter: {
-        title: "Dein Filterlevel",
-        body: "Mainstream-, offene oder unzensierte Modelle. Du entscheidest pro Skill, pro Thread, pro Nutzer. Kein Policy-Team dazwischen.",
+        title: "Deine Filterstufe",
+        body: "Mainstream, offen oder unzensiert. Du entscheidest pro Skill und pro Thread. Keine Richtlinien-Abteilung dazwischen.",
       },
       keys: {
-        title: "Deine Schlüssel",
-        body: "Bring OpenRouter, ein lokales Modell oder Claude Code mit. Die Kosten gehen an deinen Anbieter, nicht über unseren.",
+        title: "Deine Rechnung, deine Wahl",
+        body: "Modellkosten laufen über dein {{appName}}-Guthaben oder direkt an deinen eigenen Anbieter. Du entscheidest.",
       },
     },
   },
-  env: {
-    title: "Was du brauchst",
-    intro:
-      "Bun, Docker und eine Handvoll Umgebungsvariablen. Mehr steht nicht auf der Checkliste für eine private Instanz.",
-    envLabel: "Minimale Konfiguration",
-    composeLabel: "Produktion auf einem VPS",
-  },
-  instances: {
-    title: "Drei Instanzen, drei Aufgaben",
-    intro:
-      "Eine Codebasis läuft als getrennte Instanzen. Gleicher Code, andere Datenbank und Rolle. So betreiben wir selbst.",
-    atlas: {
-      name: "Atlas",
-      body: "Die Dev-Instanz. Hot Reload, Wegwerf-Datenbank. Hier entsteht der Code.",
+  includes: {
+    title: "Alles, was die Cloud kann.",
+    intro: "Dieselbe Codebasis wie {{appName}}. Nichts zurückgehalten.",
+    items: {
+      models: "{{modelCount}} Chatmodelle, dazu Bild, Video, Musik und Sprache",
+      memory: "Dauerhaftes Gedächtnis und Inkognito-Chats",
+      search: "Websuche und Seitenabruf",
+      thea: "Thea, deine KI-Admin: erledigt Aufgaben, baut Tools auf Zuruf",
+      admin: "Admin-Dashboard und Cron-Jobs",
+      tools: "SSH, Browser-Automatisierung, E-Mail-Client als KI-Tools",
     },
-    hermes: {
-      name: "Hermes",
-      body: "Dein Alltagswerkzeug. Lokale Vorschau auf eigener Postgres. In dieser Instanz lebst du.",
-    },
-    thea: {
-      name: "Thea",
-      body: "Die Cloud-Instanz auf deinem VPS. Immer an, führt deine Crons aus, nimmt Aufgaben von den anderen beiden.",
-    },
-    note: "Instanzen sind miteinander verbunden. Threads und Aufgaben synchronisieren zwischen Laptop und Server.",
   },
-  fork: {
-    title: "Gleiches Framework, anderes Produkt",
-    body: "next-vibe-headunit ist ein Car-PC-Fork. Medien, Navigation, Klima, Bluetooth und Radio sind Endpoints, und jeder ist zugleich CLI-Befehl und KI-Tool. Anderes Produkt, dieselben drei Dateien.",
+  developers: {
+    title: "Du willst darauf aufbauen?",
+    body: "Jedes Feature ist eine Definitionsdatei. Daraus werden Webseite, CLI-Befehl, MCP-Tool und KI-Tool.",
+    cta: "So funktioniert next-vibe",
   },
-  enterprise: {
-    title: "Hilfe beim Einrichten gesucht?",
+  help: {
+    title: "Hängst du fest, oder soll es fürs ganze Team laufen?",
     description:
-      "Wir helfen bei Deployment, individuellen Integrationen und laufender Entwicklungsunterstützung.",
+      "Hilfe beim Einrichten, Team-Installationen, individuelle Integrationen. Jede Nachricht liest ein Mensch.",
   },
 };

@@ -1,242 +1,224 @@
 export const translations = {
-  title: "next-vibe Framework",
-  description:
-    "The open-source SaaS framework powering {{appName}}. Define it once, it exists everywhere.",
   meta: {
-    title: "next-vibe Framework",
+    title: "next-vibe Framework - One Definition, Every Surface",
     description:
-      "Open-source AI-native SaaS framework. One endpoint definition, thirteen platforms.",
+      "Open-source TypeScript framework. One definition.ts becomes a web UI, CLI command, MCP tool, native screen, AI tool and cron job. Plus an OpenAI and Anthropic compatible hosted API.",
     category: "Framework",
-    imageAlt: "next-vibe Framework Documentation",
+    imageAlt: "next-vibe framework for developers",
     keywords:
-      "next-vibe, framework, SaaS, open-source, AI, full-stack, TypeScript",
+      "next-vibe, TypeScript framework, MCP server, CLI, AI tools, Zod, Drizzle, OpenAI compatible API",
   },
   hero: {
-    eyebrow: "Open Source · MIT + GPL v3",
-    title: "One definition.",
-    titleAccent: "Thirteen platforms.",
+    eyebrow: "Open source · MIT + GPL v3",
+    title: "One definition.ts.",
+    titleAccent: "Every surface.",
     subtitle:
-      "next-vibe turns a single TypeScript definition into thirteen platforms at once - interactive web UI, CLI command, MCP tool, mobile screen, cron job, WebSocket, admin panel, and more. Full type safety, zero drift, zero repetition.",
-    ctaGithub: "Star on GitHub",
-    ctaDocs: "Read the pattern docs",
-    stat1Label: "typed endpoints",
-    stat2Value: "0",
-    stat2Label: "runtime type errors",
-    stat3Label: "platforms per endpoint",
-    stat4Value: "2",
-    stat4Label: "files required",
+      "next-vibe is a TypeScript framework where one endpoint definition becomes a web UI, a CLI command, an MCP tool, a native screen, an AI tool, a cron job and seven more surfaces. Same validation, same types, no glue code.",
+    ctaQuickstart: "Run it in four commands",
+    ctaGithub: "View on GitHub",
+    stat1Label: "typed endpoints in this repo",
+    stat2Label: "surfaces per endpoint",
+    stat3Label: "languages per string",
+    stat4Label: "definition per feature",
   },
-  problem: {
-    eyebrow: "The problem",
-    title: "You've built the same thing thirteen times.",
-    subtitle:
-      "Every feature needs a custom web UI, CLI command, MCP tool, mobile screen, cron job, WebSocket handler, admin panel, and more. Same validation, same i18n, same error handling - just dressed differently. Every time.",
-    callout: "next-vibe builds all thirteen from one file.",
+  example: {
+    eyebrow: "One real endpoint",
+    title: "Follow the contact form.",
+    intro:
+      "The contact endpoint from the repo, live at the bottom of this page. Two files to read. Six of its thirteen surfaces below.",
+    source: "Read the full source on GitHub",
+    live: "Try the live form",
+    becomes: "What it becomes",
+    more: "Plus seven more",
+    moreSurfaces: {
+      webApi: "REST API",
+      websocket: "WebSocket events",
+      electron: "Electron app",
+      adminPanel: "Admin panel",
+      vibeFrame: "Embeddable widget",
+      remoteSkill: "Agent skill",
+      vibeBoard: "Analytics node",
+    },
+    surfaces: {
+      web: {
+        title: "Web UI",
+        body: "The form at the bottom of this page. Fields, validation and the success alert come from the definition.",
+      },
+      cli: {
+        title: "CLI command",
+        body: "vibe contact-form. One flag per field, help text with examples built in.",
+      },
+      mcp: {
+        title: "MCP tool",
+        body: "Any MCP client calls contact-form through vibe mcp. Input schema straight from Zod.",
+      },
+      ai: {
+        title: "AI tool",
+        body: "Models can call it. requiresConfirmation makes the user approve before it sends.",
+      },
+      native: {
+        title: "Native screen",
+        body: "The Expo app renders the same widget with native inputs.",
+      },
+      cron: {
+        title: "Cron job",
+        body: "Any endpoint can run on a schedule. Same handler, no second code path.",
+      },
+    },
+    callsTitle: "Four ways in",
+    callsBody:
+      "Real invocations. CLI, MCP and AI calls hit the contact handler above. The Cron tab is a real scheduled task from the repo.",
   },
   pattern: {
     eyebrow: "The pattern",
-    title: "Two files required. Every platform.",
+    title: "A feature is a folder.",
     subtitle:
-      "Each feature lives in a folder. Only definition.ts and route.ts are required - everything else is optional.",
-    definitionTitle: "definition.ts - the contract",
-    definitionBody:
-      "Declare your fields, Zod schemas, labels, error types, and examples once. This file is the single source of truth - the framework reads it at runtime on every platform.",
-    routeTitle: "repository.ts - the logic",
-    routeBody:
-      "Business logic lives here - DB queries, auth checks, error handling with success()/fail(). The route.ts is just a thin delegator; validation, logging, and platform registration happen automatically.",
-    widgetTitle: "widget.tsx - the UI (optional)",
-    widgetBody:
-      "Without a widget, the framework auto-renders your fields everywhere. Add widget.tsx to ship a fully custom interactive UI - the same component renders in admin panels, embedded widgets, and mobile screens.",
+      "definition.ts and route.ts are required. Widget, emails, table and translations sit next to them. Nothing lives in a central registry you edit by hand.",
     deleteLine:
-      "Delete the folder. The feature disappears from every platform at once.",
+      "Delete the folder and run vibe gen. The feature disappears from every surface at once.",
   },
-  surfaces: {
-    items: {
-      webApi: {
-        label: "Web API",
-        description: "REST endpoint, fully validated and typed",
-      },
-      reactUi: {
-        label: "React UI",
-        description: "Purpose-built interactive UI - no JSX required",
-      },
-      cli: {
-        label: "CLI",
-        description: "Every endpoint is a command with auto-generated flags",
-      },
-      aiTool: {
-        label: "AI Tool",
-        description: "Function-calling schema generated automatically",
-      },
-      mcpServer: {
-        label: "MCP Server",
-        description: "Connect Claude Desktop, Cursor, any MCP client",
-      },
-      reactNative: {
-        label: "React Native",
-        description: "iOS and Android screens from the same definition",
-      },
-      cron: {
-        label: "Cron Job",
-        description: "Schedule any endpoint on a cron expression",
-      },
-      websocket: {
-        label: "WebSocket",
-        description: "Push updates to connected clients on completion",
-      },
-      electron: {
-        label: "Electron",
-        description: "Native desktop app via the same endpoint contracts",
-      },
-      adminPanel: {
-        label: "Admin Panel",
-        description: "Auto-generated admin UI - no dedicated code",
-      },
-      vibeFrame: {
-        label: "VibeFrame Widget",
-        description: "Embeddable iframe widget for any site",
-      },
-      remoteSkill: {
-        label: "Agent Skill",
-        description: "Callable by AI agents as a structured skill",
-      },
-      vibeBoard: {
-        label: "Vibe Sense Node",
-        description: "Node in a live data-flow graph - same endpoint",
-      },
+  hood: {
+    eyebrow: "Under the hood",
+    title: "Boring parts, done once.",
+    intro:
+      "The framework owns validation, auth, logging, i18n and realtime. Your folder owns the business logic.",
+    platform: {
+      title: "Roles and platform markers",
+      body: "allowedRoles decides who may call an endpoint. Platform markers decide where it shows up: AI_TOOL_OFF hides it from models, PRODUCTION_OFF keeps it out of production. Checked on every surface.",
+    },
+    data: {
+      title: "Zod, Drizzle, PostgreSQL",
+      body: "Zod validates input and output and generates every tool schema. Repositories own persistence through Drizzle. Migrations live in the repo. Out of the box it runs on embedded PGlite, no Docker. Point DATABASE_URL at any Postgres when you outgrow it.",
+    },
+    realtime: {
+      title: "Typed realtime",
+      body: "Endpoints declare event schemas and channel scopes. Clients subscribe over WebSocket for streamed tokens and task progress. Pub/sub runs in process or on Redis.",
+    },
+    remote: {
+      title: "Connected instances",
+      body: "Instances connect to each other, run tools on a peer and sync the data you allow. Each side enforces its own permissions. This is how a self-hosted install uses unbottled.ai models.",
     },
   },
   typescript: {
-    eyebrow: "TypeScript supremacy",
     title: "No any. No unknown. No throw.",
     subtitle:
-      "Types must align completely - no exceptions. This isn't a style preference. It's a structural rule enforced at build time by vibe check.",
+      "Types line up end to end, with zero exceptions. vibe check enforces it before anything ships.",
     patterns: {
       any: {
         name: "no any",
         description:
-          "Replace with a real typed interface. If you reach for any, your architecture has a hole.",
+          "Write the real interface. Reaching for any means the architecture has a hole.",
       },
       unknown: {
         name: "no unknown",
-        description:
-          "Same rule. unknown is just any with extra steps. Define the type.",
+        description: "Same rule. unknown is any with extra steps.",
       },
       object: {
         name: "no bare object",
-        description:
-          "Bare object is meaningless. Write the shape you actually expect.",
+        description: "Write the shape you expect. object says nothing.",
       },
       asX: {
         name: "no as X",
         description:
-          "Type assertions are lies to the compiler. Fix the architecture instead.",
+          "Casts lie to the compiler. Fix the types at the source instead.",
       },
       throwStatements: {
         name: "no throw",
         description:
-          "Use ResponseType<T> with success(data) or fail({message, errorType}). Errors are data.",
+          "Return ResponseType<T> via success(data) or fail({ message, errorType }). Errors are data.",
       },
       hardcodedStrings: {
-        name: "no hardcoded strings",
+        name: "no raw strings",
         description:
-          "Every string needs a translation key. The checker catches untranslated literals.",
+          "Every user-facing string is a translation key. The linter catches literals.",
       },
     },
     vibeCheck:
-      "vibe check runs Oxlint (Rust), ESLint, and TypeScript type checking in parallel. Zero errors required before ship.",
+      "vibe check runs Oxlint, ESLint and the TypeScript checker in parallel. Zero errors, or it does not ship.",
+  },
+  quickstart: {
+    eyebrow: "Quickstart",
+    title: "Four commands. Then the browser takes over.",
+    intro:
+      "Clone, install, start. A setup wizard handles the admin login and your AI provider. No config files to edit.",
+    selfHost: "Self-hosting guide",
+    docs: "Pattern docs on GitHub",
+  },
+  api: {
+    eyebrow: "Hosted API",
+    title: "Or just call the {{appName}} API.",
+    intro:
+      "No install needed. OpenAI and Anthropic compatible: keep your SDK, change the base URL and the key.",
+    endpoints: {
+      chat: "OpenAI Chat Completions",
+      responses: "OpenAI Responses",
+      messages: "Anthropic Messages",
+      models: "Model list with prices",
+    },
+    access:
+      "{{modelCount}} models behind one key, billed in {{appName}} credits. API keys unlock with any subscription or credit pack.",
+    docs: "Read the API docs",
+    keys: "Create an API key",
   },
   examples: {
-    eyebrow: "Built with next-vibe",
-    title: "From a car dashboard to an AI platform.",
+    eyebrow: "In this repo",
+    title: "Not just AI chat.",
     subtitle:
-      "Same codebase, any surface. These are real products running on next-vibe - a car PC, online shops, booking sites, and {{appName}} itself. One framework, wildly different products.",
+      "Whole business domains ship in this repo, each built on the same pattern.",
     items: {
-      headunit: {
-        label: "In-car dashboard",
-        title: "A full car headunit",
-        body: "Navigation, climate, radio, Spotify, Bluetooth calls, and live vehicle diagnostics - plus Android Auto - on a touchscreen car PC. Built as a next-vibe fork.",
-      },
-      shop: {
-        label: "E-commerce",
-        title: "Online shops that sell",
-        body: "Storefront, cart, checkout, inventory, and point of sale from one install. A real shop runs on it today.",
-      },
-      booking: {
-        label: "Bookings",
-        title: "Practitioner & booking sites",
-        body: "Appointments, client records, invoicing, and a public site - the backbone of a practitioner business. Same stack as the shop.",
-      },
       aiPlatform: {
         label: "AI platform",
         title: "{{appName}}",
-        body: "{{modelCount}} models, chat, persistent memory, agents, billing, and MCP - the flagship. This exact codebase, in production.",
+        body: "{{modelCount}} models, chat, memory, agents, billing and MCP. This exact codebase, in production.",
+      },
+      commerce: {
+        label: "Commerce",
+        title: "Products and point of sale",
+        body: "Products, point of sale, inventory and purchasing.",
+      },
+      finance: {
+        label: "Finance",
+        title: "Accounting and payments",
+        body: "Chart of accounts, tax rates, invoices, Stripe and crypto payments.",
+      },
+      crm: {
+        label: "CRM",
+        title: "Leads and messaging",
+        body: "Leads, newsletter, email inbox and SMS.",
       },
     },
   },
-  quickstart: {
-    eyebrow: "Get started",
-    title: "Fork, ask, ship.",
-    subtitle: "You're at {{appName}}'s level from day one.",
-    step1: {
-      label: "Fork & clone",
-      description: "Fork on GitHub, then clone your fork locally.",
+  maturity: {
+    eyebrow: "Honest status",
+    title: "What ships today.",
+    stable: {
+      title: "In production",
+      body: "{{appName}} runs on this codebase: web, CLI, MCP, AI tools, cron, realtime, payments. Production builds run on Next.js. Local development defaults to TanStack Start and Vite.",
     },
-    step2: {
-      label: "Start the server",
-      description:
-        "For local development, vibe dev starts PostgreSQL in Docker, runs migrations, seeds data, and gives you hot reload. For production, vibe build && vibe start does the initial deploy. vibe rebuild is what you use after that to update production with zero downtime.",
+    beta: {
+      title: "Beta",
+      body: "React Native screens, instance-to-instance sync and remote skills work, with rough edges.",
     },
-    step3: {
-      label: "Login as Admin",
-      description:
-        'Open the app and click "Login as Admin" - the setup wizard walks you through API keys and admin password.',
+    honest: {
+      title: "Expect churn",
+      body: "One team, moving fast, opinionated. No semver yet, and the docs trail the code. Pin a commit or fork it.",
     },
-    step4: {
-      label: "Ask the AI",
-      description:
-        "Open {{appName}} chat or Claude Code and describe the feature you want. The AI writes all the files - definition, route, widget, i18n - and runs vibe check automatically.",
-    },
-    docsLink: "Pattern documentation",
-    githubLink: "github.com/techfreaque/next-vibe",
   },
-  oneDef: {
-    eyebrow: "One definition",
-    title: "Write it once. Run it everywhere.",
-    subtitle:
-      "This is a real endpoint from this repo: read the focused window on a Linux desktop. Three files. No glue code. It shows up as a web page, a CLI command, an MCP tool, an AI tool and a cron job.",
-    defTitle: "definition.ts",
-    defBody:
-      "Path, alias, roles, Zod schema, widget, errors, examples. Everything every surface needs, in one place.",
-    routeTitle: "route.ts",
-    routeBody:
-      "Wires the definition to a repository function. That handler is what every surface calls.",
-    surfacesTitle: "What you get without writing more code",
-    cli: {
-      title: "CLI command",
-      body: "The alias becomes a command. Output is rendered by the same widget, laid out for the terminal.",
-    },
-    mcp: {
-      title: "MCP tool",
-      body: "Point any MCP client at vibe mcp. Schemas come straight from the Zod fields.",
-    },
-    ai: {
-      title: "AI-callable tool",
-      body: "Models get a function-calling schema generated from the definition. Roles decide who may call it.",
-    },
-    cron: {
-      title: "Cron job",
-      body: "Same handler, now on a schedule. This is the real task file of our credit-expiry job.",
-    },
-    more: "Plus a web page at /tools/<alias>, a typed REST route and a native screen. The widget renders on every one of them. Delete the endpoint folder and every surface disappears with it.",
-    addTitle: "Add your own in five lines of shell",
-    addBody:
-      "Create the folder, write the three files, regenerate, check. If vibe check says 0 errors, it works everywhere.",
-  },
-  enterprise: {
-    eyebrow: "Enterprise",
-    title: "Building something big?",
+  contact: {
+    eyebrow: "The endpoint, live",
+    title: "Questions, or building something big?",
     description:
-      "We help teams with setup, custom integrations, architecture review, and ongoing development support. Same codebase, your deployment.",
+      "Setup, custom integrations, architecture review. This form is the contact endpoint from the top of the page, rendered by the framework.",
+  },
+  code: {
+    copy: "Copy",
+    copied: "Copied",
+    wrap: "Wrap",
+    terminal: "Terminal",
+    cli: "CLI",
+    mcp: "MCP",
+    ai: "AI tool",
+    cron: "Cron",
+    anthropic: "Anthropic (curl)",
   },
 };

@@ -44,9 +44,12 @@ type ScopedT = ReturnType<(typeof scopedTranslation)["scopedT"]>["t"];
 
 interface PersonalShowcaseProps {
   locale: CountryLanguage;
+  /** Story subpage styling: primary eyebrow, top-aligned, page grid gutters. */
+  onStoryPage?: boolean;
 }
 
 interface PersonalBlockProps {
+  onStoryPage: boolean;
   label: string;
   title: string;
   description: string;
@@ -56,6 +59,7 @@ interface PersonalBlockProps {
 }
 
 function PersonalBlock({
+  onStoryPage,
   label,
   title,
   description,
@@ -66,13 +70,19 @@ function PersonalBlock({
   return (
     <Div className="py-16 md:py-24">
       <MotionDiv
-        className={`grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center ${reversed ? "md:[direction:rtl]" : ""}`}
+        className={`grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 ${onStoryPage ? "items-start" : "items-center"} ${reversed ? "md:[direction:rtl]" : ""}`}
         initial={false}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay }}
       >
         <Div className={reversed ? "md:[direction:ltr]" : ""}>
-          <Span className="text-sm font-medium text-emerald-500 uppercase tracking-wider mb-3 block">
+          <Span
+            className={
+              onStoryPage
+                ? "mb-3 block text-xs font-semibold uppercase tracking-[0.14em] text-primary"
+                : "text-sm font-medium text-emerald-500 uppercase tracking-wider mb-3 block"
+            }
+          >
             {label}
           </Span>
           <H3 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-4xl mb-4">
@@ -455,8 +465,11 @@ const PERSONAL_DEMOS: PersonalDemoId[] = ["heartbeat", "ssh", "claudeCode"];
 
 function PersonalDemoVisual({
   locale,
+  storyStyle = false,
 }: {
   locale: CountryLanguage;
+  /** Story subpage: primary active tab, faded bottom edge of the clipped thread. */
+  storyStyle?: boolean;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const logger = useLogger();
@@ -506,7 +519,9 @@ function PersonalDemoVisual({
             className={cn(
               "rounded-full px-4 py-1.5 text-xs font-medium transition-all",
               activeId === id
-                ? "bg-emerald-600 text-white hover:bg-emerald-600"
+                ? storyStyle
+                  ? "bg-primary text-primary-foreground hover:bg-primary"
+                  : "bg-emerald-600 text-white hover:bg-emerald-600"
                 : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
             )}
           >
@@ -515,52 +530,57 @@ function PersonalDemoVisual({
         ))}
       </Div>
       <MockChatProvider>
-        <Div className="rounded-lg border bg-card/50 overflow-hidden p-4 space-y-1 max-h-[32rem] overflow-y-auto">
-          <StaticUserMessageBubble
-            message={userMsg}
-            locale={locale}
-            logger={logger}
-            rootFolderId={DefaultFolderId.PUBLIC}
-            user={{
-              isPublic: false,
-              leadId: "00000000-0000-0000-0000-000000000000",
-              id: "00000000-0000-0000-0000-000000000000",
-              roles: [UserPermissionRole.ADMIN],
-            }}
-          />
-          <AnimatePresence mode="wait" initial={false}>
-            <MotionDiv
-              key={activeId}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25 }}
-            >
-              <GroupedAssistantMessage
-                group={groups[activeId]}
-                locale={locale}
-                logger={logger}
-                readOnly
-                showAuthor
-                platformOverride={Platform.CLI}
-                onAnswerAsModel={null}
-                collapseState={null}
-                rootFolderId={DefaultFolderId.PUBLIC}
-                user={{
-                  id: "00000000-0000-0000-0000-000000000000",
-                  isPublic: false,
-                  leadId: "00000000-0000-0000-0000-000000000000",
-                  roles: [UserPermissionRole.ADMIN],
-                }}
-                sendMessage={null}
-                ttsAutoplay={false}
-                voiceId={undefined}
-                onVote={null}
-                userVote={null}
-                voteScore={0}
-              />
-            </MotionDiv>
-          </AnimatePresence>
+        <Div className="relative">
+          <Div className="rounded-lg border bg-card/50 overflow-hidden p-4 space-y-1 max-h-[32rem] overflow-y-auto">
+            <StaticUserMessageBubble
+              message={userMsg}
+              locale={locale}
+              logger={logger}
+              rootFolderId={DefaultFolderId.PUBLIC}
+              user={{
+                isPublic: false,
+                leadId: "00000000-0000-0000-0000-000000000000",
+                id: "00000000-0000-0000-0000-000000000000",
+                roles: [UserPermissionRole.ADMIN],
+              }}
+            />
+            <AnimatePresence mode="wait" initial={false}>
+              <MotionDiv
+                key={activeId}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25 }}
+              >
+                <GroupedAssistantMessage
+                  group={groups[activeId]}
+                  locale={locale}
+                  logger={logger}
+                  readOnly
+                  showAuthor
+                  platformOverride={Platform.CLI}
+                  onAnswerAsModel={null}
+                  collapseState={null}
+                  rootFolderId={DefaultFolderId.PUBLIC}
+                  user={{
+                    id: "00000000-0000-0000-0000-000000000000",
+                    isPublic: false,
+                    leadId: "00000000-0000-0000-0000-000000000000",
+                    roles: [UserPermissionRole.ADMIN],
+                  }}
+                  sendMessage={null}
+                  ttsAutoplay={false}
+                  voiceId={undefined}
+                  onVote={null}
+                  userVote={null}
+                  voteScore={0}
+                />
+              </MotionDiv>
+            </AnimatePresence>
+          </Div>
+          {storyStyle && (
+            <Div className="pointer-events-none absolute inset-x-px bottom-px h-12 rounded-b-lg bg-linear-to-t from-card to-transparent" />
+          )}
         </Div>
       </MockChatProvider>
     </Div>
@@ -573,17 +593,23 @@ function PersonalDemoVisual({
 
 export function PersonalShowcase({
   locale,
+  onStoryPage = false,
 }: PersonalShowcaseProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <Div className="relative overflow-hidden">
-      <Div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6">
+      <Div
+        className={`relative mx-auto w-full max-w-6xl px-4 sm:px-6 ${onStoryPage ? "lg:px-8" : ""}`}
+      >
         <PersonalBlock
+          onStoryPage={onStoryPage}
           label={t("home.personal.theaAdmin.label")}
           title={t("home.personal.theaAdmin.title")}
           description={t("home.personal.theaAdmin.description")}
-          visual={<PersonalDemoVisual locale={locale} />}
+          visual={
+            <PersonalDemoVisual locale={locale} storyStyle={onStoryPage} />
+          }
           reversed={false}
           delay={0}
         />

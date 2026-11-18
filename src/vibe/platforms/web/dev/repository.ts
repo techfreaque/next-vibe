@@ -128,7 +128,9 @@ export class DevRepository {
       try {
         const logPath = loggerEnv.VIBE_LOG_FILE;
         const logDir = loggerEnv.VIBE_LOG_PATH;
-        if (logDir) {
+        // libc.so.6 + `tee` exist on Linux only. On macOS / Windows the logger
+        // still writes its own log file; only native stderr capture is skipped.
+        if (logDir && process.platform === "linux") {
           const { isAbsolute, join: pathJoin } = await import("node:path");
           const { spawn } = await import("node:child_process");
           const absDir = isAbsolute(logDir)

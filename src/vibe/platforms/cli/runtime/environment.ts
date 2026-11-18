@@ -1,5 +1,6 @@
 import { copyFileSync, existsSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, isAbsolute, join } from "node:path";
+import { pathToFileURL } from "node:url";
 
 // Captured before dotenv runs — used as the "this process started now" fallback
 // when VIBE_START_TIME is not already in the environment.
@@ -9,6 +10,24 @@ import { config } from "dotenv";
 
 import { Platform } from "../../platforms";
 import { runtimeEnvPlaceholder } from "./runtime-env-placeholders";
+
+/**
+ * `file:./data.db` / `file:data.db` -> absolute `file:///<root>/data.db`.
+ * Absolute file URLs, Windows drive paths and non-file URLs return null.
+ */
+function anchorRelativeFileUrl(
+  value: string | undefined,
+  projectRoot: string,
+): string | null {
+  if (!value?.startsWith("file:") || value.startsWith("file:///")) {
+    return null;
+  }
+  const path = value.replace(/^file:(\/\/)?/, "");
+  if (path.length === 0 || isAbsolute(path) || /^[A-Za-z]:[\\/]/.test(path)) {
+    return null;
+  }
+  return pathToFileURL(join(projectRoot, path)).href;
+}
 
 /** CLI-specific platforms (subset of Platform that applies to CLI environments) */
 type CliPlatform = typeof Platform.CLI | typeof Platform.CLI_PACKAGE;
@@ -128,6 +147,18 @@ export function loadEnvironment(): EnvironmentResult {
   for (const key in callerEnv) {
     if (callerEnv[key] !== undefined && process.env[key] !== callerEnv[key]) {
       process.env[key] = callerEnv[key];
+    }
+  }
+
+  // A relative PGlite URL (`file:./data.db`, the .env.example default) belongs
+  // to the project, not to whatever directory `vibe` was started from: anchor
+  // it to the project root so every process opens the same database.
+  if (projectRoot) {
+    for (const key of ["DATABASE_URL", "HERMES_DATABASE_URL"]) {
+      const anchored = anchorRelativeFileUrl(process.env[key], projectRoot);
+      if (anchored) {
+        process.env[key] = anchored;
+      }
     }
   }
 

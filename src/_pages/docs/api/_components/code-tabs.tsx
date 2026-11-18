@@ -94,6 +94,7 @@ export function CodeTabs({
   copyLabel,
   copiedLabel,
   wrapLabel,
+  wrapByDefault,
   className,
 }: {
   tabs: CodeTab[];
@@ -103,6 +104,8 @@ export function CodeTabs({
   copiedLabel: string;
   /** Label of the wrap-long-lines toggle. */
   wrapLabel: string;
+  /** Initial wrap state. Unset: long one-liners start wrapped on phones. */
+  wrapByDefault?: boolean;
   className?: string;
 }): JSX.Element {
   const [active, setActive] = useState(0);
@@ -116,6 +119,7 @@ export function CodeTabs({
   const hasContinuations = lines.some((line) => line.trimEnd().endsWith("\\"));
   const wrap =
     wrapChoice ??
+    wrapByDefault ??
     (width < PHONE_MAX_WIDTH &&
       !hasContinuations &&
       longestLine > PHONE_WRAP_MIN_LINE);
@@ -125,7 +129,7 @@ export function CodeTabs({
   return (
     <Div
       className={cn(
-        "min-w-0 max-w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-950 shadow-sm dark:border-slate-800",
+        "min-w-0 max-w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-950 shadow-sm dark:border-white/10",
         className,
       )}
     >

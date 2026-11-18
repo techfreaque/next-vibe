@@ -2770,7 +2770,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Mit einem Menschen sprechen",
     titleShort: "Kontakt",
     description:
-      "Etwas funktioniert nicht, oder du möchtest einfach mit einer echten Person reden. Wir sind da. Schreib, was du brauchst – jemand aus unserem Team liest es und antwortet persönlich.",
+      "Etwas funktioniert nicht, oder du möchtest einfach mit einer echten Person reden. Wir sind da. Schreib, was du brauchst. Jemand aus unserem Team liest es und antwortet persönlich.",
     icon: "mail",
     category: "messenger",
     subCategory: "Messages",

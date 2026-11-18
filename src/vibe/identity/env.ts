@@ -3,6 +3,7 @@ import "server-only";
 import { z } from "zod";
 
 import { defineEnv } from "../env/define-env";
+import { DEFAULT_ADMIN_PASSWORD } from "./default-admin-password";
 
 export const {
   env: identityEnv,
@@ -40,7 +41,7 @@ export const {
     fieldType: "email",
   },
   VIBE_ADMIN_USER_PASSWORD: {
-    schema: z.string().min(8).optional().default("change-me-now"),
+    schema: z.string().min(8).optional().default(DEFAULT_ADMIN_PASSWORD),
     example: "your-admin-password",
     comment:
       "Root admin password. Protects all exposed tools/endpoints. Use a strong password in production! Change via the app syncs to DB.",

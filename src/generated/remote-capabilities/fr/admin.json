@@ -87196,6 +87196,7 @@
                           "enums.alertType.negativeMargin": "enums.alertType.negativeMargin",
                           "enums.alertType.thinMargin": "enums.alertType.thinMargin",
                           "enums.alertType.balanceDrain": "enums.alertType.balanceDrain",
+                          "enums.alertType.lowBalance": "enums.alertType.lowBalance",
                           "enums.alertType.spendSpike": "enums.alertType.spendSpike",
                           "enums.alertType.refundSpike": "enums.alertType.refundSpike",
                           "enums.alertType.disputeSpike": "enums.alertType.disputeSpike",
@@ -87208,6 +87209,7 @@
                         "enums.alertType.negativeMargin": "enums.alertType.negativeMargin",
                         "enums.alertType.thinMargin": "enums.alertType.thinMargin",
                         "enums.alertType.balanceDrain": "enums.alertType.balanceDrain",
+                        "enums.alertType.lowBalance": "enums.alertType.lowBalance",
                         "enums.alertType.spendSpike": "enums.alertType.spendSpike",
                         "enums.alertType.refundSpike": "enums.alertType.refundSpike",
                         "enums.alertType.disputeSpike": "enums.alertType.disputeSpike",
@@ -87218,6 +87220,7 @@
                         "enums.alertType.negativeMargin",
                         "enums.alertType.thinMargin",
                         "enums.alertType.balanceDrain",
+                        "enums.alertType.lowBalance",
                         "enums.alertType.spendSpike",
                         "enums.alertType.refundSpike",
                         "enums.alertType.disputeSpike",
@@ -87278,6 +87281,7 @@
                         "enums.alertType.negativeMargin": "enums.alertType.negativeMargin",
                         "enums.alertType.thinMargin": "enums.alertType.thinMargin",
                         "enums.alertType.balanceDrain": "enums.alertType.balanceDrain",
+                        "enums.alertType.lowBalance": "enums.alertType.lowBalance",
                         "enums.alertType.spendSpike": "enums.alertType.spendSpike",
                         "enums.alertType.refundSpike": "enums.alertType.refundSpike",
                         "enums.alertType.disputeSpike": "enums.alertType.disputeSpike",
@@ -87290,6 +87294,7 @@
                       "enums.alertType.negativeMargin": "enums.alertType.negativeMargin",
                       "enums.alertType.thinMargin": "enums.alertType.thinMargin",
                       "enums.alertType.balanceDrain": "enums.alertType.balanceDrain",
+                      "enums.alertType.lowBalance": "enums.alertType.lowBalance",
                       "enums.alertType.spendSpike": "enums.alertType.spendSpike",
                       "enums.alertType.refundSpike": "enums.alertType.refundSpike",
                       "enums.alertType.disputeSpike": "enums.alertType.disputeSpike",
@@ -87300,6 +87305,7 @@
                       "enums.alertType.negativeMargin",
                       "enums.alertType.thinMargin",
                       "enums.alertType.balanceDrain",
+                      "enums.alertType.lowBalance",
                       "enums.alertType.spendSpike",
                       "enums.alertType.refundSpike",
                       "enums.alertType.disputeSpike",
@@ -88090,6 +88096,7 @@
                           "enums.alertType.negativeMargin": "enums.alertType.negativeMargin",
                           "enums.alertType.thinMargin": "enums.alertType.thinMargin",
                           "enums.alertType.balanceDrain": "enums.alertType.balanceDrain",
+                          "enums.alertType.lowBalance": "enums.alertType.lowBalance",
                           "enums.alertType.spendSpike": "enums.alertType.spendSpike",
                           "enums.alertType.refundSpike": "enums.alertType.refundSpike",
                           "enums.alertType.disputeSpike": "enums.alertType.disputeSpike",
@@ -88102,6 +88109,7 @@
                         "enums.alertType.negativeMargin": "enums.alertType.negativeMargin",
                         "enums.alertType.thinMargin": "enums.alertType.thinMargin",
                         "enums.alertType.balanceDrain": "enums.alertType.balanceDrain",
+                        "enums.alertType.lowBalance": "enums.alertType.lowBalance",
                         "enums.alertType.spendSpike": "enums.alertType.spendSpike",
                         "enums.alertType.refundSpike": "enums.alertType.refundSpike",
                         "enums.alertType.disputeSpike": "enums.alertType.disputeSpike",
@@ -88112,6 +88120,7 @@
                         "enums.alertType.negativeMargin",
                         "enums.alertType.thinMargin",
                         "enums.alertType.balanceDrain",
+                        "enums.alertType.lowBalance",
                         "enums.alertType.spendSpike",
                         "enums.alertType.refundSpike",
                         "enums.alertType.disputeSpike",
@@ -88188,6 +88197,7 @@
                         "enums.alertType.negativeMargin": "enums.alertType.negativeMargin",
                         "enums.alertType.thinMargin": "enums.alertType.thinMargin",
                         "enums.alertType.balanceDrain": "enums.alertType.balanceDrain",
+                        "enums.alertType.lowBalance": "enums.alertType.lowBalance",
                         "enums.alertType.spendSpike": "enums.alertType.spendSpike",
                         "enums.alertType.refundSpike": "enums.alertType.refundSpike",
                         "enums.alertType.disputeSpike": "enums.alertType.disputeSpike",
@@ -88200,6 +88210,7 @@
                       "enums.alertType.negativeMargin": "enums.alertType.negativeMargin",
                       "enums.alertType.thinMargin": "enums.alertType.thinMargin",
                       "enums.alertType.balanceDrain": "enums.alertType.balanceDrain",
+                      "enums.alertType.lowBalance": "enums.alertType.lowBalance",
                       "enums.alertType.spendSpike": "enums.alertType.spendSpike",
                       "enums.alertType.refundSpike": "enums.alertType.refundSpike",
                       "enums.alertType.disputeSpike": "enums.alertType.disputeSpike",
@@ -88210,6 +88221,7 @@
                       "enums.alertType.negativeMargin",
                       "enums.alertType.thinMargin",
                       "enums.alertType.balanceDrain",
+                      "enums.alertType.lowBalance",
                       "enums.alertType.spendSpike",
                       "enums.alertType.refundSpike",
                       "enums.alertType.disputeSpike",
@@ -88294,7 +88306,13 @@
                           "enums.threshold.billingGapPct": "enums.threshold.billingGapPct",
                           "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
                           "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
-                          "enums.threshold.minCostUsd": "enums.threshold.minCostUsd"
+                          "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
+                          "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
+                          "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+                          "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
+                          "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+                          "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
+                          "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
                         }
                       },
                       "type": "enum",
@@ -88310,7 +88328,13 @@
                         "enums.threshold.billingGapPct": "enums.threshold.billingGapPct",
                         "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
                         "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
-                        "enums.threshold.minCostUsd": "enums.threshold.minCostUsd"
+                        "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
+                        "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
+                        "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+                        "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
+                        "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+                        "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
+                        "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
                       },
                       "options": [
                         "enums.threshold.marginFloorPct",
@@ -88324,7 +88348,13 @@
                         "enums.threshold.billingGapPct",
                         "enums.threshold.alertDedupHours",
                         "enums.threshold.minRevenueUsd",
-                        "enums.threshold.minCostUsd"
+                        "enums.threshold.minCostUsd",
+                        "enums.threshold.openrouterLowBalanceUsd",
+                        "enums.threshold.openrouterLowBalanceDays",
+                        "enums.threshold.nanoGptLowBalanceUsd",
+                        "enums.threshold.nanoGptLowBalanceDays",
+                        "enums.threshold.veniceLowBalanceUsd",
+                        "enums.threshold.veniceLowBalanceDays"
                       ]
                     },
                     "value": {
@@ -88386,7 +88416,13 @@
                         "enums.threshold.billingGapPct": "enums.threshold.billingGapPct",
                         "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
                         "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
-                        "enums.threshold.minCostUsd": "enums.threshold.minCostUsd"
+                        "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
+                        "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
+                        "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+                        "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
+                        "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+                        "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
+                        "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
                       }
                     },
                     "type": "enum",
@@ -88402,7 +88438,13 @@
                       "enums.threshold.billingGapPct": "enums.threshold.billingGapPct",
                       "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
                       "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
-                      "enums.threshold.minCostUsd": "enums.threshold.minCostUsd"
+                      "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
+                      "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
+                      "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+                      "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
+                      "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+                      "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
+                      "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
                     },
                     "options": [
                       "enums.threshold.marginFloorPct",
@@ -88416,7 +88458,13 @@
                       "enums.threshold.billingGapPct",
                       "enums.threshold.alertDedupHours",
                       "enums.threshold.minRevenueUsd",
-                      "enums.threshold.minCostUsd"
+                      "enums.threshold.minCostUsd",
+                      "enums.threshold.openrouterLowBalanceUsd",
+                      "enums.threshold.openrouterLowBalanceDays",
+                      "enums.threshold.nanoGptLowBalanceUsd",
+                      "enums.threshold.nanoGptLowBalanceDays",
+                      "enums.threshold.veniceLowBalanceUsd",
+                      "enums.threshold.veniceLowBalanceDays"
                     ]
                   },
                   "value": {
@@ -88539,6 +88587,30 @@
             {
               "value": "enums.threshold.minCostUsd",
               "label": "enums.threshold.minCostUsd"
+            },
+            {
+              "value": "enums.threshold.openrouterLowBalanceUsd",
+              "label": "enums.threshold.openrouterLowBalanceUsd"
+            },
+            {
+              "value": "enums.threshold.openrouterLowBalanceDays",
+              "label": "enums.threshold.openrouterLowBalanceDays"
+            },
+            {
+              "value": "enums.threshold.nanoGptLowBalanceUsd",
+              "label": "enums.threshold.nanoGptLowBalanceUsd"
+            },
+            {
+              "value": "enums.threshold.nanoGptLowBalanceDays",
+              "label": "enums.threshold.nanoGptLowBalanceDays"
+            },
+            {
+              "value": "enums.threshold.veniceLowBalanceUsd",
+              "label": "enums.threshold.veniceLowBalanceUsd"
+            },
+            {
+              "value": "enums.threshold.veniceLowBalanceDays",
+              "label": "enums.threshold.veniceLowBalanceDays"
             }
           ],
           "columns": 6,
@@ -88557,7 +88629,13 @@
                 "enums.threshold.billingGapPct": "enums.threshold.billingGapPct",
                 "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
                 "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
-                "enums.threshold.minCostUsd": "enums.threshold.minCostUsd"
+                "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
+                "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
+                "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+                "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
+                "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+                "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
+                "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
               }
             },
             "type": "enum",
@@ -88573,7 +88651,13 @@
               "enums.threshold.billingGapPct": "enums.threshold.billingGapPct",
               "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
               "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
-              "enums.threshold.minCostUsd": "enums.threshold.minCostUsd"
+              "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
+              "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
+              "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+              "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
+              "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+              "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
+              "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
             },
             "options": [
               "enums.threshold.marginFloorPct",
@@ -88587,7 +88671,13 @@
               "enums.threshold.billingGapPct",
               "enums.threshold.alertDedupHours",
               "enums.threshold.minRevenueUsd",
-              "enums.threshold.minCostUsd"
+              "enums.threshold.minCostUsd",
+              "enums.threshold.openrouterLowBalanceUsd",
+              "enums.threshold.openrouterLowBalanceDays",
+              "enums.threshold.nanoGptLowBalanceUsd",
+              "enums.threshold.nanoGptLowBalanceDays",
+              "enums.threshold.veniceLowBalanceUsd",
+              "enums.threshold.veniceLowBalanceDays"
             ]
           },
           "usage": {
@@ -88680,7 +88770,13 @@
                 "enums.threshold.billingGapPct": "enums.threshold.billingGapPct",
                 "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
                 "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
-                "enums.threshold.minCostUsd": "enums.threshold.minCostUsd"
+                "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
+                "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
+                "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+                "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
+                "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+                "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
+                "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
               }
             },
             "type": "enum",
@@ -88696,7 +88792,13 @@
               "enums.threshold.billingGapPct": "enums.threshold.billingGapPct",
               "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
               "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
-              "enums.threshold.minCostUsd": "enums.threshold.minCostUsd"
+              "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
+              "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
+              "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+              "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
+              "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+              "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
+              "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
             },
             "options": [
               "enums.threshold.marginFloorPct",
@@ -88710,7 +88812,13 @@
               "enums.threshold.billingGapPct",
               "enums.threshold.alertDedupHours",
               "enums.threshold.minRevenueUsd",
-              "enums.threshold.minCostUsd"
+              "enums.threshold.minCostUsd",
+              "enums.threshold.openrouterLowBalanceUsd",
+              "enums.threshold.openrouterLowBalanceDays",
+              "enums.threshold.nanoGptLowBalanceUsd",
+              "enums.threshold.nanoGptLowBalanceDays",
+              "enums.threshold.veniceLowBalanceUsd",
+              "enums.threshold.veniceLowBalanceDays"
             ]
           },
           "usage": {
@@ -569525,9 +569633,9 @@
         "DATABASE_URL": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Database connection URL",
-          "description": "Database connection URL",
-          "placeholder": "postgres://postgres:postgres@localhost:5432/postgres",
+          "label": "Database connection URL. Default: embedded PGlite in ./data.db, no Docker or Postgres server needed. Any Postgres works too, e.g. postgres://postgres:postgres@localhost:5432/postgres (docker-compose-dev.yml starts one).",
+          "description": "Database connection URL. Default: embedded PGlite in ./data.db, no Docker or Postgres server needed. Any Postgres works too, e.g. postgres://postgres:postgres@localhost:5432/postgres (docker-compose-dev.yml starts one).",
+          "placeholder": "file:./data.db",
           "columns": 12,
           "schema": {
             "def": {
@@ -569551,7 +569659,7 @@
           "fieldType": "text",
           "label": "Hermes (--hermes / --preview) database URL. Overrides DATABASE_URL in Hermes mode so Hermes never shares Atlas's PGlite. Unset: Hermes docker Postgres on PREVIEW_DB_PORT (docker-compose.preview.yml). Set to a file: URL (e.g. file:./data.hermes.db) for an isolated PGlite without Docker.",
           "description": "Hermes (--hermes / --preview) database URL. Overrides DATABASE_URL in Hermes mode so Hermes never shares Atlas's PGlite. Unset: Hermes docker Postgres on PREVIEW_DB_PORT (docker-compose.preview.yml). Set to a file: URL (e.g. file:./data.hermes.db) for an isolated PGlite without Docker.",
-          "placeholder": "postgres://postgres:postgres@localhost:5433/hermes",
+          "placeholder": "file:./data.hermes.db",
           "columns": 12,
           "schema": {
             "def": {

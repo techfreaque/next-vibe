@@ -15,6 +15,8 @@ interface ContactFormSectionProps {
   user: JwtPayloadType;
   platform: Platform;
   userEmail?: string;
+  /** Under a page heading: hide the widget's own title and intro. */
+  embedded?: boolean;
 }
 
 export function ContactFormSection({
@@ -22,13 +24,19 @@ export function ContactFormSection({
   user,
   platform,
   userEmail,
+  embedded = false,
 }: ContactFormSectionProps): JSX.Element {
   const logger = useLogger();
   return (
     <EndpointsPage
       logger={logger}
       endpoint={contactDefinitions}
-      widget={<ContactFormWidget field={contactDefinitions.POST.fields} />}
+      widget={
+        <ContactFormWidget
+          field={contactDefinitions.POST.fields}
+          embedded={embedded}
+        />
+      }
       locale={locale}
       user={user}
       platform={platform}

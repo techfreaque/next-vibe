@@ -49,7 +49,7 @@ export const translations = {
         label: "Message",
         description:
           "Full text of the inquiry. Minimum 10 characters. Be specific about your needs.",
-        placeholder: "Please provide more details about your needs...",
+        placeholder: "What do you need? A few sentences are enough.",
       },
       priority: {
         label: "Priority",

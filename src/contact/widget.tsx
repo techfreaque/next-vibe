@@ -32,10 +32,13 @@ import type definition from "./definition";
 
 interface ContactFormWidgetProps {
   field: (typeof definition.POST)["fields"];
+  /** Embedded under a page heading: no own title/intro, no extra padding. */
+  embedded?: boolean;
 }
 
 export function ContactFormWidget({
   field,
+  embedded = false,
 }: ContactFormWidgetProps): React.JSX.Element {
   const children = field.children;
   const data = useWidgetValue<typeof definition.POST>();
@@ -123,16 +126,24 @@ export function ContactFormWidget({
 
   // Web form: full header, description, noEmail warning flow
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      {/* Header */}
-      <Div className="flex items-center gap-2 pb-2 border-b">
-        <Div className="flex items-center gap-2 mr-auto">
-          <Mail className="h-5 w-5 text-muted-foreground" />
-          <Span className="font-semibold text-base">{t("title")}</Span>
-        </Div>
-      </Div>
+    <Div
+      className={embedded ? "flex flex-col gap-4" : "flex flex-col gap-4 p-4"}
+    >
+      {!embedded && (
+        <>
+          {/* Header */}
+          <Div className="flex items-center gap-2 pb-2 border-b">
+            <Div className="flex items-center gap-2 mr-auto">
+              <Mail className="h-5 w-5 text-muted-foreground" />
+              <Span className="font-semibold text-base">{t("title")}</Span>
+            </Div>
+          </Div>
 
-      <Span className="text-sm text-muted-foreground">{t("description")}</Span>
+          <Span className="text-sm text-muted-foreground">
+            {t("description")}
+          </Span>
+        </>
+      )}
 
       <FormAlertWidget field={{}} />
 

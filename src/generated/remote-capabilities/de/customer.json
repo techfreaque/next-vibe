@@ -3,7 +3,7 @@
     "toolName": "contact-form",
     "title": "Mit einem Menschen sprechen",
     "titleShort": "Kontakt",
-    "description": "Etwas funktioniert nicht, oder du möchtest einfach mit einer echten Person reden. Wir sind da. Schreib, was du brauchst – jemand aus unserem Team liest es und antwortet persönlich.",
+    "description": "Etwas funktioniert nicht, oder du möchtest einfach mit einer echten Person reden. Wir sind da. Schreib, was du brauchst. Jemand aus unserem Team liest es und antwortet persönlich.",
     "fields": {
       "usage": {
         "request": "data",
@@ -20,8 +20,8 @@
           },
           "type": "form_field",
           "fieldType": "text",
-          "label": "Ihr Name",
-          "description": "Geben Sie Ihren Namen ein",
+          "label": "Dein Name",
+          "description": "Wie sollen wir dich ansprechen?",
           "placeholder": "Max Mustermann",
           "columns": 12,
           "usage": {
@@ -49,7 +49,7 @@
           "type": "form_field",
           "fieldType": "email",
           "label": "E-Mail-Adresse",
-          "description": "Wohin wir antworten sollen. Wenn Sie angemeldet sind, können Sie das Feld leer lassen – wir nutzen Ihre Konto-E-Mail.",
+          "description": "Wohin wir antworten sollen. Angemeldet? Dann lass das Feld leer, wir nutzen deine Konto-E-Mail.",
           "placeholder": "max.mustermann@beispiel.de",
           "columns": 12,
           "usage": {
@@ -116,7 +116,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Betreff",
-          "description": "Kurze Beschreibung Ihrer Anfrage",
+          "description": "Worum geht es?",
           "placeholder": "Allgemeine Anfrage zu Dienstleistungen",
           "options": [
             {
@@ -185,8 +185,8 @@
           "type": "form_field",
           "fieldType": "textarea",
           "label": "Nachricht",
-          "description": "Detaillierte Beschreibung Ihrer Anfrage",
-          "placeholder": "Bitte geben Sie weitere Details zu Ihren Bedürfnissen an...",
+          "description": "Was brauchst du? Ein paar Sätze reichen.",
+          "placeholder": "Was brauchst du? Ein paar Sätze reichen.",
           "columns": 12,
           "usage": {
             "request": "data"
@@ -227,7 +227,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Priorität",
-          "description": "Wählen Sie die Dringlichkeitsstufe Ihrer Anfrage",
+          "description": "Wie dringend ist es?",
           "placeholder": "Prioritätsstufe auswählen",
           "options": [
             {

@@ -1203,8 +1203,9 @@ export const ENV_KEYS = [
   {
     key: "DATABASE_URL",
     module: "database",
-    comment: "Database connection URL",
-    example: "postgres://postgres:postgres@localhost:5432/postgres",
+    comment:
+      "Database connection URL. Default: embedded PGlite in ./data.db, no Docker or Postgres server needed. Any Postgres works too, e.g. postgres://postgres:postgres@localhost:5432/postgres (docker-compose-dev.yml starts one).",
+    example: "file:./data.db",
     sensitive: true,
     fieldType: "text",
     onboardingRequired: false,
@@ -1214,7 +1215,7 @@ export const ENV_KEYS = [
     module: "database",
     comment:
       "Hermes (--hermes / --preview) database URL. Overrides DATABASE_URL in Hermes mode so Hermes never shares Atlas's PGlite. Unset: Hermes docker Postgres on PREVIEW_DB_PORT (docker-compose.preview.yml). Set to a file: URL (e.g. file:./data.hermes.db) for an isolated PGlite without Docker.",
-    example: "postgres://postgres:postgres@localhost:5433/hermes",
+    example: "file:./data.hermes.db",
     sensitive: true,
     fieldType: "text",
     onboardingRequired: false,

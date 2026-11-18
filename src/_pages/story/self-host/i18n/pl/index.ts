@@ -2,136 +2,103 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Samodzielny hosting {{appName}} - Twoja instancja, Twoje zasady",
+    title: "Self-hosting {{appName}} - Twoja instancja, Twoje zasady",
     description:
-      "Uruchom pełny stos {{appName}} na własnym serwerze. Własne klucze API, Thea jako admin AI, pełna kontrola. Bezpłatnie na zawsze.",
+      "Cały stos {{appName}} na Twoim komputerze. Cztery polecenia, potem kreator konfiguracji w przeglądarce. Połącz konto {{appName}} albo użyj własnych kluczy.",
     category: "Self-Host",
-    imageAlt: "Samodzielny hosting {{appName}} - szybki start",
+    imageAlt: "Self-hosting {{appName}}: szybki start",
     keywords:
-      "self-host, next-vibe, {{appName}}, open-source, AI, VPS, Docker, Kubernetes",
+      "self-host, self-hosting, next-vibe, {{appName}}, open source, prywatne AI, lokalne AI, OpenRouter",
   },
   hero: {
-    badge: "Bezpłatnie na zawsze - MIT + GPL v3",
-    title: "Uruchom samodzielnie.",
+    badge: "Darmowe i open source",
+    title: "Uruchom u siebie.",
     titleHighlight: "Miej wszystko.",
     subtitle:
-      "Pełny stos {{appName}} na własnym serwerze. Każdy model, każde narzędzie, każda funkcja - plus Thea jako admin AI monitorująca i naprawiająca instancję 24/7.",
-    ctaQuickstart: "Przejdź do szybkiego startu",
-    ctaGithub: "Gwiazdka na GitHub",
-  },
-  includes: {
-    title: "Wszystko co ma chmura. I więcej.",
-    items: {
-      models:
-        "{{modelCount}} modeli - własne klucze API, płać bezpośrednio providerom",
-      memory: "Trwała pamięć, tryb incognito, 4 poziomy prywatności",
-      search: "Wyszukiwanie na żywo + pobieranie całych stron",
-      thea: "Thea: admin AI monitorująca, naprawiająca i budująca narzędzia na polecenie",
-      admin: "Panel admina, DB Studio, panel cron, monitoring stanu",
-      ssh: "SSH, automatyzacja przeglądarki, klient email - narzędzia Thei",
-      sync: "Synchronizacja lokalnej instancji z chmurą {{appName}} (beta)",
-      free: "Bezpłatnie na zawsze - MIT + GPL v3, bez vendor lock-in",
-    },
+      "Cały stos {{appName}} na Twoim komputerze. Połącz konto {{appName}} i masz wszystkie modele, albo użyj własnych kluczy. Cztery polecenia, resztę robi przeglądarka.",
+    ctaQuickstart: "Start w czterech poleceniach",
+    ctaGithub: "Zobacz na GitHubie",
   },
   quickstart: {
-    title: "Szybki start",
-    subtitle: "Trzy komendy. Gotowe w 5 minut.",
-    step1: {
-      title: "Sklonuj i zainstaluj",
-      description: "Pobierz kod i zainstaluj zależności.",
-    },
-    step2: {
-      title: "Uruchom serwer deweloperski",
-      description:
-        "Uruchamia PostgreSQL w Dockerze, migracje, seeduje dane i otwiera localhost:3000.",
-      noDocker:
-        'Nie masz Dockera? Ustaw DATABASE_URL="file:///absolutna/sciezka/data.db" w .env, a vibe dev ruszy na wbudowanym PGlite.',
-    },
-    step3: {
-      title: "Zaloguj się i skonfiguruj",
-      description:
-        'Kliknij „Zaloguj jako admin" na stronie logowania - bez hasła w trybie dev. Kreator przeprowadzi przez konfigurację klucza API i hasła admina.',
-    },
-    step4: {
-      title: "Wybierz dostawcę AI",
-      optionA: {
-        label: "Opcja A: Claude Code (zalecane)",
-        description:
-          "Bez klucza API. Korzysta z istniejącej subskrypcji Claude. Wybierz model claude-code-* w selektorze modeli.",
-      },
-      optionB: {
-        label: "Opcja B: OpenRouter",
-        description:
-          "Wszystkie modele OpenRouter, płatność za użycie. Klucz na openrouter.ai/keys.",
-      },
-    },
+    eyebrow: "Szybki start",
+    title: "Cztery polecenia. Potem przejmuje przeglądarka.",
+    intro:
+      "Żadnych plików konfiguracyjnych. Przy pierwszym logowaniu otwiera się kreator i prowadzi Cię przez resztę.",
   },
-  vps: {
-    title: "Wdrażasz na VPS?",
-    description:
-      "Działa na każdym Linux VPS. Skieruj nginx lub Caddy na port 3000 - gotowe.",
-    docker: "Konfiguracja Docker",
-    kubernetes: "Kubernetes",
-    kubernetesDescription:
-      "Zawiera szablony dla web, task workerów, Redis, ingress i namespace.",
-  },
-  localSync: {
-    title: "Połącz lokalną maszynę (beta)",
-    description:
-      "Thea może kierować zadania do Claude Code na Twoim komputerze. Przejdź do Admin → Połączenia zdalne w panelu i dodaj URL lokalnej instancji. Pamięci i zadania synchronizują się co 60 sekund - bez przekierowywania portów, bez VPN.",
+  paths: {
+    eyebrow: "Wybierz AI",
+    title: "Twój komputer. Twój wybór modeli.",
+    intro:
+      "Obie opcje znajdziesz w kroku Dostawca AI kreatora konfiguracji. Zmienisz je w każdej chwili.",
+    account: {
+      badge: "Polecane",
+      title: "Połącz konto {{appName}}",
+      body: "Zaloguj się raz w kreatorze. Twoja instancja prowadzi każdą rozmowę, modele działają na {{appName}} i rozliczają się z Twoich kredytów. Bez żonglowania kluczami.",
+      points: {
+        models:
+          "Wszystkie modele ({{modelCount}}), od mainstreamu po bez cenzury, jedno logowanie.",
+        local: "Czaty zostają w Twojej lokalnej bazie.",
+        sync: "Wspomnienia, dokumenty, skille i ulubione synchronizują się domyślnie, wątki nie. Każdy ma swój przełącznik.",
+        paid: "Wymaga płatnego planu albo pakietu kredytów. Do trzech instancji na konto.",
+      },
+      cta: "Załóż konto {{appName}}",
+    },
+    standalone: {
+      badge: "Bez konta",
+      title: "Samodzielnie, z własnymi kluczami",
+      body: "Bez konta u nas. Wklej klucz dostawcy w tym samym kroku i płać bezpośrednio dostawcy.",
+      points: {
+        openrouter: "OpenRouter: setki modeli, jeden klucz.",
+        claude:
+          "Claude Code zalogowany na tym komputerze? Wykryty automatycznie. Klucz niepotrzebny.",
+        more: "Kolejni dostawcy w każdej chwili pod Wyświetl wszystkie ustawienia.",
+        billing:
+          "Płacisz bezpośrednio dostawcy. Żadnego rachunku od {{appName}}.",
+      },
+      cta: "Zdobądź klucz OpenRouter",
+    },
   },
   own: {
-    eyebrow: "Twój serwer, twoje zasady",
-    title: "Twój stack. Twój filtr.",
+    eyebrow: "Twój serwer, Twoje zasady",
+    title: "Twój stos. Twój filtr.",
     subtitle:
-      "Żadnego konta w cudzej firmie. Twój Postgres, twoje klucze, twoje logi. Ty wybierasz modele i decydujesz, ile filtrów stoi między tobą a nimi.",
+      "Twój Postgres, Twoje pliki, Twoje logi. Ty wybierasz modele i to, ile filtrowania stoi między Tobą a nimi.",
     cards: {
       data: {
-        title: "Dane zostają u ciebie",
-        body: "Wątki, wspomnienia i pliki leżą w twoim Postgresie i na twoim dysku. Nic nie dzwoni do domu.",
+        title: "Dane zostają u Ciebie",
+        body: "Wątki, wspomnienia i pliki leżą w Twojej bazie i Twoim katalogu.",
       },
       filter: {
         title: "Twój poziom filtrowania",
-        body: "Modele mainstreamowe, otwarte albo bez cenzury. Decydujesz per skill, per wątek, per użytkownik. Bez zespołu od polityk po drodze.",
+        body: "Mainstream, otwarte albo bez cenzury. Decydujesz per skill i per wątek. Bez działu polityki treści pomiędzy.",
       },
       keys: {
-        title: "Twoje klucze",
-        body: "Podepnij OpenRouter, lokalny model albo Claude Code. Koszty idą do twojego dostawcy, nie przez nas.",
+        title: "Twój rachunek, Twój wybór",
+        body: "Koszty modeli idą z Twoich kredytów {{appName}} albo prosto do Twojego dostawcy. Ty wybierasz.",
       },
     },
   },
-  env: {
-    title: "Czego potrzeba",
-    intro:
-      "Bun, Docker i garść zmiennych środowiskowych. To cała lista dla prywatnej instancji.",
-    envLabel: "Minimalna konfiguracja",
-    composeLabel: "Produkcja na VPS",
-  },
-  instances: {
-    title: "Trzy instancje, trzy zadania",
-    intro:
-      "Jeden kod działa jako osobne instancje. Ten sam kod, inna baza i rola. Tak sami to uruchamiamy.",
-    atlas: {
-      name: "Atlas",
-      body: "Instancja deweloperska. Hot reload, baza na wyrzut. Tu powstaje kod.",
+  includes: {
+    title: "Wszystko, co ma chmura.",
+    intro: "Ten sam kod co {{appName}}. Nic nie schowaliśmy.",
+    items: {
+      models:
+        "{{modelCount}} modeli czatu, do tego obraz, wideo, muzyka i mowa",
+      memory: "Trwała pamięć i czaty incognito",
+      search: "Wyszukiwanie w sieci i pobieranie stron",
+      thea: "Thea, Twoja adminka AI: wykonuje zadania, buduje narzędzia na prośbę",
+      admin: "Panel admina i zadania cron",
+      tools: "SSH, automatyzacja przeglądarki, klient e-mail jako narzędzia AI",
     },
-    hermes: {
-      name: "Hermes",
-      body: "Twój codzienny napęd. Lokalny podgląd na własnym Postgresie. W niej na co dzień mieszkasz.",
-    },
-    thea: {
-      name: "Thea",
-      body: "Instancja w chmurze na twoim VPS. Zawsze włączona, odpala twoje crony, przyjmuje zadania od dwóch pozostałych.",
-    },
-    note: "Instancje łączą się ze sobą. Wątki i zadania synchronizują się między laptopem a serwerem.",
   },
-  fork: {
-    title: "Ten sam framework, inny produkt",
-    body: "next-vibe-headunit to fork na komputer samochodowy. Media, nawigacja, klimatyzacja, Bluetooth i radio to endpointy, a każdy jest też komendą CLI i narzędziem dla AI. Inny produkt, te same trzy pliki.",
+  developers: {
+    title: "Chcesz na tym budować?",
+    body: "Każda funkcja to jeden plik definicji. Z niego powstaje strona, polecenie CLI, narzędzie MCP i narzędzie AI.",
+    cta: "Zobacz, jak działa next-vibe",
   },
-  enterprise: {
-    title: "Potrzebujesz pomocy przy konfiguracji?",
+  help: {
+    title: "Utknąłeś albo wdrażasz to dla zespołu?",
     description:
-      "Pomagamy przy wdrożeniu, niestandardowych integracjach i bieżącym wsparciu deweloperskim.",
+      "Pomoc przy konfiguracji, instalacje dla zespołów, integracje na miarę. Każdą wiadomość czyta człowiek.",
   },
 };

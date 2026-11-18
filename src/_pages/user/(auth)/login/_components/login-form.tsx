@@ -1,23 +1,21 @@
 "use client";
 
-import { Button } from "next-vibe/ui/components/button";
-import { Div } from "next-vibe/ui/components/div";
-import { Span } from "next-vibe/ui/components/span";
-import { P } from "next-vibe/ui/components/typography";
-import { assignUrl } from "next-vibe/ui/lib/location";
-import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
-import { useCallback, useRef, useState } from "react";
-
-const DEFAULT_PASSWORD_SENTINEL = "change-me-now";
-
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { SYSTEM_SETTINGS_ALIAS } from "next-vibe/env/settings/constants";
 import { broadcastAuthChange } from "next-vibe/identity/auth/tab-sync";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { isDefaultAdminPassword } from "next-vibe/identity/default-admin-password";
 import type { Platform } from "next-vibe/platforms/platforms";
+import { Button } from "next-vibe/ui/components/button";
+import { Div } from "next-vibe/ui/components/div";
+import { Span } from "next-vibe/ui/components/span";
+import { P } from "next-vibe/ui/components/typography";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
+import { assignUrl } from "next-vibe/ui/lib/location";
+import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
+import { useCallback, useRef, useState } from "react";
 
 import type { DEV_SEED_USERS } from "@/user/dev-seed-users";
 import loginEndpoints from "@/user/public/login/definition";
@@ -66,10 +64,9 @@ function DevQuickLogin({
       });
       if (result.success) {
         broadcastAuthChange("login", logger);
-        const target =
-          devSeedPassword === DEFAULT_PASSWORD_SENTINEL
-            ? `/${locale}/tools/${SYSTEM_SETTINGS_ALIAS}`
-            : (callbackUrl ?? `/${locale}`);
+        const target = isDefaultAdminPassword(devSeedPassword)
+          ? `/${locale}/tools/${SYSTEM_SETTINGS_ALIAS}`
+          : (callbackUrl ?? `/${locale}`);
         assignUrl(target);
       } else {
         setLoadingEmail(null);
@@ -131,8 +128,9 @@ export function LoginForm({
             create: {
               mutationOptions: {
                 onSuccess: ({ requestData }) => {
-                  const usedDefaultPassword =
-                    requestData.password === DEFAULT_PASSWORD_SENTINEL;
+                  const usedDefaultPassword = isDefaultAdminPassword(
+                    requestData.password,
+                  );
                   const target = usedDefaultPassword
                     ? `/${locale}/tools/${SYSTEM_SETTINGS_ALIAS}`
                     : (callbackUrl ?? `/${locale}`);

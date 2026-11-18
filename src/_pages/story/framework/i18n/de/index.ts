@@ -1,246 +1,227 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "next-vibe Framework",
-  description:
-    "Das Open-Source SaaS-Framework hinter {{appName}}. Einmal definieren, überall vorhanden.",
   meta: {
-    title: "next-vibe Framework",
+    title: "next-vibe Framework - Eine Definition, jede Oberfläche",
     description:
-      "Open-Source KI-natives SaaS-Framework. Eine Endpoint-Definition, dreizehn Plattformen.",
+      "Open-Source-Framework in TypeScript. Aus einer definition.ts werden Web-UI, CLI-Befehl, MCP-Tool, nativer Screen, KI-Tool und Cron-Job. Dazu eine OpenAI- und Anthropic-kompatible API.",
     category: "Framework",
-    imageAlt: "next-vibe Framework Dokumentation",
+    imageAlt: "next-vibe Framework für Entwickler",
     keywords:
-      "next-vibe, Framework, SaaS, Open-Source, KI, Full-Stack, TypeScript",
+      "next-vibe, TypeScript-Framework, MCP-Server, CLI, KI-Tools, Zod, Drizzle, OpenAI-kompatible API",
   },
   hero: {
     eyebrow: "Open Source · MIT + GPL v3",
-    title: "Eine Definition.",
-    titleAccent: "Dreizehn Plattformen.",
+    title: "Eine definition.ts.",
+    titleAccent: "Jede Oberfläche.",
     subtitle:
-      "next-vibe macht aus einer einzigen TypeScript-Definition dreizehn Plattformen gleichzeitig - maßgeschneiderte Web-UI, CLI-Befehl, MCP-Tool, Mobile-Screen, Cron-Job, WebSocket, Admin-Panel und mehr. Vollständig typsicher, ohne Drift, ohne Wiederholung.",
-    ctaGithub: "Auf GitHub staren",
-    ctaDocs: "Pattern-Dokumentation lesen",
-    stat1Label: "typed endpoints",
-    stat2Value: "0",
-    stat2Label: "runtime type errors",
-    stat3Label: "platforms per endpoint",
-    stat4Value: "2",
-    stat4Label: "files required",
+      "next-vibe ist ein TypeScript-Framework, in dem eine Endpoint-Definition zu Web-UI, CLI-Befehl, MCP-Tool, nativem Screen, KI-Tool, Cron-Job und sieben weiteren Oberflächen wird. Gleiche Validierung, gleiche Typen, kein Klebecode.",
+    ctaQuickstart: "In vier Befehlen starten",
+    ctaGithub: "Auf GitHub ansehen",
+    stat1Label: "typisierte Endpoints im Repo",
+    stat2Label: "Oberflächen pro Endpoint",
+    stat3Label: "Sprachen pro Text",
+    stat4Label: "Definition pro Feature",
   },
-  problem: {
-    eyebrow: "Das Problem",
-    title: "Du hast dasselbe dreizehnmal gebaut.",
-    subtitle:
-      "Jedes Feature braucht eine eigene Web-UI, einen CLI-Befehl, ein MCP-Tool, einen Mobile-Screen, Cron-Job, WebSocket-Handler, Admin-Panel und mehr. Gleiche Validierung, gleiche i18n, gleiche Fehlerbehandlung - nur anders verkleidet. Jedes Mal.",
-    callout: "next-vibe baut alle dreizehn aus einer Datei.",
+  example: {
+    eyebrow: "Ein echter Endpoint",
+    title: "Folge dem Kontaktformular.",
+    intro:
+      "Der Kontakt-Endpoint aus dem Repo, live unten auf dieser Seite. Zwei Dateien zum Lesen. Sechs der dreizehn Oberflächen siehst du hier.",
+    source: "Kompletten Quellcode auf GitHub lesen",
+    live: "Das Live-Formular testen",
+    becomes: "Was daraus wird",
+    more: "Dazu sieben weitere",
+    moreSurfaces: {
+      webApi: "REST-API",
+      websocket: "WebSocket-Events",
+      electron: "Electron-App",
+      adminPanel: "Admin-Panel",
+      vibeFrame: "Einbettbares Widget",
+      remoteSkill: "Agent-Skill",
+      vibeBoard: "Analytics-Knoten",
+    },
+    surfaces: {
+      web: {
+        title: "Web-UI",
+        body: "Das Formular unten auf dieser Seite. Felder, Validierung und Erfolgsmeldung kommen aus der Definition.",
+      },
+      cli: {
+        title: "CLI-Befehl",
+        body: "vibe contact-form. Ein Flag pro Feld, Hilfetext mit Beispielen inklusive.",
+      },
+      mcp: {
+        title: "MCP-Tool",
+        body: "Jeder MCP-Client ruft contact-form über vibe mcp auf. Das Eingabeschema kommt direkt aus Zod.",
+      },
+      ai: {
+        title: "KI-Tool",
+        body: "Modelle können es aufrufen. requiresConfirmation lässt den Nutzer vor dem Senden bestätigen.",
+      },
+      native: {
+        title: "Nativer Screen",
+        body: "Die Expo-App rendert dasselbe Widget mit nativen Eingabefeldern.",
+      },
+      cron: {
+        title: "Cron-Job",
+        body: "Jeder Endpoint läuft auch nach Zeitplan. Gleicher Handler, kein zweiter Codepfad.",
+      },
+    },
+    callsTitle: "Vier Wege hinein",
+    callsBody:
+      "Echte Aufrufe. CLI, MCP und KI treffen den Kontakt-Handler oben. Der Cron-Tab zeigt einen echten geplanten Task aus dem Repo.",
   },
   pattern: {
     eyebrow: "Das Muster",
-    title: "Zwei Dateien erforderlich. Jede Plattform.",
+    title: "Ein Feature ist ein Ordner.",
     subtitle:
-      "Jedes Feature lebt in einem Ordner. Nur definition.ts und route.ts sind Pflicht - alles andere ist optional.",
-    definitionTitle: "definition.ts - der Vertrag",
-    definitionBody:
-      "Felder, Zod-Schemas, Labels, Fehlertypen und Beispiele einmal deklarieren. Diese Datei ist die einzige Quelle der Wahrheit - das Framework liest sie zur Laufzeit auf jeder Plattform.",
-    routeTitle: "repository.ts - die Logik",
-    routeBody:
-      "Business-Logik lebt hier - DB-Abfragen, Auth-Prüfungen, Fehlerbehandlung mit success()/fail(). Die route.ts ist nur ein dünner Delegator; Validierung, Logging und Plattform-Registrierung laufen automatisch.",
-    widgetTitle: "widget.tsx - die UI (optional)",
-    widgetBody:
-      "Ohne Widget rendert das Framework deine Felder überall automatisch. Füge widget.tsx hinzu, um eine vollständig angepasste interaktive UI auszuliefern - dieselbe Komponente rendert in Admin-Panels, eingebetteten Widgets und Mobile-Screens.",
+      "definition.ts und route.ts sind Pflicht. Widget, E-Mails, Tabelle und Übersetzungen liegen daneben. Keine zentrale Registry, die du von Hand pflegst.",
     deleteLine:
-      "Ordner löschen. Das Feature verschwindet sofort von jeder Plattform.",
+      "Ordner löschen, vibe gen ausführen. Das Feature verschwindet überall gleichzeitig.",
   },
-  surfaces: {
-    items: {
-      webApi: {
-        label: "Web API",
-        description: "REST-Endpoint, vollständig validiert und typisiert",
-      },
-      reactUi: {
-        label: "React UI",
-        description: "Maßgeschneiderte interaktive UI - kein JSX nötig",
-      },
-      cli: {
-        label: "CLI",
-        description:
-          "Jeder Endpoint ist ein Befehl mit automatisch generierten Flags",
-      },
-      aiTool: {
-        label: "KI-Tool",
-        description: "Function-Calling-Schema automatisch generiert",
-      },
-      mcpServer: {
-        label: "MCP-Server",
-        description: "Verbinde Claude Desktop, Cursor, jeden MCP-Client",
-      },
-      reactNative: {
-        label: "React Native",
-        description: "iOS- und Android-Screens aus derselben Definition",
-      },
-      cron: {
-        label: "Cron-Job",
-        description: "Jeden Endpoint nach Cron-Ausdruck planen",
-      },
-      websocket: {
-        label: "WebSocket",
-        description: "Updates nach Abschluss an verbundene Clients senden",
-      },
-      electron: {
-        label: "Electron",
-        description: "Native Desktop-App über dieselben Endpoint-Verträge",
-      },
-      adminPanel: {
-        label: "Admin-Panel",
-        description: "Automatisch generiertes Admin-UI - kein dedizierter Code",
-      },
-      vibeFrame: {
-        label: "VibeFrame-Widget",
-        description: "Einbettbares iframe-Widget für jede Seite",
-      },
-      remoteSkill: {
-        label: "Agenten-Skill",
-        description: "Von KI-Agenten als strukturierter Skill aufrufbar",
-      },
-      vibeBoard: {
-        label: "Vibe Sense-Knoten",
-        description:
-          "Knoten in einem Live-Datenflussgraphen - derselbe Endpoint",
-      },
+  hood: {
+    eyebrow: "Unter der Haube",
+    title: "Die lästigen Teile, einmal gelöst.",
+    intro:
+      "Das Framework übernimmt Validierung, Auth, Logging, i18n und Realtime. Dein Ordner enthält die Geschäftslogik.",
+    platform: {
+      title: "Rollen und Plattform-Marker",
+      body: "allowedRoles legt fest, wer einen Endpoint aufrufen darf. Plattform-Marker legen fest, wo er auftaucht: AI_TOOL_OFF versteckt ihn vor Modellen, PRODUCTION_OFF hält ihn aus der Produktion. Geprüft auf jeder Oberfläche.",
+    },
+    data: {
+      title: "Zod, Drizzle, PostgreSQL",
+      body: "Zod validiert Ein- und Ausgabe und erzeugt jedes Tool-Schema. Repositories regeln die Persistenz über Drizzle. Migrationen liegen im Repo. Ab Werk läuft alles auf eingebettetem PGlite, ohne Docker. Wird es größer, zeigt DATABASE_URL auf ein beliebiges Postgres.",
+    },
+    realtime: {
+      title: "Typisiertes Realtime",
+      body: "Endpoints deklarieren Event-Schemas und Channel-Scopes. Clients abonnieren per WebSocket gestreamte Tokens und Task-Fortschritt. Pub/Sub läuft im Prozess oder über Redis.",
+    },
+    remote: {
+      title: "Verbundene Instanzen",
+      body: "Instanzen verbinden sich, führen Tools beim Gegenüber aus und synchronisieren, was du freigibst. Jede Seite setzt ihre eigenen Rechte durch. So nutzt eine selbst gehostete Installation die Modelle von unbottled.ai.",
     },
   },
   typescript: {
-    eyebrow: "TypeScript-Suprematie",
     title: "Kein any. Kein unknown. Kein throw.",
     subtitle:
-      "Typen müssen vollständig übereinstimmen - keine Ausnahmen. Das ist keine Stilpräferenz. Es ist eine Strukturregel, zur Build-Zeit durch vibe check durchgesetzt.",
+      "Typen passen durchgehend, ohne Ausnahme. vibe check setzt das durch, bevor irgendetwas live geht.",
     patterns: {
       any: {
         name: "kein any",
         description:
-          "Durch echtes typisiertes Interface ersetzen. Wenn du nach any greifst, hat deine Architektur ein Loch.",
+          "Schreib das echte Interface. Wer zu any greift, hat ein Loch in der Architektur.",
       },
       unknown: {
         name: "kein unknown",
-        description:
-          "Gleiche Regel. unknown ist nur any mit extra Schritten. Typ definieren.",
+        description: "Gleiche Regel. unknown ist any mit Umweg.",
       },
       object: {
         name: "kein nacktes object",
         description:
-          "Nacktes object ist bedeutungslos. Schreibe die Form, die du tatsächlich erwartest.",
+          "Schreib die Form, die du erwartest. object sagt gar nichts.",
       },
       asX: {
         name: "kein as X",
         description:
-          "Typzusicherungen sind Lügen an den Compiler. Behebe stattdessen die Architektur.",
+          "Casts belügen den Compiler. Repariere die Typen an der Quelle.",
       },
       throwStatements: {
         name: "kein throw",
         description:
-          "Verwende ResponseType<T> mit success(data) oder fail({message, errorType}). Fehler sind Daten.",
+          "ResponseType<T> über success(data) oder fail({ message, errorType }) zurückgeben. Fehler sind Daten.",
       },
       hardcodedStrings: {
-        name: "keine hartcodierten Strings",
+        name: "keine festen Texte",
         description:
-          "Jeder String braucht einen Übersetzungsschlüssel. Der Checker erkennt nicht übersetzte Literale.",
+          "Jeder sichtbare Text ist ein Übersetzungsschlüssel. Der Linter findet Literale.",
       },
     },
     vibeCheck:
-      "vibe check führt Oxlint (Rust), ESLint und TypeScript-Typüberprüfung parallel aus. Null Fehler erforderlich vor dem Deployen.",
+      "vibe check lässt Oxlint, ESLint und den TypeScript-Checker parallel laufen. Null Fehler, sonst geht nichts raus.",
+  },
+  quickstart: {
+    eyebrow: "Schnellstart",
+    title: "Vier Befehle. Dann übernimmt der Browser.",
+    intro:
+      "Klonen, installieren, starten. Ein Einrichtungsassistent erledigt Admin-Login und KI-Anbieter. Keine Konfigurationsdateien.",
+    selfHost: "Anleitung zum Selbsthosten",
+    docs: "Muster-Doku auf GitHub",
+  },
+  api: {
+    eyebrow: "Gehostete API",
+    title: "Oder ruf einfach die {{appName}}-API auf.",
+    intro:
+      "Ohne Installation. Kompatibel mit OpenAI und Anthropic: SDK behalten, Base-URL und Schlüssel tauschen.",
+    endpoints: {
+      chat: "OpenAI Chat Completions",
+      responses: "OpenAI Responses",
+      messages: "Anthropic Messages",
+      models: "Modellliste mit Preisen",
+    },
+    access:
+      "{{modelCount}} Modelle hinter einem Schlüssel, abgerechnet in {{appName}}-Credits. API-Schlüssel gibt es ab jedem Abo oder Guthabenpaket.",
+    docs: "API-Doku lesen",
+    keys: "API-Schlüssel erstellen",
   },
   examples: {
-    eyebrow: "Mit next-vibe gebaut",
-    title: "Vom Auto-Cockpit bis zur KI-Plattform.",
+    eyebrow: "Im Repo",
+    title: "Nicht nur KI-Chat.",
     subtitle:
-      "Eine Codebasis, jede Oberfläche. Das sind echte Produkte auf next-vibe - ein Auto-PC, Online-Shops, Buchungsseiten und {{appName}} selbst. Ein Framework, grundverschiedene Produkte.",
+      "Ganze Geschäftsbereiche liegen im Repo, alle nach demselben Muster gebaut.",
     items: {
-      headunit: {
-        label: "Auto-Cockpit",
-        title: "Ein komplettes Auto-Headunit",
-        body: "Navigation, Klimasteuerung, Radio, Spotify, Bluetooth-Telefonie und Live-Fahrzeugdiagnose - plus Android Auto - auf einem Touchscreen-Auto-PC. Gebaut als next-vibe-Fork.",
-      },
-      shop: {
-        label: "E-Commerce",
-        title: "Online-Shops, die verkaufen",
-        body: "Shopfront, Warenkorb, Checkout, Lager und Kasse aus einer Installation. Ein echter Shop läuft heute darauf.",
-      },
-      booking: {
-        label: "Buchungen",
-        title: "Praxis- & Buchungsseiten",
-        body: "Termine, Kundenakten, Rechnungen und eine öffentliche Seite - das Rückgrat eines Praxisbetriebs. Gleicher Stack wie der Shop.",
-      },
       aiPlatform: {
         label: "KI-Plattform",
         title: "{{appName}}",
-        body: "{{modelCount}} Modelle, Chat, dauerhaftes Gedächtnis, Agenten, Abrechnung und MCP - das Flaggschiff. Genau diese Codebasis, in Produktion.",
+        body: "{{modelCount}} Modelle, Chat, Gedächtnis, Agenten, Abrechnung und MCP. Genau diese Codebasis, in Produktion.",
+      },
+      commerce: {
+        label: "Handel",
+        title: "Produkte und Kasse",
+        body: "Produkte, Kassensystem, Lager und Einkauf.",
+      },
+      finance: {
+        label: "Finanzen",
+        title: "Buchhaltung und Zahlungen",
+        body: "Kontenrahmen, Steuersätze, Rechnungen, Stripe- und Krypto-Zahlungen.",
+      },
+      crm: {
+        label: "CRM",
+        title: "Leads und Nachrichten",
+        body: "Leads, Newsletter, E-Mail-Posteingang und SMS.",
       },
     },
   },
-  quickstart: {
-    eyebrow: "Loslegen",
-    title: "Forken, fragen, deployen.",
-    subtitle: "Vom ersten Tag an auf {{appName}}-Niveau.",
-    step1: {
-      label: "Forken & klonen",
-      description: "Auf GitHub forken, dann den Fork lokal klonen.",
+  maturity: {
+    eyebrow: "Ehrlicher Stand",
+    title: "Was heute läuft.",
+    stable: {
+      title: "In Produktion",
+      body: "{{appName}} läuft auf dieser Codebasis: Web, CLI, MCP, KI-Tools, Cron, Realtime, Zahlungen. Produktions-Builds laufen auf Next.js. Lokal ist TanStack Start mit Vite der Standard.",
     },
-    step2: {
-      label: "Server starten",
-      description:
-        "Für lokale Entwicklung startet vibe dev PostgreSQL in Docker, führt Migrationen durch, befüllt Daten und gibt Hot Reload. Für Produktion erledigt vibe build && vibe start den ersten Deploy. Danach nutzt du vibe rebuild, um Produktion mit Zero Downtime zu aktualisieren.",
+    beta: {
+      title: "Beta",
+      body: "React-Native-Screens, Sync zwischen Instanzen und Remote-Skills funktionieren, mit Ecken und Kanten.",
     },
-    step3: {
-      label: "Als Admin einloggen",
-      description:
-        'App öffnen und "Als Admin einloggen" klicken - der Setup-Assistent führt durch API-Keys und Admin-Passwort.',
+    honest: {
+      title: "Rechne mit Umbauten",
+      body: "Ein Team, hohes Tempo, klare Meinung. Noch kein Semver, die Doku hinkt dem Code hinterher. Pinne einen Commit oder forke.",
     },
-    step4: {
-      label: "KI fragen",
-      description:
-        "{{appName}}-Chat oder Claude Code öffnen und das gewünschte Feature beschreiben. Die KI schreibt alle Dateien - Definition, Route, Widget, i18n - und führt vibe check automatisch aus.",
-    },
-    docsLink: "Pattern-Dokumentation",
-    githubLink: "github.com/techfreaque/next-vibe",
   },
-  oneDef: {
-    eyebrow: "Eine Definition",
-    title: "Einmal schreiben. Überall laufen lassen.",
-    subtitle:
-      "Ein echter Endpoint aus diesem Repo: das fokussierte Fenster eines Linux-Desktops auslesen. Drei Dateien. Kein Glue-Code. Er erscheint als Webseite, CLI-Befehl, MCP-Tool, KI-Tool und Cron-Job.",
-    defTitle: "definition.ts",
-    defBody:
-      "Pfad, Alias, Rollen, Zod-Schema, Widget, Fehler, Beispiele. Alles, was jede Oberfläche braucht, an einer Stelle.",
-    routeTitle: "route.ts",
-    routeBody:
-      "Verdrahtet die Definition mit einer Repository-Funktion. Genau diesen Handler ruft jede Oberfläche auf.",
-    surfacesTitle: "Das bekommst du ohne weiteren Code",
-    cli: {
-      title: "CLI-Befehl",
-      body: "Der Alias wird zum Befehl. Das Ergebnis rendert dasselbe Widget, fürs Terminal gesetzt.",
-    },
-    mcp: {
-      title: "MCP-Tool",
-      body: "Zeig jedem MCP-Client auf vibe mcp. Die Schemas kommen direkt aus den Zod-Feldern.",
-    },
-    ai: {
-      title: "KI-aufrufbares Tool",
-      body: "Modelle erhalten ein Function-Calling-Schema, erzeugt aus der Definition. Rollen bestimmen, wer aufrufen darf.",
-    },
-    cron: {
-      title: "Cron-Job",
-      body: "Derselbe Handler, jetzt nach Zeitplan. Das ist die echte Task-Datei unseres Credit-Ablauf-Jobs.",
-    },
-    more: "Dazu: eine Webseite unter /tools/<alias>, eine typisierte REST-Route und ein Native-Screen. Das Widget rendert auf allen. Lösch den Endpoint-Ordner, und jede Oberfläche verschwindet mit.",
-    addTitle: "Eigenen Endpoint in fünf Zeilen Shell",
-    addBody:
-      "Ordner anlegen, drei Dateien schreiben, neu generieren, prüfen. Meldet vibe check 0 Fehler, läuft es überall.",
-  },
-  enterprise: {
-    eyebrow: "Enterprise",
-    title: "Baust du etwas Großes?",
+  contact: {
+    eyebrow: "Der Endpoint, live",
+    title: "Fragen, oder baust du etwas Großes?",
     description:
-      "Wir helfen Teams bei Setup, individuellen Integrationen, Architektur-Review und laufender Entwicklungsunterstützung. Dieselbe Codebasis, dein Deployment.",
+      "Einrichtung, individuelle Integrationen, Architektur-Review. Dieses Formular ist der Kontakt-Endpoint von oben, gerendert vom Framework.",
+  },
+  code: {
+    copy: "Kopieren",
+    copied: "Kopiert",
+    wrap: "Umbrechen",
+    terminal: "Terminal",
+    cli: "CLI",
+    mcp: "MCP",
+    ai: "KI-Tool",
+    cron: "Cron",
+    anthropic: "Anthropic (curl)",
   },
 };

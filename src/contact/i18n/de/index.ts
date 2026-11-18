@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   title: "Mit einem Menschen sprechen",
   titleShort: "Kontakt",
   description:
-    "Etwas funktioniert nicht, oder du möchtest einfach mit einer echten Person reden. Wir sind da. Schreib, was du brauchst – jemand aus unserem Team liest es und antwortet persönlich.",
+    "Etwas funktioniert nicht, oder du möchtest einfach mit einer echten Person reden. Wir sind da. Schreib, was du brauchst. Jemand aus unserem Team liest es und antwortet persönlich.",
   category: "System",
   summary: "Kontaktformular-Einreichungen mit Lead-Tracking verarbeiten",
   tags: {
@@ -20,35 +20,34 @@ export const translations: typeof enTranslations = {
       "Eine echte Person liest das hier und antwortet. Kein Bot, keine Warteschleife.",
     fields: {
       name: {
-        label: "Ihr Name",
-        description: "Geben Sie Ihren Namen ein",
+        label: "Dein Name",
+        description: "Wie sollen wir dich ansprechen?",
         placeholder: "Max Mustermann",
       },
       email: {
         label: "E-Mail-Adresse",
         description:
-          "Wohin wir antworten sollen. Wenn Sie angemeldet sind, können Sie das Feld leer lassen – wir nutzen Ihre Konto-E-Mail.",
+          "Wohin wir antworten sollen. Angemeldet? Dann lass das Feld leer, wir nutzen deine Konto-E-Mail.",
         placeholder: "max.mustermann@beispiel.de",
       },
       company: {
         label: "Unternehmen",
-        description: "Geben Sie Ihren Firmennamen ein (optional)",
+        description: "Dein Firmenname (optional)",
         placeholder: "Musterfirma GmbH",
       },
       subject: {
         label: "Betreff",
-        description: "Kurze Beschreibung Ihrer Anfrage",
+        description: "Worum geht es?",
         placeholder: "Allgemeine Anfrage zu Dienstleistungen",
       },
       message: {
         label: "Nachricht",
-        description: "Detaillierte Beschreibung Ihrer Anfrage",
-        placeholder:
-          "Bitte geben Sie weitere Details zu Ihren Bedürfnissen an...",
+        description: "Was brauchst du? Ein paar Sätze reichen.",
+        placeholder: "Was brauchst du? Ein paar Sätze reichen.",
       },
       priority: {
         label: "Priorität",
-        description: "Wählen Sie die Dringlichkeitsstufe Ihrer Anfrage",
+        description: "Wie dringend ist es?",
         placeholder: "Prioritätsstufe auswählen",
       },
       leadId: {

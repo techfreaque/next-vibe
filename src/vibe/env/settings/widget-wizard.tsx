@@ -31,6 +31,7 @@ import { storage } from "next-vibe/ui/lib/storage";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
+import { isDefaultAdminPassword } from "../../identity/default-admin-password";
 import instanceEndpoints from "../../remote-connection/[instanceId]/definition";
 import { scopedTranslation as connectScopedTranslation } from "../../remote-connection/connect/i18n";
 import type { SyncScope } from "../../remote-connection/db";
@@ -105,7 +106,7 @@ function StepIndicator({
                   !isActive && !isDone && "bg-muted text-muted-foreground",
                 )}
               >
-                {isDone ? <Check className="h-4 w-4" /> : step.step}
+                {isDone ? <Check className="h-4 w-4" /> : idx + 1}
               </Div>
               <Span
                 className={cn(
@@ -551,7 +552,7 @@ function WizardField({
           className="h-9 text-sm font-mono"
           value={editedValue ?? ""}
           placeholder={
-            setting.isConfigured && setting.value !== "change-me-now"
+            setting.isConfigured && !isDefaultAdminPassword(setting.value)
               ? // eslint-disable-next-line i18next/no-literal-string
                 "••••••••"
               : setting.example || setting.comment || undefined

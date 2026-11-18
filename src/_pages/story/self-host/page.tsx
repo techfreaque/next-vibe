@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { getMaxToolCountAllPlatforms } from "next-vibe/agent/chat/default-tool-counts";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
 import { coreClientEnv as envClient } from "next-vibe/core/env-client";
@@ -12,19 +11,20 @@ import { Div } from "next-vibe/ui/components/div";
 import { Activity } from "next-vibe/ui/components/icons/Activity";
 import { ArrowDown } from "next-vibe/ui/components/icons/ArrowDown";
 import { Bot } from "next-vibe/ui/components/icons/Bot";
-import { Box } from "next-vibe/ui/components/icons/Box";
+import { Check } from "next-vibe/ui/components/icons/Check";
+import { Cloud } from "next-vibe/ui/components/icons/Cloud";
 import { Cpu } from "next-vibe/ui/components/icons/Cpu";
 import { Database } from "next-vibe/ui/components/icons/Database";
 import { Github } from "next-vibe/ui/components/icons/Github";
-import { Layers } from "next-vibe/ui/components/icons/Layers";
+import { Key } from "next-vibe/ui/components/icons/Key";
 import { Lock } from "next-vibe/ui/components/icons/Lock";
-import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { Search } from "next-vibe/ui/components/icons/Search";
 import { Server } from "next-vibe/ui/components/icons/Server";
 import { Terminal } from "next-vibe/ui/components/icons/Terminal";
-import { CodeSnippet } from "next-vibe/ui/components/markdown";
 import { Span } from "next-vibe/ui/components/span";
-import { P } from "next-vibe/ui/components/typography";
+import { H3, P } from "next-vibe/ui/components/typography";
+import type { IconComponent } from "next-vibe/ui/lib/helper";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
 
 import { GITHUB_REPO_URL } from "@/env/constants";
@@ -32,28 +32,20 @@ import { configScopedTranslation } from "@/env/i18n";
 
 import { ContactFormSection } from "../_components/contact-form-section";
 import { PersonalShowcase } from "../_components/personal-showcase";
-import { SelfHostSection } from "../_components/self-host-section";
 import {
-  Callout,
+  CardLink,
   Cta,
   FeatureCard,
   FeatureGrid,
   PageHero,
   PageSection,
-  Step,
-  StepList,
 } from "../_shared/marketing";
-import {
-  INSTANCE_COMPOSE,
-  INSTANCE_ENV,
-  INSTANCE_MODEL,
-} from "../_shared/surface-snippets";
+import { Quickstart } from "../_shared/quickstart/quickstart";
 import { scopedTranslation } from "./i18n";
 
 export interface SelfHostPageData {
   locale: CountryLanguage;
   modelCount: number;
-  totalToolCount: number;
   platform: Platform;
 }
 
@@ -70,7 +62,6 @@ export async function tanstackLoader({
   return {
     locale,
     modelCount,
-    totalToolCount: getMaxToolCountAllPlatforms(),
     platform: Platform.NEXT_PAGE,
   };
 }
@@ -97,28 +88,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-const CLONE_SH = `git clone https://github.com/techfreaque/next-vibe
-cd next-vibe
-bun install`;
-
-const DEV_SH = "vibe dev";
-const ENV_FILENAME = ".env";
-
-const OPTION_A_SH = `# Claude Code - no API key needed
-# Requires Claude subscription + Claude Code CLI
-claude login   # sign in once
-# Then select any claude-code-* model in the model picker`;
-
-const OPTION_B_SH = `# OpenRouter - every model, pay per use
-# Paste your key in Settings → API Keys
-# Get yours at openrouter.ai/keys`;
-
-const VPS_DOCKER_SH = `bash scripts/install-docker.sh
-vibe build && vibe start
-# Point Caddy / nginx at port 3000`;
-
-const K8S_SH = `# Edit k8s/secret.yaml with your env vars
-kubectl apply -k k8s/`;
+const OPENROUTER_KEYS_URL = "https://openrouter.ai/keys";
 
 const INCLUDES = [
   { key: "models", icon: Cpu },
@@ -126,26 +96,70 @@ const INCLUDES = [
   { key: "search", icon: Search },
   { key: "thea", icon: Bot },
   { key: "admin", icon: Activity },
-  { key: "ssh", icon: Terminal },
-  { key: "sync", icon: RefreshCw },
-  { key: "free", icon: Github },
+  { key: "tools", icon: Terminal },
 ] as const;
 
-function Shell({
-  code,
-  filename = "terminal",
+const ACCOUNT_POINTS = ["models", "local", "sync", "paid"] as const;
+const STANDALONE_POINTS = ["openrouter", "claude", "more", "billing"] as const;
+
+function PathCard({
+  icon: Icon,
+  badge,
+  title,
+  body,
+  points,
+  footer,
+  highlighted = false,
 }: {
-  code: string;
-  filename?: string;
+  icon: IconComponent;
+  badge: string;
+  title: string;
+  body: string;
+  points: string[];
+  footer: JSX.Element;
+  highlighted?: boolean;
 }): JSX.Element {
   return (
-    <Div className="min-w-0 max-w-full">
-      <CodeSnippet
-        code={code}
-        language="bash"
-        filename={filename}
-        variant="file"
-      />
+    <Div
+      className={cn(
+        "flex h-full min-w-0 flex-col rounded-2xl border bg-card p-6 shadow-xs md:p-8",
+        highlighted
+          ? "border-primary/40 ring-1 ring-primary/15"
+          : "border-border",
+      )}
+    >
+      <Div className="flex items-center justify-between gap-3">
+        <Div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Icon className="h-5 w-5" />
+        </Div>
+        <Span
+          className={cn(
+            "rounded-full px-3 py-1 text-xs font-semibold",
+            highlighted
+              ? "bg-primary text-primary-foreground"
+              : "border border-border text-muted-foreground",
+          )}
+        >
+          {badge}
+        </Span>
+      </Div>
+      <H3 className="mt-5 text-xl font-semibold tracking-tight md:text-2xl">
+        {title}
+      </H3>
+      <P className="mt-2 text-base leading-relaxed text-muted-foreground">
+        {body}
+      </P>
+      <Div className="mt-5 flex flex-col gap-3">
+        {points.map((point) => (
+          <Div key={point} className="flex gap-3">
+            <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <P className="text-sm leading-relaxed text-foreground/90">
+              {point}
+            </P>
+          </Div>
+        ))}
+      </Div>
+      <Div className="mt-auto pt-6">{footer}</Div>
     </Div>
   );
 }
@@ -153,7 +167,6 @@ function Shell({
 export function TanstackPage({
   locale,
   modelCount,
-  totalToolCount,
   platform,
 }: SelfHostPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
@@ -197,9 +210,62 @@ export function TanstackPage({
         }
       />
 
-      <PersonalShowcase locale={locale} />
+      <PageSection
+        id="quickstart"
+        tone="muted"
+        label={t("quickstart.eyebrow")}
+        title={t("quickstart.title")}
+        intro={t("quickstart.intro")}
+      >
+        <Quickstart locale={locale} />
+      </PageSection>
 
       <PageSection
+        id="ai"
+        label={t("paths.eyebrow")}
+        title={t("paths.title")}
+        intro={t("paths.intro")}
+      >
+        <Div className="grid gap-6 lg:grid-cols-2">
+          <PathCard
+            highlighted
+            icon={Cloud}
+            badge={t("paths.account.badge")}
+            title={t("paths.account.title", { appName })}
+            body={t("paths.account.body", { appName })}
+            points={ACCOUNT_POINTS.map((key) =>
+              t(`paths.account.points.${key}`, { appName, modelCount }),
+            )}
+            footer={
+              <CardLink
+                href={`/${locale}/user/signup`}
+                label={t("paths.account.cta", { appName })}
+              />
+            }
+          />
+          <PathCard
+            icon={Key}
+            badge={t("paths.standalone.badge")}
+            title={t("paths.standalone.title")}
+            body={t("paths.standalone.body", { appName })}
+            points={STANDALONE_POINTS.map((key) =>
+              t(`paths.standalone.points.${key}`, { appName }),
+            )}
+            footer={
+              <CardLink
+                href={OPENROUTER_KEYS_URL}
+                label={t("paths.standalone.cta")}
+                external
+              />
+            }
+          />
+        </Div>
+      </PageSection>
+
+      <PersonalShowcase locale={locale} onStoryPage />
+
+      <PageSection
+        tone="muted"
         label={t("own.eyebrow")}
         title={t("own.title")}
         intro={t("own.subtitle")}
@@ -212,160 +278,58 @@ export function TanstackPage({
             {t("own.cards.filter.body")}
           </FeatureCard>
           <FeatureCard icon={Cpu} title={t("own.cards.keys.title")}>
-            {t("own.cards.keys.body")}
+            {t("own.cards.keys.body", { appName })}
           </FeatureCard>
         </FeatureGrid>
-      </PageSection>
 
-      <PageSection title={t("includes.title")}>
-        <FeatureGrid columns={4}>
-          {INCLUDES.map(({ key, icon: Icon }) => (
-            <Div
-              key={key}
-              className="flex gap-3 rounded-xl border border-border bg-card p-5 shadow-xs"
-            >
-              <Div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <Icon className="h-4 w-4" />
+        <Div className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-xs md:mt-8 md:p-8">
+          <H3 className="text-xl font-semibold tracking-tight">
+            {t("includes.title")}
+          </H3>
+          <P className="mt-1 text-sm leading-relaxed text-muted-foreground md:text-base">
+            {t("includes.intro", { appName })}
+          </P>
+          <Div className="mt-5 grid gap-x-8 gap-y-4 sm:grid-cols-2">
+            {INCLUDES.map(({ key, icon: Icon }) => (
+              <Div key={key} className="flex items-start gap-3">
+                <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <P className="text-sm leading-relaxed text-foreground/90">
+                  {t(`includes.items.${key}`, { appName, modelCount })}
+                </P>
               </Div>
-              <P className="text-sm leading-relaxed text-foreground/90">
-                {t(`includes.items.${key}`, { appName, modelCount })}
-              </P>
-            </Div>
-          ))}
-        </FeatureGrid>
+            ))}
+          </Div>
+        </Div>
       </PageSection>
 
-      <SelfHostSection locale={locale} totalToolCount={totalToolCount} />
-
-      <PageSection
-        id="quickstart"
-        tone="muted"
-        title={t("quickstart.title")}
-        intro={t("quickstart.subtitle")}
-      >
-        <Div className="max-w-3xl">
-          <StepList>
-            <Step
-              number={1}
-              title={t("quickstart.step1.title")}
-              description={t("quickstart.step1.description")}
-            >
-              <Shell code={CLONE_SH} />
-            </Step>
-            <Step
-              number={2}
-              title={t("quickstart.step2.title")}
-              description={t("quickstart.step2.description")}
-            >
-              <Shell code={DEV_SH} />
-              <Callout icon={Database} tone="neutral" className="mt-4">
-                {t("quickstart.step2.noDocker")}
-              </Callout>
-            </Step>
-            <Step
-              number={3}
-              title={t("quickstart.step3.title")}
-              description={t("quickstart.step3.description")}
+      <Div className="border-b border-border">
+        <Div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-2 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+          <P className="text-base text-foreground">
+            <Span className="font-semibold">{t("developers.title")}</Span>{" "}
+            <Span className="text-muted-foreground">
+              {t("developers.body")}
+            </Span>
+          </P>
+          <Div className="shrink-0 whitespace-nowrap">
+            <CardLink
+              href={`/${locale}/story/framework`}
+              label={t("developers.cta")}
             />
-            <Step number={4} title={t("quickstart.step4.title")}>
-              <Div className="flex min-w-0 flex-col gap-4">
-                <Div className="min-w-0 rounded-xl border border-primary/30 bg-card p-5">
-                  <P className="text-sm font-semibold text-primary">
-                    {t("quickstart.step4.optionA.label")}
-                  </P>
-                  <P className="mt-1 mb-4 text-sm leading-relaxed text-muted-foreground">
-                    {t("quickstart.step4.optionA.description")}
-                  </P>
-                  <Shell code={OPTION_A_SH} />
-                </Div>
-                <Div className="min-w-0 rounded-xl border border-border bg-card p-5">
-                  <P className="text-sm font-semibold">
-                    {t("quickstart.step4.optionB.label")}
-                  </P>
-                  <P className="mt-1 mb-4 text-sm leading-relaxed text-muted-foreground">
-                    {t("quickstart.step4.optionB.description")}
-                  </P>
-                  <Shell code={OPTION_B_SH} />
-                </Div>
-              </Div>
-            </Step>
-          </StepList>
-        </Div>
-      </PageSection>
-
-      <PageSection title={t("vps.title")} intro={t("vps.description")}>
-        <FeatureGrid columns={2}>
-          <FeatureCard icon={Box} title={t("vps.docker")}>
-            <Div className="mt-3">
-              <Shell code={VPS_DOCKER_SH} />
-            </Div>
-          </FeatureCard>
-          <FeatureCard icon={Layers} title={t("vps.kubernetes")}>
-            {t("vps.kubernetesDescription")}
-            <Div className="mt-4">
-              <Shell code={K8S_SH} />
-            </Div>
-          </FeatureCard>
-        </FeatureGrid>
-        <Callout icon={RefreshCw} tone="neutral" className="mt-6 md:mt-8">
-          <Span className="font-semibold text-foreground">
-            {t("localSync.title")}
-          </Span>{" "}
-          <Span className="text-muted-foreground">
-            {t("localSync.description")}
-          </Span>
-        </Callout>
-      </PageSection>
-
-      <PageSection tone="muted" title={t("env.title")} intro={t("env.intro")}>
-        <Div className="grid gap-6 lg:grid-cols-2">
-          <Div className="flex min-w-0 flex-col gap-2">
-            <P className="text-sm font-semibold">{t("env.envLabel")}</P>
-            <Shell code={INSTANCE_ENV} filename={ENV_FILENAME} />
-          </Div>
-          <Div className="flex min-w-0 flex-col gap-2">
-            <P className="text-sm font-semibold">{t("env.composeLabel")}</P>
-            <Shell code={INSTANCE_COMPOSE} />
           </Div>
         </Div>
-      </PageSection>
-
-      <PageSection title={t("instances.title")} intro={t("instances.intro")}>
-        <FeatureGrid columns={3}>
-          <FeatureCard icon={Terminal} title={t("instances.atlas.name")}>
-            {t("instances.atlas.body")}
-          </FeatureCard>
-          <FeatureCard icon={Activity} title={t("instances.hermes.name")}>
-            {t("instances.hermes.body")}
-          </FeatureCard>
-          <FeatureCard icon={Server} title={t("instances.thea.name")}>
-            {t("instances.thea.body")}
-          </FeatureCard>
-        </FeatureGrid>
-        <Div className="mt-6">
-          <Shell code={INSTANCE_MODEL} />
-        </Div>
-        <Callout icon={RefreshCw} tone="neutral" className="mt-6">
-          {t("instances.note")}
-        </Callout>
-      </PageSection>
-
-      <PageSection tone="muted" title={t("fork.title")} narrow>
-        <P className="text-base leading-relaxed text-muted-foreground md:text-lg">
-          {t("fork.body")}
-        </P>
-      </PageSection>
+      </Div>
 
       <PageSection
-        title={t("enterprise.title")}
-        intro={t("enterprise.description")}
+        title={t("help.title")}
+        intro={t("help.description")}
         centeredHeader
       >
-        <Div className="mx-auto max-w-3xl rounded-2xl border border-border bg-card p-5 shadow-xs md:p-10">
+        <Div className="mx-auto max-w-2xl rounded-2xl border border-border bg-card p-5 shadow-xs md:p-8">
           <ContactFormSection
             locale={locale}
             user={publicUser}
             platform={platform}
+            embedded
           />
         </Div>
       </PageSection>

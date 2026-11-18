@@ -13,6 +13,9 @@
 
 # PGlite embedded database (local dev only)
 /data.db
+/data.db.pg
+/data.hermes.db
+/data.hermes.db.pg
 /src/vibe/tooling/check/test-project/.tmp
 
 # react native

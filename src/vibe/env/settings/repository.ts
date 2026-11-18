@@ -20,6 +20,7 @@ import {
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
+import { isDefaultAdminPassword } from "../../identity/default-admin-password";
 import type { EndpointLogger } from "../../logger/types";
 import type { EnvExample } from "../define-env";
 import {
@@ -37,9 +38,6 @@ import type {
 import type { SystemSettingsT } from "./i18n";
 
 export class SystemSettingsRepository {
-  /** Sentinel password that triggers onboarding */
-  private static readonly DEFAULT_PASSWORD_SENTINEL = "change-me-now";
-
   /** Patterns for detecting sensitive env keys by name */
   private static readonly SENSITIVE_PATTERNS = [
     "_KEY",
@@ -213,20 +211,20 @@ export class SystemSettingsRepository {
         });
 
       // Check onboarding issues
-      const coreModule = modules.find((m) => m.name === "env");
-      if (coreModule) {
-        const passwordSetting = coreModule.settings.find(
+      // VIBE_ADMIN_USER_PASSWORD lives in the identity env module.
+      const identityModule = modules.find((m) => m.name === "identity");
+      if (identityModule) {
+        const passwordSetting = identityModule.settings.find(
           (s) => s.key === "VIBE_ADMIN_USER_PASSWORD",
         );
         // Check raw env value (not masked) for sentinel
         const { envModules: rawModules } =
           await import("@/generated/env/index");
-        const rawEnv = rawModules["env"]?.env as
-          | Record<string, string | number | boolean | null | undefined>
-          | undefined;
+        const rawEnv = rawModules["identity"]?.env;
+        const rawPassword = rawEnv?.["VIBE_ADMIN_USER_PASSWORD"];
         if (
-          rawEnv?.["VIBE_ADMIN_USER_PASSWORD"] ===
-          SystemSettingsRepository.DEFAULT_PASSWORD_SENTINEL
+          typeof rawPassword === "string" &&
+          isDefaultAdminPassword(rawPassword)
         ) {
           onboardingIssues.push(t("errors.defaultPasswordDetected"));
         }
