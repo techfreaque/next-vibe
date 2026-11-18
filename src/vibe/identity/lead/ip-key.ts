@@ -10,6 +10,12 @@
 export const IP_POOL_PREFIX = { v4: 32, v6: 64 } as const;
 export const IP_SUBNET_PREFIX = { v4: 24, v6: 64 } as const;
 
+/**
+ * `leads.metadata` flag (boolean true) for automation leads that must never be
+ * IP-linked, e.g. the HA health probe's cookie lead. Admin-set only.
+ */
+export const IP_LINK_EXEMPT_METADATA_KEY = "ipLinkExempt";
+
 /** Guests seen from one IP pool key within this window share ONE guest pool */
 export const GUEST_IP_POOL_WINDOW_HOURS = 24;
 

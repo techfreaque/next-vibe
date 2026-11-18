@@ -214,6 +214,11 @@ cmd_status() {
   echo "peer says: $(peer_ssh state || echo unreachable)"
   [ -f "$STATE_DIR/peer-down-since" ] && echo "peer down since $(date -u -d @"$(cat "$STATE_DIR/peer-down-since")" +%T) UTC"
   [ -d "$APP_DIR" ] && [ -f "$APP_DIR/.ha-overrides" ] && echo "app overrides: $(cut -d= -f1 "$APP_DIR/.ha-overrides" | tr '\n' ' ')"
+  if [ "$APP_HEAL" = 1 ]; then
+    local deg
+    echo "app db (real query): $(app_db_ok && echo ok || echo FAILING)"
+    deg="$(wg_link_degraded)" && echo "wg link: DEGRADED ($deg)" || echo "wg link: ok"
+  fi
   echo "app self-heal: $( [ "$APP_HEAL" = 1 ] && echo on || echo off) ($HEAL_APP via $HEAL_URL)$( [ -f "$STATE_DIR/app-heal-hold" ] && echo ", HOLD set")$( [ -f "$STATE_DIR/app-bad-since" ] && echo ", failing since $(date -u -d @"$(cat "$STATE_DIR/app-bad-since")" +%T) UTC"), heals last 6h: $(awk -v c=$(( $(date +%s) - 21600 )) '$1 >= c' "$STATE_DIR/app-heal-log" 2>/dev/null | wc -l)"
   return 0
 }
@@ -406,8 +411,10 @@ While the link is down: S2 app has no DB (DNS probe pulls S2), the standby does 
 # probe as `ha-node-drain.sh local-probe`) and restarts ONLY this node's
 # unbottled app container when:
 #   - the probe has failed continuously for HA_APP_HEAL_AFTER s (default 300),
-#   - while the app's database answers (pg_isready over the same path the app
-#     uses), so a restart can actually help (a dead link is left alone),
+#   - while the app's database answers a real query (as the app's user, over
+#     the same path the app uses, ~16 KB result, short timeout) and the WG
+#     link is not degraded (handshake age, full-size ping loss), so a restart
+#     can actually help (a dead or lossy link is left alone; 2026-11-18),
 #   - the container is running and older than HA_APP_HEAL_GRACE s (240),
 #   - no deploy is in progress (app drain request / Caddy drain file) and no
 #     $STATE_DIR/app-heal-hold file exists,
@@ -433,13 +440,33 @@ app_probe() {
   printf '%s' "$body" | grep -qF '"success":true'
 }
 
-# Does the database the app is configured for answer the Postgres protocol?
-# S2 standby: S1's Postgres via 10.88.0.1:5432 (HAProxy over WG; a bare TCP
-# connect would succeed even with its backend down, so ask pg_isready from the
-# replica container, which shares the app's path). S2 primary / S1: local.
+# Does the database the app is configured for answer a REAL query?
+# S2 standby: S1's Postgres via 10.88.0.1:5432 (HAProxy over WG). 2026-11-18:
+# pg_isready passed over a lossy WG link (its tiny packets got through) while
+# the app's bigger query packets were lost, so the watchdog restarted the app
+# mid-outage and S1 kept the old pool's sessions. Now: log in exactly like the
+# app (its DATABASE_URL from $APP_DB_URL_FILE, user s2app, same HAProxy
+# forward) from the replica container, which shares the app's network path,
+# and pull a ~16 KB row (several full-MTU packets) under a short timeout.
+# The URL is passed on stdin, never on a command line. S2 primary / S1: local.
+APP_DB_URL_FILE="${HA_APP_DB_URL_FILE:-$APP_DIR/.ha-database-url}"
+APP_DB_PROBE_BYTES="${HA_APP_DB_PROBE_BYTES:-16000}"
+app_db_query_ok() {
+  local url n
+  url="$(head -1 "$APP_DB_URL_FILE" 2>/dev/null)"; url="${url%%\?*}"
+  [ -n "$url" ] || return 1
+  n="$(printf '%s' "$url" | timeout "${HA_APP_DB_PROBE_TIMEOUT:-10}" docker exec -i -e PGCONNECT_TIMEOUT=4 \
+    -e PGOPTIONS="-c statement_timeout=4000" "$LOCAL_PG" sh -c \
+    "psql \"\$(cat)\" -XAtq -v ON_ERROR_STOP=1 -c \"select repeat('x', $APP_DB_PROBE_BYTES)\" | wc -c" 2>/dev/null)"
+  [ "${n:-0}" -eq $((APP_DB_PROBE_BYTES + 1)) ] 2>/dev/null
+}
+
 app_db_ok() {
   if [ "$NODE" = "s2" ] && [ "$(role)" != "primary" ]; then
-    if [ -n "$LOCAL_PG" ]; then
+    if [ -n "$LOCAL_PG" ] && [ -f "$APP_DB_URL_FILE" ]; then
+      app_db_query_ok
+    elif [ -n "$LOCAL_PG" ]; then
+      log "no $APP_DB_URL_FILE: falling back to pg_isready for the app DB check"
       docker exec "$LOCAL_PG" pg_isready -q -t 3 -h "$PEER_WG" -p "${HA_PEER_PG_PORT:-5432}" >/dev/null 2>&1
     else
       tcp "$PEER_WG" "${HA_PEER_PG_PORT:-5432}"
@@ -447,7 +474,27 @@ app_db_ok() {
     return
   fi
   [ -n "$LOCAL_PG" ] || return 0
-  docker exec "$LOCAL_PG" pg_isready -q -t 3 >/dev/null 2>&1
+  docker exec "$LOCAL_PG" psql -U postgres -XAtqc 'select 1' >/dev/null 2>&1
+}
+
+# Is the WG link degraded? Prints the reason and returns 0 when it is.
+# Only meaningful where the app's DB runs over WG (S2 standby). Signals:
+# handshake older than HA_WG_HEAL_MAX_HS_AGE s (240; a live link re-handshakes
+# every ~2 min), or >= HA_WG_HEAL_MAX_LOSS_PCT % (10) loss on 10 full-size
+# pings (lossy links drop big packets first, see 2026-11-18).
+wg_link_degraded() {
+  [ "$NODE" = "s2" ] && [ "$(role)" != "primary" ] || return 1
+  local hs age loss
+  if command -v wg >/dev/null 2>&1 && [ -n "$(wg show wg0 peers 2>/dev/null)" ]; then
+    hs="$(wg show wg0 latest-handshakes 2>/dev/null | awk '{print $2}' | head -1)"
+    age=$(( $(date +%s) - ${hs:-0} ))
+    if [ "$age" -ge "${HA_WG_HEAL_MAX_HS_AGE:-240}" ]; then echo "handshake ${age}s old"; return 0; fi
+  fi
+  loss="$(ping -q -n -c 10 -i 0.2 -W 1 -s "${HA_WG_HEAL_PING_SIZE:-1300}" "$PEER_WG" 2>/dev/null \
+    | sed -n 's/.* \([0-9.]*\)% packet loss.*/\1/p')"
+  loss="${loss%%.*}"
+  if [ "${loss:-100}" -ge "${HA_WG_HEAL_MAX_LOSS_PCT:-10}" ]; then echo "${loss:-100}% loss on full-size pings to $PEER_WG"; return 0; fi
+  return 1
 }
 
 app_deploy_in_progress() {
@@ -476,10 +523,18 @@ app_heal_check() {
   up_s=$((now - started_s))
   if [ "$up_s" -lt "${HA_APP_HEAL_GRACE:-240}" ]; then rm -f "$STATE_DIR/app-bad-since"; return 0; fi
   if app_deploy_in_progress; then rm -f "$STATE_DIR/app-bad-since"; return 0; fi
+  local degraded
+  if degraded="$(wg_link_degraded)"; then
+    # Lossy/dead link: a restart cannot help and leaks the old pool's
+    # sessions on S1; the clock restarts once the link is clean again.
+    log "app probe failing but the WG link is degraded ($degraded): not counting towards self-heal"
+    rm -f "$STATE_DIR/app-bad-since"
+    return 0
+  fi
   if ! app_db_ok; then
     # Link/DB problem: restarting the app cannot help; the clock restarts
     # once the database answers again.
-    [ -f "$STATE_DIR/app-bad-since" ] && log "app probe failing but its database is unreachable: not counting towards self-heal"
+    log "app probe failing but its database does not answer a real query: not counting towards self-heal"
     rm -f "$STATE_DIR/app-bad-since"
     return 0
   fi

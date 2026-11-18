@@ -74,6 +74,8 @@ import {
 } from "./enum";
 import type { LeadsT } from "./i18n";
 import { scopedTranslation } from "./i18n";
+import { IP_LINK_EXEMPT_METADATA_KEY } from "./ip-key";
+import { isServerSideIp } from "./middleware-ops";
 import type {
   LeadDetailResponse,
   LeadListResponseType,
@@ -2521,6 +2523,8 @@ export class LeadsRepository {
             AND l2.status = ${LeadStatus.WEBSITE_USER}
             AND l1.created_at > ${windowStart}
             AND l2.created_at > ${windowStart}
+            AND COALESCE(l1.metadata->>${IP_LINK_EXEMPT_METADATA_KEY}, 'false') <> 'true'
+            AND COALESCE(l2.metadata->>${IP_LINK_EXEMPT_METADATA_KEY}, 'false') <> 'true'
             -- Exclude already linked pairs
             AND NOT EXISTS (
               SELECT 1 FROM lead_lead_links lll
@@ -2531,7 +2535,9 @@ export class LeadsRepository {
         `,
       );
 
-      return pairs.rows.map((row) => ({
+      return pairs.rows
+        .filter((row) => !isServerSideIp(row.ip_address))
+        .map((row) => ({
         leadId1: row.lead_id1,
         leadId2: row.lead_id2,
         ipAddress: row.ip_address,

@@ -65,6 +65,10 @@ services:
       - ./zone.unbottled.ai.tmpl:/zone.tmpl:ro
       # "lead_id=<uuid>" of the probe lead; create once per deployment:
       #   curl -s -D - -o /dev/null -A unbottled-ha-probe/1 https://unbottled.ai/en-US/story | grep -i set-cookie
+      # then exempt it from same-IP guest linking (else every guest lead from
+      # the IP it was created from joins its pool and the probe's credits
+      # query grows with each one; 2026-11-18):
+      #   UPDATE leads SET metadata = metadata || '{"ipLinkExempt": true}' WHERE id = '<uuid>';
       - ${EDGE_PROBE_COOKIE_FILE:-./probe-cookie}:/probe-cookie:ro
       - ${EDGE_ZONE_DIR:-/srv/ha-edge/zones}:/etc/powerdns/zones
     depends_on:

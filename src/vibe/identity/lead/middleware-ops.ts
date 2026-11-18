@@ -1,13 +1,20 @@
 import { and, eq, isNull, ne, or, sql } from "drizzle-orm";
 
+import { coreEnv } from "../../core/env";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "../../core/i18n/core/language-utils";
 import { parseError } from "../../core/utils/parse-error";
+import { isPrivateAddress } from "../../core/utils/ssrf-guard";
 import { db } from "../../database";
+import { Environment } from "../../env/env-util";
 import type { EndpointLogger } from "../../logger/types";
 import { leadLeadLinks, leads, userLeadLinks } from "./db";
 import { LeadSource, LeadStatus } from "./enum";
-import { GUEST_IP_POOL_WINDOW_HOURS, ipPoolKey } from "./ip-key";
+import {
+  GUEST_IP_POOL_WINDOW_HOURS,
+  IP_LINK_EXEMPT_METADATA_KEY,
+  ipPoolKey,
+} from "./ip-key";
 
 interface ClientInfo {
   userAgent?: string;
@@ -110,11 +117,30 @@ export async function createAnonymousLead(
 }
 
 /**
+ * Production sees real visitors only through the edge proxy (X-Forwarded-For
+ * = the client). A loopback/private address there is the server talking to
+ * itself (deploy warmup, health probes over the docker bridge / WireGuard),
+ * never a guest: pooling those leads glues unrelated server traffic into one
+ * ever-growing pool. Dev/test/preview keep linking (local runs are all
+ * 127.0.0.1 and the anti-farming tests use private ranges).
+ */
+export function isServerSideIp(
+  ipAddress: string,
+  production: boolean = coreEnv.NODE_ENV === Environment.PRODUCTION &&
+    !coreEnv.IS_PREVIEW_MODE,
+): boolean {
+  return production && isPrivateAddress(ipAddress);
+}
+
+/**
  * Guests behind one IP share ONE guest pool: a new lead links (ip_match) to
  * every guest lead seen from the same IP key (IPv4 /32, IPv6 /64) within the
  * last GUEST_IP_POOL_WINDOW_HOURS, whatever browser, incognito or fingerprint.
  * Leads that belong to an account are never IP-linked: accounts only join
  * devices through strong signals (login, same lead cookie).
+ * Never linked: server-side IPs (see isServerSideIp) and leads flagged
+ * `metadata.ipLinkExempt` (the HA health probe's lead, set by an admin: a
+ * request header or user agent would let anyone opt out of guest pooling).
  */
 async function linkLeadsByIp(
   newLeadId: string,
@@ -123,7 +149,7 @@ async function linkLeadsByIp(
 ): Promise<void> {
   try {
     const ipKey = ipPoolKey(ipAddress);
-    if (!ipKey) {
+    if (!ipKey || isServerSideIp(ipAddress)) {
       return;
     }
     const since = new Date(
@@ -143,6 +169,7 @@ async function linkLeadsByIp(
             sql`${leads.metadata}->>'ipAddress' = ${ipAddress}`,
           ),
           sql`GREATEST(${leads.createdAt}, ${leads.updatedAt}) >= ${since}`,
+          sql`COALESCE(${leads.metadata}->>${IP_LINK_EXEMPT_METADATA_KEY}, 'false') <> 'true'`,
           sql`NOT EXISTS (SELECT 1 FROM ${userLeadLinks} ull WHERE ull.lead_id = ${leads.id})`,
         ),
       )
