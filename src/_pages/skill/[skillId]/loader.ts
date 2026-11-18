@@ -34,7 +34,6 @@ import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/sk
 import { SkillsRepository } from "next-vibe/agent/skills/repository";
 import { getBestTtsModel } from "next-vibe/agent/text-to-speech/models";
 import { getBestVideoGenModel } from "next-vibe/agent/video-generation/models";
-import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { hreflangFor } from "next-vibe/core/i18n/core/seo-locales";
@@ -67,11 +66,6 @@ import {
   type SiteLayoutData,
   tanstackLoader as siteLayoutLoader,
 } from "../../story/layout";
-import { getDesignSamples } from "./design-samples";
-import {
-  selectSkillPageDesign,
-  type SkillPageDesign,
-} from "./design-selection";
 import { scopedTranslation } from "./i18n";
 import { getSkillMessagePrice } from "./message-price";
 import type {
@@ -224,7 +218,6 @@ export async function loadSkillPageMetadata({
 }
 
 export interface SkillLandingPageData {
-  design: SkillPageDesign | null;
   locale: CountryLanguage;
   /** Skill id exactly as in the page URL (may carry `__variant`). */
   skillId: string;
@@ -357,18 +350,15 @@ function builtInRelated(
 }
 
 async function creatorRelated(
-  skillInternalId: string,
+  creatorUserId: string,
+  excludeId: string,
   logger: EndpointLogger,
 ): Promise<RelatedSkill[]> {
   try {
     const { db } = await import("next-vibe/database");
     const { customSkills } = await import("next-vibe/agent/skills/db");
     const { SkillStatus } = await import("next-vibe/agent/skills/enum");
-    const { and, eq, inArray, ne } = await import("drizzle-orm");
-    const owner = db
-      .select({ userId: customSkills.userId })
-      .from(customSkills)
-      .where(eq(customSkills.id, skillInternalId));
+    const { and, eq, ne } = await import("drizzle-orm");
     const rows = await db
       .select({
         id: customSkills.id,
@@ -380,11 +370,12 @@ async function creatorRelated(
       .from(customSkills)
       .where(
         and(
-          inArray(customSkills.userId, owner),
+          eq(customSkills.userId, creatorUserId),
           eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
           eq(customSkills.status, SkillStatus.PUBLISHED),
           eq(customSkills.isDeleted, false),
-          ne(customSkills.id, skillInternalId),
+          ne(customSkills.slug, excludeId),
+          UUID_RE.test(excludeId) ? ne(customSkills.id, excludeId) : undefined,
         ),
       )
       .limit(MAX_RELATED);
@@ -398,7 +389,7 @@ async function creatorRelated(
     logger.warn("Skill page: loading creator's other skills failed", {
       ...parseError(error),
       page: "skill",
-      skillInternalId,
+      creatorUserId,
     });
     return [];
   }
@@ -528,7 +519,6 @@ export async function loadSkillLandingPage({
     freeCredits,
     referralPercent: Math.round(REFERRAL_CONFIG.DIRECT_PERCENTAGE * 100),
     layout,
-    design: selectSkillPageDesign(coreEnv.NODE_ENV, search["design"]),
   };
 
   // Unknown or private skill: real 404. A skill we removed on purpose (old
@@ -653,21 +643,7 @@ export async function loadSkillLandingPage({
   ).slice(0, MAX_PROMPTS);
 
   // Samples only when the page shows the variant they were generated on.
-  const samplesForSkill =
-    getSkillSamples(
-      baseSkillId,
-      locale,
-      base.design ? (activeVariant?.chatModelName ?? null) : undefined,
-    ) ??
-    (base.design && skillData && activeVariant
-      ? getDesignSamples(
-          skillData.skillOwnership === SkillOwnershipType.SYSTEM
-            ? baseSkillId
-            : skillData.internalId,
-          activeVariant.chatModelName,
-          locale,
-        )
-      : null);
+  const samplesForSkill = getSkillSamples(baseSkillId, locale);
   const samples =
     samplesForSkill && activeVariant?.isDefault !== false
       ? samplesForSkill
@@ -678,8 +654,8 @@ export async function loadSkillLandingPage({
     isCommunity && !creator?.leadMagnetActive
       ? loadLeadMagnetConfig(baseSkillId, logger)
       : Promise.resolve(null),
-    creator && skillData?.internalId
-      ? creatorRelated(skillData.internalId, logger)
+    creator
+      ? creatorRelated(creator.userId, baseSkillId, logger)
       : Promise.resolve([]),
   ]);
 

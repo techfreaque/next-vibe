@@ -120,23 +120,20 @@ export function TanstackPage({
   isHomePage,
   newsletterStatus,
   hideNewsletter,
-  header,
   children,
-}: SiteLayoutData & { header?: ReactNode }): JSX.Element {
+}: SiteLayoutData): JSX.Element {
   return (
     <NewsletterStatusProvider status={newsletterStatus}>
       <PageLayout scrollable={true}>
         <Main className="min-h-screen ">
-          {header ?? (
-            <Navbar
-              user={user}
-              userProfile={userProfile}
-              locale={locale}
-              hasSubscription={hasSubscription}
-              navigationItems={navItems}
-              totalModelCount={totalModelCount}
-            />
-          )}
+          <Navbar
+            user={user}
+            userProfile={userProfile}
+            locale={locale}
+            hasSubscription={hasSubscription}
+            navigationItems={navItems}
+            totalModelCount={totalModelCount}
+          />
           {children}
           <Div
             id={SITE_FOOTER_ID}

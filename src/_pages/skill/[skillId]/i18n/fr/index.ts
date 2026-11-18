@@ -34,37 +34,6 @@ export const translations: typeof enTranslations = {
     hacker:
       "Répond en entier aux questions de sécurité : exploits, reconnaissance, défense. Sans refus.",
   },
-  preview: {
-    officeMessage: "Posez le décor au bureau…",
-    storyMessage: "Racontez votre mésaventure…",
-    publishedBy: "Publié par {{name}}",
-    startChat: "Discuter",
-    trial:
-      "{{credits}} crédits offerts, soit environ {{count}} messages. Sans inscription.",
-    youAsk: "Votre question",
-    replies: "Réponse de {{name}}",
-    usePrompt: "Essayer cette question",
-    identity: "Personnage IA",
-    chanCommute: "Transforme mon pire trajet au travail en greentext.",
-    community: "Personnage IA de la communauté",
-    builtin: "Personnage IA intégré",
-    chanPitch: "Faites raconter votre pire journée avec un humour à froid.",
-    adrianPitch: "Jouez votre premier jour au service d’Adrian.",
-    chanDetail:
-      "Une IA au franc-parler des forums anonymes. Elle raconte en quelques lignes des histoires appelées greentexts.",
-    adrianDetail: "Votre patron attend de vous que vous ayez un coup d’avance.",
-    chatNamed: "Discuter avec {{name}}",
-    chatGeneric: "Discuter avec ce personnage",
-    startQuestion: "Choisissez votre première réplique",
-    recorded: "Extrait d’une vraie discussion",
-    adrianStarter1:
-      "Mon patron me convoque à deux réunions en même temps. Jouons la scène.",
-    adrianStarter2: "J’ai raté le délai. Comment réagis-tu ?",
-    adrianStarter3: "Le client arrive en avance. Que veux-tu que je fasse ?",
-    contentNote:
-      "Personnage pour adultes. Les réponses peuvent contenir des propos racistes.",
-    more: "Lire une autre réponse",
-  },
   sticky: {
     tryNamed: "Essayer {{name}}",
   },

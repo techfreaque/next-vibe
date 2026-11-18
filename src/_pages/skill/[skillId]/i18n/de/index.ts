@@ -34,37 +34,6 @@ export const translations: typeof enTranslations = {
     hacker:
       "Beantwortet Security-Fragen vollständig: Exploits, Recon, Abwehr. Ohne Verweigerung.",
   },
-  preview: {
-    officeMessage: "Beschreib die Szene im Büro…",
-    storyMessage: "Was ist schiefgelaufen?",
-    publishedBy: "Veröffentlicht von {{name}}",
-    startChat: "Chat starten",
-    trial:
-      "{{credits}} Gratis-Credits für etwa {{count}} Nachrichten. Ohne Anmeldung.",
-    youAsk: "Du fragst",
-    replies: "Antwort von {{name}}",
-    usePrompt: "Mit dieser Frage starten",
-    identity: "KI-Figur",
-    chanCommute: "Mach aus meiner schlimmsten Zugfahrt einen Greentext.",
-    community: "KI-Figur aus der Community",
-    builtin: "Integrierte KI-Figur",
-    chanPitch: "Lass deinen schlimmsten Tag staubtrocken nacherzählen.",
-    adrianPitch: "Spiel deinen ersten Arbeitstag als Adrians Assistenz.",
-    chanDetail:
-      "Eine direkte Imageboard-KI. Ihre Geschichten in kurzen Zeilen heißen Greentexts.",
-    adrianDetail: "Dein Chef erwartet, dass du ihm einen Schritt voraus bist.",
-    chatNamed: "Mit {{name}} chatten",
-    chatGeneric: "Chat mit dieser Figur starten",
-    startQuestion: "Wähle deinen Einstieg",
-    recorded: "Auszug aus einem echten Chat",
-    adrianStarter1:
-      "Mein Chef schickt mich zu zwei Terminen gleichzeitig. Spiel die Szene.",
-    adrianStarter2: "Ich habe die Frist verpasst. Wie reagierst du?",
-    adrianStarter3: "Der Kunde ist zu früh da. Was soll ich tun?",
-    contentNote:
-      "Figur für Erwachsene. Antworten können rassistische Sprache enthalten.",
-    more: "Weitere Antwort lesen",
-  },
   sticky: {
     tryNamed: "{{name}} ausprobieren",
   },

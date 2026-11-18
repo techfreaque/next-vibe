@@ -518,10 +518,9 @@ const SAMPLES: Record<string, SkillSampleSet> = {
 export function getSkillSamples(
   skillId: string,
   locale: CountryLanguage,
-  model?: string | null,
 ): SkillSample[] | null {
   const set = SAMPLES[skillId];
-  if (!set || (model !== undefined && set.model !== model)) {
+  if (!set) {
     return null;
   }
   const list = set.samples[getLanguageFromLocale(locale)];
