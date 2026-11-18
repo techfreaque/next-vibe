@@ -50,6 +50,7 @@ import { scopedTranslation } from "../i18n";
 import { isOutOfCreditsErrorCode } from "../widget/out-of-credits-card";
 import { getAudioQueue } from "./audio-queue";
 import { useAIStreamStore } from "./store";
+import { getUploadTooLargeMessage } from "./upload-limit";
 
 /**
  * Hook return type
@@ -131,6 +132,35 @@ export function useAIStream(): UseAIStreamReturn {
         getCachedUncensoredConsent(logger) === false
       ) {
         holdForConsent(data, model?.name ?? data.model);
+        return false;
+      }
+
+      // Files above the proxy body limit arrive truncated and the server
+      // sees an empty body. Stop here with the real reason.
+      const uploadTooLargeMessage = getUploadTooLargeMessage(data, locale);
+      if (uploadTooLargeMessage) {
+        logger.warn("Stream request blocked: upload too large", {
+          operation: data.operation,
+          threadId: data.threadId,
+          rootFolderId: data.rootFolderId,
+          attachmentCount: data.attachments?.length ?? 0,
+        });
+        if (data.threadId) {
+          addErrorMessageToChat(
+            data.threadId,
+            data.rootFolderId,
+            uploadTooLargeMessage,
+            "HTTP_ERROR",
+            null,
+            null,
+            logger,
+          );
+        }
+        toast({
+          title: t("error.title"),
+          description: uploadTooLargeMessage,
+          variant: "destructive",
+        });
         return false;
       }
 

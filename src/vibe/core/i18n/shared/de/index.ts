@@ -80,6 +80,8 @@ export const translations: typeof enTranslations = {
     invalidErrorResponseDetail: "Fehlerhafte Fehlerantwort: {{error}}",
     csrfFailedDetail: "Anfrage vom CSRF-Schutz blockiert: {{reason}}",
     csrfReasonUnknown: "CSRF-Token-Prüfung fehlgeschlagen",
+    uploadTooLargeDetail:
+      "Upload zu groß: {{size}} MB. Pro Nachricht sind bis zu {{limit}} MB an Dateien möglich. Datei entfernen oder verkleinern und erneut senden.",
     internalDetail: "Interner Fehler: {{error}}",
     authenticationFailed: "Benutzer-Authentifizierung fehlgeschlagen",
   },

@@ -27,6 +27,12 @@ import { Methods } from "../definition/enums";
 import type { CountryLanguage } from "../i18n/core/config";
 import { scopedTranslation as sharedScopedTranslation } from "../i18n/shared";
 import { parseError } from "../utils/parse-error";
+import {
+  bytesToMegabytes,
+  isContentLengthTooLarge,
+  MAX_REQUEST_BODY_BYTES,
+  MAX_UPLOAD_MEGABYTES,
+} from "./body-limit";
 import { ErrorResponseError } from "./error-response-error";
 import { type ApiHandlerOptions, createGenericHandler } from "./handler";
 import { parseRequestBody, parseSearchParams } from "./next-request-parser";
@@ -186,6 +192,35 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
               reason: csrfCheck.reason ?? sharedT("errors.csrfReasonUnknown"),
             }),
             errorType: ErrorResponseTypes.FORBIDDEN,
+          }),
+          logger,
+          locale,
+          endpoint,
+          request,
+        );
+      }
+
+      // The proxy truncates bodies above MAX_REQUEST_BODY_BYTES, so parsing
+      // would yield `{}` and a misleading "every field missing" validation
+      // error. Name the real cause instead.
+      const contentLength = request.headers.get("content-length");
+      if (
+        endpoint.method !== Methods.GET &&
+        isContentLengthTooLarge(contentLength)
+      ) {
+        logger.warn("Request body exceeds proxy limit", {
+          contentLength,
+          limit: MAX_REQUEST_BODY_BYTES,
+          contentType: request.headers.get("content-type") ?? "(none)",
+        });
+        const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
+        return wrapErrorResponse(
+          fail({
+            message: sharedT("errors.uploadTooLargeDetail", {
+              size: bytesToMegabytes(Number(contentLength)),
+              limit: MAX_UPLOAD_MEGABYTES,
+            }),
+            errorType: ErrorResponseTypes.INVALID_PAYLOAD_ERROR,
           }),
           logger,
           locale,

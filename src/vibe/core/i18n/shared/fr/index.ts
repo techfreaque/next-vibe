@@ -80,6 +80,8 @@ export const translations: typeof enTranslations = {
     invalidErrorResponseDetail: "Réponse d'erreur mal formée : {{error}}",
     csrfFailedDetail: "Requête bloquée par la protection CSRF : {{reason}}",
     csrfReasonUnknown: "La validation du jeton CSRF a échoué",
+    uploadTooLargeDetail:
+      "Envoi trop lourd : {{size}} Mo. Un message accepte jusqu'à {{limit}} Mo de fichiers. Retirez ou réduisez un fichier, puis renvoyez.",
     internalDetail: "Erreur interne : {{error}}",
     authenticationFailed: "L'authentification de l'utilisateur a échoué",
   },

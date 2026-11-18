@@ -81,6 +81,8 @@ export const translations = {
     invalidErrorResponseDetail: "Malformed error response: {{error}}",
     csrfFailedDetail: "Request blocked by CSRF protection: {{reason}}",
     csrfReasonUnknown: "CSRF token validation failed",
+    uploadTooLargeDetail:
+      "Upload too big: {{size}} MB. One message can carry up to {{limit}} MB of files. Remove or shrink a file and send again.",
     internalDetail: "Internal error: {{error}}",
     authenticationFailed: "User authentication failed",
   },

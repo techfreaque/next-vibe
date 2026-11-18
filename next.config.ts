@@ -2,6 +2,8 @@ import path from "node:path";
 
 import type { NextConfig } from "next";
 
+import { MAX_REQUEST_BODY_BYTES } from "./src/vibe/core/route/body-limit";
+
 const nextConfig: NextConfig = {
   typedRoutes: true,
   productionBrowserSourceMaps: false,
@@ -26,8 +28,9 @@ const nextConfig: NextConfig = {
     // webpackBuildWorker:
     //   process.env.NODE_ENV !== "production" ||
     //   process.env.NEXT_PUBLIC_LOCAL_MODE === "true",
-    // Audio uploads are allowed up to 25 MB — raise the proxy body limit to match.
-    proxyClientMaxBodySize: 30 * 1024 * 1024,
+    // Bodies above this are truncated by the proxy. Clients and next-handler
+    // check against the same constant (src/vibe/core/route/body-limit.ts).
+    proxyClientMaxBodySize: MAX_REQUEST_BODY_BYTES,
     webpackMemoryOptimizations: true,
     // parallelServerBuildTraces: true,
     // parallelServerCompiles: true,
