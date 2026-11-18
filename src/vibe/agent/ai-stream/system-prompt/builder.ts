@@ -120,7 +120,7 @@ export interface SystemPromptParams {
   headless?: boolean;
   subAgentDepth: number;
   excludeMemories?: boolean;
-  /** Text-only stream (see SystemPromptServerParams.toolsDisabled). */
+  /** Whether the model receives no tool schemas. */
   toolsDisabled?: boolean;
   memoryLimit?: number | null;
   mediaCapabilities?: MediaCapabilitiesParams;

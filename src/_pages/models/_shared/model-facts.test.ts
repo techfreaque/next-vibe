@@ -5,6 +5,7 @@ import {
 } from "next-vibe/agent/ai-stream/models";
 import {
   calculateCreditCost,
+  CHAT_MESSAGE_PRICE_REFERENCE,
   estimateTurnCredits,
 } from "next-vibe/agent/models/models";
 import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
@@ -23,8 +24,6 @@ import {
   isModelPageAlias,
   listModelFacts,
   PUBLIC_CHAT_MODEL_IDS,
-  REFERENCE_INPUT_TOKENS,
-  REFERENCE_OUTPUT_TOKENS,
   suggestComparisons,
   toModelSlug,
 } from "./model-facts";
@@ -176,8 +175,8 @@ describe("model page price per message", () => {
         ...options.map((o) =>
           calculateCreditCost(
             o,
-            REFERENCE_INPUT_TOKENS,
-            REFERENCE_OUTPUT_TOKENS,
+            CHAT_MESSAGE_PRICE_REFERENCE.inputTokens,
+            CHAT_MESSAGE_PRICE_REFERENCE.outputTokens,
           ),
         ),
       );
@@ -185,8 +184,8 @@ describe("model page price per message", () => {
         ...options.map((o) =>
           estimateTurnCredits(
             o,
-            REFERENCE_INPUT_TOKENS,
-            REFERENCE_OUTPUT_TOKENS,
+            CHAT_MESSAGE_PRICE_REFERENCE.inputTokens,
+            CHAT_MESSAGE_PRICE_REFERENCE.outputTokens,
           ),
         ),
       );

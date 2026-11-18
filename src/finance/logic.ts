@@ -37,8 +37,9 @@ export interface Thresholds {
   alertDedupHours: number;
   minRevenueUsd: number;
   minCostUsd: number;
-  openrouterLowBalanceUsd: number;
-  openrouterLowBalanceDays: number;
+  openrouterAutoTopUpFloorUsd: number;
+  openrouterAutoTopUpGraceHours: number;
+  gabLowBalanceCredits: number;
   nanoGptLowBalanceUsd: number;
   nanoGptLowBalanceDays: number;
   veniceLowBalanceUsd: number;
@@ -65,8 +66,11 @@ export const THRESHOLD_FIELD: Readonly<
   [ThresholdKey.ALERT_DEDUP_HOURS]: "alertDedupHours",
   [ThresholdKey.MIN_REVENUE_USD]: "minRevenueUsd",
   [ThresholdKey.MIN_COST_USD]: "minCostUsd",
-  [ThresholdKey.OPENROUTER_LOW_BALANCE_USD]: "openrouterLowBalanceUsd",
-  [ThresholdKey.OPENROUTER_LOW_BALANCE_DAYS]: "openrouterLowBalanceDays",
+  [ThresholdKey.OPENROUTER_AUTO_TOP_UP_FLOOR_USD]:
+    "openrouterAutoTopUpFloorUsd",
+  [ThresholdKey.OPENROUTER_AUTO_TOP_UP_GRACE_HOURS]:
+    "openrouterAutoTopUpGraceHours",
+  [ThresholdKey.GAB_LOW_BALANCE_CREDITS]: "gabLowBalanceCredits",
   [ThresholdKey.NANO_GPT_LOW_BALANCE_USD]: "nanoGptLowBalanceUsd",
   [ThresholdKey.NANO_GPT_LOW_BALANCE_DAYS]: "nanoGptLowBalanceDays",
   [ThresholdKey.VENICE_LOW_BALANCE_USD]: "veniceLowBalanceUsd",
@@ -83,8 +87,10 @@ export interface ThresholdOverride {
 export function resolveThresholds(rows: ThresholdOverride[]): Thresholds {
   const resolved: Thresholds = { ...DEFAULT_THRESHOLDS };
   for (const row of rows) {
-    if (row.enabled) {
-      resolved[THRESHOLD_FIELD[row.key]] = row.value;
+    const field = THRESHOLD_FIELD[row.key];
+    // Older deployments can have overrides for the retired OpenRouter policy.
+    if (row.enabled && field !== undefined) {
+      resolved[field] = row.value;
     }
   }
   return resolved;
@@ -349,10 +355,6 @@ export const LOW_BALANCE_THRESHOLDS: Partial<
     { absoluteUsd: keyof Thresholds; daysOfSpend: keyof Thresholds }
   >
 > = {
-  [FinanceSource.OPENROUTER]: {
-    absoluteUsd: "openrouterLowBalanceUsd",
-    daysOfSpend: "openrouterLowBalanceDays",
-  },
   [FinanceSource.NANO_GPT]: {
     absoluteUsd: "nanoGptLowBalanceUsd",
     daysOfSpend: "nanoGptLowBalanceDays",
@@ -362,6 +364,54 @@ export const LOW_BALANCE_THRESHOLDS: Partial<
     daysOfSpend: "veniceLowBalanceDays",
   },
 };
+
+export function detectOpenRouterLowBalance(input: {
+  balanceUsd: number;
+  floorUsd: number;
+  graceHours: number;
+  since: Date;
+  now: Date;
+}): AlertCandidate | null {
+  const { balanceUsd, floorUsd, graceHours, since, now } = input;
+  const elapsedHours = (now.getTime() - since.getTime()) / HOUR_MS;
+  if (graceHours > 0 && elapsedHours <= graceHours) {
+    return null;
+  }
+  return {
+    type: FinanceAlertType.LOW_BALANCE,
+    severity: AlertSeverity.CRITICAL,
+    subject: FinanceSource.OPENROUTER,
+    dedupKey: `low-balance:${FinanceSource.OPENROUTER}:critical`,
+    message: `OpenRouter balance is ${money(balanceUsd)}, below ${money(floorUsd)} for ${round2(elapsedHours)} hours. Check whether the automatic top-up succeeded.`,
+    metadata: {
+      balanceUsd: round2(balanceUsd),
+      thresholdUsd: floorUsd,
+      graceHours,
+      elapsedHours: round2(elapsedHours),
+    },
+  };
+}
+
+export function detectGabLowBalance(
+  balanceCredits: number,
+  warningCredits: number,
+): AlertCandidate | null {
+  if (warningCredits <= 0 || balanceCredits >= warningCredits) {
+    return null;
+  }
+  const criticalCredits =
+    warningCredits * FINANCE_CONFIG.lowBalanceCriticalFraction;
+  const critical = balanceCredits < criticalCredits;
+  const thresholdCredits = critical ? criticalCredits : warningCredits;
+  return {
+    type: FinanceAlertType.LOW_BALANCE,
+    severity: critical ? AlertSeverity.CRITICAL : AlertSeverity.WARNING,
+    subject: FinanceSource.GAB,
+    dedupKey: `low-balance:${FinanceSource.GAB}:${critical ? "critical" : "warning"}`,
+    message: `Low Gab AI balance: ${balanceCredits} credits remaining, below ${thresholdCredits}. Check the account's credits and top-up settings.`,
+    metadata: { balanceCredits, thresholdCredits },
+  };
+}
 
 export function detectLowBalance(input: {
   provider: typeof FinanceSourceValue;

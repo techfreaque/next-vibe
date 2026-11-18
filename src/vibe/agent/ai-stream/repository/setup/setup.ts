@@ -978,8 +978,9 @@ export async function setupAiStream(params: {
     subAgentDepth: params.subAgentDepth,
     excludeMemories: params.excludeMemories,
     toolsDisabled:
-      params.toolsOverride !== undefined &&
-      Object.keys(params.toolsOverride).length === 0,
+      !modelConfig.supportsTools ||
+      (params.toolsOverride !== undefined &&
+        Object.keys(params.toolsOverride).length === 0),
     memoryLimit: resolvedToolConfig.memoryLimit,
     mediaCapabilities: {
       nativeOutputs: modelConfig.outputs ?? [],

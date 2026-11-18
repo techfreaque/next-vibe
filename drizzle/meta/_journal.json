@@ -1297,6 +1297,13 @@
       "when": 1795025204302,
       "tag": "20261118180644_finance_low_balance",
       "breakpoints": true
+    },
+    {
+      "idx": 185,
+      "version": "7",
+      "when": 1795034490942,
+      "tag": "20261118204130_finance_provider_monitoring",
+      "breakpoints": true
     }
   ]
 }

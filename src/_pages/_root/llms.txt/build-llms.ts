@@ -34,13 +34,12 @@ import {
   productsRepository,
 } from "@/products/platform-products";
 import { REFERRAL_CONFIG } from "@/referral/config";
+import { CHAT_MESSAGE_PRICE_REFERENCE } from "@/vibe/agent/models/models";
 
 import {
   formatTokenCount,
   listModelFacts,
   type ModelFacts,
-  REFERENCE_INPUT_TOKENS,
-  REFERENCE_OUTPUT_TOKENS,
 } from "../../models/_shared/model-facts";
 import { formatNumber, tierName } from "../../models/_shared/model-format";
 import { listMediaFacts } from "../../models/_shared/model-media-facts";
@@ -315,8 +314,8 @@ export async function buildLlmsTxt(
     sections.push(
       `## ${t("full.chatHeading")}`,
       t("full.chatIntro", {
-        inputTokens: formatTokenCount(REFERENCE_INPUT_TOKENS),
-        outputTokens: formatTokenCount(REFERENCE_OUTPUT_TOKENS),
+        inputTokens: formatTokenCount(CHAT_MESSAGE_PRICE_REFERENCE.inputTokens),
+        outputTokens: formatTokenCount(CHAT_MESSAGE_PRICE_REFERENCE.outputTokens),
       }),
       currentChat.map(chatLink).join("\n"),
       `### ${t("full.legacyHeading")}`,

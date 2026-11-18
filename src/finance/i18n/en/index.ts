@@ -47,8 +47,10 @@ export const translations = {
       critical: "Critical",
     },
     threshold: {
-      openrouterLowBalanceUsd: "OpenRouter balance floor (USD)",
-      openrouterLowBalanceDays: "OpenRouter balance runway (days)",
+      openrouterAutoTopUpFloorUsd: "OpenRouter auto top-up alert floor (USD)",
+      openrouterAutoTopUpGraceHours:
+        "OpenRouter auto top-up grace period (hours)",
+      gabLowBalanceCredits: "Gab AI balance floor (credits)",
       nanoGptLowBalanceUsd: "NanoGPT balance floor (USD)",
       nanoGptLowBalanceDays: "NanoGPT balance runway (days)",
       veniceLowBalanceUsd: "Venice balance floor (USD)",
@@ -181,6 +183,8 @@ export const translations = {
       providers: {
         title: "Provider balances",
         lastSpend: "Spent since last reading: {{amount}}",
+        lastSpendEstimate: "Estimated spend since last reading: {{amount}}",
+        lastNativeSpend: "API charges through the last closed hour: {{amount}}",
         noSpend: "No spend measured yet",
       },
       revenue: {

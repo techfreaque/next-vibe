@@ -6,14 +6,10 @@
  *                GET  /api/v1/key                     documented  data.usage (this key's spend)
  *  - NanoGPT     POST /api/check-balance              documented  usd_balance
  *  - Venice      GET  /api/v1/api_keys/rate_limits    documented  data.balances.USD
- *  - Gab         GET  /v1/credits                     undocumented total_available (own credit unit)
- *                Flat-rate "Gab Plus" plan: credits are a monthly allotment, the
- *                real cost is the plan fee (FINANCE_CONFIG.fixedMonthlyCostUsd),
- *                added to each tracked day by the rollup.
- *  - uncensored.ai   no API: credits live in a Supabase table read with the
- *                    dashboard session (re-probed 2026-11-12: /api/* is the SPA
- *                    fallback, api.uncensored.ai does not resolve)
- *  - FreedomGPT  no API: /credits /balance /usage /user all 404
+ *  - Gab         GET  /v1/credits and /v1/usage       documented balance and charges in credits
+ *                The Gab Plus plan fee is booked separately in the USD rollup.
+ *  - uncensored.ai   developer dashboard shows credits; the API documents inference only
+ *  - FreedomGPT      public API reference exposes models and inference
  * The two API-less providers are priced from OUR usage log instead: billed calls
  * in credit_transactions x the per-call raw price from the model definitions,
  * reported as a cumulative usage counter so the same snapshot / delta / anomaly
@@ -77,6 +73,13 @@ export interface ProviderAdapter {
     apiKey: string,
     ledger: UsageLedgerPort,
   ): Promise<ProviderResult>;
+  /** Provider-reported charges in the balance's own unit, in [from, to). */
+  fetchSpendNative?(
+    http: FinanceHttp,
+    apiKey: string,
+    from: Date,
+    to: Date,
+  ): Promise<{ spend: number; reason: null } | { spend: null; reason: string }>;
 }
 
 const bearer = (apiKey: string): Record<string, string> => ({
@@ -223,12 +226,28 @@ const venice: ProviderAdapter = {
   },
 };
 
+const gabCredits = numeric.pipe(z.number().nonnegative());
+
 const gabSchema = z.object({
-  total_available: numeric,
+  total_available: gabCredits,
   monthly_allotment: z
-    .object({ used: numeric, total: numeric.optional() })
+    .object({ used: gabCredits, total: gabCredits })
     .optional(),
-  purchased: z.object({ available: numeric }).optional(),
+  purchased: z.object({ available: gabCredits }).optional(),
+  monthly_used: gabCredits.optional(),
+  monthly_credits: gabCredits.optional(),
+  purchased_credits: gabCredits.optional(),
+});
+
+const gabUsageSchema = z.object({
+  data: z.array(
+    z.object({
+      created: z.number().int(),
+      credits_used: gabCredits,
+    }),
+  ),
+  has_more: z.boolean(),
+  last_id: z.string().min(1).nullish(),
 });
 
 const gab: ProviderAdapter = {
@@ -248,30 +267,83 @@ const gab: ProviderAdapter = {
       return httpFailure(res.status);
     }
     const parsed = gabSchema.safeParse(res.json);
-    if (!parsed.success || Number.isNaN(parsed.data.total_available)) {
+    if (!parsed.success) {
       return unexpectedShape("Gab");
     }
-    // Gab bills in its own credit unit; USD only when a unit price is configured.
-    // The plan fee itself is a fixed cost the rollup adds per day.
-    const unitUsd = FINANCE_CONFIG.nativeUnitUsd.gab;
-    const used = parsed.data.monthly_allotment?.used;
-    const total = parsed.data.monthly_allotment?.total;
+    const used =
+      parsed.data.monthly_allotment?.used ?? parsed.data.monthly_used;
+    const total =
+      parsed.data.monthly_allotment?.total ?? parsed.data.monthly_credits;
+    const purchased =
+      parsed.data.purchased?.available ?? parsed.data.purchased_credits ?? 0;
     const allotment =
       used !== undefined && total !== undefined ? { used, total } : null;
     return {
       status: "ok",
-      balanceUsd:
-        unitUsd === null ? null : parsed.data.total_available * unitUsd,
+      balanceUsd: null,
       balanceNative: parsed.data.total_available,
       unit: "gab-credits",
-      cumulativeUsageUsd:
-        unitUsd === null || used === undefined ? null : used * unitUsd,
+      cumulativeUsageUsd: null,
       note: `flat-rate plan: $${FINANCE_CONFIG.fixedMonthlyCostUsd.gab.toFixed(2)}/month counted as fixed daily cost${
         allotment
           ? `; ${allotment.used.toFixed(1)} of ${allotment.total.toFixed(0)} monthly credits used`
           : ""
-      }${parsed.data.purchased && parsed.data.purchased.available > 0 ? `; ${parsed.data.purchased.available} purchased credits (unpriced)` : ""}`,
+      }${purchased > 0 ? `; ${purchased} purchased credits available` : ""}`,
     };
+  },
+  async fetchSpendNative(http, apiKey, from, to) {
+    const fromSeconds = from.getTime() / 1_000;
+    const toSeconds = to.getTime() / 1_000;
+    const url = new URL("https://gab.ai/v1/usage");
+    url.searchParams.set("start_date", from.toISOString());
+    // Gab's upper bound is inclusive and its usage timestamps are Unix seconds.
+    url.searchParams.set(
+      "end_date",
+      new Date(to.getTime() - 1_000).toISOString(),
+    );
+    url.searchParams.set("limit", "1000");
+    const cursors = new Set<string>();
+    let spend = 0;
+    for (let page = 0; page < FINANCE_CONFIG.maxPages; page += 1) {
+      const result = await http({
+        url: url.toString(),
+        method: "GET",
+        headers: bearer(apiKey),
+      }).catch(() => null);
+      if (result?.status !== 200) {
+        return {
+          spend: null,
+          reason: result
+            ? `Gab usage unavailable (HTTP ${result.status})`
+            : "Gab usage request failed",
+        };
+      }
+      const parsed = gabUsageSchema.safeParse(result.json);
+      if (!parsed.success) {
+        return {
+          spend: null,
+          reason: "Gab usage response has an unexpected shape",
+        };
+      }
+      for (const record of parsed.data.data) {
+        if (record.created >= fromSeconds && record.created < toSeconds) {
+          spend += record.credits_used;
+        }
+      }
+      if (!parsed.data.has_more) {
+        return { spend, reason: null };
+      }
+      const cursor = parsed.data.last_id;
+      if (!cursor || cursors.has(cursor)) {
+        return {
+          spend: null,
+          reason: "Gab usage pagination stopped advancing",
+        };
+      }
+      cursors.add(cursor);
+      url.searchParams.set("before", cursor);
+    }
+    return { spend: null, reason: "Gab usage exceeded the page limit" };
   },
 };
 
@@ -341,8 +413,8 @@ function usageLedgerAdapter(input: {
       return {
         status: "ok",
         balanceUsd: null,
-        balanceNative: calls,
-        unit: "calls",
+        balanceNative: null,
+        unit: "usd",
         cumulativeUsageUsd: calls * pricing.unitPriceUsd,
         note: `${input.noApiReason}: spend ${FINANCE_CONFIG.usageLedgerNote} at $${pricing.unitPriceUsd.toFixed(2)}/call`,
       };
@@ -362,7 +434,7 @@ const freedomGpt = usageLedgerAdapter({
   source: FinanceSource.FREEDOM_GPT,
   label: "FreedomGPT",
   apiProvider: ApiProvider.FREEDOMGPT,
-  noApiReason: "no balance endpoint (/credits /balance /usage /user all 404)",
+  noApiReason: "no documented API-key balance or spend endpoint",
 });
 
 export const PROVIDER_ADAPTERS: readonly ProviderAdapter[] = [

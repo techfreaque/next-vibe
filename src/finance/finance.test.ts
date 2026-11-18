@@ -13,6 +13,7 @@ import "server-only";
 import { and, eq, gte, like } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
+import { pgliteReady } from "next-vibe/database/client";
 import { users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
@@ -597,6 +598,7 @@ let openRouterUsage = 100;
 let openRouterCredits = 500;
 let nanoGptBalance = 100;
 let veniceBalance: number | null = null;
+let gabBalance = 1_000;
 let observedAt = NOW;
 /** Billed calls the mocked usage log reports for uncensored.ai / FreedomGPT. */
 let billedCalls = 10;
@@ -639,6 +641,16 @@ const mockHttp: FinanceHttp = async (
     return veniceBalance === null
       ? { status: 500, json: null }
       : { status: 200, json: { data: { balances: { USD: veniceBalance } } } };
+  }
+  if (request.url === "https://gab.ai/v1/credits") {
+    return {
+      status: 200,
+      json: {
+        total_available: gabBalance,
+        monthly_allotment: { total: 2_000, used: 2_000 - gabBalance },
+        purchased: { available: 0 },
+      },
+    };
   }
   return { status: 404, json: null };
 };
@@ -768,6 +780,7 @@ describe("finance ingest (mocked externals)", () => {
   let savedThresholds: (typeof financeThresholds.$inferSelect)[] = [];
 
   beforeAll(async () => {
+    await pgliteReady;
     FinanceRepository.deps = testDeps;
     savedStatus = await db.select().from(financeSourceStatus);
     savedThresholds = await db.select().from(financeThresholds);
@@ -780,7 +793,12 @@ describe("finance ingest (mocked externals)", () => {
     await db.delete(financeThresholds);
     await db
       .update(financeSourceStatus)
-      .set({ lowBalanceSeverity: null, lowBalanceObservedAt: null })
+      .set({
+        lowBalanceSeverity: null,
+        lowBalanceObservedAt: null,
+        lowBalanceSince: null,
+        lowBalanceFloorUsd: null,
+      })
       .where(gte(financeSourceStatus.lastRunAt, FUTURE));
     httpCalls.length = 0;
     mails.length = 0;
@@ -788,6 +806,7 @@ describe("finance ingest (mocked externals)", () => {
     openRouterCredits = 500;
     nanoGptBalance = 100;
     veniceBalance = null;
+    gabBalance = 1_000;
     observedAt = NOW;
     billedCalls = 10;
     ledgerWindows.length = 0;
@@ -827,12 +846,14 @@ describe("finance ingest (mocked externals)", () => {
     );
     // No balance API: tracked from our own usage log instead of skipped.
     expect(uncensored?.status).toBe(SourceRunStatus.OK);
+    expect(uncensored?.fallback).toBe(true);
     expect(uncensored?.reason).toContain("usage log");
     expect(uncensored?.reason).toContain("$0.05/call");
     const freedom = data.sources.find(
       (s) => s.source === FinanceSource.FREEDOM_GPT,
     );
     expect(freedom?.status).toBe(SourceRunStatus.OK);
+    expect(freedom?.fallback).toBe(true);
     expect(freedom?.reason).toContain("$0.08/call");
     // No HTTP attempt was made for them
     expect(httpCalls.some((u) => u.includes("uncensored") || u.includes("freedomgpt"))).toBe(false);
@@ -891,7 +912,7 @@ describe("finance ingest (mocked externals)", () => {
           eq(financeProviderSnapshots.bucketAt, new Date(Date.UTC(2031, 2, 4, 12))),
         ),
       );
-    expect(stored?.balanceNative).toBe(30);
+    expect(stored?.balanceNative).toBeNull();
     expect(stored?.cumulativeUsageUsd).toBe(1.5);
   });
 
@@ -1309,7 +1330,7 @@ describe("finance ingest (mocked externals)", () => {
     }
   });
 
-  it("reports a first low prepaid balance, including the $10.74 OpenRouter near-miss", async () => {
+  it("reports first low prepaid balances while OpenRouter can still auto top up", async () => {
     openRouterCredits = 150.74;
     nanoGptBalance = 45;
     veniceBalance = 30;
@@ -1320,13 +1341,6 @@ describe("finance ingest (mocked externals)", () => {
     try {
       const dryRun = await ingest(IngestScope.BALANCES, true);
       expect(dryRun.alerts).toEqual([
-        expect.objectContaining({
-          type: FinanceAlertType.LOW_BALANCE,
-          subject: FinanceSource.OPENROUTER,
-          severity: AlertSeverity.CRITICAL,
-          message: expect.stringContaining("$10.74 remaining, below $25.00"),
-          delivery: "dry-run",
-        }),
         expect.objectContaining({
           type: FinanceAlertType.LOW_BALANCE,
           subject: FinanceSource.NANO_GPT,
@@ -1346,11 +1360,8 @@ describe("finance ingest (mocked externals)", () => {
       expect(live.alerts.map((a) => a.delivery)).toEqual([
         "sent",
         "sent",
-        "sent",
       ]);
       expect(mails.map((mail) => mail.to)).toEqual([
-        "hi@unbottled.ai",
-        "thea@unbottled.ai",
         "hi@unbottled.ai",
         "thea@unbottled.ai",
         "hi@unbottled.ai",
@@ -1361,9 +1372,132 @@ describe("finance ingest (mocked externals)", () => {
     }
   });
 
+  it("waits for OpenRouter's grace period and resets it on recovery or a missed hour", async () => {
+    async function checkBalance(balance: number, mins: number, dryRun = false) {
+      openRouterCredits = openRouterUsage + 40 + balance;
+      observedAt = new Date(NOW.getTime() + mins * 60_000);
+      const result = await ingest(IngestScope.BALANCES, dryRun);
+      return result.alerts.find(
+        (alert) => alert.type === FinanceAlertType.LOW_BALANCE &&
+          alert.subject === FinanceSource.OPENROUTER,
+      );
+    }
+
+    expect(await checkBalance(4, 0)).toBeUndefined();
+    expect(await checkBalance(4, 60)).toBeUndefined();
+    expect(await checkBalance(4, 61, true)).toMatchObject({ delivery: "dry-run" });
+    expect(await checkBalance(4, 61)).toMatchObject({
+      severity: AlertSeverity.CRITICAL,
+      delivery: "sent",
+    });
+    expect(await checkBalance(4, 62)).toMatchObject({ delivery: "suppressed" });
+    expect(await checkBalance(5, 63)).toBeUndefined();
+    expect(await checkBalance(4, 64)).toBeUndefined();
+    expect(await checkBalance(4, 180)).toBeUndefined();
+    expect(await checkBalance(4, 241)).toMatchObject({ delivery: "sent" });
+    expect(mails).toHaveLength(2);
+  });
+
+  it("uses the configured OpenRouter floor and grace period", async () => {
+    await db.insert(financeThresholds).values([
+      { key: ThresholdKey.OPENROUTER_AUTO_TOP_UP_FLOOR_USD, value: 7 },
+      { key: ThresholdKey.OPENROUTER_AUTO_TOP_UP_GRACE_HOURS, value: 0.25 },
+    ]);
+    openRouterCredits = 146;
+    expect((await ingest(IngestScope.BALANCES)).alerts).toHaveLength(0);
+    observedAt = new Date(NOW.getTime() + 16 * 60_000);
+    expect((await ingest(IngestScope.BALANCES)).alerts).toEqual([
+      expect.objectContaining({
+        severity: AlertSeverity.CRITICAL,
+        subject: FinanceSource.OPENROUTER,
+        message: expect.stringContaining("$6.00, below $7.00"),
+        delivery: "sent",
+      }),
+    ]);
+  });
+
+  it("tracks Gab credit charges over closed hours and alerts on its native balance", async () => {
+    gabBalance = 150;
+    await db.insert(financeThresholds).values({
+      key: ThresholdKey.GAB_LOW_BALANCE_CREDITS,
+      value: 200,
+    });
+    const bucketAt = new Date(Date.UTC(2031, 2, 4, 12));
+    const endSeconds = bucketAt.getTime() / 1_000;
+    const endDate = new Date(bucketAt.getTime() - 1_000).toISOString();
+    const startDate = new Date(bucketAt.getTime() - FINANCE_CONFIG.hourMs).toISOString();
+    let usageCalls = 0;
+    let failUsage = false;
+    FinanceRepository.deps = {
+      ...testDeps,
+      apiKey: (source) =>
+        source === FinanceSource.GAB ? "test-key" : testDeps.apiKey(source),
+      async http(request): Promise<HttpResult> {
+        const url = new URL(request.url);
+        if (url.origin !== "https://gab.ai" || url.pathname !== "/v1/usage") {
+          return await mockHttp(request);
+        }
+        usageCalls += 1;
+        expect(request.method).toBe("GET");
+        expect(request.headers.Authorization).toBe("Bearer test-key");
+        if (failUsage) {
+          expect(url.searchParams.get("start_date")).toBe(bucketAt.toISOString());
+          return { status: 503, json: null };
+        }
+        expect(url.searchParams.get("start_date")).toBe(startDate);
+        expect(url.searchParams.get("end_date")).toBe(endDate);
+        if (url.searchParams.get("before") === "cursor") {
+          return {
+            status: 200,
+            json: { data: [{ created: endSeconds - 3_600, credits_used: 3 }], has_more: false },
+          };
+        }
+        return {
+          status: 200,
+          json: {
+            data: [
+              { created: endSeconds, credits_used: 99 },
+              { created: endSeconds - 1, credits_used: 4 },
+            ],
+            has_more: true,
+            last_id: "cursor",
+          },
+        };
+      },
+    };
+    try {
+      const result = await ingest(IngestScope.BALANCES);
+      expect(usageCalls).toBe(2);
+      expect(result.sources.find(({ source }) => source === FinanceSource.GAB))
+        .toMatchObject({ balanceUsd: null, spendUsd: null, fallback: false, reason: expect.stringContaining("7 Gab credits charged") });
+      expect(result.alerts).toEqual([
+        expect.objectContaining({
+          subject: FinanceSource.GAB,
+          severity: AlertSeverity.WARNING,
+          message: expect.stringContaining("150 credits remaining, below 200"),
+        }),
+      ]);
+      const status = await FinanceRepository.status(t, logger);
+      expect(status.success && status.data.sources.find(({ source }) => source === FinanceSource.GAB))
+        .toMatchObject({ balanceNative: 150, lastSpendNative: 7 });
+
+      failUsage = true;
+      gabBalance = 40;
+      observedAt = new Date(NOW.getTime() + FINANCE_CONFIG.hourMs);
+      const duringOutage = await ingest(IngestScope.BALANCES);
+      expect(duringOutage.alerts).toEqual([
+        expect.objectContaining({ subject: FinanceSource.GAB, severity: AlertSeverity.CRITICAL }),
+      ]);
+      expect(duringOutage.sources.find(({ source }) => source === FinanceSource.GAB))
+        .toMatchObject({ status: SourceRunStatus.OK, reason: expect.stringContaining("Gab usage unavailable (HTTP 503)") });
+    } finally {
+      FinanceRepository.deps = testDeps;
+    }
+  });
+
   it("mails once per downward crossing and rearms each step after recovery", async () => {
     async function checkBalance(balance: number, hoursAfterStart: number) {
-      openRouterCredits = openRouterUsage + 40 + balance;
+      nanoGptBalance = balance;
       observedAt = new Date(
         NOW.getTime() + hoursAfterStart * FINANCE_CONFIG.hourMs,
       );
@@ -1408,10 +1542,10 @@ describe("finance ingest (mocked externals)", () => {
   });
 
   it("uses each provider's configured floor and seven-day spend runway", async () => {
-    openRouterCredits = 195; // $55 left, above the default $50 floor
+    veniceBalance = 55;
     nanoGptBalance = 35;
     await db.insert(financeThresholds).values([
-      { key: ThresholdKey.OPENROUTER_LOW_BALANCE_DAYS, value: 4 },
+      { key: ThresholdKey.VENICE_LOW_BALANCE_DAYS, value: 4 },
       { key: ThresholdKey.NANO_GPT_LOW_BALANCE_USD, value: 30 },
     ]);
     const hour = FINANCE_CONFIG.hourMs;
@@ -1424,10 +1558,10 @@ describe("finance ingest (mocked externals)", () => {
         { at: weekStart + hour, spendUsd: 28, elapsedHours: 2 },
         { at: weekStart + 2 * hour, spendUsd: 91, elapsedHours: 1 },
       ].map(({ at, spendUsd, elapsedHours }) => ({
-        provider: FinanceSource.OPENROUTER,
+        provider: FinanceSource.VENICE,
         bucketAt: new Date(at),
         capturedAt: new Date(at),
-        cumulativeUsageUsd: openRouterUsage,
+        balanceUsd: 55,
         spendUsd,
         elapsedHours,
       })),
@@ -1437,7 +1571,7 @@ describe("finance ingest (mocked externals)", () => {
     expect(data.alerts).toEqual([
       expect.objectContaining({
         type: FinanceAlertType.LOW_BALANCE,
-        subject: FinanceSource.OPENROUTER,
+        subject: FinanceSource.VENICE,
         severity: AlertSeverity.WARNING,
         message: expect.stringContaining("$55.00 remaining, below $60.00"),
       }),
@@ -1445,7 +1579,7 @@ describe("finance ingest (mocked externals)", () => {
   });
 
   it("claims one low balance crossing across concurrent ingests", async () => {
-    openRouterCredits = 180;
+    nanoGptBalance = 40;
     const outcomes = await Promise.all([
       ingest(IngestScope.BALANCES),
       ingest(IngestScope.BALANCES),
@@ -1460,7 +1594,7 @@ describe("finance ingest (mocked externals)", () => {
   it("does not send low balance mail from a non-production instance", async () => {
     FinanceRepository.deps = { ...testDeps, isProduction: false };
     try {
-      openRouterCredits = 150.74;
+      nanoGptBalance = 10.74;
       const data = await ingest(IngestScope.BALANCES);
       expect(data.alerts[0]).toMatchObject({
         type: FinanceAlertType.LOW_BALANCE,

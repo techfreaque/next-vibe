@@ -12,7 +12,17 @@
 
 import "server-only";
 
-import { and, asc, desc, eq, gte, inArray, lt, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  gte,
+  inArray,
+  isNotNull,
+  lt,
+  sql,
+} from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
@@ -69,7 +79,9 @@ import {
   dayKey,
   DEFAULT_THRESHOLDS,
   detectDayAnomalies,
+  detectGabLowBalance,
   detectLowBalance,
+  detectOpenRouterLowBalance,
   detectProviderAnomalies,
   isDuplicateAlert,
   LOW_BALANCE_THRESHOLDS,
@@ -292,6 +304,7 @@ type AlertReport = FinanceIngestResponseOutput["alerts"][number];
 interface LowBalanceObservation {
   provider: typeof FinanceSourceValue;
   candidate: AlertCandidate | null;
+  autoTopUp?: { balanceUsd: number; floorUsd: number; graceHours: number };
 }
 
 /** One recomputed day plus the pieces anomaly detection and the report need. */
@@ -631,6 +644,40 @@ export class FinanceRepository {
           )
         : null;
 
+      let spendNative: number | null = null;
+      let note = result.note ?? null;
+      if (adapter.fetchSpendNative) {
+        // Anchor the window to closed UTC hours so a retry recomputes it.
+        const [lastUsage] = await db
+          .select({ bucketAt: financeProviderSnapshots.bucketAt })
+          .from(financeProviderSnapshots)
+          .where(
+            and(
+              eq(financeProviderSnapshots.provider, provider),
+              lt(financeProviderSnapshots.bucketAt, bucketAt),
+              isNotNull(financeProviderSnapshots.spendNative),
+            ),
+          )
+          .orderBy(desc(financeProviderSnapshots.bucketAt))
+          .limit(1);
+        const from =
+          lastUsage?.bucketAt ??
+          previous?.bucketAt ??
+          new Date(bucketAt.getTime() - FINANCE_CONFIG.hourMs);
+        const usage = await adapter.fetchSpendNative(
+          deps.http,
+          apiKey,
+          from,
+          bucketAt,
+        );
+        spendNative = usage.spend;
+        const usageNote =
+          usage.spend === null
+            ? usage.reason
+            : `${usage.spend} Gab credits charged by the API since ${from.toISOString()}`;
+        note = note ? `${note}; ${usageNote}` : usageNote;
+      }
+
       const lowBalance = LOW_BALANCE_THRESHOLDS[provider];
       const balanceUsd = result.balanceUsd;
       const hasPrepaidBalance =
@@ -679,6 +726,7 @@ export class FinanceRepository {
           unit: result.unit,
           cumulativeUsageUsd: result.cumulativeUsageUsd,
           spendUsd: delta?.spendUsd ?? null,
+          spendNative,
           elapsedHours: delta?.elapsedHours ?? null,
         };
         await db
@@ -689,11 +737,39 @@ export class FinanceRepository {
               financeProviderSnapshots.provider,
               financeProviderSnapshots.bucketAt,
             ],
-            set: values,
+            set: {
+              ...values,
+              spendNative: sql`coalesce(excluded.spend_native, ${financeProviderSnapshots.spendNative})`,
+            },
           });
       }
 
-      if (hasPrepaidBalance) {
+      if (
+        provider === FinanceSource.OPENROUTER &&
+        balanceUsd !== null &&
+        Number.isFinite(balanceUsd)
+      ) {
+        balances.push({
+          provider,
+          candidate: null,
+          autoTopUp: {
+            balanceUsd,
+            floorUsd: thresholds.openrouterAutoTopUpFloorUsd,
+            graceHours: thresholds.openrouterAutoTopUpGraceHours,
+          },
+        });
+      } else if (
+        provider === FinanceSource.GAB &&
+        result.balanceNative !== null
+      ) {
+        balances.push({
+          provider,
+          candidate: detectGabLowBalance(
+            result.balanceNative,
+            thresholds.gabLowBalanceCredits,
+          ),
+        });
+      } else if (hasPrepaidBalance) {
         balances.push({
           provider,
           candidate: detectLowBalance({
@@ -710,7 +786,8 @@ export class FinanceRepository {
       return {
         ...base,
         status: SourceRunStatus.OK,
-        reason: result.note ?? null,
+        reason: note,
+        fallback: adapter.spendBasis === "usage-ledger",
         balanceUsd: result.balanceUsd,
         spendUsd: delta?.spendUsd ?? null,
       };
@@ -1502,18 +1579,46 @@ export class FinanceRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<AlertReport | null> {
-    const { provider, candidate } = observation;
+    const { provider, autoTopUp } = observation;
     const claim = await db.transaction(async (tx) => {
       const query = tx
         .select({
           severity: financeSourceStatus.lowBalanceSeverity,
           observedAt: financeSourceStatus.lowBalanceObservedAt,
+          since: financeSourceStatus.lowBalanceSince,
+          floorUsd: financeSourceStatus.lowBalanceFloorUsd,
         })
         .from(financeSourceStatus)
         .where(eq(financeSourceStatus.source, provider));
       const [state] = await (dryRun ? query : query.for("update"));
       if (state?.observedAt && state.observedAt > now) {
-        return { delivery: "suppressed", id: null };
+        return observation.candidate
+          ? {
+              candidate: observation.candidate,
+              delivery: "suppressed",
+              id: null,
+            }
+          : null;
+      }
+
+      let candidate = observation.candidate;
+      let since: Date | null = null;
+      let previous = state?.severity;
+      if (autoTopUp) {
+        const sameFloor = state?.floorUsd === autoTopUp.floorUsd;
+        previous = sameFloor ? previous : null;
+        if (
+          autoTopUp.floorUsd > 0 &&
+          autoTopUp.balanceUsd < autoTopUp.floorUsd
+        ) {
+          const adjacent =
+            state?.observedAt &&
+            startOfUtcHour(now).getTime() -
+              startOfUtcHour(state.observedAt).getTime() <=
+              FINANCE_CONFIG.hourMs;
+          since = (sameFloor && adjacent ? state?.since : null) ?? now;
+          candidate = detectOpenRouterLowBalance({ ...autoTopUp, since, now });
+        }
       }
 
       if (!dryRun) {
@@ -1521,24 +1626,26 @@ export class FinanceRepository {
         await tx
           .update(financeSourceStatus)
           .set({
-            lowBalanceSeverity: candidate?.severity ?? null,
+            lowBalanceSeverity:
+              candidate?.severity ?? (since ? previous : null) ?? null,
             lowBalanceObservedAt: now,
+            lowBalanceSince: since,
+            lowBalanceFloorUsd: autoTopUp?.floorUsd ?? null,
           })
           .where(eq(financeSourceStatus.source, provider));
       }
       if (!candidate) {
         return null;
       }
-      const previous = state?.severity;
       const crossed =
         !previous ||
         (previous === AlertSeverity.WARNING &&
           candidate.severity === AlertSeverity.CRITICAL);
       if (!crossed) {
-        return { delivery: "suppressed", id: null };
+        return { candidate, delivery: "suppressed", id: null };
       }
       if (dryRun) {
-        return { delivery: "dry-run", id: null };
+        return { candidate, delivery: "dry-run", id: null };
       }
 
       const delivery = "pending";
@@ -1546,12 +1653,13 @@ export class FinanceRepository {
         .insert(financeAlerts)
         .values({ ...candidate, delivery, createdAt: now })
         .returning({ id: financeAlerts.id });
-      return { delivery, id: row?.id ?? null };
+      return { candidate, delivery, id: row?.id ?? null };
     });
 
-    if (!candidate || !claim) {
+    if (!claim) {
       return null;
     }
+    const { candidate } = claim;
     if (!claim.id) {
       return FinanceRepository.alertReport(candidate, claim.delivery);
     }
@@ -1694,17 +1802,22 @@ export class FinanceRepository {
       const sources = [...ProviderSources, ...RevenueSources].map((source) => {
         const status = statusRows.find((s) => s.source === source);
         const snap = providerRows.find((p) => p.provider === source);
+        const adapter = PROVIDER_ADAPTERS.find((a) => a.source === source);
         return {
           source,
           status: status?.lastStatus ?? null,
           reason: status?.lastReason ?? null,
-          fallback: status?.lastFallback ?? false,
+          fallback:
+            (status?.lastFallback ?? false) ||
+            (snap !== undefined && adapter?.spendBasis === "usage-ledger"),
           lastRunAt: status?.lastRunAt.toISOString() ?? null,
           lastOkAt: status?.lastOkAt?.toISOString() ?? null,
           balanceUsd: snap?.balanceUsd ?? null,
-          balanceNative: snap?.balanceNative ?? null,
-          unit: snap?.unit ?? null,
+          balanceNative:
+            snap?.unit === "calls" ? null : (snap?.balanceNative ?? null),
+          unit: snap?.unit === "calls" ? null : (snap?.unit ?? null),
           lastSpendUsd: snap?.spendUsd ?? null,
+          lastSpendNative: snap?.spendNative ?? null,
         };
       });
 

@@ -249,10 +249,19 @@ export function FinanceStatusWidget(): JSX.Element {
                 <Div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
                   <Span>
                     {s.lastSpendUsd !== null
-                      ? t("status.widget.providers.lastSpend", {
-                          amount: money.format(s.lastSpendUsd),
-                        })
-                      : t("status.widget.providers.noSpend")}
+                      ? t(
+                          s.fallback
+                            ? "status.widget.providers.lastSpendEstimate"
+                            : "status.widget.providers.lastSpend",
+                          {
+                            amount: money.format(s.lastSpendUsd),
+                          },
+                        )
+                      : s.lastSpendNative !== null
+                        ? t("status.widget.providers.lastNativeSpend", {
+                            amount: `${pct.format(s.lastSpendNative)} ${s.unit ?? ""}`,
+                          })
+                        : t("status.widget.providers.noSpend")}
                   </Span>
                   <Span>{when(s.lastOkAt)}</Span>
                 </Div>

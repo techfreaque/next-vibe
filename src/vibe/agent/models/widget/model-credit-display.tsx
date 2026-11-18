@@ -34,7 +34,7 @@ import {
   freePlanMessageCount,
 } from "@/products/credit-money";
 
-import { type ChatModelOption, chatModelOptions } from "../../ai-stream/models";
+import { chatModelOptions } from "../../ai-stream/models";
 import {
   COMPACT_TRIGGER,
   COMPACT_TRIGGER_PERCENTAGE,
@@ -44,13 +44,16 @@ import { musicGenModelOptions } from "../../music-generation/models";
 import { sttModelOptions } from "../../speech-to-text/models";
 import { ttsModelOptions } from "../../text-to-speech/models";
 import { videoGenModelOptions } from "../../video-generation/models";
+import type { AnyModelOptionWithVision } from "../all-models";
 import { scopedTranslation } from "../i18n";
 import {
   type AnyModelId,
   type AnyModelOption,
+  CHAT_MESSAGE_PRICE_REFERENCE,
   estimateTurnCredits,
   getEstimatedImageOutputTokens,
   getModelPrice,
+  type ModelOptionTokenBased,
   PRICE_REFERENCE_STT_SECONDS,
   PRICE_REFERENCE_TTS_CHARS,
 } from "../models";
@@ -61,6 +64,9 @@ import {
 export interface ModelCreditDisplayProps {
   /** Any model ID - chat, image, video, music, TTS, STT */
   modelId: AnyModelId;
+
+  /** Resolved provider option when the caller has already picked a route. */
+  modelOption?: AnyModelOptionWithVision;
 
   /** Display variant - badge (default) or text */
   variant?: "badge" | "text";
@@ -104,7 +110,7 @@ function findModel(id: AnyModelId): AnyModelOption | undefined {
 /**
  * Calculate cost range for different message sizes (chat token-based only)
  */
-function calculateCostRanges(model: ChatModelOption): {
+function calculateCostRanges(model: ModelOptionTokenBased): {
   ranges: Array<{
     name: string;
     input: number;
@@ -114,9 +120,6 @@ function calculateCostRanges(model: ChatModelOption): {
   }>;
   effectiveTrigger: number;
 } {
-  if (!("contextWindow" in model)) {
-    return { ranges: [], effectiveTrigger: 0 };
-  }
   const modelContextLimit = Math.floor(
     model.contextWindow * COMPACT_TRIGGER_PERCENTAGE,
   );
@@ -124,7 +127,11 @@ function calculateCostRanges(model: ChatModelOption): {
 
   const scenarios: Array<{ name: string; input: number; output: number }> = [
     { name: "Short reply", input: 5_000, output: 500 },
-    { name: "Normal chat", input: 16_000, output: 1_500 },
+    {
+      name: "Normal chat",
+      input: CHAT_MESSAGE_PRICE_REFERENCE.inputTokens,
+      output: CHAT_MESSAGE_PRICE_REFERENCE.outputTokens,
+    },
     { name: "Long conversation", input: effectiveTrigger, output: 2_000 },
   ];
 
@@ -174,6 +181,7 @@ function formatTokenThreshold(tokens: number): string {
  */
 export function ModelCreditDisplay({
   modelId,
+  modelOption,
   variant = "badge",
   badgeVariant = "secondary",
   className,
@@ -183,7 +191,7 @@ export function ModelCreditDisplay({
   moneyClassName,
 }: ModelCreditDisplayProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const model = findModel(modelId);
+  const model = modelOption ?? findModel(modelId);
   const [isOpen, setIsOpen] = useState(false);
   const openTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -475,8 +483,7 @@ export function ModelCreditDisplay({
     );
   } else if (typeof model.creditCost === "function") {
     // Token-based chat model
-    const chatModel = model as ChatModelOption;
-    const costData = calculateCostRanges(chatModel);
+    const costData = calculateCostRanges(model);
     const costRanges = costData.ranges;
     const effectiveTrigger = costData.effectiveTrigger;
     const minCost = costRanges.length > 0 ? costRanges[0].cost : 0;

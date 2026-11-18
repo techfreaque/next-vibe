@@ -1084,6 +1084,12 @@ export const defaultLlmModality = {
 const PRICE_REFERENCE_INPUT_TOKENS = 5000;
 const PRICE_REFERENCE_OUTPUT_TOKENS = 1500;
 
+/** Normal chat scenario shown on model pages, in the selector, and on skill pages. */
+export const CHAT_MESSAGE_PRICE_REFERENCE = {
+  inputTokens: 16_000,
+  outputTokens: 1_500,
+};
+
 /**
  * Image output tokens per generated image, used to ESTIMATE (display, sort)
  * the price of image-output chat models. A live Nano Banana 2.1 turn reported
@@ -1126,6 +1132,16 @@ export function estimateTurnCredits(
     0,
     0,
     imageTokens,
+  );
+}
+
+export function estimateReferenceChatTurnCredits(
+  model: CreditCostInput,
+): number {
+  return estimateTurnCredits(
+    model,
+    CHAT_MESSAGE_PRICE_REFERENCE.inputTokens,
+    CHAT_MESSAGE_PRICE_REFERENCE.outputTokens,
   );
 }
 

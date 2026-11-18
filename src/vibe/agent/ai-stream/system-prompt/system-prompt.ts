@@ -380,6 +380,9 @@ export const toolExecutionControlFragment: SystemPromptFragment = {
   placement: "leading",
   priority: 70,
   build: async (params) => {
+    if (params.toolsDisabled) {
+      return null;
+    }
     // Restricted folders (incognito, public) cannot run async tasks - never
     // advertise those modes there, or the model picks one and the tool call
     // is rejected at execution time.
@@ -427,6 +430,14 @@ export const mediaCapabilitiesFragment: SystemPromptFragment = {
   priority: 75,
   build: async (params) => {
     const mc = params.mediaCapabilities;
+    if (params.toolsDisabled) {
+      const nativeOutputs = mc?.nativeOutputs.filter(
+        (output) => output !== "text",
+      );
+      return nativeOutputs?.length
+        ? `Generate requested media directly in your response. Native output formats: ${nativeOutputs.join(", ")}.`
+        : null;
+    }
 
     const genLines = mc
       ? [

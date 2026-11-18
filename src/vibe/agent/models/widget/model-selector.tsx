@@ -444,6 +444,7 @@ export function ModelCard({
         ) : (
           <ModelCreditDisplay
             modelId={model.id}
+            modelOption={model}
             variant="badge"
             badgeVariant={selected ? "outline" : "secondary"}
             className="text-[10px] h-5"
@@ -617,6 +618,7 @@ function ProviderChips({
             {label}
             <ModelCreditDisplay
               modelId={option.id}
+              modelOption={routed}
               variant="text"
               interactive={false}
               showMoney={false}
@@ -2062,6 +2064,7 @@ export function ModelSelector({
             </Div>
             <ModelCreditDisplay
               modelId={bestModel.id}
+              modelOption={bestModel}
               variant="badge"
               badgeVariant="secondary"
               className="text-[10px] h-5 shrink-0 bg-background/60"
@@ -2573,6 +2576,7 @@ export function ModelSelectorTrigger({
                   </Span>
                   <ModelCreditDisplay
                     modelId={resolvedModel.id}
+                    modelOption={resolvedModel}
                     variant="text"
                     className="text-[11px] text-muted-foreground"
                     locale={locale}

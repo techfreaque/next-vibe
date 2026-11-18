@@ -26,7 +26,7 @@ import {
 import {
   ApiProvider,
   apiProviderDisplayNames,
-  estimateTurnCredits,
+  estimateReferenceChatTurnCredits,
   isApiProviderAvailable,
   type ModelDefinition,
   modelProviders,
@@ -42,14 +42,6 @@ import {
   CREDIT_VALUE_USD,
   STANDARD_MARKUP_PERCENTAGE,
 } from "@/products/constants";
-
-/**
- * Reference message for "price per message" - the same "Normal chat" scenario
- * ModelCreditDisplay uses for its badge, so the numbers on these pages match
- * what the model selector shows.
- */
-export const REFERENCE_INPUT_TOKENS = 16_000;
-export const REFERENCE_OUTPUT_TOKENS = 1_500;
 
 /** Rough tokens per printed page of prose (~500 words). */
 const TOKENS_PER_PAGE = 650;
@@ -306,13 +298,7 @@ export function getModelFacts(
     return null;
   }
 
-  const costs = options.map((option) =>
-    estimateTurnCredits(
-      option,
-      REFERENCE_INPUT_TOKENS,
-      REFERENCE_OUTPUT_TOKENS,
-    ),
-  );
+  const costs = options.map(estimateReferenceChatTurnCredits);
   const cheapestCost = Math.min(...costs);
   const creditsPerMessage = roundCredits(cheapestCost);
   const creditsPerUnit = 1 / CREDIT_VALUE_USD;

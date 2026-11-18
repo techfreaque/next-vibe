@@ -108,6 +108,8 @@ export const financeProviderSnapshots = pgTable(
     cumulativeUsageUsd: doublePrecision("cumulative_usage_usd"),
     /** Spend in USD since the previous reading */
     spendUsd: doublePrecision("spend_usd"),
+    /** Provider-reported spend in its own unit, for a non-USD balance */
+    spendNative: doublePrecision("spend_native"),
     /** Hours between the previous reading and this one */
     elapsedHours: doublePrecision("elapsed_hours"),
   },
@@ -170,6 +172,9 @@ export const financeSourceStatus = pgTable("finance_source_status", {
   /** Last classified prepaid balance, used to alert only on downward crossings. */
   lowBalanceSeverity: text("low_balance_severity", { enum: AlertSeverityDB }),
   lowBalanceObservedAt: timestamp("low_balance_observed_at"),
+  /** Start of the observed low balance streak for an auto-top-up provider. */
+  lowBalanceSince: timestamp("low_balance_since"),
+  lowBalanceFloorUsd: doublePrecision("low_balance_floor_usd"),
 });
 
 export const financeAlerts = pgTable(

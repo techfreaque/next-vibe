@@ -49,8 +49,11 @@ export const translations: typeof enTranslations = {
       critical: "Kritisch",
     },
     threshold: {
-      openrouterLowBalanceUsd: "OpenRouter: Mindestguthaben (USD)",
-      openrouterLowBalanceDays: "OpenRouter: Guthabenreichweite (Tage)",
+      openrouterAutoTopUpFloorUsd:
+        "OpenRouter: Guthabengrenze bei automatischer Aufladung (USD)",
+      openrouterAutoTopUpGraceHours:
+        "OpenRouter: Wartezeit für automatische Aufladung (Stunden)",
+      gabLowBalanceCredits: "Gab AI: Mindestguthaben (Credits)",
       nanoGptLowBalanceUsd: "NanoGPT: Mindestguthaben (USD)",
       nanoGptLowBalanceDays: "NanoGPT: Guthabenreichweite (Tage)",
       veniceLowBalanceUsd: "Venice: Mindestguthaben (USD)",
@@ -184,6 +187,10 @@ export const translations: typeof enTranslations = {
       providers: {
         title: "Anbieter-Guthaben",
         lastSpend: "Seit letzter Messung ausgegeben: {{amount}}",
+        lastSpendEstimate:
+          "Geschätzte Ausgaben seit letzter Messung: {{amount}}",
+        lastNativeSpend:
+          "API-Verbrauch bis zur letzten vollen Stunde: {{amount}}",
         noSpend: "Noch keine Ausgaben gemessen",
       },
       revenue: {

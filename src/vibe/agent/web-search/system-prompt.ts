@@ -16,6 +16,9 @@ export const webFragment: SystemPromptFragment = {
   placement: "leading",
   priority: 120, // After core identity (10-90), before user-specific (250+)
   build: async (params) => {
+    if (params.toolsDisabled) {
+      return null;
+    }
     const isAdmin =
       !params.user.isPublic &&
       params.user.roles.includes(UserPermissionRole.ADMIN);

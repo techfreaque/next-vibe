@@ -49,8 +49,11 @@ export const translations: typeof enTranslations = {
       critical: "Krytyczny",
     },
     threshold: {
-      openrouterLowBalanceUsd: "OpenRouter: minimalne saldo (USD)",
-      openrouterLowBalanceDays: "OpenRouter: zapas środków (dni)",
+      openrouterAutoTopUpFloorUsd:
+        "OpenRouter: próg alertu o doładowaniu automatycznym (USD)",
+      openrouterAutoTopUpGraceHours:
+        "OpenRouter: czas na doładowanie automatyczne (godziny)",
+      gabLowBalanceCredits: "Gab AI: minimalne saldo (kredyty)",
       nanoGptLowBalanceUsd: "NanoGPT: minimalne saldo (USD)",
       nanoGptLowBalanceDays: "NanoGPT: zapas środków (dni)",
       veniceLowBalanceUsd: "Venice: minimalne saldo (USD)",
@@ -183,6 +186,10 @@ export const translations: typeof enTranslations = {
       providers: {
         title: "Salda dostawców",
         lastSpend: "Wydano od ostatniego odczytu: {{amount}}",
+        lastSpendEstimate:
+          "Szacunkowe wydatki od ostatniego odczytu: {{amount}}",
+        lastNativeSpend:
+          "Zużycie w API do ostatniej pełnej godziny: {{amount}}",
         noSpend: "Brak zmierzonych wydatków",
       },
       revenue: {

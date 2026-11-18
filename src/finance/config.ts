@@ -61,14 +61,6 @@ export const FINANCE_CONFIG = {
   lowBalanceCriticalFraction: 0.5,
 
   /**
-   * USD value of one native unit for providers that report a non-USD balance.
-   * null = no per-unit price: Gab credits come with the flat-rate plan below, so
-   * burning them costs nothing extra (only purchased top-ups would, and Gab
-   * publishes no per-credit price for those).
-   */
-  nativeUnitUsd: { gab: null as number | null },
-
-  /**
    * Flat-rate provider plans, USD per month. Added to every tracked day's
    * upstream cost as monthly / days-in-month, so margin carries the real cost
    * even though usage against the plan is $0 per call.
@@ -107,8 +99,10 @@ export const FINANCE_CONFIG = {
     alertDedupHours: 12,
     minRevenueUsd: 5,
     minCostUsd: 1,
-    openrouterLowBalanceUsd: 50,
-    openrouterLowBalanceDays: 3,
+    // The account automatically tops up below $10. Give it time to recover.
+    openrouterAutoTopUpFloorUsd: 5,
+    openrouterAutoTopUpGraceHours: 1,
+    gabLowBalanceCredits: 100,
     nanoGptLowBalanceUsd: 50,
     nanoGptLowBalanceDays: 3,
     veniceLowBalanceUsd: 50,

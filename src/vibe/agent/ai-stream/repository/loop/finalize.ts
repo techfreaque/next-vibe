@@ -465,14 +465,22 @@ export async function complete(
       // tool calls with no reply): without this the user sees a
       // blank/thinking-only bubble with a charge. content-filter already
       // showed its own message.
+      const [rawFinishReason, toolCalls] = await Promise.all([
+        streamResult.rawFinishReason,
+        streamResult.toolCalls,
+      ]);
       logger.warn("[AI Stream] Turn ended without answer text", {
         threadId,
         model,
         apiProvider: modelConfig.apiProvider,
         providerModel: modelConfig.providerModel,
         finishReason: finishReason ?? null,
+        rawFinishReason: rawFinishReason ?? null,
+        offeredToolCount: Object.keys(state.p.tools ?? {}).length,
+        finalStepToolCallCount: toolCalls.length,
         steps: ctx.tokenStepCount,
         outputTokens: usage.outputTokens,
+        reasoningTokens,
         creditCost: actualCreditCost,
         creditCostBeforeMarkupWaiver: fullCreditCost,
       });

@@ -40,6 +40,7 @@ const sourceSchema = z.object({
   balanceNative: z.number().nullable(),
   unit: z.string().nullable(),
   lastSpendUsd: z.number().nullable(),
+  lastSpendNative: z.number().nullable(),
 });
 
 const daySchema = z.object({
