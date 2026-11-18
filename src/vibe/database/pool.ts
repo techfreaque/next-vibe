@@ -305,6 +305,53 @@ function guardStandardPool(p: Pool): Pool {
   return p;
 }
 
+// ─── Process-wide pool registry ──────────────────────────────────────────────
+
+declare global {
+  /**
+   * Pools shared by every copy of the database modules in this process. The
+   * Next.js build inlines client.ts into several bundle layers, each with its
+   * own module instance; globalThis is the one thing they share.
+   */
+  var __vibePgPools: Map<string, Pool> | undefined;
+}
+
+export const APP_POOL_KEY = "app";
+export const LONG_RUNNING_POOL_KEY = "long-running";
+
+function poolRegistry(): Map<string, Pool> {
+  globalThis.__vibePgPools ??= new Map();
+  return globalThis.__vibePgPools;
+}
+
+/**
+ * The live pool registered under `key` in this process, or a new one from
+ * `create` (registered) when there is none or it was ended.
+ */
+export function processSharedPool(key: string, create: () => Pool): Pool {
+  const registry = poolRegistry();
+  const existing = registry.get(key);
+  if (existing && !existing.ending && !existing.ended) {
+    return existing;
+  }
+  const created = create();
+  registry.set(key, created);
+  return created;
+}
+
+/** Register `pool` under `key` (replaces the previous one, never ends it). */
+export function setProcessSharedPool(key: string, pool: Pool): void {
+  poolRegistry().set(key, pool);
+}
+
+/** Unregister and return the pool under `key` (null when none). */
+export function takeProcessSharedPool(key: string): Pool | null {
+  const registry = poolRegistry();
+  const existing = registry.get(key) ?? null;
+  registry.delete(key);
+  return existing;
+}
+
 export function createStandardPool(opts: StandardPoolOptions): Pool {
   return guardStandardPool(
     new ResilientPool(

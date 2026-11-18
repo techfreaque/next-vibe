@@ -18,7 +18,14 @@ import { Pool } from "pg";
 import { parseError } from "../core/utils/parse-error";
 import { resolveEffectiveDatabaseUrl } from "./effective-url";
 import { databaseEnv } from "./env";
-import { createStandardPool, guardPool, LONG_RUNNING_POOL_MAX } from "./pool";
+import {
+  APP_POOL_KEY,
+  createStandardPool,
+  guardPool,
+  LONG_RUNNING_POOL_MAX,
+  processSharedPool,
+  setProcessSharedPool,
+} from "./pool";
 
 /**
  * Shared database connection primitives.
@@ -196,10 +203,17 @@ export let pgliteClient: PGlite | null = null;
 
 /**
  * Always non-null after module init.
- * Standard mode: pool → DATABASE_URL postgres.
+ * Standard mode: pool → DATABASE_URL postgres, ONE per process: the Next.js
+ * build inlines this module into several bundle layers (route handlers,
+ * middleware, a separate server chunk), each evaluating it once. Before
+ * `processSharedPool` every copy opened its own pool, multiplying
+ * DATABASE_POOL_MAX per process (prod incident 2026-11-18: S2's app held 92
+ * of S1's 100 connections). Also keeps dev HMR from orphaning the old pool.
  * PGlite mode: pool → Unix socket served by pglite-server.ts.
  */
-export let pool: Pool | null = isPglite ? null : createPool();
+export let pool: Pool | null = isPglite
+  ? null
+  : processSharedPool(APP_POOL_KEY, createPool);
 
 /**
  * Resolves once PGlite ownership for this process has been decided (owner or
@@ -367,6 +381,7 @@ export function recreatePool(): Pool | null {
     return pool;
   }
   pool = createPool();
+  setProcessSharedPool(APP_POOL_KEY, pool);
   for (const cb of poolRebuildCallbacks) {
     cb();
   }

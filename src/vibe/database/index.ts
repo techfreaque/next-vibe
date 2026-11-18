@@ -12,6 +12,11 @@ import {
   pool,
   recreatePool,
 } from "./client";
+import {
+  LONG_RUNNING_POOL_KEY,
+  processSharedPool,
+  takeProcessSharedPool,
+} from "./pool";
 
 export {
   getLivePgliteClient,
@@ -77,14 +82,19 @@ export function getLongRunningDb(): NodePgDatabase<Record<string, never>> {
     return db;
   }
   if (!longRunningDb) {
-    longRunningPool = createLongRunningPool();
+    longRunningPool = processSharedPool(
+      LONG_RUNNING_POOL_KEY,
+      createLongRunningPool,
+    );
     longRunningDb = drizzle(longRunningPool);
   }
   return longRunningDb;
 }
 
 async function closeLongRunningPool(logger: EndpointLogger): Promise<void> {
-  const p = longRunningPool;
+  // Another bundled copy of this module may have created the shared pool.
+  const shared = takeProcessSharedPool(LONG_RUNNING_POOL_KEY);
+  const p = longRunningPool ?? shared;
   longRunningPool = null;
   longRunningDb = null;
   if (!p || p.ending || p.ended) {

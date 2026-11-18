@@ -17,6 +17,7 @@
 #   ha-failover drill-partition N [--witness=down] [--mode=full]
 #                                   S2: hide S1 from S2 for N seconds (dry run)
 #   ha-failover test-alert          send a test email
+#   ha-failover pg-conn-check       run the Postgres connection-slot check now
 #
 # ---------------------------------------------------------------------------
 # Why "automatic, but only with a witness" (the split-brain trade-off):
@@ -513,11 +514,57 @@ Heals in the last 6 h: $((recent + 1)) of ${HA_APP_HEAL_MAX:-3}. A follow-up mai
 Disable: touch $STATE_DIR/app-heal-hold (rm to re-enable)."
 }
 
+# ---------------------------------------------------------------------------
+# Postgres connection-slot alert (added 2026-11-18). S2's app leaked 92 of
+# S1's 100 connections (idle sessions held open by the WG forwarder after the
+# link went lossy), S1's own app then got "remaining connection slots are
+# reserved". Runs on whichever box holds the WRITABLE primary (S1 normally,
+# S2 after a failover) every HA_PG_CONN_CHECK_EVERY s (60): alerts once when
+# the total or any single role reaches HA_PG_CONN_ALERT_PCT % (70) of
+# max_connections, clears below HA_PG_CONN_CLEAR_PCT % (50).
+# ---------------------------------------------------------------------------
+pg_conn_check() {
+  [ -n "$LOCAL_PG" ] || return 0
+  case "$(role)" in fenced|promoting) return 0 ;; esac
+  local now last max rows total worst worst_role pct alert_pct clear_pct
+  now=$(date +%s)
+  last=$(cat "$STATE_DIR/pg-conn-checked-at" 2>/dev/null || echo 0)
+  [ $((now - last)) -ge "${HA_PG_CONN_CHECK_EVERY:-60}" ] || return 0
+  echo "$now" > "$STATE_DIR/pg-conn-checked-at"
+  [ "$(pg_q 'select pg_is_in_recovery()')" = "f" ] || return 0
+  max="$(pg_q 'show max_connections')"
+  case "$max" in ''|*[!0-9]*) return 0 ;; esac
+  # role|count per role (client backends only; walsenders have own slots).
+  rows="$(pg_q "select coalesce(usename,'?')||'|'||count(*) from pg_stat_activity where backend_type='client backend' group by usename order by count(*) desc")"
+  [ -n "$rows" ] || return 0
+  total=$(printf '%s\n' "$rows" | awk -F'|' '{s+=$2} END {print s+0}')
+  worst=$(printf '%s\n' "$rows" | head -1 | cut -d'|' -f2)
+  worst_role=$(printf '%s\n' "$rows" | head -1 | cut -d'|' -f1)
+  alert_pct="${HA_PG_CONN_ALERT_PCT:-70}"; clear_pct="${HA_PG_CONN_CLEAR_PCT:-50}"
+  pct=$((total * 100 / max))
+  if [ "$pct" -ge "$alert_pct" ] || [ $((worst * 100 / max)) -ge "$alert_pct" ]; then
+    alert_once pg-conn "Postgres connections at ${pct}% (${total}/${max}, top role ${worst_role}=${worst})" "Postgres on $NODE ($LOCAL_PG) uses ${total} of max_connections=${max} client slots (alert at ${alert_pct}%). Per role:
+$(printf '%s\n' "$rows" | sed 's/^/  /')
+
+By role/state/client (oldest backend):
+$(pg_q "select '  '||coalesce(usename,'?')||' '||coalesce(state,'-')||' '||coalesce(host(client_addr),'local')||': '||count(*)||' (oldest '||date_trunc('second',now()-min(backend_start))||')' from pg_stat_activity where backend_type='client backend' group by usename,state,client_addr order by count(*) desc limit 15")
+
+Runbook (ha/README.md 'Postgres connection leak'): s2app sessions come
+through pg-wg-forward (S2 app). Free slots: docker exec $LOCAL_PG psql -U postgres -c \"select pg_terminate_backend(pid) from pg_stat_activity where usename='s2app' and state='idle' and state_change < now()-interval '2 min'\""
+  elif [ "$pct" -lt "$clear_pct" ] && [ $((worst * 100 / max)) -lt "$clear_pct" ]; then
+    was_alerted pg-conn && alert "Postgres connections back to normal (${total}/${max})" "Per role:
+$(printf '%s\n' "$rows" | sed 's/^/  /')"
+    clear_once pg-conn
+  fi
+  return 0
+}
+
 cmd_watch() {
   log "watchdog start: role=$(role) auto=$AUTO interval=${INTERVAL}s failover_after=${FAILOVER_AFTER}s app_heal=$APP_HEAL"
   while :; do
     wg_path_check
     if [ "$NODE" = "s2" ]; then watch_s2; else watch_s1; fi
+    pg_conn_check
     app_heal_check
     sleep "$INTERVAL"
   done
@@ -663,6 +710,7 @@ drill-promote) cmd_drill_promote ;;
 drill-cleanup) drill_cleanup ;;
 drill-partition) shift; cmd_drill_partition "$@" ;;
 drill-partition-undo) cmd_drill_partition_undo ;;
+pg-conn-check) HA_PG_CONN_CHECK_EVERY=0 pg_conn_check ;;
 test-alert) alert "test alert from $NODE" "If you read this, HA alert mail works. $(cmd_status 2>&1)" ;;
 *) sed -n '2,20p' "$0"; exit 2 ;;
 esac

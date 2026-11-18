@@ -38,6 +38,11 @@ services:
     #   HA_DB_SETUP      true (S2-only deploys then run migrations)
     environment:
       DATABASE_URL: ${HA_DATABASE_URL:?HA_DATABASE_URL must be set in .env}
+      # Smaller per-process pool than S1 (default 10): every S2 connection
+      # crosses WireGuard + HAProxy into S1's max_connections, where role
+      # s2app is capped (CONNECTION LIMIT 40, idle_session_timeout 5min).
+      # Incident 2026-11-18: ha/README.md "Postgres connection leak".
+      DATABASE_POOL_MAX: ${HA_DATABASE_POOL_MAX:-8}
       WS_PUBSUB_TYPE: "redis"
       REDIS_URL: ${HA_REDIS_URL:-redis://10.88.0.1:6379}
       CHAT_STORAGE_TYPE: "s3"
