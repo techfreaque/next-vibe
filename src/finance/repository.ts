@@ -58,6 +58,7 @@ import {
   SourceRunStatus,
   ThresholdKey,
 } from "./enum";
+import { isFinanceProductionInstance } from "./env";
 import type { FinanceT } from "./i18n";
 import type { FinanceIngestResponseOutput } from "./ingest/definition";
 import {
@@ -119,7 +120,10 @@ export interface FinanceDeps {
   nowPaymentsPort(http: FinanceHttp): NowPaymentsPort | null;
   /** Our own usage log, for providers without a spend API (uncensored.ai, FreedomGPT). */
   usageLedger: UsageLedgerPort;
-  /** Finance-alert recipients (ops inbox + Thea mailbox); empty when none resolve. */
+  /**
+   * Finance-alert recipients (ops inbox + Thea mailbox); empty when none
+   * resolve or on a non-production instance (Atlas/Hermes test data).
+   */
   recipients(): string[];
   sendMail(
     input: { to: string; subject: string; text: string },
@@ -254,6 +258,11 @@ export const defaultFinanceDeps: FinanceDeps = {
     // Ops inbox + the Thea mailbox, deduped. Deliberately NOT
     // THEA_MAIL_REPORT_TO: that is the founder's personal address for the daily
     // status report, and finance alerts must not land there.
+    // Off production (Atlas dev, Hermes) the data is Stripe test mode: never
+    // mail it to the ops inboxes as if it were prod.
+    if (!isFinanceProductionInstance) {
+      return [];
+    }
     const list = [
       FINANCE_CONFIG.alertInbox,
       nonEmpty(systemMailboxEnv.THEA_MAIL_ADDRESS),
@@ -1474,7 +1483,9 @@ export class FinanceRepository {
       let delivery: string;
       const recipients = deps.recipients();
       if (recipients.length === 0) {
-        delivery = "skipped: no recipient (set THEA_MAIL_ADDRESS)";
+        delivery = isFinanceProductionInstance
+          ? "skipped: no recipient (set THEA_MAIL_ADDRESS)"
+          : "skipped: no recipient (non-production instance)";
       } else {
         const subject = `[finance] ${c.severity === "enums.severity.critical" ? "CRITICAL" : "WARNING"}: ${c.message.slice(0, 120)}`;
         const text = `${c.message}\n\n${JSON.stringify(c.metadata, null, 2)}\n\nOpen Finance in the admin to review balances and thresholds.`;

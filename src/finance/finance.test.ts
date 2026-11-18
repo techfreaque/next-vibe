@@ -48,7 +48,9 @@ import {
   ThresholdKey,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
+import { isFinanceProductionInstance } from "./env";
 import type { FinanceIngestResponseOutput } from "./ingest/definition";
+import { tasks as financeTasks } from "./ingest/task";
 import {
   classifyCostCoverage,
   computeMargin,
@@ -1280,6 +1282,17 @@ describe("finance ingest (mocked externals)", () => {
       expect(mails).toHaveLength(0);
     } finally {
       FinanceRepository.deps = testDeps;
+    }
+  });
+
+  // Regression 2026-11-18: Atlas dev + Hermes ran the finance crons on Stripe
+  // TEST data (8 test subscriptions cancelled on 11-17) and mailed
+  // "[finance] WARNING: Cancellation spike" to the ops inboxes as if from prod.
+  it("non-production instances never run the crons or mail alerts", () => {
+    expect(isFinanceProductionInstance).toBe(false);
+    expect(defaultFinanceDeps.recipients()).toEqual([]);
+    for (const task of financeTasks) {
+      expect(task.enabled).toBe(false);
     }
   });
 });

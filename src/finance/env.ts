@@ -7,7 +7,9 @@
 
 import "server-only";
 
+import { coreEnv } from "next-vibe/core/env";
 import { defineEnv } from "next-vibe/env/define-env";
+import { Environment } from "next-vibe/env/env-util";
 import { z } from "zod";
 
 export const {
@@ -31,3 +33,12 @@ export const {
     sensitive: true,
   },
 });
+
+/**
+ * True only on the production instance (Thea): NODE_ENV production without
+ * --hermes/--preview. Atlas dev and Hermes run with Stripe test keys and test
+ * data, so their finance crons stay off and their alerts never mail the ops
+ * inboxes (a test-mode cancellation burst once mailed a false prod alert).
+ */
+export const isFinanceProductionInstance =
+  coreEnv.NODE_ENV === Environment.PRODUCTION && !coreEnv.IS_PREVIEW_MODE;
