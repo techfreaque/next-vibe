@@ -15,6 +15,13 @@ import {
   DialogTitle,
 } from "next-vibe/ui/components/dialog";
 import { Div } from "next-vibe/ui/components/div";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "next-vibe/ui/components/dropdown-menu";
+import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { FolderPlus } from "next-vibe/ui/components/icons/FolderPlus";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { MessageSquarePlus } from "next-vibe/ui/components/icons/MessageSquarePlus";
@@ -45,12 +52,15 @@ import {
   getFolderTourAttr,
   TOUR_DATA_ATTRS,
 } from "../../../../ai-stream/stream/widget/chat-ui/data-attrs";
+import { useSidebarPreview } from "../../../../ai-stream/stream/widget/chat-ui/sidebar/preview/context";
+import { scopedTranslation as previewTranslation } from "../../../../ai-stream/stream/widget/chat-ui/sidebar/preview/i18n";
 import cortexSearchDefinitions from "../../../../cortex/search/definition";
 import { DEFAULT_FOLDER_CONFIGS, isDefaultFolderId } from "../../../config";
 import { NEW_MESSAGE_ID } from "../../../enum";
 import folderContentsDefinition from "../../../folder-contents/[rootFolderId]/definition";
 import { useChatBootContext } from "../../../hooks/context";
 import { useChatNavigationStore } from "../../../hooks/use-chat-navigation-store";
+import { scopedTranslation as threadWidgetTranslation } from "../../../threads/widget/i18n";
 import { ThreadsList } from "../../../threads/widget/widget";
 import createFolderDefinition from "../create/definition";
 import type definition from "../definition";
@@ -127,6 +137,7 @@ function RootFolderBar({
   const { locale } = useWidgetContext();
   const { t } = scopedTranslation.scopedT(locale);
 
+  const preview = useSidebarPreview();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
 
@@ -163,50 +174,87 @@ function RootFolderBar({
 
   return (
     <>
-      <Div className="overflow-x-auto">
-        <Div
-          className="flex flex-row items-center gap-1 px-3 py-2 min-w-max"
-          data-tour={TOUR_DATA_ATTRS.ROOT_FOLDERS}
-        >
-          {rootFolders.map((folderConfig) => {
-            const isActive = folderConfig.id === activeRootFolderId;
-            const color = folderConfig.color;
-            const colorEntry = ROOT_FOLDER_COLOR_MAP[color];
-            const colorClasses = isActive
-              ? (colorEntry?.active ?? "bg-primary text-primary-foreground")
-              : (colorEntry?.hover ?? "hover:bg-accent");
-
-            return (
-              <Div
-                key={folderConfig.id}
-                onClick={() => handleClick(folderConfig.id)}
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    handleClick(folderConfig.id);
-                  }
-                }}
+      {preview ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="max-w-full gap-1.5 rounded-full bg-background text-xs"
+              aria-label={`${previewTranslation.scopedT(locale).t("locations")}: ${t(`widget.config.foldersShort.${activeRootFolderId}`)}`}
+              data-tour={TOUR_DATA_ATTRS.ROOT_FOLDERS}
+            >
+              <Icon
+                icon={DEFAULT_FOLDER_CONFIGS[activeRootFolderId].icon}
+                className="size-3.5"
+              />
+              {t(`widget.config.foldersShort.${activeRootFolderId}`)}
+              <ChevronDown className="size-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="z-[350] min-w-40">
+            {rootFolders.map((folder) => (
+              <DropdownMenuItem
+                key={folder.id}
                 className={cn(
-                  "inline-flex items-center justify-center rounded-md h-13 w-13 flex-col gap-1 text-sm font-medium transition-colors no-underline cursor-pointer",
-                  colorClasses,
+                  "min-h-10 gap-2",
+                  folder.id === activeRootFolderId && "bg-accent font-semibold",
                 )}
-                data-tour={getFolderTourAttr(folderConfig.id)}
+                onSelect={() => handleClick(folder.id)}
+                data-tour={getFolderTourAttr(folder.id)}
               >
-                <Div className="h-5 w-5 flex items-center justify-center shrink-0">
-                  <Icon
-                    icon={folderConfig.icon}
-                    className="h-5 w-5 flex items-center justify-center"
-                  />
+                <Icon icon={folder.icon} className="size-4" />
+                {t(`widget.config.foldersShort.${folder.id}`)}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : (
+        <Div className="overflow-x-auto">
+          <Div
+            className="flex flex-row items-center gap-1 px-3 py-2 min-w-max"
+            data-tour={TOUR_DATA_ATTRS.ROOT_FOLDERS}
+          >
+            {rootFolders.map((folderConfig) => {
+              const isActive = folderConfig.id === activeRootFolderId;
+              const color = folderConfig.color;
+              const colorEntry = ROOT_FOLDER_COLOR_MAP[color];
+              const colorClasses = isActive
+                ? (colorEntry?.active ?? "bg-primary text-primary-foreground")
+                : (colorEntry?.hover ?? "hover:bg-accent");
+
+              return (
+                <Div
+                  key={folderConfig.id}
+                  onClick={() => handleClick(folderConfig.id)}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleClick(folderConfig.id);
+                    }
+                  }}
+                  className={cn(
+                    "inline-flex items-center justify-center rounded-md h-13 w-13 flex-col gap-1 text-sm font-medium transition-colors no-underline cursor-pointer",
+                    colorClasses,
+                  )}
+                  data-tour={getFolderTourAttr(folderConfig.id)}
+                >
+                  <Div className="h-5 w-5 flex items-center justify-center shrink-0">
+                    <Icon
+                      icon={folderConfig.icon}
+                      className="h-5 w-5 flex items-center justify-center"
+                    />
+                  </Div>
+                  <Span className="text-[9px] font-medium leading-none opacity-80">
+                    {t(`widget.config.foldersShort.${folderConfig.id}`)}
+                  </Span>
                 </Div>
-                <Span className="text-[9px] font-medium leading-none opacity-80">
-                  {t(`widget.config.foldersShort.${folderConfig.id}`)}
-                </Span>
-              </Div>
-            );
-          })}
+              );
+            })}
+          </Div>
         </Div>
-      </Div>
+      )}
 
       {selectedFolderId && (
         <FolderAccessModal
@@ -239,6 +287,9 @@ export function FoldersListContainer(): React.JSX.Element {
     useChatBootContext();
   const { t } = scopedTranslation.scopedT(locale);
 
+  const preview = useSidebarPreview();
+  const previewT = previewTranslation.scopedT(locale).t;
+  const { t: threadT } = threadWidgetTranslation.scopedT(locale);
   const getNewChatLabel = (rootFolderId: DefaultFolderId): string => {
     switch (rootFolderId) {
       case DefaultFolderId.PRIVATE:
@@ -280,6 +331,12 @@ export function FoldersListContainer(): React.JSX.Element {
   const searchInputRef = useRef<InputRefObject>(null);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  useEffect(() => {
+    if (preview?.panel === "search") {
+      searchInputRef.current?.focus();
+    }
+  }, [preview?.panel]);
+
   const rootFolderPermissions = field?.rootFolderPermissions;
 
   const isAuthenticated = useMemo(
@@ -291,9 +348,7 @@ export function FoldersListContainer(): React.JSX.Element {
       user !== undefined &&
       !user.isPublic &&
       "roles" in user &&
-      (user as { roles?: string[] }).roles?.includes(
-        UserPermissionRole.ADMIN,
-      ) === true,
+      user.roles.includes(UserPermissionRole.ADMIN),
     [user],
   );
 
@@ -356,10 +411,14 @@ export function FoldersListContainer(): React.JSX.Element {
     }
   }, [activeRootFolderId, setSearchQuery]);
 
+  const canSearchCortex =
+    isAuthenticated &&
+    !(preview && activeRootFolderId === DefaultFolderId.INCOGNITO);
+
   // Trigger cortex search when debounced query changes or on mount with persisted query
   const searchSubmittedRef = useRef("");
   useEffect(() => {
-    if (!isAuthenticated || !debouncedQuery || !searchEndpoint?.read) {
+    if (!canSearchCortex || !debouncedQuery || !searchEndpoint?.read) {
       searchSubmittedRef.current = "";
       return;
     }
@@ -373,7 +432,7 @@ export function FoldersListContainer(): React.JSX.Element {
     form.setValue("path", `/threads/${activeRootFolderId}`);
     form.setValue("maxResults", 20);
     searchEndpoint.read.submitForm();
-  }, [debouncedQuery, activeRootFolderId, searchEndpoint, isAuthenticated]);
+  }, [debouncedQuery, activeRootFolderId, searchEndpoint, canSearchCortex]);
 
   // Extract thread IDs from cortex search results
   const searchResponse = searchEndpoint?.read?.response;
@@ -393,7 +452,7 @@ export function FoldersListContainer(): React.JSX.Element {
   }, [searchResponse]);
 
   // Show loading while debouncing OR while API is fetching
-  const isSearchActive = isAuthenticated && searchQuery.trim().length > 0;
+  const isSearchActive = canSearchCortex && searchQuery.trim().length > 0;
   const isDebouncePending =
     isSearchActive && searchQuery.trim() !== debouncedQuery;
   const isSearching =
@@ -437,6 +496,7 @@ export function FoldersListContainer(): React.JSX.Element {
       currentSubFolderId: null,
     });
     pushState(`/${locale}/threads/${activeRootFolderId}/${NEW_MESSAGE_ID}`);
+    preview?.onOpenChat();
   };
 
   const isOnNewThreadPage =
@@ -449,70 +509,124 @@ export function FoldersListContainer(): React.JSX.Element {
     ? (rootFolderPermissions?.canCreateFolder ?? false)
     : true;
 
+  const rootPicker = (
+    <RootFolderBar
+      activeRootFolderId={activeRootFolderId}
+      onSelectFolder={handleSelectRootFolder}
+      isAuthenticated={isAuthenticated}
+      isAdmin={isAdmin}
+    />
+  );
+  const showSearch = preview
+    ? preview.variant !== "B" || preview.panel === "search"
+    : isAuthenticated;
+
   return (
-    <Div className="flex flex-col h-full bg-background">
-      <Div className="bg-background flex flex-col gap-0 pt-15" />
+    <Div
+      className={
+        preview
+          ? "flex min-h-0 flex-col h-full bg-background"
+          : "flex flex-col h-full bg-background"
+      }
+    >
+      {preview ? (
+        <Div className="flex shrink-0 flex-wrap items-center justify-between gap-2 px-3 pb-2 pt-3">
+          <Span className="text-base font-semibold tracking-tight">
+            {previewT(
+              preview.panel === "search"
+                ? "search"
+                : preview.variant === "C"
+                  ? "workspace"
+                  : preview.variant === "A"
+                    ? "library"
+                    : "chats",
+            )}
+          </Span>
+          {rootPicker}
+        </Div>
+      ) : (
+        <>
+          <Div className="bg-background flex flex-col gap-0 pt-15" />
+          {rootPicker}
+        </>
+      )}
+      {preview?.panel !== "search" && (
+        <Div
+          className={
+            preview
+              ? "flex shrink-0 items-center gap-1.5 px-3 pb-2"
+              : "flex flex-row items-center gap-1 px-3 pb-2 min-w-max"
+          }
+        >
+          {canCreateThread && (
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Div className="w-full">
+                    <Button
+                      onClick={handleCreateThread}
+                      disabled={!preview && isOnNewThreadPage}
+                      className={
+                        preview
+                          ? "h-11 w-full justify-start rounded-lg px-3"
+                          : `w-full h-10 sm:h-9 ${buttonColorClass}`
+                      }
+                      data-tour={TOUR_DATA_ATTRS.NEW_CHAT_BUTTON}
+                    >
+                      <MessageSquarePlus
+                        className={preview ? "size-4" : "h-4 w-4 mr-2"}
+                      />
+                      {preview
+                        ? threadT("common.newChat")
+                        : getNewChatLabel(activeRootFolderId)}
+                    </Button>
+                  </Div>
+                </TooltipTrigger>
+              </Tooltip>
+            </TooltipProvider>
+          )}
 
-      <RootFolderBar
-        activeRootFolderId={activeRootFolderId}
-        onSelectFolder={handleSelectRootFolder}
-        isAuthenticated={isAuthenticated}
-        isAdmin={isAdmin}
-      />
-
-      <Div className="flex flex-row items-center gap-1 px-3 pb-2 min-w-max">
-        {canCreateThread && (
-          <TooltipProvider delayDuration={300}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Div className="w-full">
+          {canCreateFolder && (
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <Button
-                    onClick={handleCreateThread}
-                    disabled={isOnNewThreadPage}
-                    className={`w-full h-10 sm:h-9 ${buttonColorClass}`}
-                    data-tour={TOUR_DATA_ATTRS.NEW_CHAT_BUTTON}
+                    variant="ghost"
+                    size="icon"
+                    className={
+                      preview
+                        ? "size-11 shrink-0 rounded-lg border border-border hover:bg-accent"
+                        : "h-11 w-11 hover:bg-accent"
+                    }
+                    onClick={() => setNewFolderDialogOpen(true)}
+                    title={getNewFolderLabel(activeRootFolderId)}
                   >
-                    <MessageSquarePlus className="h-4 w-4 mr-2" />
-                    {getNewChatLabel(activeRootFolderId)}
+                    <FolderPlus className="h-5 w-5" />
                   </Button>
-                </Div>
-              </TooltipTrigger>
-            </Tooltip>
-          </TooltipProvider>
-        )}
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  {getNewFolderLabel(activeRootFolderId)}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </Div>
+      )}
 
-        {canCreateFolder && (
-          <TooltipProvider delayDuration={300}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-11 w-11 hover:bg-accent"
-                  onClick={() => setNewFolderDialogOpen(true)}
-                  title={getNewFolderLabel(activeRootFolderId)}
-                >
-                  <FolderPlus className="h-5 w-5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                {getNewFolderLabel(activeRootFolderId)}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-      </Div>
-
-      {/* Thread search is cortex vector search - account-scoped. Guests have
-          no cortex (the call was always 403), so the box is not offered. */}
-      {isAuthenticated && (
+      {/* Guests and incognito previews filter the current level locally. */}
+      {showSearch && (
         <Div className="px-3 pb-3 flex flex-row gap-2 border-b border-border">
           <Div className="relative flex-1 flex flex-row">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
             <Input
               ref={searchInputRef}
               type="text"
-              placeholder={t("widget.common.searchPlaceholder")}
+              aria-label={preview ? previewT("searchChats") : undefined}
+              placeholder={
+                preview
+                  ? previewT("searchChats")
+                  : t("widget.common.searchPlaceholder")
+              }
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -521,17 +635,31 @@ export function FoldersListContainer(): React.JSX.Element {
                 }
               }}
               className={cn(
-                "pl-8 h-10 sm:h-8 text-sm border-none bg-primary/10 focus-visible:ring-primary",
-                isSearchActive && "pr-8",
+                preview
+                  ? "pl-8 h-10 text-sm rounded-lg bg-muted/35 border-border"
+                  : "pl-8 h-10 sm:h-8 text-sm border-none bg-primary/10 focus-visible:ring-primary",
+                preview ? searchQuery && "pr-10" : isSearchActive && "pr-8",
               )}
             />
-            {isSearchActive && (
-              <Div
+            {preview && searchQuery ? (
+              <Button
+                size="icon"
+                variant="ghost"
+                className="absolute right-0 top-0 size-10"
                 onClick={handleClearSearch}
-                className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer rounded-sm p-0.5 hover:bg-primary/10"
+                aria-label={previewT("clearSearch")}
               >
-                <X className="h-3.5 w-3.5 text-muted-foreground" />
-              </Div>
+                <X />
+              </Button>
+            ) : (
+              isSearchActive && (
+                <Div
+                  onClick={handleClearSearch}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer rounded-sm p-0.5 hover:bg-primary/10"
+                >
+                  <X className="h-3.5 w-3.5 text-muted-foreground" />
+                </Div>
+              )
             )}
           </Div>
         </Div>
@@ -572,7 +700,9 @@ export function FoldersListContainer(): React.JSX.Element {
             ) : (
               <Div className="flex items-center justify-center py-8">
                 <Span className="text-sm text-muted-foreground">
-                  {t("widget.common.noResults")}
+                  {preview
+                    ? previewT("noMatches")
+                    : t("widget.common.noResults")}
                 </Span>
               </Div>
             )

@@ -738,6 +738,7 @@ function isSomethingListening(port: number): Promise<boolean> {
 export interface ClaimedPgliteServer {
   server: Server;
   attach: (pg: PGlite) => void;
+  release: () => void;
 }
 
 export async function tryClaimPgliteOwnership(
@@ -774,6 +775,12 @@ export async function tryClaimPgliteOwnership(
         probe.removeListener("error", onError);
         resolve({
           server: probe,
+          release: () => {
+            probe.close();
+            for (const socket of pending.splice(0)) {
+              socket.destroy();
+            }
+          },
           attach: (freshPg) => {
             pg = freshPg;
             for (const socket of pending.splice(0)) {

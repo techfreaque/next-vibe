@@ -87563,6 +87563,20 @@
                         }
                       },
                       "type": "nullable"
+                    },
+                    "lastSpendNative": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      },
+                      "type": "nullable"
                     }
                   }
                 },
@@ -87720,6 +87734,20 @@
                     "type": "nullable"
                   },
                   "lastSpendUsd": {
+                    "def": {
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    },
+                    "type": "nullable"
+                  },
+                  "lastSpendNative": {
                     "def": {
                       "type": "nullable",
                       "innerType": {
@@ -88301,8 +88329,9 @@
                           "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
                           "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
                           "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
-                          "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
-                          "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+                          "enums.threshold.openrouterAutoTopUpFloorUsd": "enums.threshold.openrouterAutoTopUpFloorUsd",
+                          "enums.threshold.openrouterAutoTopUpGraceHours": "enums.threshold.openrouterAutoTopUpGraceHours",
+                          "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
                           "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
                           "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
                           "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
@@ -88323,8 +88352,9 @@
                         "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
                         "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
                         "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
-                        "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
-                        "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+                        "enums.threshold.openrouterAutoTopUpFloorUsd": "enums.threshold.openrouterAutoTopUpFloorUsd",
+                        "enums.threshold.openrouterAutoTopUpGraceHours": "enums.threshold.openrouterAutoTopUpGraceHours",
+                        "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
                         "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
                         "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
                         "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
@@ -88343,8 +88373,9 @@
                         "enums.threshold.alertDedupHours",
                         "enums.threshold.minRevenueUsd",
                         "enums.threshold.minCostUsd",
-                        "enums.threshold.openrouterLowBalanceUsd",
-                        "enums.threshold.openrouterLowBalanceDays",
+                        "enums.threshold.openrouterAutoTopUpFloorUsd",
+                        "enums.threshold.openrouterAutoTopUpGraceHours",
+                        "enums.threshold.gabLowBalanceCredits",
                         "enums.threshold.nanoGptLowBalanceUsd",
                         "enums.threshold.nanoGptLowBalanceDays",
                         "enums.threshold.veniceLowBalanceUsd",
@@ -88411,8 +88442,9 @@
                         "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
                         "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
                         "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
-                        "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
-                        "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+                        "enums.threshold.openrouterAutoTopUpFloorUsd": "enums.threshold.openrouterAutoTopUpFloorUsd",
+                        "enums.threshold.openrouterAutoTopUpGraceHours": "enums.threshold.openrouterAutoTopUpGraceHours",
+                        "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
                         "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
                         "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
                         "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
@@ -88433,8 +88465,9 @@
                       "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
                       "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
                       "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
-                      "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
-                      "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+                      "enums.threshold.openrouterAutoTopUpFloorUsd": "enums.threshold.openrouterAutoTopUpFloorUsd",
+                      "enums.threshold.openrouterAutoTopUpGraceHours": "enums.threshold.openrouterAutoTopUpGraceHours",
+                      "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
                       "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
                       "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
                       "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
@@ -88453,8 +88486,9 @@
                       "enums.threshold.alertDedupHours",
                       "enums.threshold.minRevenueUsd",
                       "enums.threshold.minCostUsd",
-                      "enums.threshold.openrouterLowBalanceUsd",
-                      "enums.threshold.openrouterLowBalanceDays",
+                      "enums.threshold.openrouterAutoTopUpFloorUsd",
+                      "enums.threshold.openrouterAutoTopUpGraceHours",
+                      "enums.threshold.gabLowBalanceCredits",
                       "enums.threshold.nanoGptLowBalanceUsd",
                       "enums.threshold.nanoGptLowBalanceDays",
                       "enums.threshold.veniceLowBalanceUsd",
@@ -88583,12 +88617,16 @@
               "label": "enums.threshold.minCostUsd"
             },
             {
-              "value": "enums.threshold.openrouterLowBalanceUsd",
-              "label": "enums.threshold.openrouterLowBalanceUsd"
+              "value": "enums.threshold.openrouterAutoTopUpFloorUsd",
+              "label": "enums.threshold.openrouterAutoTopUpFloorUsd"
             },
             {
-              "value": "enums.threshold.openrouterLowBalanceDays",
-              "label": "enums.threshold.openrouterLowBalanceDays"
+              "value": "enums.threshold.openrouterAutoTopUpGraceHours",
+              "label": "enums.threshold.openrouterAutoTopUpGraceHours"
+            },
+            {
+              "value": "enums.threshold.gabLowBalanceCredits",
+              "label": "enums.threshold.gabLowBalanceCredits"
             },
             {
               "value": "enums.threshold.nanoGptLowBalanceUsd",
@@ -88624,8 +88662,9 @@
                 "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
                 "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
                 "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
-                "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
-                "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+                "enums.threshold.openrouterAutoTopUpFloorUsd": "enums.threshold.openrouterAutoTopUpFloorUsd",
+                "enums.threshold.openrouterAutoTopUpGraceHours": "enums.threshold.openrouterAutoTopUpGraceHours",
+                "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
                 "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
                 "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
                 "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
@@ -88646,8 +88685,9 @@
               "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
               "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
               "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
-              "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
-              "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+              "enums.threshold.openrouterAutoTopUpFloorUsd": "enums.threshold.openrouterAutoTopUpFloorUsd",
+              "enums.threshold.openrouterAutoTopUpGraceHours": "enums.threshold.openrouterAutoTopUpGraceHours",
+              "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
               "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
               "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
               "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
@@ -88666,8 +88706,9 @@
               "enums.threshold.alertDedupHours",
               "enums.threshold.minRevenueUsd",
               "enums.threshold.minCostUsd",
-              "enums.threshold.openrouterLowBalanceUsd",
-              "enums.threshold.openrouterLowBalanceDays",
+              "enums.threshold.openrouterAutoTopUpFloorUsd",
+              "enums.threshold.openrouterAutoTopUpGraceHours",
+              "enums.threshold.gabLowBalanceCredits",
               "enums.threshold.nanoGptLowBalanceUsd",
               "enums.threshold.nanoGptLowBalanceDays",
               "enums.threshold.veniceLowBalanceUsd",
@@ -88765,8 +88806,9 @@
                 "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
                 "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
                 "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
-                "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
-                "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+                "enums.threshold.openrouterAutoTopUpFloorUsd": "enums.threshold.openrouterAutoTopUpFloorUsd",
+                "enums.threshold.openrouterAutoTopUpGraceHours": "enums.threshold.openrouterAutoTopUpGraceHours",
+                "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
                 "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
                 "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
                 "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
@@ -88787,8 +88829,9 @@
               "enums.threshold.alertDedupHours": "enums.threshold.alertDedupHours",
               "enums.threshold.minRevenueUsd": "enums.threshold.minRevenueUsd",
               "enums.threshold.minCostUsd": "enums.threshold.minCostUsd",
-              "enums.threshold.openrouterLowBalanceUsd": "enums.threshold.openrouterLowBalanceUsd",
-              "enums.threshold.openrouterLowBalanceDays": "enums.threshold.openrouterLowBalanceDays",
+              "enums.threshold.openrouterAutoTopUpFloorUsd": "enums.threshold.openrouterAutoTopUpFloorUsd",
+              "enums.threshold.openrouterAutoTopUpGraceHours": "enums.threshold.openrouterAutoTopUpGraceHours",
+              "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
               "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
               "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
               "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
@@ -88807,8 +88850,9 @@
               "enums.threshold.alertDedupHours",
               "enums.threshold.minRevenueUsd",
               "enums.threshold.minCostUsd",
-              "enums.threshold.openrouterLowBalanceUsd",
-              "enums.threshold.openrouterLowBalanceDays",
+              "enums.threshold.openrouterAutoTopUpFloorUsd",
+              "enums.threshold.openrouterAutoTopUpGraceHours",
+              "enums.threshold.gabLowBalanceCredits",
               "enums.threshold.nanoGptLowBalanceUsd",
               "enums.threshold.nanoGptLowBalanceDays",
               "enums.threshold.veniceLowBalanceUsd",

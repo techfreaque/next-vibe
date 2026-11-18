@@ -15,6 +15,7 @@ import type { SkillGetResponseOutput } from "next-vibe/agent/skills/[id]/definit
 import { SkillOwnershipType } from "next-vibe/agent/skills/enum";
 import type { FavoriteCreateRequestOutput } from "next-vibe/agent/skills/favorites/create/definition";
 import { scopedTranslation as importTranslation } from "next-vibe/agent/skills/import/i18n";
+import { coreClientEnv } from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
@@ -61,6 +62,12 @@ import {
   CtaRow,
   SectionLabel,
 } from "../../story/_shared/marketing";
+import { DesignPreview } from "./design-preview";
+import { ADRIAN_RECORDING_ID } from "./design-samples";
+import {
+  selectSkillPageDesign,
+  type SkillPageDesign,
+} from "./design-selection";
 import { scopedTranslation, type SkillLandingPageT } from "./i18n";
 import {
   AddToSkillsAction,
@@ -71,6 +78,7 @@ import {
   ShareEarnAction,
   StickyTryBar,
 } from "./landing-actions";
+import type { SkillMessagePrice } from "./message-price";
 import type { SkillSample } from "./samples";
 
 // ─── types (exported for page.tsx) ───────────────────────────────────────────
@@ -89,10 +97,7 @@ export interface ResolvedVariantInfo {
   chatModelName: string | null;
   chatProviderName: string | null;
   modelKind: ModelKind;
-  /** Credits for a short message (200 in / 400 out tokens). */
-  chatCreditCost: number | null;
-  /** chatCreditCost formatted for the page locale ("0,8" in German). */
-  chatCreditCostLabel: string | null;
+  chatMessagePrice: SkillMessagePrice | null;
   voiceModelName: string | null;
   imageGenModelName: string | null;
   imageGenCreditCost: number | null;
@@ -126,6 +131,7 @@ export interface FreeCredits {
 }
 
 export interface SkillLandingPageProps {
+  design: SkillPageDesign | null;
   locale: CountryLanguage;
   skillId: string;
   baseSkillId: string;
@@ -210,6 +216,18 @@ function SkillAvatar({
       )}
     </Span>
   );
+}
+
+function messagePriceLabel(
+  price: SkillMessagePrice,
+  t: SkillLandingPageT,
+): string {
+  if (price.credits === 0) {
+    return t("model.free");
+  }
+  return t(price.basis ? "model.estimatedPrice" : "model.fixedPrice", {
+    cost: price.creditLabel,
+  });
 }
 
 function MetaChip({
@@ -550,16 +568,16 @@ function KindCard({
             </Span>
           )}
         </Div>
-        {variant.chatCreditCost !== null && (
+        {variant.chatMessagePrice && (
           <Div className="sm:text-right">
             <Span className="block text-xl font-semibold tabular-nums">
-              {t("model.perMessageValue", {
-                cost: variant.chatCreditCostLabel ?? "",
-              })}
+              {messagePriceLabel(variant.chatMessagePrice, t)}
             </Span>
-            <Span className="block text-xs text-muted-foreground">
-              {t("model.perMessage")}
-            </Span>
+            {variant.chatMessagePrice.credits > 0 && (
+              <Span className="block text-xs text-muted-foreground">
+                {t("model.perMessage")}
+              </Span>
+            )}
           </Div>
         )}
       </Div>
@@ -639,11 +657,20 @@ function KindCard({
           <Span>{t("model.ageNote")}</Span>
         </Div>
       )}
-      {variant.chatCreditCost !== null && (
-        <Span className="mt-5 block text-xs text-muted-foreground">
-          {t("model.perMessageHint")}
-        </Span>
-      )}
+      {variant.chatMessagePrice?.basis &&
+        variant.chatMessagePrice.credits > 0 && (
+          <Span className="mt-5 block text-xs text-muted-foreground">
+            {t(
+              variant.chatMessagePrice.basis.includesImage
+                ? "model.perMessageWithImageHint"
+                : "model.perMessageHint",
+              {
+                input: variant.chatMessagePrice.basis.input,
+                output: variant.chatMessagePrice.basis.output,
+              },
+            )}
+          </Span>
+        )}
     </Div>
   );
 }
@@ -766,7 +793,7 @@ function distinctVariants(
   const seen = new Set<string>();
   const kept = new Set<string>();
   for (const v of ordered) {
-    const key = `${v.chatModelName ?? ""}|${v.chatCreditCostLabel ?? ""}`;
+    const key = `${v.chatModelName ?? ""}|${v.chatMessagePrice?.credits ?? ""}`;
     if (v.id === activeId || v.isDefault || !seen.has(key)) {
       kept.add(v.id);
     }
@@ -841,10 +868,8 @@ function VariantList({
               <Span className="mt-1 block text-sm text-muted-foreground">
                 {[
                   v.chatModelName,
-                  v.chatCreditCostLabel !== null
-                    ? t("model.perMessageValue", {
-                        cost: v.chatCreditCostLabel,
-                      })
+                  v.chatMessagePrice
+                    ? messagePriceLabel(v.chatMessagePrice, t)
                     : null,
                 ]
                   .filter((x): x is string => !!x)
@@ -935,11 +960,13 @@ function CreatorCard({
   locale,
   t,
   children,
+  published = false,
 }: {
   creator: NonNullable<SkillGetResponseOutput["creatorProfile"]>;
   locale: CountryLanguage;
   t: SkillLandingPageT;
   children?: ReactNode;
+  published?: boolean;
 }): JSX.Element {
   const socials = CREATOR_SOCIALS.flatMap(({ key, label }) => {
     const url = creator[key];
@@ -972,9 +999,13 @@ function CreatorCard({
             )}
           </Span>
           <Div className="min-w-0">
-            <SectionLabel className="mb-1">{t("creator.label")}</SectionLabel>
+            {!published && (
+              <SectionLabel className="mb-1">{t("creator.label")}</SectionLabel>
+            )}
             <Span className="block text-lg font-semibold">
-              {t("creator.madeBy", { name: creator.publicName })}
+              {t(published ? "preview.publishedBy" : "creator.madeBy", {
+                name: creator.publicName,
+              })}
             </Span>
             {creator.bio && (
               <P className="mt-1 text-sm leading-relaxed text-muted-foreground">
@@ -1157,9 +1188,13 @@ export function SkillLandingPage(props: SkillLandingPageProps): JSX.Element {
     ? t("hero.tryGeneric")
     : t("sticky.tryNamed", { name });
   // What the guest allowance buys on this skill's model ("about 4 messages").
+  const messagePrice = active?.chatMessagePrice;
+  const messagePriceText = messagePrice
+    ? messagePriceLabel(messagePrice, t)
+    : null;
   const freeMessages =
-    active?.chatCreditCost && active.chatCreditCost > 0
-      ? Math.floor(freeCredits.guest / active.chatCreditCost) || null
+    messagePrice && messagePrice.credits > 0
+      ? Math.floor(freeCredits.guest / messagePrice.credits) || null
       : null;
   // The creator's own signup form, shown quietly inside the creator card.
   const leadForm = leadMagnetConfig ? (
@@ -1192,7 +1227,29 @@ export function SkillLandingPage(props: SkillLandingPageProps): JSX.Element {
     </>
   );
   const hasSamples = samples.length > 0;
+  const design = selectSkillPageDesign(
+    coreClientEnv.NODE_ENV,
+    props.design ?? undefined,
+  );
 
+  const isAdrian = skillData.internalId === ADRIAN_RECORDING_ID;
+  const isChan = baseSkillId === "4chan";
+  const previewPitch = isAdrian
+    ? t("preview.adrianPitch")
+    : isChan
+      ? t("preview.chanPitch")
+      : isCommunity
+        ? skillData.tagline || oneLiner
+        : oneLiner;
+  const previewPrompts = isAdrian
+    ? [
+        t("preview.adrianStarter1"),
+        t("preview.adrianStarter2"),
+        t("preview.adrianStarter3"),
+      ]
+    : isChan
+      ? [t("preview.chanCommute"), ...examplePrompts.slice(1, 3)]
+      : examplePrompts;
   return (
     <Div className="bg-background text-foreground">
       {structuredData && (
@@ -1200,201 +1257,280 @@ export function SkillLandingPage(props: SkillLandingPageProps): JSX.Element {
       )}
 
       {/* ── HERO ── */}
-      <Div className="relative overflow-hidden border-b border-border bg-linear-to-b from-primary/[0.07] via-background to-background">
-        <Div
-          className={cn(
-            CONTAINER,
-            "grid items-start gap-6 pt-4 pb-14 md:pt-10 md:pb-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14",
-          )}
-        >
-          {/* identity + CTA */}
-          <Div className="min-w-0 lg:self-start lg:pt-2">
-            <Div className="mb-3 flex flex-wrap items-center gap-1 text-sm text-muted-foreground md:mb-6">
-              <Link
-                href={`/${locale}/skills`}
-                className="inline-flex min-h-9 items-center no-underline hover:text-foreground"
-              >
-                {t("breadcrumb.skills")}
-              </Link>
-              {categoryLabel && (
-                <>
-                  <ChevronRight className="h-3.5 w-3.5" />
-                  <Span>{categoryLabel}</Span>
-                </>
-              )}
-            </Div>
-
-            <Div className="flex items-center gap-4">
-              <SkillAvatar skill={skillData} size="lg" />
-              <Div className="min-w-0">
-                <Span className="mb-1 block text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-                  {isCommunity ? t("hero.community") : t("hero.builtIn")}
-                </Span>
-                <H1
-                  className={cn(
-                    "line-clamp-2 font-semibold tracking-tight text-balance [overflow-wrap:anywhere]",
-                    // the base H1 sets lg:text-5xl, so every size names lg too
-                    name.length > 28
-                      ? "text-2xl md:text-3xl lg:text-3xl"
-                      : name.length > 16
-                        ? "text-3xl md:text-4xl lg:text-4xl"
-                        : "text-4xl md:text-5xl lg:text-5xl",
-                  )}
-                >
-                  {name}
-                </H1>
-              </Div>
-            </Div>
-
-            {oneLiner && (
-              <P className="mt-5 max-w-xl text-lg leading-relaxed text-pretty text-muted-foreground md:text-xl">
-                {oneLiner}
-              </P>
-            )}
-
-            <Div className="mt-5 flex flex-wrap items-center gap-2">
-              {active?.chatModelName && (
-                <MetaChip
-                  icon={
-                    active.modelKind === "trained" ||
-                    active.modelKind === "abliterated"
-                      ? ShieldOff
-                      : Cpu
-                  }
-                  tone="primary"
-                >
-                  <Span className="sr-only">
-                    {t("hero.runsOn", { model: "" })}
-                  </Span>
-                  {active.chatModelName}
-                </MetaChip>
-              )}
-              {active?.chatCreditCostLabel !== null &&
-                active?.chatCreditCostLabel !== undefined && (
-                  <MetaChip icon={DollarSign}>
-                    {/* short form on phones so both pills share one row */}
-                    <Span className="sm:hidden">
-                      {t("hero.costPerMessageShort", {
-                        cost: active.chatCreditCostLabel,
-                      })}
-                    </Span>
-                    <Span className="hidden sm:inline">
-                      {t("hero.costPerMessage", {
-                        cost: active.chatCreditCostLabel,
-                      })}
-                    </Span>
-                  </MetaChip>
-                )}
-              {favCount > 0 && (
-                <MetaChip icon={Star}>
-                  {t("hero.favorites", { count: favCount })}
-                </MetaChip>
-              )}
-            </Div>
-
-            {(creator || skillData.importedFrom) && (
-              <Div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
-                {creator && (
+      {design ? (
+        <DesignPreview
+          design={design}
+          name={name}
+          pitch={previewPitch}
+          detail={
+            isAdrian
+              ? t("preview.adrianDetail")
+              : isChan
+                ? t("preview.chanDetail")
+                : ""
+          }
+          board={isChan}
+          inputHint={
+            isAdrian
+              ? t("preview.officeMessage")
+              : isChan
+                ? t("preview.storyMessage")
+                : t("chat.inputPlaceholder", { name })
+          }
+          savedCount={favCount}
+          ctaLabel={
+            longName
+              ? t("preview.chatGeneric")
+              : t("preview.chatNamed", { name: name.replace(/\s*💸$/u, "") })
+          }
+          avatar={<SkillAvatar skill={skillData} size="lg" />}
+          byline={
+            <Div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <Span>
+                {isCommunity ? t("preview.community") : t("preview.builtin")}
+              </Span>
+              {skillData.importedFrom ? (
+                <ImportedCredit
+                  locale={locale}
+                  importedFrom={skillData.importedFrom}
+                />
+              ) : (
+                creator && (
                   <Link
+                    className="font-medium text-inherit underline underline-offset-4"
                     href={`/${locale}/creator/${creator.creatorSlug}`}
-                    className="inline-flex items-center gap-2 text-sm text-muted-foreground no-underline hover:text-foreground"
                   >
-                    <Span className="inline-flex h-6 w-6 items-center justify-center overflow-hidden rounded-full border border-border bg-muted">
-                      {creator.avatarUrl ? (
-                        <Image
-                          src={creator.avatarUrl}
-                          alt={creator.publicName}
-                          width={24}
-                          height={24}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <User className="h-3 w-3" />
-                      )}
-                    </Span>
                     {t("hero.byCreator", { name: creator.publicName })}
                   </Link>
-                )}
-                {skillData.importedFrom && (
-                  <ImportedCredit
-                    locale={locale}
-                    importedFrom={skillData.importedFrom}
-                  />
-                )}
-              </Div>
+                )
+              )}
+            </Div>
+          }
+          contentNote={
+            baseSkillId === "4chan" ? t("preview.contentNote") : null
+          }
+          model={active?.chatModelName ?? null}
+          price={messagePriceText}
+          guestNote={
+            user.isPublic
+              ? freeMessages && freeMessages > 1
+                ? t("preview.trial", {
+                    credits: freeCredits.guest,
+                    count: freeMessages,
+                  })
+                : t("hero.guestNote", { credits: freeCredits.guest })
+              : null
+          }
+          tryUrl={tryUrl}
+          promptUrl={promptUrl}
+          prompts={previewPrompts}
+          samples={samples}
+          t={t}
+        />
+      ) : (
+        <Div className="relative overflow-hidden border-b border-border bg-linear-to-b from-primary/[0.07] via-background to-background">
+          <Div
+            className={cn(
+              CONTAINER,
+              "grid items-start gap-6 pt-4 pb-14 md:pt-10 md:pb-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14",
             )}
-
-            {/* the one CTA */}
-            <Div id={HERO_CTA_ID} className="mt-6 flex flex-col gap-3 md:mt-8">
-              <Button
-                asChild
-                size="lg"
-                className="h-13 w-full gap-2 px-8 text-base font-semibold shadow-md shadow-primary/20 sm:w-auto"
-              >
-                <Link href={tryUrl}>
-                  {tryLabel}
-                  <ArrowRight className="h-4 w-4" />
+          >
+            {/* identity + CTA */}
+            <Div className="min-w-0 lg:self-start lg:pt-2">
+              <Div className="mb-3 flex flex-wrap items-center gap-1 text-sm text-muted-foreground md:mb-6">
+                <Link
+                  href={`/${locale}/skills`}
+                  className="inline-flex min-h-9 items-center no-underline hover:text-foreground"
+                >
+                  {t("breadcrumb.skills")}
                 </Link>
-              </Button>
-              <Span className="flex items-start justify-center gap-2 text-sm leading-snug text-muted-foreground sm:justify-start">
-                {user.isPublic ? (
+                {categoryLabel && (
                   <>
-                    <Gift className="mt-px h-4 w-4 shrink-0 text-primary" />
-                    {freeMessages !== null
-                      ? t("hero.guestNoteEstimate", {
-                          credits: freeCredits.guest,
-                          messages: freeMessages,
-                        })
-                      : t("hero.guestNote", { credits: freeCredits.guest })}
+                    <ChevronRight className="h-3.5 w-3.5" />
+                    <Span>{categoryLabel}</Span>
                   </>
-                ) : longName ? (
-                  t("hero.userNoteGeneric")
-                ) : (
-                  t("hero.userNote", { name })
                 )}
-              </Span>
-            </Div>
-
-            {/* desktop: fill the column beside the tall sample card with a
-                real next step, not padding */}
-            <Div className="mt-10 hidden flex-col gap-3 rounded-xl border border-border bg-card/60 p-4 text-sm lg:flex">
-              {active?.chatModelName && (
-                <Div className="flex gap-2.5">
-                  <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  <Span>
-                    {t("hero.trust.real", { model: active.chatModelName })}
-                  </Span>
-                </Div>
-              )}
-              <Div className="flex gap-2.5">
-                <Layers className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <Span>{t("hero.trust.switch", { count: modelCount })}</Span>
               </Div>
-              {(active?.modelKind === "trained" ||
-                active?.modelKind === "abliterated") && (
-                <Div className="flex gap-2.5">
-                  <Lock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  <Span>{t("model.ageNote")}</Span>
+
+              <Div className="flex items-center gap-4">
+                <SkillAvatar skill={skillData} size="lg" />
+                <Div className="min-w-0">
+                  <Span className="mb-1 block text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                    {isCommunity ? t("hero.community") : t("hero.builtIn")}
+                  </Span>
+                  <H1
+                    className={cn(
+                      "line-clamp-2 font-semibold tracking-tight text-balance [overflow-wrap:anywhere]",
+                      // the base H1 sets lg:text-5xl, so every size names lg too
+                      name.length > 28
+                        ? "text-2xl md:text-3xl lg:text-3xl"
+                        : name.length > 16
+                          ? "text-3xl md:text-4xl lg:text-4xl"
+                          : "text-4xl md:text-5xl lg:text-5xl",
+                    )}
+                  >
+                    {name}
+                  </H1>
+                </Div>
+              </Div>
+
+              {oneLiner && (
+                <P className="mt-5 max-w-xl text-lg leading-relaxed text-pretty text-muted-foreground md:text-xl">
+                  {oneLiner}
+                </P>
+              )}
+
+              <Div className="mt-5 flex flex-wrap items-center gap-2">
+                {active?.chatModelName && (
+                  <MetaChip
+                    icon={
+                      active.modelKind === "trained" ||
+                      active.modelKind === "abliterated"
+                        ? ShieldOff
+                        : Cpu
+                    }
+                    tone="primary"
+                  >
+                    <Span className="sr-only">
+                      {t("hero.runsOn", { model: "" })}
+                    </Span>
+                    {active.chatModelName}
+                  </MetaChip>
+                )}
+                {messagePrice && messagePriceText && (
+                  <MetaChip icon={DollarSign}>
+                    {messagePrice.credits === 0 ? (
+                      messagePriceText
+                    ) : (
+                      <>
+                        <Span className="sm:hidden">
+                          {t("hero.costPerMessageShort", {
+                            price: messagePriceText,
+                          })}
+                        </Span>
+                        <Span className="hidden sm:inline">
+                          {t("hero.costPerMessage", {
+                            price: messagePriceText,
+                          })}
+                        </Span>
+                      </>
+                    )}
+                  </MetaChip>
+                )}
+                {favCount > 0 && (
+                  <MetaChip icon={Star}>
+                    {t("hero.favorites", { count: favCount })}
+                  </MetaChip>
+                )}
+              </Div>
+
+              {(creator || skillData.importedFrom) && (
+                <Div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+                  {creator && (
+                    <Link
+                      href={`/${locale}/creator/${creator.creatorSlug}`}
+                      className="inline-flex items-center gap-2 text-sm text-muted-foreground no-underline hover:text-foreground"
+                    >
+                      <Span className="inline-flex h-6 w-6 items-center justify-center overflow-hidden rounded-full border border-border bg-muted">
+                        {creator.avatarUrl ? (
+                          <Image
+                            src={creator.avatarUrl}
+                            alt={creator.publicName}
+                            width={24}
+                            height={24}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <User className="h-3 w-3" />
+                        )}
+                      </Span>
+                      {t("hero.byCreator", { name: creator.publicName })}
+                    </Link>
+                  )}
+                  {skillData.importedFrom && (
+                    <ImportedCredit
+                      locale={locale}
+                      importedFrom={skillData.importedFrom}
+                    />
+                  )}
                 </Div>
               )}
-            </Div>
-          </Div>
 
-          {/* chat card */}
-          <ChatCard
-            skill={skillData}
-            samples={samples}
-            prompts={examplePrompts}
-            modelName={active?.chatModelName ?? null}
-            tryUrl={tryUrl}
-            promptUrl={promptUrl}
-            t={t}
-          />
+              {/* the one CTA */}
+              <Div
+                id={HERO_CTA_ID}
+                className="mt-6 flex flex-col gap-3 md:mt-8"
+              >
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-13 w-full gap-2 px-8 text-base font-semibold shadow-md shadow-primary/20 sm:w-auto"
+                >
+                  <Link href={tryUrl}>
+                    {tryLabel}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </Button>
+                <Span className="flex items-start justify-center gap-2 text-sm leading-snug text-muted-foreground sm:justify-start">
+                  {user.isPublic ? (
+                    <>
+                      <Gift className="mt-px h-4 w-4 shrink-0 text-primary" />
+                      {freeMessages !== null
+                        ? t("hero.guestNoteEstimate", {
+                            credits: freeCredits.guest,
+                            messages: freeMessages,
+                          })
+                        : t("hero.guestNote", { credits: freeCredits.guest })}
+                    </>
+                  ) : longName ? (
+                    t("hero.userNoteGeneric")
+                  ) : (
+                    t("hero.userNote", { name })
+                  )}
+                </Span>
+              </Div>
+
+              {/* desktop: fill the column beside the tall sample card with a
+                real next step, not padding */}
+              <Div className="mt-10 hidden flex-col gap-3 rounded-xl border border-border bg-card/60 p-4 text-sm lg:flex">
+                {active?.chatModelName && (
+                  <Div className="flex gap-2.5">
+                    <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <Span>
+                      {t("hero.trust.real", { model: active.chatModelName })}
+                    </Span>
+                  </Div>
+                )}
+                <Div className="flex gap-2.5">
+                  <Layers className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <Span>{t("hero.trust.switch", { count: modelCount })}</Span>
+                </Div>
+                {(active?.modelKind === "trained" ||
+                  active?.modelKind === "abliterated") && (
+                  <Div className="flex gap-2.5">
+                    <Lock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <Span>{t("model.ageNote")}</Span>
+                  </Div>
+                )}
+              </Div>
+            </Div>
+
+            {/* chat card */}
+            <ChatCard
+              skill={skillData}
+              samples={samples}
+              prompts={examplePrompts}
+              modelName={active?.chatModelName ?? null}
+              tryUrl={tryUrl}
+              promptUrl={promptUrl}
+              t={t}
+            />
+          </Div>
         </Div>
-      </Div>
+      )}
 
       {/* ── PROMPTS (only when the hero showed samples) ── */}
-      {hasSamples && examplePrompts.length > 0 && (
+      {!design && hasSamples && examplePrompts.length > 0 && (
         <Section className="py-14 md:py-20">
           <Div className={CONTAINER}>
             <Div className="mb-8 max-w-2xl">
@@ -1422,8 +1558,23 @@ export function SkillLandingPage(props: SkillLandingPageProps): JSX.Element {
         </Section>
       )}
 
+      {design && active && listedVariants.length > 1 && (
+        <Section className="py-8">
+          <Div className={CONTAINER}>
+            <VariantList
+              variants={listedVariants}
+              activeId={active.id}
+              baseSkillId={baseSkillId}
+              locale={locale}
+              tryHref={variantTryUrl}
+              t={t}
+            />
+          </Div>
+        </Section>
+      )}
+
       {/* ── UNDER THE HOOD ── */}
-      {active && (
+      {!design && active && (
         <Section className="border-y border-border bg-muted/40 py-14 md:py-20">
           <Div className={CONTAINER}>
             <Div className="mb-8 max-w-2xl">
@@ -1464,7 +1615,12 @@ export function SkillLandingPage(props: SkillLandingPageProps): JSX.Element {
         <Section className="pt-14 md:pt-20">
           <Div className={CONTAINER}>
             {creator ? (
-              <CreatorCard creator={creator} locale={locale} t={t}>
+              <CreatorCard
+                creator={creator}
+                locale={locale}
+                t={t}
+                published={Boolean(design && skillData.importedFrom)}
+              >
                 {leadForm}
               </CreatorCard>
             ) : (

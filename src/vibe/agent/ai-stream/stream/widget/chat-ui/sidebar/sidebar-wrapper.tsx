@@ -1,5 +1,10 @@
 "use client";
+import {
+  coreClientEnv,
+  platform as runtimePlatform,
+} from "next-vibe/core/env-client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Environment } from "next-vibe/env/env-util";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { Platform } from "next-vibe/platforms/platforms";
@@ -9,10 +14,11 @@ import { Link } from "next-vibe/ui/components/link";
 import { AnimatePresence, MotionDiv } from "next-vibe/ui/components/motion";
 import { ResizableContainer } from "next-vibe/ui/components/resizable";
 import { useWindowSize } from "next-vibe/ui/hooks/use-window-size";
+import { getCurrentSearch } from "next-vibe/ui/lib/location";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX, ReactNode } from "react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { scopedTranslation as studioTranslation } from "@/_pages/create/i18n";
 
@@ -21,6 +27,8 @@ import { useChatBootContext } from "../../../../../chat/hooks/context";
 import { useChatNavigationStore } from "../../../../../chat/hooks/use-chat-navigation-store";
 import { scopedTranslation } from "../../../../../chat/threads/widget/i18n";
 import { SidebarFooter } from "./footer/sidebar-footer";
+import { selectSidebarVariant, type SidebarVariant } from "./preview/selection";
+import { SidebarPreview } from "./preview/sidebar-preview";
 import {
   useSidebarCollapsed,
   useSidebarInitialized,
@@ -43,11 +51,13 @@ function WidgetSidebar({
   user,
   logger,
   platform,
+  variant,
 }: {
   locale: CountryLanguage;
   user: JwtPayloadType;
   logger: EndpointLogger;
   platform: Platform;
+  variant: SidebarVariant | null;
 }): JSX.Element {
   const { initialFoldersData, initialRootFolderId } = useChatBootContext();
 
@@ -75,19 +85,36 @@ function WidgetSidebar({
     [currentRootFolderId, foldersInitialData],
   );
 
-  return (
-    <Div className="flex flex-col h-full bg-background overflow-hidden">
-      <EndpointsPage
-        logger={logger}
-        key={currentRootFolderId}
-        endpoint={foldersDefinition}
+  const folders = (
+    <EndpointsPage
+      logger={logger}
+      key={currentRootFolderId}
+      endpoint={foldersDefinition}
+      locale={locale}
+      user={user}
+      platform={platform}
+      forceMethod="GET"
+      className="flex-1 h-full overflow-hidden"
+      endpointOptions={foldersEndpointOptions}
+    />
+  );
+
+  if (variant) {
+    return (
+      <SidebarPreview
+        variant={variant}
         locale={locale}
         user={user}
-        platform={platform}
-        forceMethod="GET"
-        className="flex-1 h-full overflow-hidden"
-        endpointOptions={foldersEndpointOptions}
-      />
+        logger={logger}
+      >
+        {folders}
+      </SidebarPreview>
+    );
+  }
+
+  return (
+    <Div className="flex flex-col h-full bg-background overflow-hidden">
+      {folders}
       <Link
         href={`/${locale}/create`}
         className="mx-2 my-1 flex min-h-10 shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-medium hover:bg-accent"
@@ -108,7 +135,14 @@ export function SidebarWrapper({
   children,
 }: SidebarWrapperProps): JSX.Element {
   const [collapsed, setSidebarCollapsed] = useSidebarCollapsed();
+  const [requestedVariant] = useState(() =>
+    runtimePlatform.isBrowser &&
+    coreClientEnv.NODE_ENV === Environment.DEVELOPMENT
+      ? selectSidebarVariant(coreClientEnv.NODE_ENV, getCurrentSearch())
+      : null,
+  );
   const sidebarReady = useSidebarInitialized();
+  const variant = sidebarReady ? requestedVariant : null;
   const { t } = scopedTranslation.scopedT(locale);
 
   const { width: windowWidth } = useWindowSize();
@@ -128,11 +162,14 @@ export function SidebarWrapper({
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className={cn(
                 "fixed inset-y-0 left-0 z-[210] bg-background border-r border-border",
-                SIDEBAR_WIDTH,
+                variant
+                  ? "w-[min(90vw,340px)] has-[[data-rail-folded]]:w-16"
+                  : SIDEBAR_WIDTH,
               )}
             >
               <Div className="h-full w-full bg-background">
                 <WidgetSidebar
+                  variant={variant}
                   locale={locale}
                   user={user}
                   logger={logger}
@@ -167,11 +204,16 @@ export function SidebarWrapper({
   return (
     <Div className="flex flex-row flex-1 min-h-0 w-full">
       <ResizableContainer
-        defaultWidth={260}
-        minWidth={SIDEBAR_MIN_WIDTH_PX}
+        key={variant}
+        defaultWidth={variant === "B" ? 334 : variant ? 296 : 260}
+        minWidth={variant === "B" ? 300 : SIDEBAR_MIN_WIDTH_PX}
         maxWidth={`${SIDEBAR_MAX_WIDTH_VW}vw`}
-        storageId="chat-sidebar"
-        className="bg-background z-10"
+        storageId={variant ? `chat-sidebar-preview-${variant}` : "chat-sidebar"}
+        className={
+          variant === "B"
+            ? "bg-background z-10 has-[[data-rail-folded]]:w-16!"
+            : "bg-background z-10"
+        }
         collapsed={collapsed}
       >
         <AnimatePresence initial={false} mode="sync">
@@ -184,6 +226,7 @@ export function SidebarWrapper({
               className="h-full"
             >
               <WidgetSidebar
+                variant={variant}
                 locale={locale}
                 user={user}
                 logger={logger}

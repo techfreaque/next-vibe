@@ -1,0 +1,18 @@
+export const translations = {
+  chats: "Chats",
+  library: "Chat library",
+  workspace: "Workspace",
+  search: "Search",
+  searchChats: "Search chats",
+  folders: "Folders",
+  recent: "Recent chats",
+  account: "Account",
+  websiteBlog: "Website & blog",
+  newsletter: "Newsletter",
+  empty: "No chats here yet",
+  noMatches: "No matching chats",
+  clearSearch: "Clear search",
+  balance: "Credit balance",
+  studioHint: "Create media",
+  locations: "Chat spaces",
+};

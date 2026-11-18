@@ -12,28 +12,16 @@ const nextConfig: NextConfig = {
   // is ours — the repo's working rules — so the injection is disabled.
   agentRules: false,
   experimental: {
-    // workerThreads: false,
-    // Cap page-data collection workers. Next.js default is min(cpuCount, freemem/1GB)
-    // which hits 23 workers locally - each worker loads the full module graph causing
-    // 14+ GB peak. 4 workers keeps peak under control with acceptable build time.
-    // cpus:
-    //   process.env.NODE_ENV === "production"
-    //     ? process.env.NEXT_PUBLIC_LOCAL_MODE === "true"
-    //       ? undefined
-    //       : 1
-    //     : undefined,
-    // Disable in prod Docker builds: the worker spawns a separate process that
-    // NODE_OPTIONS cannot cap, causing SIGKILL on low-RAM VPS. In-process build
-    // respects --max-old-space-size set in repository.ts.
-    // webpackBuildWorker:
-    //   process.env.NODE_ENV !== "production" ||
-    //   process.env.NEXT_PUBLIC_LOCAL_MODE === "true",
+    // Each page-data worker loads the server graph; bound both the pool and
+    // the number of pages a worker can prerender at once.
+    cpus: 3,
+    staticGenerationMaxConcurrency: 2,
+    // Release each compiler's heap before starting the next compiler.
+    webpackBuildWorker: true,
     // Bodies above this are truncated by the proxy. Clients and next-handler
     // check against the same constant (src/vibe/core/route/body-limit.ts).
     proxyClientMaxBodySize: MAX_REQUEST_BODY_BYTES,
     webpackMemoryOptimizations: true,
-    // parallelServerBuildTraces: true,
-    // parallelServerCompiles: true,
     turbopackFileSystemCacheForDev: false,
     turbopackFileSystemCacheForBuild: true,
     optimizePackageImports: [
@@ -158,7 +146,11 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
 
-  webpack(config, { isServer }) {
+  webpack(config, { dev, isServer }) {
+    if (!dev) {
+      config.parallelism = 2;
+    }
+
     // Webpack in Next.js 16 doesn't handle node: URI scheme.
     // Register node: builtins as externals so webpack skips bundling them.
     const existingExternals = config.externals ?? [];
@@ -200,8 +192,7 @@ const nextConfig: NextConfig = {
       { test: /[\\/]src[\\/]app-native[\\/]/, loader: "null-loader" },
     );
 
-    // Browser bundles: load only the page language's translations (de/pl as
-    // per-scope async chunks) instead of shipping every locale to everyone.
+    // Load non-English browser translations in per-scope async chunks.
     if (!isServer) {
       // The loader emits top-level await. Every browser Next.js supports has
       // async functions; without this flag webpack warns once per i18n scope.
@@ -209,14 +200,14 @@ const nextConfig: NextConfig = {
         ...config.output.environment,
         asyncFunction: true,
       };
-      // de/pl modules imported by several scopes (e.g. models/i18n/de) would
+      // Locale modules imported by several scopes (e.g. models/i18n/fr) would
       // be copied into every per-scope async chunk; share them instead.
       const splitChunks = config.optimization?.splitChunks;
       if (splitChunks && typeof splitChunks === "object") {
         splitChunks.cacheGroups = {
           ...splitChunks.cacheGroups,
           i18nLocaleShared: {
-            test: /[\\/]i18n[\\/](de|pl)[\\/]/,
+            test: /[\\/]i18n[\\/](de|pl|fr)[\\/]/,
             chunks: "async",
             minChunks: 2,
             minSize: 0,

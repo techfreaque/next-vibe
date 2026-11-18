@@ -64,6 +64,7 @@ export interface ConnectRetryOptions {
   /** 0..1, jitter source. Injectable for tests. */
   random: () => number;
   onRetry?: (error: Error, attempt: number, delayMs: number) => void;
+  recover?: (error: Error) => Promise<void>;
 }
 
 export const CONNECT_RETRY_MAX_DELAY_MS = 2_000;
@@ -140,6 +141,8 @@ export async function retryTransientConnect<T>(
       }
       const delayMs = connectRetryDelay(attempt, opts);
       opts.onRetry?.(error, attempt + 1, delayMs);
+      // eslint-disable-next-line no-await-in-loop -- recovery must finish before the next connection attempt
+      await opts.recover?.(error);
       await opts.sleep(delayMs);
     }
   }
@@ -162,6 +165,7 @@ export function resolveConnectRetryOptions(
     sleep: overrides?.sleep ?? defaultSleep,
     random: overrides?.random ?? Math.random,
     onRetry: overrides?.onRetry,
+    recover: overrides?.recover,
   };
 }
 

@@ -101,10 +101,13 @@ export class OutreachImportRepository {
         rows.push(...parsed.rows);
         skipped.push(...parsed.skipped);
       }
-      const tmpRoot = path.resolve(process.cwd(), ".tmp");
+      const cwd = process.cwd();
+      // Compare the runtime input against .tmp inline. Assigning the absolute
+      // .tmp path to a variable makes Next trace everything under it at build.
+      const cwdPrefix = cwd.endsWith(path.sep) ? cwd : `${cwd}${path.sep}`;
       for (const filePath of filePaths) {
-        const resolved = path.resolve(process.cwd(), filePath);
-        if (!resolved.startsWith(`${tmpRoot}${path.sep}`)) {
+        const resolved = path.resolve(cwd, filePath);
+        if (!resolved.startsWith(`${cwdPrefix}.tmp${path.sep}`)) {
           sourceErrors.push({ source: filePath, reason: "skip.outsideTmp" });
           continue;
         }

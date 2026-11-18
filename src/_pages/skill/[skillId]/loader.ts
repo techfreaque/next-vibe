@@ -15,6 +15,7 @@ import {
   ChatModelId,
   type ChatModelOption,
   getBestChatModel,
+  getChatModelForUser,
 } from "next-vibe/agent/ai-stream/models";
 import { isRemovedSkillId, parseSkillId } from "next-vibe/agent/chat/slugify";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
@@ -33,8 +34,8 @@ import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/sk
 import { SkillsRepository } from "next-vibe/agent/skills/repository";
 import { getBestTtsModel } from "next-vibe/agent/text-to-speech/models";
 import { getBestVideoGenModel } from "next-vibe/agent/video-generation/models";
+import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { hreflangFor } from "next-vibe/core/i18n/core/seo-locales";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
@@ -66,7 +67,13 @@ import {
   type SiteLayoutData,
   tanstackLoader as siteLayoutLoader,
 } from "../../story/layout";
+import { getDesignSamples } from "./design-samples";
+import {
+  selectSkillPageDesign,
+  type SkillPageDesign,
+} from "./design-selection";
 import { scopedTranslation } from "./i18n";
+import { getSkillMessagePrice } from "./message-price";
 import type {
   FreeCredits,
   LeadMagnetConfigData,
@@ -90,9 +97,6 @@ const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const REF_RE = /^[\w-]{1,64}$/;
 
-// Reference token counts for the "~X credits per message" estimate
-const REF_INPUT_TOKENS = 200;
-const REF_OUTPUT_TOKENS = 400;
 const MAX_RELATED = 6;
 const MAX_PROMPTS = 4;
 
@@ -220,6 +224,7 @@ export async function loadSkillPageMetadata({
 }
 
 export interface SkillLandingPageData {
+  design: SkillPageDesign | null;
   locale: CountryLanguage;
   /** Skill id exactly as in the page URL (may carry `__variant`). */
   skillId: string;
@@ -264,26 +269,6 @@ function modelKindOf(model: ChatModelOption): ModelKind {
     return "open";
   }
   return "mainstream";
-}
-
-function creditCostOf(model: ChatModelOption): number | null {
-  const cost =
-    typeof model.creditCost === "function"
-      ? model.creditCost(model, REF_INPUT_TOKENS, REF_OUTPUT_TOKENS, 0, 0)
-      : model.creditCost;
-  return cost > 0 ? Math.round(cost * 10) / 10 : null;
-}
-
-/** Locale-aware credit amount ("0,8" in German), one decimal at most. */
-function formatCredits(
-  value: number | null,
-  locale: CountryLanguage,
-): string | null {
-  return value === null
-    ? null
-    : new Intl.NumberFormat(getLanguageFromLocale(locale), {
-        maximumFractionDigits: 1,
-      }).format(value);
 }
 
 /**
@@ -372,15 +357,18 @@ function builtInRelated(
 }
 
 async function creatorRelated(
-  creatorUserId: string,
-  excludeId: string,
+  skillInternalId: string,
   logger: EndpointLogger,
 ): Promise<RelatedSkill[]> {
   try {
     const { db } = await import("next-vibe/database");
     const { customSkills } = await import("next-vibe/agent/skills/db");
     const { SkillStatus } = await import("next-vibe/agent/skills/enum");
-    const { and, eq, ne } = await import("drizzle-orm");
+    const { and, eq, inArray, ne } = await import("drizzle-orm");
+    const owner = db
+      .select({ userId: customSkills.userId })
+      .from(customSkills)
+      .where(eq(customSkills.id, skillInternalId));
     const rows = await db
       .select({
         id: customSkills.id,
@@ -392,12 +380,11 @@ async function creatorRelated(
       .from(customSkills)
       .where(
         and(
-          eq(customSkills.userId, creatorUserId),
+          inArray(customSkills.userId, owner),
           eq(customSkills.ownershipType, SkillOwnershipType.PUBLIC),
           eq(customSkills.status, SkillStatus.PUBLISHED),
           eq(customSkills.isDeleted, false),
-          ne(customSkills.slug, excludeId),
-          UUID_RE.test(excludeId) ? ne(customSkills.id, excludeId) : undefined,
+          ne(customSkills.id, skillInternalId),
         ),
       )
       .limit(MAX_RELATED);
@@ -411,7 +398,7 @@ async function creatorRelated(
     logger.warn("Skill page: loading creator's other skills failed", {
       ...parseError(error),
       page: "skill",
-      creatorUserId,
+      skillInternalId,
     });
     return [];
   }
@@ -541,6 +528,7 @@ export async function loadSkillLandingPage({
     freeCredits,
     referralPercent: Math.round(REFERRAL_CONFIG.DIRECT_PERCENTAGE * 100),
     layout,
+    design: selectSkillPageDesign(coreEnv.NODE_ENV, search["design"]),
   };
 
   // Unknown or private skill: real 404. A skill we removed on purpose (old
@@ -583,11 +571,14 @@ export async function loadSkillLandingPage({
   const variants: ResolvedVariantInfo[] = [];
   const chatModelIdByVariant = new Map<string, string>();
   for (const v of skillData?.variants ?? []) {
-    const chatModel = getBestChatModel(
+    const selectedChatModel = getBestChatModel(
       v.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION,
       user,
       availability,
     );
+    const chatModel = selectedChatModel
+      ? getChatModelForUser(selectedChatModel.id, user, availability)
+      : null;
     if (chatModel) {
       chatModelIdByVariant.set(v.id, chatModel.id);
     }
@@ -608,9 +599,8 @@ export async function loadSkillLandingPage({
       chatModelName: chatModel?.name.trim() ?? null,
       chatProviderName: provider?.name ?? null,
       modelKind: chatModel ? modelKindOf(chatModel) : "mainstream",
-      chatCreditCost: chatModel ? creditCostOf(chatModel) : null,
-      chatCreditCostLabel: chatModel
-        ? formatCredits(creditCostOf(chatModel), locale)
+      chatMessagePrice: chatModel
+        ? getSkillMessagePrice(chatModel, locale)
         : null,
       voiceModelName: v.voiceModelSelection
         ? (getBestTtsModel(v.voiceModelSelection, user, availability)?.name ??
@@ -663,7 +653,21 @@ export async function loadSkillLandingPage({
   ).slice(0, MAX_PROMPTS);
 
   // Samples only when the page shows the variant they were generated on.
-  const samplesForSkill = getSkillSamples(baseSkillId, locale);
+  const samplesForSkill =
+    getSkillSamples(
+      baseSkillId,
+      locale,
+      base.design ? (activeVariant?.chatModelName ?? null) : undefined,
+    ) ??
+    (base.design && skillData && activeVariant
+      ? getDesignSamples(
+          skillData.skillOwnership === SkillOwnershipType.SYSTEM
+            ? baseSkillId
+            : skillData.internalId,
+          activeVariant.chatModelName,
+          locale,
+        )
+      : null);
   const samples =
     samplesForSkill && activeVariant?.isDefault !== false
       ? samplesForSkill
@@ -674,8 +678,8 @@ export async function loadSkillLandingPage({
     isCommunity && !creator?.leadMagnetActive
       ? loadLeadMagnetConfig(baseSkillId, logger)
       : Promise.resolve(null),
-    creator
-      ? creatorRelated(creator.userId, baseSkillId, logger)
+    creator && skillData?.internalId
+      ? creatorRelated(skillData.internalId, logger)
       : Promise.resolve([]),
   ]);
 

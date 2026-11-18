@@ -50,6 +50,7 @@ import { Edit } from "next-vibe/ui/components/icons/Edit";
 import { FolderInput } from "next-vibe/ui/components/icons/FolderInput";
 import { FolderOpen } from "next-vibe/ui/components/icons/FolderOpen";
 import { FolderPlus } from "next-vibe/ui/components/icons/FolderPlus";
+import { Inbox } from "next-vibe/ui/components/icons/Inbox";
 import { MessageSquarePlus } from "next-vibe/ui/components/icons/MessageSquarePlus";
 import { MoreVertical } from "next-vibe/ui/components/icons/MoreVertical";
 import { Pin } from "next-vibe/ui/components/icons/Pin";
@@ -85,6 +86,8 @@ import {
 } from "@/_pages/chat/lib/utils/folder-utils";
 import { buildFolderUrl } from "@/_pages/chat/lib/utils/navigation";
 
+import { useSidebarPreview } from "../../../ai-stream/stream/widget/chat-ui/sidebar/preview/context";
+import { scopedTranslation as previewTranslation } from "../../../ai-stream/stream/widget/chat-ui/sidebar/preview/i18n";
 import { isDefaultFolderId } from "../../config";
 import { NEW_MESSAGE_ID, ThreadStreamingState } from "../../enum";
 import createFolderDefinition from "../../folders/[rootFolderId]/create/definition";
@@ -204,13 +207,8 @@ function ThreadRow({
 
   const isThreadStreaming = item.streamingState !== ThreadStreamingState.IDLE;
 
-  const handleThreadClick = (e: DivMouseEvent): void => {
-    if (isEditing) {
-      return;
-    }
-    if (e.target.closest?.("button") || e.target.closest?.("input")) {
-      return;
-    }
+  const preview = useSidebarPreview();
+  const openThread = (): void => {
     setNavigation({
       activeThreadId: item.id,
       currentRootFolderId: item.rootFolderId,
@@ -220,6 +218,16 @@ function ThreadRow({
       ? `/${locale}/threads/${item.rootFolderId}/${item.folderId}/${item.id}`
       : `/${locale}/threads/${item.rootFolderId}/${item.id}`;
     pushState(url);
+    preview?.onOpenChat();
+  };
+  const handleThreadClick = (e: DivMouseEvent): void => {
+    if (
+      !isEditing &&
+      !e.target.closest?.("button") &&
+      !e.target.closest?.("input")
+    ) {
+      openThread();
+    }
   };
 
   const mutateThread = async (updates: {
@@ -388,6 +396,22 @@ function ThreadRow({
             ? cn(chatColors.sidebar.active, "shadow-sm")
             : chatColors.sidebar.hover,
         )}
+        role={preview ? "link" : undefined}
+        tabIndex={preview ? 0 : undefined}
+        onKeyDown={
+          preview
+            ? (e) => {
+                if (
+                  e.key === "Enter" &&
+                  !isEditing &&
+                  !e.target.closest?.("button, input")
+                ) {
+                  e.preventDefault();
+                  openThread();
+                }
+              }
+            : undefined
+        }
         onClick={handleThreadClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => {
@@ -632,7 +656,7 @@ function ThreadRow({
           /* eslint-enable i18next/no-literal-string */
         )}
 
-        {item.pinned && (
+        {!preview && item.pinned && (
           <Div className="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full" />
         )}
       </Div>
@@ -717,13 +741,8 @@ function ThreadRowShared({
   const activeShareCount = item.activeShareCount ?? 0;
   const lastSharedAt = item.lastSharedAt ?? null;
 
-  const handleThreadClick = (e: DivMouseEvent): void => {
-    if (isEditing) {
-      return;
-    }
-    if (e.target.closest?.("button") || e.target.closest?.("input")) {
-      return;
-    }
+  const preview = useSidebarPreview();
+  const openThread = (): void => {
     setNavigation({
       activeThreadId: item.id,
       currentRootFolderId: item.rootFolderId,
@@ -733,6 +752,16 @@ function ThreadRowShared({
       ? `/${locale}/threads/${item.rootFolderId}/${item.folderId}/${item.id}`
       : `/${locale}/threads/${item.rootFolderId}/${item.id}`;
     pushState(url);
+    preview?.onOpenChat();
+  };
+  const handleThreadClick = (e: DivMouseEvent): void => {
+    if (
+      !isEditing &&
+      !e.target.closest?.("button") &&
+      !e.target.closest?.("input")
+    ) {
+      openThread();
+    }
   };
 
   const mutateThread = async (updates: {
@@ -887,6 +916,22 @@ function ThreadRowShared({
             ? cn(chatColors.sidebar.active, "shadow-sm")
             : chatColors.sidebar.hover,
         )}
+        role={preview ? "link" : undefined}
+        tabIndex={preview ? 0 : undefined}
+        onKeyDown={
+          preview
+            ? (e) => {
+                if (
+                  e.key === "Enter" &&
+                  !isEditing &&
+                  !e.target.closest?.("button, input")
+                ) {
+                  e.preventDefault();
+                  openThread();
+                }
+              }
+            : undefined
+        }
         onClick={handleThreadClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => {
@@ -1048,7 +1093,7 @@ function ThreadRowShared({
             </Div>
           )}
 
-          {item.pinned && (
+          {!preview && item.pinned && (
             <Div className="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full" />
           )}
         </Div>
@@ -1801,6 +1846,8 @@ function ItemSection({
   activeRootFolderId: DefaultFolderId;
   allFolders: FolderFromList[];
 }): React.JSX.Element | null {
+  const preview = useSidebarPreview();
+  const [collapsed, setCollapsed] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const { locale } = useWidgetContext();
   const { t } = foldersScopedTranslation.scopedT(locale);
@@ -1814,33 +1861,62 @@ function ItemSection({
 
   return (
     /* eslint-disable i18next/no-literal-string */
-    <Div className="mb-1">
-      {label !== undefined && (
-        <Span className="block py-1 px-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-          {label}
-        </Span>
-      )}
-      <Div className="flex flex-col gap-0.5 pl-2">
-        {visible.map((item) => {
-          if (item.type === "folder") {
+    <Div
+      className={
+        preview?.variant === "C"
+          ? "mb-1 border-b border-border/70 pb-1 last:border-0"
+          : "mb-1"
+      }
+    >
+      {label !== undefined &&
+        (preview ? (
+          <Button
+            variant="ghost"
+            size="unset"
+            className="flex min-h-9 w-full items-center justify-start gap-2 rounded-md px-2.5 text-xs font-semibold text-muted-foreground"
+            aria-expanded={!collapsed}
+            onClick={() => setCollapsed(!collapsed)}
+          >
+            <Span className="flex-1 text-left">{label}</Span>
+            <Span className="text-[11px] font-medium tabular-nums">
+              {items.length}
+            </Span>
+            {collapsed ? <ChevronRight /> : <ChevronDown />}
+          </Button>
+        ) : (
+          <Span className="block py-1 px-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+            {label}
+          </Span>
+        ))}
+      {(!preview || !collapsed) && (
+        <Div
+          className={
+            preview
+              ? "flex min-w-0 flex-col gap-0.5 px-1"
+              : "flex flex-col gap-0.5 pl-2"
+          }
+        >
+          {visible.map((item) => {
+            if (item.type === "folder") {
+              return (
+                <FolderRow
+                  key={item.id}
+                  item={item}
+                  activeRootFolderId={activeRootFolderId}
+                  allFolders={allFolders}
+                />
+              );
+            }
+            if (activeRootFolderId === DefaultFolderId.SHARED) {
+              return <ThreadRowShared key={item.id} item={item} />;
+            }
             return (
-              <FolderRow
-                key={item.id}
-                item={item}
-                activeRootFolderId={activeRootFolderId}
-                allFolders={allFolders}
-              />
+              <ThreadRow key={item.id} item={item} allFolders={allFolders} />
             );
-          }
-          if (activeRootFolderId === DefaultFolderId.SHARED) {
-            return <ThreadRowShared key={item.id} item={item} />;
-          }
-          return (
-            <ThreadRow key={item.id} item={item} allFolders={allFolders} />
-          );
-        })}
-      </Div>
-      {hasMore && (
+          })}
+        </Div>
+      )}
+      {hasMore && (!preview || !collapsed) && (
         <Button
           variant="ghost"
           size="sm"
@@ -1916,15 +1992,34 @@ export function FolderContentsWidget({
   const isPublicRootLevel =
     activeRootFolderId === DefaultFolderId.PUBLIC && !widgetSubFolderId;
 
+  const preview = useSidebarPreview();
+  const previewT = previewTranslation.scopedT(locale).t;
+  // Visitors can filter the current level locally. Server search is account-scoped.
+  const localFilter = useChatNavigationStore((s) =>
+    preview &&
+    (user.isPublic || activeRootFolderId === DefaultFolderId.INCOGNITO)
+      ? s.sidebarSearchQuery.trim().toLocaleLowerCase()
+      : "",
+  );
+  const workspaceGroups =
+    preview?.variant === "C" &&
+    !widgetSubFolderId &&
+    !form.getValues("threadIds");
   const grouped = useMemo(() => {
     // Filter out stub items that arrived via partial SSE merge (missing rootFolderId means
     // the item was upserted from a streaming-state-changed event before the full thread data
     // arrived - such items have no valid navigation target and must not render).
     const rawItems: FolderContentsItem[] = (fieldItems ?? []).filter(
-      (item) => item.rootFolderId !== null && item.rootFolderId !== undefined,
+      (item) =>
+        item.rootFolderId !== null &&
+        item.rootFolderId !== undefined &&
+        (!localFilter ||
+          (item.title ?? item.name ?? "")
+            .toLocaleLowerCase()
+            .includes(localFilter)),
     );
 
-    if (isPublicRootLevel) {
+    if (isPublicRootLevel && !workspaceGroups) {
       const sorted = [...rawItems].toSorted(
         (a, b) => a.sortOrder - b.sortOrder,
       );
@@ -1973,7 +2068,7 @@ export function FolderContentsWidget({
       lastMonth: lastMonth.toSorted(byUpdatedAtDesc),
       older: older.toSorted(byUpdatedAtDesc),
     };
-  }, [fieldItems, isPublicRootLevel]);
+  }, [fieldItems, isPublicRootLevel, localFilter, workspaceGroups]);
 
   if (!isDefaultFolderId(activeRootFolderId)) {
     return <Div />;
@@ -1987,6 +2082,18 @@ export function FolderContentsWidget({
     grouped.lastMonth.length === 0 &&
     grouped.older.length === 0;
 
+  if (isEmpty && preview && !widgetSubFolderId) {
+    return (
+      <Div className="mx-3 my-5 flex flex-col items-center gap-2 px-3 py-3 text-center">
+        <Span className="flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
+          <Inbox className="size-5" />
+        </Span>
+        <Span className="text-sm font-semibold">
+          {localFilter ? previewT("noMatches") : previewT("empty")}
+        </Span>
+      </Div>
+    );
+  }
   if (isEmpty) {
     return (
       /* eslint-disable i18next/no-literal-string */
@@ -1994,6 +2101,38 @@ export function FolderContentsWidget({
         {t("widget.common.noChatsFound")}
       </Div>
       /* eslint-enable i18next/no-literal-string */
+    );
+  }
+
+  if (workspaceGroups) {
+    const other = [
+      ...grouped.today,
+      ...grouped.lastWeek,
+      ...grouped.lastMonth,
+      ...grouped.older,
+    ];
+    return (
+      <Div className="px-1">
+        <NavigateButtonWidget field={children.backButton} />
+        <ItemSection
+          label={t("widget.folderList.pinned")}
+          items={grouped.pinned}
+          activeRootFolderId={activeRootFolderId}
+          allFolders={allFolders}
+        />
+        <ItemSection
+          label={previewT("folders")}
+          items={other.filter((item) => item.type === "folder")}
+          activeRootFolderId={activeRootFolderId}
+          allFolders={allFolders}
+        />
+        <ItemSection
+          label={previewT("recent")}
+          items={other.filter((item) => item.type === "thread")}
+          activeRootFolderId={activeRootFolderId}
+          allFolders={allFolders}
+        />
+      </Div>
     );
   }
 
@@ -2029,7 +2168,13 @@ export function FolderContentsWidget({
         </>
       )}
       <ItemSection
-        label={isPublicRootLevel ? undefined : t("widget.folderList.older")}
+        label={
+          isPublicRootLevel
+            ? preview
+              ? previewT("library")
+              : undefined
+            : t("widget.folderList.older")
+        }
         items={grouped.older}
         activeRootFolderId={activeRootFolderId}
         allFolders={allFolders}

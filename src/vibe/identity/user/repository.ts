@@ -267,14 +267,17 @@ export class UserRepository {
         logger,
       );
     } catch (error) {
-      const errorMessage = parseError(error).message;
-      logger.error("Error getting user by email", "");
-      logger.debug("Error getting user by email", parseError(error));
+      const parsed = parseError(error);
+      const cause = parsed.cause instanceof Error ? parsed.cause : undefined;
+      logger.error("Error getting user by email", {
+        error: cause?.message ?? parsed.name,
+      });
+      logger.debug("Error getting user by email", parsed);
       const { t } = userScopedTranslation.scopedT(locale);
       return fail({
         message: t("errors.email_lookup_failed", {
           email,
-          error: errorMessage,
+          error: parsed.message,
         }),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
       });

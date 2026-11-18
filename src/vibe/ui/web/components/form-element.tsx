@@ -11,6 +11,8 @@ export interface FormElementRefObject {
 }
 
 export type FormElementProps = {
+  /** A browser GET destination for forms that also work before hydration. */
+  action?: string;
   onSubmit?: () => void | Promise<void>;
   children?: ReactNode;
 } & StyleType;
@@ -21,18 +23,23 @@ export type FormElementProps = {
  * Provides semantic HTML5 form element with platform consistency
  */
 export const FormElement = forwardRef(function FormElement(
-  { className, style, onSubmit, children }: FormElementProps,
+  { className, style, action, onSubmit, children }: FormElementProps,
   ref: ForwardedRef<FormElementRefObject>,
 ) {
   return (
     <form
       ref={ref as React.Ref<HTMLFormElement>}
+      action={action}
       className={className}
       style={style}
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSubmit?.();
-      }}
+      onSubmit={
+        action && !onSubmit
+          ? undefined
+          : (e): void => {
+              e.preventDefault();
+              onSubmit?.();
+            }
+      }
     >
       {children}
     </form>

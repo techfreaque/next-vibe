@@ -33,6 +33,37 @@ export const translations: typeof enTranslations = {
     hacker:
       "Odpowiada w pełni na pytania o security: exploity, rekonesans, obronę. Bez odmów.",
   },
+  preview: {
+    officeMessage: "Opisz scenę w biurze…",
+    storyMessage: "Co poszło nie tak?",
+    publishedBy: "Wydawca {{name}}",
+    startChat: "Zacznij rozmowę",
+    trial:
+      "{{credits}} darmowych kredytów na około {{count}} wiadomości. Bez rejestracji.",
+    youAsk: "Pytasz",
+    replies: "Odpowiedź postaci {{name}}",
+    usePrompt: "Zacznij od tego pytania",
+    identity: "Postać AI",
+    chanCommute: "Zrób greentext z mojej najgorszej podróży do pracy.",
+    community: "Postać AI od społeczności",
+    builtin: "Wbudowana postać AI",
+    chanPitch: "Zmień najgorszy dzień w historię z suchą puentą.",
+    adrianPitch: "Wciel się w rolę nowej asystentki Adriana.",
+    chanDetail:
+      "Wygadana postać AI z anonimowych forów. Jej opowieści w krótkich linijkach to greentexty.",
+    adrianDetail: "Twój szef oczekuje, że przewidzisz jego następny ruch.",
+    chatNamed: "Porozmawiaj z postacią {{name}}",
+    chatGeneric: "Rozpocznij rozmowę",
+    startQuestion: "Wybierz pierwszą wiadomość",
+    recorded: "Fragment prawdziwej rozmowy",
+    adrianStarter1:
+      "Szef każe mi być na dwóch spotkaniach naraz. Odegrajmy tę scenę.",
+    adrianStarter2: "Nie udało mi się dotrzymać terminu. Jak zareagujesz?",
+    adrianStarter3: "Klient przyszedł za wcześnie. Co mam zrobić?",
+    contentNote:
+      "Postać dla dorosłych. Odpowiedzi mogą zawierać rasistowskie określenia.",
+    more: "Przeczytaj kolejną odpowiedź",
+  },
   sticky: {
     tryNamed: "Wypróbuj: {{name}}",
   },
@@ -40,8 +71,8 @@ export const translations: typeof enTranslations = {
     builtIn: "Wbudowany skill",
     community: "Skill społeczności",
     runsOn: "Działa na {{model}}",
-    costPerMessage: "~{{cost}} kredytów za wiadomość",
-    costPerMessageShort: "~{{cost}} kr./wiad.",
+    costPerMessage: "{{price}} za wiadomość",
+    costPerMessageShort: "{{price}}/wiad.",
     byCreator: "autor: {{name}}",
     favorites: "Zapisany {{count}}×",
     tryCta: "Wypróbuj teraz",
@@ -108,8 +139,13 @@ export const translations: typeof enTranslations = {
     titleGeneric: "Co napędza ten skill",
     by: "od {{provider}}",
     perMessage: "za wiadomość",
-    perMessageValue: "~{{cost}} kredytów",
-    perMessageHint: "Szacunek dla krótkiej wiadomości. 1 kredyt = 0,01 $.",
+    fixedPrice: "{{cost}} kredytów",
+    estimatedPrice: "ok. {{cost}} kredytów",
+    free: "Bezpłatnie",
+    perMessageHint:
+      "Szacunek dla {{input}} tokenów wejściowych i {{output}} wyjściowych. Koszt zależy od zużycia.",
+    perMessageWithImageHint:
+      "Szacunek dla {{input}} tokenów wejściowych, {{output}} wyjściowych i jednego wygenerowanego obrazu. Koszt zależy od zużycia.",
     freeMessages:
       "Około {{messages}} wiadomości z {{credits}} darmowych kredytów na start.",
     strength: "Mocna strona",

@@ -13,7 +13,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { PGlite } from "@electric-sql/pglite";
 import { type NodePgDatabase } from "drizzle-orm/node-postgres";
 import { type PgliteDatabase } from "drizzle-orm/pglite";
-import { Pool } from "pg";
+import type { Pool } from "pg";
 
 import { parseError } from "../core/utils/parse-error";
 import { resolveEffectiveDatabaseUrl } from "./effective-url";
@@ -24,6 +24,8 @@ import {
   guardPool,
   LONG_RUNNING_POOL_MAX,
   processSharedPool,
+  ResilientPool,
+  resolveConnectRetryOptions,
   setProcessSharedPool,
 } from "./pool";
 
@@ -47,8 +49,8 @@ import {
  * process can ever win), and self-heals the instant the owner process exits
  * — the kernel frees the port immediately, so there is no stale state to
  * clean up and no PID bookkeeping. Any process, at any time, past or future,
- * that fails to bind the port simply becomes a pool client of whichever
- * process did. See `pglite-server.ts`'s `tryClaimPgliteOwnership`.
+ * that fails to bind the port becomes a pool client. A refused connection
+ * triggers a fresh ownership election before retrying the connection.
  *
  *   - `pgliteClient` is non-null ONLY in the process that won the bind.
  *   - `pool` is always a `pg.Pool` in PGlite mode (loopback pool), in every
@@ -178,18 +180,28 @@ export function createLongRunningPool(): Pool {
   });
 }
 
-function createSocketPool(port: number): Pool {
+function createSocketPool(port: number, resolvedUrl: string): Pool {
   return guardPool(
-    new Pool({
-      host: "127.0.0.1",
-      port,
-      database: "postgres",
-      user: "postgres",
-      password: "postgres",
-      max: 10,
-      idleTimeoutMillis: 30_000,
-      connectionTimeoutMillis: 30_000,
-    }),
+    new ResilientPool(
+      {
+        host: "127.0.0.1",
+        port,
+        database: "postgres",
+        user: "postgres",
+        password: "postgres",
+        max: 10,
+        idleTimeoutMillis: 30_000,
+        connectionTimeoutMillis: 30_000,
+      },
+      resolveConnectRetryOptions({
+        retries: 2,
+        recover: async (error) => {
+          if ("code" in error && error.code === "ECONNREFUSED") {
+            await ensurePgliteOwner(port, resolvedUrl, false);
+          }
+        },
+      }),
+    ),
   );
 }
 
@@ -197,6 +209,57 @@ function createSocketPool(port: number): Pool {
 
 const PGLITE_GLOBAL_KEY = "__vibe_pglite_client__";
 const g = globalThis as typeof globalThis & Record<string, PGlite | undefined>;
+
+declare global {
+  var __vibePgliteOwnership: Promise<void> | undefined;
+}
+
+async function ensurePgliteOwner(
+  port: number,
+  resolvedUrl: string,
+  allowSelfHeal: boolean,
+): Promise<void> {
+  if (!g[PGLITE_GLOBAL_KEY]) {
+    globalThis.__vibePgliteOwnership ??= (async (): Promise<void> => {
+      const { tryClaimPgliteOwnership, servePgliteOn } =
+        await import("./pglite-server");
+      const claimed = await tryClaimPgliteOwnership(port);
+      if (!claimed) {
+        return;
+      }
+      let fresh: PGlite | undefined;
+      try {
+        removeStalePgliteLock(resolvedUrl);
+        const dbPath = fileURLToPath(resolvedUrl);
+        if (allowSelfHeal) {
+          fresh = await openPgliteWithSelfHeal(dbPath);
+        } else {
+          // A dropped connection alone is never a reason to discard data.
+          fresh = new PGlite(dbPath);
+          await pinPgliteUtc(fresh);
+        }
+        servePgliteOn(claimed, fresh);
+        g[PGLITE_GLOBAL_KEY] = fresh;
+      } catch (error) {
+        try {
+          await fresh?.close();
+        } catch (closeError) {
+          process.stderr.write(
+            `[pglite] Failed to close database after initialization error on port ${String(port)}: ${parseError(closeError).message}\n`,
+          );
+        } finally {
+          claimed.release();
+        }
+        // eslint-disable-next-line restricted/restricted-syntax -- pg connect must reject with the initialization failure
+        throw error;
+      }
+    })().finally(() => {
+      globalThis.__vibePgliteOwnership = undefined;
+    });
+    await globalThis.__vibePgliteOwnership;
+  }
+  pgliteClient = g[PGLITE_GLOBAL_KEY] ?? null;
+}
 
 /** Non-null only in the process that owns the PGlite WASM instance. */
 export let pgliteClient: PGlite | null = null;
@@ -246,41 +309,16 @@ if (isPglite) {
   // Ensure the state directory exists (heal/reset bookkeeping lives here).
   mkdirSync(socketDir, { recursive: true });
 
-  if (g[PGLITE_GLOBAL_KEY]) {
-    // HMR re-evaluation in the same process: we already own PGlite.
-    // Restore the module-level ref without opening a second WASM instance.
-    pgliteClient = g[PGLITE_GLOBAL_KEY] as PGlite;
-    resolvePgliteReady();
-  } else {
-    // Race to bind the port. Whoever wins hosts PGlite; every other
-    // process — present or started later — just becomes a pool client.
-    // Async by nature (binding takes an event-loop tick) — `pgliteReady`
-    // lets startup code (migrations, etc.) wait for the outcome instead of
-    // racing it, while `pool` below is created immediately and connects
-    // lazily so ordinary queries just wait the small amount of time this
-    // takes to resolve.
-    void import("./pglite-server")
-      .then(async ({ tryClaimPgliteOwnership, servePgliteOn }) => {
-        const claimed = await tryClaimPgliteOwnership(port);
-        if (!claimed) {
-          // Another process already owns this port — we are a client.
-          return undefined;
-        }
-        removeStalePgliteLock(resolvedUrl);
-        const dbPath = fileURLToPath(resolvedUrl);
-        const fresh = await openPgliteWithSelfHeal(dbPath);
-        g[PGLITE_GLOBAL_KEY] = fresh;
-        pgliteClient = fresh;
-        servePgliteOn(claimed, fresh);
-        return undefined;
-      })
-      .finally(() => {
-        resolvePgliteReady();
-      });
-  }
+  void ensurePgliteOwner(port, resolvedUrl, true)
+    .catch((error) => {
+      process.stderr.write(
+        `[pglite] Database initialization failed on port ${String(port)}: ${parseError(error).message}\n`,
+      );
+    })
+    .finally(resolvePgliteReady);
 
   // All processes (owner and clients) use a loopback pool so db/relational stay uniform.
-  pool = createSocketPool(port);
+  pool = createSocketPool(port, resolvedUrl);
 }
 
 // ─── No-op shims ──────────────────────────────────────────────────────────────
