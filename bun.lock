@@ -302,6 +302,7 @@
   "patchedDependencies": {
     "@openrouter/ai-sdk-provider@3.1.0": "patches/@openrouter%2Fai-sdk-provider@3.1.0.patch",
     "vite@8.3.5": "patches/vite@8.3.5.patch",
+    "@tanstack/start-plugin-core@1.171.55": "patches/@tanstack%2Fstart-plugin-core@1.171.55.patch",
   },
   "overrides": {
     "lightningcss": "1.30.1",

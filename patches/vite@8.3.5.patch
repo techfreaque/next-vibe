@@ -1,3 +1,42 @@
+diff --git a/dist/node/chunks/node.js b/dist/node/chunks/node.js
+--- a/dist/node/chunks/node.js
++++ b/dist/node/chunks/node.js
+@@ -29110,7 +29110,8 @@
+ 		root: config.root,
+ 		resolve: config.resolve,
+ 		assetsInclude: config.assetsInclude,
+-		plugins: config.plugins.map((p) => p.name),
++		// Shell detection can enable browser log forwarding without changing optimized dependencies.
++		plugins: config.plugins.map((p) => p.name).filter((name) => name !== "vite:forward-console"),
+ 		optimizeDeps: {
+ 			include: optimizeDeps.include ? unique(optimizeDeps.include).sort() : void 0,
+ 			exclude: optimizeDeps.exclude ? unique(optimizeDeps.exclude).sort() : void 0,
+@@ -29729,7 +29730,7 @@
+ 	async function resolve(environment, id, importer) {
+ 		let pluginContainer = pluginContainerMap.get(environment);
+ 		if (!pluginContainer) {
+-			pluginContainer = await createEnvironmentPluginContainer(environment, [alias$1({ entries: environment.config.resolve.alias }), ...oxcResolvePlugin({
++			pluginContainer = createEnvironmentPluginContainer(environment, [alias$1({ entries: environment.config.resolve.alias }), ...oxcResolvePlugin({
+ 				root: config.root,
+ 				isProduction: config.isProduction,
+ 				isBuild: config.command === "build",
+@@ -29739,9 +29740,15 @@
+ 				...options,
+ 				idOnly: true
+ 			}, environment.config, true)], void 0, false);
++			// Concurrent resolutions share native resolver initialization.
+ 			pluginContainerMap.set(environment, pluginContainer);
++			// Let the next resolution retry initialization if this one fails.
++			void pluginContainer.catch(() => {
++				pluginContainerMap.delete(environment);
++			});
+ 		}
+-		return await pluginContainer.resolveId(id, importer, { scan });
++		const container = await pluginContainer;
++		return await container.resolveId(id, importer, { scan });
+ 	}
+ 	const aliasOnlyPluginContainerMap = /* @__PURE__ */ new Map();
+ 	async function resolveAlias(environment, id, importer) {
 diff --git a/dist/node/module-runner.js b/dist/node/module-runner.js
 --- a/dist/node/module-runner.js
 +++ b/dist/node/module-runner.js

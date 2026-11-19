@@ -1,0 +1,37 @@
+diff --git a/dist/esm/vite/start-manifest-plugin/plugin.js b/dist/esm/vite/start-manifest-plugin/plugin.js
+--- a/dist/esm/vite/start-manifest-plugin/plugin.js
++++ b/dist/esm/vite/start-manifest-plugin/plugin.js
+@@ -34,8 +34,8 @@
+ 				basePath: resolvedStartConfig.basePaths.publicBase,
+ 				bundledDev: isClientBundledDev(this.environment)
+ 			});
+-			if (this.environment.name !== START_ENVIRONMENT_NAMES.server) return getEmptyStartManifestModule(clientEntry, devClientRuntime);
+-			if (this.environment.config.command === "serve") return getEmptyStartManifestModule(clientEntry, devClientRuntime);
++			const isDev = this.environment.config.command === "serve";
++			if (isDev || this.environment.name !== START_ENVIRONMENT_NAMES.server) return getEmptyStartManifestModule(clientEntry, devClientRuntime, !isDev);
+ 			const routeTreeRoutes = globalThis.TSS_ROUTES_MANIFEST;
+ 			if (!clientBuild) return getEmptyStartManifestModule(clientEntry);
+ 			const startManifest = buildStartManifest({
+@@ -66,7 +66,7 @@
+ 		if ("names" in bundleEntry && bundleEntry.names.includes(assetName)) return fileName;
+ 	}
+ }
+-function getEmptyStartManifestModule(clientEntry, clientRuntime) {
++function getEmptyStartManifestModule(clientEntry, clientRuntime, preloadEntry = true) {
+ 	if (clientRuntime) {
+ 		const entries = [clientRuntime, clientEntry];
+ 		return `export const tsrStartManifest = () => (${serializeStartManifest({ routes: { [rootRouteId]: {
+@@ -78,10 +78,12 @@
+ 			} }))
+ 		} } })})`;
+ 	}
++	// The async script already loads the dev entry. Firefox can fail a
++	// modulepreload reinserted after that module is already loaded.
+ 	return `export const tsrStartManifest = () => ({
+       routes: {
+         __root__: {
+-          preloads: ['${clientEntry}'],
++          preloads: ${JSON.stringify(preloadEntry ? [clientEntry] : [])},
+           scripts: [{ attrs: { type: 'module', async: true, src: '${clientEntry}' } }],
+         },
+       },
