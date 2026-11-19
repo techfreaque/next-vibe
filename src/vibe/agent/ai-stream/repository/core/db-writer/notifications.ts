@@ -5,14 +5,17 @@
 
 import "server-only";
 
+import { eq } from "drizzle-orm";
 import type { TranslatedKeyType } from "next-vibe/core/i18n/core/scoped-translation";
 import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 
+import { chatThreads } from "../../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../../chat/enum";
 import { MessagesRepository } from "../../../../chat/threads/[threadId]/messages/repository";
 import { serializeError } from "../../errors/error-utils";
-import type { DbWriterState } from "./shared";
+import { type DbWriterState, noteThreadGoneWrite } from "./shared";
 import { buildSseMessageRow } from "./sse-row";
 
 /**
@@ -182,6 +185,22 @@ export async function emitErrorMessage(
 
   // DB: save error message (skip for incognito and for errors that must not persist, e.g. credit errors)
   if (!w.deps.isIncognito && !params.skipDb) {
+    // A thread deleted mid-stream would fail this insert on its FK with an
+    // opaque query dump. Check first and route it to the shared thread-gone
+    // evidence, same as the assistant/tool message writes.
+    const [thread] = await db
+      .select({ id: chatThreads.id })
+      .from(chatThreads)
+      .where(eq(chatThreads.id, threadId))
+      .limit(1);
+    if (!thread) {
+      noteThreadGoneWrite(w, "ERROR message create", {
+        messageId: errorMessageId,
+        threadId,
+        userId: user.id,
+      });
+      return;
+    }
     await MessagesRepository.createErrorMessage({
       messageId: errorMessageId,
       threadId,

@@ -87,6 +87,7 @@ import {
 } from "./event-loop-scheduler";
 import type { ServerStartT } from "./i18n";
 import { scopedTranslation as serverStartScopedTranslation } from "./i18n";
+import { findPortHolders } from "./port-holders";
 import { patchRuntimeEnvPlaceholders } from "./runtime-env-patch";
 import {
   childPidsFromProcStat,
@@ -1855,6 +1856,11 @@ export class ServerStartRepository {
               ServerStartRepository.nextUptime.downForMs(now) / 1000,
             ),
             lastOutput: outputTail.text(),
+            // Who still listens on the port (an orphan of a crashed server,
+            // a second instance) - only looked up when bind failed.
+            portHolders: outputTail.text().includes("EADDRINUSE")
+              ? JSON.stringify(findPortHolders(nextPort))
+              : undefined,
           };
 
           const isCleanExit = code === 0 || signal === "SIGTERM";

@@ -193,7 +193,10 @@ export function CreditsTabHeader({
         navigation.push(def.default.POST, {});
       } else if (tab === "history") {
         const def = await import("@/credits/history/definition");
-        navigation.push(def.default.GET, {});
+        // GET validates a nested paginationInfo; an empty push answered 400.
+        navigation.push(def.default.GET, {
+          data: { paginationInfo: { page: 1, limit: 20 } },
+        });
       } else if (tab === "remote") {
         const def = await import("next-vibe/remote-connection/list/definition");
         navigation.push(def.default.GET, {});

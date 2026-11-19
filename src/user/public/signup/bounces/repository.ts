@@ -49,7 +49,43 @@ const LOOKBACK = 7 * 24 * 60 * MINUTE;
 export const isSignupBounceProductionInstance =
   coreEnv.NODE_ENV === Environment.PRODUCTION && !coreEnv.IS_PREVIEW_MODE;
 
-async function loadMailbox(): Promise<{
+// An IMAP host that is not a hostname (e.g. a mailbox address pasted into
+// IMAP_SEED_HOST) fails DNS on every run. Skip it so the next configured
+// source (ops mailbox host, SMTP host) is tried instead.
+const HOSTNAME =
+  /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*$/i;
+
+// Once per process: the task runs every minute.
+const warnedHostSources = new Set<string>();
+
+function pickHost(
+  logger: EndpointLogger,
+  candidates: [source: string, host: string | null | undefined][],
+): string | undefined {
+  for (const [source, host] of candidates) {
+    if (!host) {
+      continue;
+    }
+    if (HOSTNAME.test(host)) {
+      return host;
+    }
+    if (warnedHostSources.has(source)) {
+      continue;
+    }
+    warnedHostSources.add(source);
+    logger.warn(
+      "Signup bounce sync skipped an IMAP host that is not a hostname",
+      {
+        source,
+        containsAt: host.includes("@"),
+        length: host.length,
+      },
+    );
+  }
+  return undefined;
+}
+
+async function loadMailbox(logger: EndpointLogger): Promise<{
   address: string;
   imap: SystemMailboxConfig["imap"];
 } | null> {
@@ -83,14 +119,17 @@ async function loadMailbox(): Promise<{
     address.toLowerCase() === messengerEnv.EMAIL_FROM_EMAIL.toLowerCase();
   const opsMatches =
     address.toLowerCase() === systemMailboxEnv.THEA_MAIL_ADDRESS?.toLowerCase();
-  const host =
-    account?.imapHost ??
-    (envMatches
-      ? (messengerEnv.IMAP_HOST ?? imapClientEnv.IMAP_SEED_HOST)
-      : undefined) ??
-    (opsMatches ? systemMailboxEnv.THEA_MAIL_HOST : undefined) ??
-    account?.smtpHost ??
-    (envMatches ? messengerEnv.EMAIL_HOST : undefined);
+  const host = pickHost(logger, [
+    ["messenger_accounts.imap_host", account?.imapHost],
+    ["IMAP_HOST", envMatches ? messengerEnv.IMAP_HOST : undefined],
+    ["IMAP_SEED_HOST", envMatches ? imapClientEnv.IMAP_SEED_HOST : undefined],
+    [
+      "THEA_MAIL_HOST",
+      opsMatches ? systemMailboxEnv.THEA_MAIL_HOST : undefined,
+    ],
+    ["messenger_accounts.smtp_host", account?.smtpHost],
+    ["EMAIL_HOST", envMatches ? messengerEnv.EMAIL_HOST : undefined],
+  ]);
   const username =
     account?.imapUsername ??
     (envMatches
@@ -218,7 +257,7 @@ export async function syncSignupBounces(
     });
   }
   try {
-    const mailbox = await loadMailbox();
+    const mailbox = await loadMailbox(logger);
     if (!mailbox) {
       logger.warn("Signup bounce sync is missing system mailbox configuration");
       return fail({

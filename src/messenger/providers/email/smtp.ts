@@ -10,7 +10,6 @@
 import "server-only";
 
 import { and, eq } from "drizzle-orm";
-import Imap from "imap";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -24,6 +23,8 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+
+import { createImap } from "@/messenger/providers/email/imap-client/safe-imap";
 
 import { messengerAccounts } from "../../accounts/db";
 import { CampaignType, MessageChannel } from "../../accounts/enum";
@@ -197,7 +198,7 @@ export class SmtpMessengerProvider extends LocalStateProvider {
 
     const targetMailbox: string = sentPath;
     await new Promise<void>((resolve, reject) => {
-      const imap = new Imap({
+      const imap = createImap({
         user: account.username,
         password: account.password,
         host: account.host,
@@ -263,7 +264,7 @@ export class SmtpMessengerProvider extends LocalStateProvider {
       const account = toImapShape(rawAccount);
 
       await new Promise<void>((resolve, reject) => {
-        const imap = new Imap({
+        const imap = createImap({
           user: account.username,
           password: account.password,
           host: account.host,
@@ -343,7 +344,7 @@ export class SmtpMessengerProvider extends LocalStateProvider {
       const account = toImapShape(rawAccount);
 
       await new Promise<void>((resolve, reject) => {
-        const imap = new Imap({
+        const imap = createImap({
           user: account.username,
           password: account.password,
           host: account.host,

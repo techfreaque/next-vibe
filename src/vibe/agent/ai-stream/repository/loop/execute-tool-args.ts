@@ -71,11 +71,18 @@ export function normalizeExecuteToolArgs(args: ArgsRecord): ArgsRecord {
     isRecord(nested) &&
     typeof nested["toolName"] === "string"
   ) {
-    const innerInput = nested["input"];
+    const rawInner = nested["input"];
+    // Both mistakes at once (minimax-m3.1-flash, prod 2026-11-19): nested
+    // one level too deep AND the inner input JSON-encoded.
+    const innerInput =
+      typeof rawInner === "string" ? parseRecordString(rawInner) : rawInner;
     out = {
       ...without(out, "input"),
       toolName: nested["toolName"],
-      input: innerInput !== undefined && isRecord(innerInput) ? innerInput : {},
+      input:
+        innerInput !== undefined && innerInput !== null && isRecord(innerInput)
+          ? innerInput
+          : {},
     };
     if (out["callbackMode"] === undefined && nested["callbackMode"]) {
       out["callbackMode"] = nested["callbackMode"];

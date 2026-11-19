@@ -6,7 +6,9 @@
 
 import "server-only";
 
-import Imap from "imap";
+import type Imap from "imap";
+
+import { createImap } from "@/messenger/providers/email/imap-client/safe-imap";
 
 import type { SystemMailboxConfig } from "./config";
 
@@ -31,6 +33,8 @@ export function makeSnippet(text: string): string {
   return text.replace(/\s+/g, " ").trim().slice(0, SNIPPET_LENGTH);
 }
 
+const CONNECT_DEADLINE_MS = 30_000;
+
 function connect(
   config: SystemMailboxConfig["imap"],
   verifyTls: boolean,
@@ -47,9 +51,25 @@ function connect(
       authTimeout: 10000,
       socketTimeout: 15000,
     };
-    const imap = new Imap(options);
-    imap.once("ready", () => resolve(imap));
-    imap.once("error", (err: Error) => reject(err));
+    const imap = createImap(options);
+    // Hard deadline: a DNS lookup that never settles must not hold a task
+    // for the watchdog's 15 minutes (seen in prod with an invalid host).
+    const deadline = setTimeout(() => {
+      reject(
+        new Error(
+          `IMAP connect to ${config.host}:${config.port} did not finish within ${CONNECT_DEADLINE_MS} ms`,
+        ),
+      );
+      imap.destroy();
+    }, CONNECT_DEADLINE_MS);
+    imap.once("ready", () => {
+      clearTimeout(deadline);
+      resolve(imap);
+    });
+    imap.once("error", (err: Error) => {
+      clearTimeout(deadline);
+      reject(err);
+    });
     imap.connect();
   });
 }

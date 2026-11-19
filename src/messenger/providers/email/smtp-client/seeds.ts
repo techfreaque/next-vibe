@@ -62,8 +62,20 @@ function getSystemAccountConfig(
   }
 
   // IMAP: prefer IMAP_* vars, fall back to legacy IMAP_SEED_* vars
+  // A mailbox address in a host variable (seen in prod: IMAP_SEED_HOST set to
+  // the sender address) makes every IMAP connect fail DNS. Use the SMTP host.
+  const configuredImapHost =
+    messengerEnv.IMAP_HOST ?? imapClientEnv.IMAP_SEED_HOST;
   const imapHost =
-    messengerEnv.IMAP_HOST ?? imapClientEnv.IMAP_SEED_HOST ?? smtpHost;
+    configuredImapHost && !configuredImapHost.includes("@")
+      ? configuredImapHost
+      : smtpHost;
+  if (configuredImapHost?.includes("@")) {
+    logger.warn(
+      "IMAP host is a mailbox address, not a hostname - using the SMTP host",
+      { source: messengerEnv.IMAP_HOST ? "IMAP_HOST" : "IMAP_SEED_HOST" },
+    );
+  }
   const imapUsername =
     messengerEnv.IMAP_USER ?? imapClientEnv.IMAP_SEED_USERNAME ?? smtpUsername;
   const imapPassword =

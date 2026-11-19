@@ -70,4 +70,18 @@ describe("normalizeExecuteToolArgs", () => {
     };
     expect(normalizeExecuteToolArgs(args)).toEqual(args);
   });
+
+  it("unwraps a nested call whose inner input is a JSON string", () => {
+    expect(
+      normalizeExecuteToolArgs({
+        input: {
+          input: '{"title":"POV Game","description":"Two endings"}',
+          toolName: "rename-thread",
+        },
+      }),
+    ).toEqual({
+      toolName: "rename-thread",
+      input: { title: "POV Game", description: "Two endings" },
+    });
+  });
 });

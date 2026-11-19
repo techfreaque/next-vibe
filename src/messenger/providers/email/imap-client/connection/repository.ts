@@ -5,7 +5,6 @@
 
 import "server-only";
 
-import Imap from "imap";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -14,6 +13,8 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
+
+import { createImap } from "@/messenger/providers/email/imap-client/safe-imap";
 
 import type { ImapAccountShape } from "../db";
 import {
@@ -194,7 +195,7 @@ export class ImapConnectionRepository {
         return await new Promise<
           ResponseType<ImapConnectionTestResponseOutput>
         >((resolve) => {
-          const imap = new Imap({
+          const imap = createImap({
             user: config.username,
             password: config.password,
             host: config.host,
@@ -304,7 +305,7 @@ export class ImapConnectionRepository {
 
       // Implement actual folder listing using IMAP
       const folders = await new Promise<ImapFolderInfo[]>((resolve, reject) => {
-        const imap = new Imap({
+        const imap = createImap({
           user: data.account.username,
           password: data.account.password,
           host: data.account.host,
@@ -402,7 +403,7 @@ export class ImapConnectionRepository {
       // Implement actual message listing using IMAP
       const messages = await new Promise<ImapMessageInfo[]>(
         (resolve, reject) => {
-          const imap = new Imap({
+          const imap = createImap({
             user: data.account.username,
             password: data.account.password,
             host: data.account.host,

@@ -17,7 +17,6 @@ import {
   or,
   sql,
 } from "drizzle-orm";
-import Imap from "imap";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -41,6 +40,7 @@ import {
   messengerFolders as imapFolders,
 } from "@/messenger/messages/db";
 import { SpecialFolderType as ImapSpecialUseType } from "@/messenger/messages/enum";
+import { createImap } from "@/messenger/providers/email/imap-client/safe-imap";
 
 import { campaignSchedulerService } from "../emails/services/scheduler";
 import { BOUNCE_PROCESSOR_ALIAS } from "./constants";
@@ -279,7 +279,7 @@ export class BounceProcessorRepository {
       }
 
       await new Promise<void>((resolve) => {
-        const imap = new Imap({
+        const imap = createImap({
           user: account.imapUsername ?? "",
           password: account.imapPassword ?? "",
           host: account.imapHost ?? "",

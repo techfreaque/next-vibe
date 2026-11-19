@@ -73,6 +73,9 @@ export class PublicCapRepository {
       cost: number;
       spendToday: number;
       capAmount: number;
+      /** lead-cap / ip-cap: the sub-cap that refused and what was spent on it */
+      subCapSpend?: number;
+      subCap?: number;
     },
     logger: EndpointLogger,
   ): Promise<void> {
@@ -420,8 +423,15 @@ export class PublicCapRepository {
         spenders.find((s) => s.kind === "ip" && s.key === ipHash)?.spend ?? 0;
 
       if (leadId && leadSpend + expectedCost > row.perLeadCap) {
+        // spendToday/capAmount are the shared pool; name the lead's own
+        // spend and sub-cap, or the refusal looks like a bug.
         await PublicCapRepository.recordEvent(
-          { kind: "lead-cap", ...base },
+          {
+            kind: "lead-cap",
+            ...base,
+            subCapSpend: leadSpend,
+            subCap: row.perLeadCap,
+          },
           logger,
         );
         return fail({
@@ -431,7 +441,12 @@ export class PublicCapRepository {
       }
       if (ipHash && ipSpend + expectedCost > row.perIpCap) {
         await PublicCapRepository.recordEvent(
-          { kind: "ip-cap", ...base },
+          {
+            kind: "ip-cap",
+            ...base,
+            subCapSpend: ipSpend,
+            subCap: row.perIpCap,
+          },
           logger,
         );
         return fail({
