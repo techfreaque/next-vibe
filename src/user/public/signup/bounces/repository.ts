@@ -35,7 +35,10 @@ import { messengerEnv } from "@/messenger/env";
 import { imapClientEnv } from "@/messenger/providers/email/imap-client/env";
 import type { SystemMailboxConfig } from "@/messenger/system-mailbox/config";
 import { systemMailboxEnv } from "@/messenger/system-mailbox/env";
-import { visitDeliveryReports } from "@/messenger/system-mailbox/imap-ops";
+import {
+  describeImapFailure,
+  visitDeliveryReports,
+} from "@/messenger/system-mailbox/imap-ops";
 
 import { SignupBounceReason } from "../bounce-reason";
 import { pendingSignups } from "../db";
@@ -256,6 +259,7 @@ export async function syncSignupBounces(
       errorType: ErrorResponseTypes.FORBIDDEN,
     });
   }
+  let imap: SystemMailboxConfig["imap"] | undefined;
   try {
     const mailbox = await loadMailbox(logger);
     if (!mailbox) {
@@ -265,10 +269,11 @@ export async function syncSignupBounces(
         errorType: ErrorResponseTypes.EMAIL_ERROR,
       });
     }
+    imap = mailbox.imap;
     const now = Date.now();
     let marked = 0;
     await visitDeliveryReports(
-      mailbox.imap,
+      imap,
       new Date(now - LOOKBACK),
       async ({ uid, raw, receivedAt }) => {
         const report = await parseDeliveryReport(raw).catch((error: Error) => {
@@ -299,7 +304,11 @@ export async function syncSignupBounces(
     }
     return success({ marked });
   } catch (error) {
-    logger.error("Signup bounce sync failed", parseError(error));
+    const cause = parseError(error);
+    logger.error(
+      "Signup bounce sync failed",
+      imap ? describeImapFailure(imap, cause) : cause,
+    );
     return fail({
       message: t("bounceSync.mailboxUnavailable"),
       errorType: ErrorResponseTypes.EMAIL_ERROR,

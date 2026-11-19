@@ -12,6 +12,7 @@ import { composeMessage, isValidRecipient } from "./compose";
 import type { SystemMailboxEnvValues } from "./config";
 import { resolveSystemMailboxConfig } from "./config";
 import { scopedTranslation } from "./i18n";
+import { describeImapFailure } from "./imap-ops";
 import type { ReportQueryRunner, ReportRow } from "./report/composer";
 import { collectReportData, composeReport } from "./report/composer";
 import type { SystemMailboxDeps } from "./repository";
@@ -27,6 +28,36 @@ const ENV: SystemMailboxEnvValues = {
 
 const logger = createEndpointLogger(false, defaultLocale);
 const { t } = scopedTranslation.scopedT(defaultLocale);
+
+describe("describeImapFailure", () => {
+  it("includes the connection and server response while redacting credentials", () => {
+    const password = 'test"secret';
+    const error = Object.assign(
+      new Error(`Authentication failed. "${password}" or "test\\"secret"`),
+      { type: "no", textCode: "AUTHENTICATIONFAILED", source: "authentication" },
+    );
+    expect(
+      describeImapFailure(
+        {
+          host: "mail.example.com",
+          port: 993,
+          secure: true,
+          username: "ops@example.com",
+          password,
+        },
+        error,
+      ),
+    ).toEqual({
+      host: "mail.example.com",
+      port: 993,
+      tls: true,
+      responseText: 'Authentication failed. "[redacted]" or "[redacted]"',
+      status: "no",
+      responseCode: "AUTHENTICATIONFAILED",
+      source: "authentication",
+    });
+  });
+});
 
 function makeRow(overrides: Partial<MessengerAccount>): MessengerAccount {
   // Minimal row; unrelated columns are irrelevant to config resolution.
@@ -59,9 +90,7 @@ describe("resolveSystemMailboxConfig", () => {
   });
 
   it("returns null when the password is missing everywhere", () => {
-    expect(
-      resolveSystemMailboxConfig(null, { ...ENV, THEA_MAIL_PASSWORD: undefined }),
-    ).toBeNull();
+    expect(resolveSystemMailboxConfig(null, { ...ENV, THEA_MAIL_PASSWORD: undefined })).toBeNull();
   });
 
   it("lets env win and the designated row fill the gaps", () => {
@@ -174,10 +203,7 @@ describe("SystemMailboxRepository.send", () => {
 
   it("still succeeds when only the Sent append fails", async () => {
     const calls: Calls = { sent: [], appended: 0, recorded: 0 };
-    SystemMailboxRepository.deps = makeDeps(
-      { sentLastHour: 0, appendFails: true },
-      calls,
-    );
+    SystemMailboxRepository.deps = makeDeps({ sentLastHour: 0, appendFails: true }, calls);
     const result = await SystemMailboxRepository.send(input, undefined, logger, t);
     expect(result.success).toBe(true);
     if (result.success) {
@@ -189,10 +215,7 @@ describe("SystemMailboxRepository.send", () => {
 
   it("fails and records nothing when SMTP rejects", async () => {
     const calls: Calls = { sent: [], appended: 0, recorded: 0 };
-    SystemMailboxRepository.deps = makeDeps(
-      { sentLastHour: 0, smtpFails: true },
-      calls,
-    );
+    SystemMailboxRepository.deps = makeDeps({ sentLastHour: 0, smtpFails: true }, calls);
     const result = await SystemMailboxRepository.send(input, undefined, logger, t);
     expect(result.success).toBe(false);
     expect(calls.recorded).toBe(0);
@@ -233,9 +256,7 @@ describe("daily report composer", () => {
       runner(
         {
           "FROM users": [{ new_users: "4", total_users: "120" }],
-          "FROM credit_transactions": [
-            { spent: 12.5, bought: 40, usage_events: 9 },
-          ],
+          "FROM credit_transactions": [{ spent: 12.5, bought: 40, usage_events: 9 }],
           "FROM error_logs": [{ distinct_errors: 2, occurrences: 7 }],
         },
         ["task_incidents", "growth_journeys"],

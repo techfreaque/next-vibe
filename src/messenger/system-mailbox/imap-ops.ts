@@ -35,6 +35,46 @@ export function makeSnippet(text: string): string {
 
 const CONNECT_DEADLINE_MS = 30_000;
 
+export function describeImapFailure(
+  config: SystemMailboxConfig["imap"],
+  error: Error,
+): {
+  host: string;
+  port: number;
+  tls: boolean;
+  responseText: string;
+  status: string | undefined;
+  responseCode: string | undefined;
+  source: string | undefined;
+} {
+  const escapedPassword = config.password.replace(/[\\"]/g, "\\$&");
+  const redact = (text: string): string =>
+    config.password
+      ? text
+          .replaceAll(escapedPassword, "[redacted]")
+          .replaceAll(config.password, "[redacted]")
+      : text;
+
+  return {
+    host: config.host,
+    port: config.port,
+    tls: config.secure,
+    responseText: redact(error.message),
+    status:
+      "type" in error && typeof error.type === "string"
+        ? redact(error.type)
+        : undefined,
+    responseCode:
+      "textCode" in error && typeof error.textCode === "string"
+        ? redact(error.textCode)
+        : undefined,
+    source:
+      "source" in error && typeof error.source === "string"
+        ? redact(error.source)
+        : undefined,
+  };
+}
+
 function connect(
   config: SystemMailboxConfig["imap"],
   verifyTls: boolean,
