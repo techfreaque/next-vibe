@@ -137,6 +137,7 @@ export const translations = {
       "Unable to process your contact form at this time. Please try again later.",
     noContactReturned: "No contact record was returned after creation",
     validation: {
+      messageEmpty: "Enter a message before sending.",
       title: "Validation Error",
       description: "Please check your input and try again",
       nameMinLength: "Name must be at least 2 characters long",

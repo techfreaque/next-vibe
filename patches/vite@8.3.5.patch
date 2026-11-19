@@ -1,0 +1,19 @@
+diff --git a/dist/node/module-runner.js b/dist/node/module-runner.js
+--- a/dist/node/module-runner.js
++++ b/dist/node/module-runner.js
+@@ -1226,6 +1226,15 @@
+ 				startOffset: this.evaluator.startOffset
+ 			}
+ 		]);
++		// A hot update can clear the runner metadata after the cached fetch was sent.
++		// Ask for the module once without the cache hint before reporting a failure.
++		if ("cache" in fetchedModule && !cachedModule?.meta) {
++			fetchedModule = await this.transport.invoke("fetchModule", [
++				url,
++				importer,
++				{ cached: false, startOffset: this.evaluator.startOffset }
++			]);
++		}
+ 		if ("cache" in fetchedModule) {
+ 			if (!cachedModule || !cachedModule.meta) throw Error(`Module "${url}" was mistakenly invalidated during fetch phase.`);
+ 			return cachedModule;

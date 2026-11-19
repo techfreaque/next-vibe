@@ -8,6 +8,8 @@
 import { describe, expect, it } from "bun:test";
 import { NextRequest } from "next-vibe/ui/lib/request";
 
+import { coreEnv } from "../../../core/env";
+import { Environment } from "../../../env/env-util";
 import { middleware } from "./index";
 
 const options = {
@@ -47,5 +49,12 @@ describe("middleware static-file shortcut", () => {
 
   it("still 404s bare-root files with no static match", async () => {
     expect((await statusFor("/missing-icon.png")).status).toBe(404);
+  });
+
+  it("does not localize missing Vite source modules in development", async () => {
+    const result = await statusFor("/src/moved-module.tsx?t=12");
+    expect(result.status).toBe(
+      coreEnv.NODE_ENV === Environment.DEVELOPMENT ? 404 : 307,
+    );
   });
 });

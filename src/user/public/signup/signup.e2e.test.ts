@@ -3,6 +3,7 @@
  * Requires a server (Atlas dev by default): `vibe dev`.
  */
 
+import { readFile } from "node:fs/promises";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { identityEnv } from "next-vibe/identity/env";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
@@ -16,6 +17,7 @@ import { describe, expect } from "vitest";
 
 import userDeleteDefinitions from "@/users/user/[id]/definition";
 
+import { parseDeliveryReport } from "./bounces/delivery-report";
 import signupEndpoints from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -46,6 +48,48 @@ async function deleteUserByEmail(email: string): Promise<void> {
 describe("E2E: signup page", () => {
   const e2e = useE2E("user/public/signup");
   const { t } = scopedTranslation.scopedT(defaultLocale);
+
+  e2e.it("shows an Office 365 bounce after polling and focuses the address action", async ({ goto, page }) => {
+    const report = await parseDeliveryReport(
+      await readFile(new URL("./bounces/fixtures/office365-policy.eml", import.meta.url)),
+    );
+    const failure = report?.failures[0];
+    if (!failure) {
+      return expect.fail("Expected a failed recipient in the Office 365 sample");
+    }
+    let bounced = false;
+    await page.clock.install();
+    await page.route(
+      (url) => url.pathname.endsWith("/user/public/signup"),
+      async (route) => {
+        if (route.request().method() !== "PATCH") {
+          return route.fallback();
+        }
+        await route.fulfill({
+          json: {
+            success: true,
+            data: {
+              address: failure.recipient,
+              bounced,
+              message: t(bounced ? failure.reason : "confirmation.sent", {
+                email: failure.recipient,
+              }),
+            },
+          },
+        });
+      },
+    );
+    await goto(`${SIGNUP_PAGE}?pending=59326fcc-8877-49ee-85cb-63b4195d35b0`);
+    await page.getByText(t("confirmation.sent", { email: failure.recipient })).waitFor();
+    bounced = true;
+    await page.clock.fastForward(15_000);
+    const alert = page.getByRole("alert").filter({ hasText: t("confirmation.bouncePolicy") });
+    await alert.waitFor();
+    const changeAddress = page.getByRole("button", { name: t("confirmation.changeAddress") });
+    await changeAddress.and(page.locator(":focus")).waitFor();
+    await changeAddress.click();
+    await page.getByLabel(t("confirmation.email"), { exact: true }).waitFor();
+  });
 
   e2e.it(
     "creates an account and signs the user in",

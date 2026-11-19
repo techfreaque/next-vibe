@@ -136,6 +136,7 @@ export const translations: typeof enTranslations = {
       "Impossible de traiter votre formulaire pour le moment. Réessayez plus tard.",
     noContactReturned: "Aucun contact renvoyé après la création",
     validation: {
+      messageEmpty: "Saisissez un message avant de l’envoyer.",
       title: "Erreur de validation",
       description: "Vérifiez votre saisie et réessayez",
       nameMinLength: "Le nom doit contenir au moins 2 caractères",

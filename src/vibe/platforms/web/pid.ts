@@ -58,11 +58,16 @@ export function killPreviousInstance(
   pidFile: string,
   logger: EndpointLogger,
   basePort?: number,
+  reclaimUntrackedPort = true,
 ): void {
   if (!existsSync(pidFile)) {
     // No pid file, but if a same-cwd process is on our internal port it's an orphaned
     // child from a previous crash. Kill it so the port is free for the new startup.
-    if (basePort !== undefined && process.platform === "linux") {
+    if (
+      reclaimUntrackedPort &&
+      basePort !== undefined &&
+      process.platform === "linux"
+    ) {
       const internalPort = basePort + NEXT_PORT_OFFSET;
       const pidOnPort = getPidOnPort(internalPort);
       if (
@@ -159,10 +164,9 @@ export function killPreviousInstance(
     });
   }
 
-  // After tracked PIDs are dead, kill anything still on the old internal port
-  // (PORT + NEXT_PORT_OFFSET). If all our tracked PIDs are gone, whatever remains
-  // on that port must be an orphaned child (e.g. Nitro worker spawned by TanStack
-  // Start, or a Next.js grandchild) — it's safe to kill it because we own that port.
+  // Previous app servers may have left an orphan on the old internal port.
+  // Dev callers can opt out of reclaiming untracked listeners and let Vite
+  // select another port. Production callers retain the legacy recovery path.
   if (oldPort !== undefined && !isNaN(oldPort)) {
     const internalPort = oldPort + NEXT_PORT_OFFSET;
     const allTrackedDead = pids.every((p) => !isProcessRunning(p));
@@ -174,7 +178,9 @@ export function killPreviousInstance(
       // would target unkillable system PIDs (Docker HNS) that happen to show on
       // this port in netstat but don't actually block binding.
       (oldPidSet.has(pidOnPort) ||
-        (allTrackedDead && process.platform !== "win32"))
+        (reclaimUntrackedPort &&
+          allTrackedDead &&
+          process.platform !== "win32"))
     ) {
       logger.debug(
         `Killing orphaned process on internal port ${internalPort}`,

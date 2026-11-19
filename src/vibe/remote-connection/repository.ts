@@ -94,6 +94,60 @@ export class RemoteConnectionRepository {
 
   // ─── Connection Health ────────────────────────────────────────────────────────
 
+  static requiresReauth(conn: {
+    isActive: boolean;
+    isReverseEntry: boolean;
+    token: string;
+  }): boolean {
+    // Disconnect deletes the row. An inactive outbound row with credentials
+    // was kept because its peer rejected the saved session.
+    return !conn.isActive && !conn.isReverseEntry && conn.token.length > 0;
+  }
+
+  static async markSessionRejected(connection: {
+    id: string;
+    token: string;
+    leadId: string;
+    remoteUrl: string;
+  }): Promise<boolean> {
+    const [row] = await db
+      .select({ token: remoteConnections.token })
+      .from(remoteConnections)
+      .where(
+        and(
+          eq(remoteConnections.id, connection.id),
+          eq(remoteConnections.isActive, true),
+          eq(remoteConnections.leadId, connection.leadId),
+          eq(remoteConnections.remoteUrl, connection.remoteUrl),
+        ),
+      )
+      .limit(1);
+    if (
+      !row ||
+      RemoteConnectionRepository.decryptToken(row.token) !== connection.token
+    ) {
+      return false;
+    }
+
+    // Compare the stored ciphertext so a concurrent reconnect cannot have
+    // its fresh credentials marked inactive by an older response.
+    const [updated] = await db
+      .update(remoteConnections)
+      .set({ isActive: false, wsConnectedAt: null, updatedAt: new Date() })
+      .where(
+        and(
+          eq(remoteConnections.id, connection.id),
+          eq(remoteConnections.isActive, true),
+          eq(remoteConnections.token, row.token),
+          eq(remoteConnections.leadId, connection.leadId),
+          eq(remoteConnections.remoteUrl, connection.remoteUrl),
+        ),
+      )
+      .returning({ id: remoteConnections.id });
+
+    return updated !== undefined;
+  }
+
   static getConnectionHealth(conn: {
     isActive: boolean;
     lastSyncedAt: Date | null;

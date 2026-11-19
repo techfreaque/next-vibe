@@ -17,6 +17,7 @@ import { GENERATED_DIR } from "@/env/paths";
 import type { EndpointLogger } from "../../../../logger/types";
 
 export interface TanstackDevHandle {
+  port: number;
   /** Close the current Vite server (tracks restarts via the internal ref). */
   close: () => Promise<void>;
 }
@@ -90,6 +91,7 @@ export async function startTanstackDev({
   }
 
   return {
+    port: devResult.port,
     close: (): Promise<void> => viteCloseRef.fn?.() ?? Promise.resolve(),
   };
 }

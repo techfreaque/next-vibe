@@ -63,6 +63,8 @@ export function SignupConfirmationStep({
   const hasStatus = useRef(false);
   const revision = useRef(0);
   const fired = useRef(false);
+  const focusedBounce = useRef(false);
+  const addressActionsRef = useRef<HTMLDivElement>(null);
   const run = useCallback(
     async (
       data: SignupPatchRequestOutput,
@@ -149,6 +151,19 @@ export function SignupConfirmationStep({
     }
     return undefined;
   }, [magicLink, pendingId, run]);
+  const bounced = status?.bounced;
+  useEffect(() => {
+    if (!bounced) {
+      focusedBounce.current = false;
+      return;
+    }
+    if (focusedBounce.current || editing || busy || unavailable) {
+      return;
+    }
+    const button = addressActionsRef.current?.querySelector?.("button");
+    button?.focus();
+    focusedBounce.current = Boolean(button);
+  }, [bounced, editing, busy, unavailable]);
   const deadline = status?.resendAt ?? 0;
   useEffect(() => {
     if (deadline <= Date.now()) {
@@ -181,9 +196,22 @@ export function SignupConfirmationStep({
           <Mail className="h-6 w-6" />
         </Div>
         <CardTitle className="text-2xl tracking-tight">
-          {t(magicLink ? "confirmation.link" : "confirmation.title")}
+          {t(
+            magicLink
+              ? "confirmation.link"
+              : bounced
+                ? "confirmation.bouncedTitle"
+                : "confirmation.title",
+          )}
         </CardTitle>
-        {status && <CardDescription>{status.message}</CardDescription>}
+        {status &&
+          (bounced ? (
+            <Div role="alert" className="text-sm text-destructive">
+              {status.message}
+            </Div>
+          ) : (
+            <CardDescription>{status.message}</CardDescription>
+          ))}
       </CardHeader>
       <CardContent className="flex flex-col gap-4 p-6 pt-4 sm:p-8 sm:pt-4">
         {error && (
@@ -248,10 +276,13 @@ export function SignupConfirmationStep({
               >
                 {t(editing ? "confirmation.save" : "confirmation.confirm")}
               </Button>
-              <Div className="flex flex-col items-center gap-1 border-t pt-3">
+              <Div
+                ref={addressActionsRef}
+                className="flex flex-col items-center gap-1 border-t pt-3"
+              >
                 <Button
                   type="button"
-                  variant="link"
+                  variant={bounced && !editing ? "default" : "link"}
                   disabled={busy}
                   onClick={() => {
                     setEditing(!editing);
@@ -259,7 +290,13 @@ export function SignupConfirmationStep({
                     setError("");
                   }}
                 >
-                  {t(editing ? "confirmation.cancel" : "confirmation.change")}
+                  {t(
+                    editing
+                      ? "confirmation.cancel"
+                      : bounced
+                        ? "confirmation.changeAddress"
+                        : "confirmation.change",
+                  )}
                 </Button>
                 {!editing && (
                   <Button

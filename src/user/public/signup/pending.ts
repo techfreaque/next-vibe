@@ -30,6 +30,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { signupSubnetLimitHit } from "@/credits/anti-farming/signup-limit";
 
+import { SignupBounceReason } from "./bounce-reason";
 import { sendSignupChallenge } from "./confirmation-mail";
 import { type PendingSignup, pendingSignups, signupMailAttempts } from "./db";
 import type { SignupPatchResponseOutput } from "./definition";
@@ -66,7 +67,7 @@ export function pendingStatus(
     bounced: row.bounced,
     resendAt: row.sentAt.getTime() + MINUTE,
     message: row.bounced
-      ? t("confirmation.bounce", { email: row.email })
+      ? t(row.bounceReason ?? SignupBounceReason.OTHER, { email: row.email })
       : row.deliveryFailed
         ? t("confirmation.sendFailed", { email: row.email })
         : t("confirmation.sent", { email: row.email }),
@@ -150,6 +151,7 @@ export async function issueSignupChallenge(
       expiresAt: new Date(now.getTime() + CONFIRMATION_TTL),
       sentAt: now,
       bounced: false,
+      bounceReason: null,
       deliveryFailed: false,
       messageId: null,
     };

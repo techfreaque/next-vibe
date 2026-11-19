@@ -1,7 +1,19 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  bounceSync: {
+    title: "Relever les échecs de livraison à l’inscription",
+    description:
+      "Vérifie si la boîte système a reçu des avis de non-remise pour les e-mails de confirmation.",
+    marked: "Inscriptions mises à jour",
+    result: "Inscriptions mises à jour : {{count}}",
+    productionOnly: "Le relevé fonctionne uniquement en production.",
+    mailboxUnavailable:
+      "Impossible de relever les avis de non-remise dans la boîte système.",
+  },
   confirmation: {
+    bouncedTitle: "L’e-mail de confirmation n’a pas été remis",
+    changeAddress: "Modifier l’adresse e-mail",
     description:
       "Terminez votre inscription avec le code ou le lien reçu par e-mail.",
     title: "Consultez votre messagerie",
@@ -22,6 +34,12 @@ export const translations: typeof enTranslations = {
     cooldown: "Trop de demandes. Patientez avant de demander un nouveau code.",
     domain:
       "Ce domaine ne peut pas recevoir de messages. Vérifiez votre adresse.",
+    bouncePolicy:
+      "Votre messagerie a bloqué notre message. Les adresses scolaires et professionnelles refusent souvent les messages externes. Utilisez une autre adresse.",
+    bounceMailboxMissing:
+      "Votre messagerie indique que l’adresse {{email}} n’existe pas. Vérifiez la saisie ou utilisez une autre adresse.",
+    bounceMailboxFull:
+      "La boîte de réception de {{email}} est pleine. Libérez de l’espace et demandez un nouveau code, ou utilisez une autre adresse.",
     sendFailed:
       "L’envoi à {{email}} a échoué. Vérifiez votre adresse ou réessayez.",
     done: "Votre adresse est confirmée. Vous êtes connecté.",

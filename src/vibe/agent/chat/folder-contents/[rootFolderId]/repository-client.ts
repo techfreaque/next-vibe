@@ -20,6 +20,7 @@ import { ThreadStatus, ThreadStreamingState } from "../../enum";
 import {
   getFoldersForRoot,
   getThreadsForFolder,
+  getThreadsForRoot,
 } from "../../incognito/storage";
 import type {
   FolderContentsRequestOutput,
@@ -41,6 +42,7 @@ export class FolderContentsRepositoryClient {
     data: FolderContentsRequestOutput,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    includeNested = false,
   ): Promise<ResponseType<FolderContentsResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
@@ -49,16 +51,14 @@ export class FolderContentsRepositoryClient {
 
       // Fetch folders at this level
       const allFolders = await getFoldersForRoot(rootFolderId, logger);
-      const levelFolders = allFolders.filter(
-        (f) => (f.parentId ?? null) === subFolderId,
-      );
+      const levelFolders = includeNested
+        ? allFolders
+        : allFolders.filter((f) => (f.parentId ?? null) === subFolderId);
 
       // Fetch threads at this level
-      const threads = await getThreadsForFolder(
-        rootFolderId,
-        subFolderId,
-        logger,
-      );
+      const threads = includeNested
+        ? await getThreadsForRoot(rootFolderId, logger)
+        : await getThreadsForFolder(rootFolderId, subFolderId, logger);
 
       logger.debug("Client: incognito folder contents", {
         folders: levelFolders.length,

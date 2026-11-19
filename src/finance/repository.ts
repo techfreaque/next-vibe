@@ -776,8 +776,10 @@ export class FinanceRepository {
             provider,
             providerLabel: providerLabel(provider),
             balanceUsd,
-            absoluteUsd: thresholds[lowBalance.absoluteUsd],
-            daysOfSpend: thresholds[lowBalance.daysOfSpend],
+            warningUsd: thresholds[lowBalance.warningUsd],
+            warningDays: thresholds[lowBalance.warningDays],
+            criticalUsd: thresholds[lowBalance.criticalUsd],
+            criticalDays: thresholds[lowBalance.criticalDays],
             dailySpendUsd: trailing?.dailySpendUsd ?? null,
           }),
         });

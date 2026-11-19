@@ -131,7 +131,13 @@ export async function middleware(
   // and without the /api/ form here every png/jpg/svg chat file got an empty
   // 404 from this line on the Next.js build (prod 2026-11-14/15: generated and
   // uploaded images never loaded, while .mp3/.webp files reached the handler).
-  if (shouldSkipPath(path)) {
+  // Vite handles source modules before application routing. A missing module
+  // can still reach us during HMR, and redirecting it to a locale cannot find it.
+  const devSourceModule =
+    coreEnv.NODE_ENV === Environment.DEVELOPMENT &&
+    path.startsWith("/src/") &&
+    /\.(?:[cm]?ts|tsx|jsx|[cm]js)$/.test(path);
+  if (shouldSkipPath(path) || devSourceModule) {
     const hasFileExtension = /\.[a-zA-Z0-9]{2,5}$/.test(path);
     const hasLocalePrefix = /^\/(?:api\/)?[a-z]{2}-[A-Z]+\//.test(path);
     if (hasFileExtension && !hasLocalePrefix) {

@@ -11,7 +11,7 @@
 // CLI output messages don't need internationalization
 
 import type { ChildProcess } from "node:child_process";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeSync } from "node:fs";
 
 import { coreEnv } from "../../../core/env";
@@ -235,7 +235,7 @@ export class DevRepository {
     DevRepository.logStartupInfo(port, logger, data);
 
     // Kill any previous dev instance, then write our PID (including resolved port)
-    killPreviousInstance(DevRepository.activePidFile, logger);
+    killPreviousInstance(DevRepository.activePidFile, logger, undefined, false);
     writePidFile(DevRepository.activePidFile, logger, [], port);
 
     // Register early SIGINT/SIGTERM so Ctrl+C during setup exits immediately
@@ -379,7 +379,7 @@ export class DevRepository {
     );
     DevRepository.log("");
     DevRepository.log(
-      `  ${formatHint("💡 Edit src/vibe/platforms/web/dev/definition.ts to change defaults")}`,
+      `  ${formatHint("💡 CLI option defaults are defined in src/vibe/platforms/web/dev/definition.ts.")}`,
     );
     DevRepository.log("");
   }
@@ -427,22 +427,18 @@ export class DevRepository {
     tanstack = false,
     shutdownController?: AbortController,
   ): Promise<never> {
-    // Save tty state now (before anything touches it) so we can restore on exit.
-    // stty is POSIX-only; skip on Windows where it doesn't exist.
-    // Guard with [ -e /dev/tty ] first: when there is no controlling terminal
-    // (e.g. nohup / setsid / CI), the shell itself prints an error to stderr
-    // when it tries to open /dev/tty as an input redirect, even with 2>/dev/null.
+    // A device node can exist even when this process has no terminal.
+    // Only query stty when stdin is connected to one.
     let savedTtyState: string | null = null;
-    if (process.platform !== "win32") {
+    if (process.platform !== "win32" && process.stdin.isTTY) {
       try {
         savedTtyState =
-          execSync("[ -e /dev/tty ] && stty -g </dev/tty 2>/dev/null || true", {
-            shell: "/bin/sh",
-          })
-            .toString()
-            .trim() || null;
-      } catch {
-        /* not a tty */
+          execFileSync("stty", ["-g"], {
+            encoding: "utf8",
+            stdio: ["inherit", "pipe", "pipe"],
+          }).trim() || null;
+      } catch (error) {
+        logger.warn("Could not save terminal settings", parseError(error));
       }
     }
 
@@ -468,7 +464,11 @@ export class DevRepository {
     // For Next.js mode, start the proxy immediately so it's ready to accept connections.
     // For TanStack mode, we start Vite first and only then start the proxy.
     if (!tanstack) {
-      wsHandle = await startWebProxy({ port: wsPort, logger });
+      wsHandle = await startWebProxy({
+        port: wsPort,
+        reusePort: false,
+        logger,
+      });
     }
 
     // Controller over the Next.js child process - set in Next.js mode only
@@ -478,18 +478,15 @@ export class DevRepository {
     let viteClose: (() => Promise<void>) | undefined;
 
     const restoreTty = (): void => {
-      if (process.platform === "win32") {
+      if (!savedTtyState) {
         return;
       }
       try {
-        if (savedTtyState) {
-          execSync(
-            `[ -e /dev/tty ] && stty ${savedTtyState} </dev/tty 2>/dev/null || true`,
-            { shell: "/bin/sh" },
-          );
-        }
-      } catch {
-        /* not a tty */
+        execFileSync("stty", [savedTtyState], {
+          stdio: ["inherit", "ignore", "pipe"],
+        });
+      } catch (error) {
+        logger.warn("Could not restore terminal settings", parseError(error));
       }
     };
 
@@ -660,7 +657,20 @@ export class DevRepository {
 
       // Vite is now ready - start the proxy so it can forward requests to Vite
       if (!disableProxy) {
-        wsHandle = await startWebProxy({ port: wsPort, logger });
+        try {
+          wsHandle = await startWebProxy({
+            port: wsPort,
+            appPort: tanstackHandle.port,
+            reusePort: false,
+            logger,
+          });
+        } catch (error) {
+          logger.error(
+            `Could not start the development proxy on port ${String(wsPort)}`,
+            parseError(error),
+          );
+          shutdown(1);
+        }
       }
 
       // Keep the process alive - the Vite/Nitro server runs until SIGINT/SIGTERM

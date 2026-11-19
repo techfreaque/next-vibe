@@ -6,12 +6,19 @@
 
 import { describe, expect, it } from "bun:test";
 
+import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
+
+import { defaultLocale } from "../../core/i18n/core/config";
 import type {
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
 } from "../../identity/auth/types";
 import { UserPermissionRole } from "../../identity/roles/enum";
-import { describeSubscribeIdentity } from "./ws-channel-auth";
+import { createEndpointLogger } from "../../logger/server";
+import {
+  authenticateWsRequest,
+  describeSubscribeIdentity,
+} from "./ws-channel-auth";
 
 const LEAD = "04de8f9b-7bb7-43e9-acdc-a866e6178da9";
 const USER = "f6e5cfb8-e5be-4ae2-a5e3-e907aed50985";
@@ -28,6 +35,19 @@ const guest: JWTPublicPayloadType = {
   leadId: LEAD,
   roles: [UserPermissionRole.PUBLIC],
 };
+
+describe("WebSocket guest authentication", () => {
+  it("identifies an upgrade carrying only a lead cookie as a guest", async () => {
+    const request = new Request("http://localhost/ws", {
+      headers: { cookie: `${LEAD_ID_COOKIE_NAME}=${LEAD}` },
+    });
+    const result = await authenticateWsRequest(
+      request,
+      createEndpointLogger(false, defaultLocale),
+    );
+    expect(result).toEqual({ user: guest, source: "guest" });
+  });
+});
 
 describe("describeSubscribeIdentity", () => {
   it("flags a guest-state tab whose socket is logged in", () => {

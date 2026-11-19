@@ -36,6 +36,7 @@ import { throwErrorResponse } from "../../core/route/error-response-error";
 import type { ResponseType } from "../../core/route/response.schema";
 import type { EndpointLogger } from "../../logger/types";
 import { isCliPlatform, Platform } from "../../platforms/platforms";
+import { V1_API_PATH_REGEX } from "../../platforms/web/middleware/utils";
 import {
   filterUserPermissionRoles,
   UserPermissionRole,
@@ -264,8 +265,11 @@ export class AuthRepository {
     // Deduplicate concurrent requests carrying the same stale cookie:
     // if another request is already creating a lead for this cookie value,
     // reuse that promise instead of spawning a redundant DB insert.
-    const dedupeKey = existingLeadId ?? `__no_cookie__${locale}`;
-    const inflight = AuthRepository.pendingLeadCreations.get(dedupeKey);
+    // A missing cookie does not identify a visitor. Independent requests
+    // without one must get their own leads, even if they share a locale.
+    const inflight = existingLeadId
+      ? AuthRepository.pendingLeadCreations.get(existingLeadId)
+      : undefined;
     if (inflight) {
       const newLeadId = await inflight;
       return { leadId: newLeadId, shouldUpdateCookie: true };
@@ -275,9 +279,13 @@ export class AuthRepository {
       locale,
       logger,
     ).finally(() => {
-      AuthRepository.pendingLeadCreations.delete(dedupeKey);
+      if (existingLeadId) {
+        AuthRepository.pendingLeadCreations.delete(existingLeadId);
+      }
     });
-    AuthRepository.pendingLeadCreations.set(dedupeKey, creationPromise);
+    if (existingLeadId) {
+      AuthRepository.pendingLeadCreations.set(existingLeadId, creationPromise);
+    }
 
     const newLeadId = await creationPromise;
     logger.debug("Created new lead for public user, cookie will be updated", {
@@ -929,7 +937,10 @@ export class AuthRepository {
 
       // API-key surface (/api/<locale>/v1/*): keys authenticate here and
       // nowhere else. Resolved before JWT/cookie handling.
-      if (context.request) {
+      if (
+        context.request &&
+        V1_API_PATH_REGEX.test(new URL(context.request.url).pathname)
+      ) {
         const { ApiKeyAuth } = await import("@/api-keys/auth");
         const keyAuth = await ApiKeyAuth.authenticateRequest(
           context.request,

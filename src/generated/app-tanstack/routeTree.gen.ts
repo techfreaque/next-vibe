@@ -565,6 +565,7 @@ import { Route as ApiLocaleUserPublicLoginOptionsRouteImport } from './routes/ap
 import { Route as ApiLocaleUserPublicResetPasswordConfirmRouteImport } from './routes/api.$locale.user.public.reset-password.confirm'
 import { Route as ApiLocaleUserPublicResetPasswordRequestRouteImport } from './routes/api.$locale.user.public.reset-password.request'
 import { Route as ApiLocaleUserPublicResetPasswordValidateRouteImport } from './routes/api.$locale.user.public.reset-password.validate'
+import { Route as ApiLocaleUserPublicSignupBouncesRouteImport } from './routes/api.$locale.user.public.signup.bounces'
 import { Route as ApiLocaleUsersUserIdRolesRouteImport } from './routes/api.$locale.users.user.$id.roles'
 import { Route as ApiLocaleV1MediaThreadIdFilenameRouteImport } from './routes/api.$locale.v1.media.$threadId.$filename'
 import { Route as ApiLocaleV1MusicIdContentRouteImport } from './routes/api.$locale.v1.music.$id.content'
@@ -3955,6 +3956,12 @@ const ApiLocaleUserPublicResetPasswordValidateRoute =
     path: '/api/$locale/user/public/reset-password/validate',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleUserPublicSignupBouncesRoute =
+  ApiLocaleUserPublicSignupBouncesRouteImport.update({
+    id: '/bounces',
+    path: '/bounces',
+    getParentRoute: () => ApiLocaleUserPublicSignupRoute,
+  } as any)
 const ApiLocaleUsersUserIdRolesRoute =
   ApiLocaleUsersUserIdRolesRouteImport.update({
     id: '/roles',
@@ -5313,7 +5320,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/user/private/me': typeof ApiLocaleUserPrivateMeRouteWithChildren
   '/api/$locale/user/private/sessions': typeof ApiLocaleUserPrivateSessionsRouteWithChildren
   '/api/$locale/user/public/login': typeof ApiLocaleUserPublicLoginRouteWithChildren
-  '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRoute
+  '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRouteWithChildren
   '/api/$locale/user/public/verify-email': typeof ApiLocaleUserPublicVerifyEmailRoute
   '/api/$locale/users/user/$id': typeof ApiLocaleUsersUserIdRouteWithChildren
   '/api/$locale/v1/audio/speech': typeof ApiLocaleV1AudioSpeechRoute
@@ -5473,6 +5480,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/user/public/reset-password/confirm': typeof ApiLocaleUserPublicResetPasswordConfirmRoute
   '/api/$locale/user/public/reset-password/request': typeof ApiLocaleUserPublicResetPasswordRequestRoute
   '/api/$locale/user/public/reset-password/validate': typeof ApiLocaleUserPublicResetPasswordValidateRoute
+  '/api/$locale/user/public/signup/bounces': typeof ApiLocaleUserPublicSignupBouncesRoute
   '/api/$locale/users/user/$id/roles': typeof ApiLocaleUsersUserIdRolesRoute
   '/api/$locale/v1/media/$threadId/$filename': typeof ApiLocaleV1MediaThreadIdFilenameRoute
   '/api/$locale/v1/music/$id/content': typeof ApiLocaleV1MusicIdContentRoute
@@ -6021,7 +6029,7 @@ export interface FileRoutesByTo {
   '/api/$locale/user/private/me': typeof ApiLocaleUserPrivateMeRouteWithChildren
   '/api/$locale/user/private/sessions': typeof ApiLocaleUserPrivateSessionsRouteWithChildren
   '/api/$locale/user/public/login': typeof ApiLocaleUserPublicLoginRouteWithChildren
-  '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRoute
+  '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRouteWithChildren
   '/api/$locale/user/public/verify-email': typeof ApiLocaleUserPublicVerifyEmailRoute
   '/api/$locale/users/user/$id': typeof ApiLocaleUsersUserIdRouteWithChildren
   '/api/$locale/v1/audio/speech': typeof ApiLocaleV1AudioSpeechRoute
@@ -6181,6 +6189,7 @@ export interface FileRoutesByTo {
   '/api/$locale/user/public/reset-password/confirm': typeof ApiLocaleUserPublicResetPasswordConfirmRoute
   '/api/$locale/user/public/reset-password/request': typeof ApiLocaleUserPublicResetPasswordRequestRoute
   '/api/$locale/user/public/reset-password/validate': typeof ApiLocaleUserPublicResetPasswordValidateRoute
+  '/api/$locale/user/public/signup/bounces': typeof ApiLocaleUserPublicSignupBouncesRoute
   '/api/$locale/users/user/$id/roles': typeof ApiLocaleUsersUserIdRolesRoute
   '/api/$locale/v1/media/$threadId/$filename': typeof ApiLocaleV1MediaThreadIdFilenameRoute
   '/api/$locale/v1/music/$id/content': typeof ApiLocaleV1MusicIdContentRoute
@@ -6738,7 +6747,7 @@ export interface FileRoutesById {
   '/api/$locale/user/private/me': typeof ApiLocaleUserPrivateMeRouteWithChildren
   '/api/$locale/user/private/sessions': typeof ApiLocaleUserPrivateSessionsRouteWithChildren
   '/api/$locale/user/public/login': typeof ApiLocaleUserPublicLoginRouteWithChildren
-  '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRoute
+  '/api/$locale/user/public/signup': typeof ApiLocaleUserPublicSignupRouteWithChildren
   '/api/$locale/user/public/verify-email': typeof ApiLocaleUserPublicVerifyEmailRoute
   '/api/$locale/users/user/$id': typeof ApiLocaleUsersUserIdRouteWithChildren
   '/api/$locale/v1/audio/speech': typeof ApiLocaleV1AudioSpeechRoute
@@ -6898,6 +6907,7 @@ export interface FileRoutesById {
   '/api/$locale/user/public/reset-password/confirm': typeof ApiLocaleUserPublicResetPasswordConfirmRoute
   '/api/$locale/user/public/reset-password/request': typeof ApiLocaleUserPublicResetPasswordRequestRoute
   '/api/$locale/user/public/reset-password/validate': typeof ApiLocaleUserPublicResetPasswordValidateRoute
+  '/api/$locale/user/public/signup/bounces': typeof ApiLocaleUserPublicSignupBouncesRoute
   '/api/$locale/users/user/$id/roles': typeof ApiLocaleUsersUserIdRolesRoute
   '/api/$locale/v1/media/$threadId/$filename': typeof ApiLocaleV1MediaThreadIdFilenameRoute
   '/api/$locale/v1/music/$id/content': typeof ApiLocaleV1MusicIdContentRoute
@@ -7615,6 +7625,7 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/reset-password/confirm'
     | '/api/$locale/user/public/reset-password/request'
     | '/api/$locale/user/public/reset-password/validate'
+    | '/api/$locale/user/public/signup/bounces'
     | '/api/$locale/users/user/$id/roles'
     | '/api/$locale/v1/media/$threadId/$filename'
     | '/api/$locale/v1/music/$id/content'
@@ -8323,6 +8334,7 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/reset-password/confirm'
     | '/api/$locale/user/public/reset-password/request'
     | '/api/$locale/user/public/reset-password/validate'
+    | '/api/$locale/user/public/signup/bounces'
     | '/api/$locale/users/user/$id/roles'
     | '/api/$locale/v1/media/$threadId/$filename'
     | '/api/$locale/v1/music/$id/content'
@@ -9039,6 +9051,7 @@ export interface FileRouteTypes {
     | '/api/$locale/user/public/reset-password/confirm'
     | '/api/$locale/user/public/reset-password/request'
     | '/api/$locale/user/public/reset-password/validate'
+    | '/api/$locale/user/public/signup/bounces'
     | '/api/$locale/users/user/$id/roles'
     | '/api/$locale/v1/media/$threadId/$filename'
     | '/api/$locale/v1/music/$id/content'
@@ -9483,7 +9496,7 @@ export interface RootRouteChildren {
   ApiLocaleUserPrivateMeRoute: typeof ApiLocaleUserPrivateMeRouteWithChildren
   ApiLocaleUserPrivateSessionsRoute: typeof ApiLocaleUserPrivateSessionsRouteWithChildren
   ApiLocaleUserPublicLoginRoute: typeof ApiLocaleUserPublicLoginRouteWithChildren
-  ApiLocaleUserPublicSignupRoute: typeof ApiLocaleUserPublicSignupRoute
+  ApiLocaleUserPublicSignupRoute: typeof ApiLocaleUserPublicSignupRouteWithChildren
   ApiLocaleUserPublicVerifyEmailRoute: typeof ApiLocaleUserPublicVerifyEmailRoute
   ApiLocaleUsersUserIdRoute: typeof ApiLocaleUsersUserIdRouteWithChildren
   ApiLocaleV1AudioSpeechRoute: typeof ApiLocaleV1AudioSpeechRoute
@@ -13551,6 +13564,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleUserPublicResetPasswordValidateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/user/public/signup/bounces': {
+      id: '/api/$locale/user/public/signup/bounces'
+      path: '/bounces'
+      fullPath: '/api/$locale/user/public/signup/bounces'
+      preLoaderRoute: typeof ApiLocaleUserPublicSignupBouncesRouteImport
+      parentRoute: typeof ApiLocaleUserPublicSignupRoute
+    }
     '/api/$locale/users/user/$id/roles': {
       id: '/api/$locale/users/user/$id/roles'
       path: '/roles'
@@ -15541,6 +15561,21 @@ const ApiLocaleUserPublicLoginRouteWithChildren =
     ApiLocaleUserPublicLoginRouteChildren,
   )
 
+interface ApiLocaleUserPublicSignupRouteChildren {
+  ApiLocaleUserPublicSignupBouncesRoute: typeof ApiLocaleUserPublicSignupBouncesRoute
+}
+
+const ApiLocaleUserPublicSignupRouteChildren: ApiLocaleUserPublicSignupRouteChildren =
+  {
+    ApiLocaleUserPublicSignupBouncesRoute:
+      ApiLocaleUserPublicSignupBouncesRoute,
+  }
+
+const ApiLocaleUserPublicSignupRouteWithChildren =
+  ApiLocaleUserPublicSignupRoute._addFileChildren(
+    ApiLocaleUserPublicSignupRouteChildren,
+  )
+
 interface ApiLocaleUsersUserIdRouteChildren {
   ApiLocaleUsersUserIdRolesRoute: typeof ApiLocaleUsersUserIdRolesRoute
 }
@@ -16333,7 +16368,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiLocaleUserPrivateSessionsRoute:
     ApiLocaleUserPrivateSessionsRouteWithChildren,
   ApiLocaleUserPublicLoginRoute: ApiLocaleUserPublicLoginRouteWithChildren,
-  ApiLocaleUserPublicSignupRoute: ApiLocaleUserPublicSignupRoute,
+  ApiLocaleUserPublicSignupRoute: ApiLocaleUserPublicSignupRouteWithChildren,
   ApiLocaleUserPublicVerifyEmailRoute: ApiLocaleUserPublicVerifyEmailRoute,
   ApiLocaleUsersUserIdRoute: ApiLocaleUsersUserIdRouteWithChildren,
   ApiLocaleV1AudioSpeechRoute: ApiLocaleV1AudioSpeechRoute,

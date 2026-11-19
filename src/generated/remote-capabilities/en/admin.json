@@ -88334,8 +88334,12 @@
                           "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
                           "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
                           "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+                          "enums.threshold.nanoGptCriticalBalanceUsd": "enums.threshold.nanoGptCriticalBalanceUsd",
+                          "enums.threshold.nanoGptCriticalBalanceDays": "enums.threshold.nanoGptCriticalBalanceDays",
                           "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
-                          "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
+                          "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays",
+                          "enums.threshold.veniceCriticalBalanceUsd": "enums.threshold.veniceCriticalBalanceUsd",
+                          "enums.threshold.veniceCriticalBalanceDays": "enums.threshold.veniceCriticalBalanceDays"
                         }
                       },
                       "type": "enum",
@@ -88357,8 +88361,12 @@
                         "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
                         "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
                         "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+                        "enums.threshold.nanoGptCriticalBalanceUsd": "enums.threshold.nanoGptCriticalBalanceUsd",
+                        "enums.threshold.nanoGptCriticalBalanceDays": "enums.threshold.nanoGptCriticalBalanceDays",
                         "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
-                        "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
+                        "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays",
+                        "enums.threshold.veniceCriticalBalanceUsd": "enums.threshold.veniceCriticalBalanceUsd",
+                        "enums.threshold.veniceCriticalBalanceDays": "enums.threshold.veniceCriticalBalanceDays"
                       },
                       "options": [
                         "enums.threshold.marginFloorPct",
@@ -88378,8 +88386,12 @@
                         "enums.threshold.gabLowBalanceCredits",
                         "enums.threshold.nanoGptLowBalanceUsd",
                         "enums.threshold.nanoGptLowBalanceDays",
+                        "enums.threshold.nanoGptCriticalBalanceUsd",
+                        "enums.threshold.nanoGptCriticalBalanceDays",
                         "enums.threshold.veniceLowBalanceUsd",
-                        "enums.threshold.veniceLowBalanceDays"
+                        "enums.threshold.veniceLowBalanceDays",
+                        "enums.threshold.veniceCriticalBalanceUsd",
+                        "enums.threshold.veniceCriticalBalanceDays"
                       ]
                     },
                     "value": {
@@ -88447,8 +88459,12 @@
                         "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
                         "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
                         "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+                        "enums.threshold.nanoGptCriticalBalanceUsd": "enums.threshold.nanoGptCriticalBalanceUsd",
+                        "enums.threshold.nanoGptCriticalBalanceDays": "enums.threshold.nanoGptCriticalBalanceDays",
                         "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
-                        "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
+                        "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays",
+                        "enums.threshold.veniceCriticalBalanceUsd": "enums.threshold.veniceCriticalBalanceUsd",
+                        "enums.threshold.veniceCriticalBalanceDays": "enums.threshold.veniceCriticalBalanceDays"
                       }
                     },
                     "type": "enum",
@@ -88470,8 +88486,12 @@
                       "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
                       "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
                       "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+                      "enums.threshold.nanoGptCriticalBalanceUsd": "enums.threshold.nanoGptCriticalBalanceUsd",
+                      "enums.threshold.nanoGptCriticalBalanceDays": "enums.threshold.nanoGptCriticalBalanceDays",
                       "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
-                      "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
+                      "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays",
+                      "enums.threshold.veniceCriticalBalanceUsd": "enums.threshold.veniceCriticalBalanceUsd",
+                      "enums.threshold.veniceCriticalBalanceDays": "enums.threshold.veniceCriticalBalanceDays"
                     },
                     "options": [
                       "enums.threshold.marginFloorPct",
@@ -88491,8 +88511,12 @@
                       "enums.threshold.gabLowBalanceCredits",
                       "enums.threshold.nanoGptLowBalanceUsd",
                       "enums.threshold.nanoGptLowBalanceDays",
+                      "enums.threshold.nanoGptCriticalBalanceUsd",
+                      "enums.threshold.nanoGptCriticalBalanceDays",
                       "enums.threshold.veniceLowBalanceUsd",
-                      "enums.threshold.veniceLowBalanceDays"
+                      "enums.threshold.veniceLowBalanceDays",
+                      "enums.threshold.veniceCriticalBalanceUsd",
+                      "enums.threshold.veniceCriticalBalanceDays"
                     ]
                   },
                   "value": {
@@ -88637,12 +88661,28 @@
               "label": "enums.threshold.nanoGptLowBalanceDays"
             },
             {
+              "value": "enums.threshold.nanoGptCriticalBalanceUsd",
+              "label": "enums.threshold.nanoGptCriticalBalanceUsd"
+            },
+            {
+              "value": "enums.threshold.nanoGptCriticalBalanceDays",
+              "label": "enums.threshold.nanoGptCriticalBalanceDays"
+            },
+            {
               "value": "enums.threshold.veniceLowBalanceUsd",
               "label": "enums.threshold.veniceLowBalanceUsd"
             },
             {
               "value": "enums.threshold.veniceLowBalanceDays",
               "label": "enums.threshold.veniceLowBalanceDays"
+            },
+            {
+              "value": "enums.threshold.veniceCriticalBalanceUsd",
+              "label": "enums.threshold.veniceCriticalBalanceUsd"
+            },
+            {
+              "value": "enums.threshold.veniceCriticalBalanceDays",
+              "label": "enums.threshold.veniceCriticalBalanceDays"
             }
           ],
           "columns": 6,
@@ -88667,8 +88707,12 @@
                 "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
                 "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
                 "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+                "enums.threshold.nanoGptCriticalBalanceUsd": "enums.threshold.nanoGptCriticalBalanceUsd",
+                "enums.threshold.nanoGptCriticalBalanceDays": "enums.threshold.nanoGptCriticalBalanceDays",
                 "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
-                "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
+                "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays",
+                "enums.threshold.veniceCriticalBalanceUsd": "enums.threshold.veniceCriticalBalanceUsd",
+                "enums.threshold.veniceCriticalBalanceDays": "enums.threshold.veniceCriticalBalanceDays"
               }
             },
             "type": "enum",
@@ -88690,8 +88734,12 @@
               "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
               "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
               "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+              "enums.threshold.nanoGptCriticalBalanceUsd": "enums.threshold.nanoGptCriticalBalanceUsd",
+              "enums.threshold.nanoGptCriticalBalanceDays": "enums.threshold.nanoGptCriticalBalanceDays",
               "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
-              "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
+              "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays",
+              "enums.threshold.veniceCriticalBalanceUsd": "enums.threshold.veniceCriticalBalanceUsd",
+              "enums.threshold.veniceCriticalBalanceDays": "enums.threshold.veniceCriticalBalanceDays"
             },
             "options": [
               "enums.threshold.marginFloorPct",
@@ -88711,8 +88759,12 @@
               "enums.threshold.gabLowBalanceCredits",
               "enums.threshold.nanoGptLowBalanceUsd",
               "enums.threshold.nanoGptLowBalanceDays",
+              "enums.threshold.nanoGptCriticalBalanceUsd",
+              "enums.threshold.nanoGptCriticalBalanceDays",
               "enums.threshold.veniceLowBalanceUsd",
-              "enums.threshold.veniceLowBalanceDays"
+              "enums.threshold.veniceLowBalanceDays",
+              "enums.threshold.veniceCriticalBalanceUsd",
+              "enums.threshold.veniceCriticalBalanceDays"
             ]
           },
           "usage": {
@@ -88811,8 +88863,12 @@
                 "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
                 "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
                 "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+                "enums.threshold.nanoGptCriticalBalanceUsd": "enums.threshold.nanoGptCriticalBalanceUsd",
+                "enums.threshold.nanoGptCriticalBalanceDays": "enums.threshold.nanoGptCriticalBalanceDays",
                 "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
-                "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
+                "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays",
+                "enums.threshold.veniceCriticalBalanceUsd": "enums.threshold.veniceCriticalBalanceUsd",
+                "enums.threshold.veniceCriticalBalanceDays": "enums.threshold.veniceCriticalBalanceDays"
               }
             },
             "type": "enum",
@@ -88834,8 +88890,12 @@
               "enums.threshold.gabLowBalanceCredits": "enums.threshold.gabLowBalanceCredits",
               "enums.threshold.nanoGptLowBalanceUsd": "enums.threshold.nanoGptLowBalanceUsd",
               "enums.threshold.nanoGptLowBalanceDays": "enums.threshold.nanoGptLowBalanceDays",
+              "enums.threshold.nanoGptCriticalBalanceUsd": "enums.threshold.nanoGptCriticalBalanceUsd",
+              "enums.threshold.nanoGptCriticalBalanceDays": "enums.threshold.nanoGptCriticalBalanceDays",
               "enums.threshold.veniceLowBalanceUsd": "enums.threshold.veniceLowBalanceUsd",
-              "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays"
+              "enums.threshold.veniceLowBalanceDays": "enums.threshold.veniceLowBalanceDays",
+              "enums.threshold.veniceCriticalBalanceUsd": "enums.threshold.veniceCriticalBalanceUsd",
+              "enums.threshold.veniceCriticalBalanceDays": "enums.threshold.veniceCriticalBalanceDays"
             },
             "options": [
               "enums.threshold.marginFloorPct",
@@ -88855,8 +88915,12 @@
               "enums.threshold.gabLowBalanceCredits",
               "enums.threshold.nanoGptLowBalanceUsd",
               "enums.threshold.nanoGptLowBalanceDays",
+              "enums.threshold.nanoGptCriticalBalanceUsd",
+              "enums.threshold.nanoGptCriticalBalanceDays",
               "enums.threshold.veniceLowBalanceUsd",
-              "enums.threshold.veniceLowBalanceDays"
+              "enums.threshold.veniceLowBalanceDays",
+              "enums.threshold.veniceCriticalBalanceUsd",
+              "enums.threshold.veniceCriticalBalanceDays"
             ]
           },
           "usage": {
@@ -258419,6 +258483,7 @@
                           "WEB_OFF": "enums.userRole.webOff",
                           "MCP_OFF": "enums.userRole.mcpOff",
                           "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                          "CRON_ALLOWED": "enums.userRole.cronAllowed",
                           "PRODUCTION_OFF": "enums.userRole.productionOff",
                           "SKILL_OFF": "enums.userRole.skillOff"
                         }
@@ -258436,6 +258501,7 @@
                         "WEB_OFF": "enums.userRole.webOff",
                         "MCP_OFF": "enums.userRole.mcpOff",
                         "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                        "CRON_ALLOWED": "enums.userRole.cronAllowed",
                         "PRODUCTION_OFF": "enums.userRole.productionOff",
                         "SKILL_OFF": "enums.userRole.skillOff"
                       },
@@ -258451,6 +258517,7 @@
                         "enums.userRole.webOff",
                         "enums.userRole.mcpOff",
                         "enums.userRole.mcpVisible",
+                        "enums.userRole.cronAllowed",
                         "enums.userRole.productionOff",
                         "enums.userRole.skillOff"
                       ]
@@ -258490,6 +258557,7 @@
                         "WEB_OFF": "enums.userRole.webOff",
                         "MCP_OFF": "enums.userRole.mcpOff",
                         "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                        "CRON_ALLOWED": "enums.userRole.cronAllowed",
                         "PRODUCTION_OFF": "enums.userRole.productionOff",
                         "SKILL_OFF": "enums.userRole.skillOff"
                       }
@@ -258507,6 +258575,7 @@
                       "WEB_OFF": "enums.userRole.webOff",
                       "MCP_OFF": "enums.userRole.mcpOff",
                       "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                      "CRON_ALLOWED": "enums.userRole.cronAllowed",
                       "PRODUCTION_OFF": "enums.userRole.productionOff",
                       "SKILL_OFF": "enums.userRole.skillOff"
                     },
@@ -258522,6 +258591,7 @@
                       "enums.userRole.webOff",
                       "enums.userRole.mcpOff",
                       "enums.userRole.mcpVisible",
+                      "enums.userRole.cronAllowed",
                       "enums.userRole.productionOff",
                       "enums.userRole.skillOff"
                     ]
@@ -261668,6 +261738,7 @@
                               "WEB_OFF": "enums.userRole.webOff",
                               "MCP_OFF": "enums.userRole.mcpOff",
                               "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                              "CRON_ALLOWED": "enums.userRole.cronAllowed",
                               "PRODUCTION_OFF": "enums.userRole.productionOff",
                               "SKILL_OFF": "enums.userRole.skillOff"
                             }
@@ -261685,6 +261756,7 @@
                             "WEB_OFF": "enums.userRole.webOff",
                             "MCP_OFF": "enums.userRole.mcpOff",
                             "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                            "CRON_ALLOWED": "enums.userRole.cronAllowed",
                             "PRODUCTION_OFF": "enums.userRole.productionOff",
                             "SKILL_OFF": "enums.userRole.skillOff"
                           },
@@ -261700,6 +261772,7 @@
                             "enums.userRole.webOff",
                             "enums.userRole.mcpOff",
                             "enums.userRole.mcpVisible",
+                            "enums.userRole.cronAllowed",
                             "enums.userRole.productionOff",
                             "enums.userRole.skillOff"
                           ]
@@ -261739,6 +261812,7 @@
                             "WEB_OFF": "enums.userRole.webOff",
                             "MCP_OFF": "enums.userRole.mcpOff",
                             "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                            "CRON_ALLOWED": "enums.userRole.cronAllowed",
                             "PRODUCTION_OFF": "enums.userRole.productionOff",
                             "SKILL_OFF": "enums.userRole.skillOff"
                           }
@@ -261756,6 +261830,7 @@
                           "WEB_OFF": "enums.userRole.webOff",
                           "MCP_OFF": "enums.userRole.mcpOff",
                           "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                          "CRON_ALLOWED": "enums.userRole.cronAllowed",
                           "PRODUCTION_OFF": "enums.userRole.productionOff",
                           "SKILL_OFF": "enums.userRole.skillOff"
                         },
@@ -261771,6 +261846,7 @@
                           "enums.userRole.webOff",
                           "enums.userRole.mcpOff",
                           "enums.userRole.mcpVisible",
+                          "enums.userRole.cronAllowed",
                           "enums.userRole.productionOff",
                           "enums.userRole.skillOff"
                         ]
@@ -263854,38 +263930,6 @@
                 {
                   "value": "enums.userRole.admin",
                   "label": "enums.userRole.admin"
-                },
-                {
-                  "value": "enums.userRole.cliOff",
-                  "label": "enums.userRole.cliOff"
-                },
-                {
-                  "value": "enums.userRole.cliAuthBypass",
-                  "label": "enums.userRole.cliAuthBypass"
-                },
-                {
-                  "value": "enums.userRole.aiToolOff",
-                  "label": "enums.userRole.aiToolOff"
-                },
-                {
-                  "value": "enums.userRole.webOff",
-                  "label": "enums.userRole.webOff"
-                },
-                {
-                  "value": "enums.userRole.mcpOff",
-                  "label": "enums.userRole.mcpOff"
-                },
-                {
-                  "value": "enums.userRole.mcpVisible",
-                  "label": "enums.userRole.mcpVisible"
-                },
-                {
-                  "value": "enums.userRole.productionOff",
-                  "label": "enums.userRole.productionOff"
-                },
-                {
-                  "value": "enums.userRole.skillOff",
-                  "label": "enums.userRole.skillOff"
                 }
               ],
               "schema": {
@@ -263902,15 +263946,7 @@
                             "CUSTOMER": "enums.userRole.customer",
                             "PARTNER_ADMIN": "enums.userRole.partnerAdmin",
                             "PARTNER_EMPLOYEE": "enums.userRole.partnerEmployee",
-                            "ADMIN": "enums.userRole.admin",
-                            "CLI_OFF": "enums.userRole.cliOff",
-                            "CLI_AUTH_BYPASS": "enums.userRole.cliAuthBypass",
-                            "AI_TOOL_OFF": "enums.userRole.aiToolOff",
-                            "WEB_OFF": "enums.userRole.webOff",
-                            "MCP_OFF": "enums.userRole.mcpOff",
-                            "MCP_VISIBLE": "enums.userRole.mcpVisible",
-                            "PRODUCTION_OFF": "enums.userRole.productionOff",
-                            "SKILL_OFF": "enums.userRole.skillOff"
+                            "ADMIN": "enums.userRole.admin"
                           }
                         },
                         "type": "enum",
@@ -263919,30 +263955,14 @@
                           "CUSTOMER": "enums.userRole.customer",
                           "PARTNER_ADMIN": "enums.userRole.partnerAdmin",
                           "PARTNER_EMPLOYEE": "enums.userRole.partnerEmployee",
-                          "ADMIN": "enums.userRole.admin",
-                          "CLI_OFF": "enums.userRole.cliOff",
-                          "CLI_AUTH_BYPASS": "enums.userRole.cliAuthBypass",
-                          "AI_TOOL_OFF": "enums.userRole.aiToolOff",
-                          "WEB_OFF": "enums.userRole.webOff",
-                          "MCP_OFF": "enums.userRole.mcpOff",
-                          "MCP_VISIBLE": "enums.userRole.mcpVisible",
-                          "PRODUCTION_OFF": "enums.userRole.productionOff",
-                          "SKILL_OFF": "enums.userRole.skillOff"
+                          "ADMIN": "enums.userRole.admin"
                         },
                         "options": [
                           "enums.userRole.public",
                           "enums.userRole.customer",
                           "enums.userRole.partnerAdmin",
                           "enums.userRole.partnerEmployee",
-                          "enums.userRole.admin",
-                          "enums.userRole.cliOff",
-                          "enums.userRole.cliAuthBypass",
-                          "enums.userRole.aiToolOff",
-                          "enums.userRole.webOff",
-                          "enums.userRole.mcpOff",
-                          "enums.userRole.mcpVisible",
-                          "enums.userRole.productionOff",
-                          "enums.userRole.skillOff"
+                          "enums.userRole.admin"
                         ]
                       }
                     },
@@ -263955,15 +263975,7 @@
                           "CUSTOMER": "enums.userRole.customer",
                           "PARTNER_ADMIN": "enums.userRole.partnerAdmin",
                           "PARTNER_EMPLOYEE": "enums.userRole.partnerEmployee",
-                          "ADMIN": "enums.userRole.admin",
-                          "CLI_OFF": "enums.userRole.cliOff",
-                          "CLI_AUTH_BYPASS": "enums.userRole.cliAuthBypass",
-                          "AI_TOOL_OFF": "enums.userRole.aiToolOff",
-                          "WEB_OFF": "enums.userRole.webOff",
-                          "MCP_OFF": "enums.userRole.mcpOff",
-                          "MCP_VISIBLE": "enums.userRole.mcpVisible",
-                          "PRODUCTION_OFF": "enums.userRole.productionOff",
-                          "SKILL_OFF": "enums.userRole.skillOff"
+                          "ADMIN": "enums.userRole.admin"
                         }
                       },
                       "type": "enum",
@@ -263972,30 +263984,14 @@
                         "CUSTOMER": "enums.userRole.customer",
                         "PARTNER_ADMIN": "enums.userRole.partnerAdmin",
                         "PARTNER_EMPLOYEE": "enums.userRole.partnerEmployee",
-                        "ADMIN": "enums.userRole.admin",
-                        "CLI_OFF": "enums.userRole.cliOff",
-                        "CLI_AUTH_BYPASS": "enums.userRole.cliAuthBypass",
-                        "AI_TOOL_OFF": "enums.userRole.aiToolOff",
-                        "WEB_OFF": "enums.userRole.webOff",
-                        "MCP_OFF": "enums.userRole.mcpOff",
-                        "MCP_VISIBLE": "enums.userRole.mcpVisible",
-                        "PRODUCTION_OFF": "enums.userRole.productionOff",
-                        "SKILL_OFF": "enums.userRole.skillOff"
+                        "ADMIN": "enums.userRole.admin"
                       },
                       "options": [
                         "enums.userRole.public",
                         "enums.userRole.customer",
                         "enums.userRole.partnerAdmin",
                         "enums.userRole.partnerEmployee",
-                        "enums.userRole.admin",
-                        "enums.userRole.cliOff",
-                        "enums.userRole.cliAuthBypass",
-                        "enums.userRole.aiToolOff",
-                        "enums.userRole.webOff",
-                        "enums.userRole.mcpOff",
-                        "enums.userRole.mcpVisible",
-                        "enums.userRole.productionOff",
-                        "enums.userRole.skillOff"
+                        "enums.userRole.admin"
                       ]
                     }
                   }
@@ -264524,6 +264520,7 @@
                       "enums.userRole.webOff": "enums.userRole.webOff",
                       "enums.userRole.mcpOff": "enums.userRole.mcpOff",
                       "enums.userRole.mcpVisible": "enums.userRole.mcpVisible",
+                      "enums.userRole.cronAllowed": "enums.userRole.cronAllowed",
                       "enums.userRole.productionOff": "enums.userRole.productionOff",
                       "enums.userRole.skillOff": "enums.userRole.skillOff"
                     }
@@ -264541,6 +264538,7 @@
                     "enums.userRole.webOff": "enums.userRole.webOff",
                     "enums.userRole.mcpOff": "enums.userRole.mcpOff",
                     "enums.userRole.mcpVisible": "enums.userRole.mcpVisible",
+                    "enums.userRole.cronAllowed": "enums.userRole.cronAllowed",
                     "enums.userRole.productionOff": "enums.userRole.productionOff",
                     "enums.userRole.skillOff": "enums.userRole.skillOff"
                   },
@@ -264556,6 +264554,7 @@
                     "enums.userRole.webOff",
                     "enums.userRole.mcpOff",
                     "enums.userRole.mcpVisible",
+                    "enums.userRole.cronAllowed",
                     "enums.userRole.productionOff",
                     "enums.userRole.skillOff"
                   ]
@@ -582346,6 +582345,12 @@
                       },
                       "type": "boolean"
                     },
+                    "requiresReauth": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
                     "healthStatus": {
                       "def": {
                         "type": "enum",
@@ -582477,6 +582482,12 @@
                     "type": "nullable"
                   },
                   "hasToken": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  },
+                  "requiresReauth": {
                     "def": {
                       "type": "boolean"
                     },

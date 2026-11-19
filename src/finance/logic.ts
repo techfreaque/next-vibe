@@ -42,8 +42,12 @@ export interface Thresholds {
   gabLowBalanceCredits: number;
   nanoGptLowBalanceUsd: number;
   nanoGptLowBalanceDays: number;
+  nanoGptCriticalBalanceUsd: number;
+  nanoGptCriticalBalanceDays: number;
   veniceLowBalanceUsd: number;
   veniceLowBalanceDays: number;
+  veniceCriticalBalanceUsd: number;
+  veniceCriticalBalanceDays: number;
 }
 
 export const DEFAULT_THRESHOLDS: Thresholds = {
@@ -73,8 +77,12 @@ export const THRESHOLD_FIELD: Readonly<
   [ThresholdKey.GAB_LOW_BALANCE_CREDITS]: "gabLowBalanceCredits",
   [ThresholdKey.NANO_GPT_LOW_BALANCE_USD]: "nanoGptLowBalanceUsd",
   [ThresholdKey.NANO_GPT_LOW_BALANCE_DAYS]: "nanoGptLowBalanceDays",
+  [ThresholdKey.NANO_GPT_CRITICAL_BALANCE_USD]: "nanoGptCriticalBalanceUsd",
+  [ThresholdKey.NANO_GPT_CRITICAL_BALANCE_DAYS]: "nanoGptCriticalBalanceDays",
   [ThresholdKey.VENICE_LOW_BALANCE_USD]: "veniceLowBalanceUsd",
   [ThresholdKey.VENICE_LOW_BALANCE_DAYS]: "veniceLowBalanceDays",
+  [ThresholdKey.VENICE_CRITICAL_BALANCE_USD]: "veniceCriticalBalanceUsd",
+  [ThresholdKey.VENICE_CRITICAL_BALANCE_DAYS]: "veniceCriticalBalanceDays",
 };
 
 export interface ThresholdOverride {
@@ -352,16 +360,25 @@ const money = (value: number): string => `$${value.toFixed(2)}`;
 export const LOW_BALANCE_THRESHOLDS: Partial<
   Record<
     typeof FinanceSourceValue,
-    { absoluteUsd: keyof Thresholds; daysOfSpend: keyof Thresholds }
+    {
+      warningUsd: keyof Thresholds;
+      warningDays: keyof Thresholds;
+      criticalUsd: keyof Thresholds;
+      criticalDays: keyof Thresholds;
+    }
   >
 > = {
   [FinanceSource.NANO_GPT]: {
-    absoluteUsd: "nanoGptLowBalanceUsd",
-    daysOfSpend: "nanoGptLowBalanceDays",
+    warningUsd: "nanoGptLowBalanceUsd",
+    warningDays: "nanoGptLowBalanceDays",
+    criticalUsd: "nanoGptCriticalBalanceUsd",
+    criticalDays: "nanoGptCriticalBalanceDays",
   },
   [FinanceSource.VENICE]: {
-    absoluteUsd: "veniceLowBalanceUsd",
-    daysOfSpend: "veniceLowBalanceDays",
+    warningUsd: "veniceLowBalanceUsd",
+    warningDays: "veniceLowBalanceDays",
+    criticalUsd: "veniceCriticalBalanceUsd",
+    criticalDays: "veniceCriticalBalanceDays",
   },
 };
 
@@ -400,7 +417,7 @@ export function detectGabLowBalance(
     return null;
   }
   const criticalCredits =
-    warningCredits * FINANCE_CONFIG.lowBalanceCriticalFraction;
+    warningCredits * FINANCE_CONFIG.gabLowBalanceCriticalFraction;
   const critical = balanceCredits < criticalCredits;
   const thresholdCredits = critical ? criticalCredits : warningCredits;
   return {
@@ -417,26 +434,31 @@ export function detectLowBalance(input: {
   provider: typeof FinanceSourceValue;
   providerLabel: string;
   balanceUsd: number;
-  absoluteUsd: number;
-  daysOfSpend: number;
+  warningUsd: number;
+  warningDays: number;
+  criticalUsd: number;
+  criticalDays: number;
   dailySpendUsd: number | null;
 }): AlertCandidate | null {
   const {
     provider,
     providerLabel,
     balanceUsd,
-    absoluteUsd,
-    daysOfSpend,
+    warningUsd,
+    warningDays,
+    criticalUsd,
+    criticalDays,
     dailySpendUsd,
   } = input;
-  const warningUsd = Math.max(absoluteUsd, daysOfSpend * (dailySpendUsd ?? 0));
-  if (warningUsd <= 0 || balanceUsd >= warningUsd) {
+  const dailySpend = dailySpendUsd ?? 0;
+  const criticalFloor = Math.max(criticalUsd, criticalDays * dailySpend);
+  const warningFloor = Math.max(warningUsd, warningDays * dailySpend);
+  const critical = criticalFloor > 0 && balanceUsd < criticalFloor;
+  if (!critical && (warningFloor <= 0 || balanceUsd >= warningFloor)) {
     return null;
   }
 
-  const criticalUsd = warningUsd * FINANCE_CONFIG.lowBalanceCriticalFraction;
-  const critical = balanceUsd < criticalUsd;
-  const thresholdUsd = critical ? criticalUsd : warningUsd;
+  const thresholdUsd = critical ? criticalFloor : warningFloor;
   const remainingDays =
     dailySpendUsd !== null && dailySpendUsd > 0
       ? Math.max(balanceUsd, 0) / dailySpendUsd
@@ -451,8 +473,8 @@ export function detectLowBalance(input: {
     metadata: {
       balanceUsd: round2(balanceUsd),
       thresholdUsd: round2(thresholdUsd),
-      absoluteUsd,
-      daysOfSpend,
+      absoluteUsd: critical ? criticalUsd : warningUsd,
+      daysOfSpend: critical ? criticalDays : warningDays,
       trailingDays: FINANCE_CONFIG.baselineDays,
       dailySpendUsd: dailySpendUsd === null ? null : round2(dailySpendUsd),
       remainingDays: remainingDays === null ? null : round2(remainingDays),

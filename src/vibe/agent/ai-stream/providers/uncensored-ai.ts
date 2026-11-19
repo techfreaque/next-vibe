@@ -1,6 +1,6 @@
 /**
  * Uncensored AI Provider
- * Extends OpenAI's implementation with custom fetch to handle tool calling
+ * Adapts an OpenAI-compatible API with custom fetch to handle tool calling.
  *
  * Two modes controlled by USE_NATIVE_TOOLS:
  * - true:  Pass tools array natively to the API (if they now support it)
@@ -10,7 +10,7 @@
 
 import "server-only";
 
-import { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
+import { OpenAICompatibleChatLanguageModel } from "@ai-sdk/openai-compatible";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
@@ -35,7 +35,8 @@ const USE_NATIVE_TOOLS = false;
 
 /**
  * Create an Uncensored AI provider compatible with AI SDK V2
- * Uses OpenAI's internal implementation with custom fetch override
+ * Uses the compatibility adapter so tool schemas reach the prompt formatter
+ * before any OpenAI-specific schema restrictions can change them.
  *
  * @returns Provider object with chat() method
  */
@@ -45,7 +46,7 @@ export function createUncensoredAI(
   // chain (createFixtureFetch); plain live fetch otherwise. Never global.
   fetchImpl: typeof globalThis.fetch,
 ): {
-  chat: (modelId: string) => OpenAIChatLanguageModel;
+  chat: (modelId: string) => OpenAICompatibleChatLanguageModel;
 } {
   const apiKey = agentEnv.UNCENSORED_AI_API_KEY;
   const provider = "uncensored-ai" as const;
@@ -168,7 +169,7 @@ export function createUncensoredAI(
 
   return {
     chat: () => {
-      return new OpenAIChatLanguageModel("uncensored-lm", {
+      return new OpenAICompatibleChatLanguageModel("uncensored-lm", {
         provider: provider,
         headers: () => ({
           "Content-Type": "application/json",
@@ -177,7 +178,7 @@ export function createUncensoredAI(
         }),
         url: () =>
           "https://mkstqjtsujvcaobdksxs.functions.supabase.co/functions/v1/uncensoredlm-api",
-        fetch: customFetch as typeof fetch,
+        fetch: Object.assign(customFetch, { preconnect: fetchImpl.preconnect }),
       });
     },
   };

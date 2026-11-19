@@ -87,9 +87,11 @@ export const translations: typeof enTranslations = {
       tunnelLost: "Tunel utracony",
       bridgeFailed: "Połączenie nieudane",
       disconnected: "Nieaktywna",
+      reauthRequired: "Wymaga zalogowania",
       incomingActive: "Aktywna",
     },
     reconnectButton: {
+      reauth: "Zaloguj się ponownie",
       reconnect: "Połącz ponownie",
       retry: "Spróbuj ponownie",
       resync: "Zsynchronizuj ponownie",

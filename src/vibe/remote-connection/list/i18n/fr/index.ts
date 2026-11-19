@@ -90,10 +90,12 @@ export const translations: typeof enTranslations = {
       tunnelLost: "Tunnel perdu",
       bridgeFailed: "Échec de la connexion",
       disconnected: "Inactive",
+      reauthRequired: "Connexion requise",
       incomingActive: "Active",
     },
     // ── Reconnect button labels ────────────────────────────────────────────────
     reconnectButton: {
+      reauth: "Se reconnecter",
       reconnect: "Reconnecter",
       retry: "Réessayer",
       resync: "Resynchroniser",

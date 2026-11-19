@@ -32,6 +32,7 @@ export const {
  *
  * Opt-in markers: endpoint must explicitly include these to be accessible.
  *   MCP_VISIBLE   - endpoint appears in the MCP server's tool *discovery* list
+ *   CRON_ALLOWED  - endpoint remains available to cron when WEB_OFF is present
  *   CLI_AUTH_BYPASS - endpoint is accessible without auth for basic routes like check, dev, etc.
  */
 export const {
@@ -45,6 +46,7 @@ export const {
   WEB_OFF: "enums.userRole.webOff",
   MCP_OFF: "enums.userRole.mcpOff",
   MCP_VISIBLE: "enums.userRole.mcpVisible",
+  CRON_ALLOWED: "enums.userRole.cronAllowed",
   PRODUCTION_OFF: "enums.userRole.productionOff",
   SKILL_OFF: "enums.userRole.skillOff",
 });
@@ -92,6 +94,7 @@ function isPlatformMarker(
     role === PlatformMarker.AI_TOOL_OFF ||
     role === PlatformMarker.MCP_OFF ||
     role === PlatformMarker.MCP_VISIBLE ||
+    role === PlatformMarker.CRON_ALLOWED ||
     role === PlatformMarker.PRODUCTION_OFF ||
     role === PlatformMarker.CLI_AUTH_BYPASS ||
     role === PlatformMarker.SKILL_OFF

@@ -41,6 +41,7 @@ const { GET } = createEndpoint({
     UserRole.ADMIN,
     UserRole.PRODUCTION_OFF,
     UserRole.WEB_OFF,
+    UserRole.CRON_ALLOWED,
     UserRole.AI_TOOL_OFF,
   ] as const,
   aliases: ["update-model-prices"],

@@ -8,6 +8,7 @@
 import "server-only";
 
 import { and, eq, isNull } from "drizzle-orm";
+import { decodeJwt } from "jose";
 
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import {
@@ -169,16 +170,15 @@ export class RemoteConnectionInstanceRepository {
 
     // ── Reauth: refresh token from remote ────────────────────────────────────
     if (email !== undefined && password !== undefined) {
-      const reauthResult = await RemoteConnectionInstanceRepository._reauth(
-        user,
-        logger,
-        t,
-        row,
-        instanceId,
-        email,
-        password,
-        locale,
-      );
+      const reauthResult =
+        await RemoteConnectionInstanceRepository.reauthenticate(
+          user,
+          logger,
+          row,
+          email,
+          password,
+          locale,
+        );
       if (!reauthResult.success) {
         return reauthResult;
       }
@@ -520,17 +520,16 @@ export class RemoteConnectionInstanceRepository {
 
   // ─── Private helpers ────────────────────────────────────────────────────────
 
-  private static async _reauth(
+  static async reauthenticate(
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
-    t: ReturnType<typeof scopedTranslation.scopedT>["t"],
     row: typeof remoteConnections.$inferSelect,
-    instanceId: string,
     email: string,
     password: string,
     locale: CountryLanguage,
   ): Promise<ResponseType<{ updated: boolean }>> {
-    const { remoteUrl } = row;
+    const { instanceId, remoteUrl } = row;
+    const { t } = scopedTranslation.scopedT(locale);
 
     // Step 1: Login to remote with new credentials
     let token: string;
@@ -583,9 +582,32 @@ export class RemoteConnectionInstanceRepository {
       }
 
       token = loginResult.data.token;
+      // The login response comes from the peer. Check its account ID before
+      // associating fresh credentials with this link's existing sync cursors.
+      if (row.remoteUserId) {
+        let sameAccount = false;
+        try {
+          sameAccount = decodeJwt(token).id === row.remoteUserId;
+        } catch {
+          // A malformed token cannot identify the existing remote account.
+        }
+        if (!sameAccount) {
+          logger.warn(
+            "[REAUTH] Login did not match the linked remote account",
+            {
+              instanceId,
+              remoteUrl,
+            },
+          );
+          return fail({
+            message: t("get.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
+      }
       // An empty leadId from login must never overwrite a stored one — every
       // later Bearer header would carry a broken `token|` auth pair.
-      newLeadId = loginResult.data.leadId ?? row.leadId;
+      newLeadId = loginResult.data.leadId || row.leadId;
       logger.debug("[REAUTH] Logged into remote", { remoteUrl, instanceId });
     }
 

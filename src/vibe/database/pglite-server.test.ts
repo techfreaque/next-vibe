@@ -15,6 +15,7 @@ import { startPgliteServer } from "./pglite-server";
 describe("pglite-server INSERT…RETURNING", () => {
   let pg: PGlite;
   let client: Client;
+  let port: number;
   let close: () => void;
 
   beforeAll(async () => {
@@ -30,7 +31,7 @@ describe("pglite-server INSERT…RETURNING", () => {
       server.close();
     };
     const address = server.address();
-    const port = address && typeof address === "object" ? address.port : 0;
+    port = address && typeof address === "object" ? address.port : 0;
     client = new Client({ host: "127.0.0.1", port, user: "postgres" });
     await client.connect();
   });
@@ -61,5 +62,39 @@ describe("pglite-server INSERT…RETURNING", () => {
       n: null,
       flag: true,
     });
+  });
+
+  it("keeps other clients out of a failed transaction until rollback", async () => {
+    const other = new Client({ host: "127.0.0.1", port, user: "postgres" });
+    await other.connect();
+    try {
+      await client.query("BEGIN");
+      await expect(client.query("SELECT 1 / 0")).rejects.toMatchObject({
+        code: "22012",
+      });
+      const reading = other.query<{ value: number }>("SELECT 73 AS value");
+      const next = await Promise.race([
+        reading.then(() => "query finished", () => "query failed"),
+        Bun.sleep(40).then(() => "query waiting"),
+      ]);
+      await client.query("ROLLBACK");
+      expect(next).toBe("query waiting");
+      expect((await reading).rows).toEqual([{ value: 73 }]);
+    } finally {
+      await other.end();
+    }
+  });
+
+  it("rolls back uncommitted work when the owning client disconnects", async () => {
+    const owner = new Client({ host: "127.0.0.1", port, user: "postgres" });
+    await owner.connect();
+    try {
+      await owner.query("BEGIN");
+      await owner.query("INSERT INTO t(flag) VALUES (false) RETURNING id");
+    } finally {
+      await owner.end();
+    }
+    const result = await client.query("SELECT id FROM t WHERE flag = false");
+    expect(result.rows).toEqual([]);
   });
 });

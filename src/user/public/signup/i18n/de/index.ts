@@ -1,7 +1,19 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  bounceSync: {
+    title: "Unzustellbare Bestätigungsmails erfassen",
+    description:
+      "Das Systempostfach auf unzustellbare Bestätigungsmails prüfen.",
+    marked: "Aktualisierte Registrierungen",
+    result: "Aktualisierte Registrierungen: {{count}}",
+    productionOnly: "Der Abgleich läuft nur im Produktivsystem.",
+    mailboxUnavailable:
+      "Das Systempostfach konnte nicht auf unzustellbare Bestätigungsmails geprüft werden.",
+  },
   confirmation: {
+    bouncedTitle: "Die Bestätigungsmail kam nicht an",
+    changeAddress: "E-Mail-Adresse ändern",
     description:
       "Schließe die Registrierung mit dem Code oder Link aus deiner E-Mail ab.",
     title: "Schau in dein Postfach",
@@ -22,6 +34,12 @@ export const translations: typeof enTranslations = {
     cooldown:
       "Zu viele Anfragen. Warte bitte, bevor du einen neuen Code anforderst.",
     domain: "Diese Domain kann keine E-Mails empfangen. Prüfe die Adresse.",
+    bouncePolicy:
+      "Dein E-Mail-Anbieter hat unsere Nachricht blockiert. Schulen und Arbeitgeber lassen oft keine E-Mails von außen zu. Verwende eine andere Adresse.",
+    bounceMailboxMissing:
+      "Laut deinem E-Mail-Anbieter gibt es {{email}} nicht. Prüfe die Schreibweise oder verwende eine andere Adresse.",
+    bounceMailboxFull:
+      "Das Postfach für {{email}} ist voll. Schaffe Platz und fordere einen neuen Code an oder verwende eine andere Adresse.",
     sendFailed:
       "Wir konnten die E-Mail an {{email}} nicht senden. Prüfe die Adresse oder versuche es erneut.",
     done: "E-Mail bestätigt. Du bist angemeldet.",

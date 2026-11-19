@@ -27,7 +27,6 @@ import { z } from "zod";
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { coreClientEnv } from "../../core/env-client";
 import { defaultLocale } from "../../core/i18n/core/config";
-import { ErrorResponseTypes } from "../../core/route/response.schema";
 import { db } from "../../database";
 import { VibeMode } from "../../env/env-util";
 import { userLeadLinks } from "../../identity/lead/db";
@@ -792,6 +791,28 @@ class WsConnection {
         timeoutMs: 60_000,
       });
       if (!syncResult.success) {
+        if (RemoteTransport.isSessionRejected(syncStatus, syncResult.message)) {
+          const marked = await ConnRepo.markSessionRejected({
+            id: conn.id,
+            remoteUrl,
+            token,
+            leadId,
+          });
+          if (marked) {
+            this.logger.error(
+              "[WsConnection] Remote session rejected. Reconnect via remote-connect.",
+              {
+                instanceId: this.instanceId,
+                peer: remoteUrl,
+                httpStatus: syncStatus,
+              },
+            );
+            if (_connections.get(this.instanceId) === this) {
+              closeConnection(this.instanceId);
+            }
+          }
+          return;
+        }
         // The translated message is generic ("An error occurred") on a
         // network failure - peer URL, HTTP status and the network flag are
         // what say whether the peer was down, rejected us, or crashed.
@@ -803,25 +824,6 @@ class WsConnection {
           errorType: syncResult.errorType?.errorCode,
           message: syncResult.message,
         });
-      }
-
-      if (!syncResult?.success) {
-        if (syncResult?.errorType === ErrorResponseTypes.UNAUTHORIZED) {
-          await db
-            .update(remoteConnections)
-            .set({ isActive: false, updatedAt: new Date() })
-            .where(eq(remoteConnections.id, conn.id));
-          this.logger.warn(
-            "[WsConnection] pull-on-connect: 401 — deactivated and stopping channel",
-            {
-              instanceId: this.instanceId,
-            },
-          );
-          // A dead token means every future send fails too — stop the channel,
-          // don't keep a zombie socket reconnecting against a deactivated row.
-          closeConnection(this.instanceId);
-        }
-        // Non-401 failures were logged with full context just above.
         return;
       }
 

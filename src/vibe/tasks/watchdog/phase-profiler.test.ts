@@ -3,10 +3,11 @@
  * named by function, so the lag row says what blocked the loop.
  */
 
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it, mock } from "bun:test";
 
 import { defaultLocale } from "../../core/i18n/core/config";
 import { createEndpointLogger } from "../../logger/server";
+import type { LoggerMetadata } from "../../logger/types";
 import { PhaseProfiler } from "./phase-profiler";
 
 function blockTheLoopForProfilerTest(ms: number): number {
@@ -20,7 +21,8 @@ function blockTheLoopForProfilerTest(ms: number): number {
 
 describe("PhaseProfiler", () => {
   it("names the function behind a stall that starts right after the phase", async () => {
-    const logger = createEndpointLogger(false, defaultLocale);
+    const warn = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+    const logger = { ...createEndpointLogger(false, defaultLocale), warn };
     const end = PhaseProfiler.hold("cron-post:test", logger);
     // Let the sampler start (bun:jsc loads asynchronously)
     await new Promise<void>((resolve) => {
@@ -41,6 +43,15 @@ describe("PhaseProfiler", () => {
     expect(profile?.streakMs).toBeGreaterThanOrEqual(150);
     expect(profile?.hotFrames).toContain("blockTheLoopForProfilerTest");
     expect(profile?.phases).toContain("cron-post:test");
+    if (profile && profile.streakMs >= 200) {
+      expect(warn).toHaveBeenCalledWith(
+        "[EventLoop] Stall profiled in a window with cron bookkeeping",
+        expect.objectContaining({
+          profileWindowStartedAt: new Date(profile.sessionStartedAt).toISOString(),
+          profileWindowEndedAt: new Date(profile.sessionEndedAt).toISOString(),
+        }),
+      );
+    }
   });
 
   it("stays silent when the phase is idle", async () => {

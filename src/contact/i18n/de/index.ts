@@ -132,6 +132,7 @@ export const translations: typeof enTranslations = {
     noContactReturned:
       "Nach der Erstellung wurde kein Kontaktdatensatz zurückgegeben",
     validation: {
+      messageEmpty: "Gib eine Nachricht ein, bevor du sie abschickst.",
       title: "Validierungsfehler",
       description:
         "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",

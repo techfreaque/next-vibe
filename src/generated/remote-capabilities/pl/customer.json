@@ -14665,6 +14665,7 @@
                           "WEB_OFF": "enums.userRole.webOff",
                           "MCP_OFF": "enums.userRole.mcpOff",
                           "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                          "CRON_ALLOWED": "enums.userRole.cronAllowed",
                           "PRODUCTION_OFF": "enums.userRole.productionOff",
                           "SKILL_OFF": "enums.userRole.skillOff"
                         }
@@ -14682,6 +14683,7 @@
                         "WEB_OFF": "enums.userRole.webOff",
                         "MCP_OFF": "enums.userRole.mcpOff",
                         "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                        "CRON_ALLOWED": "enums.userRole.cronAllowed",
                         "PRODUCTION_OFF": "enums.userRole.productionOff",
                         "SKILL_OFF": "enums.userRole.skillOff"
                       },
@@ -14697,6 +14699,7 @@
                         "enums.userRole.webOff",
                         "enums.userRole.mcpOff",
                         "enums.userRole.mcpVisible",
+                        "enums.userRole.cronAllowed",
                         "enums.userRole.productionOff",
                         "enums.userRole.skillOff"
                       ]
@@ -14736,6 +14739,7 @@
                         "WEB_OFF": "enums.userRole.webOff",
                         "MCP_OFF": "enums.userRole.mcpOff",
                         "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                        "CRON_ALLOWED": "enums.userRole.cronAllowed",
                         "PRODUCTION_OFF": "enums.userRole.productionOff",
                         "SKILL_OFF": "enums.userRole.skillOff"
                       }
@@ -14753,6 +14757,7 @@
                       "WEB_OFF": "enums.userRole.webOff",
                       "MCP_OFF": "enums.userRole.mcpOff",
                       "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                      "CRON_ALLOWED": "enums.userRole.cronAllowed",
                       "PRODUCTION_OFF": "enums.userRole.productionOff",
                       "SKILL_OFF": "enums.userRole.skillOff"
                     },
@@ -14768,6 +14773,7 @@
                       "enums.userRole.webOff",
                       "enums.userRole.mcpOff",
                       "enums.userRole.mcpVisible",
+                      "enums.userRole.cronAllowed",
                       "enums.userRole.productionOff",
                       "enums.userRole.skillOff"
                     ]
@@ -17914,6 +17920,7 @@
                               "WEB_OFF": "enums.userRole.webOff",
                               "MCP_OFF": "enums.userRole.mcpOff",
                               "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                              "CRON_ALLOWED": "enums.userRole.cronAllowed",
                               "PRODUCTION_OFF": "enums.userRole.productionOff",
                               "SKILL_OFF": "enums.userRole.skillOff"
                             }
@@ -17931,6 +17938,7 @@
                             "WEB_OFF": "enums.userRole.webOff",
                             "MCP_OFF": "enums.userRole.mcpOff",
                             "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                            "CRON_ALLOWED": "enums.userRole.cronAllowed",
                             "PRODUCTION_OFF": "enums.userRole.productionOff",
                             "SKILL_OFF": "enums.userRole.skillOff"
                           },
@@ -17946,6 +17954,7 @@
                             "enums.userRole.webOff",
                             "enums.userRole.mcpOff",
                             "enums.userRole.mcpVisible",
+                            "enums.userRole.cronAllowed",
                             "enums.userRole.productionOff",
                             "enums.userRole.skillOff"
                           ]
@@ -17985,6 +17994,7 @@
                             "WEB_OFF": "enums.userRole.webOff",
                             "MCP_OFF": "enums.userRole.mcpOff",
                             "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                            "CRON_ALLOWED": "enums.userRole.cronAllowed",
                             "PRODUCTION_OFF": "enums.userRole.productionOff",
                             "SKILL_OFF": "enums.userRole.skillOff"
                           }
@@ -18002,6 +18012,7 @@
                           "WEB_OFF": "enums.userRole.webOff",
                           "MCP_OFF": "enums.userRole.mcpOff",
                           "MCP_VISIBLE": "enums.userRole.mcpVisible",
+                          "CRON_ALLOWED": "enums.userRole.cronAllowed",
                           "PRODUCTION_OFF": "enums.userRole.productionOff",
                           "SKILL_OFF": "enums.userRole.skillOff"
                         },
@@ -18017,6 +18028,7 @@
                           "enums.userRole.webOff",
                           "enums.userRole.mcpOff",
                           "enums.userRole.mcpVisible",
+                          "enums.userRole.cronAllowed",
                           "enums.userRole.productionOff",
                           "enums.userRole.skillOff"
                         ]
@@ -287270,6 +287282,12 @@
                       },
                       "type": "boolean"
                     },
+                    "requiresReauth": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
                     "healthStatus": {
                       "def": {
                         "type": "enum",
@@ -287401,6 +287419,12 @@
                     "type": "nullable"
                   },
                   "hasToken": {
+                    "def": {
+                      "type": "boolean"
+                    },
+                    "type": "boolean"
+                  },
+                  "requiresReauth": {
                     "def": {
                       "type": "boolean"
                     },

@@ -19,6 +19,8 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { AUTH_TOKEN_COOKIE_MAX_AGE_DAYS } from "@/env/constants";
+
 import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
@@ -47,7 +49,11 @@ const { POST } = createEndpoint({
         label: "post.fields.sessionRetentionDays.label",
         description: "post.fields.sessionRetentionDays.description",
         columns: 6,
-        schema: z.coerce.number().min(1).max(365).default(30),
+        schema: z.coerce
+          .number()
+          .min(1)
+          .max(AUTH_TOKEN_COOKIE_MAX_AGE_DAYS)
+          .default(30),
       }),
 
       tokenRetentionDays: requestField(scopedTranslation, {

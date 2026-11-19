@@ -90,6 +90,7 @@ export class RemoteConnectionListRepository {
         isInferenceProvider: r.isInferenceProvider,
         lastSyncedAt: r.lastSyncedAt?.toISOString() ?? null,
         hasToken: !!r.token,
+        requiresReauth: RemoteConnectionRepository.requiresReauth(r),
         healthStatus: RemoteConnectionRepository.getConnectionHealth(r),
         isReverseEntry: r.isReverseEntry,
         transportMode: r.transportMode,

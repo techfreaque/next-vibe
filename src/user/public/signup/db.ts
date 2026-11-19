@@ -11,6 +11,7 @@ import {
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { leads } from "next-vibe/identity/lead/db";
 
+import { SignupBounceReasonDB } from "./bounce-reason";
 import type { SignupPostRequestOutput } from "./definition";
 
 export const pendingSignups = pgTable(
@@ -42,6 +43,7 @@ export const pendingSignups = pgTable(
     messageId: text("message_id"),
     deliveryFailed: boolean("delivery_failed").notNull().default(false),
     bounced: boolean("bounced").notNull().default(false),
+    bounceReason: text("bounce_reason", { enum: SignupBounceReasonDB }),
   },
   (table) => [
     index("pending_signups_email_idx").on(table.email),

@@ -81,6 +81,10 @@ import type {
   ServerStartRequestOutput,
   ServerStartResponseOutput,
 } from "./definition";
+import {
+  readThreadSchedulerSample,
+  threadSchedulerDelta,
+} from "./event-loop-scheduler";
 import type { ServerStartT } from "./i18n";
 import { scopedTranslation as serverStartScopedTranslation } from "./i18n";
 import { patchRuntimeEnvPlaceholders } from "./runtime-env-patch";
@@ -187,10 +191,8 @@ const EL_LAG_CRITICAL_MS = 2000;
 const SUPERVISOR_MAX_HEAP_MB = 256;
 
 /**
- * Sampled stack for a lag row: what JS ran during the stall. A stall without a
- * matching JS streak while the profiler runs means no JS was running then (a
- * GC pause, sync native IO or the process was not scheduled) - said explicitly
- * so the row never looks unprofiled.
+ * Sampled stack for a lag row. A low-activity sample and a missing profile
+ * provide different evidence, so report which one the profiler returned.
  */
 function describeStallProfile(
   stallMs: number,
@@ -220,7 +222,7 @@ function describeStallProfile(
   return {
     profiledHotFrames: profile
       ? `no JS streak matched the stall (GC, native IO or not scheduled); longest JS streak ${profile.streakMs} ms: ${profile.hotFrames}`
-      : "no JS ran during the stall (GC, native IO or not scheduled)",
+      : "no completed profiler sample covered the start of the stall",
     hotNative: profile?.hotNative || undefined,
   };
 }
@@ -746,20 +748,26 @@ export class ServerStartRepository {
       // The histogram and ticker sample on different schedules. Capture
       // nearby ticker delays so borderline warnings can include a profile.
       const stallCaptureMs = EL_LAG_WARN_MS - EL_LAG_HISTOGRAM_RESOLUTION_MS;
-      let lastTickAt = Date.now();
+      let lastSchedulerSample = readThreadSchedulerSample();
+      let lastTickAt = performance.now();
       let worstStall: {
         ms: number;
         startedAt: number;
+        scheduler: ReturnType<typeof threadSchedulerDelta>;
         runningTasks: string[];
         taskTimings: string;
         recentRequests: string;
       } | null = null;
       const stallTicker = setInterval(() => {
-        const now = Date.now();
+        const now = performance.now();
         const stallMs = now - lastTickAt - STALL_TICK_MS;
         lastTickAt = now;
+        const previousSchedulerSample = lastSchedulerSample;
+        if (previousSchedulerSample) {
+          lastSchedulerSample = readThreadSchedulerSample();
+        }
         if (stallMs >= stallCaptureMs && stallMs > (worstStall?.ms ?? 0)) {
-          const startedAt = now - stallMs;
+          const startedAt = Date.now() - stallMs;
           // Running now, or finished up to 1 s before the stall began: the
           // probe runs only after the stall, when its cause may be done.
           const probed = ServerStartRepository.runningTasksProbe?.(
@@ -768,6 +776,10 @@ export class ServerStartRepository {
           worstStall = {
             ms: stallMs,
             startedAt,
+            scheduler: threadSchedulerDelta(
+              previousSchedulerSample,
+              lastSchedulerSample,
+            ),
             runningTasks: probed?.labels ?? [],
             taskTimings: probed?.timings ?? "",
             recentRequests: summarizeRecentRequests(),
@@ -840,7 +852,10 @@ export class ServerStartRepository {
             prevHeapMb,
             rssMb: Math.round(mem.rss / 1024 / 1024),
             uptime: uptime2,
-            stallMs: stall?.ms,
+            stallMs: stall ? Math.round(stall.ms) : undefined,
+            // Main-thread CPU and runnable wait between the delayed ticker's
+            // callbacks. Process CPU below covers all threads over five seconds.
+            ...stall?.scheduler,
             stallStartedAt: stall
               ? new Date(stall.startedAt).toISOString()
               : undefined,

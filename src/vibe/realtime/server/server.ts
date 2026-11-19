@@ -371,6 +371,9 @@ function unsubscribeFromAll(ws: ServerWebSocket<WsConnectionData>): void {
 
 /** Extended connection data for proxied WS connections (e.g. Next.js HMR) */
 interface WsConnectionDataWithProxy extends WsConnectionData {
+  socketAuthSource?: NonNullable<
+    Awaited<ReturnType<typeof authenticateWsRequest>>
+  >["source"];
   proxyWs?: WebSocket;
 }
 
@@ -385,6 +388,10 @@ export const NEXT_PORT_OFFSET = 100;
 interface WebSocketServerOptions {
   /** Main public-facing port */
   port: number;
+  /** Actual app port when Vite falls back from the preferred internal port. */
+  appPort?: number;
+  /** Permit overlapping listeners during a production handoff. */
+  reusePort?: boolean;
   logger: EndpointLogger;
   /** Optional hostname (default: "0.0.0.0") */
   hostname?: string;
@@ -418,12 +425,12 @@ export function startWebSocketServer(
   // Default to "::" which binds both IPv4 and IPv6 on Linux
   // so Chrome's localhost→[::1] resolution works alongside IPv4 curl/fetch.
   const { port, logger, hostname = "::" } = options;
-  const nextPort = port + NEXT_PORT_OFFSET;
+  const nextPort = options.appPort ?? port + NEXT_PORT_OFFSET;
 
   const server = Bun.serve<WsConnectionDataWithProxy>({
     port,
     hostname,
-    reusePort: true, // allow re-binding after restart without waiting for TIME_WAIT
+    reusePort: options.reusePort ?? true,
     // Use max value (255s) instead of 0 - Bun 1.3.x ignores idleTimeout: 0
     // and falls back to the 10s uWS default, killing slow SSR cold-starts.
     // 255s covers even the slowest first-load (full dep pre-bundle ~30-60s).
@@ -539,9 +546,9 @@ export function startWebSocketServer(
           ? localeParse.data
           : null;
 
-        const user = await authenticateWsRequest(req, logger);
+        const auth = await authenticateWsRequest(req, logger);
 
-        if (!user) {
+        if (!auth) {
           const cookieHeader = req.headers.get("cookie") ?? "";
           // Auth accepts EITHER httpOnly cookies (browser) OR ?token/?leadId
           // query params (server-to-server self-connections, e.g.
@@ -567,6 +574,7 @@ export function startWebSocketServer(
           });
           return new Response("Missing lead id", { status: 401 });
         }
+        const { user, source: socketAuthSource } = auth;
 
         if (channel) {
           if (!upgradeLocale) {
@@ -596,6 +604,7 @@ export function startWebSocketServer(
         const upgraded = bunServer.upgrade(req, {
           data: {
             user,
+            socketAuthSource,
             channels: new Set(channel ? [channel] : []),
             connectedAt: Date.now(),
             lastInboundAt: Date.now(),
@@ -605,7 +614,7 @@ export function startWebSocketServer(
               requestId && /^[a-z0-9-]{8,64}$/.test(requestId)
                 ? requestId
                 : undefined,
-          } satisfies WsConnectionData,
+          } satisfies WsConnectionDataWithProxy,
         });
 
         if (!upgraded) {
@@ -719,6 +728,7 @@ export function startWebSocketServer(
                 {
                   channel: msg.channel,
                   isPublic: ws.data.user.isPublic,
+                  socketAuthSource: ws.data.socketAuthSource,
                   connectorInstanceId: ws.data.connectorInstanceId,
                   ...describeSubscribeIdentity(
                     ws.data.user,

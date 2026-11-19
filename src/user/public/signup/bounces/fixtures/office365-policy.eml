@@ -1,0 +1,39 @@
+From: postmaster@cvesd.org
+To: hi@unbottled.ai
+Subject: Undeliverable: Confirm my email
+Date: Wed, 18 Nov 2026 22:24:00 +0000
+Message-ID: <office365-report@cvesd.org>
+MIME-Version: 1.0
+Content-Type: multipart/report; report-type=delivery-status; boundary="report"
+
+--report
+Content-Type: text/plain; charset=UTF-8
+
+Delivery has failed to these recipients or groups:
+
+student@live.cvesd.org
+
+A custom mail flow rule created by an admin at cvesd.org has blocked your message.
+Students are not permitted to receive email from outside of CVESD.
+
+--report
+Content-Type: message/delivery-status
+
+Reporting-MTA: dns; mail.protection.outlook.com
+
+Final-Recipient: rfc822; student@live.cvesd.org
+Action: failed
+Status: 5.7.1
+Diagnostic-Code: smtp; 550 5.7.1 TRANSPORT.RULES.RejectMessage;
+ Students are not permitted to receive email from outside of CVESD
+
+--report
+Content-Type: text/rfc822-headers
+
+From: Unbottled <hi@unbottled.ai>
+To: student@live.cvesd.org
+Subject: Confirm my email
+Date: Wed, 18 Nov 2026 22:23:00 +0000
+Message-ID: <signup-office365@unbottled.ai>
+
+--report--

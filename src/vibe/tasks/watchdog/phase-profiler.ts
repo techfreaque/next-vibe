@@ -329,13 +329,22 @@ function startSession(logger: EndpointLogger): ProfileSession {
         }
         if (session.phases.length > 0 && stall.streakMs >= STALL_REPORT_MS) {
           // Static message: the fingerprint groups on it; details in metadata.
-          logger.warn("[EventLoop] Stall profiled during cron bookkeeping", {
-            streakMs: stall.streakMs,
-            phases: stall.phases,
-            hotFrames: stall.hotFrames,
-            hotStacks: stall.hotStacks,
-            hotNative: stall.hotNative,
-          });
+          logger.warn(
+            "[EventLoop] Stall profiled in a window with cron bookkeeping",
+            {
+              streakMs: stall.streakMs,
+              profileWindowStartedAt: new Date(
+                stall.sessionStartedAt,
+              ).toISOString(),
+              profileWindowEndedAt: new Date(
+                stall.sessionEndedAt,
+              ).toISOString(),
+              phases: stall.phases,
+              hotFrames: stall.hotFrames,
+              hotStacks: stall.hotStacks,
+              hotNative: stall.hotNative,
+            },
+          );
         }
       }
     } catch {
@@ -466,7 +475,7 @@ export class PhaseProfiler {
     }
   }
 
-  /** True while continuous sampling runs (a lag row without a profile = no JS ran). */
+  /** True while continuous sampling is enabled. */
   static isContinuous(): boolean {
     return Boolean(globalThis.__vibeProfilerContinuous);
   }

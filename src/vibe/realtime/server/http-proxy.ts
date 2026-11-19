@@ -19,6 +19,7 @@
 import http from "node:http";
 
 import type { EndpointLogger } from "../../logger/types";
+import { mintRequestId } from "../../logger/with-log-context";
 import { PROXY_LOADING_HTML } from "./proxy-loading-page";
 
 // ─── Recent-request tracker (diagnoses Next.js crashes) ─────────────────────────
@@ -122,6 +123,7 @@ export async function handleHttpProxy(
   const PROXY_RETRY_DELAYS = isIdempotent ? [500, 1000, 2000, 4000, 8000] : [];
 
   let lastProxyError = "Unknown error";
+  let retryRequestId: string | undefined;
   const proxyStartMs = Date.now();
   trackRequest(req.method, url.pathname);
 
@@ -180,6 +182,16 @@ export async function handleHttpProxy(
         },
         (proxyRes) => {
           lastUpstreamOkAt = Date.now();
+          if (retryRequestId) {
+            logger.info("[Proxy] Upstream answered after retry", {
+              requestId: retryRequestId,
+              path: url.pathname,
+              method: req.method,
+              retries: attempt,
+              status: proxyRes.statusCode,
+              elapsedMs: lastUpstreamOkAt - proxyStartMs,
+            });
+          }
           // Use Headers so Set-Cookie entries are appended individually (joining
           // multiple Set-Cookie with ", " breaks them).
           const resHeaders = new Headers();
@@ -273,8 +285,10 @@ export async function handleHttpProxy(
           // down); that is reported separately so a real crash stays an
           // unambiguous signal. Both carry uptime.
           if (attempt === 0) {
+            retryRequestId = mintRequestId();
             if (lastUpstreamOkAt === 0) {
               logger.warn("[Proxy] Request arrived before Next.js was up", {
+                requestId: retryRequestId,
                 path: url.pathname,
                 method: req.method,
                 uptime: Math.floor(process.uptime()),
@@ -282,6 +296,7 @@ export async function handleHttpProxy(
               });
             } else {
               logger.error("[Proxy] Next.js went down before crash", {
+                requestId: retryRequestId,
                 path: url.pathname,
                 method: req.method,
                 uptime: Math.floor(process.uptime()),
@@ -306,6 +321,7 @@ export async function handleHttpProxy(
         }
         if (!shuttingDown) {
           logger.error("[Proxy] Server unreachable", {
+            requestId: retryRequestId,
             errorCode: nodeErr.code ?? "UNKNOWN",
             error: err.message,
             path: url.pathname,
@@ -361,6 +377,7 @@ export async function handleHttpProxy(
     const delay = PROXY_RETRY_DELAYS[attempt] ?? 8000;
     const mem = process.memoryUsage();
     logger.warn("[Proxy] Server not ready, retrying", {
+      requestId: retryRequestId,
       path: url.pathname,
       method: req.method,
       attempt: attempt + 1,
@@ -379,7 +396,8 @@ export async function handleHttpProxy(
   }
 
   const mem = process.memoryUsage();
-  logger.error("[Proxy] All retries exhausted - returning 502", {
+  logger.error("[Proxy] All retries exhausted - returning 503", {
+    requestId: retryRequestId,
     path: url.pathname,
     method: req.method,
     totalElapsedMs: Date.now() - proxyStartMs,

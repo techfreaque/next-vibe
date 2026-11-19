@@ -31,18 +31,23 @@ export function makeSnippet(text: string): string {
   return text.replace(/\s+/g, " ").trim().slice(0, SNIPPET_LENGTH);
 }
 
-function connect(config: SystemMailboxConfig["imap"]): Promise<Imap> {
+function connect(
+  config: SystemMailboxConfig["imap"],
+  verifyTls: boolean,
+): Promise<Imap> {
   return new Promise<Imap>((resolve, reject) => {
-    const imap = new Imap({
+    const options = {
       user: config.username,
       password: config.password,
       host: config.host,
       port: config.port,
       tls: config.secure,
-      tlsOptions: { rejectUnauthorized: false },
+      tlsOptions: { rejectUnauthorized: verifyTls, servername: config.host },
       connTimeout: 15000,
       authTimeout: 10000,
-    });
+      socketTimeout: 15000,
+    };
+    const imap = new Imap(options);
     imap.once("ready", () => resolve(imap));
     imap.once("error", (err: Error) => reject(err));
     imap.connect();
@@ -52,10 +57,16 @@ function connect(config: SystemMailboxConfig["imap"]): Promise<Imap> {
 async function withImap<T>(
   config: SystemMailboxConfig["imap"],
   fn: (imap: Imap) => Promise<T>,
+  verifyTls = false,
 ): Promise<T> {
-  const imap = await connect(config);
+  const imap = await connect(config, verifyTls);
   try {
-    return await fn(imap);
+    const disconnected = Promise.withResolvers<never>();
+    imap.once("error", disconnected.reject);
+    imap.once("close", () =>
+      disconnected.reject(new Error("IMAP connection closed")),
+    );
+    return await Promise.race([disconnected.promise, fn(imap)]);
   } finally {
     imap.end();
   }
@@ -108,20 +119,26 @@ export function appendToSent(
   });
 }
 
-function openInbox(imap: Imap): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    // readOnly = true: reading never changes \Seen flags
-    imap.openBox("INBOX", true, (err) => {
+function openInbox(imap: Imap, readOnly = true): Promise<Imap.Box> {
+  return new Promise<Imap.Box>((resolve, reject) => {
+    imap.openBox("INBOX", readOnly, (err, box) => {
       if (err) {
         reject(err);
         return;
       }
-      resolve();
+      resolve(box);
     });
   });
 }
 
-function searchUids(imap: Imap, criteria: string[]): Promise<number[]> {
+type SearchCriterion =
+  | string
+  | [string, ...(SearchCriterion | Date | number)[]];
+
+function searchUids(
+  imap: Imap,
+  criteria: SearchCriterion[],
+): Promise<number[]> {
   return new Promise<number[]>((resolve, reject) => {
     imap.search(criteria, (err, uids) => {
       if (err) {
@@ -137,6 +154,7 @@ interface FetchedRaw {
   uid: number;
   flags: string[];
   raw: Buffer;
+  receivedAt: Date;
 }
 
 function fetchRaw(imap: Imap, uids: number[]): Promise<FetchedRaw[]> {
@@ -146,20 +164,22 @@ function fetchRaw(imap: Imap, uids: number[]): Promise<FetchedRaw[]> {
       return;
     }
     const out: FetchedRaw[] = [];
-    const fetch = imap.fetch(uids, { bodies: "" });
+    const fetch = imap.fetch(uids, { bodies: "", markSeen: false });
     fetch.on("message", (msg) => {
       const chunks: Buffer[] = [];
       let uid = 0;
       let flags: string[] = [];
+      let receivedAt = new Date(0);
       msg.on("body", (stream) => {
         stream.on("data", (chunk: Buffer) => chunks.push(chunk));
       });
-      msg.once("attributes", (attrs) => {
+      msg.once("attributes", (attrs: Imap.ImapMessageAttributes) => {
         uid = attrs.uid;
         flags = attrs.flags;
+        receivedAt = attrs.date;
       });
       msg.once("end", () => {
-        out.push({ uid, flags, raw: Buffer.concat(chunks) });
+        out.push({ uid, flags, raw: Buffer.concat(chunks), receivedAt });
       });
     });
     fetch.once("error", (err: Error) => reject(err));
@@ -226,4 +246,67 @@ export function readInboxMessage(
     const first = fetched[0];
     return first ? await parseFull(first) : null;
   });
+}
+
+const DELIVERY_REPORT_CHECKED = "SignupDsnChecked";
+const DELIVERY_REPORT_LIMIT = 50;
+const DELIVERY_REPORT_MAX_BYTES = 512_000;
+
+/** Reads by UID without changing flags until the caller has processed the report. */
+export function visitDeliveryReports(
+  config: SystemMailboxConfig["imap"],
+  since: Date,
+  visit: (message: FetchedRaw) => Promise<{ markSeen: boolean } | null>,
+): Promise<void> {
+  return withImap(
+    config,
+    async (imap) => {
+      const box = await openInbox(imap, false);
+      const supportsKeyword = box.newKeywords;
+      const candidates = (
+        await searchUids(imap, [
+          ["SINCE", since],
+          ["SMALLER", DELIVERY_REPORT_MAX_BYTES],
+          supportsKeyword ? ["UNKEYWORD", DELIVERY_REPORT_CHECKED] : "UNSEEN",
+          [
+            "OR",
+            ["HEADER", "Content-Type", "multipart/report"],
+            [
+              "OR",
+              ["HEADER", "X-Failed-Recipients", ""],
+              ["OR", ["FROM", "mailer-daemon"], ["FROM", "postmaster"]],
+            ],
+          ],
+        ])
+      ).toSorted((a, b) => b - a);
+      for (
+        let offset = 0;
+        offset < Math.min(candidates.length, DELIVERY_REPORT_LIMIT);
+        offset += 5
+      ) {
+        const messages = await fetchRaw(
+          imap,
+          candidates.slice(offset, offset + 5),
+        );
+        for (const message of messages) {
+          const outcome = await visit(message);
+          if (outcome?.markSeen && !message.flags.includes("\\Seen")) {
+            await new Promise<void>((resolve, reject) => {
+              imap.addFlags(message.uid, "\\Seen", (err) =>
+                err ? reject(err) : resolve(),
+              );
+            });
+          }
+          if (outcome && supportsKeyword) {
+            await new Promise<void>((resolve, reject) => {
+              imap.addKeywords(message.uid, DELIVERY_REPORT_CHECKED, (err) =>
+                err ? reject(err) : resolve(),
+              );
+            });
+          }
+        }
+      }
+    },
+    true,
+  );
 }

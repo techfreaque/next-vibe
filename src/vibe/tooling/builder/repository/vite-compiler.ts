@@ -1536,13 +1536,17 @@ class ViteCompiler {
     publicPort?: number,
     /** Mutable ref updated on every restart so the caller always holds the current close fn. */
     closeRef?: { fn: (() => Promise<void>) | undefined },
-  ): Promise<{
-    success: boolean;
-    url?: string;
-    message?: string;
-    close?: () => Promise<void>;
-  }> {
+    /** The proxy is already pointing at this port during an in-process restart. */
+    fixedPort = false,
+  ): Promise<
+    | { success: true; url: string; port: number; close: () => Promise<void> }
+    | { success: false; message: string }
+  > {
     try {
+      // Vite hashes NODE_ENV and the resulting plugin list for client deps.
+      // This is always a dev server, even when launched from a production shell.
+      Object.assign(process.env, { NODE_ENV: "development" });
+
       // Vite listens for process.stdin "end" to detect parent death and calls
       // process.exit() when CI !== "true". When vibe dev is backgrounded (no
       // controlling tty, stdin redirected to /dev/null), stdin emits "end"
@@ -1604,13 +1608,23 @@ class ViteCompiler {
       // Module aliases from build.config.ts viteOptions.moduleAliases
       // Keys are import specifiers, values are paths relative to ROOT_DIR.
       const moduleAliases = fileConfig.viteOptions?.moduleAliases ?? {};
+      const watchRoot = ROOT_DIR.replaceAll("\\", "/");
+      const ignoredWatchRoots = [
+        ".tmp",
+        ".dist",
+        ".next",
+        ".next-prod",
+        ".next-rebuild",
+        ".claude",
+        ".git",
+        "node_modules",
+        "scratchpad",
+        "test-results",
+      ].map((dir) => `${watchRoot}/${dir}/`);
 
-      // Custom Vite logger: pipe all Vite/Nitro output through the same
-      // timestamp+color formatter used for Next.js output.
-      const fmtVite = createNextjsFormatter(
-        port ?? 3001,
-        publicPort ?? port ?? 3001,
-      );
+      // The startup banner already displays the public URL. Preserve the
+      // actual internal port in Vite and Nitro diagnostics.
+      const fmtVite = createNextjsFormatter(port ?? 3001, port ?? 3001);
       const viteLogger = {
         hasWarned: false,
         info(msg: string): void {
@@ -2401,14 +2415,10 @@ class ViteCompiler {
           {
             name: "nitro-restart-fix",
             configureServer(srv) {
-              const originalRestart = srv.restart.bind(srv);
-              srv.restart = async (forceOptimize?: boolean): Promise<void> => {
-                // If nitro's env runner is still alive, use Vite's built-in restart.
-                // Only intercept when nitro is already broken (no environments.nitro).
-                // We always intercept here because Vite's restart will always break
-                // Nitro - nitro:init's ctx._initialized guard is unconditional.
-                void forceOptimize; // unused - fresh start always re-optimizes
-                void originalRestart; // kept for reference
+              srv.restart = async (): Promise<void> => {
+                const address = srv.httpServer?.address();
+                const boundPort =
+                  address && typeof address !== "string" ? address.port : port;
                 try {
                   // Use closeRef.fn (which calls closeAllConnections first) so the
                   // TCP socket on port 3100 is released before we try to re-bind it.
@@ -2425,9 +2435,10 @@ class ViteCompiler {
                 // Spawn a fresh server: new nitro() call = new ctx = clean _initialized.
                 const result = await viteCompiler.startTanstackDevServer(
                   fileConfig,
-                  port,
+                  boundPort,
                   publicPort,
                   closeRef,
+                  true,
                 );
                 if (!result.success) {
                   process.stderr.write(
@@ -2605,7 +2616,7 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
         },
         server: {
           port: port ?? 3001,
-          strictPort: true,
+          strictPort: fixedPort || publicPort === undefined,
           host: "127.0.0.1",
           watch: {
             // Ignore .tmp dir - build artifacts, not user source.
@@ -2622,28 +2633,25 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
               // Windows every test below - each written with "/" separators -
               // matched NOTHING, and the watcher walked node_modules in full.
               const filePath = rawFilePath.replaceAll("\\", "/");
+              // Match the directory itself so chokidar never walks its children.
+              const directoryPath = `${filePath}/`;
               return (
-                filePath.includes("/.tmp/") ||
-                filePath.includes("/.next/") ||
-                filePath.includes("/.next-prod/") ||
-                filePath.includes("/.next-rebuild/") ||
-                filePath.includes("/node_modules/") ||
-                filePath.includes("/.claude/") ||
+                ignoredWatchRoots.some((dir) =>
+                  directoryPath.startsWith(dir),
+                ) ||
+                directoryPath.includes("/node_modules/") ||
                 filePath.endsWith("/routeTree.gen.ts") ||
-                filePath.includes("/app-tanstack/routes/") ||
-                filePath.includes("/generated/") ||
-                filePath.endsWith("/generated/email/index.ts") ||
-                filePath.includes("/app-native/") ||
-                filePath.includes("/test-files/") ||
-                filePath.includes("/testing/") ||
-                filePath.includes("/fixtures/") ||
+                directoryPath.includes("/generated/") ||
+                directoryPath.includes("/app-native/") ||
+                directoryPath.includes("/test-files/") ||
+                directoryPath.includes("/testing/") ||
+                directoryPath.includes("/fixtures/") ||
                 filePath.endsWith(".test.ts") ||
                 filePath.endsWith(".test.tsx") ||
                 filePath.endsWith(".spec.ts") ||
                 filePath.endsWith(".spec.tsx") ||
                 // PGlite socket directory — changes here are runtime DB events, not source
-                filePath.includes(".db.pg") ||
-                filePath.includes(".db.pg.lock")
+                filePath.includes(".db.pg")
               );
             },
             // disableGlobbing tells chokidar to treat bracket paths as literal paths,
@@ -2812,7 +2820,12 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
         },
       });
 
-      await server.listen();
+      try {
+        await server.listen(port);
+      } catch (error) {
+        await server.close().catch(() => undefined);
+        return { success: false, message: parseError(error).message };
+      }
       // Tune Node.js HTTP server timeouts on Vite's internal server (port 3100).
       //
       // headersTimeout (default 60s): time allowed to receive the full request headers.
@@ -2843,7 +2856,11 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
           httpServer as NodeHttpServer & { requestTimeout?: number }
         ).requestTimeout = 255_000;
       }
-      const resolvedPort = server.config.server.port ?? port ?? 3001;
+      const address = server.httpServer?.address();
+      const resolvedPort =
+        address && typeof address !== "string"
+          ? address.port
+          : (port ?? server.config.server.port);
       const url = `http://localhost:${resolvedPort}`;
       const publicUrl = publicPort ? `http://localhost:${publicPort}` : url;
 
@@ -2866,6 +2883,9 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
       const lines = [
         `⚡ TanStack Start (Vite + Nitro)`,
         `   - Local:    ${publicUrl}`,
+        publicPort !== undefined && resolvedPort !== port
+          ? `   - Internal: ${url}`
+          : undefined,
         networkUrl ? `   - Network:  ${networkUrl}` : undefined,
         `   ✓ Ready`,
       ].filter(Boolean) as string[];
@@ -2975,6 +2995,7 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
       return {
         success: true,
         url,
+        port: resolvedPort,
         close: closeFn,
       };
     } catch (error) {

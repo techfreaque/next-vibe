@@ -1,13 +1,16 @@
 /// <reference types="vite/client" />
 // import "next-vibe/ui/tanstack/global-css";
 
+import { TanstackPage as RootLayout } from "@root-layout/layout";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { viewportToHead } from "next-vibe/platforms/web/frameworks/tanstack-start/page-head";
+import { Body } from "next-vibe/ui/components/body";
+import { Head } from "next-vibe/ui/components/head";
+import { Html } from "next-vibe/ui/components/html";
+import { Scripts } from "next-vibe/ui/components/scripts";
 import globalsUrl from "next-vibe/ui/globals.css?url";
-
-import { TanstackPage as RootLayout } from "@root-layout/layout";
 
 const loadLayout = createServerFn({ method: "GET" })
   .validator((data: { locale: string }) => data)
@@ -38,8 +41,20 @@ export const Route = createRootRoute({
     ],
   }),
   shellComponent: function ShellComponent({ children }) {
+    const layout = Route.useLoaderData()?.layout;
+    if (layout) {
+      return <RootLayout {...layout}>{children}</RootLayout>;
+    }
+
+    // The router still renders its error or not-found child if the loader failed.
     return (
-      <RootLayout {...Route.useLoaderData().layout}>{children}</RootLayout>
+      <Html>
+        <Head>{null}</Head>
+        <Body>
+          {children}
+          <Scripts />
+        </Body>
+      </Html>
     );
   },
   component: () => <Outlet />,

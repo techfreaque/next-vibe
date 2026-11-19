@@ -132,6 +132,7 @@ export const translations: typeof enTranslations = {
       "Nie można obecnie przetworzyć Twojego formularza kontaktowego. Spróbuj ponownie później.",
     noContactReturned: "Po utworzeniu nie zwrócono rekordu kontaktu",
     validation: {
+      messageEmpty: "Wpisz wiadomość, zanim ją wyślesz.",
       title: "Błąd walidacji",
       description: "Sprawdź swoje dane i spróbuj ponownie",
       nameMinLength: "Imię i nazwisko musi mieć co najmniej 2 znaki",

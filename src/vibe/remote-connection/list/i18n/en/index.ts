@@ -85,10 +85,12 @@ export const translations = {
       tunnelLost: "Tunnel lost",
       bridgeFailed: "Connection failed",
       disconnected: "Inactive",
+      reauthRequired: "Sign-in required",
       incomingActive: "Active",
     },
     // ── Reconnect button labels ────────────────────────────────────────────────
     reconnectButton: {
+      reauth: "Sign in again",
       reconnect: "Reconnect",
       retry: "Retry",
       resync: "Re-sync",

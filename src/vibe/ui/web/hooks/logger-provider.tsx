@@ -10,6 +10,7 @@ import {
   useEffect,
   useMemo,
 } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { createClientLogger } from "../../../logger/client";
@@ -38,12 +39,12 @@ function getOrCreateTabId(logger: EndpointLogger): string {
     if (existing) {
       return existing;
     }
-    const id = crypto.randomUUID();
+    const id = uuidv4();
     setSessionItem("vibe-tab-id", id, logger);
     return id;
   } catch {
     // SSR or storage unavailable - use a one-off ID (won't persist but won't crash)
-    return crypto.randomUUID();
+    return uuidv4();
   }
 }
 

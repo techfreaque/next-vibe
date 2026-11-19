@@ -1,5 +1,17 @@
 export const translations = {
+  bounceSync: {
+    title: "Sync signup delivery failures",
+    description:
+      "Check the system inbox for failed signup confirmation emails.",
+    marked: "Signups updated",
+    result: "Signups updated: {{count}}",
+    productionOnly: "Signup delivery sync runs on production only.",
+    mailboxUnavailable:
+      "Could not check the system inbox for failed signup emails.",
+  },
   confirmation: {
+    bouncedTitle: "We couldn’t deliver your confirmation email",
+    changeAddress: "Change email address",
     description: "Finish signup with the code or link from your email.",
     title: "Check your inbox",
     sent: "Enter the code we sent to {{email}}. It expires in 30 minutes.",
@@ -13,7 +25,13 @@ export const translations = {
     email: "Email address",
     hint: "Enter this code to finish creating your account, or use the link below within 30 minutes.",
     bounce:
-      "The confirmation email to {{email}} bounced. Check the address and change it to get a new code.",
+      "We couldn’t deliver the confirmation email to {{email}}. Check the address or use a different one.",
+    bouncePolicy:
+      "Your email provider blocked our message. School and work accounts often reject outside email. Use a different address.",
+    bounceMailboxMissing:
+      "Your email provider says {{email}} doesn’t exist. Check the spelling or use a different address.",
+    bounceMailboxFull:
+      "The mailbox for {{email}} is full. Free up space and resend the code, or use a different address.",
     invalid: "This code or link is invalid or has expired. Request a new code.",
     cooldown: "Too many requests. Wait before asking for another code.",
     domain: "This domain cannot receive email. Check the address.",

@@ -14,7 +14,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 
 import loginEndpoints, {
   type LoginPostResponseOutput,
@@ -243,6 +243,47 @@ export class RemoteConnectionConnectRepository {
       return fail({
         message: t("post.errors.invalidUrl.title"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
+    const pendingReauth = await db
+      .select()
+      .from(remoteConnections)
+      .where(
+        and(
+          eq(remoteConnections.userId, user.id),
+          eq(remoteConnections.remoteUrl, remoteUrl),
+          eq(remoteConnections.isActive, false),
+          eq(remoteConnections.isReverseEntry, false),
+          ne(remoteConnections.token, ""),
+        ),
+      )
+      .limit(2);
+    if (pendingReauth.length > 1) {
+      return fail({
+        message: t("post.errors.conflict.title"),
+        errorType: ErrorResponseTypes.CONFLICT,
+      });
+    }
+    const [existing] = pendingReauth;
+    if (existing) {
+      const { RemoteConnectionInstanceRepository } =
+        await import("../[instanceId]/repository");
+      const result = await RemoteConnectionInstanceRepository.reauthenticate(
+        user,
+        logger,
+        existing,
+        email,
+        password,
+        locale,
+      );
+      if (!result.success) {
+        return result;
+      }
+      return success({
+        remoteUrlResult: remoteUrl,
+        instanceId: existing.instanceId,
+        isConnected: true,
       });
     }
 

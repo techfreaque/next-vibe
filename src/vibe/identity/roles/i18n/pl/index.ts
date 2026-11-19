@@ -86,6 +86,7 @@ export const translations: typeof enTranslations = {
       webOff: "Web Wyłączone",
       mcpOff: "MCP Wyłączone",
       mcpVisible: "MCP Widoczne",
+      cronAllowed: "Dostępne dla zadań Cron",
       productionOff: "Produkcja Wyłączona",
       skillOff: "Skill Wyłączony",
     },

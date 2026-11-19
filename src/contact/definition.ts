@@ -29,6 +29,7 @@ import {
   ContactSubjectOptions,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
+import { isContactMessageEmpty } from "./message";
 
 const ContactFormWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ContactFormWidget })),
@@ -97,7 +98,17 @@ const { POST } = createEndpoint({
         columns: 12,
       }),
       message: requestField(scopedTranslation, {
-        schema: z.string().min(10),
+        schema: z.string().superRefine((message, ctx) => {
+          // Empty messages reach the repository for a localized error and a log entry.
+          if (message.length < 10 && !isContactMessageEmpty(message)) {
+            ctx.addIssue({
+              code: "too_small",
+              origin: "string",
+              minimum: 10,
+              inclusive: true,
+            });
+          }
+        }),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "form.fields.message.label",

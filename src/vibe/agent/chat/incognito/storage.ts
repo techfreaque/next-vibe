@@ -301,15 +301,21 @@ export async function getThreadsForFolder(
   subFolderId: string | null,
   logger: EndpointLogger,
 ): Promise<ChatThread[]> {
+  const threads = await getThreadsForRoot(rootFolderId, logger);
+  return threads.filter((thread) => (thread.folderId ?? null) === subFolderId);
+}
+
+export async function getThreadsForRoot(
+  rootFolderId: DefaultFolderId,
+  logger: EndpointLogger,
+): Promise<ChatThread[]> {
   const threads = await getItem<Record<string, ChatThread>>(
     STORAGE_KEYS.THREADS,
     {},
     logger,
   );
-
   return Object.values(threads).filter(
-    (thread) =>
-      thread.rootFolderId === rootFolderId && thread.folderId === subFolderId,
+    (thread) => thread.rootFolderId === rootFolderId,
   );
 }
 

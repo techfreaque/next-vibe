@@ -56,6 +56,7 @@ import {
   computeMargin,
   DEFAULT_THRESHOLDS,
   detectDayAnomalies,
+  detectLowBalance,
   detectProviderAnomalies,
   isDuplicateAlert,
   type LedgerUsageBreakdown,
@@ -565,6 +566,31 @@ describe("detectDayAnomalies", () => {
     });
     expect(alerts).toContain(FinanceAlertType.NEGATIVE_MARGIN);
     expect(alerts).toContain(FinanceAlertType.BILLING_GAP);
+  });
+});
+
+describe("prepaid provider balance thresholds", () => {
+  it.each([
+    { balanceUsd: 14, dailySpendUsd: 2, severity: undefined },
+    { balanceUsd: 13.99, dailySpendUsd: 2, severity: AlertSeverity.WARNING },
+    { balanceUsd: 4, dailySpendUsd: 2, severity: AlertSeverity.WARNING },
+    { balanceUsd: 3.99, dailySpendUsd: 2, severity: AlertSeverity.CRITICAL },
+    { balanceUsd: 5, dailySpendUsd: 0.01, severity: undefined },
+    { balanceUsd: 4.99, dailySpendUsd: 0.01, severity: AlertSeverity.WARNING },
+    { balanceUsd: 1, dailySpendUsd: null, severity: AlertSeverity.WARNING },
+    { balanceUsd: 0.99, dailySpendUsd: null, severity: AlertSeverity.CRITICAL },
+  ])("classifies balance $balanceUsd with daily spend $dailySpendUsd", (row) => {
+    const alert = detectLowBalance({
+      provider: FinanceSource.NANO_GPT,
+      providerLabel: "NanoGPT",
+      warningUsd: DEFAULT_THRESHOLDS.nanoGptLowBalanceUsd,
+      warningDays: DEFAULT_THRESHOLDS.nanoGptLowBalanceDays,
+      criticalUsd: DEFAULT_THRESHOLDS.nanoGptCriticalBalanceUsd,
+      criticalDays: DEFAULT_THRESHOLDS.nanoGptCriticalBalanceDays,
+      balanceUsd: row.balanceUsd,
+      dailySpendUsd: row.dailySpendUsd,
+    });
+    expect(alert?.severity).toBe(row.severity);
   });
 });
 
@@ -1332,8 +1358,8 @@ describe("finance ingest (mocked externals)", () => {
 
   it("reports first low prepaid balances while OpenRouter can still auto top up", async () => {
     openRouterCredits = 150.74;
-    nanoGptBalance = 45;
-    veniceBalance = 30;
+    nanoGptBalance = 4.5;
+    veniceBalance = 3;
     FinanceRepository.deps = {
       ...testDeps,
       recipients: () => ["hi@unbottled.ai", "thea@unbottled.ai"],
@@ -1508,37 +1534,64 @@ describe("finance ingest (mocked externals)", () => {
       return alert && { severity: alert.severity, delivery: alert.delivery };
     }
 
-    expect(await checkBalance(50, 0)).toBeUndefined();
-    expect(await checkBalance(45, 1)).toEqual({
+    expect(await checkBalance(5, 0)).toBeUndefined();
+    expect(await checkBalance(4, 1)).toEqual({
       severity: AlertSeverity.WARNING,
       delivery: "sent",
     });
-    expect(await checkBalance(40, 25)).toEqual({
+    expect(await checkBalance(2.1, 25)).toEqual({
       severity: AlertSeverity.WARNING,
       delivery: "suppressed",
     });
-    expect(await checkBalance(20, 26)).toEqual({
+    expect(await checkBalance(0.8, 26)).toEqual({
       severity: AlertSeverity.CRITICAL,
       delivery: "sent",
     });
-    expect(await checkBalance(10, 27)).toEqual({
+    expect(await checkBalance(0.5, 27)).toEqual({
       severity: AlertSeverity.CRITICAL,
       delivery: "suppressed",
     });
-    expect(await checkBalance(25, 28)).toEqual({
+    expect(await checkBalance(1.5, 28)).toEqual({
       severity: AlertSeverity.WARNING,
       delivery: "suppressed",
     });
-    expect(await checkBalance(20, 29)).toEqual({
+    expect(await checkBalance(0.8, 29)).toEqual({
       severity: AlertSeverity.CRITICAL,
       delivery: "sent",
     });
-    expect(await checkBalance(50, 30)).toBeUndefined();
-    expect(await checkBalance(40, 31)).toEqual({
+    expect(await checkBalance(6, 30)).toBeUndefined();
+    expect(await checkBalance(4.5, 31)).toEqual({
       severity: AlertSeverity.WARNING,
       delivery: "sent",
     });
     expect(mails).toHaveLength(4);
+  });
+
+  it("keeps the reported NanoGPT and Venice balances quiet at their seven-day spend rates", async () => {
+    nanoGptBalance = 14.52;
+    veniceBalance = 6.02;
+    const bucketAt = new Date(Date.UTC(2031, 2, 4, 11));
+    await db.insert(financeProviderSnapshots).values([
+      {
+        provider: FinanceSource.NANO_GPT,
+        bucketAt,
+        capturedAt: bucketAt,
+        balanceUsd: nanoGptBalance,
+        spendUsd: (nanoGptBalance / 8.7) * 7,
+        elapsedHours: 1,
+      },
+      {
+        provider: FinanceSource.VENICE,
+        bucketAt,
+        capturedAt: bucketAt,
+        balanceUsd: veniceBalance,
+        spendUsd: (veniceBalance / 23.8) * 7,
+        elapsedHours: 1,
+      },
+    ]);
+
+    expect((await ingest(IngestScope.BALANCES)).alerts).toHaveLength(0);
+    expect(mails).toHaveLength(0);
   });
 
   it("uses each provider's configured floor and seven-day spend runway", async () => {
@@ -1576,10 +1629,30 @@ describe("finance ingest (mocked externals)", () => {
         message: expect.stringContaining("$55.00 remaining, below $60.00"),
       }),
     ]);
+
+    await db.insert(financeThresholds).values([
+      { key: ThresholdKey.VENICE_CRITICAL_BALANCE_DAYS, value: 4 },
+      { key: ThresholdKey.NANO_GPT_CRITICAL_BALANCE_USD, value: 36 },
+    ]);
+    observedAt = new Date(NOW.getTime() + 60_000);
+    expect((await ingest(IngestScope.BALANCES)).alerts).toEqual([
+      expect.objectContaining({
+        subject: FinanceSource.NANO_GPT,
+        severity: AlertSeverity.CRITICAL,
+        message: expect.stringContaining("$35.00 remaining, below $36.00"),
+        delivery: "sent",
+      }),
+      expect.objectContaining({
+        subject: FinanceSource.VENICE,
+        severity: AlertSeverity.CRITICAL,
+        message: expect.stringContaining("$55.00 remaining, below $60.00"),
+        delivery: "sent",
+      }),
+    ]);
   });
 
   it("claims one low balance crossing across concurrent ingests", async () => {
-    nanoGptBalance = 40;
+    nanoGptBalance = 4;
     const outcomes = await Promise.all([
       ingest(IngestScope.BALANCES),
       ingest(IngestScope.BALANCES),
@@ -1594,7 +1667,7 @@ describe("finance ingest (mocked externals)", () => {
   it("does not send low balance mail from a non-production instance", async () => {
     FinanceRepository.deps = { ...testDeps, isProduction: false };
     try {
-      nanoGptBalance = 10.74;
+      nanoGptBalance = 0.74;
       const data = await ingest(IngestScope.BALANCES);
       expect(data.alerts[0]).toMatchObject({
         type: FinanceAlertType.LOW_BALANCE,

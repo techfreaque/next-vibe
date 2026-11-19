@@ -22,6 +22,7 @@ import { contacts, type NewContact } from "./db";
 import type { ContactRequest, ContactResponse } from "./definition";
 import { ContactStatus } from "./enum";
 import type { ContactT } from "./i18n";
+import { isContactMessageEmpty } from "./message";
 import { sendAdminNotificationSms, sendConfirmationSms } from "./sms";
 
 /**
@@ -39,6 +40,16 @@ export class ContactRepository {
     logger: EndpointLogger,
     t: ContactT,
   ): Promise<ResponseType<ContactResponse>> {
+    if (isContactMessageEmpty(data.message)) {
+      logger.warn("Rejected contact form submission with an empty message", {
+        leadId: user.leadId,
+        subject: data.subject,
+      });
+      return fail({
+        message: t("errors.validation.messageEmpty"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
     try {
       // Get leadId from user prop (JWT payload) - always present
       const leadId = user.leadId;

@@ -170,8 +170,12 @@ export const {
   GAB_LOW_BALANCE_CREDITS: "enums.threshold.gabLowBalanceCredits",
   NANO_GPT_LOW_BALANCE_USD: "enums.threshold.nanoGptLowBalanceUsd",
   NANO_GPT_LOW_BALANCE_DAYS: "enums.threshold.nanoGptLowBalanceDays",
+  NANO_GPT_CRITICAL_BALANCE_USD: "enums.threshold.nanoGptCriticalBalanceUsd",
+  NANO_GPT_CRITICAL_BALANCE_DAYS: "enums.threshold.nanoGptCriticalBalanceDays",
   VENICE_LOW_BALANCE_USD: "enums.threshold.veniceLowBalanceUsd",
   VENICE_LOW_BALANCE_DAYS: "enums.threshold.veniceLowBalanceDays",
+  VENICE_CRITICAL_BALANCE_USD: "enums.threshold.veniceCriticalBalanceUsd",
+  VENICE_CRITICAL_BALANCE_DAYS: "enums.threshold.veniceCriticalBalanceDays",
 });
 
 export const ThresholdKeyDB = [
@@ -192,8 +196,12 @@ export const ThresholdKeyDB = [
   ThresholdKey.GAB_LOW_BALANCE_CREDITS,
   ThresholdKey.NANO_GPT_LOW_BALANCE_USD,
   ThresholdKey.NANO_GPT_LOW_BALANCE_DAYS,
+  ThresholdKey.NANO_GPT_CRITICAL_BALANCE_USD,
+  ThresholdKey.NANO_GPT_CRITICAL_BALANCE_DAYS,
   ThresholdKey.VENICE_LOW_BALANCE_USD,
   ThresholdKey.VENICE_LOW_BALANCE_DAYS,
+  ThresholdKey.VENICE_CRITICAL_BALANCE_USD,
+  ThresholdKey.VENICE_CRITICAL_BALANCE_DAYS,
 ] as const;
 
 /** Which part of an ingest to run. */

@@ -15,6 +15,7 @@ import {
   fail,
   success,
 } from "next-vibe/core/route/response.schema";
+import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
 import type { ReactElement } from "react";
 import { z } from "zod";
 
@@ -28,6 +29,7 @@ import {
 } from "../messenger/providers/email/smtp-client/components/tracking_context.email";
 import type definition from "./definition";
 import { type ContactRequest, type ContactResponse } from "./definition";
+import { ContactPriority, ContactSubject } from "./enum";
 import { type ContactT, scopedTranslation } from "./i18n";
 import { contactClientRepository } from "./repository-client";
 
@@ -62,13 +64,20 @@ function ContactFormEmail({
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
+  const subject = isValidEnumValue(ContactSubject, props.subject)
+    ? t(props.subject)
+    : props.subject;
+  const priority =
+    props.priority && isValidEnumValue(ContactPriority, props.priority)
+      ? t(props.priority)
+      : props.priority;
   return (
     <EmailTemplate
       locale={locale}
       title={t("email.partner.greeting", {
         name: props.name,
       })}
-      previewText={props.subject}
+      previewText={subject}
       recipientEmail={recipientEmail}
       tracking={tracking}
     >
@@ -185,10 +194,10 @@ function ContactFormEmail({
                 {t("email.company.contactSubject")}:
               </td>
               <td style={{ paddingBottom: "8px", verticalAlign: "top" }}>
-                {t(props.subject as Parameters<ContactT>[0])}
+                {subject}
               </td>
             </tr>
-            {props.priority && (
+            {priority && (
               <tr>
                 <td
                   style={{
@@ -203,7 +212,7 @@ function ContactFormEmail({
                   {t("email.admin_notification.priority")}:
                 </td>
                 <td style={{ paddingBottom: "8px", verticalAlign: "top" }}>
-                  {t(props.priority as Parameters<ContactT>[0])}
+                  {priority}
                 </td>
               </tr>
             )}
@@ -278,7 +287,7 @@ export const contactFormEmailTemplate: EmailTemplateDefinition<
   typeof scopedTranslation,
   ContactRequest,
   ContactResponse,
-  never,
+  undefined,
   typeof definition.POST.allowedRoles
 > = {
   scopedTranslation,
@@ -384,8 +393,9 @@ export const contactFormEmailTemplate: EmailTemplateDefinition<
       return success({
         toEmail: contactClientRepository.getSupportEmail(locale),
         toName: globalT("appName"),
-        subject: contactT("email.partner.subject", {
-          subject: requestData.subject,
+        subject: contactT("email.admin_notification.subject", {
+          name: requestData.name,
+          subject: contactT(requestData.subject),
         }),
         replyToEmail: resolvedEmail,
         replyToName: requestData.name,
@@ -426,7 +436,7 @@ export const adminContactFormEmailTemplate: EmailTemplateDefinition<
   typeof scopedTranslation,
   ContactRequest,
   ContactResponse,
-  never,
+  undefined,
   typeof definition.POST.allowedRoles
 > = {
   scopedTranslation,
@@ -532,9 +542,7 @@ export const adminContactFormEmailTemplate: EmailTemplateDefinition<
       return success({
         toEmail: resolvedEmail,
         toName: requestData.name,
-        subject: contactT("email.partner.subject", {
-          subject: requestData.subject,
-        }),
+        subject: contactT("email.partner.subject"),
         replyToEmail: contactClientRepository.getSupportEmail(locale),
         replyToName: globalT("appName"),
         leadId: user.leadId,

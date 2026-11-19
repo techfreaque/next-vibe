@@ -28,7 +28,7 @@ const SignupFormContainer = lazyWidget(() =>
   import("./widget/widget").then((m) => ({ default: m.SignupFormContainer })),
 );
 
-const errorTypes = {
+export const signupErrorTypes = {
   [EndpointErrorTypes.VALIDATION_FAILED]: {
     title: "errors.validation.title",
     description: "errors.validation.description",
@@ -355,7 +355,7 @@ const { POST } = createEndpoint({
   }),
 
   // === ERROR HANDLING ===
-  errorTypes,
+  errorTypes: signupErrorTypes,
 
   // === SUCCESS HANDLING ===
   successTypes: {
@@ -477,7 +477,7 @@ const { PATCH } = createEndpoint({
       }),
     },
   }),
-  errorTypes,
+  errorTypes: signupErrorTypes,
   successTypes: {
     title: "confirmation.title",
     description: "success.description",

@@ -88,6 +88,7 @@ export const translations: typeof enTranslations = {
       webOff: "Web désactivé",
       mcpOff: "MCP désactivé",
       mcpVisible: "Visible sur MCP",
+      cronAllowed: "Autorisé dans Cron",
       productionOff: "Désactivé en production",
       skillOff: "Skill désactivée",
     },

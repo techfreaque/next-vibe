@@ -7,7 +7,16 @@
 
 import "server-only";
 
-import { and, eq, inArray, isNull, like, lte, or, sql } from "drizzle-orm";
+import {
+  and,
+  eq,
+  isNotNull,
+  isNull,
+  like,
+  notInArray,
+  or,
+  sql,
+} from "drizzle-orm";
 import Imap from "imap";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -26,12 +35,12 @@ import { cronTasks, type NewCronTask } from "next-vibe/tasks/cron/db";
 import { CronTaskPriority, TaskCategory } from "next-vibe/tasks/enum";
 
 import { messengerAccounts as imapAccounts } from "@/messenger/accounts/db";
+import { CampaignType } from "@/messenger/accounts/enum";
 import {
   emails,
   messengerFolders as imapFolders,
 } from "@/messenger/messages/db";
 import { SpecialFolderType as ImapSpecialUseType } from "@/messenger/messages/enum";
-import { pendingSignups } from "@/user/public/signup/db";
 
 import { campaignSchedulerService } from "../emails/services/scheduler";
 import { BOUNCE_PROCESSOR_ALIAS } from "./constants";
@@ -56,57 +65,6 @@ function getDefaultConfig(): BounceProcessorConfigGetResponseOutput {
 }
 
 export class BounceProcessorRepository {
-  /** Match the current dispatch or its explicitly failed DSN recipient.
-   * Delayed reports and quoted addresses do not invalidate an address. */
-  static async markPendingSignupBounce(
-    body: string,
-    parentId: string | null | undefined,
-    reportedAt: Date,
-  ): Promise<void> {
-    const blocks = body.split(/\r?\n[ \t]*\r?\n/);
-    const recipients: string[] = [];
-    for (const block of blocks) {
-      if (/^(?:Action:[ \t]*failed|Status:[ \t]*5\.)/im.test(block)) {
-        const address =
-          /^Final-Recipient:[^;\n]+;[ \t]*<?([^\s<>]+@[^\s<>]+)>?/im.exec(
-            block,
-          )?.[1];
-        if (address) {
-          recipients.push(address.toLowerCase());
-        }
-      }
-    }
-    if (
-      !recipients.length &&
-      /^(?:Action:[ \t]*(?:delayed|delivered|relayed|expanded)|Status:[ \t]*[24]\.)/im.test(
-        body,
-      )
-    ) {
-      return;
-    }
-    const ids = [
-      ...body.matchAll(
-        /^(?:Original-Message-ID|Message-ID):[ \t]*(<[^>\s]+>)/gim,
-      ),
-    ].map((match) => match[1]);
-    if (parentId) {
-      ids.push(parentId);
-    }
-    if (ids.length || recipients.length) {
-      await db
-        .update(pendingSignups)
-        .set({ bounced: true })
-        .where(
-          and(
-            lte(pendingSignups.sentAt, reportedAt),
-            ids.length
-              ? inArray(pendingSignups.messageId, ids)
-              : inArray(pendingSignups.email, recipients),
-          ),
-        );
-    }
-  }
-
   /**
    * Sender patterns that indicate a bounce/DSN notification
    */
@@ -443,17 +401,22 @@ export class BounceProcessorRepository {
 
       logger.debug("Bounce processor starting", { dryRun, batchSize });
 
+      // Signup processes system inbox reports directly and retains them there.
+      const systemAccounts = db
+        .select({ id: imapAccounts.id })
+        .from(imapAccounts)
+        .where(
+          or(
+            eq(imapAccounts.isSystem, true),
+            sql`${imapAccounts.campaignTypes} @> ${JSON.stringify([CampaignType.SYSTEM])}`,
+          ),
+        );
       const bounceMessages = await db
         .select({
           id: emails.id,
           senderEmail: emails.senderEmail,
           subject: emails.subject,
           bodyText: emails.bodyText,
-          inReplyTo: emails.inReplyTo,
-          headers: emails.headers,
-          sentAt: emails.sentAt,
-          createdAt: emails.createdAt,
-          recipientEmail: emails.recipientEmail,
           uid: emails.uid,
           folderId: emails.folderId,
           accountId: emails.accountId,
@@ -462,7 +425,8 @@ export class BounceProcessorRepository {
         .where(
           and(
             isNull(emails.bouncedAt),
-            sql`${emails.accountId} IS NOT NULL`,
+            isNotNull(emails.accountId),
+            notInArray(emails.accountId, systemAccounts),
             or(
               ...BounceProcessorRepository.BOUNCE_SENDER_PATTERNS.map(
                 (pattern) => like(emails.senderEmail, pattern),
@@ -478,11 +442,6 @@ export class BounceProcessorRepository {
           senderEmail: emails.senderEmail,
           subject: emails.subject,
           bodyText: emails.bodyText,
-          inReplyTo: emails.inReplyTo,
-          headers: emails.headers,
-          sentAt: emails.sentAt,
-          createdAt: emails.createdAt,
-          recipientEmail: emails.recipientEmail,
           uid: emails.uid,
           folderId: emails.folderId,
           accountId: emails.accountId,
@@ -491,7 +450,8 @@ export class BounceProcessorRepository {
         .where(
           and(
             isNull(emails.bouncedAt),
-            sql`${emails.accountId} IS NOT NULL`,
+            isNotNull(emails.accountId),
+            notInArray(emails.accountId, systemAccounts),
             or(
               ...BounceProcessorRepository.BOUNCE_SUBJECT_KEYWORDS.map(
                 (kw) =>
@@ -547,11 +507,6 @@ export class BounceProcessorRepository {
           continue;
         }
 
-        await BounceProcessorRepository.markPendingSignupBounce(
-          msg.bodyText ?? "",
-          msg.inReplyTo ?? msg.headers?.["in-reply-to"],
-          msg.sentAt ?? msg.createdAt,
-        );
         await BounceProcessorRepository.moveToImapTrash(
           msg.id,
           msg.uid,

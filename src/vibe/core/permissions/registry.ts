@@ -148,8 +148,11 @@ class PermissionsRegistry implements IPermissionsRegistry {
         break;
 
       case Platform.CRON:
-        // CRON is an internal executor — only blocked by WEB_OFF (truly server-side-only endpoints).
-        if (platformMarkers.includes(PlatformMarker.WEB_OFF)) {
+        // CLI-only endpoints stay excluded unless they explicitly opt into cron.
+        if (
+          platformMarkers.includes(PlatformMarker.WEB_OFF) &&
+          !platformMarkers.includes(PlatformMarker.CRON_ALLOWED)
+        ) {
           return {
             allowed: false,
             reason: "platformExcluded",

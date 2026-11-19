@@ -21,6 +21,8 @@ import { connect, createServer, type Server, type Socket } from "node:net";
 
 import type { PGlite } from "@electric-sql/pglite";
 
+import { databaseEnv } from "./env";
+
 // ─── Wire-protocol constants ──────────────────────────────────────────────────
 
 const SSL_REQUEST_CODE = 80877103;
@@ -61,7 +63,9 @@ function buildBackendKeyData(pid: number, secret: number): Buffer {
   return buf;
 }
 
-function buildReadyForQuery(status: "I" | "T" | "E" = "I"): Buffer {
+type TransactionStatus = "I" | "T" | "E";
+
+function buildReadyForQuery(status: TransactionStatus = "I"): Buffer {
   const buf = Buffer.allocUnsafe(6);
   buf.writeUInt8(0x5a, 0);
   buf.writeInt32BE(5, 1);
@@ -294,7 +298,8 @@ function toPgText(value: PgliteValue, typeId: number): string | null {
 async function execInsertReturning(
   pg: PGlite,
   sql: string,
-  params: (string | null)[] = [],
+  params: (string | null)[],
+  status: TransactionStatus,
 ): Promise<Buffer> {
   // pg.query() runs INSERT…RETURNING correctly — only the raw wire-protocol
   // path corrupts it. The rows come back exactly as RETURNING lists them
@@ -321,7 +326,7 @@ async function execInsertReturning(
     );
   }
   parts.push(buildCommandComplete(`INSERT 0 ${String(result.rows.length)}`));
-  parts.push(buildReadyForQuery());
+  parts.push(buildReadyForQuery(status));
   return Buffer.concat(parts);
 }
 
@@ -338,6 +343,11 @@ async function execInsertReturning(
 
 const gq = globalThis as typeof globalThis & {
   __pglite_queue__?: Promise<void>;
+  __pglite_transaction__?: {
+    socket: Socket;
+    done: Promise<void>;
+    release: () => void;
+  };
 };
 if (!gq.__pglite_queue__) {
   gq.__pglite_queue__ = Promise.resolve();
@@ -367,16 +377,32 @@ function withWatchdog<T>(
   };
 }
 
-function serialise<T>(fn: () => Promise<T>, label = "direct"): Promise<T> {
-  const result = (gq.__pglite_queue__ as Promise<void>).then(
-    withWatchdog(label, fn),
-  );
+function serialise<T>(
+  fn: () => Promise<T>,
+  label = "direct",
+  socket?: Socket,
+): Promise<T> {
+  const result = (gq.__pglite_queue__ ?? Promise.resolve()).then<
+    { wait: Promise<void> } | { value: T }
+  >(async () => {
+    const transaction = gq.__pglite_transaction__;
+    if (transaction && transaction.socket !== socket) {
+      return { wait: transaction.done };
+    }
+    return { value: await withWatchdog(label, fn)() };
+  });
   // Swallow errors on the queue tail so one failure doesn't poison later work
   gq.__pglite_queue__ = result.then(
     () => undefined,
     () => undefined,
   );
-  return result;
+  // Wait outside the FIFO chain. The owner must be able to enqueue its
+  // COMMIT or ROLLBACK while other sockets are waiting.
+  return result.then((entry) =>
+    "wait" in entry
+      ? entry.wait.then(() => serialise(fn, label, socket))
+      : entry.value,
+  );
 }
 
 /**
@@ -424,16 +450,38 @@ function handleConnection(pg: PGlite, socket: Socket): void {
   let recvBuf = Buffer.alloc(0);
   let batchBuf = Buffer.alloc(0);
   let busy = false;
+  let idleTransactionTimer: ReturnType<typeof setTimeout> | undefined;
   // Last ReadyForQuery status this connection saw: 'I' idle, 'T' in a
   // transaction, 'E' failed transaction. PGlite has ONE session shared by
   // every connection, so a connection that dies mid-transaction would leave
   // the whole database inside a zombie (or aborted) transaction.
-  let txStatus = "I";
+  let txStatus: TransactionStatus = "I";
+
+  function setTxStatus(status: TransactionStatus): void {
+    txStatus = status;
+    const transaction = gq.__pglite_transaction__;
+    if (status === "I") {
+      if (transaction?.socket === socket) {
+        gq.__pglite_transaction__ = undefined;
+        transaction.release();
+      }
+    } else if (!transaction) {
+      const done = Promise.withResolvers<void>();
+      gq.__pglite_transaction__ = {
+        socket,
+        done: done.promise,
+        release: done.resolve,
+      };
+    }
+  }
 
   function trackTxStatus(resp: Uint8Array): void {
     // The response always ends with ReadyForQuery: 'Z' + int32(5) + status.
     if (resp.length >= 6 && resp[resp.length - 6] === 0x5a) {
-      txStatus = String.fromCharCode(resp[resp.length - 1] ?? 0x49);
+      const status = String.fromCharCode(resp[resp.length - 1] ?? 0x49);
+      if (status === "I" || status === "T" || status === "E") {
+        setTxStatus(status);
+      }
     }
   }
 
@@ -445,17 +493,33 @@ function handleConnection(pg: PGlite, socket: Socket): void {
   });
   socket.on("error", () => undefined);
   socket.on("close", () => {
+    clearTimeout(idleTransactionTimer);
     recvBuf = Buffer.alloc(0);
     batchBuf = Buffer.alloc(0);
-    if (txStatus !== "I") {
-      txStatus = "I";
-      void serialise(() => pg.exec("ROLLBACK"), "ROLLBACK (orphaned tx)").catch(
-        () => undefined,
-      );
+    if (busy || txStatus !== "I") {
+      void serialise(
+        async () => {
+          if (txStatus === "I") {
+            return;
+          }
+          try {
+            await pg.exec("ROLLBACK");
+          } finally {
+            setTxStatus("I");
+          }
+        },
+        "ROLLBACK (orphaned tx)",
+        socket,
+      ).catch((error) => {
+        process.stderr.write(
+          `[pglite] Orphaned transaction rollback failed: ${error instanceof Error ? error.message : String(error)}\n`,
+        );
+      });
     }
   });
 
   async function pump(): Promise<void> {
+    clearTimeout(idleTransactionTimer);
     busy = true;
     try {
       while (recvBuf.length > 0) {
@@ -471,6 +535,15 @@ function handleConnection(pg: PGlite, socket: Socket): void {
       }
     } finally {
       busy = false;
+      const timeoutMs = databaseEnv.DATABASE_IDLE_IN_TRANSACTION_TIMEOUT_MS;
+      if (txStatus !== "I" && timeoutMs > 0 && !socket.destroyed) {
+        idleTransactionTimer = setTimeout(() => {
+          process.stderr.write(
+            `[pglite] Closing connection with a transaction idle for ${String(timeoutMs)}ms\n`,
+          );
+          socket.destroy();
+        }, timeoutMs);
+      }
     }
   }
 
@@ -548,13 +621,19 @@ function handleConnection(pg: PGlite, socket: Socket): void {
         .trim();
       if (/^\s*insert\s+into\s/i.test(sql) && /\sreturning\s/i.test(sql)) {
         try {
-          socket.write(
-            await serialise(
-              () => execInsertReturning(pg, sql),
-              sql.slice(0, 200),
-            ),
+          const response = await serialise(
+            async () =>
+              socket.destroyed
+                ? null
+                : execInsertReturning(pg, sql, [], txStatus),
+            sql.slice(0, 200),
+            socket,
           );
+          if (response) {
+            socket.write(response);
+          }
         } catch (e) {
+          setTxStatus(txStatus === "I" ? "I" : "E");
           socket.write(
             Buffer.concat([
               buildErrorResponse(
@@ -562,7 +641,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
                 "XX000",
                 e instanceof Error ? e.message : "PGlite error",
               ),
-              buildReadyForQuery(),
+              buildReadyForQuery(txStatus),
             ]),
           );
         }
@@ -597,13 +676,20 @@ function handleConnection(pg: PGlite, socket: Socket): void {
           const bindComplete = Buffer.from([0x32, 0x00, 0x00, 0x00, 0x04]);
           try {
             const dataResp = await serialise(
-              () => execInsertReturning(pg, sql, params),
+              async () =>
+                socket.destroyed
+                  ? null
+                  : execInsertReturning(pg, sql, params, txStatus),
               sql.slice(0, 200),
+              socket,
             );
-            socket.write(
-              Buffer.concat([parseComplete, bindComplete, dataResp]),
-            );
+            if (dataResp) {
+              socket.write(
+                Buffer.concat([parseComplete, bindComplete, dataResp]),
+              );
+            }
           } catch (e) {
+            setTxStatus(txStatus === "I" ? "I" : "E");
             socket.write(
               Buffer.concat([
                 parseComplete,
@@ -612,7 +698,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
                   "XX000",
                   e instanceof Error ? e.message : "PGlite error",
                 ),
-                buildReadyForQuery("E"),
+                buildReadyForQuery(txStatus),
               ]),
             );
           }
@@ -627,6 +713,9 @@ function handleConnection(pg: PGlite, socket: Socket): void {
     try {
       await serialise(
         async () => {
+          if (socket.destroyed) {
+            return;
+          }
           const bytes = new Uint8Array(
             messages.buffer,
             messages.byteOffset,
@@ -637,8 +726,10 @@ function handleConnection(pg: PGlite, socket: Socket): void {
           socket.write(Buffer.from(resp));
         },
         describeBatch(messages, fenceType),
+        socket,
       );
     } catch (e) {
+      setTxStatus(txStatus === "I" ? "I" : "E");
       socket.write(
         Buffer.concat([
           buildErrorResponse(
@@ -646,7 +737,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
             "XX000",
             e instanceof Error ? e.message : "PGlite error",
           ),
-          buildReadyForQuery(),
+          buildReadyForQuery(txStatus),
         ]),
       );
     }

@@ -161,6 +161,16 @@ export type InputProps<
   "aria-label"?: string;
 } & StyleType;
 
+const keyboardInputModes = {
+  default: undefined,
+  numeric: "numeric",
+  "email-address": "email",
+  "phone-pad": "tel",
+} satisfies Record<
+  NonNullable<InputProps<undefined>["keyboardType"]>,
+  React.InputHTMLAttributes<HTMLInputElement>["inputMode"]
+>;
+
 function InputInner<
   T extends
     | "text"
@@ -202,6 +212,7 @@ function InputInner<
     onClick,
     onKeyPress,
     onKeyDown,
+    keyboardType,
     name,
     id,
     "aria-label": ariaLabel,
@@ -213,6 +224,7 @@ function InputInner<
     <input
       ref={ref as React.Ref<HTMLInputElement>}
       type={type}
+      inputMode={keyboardType ? keyboardInputModes[keyboardType] : undefined}
       value={value !== undefined ? String(value) : undefined}
       defaultValue={
         defaultValue !== undefined ? String(defaultValue) : undefined

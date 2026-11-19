@@ -82,6 +82,7 @@ export const translations = {
       webOff: "Web Disabled",
       mcpOff: "MCP Disabled",
       mcpVisible: "MCP Visible",
+      cronAllowed: "Allowed in Cron",
       productionOff: "Production Disabled",
       skillOff: "Skill Disabled",
     },

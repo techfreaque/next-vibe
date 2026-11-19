@@ -80,7 +80,16 @@ function parseCookieValue(
 export async function authenticateWsRequest(
   req: Request,
   logger: EndpointLogger,
-): Promise<JwtPayloadType | null> {
+): Promise<{
+  user: JwtPayloadType;
+  source:
+    | "browser-session"
+    | "cookie-jwt"
+    | "query-token"
+    | "guest"
+    | "rejected-cookie"
+    | "rejected-query";
+} | null> {
   const cookieHeader = req.headers.get("cookie") ?? "";
   const url = new URL(req.url);
 
@@ -105,7 +114,10 @@ export async function authenticateWsRequest(
       );
 
       if (result.success && (result.data.isPublic || !cookieToken)) {
-        return result.data;
+        return {
+          user: result.data,
+          source: cookieToken ? "cookie-jwt" : "query-token",
+        };
       }
       if (result.success) {
         // Browser cookie: the page treats a JWT whose session row is gone
@@ -121,7 +133,7 @@ export async function authenticateWsRequest(
           logger,
         );
         if (session) {
-          return result.data;
+          return { user: session, source: "browser-session" };
         }
         logger.debug("[WS] Cookie JWT has no live session - socket is public", {
           userId: result.data.id,
@@ -142,9 +154,16 @@ export async function authenticateWsRequest(
 
   // Public (unauthenticated) connection
   return {
-    isPublic: true,
-    leadId,
-    roles: [UserPermissionRole.PUBLIC],
+    user: {
+      isPublic: true,
+      leadId,
+      roles: [UserPermissionRole.PUBLIC],
+    },
+    source: cookieToken
+      ? "rejected-cookie"
+      : token
+        ? "rejected-query"
+        : "guest",
   };
 }
 

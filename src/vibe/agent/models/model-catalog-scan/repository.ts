@@ -64,8 +64,8 @@ import {
   findNewModels,
   findPriceChanges,
 } from "./diff";
-import { ModelCatalogScanEmail } from "./email";
 import type { ModelCatalogScanT } from "./i18n";
+import { ModelCatalogScanEmail } from "./report-email";
 import type {
   CatalogReport,
   CatalogScanSummary,

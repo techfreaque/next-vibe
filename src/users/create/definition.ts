@@ -18,7 +18,11 @@ import {
   Languages,
   LanguagesOptions,
 } from "next-vibe/core/i18n/core/config";
-import { UserRole, UserRoleOptions } from "next-vibe/identity/roles/enum";
+import {
+  UserPermissionRole,
+  UserPermissionRoleOptions,
+  UserRole,
+} from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
@@ -158,8 +162,8 @@ const { POST } = createEndpoint({
             description: "post.roles.description" as const,
             helpText: "post.roles.description" as const,
             columns: 12,
-            options: UserRoleOptions,
-            schema: z.array(z.enum(UserRole)).optional(),
+            options: UserPermissionRoleOptions,
+            schema: z.array(z.enum(UserPermissionRole)).optional(),
           }),
           emailVerified: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,

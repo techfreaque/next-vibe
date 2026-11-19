@@ -1,7 +1,19 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  bounceSync: {
+    title: "Sprawdź zwroty wiadomości rejestracyjnych",
+    description:
+      "Sprawdza, czy do skrzynki systemowej dotarły raporty o niedoręczeniu wiadomości rejestracyjnych.",
+    marked: "Zaktualizowane rejestracje",
+    result: "Zaktualizowane rejestracje: {{count}}",
+    productionOnly: "Zwroty są sprawdzane tylko w środowisku produkcyjnym.",
+    mailboxUnavailable:
+      "Nie udało się sprawdzić zwrotów w skrzynce systemowej.",
+  },
   confirmation: {
+    bouncedTitle: "Nie udało się dostarczyć wiadomości",
+    changeAddress: "Zmień adres e-mail",
     description: "Dokończ rejestrację kodem lub linkiem z wiadomości e-mail.",
     title: "Sprawdź skrzynkę",
     sent: "Wpisz kod wysłany na {{email}}. Masz na to 30 minut.",
@@ -20,6 +32,12 @@ export const translations: typeof enTranslations = {
       "Kod lub link jest błędny albo stracił ważność. Poproś o nowy kod.",
     cooldown: "Zbyt wiele prób. Poczekaj chwilę, zanim poprosisz o nowy kod.",
     domain: "Ta domena nie odbiera poczty. Sprawdź adres.",
+    bouncePolicy:
+      "Twój dostawca poczty zablokował naszą wiadomość. Skrzynki szkolne i służbowe często odrzucają pocztę z zewnątrz. Użyj innego adresu.",
+    bounceMailboxMissing:
+      "Według dostawcy poczty adres {{email}} nie istnieje. Sprawdź, czy nie ma literówki, lub użyj innego adresu.",
+    bounceMailboxFull:
+      "Skrzynka {{email}} jest pełna. Zwolnij w niej miejsce i poproś o nowy kod lub użyj innego adresu.",
     sendFailed:
       "Nie udało się wysłać wiadomości na {{email}}. Sprawdź adres lub spróbuj ponownie.",
     done: "Adres potwierdzony. Jesteś już na swoim koncie.",

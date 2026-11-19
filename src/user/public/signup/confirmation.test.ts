@@ -20,12 +20,13 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { scopedTranslation as creditTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
-import { BounceProcessorRepository } from "@/leads/campaigns/bounce-processor/repository";
 import { newsletterSubscriptions } from "@/newsletter/db";
 import { referralCodes, userReferrals } from "@/referral/db";
 
 import { LoginRepository } from "../login/repository";
 import { scopedTranslation as loginTranslation } from "../login/i18n";
+import { SignupBounceReason } from "./bounce-reason";
+import { recordSignupDeliveryReport } from "./bounces/repository";
 import type { sendSignupChallenge } from "./confirmation-mail";
 import { pendingSignups, signupMailAttempts } from "./db";
 import type { SignupPatchRequestOutput, SignupPostRequestOutput } from "./definition";
@@ -200,7 +201,7 @@ describe("pending signup", () => {
   }, 60000);
 
   it("offers pending login recovery only for the correct password and reports a bounced address", async () => {
-    const { user, email, act } = await start();
+    const { user, email, pendingId, act } = await start();
     const loginT = loginTranslation.scopedT(defaultLocale).t;
     const login = (attempt: string, resendPending = false) =>
       LoginRepository.login(
@@ -218,21 +219,37 @@ describe("pending signup", () => {
     expect(!valid.success && valid.message).toBe(loginT("errors.pendingEmail"));
     const resend = await login(password, true);
     expect(!resend.success && resend.message).toBe(t("confirmation.cooldown"));
-    const report = (action: string, address: string) =>
-      BounceProcessorRepository.markPendingSignupBounce(
-        `Final-Recipient: rfc822; ${address}\r\nAction: ${action}`,
-        null,
+    const [row] = await db.select().from(pendingSignups).where(eq(pendingSignups.id, pendingId));
+    expect(row.messageId).toBeTruthy();
+    const report = (messageId: string | undefined, recipient: string, sentAt?: Date) =>
+      recordSignupDeliveryReport(
+        {
+          failures: [{ recipient, reason: SignupBounceReason.POLICY }],
+          messageId,
+          sentAt,
+          sender: "hi@unbottled.ai",
+          subject: t("confirmation.link"),
+        },
         new Date(),
+        "hi@unbottled.ai",
       );
-    await report("delayed", email);
-    const delayed = await act({});
-    expect(delayed.success && delayed.data.bounced).toBe(false);
-    await report("failed", email);
+    expect(await report("<old@fixture.invalid>", email, row.sentAt)).toBe(0);
+    expect(await report(row.messageId ?? undefined, address())).toBe(0);
+    expect(await report(undefined, email)).toBe(0);
+    expect(await report(undefined, email, new Date(row.sentAt.getTime() - 60_000))).toBe(0);
+    const untouched = await act({});
+    expect(untouched.success && untouched.data.bounced).toBe(false);
+    expect(await report(row.messageId ?? undefined, email)).toBe(1);
+    expect(await report(row.messageId ?? undefined, email)).toBe(0);
     const status = await act({});
     expect(status.success && status.data.bounced).toBe(true);
-    expect(status.success && status.data.message).toContain(email);
-    const corrected = await act({ newEmail: address() });
+    expect(status.success && status.data.message).toBe(t("confirmation.bouncePolicy"));
+    const newEmail = address();
+    const corrected = await act({ newEmail });
     expect(corrected.success && corrected.data.bounced).toBe(false);
+    expect(await report(row.messageId ?? undefined, email)).toBe(0);
+    const [rotated] = await db.select().from(pendingSignups).where(eq(pendingSignups.id, pendingId));
+    expect(await report(undefined, newEmail, rotated.sentAt)).toBe(1);
   });
 
   it("allows one resend after cooldown and limits corrections to five emails per hour", async () => {

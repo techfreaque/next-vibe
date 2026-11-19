@@ -5,7 +5,7 @@
 
 import { eq, sql } from "drizzle-orm";
 import { Countries, Languages } from "next-vibe/core/i18n/core/config";
-import { db } from "next-vibe/database";
+import { db, getLongRunningDb, isPglite } from "next-vibe/database";
 import {
   emailCampaigns,
   emailJourneyVariants,
@@ -501,6 +501,7 @@ function generateRandomLead(index: number): NewLead {
  * Generate sample lead engagements
  */
 async function generateLeadEngagements(
+  database: Pick<typeof db, "insert">,
   leadIds: string[],
   logger: EndpointLogger,
 ): Promise<void> {
@@ -547,7 +548,9 @@ async function generateLeadEngagements(
     // Chunk large batch inserts to avoid query size limits
     const CHUNK = 200;
     for (let i = 0; i < engagements.length; i += CHUNK) {
-      await db.insert(leadEngagements).values(engagements.slice(i, i + CHUNK));
+      await database
+        .insert(leadEngagements)
+        .values(engagements.slice(i, i + CHUNK));
     }
     logger.debug(`✅ Generated ${engagements.length} lead engagements`);
   }
@@ -557,6 +560,7 @@ async function generateLeadEngagements(
  * Generate sample email campaigns
  */
 async function generateEmailCampaigns(
+  database: Pick<typeof db, "insert">,
   leadIds: string[],
   logger: EndpointLogger,
 ): Promise<void> {
@@ -625,7 +629,9 @@ async function generateEmailCampaigns(
     // Chunk large batch inserts to avoid query size limits
     const CHUNK = 200;
     for (let i = 0; i < campaigns.length; i += CHUNK) {
-      await db.insert(emailCampaigns).values(campaigns.slice(i, i + CHUNK));
+      await database
+        .insert(emailCampaigns)
+        .values(campaigns.slice(i, i + CHUNK));
     }
     logger.debug(`✅ Generated ${campaigns.length} email campaigns`);
   }
@@ -634,7 +640,10 @@ async function generateEmailCampaigns(
 /**
  * Seed journey variants into DB (upsert - safe to run repeatedly)
  */
-async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
+async function seedJourneyVariants(
+  logger: EndpointLogger,
+  database: Pick<typeof db, "select" | "update" | "insert"> = db,
+): Promise<void> {
   const variants: Array<{
     variantKey: string;
     displayName: string;
@@ -713,13 +722,13 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
   let updated = 0;
 
   for (const v of variants) {
-    const [existing] = await db
+    const [existing] = await database
       .select({ id: emailJourneyVariants.id })
       .from(emailJourneyVariants)
       .where(eq(emailJourneyVariants.variantKey, v.variantKey));
 
     if (existing) {
-      await db
+      await database
         .update(emailJourneyVariants)
         .set({
           displayName: v.displayName,
@@ -735,7 +744,7 @@ async function seedJourneyVariants(logger: EndpointLogger): Promise<void> {
       continue;
     }
 
-    await db.insert(emailJourneyVariants).values({
+    await database.insert(emailJourneyVariants).values({
       variantKey: v.variantKey,
       displayName: v.displayName,
       description: v.description,
@@ -809,9 +818,23 @@ function generateImportedLead(
  * Development seed data
  */
 export async function dev(logger: EndpointLogger): Promise<void> {
-  // Always seed journey variants so admin UI shows them
-  await seedJourneyVariants(logger);
+  await getLongRunningDb().transaction(async (tx) => {
+    // A PGlite transaction already owns the shared database session. On
+    // PostgreSQL, take a transaction lock to serialize competing seed runs.
+    if (!isPglite) {
+      await tx.execute(
+        sql`SELECT pg_advisory_xact_lock(hashtextextended('lead-dev-seed', 0))`,
+      );
+    }
+    await seedJourneyVariants(logger, tx);
+    await seedDevelopmentLeads(tx, logger);
+  });
+}
 
+async function seedDevelopmentLeads(
+  database: Pick<typeof db, "delete" | "insert">,
+  logger: EndpointLogger,
+): Promise<void> {
   if (SEED_MODE === "none") {
     logger.debug("⏭️ SEED_MODE=none - skipping lead seeding");
     return;
@@ -823,7 +846,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     );
 
     // Clear previous imported seed leads to avoid duplicates on re-seed
-    await db
+    await database
       .delete(leads)
       .where(
         sql`${leads.metadata}->>'imported' = 'true' AND ${leads.metadata}->>'generated' = 'true'`,
@@ -836,7 +859,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
       }
       // Insert in batches of 100 to avoid query size limits
       for (let i = 0; i < localeLeads.length; i += 100) {
-        await db.insert(leads).values(localeLeads.slice(i, i + 100));
+        await database.insert(leads).values(localeLeads.slice(i, i + 100));
       }
       logger.debug(
         `✅ Seeded ${CAMPAIGN_LEADS_PER_LOCALE} imported leads for ${language}-${country}`,
@@ -849,7 +872,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
   logger.debug("🌱 Seeding random development leads...");
 
   // Clear existing random development leads to avoid duplicates
-  await db
+  await database
     .delete(leads)
     .where(
       sql`${leads.metadata}->>'generated' = 'true' AND (${leads.metadata}->>'imported') IS NULL`,
@@ -861,7 +884,7 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     sampleLeads.push(generateRandomLead(index));
   }
 
-  const insertedLeads = await db
+  const insertedLeads = await database
     .insert(leads)
     .values(sampleLeads)
     .returning({ id: leads.id });
@@ -870,8 +893,8 @@ export async function dev(logger: EndpointLogger): Promise<void> {
   logger.debug(`✅ Seeded ${sampleLeads.length} random development leads`);
 
   // Generate related data
-  await generateLeadEngagements(leadIds, logger);
-  await generateEmailCampaigns(leadIds, logger);
+  await generateLeadEngagements(database, leadIds, logger);
+  await generateEmailCampaigns(database, leadIds, logger);
 }
 
 /**

@@ -57,8 +57,8 @@ export const FINANCE_CONFIG = {
    */
   alertInbox: "hi@unbottled.ai",
 
-  /** The critical step is half the provider's warning threshold. */
-  lowBalanceCriticalFraction: 0.5,
+  /** Gab reports native credits, with a critical step at half its warning threshold. */
+  gabLowBalanceCriticalFraction: 0.5,
 
   /**
    * Flat-rate provider plans, USD per month. Added to every tracked day's
@@ -103,9 +103,13 @@ export const FINANCE_CONFIG = {
     openrouterAutoTopUpFloorUsd: 5,
     openrouterAutoTopUpGraceHours: 1,
     gabLowBalanceCredits: 100,
-    nanoGptLowBalanceUsd: 50,
-    nanoGptLowBalanceDays: 3,
-    veniceLowBalanceUsd: 50,
-    veniceLowBalanceDays: 3,
+    nanoGptLowBalanceUsd: 5,
+    nanoGptLowBalanceDays: 7,
+    nanoGptCriticalBalanceUsd: 1,
+    nanoGptCriticalBalanceDays: 2,
+    veniceLowBalanceUsd: 5,
+    veniceLowBalanceDays: 7,
+    veniceCriticalBalanceUsd: 1,
+    veniceCriticalBalanceDays: 2,
   },
 } as const;

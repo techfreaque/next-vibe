@@ -22,6 +22,19 @@ import type { WidgetData } from "../core/utils/json";
 import type { RemoteCallParams, RemoteCallResult } from "./types";
 
 export class RemoteTransport {
+  static isSessionRejected(
+    status: number,
+    message: string | undefined,
+  ): boolean {
+    // Older peers resolve an invalid bearer to a public user before checking
+    // sync permissions. Keep authenticated permission denials retryable.
+    return (
+      status === 401 ||
+      (status === 403 &&
+        message?.startsWith("User public lacks required roles:") === true)
+    );
+  }
+
   /**
    * The ONE place that talks raw HTTP to a remote instance. Every authenticated,
    * connection-backed remote call must instead go through

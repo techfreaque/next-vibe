@@ -175,7 +175,7 @@ export class DevDatabaseSetup {
       }
       if (opened > 0) {
         logger.info(
-          `[Connector] Re-synced ${String(opened)} connection(s) on startup`,
+          `[Connector] Started sync for ${String(opened)} connection(s)`,
         );
       }
     } catch (err) {

@@ -215,6 +215,7 @@ const { POST } = createEndpoint({
                   data.requestData.isInferenceProvider ?? false,
                 lastSyncedAt: new Date().toISOString(),
                 hasToken: true,
+                requiresReauth: false,
                 healthStatus: "healthy",
                 isReverseEntry: false,
                 // Fresh connect starts on the socket-free leg both ways; transport
@@ -230,8 +231,19 @@ const { POST } = createEndpoint({
               data: {
                 ...prev.data,
                 connections: exists
-                  ? prev.data.connections.map((c) =>
-                      c.instanceId === instanceId ? newConn : c,
+                  ? prev.data.connections.map<
+                      RemoteConnectionsListResponseOutput["connections"][number]
+                    >((c) =>
+                      c.instanceId === instanceId
+                        ? {
+                            ...c,
+                            isActive: true,
+                            requiresReauth: false,
+                            healthStatus: c.lastSyncedAt
+                              ? "healthy"
+                              : "warning",
+                          }
+                        : c,
                     )
                   : [...prev.data.connections, newConn],
               },

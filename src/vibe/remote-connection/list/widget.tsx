@@ -26,8 +26,8 @@ import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Link2 } from "next-vibe/ui/components/icons/Link2";
-import { Lock } from "next-vibe/ui/components/icons/Lock";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
+import { Lock } from "next-vibe/ui/components/icons/Lock";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
@@ -156,9 +156,11 @@ function AddConnectionButton({
 
 function ReconnectButton({
   conn,
+  navigate,
   t,
 }: {
   conn: RemoteConnection;
+  navigate: ReturnType<typeof useWidgetNavigation>["push"];
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
 }): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(false);
@@ -171,8 +173,9 @@ function ReconnectButton({
     return null;
   }
 
-  const label =
-    conn.healthStatus === "disconnected"
+  const label = conn.requiresReauth
+    ? t("widget.reconnectButton.reauth")
+    : conn.healthStatus === "disconnected"
       ? t("widget.reconnectButton.reconnect")
       : conn.healthStatus === "critical"
         ? t("widget.reconnectButton.retry")
@@ -182,6 +185,14 @@ function ReconnectButton({
     e.stopPropagation();
     setIsLoading(true);
     try {
+      if (conn.requiresReauth) {
+        const defs = await import("../connect/definition");
+        navigate(defs.default.POST, {
+          data: { remoteUrl: conn.remoteUrl },
+          popNavigationOnSuccess: 1,
+        });
+        return;
+      }
       const defs = await import("../[instanceId]/definition");
       await apiClient.mutate(
         defs.default.PATCH,
@@ -375,7 +386,7 @@ function ConnectionRow({
   canManage: boolean;
 }): JSX.Element {
   const isSelf = !conn.hasToken && conn.remoteUrl === "";
-  const health = conn.healthStatus;
+  const health = conn.requiresReauth ? "critical" : conn.healthStatus;
   const isIncoming = conn.isReverseEntry;
 
   const handleRowClick =
@@ -401,7 +412,9 @@ function ConnectionRow({
     ? t("widget.selfBadge")
     : !conn.hasToken
       ? t("widget.registeredBadge")
-      : healthLabel(health, conn.transportMode, isIncoming, t);
+      : conn.requiresReauth
+        ? t("widget.health.reauthRequired")
+        : healthLabel(health, conn.transportMode, isIncoming, t);
 
   return (
     <Div
@@ -479,7 +492,7 @@ function ConnectionRow({
       {!isPickerMode && (
         <Div className="flex items-center gap-1 flex-shrink-0">
           {canManage && !isSelf && conn.hasToken && !isIncoming && (
-            <ReconnectButton conn={conn} t={t} />
+            <ReconnectButton conn={conn} navigate={navigate} t={t} />
           )}
           {canManage && <EditButton conn={conn} navigate={navigate} t={t} />}
           {!isSelf && (
