@@ -25,6 +25,7 @@ import type { UserRoleValue } from "next-vibe/identity/roles/enum";
 
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
+  AUTH_TOKEN_COOKIE_NAME,
   BEARER_LEAD_ID_SEPARATOR,
   LEAD_ID_COOKIE_NAME,
 } from "@/env/constants";
@@ -1039,23 +1040,29 @@ export class AuthRepository {
         context.platform === Platform.NEXT_PAGE ||
         context.platform === Platform.NEXT_API
       ) {
-        const sessionValid = await AuthRepository.validateWebSession(
+        const sessionState = await AuthRepository.validateWebSession(
           token,
           verifyResult.data.id,
           logger,
           context.locale,
         );
-        if (!sessionValid) {
-          logger.debug(
-            "Session validation failed - returning public user (invalid token cleared by middleware)",
-            {
-              tokenPrefix: token.slice(0, 20),
-              userId: verifyResult.data.id,
-              platform: context.platform,
-            },
-          );
-          // Invalid sessions are cleared by middleware, so treat user as public
-          // This allows seamless recovery after DB resets
+        if (sessionState !== "valid") {
+          logger.debug("Session validation failed - returning public user", {
+            sessionState,
+            userId: verifyResult.data.id,
+            platform: context.platform,
+          });
+          // Only API handlers can write cookies. Keep the cookie on a DB
+          // failure and leave bearer credentials to the caller that owns them.
+          if (
+            sessionState === "invalid" &&
+            context.platform === Platform.NEXT_API &&
+            context.request?.cookies.get(AUTH_TOKEN_COOKIE_NAME)?.value ===
+              token &&
+            !context.request.headers.has("authorization")
+          ) {
+            await authHandler.clearAuthToken(logger, context.locale);
+          }
           const { leadId, shouldUpdateCookie } =
             await AuthRepository.getLeadIdFromDb(
               undefined,
@@ -1172,7 +1179,7 @@ export class AuthRepository {
     userId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): Promise<boolean> {
+  ): Promise<"valid" | "invalid" | "unavailable"> {
     try {
       const { t: sessionT } = sessionScopedTranslation.scopedT(locale);
       const sessionResult = await SessionRepository.findByToken(
@@ -1180,14 +1187,15 @@ export class AuthRepository {
         sessionT,
       );
       if (!sessionResult.success) {
-        return false;
+        return sessionResult.errorType.errorKey ===
+          ErrorResponseTypes.NOT_FOUND.errorKey
+          ? "invalid"
+          : "unavailable";
       }
 
       const session = sessionResult.data;
       if (session.userId !== userId) {
-        // Session user ID mismatch - middleware already cleared this token cookie
-        // Don't log anything, just silently fail
-        return false;
+        return "invalid";
       }
 
       // Auto-extend session when within 25% of remaining lifetime.
@@ -1207,10 +1215,10 @@ export class AuthRepository {
         });
       }
 
-      return true;
+      return "valid";
     } catch (error) {
       logger.error("Session validation failed", parseError(error));
-      return false;
+      return "unavailable";
     }
   }
 

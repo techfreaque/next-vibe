@@ -1,7 +1,8 @@
 import { getCookie } from "next-vibe/ui/lib/cookies";
 import { getVisibilityState } from "next-vibe/ui/lib/dom";
-import { getCurrentPathname } from "next-vibe/ui/lib/location";
+import { getCurrentPathname, reloadPage } from "next-vibe/ui/lib/location";
 import { isOnline } from "next-vibe/ui/lib/media";
+import { getSessionItem, setSessionItem } from "next-vibe/ui/lib/storage";
 
 import {
   BEARER_LEAD_ID_SEPARATOR,
@@ -307,6 +308,20 @@ function describeRequestBody(
 }
 
 const CLIENT_LOG_ENDPOINT_PATH = CLIENT_LOG_PATH.join("/");
+const AUTH_REFRESH_KEY = "vibe-auth-refresh-at";
+const AUTH_REFRESH_COOLDOWN_MS = 30_000;
+
+function refreshBrowserIdentity(logger: EndpointLogger): void {
+  // Several private queries can fail together. Keep the guard across the
+  // reload too, in case a transient server failure leaves the page signed in.
+  const lastRefresh = Number(getSessionItem(AUTH_REFRESH_KEY, logger));
+  const now = Date.now();
+  if (now - lastRefresh < AUTH_REFRESH_COOLDOWN_MS) {
+    return;
+  }
+  setSessionItem(AUTH_REFRESH_KEY, String(now), logger);
+  reloadPage();
+}
 
 /**
  * Auth/permission denials a logged-out visitor gets by design (the client
@@ -374,6 +389,9 @@ function reportApiFailure(
     errorMessage: String(response.message).slice(0, 500),
     causeKey: response.cause?.errorType?.errorKey ?? null,
     transport: diag.transport ?? "http",
+    responseReceived: status !== null,
+    responseTypeMissing: errorType === undefined,
+    publicRoleDenial: response.publicRoleDenial === true,
     redirected: diag.redirected ?? null,
     durationMs,
     requestBodyKind: diag.requestBody?.kind ?? null,
@@ -655,6 +673,14 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
 
     if (!response.ok) {
       if (!json.success && json.message) {
+        if (
+          platform.isBrowser &&
+          !user.isPublic &&
+          response.status === 403 &&
+          json.publicRoleDenial === true
+        ) {
+          refreshBrowserIdentity(logger);
+        }
         return json;
       }
       return fail({

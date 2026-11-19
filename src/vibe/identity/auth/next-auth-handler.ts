@@ -152,7 +152,7 @@ export class WebAuthHandler extends BaseAuthHandler {
 
   /**
    * Clear authentication token by deleting cookies
-   * IMPORTANT: This should ONLY be called on explicit logout, NOT on session validation failures
+   * Called on explicit logout or when an API request confirms a stale session.
    * Lead ID cookie is NEVER deleted - it persists across all sessions
    */
   async clearAuthToken(
@@ -160,7 +160,7 @@ export class WebAuthHandler extends BaseAuthHandler {
     locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     try {
-      logger.debug("Clearing auth token from cookies (logout)");
+      logger.debug("Clearing auth token from cookies");
       try {
         const cookieStore = await cookies();
         cookieStore.delete(AUTH_TOKEN_COOKIE_NAME);

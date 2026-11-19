@@ -110,9 +110,15 @@ local_probe() {
 # of a route after a start can take seconds (seen: 15 s for /en-US on a new
 # container). Best-effort, never fails the caller.
 warm_up() {
-  local p
+  local p cookie
+  cookie="$(head -1 "$PROBE_COOKIE_FILE" 2>/dev/null || true)"
+  if [ -z "$cookie" ]; then
+    log "warm-up skipped (no probe cookie)"
+    return 0
+  fi
   for p in ${HA_WARM_PATHS:-/robots.txt /en-US /en-US/threads/private/new /en-US/story /api/en-US/credits}; do
-    curl -s -o /dev/null --max-time 60 -A unbottled-ha-warmup/1 "${APP_URL}${p}" || true
+    curl -s -o /dev/null --max-time 60 -A unbottled-ha-warmup/1 \
+      -H "Cookie: $cookie" "${APP_URL}${p}" || true
   done
   log "warm-up done ($APP_URL)"
 }

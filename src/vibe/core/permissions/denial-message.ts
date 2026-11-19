@@ -76,6 +76,7 @@ export function resolveEndpointAccessDenial(
           }),
       errorType: ErrorResponseTypes.FORBIDDEN,
       expected: true,
+      publicRoleDenial: true,
     });
   }
 
