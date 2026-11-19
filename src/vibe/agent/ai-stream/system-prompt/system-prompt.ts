@@ -477,7 +477,10 @@ export const mediaCapabilitiesFragment: SystemPromptFragment = {
     ];
 
     const allLines = [...genLines, ...inputLines];
-    return `## Media tools (use \`tool-help\` for schema before calling)\n${allLines.join("\n")}`;
+    return `## Media tools (use \`tool-help\` for schema before calling)
+${allLines.join("\n")}
+
+When sharing a generated file, copy the tool result's \`markdownLink\` verbatim. If the result only includes a URL, copy it in full, including the \`/files/\` segment of any storage path.`;
   },
 };
 

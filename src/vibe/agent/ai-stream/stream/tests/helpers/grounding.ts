@@ -210,7 +210,7 @@ function recordedModelInputUrls(fixturePrefix: string): string[] {
   }
   const urls: string[] = [];
   for (const file of readdirSync(dir)) {
-    if (!/^\d{4}-.*-req\.json$/.test(file)) {
+    if (!/^(?:\d{4}-.*|cmp-[0-9a-f]{16})-req\.json$/.test(file)) {
       continue;
     }
     for (const text of nonAssistantInputs(

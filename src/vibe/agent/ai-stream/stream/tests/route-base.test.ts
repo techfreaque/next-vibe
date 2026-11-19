@@ -72,7 +72,7 @@ import {
   type ToolExecutionContext,
 } from "../../../../core/execution-context";
 import { scopedTranslation as chatScopedTranslation } from "../../../chat/i18n";
-import { isThreadRenameCall } from "../../repository/loop/helpers";
+import { repairMangledStorageUrlsInText } from "../../../chat/storage/storage-url";
 import type { ImageGenModelId } from "../../../image-generation/models";
 import { scopedTranslation as consentScopedTranslation } from "../../../models/uncensored-consent/i18n";
 import { UncensoredConsentRepository } from "../../../models/uncensored-consent/repository";
@@ -84,11 +84,12 @@ import {
   ModelSortField,
 } from "../../../skills/enum";
 import type { ChatModelId } from "../../models";
-import { seedFixtureThread } from "../../testing/fixture-seed";
+import { isThreadRenameCall } from "../../repository/loop/helpers";
 import {
   createE2ECreditUser,
   drainCredits,
 } from "../../testing/e2e-credit-user";
+import { seedFixtureThread } from "../../testing/fixture-seed";
 import {
   fetchFavoriteConfigAndModel,
   fetchThreadMessages,
@@ -149,6 +150,44 @@ import {
 } from "./helpers/run-stream";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+function assertT1ToolNames(
+  result: Record<string, WidgetData> | null,
+  label: string,
+): void {
+  expect(result, `T1: ${label} result is null`).not.toBeNull();
+  const tools = result?.["tools"];
+  expect(
+    Array.isArray(tools) && tools.length > 0,
+    `T1: ${label} must return a non-empty tools array`,
+  ).toBe(true);
+  const first = toolResultRecord(Array.isArray(tools) ? tools[0] : undefined);
+  expect(first?.["name"], `T1: ${label} first tool missing name`).toBeTruthy();
+  expect(
+    first?.["description"],
+    `T1: ${label} first tool missing description`,
+  ).toBeTruthy();
+}
+
+function findRevivalAssistant(
+  messages: SlimMessage[],
+  deferredToolId: string,
+): SlimMessage | undefined {
+  const childrenByParent = buildTree(messages);
+  const byId = new Map(messages.map((message) => [message.id, message]));
+  const queue = [deferredToolId];
+  let revivalAi: SlimMessage | undefined;
+  for (const id of queue) {
+    for (const childId of childrenByParent.get(id) ?? []) {
+      const child = byId.get(childId);
+      if (child?.role === "assistant" && !child.isCompacting) {
+        revivalAi = child;
+      }
+      queue.push(childId);
+    }
+  }
+  return revivalAi;
+}
 
 /** Assert messages are in strictly ascending chronological order */
 function assertChronologicalOrder(
@@ -1024,29 +1063,9 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
             });
             return resolveToolResult(msg);
           };
-          const t1AssertNamesList = (
-            res: Record<string, WidgetData> | null,
-            label: string,
-          ): void => {
-            expect(res, `T1: ${label} result is null`).not.toBeNull();
-            const tools = res!["tools"] as WidgetData[];
-            expect(
-              Array.isArray(tools) && tools.length > 0,
-              `T1: ${label} must return a non-empty tools array`,
-            ).toBe(true);
-            const first = toolResultRecord(tools[0]);
-            expect(
-              first?.["name"],
-              `T1: ${label} first tool missing name`,
-            ).toBeTruthy();
-            expect(
-              first?.["description"],
-              `T1: ${label} first tool missing description`,
-            ).toBeTruthy();
-          };
           // (1) category-narrow and (2) keyword-query → names lists.
-          t1AssertNamesList(t1ResultForArgs("category"), "category-narrow");
-          t1AssertNamesList(t1ResultForArgs("query"), "keyword-query");
+          assertT1ToolNames(t1ResultForArgs("category"), "category-narrow");
+          assertT1ToolNames(t1ResultForArgs("query"), "keyword-query");
           // (3) detail lookup → single tool with name + description (+ schema).
           const t1DetailRes = t1ResultForArgs("toolName");
           expect(t1DetailRes, "T1: detail result is null").not.toBeNull();
@@ -2737,36 +2756,7 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
                   isCbToolMsg(m),
               );
               if (deferredTool) {
-                // Walk the chain from deferredTool to find the leaf non-compacting
-                // assistant message (may be a grandchild if compacting fired during revival).
-                const buildChildMap = (
-                  msgs: SlimMessage[],
-                ): Map<string, SlimMessage[]> => {
-                  const childMap = new Map<string, SlimMessage[]>();
-                  for (const msg of msgs) {
-                    if (msg.parentId) {
-                      const siblings = childMap.get(msg.parentId) ?? [];
-                      siblings.push(msg);
-                      childMap.set(msg.parentId, siblings);
-                    }
-                  }
-                  return childMap;
-                };
-                const childMap = buildChildMap(messages);
-                // BFS from deferredTool to find the last non-compacting assistant leaf
-                const queue: string[] = [deferredTool.id];
-                let candidate: SlimMessage | undefined;
-                while (queue.length > 0) {
-                  const current = queue.shift()!;
-                  const children = childMap.get(current) ?? [];
-                  for (const child of children) {
-                    if (child.role === "assistant" && !child.isCompacting) {
-                      candidate = child;
-                    }
-                    queue.push(child.id);
-                  }
-                }
-                revivalAi = candidate;
+                revivalAi = findRevivalAssistant(messages, deferredTool.id);
               }
               if (deferredTool && revivalAi) {
                 if ((await getStreamingState(threadId)) === "idle") {
@@ -3202,19 +3192,14 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
                 (m) => m.toolCall?.isDeferred === true && isCbToolMsg(m),
               );
               if (deferredTool) {
-                revivalAi = messages.find(
-                  (m) =>
-                    m.role === "assistant" && m.parentId === deferredTool!.id,
-                );
+                revivalAi = findRevivalAssistant(messages, deferredTool.id);
               }
               // Require the revival's FINAL content, not just its existence: the
               // mirror can carry an early streaming chunk (e.g. just "<think>")
               // before the full answer syncs. Break only once the visible answer
               // (after stripping reasoning) is non-empty AND the thread is idle.
               if (deferredTool && revivalAi) {
-                const visible = (revivalAi.content ?? "")
-                  .replaceAll(/<think>[\s\S]*?<\/think>/g, "")
-                  .trim();
+                const visible = stripReasoning(revivalAi.content);
                 if (
                   visible.length > 0 &&
                   (await getStreamingState(threadId)) === "idle"
@@ -4633,10 +4618,15 @@ Now: explore the tool catalog with ${toolInstr(cfg, "tool-help")} by making THRE
           // model never sees a STEP_OK instruction — it only sees the
           // transcribed audio and replies to THAT. The observable contract is
           // structural: clean transcription in, substantive reply out.
+          const sttAnswer = sttResult.data.lastAiMessageContent ?? "";
           expect(
-            sttResult.data.lastAiMessageContent!.length,
+            sttAnswer.length,
             "[T10c_stt] AI must produce a substantive reply to the transcribed voice message.",
           ).toBeGreaterThan(10);
+          expect(
+            sttAnswer,
+            "[T10c_stt] Media links in the final reply must include the /files/ segment.",
+          ).toBe(repairMangledStorageUrlsInText(sttAnswer));
           lastMainAiMsgId = sttResult.data.lastAiMessageId!;
 
           assertNoOrphans(
