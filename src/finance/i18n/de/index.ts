@@ -2,28 +2,6 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Finanzen",
-  documents: {
-    search: "Dokumente suchen",
-    matches: "Gefundene Dokumente ({{count}})",
-    emptyTitle: "Keine Dokumente für diese Filter",
-    emptyHint: "Ändere den Suchbegriff oder die Filter.",
-    allCompanies: "Alle Unternehmen mit Zugriff",
-    chooseCompany: "Unternehmen auswählen",
-    allCustomers: "Alle Kunden",
-    chooseCustomer: "Kunden auswählen",
-    apply: "Filter anwenden",
-    clear: "Filter zurücksetzen",
-    page: "Seite {{page}} von {{pages}} · {{total}} Ergebnisse",
-    previous: "Vorherige Seite",
-    next: "Nächste Seite",
-    select: "{{reference}} auswählen",
-    open: "{{reference}} öffnen",
-    noReference: "Ohne Belegnummer",
-    invoices: "Ausgangsrechnungen",
-    bills: "Eingangsrechnungen",
-    estimates: "Angebote",
-    heading: "Geschäftsbelege",
-  },
   tags: {
     finance: "finanzen",
     vibeSense: "vibe-sense",
@@ -185,9 +163,7 @@ export const translations: typeof enTranslations = {
     description:
       "Umsatz gegen Einkaufskosten: Anbieter-Guthaben, Marge, Alarme und Schwellenwerte.",
     response: {
-      lastIngestAt: "Letzter Synchronisierungsversuch",
-      lastSuccessfulIngestAt: "Letzte erfolgreiche Quellensynchronisierung",
-      asOf: "Stand der Statusabfrage",
+      lastIngestAt: "Letzter Abruf",
       sources: "Quellen",
       week: "Letzte 7 Tage",
       days: "Tagesmarge",
@@ -195,18 +171,11 @@ export const translations: typeof enTranslations = {
       thresholds: "Schwellenwerte",
     },
     widget: {
-      back: "Zurück",
       title: "Finanzen",
       refresh: "Aktualisieren",
       runIngest: "Abruf starten",
       loading: "Lade Finanzen…",
-      lastIngest: "Letzter Versuch {{when}}",
-      lastSuccessful: "Zuletzt erfolgreich synchronisiert {{when}}",
-      snapshot: "Letzter Messwert {{when}}",
-      stale: "Veralteter Messwert",
-      noBalance: "Kein Guthaben gemeldet",
-      missingCost: "Keine vollständigen Kostendaten",
-      noSources: "Es liegen keine Daten aus Finanzquellen vor.",
+      lastIngest: "Letzter Abruf: {{when}}",
       never: "nie",
       neverRun: "Noch nie gelaufen",
       margin: {
@@ -218,9 +187,8 @@ export const translations: typeof enTranslations = {
         pct: "Marge %",
         empty: "Noch keine Auswertung. Abruf starten.",
         costUnknown: "Kosten unbekannt",
-        missingPct: "Keine Marge in Prozent",
         costIncomplete:
-          "Für {{tracked}} von {{total}} Tagen sind die Kosten vollständig. Erfasste Nettoeinnahmen im Zeitraum: {{revenue}}.",
+          "Marge über {{tracked}} von {{total}} Tagen: Es zählen nur Tage mit vollständig erfassten Einkaufskosten. Nettoumsatz über alle {{total}} Tage: {{revenue}}.",
       },
       providers: {
         title: "Anbieter-Guthaben",
@@ -238,7 +206,7 @@ export const translations: typeof enTranslations = {
       },
       alerts: {
         title: "Letzte Alarme",
-        empty: "Keine Warnungen erfasst",
+        empty: "Keine Alarme. Marge und Guthaben sehen normal aus.",
       },
       thresholds: {
         title: "Schwellenwerte",

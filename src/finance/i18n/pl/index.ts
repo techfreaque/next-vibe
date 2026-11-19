@@ -2,28 +2,6 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Finanse",
-  documents: {
-    search: "Szukaj dokumentów",
-    matches: "Pasujące dokumenty ({{count}})",
-    emptyTitle: "Brak dokumentów dla tych filtrów",
-    emptyHint: "Zmień wyszukiwaną frazę lub filtry.",
-    allCompanies: "Wszystkie firmy, do których masz dostęp",
-    chooseCompany: "Wybierz firmę",
-    allCustomers: "Wszyscy klienci",
-    chooseCustomer: "Wybierz klienta",
-    apply: "Zastosuj filtry",
-    clear: "Wyczyść filtry",
-    page: "Strona {{page}} z {{pages}} · {{total}} wyników",
-    previous: "Poprzednia strona",
-    next: "Następna strona",
-    select: "Wybierz {{reference}}",
-    open: "Otwórz {{reference}}",
-    noReference: "Bez numeru dokumentu",
-    invoices: "Faktury sprzedażowe",
-    bills: "Faktury od dostawców",
-    estimates: "Oferty",
-    heading: "Dokumenty handlowe",
-  },
   tags: {
     finance: "finanse",
     vibeSense: "vibe-sense",
@@ -184,9 +162,7 @@ export const translations: typeof enTranslations = {
     description:
       "Przychód kontra koszt u dostawców: salda, marża, alerty i progi.",
     response: {
-      lastIngestAt: "Ostatnia próba synchronizacji",
-      lastSuccessfulIngestAt: "Ostatnia udana synchronizacja źródła",
-      asOf: "Czas sprawdzenia stanu",
+      lastIngestAt: "Ostatnie pobranie",
       sources: "Źródła",
       week: "Ostatnie 7 dni",
       days: "Dzienna marża",
@@ -194,18 +170,11 @@ export const translations: typeof enTranslations = {
       thresholds: "Progi",
     },
     widget: {
-      back: "Wróć",
       title: "Finanse",
       refresh: "Odśwież",
       runIngest: "Uruchom pobranie",
       loading: "Wczytuję finanse…",
-      lastIngest: "Ostatnia próba {{when}}",
-      lastSuccessful: "Ostatnia udana synchronizacja {{when}}",
-      snapshot: "Ostatni odczyt od dostawcy {{when}}",
-      stale: "Nieaktualny odczyt",
-      noBalance: "Brak danych o saldzie",
-      missingCost: "Brak pełnych danych o kosztach",
-      noSources: "Żadne źródło finansowe nie zgłosiło jeszcze danych.",
+      lastIngest: "Ostatnie pobranie: {{when}}",
       never: "nigdy",
       neverRun: "Jeszcze nie uruchomiono",
       margin: {
@@ -217,9 +186,8 @@ export const translations: typeof enTranslations = {
         pct: "Marża %",
         empty: "Brak podsumowań. Uruchom pobranie.",
         costUnknown: "koszt nieznany",
-        missingPct: "Brak procentowej marży",
         costIncomplete:
-          "Pełne koszty są dostępne za {{tracked}} z {{total}} dni. Zapisany przychód netto za cały okres: {{revenue}}.",
+          "Marża liczy {{tracked}} z {{total}} dni: tylko dni z pełnym kosztem u dostawców. Przychód netto ze wszystkich {{total}} dni: {{revenue}}.",
       },
       providers: {
         title: "Salda dostawców",
@@ -237,7 +205,7 @@ export const translations: typeof enTranslations = {
       },
       alerts: {
         title: "Ostatnie alerty",
-        empty: "Brak zapisanych alertów",
+        empty: "Brak alertów. Marża i salda wyglądają normalnie.",
       },
       thresholds: {
         title: "Progi",

@@ -20,8 +20,6 @@ const locales: CountryLanguage[] = [
   "de-DE",
   "pl-PL",
   "fr-FR",
-  "it-IT",
-  "es-ES",
 ];
 const logoUrl = new URL(
   EMAIL_LOGO_FALLBACK_PATH,

@@ -16,8 +16,6 @@ const locales: CountryLanguage[] = [
   "de-DE",
   "pl-PL",
   "fr-FR",
-  "it-IT",
-  "es-ES",
 ];
 const recipientEmail = "recipient@example.invalid";
 
