@@ -43,6 +43,8 @@ Open the app → **Login as Admin** (no password in dev) → the setup wizard wa
 
 ### Deploy
 
+For one container with a managed PostgreSQL database, follow the [self-hosted pod guide](docs/guides/pikapods.md).
+
 Works on any VPS. Scales to Kubernetes.
 
 ```bash

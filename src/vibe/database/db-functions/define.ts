@@ -42,7 +42,7 @@ import type { QueryResultRow } from "pg";
 
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
-import { db, isPglite } from "..";
+import { db, isPglite, supportsAdvancedSql } from "..";
 import { pool } from "../client";
 import type { CompiledQuery, PlaceholderParam, StaticParam } from "./context";
 import { isPlaceholder } from "./context";
@@ -155,7 +155,7 @@ export interface DbFunction<
 }
 
 // ---------------------------------------------------------------------------
-// PGlite in-process execution
+// In-process execution without PL/v8
 // ---------------------------------------------------------------------------
 
 /** snake_case → camelCase mapper for PGlite query results (mirrors Drizzle's field naming) */
@@ -176,15 +176,15 @@ function snakeToCamel(
 }
 
 /**
- * Execute a db function's logic directly in Node.js when running against PGlite.
+ * Execute a database function in the application when the database lacks PL/v8.
  *
  * Strategy:
- * - Build async versions of every compiled query that run via pgliteClient.query()
- * - Provide a plv8 shim whose .execute() runs pgliteClient.query() (async, awaited)
+ * - Build async versions of each compiled query using the active PostgreSQL connection
+ * - Provide a plv8 shim whose .execute() runs queries on the same connection
  * - Serialize the whole logic function as an async function (see serializeLogic)
  *   whose `q.<query>()` and `plv8.execute()` calls are awaited
  */
-async function callInPglite(
+async function callWithoutPlv8(
   name: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- logic has complex generic signature
   // oxlint-disable-next-line no-explicit-any
@@ -195,13 +195,6 @@ async function callInPglite(
   params: Record<string, string | number | boolean | null>,
   logger: EndpointLogger,
 ): Promise<Record<string, string | number | boolean | null>> {
-  // Always go through the loopback pool, never the raw pgliteClient handle —
-  // pgliteClient is only ever non-null in the ONE process that won the
-  // port-claim race (see client.ts). Any other process, or a separate Vite
-  // SSR module instance within the same dev server, would otherwise crash on
-  // a null pgliteClient. The pool works uniformly everywhere, always.
-  const client = pool!;
-
   // Build async query functions — resolve placeholders from params
   const asyncQ: Record<
     string,
@@ -271,6 +264,10 @@ async function callInPglite(
     paramEntries.map(([n]) => [n, params[n] ?? null]),
   );
 
+  // PostgreSQL needs one connection to hold row locks until the ledger write
+  // commits. PGlite already serializes queries through its loopback pool.
+  const transaction = isPglite ? undefined : await pool!.connect();
+  const client = transaction ?? pool!;
   try {
     // eslint-disable-next-line @typescript-eslint/no-implied-eval -- intentional: executes serialized logic in async context for PGlite mode
     const fn = new Function("__q", "plv8", "__params", `return ${logicCall};`);
@@ -279,14 +276,27 @@ async function callInPglite(
     // on the same FIFO queue. Holding the queue here while awaiting those
     // statements deadlocked the whole PGlite instance ("queue is blocked:
     // direct") on the first credit balance read.
+    if (transaction) {
+      await transaction.query("BEGIN");
+    }
     const result = (await fn(asyncQ, plv8Shim, declaredParams)) as Record<
       string,
       string | number | boolean | null
     >;
+    if (transaction) {
+      await transaction.query("COMMIT");
+    }
     return mapRow(result, returnEntries);
   } catch (error) {
-    logger.error(`PGlite db function ${name} failed`, parseError(error));
+    logger.error(`Database function ${name} failed`, parseError(error));
+    if (transaction) {
+      await transaction.query("ROLLBACK");
+      // Match a failed PostgreSQL function call so the caller can report or retry it.
+      return Promise.reject(error);
+    }
     return buildDefaults(returnEntries);
+  } finally {
+    transaction?.release();
   }
 }
 
@@ -341,8 +351,8 @@ export function defineDbFunction<
     tableNames,
 
     async call(params, logger) {
-      if (isPglite) {
-        return callInPglite(
+      if (!supportsAdvancedSql) {
+        return callWithoutPlv8(
           def.name,
           def.logic,
           compiledQueries,

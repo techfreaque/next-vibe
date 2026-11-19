@@ -1785,7 +1785,16 @@ export class ServerStartRepository {
       const spawnNextProcess = (): ChildProcess => {
         const proc = spawn(
           "bun",
-          ["run", "next", "start", "--port", String(nextPort)],
+          [
+            "run",
+            "next",
+            "start",
+            "--port",
+            String(nextPort),
+            ...(process.env["VIBE_POD"] === "true"
+              ? ["--hostname", "127.0.0.1"]
+              : []),
+          ],
           {
             stdio: "pipe",
             env: {

@@ -26,4 +26,5 @@ export function jsonbBool(jsonbCol: SQLWrapper, key: string): SQL {
  * True when the database supports pgvector and full JSONB operators.
  * Gate feature branches that have no PGlite-compatible fallback.
  */
-export const supportsAdvancedSql = !isPglite;
+export const supportsAdvancedSql =
+  !isPglite && process.env["VIBE_POD"] !== "true";

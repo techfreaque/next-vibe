@@ -496,6 +496,19 @@ export function startWebSocketServer(
         }
       }
 
+      if (process.env["VIBE_POD"] === "true") {
+        const { requirePodLogin } = await import("./pod-login");
+        const denial = await requirePodLogin(
+          req,
+          url,
+          logger,
+          isLoopbackAddress(bunServer.requestIP(req)?.address ?? ""),
+        );
+        if (denial) {
+          return denial;
+        }
+      }
+
       // ── Proxy non-/ws WebSocket upgrades to internal Next.js (e.g. HMR) ──
       if (
         url.pathname !== "/ws" &&

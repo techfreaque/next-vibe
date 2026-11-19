@@ -15,7 +15,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { db, isPglite } from "next-vibe/database";
+import { db, supportsAdvancedSql } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
@@ -273,7 +273,7 @@ async function runVectorSearch(
     content: string | null;
     updatedAt: Date;
     similarity: number;
-  }> = isPglite
+  }> = !supportsAdvancedSql
     ? (
         await db
           .select({

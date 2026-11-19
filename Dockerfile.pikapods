@@ -1,0 +1,44 @@
+# syntax=docker/dockerfile:1.19
+FROM oven/bun:1.3.14-alpine AS build
+WORKDIR /app
+RUN apk upgrade --no-cache && apk add --no-cache nodejs python3 make g++
+COPY package.json bun.lock ./
+COPY patches ./patches
+RUN bun install --frozen-lockfile --ignore-scripts
+COPY . .
+ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
+RUN --mount=type=cache,target=/app/.next-prod/cache \
+    NODE_OPTIONS=--max-old-space-size=16384 VIBE_BUILD_PLACEHOLDER_ENV=true \
+    bun src/vibe/platforms/cli/vibe-runtime.ts build --generate=false --package=false --migrate=false --seed=false --db-setup=false --webpack=true && \
+    test -s .next-prod/BUILD_ID
+
+FROM oven/bun:1.3.14-alpine
+WORKDIR /app
+RUN apk upgrade --no-cache && apk add --no-cache nodejs
+ENV NODE_ENV=production VIBE_POD=true NEXT_PUBLIC_VIBE_MODE=cloud PORT=3000 \
+    NEXT_TELEMETRY_DISABLED=1 CHAT_STORAGE_TYPE=filesystem CHAT_STORAGE_PATH=/data/chat \
+    WS_PUBSUB_TYPE=local VIBE_DISABLE_PROXY=false
+# Bun's runtime resolves CLI endpoints, widgets and production seeds from source.
+# Keep their JS dependencies. Omit mobile SDKs, non-musl native binaries and build artifacts.
+COPY --from=build --exclude=*.map --exclude=**/*.map \
+    --exclude=**/*.d.ts --exclude=**/*.d.mts --exclude=**/*.d.cts \
+    --exclude=react-native --exclude=react-native-* --exclude=@react-native --exclude=@react-native-async-storage \
+    --exclude=hermes-compiler --exclude=expo --exclude=expo-* --exclude=@expo --exclude=metro --exclude=metro-* \
+    --exclude=@typescript --exclude=@types --exclude=canvaskit-wasm --exclude=googleapis \
+    --exclude=@anthropic-ai/claude-agent-sdk-linux-x64 --exclude=@next/swc-linux-x64-gnu --exclude=lucide-react-native \
+    /app/node_modules ./node_modules
+COPY --from=build --chown=bun:bun --exclude=cache --exclude=trace --exclude=trace-build --exclude=types \
+    --exclude=diagnostics --exclude=**/*.nft.json /app/.next-prod ./.next-prod
+COPY --from=build /app/src ./src
+COPY --from=build --exclude=**/*.map /app/public ./public
+COPY --from=build --exclude=meta/*_snapshot.json /app/drizzle ./drizzle
+COPY --from=build /app/package.json /app/tsconfig.json /app/next.config.ts /app/LICENSE ./
+COPY --from=build --chown=bun:bun /app/scripts/pikapods ./scripts/pikapods
+RUN mkdir -p /data/files /data/chat .tmp && ln -s /data/files /app/data && ln -s /data/uploads /app/uploads && ln -s /data/settings.env /app/.env && \
+    ln -s /data/chat /app/chat-data && \
+    printf '%s\n' '#!/bin/sh' 'cd /app' 'exec bun src/vibe/platforms/cli/vibe-runtime.ts "$@"' > /usr/local/bin/vibe && \
+    chmod 755 /usr/local/bin/vibe && chown -R bun:bun /data .tmp
+USER bun
+VOLUME ["/data"]
+EXPOSE 3000
+CMD ["/bin/sh", "/app/scripts/pikapods/start.sh"]

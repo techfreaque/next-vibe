@@ -604,7 +604,7 @@ async function vectorSearch(opts: VectorSearchOpts): Promise<RelevantNode[]> {
   }
 
   try {
-    const { db, isPglite } = await import("next-vibe/database");
+    const { db, supportsAdvancedSql } = await import("next-vibe/database");
     const { cortexNodes } = await import("./db");
     const { chatMessages } = await import("../chat/db");
     const { CortexNodeType } = await import("./enum");
@@ -616,7 +616,7 @@ async function vectorSearch(opts: VectorSearchOpts): Promise<RelevantNode[]> {
     // the stored value ("[0.1,0.2,...]", pgvector's own text format) is
     // identical either way. Only the `<=>` cosine-distance OPERATOR below
     // needs a substitute: compute it in JS instead of in SQL.
-    if (isPglite) {
+    if (!supportsAdvancedSql) {
       return vectorSearchPglite({
         db,
         cortexNodes,
@@ -1820,7 +1820,7 @@ export async function loadRawEmbeddingScores(
       return { scores: [], embeddingGenerated: false };
     }
 
-    const { db, isPglite } = await import("next-vibe/database");
+    const { db, supportsAdvancedSql } = await import("next-vibe/database");
     const { cortexNodes } = await import("./db");
     const { CortexNodeType } = await import("./enum");
     const { eq, and, isNotNull, sql } = await import("drizzle-orm");
@@ -1836,7 +1836,7 @@ export async function loadRawEmbeddingScores(
     // score in JS, same as vectorSearchPglite. Without this the debug view
     // always reported "embedding failed" on local/PGlite instances.
     const rows: Array<{ path: string; updatedAt: Date; similarity: number }> =
-      isPglite
+      !supportsAdvancedSql
         ? (
             await db
               .select({
