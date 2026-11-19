@@ -37,7 +37,6 @@ export function EmailTemplate({
   children,
   locale,
   tracking,
-  recipientEmail,
 }: EmailTemplateProps): JSX.Element {
   const currentYear = getCurrentYear();
   const { t: globalT } = configScopedTranslation.scopedT(locale);
@@ -90,7 +89,6 @@ export function EmailTemplate({
                 alt={globalT("appName")}
                 width="28"
                 height="28"
-                recipientEmail={recipientEmail}
                 style={{
                   display: "block",
                 }}
