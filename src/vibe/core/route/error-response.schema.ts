@@ -15,6 +15,7 @@ import type { TranslatedKeyType } from "../i18n/core/scoped-translation";
 export const errorResponseSchema = z.object({
   success: z.literal(false),
   message: z.string() as z.ZodType<TranslatedKeyType>,
+  publicRoleDenial: z.literal(true).optional(),
   errorType: z.object({
     errorKey: z.string(),
     errorCode: z.coerce.number(),

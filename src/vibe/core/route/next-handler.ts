@@ -17,7 +17,6 @@ import {
   CSRF_REJECTED_HEADER_NAME,
   CSRF_RETRY_HEADER_NAME,
   CSRF_TOKEN_COOKIE_NAME,
-  CSRF_TOKEN_HEADER_NAME,
   LEAD_ID_COOKIE_NAME,
   REQUEST_ID_HEADER_NAME,
 } from "@/env/constants";
@@ -36,6 +35,7 @@ import {
   MAX_REQUEST_BODY_BYTES,
   MAX_UPLOAD_MEGABYTES,
 } from "./body-limit";
+import { validateCsrf } from "./csrf";
 import { ErrorResponseError } from "./error-response-error";
 import { type ApiHandlerOptions, createGenericHandler } from "./handler";
 import { parseRequestBody, parseSearchParams } from "./next-request-parser";
@@ -49,48 +49,6 @@ import {
   type ResponseType,
 } from "./response.schema";
 
-const MUTATING_METHODS = new Set([
-  Methods.POST,
-  Methods.PUT,
-  Methods.DELETE,
-  Methods.PATCH,
-]);
-
-/**
- * Validate CSRF double-submit cookie for browser-originated mutating requests.
- *
- * Rules (fail-open for non-browser contexts):
- * - Skip if method is GET/HEAD/OPTIONS
- * - Skip if no csrf_token cookie present (server-to-server, CLI, native - no cookie)
- * - Skip if Authorization header present (bearer-token auth - not cookie-based)
- * - Reject if csrf_token cookie present but X-CSRF-Token header is missing or mismatched
- */
-function validateCsrf(
-  request: NextRequest,
-  method: Methods,
-): { valid: true; checked: boolean } | { valid: false; reason: string } {
-  if (!MUTATING_METHODS.has(method)) {
-    return { valid: true, checked: false };
-  }
-  // Bearer-token auth (React Native, server-to-server) - not vulnerable to CSRF
-  if (request.headers.get("authorization")) {
-    return { valid: true, checked: false };
-  }
-  const cookieToken = request.cookies.get(CSRF_TOKEN_COOKIE_NAME)?.value;
-  if (!cookieToken) {
-    // No CSRF cookie - must be a non-browser client (CLI, MCP, server). Allow.
-    return { valid: true, checked: false };
-  }
-  const headerToken = request.headers.get(CSRF_TOKEN_HEADER_NAME);
-  if (!headerToken) {
-    return { valid: false, reason: "csrf_header_missing" };
-  }
-  if (headerToken !== cookieToken) {
-    return { valid: false, reason: "csrf_token_mismatch" };
-  }
-  return { valid: true, checked: true };
-}
-
 /** How many cookies named `name` the raw Cookie header carries. */
 function countCookies(cookieHeader: string | null, name: string): number {
   if (!cookieHeader) {
@@ -99,6 +57,25 @@ function countCookies(cookieHeader: string | null, name: string): number {
   return cookieHeader
     .split(";")
     .filter((part) => part.trim().startsWith(`${name}=`)).length;
+}
+
+/**
+ * File responses carry user uploads (chat attachments, avatars) on our own
+ * origin. An SVG/HTML/XML file opened directly would run its script as
+ * unbottled.ai (stored XSS that also reads the csrf cookie), so active types
+ * get an opaque-origin sandbox; nothing gets MIME-sniffed into one.
+ */
+const ACTIVE_CONTENT_TYPE_PATTERN = /svg|html|xml|javascript/i;
+export function fileResponseSecurityHeaders(
+  contentType: string,
+): Record<string, string> {
+  const headers: Record<string, string> = {
+    "X-Content-Type-Options": "nosniff",
+  };
+  if (ACTIVE_CONTENT_TYPE_PATTERN.test(contentType)) {
+    headers["Content-Security-Policy"] = "sandbox";
+  }
+  return headers;
 }
 
 /** Client-minted ids are uuids; accept any short token, never arbitrary text. */
@@ -172,7 +149,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
     const endInFlight = trackInFlightRequest();
     try {
       // CSRF double-submit validation for mutating browser requests
-      const csrfCheck = validateCsrf(request, endpoint.method as Methods);
+      const csrfCheck = validateCsrf(request, endpoint.method);
       const csrfRetry = request.headers.get(CSRF_RETRY_HEADER_NAME) === "1";
       if (!csrfCheck.valid) {
         // Our own client always echoes the cookie, so a rejection means the
@@ -180,6 +157,8 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         // or the request was not ours: say which from the wire.
         logger.warn("[CSRF] Mutating request rejected", {
           reason: csrfCheck.reason,
+          endpoint: endpoint.path.join("/"),
+          method: endpoint.method,
           csrfCookieCount: countCookies(
             request.headers.get("cookie"),
             CSRF_TOKEN_COOKIE_NAME,
@@ -212,7 +191,14 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         csrfResponse.headers.set(CSRF_REJECTED_HEADER_NAME, csrfCheck.reason);
         return csrfResponse;
       }
-      if (csrfRetry && csrfCheck.checked) {
+      if (csrfCheck.fetchMetadataFallback) {
+        logger.info("[CSRF] Same-origin request accepted by Fetch Metadata", {
+          reason: csrfCheck.fetchMetadataFallback,
+          endpoint: endpoint.path.join("/"),
+          method: endpoint.method,
+          csrfRetry,
+        });
+      } else if (csrfRetry && csrfCheck.checked) {
         logger.info("[CSRF] Retried request passed validation", {
           endpoint: endpoint.path.join("/"),
           method: endpoint.method,
@@ -312,6 +298,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           status: 200,
           headers: {
             "Content-Type": result.contentType,
+            ...fileResponseSecurityHeaders(result.contentType),
             ...result.headers,
           },
         });

@@ -23,6 +23,7 @@ export function fail({
   errorType,
   cause,
   expected,
+  publicRoleDenial,
 }: {
   message: TranslatedKeyType;
   errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
@@ -35,6 +36,8 @@ export function fail({
    * visible. Internal only: stripped at the wire boundary, never sent to clients.
    */
   expected?: boolean;
+  /** The server resolved a guest for an endpoint that requires a user. */
+  publicRoleDenial?: true;
 }): ErrorResponseType {
   return {
     success: false,
@@ -42,6 +45,7 @@ export function fail({
     errorType,
     cause,
     ...(expected ? { expected: true } : {}),
+    ...(publicRoleDenial ? { publicRoleDenial } : {}),
   };
 }
 
@@ -326,6 +330,8 @@ export type ErrorResponseType<
    * it never crosses a wire or reaches a client.
    */
   expected?: boolean;
+  /** Lets a client still showing a signed-in user refresh its identity. */
+  publicRoleDenial?: true;
 };
 
 export interface SuccessResponseType<TResponseData> {
