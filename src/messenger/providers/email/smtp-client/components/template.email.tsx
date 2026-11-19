@@ -12,10 +12,13 @@ import { FEEDBACK_REWARD_CREDITS } from "@/credits/constants";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { scopedTranslation } from "../i18n";
-import { EmailImage } from "./email-image.email";
+import { EmailLogo } from "./email-image.email";
 import { TrackedLink } from "./tracked_link.email";
 import { TrackedPixel } from "./tracked_pixel.email";
 import type { TrackingContext } from "./tracking_context.email";
+
+const emailFontFamily =
+  '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
 /** Evaluated at send time — kept outside the component body so render stays pure. */
 function getCurrentYear(): number {
@@ -48,8 +51,7 @@ export function EmailTemplate({
       <Body
         style={{
           backgroundColor: "#f8fafc",
-          fontFamily:
-            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+          fontFamily: emailFontFamily,
           margin: "0",
           padding: "0",
         }}
@@ -75,58 +77,41 @@ export function EmailTemplate({
               borderBottom: "3px solid #3b82f6",
             }}
           >
-            {/* Logo section - left aligned like nav */}
+            <table role="presentation" cellPadding={0} cellSpacing={0}>
+              <tbody>
+                <tr>
+                  <td style={{ verticalAlign: "middle" }}>
+                    <EmailLogo alt="" />
+                  </td>
+                  <td style={{ verticalAlign: "middle", paddingLeft: "6px" }}>
+                    <strong
+                      style={{
+                        fontFamily: emailFontFamily,
+                        fontSize: "16px",
+                        fontWeight: 700,
+                        color: "#111827",
+                        lineHeight: "16px",
+                        letterSpacing: "-0.025em",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {globalT("appName")}
+                    </strong>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                marginBottom: "12px",
+                paddingTop: "12px",
+                fontSize: "14px",
+                fontWeight: "500",
+                color: "#64748b",
+                textAlign: "left",
+                fontStyle: "italic",
               }}
             >
-              <EmailImage
-                src="/images/unbottled-icon.png"
-                alt={globalT("appName")}
-                width="28"
-                height="28"
-                style={{
-                  display: "block",
-                }}
-              />
-              <div
-                style={{
-                  fontSize: "16px",
-                  fontWeight: "700",
-                  margin: "0",
-                  color: "#111827",
-                  lineHeight: "1",
-                  letterSpacing: "-0.025em",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {globalT("appName")}
-              </div>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-              }}
-            >
-              {/* Tagline - below logo, left aligned */}
-              <div
-                style={{
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  color: "#64748b", // Muted blue-gray for tagline
-                  textAlign: "left",
-                  fontStyle: "italic",
-                  margin: "0",
-                }}
-              >
-                {t("components.email.tagline")}
-              </div>
+              {t("components.email.tagline")}
             </div>
           </Section>
 

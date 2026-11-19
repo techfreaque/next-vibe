@@ -35,6 +35,7 @@ import { SpecialFolderType } from "../../messages/enum";
 import { LocalStateProvider } from "../local-state-base";
 import type { SendMessageInput, SendMessageResult } from "../provider";
 import { toImapShape } from "./imap-client/db";
+import { withHostedEmailLogo } from "./smtp-client/email-logo";
 import { scopedTranslation as smtpScopedTranslation } from "./smtp-client/i18n";
 import type { SmtpSelectionCriteria } from "./smtp-client/repository";
 import { SmtpRepository } from "./smtp-client/repository";
@@ -193,7 +194,7 @@ export class SmtpMessengerProvider extends LocalStateProvider {
       `MIME-Version: 1.0`,
       `Content-Type: text/html; charset=utf-8`,
       ``,
-      msg.html,
+      withHostedEmailLogo(msg.html),
     ].join("\r\n");
 
     const targetMailbox: string = sentPath;

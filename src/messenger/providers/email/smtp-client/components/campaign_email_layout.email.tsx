@@ -20,6 +20,7 @@ import { contactClientRepository } from "@/contact/repository-client";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { scopedTranslation } from "../i18n";
+import { EmailLogo } from "./email-image.email";
 import { TrackedLink } from "./tracked_link.email";
 import { TrackedPixel } from "./tracked_pixel.email";
 import type { TrackingContext } from "./tracking_context.email";
@@ -85,6 +86,9 @@ export function CampaignEmailLayout({
               textAlign: "center",
             }}
           >
+            <div style={{ display: "inline-block", marginBottom: "8px" }}>
+              <EmailLogo alt={configT("appName")} />
+            </div>
             <div
               style={{
                 fontSize: "12px",

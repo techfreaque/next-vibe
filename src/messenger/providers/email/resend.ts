@@ -30,6 +30,12 @@ import { scopedTranslation as providerScopedTranslation } from "../../i18n";
 import type { SendMessageInput, SendMessageResult } from "../provider";
 import { SendOnlyProvider } from "../send-only-base";
 import { buildListUnsubscribeHeaders } from "./list-unsubscribe";
+import {
+  EMAIL_LOGO_CID,
+  EMAIL_LOGO_CONTENT_TYPE,
+  EMAIL_LOGO_FILENAME,
+} from "./smtp-client/email-logo";
+import { prepareEmailLogo } from "./smtp-client/inline-logo";
 
 /** Resend client cache keyed by api key */
 const clientCache = new Map<string, Resend>();
@@ -82,13 +88,24 @@ export class ResendMessengerProvider extends SendOnlyProvider {
       const fromName = input.senderName ?? account?.name ?? "Messenger";
 
       const resend = getResendClient(apiKey);
+      const { html, logo } = await prepareEmailLogo(input.html);
 
       const { data, error } = await resend.emails.send({
         from: `${fromName} <${fromEmail}>`,
         to: [input.to],
         subject: input.subject ?? "(no subject)",
         text: input.text,
-        html: input.html,
+        html,
+        attachments: logo
+          ? [
+              {
+                filename: EMAIL_LOGO_FILENAME,
+                content: logo,
+                contentId: EMAIL_LOGO_CID,
+                contentType: EMAIL_LOGO_CONTENT_TYPE,
+              },
+            ]
+          : undefined,
         replyTo: input.replyTo,
         headers: input.unsubscribeUrl
           ? buildListUnsubscribeHeaders(input.to, input.unsubscribeUrl)

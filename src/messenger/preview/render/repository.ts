@@ -22,6 +22,7 @@ import { getTemplate } from "@/generated/email/index";
 
 import type { EmailsT } from "../../i18n";
 import { createTrackingContext } from "../../providers/email/smtp-client/components/tracking_context.email";
+import { withHostedEmailLogo } from "../../providers/email/smtp-client/email-logo";
 import {
   getTemplateSubject,
   renderTemplateComponent,
@@ -112,7 +113,7 @@ export class EmailPreviewRenderRepository {
       }
 
       // Render to HTML
-      const html = await render(jsx);
+      const html = withHostedEmailLogo(await render(jsx));
 
       const subject = getTemplateSubject(template, locale);
 

@@ -43,6 +43,7 @@ import { EmailSecurityType } from "../enum";
 import { buildListUnsubscribeHeaders } from "../list-unsubscribe";
 import { SMTP_ERROR_MESSAGES } from "./constants";
 import type { SmtpClientT } from "./i18n";
+import { prepareSmtpEmailLogo } from "./inline-logo";
 
 export interface SmtpSelectionCriteria {
   campaignType: typeof CampaignTypeValue;
@@ -830,7 +831,7 @@ export class SmtpRepository {
         to: params.toName ? `${params.toName} <${params.to}>` : params.to,
         replyTo: params.replyTo,
         subject: params.subject,
-        html: params.html,
+        ...(await prepareSmtpEmailLogo(params.html)),
         text: params.text,
         headers,
       });
