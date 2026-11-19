@@ -5,8 +5,18 @@ import { ContentLevel } from "next-vibe/agent/skills/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
 import { buildFaqStructuredData } from "../../_components/faq-structured-data";
-import { getModelFacts, listModelFacts, type ModelFacts } from "./model-facts";
-import { isApiCallable, uncensoredKind } from "./model-format";
+import {
+  getModelFacts,
+  listModelFacts,
+  type ModelFacts,
+  suggestComparisons,
+} from "./model-facts";
+import {
+  buildFactRows,
+  chatHref,
+  isApiCallable,
+  uncensoredKind,
+} from "./model-format";
 import { listMediaFacts } from "./model-media-facts";
 import {
   bestForContent,
@@ -15,6 +25,7 @@ import {
   findRelatedMediaModels,
   findRelatedModels,
   HAND_PICKED_MODEL_IDS,
+  mediaBestForContent,
   mediaModelFaq,
   mediaModelMeta,
 } from "./model-seo";
@@ -48,7 +59,12 @@ const ALL: AgentEnvAvailability = {
   unbottledForce: false,
 };
 
-const LOCALES: readonly CountryLanguage[] = ["en-US", "de-DE", "pl-PL", "fr-FR"];
+const LOCALES: readonly CountryLanguage[] = [
+  "en-US",
+  "de-DE",
+  "pl-PL",
+  "fr-FR",
+];
 
 function factsOf(id: ChatModelId): ModelFacts {
   const facts = getModelFacts(id, ALL);
@@ -117,13 +133,17 @@ describe("best for", () => {
 });
 
 describe("uncensored kinds", () => {
-  test("UncensoredLM has its own worldview, GLM 5.3 Uncensored has refusals removed", () => {
+  test("labels each documented method and leaves unknown methods unspecified", () => {
     expect(uncensoredKind(factsOf(ChatModelId.UNCENSORED_LM_V1_2))).toBe(
       "ownWorldview",
     );
     expect(uncensoredKind(factsOf(ChatModelId.GLM_5_3_UNCENSORED))).toBe(
-      "refusalsRemoved",
+      "abliterated",
     );
+    expect(uncensoredKind(factsOf(ChatModelId.DRUMMER_ARTEMIS_31B))).toBe(
+      "fineTuned",
+    );
+    expect(uncensoredKind(factsOf(ChatModelId.GAB_AI_ARYA))).toBe("unlisted");
     expect(uncensoredKind(factsOf(ChatModelId.CLAUDE_SONNET_5_5))).toBeNull();
   });
 });
@@ -153,6 +173,62 @@ describe("related models", () => {
       slug: base.slug,
       reason: "original",
     });
+    expect(suggestComparisons(base, ALL).map((other) => other.id)).toContain(
+      variant.id,
+    );
+    expect(suggestComparisons(variant, ALL).map((other) => other.id)).toContain(
+      base.id,
+    );
+  });
+});
+
+describe("fact sheets and trial links", () => {
+  test("ties optional prices to the same provider as the reference turn", () => {
+    const facts = factsOf(ChatModelId.CLAUDE_SONNET_5_5);
+    const rows = buildFactRows(facts, "en-US");
+    expect(facts.providers[0]).toBe(facts.priceProvider);
+    expect(rows.find((row) => row.key === "price")?.hint).toContain(
+      facts.priceProvider,
+    );
+    expect(rows.find((row) => row.key === "cacheReadPrice")?.missing).toBe(
+      false,
+    );
+    expect(rows.find((row) => row.key === "imageOutputPrice")?.missing).toBe(
+      true,
+    );
+    const image = listModelFacts(ALL).find(
+      (model) =>
+        model.tokenPrice !== null &&
+        model.tokenPrice.imageOutputCredits !== null,
+    );
+    expect(image).toBeDefined();
+    if (image !== undefined) {
+      expect(chatModelFaq(image, "en-US")[0]?.answer).toContain(
+        "one generated image",
+      );
+    }
+  });
+
+  test("prefills a prompt and the model id on the locale's chat page", () => {
+    const facts = factsOf(ChatModelId.CLAUDE_SONNET_5_5);
+    const url = new URL(chatHref("fr-FR", facts), "https://example.test");
+    expect(url.pathname).toBe("/fr-FR/threads/private/new");
+    expect(url.searchParams.get("model")).toBe(facts.id);
+    expect(url.searchParams.get("q")).toBeTruthy();
+  });
+
+  test("media guidance and pricing use the model's output and a visible provider", () => {
+    for (const facts of listMediaFacts(ALL)) {
+      const bestFor = mediaBestForContent(facts, "en-US");
+      expect(bestFor.good).toHaveLength(1);
+      expect(bestFor.skip.length).toBeGreaterThan(0);
+      if (facts.price !== null) {
+        expect(facts.providers).toContain(facts.price.provider);
+        expect(mediaModelFaq(facts, "en-US")[0]?.answer).toContain(
+          facts.price.provider,
+        );
+      }
+    }
   });
 });
 
@@ -184,8 +260,11 @@ describe("FAQ", () => {
   test("FAQPage JSON-LD carries the visible text verbatim", () => {
     const faq = chatModelFaq(factsOf(ChatModelId.CLAUDE_SONNET_5_5), "de-DE");
     const parsed = JSON.parse(JSON.stringify(buildFaqStructuredData(faq)));
-    expect(parsed.mainEntity.map((q: { name: string }) => q.name)).toEqual(
-      faq.map((item) => item.question),
+    expect(parsed.mainEntity).toMatchObject(
+      faq.map(({ question, answer }) => ({
+        name: question,
+        acceptedAnswer: { text: answer },
+      })),
     );
   });
 });

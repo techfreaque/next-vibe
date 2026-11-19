@@ -52,12 +52,7 @@ import {
   formatTokenCount,
   getModelFacts,
 } from "@/_pages/models/_shared/model-facts";
-import {
-  creditValueText,
-  formatNumber,
-  tierName,
-} from "@/_pages/models/_shared/model-format";
-import { scopedTranslation as modelsScopedTranslation } from "@/_pages/models/i18n";
+import { formatNumber, tierName } from "@/_pages/models/_shared/model-format";
 import { configScopedTranslation } from "@/env/i18n";
 import {
   CREDIT_VALUE_USD,
@@ -239,7 +234,10 @@ export async function tanstackLoader({
           currency,
           locale,
         ),
-        perUnit: facts.messagesPerCurrencyUnit,
+        perUnit:
+          facts.creditsPerMessage > 0
+            ? Math.floor(1 / CREDIT_VALUE_USD / facts.creditsPerMessage)
+            : null,
       },
     ];
   });
@@ -334,7 +332,6 @@ export function TanstackPage({
 }: RoleplayPostPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
-  const { t: modelsT } = modelsScopedTranslation.scopedT(locale);
   const appName = configT("appName");
   const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
   const num = (value: number): string => formatNumber(value, locale);
@@ -358,7 +355,11 @@ export function TanstackPage({
     modelCount: rows.length,
     uncensoredCount: uncensoredRows.length,
     unit,
-    creditValue: creditValueText(locale, modelsT),
+    creditValue: formatCurrency(
+      CREDIT_VALUE_USD,
+      creditCurrency(locale),
+      locale,
+    ),
     cheapestName: cheapest?.name ?? "",
     cheapestCredits: num(cheapest?.creditsPerMessage ?? 0),
     cheapestPrice: cheapest?.messagePrice ?? "",

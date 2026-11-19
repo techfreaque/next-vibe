@@ -24,9 +24,9 @@ export const translations = {
       descriptionFlat:
         "{{model}} by {{lab}}: ~{{credits}} credits ({{money}}) per message, {{context}} context, {{tier}} tier. Free credits to start.",
       descriptionUncensored:
-        "{{model}} answers what filtered AI refuses. {{input}} input, {{output}} output per 1M tokens, {{context}} context. Chat or API, one-time 18+ check.",
+        "{{model}} is an uncensored-tier model. {{input}} input, {{output}} output per 1M tokens, {{context}} context. Chat or API, one-time 18+ check.",
       descriptionUncensoredFlat:
-        "{{model}} answers what filtered AI refuses. ~{{credits}} credits ({{money}}) per message, {{context}} context. Chat or API, one-time 18+ check.",
+        "{{model}} is an uncensored-tier model. ~{{credits}} credits ({{money}}) per message, {{context}} context. Chat or API, one-time 18+ check.",
       descriptionLegacy:
         "{{model}} by {{lab}} is a legacy model, replaced by {{successor}}. {{context}} context, ~{{credits}} credits per message. Specs, price and successor.",
       descriptionLegacyNoSuccessor:
@@ -71,7 +71,7 @@ export const translations = {
     },
     uncensored: {
       name: "Uncensored",
-      line: "Two kinds, both answer everything. Most are mainstream models with the refusal reflex cut out: same training, same worldview, no more dodging. UncensoredLM is the other kind: trained on books and documents banned from the mainstream internet, so its political takes run against the mainstream.",
+      line: "Models offered for less restricted conversations and creative work.",
     },
   },
   modality: {
@@ -89,15 +89,22 @@ export const translations = {
     price: "Estimated price per message",
     priceValue: "~{{credits}} credits",
     priceFree: "Free",
-    priceHint: "≈ {{count}} messages for {{unit}}",
-    priceHintFree: "Costs you nothing per message",
+    referenceTurn:
+      "Reference message with {{input}} input tokens and {{output}} output tokens.",
+    referenceImageTurn:
+      "Reference message with {{input}} input tokens, {{output}} text output tokens and one generated image.",
+    priceProvider: "Rates shown for {{provider}}.",
+    cacheReadPrice: "Cached input per 1M tokens",
+    cacheWritePrice: "Cache writes per 1M tokens",
+    imageOutputPrice: "Image output per 1M tokens",
+    perMillionCredits: "{{credits}} credits",
     priceFootnote:
-      "A typical message: 16K tokens in, 1.5K out. Short replies cost less. Models served via OpenRouter bill the real provider cost plus our markup, so actual charges vary. 1 credit = {{value}}.",
+      "Charges depend on usage and provider. Currency estimates use the one-time credit pack rate of {{value}} per credit.",
     context: "Context window",
     contextValue: "{{tokens}} tokens",
     contextHint: "≈ {{pages}} pages of text in one go",
-    inputs: "Reads",
-    outputs: "Writes",
+    inputs: "Input modalities",
+    outputs: "Output modalities",
     providers: "Served via",
     tools: "Tool use",
     toolsYes: "Yes - search, memory, code and more",
@@ -119,8 +126,9 @@ export const translations = {
     apiIdLegacyNoSuccessor: "Not on the API anymore.",
     notListed: "Not listed",
     notUncensored: "Filtered",
-    fixedPrice: "Fixed price per message",
+    fixedPrice: "Fixed price per message.",
     notPublished: "Not published",
+    apiIdUnsupported: "This model is outside the text chat API.",
   },
   strengths: {
     coding: "Code",
@@ -136,11 +144,19 @@ export const translations = {
   uncensoredKind: {
     ownWorldview: {
       name: "Own worldview",
-      line: "Trained on books and documents banned from the mainstream internet. Political takes run against the mainstream.",
+      line: "Trained on books and documents banned from the mainstream internet, with political takes that run against the mainstream.",
     },
-    refusalsRemoved: {
-      name: "Refusals removed",
-      line: "Built on an existing model and tuned to stop refusing. Same training, same worldview, no more dodging.",
+    abliterated: {
+      name: "Abliterated",
+      line: "The base model’s weights were modified to reduce refusals.",
+    },
+    fineTuned: {
+      name: "Fine-tuned",
+      line: "An existing model was fine-tuned for less restricted responses.",
+    },
+    unlisted: {
+      name: "Method unspecified",
+      line: "This model is in the uncensored tier. Its training or filtering method is unspecified.",
     },
   },
   units: {
@@ -166,7 +182,7 @@ export const translations = {
       vision: "Reading screenshots, photos and scans",
       videoInput: "Understanding video",
       audioInput: "Listening to audio",
-      imageGen: "Generating and editing images in chat",
+      imageGen: "Generating images in chat",
       longContext: "Whole books or codebases in one prompt",
       budget: "High-volume work on a small budget",
       tools: "Agent work with tools: search, memory, code",
@@ -175,12 +191,25 @@ export const translations = {
     },
     skipItems: {
       noTools: "Agent workflows: it has no tool calling",
-      textOnly: "Images or screenshots: it reads text only",
-      pricey: "Bulk jobs: it costs more per message than most models here",
+      noImages: "Tasks that require image input",
+      pricey: "Bulk jobs at {{credits}} credits per reference message",
       smallContext: "Very long documents: context ends at {{tokens}} tokens",
       filtered: "Topics {{lab}} filters: use an uncensored model for those",
       legacy: "New projects: {{successor}} replaces it",
       legacyNoSuccessor: "New projects: it is a legacy model",
+      coding: "Code-heavy work",
+      analysis: "In-depth analysis",
+      reasoning: "Complex reasoning",
+      creative: "Creative writing",
+      roleplay: "Character roleplay",
+    },
+    media: {
+      image: "Generating images",
+      video: "Generating video clips",
+      audio: "Generating music",
+      tts: "Turning written text into speech",
+      stt: "Transcribing recorded speech",
+      otherOutputs: "Tasks that need output other than {{outputs}}",
     },
     picks: {
       claudeOpus:
@@ -213,13 +242,13 @@ export const translations = {
       uncensoredLm:
         "The uncensored model with its own worldview. Trained on books and documents banned from the mainstream internet, so expect political takes the big labs won't give you.",
       glmUncensored:
-        "GLM 5.3 with the refusals removed. Same brain, same worldview, answers everything. One of the strongest reasoners in the uncensored tier.",
+        "Abliterated GLM 5.3 for reasoning, coding and analysis. Supports tool calling.",
       glmFlashUncensored:
-        "Fast, cheap and refusal-free. GLM 5.3 Flash without the dodging, and it reads images.",
+        "Abliterated GLM 5.3 Flash for quick replies and prompts with images.",
       deepseekFlashUncensored:
-        "DeepSeek V4.1 Flash with the refusals removed. Code, analysis and fiction without lectures, at a low price.",
+        "Abliterated DeepSeek V4.1 Flash for code, analysis and fiction. Accepts images.",
       veniceUncensored:
-        "Venice's own uncensored chat model. Cheap and quick, made for creative writing and roleplay without refusals.",
+        "Venice’s fine-tuned chat model for creative writing and roleplay.",
     },
   },
   related: {
@@ -241,20 +270,16 @@ export const translations = {
     price: {
       q: "How much does {{model}} cost?",
       aTokens:
-        "About {{credits}} credits ({{money}}) for a typical message: 16K tokens in, 1.5K out. Per 1M tokens: {{input}} input, {{output}} output. You pay per use in credits. Free credits to start.",
-      aFlat:
-        "About {{credits}} credits ({{money}}) for a typical message. You pay per use in credits. Free credits to start.",
+        "About {{credits}} credits ({{money}}) for a reference message via {{provider}}. Per million tokens, {{input}} for input and {{output}} for text output.",
+      aFlat: "{{credits}} credits ({{money}}) per message via {{provider}}.",
       aFree: "{{model}} costs no credits per message.",
     },
     uncensored: {
       q: "Is {{model}} uncensored?",
       mainstream:
         "No. {{model}} keeps {{lab}}'s safety filters and refuses some topics. For those, switch to an uncensored model in the same chat.",
-      open: "Partly. {{model}} is an open model with lighter filters than mainstream models: it refuses less, but it is not fully uncensored. For zero refusals, pick a model from the uncensored tier.",
-      refusalsRemoved:
-        "Yes. {{model}} is built on an existing model with the refusal reflex removed: same training, same worldview, it just stops dodging questions. Uncensored models need a one-time 18+ confirmation.",
-      ownWorldview:
-        "Yes, and not like most. {{model}} is trained on books and documents banned from the mainstream internet, so its political takes run against the mainstream. Most other uncensored models only have their refusals removed. Uncensored models need a one-time 18+ confirmation.",
+      open: "{{model}} is in the Open tier. Its responses can still be filtered.",
+      consent: "Uncensored chat models require a one-time 18+ confirmation.",
     },
     api: {
       q: "Can I use {{model}} via API?",
@@ -268,26 +293,26 @@ export const translations = {
       q: "How big is the context window of {{model}}?",
       a: "{{tokens}} tokens. That is about {{pages}} pages of text in one go.",
     },
+    providers: {
+      q: "Who serves {{model}} on this platform?",
+      a: "Available providers include {{providers}}.",
+    },
     inputs: {
-      q: "Can {{model}} read images and use tools?",
-      images: "Yes, it reads images: send screenshots, photos or scans.",
-      imagesAndMore: "Yes, it reads images. Other inputs: {{more}}.",
-      textOnly: "No, it reads text only.",
-      toolsYes:
-        "It supports tool calling: web search, memory and code in chat, function calls on the API.",
-      toolsNo: "It has no tool calling, so it answers from what it knows.",
+      q: "What inputs and outputs does {{model}} support?",
+      modalities: "Inputs include {{inputs}}. Outputs include {{outputs}}.",
+      toolsYes: "It supports tool calling.",
+      toolsNo: "Tool calling is unavailable.",
     },
   },
   mediaFaq: {
     price: {
       q: "How much does {{model}} cost?",
-      a: "{{credits}} credits ({{money}}) per {{unit}}. Size, length and options change the price. You pay per use in credits. Free credits to start.",
-      aNone:
-        "The price depends on size, length and options. The live price is in the table above. You pay per use in credits. Free credits to start.",
+      a: "{{credits}} credits ({{money}}) per {{unit}} via {{provider}}. Options such as length or size can affect the charge.",
+      aNone: "A reference price is currently unavailable.",
     },
     use: {
       q: "How do I use {{model}}?",
-      a: "Open the {{type}} tool with {{model}} already selected and run it. Or ask any chat model to use {{model}} for you.",
+      a: "Open the creation tool with {{model}} selected to get started.",
     },
     inputs: {
       q: "What does {{model}} take as input?",
@@ -297,8 +322,7 @@ export const translations = {
       q: "Is {{model}} uncensored?",
       mainstream: "No. {{model}} runs with {{lab}}'s content filters.",
       open: "Partly. {{model}} has lighter filters than mainstream models, but it is not fully uncensored.",
-      uncensored:
-        "Yes. {{model}} sits in the uncensored tier and generates what filtered models block.",
+      uncensored: "This model is in the uncensored tier.",
       consent: "Uncensored models need a one-time 18+ confirmation.",
     },
   },
@@ -313,17 +337,9 @@ export const translations = {
     models: "AI models",
   },
   jsonLd: {
-    perMessage: "typical message (16K tokens in, 1.5K out)",
+    perMessage: "reference message",
     perInputTokens: "input tokens",
     perOutputTokens: "output tokens",
-  },
-  currencyUnit: {
-    usd: "$1",
-    eur: "1 €",
-  },
-  creditValue: {
-    usd: "$0.01",
-    eur: "0.01 €",
   },
   chatPrompt: "What are you best at? Show me in one short, concrete example.",
   catalog: {
@@ -364,10 +380,10 @@ export const translations = {
   },
   model: {
     back: "All models",
-    chatCta: "Chat with {{model}}",
+    chatCta: "Try {{model}} in chat",
     compareCta: "Compare",
     legacyBanner:
-      "{{model}} is a legacy model. Its successor, {{successor}}, is faster or cheaper - and chats that used {{model}} move to it automatically.",
+      "{{model}} is a legacy model. Open {{successor}} to start a new chat.",
     legacyCta: "See {{successor}}",
     compareHeading: "Compare {{model}}",
     compareIntro: "Same facts, side by side.",
@@ -377,13 +393,13 @@ export const translations = {
       "Free credits to start, no card needed. The chat opens with {{model}} selected and a prompt ready. Just send.",
   },
   media: {
+    priceValue: "{{credits}} credits per {{unit}}",
+    priceProvider: "About {{price}} via {{provider}}.",
     priceLabel: "Price per use",
     generateCta: "Generate with {{model}}",
     useCta: "Use {{model}}",
-    chatNote:
-      "Also works from chat: ask any chat model to use {{model}} for you.",
     priceFootnote:
-      "Price is per unit - image, clip, second or character - and shifts with size, length and options. 1 credit = {{value}}.",
+      "Currency estimates use the one-time credit pack rate of {{value}} per credit.",
     ctaTitle: "Try {{model}} now.",
     ctaSubtitle:
       "Free credits to start, no card needed. The generator opens with {{model}} selected.",

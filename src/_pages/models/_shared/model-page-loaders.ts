@@ -24,6 +24,7 @@ import {
   resolveSuccessor,
   toModelSlug,
 } from "./model-facts";
+import { mediaUnitText } from "./model-format";
 import type { MediaModelFacts } from "./model-media-facts";
 import {
   bestForContent,
@@ -32,10 +33,10 @@ import {
   chatModelMeta,
   findRelatedMediaModels,
   findRelatedModels,
+  mediaBestForContent,
   mediaModelBlogSlugs,
   mediaModelFaq,
   mediaModelMeta,
-  mediaUnitText,
 } from "./model-seo";
 import type { BlogLink, ModelSeoContent } from "./model-seo-sections";
 import {
@@ -164,7 +165,7 @@ export function buildMediaModelPageSeo(
   const { t } = scopedTranslation.scopedT(locale);
   return {
     seo: {
-      bestFor: null,
+      bestFor: mediaBestForContent(facts, locale),
       related: findRelatedMediaModels(facts, availability),
       faq: mediaModelFaq(facts, locale),
       blog: blogLinks(mediaModelBlogSlugs(facts), locale),

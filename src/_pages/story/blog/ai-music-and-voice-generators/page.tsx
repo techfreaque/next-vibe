@@ -66,15 +66,11 @@ import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
 import { createHref } from "@/_pages/create/_shared/create-kinds";
-import {
-  creditValueText,
-  formatNumber,
-} from "@/_pages/models/_shared/model-format";
+import { formatNumber } from "@/_pages/models/_shared/model-format";
 import {
   listMediaFacts,
   type MediaType,
 } from "@/_pages/models/_shared/model-media-facts";
-import { scopedTranslation as modelsScopedTranslation } from "@/_pages/models/i18n";
 import { configScopedTranslation } from "@/env/i18n";
 import {
   CREDIT_VALUE_USD,
@@ -615,7 +611,6 @@ export function TanstackPage({
 }: AudioPostPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
-  const { t: modelsT } = modelsScopedTranslation.scopedT(locale);
   const appName = configT("appName");
   const back = { href: `/${locale}/story/blog`, label: t("hero.backToBlog") };
   const num = (value: number): string => formatNumber(value, locale);
@@ -663,7 +658,11 @@ export function TanstackPage({
     labCount,
     uncensoredVoiceCount,
     markup: Math.round(STANDARD_MARKUP_PERCENTAGE * 100),
-    creditValue: creditValueText(locale, modelsT),
+    creditValue: formatCurrency(
+      CREDIT_VALUE_USD,
+      creditCurrency(locale),
+      locale,
+    ),
     defaultMusic: defaultMusicName,
     defaultVoice: defaultVoiceName,
     defaultStt: defaultSttName,

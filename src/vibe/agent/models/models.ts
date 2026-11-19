@@ -305,6 +305,11 @@ export interface TtsVoiceMeta {
   style?: string;
 }
 
+export type UncensoredModelMethod =
+  | "abliterated"
+  | "fineTuned"
+  | "ownWorldview";
+
 /**
  * Model definition - canonical source of truth for each conceptual model.
  * Provider-specific details (id, apiProvider, costs) live in `providers`.
@@ -321,6 +326,8 @@ export interface ModelDefinition {
   supportsTools: boolean;
   intelligence: typeof IntelligenceLevelValue;
   content: typeof ContentLevelValue;
+  /** Documented method for an uncensored model. Omit when the method is unconfirmed. */
+  uncensoredMethod?: UncensoredModelMethod;
   features: ModelFeatures;
   weaknesses?: (typeof ModelUtilityValue)[];
   /** Native input modalities this model accepts */
@@ -349,7 +356,7 @@ export interface ModelDefinition {
  * Contains all necessary information for model selection and API integration.
  * Derived from ModelDefinition + ModelProviderConfig for backward compat.
  */
-export interface ModelOptionBase {
+export interface ModelOptionBase extends CreditCostInput {
   /** Unique identifier for the model */
   id: string;
   /** Human-readable display name */
@@ -902,11 +909,10 @@ export function calculateSttCreditCost(
  * 1 credit = $0.01 (1 cent)
  */
 /**
- * Structural parameter type for calculateCreditCost.
- * Uses structural shape (not AnyModelOption) so domain files can reference
- * `typeof calculateCreditCost` without circular type dependency.
+ * Pricing fields shared by provider configs and resolved model options.
+ * A structural type keeps provider configs independent of option builders.
  */
-interface CreditCostInput extends ModelOptionBase {
+interface CreditCostInput extends Pick<ModelOptionBase, "apiProvider"> {
   creditCostPerImage?: number;
   creditCostPerClip?: number;
   creditCostPerSecond?: number;
@@ -1283,7 +1289,7 @@ export function meetsRangeConstraint<T>(
  * (filterRoleModels) and by the model selector's visible list.
  */
 export function modelMeetsFilterRanges(
-  model: CreditCostInput,
+  model: CreditCostInput & Pick<ModelOptionBase, "intelligence" | "content">,
   ranges: {
     intelligenceRange?: { min?: string; max?: string };
     contentRange?: { min?: string; max?: string };

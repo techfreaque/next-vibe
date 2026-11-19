@@ -25,9 +25,9 @@ export const translations: typeof enTranslations = {
       descriptionFlat:
         "{{model}} od {{lab}}: ~{{credits}} kredytów ({{money}}) za wiadomość, kontekst {{context}}, poziom {{tier}}. Darmowe kredyty na start.",
       descriptionUncensored:
-        "{{model}} odpowiada tam, gdzie filtrowane AI odmawia. {{input}} wejście, {{output}} wyjście za 1M tokenów, kontekst {{context}}. Czat lub API, 18+.",
+        "{{model}} należy do kategorii bez cenzury. {{input}} wejście, {{output}} wyjście za 1M tokenów, kontekst {{context}}. Czat lub API, 18+.",
       descriptionUncensoredFlat:
-        "{{model}} odpowiada tam, gdzie filtrowane AI odmawia. ~{{credits}} kredytów ({{money}}) za wiadomość, kontekst {{context}}. Czat lub API, 18+.",
+        "{{model}} należy do kategorii bez cenzury. ~{{credits}} kredytów ({{money}}) za wiadomość, kontekst {{context}}. Czat lub API, 18+.",
       descriptionLegacy:
         "{{model}} od {{lab}} to starsza wersja, zastąpiona przez {{successor}}. Kontekst {{context}}, ~{{credits}} kredytów za wiadomość. Dane, cena i następca.",
       descriptionLegacyNoSuccessor:
@@ -72,7 +72,7 @@ export const translations: typeof enTranslations = {
     },
     uncensored: {
       name: "Bez cenzury",
-      line: "Dwa rodzaje, oba odpowiadają na wszystko. Większość to modele z głównego nurtu z wyciętym odruchem odmowy: ten sam trening, ten sam światopogląd, tylko bez wykrętów. UncensoredLM to drugi rodzaj: trenowany na książkach i dokumentach zakazanych w mainstreamowym internecie, więc jego poglądy polityczne idą pod prąd mainstreamu.",
+      line: "Modele do swobodniejszych rozmów i twórczej pracy.",
     },
   },
   modality: {
@@ -90,15 +90,22 @@ export const translations: typeof enTranslations = {
     price: "Szacowana cena za wiadomość",
     priceValue: "~{{credits}} kredytów",
     priceFree: "Za darmo",
-    priceHint: "≈ {{count}} wiadomości za {{unit}}",
-    priceHintFree: "Nie płacisz nic za wiadomość",
+    referenceTurn:
+      "Przykładowa wiadomość obejmuje {{input}} tokenów wejścia i {{output}} tokenów wyjścia.",
+    referenceImageTurn:
+      "Przykładowa wiadomość obejmuje {{input}} tokenów wejścia, {{output}} tokenów tekstu na wyjściu i jeden wygenerowany obraz.",
+    priceProvider: "Podane stawki dotyczą dostawcy {{provider}}.",
+    cacheReadPrice: "Odczyt z pamięci podręcznej za 1 mln tokenów",
+    cacheWritePrice: "Zapis do pamięci podręcznej za 1 mln tokenów",
+    imageOutputPrice: "Generowanie obrazu za 1 mln tokenów",
+    perMillionCredits: "{{credits}} kred.",
     priceFootnote:
-      "Typowa wiadomość: 16K tokenów na wejściu, 1,5K na wyjściu. Krótkie odpowiedzi kosztują mniej. Modele przez OpenRouter rozliczamy według realnego kosztu dostawcy plus naszą marżę, więc faktyczna cena się waha. 1 kredyt = {{value}}.",
+      "Koszt zależy od użycia i dostawcy. Przeliczenie opiera się na cenie jednorazowego pakietu, {{value}} za kredyt.",
     context: "Okno kontekstu",
     contextValue: "{{tokens}} tokenów",
     contextHint: "≈ {{pages}} stron tekstu naraz",
-    inputs: "Rozumie",
-    outputs: "Tworzy",
+    inputs: "Formaty wejściowe",
+    outputs: "Formaty wyjściowe",
     providers: "Dostępny przez",
     tools: "Narzędzia",
     toolsYes: "Tak - wyszukiwanie, pamięć, kod i więcej",
@@ -120,8 +127,9 @@ export const translations: typeof enTranslations = {
     apiIdLegacyNoSuccessor: "Już nie w API.",
     notListed: "Brak danych",
     notUncensored: "Filtrowany",
-    fixedPrice: "Stała cena za wiadomość",
+    fixedPrice: "Stała cena za wiadomość.",
     notPublished: "Nieujawniony",
+    apiIdUnsupported: "Ten model jest niedostępny w tekstowym API czatu.",
   },
   strengths: {
     coding: "Kod",
@@ -137,11 +145,19 @@ export const translations: typeof enTranslations = {
   uncensoredKind: {
     ownWorldview: {
       name: "Własny światopogląd",
-      line: "Trenowany na książkach i dokumentach zakazanych w mainstreamowym internecie. Poglądy polityczne pod prąd mainstreamu.",
+      line: "Model trenowano na książkach i dokumentach zakazanych w głównym nurcie internetu. Dlatego przedstawia poglądy polityczne spoza głównego nurtu.",
     },
-    refusalsRemoved: {
-      name: "Usunięte odmowy",
-      line: "Zbudowany na istniejącym modelu i dotrenowany, żeby przestał odmawiać. Ten sam trening, ten sam światopogląd, bez wykrętów.",
+    abliterated: {
+      name: "Po ablacji",
+      line: "Zmieniono wagi modelu bazowego, aby rzadziej odmawiał odpowiedzi.",
+    },
+    fineTuned: {
+      name: "Dostrojony",
+      line: "Istniejący model dostrojono tak, aby odpowiadał z mniejszymi ograniczeniami.",
+    },
+    unlisted: {
+      name: "Metoda niepodana",
+      line: "Ten model jest w kategorii bez cenzury. Brak informacji o metodzie trenowania lub filtrowania.",
     },
   },
   units: {
@@ -167,7 +183,7 @@ export const translations: typeof enTranslations = {
       vision: "Czytanie zrzutów ekranu, zdjęć i skanów",
       videoInput: "Rozumienie wideo",
       audioInput: "Rozumienie audio",
-      imageGen: "Tworzenie i edycja obrazów w czacie",
+      imageGen: "Generowanie obrazów w czacie",
       longContext: "Całe książki lub repozytoria w jednym prompcie",
       budget: "Praca na dużą skalę przy małym budżecie",
       tools: "Praca agentowa z narzędziami: wyszukiwanie, pamięć, kod",
@@ -176,15 +192,29 @@ export const translations: typeof enTranslations = {
     },
     skipItems: {
       noTools: "Workflowy agentowe: nie obsługuje narzędzi",
-      textOnly: "Obrazy i zrzuty ekranu: czyta tylko tekst",
+      noImages: "Zadania wymagające obrazu na wejściu",
       pricey:
-        "Zadania masowe: kosztuje więcej za wiadomość niż większość modeli tutaj",
+        "Zadania masowe przy stawce {{credits}} kred. za przykładową wiadomość",
       smallContext:
         "Bardzo długie dokumenty: kontekst kończy się na {{tokens}} tokenów",
       filtered:
         "Tematy filtrowane przez {{lab}}: do nich weź model bez cenzury",
       legacy: "Nowe projekty: zastępuje go {{successor}}",
       legacyNoSuccessor: "Nowe projekty: to starsza wersja",
+      coding: "Złożone zadania programistyczne",
+      analysis: "Pogłębiona analiza",
+      reasoning: "Złożone rozumowanie",
+      creative: "Twórcze pisanie",
+      roleplay: "Odgrywanie postaci",
+    },
+    media: {
+      image: "Generowanie obrazów",
+      video: "Tworzenie klipów wideo",
+      audio: "Generowanie muzyki",
+      tts: "Zamiana tekstu pisanego na mowę",
+      stt: "Transkrypcja nagranej mowy",
+      otherOutputs:
+        "Zadania wymagające formatu wyjściowego innego niż {{outputs}}",
     },
     picks: {
       claudeOpus:
@@ -217,13 +247,13 @@ export const translations: typeof enTranslations = {
       uncensoredLm:
         "Model bez cenzury z własnym światopoglądem. Trenowany na książkach i dokumentach zakazanych w mainstreamowym internecie, więc da ci poglądy polityczne, których duże laboratoria nie dadzą.",
       glmUncensored:
-        "GLM 5.3 bez odmów. Ten sam mózg, ten sam światopogląd, odpowiada na wszystko. Jeden z najmocniejszych w rozumowaniu wśród modeli bez cenzury.",
+        "GLM 5.3 po ablacji do rozumowania, pisania kodu i analizy. Obsługuje wywoływanie narzędzi.",
       glmFlashUncensored:
-        "Szybki, tani i bez odmów. GLM 5.3 Flash bez wykrętów, do tego czyta obrazy.",
+        "GLM 5.3 Flash po ablacji do szybkich odpowiedzi i poleceń z obrazami.",
       deepseekFlashUncensored:
-        "DeepSeek V4.1 Flash bez odmów. Kod, analiza i fikcja bez moralizowania, w niskiej cenie.",
+        "DeepSeek V4.1 Flash po ablacji do kodu, analizy i pisania fikcji. Przyjmuje obrazy.",
       veniceUncensored:
-        "Własny model czatu bez cenzury od Venice. Tani i szybki, stworzony do pisania kreatywnego i roleplayu bez odmów.",
+        "Dostrojony model czatu Venice do twórczego pisania i odgrywania postaci.",
     },
   },
   related: {
@@ -246,20 +276,18 @@ export const translations: typeof enTranslations = {
     price: {
       q: "Ile kosztuje {{model}}?",
       aTokens:
-        "Około {{credits}} kredytów ({{money}}) za typową wiadomość: 16K tokenów na wejściu, 1,5K na wyjściu. Za 1M tokenów: {{input}} wejście, {{output}} wyjście. Płacisz za użycie w kredytach. Darmowe kredyty na start.",
+        "Przykładowa wiadomość przez {{provider}} kosztuje około {{credits}} kred. ({{money}}). Stawki za milion tokenów to {{input}} na wejściu i {{output}} za tekst na wyjściu.",
       aFlat:
-        "Około {{credits}} kredytów ({{money}}) za typową wiadomość. Płacisz za użycie w kredytach. Darmowe kredyty na start.",
+        "Wiadomość przez {{provider}} kosztuje {{credits}} kred. ({{money}}).",
       aFree: "{{model}} nie kosztuje żadnych kredytów za wiadomość.",
     },
     uncensored: {
       q: "Czy {{model}} jest bez cenzury?",
       mainstream:
         "Nie. {{model}} ma filtry bezpieczeństwa {{lab}} i odmawia niektórych tematów. Przy nich przełącz się w tym samym czacie na model bez cenzury.",
-      open: "Częściowo. {{model}} to otwarty model z lżejszymi filtrami niż modele z głównego nurtu: odmawia rzadziej, ale nie jest w pełni bez cenzury. Jeśli chcesz zero odmów, wybierz model z poziomu Bez cenzury.",
-      refusalsRemoved:
-        "Tak. {{model}} to istniejący model z wyciętym odruchem odmowy: ten sam trening, ten sam światopogląd, po prostu przestaje się wykręcać. Modele bez cenzury wymagają jednorazowego potwierdzenia 18+.",
-      ownWorldview:
-        "Tak, i to inaczej niż większość. {{model}} jest trenowany na książkach i dokumentach zakazanych w mainstreamowym internecie, więc jego poglądy polityczne idą pod prąd mainstreamu. Większość innych modeli bez cenzury ma tylko usunięte odmowy. Modele bez cenzury wymagają jednorazowego potwierdzenia 18+.",
+      open: "{{model}} jest w kategorii „Otwarte”. Odpowiedzi wciąż mogą podlegać filtrom.",
+      consent:
+        "Modele czatu bez cenzury wymagają jednorazowego potwierdzenia pełnoletności.",
     },
     api: {
       q: "Czy mogę używać {{model}} przez API?",
@@ -273,26 +301,27 @@ export const translations: typeof enTranslations = {
       q: "Jak duże jest okno kontekstu {{model}}?",
       a: "{{tokens}} tokenów. To około {{pages}} stron tekstu naraz.",
     },
+    providers: {
+      q: "Którzy dostawcy udostępniają tutaj model {{model}}?",
+      a: "Dostępni dostawcy to {{providers}}.",
+    },
     inputs: {
-      q: "Czy {{model}} czyta obrazy i używa narzędzi?",
-      images: "Tak, czyta obrazy: wyślij zrzuty ekranu, zdjęcia lub skany.",
-      imagesAndMore: "Tak, czyta obrazy. Inne wejścia: {{more}}.",
-      textOnly: "Nie, czyta tylko tekst.",
-      toolsYes:
-        "Obsługuje wywoływanie narzędzi: wyszukiwanie w sieci, pamięć i kod w czacie, function calling w API.",
-      toolsNo: "Nie obsługuje narzędzi, więc odpowiada z własnej wiedzy.",
+      q: "Jakie formaty wejściowe i wyjściowe obsługuje {{model}}?",
+      modalities:
+        "Formaty wejściowe to {{inputs}}. Formaty wyjściowe to {{outputs}}.",
+      toolsYes: "Model obsługuje wywoływanie narzędzi.",
+      toolsNo: "Model nie obsługuje wywoływania narzędzi.",
     },
   },
   mediaFaq: {
     price: {
       q: "Ile kosztuje {{model}}?",
-      a: "{{credits}} kredytów ({{money}}) za {{unit}}. Rozmiar, długość i opcje zmieniają cenę. Płacisz za użycie w kredytach. Darmowe kredyty na start.",
-      aNone:
-        "Cena zależy od rozmiaru, długości i opcji. Aktualną cenę pokazuje tabela powyżej. Płacisz za użycie w kredytach. Darmowe kredyty na start.",
+      a: "Stawka u dostawcy {{provider}} wynosi {{credits}} kred. ({{money}}) za {{unit}}. Długość i rozmiar mogą wpłynąć na cenę.",
+      aNone: "Cena przykładowego użycia jest obecnie niedostępna.",
     },
     use: {
       q: "Jak używać {{model}}?",
-      a: "Otwórz narzędzie {{type}} z wybranym już {{model}} i uruchom. Albo poproś dowolny model czatu, żeby użył {{model}} za ciebie.",
+      a: "Otwórz narzędzie z wybranym modelem {{model}}, aby zacząć.",
     },
     inputs: {
       q: "Co {{model}} przyjmuje na wejściu?",
@@ -302,8 +331,7 @@ export const translations: typeof enTranslations = {
       q: "Czy {{model}} jest bez cenzury?",
       mainstream: "Nie. {{model}} działa z filtrami treści {{lab}}.",
       open: "Częściowo. {{model}} ma lżejsze filtry niż modele z głównego nurtu, ale nie jest w pełni bez cenzury.",
-      uncensored:
-        "Tak. {{model}} należy do poziomu Bez cenzury i generuje to, co filtrowane modele blokują.",
+      uncensored: "Ten model należy do kategorii bez cenzury.",
       consent: "Modele bez cenzury wymagają jednorazowego potwierdzenia 18+.",
     },
   },
@@ -319,17 +347,9 @@ export const translations: typeof enTranslations = {
     models: "Modele AI",
   },
   jsonLd: {
-    perMessage: "typowa wiadomość (16K tokenów na wejściu, 1,5K na wyjściu)",
+    perMessage: "przykładowa wiadomość",
     perInputTokens: "tokeny wejściowe",
     perOutputTokens: "tokeny wyjściowe",
-  },
-  currencyUnit: {
-    usd: "1 $",
-    eur: "1 €",
-  },
-  creditValue: {
-    usd: "0,01 $",
-    eur: "0,01 €",
   },
   chatPrompt:
     "W czym jesteś najlepszy? Pokaż mi to na jednym krótkim, konkretnym przykładzie.",
@@ -371,10 +391,10 @@ export const translations: typeof enTranslations = {
   },
   model: {
     back: "Wszystkie modele",
-    chatCta: "Pisz z {{model}}",
+    chatCta: "Wypróbuj {{model}} na czacie",
     compareCta: "Porównaj",
     legacyBanner:
-      "{{model}} to starsza wersja. Następca, {{successor}}, jest szybszy lub tańszy - a czaty z {{model}} same na niego przechodzą.",
+      "{{model}} to starszy model. Otwórz {{successor}}, aby rozpocząć nowy czat.",
     legacyCta: "Zobacz {{successor}}",
     compareHeading: "Porównaj {{model}}",
     compareIntro: "Te same fakty, obok siebie.",
@@ -384,13 +404,13 @@ export const translations: typeof enTranslations = {
       "Darmowe kredyty na start, bez karty. Czat otwiera się z wybranym modelem {{model}} i gotowym promptem. Po prostu wyślij.",
   },
   media: {
+    priceValue: "{{credits}} kred. za {{unit}}",
+    priceProvider: "Około {{price}} przez {{provider}}.",
     priceLabel: "Cena za użycie",
     generateCta: "Generuj z {{model}}",
     useCta: "Użyj {{model}}",
-    chatNote:
-      "Działa też z czatu: poproś dowolny model czatu, by użył {{model}} za Ciebie.",
     priceFootnote:
-      "Cena jest za jednostkę - obraz, klip, sekundę lub znak - i zależy od rozmiaru, długości i opcji. 1 kredyt = {{value}}.",
+      "Przeliczenie opiera się na cenie jednorazowego pakietu, {{value}} za kredyt.",
     ctaTitle: "Wypróbuj {{model}} teraz.",
     ctaSubtitle:
       "Darmowe kredyty na start, bez karty. Generator otwiera się z wybranym {{model}}.",

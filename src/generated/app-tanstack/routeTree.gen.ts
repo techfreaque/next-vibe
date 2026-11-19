@@ -153,6 +153,7 @@ import { Route as ApiLocalePaymentCheckoutRouteImport } from './routes/api.$loca
 import { Route as ApiLocalePaymentDashboardRouteImport } from './routes/api.$locale.payment.dashboard'
 import { Route as ApiLocalePaymentInvoiceRouteImport } from './routes/api.$locale.payment.invoice'
 import { Route as ApiLocalePaymentPortalRouteImport } from './routes/api.$locale.payment.portal'
+import { Route as ApiLocalePaymentProcessorRouteImport } from './routes/api.$locale.payment.processor'
 import { Route as ApiLocalePaymentRefundRouteImport } from './routes/api.$locale.payment.refund'
 import { Route as ApiLocalePaymentStripePricesRouteImport } from './routes/api.$locale.payment.stripe-prices'
 import { Route as ApiLocalePosDashboardRouteImport } from './routes/api.$locale.pos.dashboard'
@@ -180,9 +181,11 @@ import { Route as ApiLocaleV1ResponsesRouteImport } from './routes/api.$locale.v
 import { Route as ApiLocaleV1VideosRouteImport } from './routes/api.$locale.v1.videos'
 import { Route as ApiLocaleVibeExecuteToolRouteImport } from './routes/api.$locale.vibe.execute-tool'
 import { Route as ApiLocaleVibeHelpToolRouteImport } from './routes/api.$locale.vibe.help-tool'
+import { Route as LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRouteImport } from './routes/$locale.story.blog.abliterated-vs-uncensored-models.index'
 import { Route as LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRouteImport } from './routes/$locale.story.blog.ai-music-and-voice-generators.index'
 import { Route as LocaleStoryBlogAiRoleplayWithoutFilterIndexRouteImport } from './routes/$locale.story.blog.ai-roleplay-without-filter.index'
 import { Route as LocaleStoryBlogAiVideoGeneratorsComparedIndexRouteImport } from './routes/$locale.story.blog.ai-video-generators-compared.index'
+import { Route as LocaleStoryBlogCharacterAiAlternativesIndexRouteImport } from './routes/$locale.story.blog.character-ai-alternatives.index'
 import { Route as LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRouteImport } from './routes/$locale.story.blog.chatgpt-alternative-without-filters.index'
 import { Route as LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport } from './routes/$locale.story.blog.dead-trading-bot-to-monitoring-engine.index'
 import { Route as LocaleStoryBlogE2eTestsFoundRealBugsIndexRouteImport } from './routes/$locale.story.blog.e2e-tests-found-real-bugs.index'
@@ -1511,6 +1514,12 @@ const ApiLocalePaymentPortalRoute = ApiLocalePaymentPortalRouteImport.update({
   path: '/portal',
   getParentRoute: () => ApiLocalePaymentRoute,
 } as any)
+const ApiLocalePaymentProcessorRoute =
+  ApiLocalePaymentProcessorRouteImport.update({
+    id: '/processor',
+    path: '/processor',
+    getParentRoute: () => ApiLocalePaymentRoute,
+  } as any)
 const ApiLocalePaymentRefundRoute = ApiLocalePaymentRefundRouteImport.update({
   id: '/refund',
   path: '/refund',
@@ -1657,6 +1666,12 @@ const ApiLocaleVibeHelpToolRoute = ApiLocaleVibeHelpToolRouteImport.update({
   path: '/api/$locale/vibe/help-tool',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute =
+  LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRouteImport.update({
+    id: '/blog/abliterated-vs-uncensored-models/',
+    path: '/blog/abliterated-vs-uncensored-models/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute =
   LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRouteImport.update({
     id: '/blog/ai-music-and-voice-generators/',
@@ -1673,6 +1688,12 @@ const LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute =
   LocaleStoryBlogAiVideoGeneratorsComparedIndexRouteImport.update({
     id: '/blog/ai-video-generators-compared/',
     path: '/blog/ai-video-generators-compared/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogCharacterAiAlternativesIndexRoute =
+  LocaleStoryBlogCharacterAiAlternativesIndexRouteImport.update({
+    id: '/blog/character-ai-alternatives/',
+    path: '/blog/character-ai-alternatives/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute =
@@ -5048,6 +5069,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/payment/dashboard': typeof ApiLocalePaymentDashboardRoute
   '/api/$locale/payment/invoice': typeof ApiLocalePaymentInvoiceRouteWithChildren
   '/api/$locale/payment/portal': typeof ApiLocalePaymentPortalRoute
+  '/api/$locale/payment/processor': typeof ApiLocalePaymentProcessorRoute
   '/api/$locale/payment/refund': typeof ApiLocalePaymentRefundRoute
   '/api/$locale/payment/stripe-prices': typeof ApiLocalePaymentStripePricesRoute
   '/api/$locale/pos/dashboard': typeof ApiLocalePosDashboardRoute
@@ -5359,9 +5381,11 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/remote-connection/list': typeof ApiLocaleVibeRemoteConnectionListRoute
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
+  '/$locale/story/blog/abliterated-vs-uncensored-models/': typeof LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute
   '/$locale/story/blog/ai-music-and-voice-generators/': typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute
   '/$locale/story/blog/ai-roleplay-without-filter/': typeof LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute
   '/$locale/story/blog/ai-video-generators-compared/': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
+  '/$locale/story/blog/character-ai-alternatives/': typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters/': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
@@ -5757,6 +5781,7 @@ export interface FileRoutesByTo {
   '/api/$locale/payment/dashboard': typeof ApiLocalePaymentDashboardRoute
   '/api/$locale/payment/invoice': typeof ApiLocalePaymentInvoiceRouteWithChildren
   '/api/$locale/payment/portal': typeof ApiLocalePaymentPortalRoute
+  '/api/$locale/payment/processor': typeof ApiLocalePaymentProcessorRoute
   '/api/$locale/payment/refund': typeof ApiLocalePaymentRefundRoute
   '/api/$locale/payment/stripe-prices': typeof ApiLocalePaymentStripePricesRoute
   '/api/$locale/pos/dashboard': typeof ApiLocalePosDashboardRoute
@@ -6068,9 +6093,11 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/remote-connection/list': typeof ApiLocaleVibeRemoteConnectionListRoute
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
+  '/$locale/story/blog/abliterated-vs-uncensored-models': typeof LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute
   '/$locale/story/blog/ai-music-and-voice-generators': typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute
   '/$locale/story/blog/ai-roleplay-without-filter': typeof LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute
   '/$locale/story/blog/ai-video-generators-compared': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
+  '/$locale/story/blog/character-ai-alternatives': typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
@@ -6475,6 +6502,7 @@ export interface FileRoutesById {
   '/api/$locale/payment/dashboard': typeof ApiLocalePaymentDashboardRoute
   '/api/$locale/payment/invoice': typeof ApiLocalePaymentInvoiceRouteWithChildren
   '/api/$locale/payment/portal': typeof ApiLocalePaymentPortalRoute
+  '/api/$locale/payment/processor': typeof ApiLocalePaymentProcessorRoute
   '/api/$locale/payment/refund': typeof ApiLocalePaymentRefundRoute
   '/api/$locale/payment/stripe-prices': typeof ApiLocalePaymentStripePricesRoute
   '/api/$locale/pos/dashboard': typeof ApiLocalePosDashboardRoute
@@ -6786,9 +6814,11 @@ export interface FileRoutesById {
   '/api/$locale/vibe/remote-connection/list': typeof ApiLocaleVibeRemoteConnectionListRoute
   '/api/$locale/vibe/remote-connection/sync': typeof ApiLocaleVibeRemoteConnectionSyncRouteWithChildren
   '/api/$locale/vibe/tasks/execute': typeof ApiLocaleVibeTasksExecuteRoute
+  '/$locale/story/blog/abliterated-vs-uncensored-models/': typeof LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute
   '/$locale/story/blog/ai-music-and-voice-generators/': typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute
   '/$locale/story/blog/ai-roleplay-without-filter/': typeof LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute
   '/$locale/story/blog/ai-video-generators-compared/': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
+  '/$locale/story/blog/character-ai-alternatives/': typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters/': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
@@ -7193,6 +7223,7 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/dashboard'
     | '/api/$locale/payment/invoice'
     | '/api/$locale/payment/portal'
+    | '/api/$locale/payment/processor'
     | '/api/$locale/payment/refund'
     | '/api/$locale/payment/stripe-prices'
     | '/api/$locale/pos/dashboard'
@@ -7504,9 +7535,11 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/list'
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
+    | '/$locale/story/blog/abliterated-vs-uncensored-models/'
     | '/$locale/story/blog/ai-music-and-voice-generators/'
     | '/$locale/story/blog/ai-roleplay-without-filter/'
     | '/$locale/story/blog/ai-video-generators-compared/'
+    | '/$locale/story/blog/character-ai-alternatives/'
     | '/$locale/story/blog/chatgpt-alternative-without-filters/'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
     | '/$locale/story/blog/e2e-tests-found-real-bugs/'
@@ -7902,6 +7935,7 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/dashboard'
     | '/api/$locale/payment/invoice'
     | '/api/$locale/payment/portal'
+    | '/api/$locale/payment/processor'
     | '/api/$locale/payment/refund'
     | '/api/$locale/payment/stripe-prices'
     | '/api/$locale/pos/dashboard'
@@ -8213,9 +8247,11 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/list'
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
+    | '/$locale/story/blog/abliterated-vs-uncensored-models'
     | '/$locale/story/blog/ai-music-and-voice-generators'
     | '/$locale/story/blog/ai-roleplay-without-filter'
     | '/$locale/story/blog/ai-video-generators-compared'
+    | '/$locale/story/blog/character-ai-alternatives'
     | '/$locale/story/blog/chatgpt-alternative-without-filters'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine'
     | '/$locale/story/blog/e2e-tests-found-real-bugs'
@@ -8619,6 +8655,7 @@ export interface FileRouteTypes {
     | '/api/$locale/payment/dashboard'
     | '/api/$locale/payment/invoice'
     | '/api/$locale/payment/portal'
+    | '/api/$locale/payment/processor'
     | '/api/$locale/payment/refund'
     | '/api/$locale/payment/stripe-prices'
     | '/api/$locale/pos/dashboard'
@@ -8930,9 +8967,11 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/remote-connection/list'
     | '/api/$locale/vibe/remote-connection/sync'
     | '/api/$locale/vibe/tasks/execute'
+    | '/$locale/story/blog/abliterated-vs-uncensored-models/'
     | '/$locale/story/blog/ai-music-and-voice-generators/'
     | '/$locale/story/blog/ai-roleplay-without-filter/'
     | '/$locale/story/blog/ai-video-generators-compared/'
+    | '/$locale/story/blog/character-ai-alternatives/'
     | '/$locale/story/blog/chatgpt-alternative-without-filters/'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
     | '/$locale/story/blog/e2e-tests-found-real-bugs/'
@@ -10680,6 +10719,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocalePaymentPortalRouteImport
       parentRoute: typeof ApiLocalePaymentRoute
     }
+    '/api/$locale/payment/processor': {
+      id: '/api/$locale/payment/processor'
+      path: '/processor'
+      fullPath: '/api/$locale/payment/processor'
+      preLoaderRoute: typeof ApiLocalePaymentProcessorRouteImport
+      parentRoute: typeof ApiLocalePaymentRoute
+    }
     '/api/$locale/payment/refund': {
       id: '/api/$locale/payment/refund'
       path: '/refund'
@@ -10869,6 +10915,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeHelpToolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$locale/story/blog/abliterated-vs-uncensored-models/': {
+      id: '/$locale/story/blog/abliterated-vs-uncensored-models/'
+      path: '/blog/abliterated-vs-uncensored-models'
+      fullPath: '/$locale/story/blog/abliterated-vs-uncensored-models/'
+      preLoaderRoute: typeof LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/blog/ai-music-and-voice-generators/': {
       id: '/$locale/story/blog/ai-music-and-voice-generators/'
       path: '/blog/ai-music-and-voice-generators'
@@ -10888,6 +10941,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/ai-video-generators-compared'
       fullPath: '/$locale/story/blog/ai-video-generators-compared/'
       preLoaderRoute: typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/character-ai-alternatives/': {
+      id: '/$locale/story/blog/character-ai-alternatives/'
+      path: '/blog/character-ai-alternatives'
+      fullPath: '/$locale/story/blog/character-ai-alternatives/'
+      preLoaderRoute: typeof LocaleStoryBlogCharacterAiAlternativesIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/chatgpt-alternative-without-filters/': {
@@ -14750,9 +14810,11 @@ interface LocaleStoryRouteChildren {
   LocaleStoryRefusalIndexIndexRoute: typeof LocaleStoryRefusalIndexIndexRoute
   LocaleStorySelfHostIndexRoute: typeof LocaleStorySelfHostIndexRoute
   LocaleStoryTermsOfServiceIndexRoute: typeof LocaleStoryTermsOfServiceIndexRoute
+  LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute: typeof LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute
   LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute: typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute
   LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute: typeof LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute
   LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute: typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
+  LocaleStoryBlogCharacterAiAlternativesIndexRoute: typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute: typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute: typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute: typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
@@ -14801,12 +14863,16 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
   LocaleStoryRefusalIndexIndexRoute: LocaleStoryRefusalIndexIndexRoute,
   LocaleStorySelfHostIndexRoute: LocaleStorySelfHostIndexRoute,
   LocaleStoryTermsOfServiceIndexRoute: LocaleStoryTermsOfServiceIndexRoute,
+  LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute:
+    LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute,
   LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute:
     LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute,
   LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute:
     LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute,
   LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute:
     LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute,
+  LocaleStoryBlogCharacterAiAlternativesIndexRoute:
+    LocaleStoryBlogCharacterAiAlternativesIndexRoute,
   LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute:
     LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute,
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute:
@@ -15093,6 +15159,7 @@ interface ApiLocalePaymentRouteChildren {
   ApiLocalePaymentDashboardRoute: typeof ApiLocalePaymentDashboardRoute
   ApiLocalePaymentInvoiceRoute: typeof ApiLocalePaymentInvoiceRouteWithChildren
   ApiLocalePaymentPortalRoute: typeof ApiLocalePaymentPortalRoute
+  ApiLocalePaymentProcessorRoute: typeof ApiLocalePaymentProcessorRoute
   ApiLocalePaymentRefundRoute: typeof ApiLocalePaymentRefundRoute
   ApiLocalePaymentStripePricesRoute: typeof ApiLocalePaymentStripePricesRoute
   ApiLocalePaymentBillCreateRoute: typeof ApiLocalePaymentBillCreateRoute
@@ -15129,6 +15196,7 @@ const ApiLocalePaymentRouteChildren: ApiLocalePaymentRouteChildren = {
   ApiLocalePaymentDashboardRoute: ApiLocalePaymentDashboardRoute,
   ApiLocalePaymentInvoiceRoute: ApiLocalePaymentInvoiceRouteWithChildren,
   ApiLocalePaymentPortalRoute: ApiLocalePaymentPortalRoute,
+  ApiLocalePaymentProcessorRoute: ApiLocalePaymentProcessorRoute,
   ApiLocalePaymentRefundRoute: ApiLocalePaymentRefundRoute,
   ApiLocalePaymentStripePricesRoute: ApiLocalePaymentStripePricesRoute,
   ApiLocalePaymentBillCreateRoute: ApiLocalePaymentBillCreateRoute,

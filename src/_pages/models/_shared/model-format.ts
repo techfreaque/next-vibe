@@ -5,25 +5,20 @@
 
 import { scopedTranslation as agentScopedTranslation } from "next-vibe/agent/i18n";
 import type { Modality } from "next-vibe/agent/models/enum";
+import { CHAT_MESSAGE_PRICE_REFERENCE } from "next-vibe/agent/models/models";
 import {
   ContentLevel,
   type ContentLevelValue,
 } from "next-vibe/agent/skills/enum";
 import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import {
-  getCountryFromLocale,
-  getLanguageFromLocale,
-} from "next-vibe/core/i18n/core/language-utils";
+import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 
 import { getCreditUnitPrice } from "@/products/credit-money";
 
 import { scopedTranslation } from "../i18n";
-import {
-  formatTokenCount,
-  type ModelFacts,
-  OWN_WORLDVIEW_UNCENSORED_MODEL_ID,
-} from "./model-facts";
+import type { ModelFacts, ModelRef } from "./model-facts";
+import type { MediaPrice } from "./model-media-facts";
 
 type ModelsT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
@@ -90,10 +85,6 @@ export function formatNumber(value: number, locale: CountryLanguage): string {
   }).format(value);
 }
 
-function isEuroLocale(locale: CountryLanguage): boolean {
-  return getCountryFromLocale(locale) === "DE";
-}
-
 export function priceText(
   facts: ModelFacts,
   locale: CountryLanguage,
@@ -106,17 +97,22 @@ export function priceText(
     : t("facts.priceFree");
 }
 
-export function priceHint(
+export function referenceTurnText(
   facts: ModelFacts,
   locale: CountryLanguage,
   t: ModelsT,
 ): string {
-  if (facts.messagesPerCurrencyUnit === null) {
-    return t("facts.priceHintFree");
+  if (facts.tokenPrice === null) {
+    return t("facts.fixedPrice");
   }
-  return t("facts.priceHint", {
-    count: formatNumber(facts.messagesPerCurrencyUnit, locale),
-    unit: isEuroLocale(locale) ? t("currencyUnit.eur") : t("currencyUnit.usd"),
+  const { inputTokens, outputTokens } = CHAT_MESSAGE_PRICE_REFERENCE;
+  const key =
+    facts.tokenPrice.imageOutputCredits === null
+      ? "facts.referenceTurn"
+      : "facts.referenceImageTurn";
+  return t(key, {
+    input: formatNumber(inputTokens, locale),
+    output: formatNumber(outputTokens, locale),
   });
 }
 
@@ -128,27 +124,33 @@ export function priceHint(
 export function formatMoney(credits: number, locale: CountryLanguage): string {
   const { amount, currency } = getCreditUnitPrice(locale);
   const value = credits * amount;
-  const digits = value > 0 && value < 0.1 ? 3 : 2;
+  if (value > 0 && value < 0.01) {
+    return new Intl.NumberFormat(getLanguageFromLocale(locale), {
+      style: "currency",
+      currency,
+      maximumSignificantDigits: 2,
+    }).format(value);
+  }
   return new Intl.NumberFormat(getLanguageFromLocale(locale), {
     style: "currency",
     currency,
     minimumFractionDigits: 2,
-    maximumFractionDigits: digits,
+    maximumFractionDigits: value < 0.1 ? 3 : 2,
   }).format(value);
 }
 
 /** Which kind of uncensored a chat model is; null outside the uncensored tier. */
-export type UncensoredKind = "ownWorldview" | "refusalsRemoved";
+export type UncensoredKind =
+  | NonNullable<ModelFacts["uncensoredMethod"]>
+  | "unlisted";
 
 export function uncensoredKind(
-  facts: Pick<ModelFacts, "id" | "content">,
+  facts: Pick<ModelFacts, "uncensoredMethod" | "content">,
 ): UncensoredKind | null {
   if (facts.content !== ContentLevel.UNCENSORED) {
     return null;
   }
-  return facts.id === OWN_WORLDVIEW_UNCENSORED_MODEL_ID
-    ? "ownWorldview"
-    : "refusalsRemoved";
+  return facts.uncensoredMethod ?? "unlisted";
 }
 
 /** Current text-in/text-out models are callable on the /v1 API. */
@@ -186,14 +188,8 @@ export function strengthList(facts: ModelFacts, t: ModelsT): string {
   return labels.join(", ");
 }
 
-export function creditValueText(locale: CountryLanguage, t: ModelsT): string {
-  return isEuroLocale(locale) ? t("creditValue.eur") : t("creditValue.usd");
-}
-
 export function priceFootnote(locale: CountryLanguage, t: ModelsT): string {
-  return t("facts.priceFootnote", {
-    value: isEuroLocale(locale) ? t("creditValue.eur") : t("creditValue.usd"),
-  });
+  return t("facts.priceFootnote", { value: formatMoney(1, locale) });
 }
 
 export function modalityList(modalities: Modality[], t: ModelsT): string {
@@ -208,6 +204,9 @@ export type FactKey =
   | "strengths"
   | "price"
   | "tokenPrice"
+  | "cacheReadPrice"
+  | "cacheWritePrice"
+  | "imageOutputPrice"
   | "context"
   | "parameters"
   | "inputs"
@@ -230,6 +229,12 @@ export interface FactRow {
   missing: boolean;
 }
 
+const EXTRA_TOKEN_RATES = [
+  { key: "cacheReadPrice", rate: "cacheReadCredits" },
+  { key: "cacheWritePrice", rate: "cacheWriteCredits" },
+  { key: "imageOutputPrice", rate: "imageOutputCredits" },
+] as const;
+
 function apiIdRow(facts: ModelFacts, t: ModelsT): FactRow {
   const label = t("facts.apiId");
   if (isApiCallable(facts)) {
@@ -244,8 +249,9 @@ function apiIdRow(facts: ModelFacts, t: ModelsT): FactRow {
   return {
     key: "apiId",
     label,
-    value:
-      facts.successor === null
+    value: !facts.isLegacy
+      ? t("facts.apiIdUnsupported")
+      : facts.successor === null
         ? t("facts.apiIdLegacyNoSuccessor")
         : t("facts.apiIdLegacy", { successor: facts.successor.id }),
     hint: null,
@@ -310,14 +316,14 @@ export function buildFactRows(
       key: "price",
       label: t("facts.price"),
       value: priceText(facts, locale, t),
-      hint: priceHint(facts, locale, t),
+      hint: `${referenceTurnText(facts, locale, t)} ${t("facts.priceProvider", { provider: facts.priceProvider })}`,
       missing: false,
     },
     facts.tokenPrice === null
       ? {
           key: "tokenPrice",
           label: t("facts.tokenPrice"),
-          value: t("facts.fixedPrice"),
+          value: t("facts.notListed"),
           hint: null,
           missing: true,
         }
@@ -334,11 +340,29 @@ export function buildFactRows(
           }),
           missing: false,
         },
+    ...EXTRA_TOKEN_RATES.map(({ key, rate }): FactRow => {
+      const credits = facts.tokenPrice?.[rate] ?? null;
+      return {
+        key,
+        label: t(`facts.${key}`),
+        value:
+          credits === null
+            ? t("facts.notListed")
+            : formatMoney(credits, locale),
+        hint:
+          credits === null
+            ? null
+            : t("facts.perMillionCredits", {
+                credits: formatNumber(credits, locale),
+              }),
+        missing: credits === null,
+      };
+    }),
     {
       key: "context",
       label: t("facts.context"),
       value: t("facts.contextValue", {
-        tokens: formatTokenCount(facts.contextWindow),
+        tokens: formatNumber(facts.contextWindow, locale),
       }),
       hint: t("facts.contextHint", {
         pages: formatNumber(facts.contextPages, locale),
@@ -406,6 +430,24 @@ export function modelDescription(
   return t(facts.description);
 }
 
+/** "image", "8s clip", "600 characters": what one priced use is. */
+export function mediaUnitText(price: MediaPrice, t: ModelsT): string {
+  switch (price.unit) {
+    case "image":
+      return t("units.image");
+    case "audio":
+      return t("units.audio");
+    case "video":
+      return price.amount === null
+        ? t("units.videoClip")
+        : t("units.video", { seconds: price.amount });
+    case "tts":
+      return t("units.tts", { chars: price.amount ?? 0 });
+    case "stt":
+      return t("units.stt", { seconds: price.amount ?? 0 });
+  }
+}
+
 export function modelHref(locale: CountryLanguage, slug: string): string {
   return `/${locale}/models/${slug}`;
 }
@@ -423,7 +465,7 @@ export function compareHref(
  * Public visitors get redirected to incognito by the threads page, which
  * keeps both params.
  */
-export function chatHref(locale: CountryLanguage, facts: ModelFacts): string {
+export function chatHref(locale: CountryLanguage, facts: ModelRef): string {
   const { t } = scopedTranslation.scopedT(locale);
   const query = new URLSearchParams({
     [MODEL_PARAM]: facts.id,

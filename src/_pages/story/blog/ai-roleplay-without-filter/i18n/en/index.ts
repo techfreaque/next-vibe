@@ -95,7 +95,7 @@ export const translations = {
   setup: {
     title: "Set up a character in two minutes",
     intro:
-      "No character marketplace, no hunting for the right bot. Build your own.",
+      "Start with a community skill, import a public character from a Character.AI or Talkie link, or create your own with the steps below.",
     steps: {
       skill: {
         title: "Open the Roleplay skill",
@@ -149,7 +149,7 @@ export const translations = {
     title: "When Character.AI is the better pick",
     intro: "Sometimes. Here is when.",
     library:
-      "You want to browse thousands of ready-made community characters. Here you build your own, or start from a skill.",
+      "You already follow creators or have ongoing stories on Character.AI and want to pick up where you left off.",
     flatRate:
       "You want a flat fee and never want to think about cost per reply. Credits are metered, and long scenes on premium models add up.",
     wantFilter:

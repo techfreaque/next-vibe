@@ -14,6 +14,22 @@ export const translations = {
     },
   },
   posts: {
+    characterAiAlternatives: {
+      title:
+        "Character.AI alternatives without the filter. Checked, not guessed.",
+      category: "Comparison",
+      excerpt:
+        "Janitor AI, SillyTavern, CrushOn, Kindroid, Nomi, Venice and us, compared on their own pricing, filter and privacy pages. Plus: import your Character.AI characters from a link.",
+      readTime: "10 min read",
+    },
+    abliteratedExplained: {
+      title:
+        "Abliterated, fine-tuned, or its own worldview. Three kinds of uncensored AI.",
+      category: "Model Guide",
+      excerpt:
+        "What each method changes and what it leaves alone, which of our uncensored models is which, three models next to their uncensored builds, and a ten-minute test to tell them apart.",
+      readTime: "8 min read",
+    },
     imageGenerators: {
       title: "Uncensored AI image generators. Real prices, no blur.",
       category: "Model Comparison",

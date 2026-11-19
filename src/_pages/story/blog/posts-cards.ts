@@ -13,6 +13,8 @@ import { type BlogPostSlug, formatPostDate } from "./posts-meta";
 
 /** i18n key under `posts.*` for each post, in display order. */
 const POST_CARD_KEYS = [
+  ["character-ai-alternatives", "characterAiAlternatives"],
+  ["abliterated-vs-uncensored-models", "abliteratedExplained"],
   ["uncensored-ai-image-generator", "imageGenerators"],
   ["ai-roleplay-without-filter", "roleplayWithoutFilter"],
   ["ai-music-and-voice-generators", "musicVoice"],

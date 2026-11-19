@@ -98,7 +98,7 @@ export const translations: typeof enTranslations = {
   setup: {
     title: "Eine Figur in zwei Minuten anlegen",
     intro:
-      "Kein Figurenmarktplatz, keine Suche nach dem passenden Bot. Bau dir deine eigene.",
+      "Wähle einen Community-Skill, importiere eine öffentliche Figur per Link von Character.AI oder Talkie oder erstelle mit dieser Anleitung deine eigene Figur.",
     steps: {
       skill: {
         title: "Den Rollenspiel-Skill öffnen",
@@ -152,7 +152,7 @@ export const translations: typeof enTranslations = {
     title: "Wann Character.AI die bessere Wahl ist",
     intro: "Manchmal. Und zwar dann.",
     library:
-      "Du willst durch Tausende fertige Community-Figuren stöbern. Hier baust du deine eigene oder startest mit einem Skill.",
+      "Du folgst bereits Creators auf Character.AI oder möchtest dort begonnene Geschichten weiterspielen.",
     flatRate:
       "Du willst einen Festpreis und nie über Kosten pro Antwort nachdenken. Credits werden nach Verbrauch abgerechnet, und lange Szenen auf Premium-Modellen summieren sich.",
     wantFilter:

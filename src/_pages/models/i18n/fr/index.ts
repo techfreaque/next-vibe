@@ -26,9 +26,9 @@ export const translations: typeof enTranslations = {
       descriptionFlat:
         "{{model}} par {{lab}} : ~{{credits}} crédits ({{money}}) par message, contexte de {{context}}, niveau {{tier}}. Crédits offerts pour commencer.",
       descriptionUncensored:
-        "{{model}} répond là où l'IA filtrée refuse. {{input}} en entrée, {{output}} en sortie par million de tokens, contexte {{context}}. Chat ou API, accès 18+.",
+        "{{model}} appartient à la catégorie non censurée. {{input}} en entrée, {{output}} en sortie par million de tokens, contexte {{context}}. Chat ou API, accès 18+.",
       descriptionUncensoredFlat:
-        "{{model}} répond là où l'IA filtrée refuse. ~{{credits}} crédits ({{money}}) par message, contexte {{context}}. Chat ou API, accès 18+.",
+        "{{model}} appartient à la catégorie non censurée. ~{{credits}} crédits ({{money}}) par message, contexte {{context}}. Chat ou API, accès 18+.",
       descriptionLegacy:
         "{{model}} par {{lab}} est un ancien modèle, remplacé par {{successor}}. Contexte {{context}}, ~{{credits}} crédits par message. Specs, prix et successeur.",
       descriptionLegacyNoSuccessor:
@@ -73,7 +73,7 @@ export const translations: typeof enTranslations = {
     },
     uncensored: {
       name: "Non censuré",
-      line: "Deux familles, qui répondent à tout. La plupart sont des modèles grand public dont on a retiré le réflexe de refus : même entraînement, même vision du monde, plus aucune esquive. UncensoredLM est l'autre famille : entraîné sur des livres et des documents bannis de l'internet grand public, d'où des positions politiques à contre-courant.",
+      line: "Des modèles pour des conversations et des créations avec moins de restrictions.",
     },
   },
   modality: {
@@ -91,15 +91,22 @@ export const translations: typeof enTranslations = {
     price: "Prix estimé par message",
     priceValue: "~{{credits}} crédits",
     priceFree: "Gratuit",
-    priceHint: "≈ {{count}} messages pour {{unit}}",
-    priceHintFree: "Aucun coût par message",
+    referenceTurn:
+      "Le message de référence contient {{input}} tokens en entrée et {{output}} en sortie.",
+    referenceImageTurn:
+      "Le message de référence contient {{input}} tokens en entrée, {{output}} tokens de texte en sortie et une image générée.",
+    priceProvider: "Tarifs affichés pour {{provider}}.",
+    cacheReadPrice: "Lecture du cache par million de tokens",
+    cacheWritePrice: "Écriture dans le cache par million de tokens",
+    imageOutputPrice: "Sortie image par million de tokens",
+    perMillionCredits: "{{credits}} crédits",
     priceFootnote:
-      "Un message type : 16K tokens en entrée, 1,5K en sortie. Les réponses courtes coûtent moins. Les modèles servis via OpenRouter facturent le coût réel du fournisseur plus notre marge : le montant réel varie donc. 1 crédit = {{value}}.",
+      "Le montant varie selon l’usage et le fournisseur. L’estimation utilise le tarif du pack de crédits à l’unité, soit {{value}} par crédit.",
     context: "Fenêtre de contexte",
     contextValue: "{{tokens}} tokens",
     contextHint: "≈ {{pages}} pages de texte d'un seul coup",
-    inputs: "Lit",
-    outputs: "Écrit",
+    inputs: "Formats d’entrée",
+    outputs: "Formats de sortie",
     providers: "Servi via",
     tools: "Outils",
     toolsYes: "Oui : recherche, mémoire, code et plus",
@@ -121,8 +128,9 @@ export const translations: typeof enTranslations = {
     apiIdLegacyNoSuccessor: "Plus disponible dans l'API.",
     notListed: "Non renseigné",
     notUncensored: "Filtré",
-    fixedPrice: "Prix fixe par message",
+    fixedPrice: "Tarif fixe par message.",
     notPublished: "Non publié",
+    apiIdUnsupported: "Ce modèle est indisponible via l’API de chat textuel.",
   },
   strengths: {
     coding: "Code",
@@ -137,12 +145,20 @@ export const translations: typeof enTranslations = {
   },
   uncensoredKind: {
     ownWorldview: {
-      name: "Vision du monde propre",
-      line: "Entraîné sur des livres et des documents bannis de l'internet grand public. Positions politiques à contre-courant.",
+      name: "Sa propre vision du monde",
+      line: "Entraîné sur des livres et documents bannis de l’internet grand public. Ses positions politiques vont à contre-courant.",
     },
-    refusalsRemoved: {
-      name: "Refus supprimés",
-      line: "Construit sur un modèle existant et réentraîné pour ne plus refuser. Même entraînement, même vision du monde, plus aucune esquive.",
+    abliterated: {
+      name: "Avec ablation",
+      line: "Les poids du modèle de base ont été modifiés pour réduire les refus.",
+    },
+    fineTuned: {
+      name: "Avec entraînement ciblé",
+      line: "Un modèle existant a reçu un entraînement ciblé pour répondre avec moins de restrictions.",
+    },
+    unlisted: {
+      name: "Méthode non précisée",
+      line: "Ce modèle appartient à la catégorie non censurée. Sa méthode d’entraînement ou de filtrage reste indéterminée.",
     },
   },
   units: {
@@ -169,7 +185,7 @@ export const translations: typeof enTranslations = {
       vision: "Lire captures d'écran, photos et scans",
       videoInput: "Comprendre la vidéo",
       audioInput: "Comprendre l'audio",
-      imageGen: "Créer et retoucher des images dans le chat",
+      imageGen: "Générer des images dans le chat",
       longContext: "Des livres ou bases de code entiers en un seul prompt",
       budget: "Gros volumes avec un petit budget",
       tools: "Travail d'agent avec outils : recherche, mémoire, code",
@@ -178,15 +194,29 @@ export const translations: typeof enTranslations = {
     },
     skipItems: {
       noTools: "Workflows d'agent : pas d'appel d'outils",
-      textOnly: "Images ou captures : il ne lit que du texte",
+      noImages: "Tâches qui nécessitent des images en entrée",
       pricey:
-        "Traitements de masse : plus cher par message que la plupart des modèles ici",
+        "Traitement en volume à {{credits}} crédits par message de référence",
       smallContext:
         "Très longs documents : le contexte s'arrête à {{tokens}} tokens",
       filtered:
         "Sujets filtrés par {{lab}} : prenez un modèle non censuré pour ceux-là",
       legacy: "Nouveaux projets : {{successor}} le remplace",
       legacyNoSuccessor: "Nouveaux projets : c'est un ancien modèle",
+      coding: "Programmation complexe",
+      analysis: "Analyse approfondie",
+      reasoning: "Raisonnement complexe",
+      creative: "Écriture créative",
+      roleplay: "Jeu de rôle",
+    },
+    media: {
+      image: "Générer des images",
+      video: "Générer des clips vidéo",
+      audio: "Générer de la musique",
+      tts: "Transformer un texte écrit en parole",
+      stt: "Transcrire des enregistrements vocaux",
+      otherOutputs:
+        "Tâches qui exigent un format de sortie autre que {{outputs}}",
     },
     picks: {
       claudeOpus:
@@ -219,13 +249,13 @@ export const translations: typeof enTranslations = {
       uncensoredLm:
         "Le modèle non censuré qui a sa propre vision du monde. Entraîné sur des livres et des documents bannis de l'internet grand public : attendez-vous à des positions politiques que les grands labos ne vous donneront pas.",
       glmUncensored:
-        "GLM 5.3 sans les refus. Même cerveau, même vision du monde, il répond à tout. L'un des meilleurs en raisonnement parmi les modèles non censurés.",
+        "GLM 5.3 avec ablation pour le raisonnement, le code et l’analyse. Il peut appeler des outils.",
       glmFlashUncensored:
-        "Rapide, économique et sans refus. GLM 5.3 Flash sans les esquives, et il lit les images.",
+        "GLM 5.3 Flash avec ablation pour les réponses rapides et les demandes avec images.",
       deepseekFlashUncensored:
-        "DeepSeek V4.1 Flash sans les refus. Code, analyse et fiction sans sermons, à petit prix.",
+        "DeepSeek V4.1 Flash avec ablation pour le code, l’analyse et la fiction. Il accepte les images.",
       veniceUncensored:
-        "Le modèle de chat non censuré maison de Venice. Économique et rapide, fait pour l'écriture créative et le jeu de rôle sans refus.",
+        "Le modèle de chat de Venice optimisé pour l’écriture créative et le jeu de rôle.",
     },
   },
   related: {
@@ -247,20 +277,18 @@ export const translations: typeof enTranslations = {
     price: {
       q: "Combien coûte {{model}} ?",
       aTokens:
-        "Environ {{credits}} crédits ({{money}}) pour un message type : 16K tokens en entrée, 1,5K en sortie. Par million de tokens : {{input}} en entrée, {{output}} en sortie. Vous payez à l'usage, en crédits. Crédits offerts pour commencer.",
+        "Un message de référence via {{provider}} coûte environ {{credits}} crédits ({{money}}). Par million de tokens, comptez {{input}} en entrée et {{output}} pour le texte en sortie.",
       aFlat:
-        "Environ {{credits}} crédits ({{money}}) pour un message type. Vous payez à l'usage, en crédits. Crédits offerts pour commencer.",
+        "Un message via {{provider}} coûte {{credits}} crédits ({{money}}).",
       aFree: "{{model}} ne coûte aucun crédit par message.",
     },
     uncensored: {
       q: "{{model}} est-il non censuré ?",
       mainstream:
         "Non. {{model}} garde les filtres de sécurité de {{lab}} et refuse certains sujets. Pour ceux-là, passez à un modèle non censuré dans le même chat.",
-      open: "En partie. {{model}} est un modèle ouvert aux filtres plus légers que les modèles grand public : il refuse moins, mais il n'est pas totalement non censuré. Pour zéro refus, choisissez un modèle du niveau Non censuré.",
-      refusalsRemoved:
-        "Oui. {{model}} repose sur un modèle existant dont on a retiré le réflexe de refus : même entraînement, même vision du monde, il arrête simplement d'esquiver. Les modèles non censurés demandent une confirmation 18+ unique.",
-      ownWorldview:
-        "Oui, et pas comme les autres. {{model}} est entraîné sur des livres et des documents bannis de l'internet grand public, d'où des positions politiques à contre-courant. La plupart des autres modèles non censurés ont seulement perdu leurs refus. Les modèles non censurés demandent une confirmation 18+ unique.",
+      open: "{{model}} appartient à la catégorie « Ouvert ». Ses réponses peuvent encore être filtrées.",
+      consent:
+        "Pour utiliser un modèle de chat non censuré, confirmez une fois que vous avez au moins 18 ans.",
     },
     api: {
       q: "Puis-je utiliser {{model}} via API ?",
@@ -274,27 +302,27 @@ export const translations: typeof enTranslations = {
       q: "Quelle est la fenêtre de contexte de {{model}} ?",
       a: "{{tokens}} tokens, soit environ {{pages}} pages de texte d'un seul coup.",
     },
+    providers: {
+      q: "Quels fournisseurs proposent {{model}} sur cette plateforme ?",
+      a: "Fournisseurs disponibles : {{providers}}.",
+    },
     inputs: {
-      q: "{{model}} lit-il les images et utilise-t-il des outils ?",
-      images:
-        "Oui, il lit les images : envoyez captures d'écran, photos ou scans.",
-      imagesAndMore: "Oui, il lit les images. Autres entrées : {{more}}.",
-      textOnly: "Non, il ne lit que du texte.",
-      toolsYes:
-        "Il gère l'appel d'outils : recherche web, mémoire et code dans le chat, function calling dans l'API.",
-      toolsNo: "Il ne gère pas l'appel d'outils et répond avec ce qu'il sait.",
+      q: "Quels formats {{model}} accepte-t-il et produit-il ?",
+      modalities:
+        "Formats acceptés en entrée : {{inputs}}. Formats produits en sortie : {{outputs}}.",
+      toolsYes: "Le modèle peut appeler des outils.",
+      toolsNo: "Le modèle ne peut pas appeler d’outils.",
     },
   },
   mediaFaq: {
     price: {
       q: "Combien coûte {{model}} ?",
-      a: "{{credits}} crédits ({{money}}) par {{unit}}. La taille, la durée et les options font varier le prix. Vous payez à l'usage, en crédits. Crédits offerts pour commencer.",
-      aNone:
-        "Le prix dépend de la taille, de la durée et des options. Le prix en direct est dans le tableau ci-dessus. Vous payez à l'usage, en crédits. Crédits offerts pour commencer.",
+      a: "Avec {{provider}}, comptez {{credits}} crédits ({{money}}) par {{unit}}. La durée, la taille et les options peuvent modifier le tarif.",
+      aNone: "Le tarif de référence est actuellement indisponible.",
     },
     use: {
       q: "Comment utiliser {{model}} ?",
-      a: "Ouvrez l'outil {{type}} avec {{model}} déjà sélectionné et lancez-le. Ou demandez à n'importe quel modèle de chat d'utiliser {{model}} pour vous.",
+      a: "Ouvrez l’outil de création avec {{model}} déjà sélectionné.",
     },
     inputs: {
       q: "Que prend {{model}} en entrée ?",
@@ -305,8 +333,7 @@ export const translations: typeof enTranslations = {
       mainstream:
         "Non. {{model}} fonctionne avec les filtres de contenu de {{lab}}.",
       open: "En partie. {{model}} a des filtres plus légers que les modèles grand public, mais il n'est pas totalement non censuré.",
-      uncensored:
-        "Oui. {{model}} fait partie du niveau Non censuré et génère ce que les modèles filtrés bloquent.",
+      uncensored: "Ce modèle appartient à la catégorie non censurée.",
       consent:
         "Les modèles non censurés demandent une confirmation 18+ unique.",
     },
@@ -323,17 +350,9 @@ export const translations: typeof enTranslations = {
     models: "Modèles d'IA",
   },
   jsonLd: {
-    perMessage: "message type (16K tokens en entrée, 1,5K en sortie)",
+    perMessage: "message de référence",
     perInputTokens: "tokens en entrée",
     perOutputTokens: "tokens en sortie",
-  },
-  currencyUnit: {
-    usd: "1 $",
-    eur: "1 €",
-  },
-  creditValue: {
-    usd: "0,01 $",
-    eur: "0,01 €",
   },
   chatPrompt:
     "Dans quoi êtes-vous le meilleur ? Montrez-le-moi avec un exemple court et concret.",
@@ -375,10 +394,10 @@ export const translations: typeof enTranslations = {
   },
   model: {
     back: "Tous les modèles",
-    chatCta: "Discuter avec {{model}}",
+    chatCta: "Essayer {{model}} dans le chat",
     compareCta: "Comparer",
     legacyBanner:
-      "{{model}} est un ancien modèle. Son successeur, {{successor}}, est plus rapide ou moins cher, et les discussions qui utilisaient {{model}} passent automatiquement sur lui.",
+      "{{model}} est un ancien modèle. Ouvrez {{successor}} pour lancer une nouvelle conversation.",
     legacyCta: "Voir {{successor}}",
     compareHeading: "Comparer {{model}}",
     compareIntro: "Les mêmes faits, côte à côte.",
@@ -388,13 +407,13 @@ export const translations: typeof enTranslations = {
       "Des crédits offerts pour commencer, sans carte. Le chat s'ouvre avec {{model}} sélectionné et un prompt prêt : il ne reste qu'à envoyer.",
   },
   media: {
+    priceValue: "{{credits}} crédits par {{unit}}",
+    priceProvider: "Environ {{price}} via {{provider}}.",
     priceLabel: "Prix par usage",
     generateCta: "Générer avec {{model}}",
     useCta: "Utiliser {{model}}",
-    chatNote:
-      "Marche aussi depuis le chat : demandez à n'importe quel modèle de chat d'utiliser {{model}} pour vous.",
     priceFootnote:
-      "Le prix s'entend par unité (image, clip, seconde ou caractère) et varie selon la taille, la durée et les options. 1 crédit = {{value}}.",
+      "L’estimation utilise le tarif du pack de crédits à l’unité, soit {{value}} par crédit.",
     ctaTitle: "Essayez {{model}} maintenant.",
     ctaSubtitle:
       "Des crédits offerts pour commencer, sans carte. Le générateur s'ouvre avec {{model}} déjà choisi.",

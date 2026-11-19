@@ -97,7 +97,7 @@ export const translations: typeof enTranslations = {
   setup: {
     title: "Créer un personnage en deux minutes",
     intro:
-      "Pas de catalogue de personnages, pas de chasse au bon bot. Créez le vôtre.",
+      "Choisissez un skill de la communauté, importez un personnage public à partir d’un lien Character.AI ou Talkie, ou créez le vôtre en suivant les étapes ci-dessous.",
     steps: {
       skill: {
         title: "Ouvrez le skill Roleplay",
@@ -151,7 +151,7 @@ export const translations: typeof enTranslations = {
     title: "Quand Character.AI reste le meilleur choix",
     intro: "Parfois. Voici quand.",
     library:
-      "Vous voulez parcourir des milliers de personnages créés par la communauté. Ici, vous créez le vôtre ou partez d'un skill.",
+      "Vous suivez déjà des créateurs sur Character.AI ou souhaitez y reprendre vos histoires en cours.",
     flatRate:
       "Vous voulez un forfait fixe sans jamais penser au coût d'une réponse. Les crédits se consomment à l'usage, et les longues scènes sur les modèles premium finissent par peser.",
     wantFilter:

@@ -16,6 +16,22 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    characterAiAlternatives: {
+      title:
+        "Alternatywy dla Character.AI bez filtra. Sprawdzone, nie zgadywane.",
+      category: "Porównanie",
+      excerpt:
+        "Janitor AI, SillyTavern, CrushOn, Kindroid, Nomi, Venice i my, porównani na podstawie ich własnych stron z cenami, zasadami treści i prywatnością. Do tego: import postaci z Character.AI z linku.",
+      readTime: "10 min czytania",
+    },
+    abliteratedExplained: {
+      title:
+        "Abliterowany, fine-tunowany czy z własnym światopoglądem. Trzy rodzaje AI bez cenzury.",
+      category: "Przewodnik po modelach",
+      excerpt:
+        "Co zmienia każda metoda, a czego nie rusza, który z naszych modeli bez cenzury jest którym rodzajem, trzy modele obok ich wersji bez cenzury i dziesięciominutowy test, żeby je odróżnić.",
+      readTime: "8 min czytania",
+    },
     imageGenerators: {
       title:
         "Generatory obrazów AI bez cenzury. Prawdziwe ceny, zero rozmycia.",

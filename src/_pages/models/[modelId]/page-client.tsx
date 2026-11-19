@@ -63,6 +63,14 @@ function ChatModelPage({
   const { t } = scopedTranslation.scopedT(locale);
   const rows = buildFactRows(facts, locale).filter((row) => !row.missing);
   const statKeys = new Set(["price", "context", "inputs", "intelligence"]);
+  const chatModel = facts.isLegacy ? facts.successor : facts;
+  const tryInChat =
+    chatModel === null ? null : (
+      <Cta
+        href={chatHref(locale, chatModel)}
+        label={t("model.chatCta", { model: chatModel.name })}
+      />
+    );
 
   return (
     <Div>
@@ -73,10 +81,7 @@ function ChatModelPage({
         subtitle={modelDescription(facts, locale)}
         actions={
           <>
-            <Cta
-              href={chatHref(locale, facts)}
-              label={t("model.chatCta", { model: facts.name })}
-            />
+            {tryInChat}
             <ModelPicker
               locale={locale}
               models={pickerModels}
@@ -181,16 +186,13 @@ function ChatModelPage({
 
       {sections}
 
-      <CtaBand
-        title={t("model.ctaTitle", { model: facts.name })}
-        subtitle={t("model.ctaSubtitle", { model: facts.name })}
-        actions={
-          <Cta
-            href={chatHref(locale, facts)}
-            label={t("model.chatCta", { model: facts.name })}
-          />
-        }
-      />
+      {chatModel !== null && (
+        <CtaBand
+          title={t("model.ctaTitle", { model: chatModel.name })}
+          subtitle={t("model.ctaSubtitle", { model: chatModel.name })}
+          actions={tryInChat}
+        />
+      )}
     </Div>
   );
 }

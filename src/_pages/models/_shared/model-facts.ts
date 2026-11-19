@@ -30,6 +30,7 @@ import {
   isApiProviderAvailable,
   type ModelDefinition,
   modelProviders,
+  type UncensoredModelMethod,
 } from "next-vibe/agent/models/models";
 import {
   ContentLevel,
@@ -64,28 +65,36 @@ export interface ModelFacts extends ModelRef {
   labName: string;
   description: AgentTranslationKey;
   content: typeof ContentLevelValue;
+  uncensoredMethod: UncensoredModelMethod | null;
   intelligence: typeof IntelligenceLevelValue;
   contextWindow: number;
   /** Context window expressed as printed pages of prose. */
   contextPages: number;
   inputs: Modality[];
   outputs: Modality[];
-  /** Public API providers serving this model (display names, cheapest first). */
+  /** Public API providers serving this model, ordered by reference turn price. */
   providers: string[];
+  /** Provider behind the displayed reference price and token rates. */
+  priceProvider: string;
   supportsTools: boolean;
   /** Credits for one reference message on the cheapest public provider. */
   creditsPerMessage: number;
-  /** How many reference messages one unit of currency ($1 / 1 €) buys. Null when free. */
-  messagesPerCurrencyUnit: number | null;
   /**
    * Credits per 1M tokens on the provider behind creditsPerMessage, markup
    * included. Null for fixed-price routes (no per-token price exists).
    */
-  tokenPrice: { inputCredits: number; outputCredits: number } | null;
+  tokenPrice: {
+    inputCredits: number;
+    outputCredits: number;
+    cacheReadCredits: number | null;
+    cacheWriteCredits: number | null;
+    imageOutputCredits: number | null;
+  } | null;
   /** Parameter count in billions, when the registry knows it. */
   parameterCount: number | null;
   /** Registry strengths (ModelUtility values), registry order, meta tags dropped. */
   strengths: (typeof ModelUtilityValue)[];
+  weaknesses: (typeof ModelUtilityValue)[];
   isLegacy: boolean;
   successor: ModelRef | null;
 }
@@ -279,10 +288,14 @@ function roundCredits(value: number): number {
 }
 
 /** USD per 1M tokens (provider list price) → credits per 1M, markup included. */
-function perMillionCredits(usdPerMillion: number): number {
-  return roundCredits(
-    (usdPerMillion * (1 + STANDARD_MARKUP_PERCENTAGE)) / CREDIT_VALUE_USD,
-  );
+function perMillionCredits(usdPerMillion: number): number;
+function perMillionCredits(usdPerMillion: number | undefined): number | null;
+function perMillionCredits(usdPerMillion: number | undefined): number | null {
+  return usdPerMillion === undefined
+    ? null
+    : roundCredits(
+        (usdPerMillion * (1 + STANDARD_MARKUP_PERCENTAGE)) / CREDIT_VALUE_USD,
+      );
 }
 
 export function getModelFacts(
@@ -293,29 +306,34 @@ export function getModelFacts(
     return null;
   }
   const def = chatModelDefinitions[id];
-  const options = availableOptionsFor(id, availability);
-  if (options.length === 0) {
+  const options = availableOptionsFor(id, availability)
+    .map((option) => ({
+      option,
+      cost: estimateReferenceChatTurnCredits(option),
+    }))
+    .toSorted((a, b) => a.cost - b.cost);
+  const first = options[0];
+  if (first === undefined) {
     return null;
   }
 
-  const costs = options.map(estimateReferenceChatTurnCredits);
-  const cheapestCost = Math.min(...costs);
-  const creditsPerMessage = roundCredits(cheapestCost);
-  const creditsPerUnit = 1 / CREDIT_VALUE_USD;
-  const cheapest = options[costs.indexOf(cheapestCost)];
+  const { option: cheapest, cost } = first;
+  const creditsPerMessage = roundCredits(cost);
   const tokenPrice =
-    cheapest !== undefined &&
     "inputTokenCost" in cheapest &&
     typeof cheapest.inputTokenCost === "number" &&
     typeof cheapest.outputTokenCost === "number"
       ? {
           inputCredits: perMillionCredits(cheapest.inputTokenCost),
           outputCredits: perMillionCredits(cheapest.outputTokenCost),
+          cacheReadCredits: perMillionCredits(cheapest.cacheReadTokenCost),
+          cacheWriteCredits: perMillionCredits(cheapest.cacheWriteTokenCost),
+          imageOutputCredits: perMillionCredits(cheapest.imageOutputTokenCost),
         }
       : null;
 
   const providers: string[] = [];
-  for (const option of options) {
+  for (const { option } of options) {
     const label = apiProviderDisplayNames[option.apiProvider];
     if (!providers.includes(label)) {
       providers.push(label);
@@ -330,23 +348,22 @@ export function getModelFacts(
     labName: modelProviders[def.by]?.name ?? def.by,
     description: def.description,
     content: def.content,
+    uncensoredMethod: def.uncensoredMethod ?? null,
     intelligence: def.intelligence,
     contextWindow: def.contextWindow,
     contextPages: Math.max(1, Math.round(def.contextWindow / TOKENS_PER_PAGE)),
     inputs: def.inputs,
     outputs: def.outputs,
     providers,
+    priceProvider: apiProviderDisplayNames[cheapest.apiProvider],
     supportsTools: def.supportsTools,
     creditsPerMessage,
-    messagesPerCurrencyUnit:
-      creditsPerMessage > 0
-        ? Math.floor(creditsPerUnit / creditsPerMessage)
-        : null,
     tokenPrice,
     parameterCount: def.parameterCount ?? null,
     strengths: def.utilities.filter((utility) =>
       STRENGTH_UTILITIES.has(utility),
     ),
+    weaknesses: def.weaknesses ?? [],
     isLegacy,
     successor: isLegacy ? resolveSuccessor(id, availability) : null,
   };
@@ -437,10 +454,32 @@ function featuredComparisons(
   return refs;
 }
 
+/** "GLM-5.3" and "GLM 5.3 Uncensored" → "glm53", "glm53uncensored". */
+function nameKey(name: string): string {
+  return name.toLowerCase().replaceAll(/[^a-z0-9]/g, "");
+}
+
+const UNCENSORED_SUFFIXES = ["uncensored", "abliterated"];
+
+/** True when `variant` is `base` with only an uncensored/abliterated suffix. */
+export function isUncensoredVariantOf(
+  variant: ModelFacts,
+  base: ModelFacts,
+): boolean {
+  if (variant.content !== ContentLevel.UNCENSORED || variant.id === base.id) {
+    return false;
+  }
+  const variantKey = nameKey(variant.name);
+  const baseKey = nameKey(base.name);
+  return UNCENSORED_SUFFIXES.some(
+    (suffix) => variantKey === `${baseKey}${suffix}`,
+  );
+}
+
 /**
  * Comparison suggestions for a model page: its successor first (legacy), then
- * the featured pairs (always shown, may exceed `limit`), then the current
- * same-tier models with the same outputs, closest in price.
+ * the featured pairs (always shown, may exceed `limit`), then known
+ * base/uncensored variants and same-tier models, closest in price.
  * Feeds internal links and the sitemap.
  */
 export function suggestComparisons(
@@ -462,16 +501,27 @@ export function suggestComparisons(
       (other) =>
         other.id !== facts.id &&
         !other.isLegacy &&
-        other.content === facts.content &&
-        other.outputs.join() === facts.outputs.join() &&
         !picks.some((pick) => pick.id === other.id),
+    )
+    .map((other) => ({
+      other,
+      isVariant:
+        isUncensoredVariantOf(other, facts) ||
+        isUncensoredVariantOf(facts, other),
+    }))
+    .filter(
+      ({ other, isVariant }) =>
+        isVariant ||
+        (other.content === facts.content &&
+          other.outputs.join() === facts.outputs.join()),
     )
     .toSorted(
       (a, b) =>
-        Math.abs(a.creditsPerMessage - facts.creditsPerMessage) -
-        Math.abs(b.creditsPerMessage - facts.creditsPerMessage),
+        Number(b.isVariant) - Number(a.isVariant) ||
+        Math.abs(a.other.creditsPerMessage - facts.creditsPerMessage) -
+          Math.abs(b.other.creditsPerMessage - facts.creditsPerMessage),
     );
-  for (const candidate of candidates) {
+  for (const { other: candidate } of candidates) {
     if (picks.length >= limit) {
       break;
     }

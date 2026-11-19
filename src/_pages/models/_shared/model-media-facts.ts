@@ -7,26 +7,21 @@
 
 import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import type { AgentTranslationKey } from "next-vibe/agent/i18n";
-import { imageGenModelOptions } from "next-vibe/agent/image-generation/models";
 import { type Modality, ModelUtility } from "next-vibe/agent/models/enum";
 import {
   type AnyModelId,
-  type AnyModelOption,
   apiProviderDisplayNames,
   getModelPrice,
   getProviderPrice,
+  type ModelProviderConfig,
   modelProviders,
   PRICE_REFERENCE_STT_SECONDS,
   PRICE_REFERENCE_TTS_CHARS,
 } from "next-vibe/agent/models/models";
-import { musicGenModelOptions } from "next-vibe/agent/music-generation/models";
 import type {
   ContentLevelValue,
   IntelligenceLevelValue,
 } from "next-vibe/agent/skills/enum";
-import { sttModelOptions } from "next-vibe/agent/speech-to-text/models";
-import { ttsModelOptions } from "next-vibe/agent/text-to-speech/models";
-import { videoGenModelOptions } from "next-vibe/agent/video-generation/models";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 
 import {
@@ -58,61 +53,41 @@ export const MEDIA_TYPES: readonly MediaType[] = [
  */
 export interface MediaPrice {
   credits: number;
+  provider: string;
   unit: MediaType;
   /** Seconds (video clip, transcribed audio) or characters (speech); null for image/music. */
   amount: number | null;
 }
 
-/**
- * The same option and reference size ModelCreditDisplay prices, so the static
- * numbers (FAQ, meta, JSON-LD) match the live price row on the page.
- */
-function findMediaOption(
+function mediaPrice(
   type: MediaType,
-  modelId: AnyModelId,
-): AnyModelOption | undefined {
-  switch (type) {
-    case "image":
-      return imageGenModelOptions.find((option) => option.id === modelId);
-    case "video":
-      return videoGenModelOptions.find((option) => option.id === modelId);
-    case "audio":
-      return musicGenModelOptions.find((option) => option.id === modelId);
-    case "tts":
-      return ttsModelOptions.find((option) => option.id === modelId);
-    case "stt":
-      return sttModelOptions.find((option) => option.id === modelId);
-  }
-}
-
-function mediaPrice(type: MediaType, modelId: AnyModelId): MediaPrice | null {
-  const option = findMediaOption(type, modelId);
-  if (option === undefined) {
-    return null;
-  }
-  const credits = getModelPrice(option);
+  config: ModelProviderConfig,
+): MediaPrice | null {
+  const credits = getModelPrice(config);
   if (!(credits > 0)) {
     return null;
   }
+  const base = {
+    credits,
+    provider: apiProviderDisplayNames[config.apiProvider],
+    unit: type,
+  };
+  let amount: number | null = null;
   switch (type) {
     case "video":
-      return {
-        credits,
-        unit: type,
-        amount:
-          "defaultDurationSeconds" in option &&
-          typeof option.defaultDurationSeconds === "number"
-            ? option.defaultDurationSeconds
-            : null,
-      };
+      amount =
+        "defaultDurationSeconds" in config
+          ? (config.defaultDurationSeconds ?? null)
+          : null;
+      break;
     case "tts":
-      return { credits, unit: type, amount: PRICE_REFERENCE_TTS_CHARS };
+      amount = PRICE_REFERENCE_TTS_CHARS;
+      break;
     case "stt":
-      return { credits, unit: type, amount: PRICE_REFERENCE_STT_SECONDS };
-    case "image":
-    case "audio":
-      return { credits, unit: type, amount: null };
+      amount = PRICE_REFERENCE_STT_SECONDS;
+      break;
   }
+  return { ...base, amount };
 }
 
 export interface MediaModelFacts {
@@ -146,14 +121,12 @@ function buildAll(availability: AgentEnvAvailability): MediaModelFacts[] {
       if (def === undefined) {
         continue;
       }
-      const providers: string[] = [];
-      for (const provider of visibleProviders(def, { availability }).toSorted(
+      const configs = visibleProviders(def, { availability }).toSorted(
         (a, b) => getProviderPrice(a) - getProviderPrice(b),
-      )) {
-        const label = apiProviderDisplayNames[provider.apiProvider];
-        if (!providers.includes(label)) {
-          providers.push(label);
-        }
+      );
+      const first = configs[0];
+      if (first === undefined) {
+        continue;
       }
       result.push({
         type,
@@ -167,9 +140,15 @@ function buildAll(availability: AgentEnvAvailability): MediaModelFacts[] {
         intelligence: def.intelligence,
         inputs: def.inputs,
         outputs: def.outputs,
-        providers,
+        providers: [
+          ...new Set(
+            configs.map(
+              ({ apiProvider }) => apiProviderDisplayNames[apiProvider],
+            ),
+          ),
+        ],
         isLegacy: def.utilities.includes(ModelUtility.LEGACY),
-        price: mediaPrice(type, entry.modelId),
+        price: mediaPrice(type, first),
       });
     }
   }

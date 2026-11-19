@@ -25,9 +25,8 @@ import {
 
 import { PageSection } from "../../story/_shared/marketing";
 import { scopedTranslation } from "../i18n";
-import { formatNumber, modelHref } from "./model-format";
+import { formatNumber, mediaUnitText, modelHref } from "./model-format";
 import type { BestForContent, RelatedModel } from "./model-seo";
-import { mediaUnitText } from "./model-seo";
 
 export interface BlogLink {
   /** Locale-less path, e.g. "/story/blog/<slug>". */

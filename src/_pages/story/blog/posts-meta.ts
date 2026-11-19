@@ -7,6 +7,8 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 
 export const BLOG_POST_DATES = {
+  "character-ai-alternatives": "2026-11-19",
+  "abliterated-vs-uncensored-models": "2026-11-19",
   "uncensored-ai-image-generator": "2026-11-17",
   "ai-roleplay-without-filter": "2026-11-17",
   "ai-music-and-voice-generators": "2026-11-16",

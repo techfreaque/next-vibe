@@ -27,6 +27,7 @@ import type { BlogPostSlug } from "../../story/blog/posts-meta";
 import { scopedTranslation } from "../i18n";
 import {
   formatTokenCount,
+  isUncensoredVariantOf,
   listModelFacts,
   type ModelFacts,
 } from "./model-facts";
@@ -34,7 +35,9 @@ import {
   formatMoney,
   formatNumber,
   isApiCallable,
+  mediaUnitText,
   modalityList,
+  referenceTurnText,
   tierName,
   uncensoredKind,
 } from "./model-format";
@@ -43,8 +46,6 @@ import {
   type MediaModelFacts,
   type MediaPrice,
 } from "./model-media-facts";
-
-type ModelsT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /** Google shows ~60 characters of a title; longer ones get cut mid-word. */
 const TITLE_MAX_CHARS = 60;
@@ -142,24 +143,6 @@ export function chatModelMeta(
   };
 }
 
-/** "image", "8s clip", "600 characters": what one priced use is. */
-export function mediaUnitText(price: MediaPrice, t: ModelsT): string {
-  switch (price.unit) {
-    case "image":
-      return t("units.image");
-    case "audio":
-      return t("units.audio");
-    case "video":
-      return price.amount === null
-        ? t("units.videoClip")
-        : t("units.video", { seconds: price.amount });
-    case "tts":
-      return t("units.tts", { chars: price.amount ?? 0 });
-    case "stt":
-      return t("units.stt", { seconds: price.amount ?? 0 });
-  }
-}
-
 export function mediaModelMeta(
   facts: MediaModelFacts,
   locale: CountryLanguage,
@@ -247,7 +230,12 @@ export type BestForKey =
 
 export type SkipKey =
   | "noTools"
-  | "textOnly"
+  | "noImages"
+  | "coding"
+  | "analysis"
+  | "reasoning"
+  | "creative"
+  | "roleplay"
   | "pricey"
   | "smallContext"
   | "filtered"
@@ -310,14 +298,14 @@ export const HAND_PICKED_MODEL_IDS: readonly ChatModelId[] = Object.values(
   ChatModelId,
 ).filter((id) => HAND_PICKED_LINES[id] !== undefined);
 
-const STRENGTH_BEST_FOR: readonly (readonly [string, BestForKey])[] = [
+const STRENGTH_BEST_FOR = [
   [ModelUtility.CODING, "coding"],
   [ModelUtility.REASONING, "reasoning"],
   [ModelUtility.ANALYSIS, "analysis"],
   [ModelUtility.CREATIVE, "creative"],
   [ModelUtility.ROLEPLAY, "roleplay"],
   [ModelUtility.ROLEPLAY_DARK, "roleplayDark"],
-];
+] as const satisfies readonly (readonly [string, BestForKey])[];
 
 const INTELLIGENCE_RANK: Record<typeof IntelligenceLevelValue, number> = {
   [IntelligenceLevel.QUICK]: 0,
@@ -331,7 +319,7 @@ export function bestForKeys(facts: ModelFacts): BestForKey[] {
   const kind = uncensoredKind(facts);
   if (kind === "ownWorldview") {
     keys.push("ownWorldview");
-  } else if (kind === "refusalsRemoved") {
+  } else if (kind !== null) {
     keys.push("uncensored");
   }
   for (const [utility, key] of STRENGTH_BEST_FOR) {
@@ -385,8 +373,17 @@ export function skipKeys(facts: ModelFacts): SkipKey[] {
   if (!facts.supportsTools) {
     keys.push("noTools");
   }
+  for (const [utility, key] of STRENGTH_BEST_FOR) {
+    if (
+      key !== "roleplayDark" &&
+      !facts.strengths.some((strength) => strength === utility) &&
+      facts.weaknesses.some((weakness) => weakness === utility)
+    ) {
+      keys.push(key);
+    }
+  }
   if (!facts.inputs.includes("image")) {
-    keys.push("textOnly");
+    keys.push("noImages");
   }
   if (facts.creditsPerMessage >= PRICEY_CREDITS) {
     keys.push("pricey");
@@ -418,8 +415,26 @@ export function bestForContent(
         lab: facts.labName,
         successor: facts.successor?.name ?? "",
         tokens: formatTokenCount(facts.contextWindow),
+        credits: formatNumber(facts.creditsPerMessage, locale),
       }),
     ),
+  };
+}
+
+export function mediaBestForContent(
+  facts: MediaModelFacts,
+  locale: CountryLanguage,
+): BestForContent {
+  const { t } = scopedTranslation.scopedT(locale);
+  return {
+    line: null,
+    good: [t(`bestFor.media.${facts.type}`)],
+    skip: [
+      ...(facts.isLegacy ? [t("bestFor.skipItems.legacyNoSuccessor")] : []),
+      t("bestFor.media.otherOutputs", {
+        outputs: modalityList(facts.outputs, t),
+      }),
+    ],
   };
 }
 
@@ -442,25 +457,6 @@ export interface RelatedModel {
   credits: number | null;
   /** Media only: what one priced use is. */
   mediaPrice: MediaPrice | null;
-}
-
-/** "GLM-5.3" and "GLM 5.3 Uncensored" → "glm53", "glm53uncensored". */
-function nameKey(name: string): string {
-  return name.toLowerCase().replaceAll(/[^a-z0-9]/g, "");
-}
-
-const UNCENSORED_SUFFIXES = ["uncensored", "abliterated"];
-
-/** True when `variant` is `base` with only an uncensored/abliterated suffix. */
-function isUncensoredVariantOf(variant: ModelFacts, base: ModelFacts): boolean {
-  if (variant.content !== ContentLevel.UNCENSORED || variant.id === base.id) {
-    return false;
-  }
-  const variantKey = nameKey(variant.name);
-  const baseKey = nameKey(base.name);
-  return UNCENSORED_SUFFIXES.some(
-    (suffix) => variantKey === `${baseKey}${suffix}`,
-  );
 }
 
 function toRelated(other: ModelFacts, reason: RelatedReason): RelatedModel {
@@ -597,10 +593,15 @@ export function chatModelFaq(
     facts.creditsPerMessage <= 0
       ? t("faq.price.aFree", { model })
       : facts.tokenPrice === null
-        ? t("faq.price.aFlat", { credits, money })
+        ? t("faq.price.aFlat", {
+            credits,
+            money,
+            provider: facts.priceProvider,
+          })
         : t("faq.price.aTokens", {
             credits,
             money,
+            provider: facts.priceProvider,
             input: formatMoney(facts.tokenPrice.inputCredits, locale),
             output: formatMoney(facts.tokenPrice.outputCredits, locale),
           });
@@ -608,35 +609,38 @@ export function chatModelFaq(
   const kind = uncensoredKind(facts);
   const uncensoredAnswer =
     kind !== null
-      ? t(`faq.uncensored.${kind}`, { model })
+      ? `${t(`uncensoredKind.${kind}.line`)} ${t("faq.uncensored.consent")}`
       : facts.content === ContentLevel.OPEN
         ? t("faq.uncensored.open", { model })
         : t("faq.uncensored.mainstream", { model, lab: facts.labName });
 
   const apiAnswer = isApiCallable(facts)
     ? t("faq.api.a", { id: facts.id, appName: configT("appName") })
-    : facts.successor === null
-      ? t("faq.api.legacyNoSuccessor", { model })
-      : t("faq.api.legacy", {
-          model,
-          successor: facts.successor.name,
-          id: facts.successor.id,
-        });
-
-  const extraInputs = facts.inputs.filter(
-    (modality) => modality !== "text" && modality !== "image",
-  );
-  const imagesSentence = !facts.inputs.includes("image")
-    ? t("faq.inputs.textOnly")
-    : extraInputs.length > 0
-      ? t("faq.inputs.imagesAndMore", { more: modalityList(extraInputs, t) })
-      : t("faq.inputs.images");
+    : !facts.isLegacy
+      ? t("facts.apiIdUnsupported")
+      : facts.successor === null
+        ? t("faq.api.legacyNoSuccessor", { model })
+        : t("faq.api.legacy", {
+            model,
+            successor: facts.successor.name,
+            id: facts.successor.id,
+          });
+  const modalitiesSentence = t("faq.inputs.modalities", {
+    inputs: modalityList(facts.inputs, t),
+    outputs: modalityList(facts.outputs, t),
+  });
   const toolsSentence = facts.supportsTools
     ? t("faq.inputs.toolsYes")
     : t("faq.inputs.toolsNo");
 
   return [
-    { question: t("faq.price.q", { model }), answer: priceAnswer },
+    {
+      question: t("faq.price.q", { model }),
+      answer:
+        facts.tokenPrice === null || facts.creditsPerMessage === 0
+          ? priceAnswer
+          : `${priceAnswer} ${referenceTurnText(facts, locale, t)}`,
+    },
     { question: t("faq.uncensored.q", { model }), answer: uncensoredAnswer },
     { question: t("faq.api.q", { model }), answer: apiAnswer },
     {
@@ -648,7 +652,11 @@ export function chatModelFaq(
     },
     {
       question: t("faq.inputs.q", { model }),
-      answer: `${imagesSentence} ${toolsSentence}`,
+      answer: `${modalitiesSentence} ${toolsSentence}`,
+    },
+    {
+      question: t("faq.providers.q", { model }),
+      answer: t("faq.providers.a", { providers: facts.providers.join(", ") }),
     },
   ];
 }
@@ -667,6 +675,7 @@ export function mediaModelFaq(
           credits: formatNumber(facts.price.credits, locale),
           money: formatMoney(facts.price.credits, locale),
           unit: mediaUnitText(facts.price, t),
+          provider: facts.price.provider,
         });
   const uncensoredAnswer =
     facts.content === ContentLevel.UNCENSORED
@@ -695,6 +704,10 @@ export function mediaModelFaq(
     {
       question: t("mediaFaq.uncensored.q", { model }),
       answer: uncensoredAnswer,
+    },
+    {
+      question: t("faq.providers.q", { model }),
+      answer: t("faq.providers.a", { providers: facts.providers.join(", ") }),
     },
   ];
 }
