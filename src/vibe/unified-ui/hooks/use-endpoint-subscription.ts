@@ -26,6 +26,7 @@
  */
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { z } from "zod";
 
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { CountryLanguage } from "../../core/i18n/core/config";
@@ -41,6 +42,7 @@ import {
   buildUserWsChannel,
   buildWsChannel,
 } from "../../realtime/core/channel";
+import { buildEventFieldSchema } from "../../realtime/core/event-field-schema";
 import type { AnyEndpointEventEnvelope } from "../../realtime/core/structured-events";
 import { eventDeclarationHasFields } from "../../realtime/core/structured-events";
 import type { WsChannelDescriptor } from "../../realtime/core/types";
@@ -180,6 +182,7 @@ export function useEndpointSubscription(
       urlPathParams: resolvedParams,
       requestData: toCacheKeyParams(requestDataRef.current),
     };
+    const responseSchemas = new Map<string, z.ZodType<WidgetData>>();
 
     /**
      * Dispatch a received event to cache-merger + onEvent. Every event arrives as
@@ -188,7 +191,6 @@ export function useEndpointSubscription(
      */
     function handleEvent(envelope: AnyEndpointEventEnvelope): void {
       const eventName = envelope.eventName;
-      const wirePayload = envelope.responseData ?? envelope.payload;
       const declaration = endpoint?.events?.[eventName];
       if (!declaration) {
         logger.warn(
@@ -208,12 +210,41 @@ export function useEndpointSubscription(
         return;
       }
 
+      const operation = declaration.operation ?? "merge";
+      const hasResponseFields = eventDeclarationHasFields(declaration);
+      let responseData: WidgetData = envelope.responseData ?? envelope.payload;
+      if (
+        hasResponseFields &&
+        (operation === "merge" || operation === "upsert")
+      ) {
+        let schema = responseSchemas.get(eventName);
+        if (!schema) {
+          schema = buildEventFieldSchema(
+            endpoint.responseSchema,
+            declaration.responseFields,
+          );
+          responseSchemas.set(eventName, schema);
+        }
+        // JSON turns Dates into strings. Apply the response field transforms
+        // to the patch before it reaches the cache or the event callbacks.
+        const parsed = schema.safeParse(responseData ?? {});
+        if (!parsed.success) {
+          logger.warn("useEndpointSubscription: invalid response data", {
+            eventName,
+            endpointPath: endpoint.path.join("/"),
+            fields: parsed.error.issues.map((issue) => issue.path.join(".")),
+          });
+          return;
+        }
+        responseData = parsed.data;
+      }
+
       const currentUser = userRef.current;
       const shouldApply =
         !declaration.shouldApplyOperation ||
         !currentUser ||
         declaration.shouldApplyOperation({
-          responseData: wirePayload,
+          responseData,
           requestData: envelope.requestData ?? requestDataRef.current,
           urlPathParams: envelope.urlPathParams ?? resolvedParams,
           payload: envelope.payload,
@@ -222,11 +253,7 @@ export function useEndpointSubscription(
           locale: localeRef.current,
         });
 
-      if (
-        shouldApply &&
-        eventDeclarationHasFields(declaration) &&
-        cacheKey !== undefined
-      ) {
+      if (shouldApply && hasResponseFields && cacheKey !== undefined) {
         queryClient.setQueryData(
           [cacheKey],
           (
@@ -238,17 +265,16 @@ export function useEndpointSubscription(
               return existing;
             }
 
-            const operation = declaration.operation ?? "merge";
             const newData =
               operation === "append"
-                ? appendDeltaToCache(existing.data, wirePayload)
+                ? appendDeltaToCache(existing.data, responseData)
                 : operation === "remove"
-                  ? removeFromCache(existing.data, wirePayload)
+                  ? removeFromCache(existing.data, responseData)
                   : // upsert may insert unknown ids (creation events carrying the
                     // full item); plain merge only patches items already present.
                     applyPartialToCache(
                       existing.data,
-                      wirePayload,
+                      responseData,
                       operation === "upsert",
                     );
 
@@ -262,7 +288,7 @@ export function useEndpointSubscription(
 
       if (declaration.onEvent && currentUser) {
         void declaration.onEvent({
-          responseData: wirePayload,
+          responseData,
           // The envelope carries the emitter's own requestData/urlPathParams, so
           // onEvent gets the EVENT's context, not the subscriber's.
           requestData: envelope.requestData ?? requestDataRef.current,

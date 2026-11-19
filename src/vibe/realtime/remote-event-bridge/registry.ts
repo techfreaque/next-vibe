@@ -13,86 +13,16 @@
  *   payload       ← payloadType (zod schema on the event declaration)
  */
 
-import { z } from "zod";
+import type { z } from "zod";
 
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { RemoteEventContext } from "../../core/route/handler-realtime";
 import type { WidgetData } from "../../core/utils/json";
 import { WidgetDataSchema } from "../../core/utils/json";
 import type { EndpointLogger } from "../../logger/types";
+import { buildEventFieldSchema } from "../core/event-field-schema";
 import type { AnyEndpointEventEnvelope } from "../core/structured-events";
 import type { RegistryRouteModule } from "../server/ws-channel-registry";
-
-const recordSchema: z.ZodType<Record<string, WidgetData>> = z.record(
-  z.string(),
-  WidgetDataSchema,
-);
-
-/**
- * Build a parse schema for one envelope field from the event declaration.
- */
-function buildFieldSchema(
-  baseSchema: z.ZodTypeAny,
-  fieldSpec:
-    | readonly string[]
-    | Record<string, readonly string[] | true>
-    | undefined,
-): z.ZodTypeAny {
-  if (fieldSpec === undefined) {
-    return z.record(z.string(), WidgetDataSchema).default({});
-  }
-
-  if (Array.isArray(fieldSpec)) {
-    if (!(baseSchema instanceof z.ZodObject)) {
-      return z.record(z.string(), WidgetDataSchema).default({});
-    }
-    const maskObj: Record<string, true> = {};
-    for (const k of fieldSpec as string[]) {
-      maskObj[k] = true;
-    }
-    return baseSchema.pick(maskObj).partial();
-  }
-
-  if (!(baseSchema instanceof z.ZodObject)) {
-    return z.record(z.string(), WidgetDataSchema).default({});
-  }
-  const shape: Record<string, z.ZodTypeAny> = {};
-  for (const [topKey, subSpec] of Object.entries(
-    fieldSpec as Record<string, readonly string[] | true>,
-  )) {
-    const topFieldSchema = (baseSchema.shape as Record<string, z.ZodTypeAny>)[
-      topKey
-    ];
-    if (!topFieldSchema) {
-      continue;
-    }
-    if (subSpec === true) {
-      shape[topKey] = topFieldSchema.optional();
-    } else if (Array.isArray(subSpec)) {
-      const elementSchema = unwrapArrayElement(topFieldSchema);
-      if (elementSchema instanceof z.ZodObject) {
-        const mask: Record<string, true> = {};
-        for (const f of subSpec as string[]) {
-          mask[f] = true;
-        }
-        shape[topKey] = z.array(elementSchema.pick(mask).partial()).optional();
-      } else {
-        shape[topKey] = topFieldSchema.optional();
-      }
-    }
-  }
-  return z.object(shape).partial();
-}
-
-function unwrapArrayElement(schema: z.ZodTypeAny): z.ZodTypeAny {
-  if (schema instanceof z.ZodArray) {
-    return schema.element as z.ZodTypeAny;
-  }
-  if (schema instanceof z.ZodOptional || schema instanceof z.ZodNullable) {
-    return unwrapArrayElement(schema.unwrap() as z.ZodTypeAny);
-  }
-  return schema;
-}
 
 function gateEnvelope(
   endpoint: CreateApiEndpointAny,
@@ -120,18 +50,15 @@ function gateEnvelope(
       | undefined
   )?.[envelope.eventName];
 
-  const responseGate = buildFieldSchema(
+  const responseGate = buildEventFieldSchema(
     endpoint.responseSchema,
-    eventDecl?.responseFields as
-      | readonly string[]
-      | Record<string, readonly string[] | true>
-      | undefined,
+    eventDecl?.responseFields,
   ).safeParse(envelope.responseData ?? {});
-  const requestGate = buildFieldSchema(
+  const requestGate = buildEventFieldSchema(
     endpoint.requestSchema,
     eventDecl?.requestFields,
   ).safeParse(envelope.requestData ?? {});
-  const urlGate = buildFieldSchema(
+  const urlGate = buildEventFieldSchema(
     endpoint.requestUrlPathParamsSchema,
     eventDecl?.urlPathParamsFields,
   ).safeParse(envelope.urlPathParams ?? {});
@@ -172,9 +99,9 @@ function gateEnvelope(
   }
 
   return {
-    responseData: recordSchema.parse(responseGate.data),
-    requestData: recordSchema.parse(requestGate.data),
-    urlPathParams: recordSchema.parse(urlGate.data),
+    responseData: responseGate.data,
+    requestData: requestGate.data,
+    urlPathParams: urlGate.data,
     payload: parsedPayload,
   };
 }

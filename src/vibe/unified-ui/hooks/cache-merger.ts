@@ -6,6 +6,7 @@
  * - Objects: recursively merges keys. Only creates a new object when a key value changes.
  * - Arrays of objects with an `id` field: merges by id. Items not in the patch are kept.
  * - Arrays without `id`: replaced wholesale.
+ * - Dates: replaced when their timestamps differ.
  * - Primitives: replaced when changed, same reference when equal.
  *
  * Used by useEndpointSubscription to apply server-emitted partials into
@@ -117,6 +118,12 @@ export function applyPartialToCache(
     return partial === existing ? existing : partial;
   }
 
+  if (partial instanceof Date) {
+    return existing instanceof Date && existing.getTime() === partial.getTime()
+      ? existing
+      : partial;
+  }
+
   // Arrays
   if (Array.isArray(partial)) {
     if (!Array.isArray(existing)) {
@@ -126,11 +133,12 @@ export function applyPartialToCache(
     return merged === existing ? existing : merged;
   }
 
-  // Object merge - existing must also be an object (non-array)
+  // Deep merging requires two records.
   if (
     typeof existing !== "object" ||
     existing === null ||
-    Array.isArray(existing)
+    Array.isArray(existing) ||
+    existing instanceof Date
   ) {
     return partial;
   }
