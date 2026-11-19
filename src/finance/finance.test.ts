@@ -10,13 +10,13 @@
 
 import "server-only";
 
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "bun:test";
 import { and, eq, gte, like } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import { pgliteReady } from "next-vibe/database/client";
 import { users } from "next-vibe/identity/user/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { paymentRefunds, paymentTransactions } from "@/payment/db";
 import {
@@ -56,7 +56,6 @@ import {
   computeMargin,
   DEFAULT_THRESHOLDS,
   detectDayAnomalies,
-  detectLowBalance,
   detectProviderAnomalies,
   isDuplicateAlert,
   type LedgerUsageBreakdown,
@@ -569,31 +568,6 @@ describe("detectDayAnomalies", () => {
   });
 });
 
-describe("prepaid provider balance thresholds", () => {
-  it.each([
-    { balanceUsd: 14, dailySpendUsd: 2, severity: undefined },
-    { balanceUsd: 13.99, dailySpendUsd: 2, severity: AlertSeverity.WARNING },
-    { balanceUsd: 4, dailySpendUsd: 2, severity: AlertSeverity.WARNING },
-    { balanceUsd: 3.99, dailySpendUsd: 2, severity: AlertSeverity.CRITICAL },
-    { balanceUsd: 5, dailySpendUsd: 0.01, severity: undefined },
-    { balanceUsd: 4.99, dailySpendUsd: 0.01, severity: AlertSeverity.WARNING },
-    { balanceUsd: 1, dailySpendUsd: null, severity: AlertSeverity.WARNING },
-    { balanceUsd: 0.99, dailySpendUsd: null, severity: AlertSeverity.CRITICAL },
-  ])("classifies balance $balanceUsd with daily spend $dailySpendUsd", (row) => {
-    const alert = detectLowBalance({
-      provider: FinanceSource.NANO_GPT,
-      providerLabel: "NanoGPT",
-      warningUsd: DEFAULT_THRESHOLDS.nanoGptLowBalanceUsd,
-      warningDays: DEFAULT_THRESHOLDS.nanoGptLowBalanceDays,
-      criticalUsd: DEFAULT_THRESHOLDS.nanoGptCriticalBalanceUsd,
-      criticalDays: DEFAULT_THRESHOLDS.nanoGptCriticalBalanceDays,
-      balanceUsd: row.balanceUsd,
-      dailySpendUsd: row.dailySpendUsd,
-    });
-    expect(alert?.severity).toBe(row.severity);
-  });
-});
-
 describe("thresholds + dedup window", () => {
   it("an enabled override wins, a disabled one falls back", () => {
     const th = resolveThresholds([
@@ -799,6 +773,14 @@ async function ingest(
     throw new Error(result.message);
   }
   return result.data;
+}
+
+async function checkAutoTopUpBalances(nano: number, venice: number, minutes: number, dryRun = false): Promise<FinanceIngestResponseOutput["alerts"]> {
+  nanoGptBalance = nano;
+  veniceBalance = venice;
+  observedAt = new Date(NOW.getTime() + minutes * 60_000);
+  const result = await ingest(IngestScope.BALANCES, dryRun);
+  return result.alerts.filter((alert) => alert.type === FinanceAlertType.LOW_BALANCE);
 }
 
 describe("finance ingest (mocked externals)", () => {
@@ -1356,46 +1338,47 @@ describe("finance ingest (mocked externals)", () => {
     }
   });
 
-  it("reports first low prepaid balances while OpenRouter can still auto top up", async () => {
-    openRouterCredits = 150.74;
-    nanoGptBalance = 4.5;
-    veniceBalance = 3;
-    FinanceRepository.deps = {
-      ...testDeps,
-      recipients: () => ["hi@unbottled.ai", "thea@unbottled.ai"],
-    };
-    try {
-      const dryRun = await ingest(IngestScope.BALANCES, true);
-      expect(dryRun.alerts).toEqual([
-        expect.objectContaining({
-          type: FinanceAlertType.LOW_BALANCE,
-          subject: FinanceSource.NANO_GPT,
-          severity: AlertSeverity.WARNING,
-          delivery: "dry-run",
-        }),
-        expect.objectContaining({
-          type: FinanceAlertType.LOW_BALANCE,
-          subject: FinanceSource.VENICE,
-          severity: AlertSeverity.WARNING,
-          delivery: "dry-run",
-        }),
-      ]);
-      expect(mails).toHaveLength(0);
+  it("waits over an hour for NanoGPT and Venice auto top-ups", async () => {
+    expect(await checkAutoTopUpBalances(9.75, 9.9, 0)).toEqual([]);
+    expect(await checkAutoTopUpBalances(4.5, 3, 1, true)).toEqual([]);
+    expect(await checkAutoTopUpBalances(4.5, 3, 1)).toEqual([]);
+    expect(await checkAutoTopUpBalances(4.5, 3, 61)).toEqual([]);
+    expect(mails).toHaveLength(0);
 
-      const live = await ingest(IngestScope.BALANCES);
-      expect(live.alerts.map((a) => a.delivery)).toEqual([
-        "sent",
-        "sent",
-      ]);
-      expect(mails.map((mail) => mail.to)).toEqual([
-        "hi@unbottled.ai",
-        "thea@unbottled.ai",
-        "hi@unbottled.ai",
-        "thea@unbottled.ai",
-      ]);
-    } finally {
-      FinanceRepository.deps = testDeps;
-    }
+    expect(await checkAutoTopUpBalances(4.5, 3, 62)).toEqual([
+      expect.objectContaining({
+        subject: FinanceSource.NANO_GPT,
+        severity: AlertSeverity.CRITICAL,
+        delivery: "sent",
+      }),
+      expect.objectContaining({
+        subject: FinanceSource.VENICE,
+        severity: AlertSeverity.CRITICAL,
+        delivery: "sent",
+      }),
+    ]);
+    expect((await checkAutoTopUpBalances(4.5, 3, 63)).map((alert) => alert.delivery)).toEqual([
+      "suppressed",
+      "suppressed",
+    ]);
+
+    // A recovery clears only this provider's low-balance streak.
+    expect(await checkAutoTopUpBalances(5, 3, 64)).toEqual([
+      expect.objectContaining({
+        subject: FinanceSource.VENICE,
+        delivery: "suppressed",
+      }),
+    ]);
+    expect(await checkAutoTopUpBalances(4.9, 5, 65)).toEqual([]);
+    expect(await checkAutoTopUpBalances(4.9, 5, 125)).toEqual([]);
+    expect(await checkAutoTopUpBalances(4.9, 5, 126)).toEqual([
+      expect.objectContaining({
+        subject: FinanceSource.NANO_GPT,
+        severity: AlertSeverity.CRITICAL,
+        delivery: "sent",
+      }),
+    ]);
+    expect(mails).toHaveLength(3);
   });
 
   it("waits for OpenRouter's grace period and resets it on recovery or a missed hour", async () => {
@@ -1514,60 +1497,18 @@ describe("finance ingest (mocked externals)", () => {
       expect(duringOutage.alerts).toEqual([
         expect.objectContaining({ subject: FinanceSource.GAB, severity: AlertSeverity.CRITICAL }),
       ]);
-      expect(duringOutage.sources.find(({ source }) => source === FinanceSource.GAB))
-        .toMatchObject({ status: SourceRunStatus.OK, reason: expect.stringContaining("Gab usage unavailable (HTTP 503)") });
+      expect(duringOutage.sources.find(({ source }) => source === FinanceSource.GAB)).toMatchObject(
+        {
+          status: SourceRunStatus.OK,
+          reason: expect.stringContaining("Gab usage unavailable (HTTP 503)"),
+        },
+      );
     } finally {
       FinanceRepository.deps = testDeps;
     }
   });
 
-  it("mails once per downward crossing and rearms each step after recovery", async () => {
-    async function checkBalance(balance: number, hoursAfterStart: number) {
-      nanoGptBalance = balance;
-      observedAt = new Date(
-        NOW.getTime() + hoursAfterStart * FINANCE_CONFIG.hourMs,
-      );
-      const data = await ingest(IngestScope.BALANCES);
-      const alert = data.alerts.find(
-        (a) => a.type === FinanceAlertType.LOW_BALANCE,
-      );
-      return alert && { severity: alert.severity, delivery: alert.delivery };
-    }
-
-    expect(await checkBalance(5, 0)).toBeUndefined();
-    expect(await checkBalance(4, 1)).toEqual({
-      severity: AlertSeverity.WARNING,
-      delivery: "sent",
-    });
-    expect(await checkBalance(2.1, 25)).toEqual({
-      severity: AlertSeverity.WARNING,
-      delivery: "suppressed",
-    });
-    expect(await checkBalance(0.8, 26)).toEqual({
-      severity: AlertSeverity.CRITICAL,
-      delivery: "sent",
-    });
-    expect(await checkBalance(0.5, 27)).toEqual({
-      severity: AlertSeverity.CRITICAL,
-      delivery: "suppressed",
-    });
-    expect(await checkBalance(1.5, 28)).toEqual({
-      severity: AlertSeverity.WARNING,
-      delivery: "suppressed",
-    });
-    expect(await checkBalance(0.8, 29)).toEqual({
-      severity: AlertSeverity.CRITICAL,
-      delivery: "sent",
-    });
-    expect(await checkBalance(6, 30)).toBeUndefined();
-    expect(await checkBalance(4.5, 31)).toEqual({
-      severity: AlertSeverity.WARNING,
-      delivery: "sent",
-    });
-    expect(mails).toHaveLength(4);
-  });
-
-  it("keeps the reported NanoGPT and Venice balances quiet at their seven-day spend rates", async () => {
+  it("keeps the reported NanoGPT and Venice balances quiet during normal auto top-up dips", async () => {
     nanoGptBalance = 14.52;
     veniceBalance = 6.02;
     const bucketAt = new Date(Date.UTC(2031, 2, 4, 11));
@@ -1594,58 +1535,34 @@ describe("finance ingest (mocked externals)", () => {
     expect(mails).toHaveLength(0);
   });
 
-  it("uses each provider's configured floor and seven-day spend runway", async () => {
-    veniceBalance = 55;
-    nanoGptBalance = 35;
+  it("uses separate NanoGPT and Venice auto top-up overrides", async () => {
+    veniceBalance = 5.5;
+    nanoGptBalance = 6.5;
     await db.insert(financeThresholds).values([
-      { key: ThresholdKey.VENICE_LOW_BALANCE_DAYS, value: 4 },
-      { key: ThresholdKey.NANO_GPT_LOW_BALANCE_USD, value: 30 },
-    ]);
-    const hour = FINANCE_CONFIG.hourMs;
-    const weekStart =
-      Date.UTC(2031, 2, 4, 12) -
-      FINANCE_CONFIG.baselineDays * FINANCE_CONFIG.dayMs;
-    await db.insert(financeProviderSnapshots).values(
-      [
-        { at: weekStart - hour, spendUsd: 700, elapsedHours: 1 },
-        { at: weekStart + hour, spendUsd: 28, elapsedHours: 2 },
-        { at: weekStart + 2 * hour, spendUsd: 91, elapsedHours: 1 },
-      ].map(({ at, spendUsd, elapsedHours }) => ({
-        provider: FinanceSource.VENICE,
-        bucketAt: new Date(at),
-        capturedAt: new Date(at),
-        balanceUsd: 55,
-        spendUsd,
-        elapsedHours,
-      })),
-    );
-
-    const data = await ingest(IngestScope.BALANCES);
-    expect(data.alerts).toEqual([
-      expect.objectContaining({
-        type: FinanceAlertType.LOW_BALANCE,
-        subject: FinanceSource.VENICE,
-        severity: AlertSeverity.WARNING,
-        message: expect.stringContaining("$55.00 remaining, below $60.00"),
-      }),
+      { key: ThresholdKey.NANO_GPT_AUTO_TOP_UP_FLOOR_USD, value: 7 },
+      { key: ThresholdKey.NANO_GPT_AUTO_TOP_UP_GRACE_HOURS, value: 0.25 },
+      { key: ThresholdKey.VENICE_AUTO_TOP_UP_FLOOR_USD, value: 6 },
+      { key: ThresholdKey.VENICE_AUTO_TOP_UP_GRACE_HOURS, value: 0.5 },
     ]);
 
-    await db.insert(financeThresholds).values([
-      { key: ThresholdKey.VENICE_CRITICAL_BALANCE_DAYS, value: 4 },
-      { key: ThresholdKey.NANO_GPT_CRITICAL_BALANCE_USD, value: 36 },
-    ]);
-    observedAt = new Date(NOW.getTime() + 60_000);
+    expect((await ingest(IngestScope.BALANCES)).alerts).toEqual([]);
+    observedAt = new Date(NOW.getTime() + 16 * 60_000);
     expect((await ingest(IngestScope.BALANCES)).alerts).toEqual([
       expect.objectContaining({
         subject: FinanceSource.NANO_GPT,
         severity: AlertSeverity.CRITICAL,
-        message: expect.stringContaining("$35.00 remaining, below $36.00"),
         delivery: "sent",
+      }),
+    ]);
+    observedAt = new Date(NOW.getTime() + 31 * 60_000);
+    expect((await ingest(IngestScope.BALANCES)).alerts).toEqual([
+      expect.objectContaining({
+        subject: FinanceSource.NANO_GPT,
+        delivery: "suppressed",
       }),
       expect.objectContaining({
         subject: FinanceSource.VENICE,
         severity: AlertSeverity.CRITICAL,
-        message: expect.stringContaining("$55.00 remaining, below $60.00"),
         delivery: "sent",
       }),
     ]);
@@ -1653,13 +1570,13 @@ describe("finance ingest (mocked externals)", () => {
 
   it("claims one low balance crossing across concurrent ingests", async () => {
     nanoGptBalance = 4;
+    expect((await ingest(IngestScope.BALANCES)).alerts).toEqual([]);
+    observedAt = new Date(NOW.getTime() + 61 * 60_000);
     const outcomes = await Promise.all([
       ingest(IngestScope.BALANCES),
       ingest(IngestScope.BALANCES),
     ]);
-    const deliveries = outcomes.flatMap((outcome) =>
-      outcome.alerts.map((alert) => alert.delivery),
-    );
+    const deliveries = outcomes.flatMap((outcome) => outcome.alerts.map((alert) => alert.delivery));
     expect(deliveries.toSorted()).toEqual(["sent", "suppressed"]);
     expect(mails).toHaveLength(1);
   });
@@ -1668,6 +1585,8 @@ describe("finance ingest (mocked externals)", () => {
     FinanceRepository.deps = { ...testDeps, isProduction: false };
     try {
       nanoGptBalance = 0.74;
+      expect((await ingest(IngestScope.BALANCES)).alerts).toEqual([]);
+      observedAt = new Date(NOW.getTime() + 61 * 60_000);
       const data = await ingest(IngestScope.BALANCES);
       expect(data.alerts[0]).toMatchObject({
         type: FinanceAlertType.LOW_BALANCE,

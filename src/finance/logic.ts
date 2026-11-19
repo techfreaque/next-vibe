@@ -40,14 +40,10 @@ export interface Thresholds {
   openrouterAutoTopUpFloorUsd: number;
   openrouterAutoTopUpGraceHours: number;
   gabLowBalanceCredits: number;
-  nanoGptLowBalanceUsd: number;
-  nanoGptLowBalanceDays: number;
-  nanoGptCriticalBalanceUsd: number;
-  nanoGptCriticalBalanceDays: number;
-  veniceLowBalanceUsd: number;
-  veniceLowBalanceDays: number;
-  veniceCriticalBalanceUsd: number;
-  veniceCriticalBalanceDays: number;
+  nanoGptAutoTopUpFloorUsd: number;
+  nanoGptAutoTopUpGraceHours: number;
+  veniceAutoTopUpFloorUsd: number;
+  veniceAutoTopUpGraceHours: number;
 }
 
 export const DEFAULT_THRESHOLDS: Thresholds = {
@@ -75,14 +71,10 @@ export const THRESHOLD_FIELD: Readonly<
   [ThresholdKey.OPENROUTER_AUTO_TOP_UP_GRACE_HOURS]:
     "openrouterAutoTopUpGraceHours",
   [ThresholdKey.GAB_LOW_BALANCE_CREDITS]: "gabLowBalanceCredits",
-  [ThresholdKey.NANO_GPT_LOW_BALANCE_USD]: "nanoGptLowBalanceUsd",
-  [ThresholdKey.NANO_GPT_LOW_BALANCE_DAYS]: "nanoGptLowBalanceDays",
-  [ThresholdKey.NANO_GPT_CRITICAL_BALANCE_USD]: "nanoGptCriticalBalanceUsd",
-  [ThresholdKey.NANO_GPT_CRITICAL_BALANCE_DAYS]: "nanoGptCriticalBalanceDays",
-  [ThresholdKey.VENICE_LOW_BALANCE_USD]: "veniceLowBalanceUsd",
-  [ThresholdKey.VENICE_LOW_BALANCE_DAYS]: "veniceLowBalanceDays",
-  [ThresholdKey.VENICE_CRITICAL_BALANCE_USD]: "veniceCriticalBalanceUsd",
-  [ThresholdKey.VENICE_CRITICAL_BALANCE_DAYS]: "veniceCriticalBalanceDays",
+  [ThresholdKey.NANO_GPT_AUTO_TOP_UP_FLOOR_USD]: "nanoGptAutoTopUpFloorUsd",
+  [ThresholdKey.NANO_GPT_AUTO_TOP_UP_GRACE_HOURS]: "nanoGptAutoTopUpGraceHours",
+  [ThresholdKey.VENICE_AUTO_TOP_UP_FLOOR_USD]: "veniceAutoTopUpFloorUsd",
+  [ThresholdKey.VENICE_AUTO_TOP_UP_GRACE_HOURS]: "veniceAutoTopUpGraceHours",
 };
 
 export interface ThresholdOverride {
@@ -96,7 +88,7 @@ export function resolveThresholds(rows: ThresholdOverride[]): Thresholds {
   const resolved: Thresholds = { ...DEFAULT_THRESHOLDS };
   for (const row of rows) {
     const field = THRESHOLD_FIELD[row.key];
-    // Older deployments can have overrides for the retired OpenRouter policy.
+    // Older deployments can have overrides for retired balance policies.
     if (row.enabled && field !== undefined) {
       resolved[field] = row.value;
     }
@@ -357,39 +349,44 @@ export interface AlertCandidate {
 
 const money = (value: number): string => `$${value.toFixed(2)}`;
 
-export const LOW_BALANCE_THRESHOLDS: Partial<
+export const AUTO_TOP_UP_THRESHOLDS: Partial<
   Record<
     typeof FinanceSourceValue,
-    {
-      warningUsd: keyof Thresholds;
-      warningDays: keyof Thresholds;
-      criticalUsd: keyof Thresholds;
-      criticalDays: keyof Thresholds;
-    }
+    { floorUsd: keyof Thresholds; graceHours: keyof Thresholds }
   >
 > = {
+  [FinanceSource.OPENROUTER]: {
+    floorUsd: "openrouterAutoTopUpFloorUsd",
+    graceHours: "openrouterAutoTopUpGraceHours",
+  },
   [FinanceSource.NANO_GPT]: {
-    warningUsd: "nanoGptLowBalanceUsd",
-    warningDays: "nanoGptLowBalanceDays",
-    criticalUsd: "nanoGptCriticalBalanceUsd",
-    criticalDays: "nanoGptCriticalBalanceDays",
+    floorUsd: "nanoGptAutoTopUpFloorUsd",
+    graceHours: "nanoGptAutoTopUpGraceHours",
   },
   [FinanceSource.VENICE]: {
-    warningUsd: "veniceLowBalanceUsd",
-    warningDays: "veniceLowBalanceDays",
-    criticalUsd: "veniceCriticalBalanceUsd",
-    criticalDays: "veniceCriticalBalanceDays",
+    floorUsd: "veniceAutoTopUpFloorUsd",
+    graceHours: "veniceAutoTopUpGraceHours",
   },
 };
 
-export function detectOpenRouterLowBalance(input: {
+export function detectAutoTopUpLowBalance(input: {
+  provider: typeof FinanceSourceValue;
+  providerLabel: string;
   balanceUsd: number;
   floorUsd: number;
   graceHours: number;
   since: Date;
   now: Date;
 }): AlertCandidate | null {
-  const { balanceUsd, floorUsd, graceHours, since, now } = input;
+  const {
+    provider,
+    providerLabel,
+    balanceUsd,
+    floorUsd,
+    graceHours,
+    since,
+    now,
+  } = input;
   const elapsedHours = (now.getTime() - since.getTime()) / HOUR_MS;
   if (graceHours > 0 && elapsedHours <= graceHours) {
     return null;
@@ -397,9 +394,9 @@ export function detectOpenRouterLowBalance(input: {
   return {
     type: FinanceAlertType.LOW_BALANCE,
     severity: AlertSeverity.CRITICAL,
-    subject: FinanceSource.OPENROUTER,
-    dedupKey: `low-balance:${FinanceSource.OPENROUTER}:critical`,
-    message: `OpenRouter balance is ${money(balanceUsd)}, below ${money(floorUsd)} for ${round2(elapsedHours)} hours. Check whether the automatic top-up succeeded.`,
+    subject: provider,
+    dedupKey: `low-balance:${provider}:critical`,
+    message: `${providerLabel} balance is ${money(balanceUsd)}, below ${money(floorUsd)} for ${round2(elapsedHours)} hours. Check whether the automatic top-up succeeded.`,
     metadata: {
       balanceUsd: round2(balanceUsd),
       thresholdUsd: floorUsd,
@@ -427,58 +424,6 @@ export function detectGabLowBalance(
     dedupKey: `low-balance:${FinanceSource.GAB}:${critical ? "critical" : "warning"}`,
     message: `Low Gab AI balance: ${balanceCredits} credits remaining, below ${thresholdCredits}. Check the account's credits and top-up settings.`,
     metadata: { balanceCredits, thresholdCredits },
-  };
-}
-
-export function detectLowBalance(input: {
-  provider: typeof FinanceSourceValue;
-  providerLabel: string;
-  balanceUsd: number;
-  warningUsd: number;
-  warningDays: number;
-  criticalUsd: number;
-  criticalDays: number;
-  dailySpendUsd: number | null;
-}): AlertCandidate | null {
-  const {
-    provider,
-    providerLabel,
-    balanceUsd,
-    warningUsd,
-    warningDays,
-    criticalUsd,
-    criticalDays,
-    dailySpendUsd,
-  } = input;
-  const dailySpend = dailySpendUsd ?? 0;
-  const criticalFloor = Math.max(criticalUsd, criticalDays * dailySpend);
-  const warningFloor = Math.max(warningUsd, warningDays * dailySpend);
-  const critical = criticalFloor > 0 && balanceUsd < criticalFloor;
-  if (!critical && (warningFloor <= 0 || balanceUsd >= warningFloor)) {
-    return null;
-  }
-
-  const thresholdUsd = critical ? criticalFloor : warningFloor;
-  const remainingDays =
-    dailySpendUsd !== null && dailySpendUsd > 0
-      ? Math.max(balanceUsd, 0) / dailySpendUsd
-      : null;
-
-  return {
-    type: FinanceAlertType.LOW_BALANCE,
-    severity: critical ? AlertSeverity.CRITICAL : AlertSeverity.WARNING,
-    subject: provider,
-    dedupKey: `low-balance:${provider}:${critical ? "critical" : "warning"}`,
-    message: `Low prepaid balance for ${providerLabel}: ${money(balanceUsd)} remaining, below ${money(thresholdUsd)}. Top up the provider account.${remainingDays === null ? "" : ` Estimated runway: ${remainingDays.toFixed(1)} days.`}`,
-    metadata: {
-      balanceUsd: round2(balanceUsd),
-      thresholdUsd: round2(thresholdUsd),
-      absoluteUsd: critical ? criticalUsd : warningUsd,
-      daysOfSpend: critical ? criticalDays : warningDays,
-      trailingDays: FINANCE_CONFIG.baselineDays,
-      dailySpendUsd: dailySpendUsd === null ? null : round2(dailySpendUsd),
-      remainingDays: remainingDays === null ? null : round2(remainingDays),
-    },
   };
 }
 

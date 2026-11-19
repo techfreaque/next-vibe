@@ -1092,9 +1092,12 @@ export class AiStreamRepository {
             : logger.warn;
       logFn("[AiStream] Setup failed", {
         errorType: errorCode,
+        errorKey: setupResult.errorType.errorKey,
         message: setupResult.message,
         threadId: data.threadId,
         model: data.model,
+        operation: data.operation,
+        rootFolderId: data.rootFolderId,
         userKind: user.isPublic ? "public" : "user",
         isCron: Boolean(cronTaskId),
       });

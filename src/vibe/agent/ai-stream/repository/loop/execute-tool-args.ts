@@ -30,6 +30,20 @@ function isRecord(value: WidgetData): value is ArgsRecord {
   );
 }
 
+/** Describe model arguments without storing their contents in the error log. */
+export function describeToolArgShape(value: WidgetData): string {
+  if (value === undefined) {
+    return "missing";
+  }
+  if (value === null) {
+    return "null";
+  }
+  if (isRecord(value)) {
+    return Object.keys(value).length === 0 ? "empty-record" : "record";
+  }
+  return Array.isArray(value) ? "array" : typeof value;
+}
+
 function without(record: ArgsRecord, key: string): ArgsRecord {
   return Object.fromEntries(Object.entries(record).filter(([k]) => k !== key));
 }

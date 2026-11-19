@@ -99,17 +99,13 @@ export const FINANCE_CONFIG = {
     alertDedupHours: 12,
     minRevenueUsd: 5,
     minCostUsd: 1,
-    // The account automatically tops up below $10. Give it time to recover.
+    // These accounts automatically top up. Alert only if they fail to recover.
     openrouterAutoTopUpFloorUsd: 5,
     openrouterAutoTopUpGraceHours: 1,
     gabLowBalanceCredits: 100,
-    nanoGptLowBalanceUsd: 5,
-    nanoGptLowBalanceDays: 7,
-    nanoGptCriticalBalanceUsd: 1,
-    nanoGptCriticalBalanceDays: 2,
-    veniceLowBalanceUsd: 5,
-    veniceLowBalanceDays: 7,
-    veniceCriticalBalanceUsd: 1,
-    veniceCriticalBalanceDays: 2,
+    nanoGptAutoTopUpFloorUsd: 5,
+    nanoGptAutoTopUpGraceHours: 1,
+    veniceAutoTopUpFloorUsd: 5,
+    veniceAutoTopUpGraceHours: 1,
   },
 } as const;

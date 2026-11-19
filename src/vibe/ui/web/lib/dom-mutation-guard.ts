@@ -56,7 +56,22 @@ const EXTENSION_MARKERS: readonly (readonly [string, string])[] = [
   ["darkReader", "[data-darkreader-mode], [data-darkreader-scheme]"],
   ["lastPass", "[data-lastpass-icon-root], [data-lastpass-root]"],
   ["bitwarden", "[data-bwautofill], bit-notification-bar"],
+  ["nordpass", "nordpass-portal"],
 ];
+
+function getMutationTargetMarkers(target: Node): string {
+  const element = target instanceof Element ? target : target.parentElement;
+  if (!element) {
+    return "";
+  }
+  const markers = EXTENSION_MARKERS.filter(([, selector]) =>
+    element.closest(selector),
+  ).map(([name]) => name);
+  if (element.closest('font[style*="vertical-align"]')) {
+    markers.push("fontWrappers");
+  }
+  return markers.join(",");
+}
 
 function safeCount(selector: string): number {
   try {
@@ -121,6 +136,7 @@ export interface DomGuardEvent {
   parentNode: string;
   targetNode: string;
   targetActualParent: string | null;
+  targetExtensionMarkers: string | null;
   /** 1-based count of guard hits on this page load (summary: total so far) */
   occurrence: number;
   path: string;
@@ -158,7 +174,7 @@ function describeNode(node: Node | null): string {
     return "null";
   }
   if (node.nodeType === Node.TEXT_NODE) {
-    return `#text(${(node.textContent ?? "").slice(0, 40)})`;
+    return "#text";
   }
   if (node instanceof Element) {
     const id = node.id ? `#${node.id}` : "";
@@ -195,6 +211,7 @@ function record(
     targetActualParent: target.parentNode
       ? describeNode(target.parentNode)
       : null,
+    targetExtensionMarkers: getMutationTargetMarkers(target),
     occurrence: occurrences,
     path: window.location.pathname,
     summary: false,
@@ -230,6 +247,7 @@ function armSummary(): void {
       parentNode: "summary",
       targetNode: laterSamples.join(" | ").slice(0, 300),
       targetActualParent: null,
+      targetExtensionMarkers: null,
       occurrence: occurrences,
       path: window.location.pathname,
       summary: true,

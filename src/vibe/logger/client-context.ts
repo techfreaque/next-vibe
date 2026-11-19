@@ -58,6 +58,28 @@ export function getClientRoute(): string | null {
   return sanitizeRoutePath(getCurrentPathname());
 }
 
+/** Attribute automated traffic for diagnostics only. */
+export function identifyBrowserAutomation(userAgent: string): string | null {
+  if (
+    /meta-externalagent|meta-externalfetcher|facebookexternalhit/i.test(
+      userAgent,
+    )
+  ) {
+    return "meta-crawler";
+  }
+  if (/google-safety/i.test(userAgent)) {
+    return "google-safety-scanner";
+  }
+  if (
+    /\b(?:googlebot|bingbot|gptbot|claudebot|bytespider|yandexbot|petalbot)\b/i.test(
+      userAgent,
+    )
+  ) {
+    return "other-crawler";
+  }
+  return null;
+}
+
 /**
  * Context fields every client report carries. Values are primitives so they
  * pass the client-log endpoint's metadata schema untouched.
@@ -70,10 +92,12 @@ export function getClientReportContext(): Record<
   if (platform !== "web") {
     return { platform };
   }
+  const userAgent = getUserAgent();
   return {
     platform,
     route: getClientRoute(),
-    userAgent: getUserAgent().slice(0, 300),
+    userAgent: userAgent.slice(0, 300),
+    browserAutomation: identifyBrowserAutomation(userAgent),
     viewport: getViewportLabel(),
     online: isOnline(),
     visibility: getVisibilityState(),

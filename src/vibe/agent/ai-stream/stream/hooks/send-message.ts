@@ -90,6 +90,7 @@ export async function sendMessage(
     locale,
   } = deps;
   const { content } = params;
+  let sendStage = "prepare-thread";
 
   logger.debug("Send message operation", {
     content: content.slice(0, 50),
@@ -393,6 +394,7 @@ export async function sendMessage(
 
     // Use shared function for message creation and sending.
     // If the thread is already streaming, the server auto-queues the message.
+    sendStage = "start-stream";
     const streamStarted = await createAndSendUserMessage(
       {
         content,
@@ -421,8 +423,12 @@ export async function sendMessage(
 
     // If stream failed and we created a new thread optimistically, revert everything
     if (!streamStarted && createdThreadIdForNewThread) {
+      sendStage = "rollback-thread";
       logger.warn("Stream failed - reverting optimistic new thread", {
         threadId: createdThreadIdForNewThread,
+        rootFolderId: currentRootFolderId,
+        model: settings.selectedModel,
+        attachmentCount: params.attachments?.length ?? 0,
       });
 
       // Remove from threads sidebar cache
@@ -485,7 +491,13 @@ export async function sendMessage(
       createdThreadId: createdThreadIdForNewThread,
     };
   } catch (error) {
-    logger.error("Failed to send message", parseError(error));
+    logger.error("Failed to send message", parseError(error), {
+      sendStage,
+      rootFolderId: currentRootFolderId,
+      isExistingThread: Boolean(activeThreadId && activeThreadId !== "new"),
+      model: settings.selectedModel,
+      attachmentCount: params.attachments?.length ?? 0,
+    });
     return { success: false, createdThreadId: null };
   }
 }

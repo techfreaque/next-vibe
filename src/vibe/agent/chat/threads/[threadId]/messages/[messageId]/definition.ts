@@ -458,6 +458,8 @@ const { DELETE } = createEndpoint({
           {
             messageId: data.pathParams.messageId,
             threadId: data.pathParams.threadId,
+            rootFolderId: data.requestData.rootFolderId,
+            errorKey: data.error.errorType.errorKey,
           },
         );
         removeMessage(

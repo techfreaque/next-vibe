@@ -233,10 +233,14 @@ function tryParseToolCallsJson(
       return parsed;
     }
   } catch (error) {
-    const message = parseError(error).message;
+    const parsedError = parseError(error);
+    const message = parsedError.message;
     const position = Number(/position (\d+)/.exec(message)?.[1] ?? -1);
-    logger.error("Failed to parse tool calls JSON", parseError(error), {
+    logger.error("Failed to parse tool calls JSON", parsedError, {
       rawLength: raw.length,
+      parserErrorOffset: position >= 0 ? position : null,
+      startsWithArray: raw.trimStart().startsWith("["),
+      endsWithArray: raw.trimEnd().endsWith("]"),
       rawSnippet: raw.slice(0, 200),
       // Where JSON.parse choked - the head alone rarely shows the real cause
       aroundError:

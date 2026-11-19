@@ -43,6 +43,8 @@ describe("PhaseProfiler", () => {
     expect(profile?.streakMs).toBeGreaterThanOrEqual(150);
     expect(profile?.hotFrames).toContain("blockTheLoopForProfilerTest");
     expect(profile?.phases).toContain("cron-post:test");
+    expect(profile?.totalSamples).toBeGreaterThan(0);
+    expect(profile?.gcSamples).toBeLessThanOrEqual(profile?.totalSamples ?? 0);
     if (profile && profile.streakMs >= 200) {
       expect(warn).toHaveBeenCalledWith(
         "[EventLoop] Stall profiled in a window with cron bookkeeping",

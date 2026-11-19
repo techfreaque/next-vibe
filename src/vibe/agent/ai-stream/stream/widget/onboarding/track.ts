@@ -47,6 +47,8 @@ export function trackOnboarding(
     arrivalSkillId?: string;
   },
 ): void {
+  const startedAt = Date.now();
+  const endpoint = trackingEndpoints.POST.path.join("/");
   const customData: Record<string, string> = {
     mode: data.mode,
     step: data.step,
@@ -84,7 +86,11 @@ export function trackOnboarding(
         logger.warn("Onboarding tracking event not stored", {
           event,
           mode: data.mode,
+          step: data.step,
+          endpoint,
           errorType: result.errorType.errorKey,
+          errorCode: result.errorType.errorCode,
+          durationMs: Date.now() - startedAt,
           reason: result.message,
         });
       }
@@ -94,6 +100,9 @@ export function trackOnboarding(
       logger.warn("Onboarding tracking event threw", {
         event,
         mode: data.mode,
+        step: data.step,
+        endpoint,
+        durationMs: Date.now() - startedAt,
         error: parseError(error).message,
       });
     });

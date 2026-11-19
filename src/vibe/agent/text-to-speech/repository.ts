@@ -249,6 +249,12 @@ export class TextToSpeechRepository {
       logger.error("[TTS] NanoGPT TTS API error", {
         status: response.status,
         error: errorText,
+        model,
+        voice,
+        format: output.format ?? "default",
+        speed: output.speed ?? null,
+        inputChars: text.length,
+        providerRequestId: response.headers.get("x-request-id"),
       });
       return fail({
         message: t("post.errors.conversionFailed", { error: errorText }),

@@ -24,7 +24,10 @@ import { getEndpoint } from "@/generated/endpoints/endpoint";
 import type { ToolCall } from "../../../chat/db";
 import type { PendingToolData } from "../core/stream";
 import { resolveToolParentId } from "./chain-tip";
-import { normalizeExecuteToolArgs } from "./execute-tool-args";
+import {
+  describeToolArgShape,
+  normalizeExecuteToolArgs,
+} from "./execute-tool-args";
 import {
   endLoopNeedsAnswerStep,
   isThreadRenameCall,
@@ -932,7 +935,19 @@ async function executeFallbackTool(
           toolName,
           error: result.message,
           errorKey: result.errorType.errorKey,
-          args: JSON.stringify(args ?? {}).slice(0, 500),
+          argsShape: describeToolArgShape(args),
+          executeToolTargetShape:
+            toolName === EXECUTE_TOOL_ALIAS
+              ? describeToolArgShape(rawArgs["toolName"])
+              : undefined,
+          executeToolInputShape:
+            toolName === EXECUTE_TOOL_ALIAS
+              ? describeToolArgShape(rawArgs["input"])
+              : undefined,
+          normalizedInputShape:
+            toolName === EXECUTE_TOOL_ALIAS
+              ? describeToolArgShape(inputArgs["input"])
+              : undefined,
           // Which model keeps sending malformed calls (tool-description fix
           // vs model quirk); `repaired` = normalizeExecuteToolArgs changed them.
           model,

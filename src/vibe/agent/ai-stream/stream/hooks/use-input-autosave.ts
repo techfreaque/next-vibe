@@ -117,12 +117,24 @@ async function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.addEventListener("load", () => {
-      const result = reader.result as string;
-      // Extract base64 data (remove data:...;base64, prefix)
-      const base64 = result.split(",")[1] ?? "";
-      resolve(base64);
+      const result = reader.result;
+      if (typeof result !== "string") {
+        reject(new Error("FileReader returned no data URL"));
+        return;
+      }
+      const delimiter = result.indexOf(",");
+      if (delimiter === -1) {
+        reject(new Error("FileReader returned a malformed data URL"));
+        return;
+      }
+      resolve(result.slice(delimiter + 1));
     });
-    reader.addEventListener("error", () => reject(reader.error));
+    reader.addEventListener("error", () =>
+      reject(reader.error ?? new Error("FileReader failed to read attachment")),
+    );
+    reader.addEventListener("abort", () =>
+      reject(new DOMException("Attachment read aborted", "AbortError")),
+    );
     reader.readAsDataURL(file);
   });
 }
@@ -153,6 +165,7 @@ export async function saveDraftAttachments(
   files: File[],
   logger: EndpointLogger,
 ): Promise<void> {
+  let stage = "storage";
   try {
     const attachmentKey = `${storageKey}-attachments`;
 
@@ -165,6 +178,7 @@ export async function saveDraftAttachments(
     }
 
     // Convert files to serializable format
+    stage = "file-read";
     const serializableFiles = await Promise.all(
       files.map(async (file): Promise<SerializableFile> => ({
         name: file.name,
@@ -176,6 +190,7 @@ export async function saveDraftAttachments(
     );
 
     // Base64 attachments are MBs: IndexedDB on web, never localStorage
+    stage = "storage";
     await largeStorage.setItem(
       attachmentKey,
       JSON.stringify(serializableFiles),
@@ -188,6 +203,10 @@ export async function saveDraftAttachments(
   } catch (error) {
     logger.error("Chat Input Autosave", "Failed to save draft attachments", {
       error: error instanceof Error ? error.message : String(error),
+      errorName: error instanceof Error ? error.name : null,
+      stage,
+      fileCount: files.length,
+      totalBytes: files.reduce((sum, file) => sum + file.size, 0),
       storageKey,
     });
   }

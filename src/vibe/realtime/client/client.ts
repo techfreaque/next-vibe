@@ -139,6 +139,8 @@ interface DropInfo {
   channelCount: number;
   /** null = the socket never opened (handshake/upgrade failed) */
   connectedForMs: number | null;
+  handshakeMs: number;
+  acknowledgedChannels: number;
   sinceLastFrameMs: number | null;
 }
 // The current outage: its first close, whether it was reported, and how long
@@ -146,6 +148,8 @@ interface DropInfo {
 let pendingDrop: DropInfo | null = null;
 let dropReported = false;
 let dropReconnectCount = 0;
+let failedHandshakesDuringDrop = 0;
+let maxReconnectTimerOverrunMs = 0;
 let noticeableDownMs = 0;
 let dropCheckTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -171,6 +175,8 @@ function reportDrop(logger: EndpointLogger, recovered: boolean): void {
     offlineMs: Date.now() - disconnectedAt,
     noticeableDownMs,
     attempts: dropReconnectCount,
+    failedHandshakesDuringDrop,
+    maxReconnectTimerOverrunMs,
     reconnectPaused,
     recovered,
   });
@@ -216,6 +222,8 @@ function handleOpen(logger: EndpointLogger): void {
       logger.warn("[WS Client] Reconnected after disconnect", {
         ...pendingDrop,
         attempts: dropReconnectCount,
+        failedHandshakesDuringDrop,
+        maxReconnectTimerOverrunMs,
         offlineMs: Date.now() - disconnectedAt,
         noticeableDownMs,
         channelCount: channels.size,
@@ -229,6 +237,8 @@ function handleOpen(logger: EndpointLogger): void {
   pendingDrop = null;
   dropReported = false;
   dropReconnectCount = 0;
+  failedHandshakesDuringDrop = 0;
+  maxReconnectTimerOverrunMs = 0;
   noticeableDownMs = 0;
   stopDropCheck();
   reconnectAttempts = 0;
@@ -342,6 +352,7 @@ function connect(logger: EndpointLogger): void {
   const url = `${protocol}//${getCurrentHost()}/ws?requestId=${requestId}`;
 
   lastLogger = logger;
+  const connectStartedAt = Date.now();
   const ws = new WebSocket(url);
   sharedWs = ws;
   if (pendingDrop !== null) {
@@ -388,6 +399,9 @@ function connect(logger: EndpointLogger): void {
     if (channels.size === 0) {
       return;
     }
+    if (disconnectedAt !== null && socketOpenedAt === null) {
+      failedHandshakesDuringDrop++;
+    }
     // Keep the first close of the episode. Recovery, the report timer, or
     // pagehide reports it once, even when several reconnects fail.
     if (disconnectedAt === null && !pageUnloading) {
@@ -405,6 +419,11 @@ function connect(logger: EndpointLogger): void {
         channelCount: channels.size,
         connectedForMs:
           socketOpenedAt === null ? null : closedAt - socketOpenedAt,
+        handshakeMs: (socketOpenedAt ?? closedAt) - connectStartedAt,
+        acknowledgedChannels:
+          socketOpenedAt === null
+            ? 0
+            : [...channels.values()].filter((state) => state.acked).length,
         sinceLastFrameMs:
           socketLastFrameAt === null ? null : closedAt - socketLastFrameAt,
       };
@@ -423,6 +442,8 @@ function connect(logger: EndpointLogger): void {
         offlineMs: disconnectedAt === null ? null : Date.now() - disconnectedAt,
         noticeableDownMs,
         firstDropCode: pendingDrop?.code ?? null,
+        failedHandshakesDuringDrop,
+        maxReconnectTimerOverrunMs,
         hiddenAtClose: pendingDrop?.hiddenAtClose ?? null,
         channelCount: channels.size,
         online: isOnline(),
@@ -441,7 +462,15 @@ function connect(logger: EndpointLogger): void {
         ? 100 + Math.floor(Math.random() * 400)
         : Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
     reconnectAttempts++;
+    const scheduledDrop = pendingDrop;
+    const reconnectDueAt = Date.now() + delay;
     setTimeout(() => {
+      if (scheduledDrop && pendingDrop === scheduledDrop) {
+        maxReconnectTimerOverrunMs = Math.max(
+          maxReconnectTimerOverrunMs,
+          Date.now() - reconnectDueAt,
+        );
+      }
       connect(logger);
     }, delay);
   };

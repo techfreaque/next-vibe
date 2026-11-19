@@ -122,7 +122,7 @@ function readRecord(logger: EndpointLogger): ChunkReloadRecord | null {
   }
 }
 
-function currentBuildId(): string | null {
+export function currentBuildId(): string | null {
   if (typeof document === "undefined") {
     return null;
   }

@@ -78,6 +78,8 @@ export interface StallProfile {
   hotStacks: string;
   /** Most sampled innermost frames incl. native / builtin ones (GC, JSON, regex) */
   hotNative: string;
+  gcSamples: number;
+  totalSamples: number;
 }
 
 declare global {
@@ -209,10 +211,14 @@ function summarize(
   const hotFrames = new Map<string, number>();
   const hotStacks = new Map<string, number>();
   const hotNative = new Map<string, number>();
+  let gcSamples = 0;
   for (let i = start; i < end; i++) {
     const frames = traces[i].frames;
     if (frames.length > 0) {
       bump(hotNative, frameKey(frames[0]));
+      if (/\bgc\b|garbage\s*collect/i.test(frames[0].name)) {
+        gcSamples++;
+      }
     }
     const appFrames = frames.filter(isAppFrame);
     if (appFrames.length > 0) {
@@ -244,6 +250,8 @@ function summarize(
     hotFrames: topCounts(hotFrames, 6),
     hotStacks: topCounts(hotStacks, 3),
     hotNative: topCounts(hotNative, 4),
+    gcSamples,
+    totalSamples: end - start,
   };
 }
 
@@ -343,6 +351,8 @@ function startSession(logger: EndpointLogger): ProfileSession {
               hotFrames: stall.hotFrames,
               hotStacks: stall.hotStacks,
               hotNative: stall.hotNative,
+              gcSamples: stall.gcSamples,
+              totalSamples: stall.totalSamples,
             },
           );
         }

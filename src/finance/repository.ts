@@ -74,17 +74,16 @@ import type { FinanceT } from "./i18n";
 import type { FinanceIngestResponseOutput } from "./ingest/definition";
 import {
   type AlertCandidate,
+  AUTO_TOP_UP_THRESHOLDS,
   classifyCostCoverage,
   computeMargin,
   dayKey,
   DEFAULT_THRESHOLDS,
+  detectAutoTopUpLowBalance,
   detectDayAnomalies,
   detectGabLowBalance,
-  detectLowBalance,
-  detectOpenRouterLowBalance,
   detectProviderAnomalies,
   isDuplicateAlert,
-  LOW_BALANCE_THRESHOLDS,
   resolveThresholds,
   round2,
   spendBetween,
@@ -678,16 +677,14 @@ export class FinanceRepository {
         note = note ? `${note}; ${usageNote}` : usageNote;
       }
 
-      const lowBalance = LOW_BALANCE_THRESHOLDS[provider];
+      const autoTopUp = AUTO_TOP_UP_THRESHOLDS[provider];
       const balanceUsd = result.balanceUsd;
-      const hasPrepaidBalance =
-        lowBalance && balanceUsd !== null && Number.isFinite(balanceUsd);
-      const trailing =
-        delta || hasPrepaidBalance
-          ? await FinanceRepository.trailingProviderSpend(provider, bucketAt)
-          : null;
 
-      if (delta && trailing) {
+      if (delta) {
+        const trailing = await FinanceRepository.trailingProviderSpend(
+          provider,
+          bucketAt,
+        );
         runSpend.set(provider, delta.spendUsd);
         // Ledger-estimated providers: who / what drove the window, so the
         // alert reads as a usage spike with its margin, not a key compromise.
@@ -707,7 +704,7 @@ export class FinanceRepository {
             providerLabel: providerLabel(provider),
             spendUsd: delta.spendUsd,
             elapsedHours: delta.elapsedHours,
-            trailing: trailing.rate,
+            trailing,
             balanceUsd: result.balanceUsd,
             thresholds,
             spendBasis: adapter.spendBasis,
@@ -744,18 +741,14 @@ export class FinanceRepository {
           });
       }
 
-      if (
-        provider === FinanceSource.OPENROUTER &&
-        balanceUsd !== null &&
-        Number.isFinite(balanceUsd)
-      ) {
+      if (autoTopUp && balanceUsd !== null && Number.isFinite(balanceUsd)) {
         balances.push({
           provider,
           candidate: null,
           autoTopUp: {
             balanceUsd,
-            floorUsd: thresholds.openrouterAutoTopUpFloorUsd,
-            graceHours: thresholds.openrouterAutoTopUpGraceHours,
+            floorUsd: thresholds[autoTopUp.floorUsd],
+            graceHours: thresholds[autoTopUp.graceHours],
           },
         });
       } else if (
@@ -768,20 +761,6 @@ export class FinanceRepository {
             result.balanceNative,
             thresholds.gabLowBalanceCredits,
           ),
-        });
-      } else if (hasPrepaidBalance) {
-        balances.push({
-          provider,
-          candidate: detectLowBalance({
-            provider,
-            providerLabel: providerLabel(provider),
-            balanceUsd,
-            warningUsd: thresholds[lowBalance.warningUsd],
-            warningDays: thresholds[lowBalance.warningDays],
-            criticalUsd: thresholds[lowBalance.criticalUsd],
-            criticalDays: thresholds[lowBalance.criticalDays],
-            dailySpendUsd: trailing?.dailySpendUsd ?? null,
-          }),
         });
       }
 
@@ -814,12 +793,11 @@ export class FinanceRepository {
    * interval is longer than the gap tolerance is a gap: its cost still counts,
    * its uncertain hours do not. trailingSpendRate turns too-little coverage into
    * an insufficient-data (null) rate rather than a falsely-tiny baseline.
-   * The runway estimate averages measured spend across all seven days.
    */
   private static async trailingProviderSpend(
     provider: (typeof ProviderSources)[number],
     bucketAt: Date,
-  ): Promise<{ rate: TrailingRate; dailySpendUsd: number | null }> {
+  ): Promise<TrailingRate> {
     const from = new Date(
       bucketAt.getTime() - FINANCE_CONFIG.baselineDays * DAY_MS,
     );
@@ -828,12 +806,6 @@ export class FinanceRepository {
       .select({
         spend: sql<number>`coalesce(sum(${financeProviderSnapshots.spendUsd}), 0)`,
         coveredHours: sql<number>`coalesce(sum(case when ${financeProviderSnapshots.elapsedHours} <= ${gapCutHours} then ${financeProviderSnapshots.elapsedHours} else 0 end), 0)`,
-        // Prorate an interval that began before the seven-day window.
-        windowSpend: sql<
-          number | null
-        >`sum(${financeProviderSnapshots.spendUsd} * least(1,
-          extract(epoch from (${financeProviderSnapshots.capturedAt} - ${from.toISOString()}::timestamp))
-          / 3600 / nullif(${financeProviderSnapshots.elapsedHours}, 0)))`,
       })
       .from(financeProviderSnapshots)
       .where(
@@ -843,16 +815,10 @@ export class FinanceRepository {
           lt(financeProviderSnapshots.bucketAt, bucketAt),
         ),
       );
-    const windowSpend = Number(row?.windowSpend ?? Number.NaN);
-    return {
-      rate: trailingSpendRate({
-        windowSpendUsd: Number(row?.spend ?? 0),
-        coveredHours: Number(row?.coveredHours ?? 0),
-      }),
-      dailySpendUsd: Number.isFinite(windowSpend)
-        ? windowSpend / FINANCE_CONFIG.baselineDays
-        : null,
-    };
+    return trailingSpendRate({
+      windowSpendUsd: Number(row?.spend ?? 0),
+      coveredHours: Number(row?.coveredHours ?? 0),
+    });
   }
 
   // ─── Revenue ───────────────────────────────────────────────────────────────
@@ -1619,7 +1585,13 @@ export class FinanceRepository {
               startOfUtcHour(state.observedAt).getTime() <=
               FINANCE_CONFIG.hourMs;
           since = (sameFloor && adjacent ? state?.since : null) ?? now;
-          candidate = detectOpenRouterLowBalance({ ...autoTopUp, since, now });
+          candidate = detectAutoTopUpLowBalance({
+            ...autoTopUp,
+            provider,
+            providerLabel: providerLabel(provider),
+            since,
+            now,
+          });
         }
       }
 

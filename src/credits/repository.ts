@@ -3982,6 +3982,9 @@ export class CreditRepository {
           ...identifier,
           cost,
           reason: result.message,
+          errorKey: result.errorType.errorKey,
+          errorCode: result.errorType.errorCode,
+          walletKind: user.isPublic ? "lead" : "account",
         });
         return fail({
           message: t("errors.deductionFailed", { cost }),

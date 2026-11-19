@@ -22,7 +22,7 @@ import {
   success,
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
-import { db } from "../../database";
+import { db, rawPool } from "../../database";
 import type { EndpointLogger } from "../../logger/types";
 import { leadLeadLinks, leads, userLeadLinks } from "./db";
 import { LeadSource, LeadStatus } from "./enum";
@@ -128,6 +128,7 @@ export class LeadAuthRepository {
     leadId: string,
     logger: EndpointLogger,
   ): Promise<boolean | null> {
+    const startedAt = Date.now();
     try {
       const [lead] = await db
         .select({ id: leads.id })
@@ -137,7 +138,16 @@ export class LeadAuthRepository {
 
       return !!lead;
     } catch (error) {
-      logger.error("Failed to validate leadId", parseError(error).message);
+      const parsed = parseError(error);
+      const cause = parsed.cause instanceof Error ? parsed.cause : parsed;
+      logger.error("Failed to validate leadId", cause.message, {
+        elapsedMs: Date.now() - startedAt,
+        poolTotal: rawPool.totalCount,
+        poolIdle: rawPool.idleCount,
+        poolWaiting: rawPool.waitingCount,
+        poolEnding: rawPool.ending,
+        causeName: cause.name,
+      });
       return null;
     }
   }

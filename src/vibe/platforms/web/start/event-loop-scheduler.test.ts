@@ -1,9 +1,31 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 
 import {
+  describeSchedulerEvidence,
   readThreadSchedulerSample,
   threadSchedulerDelta,
 } from "./event-loop-scheduler";
+
+describe("describeSchedulerEvidence", () => {
+  it("distinguishes main-thread work from runnable scheduler wait", () => {
+    expect(describeSchedulerEvidence({ stallThreadCpuMs: 130 }, 135)).toBe(
+      "main-thread-cpu",
+    );
+    expect(
+      describeSchedulerEvidence(
+        { stallThreadCpuMs: 12, stallRunQueueMs: 174 },
+        200,
+      ),
+    ).toBe("main-thread-runnable-wait");
+  });
+
+  it("keeps ambiguous or unavailable scheduler evidence explicit", () => {
+    expect(describeSchedulerEvidence({ stallThreadCpuMs: 12 }, 200)).toBe(
+      "no-dominant-scheduler-counter",
+    );
+    expect(describeSchedulerEvidence(undefined, 200)).toBe("no-scheduler-sample");
+  });
+});
 
 describe("threadSchedulerDelta", () => {
   it("reports the loop thread's CPU and runnable wait between ticks", () => {

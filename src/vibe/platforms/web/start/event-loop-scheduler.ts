@@ -52,3 +52,22 @@ export function threadSchedulerDelta(
         : undefined,
   };
 }
+
+/** Attribute elapsed time using only the counters the kernel actually reported. */
+export function describeSchedulerEvidence(
+  scheduler: ReturnType<typeof threadSchedulerDelta>,
+  stallMs: number,
+): string {
+  if (!scheduler) {
+    return "no-scheduler-sample";
+  }
+  const cpuMs = scheduler.stallThreadCpuMs;
+  const waitMs = scheduler.stallRunQueueMs ?? 0;
+  if (cpuMs >= stallMs / 2 && cpuMs > waitMs) {
+    return "main-thread-cpu";
+  }
+  if (waitMs >= stallMs / 2 && waitMs > cpuMs) {
+    return "main-thread-runnable-wait";
+  }
+  return "no-dominant-scheduler-counter";
+}

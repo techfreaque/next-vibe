@@ -54,6 +54,7 @@ describe("WS keepalive", () => {
       connectedForMs: 125_000,
       sinceLastInboundMs: 40_000,
       pongCount: 3,
+      inboundActivity: "answered-ping",
       channelCount: 2,
       isPublic: true,
       connector: false,
@@ -64,6 +65,12 @@ describe("WS keepalive", () => {
     const d = diagnoseWsClose(socketData(90_000, 40_500, 0), 1006, "", NOW);
     expect(d.kind).toBe("idle-timeout");
     expect(d.meta.idleEvidence).toBe("silent-window");
+    expect(d.meta.inboundActivity).toBe("application-traffic");
+  });
+
+  it("identifies a socket that never sent application frames or a pong", () => {
+    const d = diagnoseWsClose(socketData(40_000, 40_000, 0), 1006, "", NOW);
+    expect(d.meta.inboundActivity).toBe("silent");
   });
 
   it("reports a 1006 cut mid-window as a drop", () => {

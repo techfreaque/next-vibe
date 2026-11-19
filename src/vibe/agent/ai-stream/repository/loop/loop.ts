@@ -57,6 +57,7 @@ import {
 } from "../core/output-cost-cap";
 import { claimResultToolCallId, type PendingToolData } from "../core/stream";
 import { estimateInputTokens } from "../core/token-estimator";
+import { providerErrorTranslationKey } from "../errors/provider-error-key";
 import { isTransientErrorText } from "../errors/transient";
 import {
   deregisterActiveLoop,
@@ -961,6 +962,10 @@ export class StreamLoop implements StreamLoopState {
       // idle-timeout / outage is attributable to the provider at a glance.
       const errorMeta = {
         error: errorText,
+        upstreamStatus: APICallError.isInstance(rawError)
+          ? rawError.statusCode
+          : undefined,
+        upstreamReason: providerErrorTranslationKey(errorText),
         model,
         apiProvider: this.p.modelConfig.apiProvider,
         providerModel: this.p.modelConfig.providerModel,

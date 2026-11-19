@@ -41,17 +41,46 @@ export function urlExtension(raw: string | null | undefined): string | null {
   }
 }
 
-/**
- * What the network said about a failed resource: Resource Timing knows the
- * HTTP status (Chromium) and whether bytes arrived, which the error event
- * never carries. 0/null = blocked, aborted or a cross-origin opaque response.
- */
-export function resourceTiming(raw: string | null | undefined): {
+interface ResourceTimingEvidence {
   responseStatus: number | null;
   transferSize: number | null;
   durationMs: number | null;
-} {
-  const empty = { responseStatus: null, transferSize: null, durationMs: null };
+  resourceFailureKind: string;
+}
+
+/** Classify evidence from failed loads without guessing why an opaque one failed. */
+export function classifyResourceFailure(
+  status: number | null,
+  decodedBodySize: number,
+): string {
+  if (status === 429) {
+    return "http-rate-limited";
+  }
+  if (status !== null && status >= 500) {
+    return "http-server-error";
+  }
+  if (status !== null && status >= 400) {
+    return "http-client-error";
+  }
+  if (decodedBodySize > 0) {
+    return "body-received";
+  }
+  if (status !== null && status > 0) {
+    return "http-response-observed";
+  }
+  return status === 0 ? "opaque-or-no-response" : "status-unavailable";
+}
+
+/** Resource Timing records evidence that the generic browser error event lacks. */
+export function resourceTiming(
+  raw: string | null | undefined,
+): ResourceTimingEvidence {
+  const empty = {
+    responseStatus: null,
+    transferSize: null,
+    durationMs: null,
+    resourceFailureKind: "no-resource-timing",
+  };
   if (!raw || typeof performance === "undefined") {
     return empty;
   }
@@ -72,13 +101,18 @@ export function resourceTiming(raw: string | null | undefined): {
     if (!(entry instanceof PerformanceResourceTiming)) {
       return empty;
     }
+    const responseStatus =
+      "responseStatus" in entry && typeof entry.responseStatus === "number"
+        ? entry.responseStatus
+        : null;
     return {
-      responseStatus:
-        "responseStatus" in entry && typeof entry.responseStatus === "number"
-          ? entry.responseStatus
-          : null,
+      responseStatus,
       transferSize: entry.transferSize,
       durationMs: Math.round(entry.duration),
+      resourceFailureKind: classifyResourceFailure(
+        responseStatus,
+        entry.decodedBodySize,
+      ),
     };
   } catch {
     return empty;
@@ -98,6 +132,7 @@ export function chunkLoadDiagnostics(message: string | undefined): {
   responseStatus?: number | null;
   transferSize?: number | null;
   durationMs?: number | null;
+  resourceFailureKind?: string;
 } {
   const match =
     /Loading (?:CSS )?chunk (\S+) failed(?:\.?\s*\((\w+): ([^)\s]+)\))?/i.exec(

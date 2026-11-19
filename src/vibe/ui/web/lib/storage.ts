@@ -327,6 +327,7 @@ export function setLocalItem(
         extra: {
           fallback: "memory",
           recoveredAfterCleanup: !quotaOverflow.has(key),
+          usedCharsAfterCleanup: storageUsage(store).usedChars ?? null,
         },
       });
       return undefined;

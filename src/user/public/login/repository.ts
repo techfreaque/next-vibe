@@ -210,6 +210,12 @@ export class LoginRepository {
         logger.warn("Login failed: invalid credentials", {
           reason: userRow ? "wrong_password" : "no_account",
           hasPendingSignup: Boolean(pending),
+          pendingSignupExpired: pending
+            ? pending.expiresAt.getTime() <= Date.now()
+            : null,
+          pendingSignupBounced: pending?.bounced ?? null,
+          pendingSignupDeliveryFailed: pending?.deliveryFailed ?? null,
+          requestedPendingResend: data.resendPending ?? false,
           email: `${emailLocal.slice(0, 2)}***@${emailDomain}`,
           emailVerified: userRow?.emailVerified ?? null,
           isBanned: userRow?.isBanned ?? null,

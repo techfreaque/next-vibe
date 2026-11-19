@@ -54,16 +54,14 @@ export const translations: typeof enTranslations = {
       openrouterAutoTopUpGraceHours:
         "OpenRouter : délai de recharge automatique (heures)",
       gabLowBalanceCredits: "Gab AI : solde minimum (crédits)",
-      nanoGptLowBalanceUsd: "NanoGPT : seuil d’avertissement du solde (USD)",
-      nanoGptLowBalanceDays:
-        "NanoGPT : seuil d’avertissement de l’autonomie (jours)",
-      nanoGptCriticalBalanceUsd: "NanoGPT : solde critique (USD)",
-      nanoGptCriticalBalanceDays: "NanoGPT : autonomie critique (jours)",
-      veniceLowBalanceUsd: "Venice : seuil d’avertissement du solde (USD)",
-      veniceLowBalanceDays:
-        "Venice : seuil d’avertissement de l’autonomie (jours)",
-      veniceCriticalBalanceUsd: "Venice : solde critique (USD)",
-      veniceCriticalBalanceDays: "Venice : autonomie critique (jours)",
+      nanoGptAutoTopUpFloorUsd:
+        "NanoGPT seuil d’alerte de recharge automatique (USD)",
+      nanoGptAutoTopUpGraceHours:
+        "NanoGPT délai de recharge automatique (heures)",
+      veniceAutoTopUpFloorUsd:
+        "Venice seuil d’alerte de recharge automatique (USD)",
+      veniceAutoTopUpGraceHours:
+        "Venice délai de recharge automatique (heures)",
       marginFloorPct: "Marge plancher (%)",
       drainMultiplier: "Multiplicateur de baisse (x moyenne glissante)",
       hourlySpendCapUsd: "Plafond de dépenses horaire par fournisseur ($/h)",

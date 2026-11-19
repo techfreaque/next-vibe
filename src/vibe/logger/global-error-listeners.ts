@@ -13,6 +13,7 @@ import {
 import { getCurrentOrigin, getCurrentUrl } from "next-vibe/ui/lib/location";
 
 import {
+  currentBuildId,
   handleChunkLoadFailure,
   isChunkLoadError,
   observeChunkReloadOutcome,
@@ -128,6 +129,9 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
           resource !== null && resource === describeUrl(getCurrentUrl()),
         // next/image hides the real file in ?url=: name it (path only)
         imageUrl: nextImageSource(src),
+        // Static requests from a tab that still runs an older build can
+        // fail after a rollout even though the current assets are intact.
+        pageBuildId: resource?.startsWith("/_next/") ? currentBuildId() : null,
         ...resourceTiming(src),
       };
       logger.warn(`Resource failed to load: <${tag}>`, details);

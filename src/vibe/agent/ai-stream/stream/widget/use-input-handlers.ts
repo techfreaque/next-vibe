@@ -191,7 +191,11 @@ export function useInputHandlers({
           // "[client] Chat" with no useful detail.
           logger.warn(
             "Stream failed - reverted navigation store to pre-send state",
-            { threadId: result.createdThreadId },
+            {
+              threadId: result.createdThreadId,
+              restoredDraftText: currentInput.length > 0,
+              restoredDraftAttachments: currentAttachments.length,
+            },
           );
         }
       }

@@ -71,6 +71,8 @@ export const SERVER_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "hotStacks",
   "hotFrames",
   "hotNative",
+  "gcSamples",
+  "totalSamples",
   "profiledHotFrames",
   "profileWindowStartedAt",
   "profileWindowEndedAt",

@@ -95,6 +95,8 @@ export function createNanoGPT(
         statusText: response.statusText,
         body: upstreamError.summary,
         cfRay: upstreamError.cfRay,
+        providerRequestId: response.headers.get("x-request-id"),
+        retryAfter: response.headers.get("retry-after"),
         // Which model failed: an upstream outage is usually per model
         // (e.g. 503 all_fallbacks_failed on one GLM variant).
         model: requestModelOf(init?.body),

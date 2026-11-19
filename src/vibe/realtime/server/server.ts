@@ -558,6 +558,11 @@ export function startWebSocketServer(
         const upgradeLocale: CountryLanguage | null = localeParse.success
           ? localeParse.data
           : null;
+        const suppliedRequestId = url.searchParams.get("requestId");
+        const requestId =
+          suppliedRequestId && /^[a-z0-9-]{8,64}$/.test(suppliedRequestId)
+            ? suppliedRequestId
+            : undefined;
 
         const auth = await authenticateWsRequest(req, logger);
 
@@ -569,6 +574,7 @@ export function startWebSocketServer(
           // rejection is unambiguous: a self-connection that reaches here lost
           // its leadId query param, a browser one lost its cookies.
           logger.warn("[WS] Rejected upgrade - no lead id (cookie or query)", {
+            requestId,
             userAgent: req.headers.get("user-agent") ?? undefined,
             origin: req.headers.get("origin") ?? undefined,
             ip:
@@ -612,7 +618,6 @@ export function startWebSocketServer(
 
         const connectorInstanceId =
           url.searchParams.get("connectorInstanceId") ?? undefined;
-        const requestId = url.searchParams.get("requestId");
 
         const upgraded = bunServer.upgrade(req, {
           data: {
@@ -623,10 +628,7 @@ export function startWebSocketServer(
             lastInboundAt: Date.now(),
             pongCount: 0,
             connectorInstanceId,
-            requestId:
-              requestId && /^[a-z0-9-]{8,64}$/.test(requestId)
-                ? requestId
-                : undefined,
+            requestId,
           } satisfies WsConnectionDataWithProxy,
         });
 
@@ -740,6 +742,9 @@ export function startWebSocketServer(
                 "[WS] Subscribe denied - socket identity may not join channel",
                 {
                   channel: msg.channel,
+                  requestId: ws.data.requestId,
+                  connectedForMs: Date.now() - ws.data.connectedAt,
+                  hasEndpointDescriptor: msg.descriptor !== undefined,
                   isPublic: ws.data.user.isPublic,
                   socketAuthSource: ws.data.socketAuthSource,
                   connectorInstanceId: ws.data.connectorInstanceId,

@@ -1,6 +1,20 @@
 import { describe, expect, it } from "bun:test";
 
-import { normalizeExecuteToolArgs } from "./execute-tool-args";
+import {
+  describeToolArgShape,
+  normalizeExecuteToolArgs,
+} from "./execute-tool-args";
+
+describe("describeToolArgShape", () => {
+  it("distinguishes missing, empty and malformed model arguments", () => {
+    expect(describeToolArgShape(undefined)).toBe("missing");
+    expect(describeToolArgShape(null)).toBe("null");
+    expect(describeToolArgShape({})).toBe("empty-record");
+    expect(describeToolArgShape({ input: "private text" })).toBe("record");
+    expect(describeToolArgShape('{"input":{}}')).toBe("string");
+    expect(describeToolArgShape([])).toBe("array");
+  });
+});
 
 describe("normalizeExecuteToolArgs", () => {
   it("unwraps a call nested one level too deep", () => {

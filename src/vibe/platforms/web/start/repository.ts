@@ -82,6 +82,7 @@ import type {
   ServerStartResponseOutput,
 } from "./definition";
 import {
+  describeSchedulerEvidence,
   readThreadSchedulerSample,
   threadSchedulerDelta,
 } from "./event-loop-scheduler";
@@ -203,6 +204,8 @@ function describeStallProfile(
       profiledHotFrames: string;
       hotStacks?: string;
       hotNative?: string;
+      gcSamples?: number;
+      totalSamples?: number;
       phases?: string;
       streakMs?: number;
     }
@@ -213,6 +216,8 @@ function describeStallProfile(
       profiledHotFrames: profile.hotFrames || "(no app frames)",
       hotStacks: profile.hotStacks || undefined,
       hotNative: profile.hotNative || undefined,
+      gcSamples: profile.gcSamples,
+      totalSamples: profile.totalSamples,
       phases: profile.phases || undefined,
       streakMs: profile.streakMs,
     };
@@ -857,6 +862,9 @@ export class ServerStartRepository {
             // Main-thread CPU and runnable wait between the delayed ticker's
             // callbacks. Process CPU below covers all threads over five seconds.
             ...stall?.scheduler,
+            schedulerEvidence: stall
+              ? describeSchedulerEvidence(stall.scheduler, stall.ms)
+              : "no-timer-sample",
             stallStartedAt: stall
               ? new Date(stall.startedAt).toISOString()
               : undefined,

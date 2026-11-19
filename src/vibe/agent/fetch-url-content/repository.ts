@@ -50,6 +50,7 @@ type FetchResult<T> =
       ok: false;
       error: string;
       isTimeout?: boolean;
+      upstreamStatus?: number;
       /** The caller's input was unfetchable (bad URL, scraper answered 4xx). */
       isCallerError?: boolean;
     };
@@ -409,6 +410,7 @@ class FetchUrlService {
           ok: false,
           // eslint-disable-next-line i18next/no-literal-string
           error: `Scrappey API error: ${response.status} ${response.statusText}${detail ? ` - ${detail}` : ""}`,
+          upstreamStatus: response.status,
           // Scrappey's status is about OUR API call, not the target page (a
           // page 404 comes back as 200 + solution.statusCode). Only a rejected
           // URL (400/422) is the caller's; 401/402/403/429 mean our key,
@@ -560,6 +562,7 @@ export class FetchUrlContentRepository {
     }
 
     const fetchService = FetchUrlContentRepository.getFetchUrlService();
+    const startedAt = Date.now();
     const result = await fetchService.fetchUrl(
       url,
       createFixtureFetch(toolExecutionContext, logger),
@@ -577,7 +580,9 @@ export class FetchUrlContentRepository {
           isTimeout: result.isTimeout ?? false,
           isCallerError: result.isCallerError ?? false,
           timeoutMs: fetchService.TIMEOUT,
-          url,
+          elapsedMs: Date.now() - startedAt,
+          upstreamStatus: result.upstreamStatus,
+          targetHost: URL.canParse(url) ? new URL(url).hostname : null,
         },
       );
 

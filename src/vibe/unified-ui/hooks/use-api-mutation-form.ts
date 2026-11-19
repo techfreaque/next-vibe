@@ -354,9 +354,8 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           // (error-monitor/client-log/repository.ts) already prepends it to
           // every forwarded client log; adding it here doubled up as
           // "[client] [client] Error in submitForm".
-          const errorType = isErrorResponseType(error)
-            ? error.errorType
-            : undefined;
+          const serverError = isErrorResponseType(error) ? error : undefined;
+          const errorType = serverError?.errorType;
           const logMeta = {
             endpoint: endpoint.path.join("/"),
             method: endpoint.method,
@@ -366,6 +365,8 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
             // no key = server failure or the request never arrived.
             errorKey: errorType?.errorKey,
             errorCode: errorType?.errorCode,
+            causeKey: serverError?.cause?.errorType?.errorKey,
+            publicRoleDenial: serverError?.publicRoleDenial === true,
             fieldKeys: Object.keys(formSnapshot).join(", "),
             hasFiles: containsFile(formSnapshot),
           };

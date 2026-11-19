@@ -1821,6 +1821,9 @@ export class SubscriptionRepository {
             subscriptionId,
             invoiceId,
             billingReason: billingReason ?? "undefined",
+            creditGrantPath: isInitialCheckout
+              ? "checkout-session-completed"
+              : "subscription-renewal",
           },
         );
         return;
@@ -2642,7 +2645,6 @@ export class SubscriptionRepository {
   ): Promise<void> {
     try {
       logger.info("Processing NOWPayments success redirect", {
-        token: callbackToken.slice(0, 8),
         userId,
       });
 
@@ -2656,8 +2658,9 @@ export class SubscriptionRepository {
 
       if (!matchedInvoice?.metadata) {
         logger.warn("No invoice found for callback token", {
-          token: callbackToken.slice(0, 8),
           userId,
+          invoiceFound: matchedInvoice !== undefined,
+          invoiceMetadataPresent: Boolean(matchedInvoice?.metadata),
         });
         return;
       }

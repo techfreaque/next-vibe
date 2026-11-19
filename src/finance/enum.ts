@@ -168,14 +168,11 @@ export const {
   OPENROUTER_AUTO_TOP_UP_GRACE_HOURS:
     "enums.threshold.openrouterAutoTopUpGraceHours",
   GAB_LOW_BALANCE_CREDITS: "enums.threshold.gabLowBalanceCredits",
-  NANO_GPT_LOW_BALANCE_USD: "enums.threshold.nanoGptLowBalanceUsd",
-  NANO_GPT_LOW_BALANCE_DAYS: "enums.threshold.nanoGptLowBalanceDays",
-  NANO_GPT_CRITICAL_BALANCE_USD: "enums.threshold.nanoGptCriticalBalanceUsd",
-  NANO_GPT_CRITICAL_BALANCE_DAYS: "enums.threshold.nanoGptCriticalBalanceDays",
-  VENICE_LOW_BALANCE_USD: "enums.threshold.veniceLowBalanceUsd",
-  VENICE_LOW_BALANCE_DAYS: "enums.threshold.veniceLowBalanceDays",
-  VENICE_CRITICAL_BALANCE_USD: "enums.threshold.veniceCriticalBalanceUsd",
-  VENICE_CRITICAL_BALANCE_DAYS: "enums.threshold.veniceCriticalBalanceDays",
+  NANO_GPT_AUTO_TOP_UP_FLOOR_USD: "enums.threshold.nanoGptAutoTopUpFloorUsd",
+  NANO_GPT_AUTO_TOP_UP_GRACE_HOURS:
+    "enums.threshold.nanoGptAutoTopUpGraceHours",
+  VENICE_AUTO_TOP_UP_FLOOR_USD: "enums.threshold.veniceAutoTopUpFloorUsd",
+  VENICE_AUTO_TOP_UP_GRACE_HOURS: "enums.threshold.veniceAutoTopUpGraceHours",
 });
 
 export const ThresholdKeyDB = [
@@ -194,14 +191,10 @@ export const ThresholdKeyDB = [
   ThresholdKey.OPENROUTER_AUTO_TOP_UP_FLOOR_USD,
   ThresholdKey.OPENROUTER_AUTO_TOP_UP_GRACE_HOURS,
   ThresholdKey.GAB_LOW_BALANCE_CREDITS,
-  ThresholdKey.NANO_GPT_LOW_BALANCE_USD,
-  ThresholdKey.NANO_GPT_LOW_BALANCE_DAYS,
-  ThresholdKey.NANO_GPT_CRITICAL_BALANCE_USD,
-  ThresholdKey.NANO_GPT_CRITICAL_BALANCE_DAYS,
-  ThresholdKey.VENICE_LOW_BALANCE_USD,
-  ThresholdKey.VENICE_LOW_BALANCE_DAYS,
-  ThresholdKey.VENICE_CRITICAL_BALANCE_USD,
-  ThresholdKey.VENICE_CRITICAL_BALANCE_DAYS,
+  ThresholdKey.NANO_GPT_AUTO_TOP_UP_FLOOR_USD,
+  ThresholdKey.NANO_GPT_AUTO_TOP_UP_GRACE_HOURS,
+  ThresholdKey.VENICE_AUTO_TOP_UP_FLOOR_USD,
+  ThresholdKey.VENICE_AUTO_TOP_UP_GRACE_HOURS,
 ] as const;
 
 /** Which part of an ingest to run. */

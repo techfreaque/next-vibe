@@ -192,7 +192,16 @@ export class DbHealthRepository {
     }
 
     if (warnings.length > 0) {
-      logger.warn(`[DbHealth] ${status}: ${warnings.join("; ")}`);
+      logger.warn(`[DbHealth] ${status}: ${warnings.join("; ")}`, {
+        dbResponseMs,
+        memoryUsedPct,
+        processMemoryAvailable: nodeMem !== null,
+        hostMemorySource: procMem ? "procfs" : "node-os",
+        diskUsedPct,
+        uptimeHours,
+        bunVersion: process.versions.bun,
+        nodeVersion: process.versions.node,
+      });
     }
 
     return success(result);

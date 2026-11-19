@@ -706,6 +706,7 @@ export class StreamErrorHandler {
     // error.name, not constructor.name: the prod build minifies class names
     // (every row read errorType "p").
     const errorName = error instanceof Error ? error.name : typeof error;
+    const providerKey = providerErrorTranslationKey(providerErrorText);
 
     // Pass the raw error: the logger serializes name/message/stack/cause plus
     // provider fields (statusCode, url, responseBody) - never `{}`.
@@ -715,6 +716,8 @@ export class StreamErrorHandler {
       errorType: errorName,
       model,
       providerError: providerErrorText,
+      providerErrorKey: providerKey,
+      sawProviderErrorPart: providerErrorText !== null,
       threadId,
       userId: user.isPublic ? null : user.id,
       leadId: user.leadId,
@@ -723,8 +726,6 @@ export class StreamErrorHandler {
     let translationKey: AiStreamTranslationKey;
     let errorType = ErrorResponseTypes.UNKNOWN_ERROR;
     let skipDb = false;
-    const providerKey = providerErrorTranslationKey(providerErrorText);
-
     if (providerKey) {
       // The provider said why (overload, content filter, unavailable): tell
       // the user that, not a generic "no response".

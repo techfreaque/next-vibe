@@ -221,8 +221,10 @@ export function wrapErrorResponse(
   const errorCode = error.errorType.errorCode;
   const logMeta = {
     endpoint: endpoint?.aliases?.[0] ?? endpoint?.path?.join("/"),
+    endpointPath: endpoint?.path.join("/"),
     errorKey: error.errorType.errorKey,
     errorCode,
+    publicRoleDenial: error.publicRoleDenial === true,
     ...(request ? describeRequestForLog(request) : {}),
   };
   if (error.expected) {

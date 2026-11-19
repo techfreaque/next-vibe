@@ -324,8 +324,12 @@ export class ExecuteToolGuards {
       // (the rename-thread bug) - keep it visible at warn.
       logger.warn("[RouteExecute] execute-tool denied by permission cascade", {
         toolName,
+        canonicalToolName: getPreferredName(toolName),
         reason: permissionBlock,
         rootFolderId: toolExecutionContext.rootFolderId,
+        isPublic: user.isPublic,
+        hasFavorite: Boolean(toolExecutionContext.favoriteId),
+        hasSkill: Boolean(toolExecutionContext.skillId),
         deniedToolIds: [...permissions.deniedToolIds],
         whitelistSize: permissions.availableTools?.length ?? null,
       });

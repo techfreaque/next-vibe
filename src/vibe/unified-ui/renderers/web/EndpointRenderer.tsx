@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Div } from "next-vibe/ui/components/div";
 import { Form } from "next-vibe/ui/components/form/form";
 import type { JSX, ReactElement } from "react";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import type {
   DefaultValues,
   Path,
@@ -143,11 +143,6 @@ interface EndpointRendererProps<TEndpoint extends CreateApiEndpointAny> {
   navigationOverride?: Partial<UseNavigationStackReturn>;
 }
 
-/**
- * Blocked submits per endpoint on this page. Repeated attempts signal that
- * the user may be stuck.
- */
-const blockedSubmits = new Map<string, number>();
 const STUCK_SUBMIT_THRESHOLD = 3;
 
 /**
@@ -256,39 +251,64 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
 
   // Use external form if provided, otherwise use internal form
   const form = externalForm ?? internalForm;
+  const blockedSubmitState = useRef({
+    endpointKey: "",
+    signature: "",
+    count: 0,
+  });
 
   // Wrap onSubmit for widgets - widgets trigger submission without data parameter
   const handleWidgetSubmit = useCallback((): void => {
     if (onSubmit) {
-      void form.handleSubmit(onSubmit, (errors) => {
-        // The user sees field errors and nothing is sent. Field name + rule +
-        // message only, never the entered values.
-        const endpointKey = `${endpoint.path.join("/")}/${endpoint.method}`;
-        const context = {
-          endpoint: endpointKey,
-          alias: endpoint.aliases?.[0] ?? null,
-          fields: Object.entries(errors)
-            .map(
-              ([field, fieldError]) =>
-                `${field}: ${String(fieldError?.type ?? "invalid")} - ${String(fieldError?.message ?? "")}`,
-            )
-            .join("; ")
-            .slice(0, 1000),
-        };
-        const blocked = (blockedSubmits.get(endpointKey) ?? 0) + 1;
-        blockedSubmits.set(endpointKey, blocked);
-        if (blocked < STUCK_SUBMIT_THRESHOLD) {
-          logger.warn("Form validation blocked submit", context);
-          return;
-        }
-        // Blocked again and again: the user is stuck on this form - a UX
-        // problem (unclear rule, hidden field, broken widget). Reported with
-        // the rules that keep failing.
-        logger.warn("Form validation blocked submit repeatedly", {
-          ...context,
-          blockedSubmits: blocked,
-        });
-      })();
+      void form.handleSubmit(
+        (values) => {
+          blockedSubmitState.current = {
+            endpointKey: "",
+            signature: "",
+            count: 0,
+          };
+          return onSubmit(values);
+        },
+        (errors) => {
+          // Report the failing fields and rules without collecting form values.
+          const endpointKey = `${endpoint.path.join("/")}/${endpoint.method}`;
+          const fields = Object.entries(errors).map(([field, error]) => ({
+            rule: `${field}: ${String(error?.type ?? "invalid")}`,
+            message: String(error?.message ?? ""),
+          }));
+          const signature = fields
+            .map(({ rule }) => rule)
+            .toSorted()
+            .join("; ");
+          const previous = blockedSubmitState.current;
+          const blocked =
+            previous.endpointKey === endpointKey &&
+            previous.signature === signature
+              ? previous.count + 1
+              : 1;
+          blockedSubmitState.current = {
+            endpointKey,
+            signature,
+            count: blocked,
+          };
+          const context = {
+            endpoint: endpointKey,
+            alias: endpoint.aliases?.[0] ?? null,
+            fieldRules: signature.slice(0, 400),
+            consecutiveBlockedSubmits: blocked,
+            fields: fields
+              .map(({ rule, message }) => `${rule} - ${message}`)
+              .join("; ")
+              .slice(0, 1000),
+          };
+          logger.warn(
+            blocked < STUCK_SUBMIT_THRESHOLD
+              ? "Form validation blocked submit"
+              : "Form validation blocked submit repeatedly",
+            context,
+          );
+        },
+      )();
     }
   }, [form, onSubmit, logger, endpoint]);
 

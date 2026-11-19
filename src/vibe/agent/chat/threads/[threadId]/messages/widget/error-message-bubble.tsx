@@ -130,6 +130,8 @@ export function ErrorMessageBubble({
         errorCode: message.errorCode,
         structuredErrorCode,
         structuredErrorKey,
+        errorPayloadFormat: structuredErrorKey ? "structured" : "plain",
+        localOnly: message.metadata?.isLocalOnly === true,
         errorText: errorText.slice(0, 300),
         ageMs,
       },
@@ -144,6 +146,7 @@ export function ErrorMessageBubble({
     message.skill,
     message.errorType,
     message.errorCode,
+    message.metadata?.isLocalOnly,
     message.content,
     rootFolderId,
   ]);

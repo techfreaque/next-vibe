@@ -128,6 +128,7 @@ function deliveredSize(dimensions: ImageDimensions | null): {
 function logRatioMismatch(
   logger: EndpointLogger,
   model: string,
+  provider: ApiProvider,
   requested: string | undefined,
   dimensions: ImageDimensions | null,
 ): void {
@@ -142,7 +143,9 @@ function logRatioMismatch(
   if (Math.abs(Math.log(got) - Math.log(wanted)) > 0.15) {
     logger.warn("[ImageGen] Provider delivered a different aspect ratio", {
       model,
+      provider,
       requested,
+      delivered: describeAspectRatio(dimensions.width, dimensions.height),
       width: dimensions.width,
       height: dimensions.height,
     });
@@ -606,7 +609,13 @@ export class ImageGenerationRepository {
       width: dimensions?.width ?? null,
       height: dimensions?.height ?? null,
     });
-    logRatioMismatch(logger, data.model, aspectRatio, dimensions);
+    logRatioMismatch(
+      logger,
+      data.model,
+      imageModel.apiProvider,
+      aspectRatio,
+      dimensions,
+    );
 
     const toolMessageId = toolExecutionContext.currentToolMessageId;
     if (toolMessageId && !user.isPublic) {
@@ -898,7 +907,13 @@ export class ImageGenerationRepository {
     // Credits already deducted per-token by the headless AI stream - report the
     // actual cost so the UI displays it the same way as fixed-price image gen models.
     const creditCost = result.data.totalCreditsDeducted ?? 0;
-    logRatioMismatch(logger, modelConfig.id, data.aspectRatio, dimensions);
+    logRatioMismatch(
+      logger,
+      modelConfig.id,
+      modelConfig.apiProvider,
+      data.aspectRatio,
+      dimensions,
+    );
     return success({ imageUrl, creditCost, ...deliveredSize(dimensions) });
   }
 

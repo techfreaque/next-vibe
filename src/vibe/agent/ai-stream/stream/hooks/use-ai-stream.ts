@@ -144,6 +144,9 @@ export function useAIStream(): UseAIStreamReturn {
           threadId: data.threadId,
           rootFolderId: data.rootFolderId,
           attachmentCount: data.attachments?.length ?? 0,
+          uploadBytes:
+            (data.attachments?.reduce((sum, file) => sum + file.size, 0) ?? 0) +
+            (data.audioInput?.file?.size ?? 0),
         });
         if (data.threadId) {
           addErrorMessageToChat(
@@ -364,6 +367,7 @@ export function useAIStream(): UseAIStreamReturn {
               cancelAckMs,
               elapsedMs: Date.now() - cancelStartedAt,
               isPending: useAIStreamStore.getState().isPending(threadId),
+              cancelRequestAcknowledged: cancelAckMs !== null,
               online: isOnline(),
               visibilityState: getVisibilityState(),
             },
