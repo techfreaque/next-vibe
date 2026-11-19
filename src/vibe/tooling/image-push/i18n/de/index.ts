@@ -142,6 +142,8 @@ export const translations: typeof enTranslations = {
         buildStart: "🐳 Baue {{image}}:{{tag}} ...",
         buildSuccess: "✅ {{refs}} gebaut (nicht gepusht)",
         pushSuccess: "🚀 {{refs}} gepusht",
+        buildMemoryExceeded:
+          "Build beim Speicherlimit von {{gb}} GB abgebrochen.",
         buildExitCode: "docker buildx wurde mit Code {{code}} beendet",
         buildKilled: "docker buildx wurde durch Signal {{signal}} beendet",
         dockerBuildFailed: "Docker-Build fehlgeschlagen: {{error}}",

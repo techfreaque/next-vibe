@@ -1,4 +1,6 @@
-@import "tailwindcss";
+/* Only scan the source tree below. The Docker build has no .gitignore and
+   its working directory also contains the server chunks and webpack cache. */
+@import "tailwindcss" source(none);
 @import "@fontsource-variable/inter";
 @source "../..";
 @source not "../../**/i18n/**";

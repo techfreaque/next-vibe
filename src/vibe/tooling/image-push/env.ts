@@ -13,6 +13,19 @@ export const {
   schema: imagePushEnvSchema,
   examples: imagePushEnvExamples,
 } = defineEnv({
+  DOCKER_BUILD_MEMORY_GB: {
+    schema: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(Math.floor(Number.MAX_SAFE_INTEGER / 1e9))
+      .default(30),
+    example: "30",
+    fieldType: "number",
+    comment:
+      "Total memory ceiling for the image-push BuildKit container, in decimal GB. The kernel enforces this across all build steps.",
+    commented: true,
+  },
   DOCKER_IMAGE_NAME: {
     schema: z.string().default("ghcr.io/techfreaque/next-vibe-app"),
     example: "ghcr.io/techfreaque/next-vibe-app",

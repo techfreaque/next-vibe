@@ -36,6 +36,7 @@ import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
 import { ImagePushCleanup } from "./cleanup";
 import type { RemoteNode } from "./cleanup-selection";
+import { IMAGE_BUILD_BUILDER } from "./constants";
 import type {
   ImagePushRequestOutput,
   ImagePushResponseOutput,
@@ -163,8 +164,13 @@ export class ImagePushRepository {
     // (to `docker save` it), same as a build-only run - only a registry push
     // uses buildx's own --push.
     const args = [
-      "buildx",
-      "build",
+      join(
+        ImagePushRepository.buildPaths().repoRoot,
+        "scripts",
+        "image-build.sh",
+      ),
+      IMAGE_BUILD_BUILDER,
+      String(imagePushEnv.DOCKER_BUILD_MEMORY_GB),
       "--platform",
       data.platform,
       "--network=host",
@@ -175,7 +181,7 @@ export class ImagePushRepository {
       contextDir,
     ];
 
-    const buildResult = spawnSync("docker", args, {
+    const buildResult = spawnSync("bash", args, {
       stdio: "inherit",
       cwd: process.cwd(),
     });
@@ -192,6 +198,14 @@ export class ImagePushRepository {
       });
     }
 
+    if (buildResult.status === 42) {
+      return fail({
+        message: t("post.repository.messages.buildMemoryExceeded", {
+          gb: imagePushEnv.DOCKER_BUILD_MEMORY_GB,
+        }),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
     if (buildResult.status !== 0) {
       const detail =
         buildResult.signal !== null

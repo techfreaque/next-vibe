@@ -139,6 +139,7 @@ export const translations = {
         buildStart: "🐳 Building {{image}}:{{tag}} ...",
         buildSuccess: "✅ Built {{refs}} (not pushed)",
         pushSuccess: "🚀 Pushed {{refs}}",
+        buildMemoryExceeded: "Build stopped at the {{gb}} GB memory ceiling.",
         buildExitCode: "docker buildx exited with code {{code}}",
         buildKilled: "docker buildx was killed by signal {{signal}}",
         dockerBuildFailed: "Docker build failed: {{error}}",

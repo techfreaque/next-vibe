@@ -37,6 +37,7 @@ import {
   selectImageRefsToRemove,
   selectLocalImageRefsToRemove,
 } from "./cleanup-selection";
+import { IMAGE_BUILD_BUILDER } from "./constants";
 import type { ImagePushT } from "./i18n";
 
 const GB = 1024 ** 3;
@@ -295,7 +296,7 @@ export class ImagePushCleanup {
       );
     }
     const excess = ImagePushCleanup.pruneBuilder(
-      ["--keep-storage", `${String(BUILD_CACHE_KEEP_GB)}GB`],
+      ["--max-used-space", `${String(BUILD_CACHE_KEEP_GB)}GB`],
       logger,
       t,
     );
@@ -315,8 +316,10 @@ export class ImagePushCleanup {
     t: ImagePushT,
   ): string | undefined {
     const result = ImagePushCleanup.docker([
-      "builder",
+      "buildx",
       "prune",
+      "--builder",
+      IMAGE_BUILD_BUILDER,
       "--force",
       "--all",
       ...args,

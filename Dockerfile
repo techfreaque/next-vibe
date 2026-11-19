@@ -38,17 +38,16 @@ RUN bun install --frozen-lockfile --ignore-scripts
 COPY . .
 
 # Build
-# --webpack: use webpack instead of Turbopack (~7.5 GB vs ~12 GB peak memory)
-# /app/.next-prod/cache mounted directly - Next.js webpack/RSC incremental cache persisted across builds
 # DB unreachable at build time (docker network only); migrations run via docker compose run in install-docker.sh
 # VIBE_BUILD_PLACEHOLDER_ENV: set only on this command's shell env (not a persisted
 # image ENV) - bakes runtime-patch sentinels into every NEXT_PUBLIC_* value instead of
 # real ones. Real public config + the secrets behind NEXT_PUBLIC_AGENT_* never need to
 # reach the build; the container patches the compiled bundle with real values at start.
 # See runtime-env-placeholders.ts / server/server/start/runtime-env-patch.ts.
-# NODE_OPTIONS: the default V8 heap OOMed once the fr locale (~64k strings, 2026-11-17) was added.
+# Keep the webpack cache between solves. Bound V8 old space and the native
+# Tailwind/SWC worker pools separately; the heap limit does not cover them.
 RUN --mount=type=cache,target=/app/.next-prod/cache,id=next-vibe-next-cache-v2,sharing=locked \
-    NODE_OPTIONS=--max-old-space-size=16384 VIBE_BUILD_PLACEHOLDER_ENV=true bun src/vibe/platforms/cli/vibe-runtime.ts build --migrate=false --seed=false --db-setup=false --webpack=true && \
+    RAYON_NUM_THREADS=2 UV_THREADPOOL_SIZE=2 NODE_OPTIONS=--max-old-space-size=12288 VIBE_BUILD_PLACEHOLDER_ENV=true bun src/vibe/platforms/cli/vibe-runtime.ts build --migrate=false --seed=false --db-setup=false --webpack=true && \
     test -f .next-prod/BUILD_ID || (echo "ERROR: .next-prod/BUILD_ID missing - Next.js build failed" && exit 1)
 
 
