@@ -57,8 +57,8 @@ export const FINANCE_CONFIG = {
    */
   alertInbox: "hi@unbottled.ai",
 
-  /** Gab reports native credits, with a critical step at half its warning threshold. */
-  gabLowBalanceCriticalFraction: 0.5,
+  /** Native-credit balances reach critical at half the warning threshold. */
+  creditLowBalanceCriticalFraction: 0.5,
 
   /**
    * Flat-rate provider plans, USD per month. Added to every tracked day's
@@ -73,14 +73,14 @@ export const FINANCE_CONFIG = {
   fixedMonthlyCostUsd: { gab: 200 / 12 },
 
   /**
-   * Usage-priced providers without any spend / balance API (uncensored.ai,
-   * FreedomGPT). Spend = billed calls in credit_transactions x the per-call raw
+   * When provider USD spend is unavailable, estimate with billed calls in
+   * credit_transactions x the per-call raw
    * price from the model definitions (creditCost of the direct provider entry,
    * 1 credit = $0.01). One assistant turn can be split across several usage rows
    * (free + pack credits); they share a messageId and count once.
    */
   usageLedgerNote:
-    "estimated from our own usage log (billed calls x per-call price), no provider API",
+    "estimated from our own usage log (billed calls x per-call price)",
 
   /** Wallets named in a ledger-estimated spike alert (biggest spenders first). */
   ledgerTopWallets: 3,
@@ -103,6 +103,8 @@ export const FINANCE_CONFIG = {
     openrouterAutoTopUpFloorUsd: 5,
     openrouterAutoTopUpGraceHours: 1,
     gabLowBalanceCredits: 100,
+    uncensoredAiLowBalanceCredits: 100,
+    freedomGptLowBalanceCredits: 100,
     nanoGptAutoTopUpFloorUsd: 5,
     nanoGptAutoTopUpGraceHours: 1,
     veniceAutoTopUpFloorUsd: 5,

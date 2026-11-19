@@ -179,7 +179,7 @@ export async function collectFinanceDigestLines(
       );
     } else if (native !== null) {
       lines.push(
-        `  ${label(provider)}: ${native.toLocaleString("en-US", { maximumFractionDigits: 1 })} ${unit} (no USD rate, excluded from cost)`,
+        `  ${label(provider)}: ${native.toLocaleString("en-US", { maximumFractionDigits: 1 })} ${unit} left`,
       );
     }
   }

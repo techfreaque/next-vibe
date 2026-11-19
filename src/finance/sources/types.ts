@@ -17,6 +17,8 @@ export interface ProviderReadingOk {
   unit: string;
   /** Provider-reported cumulative spend in USD, when it has one */
   cumulativeUsageUsd: number | null;
+  /** Provider-reported spend for the last completed UTC day, in native credits. */
+  previousDaySpendNative?: number;
   /** How the figure was obtained when it is not a plain provider balance. */
   note?: string;
 }

@@ -8,14 +8,9 @@
  *  - Venice      GET  /api/v1/api_keys/rate_limits    documented  data.balances.USD
  *  - Gab         GET  /v1/credits and /v1/usage       documented balance and charges in credits
  *                The Gab Plus plan fee is booked separately in the USD rollup.
- *  - uncensored.ai   developer dashboard shows credits; the API documents inference only
- *  - FreedomGPT      public API reference exposes models and inference
- * The two API-less providers are priced from OUR usage log instead: billed calls
- * in credit_transactions x the per-call raw price from the model definitions,
- * reported as a cumulative usage counter so the same snapshot / delta / anomaly
- * machinery as OpenRouter applies. Their spend basis is "usage-ledger": a spike
- * there is our own users' billed usage, never evidence of a stolen key, so the
- * anomaly alert is worded and graded differently (see detectProviderAnomalies).
+ *  - uncensored.ai and FreedomGPT use signed-in dashboard reads (dashboard.ts).
+ * The usage ledger supplies a USD estimate whenever dashboard usage cannot be
+ * measured in dollars.
  */
 
 /* eslint-disable i18next/no-literal-string */
@@ -33,13 +28,21 @@ import { ApiProvider } from "@/vibe/agent/models/models";
 import { FINANCE_CONFIG } from "../config";
 import { FinanceSource, type FinanceSourceValue } from "../enum";
 import type { LedgerUsageBreakdown, SpendBasis } from "../logic";
+import {
+  freedomDashboard,
+  type ProviderDashboard,
+  uncensoredDashboard,
+} from "./dashboard";
 import type { FinanceHttp } from "./http";
 import type { ProviderResult } from "./types";
 
-/** Our own usage log, for providers that expose no spend / balance API. */
+/** Our own usage log, used when a provider's USD spend is unavailable. */
 export interface UsageLedgerPort {
-  /** Distinct billed calls (all time) on these model ids. */
-  billedCalls(modelIds: readonly ChatModelId[]): Promise<number>;
+  /** Distinct billed calls on these model IDs, optionally in [from, to). */
+  billedCalls(
+    modelIds: readonly ChatModelId[],
+    window?: { from: Date; to: Date },
+  ): Promise<number>;
   /** Who / what was billed on these model ids in [from, to): alert context. */
   usageBreakdown(
     modelIds: readonly ChatModelId[],
@@ -57,6 +60,12 @@ export interface ProviderAdapter {
   noEndpointReason: string | null;
   /** provider-api = the provider's own figures; usage-ledger = estimated from ours. */
   spendBasis: SpendBasis;
+  dashboard?: ProviderDashboard;
+  estimateSpend?(
+    ledger: UsageLedgerPort,
+    from: Date,
+    to: Date,
+  ): Promise<number | null>;
   /**
    * Usage-ledger providers only: the billed usage behind a spend window, so a
    * spike alert can say who / what drove it. null for provider-api adapters.
@@ -385,14 +394,23 @@ function usageLedgerAdapter(input: {
   source: typeof FinanceSourceValue;
   label: string;
   apiProvider: ApiProvider;
-  noApiReason: string;
+  dashboard: ProviderDashboard;
 }): ProviderAdapter {
   return {
     source: input.source,
     label: input.label,
-    endpoint: "usage-ledger:credit_transactions",
+    endpoint: input.dashboard.balanceUrl,
     noEndpointReason: null,
     spendBasis: "usage-ledger",
+    dashboard: input.dashboard,
+    async estimateSpend(ledger, from, to) {
+      const { modelIds, unitPriceUsd } = usagePricing(input.apiProvider);
+      if (modelIds.length === 0 || unitPriceUsd === null) {
+        return null;
+      }
+      const calls = await ledger.billedCalls(modelIds, { from, to });
+      return calls * unitPriceUsd;
+    },
     async ledgerBreakdown(ledger, from, to) {
       const pricing = usagePricing(input.apiProvider);
       if (pricing.modelIds.length === 0) {
@@ -406,7 +424,8 @@ function usageLedgerAdapter(input: {
       if (pricing.modelIds.length === 0 || pricing.unitPriceUsd === null) {
         return {
           status: "skipped",
-          reason: `${input.noApiReason}; no single per-call price in the model definitions to estimate from`,
+          reason:
+            "no single per-call price in the model definitions to estimate from",
         };
       }
       const calls = await ledger.billedCalls(pricing.modelIds);
@@ -416,7 +435,7 @@ function usageLedgerAdapter(input: {
         balanceNative: null,
         unit: "usd",
         cumulativeUsageUsd: calls * pricing.unitPriceUsd,
-        note: `${input.noApiReason}: spend ${FINANCE_CONFIG.usageLedgerNote} at $${pricing.unitPriceUsd.toFixed(2)}/call`,
+        note: `USD spend ${FINANCE_CONFIG.usageLedgerNote} at $${pricing.unitPriceUsd.toFixed(2)}/call`,
       };
     },
   };
@@ -426,15 +445,14 @@ const uncensoredAi = usageLedgerAdapter({
   source: FinanceSource.UNCENSORED_AI,
   label: "uncensored.ai",
   apiProvider: ApiProvider.UNCENSORED_AI,
-  noApiReason:
-    "no API-key balance endpoint (credits sit in the logged-in dashboard)",
+  dashboard: uncensoredDashboard,
 });
 
 const freedomGpt = usageLedgerAdapter({
   source: FinanceSource.FREEDOM_GPT,
   label: "FreedomGPT",
   apiProvider: ApiProvider.FREEDOMGPT,
-  noApiReason: "no documented API-key balance or spend endpoint",
+  dashboard: freedomDashboard,
 });
 
 export const PROVIDER_ADAPTERS: readonly ProviderAdapter[] = [

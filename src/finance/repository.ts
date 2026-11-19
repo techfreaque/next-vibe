@@ -69,7 +69,7 @@ import {
   SourceRunStatus,
   ThresholdKey,
 } from "./enum";
-import { isFinanceProductionInstance } from "./env";
+import { financeEnv, isFinanceProductionInstance } from "./env";
 import type { FinanceT } from "./i18n";
 import type { FinanceIngestResponseOutput } from "./ingest/definition";
 import {
@@ -77,15 +77,17 @@ import {
   AUTO_TOP_UP_THRESHOLDS,
   classifyCostCoverage,
   computeMargin,
+  CREDIT_BALANCE_THRESHOLDS,
   dayKey,
   DEFAULT_THRESHOLDS,
   detectAutoTopUpLowBalance,
+  detectCreditLowBalance,
   detectDayAnomalies,
-  detectGabLowBalance,
   detectProviderAnomalies,
   isDuplicateAlert,
   resolveThresholds,
   round2,
+  type SpendBasis,
   spendBetween,
   startOfUtcDay,
   startOfUtcHour,
@@ -94,6 +96,10 @@ import {
   type TrailingRate,
   trailingSpendRate,
 } from "./logic";
+import {
+  type DashboardCredentials,
+  UNCENSORED_CREDIT_UNIT,
+} from "./sources/dashboard";
 import { type FinanceHttp, liveHttp } from "./sources/http";
 import {
   PROVIDER_ADAPTERS,
@@ -131,9 +137,12 @@ export interface FinanceDeps {
   http: FinanceHttp;
   now(): Date;
   apiKey(source: typeof FinanceSourceValue): string | undefined;
+  dashboardCredentials(
+    source: typeof FinanceSourceValue,
+  ): DashboardCredentials | null;
   stripePort(): StripeLedgerPort | null;
   nowPaymentsPort(http: FinanceHttp): NowPaymentsPort | null;
-  /** Our own usage log, for providers without a spend API (uncensored.ai, FreedomGPT). */
+  /** Our own usage log, for providers without measured USD spend. */
   usageLedger: UsageLedgerPort;
   /**
    * Finance-alert recipients (ops inbox + Thea mailbox); empty when none
@@ -155,6 +164,23 @@ export const defaultFinanceDeps: FinanceDeps = {
   isProduction: isFinanceProductionInstance,
   http: liveHttp,
   now: () => new Date(),
+  dashboardCredentials(source) {
+    if (
+      source !== FinanceSource.UNCENSORED_AI &&
+      source !== FinanceSource.FREEDOM_GPT
+    ) {
+      return null;
+    }
+    const email =
+      source === FinanceSource.UNCENSORED_AI
+        ? financeEnv.UNCENSORED_AI_EMAIL
+        : financeEnv.FREEDOMGPT_EMAIL;
+    const password =
+      source === FinanceSource.UNCENSORED_AI
+        ? financeEnv.UNCENSORED_AI_PASSWORD
+        : financeEnv.FREEDOMGPT_PASSWORD;
+    return email && password ? { email, password } : null;
+  },
   apiKey(source) {
     switch (source) {
       case FinanceSource.OPENROUTER:
@@ -180,7 +206,7 @@ export const defaultFinanceDeps: FinanceDeps = {
   stripePort: () => createStripePort(),
   nowPaymentsPort: (http) => createNowPaymentsPort(http),
   usageLedger: {
-    async billedCalls(modelIds) {
+    async billedCalls(modelIds, dateRange) {
       if (modelIds.length === 0) {
         return 0;
       }
@@ -195,6 +221,12 @@ export const defaultFinanceDeps: FinanceDeps = {
           and(
             eq(creditTransactions.type, CreditTransactionType.USAGE),
             inArray(creditTransactions.modelId, [...modelIds]),
+            dateRange
+              ? gte(creditTransactions.createdAt, dateRange.from)
+              : undefined,
+            dateRange
+              ? lt(creditTransactions.createdAt, dateRange.to)
+              : undefined,
           ),
         );
       return Number(row?.calls ?? 0);
@@ -595,15 +627,23 @@ export class FinanceRepository {
       };
     }
     const apiKey = deps.apiKey(provider);
-    if (!apiKey) {
+    const credentials = adapter.dashboard
+      ? deps.dashboardCredentials(provider)
+      : null;
+    if (!apiKey && !credentials) {
       return { ...base, reason: "no API key configured" };
     }
     try {
-      const result = await adapter.fetchBalance(
-        deps.http,
-        apiKey,
-        deps.usageLedger,
-      );
+      const dashboard =
+        adapter.dashboard && credentials
+          ? await adapter.dashboard.fetchBalance(deps.http, credentials, now)
+          : null;
+      const account = dashboard?.status === "ok" ? dashboard : null;
+      const measuredUsd =
+        account !== null && account.cumulativeUsageUsd !== null;
+      const result = measuredUsd
+        ? account
+        : await adapter.fetchBalance(deps.http, apiKey ?? "", deps.usageLedger);
       if (result.status !== "ok") {
         return {
           ...base,
@@ -628,24 +668,77 @@ export class FinanceRepository {
         .orderBy(desc(financeProviderSnapshots.bucketAt))
         .limit(1);
 
-      const delta = previous
-        ? spendBetween(
-            {
-              balanceUsd: previous.balanceUsd,
-              cumulativeUsageUsd: previous.cumulativeUsageUsd,
-              at: previous.capturedAt,
-            },
-            {
-              balanceUsd: result.balanceUsd,
-              cumulativeUsageUsd: result.cumulativeUsageUsd,
-              at: now,
-            },
-          )
-        : null;
+      const balanceUsd = account?.balanceUsd ?? result.balanceUsd;
+      const balanceNative = account?.balanceNative ?? result.balanceNative;
+      const unit = account?.unit ?? result.unit;
+      const cumulativeUsageUsd = result.cumulativeUsageUsd;
+      let spendBasis: SpendBasis = measuredUsd
+        ? "provider-api"
+        : adapter.spendBasis;
+      let note =
+        [
+          account?.note,
+          dashboard && dashboard.status !== "ok" ? dashboard.reason : null,
+          adapter.dashboard && !credentials
+            ? "dashboard login is missing"
+            : null,
+          result === account ? null : result.note,
+        ]
+          .filter(Boolean)
+          .join(". ") || null;
+      const previousMeasuredUsd = previous?.unit === UNCENSORED_CREDIT_UNIT;
+      const counterReset =
+        measuredUsd &&
+        previous &&
+        previousMeasuredUsd &&
+        previous.cumulativeUsageUsd !== null &&
+        cumulativeUsageUsd !== null &&
+        cumulativeUsageUsd < previous.cumulativeUsageUsd;
+      const changedBasis =
+        adapter.dashboard && previousMeasuredUsd !== measuredUsd;
+      let delta =
+        previous && !changedBasis && !counterReset
+          ? spendBetween(
+              {
+                balanceUsd: previous.balanceUsd,
+                cumulativeUsageUsd: previous.cumulativeUsageUsd,
+                at: previous.capturedAt,
+              },
+              {
+                balanceUsd,
+                cumulativeUsageUsd,
+                at: now,
+              },
+            )
+          : null;
+      if (previous && adapter.estimateSpend && (changedBasis || counterReset)) {
+        const elapsedHours =
+          (now.getTime() - previous.capturedAt.getTime()) /
+          FINANCE_CONFIG.hourMs;
+        if (elapsedHours > 0) {
+          const spendUsd = await adapter.estimateSpend(
+            deps.usageLedger,
+            previous.capturedAt,
+            now,
+          );
+          if (spendUsd !== null) {
+            delta = { spendUsd, elapsedHours };
+            spendBasis = "usage-ledger";
+            const reason = counterReset
+              ? "dashboard usage counter decreased"
+              : "spend source changed";
+            note = [
+              note,
+              `${reason}. USD spend for this interval is ${FINANCE_CONFIG.usageLedgerNote}`,
+            ]
+              .filter(Boolean)
+              .join(". ");
+          }
+        }
+      }
 
-      let spendNative: number | null = null;
-      let note = result.note ?? null;
-      if (adapter.fetchSpendNative) {
+      let spendNative = account?.previousDaySpendNative ?? null;
+      if (adapter.fetchSpendNative && apiKey) {
         // Anchor the window to closed UTC hours so a retry recomputes it.
         const [lastUsage] = await db
           .select({ bucketAt: financeProviderSnapshots.bucketAt })
@@ -678,7 +771,6 @@ export class FinanceRepository {
       }
 
       const autoTopUp = AUTO_TOP_UP_THRESHOLDS[provider];
-      const balanceUsd = result.balanceUsd;
 
       if (delta) {
         const trailing = await FinanceRepository.trailingProviderSpend(
@@ -689,6 +781,7 @@ export class FinanceRepository {
         // Ledger-estimated providers: who / what drove the window, so the
         // alert reads as a usage spike with its margin, not a key compromise.
         const ledgerUsage =
+          spendBasis === "usage-ledger" &&
           adapter.ledgerBreakdown !== null &&
           previous &&
           delta.spendUsd >= thresholds.minSpikeUsd
@@ -705,9 +798,9 @@ export class FinanceRepository {
             spendUsd: delta.spendUsd,
             elapsedHours: delta.elapsedHours,
             trailing,
-            balanceUsd: result.balanceUsd,
+            balanceUsd,
             thresholds,
-            spendBasis: adapter.spendBasis,
+            spendBasis,
             ledgerUsage,
           }),
         );
@@ -718,10 +811,10 @@ export class FinanceRepository {
           provider,
           bucketAt,
           capturedAt: now,
-          balanceUsd: result.balanceUsd,
-          balanceNative: result.balanceNative,
-          unit: result.unit,
-          cumulativeUsageUsd: result.cumulativeUsageUsd,
+          balanceUsd,
+          balanceNative,
+          unit,
+          cumulativeUsageUsd,
           spendUsd: delta?.spendUsd ?? null,
           spendNative,
           elapsedHours: delta?.elapsedHours ?? null,
@@ -736,7 +829,9 @@ export class FinanceRepository {
             ],
             set: {
               ...values,
-              spendNative: sql`coalesce(excluded.spend_native, ${financeProviderSnapshots.spendNative})`,
+              spendNative: sql`case when excluded.unit = ${financeProviderSnapshots.unit}
+                then coalesce(excluded.spend_native, ${financeProviderSnapshots.spendNative})
+                else excluded.spend_native end`,
             },
           });
       }
@@ -751,25 +846,27 @@ export class FinanceRepository {
             graceHours: thresholds[autoTopUp.graceHours],
           },
         });
-      } else if (
-        provider === FinanceSource.GAB &&
-        result.balanceNative !== null
-      ) {
-        balances.push({
-          provider,
-          candidate: detectGabLowBalance(
-            result.balanceNative,
-            thresholds.gabLowBalanceCredits,
-          ),
-        });
+      } else {
+        const creditFloor = CREDIT_BALANCE_THRESHOLDS[provider];
+        if (creditFloor && balanceNative !== null) {
+          balances.push({
+            provider,
+            candidate: detectCreditLowBalance({
+              provider,
+              providerLabel: adapter.label,
+              balanceCredits: balanceNative,
+              warningCredits: thresholds[creditFloor],
+            }),
+          });
+        }
       }
 
       return {
         ...base,
         status: SourceRunStatus.OK,
         reason: note,
-        fallback: adapter.spendBasis === "usage-ledger",
-        balanceUsd: result.balanceUsd,
+        fallback: spendBasis === "usage-ledger",
+        balanceUsd,
         spendUsd: delta?.spendUsd ?? null,
       };
     } catch (error) {
@@ -1530,7 +1627,10 @@ export class FinanceRepository {
           lastRunAt: now,
           lastStatus: report.status,
           lastReason: report.reason,
-          lastFallback: report.fallback,
+          // Failed provider runs still display the previous snapshot and its spend basis.
+          ...(ok || report.kind !== "provider"
+            ? { lastFallback: report.fallback }
+            : {}),
           ...(ok ? { lastOkAt: now } : {}),
         },
       });
@@ -1766,11 +1866,13 @@ export class FinanceRepository {
     try {
       const now = FinanceRepository.deps.now();
       const providerRows = await db
-        .select()
+        .selectDistinctOn([financeProviderSnapshots.provider])
         .from(financeProviderSnapshots)
         .where(inArray(financeProviderSnapshots.provider, [...ProviderSources]))
-        .orderBy(desc(financeProviderSnapshots.capturedAt))
-        .limit(500);
+        .orderBy(
+          financeProviderSnapshots.provider,
+          desc(financeProviderSnapshots.capturedAt),
+        );
       const statusRows = await db.select().from(financeSourceStatus);
 
       const sources = [...ProviderSources, ...RevenueSources].map((source) => {
@@ -1783,9 +1885,12 @@ export class FinanceRepository {
           reason: status?.lastReason ?? null,
           fallback:
             (status?.lastFallback ?? false) ||
-            (snap !== undefined && adapter?.spendBasis === "usage-ledger"),
+            (snap !== undefined &&
+              snap.unit !== UNCENSORED_CREDIT_UNIT &&
+              adapter?.spendBasis === "usage-ledger"),
           lastRunAt: status?.lastRunAt.toISOString() ?? null,
           lastOkAt: status?.lastOkAt?.toISOString() ?? null,
+          snapshotAt: snap?.capturedAt.toISOString() ?? null,
           balanceUsd: snap?.balanceUsd ?? null,
           balanceNative:
             snap?.unit === "calls" ? null : (snap?.balanceNative ?? null),
@@ -1795,11 +1900,19 @@ export class FinanceRepository {
         };
       });
 
-      const since = new Date(startOfUtcDay(now).getTime() - 7 * DAY_MS);
+      const expectedDays = 7;
+      const today = startOfUtcDay(now);
+      const since = new Date(today.getTime() - (expectedDays - 1) * DAY_MS);
+      const tomorrow = new Date(today.getTime() + DAY_MS);
       const rollups = await db
         .select()
         .from(financeDailyRollups)
-        .where(gte(financeDailyRollups.day, since))
+        .where(
+          and(
+            gte(financeDailyRollups.day, since),
+            lt(financeDailyRollups.day, tomorrow),
+          ),
+        )
         .orderBy(desc(financeDailyRollups.day));
       const days = rollups.map((r) => ({
         day: dayKey(r.day),
@@ -1822,7 +1935,7 @@ export class FinanceRepository {
       const net = tracked.reduce((a, r) => a + r.netRevenueUsd, 0);
       const fees = tracked.reduce((a, r) => a + r.processorFeesUsd, 0);
       const cost = tracked.reduce((a, r) => a + (r.upstreamCostUsd ?? 0), 0);
-      const costComplete = tracked.length === rollups.length;
+      const costComplete = tracked.length === expectedDays;
       const weekMargin = computeMargin({
         grossRevenueUsd: net,
         refundsUsd: 0,
@@ -1844,7 +1957,17 @@ export class FinanceRepository {
         null,
       );
 
+      const lastSuccessfulIngestAt = statusRows.reduce<Date | null>(
+        (latest, row) =>
+          row.lastOkAt && (latest === null || row.lastOkAt > latest)
+            ? row.lastOkAt
+            : latest,
+        null,
+      );
+
       return success({
+        asOf: now.toISOString(),
+        lastSuccessfulIngestAt: lastSuccessfulIngestAt?.toISOString() ?? null,
         lastIngestAt: lastIngestAt?.toISOString() ?? null,
         sources,
         week: {
@@ -1856,6 +1979,7 @@ export class FinanceRepository {
           costComplete,
           marginDays: tracked.length,
           totalDays: rollups.length,
+          expectedDays,
           netRevenueAllDaysUsd: round2(netAll),
         },
         days,

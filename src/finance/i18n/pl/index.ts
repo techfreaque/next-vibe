@@ -2,6 +2,28 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Finanse",
+  documents: {
+    search: "Szukaj dokumentów",
+    matches: "Pasujące dokumenty ({{count}})",
+    emptyTitle: "Brak dokumentów dla tych filtrów",
+    emptyHint: "Zmień wyszukiwaną frazę lub filtry.",
+    allCompanies: "Wszystkie firmy, do których masz dostęp",
+    chooseCompany: "Wybierz firmę",
+    allCustomers: "Wszyscy klienci",
+    chooseCustomer: "Wybierz klienta",
+    apply: "Zastosuj filtry",
+    clear: "Wyczyść filtry",
+    page: "Strona {{page}} z {{pages}} · {{total}} wyników",
+    previous: "Poprzednia strona",
+    next: "Następna strona",
+    select: "Wybierz {{reference}}",
+    open: "Otwórz {{reference}}",
+    noReference: "Bez numeru dokumentu",
+    invoices: "Faktury sprzedażowe",
+    bills: "Faktury od dostawców",
+    estimates: "Oferty",
+    heading: "Dokumenty handlowe",
+  },
   tags: {
     finance: "finanse",
     vibeSense: "vibe-sense",
@@ -54,6 +76,8 @@ export const translations: typeof enTranslations = {
       openrouterAutoTopUpGraceHours:
         "OpenRouter: czas na doładowanie automatyczne (godziny)",
       gabLowBalanceCredits: "Gab AI: minimalne saldo (kredyty)",
+      uncensoredAiLowBalanceCredits: "uncensored.ai: minimalne saldo (kredyty)",
+      freedomGptLowBalanceCredits: "FreedomGPT: minimalne saldo (kredyty)",
       nanoGptAutoTopUpFloorUsd:
         "NanoGPT próg alarmu dla automatycznego doładowania (USD)",
       nanoGptAutoTopUpGraceHours:
@@ -160,7 +184,9 @@ export const translations: typeof enTranslations = {
     description:
       "Przychód kontra koszt u dostawców: salda, marża, alerty i progi.",
     response: {
-      lastIngestAt: "Ostatnie pobranie",
+      lastIngestAt: "Ostatnia próba synchronizacji",
+      lastSuccessfulIngestAt: "Ostatnia udana synchronizacja źródła",
+      asOf: "Czas sprawdzenia stanu",
       sources: "Źródła",
       week: "Ostatnie 7 dni",
       days: "Dzienna marża",
@@ -168,11 +194,18 @@ export const translations: typeof enTranslations = {
       thresholds: "Progi",
     },
     widget: {
+      back: "Wróć",
       title: "Finanse",
       refresh: "Odśwież",
       runIngest: "Uruchom pobranie",
       loading: "Wczytuję finanse…",
-      lastIngest: "Ostatnie pobranie: {{when}}",
+      lastIngest: "Ostatnia próba {{when}}",
+      lastSuccessful: "Ostatnia udana synchronizacja {{when}}",
+      snapshot: "Ostatni odczyt od dostawcy {{when}}",
+      stale: "Nieaktualny odczyt",
+      noBalance: "Brak danych o saldzie",
+      missingCost: "Brak pełnych danych o kosztach",
+      noSources: "Żadne źródło finansowe nie zgłosiło jeszcze danych.",
       never: "nigdy",
       neverRun: "Jeszcze nie uruchomiono",
       margin: {
@@ -184,14 +217,16 @@ export const translations: typeof enTranslations = {
         pct: "Marża %",
         empty: "Brak podsumowań. Uruchom pobranie.",
         costUnknown: "koszt nieznany",
+        missingPct: "Brak procentowej marży",
         costIncomplete:
-          "Marża liczy {{tracked}} z {{total}} dni: tylko dni z pełnym kosztem u dostawców. Przychód netto ze wszystkich {{total}} dni: {{revenue}}.",
+          "Pełne koszty są dostępne za {{tracked}} z {{total}} dni. Zapisany przychód netto za cały okres: {{revenue}}.",
       },
       providers: {
         title: "Salda dostawców",
         lastSpend: "Wydano od ostatniego odczytu: {{amount}}",
         lastSpendEstimate:
           "Szacunkowe wydatki od ostatniego odczytu: {{amount}}",
+        previousDaySpend: "Zużycie API w dniu {{day}} (UTC): {{amount}}",
         lastNativeSpend:
           "Zużycie w API do ostatniej pełnej godziny: {{amount}}",
         noSpend: "Brak zmierzonych wydatków",
@@ -202,7 +237,7 @@ export const translations: typeof enTranslations = {
       },
       alerts: {
         title: "Ostatnie alerty",
-        empty: "Brak alertów. Marża i salda wyglądają normalnie.",
+        empty: "Brak zapisanych alertów",
       },
       thresholds: {
         title: "Progi",

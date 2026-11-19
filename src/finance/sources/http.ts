@@ -2,9 +2,8 @@
  * Finance HTTP port
  *
  * Every external provider call goes through this one function so tests inject
- * a mock and NEVER touch a live API. Real calls are read-only GET / POST-for-
- * balance-lookup against our own accounts. Keys travel only in headers and are
- * never logged.
+ * a mock. Live calls authenticate or read balances and usage for our accounts.
+ * Private API keys and session tokens travel in headers and are never logged.
  */
 
 import "server-only";
@@ -25,11 +24,13 @@ export interface HttpRequest {
   headers: Record<string, string>;
   /** JSON body (POST) */
   body?: JsonValue;
+  rejectRedirects?: boolean;
 }
 
 export interface HttpResult {
   status: number;
   json: JsonValue;
+  retryAfterMs?: number;
 }
 
 export type FinanceHttp = (request: HttpRequest) => Promise<HttpResult>;
@@ -45,8 +46,22 @@ export const liveHttp: FinanceHttp = async (request) => {
         ? request.headers
         : { "Content-Type": "application/json", ...request.headers },
     body: request.body === undefined ? undefined : JSON.stringify(request.body),
+    redirect: request.rejectRedirects ? "error" : "follow",
     signal: AbortSignal.timeout(FINANCE_CONFIG.requestTimeoutMs),
   });
   const json: JsonValue = await response.json().catch((): JsonValue => null);
-  return { status: response.status, json };
+  const retryAfter = response.headers.get("Retry-After");
+  const retryAfterMs =
+    retryAfter === null
+      ? undefined
+      : /^\d+$/.test(retryAfter)
+        ? Number(retryAfter) * 1_000
+        : Date.parse(retryAfter) - Date.now();
+  return {
+    status: response.status,
+    json,
+    ...(retryAfterMs !== undefined && Number.isFinite(retryAfterMs)
+      ? { retryAfterMs }
+      : {}),
+  };
 };

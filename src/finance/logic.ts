@@ -40,6 +40,8 @@ export interface Thresholds {
   openrouterAutoTopUpFloorUsd: number;
   openrouterAutoTopUpGraceHours: number;
   gabLowBalanceCredits: number;
+  uncensoredAiLowBalanceCredits: number;
+  freedomGptLowBalanceCredits: number;
   nanoGptAutoTopUpFloorUsd: number;
   nanoGptAutoTopUpGraceHours: number;
   veniceAutoTopUpFloorUsd: number;
@@ -71,6 +73,9 @@ export const THRESHOLD_FIELD: Readonly<
   [ThresholdKey.OPENROUTER_AUTO_TOP_UP_GRACE_HOURS]:
     "openrouterAutoTopUpGraceHours",
   [ThresholdKey.GAB_LOW_BALANCE_CREDITS]: "gabLowBalanceCredits",
+  [ThresholdKey.UNCENSORED_AI_LOW_BALANCE_CREDITS]:
+    "uncensoredAiLowBalanceCredits",
+  [ThresholdKey.FREEDOM_GPT_LOW_BALANCE_CREDITS]: "freedomGptLowBalanceCredits",
   [ThresholdKey.NANO_GPT_AUTO_TOP_UP_FLOOR_USD]: "nanoGptAutoTopUpFloorUsd",
   [ThresholdKey.NANO_GPT_AUTO_TOP_UP_GRACE_HOURS]: "nanoGptAutoTopUpGraceHours",
   [ThresholdKey.VENICE_AUTO_TOP_UP_FLOOR_USD]: "veniceAutoTopUpFloorUsd",
@@ -406,23 +411,34 @@ export function detectAutoTopUpLowBalance(input: {
   };
 }
 
-export function detectGabLowBalance(
-  balanceCredits: number,
-  warningCredits: number,
-): AlertCandidate | null {
+export const CREDIT_BALANCE_THRESHOLDS: Partial<
+  Record<typeof FinanceSourceValue, keyof Thresholds>
+> = {
+  [FinanceSource.GAB]: "gabLowBalanceCredits",
+  [FinanceSource.UNCENSORED_AI]: "uncensoredAiLowBalanceCredits",
+  [FinanceSource.FREEDOM_GPT]: "freedomGptLowBalanceCredits",
+};
+
+export function detectCreditLowBalance(input: {
+  provider: typeof FinanceSourceValue;
+  providerLabel: string;
+  balanceCredits: number;
+  warningCredits: number;
+}): AlertCandidate | null {
+  const { provider, providerLabel, balanceCredits, warningCredits } = input;
   if (warningCredits <= 0 || balanceCredits >= warningCredits) {
     return null;
   }
   const criticalCredits =
-    warningCredits * FINANCE_CONFIG.gabLowBalanceCriticalFraction;
+    warningCredits * FINANCE_CONFIG.creditLowBalanceCriticalFraction;
   const critical = balanceCredits < criticalCredits;
   const thresholdCredits = critical ? criticalCredits : warningCredits;
   return {
     type: FinanceAlertType.LOW_BALANCE,
     severity: critical ? AlertSeverity.CRITICAL : AlertSeverity.WARNING,
-    subject: FinanceSource.GAB,
-    dedupKey: `low-balance:${FinanceSource.GAB}:${critical ? "critical" : "warning"}`,
-    message: `Low Gab AI balance: ${balanceCredits} credits remaining, below ${thresholdCredits}. Check the account's credits and top-up settings.`,
+    subject: provider,
+    dedupKey: `low-balance:${provider}:${critical ? "critical" : "warning"}`,
+    message: `Low ${providerLabel} balance: ${balanceCredits} credits remaining, below ${thresholdCredits}. Check the account's credits and top-up settings.`,
     metadata: { balanceCredits, thresholdCredits },
   };
 }
@@ -431,7 +447,7 @@ export function detectGabLowBalance(
  * Where a provider's spend figure comes from:
  *  - provider-api: the provider's own balance / usage API. A spike there is money
  *    leaving OUR account at the provider, so it can mean a stolen key.
- *  - usage-ledger: no spend API (uncensored.ai, FreedomGPT). Spend is ESTIMATED
+ *  - usage-ledger: provider USD spend is unavailable. Spend is estimated
  *    from our own credit_transactions (billed calls x creditCost), so it only ever
  *    sees calls our users made and paid for through us. Key theft is invisible to
  *    it; a spike is a usage spike, and the real question is whether billing covered it.
@@ -584,7 +600,7 @@ export function detectProviderAnomalies(input: {
   };
   const severity = ledger ? ledger.severity : AlertSeverity.CRITICAL;
   const lead = ledger
-    ? `Usage spike on ${input.providerLabel} (estimated from our own credit ledger, the provider has no spend API).`
+    ? `Usage spike on ${input.providerLabel} (estimated from our own credit ledger).`
     : `Possible key compromise: ${input.providerLabel}.`;
   const tail = ledger ? ` ${ledger.detail}` : "";
   const costWord = ledger ? "estimated upstream cost" : "spent";

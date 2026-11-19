@@ -168,6 +168,10 @@ export const {
   OPENROUTER_AUTO_TOP_UP_GRACE_HOURS:
     "enums.threshold.openrouterAutoTopUpGraceHours",
   GAB_LOW_BALANCE_CREDITS: "enums.threshold.gabLowBalanceCredits",
+  UNCENSORED_AI_LOW_BALANCE_CREDITS:
+    "enums.threshold.uncensoredAiLowBalanceCredits",
+  FREEDOM_GPT_LOW_BALANCE_CREDITS:
+    "enums.threshold.freedomGptLowBalanceCredits",
   NANO_GPT_AUTO_TOP_UP_FLOOR_USD: "enums.threshold.nanoGptAutoTopUpFloorUsd",
   NANO_GPT_AUTO_TOP_UP_GRACE_HOURS:
     "enums.threshold.nanoGptAutoTopUpGraceHours",
@@ -191,6 +195,8 @@ export const ThresholdKeyDB = [
   ThresholdKey.OPENROUTER_AUTO_TOP_UP_FLOOR_USD,
   ThresholdKey.OPENROUTER_AUTO_TOP_UP_GRACE_HOURS,
   ThresholdKey.GAB_LOW_BALANCE_CREDITS,
+  ThresholdKey.UNCENSORED_AI_LOW_BALANCE_CREDITS,
+  ThresholdKey.FREEDOM_GPT_LOW_BALANCE_CREDITS,
   ThresholdKey.NANO_GPT_AUTO_TOP_UP_FLOOR_USD,
   ThresholdKey.NANO_GPT_AUTO_TOP_UP_GRACE_HOURS,
   ThresholdKey.VENICE_AUTO_TOP_UP_FLOOR_USD,

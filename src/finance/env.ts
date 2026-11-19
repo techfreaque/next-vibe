@@ -32,6 +32,36 @@ export const {
     commented: true,
     sensitive: true,
   },
+  UNCENSORED_AI_EMAIL: {
+    schema: z.string().trim().email().optional(),
+    example: "you@example.com",
+    comment: "uncensored.ai dashboard email for API credit balance and usage.",
+    commented: true,
+    fieldType: "email",
+    sensitive: true,
+  },
+  UNCENSORED_AI_PASSWORD: {
+    schema: z.string().min(1).optional(),
+    example: "your-uncensored-ai-password",
+    comment: "uncensored.ai dashboard password (see UNCENSORED_AI_EMAIL).",
+    commented: true,
+    sensitive: true,
+  },
+  FREEDOMGPT_EMAIL: {
+    schema: z.string().trim().email().optional(),
+    example: "you@example.com",
+    comment: "FreedomGPT dashboard email for account credit balance and usage.",
+    commented: true,
+    fieldType: "email",
+    sensitive: true,
+  },
+  FREEDOMGPT_PASSWORD: {
+    schema: z.string().min(1).optional(),
+    example: "your-freedomgpt-password",
+    comment: "FreedomGPT dashboard password (see FREEDOMGPT_EMAIL).",
+    commented: true,
+    sensitive: true,
+  },
 });
 
 /**

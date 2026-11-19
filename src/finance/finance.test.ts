@@ -64,11 +64,8 @@ import {
   spendBetween,
   trailingSpendRate,
 } from "./logic";
-import {
-  defaultFinanceDeps,
-  type FinanceDeps,
-  FinanceRepository,
-} from "./repository";
+import { defaultFinanceDeps, type FinanceDeps, FinanceRepository } from "./repository";
+import { UNCENSORED_CREDIT_UNIT } from "./sources/dashboard";
 import type { FinanceHttp, HttpRequest, HttpResult } from "./sources/http";
 import { usagePricing } from "./sources/providers";
 import type { StripeLedgerPort } from "./sources/revenue";
@@ -468,10 +465,7 @@ describe("detectProviderAnomalies", () => {
       trailing,
     });
     expect(out.map((a) => a.type)).toEqual(
-      expect.arrayContaining([
-        FinanceAlertType.SPEND_SPIKE,
-        FinanceAlertType.BALANCE_DRAIN,
-      ]),
+      expect.arrayContaining([FinanceAlertType.SPEND_SPIKE, FinanceAlertType.BALANCE_DRAIN]),
     );
   });
 });
@@ -491,17 +485,13 @@ describe("detectDayAnomalies", () => {
     internalBilledUsd: 80,
   };
   const types = (over: Partial<typeof quiet>): string[] =>
-    detectDayAnomalies({ ...quiet, ...over }, DEFAULT_THRESHOLDS).map(
-      (a) => a.type,
-    );
+    detectDayAnomalies({ ...quiet, ...over }, DEFAULT_THRESHOLDS).map((a) => a.type);
 
   it("is silent for a healthy day", () => {
     expect(types({})).toEqual([]);
   });
   it("flags negative margin", () => {
-    expect(types({ upstreamCostUsd: 260 })).toContain(
-      FinanceAlertType.NEGATIVE_MARGIN,
-    );
+    expect(types({ upstreamCostUsd: 260 })).toContain(FinanceAlertType.NEGATIVE_MARGIN);
   });
   it("flags thin margin below the floor, not above", () => {
     expect(types({ upstreamCostUsd: 170 })).toEqual([
@@ -512,15 +502,9 @@ describe("detectDayAnomalies", () => {
   });
   it("flags refund, dispute, cancellation spikes and the billing gap", () => {
     expect(types({ refundsUsd: 40 })).toContain(FinanceAlertType.REFUND_SPIKE);
-    expect(types({ disputeCount: 2, disputesUsd: 30 })).toContain(
-      FinanceAlertType.DISPUTE_SPIKE,
-    );
-    expect(types({ cancellationCount: 6 })).toContain(
-      FinanceAlertType.CANCELLATION_SPIKE,
-    );
-    expect(types({ cancellationCount: 2 })).not.toContain(
-      FinanceAlertType.CANCELLATION_SPIKE,
-    );
+    expect(types({ disputeCount: 2, disputesUsd: 30 })).toContain(FinanceAlertType.DISPUTE_SPIKE);
+    expect(types({ cancellationCount: 6 })).toContain(FinanceAlertType.CANCELLATION_SPIKE);
+    expect(types({ cancellationCount: 2 })).not.toContain(FinanceAlertType.CANCELLATION_SPIKE);
     expect(types({ upstreamCostUsd: 60, internalBilledUsd: 20 })).toContain(
       FinanceAlertType.BILLING_GAP,
     );
@@ -580,12 +564,8 @@ describe("thresholds + dedup window", () => {
   it("suppresses a repeat inside the window only", () => {
     const now = new Date("2031-03-04T12:00:00Z");
     expect(isDuplicateAlert(null, now, 12)).toBe(false);
-    expect(isDuplicateAlert(new Date("2031-03-04T03:00:00Z"), now, 12)).toBe(
-      true,
-    );
-    expect(isDuplicateAlert(new Date("2031-03-03T23:00:00Z"), now, 12)).toBe(
-      false,
-    );
+    expect(isDuplicateAlert(new Date("2031-03-04T03:00:00Z"), now, 12)).toBe(true);
+    expect(isDuplicateAlert(new Date("2031-03-03T23:00:00Z"), now, 12)).toBe(false);
   });
 });
 
@@ -615,9 +595,7 @@ const ledgerWindows: { from: Date; to: Date }[] = [];
 const httpCalls: string[] = [];
 const mails: { to: string; subject: string }[] = [];
 
-const mockHttp: FinanceHttp = async (
-  request: HttpRequest,
-): Promise<HttpResult> => {
+const mockHttp: FinanceHttp = async (request: HttpRequest): Promise<HttpResult> => {
   httpCalls.push(request.url);
   if (request.url.includes("openrouter.ai/api/v1/credits")) {
     return {
@@ -659,11 +637,46 @@ const stripePort: StripeLedgerPort = {
   async listBalanceTransactions() {
     const at = Math.floor(Date.UTC(2031, 2, 3, 10) / 1000);
     return [
-      { id: "txn_t1", reportingCategory: "charge", amount: 10000, fee: 320, currency: "usd", createdUnix: at },
-      { id: "txn_t2", reportingCategory: "refund", amount: -2000, fee: 0, currency: "usd", createdUnix: at },
-      { id: "txn_t3", reportingCategory: "dispute", amount: -1000, fee: 1500, currency: "usd", createdUnix: at },
-      { id: "txn_t4", reportingCategory: "payout", amount: -5000, fee: 0, currency: "usd", createdUnix: at },
-      { id: "txn_t5", reportingCategory: "fee", amount: -100, fee: 0, currency: "usd", createdUnix: at },
+      {
+        id: "txn_t1",
+        reportingCategory: "charge",
+        amount: 10000,
+        fee: 320,
+        currency: "usd",
+        createdUnix: at,
+      },
+      {
+        id: "txn_t2",
+        reportingCategory: "refund",
+        amount: -2000,
+        fee: 0,
+        currency: "usd",
+        createdUnix: at,
+      },
+      {
+        id: "txn_t3",
+        reportingCategory: "dispute",
+        amount: -1000,
+        fee: 1500,
+        currency: "usd",
+        createdUnix: at,
+      },
+      {
+        id: "txn_t4",
+        reportingCategory: "payout",
+        amount: -5000,
+        fee: 0,
+        currency: "usd",
+        createdUnix: at,
+      },
+      {
+        id: "txn_t5",
+        reportingCategory: "fee",
+        amount: -100,
+        fee: 0,
+        currency: "usd",
+        createdUnix: at,
+      },
     ];
   },
   async listCancellations() {
@@ -684,6 +697,7 @@ const testDeps: FinanceDeps = {
     source === FinanceSource.FREEDOM_GPT
       ? "test-key"
       : undefined,
+  dashboardCredentials: () => null,
   stripePort: () => stripePort,
   nowPaymentsPort: () => null,
   usageLedger: {
@@ -702,18 +716,10 @@ const testDeps: FinanceDeps = {
 
 async function purge(): Promise<void> {
   await db.delete(financeAlerts).where(gte(financeAlerts.createdAt, FUTURE));
-  await db
-    .delete(financeProviderSnapshots)
-    .where(gte(financeProviderSnapshots.bucketAt, FUTURE));
-  await db
-    .delete(financeRevenueEvents)
-    .where(gte(financeRevenueEvents.occurredAt, FUTURE));
-  await db
-    .delete(financeRevenueSnapshots)
-    .where(gte(financeRevenueSnapshots.day, FUTURE));
-  await db
-    .delete(financeDailyRollups)
-    .where(gte(financeDailyRollups.day, FUTURE));
+  await db.delete(financeProviderSnapshots).where(gte(financeProviderSnapshots.bucketAt, FUTURE));
+  await db.delete(financeRevenueEvents).where(gte(financeRevenueEvents.occurredAt, FUTURE));
+  await db.delete(financeRevenueSnapshots).where(gte(financeRevenueSnapshots.day, FUTURE));
+  await db.delete(financeDailyRollups).where(gte(financeDailyRollups.day, FUTURE));
 }
 
 async function insertPayment(
@@ -797,6 +803,7 @@ describe("finance ingest (mocked externals)", () => {
   });
 
   beforeEach(async () => {
+    FinanceRepository.deps = testDeps;
     await purge();
     await db.delete(financeThresholds);
     await db
@@ -849,17 +856,13 @@ describe("finance ingest (mocked externals)", () => {
 
   it("prices API-less providers from the usage log and keeps going", async () => {
     const data = await ingest(IngestScope.BALANCES);
-    const uncensored = data.sources.find(
-      (s) => s.source === FinanceSource.UNCENSORED_AI,
-    );
+    const uncensored = data.sources.find((s) => s.source === FinanceSource.UNCENSORED_AI);
     // No balance API: tracked from our own usage log instead of skipped.
     expect(uncensored?.status).toBe(SourceRunStatus.OK);
     expect(uncensored?.fallback).toBe(true);
     expect(uncensored?.reason).toContain("usage log");
     expect(uncensored?.reason).toContain("$0.05/call");
-    const freedom = data.sources.find(
-      (s) => s.source === FinanceSource.FREEDOM_GPT,
-    );
+    const freedom = data.sources.find((s) => s.source === FinanceSource.FREEDOM_GPT);
     expect(freedom?.status).toBe(SourceRunStatus.OK);
     expect(freedom?.fallback).toBe(true);
     expect(freedom?.reason).toContain("$0.08/call");
@@ -907,9 +910,7 @@ describe("finance ingest (mocked externals)", () => {
     });
     billedCalls = 30;
     const data = await ingest(IngestScope.BALANCES);
-    const uncensored = data.sources.find(
-      (s) => s.source === FinanceSource.UNCENSORED_AI,
-    );
+    const uncensored = data.sources.find((s) => s.source === FinanceSource.UNCENSORED_AI);
     expect(uncensored?.spendUsd).toBe(1);
     const [stored] = await db
       .select()
@@ -922,6 +923,88 @@ describe("finance ingest (mocked externals)", () => {
       );
     expect(stored?.balanceNative).toBeNull();
     expect(stored?.cumulativeUsageUsd).toBe(1.5);
+  });
+
+  it("uses uncensored.ai's credit counter and falls back across a counter reset", async () => {
+    await db.insert(financeThresholds).values({
+      key: ThresholdKey.UNCENSORED_AI_LOW_BALANCE_CREDITS,
+      value: 40,
+    });
+    const previousCapture = new Date(Date.UTC(2031, 2, 4, 11, 30));
+    await db.insert(financeProviderSnapshots).values({
+      provider: FinanceSource.UNCENSORED_AI,
+      bucketAt: new Date(Date.UTC(2031, 2, 4, 11)),
+      capturedAt: previousCapture,
+      balanceUsd: 3,
+      balanceNative: 60,
+      unit: UNCENSORED_CREDIT_UNIT,
+      cumulativeUsageUsd: 2,
+    });
+    let allocatedCredits = 80;
+    FinanceRepository.deps = {
+      ...testDeps,
+      apiKey: (source) =>
+        source === FinanceSource.UNCENSORED_AI ? undefined : testDeps.apiKey(source),
+      dashboardCredentials: (source) =>
+        source === FinanceSource.UNCENSORED_AI
+          ? { email: "finance@example.test", password: "fixture-password" }
+          : null,
+      usageLedger: {
+        ...testDeps.usageLedger,
+        async billedCalls(_models, dateRange) {
+          if (dateRange) {
+            expect(dateRange).toEqual({ from: previousCapture, to: NOW });
+            return 3;
+          }
+          return 100;
+        },
+      },
+      async http(request) {
+        const url = new URL(request.url);
+        if (url.hostname !== "mkstqjtsujvcaobdksxs.supabase.co") {
+          return await mockHttp(request);
+        }
+        switch (url.pathname) {
+          case "/auth/v1/token":
+            return {
+              status: 200,
+              json: {
+                access_token: "fixture-session",
+                expires_in: 3600,
+                user: { id: "70dd4cc6-9269-4eb9-8c07-49d1ff541f3c" },
+              },
+            };
+          case "/rest/v1/rpc/get_user_credit_balance":
+            return { status: 200, json: 5 };
+          default:
+            return {
+              status: 200,
+              json: [{ status: "active", total_credits: allocatedCredits, credits_remaining: 10 }],
+            };
+        }
+      },
+    };
+    const result = await ingest(IngestScope.BALANCES);
+    expect(result.sources.find((source) => source.source === FinanceSource.UNCENSORED_AI))
+      .toMatchObject({ balanceUsd: 0.75, spendUsd: 1.5, fallback: false });
+    expect(result.alerts).toContainEqual(expect.objectContaining({
+      subject: FinanceSource.UNCENSORED_AI,
+      severity: AlertSeverity.CRITICAL,
+      type: FinanceAlertType.LOW_BALANCE,
+    }));
+    const status = await FinanceRepository.status(t, logger);
+    expect(status.success && status.data.sources.find((source) => source.source === FinanceSource.UNCENSORED_AI))
+      .toMatchObject({ balanceNative: 15, fallback: false, lastSpendUsd: 1.5 });
+
+    allocatedCredits = 20;
+    const retry = await ingest(IngestScope.BALANCES);
+    expect(retry.sources.find((source) => source.source === FinanceSource.UNCENSORED_AI))
+      .toMatchObject({
+        balanceUsd: 0.75,
+        spendUsd: expect.closeTo(0.15),
+        fallback: true,
+        reason: expect.stringContaining("dashboard usage counter decreased"),
+      });
   });
 
   it("raises a ledger spike as a WARNING usage spike with who / what", async () => {
@@ -953,9 +1036,7 @@ describe("finance ingest (mocked externals)", () => {
       to: NOW,
     });
     const spike = data.alerts.find(
-      (a) =>
-        a.type === FinanceAlertType.SPEND_SPIKE &&
-        a.subject === FinanceSource.UNCENSORED_AI,
+      (a) => a.type === FinanceAlertType.SPEND_SPIKE && a.subject === FinanceSource.UNCENSORED_AI,
     );
     expect(spike?.severity).toBe(AlertSeverity.WARNING);
     expect(spike?.message).toContain("Usage spike on uncensored.ai");
@@ -972,9 +1053,7 @@ describe("finance ingest (mocked externals)", () => {
     );
     expect(all.calls).toBeGreaterThanOrEqual(0);
     expect(all.packCredits + all.freeCredits).toBeCloseTo(all.billedCredits, 1);
-    expect(all.topWallets.length).toBeLessThanOrEqual(
-      Math.min(all.walletCount, 3),
-    );
+    expect(all.topWallets.length).toBeLessThanOrEqual(Math.min(all.walletCount, 3));
     const none = await defaultFinanceDeps.usageLedger.usageBreakdown(
       modelIds,
       FUTURE,
@@ -1123,12 +1202,8 @@ describe("finance ingest (mocked externals)", () => {
       expect(rolled?.netRevenueUsd).toBe(80.8);
     } finally {
       FinanceRepository.deps = testDeps;
-      await db
-        .delete(paymentRefunds)
-        .where(gte(paymentRefunds.createdAt, FUTURE));
-      await db
-        .delete(paymentTransactions)
-        .where(gte(paymentTransactions.createdAt, FUTURE));
+      await db.delete(paymentRefunds).where(gte(paymentRefunds.createdAt, FUTURE));
+      await db.delete(paymentTransactions).where(gte(paymentTransactions.createdAt, FUTURE));
     }
   });
 
@@ -1139,13 +1214,7 @@ describe("finance ingest (mocked externals)", () => {
       throw new Error("test requires at least one user");
     }
     const sale = new Date(Date.UTC(2031, 2, 2, 15)); // 2031-03-02
-    await insertPayment(
-      anyUser.id,
-      "30.00",
-      "USD",
-      PaymentStatus.SUCCEEDED,
-      sale,
-    );
+    await insertPayment(anyUser.id, "30.00", "USD", PaymentStatus.SUCCEEDED, sale);
     // No processor API: the backfill falls back (flagged) to our own ledger.
     FinanceRepository.deps = {
       ...testDeps,
@@ -1191,9 +1260,7 @@ describe("finance ingest (mocked externals)", () => {
       expect(result.data.alertsRaised).toBe(0);
     } finally {
       FinanceRepository.deps = testDeps;
-      await db
-        .delete(paymentTransactions)
-        .where(gte(paymentTransactions.createdAt, FUTURE));
+      await db.delete(paymentTransactions).where(gte(paymentTransactions.createdAt, FUTURE));
     }
   });
 
@@ -1234,17 +1301,14 @@ describe("finance ingest (mocked externals)", () => {
       expect(snap?.grossUsd).toBe(100);
     } finally {
       FinanceRepository.deps = testDeps;
-      await db
-        .delete(paymentTransactions)
-        .where(gte(paymentTransactions.createdAt, FUTURE));
+      await db.delete(paymentTransactions).where(gte(paymentTransactions.createdAt, FUTURE));
     }
   });
 
   it("adds the flat-rate Gab plan to daily cost when its key is set", async () => {
     FinanceRepository.deps = {
       ...testDeps,
-      apiKey: (source) =>
-        source === FinanceSource.GAB ? "test-key" : testDeps.apiKey(source),
+      apiKey: (source) => (source === FinanceSource.GAB ? "test-key" : testDeps.apiKey(source)),
     };
     try {
       await seedPreviousReading(90);
@@ -1273,9 +1337,7 @@ describe("finance ingest (mocked externals)", () => {
     openRouterUsage = 190;
 
     const first = await ingest(IngestScope.BALANCES);
-    const spike = first.alerts.filter(
-      (a) => a.type === FinanceAlertType.SPEND_SPIKE,
-    );
+    const spike = first.alerts.filter((a) => a.type === FinanceAlertType.SPEND_SPIKE);
     expect(spike).toHaveLength(1);
     expect(spike[0]?.delivery).toBe("sent");
     expect(spike[0]?.message).toContain("Possible key compromise: OpenRouter");
@@ -1285,9 +1347,7 @@ describe("finance ingest (mocked externals)", () => {
 
     openRouterUsage = 260;
     const second = await ingest(IngestScope.BALANCES);
-    const repeat = second.alerts.filter(
-      (a) => a.type === FinanceAlertType.SPEND_SPIKE,
-    );
+    const repeat = second.alerts.filter((a) => a.type === FinanceAlertType.SPEND_SPIKE);
     expect(repeat[0]?.delivery).toBe("suppressed");
     expect(second.alertsSuppressed).toBeGreaterThan(0);
     expect(mails).toHaveLength(2);
@@ -1296,9 +1356,7 @@ describe("finance ingest (mocked externals)", () => {
       .select()
       .from(financeAlerts)
       .where(gte(financeAlerts.createdAt, FUTURE));
-    expect(
-      stored.filter((a) => a.type === FinanceAlertType.SPEND_SPIKE),
-    ).toHaveLength(1);
+    expect(stored.filter((a) => a.type === FinanceAlertType.SPEND_SPIKE)).toHaveLength(1);
   });
 
   it("a dry run reports alerts but stores and sends nothing", async () => {
@@ -1306,9 +1364,7 @@ describe("finance ingest (mocked externals)", () => {
     openRouterUsage = 190;
     const data = await ingest(IngestScope.BALANCES, true);
     expect(data.dryRunResult).toBe(true);
-    expect(
-      data.alerts.some((a) => a.type === FinanceAlertType.SPEND_SPIKE),
-    ).toBe(true);
+    expect(data.alerts.some((a) => a.type === FinanceAlertType.SPEND_SPIKE)).toBe(true);
     expect(mails).toHaveLength(0);
     const stored = await db
       .select()
@@ -1328,9 +1384,7 @@ describe("finance ingest (mocked externals)", () => {
       await seedPreviousReading(100);
       openRouterUsage = 190;
       const data = await ingest(IngestScope.BALANCES);
-      const spike = data.alerts.find(
-        (a) => a.type === FinanceAlertType.SPEND_SPIKE,
-      );
+      const spike = data.alerts.find((a) => a.type === FinanceAlertType.SPEND_SPIKE);
       expect(spike?.delivery).toContain("skipped: no recipient");
       expect(mails).toHaveLength(0);
     } finally {
@@ -1387,8 +1441,8 @@ describe("finance ingest (mocked externals)", () => {
       observedAt = new Date(NOW.getTime() + mins * 60_000);
       const result = await ingest(IngestScope.BALANCES, dryRun);
       return result.alerts.find(
-        (alert) => alert.type === FinanceAlertType.LOW_BALANCE &&
-          alert.subject === FinanceSource.OPENROUTER,
+        (alert) =>
+          alert.type === FinanceAlertType.LOW_BALANCE && alert.subject === FinanceSource.OPENROUTER,
       );
     }
 
@@ -1434,13 +1488,20 @@ describe("finance ingest (mocked externals)", () => {
     const bucketAt = new Date(Date.UTC(2031, 2, 4, 12));
     const endSeconds = bucketAt.getTime() / 1_000;
     const endDate = new Date(bucketAt.getTime() - 1_000).toISOString();
-    const startDate = new Date(bucketAt.getTime() - FINANCE_CONFIG.hourMs).toISOString();
+    const previousBucket = new Date(bucketAt.getTime() - FINANCE_CONFIG.hourMs);
+    const startDate = previousBucket.toISOString();
+    await db.insert(financeProviderSnapshots).values({
+      provider: FinanceSource.GAB,
+      bucketAt: previousBucket,
+      capturedAt: previousBucket,
+      unit: "gab-credits",
+      spendNative: 0,
+    });
     let usageCalls = 0;
     let failUsage = false;
     FinanceRepository.deps = {
       ...testDeps,
-      apiKey: (source) =>
-        source === FinanceSource.GAB ? "test-key" : testDeps.apiKey(source),
+      apiKey: (source) => (source === FinanceSource.GAB ? "test-key" : testDeps.apiKey(source)),
       async http(request): Promise<HttpResult> {
         const url = new URL(request.url);
         if (url.origin !== "https://gab.ai" || url.pathname !== "/v1/usage") {
@@ -1477,8 +1538,12 @@ describe("finance ingest (mocked externals)", () => {
     try {
       const result = await ingest(IngestScope.BALANCES);
       expect(usageCalls).toBe(2);
-      expect(result.sources.find(({ source }) => source === FinanceSource.GAB))
-        .toMatchObject({ balanceUsd: null, spendUsd: null, fallback: false, reason: expect.stringContaining("7 Gab credits charged") });
+      expect(result.sources.find(({ source }) => source === FinanceSource.GAB)).toMatchObject({
+        balanceUsd: null,
+        spendUsd: null,
+        fallback: false,
+        reason: expect.stringContaining("7 Gab credits charged"),
+      });
       expect(result.alerts).toEqual([
         expect.objectContaining({
           subject: FinanceSource.GAB,
@@ -1487,8 +1552,9 @@ describe("finance ingest (mocked externals)", () => {
         }),
       ]);
       const status = await FinanceRepository.status(t, logger);
-      expect(status.success && status.data.sources.find(({ source }) => source === FinanceSource.GAB))
-        .toMatchObject({ balanceNative: 150, lastSpendNative: 7 });
+      expect(
+        status.success && status.data.sources.find(({ source }) => source === FinanceSource.GAB),
+      ).toMatchObject({ balanceNative: 150, lastSpendNative: 7 });
 
       failUsage = true;
       gabBalance = 40;
