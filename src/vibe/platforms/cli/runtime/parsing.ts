@@ -50,6 +50,26 @@ function readZodObject(
 }
 
 export class CliInputParser {
+  static normalizeRemoteFlag(
+    args: readonly string[],
+    isCommand: (value: string) => boolean,
+  ): string[] {
+    const normalized = [...args];
+    for (let index = 0; index < args.length; index++) {
+      const arg = args[index];
+      if (arg === "--") {
+        break;
+      }
+      const next = args[index + 1];
+      if (arg === "--remote" && next && isCommand(next)) {
+        // Commander would otherwise consume the tool as the optional target.
+        // An instance label matching a command can use --remote=<id>.
+        normalized[index] = "--remote=thea";
+      }
+    }
+    return normalized;
+  }
+
   /**
    * Convert kebab-case to camelCase
    * Example: "force-update" -> "forceUpdate"

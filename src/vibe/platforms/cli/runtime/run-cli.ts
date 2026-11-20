@@ -468,5 +468,16 @@ export function runCli({
       },
     );
 
-  program.parse();
+  program.parse(
+    CliInputParser.normalizeRemoteFlag(
+      process.argv.slice(2),
+      (arg) =>
+        Object.hasOwn(pathToAliasMap, arg) ||
+        arg === "mcp" ||
+        arg === "h" ||
+        arg === "help" ||
+        resolveCommandFromPath(arg) !== null,
+    ),
+    { from: "user" },
+  );
 }

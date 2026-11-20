@@ -4,8 +4,52 @@ import { join } from "node:path";
 
 import { describe, expect, it } from "bun:test";
 
+import { Command } from "commander";
+
 import { resolveInputPath } from "./input-path";
 import { CliInputParser } from "./parsing";
+
+describe("CliInputParser.normalizeRemoteFlag", () => {
+  const parse = (args: string[]): { remote: string; command?: string } => {
+    const program = new Command()
+      .option("--hermes")
+      .option("--remote [instanceId]")
+      .argument("[command]")
+      .argument("[args...]")
+      .allowUnknownOption();
+    program.parse(
+      CliInputParser.normalizeRemoteFlag(args, (arg) => arg === "user-update"),
+      { from: "user" },
+    );
+    return {
+      remote: program.opts<{ remote: string }>().remote,
+      command: program.args[0],
+    };
+  };
+
+  it("preserves the command after bare --remote", () => {
+    expect(parse(["--hermes", "--remote", "user-update", "--id=demo"])).toEqual({
+      remote: "thea",
+      command: "user-update",
+    });
+  });
+
+  it("accepts explicit labels with equals or a space", () => {
+    expect(parse(["--remote=user-update", "user-update"])).toEqual({
+      remote: "user-update",
+      command: "user-update",
+    });
+    expect(parse(["--remote", "peer", "user-update"])).toEqual({
+      remote: "peer",
+      command: "user-update",
+    });
+  });
+
+  it("leaves literals after -- unchanged", () => {
+    const args = ["user-update", "--", "--remote", "user-update"];
+    expect(CliInputParser.normalizeRemoteFlag(args, () => true)).toEqual(args);
+  });
+});
 
 describe("CliInputParser.parseCliArgumentsSimple", () => {
   it("keeps everything after -- positional, flags included", () => {

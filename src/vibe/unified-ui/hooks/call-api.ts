@@ -197,6 +197,7 @@ async function readNonJsonBodyPreview(
  * report can say more than the ErrorResponseType carries.
  */
 interface CallDiagnostics {
+  startedAt: number;
   status?: number;
   transport?: "http" | "client-route";
   redirected?: boolean;
@@ -220,6 +221,13 @@ interface CallDiagnostics {
    * cookie is invisible to JS: duplicate/foreign-path cookie, webview).
    */
   csrfHeaderSent?: boolean | null;
+}
+
+let devFullReloadAt = 0;
+if (typeof window !== "undefined" && import.meta.hot) {
+  import.meta.hot.on("vite:beforeFullReload", () => {
+    devFullReloadAt = Date.now();
+  });
 }
 
 /** Page visibility, null outside a browser document (SSR, workers). */
@@ -250,6 +258,9 @@ function networkFailureContext(
     visibilityAtStart: diag.visibilityAtStart ?? null,
     visibilityAtFailure,
     online,
+    ...(devFullReloadAt > 0 && devFullReloadAt >= diag.startedAt
+      ? { devFullReloadDuringRequest: true }
+      : {}),
     networkFailureKind: classifyNetworkFailure(
       durationMs,
       visibilityAtFailure,
@@ -431,8 +442,8 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   const diag: CallDiagnostics = {
     requestId,
     visibilityAtStart: currentVisibility(),
+    startedAt: Date.now(),
   };
-  const startedAt = Date.now();
   // Every log line of this call (non-JSON body, schema mismatch, central
   // failure report, client-route handler logs) carries the request id.
   const callLogger = withLogContext(logger, { requestId });
@@ -454,7 +465,7 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         user,
         result,
         diag,
-        Date.now() - startedAt,
+        Date.now() - diag.startedAt,
       );
     } catch {
       // Reporting must never turn a handled failure into a thrown one

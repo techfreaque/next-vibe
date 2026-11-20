@@ -1,0 +1,28 @@
+diff --git a/dist/esm/core/router-code-splitter-plugin.js b/dist/esm/core/router-code-splitter-plugin.js
+--- a/dist/esm/core/router-code-splitter-plugin.js
++++ b/dist/esm/core/router-code-splitter-plugin.js
+@@ -12,6 +12,16 @@ import { decodeIdentifier, logDiff } from "@tanstack/router-utils";
+ * https://github.com/TanStack/router/pull/3355
+ */
+ var CODE_SPLITTER_PLUGIN_NAME = "tanstack-router:code-splitter:compile-reference-file";
++// These generated next-vibe shells defer the endpoint import to the handler.
++// They have no split targets. Match the complete shell so custom route code
++// and future generator output fall through to the normal compiler.
++var vibeApiRouteShell = new RegExp(
++	'^// AUTO-GENERATED from [^\\r\\n]+\\r?\\n' +
++	'import \\{ createFileRoute \\} from "@tanstack/react-router";\\s*' +
++	'import \\{ wrapNextApiRoute \\} from "\\.\\./nextjs-compat-wrapper";\\s*' +
++	'export const Route = createFileRoute\\(\\s*"/api/[^"\\r\\n]+"\\s*,?\\s*\\)\\(' +
++	'\\s*\\{\\s*server: \\{\\s*handlers: wrapNextApiRoute\\(\\s*\\(\\) =>\\s*import\\("@/[^"\\r\\n]+"\\),\\s*\\),\\s*\\},\\s*\\}\\s*,?\\s*\\);\\s*$'
++);
+ /**
+ * JSX transformation plugins grouped by framework.
+ * These plugins must come AFTER the TanStack Router plugin in the Vite config.
+@@ -67,6 +77,7 @@ function createRouterCodeSplitterPlugin(options = {}, routerPluginContext) {
+ 		return userConfig.codeSplittingOptions?.splitBehavior;
+ 	};
+ 	const handleCompilingReferenceFile = (code, id, generatorNodeInfo) => {
++		if (!isProduction && !addHmr && compilerPlugins.length === 0 && !userConfig.codeSplittingOptions?.deleteNodes?.length && !getShouldSplitFn() && vibeApiRouteShell.test(code)) return null;
+ 		if (debug) console.info("Compiling Route: ", id);
+ 		const fromCode = detectCodeSplitGroupingsFromRoute({
+ 			code,

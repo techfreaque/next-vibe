@@ -304,14 +304,6 @@ export class DevRepository {
     // Shared abort controller: aborted by shutdown() so task runners stop cleanly
     const shutdownController = new AbortController();
 
-    // Start task runner if not skipped
-    void DevRepository.startTaskRunnerIfEnabled(
-      data,
-      locale,
-      logger,
-      shutdownController.signal,
-    );
-
     // Start Next.js (or Vite for TanStack) and keep process alive
     return await DevRepository.startNextJsAndWait(
       port,
@@ -320,6 +312,14 @@ export class DevRepository {
       data.profile,
       data.framework === ServerFramework.TANSTACK,
       shutdownController,
+      () => {
+        void DevRepository.startTaskRunnerIfEnabled(
+          data,
+          locale,
+          logger,
+          shutdownController.signal,
+        );
+      },
     );
   }
 
@@ -426,6 +426,7 @@ export class DevRepository {
     profile = false,
     tanstack = false,
     shutdownController?: AbortController,
+    onReady?: () => void,
   ): Promise<never> {
     // A device node can exist even when this process has no terminal.
     // Only query stty when stdin is connected to one.
@@ -670,8 +671,15 @@ export class DevRepository {
             parseError(error),
           );
           shutdown(1);
+          return new Promise<never>(() => {
+            /* Shutdown closes Vite and exits. */
+          });
         }
       }
+
+      // The first task pulse can publish events immediately. Wait until the
+      // proxy has registered its local broadcast sink before starting it.
+      onReady?.();
 
       // Keep the process alive - the Vite/Nitro server runs until SIGINT/SIGTERM
       // oxlint-disable-next-line no-empty-function -- intentional infinite wait; server runs until SIGINT/SIGTERM
@@ -694,6 +702,8 @@ export class DevRepository {
       },
       logger,
     });
+
+    onReady?.();
 
     // Keep the process alive indefinitely
     return await new Promise<never>(() => {

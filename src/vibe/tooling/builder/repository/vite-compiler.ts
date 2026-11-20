@@ -20,9 +20,9 @@ import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
 import {
   type BuildOptions,
   type EnvironmentModuleGraph,
+  type EnvironmentModuleNode,
   type InlineConfig,
   isRunnableDevEnvironment,
-  type ModuleNode,
   type Plugin,
   type PluginOption,
 } from "vite";
@@ -642,26 +642,36 @@ function evictSsrModules(
 // importer graph from a changed module until an accept boundary stops the
 // update, or a graph root is reached without one. Returns the escaping import
 // chain (changed file first, root last) or null when every path is accepted.
-// Approximation only — partial accepts (acceptedHmrExports) and circular-import
-// detection are not modeled — so callers should label output as "likely".
-function findFullReloadPath(
-  mod: ModuleNode,
-  visited: Set<string>,
+// React can also invalidate a boundary after evaluating its new exports.
+export function findFullReloadPath(
+  mod: EnvironmentModuleNode,
+  visited: Set<EnvironmentModuleNode>,
 ): string[] | null {
-  const key = mod.id ?? mod.url;
-  if (visited.has(key)) {
+  if (
+    visited.has(mod) ||
+    mod.isSelfAccepting ||
+    (mod.id && mod.isSelfAccepting === undefined)
+  ) {
     return null;
   }
-  visited.add(key);
-  const shortName = key.replace(/^.*\/src\//, "src/");
-  if (mod.isSelfAccepting) {
-    return null;
-  }
-  if (mod.importers.size === 0) {
+  visited.add(mod);
+  const shortName = (mod.id ?? mod.url).replace(/^.*\/src\//, "src/");
+  if (mod.importers.size === 0 && !mod.acceptedHmrExports) {
     return [shortName];
   }
   for (const importer of mod.importers) {
     if (importer.acceptedHmrDeps.has(mod)) {
+      continue;
+    }
+    const imported = mod.id
+      ? importer.importedBindings?.get(mod.id)
+      : undefined;
+    const accepted = mod.acceptedHmrExports;
+    if (
+      imported &&
+      accepted &&
+      [...imported].every((binding) => accepted.has(binding))
+    ) {
       continue;
     }
     const rest = findFullReloadPath(importer, visited);
@@ -2244,7 +2254,11 @@ class ViteCompiler {
                 },
               } as never);
             },
-            handleHotUpdate({ modules, server: viteServer }) {
+            handleHotUpdate({
+              file: changedFile,
+              modules,
+              server: viteServer,
+            }) {
               const srcModules = modules.filter((m) => m.id?.includes("/src/"));
               if (srcModules.length === 0) {
                 return;
@@ -2269,8 +2283,13 @@ class ViteCompiler {
               // boundary, Vite broadcasts full-reload to EVERY open tab —
               // regardless of what page they show. Log the escaping chain so
               // "why did my page reload" is answerable from the dev log.
-              for (const mod of nonCssModules) {
-                const escapePath = findFullReloadPath(mod, new Set());
+              const clientModules =
+                viteServer.environments["client"]?.moduleGraph.getModulesByFile(
+                  changedFile,
+                );
+              const clientVisited = new Set<EnvironmentModuleNode>();
+              for (const mod of clientModules ?? []) {
+                const escapePath = findFullReloadPath(mod, clientVisited);
                 if (escapePath) {
                   const reloadMsg = fmtVite(
                     `full-reload likely — unaccepted chain: ${escapePath.join(" → ")}`,
