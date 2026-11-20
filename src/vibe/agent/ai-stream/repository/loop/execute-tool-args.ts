@@ -85,6 +85,18 @@ export function describeNestedExecuteToolArgs(value: WidgetData): {
   };
 }
 
+export function describeExecuteToolValidationStage(args: ArgsRecord): string {
+  const target = args["toolName"];
+  if (typeof target !== "string" || target.length === 0) {
+    return "wrapper-target";
+  }
+  const input = args["input"];
+  if (input !== undefined && !isRecord(input)) {
+    return "wrapper-input";
+  }
+  return "wrapper-target-and-input-valid";
+}
+
 export function normalizeExecuteToolArgs(args: ArgsRecord): ArgsRecord {
   let out: ArgsRecord = args;
 

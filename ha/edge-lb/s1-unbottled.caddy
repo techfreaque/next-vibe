@@ -76,6 +76,8 @@ http://unbottled.ai, http://www.unbottled.ai {
 }
 
 unbottled.ai {
+	# Mark responses that reached this edge, including errors generated here.
+	header +Server-Timing "vibe-edge;desc=\"s1\""
 	tls {
 		issuer acme {
 			disable_tlsalpn_challenge

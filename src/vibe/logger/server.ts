@@ -89,6 +89,7 @@ export const SERVER_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "totalTokens",
   "inputTokens",
   "outputTokens",
+  "reasoningTokens",
   "cachedInputTokens",
   "partialOutputChars",
   "fallbackUsd",

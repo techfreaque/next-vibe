@@ -1,5 +1,9 @@
 import { describe, expect, it } from "bun:test";
 
+import {
+  readEdgeTimingHeader,
+  readProxyTimingHeader,
+} from "../realtime/core/proxy-timing";
 import { identifyBrowserAutomation } from "./client-context";
 import { classifyResourceFailure, resourceTiming } from "./resource-diagnostics";
 
@@ -30,5 +34,13 @@ describe("browser failure attribution", () => {
     expect(classifyResourceFailure(0, 0)).toBe("opaque-or-no-response");
     expect(classifyResourceFailure(null, 0)).toBe("status-unavailable");
     expect(resourceTiming(null).resourceFailureKind).toBe("no-resource-timing");
+  });
+
+  it("reads independent edge and app markers from one response", () => {
+    const header = 'vibe-edge;desc="s2", vibe-proxy;desc="upstream-timeout"';
+    expect(readEdgeTimingHeader(header)).toBe("s2");
+    expect(readProxyTimingHeader(header)).toBe("upstream-timeout");
+    expect(readEdgeTimingHeader('vibe-edge;desc="unknown"')).toBeNull();
+    expect(readEdgeTimingHeader(null)).toBeNull();
   });
 });

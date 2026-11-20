@@ -121,6 +121,7 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
         lastFailedHandshakeRequestId: new URL(TestSocket.sockets[2]?.url ?? "").searchParams.get(
           "requestId",
         ),
+        lastFailedHandshakeMs: 0,
         msSinceVisibilityChange: 0,
         msSinceNetworkChange: 0,
         offlineMs: 20_000,

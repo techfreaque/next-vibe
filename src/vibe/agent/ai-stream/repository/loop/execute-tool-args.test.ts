@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 
 import {
+  describeExecuteToolValidationStage,
   describeNestedExecuteToolArgs,
   describeToolArgShape,
   normalizeExecuteToolArgs,
@@ -133,5 +134,17 @@ describe("normalizeExecuteToolArgs", () => {
       nestedExecuteToolInputShape: "array",
       nestedExecuteToolSiblingFields: true,
     });
+  });
+});
+
+describe("describeExecuteToolValidationStage", () => {
+  it("locates invalid wrapper fields after normalization", () => {
+    expect(describeExecuteToolValidationStage({ input: { prompt: "sample" } }))
+      .toBe("wrapper-target");
+    expect(describeExecuteToolValidationStage({ toolName: "sample", input: [] }))
+      .toBe("wrapper-input");
+    expect(describeExecuteToolValidationStage(normalizeExecuteToolArgs({
+      input: { toolName: "sample", input: {} },
+    }))).toBe("wrapper-target-and-input-valid");
   });
 });

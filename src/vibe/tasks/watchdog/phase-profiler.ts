@@ -39,9 +39,7 @@ const SAMPLE_INTERVAL_US = 1000;
 const STREAK_GAP_S = 0.005;
 /** Log a profiled cron phase stall as its own row from this long. */
 const STALL_REPORT_MS = 200;
-/** Keep a streak for the lag row from this long. Lag rows start at 100 ms. */
-const STALL_ATTACH_MS = 80;
-/** Stall profiles kept for the lag row to attach. */
+/** Completed sampling windows kept for the lag row, including idle ones. */
 const RECENT_RING_SIZE = 10;
 /** The lag row waits at most this long for the covering session's summary. */
 const FLUSH_WAIT_MS = 2000;
@@ -191,22 +189,16 @@ function summarize(
   result: SamplingProfile,
   session: ProfileSession,
   endedAt: number,
-): StallProfile | null {
+): StallProfile {
   const traces = result.stackTraces.traces;
-  if (traces.length < 2) {
-    return null;
-  }
   const [start, end] = longestStreak(traces);
-  if (end - start < 2) {
-    return null;
-  }
-  const streakMs = Math.round(
-    (traces[end - 1].timestamp - traces[start].timestamp) * 1000 +
-      result.stackTraces.interval * 1000,
-  );
-  if (streakMs < STALL_ATTACH_MS) {
-    return null;
-  }
+  const streakMs =
+    end > start
+      ? Math.round(
+          (traces[end - 1].timestamp - traces[start].timestamp) * 1000 +
+            result.stackTraces.interval * 1000,
+        )
+      : 0;
 
   const hotFrames = new Map<string, number>();
   const hotStacks = new Map<string, number>();
@@ -329,33 +321,29 @@ function startSession(logger: EndpointLogger): ProfileSession {
       }
       const result = await jsc.profile(() => sessionWindow, SAMPLE_INTERVAL_US);
       const stall = summarize(result, session, Date.now());
-      if (stall) {
-        const ring = recent();
-        ring.push(stall);
-        if (ring.length > RECENT_RING_SIZE) {
-          ring.splice(0, ring.length - RECENT_RING_SIZE);
-        }
-        if (session.phases.length > 0 && stall.streakMs >= STALL_REPORT_MS) {
-          // Static message: the fingerprint groups on it; details in metadata.
-          logger.warn(
-            "[EventLoop] Stall profiled in a window with cron bookkeeping",
-            {
-              streakMs: stall.streakMs,
-              profileWindowStartedAt: new Date(
-                stall.sessionStartedAt,
-              ).toISOString(),
-              profileWindowEndedAt: new Date(
-                stall.sessionEndedAt,
-              ).toISOString(),
-              phases: stall.phases,
-              hotFrames: stall.hotFrames,
-              hotStacks: stall.hotStacks,
-              hotNative: stall.hotNative,
-              gcSamples: stall.gcSamples,
-              totalSamples: stall.totalSamples,
-            },
-          );
-        }
+      const ring = recent();
+      ring.push(stall);
+      if (ring.length > RECENT_RING_SIZE) {
+        ring.splice(0, ring.length - RECENT_RING_SIZE);
+      }
+      if (session.phases.length > 0 && stall.streakMs >= STALL_REPORT_MS) {
+        // Static message: the fingerprint groups on it; details in metadata.
+        logger.warn(
+          "[EventLoop] Stall profiled in a window with cron bookkeeping",
+          {
+            streakMs: stall.streakMs,
+            profileWindowStartedAt: new Date(
+              stall.sessionStartedAt,
+            ).toISOString(),
+            profileWindowEndedAt: new Date(stall.sessionEndedAt).toISOString(),
+            phases: stall.phases,
+            hotFrames: stall.hotFrames,
+            hotStacks: stall.hotStacks,
+            hotNative: stall.hotNative,
+            gcSamples: stall.gcSamples,
+            totalSamples: stall.totalSamples,
+          },
+        );
       }
     } catch {
       // Diagnostics only: a profiler failure must never touch the pulse.

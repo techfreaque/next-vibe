@@ -440,11 +440,14 @@ export async function complete(
         (finishReason === "length" ||
           (isEmptyAnswer && finishReason !== "content-filter")));
     if (budgetCut) {
-      logger.info("[AI Stream] Turn cut short by the remaining balance", {
+      logger.warn("[AI Stream] Turn cut short by the remaining balance", {
         threadId,
         model,
         finishReason: finishReason ?? null,
         loopStopped: ctx.creditBudgetStopped,
+        outputCapped: ctx.creditBudgetCapped,
+        isEmptyAnswer,
+        errorKey: ErrorResponseTypes.PAYMENT_REQUIRED.errorKey,
         steps: ctx.tokenStepCount,
         creditCost: actualCreditCost,
       });
@@ -535,6 +538,8 @@ export async function complete(
       providerError: ctx.lastProviderErrorText,
       totalTokens: usage.totalTokens,
       finishReason: finishReason ?? null,
+      outputCapped: ctx.creditBudgetCapped,
+      loopStopped: ctx.creditBudgetStopped,
     };
     if (explained) {
       logger.warn(

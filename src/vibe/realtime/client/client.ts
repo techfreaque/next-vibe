@@ -156,6 +156,7 @@ let dropReported = false;
 let dropReconnectCount = 0;
 let failedHandshakesDuringDrop = 0;
 let lastFailedHandshakeRequestId: string | null = null;
+let lastFailedHandshakeMs: number | null = null;
 let maxReconnectTimerOverrunMs = 0;
 let noticeableDownMs = 0;
 let dropCheckTimer: ReturnType<typeof setInterval> | null = null;
@@ -184,6 +185,7 @@ function reportDrop(logger: EndpointLogger, recovered: boolean): void {
     attempts: dropReconnectCount,
     failedHandshakesDuringDrop,
     lastFailedHandshakeRequestId,
+    lastFailedHandshakeMs,
     maxReconnectTimerOverrunMs,
     reconnectPaused,
     recovered,
@@ -233,6 +235,7 @@ function handleOpen(logger: EndpointLogger): void {
         attempts: dropReconnectCount,
         failedHandshakesDuringDrop,
         lastFailedHandshakeRequestId,
+        lastFailedHandshakeMs,
         maxReconnectTimerOverrunMs,
         offlineMs: Date.now() - disconnectedAt,
         noticeableDownMs,
@@ -249,6 +252,7 @@ function handleOpen(logger: EndpointLogger): void {
   dropReconnectCount = 0;
   failedHandshakesDuringDrop = 0;
   lastFailedHandshakeRequestId = null;
+  lastFailedHandshakeMs = null;
   maxReconnectTimerOverrunMs = 0;
   noticeableDownMs = 0;
   stopDropCheck();
@@ -417,6 +421,7 @@ function connect(logger: EndpointLogger): void {
     if (disconnectedAt !== null && socketOpenedAt === null) {
       failedHandshakesDuringDrop++;
       lastFailedHandshakeRequestId = requestId;
+      lastFailedHandshakeMs = closedAt - connectStartedAt;
     }
     // Keep the first close of the episode. Recovery, the report timer, or
     // pagehide reports it once, even when several reconnects fail.
@@ -466,6 +471,7 @@ function connect(logger: EndpointLogger): void {
         firstDropCode: pendingDrop?.code ?? null,
         failedHandshakesDuringDrop,
         lastFailedHandshakeRequestId,
+        lastFailedHandshakeMs,
         maxReconnectTimerOverrunMs,
         hiddenAtClose: pendingDrop?.hiddenAtClose ?? null,
         channelCount: channels.size,

@@ -7,7 +7,7 @@
 
 import "server-only";
 
-import { type ModelMessage, streamText } from "ai";
+import { type FinishReason, type ModelMessage, streamText } from "ai";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
@@ -68,7 +68,13 @@ export function buildCompactingInstructions(): string {
 export type CompactingLLMOutcome =
   | { status: "done"; compactedSummary: string }
   | { status: "no-finish"; compactedSummary: string }
-  | { status: "empty"; inputTokens: number; outputTokens: number }
+  | {
+      status: "empty";
+      inputTokens: number;
+      outputTokens: number;
+      reasoningTokens: number | null;
+      finishReason: FinishReason;
+    }
   | { status: "stream-error"; error: Error }
   | { status: "exception"; error: Error };
 
@@ -162,7 +168,14 @@ export async function runCompactingLLM(params: {
         // Empty summary is worse than no compacting — it would erase context.
         // The caller decides whether that fails the stream or is skipped.
         if (compactedSummary.trim() === "") {
-          return { status: "empty", inputTokens, outputTokens };
+          return {
+            status: "empty",
+            inputTokens,
+            outputTokens,
+            reasoningTokens:
+              usageData.outputTokenDetails?.reasoningTokens ?? null,
+            finishReason: part.finishReason,
+          };
         }
 
         // Full input + cached split: passing only the uncached count left

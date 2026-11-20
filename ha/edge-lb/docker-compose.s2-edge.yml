@@ -35,6 +35,7 @@ services:
       - caddy_internal
     labels:
       caddy_internal_10: "https://unbottled.ai"
+      caddy_internal_10.header: '+Server-Timing "vibe-edge;desc=\"s2\""'
       caddy_internal_10.tls.issuer: "acme"
       caddy_internal_10.tls.issuer.disable_tlsalpn_challenge: ""
       # Deploy drain (scripts/ha-node-drain.sh edge-on s2 / swap): while

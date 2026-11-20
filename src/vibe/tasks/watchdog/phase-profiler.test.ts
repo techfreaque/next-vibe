@@ -56,8 +56,9 @@ describe("PhaseProfiler", () => {
     }
   });
 
-  it("stays silent when the phase is idle", async () => {
-    const logger = createEndpointLogger(false, defaultLocale);
+  it("keeps short sampling windows available without reporting a cron stall", async () => {
+    const warn = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+    const logger = { ...createEndpointLogger(false, defaultLocale), warn };
     const end = PhaseProfiler.hold("cron-post:idle", logger);
     const idleAt = Date.now();
     await new Promise<void>((resolve) => {
@@ -67,7 +68,10 @@ describe("PhaseProfiler", () => {
     await new Promise<void>((resolve) => {
       setTimeout(resolve, 1800);
     });
-    expect(PhaseProfiler.profileCovering(idleAt)).toBeUndefined();
+    const profile = PhaseProfiler.profileCovering(idleAt);
+    expect(profile).toBeDefined();
+    expect(profile?.streakMs).toBeLessThan(200);
+    expect(warn).not.toHaveBeenCalled();
   });
 
   it("names a stall outside any phase in continuous mode", async () => {

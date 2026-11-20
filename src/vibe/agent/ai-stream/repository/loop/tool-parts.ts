@@ -25,6 +25,7 @@ import type { ToolCall } from "../../../chat/db";
 import type { PendingToolData } from "../core/stream";
 import { resolveToolParentId } from "./chain-tip";
 import {
+  describeExecuteToolValidationStage,
   describeNestedExecuteToolArgs,
   describeToolArgShape,
   normalizeExecuteToolArgs,
@@ -951,6 +952,11 @@ async function executeFallbackTool(
           normalizedInputShape:
             toolName === EXECUTE_TOOL_ALIAS
               ? describeToolArgShape(inputArgs["input"])
+              : undefined,
+          executeToolValidationStage:
+            toolName === EXECUTE_TOOL_ALIAS &&
+            result.errorType.errorKey === "errorTypes.validation_error"
+              ? describeExecuteToolValidationStage(inputArgs)
               : undefined,
           ...(toolName === EXECUTE_TOOL_ALIAS
             ? describeNestedExecuteToolArgs(rawArgs["input"])

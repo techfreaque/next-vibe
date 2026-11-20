@@ -476,9 +476,11 @@ export function useEdenAISpeech({
       // part of it. No pre-check is needed to avoid a futile prompt: with the
       // permission already granted the browser rejects NotFoundError directly.
       logger.debug("STT: Requesting microphone access");
+      const microphoneRequestedAt = Date.now();
       const micResult = await requestMicrophoneStream();
       const stream = micResult.stream;
       if (!stream) {
+        const durationMs = Date.now() - microphoneRequestedAt;
         // Map the REAL rejection (permission denied / no device / mic busy /
         // insecure context) to its own message - this used to always say
         // "No microphone found".
@@ -493,6 +495,8 @@ export function useEdenAISpeech({
           audioInputCount: diagnostics.audioInputCount,
           isSecureContext: diagnostics.isSecureContext,
           hasMediaDevices: diagnostics.hasMediaDevices,
+          isEmbeddedDocument: diagnostics.isEmbeddedDocument,
+          durationMs,
         });
         const errorMsg = getMicrophoneErrorMessage(errorName, t, {
           errorMessage: micResult.errorMessage,

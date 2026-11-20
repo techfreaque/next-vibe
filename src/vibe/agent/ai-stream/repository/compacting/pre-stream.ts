@@ -217,6 +217,9 @@ export class CompactingHandler {
           {
             inputTokens: outcome.inputTokens,
             outputTokens: outcome.outputTokens,
+            reasoningTokens: outcome.reasoningTokens,
+            finishReason: outcome.finishReason,
+            model,
           },
         );
         await ctx.dbWriter.emitCompactingFailed({

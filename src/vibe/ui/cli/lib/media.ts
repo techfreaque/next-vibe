@@ -36,12 +36,14 @@ export async function getMicrophoneDiagnostics(): Promise<{
   audioInputCount: number | null;
   isSecureContext: boolean;
   hasMediaDevices: boolean;
+  isEmbeddedDocument: null;
 }> {
   return {
     permissionState: null,
     audioInputCount: null,
     isSecureContext: true,
     hasMediaDevices: false,
+    isEmbeddedDocument: null,
   };
 }
 

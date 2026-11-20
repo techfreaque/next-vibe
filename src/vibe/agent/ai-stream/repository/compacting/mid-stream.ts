@@ -233,13 +233,21 @@ export class MidStreamCompactingHandler {
 
     // Empty summary is worse than no compacting — it would erase context.
     if (outcome.status === "empty") {
-      const { inputTokens, outputTokens } = outcome;
+      const { inputTokens, outputTokens, reasoningTokens, finishReason } =
+        outcome;
+      const diagnostics = {
+        inputTokens,
+        outputTokens,
+        reasoningTokens,
+        finishReason,
+        model,
+      };
       if (outputTokens > 0) {
         // Model produced tokens but no text (reasoning-only response, e.g. kimi-k2.6).
         // Skip compacting and continue stream with original messages — safer than aborting.
         logger.warn(
           "[MidStreamCompacting] LLM produced reasoning tokens but no text — skipping compacting, stream continues",
-          { inputTokens, outputTokens },
+          diagnostics,
         );
         await ctx.dbWriter.emitCompactingFailed({
           messageId: compactingMessageId,
@@ -249,7 +257,7 @@ export class MidStreamCompactingHandler {
       }
       logger.error(
         "[MidStreamCompacting] LLM produced no text output - treating as compacting failure",
-        { inputTokens, outputTokens },
+        diagnostics,
       );
       await MidStreamCompactingHandler.handleFailure({
         compactingMessageId,

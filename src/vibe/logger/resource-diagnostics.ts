@@ -8,8 +8,10 @@
 import { getCurrentOrigin, getCurrentUrl } from "next-vibe/ui/lib/location";
 
 import {
+  EDGE_TIMING_METRIC,
   PROXY_TIMING_METRIC,
   type ProxyTimingStage,
+  readEdgeTimingNode,
   readProxyTimingStage,
 } from "../realtime/core/proxy-timing";
 import { sanitizeRoutePath } from "./client-context";
@@ -52,6 +54,7 @@ interface ResourceTimingEvidence {
   durationMs: number | null;
   resourceFailureKind: string;
   proxyTimingStage: ProxyTimingStage | null;
+  edgeTimingNode: ReturnType<typeof readEdgeTimingNode>;
 }
 
 /** Classify evidence from failed loads without guessing why an opaque one failed. */
@@ -87,6 +90,7 @@ export function resourceTiming(
     durationMs: null,
     resourceFailureKind: "no-resource-timing",
     proxyTimingStage: null,
+    edgeTimingNode: null,
   };
   if (!raw || typeof performance === "undefined") {
     return empty;
@@ -111,6 +115,7 @@ export function resourceTiming(
       "responseStatus" in entry && typeof entry.responseStatus === "number"
         ? entry.responseStatus
         : null;
+    const sameOrigin = resource.origin === getCurrentOrigin();
     return {
       responseStatus,
       transferSize: entry.transferSize,
@@ -119,14 +124,18 @@ export function resourceTiming(
         responseStatus,
         entry.decodedBodySize,
       ),
-      proxyTimingStage:
-        resource.origin === getCurrentOrigin()
-          ? readProxyTimingStage(
-              entry.serverTiming?.find(
-                ({ name }) => name === PROXY_TIMING_METRIC,
-              )?.description,
-            )
-          : null,
+      proxyTimingStage: sameOrigin
+        ? readProxyTimingStage(
+            entry.serverTiming?.find(({ name }) => name === PROXY_TIMING_METRIC)
+              ?.description,
+          )
+        : null,
+      edgeTimingNode: sameOrigin
+        ? readEdgeTimingNode(
+            entry.serverTiming?.find(({ name }) => name === EDGE_TIMING_METRIC)
+              ?.description,
+          )
+        : null,
     };
   } catch {
     return empty;
@@ -148,6 +157,7 @@ export function chunkLoadDiagnostics(message: string | undefined): {
   durationMs?: number | null;
   resourceFailureKind?: string;
   proxyTimingStage?: ProxyTimingStage | null;
+  edgeTimingNode?: ReturnType<typeof readEdgeTimingNode>;
 } {
   const match =
     /Loading (?:CSS )?chunk (\S+) failed(?:\.?\s*\((\w+): ([^)\s]+)\))?/i.exec(

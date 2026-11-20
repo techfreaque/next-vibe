@@ -215,6 +215,7 @@ function describeStallProfile(
       profileEvidence:
         | "matching-streak"
         | "short-streak"
+        | "no-js-samples"
         | "no-covering-sample";
       profileWindowStartedAt?: string;
       profileWindowEndedAt?: string;
@@ -232,7 +233,11 @@ function describeStallProfile(
   }
   return {
     profileEvidence:
-      profile.streakMs >= stallMs / 2 ? "matching-streak" : "short-streak",
+      profile.totalSamples === 0
+        ? "no-js-samples"
+        : profile.streakMs >= stallMs / 2
+          ? "matching-streak"
+          : "short-streak",
     profileWindowStartedAt: new Date(profile.sessionStartedAt).toISOString(),
     profileWindowEndedAt: new Date(profile.sessionEndedAt).toISOString(),
     profiledHotFrames: profile.hotFrames || "(no app frames)",

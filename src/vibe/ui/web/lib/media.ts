@@ -84,6 +84,7 @@ export interface MicrophoneDiagnostics {
   audioInputCount: number | null;
   isSecureContext: boolean;
   hasMediaDevices: boolean;
+  isEmbeddedDocument: boolean;
 }
 
 /** Microphone environment snapshot - never prompts the user. */
@@ -110,6 +111,7 @@ export async function getMicrophoneDiagnostics(): Promise<MicrophoneDiagnostics>
     audioInputCount,
     isSecureContext: globalThis.isSecureContext,
     hasMediaDevices,
+    isEmbeddedDocument: window.top !== window,
   };
 }
 

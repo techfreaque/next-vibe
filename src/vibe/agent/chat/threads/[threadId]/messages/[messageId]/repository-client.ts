@@ -18,6 +18,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import {
   deleteMessage,
+  getIncognitoThread,
   getMessagesForThread,
   updateIncognitoMessage,
 } from "../../../../incognito/storage";
@@ -139,6 +140,12 @@ export class ChatMessageByIdRepositoryClient {
       const message = messages.find((m) => m.id === messageId);
 
       if (!message) {
+        const thread = await getIncognitoThread(threadId, logger);
+        logger.warn("Incognito delete could not find the message in storage", {
+          hasStoredThread: thread !== null,
+          storedMessageCount: messages.length,
+          hasStoredChildren: messages.some((row) => row.parentId === messageId),
+        });
         return fail({
           message: t("delete.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
