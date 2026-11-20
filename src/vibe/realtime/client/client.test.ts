@@ -101,10 +101,12 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     ]);
 
     fakeDocument.visibilityState = "hidden";
+    fakeDocument.dispatchEvent(new Event("visibilitychange"));
     Object.defineProperty(navigator, "onLine", {
       configurable: true,
       value: false,
     });
+    fakeWindow.dispatchEvent(new Event("offline"));
     TestSocket.sockets[1]?.drop(1006, "offline");
     jest.advanceTimersByTime(1000);
     TestSocket.sockets[2]?.drop(1006, "retry failed");
@@ -116,6 +118,11 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
         reason: "offline",
         attempts: 2,
         failedHandshakesDuringDrop: 1,
+        lastFailedHandshakeRequestId: new URL(TestSocket.sockets[2]?.url ?? "").searchParams.get(
+          "requestId",
+        ),
+        msSinceVisibilityChange: 0,
+        msSinceNetworkChange: 0,
         offlineMs: 20_000,
         hiddenAtClose: true,
         online: false,

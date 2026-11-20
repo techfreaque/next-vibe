@@ -1,5 +1,5 @@
 /**
- * Repair the two execute-tool argument mistakes models make most often, before
+ * Repair common execute-tool argument mistakes before
  * the call fails validation and costs the model a retry round-trip:
  *
  *  1. The real call nested one level too deep:
@@ -58,13 +58,31 @@ function parseRecordString(value: string): ArgsRecord | null {
     return null;
   }
   try {
-    const parsed = JSON.parse(value) as WidgetData;
+    const parsed: WidgetData = JSON.parse(value);
     return isRecord(parsed) ? parsed : null;
   } catch {
     // Not valid JSON (truncated, or garbage like `<arg_value>`): leave it,
     // the validation error tells the model what to fix.
     return null;
   }
+}
+
+export function describeNestedExecuteToolArgs(value: WidgetData): {
+  nestedExecuteToolTargetShape?: string;
+  nestedExecuteToolInputShape?: string;
+  nestedExecuteToolSiblingFields?: boolean;
+} {
+  if (!isRecord(value)) {
+    return {};
+  }
+  return {
+    nestedExecuteToolTargetShape: describeToolArgShape(value["toolName"]),
+    nestedExecuteToolInputShape: describeToolArgShape(value["input"]),
+    nestedExecuteToolSiblingFields: Object.keys(value).some(
+      (key) =>
+        !["toolName", "input", "callbackMode", "instanceId"].includes(key),
+    ),
+  };
 }
 
 export function normalizeExecuteToolArgs(args: ArgsRecord): ArgsRecord {
@@ -85,24 +103,29 @@ export function normalizeExecuteToolArgs(args: ArgsRecord): ArgsRecord {
     isRecord(nested) &&
     typeof nested["toolName"] === "string"
   ) {
-    const rawInner = nested["input"];
+    const {
+      toolName,
+      input: rawInner,
+      callbackMode,
+      instanceId,
+      ...fields
+    } = nested;
     // Both mistakes at once (minimax-m3.1-flash, prod 2026-11-19): nested
     // one level too deep AND the inner input JSON-encoded.
     const innerInput =
-      typeof rawInner === "string" ? parseRecordString(rawInner) : rawInner;
+      typeof rawInner === "string"
+        ? (parseRecordString(rawInner) ?? rawInner)
+        : rawInner;
     out = {
       ...without(out, "input"),
-      toolName: nested["toolName"],
-      input:
-        innerInput !== undefined && innerInput !== null && isRecord(innerInput)
-          ? innerInput
-          : {},
+      toolName,
+      input: innerInput === undefined ? fields : innerInput,
     };
-    if (out["callbackMode"] === undefined && nested["callbackMode"]) {
-      out["callbackMode"] = nested["callbackMode"];
+    if (out["callbackMode"] === undefined && callbackMode) {
+      out["callbackMode"] = callbackMode;
     }
-    if (out["instanceId"] === undefined && nested["instanceId"]) {
-      out["instanceId"] = nested["instanceId"];
+    if (out["instanceId"] === undefined && instanceId) {
+      out["instanceId"] = instanceId;
     }
   }
 

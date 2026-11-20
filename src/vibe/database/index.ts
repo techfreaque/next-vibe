@@ -12,6 +12,7 @@ import {
   pool,
   recreatePool,
 } from "./client";
+import { pgDiagnosticQueryLogger } from "./pg-result-diagnostics";
 import {
   LONG_RUNNING_POOL_KEY,
   processSharedPool,
@@ -51,7 +52,9 @@ interface RawPoolShim {
 
 // pool is non-null at this point: isPglite initialises pool in client.ts,
 // standard mode initialises pool in client.ts.
-export let db: NodePgDatabase<Record<string, never>> = drizzle(pool as Pool);
+export let db: NodePgDatabase<Record<string, never>> = drizzle(pool as Pool, {
+  logger: pgDiagnosticQueryLogger,
+});
 
 export let rawPool: RawPoolShim = pool as Pool;
 
@@ -86,7 +89,9 @@ export function getLongRunningDb(): NodePgDatabase<Record<string, never>> {
       LONG_RUNNING_POOL_KEY,
       createLongRunningPool,
     );
-    longRunningDb = drizzle(longRunningPool);
+    longRunningDb = drizzle(longRunningPool, {
+      logger: pgDiagnosticQueryLogger,
+    });
   }
   return longRunningDb;
 }
@@ -156,7 +161,7 @@ export function reopenDatabase(): void {
     return;
   }
   const newPool = recreatePool();
-  db = drizzle(newPool as Pool);
+  db = drizzle(newPool as Pool, { logger: pgDiagnosticQueryLogger });
   rawPool = newPool as Pool;
   databaseClosed = false;
 }

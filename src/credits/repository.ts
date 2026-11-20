@@ -58,7 +58,7 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { db, trackPendingDbWork } from "next-vibe/database";
+import { db, rawPool, trackPendingDbWork } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import {
   leadLeadLinks,
@@ -324,16 +324,20 @@ export class CreditRepository {
     t: CreditsT,
     locale: CountryLanguage,
   ): Promise<ResponseType<CreditPool>> {
+    const startedAt = Date.now();
+    let step = "find-guest-pool-members";
     try {
       const connectedLeadIds =
         await CreditRepository.findGuestPoolLeadIds(leadId);
 
+      step = "read-wallets";
       let leadWallets = await db
         .select()
         .from(creditWallets)
         .where(inArray(creditWallets.leadId, connectedLeadIds));
 
       if (leadWallets.length === 0) {
+        step = "create-wallet";
         const walletResult = await CreditRepository.getOrCreateLeadWallet(
           leadId,
           logger,
@@ -353,7 +357,13 @@ export class CreditRepository {
         poolType: "LEAD_POOL",
       });
     } catch (error) {
-      logger.error("Failed to get lead pool", parseError(error));
+      CreditRepository.logLeadPoolFailure(
+        logger,
+        parseError(error),
+        step,
+        startedAt,
+        "guest-only",
+      );
       return fail({
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         message: t("errors.getBalanceFailed"),
@@ -374,6 +384,8 @@ export class CreditRepository {
     locale: CountryLanguage,
     readOnly = false,
   ): Promise<ResponseType<CreditPool>> {
+    const startedAt = Date.now();
+    let step = "find-pool-owner";
     try {
       // Lead connected to an account through strong links (login, same
       // device) -> the account's pool. Logging out never opens a fresh guest
@@ -384,10 +396,12 @@ export class CreditRepository {
           ? CreditRepository.getUserPoolReadOnly(ownerUserId, logger, t)
           : CreditRepository.getUserPool(ownerUserId, logger, t, locale);
       }
+      step = "find-guest-pool-members";
       const connectedLeadIds =
         await CreditRepository.findGuestPoolLeadIds(leadId);
 
       // Get EXISTING wallets for all connected leads
+      step = "read-wallets";
       let leadWallets = await db
         .select()
         .from(creditWallets)
@@ -395,6 +409,7 @@ export class CreditRepository {
 
       // If no wallets exist, create wallet for the PRIMARY lead only
       if (!readOnly && leadWallets.length === 0) {
+        step = "create-wallet";
         const walletResult = await CreditRepository.getOrCreateLeadWallet(
           leadId,
           logger,
@@ -422,12 +437,42 @@ export class CreditRepository {
         poolType: "LEAD_POOL",
       });
     } catch (error) {
-      logger.error("Failed to get lead pool", parseError(error));
+      CreditRepository.logLeadPoolFailure(
+        logger,
+        parseError(error),
+        step,
+        startedAt,
+        readOnly ? "read-only" : "writable",
+      );
       return fail({
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         message: t("errors.getBalanceFailed"),
       });
     }
+  }
+
+  private static logLeadPoolFailure(
+    logger: EndpointLogger,
+    error: Error,
+    step: string,
+    startedAt: number,
+    access: string,
+  ): void {
+    const cause = error.cause instanceof Error ? error.cause : error;
+    const databaseCode =
+      "code" in cause && typeof cause.code === "string"
+        ? cause.code
+        : undefined;
+    logger.error("Failed to get lead pool", error, {
+      step,
+      access,
+      databaseCode,
+      elapsedMs: Date.now() - startedAt,
+      poolTotal: rawPool.totalCount,
+      poolIdle: rawPool.idleCount,
+      poolWaiting: rawPool.waitingCount,
+      poolEnding: rawPool.ending,
+    });
   }
 
   /**

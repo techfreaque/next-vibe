@@ -127,6 +127,14 @@ const subscribedFrameSchema = z.object({
   complete: z.boolean(),
 });
 
+const guestIdentityChangedFrameSchema = z.object({
+  type: z.literal("guest-identity-changed"),
+});
+
+export type WsGuestIdentityChangedFrame = z.infer<
+  typeof guestIdentityChangedFrameSchema
+>;
+
 /**
  * Browser-side frame parser: event/batch frames plus the subscribe ack, which
  * only a client that asked for replay (`replay: true`) ever receives. Server
@@ -134,10 +142,18 @@ const subscribedFrameSchema = z.object({
  */
 export function parseWsClientFrame(
   raw: string,
-): WsWireFrame | WsSubscribedFrame | null {
+): WsWireFrame | WsSubscribedFrame | WsGuestIdentityChangedFrame | null {
   if (raw.startsWith('{"type":"subscribed"')) {
     try {
       const result = subscribedFrameSchema.safeParse(JSON.parse(raw));
+      return result.success ? result.data : null;
+    } catch {
+      return null;
+    }
+  }
+  if (raw.startsWith('{"type":"guest-identity-changed"')) {
+    try {
+      const result = guestIdentityChangedFrameSchema.safeParse(JSON.parse(raw));
       return result.success ? result.data : null;
     } catch {
       return null;
@@ -190,6 +206,8 @@ interface WsSubscribeMessage {
   readonly replay?: boolean;
   /** Last seq the client saw on this channel before its socket dropped. */
   readonly since?: number;
+  /** The browser built this user channel from its rendered guest identity. */
+  readonly refreshGuestIdentity?: true;
 }
 
 interface WsUnsubscribeMessage {
@@ -226,6 +244,7 @@ const clientMessageSchema = z.discriminatedUnion("type", [
     descriptor: descriptorSchema.optional(),
     replay: z.boolean().optional(),
     since: z.number().int().nonnegative().optional(),
+    refreshGuestIdentity: z.literal(true).optional(),
   }),
   z.object({
     type: z.literal("unsubscribe"),

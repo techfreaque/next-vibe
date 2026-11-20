@@ -85,6 +85,7 @@ interface ChannelState {
    * Whatever is still mounted after the grace period is resubscribed.
    */
   identityStale: boolean;
+  refreshGuestIdentity: boolean;
 }
 
 /** RFC 6455 close code the server sends on a restart or deploy drain. */
@@ -111,6 +112,7 @@ const channels = new Map<string, ChannelState>();
 // Gap-too-old handlers per channel (refetch the channel's data). Kept apart
 // from ChannelState so a handler can register before/after the subscription.
 const resyncHandlers = new Map<string, Set<() => void>>();
+const guestIdentityChangeHandlers = new Set<() => void>();
 
 // Last real logger handed to connect(): the visibility-restore reconnect has
 // no caller of its own, and a no-op logger there hid every failure after it.
@@ -126,6 +128,8 @@ let pageUnloading = false;
 // the close code alone is 1006 for all of them.
 let openedAt: number | null = null;
 let lastFrameAt: number | null = null;
+let lastVisibilityChangeAt: number | null = null;
+let lastNetworkChangeAt: number | null = null;
 
 /** Close details of the socket that started the current outage. */
 interface DropInfo {
@@ -142,6 +146,8 @@ interface DropInfo {
   handshakeMs: number;
   acknowledgedChannels: number;
   sinceLastFrameMs: number | null;
+  msSinceVisibilityChange: number | null;
+  msSinceNetworkChange: number | null;
 }
 // The current outage: its first close, whether it was reported, and how long
 // it lasted while the user could notice it (tab visible + browser online).
@@ -149,6 +155,7 @@ let pendingDrop: DropInfo | null = null;
 let dropReported = false;
 let dropReconnectCount = 0;
 let failedHandshakesDuringDrop = 0;
+let lastFailedHandshakeRequestId: string | null = null;
 let maxReconnectTimerOverrunMs = 0;
 let noticeableDownMs = 0;
 let dropCheckTimer: ReturnType<typeof setInterval> | null = null;
@@ -176,6 +183,7 @@ function reportDrop(logger: EndpointLogger, recovered: boolean): void {
     noticeableDownMs,
     attempts: dropReconnectCount,
     failedHandshakesDuringDrop,
+    lastFailedHandshakeRequestId,
     maxReconnectTimerOverrunMs,
     reconnectPaused,
     recovered,
@@ -211,6 +219,7 @@ function sendSubscribe(channel: string, state: ChannelState): void {
     descriptor: state.descriptor,
     replay: true,
     since: state.lastSeq ?? undefined,
+    refreshGuestIdentity: state.refreshGuestIdentity ? true : undefined,
   });
 }
 
@@ -223,6 +232,7 @@ function handleOpen(logger: EndpointLogger): void {
         ...pendingDrop,
         attempts: dropReconnectCount,
         failedHandshakesDuringDrop,
+        lastFailedHandshakeRequestId,
         maxReconnectTimerOverrunMs,
         offlineMs: Date.now() - disconnectedAt,
         noticeableDownMs,
@@ -238,6 +248,7 @@ function handleOpen(logger: EndpointLogger): void {
   dropReported = false;
   dropReconnectCount = 0;
   failedHandshakesDuringDrop = 0;
+  lastFailedHandshakeRequestId = null;
   maxReconnectTimerOverrunMs = 0;
   noticeableDownMs = 0;
   stopDropCheck();
@@ -381,6 +392,10 @@ function connect(logger: EndpointLogger): void {
       for (const msg of frame.events) {
         dispatch(msg, logger);
       }
+    } else if (frame.type === "guest-identity-changed") {
+      for (const handler of guestIdentityChangeHandlers) {
+        handler();
+      }
     } else {
       handleSubscribed(frame, logger);
     }
@@ -401,6 +416,7 @@ function connect(logger: EndpointLogger): void {
     }
     if (disconnectedAt !== null && socketOpenedAt === null) {
       failedHandshakesDuringDrop++;
+      lastFailedHandshakeRequestId = requestId;
     }
     // Keep the first close of the episode. Recovery, the report timer, or
     // pagehide reports it once, even when several reconnects fail.
@@ -426,6 +442,12 @@ function connect(logger: EndpointLogger): void {
             : [...channels.values()].filter((state) => state.acked).length,
         sinceLastFrameMs:
           socketLastFrameAt === null ? null : closedAt - socketLastFrameAt,
+        msSinceVisibilityChange:
+          lastVisibilityChangeAt === null
+            ? null
+            : closedAt - lastVisibilityChangeAt,
+        msSinceNetworkChange:
+          lastNetworkChangeAt === null ? null : closedAt - lastNetworkChangeAt,
       };
       startDropCheck(logger);
     }
@@ -443,6 +465,7 @@ function connect(logger: EndpointLogger): void {
         noticeableDownMs,
         firstDropCode: pendingDrop?.code ?? null,
         failedHandshakesDuringDrop,
+        lastFailedHandshakeRequestId,
         maxReconnectTimerOverrunMs,
         hiddenAtClose: pendingDrop?.hiddenAtClose ?? null,
         channelCount: channels.size,
@@ -500,9 +523,9 @@ if (typeof document !== "undefined") {
   addWindowListener("pageshow", () => {
     pageUnloading = false;
   });
-  addDocumentListener("visibilitychange", (event) => {
-    const target = event.target as Document | null;
-    if (target?.visibilityState === "visible" && reconnectPaused) {
+  addDocumentListener("visibilitychange", () => {
+    lastVisibilityChangeAt = Date.now();
+    if (isTabVisible() && reconnectPaused) {
       reconnectPaused = false;
       reconnectAttempts = 0;
       if (channels.size > 0 && !sharedWs) {
@@ -514,6 +537,11 @@ if (typeof document !== "undefined") {
       }
     }
   });
+  const recordNetworkChange = (): void => {
+    lastNetworkChangeAt = Date.now();
+  };
+  addWindowListener("online", recordNetworkChange);
+  addWindowListener("offline", recordNetworkChange);
 }
 
 function ensureConnected(logger: EndpointLogger): void {
@@ -537,6 +565,7 @@ function getOrCreateChannel(
   locale: CountryLanguage,
   logger: EndpointLogger,
   descriptor?: WsChannelDescriptor,
+  refreshGuestIdentity = false,
 ): ChannelState {
   const existing = channels.get(channel);
   if (existing) {
@@ -545,7 +574,10 @@ function getOrCreateChannel(
     if (descriptor && !existing.descriptor) {
       existing.descriptor = descriptor;
     }
-    if (existing.identityStale) {
+    const addedGuestRefresh =
+      refreshGuestIdentity && !existing.refreshGuestIdentity;
+    existing.refreshGuestIdentity ||= refreshGuestIdentity;
+    if (existing.identityStale || addedGuestRefresh) {
       // A widget re-subscribed after the identity change: it is live again.
       existing.identityStale = false;
       sendSubscribe(channel, existing);
@@ -560,6 +592,7 @@ function getOrCreateChannel(
     lastSeq: null,
     acked: false,
     identityStale: false,
+    refreshGuestIdentity,
   };
   channels.set(channel, state);
 
@@ -606,9 +639,24 @@ export function subscribeToChannel<T = WsWireMessage["data"]>(
   locale: CountryLanguage,
   logger: EndpointLogger,
   descriptor?: WsChannelDescriptor,
+  refreshGuestIdentity = false,
 ): () => void {
-  const state = getOrCreateChannel(channel, locale, logger, descriptor);
+  const state = getOrCreateChannel(
+    channel,
+    locale,
+    logger,
+    descriptor,
+    refreshGuestIdentity,
+  );
   return addListener(state, event, handler as WireHandler, channel);
+}
+
+/** The socket used a newer guest cookie than the page's rendered identity. */
+export function onGuestSocketIdentityChange(handler: () => void): () => void {
+  guestIdentityChangeHandlers.add(handler);
+  return (): void => {
+    guestIdentityChangeHandlers.delete(handler);
+  };
 }
 
 /**

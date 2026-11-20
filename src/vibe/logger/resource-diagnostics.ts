@@ -7,6 +7,11 @@
 
 import { getCurrentOrigin, getCurrentUrl } from "next-vibe/ui/lib/location";
 
+import {
+  PROXY_TIMING_METRIC,
+  type ProxyTimingStage,
+  readProxyTimingStage,
+} from "../realtime/core/proxy-timing";
 import { sanitizeRoutePath } from "./client-context";
 
 /** Path of a resource URL without query/hash (may carry signed tokens). */
@@ -46,6 +51,7 @@ interface ResourceTimingEvidence {
   transferSize: number | null;
   durationMs: number | null;
   resourceFailureKind: string;
+  proxyTimingStage: ProxyTimingStage | null;
 }
 
 /** Classify evidence from failed loads without guessing why an opaque one failed. */
@@ -80,14 +86,14 @@ export function resourceTiming(
     transferSize: null,
     durationMs: null,
     resourceFailureKind: "no-resource-timing",
+    proxyTimingStage: null,
   };
   if (!raw || typeof performance === "undefined") {
     return empty;
   }
   try {
-    const entries = performance.getEntriesByName(
-      new URL(raw, getCurrentUrl()).href,
-    );
+    const resource = new URL(raw, getCurrentUrl());
+    const entries = performance.getEntriesByName(resource.href);
     // The page's own navigation entry is a PerformanceResourceTiming too: an
     // element whose src resolved to the page URL (src="") must not borrow the
     // document's status/size (prod: <img>/<audio> "200, 9199 bytes").
@@ -113,6 +119,14 @@ export function resourceTiming(
         responseStatus,
         entry.decodedBodySize,
       ),
+      proxyTimingStage:
+        resource.origin === getCurrentOrigin()
+          ? readProxyTimingStage(
+              entry.serverTiming?.find(
+                ({ name }) => name === PROXY_TIMING_METRIC,
+              )?.description,
+            )
+          : null,
     };
   } catch {
     return empty;
@@ -133,6 +147,7 @@ export function chunkLoadDiagnostics(message: string | undefined): {
   transferSize?: number | null;
   durationMs?: number | null;
   resourceFailureKind?: string;
+  proxyTimingStage?: ProxyTimingStage | null;
 } {
   const match =
     /Loading (?:CSS )?chunk (\S+) failed(?:\.?\s*\((\w+): ([^)\s]+)\))?/i.exec(

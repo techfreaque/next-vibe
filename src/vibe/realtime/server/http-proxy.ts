@@ -18,8 +18,12 @@
 
 import http from "node:http";
 
+import { REQUEST_ID_HEADER_NAME } from "@/env/constants";
+
+import { sanitizeRoutePath } from "../../logger/client-context";
 import type { EndpointLogger } from "../../logger/types";
 import { mintRequestId } from "../../logger/with-log-context";
+import { proxyTimingHeader, readProxyTimingHeader } from "../core/proxy-timing";
 import { PROXY_LOADING_HTML } from "./proxy-loading-page";
 
 // ─── Recent-request tracker (diagnoses Next.js crashes) ─────────────────────────
@@ -95,6 +99,11 @@ export async function handleHttpProxy(
 ): Promise<Response> {
   const { nextPort, logger, isShuttingDown } = ctx;
   const url = new URL(req.url);
+  const clientRequestId = req.headers.get(REQUEST_ID_HEADER_NAME);
+  const requestId =
+    clientRequestId && /^[A-Za-z0-9_-]{8,64}$/.test(clientRequestId)
+      ? clientRequestId
+      : undefined;
 
   const clientIp =
     req.headers.get("x-forwarded-for") ??
@@ -147,6 +156,7 @@ export async function handleHttpProxy(
   for (let attempt = 0; attempt <= PROXY_RETRY_DELAYS.length; attempt++) {
     const proxyResult = await new Promise<Response | null>((resolve) => {
       let settled = false;
+      let timedOut = false;
       // settle() wraps resolve() with a guard so the timeout and the normal
       // response path can't both resolve the Promise.
       const settle = (result: Response | null): void => {
@@ -159,12 +169,23 @@ export async function handleHttpProxy(
         resolve(result);
       };
       const timeoutHandle = setTimeout(() => {
-        proxyReq.destroy(new Error("upstream timeout"));
+        timedOut = true;
+        if (!isShuttingDown()) {
+          logger.error("[Proxy] Upstream request timed out", {
+            requestId: retryRequestId ?? requestId ?? mintRequestId(),
+            path: sanitizeRoutePath(url.pathname),
+            method: req.method,
+            elapsedMs: Date.now() - proxyStartMs,
+          });
+        }
         settle(
-          new Response("Gateway Timeout: Vite dev server is not responding", {
+          new Response("Gateway Timeout", {
             status: 504,
+            headers: { "server-timing": proxyTimingHeader("upstream-timeout") },
           }),
         );
+        // A synthetic 504 has already been sent and reported above.
+        proxyReq.destroy();
       }, PROXY_REQUEST_TIMEOUT_MS);
       const proxyReq = http.request(
         {
@@ -206,6 +227,15 @@ export async function handleHttpProxy(
             } else {
               resHeaders.set(key, value);
             }
+          }
+          if (
+            url.pathname.startsWith("/_next/static/") &&
+            readProxyTimingHeader(resHeaders.get("server-timing")) === null
+          ) {
+            resHeaders.append(
+              "server-timing",
+              proxyTimingHeader("upstream-response"),
+            );
           }
 
           // Stream the raw (possibly compressed) body straight to the browser.
@@ -273,6 +303,9 @@ export async function handleHttpProxy(
       );
 
       proxyReq.on("error", (err) => {
+        if (timedOut) {
+          return;
+        }
         const nodeErr = err as NodeJS.ErrnoException;
         const isConnRefused = nodeErr.code === "ECONNREFUSED";
         const shuttingDown = isShuttingDown();
@@ -285,7 +318,7 @@ export async function handleHttpProxy(
           // down); that is reported separately so a real crash stays an
           // unambiguous signal. Both carry uptime.
           if (attempt === 0) {
-            retryRequestId = mintRequestId();
+            retryRequestId = requestId ?? mintRequestId();
             if (lastUpstreamOkAt === 0) {
               logger.warn("[Proxy] Request arrived before Next.js was up", {
                 requestId: retryRequestId,
@@ -311,17 +344,30 @@ export async function handleHttpProxy(
         if (isConnRefused && !shuttingDown && !isIdempotent) {
           // Non-idempotent method, server not ready — return 503 immediately so
           // the body is never buffered and the caller can retry on their own.
+          logger.warn(
+            "[Proxy] Upstream unavailable for a non-retriable request",
+            {
+              requestId: requestId ?? mintRequestId(),
+              path: sanitizeRoutePath(url.pathname),
+              method: req.method,
+              nextEverResponded: lastUpstreamOkAt !== 0,
+              elapsedMs: Date.now() - proxyStartMs,
+            },
+          );
           settle(
             new Response("Service Unavailable", {
               status: 503,
-              headers: { "retry-after": "5" },
+              headers: {
+                "retry-after": "5",
+                "server-timing": proxyTimingHeader("upstream-unavailable"),
+              },
             }),
           );
           return;
         }
         if (!shuttingDown) {
           logger.error("[Proxy] Server unreachable", {
-            requestId: retryRequestId,
+            requestId: retryRequestId ?? requestId,
             errorCode: nodeErr.code ?? "UNKNOWN",
             error: err.message,
             path: url.pathname,
@@ -329,7 +375,14 @@ export async function handleHttpProxy(
             elapsedMs: Date.now() - proxyStartMs,
           });
         }
-        settle(new Response("Bad Gateway", { status: 502 }));
+        settle(
+          new Response("Bad Gateway", {
+            status: 502,
+            headers: {
+              "server-timing": proxyTimingHeader("upstream-unavailable"),
+            },
+          }),
+        );
       });
 
       // Send the request body upstream. Multipart and JSON bodies are
@@ -414,6 +467,7 @@ export async function handleHttpProxy(
       "content-type": "text/html; charset=utf-8",
       "retry-after": "15",
       "cache-control": "no-store",
+      "server-timing": proxyTimingHeader("upstream-unavailable"),
     },
   });
 }

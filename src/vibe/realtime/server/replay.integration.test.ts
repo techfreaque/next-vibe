@@ -12,6 +12,8 @@ import { createServer } from "node:net";
 
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
+import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
+
 import { defaultLocale } from "../../core/i18n/core/config";
 import { createEndpointLogger } from "../../logger/server";
 import { getLocalBroadcast } from "../core/local-broadcast";
@@ -29,17 +31,16 @@ vi.mock("next-vibe/ui/lib/location", () => ({
 const LEAD_ID = "6c4d6f2e-1b7a-4c1e-9a55-2d1f6f0b9a11";
 const STREAM_CHANNEL = `user/${LEAD_ID}/ws-replay-test-stream`;
 
-/**
- * The browser authenticates the upgrade with its lead cookie; here the lead id
- * rides the query param the server also accepts (server-to-server form).
- */
-class LeadWebSocket extends WebSocket {
-  constructor(url: string | URL) {
-    const withLead = new URL(url);
-    withLead.searchParams.set("leadId", LEAD_ID);
-    super(withLead);
-  }
-}
+// The DOM constructor type cannot supply cookies. Bun's test runtime accepts
+// headers so the fixture can send the current HttpOnly lead cookie at upgrade.
+const LeadWebSocket = new Proxy(WebSocket, {
+  construct(target, [url]: [string | URL], newTarget): WebSocket {
+    const options: Bun.WebSocketOptions = {
+      headers: { Cookie: `${LEAD_ID_COOKIE_NAME}=${LEAD_ID}` },
+    };
+    return Reflect.construct(target, [url, options], newTarget);
+  },
+});
 
 async function freePort(): Promise<number> {
   const probe = createServer();
@@ -87,10 +88,7 @@ function emitToken(token: number): boolean {
   return true;
 }
 
-async function waitFor(
-  condition: () => boolean,
-  timeoutMs: number,
-): Promise<void> {
+async function waitFor(condition: () => boolean, timeoutMs: number): Promise<void> {
   const start = Date.now();
   while (!condition()) {
     if (Date.now() - start > timeoutMs) {
@@ -225,8 +223,7 @@ describe("WS reconnect catch-up (real client + real server)", () => {
     let delivered = 0;
     for (const frame of second.frames) {
       if (frame.startsWith('{"type":"batch"')) {
-        const batch: { events: AnyEndpointEventEnvelope[] } =
-          JSON.parse(frame);
+        const batch: { events: AnyEndpointEventEnvelope[] } = JSON.parse(frame);
         delivered += batch.events.length;
       } else if (!frame.startsWith('{"type":"subscribed"')) {
         delivered++;
@@ -236,14 +233,10 @@ describe("WS reconnect catch-up (real client + real server)", () => {
   });
 
   it("WS-REPLAY-3: another user's channel is never replayed (auth runs first)", async () => {
-    const foreign =
-      "user/11111111-2222-3333-4444-555555555555/ws-replay-test-stream";
+    const foreign = "user/11111111-2222-3333-4444-555555555555/ws-replay-test-stream";
     // The foreign channel has replay state and history...
     const { getPubSubAdapter } = await import("./pubsub/index");
-    const { cursor } = await getPubSubAdapter().prepareReplay(
-      foreign,
-      undefined,
-    );
+    const { cursor } = await getPubSubAdapter().prepareReplay(foreign, undefined);
     getLocalBroadcast()?.broadcastToAll(foreign, "__event__", tokenEnvelope(1));
     // ...but this socket is a different identity: no replay, no ack.
     const raw = await openRawSocket();
@@ -251,6 +244,58 @@ describe("WS reconnect catch-up (real client + real server)", () => {
     await delay(300);
     raw.ws.close();
     expect(raw.frames).toEqual([]);
+  });
+
+  it("refreshes stale guest subscriptions once and binds the new lead on the same socket", async () => {
+    const client = await import("../client/client");
+    const staleLead = "2a694531-5f2a-41bc-b5e1-7acb04e05486";
+    const staleCredits = `user/${staleLead}/ws-replay-test-credits`;
+    const staleChat = `user/${staleLead}/ws-replay-test-chat`;
+    const current = `user/${LEAD_ID}/ws-replay-test-credits`;
+    const hooks: Array<() => void> = [];
+    const subscribe = (
+      channel: string,
+      handle: (data: AnyEndpointEventEnvelope) => void,
+    ): (() => void) =>
+      client.subscribeToChannel(
+        channel,
+        "__event__",
+        handle,
+        defaultLocale,
+        logger,
+        undefined,
+        true,
+      );
+    const received: number[] = [];
+    let refreshes = 0;
+    const stopRefresh = client.onGuestSocketIdentityChange(() => {
+      refreshes++;
+      // Commit of the reloaded page: the old effects clean up and the new
+      // guest lead, resolved from the cookie by the page loader, subscribes.
+      for (const stop of hooks.splice(0)) {
+        stop();
+      }
+      hooks.push(subscribe(current, (data) => received.push(tokenOf(data))));
+    });
+    try {
+      hooks.push(subscribe(staleCredits, () => received.push(-1)));
+      hooks.push(subscribe(staleChat, () => received.push(-1)));
+      const connected = (): boolean => getLocalBroadcast()?.isChannelLive(current) === true;
+      await waitFor(connected, 1_000);
+      expect(connected()).toBe(true);
+      expect(getLocalBroadcast()?.isChannelLive(staleCredits)).toBe(false);
+      expect(getLocalBroadcast()?.isChannelLive(staleChat)).toBe(false);
+      expect(server?.clientCount().clients).toBe(1);
+      getLocalBroadcast()?.broadcastToAll(current, "__event__", tokenEnvelope(73));
+      await waitFor(() => received.length > 0, 1_000);
+      expect(received).toEqual([73]);
+      expect(refreshes).toBe(1);
+    } finally {
+      stopRefresh();
+      for (const stop of hooks) {
+        stop();
+      }
+    }
   });
 });
 

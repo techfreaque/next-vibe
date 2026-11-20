@@ -33,6 +33,7 @@ import { CLIENT_LOG_PATH } from "../../logger/error-monitor/client-log/constants
 import type { EndpointLogger } from "../../logger/types";
 import { mintRequestId, withLogContext } from "../../logger/with-log-context";
 import { Platform } from "../../platforms/platforms";
+import { readProxyTimingHeader } from "../../realtime/core/proxy-timing";
 import { containsFile, objectToFormData } from "./api-utils-shared";
 import { scopedTranslation as hooksTranslation } from "./i18n";
 
@@ -654,6 +655,8 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
         server: h.get("server"),
         poweredBy: h.get("x-powered-by"),
         servedBy: h.get("x-vibe-upstream") ?? h.get("x-served-by"),
+        haUpstreamObserved: h.has("x-ha-upstream"),
+        proxyTimingStage: readProxyTimingHeader(h.get("server-timing")),
         contentLength: h.get("content-length"),
         hasVibeCors: h.has("access-control-allow-credentials"),
         bodyTitle: body.title,

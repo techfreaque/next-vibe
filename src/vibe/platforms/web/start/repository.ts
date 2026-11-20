@@ -35,6 +35,10 @@ import {
 import { parseError } from "../../../core/utils/parse-error";
 import { databaseEnv, usesPglite } from "../../../database/env";
 import { readProcMeminfo } from "../../../database/health/repository";
+import {
+  enablePgResultDiagnostics,
+  summarizePgResultDecodes,
+} from "../../../database/pg-result-diagnostics";
 import { scopedTranslation as dockerOperationsScopedTranslation } from "../../../database/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../../database/utils/i18n";
 import type { JwtPayloadType } from "../../../identity/auth/types";
@@ -208,28 +212,36 @@ function describeStallProfile(
       totalSamples?: number;
       phases?: string;
       streakMs?: number;
+      profileEvidence:
+        | "matching-streak"
+        | "short-streak"
+        | "no-covering-sample";
+      profileWindowStartedAt?: string;
+      profileWindowEndedAt?: string;
     }
   | undefined {
   const profile = PhaseProfiler.profileCovering(stallStartedAt);
-  if (profile && profile.streakMs >= stallMs / 2) {
-    return {
-      profiledHotFrames: profile.hotFrames || "(no app frames)",
-      hotStacks: profile.hotStacks || undefined,
-      hotNative: profile.hotNative || undefined,
-      gcSamples: profile.gcSamples,
-      totalSamples: profile.totalSamples,
-      phases: profile.phases || undefined,
-      streakMs: profile.streakMs,
-    };
-  }
-  if (!PhaseProfiler.isContinuous()) {
-    return undefined;
+  if (!profile) {
+    return PhaseProfiler.isContinuous()
+      ? {
+          profileEvidence: "no-covering-sample",
+          profiledHotFrames:
+            "no completed profiler sample covered the start of the stall",
+        }
+      : undefined;
   }
   return {
-    profiledHotFrames: profile
-      ? `no JS streak matched the stall (GC, native IO or not scheduled); longest JS streak ${profile.streakMs} ms: ${profile.hotFrames}`
-      : "no completed profiler sample covered the start of the stall",
-    hotNative: profile?.hotNative || undefined,
+    profileEvidence:
+      profile.streakMs >= stallMs / 2 ? "matching-streak" : "short-streak",
+    profileWindowStartedAt: new Date(profile.sessionStartedAt).toISOString(),
+    profileWindowEndedAt: new Date(profile.sessionEndedAt).toISOString(),
+    profiledHotFrames: profile.hotFrames || "(no app frames)",
+    hotStacks: profile.hotStacks || undefined,
+    hotNative: profile.hotNative || undefined,
+    gcSamples: profile.gcSamples,
+    totalSamples: profile.totalSamples,
+    phases: profile.phases || undefined,
+    streakMs: profile.streakMs,
   };
 }
 
@@ -740,6 +752,7 @@ export class ServerStartRepository {
         resolution: EL_LAG_HISTOGRAM_RESOLUTION_MS,
       });
       histogram.enable();
+      enablePgResultDiagnostics();
       // Sample the JS thread all the time, so each lag row below names the
       // code that blocked the loop (most prod stalls ran outside any cron
       // phase, where the phase-only profiler saw nothing).
@@ -753,7 +766,7 @@ export class ServerStartRepository {
       const STALL_TICK_MS = 50;
       // The histogram and ticker sample on different schedules. Capture
       // nearby ticker delays so borderline warnings can include a profile.
-      const stallCaptureMs = EL_LAG_WARN_MS - EL_LAG_HISTOGRAM_RESOLUTION_MS;
+      const stallCaptureMs = EL_LAG_WARN_MS - STALL_TICK_MS;
       let lastSchedulerSample = readThreadSchedulerSample();
       let lastTickAt = performance.now();
       let worstStall: {
@@ -763,6 +776,7 @@ export class ServerStartRepository {
         runningTasks: string[];
         taskTimings: string;
         recentRequests: string;
+        pgResultDecodes: ReturnType<typeof summarizePgResultDecodes>;
       } | null = null;
       const stallTicker = setInterval(() => {
         const now = performance.now();
@@ -773,7 +787,8 @@ export class ServerStartRepository {
           lastSchedulerSample = readThreadSchedulerSample();
         }
         if (stallMs >= stallCaptureMs && stallMs > (worstStall?.ms ?? 0)) {
-          const startedAt = Date.now() - stallMs;
+          const endedAt = Date.now();
+          const startedAt = endedAt - stallMs;
           // Running now, or finished up to 1 s before the stall began: the
           // probe runs only after the stall, when its cause may be done.
           const probed = ServerStartRepository.runningTasksProbe?.(
@@ -789,6 +804,7 @@ export class ServerStartRepository {
             runningTasks: probed?.labels ?? [],
             taskTimings: probed?.timings ?? "",
             recentRequests: summarizeRecentRequests(),
+            pgResultDecodes: summarizePgResultDecodes(startedAt, endedAt),
           };
           // Close the sampling window that covered the stall now, so its
           // stack is summarized before the lag row below is written.
@@ -813,8 +829,12 @@ export class ServerStartRepository {
       // committed (heap growth / GC), major faults = pages read back from
       // disk, fs ops = sync file IO, involuntary switches = CPU contention.
       let lastRusage = process.resourceUsage();
+      let lagWindowStartedAt = Date.now();
       const logLagWindow = async (): Promise<void> => {
         try {
+          const windowStartedAt = lagWindowStartedAt;
+          const windowEndedAt = Date.now();
+          lagWindowStartedAt = windowEndedAt;
           // histogram.mean is in nanoseconds
           const meanMs = histogram.mean / 1e6;
           const maxMs = histogram.max / 1e6;
@@ -849,6 +869,14 @@ export class ServerStartRepository {
                 profiledHotFrames:
                   "histogram delay had no matching timer sample in this window",
               };
+          const pgResultDecodes = stall
+            ? (summarizePgResultDecodes(
+                stall.startedAt,
+                stall.startedAt + stall.ms,
+              ) ?? stall.pgResultDecodes)
+            : maxMs >= EL_LAG_WARN_MS
+              ? summarizePgResultDecodes(windowStartedAt, windowEndedAt)
+              : undefined;
           // Taken every window (it resets), logged only with a lag row
           const wsActivity = takeWsActivitySummary();
           // Shared context for every lag level: when, how big the heap was
@@ -858,6 +886,8 @@ export class ServerStartRepository {
             prevHeapMb,
             rssMb: Math.round(mem.rss / 1024 / 1024),
             uptime: uptime2,
+            taskRunnerRunning: ServerStartRepository.taskRunnerStarted,
+            nextRestartCount: ServerStartRepository.nextRestartCount,
             stallMs: stall ? Math.round(stall.ms) : undefined,
             // Main-thread CPU and runnable wait between the delayed ticker's
             // callbacks. Process CPU below covers all threads over five seconds.
@@ -872,6 +902,12 @@ export class ServerStartRepository {
             // Per run: start/end wall clock, to place it against stallStartedAt
             taskTimings: stall?.taskTimings || undefined,
             recentRequests: stall?.recentRequests,
+            pgResultDecodes,
+            pgResultDecodeWindow: pgResultDecodes
+              ? stall
+                ? "stall"
+                : "histogram-window"
+              : undefined,
             // Prod hub serves only WS (Next.js has its own port), so this is
             // the in-process traffic a no-task stall can come from
             wsActivity,

@@ -76,6 +76,7 @@ export const SERVER_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "profiledHotFrames",
   "profileWindowStartedAt",
   "profileWindowEndedAt",
+  "pgResultDecodes",
   "phases",
   "streakMs",
   "fsReads",

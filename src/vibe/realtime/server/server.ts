@@ -42,6 +42,7 @@ import type { AnyEndpointEventEnvelope } from "../core/structured-events";
 import type {
   WsBatchEvent,
   WsConnectionData,
+  WsGuestIdentityChangedFrame,
   WsWireMessage,
 } from "../core/types";
 import { parseWsClientMessage } from "../core/types";
@@ -374,6 +375,7 @@ interface WsConnectionDataWithProxy extends WsConnectionData {
   socketAuthSource?: NonNullable<
     Awaited<ReturnType<typeof authenticateWsRequest>>
   >["source"];
+  guestIdentityRefreshSent?: boolean;
   proxyWs?: WebSocket;
 }
 
@@ -738,6 +740,17 @@ export function startWebSocketServer(
                 msg.locale,
               ))
             ) {
+              const identity = describeSubscribeIdentity(
+                ws.data.user,
+                msg.channel,
+                await isRequestedUidLinkedLead(ws.data.user, msg.channel),
+              );
+              const shouldRefreshGuestIdentity =
+                msg.refreshGuestIdentity === true &&
+                ws.data.socketAuthSource === "guest" &&
+                identity.identityMismatch === "socket-guest-other-uid";
+              const notifyGuest =
+                shouldRefreshGuestIdentity && !ws.data.guestIdentityRefreshSent;
               logger.warn(
                 "[WS] Subscribe denied - socket identity may not join channel",
                 {
@@ -748,13 +761,26 @@ export function startWebSocketServer(
                   isPublic: ws.data.user.isPublic,
                   socketAuthSource: ws.data.socketAuthSource,
                   connectorInstanceId: ws.data.connectorInstanceId,
-                  ...describeSubscribeIdentity(
-                    ws.data.user,
-                    msg.channel,
-                    await isRequestedUidLinkedLead(ws.data.user, msg.channel),
-                  ),
+                  ...identity,
+                  guestIdentityRefreshRequested:
+                    msg.refreshGuestIdentity === true,
+                  staleRenderedGuestLead: shouldRefreshGuestIdentity,
+                  guestIdentityRefreshNotice: notifyGuest
+                    ? "sending"
+                    : shouldRefreshGuestIdentity
+                      ? "already-sent"
+                      : "not-applicable",
                 },
               );
+              // The cookie is HttpOnly. Refresh the page's identity through
+              // its loader without exposing the cookie or admitting the channel.
+              if (notifyGuest) {
+                ws.data.guestIdentityRefreshSent = true;
+                const frame: WsGuestIdentityChangedFrame = {
+                  type: "guest-identity-changed",
+                };
+                ws.send(JSON.stringify(frame));
+              }
               return;
             }
             subscribeToChannel(

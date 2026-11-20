@@ -154,8 +154,11 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
     requestData = {} as TEndpoint["types"]["RequestOutput"];
   }
 
+  let phase: "load-client" | "call-api" | "on-error" | "on-success" =
+    "load-client";
   try {
     const callApi = await loadCallApi();
+    phase = "call-api";
     const response = await callApi(
       endpoint,
       logger,
@@ -167,6 +170,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
 
     if (!response.success) {
       if (options.onError) {
+        phase = "on-error";
         await options.onError({
           error: response,
           requestData,
@@ -178,6 +182,7 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
     }
 
     if (options.onSuccess) {
+      phase = "on-success";
       const callbackResult = await options.onSuccess({
         requestData,
         urlPathParams: pathParams,
@@ -203,12 +208,15 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
       parsedError,
     );
 
-    logger.error("Mutation failed", {
+    logger.error("Mutation failed", parsedError, {
       endpoint: endpoint.path.join("/"),
-      error: parsedError,
+      method: endpoint.method,
+      phase,
+      errorKey: errorResponse.errorType.errorKey,
+      status: errorResponse.errorType.errorCode,
     });
 
-    if (options.onError) {
+    if (options.onError && phase !== "on-error") {
       await options.onError({
         error: errorResponse,
         requestData,

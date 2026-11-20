@@ -137,6 +137,7 @@ export function useEndpointSubscription(
 
   // Stable user id key - avoid re-subscribing when the user object is recreated.
   const userId = user ? (user.isPublic ? user.leadId : user.id) : undefined;
+  const isGuest = user?.isPublic === true;
 
   useEffect(() => {
     if (!enabled || !endpoint?.events) {
@@ -338,6 +339,8 @@ export function useEndpointSubscription(
           handleEvent,
           locale,
           logger,
+          undefined,
+          isGuest,
         ),
       );
     }
@@ -382,6 +385,7 @@ export function useEndpointSubscription(
     logger,
     cacheKey,
     userId,
+    isGuest,
     locale,
   ]);
 }

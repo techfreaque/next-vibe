@@ -295,6 +295,12 @@ export class SignupRepository {
       if (data.token || data.code) {
         const claim = await consumeSignupChallenge(data, user.leadId, t);
         if (!claim.success) {
+          logger.warn("Signup confirmation challenge rejected", {
+            challengeType: data.token ? "link" : "code",
+            hasPendingId: Boolean(data.pendingId),
+            errorKey: claim.errorType.errorKey,
+            status: claim.errorType.errorCode,
+          });
           return claim;
         }
         return await SignupRepository.finishSignup(
@@ -306,6 +312,13 @@ export class SignupRepository {
         );
       }
       if (!data.pendingId) {
+        logger.warn(
+          "Signup confirmation requested without a pending signup id",
+          {
+            resend: Boolean(data.resend),
+            changeEmail: Boolean(data.newEmail),
+          },
+        );
         return fail({
           message: t("confirmation.expired"),
           errorType: ErrorResponseTypes.NOT_FOUND,
@@ -321,6 +334,10 @@ export class SignupRepository {
           ),
         );
       if (!row) {
+        logger.warn("Signup confirmation has no pending signup for this lead", {
+          resend: Boolean(data.resend),
+          changeEmail: Boolean(data.newEmail),
+        });
         return fail({
           message: t("confirmation.expired"),
           errorType: ErrorResponseTypes.NOT_FOUND,

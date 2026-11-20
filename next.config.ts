@@ -3,6 +3,7 @@ import path from "node:path";
 import type { NextConfig } from "next";
 
 import { MAX_REQUEST_BODY_BYTES } from "./src/vibe/core/route/body-limit";
+import { proxyTimingHeader } from "./src/vibe/realtime/core/proxy-timing";
 
 const nextConfig: NextConfig = {
   typedRoutes: true,
@@ -11,6 +12,19 @@ const nextConfig: NextConfig = {
   // when it detects an AI coding agent (generate-agent-files.js). AGENTS.md
   // is ours — the repo's working rules — so the injection is disabled.
   agentRules: false,
+  async headers() {
+    return [
+      {
+        source: "/_next/static/:path*",
+        headers: [
+          {
+            key: "Server-Timing",
+            value: proxyTimingHeader("upstream-response"),
+          },
+        ],
+      },
+    ];
+  },
   experimental: {
     // Each page-data worker loads the server graph; bound both the pool and
     // the number of pages a worker can prerender at once.

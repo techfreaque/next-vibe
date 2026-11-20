@@ -4,6 +4,7 @@ import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { Pool } from "pg";
 
 import { onPgliteReopen, onPoolRebuild, pool } from "./client";
+import { pgDiagnosticQueryLogger } from "./pg-result-diagnostics";
 
 /**
  * Build a Drizzle client registered with a single domain's schema cluster.
@@ -22,7 +23,7 @@ export function createRelationalDb<
   TSchema extends Record<string, unknown>,
 >(schema: TSchema): NodePgDatabase<TSchema> {
   const buildCurrent = (): NodePgDatabase<TSchema> =>
-    drizzle(pool as Pool, { schema });
+    drizzle(pool as Pool, { schema, logger: pgDiagnosticQueryLogger });
 
   let inner = buildCurrent();
 

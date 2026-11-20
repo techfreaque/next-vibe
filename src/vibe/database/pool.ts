@@ -1,8 +1,12 @@
 import "server-only";
 
-import { Pool, type PoolClient, type PoolConfig, type Query } from "pg";
+import { Pool, type PoolClient, type PoolConfig } from "pg";
 
 import { databaseEnv } from "./env";
+import {
+  getActivePgQuery,
+  observePgResultDecoding,
+} from "./pg-result-diagnostics";
 
 /**
  * Real-Postgres pool factory (never PGlite). Side-effect free, so tests can
@@ -256,24 +260,6 @@ export function buildStandardPoolConfig(opts: StandardPoolOptions): PoolConfig {
 }
 
 /**
- * pg exposes no public "query still in flight" flag. A client released while
- * a query is still on the wire hit the client read timeout (the server never
- * answered): its socket is wedged and every later query would queue behind
- * the hung one.
- */
-function hasInFlightQuery(client: PoolClient): boolean {
-  if (!("_getActiveQuery" in client)) {
-    return false;
-  }
-  const getActiveQuery = client._getActiveQuery;
-  if (typeof getActiveQuery !== "function") {
-    return false;
-  }
-  const active: Query | null | undefined = getActiveQuery.call(client);
-  return active !== null && active !== undefined;
-}
-
-/**
  * An idle pooled client whose backend dies (database restart, network drop)
  * emits 'error' on the pool; with no listener Node treats it as an uncaught
  * exception and takes the whole server down. The pool already discards the
@@ -300,8 +286,9 @@ function guardStandardPool(p: Pool): Pool {
   p.on("connect", (client) => {
     client.on("error", () => undefined);
   });
+  p.on("acquire", observePgResultDecoding);
   p.on("release", (err, client) => {
-    if (!err && hasInFlightQuery(client)) {
+    if (!err && getActivePgQuery(client)) {
       // Callback form: end() never rejects into an unhandled promise here.
       client.end(() => undefined);
     }

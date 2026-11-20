@@ -26,7 +26,10 @@ import { useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { addDocumentListener, getVisibilityState } from "next-vibe/ui/lib/dom";
 import { useEffect, useLayoutEffect, useRef, useTransition } from "react";
 
-import { reconnectForIdentityChange } from "../../realtime/client/client";
+import {
+  onGuestSocketIdentityChange,
+  reconnectForIdentityChange,
+} from "../../realtime/client/client";
 import { queryClient } from "../../unified-ui/hooks/store";
 import { onAuthChangeInOtherTab } from "./tab-sync";
 
@@ -34,6 +37,7 @@ import { onAuthChangeInOtherTab } from "./tab-sync";
 const SWITCH_DEBOUNCE_MS = 150;
 /** Visible tab: let the re-rendered route settle before refetching. */
 const VISIBLE_REFETCH_DELAY_MS = 1_500;
+const GUEST_IDENTITY_REFRESH_COOLDOWN_MS = 5_000;
 
 function refetchActiveQueries(): void {
   void queryClient.refetchQueries({ type: "active", stale: true });
@@ -44,6 +48,7 @@ export function TabIdentitySync(): null {
   const router = useRouter();
   const [isRefreshing, startRefresh] = useTransition();
   const awaitingRefresh = useRef(false);
+  const lastGuestRefresh = useRef<number | null>(null);
   // The TanStack shim returns a fresh object per render; keep the listener
   // registered once and call the latest router.
   const routerRef = useRef(router);
@@ -52,19 +57,24 @@ export function TabIdentitySync(): null {
   });
 
   useEffect(() => {
-    const pending: { timer: ReturnType<typeof setTimeout> | null } = {
+    const pending: {
+      timer: ReturnType<typeof setTimeout> | null;
+      replaceSocket: boolean;
+    } = {
       timer: null,
+      replaceSocket: false,
     };
-    const unsubscribe = onAuthChangeInOtherTab((kind) => {
+    const queueRefresh = (replaceSocket: boolean): void => {
+      pending.replaceSocket ||= replaceSocket;
       if (pending.timer) {
         clearTimeout(pending.timer);
       }
       pending.timer = setTimeout(() => {
         pending.timer = null;
-        logger.info("[TabIdentitySync] Identity changed in another tab", {
-          kind,
-        });
-        reconnectForIdentityChange(logger);
+        if (pending.replaceSocket) {
+          pending.replaceSocket = false;
+          reconnectForIdentityChange(logger);
+        }
         void queryClient.invalidateQueries({ refetchType: "none" });
         awaitingRefresh.current = true;
         startRefresh(async () => {
@@ -73,12 +83,32 @@ export function TabIdentitySync(): null {
           await Promise.resolve(routerRef.current.refresh());
         });
       }, SWITCH_DEBOUNCE_MS);
+    };
+    const stopTabSync = onAuthChangeInOtherTab((kind) => {
+      logger.info("[TabIdentitySync] Identity changed in another tab", {
+        kind,
+      });
+      queueRefresh(true);
+    });
+    const stopSocketSync = onGuestSocketIdentityChange(() => {
+      const now = Date.now();
+      if (
+        lastGuestRefresh.current !== null &&
+        now - lastGuestRefresh.current < GUEST_IDENTITY_REFRESH_COOLDOWN_MS
+      ) {
+        return;
+      }
+      lastGuestRefresh.current = now;
+      // This socket already uses the new cookie. The loader will rebuild the
+      // channel names from that cookie, and the subscription effect will rebind.
+      queueRefresh(false);
     });
     return (): void => {
       if (pending.timer) {
         clearTimeout(pending.timer);
       }
-      unsubscribe();
+      stopTabSync();
+      stopSocketSync();
     };
   }, [logger]);
 

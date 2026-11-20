@@ -25,6 +25,7 @@ import type { ToolCall } from "../../../chat/db";
 import type { PendingToolData } from "../core/stream";
 import { resolveToolParentId } from "./chain-tip";
 import {
+  describeNestedExecuteToolArgs,
   describeToolArgShape,
   normalizeExecuteToolArgs,
 } from "./execute-tool-args";
@@ -515,7 +516,10 @@ export async function onToolResult(
   ) {
     logger.debug(
       "[AI Stream] Skipping tool result emit - tool is waiting for remote task",
-      { toolMessageId, toolName: part.toolName },
+      {
+        toolMessageId,
+        toolName: part.toolName,
+      },
     );
     return { currentParentId: toolMessageId };
   }
@@ -948,6 +952,9 @@ async function executeFallbackTool(
             toolName === EXECUTE_TOOL_ALIAS
               ? describeToolArgShape(inputArgs["input"])
               : undefined,
+          ...(toolName === EXECUTE_TOOL_ALIAS
+            ? describeNestedExecuteToolArgs(rawArgs["input"])
+            : {}),
           // Which model keeps sending malformed calls (tool-description fix
           // vs model quirk); `repaired` = normalizeExecuteToolArgs changed them.
           model,

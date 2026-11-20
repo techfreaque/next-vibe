@@ -10,6 +10,7 @@ import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test";
 import { defaultLocale } from "../../core/i18n/core/config";
 import { createEndpointLogger } from "../../logger/server";
 import type { LoggerMetadata } from "../../logger/types";
+import { readProxyTimingHeader } from "../core/proxy-timing";
 import { handleHttpProxy } from "./http-proxy";
 
 const logger = createEndpointLogger(false, defaultLocale);
@@ -21,10 +22,13 @@ beforeAll(() => {
   upstream = Bun.serve({
     port: 0,
     fetch: (req) =>
-      Response.json({
-        proto: req.headers.get("x-forwarded-proto"),
-        host: req.headers.get("x-forwarded-host"),
-      }),
+      Response.json(
+        {
+          proto: req.headers.get("x-forwarded-proto"),
+          host: req.headers.get("x-forwarded-host"),
+        },
+        { headers: { "server-timing": "fixture;dur=1" } },
+      ),
   });
   nextPort = upstream.port ?? 0;
 });
@@ -64,14 +68,11 @@ it("correlates a startup refusal and its retry outcome", async () => {
   });
   const info = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
   try {
-    const response = await handleHttpProxy(
-      new Request("http://127.0.0.1:3000/robots.txt"),
-      {
-        nextPort: port,
-        logger: { ...logger, warn, info },
-        isShuttingDown: () => false,
-      },
-    );
+    const response = await handleHttpProxy(new Request("http://127.0.0.1:3000/robots.txt"), {
+      nextPort: port,
+      logger: { ...logger, warn, info },
+      isShuttingDown: () => false,
+    });
     expect(await response.text()).toBe("ready");
     const first = warn.mock.calls[0]?.[1];
     const requestId =
@@ -94,6 +95,37 @@ it("correlates a startup refusal and its retry outcome", async () => {
   } finally {
     await recovering?.stop(true);
   }
+});
+
+it("identifies Next asset responses while preserving upstream timing", async () => {
+  const response = await handleHttpProxy(
+    new Request("http://127.0.0.1:3000/_next/static/chunks/sample.js"),
+    { nextPort, logger, isShuttingDown: () => false },
+  );
+  const timing = response.headers.get("server-timing");
+  expect(timing).toContain("fixture;dur=1");
+  expect(readProxyTimingHeader(timing)).toBe("upstream-response");
+  await response.text();
+});
+
+it("identifies and logs a synthetic 503 with the client request id", async () => {
+  const socket = Bun.serve({ port: 0, fetch: () => new Response("fixture") });
+  const port = socket.port ?? 0;
+  await socket.stop(true);
+  const warn = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+  const response = await handleHttpProxy(
+    new Request("http://127.0.0.1:3000/api/en-US/sample", {
+      method: "POST",
+      headers: { "x-request-id": "fixture-request-503" },
+    }),
+    { nextPort: port, logger: { ...logger, warn }, isShuttingDown: () => false },
+  );
+  expect(response.status).toBe(503);
+  expect(readProxyTimingHeader(response.headers.get("server-timing"))).toBe("upstream-unavailable");
+  expect(warn).toHaveBeenCalledWith(
+    "[Proxy] Upstream unavailable for a non-retriable request",
+    expect.objectContaining({ requestId: "fixture-request-503" }),
+  );
 });
 
 describe("http proxy forwarded headers", () => {

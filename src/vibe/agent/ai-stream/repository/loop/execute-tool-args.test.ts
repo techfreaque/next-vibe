@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 
 import {
+  describeNestedExecuteToolArgs,
   describeToolArgShape,
   normalizeExecuteToolArgs,
 } from "./execute-tool-args";
@@ -96,6 +97,41 @@ describe("normalizeExecuteToolArgs", () => {
     ).toEqual({
       toolName: "rename-thread",
       input: { title: "POV Game", description: "Two endings" },
+    });
+  });
+
+  it("retains direct target fields in a nested envelope without an input field", () => {
+    expect(
+      normalizeExecuteToolArgs({
+        input: {
+          toolName: "rename-thread",
+          threadId: "sample-thread",
+          title: "Sample title",
+          instanceId: "sample-instance",
+          callbackMode: "detach",
+        },
+      }),
+    ).toEqual({
+      toolName: "rename-thread",
+      input: { threadId: "sample-thread", title: "Sample title" },
+      instanceId: "sample-instance",
+      callbackMode: "detach",
+    });
+  });
+
+  it("keeps malformed explicit inner input available for validation", () => {
+    expect(
+      normalizeExecuteToolArgs({
+        input: { toolName: "rename-thread", input: "truncated JSON" },
+      }),
+    ).toEqual({ toolName: "rename-thread", input: "truncated JSON" });
+  });
+
+  it("reports the nested envelope's shapes without leaking field values", () => {
+    expect(describeNestedExecuteToolArgs({ input: [], threadId: "sample-thread" })).toEqual({
+      nestedExecuteToolTargetShape: "missing",
+      nestedExecuteToolInputShape: "array",
+      nestedExecuteToolSiblingFields: true,
     });
   });
 });
