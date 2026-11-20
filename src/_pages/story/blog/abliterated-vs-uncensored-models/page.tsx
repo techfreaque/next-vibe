@@ -11,7 +11,10 @@
  */
 
 import type { Metadata } from "next";
-import { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import {
+  chatModelDefinitions,
+  ChatModelId,
+} from "next-vibe/agent/ai-stream/models";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import type { UncensoredModelMethod } from "next-vibe/agent/models/models";
 import {
@@ -44,6 +47,7 @@ import {
   formatTokenCount,
   getModelFacts,
   listModelFacts,
+  OWN_WORLDVIEW_UNCENSORED_MODEL_ID,
 } from "@/_pages/models/_shared/model-facts";
 import {
   formatMoney,
@@ -87,7 +91,7 @@ interface Props {
   params: Promise<{ locale: CountryLanguage }>;
 }
 
-/** Same model with the filter on (base) and off (uncensored build). */
+/** Base models and the corresponding uncensored variants in the catalog. */
 const PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
   [ChatModelId.GLM_5_3, ChatModelId.GLM_5_3_UNCENSORED],
   [
@@ -117,11 +121,12 @@ const TEST_STEPS: readonly ("refusal" | "voice" | "worldview" | "switch")[] = [
 const FAQ_KEYS: readonly (
   | "whatIs"
   | "difference"
+  | "identify"
   | "worse"
   | "truly"
   | "free"
   | "legal"
-)[] = ["whatIs", "difference", "worse", "truly", "free", "legal"];
+)[] = ["whatIs", "difference", "identify", "worse", "truly", "free", "legal"];
 
 export interface KindModel {
   id: ChatModelId;
@@ -202,16 +207,17 @@ export async function tanstackLoader({
     ];
   });
   const own = uncensored.find(
-    (facts) => facts.uncensoredMethod === "ownWorldview",
+    (facts) => facts.id === OWN_WORLDVIEW_UNCENSORED_MODEL_ID,
   );
+  const ownDefinition = chatModelDefinitions[OWN_WORLDVIEW_UNCENSORED_MODEL_ID];
   return {
     locale,
     groups,
     pairs,
     uncensoredCount: uncensored.length,
-    ownName: own?.name ?? "",
+    ownName: ownDefinition.name,
     ownSlug: own?.slug ?? "",
-    ownContext: own?.contextWindow ?? 0,
+    ownContext: ownDefinition.contextWindow,
   };
 }
 
@@ -269,7 +275,9 @@ export function TanstackPage({
     new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(value);
   const countOf = (key: KindKey): number =>
     groups.find((group) => group.key === key)?.models.length ?? 0;
-
+  const abliteratedModels =
+    groups.find((group) => group.key === "abliterated")?.models ?? [];
+  const otherGroups = groups.filter((group) => group.key !== "abliterated");
   const stats = {
     appName,
     uncensoredCount,
@@ -280,6 +288,11 @@ export function TanstackPage({
     guestCredits: FREE_CREDIT_ALLOWANCE.guest,
     freeCredits: FREE_CREDIT_SIGNED_IN_TOTAL,
   };
+  const faq = FAQ_KEYS.map((key) => ({
+    key,
+    question: t(`faq.${key}.q`, stats),
+    answer: t(`faq.${key}.a`, stats),
+  }));
 
   return (
     <Div className="min-h-screen bg-background">
@@ -297,6 +310,44 @@ export function TanstackPage({
           <ArticleLead>{t("intro.lead")}</ArticleLead>
           <ArticleP>{t("intro.p2", stats)}</ArticleP>
         </Div>
+
+        <ArticleSection
+          id="online"
+          title={t("online.title")}
+          intro={t("online.compare", stats)}
+        >
+          <CardLink
+            href={`/${locale}/story/abliterated-ai-chat`}
+            label={t("online.directoryLink")}
+          />
+          {abliteratedModels.length > 0 && (
+            <Div className="flex flex-col gap-3">
+              <ArticleH3>
+                {t("ours.abliterated.title", {
+                  count: abliteratedModels.length,
+                })}
+              </ArticleH3>
+              <ArticleP>{t("ours.abliterated.body")}</ArticleP>
+              <ArticleList
+                items={abliteratedModels.map((model) => (
+                  <ModelLink key={model.id} model={model} locale={locale} />
+                ))}
+              />
+            </Div>
+          )}
+          <Div className="flex flex-col">
+            <CardLink
+              href={`/${locale}/story/uncensored-ai`}
+              label={t("online.guideLink")}
+            />
+            {ownSlug !== "" && (
+              <CardLink
+                href={`/${locale}/models/${ownSlug}`}
+                label={t("faq.ownLink", stats)}
+              />
+            )}
+          </Div>
+        </ArticleSection>
 
         <ArticleSection id="label" title={t("label.title")}>
           <ArticleP>{t("label.p1")}</ArticleP>
@@ -347,7 +398,7 @@ export function TanstackPage({
           title={t("ours.title")}
           intro={t("ours.intro", stats)}
         >
-          {groups.map((group) => (
+          {otherGroups.map((group) => (
             <Div key={group.key} className="flex flex-col gap-3">
               <ArticleH3>
                 {t(`ours.${group.key}.title`, {
@@ -499,28 +550,14 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleSection id="faq" title={t("faq.title")}>
-          <JsonLd
-            id="faq-structured-data"
-            data={buildFaqStructuredData(
-              FAQ_KEYS.map((key) => ({
-                question: t(`faq.${key}.q`, stats),
-                answer: t(`faq.${key}.a`, stats),
-              })),
-            )}
-          />
-          {FAQ_KEYS.map((key) => (
+          <JsonLd id="faq-structured-data" data={buildFaqStructuredData(faq)} />
+          {faq.map(({ key, question, answer }) => (
             <Div key={key} className="flex flex-col gap-2">
-              <ArticleH3>{t(`faq.${key}.q`, stats)}</ArticleH3>
-              <ArticleP>{t(`faq.${key}.a`, stats)}</ArticleP>
+              <ArticleH3>{question}</ArticleH3>
+              <ArticleP>{answer}</ArticleP>
             </Div>
           ))}
           <Div className="flex flex-col">
-            {ownSlug !== "" && (
-              <CardLink
-                href={`/${locale}/models/${ownSlug}`}
-                label={t("faq.ownLink", stats)}
-              />
-            )}
             <CardLink
               href={`/${locale}/story/blog/uncensored-models-what-each-is-good-at`}
               label={t("faq.guideLink")}

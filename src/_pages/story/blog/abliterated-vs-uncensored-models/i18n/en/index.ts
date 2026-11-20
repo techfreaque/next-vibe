@@ -1,25 +1,31 @@
 export const translations = {
   meta: {
-    title: "Abliterated vs Uncensored AI Models: 3 Kinds Explained",
+    title: "Abliterated vs. Uncensored AI Models",
     description:
-      "Abliterated, fine-tuned or trained on its own worldview: what each kind of uncensored AI model changes, how to tell them apart in ten minutes, and which model on {{appName}} is which.",
+      "Learn what abliteration changes in a language model, how it differs from uncensored fine-tuning, and how to compare a variant with its base model.",
     category: "Model Guide",
     imageAlt: "Three kinds of uncensored AI model, explained",
     keywords:
-      "abliterated vs uncensored, what is an abliterated model, abliteration explained, abliterated LLM, uncensored AI models, uncensored fine-tune, uncensored AI chat, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, Kimi K3.1 Pro Uncensored, UncensoredLM, {{appName}}",
+      "abliterated vs uncensored, what is an abliterated model, abliteration explained, abliterated LLM, uncensored AI models, uncensored fine-tune, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, Kimi K3.1 Pro Uncensored, UncensoredLM, {{appName}}",
   },
   hero: {
     backToBlog: "Back to Blog",
     category: "Model Guide",
     readTime: "8 min read",
-    title:
-      "Abliterated, fine-tuned, or its own worldview. Three kinds of uncensored AI.",
+    title: "How abliterated models differ from other uncensored models",
     subtitle:
-      "{{uncensoredCount}} uncensored models on {{appName}}, sorted by how they lost their filter. What each method changes, what it leaves alone, and a ten-minute test to tell them apart.",
+      "See what happens to refusals, writing style, and accuracy when model weights change. Compare abliteration, fine-tuning, and the approach behind {{ownName}}.",
   },
   intro: {
-    lead: 'Two models both say "uncensored". One answers your political question in the voice of the lab that built it. The other argues the opposite side. Same label, different machines.',
-    p2: "There are three ways to make an AI model stop refusing, and they produce three different models. This guide explains each method in plain terms, shows which of our models was made which way, puts three open models next to their uncensored builds, and gives you a test you can run yourself.",
+    lead: "An abliterated LLM is a language model whose weights have been edited to reduce learned refusals. It starts from an existing model, so its knowledge and writing style may still feel familiar.",
+    p2: "Uncensored is a broader label. It can cover models edited through abliteration, models fine-tuned to answer more freely, and models trained to offer a different perspective, such as {{ownName}}.",
+  },
+  online: {
+    title: "Try an abliterated model online",
+    directoryLink: "Browse abliterated models for browser chat",
+    guideLink: "Explore uncensored AI chat and models",
+    compare:
+      "On {{appName}}, open a model page to check its context window, features, and estimated cost before you start a chat. Compare an abliterated model with its base version if both are available.",
   },
   label: {
     title: 'Why "uncensored" alone tells you little',
@@ -31,11 +37,11 @@ export const translations = {
     intro: "From the smallest change to the biggest.",
     abliterated: {
       title: "1. Abliterated: the refusal cut out of the weights",
-      how: "Research from 2024 showed that refusal in chat models runs through a single direction inside the model. Abliteration measures that direction by comparing how the model reacts to prompts it refuses and prompts it answers, then removes it from the weights. No new training data, no retraining.",
+      how: "Abliteration reduces learned refusals by editing a model’s weights. A 2024 study identified a direction associated with refusal in the chat models it tested. The effect of removing that signal varies by model and prompt.",
       keeps:
-        "Keeps: the base model's knowledge, writing style, tool calling and worldview. Same model, minus the reflex to say no.",
+        "The base model’s writing style and knowledge often remain recognizable. Test the exact version for accuracy and tool use.",
       changes:
-        "Changes: refusals mostly stop. On political or moral questions it still answers the way its base lab trained it to, just without the dodge.",
+        "An abliterated variant may answer prompts its base model refuses. Results vary with the model and prompt.",
     },
     fineTuned: {
       title: "2. Fine-tuned: retrained to answer",
@@ -54,7 +60,7 @@ export const translations = {
         "Changes: the answers themselves. Ask about politics and you get takes the mainstream models will not give you, unlocked or not.",
     },
     callout:
-      "Short version. Abliterated and fine-tuned models are mainstream models that stopped dodging: same worldview, they just answer. {{ownName}} is the other kind: a different worldview. Pick the first for capability without refusals. Pick the second for the other side of the argument.",
+      "The method tells you what the developer changed. Use the comparison below to see what matters for your own prompts.",
     sources: {
       paper:
         "Paper: Refusal in language models is mediated by a single direction (arXiv)",
@@ -62,12 +68,12 @@ export const translations = {
     },
   },
   ours: {
-    title: "Which of our models is which",
+    title: "Other uncensored models",
     intro:
-      "Live from our model registry: every uncensored model on {{appName}} right now, grouped by how it was made. We only list a method where the model's provider documents it.",
+      "The remaining uncensored models on {{appName}} are grouped by documented method. If the provider hasn’t published its method, we leave it unspecified.",
     abliterated: {
-      title: "Abliterated ({{count}})",
-      body: "Mainstream and open models with the refusal direction removed. The most capability in the uncensored set: reasoning, code, tools.",
+      title: "Abliterated models available now ({{count}})",
+      body: "For coding or analysis, check tool support. For long chats or fiction, compare context windows.",
     },
     fineTuned: {
       title: "Fine-tuned ({{count}})",
@@ -83,9 +89,9 @@ export const translations = {
     },
   },
   pairs: {
-    title: "Same model, filter on and off",
+    title: "How the base and uncensored versions compare",
     intro:
-      "Three open models next to their uncensored builds. Same lab, same base. What changes is the refusals, and the price.",
+      "Compare the base models and their uncensored variants below. Check each pair for the method, context window, and estimated price per message.",
     colBase: "Base model",
     colUncensored: "Uncensored build",
     colMethod: "Method",
@@ -110,7 +116,7 @@ export const translations = {
     steps: {
       refusal: {
         title: "The refusal test",
-        body: "Ask something the base model dodges: a blunt medical question, a dark scene, a security write-up. Every uncensored model should answer. If it still refuses or wraps the answer in warnings, the uncensoring is shallow.",
+        body: "Try a benign prompt where the base model is reluctant, such as writing a dark fictional scene. Compare how directly each model responds. One answer alone tells you little about how the model was made.",
       },
       voice: {
         title: "The voice test",
@@ -155,19 +161,23 @@ export const translations = {
     title: "FAQ",
     whatIs: {
       q: "What is an abliterated model?",
-      a: "A model with its refusal direction removed from the weights. Researchers found that refusal runs through one direction inside the model. Abliteration measures it and cuts it out, without retraining. The model keeps its knowledge and worldview and stops refusing.",
+      a: "An abliterated model is an existing language model edited to refuse fewer prompts. The change targets the model’s weights.",
     },
     difference: {
       q: "What is the difference between abliterated and uncensored?",
       a: "Uncensored is the behavior: the model answers. Abliterated is one way to get there. Others are a decensoring fine-tune, or training on different material, like {{ownName}}. On {{appName}}, {{abliteratedCount}} uncensored models are abliterated and {{fineTunedCount}} are fine-tuned.",
     },
+    identify: {
+      q: "How can I tell if an AI model is abliterated?",
+      a: "Check the model card or release notes for a description of the method. In the {{appName}} catalog, the abliterated label is based on provider documentation.",
+    },
     worse: {
-      q: "Are abliterated models dumber than the original?",
-      a: "Slightly, sometimes. Removing the refusal direction can cost some accuracy, and an extra round of training recovers most of it. For most tasks you keep the base model's strengths. Compare both on your own prompt.",
+      q: "Can abliteration affect model quality?",
+      a: "Yes. It changes the weights, so it can affect accuracy, style, or other capabilities. Compare the specific variant with its base model on the same task.",
     },
     truly: {
-      q: "Which uncensored model is truly uncensored?",
-      a: 'Abliterated and fine-tuned models stop refusing but keep a mainstream worldview. {{ownName}} is trained on books and documents banned from the mainstream internet, so it has contrary political opinions of its own. Which one is "truly" uncensored depends on whether you want answers or a different view.',
+      q: "Is {{ownName}} an abliterated model?",
+      a: "{{ownName}} is listed separately because its developer describes a model trained on different material for a different perspective. The abliterated models here are variants of existing models edited to reduce refusals.",
     },
     free: {
       q: "Can I try uncensored models for free?",

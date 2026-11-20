@@ -130,13 +130,16 @@ function publicOptionsFor(id: ChatModelId): ChatModelOption[] {
   );
 }
 
-/** Public routes of a model whose provider API key is configured here. */
+/** Configured public routes allowed by this instance's relay policy. */
 function availableOptionsFor(
   id: ChatModelId,
   availability: AgentEnvAvailability,
 ): ChatModelOption[] {
-  return publicOptionsFor(id).filter((option) =>
-    isApiProviderAvailable(option.apiProvider, availability),
+  return publicOptionsFor(id).filter(
+    (option) =>
+      (!availability.unbottledForce ||
+        option.apiProvider === ApiProvider.UNBOTTLED) &&
+      isApiProviderAvailable(option.apiProvider, availability),
   );
 }
 

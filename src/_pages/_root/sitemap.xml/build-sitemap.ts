@@ -33,6 +33,8 @@ import {
 export const SITEMAP_STATIC_PATHS: readonly string[] = [
   "/story",
   "/story/about-us",
+  "/story/uncensored-ai",
+  "/story/abliterated-ai-chat",
   "/story/blog",
   "/story/careers",
   "/story/framework",

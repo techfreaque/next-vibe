@@ -54,6 +54,7 @@ import { Route as LocaleInvoiceInvoiceIdIndexRouteImport } from './routes/$local
 import { Route as LocaleModelsModelIdIndexRouteImport } from './routes/$locale.models.$modelId.index'
 import { Route as LocaleSharedTokenIndexRouteImport } from './routes/$locale.shared.$token.index'
 import { Route as LocaleSkillSkillIdIndexRouteImport } from './routes/$locale.skill.$skillId.index'
+import { Route as LocaleStoryAbliteratedAiChatIndexRouteImport } from './routes/$locale.story.abliterated-ai-chat.index'
 import { Route as LocaleStoryAboutUsIndexRouteImport } from './routes/$locale.story.about-us.index'
 import { Route as LocaleStoryBlogIndexRouteImport } from './routes/$locale.story.blog.index'
 import { Route as LocaleStoryBuildASkillIndexRouteImport } from './routes/$locale.story.build-a-skill.index'
@@ -68,6 +69,7 @@ import { Route as LocaleStoryPrivacyPolicyIndexRouteImport } from './routes/$loc
 import { Route as LocaleStoryRefusalIndexIndexRouteImport } from './routes/$locale.story.refusal-index.index'
 import { Route as LocaleStorySelfHostIndexRouteImport } from './routes/$locale.story.self-host.index'
 import { Route as LocaleStoryTermsOfServiceIndexRouteImport } from './routes/$locale.story.terms-of-service.index'
+import { Route as LocaleStoryUncensoredAiIndexRouteImport } from './routes/$locale.story.uncensored-ai.index'
 import { Route as LocaleSubscriptionBuyIndexRouteImport } from './routes/$locale.subscription.buy.index'
 import { Route as LocaleSubscriptionHistoryIndexRouteImport } from './routes/$locale.subscription.history.index'
 import { Route as LocaleSubscriptionOverviewIndexRouteImport } from './routes/$locale.subscription.overview.index'
@@ -956,6 +958,12 @@ const LocaleSkillSkillIdIndexRoute = LocaleSkillSkillIdIndexRouteImport.update({
   path: '/$locale/skill/$skillId/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocaleStoryAbliteratedAiChatIndexRoute =
+  LocaleStoryAbliteratedAiChatIndexRouteImport.update({
+    id: '/abliterated-ai-chat/',
+    path: '/abliterated-ai-chat/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryAboutUsIndexRoute = LocaleStoryAboutUsIndexRouteImport.update({
   id: '/about-us/',
   path: '/about-us/',
@@ -1032,6 +1040,12 @@ const LocaleStoryTermsOfServiceIndexRoute =
   LocaleStoryTermsOfServiceIndexRouteImport.update({
     id: '/terms-of-service/',
     path: '/terms-of-service/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryUncensoredAiIndexRoute =
+  LocaleStoryUncensoredAiIndexRouteImport.update({
+    id: '/uncensored-ai/',
+    path: '/uncensored-ai/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleSubscriptionBuyIndexRoute =
@@ -5104,6 +5118,7 @@ export interface FileRoutesByFullPath {
   '/$locale/models/$modelId/': typeof LocaleModelsModelIdIndexRoute
   '/$locale/shared/$token/': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId/': typeof LocaleSkillSkillIdIndexRoute
+  '/$locale/story/abliterated-ai-chat/': typeof LocaleStoryAbliteratedAiChatIndexRoute
   '/$locale/story/about-us/': typeof LocaleStoryAboutUsIndexRoute
   '/$locale/story/blog/': typeof LocaleStoryBlogIndexRoute
   '/$locale/story/build-a-skill/': typeof LocaleStoryBuildASkillIndexRoute
@@ -5118,6 +5133,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/refusal-index/': typeof LocaleStoryRefusalIndexIndexRoute
   '/$locale/story/self-host/': typeof LocaleStorySelfHostIndexRoute
   '/$locale/story/terms-of-service/': typeof LocaleStoryTermsOfServiceIndexRoute
+  '/$locale/story/uncensored-ai/': typeof LocaleStoryUncensoredAiIndexRoute
   '/$locale/subscription/buy/': typeof LocaleSubscriptionBuyIndexRoute
   '/$locale/subscription/history/': typeof LocaleSubscriptionHistoryIndexRoute
   '/$locale/subscription/overview/': typeof LocaleSubscriptionOverviewIndexRoute
@@ -5816,6 +5832,7 @@ export interface FileRoutesByTo {
   '/$locale/models/$modelId': typeof LocaleModelsModelIdIndexRoute
   '/$locale/shared/$token': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId': typeof LocaleSkillSkillIdIndexRoute
+  '/$locale/story/abliterated-ai-chat': typeof LocaleStoryAbliteratedAiChatIndexRoute
   '/$locale/story/about-us': typeof LocaleStoryAboutUsIndexRoute
   '/$locale/story/blog': typeof LocaleStoryBlogIndexRoute
   '/$locale/story/build-a-skill': typeof LocaleStoryBuildASkillIndexRoute
@@ -5830,6 +5847,7 @@ export interface FileRoutesByTo {
   '/$locale/story/refusal-index': typeof LocaleStoryRefusalIndexIndexRoute
   '/$locale/story/self-host': typeof LocaleStorySelfHostIndexRoute
   '/$locale/story/terms-of-service': typeof LocaleStoryTermsOfServiceIndexRoute
+  '/$locale/story/uncensored-ai': typeof LocaleStoryUncensoredAiIndexRoute
   '/$locale/subscription/buy': typeof LocaleSubscriptionBuyIndexRoute
   '/$locale/subscription/history': typeof LocaleSubscriptionHistoryIndexRoute
   '/$locale/subscription/overview': typeof LocaleSubscriptionOverviewIndexRoute
@@ -6537,6 +6555,7 @@ export interface FileRoutesById {
   '/$locale/models/$modelId/': typeof LocaleModelsModelIdIndexRoute
   '/$locale/shared/$token/': typeof LocaleSharedTokenIndexRoute
   '/$locale/skill/$skillId/': typeof LocaleSkillSkillIdIndexRoute
+  '/$locale/story/abliterated-ai-chat/': typeof LocaleStoryAbliteratedAiChatIndexRoute
   '/$locale/story/about-us/': typeof LocaleStoryAboutUsIndexRoute
   '/$locale/story/blog/': typeof LocaleStoryBlogIndexRoute
   '/$locale/story/build-a-skill/': typeof LocaleStoryBuildASkillIndexRoute
@@ -6551,6 +6570,7 @@ export interface FileRoutesById {
   '/$locale/story/refusal-index/': typeof LocaleStoryRefusalIndexIndexRoute
   '/$locale/story/self-host/': typeof LocaleStorySelfHostIndexRoute
   '/$locale/story/terms-of-service/': typeof LocaleStoryTermsOfServiceIndexRoute
+  '/$locale/story/uncensored-ai/': typeof LocaleStoryUncensoredAiIndexRoute
   '/$locale/subscription/buy/': typeof LocaleSubscriptionBuyIndexRoute
   '/$locale/subscription/history/': typeof LocaleSubscriptionHistoryIndexRoute
   '/$locale/subscription/overview/': typeof LocaleSubscriptionOverviewIndexRoute
@@ -7258,6 +7278,7 @@ export interface FileRouteTypes {
     | '/$locale/models/$modelId/'
     | '/$locale/shared/$token/'
     | '/$locale/skill/$skillId/'
+    | '/$locale/story/abliterated-ai-chat/'
     | '/$locale/story/about-us/'
     | '/$locale/story/blog/'
     | '/$locale/story/build-a-skill/'
@@ -7272,6 +7293,7 @@ export interface FileRouteTypes {
     | '/$locale/story/refusal-index/'
     | '/$locale/story/self-host/'
     | '/$locale/story/terms-of-service/'
+    | '/$locale/story/uncensored-ai/'
     | '/$locale/subscription/buy/'
     | '/$locale/subscription/history/'
     | '/$locale/subscription/overview/'
@@ -7970,6 +7992,7 @@ export interface FileRouteTypes {
     | '/$locale/models/$modelId'
     | '/$locale/shared/$token'
     | '/$locale/skill/$skillId'
+    | '/$locale/story/abliterated-ai-chat'
     | '/$locale/story/about-us'
     | '/$locale/story/blog'
     | '/$locale/story/build-a-skill'
@@ -7984,6 +8007,7 @@ export interface FileRouteTypes {
     | '/$locale/story/refusal-index'
     | '/$locale/story/self-host'
     | '/$locale/story/terms-of-service'
+    | '/$locale/story/uncensored-ai'
     | '/$locale/subscription/buy'
     | '/$locale/subscription/history'
     | '/$locale/subscription/overview'
@@ -8690,6 +8714,7 @@ export interface FileRouteTypes {
     | '/$locale/models/$modelId/'
     | '/$locale/shared/$token/'
     | '/$locale/skill/$skillId/'
+    | '/$locale/story/abliterated-ai-chat/'
     | '/$locale/story/about-us/'
     | '/$locale/story/blog/'
     | '/$locale/story/build-a-skill/'
@@ -8704,6 +8729,7 @@ export interface FileRouteTypes {
     | '/$locale/story/refusal-index/'
     | '/$locale/story/self-host/'
     | '/$locale/story/terms-of-service/'
+    | '/$locale/story/uncensored-ai/'
     | '/$locale/subscription/buy/'
     | '/$locale/subscription/history/'
     | '/$locale/subscription/overview/'
@@ -10026,6 +10052,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleSkillSkillIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$locale/story/abliterated-ai-chat/': {
+      id: '/$locale/story/abliterated-ai-chat/'
+      path: '/abliterated-ai-chat'
+      fullPath: '/$locale/story/abliterated-ai-chat/'
+      preLoaderRoute: typeof LocaleStoryAbliteratedAiChatIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/about-us/': {
       id: '/$locale/story/about-us/'
       path: '/about-us'
@@ -10122,6 +10155,13 @@ declare module '@tanstack/react-router' {
       path: '/terms-of-service'
       fullPath: '/$locale/story/terms-of-service/'
       preLoaderRoute: typeof LocaleStoryTermsOfServiceIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/uncensored-ai/': {
+      id: '/$locale/story/uncensored-ai/'
+      path: '/uncensored-ai'
+      fullPath: '/$locale/story/uncensored-ai/'
+      preLoaderRoute: typeof LocaleStoryUncensoredAiIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/subscription/buy/': {
@@ -14796,6 +14836,7 @@ const LocaleModelsRouteWithChildren = LocaleModelsRoute._addFileChildren(
 
 interface LocaleStoryRouteChildren {
   LocaleStoryIndexRoute: typeof LocaleStoryIndexRoute
+  LocaleStoryAbliteratedAiChatIndexRoute: typeof LocaleStoryAbliteratedAiChatIndexRoute
   LocaleStoryAboutUsIndexRoute: typeof LocaleStoryAboutUsIndexRoute
   LocaleStoryBlogIndexRoute: typeof LocaleStoryBlogIndexRoute
   LocaleStoryBuildASkillIndexRoute: typeof LocaleStoryBuildASkillIndexRoute
@@ -14810,6 +14851,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryRefusalIndexIndexRoute: typeof LocaleStoryRefusalIndexIndexRoute
   LocaleStorySelfHostIndexRoute: typeof LocaleStorySelfHostIndexRoute
   LocaleStoryTermsOfServiceIndexRoute: typeof LocaleStoryTermsOfServiceIndexRoute
+  LocaleStoryUncensoredAiIndexRoute: typeof LocaleStoryUncensoredAiIndexRoute
   LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute: typeof LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute
   LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute: typeof LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute
   LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute: typeof LocaleStoryBlogAiRoleplayWithoutFilterIndexRoute
@@ -14849,6 +14891,8 @@ interface LocaleStoryRouteChildren {
 
 const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
   LocaleStoryIndexRoute: LocaleStoryIndexRoute,
+  LocaleStoryAbliteratedAiChatIndexRoute:
+    LocaleStoryAbliteratedAiChatIndexRoute,
   LocaleStoryAboutUsIndexRoute: LocaleStoryAboutUsIndexRoute,
   LocaleStoryBlogIndexRoute: LocaleStoryBlogIndexRoute,
   LocaleStoryBuildASkillIndexRoute: LocaleStoryBuildASkillIndexRoute,
@@ -14863,6 +14907,7 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
   LocaleStoryRefusalIndexIndexRoute: LocaleStoryRefusalIndexIndexRoute,
   LocaleStorySelfHostIndexRoute: LocaleStorySelfHostIndexRoute,
   LocaleStoryTermsOfServiceIndexRoute: LocaleStoryTermsOfServiceIndexRoute,
+  LocaleStoryUncensoredAiIndexRoute: LocaleStoryUncensoredAiIndexRoute,
   LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute:
     LocaleStoryBlogAbliteratedVsUncensoredModelsIndexRoute,
   LocaleStoryBlogAiMusicAndVoiceGeneratorsIndexRoute:

@@ -43,6 +43,7 @@ import {
 } from "../../models/_shared/model-facts";
 import { formatNumber, tierName } from "../../models/_shared/model-format";
 import { listMediaFacts } from "../../models/_shared/model-media-facts";
+import { scopedTranslation as abliteratedChatTranslation } from "../../story/abliterated-ai-chat/i18n";
 import { listBlogPostCards } from "../../story/blog/posts-cards";
 import {
   COMPARE_HUB_PATH,
@@ -51,6 +52,7 @@ import {
   versusPath,
 } from "../../story/compare/_shared/platforms";
 import { scopedTranslation as compareScopedTranslation } from "../../story/compare/i18n";
+import { scopedTranslation as uncensoredChatTranslation } from "../../story/uncensored-ai/i18n";
 import { sitemapLocales } from "../sitemap.xml/build-sitemap";
 import { scopedTranslation } from "./i18n";
 
@@ -192,7 +194,15 @@ export async function buildLlmsTxt(
   ];
 
   const { t: studioT } = studioTranslation.scopedT(locale);
+  const { t: chatT } = uncensoredChatTranslation.scopedT(locale);
+  const { t: abliteratedT } = abliteratedChatTranslation.scopedT(locale);
   const pages = [
+    link(chatT("title"), page("/story/uncensored-ai"), chatT("description")),
+    link(
+      abliteratedT("title"),
+      page("/story/abliterated-ai-chat"),
+      abliteratedT("description"),
+    ),
     link(studioT("studio"), page("/create")),
     ...CREATE_KINDS.map((kind) =>
       link(studioT(`kinds.${kind}.title`), page(`/create/${kind}`)),

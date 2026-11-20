@@ -2,26 +2,33 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Modelli IA abliterati e senza censura: tre tipi a confronto",
+    title: "Modelli IA abliterati e modelli senza censura",
     description:
-      "Abliterazione, fine-tuning o una visione del mondo propria. Cosa cambia nei tre tipi di IA senza censura, come distinguerli in dieci minuti e come riconoscerli su {{appName}}.",
+      "Scopri cosa cambia con l’abliterazione, come si distingue dal fine-tuning e come confrontare una variante abliterata con il suo modello di base.",
     category: "Guida ai modelli",
     imageAlt: "Tre tipi di modelli IA senza censura a confronto",
     keywords:
-      "abliterazione e IA senza censura, cos’è un modello abliterato, abliteration, LLM abliterato, modelli IA senza censura, fine-tuning senza censura, chat IA senza censura, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, Kimi K3.1 Pro Uncensored, UncensoredLM, {{appName}}",
+      "abliterazione e IA senza censura, cos’è un modello abliterato, abliteration, LLM abliterato, modelli IA senza censura, fine-tuning senza censura, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, Kimi K3.1 Pro Uncensored, UncensoredLM, {{appName}}",
   },
   hero: {
     backToBlog: "Torna al blog",
     category: "Guida ai modelli",
     readTime: "8 minuti di lettura",
     title:
-      "Tre tipi di IA senza censura: abliterazione, fine-tuning e visione del mondo propria.",
+      "Come si distinguono i modelli abliterati dagli altri modelli senza censura?",
     subtitle:
-      "I {{uncensoredCount}} modelli senza censura su {{appName}}, divisi per metodo. Cosa cambia, cosa resta e come distinguerli con una prova di dieci minuti.",
+      "Scopri come la modifica dei pesi può influire sui rifiuti, sullo stile e sulla precisione. Confronta l’abliterazione, il fine-tuning e l’approccio di {{ownName}}.",
   },
   intro: {
-    lead: "Due modelli si dicono «senza censura». Fai la stessa domanda politica a entrambi. Il primo risponde come gli ha insegnato il suo laboratorio. Il secondo sostiene la posizione opposta. Stessa etichetta, modelli diversi.",
-    p2: "Ci sono tre modi per far sì che un modello IA smetta di rifiutare le domande. Il risultato cambia in ogni caso. Questa guida spiega i tre metodi, mostra come sono nati i nostri modelli, confronta tre modelli aperti con le loro versioni senza censura e ti propone una prova da fare in chat.",
+    lead: "Un LLM abliterated è un modello linguistico i cui pesi sono stati modificati per ridurre i rifiuti appresi. Deriva da un modello esistente, quindi può conservarne parte delle conoscenze e dello stile.",
+    p2: "«Senza censura» è una definizione più ampia. Comprende i modelli abliterated, quelli sottoposti a fine-tuning per rispondere più liberamente e quelli addestrati per offrire un altro punto di vista, come {{ownName}}.",
+  },
+  online: {
+    title: "Prova un modello abliterated online",
+    directoryLink: "Vedi i modelli abliterati disponibili in chat",
+    guideLink: "Scopri la chat IA e i modelli senza censura",
+    compare:
+      "Su {{appName}}, apri la scheda del modello per vedere la finestra di contesto, le funzionalità e il costo stimato prima di iniziare una chat. Se trovi entrambe le varianti, confronta la versione abliterated con il modello di base.",
   },
   label: {
     title: "Perché «senza censura» da solo dice poco",
@@ -33,11 +40,11 @@ export const translations: typeof enTranslations = {
     intro: "Dall’intervento più leggero al più radicale.",
     abliterated: {
       title: "1. Abliterazione: il rifiuto viene rimosso dai pesi",
-      how: "Una ricerca del 2024 ha mostrato che i rifiuti nei modelli di chat dipendono da un’unica direzione all’interno del modello. L’abliterazione la misura confrontando le reazioni alle richieste rifiutate e a quelle a cui il modello risponde. Poi la rimuove dai pesi. Senza nuovi dati e senza ripetere l’addestramento.",
+      how: "L’abliteration modifica i pesi del modello per ridurre i rifiuti appresi. Uno studio del 2024 ha individuato una direzione associata ai rifiuti nei modelli di chat esaminati. L’effetto della rimozione di quel segnale varia in base al modello e al prompt.",
       keeps:
-        "Restano le conoscenze, lo stile, le chiamate agli strumenti e la visione del mondo del modello di base. Il modello perde il riflesso di dire di no.",
+        "Lo stile e le conoscenze del modello di base spesso restano riconoscibili. Verifica la precisione e l’uso degli strumenti nella versione che scegli.",
       changes:
-        "I rifiuti quasi scompaiono. Sulle questioni politiche o morali continua a rispondere secondo l’impostazione del laboratorio che lo ha addestrato. Ora affronta la domanda.",
+        "Una variante abliterated può rispondere a richieste che il modello di base rifiuta. L’effetto dipende dal modello e dal prompt.",
     },
     fineTuned: {
       title: "2. Fine-tuning: un addestramento aggiuntivo per rispondere",
@@ -57,7 +64,7 @@ export const translations: typeof enTranslations = {
         "Cambiano le risposte stesse. Fai una domanda politica e otterrai posizioni che i modelli tradizionali non ti offrono, neppure con i filtri rimossi.",
     },
     callout:
-      "I modelli abliterati e quelli con fine-tuning smettono di evitare le domande. Rispondono mantenendo la stessa visione del mondo. {{ownName}} ha una visione propria. Scegli i primi per mantenere le capacità e ridurre i rifiuti. Scegli il secondo per ascoltare l’altra parte.",
+      "Il metodo indica dove è intervenuto lo sviluppatore. Usa il confronto qui sotto per capire cosa cambia con i tuoi prompt.",
     sources: {
       paper:
         "Studio: Refusal in language models is mediated by a single direction (arXiv)",
@@ -65,12 +72,12 @@ export const translations: typeof enTranslations = {
     },
   },
   ours: {
-    title: "Come sono fatti i nostri modelli",
+    title: "Altri modelli senza censura",
     intro:
-      "Dal catalogo aggiornato di {{appName}}: tutti i modelli senza censura attualmente disponibili, divisi per metodo. Indichiamo il metodo quando il fornitore lo documenta.",
+      "Gli altri modelli senza censura su {{appName}} sono raggruppati per metodo dichiarato dal fornitore. Se il fornitore non lo specifica, il metodo resta sconosciuto.",
     abliterated: {
-      title: "Abliterati ({{count}})",
-      body: "Modelli tradizionali e aperti da cui è stata rimossa la direzione del rifiuto. Tra i modelli senza censura sono i più versatili per ragionamento, codice e strumenti.",
+      title: "Modelli abliterated disponibili ({{count}})",
+      body: "Per codice e analisi, verifica che il modello possa usare strumenti. Per chat lunghe e narrativa, confronta le finestre di contesto.",
     },
     fineTuned: {
       title: "Con fine-tuning ({{count}})",
@@ -86,9 +93,9 @@ export const translations: typeof enTranslations = {
     },
   },
   pairs: {
-    title: "Lo stesso modello con e senza filtro",
+    title: "Modelli di base e varianti senza censura",
     intro:
-      "Tre modelli aperti accanto alle relative versioni senza censura. Stesso laboratorio, stessa base. Cambiano i rifiuti e il prezzo.",
+      "Confronta i modelli di base e le versioni senza censura per metodo, finestra di contesto e costo stimato per messaggio.",
     colBase: "Modello di base",
     colUncensored: "Versione senza censura",
     colMethod: "Metodo",
@@ -113,7 +120,7 @@ export const translations: typeof enTranslations = {
     steps: {
       refusal: {
         title: "La prova del rifiuto",
-        body: "Fai una domanda che il modello di base evita: una domanda medica diretta, una scena cupa o un’analisi di sicurezza. Un modello senza censura dovrebbe rispondere. Se rifiuta ancora o riempie la risposta di avvertenze, i filtri sono cambiati poco.",
+        body: "Prova una richiesta innocua su cui il modello di base esita, per esempio una scena di narrativa cupa. Confronta quanto sono dirette le risposte. Una sola risposta dice poco sul metodo usato.",
       },
       voice: {
         title: "La prova della voce",
@@ -158,19 +165,23 @@ export const translations: typeof enTranslations = {
     title: "Domande frequenti",
     whatIs: {
       q: "Cos’è un modello abliterato?",
-      a: "È un modello da cui è stata rimossa la direzione del rifiuto nei pesi. I ricercatori hanno scoperto che i rifiuti passano per quella direzione. L’abliterazione la misura e la elimina senza ripetere l’addestramento. Il modello mantiene le sue conoscenze e la sua visione del mondo e smette di rifiutare le richieste.",
+      a: "Un modello abliterated è un modello linguistico esistente i cui pesi sono stati modificati per ridurre i rifiuti.",
     },
     difference: {
       q: "Che differenza c’è tra un modello abliterato e uno senza censura?",
       a: "«Senza censura» è il comportamento: il modello risponde. L’abliterazione è un metodo per ottenerlo. Altri metodi sono il fine-tuning per ridurre i rifiuti e l’addestramento su materiali diversi, come in {{ownName}}. Su {{appName}}, {{abliteratedCount}} modelli senza censura sono abliterati e {{fineTunedCount}} hanno ricevuto un fine-tuning.",
     },
+    identify: {
+      q: "Come riconosco un modello IA abliterato?",
+      a: "Controlla la scheda del modello o le note di rilascio. Nel catalogo di {{appName}}, la dicitura «abliterato» si basa sulla documentazione del fornitore.",
+    },
     worse: {
-      q: "I modelli abliterati sono meno capaci degli originali?",
-      a: "A volte, di poco. Rimuovere la direzione del rifiuto può ridurre l’accuratezza. Un altro ciclo di addestramento può recuperarne gran parte. Nella maggior parte dei compiti conservi i punti di forza del modello di base. Provali entrambi con una tua richiesta.",
+      q: "L’abliteration può influire sulla qualità del modello?",
+      a: "Sì. Modificare i pesi può incidere sulla precisione, sullo stile e su altre capacità. Confronta la variante specifica con il modello di base usando lo stesso compito.",
     },
     truly: {
-      q: "Quale modello è davvero senza censura?",
-      a: "I modelli abliterati e quelli con fine-tuning smettono di rifiutare le richieste e mantengono una visione del mondo tradizionale. {{ownName}} è addestrato su libri e documenti banditi dall’Internet mainstream e ha opinioni politiche controcorrente. Dipende da cosa cerchi: risposte dirette o una prospettiva diversa.",
+      q: "{{ownName}} è un modello abliterated?",
+      a: "{{ownName}} è in una categoria a parte. Lo sviluppatore lo descrive come un modello addestrato su fonti diverse per offrire un’altra prospettiva. I modelli abliterated qui sono varianti di modelli esistenti, modificate per ridurre i rifiuti.",
     },
     free: {
       q: "Posso provare gratis i modelli senza censura?",

@@ -2,26 +2,33 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Modèle abliteré ou non censuré : les 3 types d'IA expliqués",
+    title: "Modèles abliterated et IA non censurée",
     description:
-      "Abliteré, fine-tuné ou doté de sa propre vision du monde : ce que change chaque type de modèle d'IA non censuré, comment les distinguer en dix minutes, et quel modèle de {{appName}} relève de quel type.",
+      "Découvrez ce que l’abliteration change dans un modèle de langage, en quoi elle diffère du fine-tuning et comment comparer une variante à son modèle de base.",
     category: "Guide des modèles",
     imageAlt: "Les trois types de modèles d'IA non censurés, expliqués",
     keywords:
-      "modèle abliteré, abliteré vs non censuré, qu'est-ce qu'un modèle abliteré, abliteration expliquée, LLM abliteré, modèles d'IA non censurés, IA non censurée, fine-tune non censuré, chat IA non censuré, IA sans censure, abliterated vs uncensored, what is an abliterated model, abliterated LLM, uncensored AI models, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, Kimi K3.1 Pro Uncensored, UncensoredLM, {{appName}}",
+      "modèle abliteré, abliteré vs non censuré, qu'est-ce qu'un modèle abliteré, abliteration expliquée, LLM abliteré, modèles d'IA non censurés, IA non censurée, fine-tune non censuré, IA sans censure, abliterated vs uncensored, what is an abliterated model, abliterated LLM, uncensored AI models, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, Kimi K3.1 Pro Uncensored, UncensoredLM, {{appName}}",
   },
   hero: {
     backToBlog: "Retour au blog",
     category: "Guide des modèles",
     readTime: "8 min de lecture",
     title:
-      "Abliteré, fine-tuné ou sa propre vision du monde. Trois sortes d'IA non censurée.",
+      "Qu’est-ce qui distingue les modèles abliterated des autres modèles non censurés ?",
     subtitle:
-      "{{uncensoredCount}} modèles non censurés sur {{appName}}, classés selon la façon dont ils ont perdu leur filtre. Ce que chaque méthode change, ce qu'elle laisse intact, et un test de dix minutes pour les distinguer.",
+      "Voyez comment la modification des poids peut agir sur les refus, le style et la précision. Comparez l’abliteration, le fine-tuning et l’approche suivie pour {{ownName}}.",
   },
   intro: {
-    lead: "Deux modèles affichent tous les deux « non censuré ». L'un répond à votre question politique avec la voix du labo qui l'a construit. L'autre défend la position inverse. Même étiquette, machines différentes.",
-    p2: "Il existe trois façons d'empêcher un modèle d'IA de refuser, et elles donnent trois modèles différents. Ce guide explique chaque méthode simplement, montre comment chacun de nos modèles a été fabriqué, place trois modèles ouverts à côté de leur version non censurée et vous donne un test à faire vous-même.",
+    lead: "Un LLM abliterated est un modèle de langage dont les poids ont été modifiés pour qu’il oppose moins souvent un refus. Il dérive d’un modèle existant et peut garder une partie de ses connaissances et de son style.",
+    p2: "« Non censuré » est un terme plus large. Il regroupe des modèles abliterated, des modèles affinés pour répondre plus librement et des modèles entraînés à proposer un autre point de vue, comme {{ownName}}.",
+  },
+  online: {
+    title: "Essayer un modèle abliterated en ligne",
+    directoryLink: "Voir les modèles abliterated disponibles dans le chat",
+    guideLink: "Découvrir le chat IA et les modèles non censurés",
+    compare:
+      "Sur {{appName}}, la fiche de chaque modèle indique sa fenêtre de contexte, ses fonctions et le coût estimé avant de lancer le chat. Si le modèle d’origine est disponible, comparez les deux versions.",
   },
   label: {
     title: "Pourquoi « non censuré » ne dit presque rien",
@@ -33,11 +40,11 @@ export const translations: typeof enTranslations = {
     intro: "Du plus petit changement au plus grand.",
     abliterated: {
       title: "1. Abliteré : le refus retiré des poids",
-      how: "Une recherche de 2024 a montré que le refus, dans les modèles de chat, passe par une seule direction à l'intérieur du modèle. L'abliteration mesure cette direction en comparant les réactions du modèle aux prompts qu'il refuse et à ceux auxquels il répond, puis la retire des poids. Aucune nouvelle donnée d'entraînement, aucun réentraînement.",
+      how: "L’abliteration consiste à modifier les poids du modèle pour réduire les refus appris. Une étude de 2024 a identifié une direction associée aux refus dans les modèles de chat testés. L’effet de la suppression de ce signal varie selon le modèle et la requête.",
       keeps:
-        "Conserve : les connaissances du modèle de base, son style d'écriture, ses appels d'outils et sa vision du monde. Le même modèle, sans le réflexe de dire non.",
+        "Le style et les connaissances du modèle de départ restent souvent reconnaissables. Vérifiez la précision et l’usage des outils sur la version choisie.",
       changes:
-        "Change : les refus s'arrêtent presque tous. Sur les questions politiques ou morales, il répond toujours comme son labo d'origine l'a entraîné à le faire, l'esquive en moins.",
+        "Une variante abliterated peut répondre à des requêtes que le modèle de départ refuse. Le résultat dépend du modèle et de la requête.",
     },
     fineTuned: {
       title: "2. Fine-tuné : réentraîné pour répondre",
@@ -56,7 +63,7 @@ export const translations: typeof enTranslations = {
         "Change : les réponses elles-mêmes. Interrogez-le sur la politique et vous obtenez des positions que les modèles grand public ne vous donneront pas, débridés ou non.",
     },
     callout:
-      "En bref. Les modèles abliterés et fine-tunés sont des modèles grand public qui ont arrêté d'esquiver : même vision du monde, ils répondent, c'est tout. {{ownName}} est de l'autre sorte : une vision du monde différente. Prenez les premiers pour la puissance sans les refus. Prenez le second pour l'autre côté du débat.",
+      "La méthode indique où le développeur est intervenu. Le comparatif ci-dessous montre comment tester les différences sur vos propres requêtes.",
     sources: {
       paper:
         "Article : Refusal in language models is mediated by a single direction (arXiv)",
@@ -64,12 +71,12 @@ export const translations: typeof enTranslations = {
     },
   },
   ours: {
-    title: "Lequel de nos modèles est de quel type",
+    title: "Autres modèles non censurés",
     intro:
-      "En direct depuis notre registre de modèles : tous les modèles non censurés de {{appName}} en ce moment, regroupés selon leur fabrication. Nous n'indiquons une méthode que lorsque le fournisseur du modèle la documente.",
+      "Les autres modèles non censurés sur {{appName}} sont classés selon la méthode indiquée par leur fournisseur. Si celui-ci ne la publie pas, nous la laissons indéterminée.",
     abliterated: {
-      title: "Abliterés ({{count}})",
-      body: "Des modèles grand public et ouverts dont on a retiré la direction du refus. Le plus de puissance parmi les non censurés : raisonnement, code, outils.",
+      title: "Modèles abliterated disponibles ({{count}})",
+      body: "Pour coder ou analyser, vérifiez la prise en charge des outils. Pour les longues conversations ou la fiction, comparez les fenêtres de contexte.",
     },
     fineTuned: {
       title: "Fine-tunés ({{count}})",
@@ -85,9 +92,9 @@ export const translations: typeof enTranslations = {
     },
   },
   pairs: {
-    title: "Le même modèle, filtre activé et désactivé",
+    title: "Modèles d’origine et variantes non censurées",
     intro:
-      "Trois modèles ouverts à côté de leur version non censurée. Même labo, même base. Ce qui change : les refus, et le prix.",
+      "Comparez les modèles de base et leurs variantes non censurées selon la méthode, la fenêtre de contexte et le coût estimé par message.",
     colBase: "Modèle de base",
     colUncensored: "Version non censurée",
     colMethod: "Méthode",
@@ -112,7 +119,7 @@ export const translations: typeof enTranslations = {
     steps: {
       refusal: {
         title: "Le test du refus",
-        body: "Demandez ce que le modèle de base esquive : une question médicale franche, une scène sombre, un rapport de sécurité. Tout modèle non censuré doit répondre. S'il refuse encore ou noie la réponse sous les avertissements, la décensure est superficielle.",
+        body: "Essayez une requête sans danger face à laquelle le modèle de base hésite, comme l’écriture d’une scène de fiction sombre. Comparez la franchise des réponses. Une seule réponse renseigne peu sur la méthode employée.",
       },
       voice: {
         title: "Le test de la voix",
@@ -157,19 +164,23 @@ export const translations: typeof enTranslations = {
     title: "FAQ",
     whatIs: {
       q: "Qu'est-ce qu'un modèle abliteré ?",
-      a: "Un modèle dont la direction du refus a été retirée des poids. Des chercheurs ont découvert que le refus passe par une seule direction à l'intérieur du modèle. L'abliteration la mesure et la coupe, sans réentraînement. Le modèle garde ses connaissances et sa vision du monde, et cesse de refuser.",
+      a: "Un modèle abliterated est un modèle de langage existant dont les poids ont été modifiés pour réduire les refus.",
     },
     difference: {
       q: "Quelle différence entre abliteré et non censuré ?",
       a: "Non censuré, c'est le comportement : le modèle répond. Abliteré, c'est une façon d'y arriver. Les autres : un fine-tune de décensure, ou un entraînement sur un autre matériau, comme {{ownName}}. Sur {{appName}}, {{abliteratedCount}} modèles non censurés sont abliterés et {{fineTunedCount}} sont fine-tunés.",
     },
+    identify: {
+      q: "Comment savoir si un modèle d’IA est abliterated ?",
+      a: "Consultez la fiche du modèle ou les notes de version. Dans le catalogue de {{appName}}, la mention « abliterated » s’appuie sur la documentation du fournisseur.",
+    },
     worse: {
-      q: "Les modèles abliterés sont-ils plus bêtes que l'original ?",
-      a: "Un peu, parfois. Retirer la direction du refus peut coûter un peu d'exactitude, et une passe d'entraînement supplémentaire en récupère l'essentiel. Pour la plupart des tâches, vous gardez les points forts du modèle de base. Comparez les deux sur votre propre prompt.",
+      q: "L’abliteration peut-elle modifier la qualité d’un modèle ?",
+      a: "Oui. La modification des poids peut agir sur la précision, le style et d’autres capacités. Comparez la variante exacte au modèle d’origine sur la même tâche.",
     },
     truly: {
-      q: "Quel modèle non censuré l'est vraiment ?",
-      a: "Les modèles abliterés et fine-tunés cessent de refuser mais gardent une vision du monde grand public. {{ownName}} est entraîné sur des livres et des documents bannis de l'internet grand public : il a donc ses propres opinions politiques à contre-courant. Lequel est « vraiment » non censuré dépend de ce que vous voulez : des réponses, ou un autre regard.",
+      q: "{{ownName}} est-il un modèle abliterated ?",
+      a: "{{ownName}} est classé à part. Son développeur décrit un modèle entraîné sur d’autres sources pour proposer un autre point de vue. Les modèles abliterated de cette page sont des variantes de modèles existants, modifiées pour réduire les refus.",
     },
     free: {
       q: "Puis-je essayer les modèles non censurés gratuitement ?",

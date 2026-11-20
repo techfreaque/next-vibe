@@ -38,6 +38,7 @@ import {
   ArticleSection,
 } from "../../_shared/article";
 import { Callout, CardLink, Cta } from "../../_shared/marketing";
+import { scopedTranslation as uncensoredChatTranslation } from "../../uncensored-ai/i18n";
 import {
   allPlansText,
   apiText,
@@ -134,6 +135,7 @@ export function TanstackPage({
   params,
 }: HubPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: chatT } = uncensoredChatTranslation.scopedT(locale);
   const checked = formatCompareDate(COMPARE_CHECKED_DATE, locale);
   const stats = { ...params, count: PLATFORM_KEYS.length, date: checked };
   const back = {
@@ -395,6 +397,10 @@ export function TanstackPage({
             ]}
           />
           <Div className="flex flex-col">
+            <CardLink
+              href={`/${locale}/story/uncensored-ai`}
+              label={chatT("title")}
+            />
             <CardLink
               href={`/${locale}/models`}
               label={t("hub.us.modelsLink", stats)}

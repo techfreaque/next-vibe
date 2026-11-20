@@ -1,6 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
+import {
+  ApiProvider,
+  apiProviderDisplayNames,
+} from "next-vibe/agent/models/models";
 import { ContentLevel } from "next-vibe/agent/skills/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
@@ -145,6 +149,27 @@ describe("uncensored kinds", () => {
     );
     expect(uncensoredKind(factsOf(ChatModelId.GAB_AI_ARYA))).toBe("unlisted");
     expect(uncensoredKind(factsOf(ChatModelId.CLAUDE_SONNET_5_5))).toBeNull();
+  });
+
+  test("uses only relay routes when the instance forces the relay", () => {
+    const availability = {
+      ...ALL,
+      unbottledSystem: true,
+      unbottledForce: true,
+    };
+    expect(
+      getModelFacts(ChatModelId.KIMI_K3_1_PRO_UNCENSORED, ALL),
+    ).not.toBeNull();
+    expect(
+      getModelFacts(ChatModelId.KIMI_K3_1_PRO_UNCENSORED, availability),
+    ).toBeNull();
+    const relayModel = getModelFacts(
+      ChatModelId.MIMO_V2_6_FLASH_ABLITERATED,
+      availability,
+    );
+    expect(relayModel?.providers).toEqual([
+      apiProviderDisplayNames[ApiProvider.UNBOTTLED],
+    ]);
   });
 });
 

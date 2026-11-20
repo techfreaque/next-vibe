@@ -2,10 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "{{modelCount}} Modelle, eine API: OpenAI- und Anthropic-kompatibel | {{appName}}",
+    title: "OpenRouter-Alternative | OpenAI- und Anthropic-API | {{appName}}",
     description:
-      "Ein {{appName}}-Key für {{modelCount}} Modelle. OpenAI Chat Completions, Responses API und Anthropic Messages an einem Endpoint. Läuft mit Claude Code und Codex CLI. Dazu {{mediaModelCount}} Bild-, Sprach-, Video- und Musikmodelle im OpenAI-Format.",
+      "Vergleiche {{appName}} mit OpenRouter. Nutze dein OpenAI-SDK mit einer API für {{modelCount}} Chatmodelle und {{mediaModelCount}} Medienmodelle.",
     category: "Entwickler-Guide",
     imageAlt: "{{appName}}: ein API-Endpoint für jedes Modell",
     keywords:
@@ -17,7 +16,7 @@ export const translations: typeof enTranslations = {
     readTime: "11 Min. Lesezeit",
     title: "Ein API-Key. {{modelCount}} Modelle. Drei Wire-Formate.",
     subtitle:
-      "{{appName}} spricht OpenAI Chat Completions, die OpenAI Responses API und die Anthropic Messages API an einem Endpoint. Dein SDK bleibt. Deine Tools bleiben. Nur die Basis-URL ändert sich. Derselbe Key steuert auch {{mediaModelCount}} Bild-, Sprach-, Video- und Musikmodelle.",
+      "Nutze Chat Completions, Responses oder Anthropic Messages mit einem {{appName}}-Schlüssel. Behalte dein SDK, ändere Basis-URL und Schlüssel und prüfe die Modell-ID. Derselbe Schlüssel funktioniert auch für {{mediaModelCount}} Medienmodelle.",
   },
   intro: {
     lead: "GPT bei OpenAI, Claude bei Anthropic, Gemini bei Google. Drei SDKs, drei Keys, drei Rechnungen, drei Dashboards. Oder schlimmer: Dein Lieblingstool spricht nur ein Format und bekommt damit nur die Modelle eines Anbieters.",
@@ -48,6 +47,19 @@ export const translations: typeof enTranslations = {
     anthropicBaseUrlLabel: "Anthropic-Basis-URL",
     anthropicBaseUrlNote:
       "Für die Anthropic-SDKs und Claude Code. Dieselbe URL ohne /v1: /v1/messages hängen sie selbst an.",
+  },
+  switching: {
+    title: "Von OpenRouter zu {{appName}} wechseln",
+    intro:
+      "Du suchst eine OpenRouter-Alternative? Beide Dienste akzeptieren Chat-Completions-Anfragen im OpenAI-Format. Du kannst dein OpenAI-SDK weiterverwenden und seine Konfiguration anpassen.",
+    key: "Aktiviere den API-Zugang in deinem {{appName}}-Konto und erstelle in den Einstellungen einen neuen API-Schlüssel.",
+    baseUrl:
+      "Setze im OpenAI-Client die oben angegebene Basis-URL für deine Sprache ein, einschließlich /v1.",
+    model:
+      "Rufe GET /v1/models in der neuen API auf und übernimm eine der ausgegebenen IDs in das Feld model.",
+    routing:
+      "Prüfe vor dem Wechsel alle OpenRouter-spezifischen Routing-Optionen. Teste die Funktionen deiner App, etwa Streaming oder Tool-Aufrufe, mit dem gewählten Modell.",
+    openrouterDocs: "API-Referenz von OpenRouter",
   },
   samples: {
     title: "Code: dein SDK, unsere Basis-URL",
@@ -97,7 +109,7 @@ export const translations: typeof enTranslations = {
     vendor:
       "Anbieter-Schreibweisen gehen auch. Anthropic-IDs mit Datumsstempel (claude-sonnet-4-5-20250929 wird zu claude-sonnet-4.5), Versionsnummern mit Bindestrich, das Suffix -latest, das Kontext-Suffix [1m] und IDs mit Punkt wie gpt-5.5.",
     prefix:
-      "Provider-Präfixe wie anthropic/... oder openai/..., damit IDs im OpenRouter-Stil aus einer bestehenden Config weiterlaufen.",
+      "Die API erkennt bei unterstützten Modellen gängige Anbieterpräfixe wie anthropic/ und openai/.",
     claudeFallback:
       "Nur auf /v1/messages: Eine Claude-ID, die dein Konto nicht aufrufen kann, etwa die eingebauten IDs, die Claude Code für seine Hintergrundaufrufe schickt, fällt auf das neueste Claude derselben Familie (Opus, Sonnet oder Haiku) zurück, das du aufrufen darfst. Claude Code läuft damit ohne zusätzliche Umgebungsvariablen. Jede andere unbekannte ID liefert 404 model_not_found.",
   },
@@ -163,14 +175,14 @@ export const translations: typeof enTranslations = {
     },
     router: {
       title: "Ein Aggregator wie OpenRouter",
-      body: "Viele Modelle, Bezahlung nach Verbrauch. Offen gesagt: Viele unserer Modelle laufen über OpenRouter. Brauchst du nur reines Routing, bist du dort richtig.",
+      body: "OpenRouter bietet eine API für viele Modelle mit Anbieterauswahl und Ausweichrouten. Auch ein Teil unserer Modellanfragen läuft über OpenRouter.",
     },
     here: {
       title: "{{appName}}",
       body: "Ein Key für drei Wire-Formate: Chat Completions, Responses und Anthropic Messages samt count_tokens. Claude Code und Codex CLI verbinden sich ohne Proxy. Unzensierte Modelle stehen neben den Mainstream-Modellen, hinter einer einmaligen Bestätigung ab 18. Dasselbe Guthaben zahlt Chat-App und API, aus Abo-Credits oder Paketen. Und {{appName}} ist Open Source und selbst hostbar.",
     },
     verdict:
-      "Unterm Strich: Ein Anbieter, dann geh direkt. Reines Routing im OpenAI-Format erledigt ein Router. Du willst Claude Code, Codex CLI und die SDKs von OpenAI und Anthropic an einem Key, unzensierte Modelle inklusive, und eine Chat-App auf demselben Guthaben? Genau dafür haben wir das gebaut.",
+      "Vergleiche die Modellkataloge und die Routing-Funktionen, die du brauchst. Wenn du unzensierte Modelle per API aufrufen und dasselbe Guthaben im Chat nutzen willst, prüfe, welche Modelle dein {{appName}}-Schlüssel aufrufen kann.",
   },
   limits: {
     title: "Grenzen, die du kennen solltest",
@@ -206,7 +218,11 @@ export const translations: typeof enTranslations = {
     title: "FAQ",
     openrouter: {
       q: "Ist {{appName}} eine OpenRouter-Alternative?",
-      a: "Für viele Zwecke ja: ein Key, viele Modelle, Abrechnung pro Token. Die Unterschiede: {{appName}} spricht die Anthropic Messages API und die OpenAI Responses API nativ, nicht nur Chat Completions. Es gibt unzensierte Modelle. Und die Chat-App läuft auf demselben Guthaben. Viele unserer Modelle laufen im Hintergrund über OpenRouter.",
+      a: "{{appName}} bündelt Chat Completions, Responses und Anthropic Messages unter einem Schlüssel. Nach der Altersbestätigung ab 18 kannst du unzensierte Modelle aufrufen. Chat und API greifen auf dasselbe Guthaben zu. Manche Anfragen laufen im Hintergrund über OpenRouter.",
+    },
+    openrouterModels: {
+      q: "Kann ich beim Wechsel meine OpenRouter-Modell-IDs behalten?",
+      a: "Einige IDs mit Anbieterpräfix funktionieren, wenn das entsprechende Modell verfügbar ist. Prüfe die Verfügbarkeit mit GET /v1/models und übernimm die exakte ID aus der Antwort der neuen API.",
     },
     claudeCode: {
       q: "Kann ich Claude Code mit Nicht-Claude-Modellen nutzen?",
@@ -214,7 +230,7 @@ export const translations: typeof enTranslations = {
     },
     sdk: {
       q: "Brauche ich ein neues SDK?",
-      a: "Nein. Nutz die offiziellen SDKs von OpenAI und Anthropic. Basis-URL und Key ändern, sonst nichts.",
+      a: "Nutze das offizielle OpenAI- oder Anthropic-SDK. Setze die passende Basis-URL, hinterlege deinen API-Schlüssel und wähle eine verfügbare Modell-ID.",
     },
     free: {
       q: "Gibt es einen kostenlosen API-Tarif?",

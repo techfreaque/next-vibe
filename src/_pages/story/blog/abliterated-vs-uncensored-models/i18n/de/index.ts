@@ -2,26 +2,33 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Abliteriert vs. unzensiert: 3 Arten unzensierter KI",
+    title: "Abliterierte und unzensierte KI-Modelle im Vergleich",
     description:
-      "Abliteriert, nachtrainiert oder mit eigenem Weltbild: Was jede Art unzensierter KI verändert, wie du sie in zehn Minuten auseinanderhältst und welches Modell auf {{appName}} welche Art ist.",
+      "Was verändert Abliteration an einem Sprachmodell? Erfahre, wie sie sich vom Fine-Tuning unterscheidet und wie du eine Variante mit ihrem Basismodell vergleichst.",
     category: "Modell-Ratgeber",
     imageAlt: "Drei Arten unzensierter KI-Modelle, erklärt",
     keywords:
-      "abliteriert vs. unzensiert, was ist abliteriert, abliterierte Modelle, Abliteration erklärt, abliteriertes LLM, unzensierte KI-Modelle, unzensierter Fine-Tune, unzensierter KI-Chat, KI ohne Filter, abliterated vs uncensored, what is an abliterated model, abliterated LLM, uncensored AI models, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, Kimi K3.1 Pro Uncensored, UncensoredLM, {{appName}}",
+      "abliteriert vs. unzensiert, was ist abliteriert, abliterierte Modelle, Abliteration erklärt, abliteriertes LLM, unzensierte KI-Modelle, unzensierter Fine-Tune, KI ohne Filter, abliterated vs uncensored, what is an abliterated model, abliterated LLM, uncensored AI models, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, Kimi K3.1 Pro Uncensored, UncensoredLM, {{appName}}",
   },
   hero: {
     backToBlog: "Zurück zum Blog",
     category: "Modell-Ratgeber",
     readTime: "8 Min. Lesezeit",
     title:
-      "Abliteriert, nachtrainiert oder eigenes Weltbild. Drei Arten unzensierter KI.",
+      "Was abliterierte Modelle von anderen unzensierten Modellen unterscheidet",
     subtitle:
-      "{{uncensoredCount}} unzensierte Modelle auf {{appName}}, sortiert danach, wie sie ihren Filter verloren haben. Was jede Methode ändert, was sie unberührt lässt, und ein Zehn-Minuten-Test, mit dem du sie auseinanderhältst.",
+      "Wie wirken sich geänderte Modellgewichte auf Ablehnungen, Schreibstil und Genauigkeit aus? Vergleiche Abliteration, Fine-Tuning und den Ansatz hinter {{ownName}}.",
   },
   intro: {
-    lead: "Zwei Modelle, beide „unzensiert“. Das eine beantwortet deine politische Frage mit der Stimme des Labors, das es gebaut hat. Das andere vertritt die Gegenseite. Gleiches Etikett, verschiedene Maschinen.",
-    p2: "Es gibt drei Wege, einem KI-Modell das Verweigern abzugewöhnen. Sie ergeben drei verschiedene Modelle. Dieser Ratgeber erklärt jede Methode ohne Fachchinesisch, zeigt, welches unserer Modelle wie entstanden ist, stellt drei offene Modelle neben ihre unzensierten Builds und gibt dir einen Test, den du selbst machen kannst.",
+    lead: "Bei einem abliterierten LLM wurden die Modellgewichte gezielt verändert, damit es Anfragen seltener ablehnt. Es baut auf einem bestehenden Sprachmodell auf. Wissen und Schreibstil können dir deshalb vertraut vorkommen.",
+    p2: "„Unzensiert“ ist der Oberbegriff. Er umfasst abliterierte Modelle, Modelle mit einem Fine-Tuning für direktere Antworten und Modelle wie {{ownName}}, die auf eine andere Sichtweise trainiert wurden.",
+  },
+  online: {
+    title: "Ein abliteriertes Modell online testen",
+    directoryLink: "Abliterierte Modelle für den Browser-Chat ansehen",
+    guideLink: "Unzensierten KI-Chat und Modelle entdecken",
+    compare:
+      "Öffne auf {{appName}} die Modellseite. Dort findest du Kontextfenster, Funktionen und geschätzte Kosten, bevor du einen Chat startest. Wenn beide Varianten verfügbar sind, vergleiche den abliterierten Build mit seinem Basismodell.",
   },
   label: {
     title: "Warum „unzensiert“ allein wenig verrät",
@@ -33,11 +40,11 @@ export const translations: typeof enTranslations = {
     intro: "Von der kleinsten Änderung zur größten.",
     abliterated: {
       title: "1. Abliteriert: die Verweigerung aus den Gewichten geschnitten",
-      how: "Forschung aus dem Jahr 2024 hat gezeigt: Verweigerung läuft in Chatmodellen über eine einzige Richtung im Modell. Abliteration misst diese Richtung, indem sie vergleicht, wie das Modell auf Prompts reagiert, die es verweigert, und auf solche, die es beantwortet. Dann entfernt sie die Richtung aus den Gewichten. Keine neuen Trainingsdaten, kein Neutraining.",
+      how: "Abliteration verändert die Gewichte eines Modells, damit es Anfragen seltener ablehnt. Eine Studie von 2024 fand in den untersuchten Chatmodellen eine Richtung, die mit diesem Verhalten zusammenhängt. Wie stark das Entfernen dieses Signals wirkt, hängt vom Modell und vom Prompt ab.",
       keeps:
-        "Bleibt: das Wissen des Basismodells, sein Schreibstil, Tool-Calling und Weltbild. Dasselbe Modell, nur ohne den Reflex, Nein zu sagen.",
+        "Schreibstil und Wissen des Basismodells bleiben oft erkennbar. Prüfe Genauigkeit und Tool-Nutzung bei der konkreten Variante.",
       changes:
-        "Ändert sich: Verweigerungen hören größtenteils auf. Bei politischen oder moralischen Fragen antwortet es weiter so, wie sein Basislabor es trainiert hat, nur ohne Ausweichen.",
+        "Ein abliterierter Build kann Prompts beantworten, die das Basismodell ablehnt. Das hängt vom Modell und vom Prompt ab.",
     },
     fineTuned: {
       title: "2. Nachtrainiert: neu trainiert, um zu antworten",
@@ -56,7 +63,7 @@ export const translations: typeof enTranslations = {
         "Ändert sich: die Antworten selbst. Frag nach Politik, und du bekommst Positionen, die dir Mainstream-Modelle nicht geben, entsperrt oder nicht.",
     },
     callout:
-      "Kurz gesagt. Abliterierte und nachtrainierte Modelle sind Mainstream-Modelle, die nicht mehr ausweichen: gleiches Weltbild, sie antworten nur. {{ownName}} ist die andere Art: ein anderes Weltbild. Nimm die erste für Leistung ohne Verweigerung. Nimm die zweite für die andere Seite des Arguments.",
+      "Die Methode zeigt, wo der Entwickler angesetzt hat. Mit dem Vergleich unten findest du heraus, was sich bei deinen Prompts ändert.",
     sources: {
       paper:
         "Paper: Refusal in language models is mediated by a single direction (arXiv)",
@@ -64,12 +71,12 @@ export const translations: typeof enTranslations = {
     },
   },
   ours: {
-    title: "Welches unserer Modelle welche Art ist",
+    title: "Weitere unzensierte Modelle",
     intro:
-      "Live aus unserem Modellregister: jedes unzensierte Modell, das gerade auf {{appName}} läuft, gruppiert nach Herstellungsweg. Eine Methode nennen wir nur, wenn der Anbieter des Modells sie dokumentiert.",
+      "Wir gruppieren die übrigen unzensierten Modelle auf {{appName}} nach der vom Anbieter dokumentierten Methode. Fehlt die Angabe, bleibt die Methode offen.",
     abliterated: {
-      title: "Abliteriert ({{count}})",
-      body: "Mainstream- und offene Modelle, denen die Verweigerungsrichtung entfernt wurde. Die meiste Leistung im unzensierten Angebot: Reasoning, Code, Tools.",
+      title: "Aktuell verfügbare abliterierte Modelle ({{count}})",
+      body: "Prüfe für Code oder Analysen, ob das Modell Tools aufrufen kann. Für lange Chats oder Geschichten zählt das Kontextfenster.",
     },
     fineTuned: {
       title: "Nachtrainiert ({{count}})",
@@ -85,9 +92,9 @@ export const translations: typeof enTranslations = {
     },
   },
   pairs: {
-    title: "Dasselbe Modell, Filter an und aus",
+    title: "Basismodelle und unzensierte Varianten im Vergleich",
     intro:
-      "Drei offene Modelle neben ihren unzensierten Builds. Gleiches Labor, gleiche Basis. Was sich ändert: die Verweigerungen und der Preis.",
+      "Vergleiche die Basismodelle mit ihren unzensierten Varianten anhand der Methode, des Kontextfensters und der geschätzten Kosten pro Nachricht.",
     colBase: "Basismodell",
     colUncensored: "Unzensierter Build",
     colMethod: "Methode",
@@ -112,7 +119,7 @@ export const translations: typeof enTranslations = {
     steps: {
       refusal: {
         title: "Der Verweigerungstest",
-        body: "Frag etwas, dem das Basismodell ausweicht: eine unverblümte medizinische Frage, eine düstere Szene, eine Sicherheitsanalyse. Jedes unzensierte Modell sollte antworten. Verweigert es weiter oder packt die Antwort in Warnhinweise, ist die Entzensierung oberflächlich.",
+        body: "Teste eine harmlose Aufgabe, bei der das Basismodell zögert, etwa eine düstere fiktive Szene. Vergleiche, wie direkt die Modelle antworten. Eine einzelne Antwort verrät kaum etwas über die Methode.",
       },
       voice: {
         title: "Der Stimmtest",
@@ -157,19 +164,23 @@ export const translations: typeof enTranslations = {
     title: "FAQ",
     whatIs: {
       q: "Was ist ein abliteriertes Modell?",
-      a: "Ein Modell, dem die Verweigerungsrichtung aus den Gewichten entfernt wurde. Forscher fanden heraus, dass Verweigerung über eine einzige Richtung im Modell läuft. Abliteration misst sie und schneidet sie heraus, ohne Neutraining. Das Modell behält Wissen und Weltbild und hört auf zu verweigern.",
+      a: "Ein abliteriertes Modell ist ein bestehendes Sprachmodell mit veränderten Gewichten. Dadurch lehnt es Anfragen seltener ab.",
     },
     difference: {
       q: "Was ist der Unterschied zwischen abliteriert und unzensiert?",
       a: "Unzensiert ist das Verhalten: Das Modell antwortet. Abliteriert ist ein Weg dorthin. Andere sind ein Fine-Tune zur Entzensierung oder Training mit anderem Material, wie bei {{ownName}}. Auf {{appName}} sind {{abliteratedCount}} unzensierte Modelle abliteriert und {{fineTunedCount}} nachtrainiert.",
     },
+    identify: {
+      q: "Woran erkenne ich ein abliteriertes KI-Modell?",
+      a: "Schau in die Modellkarte oder in die Versionshinweise. Im Modellkatalog von {{appName}} stützt sich die Kennzeichnung als abliteriert auf die Angaben des Anbieters.",
+    },
     worse: {
-      q: "Sind abliterierte Modelle dümmer als das Original?",
-      a: "Manchmal ein wenig. Das Entfernen der Verweigerungsrichtung kann etwas Genauigkeit kosten, eine zusätzliche Trainingsrunde holt das meiste zurück. Für die meisten Aufgaben behältst du die Stärken des Basismodells. Vergleich beide mit deinem eigenen Prompt.",
+      q: "Kann Abliteration die Modellqualität verändern?",
+      a: "Ja. Geänderte Gewichte können Genauigkeit, Stil und andere Fähigkeiten beeinflussen. Vergleiche die konkrete Variante und das Basismodell mit derselben Aufgabe.",
     },
     truly: {
-      q: "Welches unzensierte Modell ist wirklich unzensiert?",
-      a: "Abliterierte und nachtrainierte Modelle hören auf zu verweigern, behalten aber ein Mainstream-Weltbild. {{ownName}} ist trainiert mit Büchern und Dokumenten, die im Mainstream-Internet verbannt sind, und hat deshalb eigene politische Gegenpositionen. Welches „wirklich“ unzensiert ist, hängt davon ab, ob du Antworten willst oder eine andere Sicht.",
+      q: "Ist {{ownName}} ein abliteriertes Modell?",
+      a: "{{ownName}} steht in einer eigenen Gruppe. Der Entwickler beschreibt ein Modell, das mit anderem Material für eine andere Perspektive trainiert wurde. Die abliterierten Modelle hier sind Varianten bestehender Modelle, die seltener ablehnen sollen.",
     },
     free: {
       q: "Kann ich unzensierte Modelle kostenlos testen?",

@@ -86,6 +86,7 @@ describe("sitemap.xml", () => {
     );
 
     for (const locale of SEO_LOCALES) {
+      expect(urls).toContain(`${BASE}/${locale}/story/abliterated-ai-chat`);
       expect(urls).toContain(`${BASE}/${locale}/models/${chat[0]?.slug}`);
       expect(urls).toContain(`${BASE}/${locale}/models/${media[0]?.slug}`);
       expect(urls).toContain(`${BASE}/${locale}/skill/community-skill`);

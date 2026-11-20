@@ -2,26 +2,33 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Model abliterowany a model bez cenzury: 3 rodzaje AI",
+    title: "Modele AI abliterowane a modele bez cenzury",
     description:
-      "Abliterowany, fine-tunowany albo z własnym światopoglądem: co zmienia każdy rodzaj modelu AI bez cenzury, jak odróżnić je w dziesięć minut i który model na {{appName}} jest którym.",
+      "Dowiedz się, co abliteracja zmienia w modelu językowym, czym różni się od dostrajania i jak porównać zmodyfikowany model z wersją bazową.",
     category: "Przewodnik po modelach",
     imageAlt: "Trzy rodzaje modeli AI bez cenzury, wyjaśnione",
     keywords:
-      "model abliterowany, co to jest model abliterowany, abliteracja, abliterowany a bez cenzury, modele AI bez cenzury, AI bez cenzury, czat AI bez cenzury, fine-tune bez cenzury, abliterated vs uncensored, what is an abliterated model, abliterated LLM, uncensored AI models, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, Kimi K3.1 Pro Uncensored, UncensoredLM, {{appName}}",
+      "model abliterowany, co to jest model abliterowany, abliteracja, abliterowany a bez cenzury, modele AI bez cenzury, AI bez cenzury, fine-tune bez cenzury, abliterated vs uncensored, what is an abliterated model, abliterated LLM, uncensored AI models, GLM 5.3 Uncensored, DeepSeek V4.1 Flash Uncensored, Kimi K3.1 Pro Uncensored, UncensoredLM, {{appName}}",
   },
   hero: {
     backToBlog: "Wróć do bloga",
     category: "Przewodnik po modelach",
     readTime: "8 min czytania",
-    title:
-      "Abliterowany, fine-tunowany albo z własnym światopoglądem. Trzy rodzaje AI bez cenzury.",
+    title: "Czym modele abliterowane różnią się od innych modeli bez cenzury?",
     subtitle:
-      "{{uncensoredCount}} modeli bez cenzury na {{appName}}, posortowanych według tego, jak straciły filtr. Co zmienia każda metoda, czego nie rusza, i test, który w dziesięć minut pokaże ci różnicę.",
+      "Sprawdź, jak zmiana wag wpływa na odmowy, styl i trafność odpowiedzi. Porównaj abliterację, dostrajanie i metodę użytą w modelu {{ownName}}.",
   },
   intro: {
-    lead: "Dwa modele, oba „bez cenzury”. Jeden odpowiada na twoje pytanie o politykę głosem laboratorium, które go zbudowało. Drugi broni przeciwnej strony. Ta sama etykieta, zupełnie inne maszyny.",
-    p2: "Są trzy sposoby, żeby model AI przestał odmawiać, i każdy daje inny model. Ten przewodnik prosto wyjaśnia każdą metodę, pokazuje, który z naszych modeli powstał w jaki sposób, stawia trzy otwarte modele obok ich wersji bez cenzury i daje ci test, który zrobisz sam.",
+    lead: "Abliterowany LLM to model językowy, którego wagi zmieniono tak, by rzadziej odmawiał odpowiedzi. Powstaje z istniejącego modelu, więc część wiedzy i styl pisania mogą brzmieć znajomo.",
+    p2: "„Bez cenzury” to szersze pojęcie. Obejmuje modele abliterowane, modele dostrojone do swobodniejszych odpowiedzi oraz modele trenowane tak, by pokazywały inną perspektywę, jak {{ownName}}.",
+  },
+  online: {
+    title: "Wypróbuj abliterowany model online",
+    directoryLink:
+      "Zobacz modele abliterowane dostępne na czacie w przeglądarce",
+    guideLink: "Poznaj czat AI i modele bez cenzury",
+    compare:
+      "W {{appName}} otwórz stronę modelu. Przed rozpoczęciem rozmowy sprawdzisz tam okno kontekstu, funkcje i szacowany koszt. Jeśli obie wersje są dostępne, porównaj model abliterowany z bazowym.",
   },
   label: {
     title: "Dlaczego samo „bez cenzury” mówi niewiele",
@@ -33,11 +40,11 @@ export const translations: typeof enTranslations = {
     intro: "Od najmniejszej zmiany do największej.",
     abliterated: {
       title: "1. Abliterowany: odmowa wycięta z wag",
-      how: "Badania z 2024 roku pokazały, że odmowa w modelach czatu przebiega jednym kierunkiem wewnątrz modelu. Abliteracja mierzy ten kierunek, porównując reakcję modelu na prompty, których odmawia, i na te, na które odpowiada, a potem usuwa go z wag. Bez nowych danych treningowych, bez ponownego treningu.",
+      how: "Abliteracja zmienia wagi modelu, by ograniczyć wyuczone odmowy. W badaniu z 2024 roku znaleziono kierunek powiązany z odmowami w badanych modelach czatowych. Skutek usunięcia tego sygnału zależy od modelu i polecenia.",
       keeps:
-        "Zostaje: wiedza modelu bazowego, styl pisania, wywoływanie narzędzi i światopogląd. Ten sam model, tylko bez odruchu mówienia nie.",
+        "Styl i wiedza modelu bazowego często pozostają rozpoznawalne. Sprawdź trafność odpowiedzi i obsługę narzędzi w konkretnej wersji.",
       changes:
-        "Zmienia się: odmowy w większości znikają. Na pytania polityczne i moralne wciąż odpowiada tak, jak nauczyło go macierzyste laboratorium, tylko bez wykrętów.",
+        "Wersja abliterowana może odpowiedzieć na polecenie, którego model bazowy odmawia. Wynik zależy od modelu i polecenia.",
     },
     fineTuned: {
       title: "2. Fine-tunowany: dotrenowany, żeby odpowiadał",
@@ -56,7 +63,7 @@ export const translations: typeof enTranslations = {
         "Zmieniają się: same odpowiedzi. Zapytaj o politykę, a dostaniesz opinie, których modele mainstream ci nie dadzą, odblokowane czy nie.",
     },
     callout:
-      "W skrócie. Modele abliterowane i fine-tunowane to modele mainstream, które przestały się wykręcać: ten sam światopogląd, po prostu odpowiadają. {{ownName}} to ten drugi rodzaj: inny światopogląd. Pierwsze bierzesz po możliwości bez odmów. Drugi po drugą stronę sporu.",
+      "Metoda pokazuje, co zmienił twórca. Porównanie poniżej pomoże ci sprawdzić, co to oznacza w twoich zadaniach.",
     sources: {
       paper:
         "Publikacja: Refusal in language models is mediated by a single direction (arXiv)",
@@ -64,12 +71,12 @@ export const translations: typeof enTranslations = {
     },
   },
   ours: {
-    title: "Który z naszych modeli jest którym",
+    title: "Inne modele bez cenzury",
     intro:
-      "Na żywo z naszego rejestru modeli: każdy model bez cenzury, który jest teraz na {{appName}}, pogrupowany według tego, jak powstał. Metodę podajemy tylko tam, gdzie dostawca modelu ją dokumentuje.",
+      "Pozostałe modele bez cenzury w {{appName}} grupujemy według metody opisanej przez dostawcę. Jeśli dostawca jej nie ujawnił, zostawiamy ją jako nieznaną.",
     abliterated: {
-      title: "Abliterowane ({{count}})",
-      body: "Modele mainstream i open z usuniętym kierunkiem odmowy. Największe możliwości wśród modeli bez cenzury: rozumowanie, kod, narzędzia.",
+      title: "Dostępne modele abliterowane ({{count}})",
+      body: "Do kodu i analiz sprawdź obsługę narzędzi. Do długich rozmów i opowiadań porównaj rozmiary okien kontekstu.",
     },
     fineTuned: {
       title: "Fine-tunowane ({{count}})",
@@ -85,9 +92,9 @@ export const translations: typeof enTranslations = {
     },
   },
   pairs: {
-    title: "Ten sam model, z filtrem i bez",
+    title: "Modele bazowe i wersje bez cenzury",
     intro:
-      "Trzy otwarte modele obok ich wersji bez cenzury. To samo laboratorium, ta sama baza. Zmieniają się odmowy. I cena.",
+      "Porównaj modele bazowe z wersjami bez cenzury. Sprawdź metodę, okno kontekstu i szacowany koszt jednej wiadomości.",
     colBase: "Model bazowy",
     colUncensored: "Wersja bez cenzury",
     colMethod: "Metoda",
@@ -112,7 +119,7 @@ export const translations: typeof enTranslations = {
     steps: {
       refusal: {
         title: "Test odmowy",
-        body: "Zapytaj o coś, przed czym model bazowy się wykręca: dosadne pytanie medyczne, mroczna scena, opis luki bezpieczeństwa. Każdy model bez cenzury powinien odpowiedzieć. Jeśli nadal odmawia albo owija odpowiedź w ostrzeżenia, zdjęcie cenzury jest płytkie.",
+        body: "Wypróbuj nieszkodliwe polecenie, przy którym model bazowy się waha, na przykład prośbę o mroczną scenę fikcyjną. Porównaj, jak wprost odpowiadają modele. Pojedyncza odpowiedź niewiele mówi o zastosowanej metodzie.",
       },
       voice: {
         title: "Test głosu",
@@ -157,19 +164,23 @@ export const translations: typeof enTranslations = {
     title: "FAQ",
     whatIs: {
       q: "Co to jest model abliterowany?",
-      a: "Model, któremu usunięto z wag kierunek odmowy. Badacze odkryli, że odmowa przebiega jednym kierunkiem wewnątrz modelu. Abliteracja go mierzy i wycina, bez ponownego treningu. Model zachowuje wiedzę i światopogląd, a przestaje odmawiać.",
+      a: "Model abliterowany to istniejący model językowy, którego wagi zmieniono, by rzadziej odmawiał odpowiedzi.",
     },
     difference: {
       q: "Czym różni się model abliterowany od modelu bez cenzury?",
       a: "Bez cenzury to zachowanie: model odpowiada. Abliteracja to jeden ze sposobów, żeby do tego dojść. Inne to fine-tune usuwający cenzurę albo trening na innym materiale, jak w przypadku {{ownName}}. Na {{appName}} {{abliteratedCount}} modeli bez cenzury jest abliterowanych, a {{fineTunedCount}} fine-tunowanych.",
     },
+    identify: {
+      q: "Jak rozpoznać abliterowany model AI?",
+      a: "Sprawdź kartę modelu lub informacje o wydaniu. W katalogu {{appName}} oznaczenie modeli abliterowanych opiera się na dokumentacji dostawcy.",
+    },
     worse: {
-      q: "Czy modele abliterowane są głupsze od oryginału?",
-      a: "Czasem trochę. Usunięcie kierunku odmowy może kosztować nieco trafności, a dodatkowa runda treningu odrabia większość. W większości zadań zachowujesz mocne strony modelu bazowego. Porównaj oba na własnym prompcie.",
+      q: "Czy abliteracja może zmienić jakość modelu?",
+      a: "Tak. Zmiana wag może wpływać na trafność, styl i inne zdolności modelu. Porównaj konkretną wersję z modelem bazowym na tym samym zadaniu.",
     },
     truly: {
-      q: "Który model bez cenzury jest naprawdę bez cenzury?",
-      a: "Modele abliterowane i fine-tunowane przestają odmawiać, ale zachowują światopogląd mainstreamu. {{ownName}} jest trenowany na książkach i dokumentach zakazanych w mainstreamowym internecie, więc ma własne, przeciwne poglądy polityczne. Który jest „naprawdę” bez cenzury, zależy od tego, czy chcesz odpowiedzi, czy innego spojrzenia.",
+      q: "Czy {{ownName}} jest modelem abliterowanym?",
+      a: "{{ownName}} jest w osobnej grupie. Twórca opisuje go jako model trenowany na innych materiałach, by przedstawiał inną perspektywę. Modele abliterowane na tej stronie to wersje istniejących modeli zmodyfikowane tak, by rzadziej odmawiały odpowiedzi.",
     },
     free: {
       q: "Czy mogę wypróbować modele bez cenzury za darmo?",

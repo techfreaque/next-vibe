@@ -94,7 +94,7 @@ export const generateMetadata = async ({
   const mediaModelCount = countMediaModels(availability);
   return metadataGenerator(locale, {
     path: `story/blog/${SLUG}`,
-    title: t("meta.title", { appName, modelCount }),
+    title: t("meta.title", { appName }),
     category: t("meta.category"),
     description: t("meta.description", {
       appName,
@@ -156,13 +156,23 @@ const COMPARE_PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
 
 const FAQ_KEYS: readonly (
   | "openrouter"
+  | "openrouterModels"
   | "claudeCode"
   | "sdk"
   | "free"
   | "pricing"
   | "models"
   | "data"
-)[] = ["openrouter", "claudeCode", "sdk", "free", "pricing", "models", "data"];
+)[] = [
+  "openrouter",
+  "openrouterModels",
+  "claudeCode",
+  "sdk",
+  "free",
+  "pricing",
+  "models",
+  "data",
+];
 
 export interface CompatibleApiPostPageData {
   locale: CountryLanguage;
@@ -287,6 +297,16 @@ export function TanstackPage({
     maxTokens: V1_MAX_OUTPUT_TOKENS,
   };
   const prices = { subPrice, subCredits, packPrice, packCredits };
+  const faq = FAQ_KEYS.map((key) => ({
+    key,
+    question: t(`faq.${key}.q`, { appName }),
+    answer: t(`faq.${key}.a`, {
+      appName,
+      modelCount,
+      mediaModelCount,
+      ...prices,
+    }),
+  }));
 
   return (
     <Div className="min-h-screen bg-background">
@@ -354,6 +374,29 @@ export function TanstackPage({
               {t("endpoints.anthropicBaseUrlNote")}
             </P>
           </Callout>
+        </ArticleSection>
+
+        <ArticleSection
+          id="openrouter-alternative"
+          title={t("switching.title", { appName })}
+          intro={t("switching.intro", { appName })}
+        >
+          <ArticleList
+            ordered
+            items={[
+              t("switching.key", { appName }),
+              t("switching.baseUrl"),
+              t("switching.model"),
+            ]}
+          />
+          <ArticleP>{t("switching.routing")}</ArticleP>
+          <Div className="flex flex-col">
+            <CardLink href={`/${locale}/docs/api`} label={t("faq.docsLink")} />
+            <CardLink
+              href="https://openrouter.ai/docs/api_reference/overview"
+              label={t("switching.openrouterDocs")}
+            />
+          </Div>
         </ArticleSection>
 
         <ArticleSection
@@ -538,7 +581,7 @@ export function TanstackPage({
           <ArticleH3>{t("versus.here.title", { appName })}</ArticleH3>
           <ArticleP>{t("versus.here.body", { appName })}</ArticleP>
           <Callout icon={Scale} tone="neutral">
-            {t("versus.verdict")}
+            {t("versus.verdict", { appName })}
           </Callout>
         </ArticleSection>
 
@@ -586,31 +629,11 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleSection id="faq" title={t("faq.title")}>
-          <JsonLd
-            id="faq-structured-data"
-            data={buildFaqStructuredData(
-              FAQ_KEYS.map((key) => ({
-                question: t(`faq.${key}.q`, { appName }),
-                answer: t(`faq.${key}.a`, {
-                  appName,
-                  modelCount,
-                  mediaModelCount,
-                  ...prices,
-                }),
-              })),
-            )}
-          />
-          {FAQ_KEYS.map((key) => (
+          <JsonLd id="faq-structured-data" data={buildFaqStructuredData(faq)} />
+          {faq.map(({ key, question, answer }) => (
             <Div key={key} className="flex flex-col gap-2">
-              <ArticleH3>{t(`faq.${key}.q`, { appName })}</ArticleH3>
-              <ArticleP>
-                {t(`faq.${key}.a`, {
-                  appName,
-                  modelCount,
-                  mediaModelCount,
-                  ...prices,
-                })}
-              </ArticleP>
+              <ArticleH3>{question}</ArticleH3>
+              <ArticleP>{answer}</ArticleP>
             </Div>
           ))}
           <Div className="flex flex-col">

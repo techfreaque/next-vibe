@@ -52,6 +52,7 @@ describe("llms.txt", () => {
     for (const locale of sitemapLocales()) {
       for (const variant of ["short", "full"] as const) {
         const text = await buildLlmsTxt(locale, variant);
+        expect(text).toContain(`/${locale}/story/abliterated-ai-chat)`);
         expect(text).not.toContain("{{");
         expect(text).not.toContain(EM_DASH);
       }

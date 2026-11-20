@@ -1,9 +1,8 @@
 export const translations = {
   meta: {
-    title:
-      "{{modelCount}} models, one API: OpenAI and Anthropic compatible | {{appName}}",
+    title: "OpenRouter Alternative | OpenAI & Anthropic API | {{appName}}",
     description:
-      "One {{appName}} key for {{modelCount}} models. OpenAI chat completions, Responses API and Anthropic Messages on one endpoint. Works with Claude Code and Codex CLI. Plus {{mediaModelCount}} image, voice, video and music models in OpenAI format.",
+      "Compare {{appName}} with OpenRouter. Switch your existing OpenAI SDK to an API for {{modelCount}} chat models and {{mediaModelCount}} media models.",
     category: "Developer Guide",
     imageAlt: "{{appName}}: one API endpoint for every model",
     keywords:
@@ -15,7 +14,7 @@ export const translations = {
     readTime: "11 min read",
     title: "One API key. {{modelCount}} models. Three wire formats.",
     subtitle:
-      "{{appName}} speaks OpenAI chat completions, the OpenAI Responses API and the Anthropic Messages API on one endpoint. Your SDK stays. Your tools stay. Only the base URL changes. The same key also runs {{mediaModelCount}} image, voice, video and music models.",
+      "Use Chat Completions, Responses, or Anthropic Messages with one {{appName}} key. Keep your SDK, update its base URL and key, and check your model ID. The same key also works with {{mediaModelCount}} media models.",
   },
   intro: {
     lead: "GPT from OpenAI, Claude from Anthropic, Gemini from Google. Three SDKs, three keys, three bills, three dashboards. Or worse: the tool you like only speaks one format, so it only gets one vendor's models.",
@@ -46,6 +45,19 @@ export const translations = {
     anthropicBaseUrlLabel: "Anthropic base URL",
     anthropicBaseUrlNote:
       "For the Anthropic SDKs and Claude Code. Same URL without /v1: they append /v1/messages themselves.",
+  },
+  switching: {
+    title: "Switching from OpenRouter to {{appName}}",
+    intro:
+      "Looking for an OpenRouter alternative? Both services accept OpenAI-style Chat Completions requests. You can keep your OpenAI SDK and update its configuration.",
+    key: "Enable API access in your {{appName}} account and create a new API key in Settings.",
+    baseUrl:
+      "Set your OpenAI client to the localized base URL above, including /v1.",
+    model:
+      "Call GET /v1/models on the new API and use a returned id in the model field.",
+    routing:
+      "Review any OpenRouter-specific routing options before switching. Test the features your app uses, such as streaming or tool calls, on your chosen model.",
+    openrouterDocs: "OpenRouter API reference",
   },
   samples: {
     title: "Code: your SDK, our base URL",
@@ -95,7 +107,7 @@ export const translations = {
     vendor:
       "Vendor spellings work too. Date-stamped Anthropic ids (claude-sonnet-4-5-20250929 resolves to claude-sonnet-4.5), dashed version numbers, -latest suffixes, the [1m] context suffix, and dotted ids like gpt-5.5.",
     prefix:
-      "Provider prefixes such as anthropic/... or openai/..., so OpenRouter-style ids from an existing config keep working.",
+      "The API recognizes common vendor prefixes such as anthropic/ and openai/ for supported models.",
     claudeFallback:
       "On /v1/messages only: a Claude id your account cannot call, like the built-in ids Claude Code sends for its background calls, falls back to the newest Claude of the same family (Opus, Sonnet or Haiku) that you can call. Claude Code works without extra env vars. Any other unknown id returns 404 model_not_found.",
   },
@@ -161,14 +173,14 @@ export const translations = {
     },
     router: {
       title: "An aggregator such as OpenRouter",
-      body: "Many models, pay as you go. Full disclosure: many of our models are served through OpenRouter. If raw routing is all you need, go there.",
+      body: "OpenRouter offers a multi-model API with provider selection and fallbacks. It also serves some of our model requests upstream.",
     },
     here: {
       title: "{{appName}}",
       body: "One key across three wire formats: chat completions, Responses, and Anthropic Messages with count_tokens. Claude Code and Codex CLI connect without a proxy. Uncensored models sit next to mainstream ones, behind a one-time 18+ confirmation. The same balance pays for the chat app and the API, from subscription credits or packs. And {{appName}} is open source and self-hostable.",
     },
     verdict:
-      "Bottom line: one vendor, go direct. Plain routing over the OpenAI format, a router does the job. Want Claude Code, Codex CLI and the OpenAI and Anthropic SDKs on one key, uncensored models included, with a chat app on the same balance? That is what we built this for.",
+      "Compare the model catalog and the routing features you rely on. If you want uncensored models in the API and a chat app on the same credit balance, see what your {{appName}} key can call.",
   },
   limits: {
     title: "Limits you should know",
@@ -204,7 +216,11 @@ export const translations = {
     title: "FAQ",
     openrouter: {
       q: "Is {{appName}} an OpenRouter alternative?",
-      a: "For many uses, yes: one key, many models, pay per token. The differences: {{appName}} speaks the Anthropic Messages API and the OpenAI Responses API natively, not just chat completions. It carries uncensored models. And the chat app runs on the same balance. Many of our models are served through OpenRouter underneath.",
+      a: "{{appName}} provides a single key for Chat Completions, Responses, and Anthropic Messages. You can call uncensored models after the 18+ confirmation and use the same credit balance in chat and the API. Some requests are served through OpenRouter upstream.",
+    },
+    openrouterModels: {
+      q: "Can I keep my OpenRouter model IDs when switching?",
+      a: "Some provider-prefixed IDs resolve when the underlying model is available. Use GET /v1/models to check availability and copy the exact id returned by the new API.",
     },
     claudeCode: {
       q: "Can I use Claude Code with non-Claude models?",
@@ -212,7 +228,7 @@ export const translations = {
     },
     sdk: {
       q: "Do I need a new SDK?",
-      a: "No. Use the official OpenAI and Anthropic SDKs. Change the base URL and the key. Nothing else.",
+      a: "Use the official OpenAI or Anthropic SDK. Set the base URL for that SDK, add your API key, and choose an available model ID.",
     },
     free: {
       q: "Is there a free tier for the API?",
