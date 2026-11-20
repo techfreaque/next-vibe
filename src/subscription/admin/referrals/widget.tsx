@@ -6,7 +6,10 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
+import {
+  formatCurrency,
+  formatSimpleDate,
+} from "next-vibe/core/i18n/core/localization-utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +41,7 @@ import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/sele
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import React, { useCallback, useState } from "react";
 
+import { scopedTranslation as growthTranslation } from "@/leads/growth/i18n";
 import { PayoutStatus } from "@/referral/enum";
 
 import { PayoutAction } from "../enum";
@@ -94,6 +98,8 @@ function CodeRow({
   locale: CountryLanguage;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element {
+  const { t: growthT } = growthTranslation.scopedT(locale);
+  const acquisition = code.acquisition;
   return (
     <Div className="flex items-start justify-between gap-3 py-3">
       <Div className="flex-1 min-w-0 space-y-1">
@@ -112,10 +118,34 @@ function CodeRow({
         <Div className="text-sm text-muted-foreground">
           {code.ownerEmail || code.ownerName}
         </Div>
-        <Div className="flex items-center gap-4 text-xs text-muted-foreground">
+        <Div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
           <Span>
-            {code.currentUses} {t("widget.clicks")}
+            {code.visits.toLocaleString(locale)} {t("widget.clicks")}
           </Span>
+          {acquisition && (
+            <>
+              <Span>
+                {acquisition.leads.toLocaleString(locale)}{" "}
+                {growthT("acquisition.metrics.leads")}
+              </Span>
+              <Span>
+                {acquisition.firstChats.toLocaleString(locale)}{" "}
+                {growthT("acquisition.metrics.firstChats")}
+              </Span>
+              <Span>
+                {acquisition.payers.toLocaleString(locale)}{" "}
+                {growthT("acquisition.metrics.payers")}
+              </Span>
+              <Span>
+                {growthT("acquisition.metrics.revenue")}{" "}
+                {formatCurrency(
+                  acquisition.revenue,
+                  acquisition.currency,
+                  locale,
+                )}
+              </Span>
+            </>
+          )}
           <Span>
             {code.totalSignups} {t("widget.signups")}
           </Span>
@@ -362,6 +392,10 @@ export function ReferralsContainer({
         />
       </Div>
       <Div className="px-4 pb-2 grid grid-cols-2 gap-2">
+        <SelectFieldWidget
+          fieldName="acquisitionCurrency"
+          field={children.acquisitionCurrency}
+        />
         <SelectFieldWidget
           fieldName="searchFilters.payoutStatus"
           field={children.searchFilters.children.payoutStatus}

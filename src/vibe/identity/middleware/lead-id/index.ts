@@ -11,7 +11,7 @@ import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
 import {
   extractTouch,
-  hasCampaignSignal,
+  isAcquisitionVisit,
   isLikelyBot,
 } from "@/leads/growth/attribution";
 
@@ -177,7 +177,7 @@ export async function createLeadId(
   const leadId = await createAnonymousLead(clientInfo, locale, logger);
 
   if (leadId) {
-    recordAttributionTouch(request, leadId, true, logger);
+    await recordAttributionTouch(request, leadId, logger);
   }
 
   if (!leadId) {
@@ -209,23 +209,25 @@ export async function createLeadId(
 
 /**
  * Growth attribution: record how this page request arrived.
- * First visit → first + last touch. Later visits → only when the URL carries
- * UTM / ref / utm_id (zero DB work otherwise). Skips API calls, prefetches,
- * non-GET requests and crawlers. Fire-and-forget: never blocks the request.
+ * Record document arrivals. Internal navigation only counts when it carries
+ * new campaign markers. Skip API calls, prefetches, subresources and crawlers.
  */
-export function recordAttributionTouch(
+export async function recordAttributionTouch(
   request: NextRequest,
   leadId: string,
-  isNewLead: boolean,
   logger: EndpointLogger,
-): void {
+): Promise<void> {
   const path = request.nextUrl.pathname;
+  const destination = request.headers.get("sec-fetch-dest");
   if (
     request.method !== "GET" ||
     path.startsWith("/api/") ||
+    (destination !== null && destination !== "document") ||
+    !request.headers.get("accept")?.includes("text/html") ||
     request.headers.get("rsc") !== null ||
     request.headers.get("next-router-prefetch") !== null ||
-    request.headers.get("purpose") === "prefetch" ||
+    request.headers.get("purpose")?.includes("prefetch") ||
+    request.headers.get("sec-purpose")?.includes("prefetch") ||
     isLikelyBot(request.headers.get("user-agent"))
   ) {
     return;
@@ -234,19 +236,22 @@ export function recordAttributionTouch(
     new URL(coreEnv.NEXT_PUBLIC_APP_URL).hostname,
     request.headers.get("x-forwarded-host")?.split(":")[0] ?? "",
   ].filter((h) => h.length > 0);
-  const touch = extractTouch(
-    new URL(request.nextUrl.href),
-    request.headers.get("referer"),
-    ownHosts,
-  );
-  if (!isNewLead && !hasCampaignSignal(touch)) {
+  const url = new URL(request.nextUrl.href);
+  const referer = request.headers.get("referer");
+  const touch = extractTouch(url, referer, ownHosts);
+  if (
+    !isAcquisitionVisit(
+      url,
+      referer,
+      ownHosts,
+      touch,
+      request.headers.get("sec-fetch-site"),
+    )
+  ) {
     return;
   }
-  void (async (): Promise<void> => {
-    const { GrowthJourneyRepository } =
-      await import("@/leads/growth/repository");
-    await GrowthJourneyRepository.recordTouch(leadId, touch, logger);
-  })();
+  const { GrowthJourneyRepository } = await import("@/leads/growth/repository");
+  await GrowthJourneyRepository.recordTouch(leadId, touch, logger);
 }
 
 /**

@@ -4,7 +4,8 @@
  * A visitor who lands on a skill page or a chat deep link with `?ref=` and/or
  * `?skill=` gets the referral code linked to their lead and the skill stored
  * as first-touch skill, exactly like the signup page does. Never blocks the
- * page: failures are logged with context, nothing is thrown.
+ * page: failures are logged with context, nothing is thrown. Document visits
+ * are measured by the growth middleware independently of referral credit.
  */
 
 import "server-only";

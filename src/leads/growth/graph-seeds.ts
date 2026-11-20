@@ -16,6 +16,8 @@ import type {
 import { EVALUATOR_DROP_ALIAS } from "../../analytics/evaluators/drop/constants";
 import { WINDOW_SUM_ALIAS } from "../../analytics/indicators/window-sum/constants";
 import { TRANSFORMER_RATIO_ALIAS } from "../../analytics/transformers/ratio/constants";
+import { AcquisitionMetric, AcquisitionSource } from "./acquisition";
+import { GROWTH_ACQUISITION_ALIAS } from "./data-sources/acquisition/constants";
 import { GROWTH_CHANNEL_SPEND_ALIAS } from "./data-sources/channel-spend/constants";
 import { GROWTH_FUNNEL_STEP_ALIAS } from "./data-sources/funnel-step/constants";
 import { ChannelTypeFilter, FunnelStep } from "./enum";
@@ -255,7 +257,81 @@ const growthFunnelConfig: GraphConfig = {
 
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
+const acquisitionMetrics = [
+  { id: "visits", metric: AcquisitionMetric.VISITS, pane: 0, color: BLUE },
+  { id: "leads", metric: AcquisitionMetric.LEADS, pane: 0, color: CYAN },
+  { id: "signups", metric: AcquisitionMetric.SIGNUPS, pane: 1, color: PURPLE },
+  {
+    id: "first_chats",
+    metric: AcquisitionMetric.FIRST_CHATS,
+    pane: 1,
+    color: AMBER,
+  },
+  { id: "payers", metric: AcquisitionMetric.PAYERS, pane: 1, color: GREEN },
+  {
+    id: "revenue_eur",
+    metric: AcquisitionMetric.REVENUE,
+    pane: 2,
+    color: PINK,
+  },
+];
+
+const acquisitionVisitSources = [
+  { id: "organic_search", sourceType: AcquisitionSource.SEARCH, color: GREEN },
+  {
+    id: "external_referrer",
+    sourceType: AcquisitionSource.REFERRER,
+    color: BLUE,
+  },
+  { id: "referral_code", sourceType: AcquisitionSource.REFERRAL, color: AMBER },
+  { id: "creator_code", sourceType: AcquisitionSource.CREATOR, color: PURPLE },
+  { id: "utm_campaign", sourceType: AcquisitionSource.CAMPAIGN, color: CYAN },
+  { id: "direct", sourceType: AcquisitionSource.DIRECT, color: PINK },
+];
+
+const acquisitionConfig: GraphConfig = {
+  nodes: Object.fromEntries([
+    ...acquisitionMetrics.map(({ id, metric, pane, color }) => [
+      id,
+      {
+        endpointPath: GROWTH_ACQUISITION_ALIAS,
+        params: { metric, currency: "EUR" },
+        pane,
+        color,
+      },
+    ]),
+    ...acquisitionVisitSources.map(({ id, sourceType, color }) => [
+      id,
+      {
+        endpointPath: GROWTH_ACQUISITION_ALIAS,
+        params: { metric: AcquisitionMetric.VISITS, sourceType },
+        pane: 3,
+        color,
+      },
+    ]),
+  ]),
+  positions: Object.fromEntries([
+    ...acquisitionMetrics.map(({ id }, index) => [
+      id,
+      { x: 0, y: index * 120 },
+    ]),
+    ...acquisitionVisitSources.map(({ id }, index) => [
+      id,
+      { x: 320, y: index * 120 },
+    ]),
+  ]),
+  edges: [],
+  trigger: { type: "cron", schedule: "0 */6 * * *" },
+};
+
 export const graphSeeds: GraphSeedEntry[] = [
+  {
+    slug: "lead-acquisition",
+    name: "Lead Acquisition",
+    description:
+      "Visits, leads, signups, first chats, payers and EUR revenue. Filter a series by referral code, campaign tags or referrer domain.",
+    config: acquisitionConfig,
+  },
   {
     slug: "growth-funnel",
     name: "Growth Funnel",

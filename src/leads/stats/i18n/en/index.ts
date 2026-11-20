@@ -5,6 +5,46 @@ import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
  */
 
 export const translations = {
+  acquisition: {
+    totals: "Total for filters",
+    title: "Lead acquisition",
+    description:
+      "Arrivals use the source of each visit. Lead and conversion activity uses the lead’s recorded source and credited referral code. Revenue is gross successful payments in the selected currency. Historic arrival counts use the landing records we could recover.",
+    sources: {
+      all: "All sources",
+      creator: "Creator code",
+      referral: "Referral code",
+      campaign: "UTM campaign",
+      search: "Organic search",
+      referrer: "External referrer",
+      direct: "Direct",
+      unattributed: "Unattributed",
+    },
+    metrics: {
+      visits: "Visits",
+      leads: "Leads",
+      signups: "Signups",
+      firstChats: "First chats",
+      payers: "Payers",
+      revenue: "Revenue",
+    },
+    fields: {
+      type: "Source type",
+      source: "UTM source",
+      medium: "UTM medium",
+      campaign: "UTM campaign",
+      referrerHost: "Referrer domain",
+      refCode: "Referral code",
+      currency: "Revenue currency",
+      metric: "Metric",
+    },
+    series: "Lead acquisition over time",
+    empty: "No acquisition activity in this period.",
+    page: "Page",
+    previous: "Previous",
+    next: "Next",
+    apply: "Apply filters",
+  },
   title: "Lead Statistics",
   titleShort: "Lead Stats",
   description:
@@ -416,6 +456,7 @@ export const translations = {
     dateSeparator: "–",
   },
   enums: {
+    currency: { eur: "EUR", usd: "USD", pln: "PLN" },
     sortOrder: {
       asc: "Ascending",
       desc: "Descending",

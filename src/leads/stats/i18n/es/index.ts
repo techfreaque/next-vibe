@@ -6,6 +6,46 @@ import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  acquisition: {
+    totals: "Total filtrado",
+    title: "Captación de contactos",
+    description:
+      "Cada visita se atribuye a su fuente de entrada. Los contactos y las conversiones usan la fuente registrada y el código de referido asignado. Los ingresos incluyen pagos exitosos en la moneda elegida.",
+    sources: {
+      all: "Todas las fuentes",
+      creator: "Código de creador",
+      referral: "Código de referido",
+      campaign: "Campaña UTM",
+      search: "Búsqueda orgánica",
+      referrer: "Sitio de referencia",
+      direct: "Acceso directo",
+      unattributed: "Sin atribución",
+    },
+    metrics: {
+      visits: "Visitas",
+      leads: "Contactos",
+      signups: "Registros",
+      firstChats: "Primeros chats",
+      payers: "Usuarios de pago",
+      revenue: "Ingresos",
+    },
+    fields: {
+      type: "Tipo de fuente",
+      source: "Fuente UTM",
+      medium: "Medio UTM",
+      campaign: "Campaña UTM",
+      referrerHost: "Dominio de referencia",
+      refCode: "Código de referido",
+      currency: "Moneda de ingresos",
+      metric: "Métrica",
+    },
+    series: "Captación de contactos a lo largo del tiempo",
+    empty: "Sin actividad en este periodo.",
+    page: "Página",
+    previous: "Anterior",
+    next: "Siguiente",
+    apply: "Aplicar filtros",
+  },
   title: "Principales estadísticas",
   titleShort: "Estadísticas de contactos",
   description: "Estadísticas y análisis completos con datos históricos",
@@ -422,6 +462,7 @@ export const translations: typeof enTranslations = {
     dateSeparator: "–",
   },
   enums: {
+    currency: { eur: "EUR", usd: "USD", pln: "PLN" },
     sortOrder: {
       asc: "Ascendencia",
       desc: "Descendiente",

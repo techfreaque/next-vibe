@@ -5,7 +5,10 @@
 
 "use client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
+import {
+  formatCurrency,
+  formatSimpleDate,
+} from "next-vibe/core/i18n/core/localization-utils";
 import { objectEntries } from "next-vibe/core/utils/object";
 import {
   type LeadStatusFilter,
@@ -32,6 +35,7 @@ import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { Upload } from "next-vibe/ui/components/icons/Upload";
 import { Users } from "next-vibe/ui/components/icons/Users";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
@@ -54,6 +58,8 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useMemo } from "react";
 
+import { AcquisitionSourceFilter } from "../growth/acquisition";
+import { AcquisitionFilterInputs } from "../growth/acquisition-filter-inputs";
 import type definition from "./definition";
 import type { LeadListGetResponseTypeOutput } from "./definition";
 
@@ -154,6 +160,38 @@ function LeadRow({
   isPickerMode,
 }: LeadRowProps): React.JSX.Element {
   const isConverted = Boolean(lead.convertedUserId);
+  const acquisition = lead.acquisition;
+  const acquisitionColumns = acquisition && [
+    { label: t("acquisition.fields.type"), value: t(acquisition.sourceType) },
+    { label: t("acquisition.fields.refCode"), value: acquisition.refCode },
+    {
+      label: t("acquisition.fields.referrerHost"),
+      value: acquisition.referrerHost,
+    },
+    { label: t("acquisition.fields.source"), value: acquisition.source },
+    { label: t("acquisition.fields.medium"), value: acquisition.medium },
+    { label: t("acquisition.fields.campaign"), value: acquisition.campaign },
+    {
+      label: t("acquisition.metrics.visits"),
+      value: acquisition.visits.toLocaleString(locale),
+    },
+    {
+      label: t("acquisition.metrics.signups"),
+      value: acquisition.signups.toLocaleString(locale),
+    },
+    {
+      label: t("acquisition.metrics.firstChats"),
+      value: acquisition.firstChats.toLocaleString(locale),
+    },
+    {
+      label: t("acquisition.metrics.payers"),
+      value: acquisition.payers.toLocaleString(locale),
+    },
+    {
+      label: t("acquisition.metrics.revenue"),
+      value: formatCurrency(acquisition.revenue, acquisition.currency, locale),
+    },
+  ];
 
   return (
     <Div className="group relative flex min-w-0 flex-wrap items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors">
@@ -284,6 +322,18 @@ function LeadRow({
           >
             <Trash2 className="h-4 w-4" />
           </Button>
+        </Div>
+      )}
+      {!isPickerMode && acquisitionColumns && (
+        <Div className="grid w-full grid-cols-2 gap-x-4 gap-y-2 border-t pt-2 @sm:grid-cols-3 @lg:grid-cols-6">
+          {acquisitionColumns.map(({ label, value }) => (
+            <Div key={label} className="min-w-0 text-xs">
+              <Span className="block text-muted-foreground">{label}</Span>
+              <Span className="block break-words font-medium">
+                {value ?? "·"}
+              </Span>
+            </Div>
+          ))}
         </Div>
       )}
     </Div>
@@ -518,8 +568,12 @@ export function LeadsListContainer({
     [form, onSubmit],
   );
 
+  const { sourceType, ...acquisitionFilters } =
+    form.watch("acquisitionFilters") ?? {};
   const activeSources = form.watch("statusFilters.source") ?? [];
   const hasActiveFilters = Boolean(
+    (sourceType && sourceType !== AcquisitionSourceFilter.ALL) ||
+    Object.values(acquisitionFilters).some(Boolean) ||
     activeStatuses.length ||
     activeSources.length ||
     form.watch("statusFilters.search")?.trim() ||
@@ -537,6 +591,7 @@ export function LeadsListContainer({
     });
     form.setValue("locationFilters.country", [], { shouldDirty: true });
     form.setValue("locationFilters.language", [], { shouldDirty: true });
+    form.setValue("acquisitionFilters", {}, { shouldDirty: true });
     handlePageChange(1);
   };
 
@@ -745,6 +800,23 @@ export function LeadsListContainer({
           </>
         )}
       </Div>
+
+      {!isPickerMode && (
+        <Div className="px-4 py-2">
+          <SectionGroup title={t("acquisition.title")}>
+            <AcquisitionFilterInputs />
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              disabled={isFetching}
+              onClick={() => handlePageChange(1)}
+            >
+              {t("acquisition.apply")}
+            </Button>
+          </SectionGroup>
+        </Div>
+      )}
 
       {/* Status breakdown subtitle — full mode only */}
       {!isPickerMode && !isLoading && leads.length > 0 && (

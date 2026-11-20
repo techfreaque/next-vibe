@@ -3,6 +3,99 @@ import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  filters: {
+    search: {
+      label: "Wyszukaj",
+      description: "Szukaj leadów po e-mailu lub nazwie firmy",
+      placeholder: "Wpisz e-mail lub nazwę firmy...",
+    },
+    status: {
+      label: "Status",
+      description: "Filtruj po statusie leada",
+      placeholder: "Wszystkie statusy",
+    },
+    currentCampaignStage: {
+      label: "Etap kampanii",
+      description: "Filtruj po etapie kampanii e-mailowej",
+      placeholder: "Wszystkie etapy",
+    },
+    source: {
+      label: "Źródło",
+      description: "Filtruj po źródle leada",
+      placeholder: "Wszystkie źródła",
+    },
+    country: {
+      label: "Kraj",
+      description: "Filtruj po kraju",
+      placeholder: "Wszystkie kraje",
+    },
+    language: {
+      label: "Język",
+      description: "Filtruj po języku",
+      placeholder: "Wszystkie języki",
+    },
+    sortBy: {
+      label: "Sortuj po",
+      description: "Wybierz pole do sortowania",
+      placeholder: "Pole sortowania",
+    },
+    sortOrder: {
+      label: "Kolejność sortowania",
+      description: "Sortuj rosnąco lub malejąco",
+      placeholder: "Kolejność",
+    },
+    statusFilters: {
+      title: "Filtry statusu i kampanii",
+      description: "Filtruj po statusie, etapie kampanii i źródle",
+    },
+    locationFilters: {
+      title: "Filtry lokalizacji",
+      description: "Filtruj po kraju i języku",
+    },
+    sortingOptions: {
+      title: "Opcje sortowania",
+      description: "Skonfiguruj kolejność sortowania",
+    },
+  },
+  acquisition: {
+    title: "Pozyskiwanie kontaktów",
+    description:
+      "Wizyty liczymy według źródła wejścia. Kontakty i konwersje korzystają z zapisanej atrybucji i przypisanego kodu polecenia. Przychód obejmuje udane płatności w wybranej walucie.",
+    sources: {
+      all: "Wszystkie źródła",
+      creator: "Kod twórcy",
+      referral: "Kod polecenia",
+      campaign: "Kampania UTM",
+      search: "Wyniki organiczne",
+      referrer: "Odnośnik zewnętrzny",
+      direct: "Bezpośrednio",
+      unattributed: "Bez atrybucji",
+    },
+    metrics: {
+      visits: "Wizyty",
+      leads: "Kontakty",
+      signups: "Rejestracje",
+      firstChats: "Pierwsze rozmowy",
+      payers: "Płacący",
+      revenue: "Przychód",
+    },
+    fields: {
+      type: "Typ źródła",
+      source: "Źródło UTM",
+      medium: "Medium UTM",
+      campaign: "Kampania UTM",
+      referrerHost: "Domena odsyłająca",
+      refCode: "Kod polecenia",
+      currency: "Waluta przychodu",
+      metric: "Wskaźnik",
+    },
+    series: "Pozyskiwanie kontaktów w czasie",
+    empty: "Brak aktywności w tym okresie.",
+    page: "Strona",
+    previous: "Wstecz",
+    next: "Dalej",
+    apply: "Zastosuj filtry",
+  },
   category: "Leads",
   tags: {
     leads: "Leady",
@@ -229,6 +322,7 @@ export const translations: typeof enTranslations = {
     fr: "Francuski",
   },
   enums: {
+    currency: { eur: "EUR", usd: "USD", pln: "PLN" },
     leadStatus: {
       new: "Nowy",
       pending: "Oczekujący",

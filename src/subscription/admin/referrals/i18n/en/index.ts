@@ -1,4 +1,8 @@
 export const translations = {
+  acquisition: {
+    title: "Lead acquisition",
+    fields: { currency: "Revenue currency" },
+  },
   get: {
     title: "Referral Dashboard",
     titleShort: "Admin Referrals",
@@ -59,7 +63,7 @@ export const translations = {
         code: "Code",
         ownerEmail: "Owner",
         ownerName: "Name",
-        currentUses: "Clicks",
+        currentUses: "Code uses",
         totalSignups: "Signups",
         totalEarned: "Earned",
         isActive: "Active",
@@ -216,6 +220,7 @@ export const translations = {
     },
   },
   enums: {
+    currency: { eur: "EUR", usd: "USD", pln: "PLN" },
     payoutStatusFilter: {
       all: "All",
       pending: "Pending",

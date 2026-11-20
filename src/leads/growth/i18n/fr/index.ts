@@ -1,6 +1,45 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  acquisition: {
+    title: "Acquisition de contacts",
+    description:
+      "Chaque visite est rattachée à sa propre source. Les contacts et conversions suivent la source enregistrée et le code de parrainage attribué. Le chiffre d’affaires inclut les paiements réussis dans la devise choisie.",
+    sources: {
+      all: "Toutes les sources",
+      creator: "Code créateur",
+      referral: "Code de parrainage",
+      campaign: "Campagne UTM",
+      search: "Recherche naturelle",
+      referrer: "Site référent",
+      direct: "Accès direct",
+      unattributed: "Sans attribution",
+    },
+    metrics: {
+      visits: "Visites",
+      leads: "Contacts",
+      signups: "Inscriptions",
+      firstChats: "Premiers chats",
+      payers: "Clients payants",
+      revenue: "Chiffre d’affaires",
+    },
+    fields: {
+      type: "Type de source",
+      source: "Source UTM",
+      medium: "Support UTM",
+      campaign: "Campagne UTM",
+      referrerHost: "Domaine référent",
+      refCode: "Code de parrainage",
+      currency: "Devise du chiffre d’affaires",
+      metric: "Indicateur",
+    },
+    series: "Acquisition de contacts dans le temps",
+    empty: "Aucune activité sur cette période.",
+    page: "Page",
+    previous: "Précédent",
+    next: "Suivant",
+    apply: "Appliquer les filtres",
+  },
   category: "Croissance",
   tags: {
     vibeSense: "vibe-sense",

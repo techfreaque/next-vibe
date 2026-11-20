@@ -34,6 +34,7 @@ import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
   objectField,
+  objectOptionalField,
   responseArrayField,
   responseField,
   widgetField,
@@ -41,6 +42,11 @@ import {
 import { paginationField } from "next-vibe/unified-ui/widgets/containers/pagination/types";
 import { z } from "zod";
 
+import { acquisitionLeadRow } from "../growth/acquisition";
+import {
+  acquisitionCurrencyField,
+  acquisitionFilterFields,
+} from "../growth/acquisition-fields";
 import {
   leadsLocationFiltersContainer,
   leadsSortingOptionsContainer,
@@ -118,6 +124,14 @@ const { GET } = createEndpoint({
       // === LOCATION FILTERS ===
       locationFilters: leadsLocationFiltersContainer,
 
+      acquisitionFilters: objectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "acquisition.title",
+        usage: { request: "data" },
+        children: acquisitionFilterFields,
+      }),
+      acquisitionCurrency: acquisitionCurrencyField,
+
       // === SORTING OPTIONS ===
       sortingOptions: leadsSortingOptionsContainer,
 
@@ -182,6 +196,11 @@ const { GET } = createEndpoint({
                   label: "get.response.leads.source",
                   enumOptions: LeadSourceOptions,
                   schema: z.enum(LeadSource).nullable(),
+                }),
+                acquisition: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "acquisition.title",
+                  schema: acquisitionLeadRow.optional(),
                 }),
                 currentCampaignStage: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,

@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Współczynnik konwersji poleceń",
     titleShort: "Konwersja",
     description:
-      "Rejestracje na kliknięcie leada - ilu użytkowników z kliknięć w linki polecające faktycznie się rejestrowało",
+      "Odsetek zmierzonych pierwszych wizyt z polecenia zakończonych przypisaną rejestracją",
     fields: {
       resolution: {
         label: "Rozdzielczość",
@@ -19,7 +19,8 @@ export const translations: typeof enTranslations = {
       },
       result: {
         label: "Współczynnik konwersji",
-        description: "Rejestracje / kliknięcia leadów na przedział (0–100%)",
+        description:
+          "Rejestracje jako procent pierwszych wizyt według daty wizyty",
       },
       meta: { label: "Meta", description: "Metadane wykonania węzła" },
     },

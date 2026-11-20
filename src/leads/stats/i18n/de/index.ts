@@ -7,6 +7,46 @@ import type { translations as enTranslations } from "../en";
  */
 
 export const translations: typeof enTranslations = {
+  acquisition: {
+    totals: "Summe für Filter",
+    title: "Lead-Gewinnung",
+    description:
+      "Besuche zählen zur jeweiligen Zugriffsquelle. Leads und Abschlüsse nutzen die gespeicherte Quelle und den zugeordneten Empfehlungscode. Der Umsatz umfasst erfolgreiche Zahlungen in der gewählten Währung.",
+    sources: {
+      all: "Alle Quellen",
+      creator: "Creator-Code",
+      referral: "Empfehlungscode",
+      campaign: "UTM-Kampagne",
+      search: "Organische Suche",
+      referrer: "Externer Verweis",
+      direct: "Direkt",
+      unattributed: "Nicht zugeordnet",
+    },
+    metrics: {
+      visits: "Besuche",
+      leads: "Leads",
+      signups: "Registrierungen",
+      firstChats: "Erste Chats",
+      payers: "Zahlende Nutzer",
+      revenue: "Umsatz",
+    },
+    fields: {
+      type: "Quellentyp",
+      source: "UTM-Quelle",
+      medium: "UTM-Medium",
+      campaign: "UTM-Kampagne",
+      referrerHost: "Verweisdomain",
+      refCode: "Empfehlungscode",
+      currency: "Umsatzwährung",
+      metric: "Kennzahl",
+    },
+    series: "Lead-Gewinnung im Zeitverlauf",
+    empty: "Keine Aktivitäten in diesem Zeitraum.",
+    page: "Seite",
+    previous: "Zurück",
+    next: "Weiter",
+    apply: "Filter anwenden",
+  },
   title: "Lead-Statistiken",
   titleShort: "Lead-Statistiken",
   description:
@@ -420,6 +460,7 @@ export const translations: typeof enTranslations = {
     dateSeparator: "–",
   },
   enums: {
+    currency: { eur: "EUR", usd: "USD", pln: "PLN" },
     sortOrder: {
       asc: "Aufsteigend",
       desc: "Absteigend",

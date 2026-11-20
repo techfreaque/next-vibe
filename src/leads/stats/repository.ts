@@ -50,6 +50,7 @@ import {
 } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { AcquisitionRepository } from "../growth/acquisition-repository";
 import type {
   LeadsStatsGroupedByCampaignStage,
   LeadsStatsGroupedByConversionFunnel,
@@ -161,6 +162,9 @@ export class LeadStatsRepository {
         dateTo,
       );
 
+      const acquisitionPage = query.acquisitionPage ?? 1;
+      const acquisitionCurrency = query.acquisitionCurrency ?? "EUR";
+
       // Get all metrics in parallel
       const [
         currentMetrics,
@@ -169,6 +173,7 @@ export class LeadStatsRepository {
         recentActivity,
         topPerformingCampaigns,
         topPerformingSources,
+        acquisition,
       ] = await Promise.all([
         LeadStatsRepository.getCurrentPeriodMetrics(whereConditions),
         LeadStatsRepository.generateHistoricalData(
@@ -183,6 +188,12 @@ export class LeadStatsRepository {
         LeadStatsRepository.generateRecentActivity(whereConditions),
         LeadStatsRepository.generateTopPerformingCampaigns(whereConditions),
         LeadStatsRepository.generateTopPerformingSources(whereConditions),
+        AcquisitionRepository.summary({
+          range: dateRange,
+          filters: query.acquisitionFilters ?? {},
+          currency: acquisitionCurrency,
+          page: acquisitionPage,
+        }),
       ]);
 
       const response: LeadsStatsResponseOutput = {
@@ -192,6 +203,11 @@ export class LeadStatsRepository {
         recentActivity,
         topPerformingCampaigns,
         topPerformingSources,
+        acquisition: {
+          ...acquisition,
+          page: acquisitionPage,
+          currency: acquisitionCurrency,
+        },
         generatedAt: new Date(),
         dataRange: {
           from: dateFrom.toISOString(),

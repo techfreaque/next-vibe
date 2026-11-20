@@ -33,6 +33,7 @@ import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { AcquisitionRepository } from "@/leads/growth/acquisition-repository";
 import {
   payoutRequests,
   referralCodes,
@@ -100,20 +101,24 @@ export class SubscriptionAdminReferralsRepository {
       const codeWhereClause =
         codeConditions.length > 0 ? and(...codeConditions) : undefined;
 
-      // Sort mapping for codes
-      const codeSortColumn = (():
-        | typeof referralCodes.createdAt
-        | typeof referralCodes.currentUses => {
-        switch (sortingOptions.sortBy) {
-          case ReferralSortField.EARNINGS:
-            return referralCodes.currentUses;
-          case ReferralSortField.SIGNUPS:
-            return referralCodes.currentUses;
-          case ReferralSortField.CREATED_AT:
-          default:
-            return referralCodes.createdAt;
-        }
-      })();
+      const creditedSignups = sql<number>`(
+        SELECT count(*)::int FROM ${userReferrals}
+        WHERE ${userReferrals.referralCodeId} = ${referralCodes.id}
+      )`;
+
+      const earnedByCode = sql<number>`(
+        SELECT coalesce(sum(${referralEarnings.amountCents}), 0)::int
+        FROM ${referralEarnings}
+        INNER JOIN ${userReferrals}
+          ON ${userReferrals.referredUserId} = ${referralEarnings.sourceUserId}
+        WHERE ${referralEarnings.earnerUserId} = ${referralCodes.ownerUserId}
+          AND ${userReferrals.referralCodeId} = ${referralCodes.id}
+      )`;
+      const codeSortColumn = {
+        [ReferralSortField.CREATED_AT]: referralCodes.createdAt,
+        [ReferralSortField.SIGNUPS]: creditedSignups,
+        [ReferralSortField.EARNINGS]: earnedByCode,
+      }[sortingOptions.sortBy];
 
       const orderDirection =
         sortingOptions.sortOrder === SortOrder.ASC ? asc : desc;
@@ -136,9 +141,10 @@ export class SubscriptionAdminReferralsRepository {
           ownerEmail: users.email,
           ownerName: users.privateName,
           currentUses: referralCodes.currentUses,
+          totalSignups: creditedSignups,
+          totalEarned: earnedByCode,
           isActive: referralCodes.isActive,
           createdAt: referralCodes.createdAt,
-          ownerUserId: referralCodes.ownerUserId,
         })
         .from(referralCodes)
         .innerJoin(users, eq(referralCodes.ownerUserId, users.id))
@@ -147,32 +153,28 @@ export class SubscriptionAdminReferralsRepository {
         .limit(limit)
         .offset(offset);
 
-      // Get signups and earnings per code owner
-      const codes: ReferralsResponse["codes"] = [];
-      for (const row of codeRows) {
-        // Count signups via userReferrals where referrerUserId = owner
-        const [signupResult] = await db
-          .select({ value: count() })
-          .from(userReferrals)
-          .where(eq(userReferrals.referrerUserId, row.ownerUserId));
+      const acquisitionCurrency = data.acquisitionCurrency ?? "EUR";
+      const acquisitionByCode = await AcquisitionRepository.referralCodeSummary(
+        codeRows.map((row) => row.code),
+        acquisitionCurrency,
+      );
 
-        // Sum earnings for this owner
-        const [earningsResult] = await db
-          .select({ value: sum(referralEarnings.amountCents) })
-          .from(referralEarnings)
-          .where(eq(referralEarnings.earnerUserId, row.ownerUserId));
-
-        codes.push({
-          code: row.code,
+      const codes: ReferralsResponse["codes"] = codeRows.map((row) => {
+        const acquisition = acquisitionByCode.get(row.code);
+        return {
+          ...row,
           ownerEmail: row.ownerEmail ?? "",
           ownerName: row.ownerName ?? "",
-          currentUses: row.currentUses,
-          totalSignups: signupResult?.value ?? 0,
-          totalEarned: Number(earningsResult?.value ?? 0),
-          isActive: row.isActive,
-          createdAt: row.createdAt,
-        });
-      }
+          visits: acquisition?.visits ?? 0,
+          acquisition: {
+            leads: acquisition?.leads ?? 0,
+            firstChats: acquisition?.firstChats ?? 0,
+            payers: acquisition?.payers ?? 0,
+            revenue: acquisition?.revenue ?? 0,
+            currency: acquisitionCurrency,
+          },
+        };
+      });
 
       // === PAYOUT REQUESTS QUERY ===
       const payoutConditions: SQL[] = [];

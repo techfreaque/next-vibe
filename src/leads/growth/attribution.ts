@@ -79,7 +79,11 @@ function hostOf(url: string | null | undefined): string | null {
     return null;
   }
   try {
-    const host = new URL(url).hostname.toLowerCase();
+    const parsed = new URL(url);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return null;
+    }
+    const host = parsed.hostname.toLowerCase();
     return host.length > 0 ? host : null;
   } catch {
     return null;
@@ -88,6 +92,45 @@ function hostOf(url: string | null | undefined): string | null {
 
 function stripWww(host: string): string {
   return host.startsWith("www.") ? host.slice(4) : host;
+}
+
+/** Count document arrivals and explicit campaign links. Internal continuations
+ * carrying the same referral code or UTM tags belong to the original arrival.
+ */
+export function isAcquisitionVisit(
+  url: URL,
+  referer: string | null,
+  ownHosts: readonly string[],
+  touch: Touch,
+  fetchSite: string | null,
+): boolean {
+  const fromHost = hostOf(referer);
+  const internal =
+    fetchSite === "same-origin" ||
+    (fromHost !== null &&
+      [url.hostname, ...ownHosts].some(
+        (host) => stripWww(host.toLowerCase()) === stripWww(fromHost),
+      ));
+  if (!internal) {
+    return true;
+  }
+  if (!hasCampaignSignal(touch)) {
+    return false;
+  }
+  if (!referer || fromHost === null) {
+    return true;
+  }
+  const previous = extractTouch(new URL(referer), null, ownHosts);
+  const markers = [
+    "source",
+    "medium",
+    "campaign",
+    "linkId",
+    "refCode",
+  ] as const;
+  return markers.some(
+    (key) => touch[key] !== null && touch[key] !== previous[key],
+  );
 }
 
 /**

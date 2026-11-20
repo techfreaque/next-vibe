@@ -3,6 +3,99 @@ import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  filters: {
+    search: {
+      label: "Buscar",
+      description: "Buscar guías por correo electrónico o nombre comercial",
+      placeholder: "Escriba correo electrónico o nombre de empresa...",
+    },
+    status: {
+      label: "Situación",
+      description: "Filtro por estado de contacto",
+      placeholder: "Todos los estados",
+    },
+    currentCampaignStage: {
+      label: "Etapa de campaña",
+      description: "Filtrar por el escenario de la campaña de email",
+      placeholder: "Todas las etapas",
+    },
+    source: {
+      label: "Fuente",
+      description: "Filtro por fuente de contacto",
+      placeholder: "Todas las fuentes",
+    },
+    country: {
+      label: "País",
+      description: "Filtro por país",
+      placeholder: "Todos los países",
+    },
+    language: {
+      label: "Idioma",
+      description: "Filtro por idioma",
+      placeholder: "Todos los idiomas",
+    },
+    sortBy: {
+      label: "Ordenar por",
+      description: "Elija el campo para ordenar",
+      placeholder: "Campo tipo",
+    },
+    sortOrder: {
+      label: "Ordenar orden",
+      description: "Ordenar ascender o descender",
+      placeholder: "Orden ordenada",
+    },
+    statusFilters: {
+      title: "Estado &quot; Filtros de campaña",
+      description: "Filtro por estado, etapa de campaña y fuente",
+    },
+    locationFilters: {
+      title: "Filtros de ubicación",
+      description: "Filtro por país e idioma",
+    },
+    sortingOptions: {
+      title: "Opciones de clasificación",
+      description: "Configurar la orden de tipo",
+    },
+  },
+  acquisition: {
+    title: "Captación de contactos",
+    description:
+      "Cada visita se atribuye a su fuente de entrada. Los contactos y las conversiones usan la fuente registrada y el código de referido asignado. Los ingresos incluyen pagos exitosos en la moneda elegida.",
+    sources: {
+      all: "Todas las fuentes",
+      creator: "Código de creador",
+      referral: "Código de referido",
+      campaign: "Campaña UTM",
+      search: "Búsqueda orgánica",
+      referrer: "Sitio de referencia",
+      direct: "Acceso directo",
+      unattributed: "Sin atribución",
+    },
+    metrics: {
+      visits: "Visitas",
+      leads: "Contactos",
+      signups: "Registros",
+      firstChats: "Primeros chats",
+      payers: "Usuarios de pago",
+      revenue: "Ingresos",
+    },
+    fields: {
+      type: "Tipo de fuente",
+      source: "Fuente UTM",
+      medium: "Medio UTM",
+      campaign: "Campaña UTM",
+      referrerHost: "Dominio de referencia",
+      refCode: "Código de referido",
+      currency: "Moneda de ingresos",
+      metric: "Métrica",
+    },
+    series: "Captación de contactos a lo largo del tiempo",
+    empty: "Sin actividad en este periodo.",
+    page: "Página",
+    previous: "Anterior",
+    next: "Siguiente",
+    apply: "Aplicar filtros",
+  },
   category: "Contactos",
   tags: {
     leads: "Contactos",
@@ -232,6 +325,7 @@ export const translations: typeof enTranslations = {
     fr: "Francés",
   },
   enums: {
+    currency: { eur: "EUR", usd: "USD", pln: "PLN" },
     leadStatus: {
       new: "Nuevo",
       pending: "Pendiente",

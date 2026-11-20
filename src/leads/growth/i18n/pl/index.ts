@@ -1,6 +1,45 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  acquisition: {
+    title: "Pozyskiwanie kontaktów",
+    description:
+      "Wizyty liczymy według źródła wejścia. Kontakty i konwersje korzystają z zapisanej atrybucji i przypisanego kodu polecenia. Przychód obejmuje udane płatności w wybranej walucie.",
+    sources: {
+      all: "Wszystkie źródła",
+      creator: "Kod twórcy",
+      referral: "Kod polecenia",
+      campaign: "Kampania UTM",
+      search: "Wyniki organiczne",
+      referrer: "Odnośnik zewnętrzny",
+      direct: "Bezpośrednio",
+      unattributed: "Bez atrybucji",
+    },
+    metrics: {
+      visits: "Wizyty",
+      leads: "Kontakty",
+      signups: "Rejestracje",
+      firstChats: "Pierwsze rozmowy",
+      payers: "Płacący",
+      revenue: "Przychód",
+    },
+    fields: {
+      type: "Typ źródła",
+      source: "Źródło UTM",
+      medium: "Medium UTM",
+      campaign: "Kampania UTM",
+      referrerHost: "Domena odsyłająca",
+      refCode: "Kod polecenia",
+      currency: "Waluta przychodu",
+      metric: "Wskaźnik",
+    },
+    series: "Pozyskiwanie kontaktów w czasie",
+    empty: "Brak aktywności w tym okresie.",
+    page: "Strona",
+    previous: "Wstecz",
+    next: "Dalej",
+    apply: "Zastosuj filtry",
+  },
   category: "Wzrost",
   tags: {
     vibeSense: "vibe-sense",

@@ -12,6 +12,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
@@ -25,6 +26,9 @@ import {
   widgetField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
+
+import { acquisitionMetrics } from "@/leads/growth/acquisition";
+import { acquisitionCurrencyField } from "@/leads/growth/acquisition-fields";
 
 import {
   PayoutAction,
@@ -66,6 +70,8 @@ export const { GET } = createEndpoint({
     render: ReferralsContainer,
     usage: { request: "data", response: true } as const,
     children: {
+      acquisitionCurrency: acquisitionCurrencyField,
+
       // === SEARCH & FILTERS ===
       searchFilters: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
@@ -231,6 +237,19 @@ export const { GET } = createEndpoint({
                   type: WidgetType.TEXT,
                   label: "get.response.codes.currentUses" as const,
                   schema: z.coerce.number(),
+                }),
+                visits: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "widget.clicks",
+                  schema: z.number(),
+                }),
+                acquisition: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "acquisition.title",
+                  schema: acquisitionMetrics
+                    .omit({ visits: true, signups: true })
+                    .extend({ currency: z.enum(CurrenciesArr) })
+                    .optional(),
                 }),
                 totalSignups: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,

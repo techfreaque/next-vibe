@@ -5,6 +5,7 @@
 
 "use client";
 import { DateRangePreset } from "next-vibe/core/core-utils/stats-filtering.schema";
+import { formatCurrency } from "next-vibe/core/i18n/core/localization-utils";
 import {
   LeadSource,
   LeadSourceFilter,
@@ -32,6 +33,14 @@ import { MetricCard } from "next-vibe/ui/components/metric-card";
 import { MetricGrid } from "next-vibe/ui/components/metric-grid";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe/ui/components/table";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
@@ -50,6 +59,7 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
+import { AcquisitionFilterInputs } from "../growth/acquisition-filter-inputs";
 import type definition from "./definition";
 
 interface CustomWidgetProps {
@@ -494,6 +504,27 @@ export function LeadsStatsContainer({
     }
   }, [onSubmit, endpointMutations]);
 
+  const acquisition = data?.acquisition;
+  const acquisitionCurrency = data?.acquisition?.currency ?? "EUR";
+  const showAcquisitionPage = (page: number): void => {
+    form.setValue("acquisitionPage", page, { shouldDirty: true });
+    handleApplyFilters();
+  };
+  const acquisitionHeaders = [
+    t("acquisition.fields.type"),
+    t("acquisition.fields.refCode"),
+    t("acquisition.fields.referrerHost"),
+    t("acquisition.fields.source"),
+    t("acquisition.fields.medium"),
+    t("acquisition.fields.campaign"),
+    t("acquisition.metrics.visits"),
+    t("acquisition.metrics.leads"),
+    t("acquisition.metrics.signups"),
+    t("acquisition.metrics.firstChats"),
+    t("acquisition.metrics.payers"),
+    t("acquisition.metrics.revenue"),
+  ];
+
   const groupedStats = data?.groupedStats;
   const recentActivity = useMemo(
     () => data?.recentActivity ?? [],
@@ -896,6 +927,112 @@ export function LeadsStatsContainer({
           subscriptionConfirmed: t("widget.funnelSubscriptionConfirmed"),
         }}
       />
+
+      <SectionGroup
+        title={t("acquisition.title")}
+        subtitle={t("acquisition.description")}
+      >
+        <AcquisitionFilterInputs />
+        <Div className="flex flex-wrap items-center justify-between gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={endpointMutations?.read?.isFetching}
+            onClick={() => showAcquisitionPage(1)}
+          >
+            {t("acquisition.apply")}
+          </Button>
+          {acquisition && (acquisition.page > 1 || acquisition.hasMore) && (
+            <Div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={acquisition.page <= 1}
+                onClick={() => showAcquisitionPage(acquisition.page - 1)}
+              >
+                {t("acquisition.previous")}
+              </Button>
+              <Span className="text-sm tabular-nums">{acquisition.page}</Span>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={!acquisition.hasMore}
+                onClick={() => showAcquisitionPage(acquisition.page + 1)}
+              >
+                {t("acquisition.next")}
+              </Button>
+            </Div>
+          )}
+        </Div>
+        {acquisition &&
+          (acquisition.rows.length > 0 ? (
+            <Div className="overflow-x-auto rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    {acquisitionHeaders.map((name) => (
+                      <TableHead key={name} className="whitespace-nowrap">
+                        {name}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {acquisition.rows.map((row) => (
+                    <TableRow
+                      key={JSON.stringify([
+                        row.sourceType,
+                        row.refCode,
+                        row.referrerHost,
+                        row.source,
+                        row.medium,
+                        row.campaign,
+                      ])}
+                    >
+                      <TableCell className="font-medium">
+                        {t(row.sourceType)}
+                      </TableCell>
+                      <TableCell>{row.refCode}</TableCell>
+                      <TableCell>{row.referrerHost}</TableCell>
+                      <TableCell>{row.source}</TableCell>
+                      <TableCell>{row.medium}</TableCell>
+                      <TableCell>{row.campaign}</TableCell>
+                      <TableCell className="tabular-nums">
+                        {row.visits.toLocaleString(locale)}
+                      </TableCell>
+                      <TableCell className="tabular-nums">
+                        {row.leads.toLocaleString(locale)}
+                      </TableCell>
+                      <TableCell className="tabular-nums">
+                        {row.signups.toLocaleString(locale)}
+                      </TableCell>
+                      <TableCell className="tabular-nums">
+                        {row.firstChats.toLocaleString(locale)}
+                      </TableCell>
+                      <TableCell className="tabular-nums">
+                        {row.payers.toLocaleString(locale)}
+                      </TableCell>
+                      <TableCell className="tabular-nums">
+                        {formatCurrency(
+                          row.revenue,
+                          acquisitionCurrency,
+                          locale,
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Div>
+          ) : (
+            <Span className="text-sm text-muted-foreground">
+              {t("acquisition.empty")}
+            </Span>
+          ))}
+      </SectionGroup>
 
       {/* Grouped stats breakdown */}
       {groupedStats && (

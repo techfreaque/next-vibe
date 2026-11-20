@@ -1,12 +1,10 @@
 /**
- * Referral Conversion Rate - Repository
- * Server-only. DB access.
- * Signups / lead-clicks per resolution bucket = conversion rate (0–100).
+ * Share of measured first referral visits that led to a credited signup.
  */
 
 import "server-only";
 
-import { and, count, gte, lte, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -19,8 +17,7 @@ import type {
 } from "next-vibe/dataflow/shared/fields";
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
-
-import { leadReferrals, userReferrals } from "../../db";
+import type { QueryResultRow } from "pg";
 
 export class QueryReferralsConversionRateRepository {
   static async queryReferralsConversionRate(data: {
@@ -34,67 +31,40 @@ export class QueryReferralsConversionRateRepository {
     }>
   > {
     const { resolution, range, lookback } = data;
+    const { rows } = await db.execute<
+      QueryResultRow & { bucket: string; value: number }
+    >(sql`
+      WITH first_visits AS (
+        SELECT v.lead_id, c.id AS code_id, min(v.visited_at) AS first_visit
+        FROM growth_visits v JOIN referral_codes c ON c.code = v.ref_code
+        WHERE v.visited_at <= ${range.to.toISOString()}::timestamp
+        GROUP BY v.lead_id, c.id
+      )
+      SELECT ${resolutionBucketExpr(resolution, sql`first_visit`)} AS bucket,
+        round(100.0 * avg((EXISTS (
+          SELECT 1 FROM user_referrals ur
+          LEFT JOIN growth_journeys j ON j.user_id = ur.referred_user_id
+          LEFT JOIN user_lead_links ul ON ul.user_id = ur.referred_user_id
+            AND ul.lead_id = v.lead_id AND ul.link_reason = 'signup'
+          WHERE ur.referral_code_id = v.code_id AND ur.created_at >= v.first_visit
+            AND coalesce(j.lead_id, ul.lead_id) = v.lead_id
+        ))::int))::float8 AS value
+      FROM first_visits v
+      WHERE v.first_visit >= ${range.from.toISOString()}::timestamp
+      GROUP BY 1 ORDER BY 1
+    `);
 
-    // Fetch clicks (lead_referrals) and signups (user_referrals) in parallel
-    const [clickRows, signupRows] = await Promise.all([
-      db
-        .select({
-          bucket: resolutionBucketExpr(resolution, leadReferrals.createdAt).as(
-            "bucket",
-          ),
-          cnt: count(),
-        })
-        .from(leadReferrals)
-        .where(
-          and(
-            gte(leadReferrals.createdAt, range.from),
-            lte(leadReferrals.createdAt, range.to),
-          ),
-        )
-        .groupBy(sql`1`)
-        .orderBy(sql`1`),
-
-      db
-        .select({
-          bucket: resolutionBucketExpr(resolution, userReferrals.createdAt).as(
-            "bucket",
-          ),
-          cnt: count(),
-        })
-        .from(userReferrals)
-        .where(
-          and(
-            gte(userReferrals.createdAt, range.from),
-            lte(userReferrals.createdAt, range.to),
-          ),
-        )
-        .groupBy(sql`1`)
-        .orderBy(sql`1`),
-    ]);
-
-    // Build lookup maps keyed by bucket ISO string
-    const clickMap = new Map(
-      clickRows.map((r) => [new Date(r.bucket).toISOString(), Number(r.cnt)]),
-    );
-    const signupMap = new Map(
-      signupRows.map((r) => [new Date(r.bucket).toISOString(), Number(r.cnt)]),
-    );
-
-    // Collect all bucket timestamps
-    const allBuckets = new Set([...clickMap.keys(), ...signupMap.keys()]);
-
-    const raw: DataPoint[] = [...allBuckets].toSorted().map((iso) => {
-      const clicks = clickMap.get(iso) ?? 0;
-      const signups = signupMap.get(iso) ?? 0;
-      const rate = clicks > 0 ? Math.round((signups / clicks) * 100) : 0;
-      return { timestamp: new Date(iso), value: rate };
-    });
-
-    const result = fillGaps(raw, range, resolution);
     return success({
-      result,
+      result: fillGaps(
+        rows.map(({ bucket, value }) => ({
+          timestamp: new Date(bucket),
+          value,
+        })),
+        range,
+        resolution,
+      ),
       meta: {
-        actualResolution: resolution ?? "enums.resolution.1d",
+        actualResolution: resolution,
         lookbackUsed: lookback ?? 0,
       },
     });

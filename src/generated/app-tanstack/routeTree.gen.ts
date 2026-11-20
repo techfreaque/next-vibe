@@ -504,6 +504,7 @@ import { Route as ApiLocaleInventoryWarehouseWarehouseIdGetRouteImport } from '.
 import { Route as ApiLocaleInventoryWarehouseWarehouseIdUpdateRouteImport } from './routes/api.$locale.inventory.warehouse.$warehouseId.update'
 import { Route as ApiLocaleLeadMagnetProvidersGoogleSheetsSheetsListRouteImport } from './routes/api.$locale.lead-magnet.providers.google-sheets.sheets-list'
 import { Route as ApiLocaleLeadsCampaignsEmailsTestMailRouteImport } from './routes/api.$locale.leads.campaigns.emails.test-mail'
+import { Route as ApiLocaleLeadsGrowthDataSourcesAcquisitionRouteImport } from './routes/api.$locale.leads.growth.data-sources.acquisition'
 import { Route as ApiLocaleLeadsGrowthDataSourcesChannelSpendRouteImport } from './routes/api.$locale.leads.growth.data-sources.channel-spend'
 import { Route as ApiLocaleLeadsGrowthDataSourcesFunnelStepRouteImport } from './routes/api.$locale.leads.growth.data-sources.funnel-step'
 import { Route as ApiLocaleLeadsImportJobsJobIdRouteImport } from './routes/api.$locale.leads.import.jobs.$jobId'
@@ -3595,6 +3596,12 @@ const ApiLocaleLeadsCampaignsEmailsTestMailRoute =
     path: '/api/$locale/leads/campaigns/emails/test-mail',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleLeadsGrowthDataSourcesAcquisitionRoute =
+  ApiLocaleLeadsGrowthDataSourcesAcquisitionRouteImport.update({
+    id: '/api/$locale/leads/growth/data-sources/acquisition',
+    path: '/api/$locale/leads/growth/data-sources/acquisition',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute =
   ApiLocaleLeadsGrowthDataSourcesChannelSpendRouteImport.update({
     id: '/api/$locale/leads/growth/data-sources/channel-spend',
@@ -5454,6 +5461,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/inventory/warehouse/$warehouseId/update': typeof ApiLocaleInventoryWarehouseWarehouseIdUpdateRoute
   '/api/$locale/lead-magnet/providers/google-sheets/sheets-list': typeof ApiLocaleLeadMagnetProvidersGoogleSheetsSheetsListRoute
   '/api/$locale/leads/campaigns/emails/test-mail': typeof ApiLocaleLeadsCampaignsEmailsTestMailRoute
+  '/api/$locale/leads/growth/data-sources/acquisition': typeof ApiLocaleLeadsGrowthDataSourcesAcquisitionRoute
   '/api/$locale/leads/growth/data-sources/channel-spend': typeof ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute
   '/api/$locale/leads/growth/data-sources/funnel-step': typeof ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute
   '/api/$locale/leads/import/jobs/$jobId': typeof ApiLocaleLeadsImportJobsJobIdRouteWithChildren
@@ -6168,6 +6176,7 @@ export interface FileRoutesByTo {
   '/api/$locale/inventory/warehouse/$warehouseId/update': typeof ApiLocaleInventoryWarehouseWarehouseIdUpdateRoute
   '/api/$locale/lead-magnet/providers/google-sheets/sheets-list': typeof ApiLocaleLeadMagnetProvidersGoogleSheetsSheetsListRoute
   '/api/$locale/leads/campaigns/emails/test-mail': typeof ApiLocaleLeadsCampaignsEmailsTestMailRoute
+  '/api/$locale/leads/growth/data-sources/acquisition': typeof ApiLocaleLeadsGrowthDataSourcesAcquisitionRoute
   '/api/$locale/leads/growth/data-sources/channel-spend': typeof ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute
   '/api/$locale/leads/growth/data-sources/funnel-step': typeof ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute
   '/api/$locale/leads/import/jobs/$jobId': typeof ApiLocaleLeadsImportJobsJobIdRouteWithChildren
@@ -6891,6 +6900,7 @@ export interface FileRoutesById {
   '/api/$locale/inventory/warehouse/$warehouseId/update': typeof ApiLocaleInventoryWarehouseWarehouseIdUpdateRoute
   '/api/$locale/lead-magnet/providers/google-sheets/sheets-list': typeof ApiLocaleLeadMagnetProvidersGoogleSheetsSheetsListRoute
   '/api/$locale/leads/campaigns/emails/test-mail': typeof ApiLocaleLeadsCampaignsEmailsTestMailRoute
+  '/api/$locale/leads/growth/data-sources/acquisition': typeof ApiLocaleLeadsGrowthDataSourcesAcquisitionRoute
   '/api/$locale/leads/growth/data-sources/channel-spend': typeof ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute
   '/api/$locale/leads/growth/data-sources/funnel-step': typeof ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute
   '/api/$locale/leads/import/jobs/$jobId': typeof ApiLocaleLeadsImportJobsJobIdRouteWithChildren
@@ -7614,6 +7624,7 @@ export interface FileRouteTypes {
     | '/api/$locale/inventory/warehouse/$warehouseId/update'
     | '/api/$locale/lead-magnet/providers/google-sheets/sheets-list'
     | '/api/$locale/leads/campaigns/emails/test-mail'
+    | '/api/$locale/leads/growth/data-sources/acquisition'
     | '/api/$locale/leads/growth/data-sources/channel-spend'
     | '/api/$locale/leads/growth/data-sources/funnel-step'
     | '/api/$locale/leads/import/jobs/$jobId'
@@ -8328,6 +8339,7 @@ export interface FileRouteTypes {
     | '/api/$locale/inventory/warehouse/$warehouseId/update'
     | '/api/$locale/lead-magnet/providers/google-sheets/sheets-list'
     | '/api/$locale/leads/campaigns/emails/test-mail'
+    | '/api/$locale/leads/growth/data-sources/acquisition'
     | '/api/$locale/leads/growth/data-sources/channel-spend'
     | '/api/$locale/leads/growth/data-sources/funnel-step'
     | '/api/$locale/leads/import/jobs/$jobId'
@@ -9050,6 +9062,7 @@ export interface FileRouteTypes {
     | '/api/$locale/inventory/warehouse/$warehouseId/update'
     | '/api/$locale/lead-magnet/providers/google-sheets/sheets-list'
     | '/api/$locale/leads/campaigns/emails/test-mail'
+    | '/api/$locale/leads/growth/data-sources/acquisition'
     | '/api/$locale/leads/growth/data-sources/channel-spend'
     | '/api/$locale/leads/growth/data-sources/funnel-step'
     | '/api/$locale/leads/import/jobs/$jobId'
@@ -9610,6 +9623,7 @@ export interface RootRouteChildren {
   ApiLocaleInventoryWarehouseWarehouseIdGetRoute: typeof ApiLocaleInventoryWarehouseWarehouseIdGetRoute
   ApiLocaleInventoryWarehouseWarehouseIdUpdateRoute: typeof ApiLocaleInventoryWarehouseWarehouseIdUpdateRoute
   ApiLocaleLeadsCampaignsEmailsTestMailRoute: typeof ApiLocaleLeadsCampaignsEmailsTestMailRoute
+  ApiLocaleLeadsGrowthDataSourcesAcquisitionRoute: typeof ApiLocaleLeadsGrowthDataSourcesAcquisitionRoute
   ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute: typeof ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute
   ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute: typeof ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute
   ApiLocaleMessengerAccountsEditIdRoute: typeof ApiLocaleMessengerAccountsEditIdRoute
@@ -13202,6 +13216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleLeadsCampaignsEmailsTestMailRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/leads/growth/data-sources/acquisition': {
+      id: '/api/$locale/leads/growth/data-sources/acquisition'
+      path: '/api/$locale/leads/growth/data-sources/acquisition'
+      fullPath: '/api/$locale/leads/growth/data-sources/acquisition'
+      preLoaderRoute: typeof ApiLocaleLeadsGrowthDataSourcesAcquisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/leads/growth/data-sources/channel-spend': {
       id: '/api/$locale/leads/growth/data-sources/channel-spend'
       path: '/api/$locale/leads/growth/data-sources/channel-spend'
@@ -16558,6 +16579,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleInventoryWarehouseWarehouseIdUpdateRoute,
   ApiLocaleLeadsCampaignsEmailsTestMailRoute:
     ApiLocaleLeadsCampaignsEmailsTestMailRoute,
+  ApiLocaleLeadsGrowthDataSourcesAcquisitionRoute:
+    ApiLocaleLeadsGrowthDataSourcesAcquisitionRoute,
   ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute:
     ApiLocaleLeadsGrowthDataSourcesChannelSpendRoute,
   ApiLocaleLeadsGrowthDataSourcesFunnelStepRoute:

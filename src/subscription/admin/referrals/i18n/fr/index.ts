@@ -1,6 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  acquisition: {
+    title: "Acquisition de contacts",
+    fields: { currency: "Devise du chiffre d’affaires" },
+  },
   get: {
     title: "Tableau de bord des parrainages",
     titleShort: "Parrainages (admin)",
@@ -71,7 +75,7 @@ export const translations: typeof enTranslations = {
         code: "Code",
         ownerEmail: "Propriétaire",
         ownerName: "Nom",
-        currentUses: "Clics",
+        currentUses: "Utilisations du code",
         totalSignups: "Inscriptions",
         totalEarned: "Gagné",
         isActive: "Actif",
@@ -241,6 +245,7 @@ export const translations: typeof enTranslations = {
     },
   },
   enums: {
+    currency: { eur: "EUR", usd: "USD", pln: "PLN" },
     payoutStatusFilter: {
       all: "Tous",
       pending: "En attente",

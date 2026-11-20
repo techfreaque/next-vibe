@@ -138784,6 +138784,1425 @@
     "credits": 0
   },
   {
+    "toolName": "growth-acquisition",
+    "title": "Captación de contactos",
+    "titleShort": "Captación de contactos",
+    "description": "Cada visita se atribuye a su fuente de entrada. Los contactos y las conversiones usan la fuente registrada y el código de referido asignado. Los ingresos incluyen pagos exitosos en la moneda elegida.",
+    "fields": {
+      "noFormElement": true,
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "resolution": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Resolución",
+          "description": "Tamaño del cubo",
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "enums.resolution.1m": "enums.resolution.1m",
+                    "enums.resolution.3m": "enums.resolution.3m",
+                    "enums.resolution.5m": "enums.resolution.5m",
+                    "enums.resolution.15m": "enums.resolution.15m",
+                    "enums.resolution.30m": "enums.resolution.30m",
+                    "enums.resolution.1h": "enums.resolution.1h",
+                    "enums.resolution.4h": "enums.resolution.4h",
+                    "enums.resolution.1d": "enums.resolution.1d",
+                    "enums.resolution.1w": "enums.resolution.1w",
+                    "enums.resolution.1M": "enums.resolution.1M"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "enums.resolution.1m": "enums.resolution.1m",
+                  "enums.resolution.3m": "enums.resolution.3m",
+                  "enums.resolution.5m": "enums.resolution.5m",
+                  "enums.resolution.15m": "enums.resolution.15m",
+                  "enums.resolution.30m": "enums.resolution.30m",
+                  "enums.resolution.1h": "enums.resolution.1h",
+                  "enums.resolution.4h": "enums.resolution.4h",
+                  "enums.resolution.1d": "enums.resolution.1d",
+                  "enums.resolution.1w": "enums.resolution.1w",
+                  "enums.resolution.1M": "enums.resolution.1M"
+                },
+                "options": [
+                  "enums.resolution.1m",
+                  "enums.resolution.3m",
+                  "enums.resolution.5m",
+                  "enums.resolution.15m",
+                  "enums.resolution.30m",
+                  "enums.resolution.1h",
+                  "enums.resolution.4h",
+                  "enums.resolution.1d",
+                  "enums.resolution.1w",
+                  "enums.resolution.1M"
+                ]
+              },
+              "defaultValue": "enums.resolution.1d"
+            },
+            "type": "default"
+          },
+          "options": [
+            {
+              "value": "enums.resolution.1m",
+              "label": "enums.resolution.1m"
+            },
+            {
+              "value": "enums.resolution.3m",
+              "label": "enums.resolution.3m"
+            },
+            {
+              "value": "enums.resolution.5m",
+              "label": "enums.resolution.5m"
+            },
+            {
+              "value": "enums.resolution.15m",
+              "label": "enums.resolution.15m"
+            },
+            {
+              "value": "enums.resolution.30m",
+              "label": "enums.resolution.30m"
+            },
+            {
+              "value": "enums.resolution.1h",
+              "label": "enums.resolution.1h"
+            },
+            {
+              "value": "enums.resolution.4h",
+              "label": "enums.resolution.4h"
+            },
+            {
+              "value": "enums.resolution.1d",
+              "label": "enums.resolution.1d"
+            },
+            {
+              "value": "enums.resolution.1w",
+              "label": "enums.resolution.1w"
+            },
+            {
+              "value": "enums.resolution.1M",
+              "label": "enums.resolution.1M"
+            }
+          ],
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "range": {
+          "type": "form_field",
+          "fieldType": "date_range",
+          "label": "Rango",
+          "description": "Rango de tiempo para la consulta",
+          "schema": {
+            "def": {
+              "type": "object",
+              "shape": {
+                "from": {
+                  "def": {
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  },
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                },
+                "to": {
+                  "def": {
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  },
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                }
+              }
+            },
+            "type": "object"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "lookback": {
+          "type": "form_field",
+          "fieldType": "int",
+          "label": "Mira atrás.",
+          "description": "Barras extra antes de empezar el rango",
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "defaultValue": 0
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "metric": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Métrica",
+          "options": [
+            {
+              "value": "acquisition.metrics.visits",
+              "label": "acquisition.metrics.visits"
+            },
+            {
+              "value": "acquisition.metrics.leads",
+              "label": "acquisition.metrics.leads"
+            },
+            {
+              "value": "acquisition.metrics.signups",
+              "label": "acquisition.metrics.signups"
+            },
+            {
+              "value": "acquisition.metrics.firstChats",
+              "label": "acquisition.metrics.firstChats"
+            },
+            {
+              "value": "acquisition.metrics.payers",
+              "label": "acquisition.metrics.payers"
+            },
+            {
+              "value": "acquisition.metrics.revenue",
+              "label": "acquisition.metrics.revenue"
+            }
+          ],
+          "schema": {
+            "def": {
+              "type": "default",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "VISITS": "acquisition.metrics.visits",
+                    "LEADS": "acquisition.metrics.leads",
+                    "SIGNUPS": "acquisition.metrics.signups",
+                    "FIRST_CHATS": "acquisition.metrics.firstChats",
+                    "PAYERS": "acquisition.metrics.payers",
+                    "REVENUE": "acquisition.metrics.revenue"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "VISITS": "acquisition.metrics.visits",
+                  "LEADS": "acquisition.metrics.leads",
+                  "SIGNUPS": "acquisition.metrics.signups",
+                  "FIRST_CHATS": "acquisition.metrics.firstChats",
+                  "PAYERS": "acquisition.metrics.payers",
+                  "REVENUE": "acquisition.metrics.revenue"
+                },
+                "options": [
+                  "acquisition.metrics.visits",
+                  "acquisition.metrics.leads",
+                  "acquisition.metrics.signups",
+                  "acquisition.metrics.firstChats",
+                  "acquisition.metrics.payers",
+                  "acquisition.metrics.revenue"
+                ]
+              },
+              "defaultValue": "acquisition.metrics.visits"
+            },
+            "type": "default"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "sourceType": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Tipo de fuente",
+          "options": [
+            {
+              "value": "acquisition.sources.all",
+              "label": "acquisition.sources.all"
+            },
+            {
+              "value": "acquisition.sources.creator",
+              "label": "acquisition.sources.creator"
+            },
+            {
+              "value": "acquisition.sources.referral",
+              "label": "acquisition.sources.referral"
+            },
+            {
+              "value": "acquisition.sources.campaign",
+              "label": "acquisition.sources.campaign"
+            },
+            {
+              "value": "acquisition.sources.search",
+              "label": "acquisition.sources.search"
+            },
+            {
+              "value": "acquisition.sources.referrer",
+              "label": "acquisition.sources.referrer"
+            },
+            {
+              "value": "acquisition.sources.direct",
+              "label": "acquisition.sources.direct"
+            },
+            {
+              "value": "acquisition.sources.unattributed",
+              "label": "acquisition.sources.unattributed"
+            }
+          ],
+          "placeholder": "Todas las fuentes",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "ALL": "acquisition.sources.all",
+                    "CREATOR": "acquisition.sources.creator",
+                    "REFERRAL": "acquisition.sources.referral",
+                    "CAMPAIGN": "acquisition.sources.campaign",
+                    "SEARCH": "acquisition.sources.search",
+                    "REFERRER": "acquisition.sources.referrer",
+                    "DIRECT": "acquisition.sources.direct",
+                    "UNATTRIBUTED": "acquisition.sources.unattributed"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "ALL": "acquisition.sources.all",
+                  "CREATOR": "acquisition.sources.creator",
+                  "REFERRAL": "acquisition.sources.referral",
+                  "CAMPAIGN": "acquisition.sources.campaign",
+                  "SEARCH": "acquisition.sources.search",
+                  "REFERRER": "acquisition.sources.referrer",
+                  "DIRECT": "acquisition.sources.direct",
+                  "UNATTRIBUTED": "acquisition.sources.unattributed"
+                },
+                "options": [
+                  "acquisition.sources.all",
+                  "acquisition.sources.creator",
+                  "acquisition.sources.referral",
+                  "acquisition.sources.campaign",
+                  "acquisition.sources.search",
+                  "acquisition.sources.referrer",
+                  "acquisition.sources.direct",
+                  "acquisition.sources.unattributed"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "source": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Fuente UTM",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "medium": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Medio UTM",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "campaign": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Campaña UTM",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "referrerHost": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Dominio de referencia",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "refCode": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Código de referido",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "currency": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Moneda de ingresos",
+          "options": [
+            {
+              "value": "EUR",
+              "label": "enums.currency.eur"
+            },
+            {
+              "value": "USD",
+              "label": "enums.currency.usd"
+            },
+            {
+              "value": "PLN",
+              "label": "enums.currency.pln"
+            }
+          ],
+          "placeholder": "EUR",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "EUR": "EUR",
+                    "USD": "USD",
+                    "PLN": "PLN"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "EUR": "EUR",
+                  "USD": "USD",
+                  "PLN": "PLN"
+                },
+                "options": ["EUR", "USD", "PLN"]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "result": {
+          "type": "form_field",
+          "fieldType": "time_series",
+          "label": "Captación de contactos a lo largo del tiempo",
+          "description": "Cada visita se atribuye a su fuente de entrada. Los contactos y las conversiones usan la fuente registrada y el código de referido asignado. Los ingresos incluyen pagos exitosos en la moneda elegida.",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "timestamp": {
+                      "def": {
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "date"
+                                },
+                                "type": "date"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "coerce": true,
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            ]
+                          },
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
+                    "value": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "meta": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "record",
+                            "keyType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "valueType": {
+                              "def": {
+                                "type": "union",
+                                "options": [
+                                  {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  {
+                                    "def": {
+                                      "type": "number",
+                                      "checks": []
+                                    },
+                                    "type": "number",
+                                    "isFinite": true
+                                  },
+                                  {
+                                    "def": {
+                                      "type": "boolean"
+                                    },
+                                    "type": "boolean"
+                                  },
+                                  {
+                                    "def": {
+                                      "type": "null"
+                                    },
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                },
+                                {
+                                  "def": {
+                                    "type": "boolean"
+                                  },
+                                  "type": "boolean"
+                                },
+                                {
+                                  "def": {
+                                    "type": "null"
+                                  },
+                                  "type": "null"
+                                }
+                              ]
+                            }
+                          },
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                },
+                                {
+                                  "def": {
+                                    "type": "boolean"
+                                  },
+                                  "type": "boolean"
+                                },
+                                {
+                                  "def": {
+                                    "type": "null"
+                                  },
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              {
+                                "def": {
+                                  "type": "null"
+                                },
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "type": "optional"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "timestamp": {
+                    "def": {
+                      "type": "pipe",
+                      "in": {
+                        "def": {
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "out": {
+                        "def": {
+                          "type": "transform"
+                        },
+                        "type": "transform"
+                      }
+                    },
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  },
+                  "value": {
+                    "def": {
+                      "type": "number",
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "meta": {
+                    "def": {
+                      "type": "optional",
+                      "innerType": {
+                        "def": {
+                          "type": "record",
+                          "keyType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "valueType": {
+                            "def": {
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                },
+                                {
+                                  "def": {
+                                    "type": "boolean"
+                                  },
+                                  "type": "boolean"
+                                },
+                                {
+                                  "def": {
+                                    "type": "null"
+                                  },
+                                  "type": "null"
+                                }
+                              ]
+                            },
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              {
+                                "def": {
+                                  "type": "null"
+                                },
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "type": "record",
+                        "keyType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "valueType": {
+                          "def": {
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              {
+                                "def": {
+                                  "type": "null"
+                                },
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            },
+                            {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            },
+                            {
+                              "def": {
+                                "type": "null"
+                              },
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "type": "optional"
+                  }
+                }
+              },
+              "type": "object"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "meta": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Meta",
+          "description": "Metadatos de ejecución de nodos",
+          "schema": {
+            "def": {
+              "type": "object",
+              "shape": {
+                "actualResolution": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "enums.resolution.1m": "enums.resolution.1m",
+                      "enums.resolution.3m": "enums.resolution.3m",
+                      "enums.resolution.5m": "enums.resolution.5m",
+                      "enums.resolution.15m": "enums.resolution.15m",
+                      "enums.resolution.30m": "enums.resolution.30m",
+                      "enums.resolution.1h": "enums.resolution.1h",
+                      "enums.resolution.4h": "enums.resolution.4h",
+                      "enums.resolution.1d": "enums.resolution.1d",
+                      "enums.resolution.1w": "enums.resolution.1w",
+                      "enums.resolution.1M": "enums.resolution.1M"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "enums.resolution.1m": "enums.resolution.1m",
+                    "enums.resolution.3m": "enums.resolution.3m",
+                    "enums.resolution.5m": "enums.resolution.5m",
+                    "enums.resolution.15m": "enums.resolution.15m",
+                    "enums.resolution.30m": "enums.resolution.30m",
+                    "enums.resolution.1h": "enums.resolution.1h",
+                    "enums.resolution.4h": "enums.resolution.4h",
+                    "enums.resolution.1d": "enums.resolution.1d",
+                    "enums.resolution.1w": "enums.resolution.1w",
+                    "enums.resolution.1M": "enums.resolution.1M"
+                  },
+                  "options": [
+                    "enums.resolution.1m",
+                    "enums.resolution.3m",
+                    "enums.resolution.5m",
+                    "enums.resolution.15m",
+                    "enums.resolution.30m",
+                    "enums.resolution.1h",
+                    "enums.resolution.4h",
+                    "enums.resolution.1d",
+                    "enums.resolution.1w",
+                    "enums.resolution.1M"
+                  ]
+                },
+                "lookbackUsed": {
+                  "def": {
+                    "type": "number",
+                    "checks": [
+                      {
+                        "def": {
+                          "type": "number",
+                          "check": "number_format",
+                          "abort": false,
+                          "format": "safeint"
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      {}
+                    ]
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "sparse": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "optional"
+                }
+              }
+            },
+            "type": "object"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "analytics",
+    "tags": ["vibe-sense"],
+    "aliases": ["growth-acquisition"],
+    "credits": 0
+  },
+  {
     "toolName": "growth-channel-spend",
     "title": "Gasto de canal",
     "titleShort": "Gasto de canal",
@@ -148690,8 +150109,8 @@
         "statusFilters": {
           "schemaType": "object-optional",
           "type": "container",
-          "title": "filters.statusFilters.title",
-          "description": "filters.statusFilters.description",
+          "title": "Estado &quot; Filtros de campaña",
+          "description": "Filtro por estado, etapa de campaña y fuente",
           "layoutType": "grid",
           "columns": 6,
           "order": 1,
@@ -148703,9 +150122,9 @@
             "search": {
               "type": "form_field",
               "fieldType": "text",
-              "label": "filters.search.label",
-              "description": "filters.search.description",
-              "placeholder": "filters.search.placeholder",
+              "label": "Buscar",
+              "description": "Buscar guías por correo electrónico o nombre comercial",
+              "placeholder": "Escriba correo electrónico o nombre de empresa...",
               "columns": 6,
               "schema": {
                 "def": {
@@ -148727,9 +150146,9 @@
             "status": {
               "type": "form_field",
               "fieldType": "multiselect",
-              "label": "filters.status.label",
-              "description": "filters.status.description",
-              "placeholder": "filters.status.placeholder",
+              "label": "Situación",
+              "description": "Filtro por estado de contacto",
+              "placeholder": "Todos los estados",
               "options": [
                 {
                   "value": "enums.leadStatusFilter.all",
@@ -148897,9 +150316,9 @@
             "currentCampaignStage": {
               "type": "form_field",
               "fieldType": "multiselect",
-              "label": "filters.currentCampaignStage.label",
-              "description": "filters.currentCampaignStage.description",
-              "placeholder": "filters.currentCampaignStage.placeholder",
+              "label": "Etapa de campaña",
+              "description": "Filtrar por el escenario de la campaña de email",
+              "placeholder": "Todas las etapas",
               "options": [
                 {
                   "value": "enums.emailCampaignStageFilter.all",
@@ -149027,9 +150446,9 @@
             "source": {
               "type": "form_field",
               "fieldType": "multiselect",
-              "label": "filters.source.label",
-              "description": "filters.source.description",
-              "placeholder": "filters.source.placeholder",
+              "label": "Fuente",
+              "description": "Filtro por fuente de contacto",
+              "placeholder": "Todas las fuentes",
               "options": [
                 {
                   "value": "enums.leadSourceFilter.all",
@@ -149139,8 +150558,8 @@
         "locationFilters": {
           "schemaType": "object-optional",
           "type": "container",
-          "title": "filters.locationFilters.title",
-          "description": "filters.locationFilters.description",
+          "title": "Filtros de ubicación",
+          "description": "Filtro por país e idioma",
           "layoutType": "grid",
           "columns": 2,
           "order": 2,
@@ -149152,9 +150571,9 @@
             "country": {
               "type": "form_field",
               "fieldType": "multiselect",
-              "label": "filters.country.label",
-              "description": "filters.country.description",
-              "placeholder": "filters.country.placeholder",
+              "label": "País",
+              "description": "Filtro por país",
+              "placeholder": "Todos los países",
               "options": [
                 {
                   "value": "GLOBAL",
@@ -150751,9 +152170,9 @@
             "language": {
               "type": "form_field",
               "fieldType": "multiselect",
-              "label": "filters.language.label",
-              "description": "filters.language.description",
-              "placeholder": "filters.language.placeholder",
+              "label": "Idioma",
+              "description": "Filtro por idioma",
+              "placeholder": "Todos los idiomas",
               "options": [
                 {
                   "value": "en",
@@ -150845,11 +152264,264 @@
             }
           }
         },
+        "acquisitionFilters": {
+          "schemaType": "object-optional",
+          "type": "container",
+          "title": "Captación de contactos",
+          "usage": {
+            "request": "data"
+          },
+          "children": {
+            "sourceType": {
+              "type": "form_field",
+              "fieldType": "select",
+              "label": "Tipo de fuente",
+              "options": [
+                {
+                  "value": "acquisition.sources.all",
+                  "label": "acquisition.sources.all"
+                },
+                {
+                  "value": "acquisition.sources.creator",
+                  "label": "acquisition.sources.creator"
+                },
+                {
+                  "value": "acquisition.sources.referral",
+                  "label": "acquisition.sources.referral"
+                },
+                {
+                  "value": "acquisition.sources.campaign",
+                  "label": "acquisition.sources.campaign"
+                },
+                {
+                  "value": "acquisition.sources.search",
+                  "label": "acquisition.sources.search"
+                },
+                {
+                  "value": "acquisition.sources.referrer",
+                  "label": "acquisition.sources.referrer"
+                },
+                {
+                  "value": "acquisition.sources.direct",
+                  "label": "acquisition.sources.direct"
+                },
+                {
+                  "value": "acquisition.sources.unattributed",
+                  "label": "acquisition.sources.unattributed"
+                }
+              ],
+              "placeholder": "Todas las fuentes",
+              "schema": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "ALL": "acquisition.sources.all",
+                        "CREATOR": "acquisition.sources.creator",
+                        "REFERRAL": "acquisition.sources.referral",
+                        "CAMPAIGN": "acquisition.sources.campaign",
+                        "SEARCH": "acquisition.sources.search",
+                        "REFERRER": "acquisition.sources.referrer",
+                        "DIRECT": "acquisition.sources.direct",
+                        "UNATTRIBUTED": "acquisition.sources.unattributed"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "ALL": "acquisition.sources.all",
+                      "CREATOR": "acquisition.sources.creator",
+                      "REFERRAL": "acquisition.sources.referral",
+                      "CAMPAIGN": "acquisition.sources.campaign",
+                      "SEARCH": "acquisition.sources.search",
+                      "REFERRER": "acquisition.sources.referrer",
+                      "DIRECT": "acquisition.sources.direct",
+                      "UNATTRIBUTED": "acquisition.sources.unattributed"
+                    },
+                    "options": [
+                      "acquisition.sources.all",
+                      "acquisition.sources.creator",
+                      "acquisition.sources.referral",
+                      "acquisition.sources.campaign",
+                      "acquisition.sources.search",
+                      "acquisition.sources.referrer",
+                      "acquisition.sources.direct",
+                      "acquisition.sources.unattributed"
+                    ]
+                  }
+                },
+                "type": "optional"
+              },
+              "usage": {
+                "request": "data"
+              },
+              "schemaType": "primitive"
+            },
+            "source": {
+              "type": "form_field",
+              "fieldType": "text",
+              "label": "Fuente UTM",
+              "schema": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "string",
+                      "checks": [{}]
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "optional"
+              },
+              "usage": {
+                "request": "data"
+              },
+              "schemaType": "primitive"
+            },
+            "medium": {
+              "type": "form_field",
+              "fieldType": "text",
+              "label": "Medio UTM",
+              "schema": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "string",
+                      "checks": [{}]
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "optional"
+              },
+              "usage": {
+                "request": "data"
+              },
+              "schemaType": "primitive"
+            },
+            "campaign": {
+              "type": "form_field",
+              "fieldType": "text",
+              "label": "Campaña UTM",
+              "schema": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "string",
+                      "checks": [{}]
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "optional"
+              },
+              "usage": {
+                "request": "data"
+              },
+              "schemaType": "primitive"
+            },
+            "referrerHost": {
+              "type": "form_field",
+              "fieldType": "text",
+              "label": "Dominio de referencia",
+              "schema": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "string",
+                      "checks": [{}]
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "optional"
+              },
+              "usage": {
+                "request": "data"
+              },
+              "schemaType": "primitive"
+            },
+            "refCode": {
+              "type": "form_field",
+              "fieldType": "text",
+              "label": "Código de referido",
+              "schema": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "string",
+                      "checks": [{}]
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "optional"
+              },
+              "usage": {
+                "request": "data"
+              },
+              "schemaType": "primitive"
+            }
+          }
+        },
+        "acquisitionCurrency": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Moneda de ingresos",
+          "options": [
+            {
+              "value": "EUR",
+              "label": "enums.currency.eur"
+            },
+            {
+              "value": "USD",
+              "label": "enums.currency.usd"
+            },
+            {
+              "value": "PLN",
+              "label": "enums.currency.pln"
+            }
+          ],
+          "placeholder": "EUR",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "EUR": "EUR",
+                    "USD": "USD",
+                    "PLN": "PLN"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "EUR": "EUR",
+                  "USD": "USD",
+                  "PLN": "PLN"
+                },
+                "options": ["EUR", "USD", "PLN"]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "sortingOptions": {
           "schemaType": "object-optional",
           "type": "container",
-          "title": "filters.sortingOptions.title",
-          "description": "filters.sortingOptions.description",
+          "title": "Opciones de clasificación",
+          "description": "Configurar la orden de tipo",
           "layoutType": "grid",
           "columns": 2,
           "order": 3,
@@ -150861,9 +152533,9 @@
             "sortBy": {
               "type": "form_field",
               "fieldType": "select",
-              "label": "filters.sortBy.label",
-              "description": "filters.sortBy.description",
-              "placeholder": "filters.sortBy.placeholder",
+              "label": "Ordenar por",
+              "description": "Elija el campo para ordenar",
+              "placeholder": "Campo tipo",
               "options": [
                 {
                   "value": "enums.leadSortField.email",
@@ -150928,9 +152600,9 @@
             "sortOrder": {
               "type": "form_field",
               "fieldType": "select",
-              "label": "filters.sortOrder.label",
-              "description": "filters.sortOrder.description",
-              "placeholder": "filters.sortOrder.placeholder",
+              "label": "Ordenar orden",
+              "description": "Ordenar ascender o descender",
+              "placeholder": "Orden ordenada",
               "options": [
                 {
                   "value": "enums.sortOrder.asc",
@@ -152371,6 +154043,179 @@
                         }
                       },
                       "type": "nullable"
+                    },
+                    "usage": {
+                      "response": true
+                    },
+                    "schemaType": "primitive"
+                  },
+                  "acquisition": {
+                    "type": "text",
+                    "label": "Captación de contactos",
+                    "schema": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "visits": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "signups": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "firstChats": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "payers": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "revenue": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "sourceType": {
+                                "def": {
+                                  "type": "enum",
+                                  "entries": {
+                                    "CREATOR": "acquisition.sources.creator",
+                                    "REFERRAL": "acquisition.sources.referral",
+                                    "CAMPAIGN": "acquisition.sources.campaign",
+                                    "SEARCH": "acquisition.sources.search",
+                                    "REFERRER": "acquisition.sources.referrer",
+                                    "DIRECT": "acquisition.sources.direct",
+                                    "UNATTRIBUTED": "acquisition.sources.unattributed"
+                                  }
+                                },
+                                "type": "enum",
+                                "enum": {
+                                  "CREATOR": "acquisition.sources.creator",
+                                  "REFERRAL": "acquisition.sources.referral",
+                                  "CAMPAIGN": "acquisition.sources.campaign",
+                                  "SEARCH": "acquisition.sources.search",
+                                  "REFERRER": "acquisition.sources.referrer",
+                                  "DIRECT": "acquisition.sources.direct",
+                                  "UNATTRIBUTED": "acquisition.sources.unattributed"
+                                },
+                                "options": [
+                                  "acquisition.sources.creator",
+                                  "acquisition.sources.referral",
+                                  "acquisition.sources.campaign",
+                                  "acquisition.sources.search",
+                                  "acquisition.sources.referrer",
+                                  "acquisition.sources.direct",
+                                  "acquisition.sources.unattributed"
+                                ]
+                              },
+                              "source": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "medium": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "campaign": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "referrerHost": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "refCode": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "currency": {
+                                "def": {
+                                  "type": "enum",
+                                  "entries": {
+                                    "EUR": "EUR",
+                                    "USD": "USD",
+                                    "PLN": "PLN"
+                                  }
+                                },
+                                "type": "enum",
+                                "enum": {
+                                  "EUR": "EUR",
+                                  "USD": "USD",
+                                  "PLN": "PLN"
+                                },
+                                "options": ["EUR", "USD", "PLN"]
+                              }
+                            },
+                            "checks": []
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "optional"
                     },
                     "usage": {
                       "response": true
@@ -165255,6 +167100,720 @@
           "usage": {
             "response": true
           }
+        },
+        "acquisitionFilters": {
+          "schemaType": "object-optional",
+          "type": "container",
+          "title": "Captación de contactos",
+          "usage": {
+            "request": "data"
+          },
+          "children": {
+            "sourceType": {
+              "type": "form_field",
+              "fieldType": "select",
+              "label": "Tipo de fuente",
+              "options": [
+                {
+                  "value": "acquisition.sources.all",
+                  "label": "acquisition.sources.all"
+                },
+                {
+                  "value": "acquisition.sources.creator",
+                  "label": "acquisition.sources.creator"
+                },
+                {
+                  "value": "acquisition.sources.referral",
+                  "label": "acquisition.sources.referral"
+                },
+                {
+                  "value": "acquisition.sources.campaign",
+                  "label": "acquisition.sources.campaign"
+                },
+                {
+                  "value": "acquisition.sources.search",
+                  "label": "acquisition.sources.search"
+                },
+                {
+                  "value": "acquisition.sources.referrer",
+                  "label": "acquisition.sources.referrer"
+                },
+                {
+                  "value": "acquisition.sources.direct",
+                  "label": "acquisition.sources.direct"
+                },
+                {
+                  "value": "acquisition.sources.unattributed",
+                  "label": "acquisition.sources.unattributed"
+                }
+              ],
+              "placeholder": "Todas las fuentes",
+              "schema": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "ALL": "acquisition.sources.all",
+                        "CREATOR": "acquisition.sources.creator",
+                        "REFERRAL": "acquisition.sources.referral",
+                        "CAMPAIGN": "acquisition.sources.campaign",
+                        "SEARCH": "acquisition.sources.search",
+                        "REFERRER": "acquisition.sources.referrer",
+                        "DIRECT": "acquisition.sources.direct",
+                        "UNATTRIBUTED": "acquisition.sources.unattributed"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "ALL": "acquisition.sources.all",
+                      "CREATOR": "acquisition.sources.creator",
+                      "REFERRAL": "acquisition.sources.referral",
+                      "CAMPAIGN": "acquisition.sources.campaign",
+                      "SEARCH": "acquisition.sources.search",
+                      "REFERRER": "acquisition.sources.referrer",
+                      "DIRECT": "acquisition.sources.direct",
+                      "UNATTRIBUTED": "acquisition.sources.unattributed"
+                    },
+                    "options": [
+                      "acquisition.sources.all",
+                      "acquisition.sources.creator",
+                      "acquisition.sources.referral",
+                      "acquisition.sources.campaign",
+                      "acquisition.sources.search",
+                      "acquisition.sources.referrer",
+                      "acquisition.sources.direct",
+                      "acquisition.sources.unattributed"
+                    ]
+                  }
+                },
+                "type": "optional"
+              },
+              "usage": {
+                "request": "data"
+              },
+              "schemaType": "primitive"
+            },
+            "source": {
+              "type": "form_field",
+              "fieldType": "text",
+              "label": "Fuente UTM",
+              "schema": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "string",
+                      "checks": [{}]
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "optional"
+              },
+              "usage": {
+                "request": "data"
+              },
+              "schemaType": "primitive"
+            },
+            "medium": {
+              "type": "form_field",
+              "fieldType": "text",
+              "label": "Medio UTM",
+              "schema": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "string",
+                      "checks": [{}]
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "optional"
+              },
+              "usage": {
+                "request": "data"
+              },
+              "schemaType": "primitive"
+            },
+            "campaign": {
+              "type": "form_field",
+              "fieldType": "text",
+              "label": "Campaña UTM",
+              "schema": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "string",
+                      "checks": [{}]
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "optional"
+              },
+              "usage": {
+                "request": "data"
+              },
+              "schemaType": "primitive"
+            },
+            "referrerHost": {
+              "type": "form_field",
+              "fieldType": "text",
+              "label": "Dominio de referencia",
+              "schema": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "string",
+                      "checks": [{}]
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "optional"
+              },
+              "usage": {
+                "request": "data"
+              },
+              "schemaType": "primitive"
+            },
+            "refCode": {
+              "type": "form_field",
+              "fieldType": "text",
+              "label": "Código de referido",
+              "schema": {
+                "def": {
+                  "type": "optional",
+                  "innerType": {
+                    "def": {
+                      "type": "string",
+                      "checks": [{}]
+                    },
+                    "type": "string"
+                  }
+                },
+                "type": "optional"
+              },
+              "usage": {
+                "request": "data"
+              },
+              "schemaType": "primitive"
+            }
+          }
+        },
+        "acquisitionCurrency": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Moneda de ingresos",
+          "options": [
+            {
+              "value": "EUR",
+              "label": "enums.currency.eur"
+            },
+            {
+              "value": "USD",
+              "label": "enums.currency.usd"
+            },
+            {
+              "value": "PLN",
+              "label": "enums.currency.pln"
+            }
+          ],
+          "placeholder": "EUR",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "EUR": "EUR",
+                    "USD": "USD",
+                    "PLN": "PLN"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "EUR": "EUR",
+                  "USD": "USD",
+                  "PLN": "PLN"
+                },
+                "options": ["EUR", "USD", "PLN"]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "acquisitionPage": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Página",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "coerce": true,
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "acquisition": {
+          "type": "text",
+          "label": "Captación de contactos",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "rows": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "visits": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "leads": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "signups": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "firstChats": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "payers": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "revenue": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "sourceType": {
+                                "def": {
+                                  "type": "enum",
+                                  "entries": {
+                                    "CREATOR": "acquisition.sources.creator",
+                                    "REFERRAL": "acquisition.sources.referral",
+                                    "CAMPAIGN": "acquisition.sources.campaign",
+                                    "SEARCH": "acquisition.sources.search",
+                                    "REFERRER": "acquisition.sources.referrer",
+                                    "DIRECT": "acquisition.sources.direct",
+                                    "UNATTRIBUTED": "acquisition.sources.unattributed"
+                                  }
+                                },
+                                "type": "enum",
+                                "enum": {
+                                  "CREATOR": "acquisition.sources.creator",
+                                  "REFERRAL": "acquisition.sources.referral",
+                                  "CAMPAIGN": "acquisition.sources.campaign",
+                                  "SEARCH": "acquisition.sources.search",
+                                  "REFERRER": "acquisition.sources.referrer",
+                                  "DIRECT": "acquisition.sources.direct",
+                                  "UNATTRIBUTED": "acquisition.sources.unattributed"
+                                },
+                                "options": [
+                                  "acquisition.sources.creator",
+                                  "acquisition.sources.referral",
+                                  "acquisition.sources.campaign",
+                                  "acquisition.sources.search",
+                                  "acquisition.sources.referrer",
+                                  "acquisition.sources.direct",
+                                  "acquisition.sources.unattributed"
+                                ]
+                              },
+                              "source": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "medium": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "campaign": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "referrerHost": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "refCode": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              }
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "object",
+                          "shape": {
+                            "visits": {
+                              "def": {
+                                "type": "number",
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            },
+                            "leads": {
+                              "def": {
+                                "type": "number",
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            },
+                            "signups": {
+                              "def": {
+                                "type": "number",
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            },
+                            "firstChats": {
+                              "def": {
+                                "type": "number",
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            },
+                            "payers": {
+                              "def": {
+                                "type": "number",
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            },
+                            "revenue": {
+                              "def": {
+                                "type": "number",
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            },
+                            "sourceType": {
+                              "def": {
+                                "type": "enum",
+                                "entries": {
+                                  "CREATOR": "acquisition.sources.creator",
+                                  "REFERRAL": "acquisition.sources.referral",
+                                  "CAMPAIGN": "acquisition.sources.campaign",
+                                  "SEARCH": "acquisition.sources.search",
+                                  "REFERRER": "acquisition.sources.referrer",
+                                  "DIRECT": "acquisition.sources.direct",
+                                  "UNATTRIBUTED": "acquisition.sources.unattributed"
+                                }
+                              },
+                              "type": "enum",
+                              "enum": {
+                                "CREATOR": "acquisition.sources.creator",
+                                "REFERRAL": "acquisition.sources.referral",
+                                "CAMPAIGN": "acquisition.sources.campaign",
+                                "SEARCH": "acquisition.sources.search",
+                                "REFERRER": "acquisition.sources.referrer",
+                                "DIRECT": "acquisition.sources.direct",
+                                "UNATTRIBUTED": "acquisition.sources.unattributed"
+                              },
+                              "options": [
+                                "acquisition.sources.creator",
+                                "acquisition.sources.referral",
+                                "acquisition.sources.campaign",
+                                "acquisition.sources.search",
+                                "acquisition.sources.referrer",
+                                "acquisition.sources.direct",
+                                "acquisition.sources.unattributed"
+                              ]
+                            },
+                            "source": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              },
+                              "type": "nullable"
+                            },
+                            "medium": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              },
+                              "type": "nullable"
+                            },
+                            "campaign": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              },
+                              "type": "nullable"
+                            },
+                            "referrerHost": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              },
+                              "type": "nullable"
+                            },
+                            "refCode": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              },
+                              "type": "nullable"
+                            }
+                          }
+                        },
+                        "type": "object"
+                      }
+                    },
+                    "totals": {
+                      "def": {
+                        "type": "object",
+                        "shape": {
+                          "visits": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          },
+                          "leads": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          },
+                          "signups": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          },
+                          "firstChats": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          },
+                          "payers": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          },
+                          "revenue": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "hasMore": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
+                    "page": {
+                      "def": {
+                        "type": "number",
+                        "checks": [
+                          {
+                            "def": {
+                              "type": "number",
+                              "check": "number_format",
+                              "abort": false,
+                              "format": "safeint"
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "currency": {
+                      "def": {
+                        "type": "enum",
+                        "entries": {
+                          "EUR": "EUR",
+                          "USD": "USD",
+                          "PLN": "PLN"
+                        }
+                      },
+                      "type": "enum",
+                      "enum": {
+                        "EUR": "EUR",
+                        "USD": "USD",
+                        "PLN": "PLN"
+                      },
+                      "options": ["EUR", "USD", "PLN"]
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
         },
         "generatedAt": {
           "type": "text",
@@ -241316,7 +243875,7 @@
     "toolName": "referrals-conversion-rate",
     "title": "Tasa de conversión de referencia",
     "titleShort": "Tasa de conversión",
-    "description": "Suscripciones por clic de guía - cuántos clics de referencia se convierten en usuarios registrados",
+    "description": "Porcentaje de primeras visitas medidas que generaron una inscripción atribuida",
     "fields": {
       "noFormElement": true,
       "usage": {
@@ -241728,7 +244287,7 @@
           "type": "form_field",
           "fieldType": "time_series",
           "label": "Tasa de conversión",
-          "description": "Suscripciones / clics de contacto por cubo (0-100%)",
+          "description": "Inscripciones como porcentaje de primeras visitas, por fecha de visita",
           "schema": {
             "def": {
               "type": "array",
@@ -253532,6 +256091,53 @@
         "response": true
       },
       "children": {
+        "acquisitionCurrency": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Moneda de ingresos",
+          "options": [
+            {
+              "value": "EUR",
+              "label": "enums.currency.eur"
+            },
+            {
+              "value": "USD",
+              "label": "enums.currency.usd"
+            },
+            {
+              "value": "PLN",
+              "label": "enums.currency.pln"
+            }
+          ],
+          "placeholder": "EUR",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "EUR": "EUR",
+                    "USD": "USD",
+                    "PLN": "PLN"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "EUR": "EUR",
+                  "USD": "USD",
+                  "PLN": "PLN"
+                },
+                "options": ["EUR", "USD", "PLN"]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "searchFilters": {
           "schemaType": "object-optional",
           "type": "container",
@@ -253982,7 +256588,7 @@
                   },
                   "currentUses": {
                     "type": "text",
-                    "label": "Clics",
+                    "label": "Usos del código",
                     "schema": {
                       "def": {
                         "type": "number",
@@ -253991,6 +256597,94 @@
                       },
                       "type": "number",
                       "isFinite": true
+                    },
+                    "usage": {
+                      "response": true
+                    },
+                    "schemaType": "primitive"
+                  },
+                  "visits": {
+                    "type": "text",
+                    "label": "clics",
+                    "schema": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "usage": {
+                      "response": true
+                    },
+                    "schemaType": "primitive"
+                  },
+                  "acquisition": {
+                    "type": "text",
+                    "label": "Captación de contactos",
+                    "schema": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "leads": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "firstChats": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "payers": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "revenue": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "currency": {
+                                "def": {
+                                  "type": "enum",
+                                  "entries": {
+                                    "EUR": "EUR",
+                                    "USD": "USD",
+                                    "PLN": "PLN"
+                                  }
+                                },
+                                "type": "enum",
+                                "enum": {
+                                  "EUR": "EUR",
+                                  "USD": "USD",
+                                  "PLN": "PLN"
+                                },
+                                "options": ["EUR", "USD", "PLN"]
+                              }
+                            },
+                            "checks": []
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "optional"
                     },
                     "usage": {
                       "response": true

@@ -363,6 +363,11 @@ export async function middleware(
       });
       stampCsrfCookie(request, urlLeadResp);
       addCorsHeaders(request, urlLeadResp, path);
+      await recordAttributionTouch(
+        request,
+        urlLeadId,
+        createEndpointLogger(false, locale),
+      );
       return urlLeadResp;
     }
 
@@ -374,17 +379,13 @@ export async function middleware(
     return leadIdResp;
   }
 
-  // Valid leadId - a later visit carrying UTMs / ref moves the last touch
-  if (/[?&](?:utm_|ref=)/.test(request.nextUrl.search)) {
-    const touchLeadId = getLeadIdFromRequest(request);
-    if (touchLeadId) {
-      recordAttributionTouch(
-        request,
-        touchLeadId,
-        false,
-        createEndpointLogger(false, locale),
-      );
-    }
+  const touchLeadId = getLeadIdFromRequest(request);
+  if (touchLeadId) {
+    await recordAttributionTouch(
+      request,
+      touchLeadId,
+      createEndpointLogger(false, locale),
+    );
   }
 
   // Valid leadId - sync lead locale if it changed

@@ -6,6 +6,46 @@ import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  acquisition: {
+    totals: "Totale filtrato",
+    title: "Acquisizione contatti",
+    description:
+      "Ogni visita usa la propria fonte. Contatti e conversioni usano la fonte registrata e il codice referral attribuito. I ricavi includono i pagamenti riusciti nella valuta scelta.",
+    sources: {
+      all: "Tutte le fonti",
+      creator: "Codice creator",
+      referral: "Codice referral",
+      campaign: "Campagna UTM",
+      search: "Ricerca organica",
+      referrer: "Sito referente",
+      direct: "Accesso diretto",
+      unattributed: "Senza attribuzione",
+    },
+    metrics: {
+      visits: "Visite",
+      leads: "Contatti",
+      signups: "Iscrizioni",
+      firstChats: "Prime chat",
+      payers: "Utenti paganti",
+      revenue: "Ricavi",
+    },
+    fields: {
+      type: "Tipo di fonte",
+      source: "Fonte UTM",
+      medium: "Mezzo UTM",
+      campaign: "Campagna UTM",
+      referrerHost: "Dominio referente",
+      refCode: "Codice referral",
+      currency: "Valuta dei ricavi",
+      metric: "Metrica",
+    },
+    series: "Acquisizione contatti nel tempo",
+    empty: "Nessuna attività nel periodo.",
+    page: "Pagina",
+    previous: "Indietro",
+    next: "Avanti",
+    apply: "Applica filtri",
+  },
   title: "Statistiche di contatto",
   titleShort: "Statistiche dei contatti",
   description: "Comprehensive conduce statistiche e analisi con dati storici",
@@ -423,6 +463,7 @@ export const translations: typeof enTranslations = {
     dateSeparator: "–",
   },
   enums: {
+    currency: { eur: "EUR", usd: "USD", pln: "PLN" },
     sortOrder: {
       asc: "Assunzione",
       desc: "Discussione",

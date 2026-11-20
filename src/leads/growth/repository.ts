@@ -15,7 +15,7 @@ import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { deriveChannel, hasCampaignSignal, type Touch } from "./attribution";
-import { growthCampaignLinks, growthJourneys } from "./db";
+import { growthCampaignLinks, growthJourneys, growthVisits } from "./db";
 import type { FunnelStepValue, PaidKindValue } from "./enum";
 import { ChannelType, FunnelStep } from "./enum";
 
@@ -48,36 +48,47 @@ export class GrowthJourneyRepository {
         lastLinkId: linkId,
         lastTouchAt: now,
       };
-      const insert = db.insert(growthJourneys).values({
-        leadId,
-        firstChannel: t.channel,
-        firstChannelType: t.channelType,
-        firstSource: t.source,
-        firstMedium: t.medium,
-        firstCampaign: t.campaign,
-        firstContent: t.content,
-        firstTerm: t.term,
-        firstReferrerHost: t.referrerHost,
-        firstLandingPath: t.landingPath,
-        firstRefCode: t.refCode,
-        firstLinkId: linkId,
-        firstTouchAt: now,
-        ...last,
+      await db.transaction(async (tx) => {
+        await tx.insert(growthVisits).values({
+          leadId,
+          visitedAt: now,
+          source: t.source,
+          medium: t.medium,
+          campaign: t.campaign,
+          referrerHost: t.referrerHost,
+          refCode: t.refCode,
+        });
+        const insert = tx.insert(growthJourneys).values({
+          leadId,
+          firstChannel: t.channel,
+          firstChannelType: t.channelType,
+          firstSource: t.source,
+          firstMedium: t.medium,
+          firstCampaign: t.campaign,
+          firstContent: t.content,
+          firstTerm: t.term,
+          firstReferrerHost: t.referrerHost,
+          firstLandingPath: t.landingPath,
+          firstRefCode: t.refCode,
+          firstLinkId: linkId,
+          firstTouchAt: now,
+          ...last,
+        });
+
+        await (hasCampaignSignal(t)
+          ? insert.onConflictDoUpdate({
+              target: growthJourneys.leadId,
+              set: { ...last, updatedAt: now },
+            })
+          : insert.onConflictDoNothing({ target: growthJourneys.leadId }));
+
+        if (linkId) {
+          await tx
+            .update(growthCampaignLinks)
+            .set({ visits: sql`${growthCampaignLinks.visits} + 1` })
+            .where(eq(growthCampaignLinks.id, linkId));
+        }
       });
-
-      await (hasCampaignSignal(t)
-        ? insert.onConflictDoUpdate({
-            target: growthJourneys.leadId,
-            set: { ...last, updatedAt: now },
-          })
-        : insert.onConflictDoNothing({ target: growthJourneys.leadId }));
-
-      if (linkId) {
-        await db
-          .update(growthCampaignLinks)
-          .set({ visits: sql`${growthCampaignLinks.visits} + 1` })
-          .where(eq(growthCampaignLinks.id, linkId));
-      }
     } catch (error) {
       logger.error("Failed to record growth touch", parseError(error), {
         leadId,

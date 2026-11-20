@@ -3,6 +3,99 @@ import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  filters: {
+    search: {
+      label: "Suche",
+      description: "Leads nach E-Mail oder Firmenname suchen",
+      placeholder: "E-Mail oder Firmenname eingeben...",
+    },
+    status: {
+      label: "Status",
+      description: "Nach Lead-Status filtern",
+      placeholder: "Alle Status",
+    },
+    currentCampaignStage: {
+      label: "Kampagnenphase",
+      description: "Nach E-Mail-Kampagnenphase filtern",
+      placeholder: "Alle Phasen",
+    },
+    source: {
+      label: "Quelle",
+      description: "Nach Lead-Quelle filtern",
+      placeholder: "Alle Quellen",
+    },
+    country: {
+      label: "Land",
+      description: "Nach Land filtern",
+      placeholder: "Alle Länder",
+    },
+    language: {
+      label: "Sprache",
+      description: "Nach Sprache filtern",
+      placeholder: "Alle Sprachen",
+    },
+    sortBy: {
+      label: "Sortieren nach",
+      description: "Feld auswählen, nach dem sortiert werden soll",
+      placeholder: "Sortierfeld",
+    },
+    sortOrder: {
+      label: "Sortierreihenfolge",
+      description: "Aufsteigend oder absteigend sortieren",
+      placeholder: "Reihenfolge",
+    },
+    statusFilters: {
+      title: "Status- & Kampagnenfilter",
+      description: "Nach Status, Kampagnenphase und Quelle filtern",
+    },
+    locationFilters: {
+      title: "Standortfilter",
+      description: "Nach Land und Sprache filtern",
+    },
+    sortingOptions: {
+      title: "Sortieroptionen",
+      description: "Sortierreihenfolge konfigurieren",
+    },
+  },
+  acquisition: {
+    title: "Lead-Gewinnung",
+    description:
+      "Besuche zählen zur jeweiligen Zugriffsquelle. Leads und Abschlüsse nutzen die gespeicherte Quelle und den zugeordneten Empfehlungscode. Der Umsatz umfasst erfolgreiche Zahlungen in der gewählten Währung.",
+    sources: {
+      all: "Alle Quellen",
+      creator: "Creator-Code",
+      referral: "Empfehlungscode",
+      campaign: "UTM-Kampagne",
+      search: "Organische Suche",
+      referrer: "Externer Verweis",
+      direct: "Direkt",
+      unattributed: "Nicht zugeordnet",
+    },
+    metrics: {
+      visits: "Besuche",
+      leads: "Leads",
+      signups: "Registrierungen",
+      firstChats: "Erste Chats",
+      payers: "Zahlende Nutzer",
+      revenue: "Umsatz",
+    },
+    fields: {
+      type: "Quellentyp",
+      source: "UTM-Quelle",
+      medium: "UTM-Medium",
+      campaign: "UTM-Kampagne",
+      referrerHost: "Verweisdomain",
+      refCode: "Empfehlungscode",
+      currency: "Umsatzwährung",
+      metric: "Kennzahl",
+    },
+    series: "Lead-Gewinnung im Zeitverlauf",
+    empty: "Keine Aktivitäten in diesem Zeitraum.",
+    page: "Seite",
+    previous: "Zurück",
+    next: "Weiter",
+    apply: "Filter anwenden",
+  },
   category: "Leads",
   tags: {
     leads: "Leads",
@@ -228,6 +321,7 @@ export const translations: typeof enTranslations = {
     fr: "Französisch",
   },
   enums: {
+    currency: { eur: "EUR", usd: "USD", pln: "PLN" },
     leadStatus: {
       new: "Neu",
       pending: "Ausstehend",

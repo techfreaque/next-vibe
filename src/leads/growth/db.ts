@@ -26,6 +26,28 @@ import type { z } from "zod";
 
 import { ChannelTypeDB, PaidKindDB } from "./enum";
 
+/** One measured arrival. Signup and referral credit never write to this table. */
+export const growthVisits = pgTable(
+  "growth_visits",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    leadId: uuid("lead_id")
+      .notNull()
+      .references(() => leads.id, { onDelete: "cascade" }),
+    visitedAt: timestamp("visited_at").notNull(),
+    source: text("source"),
+    medium: text("medium"),
+    campaign: text("campaign"),
+    referrerHost: text("referrer_host"),
+    refCode: text("ref_code"),
+  },
+  (table) => [
+    index("idx_growth_visits_visited_at").on(table.visitedAt),
+    index("idx_growth_visits_ref_code").on(table.refCode),
+    index("idx_growth_visits_lead_id").on(table.leadId),
+  ],
+);
+
 /**
  * Campaign Links
  * Admin-built UTM links. `utm_id` on the generated URL carries the link id.

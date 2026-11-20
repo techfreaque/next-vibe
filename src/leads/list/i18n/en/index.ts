@@ -1,6 +1,99 @@
 import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
 
 export const translations = {
+  filters: {
+    search: {
+      label: "Search",
+      description: "Search leads by email or business name",
+      placeholder: "Enter email or business name...",
+    },
+    status: {
+      label: "Status",
+      description: "Filter by lead status",
+      placeholder: "All statuses",
+    },
+    currentCampaignStage: {
+      label: "Campaign Stage",
+      description: "Filter by email campaign stage",
+      placeholder: "All stages",
+    },
+    source: {
+      label: "Source",
+      description: "Filter by lead source",
+      placeholder: "All sources",
+    },
+    country: {
+      label: "Country",
+      description: "Filter by country",
+      placeholder: "All countries",
+    },
+    language: {
+      label: "Language",
+      description: "Filter by language",
+      placeholder: "All languages",
+    },
+    sortBy: {
+      label: "Sort By",
+      description: "Choose the field to sort by",
+      placeholder: "Sort field",
+    },
+    sortOrder: {
+      label: "Sort Order",
+      description: "Sort ascending or descending",
+      placeholder: "Sort order",
+    },
+    statusFilters: {
+      title: "Status & Campaign Filters",
+      description: "Filter by status, campaign stage, and source",
+    },
+    locationFilters: {
+      title: "Location Filters",
+      description: "Filter by country and language",
+    },
+    sortingOptions: {
+      title: "Sorting Options",
+      description: "Configure the sort order",
+    },
+  },
+  acquisition: {
+    title: "Lead acquisition",
+    description:
+      "Arrivals use the source of each visit. Lead and conversion activity uses the lead’s recorded source and credited referral code. Revenue is gross successful payments in the selected currency. Historic arrival counts use the landing records we could recover.",
+    sources: {
+      all: "All sources",
+      creator: "Creator code",
+      referral: "Referral code",
+      campaign: "UTM campaign",
+      search: "Organic search",
+      referrer: "External referrer",
+      direct: "Direct",
+      unattributed: "Unattributed",
+    },
+    metrics: {
+      visits: "Visits",
+      leads: "Leads",
+      signups: "Signups",
+      firstChats: "First chats",
+      payers: "Payers",
+      revenue: "Revenue",
+    },
+    fields: {
+      type: "Source type",
+      source: "UTM source",
+      medium: "UTM medium",
+      campaign: "UTM campaign",
+      referrerHost: "Referrer domain",
+      refCode: "Referral code",
+      currency: "Revenue currency",
+      metric: "Metric",
+    },
+    series: "Lead acquisition over time",
+    empty: "No acquisition activity in this period.",
+    page: "Page",
+    previous: "Previous",
+    next: "Next",
+    apply: "Apply filters",
+  },
   category: "Leads",
   tags: {
     leads: "Leads",
@@ -226,6 +319,7 @@ export const translations = {
     fr: "French",
   },
   enums: {
+    currency: { eur: "EUR", usd: "USD", pln: "PLN" },
     leadStatus: {
       new: "New",
       pending: "Pending",

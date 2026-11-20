@@ -10,6 +10,7 @@ import {
   deriveChannel,
   extractTouch,
   hasCampaignSignal,
+  isAcquisitionVisit,
   isLikelyBot,
   normalizeChannelKey,
   normalizeDestinationPath,
@@ -214,5 +215,24 @@ describe("link builder helpers", () => {
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 HeadlessChrome/131.0 Safari/537.36",
       ),
     ).toBe(false);
+  });
+});
+
+describe("isAcquisitionVisit", () => {
+  it("counts referral arrivals without recounting internal redirects or signup navigation", () => {
+    const track = new URL("/en-US/track?ref=PARTNER&url=%2Fen-US%2Fstory", APP);
+    const external = "https://example.com/watch";
+    expect(isAcquisitionVisit(track, external, OWN, extractTouch(track, external, OWN), "cross-site")).toBe(true);
+
+    const signup = new URL("/en-US/user/signup?ref=PARTNER", APP);
+    const referer = track.toString();
+    expect(isAcquisitionVisit(signup, referer, OWN, extractTouch(signup, referer, OWN), "same-origin")).toBe(false);
+
+    const secondCode = new URL("/en-US/story?ref=OTHER", APP);
+    expect(isAcquisitionVisit(secondCode, referer, OWN, extractTouch(secondCode, referer, OWN), "same-origin")).toBe(true);
+
+    const home = new URL("/en-US", APP);
+    expect(isAcquisitionVisit(home, referer, OWN, extractTouch(home, referer, OWN), "same-origin")).toBe(false);
+    expect(isAcquisitionVisit(home, null, OWN, extractTouch(home, null, OWN), "none")).toBe(true);
   });
 });

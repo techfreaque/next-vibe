@@ -25,6 +25,7 @@ import { creditPacks, creditTransactions, creditWallets } from "@/credits/db";
 import { CreditPackType, CreditTransactionType } from "@/credits/enum";
 import type { CreditsT } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
+import { growthVisits } from "@/leads/growth/db";
 import { NotificationType } from "@/notifications/enum";
 import { NotificationsRepository } from "@/notifications/repository";
 
@@ -182,13 +183,13 @@ export class ReferralRepository {
               .from(userReferrals)
               .where(eq(userReferrals.referralCodeId, code.id));
 
-            // Count unique visitors: leads linked to this code who have NOT signed up yet
+            // Count distinct lead IDs with a measured visit using this code.
             const [visitorCount] = await db
               .select({
-                count: sql<number>`count(distinct ${leadReferrals.leadId})::int`,
+                count: sql<number>`count(distinct ${growthVisits.leadId})::int`,
               })
-              .from(leadReferrals)
-              .where(eq(leadReferrals.referralCodeId, code.id));
+              .from(growthVisits)
+              .where(eq(growthVisits.refCode, code.code));
 
             // Get earnings and revenue for this code from users referred by this code
             // Revenue = total amount paid by referred users (amountCents / POOL_PERCENTAGE)

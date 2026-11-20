@@ -3,6 +3,99 @@ import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  filters: {
+    search: {
+      label: "Recherche",
+      description: "Rechercher des leads par e-mail ou nom d'entreprise",
+      placeholder: "Saisissez un e-mail ou un nom d'entreprise...",
+    },
+    status: {
+      label: "Statut",
+      description: "Filtrer par statut du lead",
+      placeholder: "Tous les statuts",
+    },
+    currentCampaignStage: {
+      label: "Étape de campagne",
+      description: "Filtrer par étape de la campagne e-mail",
+      placeholder: "Toutes les étapes",
+    },
+    source: {
+      label: "Source",
+      description: "Filtrer par source du lead",
+      placeholder: "Toutes les sources",
+    },
+    country: {
+      label: "Pays",
+      description: "Filtrer par pays",
+      placeholder: "Tous les pays",
+    },
+    language: {
+      label: "Langue",
+      description: "Filtrer par langue",
+      placeholder: "Toutes les langues",
+    },
+    sortBy: {
+      label: "Trier par",
+      description: "Choisissez le champ de tri",
+      placeholder: "Champ de tri",
+    },
+    sortOrder: {
+      label: "Ordre de tri",
+      description: "Tri croissant ou décroissant",
+      placeholder: "Ordre de tri",
+    },
+    statusFilters: {
+      title: "Filtres de statut et de campagne",
+      description: "Filtrer par statut, étape de campagne et source",
+    },
+    locationFilters: {
+      title: "Filtres de localisation",
+      description: "Filtrer par pays et langue",
+    },
+    sortingOptions: {
+      title: "Options de tri",
+      description: "Configurer l'ordre de tri",
+    },
+  },
+  acquisition: {
+    title: "Acquisition de contacts",
+    description:
+      "Chaque visite est rattachée à sa propre source. Les contacts et conversions suivent la source enregistrée et le code de parrainage attribué. Le chiffre d’affaires inclut les paiements réussis dans la devise choisie.",
+    sources: {
+      all: "Toutes les sources",
+      creator: "Code créateur",
+      referral: "Code de parrainage",
+      campaign: "Campagne UTM",
+      search: "Recherche naturelle",
+      referrer: "Site référent",
+      direct: "Accès direct",
+      unattributed: "Sans attribution",
+    },
+    metrics: {
+      visits: "Visites",
+      leads: "Contacts",
+      signups: "Inscriptions",
+      firstChats: "Premiers chats",
+      payers: "Clients payants",
+      revenue: "Chiffre d’affaires",
+    },
+    fields: {
+      type: "Type de source",
+      source: "Source UTM",
+      medium: "Support UTM",
+      campaign: "Campagne UTM",
+      referrerHost: "Domaine référent",
+      refCode: "Code de parrainage",
+      currency: "Devise du chiffre d’affaires",
+      metric: "Indicateur",
+    },
+    series: "Acquisition de contacts dans le temps",
+    empty: "Aucune activité sur cette période.",
+    page: "Page",
+    previous: "Précédent",
+    next: "Suivant",
+    apply: "Appliquer les filtres",
+  },
   category: "Leads",
   tags: {
     leads: "Leads",
@@ -231,6 +324,7 @@ export const translations: typeof enTranslations = {
     fr: "Français",
   },
   enums: {
+    currency: { eur: "EUR", usd: "USD", pln: "PLN" },
     leadStatus: {
       new: "Nouveau",
       pending: "En attente",

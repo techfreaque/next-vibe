@@ -3,6 +3,99 @@ import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  filters: {
+    search: {
+      label: "Cerca",
+      description: "Ricerca conduce per e-mail o nome commerciale",
+      placeholder: "Inserisci e-mail o nome di affari...",
+    },
+    status: {
+      label: "Stato",
+      description: "Filtra per stato di contatto",
+      placeholder: "Tutti gli stati",
+    },
+    currentCampaignStage: {
+      label: "Fase di campagna",
+      description: "Filtra per la fase della campagna email",
+      placeholder: "Tutte le fasi",
+    },
+    source: {
+      label: "Fonte",
+      description: "Filtra per fonte di contatto",
+      placeholder: "Tutte le fonti",
+    },
+    country: {
+      label: "Paese",
+      description: "Filtra per paese",
+      placeholder: "Tutti i paesi",
+    },
+    language: {
+      label: "Lingua",
+      description: "Filtra per lingua",
+      placeholder: "Tutte le lingue",
+    },
+    sortBy: {
+      label: "Ordina per",
+      description: "Scegli il campo da ordinare",
+      placeholder: "Ordinare il campo",
+    },
+    sortOrder: {
+      label: "Ordinare",
+      description: "Ordinare ascendente o discesa",
+      placeholder: "Ordine ordinario",
+    },
+    statusFilters: {
+      title: "Stato e filtri per la campagna",
+      description: "Filtra per stato, fase di campagna e fonte",
+    },
+    locationFilters: {
+      title: "Filtri di posizione",
+      description: "Filtra per paese e lingua",
+    },
+    sortingOptions: {
+      title: "Opzioni di selezione",
+      description: "Configurare l'ordine ordinario",
+    },
+  },
+  acquisition: {
+    title: "Acquisizione contatti",
+    description:
+      "Ogni visita usa la propria fonte. Contatti e conversioni usano la fonte registrata e il codice referral attribuito. I ricavi includono i pagamenti riusciti nella valuta scelta.",
+    sources: {
+      all: "Tutte le fonti",
+      creator: "Codice creator",
+      referral: "Codice referral",
+      campaign: "Campagna UTM",
+      search: "Ricerca organica",
+      referrer: "Sito referente",
+      direct: "Accesso diretto",
+      unattributed: "Senza attribuzione",
+    },
+    metrics: {
+      visits: "Visite",
+      leads: "Contatti",
+      signups: "Iscrizioni",
+      firstChats: "Prime chat",
+      payers: "Utenti paganti",
+      revenue: "Ricavi",
+    },
+    fields: {
+      type: "Tipo di fonte",
+      source: "Fonte UTM",
+      medium: "Mezzo UTM",
+      campaign: "Campagna UTM",
+      referrerHost: "Dominio referente",
+      refCode: "Codice referral",
+      currency: "Valuta dei ricavi",
+      metric: "Metrica",
+    },
+    series: "Acquisizione contatti nel tempo",
+    empty: "Nessuna attività nel periodo.",
+    page: "Pagina",
+    previous: "Indietro",
+    next: "Avanti",
+    apply: "Applica filtri",
+  },
   category: "Contatti",
   tags: {
     leads: "Contatti",
@@ -232,6 +325,7 @@ export const translations: typeof enTranslations = {
     fr: "Francese",
   },
   enums: {
+    currency: { eur: "EUR", usd: "USD", pln: "PLN" },
     leadStatus: {
       new: "Nuovo",
       pending: "Finanziamenti",

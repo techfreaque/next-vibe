@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
     title: "Taux de conversion du parrainage",
     titleShort: "Taux de conversion",
     description:
-      "Inscriptions par clic de lead : combien de clics de parrainage deviennent des utilisateurs inscrits",
+      "Part des premières visites mesurées qui ont mené à une inscription créditée",
     fields: {
       resolution: {
         label: "Résolution",
@@ -25,7 +25,7 @@ export const translations: typeof enTranslations = {
       result: {
         label: "Taux de conversion",
         description:
-          "Inscriptions / clics de leads par intervalle (de 0 à 100 %)",
+          "Inscriptions en pourcentage des premières visites, par date de visite",
       },
       meta: {
         label: "Méta",

@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Empfehlungs-Konversionsrate",
     titleShort: "Konversionsrate",
     description:
-      "Anmeldungen pro Lead-Klick - wie viele Empfehlungsklicks zu registrierten Nutzern werden",
+      "Anteil der gemessenen ersten Empfehlungsbesuche mit zugeordneter Registrierung",
     fields: {
       resolution: { label: "Auflösung", description: "Berechnungszeitrahmen" },
       range: { label: "Bereich", description: "Abzufragender Zeitraum" },
@@ -16,7 +16,8 @@ export const translations: typeof enTranslations = {
       },
       result: {
         label: "Konversionsrate",
-        description: "Anmeldungen / Lead-Klicks pro Bucket (0–100%)",
+        description:
+          "Registrierungen in Prozent der Erstbesuche nach Besuchsdatum",
       },
       meta: { label: "Meta", description: "Knotenausführungsmetadaten" },
     },

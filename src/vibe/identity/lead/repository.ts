@@ -13,6 +13,8 @@ import type {
   LeadExportRequestOutput,
   LeadExportResponseOutput,
 } from "@/leads/export/definition";
+import { AcquisitionSourceFilter } from "@/leads/growth/acquisition";
+import { AcquisitionRepository } from "@/leads/growth/acquisition-repository";
 import type { LeadListGetRequestTypeOutput } from "@/leads/list/definition";
 import type { LeadEngagementResponseOutput } from "@/leads/tracking/definition";
 import { newsletterSubscriptions } from "@/newsletter/db";
@@ -437,12 +439,23 @@ export class LeadsRepository {
         );
       }
 
+      const { sourceType, ...sourceFields } = query.acquisitionFilters ?? {};
+      const acquisitionCondition =
+        (sourceType && sourceType !== AcquisitionSourceFilter.ALL) ||
+        Object.values(sourceFields).some((value) => value?.trim())
+          ? sql`${leads.id} IN (${AcquisitionRepository.matchingLeadIds({ sourceType, ...sourceFields })})`
+          : undefined;
+      if (acquisitionCondition) {
+        conditions.push(acquisitionCondition);
+      }
       const whereClause =
         conditions.length > 0 ? and(...conditions) : undefined;
 
       // Build base conditions without status filter - used for per-status counts
       // so all tabs show accurate counts simultaneously regardless of active status filter
-      const baseConditions: SQL[] = [];
+      const baseConditions: SQL[] = acquisitionCondition
+        ? [acquisitionCondition]
+        : [];
       if (campaignStageFilters && campaignStageFilters.length > 0) {
         const mappedStages = campaignStageFilters
           .map((filter) => mapCampaignStageFilter(filter))
@@ -504,102 +517,35 @@ export class LeadsRepository {
       const baseWhereClause =
         baseConditions.length > 0 ? and(...baseConditions) : undefined;
 
-      const makeStatusCountWhere = (
-        statusVal: (typeof LeadStatus)[keyof typeof LeadStatus],
-      ): ReturnType<typeof eq> | ReturnType<typeof and> =>
-        baseWhereClause
-          ? and(baseWhereClause, eq(leads.status, statusVal))!
-          : eq(leads.status, statusVal);
-
       // Get total count
       const [{ total }] = await db
         .select({ total: count() })
         .from(leads)
         .where(whereClause);
 
-      // Per-status counts - independent of the active status filter
-      const [
-        countNew,
-        countPending,
-        countCampaignRunning,
-        countWebsiteUser,
-        countNewsletterSubscriber,
-        countInContact,
-        countSignedUp,
-        countSubscriptionConfirmed,
-        countUnsubscribed,
-        countBounced,
-        countInvalid,
-      ] = await Promise.all([
-        db
-          .select({ n: count() })
-          .from(leads)
-          .where(makeStatusCountWhere(LeadStatus.NEW))
-          .then(([r]) => r?.n ?? 0),
-        db
-          .select({ n: count() })
-          .from(leads)
-          .where(makeStatusCountWhere(LeadStatus.PENDING))
-          .then(([r]) => r?.n ?? 0),
-        db
-          .select({ n: count() })
-          .from(leads)
-          .where(makeStatusCountWhere(LeadStatus.CAMPAIGN_RUNNING))
-          .then(([r]) => r?.n ?? 0),
-        db
-          .select({ n: count() })
-          .from(leads)
-          .where(makeStatusCountWhere(LeadStatus.WEBSITE_USER))
-          .then(([r]) => r?.n ?? 0),
-        db
-          .select({ n: count() })
-          .from(leads)
-          .where(makeStatusCountWhere(LeadStatus.NEWSLETTER_SUBSCRIBER))
-          .then(([r]) => r?.n ?? 0),
-        db
-          .select({ n: count() })
-          .from(leads)
-          .where(makeStatusCountWhere(LeadStatus.IN_CONTACT))
-          .then(([r]) => r?.n ?? 0),
-        db
-          .select({ n: count() })
-          .from(leads)
-          .where(makeStatusCountWhere(LeadStatus.SIGNED_UP))
-          .then(([r]) => r?.n ?? 0),
-        db
-          .select({ n: count() })
-          .from(leads)
-          .where(makeStatusCountWhere(LeadStatus.SUBSCRIPTION_CONFIRMED))
-          .then(([r]) => r?.n ?? 0),
-        db
-          .select({ n: count() })
-          .from(leads)
-          .where(makeStatusCountWhere(LeadStatus.UNSUBSCRIBED))
-          .then(([r]) => r?.n ?? 0),
-        db
-          .select({ n: count() })
-          .from(leads)
-          .where(makeStatusCountWhere(LeadStatus.BOUNCED))
-          .then(([r]) => r?.n ?? 0),
-        db
-          .select({ n: count() })
-          .from(leads)
-          .where(makeStatusCountWhere(LeadStatus.INVALID))
-          .then(([r]) => r?.n ?? 0),
-      ]);
-
+      // One grouped query keeps the tab counts in sync with all non-status filters.
+      const statusCounts = await db
+        .select({ status: leads.status, value: count() })
+        .from(leads)
+        .where(baseWhereClause)
+        .groupBy(leads.status);
+      const byStatus = new Map(
+        statusCounts.map(({ status, value }) => [status, value]),
+      );
       const countsByStatus = {
-        new: countNew,
-        pending: countPending,
-        campaignRunning: countCampaignRunning,
-        websiteUser: countWebsiteUser,
-        newsletterSubscriber: countNewsletterSubscriber,
-        inContact: countInContact,
-        signedUp: countSignedUp,
-        subscriptionConfirmed: countSubscriptionConfirmed,
-        unsubscribed: countUnsubscribed,
-        bounced: countBounced,
-        invalid: countInvalid,
+        new: byStatus.get(LeadStatus.NEW) ?? 0,
+        pending: byStatus.get(LeadStatus.PENDING) ?? 0,
+        campaignRunning: byStatus.get(LeadStatus.CAMPAIGN_RUNNING) ?? 0,
+        websiteUser: byStatus.get(LeadStatus.WEBSITE_USER) ?? 0,
+        newsletterSubscriber:
+          byStatus.get(LeadStatus.NEWSLETTER_SUBSCRIBER) ?? 0,
+        inContact: byStatus.get(LeadStatus.IN_CONTACT) ?? 0,
+        signedUp: byStatus.get(LeadStatus.SIGNED_UP) ?? 0,
+        subscriptionConfirmed:
+          byStatus.get(LeadStatus.SUBSCRIPTION_CONFIRMED) ?? 0,
+        unsubscribed: byStatus.get(LeadStatus.UNSUBSCRIBED) ?? 0,
+        bounced: byStatus.get(LeadStatus.BOUNCED) ?? 0,
+        invalid: byStatus.get(LeadStatus.INVALID) ?? 0,
       };
 
       // Get leads with sorting
@@ -700,11 +646,16 @@ export class LeadsRepository {
         resultsCount: leadsList.length,
       });
 
+      const acquisitionByLead = await AcquisitionRepository.leadDetails(
+        leadsList.map((lead) => lead.id),
+        query.acquisitionCurrency ?? "EUR",
+      );
       return success<LeadListResponseType>({
         response: {
-          leads: leadsList.map((lead) =>
-            LeadsRepository.formatLeadResponse(lead),
-          ),
+          leads: leadsList.map((lead) => ({
+            ...LeadsRepository.formatLeadResponse(lead),
+            acquisition: acquisitionByLead.get(lead.id),
+          })),
         },
         paginationInfo: {
           totalCount: total,
@@ -2538,10 +2489,10 @@ export class LeadsRepository {
       return pairs.rows
         .filter((row) => !isServerSideIp(row.ip_address))
         .map((row) => ({
-        leadId1: row.lead_id1,
-        leadId2: row.lead_id2,
-        ipAddress: row.ip_address,
-      }));
+          leadId1: row.lead_id1,
+          leadId2: row.lead_id2,
+          ipAddress: row.ip_address,
+        }));
     } catch (error) {
       logger.error("Error finding IP-match lead pairs", parseError(error));
       return [];

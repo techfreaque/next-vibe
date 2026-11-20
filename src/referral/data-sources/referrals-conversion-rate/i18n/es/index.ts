@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Tasa de conversión de referencia",
     titleShort: "Tasa de conversión",
     description:
-      "Suscripciones por clic de guía - cuántos clics de referencia se convierten en usuarios registrados",
+      "Porcentaje de primeras visitas medidas que generaron una inscripción atribuida",
     fields: {
       resolution: { label: "Resolución", description: "Plazo de cálculo" },
       range: {
@@ -19,7 +19,8 @@ export const translations: typeof enTranslations = {
       },
       result: {
         label: "Tasa de conversión",
-        description: "Suscripciones / clics de contacto por cubo (0-100%)",
+        description:
+          "Inscripciones como porcentaje de primeras visitas, por fecha de visita",
       },
       meta: { label: "Meta", description: "Metadatos de ejecución de nodos" },
     },

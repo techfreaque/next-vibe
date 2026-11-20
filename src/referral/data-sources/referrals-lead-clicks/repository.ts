@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { and, count, gte, lte, sql } from "drizzle-orm";
+import { and, count, eq, gte, lte, sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -20,7 +20,9 @@ import type {
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
 
-import { leadReferrals } from "../../db";
+import { growthVisits } from "@/leads/growth/db";
+
+import { referralCodes } from "../../db";
 
 export class QueryReferralsLeadClicksRepository {
   static async queryReferralsLeadClicks(data: {
@@ -36,16 +38,17 @@ export class QueryReferralsLeadClicksRepository {
     const { resolution, range, lookback } = data;
     const rows = await db
       .select({
-        bucket: resolutionBucketExpr(resolution, leadReferrals.createdAt).as(
+        bucket: resolutionBucketExpr(resolution, growthVisits.visitedAt).as(
           "bucket",
         ),
         cnt: count(),
       })
-      .from(leadReferrals)
+      .from(growthVisits)
+      .innerJoin(referralCodes, eq(referralCodes.code, growthVisits.refCode))
       .where(
         and(
-          gte(leadReferrals.createdAt, range.from),
-          lte(leadReferrals.createdAt, range.to),
+          gte(growthVisits.visitedAt, range.from),
+          lte(growthVisits.visitedAt, range.to),
         ),
       )
       .groupBy(sql`1`)

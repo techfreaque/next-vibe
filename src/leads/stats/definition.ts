@@ -19,6 +19,7 @@ import {
 } from "next-vibe/core/definition/enums";
 import {
   CountriesOptions,
+  CurrenciesArr,
   LanguagesOptions,
 } from "next-vibe/core/i18n/core/config";
 import { CountryFilter, LanguageFilter } from "next-vibe/identity/lead/enum";
@@ -45,12 +46,21 @@ import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
   objectField,
+  objectOptionalField,
   requestField,
   responseArrayField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import {
+  acquisitionMetrics,
+  acquisitionSummaryRow,
+} from "../growth/acquisition";
+import {
+  acquisitionCurrencyField,
+  acquisitionFilterFields,
+} from "../growth/acquisition-fields";
 import { LEADS_STATS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
@@ -1030,6 +1040,33 @@ const { GET } = createEndpoint({
             }),
           },
         }),
+      }),
+
+      acquisitionFilters: objectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "acquisition.title",
+        usage: { request: "data" },
+        children: acquisitionFilterFields,
+      }),
+      acquisitionCurrency: acquisitionCurrencyField,
+      acquisitionPage: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "acquisition.page",
+        schema: z.coerce.number().int().min(1).max(10000).optional(),
+      }),
+      acquisition: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "acquisition.title",
+        schema: z
+          .object({
+            rows: z.array(acquisitionSummaryRow),
+            totals: acquisitionMetrics,
+            hasMore: z.boolean(),
+            page: z.number().int(),
+            currency: z.enum(CurrenciesArr),
+          })
+          .optional(),
       }),
 
       // Metadata

@@ -4,7 +4,7 @@ export const translations = {
     title: "Referral Conversion Rate",
     titleShort: "Conversion Rate",
     description:
-      "Signups per lead click - how many referral clicks turn into registered users",
+      "Share of measured first referral visits that led to a credited signup",
     fields: {
       resolution: { label: "Resolution", description: "Computation timeframe" },
       range: { label: "Range", description: "Time range to query" },
@@ -14,7 +14,8 @@ export const translations = {
       },
       result: {
         label: "Conversion Rate",
-        description: "Signups / lead clicks per bucket (0–100%)",
+        description:
+          "Signups as a percentage of first visits, grouped by visit date",
       },
       meta: { label: "Meta", description: "Node execution metadata" },
     },

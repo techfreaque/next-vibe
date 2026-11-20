@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     title: "Tasso di conversione del riferimento",
     titleShort: "Tasso di conversione",
     description:
-      "Segnali per lead click - quanti clic di riferimento si trasformano in utenti registrati",
+      "Percentuale delle prime visite misurate che hanno portato a un’iscrizione attribuita",
     fields: {
       resolution: { label: "Risoluzione", description: "Tempo di calcolo" },
       range: {
@@ -19,7 +19,8 @@ export const translations: typeof enTranslations = {
       },
       result: {
         label: "Tasso di conversione",
-        description: "Segnali / lead click per secchio (0-100%)",
+        description:
+          "Iscrizioni in percentuale sulle prime visite, per data di visita",
       },
       meta: { label: "Meta", description: "metadati di esecuzione del nodo" },
     },
