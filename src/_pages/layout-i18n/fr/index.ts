@@ -37,6 +37,8 @@ export const translations: typeof enTranslations = {
   },
   constants: {
     languages: {
+      it: "Italien",
+      es: "Espagnol",
       en: "Anglais",
       de: "Allemand",
       pl: "Polonais",

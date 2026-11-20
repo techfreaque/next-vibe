@@ -636,66 +636,21 @@ export const DeviceTypeDB = [
  * createEnumOptions enums above. They are compared against and written to the
  * `country`/`language` columns, so they must stay verbatim.
  */
-export enum CountryFilter {
-  ALL = "all",
-  DE = "DE",
-  PL = "PL",
-  FR = "FR",
-  US = "US",
-  GLOBAL = "GLOBAL",
-}
+export const CountryFilter = { ALL: "all", ...Countries } as const;
+export type CountryFilter = (typeof CountryFilter)[keyof typeof CountryFilter];
 
-export enum LanguageFilter {
-  ALL = "all",
-  EN = "en",
-  DE = "de",
-  PL = "pl",
-  FR = "fr",
-}
+export const LanguageFilter = { ALL: "all", ...Languages } as const;
+export type LanguageFilter =
+  (typeof LanguageFilter)[keyof typeof LanguageFilter];
 
-/**
- * Narrow a country filter to a country code, or null for "no filter".
- *
- * Switch rather than a cast: a string enum member is not assignable to its own
- * literal type in TypeScript, so mapping each member explicitly is what lets
- * this return a real `Countries` without asserting.
- */
 export function convertCountryFilter(
-  country: CountryFilter | Countries | undefined,
+  country: CountryFilter | undefined,
 ): Countries | null {
-  switch (country) {
-    case CountryFilter.DE:
-      return Countries.DE;
-    case CountryFilter.PL:
-      return Countries.PL;
-    case CountryFilter.FR:
-      return Countries.FR;
-    case CountryFilter.US:
-      return Countries.US;
-    case CountryFilter.GLOBAL:
-      return Countries.GLOBAL;
-    default:
-      // Covers CountryFilter.ALL and undefined alike: both mean "unfiltered".
-      return null;
-  }
+  return country === CountryFilter.ALL ? null : (country ?? null);
 }
 
-/**
- * Narrow a language filter to a language code, or null for "no filter".
- */
 export function convertLanguageFilter(
-  language: LanguageFilter | Languages | undefined,
+  language: LanguageFilter | undefined,
 ): Languages | null {
-  switch (language) {
-    case LanguageFilter.EN:
-      return Languages.EN;
-    case LanguageFilter.DE:
-      return Languages.DE;
-    case LanguageFilter.PL:
-      return Languages.PL;
-    case LanguageFilter.FR:
-      return Languages.FR;
-    default:
-      return null;
-  }
+  return language === LanguageFilter.ALL ? null : (language ?? null);
 }

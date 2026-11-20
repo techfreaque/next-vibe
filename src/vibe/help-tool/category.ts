@@ -17,6 +17,8 @@ export const category: CategoryDefinition = {
     "de-DE": "System",
     "pl-PL": "System",
     "fr-FR": "Système",
+    "it-IT": "Sistema",
+    "es-ES": "Sistema",
   },
   group: "system",
   icon: "settings",
@@ -36,6 +38,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Generatoren",
         "pl-PL": "Generatory",
         "fr-FR": "Générateurs",
+        "it-IT": "Generatori",
+        "es-ES": "Generadores",
       },
     },
     Build: {
@@ -47,6 +51,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Build",
         "pl-PL": "Kompilacja",
         "fr-FR": "Build",
+        "it-IT": "Compilazione",
+        "es-ES": "Compilación",
       },
     },
     Check: {
@@ -58,6 +64,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Prüfen",
         "pl-PL": "Sprawdź",
         "fr-FR": "Vérification",
+        "it-IT": "Verifica",
+        "es-ES": "Verificación",
       },
     },
     serverManagement: {
@@ -69,6 +77,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Server",
         "pl-PL": "Serwer",
         "fr-FR": "Serveur",
+        "it-IT": "Server",
+        "es-ES": "Servidor",
       },
     },
     serverGuard: {
@@ -80,6 +90,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Guard",
         "pl-PL": "Guard",
         "fr-FR": "Guard",
+        "it-IT": "Protezione",
+        "es-ES": "Protección",
       },
     },
     serverElectron: {
@@ -91,6 +103,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Electron",
         "pl-PL": "Electron",
         "fr-FR": "Electron",
+        "it-IT": "Electron",
+        "es-ES": "Electron",
       },
     },
     settingsEnv: {
@@ -102,6 +116,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Einstellungen",
         "pl-PL": "Ustawienia",
         "fr-FR": "Paramètres",
+        "it-IT": "Impostazioni",
+        "es-ES": "Configuración",
       },
     },
     settingsKeys: {
@@ -113,6 +129,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Schlüssel",
         "pl-PL": "Klucze",
         "fr-FR": "Clés",
+        "it-IT": "Chiavi",
+        "es-ES": "Claves",
       },
     },
     interfacesCli: {
@@ -124,6 +142,8 @@ export const category: CategoryDefinition = {
         "de-DE": "CLI",
         "pl-PL": "CLI",
         "fr-FR": "CLI",
+        "it-IT": "CLI",
+        "es-ES": "CLI",
       },
     },
     interfacesMcp: {
@@ -135,6 +155,8 @@ export const category: CategoryDefinition = {
         "de-DE": "MCP",
         "pl-PL": "MCP",
         "fr-FR": "MCP",
+        "it-IT": "MCP",
+        "es-ES": "MCP",
       },
     },
     interfacesFrame: {
@@ -146,6 +168,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Frame",
         "pl-PL": "Frame",
         "fr-FR": "Frame",
+        "it-IT": "Frame",
+        "es-ES": "Frame",
       },
     },
     tasksCron: {
@@ -157,6 +181,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Cron-Aufgaben",
         "pl-PL": "Zadania cron",
         "fr-FR": "Tâches cron",
+        "it-IT": "Attività cron",
+        "es-ES": "Tareas cron",
       },
     },
     tasksMonitoring: {
@@ -168,6 +194,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Überwachung",
         "pl-PL": "Monitoring",
         "fr-FR": "Monitoring",
+        "it-IT": "Monitoraggio",
+        "es-ES": "Monitoreo",
       },
     },
     tasksPulse: {
@@ -179,6 +207,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Pulse",
         "pl-PL": "Puls",
         "fr-FR": "Pulse",
+        "it-IT": "Pulse",
+        "es-ES": "Pulse",
       },
     },
     tasksSync: {
@@ -190,6 +220,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Synchronisierung",
         "pl-PL": "Synchronizacja",
         "fr-FR": "Synchronisation",
+        "it-IT": "Sincronizzazione",
+        "es-ES": "Sincronización",
       },
     },
   },

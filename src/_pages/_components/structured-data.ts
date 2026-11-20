@@ -5,7 +5,10 @@
  * copy. No ratings or reviews: we have none to show, so none are claimed.
  */
 
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import {
+  type CountryLanguage,
+  LanguagesArr,
+} from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import type { JsonLdNode } from "next-vibe/ui/components/json-ld";
 
@@ -35,7 +38,7 @@ const LICENSE_URLS = [
   "https://opensource.org/licenses/MIT",
   "https://www.gnu.org/licenses/gpl-3.0.html",
 ];
-const SITE_LANGUAGES = ["en", "de", "pl", "fr"];
+const SITE_LANGUAGES = [...LanguagesArr];
 
 /** Canonical origin, same source as every page's canonical/hreflang tags. */
 function siteBase(locale: CountryLanguage): string {
@@ -69,12 +72,9 @@ function buildOrganization(locale: CountryLanguage): JsonLdNode {
       "@type": "ContactPoint",
       email: configT("emails.support"),
       contactType: t("structuredData.organization.contactPoint.contactType"),
-      availableLanguage: [
-        t("constants.languages.en"),
-        t("constants.languages.de"),
-        t("constants.languages.pl"),
-        t("constants.languages.fr"),
-      ],
+      availableLanguage: LanguagesArr.map((language) =>
+        configT(`languages.${language}`),
+      ),
     },
   };
 }

@@ -1,0 +1,123 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  category: "Fatturazione",
+  tags: {
+    payment: "pagamento",
+    invoice: "fattura"
+  },
+  get: {
+    title: "Ottieni fattura",
+    titleShort: "Dettagli della fattura",
+    description: "Recuperare una singola fattura con tutti i suoi articoli di linea",
+    form: {
+      title: "Fatturato",
+      description: "Dettagli di fatturazione con gli articoli di linea"
+    },
+    response: {
+      id: "Fatturazione ID",
+      companyId: "Società ID",
+      customerId: "Cliente ID",
+      invoiceSequenceNumber: "Numero di fatturazione",
+      currency: "Valuta",
+      status: "Stato",
+      amount: "Importo",
+      dueDate: "Data di scadenza",
+      paidAt: "Pagato a",
+      notes: "Osservazioni",
+      journalEntryId: "Entrata di giornale ID",
+      createdAt: "Creato a",
+      updatedAt: "Aggiornato At",
+      lines: "Linee",
+      lineId: "Linea ID",
+      lineDescription: "Designazione",
+      productId: "Prodotto ID",
+      quantity: "Quantità",
+      unitPrice: "Prezzo unitario",
+      taxRate: "Tasso d'imposta",
+      taxAmount: "Importo fiscale",
+      lineTotal: "Totale",
+      sortOrder: "Ordinare",
+      lineCreatedAt: "Linea creata a",
+      lineUpdatedAt: "Linea aggiornata At"
+    },
+    errors: {
+      unauthorized: {
+        title: "Autenticazione richiesta",
+        description: "Accedi per continuare"
+      },
+      validation: {
+        title: "Errore di convalida",
+        description: "Parametri non validi"
+      },
+      server: {
+        title: "Errore del server",
+        description: "Si è verificato un errore interno del server"
+      },
+      unknown: {
+        title: "Errore sconosciuto",
+        description: "Si è verificato un errore sconosciuto"
+      },
+      network: {
+        title: "Errore di rete",
+        description: "Si è verificato un errore di rete"
+      },
+      forbidden: {
+        title: "Accesso negato",
+        description: "Deve essere un membro di questa azienda"
+      },
+      notFound: {
+        title: "Non trovato",
+        description: "Fattura non trovata"
+      },
+      conflict: {
+        title: "Conflitto",
+        description: "Si è verificato un conflitto"
+      },
+      unsavedChanges: {
+        title: "Modifiche non salvate",
+        description: "Ci sono cambiamenti non rilevati"
+      }
+    },
+    success: {
+      title: "Operazione riuscita",
+      description: "Fattura recuperata"
+    }
+  },
+  invoiceId: {
+    label: "Fatturazione ID",
+    description: "La fattura per recuperare",
+    placeholder: "Inserire la fattura ID"
+  },
+  widget: {
+    back: "Indietro",
+    submit: "Guarda su Fattura",
+    invoiceNumber: "Fatturato",
+    overdue: "Più tardi.",
+    issued: "Fascicolo",
+    due: "Due",
+    paid: "Pagato",
+    customer: "Cliente",
+    journalEntry: "Entrata del giornale",
+    lineItems: "Elementi di linea",
+    description: "Designazione",
+    qty: "Qty",
+    unitPrice: "Prezzo unitario",
+    tax: "Imposte",
+    total: "Totale",
+    subtotal: "Totale parziale",
+    sendInvoice: "Invia fattura",
+    addLine: "Aggiungere la linea",
+    recordPayment: "Pagamento record",
+    sendReminder: "Inviare il Mittente",
+    void: "Void",
+    viewJournalEntry: "Visualizza l'ingresso del giornale",
+    status: {
+      draft: "Progetto",
+      open: "Aperto",
+      paid: "Pagato",
+      void: "Void",
+      uncollectible: "Incoltoso"
+    }
+  }
+};

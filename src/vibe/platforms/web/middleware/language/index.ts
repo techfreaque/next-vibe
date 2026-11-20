@@ -8,6 +8,7 @@ import type { NextRequest } from "next-vibe/ui/lib/request";
 
 import { LOCALE_COOKIE_NAME } from "@/env/constants";
 
+import { languageConfig } from "../../../../core/i18n";
 import type { CountryLanguage } from "../../../../core/i18n/core/config";
 
 export interface LanguageMiddlewareOptions {
@@ -71,6 +72,8 @@ const LOCALE_SHAPED_SEGMENT_REGEX = /^[a-z]{2}[-_](?:[a-z]{2}|global)$/i;
  * Expand the base locales into every language x country combination when
  * mixed locales are allowed (de-PL, en-DE, ...).
  */
+const expandedLocaleCache = new WeakMap<CountryLanguage[], CountryLanguage[]>();
+
 function expandLocales(
   baseLocales: CountryLanguage[],
   allowMixedLocales: boolean,
@@ -78,15 +81,21 @@ function expandLocales(
   if (!allowMixedLocales) {
     return baseLocales;
   }
+  const cached = expandedLocaleCache.get(baseLocales);
+  if (cached) {
+    return cached;
+  }
   const languages = [
     ...new Set(baseLocales.map((locale) => locale.split("-")[0])),
   ];
   const countries = [
     ...new Set(baseLocales.map((locale) => locale.split("-")[1])),
   ];
-  return languages.flatMap((lang) =>
+  const expanded = languages.flatMap((lang) =>
     countries.map((country) => `${lang}-${country}` as CountryLanguage),
   );
+  expandedLocaleCache.set(baseLocales, expanded);
+  return expanded;
 }
 
 function findLocale(
@@ -124,9 +133,24 @@ function negotiateLocale(
     return cookieLocale;
   }
 
-  const acceptLanguage = request.headers.get("accept-language") || "";
-  for (const lang of acceptLanguage.split(",")) {
-    const headerLocale = lang.split(";")[0]?.trim();
+  const geoCode = (
+    request.headers.get("cf-ipcountry") ??
+    request.headers.get("x-vercel-ip-country")
+  )?.toUpperCase();
+  const geo = geoCode
+    ? Object.values(languageConfig.countryInfo).find(
+        ({ code }) => code === geoCode,
+      )
+    : undefined;
+  const preferences = (request.headers.get("accept-language") ?? "")
+    .split(",")
+    .map((entry) => {
+      const [tag, weight] = entry.trim().split(/;\s*q=/i);
+      return { tag, weight: weight === undefined ? 1 : Number(weight) };
+    })
+    .filter(({ weight }) => weight > 0 && weight <= 1)
+    .toSorted((a, b) => b.weight - a.weight);
+  for (const { tag: headerLocale } of preferences) {
     if (!headerLocale) {
       continue;
     }
@@ -147,6 +171,12 @@ function negotiateLocale(
       return exact;
     }
 
+    if (geo) {
+      const regional = findLocale(supportedLocales, `${langCode}-${geo.code}`);
+      if (regional) {
+        return regional;
+      }
+    }
     // Prefer GLOBAL variant for the language if available
     const globalLocale = supportedLocales.find(
       (locale) => locale === `${langCode}-GLOBAL`,
@@ -164,6 +194,15 @@ function negotiateLocale(
     }
   }
 
+  if (geo) {
+    const regional = findLocale(
+      supportedLocales,
+      `${language ?? geo.language}-${geo.code}`,
+    );
+    if (regional) {
+      return regional;
+    }
+  }
   if (language !== undefined) {
     const languageLocale =
       supportedLocales.find((locale) => locale === `${language}-GLOBAL`) ??
@@ -225,13 +264,15 @@ export function detectLocale(
     if (isLanguageOnly || LOCALE_SHAPED_SEGMENT_REGEX.test(localeSegment)) {
       const language = languageOf(localeSegment);
       return {
-        locale: negotiateLocale(
-          request,
-          supportedLocales,
-          defaultLocale,
-          cookieName,
-          supportedLanguages.has(language) ? language : undefined,
-        ),
+        locale:
+          findLocale(supportedLocales, normalizeLocaleFormat(localeSegment)) ??
+          negotiateLocale(
+            request,
+            supportedLocales,
+            defaultLocale,
+            cookieName,
+            supportedLanguages.has(language) ? language : undefined,
+          ),
         replaceSegment: true,
       };
     }

@@ -315,6 +315,8 @@ export class RefusalPublicRepository {
           questionDe: refusalIndexQuestions.textDe,
           questionPl: refusalIndexQuestions.textPl,
           questionFr: refusalIndexQuestions.textFr,
+          questionIt: refusalIndexQuestions.textIt,
+          questionEs: refusalIndexQuestions.textEs,
           verdict: refusalIndexResults.verdict,
           answerExcerpt: refusalIndexResults.answerExcerpt,
           judgeReason: refusalIndexResults.judgeReason,

@@ -1,14 +1,15 @@
 import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 
 import { Glob } from "bun";
 import { describe, expect, it } from "bun:test";
 
 import { transformClientLocaleSource } from "./client-locale-loader.cjs";
 
-const SCOPE_GLOB = new Glob("src/**/i18n/index.ts");
+const SCOPE_GLOB = new Glob("src/**/en/index.ts");
 
 describe("client-locale-loader", () => {
-  it("rewrites lazy de/pl/fr requires into page-language dynamic imports", () => {
+  it("rewrites lazy non-English requires into page-language dynamic imports", () => {
     const source = [
       'import { translations as enTranslations } from "./en";',
       "export const scopedTranslation = createScopedTranslation({",
@@ -16,6 +17,8 @@ describe("client-locale-loader", () => {
       '  de: () => require("./de").translations,',
       '  pl: () => require("next-vibe/ui/i18n/pl").translations,',
       '  fr: () => require("./fr").translations,',
+      '  it: () => require("./it").translations,',
+      '  es: () => require("./es").translations,',
       "});",
     ].join("\n");
 
@@ -28,6 +31,8 @@ describe("client-locale-loader", () => {
     expect(out).toContain(
       'const __vibeI18n_1 = __vibeI18nLang === "pl" ? (await import("next-vibe/ui/i18n/pl")).translations : undefined;',
     );
+    expect(out).toContain('await import("./it")');
+    expect(out).toContain('await import("./es")');
     expect(out).toContain("de: () => __vibeI18n_0 ?? {},");
     expect(out).toContain("pl: () => __vibeI18n_1 ?? {},");
     expect(out).toContain(
@@ -41,10 +46,11 @@ describe("client-locale-loader", () => {
     expect(transformClientLocaleSource(source)).toBe(source);
   });
 
-  it("covers every scope in the repo (no de/pl/fr left in client bundles)", () => {
+  it("covers every scope in the repo (no non-English left in client bundles)", () => {
     const missed: string[] = [];
     let scopes = 0;
-    for (const file of SCOPE_GLOB.scanSync({ cwd: process.cwd() })) {
+    for (const english of SCOPE_GLOB.scanSync({ cwd: process.cwd() })) {
+      const file = join(dirname(dirname(english)), "index.ts");
       if (file.includes("/generated/")) {
         continue;
       }

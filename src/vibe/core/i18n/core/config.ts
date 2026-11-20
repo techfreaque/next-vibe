@@ -2,6 +2,7 @@
 // TYPES
 
 import { languageConfig, languageDefaults } from "..";
+import { countryOptions } from "./regions";
 
 // ----------------
 export type Countries = keyof typeof languageConfig.countries;
@@ -15,6 +16,7 @@ export interface CountryInfo {
   name: string;
   language: Languages;
   langName: string;
+  languages: readonly Languages[];
   flag: string;
   currency: Currencies;
   symbol: string;
@@ -23,25 +25,19 @@ export interface CountryInfo {
 // Enum-like objects to replace the enums
 
 export const Countries = languageConfig.countries;
-export const CountriesArr = ["DE", "PL", "FR", "US", "GLOBAL"] as const;
+export const CountriesArr = languageConfig.countriesArr;
 
 export const Currencies = languageConfig.currencies;
-export const CurrenciesArr = ["EUR", "USD", "PLN"] as const;
+export const CurrenciesArr = languageConfig.currenciesArr;
 
 export const Languages = languageConfig.languages;
-export const LanguagesArr = ["de", "pl", "fr", "en"] as const;
+export const LanguagesArr = languageConfig.languagesArr;
 
 /**
  * Countries Options for select fields
  * Maps country codes to translation keys for UI display
  */
-export const CountriesOptions = [
-  { value: Countries.GLOBAL, label: "countries.global" as const },
-  { value: Countries.DE, label: "countries.de" as const },
-  { value: Countries.PL, label: "countries.pl" as const },
-  { value: Countries.FR, label: "countries.fr" as const },
-  { value: Countries.US, label: "countries.us" as const },
-];
+export const CountriesOptions = [...countryOptions];
 
 /**
  * Languages Options for select fields
@@ -52,6 +48,8 @@ export const LanguagesOptions = [
   { value: Languages.DE, label: "languages.de" as const },
   { value: Languages.PL, label: "languages.pl" as const },
   { value: Languages.FR, label: "languages.fr" as const },
+  { value: Languages.IT, label: "languages.it" as const },
+  { value: Languages.ES, label: "languages.es" as const },
 ];
 
 // Create a proper enum-like object for CountryLanguageValues that works with z.enum()
@@ -72,15 +70,10 @@ export const CountryLanguageValues = Object.values(
 export const currencyByCountry = languageConfig.mappings.currencyByCountry;
 export const defaultLocaleConfig = languageDefaults;
 export const defaultLocale: CountryLanguage = `${languageDefaults.language}-${languageDefaults.country}`;
-export const globalCountryInfo: CountryInfo = languageConfig.countryInfo
-  .GLOBAL as CountryInfo;
-export const availableCountries: readonly CountryInfo[] = [
-  languageConfig.countryInfo.DE as CountryInfo,
-  languageConfig.countryInfo.PL as CountryInfo,
-  languageConfig.countryInfo.FR as CountryInfo,
-  languageConfig.countryInfo.US as CountryInfo,
-  languageConfig.countryInfo.GLOBAL as CountryInfo,
-];
+export const globalCountryInfo: CountryInfo = languageConfig.countryInfo.GLOBAL;
+export const availableCountries: readonly CountryInfo[] = Object.values(
+  languageConfig.countryInfo,
+);
 export interface LanguageConfig {
   debug: boolean;
   countries: {

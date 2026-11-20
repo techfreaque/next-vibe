@@ -124,6 +124,14 @@ export const translations: typeof enTranslations = {
         label: "Pytanie (francuski)",
         description: "Tłumaczenie do publicznych przykładów (opcjonalne)",
       },
+      textIt: {
+        label: "Pytanie (włoski)",
+        description: "Tłumaczenie do publicznych przykładów (opcjonalne)",
+      },
+      textEs: {
+        label: "Pytanie (hiszpański)",
+        description: "Tłumaczenie do publicznych przykładów (opcjonalne)",
+      },
       generatedBy: { label: "Zaproponował" },
       active: {
         label: "Aktywne",

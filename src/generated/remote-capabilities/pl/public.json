@@ -32503,6 +32503,46 @@
                 },
                 "schemaType": "primitive"
               },
+              "questionIt": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "questionEs": {
+                "type": "text",
+                "hidden": true,
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "verdict": {
                 "type": "badge",
                 "label": "Werdykt",

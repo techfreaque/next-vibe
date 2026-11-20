@@ -3470,6 +3470,8 @@ export const translations: typeof enTranslations = {
     complete: "Complet",
   },
   language: {
+    it: "Italien",
+    es: "Espagnol",
     en: "Anglais",
     de: "Allemand",
     pl: "Polonais",

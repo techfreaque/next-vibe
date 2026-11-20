@@ -207,7 +207,7 @@ const nextConfig: NextConfig = {
         splitChunks.cacheGroups = {
           ...splitChunks.cacheGroups,
           i18nLocaleShared: {
-            test: /[\\/]i18n[\\/](de|pl|fr)[\\/]/,
+            test: /[\\/](?:i18n|layout-i18n|i18n[\\/]shared)[\\/](de|pl|fr|it|es)[\\/]/,
             chunks: "async",
             minChunks: 2,
             minSize: 0,
@@ -217,7 +217,7 @@ const nextConfig: NextConfig = {
         };
       }
       config.module.rules.push({
-        test: /[\\/]i18n[\\/]index\.ts$/,
+        test: /[\\/](?:i18n|layout-i18n|i18n[\\/]shared)[\\/]index\.ts$/,
         enforce: "pre",
         loader: path.join(
           __dirname,

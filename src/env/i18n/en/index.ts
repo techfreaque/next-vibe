@@ -1,3 +1,5 @@
+import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
+
 export const translations = {
   appName: "unbottled.ai",
   appDescription:
@@ -40,6 +42,8 @@ export const translations = {
     PL: "Europe/Warsaw",
     DE: "Europe/Berlin",
     FR: "Europe/Paris",
+    IT: "Europe/Rome",
+    ES: "Europe/Madrid",
     US: "America/New_York",
     GLOBAL: "UTC",
   },
@@ -54,16 +58,21 @@ export const translations = {
     description: "Please try again or contact support if the problem persists.",
   },
   countries: {
+    ...regionalCountryNames("en"),
     global: "Global",
     de: "Germany",
     pl: "Poland",
     fr: "France",
     us: "United States",
+    it: "Italy",
+    es: "Spain",
   },
   languages: {
     en: "English",
     de: "German",
     pl: "Polish",
     fr: "French",
+    it: "Italian",
+    es: "Spanish",
   },
 };

@@ -180,13 +180,13 @@ const DEFAULT_MESSAGES: BoilerplateMessages = {
   i18nEnExtraDeclaration:
     "i18n/en/index.ts must contain only the `export const translations` declaration.",
   i18nLangWrongImport:
-    "i18n/de, i18n/pl or i18n/fr index.ts may only import `type { translations as enTranslations } from '../en'`.",
+    "Non-English i18n index.ts may only import `type { translations as enTranslations } from '../en'`.",
   i18nLangNotSingleExport:
-    "i18n/de, i18n/pl or i18n/fr index.ts must export exactly one `export const translations: typeof enTranslations = { ... }`.",
+    "Non-English i18n index.ts must export exactly one `export const translations: typeof enTranslations = { ... }`.",
   i18nLangExtraDeclaration:
-    "i18n/de, i18n/pl or i18n/fr index.ts must contain only imports and the `export const translations` declaration.",
+    "Non-English i18n index.ts must contain only imports and the `export const translations` declaration.",
   i18nLangMissingType:
-    "i18n/de, i18n/pl or i18n/fr `translations` must be typed as `typeof enTranslations`.",
+    "Non-English i18n `translations` must be typed as `typeof enTranslations`.",
   // i18n/index.ts (root scoped translation factory)
   i18nIndexWrongImport:
     "i18n/index.ts may only import `createScopedTranslation` from '../../../../../../../core/i18n/core/scoped-translation' and `translations as enTranslations` from './en'.",
@@ -294,7 +294,9 @@ function isI18nLangFile(context: BoilerplateRuleContext): boolean {
   return (
     (filename.includes("/i18n/de/index.ts") ||
       filename.includes("/i18n/pl/index.ts") ||
-      filename.includes("/i18n/fr/index.ts")) &&
+      filename.includes("/i18n/fr/index.ts") ||
+      filename.includes("/i18n/it/index.ts") ||
+      filename.includes("/i18n/es/index.ts")) &&
     !filename.includes("/i18n/en/")
   );
 }
@@ -782,6 +784,12 @@ const i18nPatternRule = {
     return {
       // ── en: no imports allowed ─────────────────────────────
       ImportDeclaration(node: OxlintASTNode): void {
+        if (
+          (node as ImportDeclaration).source.value ===
+          "next-vibe/core/i18n/core/regions"
+        ) {
+          return;
+        }
         if (isEn) {
           context.report({ node, message: messages.i18nEnHasImport });
           return;

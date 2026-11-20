@@ -1,3 +1,5 @@
+import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
+
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -42,6 +44,8 @@ export const translations: typeof enTranslations = {
     PL: "Europe/Warsaw",
     DE: "Europe/Berlin",
     FR: "Europe/Paris",
+    IT: "Europe/Rome",
+    ES: "Europe/Madrid",
     US: "America/New_York",
     GLOBAL: "UTC",
   },
@@ -56,16 +60,21 @@ export const translations: typeof enTranslations = {
     description: "Please try again or contact support if the problem persists.",
   },
   countries: {
+    ...regionalCountryNames("de"),
     global: "Global",
     de: "Germany",
     pl: "Poland",
     fr: "France",
     us: "United States",
+    it: "Italien",
+    es: "Spanien",
   },
   languages: {
     en: "English",
     de: "German",
     pl: "Polish",
     fr: "French",
+    it: "Italienisch",
+    es: "Spanisch",
   },
 };

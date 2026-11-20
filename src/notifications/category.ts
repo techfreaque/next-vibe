@@ -15,6 +15,8 @@ export const category: CategoryDefinition = {
     "de-DE": "Benachrichtigungen",
     "pl-PL": "Powiadomienia",
     "fr-FR": "Notifications",
+    "it-IT": "Notifiche",
+    "es-ES": "Notificaciones",
   },
   group: "business",
   icon: "bell",

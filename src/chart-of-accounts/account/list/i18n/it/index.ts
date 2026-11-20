@@ -1,0 +1,131 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  get: {
+    title: "Grafico dei conti",
+    titleShort: "Account",
+    description:
+      "Albero di conto completo per un'azienda con struttura gerarchica",
+    companyId: {
+      label: "Società ID",
+      description: "Società il cui grafico dei conti per recuperare",
+      placeholder: "Entra in azienda UUID",
+    },
+    page: {
+      label: "Pagina",
+      description: "Numero di pagina (a partire da 1)",
+    },
+    pageSize: {
+      label: "Per pagina",
+      description: "Conti per pagina (max 200)",
+    },
+    response: {
+      total: "Totale",
+      accounts: "Account",
+      id: "ID",
+      code: "Codice",
+      name: "Nome",
+      type: "Tipologia",
+      subtype: "Sottotitoli",
+      parentId: "Parent ID",
+      isPostable: "Postabile",
+      isActive: "Attivo",
+      isSystem: "Sistema",
+      description: "Designazione",
+      sortOrder: "Ordinare",
+      companyId: "Società ID",
+    },
+    errors: {
+      unauthorized: {
+        title: "Autenticazione richiesta",
+        description: "Devi essere connesso per visualizzare gli account",
+      },
+      validation: {
+        title: "Errore di convalida",
+        description: "Società non valida ID",
+      },
+      forbidden: {
+        title: "Accesso negato",
+        description: "Non hai accesso ai conti di questa azienda",
+      },
+      server: {
+        title: "Errore del server",
+        description: "Non è possibile caricare i conti",
+      },
+      unknown: {
+        title: "Errore sconosciuto",
+        description: "Si è verificato un errore imprevisto",
+      },
+      conflict: {
+        title: "Conflitto",
+        description: "Conflittuale dei dati",
+      },
+      network: {
+        title: "Errore di rete",
+        description: "Non è possibile raggiungere il server",
+      },
+      notFound: {
+        title: "Non trovato",
+        description: "Nessun account trovato per questa azienda",
+      },
+      unsavedChanges: {
+        title: "Modifiche non salvate",
+        description: "Hai modifiche non salvate",
+      },
+    },
+    success: {
+      title: "Conti Caricati",
+      description: "Grafico dei conti recuperati con successo",
+    },
+    widget: {
+      loading: "Conti di carico...",
+      empty: "Nessun conto. Eseguire la configurazione per seme da un modello.",
+      createButton: "Nuovo account",
+      inactive: "Inattivo",
+      setupButton: "Impostazione di corsa",
+      selectCompany: "Immettere un Azienda ID per visualizzare gli account",
+      back: "Indietro",
+    },
+  },
+  enums: {
+    accountType: {
+      ASSET: "Benefici",
+      LIABILITY: "Responsabilità",
+      EQUITY: "Equità",
+      REVENUE: "Entrate",
+      EXPENSE: "Spese",
+    },
+    accountSubtype: {
+      CURRENT_ASSET: "Attualità",
+      FIXED_ASSET: "Attivo fisso",
+      BANK: "Banca",
+      CASH: "Contanti",
+      ACCOUNTS_RECEIVABLE: "Conti crediti",
+      INVENTORY: "Inventario",
+      PREPAID: "Spese prepagate",
+      ACCOUNTS_PAYABLE: "Conti pagabili",
+      VAT_PAYABLE: "VAT Payable",
+      VAT_RECEIVABLE: "VAT Recepibile",
+      ACCRUED_LIABILITY: "Responsabilità acquisita",
+      SHORT_TERM_DEBT: "Debiti a breve termine",
+      LONG_TERM_DEBT: "Debiti a lungo termine",
+      SHARE_CAPITAL: "Capitale sociale",
+      RETAINED_EARNINGS: "Guadagni incassati",
+      REVENUE_SALES: "Entrate di vendita",
+      REVENUE_SERVICE: "Entrate di servizio",
+      COGS: "Costo dei beni venduti",
+      PAYROLL: "Pagamenti",
+      RENT: "Affitto",
+      UTILITIES: "Utilità",
+      OPEX: "Spese operative",
+      FINANCIAL_INCOME: "Reddito finanziario",
+      FINANCIAL_EXPENSE: "Spese finanziarie",
+      TAX_EXPENSE: "Spese fiscali",
+      OTHER: "Altro",
+    },
+  },
+  title: "Elenco dei conti",
+  description: "Elenca tutti gli account nel grafico dei conti",
+  category: "Grafico dei conti",
+  tag: "Account",
+};

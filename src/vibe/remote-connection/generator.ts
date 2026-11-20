@@ -108,6 +108,8 @@ class RemoteCapabilitiesGenerator {
     "de-DE",
     "pl-PL",
     "fr-FR",
+    "it-IT",
+    "es-ES",
   ];
 
   /** Locale → short basename */
@@ -118,6 +120,8 @@ class RemoteCapabilitiesGenerator {
     "de-DE": "de",
     "pl-PL": "pl",
     "fr-FR": "fr",
+    "it-IT": "it",
+    "es-ES": "es",
   };
 
   /** User roles we generate snapshots for */
@@ -563,12 +567,21 @@ export const generator: GeneratorDefinition = {
   needs: {},
   cacheKey: "endpoints",
   findInputs(live) {
+    const translationFiles = findFilesRecursively(
+      getApiDir(),
+      "index.ts",
+    ).filter((file) => file.includes("/i18n/"));
     if (live) {
-      return [...live.definitionFiles, ...live.routeFiles].toSorted();
+      return [
+        ...live.definitionFiles,
+        ...live.routeFiles,
+        ...translationFiles,
+      ].toSorted();
     }
     return [
       ...findFilesRecursively(getApiDir(), "definition.ts"),
       ...findFilesRecursively(getApiDir(), "route.ts"),
+      ...translationFiles,
     ].toSorted();
   },
   /**

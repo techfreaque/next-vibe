@@ -1,0 +1,137 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  title: "Estadísticas de campañas",
+  description:
+    "Estadísticas de rendimiento de la campaña por correo electrónico",
+  enums: {
+    emailJourneyVariantFilter: {
+      all: "Todos",
+      uncensoredConvert: "Conversión a modelos sin censura",
+      sideHustle: "Hustle lateral",
+      quietRecommendation: "Recomendación silenciosa",
+      signupNurture: "Nutrición de registro",
+      retention: "Retención",
+      winback: "Winback",
+      newsletterMay2026: "Boletín May 2026",
+      newsletterNov2026: "Boletín de noviembre 2026",
+    },
+  },
+  get: {
+    title: "Estadísticas de campañas",
+    titleShort: "Estadísticas de campañas",
+    description: "Recuperar estadísticas de rendimiento de la campaña de email",
+    container: {
+      title: "Filtros",
+      description: "Estadísticas de la campaña filtrante",
+    },
+    fields: {
+      journeyVariant: {
+        label: "Variante de viaje",
+        description: "Filtro por variante de viaje por correo electrónico",
+      },
+    },
+    response: {
+      total: "Total de campañas",
+      pending: "Pendiente",
+      sent: "Sent",
+      delivered: "Entrega",
+      opened: "Abierto",
+      clicked: "Seguido",
+      failed: "Failed",
+      openRate: "Tasa de apertura",
+      clickRate: "Tasa de clics a través",
+      deliveryRate: "Tasa de entrega",
+      failureRate: "Tasa de fracaso",
+      byStage: "Por etapas",
+      byJourneyVariant: "Por variante de viaje",
+      byStatus: "Por estado",
+      totalLeads: "Total de leads",
+      linkedLeadsCount: "Líderes vinculados",
+      uniquePersonsEstimate: "Personas únicas (est.)",
+      pendingLeadsCount: "Líderes activos en campañas",
+      emailsScheduledToday: "Correos electrónicos programados hoy",
+      quotaProgress: "Progresos de las cuotas semanales",
+      campaignTasks: "Tareas de campaña",
+      alerts: "Alertas",
+      taskStats: "Estadísticas de tareas",
+    },
+    errors: {
+      unauthorized: {
+        title: "Se requiere autenticación",
+        description:
+          "Debes estar conectado para ver las estadísticas de campaña",
+      },
+      forbidden: {
+        title: "Acceso denegado",
+        description: "Usted no tiene permiso para ver estadísticas de campaña",
+      },
+      server: {
+        title: "Error del servidor",
+        description:
+          "Se produjo un error mientras se recogen las estadísticas de campaña",
+      },
+      unknown: {
+        title: "Error desconocido",
+        description: "Ocurrió un error desconocido",
+      },
+      validation: {
+        title: "Error de validación",
+        description: "Parámetros de entrada inválidos",
+      },
+    },
+    success: {
+      title: "Stats Retrieved",
+      description: "Estadísticas de campaña recuperadas con éxito",
+    },
+  },
+  widget: {
+    title: "Ejecución de la campaña",
+    refresh: "Actualizar",
+    noData: "Todavía no hay datos de campaña",
+    openRateSuffix: "% abierto",
+    clickRateSuffix: "% CTR",
+    stageLabel: "embudo de estadio",
+    statusLabel: "Enviar estado",
+    variantLabel: "En viaje",
+    emDash: ", ",
+    leadOverview: "Panorama general",
+    totalLeads: "Total de leads",
+    linkedLeadsCount: "Líderes vinculados",
+    uniquePersonsEstimate: "Personas únicas (est.)",
+    uniquePersonsTooltip:
+      "Líderes menos cables secundarios ligados (duplicaciones de la misma persona)",
+    activeCampaigns: "Campañas activas",
+    sendPerformance: "Enviar rendimiento",
+    perRunBudget:
+      "~ {{perRunBudget}} /run · {{totalRunsPerWeek}} carreras/semana",
+    perRunBudgetZero: "0/run - aumentar la cuota o reducir la frecuencia",
+    accumulator: "siguiente pista: {{pct}} %",
+    cronHealth: {
+      title: "Cron Health",
+      healthy: "Salud",
+      warning: "Advertencia",
+      critical: "Crítica",
+      enabled: "habilitado",
+      failed24h: "fallido (24h)",
+      lastRun: "Última carrera.",
+      nextRun: "Siguiente carrera",
+      never: "Nunca.",
+      runNow: "Ejecutar ahora",
+      alerts: "Alertas",
+      alertFailures: "fracasos consecutivos",
+      empty: "Sin tareas de campaña configuradas",
+      status: {
+        running: "Corriendo",
+        completed: "Completado",
+        failed: "Failed",
+        error: "Error",
+        timeout: "Hora de salir",
+        pending: "Pendiente",
+        scheduled: "Programado",
+        cancelled: "Cancelada",
+        unknown: "Desconocida",
+      },
+    },
+  },
+};

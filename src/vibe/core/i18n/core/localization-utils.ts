@@ -4,74 +4,28 @@
  */
 
 import { format } from "date-fns";
-import { de, enUS, fr, type Locale, pl } from "date-fns/locale";
+import { de, enUS, es, fr, it, type Locale, pl } from "date-fns/locale";
 import type z from "zod";
 
-import { configScopedTranslation } from "@/env/i18n";
-
 import { dateSchema } from "../../definition/common.schema";
+import { languageConfig } from "..";
 import type { CountryLanguage, Currencies } from "./config";
-import { getCountryFromLocale } from "./language-utils";
+import { getCountryFromLocale, getLanguageFromLocale } from "./language-utils";
 
 /**
  * Get locale string from CountryLanguage format
  * Converts "en-GLOBAL" to "en-US", "de-DE" to "de-DE", etc.
  */
 function getLocaleString(countryLanguage: CountryLanguage): string {
-  const [lang, country] = countryLanguage.split("-");
-
-  // Map country codes to proper locale strings
-  switch (country) {
-    case "DE":
-      return "de-DE";
-    case "PL":
-      return "pl-PL";
-    case "FR":
-      return "fr-FR";
-    case "AT":
-      return "de-AT";
-    case "CH":
-      return lang === "de" ? "de-CH" : "fr-CH";
-    case "GLOBAL":
-      // No region: format in the page language (fr-GLOBAL reads French).
-      return lang === "fr" ? "fr-FR" : "en-US";
-    case "US":
-    default:
-      return "en-US";
-  }
+  return countryLanguage.endsWith("-GLOBAL")
+    ? getLanguageFromLocale(countryLanguage)
+    : countryLanguage;
 }
 
-/**
- * Check if locale should use 24-hour time format
- */
-function shouldUse24HourFormat(countryLanguage: CountryLanguage): boolean {
-  const country = countryLanguage.split("-")[1];
-  const language = countryLanguage.split("-")[0];
-  return (
-    country === "DE" ||
-    country === "PL" ||
-    country === "FR" ||
-    country === "AT" ||
-    language === "fr"
-  );
-}
+const dateLocales = { de, en: enUS, es, fr, it, pl };
 
-/**
- * Get date-fns locale object based on country language
- */
 function getDateFnsLocale(countryLanguage: CountryLanguage): Locale {
-  const country = countryLanguage.split("-")[1];
-  switch (country) {
-    case "DE":
-    case "AT":
-      return de;
-    case "PL":
-      return pl;
-    case "FR":
-      return fr;
-    default:
-      return countryLanguage.startsWith("fr-") ? fr : enUS;
-  }
+  return dateLocales[getLanguageFromLocale(countryLanguage)];
 }
 
 /**
@@ -97,14 +51,12 @@ export function formatTimestamp(
     const date =
       typeof timestamp === "string" ? new Date(timestamp) : timestamp;
     const localeString = getLocaleString(locale);
-    const use24Hour = shouldUse24HourFormat(locale);
 
     return new Intl.DateTimeFormat(localeString, {
       month: "short",
       day: "numeric",
       hour: "numeric",
       minute: "numeric",
-      hour12: !use24Hour,
     }).format(date);
   } catch {
     // Error formatting timestamp - return raw value
@@ -149,8 +101,5 @@ export function formatSimpleDate(
  * Returns appropriate timezone for the given locale
  */
 export function getDefaultTimezone(locale: CountryLanguage): string {
-  const { t } = configScopedTranslation.scopedT(locale);
-  const country = getCountryFromLocale(locale);
-  const key = `timezone.${country}` as Parameters<typeof t>[0];
-  return t(key);
+  return languageConfig.countryInfo[getCountryFromLocale(locale)].timezone;
 }

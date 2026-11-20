@@ -258,13 +258,18 @@ export class HelpRepository {
     // Load only the locale we need.
     // Meta is generated per language; any country variant reads its language.
     const language = getLanguageFromLocale(locale);
-    const metaModule = await (language === "de"
-      ? import("@/generated/endpoints/meta/de")
-      : language === "pl"
-        ? import("@/generated/endpoints/meta/pl")
-        : language === "fr"
-          ? import("@/generated/endpoints/meta/fr")
-          : import("@/generated/endpoints/meta/en"));
+    const metadata: Record<
+      typeof language,
+      () => Promise<{ endpointsMeta: EndpointMeta[] }>
+    > = {
+      en: () => import("@/generated/endpoints/meta/en"),
+      de: () => import("@/generated/endpoints/meta/de"),
+      pl: () => import("@/generated/endpoints/meta/pl"),
+      fr: () => import("@/generated/endpoints/meta/fr"),
+      it: () => import("@/generated/endpoints/meta/it"),
+      es: () => import("@/generated/endpoints/meta/es"),
+    };
+    const metaModule = await metadata[language]();
     const allMeta = metaModule.endpointsMeta;
 
     // Discovery platform - what platform context are we listing tools for?

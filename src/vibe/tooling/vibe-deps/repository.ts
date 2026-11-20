@@ -2136,7 +2136,7 @@ function buildUnusedI18n(
       if (!isGenerated(file) && (!scope || file.includes(scope))) {
         enFiles.push(file);
       }
-    } else if (!/\/i18n\/(?:en|de|pl)\//.test(file)) {
+    } else if (!/\/i18n\/(?:en|de|pl|fr|it|es)\//.test(file)) {
       // i18n helpers (i18n/utils.ts, …) reference keys too — only the
       // translation files themselves are excluded
       referenceSources.push(readFileSync(file, "utf8"));

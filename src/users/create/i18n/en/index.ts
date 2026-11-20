@@ -1,3 +1,5 @@
+import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
+
 export const translations = {
   category: "Users",
   tags: {
@@ -316,6 +318,7 @@ export const translations = {
     },
   },
   countries: {
+    ...regionalCountryNames("en"),
     global: "Global",
     de: "Germany",
     pl: "Poland",
@@ -323,6 +326,8 @@ export const translations = {
     us: "United States",
   },
   languages: {
+    it: "Italian",
+    es: "Spanish",
     en: "English",
     de: "German",
     pl: "Polish",

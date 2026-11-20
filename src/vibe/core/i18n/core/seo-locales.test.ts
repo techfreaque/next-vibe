@@ -18,6 +18,10 @@ describe("seo-locales", () => {
     expect(canonicalSeoLocale("de-US")).toBe("de-DE");
     expect(canonicalSeoLocale("de-GLOBAL")).toBe("de-DE");
     expect(canonicalSeoLocale("pl-GLOBAL")).toBe("pl-PL");
+    expect(canonicalSeoLocale("it-CH")).toBe("it-IT");
+    expect(canonicalSeoLocale("es-MX")).toBe("es-ES");
+    expect(canonicalSeoLocale("de-AT")).toBe("de-DE");
+    expect(canonicalSeoLocale("fr-CA")).toBe("fr-FR");
     expect(canonicalSeoLocale("fr-DE")).toBe("fr-FR");
     expect(canonicalSeoLocale("en-PL")).toBe("en-GLOBAL");
     expect(canonicalSeoLocale("en-DE")).toBe("en-GLOBAL");
@@ -31,7 +35,7 @@ describe("seo-locales", () => {
   it("builds valid alternates with x-default and no GLOBAL region", () => {
     const alternates = seoLanguageAlternates("https://example.com/", "models");
     expect(Object.keys(alternates).toSorted()).toEqual(
-      ["de-DE", "en", "en-US", "fr-FR", "pl-PL", "x-default"].toSorted(),
+      ["de-DE", "en", "en-US", "fr-FR", "it-IT", "es-ES", "pl-PL", "x-default"].toSorted(),
     );
     expect(alternates["x-default"]).toBe("https://example.com/en-GLOBAL/models");
     expect(alternates["en"]).toBe("https://example.com/en-GLOBAL/models");

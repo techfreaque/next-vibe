@@ -3343,6 +3343,8 @@ export const translations = {
     complete: "Complete",
   },
   language: {
+    it: "Italian",
+    es: "Spanish",
     en: "English",
     de: "German",
     pl: "Polish",

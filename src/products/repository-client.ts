@@ -3,6 +3,7 @@
  * Single source of truth for all pricing and product data across the platform
  */
 
+import { languageConfig } from "next-vibe/core/i18n";
 import type {
   Countries,
   CountryLanguage,
@@ -124,23 +125,34 @@ export const FEATURE_COSTS = {
 /**
  * Product definition with pricing per country
  */
+type PriceMarket = "DE" | "FR" | "PL" | "US" | "GLOBAL";
+
+function priceMarket(country: Countries): PriceMarket {
+  if (country === "US" || country === "FR" || country === "PL") {
+    return country;
+  }
+  return languageConfig.countryInfo[country].currency === "EUR"
+    ? "DE"
+    : "GLOBAL";
+}
+
 export interface ProductDefinition {
   name: ProductsTranslationKey;
   description: ProductsTranslationKey;
   priceByCountry: {
-    [key in Countries]: {
+    [key in PriceMarket]: {
       price: number;
       currency: Currencies;
     };
   };
   yearlyPriceByCountry?: {
-    [key in Countries]: {
+    [key in PriceMarket]: {
       price: number;
       currency: Currencies;
     };
   };
   oneTimePriceByCountry?: {
-    [key in Countries]: {
+    [key in PriceMarket]: {
       price: number;
       currency: Currencies;
     };
@@ -467,6 +479,7 @@ export class ProductsRepositoryImpl implements ProductsRepository {
     interval: PaymentInterval = "month",
   ): Product {
     const country = getCountryFromLocale(locale);
+    const market = priceMarket(country);
     const definition = productDefinitions[productId];
     // An interval the product is not sold in falls back to its first one, so a
     // credit pack read without "one_time" still shows the checkout price.
@@ -478,10 +491,10 @@ export class ProductsRepositoryImpl implements ProductsRepository {
     // Let TypeScript infer the literal type from the data
     const priceData =
       effectiveInterval === "year" && definition.yearlyPriceByCountry
-        ? definition.yearlyPriceByCountry[country]
+        ? definition.yearlyPriceByCountry[market]
         : effectiveInterval === "one_time" && definition.oneTimePriceByCountry
-          ? definition.oneTimePriceByCountry[country]
-          : definition.priceByCountry[country];
+          ? definition.oneTimePriceByCountry[market]
+          : definition.priceByCountry[market];
 
     return {
       id: productId,
@@ -607,7 +620,7 @@ function formatPriceLabel(
 ): string {
   const symbolAfter =
     currency === "PLN" ||
-    (currency === "EUR" && locale !== undefined && locale.startsWith("fr-"));
+    (currency === "EUR" && locale !== undefined && /^(fr|it|es)-/.test(locale));
   return symbolAfter
     ? `${price} ${currencySymbol(currency)}`
     : `${currencySymbol(currency)}${price}`;
@@ -623,7 +636,7 @@ function formatPriceLabel(
 export function getPricingParams(
   locale: CountryLanguage,
 ): Record<string, string> {
-  const country = getCountryFromLocale(locale);
+  const country = priceMarket(getCountryFromLocale(locale));
   const free = productDefinitions[ProductIds.FREE_TIER];
   const sub = productDefinitions[ProductIds.SUBSCRIPTION];
   const pack = productDefinitions[ProductIds.CREDIT_PACK];
@@ -709,7 +722,7 @@ function formatCreditsLabel(credits: number, locale: CountryLanguage): string {
 export function getSubscriptionTiers(
   locale: CountryLanguage,
 ): SubscriptionTier[] {
-  const country = getCountryFromLocale(locale);
+  const country = priceMarket(getCountryFromLocale(locale));
   return SUBSCRIPTION_TIER_PRODUCT_IDS.filter(
     (productId) => productDefinitions[productId].status === "active",
   ).map((productId) => {

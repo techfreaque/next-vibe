@@ -594,6 +594,8 @@ function detectLocale(): CountryLanguage {
     de: "de-DE",
     pl: "pl-PL",
     fr: "fr-FR",
+    it: "it-IT",
+    es: "es-ES",
   };
   return regionMap[lang] ?? "en-US";
 }

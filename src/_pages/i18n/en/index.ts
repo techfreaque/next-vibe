@@ -1,3 +1,5 @@
+import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
+
 export const translations = {
   currency: {
     usd: "USD",
@@ -218,6 +220,8 @@ export const translations = {
 
   constants: {
     languages: {
+      it: "Italian",
+      es: "Spanish",
       en: "English",
       de: "German",
       pl: "Polish",
@@ -290,6 +294,7 @@ export const translations = {
       language: "Language",
     },
     countries: {
+      ...regionalCountryNames("en"),
       de: "Germany",
       pl: "Poland",
       fr: "France",
@@ -297,6 +302,8 @@ export const translations = {
       global: "Global",
     },
     languages: {
+      it: "Italian",
+      es: "Spanish",
       en: "English",
       de: "German",
       pl: "Polish",

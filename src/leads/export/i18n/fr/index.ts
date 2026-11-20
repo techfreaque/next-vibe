@@ -1,3 +1,5 @@
+import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
+
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -205,6 +207,7 @@ export const translations: typeof enTranslations = {
     referralCode: "Code de parrainage",
   },
   countries: {
+    ...regionalCountryNames("fr"),
     global: "International",
     de: "Allemagne",
     pl: "Pologne",
@@ -212,6 +215,8 @@ export const translations: typeof enTranslations = {
     us: "États-Unis",
   },
   languages: {
+    it: "Italien",
+    es: "Espagnol",
     en: "Anglais",
     de: "Allemand",
     pl: "Polonais",

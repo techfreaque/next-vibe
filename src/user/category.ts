@@ -16,6 +16,8 @@ export const category: CategoryDefinition = {
     "de-DE": "Konto",
     "pl-PL": "Konto",
     "fr-FR": "Compte",
+    "it-IT": "Account",
+    "es-ES": "Cuenta",
   },
   group: "system",
   icon: "user",
@@ -35,6 +37,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Login & Registrierung",
         "pl-PL": "Logowanie i rejestracja",
         "fr-FR": "Connexion et inscription",
+        "it-IT": "Accesso e registrazione",
+        "es-ES": "Acceso y registro",
       },
     },
     profile: {
@@ -46,6 +50,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Profil",
         "pl-PL": "Profil",
         "fr-FR": "Profil",
+        "it-IT": "Profilo",
+        "es-ES": "Perfil",
       },
     },
     sessions: {
@@ -57,6 +63,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Sitzungen",
         "pl-PL": "Sesje",
         "fr-FR": "Sessions",
+        "it-IT": "Sessioni",
+        "es-ES": "Sesiones",
       },
     },
     directory: {
@@ -68,6 +76,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Verzeichnis",
         "pl-PL": "Katalog",
         "fr-FR": "Annuaire",
+        "it-IT": "Elenco",
+        "es-ES": "Directorio",
       },
     },
     manageUsers: {
@@ -79,6 +89,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Nutzer verwalten",
         "pl-PL": "Zarządzaj użytkownikami",
         "fr-FR": "Gérer les utilisateurs",
+        "it-IT": "Gestione utenti",
+        "es-ES": "Gestión de usuarios",
       },
     },
     userStats: {
@@ -90,6 +102,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Nutzerstatistiken",
         "pl-PL": "Statystyki użytkowników",
         "fr-FR": "Stats des utilisateurs",
+        "it-IT": "Statistiche utenti",
+        "es-ES": "Estadísticas de usuarios",
       },
     },
     remoteInstances: {
@@ -101,6 +115,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Remote-Instanzen",
         "pl-PL": "Zdalne instancje",
         "fr-FR": "Instances distantes",
+        "it-IT": "Istanze remote",
+        "es-ES": "Instancias remotas",
       },
     },
     remoteSelf: {
@@ -112,6 +128,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Eigene Instanz",
         "pl-PL": "Własna instancja",
         "fr-FR": "Instance locale",
+        "it-IT": "Il mio account",
+        "es-ES": "Mi cuenta",
       },
     },
   },

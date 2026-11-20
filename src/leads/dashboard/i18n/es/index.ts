@@ -1,0 +1,98 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  tags: {
+    leads: "leads",
+    dashboard: "dashboard",
+  },
+  get: {
+    title: "Leads Dashboard",
+    titleShort: "Panel de contactos",
+    description:
+      "Cuentas en vivo de pistas activas, llegadas nuevas, campañas de ejecución y conversiones",
+    errors: {
+      unauthorized: {
+        title: "Se requiere autenticación",
+        description: "Inicia sesión para continuar",
+      },
+      validation: {
+        title: "Error de validación",
+        description: "Parámetros de solicitud no válidos",
+      },
+      server: {
+        title: "Error del servidor",
+        description: "Failed to load dashboard data",
+      },
+      unknown: {
+        title: "Error desconocido",
+        description: "Ocurrió un error inesperado",
+      },
+      network: {
+        title: "Error de red",
+        description: "La conexión de red falló",
+      },
+      forbidden: {
+        title: "Acceso denegado",
+        description: "Usted no tiene acceso a estos datos",
+      },
+      notFound: {
+        title: "No encontrado",
+        description: "Datos de panel no encontrados",
+      },
+      unsavedChanges: {
+        title: "Cambios sin guardar",
+        description: "Hay cambios sin salvar",
+      },
+      conflict: {
+        title: "Conflicto",
+        description: "Un conflicto de datos",
+      },
+    },
+    success: {
+      title: "Operación completada",
+      description: "Datos de panel cargados",
+    },
+    response: {
+      activeLeadsCount: "contacto activo",
+      newThisWeekCount: "Esta semana",
+      runningCampaignsCount: "Campañas en marcha",
+      convertedCount: "Conversión",
+      totalLeadsCount: "Total de productos básicos",
+      conversionRate: "Tasa de conversión",
+      statusBreakdown: "Estado desglose",
+      recentLeads: "Líderes recientes",
+      "recentLeads.id": "ID",
+      "recentLeads.businessName": "Nombre del negocio",
+      "recentLeads.email": "Correo electrónico",
+      "recentLeads.status": "Situación",
+      "recentLeads.source": "Fuente",
+      "recentLeads.createdAt": "Creado en",
+    },
+  },
+  widget: {
+    loading: "Carga dashboard...",
+    activeLeads: "contacto activo",
+    newThisWeek: "Esta semana",
+    runningCampaigns: "In Campaign",
+    converted: "Conversión",
+    totalLeads: "Total de productos básicos",
+    conversionRate: "Tasa de conversión",
+    quickActions: "Medidas rápidas",
+    newLead: "Nuevo contacto",
+    newLeadDesc: "Crear un nuevo contacto manualmente",
+    allLeads: "All Leads",
+    allLeadsDesc: "Explorar y filtrar todos los cables",
+    campaignStats: "Estadísticas de campañas",
+    campaignStatsDesc: "Analizar el rendimiento de la campaña",
+    searchLeads: "Búsqueda de contactos",
+    searchLeadsDesc: "Encontrar leads por nombre o correo electrónico",
+    importLeads: "Importación",
+    importLeadsDesc: "Líderes de importación a granel de CSV",
+    statusBreakdown: "Estado desglose",
+    recentLeads: "Líderes recientes",
+    viewAll: "Ver todos",
+    noLeadsYet: "Aún no hay pistas.",
+    noLeadsHint: "Cree su primer contacto o importación desde CSV para empezar",
+    createFirst: "Crear contacto",
+  },
+};

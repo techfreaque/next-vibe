@@ -34,6 +34,8 @@ export const translations = {
   },
   constants: {
     languages: {
+      it: "Italian",
+      es: "Spanish",
       en: "English",
       de: "German",
       pl: "Polish",

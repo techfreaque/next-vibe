@@ -9,11 +9,13 @@
 
 import type { CountryLanguage } from "./config";
 
-/** Indexable locales - same set the middleware lists as supported. */
+/** Indexable locales - regional variants share a canonical page per language. */
 export const SEO_LOCALES: readonly CountryLanguage[] = [
   "de-DE",
   "pl-PL",
   "fr-FR",
+  "it-IT",
+  "es-ES",
   "en-GLOBAL",
   "en-US",
 ];

@@ -103,6 +103,22 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z.string().max(4000).optional(),
       }),
+      textIt: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "questions.fields.textIt.label" as const,
+        description: "questions.patch.clearHint" as const,
+        columns: 6,
+        schema: z.string().max(4000).optional(),
+      }),
+      textEs: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "questions.fields.textEs.label" as const,
+        description: "questions.patch.clearHint" as const,
+        columns: 6,
+        schema: z.string().max(4000).optional(),
+      }),
 
       updatedId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

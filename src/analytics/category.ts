@@ -17,6 +17,8 @@ export const category: CategoryDefinition = {
     "de-DE": "Analytik",
     "pl-PL": "Analityka",
     "fr-FR": "Analytique",
+    "it-IT": "Analisi",
+    "es-ES": "Analítica",
   },
   group: "analytics",
   icon: "bar-chart-2",
@@ -36,6 +38,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Vibe Sense",
         "pl-PL": "Vibe Sense",
         "fr-FR": "Vibe Sense",
+        "it-IT": "Vibe Sense",
+        "es-ES": "Vibe Sense",
       },
     },
     Indicators: {
@@ -47,6 +51,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Indikatoren",
         "pl-PL": "Wskaźniki",
         "fr-FR": "Indicateurs",
+        "it-IT": "Indicatori",
+        "es-ES": "Indicadores",
       },
     },
     Evaluators: {
@@ -58,6 +64,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Auswertungen",
         "pl-PL": "Ewaluatory",
         "fr-FR": "Évaluateurs",
+        "it-IT": "Valutatori",
+        "es-ES": "Evaluadores",
       },
     },
     Transformers: {
@@ -69,6 +77,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Transformatoren",
         "pl-PL": "Transformatory",
         "fr-FR": "Transformateurs",
+        "it-IT": "Trasformatori",
+        "es-ES": "Transformadores",
       },
     },
     leadsData: {
@@ -80,6 +90,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Lead-Daten",
         "pl-PL": "Dane leadów",
         "fr-FR": "Données des leads",
+        "it-IT": "Dati sui contatti commerciali",
+        "es-ES": "Datos de prospectos",
       },
     },
     usersData: {
@@ -91,6 +103,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Nutzerdaten",
         "pl-PL": "Dane użytkowników",
         "fr-FR": "Données des utilisateurs",
+        "it-IT": "Dati degli utenti",
+        "es-ES": "Datos de usuarios",
       },
     },
     messengerData: {
@@ -102,6 +116,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Messenger-Daten",
         "pl-PL": "Dane komunikatora",
         "fr-FR": "Données de la messagerie",
+        "it-IT": "Dati di messaggistica",
+        "es-ES": "Datos de mensajería",
       },
     },
     paymentsData: {
@@ -113,6 +129,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Zahlungsdaten",
         "pl-PL": "Dane płatności",
         "fr-FR": "Données des paiements",
+        "it-IT": "Dati sui pagamenti",
+        "es-ES": "Datos de pagos",
       },
     },
     creditsData: {
@@ -124,6 +142,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Guthaben-Daten",
         "pl-PL": "Dane kredytów",
         "fr-FR": "Données des crédits",
+        "it-IT": "Dati sui crediti",
+        "es-ES": "Datos de créditos",
       },
     },
     subscriptionsData: {
@@ -135,6 +155,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Abonnement-Daten",
         "pl-PL": "Dane subskrypcji",
         "fr-FR": "Données des abonnements",
+        "it-IT": "Dati sugli abbonamenti",
+        "es-ES": "Datos de suscripciones",
       },
     },
     referralData: {
@@ -146,6 +168,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Empfehlungsdaten",
         "pl-PL": "Dane poleceń",
         "fr-FR": "Données du parrainage",
+        "it-IT": "Dati sugli inviti",
+        "es-ES": "Datos de referidos",
       },
     },
     newsletterData: {
@@ -157,6 +181,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Newsletter-Daten",
         "pl-PL": "Dane newslettera",
         "fr-FR": "Données de la newsletter",
+        "it-IT": "Dati della newsletter",
+        "es-ES": "Datos del boletín",
       },
     },
     chatData: {
@@ -168,6 +194,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Chat-Daten",
         "pl-PL": "Dane czatu",
         "fr-FR": "Données du chat",
+        "it-IT": "Dati delle chat",
+        "es-ES": "Datos del chat",
       },
     },
     systemData: {
@@ -179,6 +207,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Systemdaten",
         "pl-PL": "Dane systemowe",
         "fr-FR": "Données système",
+        "it-IT": "Dati di sistema",
+        "es-ES": "Datos del sistema",
       },
     },
     financeData: {
@@ -190,6 +220,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Finanzdaten",
         "pl-PL": "Dane finansowe",
         "fr-FR": "Données financières",
+        "it-IT": "Dati finanziari",
+        "es-ES": "Datos financieros",
       },
     },
   },

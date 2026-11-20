@@ -9,7 +9,7 @@
  */
 
 import { eq } from "drizzle-orm";
-import { Countries, Languages } from "next-vibe/core/i18n/core/config";
+import { CountriesArr, LanguagesArr } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import {
@@ -128,14 +128,8 @@ function getSystemAccountConfig(
     ],
     emailJourneyVariants: [],
     emailCampaignStages: [],
-    countries: [
-      Countries.GLOBAL,
-      Countries.DE,
-      Countries.PL,
-      Countries.FR,
-      Countries.US,
-    ],
-    languages: [Languages.EN, Languages.DE, Languages.PL, Languages.FR],
+    countries: [...CountriesArr],
+    languages: [...LanguagesArr],
     isExactMatch: false,
     weight: 90,
     isFailover: false,
@@ -236,14 +230,8 @@ function getLeadsAccountConfig(
       EmailCampaignStage.NURTURE,
       EmailCampaignStage.REACTIVATION,
     ],
-    countries: [
-      Countries.GLOBAL,
-      Countries.DE,
-      Countries.PL,
-      Countries.FR,
-      Countries.US,
-    ],
-    languages: [Languages.EN, Languages.DE, Languages.PL, Languages.FR],
+    countries: [...CountriesArr],
+    languages: [...LanguagesArr],
     isExactMatch: false,
     weight: 100,
     isFailover: false,

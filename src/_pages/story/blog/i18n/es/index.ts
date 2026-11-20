@@ -1,0 +1,230 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  page: {
+    title: "Bitácora de desarrollo",
+    subtitle:
+      "Cómo construimos {{appName}} y next-vibe. Las decisiones de arquitectura, los caminos sin salida y lo que terminó marcando la diferencia.",
+    meta: {
+      title: "Bitácora de next-vibe y {{appName}}",
+      description:
+        "Las decisiones técnicas detrás de next-vibe y {{appName}}. Una arquitectura para varias interfaces, reglas de TypeScript, Vibe Sense y la historia de cómo construimos ambos.",
+      category: "Blog",
+      imageAlt: "Blog de next-vibe y {{appName}}",
+      keywords:
+        "next-vibe, {{appName}}, blog, TypeScript, arquitectura, SaaS, IA, código abierto, desarrollo de software",
+    },
+  },
+  posts: {
+    characterAiAlternatives: {
+      title:
+        "Alternativas a Character.AI sin filtros. Comparamos con fuentes en mano.",
+      category: "Comparación",
+      excerpt:
+        "Janitor AI, SillyTavern, CrushOn, Kindroid, Nomi, Venice y nosotros, según lo que cada uno publica sobre precios, filtros y privacidad. Además, importa tus personajes de Character.AI desde un enlace.",
+      readTime: "10 min de lectura",
+    },
+    abliteratedExplained: {
+      title:
+        "Tres tipos de IA sin censura: abliteración, ajuste fino y una visión del mundo propia.",
+      category: "Guía de modelos",
+      excerpt:
+        "Qué cambia con cada método, cómo se hicieron nuestros modelos, tres comparaciones de originales y versiones sin censura y una prueba de diez minutos para distinguirlos.",
+      readTime: "8 min de lectura",
+    },
+    imageGenerators: {
+      title:
+        "Generadores de imágenes con IA sin censura. Precios reales, sin difuminar nada.",
+      category: "Comparación de modelos",
+      excerpt:
+        "Qué modelos generan imágenes sin filtros, cuánto cuesta cada imagen y cómo crearla o editarla directamente en el chat.",
+      readTime: "8 min de lectura",
+    },
+    roleplayWithoutFilter: {
+      title:
+        "Juego de rol con IA sin filtros. Tú decides adónde va la historia.",
+      category: "Guía",
+      excerpt:
+        "Una alternativa a Character.AI. Descubre qué modelo sin censura se mantiene en personaje, cuál recuerda toda la campaña, cómo empezar en dos minutos y cuánto cuesta cada respuesta.",
+      readTime: "8 min de lectura",
+    },
+    musicVoice: {
+      title: "Música, voces y transcripción con IA. Qué modelo sirve para qué.",
+      category: "Guía",
+      excerpt:
+        "Canciones, ritmos, locuciones y transcripciones con un solo saldo. Compara los modelos de música, voz y transcripción con precios reales por clip, minuto y hora. Descubre también cuándo vale la pena buscar una alternativa a Suno.",
+      readTime: "11 min de lectura",
+    },
+    videoGenerators: {
+      title:
+        "Generadores de video con IA comparados: Kling, Seedance, Veo, Wan y más.",
+      category: "Guía",
+      excerpt:
+        "Todos los modelos de video en una sola cuenta. Compara generación desde texto o imagen, fotogramas inicial y final, duración, resolución, sonido y precio real por segundo. Descubre para qué sirve cada modelo y qué límites tiene.",
+      readTime: "10 min de lectura",
+    },
+    compatibleApi: {
+      title:
+        "Una clave de API para todos los modelos. Formatos OpenAI y Anthropic.",
+      category: "Guía para desarrolladores",
+      excerpt:
+        "Chat Completions de OpenAI, la API Responses y Anthropic Messages en un solo endpoint. Usa tu SDK, Claude Code y Codex CLI con cualquier modelo. Cuánto cuesta y cuándo te conviene ir directo al proveedor o usar OpenRouter.",
+      readTime: "11 min de lectura",
+    },
+    chatgptAlternative: {
+      title: "Una alternativa a ChatGPT sin filtros. Tú eliges el nivel.",
+      category: "Guía",
+      excerpt:
+        "Los modelos convencionales conservan sus filtros. Aquí los tienes junto a los modelos abiertos y sin censura. Tú eliges con cada mensaje. Qué cambia, cuánto cuesta y cuándo sigue conviniendo ChatGPT.",
+      readTime: "7 min de lectura",
+    },
+    codingTools: {
+      title:
+        "Una clave para todos los modelos, también en Codex y Claude Code.",
+      category: "Guía para desarrolladores",
+      excerpt:
+        "Codex CLI, Claude Code, OpenCode, Continue, Aider y Cline con una sola clave de API, incluidos los modelos sin censura. Una URL base, un comando por herramienta y los tropiezos que encontramos.",
+      readTime: "8 min de lectura",
+    },
+    uncensoredGuide: {
+      title: "Los modelos sin censura, uno por uno.",
+      category: "Guía de modelos",
+      excerpt:
+        "Dos tipos de modelos sin censura: modelos convencionales sin el reflejo de rechazar preguntas y UncensoredLM, entrenado con libros y documentos prohibidos. Venice, GLM, DeepSeek, Qwen, Gemma, Arya, FreedomGPT y más, con los puntos fuertes y límites de cada uno.",
+      readTime: "7 min de lectura",
+    },
+    modelRefresh: {
+      title: "Ya llegaron los modelos nuevos. La oferta sin censura crece.",
+      category: "Nuevos modelos",
+      excerpt:
+        "Claude 5.5, GPT-6, Gemini 4 Argon, Grok 4.7 y nuevos modelos abiertos. También NanoGPT, más modelos de Venice y los primeros generadores de imágenes sin censura.",
+      readTime: "5 min de lectura",
+    },
+    whatsNewNovember2026: {
+      title:
+        "Seis meses de novedades: más rápido, más seguro y en cualquier equipo.",
+      category: "Novedades del producto",
+      excerpt:
+        "El botón Detener ahora sí detiene la respuesta. La voz funciona en iPhone. Tu IA te sigue de un equipo a otro. Puedes alojarla sin Docker. Todo lo nuevo desde mayo.",
+      readTime: "6 min de lectura",
+    },
+    hermesThea: {
+      title: "Dos IA. Una conversación. En ambos sentidos.",
+      category: "Hermes y Thea",
+      excerpt:
+        "Hermes en tu equipo y Thea en un servidor. Ahora ambas pueden pasarse una conversación. Y si falta una clave de API, la respuesta ya no se interrumpe.",
+      readTime: "6 min de lectura",
+    },
+    codingAgent: {
+      title: "Tu IA abre una terminal y le pasa el trabajo a Claude Code.",
+      category: "Agente de programación",
+      excerpt:
+        "El agente de programación delega cambios reales a Claude Code u OpenCode, en segundo plano o en una terminal que avisa al terminar. Ahora también funciona entre instancias.",
+      readTime: "5 min de lectura",
+    },
+    e2eTests: {
+      title:
+        "Un robot pulsó todos los botones. Encontró ocho fallos de seguridad.",
+      category: "Ingeniería",
+      excerpt:
+        "Empezamos a probar páginas completas. Un navegador real para cada endpoint que usan los clientes. Así encontramos una redirección abierta, SSRF y filtraciones de datos.",
+      readTime: "7 min de lectura",
+    },
+    whatsNewMay2026: {
+      title: "Cortex, Dreamer y Autopilot. Tu IA ya tiene memoria.",
+      category: "Novedades del producto",
+      excerpt:
+        "Memoria persistente, reflexión nocturna y ejecución en segundo plano. También generación multimedia y {{credits}} créditos, un mes gratis, por contarnos qué falla.",
+      readTime: "6 min de lectura",
+    },
+    whatsNewApril2026: {
+      title: "123 modelos. Todos los formatos. Un solo compañero.",
+      category: "Novedades del producto",
+      excerpt:
+        "Soporte multimodal en 123 modelos, compañeros de IA con personalidad, un sistema para ganar con habilidades y una revisión de lo que no iba bien. Esto cambió.",
+      readTime: "7 min de lectura",
+    },
+    oneCodebase: {
+      title: "Un solo código para 13 plataformas.",
+      category: "Arquitectura",
+      excerpt:
+        "Una definición de endpoint genera a la vez un formulario web, un comando de CLI, una herramienta MCP, una pantalla nativa y una tarea cron. Así funciona.",
+      readTime: "12 min de lectura",
+    },
+    typeChecker: {
+      title:
+        "Escribí un verificador de tipos que hizo que la IA dejara de mentirme",
+      category: "TypeScript",
+      excerpt:
+        "La IA usa `any` para esquivar un error de tipos. Agrega eslint-disable. Te dice que todo está bien. Así corregimos el ciclo de verificación.",
+      readTime: "10 min de lectura",
+    },
+    tradingBot: {
+      title:
+        "Mi bot de trading abandonado se convirtió en un motor de monitoreo",
+      category: "Vibe Sense",
+      excerpt:
+        "Abandoné un bot de trading. Años después, su arquitectura se convirtió en la parte más interesante de next-vibe. El flujo está hecho de endpoints.",
+      readTime: "14 min de lectura",
+    },
+    oneEndpoint: {
+      title: "Un endpoint para todas las interfaces.",
+      category: "Arquitectura",
+      excerpt:
+        "Escribe un solo definition.ts por función. De ahí salen un formulario web, un comando de CLI, una herramienta MCP, una pantalla nativa y una tarea cron.",
+      readTime: "5 min de lectura",
+    },
+    referralBeginners: {
+      title:
+        "Nunca he hecho marketing de afiliados. ¿De verdad puedo ganar dinero?",
+      category: "Referidos",
+      excerpt:
+        "Sí, si partes de expectativas realistas. Así funcionan las comisiones recurrentes cuando invitas a alguien por primera vez.",
+      readTime: "6 min de lectura",
+    },
+    referralAffiliatePros: {
+      title: "Trabajo con afiliados. ¿Qué cambia con las suscripciones de IA?",
+      category: "Referidos",
+      excerpt:
+        "La base de ingresos empieza más alta y sube con el tiempo. Comisiones mensuales recurrentes de suscriptores que gastan más a medida que crece la plataforma.",
+      readTime: "7 min de lectura",
+    },
+    referralDevelopers: {
+      title: "Creaste algo con IA. Gana dinero al compartirlo.",
+      category: "Referidos",
+      excerpt:
+        "Tu enlace de referido puede generar ingresos. Artículos, README y tutoriales: las cuentas para un público técnico.",
+      readTime: "5 min de lectura",
+    },
+    skillSharingEconomy: {
+      title: "Crea una habilidad. Comparte el enlace. Gana cada mes.",
+      category: "Economía de habilidades",
+      excerpt:
+        "Una habilidad es una configuración de IA que preparas una vez y compartes donde quieras. El código de referido en el enlace te da un 10% recurrente por cada registro. Así funciona.",
+      readTime: "7 min de lectura",
+    },
+    referralLanding: {
+      title:
+        "10% directo. +5% cuando alguien comparte tu habilidad. Comisiones recurrentes sin fecha de vencimiento.",
+      category: "Referidos",
+      excerpt:
+        "Cómo funciona el programa de ingresos por referidos y habilidades: niveles de la cadena, porcentajes exactos, opciones de pago y cómo se suma la bonificación por habilidades.",
+      readTime: "4 min de lectura",
+    },
+  },
+  cta: {
+    title: "Nuevos artículos directamente en tu correo.",
+    subtitle:
+      "Análisis técnicos y novedades apenas se publican. Solo actualizaciones. Puedes darte de baja con un clic.",
+    newsletter: "Suscribirme al boletín",
+    subscribedTitle: "Ya estás en la lista.",
+    subscribedSubtitle:
+      "Recibirás los artículos nuevos el día que salgan. Mientras tanto, explora el framework con el que los hicimos.",
+    framework: "Explorar next-vibe",
+  },
+  labels: {
+    readMore: "Leer más",
+    allPosts: "Todos los artículos",
+    featured: "Destacados",
+  },
+};

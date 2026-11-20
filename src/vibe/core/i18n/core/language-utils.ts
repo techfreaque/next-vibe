@@ -27,6 +27,24 @@ type LanguageGroupMap = {
 /**
  * Singleton class for efficient language mapping operations
  */
+function groupCountries(language: Languages): {
+  name: string;
+  countries: CountryInfo[];
+} {
+  const countries = availableCountries.filter((country) =>
+    country.languages.includes(language),
+  );
+  const primary = availableCountries.find(
+    (country) => country.language === language,
+  );
+  return {
+    name: primary?.langName ?? language,
+    countries: primary
+      ? [primary, ...countries.filter((country) => country !== primary)]
+      : countries,
+  };
+}
+
 let instance: LanguageMapper | null = null;
 class LanguageMapper {
   private _uniqueLanguages:
@@ -56,19 +74,14 @@ class LanguageMapper {
    */
   private getLanguageGroupMap(): LanguageGroupMap {
     if (this._languageGroupMap === null) {
-      this._languageGroupMap = availableCountries.reduce((acc, curr) => {
-        const language = curr.language;
-
-        if (!acc[language]) {
-          acc[language] = {
-            name: curr.langName,
-            countries: [],
-          };
-        }
-        // Create a mutable copy to avoid readonly issues
-        acc[language].countries = [...acc[language].countries, curr];
-        return acc;
-      }, {} as LanguageGroupMap);
+      this._languageGroupMap = {
+        de: groupCountries("de"),
+        en: groupCountries("en"),
+        pl: groupCountries("pl"),
+        fr: groupCountries("fr"),
+        it: groupCountries("it"),
+        es: groupCountries("es"),
+      };
     }
     return this._languageGroupMap;
   }
@@ -188,4 +201,12 @@ export function getLocaleFromLanguageAndCountry(
   country: Countries,
 ): CountryLanguage {
   return `${language}-${country}` as CountryLanguage;
+}
+
+/** Keep a visitor's language in multilingual regions. */
+export function languageForCountry(
+  country: CountryInfo,
+  current: Languages,
+): Languages {
+  return country.languages.includes(current) ? current : country.language;
 }

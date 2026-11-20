@@ -27,6 +27,7 @@ import {
   defaultLocaleConfig,
   globalCountryInfo,
 } from "./config";
+import { languageForCountry } from "./language-utils";
 
 // Translation context type with country support
 interface TranslationContextType {
@@ -37,7 +38,7 @@ interface TranslationContextType {
   setCountry: (country: Countries) => void;
   countries: readonly CountryInfo[];
   currentCountry: CountryInfo;
-  changeLocale: (country: Countries) => void;
+  changeLocale: (country: Countries, language?: Languages) => void;
 }
 
 // Default no-op handlers for context initialization
@@ -163,13 +164,16 @@ export function TranslationProvider({
   };
 
   // Function to change both country and language at once
-  const changeLocale = async (newCountry: Countries): Promise<void> => {
+  const changeLocale = async (
+    newCountry: Countries,
+    preferredLanguage: Languages = language,
+  ): Promise<void> => {
     if (!mounted) {
       return;
     }
 
     const countryInfo = languageConfig.countryInfo[newCountry];
-    const newLocale = `${countryInfo.language}-${newCountry}`;
+    const newLocale = `${languageForCountry(countryInfo, preferredLanguage)}-${newCountry}`;
 
     // Save to storage (single write, no intermediate states)
     await storage.setItem(LOCALE_COOKIE_NAME, newLocale, logger);

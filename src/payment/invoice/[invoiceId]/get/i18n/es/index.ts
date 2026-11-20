@@ -1,0 +1,123 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  category: "Facturación",
+  tags: {
+    payment: "pago",
+    invoice: "factura"
+  },
+  get: {
+    title: "Invocar",
+    titleShort: "Detalles de facturación",
+    description: "Recuperar una sola factura con todos sus artículos de línea",
+    form: {
+      title: "Factura",
+      description: "Detalles de facturación con artículos de línea"
+    },
+    response: {
+      id: "Factura ID",
+      companyId: "Company ID",
+      customerId: "Cliente ID",
+      invoiceSequenceNumber: "Número de facturación",
+      currency: "Moneda",
+      status: "Situación",
+      amount: "Monto",
+      dueDate: "Fecha prevista",
+      paidAt: "Pagado en",
+      notes: "Notas",
+      journalEntryId: "Journal Entry ID",
+      createdAt: "Creado en",
+      updatedAt: "Actualizado en",
+      lines: "Líneas",
+      lineId: "Línea ID",
+      lineDescription: "Descripción",
+      productId: "Producto ID",
+      quantity: "Cantidad",
+      unitPrice: "Precio unitario",
+      taxRate: "Tasa de impuestos",
+      taxAmount: "Cuantía fiscal",
+      lineTotal: "Total",
+      sortOrder: "Ordenar orden",
+      lineCreatedAt: "Línea creada en",
+      lineUpdatedAt: "Línea actualizada en"
+    },
+    errors: {
+      unauthorized: {
+        title: "Se requiere autenticación",
+        description: "Inicia sesión para continuar"
+      },
+      validation: {
+        title: "Error de validación",
+        description: "Parámetros inválidos"
+      },
+      server: {
+        title: "Error del servidor",
+        description: "Ocurrió un error interno del servidor"
+      },
+      unknown: {
+        title: "Error desconocido",
+        description: "Ocurrió un error desconocido"
+      },
+      network: {
+        title: "Error de red",
+        description: "Ocurrió un error de red"
+      },
+      forbidden: {
+        title: "Acceso denegado",
+        description: "Debe ser miembro de esta empresa"
+      },
+      notFound: {
+        title: "No encontrado",
+        description: "Factura no encontrada"
+      },
+      conflict: {
+        title: "Conflicto",
+        description: "Se produjo un conflicto"
+      },
+      unsavedChanges: {
+        title: "Cambios sin guardar",
+        description: "Hay cambios sin salvar"
+      }
+    },
+    success: {
+      title: "Operación completada",
+      description: "Factura recuperada"
+    }
+  },
+  invoiceId: {
+    label: "Factura ID",
+    description: "La factura para recuperar",
+    placeholder: "Introduzca la factura ID"
+  },
+  widget: {
+    back: "Atrás",
+    submit: "Mira hacia arriba facturación",
+    invoiceNumber: "Factura",
+    overdue: "Atrasados",
+    issued: "Publicada",
+    due: "Sumas",
+    paid: "Pagado",
+    customer: "Cliente",
+    journalEntry: "Journal Entry",
+    lineItems: "Temas de línea",
+    description: "Descripción",
+    qty: "Qty",
+    unitPrice: "Precio unitario",
+    tax: "Impuestos",
+    total: "Total",
+    subtotal: "Subtotal",
+    sendInvoice: "Enviar factura",
+    addLine: "Añadir línea",
+    recordPayment: "Pago de registro",
+    sendReminder: "Enviar recordatorio",
+    void: "Vacío",
+    viewJournalEntry: "View Journal Entry",
+    status: {
+      draft: "Proyecto",
+      open: "Abierto",
+      paid: "Pagado",
+      void: "Vacío",
+      uncollectible: "Incolectible"
+    }
+  }
+};

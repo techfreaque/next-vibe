@@ -5,7 +5,7 @@ import { scopedTranslation as browserT } from "../browser/i18n";
 import { scopedTranslation as smsT } from "../sms/i18n";
 import { scopedTranslation as desktopT } from "./i18n";
 
-const LOCALES = ["en-US", "de-DE", "pl-PL", "fr-FR"] as const;
+const LOCALES = ["en-US", "de-DE", "pl-PL", "fr-FR", "it-IT", "es-ES"] as const;
 
 /**
  * Guards the i18n contract these keys exist to satisfy: every converted fail()

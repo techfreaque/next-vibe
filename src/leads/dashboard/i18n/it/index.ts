@@ -1,0 +1,99 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  tags: {
+    leads: "leads",
+    dashboard: "cruscotto",
+  },
+  get: {
+    title: "Contatto Dashboard",
+    titleShort: "Pannello dei contatti",
+    description:
+      "Conti dal vivo di piste attive, nuovi arrivi, campagne in esecuzione e conversioni",
+    errors: {
+      unauthorized: {
+        title: "Autenticazione richiesta",
+        description: "Accedi per continuare",
+      },
+      validation: {
+        title: "Errore di convalida",
+        description: "Parametri della richiesta non validi",
+      },
+      server: {
+        title: "Errore del server",
+        description: "Non caricare i dati del cruscotto",
+      },
+      unknown: {
+        title: "Errore sconosciuto",
+        description: "Si è verificato un errore imprevisto",
+      },
+      network: {
+        title: "Errore di rete",
+        description: "Collegamento di rete fallito",
+      },
+      forbidden: {
+        title: "Accesso negato",
+        description: "Non hai accesso a questi dati",
+      },
+      notFound: {
+        title: "Non trovato",
+        description: "Dati non trovati",
+      },
+      unsavedChanges: {
+        title: "Modifiche non salvate",
+        description: "Ci sono cambiamenti non rilevati",
+      },
+      conflict: {
+        title: "Conflitto",
+        description: "Si è verificato un conflitto di dati",
+      },
+    },
+    success: {
+      title: "Operazione riuscita",
+      description: "Dati di Dashboard caricato",
+    },
+    response: {
+      activeLeadsCount: "Contatto attivo",
+      newThisWeekCount: "Nuova settimana",
+      runningCampaignsCount: "Campagne in esecuzione",
+      convertedCount: "Convertito",
+      totalLeadsCount: "Totale Contatto",
+      conversionRate: "Tasso di conversione",
+      statusBreakdown: "Ripartizione dello stato",
+      recentLeads: "Contatto recenti",
+      "recentLeads.id": "ID",
+      "recentLeads.businessName": "Nome di affari",
+      "recentLeads.email": "Email",
+      "recentLeads.status": "Stato",
+      "recentLeads.source": "Fonte",
+      "recentLeads.createdAt": "Creato a",
+    },
+  },
+  widget: {
+    loading: "Caricamento cruscotto...",
+    activeLeads: "Contatto attivo",
+    newThisWeek: "Nuova settimana",
+    runningCampaigns: "In campagna",
+    converted: "Convertito",
+    totalLeads: "Totale Contatto",
+    conversionRate: "Tasso di conversione",
+    quickActions: "Azioni rapide",
+    newLead: "Nuovo contatto",
+    newLeadDesc: "Creare un nuovo comando manualmente",
+    allLeads: "Tutti i Contatto",
+    allLeadsDesc: "Sfoglia e filtra tutti i cavi",
+    campaignStats: "Statistiche campagne",
+    campaignStatsDesc: "Analizzare le prestazioni della campagna",
+    searchLeads: "Contatto di ricerca",
+    searchLeadsDesc: "Trova i cavi per nome o e-mail",
+    importLeads: "Importazione",
+    importLeadsDesc: "Importazione della massa porta da CSV",
+    statusBreakdown: "Ripartizione dello stato",
+    recentLeads: "Contatto recenti",
+    viewAll: "Vedi tutto",
+    noLeadsYet: "Non ci sono ancora piste",
+    noLeadsHint:
+      "Crea il tuo primo vantaggio o importazione da CSV per iniziare",
+    createFirst: "Crea contatto",
+  },
+};

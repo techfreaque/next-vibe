@@ -1,0 +1,238 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  category: "Utenti",
+  tags: {
+    user: "Utente",
+    view: "Vista"
+  },
+  get: {
+    title: "Dettagli utente",
+    titleShort: "Utente",
+    description: "Un account termina alla fine: entrate a vita, portafoglio di credito, abbonamento, pagamenti, attribuzione, referral, attività ed errori. Modificare, concedere crediti, cambiare ruoli o vietare da qui.",
+    userId: {
+      label: "Utente ID"
+    }
+  },
+  errors: {
+    validation: {
+      title: "Utente non valido ID",
+      description: "Passare un utente valido UUID"
+    },
+    network: {
+      title: "Errore di rete",
+      description: "Non è possibile raggiungere il server"
+    },
+    unauthorized: {
+      title: "Accedi per continuare",
+      description: "Accedi per visualizzare i dettagli dell'utente"
+    },
+    forbidden: {
+      title: "Admins solo",
+      description: "Hai bisogno del ruolo di amministratore per visualizzare questo utente"
+    },
+    notFound: {
+      title: "Utente non trovato",
+      description: "Nessun utente con questo ID"
+    },
+    serverError: {
+      title: "Non poteva caricare l'utente",
+      description: "Il server non è riuscito a caricare questo utente"
+    },
+    unknown: {
+      title: "Errore inaspettato",
+      description: "Qualcosa è andato storto caricare questo utente"
+    },
+    unsavedChanges: {
+      title: "Modifiche non salvate",
+      description: "Hai modifiche non salvate"
+    },
+    conflict: {
+      title: "Conflittuale dei dati",
+      description: "L'utente è cambiato nel frattempo. Rinfresco e riprovazione"
+    }
+  },
+  success: {
+    title: "Caricamento utente",
+    description: "Dati utente caricati"
+  },
+  status: {
+    active: "Attivo",
+    banned: "Banati",
+    inactive: "Inattivo",
+    verified: "Verificato",
+    unverified: "Unverified"
+  },
+  fields: {
+    userId: "Utente ID",
+    roles: "Roles",
+    locale: "Locale",
+    twoFactor: "Auth a due fattori",
+    enabled: "Attivi",
+    disabled: "Disattivati",
+    marketing: "Email di marketing",
+    optedIn: "Optato in",
+    optedOut: "Optato fuori",
+    created: "Registrato",
+    lastUpdated: "Profilo aggiornato",
+    banReason: "Motivazione di Ban"
+  },
+  text: {
+    lastSeen: "Ultimo accesso",
+    payments: "{{ok}} pagato, {{failed}} fallito",
+    actions: "Azioni: vibe user-update --id= {{id}} | vibe user-role-add --id= {{id}} --role= <role> | vibe user-role-remove --id= {{id}} --role= <role>"
+  },
+  kpi: {
+    paid: "Durata della vita",
+    paidHint: "pagamenti di successo {{count}}, USD",
+    refunded: "Rimborso",
+    credits: "Bilancio di credito",
+    creditsHint: "+ Crediti gratuiti {{free}}",
+    spent: "Crediti spesi",
+    spentHint: "circa {{usd}} di utilizzo",
+    lastSeen: "Ultimo accesso",
+    joined: "Adeguato {{date}}"
+  },
+  payment: {
+    subscription: "Abbonamento",
+    status: "Stato",
+    interval: "Fatturazione",
+    renews: "Rinnovi",
+    endsOn: "Fini su",
+    firstPayment: "Pagamento anticipato",
+    lastPayment: "Ultimo pagamento",
+    stripeCustomerId: "cliente Stripe",
+    none: "Nessun abbonamento",
+    noSubscriptionButPaid: "Nessun abbonamento. Crediti acquistati vale la pena {{amount}}."
+  },
+  credits: {
+    subscription: "Crediti di abbonamento",
+    permanent: "Crediti acquistati",
+    bonus: "Crediti bonus",
+    free: "Crediti gratuiti",
+    expires: "Scade {{date}}",
+    purchased: "Crediti comprati",
+    earnedTotal: "Crediti guadagnati (referrals)",
+    spentTotal: "Crediti spesi (tutti i portafogli)"
+  },
+  attribution: {
+    title: "Da dove vengono",
+    firstChannel: "Primo canale",
+    utm: "UTM sorgente / media / campagna",
+    refCode: "Codice invito",
+    referrerHost: "Referrer",
+    landingPath: "Pagina di atterraggio",
+    lastChannel: "Ultimo canale",
+    firstTouch: "Prima visita",
+    firstChat: "Prima chat",
+    firstPaid: "Pagamento anticipato",
+    none: "Nessun dato di tracciamento per questo utente."
+  },
+  referrals: {
+    referredBy: "Riferito da",
+    viaCode: "Code {{code}}",
+    signups: "Segnalazioni di cui",
+    paying: "Riferimenti di pagamento",
+    activeCodes: "Codici attivi",
+    earnings: "Retribuzioni di riferimento",
+    referredUsers: "Utenti che hanno fatto riferimento",
+    noneReferred: "Nessuno ha ancora firmato attraverso questo utente."
+  },
+  chat: {
+    threads: "Conversazioni",
+    threadsHint: "{{active}} attivo, {{archived}} archiviato",
+    userMessages: "Messaggi inviati",
+    aiMessages: "AI risponde",
+    incognitoNote: "Incognito chat non sono mai memorizzati. La spesa di credito è il segnale di utilizzo reale."
+  },
+  engagement: {
+    favorites: "Preferiti",
+    skills: "Competenze personalizzate",
+    skillsHint: "{{count}} competenze personalizzate"
+  },
+  billing: {
+    paymentsTitle: "Trattazioni di processori recenti",
+    subscriptionsTitle: "Storia dell'abbonamento",
+    succeeded: "Pagamenti di successo",
+    ofAttempts: "di tentativi {{count}}",
+    failedPending: "In sospeso / in attesa",
+    noPayments: "Nessun tentativo di pagamento",
+    date: "Data",
+    amount: "Importo",
+    status: "Stato",
+    kind: "Tipo",
+    provider: "Fornitore",
+    started: "Inizio",
+    periodEnd: "Fine del periodo",
+    cancels: "cancellazioni a fine periodo"
+  },
+  modelUsage: {
+    title: "Trascorrere per modello",
+    model: "Modello",
+    spent: "Crediti",
+    messages: "Chiamate"
+  },
+  errorsTab: {
+    title: "Errori che coinvolgono questo utente",
+    none: "Nessun errore registrato menzionare questo utente.",
+    resolved: "Risolto",
+    open: "Aperto",
+    openMonitor: "Monitor di errore aperto"
+  },
+  widget: {
+    loading: "Caricamento utente...",
+    never: "Mai.",
+    actions: {
+      edit: "Modifica",
+      addCredits: "Crediti di sovvenzione",
+      delete: "Cancella utente",
+      copyUserId: "Copia utente ID"
+    }
+  },
+  ban: {
+    banUser: "Ban ban",
+    unbanUser: "Unban"
+  },
+  roles: {
+    add: "Aggiungi il ruolo",
+    remove: "Rimozione del ruolo"
+  },
+  tabs: {
+    overview: "Panoramica",
+    billing: "Fatturazione",
+    credits: "Storia del credito",
+    referrals: "Referrals",
+    activity: "Attività",
+    connections: "Supporti collegati",
+    favorites: "Preferiti",
+    skills: "Skill"
+  },
+  sections: {
+    subscription: "Abbonamento",
+    credits: "Portafogli di credito",
+    profile: "Profilo",
+    recentActivity: "Ultima attività",
+    chatActivity: "Chat"
+  },
+  newsletter: {
+    status: "Newsletter",
+    subscribed: "Iscritto",
+    notSubscribed: "Non sottoscritto"
+  },
+  activity: {
+    lastCreditUsage: "Ultima spesa di credito",
+    lastLogin: "Ultimo accesso",
+    activeSessions: "Sessioni attive",
+    lastMessage: "Ultimo messaggio",
+    lastThread: "Ultima conversazione avviata",
+    lastPayment: "Ultimo pagamento"
+  },
+  connections: {
+    leadsTitle: "Supporti collegati",
+    usersTitle: "Utenti che condividono un lead",
+    noLeads: "Nessun cavo collegato",
+    noUsers: "Nessun altro utente condivide questi lead",
+    viewLead: "Visualizzare il comando",
+    viewUser: "Visualizza utente"
+  }
+};

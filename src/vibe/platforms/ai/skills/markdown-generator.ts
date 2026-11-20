@@ -20,10 +20,7 @@ import { pathSegmentsToToolName } from "../../../core/core-utils/path";
 import { zodSchemaToJsonSchema } from "../../../core/definition/endpoint-to-metadata";
 import { FieldUsage } from "../../../core/definition/enums";
 import { coreEnv } from "../../../core/env";
-import type {
-  CountryLanguage,
-  Languages,
-} from "../../../core/i18n/core/config";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { getLanguageFromLocale } from "../../../core/i18n/core/language-utils";
 import type { WidgetData } from "../../../core/utils/json";
 import { filterUserPermissionRoles } from "../../../identity/roles/enum";
@@ -348,16 +345,7 @@ function filterForTier(
 async function loadMetaForLocale(
   locale: CountryLanguage,
 ): Promise<SkillEndpointInfo[]> {
-  // Map locale to generated file
-  // Meta is generated per language; any country variant (fr-GLOBAL, de-PL)
-  // reads its language's file.
-  const languageFileMap: Partial<Record<Languages, string>> = {
-    en: "en",
-    de: "de",
-    pl: "pl",
-    fr: "fr",
-  };
-  const file = languageFileMap[getLanguageFromLocale(locale)] ?? "en";
+  const file = getLanguageFromLocale(locale);
 
   const mod = (await import(`@/generated/endpoints/meta/${file}`)) as {
     endpointsMeta: SkillEndpointInfo[];

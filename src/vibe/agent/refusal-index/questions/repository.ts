@@ -93,6 +93,8 @@ export class RefusalQuestionsRepository {
           textDe: row.textDe,
           textPl: row.textPl,
           textFr: row.textFr,
+          textIt: row.textIt,
+          textEs: row.textEs,
           generatedBy: row.generatedBy,
           active: row.active,
         })),
@@ -135,6 +137,8 @@ export class RefusalQuestionsRepository {
           textDe: emptyToNull(data.textDe) ?? null,
           textPl: emptyToNull(data.textPl) ?? null,
           textFr: emptyToNull(data.textFr) ?? null,
+          textIt: emptyToNull(data.textIt) ?? null,
+          textEs: emptyToNull(data.textEs) ?? null,
           active: data.active,
         })
         .returning({ id: refusalIndexQuestions.id });
@@ -169,6 +173,8 @@ export class RefusalQuestionsRepository {
       const textDe = emptyToNull(data.textDe);
       const textPl = emptyToNull(data.textPl);
       const textFr = emptyToNull(data.textFr);
+      const textIt = emptyToNull(data.textIt);
+      const textEs = emptyToNull(data.textEs);
       const [row] = await db
         .update(refusalIndexQuestions)
         .set({
@@ -180,6 +186,8 @@ export class RefusalQuestionsRepository {
           ...(textDe !== undefined ? { textDe } : {}),
           ...(textPl !== undefined ? { textPl } : {}),
           ...(textFr !== undefined ? { textFr } : {}),
+          ...(textIt !== undefined ? { textIt } : {}),
+          ...(textEs !== undefined ? { textEs } : {}),
           updatedAt: sql`now()`,
         })
         .where(eq(refusalIndexQuestions.id, urlPathParams.id))

@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     referral:
       "Programme de parrainage : {{direct}} % de commission récurrente sur les paiements des filleuls, plus une cagnotte de {{upline}} % partagée sur {{levels}} niveaux de parrains. Versement en crédits ou en BTC/USDC, versement minimum {{minPayout}}.",
     languages:
-      "Chaque page existe en anglais ({{en}}), en allemand ({{de}}), en polonais ({{pl}}) et en français ({{fr}}).",
+      "Langues du site : anglais ({{en}}), allemand ({{de}}), polonais ({{pl}}), français ({{fr}}), italien ({{it}}) et espagnol ({{es}}).",
   },
   pages: {
     heading: "Pages principales",

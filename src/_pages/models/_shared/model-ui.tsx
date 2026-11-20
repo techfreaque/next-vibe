@@ -9,6 +9,7 @@ import { scopedTranslation as refusalScopedTranslation } from "next-vibe/agent/r
 import type { ModelStatsResponseOutput } from "next-vibe/agent/refusal-index/model/[modelId]/definition";
 import type { ContentLevelValue } from "next-vibe/agent/skills/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { Div } from "next-vibe/ui/components/div";
 import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
@@ -104,16 +105,20 @@ export function SampleAnswersSlot({
       : new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
           new Date(stats.runFinishedAt),
         );
+  const language = getLanguageFromLocale(locale);
   const questionOf = (
     sample: ModelStatsResponseOutput["samples"][number],
-  ): string =>
-    (locale.startsWith("de")
-      ? sample.questionDe
-      : locale.startsWith("pl")
-        ? sample.questionPl
-        : locale.startsWith("fr")
-          ? sample.questionFr
-          : null) ?? sample.questionEn;
+  ): string => {
+    const questionByLanguage = {
+      en: sample.questionEn,
+      de: sample.questionDe,
+      pl: sample.questionPl,
+      fr: sample.questionFr,
+      it: sample.questionIt,
+      es: sample.questionEs,
+    };
+    return questionByLanguage[language] ?? sample.questionEn;
+  };
   const pct = (value: number): string => `${formatNumber(value, locale)}%`;
 
   return (

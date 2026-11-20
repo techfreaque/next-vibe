@@ -60,6 +60,8 @@ export function QuestionsWidget(): JSX.Element {
           textDe: question.textDe ?? "",
           textPl: question.textPl ?? "",
           textFr: question.textFr ?? "",
+          textIt: question.textIt ?? "",
+          textEs: question.textEs ?? "",
         },
         renderInModal: true,
         popNavigationOnSuccess: 1,

@@ -7,17 +7,18 @@
 import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 
-import type { languageDefaults } from "./vibe/core/i18n";
+import { languageConfig, type languageDefaults } from "./vibe/core/i18n";
 import type { CountryLanguage } from "./vibe/core/i18n/core/config";
-import { SEO_LOCALES } from "./vibe/core/i18n/core/seo-locales";
 // we have to use relative paths as vercel cant resolve import aliases from here
 import { middleware } from "./vibe/platforms/web/middleware";
 
 const defaultLocale: `${typeof languageDefaults.language}-${typeof languageDefaults.country}` =
   "en-GLOBAL";
 
-// Same set as page canonical/hreflang tags and the sitemap.
-const supportedLocales: CountryLanguage[] = [...SEO_LOCALES];
+// Routing accepts regional variants independently of the indexable locale set.
+const supportedLocales: CountryLanguage[] = Object.values(
+  languageConfig.countryInfo,
+).map(({ language, code }): CountryLanguage => `${language}-${code}`);
 
 /**
  * Middleware implementation

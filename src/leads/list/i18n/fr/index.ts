@@ -1,3 +1,5 @@
+import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
+
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -174,6 +176,7 @@ export const translations: typeof enTranslations = {
     emptyState: "Aucun lead pour l'instant",
   },
   widget: {
+    clearFilters: "Effacer les filtres",
     converted: "Converti",
     emailsSent: "{{count}} e-mails envoyés",
     openRate: "{{percent}} % de taux d'ouverture",
@@ -212,6 +215,7 @@ export const translations: typeof enTranslations = {
     referralCode: "Code parrain",
   },
   countries: {
+    ...regionalCountryNames("fr"),
     global: "Mondial",
     de: "Allemagne",
     pl: "Pologne",
@@ -219,6 +223,8 @@ export const translations: typeof enTranslations = {
     us: "États-Unis",
   },
   languages: {
+    it: "Italien",
+    es: "Espagnol",
     en: "Anglais",
     de: "Allemand",
     pl: "Polonais",

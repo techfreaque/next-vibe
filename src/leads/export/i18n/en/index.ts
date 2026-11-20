@@ -1,3 +1,5 @@
+import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
+
 export const translations = {
   category: "Leads",
   tags: {
@@ -202,6 +204,7 @@ export const translations = {
     referralCode: "Referral Code",
   },
   countries: {
+    ...regionalCountryNames("en"),
     global: "Global",
     de: "Germany",
     pl: "Poland",
@@ -209,6 +212,8 @@ export const translations = {
     us: "United States",
   },
   languages: {
+    it: "Italian",
+    es: "Spanish",
     en: "English",
     de: "German",
     pl: "Polish",

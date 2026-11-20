@@ -131,13 +131,6 @@ export async function buildLlmsTxt(
   const price = (amount: number, currency: typeof pack.currency): string =>
     wholePrice(formatCurrency(amount, currency, locale));
 
-  const [enLocale, deLocale, plLocale, frLocale] = [
-    defaultLlmsLocale(),
-    sitemapLocales().find((l) => l.startsWith("de-")) ?? locale,
-    sitemapLocales().find((l) => l.startsWith("pl-")) ?? locale,
-    sitemapLocales().find((l) => l.startsWith("fr-")) ?? locale,
-  ];
-
   const facts = [
     t("facts.models", {
       modelCount,
@@ -189,10 +182,12 @@ export async function buildLlmsTxt(
       ),
     }),
     t("facts.languages", {
-      en: page("/story", enLocale),
-      de: page("/story", deLocale),
-      pl: page("/story", plLocale),
-      fr: page("/story", frLocale),
+      en: page("/story", resolveLlmsLocale("en")),
+      de: page("/story", resolveLlmsLocale("de")),
+      pl: page("/story", resolveLlmsLocale("pl")),
+      fr: page("/story", resolveLlmsLocale("fr")),
+      it: page("/story", resolveLlmsLocale("it")),
+      es: page("/story", resolveLlmsLocale("es")),
     }),
   ];
 
@@ -315,7 +310,9 @@ export async function buildLlmsTxt(
       `## ${t("full.chatHeading")}`,
       t("full.chatIntro", {
         inputTokens: formatTokenCount(CHAT_MESSAGE_PRICE_REFERENCE.inputTokens),
-        outputTokens: formatTokenCount(CHAT_MESSAGE_PRICE_REFERENCE.outputTokens),
+        outputTokens: formatTokenCount(
+          CHAT_MESSAGE_PRICE_REFERENCE.outputTokens,
+        ),
       }),
       currentChat.map(chatLink).join("\n"),
       `### ${t("full.legacyHeading")}`,

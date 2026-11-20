@@ -1,0 +1,132 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  get: {
+    title: "Gráfico de Cuentas",
+    titleShort: "Cuentas",
+    description:
+      "Árbol de cuenta completa para una empresa con estructura jerárquica",
+    companyId: {
+      label: "Company ID",
+      description: "Compañía cuyo gráfico de cuentas para recuperar",
+      placeholder: "Entrar en la empresa UUID",
+    },
+    page: {
+      label: "Página",
+      description: "Número de página (fotos a 1)",
+    },
+    pageSize: {
+      label: "Por página",
+      description: "Cuentas por página (max 200)",
+    },
+    response: {
+      total: "Total",
+      accounts: "Cuentas",
+      id: "ID",
+      code: "Código",
+      name: "Nombre",
+      type: "Tipo",
+      subtype: "Subtipo",
+      parentId: "Parent ID",
+      isPostable: "Puestos",
+      isActive: "Activa",
+      isSystem: "Sistema",
+      description: "Descripción",
+      sortOrder: "Ordenar orden",
+      companyId: "Company ID",
+    },
+    errors: {
+      unauthorized: {
+        title: "Se requiere autenticación",
+        description: "Debes estar conectado para ver las cuentas",
+      },
+      validation: {
+        title: "Error de validación",
+        description: "Inválido ID",
+      },
+      forbidden: {
+        title: "Acceso denegado",
+        description: "Usted no tiene acceso a las cuentas de esta empresa",
+      },
+      server: {
+        title: "Error del servidor",
+        description: "No podía cargar cuentas",
+      },
+      unknown: {
+        title: "Error desconocido",
+        description: "Ocurrió un error inesperado",
+      },
+      conflict: {
+        title: "Conflicto",
+        description: "Conflicto de datos",
+      },
+      network: {
+        title: "Error de red",
+        description: "No podía llegar al servidor",
+      },
+      notFound: {
+        title: "No encontrado",
+        description: "No se han encontrado cuentas para esta empresa",
+      },
+      unsavedChanges: {
+        title: "Cambios sin guardar",
+        description: "Tienes cambios sin guardar",
+      },
+    },
+    success: {
+      title: "Cuentas cargadas",
+      description: "Gráfico de cuentas recuperadas con éxito",
+    },
+    widget: {
+      loading: "Carga cuentas...",
+      empty:
+        "Todavía no hay cuentas. Ejecute la configuración para la semilla de una plantilla.",
+      createButton: "Cuenta nueva",
+      inactive: "Inactivo",
+      setupButton: "Configuración de ejecución",
+      selectCompany: "Introduzca una empresa ID para ver las cuentas",
+      back: "Atrás",
+    },
+  },
+  enums: {
+    accountType: {
+      ASSET: "Activo",
+      LIABILITY: "Responsabilidad",
+      EQUITY: "Equidad",
+      REVENUE: "Ingresos",
+      EXPENSE: "Gastos",
+    },
+    accountSubtype: {
+      CURRENT_ASSET: "Activo actual",
+      FIXED_ASSET: "Activo fijo",
+      BANK: "Banco",
+      CASH: "Efectivo",
+      ACCOUNTS_RECEIVABLE: "Cuentas disponibles",
+      INVENTORY: "Inventario",
+      PREPAID: "Gastos pagados anticipados",
+      ACCOUNTS_PAYABLE: "Cuentas por pagar",
+      VAT_PAYABLE: "VAT Payable",
+      VAT_RECEIVABLE: "VAT Receptible",
+      ACCRUED_LIABILITY: "Responsabilidad acumulada",
+      SHORT_TERM_DEBT: "Deuda a corto plazo",
+      LONG_TERM_DEBT: "Deuda a largo plazo",
+      SHARE_CAPITAL: "Compartir capital",
+      RETAINED_EARNINGS: "Pendientes retenidos",
+      REVENUE_SALES: "Ingresos de ventas",
+      REVENUE_SERVICE: "Ingresos de servicio",
+      COGS: "Costo de los bienes vendidos",
+      PAYROLL: "nómina",
+      RENT: "Alquiler",
+      UTILITIES: "Utilidades",
+      OPEX: "Gastos de funcionamiento",
+      FINANCIAL_INCOME: "Ingresos financieros",
+      FINANCIAL_EXPENSE: "Gasto financiero",
+      TAX_EXPENSE: "Gastos fiscales",
+      OTHER: "Otro",
+    },
+  },
+  title: "Lista de Cuentas",
+  description: "Listar todas las cuentas en el gráfico de cuentas",
+  category: "Gráfico de Cuentas",
+  tag: "Cuenta",
+};

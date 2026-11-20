@@ -1,0 +1,96 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  meta: {
+    category: "Generazione AI",
+    imageAlt: "{{appName}} {{title}}",
+  },
+  studio: "Media Studio",
+  navName: "Studio",
+  overview: "Scegli cosa fare. Il tuo recente lavoro e' qui quando torni.",
+  recent: "Risultati recenti",
+  empty: "Le immagini, le clip e le registrazioni finite appaiono qui.",
+  emptyKind: "I tuoi risultati verranno visualizzati qui dopo aver generato.",
+  download: "Scarica",
+  moreOptions: "Altre opzioni",
+  modelDefault: "Modello predefinito",
+  model: "Modello",
+  voice: "Voce",
+  estimate: "Costo stimato",
+  credits: "Crediti {{amount}}",
+  queued: "Queued",
+  saving: "Salvare il file",
+  running: "Generazione",
+  failed: "Generazione fallita",
+  historyError:
+    "Non poteva aprire la tua storia dello Studio. Per favore, riprovate.",
+  unavailable:
+    "Nessun modello è disponibile per questo generatore in questo momento.",
+  file: "File audio",
+  language: "Lingua di registrazione",
+  referenceAudio: "audio di riferimento URL",
+  durationSeconds: "Lunghezza di registrazione in pochi secondi",
+  duration: "Durata",
+  ratio: "Rapporto di ispezione",
+  size: "Dimensione",
+  quality: "Qualità",
+  reference: "Immagine di riferimento URL",
+  lastFrame: "Ultimo frame URL",
+  creating: "Generazione · {{seconds}} s",
+  submitImage: "Generare l'immagine",
+  submitVideo: "Generare video",
+  submitMusic: "Generare musica",
+  submitSpeech: "Generare il discorso",
+  submitTranscribe: "Trascrizione audio",
+  meteredCost: "L'addebito finale utilizza l'utilizzo segnalato del fornitore.",
+  estimatePending: "Aggiungere l'audio per stimare il costo.",
+  units: {
+    image: "Crediti / immagine {{amount}}",
+    video: "Crediti {{amount}} / sec",
+    music: "Crediti / traccia {{amount}}",
+    speech: "Crediti {{amount}} / 1.000 caratteri",
+    transcribe: "Crediti {{amount}} / min",
+    tokenImage: "≈ {{amount}} credits / immagine",
+  },
+  kinds: {
+    image: {
+      label: "Immagine",
+      title: "Creare un'immagine",
+      metaTitle: "Generatore di immagini AI non censurato - {{appName}}",
+      description: "Descrivi una scena e scegli la sua inquadratura.",
+      keywords:
+        "uncensored AI generatore di immagini, arte AI, testo a immagine",
+    },
+    video: {
+      label: "Video",
+      title: "Creare un video",
+      metaTitle: "Generatore di video AI - {{appName}}",
+      description:
+        "Impostare una scena in movimento, dal primo telaio all'ultimo.",
+      keywords: "Generatore di video AI, testo in video, immagine a video",
+    },
+    music: {
+      label: "Musica",
+      title: "Fare musica",
+      metaTitle: "Generatore di musica AI - {{appName}}",
+      description:
+        "Descrivi l'umore, gli strumenti e la lunghezza della tua traccia.",
+      keywords: "Generatore di musica AI, testo alla musica, canzone AI",
+    },
+    speech: {
+      label: "Discorso",
+      title: "Dare testo a voce",
+      metaTitle: "Testo AI al discorso - {{appName}}",
+      description: "Scegli una voce per leggere il tuo copione ad alta voce.",
+      keywords: "testo a discorso, voce AI, TTS",
+    },
+    transcribe: {
+      label: "Trascrizione",
+      title: "Trascrizione audio",
+      metaTitle: "Discorso AI al testo - {{appName}}",
+      description:
+        "Trasformare una registrazione in una trascrizione che è possibile scaricare.",
+      keywords: "discorso al testo, trascrizione AI, audio a testo",
+    },
+  },
+};

@@ -1,0 +1,65 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  tags: { vibeSense: "vibe-sense" },
+  post: {
+    title: "Messaggi di chat degli utenti",
+    titleShort: "Messaggi degli utenti",
+    description: "Numero di messaggi inviati dagli utenti per intervallo",
+    fields: {
+      resolution: {
+        label: "Risoluzione",
+        description: "Intervallo usato per il calcolo",
+      },
+      range: { label: "Periodo", description: "Periodo da esaminare" },
+      lookback: {
+        label: "Storico aggiuntivo",
+        description: "Intervalli aggiuntivi prima dell’inizio del periodo",
+      },
+      result: {
+        label: "Messaggi degli utenti",
+        description: "Serie temporale risultante",
+      },
+      meta: {
+        label: "Metadati",
+        description: "Metadati sull’esecuzione del nodo",
+      },
+    },
+    success: {
+      title: "Calcolo completato: Messaggi degli utenti",
+      description: "Serie temporale restituita: Messaggi degli utenti",
+    },
+    errors: {
+      unauthorized: {
+        title: "Autenticazione richiesta",
+        description: "Accedi per continuare",
+      },
+      forbidden: {
+        title: "Accesso negato",
+        description: "Servono i permessi di amministratore",
+      },
+      server: {
+        title: "Errore del server",
+        description: "Impossibile eseguire la query",
+      },
+      unknown: {
+        title: "Errore sconosciuto",
+        description: "Si è verificato un errore imprevisto",
+      },
+      validation: {
+        title: "Convalida fallita",
+        description: "Parametri della richiesta non validi",
+      },
+      notFound: { title: "Non trovato", description: "Non trovato" },
+      conflict: { title: "Conflitto", description: "Conflitto" },
+      network: {
+        title: "Errore di rete",
+        description: "Richiesta di rete fallita",
+      },
+      unsavedChanges: {
+        title: "Modifiche non salvate",
+        description: "Prima salva le modifiche",
+      },
+    },
+  },
+};

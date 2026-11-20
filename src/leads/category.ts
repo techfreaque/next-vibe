@@ -17,6 +17,8 @@ export const category: CategoryDefinition = {
     "de-DE": "Leads",
     "pl-PL": "Leady",
     "fr-FR": "Leads",
+    "it-IT": "Contatti commerciali",
+    "es-ES": "Prospectos",
   },
   group: "business",
   icon: "target",
@@ -36,6 +38,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Verwaltung",
         "pl-PL": "Zarządzanie",
         "fr-FR": "Gestion",
+        "it-IT": "Gestione",
+        "es-ES": "Gestión",
       },
       // inherits parent defaultEntry (leads-dashboard)
     },
@@ -48,6 +52,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Import",
         "pl-PL": "Import",
         "fr-FR": "Import",
+        "it-IT": "Importazione",
+        "es-ES": "Importación",
       },
     },
     Leads: {
@@ -59,6 +65,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Leads",
         "pl-PL": "Leady",
         "fr-FR": "Leads",
+        "it-IT": "Contatti commerciali",
+        "es-ES": "Prospectos",
       },
     },
     emailCampaignsProcessing: {
@@ -70,6 +78,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Kampagnen",
         "pl-PL": "Kampanie",
         "fr-FR": "Campagnes",
+        "it-IT": "Campagne",
+        "es-ES": "Campañas",
       },
     },
     emailCampaignsJourneys: {
@@ -81,6 +91,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Journeys",
         "pl-PL": "Ścieżki",
         "fr-FR": "Parcours",
+        "it-IT": "Percorsi",
+        "es-ES": "Secuencias",
       },
     },
     emailCampaignsQueue: {
@@ -92,6 +104,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Warteschlange",
         "pl-PL": "Kolejka",
         "fr-FR": "File d'attente",
+        "it-IT": "Coda",
+        "es-ES": "Cola",
       },
     },
     emailCampaignsStats: {
@@ -103,6 +117,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Kampagnenstatistiken",
         "pl-PL": "Statystyki kampanii",
         "fr-FR": "Stats des campagnes",
+        "it-IT": "Statistiche campagne",
+        "es-ES": "Estadísticas de campañas",
       },
     },
     growth: {
@@ -114,6 +130,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Wachstum",
         "pl-PL": "Wzrost",
         "fr-FR": "Croissance",
+        "it-IT": "Crescita",
+        "es-ES": "Crecimiento",
       },
     },
     outreach: {
@@ -125,6 +143,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Outreach",
         "pl-PL": "Outreach",
         "fr-FR": "Prospection",
+        "it-IT": "Primi contatti",
+        "es-ES": "Contacto inicial",
       },
     },
     leadMagnetIntegrations: {
@@ -136,6 +156,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Integrationen",
         "pl-PL": "Integracje",
         "fr-FR": "Intégrations",
+        "it-IT": "Integrazioni",
+        "es-ES": "Integraciones",
       },
     },
   },

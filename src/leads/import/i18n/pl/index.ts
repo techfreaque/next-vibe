@@ -1,3 +1,5 @@
+import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
+
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -1377,6 +1379,7 @@ export const translations: typeof enTranslations = {
     },
   },
   countries: {
+    ...regionalCountryNames("pl"),
     global: "Globalny",
     de: "Niemcy",
     pl: "Polska",
@@ -1384,6 +1387,8 @@ export const translations: typeof enTranslations = {
     us: "Stany Zjednoczone",
   },
   languages: {
+    it: "Włoski",
+    es: "Hiszpański",
     en: "Angielski",
     de: "Niemiecki",
     pl: "Polski",

@@ -127,6 +127,16 @@ export const translations: typeof enTranslations = {
         description:
           "Traduction affichée dans les exemples publics (facultatif)",
       },
+      textIt: {
+        label: "Question (italien)",
+        description:
+          "Traduction affichée dans les exemples publics (facultatif)",
+      },
+      textEs: {
+        label: "Question (espagnol)",
+        description:
+          "Traduction affichée dans les exemples publics (facultatif)",
+      },
       generatedBy: { label: "Proposée par" },
       active: {
         label: "Active",

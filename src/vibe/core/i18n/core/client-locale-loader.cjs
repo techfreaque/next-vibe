@@ -28,7 +28,7 @@
 "use strict";
 
 const LAZY_LOCALE_PATTERN =
-  /\(\)\s*=>\s*require\((["'])([^"'`]+\/(de|pl|fr))\1\)\.translations/g;
+  /\(\)\s*=>\s*require\((["'])([^"'`]+\/(de|pl|fr|it|es))\1\)\.translations/g;
 
 const LANGUAGE_EXPRESSION =
   'typeof location === "undefined" ? undefined : (location.pathname.split("/")[1] || "").split("-")[0].toLowerCase()';

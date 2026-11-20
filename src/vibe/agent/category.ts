@@ -16,6 +16,8 @@ export const category: CategoryDefinition = {
     "de-DE": "KI-Agent",
     "pl-PL": "Agent AI",
     "fr-FR": "Agent IA",
+    "it-IT": "Agente IA",
+    "es-ES": "Agente de IA",
   },
   group: "ai",
   icon: "bot",
@@ -35,6 +37,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Inferenz",
         "pl-PL": "Wnioskowanie",
         "fr-FR": "Inférence",
+        "it-IT": "Inferenza",
+        "es-ES": "Inferencia",
       },
     },
     Generation: {
@@ -46,6 +50,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Generierung",
         "pl-PL": "Generowanie",
         "fr-FR": "Génération",
+        "it-IT": "Generazione",
+        "es-ES": "Generación",
       },
     },
     Tools: {
@@ -57,6 +63,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Werkzeuge",
         "pl-PL": "Narzędzia",
         "fr-FR": "Outils",
+        "it-IT": "Strumenti",
+        "es-ES": "Herramientas",
       },
     },
     Search: {
@@ -68,6 +76,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Suche",
         "pl-PL": "Wyszukiwanie",
         "fr-FR": "Recherche",
+        "it-IT": "Ricerca",
+        "es-ES": "Búsqueda",
       },
     },
     chat: {
@@ -79,6 +89,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Chat",
         "pl-PL": "Chat",
         "fr-FR": "Chat",
+        "it-IT": "Chat",
+        "es-ES": "Chat",
       },
     },
     chatFavorites: {
@@ -90,6 +102,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Favoriten",
         "pl-PL": "Ulubione",
         "fr-FR": "Favoris",
+        "it-IT": "Preferiti",
+        "es-ES": "Favoritos",
       },
     },
     chatOrganization: {
@@ -101,6 +115,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Organisation",
         "pl-PL": "Organizacja",
         "fr-FR": "Organisation",
+        "it-IT": "Organizzazione",
+        "es-ES": "Organización",
       },
     },
     chatSettings: {
@@ -112,6 +128,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Chat-Einstellungen",
         "pl-PL": "Ustawienia czatu",
         "fr-FR": "Paramètres du chat",
+        "it-IT": "Impostazioni chat",
+        "es-ES": "Configuración del chat",
       },
     },
     skillsManagement: {
@@ -123,6 +141,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Skills",
         "pl-PL": "Umiejętności",
         "fr-FR": "Compétences",
+        "it-IT": "Skill",
+        "es-ES": "Skills",
       },
     },
     skillsCommunity: {
@@ -134,6 +154,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Community-Skills",
         "pl-PL": "Umiejętności społeczności",
         "fr-FR": "Compétences de la communauté",
+        "it-IT": "Skill della community",
+        "es-ES": "Skills de la comunidad",
       },
     },
     skillsModeration: {
@@ -145,6 +167,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Skills-Moderation",
         "pl-PL": "Moderacja umiejętności",
         "fr-FR": "Modération des compétences",
+        "it-IT": "Moderazione delle skill",
+        "es-ES": "Moderación de skills",
       },
     },
     threadsManagement: {
@@ -156,6 +180,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Threads",
         "pl-PL": "Wątki",
         "fr-FR": "Fils de discussion",
+        "it-IT": "Conversazioni",
+        "es-ES": "Conversaciones",
       },
     },
     threadsSharing: {
@@ -167,6 +193,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Thread-Freigabe",
         "pl-PL": "Udostępnianie wątków",
         "fr-FR": "Partage de fils",
+        "it-IT": "Condivisione delle conversazioni",
+        "es-ES": "Conversaciones compartidas",
       },
     },
     threadsSearch: {
@@ -178,6 +206,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Thread-Suche",
         "pl-PL": "Wyszukiwanie wątków",
         "fr-FR": "Recherche de fils",
+        "it-IT": "Ricerca nelle conversazioni",
+        "es-ES": "Búsqueda de conversaciones",
       },
     },
     messagesModerating: {
@@ -189,6 +219,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Nachrichten",
         "pl-PL": "Wiadomości",
         "fr-FR": "Messages",
+        "it-IT": "Messaggi",
+        "es-ES": "Mensajes",
       },
     },
     messagesSearch: {
@@ -200,6 +232,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Nachrichtensuche",
         "pl-PL": "Wyszukiwanie wiadomości",
         "fr-FR": "Recherche de messages",
+        "it-IT": "Ricerca nei messaggi",
+        "es-ES": "Búsqueda de mensajes",
       },
     },
     messagesFiles: {
@@ -211,6 +245,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Nachrichtendateien",
         "pl-PL": "Pliki wiadomości",
         "fr-FR": "Fichiers des messages",
+        "it-IT": "Allegati dei messaggi",
+        "es-ES": "Archivos de mensajes",
       },
     },
     tasksCron: {
@@ -222,6 +258,8 @@ export const category: CategoryDefinition = {
         "de-DE": "Geplante Aufgaben",
         "pl-PL": "Zadania cykliczne",
         "fr-FR": "Tâches planifiées",
+        "it-IT": "Attività pianificate",
+        "es-ES": "Tareas programadas",
       },
     },
   },

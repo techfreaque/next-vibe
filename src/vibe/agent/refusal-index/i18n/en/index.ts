@@ -111,6 +111,14 @@ export const translations = {
         label: "Question (French)",
         description: "Display translation for public samples (optional)",
       },
+      textIt: {
+        label: "Question (Italian)",
+        description: "Display translation for public samples (optional)",
+      },
+      textEs: {
+        label: "Question (Spanish)",
+        description: "Display translation for public samples (optional)",
+      },
       generatedBy: { label: "Proposed by" },
       active: {
         label: "Active",

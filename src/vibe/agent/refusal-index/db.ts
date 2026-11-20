@@ -41,6 +41,8 @@ export const refusalIndexQuestions = pgTable(
     textDe: text("text_de"),
     textPl: text("text_pl"),
     textFr: text("text_fr"),
+    textIt: text("text_it"),
+    textEs: text("text_es"),
     /** Model that proposed this question. Null = curated by hand. */
     generatedBy: text("generated_by"),
     active: boolean("active").notNull().default(true),

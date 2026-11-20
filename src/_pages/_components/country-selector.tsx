@@ -6,6 +6,7 @@ import type {
   Languages,
 } from "next-vibe/core/i18n/core/config";
 import { getUniqueLanguages } from "next-vibe/core/i18n/core/language-utils";
+import { countryOptions } from "next-vibe/core/i18n/core/regions";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
@@ -26,7 +27,7 @@ import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { executeMutation } from "next-vibe/unified-ui/hooks/mutation-executor";
 import type { FC } from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
@@ -51,6 +52,14 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
     locale: currentLocale,
   } = useTranslation();
   const { t } = configScopedTranslation.scopedT(currentLocale);
+  const countryNames = useMemo(
+    () =>
+      new Map(
+        countryOptions.map(({ value, label }) => [value, t(label)] as const),
+      ),
+    [t],
+  );
+  const currentCountryName = countryNames.get(country) ?? currentCountry.name;
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"country" | "language">("country");
   const [tabHover, setTabHover] = useState<"country" | "language" | null>(null);
@@ -103,14 +112,13 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
   );
 
   const handleCountryChange = useCallback(
-    (countryCode: Countries) => {
-      const countryItem = countries.find((c) => c.code === countryCode);
-      const newLocale: CountryLanguage = `${countryItem?.language ?? language}-${countryCode}`;
+    (countryCode: Countries, groupLanguage: Languages) => {
+      const newLocale: CountryLanguage = `${groupLanguage}-${countryCode}`;
       syncLocale(newLocale);
-      changeLocale(countryCode);
+      changeLocale(countryCode, groupLanguage);
       setIsOpen(false);
     },
-    [changeLocale, syncLocale, countries, language, setIsOpen],
+    [changeLocale, syncLocale, setIsOpen],
   );
 
   const currentLanguageFlag = countries.find(
@@ -130,15 +138,15 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
             "flex items-center justify-center h-10",
             isNavBar ? "w-10" : "px-3 rounded-md border",
           )}
-          aria-label={currentCountry.name}
-          title={currentCountry.name}
+          aria-label={currentCountryName}
+          title={currentCountryName}
         >
           <Span className="text-lg flex items-center justify-center my-auto">
             {currentCountry.flag}
           </Span>
           {!isNavBar && (
             <Span className="flex items-center text-sm font-medium">
-              {currentCountry.name}
+              {currentCountryName}
             </Span>
           )}
         </Button>
@@ -174,31 +182,50 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
 
           <TabsContent value="country" className="max-h-80 overflow-y-auto">
             <Div className="grid grid-cols-1 gap-1">
-              {countries.map((countryItem) => (
-                <Button
-                  key={countryItem.code}
-                  variant="ghost"
-                  className={`flex items-center justify-between w-full h-auto py-2 px-3 hover:bg-accent transition-colors ${
-                    country === countryItem.code ? "bg-muted" : ""
-                  }`}
-                  onClick={() => {
-                    // Change locale (country) and also set the language to match the country's default language
-                    handleCountryChange(countryItem.code);
-                  }}
-                >
-                  <Div className="flex items-center gap-2">
-                    <Span className="text-lg mr-1">{countryItem.flag}</Span>
-                    <Div className="flex flex-col items-start">
-                      <Span className="font-medium">{countryItem.name}</Span>
-                      <Span className="text-xs text-muted-foreground">
-                        {countryItem.langName}
-                      </Span>
-                    </Div>
+              {uniqueLanguages.map(([groupLanguage, group]) => (
+                <Div key={groupLanguage}>
+                  <Div className="px-3 py-1 text-xs font-semibold">
+                    {group.name}
                   </Div>
-                  {country === countryItem.code && (
-                    <Check className="h-4 w-4 text-primary" />
-                  )}
-                </Button>
+                  {group.countries
+                    .map((item) => ({
+                      ...item,
+                      name: countryNames.get(item.code) ?? item.name,
+                    }))
+                    .toSorted((left, right) =>
+                      left.name.localeCompare(right.name, language),
+                    )
+                    .map((countryItem) => (
+                      <Button
+                        key={countryItem.code}
+                        variant="ghost"
+                        className={`flex items-center justify-between w-full h-auto py-2 px-3 hover:bg-accent transition-colors ${
+                          language === groupLanguage &&
+                          country === countryItem.code
+                            ? "bg-muted"
+                            : ""
+                        }`}
+                        onClick={() => {
+                          handleCountryChange(countryItem.code, groupLanguage);
+                        }}
+                      >
+                        <Div className="flex items-center gap-2">
+                          <Span className="text-lg mr-1">
+                            {countryItem.flag}
+                          </Span>
+                          <Div className="flex flex-col items-start">
+                            <Span className="font-medium">
+                              {countryItem.name}
+                            </Span>
+                          </Div>
+                        </Div>
+                        {language === groupLanguage &&
+                          country === countryItem.code && (
+                            <Check className="h-4 w-4 text-primary" />
+                          )}
+                      </Button>
+                    ))}
+                </Div>
               ))}
             </Div>
           </TabsContent>

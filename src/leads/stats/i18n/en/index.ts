@@ -1,3 +1,5 @@
+import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
+
 /**
  * Leads Stats subdomain translations for English
  */
@@ -91,7 +93,24 @@ export const translations = {
     label: "Lead Source",
     description: "Filter by lead source",
   },
+  countries: {
+    ...regionalCountryNames("en"),
+    global: "Global",
+    de: "Germany",
+    pl: "Poland",
+    fr: "France",
+    us: "United States",
+  },
+  languages: {
+    en: "English",
+    de: "German",
+    pl: "Polish",
+    fr: "French",
+    it: "Italian",
+    es: "Spanish",
+  },
   country: {
+    ...regionalCountryNames("en"),
     label: "Country",
     description: "Filter by country",
     all: "All Countries",
@@ -101,6 +120,8 @@ export const translations = {
     global: "Global",
   },
   language: {
+    it: "Italian",
+    es: "Spanish",
     label: "Language",
     description: "Filter by language preference",
     all: "All Languages",

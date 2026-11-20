@@ -8,17 +8,12 @@
 import { describe, expect, it } from "bun:test";
 import { NextRequest } from "next-vibe/ui/lib/request";
 
+import { languageConfig } from "../../../../core/i18n";
 import type { CountryLanguage } from "../../../../core/i18n/core/config";
 import { middleware } from "../index";
 import { buildLocaleRedirectPath, detectLocale } from "./index";
 
-const supportedLocales: CountryLanguage[] = [
-  "de-DE",
-  "pl-PL",
-  "fr-FR",
-  "en-GLOBAL",
-  "en-US",
-];
+const supportedLocales: CountryLanguage[] = Object.values(languageConfig.countryInfo).map(({ language, code }): CountryLanguage => `${language}-${code}`);
 const options = {
   supportedLocales,
   defaultLocale: "en-GLOBAL" as const,
@@ -48,6 +43,18 @@ describe("locale redirect mapping", () => {
     expect(target("/api/en-GLOBAL/credits")).toBe("(none)");
   });
 
+  it("serves each configured regional language and negotiates language before location", () => {
+    for (const { code, languages } of Object.values(languageConfig.countryInfo)) {
+      for (const language of languages) {
+        expect(target(`/${language}-${code}/story`)).toBe("(none)");
+      }
+    }
+    expect(target("/story", { "accept-language": "de-AT" })).toBe("/de-AT/story");
+    expect(target("/story", { "accept-language": "es", "cf-ipcountry": "US" })).toBe("/es-US/story");
+    expect(target("/story", { "accept-language": "fr-CA;q=0.2,it-CH;q=0.9" })).toBe("/it-CH/story");
+    expect(target("/story", { "cf-ipcountry": "MX" })).toBe("/es-MX/story");
+  });
+
   it("replaces a language-only segment", () => {
     expect(target("/en/user/referral")).toBe("/en-GLOBAL/user/referral");
     expect(target("/de/user/referral")).toBe("/de-GLOBAL/user/referral");
@@ -74,24 +81,24 @@ describe("locale redirect mapping", () => {
   });
 
   it("replaces an unsupported locale with the same language when supported", () => {
-    expect(target("/en-GB/user")).toBe("/en-GLOBAL/user");
-    expect(target("/de_at/user")).toBe("/de-GLOBAL/user");
+    expect(target("/en-JP/user")).toBe("/en-GLOBAL/user");
+    expect(target("/de_jp/user")).toBe("/de-GLOBAL/user");
   });
 
   it("replaces an unsupported language with the negotiated locale", () => {
-    expect(target("/es-ES/user/referral")).toBe("/en-GLOBAL/user/referral");
-    expect(target("/es-ES/")).toBe("/en-GLOBAL");
-    expect(target("/es-ES/x/")).toBe("/en-GLOBAL/x/");
-    expect(target("/it-IT/user", { cookie: "locale=de-DE" })).toBe(
+    expect(target("/nl-NL/user/referral")).toBe("/en-GLOBAL/user/referral");
+    expect(target("/nl-NL/")).toBe("/en-GLOBAL");
+    expect(target("/nl-NL/x/")).toBe("/en-GLOBAL/x/");
+    expect(target("/ja-JP/user", { cookie: "locale=de-DE" })).toBe(
       "/de-DE/user",
     );
-    expect(target("/it-IT/user", { "accept-language": "pl-PL" })).toBe(
+    expect(target("/ja-JP/user", { "accept-language": "pl-PL" })).toBe(
       "/pl-PL/user",
     );
-    expect(target("/it-IT/user", { "accept-language": "fr-FR" })).toBe(
+    expect(target("/ja-JP/user", { "accept-language": "fr-FR" })).toBe(
       "/fr-FR/user",
     );
-    expect(target("/api/es-ES/credits")).toBe("/api/en-GLOBAL/credits");
+    expect(target("/api/nl-NL/credits")).toBe("/api/en-GLOBAL/credits");
   });
 
   it("lands French visitors on French, not en-GLOBAL", () => {
@@ -102,7 +109,7 @@ describe("locale redirect mapping", () => {
       "/fr-GLOBAL/story",
     );
     expect(target("/", { "accept-language": "fr-CA,fr;q=0.9" })).toBe(
-      "/fr-GLOBAL",
+      "/fr-CA",
     );
     expect(target("/user", { cookie: "locale=fr-FR" })).toBe("/fr-FR/user");
     expect(target("/fr-fr/user")).toBe("/fr-FR/user");
@@ -130,7 +137,7 @@ describe("locale redirect mapping", () => {
 describe("middleware locale redirect", () => {
   it("redirects once and keeps the query string", async () => {
     const res = await middleware(
-      request("/es-ES/user/referral?ref=abc&utm_source=x"),
+      request("/nl-NL/user/referral?ref=abc&utm_source=x"),
       options,
     );
     expect(res.status).toBe(307);

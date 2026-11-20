@@ -1,3 +1,5 @@
+import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
+
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -4405,6 +4407,7 @@ export const translations: typeof enTranslations = {
       description: "Filtruj według źródła leada",
     },
     country: {
+      ...regionalCountryNames("pl"),
       label: "Kraj",
       description: "Filtruj według kraju",
       all: "Wszystkie kraje",
@@ -4414,6 +4417,8 @@ export const translations: typeof enTranslations = {
       global: "Globalny",
     },
     language: {
+      it: "Włoski",
+      es: "Hiszpański",
       label: "Język",
       description: "Filtruj według preferencji językowych",
       all: "Wszystkie języki",
@@ -5227,12 +5232,15 @@ export const translations: typeof enTranslations = {
       allPages: "Wszystkie strony",
     },
     country: {
+      ...regionalCountryNames("pl"),
       de: "Niemcy",
       pl: "Polska",
       fr: "Francja",
       global: "Globalnie",
     },
     language: {
+      it: "Włoski",
+      es: "Hiszpański",
       de: "Niemiecki",
       pl: "Polski",
       fr: "Francuski",
@@ -5353,6 +5361,7 @@ export const translations: typeof enTranslations = {
     },
   },
   countries: {
+    ...regionalCountryNames("pl"),
     global: "Globalny",
     de: "Niemcy",
     pl: "Polska",
@@ -5360,6 +5369,8 @@ export const translations: typeof enTranslations = {
     us: "Stany Zjednoczone",
   },
   languages: {
+    it: "Włoski",
+    es: "Hiszpański",
     en: "Angielski",
     de: "Niemiecki",
     pl: "Polski",
