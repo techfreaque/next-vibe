@@ -8,6 +8,8 @@ import {
 import { ContentLevel } from "next-vibe/agent/skills/enum";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 
+import { getCreditUnitPrice } from "@/products/credit-money";
+
 import { buildFaqStructuredData } from "../../_components/faq-structured-data";
 import {
   getModelFacts,
@@ -33,7 +35,10 @@ import {
   mediaModelFaq,
   mediaModelMeta,
 } from "./model-seo";
-import { buildChatModelStructuredData } from "./model-structured-data";
+import {
+  buildChatModelStructuredData,
+  buildMediaModelStructuredData,
+} from "./model-structured-data";
 
 /** Every provider key configured: the registry-level public set. */
 const ALL: AgentEnvAvailability = {
@@ -295,22 +300,48 @@ describe("FAQ", () => {
 });
 
 describe("structured data", () => {
-  test("Product with a per-locale offer plus a 3-level BreadcrumbList", () => {
+  test("chat models carry a Service with a per-locale offer and breadcrumbs", () => {
     const facts = factsOf(ChatModelId.CLAUDE_SONNET_5_5);
     for (const locale of LOCALES) {
       const graph = JSON.parse(
         JSON.stringify(buildChatModelStructuredData(facts, locale, "d")),
       );
-      const [product, breadcrumbs] = graph["@graph"];
-      expect(product["@type"]).toBe("Product");
-      expect(product.brand.name).toBe(facts.labName);
-      expect(product.offers.price).toBeGreaterThan(0);
-      expect(product.offers.priceCurrency).toBe(
-        locale === "pl-PL" ? "PLN" : locale === "en-US" ? "USD" : "EUR",
+      const [service, breadcrumbs] = graph["@graph"];
+      const { amount, currency } = getCreditUnitPrice(locale);
+      expect(service["@type"]).toBe("Service");
+      expect(service.brand.name).toBe(facts.labName);
+      expect(service.offers.price).toBeCloseTo(
+        facts.creditsPerMessage * amount,
+        6,
       );
-      expect(product.aggregateRating).toBeUndefined();
+      expect(service.offers.priceCurrency).toBe(currency);
+      expect(service.aggregateRating).toBeUndefined();
+      expect(service.review).toBeUndefined();
+      expect(service.offers.shippingDetails).toBeUndefined();
+      expect(service.offers.hasMerchantReturnPolicy).toBeUndefined();
       expect(breadcrumbs["@type"]).toBe("BreadcrumbList");
       expect(breadcrumbs.itemListElement).toHaveLength(3);
     }
+  });
+
+  test("media model offers exist only when the unit and registry price are known", () => {
+    const facts = listMediaFacts(ALL).find((model) => model.price !== null);
+    if (!facts?.price) {
+      expect.unreachable("registry has no priced media models");
+    }
+    const locale = "pl-PL";
+    const { amount, currency } = getCreditUnitPrice(locale);
+    const withPrice = buildMediaModelStructuredData(facts, locale, "d", "image");
+    const withoutPrice = buildMediaModelStructuredData(
+      { ...facts, price: null },
+      locale,
+      "d",
+      "image",
+    );
+    const [service] = JSON.parse(JSON.stringify(withPrice))["@graph"];
+    expect(service["@type"]).toBe("Service");
+    expect(service.offers.price).toBeCloseTo(facts.price.credits * amount, 6);
+    expect(service.offers.priceCurrency).toBe(currency);
+    expect(JSON.stringify(withoutPrice)).not.toContain('"offers"');
   });
 });

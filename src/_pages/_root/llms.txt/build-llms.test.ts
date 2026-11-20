@@ -82,6 +82,9 @@ describe("JSON-LD", () => {
     for (const locale of sitemapLocales()) {
       const products = productsRepository.getProducts(locale);
       const offers = buildPlanOffers(locale, 1);
+      const pricing = buildPricingStructuredData({ locale, modelCount: 1 });
+      expect(pricing["@type"]).toBe("Service");
+      expect(pricing.offers).toEqual(offers);
       const prices = offers.map((offer) => offer.price);
       expect(prices).toEqual([
         0,
@@ -122,6 +125,9 @@ describe("JSON-LD", () => {
     ]);
     expect(json).not.toContain("aggregateRating");
     expect(json).not.toContain("review");
+    expect(json).not.toContain('"@type":"Product"');
+    expect(json).not.toContain("shippingDetails");
+    expect(json).not.toContain("hasMerchantReturnPolicy");
     expect(json).not.toContain("{{");
   });
 

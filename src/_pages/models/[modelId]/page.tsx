@@ -28,14 +28,11 @@ import {
   suggestComparisons,
 } from "../_shared/model-facts";
 import { tierName } from "../_shared/model-format";
-import {
-  findMediaFacts,
-  type MediaModelFacts,
-} from "../_shared/model-media-facts";
+import type { MediaModelFacts } from "../_shared/model-media-facts";
 import {
   buildChatModelPageSeo,
   buildMediaModelPageSeo,
-  redirectModelAlias,
+  resolveMediaModelFacts,
   resolveModelFacts,
 } from "../_shared/model-page-loaders";
 import { chatModelMeta, mediaModelMeta } from "../_shared/model-seo";
@@ -55,13 +52,12 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, modelId } = await params;
-  redirectModelAlias(locale, modelId);
   const availability = await getEnvAvailability();
   const facts = resolveModelFacts(locale, modelId, availability);
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   if (facts === null) {
-    const media = findMediaFacts(modelId, availability);
+    const media = resolveMediaModelFacts(locale, modelId, availability);
     if (media === null) {
       notFound();
     }
@@ -108,7 +104,7 @@ export interface ChatModelPageData {
   pickerModels: PickerModel[];
   refusal: ModelStatsResponseOutput | null;
   seo: ModelSeoContent;
-  /** Product + BreadcrumbList JSON-LD. */
+  /** Service + BreadcrumbList JSON-LD. */
   structuredData: JsonLdNode;
 }
 
@@ -126,11 +122,10 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<ModelPageData> {
   const { locale, modelId } = await params;
-  redirectModelAlias(locale, modelId);
   const availability = await getEnvAvailability();
   const facts = resolveModelFacts(locale, modelId, availability);
   if (facts === null) {
-    const media = findMediaFacts(modelId, availability);
+    const media = resolveMediaModelFacts(locale, modelId, availability);
     if (media === null) {
       notFound();
     }

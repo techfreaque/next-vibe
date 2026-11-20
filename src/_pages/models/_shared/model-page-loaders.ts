@@ -17,15 +17,13 @@ import { getBlogPostCard } from "../../story/blog/posts-cards";
 import type { BlogPostSlug } from "../../story/blog/posts-meta";
 import { scopedTranslation } from "../i18n";
 import {
-  findModelPageAlias,
   findPublicModelId,
   getModelFacts,
   type ModelFacts,
   resolveSuccessor,
-  toModelSlug,
 } from "./model-facts";
 import { mediaUnitText } from "./model-format";
-import type { MediaModelFacts } from "./model-media-facts";
+import { findMediaFacts, type MediaModelFacts } from "./model-media-facts";
 import {
   bestForContent,
   chatModelBlogSlugs,
@@ -45,20 +43,6 @@ import {
 } from "./model-structured-data";
 
 /**
- * Duplicate entries (e.g. /models/claude-code-haiku, a provider route of
- * Claude Haiku 5.5) have no page of their own: 308 to the canonical page.
- */
-export function redirectModelAlias(
-  locale: CountryLanguage,
-  modelId: string,
-): void {
-  const canonical = findModelPageAlias(modelId);
-  if (canonical !== null) {
-    permanentRedirect(`/${locale}/models/${toModelSlug(canonical)}`);
-  }
-}
-
-/**
  * Facts for an available chat model. A known model whose providers have no
  * API key configured here 308s to its available successor; without one the
  * caller falls through to the media lookup and then 404s.
@@ -73,46 +57,44 @@ export function resolveModelFacts(
     return null;
   }
   const facts = getModelFacts(id, availability);
-  if (facts === null) {
-    const successor = resolveSuccessor(id, availability);
-    if (successor !== null) {
-      permanentRedirect(`/${locale}/models/${successor.slug}`);
-    }
+  const target = facts ?? resolveSuccessor(id, availability);
+  if (target !== null && target.slug !== modelId) {
+    permanentRedirect(`/${locale}/models/${target.slug}`);
   }
   return facts;
 }
 
-/** A duplicate (alias) slug on either side 308s to the canonical pair. */
-export function redirectCompareAliases(
+export function resolveMediaModelFacts(
   locale: CountryLanguage,
-  a: string,
-  b: string,
-): void {
-  const left = findModelPageAlias(a);
-  const right = findModelPageAlias(b);
-  if (left === null && right === null) {
-    return;
+  modelId: string,
+  availability: AgentEnvAvailability,
+): MediaModelFacts | null {
+  const facts = findMediaFacts(modelId, availability);
+  if (facts !== null && facts.slug !== modelId) {
+    permanentRedirect(`/${locale}/models/${facts.slug}`);
   }
-  permanentRedirect(
-    `/${locale}/models/compare/${left === null ? a : toModelSlug(left)}/${right === null ? b : toModelSlug(right)}`,
-  );
+  return facts;
 }
 
-/** Both sides must be models available on this instance (provider key set). */
+/** Resolve two distinct, available models and normalize aliases on either side. */
 export function resolveComparePair(
+  locale: CountryLanguage,
   a: string,
   b: string,
   availability: AgentEnvAvailability,
 ): { left: ModelFacts; right: ModelFacts } | null {
   const leftId = findPublicModelId(a);
   const rightId = findPublicModelId(b);
-  if (leftId === null || rightId === null) {
+  if (leftId === null || rightId === null || leftId === rightId) {
     return null;
   }
   const left = getModelFacts(leftId, availability);
   const right = getModelFacts(rightId, availability);
   if (left === null || right === null) {
     return null;
+  }
+  if (left.slug !== a || right.slug !== b) {
+    permanentRedirect(`/${locale}/models/compare/${left.slug}/${right.slug}`);
   }
   return { left, right };
 }
@@ -133,7 +115,7 @@ function blogLinks(
 
 export interface ModelPageSeo {
   seo: ModelSeoContent;
-  /** Product + BreadcrumbList JSON-LD. */
+  /** Service + BreadcrumbList JSON-LD. */
   structuredData: JsonLdNode;
 }
 

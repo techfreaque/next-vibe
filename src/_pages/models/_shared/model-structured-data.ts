@@ -1,9 +1,7 @@
 /**
- * schema.org JSON-LD for the public /models pages: Product (the model, sold
- * per use) with real per-locale offers and a BreadcrumbList. The FAQPage is
- * rendered next to the visible FAQ from the same items (model-seo-sections). Prices come from the model registry and the
- * credit pack's checkout price (same anchor as the pricing page offers).
- * No ratings or reviews.
+ * schema.org JSON-LD for the public /models pages: a digital Service with
+ * per-locale offers and a BreadcrumbList. Prices come from the model registry
+ * and the credit pack's checkout price, as on the pricing page.
  */
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -87,19 +85,20 @@ function modelGraph(
 ): JsonLdNode {
   const { t } = scopedTranslation.scopedT(locale);
   const url = pageUrl(locale, path);
-  const product: JsonLdNode = {
-    "@type": "Product",
-    "@id": `${url}#product`,
+  const service: JsonLdNode = {
+    "@type": "Service",
+    "@id": `${url}#service`,
     name,
     description,
     url,
     brand: { "@type": "Brand", name: labName },
-    category,
+    provider: { "@id": organizationId(locale) },
+    serviceType: category,
   };
   return {
     "@context": SCHEMA_CONTEXT,
     "@graph": [
-      offer === null ? product : { ...product, offers: offer },
+      offer === null ? service : { ...service, offers: offer },
       buildBreadcrumbList(locale, [
         { name: t("breadcrumb.models"), path: "/models" },
         { name, path },
@@ -108,7 +107,7 @@ function modelGraph(
   };
 }
 
-/** Product + BreadcrumbList for a chat model page. */
+/** Service + BreadcrumbList for a chat model page. */
 export function buildChatModelStructuredData(
   facts: ModelFacts,
   locale: CountryLanguage,
@@ -150,7 +149,7 @@ export function buildChatModelStructuredData(
   });
 }
 
-/** Product + BreadcrumbList for an image/video/music/voice model page. */
+/** Service + BreadcrumbList for an image/video/music/voice model page. */
 export function buildMediaModelStructuredData(
   facts: MediaModelFacts,
   locale: CountryLanguage,

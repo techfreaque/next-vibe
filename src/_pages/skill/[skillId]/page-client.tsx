@@ -140,13 +140,12 @@ export interface SkillLandingPageProps {
   resolvedModels: ResolvedSkillModels;
   activeVariantId: string | null;
   leadMagnetConfig: LeadMagnetConfigData | null;
-  skillData: SkillGetResponseOutput | null;
+  skillData: SkillGetResponseOutput;
   samples: SkillSample[];
   examplePrompts: string[];
   categoryLabel: string | null;
   relatedSkills: RelatedSkill[];
   creatorSkills: RelatedSkill[];
-  removed: boolean;
   structuredData: JsonLdNode | null;
 }
 
@@ -1031,8 +1030,6 @@ function CreatorCard({
   );
 }
 
-// ─── removed state ───────────────────────────────────────────────────────────
-
 /**
  * Closing CTA band: same look as the story pages' CtaBand, tighter on phones
  * (no dead space under the login link), and tagged for the sticky bar.
@@ -1071,43 +1068,6 @@ function ClosingBand({
   );
 }
 
-function RemovedSkillNotice({
-  locale,
-  relatedSkills,
-}: {
-  locale: CountryLanguage;
-  relatedSkills: RelatedSkill[];
-}): JSX.Element {
-  const { t } = scopedTranslation.scopedT(locale);
-  return (
-    <Div className="bg-background text-foreground">
-      <Div className={cn(CONTAINER, "py-16 md:py-24")}>
-        <Div className="mx-auto max-w-md text-center">
-          <Span className="mx-auto mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-muted text-muted-foreground">
-            <Sparkles className="h-7 w-7" />
-          </Span>
-          <H1 className="text-3xl font-semibold tracking-tight">
-            {t("removed.title")}
-          </H1>
-          <P className="mt-3 text-muted-foreground">{t("removed.body")}</P>
-          <Div className="mt-6 flex justify-center">
-            <Cta href={`/${locale}/skills`} label={t("removed.cta")} />
-          </Div>
-        </Div>
-        {relatedSkills.length > 0 && (
-          <Div className="mt-16">
-            <RelatedGrid
-              title={t("related.similar")}
-              skills={relatedSkills}
-              locale={locale}
-            />
-          </Div>
-        )}
-      </Div>
-    </Div>
-  );
-}
-
 // ─── page ────────────────────────────────────────────────────────────────────
 
 export function SkillLandingPage(props: SkillLandingPageProps): JSX.Element {
@@ -1132,14 +1092,9 @@ export function SkillLandingPage(props: SkillLandingPageProps): JSX.Element {
     categoryLabel,
     relatedSkills,
     creatorSkills,
-    removed,
     structuredData,
   } = props;
   const { t } = scopedTranslation.scopedT(locale);
-
-  if (removed || !skillData) {
-    return <RemovedSkillNotice locale={locale} relatedSkills={relatedSkills} />;
-  }
 
   const name = skillData.name ?? "";
   // Built-in skills get a landing line that says what the skill does for the

@@ -17,7 +17,11 @@ import {
   getBestChatModel,
   getChatModelForUser,
 } from "next-vibe/agent/ai-stream/models";
-import { isRemovedSkillId, parseSkillId } from "next-vibe/agent/chat/slugify";
+import {
+  formatSkillId,
+  isSkillVariantId,
+  parseSkillId,
+} from "next-vibe/agent/chat/slugify";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { getBestImageGenModel } from "next-vibe/agent/image-generation/models";
 import { getAvailableChatModelCount } from "next-vibe/agent/models/all-models";
@@ -48,6 +52,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { Platform } from "next-vibe/platforms/platforms";
 import type { JsonLdNode } from "next-vibe/ui/components/json-ld";
 import { notFound } from "next-vibe/ui/lib/not-found";
+import { permanentRedirect } from "next-vibe/ui/lib/redirect";
 
 import {
   buildBreadcrumbList,
@@ -84,7 +89,7 @@ import {
 
 export interface SkillPageProps {
   params: Promise<{ locale: CountryLanguage; skillId: string }>;
-  searchParams?: Promise<Record<string, string | undefined>>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }
 
 const UUID_RE =
@@ -120,9 +125,6 @@ async function indexableSkillPageId(
   skill: SkillGetResponseOutput,
   logger: EndpointLogger,
 ): Promise<string | null> {
-  if (!skill.name) {
-    return null;
-  }
   if (skill.skillOwnership === SkillOwnershipType.SYSTEM) {
     return SkillsRepository.listPublicDefaultSkillIds().includes(baseSkillId)
       ? baseSkillId
@@ -134,6 +136,58 @@ async function indexableSkillPageId(
   );
 }
 
+async function resolveLandingSkill(
+  skillId: string,
+  locale: CountryLanguage,
+  logger: EndpointLogger,
+): Promise<{
+  user: JwtPayloadType;
+  skill: SkillGetResponseOutput;
+  baseSkillId: string;
+  variantId: string | null;
+  indexableId: string | null;
+}> {
+  const { skillId: baseSkillId, variantId } = parseSkillId(skillId);
+  if (!baseSkillId || (variantId === null && isSkillVariantId(skillId))) {
+    notFound();
+  }
+
+  const user = await getVisitor(locale, logger);
+  if (!user) {
+    logger.error("Failed to get identity on skill page");
+    return Promise.reject(new Error("Failed to get identity on skill page"));
+  }
+
+  const result = await SkillsRepository.getSkillById(
+    { id: baseSkillId },
+    user,
+    logger,
+    locale,
+  );
+  if (
+    !result.success &&
+    result.errorType === ErrorResponseTypes.INTERNAL_ERROR
+  ) {
+    return Promise.reject(new Error("Failed to load skill landing page"));
+  }
+  if (
+    !result.success ||
+    !result.data.name?.trim() ||
+    (variantId !== null &&
+      !result.data.variants?.some((variant) => variant.id === variantId))
+  ) {
+    notFound();
+  }
+  const skill = result.data;
+  return {
+    user,
+    skill,
+    baseSkillId,
+    variantId,
+    indexableId: await indexableSkillPageId(baseSkillId, skill, logger),
+  };
+}
+
 export async function loadSkillPageMetadata({
   params,
 }: SkillPageProps): Promise<Metadata> {
@@ -142,41 +196,10 @@ export async function loadSkillPageMetadata({
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
   const logger = createEndpointLogger(false, locale);
-  const user = await getVisitor(locale, logger);
-
-  let name = "";
-  let tagline = "";
-  let description = "";
-  const baseSkillId = parseSkillId(skillId).skillId;
-  let canonicalId: string | null = null;
-  if (user) {
-    const skillResult = await SkillsRepository.getSkillById(
-      { id: baseSkillId },
-      user,
-      logger,
-      locale,
-    );
-    if (
-      !skillResult.success &&
-      skillResult.errorType === ErrorResponseTypes.NOT_FOUND
-    ) {
-      if (!isRemovedSkillId(baseSkillId)) {
-        notFound();
-      }
-      name = t("removed.title");
-      description = t("removed.body");
-    }
-    if (skillResult.success) {
-      name = skillResult.data.name ?? "";
-      tagline = skillResult.data.tagline ?? "";
-      description = skillResult.data.description ?? "";
-      canonicalId = await indexableSkillPageId(
-        baseSkillId,
-        skillResult.data,
-        logger,
-      );
-    }
-  }
+  const { skill, baseSkillId, variantId, indexableId } =
+    await resolveLandingSkill(skillId, locale, logger);
+  const { tagline, description } = skill;
+  const name = skill.name ?? "";
 
   const summary = asSentence(description || tagline || name);
   const metaDescription = getSkillSamples(baseSkillId, locale)
@@ -192,7 +215,7 @@ export async function loadSkillPageMetadata({
     : summary || t("hero.tryGeneric");
 
   return metadataGenerator(locale, {
-    path: `skill/${encodeURIComponent(canonicalId ?? baseSkillId)}`,
+    path: `skill/${encodeURIComponent(indexableId ?? baseSkillId)}`,
     title: tagline
       ? t("meta.title", { appName, name, tagline })
       : t("meta.titlePlain", { appName, name }),
@@ -202,10 +225,11 @@ export async function loadSkillPageMetadata({
       "https://images.unsplash.com/photo-1633356122102-3fe601e05bd2?q=80&w=2070",
     imageAlt: t("meta.imageAlt", { appName, name }),
     keywords: [t("meta.keywords", { appName, name })],
-    ...(canonicalId === null
+    generateAlternates: indexableId !== null && variantId === null,
+    ...(indexableId === null
       ? {
-          generateAlternates: false,
           additionalMetadata: {
+            alternates: null,
             robots: {
               index: false,
               follow: true,
@@ -237,14 +261,12 @@ export interface SkillLandingPageData {
   /** Variant the page is about: URL variant, else the skill default. */
   activeVariantId: string | null;
   leadMagnetConfig: LeadMagnetConfigData | null;
-  skillData: SkillGetResponseOutput | null;
+  skillData: SkillGetResponseOutput;
   samples: SkillSample[];
   examplePrompts: string[];
   categoryLabel: string | null;
   relatedSkills: RelatedSkill[];
   creatorSkills: RelatedSkill[];
-  /** The id points at a skill that was removed: render the retired state. */
-  removed: boolean;
   /** BreadcrumbList + WebPage JSON-LD. */
   structuredData: JsonLdNode | null;
   layout: Omit<SiteLayoutData, "children">;
@@ -446,24 +468,37 @@ async function loadLeadMagnetConfig(
 export async function loadSkillLandingPage({
   params,
   searchParams,
-}: SkillPageProps): Promise<SkillLandingPageData | null> {
+}: SkillPageProps): Promise<SkillLandingPageData> {
   const { locale, skillId } = await params;
   const search = searchParams ? await searchParams : {};
   const logger = createEndpointLogger(false, locale);
 
-  const [user, layout] = await Promise.all([
-    getVisitor(locale, logger),
-    siteLayoutLoader({ params: Promise.resolve({ locale }) }),
-  ]);
-  if (!user) {
-    logger.error("Failed to get identity on skill page");
-    return null;
+  const { user, skill, baseSkillId, variantId, indexableId } =
+    await resolveLandingSkill(skillId, locale, logger);
+  const canonicalSkillId = formatSkillId(indexableId ?? baseSkillId, variantId);
+  if (canonicalSkillId !== skillId) {
+    const query = new URLSearchParams();
+    for (const [name, value] of Object.entries(search)) {
+      if (typeof value === "string") {
+        query.append(name, value);
+      } else if (value) {
+        for (const item of value) {
+          query.append(name, item);
+        }
+      }
+    }
+    const suffix = query.size > 0 ? `?${query.toString()}` : "";
+    permanentRedirect(
+      `/${locale}/skill/${encodeURIComponent(canonicalSkillId)}${suffix}`,
+    );
   }
 
-  const { skillId: baseSkillId, variantId } = parseSkillId(skillId);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const availability = await getEnvAvailability();
+  const [layout, availability] = await Promise.all([
+    siteLayoutLoader({ params: Promise.resolve({ locale }) }),
+    getEnvAvailability(),
+  ]);
   const modelCount = getAvailableChatModelCount(false, availability);
   const freeCredits: FreeCredits = {
     guest: FREE_CREDIT_ALLOWANCE.guest,
@@ -472,7 +507,8 @@ export async function loadSkillLandingPage({
   };
 
   const urlRef = search["ref"];
-  const refFromUrl = urlRef && REF_RE.test(urlRef) ? urlRef : null;
+  const refFromUrl =
+    typeof urlRef === "string" && REF_RE.test(urlRef) ? urlRef : null;
   if (refFromUrl && user.leadId) {
     // Fire and forget: the helper logs its own failures.
     void linkDeepLinkAttribution({
@@ -484,18 +520,9 @@ export async function loadSkillLandingPage({
     });
   }
 
-  const skillResult = await SkillsRepository.getSkillById(
-    { id: baseSkillId },
-    user,
-    logger,
-    locale,
-  );
-
-  const emptyModels: ResolvedSkillModels = { variants: [] };
   const base: Omit<
     SkillLandingPageData,
     | "skillData"
-    | "removed"
     | "resolvedModels"
     | "samples"
     | "examplePrompts"
@@ -521,46 +548,15 @@ export async function loadSkillLandingPage({
     layout,
   };
 
-  // Unknown or private skill: real 404. A skill we removed on purpose (old
-  // messages still link it) gets a "retired" state instead.
-  if (
-    !skillResult.success &&
-    skillResult.errorType === ErrorResponseTypes.NOT_FOUND
-  ) {
-    if (!isRemovedSkillId(baseSkillId)) {
-      notFound();
-    }
-    return {
-      ...base,
-      signupUrl: `/${locale}/user/signup${refFromUrl ? `?ref=${refFromUrl}` : ""}`,
-      refCode: refFromUrl,
-      resolvedModels: emptyModels,
-      activeVariantId: null,
-      leadMagnetConfig: null,
-      skillData: null,
-      samples: [],
-      examplePrompts: [],
-      categoryLabel: null,
-      relatedSkills: [],
-      creatorSkills: [],
-      removed: true,
-      structuredData: null,
-    };
-  }
   // The system prompt never reaches the public page: loader data is
   // serialized into the HTML, and the landing page does not show it.
-  const skillData = skillResult.success
-    ? { ...skillResult.data, systemPrompt: null }
-    : null;
-  const canonicalId = skillData
-    ? await indexableSkillPageId(baseSkillId, skillData, logger)
-    : null;
+  const skillData = { ...skill, systemPrompt: null };
 
   // Per-variant model info, resolved server-side (keeps model registries
   // out of the client bundle).
   const variants: ResolvedVariantInfo[] = [];
   const chatModelIdByVariant = new Map<string, string>();
-  for (const v of skillData?.variants ?? []) {
+  for (const v of skillData.variants ?? []) {
     const selectedChatModel = getBestChatModel(
       v.modelSelection ?? DEFAULT_CHAT_MODEL_SELECTION,
       user,
@@ -617,7 +613,7 @@ export async function loadSkillLandingPage({
     null;
 
   // Referral: URL ?ref= wins, else the creator's own code.
-  const creator = skillData?.creatorProfile ?? null;
+  const creator = skillData.creatorProfile;
   const refCode = refFromUrl ?? creator?.referralCode ?? null;
   const signupUrl = `/${locale}/user/signup?${
     refCode ? `ref=${encodeURIComponent(refCode)}&` : ""
@@ -649,7 +645,7 @@ export async function loadSkillLandingPage({
       ? samplesForSkill
       : [];
 
-  const isCommunity = skillData?.skillOwnership !== SkillOwnershipType.SYSTEM;
+  const isCommunity = skillData.skillOwnership !== SkillOwnershipType.SYSTEM;
   const [leadMagnetConfig, creatorSkills] = await Promise.all([
     isCommunity && !creator?.leadMagnetActive
       ? loadLeadMagnetConfig(baseSkillId, logger)
@@ -674,9 +670,9 @@ export async function loadSkillLandingPage({
     skillData,
     samples,
     examplePrompts,
-    categoryLabel: skillData ? skillsT(skillData.category) : null,
+    categoryLabel: skillsT(skillData.category),
     relatedSkills: builtInRelated(locale, baseSkillId, {
-      category: skillData?.category ?? null,
+      category: skillData.category,
       chatModelId: activeVariant
         ? (chatModelIdByVariant.get(activeVariant.id) ?? null)
         : null,
@@ -684,10 +680,9 @@ export async function loadSkillLandingPage({
       availability,
     }),
     creatorSkills,
-    removed: false,
     structuredData:
-      canonicalId !== null && skillData?.name
-        ? buildStructuredData(locale, canonicalId, skillData.name, {
+      indexableId !== null && skillData.name
+        ? buildStructuredData(locale, indexableId, skillData.name, {
             description: skillData.description ?? skillData.tagline ?? "",
             skillsLabel: t("breadcrumb.skills"),
             modelName: activeVariant?.chatModelName ?? null,

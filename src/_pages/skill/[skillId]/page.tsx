@@ -11,7 +11,6 @@
 export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
-import { Div } from "next-vibe/ui/components/div";
 import type { JSX } from "react";
 
 import { TanstackPage as SiteLayoutPage } from "../../story/layout";
@@ -30,7 +29,7 @@ export async function generateMetadata({
 export async function tanstackLoader({
   params,
   searchParams,
-}: SkillPageProps): Promise<SkillLandingPageData | null> {
+}: SkillPageProps): Promise<SkillLandingPageData> {
   return loadSkillLandingPage({ params, searchParams });
 }
 
@@ -50,8 +49,5 @@ export default async function SkillPage({
   searchParams,
 }: SkillPageProps): Promise<JSX.Element> {
   const data = await tanstackLoader({ params, searchParams });
-  if (!data) {
-    return <Div />;
-  }
   return <TanstackPage {...data} />;
 }

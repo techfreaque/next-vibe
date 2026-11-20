@@ -7,18 +7,20 @@
  * App pages (threads, account, admin, tools) are deliberately absent.
  */
 
+import { resolveIdAlias } from "next-vibe/agent/chat/slugify";
 import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
+import { NO_SKILL_ID } from "next-vibe/agent/skills/constants";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
-  hreflangFor,
-  SEO_DEFAULT_LOCALE,
   SEO_LOCALES,
+  seoLanguageAlternates,
 } from "next-vibe/core/i18n/core/seo-locales";
 
 import { configScopedTranslation } from "@/env/i18n";
 
 import { CREATE_KINDS } from "../../create/_shared/create-kinds";
 import {
+  canonicalComparisonPath,
   listModelFacts,
   suggestComparisons,
 } from "../../models/_shared/model-facts";
@@ -102,7 +104,12 @@ export function collectSitemapEntries(
 
   const seenSkills = new Set<string>();
   for (const skill of skillPages) {
-    if (seenSkills.has(skill.id)) {
+    if (
+      seenSkills.has(skill.id) ||
+      !/^[a-z0-9][a-z0-9-]*$/.test(skill.id) ||
+      skill.id === NO_SKILL_ID ||
+      resolveIdAlias(skill.id) !== skill.id
+    ) {
       continue;
     }
     seenSkills.add(skill.id);
@@ -129,15 +136,12 @@ export function collectSitemapEntries(
       availability,
       COMPARISONS_PER_MODEL,
     )) {
-      const pairKey = [facts.slug, other.slug].toSorted().join("|");
-      if (seenPairs.has(pairKey)) {
+      const path = canonicalComparisonPath(facts, other);
+      if (seenPairs.has(path)) {
         continue;
       }
-      seenPairs.add(pairKey);
-      entries.push({
-        path: `/models/compare/${facts.slug}/${other.slug}`,
-        lastmod: null,
-      });
+      seenPairs.add(path);
+      entries.push({ path, lastmod: null });
     }
   }
   return entries;
@@ -170,19 +174,16 @@ export function buildSitemapXml(
 ): string {
   const base = baseUrl.replace(/\/+$/, "");
   const locales = sitemapLocales();
-  const defaultLocale = SEO_DEFAULT_LOCALE;
   const lines: string[] = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">`,
   ];
 
   for (const entry of collectSitemapEntries(availability, skillPages)) {
-    const alternates = locales.map(
-      (locale) =>
-        `    <xhtml:link rel="alternate" hreflang="${hreflangFor(locale)}" href="${escapeXml(`${base}/${locale}${entry.path}`)}"/>`,
-    );
-    alternates.push(
-      `    <xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(`${base}/${defaultLocale}${entry.path}`)}"/>`,
+    const languageUrls = seoLanguageAlternates(base, entry.path);
+    const alternates = Object.entries(languageUrls).map(
+      ([language, url]) =>
+        `    <xhtml:link rel="alternate" hreflang="${language}" href="${escapeXml(url)}"/>`,
     );
     for (const locale of locales) {
       lines.push(`  <url>`);

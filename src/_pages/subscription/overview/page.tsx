@@ -34,7 +34,7 @@ export interface OverviewPageData {
   user: Awaited<ReturnType<typeof subscriptionLoader>>["user"];
   initialCredits: CreditsGetResponseOutput | null;
   platform: Awaited<ReturnType<typeof subscriptionLoader>>["platform"];
-  /** Product + Offer JSON-LD for the public pricing page. */
+  /** Service and Offer JSON-LD for the public pricing page. */
   structuredData: JsonLdNode;
 }
 

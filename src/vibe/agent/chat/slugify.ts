@@ -98,7 +98,9 @@ export function isRemovedSkillId(id: string): boolean {
  * Handles legacy camelCase / apostrophe IDs transparently.
  */
 export function resolveIdAlias(id: string): string {
-  return SKILL_ID_ALIASES[id] ?? id;
+  return Object.hasOwn(SKILL_ID_ALIASES, id)
+    ? (SKILL_ID_ALIASES[id] ?? id)
+    : id;
 }
 
 // ============================================================

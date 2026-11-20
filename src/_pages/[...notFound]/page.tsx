@@ -32,8 +32,10 @@ export async function generateMetadata({
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/not-found.jpg`,
     imageAlt: t("meta.imageAlt"),
     keywords: [t("meta.keywords")],
-    generateAlternates: false,
-    additionalMetadata: { robots: { index: false, follow: false } },
+    additionalMetadata: {
+      alternates: null,
+      robots: { index: false, follow: false },
+    },
   });
 }
 

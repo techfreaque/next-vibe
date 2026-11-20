@@ -246,7 +246,7 @@ export function buildSiteStructuredData({
   };
 }
 
-/** Pricing page: the plans as one Product with its offers. */
+/** Pricing page: digital service plans and credit offers. */
 export function buildPricingStructuredData({
   locale,
   modelCount,
@@ -257,16 +257,17 @@ export function buildPricingStructuredData({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const url = pageUrl(locale, "/subscription/overview");
   return {
     "@context": SCHEMA_CONTEXT,
-    "@type": "Product",
-    "@id": `${pageUrl(locale, "/subscription/overview")}#product`,
+    "@type": "Service",
+    "@id": `${url}#service`,
     name: t("structuredData.pricing.name", { appName }),
     description: t("structuredData.pricing.description", { modelCount }),
-    url: pageUrl(locale, "/subscription/overview"),
+    url,
     image: `${siteBase(locale)}/og-image.jpg`,
-    brand: { "@type": "Brand", name: appName },
-    category: t("meta.category"),
+    provider: { "@id": organizationId(locale) },
+    serviceType: t("meta.category"),
     offers: buildPlanOffers(locale, modelCount),
   };
 }

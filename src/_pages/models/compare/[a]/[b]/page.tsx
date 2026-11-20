@@ -15,13 +15,11 @@ import { configScopedTranslation } from "@/env/i18n";
 
 import {
   buildPickerModels,
+  canonicalComparisonPath,
   type ModelFacts,
   type PickerModel,
 } from "../../../_shared/model-facts";
-import {
-  redirectCompareAliases,
-  resolveComparePair,
-} from "../../../_shared/model-page-loaders";
+import { resolveComparePair } from "../../../_shared/model-page-loaders";
 import { compareMeta } from "../../../_shared/model-seo";
 import { buildCompareStructuredData } from "../../../_shared/model-structured-data";
 import { MODELS_OG_IMAGE } from "../../../constants";
@@ -36,9 +34,8 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, a, b } = await params;
-  redirectCompareAliases(locale, a, b);
   const availability = await getEnvAvailability();
-  const pair = resolveComparePair(a, b, availability);
+  const pair = resolveComparePair(locale, a, b, availability);
   if (pair === null) {
     notFound();
   }
@@ -50,8 +47,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     b: pair.right.name,
   };
   const meta = compareMeta(pair.left, pair.right, locale);
+  const path = canonicalComparisonPath(pair.left, pair.right);
   return metadataGenerator(locale, {
-    path: `models/compare/${pair.left.slug}/${pair.right.slug}`,
+    path: path.slice(1),
+    generateAlternates: path === `/models/compare/${a}/${b}`,
     title: meta.title,
     category: t("meta.category"),
     description: meta.description,
@@ -76,9 +75,8 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<ComparePageData> {
   const { locale, a, b } = await params;
-  redirectCompareAliases(locale, a, b);
   const availability = await getEnvAvailability();
-  const pair = resolveComparePair(a, b, availability);
+  const pair = resolveComparePair(locale, a, b, availability);
   if (pair === null) {
     notFound();
   }
@@ -88,7 +86,7 @@ export async function tanstackLoader({
     structuredData: buildCompareStructuredData(
       locale,
       t("compare.title", { a: pair.left.name, b: pair.right.name }),
-      `/models/compare/${pair.left.slug}/${pair.right.slug}`,
+      canonicalComparisonPath(pair.left, pair.right),
     ),
     left: pair.left,
     right: pair.right,

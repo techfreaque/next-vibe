@@ -4,6 +4,7 @@
  */
 
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
+import { DEFAULT_SKILLS } from "next-vibe/agent/skills/config";
 import { SkillsRepository } from "next-vibe/agent/skills/repository";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -21,6 +22,7 @@ export const dynamic = "force-dynamic";
 
 /** Built once per (availability, public skill set) state. */
 let cached: { key: string; xml: string } | null = null;
+const builtInSkillIds = new Set(DEFAULT_SKILLS.map(({ id }) => id));
 
 async function listSkillPages(): Promise<SitemapSkillPage[]> {
   const pages: SitemapSkillPage[] =
@@ -34,7 +36,9 @@ async function listSkillPages(): Promise<SitemapSkillPage[]> {
   );
   if (community.success) {
     pages.push(
-      ...community.data.map(({ id, updatedAt }) => ({ id, updatedAt })),
+      ...community.data
+        .filter(({ id, name }) => name.trim() && !builtInSkillIds.has(id))
+        .map(({ id, updatedAt }) => ({ id, updatedAt })),
     );
   }
   return pages;

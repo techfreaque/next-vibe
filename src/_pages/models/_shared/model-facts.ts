@@ -423,6 +423,24 @@ export const FEATURED_COMPARISON_PAIRS: readonly (readonly [
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GROK_4_7],
 ];
 
+/** Pick one indexable URL for a pair while allowing either on-screen order. */
+export function canonicalComparisonPath(
+  left: ModelRef,
+  right: ModelRef,
+): string {
+  const featured = FEATURED_COMPARISON_PAIRS.find(
+    ([a, b]) =>
+      (a === left.id && b === right.id) || (a === right.id && b === left.id),
+  );
+  const leftFirst = featured
+    ? featured[0] === left.id
+    : PUBLIC_CHAT_MODEL_IDS.indexOf(left.id) <
+      PUBLIC_CHAT_MODEL_IDS.indexOf(right.id);
+  return leftFirst
+    ? `/models/compare/${left.slug}/${right.slug}`
+    : `/models/compare/${right.slug}/${left.slug}`;
+}
+
 /** Featured partners of a model, in pair order, public text models only. */
 function featuredComparisons(
   facts: ModelFacts,
