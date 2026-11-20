@@ -24,22 +24,27 @@ export async function sendSignupChallenge(
 ): Promise<string | null> {
   const { t } = scopedTranslation.scopedT(locale);
   const subject = t("confirmation.link");
+  const hint = t("confirmation.hint");
+  const newsletterNotice = pending.subscribeToNewsletter
+    ? t("confirmation.newsletter")
+    : null;
   const url = `${coreEnv.NEXT_PUBLIC_APP_URL}/${locale}/user/signup?confirm=1#${challenge.token}`;
+  const text = [hint, challenge.code, newsletterNotice, `${subject}\n${url}`]
+    .filter(Boolean)
+    .join("\n\n");
   const jsx = (
     <EmailTemplate
       locale={locale}
       title={subject}
       previewText={subject}
-      tracking={createTrackingContext(locale, pending.leadId)}
+      tracking={createTrackingContext(locale)}
       recipientEmail={pending.email}
     >
-      <Text>{t("confirmation.hint")}</Text>
-      <Text style={{ fontSize: "32px", fontWeight: 700, letterSpacing: "5px" }}>
+      <Text>{hint}</Text>
+      <Text style={{ fontSize: "22px", fontWeight: 700, letterSpacing: "5px" }}>
         {challenge.code}
       </Text>
-      {pending.subscribeToNewsletter && (
-        <Text>{t("confirmation.newsletter")}</Text>
-      )}
+      {newsletterNotice && <Text>{newsletterNotice}</Text>}
       <Button
         href={url}
         style={{
@@ -49,7 +54,7 @@ export async function sendSignupChallenge(
           padding: "12px 20px",
         }}
       >
-        {t("confirmation.link")}
+        {subject}
       </Button>
     </EmailTemplate>
   );
@@ -60,6 +65,7 @@ export async function sendSignupChallenge(
       leadId: pending.leadId,
       locale,
       subject,
+      text,
       jsx,
     },
     logger,

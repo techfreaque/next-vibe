@@ -37,6 +37,7 @@ import { SmtpSendingRepository } from "../sending/repository";
 
 interface SendEmailParams {
   jsx: JSX.Element;
+  text?: string;
   subject: string;
   toEmail: string;
   toName: string;
@@ -132,6 +133,7 @@ export class EmailSendingRepository {
           toName: params.toName,
           subject: params.subject,
           html: rawHtml,
+          text: params.text,
           replyTo:
             params.replyToName && params.replyToEmail
               ? `${params.replyToName} <${params.replyToEmail}>`

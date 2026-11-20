@@ -9,10 +9,12 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 
 import { createTrackingContext } from "@/messenger/providers/email/smtp-client/components/tracking_context.email";
 import { EMAIL_LOGO_FALLBACK_PATH } from "@/messenger/providers/email/smtp-client/email-logo";
+import { buildListUnsubscribeHeaders } from "@/messenger/providers/email/list-unsubscribe";
 import { SmtpSendingRepository } from "@/messenger/providers/email/smtp-client/sending/repository";
 
 import { sendSignupChallenge } from "./confirmation-mail";
 import { signupWelcomeEmailTemplate } from "./email";
+import { scopedTranslation as signupScopedTranslation } from "./i18n";
 
 const recipientEmail = "creator@example.invalid";
 const locales: CountryLanguage[] = [
@@ -50,41 +52,57 @@ function expectStyledWordmark(html: string): void {
 }
 
 test.each(locales)(
-  "signup confirmation fits within the email size limit in %s",
+  "signup confirmation has untracked HTML and text alternatives in %s",
   async (locale) => {
     const messageId = "<signup-test@example.invalid>";
-    let html = "";
+    const { t } = signupScopedTranslation.scopedT(locale);
     const send = spyOn(SmtpSendingRepository, "sendEmail").mockImplementation(
-      async ({ html: renderedHtml }) => {
-        html = renderedHtml;
-        return success({
+      async () =>
+        success({
           messageId,
           accountId: "test-account",
           accountName: "Test account",
           accepted: [recipientEmail],
           rejected: [],
           response: "Accepted",
-        });
-      },
+        }),
     );
     try {
-      const result = await sendSignupChallenge(
-        {
-          email: recipientEmail,
-          privateName: "Test Creator",
-          leadId: "test-lead",
-          subscribeToNewsletter: false,
-        },
-        { code: "123456", token: "test-token" },
-        locale,
-        createEndpointLogger(false, locale),
-      );
+      for (const subscribeToNewsletter of [false, true]) {
+        const result = await sendSignupChallenge(
+          {
+            email: recipientEmail,
+            privateName: "Test Creator",
+            leadId: "test-lead",
+            subscribeToNewsletter,
+          },
+          { code: "123456", token: "test-token" },
+          locale,
+          createEndpointLogger(false, locale),
+        );
 
-      expect(result).toBe(messageId);
-      expect(html).toContain("123456");
-      expect(html).toContain(`/${locale}/user/signup?confirm=1#test-token`);
-      expectUnclippedEmail(html);
-      expectStyledWordmark(html);
+        expect(result).toBe(messageId);
+        const mail = send.mock.lastCall?.[0];
+        expect(mail?.leadId).toBe("test-lead");
+        expect(mail?.subject).toBe(t("confirmation.link"));
+        expect(buildListUnsubscribeHeaders(recipientEmail, mail?.unsubscribeUrl))
+          .toEqual({});
+        const { html = "", text = "" } = mail ?? {};
+        const url = `${coreClientEnv.NEXT_PUBLIC_APP_URL}/${locale}/user/signup?confirm=1#test-token`;
+        expect(text).toContain(t("confirmation.hint"));
+        expect(text.includes(t("confirmation.newsletter"))).toBe(
+          subscribeToNewsletter,
+        );
+        expect(html.match(/<img\b/g)).toHaveLength(1);
+        for (const body of [html, text]) {
+          expect(body).toContain("123456");
+          expect(body).toContain(url);
+          expect(body).not.toContain("/tracking/pixel");
+          expect(body).not.toContain("/track?");
+        }
+        expectUnclippedEmail(html);
+        expectStyledWordmark(html);
+      }
     } finally {
       send.mockRestore();
     }
