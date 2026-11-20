@@ -13,9 +13,12 @@ import "server-only";
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { InferJwtPayloadTypeFromRoles } from "../../core/route/handler-roles";
 import { type ResponseType, success } from "../../core/route/response.schema";
-import type { UserRoleValue } from "../../identity/roles/enum";
+import {
+  UserPermissionRole,
+  type UserRoleValue,
+} from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
-import type { Platform } from "../../platforms/platforms";
+import { isCliPlatform, Platform } from "../../platforms/platforms";
 import type {
   HelpGetRequestOutput,
   HelpGetResponseOutput,
@@ -23,6 +26,11 @@ import type {
   HelpToolParameters,
 } from "../definition";
 import { scopedTranslation } from "../i18n";
+import {
+  buildCategories,
+  filterCatalogCategory,
+  searchCatalog,
+} from "./meta-filter";
 import {
   COMPACT_DEFAULT_PAGE_SIZE,
   COMPACT_FULL_DETAIL_THRESHOLD,
@@ -198,16 +206,30 @@ export async function getToolsFromRemoteInstance(
   const { t } = scopedTranslation.scopedT(locale);
   const { RemoteConnectionRepository } =
     await import("../../remote-connection/repository");
+  const isWeb =
+    !isCompact &&
+    !isCliPlatform(platform) &&
+    platform !== Platform.REMOTE_SKILL;
 
   // Try user-scoped lookup first, fall back to any-user lookup for CLI/system users
   // whose userId doesn't own the connection.
-  const conn = user.isPublic
-    ? await RemoteConnectionRepository.getConnectionAnyUser(instanceId)
-    : ((await RemoteConnectionRepository.getConnectionForInstance(
-        user.id,
-        instanceId,
-      )) ??
-      (await RemoteConnectionRepository.getConnectionAnyUser(instanceId)));
+  const mayDiscloseSnapshot =
+    !isWeb ||
+    (!user.isPublic &&
+      user.roles.includes(UserPermissionRole.ADMIN) &&
+      !data.viewAsRole);
+  const ownConnection =
+    mayDiscloseSnapshot && !user.isPublic
+      ? await RemoteConnectionRepository.getConnectionForInstance(
+          user.id,
+          instanceId,
+        )
+      : null;
+  const conn =
+    ownConnection ??
+    (isWeb
+      ? null
+      : await RemoteConnectionRepository.getConnectionAnyUser(instanceId));
 
   const capabilities = conn?.capabilities ?? null;
 
@@ -246,25 +268,15 @@ export async function getToolsFromRemoteInstance(
     };
   });
 
-  // Apply query filter if provided - also match bare tool name (without instanceId prefix)
-  const lowerQuery = query?.toLowerCase();
-  const filtered = lowerQuery
-    ? allTools.filter((tool) => {
-        if (
-          tool.name.toLowerCase().includes(lowerQuery) ||
-          tool.title?.toLowerCase().includes(lowerQuery) ||
-          tool.description.toLowerCase().includes(lowerQuery) ||
-          tool.category?.toLowerCase().includes(lowerQuery) ||
-          tool.tags?.some((tag) => tag.toLowerCase().includes(lowerQuery)) ||
-          tool.aliases?.some((a) => a.toLowerCase().includes(lowerQuery))
-        ) {
-          return true;
-        }
-        // Also match bare name without instanceId prefix
-        const bareName = tool.name.slice(instanceId.length + 2);
-        return bareName.toLowerCase().includes(lowerQuery);
-      })
-    : allTools;
+  const scoped = filterCatalogCategory(
+    allTools,
+    data.category,
+    data.subCategory,
+    isWeb,
+  );
+  const filtered = query
+    ? searchCatalog(scoped, query, (tool) => tool.name)
+    : scoped;
 
   const matchedCount = filtered.length;
   const totalCount = allTools.length;
@@ -278,7 +290,11 @@ export async function getToolsFromRemoteInstance(
   const pageSlice = filtered.slice(offset, offset + effectivePageSize);
 
   // Auto-upgrade to full detail for small result sets (same threshold as local tools)
-  if (matchedCount > 0 && matchedCount <= COMPACT_FULL_DETAIL_THRESHOLD) {
+  if (
+    !isWeb &&
+    matchedCount > 0 &&
+    matchedCount <= COMPACT_FULL_DETAIL_THRESHOLD
+  ) {
     const schemaMap =
       conn?.token && conn.remoteUrl
         ? await fetchRemoteToolSchemas({
@@ -337,6 +353,13 @@ export async function getToolsFromRemoteInstance(
     tools: pageSlice,
     totalCount,
     matchedCount,
+    ...(isWeb && {
+      categories: buildCategories(filtered),
+      webCategories: buildCategories(allTools),
+      currentPage: safePage,
+      effectivePageSize,
+      totalPages,
+    }),
     hint: t("get.hints.remoteList", {
       matched: matchedCount,
       total: totalCount,

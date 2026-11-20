@@ -586,6 +586,8 @@ export const translations = {
   // Enum translations
   enums: {
     subscriptionStatusFilter: {
+      incomplete: "Incomplete",
+      incompleteExpired: "Incomplete expired",
       all: "All",
       active: "Active",
       trialing: "Trialing",
@@ -605,6 +607,7 @@ export const translations = {
       nowpayments: "NowPayments",
     },
     subscriptionSortField: {
+      periodEnd: "Period end",
       createdAt: "Created At",
       status: "Status",
       interval: "Interval",

@@ -30,8 +30,13 @@ import { db } from "../../../database";
 import type { JwtPayloadType } from "../../../identity/auth/types";
 import { UserPermissionRole } from "../../../identity/roles/enum";
 import type { EndpointLogger } from "../../../logger/types";
-import { CronTaskPriority, CronTaskStatus } from "../../enum";
+import {
+  CronTaskPriorityDB,
+  CronTaskStatus,
+  CronTaskStatusDB,
+} from "../../enum";
 import { cronTaskExecutions, cronTasks } from "../db";
+import { CRON_HISTORY_PAGE_SIZE } from "./constants";
 import type {
   CronHistoryExecution,
   CronHistoryRequestOutput,
@@ -49,9 +54,7 @@ export class CronHistoryRepository {
     t: CronHistoryT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronHistoryResponseOutput>> {
-    // Hoisted above the try so the catch can report the limit it attempted.
-    const limit =
-      data?.limit && Number(data.limit) > 0 ? Number(data.limit) : 50;
+    const limit = data.limit || CRON_HISTORY_PAGE_SIZE;
 
     try {
       logger.debug("Fetching task execution history", { filters: data });
@@ -60,19 +63,15 @@ export class CronHistoryRepository {
         !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
       const userId = !user.isPublic ? user.id : null;
 
-      const offset = data?.offset ? Number(data.offset) : 0;
+      const offset = data.offset ?? 0;
 
       // Base conditions (applied to all queries including status counts)
       const baseConditions = [];
 
       // Filter executions to only those belonging to the user's tasks (unless admin)
-      // Use correlated subqueries to avoid referencing the joined table in WHERE,
-      // which causes Drizzle to drop the LEFT JOIN from count/stats queries.
       if (!isAdmin) {
         if (userId) {
-          baseConditions.push(
-            sql`EXISTS (SELECT 1 FROM ${cronTasks} WHERE ${cronTasks.id} = ${cronTaskExecutions.taskId} AND ${cronTasks.userId} = ${userId})`,
-          );
+          baseConditions.push(eq(cronTasks.userId, userId));
         } else {
           // Public users see nothing
           baseConditions.push(
@@ -82,11 +81,9 @@ export class CronHistoryRepository {
       }
 
       // Hidden tasks are excluded from history, UNLESS they failed (so errors are never silently hidden)
-      // Use a correlated subquery to avoid referencing the joined table in WHERE,
-      // which causes Drizzle to drop the LEFT JOIN from count/stats queries.
       baseConditions.push(
         or(
-          sql`EXISTS (SELECT 1 FROM ${cronTasks} WHERE ${cronTasks.id} = ${cronTaskExecutions.taskId} AND ${cronTasks.hidden} = false)`,
+          eq(cronTasks.hidden, false),
           inArray(cronTaskExecutions.status, [
             CronTaskStatus.FAILED,
             CronTaskStatus.TIMEOUT,
@@ -99,32 +96,34 @@ export class CronHistoryRepository {
         baseConditions.push(eq(cronTaskExecutions.taskId, data.taskId));
       }
 
-      if (data?.taskName) {
-        baseConditions.push(ilike(cronTasks.routeId, `%${data.taskName}%`));
+      const taskName = data.taskName?.trim();
+      if (taskName) {
+        const pattern = `%${taskName.replace(/[\\%_]/g, "\\$&")}%`;
+        baseConditions.push(
+          or(
+            ilike(cronTasks.displayName, pattern),
+            ilike(cronTasks.routeId, pattern),
+            ilike(cronTaskExecutions.taskName, pattern),
+          ),
+        );
       }
 
       if (data?.priority) {
         const priorityStrings = data.priority.split(",").map((p) => p.trim());
-        if (priorityStrings.length > 0) {
-          baseConditions.push(
-            inArray(
-              cronTasks.priority,
-              priorityStrings as (typeof CronTaskPriority)[keyof typeof CronTaskPriority][],
-            ),
-          );
+        const priorities = CronTaskPriorityDB.filter((priority) =>
+          priorityStrings.includes(priority),
+        );
+        if (priorities.length > 0) {
+          baseConditions.push(inArray(cronTaskExecutions.priority, priorities));
         }
       }
 
-      if (data?.startDate) {
-        baseConditions.push(
-          gte(cronTaskExecutions.startedAt, new Date(data.startDate)),
-        );
+      if (data.startDate && !Number.isNaN(data.startDate.getTime())) {
+        baseConditions.push(gte(cronTaskExecutions.startedAt, data.startDate));
       }
 
-      if (data?.endDate) {
-        baseConditions.push(
-          lte(cronTaskExecutions.startedAt, new Date(data.endDate)),
-        );
+      if (data.endDate && !Number.isNaN(data.endDate.getTime())) {
+        baseConditions.push(lte(cronTaskExecutions.startedAt, data.endDate));
       }
 
       // Full conditions including status filter (for executions list + count + stats)
@@ -134,16 +133,9 @@ export class CronHistoryRepository {
         // Handle string status filter
         const statusStrings = data.status.split(",").map((s) => s.trim());
         // Validate each status string is a valid CronTaskStatus
-        const validStatuses: (typeof CronTaskStatus)[keyof typeof CronTaskStatus][] =
-          [];
-        for (const statusStr of statusStrings) {
-          const statusEnum = Object.values(CronTaskStatus).find(
-            (val) => val === statusStr,
-          );
-          if (statusEnum) {
-            validStatuses.push(statusEnum);
-          }
-        }
+        const validStatuses = CronTaskStatusDB.filter((status) =>
+          statusStrings.includes(status),
+        );
         if (validStatuses.length > 0) {
           conditions.push(inArray(cronTaskExecutions.status, validStatuses));
         }
@@ -154,9 +146,10 @@ export class CronHistoryRepository {
         .select({
           id: cronTaskExecutions.id,
           taskId: cronTaskExecutions.taskId,
-          taskName: cronTasks.routeId,
+          taskName: cronTaskExecutions.taskName,
+          taskDisplayName: cronTasks.displayName,
           status: cronTaskExecutions.status,
-          priority: cronTasks.priority,
+          priority: cronTaskExecutions.priority,
           startedAt: cronTaskExecutions.startedAt,
           completedAt: cronTaskExecutions.completedAt,
           durationMs: cronTaskExecutions.durationMs,
@@ -168,19 +161,28 @@ export class CronHistoryRepository {
         .from(cronTaskExecutions)
         .leftJoin(cronTasks, eq(cronTaskExecutions.taskId, cronTasks.id))
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(desc(cronTaskExecutions.startedAt))
+        .orderBy(
+          desc(cronTaskExecutions.startedAt),
+          desc(cronTaskExecutions.id),
+        )
         .limit(limit)
         .offset(offset);
 
       const executions = await executionsQuery;
 
-      // Get total count
-      const [countResult] = await db
-        .select({ count: count() })
-        .from(cronTaskExecutions)
-        .where(conditions.length > 0 ? and(...conditions) : undefined);
-
-      const totalCount = countResult?.count ?? 0;
+      const [selectedTask] =
+        data.taskId && (isAdmin || userId)
+          ? await db
+              .select({ id: cronTasks.id, name: cronTasks.displayName })
+              .from(cronTasks)
+              .where(
+                and(
+                  eq(cronTasks.id, data.taskId),
+                  isAdmin || !userId ? undefined : eq(cronTasks.userId, userId),
+                ),
+              )
+              .limit(1)
+          : [];
 
       // Calculate summary statistics (against full conditions including status filter)
       const [statsResult] = await db
@@ -197,6 +199,8 @@ export class CronHistoryRepository {
         .from(cronTaskExecutions)
         .leftJoin(cronTasks, eq(cronTaskExecutions.taskId, cronTasks.id))
         .where(conditions.length > 0 ? and(...conditions) : undefined);
+
+      const totalCount = statsResult?.totalExecutions ?? 0;
 
       // Status counts against base conditions (no status filter) for accurate chip counts
       const [statusCountsResult] = await db
@@ -241,9 +245,10 @@ export class CronHistoryRepository {
           const execution: CronHistoryExecution = {
             id: exec.id,
             taskId: exec.taskId,
-            taskName: exec.taskName ?? t("errors.cronTaskNotFound"),
+            taskName: exec.taskName,
+            taskDisplayName: exec.taskDisplayName ?? undefined,
             status: exec.status,
-            priority: exec.priority ?? CronTaskPriority.MEDIUM,
+            priority: exec.priority,
             startedAt: exec.startedAt.toISOString(),
             completedAt: exec.completedAt?.toISOString() ?? null,
             durationMs: exec.durationMs,
@@ -263,6 +268,7 @@ export class CronHistoryRepository {
           };
           return execution;
         }),
+        selectedTask,
         totalCount,
         hasMore: totalCount > offset + limit,
         statusCounts: {

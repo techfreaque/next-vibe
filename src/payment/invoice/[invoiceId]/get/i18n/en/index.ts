@@ -88,6 +88,7 @@ export const translations = {
     placeholder: "Enter invoice ID",
   },
   widget: {
+    createCreditNote: "Create credit note",
     back: "Back",
     submit: "Look Up Invoice",
     invoiceNumber: "Invoice",

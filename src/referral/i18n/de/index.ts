@@ -316,7 +316,22 @@ export const translations: typeof enTranslations = {
         description: "Auszahlungsanfrage genehmigen, ablehnen oder abschließen",
       },
       fields: {
+        search: {
+          label: "Partner-E-Mail",
+          description:
+            "Nach der vollständigen E-Mail-Adresse oder einem Teil davon suchen.",
+        },
+        userId: {
+          label: "Partnerkonto",
+        },
+        page: {
+          label: "Seite",
+        },
+        limit: {
+          label: "Ergebnisse pro Seite",
+        },
         status: {
+          all: "Alle Status",
           label: "Statusfilter",
           description: "Nach Auszahlungsstatus filtern",
         },
@@ -339,6 +354,36 @@ export const translations: typeof enTranslations = {
       },
       widget: {
         empty: "Keine Auszahlungsanfragen gefunden",
+        emptyHint: "Andere E-Mail-Adresse oder anderen Status auswählen.",
+        results: "{{count}} Auszahlungsanfragen",
+        apply: "Filter anwenden",
+        clear: "Filter zurücksetzen",
+        refresh: "Aktualisieren",
+        loading: "Auszahlungsanfragen werden geladen…",
+        amount: "{{credits}} verdiente Credits · {{value}} Gegenwert in USD",
+        payoutSummary: "{{amount}} · Auszahlungsziel: {{currency}}",
+        requestedAt: "Angefragt am {{date}}",
+        processedAt: "Aktualisiert am {{date}}",
+        rejectionReason: "Grund: {{reason}}",
+        adminNotes: "Notizen: {{notes}}",
+        openPartner: "Partnerkonto öffnen",
+        openPartnerFor: "Partnerkonto für {{email}} öffnen",
+        actionFor: "{{action}}: Auszahlung für {{email}}",
+        previous: "Vorherige Seite",
+        next: "Nächste Seite",
+        page: "Seite {{page}} von {{total}}",
+        confirmAction: "Aktion bestätigen",
+        lookupFailed: "Auszahlungsanfrage konnte nicht geladen werden.",
+        state: "Status",
+        valueLabel: "Angefragter Gegenwert",
+        destinationLabel: "Auszahlungsziel",
+        actionSaved: "Auszahlungsaktion gespeichert.",
+        approveDetail:
+          "Bei Genehmigung bleiben die verdienten Credits für diese Auszahlung reserviert.",
+        rejectDetail:
+          "Bei Ablehnung werden die für diese Auszahlung reservierten Credits freigegeben.",
+        completeDetail:
+          "Die Auszahlung nach dem Transfer als abgeschlossen markieren. Dabei werden die entsprechenden verdienten Credits abgebucht.",
         approve: "Genehmigen",
         reject: "Ablehnen",
         complete: "Abschließen",

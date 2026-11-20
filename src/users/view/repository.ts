@@ -38,6 +38,7 @@ import { newsletterSubscriptions } from "@/newsletter/db";
 import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
 import { paymentRefunds, paymentTransactions } from "@/payment/db";
 import { PaymentStatus, RefundStatus } from "@/payment/enum";
+import { canStartStripeRefund } from "@/payment/refund/eligibility";
 import { referralCodes, referralEarnings, userReferrals } from "@/referral/db";
 import { subscriptions } from "@/subscription/db";
 import { SubscriptionStatus } from "@/subscription/enum";
@@ -421,18 +422,9 @@ export class UserViewRepository {
   }
 
   /** Most recent payment attempts, any status. */
-  private static async getPayments(userId: string): Promise<
-    Array<{
-      id: string;
-      createdAt: Date;
-      amount: number;
-      currency: string;
-      amountUsd: number;
-      status: string;
-      provider: string;
-      mode: string;
-    }>
-  > {
+  private static async getPayments(
+    userId: string,
+  ): Promise<UserViewResponseOutput["payments"]> {
     const rows = await db
       .select({
         id: paymentTransactions.id,
@@ -442,6 +434,8 @@ export class UserViewRepository {
         amountUsd: sql<number>`${usdAmountSql(paymentTransactions.amount, paymentTransactions.currency)}::float8`,
         status: paymentTransactions.status,
         provider: paymentTransactions.provider,
+        providerPaymentIntentId: paymentTransactions.providerPaymentIntentId,
+        providerSessionId: paymentTransactions.providerSessionId,
         mode: paymentTransactions.mode,
       })
       .from(paymentTransactions)
@@ -457,6 +451,7 @@ export class UserViewRepository {
       status: r.status,
       provider: r.provider,
       mode: r.mode,
+      refundEligible: canStartStripeRefund(r),
     }));
   }
 

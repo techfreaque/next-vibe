@@ -258,6 +258,8 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    on: "Attivo",
+    off: "Disattivo",
     title: "Avviamento della campagna",
     titleSaved: "Configurazione Salvataggio",
     description:

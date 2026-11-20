@@ -644,6 +644,7 @@ export const translations: typeof enTranslations = {
     openLead: "Apri la scheda del lead",
     attributionOnly:
       "I link di attribuzione sono indizi da rivedere. Una visita condivisa IP o monitoraggio può coinvolgere più di una persona.",
+    recordedAccountLink: "Collegamento al conto registrato",
     recordedConversion: "Conto registrato alla conversione",
     attributedAccount: "Conto registrato nell'attribuzione della crescita",
     previewIpMatches: "Anteprima IP abbinato tra i cavi",

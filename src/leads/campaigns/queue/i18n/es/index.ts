@@ -12,31 +12,33 @@ export const translations: typeof enTranslations = {
       winback: "Winback",
       transactional: "Transaccional",
       notification: "Notificación",
-      system: "Sistema"
+      system: "Sistema",
     },
     campaignTypeFilter: {
-      all: "Todos"
-    }
+      all: "Todos",
+    },
   },
   get: {
     title: "Campaign Queue",
     titleShort: "Campaign Queue",
-    description: "Ver lista paginada de leads actualmente en campañas de correo electrónico",
+    description:
+      "Ver lista paginada de leads actualmente en campañas de correo electrónico",
     fields: {
       page: {
         label: "Página",
-        description: "Número de página"
+        description: "Número de página",
       },
       pageSize: {
         label: "Tamaño de página",
-        description: "Número de registros por página"
+        description: "Número de registros por página",
       },
       campaignType: {
         label: "Tipo de campaña",
-        description: "Filtro por tipo de campaña"
-      }
+        description: "Filtro por tipo de campaña",
+      },
     },
     response: {
+      nextSubject: "Tema programado",
       leadId: "ID del contacto",
       leadEmail: "Correo electrónico",
       businessName: "Negocios",
@@ -51,52 +53,56 @@ export const translations: typeof enTranslations = {
       total: "Total",
       page: "Página",
       pageSize: "Tamaño de página",
-      items: "Temas de búsqueda"
+      items: "Temas de búsqueda",
     },
     errors: {
       unauthorized: {
         title: "Se requiere autenticación",
-        description: "Debes estar conectado para ver la cola de campaña"
+        description: "Debes estar conectado para ver la cola de campaña",
       },
       forbidden: {
         title: "Acceso denegado",
-        description: "Usted no tiene permiso para ver la cola de campaña"
+        description: "Usted no tiene permiso para ver la cola de campaña",
       },
       server: {
         title: "Error del servidor",
-        description: "Se produjo un error al buscar la cola de campaña"
+        description: "Se produjo un error al buscar la cola de campaña",
       },
       unknown: {
         title: "Error desconocido",
-        description: "Ocurrió un error desconocido"
+        description: "Ocurrió un error desconocido",
       },
       validation: {
         title: "Error de validación",
-        description: "Parámetros de entrada inválidos"
-      }
+        description: "Parámetros de entrada inválidos",
+      },
     },
     success: {
       title: "Consultas realizadas",
-      description: "Cohesión de campaña recuperada con éxito"
-    }
+      description: "Cohesión de campaña recuperada con éxito",
+    },
   },
   widget: {
     title: "Campaign Queue",
     refresh: "Actualizar",
     noData: "No hay entradas de cola de campaña",
-    emptyDescription: "Los correos electrónicos solicitados y los líderes activos de la campaña aparecen aquí.",
-    empty: "No se encontraron prospectos",
-    columnEmail: "Correo electrónico",
-    columnBusiness: "Empresa",
-    columnType: "Tipo",
-    columnStage: "Etapa",
-    columnVariant: "Variante",
-    columnNext: "Próximo correo",
-    columnSent: "Enviado",
-    columnOpen: "Abierto",
-    columnClick: "Clic en el enlace",
-    columnStarted: "Fecha de inicio",
-    never: "Nunca",
-    pagination: "Página {{page}} de {{totalPages}} · Líderes {{total}}"
-  }
+    emptyDescription:
+      "Los correos electrónicos solicitados y los líderes activos de la campaña aparecen aquí.",
+    back: "Atrás",
+    loading: "Cargar cola de campaña",
+    selectedLead: "Directo seleccionado",
+    clearFilters: "Filtros claros",
+    leadEmpty: "No hay entradas de cola para este plomo",
+    firstPage: "Vaya a la primera página",
+    scheduledFor: "Programado para {{date}}",
+    noScheduledEmail: "No hay email programado",
+    deliveryStats:
+      "{{sent}} enviado · {{opened}} abierto · {{clicked}} clicado",
+    startedOn: "Inicio {{date}}",
+    openLead: "Abrir ficha del prospecto",
+    openLeadNamed: "Open lead {{recipient}}",
+    previous: "Anterior",
+    next: "Siguiente",
+    pagination: "Página {{page}} de {{totalPages}} · Líderes {{total}}",
+  },
 };

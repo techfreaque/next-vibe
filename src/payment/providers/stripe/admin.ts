@@ -37,6 +37,7 @@ import type {
   PaymentRefundRequestOutput,
   PaymentRefundResponseOutput,
 } from "../../refund/definition";
+import { canStartStripeRefund } from "../../refund/eligibility";
 import { scopedTranslation as refundScopedTranslation } from "../../refund/i18n";
 import { scopedTranslation as stripeScopedTranslation } from "./i18n";
 import { StripeProvider } from "./repository";
@@ -359,9 +360,23 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         });
       }
 
-      // Legacy rows only stored the checkout session id — resolve its intent.
-      let paymentIntentId = transaction.providerPaymentIntentId;
-      if (!paymentIntentId && transaction.providerSessionId) {
+      if (!canStartStripeRefund(transaction)) {
+        return fail({
+          message: tRefund("post.errors.validation.ineligible"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
+
+      // Legacy rows only stored the checkout session ID.
+      let paymentIntentId = transaction.providerPaymentIntentId?.startsWith(
+        "pi_",
+      )
+        ? transaction.providerPaymentIntentId
+        : null;
+      if (
+        !paymentIntentId &&
+        transaction.providerSessionId?.startsWith("cs_")
+      ) {
         const session = await stripeClient.checkout.sessions.retrieve(
           transaction.providerSessionId,
         );
@@ -425,7 +440,10 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         if (!clawback.success) {
           logger.error(
             "Refund issued but credit clawback failed — webhook retry will reapply",
-            { refundId: refund.id, transactionId: data.transactionId },
+            {
+              refundId: refund.id,
+              transactionId: data.transactionId,
+            },
           );
         }
       }

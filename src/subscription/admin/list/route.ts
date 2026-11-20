@@ -15,7 +15,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, logger, locale }) =>
-      SubscriptionAdminListRepository.listSubscriptions(data, logger, locale),
+    handler: ({ data, logger, t }) =>
+      SubscriptionAdminListRepository.listSubscriptions(data, logger, t),
   },
 });

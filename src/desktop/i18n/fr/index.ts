@@ -1134,6 +1134,7 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    refresh: "Actualiser",
     noWindows: "Aucune fenêtre ouverte",
     windowCount_one: "{{count}} fenêtre",
     windowCount_other: "{{count}} fenêtres",

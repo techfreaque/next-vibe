@@ -433,7 +433,7 @@ const { GET } = createEndpoint({
           stripeCustomerId: null,
           userRoles: [
             {
-              id: "role-id",
+              id: "48649767-c92b-4c41-9d28-e64e3d6c34d6",
               role: UserRole.CUSTOMER,
             },
           ],
@@ -469,7 +469,7 @@ const { GET } = createEndpoint({
         stripeCustomerId: null,
         userRoles: [
           {
-            id: "role-id",
+            id: "48649767-c92b-4c41-9d28-e64e3d6c34d6",
             role: UserRole.CUSTOMER,
           },
         ],
@@ -761,7 +761,7 @@ const { PUT } = createEndpoint({
         stripeCustomerId: null,
         userRoles: [
           {
-            id: "role-id",
+            id: "48649767-c92b-4c41-9d28-e64e3d6c34d6",
             role: UserRole.CUSTOMER,
           },
         ],

@@ -6,9 +6,10 @@ export const translations = {
     list: "list",
   },
   get: {
-    title: "Estimates",
-    titleShort: "Estimates",
-    description: "Get a paginated list of estimates for a company",
+    title: "Sales Estimates",
+    titleShort: "Sales Estimates",
+    description:
+      "Search estimates by reference, customer, email, title or estimate ID, and filter by company or status.",
     form: {
       title: "Estimate Filters",
       description: "Filter and paginate estimates",
@@ -73,6 +74,12 @@ export const translations = {
     description: "Filter by company",
     placeholder: "Enter company ID",
   },
+  search: {
+    label: "Search documents",
+    description:
+      "Search estimates by reference, customer, email, title or estimate ID, and filter by company or status.",
+    placeholder: "Estimate number, customer or title",
+  },
   status: {
     label: "Status",
     description: "Filter by status",
@@ -92,8 +99,9 @@ export const translations = {
     description: "Items per page",
   },
   widget: {
+    pageCount: "Total pages",
     back: "Back",
-    title: "Estimates",
+    title: "Sales Estimates",
     newEstimate: "New Estimate",
     loading: "Loading estimates...",
     noEstimates: "No estimates yet.",

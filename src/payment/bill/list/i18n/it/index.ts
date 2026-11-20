@@ -4,53 +4,48 @@ export const translations: typeof enTranslations = {
   tags: {
     payment: "pagamento",
     bill: "fatturazione",
-    ap: "contabilità-pagabile"
+    ap: "contabilità-pagabile",
   },
   get: {
     title: "Biglietti del fornitore",
     titleShort: "Biglietti del fornitore",
-    description: "Conti di ricerca pagabili per numero di fattura, nome del fornitore o disegno di legge ID, e filtro per società o stato.",
+    description:
+      "Conti di ricerca pagabili per numero di fattura, nome del fornitore o disegno di legge ID, e filtro per società o stato.",
     errors: {
       validation: {
         title: "Errore di convalida",
-        description: "Controllare i parametri del filtro"
+        description: "Controllare i parametri del filtro",
       },
       unauthorized: {
         title: "Non firmata",
-        description: "Accedi per visualizzare le bollette"
+        description: "Accedi per visualizzare le bollette",
       },
       forbidden: {
         title: "Accesso negato",
-        description: "Tu non sei un membro di questa azienda"
+        description: "Tu non sei un membro di questa azienda",
       },
-      conflict: {
-        title: "Conflitto",
-        description: "Conflittuale dei dati"
-      },
+      conflict: { title: "Conflitto", description: "Conflittuale dei dati" },
       server: {
         title: "Errore del server",
-        description: "Non poteva caricare le bollette"
+        description: "Non poteva caricare le bollette",
       },
       unknown: {
         title: "Errore sconosciuto",
-        description: "Si è verificato un errore imprevisto"
+        description: "Si è verificato un errore imprevisto",
       },
       network: {
         title: "Errore di rete",
-        description: "Controlla la connessione"
+        description: "Controlla la connessione",
       },
-      notFound: {
-        title: "Non trovato",
-        description: "Società non trovata"
-      },
+      notFound: { title: "Non trovato", description: "Società non trovata" },
       unsavedChanges: {
         title: "Modifiche non salvate",
-        description: "Hai modifiche non salvate"
-      }
+        description: "Hai modifiche non salvate",
+      },
     },
     success: {
       title: "Bills Caricato",
-      description: "Le bollette del fornitore recuperate"
+      description: "Le bollette del fornitore recuperate",
     },
     response: {
       totalCount: "Totale",
@@ -62,37 +57,38 @@ export const translations: typeof enTranslations = {
       currency: "Valuta",
       billTotal: "Importo",
       status: "Stato",
-      createdAt: "Creato"
-    }
+      createdAt: "Creato",
+    },
   },
   companyId: {
     label: "Società",
     description: "Filtra per azienda",
-    placeholder: "Società UUID"
+    placeholder: "Società UUID",
+  },
+  search: {
+    label: "Documenti di ricerca",
+    description:
+      "Conti di ricerca pagabili per numero di fattura, nome del fornitore o disegno di legge ID, e filtro per società o stato.",
+    placeholder: "Numero di fattura, fornitore o ID",
   },
   status: {
     label: "Stato",
     description: "Filtra per stato di fattura",
-    placeholder: "Qualsiasi stato"
+    placeholder: "Qualsiasi stato",
   },
-  page: {
-    label: "Pagina",
-    description: "Numero di pagina"
-  },
-  pageSize: {
-    label: "Per pagina",
-    description: "Risultati per pagina"
-  },
+  page: { label: "Pagina", description: "Numero di pagina" },
+  pageSize: { label: "Per pagina", description: "Risultati per pagina" },
   enums: {
     billStatus: {
       DRAFT: "Progetto",
       RECEIVED: "Ricevuto.",
       APPROVED: "Approvazione",
       PAID: "Pagato",
-      DISPUTED: "Disputato"
-    }
+      DISPUTED: "Disputato",
+    },
   },
   widget: {
+    pageCount: "Totale pagine",
     back: "Indietro",
     title: "Biglietti del fornitore",
     newBill: "Registrazione",
@@ -100,14 +96,14 @@ export const translations: typeof enTranslations = {
     empty: {
       title: "Nessuna fattura del fornitore",
       hint: "Registrare una fattura quando si riceve una fattura da un fornitore.",
-      cta: "Registrazione"
+      cta: "Registrazione",
     },
     company: {
       select: "Selezionare la società",
-      selected: "Azienda Selezionata"
+      selected: "Azienda Selezionata",
     },
     due: "Due",
     overdue: "Più tardi.",
-    view: "Vista"
-  }
+    view: "Vista",
+  },
 };

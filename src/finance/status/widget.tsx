@@ -12,17 +12,23 @@ import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetEndpointMutations,
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponse,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
 
 import { FINANCE_CONFIG } from "../config";
@@ -43,7 +49,7 @@ function Section({
 }): JSX.Element {
   return (
     <Div className="flex flex-col gap-2">
-      <Div className="flex items-center gap-2">
+      <Div className="flex flex-wrap items-center gap-2">
         <H3 className="text-sm font-semibold">{title}</H3>
         {count !== undefined && (
           <Badge variant={count > 0 ? "secondary" : "outline"}>{count}</Badge>
@@ -64,10 +70,15 @@ export function FinanceStatusWidget(): JSX.Element {
   const locale = useWidgetLocale();
   const { push: navigate, pop, canGoBack } = useWidgetNavigation();
   const mutations = useWidgetEndpointMutations();
+  const response = useWidgetResponse();
+  const responseOnly = useWidgetResponseOnly();
+  const isInteractive = useWidgetIsInteractive() && !responseOnly;
+  const openRelated = useRelatedEntityNavigation();
 
   const money = new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "USD",
+    currencyDisplay: "code",
     maximumFractionDigits: 2,
   });
   const pct = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
@@ -100,88 +111,158 @@ export function FinanceStatusWidget(): JSX.Element {
   if (!data) {
     return (
       <WidgetShell>
-        <LoadingBlock message={t("status.widget.loading")} />
+        <WidgetHeader title={t("status.widget.title")} />
+        <FormAlertWidget field={{}} />
+        {!response && <LoadingBlock message={t("status.widget.loading")} />}
       </WidgetShell>
     );
   }
+
+  const readingIsStale = (timestamp: string | null, cadence: number): boolean =>
+    timestamp !== null &&
+    new Date(data.asOf).getTime() - new Date(timestamp).getTime() > 2 * cadence;
+  const marginValue = (amount: number): string =>
+    data.week.marginDays > 0
+      ? money.format(amount)
+      : t("status.widget.missingCost");
 
   const revenue = data.sources.filter((s) => isRevenue(s.source));
   const provs = data.sources.filter((s) => !isRevenue(s.source));
 
   return (
-    <WidgetShell>
-      <Div className="flex flex-col gap-5">
+    <WidgetShell className="min-w-0">
+      <Div className="flex min-w-0 flex-col gap-5">
         <WidgetHeader
           title={t("status.widget.title")}
+          className="flex-wrap"
           backButton={
-            canGoBack ? (
+            isInteractive && canGoBack ? (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => pop()}
                 className="-ml-1"
+                aria-label={t("status.widget.back")}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
             ) : undefined
           }
           actions={
-            <>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => void mutations?.read?.refetch?.()}
-                aria-label={t("status.widget.refresh")}
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
-              <Button type="button" size="sm" onClick={runIngest}>
-                {t("status.widget.runIngest")}
-              </Button>
-            </>
+            isInteractive && (
+              <>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => void mutations?.read?.refetch?.()}
+                  aria-label={t("status.widget.refresh")}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+                <Button type="button" size="sm" onClick={runIngest}>
+                  {t("status.widget.runIngest")}
+                </Button>
+              </>
+            )
           }
         />
-        <P className="text-sm text-muted-foreground">
-          {t("status.widget.lastIngest", { when: when(data.lastIngestAt) })}
-        </P>
+        <FormAlertWidget field={{}} />
+        <Div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
+          <Span>
+            {t("status.widget.lastIngest", { when: when(data.lastIngestAt) })}
+          </Span>
+          <Span>
+            {t("status.widget.lastSuccessful", {
+              when: when(data.lastSuccessfulIngestAt),
+            })}
+          </Span>
+        </Div>
+        {isInteractive && (
+          <SectionGroup title={t("documents.heading")}>
+            <Div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  openRelated(() =>
+                    import("@/payment/invoice/list/definition").then(
+                      (module) => module.default.GET,
+                    ),
+                  )
+                }
+              >
+                {t("documents.invoices")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  openRelated(() =>
+                    import("@/payment/bill/list/definition").then(
+                      (module) => module.default.GET,
+                    ),
+                  )
+                }
+              >
+                {t("documents.bills")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  openRelated(() =>
+                    import("@/payment/estimate/list/definition").then(
+                      (module) => module.default.GET,
+                    ),
+                  )
+                }
+              >
+                {t("documents.estimates")}
+              </Button>
+            </Div>
+          </SectionGroup>
+        )}
 
         <Section title={t("status.widget.margin.title")}>
           <>
-            <Div className="grid grid-cols-2 gap-3 @sm:grid-cols-5">
+            <Div className="grid grid-cols-2 gap-2 @md:grid-cols-3 @xl:grid-cols-5">
               <Stat
                 label={t("status.widget.margin.revenue")}
-                value={money.format(data.week.netRevenueUsd)}
+                value={marginValue(data.week.netRevenueUsd)}
               />
               <Stat
                 label={t("status.widget.margin.fees")}
-                value={money.format(data.week.processorFeesUsd)}
+                value={marginValue(data.week.processorFeesUsd)}
               />
               <Stat
                 label={t("status.widget.margin.cost")}
-                value={money.format(data.week.upstreamCostUsd)}
+                value={marginValue(data.week.upstreamCostUsd)}
               />
               <Stat
                 label={t("status.widget.margin.margin")}
-                value={money.format(data.week.grossMarginUsd)}
+                value={marginValue(data.week.grossMarginUsd)}
                 negative={data.week.grossMarginUsd < 0}
               />
               <Stat
                 label={t("status.widget.margin.pct")}
                 value={
                   data.week.grossMarginPct === null
-                    ? "-"
+                    ? t("status.widget.margin.missingPct")
                     : `${pct.format(data.week.grossMarginPct)}%`
                 }
                 negative={(data.week.grossMarginPct ?? 0) < 0}
               />
             </Div>
-            {!data.week.costComplete && (
+            {data.week.totalDays > 0 && !data.week.costComplete && (
               <P className="text-xs text-muted-foreground">
                 {t("status.widget.margin.costIncomplete", {
                   tracked: data.week.marginDays,
-                  total: data.week.totalDays,
+                  total: data.week.expectedDays,
                   revenue: money.format(data.week.netRevenueAllDaysUsd),
                 })}
               </P>
@@ -193,7 +274,7 @@ export function FinanceStatusWidget(): JSX.Element {
                 {data.days.map((d) => (
                   <Div
                     key={d.day}
-                    className="flex items-center justify-between gap-3 px-4 py-2 text-sm tabular-nums"
+                    className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-4 py-2 text-sm tabular-nums"
                   >
                     <Span className="font-medium">{d.day}</Span>
                     <Span className="text-muted-foreground">
@@ -232,21 +313,29 @@ export function FinanceStatusWidget(): JSX.Element {
           count={provs.length}
         >
           <Div className="flex flex-col divide-y divide-border rounded-lg border overflow-hidden">
+            {provs.length === 0 && (
+              <Empty text={t("status.widget.noSources")} />
+            )}
             {provs.map((s) => (
               <Div key={s.source} className="flex flex-col gap-1 px-4 py-3">
-                <Div className="flex items-center justify-between gap-3">
-                  <Div className="flex items-center gap-2 min-w-0">
+                <Div className="flex flex-wrap items-center justify-between gap-2">
+                  <Div className="flex min-w-0 flex-wrap items-center gap-2">
                     <Span className="text-sm font-semibold truncate">
                       {t(s.source)}
                     </Span>
                     <StatusBadge status={s.status} t={t} />
+                    {readingIsStale(s.snapshotAt, FINANCE_CONFIG.hourMs) && (
+                      <Badge variant="outline">
+                        {t("status.widget.stale")}
+                      </Badge>
+                    )}
                   </Div>
                   <Span className="text-sm font-bold tabular-nums">
                     {s.balanceUsd !== null
                       ? money.format(s.balanceUsd)
                       : s.balanceNative !== null
                         ? `${pct.format(s.balanceNative)} ${s.unit ?? ""}`
-                        : "-"}
+                        : t("status.widget.noBalance")}
                   </Span>
                 </Div>
                 <Div className="flex flex-wrap gap-x-3 text-xs text-muted-foreground">
@@ -281,7 +370,18 @@ export function FinanceStatusWidget(): JSX.Element {
                   {s.lastSpendUsd === null && s.lastSpendNative === null && (
                     <Span>{t("status.widget.providers.noSpend")}</Span>
                   )}
-                  <Span>{when(s.lastOkAt)}</Span>
+                  {s.snapshotAt && (
+                    <Span>
+                      {t("status.widget.snapshot", {
+                        when: when(s.snapshotAt),
+                      })}
+                    </Span>
+                  )}
+                  <Span>
+                    {t("status.widget.lastSuccessful", {
+                      when: when(s.lastOkAt),
+                    })}
+                  </Span>
                 </Div>
                 {s.reason && (
                   <Span className="text-xs text-muted-foreground">
@@ -298,18 +398,26 @@ export function FinanceStatusWidget(): JSX.Element {
           count={revenue.length}
         >
           <Div className="flex flex-col divide-y divide-border rounded-lg border overflow-hidden">
+            {revenue.length === 0 && (
+              <Empty text={t("status.widget.noSources")} />
+            )}
             {revenue.map((s) => (
               <Div key={s.source} className="flex flex-col gap-1 px-4 py-3">
-                <Div className="flex items-center gap-2">
+                <Div className="flex flex-wrap items-center gap-2">
                   <Span className="text-sm font-semibold">{t(s.source)}</Span>
                   <StatusBadge status={s.status} t={t} />
+                  {readingIsStale(s.lastOkAt, FINANCE_CONFIG.dayMs) && (
+                    <Badge variant="outline">{t("status.widget.stale")}</Badge>
+                  )}
                   {s.fallback && (
                     <Badge variant="destructive">
                       {t("status.widget.revenue.fallback")}
                     </Badge>
                   )}
                   <Span className="text-xs text-muted-foreground">
-                    {when(s.lastOkAt)}
+                    {t("status.widget.lastSuccessful", {
+                      when: when(s.lastOkAt),
+                    })}
                   </Span>
                 </Div>
                 {s.reason && (
@@ -332,7 +440,7 @@ export function FinanceStatusWidget(): JSX.Element {
             <Div className="flex flex-col divide-y divide-border rounded-lg border overflow-hidden">
               {data.alerts.map((a) => (
                 <Div key={a.id} className="flex flex-col gap-1 px-4 py-3">
-                  <Div className="flex items-center gap-2">
+                  <Div className="flex flex-wrap items-center gap-2">
                     <Badge
                       variant={
                         a.severity === "enums.severity.critical"
@@ -377,20 +485,22 @@ export function FinanceStatusWidget(): JSX.Element {
                     {th.note ? ` · ${th.note}` : ""}
                   </Span>
                 </Div>
-                <Div className="flex items-center gap-2">
+                <Div className="flex flex-wrap items-center gap-2">
                   <Span className="text-sm font-bold tabular-nums">
                     {pct.format(th.value)}
                   </Span>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      editThreshold(th.key, th.value, true, th.note)
-                    }
-                  >
-                    {t("status.widget.thresholds.edit")}
-                  </Button>
+                  {isInteractive && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        editThreshold(th.key, th.value, true, th.note)
+                      }
+                    >
+                      {t("status.widget.thresholds.edit")}
+                    </Button>
+                  )}
                 </Div>
               </Div>
             ))}
@@ -417,10 +527,10 @@ function Stat({
   negative?: boolean;
 }): JSX.Element {
   return (
-    <Div className="flex flex-col gap-0.5 rounded-lg border px-3 py-2">
+    <Div className="flex min-w-0 flex-col gap-0.5 rounded-lg border px-3 py-2">
       <Span className="text-xs text-muted-foreground">{label}</Span>
       <Span
-        className={`text-base font-bold tabular-nums ${negative ? "text-destructive" : ""}`}
+        className={`text-base font-bold tabular-nums [overflow-wrap:anywhere] ${negative ? "text-destructive" : ""}`}
       >
         {value}
       </Span>

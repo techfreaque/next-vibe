@@ -3,10 +3,15 @@
  * Covers lead records, imports, campaigns, and bulk operations.
  */
 
-import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
+import type {
+  CategoryDefinition,
+  RecordSearchDestination,
+} from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 import { LEADS_DASHBOARD_ALIAS } from "@/leads/dashboard/constants";
+import { LEADS_SEARCH_ALIAS } from "@/leads/search/constants";
+import type leadSearch from "@/leads/search/definition";
 import { USER_ME_ALIAS } from "@/user/private/me/constants";
 
 export const category: CategoryDefinition = {
@@ -28,6 +33,10 @@ export const category: CategoryDefinition = {
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
     [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
   },
+  recordSearch: {
+    alias: LEADS_SEARCH_ALIAS,
+    field: "search",
+  } satisfies RecordSearchDestination<typeof leadSearch.GET>,
   subcategories: {
     Management: {
       icon: "users",

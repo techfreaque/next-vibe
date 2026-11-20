@@ -84,8 +84,7 @@ export const translations: typeof enTranslations = {
       companies: "Entreprises",
       invoices: "Factures",
       bills: "Factures fournisseurs",
-      selectCompany:
-        "Saisissez un ID d'entreprise pour charger le tableau de bord comptable.",
+      selectCompany: "Sélectionnez une entreprise pour ouvrir sa comptabilité.",
     },
   },
   category: "Comptabilité",

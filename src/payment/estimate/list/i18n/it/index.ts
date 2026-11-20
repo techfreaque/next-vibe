@@ -5,15 +5,16 @@ export const translations: typeof enTranslations = {
   tags: {
     payment: "pagamento",
     estimate: "Grafico",
-    list: "elenco"
+    list: "elenco",
   },
   get: {
     title: "Stime di vendita",
     titleShort: "Stime di vendita",
-    description: "Stime di ricerca per riferimento, cliente, e-mail, titolo o stima ID, e filtro per società o stato.",
+    description:
+      "Stime di ricerca per riferimento, cliente, e-mail, titolo o stima ID, e filtro per società o stato.",
     form: {
       title: "Filtri stimati",
-      description: "Filtro e paginate stime"
+      description: "Filtro e paginate stime",
     },
     response: {
       totalCount: "Conto totale",
@@ -27,50 +28,44 @@ export const translations: typeof enTranslations = {
       validUntil: "Valido fino a quando",
       lineCount: "Contatore di linea",
       createdAt: "Creato a",
-      updatedAt: "Aggiornato At"
+      updatedAt: "Aggiornato At",
     },
     errors: {
       unauthorized: {
         title: "Autenticazione richiesta",
-        description: "Accedi per continuare"
+        description: "Accedi per continuare",
       },
       validation: {
         title: "Errore di convalida",
-        description: "Parametri non validi"
+        description: "Parametri non validi",
       },
       server: {
         title: "Errore del server",
-        description: "Errore del server interno"
+        description: "Errore del server interno",
       },
       unknown: {
         title: "Errore sconosciuto",
-        description: "Si è verificato un errore sconosciuto"
+        description: "Si è verificato un errore sconosciuto",
       },
       network: {
         title: "Errore di rete",
-        description: "Si è verificato un errore di rete"
+        description: "Si è verificato un errore di rete",
       },
-      forbidden: {
-        title: "Accesso negato",
-        description: "Accesso negato"
-      },
-      notFound: {
-        title: "Non trovato",
-        description: "Società non trovata"
-      },
+      forbidden: { title: "Accesso negato", description: "Accesso negato" },
+      notFound: { title: "Non trovato", description: "Società non trovata" },
       conflict: {
         title: "Conflitto",
-        description: "Si è verificato un conflitto"
+        description: "Si è verificato un conflitto",
       },
       unsavedChanges: {
         title: "Modifiche non salvate",
-        description: "Ci sono cambiamenti non rilevati"
-      }
+        description: "Ci sono cambiamenti non rilevati",
+      },
     },
     success: {
       title: "Operazione riuscita",
-      description: "Stime recuperate"
-    }
+      description: "Stime recuperate",
+    },
   },
   enums: {
     estimateStatus: {
@@ -79,33 +74,40 @@ export const translations: typeof enTranslations = {
       ACCEPTED: "Accettato",
       DECLINED: "Declinato",
       EXPIRED: "Scadenza",
-      CONVERTED: "Convertito"
-    }
+      CONVERTED: "Convertito",
+    },
   },
   companyId: {
     label: "Società ID",
     description: "Filtra per azienda",
-    placeholder: "Entra in azienda ID"
+    placeholder: "Entra in azienda ID",
+  },
+  search: {
+    label: "Documenti di ricerca",
+    description:
+      "Stime di ricerca per riferimento, cliente, e-mail, titolo o stima ID, e filtro per società o stato.",
+    placeholder: "Numero di stima, cliente o titolo",
   },
   status: {
     label: "Stato",
     description: "Filtra per stato",
-    placeholder: "Tutti gli stati"
+    placeholder: "Tutti gli stati",
   },
   customerId: {
     label: "Cliente ID",
     description: "Filtra dal cliente",
-    placeholder: "Inserisci il cliente ID"
+    placeholder: "Inserisci il cliente ID",
   },
   page: {
     label: "Pagina",
-    description: "Numero di pagina"
+    description: "Numero di pagina",
   },
   pageSize: {
     label: "Dimensione della pagina",
-    description: "Elementi per pagina"
+    description: "Elementi per pagina",
   },
   widget: {
+    pageCount: "Totale pagine",
     back: "Indietro",
     title: "Stime di vendita",
     newEstimate: "Nuova stima",
@@ -115,7 +117,7 @@ export const translations: typeof enTranslations = {
     empty: {
       title: "Non ci sono ancora stime.",
       hint: "Crea il tuo primo preventivo per iniziare.",
-      cta: "Nuova stima"
+      cta: "Nuova stima",
     },
     valid: "Valido",
     lines: "linee",
@@ -127,7 +129,7 @@ export const translations: typeof enTranslations = {
       accepted: "Accettato",
       declined: "Declinato",
       expired: "Scadenza",
-      converted: "Convertito"
-    }
-  }
+      converted: "Convertito",
+    },
+  },
 };

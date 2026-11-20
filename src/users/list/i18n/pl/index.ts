@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
       "Każde konto: ile zapłaciło, ile wydaje i kiedy było ostatnio aktywne. Szukaj, filtruj po przychodzie, aktywności, dacie rejestracji lub źródle, sortuj po każdej kolumnie z pieniędzmi.",
     fields: {
       search: {
-        label: "Szukaj",
+        label: "Szukaj kont",
         description: "E-mail, imię lub początek ID użytkownika",
         placeholder: "Szukaj e-maila, imienia lub ID...",
       },
@@ -193,6 +193,10 @@ export const translations: typeof enTranslations = {
     never: "Nigdy",
     referredBy: "przez {{email}}",
     actions: {
+      open: "Otwórz",
+      select: "Wybierz",
+      openUser: "Otwórz konto {{email}}",
+      selectUser: "Wybierz {{email}}",
       stats: "Statystyki",
       refresh: "Odśwież",
       newUser: "Nowy użytkownik",
@@ -226,6 +230,9 @@ export const translations: typeof enTranslations = {
       source: "Źródło",
       id: "ID",
     },
+    compact: {
+      credits: "Kredyty: {{count}}",
+    },
     flags: {
       admin: "admin",
       banned: "Zablokowany",
@@ -237,6 +244,8 @@ export const translations: typeof enTranslations = {
       filteredHint: "Poluzuj filtr albo wyczyść wszystkie.",
     },
     pagination: {
+      previous: "Poprzednia strona",
+      next: "Następna strona",
       showing: "{{start}}-{{end}} z {{total}}",
     },
     text: {

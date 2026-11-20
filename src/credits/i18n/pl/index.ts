@@ -372,6 +372,16 @@ export const translations: typeof enTranslations = {
   },
   history: {
     get: {
+      bonusGrant: "Przyznanie kredytów bonusowych",
+      relatedRecords: "Powiązane dane",
+      account: "Konto klienta",
+      lead: "Lead",
+      openAccount: "Otwórz konto klienta",
+      openLead: "Otwórz lead",
+      openPayouts: "Zobacz wypłaty partnera",
+      loading: "Wczytywanie historii kredytów…",
+      delta: "{{amount}} kred.",
+      entryBalance: "Saldo po operacji: {{count}} kred.",
       emptyHint: "Każdy kredyt na plus i na minus trafi tutaj.",
       title: "Pobierz historię kredytów",
       titleShort: "Historia",
@@ -482,25 +492,39 @@ export const translations: typeof enTranslations = {
     },
   },
   adminAdd: {
+    recipient: {
+      title: "Sprawdź odbiorcę",
+      description: "Sprawdź, czy konto może otrzymać kredyty bonusowe.",
+      accountId: "Identyfikator konta",
+      email: "Adres e-mail odbiorcy",
+      noLinkedDevice: "Z tym kontem nie powiązano żadnego urządzenia.",
+      loadFailed: "Nie udało się sprawdzić odbiorcy.",
+      loading: "Sprawdzanie odbiorcy…",
+      retry: "Spróbuj ponownie",
+      openAccount: "Otwórz konto klienta",
+      change: "Wybierz innego odbiorcę",
+      verify: "Sprawdź",
+    },
     post: {
       title: "Dodaj kredyty",
       titleShort: "Dodaj kredyty",
       description: "Dodaj pakiety kredytów do konta użytkownika (tylko admin)",
       tag: "admin",
       container: {
-        title: "Dodaj kredyty użytkownikowi",
-        description: "Przyznaj bonusowe kredyty konkretnemu kontu użytkownika",
-        selfTitle: "Dodaj kredyty do swojego konta",
-        selfDescription: "Przyznaj sobie bonusowe kredyty",
+        title: "Przyznaj kredyty bonusowe",
+        description:
+          "Wybierz odbiorcę i podaj dokładną liczbę kredytów do dopisania do portfela.",
+        selfTitle: "Przyznaj kredyty swojemu kontu",
+        selfDescription: "Dopisz kredyty bonusowe do własnego konta",
       },
       targetUserId: {
-        label: "ID użytkownika docelowego",
-        description: "Użytkownik, któremu zostaną dodane kredyty",
+        label: "Odbiorca",
+        description: "Wybierz klienta z listy kont.",
       },
       amount: {
-        label: "Kwota",
-        description: "Liczba kredytów do dodania",
-        placeholder: "Wprowadź kwotę kredytów...",
+        label: "Kwota w kredytach",
+        description: "Podaj liczbę całkowitą kredytów bonusowych.",
+        placeholder: "137",
       },
       packType: {
         label: "Typ pakietu",
@@ -515,8 +539,8 @@ export const translations: typeof enTranslations = {
         label: "Wstecz",
       },
       submitButton: {
-        label: "Dodaj kredyty",
-        loadingText: "Dodawanie...",
+        label: "Przyznaj kredyty bonusowe",
+        loadingText: "Przyznawanie kredytów…",
       },
       success: {
         title: "Kredyty dodane",

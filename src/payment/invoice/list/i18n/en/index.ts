@@ -5,9 +5,10 @@ export const translations = {
     invoice: "invoice",
   },
   get: {
-    title: "Invoices",
-    titleShort: "Invoices",
-    description: "List AR invoices for a company with optional filters",
+    title: "Customer Invoices",
+    titleShort: "Customer Invoices",
+    description:
+      "Search invoices by document number, invoice ID or customer ID, and filter by company or status.",
     form: {
       title: "Invoice Filters",
       description: "Filter the invoice list",
@@ -87,6 +88,12 @@ export const translations = {
     description: "Filter invoices for this company",
     placeholder: "Enter company ID",
   },
+  search: {
+    label: "Search documents",
+    description:
+      "Search invoices by document number, invoice ID or customer ID, and filter by company or status.",
+    placeholder: "Document number or ID",
+  },
   status: {
     label: "Status",
     description: "Filter by invoice status",
@@ -106,7 +113,8 @@ export const translations = {
     description: "Results per page",
   },
   widget: {
-    title: "Invoices",
+    pageCount: "Total pages",
+    title: "Customer Invoices",
     newInvoice: "New Invoice",
     loading: "Loading invoices...",
     noInvoices: "No invoices yet.",

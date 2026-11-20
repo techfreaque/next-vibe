@@ -1,11 +1,20 @@
 /**
  * Campaign Queue Repository
- * Queries leads currently active in email campaigns with pagination.
  */
 
 import "server-only";
 
-import { and, asc, count, eq, sql } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  exists,
+  isNull,
+  or,
+  sql,
+} from "drizzle-orm";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -18,10 +27,9 @@ import { emailCampaigns, leads } from "next-vibe/identity/lead/db";
 import { LeadStatus } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import {
-  CampaignTypeFilter,
-  mapCampaignTypeFilter,
-} from "../../../messenger/accounts/enum";
+import { mapCampaignTypeFilter } from "@/messenger/accounts/enum";
+import { MessageStatus } from "@/messenger/messages/enum";
+
 import type {
   CampaignQueueGetRequestOutput,
   CampaignQueueGetResponseOutput,
@@ -37,122 +45,112 @@ export class CampaignQueueRepository {
     try {
       const page = data.page ?? 1;
       const pageSize = data.limit ?? 20;
-      const offset = (page - 1) * pageSize;
+      const campaignType = mapCampaignTypeFilter(data.campaignType);
+      const matchesCampaign = and(
+        eq(emailCampaigns.leadId, leads.id),
+        campaignType
+          ? eq(emailCampaigns.campaignType, campaignType)
+          : undefined,
+      );
+      const isPending = and(
+        eq(emailCampaigns.status, MessageStatus.PENDING),
+        isNull(emailCampaigns.sentAt),
+      );
+      const matchingDelivery = db
+        .select({ id: emailCampaigns.id })
+        .from(emailCampaigns)
+        .where(matchesCampaign);
+      const pendingDelivery = db
+        .select({ id: emailCampaigns.id })
+        .from(emailCampaigns)
+        .where(and(matchesCampaign, isPending));
+      const filter = and(
+        data.leadId ? eq(leads.id, data.leadId) : undefined,
+        or(
+          exists(pendingDelivery),
+          and(
+            eq(leads.status, LeadStatus.CAMPAIGN_RUNNING),
+            campaignType ? exists(matchingDelivery) : undefined,
+          ),
+        ),
+      );
 
-      // Map campaign type filter to actual campaign type value
-      const campaignTypeValue =
-        data.campaignType && data.campaignType !== CampaignTypeFilter.ANY
-          ? mapCampaignTypeFilter(data.campaignType)
-          : null;
-
-      // Build the subquery for the next pending email per lead
-      const nextScheduledSubquery = db
+      // A single matching row per lead keeps paging and counts consistent.
+      const nextDelivery = db
         .select({
-          leadId: emailCampaigns.leadId,
-          nextScheduledAt: sql<
+          campaignType: emailCampaigns.campaignType,
+          stage: emailCampaigns.stage,
+          journeyVariant: emailCampaigns.journeyVariant,
+          nextScheduledAt:
+            sql<Date | null>`case when ${isPending} then ${emailCampaigns.scheduledAt} end`
+              .mapWith(emailCampaigns.scheduledAt)
+              .as("next_scheduled_at"),
+          nextSubject: sql<
             string | null
-          >`min(${emailCampaigns.scheduledAt})`.as("next_scheduled_at"),
+          >`case when ${isPending} then ${emailCampaigns.subject} end`.as(
+            "next_subject",
+          ),
         })
         .from(emailCampaigns)
-        .where(
-          sql`${emailCampaigns.status} = 'PENDING' and ${emailCampaigns.sentAt} is null`,
+        .where(matchesCampaign)
+        .orderBy(
+          sql`case when ${isPending} then ${emailCampaigns.scheduledAt} end asc nulls last`,
+          desc(emailCampaigns.createdAt),
+          asc(emailCampaigns.id),
         )
-        .groupBy(emailCampaigns.leadId)
-        .as("next_email");
+        .limit(1)
+        .as("next_delivery");
 
-      // Base filter: leads with CAMPAIGN_RUNNING status
-      const baseFilter = eq(leads.status, LeadStatus.CAMPAIGN_RUNNING);
-
-      // Campaign type condition for joining
-      const campaignTypeCondition = campaignTypeValue
-        ? eq(emailCampaigns.campaignType, campaignTypeValue)
-        : undefined;
-
-      // Count query
-      const countQuery = db
-        .selectDistinct({ total: count(leads.id) })
-        .from(leads)
-        .where(baseFilter);
-
-      if (campaignTypeValue) {
-        countQuery.innerJoin(
-          emailCampaigns,
-          and(eq(emailCampaigns.leadId, leads.id), campaignTypeCondition),
-        );
-      }
-
-      const [countRow] = await countQuery;
-      const total = countRow?.total ?? 0;
-
-      // Data query - join with subquery for next scheduled email
-      const dataQuery = db
-        .select({
-          leadId: leads.id,
-          leadEmail: leads.email,
-          businessName: leads.businessName,
-          currentStage: leads.currentCampaignStage,
-          journeyVariant: leads.emailJourneyVariant,
-          emailsSent: leads.emailsSent,
-          emailsOpened: leads.emailsOpened,
-          emailsClicked: leads.emailsClicked,
-          startedAt: leads.campaignStartedAt,
-          nextScheduledAt: nextScheduledSubquery.nextScheduledAt,
-          // Get campaign type from the most recent email campaign
-          campaignType: sql<string>`(
-            select ec.campaign_type
-            from email_campaigns ec
-            where ec.lead_id = ${leads.id}
-            order by ec.created_at desc
-            limit 1
-          )`,
-        })
-        .from(leads)
-        .leftJoin(
-          nextScheduledSubquery,
-          eq(nextScheduledSubquery.leadId, leads.id),
-        )
-        .where(baseFilter)
-        .orderBy(asc(leads.campaignStartedAt))
-        .limit(pageSize)
-        .offset(offset);
-
-      if (campaignTypeValue) {
-        dataQuery.innerJoin(
-          emailCampaigns,
-          and(eq(emailCampaigns.leadId, leads.id), campaignTypeCondition),
-        );
-      }
-
-      const rows = await dataQuery;
-
-      const items = rows.map((r) => ({
-        leadId: r.leadId,
-        leadEmail: r.leadEmail ?? null,
-        businessName: r.businessName,
-        campaignType: r.campaignType ?? "",
-        journeyVariant: r.journeyVariant ?? "",
-        currentStage: r.currentStage ?? "",
-        nextScheduledAt: r.nextScheduledAt
-          ? new Date(r.nextScheduledAt).toISOString()
-          : null,
-        emailsSent: r.emailsSent,
-        emailsOpened: r.emailsOpened,
-        emailsClicked: r.emailsClicked,
-        startedAt: r.startedAt ? new Date(r.startedAt) : new Date(),
-      }));
-
-      logger.debug("Campaign queue retrieved", {
-        total,
-        page,
-        pageSize,
-        itemCount: items.length,
-      });
+      const [[countRow], rows] = await Promise.all([
+        db.select({ total: count() }).from(leads).where(filter),
+        db
+          .select({
+            leadId: leads.id,
+            leadEmail: leads.email,
+            businessName: leads.businessName,
+            currentStage: leads.currentCampaignStage,
+            journeyVariant: leads.emailJourneyVariant,
+            emailsSent: leads.emailsSent,
+            emailsOpened: leads.emailsOpened,
+            emailsClicked: leads.emailsClicked,
+            startedAt: leads.campaignStartedAt,
+            deliveryType: nextDelivery.campaignType,
+            deliveryStage: nextDelivery.stage,
+            deliveryVariant: nextDelivery.journeyVariant,
+            nextScheduledAt: nextDelivery.nextScheduledAt,
+            nextSubject: nextDelivery.nextSubject,
+          })
+          .from(leads)
+          .leftJoinLateral(nextDelivery, sql`true`)
+          .where(filter)
+          .orderBy(
+            sql`${nextDelivery.nextScheduledAt} asc nulls last`,
+            asc(leads.campaignStartedAt),
+            asc(leads.id),
+          )
+          .limit(pageSize)
+          .offset((page - 1) * pageSize),
+      ]);
 
       return success({
-        totalCount: total,
+        totalCount: countRow?.total ?? 0,
         currentPage: page,
         pageSize,
-        items,
+        items: rows.map(
+          ({
+            deliveryType,
+            deliveryStage,
+            deliveryVariant,
+            nextScheduledAt,
+            ...lead
+          }) => ({
+            ...lead,
+            campaignType: deliveryType ?? "",
+            currentStage: deliveryStage ?? lead.currentStage ?? "",
+            journeyVariant: deliveryVariant ?? lead.journeyVariant ?? "",
+            nextScheduledAt: nextScheduledAt?.toISOString() ?? null,
+          }),
+        ),
       });
     } catch (error) {
       logger.error("campaign.queue.error", parseError(error));

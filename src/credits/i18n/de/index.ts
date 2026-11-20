@@ -377,6 +377,16 @@ export const translations: typeof enTranslations = {
   },
   history: {
     get: {
+      bonusGrant: "Bonusgutschrift",
+      relatedRecords: "Verknüpfte Datensätze",
+      account: "Kundenkonto",
+      lead: "Lead",
+      openAccount: "Kundenkonto öffnen",
+      openLead: "Lead öffnen",
+      openPayouts: "Partnerauszahlungen ansehen",
+      loading: "Credit-Verlauf wird geladen…",
+      delta: "{{amount}} Credits",
+      entryBalance: "Saldo nach Buchung: {{count}} Credits",
       emptyHint: "Jeder Credit, der rein- oder rausgeht, landet hier.",
       title: "Credit-Verlauf abrufen",
       titleShort: "Verlauf",
@@ -488,6 +498,19 @@ export const translations: typeof enTranslations = {
     },
   },
   adminAdd: {
+    recipient: {
+      title: "Empfänger prüfen",
+      description: "Prüfen, ob dieses Konto Bonus-Credits erhalten kann.",
+      accountId: "Konto-ID",
+      email: "E-Mail des Empfängers",
+      noLinkedDevice: "Mit diesem Konto ist kein Gerät verknüpft.",
+      loadFailed: "Empfänger konnte nicht geprüft werden.",
+      loading: "Empfänger wird geprüft…",
+      retry: "Erneut versuchen",
+      openAccount: "Kundenkonto öffnen",
+      change: "Anderen Empfänger auswählen",
+      verify: "Prüfen",
+    },
     post: {
       title: "Guthaben hinzufügen",
       titleShort: "Guthaben hinzufügen",
@@ -495,20 +518,20 @@ export const translations: typeof enTranslations = {
         "Guthabenpakete zu einem Benutzerkonto hinzufügen (nur Admin)",
       tag: "admin",
       container: {
-        title: "Guthaben zum Benutzer hinzufügen",
+        title: "Bonus-Credits gutschreiben",
         description:
-          "Bonusguthaben einem bestimmten Benutzerkonto gutschreiben",
-        selfTitle: "Guthaben zum eigenen Konto hinzufügen",
-        selfDescription: "Sich selbst Bonusguthaben gutschreiben",
+          "Empfänger auswählen und den genauen Betrag für sein Guthaben eingeben.",
+        selfTitle: "Eigene Bonus-Credits gutschreiben",
+        selfDescription: "Bonus-Credits auf das eigene Konto gutschreiben",
       },
       targetUserId: {
-        label: "Zielbenutzer-ID",
-        description: "Der Benutzer, dem Guthaben hinzugefügt werden soll",
+        label: "Empfänger",
+        description: "Kundenkonto im Verzeichnis auswählen.",
       },
       amount: {
-        label: "Betrag",
-        description: "Anzahl der hinzuzufügenden Guthabenpunkte",
-        placeholder: "Guthabenbetrag eingeben...",
+        label: "Betrag in Credits",
+        description: "Bonus-Credits als ganze Zahl eingeben.",
+        placeholder: "137",
       },
       packType: {
         label: "Pakettyp",
@@ -523,8 +546,8 @@ export const translations: typeof enTranslations = {
         label: "Zurück",
       },
       submitButton: {
-        label: "Guthaben hinzufügen",
-        loadingText: "Wird hinzugefügt...",
+        label: "Bonus-Credits gutschreiben",
+        loadingText: "Credits werden gutgeschrieben…",
       },
       success: {
         title: "Guthaben hinzugefügt",

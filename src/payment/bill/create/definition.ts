@@ -40,6 +40,16 @@ const { POST } = createEndpoint({
   tags: ["tags.payment" as const, "tags.bill" as const, "tags.ap" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { refreshBillDocuments } =
+          await import("@/finance/document-cache");
+        await refreshBillDocuments(data.logger);
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: BillCreateWidgetLazy,
     usage: { request: "data", response: true },

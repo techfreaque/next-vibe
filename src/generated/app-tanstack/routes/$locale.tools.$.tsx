@@ -10,7 +10,12 @@ import { TanstackPage as Page } from "@/_pages/tools/[...toolPath]/page";
 import { runPageLoader, toNextParams } from "../nextjs-compat-wrapper";
 
 const loadData = createServerFn({ method: "GET" })
-  .validator((data: Record<string, string>) => data)
+  .validator(
+    (data: {
+      params: Record<string, string>;
+      search: Record<string, string>;
+    }) => data,
+  )
   .handler(async ({ data }) =>
     runPageLoader(async () => {
       const page = await import("@/_pages/tools/[...toolPath]/page");
@@ -18,16 +23,17 @@ const loadData = createServerFn({ method: "GET" })
       const [pageData, head] = await Promise.all([
         page.tanstackLoader({
           params: Promise.resolve({
-            ...toNextParams(data),
-            toolPath: (data["_splat"] ?? "").split("/").filter(Boolean),
+            ...toNextParams(data.params),
+            toolPath: (data.params["_splat"] ?? "").split("/").filter(Boolean),
           } as { locale: CountryLanguage; toolPath: string[] }),
+          searchParams: Promise.resolve(data.search),
         }),
         resolvePageHead([
           () =>
             layout0.generateMetadata({
               params: Promise.resolve({
-                ...toNextParams(data),
-                toolPath: (data["_splat"] ?? "").split("/").filter(Boolean),
+                ...toNextParams(data.params),
+                toolPath: (data.params["_splat"] ?? "").split("/").filter(Boolean),
               } as { locale: CountryLanguage; toolPath: string[] }),
             }),
         ]),
@@ -42,7 +48,10 @@ function PageComponent(): JSX.Element {
 
 export const Route = createFileRoute("/$locale/tools/$")({
   staleTime: 0,
-  loader: ({ params }) => loadData({ data: params as Record<string, string> }),
+  validateSearch: (search: Record<string, string>) => search,
+  loaderDeps: ({ search }) => ({ search }),
+  loader: ({ params, deps: { search } }) =>
+    loadData({ data: { params: params as Record<string, string>, search } }),
   head: ({ loaderData }) => loaderData?.head ?? {},
   component: PageComponent,
 });

@@ -13,7 +13,10 @@ import {
   LanguagesArr,
   LanguagesOptions,
 } from "next-vibe/core/i18n/core/config";
-import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
+import {
+  formatDate,
+  formatSimpleDate,
+} from "next-vibe/core/i18n/core/localization-utils";
 import {
   DeviceType,
   EmailCampaignStage,
@@ -43,7 +46,6 @@ import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { CreditCard } from "next-vibe/ui/components/icons/CreditCard";
 import { ExternalLink as ExternalLinkIcon } from "next-vibe/ui/components/icons/ExternalLink";
 import { Globe } from "next-vibe/ui/components/icons/Globe";
-import { Hash } from "next-vibe/ui/components/icons/Hash";
 import { Info } from "next-vibe/ui/components/icons/Info";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
@@ -58,6 +60,7 @@ import { User } from "next-vibe/ui/components/icons/User";
 import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
 import { ExternalLink } from "next-vibe/ui/components/link";
+import { ListItem } from "next-vibe/ui/components/list-item";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { MetricCard } from "next-vibe/ui/components/metric-card";
 import { MetricGrid } from "next-vibe/ui/components/metric-grid";
@@ -88,6 +91,11 @@ import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
+  RelatedEntitiesPanel,
+  type RelatedEntityItem,
+  useRelatedEntityNavigation,
+} from "next-vibe/unified-ui/_shared/related-entities";
+import {
   useWidgetContext,
   useWidgetEndpointMutations,
   useWidgetForm,
@@ -104,12 +112,11 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { configScopedTranslation } from "@/env/i18n";
 import leadsListDefinitions from "@/leads/list/definition";
 import leadsSearchDefinitions from "@/leads/search/definition";
+import { scopedTranslation as newsletterI18n } from "@/newsletter/i18n";
 
 import type { LeadGetResponseOutput } from "./definition";
-import {
-  default as definition,
-  default as userDefinitions,
-} from "./definition";
+import definition from "./definition";
+import { LeadLinkEvidence } from "./enum";
 
 // ─── Enum type helpers ────────────────────────────────────────────────────────
 
@@ -813,25 +820,424 @@ function DetailsTab({
 
 // ─── Identity tab content ──────────────────────────────────────────────────────
 
+type LeadReview = LeadGetResponseOutput["review"];
+type DetailT = ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+
+function JourneyOverview({
+  lead,
+  review,
+  locale,
+  t,
+  leadsT,
+}: {
+  lead: LeadGetResponseOutput["lead"];
+  review: LeadReview;
+  locale: CountryLanguage;
+  t: DetailT;
+  leadsT: LeadsT;
+}): React.JSX.Element {
+  const navigate = useRelatedEntityNavigation();
+  const leadId = lead.basicInfo.id;
+  const nextEmail = review?.nextEmailAt;
+  const showQueue =
+    nextEmail || lead.basicInfo.status === LeadStatus.CAMPAIGN_RUNNING;
+
+  return (
+    <Div className="flex min-w-0 flex-col gap-4">
+      {showQueue && (
+        <RelatedEntitiesPanel
+          title={t("journey.campaign")}
+          emptyTitle={t("journey.noQueue")}
+          items={[
+            {
+              id: leadId,
+              title: nextEmail
+                ? t("journey.emailScheduled")
+                : t("journey.campaignRunning"),
+              subtitle: nextEmail
+                ? formatDate(new Date(nextEmail), locale, "PPp")
+                : review
+                  ? t("journey.noQueue")
+                  : undefined,
+              action: {
+                label: t("journey.openQueue"),
+                onClick: () =>
+                  navigate(
+                    async () =>
+                      (await import("@/leads/campaigns/queue/definition"))
+                        .default.GET,
+                    { data: { leadId, page: 1 } },
+                  ),
+              },
+            },
+          ]}
+        />
+      )}
+      <SectionGroup title={t("journey.title")} subtitle={t("journey.subtitle")}>
+        {review ? (
+          <Div className="flex min-w-0 flex-col gap-2">
+            {review.events.map((event) => (
+              <ListItem
+                key={event.id}
+                title={
+                  event.engagementType
+                    ? leadsT(event.engagementType)
+                    : t(event.kind)
+                }
+                subtitle={formatDate(new Date(event.date), locale, "PPp")}
+                meta={
+                  event.detail && (
+                    <Span className="break-all">{event.detail}</Span>
+                  )
+                }
+              />
+            ))}
+          </Div>
+        ) : (
+          <EmptyBlock title={t("journey.unavailable")} className="py-3" />
+        )}
+      </SectionGroup>
+    </Div>
+  );
+}
+
 function LinkedIdentitiesTab({
   data,
+  review,
   locale,
   t,
   leadsT,
   onViewUserProfile,
-  onViewLinkedLead,
 }: {
-  data: NonNullable<LeadGetResponseOutput["lead"]>;
-  locale: ReturnType<typeof useWidgetLocale>;
-  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  data: LeadGetResponseOutput["lead"];
+  review: LeadReview;
+  locale: CountryLanguage;
+  t: DetailT;
   leadsT: LeadsT;
   onViewUserProfile: (id: string) => void;
-  onViewLinkedLead: (id: string) => void;
 }): React.JSX.Element {
-  const { identity, lifecycle, linkedLeads, linkedUsers } = data;
+  const {
+    identity,
+    lifecycle,
+    linkedLeads,
+    linkedUsers,
+    conversion,
+    basicInfo,
+  } = data;
+  const navigate = useRelatedEntityNavigation();
+  const newsletterT = newsletterI18n.scopedT(locale).t;
+  const localDate = (date: Date): string =>
+    formatDate(new Date(date), locale, "PPp");
+  const evidenceLabel = (reason: string): string => {
+    const evidence = Object.entries(LeadLinkEvidence).find(
+      ([key]) => key === reason,
+    );
+    return evidence ? t(evidence[1]) : reason;
+  };
+  const legacyAccounts: RelatedEntityItem[] = linkedUsers.map((link) => ({
+    id: link.userId,
+    title: link.publicName || link.email,
+    subtitle: link.email,
+    meta: [evidenceLabel(link.linkReason), localDate(link.linkedAt)].join(
+      " · ",
+    ),
+    action: {
+      label: t("journey.openAccount"),
+      onClick: () => onViewUserProfile(link.userId),
+    },
+  }));
+  if (
+    conversion.convertedUserId &&
+    !legacyAccounts.some(({ id }) => id === conversion.convertedUserId)
+  ) {
+    const userId = conversion.convertedUserId;
+    legacyAccounts.push({
+      id: userId,
+      title: userId,
+      subtitle: t("journey.recordedConversion"),
+      meta: conversion.convertedAt
+        ? localDate(conversion.convertedAt)
+        : undefined,
+      action: {
+        label: t("journey.openAccount"),
+        onClick: () => onViewUserProfile(userId),
+      },
+    });
+  }
+  if (
+    review?.attributedUserId &&
+    !legacyAccounts.some(({ id }) => id === review.attributedUserId)
+  ) {
+    const userId = review.attributedUserId;
+    legacyAccounts.push({
+      id: userId,
+      title: userId,
+      subtitle: t("journey.attributedAccount"),
+      meta: t("journey.attributionOnly"),
+      action: {
+        label: t("journey.openAccount"),
+        onClick: () => onViewUserProfile(userId),
+      },
+    });
+  }
+
+  const linkedAccounts =
+    review?.accountAssociations?.map((record): RelatedEntityItem => {
+      const meta = (
+        <Div className="flex w-full min-w-0 flex-col gap-1 [overflow-wrap:anywhere]">
+          <Span>{t("journey.leadReference", { id: record.leadId })}</Span>
+          <Span>{t("journey.accountReference", { id: record.userId })}</Span>
+          <Span>
+            {[
+              record.reason
+                ? evidenceLabel(record.reason)
+                : t(record.association),
+              record.recordedAt ? localDate(record.recordedAt) : null,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </Span>
+        </Div>
+      );
+      return {
+        id: `${record.leadId}/${record.userId}/${record.association}`,
+        title: record.publicName || record.email || record.userId,
+        subtitle: record.email ?? undefined,
+        meta,
+        action: {
+          label: t("journey.openAccount"),
+          onClick: () => onViewUserProfile(record.userId),
+        },
+      };
+    }) ?? legacyAccounts;
+
+  const evidenceById = new Map(
+    review?.relatedLeadEvidence?.map((record) => [record.leadId, record]),
+  );
+  const touchSummary = (
+    date: Date,
+    channel: string,
+    source: string | null,
+    campaign: string | null,
+  ): string =>
+    [localDate(date), channel, source === channel ? null : source, campaign]
+      .filter(Boolean)
+      .join(" · ");
+
+  const relatedLeads = linkedLeads.map((link): RelatedEntityItem => {
+    const badge = (
+      <StatusPill
+        status={leadsT(link.status)}
+        variant={STATUS_VARIANT[link.status] ?? "default"}
+      />
+    );
+    const record = evidenceById.get(link.linkedLeadId);
+    const attribution = record?.attribution;
+    const linkEvidence = [
+      evidenceLabel(link.linkReason),
+      localDate(link.linkedAt),
+      link.ipAddress,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    const meta = (
+      <Div className="flex w-full min-w-0 flex-col gap-1 [overflow-wrap:anywhere]">
+        <Span>{linkEvidence}</Span>
+        <Span>{t("journey.leadReference", { id: link.linkedLeadId })}</Span>
+        {record ? (
+          <>
+            <Span>
+              {t("journey.leadSource", { source: leadsT(record.source) })}
+            </Span>
+            <Span>
+              {record.guestConsentAt
+                ? t("journey.guestConsentOn", {
+                    date: localDate(record.guestConsentAt),
+                  })
+                : t("journey.guestConsentMissing")}
+            </Span>
+            {record.guestConsentVersion !== null ? (
+              <Span>
+                {t("journey.consentVersion", {
+                  version: record.guestConsentVersion,
+                })}
+              </Span>
+            ) : record.guestConsentAt ? (
+              <Span>{t("journey.consentVersionMissing")}</Span>
+            ) : null}
+            {attribution ? (
+              <>
+                <Span>
+                  {t("journey.firstTouch", {
+                    touch: touchSummary(
+                      attribution.firstTouchAt,
+                      attribution.firstChannel,
+                      attribution.firstSource,
+                      attribution.firstCampaign,
+                    ),
+                  })}
+                </Span>
+                <Span>
+                  {t("journey.lastTouch", {
+                    touch: touchSummary(
+                      attribution.lastTouchAt,
+                      attribution.lastChannel,
+                      attribution.lastSource,
+                      attribution.lastCampaign,
+                    ),
+                  })}
+                </Span>
+              </>
+            ) : (
+              <Span>{t("journey.attributionMissing")}</Span>
+            )}
+          </>
+        ) : (
+          <Span>{t("journey.linkEvidenceUnavailable")}</Span>
+        )}
+      </Div>
+    );
+    return {
+      id: link.linkedLeadId,
+      title: link.businessName || link.email || link.linkedLeadId,
+      subtitle: link.email ?? undefined,
+      badges: badge,
+      meta,
+      action: {
+        label: t("journey.openLead"),
+        onClick: () =>
+          navigate(async () => (await import("./definition")).default.GET, {
+            urlPathParams: { id: link.linkedLeadId },
+          }),
+      },
+    };
+  });
+  const wallets =
+    review?.wallets.map(({ id, leadId, userId }): RelatedEntityItem => {
+      const walletId = <Span className="break-all">{id}</Span>;
+      return {
+        id,
+        title:
+          leadId === basicInfo.id
+            ? t("journey.thisLeadWallet")
+            : userId
+              ? t("journey.accountWallet")
+              : t("journey.relatedLeadWallet"),
+        subtitle: userId
+          ? t("journey.accountReference", { id: userId })
+          : leadId
+            ? t("journey.leadReference", { id: leadId })
+            : undefined,
+        meta: walletId,
+      };
+    }) ?? [];
+  const subscriptions =
+    review?.newsletter.map((subscription): RelatedEntityItem => {
+      const badge = (
+        <StatusPill status={newsletterT(subscription.status)} variant="muted" />
+      );
+      const consent = t(
+        subscription.marketingConsent
+          ? "journey.consentRecorded"
+          : "journey.consentAbsent",
+      );
+      const confirmation = subscription.confirmedAt
+        ? t("journey.confirmedOn", {
+            date: localDate(subscription.confirmedAt),
+          })
+        : t("journey.confirmationMissing");
+      const optOut = subscription.unsubscribedDate
+        ? t("journey.optedOutOn", {
+            date: localDate(subscription.unsubscribedDate),
+          })
+        : t("journey.optOutDateMissing");
+      const owners = [
+        subscription.leadId
+          ? t("journey.leadReference", { id: subscription.leadId })
+          : undefined,
+        subscription.userId
+          ? t("journey.accountReference", { id: subscription.userId })
+          : undefined,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+      const meta = (
+        <Div className="flex w-full min-w-0 flex-col gap-1 [overflow-wrap:anywhere]">
+          {owners && <Span>{owners}</Span>}
+          <Span>{[consent, confirmation, optOut].join(" · ")}</Span>
+        </Div>
+      );
+      return {
+        id: subscription.id,
+        title: subscription.email,
+        badges: badge,
+        meta,
+      };
+    }) ?? [];
 
   return (
     <Div className="flex flex-col gap-4">
+      <RelatedEntitiesPanel
+        title={t("widget.linkedLeadsSection")}
+        emptyTitle={t("widget.linkedLeadsEmpty")}
+        subtitle={t("journey.attributionOnly")}
+        items={relatedLeads}
+      />
+      <RelatedEntitiesPanel
+        title={t("widget.linkedUsersSection")}
+        emptyTitle={t("widget.linkedUsersEmpty")}
+        items={linkedAccounts}
+      />
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="w-fit"
+        onClick={() =>
+          navigate(
+            async () =>
+              (await import("@/leads/attribution/definition")).default.POST,
+            {
+              data: { dryRun: true },
+            },
+          )
+        }
+      >
+        {t("journey.previewIpMatches")}
+      </Button>
+      {!review && (
+        <P className="text-sm text-muted-foreground">
+          {t("journey.reviewUnavailable")}
+        </P>
+      )}
+      {review && (
+        <>
+          <RelatedEntitiesPanel
+            title={t("journey.wallets")}
+            emptyTitle={t("journey.noWallets")}
+            items={wallets}
+          />
+          <RelatedEntitiesPanel
+            title={t("journey.newsletterConsent")}
+            emptyTitle={t("journey.noNewsletter")}
+            items={subscriptions}
+          />
+          <SectionGroup title={t("journey.guestConsent")}>
+            <P className="text-sm">
+              {review.guestConsentAt
+                ? localDate(review.guestConsentAt)
+                : t("journey.consentAbsent")}
+            </P>
+            {review.guestConsentVersion !== null && (
+              <P className="text-sm text-muted-foreground">
+                {t("journey.consentVersion", {
+                  version: review.guestConsentVersion,
+                })}
+              </P>
+            )}
+          </SectionGroup>
+        </>
+      )}
       {/* Device & Identity */}
       <SectionGroup title={t("widget.deviceIdentity")}>
         <DetailGrid columns={2}>
@@ -915,149 +1321,6 @@ function LinkedIdentitiesTab({
           </DetailGrid>
         </SectionGroup>
       )}
-
-      {/* Linked Leads */}
-      <SectionGroup
-        title={t("widget.linkedLeadsSection")}
-        subtitle={
-          linkedLeads.length > 0 ? (
-            <StatusPill status={String(linkedLeads.length)} variant="info" />
-          ) : undefined
-        }
-      >
-        {linkedLeads.length === 0 ? (
-          <P className="text-sm text-muted-foreground">
-            {t("widget.linkedLeadsEmpty")}
-          </P>
-        ) : (
-          <Div className="flex flex-col gap-3">
-            {linkedLeads.map((link) => (
-              <Div
-                key={link.linkedLeadId}
-                className="flex flex-col gap-1.5 p-3 rounded-lg border bg-muted/30"
-              >
-                <Div className="flex items-center justify-between gap-2">
-                  <Div className="flex items-center gap-2 min-w-0">
-                    <User className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                    <Strong className="text-sm font-medium truncate">
-                      {link.businessName ?? link.email ?? "—"}
-                    </Strong>
-                    {link.status && (
-                      <StatusPill
-                        status={leadsT(link.status)}
-                        variant={STATUS_VARIANT[link.status] ?? "default"}
-                      />
-                    )}
-                  </Div>
-                  <Div className="flex items-center gap-1 flex-shrink-0">
-                    <CopyButton
-                      text={link.linkedLeadId}
-                      label={t("widget.copyLinkedLeadId")}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onViewLinkedLead(link.linkedLeadId)}
-                      className="h-6 px-1.5 gap-1 text-muted-foreground hover:text-foreground"
-                    >
-                      <ExternalLinkIcon className="h-3 w-3" />
-                    </Button>
-                  </Div>
-                </Div>
-                {link.email && (
-                  <P className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Mail className="h-3 w-3 flex-shrink-0" />
-                    {link.email}
-                  </P>
-                )}
-                {link.ipAddress && (
-                  <P className="text-xs text-muted-foreground font-mono">
-                    {link.ipAddress}
-                  </P>
-                )}
-                <Div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-0.5">
-                  <Span>
-                    {t("widget.linkReason")}{" "}
-                    <Strong className="text-foreground">
-                      {link.linkReason}
-                    </Strong>
-                  </Span>
-                  <Span>
-                    {t("widget.linkedAt")}{" "}
-                    {formatSimpleDate(link.linkedAt, locale)}
-                  </Span>
-                </Div>
-              </Div>
-            ))}
-          </Div>
-        )}
-      </SectionGroup>
-
-      {/* Linked Users */}
-      <SectionGroup
-        title={t("widget.linkedUsersSection")}
-        subtitle={
-          linkedUsers.length > 0 ? (
-            <StatusPill status={String(linkedUsers.length)} variant="info" />
-          ) : undefined
-        }
-      >
-        {linkedUsers.length === 0 ? (
-          <P className="text-sm text-muted-foreground">
-            {t("widget.linkedUsersEmpty")}
-          </P>
-        ) : (
-          <Div className="flex flex-col gap-3">
-            {linkedUsers.map((link) => (
-              <Div
-                key={link.userId}
-                className="flex flex-col gap-1.5 p-3 rounded-lg border bg-muted/30"
-              >
-                <Div className="flex items-center justify-between gap-2">
-                  <Div className="flex items-center gap-2 min-w-0">
-                    <Hash className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                    <Strong className="text-sm font-medium truncate">
-                      {link.publicName ?? link.email}
-                    </Strong>
-                  </Div>
-                  <Div className="flex items-center gap-1 flex-shrink-0">
-                    <CopyButton
-                      text={link.userId}
-                      label={t("widget.copyUserId2")}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onViewUserProfile(link.userId)}
-                      className="h-6 px-1.5 gap-1 text-muted-foreground hover:text-foreground"
-                    >
-                      <ExternalLinkIcon className="h-3 w-3" />
-                    </Button>
-                  </Div>
-                </Div>
-                <P className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Mail className="h-3 w-3 flex-shrink-0" />
-                  {link.email}
-                </P>
-                <Div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-0.5">
-                  <Span>
-                    {t("widget.linkReason")}{" "}
-                    <Strong className="text-foreground">
-                      {link.linkReason}
-                    </Strong>
-                  </Span>
-                  <Span>
-                    {t("widget.linkedAt")}{" "}
-                    {formatSimpleDate(link.linkedAt, locale)}
-                  </Span>
-                </Div>
-              </Div>
-            ))}
-          </Div>
-        )}
-      </SectionGroup>
     </Div>
   );
 }
@@ -1067,12 +1330,14 @@ function LinkedIdentitiesTab({
 export function LeadDetailContainer(): React.JSX.Element {
   const locale = useWidgetLocale();
   const navigation = useWidgetNavigation();
+  const navigate = useRelatedEntityNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const leadsT = leadsScopedTranslation.scopedT(locale).t;
   const endpointMutations = useWidgetEndpointMutations();
   const [activeTab, setActiveTab] = useState("overview");
 
   const fieldValue = useWidgetValue<typeof definition.GET>();
+  const isLoading = endpointMutations?.read?.isLoading ?? false;
   const { response } = useWidgetContext();
   const data = fieldValue?.lead;
   const leadId = data?.basicInfo?.id;
@@ -1128,23 +1393,14 @@ export function LeadDetailContainer(): React.JSX.Element {
     });
   }, [navigation, leadId]);
 
-  const handleViewUserProfile = useCallback(
-    (convertedUserId: string): void => {
-      navigation.push(userDefinitions.GET, {
-        urlPathParams: { id: convertedUserId },
-      });
-    },
-    [navigation],
-  );
-
-  const handleViewLinkedLead = useCallback(
-    (linkedLeadId: string): void => {
-      navigation.push(definition.GET, {
-        urlPathParams: { id: linkedLeadId },
-      });
-    },
-    [navigation],
-  );
+  const handleViewUserProfile = (userId: string): void => {
+    navigate(
+      async () => (await import("@/users/view/definition")).default.GET,
+      {
+        data: { userId },
+      },
+    );
+  };
 
   const handleSendTestEmail = useCallback((): void => {
     void (async (): Promise<void> => {
@@ -1162,14 +1418,26 @@ export function LeadDetailContainer(): React.JSX.Element {
   }, [navigation]);
 
   if (!fieldValue) {
-    if (response === undefined) {
+    if (isLoading) {
       return (
         <WidgetShell>
           <LoadingBlock message={t("widget.loading")} />
         </WidgetShell>
       );
     }
-    // No id in URL — show picker so user can select a lead
+    if (
+      response?.success === false &&
+      navigation.current?.params?.urlPathParams?.id
+    ) {
+      return (
+        <WidgetShell>
+          <EmptyBlock
+            title={response.message}
+            action={{ label: t("widget.back"), onClick: handleBack }}
+          />
+        </WidgetShell>
+      );
+    }
     return (
       <WidgetShell>
         <Div className="flex items-center justify-center h-full py-16">
@@ -1214,10 +1482,19 @@ export function LeadDetailContainer(): React.JSX.Element {
   }
 
   const { basicInfo, conversion } = data;
+  const identityCount =
+    data.linkedLeads.length +
+    (fieldValue.review?.accountAssociations?.length ?? data.linkedUsers.length);
 
   const headerActions = (
     <Div className="flex items-center gap-1">
-      <Button variant="ghost" size="sm" onClick={handleEdit} className="gap-1">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleEdit}
+        aria-label={t("widget.edit")}
+        className="gap-1"
+      >
         <Pencil className="h-4 w-4" />
         <Span className="hidden @sm:inline">{t("widget.edit")}</Span>
       </Button>
@@ -1225,6 +1502,7 @@ export function LeadDetailContainer(): React.JSX.Element {
         variant="ghost"
         size="sm"
         onClick={handleDelete}
+        aria-label={t("widget.delete")}
         className="gap-1 text-destructive hover:text-destructive"
       >
         <Trash2 className="h-4 w-4" />
@@ -1274,15 +1552,22 @@ export function LeadDetailContainer(): React.JSX.Element {
             </TabsTrigger>
             <TabsTrigger value="identity" className="flex-1 relative">
               {t("widget.tabIdentity")}
-              {(data.linkedLeads.length > 0 || data.linkedUsers.length > 0) && (
-                <Span className="absolute -top-1 -right-1 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[10px] font-bold w-4 h-4">
-                  {data.linkedLeads.length + data.linkedUsers.length}
+              {identityCount > 0 && (
+                <Span className="absolute -top-1 -right-1 inline-flex items-center justify-center rounded-full bg-primary px-1 text-primary-foreground text-[10px] font-bold min-w-4 h-4">
+                  {identityCount}
                 </Span>
               )}
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="mt-4">
+          <TabsContent value="overview" className="mt-4 flex flex-col gap-4">
+            <JourneyOverview
+              lead={data}
+              review={fieldValue.review}
+              locale={locale}
+              t={t}
+              leadsT={leadsT}
+            />
             <OverviewTab
               data={data}
               locale={locale}
@@ -1303,11 +1588,11 @@ export function LeadDetailContainer(): React.JSX.Element {
           <TabsContent value="identity" className="mt-4">
             <LinkedIdentitiesTab
               data={data}
+              review={fieldValue.review}
               locale={locale}
               t={t}
               leadsT={leadsT}
               onViewUserProfile={handleViewUserProfile}
-              onViewLinkedLead={handleViewLinkedLead}
             />
           </TabsContent>
         </Tabs>

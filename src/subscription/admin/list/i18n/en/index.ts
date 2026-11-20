@@ -57,6 +57,9 @@ export const translations = {
       title: "Subscriptions",
       description: "Matching subscriptions",
       subscriptions: {
+        userId: "Customer ID",
+        paymentFailedAt: "First failed payment",
+        gracePeriodEndsAt: "Grace period ends",
         id: "ID",
         userEmail: "Email",
         userName: "Name",
@@ -115,6 +118,20 @@ export const translations = {
     success: { title: "Success", description: "Subscriptions retrieved" },
   },
   widget: {
+    pick: "Select subscription",
+    failedPayments: "Failed transactions",
+    renewal: "Scheduled renewal",
+    scheduledEnd: "Ends without renewal",
+    notRecorded: "Unrecorded",
+    customer: "Open customer",
+    paymentAttempts: "View payment attempts",
+    apply: "Apply filters",
+    previous: "Previous",
+    next: "Next",
+    pagination: "Page {{page}} of {{pages}} · {{total}} subscriptions",
+    loading: "Loading subscriptions",
+    customerScope: "Customer {{id}}",
+    clearScope: "Clear scope",
     noSubscriptions: "No subscriptions found.",
     noMatchingSubscriptions: "No subscriptions match your filters.",
     searchPlaceholder: "Search by email or name...",
@@ -123,6 +140,8 @@ export const translations = {
   },
   enums: {
     subscriptionStatusFilter: {
+      incomplete: "Incomplete",
+      incompleteExpired: "Incomplete expired",
       all: "All",
       active: "Active",
       trialing: "Trialing",
@@ -142,6 +161,7 @@ export const translations = {
       nowpayments: "NowPayments",
     },
     subscriptionSortField: {
+      periodEnd: "Period end",
       createdAt: "Created At",
       status: "Status",
       interval: "Interval",

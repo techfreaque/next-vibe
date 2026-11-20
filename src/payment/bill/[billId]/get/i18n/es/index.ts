@@ -1,60 +1,48 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tags: {
-    payment: "pago",
-    bill: "factura",
-    ap: "cuentas pagaderas"
-  },
+  tags: { payment: "pago", bill: "factura", ap: "cuentas pagaderas" },
   get: {
     title: "Detalles de la factura",
     titleShort: "Detalles de la factura",
-    description: "Obtenga una factura de proveedor con todos los artículos de línea",
-    billId: {
-      label: "Bill ID",
-      description: "La cuenta para recuperar"
-    },
+    description:
+      "Obtenga una factura de proveedor con todos los artículos de línea",
+    billId: { label: "Bill ID", description: "La cuenta para recuperar" },
     errors: {
       validation: {
         title: "Error de validación",
-        description: "factura inválida ID"
+        description: "factura inválida ID",
       },
       unauthorized: {
         title: "No se registró",
-        description: "Inicie sesión para ver las facturas"
+        description: "Inicie sesión para ver las facturas",
       },
       forbidden: {
         title: "Acceso denegado",
-        description: "No es miembro de esta empresa"
+        description: "No es miembro de esta empresa",
       },
-      conflict: {
-        title: "Conflicto",
-        description: "Conflicto de datos"
-      },
+      conflict: { title: "Conflicto", description: "Conflicto de datos" },
       server: {
         title: "Error del servidor",
-        description: "No podía cargar la cuenta"
+        description: "No podía cargar la cuenta",
       },
       unknown: {
         title: "Error desconocido",
-        description: "Ocurrió un error inesperado"
+        description: "Ocurrió un error inesperado",
       },
-      network: {
-        title: "Error de red",
-        description: "Comprueba tu conexión"
-      },
+      network: { title: "Error de red", description: "Comprueba tu conexión" },
       notFound: {
         title: "Bill no se encontró",
-        description: "Esta medida no existe"
+        description: "Esta medida no existe",
       },
       unsavedChanges: {
         title: "Cambios sin guardar",
-        description: "Tienes cambios sin guardar"
-      }
+        description: "Tienes cambios sin guardar",
+      },
     },
     success: {
       title: "Bill Cargado",
-      description: "Detalles de la factura recuperados"
+      description: "Detalles de la factura recuperados",
     },
     response: {
       id: "ID",
@@ -81,8 +69,8 @@ export const translations: typeof enTranslations = {
       unitPrice: "Precio unitario",
       taxRate: "Tasa de impuestos",
       lineTaxAmount: "Impuestos",
-      lineTotal: "Total"
-    }
+      lineTotal: "Total",
+    },
   },
   enums: {
     billStatus: {
@@ -90,10 +78,11 @@ export const translations: typeof enTranslations = {
       RECEIVED: "Recibidos",
       APPROVED: "Aprobados",
       PAID: "Pagado",
-      DISPUTED: "Controversias"
-    }
+      DISPUTED: "Controversias",
+    },
   },
   widget: {
+    markReceived: "Mark received",
     back: "Atrás",
     submit: "Mira a Bill.",
     billNumber: "Bill",
@@ -115,7 +104,8 @@ export const translations: typeof enTranslations = {
     addLine: "Añadir línea",
     viewJournalEntry: "View Journal Entry",
     approveConfirmTitle: "¿Aprobar este proyecto de ley?",
-    approveConfirmDescription: "Esto promoverá el estado de la factura. Una vez aprobado, se publicará una entrada de la revista. Esto no puede ser deshecho.",
+    approveConfirmDescription:
+      "Esto promoverá el estado de la factura. Una vez aprobado, se publicará una entrada de la revista. Esto no puede ser deshecho.",
     approveConfirmProceed: "Sí, aprobar",
     approveConfirmCancel: "Cancelar",
     status: {
@@ -123,7 +113,7 @@ export const translations: typeof enTranslations = {
       received: "Recibidos",
       approved: "Aprobados",
       paid: "Pagado",
-      disputed: "Controversias"
-    }
-  }
+      disputed: "Controversias",
+    },
+  },
 };

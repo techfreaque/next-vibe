@@ -103,9 +103,16 @@ describe("E2E: /tools tool browser", () => {
     "a paginated search URL fetches and renders exactly that page",
     async ({ gotoReady, page, capture }) => {
       const pageSize = 3;
-      // A filtered URL must fetch its own page — not reuse the default SSR list
+      await gotoReady(
+        `${TOOLS_PAGE}?sf=all&q=s&ps=${pageSize}&p=2`,
+        searchReady(page),
+      );
+      // The matching page may be seeded by SSR. A manual refresh must keep the same filters.
       const call = await capture(endpoint, async () => {
-        await gotoReady(`${TOOLS_PAGE}?sf=all&q=s&ps=${pageSize}&p=2`, searchReady(page));
+        await page
+          .getByRole("button", { name: t("catalog.searchAction") })
+          .first()
+          .click();
       });
       expect(call.response.success, JSON.stringify(call.response)).toBe(true);
       if (!call.response.success) return;
@@ -120,10 +127,9 @@ describe("E2E: /tools tool browser", () => {
       expect(call.response.data.matchedCount).toBeGreaterThan(pageSize * 2);
 
       await page
-        .getByText(
-          t("aiTools.modal.searchResultMany", { count: pageSize }),
-          { exact: true },
-        )
+        .getByText(t("aiTools.modal.searchResultMany", { count: pageSize }), {
+          exact: true,
+        })
         .waitFor({ state: "visible" });
       expect(await searchBox(page).inputValue()).toBe("s");
     },
@@ -133,10 +139,12 @@ describe("E2E: /tools tool browser", () => {
     "a visitor's default pinned view paginates server-side — no empty pages",
     async ({ gotoReady, page, capture }) => {
       const pageSize = 2;
-      // Regression: the server ignored "pinned" for visitors and paged the full
-      // list, then the client filtered that page down to nothing.
+      await gotoReady(`${TOOLS_PAGE}?q=s&ps=${pageSize}`, searchReady(page));
       const call = await capture(endpoint, async () => {
-        await gotoReady(`${TOOLS_PAGE}?q=s&ps=${pageSize}`, searchReady(page));
+        await page
+          .getByRole("button", { name: t("catalog.searchAction") })
+          .first()
+          .click();
       });
       expect(call.response.success, JSON.stringify(call.response)).toBe(true);
       if (!call.response.success) return;

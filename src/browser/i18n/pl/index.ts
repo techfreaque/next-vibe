@@ -2423,6 +2423,9 @@ export const translations: typeof enTranslations = {
   },
 
   shared: {
+    addItem: "Dodaj pozycję",
+    removeItem: "Usuń ostatnią pozycję",
+    back: "Wróć",
     instanceId: {
       label: "ID sesji",
       description:

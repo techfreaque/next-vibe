@@ -80,7 +80,7 @@ export class LeadSearchRepository {
     const searchResult = await LeadsRepository.listLeads(
       {
         statusFilters: {
-          search: data.search ?? undefined,
+          search: data.search?.trim() || undefined,
           status: statusFilterValue,
           currentCampaignStage: undefined,
           source: undefined,
@@ -113,8 +113,9 @@ export class LeadSearchRepository {
     // Type-safe access to success response data
     const responseData = searchResult.data.response;
 
-    // Calculate if there are more results
-    const hasMore = responseData.leads.length === limit;
+    const hasMore =
+      offset + responseData.leads.length <
+      searchResult.data.paginationInfo.totalCount;
 
     // Transform leads to match search definition schema
     const transformedLeads = responseData.leads.map((lead) => ({

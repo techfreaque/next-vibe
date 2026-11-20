@@ -1,21 +1,28 @@
 "use client";
 
 import { Methods } from "next-vibe/core/definition/enums";
+import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { Button } from "next-vibe/ui/components/button";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
 import { FolderOpen } from "next-vibe/ui/components/icons/FolderOpen";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetEndpoint,
   useWidgetForm,
+  useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
 import { PasswordFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/password-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
@@ -32,6 +39,57 @@ import type endpoints from "./definition";
 
 interface CustomWidgetProps {
   field: (typeof endpoints.PATCH)["fields"];
+}
+
+export function ConnectionReadWidget({
+  field: { children },
+}: {
+  field: typeof endpoints.GET.fields;
+}): JSX.Element {
+  const data = useWidgetValue<typeof endpoints.GET>();
+  const t = useWidgetTranslation<typeof endpoints.GET>();
+  const locale = useWidgetLocale();
+  const interactive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  return (
+    <WidgetShell>
+      <WidgetHeader title={data?.label ?? t("get.title")} />
+      {!data && interactive && !responseOnly && (
+        <>
+          <EntityPickerFieldWidget fieldName="id" field={children.id} />
+          <SubmitButtonWidget<typeof endpoints.GET>
+            field={{ text: "get.titleShort" }}
+          />
+        </>
+      )}
+      <FormAlertWidget field={{}} />
+      {data && (
+        <DetailGrid>
+          <DetailField label={t("get.response.host.title")} value={data.host} />
+          <DetailField label={t("get.response.port.title")} value={data.port} />
+          <DetailField
+            label={t("get.response.username.title")}
+            value={data.username}
+          />
+          <DetailField
+            label={t("get.response.authType.title")}
+            value={t(data.authType)}
+          />
+          {data.fingerprint && (
+            <DetailField
+              label={t("get.response.fingerprint.title")}
+              value={data.fingerprint}
+              mono
+            />
+          )}
+          <DetailField
+            label={t("get.response.createdAt.title")}
+            value={formatSimpleDate(data.createdAt, locale)}
+          />
+        </DetailGrid>
+      )}
+    </WidgetShell>
+  );
 }
 
 export function ConnectionDetailContainer({

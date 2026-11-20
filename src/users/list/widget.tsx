@@ -38,8 +38,14 @@ import {
 } from "next-vibe/ui/components/table";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { useSilentHistory } from "next-vibe/ui/hooks/use-navigation";
+import {
+  getCurrentPathname,
+  getCurrentSearch,
+} from "next-vibe/ui/lib/location";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -59,7 +65,7 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import type React from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useId, useState } from "react";
 
 import {
   cell,
@@ -71,6 +77,7 @@ import {
   subscriptionStatusLabel,
   subscriptionStatusVariant,
 } from "../format";
+import { USERS_LIST_ALIAS } from "./constants";
 import type definition from "./definition";
 import type { UserListResponseOutput, UserListRow } from "./definition";
 import {
@@ -190,7 +197,16 @@ function SortHeader({
 }): React.JSX.Element {
   const active = field === activeField;
   return (
-    <TableHead className={className}>
+    <TableHead
+      className={className}
+      aria-sort={
+        active
+          ? order === ListSortOrder.ASC
+            ? "ascending"
+            : "descending"
+          : "none"
+      }
+    >
       <Button
         type="button"
         variant="ghost"
@@ -223,13 +239,13 @@ function UserCell({
   locale: CountryLanguage;
 }): React.JSX.Element {
   return (
-    <Div className="flex items-center gap-3 min-w-0">
+    <Div className="flex items-start gap-3 min-w-0">
       <Div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
         {displayName(user).slice(0, 2).toUpperCase()}
       </Div>
       <Div className="min-w-0">
         <Div className="flex items-center gap-1.5 flex-wrap">
-          <Span className="font-medium text-sm truncate max-w-[220px]">
+          <Span className="font-medium text-sm break-all @3xl:truncate @3xl:max-w-[220px]">
             {displayName(user)}
           </Span>
           {user.roles
@@ -257,7 +273,7 @@ function UserCell({
             />
           )}
         </Div>
-        <Span className="block text-xs text-muted-foreground truncate max-w-[260px]">
+        <Span className="block text-xs text-muted-foreground break-all @3xl:truncate @3xl:max-w-[260px]">
           {user.email}
         </Span>
       </Div>
@@ -280,6 +296,7 @@ function QuickChip({
       variant="ghost"
       size="sm"
       onClick={onClick}
+      aria-pressed={active}
       className={cn(
         "h-7 px-2.5 rounded-full text-xs font-medium border transition-colors",
         active
@@ -346,10 +363,13 @@ export function UsersListContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
+  const searchId = useId();
   const locale = useWidgetLocale();
   const platform = useWidgetPlatform();
   const responseOnly = useWidgetResponseOnly();
   const { push: navigate } = useWidgetNavigation();
+  const history = useSilentHistory();
+  const openRelated = useRelatedEntityNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
@@ -438,26 +458,25 @@ export function UsersListContainer({
     [form, submit],
   );
 
-  const handleView = useCallback(
-    async (user: UserListRow): Promise<void> => {
-      const viewDefinitions = await import("../view/definition");
-      navigate(viewDefinitions.default.GET, {
-        data: { userId: user.id },
-      });
-    },
-    [navigate],
-  );
-
-  const handleRowClick = useCallback(
-    (user: UserListRow): void => {
-      if (onPick) {
-        onPick(user);
-        return;
-      }
-      void handleView(user);
-    },
-    [onPick, handleView],
-  );
+  const handleRowClick = (user: UserListRow): void => {
+    if (onPick) {
+      onPick(user);
+      return;
+    }
+    const pathname = getCurrentPathname();
+    if (pathname.endsWith(`/tools/${USERS_LIST_ALIAS}`)) {
+      // Browser Back reconstructs this entry from its URL.
+      const params = new URLSearchParams(getCurrentSearch());
+      params.delete("search");
+      params.delete("page");
+      params.set("arg.search", form.getValues("search") ?? "");
+      params.set("arg.page", String(form.getValues("page") ?? 1));
+      history.replaceState(`${pathname}?${params.toString()}`);
+    }
+    openRelated(() => import("../view/definition").then((m) => m.GET), {
+      data: { userId: user.id },
+    });
+  };
 
   const handleCreate = useCallback((): void => {
     void (async (): Promise<void> => {
@@ -491,8 +510,9 @@ export function UsersListContainer({
     totalCount === 0 ? 0 : (currentPage - 1) * (summary?.limit ?? 0) + 1;
   const rangeEnd = Math.min(currentPage * (summary?.limit ?? 0), totalCount);
 
+  const search = form.watch("search") ?? "";
   const hasActiveFilters = Boolean(
-    form.watch("search") ||
+    search ||
     (form.watch("roles") ?? []).length > 0 ||
     (form.watch("accountState") ?? []).length > 0 ||
     payer ||
@@ -507,7 +527,7 @@ export function UsersListContainer({
   );
 
   return (
-    <WidgetShell>
+    <WidgetShell className="min-w-0">
       <WidgetHeader
         title={
           summary
@@ -525,6 +545,7 @@ export function UsersListContainer({
                 variant="ghost"
                 size="sm"
                 onClick={handleViewStats}
+                aria-label={t("widget.actions.stats")}
                 className="gap-1"
               >
                 <BarChart3 className="h-4 w-4" />
@@ -538,6 +559,7 @@ export function UsersListContainer({
                 size="sm"
                 onClick={handleRefresh}
                 title={t("widget.actions.refresh")}
+                aria-label={t("widget.actions.refresh")}
               >
                 <RefreshCw className="h-4 w-4" />
               </Button>
@@ -555,6 +577,25 @@ export function UsersListContainer({
           ) : undefined
         }
       />
+
+      <Div className="flex flex-col gap-2">
+        <Label htmlFor={searchId}>{t("get.fields.search.label")}</Label>
+        <Input
+          id={searchId}
+          type="text"
+          value={search}
+          autoCapitalize="none"
+          autoComplete="off"
+          spellCheck={false}
+          maxLength={200}
+          aria-label={t("get.fields.search.label")}
+          placeholder={t("get.fields.search.placeholder")}
+          onChangeText={(value) => {
+            form.setValue("page", 1, { shouldDirty: true });
+            form.setValue("search", value, { shouldDirty: true });
+          }}
+        />
+      </Div>
 
       {/* KPI strip for the current filter */}
       {!isPickerMode && summary && (
@@ -591,9 +632,6 @@ export function UsersListContainer({
           />
         </MetricGrid>
       )}
-
-      {/* Search */}
-      <TextFieldWidget fieldName="search" field={children.search} />
 
       {/* Quick filters */}
       {!isPickerMode && (
@@ -642,6 +680,7 @@ export function UsersListContainer({
               size="sm"
               className="h-7 gap-1 text-xs"
               onClick={() => setShowFilters((v) => !v)}
+              aria-expanded={showFilters}
             >
               <Filter className="h-3.5 w-3.5" />
               {t("widget.actions.moreFilters")}
@@ -692,6 +731,8 @@ export function UsersListContainer({
             field={children.referralActivity}
           />
           <SelectFieldWidget fieldName="payer" field={children.payer} />
+          <SelectFieldWidget fieldName="sortBy" field={children.sortBy} />
+          <SelectFieldWidget fieldName="sortOrder" field={children.sortOrder} />
           <NumberFieldWidget fieldName="limit" field={children.limit} />
         </Div>
       )}
@@ -714,6 +755,14 @@ export function UsersListContainer({
           message={
             hasActiveFilters ? t("widget.empty.filteredHint") : undefined
           }
+          action={
+            hasActiveFilters
+              ? {
+                  label: t("widget.actions.clearFilters"),
+                  onClick: handleClearFilters,
+                }
+              : undefined
+          }
         />
       ) : (
         <Div className="rounded-lg border overflow-x-auto">
@@ -735,7 +784,7 @@ export function UsersListContainer({
                       activeField={sortBy}
                       order={sortOrder}
                       onSort={handleSort}
-                      className="whitespace-nowrap"
+                      className="hidden whitespace-nowrap @3xl:table-cell"
                     />
                     <SortHeader
                       label={t("widget.columns.lastActive")}
@@ -743,7 +792,7 @@ export function UsersListContainer({
                       activeField={sortBy}
                       order={sortOrder}
                       onSort={handleSort}
-                      className="whitespace-nowrap"
+                      className="hidden whitespace-nowrap @3xl:table-cell"
                     />
                     <SortHeader
                       label={t("widget.columns.credits")}
@@ -751,7 +800,7 @@ export function UsersListContainer({
                       activeField={sortBy}
                       order={sortOrder}
                       onSort={handleSort}
-                      className="text-right"
+                      className="hidden text-right @3xl:table-cell"
                     />
                     <SortHeader
                       label={t("widget.columns.spent")}
@@ -759,7 +808,7 @@ export function UsersListContainer({
                       activeField={sortBy}
                       order={sortOrder}
                       onSort={handleSort}
-                      className="text-right"
+                      className="hidden text-right @3xl:table-cell"
                     />
                     <SortHeader
                       label={t("widget.columns.paid")}
@@ -767,12 +816,12 @@ export function UsersListContainer({
                       activeField={sortBy}
                       order={sortOrder}
                       onSort={handleSort}
-                      className="text-right"
+                      className="hidden text-right @3xl:table-cell"
                     />
-                    <TableHead className="text-xs">
+                    <TableHead className="hidden text-xs @3xl:table-cell">
                       {t("widget.columns.subscription")}
                     </TableHead>
-                    <TableHead className="text-xs">
+                    <TableHead className="hidden text-xs @3xl:table-cell">
                       {t("widget.columns.source")}
                     </TableHead>
                   </>
@@ -786,15 +835,56 @@ export function UsersListContainer({
                   className="cursor-pointer hover:bg-accent/50"
                   onClick={() => handleRowClick(user)}
                 >
-                  <TableCell>
-                    <UserCell user={user} t={t} locale={locale} />
+                  <TableCell className="whitespace-normal">
+                    <Div className="flex flex-col items-start gap-2">
+                      <UserCell user={user} t={t} locale={locale} />
+                      {!isPickerMode && (
+                        <Div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground @3xl:hidden">
+                          <Span>
+                            {t("widget.compact.credits", {
+                              count: formatNumber(user.creditBalance, locale),
+                            })}
+                          </Span>
+                          {user.subscriptionStatus && (
+                            <Span>
+                              {subscriptionStatusLabel(
+                                user.subscriptionStatus,
+                                locale,
+                              )}
+                            </Span>
+                          )}
+                        </Div>
+                      )}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-auto min-h-9 whitespace-normal"
+                        aria-label={t(
+                          isPickerMode
+                            ? "widget.actions.selectUser"
+                            : "widget.actions.openUser",
+                          { email: user.email },
+                        )}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleRowClick(user);
+                        }}
+                      >
+                        {t(
+                          isPickerMode
+                            ? "widget.actions.select"
+                            : "widget.actions.open",
+                        )}
+                      </Button>
+                    </Div>
                   </TableCell>
                   {!isPickerMode && (
                     <>
-                      <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                      <TableCell className="hidden text-xs text-muted-foreground whitespace-nowrap @3xl:table-cell">
                         {formatDay(user.createdAt, locale)}
                       </TableCell>
-                      <TableCell className="text-xs whitespace-nowrap">
+                      <TableCell className="hidden text-xs whitespace-nowrap @3xl:table-cell">
                         {user.lastActiveAt ? (
                           formatRelative(user.lastActiveAt, locale)
                         ) : (
@@ -803,13 +893,13 @@ export function UsersListContainer({
                           </Span>
                         )}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums text-sm">
+                      <TableCell className="hidden text-right tabular-nums text-sm @3xl:table-cell">
                         {formatNumber(user.creditBalance, locale)}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums text-sm text-muted-foreground">
+                      <TableCell className="hidden text-right tabular-nums text-sm text-muted-foreground @3xl:table-cell">
                         {formatNumber(user.creditsSpent, locale)}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums text-sm">
+                      <TableCell className="hidden text-right tabular-nums text-sm @3xl:table-cell">
                         {user.totalPaidUsd > 0 ? (
                           <Span className="font-medium text-success">
                             {formatUsd(user.totalPaidUsd, locale)}
@@ -818,7 +908,7 @@ export function UsersListContainer({
                           <Span className="text-muted-foreground">-</Span>
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden @3xl:table-cell">
                         {user.subscriptionStatus ? (
                           <StatusPill
                             status={user.subscriptionStatus}
@@ -836,7 +926,7 @@ export function UsersListContainer({
                           </Span>
                         )}
                       </TableCell>
-                      <TableCell className="text-xs text-muted-foreground max-w-[180px] truncate">
+                      <TableCell className="hidden text-xs text-muted-foreground max-w-[180px] truncate @3xl:table-cell">
                         {user.referredByEmail
                           ? t("widget.referredBy", {
                               email: user.referredByEmail,
@@ -854,7 +944,7 @@ export function UsersListContainer({
 
       {/* Pagination */}
       {summary && totalCount > 0 && (
-        <Div className="flex items-center justify-between text-sm text-muted-foreground">
+        <Div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
           <Span>
             {t("widget.pagination.showing", {
               start: rangeStart,
@@ -869,6 +959,7 @@ export function UsersListContainer({
                 variant="ghost"
                 size="sm"
                 disabled={currentPage <= 1}
+                aria-label={t("widget.pagination.previous")}
                 onClick={() => handlePageChange(currentPage - 1)}
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -881,6 +972,7 @@ export function UsersListContainer({
                 variant="ghost"
                 size="sm"
                 disabled={currentPage >= totalPages}
+                aria-label={t("widget.pagination.next")}
                 onClick={() => handlePageChange(currentPage + 1)}
               >
                 <ChevronRight className="h-4 w-4" />

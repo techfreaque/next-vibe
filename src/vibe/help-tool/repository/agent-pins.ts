@@ -21,7 +21,6 @@ import "server-only";
 import type { EndpointMeta } from "../../core/definition/endpoints-meta";
 import { permissionsRegistry } from "../../core/permissions/registry";
 import type { JwtPayloadType } from "../../identity/auth/types";
-import { UserPermissionRole } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
 import { Platform } from "../../platforms/platforms";
 import type { HelpGetRequestOutput } from "../definition";
@@ -53,6 +52,7 @@ export async function resolveAgentPins(params: {
   /** All AI-platform tools for the effective user — computed by the caller so the
    * failure path can still report allAiToolIds. */
   aiMeta: EndpointMeta[];
+  webMeta: EndpointMeta[];
   effectiveUser: JwtPayloadType;
   user: JwtPayloadType;
   viewAsRole: HelpGetRequestOutput["viewAsRole"];
@@ -63,6 +63,7 @@ export async function resolveAgentPins(params: {
   const {
     allMeta,
     aiMeta,
+    webMeta,
     effectiveUser,
     user,
     viewAsRole,
@@ -169,7 +170,7 @@ export async function resolveAgentPins(params: {
 
     // AI counts
     const pinnedCount = aiMeta.filter((m) => inSet(m, aiPinnedIds)).length;
-    const webPinnedCount = aiMeta.filter((m) => inSet(m, webPinnedIds)).length;
+    const webPinnedCount = webMeta.filter((m) => inSet(m, webPinnedIds)).length;
     // allowed = all AI-platform tools (platform capability, not user/skill restriction)
     const allowedCount = aiMeta.length;
 
@@ -209,20 +210,17 @@ export async function resolveAgentPins(params: {
         : aiMeta;
 
     // Apply the active statsFilter to narrow the tool list returned to the client.
-    // Web admin: "all" = AI platform tools; "webPinned" = web-platform tools filtered to pinned.
     let filteredMeta: EndpointMeta[] | null = null;
     if (statsFilter === "pinned") {
       filteredMeta = aiMeta.filter((m) => inSet(m, aiPinnedIds));
     } else if (statsFilter === "webPinned") {
-      // Web sidebar pins: base set = web-platform tools (not AI), filtered to pinned IDs.
-      const webMeta = filterMetaForUser(
-        allMeta,
-        Platform.NEXT_PAGE,
-        effectiveUser,
-      );
       filteredMeta = webMeta.filter((m) => inSet(m, webPinnedIds));
-    } else if (statsFilter === "allowed" || statsFilter === "all") {
-      // "allowed" and "all" both show the full AI-platform tool set.
+    } else if (statsFilter === "web") {
+      filteredMeta = webMeta;
+    } else if (
+      statsFilter === "allowed" ||
+      (statsFilter === "all" && !isAdmin)
+    ) {
       filteredMeta = aiMeta;
     } else if (statsFilter === "cliAllowed" && isAdmin) {
       filteredMeta = getCliMeta();
@@ -278,29 +276,4 @@ export async function narrowPublicPins(
       : getDefaultWebPinnedIdsForUser(effectiveUser),
   );
   return meta.filter((m) => inSet(m, ids));
-}
-
-/**
- * The user whose eyes we list through: the caller, or the impersonated role.
- * Admin-only view-as-role, so an admin can see exactly what a lower role sees.
- * Also drives the pin defaults, so listing and pins agree on whose view this is.
- */
-export function resolveEffectiveUser(
-  user: JwtPayloadType,
-  viewAsRole: HelpGetRequestOutput["viewAsRole"],
-): JwtPayloadType {
-  const isPublicView =
-    viewAsRole === UserPermissionRole.PUBLIC || user.isPublic;
-  return isPublicView
-    ? {
-        leadId: user.leadId,
-        roles: [UserPermissionRole.PUBLIC] as const,
-        isPublic: true as const,
-      }
-    : {
-        id: user.isPublic ? "" : user.id,
-        leadId: user.leadId,
-        roles: viewAsRole ? [viewAsRole] : [...user.roles],
-        isPublic: false as const,
-      };
 }

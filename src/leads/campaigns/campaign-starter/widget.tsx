@@ -12,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe/ui/components/card";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
 import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { Clock } from "next-vibe/ui/components/icons/Clock";
@@ -21,6 +22,8 @@ import { Users } from "next-vibe/ui/components/icons/Users";
 import { Wrench } from "next-vibe/ui/components/icons/Wrench";
 import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
 import {
   Select,
   SelectContent,
@@ -29,6 +32,8 @@ import {
   SelectValue,
 } from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import React from "react";
 
 function getBrowserTimezone(): string {
@@ -88,6 +93,7 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -114,6 +120,78 @@ const DAY_LABEL_KEYS = [
   "widget.days.sat",
   "widget.days.sun",
 ] as const;
+
+export function CampaignStarterReadWidget(): React.JSX.Element {
+  const t = useWidgetTranslation<typeof definition.GET>();
+  const data = useWidgetValue<typeof definition.GET>();
+  const response = useWidgetResponse();
+  return (
+    <WidgetShell>
+      <WidgetHeader title={t("get.title")} />
+      <FormAlertWidget field={{}} />
+      {!data && !response && <LoadingBlock />}
+      {data && (
+        <>
+          <DetailGrid>
+            <DetailField
+              label={t("get.response.enabled")}
+              value={t(data.enabled ? "widget.on" : "widget.off")}
+            />
+            <DetailField
+              label={t("get.response.dryRun")}
+              value={t(data.dryRun ? "widget.on" : "widget.off")}
+            />
+            <DetailField
+              label={t("get.response.schedule")}
+              value={data.schedule}
+              mono
+            />
+            <DetailField
+              label={t("get.response.minAgeHours")}
+              value={data.minAgeHours}
+            />
+            <DetailField
+              label={t("get.response.priority")}
+              value={t(data.priority)}
+            />
+            <DetailField
+              label={t("get.response.timeout")}
+              value={`${data.timeout} ms`}
+            />
+            <DetailField
+              label={t("get.response.retries")}
+              value={data.retries}
+            />
+            <DetailField
+              label={t("get.response.retryDelay")}
+              value={`${data.retryDelay} ms`}
+            />
+          </DetailGrid>
+          {Object.entries(data.localeConfig).map(([locale, config]) => (
+            <SectionGroup title={locale} key={locale}>
+              <DetailGrid>
+                <DetailField
+                  label={t("get.response.leadsPerWeek")}
+                  value={config.leadsPerWeek}
+                />
+                <DetailField
+                  label={t("get.response.enabledDays")}
+                  value={DAY_LABEL_KEYS.flatMap((key, index) =>
+                    config.enabledDays.includes(index + 1) ? [t(key)] : [],
+                  ).join(", ")}
+                />
+                <DetailField
+                  label={t("get.response.enabledHours")}
+                  value={`${config.enabledHours.start}:00 – ${config.enabledHours.end}:00`}
+                />
+              </DetailGrid>
+            </SectionGroup>
+          ))}
+        </>
+      )}
+    </WidgetShell>
+  );
+}
 
 export function CampaignStarterConfigContainer({
   field,

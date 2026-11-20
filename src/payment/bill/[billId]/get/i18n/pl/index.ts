@@ -81,6 +81,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    markReceived: "Oznacz jako otrzymaną",
     back: "Wróć",
     submit: "Wyszukaj rachunek",
     billNumber: "Faktura",

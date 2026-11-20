@@ -5,11 +5,18 @@
 "use client";
 
 import { Button } from "next-vibe/ui/components/button";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetForm,
+  useWidgetIsInteractive,
+  useWidgetLocale,
+  useWidgetResponseOnly,
   useWidgetTranslation,
+  useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
 import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
@@ -29,6 +36,7 @@ import {
   MessageChannel,
   MessengerProviderOptions,
 } from "../../enum";
+import { scopedTranslation as accountTranslation } from "../../i18n";
 import type definition from "./definition";
 import type { MessengerAccountEditPUTResponseOutput } from "./definition";
 
@@ -36,6 +44,65 @@ interface CustomWidgetProps {
   field: {
     value: MessengerAccountEditPUTResponseOutput | null | undefined;
   } & (typeof definition.PUT)["fields"];
+}
+
+export function MessengerAccountReadWidget({
+  field: { children },
+}: {
+  field: typeof definition.GET.fields;
+}): React.JSX.Element {
+  const t = useWidgetTranslation<typeof definition.GET>();
+  const { t: label } = accountTranslation.scopedT(useWidgetLocale());
+  const data = useWidgetValue<typeof definition.GET>();
+  const interactive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  return (
+    <WidgetShell>
+      <WidgetHeader title={data?.name ?? t("get.title")} />
+      {!data && interactive && !responseOnly && (
+        <>
+          <TextFieldWidget field={children.id} fieldName="id" />
+          <SubmitButtonWidget<typeof definition.GET>
+            field={{ text: "get.titleShort" }}
+          />
+        </>
+      )}
+      <FormAlertWidget field={{}} />
+      {data && (
+        <>
+          {data.description && <Span>{data.description}</Span>}
+          <DetailGrid>
+            <DetailField
+              label={t("response.account.channel")}
+              value={label(data.channel)}
+            />
+            <DetailField
+              label={t("response.account.provider")}
+              value={label(data.provider)}
+            />
+            <DetailField
+              label={t("response.account.status")}
+              value={label(data.status)}
+            />
+            {data.healthStatus && (
+              <DetailField
+                label={t("response.account.healthStatus")}
+                value={label(data.healthStatus)}
+              />
+            )}
+            <DetailField
+              label={t("response.account.priority")}
+              value={data.priority}
+            />
+            <DetailField
+              label={t("response.account.messagesSentTotal")}
+              value={data.messagesSentTotal}
+            />
+          </DetailGrid>
+        </>
+      )}
+    </WidgetShell>
+  );
 }
 
 function SectionCard({

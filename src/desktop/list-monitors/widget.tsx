@@ -10,14 +10,14 @@ import { Span } from "next-vibe/ui/components/span";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetNavigation,
-  useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
-import { useEffect } from "react";
 
 import { DesktopNavHeader } from "../shared/nav-header";
+import { useDesktopRead } from "../shared/use-desktop-read";
 import type definition from "./definition";
 import type { DesktopListMonitorsResponseOutput } from "./definition";
 
@@ -112,15 +112,7 @@ export function ListMonitorsWidget(_props: CustomWidgetProps): JSX.Element {
   const t = useWidgetTranslation<typeof definition.POST>();
   const onPickRaw = usePickerCallback<{ id: string; name: string }>();
   const isPickerMode = !!onPickRaw;
-  const onSubmit = useWidgetOnSubmit();
-
-  useEffect((): void => {
-    if (!data && onSubmit) {
-      onSubmit();
-    }
-  }, [data, onSubmit]);
-
-  const isLoading = !data;
+  const { onSubmit, isLoading } = useDesktopRead();
 
   const title = data?.monitors
     ? t("widget.windowCount_other").replace(
@@ -156,23 +148,26 @@ export function ListMonitorsWidget(_props: CustomWidgetProps): JSX.Element {
       <DesktopNavHeader
         title={String(title)}
         right={
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-7 w-7 p-0"
-            onClick={(): void => {
-              onSubmit?.();
-            }}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <RefreshCw className="h-3.5 w-3.5" />
-            )}
-          </Button>
+          onSubmit && (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="h-7 w-7 p-0"
+              aria-label={t("widget.refresh")}
+              onClick={onSubmit}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <RefreshCw className="h-3.5 w-3.5" />
+              )}
+            </Button>
+          )
         }
       />
+      <FormAlertWidget field={{}} />
 
       {isLoading ? (
         <Div className="flex items-center justify-center py-16 gap-2 text-muted-foreground">
@@ -198,12 +193,12 @@ export function ListMonitorsWidget(_props: CustomWidgetProps): JSX.Element {
             ))}
           </Div>
         </Div>
-      ) : (
+      ) : data?.success ? (
         <Div className="flex flex-col items-center justify-center py-16 gap-2 text-muted-foreground">
           <Monitor className="h-8 w-8 opacity-30" />
           <Span className="text-sm">{t("widget.noWindows")}</Span>
         </Div>
-      )}
+      ) : null}
 
       {data?.error ? (
         <Div className="px-4 py-3 border-t">

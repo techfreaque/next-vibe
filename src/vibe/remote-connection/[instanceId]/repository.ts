@@ -59,8 +59,8 @@ export class RemoteConnectionInstanceRepository {
         ),
       );
 
-    if (!row || !row.isActive) {
-      logger.debug("No active remote connection for user+instance", {
+    if (!row) {
+      logger.debug("No remote connection for user+instance", {
         userId: user.id,
         instanceId,
       });
@@ -80,7 +80,7 @@ export class RemoteConnectionInstanceRepository {
     }
 
     return success({
-      isConnected: true,
+      isConnected: row.isActive,
       remoteUrl: row.remoteUrl,
       isActive: row.isActive,
       lastSyncedAt: row.lastSyncedAt?.toISOString() ?? null,
@@ -320,7 +320,10 @@ export class RemoteConnectionInstanceRepository {
       } catch (err) {
         logger.warn(
           "[PATCH] Failed to mirror settings to peer — picked up on reconnect",
-          { instanceId: targetInstanceId, error: String(err) },
+          {
+            instanceId: targetInstanceId,
+            error: String(err),
+          },
         );
       }
     }
@@ -499,7 +502,10 @@ export class RemoteConnectionInstanceRepository {
           if (status === 401 || status === 404) {
             logger.warn(
               "Remote disconnect rejected — remote record unusable anyway",
-              { instanceId, status },
+              {
+                instanceId,
+                status,
+              },
             );
             return;
           }

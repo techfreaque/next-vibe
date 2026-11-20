@@ -1,52 +1,116 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { formatDate } from "next-vibe/core/i18n/core/localization-utils";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { FilePlus } from "next-vibe/ui/components/icons/FilePlus";
-import { FolderX } from "next-vibe/ui/components/icons/FolderX";
-import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Span } from "next-vibe/ui/components/span";
-import { H3, P } from "next-vibe/ui/components/typography";
-import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  StatusPill,
+  type StatusPillVariant,
+} from "next-vibe/ui/components/status-pill";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
+import {
+  useWidgetForm,
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetOnSubmit,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import type { JSX } from "react";
 
-import { InvoiceStatus } from "@/payment/enum";
+import {
+  DocumentList,
+  DocumentScopePicker,
+  useDocumentListCopy,
+  useDocumentListHistory,
+} from "@/finance/document-list-ui";
 
+import { InvoiceStatus } from "../../enum";
 import type definition from "./definition";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function InvoiceListWidget(_props: {
+type Row = (typeof definition.GET.types.ResponseOutput)["invoices"][number];
+
+const statusVariants: Record<Row["status"], StatusPillVariant> = {
+  [InvoiceStatus.DRAFT]: "muted",
+  [InvoiceStatus.OPEN]: "info",
+  [InvoiceStatus.PAID]: "success",
+  [InvoiceStatus.VOID]: "muted",
+  [InvoiceStatus.UNCOLLECTIBLE]: "danger",
+};
+
+export function InvoiceListWidget({
+  field: { children },
+}: {
   field: (typeof definition.GET)["fields"];
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
-  const { push: navigate, pop, canGoBack } = useWidgetNavigation();
+  const form = useWidgetForm<typeof definition.GET>();
+  const onSubmit = useWidgetOnSubmit();
+  const { push } = useWidgetNavigation();
+  const openRelated = useRelatedEntityNavigation();
+  const rememberList = useDocumentListHistory("payment-invoice-list");
   const t = useWidgetTranslation<typeof definition.GET>();
+  const tDocument = useDocumentListCopy();
   const locale = useWidgetLocale();
-  const onPick =
-    usePickerCallback<
-      NonNullable<
-        (typeof definition.GET.types.ResponseOutput)["invoices"]
-      >[number]
-    >();
-  const isPickerMode = !!onPick;
+  const onPick = usePickerCallback<Row>();
+  const responseOnly = useWidgetResponseOnly();
+  const isInteractive = useWidgetIsInteractive() && !responseOnly;
+  const companyId = form.watch("companyId");
+  const customerId = form.watch("customerId");
+  const money = (amount: number, currency: string): string =>
+    new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+      currencyDisplay: "code",
+    }).format(amount);
 
-  const handleNewInvoice = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
+  const rememberFilters = (page: number): void => {
+    const values = form.getValues();
+    rememberList({
+      search: values.search,
+      status: values.status,
+      companyId: values.companyId,
+      customerId: values.customerId,
+      page,
+      pageSize: values.pageSize,
+    });
+  };
+
+  const setPage = (page: number): void => {
+    form.setValue("page", page, { shouldDirty: true });
+    rememberFilters(page);
+  };
+
+  const submitPage = (page: number): void => {
+    setPage(page);
+    onSubmit?.();
+  };
+
+  const clearFilters = (): void => {
+    form.reset({ page: 1, pageSize: data?.pageSizeApplied ?? 20 });
+    submitPage(1);
+  };
+
+  const createDocument = (): void => {
+    rememberFilters(data?.currentPage ?? 1);
     void (async (): Promise<void> => {
       const [createDef, getDef] = await Promise.all([
-        import("@/payment/invoice/create/definition"),
-        import("@/payment/invoice/[invoiceId]/get/definition"),
+        import("../create/definition"),
+        import("../[invoiceId]/get/definition"),
       ]);
-      navigate(createDef.default.POST, {
+      push(createDef.default.POST, {
         renderInModal: true,
+        data: data?.selectedCompanyId
+          ? { companyId: data.selectedCompanyId }
+          : undefined,
         replaceOnSuccess: {
           endpoint: getDef.default.GET,
           getUrlPathParams: (responseData) => ({
@@ -57,161 +121,133 @@ export function InvoiceListWidget(_props: {
     })();
   };
 
-  const handleView =
-    (invoiceId: string) =>
-    (e: ButtonMouseEvent): void => {
-      e.stopPropagation();
-      if (isPickerMode) {
-        const inv = (data?.invoices ?? []).find((i) => i.id === invoiceId);
-        if (inv && onPick) {
-          onPick(inv);
-          pop();
-        }
-        return;
-      }
-      void (async (): Promise<void> => {
-        const def =
-          await import("@/payment/invoice/[invoiceId]/get/definition");
-        navigate(def.default.GET, { urlPathParams: { invoiceId } });
-      })();
-    };
-
-  const invoices = data?.invoices;
+  const openDocument = (row: Row): void => {
+    if (onPick) {
+      onPick(row);
+      return;
+    }
+    rememberFilters(data?.currentPage ?? 1);
+    openRelated(
+      () =>
+        import("../[invoiceId]/get/definition").then(
+          (module) => module.default.GET,
+        ),
+      { urlPathParams: { invoiceId: row.id } },
+    );
+  };
 
   return (
-    <Div className="flex flex-col gap-4">
-      {canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("widget.back")}
-        </Button>
-      )}
-
-      <Div className="flex items-center justify-between">
-        <H3 className="text-base font-semibold">
-          {t("widget.title")}
-          {data && (
-            <Span className="ml-2 text-sm font-normal text-muted-foreground">
-              ({data.total})
-            </Span>
-          )}
-        </H3>
-        {!isPickerMode && (
+    <DocumentList
+      title={t("widget.title")}
+      backLabel={t("widget.back")}
+      loadingLabel={t("widget.loading")}
+      emptyTitle={t("widget.empty.title")}
+      emptyHint={onPick ? undefined : t("widget.empty.hint")}
+      filtered={data?.hasFilters ?? false}
+      filters={
+        isInteractive && onSubmit ? (
+          <>
+            <TextFieldWidget fieldName="search" field={children.search} />
+            <Div className="grid min-w-0 grid-cols-1 gap-3 @sm:grid-cols-2">
+              <SelectFieldWidget fieldName="status" field={children.status} />
+              <NumberFieldWidget
+                fieldName="pageSize"
+                field={children.pageSize}
+              />
+            </Div>
+            <Div className="flex min-w-0 flex-wrap items-center gap-2">
+              <DocumentScopePicker
+                kind="company"
+                value={companyId}
+                appliedLabel={
+                  data?.selectedCompanyId === companyId
+                    ? data?.selectedCompanyName
+                    : undefined
+                }
+                onSelect={(id) =>
+                  form.setValue("companyId", id, { shouldDirty: true })
+                }
+              />
+              <DocumentScopePicker
+                kind="customer"
+                value={customerId}
+                onSelect={(id) =>
+                  form.setValue("customerId", id, { shouldDirty: true })
+                }
+              />
+            </Div>
+          </>
+        ) : undefined
+      }
+      create={
+        isInteractive && !onPick ? (
           <Button
             type="button"
             size="sm"
-            onClick={handleNewInvoice}
-            className="gap-1.5"
+            onClick={createDocument}
+            className="gap-1.5 whitespace-normal"
           >
             <FilePlus className="h-4 w-4" />
             {t("widget.newInvoice")}
           </Button>
-        )}
-      </Div>
-
-      {!data && (
-        <Div className="flex items-center justify-center py-12 text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin mr-2" />
-          <Span className="text-sm">{t("widget.loading")}</Span>
-        </Div>
-      )}
-
-      {data && (!invoices || invoices.length === 0) && (
-        <Div className="py-14 text-center border border-dashed rounded-md flex flex-col items-center gap-4">
-          <FolderX className="h-8 w-8 text-muted-foreground" />
-          <Div className="flex flex-col gap-1">
-            <P className="text-sm font-medium">{t("widget.empty.title")}</P>
-            <P className="text-xs text-muted-foreground">
-              {t("widget.empty.hint")}
-            </P>
-          </Div>
-          {!isPickerMode && (
-            <Button type="button" size="sm" onClick={handleNewInvoice}>
-              {t("widget.empty.cta")}
-            </Button>
-          )}
-        </Div>
-      )}
-
-      {invoices && invoices.length > 0 && (
-        <Div className="flex flex-col divide-y divide-border rounded-lg border overflow-hidden">
-          {invoices.map((inv) => (
-            <Div
-              key={inv.id}
-              className="flex items-center justify-between px-4 py-3 bg-card hover:bg-muted/40 transition-colors cursor-pointer"
-              onClick={handleView(inv.id)}
-            >
-              <Div className="flex flex-col gap-0.5 min-w-0">
-                <Div className="flex items-center gap-2">
-                  <Span className="font-mono text-sm font-semibold">
-                    #{inv.invoiceSequenceNumber ?? "—"}
-                  </Span>
-                  {inv.isOverdue && (
-                    <Span className="text-xs font-medium text-destructive">
-                      {t("widget.overdue")}
-                    </Span>
-                  )}
-                </Div>
-                <Div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <Span className="font-medium text-foreground">
-                    {new Intl.NumberFormat(locale, {
-                      style: "currency",
-                      currency: inv.currency,
-                    }).format(parseFloat(inv.amount))}
-                  </Span>
-                  {inv.dueDate && (
-                    <Span>
-                      {t("widget.due")}{" "}
-                      {new Date(inv.dueDate).toLocaleDateString(locale)}
-                    </Span>
-                  )}
-                  <Span>
-                    {inv.lineCount}{" "}
-                    {inv.lineCount !== 1 ? t("widget.lines") : t("widget.line")}
-                  </Span>
-                </Div>
-              </Div>
-
-              <Div className="flex items-center gap-3 shrink-0">
-                <Badge
-                  variant={
-                    inv.status === InvoiceStatus.PAID
-                      ? "default"
-                      : inv.status === InvoiceStatus.OPEN
-                        ? "secondary"
-                        : inv.status === InvoiceStatus.UNCOLLECTIBLE
-                          ? "destructive"
-                          : "outline"
-                  }
-                  className={
-                    inv.status === InvoiceStatus.VOID
-                      ? "line-through text-muted-foreground"
-                      : inv.status === InvoiceStatus.OPEN && inv.isOverdue
-                        ? "border-destructive text-destructive"
-                        : ""
-                  }
-                >
-                  {inv.status === InvoiceStatus.DRAFT
-                    ? t("widget.status.draft")
-                    : inv.status === InvoiceStatus.OPEN
-                      ? t("widget.status.open")
-                      : inv.status === InvoiceStatus.PAID
-                        ? t("widget.status.paid")
-                        : inv.status === InvoiceStatus.VOID
-                          ? t("widget.status.void")
-                          : t("widget.status.uncollectible")}
-                </Badge>
-              </Div>
-            </Div>
-          ))}
-        </Div>
-      )}
-    </Div>
+        ) : undefined
+      }
+      items={(data?.invoices ?? []).map((row) => {
+        const reference =
+          row.invoiceNumber ??
+          (row.invoiceSequenceNumber === null
+            ? tDocument("documents.noReference")
+            : `INV-${row.invoiceSequenceNumber}`);
+        const badges = (
+          <StatusPill
+            status={t(row.status)}
+            variant={statusVariants[row.status]}
+          />
+        );
+        const meta = (
+          <>
+            <Span className="font-semibold">
+              {money(Number(row.amount), row.currency)}
+            </Span>
+            {row.dueDate && (
+              <Span>
+                {t("widget.due")} {formatDate(row.dueDate, locale, "PP")}
+              </Span>
+            )}
+            {row.isOverdue && (
+              <Span className="text-destructive">{t("widget.overdue")}</Span>
+            )}
+          </>
+        );
+        return {
+          id: row.id,
+          title: reference,
+          subtitle: row.companyName ?? undefined,
+          badges,
+          meta,
+          action: isInteractive
+            ? {
+                label: tDocument(
+                  onPick ? "documents.select" : "documents.open",
+                  { reference },
+                ),
+                onClick: () => openDocument(row),
+              }
+            : undefined,
+        };
+      })}
+      pagination={
+        data
+          ? {
+              total: data.total,
+              currentPage: data.currentPage,
+              pageCount: data.pageCount,
+            }
+          : undefined
+      }
+      onApply={() => submitPage(1)}
+      onClear={clearFilters}
+      onPage={submitPage}
+    />
   );
 }

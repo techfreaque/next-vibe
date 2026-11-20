@@ -2,70 +2,66 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Estimación",
-  tags: {
-    payment: "pago",
-    estimate: "Estimaciones"
-  },
+  tags: { payment: "pago", estimate: "Estimaciones" },
   post: {
     title: "Estimación",
     titleShort: "Estimación",
     description: "Consigue una sola estimación con todas sus líneas",
     form: {
       title: "Estimación",
-      description: "Consigue una sola estimación con todas sus líneas"
+      description: "Consigue una sola estimación con todas sus líneas",
     },
-    response: {
-      success: "Operación completada",
-      message: "Mensaje de Estado"
-    },
+    response: { success: "Operación completada", message: "Mensaje de Estado" },
     errors: {
       unauthorized: {
         title: "Se requiere autenticación",
-        description: "Inicia sesión para continuar"
+        description: "Inicia sesión para continuar",
       },
       validation: {
         title: "Error de validación",
-        description: "Parámetros inválidos"
+        description: "Parámetros inválidos",
       },
       server: {
         title: "Error del servidor",
-        description: "Error del servidor interno"
+        description: "Error del servidor interno",
       },
       unknown: {
         title: "Error desconocido",
-        description: "Ocurrió un error desconocido"
+        description: "Ocurrió un error desconocido",
       },
       network: {
         title: "Error de red",
-        description: "Ocurrió un error de red"
+        description: "Ocurrió un error de red",
       },
-      forbidden: {
-        title: "Acceso denegado",
-        description: "Acceso denegado"
-      },
+      forbidden: { title: "Acceso denegado", description: "Acceso denegado" },
       notFound: {
         title: "No encontrado",
-        description: "Estimación no encontrada"
+        description: "Estimación no encontrada",
       },
       conflict: {
         title: "Conflicto",
-        description: "No puede actuar en el estado actual"
+        description: "No puede actuar en el estado actual",
       },
       unsavedChanges: {
         title: "Cambios sin guardar",
-        description: "Hay cambios sin salvar"
-      }
+        description: "Hay cambios sin salvar",
+      },
     },
     success: {
       title: "Operación completada",
-      description: "Consigue una sola estimación con todas sus líneas"
-    }
+      description: "Consigue una sola estimación con todas sus líneas",
+    },
   },
   estimateId: {
     label: "Estimación ID",
-    description: "La estimación para actuar en"
+    description: "La estimación para actuar en",
   },
   widget: {
+    send: "Estimaciones",
+    addLine: "Línea de adición",
+    accept: "Aceptación récord",
+    decline: "Declinación récord",
+    openInvoice: "Factura abierta",
     back: "Atrás",
     submit: "Look Up Estimación",
     estimateNumber: "Estimación",
@@ -89,7 +85,7 @@ export const translations: typeof enTranslations = {
       accepted: "Aceptado",
       declined: "Declind",
       expired: "Gastos",
-      converted: "Conversión"
-    }
-  }
+      converted: "Conversión",
+    },
+  },
 };

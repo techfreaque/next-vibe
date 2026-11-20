@@ -30,7 +30,7 @@ export const translations: typeof enTranslations = {
       },
       amount: {
         label: "Kwota zwrotu",
-        description: "Kwota do zwrotu (opcjonalna, domyślnie pełna kwota)",
+        description: "Opcjonalny zwrot częściowy w walucie transakcji",
         placeholder: "Wprowadź kwotę",
       },
       reason: {
@@ -44,6 +44,31 @@ export const translations: typeof enTranslations = {
         placeholder: "Wprowadź metadane jako JSON",
       },
     },
+  },
+
+  widget: {
+    transactionDetails: "Zapisana transakcja",
+    customerEmail: "E-mail klienta",
+    customerId: "Identyfikator klienta",
+    originalAmount: "Pierwotna kwota",
+    enterTransaction:
+      "Wpisz identyfikator transakcji, aby wczytać dane płatności.",
+    lookupLoading: "Wczytywanie zapisanej transakcji",
+    transactionMissing: "Nie znaleziono transakcji",
+    lookupFailed: "Nie udało się wczytać transakcji",
+    retryLookup: "Ponów wyszukiwanie",
+    amountExceedsCharge: "Wpisz kwotę nie większą od pierwotnej płatności.",
+    confirmRemaining: "Stripe zwróci całą pozostałą kwotę w {{currency}}.",
+    confirmAmount: "Zwrot częściowy: {{amount}} ({{currency}}).",
+    title: "Sprawdź zwrot przez Stripe",
+    amountHelp:
+      "Wpisz część kwoty w {{currency}}. Pozostaw pole puste, aby zwrócić całą pozostałą kwotę.",
+    review: "Sprawdź kwotę",
+    confirmTitle: "Potwierdź zwrot przez Stripe",
+    confirmDescription:
+      "Stripe zwróci klientowi {{email}} środki z transakcji {{transactionId}}. Ta operacja zwraca pieniądze klientowi.",
+    confirm: "Zleć zwrot",
+    cancel: "Anuluj",
   },
 
   post: {
@@ -71,6 +96,7 @@ export const translations: typeof enTranslations = {
       validation: {
         title: "Błąd walidacji",
         description: "Nieprawidłowe parametry zwrotu",
+        ineligible: "Tej transakcji nie można zwrócić przez Stripe.",
       },
       unauthorized: {
         title: "Brak autoryzacji",

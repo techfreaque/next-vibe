@@ -391,6 +391,11 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    pagination: {
+      info: "Strona {{page}} z {{totalPages}}",
+      prev: "Poprzednia",
+      next: "Następna",
+    },
     title: "Zadania Cron",
     loading: "Ładowanie zadań...",
     header: {
@@ -425,6 +430,9 @@ export const translations: typeof enTranslations = {
       executionsMost: "Najwięcej wykonań",
     },
     task: {
+      runCount: "Wykonania: {{count}}",
+      successCount: "Udane: {{count}}",
+      failureCount: "Nieudane: {{count}}",
       executions: "Wykonania:",
       lastRun: "Ostatni przebieg:",
       never: "Nigdy",
@@ -443,6 +451,7 @@ export const translations: typeof enTranslations = {
       },
     },
     action: {
+      select: "Zaznacz {{task}}",
       view: "Pokaż szczegóły",
       history: "Pokaż historię",
       edit: "Edytuj zadanie",
@@ -451,7 +460,7 @@ export const translations: typeof enTranslations = {
     },
     bulk: {
       selected: "{count} zaznaczono",
-      selectAll: "Zaznacz wszystkie",
+      selectAll: "Zaznacz tę stronę",
       clearSelection: "Wyczyść zaznaczenie",
       enable: "Włącz",
       disable: "Wyłącz",
@@ -461,7 +470,7 @@ export const translations: typeof enTranslations = {
       confirmDelete:
         "Usunąć {count} zadanie(a)? Tej operacji nie można cofnąć.",
       cancel: "Anuluj",
-      success: "{succeeded} udanych, {failed} nieudanych",
+      success: "{{succeeded}} udanych, {{failed}} nieudanych",
     },
     empty: {
       noTasks: "Brak zadań cron",

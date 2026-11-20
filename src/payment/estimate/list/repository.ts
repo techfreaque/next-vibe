@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, eq, inArray, type SQL, sql } from "drizzle-orm";
+import { and, count, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
@@ -18,12 +18,12 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { companyMembers } from "@/companies/db";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
+import { getDocumentCompanies } from "@/finance/document-company-scope";
+import { documentPage, documentSearchPattern } from "@/finance/document-list";
 
 import { paymentEstimateLines, paymentEstimates } from "../../db";
-import type { EstimateStatusDB } from "../../enum";
 import type {
   EstimateListRequestOutput,
   EstimateListResponseOutput,
@@ -40,7 +40,6 @@ export class EstimateListRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      let companyFilter: SQL;
       if (data.companyId) {
         const authResult = await CompanyAuthRepository.requireMember(
           userId,
@@ -52,55 +51,67 @@ export class EstimateListRepository {
         if (!authResult.success) {
           return authResult;
         }
-        companyFilter = eq(paymentEstimates.companyId, data.companyId);
-      } else {
-        const memberRows = await db
-          .select({ companyId: companyMembers.companyId })
-          .from(companyMembers)
-          .where(
-            and(
-              eq(companyMembers.userId, userId),
-              eq(companyMembers.isActive, true),
-            ),
-          );
-        const companyIds = memberRows.map((r) => r.companyId);
-        if (companyIds.length === 0) {
-          return success({ total: 0, estimates: [] });
+      }
+
+      const selectedCompanies = await getDocumentCompanies(
+        userId,
+        data.companyId,
+      );
+      const companyNames = new Map(
+        selectedCompanies.map((company) => [company.id, company.name]),
+      );
+      const hasFilters = Boolean(
+        data.companyId || data.status || data.search || data.customerId,
+      );
+      const pageSize = data.pageSize;
+      if (companyNames.size === 0) {
+        if (data.companyId) {
+          return fail({
+            message: t("get.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
         }
-        companyFilter = inArray(paymentEstimates.companyId, companyIds);
+        return success({
+          total: 0,
+          estimates: [],
+          ...documentPage(0, data.page, pageSize),
+          hasFilters,
+          selectedCompanyId: null,
+          selectedCompanyName: null,
+        });
       }
 
-      const filters: SQL[] = [companyFilter];
-
-      if (data.status) {
-        filters.push(
-          eq(
-            paymentEstimates.status,
-            data.status as (typeof EstimateStatusDB)[number],
-          ),
-        );
-      }
-
-      if (data.customerId) {
-        filters.push(eq(paymentEstimates.customerId, data.customerId));
-      }
-
-      const whereClause = and(...filters);
-
+      const pattern = data.search
+        ? documentSearchPattern(data.search)
+        : undefined;
+      const where = and(
+        inArray(paymentEstimates.companyId, [...companyNames.keys()]),
+        data.status ? eq(paymentEstimates.status, data.status) : undefined,
+        data.customerId
+          ? eq(paymentEstimates.customerId, data.customerId)
+          : undefined,
+        pattern
+          ? or(
+              ilike(paymentEstimates.estimateNumber, pattern),
+              ilike(paymentEstimates.customerName, pattern),
+              ilike(paymentEstimates.customerEmail, pattern),
+              ilike(paymentEstimates.title, pattern),
+              ilike(sql`${paymentEstimates.id}::text`, pattern),
+            )
+          : undefined,
+      );
       const [{ value: total }] = await db
         .select({ value: count() })
         .from(paymentEstimates)
-        .where(whereClause);
-
-      const page = data.page ?? 1;
-      const pageSize = data.pageSize ?? 20;
-      const offset = (page - 1) * pageSize;
+        .where(where);
+      const pagination = documentPage(total, data.page, pageSize);
+      const offset = (pagination.currentPage - 1) * pageSize;
 
       const rows = await db
         .select()
         .from(paymentEstimates)
-        .where(whereClause)
-        .orderBy(sql`${paymentEstimates.createdAt} DESC`)
+        .where(where)
+        .orderBy(desc(paymentEstimates.createdAt), paymentEstimates.id)
         .limit(pageSize)
         .offset(offset);
 
@@ -114,11 +125,7 @@ export class EstimateListRepository {
                 cnt: count(),
               })
               .from(paymentEstimateLines)
-              .where(
-                sql`${paymentEstimateLines.estimateId} = ANY(${sql.raw(
-                  `ARRAY[${estimateIds.map((id) => `'${id}'`).join(",")}]::uuid[]`,
-                )})`,
-              )
+              .where(inArray(paymentEstimateLines.estimateId, estimateIds))
               .groupBy(paymentEstimateLines.estimateId)
           : [];
 
@@ -129,13 +136,21 @@ export class EstimateListRepository {
       logger.debug("Estimates listed", {
         companyId: data.companyId,
         total,
-        page,
+        page: pagination.currentPage,
       });
 
       return success({
-        total: Number(total),
+        total,
+        ...pagination,
+        hasFilters,
+        selectedCompanyId: data.companyId ?? null,
+        selectedCompanyName: data.companyId
+          ? (companyNames.get(data.companyId) ?? null)
+          : null,
         estimates: rows.map((e) => ({
           id: e.id,
+          companyId: e.companyId,
+          companyName: companyNames.get(e.companyId) ?? null,
           estimateNumber: e.estimateNumber,
           status: e.status,
           customerId: e.customerId ?? null,

@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
   },
 
   delete: {
+    review: "Consulta la cuenta local en la lista de usuarios de Linux.",
     title: "Eliminar el usuario de Linux",
     titleShort: "Eliminar el usuario",
     description: "Eliminar una cuenta de usuario OS desde el host",

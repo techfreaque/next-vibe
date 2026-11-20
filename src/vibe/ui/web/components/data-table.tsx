@@ -51,6 +51,7 @@ export type DataTableProps<TData extends RowData> = {
   ListFooterComponent?: React.ComponentType | ReactElement | null;
   isRefreshing?: boolean;
   onRefresh?: () => void;
+  scrollLabel?: string;
 } & StyleType;
 
 /**
@@ -62,6 +63,7 @@ export function DataTable<TData extends RowData>({
   onRowPress,
   ListEmptyComponent,
   ListFooterComponent,
+  scrollLabel,
   className,
   style,
 }: DataTableProps<TData>): ReactElement {
@@ -80,8 +82,11 @@ export function DataTable<TData extends RowData>({
   const hasNoData = rows.length === 0;
 
   return (
-    <div className={cn("relative w-full", className)} style={style}>
-      <Table>
+    <div
+      className={cn("relative w-full min-w-0 max-w-full", className)}
+      style={style}
+    >
+      <Table scrollLabel={scrollLabel}>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>

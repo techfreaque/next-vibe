@@ -8,8 +8,9 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Eingangsrechnungen",
-    titleShort: "Verbindlichkeiten",
-    description: "Lieferantenrechnungen eines Unternehmens auflisten",
+    titleShort: "Eingangsrechnungen",
+    description:
+      "Suche nach Belegnummer, Lieferant oder Rechnungs-ID. Filtere nach Unternehmen oder Status.",
     errors: {
       validation: {
         title: "Validierungsfehler",
@@ -64,6 +65,12 @@ export const translations: typeof enTranslations = {
     description: "Nach Unternehmen filtern",
     placeholder: "Unternehmens-UUID",
   },
+  search: {
+    label: "Dokumente suchen",
+    description:
+      "Suche nach Belegnummer, Lieferant oder Rechnungs-ID. Filtere nach Unternehmen oder Status.",
+    placeholder: "Belegnummer, Lieferant oder ID",
+  },
   status: {
     label: "Status",
     description: "Nach Rechnungsstatus filtern",
@@ -81,6 +88,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    pageCount: "Seiten insgesamt",
     back: "Zurück",
     title: "Eingangsrechnungen",
     newBill: "Rechnung erfassen",

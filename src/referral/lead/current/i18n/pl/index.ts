@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   description:
     "Zwraca kod polecenia powiązany z aktualnym leadem, jeśli istnieje",
   tag: "Polecenie",
+  noReferral: "Brak polecenia przypisanego do tego leada",
   response: {
     referralCode: "Kod polecenia",
     referralLabel: "Etykieta polecenia",

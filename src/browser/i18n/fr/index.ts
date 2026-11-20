@@ -2447,6 +2447,9 @@ export const translations: typeof enTranslations = {
     description: "L'outil du navigateur a bien été exécuté",
   },
   shared: {
+    addItem: "Ajouter un élément",
+    removeItem: "Retirer le dernier élément",
+    back: "Retour",
     instanceId: {
       label: "ID de session",
       description:

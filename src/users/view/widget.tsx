@@ -9,6 +9,8 @@
 
 import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { LeadStatus } from "next-vibe/identity/lead/enum";
+import { scopedTranslation as leadTranslation } from "next-vibe/identity/lead/i18n";
 import { UserPermissionRoleOptions } from "next-vibe/identity/roles/enum";
 import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/components/button";
@@ -50,12 +52,21 @@ import { P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
+import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
+import {
+  RelatedEntitiesPanel,
+  useRelatedEntityNavigation,
+} from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetContext,
+  useWidgetEndpoint,
+  useWidgetForm,
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetPlatform,
+  useWidgetResponse,
   useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
@@ -64,6 +75,11 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage"
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { useCallback, useMemo, useState } from "react";
+
+import { CheckoutMode, PaymentProvider, PaymentStatus } from "@/payment/enum";
+import { scopedTranslation as paymentTranslation } from "@/payment/i18n";
+import { BillingInterval } from "@/subscription/enum";
+import { scopedTranslation as subscriptionTranslation } from "@/subscription/i18n";
 
 import {
   formatDateTime,
@@ -229,7 +245,11 @@ export function UserViewContainer({
   const platform = useWidgetPlatform();
   const responseOnly = useWidgetResponseOnly();
   const { user, endpointMutations } = useWidgetContext();
-  const { push: navigate } = useWidgetNavigation();
+  const { push: navigate, canGoBack } = useWidgetNavigation();
+  const openRelated = useRelatedEntityNavigation();
+  const endpoint = useWidgetEndpoint<typeof definition.GET>();
+  const form = useWidgetForm<typeof definition.GET>();
+  const response = useWidgetResponse();
   const logger = useWidgetLogger();
   const data = useWidgetValue<typeof definition.GET>();
   const children = field.children;
@@ -325,13 +345,9 @@ export function UserViewContainer({
     [navigate, userId],
   );
 
-  const handleViewUser = useCallback(
-    async (viewUserId: string): Promise<void> => {
-      const userViewDef = await import("./definition");
-      navigate(userViewDef.GET, { data: { userId: viewUserId } });
-    },
-    [navigate],
-  );
+  const openDirectory = (): void => {
+    openRelated(() => import("../list/definition").then((m) => m.default.GET));
+  };
 
   const handleViewErrors = useCallback(async (): Promise<void> => {
     const errorDefs =
@@ -395,15 +411,30 @@ export function UserViewContainer({
   }
 
   if (!data) {
+    const requestedId = form?.watch("userId");
+    const validTarget = endpoint.requestSchema.safeParse({
+      userId: requestedId,
+    }).success;
     return (
-      <WidgetShell>
+      <WidgetShell className="min-w-0">
         <WidgetHeader
           title={t("get.title")}
           backButton={<NavigateButtonWidget field={children.backButton} />}
         />
         <FormAlertWidget field={{}} />
-        {endpointMutations?.read?.isLoading !== false && (
+        {validTarget &&
+        response?.success !== false &&
+        endpointMutations?.read?.isLoading !== false ? (
           <LoadingBlock message={t("widget.loading")} />
+        ) : (
+          <EmptyBlock
+            icon={<Users className="h-8 w-8" />}
+            title={t(requestedId ? "widget.unavailable" : "widget.chooseUser")}
+            action={{
+              label: t("widget.actions.browse"),
+              onClick: openDirectory,
+            }}
+          />
         )}
       </WidgetShell>
     );
@@ -459,70 +490,21 @@ export function UserViewContainer({
   ];
 
   return (
-    <WidgetShell>
+    <WidgetShell className="min-w-0">
       <WidgetHeader
         title={basicInfo.privateName || basicInfo.email}
         backButton={<NavigateButtonWidget field={children.backButton} />}
         actions={
-          <>
+          !canGoBack && (
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => void handleEdit()}
-              className="gap-1"
+              onClick={openDirectory}
             >
-              <Pencil className="h-4 w-4" />
-              <Span className="hidden sm:inline">
-                {t("widget.actions.edit")}
-              </Span>
+              {t("widget.actions.browse")}
             </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => void handleAddCredits()}
-              className="gap-1"
-            >
-              <Coins className="h-4 w-4" />
-              <Span className="hidden sm:inline">
-                {t("widget.actions.addCredits")}
-              </Span>
-            </Button>
-            {basicInfo.isBanned ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => void handleSetBanned(false)}
-                className="gap-1 text-success hover:text-success/80"
-              >
-                <CheckCircle className="h-4 w-4" />
-                <Span className="hidden sm:inline">{t("ban.unbanUser")}</Span>
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => void handleSetBanned(true)}
-                className="gap-1 text-destructive hover:text-destructive"
-              >
-                <XCircle className="h-4 w-4" />
-                <Span className="hidden sm:inline">{t("ban.banUser")}</Span>
-              </Button>
-            )}
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => void handleDelete()}
-              className="gap-1 text-destructive hover:text-destructive"
-              title={t("widget.actions.delete")}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </>
+          )
         }
       />
 
@@ -533,8 +515,10 @@ export function UserViewContainer({
         </Div>
         <Div className="flex-1 min-w-0 flex flex-col gap-1">
           <Div className="flex items-center gap-2 flex-wrap">
-            <Span className="text-xl font-bold">{basicInfo.privateName}</Span>
-            <Span className="text-sm text-muted-foreground">
+            <Span className="break-all text-xl font-bold">
+              {basicInfo.privateName}
+            </Span>
+            <Span className="break-all text-sm text-muted-foreground">
               @{basicInfo.publicName}
             </Span>
             {basicInfo.isBanned ? (
@@ -579,18 +563,19 @@ export function UserViewContainer({
             )}
           </Div>
           <P className="text-sm text-muted-foreground flex items-center gap-1">
-            <Mail className="h-3 w-3" />
-            {basicInfo.email}
+            <Mail className="h-3 w-3 shrink-0" />
+            <Span className="break-all">{basicInfo.email}</Span>
           </P>
           <Div className="flex items-center gap-1 text-xs text-muted-foreground font-mono">
-            <Span>{basicInfo.id}</Span>
+            <Span className="break-all">{basicInfo.id}</Span>
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              className="h-5 w-5 p-0"
+              className="h-9 w-9 shrink-0 p-0"
               onClick={() => void handleCopyUserId()}
               title={t("widget.actions.copyUserId")}
+              aria-label={t("widget.actions.copyUserId")}
             >
               {copyIdSuccess ? (
                 <CheckCircle className="h-3 w-3 text-success" />
@@ -618,6 +603,9 @@ export function UserViewContainer({
                       className="h-4 w-4 p-0 rounded-full hover:text-destructive"
                       onClick={() => void handleRemoveRole(value)}
                       title={t("roles.remove")}
+                      aria-label={t("roles.removeNamed", {
+                        role: roleLabel(roleItem.role, locale),
+                      })}
                     >
                       <X className="h-3 w-3" />
                     </Button>
@@ -638,6 +626,63 @@ export function UserViewContainer({
             )}
           </Div>
         </Div>
+      </Div>
+
+      <Div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => void handleEdit()}
+          className="gap-1"
+        >
+          <Pencil className="h-4 w-4" />
+          {t("widget.actions.edit")}
+        </Button>
+        <Button
+          type="button"
+          variant="default"
+          size="sm"
+          onClick={() => void handleAddCredits()}
+          className="gap-1"
+        >
+          <Coins className="h-4 w-4" />
+          {t("widget.actions.addCredits")}
+        </Button>
+        {basicInfo.isBanned ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => void handleSetBanned(false)}
+            className="gap-1 text-success hover:text-success/80"
+          >
+            <CheckCircle className="h-4 w-4" />
+            {t("ban.unbanUser")}
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => void handleSetBanned(true)}
+            className="gap-1 text-destructive hover:text-destructive"
+          >
+            <XCircle className="h-4 w-4" />
+            {t("ban.banUser")}
+          </Button>
+        )}
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => void handleDelete()}
+          className="gap-1 text-destructive hover:text-destructive"
+          title={t("widget.actions.delete")}
+          aria-label={t("widget.actions.delete")}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
       </Div>
 
       {basicInfo.isBanned && basicInfo.bannedReason && (
@@ -693,7 +738,7 @@ export function UserViewContainer({
       </MetricGrid>
 
       {/* Tabs */}
-      <Div className="flex gap-1 border-b overflow-x-auto">
+      <Div className="flex flex-wrap gap-1 border-b">
         {tabs.map((tab) => (
           <Button
             key={tab.id}
@@ -701,7 +746,8 @@ export function UserViewContainer({
             variant="ghost"
             size="sm"
             onClick={() => setActiveTab(tab.id)}
-            className={`rounded-b-none border-b-2 flex-shrink-0 gap-1.5 ${
+            aria-pressed={activeTab === tab.id}
+            className={`h-auto min-h-9 whitespace-normal rounded-b-none border-b-2 gap-1.5 ${
               activeTab === tab.id
                 ? "border-primary text-primary font-semibold"
                 : "border-transparent text-muted-foreground hover:text-foreground"
@@ -737,12 +783,7 @@ export function UserViewContainer({
         referralEndpointOptions &&
         earningsEndpointOptions && (
           <Div className="flex flex-col gap-4">
-            <ReferralSummary
-              data={data}
-              t={t}
-              locale={locale}
-              onViewUser={handleViewUser}
-            />
+            <ReferralSummary data={data} t={t} locale={locale} />
             <ReferralCodesTab
               locale={locale}
               user={user}
@@ -772,7 +813,6 @@ export function UserViewContainer({
           connectedLeads={data.connectedLeads}
           connectedUsers={data.connectedUsers}
           t={t}
-          navigate={navigate}
           locale={locale}
         />
       )}
@@ -1021,7 +1061,11 @@ function BillingTab({
   t: ViewT;
   locale: CountryLanguage;
 }): React.JSX.Element {
-  const { paymentStats, payments, subscriptions } = data;
+  const { basicInfo, paymentStats, payments, subscriptions } = data;
+  const openRelated = useRelatedEntityNavigation();
+  const isInteractive = useWidgetIsInteractive();
+  const { t: tPayment } = paymentTranslation.scopedT(locale);
+  const { t: tSubscription } = subscriptionTranslation.scopedT(locale);
   return (
     <Div className="flex flex-col gap-4">
       <MetricGrid columns={4}>
@@ -1056,99 +1100,192 @@ function BillingTab({
             title={t("billing.noPayments")}
           />
         ) : (
-          <Div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("billing.date")}</TableHead>
-                  <TableHead className="text-right">
-                    {t("billing.amount")}
-                  </TableHead>
-                  <TableHead className="text-right">USD</TableHead>
-                  <TableHead>{t("billing.status")}</TableHead>
-                  <TableHead>{t("billing.kind")}</TableHead>
-                  <TableHead>{t("billing.provider")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {payments.map((p) => (
-                  <TableRow key={p.id}>
-                    <TableCell className="text-xs whitespace-nowrap">
-                      {formatDateTime(p.createdAt, locale)}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {formatMoney(p.amount, p.currency, locale)}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums text-muted-foreground">
-                      {formatUsd(p.amountUsd, locale)}
-                    </TableCell>
-                    <TableCell>
-                      <StatusPill
-                        status={p.status}
-                        label={enumTail(p.status)}
-                        variant={paymentStatusVariant(p.status)}
-                      />
-                    </TableCell>
-                    <TableCell className="text-xs">
-                      {enumTail(p.mode)}
-                    </TableCell>
-                    <TableCell className="text-xs">
-                      {enumTail(p.provider)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <Div className="flex flex-col gap-2">
+            {payments.map((payment) => {
+              const amount = formatMoney(
+                payment.amount,
+                payment.currency,
+                locale,
+              );
+              const date = formatDateTime(payment.createdAt, locale);
+              return (
+                <ListItem
+                  key={payment.id}
+                  title={amount}
+                  subtitle={date}
+                  badges={
+                    <StatusPill
+                      status={payment.status}
+                      label={
+                        isValidEnumValue(PaymentStatus, payment.status)
+                          ? tPayment(payment.status)
+                          : payment.status
+                      }
+                      variant={paymentStatusVariant(payment.status)}
+                    />
+                  }
+                  meta={
+                    <>
+                      <Span>
+                        {isValidEnumValue(PaymentProvider, payment.provider)
+                          ? tPayment(payment.provider)
+                          : payment.provider}
+                      </Span>
+                      <Span>
+                        {isValidEnumValue(CheckoutMode, payment.mode)
+                          ? tPayment(payment.mode)
+                          : payment.mode}
+                      </Span>
+                      {payment.currency.toUpperCase() !== "USD" && (
+                        <Span>{formatUsd(payment.amountUsd, locale)} USD</Span>
+                      )}
+                      {isInteractive && (
+                        <Div className="flex flex-wrap gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-auto min-h-9 whitespace-normal"
+                            aria-label={t("billing.inspectNamed", {
+                              amount,
+                              date,
+                            })}
+                            onClick={() =>
+                              openRelated(
+                                () =>
+                                  import("@/payment/processor/definition").then(
+                                    (m) => m.default.GET,
+                                  ),
+                                {
+                                  data: {
+                                    userId: basicInfo.id,
+                                    transactionId: payment.id,
+                                  },
+                                },
+                              )
+                            }
+                          >
+                            {t("billing.inspect")}
+                          </Button>
+                          {payment.refundEligible && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-auto min-h-9 whitespace-normal"
+                              aria-label={t("billing.refundNamed", {
+                                amount,
+                                date,
+                              })}
+                              onClick={() =>
+                                openRelated(
+                                  () =>
+                                    import("@/payment/refund/definition").then(
+                                      (m) => m.default.POST,
+                                    ),
+                                  {
+                                    data: { transactionId: payment.id },
+                                    renderInModal: true,
+                                    popNavigationOnSuccess: 1,
+                                  },
+                                )
+                              }
+                            >
+                              {t("billing.refund")}
+                            </Button>
+                          )}
+                        </Div>
+                      )}
+                    </>
+                  }
+                />
+              );
+            })}
           </Div>
         )}
       </SectionGroup>
 
       <SectionGroup title={t("billing.subscriptionsTitle")}>
         {subscriptions.length === 0 ? (
-          <P className="text-sm text-muted-foreground">{t("payment.none")}</P>
+          <EmptyBlock title={t("payment.none")} className="py-3" />
         ) : (
-          <Div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t("billing.started")}</TableHead>
-                  <TableHead>{t("billing.status")}</TableHead>
-                  <TableHead>{t("payment.interval")}</TableHead>
-                  <TableHead>{t("billing.periodEnd")}</TableHead>
-                  <TableHead>{t("billing.provider")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {subscriptions.map((s) => (
-                  <TableRow key={s.id}>
-                    <TableCell className="text-xs whitespace-nowrap">
-                      {formatDay(s.createdAt, locale)}
-                    </TableCell>
-                    <TableCell>
-                      <StatusPill
-                        status={s.status}
-                        label={subscriptionStatusLabel(s.status, locale)}
-                        variant={subscriptionStatusVariant(s.status)}
-                      />
-                      {s.cancelAtPeriodEnd && (
-                        <Span className="ml-1 text-xs text-warning">
+          <Div className="flex flex-col gap-2">
+            {isInteractive && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="self-start h-auto min-h-9 whitespace-normal"
+                onClick={() =>
+                  openRelated(
+                    () =>
+                      import("@/subscription/admin/list/definition").then(
+                        (m) => m.default.GET,
+                      ),
+                    {
+                      data: { userId: basicInfo.id },
+                    },
+                  )
+                }
+              >
+                {t("billing.openSubscriptions")}
+              </Button>
+            )}
+            {subscriptions.map((subscription) => {
+              const provider = isValidEnumValue(
+                PaymentProvider,
+                subscription.provider,
+              )
+                ? tPayment(subscription.provider)
+                : subscription.provider;
+              const interval = isValidEnumValue(
+                BillingInterval,
+                subscription.billingInterval,
+              )
+                ? tSubscription(subscription.billingInterval)
+                : subscription.billingInterval;
+              return (
+                <ListItem
+                  key={subscription.id}
+                  title={provider}
+                  subtitle={interval}
+                  badges={
+                    <StatusPill
+                      status={subscription.status}
+                      label={subscriptionStatusLabel(
+                        subscription.status,
+                        locale,
+                      )}
+                      variant={subscriptionStatusVariant(subscription.status)}
+                    />
+                  }
+                  meta={
+                    <>
+                      <Span>
+                        {t("billing.startedOn", {
+                          date: formatDay(subscription.createdAt, locale),
+                        })}
+                      </Span>
+                      {subscription.currentPeriodEnd && (
+                        <Span>
+                          {t("billing.periodEndsOn", {
+                            date: formatDay(
+                              subscription.currentPeriodEnd,
+                              locale,
+                            ),
+                          })}
+                        </Span>
+                      )}
+                      {subscription.cancelAtPeriodEnd && (
+                        <Span className="text-warning">
                           {t("billing.cancels")}
                         </Span>
                       )}
-                    </TableCell>
-                    <TableCell className="text-xs">
-                      {enumTail(s.billingInterval)}
-                    </TableCell>
-                    <TableCell className="text-xs whitespace-nowrap">
-                      {formatDay(s.currentPeriodEnd, locale)}
-                    </TableCell>
-                    <TableCell className="text-xs">
-                      {enumTail(s.provider)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                    </>
+                  }
+                />
+              );
+            })}
           </Div>
         )}
       </SectionGroup>
@@ -1162,39 +1299,45 @@ function ReferralSummary({
   data,
   t,
   locale,
-  onViewUser,
 }: {
   data: UserViewResponseOutput;
   t: ViewT;
   locale: CountryLanguage;
-  onViewUser: (id: string) => Promise<void>;
 }): React.JSX.Element {
   const { referralStats, referredBy, referredUsers } = data;
+  const openRelated = useRelatedEntityNavigation();
+  const openAccount = (userId: string): void =>
+    openRelated(() => import("./definition").then((m) => m.GET), {
+      data: { userId },
+    });
+
   return (
     <Div className="flex flex-col gap-4">
-      {referredBy && (
-        <SectionGroup title={t("referrals.referredBy")}>
-          <ListItem
-            title={referredBy.email}
-            subtitle={
-              referredBy.code
-                ? t("referrals.viaCode", { code: referredBy.code })
-                : undefined
-            }
-            meta={<Span>{formatDay(referredBy.referredAt, locale)}</Span>}
-            actions={
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => void onViewUser(referredBy.userId)}
-              >
-                {t("connections.viewUser")}
-              </Button>
-            }
-          />
-        </SectionGroup>
-      )}
+      <RelatedEntitiesPanel
+        title={t("referrals.referredBy")}
+        emptyTitle={t("referrals.noReferrer")}
+        items={
+          referredBy
+            ? [
+                {
+                  id: referredBy.userId,
+                  title: referredBy.email,
+                  subtitle: referredBy.code
+                    ? t("referrals.viaCode", { code: referredBy.code })
+                    : undefined,
+                  meta: formatDay(referredBy.referredAt, locale),
+                  action: {
+                    label: t("connections.viewUser"),
+                    ariaLabel: t("connections.viewNamedUser", {
+                      name: referredBy.email,
+                    }),
+                    onClick: () => openAccount(referredBy.userId),
+                  },
+                },
+              ]
+            : []
+        }
+      />
 
       <MetricGrid columns={4}>
         <MetricCard
@@ -1226,42 +1369,34 @@ function ReferralSummary({
         />
       </MetricGrid>
 
-      <SectionGroup title={t("referrals.referredUsers")}>
-        {referredUsers.length === 0 ? (
-          <P className="text-sm text-muted-foreground">
-            {t("referrals.noneReferred")}
-          </P>
-        ) : (
-          <Div className="flex flex-col divide-y divide-border">
-            {referredUsers.map((u) => (
-              <ListItem
-                key={u.id}
-                title={u.email}
-                meta={
-                  <>
-                    <Span>{formatDay(u.createdAt, locale)}</Span>
-                    {u.totalPaidUsd > 0 && (
-                      <Span className="text-success">
-                        {formatUsd(u.totalPaidUsd, locale)}
-                      </Span>
-                    )}
-                  </>
-                }
-                actions={
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => void onViewUser(u.id)}
-                  >
-                    {t("connections.viewUser")}
-                  </Button>
-                }
-              />
-            ))}
-          </Div>
-        )}
-      </SectionGroup>
+      <RelatedEntitiesPanel
+        title={t("referrals.referredUsers")}
+        emptyTitle={t("referrals.noneReferred")}
+        items={referredUsers.map((account) => {
+          const meta = (
+            <>
+              <Span>{formatDay(account.createdAt, locale)}</Span>
+              {account.totalPaidUsd > 0 && (
+                <Span className="text-success">
+                  {formatUsd(account.totalPaidUsd, locale)}
+                </Span>
+              )}
+            </>
+          );
+          return {
+            id: account.id,
+            title: account.email,
+            meta,
+            action: {
+              label: t("connections.viewUser"),
+              ariaLabel: t("connections.viewNamedUser", {
+                name: account.email,
+              }),
+              onClick: () => openAccount(account.id),
+            },
+          };
+        })}
+      />
     </Div>
   );
 }
@@ -1431,123 +1566,99 @@ function ConnectionsTab({
   connectedLeads,
   connectedUsers,
   t,
-  navigate,
   locale,
 }: {
   connectedLeads: UserViewResponseOutput["connectedLeads"];
   connectedUsers: UserViewResponseOutput["connectedUsers"];
   t: ViewT;
-  navigate: ReturnType<typeof useWidgetNavigation>["push"];
   locale: CountryLanguage;
 }): React.JSX.Element {
-  const handleViewLead = useCallback(
-    async (leadId: string): Promise<void> => {
-      const leadDefs = await import("@/leads/[id]/definition");
-      navigate(leadDefs.default.GET, {
-        urlPathParams: { id: leadId },
-      });
-    },
-    [navigate],
-  );
-
-  const handleViewUser = useCallback(
-    async (viewUserId: string): Promise<void> => {
-      const userViewDef = await import("./definition");
-      navigate(userViewDef.GET, {
-        data: { userId: viewUserId },
-      });
-    },
-    [navigate],
-  );
+  const openRelated = useRelatedEntityNavigation();
+  const { t: tLead } = leadTranslation.scopedT(locale);
 
   return (
     <Div className="flex flex-col gap-4">
-      {/* Connected Leads */}
-      <SectionGroup title={t("connections.leadsTitle")}>
-        {connectedLeads.length === 0 ? (
-          <EmptyBlock
-            icon={<Users className="h-8 w-8" />}
-            title={t("connections.noLeads")}
-          />
-        ) : (
-          <Div className="flex flex-col divide-y divide-border">
-            {connectedLeads.map((lead) => (
-              <ListItem
-                key={lead.id}
-                title={lead.email ?? "—"}
-                subtitle={lead.businessName}
-                badges={<StatusPill status={lead.status} variant="default" />}
-                meta={
-                  <>
-                    {lead.ipAddress && (
-                      <Span className="font-mono text-xs">
-                        {lead.ipAddress}
-                      </Span>
-                    )}
-                    {[lead.deviceType, lead.browser, lead.os]
-                      .filter(Boolean)
-                      .join(" · ") && (
-                      <Span>
-                        {[lead.deviceType, lead.browser, lead.os]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </Span>
-                    )}
-                    {lead.linkReason && <Span>{lead.linkReason}</Span>}
-                    <Span>{formatDateTime(lead.linkedAt, locale)}</Span>
-                  </>
-                }
-                actions={
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => void handleViewLead(lead.id)}
-                  >
-                    {t("connections.viewLead")}
-                  </Button>
-                }
-              />
-            ))}
-          </Div>
-        )}
-      </SectionGroup>
+      <RelatedEntitiesPanel
+        title={t("connections.leadsTitle")}
+        emptyTitle={t("connections.noLeads")}
+        items={connectedLeads.map((lead) => {
+          const title = lead.email || lead.businessName || lead.id;
+          const device = [lead.deviceType, lead.browser, lead.os]
+            .filter(Boolean)
+            .join(" · ");
+          const badges = (
+            <StatusPill
+              status={lead.status}
+              label={
+                isValidEnumValue(LeadStatus, lead.status)
+                  ? tLead(lead.status)
+                  : lead.status
+              }
+              variant="default"
+            />
+          );
+          const meta = (
+            <>
+              {lead.ipAddress && (
+                <Span className="font-mono">{lead.ipAddress}</Span>
+              )}
+              {device && <Span>{device}</Span>}
+              {lead.linkReason && <Span>{lead.linkReason}</Span>}
+              <Span>{formatDateTime(lead.linkedAt, locale)}</Span>
+            </>
+          );
+          return {
+            id: lead.id,
+            title,
+            subtitle: lead.email ? lead.businessName : undefined,
+            badges,
+            meta,
+            action: {
+              label: t("connections.viewLead"),
+              ariaLabel: t("connections.viewNamedLead", { name: title }),
+              onClick: () =>
+                openRelated(
+                  () =>
+                    import("@/leads/[id]/definition").then(
+                      (m) => m.default.GET,
+                    ),
+                  {
+                    urlPathParams: { id: lead.id },
+                  },
+                ),
+            },
+          };
+        })}
+      />
 
-      {/* Connected Users */}
-      <SectionGroup title={t("connections.usersTitle")}>
-        {connectedUsers.length === 0 ? (
-          <EmptyBlock
-            icon={<User className="h-8 w-8" />}
-            title={t("connections.noUsers")}
-          />
-        ) : (
-          <Div className="flex flex-col divide-y divide-border">
-            {connectedUsers.map((u) => (
-              <ListItem
-                key={u.id}
-                title={u.email}
-                subtitle={`@${u.publicName}`}
-                meta={
-                  <>
-                    {u.linkReason && <Span>{u.linkReason}</Span>}
-                    <Span>{formatDateTime(u.linkedAt, locale)}</Span>
-                  </>
-                }
-                actions={
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => void handleViewUser(u.id)}
-                  >
-                    {t("connections.viewUser")}
-                  </Button>
-                }
-              />
-            ))}
-          </Div>
-        )}
-      </SectionGroup>
+      <RelatedEntitiesPanel
+        title={t("connections.usersTitle")}
+        emptyTitle={t("connections.noUsers")}
+        items={connectedUsers.map((account) => {
+          const meta = (
+            <>
+              {account.linkReason && <Span>{account.linkReason}</Span>}
+              <Span>{formatDateTime(account.linkedAt, locale)}</Span>
+            </>
+          );
+          return {
+            id: account.id,
+            title: account.email,
+            subtitle: account.publicName ? `@${account.publicName}` : undefined,
+            meta,
+            action: {
+              label: t("connections.viewUser"),
+              ariaLabel: t("connections.viewNamedUser", {
+                name: account.email,
+              }),
+              onClick: () =>
+                openRelated(() => import("./definition").then((m) => m.GET), {
+                  data: { userId: account.id },
+                }),
+            },
+          };
+        })}
+      />
     </Div>
   );
 }

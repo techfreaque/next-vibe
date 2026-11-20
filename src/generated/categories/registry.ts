@@ -680,6 +680,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     icon: "credit-card",
     order: 10,
     defaultEntryAlias: "payment-dashboard",
+    recordSearch: { alias: "payment-invoice-list", field: "search" },
     subcategories: {
       Transactions: {
         icon: "receipt",
@@ -835,6 +836,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     icon: "target",
     order: 20,
     defaultEntryAlias: "leads-dashboard",
+    recordSearch: { alias: "leads-search", field: "search" },
     subcategories: {
       Management: {
         icon: "users",
@@ -1864,7 +1866,8 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     group: "system",
     icon: "user",
     order: 10,
-    defaultEntryAlias: "user-me",
+    defaultEntryAlias: "users-list",
+    recordSearch: { alias: "users-list", field: "search" },
     subcategories: {
       login: {
         icon: "log-in",

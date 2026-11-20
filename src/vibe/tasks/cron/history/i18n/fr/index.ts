@@ -158,6 +158,11 @@ export const translations: typeof enTranslations = {
     unknownTask: "Tâche inconnue",
   },
   widget: {
+    runDetails: "Détail de l’exécution",
+    runId: "Identifiant de l’exécution",
+    emptyFiltered:
+      "Aucune exécution ne correspond. Ajustez la tâche, le statut, la priorité ou les dates.",
+    emptyUnfiltered: "Les exécutions apparaissent ici dès leur lancement.",
     title: "Historique d'exécution des tâches",
     loading: "Chargement de l'historique...",
     header: {
@@ -167,7 +172,7 @@ export const translations: typeof enTranslations = {
       refresh: "Actualiser",
     },
     summary: {
-      total: "Total",
+      total: "Exécutions trouvées",
       successful: "Réussies",
       failed: "Échouées",
       successRate: "Taux de réussite",
@@ -177,6 +182,10 @@ export const translations: typeof enTranslations = {
       placeholder: "Rechercher des tâches...",
     },
     filter: {
+      clear: "Effacer les filtres",
+      allTasks: "Toutes les tâches",
+      allPriorities: "Toutes les priorités",
+      taskHistory: "Historique de cette tâche",
       all: "Toutes",
       running: "En cours",
       completed: "Terminées",

@@ -10,11 +10,18 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import { responseField } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";
+
+const CurrentLeadReferralWidget = lazyWidget(() =>
+  import("./widget").then((module) => ({
+    default: module.CurrentLeadReferralWidget,
+  })),
+);
 
 export const { GET } = createEndpoint({
   scopedTranslation,
@@ -35,6 +42,7 @@ export const { GET } = createEndpoint({
   ] as const,
 
   fields: customWidgetObject({
+    render: CurrentLeadReferralWidget,
     usage: { response: true } as const,
     children: {
       referralCode: responseField(scopedTranslation, {

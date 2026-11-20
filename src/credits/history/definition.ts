@@ -62,7 +62,7 @@ const { GET } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "history.get.targetUserId.label" as const,
         hidden: true,
-        schema: z.string().optional(),
+        schema: z.uuid().optional(),
         includeInCacheKey: true,
       }),
 
@@ -72,7 +72,7 @@ const { GET } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "history.get.targetLeadId.label" as const,
         hidden: true,
-        schema: z.string().optional(),
+        schema: z.uuid().optional(),
         includeInCacheKey: true,
       }),
 
@@ -188,6 +188,39 @@ const { GET } = createEndpoint({
       },
     },
     responses: {
+      adminLedger: {
+        transactions: [
+          {
+            id: "323e4567-e89b-12d3-a456-426614174000",
+            amount: -2505,
+            balanceAfter: 211.823015,
+            type: CreditTransactionType.REFERRAL_PAYOUT,
+            messageId: null,
+            createdAt: "2026-11-18T15:20:00.000Z",
+          },
+          {
+            id: "423e4567-e89b-12d3-a456-426614174000",
+            amount: -0.176985,
+            balanceAfter: 2716.823015,
+            type: CreditTransactionType.USAGE,
+            messageId: "msg-423e4567-e89b-12d3-a456-426614174000",
+            createdAt: "2026-11-18T14:00:00.000Z",
+          },
+          {
+            id: "523e4567-e89b-12d3-a456-426614174000",
+            amount: 137,
+            balanceAfter: 2717,
+            type: "history.get.bonusGrant",
+            messageId: null,
+            createdAt: "2026-11-17T10:00:00.000Z",
+          },
+        ],
+        paginationInfo: { totalCount: 3, pageCount: 1 },
+      },
+      empty: {
+        transactions: [],
+        paginationInfo: { totalCount: 0, pageCount: 0 },
+      },
       default: {
         transactions: [
           {

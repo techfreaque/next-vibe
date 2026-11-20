@@ -23,7 +23,12 @@ import {
   requestField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { CronTaskPriorityDB, CronTaskStatusDB } from "../../enum";
+import {
+  CronTaskPriority,
+  CronTaskPriorityDB,
+  CronTaskStatus,
+  CronTaskStatusDB,
+} from "../../enum";
 import { CRON_HISTORY_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 
@@ -125,7 +130,7 @@ export const { GET } = createEndpoint({
         label: "get.fields.limit.label",
         description: "get.fields.limit.description",
         placeholder: "get.fields.limit.placeholder",
-        schema: z.coerce.number().optional(),
+        schema: z.coerce.number().int().nonnegative().optional(),
       }),
       offset: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -133,7 +138,7 @@ export const { GET } = createEndpoint({
         label: "get.fields.offset.label",
         description: "get.fields.offset.description",
         placeholder: "get.fields.offset.placeholder",
-        schema: z.coerce.number().optional(),
+        schema: z.coerce.number().int().nonnegative().optional(),
       }),
 
       // === RESPONSE FIELDS ===
@@ -145,6 +150,7 @@ export const { GET } = createEndpoint({
             id: z.string(),
             taskId: z.string(),
             taskName: z.string(),
+            taskDisplayName: z.string().optional(),
             status: z.enum(CronTaskStatusDB),
             priority: z.enum(CronTaskPriorityDB),
             startedAt: z.string(),
@@ -156,6 +162,11 @@ export const { GET } = createEndpoint({
             createdAt: z.string(),
           }),
         ),
+      }),
+      selectedTask: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.fields.taskId.label",
+        schema: z.object({ id: z.string(), name: z.string() }).optional(),
       }),
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -238,9 +249,8 @@ export const { GET } = createEndpoint({
     requests: {
       default: {},
       filtered: {
-        taskId: "123",
-        startDate: "2021-01-01",
-        endDate: "2021-01-31",
+        taskId: "audit-job-preview",
+        status: CronTaskStatus.COMPLETED,
         limit: 10,
         offset: 0,
       },
@@ -267,23 +277,40 @@ export const { GET } = createEndpoint({
         },
       },
       filtered: {
-        executions: [],
-        totalCount: 0,
+        executions: [
+          {
+            id: "fc57a42c-2a31-4368-9b4c-76a93ccd3d13",
+            taskId: "audit-job-preview",
+            taskName: "vibe.tasks.audit-preview",
+            taskDisplayName: "Audit preview",
+            status: CronTaskStatus.COMPLETED,
+            priority: CronTaskPriority.MEDIUM,
+            startedAt: "2026-11-19T09:00:00.000Z",
+            completedAt: "2026-11-19T09:00:01.490Z",
+            durationMs: 1490,
+            error: null,
+            result: { recordsRead: 4 },
+            environment: "test",
+            createdAt: "2026-11-19T09:00:00.000Z",
+          },
+        ],
+        selectedTask: { id: "audit-job-preview", name: "Audit preview" },
+        totalCount: 1,
         hasMore: false,
         statusCounts: {
-          all: 0,
+          all: 2,
           running: 0,
-          completed: 0,
-          failed: 0,
+          completed: 1,
+          failed: 1,
           timeout: 0,
           cancelled: 0,
         },
         summary: {
-          totalExecutions: 0,
-          successfulExecutions: 0,
+          totalExecutions: 1,
+          successfulExecutions: 1,
           failedExecutions: 0,
-          averageDuration: null,
-          successRate: 0,
+          averageDuration: 1490,
+          successRate: 100,
         },
       },
     },

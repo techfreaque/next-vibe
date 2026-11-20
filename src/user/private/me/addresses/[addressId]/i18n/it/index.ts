@@ -4,6 +4,15 @@ export const translations: typeof enTranslations = {
   category: "Indirizzi utente",
   tag: "indirizzi",
 
+  widget: {
+    chooseAddress: "Scegli un indirizzo salvato",
+    addressUnavailable: "Indirizzo non disponibile",
+    saveChanges: "Salva modifiche",
+    reviewDeletion: "Verifica prima di eliminare",
+    confirmDeletion: "Rimuovere {{label}} dagli indirizzi salvati?",
+    cancel: "Annulla",
+  },
+
   update: {
     title: "Indirizzo di aggiornamento",
     titleShort: "Indirizzo di aggiornamento",

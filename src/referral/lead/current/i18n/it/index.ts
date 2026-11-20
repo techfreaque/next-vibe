@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
   description:
     "Restituisce il codice di riferimento legato al comando corrente, se presente",
   tag: "Inviti",
+  noReferral: "Nessun invito associato a questo contatto",
   response: {
     referralCode: "Codice invito",
     referralLabel: "Etichetta di riferimento",

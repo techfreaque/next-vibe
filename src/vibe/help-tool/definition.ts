@@ -71,6 +71,16 @@ const aiToolMetadataSchema = z.object({
   instanceId: z.string().optional(),
 });
 
+const categoriesSchema = z.array(
+  z.object({
+    name: z.string(),
+    count: z.number(),
+    subCategories: z
+      .array(z.object({ name: z.string(), count: z.number() }))
+      .optional(),
+  }),
+);
+
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
@@ -149,6 +159,20 @@ const { GET } = createEndpoint({
         description: "get.fields.category.description" as const,
         columns: 4,
         schema: z.string().optional(),
+      }),
+
+      subCategory: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.category.label",
+        description: "get.fields.category.description",
+        schema: z.string().optional(),
+        hiddenForPlatforms: [
+          Platform.AI,
+          Platform.MCP,
+          Platform.CRON,
+          Platform.REMOTE_SKILL,
+        ],
       }),
 
       toolName: requestField(scopedTranslation, {
@@ -242,6 +266,7 @@ const { GET } = createEndpoint({
         schema: z
           .enum([
             "all",
+            "web",
             "pinned",
             "allowed",
             "webPinned",
@@ -280,17 +305,42 @@ const { GET } = createEndpoint({
       categories: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.fields.categories.title" as const,
+        schema: categoriesSchema.optional(),
+      }),
+
+      webCategories: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.fields.categories.title",
+        schema: categoriesSchema.optional(),
+        hiddenForPlatforms: [
+          Platform.AI,
+          Platform.MCP,
+          Platform.CRON,
+          Platform.REMOTE_SKILL,
+        ],
+      }),
+
+      recordSearchTargets: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "catalog.findRecord",
         schema: z
           .array(
             z.object({
-              name: z.string(),
-              count: z.number(),
-              subCategories: z
-                .array(z.object({ name: z.string(), count: z.number() }))
-                .optional(),
+              alias: z.string(),
+              field: z.string(),
+              label: z.string(),
             }),
           )
           .optional(),
+        visibleFor: [UserPermissionRole.ADMIN],
+        hiddenForPlatforms: [
+          Platform.AI,
+          Platform.MCP,
+          Platform.CRON,
+          Platform.REMOTE_SKILL,
+          Platform.CLI,
+          Platform.CLI_PACKAGE,
+        ],
       }),
 
       hint: responseField(scopedTranslation, {

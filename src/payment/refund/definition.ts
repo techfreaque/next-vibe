@@ -13,7 +13,10 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
+import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
+  backButton,
   objectField,
   requestField,
   responseField,
@@ -21,6 +24,12 @@ import {
 import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";
+
+const PaymentRefundWidget = lazyWidget(() =>
+  import("./widget").then((module) => ({
+    default: module.PaymentRefundWidget,
+  })),
+);
 
 /**
  * Create Refund Endpoint (POST)
@@ -40,14 +49,12 @@ const { POST } = createEndpoint({
   icon: "refresh-ccw" as const,
   tags: ["tags.refund" as const, "tags.transaction" as const],
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "form.title" as const,
-    description: "form.description" as const,
-    layoutType: LayoutType.GRID,
-    columns: 12,
+  fields: customWidgetObject({
+    render: PaymentRefundWidget,
+    noFormElement: true,
     usage: { request: "data", response: true },
     children: {
+      backButton: backButton(scopedTranslation, { usage: { response: true } }),
       // REQUEST FIELDS
       transactionId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -66,6 +73,7 @@ const { POST } = createEndpoint({
         description: "form.fields.amount.description" as const,
         placeholder: "form.fields.amount.placeholder" as const,
         columns: 12,
+        step: 0.01,
         schema: z.coerce.number().positive().optional(),
       }),
 
@@ -113,7 +121,7 @@ const { POST } = createEndpoint({
           id: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
             label: "post.response.refund.id" as const,
-            schema: z.uuid(),
+            schema: z.string(),
           }),
           userId: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
@@ -223,6 +231,11 @@ const { POST } = createEndpoint({
         transactionId: "123e4567-e89b-12d3-a456-426614174000",
         amount: 15.0,
         reason: "Partial refund for damaged item",
+      },
+      eligibleReview: {
+        transactionId: "d4f2b541-0f4e-4336-b037-ac7b8913b778",
+        amount: 7.5,
+        reason: "Billing adjustment",
       },
       full: {
         transactionId: "123e4567-e89b-12d3-a456-426614174000",

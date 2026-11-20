@@ -4,57 +4,55 @@ export const translations: typeof enTranslations = {
   tags: {
     payment: "pagamento",
     bill: "fatturazione",
-    ap: "contabilità-pagabile"
+    ap: "contabilità-pagabile",
   },
   get: {
     title: "Dettagli di Bill",
     titleShort: "Dettagli di Bill",
-    description: "Ottieni una fattura del fornitore con tutti gli articoli della linea",
+    description:
+      "Ottieni una fattura del fornitore con tutti gli articoli della linea",
     billId: {
       label: "Bill ID",
-      description: "Il disegno di legge per recuperare"
+      description: "Il disegno di legge per recuperare",
     },
     errors: {
       validation: {
         title: "Errore di convalida",
-        description: "fattura non valida ID"
+        description: "fattura non valida ID",
       },
       unauthorized: {
         title: "Non firmata",
-        description: "Accedi per visualizzare le bollette"
+        description: "Accedi per visualizzare le bollette",
       },
       forbidden: {
         title: "Accesso negato",
-        description: "Non un membro di questa società"
+        description: "Non un membro di questa società",
       },
-      conflict: {
-        title: "Conflitto",
-        description: "Conflittuale dei dati"
-      },
+      conflict: { title: "Conflitto", description: "Conflittuale dei dati" },
       server: {
         title: "Errore del server",
-        description: "Non poteva caricare la bolletta"
+        description: "Non poteva caricare la bolletta",
       },
       unknown: {
         title: "Errore sconosciuto",
-        description: "Si è verificato un errore imprevisto"
+        description: "Si è verificato un errore imprevisto",
       },
       network: {
         title: "Errore di rete",
-        description: "Controlla la connessione"
+        description: "Controlla la connessione",
       },
       notFound: {
         title: "Bill non trovato",
-        description: "Questa legge non esiste"
+        description: "Questa legge non esiste",
       },
       unsavedChanges: {
         title: "Modifiche non salvate",
-        description: "Hai modifiche non salvate"
-      }
+        description: "Hai modifiche non salvate",
+      },
     },
     success: {
       title: "Caricamento in corso",
-      description: "Dettagli di fattura recuperati"
+      description: "Dettagli di fattura recuperati",
     },
     response: {
       id: "ID",
@@ -81,8 +79,8 @@ export const translations: typeof enTranslations = {
       unitPrice: "Prezzo unitario",
       taxRate: "Tasso d'imposta",
       lineTaxAmount: "Imposte",
-      lineTotal: "Totale"
-    }
+      lineTotal: "Totale",
+    },
   },
   enums: {
     billStatus: {
@@ -90,10 +88,11 @@ export const translations: typeof enTranslations = {
       RECEIVED: "Ricevuto.",
       APPROVED: "Approvazione",
       PAID: "Pagato",
-      DISPUTED: "Disputato"
-    }
+      DISPUTED: "Disputato",
+    },
   },
   widget: {
+    markReceived: "Mark ricevuto",
     back: "Indietro",
     submit: "Guarda Bill",
     billNumber: "Bill Bill",
@@ -115,7 +114,8 @@ export const translations: typeof enTranslations = {
     addLine: "Aggiungere la linea",
     viewJournalEntry: "Visualizza l'ingresso del giornale",
     approveConfirmTitle: "Approva questo disegno di legge?",
-    approveConfirmDescription: "Questo avanzerà lo stato di fattura. Una volta approvato, verrà postata una voce di giornale. Questo non può essere annullato.",
+    approveConfirmDescription:
+      "Questo avanzerà lo stato di fattura. Una volta approvato, verrà postata una voce di giornale. Questo non può essere annullato.",
     approveConfirmProceed: "Sì, Approvo",
     approveConfirmCancel: "Annulla",
     status: {
@@ -123,7 +123,7 @@ export const translations: typeof enTranslations = {
       received: "Ricevuto.",
       approved: "Approvazione",
       paid: "Pagato",
-      disputed: "Disputato"
-    }
-  }
+      disputed: "Disputato",
+    },
+  },
 };

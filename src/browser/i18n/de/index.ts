@@ -2530,6 +2530,9 @@ export const translations: typeof enTranslations = {
   },
 
   shared: {
+    addItem: "Eintrag hinzufügen",
+    removeItem: "Letzten Eintrag entfernen",
+    back: "Zurück",
     instanceId: {
       label: "Sitzungs-ID",
       description:

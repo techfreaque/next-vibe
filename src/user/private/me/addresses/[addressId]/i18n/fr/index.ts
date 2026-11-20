@@ -4,6 +4,15 @@ export const translations: typeof enTranslations = {
   category: "Adresses de l'utilisateur",
   tag: "adresses",
 
+  widget: {
+    chooseAddress: "Choisir une adresse enregistrée",
+    addressUnavailable: "Adresse indisponible",
+    saveChanges: "Enregistrer les modifications",
+    reviewDeletion: "Vérifier avant de supprimer",
+    confirmDeletion: "Supprimer {{label}} de vos adresses enregistrées ?",
+    cancel: "Annuler",
+  },
+
   update: {
     title: "Modifier l'adresse",
     titleShort: "Modifier l'adresse",

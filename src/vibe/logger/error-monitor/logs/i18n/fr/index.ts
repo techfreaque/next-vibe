@@ -34,9 +34,11 @@ export const translations: typeof enTranslations = {
         description: "Filtrer par statut de résolution",
       },
       search: {
-        label: "Recherche",
-        description: "Rechercher dans les messages d'erreur",
-        placeholder: "Rechercher dans les messages...",
+        label: "Rechercher une erreur",
+        description:
+          "Rechercher par message, empreinte ou identifiant du journal",
+        placeholder:
+          "Rechercher par message, empreinte ou identifiant du journal",
       },
       errorType: {
         label: "Type d'erreur",
@@ -266,6 +268,14 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    emptyFiltered:
+      "Aucun groupe ne correspond. Retirez un filtre et relancez la recherche.",
+    emptyActive:
+      "Aucun groupe actif. Choisissez « Tous » pour revoir les erreurs résolues.",
+    severity: {
+      error: "Erreur",
+      warning: "Avertissement",
+    },
     title: "Journaux d'erreurs",
     loading: "Chargement des journaux...",
     empty: "Aucun journal d'erreurs trouvé",
@@ -273,7 +283,7 @@ export const translations: typeof enTranslations = {
       refresh: "Actualiser",
       runScan: "Lancer l'analyse",
       back: "Retour",
-      activeCount: "actives",
+      activeCount: "{{count}} groupes ouverts au total",
     },
     col: {
       message: "Message",
@@ -287,16 +297,20 @@ export const translations: typeof enTranslations = {
       resolved: "Résolue",
     },
     action: {
+      confirm: "Enregistrer le statut",
+      clear: "Effacer les filtres",
       resolve: "Résoudre",
       reopen: "Rouvrir",
     },
     detail: {
+      context: "Contexte de l’erreur",
       stackTrace: "Pile d'appels",
       metadata: "Métadonnées",
       collapse: "Replier",
       resolved: "Résolue",
     },
     pagination: {
+      matches: "Groupes trouvés : {{count}}",
       info: "Page {{page}} sur {{totalPages}} ({{total}} au total)",
       prev: "Précédent",
       next: "Suivant",

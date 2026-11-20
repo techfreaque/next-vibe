@@ -21,6 +21,7 @@ import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import {
   requestField,
   responseField,
+  submitButton,
 } from "../../../unified-ui/_shared/utils-i18n";
 import { ERROR_LOGS_ALIAS } from "./constants";
 import {
@@ -34,6 +35,10 @@ const ErrorLogsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({
     default: m.ErrorLogsContainer,
   })),
+);
+
+const UpdateErrorLogContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.UpdateErrorLogContainer })),
 );
 
 export const { GET } = createEndpoint({
@@ -104,7 +109,7 @@ export const { GET } = createEndpoint({
         label: "get.fields.limit.label",
         description: "get.fields.limit.description",
         placeholder: "get.fields.limit.placeholder",
-        schema: z.coerce.number().optional(),
+        schema: z.coerce.number().int().nonnegative().optional(),
       }),
       offset: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -112,7 +117,7 @@ export const { GET } = createEndpoint({
         label: "get.fields.offset.label",
         description: "get.fields.offset.description",
         placeholder: "get.fields.offset.placeholder",
-        schema: z.coerce.number().optional(),
+        schema: z.coerce.number().int().nonnegative().optional(),
       }),
 
       // === RESPONSE FIELDS ===
@@ -201,8 +206,9 @@ export const { GET } = createEndpoint({
     requests: {
       default: {},
       filtered: {
-        status: ErrorLogStatusFilter.ACTIVE,
-        limit: 50,
+        search: "8b6fa4b2",
+        status: ErrorLogStatusFilter.ALL,
+        limit: 1,
         offset: 0,
       },
     },
@@ -212,6 +218,27 @@ export const { GET } = createEndpoint({
         totalCount: 0,
         hasMore: false,
         unresolvedCount: 0,
+      },
+      filtered: {
+        logs: [
+          {
+            id: "8b6fa4b2-174a-438c-a664-478e9688c458",
+            message: "Unable to read scheduled job settings",
+            errorType: "INTERNAL_ERROR",
+            stackTrace:
+              "Error: Unable to read scheduled job settings\n    at loadJobSettings",
+            metadata: [{ taskId: "audit-job-preview", environment: "test" }],
+            fingerprint: "6f7c1b82d9e1",
+            occurrences: 3,
+            resolved: false,
+            level: "error",
+            firstSeen: "2026-11-19T08:00:00.000Z",
+            createdAt: "2026-11-19T08:12:00.000Z",
+          },
+        ],
+        totalCount: 1,
+        hasMore: false,
+        unresolvedCount: 4,
       },
     },
   },
@@ -232,7 +259,7 @@ export const { PATCH } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
 
   fields: customWidgetObject({
-    render: ErrorLogsContainer,
+    render: UpdateErrorLogContainer,
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
@@ -264,6 +291,11 @@ export const { PATCH } = createEndpoint({
         description: "patch.fields.resolved.description",
         schema: z.boolean(),
       }),
+      submit: submitButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+        inline: true,
+        label: "widget.action.confirm",
+      }),
 
       // === RESPONSE FIELDS ===
       responseFingerprint: responseField(scopedTranslation, {
@@ -283,6 +315,14 @@ export const { PATCH } = createEndpoint({
       }),
     },
   }),
+  options: {
+    mutationOptions: {
+      onSuccess: async ({ logger }) => {
+        const { apiClient } = await import("../../../unified-ui/hooks/store");
+        await apiClient.refetchEndpoint(GET, logger);
+      },
+    },
+  },
 
   successTypes: {
     title: "patch.success.title",

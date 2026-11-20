@@ -77,6 +77,8 @@ export const translations: typeof enTranslations = {
     placeholder: "Firmen-ID eingeben",
   },
   widget: {
+    commercialDocuments: "Geschäftsbelege",
+    processorDiagnostics: "Zahlungsdiagnose",
     loading: "Übersicht wird geladen...",
     noData: "Kein Unternehmen ausgewählt.",
     noDataHint:

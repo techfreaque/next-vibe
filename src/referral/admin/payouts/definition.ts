@@ -5,10 +5,10 @@
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
@@ -16,22 +16,44 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  objectField,
+  backButton,
   requestField,
   responseField,
+  submitButton,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
 import {
+  PayoutCurrency,
   PayoutCurrencyDB,
+  PayoutStatus,
   PayoutStatusDB,
   PayoutStatusOptions,
 } from "../../enum";
 import { scopedTranslation } from "../../i18n";
+import { adminPayoutActions } from "../../payout-actions";
 
 const AdminPayoutsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.AdminPayoutsContainer })),
 );
+
+const PayoutActionContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.PayoutActionContainer })),
+);
+
+const payoutExample = {
+  id: "123e4567-e89b-12d3-a456-426614174101",
+  userId: "123e4567-e89b-12d3-a456-426614174000",
+  userEmail: "partner@example.test",
+  amountCents: 2505,
+  currency: PayoutCurrency.USDC,
+  status: PayoutStatus.PENDING,
+  walletAddress: "0x46836cbe9fc7ec2040a2203149ca7e1a178ad013",
+  adminNotes: null,
+  rejectionReason: null,
+  createdAt: "2026-11-18T15:20:00.000Z",
+  processedAt: null,
+};
 
 /**
  * GET: list all payout requests
@@ -53,11 +75,52 @@ export const { GET } = createEndpoint({
     render: AdminPayoutsContainer,
     usage: { request: "data", response: true } as const,
     children: {
+      backButton: backButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
+      search: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        schema: z.string().trim().max(200).optional(),
+        label: "admin.payouts.fields.search.label",
+        description: "admin.payouts.fields.search.description",
+      }),
+      userId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        schema: z.uuid().optional(),
+        label: "admin.payouts.fields.userId.label",
+        hidden: true,
+        includeInCacheKey: true,
+      }),
+      requestId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        schema: z.uuid().optional(),
+        label: "admin.payouts.fields.requestId.label",
+        hidden: true,
+        includeInCacheKey: true,
+      }),
+      page: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        schema: z.coerce.number().int().min(1).max(10_000_000).default(1),
+        label: "admin.payouts.fields.page.label",
+        hidden: true,
+      }),
+      limit: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        schema: z.coerce.number().int().min(1).max(100).default(20),
+        label: "admin.payouts.fields.limit.label",
+        hidden: true,
+      }),
       status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "admin.payouts.fields.status.label" as const,
         description: "admin.payouts.fields.status.description" as const,
+        placeholder: "admin.payouts.fields.status.all",
         schema: z.enum(PayoutStatusDB).optional(),
         options: PayoutStatusOptions,
       }),
@@ -79,6 +142,14 @@ export const { GET } = createEndpoint({
           }),
         ),
       }),
+      resultPage: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.coerce.number(),
+      }),
+      pageSize: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.coerce.number(),
+      }),
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.coerce.number(),
@@ -87,9 +158,70 @@ export const { GET } = createEndpoint({
   }),
 
   examples: {
-    requests: { default: {} },
+    requests: {
+      default: {},
+      pending: { status: PayoutStatus.PENDING },
+      approved: { status: PayoutStatus.APPROVED },
+      empty: { search: "no-match@example.test" },
+      secondPage: { page: 2, limit: 1 },
+    },
     responses: {
-      default: { items: [], totalCount: 0 },
+      default: {
+        items: [
+          payoutExample,
+          {
+            ...payoutExample,
+            id: "123e4567-e89b-12d3-a456-426614174102",
+            status: PayoutStatus.APPROVED,
+            currency: PayoutCurrency.BTC,
+            walletAddress: "bc1q2ej7jptwr7x77wa0udhd9ckuwtnsg540jfwhnt",
+            amountCents: 5030,
+            createdAt: "2026-11-17T09:00:00.000Z",
+            processedAt: "2026-11-18T08:00:00.000Z",
+          },
+        ],
+        totalCount: 2,
+        resultPage: 1,
+        pageSize: 20,
+      },
+      pending: {
+        items: [payoutExample],
+        totalCount: 1,
+        resultPage: 1,
+        pageSize: 20,
+      },
+      approved: {
+        items: [
+          {
+            ...payoutExample,
+            id: "123e4567-e89b-12d3-a456-426614174102",
+            status: PayoutStatus.APPROVED,
+            currency: PayoutCurrency.BTC,
+            walletAddress: "bc1q2ej7jptwr7x77wa0udhd9ckuwtnsg540jfwhnt",
+            amountCents: 5030,
+            processedAt: "2026-11-18T08:00:00.000Z",
+          },
+        ],
+        totalCount: 1,
+        resultPage: 1,
+        pageSize: 20,
+      },
+      empty: { items: [], totalCount: 0, resultPage: 1, pageSize: 20 },
+      secondPage: {
+        items: [
+          {
+            ...payoutExample,
+            id: "123e4567-e89b-12d3-a456-426614174103",
+            status: PayoutStatus.COMPLETED,
+            currency: PayoutCurrency.CREDITS,
+            walletAddress: null,
+            processedAt: "2026-11-18T16:20:00.000Z",
+          },
+        ],
+        totalCount: 2,
+        resultPage: 2,
+        pageSize: 1,
+      },
     },
   },
 
@@ -150,18 +282,46 @@ export const { POST } = createEndpoint({
   tags: ["tags.referral"],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: objectField(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    noCard: true,
-    layoutType: LayoutType.STACKED,
+  options: {
+    mutationOptions: {
+      onSuccess: async ({ logger }) => {
+        const { buildKey } =
+          await import("next-vibe/unified-ui/hooks/query-key-builder");
+        const { queryClient } =
+          await import("next-vibe/unified-ui/hooks/store");
+        const key = buildKey<CreateApiEndpointAny>(
+          "query",
+          GET,
+          undefined,
+          logger,
+          undefined,
+        );
+        await queryClient.invalidateQueries({
+          predicate: ({ queryKey: [query] }) =>
+            typeof query === "string" &&
+            (query === key || query.startsWith(`${key}-`)),
+        });
+      },
+    },
+  },
+
+  fields: customWidgetObject({
+    render: PayoutActionContainer,
     usage: { request: "data", response: true },
     children: {
+      backButton: backButton(scopedTranslation, {
+        usage: { request: "data" },
+      }),
+      submitButton: submitButton(scopedTranslation, {
+        label: "admin.payouts.widget.confirmAction",
+        usage: { request: "data" },
+      }),
       requestId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "admin.payouts.fields.requestId.label" as const,
         description: "admin.payouts.fields.requestId.description" as const,
-        schema: z.string().uuid(),
+        schema: z.uuid(),
       }),
       action: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -176,7 +336,7 @@ export const { POST } = createEndpoint({
             label: "admin.payouts.widget.complete" as const,
           },
         ],
-        schema: z.enum(["approve", "reject", "complete"] as const),
+        schema: z.enum(adminPayoutActions),
       }),
       adminNotes: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -207,7 +367,7 @@ export const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        requestId: "123e4567-e89b-12d3-a456-426614174000",
+        requestId: payoutExample.id,
         action: "approve" as const,
       },
     },

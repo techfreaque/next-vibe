@@ -16,10 +16,10 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
-    title: "Approuver la facture",
-    titleShort: "Approuver la facture",
+    title: "Vérifier le statut de la facture",
+    titleShort: "Vérifier le statut de la facture",
     description:
-      "Faire avancer le statut de la facture (DRAFT→RECEIVED→APPROVED) et passer l'écriture comptable",
+      "Met à jour le statut d’une facture fournisseur en brouillon ou reçue.",
     billId: {
       label: "ID de la facture",
       description: "La facture à approuver",
@@ -72,13 +72,13 @@ export const translations: typeof enTranslations = {
     },
     widget: {
       back: "Retour",
-      submit: "Approuver la facture",
+      submit: "Confirmer le changement de statut",
       confirmTitle: "Approuver cette facture ?",
       confirmDescription:
-        "Le statut de la facture va avancer. Une fois approuvée, une écriture comptable sera passée.",
+        "Un brouillon passe au statut Reçue. Une facture reçue passe au statut Approuvée. Une écriture est créée si la comptabilité est configurée.",
       confirmButton: "Oui, approuver",
       cancelButton: "Annuler",
-      approved: "Facture approuvée",
+      approved: "Statut de la facture mis à jour",
     },
   },
 };

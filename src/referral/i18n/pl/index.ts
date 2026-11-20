@@ -315,7 +315,21 @@ export const translations: typeof enTranslations = {
         description: "Zatwierdź, odrzuć lub zakończ żądanie wypłaty",
       },
       fields: {
+        search: {
+          label: "E-mail partnera",
+          description: "Wpisz cały adres e-mail lub jego fragment.",
+        },
+        userId: {
+          label: "Konto partnera",
+        },
+        page: {
+          label: "Strona",
+        },
+        limit: {
+          label: "Wyniki na stronę",
+        },
         status: {
+          all: "Wszystkie statusy",
           label: "Filtr statusu",
           description: "Filtruj według statusu wypłaty",
         },
@@ -337,7 +351,37 @@ export const translations: typeof enTranslations = {
         },
       },
       widget: {
-        empty: "Nie znaleziono żądań wypłat",
+        empty: "Brak wniosków o wypłatę",
+        emptyHint: "Sprawdź inny adres e-mail lub status.",
+        results: "Wnioski o wypłatę: {{count}}",
+        apply: "Zastosuj filtry",
+        clear: "Wyczyść filtry",
+        refresh: "Odśwież",
+        loading: "Wczytywanie wniosków o wypłatę…",
+        amount: "Zarobione kredyty: {{credits}} · równowartość {{value}} USD",
+        payoutSummary: "{{amount}} · Metoda wypłaty: {{currency}}",
+        requestedAt: "Złożono {{date}}",
+        processedAt: "Zaktualizowano {{date}}",
+        rejectionReason: "Powód: {{reason}}",
+        adminNotes: "Notatki: {{notes}}",
+        openPartner: "Otwórz konto partnera",
+        openPartnerFor: "Otwórz konto partnera {{email}}",
+        actionFor: "{{action}} wypłatę dla {{email}}",
+        previous: "Poprzednia strona",
+        next: "Następna strona",
+        page: "Strona {{page}} z {{total}}",
+        confirmAction: "Potwierdź akcję",
+        lookupFailed: "Nie udało się wczytać wniosku o wypłatę.",
+        state: "Status",
+        valueLabel: "Wnioskowana kwota",
+        destinationLabel: "Metoda wypłaty",
+        actionSaved: "Zapisano akcję dotyczącą wypłaty.",
+        approveDetail:
+          "Po zatwierdzeniu zarobione kredyty pozostaną zarezerwowane na tę wypłatę.",
+        rejectDetail:
+          "Po odrzuceniu wniosku zarezerwowane kredyty wrócą do dostępnego salda.",
+        completeDetail:
+          "Po wykonaniu przelewu oznacz wypłatę jako zakończoną. Odpowiednia liczba zarobionych kredytów zostanie odjęta.",
         approve: "Zatwierdź",
         reject: "Odrzuć",
         complete: "Zakończ",

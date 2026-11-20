@@ -37,6 +37,16 @@ const { POST } = createEndpoint({
   tags: ["tags.payment" as const, "tags.estimate" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { refreshEstimateDocuments } =
+          await import("@/finance/document-cache");
+        await refreshEstimateDocuments(data.logger, data.pathParams.estimateId);
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: EstimateSendWidgetLazy,
     usage: { request: "urlPathParams", response: true },

@@ -90,6 +90,7 @@ export const translations: typeof enTranslations = {
     placeholder: "Rechnungs-ID eingeben",
   },
   widget: {
+    createCreditNote: "Gutschrift erstellen",
     back: "Zurück",
     submit: "Rechnung abrufen",
     invoiceNumber: "Rechnung",

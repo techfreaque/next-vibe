@@ -290,6 +290,12 @@ const accountResponseFields = {
 /**
  * GET - retrieve account by ID
  */
+const MessengerAccountReadWidget = lazyWidget(() =>
+  import("./widget").then((module) => ({
+    default: module.MessengerAccountReadWidget,
+  })),
+);
+
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
@@ -304,6 +310,7 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
 
   fields: customWidgetObject({
+    render: MessengerAccountReadWidget,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
       id: requestUrlPathParamsResponseField(scopedTranslation, {

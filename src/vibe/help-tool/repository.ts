@@ -18,6 +18,8 @@ import "server-only";
 
 import { z } from "zod";
 
+import { CATEGORY_REGISTRY } from "@/generated/categories/registry";
+
 import { getEnvAvailability } from "../agent/env-availability";
 import { getUnavailableModelIds } from "../agent/models/all-models";
 import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
@@ -32,7 +34,6 @@ import type { CountryLanguage } from "../core/i18n/core/config";
 import { getLanguageFromLocale } from "../core/i18n/core/language-utils";
 import type { InferJwtPayloadTypeFromRoles } from "../core/route/handler-roles";
 import { type ResponseType, success } from "../core/route/response.schema";
-import { searchField, searchItems } from "../core/utils/in-memory-search";
 import { parseError } from "../core/utils/parse-error";
 import {
   filterUserPermissionRoles,
@@ -52,15 +53,15 @@ import type {
   HelpToolParameters,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
-import {
-  narrowPublicPins,
-  resolveAgentPins,
-  resolveEffectiveUser,
-} from "./repository/agent-pins";
+import { narrowPublicPins, resolveAgentPins } from "./repository/agent-pins";
 import {
   buildCategories,
+  filterCatalogCategory,
   filterMetaForUser,
   getMetaPlatforms,
+  getRecordSearchTargets,
+  resolveEffectiveUser,
+  searchCatalog,
 } from "./repository/meta-filter";
 import {
   COMPACT_CATEGORY_ONLY_THRESHOLD,
@@ -294,6 +295,32 @@ export class HelpRepository {
       discoveryPlatform,
       effectiveUser,
     );
+    const isCli =
+      platform === Platform.CLI || platform === Platform.CLI_PACKAGE;
+    const isWebPlatform = !isCompact && !isCli;
+    const webMeta = !isCompact
+      ? filterMetaForUser(allMeta, Platform.NEXT_PAGE, effectiveUser)
+      : [];
+    const allowedForProduction = (tool: EndpointMeta): boolean =>
+      !isAdmin ||
+      !data.includeProdOnly ||
+      !tool.allowedRoles.includes(PlatformMarker.PRODUCTION_OFF);
+    const webCatalog = webMeta.filter(allowedForProduction);
+    const recordSearchTargets =
+      isAdmin && isWebPlatform && !viewAsRole
+        ? getRecordSearchTargets(CATEGORY_REGISTRY, webCatalog)
+        : undefined;
+    const allAccessibleMeta =
+      isAdmin && isWebPlatform
+        ? [
+            ...new Map(
+              [...webMeta, ...filteredByPlatform].map((tool) => [
+                tool.toolName,
+                tool,
+              ]),
+            ).values(),
+          ]
+        : filteredByPlatform;
 
     // Admin platform badges - derived directly from allowedRoles in meta.
     // Web/CLI admin only: compact (AI/MCP) consumers don't get the 10-entry
@@ -310,27 +337,12 @@ export class HelpRepository {
     // accessible on the requested platform — MCP_OFF tools are excluded by
     // filterMetaForUser via checkPlatformAccess, but MCP_VISIBLE is not a filter
     // here: it's a pin that controls auto-discovery, not execution access.
-    let platformFilteredMeta = filteredByPlatform;
-    // Keep an unfiltered copy for detail-mode lookups (detail should search all accessible tools,
-    // not just the active pinned/allowed subset chosen for list display).
-    const allAccessibleMeta = filteredByPlatform;
-
-    // includeProdOnly: exclude PRODUCTION_OFF tools
-    if (isAdmin && data.includeProdOnly) {
-      platformFilteredMeta = platformFilteredMeta.filter(
-        (m) => !m.allowedRoles.includes(PlatformMarker.PRODUCTION_OFF),
-      );
-    }
-
+    let platformFilteredMeta = allAccessibleMeta.filter(allowedForProduction);
     const totalCount = platformFilteredMeta.length;
 
     // statsFilter: web platforms (NEXT_PAGE, NEXT_API, TRPC, FRAME, ELECTRON) default to "pinned"
     // to avoid loading all tools unnecessarily in the web UI.
     // Compact platforms (AI/MCP/CRON) and CLI default to "all" - no pinned filtering needed.
-    const isWebPlatform =
-      !isCompact &&
-      platform !== Platform.CLI &&
-      platform !== Platform.CLI_PACKAGE;
     const statsFilter =
       data.statsFilter ??
       (isWebPlatform ? (isAdmin ? "webPinned" : "pinned") : "all");
@@ -345,6 +357,7 @@ export class HelpRepository {
         ? await resolveAgentPins({
             allMeta,
             aiMeta,
+            webMeta,
             effectiveUser,
             user,
             viewAsRole,
@@ -354,9 +367,11 @@ export class HelpRepository {
           })
         : null;
     if (pins?.filteredMeta) {
-      platformFilteredMeta = pins.filteredMeta;
+      platformFilteredMeta = pins.filteredMeta.filter(allowedForProduction);
+    } else if (statsFilter === "web" || statsFilter === "webPinned") {
+      platformFilteredMeta = webCatalog;
     }
-    if (!isCompact && user.isPublic) {
+    if (!isCompact && (user.isPublic || !pins?.filteredMeta)) {
       platformFilteredMeta =
         (await narrowPublicPins(
           platformFilteredMeta,
@@ -401,12 +416,14 @@ export class HelpRepository {
       const needle = data.toolName.toLowerCase().trim();
       // Use allAccessibleMeta (pre-statsFilter) so detail lookups work for any accessible tool,
       // not just the ones currently pinned/allowed in the active list view.
-      const matchedTool = allAccessibleMeta.find(
-        (m) =>
-          m.toolName.toLowerCase() === needle ||
-          (m.aliases.length > 0 && m.aliases[0].toLowerCase() === needle) ||
-          m.aliases.some((a) => a.toLowerCase() === needle),
-      );
+      const matchedTool = allAccessibleMeta
+        .filter(allowedForProduction)
+        .find(
+          (m) =>
+            m.toolName.toLowerCase() === needle ||
+            (m.aliases.length > 0 && m.aliases[0].toLowerCase() === needle) ||
+            m.aliases.some((a) => a.toLowerCase() === needle),
+        );
       if (!matchedTool) {
         return success({
           tools: [] satisfies HelpToolMetadataSerialized[],
@@ -457,12 +474,14 @@ export class HelpRepository {
 
     const query = data.query?.toLowerCase().trim();
     const category = data.category?.toLowerCase().trim();
+    const searchWebCatalog =
+      isWebPlatform && statsFilter === "webPinned" && !!query;
 
     // Auto-upgrade to detail mode on exact name/alias match.
     // Uses allAccessibleMeta (pre-statsFilter) so exact lookups work even for
     // tools excluded from the current stats view (e.g. AI_TOOL_OFF tools when
     // statsFilter="all" replaces platformFilteredMeta with aiMeta).
-    if (query && !category) {
+    if (query && !category && !isWebPlatform) {
       const exactMatch = allAccessibleMeta.find(
         (m) =>
           m.toolName.toLowerCase() === query ||
@@ -508,44 +527,25 @@ export class HelpRepository {
       }
     }
 
-    let filtered = platformFilteredMeta;
+    let filtered = filterCatalogCategory(
+      searchWebCatalog ? webCatalog : platformFilteredMeta,
+      category,
+      data.subCategory,
+      isWebPlatform && (statsFilter === "web" || !!data.subCategory),
+    );
 
     if (query) {
-      filtered = searchItems(filtered, {
-        query,
-        fields: [
-          searchField((m) => m.toolName, 1.0),
-          searchField((m) => m.aliases, 0.8),
-          searchField((m) => m.description, 0.3),
-          searchField((m) => m.tags, 0.2),
-          searchField((m) => m.category, 0.1),
-        ],
-      });
-    }
-
-    if (category) {
-      // category field accepts both parent category key (e.g. "ai") and subCategory name (e.g. "Search").
-      // Match against category first; if no tools match, try subCategory fallback.
-      const byCat = filtered.filter((m) =>
-        m.category?.toLowerCase().includes(category),
-      );
-      filtered =
-        byCat.length > 0
-          ? byCat
-          : filtered.filter((m) =>
-              (m.subCategory ?? m.category)?.toLowerCase().includes(category),
-            );
+      filtered = searchCatalog(filtered, query, (tool) => tool.toolName);
     }
 
     // Web: if no filters at all (no query, no category, no toolName), return categories only.
     // This lets the sidebar start page show folders without loading every tool.
     // CLI/compact platforms skip this to preserve existing "return everything" behaviour.
-    const isCli =
-      platform === Platform.CLI || platform === Platform.CLI_PACKAGE;
     const hasFilters =
       !!(query ?? category ?? data.toolName) ||
       statsFilter === "pinned" ||
       statsFilter === "webPinned" ||
+      statsFilter === "web" ||
       statsFilter === "allowed" ||
       statsFilter === "all" ||
       statsFilter === "cliAllowed" ||
@@ -573,13 +573,13 @@ export class HelpRepository {
     }
 
     // Sort by category (A-Z), then by tool name (A-Z) within each category
-    filtered.sort((a, b) => {
-      const catCmp = a.category.localeCompare(b.category);
-      if (catCmp !== 0) {
-        return catCmp;
-      }
-      return a.toolName.localeCompare(b.toolName);
-    });
+    if (!query) {
+      filtered = filtered.toSorted(
+        (a, b) =>
+          a.category.localeCompare(b.category) ||
+          a.title.localeCompare(b.title, locale),
+      );
+    }
 
     const matchedCount = filtered.length;
     const totalPages = Math.ceil(matchedCount / effectivePageSize);
@@ -721,6 +721,8 @@ export class HelpRepository {
       totalCount,
       matchedCount,
       categories,
+      webCategories: isWebPlatform ? buildCategories(webCatalog) : undefined,
+      recordSearchTargets,
       hint:
         totalPages > 1
           ? t("get.hints.cliList", {

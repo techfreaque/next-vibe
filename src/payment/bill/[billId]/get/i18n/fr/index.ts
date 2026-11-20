@@ -91,6 +91,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    markReceived: "Marquer comme reçue",
     back: "Retour",
     submit: "Rechercher la facture",
     billNumber: "Facture",

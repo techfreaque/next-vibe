@@ -3,6 +3,7 @@
  * Browse all subscriptions with filtering and pagination
  */
 
+import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -25,6 +26,14 @@ import {
   widgetField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
+
+import { PaymentProvider } from "@/payment/enum";
+import {
+  BillingInterval,
+  CancellationReason,
+  SubscriptionPlan,
+  SubscriptionStatus,
+} from "@/subscription/enum";
 
 import {
   BillingIntervalAdminFilter,
@@ -71,6 +80,14 @@ const { GET } = createEndpoint({
     children: {
       backButton: backButton(scopedTranslation, {
         usage: { request: "data", response: true },
+      }),
+      userId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.response.subscriptions.userId",
+        hidden: true,
+        includeInCacheKey: true,
+        schema: z.uuid().optional(),
       }),
 
       // === SEARCH & FILTERS ===
@@ -128,7 +145,7 @@ const { GET } = createEndpoint({
             label: "get.dateFrom.label" as const,
             description: "get.dateFrom.description" as const,
             columns: 6,
-            schema: z.coerce.date().optional(),
+            schema: dateSchema.optional(),
           }),
           dateTo: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -136,13 +153,13 @@ const { GET } = createEndpoint({
             label: "get.dateTo.label" as const,
             description: "get.dateTo.description" as const,
             columns: 6,
-            schema: z.coerce.date().optional(),
+            schema: dateSchema.optional(),
           }),
         },
       }),
 
       // === SORTING OPTIONS ===
-      sortingOptions: objectField(scopedTranslation, {
+      sortingOptions: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.sortingOptions.title" as const,
         description: "get.sortingOptions.description" as const,
@@ -206,6 +223,11 @@ const { GET } = createEndpoint({
                   label: "get.response.subscriptions.id" as const,
                   schema: z.string(),
                 }),
+                userId: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.subscriptions.userId",
+                  schema: z.uuid(),
+                }),
                 userEmail: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   label: "get.response.subscriptions.userEmail" as const,
@@ -219,18 +241,18 @@ const { GET } = createEndpoint({
                 planId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   label: "get.response.subscriptions.planId" as const,
-                  schema: z.string(),
+                  schema: z.enum(SubscriptionPlan),
                 }),
                 billingInterval: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
                     "get.response.subscriptions.billingInterval" as const,
-                  schema: z.string(),
+                  schema: z.enum(BillingInterval),
                 }),
                 status: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "get.response.subscriptions.status" as const,
-                  schema: z.string(),
+                  schema: z.enum(SubscriptionStatus),
                 }),
                 createdAt: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
@@ -243,6 +265,18 @@ const { GET } = createEndpoint({
                   fieldType: FieldDataType.DATETIME,
                   content:
                     "get.response.subscriptions.currentPeriodEnd" as const,
+                  schema: z.coerce.date().nullable(),
+                }),
+                paymentFailedAt: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  label: "get.response.subscriptions.paymentFailedAt",
+                  schema: z.coerce.date().nullable(),
+                }),
+                gracePeriodEndsAt: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  label: "get.response.subscriptions.gracePeriodEndsAt",
                   schema: z.coerce.date().nullable(),
                 }),
                 cancelAtPeriodEnd: responseField(scopedTranslation, {
@@ -260,12 +294,12 @@ const { GET } = createEndpoint({
                   type: WidgetType.TEXT,
                   content:
                     "get.response.subscriptions.cancellationReason" as const,
-                  schema: z.string().nullable(),
+                  schema: z.enum(CancellationReason).nullable(),
                 }),
                 provider: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   label: "get.response.subscriptions.provider" as const,
-                  schema: z.string(),
+                  schema: z.enum(PaymentProvider),
                 }),
                 providerSubscriptionId: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
@@ -280,7 +314,7 @@ const { GET } = createEndpoint({
       }),
 
       // === PAGINATION INFO ===
-      paginationInfo: objectField(scopedTranslation, {
+      paginationInfo: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         layoutType: LayoutType.HORIZONTAL,
         noCard: true,
@@ -293,14 +327,14 @@ const { GET } = createEndpoint({
             fieldType: FieldDataType.NUMBER,
             label: "get.page.label" as const,
             columns: 3,
-            schema: z.coerce.number().optional().default(1),
+            schema: z.coerce.number().int().min(1).max(1_000_000).default(1),
           }),
           limit: requestResponseField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
             label: "get.limit.label" as const,
             columns: 3,
-            schema: z.coerce.number().optional().default(20),
+            schema: z.coerce.number().int().min(1).max(100).default(20),
           }),
           totalCount: responseField(scopedTranslation, {
             type: WidgetType.TEXT,
@@ -392,6 +426,31 @@ const { GET } = createEndpoint({
           page: 1,
           limit: 20,
         },
+      },
+      pastDue: {
+        response: {
+          subscriptions: [
+            {
+              id: "ebddf6d3-2937-4650-a704-1fb6d454b589",
+              userId: "22cca261-5789-4d02-aa9c-26d1b6b986af",
+              userEmail: "billing-test@example.com",
+              userName: "Billing Test",
+              planId: SubscriptionPlan.PLUS,
+              billingInterval: BillingInterval.MONTHLY,
+              status: SubscriptionStatus.PAST_DUE,
+              createdAt: new Date("2026-10-19T09:30:00.000Z"),
+              currentPeriodEnd: new Date("2026-11-19T09:30:00.000Z"),
+              paymentFailedAt: new Date("2026-11-19T09:30:02.000Z"),
+              gracePeriodEndsAt: new Date("2026-11-26T09:30:02.000Z"),
+              cancelAtPeriodEnd: false,
+              canceledAt: null,
+              cancellationReason: null,
+              provider: PaymentProvider.STRIPE,
+              providerSubscriptionId: "sub_audit_example",
+            },
+          ],
+        },
+        paginationInfo: { totalCount: 1, pageCount: 1, page: 1, limit: 20 },
       },
     },
   },

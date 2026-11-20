@@ -6,16 +6,21 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { UserRole } from "next-vibe/identity/roles/enum";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { Crown } from "next-vibe/ui/components/icons/Crown";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { Span } from "next-vibe/ui/components/span";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetContext,
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponseOnly,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import React, { useCallback, useMemo } from "react";
@@ -82,6 +87,10 @@ export function SubscriptionDashboardWidget(_props: {
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
   const data = useWidgetValue<typeof definition.GET>();
+  const user = useWidgetUser();
+  const responseOnly = useWidgetResponseOnly();
+  const isInteractive = useWidgetIsInteractive() && !responseOnly;
+  const openRelated = useRelatedEntityNavigation();
 
   const handleRefresh = useCallback((): void => {
     endpointMutations?.read?.refetch?.();
@@ -119,6 +128,25 @@ export function SubscriptionDashboardWidget(_props: {
           <RefreshCw className="h-4 w-4" />
         </Button>
       </Div>
+
+      {isInteractive &&
+        !user.isPublic &&
+        user.roles.includes(UserRole.ADMIN) && (
+          <Button
+            type="button"
+            variant="outline"
+            className="h-auto min-h-9 self-start whitespace-normal"
+            onClick={() =>
+              openRelated(() =>
+                import("../admin/list/definition").then(
+                  (module) => module.default.GET,
+                ),
+              )
+            }
+          >
+            {t("widget.renewalDiagnostics")}
+          </Button>
+        )}
 
       {/* KPI cards */}
       <Div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

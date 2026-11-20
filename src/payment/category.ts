@@ -3,10 +3,14 @@
  * Covers invoices, estimates, billing, subscriptions, and payment providers.
  */
 
-import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
+import type {
+  CategoryDefinition,
+  RecordSearchDestination,
+} from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 import { PAYMENT_DASHBOARD_ALIAS } from "@/payment/dashboard/constants";
+import type invoiceList from "@/payment/invoice/list/definition";
 import { USER_ME_ALIAS } from "@/user/private/me/constants";
 
 export const category: CategoryDefinition = {
@@ -28,6 +32,10 @@ export const category: CategoryDefinition = {
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
     [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
   },
+  recordSearch: {
+    alias: "payment-invoice-list",
+    field: "search",
+  } satisfies RecordSearchDestination<typeof invoiceList.GET>,
   subcategories: {
     Transactions: {
       icon: "receipt",

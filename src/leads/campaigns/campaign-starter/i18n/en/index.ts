@@ -248,6 +248,8 @@ export const translations = {
     },
   },
   widget: {
+    on: "On",
+    off: "Off",
     title: "Campaign Starter",
     titleSaved: "Configuration Saved",
     description:

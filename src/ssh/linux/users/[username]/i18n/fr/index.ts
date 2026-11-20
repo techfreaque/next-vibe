@@ -15,6 +15,7 @@ export const translations: typeof enTranslations = {
   },
 
   delete: {
+    review: "Consultez le compte local dans la liste des utilisateurs Linux.",
     title: "Supprimer un utilisateur Linux",
     titleShort: "Supprimer l'utilisateur",
     description: "Supprimer un compte utilisateur système de l'hôte",

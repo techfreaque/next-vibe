@@ -9,7 +9,7 @@ export const translations: typeof enTranslations = {
       "Jedes Konto mit Umsatz, Credit-Verbrauch und letzter Aktivität. Suchen, nach Umsatz, Aktivität, Anmeldedatum oder Herkunft filtern, nach jeder Geldspalte sortieren.",
     fields: {
       search: {
-        label: "Suche",
+        label: "Konten suchen",
         description: "E-Mail, Name oder Anfang einer Nutzer-ID",
         placeholder: "E-Mail, Name oder ID suchen...",
       },
@@ -192,6 +192,10 @@ export const translations: typeof enTranslations = {
     never: "Nie",
     referredBy: "über {{email}}",
     actions: {
+      open: "Öffnen",
+      select: "Auswählen",
+      openUser: "Konto von {{email}} öffnen",
+      selectUser: "{{email}} auswählen",
       stats: "Statistik",
       refresh: "Aktualisieren",
       newUser: "Neuer Nutzer",
@@ -225,6 +229,9 @@ export const translations: typeof enTranslations = {
       source: "Herkunft",
       id: "ID",
     },
+    compact: {
+      credits: "{{count}} Credits",
+    },
     flags: {
       admin: "Admin",
       banned: "Gesperrt",
@@ -236,6 +243,8 @@ export const translations: typeof enTranslations = {
       filteredHint: "Lockere einen Filter oder setze alle zurück.",
     },
     pagination: {
+      previous: "Vorherige Seite",
+      next: "Nächste Seite",
       showing: "{{start}}-{{end}} von {{total}}",
     },
     text: {

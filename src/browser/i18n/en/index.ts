@@ -2411,6 +2411,9 @@ export const translations = {
   },
 
   shared: {
+    addItem: "Add item",
+    removeItem: "Remove last item",
+    back: "Back",
     instanceId: {
       label: "Session ID",
       description:

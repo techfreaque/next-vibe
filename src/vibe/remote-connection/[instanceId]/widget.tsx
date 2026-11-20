@@ -22,7 +22,6 @@ import {
 import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
 import { Activity } from "next-vibe/ui/components/icons/Activity";
-import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
@@ -43,6 +42,8 @@ import { useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 
 import { Methods } from "../../core/definition/enums";
+import { coreClientEnv } from "../../core/env-client";
+import { VibeMode } from "../../env/env-util";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import {
   useWidgetEndpoint,
@@ -52,6 +53,7 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetPlatform,
+  useWidgetResponse,
   useWidgetUser,
   useWidgetValue,
 } from "../../unified-ui/_shared/use-widget-context";
@@ -84,26 +86,22 @@ interface RemoteConnectionByIdWidgetProps {
 
 type ConnectionState =
   | "healthy-tunnel"
-  | "healthy-bridge"
+  | "sync-recorded"
   | "warning"
-  | "critical"
   | "inactive";
 
 function deriveConnectionState(status: {
   isActive: boolean | null;
-  transportMode: string | null;
+  lastSyncedAt: string | null;
   wsConnectedAt: string | null;
 }): ConnectionState {
   if (!status.isActive) {
     return "inactive";
   }
   if (status.wsConnectedAt) {
-    return status.transportMode === "reverse-ws"
-      ? "healthy-tunnel"
-      : "healthy-bridge";
+    return "healthy-tunnel";
   }
-  // Active but no WS — critical (initial sync not yet done or dropped)
-  return "critical";
+  return status.lastSyncedAt ? "sync-recorded" : "warning";
 }
 
 function ConnectionStateBar({
@@ -144,22 +142,20 @@ function ConnectionStateBar({
     );
   }
 
-  if (state === "healthy-bridge") {
+  if (state === "sync-recorded") {
     const syncedAt = lastSyncedAt
       ? new Date(lastSyncedAt).toLocaleString(locale)
       : null;
     return (
-      <Div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
-        <Activity
-          className={`${iconClass} text-emerald-600 dark:text-emerald-400`}
-        />
+      <Div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+        <Activity className={`${iconClass} text-blue-600 dark:text-blue-400`} />
         <Div className="flex flex-col gap-0.5 min-w-0">
-          <P className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
-            {t("widget.state.bridgeActive")}
+          <P className="text-sm font-medium text-blue-800 dark:text-blue-300">
+            {t("widget.state.syncRecorded")}
           </P>
           {syncedAt && (
-            <P className="text-xs text-emerald-700/70 dark:text-emerald-400/70">
-              {t("widget.state.initialSync")} {syncedAt}
+            <P className="text-xs text-blue-700/70 dark:text-blue-400/70">
+              {t("widget.connected.lastSynced")} {syncedAt}
             </P>
           )}
         </Div>
@@ -174,20 +170,7 @@ function ConnectionStateBar({
           className={`${iconClass} text-amber-600 dark:text-amber-400`}
         />
         <P className="text-sm font-medium text-amber-800 dark:text-amber-300">
-          {t("widget.state.degraded")}
-        </P>
-      </Div>
-    );
-  }
-
-  if (state === "critical") {
-    return (
-      <Div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800">
-        <AlertCircle
-          className={`${iconClass} text-red-600 dark:text-red-400`}
-        />
-        <P className="text-sm font-medium text-red-800 dark:text-red-300">
-          {t("widget.state.connectionLost")}
+          {t("widget.state.noSyncRecorded")}
         </P>
       </Div>
     );
@@ -335,6 +318,7 @@ function ViewWidget({
   const [isReconnecting, setIsReconnecting] = useState(false);
 
   const status = useWidgetValue<typeof definitionsType.GET>();
+  const response = useWidgetResponse();
   const instanceId =
     (current?.params.urlPathParams as { instanceId?: string } | undefined)
       ?.instanceId ?? instanceIdProp;
@@ -370,8 +354,15 @@ function ViewWidget({
     );
   }
 
+  if (response?.success === false) {
+    return <FormAlertWidget field={{}} />;
+  }
   if (!status) {
-    return <LoadingBlock />;
+    return (
+      <Div aria-live="polite">
+        <LoadingBlock message={t("widget.loading")} />
+      </Div>
+    );
   }
 
   const isConnected = status.isConnected === true;
@@ -408,13 +399,37 @@ function ViewWidget({
             </P>
             <P>✓ {t("widget.notConnected.benefit3")}</P>
           </Div>
-          <EndpointsPage
-            logger={logger}
-            endpoint={connectDefinitions}
-            locale={locale}
-            user={user}
-            platform={platform}
-          />
+          {status.isActive === false && (
+            <DetailGrid columns={2}>
+              {status.remoteUrl && (
+                <DetailField
+                  label={t("widget.connected.connectedTo")}
+                  value={status.remoteUrl}
+                  mono
+                />
+              )}
+              <DetailField
+                label={t("widget.connected.lastSynced")}
+                value={
+                  status.lastSyncedAt
+                    ? new Date(status.lastSyncedAt).toLocaleString(locale, {
+                        timeZoneName: "short",
+                      })
+                    : t("widget.state.noSyncRecorded")
+                }
+              />
+            </DetailGrid>
+          )}
+          {isAdmin &&
+            coreClientEnv.NEXT_PUBLIC_VIBE_MODE !== VibeMode.CLOUD && (
+              <EndpointsPage
+                logger={logger}
+                endpoint={connectDefinitions}
+                locale={locale}
+                user={user}
+                platform={platform}
+              />
+            )}
         </SectionGroup>
       </WidgetShell>
     );
@@ -422,14 +437,11 @@ function ViewWidget({
 
   const connState = deriveConnectionState({
     isActive: status.isActive,
-    transportMode: status.transportMode,
+    lastSyncedAt: status.lastSyncedAt,
     wsConnectedAt: status.wsConnectedAt,
   });
 
-  const isUnhealthy =
-    connState === "critical" ||
-    connState === "inactive" ||
-    connState === "warning";
+  const isUnhealthy = connState === "warning";
 
   const handleRefresh = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
@@ -506,6 +518,7 @@ function ViewWidget({
     <WidgetShell>
       <WidgetHeader
         title={instanceId}
+        className="flex-wrap [&>div]:min-w-0 [&>div]:shrink [&>div]:flex-wrap"
         backButton={
           canGoBack ? (
             <Button
@@ -521,7 +534,7 @@ function ViewWidget({
           ) : undefined
         }
         actions={
-          <Div className="flex items-center gap-2">
+          <Div className="flex flex-wrap items-center gap-2">
             {/* Settings + reconnect are PATCH (admin-only); customers manage
                 the link from their own instance and can disconnect here. */}
             {isAdmin && isUnhealthy ? (
@@ -627,7 +640,9 @@ function ViewWidget({
           {status.lastSyncedAt && (
             <DetailField
               label={t("widget.connected.lastSynced")}
-              value={new Date(status.lastSyncedAt).toLocaleString(locale)}
+              value={new Date(status.lastSyncedAt).toLocaleString(locale, {
+                timeZoneName: "short",
+              })}
             />
           )}
         </DetailGrid>

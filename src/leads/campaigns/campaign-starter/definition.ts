@@ -341,6 +341,12 @@ const { POST } = createEndpoint({
   },
 });
 
+const CampaignStarterReadWidget = lazyWidget(() =>
+  import("./widget").then((module) => ({
+    default: module.CampaignStarterReadWidget,
+  })),
+);
+
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
@@ -355,7 +361,7 @@ const { GET } = createEndpoint({
   tags: ["tag"],
 
   fields: customWidgetObject({
-    render: CampaignStarterConfigContainer,
+    render: CampaignStarterReadWidget,
     usage: { request: "data", response: true } as const,
     children: {
       timezone: requestField(scopedTranslation, {

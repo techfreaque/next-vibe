@@ -45,6 +45,19 @@ const { POST } = createEndpoint({
   ],
   allowedRoles: [UserRole.ADMIN] as const,
 
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { refreshEstimateDocuments } =
+          await import("@/finance/document-cache");
+        await refreshEstimateDocuments(
+          data.logger,
+          data.requestData.estimateId,
+        );
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: EstimateLineAddWidgetLazy,
     usage: { request: "data", response: true },

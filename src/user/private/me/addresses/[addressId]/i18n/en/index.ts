@@ -2,6 +2,15 @@ export const translations = {
   category: "User Addresses",
   tag: "addresses",
 
+  widget: {
+    chooseAddress: "Choose a saved address",
+    addressUnavailable: "Address unavailable",
+    saveChanges: "Save changes",
+    reviewDeletion: "Review deletion",
+    confirmDeletion: "Remove {{label}} from your saved addresses?",
+    cancel: "Cancel",
+  },
+
   update: {
     title: "Update Address",
     titleShort: "Update Address",

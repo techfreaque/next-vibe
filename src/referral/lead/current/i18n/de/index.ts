@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   description:
     "Gibt den Empfehlungscode des aktuellen Leads zurück, falls vorhanden",
   tag: "Empfehlung",
+  noReferral: "Diesem Lead ist keine Empfehlung zugeordnet",
   response: {
     referralCode: "Empfehlungscode",
     referralLabel: "Empfehlungsbezeichnung",

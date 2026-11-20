@@ -636,6 +636,7 @@ export const translations = {
     openLead: "Open lead",
     attributionOnly:
       "Attribution links are clues to review. A shared IP or tracking visit can involve more than one person.",
+    recordedAccountLink: "Recorded account link",
     recordedConversion: "Account recorded at conversion",
     attributedAccount: "Account recorded in growth attribution",
     previewIpMatches: "Preview IP matching across leads",

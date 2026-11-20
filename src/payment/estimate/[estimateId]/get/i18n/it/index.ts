@@ -2,70 +2,60 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Stime",
-  tags: {
-    payment: "pagamento",
-    estimate: "Grafico"
-  },
+  tags: { payment: "pagamento", estimate: "Grafico" },
   post: {
     title: "Ottieni il preventivo",
     titleShort: "Ottieni il preventivo",
     description: "Ottenere una stima unica con tutte le sue linee",
     form: {
       title: "Ottieni il preventivo",
-      description: "Ottenere una stima unica con tutte le sue linee"
+      description: "Ottenere una stima unica con tutte le sue linee",
     },
-    response: {
-      success: "Operazione riuscita",
-      message: "Messaggio di stato"
-    },
+    response: { success: "Operazione riuscita", message: "Messaggio di stato" },
     errors: {
       unauthorized: {
         title: "Autenticazione richiesta",
-        description: "Accedi per continuare"
+        description: "Accedi per continuare",
       },
       validation: {
         title: "Errore di convalida",
-        description: "Parametri non validi"
+        description: "Parametri non validi",
       },
       server: {
         title: "Errore del server",
-        description: "Errore del server interno"
+        description: "Errore del server interno",
       },
       unknown: {
         title: "Errore sconosciuto",
-        description: "Si è verificato un errore sconosciuto"
+        description: "Si è verificato un errore sconosciuto",
       },
       network: {
         title: "Errore di rete",
-        description: "Si è verificato un errore di rete"
+        description: "Si è verificato un errore di rete",
       },
-      forbidden: {
-        title: "Accesso negato",
-        description: "Accesso negato"
-      },
-      notFound: {
-        title: "Non trovato",
-        description: "Stima non trovata"
-      },
+      forbidden: { title: "Accesso negato", description: "Accesso negato" },
+      notFound: { title: "Non trovato", description: "Stima non trovata" },
       conflict: {
         title: "Conflitto",
-        description: "Non può eseguire l'azione nello stato attuale"
+        description: "Non può eseguire l'azione nello stato attuale",
       },
       unsavedChanges: {
         title: "Modifiche non salvate",
-        description: "Ci sono cambiamenti non rilevati"
-      }
+        description: "Ci sono cambiamenti non rilevati",
+      },
     },
     success: {
       title: "Operazione riuscita",
-      description: "Ottenere una stima unica con tutte le sue linee"
-    }
+      description: "Ottenere una stima unica con tutte le sue linee",
+    },
   },
-  estimateId: {
-    label: "Stima ID",
-    description: "La stima di agire su"
-  },
+  estimateId: { label: "Stima ID", description: "La stima di agire su" },
   widget: {
+    send: "Invia preventivo",
+    addLine: "Aggiungere la linea",
+    accept: "Accettazione dei record",
+    decline: "Rifiuto record",
+    openInvoice: "Fattura aperta",
     back: "Indietro",
     submit: "Guarda il preventivo",
     estimateNumber: "Stima",
@@ -89,7 +79,7 @@ export const translations: typeof enTranslations = {
       accepted: "Accettato",
       declined: "Declinato",
       expired: "Scadenza",
-      converted: "Convertito"
-    }
-  }
+      converted: "Convertito",
+    },
+  },
 };

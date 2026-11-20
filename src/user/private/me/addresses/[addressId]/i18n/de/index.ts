@@ -4,6 +4,15 @@ export const translations: typeof enTranslations = {
   category: "Adressen",
   tag: "addresses",
 
+  widget: {
+    chooseAddress: "Gespeicherte Adresse auswählen",
+    addressUnavailable: "Adresse nicht verfügbar",
+    saveChanges: "Änderungen speichern",
+    reviewDeletion: "Löschen prüfen",
+    confirmDeletion: "{{label}} aus deinen gespeicherten Adressen entfernen?",
+    cancel: "Abbrechen",
+  },
+
   update: {
     title: "Adresse bearbeiten",
     titleShort: "Adresse ändern",

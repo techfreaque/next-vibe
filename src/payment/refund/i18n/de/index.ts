@@ -30,8 +30,7 @@ export const translations: typeof enTranslations = {
       },
       amount: {
         label: "Rückerstattungsbetrag",
-        description:
-          "Zu erstattender Betrag (optional, Standard ist voller Betrag)",
+        description: "Optionaler Teilbetrag in der Währung der Transaktion",
         placeholder: "Betrag eingeben",
       },
       reason: {
@@ -45,6 +44,31 @@ export const translations: typeof enTranslations = {
         placeholder: "Metadaten als JSON eingeben",
       },
     },
+  },
+
+  widget: {
+    transactionDetails: "Gespeicherte Transaktion",
+    customerEmail: "Kunden-E-Mail",
+    customerId: "Kunden-ID",
+    originalAmount: "Ursprünglicher Zahlbetrag",
+    enterTransaction:
+      "Gib die Transaktions-ID ein, um die Zahlungsdaten zu laden.",
+    lookupLoading: "Gespeicherte Transaktion wird geladen",
+    transactionMissing: "Transaktion nicht gefunden",
+    lookupFailed: "Transaktion konnte nicht geladen werden",
+    retryLookup: "Erneut suchen",
+    amountExceedsCharge: "Gib höchstens den ursprünglichen Zahlbetrag ein.",
+    confirmRemaining: "Stripe erstattet den Restbetrag in {{currency}}.",
+    confirmAmount: "Teilrückerstattung: {{amount}} ({{currency}}).",
+    title: "Stripe-Erstattung prüfen",
+    amountHelp:
+      "Gib einen Teilbetrag in {{currency}} ein. Lass das Feld für den gesamten Restbetrag frei.",
+    review: "Betrag prüfen",
+    confirmTitle: "Stripe-Erstattung bestätigen",
+    confirmDescription:
+      "Stripe erstattet für {{email}} die Transaktion {{transactionId}}. Dadurch wird Geld zurückgezahlt.",
+    confirm: "Erstattung auslösen",
+    cancel: "Abbrechen",
   },
 
   post: {
@@ -72,6 +96,8 @@ export const translations: typeof enTranslations = {
       validation: {
         title: "Validierungsfehler",
         description: "Ungültige Rückerstattungsparameter",
+        ineligible:
+          "Für diese Transaktion ist keine Stripe-Erstattung verfügbar.",
       },
       unauthorized: {
         title: "Nicht autorisiert",

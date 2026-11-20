@@ -7,6 +7,18 @@ import {
   useRouter as useExpoRouter,
 } from "expo-router";
 
+import { silentPushState, silentReplaceState } from "../lib/location";
+
+const nativeHistory = {
+  pushState: silentPushState,
+  replaceState: silentReplaceState,
+};
+
+/** Native screens keep transient widget navigation in the endpoint stack. */
+export function useSilentHistory(): typeof nativeHistory {
+  return nativeHistory;
+}
+
 /**
  * Get the current pathname
  * Compatible with Next.js usePathname

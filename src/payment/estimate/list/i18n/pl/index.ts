@@ -19,8 +19,9 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Oferty",
-    titleShort: "Wyceny",
-    description: "Pobierz paginowaną listę ofert firmy",
+    titleShort: "Oferty",
+    description:
+      "Szukaj po numerze oferty, kliencie, adresie e-mail, tytule lub identyfikatorze. Filtruj według firmy lub statusu.",
     form: {
       title: "Filtry ofert",
       description: "Filtruj i paginuj oferty",
@@ -75,6 +76,12 @@ export const translations: typeof enTranslations = {
     description: "Filtruj po firmie",
     placeholder: "Wprowadź ID firmy",
   },
+  search: {
+    label: "Szukaj dokumentów",
+    description:
+      "Szukaj po numerze oferty, kliencie, adresie e-mail, tytule lub identyfikatorze. Filtruj według firmy lub statusu.",
+    placeholder: "Numer oferty, klient lub tytuł",
+  },
   status: {
     label: "Status",
     description: "Filtruj po statusie",
@@ -94,6 +101,7 @@ export const translations: typeof enTranslations = {
     description: "Elementy na stronę",
   },
   widget: {
+    pageCount: "Liczba stron",
     back: "Wróć",
     title: "Oferty",
     newEstimate: "Nowa oferta",

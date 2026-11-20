@@ -12,10 +12,10 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
-    title: "Zatwierdź fakturę",
-    titleShort: "Zatwierdź rachunek",
+    title: "Sprawdź status faktury",
+    titleShort: "Sprawdź status faktury",
     description:
-      "Zmień status faktury: SZKIC→OTRZYMANA→ZATWIERDZONA i utwórz zapis księgowy",
+      "Zmienia status wersji roboczej lub otrzymanej faktury od dostawcy.",
     billId: { label: "ID faktury", description: "Faktura do zatwierdzenia" },
     errors: {
       validation: {
@@ -62,13 +62,13 @@ export const translations: typeof enTranslations = {
     },
     widget: {
       back: "Wróć",
-      submit: "Zatwierdź rachunek",
+      submit: "Potwierdź zmianę statusu",
       confirmTitle: "Zatwierdzić tę fakturę?",
       confirmDescription:
-        "Status faktury zostanie zmieniony. Po zatwierdzeniu zostanie utworzony zapis księgowy.",
+        "Szkic otrzyma status Otrzymana. Otrzymana faktura zostanie zatwierdzona. Jeśli księgowość jest skonfigurowana, powstanie zapis księgowy.",
       confirmButton: "Tak, zatwierdź",
       cancelButton: "Anuluj",
-      approved: "Faktura zatwierdzona",
+      approved: "Status faktury zmieniony",
     },
   },
 };

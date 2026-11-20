@@ -9,15 +9,16 @@ import { LeadStatus } from "next-vibe/identity/lead/enum";
 import type { ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { Check } from "next-vibe/ui/components/icons/Check";
-import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { Copy } from "next-vibe/ui/components/icons/Copy";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
-import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { Search } from "next-vibe/ui/components/icons/Search";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { X } from "next-vibe/ui/components/icons/X";
+import { Input } from "next-vibe/ui/components/input";
+import { Label } from "next-vibe/ui/components/label";
 import { Span } from "next-vibe/ui/components/span";
 import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
@@ -29,10 +30,10 @@ import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
@@ -193,7 +194,7 @@ function CopyEmail({
       type="button"
       onClick={handleCopy}
       title={copyEmailTitle}
-      className="group/copy flex items-center gap-1 hover:text-foreground transition-colors"
+      className="group/copy relative z-10 flex items-center gap-1 hover:text-foreground transition-colors"
     >
       <Span className="truncate max-w-[160px]">{email}</Span>
       {copied ? (
@@ -219,13 +220,14 @@ export function LeadsSearchContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const data = useWidgetValue<typeof definition.GET>();
-  const { endpointMutations } = useWidgetContext();
+  const { endpointMutations, response } = useWidgetContext();
   const locale = useWidgetLocale();
   const { push: navigate, pop } = useWidgetNavigation();
   const form = useWidgetForm<typeof definition.GET>();
   const isLoadingFresh = endpointMutations?.read?.isLoadingFresh ?? false;
   const isFetching = endpointMutations?.read?.isFetching ?? false;
   const isLoading = isLoadingFresh;
+  const submit = useWidgetOnSubmit();
 
   const t = useWidgetTranslation<typeof definition.GET>();
 
@@ -236,7 +238,11 @@ export function LeadsSearchContainer({
   const total = data?.response?.total ?? 0;
   const hasMore = data?.response?.hasMore ?? false;
 
-  const activeStatus = form?.watch("status") ?? undefined;
+  const activeStatus = form.watch("status");
+  const search = form.watch("search");
+  const offset = form.watch("offset") ?? 0;
+  const limit = form.watch("limit") ?? 10;
+  const filtered = Boolean(search?.trim() || activeStatus);
 
   // ── Navigation helpers ────────────────────────────────────────────────────
 
@@ -286,38 +292,15 @@ export function LeadsSearchContainer({
     })();
   }, [navigate]);
 
-  // ── "Load more" - advances the offset field in the parent form ────────────
-
-  const handleLoadMore = useCallback((): void => {
-    if (!form) {
-      return;
-    }
-    const currentOffset = form.getValues("offset") ?? 0;
-    const currentLimit = form.getValues("limit") ?? 10;
-    form.setValue("offset", currentOffset + currentLimit);
-  }, [form]);
-
-  // ── Status filter chip toggles ────────────────────────────────────────────
-
-  const toggleStatus = useCallback(
-    (status: string): void => {
-      const current = form?.getValues("status");
-      form?.setValue(
-        "status",
-        current === status
-          ? undefined
-          : (status as (typeof LeadStatus)[keyof typeof LeadStatus]),
-      );
-    },
-    [form],
-  );
-
-  const clearStatusFilter = useCallback((): void => {
-    form?.setValue("status", undefined);
-  }, [form]);
-
-  // ─────────────────────────────────────────────────────────────────────────
-
+  const changePage = (nextOffset: number): void => {
+    form.setValue("offset", nextOffset, { shouldDirty: true });
+    submit?.();
+  };
+  const clearFilters = (): void => {
+    form.setValue("search", "", { shouldDirty: true });
+    form.setValue("status", undefined, { shouldDirty: true });
+    changePage(0);
+  };
   return (
     <Div className="flex flex-col gap-0">
       {/* ── Header ── */}
@@ -328,8 +311,7 @@ export function LeadsSearchContainer({
           <Span className="font-semibold text-base">{t("widget.title")}</Span>
           {total > 0 && (
             <Span className="text-sm text-muted-foreground font-normal">
-              ({total}
-              {hasMore ? "+" : ""})
+              ({total})
             </Span>
           )}
         </Div>
@@ -339,9 +321,20 @@ export function LeadsSearchContainer({
       </Div>
 
       {/* ── Search form ── */}
-      <Div className="px-4 pt-3 pb-2 flex items-center gap-2">
-        <Div className="flex-1">
-          <TextFieldWidget fieldName="search" field={children.search} />
+      <Div className="px-4 pt-3 pb-2 flex items-end gap-2">
+        <Div className="flex min-w-0 flex-1 flex-col gap-1">
+          <Label htmlFor="lead-search-query">{t("get.search.label")}</Label>
+          <Input
+            id="lead-search-query"
+            value={search ?? ""}
+            placeholder={t("get.search.placeholder")}
+            onChange={(event) => {
+              form.setValue("search", event.target.value, {
+                shouldDirty: true,
+              });
+              form.setValue("offset", 0, { shouldDirty: true });
+            }}
+          />
         </Div>
         <SubmitButtonWidget<typeof definition.GET>
           field={{
@@ -355,7 +348,7 @@ export function LeadsSearchContainer({
       <FormAlertWidget field={{}} />
 
       {/* ── Results ── */}
-      <Div className="px-4 pb-2 overflow-y-auto max-h-[min(700px,calc(100dvh-260px))]">
+      <Div className="px-4 pb-2 overflow-y-auto @md:max-h-[min(700px,calc(100dvh-260px))]">
         {/* Status filter chips — full mode only */}
         {!isPickerMode && (
           <Div className="flex flex-wrap items-center gap-1.5 pt-3 pb-1">
@@ -369,7 +362,10 @@ export function LeadsSearchContainer({
                   key={status}
                   type="button"
                   onClick={() => {
-                    toggleStatus(status);
+                    form.setValue("status", isActive ? undefined : status, {
+                      shouldDirty: true,
+                    });
+                    changePage(0);
                   }}
                   className={cn(
                     "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border transition-all",
@@ -388,7 +384,10 @@ export function LeadsSearchContainer({
             {activeStatus && (
               <Button
                 type="button"
-                onClick={clearStatusFilter}
+                onClick={() => {
+                  form.setValue("status", undefined, { shouldDirty: true });
+                  changePage(0);
+                }}
                 className="text-xs text-muted-foreground hover:text-foreground underline ml-1"
               >
                 {t("widget.clearFilter")}
@@ -406,34 +405,26 @@ export function LeadsSearchContainer({
           </Div>
         )}
 
-        {/* Empty state */}
-        {!isLoading && leads.length === 0 && (
-          <Div className="flex flex-col items-center justify-center py-12 gap-3 text-center">
-            <Div className="rounded-full bg-muted p-4">
-              <Search className="h-6 w-6 text-muted-foreground" />
-            </Div>
-            <Div className="flex flex-col gap-1">
-              <Span className="text-sm font-medium">
-                {t("widget.noResultsTitle")}
-              </Span>
-              <Span className="text-xs text-muted-foreground">
-                {t("widget.noResultsSubtitle")}
-              </Span>
-            </Div>
-            {!isPickerMode && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="gap-1.5 mt-1"
-                onClick={handleCreateLead}
-              >
-                <Plus className="h-3.5 w-3.5" />
-                {t("widget.createLead")}
-              </Button>
-            )}
-          </Div>
-        )}
+        {data &&
+          !isFetching &&
+          response?.success !== false &&
+          leads.length === 0 && (
+            <EmptyBlock
+              icon={<Search className="h-6 w-6" />}
+              title={t("widget.noResultsTitle")}
+              message={t("widget.noResultsSubtitle")}
+              action={
+                filtered
+                  ? { label: t("widget.clearFilter"), onClick: clearFilters }
+                  : !isPickerMode
+                    ? {
+                        label: t("widget.createLead"),
+                        onClick: handleCreateLead,
+                      }
+                    : undefined
+              }
+            />
+          )}
 
         {/* Result rows */}
         {leads.length > 0 && (
@@ -458,10 +449,7 @@ export function LeadsSearchContainer({
               return (
                 <Div
                   key={lead.id}
-                  className="group/row relative flex items-center gap-3 p-3 rounded-lg border hover:bg-accent cursor-pointer transition-colors"
-                  onClick={() => {
-                    handleViewLead(lead);
-                  }}
+                  className="group/row relative flex min-w-0 flex-wrap items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors"
                 >
                   {/* Avatar */}
                   <Div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
@@ -472,9 +460,16 @@ export function LeadsSearchContainer({
                   <Div className="flex-1 min-w-0">
                     {/* Row 1 - name + status badges */}
                     <Div className="flex items-center gap-2 flex-wrap">
-                      <Span className="font-semibold text-sm truncate">
-                        {lead.businessName ?? lead.email ?? "—"}
-                      </Span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => handleViewLead(lead)}
+                        className="h-auto min-w-0 p-0 font-semibold text-sm hover:bg-transparent hover:underline before:absolute before:inset-0 before:rounded-lg focus-visible:before:ring-2 focus-visible:before:ring-ring"
+                      >
+                        <Span className="truncate">
+                          {lead.businessName || lead.email || lead.id}
+                        </Span>
+                      </Button>
 
                       {/* Status chip */}
                       {lead.status && (
@@ -508,7 +503,7 @@ export function LeadsSearchContainer({
                     </Div>
 
                     {/* Row 2 - email (copyable) + country + source */}
-                    <Div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                    <Div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground mt-0.5">
                       {lead.email && (
                         <CopyEmail
                           email={lead.email}
@@ -552,7 +547,7 @@ export function LeadsSearchContainer({
                   {/* Inline hover action buttons - hidden in picker mode */}
                   {!isPickerMode && (
                     <Div
-                      className="hidden group-hover/row:flex items-center gap-1 absolute right-3 top-1/2 -translate-y-1/2 bg-background/95 backdrop-blur-sm border rounded-md px-1 py-0.5 shadow-sm"
+                      className="relative z-10 ms-auto flex shrink-0 items-center gap-1 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/row:opacity-100 [@media(hover:hover)]:focus-within:opacity-100"
                       onClick={(e) => {
                         e.stopPropagation();
                       }}
@@ -560,6 +555,7 @@ export function LeadsSearchContainer({
                       <Button
                         type="button"
                         title={t("widget.editLeadTitle")}
+                        aria-label={t("widget.editLeadTitle")}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleEditLead(lead);
@@ -571,6 +567,7 @@ export function LeadsSearchContainer({
                       <Button
                         type="button"
                         title={t("widget.deleteLeadTitle")}
+                        aria-label={t("widget.deleteLeadTitle")}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteLead(lead);
@@ -587,22 +584,36 @@ export function LeadsSearchContainer({
           </Div>
         )}
 
-        {/* Load more */}
-        {hasMore && !isLoading && leads.length > 0 && (
-          <Div className="flex justify-center pt-3 pb-1">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-1.5 w-full max-w-xs"
-              onClick={handleLoadMore}
-            >
-              <ChevronDown className="h-4 w-4" />
-              {t("widget.loadMore")}
-            </Button>
+        {(offset > 0 || hasMore) && (
+          <Div className="flex flex-wrap items-center justify-between gap-2 py-3">
+            <Span className="text-sm text-muted-foreground">
+              {t("widget.page", {
+                page: Math.floor(offset / limit) + 1,
+                pages: Math.max(1, Math.ceil(total / limit)),
+              })}
+            </Span>
+            <Div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={offset === 0 || isFetching}
+                onClick={() => changePage(Math.max(0, offset - limit))}
+              >
+                {t("widget.previous")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={!hasMore || isFetching}
+                onClick={() => changePage(offset + limit)}
+              >
+                {t("widget.next")}
+              </Button>
+            </Div>
           </Div>
         )}
-
         {/* Loading more indicator */}
         {isLoading && leads.length > 0 && (
           <Div className="flex justify-center pt-3 pb-1">

@@ -81,7 +81,7 @@ export const translations: typeof enTranslations = {
       companies: "Firmy",
       invoices: "Faktury sprzedaży",
       bills: "Faktury zakupu",
-      selectCompany: "Podaj ID firmy, aby załadować przegląd księgowości.",
+      selectCompany: "Wybierz firmę, aby otworzyć jej księgowość.",
     },
   },
   category: "Księgowość",

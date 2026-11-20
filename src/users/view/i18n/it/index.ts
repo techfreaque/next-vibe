@@ -4,64 +4,67 @@ export const translations: typeof enTranslations = {
   category: "Utenti",
   tags: {
     user: "Utente",
-    view: "Vista"
+    view: "Vista",
   },
   get: {
     title: "Dettagli utente",
     titleShort: "Utente",
-    description: "Un account termina alla fine: entrate a vita, portafoglio di credito, abbonamento, pagamenti, attribuzione, referral, attività ed errori. Modificare, concedere crediti, cambiare ruoli o vietare da qui.",
+    description:
+      "Un account termina alla fine: entrate a vita, portafoglio di credito, abbonamento, pagamenti, attribuzione, referral, attività ed errori. Modificare, concedere crediti, cambiare ruoli o vietare da qui.",
     userId: {
-      label: "Utente ID"
-    }
+      label: "Utente ID",
+    },
   },
   errors: {
     validation: {
       title: "Utente non valido ID",
-      description: "Passare un utente valido UUID"
+      description: "Passare un utente valido UUID",
     },
     network: {
       title: "Errore di rete",
-      description: "Non è possibile raggiungere il server"
+      description: "Non è possibile raggiungere il server",
     },
     unauthorized: {
       title: "Accedi per continuare",
-      description: "Accedi per visualizzare i dettagli dell'utente"
+      description: "Accedi per visualizzare i dettagli dell'utente",
     },
     forbidden: {
       title: "Admins solo",
-      description: "Hai bisogno del ruolo di amministratore per visualizzare questo utente"
+      description:
+        "Hai bisogno del ruolo di amministratore per visualizzare questo utente",
     },
     notFound: {
       title: "Utente non trovato",
-      description: "Nessun utente con questo ID"
+      description: "Nessun utente con questo ID",
     },
     serverError: {
       title: "Non poteva caricare l'utente",
-      description: "Il server non è riuscito a caricare questo utente"
+      description: "Il server non è riuscito a caricare questo utente",
     },
     unknown: {
       title: "Errore inaspettato",
-      description: "Qualcosa è andato storto caricare questo utente"
+      description: "Qualcosa è andato storto caricare questo utente",
     },
     unsavedChanges: {
       title: "Modifiche non salvate",
-      description: "Hai modifiche non salvate"
+      description: "Hai modifiche non salvate",
     },
     conflict: {
       title: "Conflittuale dei dati",
-      description: "L'utente è cambiato nel frattempo. Rinfresco e riprovazione"
-    }
+      description:
+        "L'utente è cambiato nel frattempo. Rinfresco e riprovazione",
+    },
   },
   success: {
     title: "Caricamento utente",
-    description: "Dati utente caricati"
+    description: "Dati utente caricati",
   },
   status: {
     active: "Attivo",
     banned: "Banati",
     inactive: "Inattivo",
     verified: "Verificato",
-    unverified: "Unverified"
+    unverified: "Unverified",
   },
   fields: {
     userId: "Utente ID",
@@ -75,12 +78,13 @@ export const translations: typeof enTranslations = {
     optedOut: "Optato fuori",
     created: "Registrato",
     lastUpdated: "Profilo aggiornato",
-    banReason: "Motivazione di Ban"
+    banReason: "Motivazione di Ban",
   },
   text: {
     lastSeen: "Ultimo accesso",
     payments: "{{ok}} pagato, {{failed}} fallito",
-    actions: "Azioni: vibe user-update --id= {{id}} | vibe user-role-add --id= {{id}} --role= <role> | vibe user-role-remove --id= {{id}} --role= <role>"
+    actions:
+      "Azioni: vibe user-update --id= {{id}} | vibe user-role-add --id= {{id}} --role= <role> | vibe user-role-remove --id= {{id}} --role= <role>",
   },
   kpi: {
     paid: "Durata della vita",
@@ -91,7 +95,7 @@ export const translations: typeof enTranslations = {
     spent: "Crediti spesi",
     spentHint: "circa {{usd}} di utilizzo",
     lastSeen: "Ultimo accesso",
-    joined: "Adeguato {{date}}"
+    joined: "Adeguato {{date}}",
   },
   payment: {
     subscription: "Abbonamento",
@@ -103,7 +107,8 @@ export const translations: typeof enTranslations = {
     lastPayment: "Ultimo pagamento",
     stripeCustomerId: "cliente Stripe",
     none: "Nessun abbonamento",
-    noSubscriptionButPaid: "Nessun abbonamento. Crediti acquistati vale la pena {{amount}}."
+    noSubscriptionButPaid:
+      "Nessun abbonamento. Crediti acquistati vale la pena {{amount}}.",
   },
   credits: {
     subscription: "Crediti di abbonamento",
@@ -113,7 +118,7 @@ export const translations: typeof enTranslations = {
     expires: "Scade {{date}}",
     purchased: "Crediti comprati",
     earnedTotal: "Crediti guadagnati (referrals)",
-    spentTotal: "Crediti spesi (tutti i portafogli)"
+    spentTotal: "Crediti spesi (tutti i portafogli)",
   },
   attribution: {
     title: "Da dove vengono",
@@ -126,9 +131,10 @@ export const translations: typeof enTranslations = {
     firstTouch: "Prima visita",
     firstChat: "Prima chat",
     firstPaid: "Pagamento anticipato",
-    none: "Nessun dato di tracciamento per questo utente."
+    none: "Nessun dato di tracciamento per questo utente.",
   },
   referrals: {
+    noReferrer: "Nessun conto di riferimento",
     referredBy: "Riferito da",
     viaCode: "Code {{code}}",
     signups: "Segnalazioni di cui",
@@ -136,66 +142,71 @@ export const translations: typeof enTranslations = {
     activeCodes: "Codici attivi",
     earnings: "Retribuzioni di riferimento",
     referredUsers: "Utenti che hanno fatto riferimento",
-    noneReferred: "Nessuno ha ancora firmato attraverso questo utente."
+    noneReferred: "Nessuno ha ancora firmato attraverso questo utente.",
   },
   chat: {
     threads: "Conversazioni",
     threadsHint: "{{active}} attivo, {{archived}} archiviato",
     userMessages: "Messaggi inviati",
     aiMessages: "AI risponde",
-    incognitoNote: "Incognito chat non sono mai memorizzati. La spesa di credito è il segnale di utilizzo reale."
+    incognitoNote:
+      "Incognito chat non sono mai memorizzati. La spesa di credito è il segnale di utilizzo reale.",
   },
   engagement: {
     favorites: "Preferiti",
     skills: "Competenze personalizzate",
-    skillsHint: "{{count}} competenze personalizzate"
+    skillsHint: "{{count}} competenze personalizzate",
   },
   billing: {
     paymentsTitle: "Trattazioni di processori recenti",
+    inspect: "Transazione aperta",
+    inspectNamed: "Operazione aperta per {{amount}} su {{date}}",
+    refund: "Rimborso",
+    refundNamed: "Rimborso recensione per {{amount}} su {{date}}",
+    openSubscriptions: "Aprire gli abbonamenti di questo account",
+    startedOn: "Iniziato {{date}}",
+    periodEndsOn: "Periodo di chiusura {{date}}",
     subscriptionsTitle: "Storia dell'abbonamento",
     succeeded: "Pagamenti di successo",
     ofAttempts: "di tentativi {{count}}",
     failedPending: "In sospeso / in attesa",
     noPayments: "Nessun tentativo di pagamento",
-    date: "Data",
-    amount: "Importo",
-    status: "Stato",
-    kind: "Tipo",
-    provider: "Fornitore",
-    started: "Inizio",
-    periodEnd: "Fine del periodo",
-    cancels: "cancellazioni a fine periodo"
+    cancels: "cancellazioni a fine periodo",
   },
   modelUsage: {
     title: "Trascorrere per modello",
     model: "Modello",
     spent: "Crediti",
-    messages: "Chiamate"
+    messages: "Chiamate",
   },
   errorsTab: {
     title: "Errori che coinvolgono questo utente",
     none: "Nessun errore registrato menzionare questo utente.",
     resolved: "Risolto",
     open: "Aperto",
-    openMonitor: "Monitor di errore aperto"
+    openMonitor: "Monitor di errore aperto",
   },
   widget: {
+    unavailable: "Account non disponibile",
+    chooseUser: "Scegli un account per visualizzare",
     loading: "Caricamento utente...",
     never: "Mai.",
     actions: {
+      browse: "Sfoglia gli account",
       edit: "Modifica",
       addCredits: "Crediti di sovvenzione",
       delete: "Cancella utente",
-      copyUserId: "Copia utente ID"
-    }
+      copyUserId: "Copia utente ID",
+    },
   },
   ban: {
     banUser: "Ban ban",
-    unbanUser: "Unban"
+    unbanUser: "Unban",
   },
   roles: {
+    removeNamed: "Rimuovi il ruolo {{role}}",
     add: "Aggiungi il ruolo",
-    remove: "Rimozione del ruolo"
+    remove: "Rimozione del ruolo",
   },
   tabs: {
     overview: "Panoramica",
@@ -205,19 +216,19 @@ export const translations: typeof enTranslations = {
     activity: "Attività",
     connections: "Supporti collegati",
     favorites: "Preferiti",
-    skills: "Skill"
+    skills: "Skill",
   },
   sections: {
     subscription: "Abbonamento",
     credits: "Portafogli di credito",
     profile: "Profilo",
     recentActivity: "Ultima attività",
-    chatActivity: "Chat"
+    chatActivity: "Chat",
   },
   newsletter: {
     status: "Newsletter",
     subscribed: "Iscritto",
-    notSubscribed: "Non sottoscritto"
+    notSubscribed: "Non sottoscritto",
   },
   activity: {
     lastCreditUsage: "Ultima spesa di credito",
@@ -225,14 +236,16 @@ export const translations: typeof enTranslations = {
     activeSessions: "Sessioni attive",
     lastMessage: "Ultimo messaggio",
     lastThread: "Ultima conversazione avviata",
-    lastPayment: "Ultimo pagamento"
+    lastPayment: "Ultimo pagamento",
   },
   connections: {
+    viewNamedUser: "Aprire il conto per {{name}}",
+    viewNamedLead: "Open lead {{name}}",
     leadsTitle: "Supporti collegati",
     usersTitle: "Utenti che condividono un lead",
     noLeads: "Nessun cavo collegato",
     noUsers: "Nessun altro utente condivide questi lead",
     viewLead: "Visualizzare il comando",
-    viewUser: "Visualizza utente"
-  }
+    viewUser: "Visualizza utente",
+  },
 };

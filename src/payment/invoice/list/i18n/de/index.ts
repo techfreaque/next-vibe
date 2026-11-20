@@ -16,10 +16,10 @@ export const translations: typeof enTranslations = {
     invoice: "rechnung",
   },
   get: {
-    title: "Rechnungen",
-    titleShort: "Rechnungen",
+    title: "Ausgangsrechnungen",
+    titleShort: "Ausgangsrechnungen",
     description:
-      "Ausgangsrechnungen einer Firma mit optionalen Filtern abrufen",
+      "Suche nach Belegnummer, Rechnungs-ID oder Kunden-ID. Filtere nach Unternehmen oder Status.",
     form: {
       title: "Rechnungsfilter",
       description: "Rechnungsliste filtern",
@@ -90,6 +90,12 @@ export const translations: typeof enTranslations = {
     description: "Rechnungen dieser Firma filtern",
     placeholder: "Firmen-ID eingeben",
   },
+  search: {
+    label: "Dokumente suchen",
+    description:
+      "Suche nach Belegnummer, Rechnungs-ID oder Kunden-ID. Filtere nach Unternehmen oder Status.",
+    placeholder: "Belegnummer oder ID",
+  },
   status: {
     label: "Status",
     description: "Nach Rechnungsstatus filtern",
@@ -109,7 +115,8 @@ export const translations: typeof enTranslations = {
     description: "Ergebnisse pro Seite",
   },
   widget: {
-    title: "Rechnungen",
+    pageCount: "Seiten insgesamt",
+    title: "Ausgangsrechnungen",
     newInvoice: "Neue Rechnung",
     loading: "Rechnungen werden geladen...",
     noInvoices: "Noch keine Rechnungen.",

@@ -13,12 +13,11 @@ import {
   eq,
   gte,
   ilike,
+  inArray,
   lte,
   or,
   type SQL,
-  sql,
 } from "drizzle-orm";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -32,7 +31,11 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { PaymentProvider } from "@/payment/enum";
 import { subscriptions } from "@/subscription/db";
-import { BillingInterval, SubscriptionStatus } from "@/subscription/enum";
+import {
+  BillingInterval,
+  SubscriptionStatus,
+  type SubscriptionStatusValue,
+} from "@/subscription/enum";
 
 import {
   BillingIntervalAdminFilter,
@@ -45,7 +48,32 @@ import type {
   SubscriptionListRequestOutput,
   SubscriptionListResponseOutput,
 } from "./definition";
-import { scopedTranslation } from "./i18n";
+import type { SubscriptionAdminListT } from "./i18n";
+
+const statusMap = {
+  [SubscriptionStatusAdminFilter.ALL]: null,
+  [SubscriptionStatusAdminFilter.ACTIVE]: SubscriptionStatus.ACTIVE,
+  [SubscriptionStatusAdminFilter.TRIALING]: SubscriptionStatus.TRIALING,
+  [SubscriptionStatusAdminFilter.PAST_DUE]: SubscriptionStatus.PAST_DUE,
+  [SubscriptionStatusAdminFilter.CANCELED]: SubscriptionStatus.CANCELED,
+  [SubscriptionStatusAdminFilter.UNPAID]: SubscriptionStatus.UNPAID,
+  [SubscriptionStatusAdminFilter.PAUSED]: SubscriptionStatus.PAUSED,
+  [SubscriptionStatusAdminFilter.INCOMPLETE]: SubscriptionStatus.INCOMPLETE,
+  [SubscriptionStatusAdminFilter.INCOMPLETE_EXPIRED]:
+    SubscriptionStatus.INCOMPLETE_EXPIRED,
+};
+
+const intervalMap = {
+  [BillingIntervalAdminFilter.ANY]: null,
+  [BillingIntervalAdminFilter.MONTHLY]: BillingInterval.MONTHLY,
+  [BillingIntervalAdminFilter.YEARLY]: BillingInterval.YEARLY,
+};
+
+const providerMap = {
+  [ProviderAdminFilter.ANY]: null,
+  [ProviderAdminFilter.STRIPE]: PaymentProvider.STRIPE,
+  [ProviderAdminFilter.NOWPAYMENTS]: PaymentProvider.NOWPAYMENTS,
+};
 
 export class SubscriptionAdminListRepository {
   /**
@@ -56,47 +84,14 @@ export class SubscriptionAdminListRepository {
       | (typeof SubscriptionStatusAdminFilter)[keyof typeof SubscriptionStatusAdminFilter][]
       | undefined,
   ): SQL | null {
-    if (!statuses?.length) {
-      return null;
-    }
-
-    // Remove "ALL" from filters
-    const filtered = statuses.filter(
-      (s) => s !== SubscriptionStatusAdminFilter.ALL,
-    );
-    if (filtered.length === 0) {
-      return null;
-    }
-
-    // Map admin filter values to subscription status values
-    const statusMap: Record<string, string> = {
-      [SubscriptionStatusAdminFilter.ACTIVE]: SubscriptionStatus.ACTIVE,
-      [SubscriptionStatusAdminFilter.TRIALING]: SubscriptionStatus.TRIALING,
-      [SubscriptionStatusAdminFilter.PAST_DUE]: SubscriptionStatus.PAST_DUE,
-      [SubscriptionStatusAdminFilter.CANCELED]: SubscriptionStatus.CANCELED,
-      [SubscriptionStatusAdminFilter.UNPAID]: SubscriptionStatus.UNPAID,
-      [SubscriptionStatusAdminFilter.PAUSED]: SubscriptionStatus.PAUSED,
-    };
-
-    const mappedStatuses = filtered
-      .map((s) => statusMap[s])
-      .filter((s): s is string => s !== undefined);
-
-    if (mappedStatuses.length === 0) {
-      return null;
-    }
-
-    if (mappedStatuses.length === 1) {
-      return eq(
-        subscriptions.status,
-        mappedStatuses[0] as typeof SubscriptionStatus.ACTIVE,
+    const mappedStatuses = statuses
+      ?.map((status) => statusMap[status])
+      .filter(
+        (status): status is typeof SubscriptionStatusValue => status !== null,
       );
-    }
-
-    return sql`${subscriptions.status} IN (${sql.join(
-      mappedStatuses.map((s) => sql`${s}`),
-      sql`, `,
-    )})`;
+    return mappedStatuses?.length
+      ? inArray(subscriptions.status, mappedStatuses)
+      : null;
   }
 
   /**
@@ -105,7 +100,7 @@ export class SubscriptionAdminListRepository {
   static async listSubscriptions(
     rawQuery: SubscriptionListRequestOutput | undefined,
     logger: EndpointLogger,
-    locale: CountryLanguage,
+    t: SubscriptionAdminListT,
   ): Promise<ResponseType<SubscriptionListResponseOutput>> {
     try {
       const searchFilters = rawQuery?.searchFilters;
@@ -117,13 +112,15 @@ export class SubscriptionAdminListRepository {
       const offset = (page - 1) * limit;
 
       logger.debug("Listing subscriptions", {
-        search: searchFilters?.search,
         page,
         limit,
       });
 
       // Build where conditions
       const whereConditions: SQL[] = [];
+      if (rawQuery?.userId) {
+        whereConditions.push(eq(subscriptions.userId, rawQuery.userId));
+      }
 
       // Search by user email or name
       if (searchFilters?.search) {
@@ -147,46 +144,31 @@ export class SubscriptionAdminListRepository {
       }
 
       // Interval filter
-      if (
-        searchFilters?.interval &&
-        searchFilters.interval !== BillingIntervalAdminFilter.ANY
-      ) {
-        const intervalMap: Record<string, string> = {
-          [BillingIntervalAdminFilter.MONTHLY]: BillingInterval.MONTHLY,
-          [BillingIntervalAdminFilter.YEARLY]: BillingInterval.YEARLY,
-        };
-        const mapped = intervalMap[searchFilters.interval];
-        if (mapped) {
-          whereConditions.push(
-            eq(
-              subscriptions.billingInterval,
-              mapped as typeof BillingInterval.MONTHLY,
-            ),
-          );
-        }
+      const interval =
+        searchFilters?.interval && intervalMap[searchFilters.interval];
+      if (interval) {
+        whereConditions.push(eq(subscriptions.billingInterval, interval));
       }
 
       // Provider filter
-      if (
-        searchFilters?.provider &&
-        searchFilters.provider !== ProviderAdminFilter.ANY
-      ) {
-        const providerMap: Record<string, string> = {
-          [ProviderAdminFilter.STRIPE]: PaymentProvider.STRIPE,
-          [ProviderAdminFilter.NOWPAYMENTS]: PaymentProvider.NOWPAYMENTS,
-        };
-        const mappedProvider = providerMap[searchFilters.provider];
-        if (mappedProvider) {
-          whereConditions.push(
-            eq(
-              subscriptions.provider,
-              mappedProvider as typeof PaymentProvider.STRIPE,
-            ),
-          );
-        }
+      const provider =
+        searchFilters?.provider && providerMap[searchFilters.provider];
+      if (provider) {
+        whereConditions.push(eq(subscriptions.provider, provider));
       }
 
       // Date filters
+      if (
+        (searchFilters?.dateFrom &&
+          !Number.isFinite(searchFilters.dateFrom.getTime())) ||
+        (searchFilters?.dateTo &&
+          !Number.isFinite(searchFilters.dateTo.getTime()))
+      ) {
+        return fail({
+          message: t("get.errors.validation.description"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
       if (searchFilters?.dateFrom) {
         whereConditions.push(
           gte(subscriptions.createdAt, searchFilters.dateFrom),
@@ -227,6 +209,9 @@ export class SubscriptionAdminListRepository {
         case SubscriptionSortField.USER_EMAIL:
           orderColumn = users.email;
           break;
+        case SubscriptionSortField.PERIOD_END:
+          orderColumn = subscriptions.currentPeriodEnd;
+          break;
         case SubscriptionSortField.CREATED_AT:
         default:
           orderColumn = subscriptions.createdAt;
@@ -237,6 +222,7 @@ export class SubscriptionAdminListRepository {
       const rows = await db
         .select({
           id: subscriptions.id,
+          userId: subscriptions.userId,
           userEmail: users.email,
           userName: users.privateName,
           planId: subscriptions.planId,
@@ -244,6 +230,8 @@ export class SubscriptionAdminListRepository {
           status: subscriptions.status,
           createdAt: subscriptions.createdAt,
           currentPeriodEnd: subscriptions.currentPeriodEnd,
+          paymentFailedAt: subscriptions.paymentFailedAt,
+          gracePeriodEndsAt: subscriptions.gracePeriodEndsAt,
           cancelAtPeriodEnd: subscriptions.cancelAtPeriodEnd,
           canceledAt: subscriptions.canceledAt,
           cancellationReason: subscriptions.cancellationReason,
@@ -253,7 +241,7 @@ export class SubscriptionAdminListRepository {
         .from(subscriptions)
         .leftJoin(users, eq(subscriptions.userId, users.id))
         .where(whereClause)
-        .orderBy(orderFn(orderColumn))
+        .orderBy(orderFn(orderColumn), desc(subscriptions.id))
         .limit(limit)
         .offset(offset);
 
@@ -261,6 +249,7 @@ export class SubscriptionAdminListRepository {
         response: {
           subscriptions: rows.map((row) => ({
             id: row.id,
+            userId: row.userId,
             userEmail: row.userEmail ?? "",
             userName: row.userName ?? null,
             planId: row.planId,
@@ -268,6 +257,8 @@ export class SubscriptionAdminListRepository {
             status: row.status,
             createdAt: row.createdAt,
             currentPeriodEnd: row.currentPeriodEnd ?? null,
+            paymentFailedAt: row.paymentFailedAt,
+            gracePeriodEndsAt: row.gracePeriodEndsAt,
             cancelAtPeriodEnd: row.cancelAtPeriodEnd,
             canceledAt: row.canceledAt ?? null,
             cancellationReason: row.cancellationReason ?? null,
@@ -284,11 +275,8 @@ export class SubscriptionAdminListRepository {
       });
     } catch (error) {
       logger.error("Error listing subscriptions", parseError(error));
-      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: t("get.errors.server.detail", {
-          error: parseError(error).message,
-        }),
+        message: t("get.errors.server.description"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

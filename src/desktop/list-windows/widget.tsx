@@ -11,14 +11,14 @@ import { Span } from "next-vibe/ui/components/span";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
   useWidgetNavigation,
-  useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
-import { useEffect } from "react";
 
 import { DesktopNavHeader } from "../shared/nav-header";
+import { useDesktopRead } from "../shared/use-desktop-read";
 import type definition from "./definition";
 import type { DesktopListWindowsResponseOutput } from "./definition";
 
@@ -58,7 +58,7 @@ function WindowRow({
 }): JSX.Element {
   return (
     <Div
-      className={`group flex items-center gap-3 px-4 py-3 border-b last:border-b-0 transition-colors${
+      className={`group grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 px-4 py-3 border-b last:border-b-0 transition-colors sm:flex sm:items-center${
         isPickerMode ? " hover:bg-accent cursor-pointer" : ""
       }`}
       onClick={isPickerMode ? onPick : undefined}
@@ -67,10 +67,10 @@ function WindowRow({
         <MousePointer className="h-4 w-4 text-muted-foreground" />
       </Div>
       <Div className="flex-1 min-w-0">
-        <Span className="text-sm font-medium block truncate leading-tight">
+        <Span className="block text-sm font-medium leading-tight [overflow-wrap:anywhere] sm:truncate">
           {truncate(w.title, 55)}
         </Span>
-        <Div className="flex items-center gap-2 mt-0.5">
+        <Div className="mt-0.5 flex flex-wrap items-center gap-2">
           <Span className="text-[11px] text-muted-foreground font-mono">
             {w.windowId}
           </Span>
@@ -89,7 +89,7 @@ function WindowRow({
         </Div>
       </Div>
       {!isPickerMode ? (
-        <Div className="shrink-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <Div className="col-start-2 flex min-w-0 flex-wrap items-center gap-1 sm:shrink-0 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
           <Button
             size="sm"
             variant="default"
@@ -144,15 +144,7 @@ export function ListWindowsWidget(_props: CustomWidgetProps): JSX.Element {
   const t = useWidgetTranslation<typeof definition.POST>();
   const onPickRaw = usePickerCallback<{ id: string; title: string }>();
   const isPickerMode = !!onPickRaw;
-  const onSubmit = useWidgetOnSubmit();
-
-  useEffect((): void => {
-    if (!data && onSubmit) {
-      onSubmit();
-    }
-  }, [data, onSubmit]);
-
-  const isLoading = !data;
+  const { onSubmit, isLoading } = useDesktopRead();
 
   const title = data?.windows
     ? data.windows.length === 1
@@ -222,23 +214,26 @@ export function ListWindowsWidget(_props: CustomWidgetProps): JSX.Element {
       <DesktopNavHeader
         title={String(title)}
         right={
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-7 w-7 p-0"
-            onClick={(): void => {
-              onSubmit?.();
-            }}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <RefreshCw className="h-3.5 w-3.5" />
-            )}
-          </Button>
+          onSubmit && (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="h-7 w-7 p-0"
+              aria-label={t("widget.refresh")}
+              onClick={onSubmit}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <RefreshCw className="h-3.5 w-3.5" />
+              )}
+            </Button>
+          )
         }
       />
+      <FormAlertWidget field={{}} />
 
       {isLoading ? (
         <Div className="flex items-center justify-center py-16 text-muted-foreground gap-2">
@@ -265,12 +260,12 @@ export function ListWindowsWidget(_props: CustomWidgetProps): JSX.Element {
             />
           ))}
         </Div>
-      ) : (
+      ) : data?.success ? (
         <Div className="flex flex-col items-center justify-center py-16 gap-2 text-muted-foreground">
           <Keyboard className="h-8 w-8 opacity-30" />
           <Span className="text-sm">{t("widget.noWindows")}</Span>
         </Div>
-      )}
+      ) : null}
 
       {data?.error ? (
         <Div className="px-4 py-3 border-t">

@@ -10,10 +10,9 @@ export const translations = {
     },
   },
   post: {
-    title: "Approve Bill",
-    titleShort: "Approve Bill",
-    description:
-      "Advance bill status: DRAFT→RECEIVED→APPROVED and post journal entry",
+    title: "Review Bill Status",
+    titleShort: "Review Bill Status",
+    description: "Updates the status of a draft or received supplier bill.",
     billId: { label: "Bill ID", description: "The bill to approve" },
     errors: {
       validation: { title: "Validation Error", description: "Invalid bill ID" },
@@ -57,13 +56,13 @@ export const translations = {
     },
     widget: {
       back: "Back",
-      submit: "Approve Bill",
+      submit: "Confirm status change",
       confirmTitle: "Approve this bill?",
       confirmDescription:
-        "This will advance the bill status. Once approved, a journal entry will be posted.",
+        "A draft moves to Received. A received bill moves to Approved and posts a journal entry if accounting is configured.",
       confirmButton: "Yes, Approve",
       cancelButton: "Cancel",
-      approved: "Bill approved",
+      approved: "Bill status updated",
     },
   },
 };

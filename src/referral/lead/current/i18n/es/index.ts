@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
   description:
     "Devuelve el código de referencia vinculado al contacto actual, si hay",
   tag: "Referidos",
+  noReferral: "Este contacto no tiene una recomendación asociada",
   response: {
     referralCode: "Código de referido",
     referralLabel: "Label de referencia",

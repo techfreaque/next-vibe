@@ -12,14 +12,14 @@ import { Type } from "next-vibe/ui/components/icons/Type";
 import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetNavigation,
-  useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
-import { useEffect } from "react";
 
 import { DesktopNavHeader } from "../shared/nav-header";
+import { useDesktopRead } from "../shared/use-desktop-read";
 import type definition from "./definition";
 
 interface CustomWidgetProps {
@@ -32,15 +32,7 @@ export function GetFocusedWindowWidget(_props: CustomWidgetProps): JSX.Element {
   const navigation = useWidgetNavigation();
   const { push: navigate } = navigation;
   const t = useWidgetTranslation<typeof definition.POST>();
-  const onSubmit = useWidgetOnSubmit();
-
-  useEffect((): void => {
-    if (!data && onSubmit) {
-      onSubmit();
-    }
-  }, [data, onSubmit]);
-
-  const isLoading = !data;
+  const { onSubmit, isLoading } = useDesktopRead();
 
   const handleType = (): void => {
     void (async (): Promise<void> => {
@@ -91,23 +83,26 @@ export function GetFocusedWindowWidget(_props: CustomWidgetProps): JSX.Element {
       <DesktopNavHeader
         title={String(data?.windowTitle ?? t("widget.titleGetFocusedWindow"))}
         right={
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-7 w-7 p-0"
-            onClick={(): void => {
-              onSubmit?.();
-            }}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <RefreshCw className="h-3.5 w-3.5" />
-            )}
-          </Button>
+          onSubmit && (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="h-7 w-7 p-0"
+              aria-label={t("widget.refresh")}
+              onClick={onSubmit}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <RefreshCw className="h-3.5 w-3.5" />
+              )}
+            </Button>
+          )
         }
       />
+      <FormAlertWidget field={{}} />
 
       {isLoading ? (
         <Div className="flex items-center justify-center py-16 text-muted-foreground">

@@ -18,7 +18,12 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
+import {
+  canManageCompanyDocuments,
+  getDocumentCompanies,
+} from "@/finance/document-company-scope";
 
 import { paymentBillLines, paymentBills } from "../../../db";
 import type { BillGetResponseOutput, BillGetUrlPathParams } from "./definition";
@@ -51,12 +56,20 @@ export class BillGetRepository {
       const authResult = await CompanyAuthRepository.requireMember(
         userId,
         bill.companyId,
-        null,
+        CompanyMemberRole.VIEWER,
         logger,
         locale,
       );
       if (!authResult.success) {
         return authResult;
+      }
+
+      const [company] = await getDocumentCompanies(userId, bill.companyId);
+      if (!company) {
+        return fail({
+          message: t("get.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
       }
 
       const lines = await db
@@ -67,6 +80,8 @@ export class BillGetRepository {
 
       return success({
         id: bill.id,
+        companyName: company.name,
+        canManage: canManageCompanyDocuments(authResult.data.role),
         companyId: bill.companyId,
         supplierName: bill.supplierName,
         supplierVatNumber: bill.supplierVatNumber,

@@ -1086,6 +1086,7 @@ export const translations = {
   },
 
   widget: {
+    refresh: "Refresh",
     noWindows: "No open windows found",
     windowCount_one: "{{count}} window",
     windowCount_other: "{{count}} windows",

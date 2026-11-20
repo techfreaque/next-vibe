@@ -1,7 +1,10 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { HelpGetResponseOutput } from "next-vibe/help-tool/definition";
+import type {
+  HelpGetRequestInput,
+  HelpGetResponseOutput,
+} from "next-vibe/help-tool/definition";
 import helpDefinitions from "next-vibe/help-tool/definition";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { Platform } from "next-vibe/platforms/platforms";
@@ -19,26 +22,27 @@ export function ToolsPageClient({
   user,
   platform,
   initialHelpData,
+  serverState,
 }: {
   locale: CountryLanguage;
   user: JwtPayloadType;
   platform: Platform;
   initialHelpData?: HelpGetResponseOutput | null;
+  serverState: Partial<HelpGetRequestInput>;
 }): JSX.Element {
   const searchParams = useSearchParams();
   const logger = useLogger();
 
   const initialState = parseToolsInitialState(searchParams);
-  // The SSR snapshot is the default view only (webPinned, page 1, no filters).
-  // Any URL filter (?q, ?cat, ?p, ?ps, ?inst, ?prod, ?view) must fetch - seeding
-  // the default snapshot would render the unfiltered list under a filtered URL.
-  const isDefaultView = Object.entries(initialState).every(
-    ([key, value]) => key === "statsFilter" && value === "webPinned",
-  );
+  const snapshotMatchesUrl =
+    JSON.stringify(initialState) === JSON.stringify(serverState);
   const endpointOptions = {
     read: {
       initialState,
-      initialData: isDefaultView ? (initialHelpData ?? undefined) : undefined,
+      initialData: snapshotMatchesUrl
+        ? (initialHelpData ?? undefined)
+        : undefined,
+      formOptions: { persistForm: false, autoSubmit: false },
       queryOptions: {
         staleTime: 60 * 1000,
         refetchOnWindowFocus: false,
@@ -54,7 +58,7 @@ export function ToolsPageClient({
   );
 
   return (
-    <Div className="flex flex-col h-dvh w-full">
+    <Div className="flex flex-col h-dvh w-full min-w-0">
       <EndpointsPage
         logger={logger}
         endpoint={helpDefinitions}

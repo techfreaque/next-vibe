@@ -4,15 +4,16 @@ export const translations: typeof enTranslations = {
   category: "Fatturazione",
   tags: {
     payment: "pagamento",
-    invoice: "fattura"
+    invoice: "fattura",
   },
   get: {
     title: "Ottieni fattura",
     titleShort: "Dettagli della fattura",
-    description: "Recuperare una singola fattura con tutti i suoi articoli di linea",
+    description:
+      "Recuperare una singola fattura con tutti i suoi articoli di linea",
     form: {
       title: "Fatturato",
-      description: "Dettagli di fatturazione con gli articoli di linea"
+      description: "Dettagli di fatturazione con gli articoli di linea",
     },
     response: {
       id: "Fatturazione ID",
@@ -39,57 +40,58 @@ export const translations: typeof enTranslations = {
       lineTotal: "Totale",
       sortOrder: "Ordinare",
       lineCreatedAt: "Linea creata a",
-      lineUpdatedAt: "Linea aggiornata At"
+      lineUpdatedAt: "Linea aggiornata At",
     },
     errors: {
       unauthorized: {
         title: "Autenticazione richiesta",
-        description: "Accedi per continuare"
+        description: "Accedi per continuare",
       },
       validation: {
         title: "Errore di convalida",
-        description: "Parametri non validi"
+        description: "Parametri non validi",
       },
       server: {
         title: "Errore del server",
-        description: "Si è verificato un errore interno del server"
+        description: "Si è verificato un errore interno del server",
       },
       unknown: {
         title: "Errore sconosciuto",
-        description: "Si è verificato un errore sconosciuto"
+        description: "Si è verificato un errore sconosciuto",
       },
       network: {
         title: "Errore di rete",
-        description: "Si è verificato un errore di rete"
+        description: "Si è verificato un errore di rete",
       },
       forbidden: {
         title: "Accesso negato",
-        description: "Deve essere un membro di questa azienda"
+        description: "Deve essere un membro di questa azienda",
       },
       notFound: {
         title: "Non trovato",
-        description: "Fattura non trovata"
+        description: "Fattura non trovata",
       },
       conflict: {
         title: "Conflitto",
-        description: "Si è verificato un conflitto"
+        description: "Si è verificato un conflitto",
       },
       unsavedChanges: {
         title: "Modifiche non salvate",
-        description: "Ci sono cambiamenti non rilevati"
-      }
+        description: "Ci sono cambiamenti non rilevati",
+      },
     },
     success: {
       title: "Operazione riuscita",
-      description: "Fattura recuperata"
-    }
+      description: "Fattura recuperata",
+    },
   },
   invoiceId: {
     label: "Fatturazione ID",
     description: "La fattura per recuperare",
-    placeholder: "Inserire la fattura ID"
+    placeholder: "Inserire la fattura ID",
   },
   widget: {
+    createCreditNote: "Creare una nota di credito",
     back: "Indietro",
     submit: "Guarda su Fattura",
     invoiceNumber: "Fatturato",
@@ -117,7 +119,7 @@ export const translations: typeof enTranslations = {
       open: "Aperto",
       paid: "Pagato",
       void: "Void",
-      uncollectible: "Incoltoso"
-    }
-  }
+      uncollectible: "Incoltoso",
+    },
+  },
 };

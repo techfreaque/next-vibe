@@ -9,7 +9,8 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Factures fournisseurs",
     titleShort: "Factures fournisseurs",
-    description: "Lister les factures fournisseurs d'une entreprise",
+    description:
+      "Recherchez par numéro de facture, nom du fournisseur ou identifiant. Filtrez par entreprise ou statut.",
     errors: {
       validation: {
         title: "Erreur de validation",
@@ -67,6 +68,12 @@ export const translations: typeof enTranslations = {
     description: "Filtrer par entreprise",
     placeholder: "UUID de l'entreprise",
   },
+  search: {
+    label: "Rechercher des documents",
+    description:
+      "Recherchez par numéro de facture, nom du fournisseur ou identifiant. Filtrez par entreprise ou statut.",
+    placeholder: "Numéro de facture, fournisseur ou identifiant",
+  },
   status: {
     label: "Statut",
     description: "Filtrer par statut de facture",
@@ -84,6 +91,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    pageCount: "Nombre de pages",
     back: "Retour",
     title: "Factures fournisseurs",
     newBill: "Enregistrer une facture",

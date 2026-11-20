@@ -3,13 +3,24 @@
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
+  useWidgetForm,
+  useWidgetIsInteractive,
   useWidgetNavigation,
+  useWidgetResponse,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import type { JSX } from "react";
+
+import { DocumentScopePicker } from "@/finance/document-list-ui";
 
 import type definition from "./definition";
 
@@ -116,16 +127,32 @@ export function AccountingDashboardWidget(
   const data = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
   const navigation = useWidgetNavigation();
+  const form = useWidgetForm<typeof definition.GET>();
+  const response = useWidgetResponse();
+  const responseOnly = useWidgetResponseOnly();
+  const isInteractive = useWidgetIsInteractive() && !responseOnly;
+  const companyId = form.watch("companyId");
+  const selectedCompanyId = data?.selectedCompanyId ?? undefined;
+  const hasCompany =
+    selectedCompanyId !== undefined &&
+    (!isInteractive || selectedCompanyId === companyId);
+  const canConfigure = isInteractive && data?.canConfigure;
 
   const handleNavGet = (
     importFn: () => Promise<{
       default: { GET: Parameters<typeof navigation.push>[0] };
     }>,
+    useCompany = true,
   ): (() => void) => {
     return (): void => {
       void (async (): Promise<void> => {
         const mod = await importFn();
-        navigation.push(mod.default.GET, {});
+        navigation.push(mod.default.GET, {
+          data:
+            useCompany && selectedCompanyId
+              ? { companyId: selectedCompanyId }
+              : undefined,
+        });
       })();
     };
   };
@@ -138,7 +165,11 @@ export function AccountingDashboardWidget(
     return (): void => {
       void (async (): Promise<void> => {
         const mod = await importFn();
-        navigation.push(mod.default.POST, {});
+        navigation.push(mod.default.POST, {
+          data: selectedCompanyId
+            ? { companyId: selectedCompanyId }
+            : undefined,
+        });
       })();
     };
   };
@@ -170,6 +201,7 @@ export function AccountingDashboardWidget(
   );
   const handleNavCompanies = handleNavGet(
     () => import("@/companies/list/definition"),
+    false,
   );
   const handleNavInvoices = handleNavGet(
     () => import("@/payment/invoice/list/definition"),
@@ -178,18 +210,40 @@ export function AccountingDashboardWidget(
     () => import("@/payment/bill/list/definition"),
   );
 
-  if (!data) {
-    return (
-      <Div className="py-10 text-center text-sm text-muted-foreground">
-        {t("dashboard.widget.loading")}
-      </Div>
-    );
-  }
-
   return (
-    <Div className="flex flex-col gap-6">
-      {data.accountCount !== undefined ? (
-        <Div className="flex flex-col gap-6">
+    <WidgetShell className="min-w-0">
+      <WidgetHeader title={t("dashboard.title")} />
+      {isInteractive && (
+        <Div className="flex min-w-0 flex-wrap items-center gap-2">
+          <DocumentScopePicker
+            kind="company"
+            required
+            value={companyId}
+            appliedLabel={
+              selectedCompanyId === companyId
+                ? data?.selectedCompanyName
+                : undefined
+            }
+            onSelect={(id) =>
+              form.setValue("companyId", id, { shouldDirty: true })
+            }
+          />
+          {hasCompany && (
+            <Span className="text-sm text-muted-foreground">
+              {data?.currency}
+            </Span>
+          )}
+        </Div>
+      )}
+      <FormAlertWidget field={{}} />
+      {response?.success !== false && companyId && !hasCompany && (
+        <LoadingBlock message={t("dashboard.widget.loading")} />
+      )}
+      {response?.success !== false && !companyId && !hasCompany && (
+        <EmptyBlock title={t("dashboard.widget.selectCompany")} />
+      )}
+      {hasCompany && data && (
+        <Div className="flex min-w-0 flex-col gap-6">
           {/* Period status bar */}
           <Div className="rounded-md border px-4 py-3 flex items-center justify-between gap-3 flex-wrap bg-card">
             <Div className="flex items-center gap-3">
@@ -210,9 +264,6 @@ export function AccountingDashboardWidget(
                         {`${data.currentPeriodStartDate}${DATE_SEPARATOR}${data.currentPeriodEndDate}`}
                       </Span>
                     )}
-                  <Badge variant="default" className="text-xs">
-                    {data.currentPeriodStatus ?? ""}
-                  </Badge>
                 </Div>
               ) : (
                 <Span className="text-sm text-amber-600 font-medium">
@@ -220,17 +271,18 @@ export function AccountingDashboardWidget(
                 </Span>
               )}
             </Div>
-            {(data.currentPeriodName === null ||
-              data.currentPeriodName === undefined) && (
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={handleNavCreatePeriod}
-              >
-                {t("dashboard.widget.createPeriod")}
-              </Button>
-            )}
+            {canConfigure &&
+              (data.currentPeriodName === null ||
+                data.currentPeriodName === undefined) && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={handleNavCreatePeriod}
+                >
+                  {t("dashboard.widget.createPeriod")}
+                </Button>
+              )}
           </Div>
 
           {/* KPI cards */}
@@ -239,7 +291,7 @@ export function AccountingDashboardWidget(
               label={t("dashboard.widget.totalAccounts")}
               value={data.accountCount}
               actionLabel={t("dashboard.widget.viewAccounts")}
-              onAction={handleNavAccountList}
+              onAction={isInteractive ? handleNavAccountList : undefined}
             />
             <KpiCard
               label={t("dashboard.widget.draftEntries")}
@@ -253,7 +305,7 @@ export function AccountingDashboardWidget(
                 data.draftEntryCount > 0 ? "destructive" : undefined
               }
               actionLabel={t("dashboard.widget.viewDrafts")}
-              onAction={handleNavJournalList}
+              onAction={isInteractive ? handleNavJournalList : undefined}
             />
             <KpiCard
               label={t("dashboard.widget.postedThisMonth")}
@@ -268,76 +320,78 @@ export function AccountingDashboardWidget(
               }
               badgeVariant={data.hasSetup ? "default" : "secondary"}
               actionLabel={
-                data.hasSetup ? undefined : t("dashboard.widget.runSetup")
+                !canConfigure || data.hasSetup
+                  ? undefined
+                  : t("dashboard.widget.runSetup")
               }
-              onAction={data.hasSetup ? undefined : handleNavSetup}
+              onAction={
+                !canConfigure || data.hasSetup ? undefined : handleNavSetup
+              }
             />
           </Div>
 
           {/* Quick navigation */}
-          <Div className="flex flex-col gap-3">
-            <Span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              {t("dashboard.widget.navTitle")}
-            </Span>
-            <Div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-              <NavCard
-                label={t("dashboard.widget.chartOfAccounts")}
-                iconKey="accounts"
-                onClick={handleNavAccountList}
-              />
-              <NavCard
-                label={t("dashboard.widget.journalEntries")}
-                iconKey="journal"
-                onClick={handleNavJournalList}
-              />
-              <NavCard
-                label={t("dashboard.widget.periods")}
-                iconKey="periods"
-                onClick={handleNavPeriodList}
-              />
-              <NavCard
-                label={t("dashboard.widget.balanceSheet")}
-                iconKey="balanceSheet"
-                onClick={handleNavBalanceSheet}
-              />
-              <NavCard
-                label={t("dashboard.widget.profitLoss")}
-                iconKey="profitLoss"
-                onClick={handleNavProfitLoss}
-              />
-              <NavCard
-                label={t("dashboard.widget.trialBalance")}
-                iconKey="trialBalance"
-                onClick={handleNavTrialBalance}
-              />
-              <NavCard
-                label={t("dashboard.widget.taxReport")}
-                iconKey="taxReport"
-                onClick={handleNavTaxReport}
-              />
-              <NavCard
-                label={t("dashboard.widget.companies")}
-                iconKey="companies"
-                onClick={handleNavCompanies}
-              />
-              <NavCard
-                label={t("dashboard.widget.invoices")}
-                iconKey="invoices"
-                onClick={handleNavInvoices}
-              />
-              <NavCard
-                label={t("dashboard.widget.bills")}
-                iconKey="bills"
-                onClick={handleNavBills}
-              />
+          {isInteractive && (
+            <Div className="flex flex-col gap-3">
+              <Span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t("dashboard.widget.navTitle")}
+              </Span>
+              <Div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                <NavCard
+                  label={t("dashboard.widget.chartOfAccounts")}
+                  iconKey="accounts"
+                  onClick={handleNavAccountList}
+                />
+                <NavCard
+                  label={t("dashboard.widget.journalEntries")}
+                  iconKey="journal"
+                  onClick={handleNavJournalList}
+                />
+                <NavCard
+                  label={t("dashboard.widget.periods")}
+                  iconKey="periods"
+                  onClick={handleNavPeriodList}
+                />
+                <NavCard
+                  label={t("dashboard.widget.balanceSheet")}
+                  iconKey="balanceSheet"
+                  onClick={handleNavBalanceSheet}
+                />
+                <NavCard
+                  label={t("dashboard.widget.profitLoss")}
+                  iconKey="profitLoss"
+                  onClick={handleNavProfitLoss}
+                />
+                <NavCard
+                  label={t("dashboard.widget.trialBalance")}
+                  iconKey="trialBalance"
+                  onClick={handleNavTrialBalance}
+                />
+                <NavCard
+                  label={t("dashboard.widget.taxReport")}
+                  iconKey="taxReport"
+                  onClick={handleNavTaxReport}
+                />
+                <NavCard
+                  label={t("dashboard.widget.companies")}
+                  iconKey="companies"
+                  onClick={handleNavCompanies}
+                />
+                <NavCard
+                  label={t("dashboard.widget.invoices")}
+                  iconKey="invoices"
+                  onClick={handleNavInvoices}
+                />
+                <NavCard
+                  label={t("dashboard.widget.bills")}
+                  iconKey="bills"
+                  onClick={handleNavBills}
+                />
+              </Div>
             </Div>
-          </Div>
-        </Div>
-      ) : (
-        <Div className="text-center py-10 text-sm text-muted-foreground border border-dashed rounded-md">
-          {t("dashboard.widget.noData")}
+          )}
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

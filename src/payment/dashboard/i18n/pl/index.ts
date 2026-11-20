@@ -77,6 +77,8 @@ export const translations: typeof enTranslations = {
     placeholder: "Wprowadź ID firmy",
   },
   widget: {
+    commercialDocuments: "Dokumenty handlowe",
+    processorDiagnostics: "Diagnostyka płatności",
     loading: "Ładowanie pulpitu...",
     noData: "Nie wybrano firmy.",
     noDataHint: "Wybierz firmę, aby zobaczyć przegląd płatności.",

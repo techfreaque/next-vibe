@@ -75,6 +75,8 @@ export const translations = {
     placeholder: "Enter company ID",
   },
   widget: {
+    commercialDocuments: "Commercial documents",
+    processorDiagnostics: "Processor diagnostics",
     loading: "Loading dashboard...",
     noData: "No company selected.",
     noDataHint: "Select a company to see payment overview.",

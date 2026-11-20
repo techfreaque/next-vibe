@@ -11,6 +11,7 @@ export const translations = {
   },
 
   delete: {
+    review: "Review the local account in the Linux user directory.",
     title: "Delete Linux User",
     titleShort: "Delete User",
     description: "Delete an OS user account from the host",

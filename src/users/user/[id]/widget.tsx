@@ -25,17 +25,22 @@ import { Wallet } from "next-vibe/ui/components/icons/Wallet";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { copyToClipboard } from "next-vibe/ui/lib/clipboard";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
 import { EmailFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/email-field/widget";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { UuidFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/uuid-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
@@ -75,7 +80,8 @@ export function UserDetailContainer({
   const t = useWidgetTranslation<typeof definition.GET>();
   const { push: navigate } = useWidgetNavigation();
   const logger = useWidgetLogger();
-  const isLoading = !data;
+  const interactive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
   const [copiedId, setCopiedId] = useState(false);
   const [copiedLeadId, setCopiedLeadId] = useState(false);
 
@@ -180,11 +186,20 @@ export function UserDetailContainer({
     })();
   }, [leadId, logger]);
 
-  if (isLoading) {
+  if (!data) {
     return (
-      <Div className="h-64 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </Div>
+      <WidgetShell>
+        <WidgetHeader title={t("id.get.title")} />
+        {interactive && !responseOnly && (
+          <>
+            <EntityPickerFieldWidget fieldName="id" field={children.id} />
+            <SubmitButtonWidget<typeof definition.GET>
+              field={{ text: "id.get.titleShort" }}
+            />
+          </>
+        )}
+        <FormAlertWidget field={{}} />
+      </WidgetShell>
     );
   }
 

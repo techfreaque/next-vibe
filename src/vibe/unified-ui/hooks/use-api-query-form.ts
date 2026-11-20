@@ -17,6 +17,11 @@ import type { WidgetData } from "../../core/utils/json";
 import { parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import type { EndpointLogger } from "../../logger/types";
+import { applyQueryFormInitialState } from "../_shared/query-form-initial-state";
+import {
+  getQueryFormResponseDefaults,
+  restoreSavedQueryForm,
+} from "../_shared/query-form-reconciliation";
 import { extractSchemaDefaults } from "../_shared/utils";
 import { scopedTranslation as hooksScopedTranslation } from "./i18n";
 import { isQueryRequestValid } from "./query-executor";
@@ -134,6 +139,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
      * If not provided, a key will be generated based on the endpoint
      */
     persistenceKey?: string;
+    _dataSources?: { initialState?: Record<string, WidgetData> };
   };
   queryOptions: ApiQueryOptions<
     TEndpoint["types"]["RequestOutput"],
@@ -161,8 +167,10 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     debounceMs = 500,
     persistForm = true,
     persistenceKey,
+    _dataSources,
     ...restFormOptions
   } = formOptions;
+  const initialState = _dataSources?.initialState;
   // Get Zustand store methods
   const { setFormQueryParams } = useApiStore();
 
@@ -210,10 +218,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       Object.keys(provided).length > 0
     ) {
       // Merge provided values over schema defaults
-      return {
-        ...schemaDefaultValues,
-        ...provided,
-      } as TEndpoint["types"]["FormValues"];
+      return applyQueryFormInitialState(schemaDefaultValues, provided);
     }
     return schemaDefaultValues;
   }, [schemaDefaultValues, restFormOptions.defaultValues]);
@@ -400,21 +405,29 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     if (!persistForm || typeof window === "undefined") {
       return;
     }
+    let current = true;
 
     void (async (): Promise<void> => {
       try {
-        const savedFormData = await storage.getItem(storageKey, logger);
-        if (savedFormData) {
-          const parsedData = JSON.parse(
-            savedFormData,
-          ) as TEndpoint["types"]["RequestOutput"];
-          // Merge saved data with schema defaults - defaults take precedence for undefined/null values.
-          // mergedDefaultValues already includes initialState (from URL), so it wins over localStorage.
-          const mergedData = mergeWithDefaults(parsedData, mergedDefaultValues);
-          formMethods.reset(mergedData);
-          // Update query params with merged data
-          setQueryParams(mergedData);
-        }
+        await restoreSavedQueryForm({
+          readSaved: () => storage.getItem(storageKey, logger),
+          getValues: formMethods.getValues,
+          isCurrent: () => current,
+          apply: (savedFormData) => {
+            const parsedData = JSON.parse(
+              savedFormData,
+            ) as TEndpoint["types"]["RequestOutput"];
+            const restoredData = mergeWithDefaults(
+              parsedData,
+              mergedDefaultValues,
+            );
+            const mergedData = initialState
+              ? applyQueryFormInitialState(restoredData, initialState)
+              : restoredData;
+            formMethods.reset(mergedData);
+            setQueryParams(mergedData);
+          },
+        });
       } catch (error) {
         // Never break the UI for storage errors - but never hide them either
         logger.warn("Query form: restoring saved form data failed", {
@@ -424,6 +437,9 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         });
       }
     })();
+    return (): void => {
+      current = false;
+    };
   }, [
     logger,
     storageKey,
@@ -431,6 +447,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     setQueryParams,
     mergedDefaultValues,
     formMethods,
+    initialState,
   ]);
 
   // Save form values when they change
@@ -542,59 +559,33 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       onSuccess: (
         data,
       ): void | ErrorResponseType | Promise<void | ErrorResponseType> => {
-        // Merge response data into form so FormFieldWidget can display it
-        const responseData = data.responseData;
         const currentFormData = formMethods.getValues();
-
-        // First merge current form data with response data
-        const mergedData = {
+        const current = endpoint.requestSchema.safeParse(currentFormData);
+        const submitted = endpoint.requestSchema.safeParse(data.requestData);
+        const withResponse = endpoint.requestSchema.safeParse({
           ...currentFormData,
-          ...responseData,
-        };
-
-        // Then parse with request schema to filter out response-only fields
-        // This ensures only fields that are valid request fields stay in form
-        // Prevents response fields from overwriting request fields (like filters)
-        const requestSchemaResult =
-          endpoint.requestSchema.safeParse(mergedData);
-
-        if (requestSchemaResult.success) {
-          // Parse current form data through requestSchema to get the user's
-          // current request field values (e.g. paginationInfo.page, filters).
-          // These must win over defaults injected from the response merge.
-          const currentRequestResult =
-            endpoint.requestSchema.safeParse(currentFormData);
-          const currentRequestData = currentRequestResult.success
-            ? (currentRequestResult.data as TEndpoint["types"]["RequestOutput"])
-            : ({} as TEndpoint["types"]["RequestOutput"]);
-
-          // Merge: response-derived request defaults first, then current form
-          // values on top - so the user's current page/filter state is preserved.
-          const filteredData = Object.assign(
-            {},
-            requestSchemaResult.data,
-            currentRequestData,
-          ) as TEndpoint["types"]["RequestOutput"];
-
-          // Update form with filtered data
-          // This will trigger auto-submit watcher, but watcher filters through requestSchema
-          // so only request fields are sent back to API (preventing 431 error)
-          formMethods.reset(filteredData, {
-            keepDirty: false,
-            keepTouched: false,
-          });
-        } else {
-          // If merge failed validation, don't reset form - keep current values
-          logger.debug("Response data merge failed request schema validation", {
-            endpoint: endpoint.path.join("/"),
-            errors: requestSchemaResult.error,
-          });
+          ...data.responseData,
+        });
+        if (current.success && submitted.success && withResponse.success) {
+          // A hidden instance can execute a shared query after the visible
+          // instance changes filters. Resetting its older form would submit
+          // those stale filters back into the shared query.
+          const defaults = getQueryFormResponseDefaults(
+            submitted.data,
+            current.data,
+            withResponse.data,
+          );
+          if (defaults && typeof defaults === "object") {
+            formMethods.reset(
+              { ...currentFormData, ...defaults },
+              {
+                keepDirty: false,
+                keepTouched: false,
+              },
+            );
+          }
         }
-
-        // Call the user's onSuccess handler if provided
-        if (queryOptions.onSuccess) {
-          return queryOptions.onSuccess(data, user, logger);
-        }
+        return queryOptions.onSuccess?.(data, user, logger);
       },
       // Use a custom onError handler
       onError: ({ error }): void => {

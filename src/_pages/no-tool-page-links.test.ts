@@ -47,6 +47,15 @@ const ALLOWED_FILES: Record<string, string> = {
 const TOOL_LINK_PATTERN =
   /(?:\$\{[^}]*\}|\/[a-z]{2}-[A-Z]{2}|unbottled\.ai(?:\/[a-z]{2}-[A-Z]{2})?|["'`(])\/tools\/[\w$<{]/;
 
+/** Reading the current route is valid. Check any links on the same line. */
+function hasToolLink(line: string): boolean {
+  const withoutRouteChecks = line.replaceAll(
+    /\bpathname\.endsWith\((["'`])\/tools\/[^"'`)]*\1\)/g,
+    "",
+  );
+  return TOOL_LINK_PATTERN.test(withoutRouteChecks);
+}
+
 const SOURCE_EXTENSIONS = [".ts", ".tsx", ".md", ".txt", ".html"];
 
 function isTestFile(path: string): boolean {
@@ -97,7 +106,7 @@ describe("no user-facing links to /tools/*", () => {
         if (isImportLine(line) || isCommentLine(line)) {
           return;
         }
-        if (TOOL_LINK_PATTERN.test(line)) {
+        if (hasToolLink(line)) {
           offenders.push(`src${sep}${rel}:${index + 1}: ${line.trim()}`);
         }
       });
@@ -112,18 +121,20 @@ describe("no user-facing links to /tools/*", () => {
       'link: "/tools/notifications"',
       "see https://unbottled.ai/en-US/tools/models",
       "web: /en-US/tools/desktop-get-focused-window",
+      'if (pathname.endsWith("/tools/a")) go("/tools/b")',
     ];
     const good = [
       'href: "https://aitoolscapital.com/tools/unbottled-ai"',
       "href={`/${locale}/user/api-keys`}",
       "Visitor pagination on /tools was broken.",
       "Plus a web page at /tools/<alias>",
+      "if (!pathname.endsWith(`/tools/${alias}`)) {",
     ];
     for (const line of bad) {
-      expect(TOOL_LINK_PATTERN.test(line)).toBe(true);
+      expect(hasToolLink(line)).toBe(true);
     }
     for (const line of good) {
-      expect(TOOL_LINK_PATTERN.test(line)).toBe(false);
+      expect(hasToolLink(line)).toBe(false);
     }
   });
 });

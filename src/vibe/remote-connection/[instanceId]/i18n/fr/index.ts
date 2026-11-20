@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
     remoteConnection: "Connexion distante",
   },
   widget: {
+    loading: "Chargement de la connexion…",
     title: "Connexion distante",
     signInDescription:
       "Connectez-vous pour configurer votre connexion distante",
@@ -20,7 +21,7 @@ export const translations: typeof enTranslations = {
       remoteTransport: "Leur transport",
       remoteInstance: "Instance distante",
       capabilities: "Version des capacités",
-      lastSynced: "Synchro initiale",
+      lastSynced: "Dernier échange de synchronisation",
       wsConnected: "Connecté depuis",
       refresh: "Actualiser",
       transportReverseWs: "WS inverse (tunnel)",
@@ -58,7 +59,9 @@ export const translations: typeof enTranslations = {
     sshLink: "Ouvrir les connexions SSH",
     // ── Connection state banner ────────────────────────────────────────────
     state: {
-      tunnelActive: "Tunnel ouvert",
+      noSyncRecorded: "Aucune synchronisation enregistrée",
+      syncRecorded: "Synchronisation enregistrée",
+      tunnelActive: "WebSocket ouvert",
       bridgeActive: "Connecté",
       degraded: "Connexion dégradée",
       connectionLost: "Connexion perdue",

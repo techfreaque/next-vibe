@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   category: "Gestión de contactos",
   tags: {
     leads: "Contactos",
-    search: "Buscar"
+    search: "Buscar",
   },
   get: {
     title: "Búsqueda de contactos",
@@ -12,86 +12,97 @@ export const translations: typeof enTranslations = {
     description: "Búsqueda conduce con filtrado y paginación",
     form: {
       title: "Formulario de búsqueda de contactos",
-      description: "Introduzca criterios de búsqueda para encontrar leads"
+      description: "Introduzca criterios de búsqueda para encontrar leads",
     },
     search: {
       label: "Búsqueda",
-      description: "Términos de búsqueda para filtrar leads por correo electrónico, nombre de negocio o notas",
-      placeholder: "Ingrese el término de búsqueda..."
+      description:
+        "Términos de búsqueda para filtrar leads por correo electrónico, nombre de negocio o notas",
+      placeholder: "Ingrese el término de búsqueda...",
     },
     status: {
       label: "Filtro de estado",
-      description: "Filtros por estado"
+      description: "Filtros por estado",
     },
     limit: {
       label: "Límite de resultados",
-      description: "Número máximo de resultados a la vuelta (1-100)"
+      description: "Número máximo de resultados a la vuelta (1-100)",
     },
     offset: {
       label: "Resultados Offset",
-      description: "Número de resultados para saltar para paginación"
+      description: "Número de resultados para saltar para paginación",
     },
     response: {
       title: "Resultados de búsqueda",
       description: "Resultados de búsqueda con datos de contacto",
       leads: {
         title: "Contactos",
-        item: "Prospecto"
+        item: "Prospecto",
       },
       total: "Total de resultados",
-      hasMore: "Tiene más resultados"
+      hasMore: "Tiene más resultados",
     },
     errors: {
       unauthorized: {
         title: "Se requiere autenticación",
-        description: "Autenticación necesaria para buscar los leads"
+        description: "Autenticación necesaria para buscar los leads",
       },
       validation: {
         title: "Error de validación",
-        description: "Parámetros de búsqueda inválidos proporcionados"
+        description: "Parámetros de búsqueda inválidos proporcionados",
       },
       server: {
         title: "Error del servidor",
-        description: "Error del servidor interno se produjo mientras que las guías de búsqueda"
+        description:
+          "Error del servidor interno se produjo mientras que las guías de búsqueda",
       },
       unknown: {
         title: "Error desconocido",
-        description: "Se produjo un error desconocido mientras se registran las pistas"
+        description:
+          "Se produjo un error desconocido mientras se registran las pistas",
       },
       network: {
         title: "Error de red",
-        description: "Error de la red ocurrió mientras que los guías de búsqueda"
+        description:
+          "Error de la red ocurrió mientras que los guías de búsqueda",
       },
       forbidden: {
         title: "Acceso denegado",
-        description: "Acceso prohibido para la búsqueda de contacto"
+        description: "Acceso prohibido para la búsqueda de contacto",
       },
       notFound: {
         title: "No hay resultados",
-        description: "No hay pistas encontradas criterios de búsqueda coincidentes"
+        description:
+          "No hay pistas encontradas criterios de búsqueda coincidentes",
       },
       unsavedChanges: {
         title: "Cambios sin guardar",
-        description: "Hay cambios sin salvar en el formulario de búsqueda"
+        description: "Hay cambios sin salvar en el formulario de búsqueda",
       },
       conflict: {
         title: "Conflicto",
-        description: "Conflicto de datos ocurrió mientras se registraban los líderes"
-      }
+        description:
+          "Conflicto de datos ocurrió mientras se registraban los líderes",
+      },
     },
     success: {
       title: "Búsqueda Completa",
-      description: "Búsqueda de contacto completada con éxito"
-    }
+      description: "Búsqueda de contacto completada con éxito",
+    },
   },
   widget: {
+    previous: "Anterior",
+    next: "Siguiente",
+    page: "Página {{page}} de {{pages}}",
     title: "Búsqueda de contactos",
     filterLabel: "Filtro:",
     clearFilter: "Limpiar",
     noResultsTitle: "No se encontraron resultados",
-    noResultsSubtitle: "Búsqueda por correo electrónico, nombre de empresa o teléfono",
+    noResultsSubtitle:
+      "Búsqueda por correo electrónico, nombre de empresa o teléfono",
     createLead: "Crear contacto",
-    noLeadsMatchFilter: "No hay pistas que coincidan con los filtros seleccionados.",
+    noLeadsMatchFilter:
+      "No hay pistas que coincidan con los filtros seleccionados.",
     clearFilters: "Filtros claros",
     loadMore: "Carga más",
     openRateSuffix: "% abierto",
@@ -111,7 +122,7 @@ export const translations: typeof enTranslations = {
     statusSubscribed: "Suscrito",
     statusUnsub: "Unsub",
     statusBounced: "Bounced",
-    statusInvalid: "Inválidos"
+    statusInvalid: "Inválidos",
   },
   enums: {
     leadStatus: {
@@ -125,7 +136,7 @@ export const translations: typeof enTranslations = {
       subscriptionConfirmed: "Suscripción confirmada",
       unsubscribed: "Suscripción cancelada",
       bounced: "Bounced",
-      invalid: "Inválidos"
-    }
-  }
+      invalid: "Inválidos",
+    },
+  },
 };

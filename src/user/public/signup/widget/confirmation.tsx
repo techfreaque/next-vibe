@@ -15,12 +15,12 @@ import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
 import { Link } from "next-vibe/ui/components/link";
-import { P } from "next-vibe/ui/components/typography";
 import { getCurrentUrl, replaceUrl } from "next-vibe/ui/lib/location";
 import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetPlatform,
+  useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -36,7 +36,17 @@ import { scopedTranslation } from "../i18n";
 
 export function SignupConfirmationWidget(): React.JSX.Element {
   const data = useWidgetValue<typeof definition.PATCH>();
-  return <P>{data?.message}</P>;
+  const t = useWidgetTranslation<typeof definition.PATCH>();
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t("confirmation.title")}</CardTitle>
+        <CardDescription>
+          {data?.message ?? t("confirmation.description")}
+        </CardDescription>
+      </CardHeader>
+    </Card>
+  );
 }
 
 export function SignupConfirmationStep({

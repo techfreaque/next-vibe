@@ -2,7 +2,8 @@
 
 import { Button } from "next-vibe/ui/components/button";
 import { LogOut } from "next-vibe/ui/components/icons/LogOut";
-import { LoadingBlock } from "next-vibe/ui/components/loading-block";
+import { SectionGroup } from "next-vibe/ui/components/section-group";
+import { P } from "next-vibe/ui/components/typography";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import {
   useWidgetLocale,
@@ -10,7 +11,6 @@ import {
   useWidgetUser,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import type { JSX } from "react";
-import { useEffect, useRef } from "react";
 
 import { useLogout } from "./hooks";
 import { scopedTranslation } from "./i18n";
@@ -21,22 +21,16 @@ export function LogoutWidget(): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const logout = useLogout(logger, user);
-  const hasTriggered = useRef(false);
-
-  useEffect(() => {
-    if (!hasTriggered.current) {
-      hasTriggered.current = true;
-      logout();
-    }
-  }, [logout]);
 
   return (
     <WidgetShell>
-      <LoadingBlock message={t("loggingOut")} />
-      <Button variant="outline" size="sm" onClick={logout} className="gap-2">
-        <LogOut className="h-4 w-4" />
-        {t("logoutButton")}
-      </Button>
+      <SectionGroup title={t("titleShort")}>
+        <P className="mb-4 text-sm text-muted-foreground">{t("description")}</P>
+        <Button type="button" variant="outline" size="sm" onClick={logout}>
+          <LogOut className="h-4 w-4" />
+          {t("logoutButton")}
+        </Button>
+      </SectionGroup>
     </WidgetShell>
   );
 }

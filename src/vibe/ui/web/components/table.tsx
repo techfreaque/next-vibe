@@ -8,11 +8,21 @@ import type { DivKeyboardEvent } from "./div";
 // Table
 export type TableProps = {
   children?: ReactNode;
+  scrollLabel?: string;
 } & StyleType;
 
-export function Table({ className, ...props }: TableProps): React.JSX.Element {
+export function Table({
+  className,
+  scrollLabel,
+  ...props
+}: TableProps): React.JSX.Element {
   return (
-    <div className="relative w-full overflow-auto">
+    <div
+      className="relative w-full min-w-0 max-w-full overflow-x-auto focus-visible:outline focus-visible:outline-ring"
+      tabIndex={scrollLabel ? 0 : undefined}
+      role={scrollLabel ? "region" : undefined}
+      aria-label={scrollLabel}
+    >
       <table
         className={cn("w-full caption-bottom text-sm", className)}
         {...props}
@@ -97,13 +107,34 @@ export function TableRow({
   const isInteractive = Boolean(onClick) || Boolean(onKeyDown);
   const interactiveProps = isInteractive
     ? {
-        onClick,
-        onKeyDown: (e: DivKeyboardEvent): void => {
-          if (onKeyDown) {
-            onKeyDown(e);
+        onClick: onClick
+          ? (event: React.MouseEvent<HTMLTableRowElement>): void => {
+              const action =
+                event.target instanceof Element
+                  ? event.target.closest(
+                      "button, a, input, select, textarea, [role=button], [role=link], [role=checkbox]",
+                    )
+                  : null;
+              if (
+                !action ||
+                action === event.currentTarget ||
+                !event.currentTarget.contains(action)
+              ) {
+                onClick();
+              }
+            }
+          : undefined,
+        onKeyDown: (event: React.KeyboardEvent<HTMLTableRowElement>): void => {
+          if (event.target !== event.currentTarget) {
+            return;
           }
-          if (onClick && (e.key === "Enter" || e.key === " ")) {
-            e.preventDefault();
+          onKeyDown?.(event);
+          if (
+            onClick &&
+            !event.defaultPrevented &&
+            (event.key === "Enter" || event.key === " ")
+          ) {
+            event.preventDefault();
             onClick();
           }
         },
@@ -115,7 +146,8 @@ export function TableRow({
     <tr
       className={cn(
         "border-b transition-colors hover:bg-accent data-[state=selected]:bg-muted",
-        onClick && "cursor-pointer",
+        onClick &&
+          "cursor-pointer focus-visible:outline focus-visible:outline-ring focus-visible:-outline-offset-2",
         className,
       )}
       {...interactiveProps}

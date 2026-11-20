@@ -19,6 +19,10 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
+import {
+  canManageCompanyDocuments,
+  getDocumentCompanies,
+} from "@/finance/document-company-scope";
 
 import { paymentEstimateLines, paymentEstimates } from "../../../db";
 import type {
@@ -61,6 +65,14 @@ export class EstimateGetRepository {
         return authResult;
       }
 
+      const [company] = await getDocumentCompanies(userId, estimate.companyId);
+      if (!company) {
+        return fail({
+          message: t("post.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+
       const lines = await db
         .select()
         .from(paymentEstimateLines)
@@ -69,6 +81,8 @@ export class EstimateGetRepository {
 
       return success({
         id: estimate.id,
+        companyName: company.name,
+        canManage: canManageCompanyDocuments(authResult.data.role),
         companyId: estimate.companyId,
         estimateNumber: estimate.estimateNumber,
         status: estimate.status,

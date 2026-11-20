@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
   },
 
   delete: {
+    review: "Prüfe das lokale Konto im Linux-Benutzerverzeichnis.",
     title: "Linux-Benutzer löschen",
     titleShort: "Benutzer löschen",
     description: "OS-Benutzerkonto vom Host löschen",

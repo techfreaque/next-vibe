@@ -51,6 +51,7 @@ export const translations = {
     },
   },
   widget: {
+    renewalDiagnostics: "Renewals and payment failures",
     actions: "Quick Actions",
     mySubscription: "My Subscription",
     manage: "Manage",

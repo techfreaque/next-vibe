@@ -643,6 +643,7 @@ export const translations: typeof enTranslations = {
     openLead: "Ouvrir le lead",
     attributionOnly:
       "Les liens d’attribution donnent des indices. Plusieurs personnes peuvent partager une adresse IP ou un lien suivi.",
+    recordedAccountLink: "Lien de compte enregistré",
     recordedConversion: "Compte enregistré lors de la conversion",
     attributedAccount: "Compte associé à l’attribution d’acquisition",
     previewIpMatches: "Prévisualiser les correspondances IP des leads",

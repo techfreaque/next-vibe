@@ -46,6 +46,11 @@ export const translations = {
   },
   estimateId: { label: "Estimate ID", description: "The estimate to act on" },
   widget: {
+    send: "Send estimate",
+    addLine: "Add line",
+    accept: "Record acceptance",
+    decline: "Record decline",
+    openInvoice: "Open invoice",
     back: "Back",
     submit: "Look Up Estimate",
     estimateNumber: "Estimate",

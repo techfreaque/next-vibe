@@ -282,15 +282,16 @@ export class UserListRepository {
     const conditions: SQL[] = [];
     const now = Date.now();
 
-    // Search: email, names, id prefix, referral code
+    // Search treats punctuation in email addresses and names literally.
     const search = data.search?.trim();
     if (search) {
-      const pattern = `%${search}%`;
+      const literal = search.replaceAll(/[\\%_]/g, (char) => `\\${char}`);
+      const pattern = `%${literal}%`;
       const searchCondition = or(
         ilike(e.email, pattern),
         ilike(e.privateName, pattern),
         ilike(e.publicName, pattern),
-        sql`${e.id}::text ilike ${`${search.toLowerCase()}%`}`,
+        sql`${e.id}::text ilike ${`${literal}%`}`,
       );
       if (searchCondition) {
         conditions.push(searchCondition);

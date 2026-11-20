@@ -156,6 +156,11 @@ export const translations: typeof enTranslations = {
     unknownTask: "Nieznane zadanie",
   },
   widget: {
+    runDetails: "Szczegóły wykonania",
+    runId: "ID wykonania",
+    emptyFiltered:
+      "Brak pasujących wykonań. Zmień zadanie, stan, priorytet lub daty.",
+    emptyUnfiltered: "Wykonania pojawiają się tutaj po uruchomieniu.",
     title: "Historia wykonań zadań",
     loading: "Ładowanie historii...",
     header: {
@@ -165,7 +170,7 @@ export const translations: typeof enTranslations = {
       refresh: "Odśwież",
     },
     summary: {
-      total: "Łącznie",
+      total: "Pasujące wykonania",
       successful: "Pomyślne",
       failed: "Nieudane",
       successRate: "Wskaźnik sukcesu",
@@ -175,6 +180,10 @@ export const translations: typeof enTranslations = {
       placeholder: "Szukaj zadań...",
     },
     filter: {
+      clear: "Wyczyść filtry",
+      allTasks: "Wszystkie zadania",
+      allPriorities: "Wszystkie priorytety",
+      taskHistory: "Historia tego zadania",
       all: "Wszystkie",
       running: "Uruchomione",
       completed: "Ukończone",

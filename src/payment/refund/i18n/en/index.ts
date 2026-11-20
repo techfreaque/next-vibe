@@ -28,7 +28,7 @@ export const translations = {
       },
       amount: {
         label: "Refund Amount",
-        description: "Amount to refund (optional, defaults to full amount)",
+        description: "Optional partial refund in the transaction currency",
         placeholder: "Enter amount",
       },
       reason: {
@@ -42,6 +42,31 @@ export const translations = {
         placeholder: "Enter metadata as JSON",
       },
     },
+  },
+
+  widget: {
+    transactionDetails: "Saved transaction",
+    customerEmail: "Customer email",
+    customerId: "Customer ID",
+    originalAmount: "Original charge",
+    enterTransaction: "Enter a transaction ID to load payment details.",
+    lookupLoading: "Loading saved transaction",
+    transactionMissing: "Transaction not found",
+    lookupFailed: "Couldn’t load the transaction",
+    retryLookup: "Retry lookup",
+    amountExceedsCharge: "Enter an amount up to the original charge.",
+    confirmRemaining:
+      "Stripe will refund the remaining balance in {{currency}}.",
+    confirmAmount: "Partial refund: {{amount}} ({{currency}}).",
+    title: "Review Stripe refund",
+    amountHelp:
+      "Enter a partial amount in {{currency}}. Leave it blank to refund the remaining balance.",
+    review: "Review amount",
+    confirmTitle: "Confirm Stripe refund",
+    confirmDescription:
+      "Stripe will refund transaction {{transactionId}} for {{email}}. This action moves money.",
+    confirm: "Issue refund",
+    cancel: "Cancel",
   },
 
   post: {
@@ -69,6 +94,7 @@ export const translations = {
       validation: {
         title: "Validation Error",
         description: "Invalid refund parameters",
+        ineligible: "This transaction is ineligible for a Stripe refund.",
       },
       unauthorized: {
         title: "Unauthorized",

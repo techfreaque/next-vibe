@@ -154,6 +154,11 @@ export const translations = {
     unknownTask: "Unknown Task",
   },
   widget: {
+    runDetails: "Run details",
+    runId: "Run ID",
+    emptyFiltered:
+      "No runs match this view. Adjust the task, status, priority, or dates.",
+    emptyUnfiltered: "Task runs appear here after they start.",
     title: "Task Execution History",
     loading: "Loading history...",
     header: {
@@ -163,7 +168,7 @@ export const translations = {
       refresh: "Refresh",
     },
     summary: {
-      total: "Total",
+      total: "Matching runs",
       successful: "Successful",
       failed: "Failed",
       successRate: "Success Rate",
@@ -173,6 +178,10 @@ export const translations = {
       placeholder: "Search tasks...",
     },
     filter: {
+      clear: "Clear filters",
+      allTasks: "All tasks",
+      allPriorities: "All priorities",
+      taskHistory: "History for this task",
       all: "All",
       running: "Running",
       completed: "Completed",

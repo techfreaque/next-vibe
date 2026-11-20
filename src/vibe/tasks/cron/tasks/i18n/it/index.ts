@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     high: "Alto.",
     medium: "Mezzo medio",
     low: "Basso",
-    background: "Sfondo"
+    background: "Sfondo",
   },
   taskCategory: {
     development: "Sviluppo",
@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
     database: "Database",
     system: "Sistema",
     monitoring: "Monitoraggio",
-    leadManagement: "Gestione contatti"
+    leadManagement: "Gestione contatti",
   },
   status: {
     pending: "Finanziamenti",
@@ -31,97 +31,101 @@ export const translations: typeof enTranslations = {
     blocked: "Bloccato",
     scheduled: "Programmato",
     stopped: "Non ci sono.",
-    error: "Errore"
+    error: "Errore",
   },
   hiddenFilter: {
     visible: "Visibile",
     hidden: "Nascosto",
-    all: "Tutti"
+    all: "Tutti",
   },
   enabledFilter: {
     all: "Tutti",
     enabled: "Abilitato",
-    disabled: "Disabili"
+    disabled: "Disabili",
   },
   outputMode: {
     storeOnly: "Solo",
     notifyOnFailure: "Informare sul fallimento",
-    notifyAlways: "Informare sempre"
+    notifyAlways: "Informare sempre",
   },
   category: "API Endpoint",
   tags: {
     tasks: "Compiti",
     cron: "Cron",
-    scheduling: "Scheduling"
+    scheduling: "Scheduling",
   },
   errors: {
     fetchCronTasks: "Non è riuscito a prendere i compiti del cron",
     createCronTask: "Non è riuscito a creare l'attività di cron",
-    invalidTaskInput: "L'ingresso dell'attività non corrisponde allo schema di richiesta del punto finale",
+    invalidTaskInput:
+      "L'ingresso dell'attività non corrisponde allo schema di richiesta del punto finale",
     endpointNotFound: "Endpoint non trovato per il dato percorso ID",
-    targetInstanceForbidden: "Solo gli amministratori possono impostare l'istanza di destinazione per le attività"
+    targetInstanceForbidden:
+      "Solo gli amministratori possono impostare l'istanza di destinazione per le attività",
   },
   list: {
     columns: {
       createdAt: "Creato a",
-      updatedAt: "Aggiornato At"
-    }
+      updatedAt: "Aggiornato At",
+    },
   },
   get: {
     title: "Elenco delle attività Cron",
     titleShort: "Attività cron",
-    description: "Recuperare un elenco di attività di cron con filtro opzionale",
+    description:
+      "Recuperare un elenco di attività di cron con filtro opzionale",
     container: {
       title: "Elenco delle attività Cron",
-      description: "Filtra e visualizza le attività del cron"
+      description: "Filtra e visualizza le attività del cron",
     },
     fields: {
       status: {
         label: "Stato",
         description: "Filtra per lo stato dell'attività",
-        placeholder: "Selezionare lo stato..."
+        placeholder: "Selezionare lo stato...",
       },
       priority: {
         label: "Priorità",
         description: "Filtra per priorità di compito",
-        placeholder: "Seleziona la priorità..."
+        placeholder: "Seleziona la priorità...",
       },
       category: {
         label: "Categoria",
         description: "Filtra per categoria di attività",
-        placeholder: "Seleziona la categoria..."
+        placeholder: "Seleziona la categoria...",
       },
       enabled: {
         label: "Stato",
         description: "Filtra per stato abilitato",
-        placeholder: "Tutte le attività"
+        placeholder: "Tutte le attività",
       },
       hidden: {
         label: "Visibilità",
         description: "Filtra per stato nascosto (predefinito: visibile solo)",
-        placeholder: "Compiti visibili"
+        placeholder: "Compiti visibili",
       },
       search: {
         label: "Cerca",
-        description: "Filtra le attività per nome, percorso, descrizione o categoria",
-        placeholder: "Compiti di ricerca..."
+        description:
+          "Filtra le attività per nome, percorso, descrizione o categoria",
+        placeholder: "Compiti di ricerca...",
       },
       sort: {
         label: "Ordine",
-        description: "Ordinare l'ordine per la lista delle attività"
+        description: "Ordinare l'ordine per la lista delle attività",
       },
       limit: {
         label: "Limite",
-        description: "Numero massimo di compiti da restituire"
+        description: "Numero massimo di compiti da restituire",
       },
       offset: {
         label: "Offset",
-        description: "Numero di compiti da saltare"
-      }
+        description: "Numero di compiti da saltare",
+      },
     },
     response: {
       tasks: {
-        title: "Compiti"
+        title: "Compiti",
       },
       task: {
         title: "Compiti",
@@ -163,54 +167,60 @@ export const translations: typeof enTranslations = {
         targetInstance: "Destinazione",
         tags: "Tags",
         createdAt: "Creato a",
-        updatedAt: "Aggiornato At"
+        updatedAt: "Aggiornato At",
       },
-      totalTasks: "Compiti totali"
+      totalTasks: "Compiti totali",
     },
     errors: {
       internal: {
-        title: "Errore del server interno si è verificato durante il recupero delle attività",
-        description: "Un errore inaspettato si è verificato durante la ricerca della lista delle attività"
+        title:
+          "Errore del server interno si è verificato durante il recupero delle attività",
+        description:
+          "Un errore inaspettato si è verificato durante la ricerca della lista delle attività",
       },
       unauthorized: {
         title: "Accesso non autorizzato all'elenco delle attività",
-        description: "Non hai il permesso di visualizzare l'elenco delle attività"
+        description:
+          "Non hai il permesso di visualizzare l'elenco delle attività",
       },
       validation: {
         title: "Parametri della richiesta non validi",
-        description: "I parametri di richiesta forniti non sono validi"
+        description: "I parametri di richiesta forniti non sono validi",
       },
       forbidden: {
         title: "Accesso non consentito",
-        description: "L'accesso a questa risorsa è vietato"
+        description: "L'accesso a questa risorsa è vietato",
       },
       notFound: {
         title: "Compiti non trovati",
-        description: "Non sono stati trovati compiti corrispondenti ai criteri"
+        description: "Non sono stati trovati compiti corrispondenti ai criteri",
       },
       network: {
         title: "Errore di rete",
-        description: "Si è verificato un errore di rete durante il recupero delle attività"
+        description:
+          "Si è verificato un errore di rete durante il recupero delle attività",
       },
       unknown: {
         title: "Errore sconosciuto",
-        description: "Si è verificato un errore sconosciuto"
+        description: "Si è verificato un errore sconosciuto",
       },
       unsaved: {
         title: "Modifiche non salvate",
-        description: "Ci sono cambiamenti non salvati che devono essere affrontati"
+        description:
+          "Ci sono cambiamenti non salvati che devono essere affrontati",
       },
       conflict: {
         title: "Errore di conflitto",
-        description: "Si è verificato un conflitto durante l'elaborazione della richiesta"
-      }
+        description:
+          "Si è verificato un conflitto durante l'elaborazione della richiesta",
+      },
     },
     success: {
       retrieved: {
         title: "Compiti recuperati con successo",
-        description: "L'elenco delle attività è stato recuperato con successo"
-      }
-    }
+        description: "L'elenco delle attività è stato recuperato con successo",
+      },
+    },
   },
   post: {
     title: "Creare attività Cron",
@@ -218,83 +228,90 @@ export const translations: typeof enTranslations = {
     description: "Creare un nuovo compito di cron",
     container: {
       title: "Creare attività",
-      description: "Configurare un nuovo compito di cron"
+      description: "Configurare un nuovo compito di cron",
     },
     fields: {
       id: {
         label: "Task ID",
-        description: "Unico e stabile identificatore per questo compito (ad esempio 'db-health')",
-        placeholder: "Inserire l'attività ID..."
+        description:
+          "Unico e stabile identificatore per questo compito (ad esempio 'db-health')",
+        placeholder: "Inserire l'attività ID...",
       },
       routeId: {
         label: "Route ID",
-        description: "Identificazione del manubrio: nome dell'attività, alias endpoint o 'cron-steps'",
-        placeholder: "Inserire il percorso ID..."
+        description:
+          "Identificazione del manubrio: nome dell'attività, alias endpoint o 'cron-steps'",
+        placeholder: "Inserire il percorso ID...",
       },
       displayName: {
         label: "Nome dell'esposizione",
         description: "Etichetta leggibile umana per questo compito",
-        placeholder: "Inserisci il nome del display..."
+        placeholder: "Inserisci il nome del display...",
       },
       outputMode: {
         label: "Modalità di uscita",
         description: "Quando inviare notifiche dopo l'esecuzione",
-        placeholder: "Selezionare la modalità di uscita..."
+        placeholder: "Selezionare la modalità di uscita...",
       },
       description: {
         label: "Designazione",
         description: "Descrizione dell'attività",
-        placeholder: "Inserisci la descrizione..."
+        placeholder: "Inserisci la descrizione...",
       },
       schedule: {
         label: "Pianificazione",
         description: "Cron pianificazione espressione",
-        placeholder: "*/5 * * * *"
+        placeholder: "*/5 * * * *",
       },
       priority: {
         label: "Priorità",
-        description: "Livello prioritario delle attività"
+        description: "Livello prioritario delle attività",
       },
       category: {
         label: "Categoria",
-        description: "Categoria di attività"
+        description: "Categoria di attività",
       },
       enabled: {
         label: "Abilitato",
-        description: "Abilitare o disabilitare l'attività"
+        description: "Abilitare o disabilitare l'attività",
       },
       hidden: {
         label: "Nascosto",
-        description: "Nascondi questa attività dai prompt del sistema AI e dagli elenchi delle attività predefinite"
+        description:
+          "Nascondi questa attività dai prompt del sistema AI e dagli elenchi delle attività predefinite",
       },
       timeout: {
         label: "Timeout (ms)",
-        description: "Tempo massimo di esecuzione in millisecondi"
+        description: "Tempo massimo di esecuzione in millisecondi",
       },
       retries: {
         label: "Ritiri",
-        description: "Numero di tentativi di riprova"
+        description: "Numero di tentativi di riprova",
       },
       retryDelay: {
         label: "Rettifica di ritardo (ms)",
-        description: "Ritardo tra i ripetitori in millisecondi"
+        description: "Ritardo tra i ripetitori in millisecondi",
       },
       taskInput: {
         label: "Input di attività",
         description: "Dati di input JSON per l'attività",
-        placeholder: "{ \"dryRun\": false }",
-        invalidJson: "Non valido JSON. Controllare le citazioni, le virgole e le parentesi.",
-        notObject: "L'ingresso del compito deve essere un oggetto JSON, come { \"chiave\": \"valore\" }."
+        placeholder: '{ "dryRun": false }',
+        invalidJson:
+          "Non valido JSON. Controllare le citazioni, le virgole e le parentesi.",
+        notObject:
+          'L\'ingresso del compito deve essere un oggetto JSON, come { "chiave": "valore" }.',
       },
       runOnce: {
         label: "Scappare",
-        description: "Eseguire questo compito solo una volta e poi disabilitarlo"
+        description:
+          "Eseguire questo compito solo una volta e poi disabilitarlo",
       },
       targetInstance: {
         label: "Destinazione",
-        description: "Tribunale di primo grado ID questo compito dovrebbe funzionare (ad esempio 'erme', 'thea-prod'). Lasciare vuoto per funzionare solo sull'istanza host.",
-        placeholder: "Lasciare vuoto solo per l'host"
-      }
+        description:
+          "Tribunale di primo grado ID questo compito dovrebbe funzionare (ad esempio 'erme', 'thea-prod'). Lasciare vuoto per funzionare solo sull'istanza host.",
+        placeholder: "Lasciare vuoto solo per l'host",
+      },
     },
     response: {
       task: {
@@ -332,55 +349,61 @@ export const translations: typeof enTranslations = {
         tags: "Tags",
         owner: "Proprietario",
         createdAt: "Creato a",
-        updatedAt: "Aggiornato At"
-      }
+        updatedAt: "Aggiornato At",
+      },
     },
     errors: {
       validation: {
         title: "Convalida fallita",
-        description: "I dati dell'attività forniti sono invalidi"
+        description: "I dati dell'attività forniti sono invalidi",
       },
       unauthorized: {
         title: "Autenticazione richiesta",
-        description: "Non hai il permesso di creare attività"
+        description: "Non hai il permesso di creare attività",
       },
       internal: {
         title: "Errore interno",
-        description: "Si è verificato un errore durante la creazione dell'attività"
+        description:
+          "Si è verificato un errore durante la creazione dell'attività",
       },
       forbidden: {
         title: "Accesso negato",
-        description: "L'accesso a questa risorsa è vietato"
+        description: "L'accesso a questa risorsa è vietato",
       },
       conflict: {
         title: "Conflitto",
-        description: "Un compito con questo nome esiste già"
+        description: "Un compito con questo nome esiste già",
       },
       network: {
         title: "Errore di rete",
-        description: "Si è verificato un errore di rete"
+        description: "Si è verificato un errore di rete",
       },
       unknown: {
         title: "Errore sconosciuto",
-        description: "Si è verificato un errore sconosciuto"
+        description: "Si è verificato un errore sconosciuto",
       },
       notFound: {
         title: "Account o sessione non trovati",
-        description: "La risorsa richiesta non è stata trovata"
+        description: "La risorsa richiesta non è stata trovata",
       },
       unsaved: {
         title: "Modifiche non salvate",
-        description: "Ci sono cambiamenti non rilevati"
-      }
+        description: "Ci sono cambiamenti non rilevati",
+      },
     },
     success: {
       created: {
         title: "Compito creato",
-        description: "Il compito è stato creato con successo"
-      }
-    }
+        description: "Il compito è stato creato con successo",
+      },
+    },
   },
   widget: {
+    pagination: {
+      info: "Pagina {{page}} di {{totalPages}}",
+      prev: "Precedente",
+      next: "Avanti",
+    },
     title: "Attività cron",
     loading: "Caricamento in corso...",
     header: {
@@ -389,7 +412,7 @@ export const translations: typeof enTranslations = {
       history: "Storia",
       queue: "Coda",
       refresh: "Aggiorna",
-      create: "Nuovo compito"
+      create: "Nuovo compito",
     },
     filter: {
       all: "Tutti",
@@ -402,19 +425,22 @@ export const translations: typeof enTranslations = {
       allCategories: "Tutte le categorie",
       visible: "Visibile",
       hiddenOnly: "Nascosto",
-      allTasks: "Tutte le attività"
+      allTasks: "Tutte le attività",
     },
     search: {
-      placeholder: "Compiti di ricerca..."
+      placeholder: "Compiti di ricerca...",
     },
     sort: {
       nameAsc: "Nome A-Z",
       nameDesc: "Nome Z-A",
       schedule: "Pianificazione",
       lastRunNewest: "Ultima corsa (newest)",
-      executionsMost: "La maggior parte delle esecuzioni"
+      executionsMost: "La maggior parte delle esecuzioni",
     },
     task: {
+      runCount: "Esecuzioni: {{count}}",
+      successCount: "Esecuzioni riuscite: {{count}}",
+      failureCount: "{{count}} ha fallito",
       executions: "Esecuzioni:",
       lastRun: "Ultima corsa:",
       never: "Mai.",
@@ -424,20 +450,21 @@ export const translations: typeof enTranslations = {
       hiddenBadge: "Nascosto",
       owner: {
         system: "Sistema",
-        user: "Utente"
+        user: "Utente",
       },
       outputMode: {
         storeOnly: "Solo",
         notifyOnFailure: "Informare sul fallimento",
-        notifyAlways: "Informare sempre"
-      }
+        notifyAlways: "Informare sempre",
+      },
     },
     action: {
+      select: "Seleziona {{task}}",
       view: "Visualizza dettagli",
       history: "Visualizza la storia",
       edit: "Modifica dell'attività",
       delete: "Eliminare l'attività",
-      runNow: "Correte!"
+      runNow: "Correte!",
     },
     bulk: {
       selected: "{count} selezionato",
@@ -448,16 +475,17 @@ export const translations: typeof enTranslations = {
       runNow: "Avvia ora",
       delete: "Elimina",
       confirmDeleteTitle: "Eliminare le attività?",
-      confirmDelete: "Eliminare le attività di {count}(s)? Questo non può essere annullato.",
+      confirmDelete:
+        "Eliminare le attività di {count}(s)? Questo non può essere annullato.",
       cancel: "Annulla",
-      success: "Esecuzioni riuscite: {succeeded}. Non riuscite: {failed}."
+      success: "Esecuzioni riuscite: {{succeeded}}. Non riuscite: {{failed}}.",
     },
     empty: {
       noTasks: "Nessun compito di cron",
       noTasksDesc: "Crea il tuo primo compito di cron per iniziare",
       noMatches: "Nessun compito corrisponde ai tuoi filtri",
       noMatchesDesc: "Prova a regolare i criteri di ricerca o filtro",
-      clearFilters: "Filtri trasparenti"
+      clearFilters: "Filtri trasparenti",
     },
     create: {
       created: "Compito creato",
@@ -473,7 +501,7 @@ export const translations: typeof enTranslations = {
       disabled: "Disabili",
       taskInput: "Inserimento delle attività",
       noInput: "Nessun input - il percorso viene eseguito con i suoi default.",
-      openTask: "Attività aperte"
-    }
-  }
+      openTask: "Attività aperte",
+    },
+  },
 };

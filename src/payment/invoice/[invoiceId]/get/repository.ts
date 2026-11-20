@@ -21,6 +21,10 @@ import { z } from "zod";
 
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
+import {
+  canManageCompanyDocuments,
+  getDocumentCompanies,
+} from "@/finance/document-company-scope";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../../db";
 import type {
@@ -52,7 +56,8 @@ export class InvoiceGetRepository {
         });
       }
 
-      // Verify company membership
+      let companyName: string | null = null;
+      let canCreateCreditNote = false;
       if (invoice.companyId) {
         const authResult = await CompanyAuthRepository.requireMember(
           userId,
@@ -64,6 +69,15 @@ export class InvoiceGetRepository {
         if (!authResult.success) {
           return authResult;
         }
+        const [company] = await getDocumentCompanies(userId, invoice.companyId);
+        if (!company) {
+          return fail({
+            message: t("get.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
+        companyName = company.name;
+        canCreateCreditNote = canManageCompanyDocuments(authResult.data.role);
       } else if (invoice.userId !== userId) {
         // Fallback: owner check for invoices without companyId
         return fail({
@@ -86,6 +100,10 @@ export class InvoiceGetRepository {
 
       return success({
         id: invoice.id,
+        invoiceNumber: invoice.invoiceNumber,
+        companyName,
+        canManage: invoice.userId === userId,
+        canCreateCreditNote,
         companyId: invoice.companyId ?? null,
         customerId,
         invoiceSequenceNumber: invoice.invoiceSequenceNumber ?? null,

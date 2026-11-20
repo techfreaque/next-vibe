@@ -46,6 +46,7 @@ import {
 import type { NotificationTarget } from "../../unified-runner/types";
 import { cronTasks, dbUserIdToOwner } from "../db";
 import { CronTasksRepository } from "../repository";
+import { CRON_LIST_PAGE_SIZE } from "./constants";
 import type {
   CronTaskCreateRequestOutput,
   CronTaskCreateResponseOutput,
@@ -205,14 +206,16 @@ export class CronTasksListRepository {
       }
 
       // Handle pagination
-      const limit = data.limit ? parseInt(data.limit, 10) : 100;
-      const offset = data.offset ? parseInt(data.offset, 10) : 0;
+      const limit = Math.max(
+        1,
+        Number.parseInt(data.limit ?? "", 10) || CRON_LIST_PAGE_SIZE,
+      );
+      const offset = Math.max(0, Number.parseInt(data.offset ?? "", 10) || 0);
 
       const whereClause =
         conditions.length > 0 ? and(...conditions) : undefined;
 
-      // Server-side search filter - applied after base filters, not counted in status counts
-      const searchTerm = data.search?.trim();
+      const searchTerm = data.search?.trim().replace(/[\\%_]/g, "\\$&");
       const searchCondition = searchTerm
         ? or(
             ilike(cronTasks.displayName, `%${searchTerm}%`),
@@ -255,8 +258,7 @@ export class CronTasksListRepository {
       if (data.category && data.category.length > 0) {
         countConditions.push(inArray(cronTasks.category, data.category));
       }
-      const countBaseWhere =
-        countConditions.length > 0 ? and(...countConditions) : undefined;
+      const countBaseWhere = and(...countConditions, searchCondition);
 
       const makeStatusWhere = (
         statusCond: Parameters<typeof and>[0],
@@ -350,16 +352,23 @@ export class CronTasksListRepository {
           baseCountConditions.push(isNull(cronTasks.id));
         }
       }
+      if (data.enabled === CronTaskEnabledFilter.ENABLED) {
+        baseCountConditions.push(eq(cronTasks.enabled, true));
+      } else if (data.enabled === CronTaskEnabledFilter.DISABLED) {
+        baseCountConditions.push(eq(cronTasks.enabled, false));
+      }
+      if (data.status?.length) {
+        baseCountConditions.push(
+          inArray(cronTasks.lastExecutionStatus, data.status),
+        );
+      }
       if (data.priority && data.priority.length > 0) {
         baseCountConditions.push(inArray(cronTasks.priority, data.priority));
       }
       if (data.category && data.category.length > 0) {
         baseCountConditions.push(inArray(cronTasks.category, data.category));
       }
-      const baseCountWhere =
-        baseCountConditions.length > 0
-          ? and(...baseCountConditions)
-          : undefined;
+      const baseCountWhere = and(...baseCountConditions, searchCondition);
 
       const [countHiddenVisible, countHiddenHidden, countHiddenAll] =
         await Promise.all([
@@ -417,7 +426,7 @@ export class CronTasksListRepository {
         .select()
         .from(cronTasks)
         .where(fullWhereClause)
-        .orderBy(sortOrder)
+        .orderBy(sortOrder, asc(cronTasks.id))
         .limit(limit)
         .offset(offset);
 

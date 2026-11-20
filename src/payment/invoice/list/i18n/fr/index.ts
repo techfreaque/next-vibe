@@ -7,10 +7,10 @@ export const translations: typeof enTranslations = {
     invoice: "facture",
   },
   get: {
-    title: "Factures",
-    titleShort: "Factures",
+    title: "Factures clients",
+    titleShort: "Factures clients",
     description:
-      "Liste les factures clients d'une entreprise, avec filtres facultatifs",
+      "Recherchez par numéro de document, identifiant de facture ou de client. Filtrez par entreprise ou statut.",
     form: {
       title: "Filtres des factures",
       description: "Filtrez la liste des factures",
@@ -90,6 +90,12 @@ export const translations: typeof enTranslations = {
     description: "Filtrer les factures de cette entreprise",
     placeholder: "Saisir l'ID de l'entreprise",
   },
+  search: {
+    label: "Rechercher des documents",
+    description:
+      "Recherchez par numéro de document, identifiant de facture ou de client. Filtrez par entreprise ou statut.",
+    placeholder: "Numéro de document ou identifiant",
+  },
   status: {
     label: "Statut",
     description: "Filtrer par statut de facture",
@@ -109,7 +115,8 @@ export const translations: typeof enTranslations = {
     description: "Résultats par page",
   },
   widget: {
-    title: "Factures",
+    pageCount: "Nombre de pages",
+    title: "Factures clients",
     newInvoice: "Nouvelle facture",
     loading: "Chargement des factures...",
     noInvoices: "Aucune facture pour l'instant.",

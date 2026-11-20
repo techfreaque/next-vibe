@@ -45,6 +45,16 @@ const { POST } = createEndpoint({
   ],
   allowedRoles: [UserRole.ADMIN] as const,
 
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { refreshInvoiceDocuments } =
+          await import("@/finance/document-cache");
+        await refreshInvoiceDocuments(data.logger, data.requestData.invoiceId);
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: InvoiceLineAddWidgetLazy,
     usage: { request: "data", response: true },

@@ -24,6 +24,7 @@ import {
 } from "next-vibe/ui/components/avatar";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Dialog, DialogContent } from "next-vibe/ui/components/dialog";
 import { Div } from "next-vibe/ui/components/div";
 import { Form } from "next-vibe/ui/components/form/form";
@@ -59,6 +60,7 @@ import { Youtube } from "next-vibe/ui/components/icons/Youtube";
 import { Zap } from "next-vibe/ui/components/icons/Zap";
 import { Input } from "next-vibe/ui/components/input";
 import { Link } from "next-vibe/ui/components/link";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import {
   Select,
   SelectContent,
@@ -70,17 +72,21 @@ import { Span } from "next-vibe/ui/components/span";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { useThemeToggle } from "next-vibe/ui/components/theme-provider";
 import { H2, H3, P } from "next-vibe/ui/components/typography";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
-import { useRouter } from "next-vibe/ui/hooks/use-navigation";
+import { usePathname, useRouter } from "next-vibe/ui/hooks/use-navigation";
 import { assignUrl } from "next-vibe/ui/lib/location";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
+  useWidgetEndpointMutations,
   useWidgetForm,
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetPlatform,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
@@ -118,7 +124,7 @@ import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 import subscriptionDef from "@/subscription/definition";
 import { SubscriptionStatus } from "@/subscription/enum";
 import { scopedTranslation as subscriptionScopedTranslation } from "@/subscription/i18n";
-import logoutDef from "@/user/private/logout/definition";
+import { useLogout } from "@/user/private/logout/hooks";
 import addressesDef from "@/user/private/me/addresses/definition";
 import exportDef from "@/user/private/me/export/definition";
 import passwordDef from "@/user/private/me/password/definition";
@@ -497,21 +503,66 @@ function ChatPrefsSection(): JSX.Element {
   );
 }
 
-/**
- * MeGetWidget - entry point for the GET card in the admin panel.
- * Immediately replaces itself with the full profile widget (POST endpoint).
- */
 export function MeGetWidget(): JSX.Element {
   const { push: navigate } = useWidgetNavigation();
+  const t = useWidgetTranslation<typeof meDefinition.GET>();
+  const data = useWidgetValue<typeof meDefinition.GET>();
+  const isInteractive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const { read } = useWidgetEndpointMutations() ?? {};
+  const inToolCatalog = usePathname().split("/").includes("tools");
+  const canOpenProfile = isInteractive && !responseOnly;
 
-  useEffect(() => {
+  const openProfile = useCallback((): void => {
     void (async (): Promise<void> => {
       const meDef = await import("./definition");
       navigate(meDef.default.POST, {});
     })();
   }, [navigate]);
 
-  return <Div className="min-h-64 bg-background" />;
+  useEffect(() => {
+    if (canOpenProfile && !inToolCatalog) {
+      openProfile();
+    }
+  }, [canOpenProfile, inToolCatalog, openProfile]);
+
+  return (
+    <WidgetShell className="min-w-0">
+      <WidgetHeader
+        title={t("get.titleShort")}
+        actions={
+          canOpenProfile &&
+          inToolCatalog &&
+          data && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={openProfile}
+            >
+              {t("widget.editProfile")}
+            </Button>
+          )
+        }
+      />
+      <FormAlertWidget field={{}} />
+      {data ? (
+        <DetailGrid columns={2}>
+          <DetailField
+            label={t("get.response.privateName")}
+            value={data.privateName}
+          />
+          <DetailField
+            label={t("get.response.publicName")}
+            value={data.publicName}
+          />
+          <DetailField label={t("get.response.email")} value={data.email} />
+        </DetailGrid>
+      ) : read?.isLoading ? (
+        <LoadingBlock message={t("widget.loadState.loading")} />
+      ) : null}
+    </WidgetShell>
+  );
 }
 
 export function MeDeleteWidget(): JSX.Element {
@@ -877,9 +928,7 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
   const platform = useWidgetPlatform();
   const showVisualSettings = isVisualPlatform(platform);
 
-  const handleLogout = useCallback((): void => {
-    navigate(logoutDef.POST, {});
-  }, [navigate]);
+  const handleLogout = useLogout(logger, user);
 
   // Open the list (it has its own empty state + add button) so saved
   // addresses can be seen and edited, not only added.

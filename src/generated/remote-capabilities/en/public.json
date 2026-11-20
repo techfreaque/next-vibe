@@ -639,7 +639,11 @@
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "string",
+                  "format": "uuid",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
                 },
                 "type": "string"
               }
@@ -662,7 +666,11 @@
               "type": "optional",
               "innerType": {
                 "def": {
-                  "type": "string"
+                  "type": "string",
+                  "format": "uuid",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
                 },
                 "type": "string"
               }
@@ -73118,6 +73126,29 @@
           },
           "schemaType": "primitive"
         },
+        "subCategory": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Category Filter",
+          "description": "Filter tools by category or sub-category name (case-insensitive). Accepts a parent category key (e.g. 'ai') or a sub-category name (e.g. 'Search'). Omit to see all categories.",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "hiddenForPlatforms": ["ai", "mcp", "cron", "remote-skill"],
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "toolName": {
           "type": "form_field",
           "fieldType": "text",
@@ -73400,6 +73431,7 @@
                   "type": "enum",
                   "entries": {
                     "all": "all",
+                    "web": "web",
                     "pinned": "pinned",
                     "allowed": "allowed",
                     "webPinned": "webPinned",
@@ -73411,6 +73443,7 @@
                 "type": "enum",
                 "enum": {
                   "all": "all",
+                  "web": "web",
                   "pinned": "pinned",
                   "allowed": "allowed",
                   "webPinned": "webPinned",
@@ -73420,6 +73453,7 @@
                 },
                 "options": [
                   "all",
+                  "web",
                   "pinned",
                   "allowed",
                   "webPinned",
@@ -74482,6 +74516,264 @@
             },
             "type": "optional"
           },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "webCategories": {
+          "type": "text",
+          "label": "Tool categories",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "name": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "count": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "subCategories": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "array",
+                                "element": {
+                                  "def": {
+                                    "type": "object",
+                                    "shape": {
+                                      "name": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      },
+                                      "count": {
+                                        "def": {
+                                          "type": "number",
+                                          "checks": []
+                                        },
+                                        "type": "number",
+                                        "isFinite": true
+                                      }
+                                    }
+                                  },
+                                  "type": "object"
+                                }
+                              },
+                              "type": "array",
+                              "element": {
+                                "def": {
+                                  "type": "object",
+                                  "shape": {
+                                    "name": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    },
+                                    "count": {
+                                      "def": {
+                                        "type": "number",
+                                        "checks": []
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    }
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            }
+                          },
+                          "type": "optional"
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "name": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "count": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "subCategories": {
+                        "def": {
+                          "type": "optional",
+                          "innerType": {
+                            "def": {
+                              "type": "array",
+                              "element": {
+                                "def": {
+                                  "type": "object",
+                                  "shape": {
+                                    "name": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    },
+                                    "count": {
+                                      "def": {
+                                        "type": "number",
+                                        "checks": []
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    }
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "name": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "count": {
+                                    "def": {
+                                      "type": "number",
+                                      "checks": []
+                                    },
+                                    "type": "number",
+                                    "isFinite": true
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          }
+                        },
+                        "type": "optional"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "hiddenForPlatforms": ["ai", "mcp", "cron", "remote-skill"],
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "recordSearchTargets": {
+          "type": "text",
+          "label": "Find a record",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "alias": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "field": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "label": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "alias": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "field": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "label": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "visibleFor": ["enums.userRole.admin"],
+          "hiddenForPlatforms": [
+            "ai",
+            "mcp",
+            "cron",
+            "remote-skill",
+            "cli",
+            "cli-package"
+          ],
           "usage": {
             "response": true
           },

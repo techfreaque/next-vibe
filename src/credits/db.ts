@@ -90,6 +90,7 @@ export interface FreeResetMetadata {
 }
 
 export interface PurchaseMetadata {
+  bonusGrant?: true;
   sessionId?: string;
   /** Set (instead of sessionId) on a duplicate grant neutralised by the uq_packs_session_id migration */
   duplicateOfSessionId?: string;

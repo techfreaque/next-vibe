@@ -2,16 +2,20 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Gestión de tareas",
+
   errors: {
     cronTaskNotFound: "Cron task not found",
     repositoryInternalError: "Se produjo un error interno",
-    fetchCronTaskHistoryDetail: "No podía cargar historia para la tarea {{taskId}} (limit {{limit}}): {{error}}",
-    fetchCronTaskHistoryAllDetail: "No podía cargar el historial de tareas (limit {{limit}}): {{error}}"
+    fetchCronTaskHistoryDetail:
+      "No podía cargar historia para la tarea {{taskId}} (limit {{limit}}): {{error}}",
+    fetchCronTaskHistoryAllDetail:
+      "No podía cargar el historial de tareas (limit {{limit}}): {{error}}",
   },
+
   get: {
     tags: {
       tasks: "Tareas",
-      monitoring: "Monitoreo"
+      monitoring: "Monitoreo",
     },
     title: "Historia de la ejecución de tareas",
     titleShort: "Historia de la tarea",
@@ -20,12 +24,12 @@ export const translations: typeof enTranslations = {
       taskId: {
         label: "Task ID",
         description: "Filtro por tarea específica ID",
-        placeholder: "Ingrese la tarea ID"
+        placeholder: "Ingrese la tarea ID",
       },
       taskName: {
         label: "Nombre de la tarea",
         description: "Filtro por nombre de tarea (concordancia parcial)",
-        placeholder: "Ingrese el nombre de tarea"
+        placeholder: "Ingrese el nombre de tarea",
       },
       status: {
         label: "Estado de ejecución",
@@ -42,8 +46,8 @@ export const translations: typeof enTranslations = {
           SKIPPED: "Saltó.",
           CANCELLED: "Cancelada",
           STOPPED: "Detenido.",
-          BLOCKED: "Bloqueados"
-        }
+          BLOCKED: "Bloqueados",
+        },
       },
       priority: {
         label: "Prioridad de la tarea",
@@ -53,130 +57,140 @@ export const translations: typeof enTranslations = {
           LOW: "Baja",
           MEDIUM: "Mediana",
           HIGH: "Alto",
-          CRITICAL: "Crítica"
-        }
+          CRITICAL: "Crítica",
+        },
       },
       startDate: {
         label: "Fecha de inicio",
-        description: "Ejecuciones de filtro después de esta fecha"
+        description: "Ejecuciones de filtro después de esta fecha",
       },
       endDate: {
         label: "Fecha final",
-        description: "Ejecuciones de filtro antes de esta fecha"
+        description: "Ejecuciones de filtro antes de esta fecha",
       },
       limit: {
         label: "Límite de resultados",
         description: "Número máximo de resultados a la vuelta",
-        placeholder: "50"
+        placeholder: "50",
       },
       offset: {
         label: "Resultados Offset",
         description: "Número de resultados para saltar para paginación",
-        placeholder: "0"
-      }
+        placeholder: "0",
+      },
     },
     response: {
       title: "Respuesta a la historia de la tarea",
       description: "Datos históricos de ejecución para tareas de cron",
       executions: {
-        title: "Documentos de ejecución"
+        title: "Documentos de ejecución",
       },
       totalCount: {
-        title: "Total Conde"
+        title: "Total Conde",
       },
       hasMore: {
-        title: "Tiene más resultados"
+        title: "Tiene más resultados",
       },
       statusCounts: {
-        title: "Cuentas de Estado"
+        title: "Cuentas de Estado",
       },
       summary: {
-        title: "Resumen de ejecución"
-      }
+        title: "Resumen de ejecución",
+      },
     },
     errors: {
       validation: {
         title: "Error de validación",
-        description: "Parámetros de solicitud inválidos proporcionados"
+        description: "Parámetros de solicitud inválidos proporcionados",
       },
       internal: {
         title: "Error de servidor interno",
-        description: "Fallado para recuperar la historia de la tarea"
+        description: "Fallado para recuperar la historia de la tarea",
       },
       unauthorized: {
         title: "Se requiere autenticación",
-        description: "Usted no tiene permiso para ver el historial de tareas"
+        description: "Usted no tiene permiso para ver el historial de tareas",
       },
       notFound: {
         title: "No encontrado",
-        description: "Registro de tareas o ejecución no encontrado"
+        description: "Registro de tareas o ejecución no encontrado",
       },
       network: {
         title: "Error de red",
-        description: "Se produjo error de red mientras que el historial de tareas de búsqueda"
+        description:
+          "Se produjo error de red mientras que el historial de tareas de búsqueda",
       },
       forbidden: {
         title: "Acceso denegado",
-        description: "El acceso a la historia de la tarea está prohibido"
+        description: "El acceso a la historia de la tarea está prohibido",
       },
       server: {
         title: "Error del servidor",
-        description: "Ocurrió un error interno del servidor"
+        description: "Ocurrió un error interno del servidor",
       },
       unknown: {
         title: "Error desconocido",
-        description: "Ocurrió un error desconocido"
+        description: "Ocurrió un error desconocido",
       },
       unsavedChanges: {
         titleChanges: "Cambios sin guardar",
         title: "Cambios sin guardar",
-        description: "Tienes cambios sin guardar"
+        description: "Tienes cambios sin guardar",
       },
       conflict: {
         title: "Conflicto",
-        description: "Hay un conflicto entre los datos"
-      }
+        description: "Hay un conflicto entre los datos",
+      },
     },
     success: {
       title: "Historia Conseguida",
-      description: "Historia de ejecución de tareas recuperada con éxito"
+      description: "Historia de ejecución de tareas recuperada con éxito",
     },
     log: {
       fetchSuccess: "Registros de ejecución de {{count}} con éxito",
-      fetchError: "Fallado en la historia de ejecución de tareas"
+      fetchError: "Fallado en la historia de ejecución de tareas",
     },
     request: {
       title: "Solicitar parámetros",
-      description: "Historial de ejecución de tareas filtrantes"
+      description: "Historial de ejecución de tareas filtrantes",
     },
-    unknownTask: "Tareas desconocidas"
+    unknownTask: "Tareas desconocidas",
   },
   widget: {
+    runDetails: "Detalles de la ejecución",
+    runId: "Corre ID",
+    emptyFiltered:
+      "Ninguna ejecución coincide con esta vista. Cambia la tarea, el estado, la prioridad o las fechas.",
+    emptyUnfiltered: "Las ejecuciones de tareas aparecen aquí cuando empiezan.",
     title: "Historia de la ejecución de tareas",
     loading: "Cargando historia...",
     header: {
       tasks: "Tareas",
       stats: "Stats",
       pulse: "Pulse",
-      refresh: "Actualizar"
+      refresh: "Actualizar",
     },
     summary: {
       total: "Ejecuciones coincidentes",
       successful: "Éxito",
       failed: "Failed",
       successRate: "Tasa de éxito",
-      avgDuration: "Duración de la Avg"
+      avgDuration: "Duración de la Avg",
     },
     search: {
-      placeholder: "Tareas de búsqueda..."
+      placeholder: "Tareas de búsqueda...",
     },
     filter: {
+      clear: "Filtros claros",
+      allTasks: "Todas las tareas",
+      allPriorities: "Todas las prioridades",
+      taskHistory: "Historial de esta tarea",
       all: "Todos",
       running: "Corriendo",
       completed: "Completado",
       failed: "Failed",
       timeout: "Hora de salir",
-      cancelled: "Cancelada"
+      cancelled: "Cancelada",
     },
     col: {
       taskName: "Nombre de la tarea",
@@ -185,18 +199,18 @@ export const translations: typeof enTranslations = {
       started: "Comienzo",
       completed: "Completado",
       environment: "para el Medio Ambiente",
-      error: "Error"
+      error: "Error",
     },
     empty: "No hay historial de ejecución encontrado",
     result: "Resultado",
     error: {
       collapse: "Error de colapso",
-      label: "Error"
+      label: "Error",
     },
     pagination: {
       info: "Página {{page}} de {{totalPages}} (Total {{total}})",
       prev: "Anterior",
-      next: "Siguiente"
-    }
-  }
+      next: "Siguiente",
+    },
+  },
 };

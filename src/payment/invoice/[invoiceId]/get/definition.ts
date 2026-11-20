@@ -23,6 +23,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { InvoiceStatus } from "../../../enum";
 import { scopedTranslation } from "./i18n";
 
 const InvoiceGetWidgetLazy = lazyWidget(() =>
@@ -64,6 +65,26 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "get.response.id" as const,
         schema: z.string(),
+      }),
+      companyName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.companyId",
+        schema: z.string().nullable(),
+      }),
+      canManage: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.boolean(),
+      }),
+      invoiceNumber: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "widget.invoiceNumber",
+        schema: z.string().nullable(),
+      }),
+      canCreateCreditNote: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.boolean(),
       }),
       companyId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -244,12 +265,16 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         id: "456e7890-e89b-12d3-a456-426614174000",
+        companyName: "Harbour Ledger & Supply",
+        canManage: true,
+        invoiceNumber: "INV-1042",
+        canCreateCreditNote: true,
         companyId: "00000000-0000-0000-0000-000000000001",
         customerId: null,
-        invoiceSequenceNumber: 1,
+        invoiceSequenceNumber: 1042,
         currency: "EUR",
-        status: "DRAFT",
-        amount: "0",
+        status: InvoiceStatus.OPEN,
+        amount: "325.00",
         dueDate: null,
         paidAt: null,
         notes: null,

@@ -34,9 +34,11 @@ export const translations: typeof enTranslations = {
         description: "Nach Lösungsstatus filtern",
       },
       search: {
-        label: "Suche",
-        description: "In Fehlermeldungen suchen",
-        placeholder: "Meldungen durchsuchen...",
+        label: "Fehler suchen",
+        description:
+          "Fehlermeldungen, Fingerabdrücke oder Protokoll-IDs suchen",
+        placeholder:
+          "Fehlermeldungen, Fingerabdrücke oder Protokoll-IDs suchen",
       },
       errorType: {
         label: "Fehlertyp",
@@ -267,6 +269,14 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    emptyFiltered:
+      "Keine Fehlergruppe passt zu diesen Filtern. Entferne einen Filter und suche erneut.",
+    emptyActive:
+      "Keine aktiven Fehlergruppen. Wähle „Alle“, um behobene Fehler zu sehen.",
+    severity: {
+      error: "Fehler",
+      warning: "Warnung",
+    },
     title: "Fehlerprotokolle",
     loading: "Protokolle werden geladen...",
     empty: "Keine Fehlerprotokolle gefunden",
@@ -274,7 +284,7 @@ export const translations: typeof enTranslations = {
       refresh: "Aktualisieren",
       runScan: "Scan starten",
       back: "Zurück",
-      activeCount: "aktiv",
+      activeCount: "{{count}} insgesamt offen",
     },
     col: {
       message: "Nachricht",
@@ -288,16 +298,20 @@ export const translations: typeof enTranslations = {
       resolved: "Gelöst",
     },
     action: {
+      confirm: "Status speichern",
+      clear: "Filter zurücksetzen",
       resolve: "Lösen",
       reopen: "Wieder öffnen",
     },
     detail: {
+      context: "Fehlerdetails",
       stackTrace: "Stack-Trace",
       metadata: "Metadaten",
       collapse: "Einklappen",
       resolved: "Gelöst",
     },
     pagination: {
+      matches: "{{count}} passende Gruppen",
       info: "Seite {{page}} von {{totalPages}} ({{total}} gesamt)",
       prev: "Zurück",
       next: "Weiter",

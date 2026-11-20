@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   category: "Facturación",
   tags: {
     payment: "pago",
-    invoice: "factura"
+    invoice: "factura",
   },
   get: {
     title: "Invocar",
@@ -12,7 +12,7 @@ export const translations: typeof enTranslations = {
     description: "Recuperar una sola factura con todos sus artículos de línea",
     form: {
       title: "Factura",
-      description: "Detalles de facturación con artículos de línea"
+      description: "Detalles de facturación con artículos de línea",
     },
     response: {
       id: "Factura ID",
@@ -39,57 +39,58 @@ export const translations: typeof enTranslations = {
       lineTotal: "Total",
       sortOrder: "Ordenar orden",
       lineCreatedAt: "Línea creada en",
-      lineUpdatedAt: "Línea actualizada en"
+      lineUpdatedAt: "Línea actualizada en",
     },
     errors: {
       unauthorized: {
         title: "Se requiere autenticación",
-        description: "Inicia sesión para continuar"
+        description: "Inicia sesión para continuar",
       },
       validation: {
         title: "Error de validación",
-        description: "Parámetros inválidos"
+        description: "Parámetros inválidos",
       },
       server: {
         title: "Error del servidor",
-        description: "Ocurrió un error interno del servidor"
+        description: "Ocurrió un error interno del servidor",
       },
       unknown: {
         title: "Error desconocido",
-        description: "Ocurrió un error desconocido"
+        description: "Ocurrió un error desconocido",
       },
       network: {
         title: "Error de red",
-        description: "Ocurrió un error de red"
+        description: "Ocurrió un error de red",
       },
       forbidden: {
         title: "Acceso denegado",
-        description: "Debe ser miembro de esta empresa"
+        description: "Debe ser miembro de esta empresa",
       },
       notFound: {
         title: "No encontrado",
-        description: "Factura no encontrada"
+        description: "Factura no encontrada",
       },
       conflict: {
         title: "Conflicto",
-        description: "Se produjo un conflicto"
+        description: "Se produjo un conflicto",
       },
       unsavedChanges: {
         title: "Cambios sin guardar",
-        description: "Hay cambios sin salvar"
-      }
+        description: "Hay cambios sin salvar",
+      },
     },
     success: {
       title: "Operación completada",
-      description: "Factura recuperada"
-    }
+      description: "Factura recuperada",
+    },
   },
   invoiceId: {
     label: "Factura ID",
     description: "La factura para recuperar",
-    placeholder: "Introduzca la factura ID"
+    placeholder: "Introduzca la factura ID",
   },
   widget: {
+    createCreditNote: "Crear nota de crédito",
     back: "Atrás",
     submit: "Mira hacia arriba facturación",
     invoiceNumber: "Factura",
@@ -117,7 +118,7 @@ export const translations: typeof enTranslations = {
       open: "Abierto",
       paid: "Pagado",
       void: "Vacío",
-      uncollectible: "Incolectible"
-    }
-  }
+      uncollectible: "Incolectible",
+    },
+  },
 };

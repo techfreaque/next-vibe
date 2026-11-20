@@ -85,7 +85,7 @@ export const translations: typeof enTranslations = {
       invoices: "Rechnungen",
       bills: "Eingangsrechnungen",
       selectCompany:
-        "Unternehmens-ID eingeben, um die Buchhaltungsübersicht zu laden.",
+        "Wähle ein Unternehmen aus, um seine Buchhaltung zu öffnen.",
     },
   },
   category: "Buchhaltung",

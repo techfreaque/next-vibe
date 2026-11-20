@@ -1,313 +1,241 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { formatDate } from "next-vibe/core/i18n/core/localization-utils";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { Building } from "next-vibe/ui/components/icons/Building";
-import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { FilePlus } from "next-vibe/ui/components/icons/FilePlus";
-import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
-import { Receipt } from "next-vibe/ui/components/icons/Receipt";
 import { Span } from "next-vibe/ui/components/span";
-import { P } from "next-vibe/ui/components/typography";
+import {
+  StatusPill,
+  type StatusPillVariant,
+} from "next-vibe/ui/components/status-pill";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetForm,
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetOnSubmit,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { type JSX, useState } from "react";
+import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import type { JSX } from "react";
 
-import { BillStatus } from "@/payment/enum";
+import {
+  DocumentList,
+  DocumentScopePicker,
+  useDocumentListCopy,
+  useDocumentListHistory,
+} from "@/finance/document-list-ui";
 
+import { BillStatus } from "../../enum";
 import type definition from "./definition";
 
-/** Wall-clock comparison kept outside render so components stay pure. */
-function isInPast(date: Date | string | number): boolean {
-  return new Date(date) < new Date();
-}
+type Row = (typeof definition.GET.types.ResponseOutput)["bills"][number];
 
-function statusVariant(
-  status: string,
-): "default" | "secondary" | "destructive" | "outline" {
-  switch (status) {
-    case BillStatus.PAID:
-      return "default";
-    case BillStatus.APPROVED:
-    case BillStatus.RECEIVED:
-      return "secondary";
-    case BillStatus.DISPUTED:
-      return "destructive";
-    default:
-      return "outline";
-  }
-}
+const statusVariants: Record<Row["status"], StatusPillVariant> = {
+  [BillStatus.DRAFT]: "muted",
+  [BillStatus.RECEIVED]: "info",
+  [BillStatus.APPROVED]: "info",
+  [BillStatus.PAID]: "success",
+  [BillStatus.DISPUTED]: "danger",
+};
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function BillListWidget(_props: {
+export function BillListWidget({
+  field: { children },
+}: {
   field: (typeof definition.GET)["fields"];
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
-  const { push: navigate, pop, canGoBack } = useWidgetNavigation();
+  const onSubmit = useWidgetOnSubmit();
+  const { push } = useWidgetNavigation();
+  const openRelated = useRelatedEntityNavigation();
+  const rememberList = useDocumentListHistory("payment-bill-list");
   const t = useWidgetTranslation<typeof definition.GET>();
+  const tDocument = useDocumentListCopy();
   const locale = useWidgetLocale();
-  const onPick =
-    usePickerCallback<
-      NonNullable<(typeof definition.GET.types.ResponseOutput)["bills"]>[number]
-    >();
-  const isPickerMode = !!onPick;
+  const onPick = usePickerCallback<Row>();
+  const responseOnly = useWidgetResponseOnly();
+  const isInteractive = useWidgetIsInteractive() && !responseOnly;
+  const companyId = form.watch("companyId");
+  const money = (amount: number, currency: string): string =>
+    new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+      currencyDisplay: "code",
+    }).format(amount);
 
-  const [companyName, setCompanyName] = useState<string | undefined>(undefined);
-
-  const companyId = form?.watch("companyId") as string | undefined;
-  const bills = companyId ? data?.bills : undefined;
-  const resolvedData = companyId ? data : undefined;
-
-  const handleSelectCompany = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
-    void (async (): Promise<void> => {
-      const def = await import("@/companies/list/definition");
-      navigate(def.default.GET, {
-        renderInModal: true,
-        pickerCallback: (value) => {
-          const picked = value as Record<string, string>;
-          // oxlint-disable-next-line typescript/no-explicit-any
-          form?.setValue("companyId" as any, picked["id"] ?? "");
-          setCompanyName(picked["name"]);
-        },
-      });
-    })();
+  const rememberFilters = (page: number): void => {
+    const values = form.getValues();
+    rememberList({
+      search: values.search,
+      status: values.status,
+      companyId: values.companyId,
+      page,
+      pageSize: values.pageSize,
+    });
   };
 
-  const handleNewBill = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
+  const setPage = (page: number): void => {
+    form.setValue("page", page, { shouldDirty: true });
+    rememberFilters(page);
+  };
+
+  const submitPage = (page: number): void => {
+    setPage(page);
+    onSubmit?.();
+  };
+
+  const clearFilters = (): void => {
+    form.reset({ page: 1, pageSize: data?.pageSizeApplied ?? 20 });
+    submitPage(1);
+  };
+
+  const createDocument = (): void => {
+    rememberFilters(data?.currentPage ?? 1);
     void (async (): Promise<void> => {
       const [createDef, getDef] = await Promise.all([
-        import("@/payment/bill/create/definition"),
-        import("@/payment/bill/[billId]/get/definition"),
+        import("../create/definition"),
+        import("../[billId]/get/definition"),
       ]);
-      navigate(createDef.default.POST, {
+      push(createDef.default.POST, {
         renderInModal: true,
-        data: companyId ? { companyId } : undefined,
+        data: data?.selectedCompanyId
+          ? { companyId: data.selectedCompanyId }
+          : undefined,
         replaceOnSuccess: {
           endpoint: getDef.default.GET,
-          getUrlPathParams: (responseData) => ({
-            billId: responseData.id,
-          }),
+          getUrlPathParams: (responseData) => ({ billId: responseData.id }),
         },
       });
     })();
   };
 
-  const handleView =
-    (billId: string) =>
-    (e: ButtonMouseEvent): void => {
-      e.stopPropagation();
-      if (isPickerMode) {
-        const bill = (data?.bills ?? []).find((b) => b.id === billId);
-        if (bill && onPick) {
-          onPick(bill);
-          pop();
-        }
-        return;
-      }
-      void (async (): Promise<void> => {
-        const def = await import("@/payment/bill/[billId]/get/definition");
-        navigate(def.default.GET, { urlPathParams: { billId } });
-      })();
-    };
-
-  // ── No company selected ──────────────────────────────────────────
-  if (!companyId) {
-    return (
-      <Div className="max-w-2xl mx-auto w-full px-4 py-6">
-        {canGoBack && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => pop()}
-            className="self-start gap-1.5 mb-4"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            {t("widget.back")}
-          </Button>
-        )}
-
-        <Div className="flex flex-col items-center justify-center py-20 gap-6">
-          <Div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <Receipt className="h-8 w-8 text-primary" />
-          </Div>
-          <Div className="flex flex-col items-center gap-2 max-w-md text-center">
-            <Span className="text-xl font-semibold">{t("widget.title")}</Span>
-            <P className="text-sm text-muted-foreground leading-relaxed">
-              {t("widget.empty.hint")}
-            </P>
-          </Div>
-          <Button
-            type="button"
-            size="lg"
-            onClick={handleSelectCompany}
-            className="gap-2.5 px-6"
-          >
-            <Building className="h-5 w-5" />
-            {t("widget.company.select")}
-          </Button>
-        </Div>
-      </Div>
+  const openDocument = (row: Row): void => {
+    if (onPick) {
+      onPick(row);
+      return;
+    }
+    rememberFilters(data?.currentPage ?? 1);
+    openRelated(
+      () =>
+        import("../[billId]/get/definition").then(
+          (module) => module.default.GET,
+        ),
+      {
+        urlPathParams: { billId: row.id },
+      },
     );
-  }
+  };
 
-  // ── Company selected ─────────────────────────────────────────────
   return (
-    <Div className="max-w-2xl mx-auto w-full px-4 pt-8 pb-6 flex flex-col gap-6">
-      {canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => pop()}
-          className="self-start gap-1.5"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("widget.back")}
-        </Button>
-      )}
-
-      {/* Header: company context + actions */}
-      <Div className="flex flex-col gap-4">
-        <Div className="flex items-center justify-between gap-3">
-          <Span className="text-lg font-semibold">{t("widget.title")}</Span>
-          {!isPickerMode && resolvedData && (
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleNewBill}
-              className="gap-1.5 shrink-0"
-            >
-              <FilePlus className="h-4 w-4" />
-              {t("widget.newBill")}
-            </Button>
-          )}
-        </Div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleSelectCompany}
-          className="self-start gap-2 font-normal max-w-64"
-        >
-          <Building className="h-4 w-4 shrink-0 text-muted-foreground" />
-          <Span className="truncate">
-            {companyName ?? t("widget.company.selected")}
-          </Span>
-        </Button>
-      </Div>
-
-      {/* Loading */}
-      {!resolvedData && (
-        <Div className="flex items-center justify-center py-20 text-muted-foreground gap-2">
-          <Loader2 className="h-5 w-5 animate-spin" />
-          <Span className="text-sm">{t("widget.loading")}</Span>
-        </Div>
-      )}
-
-      {/* Empty state */}
-      {resolvedData && (!bills || bills.length === 0) && (
-        <Div className="flex flex-col items-center justify-center py-16 gap-5">
-          <Div className="h-14 w-14 rounded-2xl bg-muted flex items-center justify-center">
-            <Receipt className="h-7 w-7 text-muted-foreground" />
-          </Div>
-          <Div className="flex flex-col items-center gap-1.5 text-center">
-            <Span className="text-sm font-medium">
-              {t("widget.empty.title")}
+    <DocumentList
+      title={t("widget.title")}
+      backLabel={t("widget.back")}
+      loadingLabel={t("widget.loading")}
+      emptyTitle={t("widget.empty.title")}
+      emptyHint={onPick ? undefined : t("widget.empty.hint")}
+      filtered={data?.hasFilters ?? false}
+      filters={
+        isInteractive && onSubmit ? (
+          <>
+            <TextFieldWidget fieldName="search" field={children.search} />
+            <Div className="grid min-w-0 grid-cols-1 gap-3 @sm:grid-cols-2">
+              <SelectFieldWidget fieldName="status" field={children.status} />
+              <NumberFieldWidget
+                fieldName="pageSize"
+                field={children.pageSize}
+              />
+            </Div>
+            <Div className="flex min-w-0 flex-wrap items-center gap-2">
+              <DocumentScopePicker
+                kind="company"
+                value={companyId}
+                appliedLabel={
+                  data?.selectedCompanyId === companyId
+                    ? data?.selectedCompanyName
+                    : undefined
+                }
+                onSelect={(id) =>
+                  form.setValue("companyId", id, { shouldDirty: true })
+                }
+              />
+            </Div>
+          </>
+        ) : undefined
+      }
+      create={
+        isInteractive && !onPick ? (
+          <Button
+            type="button"
+            size="sm"
+            onClick={createDocument}
+            className="gap-1.5 whitespace-normal"
+          >
+            <FilePlus className="h-4 w-4" />
+            {t("widget.newBill")}
+          </Button>
+        ) : undefined
+      }
+      items={(data?.bills ?? []).map((row) => {
+        const reference = row.billNumber ?? tDocument("documents.noReference");
+        const badges = (
+          <StatusPill
+            status={t(row.status)}
+            variant={statusVariants[row.status]}
+          />
+        );
+        const meta = (
+          <>
+            <Span className="font-semibold">
+              {money(row.billTotal, row.currency)}
             </Span>
-            <P className="text-xs text-muted-foreground max-w-xs leading-relaxed">
-              {t("widget.empty.hint")}
-            </P>
-          </Div>
-          {!isPickerMode && (
-            <Button
-              type="button"
-              size="sm"
-              onClick={handleNewBill}
-              className="gap-1.5"
-            >
-              <FilePlus className="h-4 w-4" />
-              {t("widget.empty.cta")}
-            </Button>
-          )}
-        </Div>
-      )}
-
-      {/* Bill list */}
-      {bills && bills.length > 0 && (
-        <Div className="flex flex-col gap-3">
-          <Div className="flex flex-col rounded-lg border overflow-hidden divide-y divide-border">
-            {bills.map((bill) => {
-              const isOverdue =
-                (bill.status === BillStatus.DRAFT ||
-                  bill.status === BillStatus.RECEIVED ||
-                  bill.status === BillStatus.APPROVED) &&
-                bill.dueDate !== null &&
-                bill.dueDate !== undefined &&
-                isInPast(bill.dueDate);
-
-              return (
-                <Div
-                  key={bill.id}
-                  className="flex items-center gap-3 px-4 py-3 bg-card hover:bg-muted/50 transition-colors cursor-pointer group"
-                  onClick={handleView(bill.id)}
-                >
-                  <Div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                    <Div className="flex items-center gap-2">
-                      <Span className="text-sm font-semibold font-mono">
-                        {bill.billNumber ?? "—"}
-                      </Span>
-                      <Span className="text-sm text-muted-foreground truncate">
-                        {bill.supplierName}
-                      </Span>
-                    </Div>
-                    <Div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      {bill.dueDate && (
-                        <Span>
-                          {t("widget.due")}{" "}
-                          {new Date(bill.dueDate).toLocaleDateString(locale)}
-                        </Span>
-                      )}
-                      {isOverdue && (
-                        <Span className="font-medium text-destructive">
-                          {t("widget.overdue")}
-                        </Span>
-                      )}
-                    </Div>
-                  </Div>
-
-                  <Div className="flex items-center gap-3 shrink-0">
-                    <Span className="text-sm font-semibold font-mono tabular-nums">
-                      {new Intl.NumberFormat(locale, {
-                        style: "currency",
-                        currency: bill.currency,
-                      }).format(bill.billTotal)}
-                    </Span>
-                    <Badge
-                      variant={statusVariant(bill.status)}
-                      className="text-xs"
-                    >
-                      {t(bill.status)}
-                    </Badge>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </Div>
-                </Div>
-              );
-            })}
-          </Div>
-        </Div>
-      )}
-    </Div>
+            {row.companyName && <Span>{row.companyName}</Span>}
+            {row.dueDate && (
+              <Span>
+                {t("widget.due")} {formatDate(row.dueDate, locale, "PP")}
+              </Span>
+            )}
+            {row.isOverdue && (
+              <Span className="text-destructive">{t("widget.overdue")}</Span>
+            )}
+          </>
+        );
+        return {
+          id: row.id,
+          title: reference,
+          subtitle: row.supplierName,
+          badges,
+          meta,
+          action: isInteractive
+            ? {
+                label: tDocument(
+                  onPick ? "documents.select" : "documents.open",
+                  { reference },
+                ),
+                onClick: () => openDocument(row),
+              }
+            : undefined,
+        };
+      })}
+      pagination={
+        data
+          ? {
+              total: data.totalCount,
+              currentPage: data.currentPage,
+              pageCount: data.pageCount,
+            }
+          : undefined
+      }
+      onApply={() => submitPage(1)}
+      onClear={clearFilters}
+      onPage={submitPage}
+    />
   );
 }

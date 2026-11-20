@@ -37,6 +37,12 @@ const ConnectionDetailContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.ConnectionDetailContainer })),
 );
 
+const ConnectionReadWidget = lazyWidget(() =>
+  import("./widget").then((module) => ({
+    default: module.ConnectionReadWidget,
+  })),
+);
+
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
@@ -51,7 +57,7 @@ export const { GET } = createEndpoint({
   tags: ["category" as const],
 
   fields: customWidgetObject({
-    render: ConnectionDetailContainer,
+    render: ConnectionReadWidget,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       id: requestUrlPathParamsField(scopedTranslation, {

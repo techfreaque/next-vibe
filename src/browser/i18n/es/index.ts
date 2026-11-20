@@ -2477,6 +2477,9 @@ export const translations: typeof enTranslations = {
   },
 
   shared: {
+    addItem: "Añadir elemento",
+    removeItem: "Quitar el último elemento",
+    back: "Volver",
     instanceId: {
       label: "Período de sesiones ID",
       description:

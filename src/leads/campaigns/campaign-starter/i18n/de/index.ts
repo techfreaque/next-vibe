@@ -257,6 +257,8 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    on: "Ein",
+    off: "Aus",
     title: "Campaign-Starter-Konfiguration",
     titleSaved: "Konfiguration gespeichert",
     description:

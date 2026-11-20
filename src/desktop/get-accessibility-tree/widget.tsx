@@ -11,7 +11,6 @@ import { Span } from "next-vibe/ui/components/span";
 import {
   useWidgetForm,
   useWidgetNavigation,
-  useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -22,9 +21,10 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { DesktopNavHeader } from "../shared/nav-header";
+import { useDesktopRead } from "../shared/use-desktop-read";
 import type definition from "./definition";
 import type { DesktopGetAccessibilityTreeResponseOutput } from "./definition";
 
@@ -107,16 +107,8 @@ export function GetAccessibilityTreeWidget({
   const form = useWidgetForm<typeof definition.POST>();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.POST>();
-  const onSubmit = useWidgetOnSubmit();
-
-  useEffect((): void => {
-    if (!data && onSubmit) {
-      onSubmit();
-    }
-  }, [data, onSubmit]);
-
-  const appName = form?.getValues("appName") as string | undefined;
-  const isLoading = !data;
+  const { onSubmit, isLoading } = useDesktopRead();
+  const appName = form.getValues("appName");
 
   const handleListWindows = (): void => {
     void (async (): Promise<void> => {
@@ -130,23 +122,26 @@ export function GetAccessibilityTreeWidget({
       <DesktopNavHeader
         title={appName ?? t("widget.titleA11yTree")}
         right={
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-7 w-7 p-0"
-            onClick={(): void => {
-              onSubmit?.();
-            }}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <RefreshCw className="h-3.5 w-3.5" />
-            )}
-          </Button>
+          onSubmit && (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="h-7 w-7 p-0"
+              aria-label={t("widget.refresh")}
+              onClick={onSubmit}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <RefreshCw className="h-3.5 w-3.5" />
+              )}
+            </Button>
+          )
         }
       />
+      <FormAlertWidget field={{}} />
 
       {isLoading ? (
         <Div className="flex items-center justify-center py-16 gap-2 text-muted-foreground">
@@ -183,7 +178,6 @@ export function GetAccessibilityTreeWidget({
 
           <Div className="flex gap-2">
             <NavigateButtonWidget field={{}} />
-            <FormAlertWidget field={{}} />
             <SubmitButtonWidget<typeof definition.POST> field={{}} />
           </Div>
 

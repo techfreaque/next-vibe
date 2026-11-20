@@ -260,6 +260,8 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    on: "Activé",
+    off: "Désactivé",
     title: "Lanceur de campagnes",
     titleSaved: "Configuration enregistrée",
     description:

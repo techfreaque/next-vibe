@@ -5,16 +5,20 @@ export const translations: typeof enTranslations = {
   titleShort: "Rimborso",
   description: "Elaborare un rimborso per una transazione di pagamento",
   category: "Rimborsi di pagamento",
+
   tags: {
     refund: "rimborso",
-    transaction: "transazione"
+    transaction: "transazione",
   },
+
   success: {
-    created: "Rimborso effettuato con successo"
+    created: "Rimborso effettuato con successo",
   },
+
   reason: {
-    requestedByCustomer: "Richiesta da parte del cliente"
+    requestedByCustomer: "Richiesta da parte del cliente",
   },
+
   form: {
     title: "Modulo di rimborso",
     description: "Inserisci i dettagli del rimborso",
@@ -22,25 +26,53 @@ export const translations: typeof enTranslations = {
       transactionId: {
         label: "Transazione ID",
         description: "ID della transazione al rimborso",
-        placeholder: "Inserisci la transazione ID"
+        placeholder: "Inserisci la transazione ID",
       },
       amount: {
         label: "Importo del rimborso",
-        description: "Rimborso parziale facoltativo nella valuta della transazione",
-        placeholder: "Inserisci l'importo"
+        description:
+          "Rimborso parziale facoltativo nella valuta della transazione",
+        placeholder: "Inserisci l'importo",
       },
       reason: {
         label: "Ragione di rimborso",
         description: "Motivo del rimborso",
-        placeholder: "Inserisci il motivo"
+        placeholder: "Inserisci il motivo",
       },
       metadata: {
         label: "Metadati",
         description: "Altri metadati di rimborso",
-        placeholder: "Inserisci i metadati come JSON"
-      }
-    }
+        placeholder: "Inserisci i metadati come JSON",
+      },
+    },
   },
+
+  widget: {
+    transactionDetails: "Transazione salvata",
+    customerEmail: "E-mail cliente",
+    customerId: "Cliente ID",
+    originalAmount: "Addebito iniziale",
+    enterTransaction:
+      "Inserisci l’ID della transazione per vedere i dettagli del pagamento.",
+    lookupLoading: "Caricamento della transazione salvata",
+    transactionMissing: "Transazione non trovata",
+    lookupFailed: "Impossibile caricare la transazione",
+    retryLookup: "Ripeti la ricerca",
+    amountExceedsCharge:
+      "Inserisci un importo che non superi l’addebito iniziale.",
+    confirmRemaining: "Stripe rimborserà il saldo residuo in {{currency}}.",
+    confirmAmount: "Rimborso parziale: {{amount}} ({{currency}}).",
+    title: "Rimborso Stripe",
+    amountHelp:
+      "Inserisci l’importo parziale in {{currency}}. Lascia il campo vuoto per rimborsare tutto il saldo residuo.",
+    review: "Importo della recensione",
+    confirmTitle: "Confermare il rimborso Stripe",
+    confirmDescription:
+      "Stripe rimborserà la transazione {{transactionId}} per {{email}}. L’operazione comporta un trasferimento di denaro.",
+    confirm: "Rimborso",
+    cancel: "Annulla",
+  },
+
   post: {
     title: "Rimborso di processo",
     description: "Elaborare un rimborso di pagamento",
@@ -59,53 +91,55 @@ export const translations: typeof enTranslations = {
         status: "Stato di rimborso",
         reason: "Ragione di rimborso",
         createdAt: "Creato a",
-        updatedAt: "Aggiornato At"
-      }
+        updatedAt: "Aggiornato At",
+      },
     },
     errors: {
       validation: {
         title: "Errore di convalida",
-        description: "Parametri di rimborso non validi"
+        description: "Parametri di rimborso non validi",
+        ineligible: "Questa transazione è idonea per un rimborso Stripe.",
       },
       unauthorized: {
         title: "Autenticazione richiesta",
-        description: "Accedi per continuare"
+        description: "Accedi per continuare",
       },
       forbidden: {
         title: "Accesso negato",
-        description: "Permesso negato"
+        description: "Permesso negato",
       },
       notFound: {
         detail: "Nessuna transazione trovata con id {{transactionId}}",
         title: "Non trovato",
-        description: "Transazione non trovata"
+        description: "Transazione non trovata",
       },
       server: {
         detail: "Non è possibile elaborare il rimborso: {{error}}",
-        noPaymentIntent: "Questa transazione non ha alcun pagamento collegato Stripe, quindi non può essere rimborsato",
+        noPaymentIntent:
+          "Questa transazione non ha alcun pagamento collegato Stripe, quindi non può essere rimborsato",
         title: "Errore del server",
-        description: "Si è verificato un errore interno del server"
+        description: "Si è verificato un errore interno del server",
       },
       network: {
         title: "Errore di rete",
-        description: "Errore di connessione di rete"
+        description: "Errore di connessione di rete",
       },
       unknown: {
         title: "Errore sconosciuto",
-        description: "Si è verificato un errore imprevisto"
+        description: "Si è verificato un errore imprevisto",
       },
       conflict: {
         title: "Conflitto",
-        description: "Rimborso del conflitto rilevato"
+        description: "Rimborso del conflitto rilevato",
       },
       unsavedChanges: {
         title: "Modifiche non salvate",
-        description: "Ci sono cambiamenti non rilevati"
-      }
+        description: "Ci sono cambiamenti non rilevati",
+      },
     },
     success: {
       title: "Operazione riuscita",
-      description: "Rimborso effettuato con successo"
-    }
-  }
+      description: "Rimborso effettuato con successo",
+    },
+  },
 };

@@ -5,15 +5,16 @@ export const translations: typeof enTranslations = {
   tags: {
     payment: "pago",
     estimate: "Estimaciones",
-    list: "lista"
+    list: "lista",
   },
   get: {
     title: "Estimaciones de ventas",
     titleShort: "Estimaciones de ventas",
-    description: "Estimaciones de búsqueda por referencia, cliente, correo electrónico, título o estimación ID y filtro por empresa o estado.",
+    description:
+      "Estimaciones de búsqueda por referencia, cliente, correo electrónico, título o estimación ID y filtro por empresa o estado.",
     form: {
       title: "Filtros estimados",
-      description: "Estimaciones de filtros y paginas"
+      description: "Estimaciones de filtros y paginas",
     },
     response: {
       totalCount: "Total de cuentas",
@@ -27,50 +28,44 @@ export const translations: typeof enTranslations = {
       validUntil: "Válido hasta",
       lineCount: "Cuenta de línea",
       createdAt: "Creado en",
-      updatedAt: "Actualizado en"
+      updatedAt: "Actualizado en",
     },
     errors: {
       unauthorized: {
         title: "Se requiere autenticación",
-        description: "Inicia sesión para continuar"
+        description: "Inicia sesión para continuar",
       },
       validation: {
         title: "Error de validación",
-        description: "Parámetros inválidos"
+        description: "Parámetros inválidos",
       },
       server: {
         title: "Error del servidor",
-        description: "Error del servidor interno"
+        description: "Error del servidor interno",
       },
       unknown: {
         title: "Error desconocido",
-        description: "Ocurrió un error desconocido"
+        description: "Ocurrió un error desconocido",
       },
       network: {
         title: "Error de red",
-        description: "Ocurrió un error de red"
+        description: "Ocurrió un error de red",
       },
-      forbidden: {
-        title: "Acceso denegado",
-        description: "Acceso denegado"
-      },
+      forbidden: { title: "Acceso denegado", description: "Acceso denegado" },
       notFound: {
         title: "No encontrado",
-        description: "Compañía no encontrada"
+        description: "Compañía no encontrada",
       },
-      conflict: {
-        title: "Conflicto",
-        description: "Se produjo un conflicto"
-      },
+      conflict: { title: "Conflicto", description: "Se produjo un conflicto" },
       unsavedChanges: {
         title: "Cambios sin guardar",
-        description: "Hay cambios sin salvar"
-      }
+        description: "Hay cambios sin salvar",
+      },
     },
     success: {
       title: "Operación completada",
-      description: "Estimaciones recuperadas"
-    }
+      description: "Estimaciones recuperadas",
+    },
   },
   enums: {
     estimateStatus: {
@@ -79,33 +74,40 @@ export const translations: typeof enTranslations = {
       ACCEPTED: "Aceptado",
       DECLINED: "Declind",
       EXPIRED: "Gastos",
-      CONVERTED: "Conversión"
-    }
+      CONVERTED: "Conversión",
+    },
   },
   companyId: {
     label: "Company ID",
     description: "Filtro por empresa",
-    placeholder: "Entrar en la empresa ID"
+    placeholder: "Entrar en la empresa ID",
+  },
+  search: {
+    label: "Documentos de búsqueda",
+    description:
+      "Estimaciones de búsqueda por referencia, cliente, correo electrónico, título o estimación ID y filtro por empresa o estado.",
+    placeholder: "Número de estimación, cliente o título",
   },
   status: {
     label: "Situación",
     description: "Filtro por estado",
-    placeholder: "Todos los estados"
+    placeholder: "Todos los estados",
   },
   customerId: {
     label: "Cliente ID",
     description: "Filtro por cliente",
-    placeholder: "Ingrese al cliente ID"
+    placeholder: "Ingrese al cliente ID",
   },
   page: {
     label: "Página",
-    description: "Número de página"
+    description: "Número de página",
   },
   pageSize: {
     label: "Tamaño de página",
-    description: "Elementos por página"
+    description: "Elementos por página",
   },
   widget: {
+    pageCount: "Páginas totales",
     back: "Atrás",
     title: "Estimaciones de ventas",
     newEstimate: "Nueva estimación",
@@ -115,7 +117,7 @@ export const translations: typeof enTranslations = {
     empty: {
       title: "Todavía no hay estimaciones.",
       hint: "Crea tu primera estimación para empezar.",
-      cta: "Nueva estimación"
+      cta: "Nueva estimación",
     },
     valid: "Valide",
     lines: "líneas",
@@ -127,7 +129,7 @@ export const translations: typeof enTranslations = {
       accepted: "Aceptado",
       declined: "Declind",
       expired: "Gastos",
-      converted: "Conversión"
-    }
-  }
+      converted: "Conversión",
+    },
+  },
 };

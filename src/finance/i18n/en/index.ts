@@ -1,5 +1,27 @@
 export const translations = {
   category: "Finance",
+  documents: {
+    search: "Search documents",
+    matches: "Matching documents ({{count}})",
+    emptyTitle: "No documents match these filters",
+    emptyHint: "Change the search or filters and try again.",
+    allCompanies: "All companies you can access",
+    chooseCompany: "Select company",
+    allCustomers: "All customers",
+    chooseCustomer: "Select customer",
+    apply: "Apply filters",
+    clear: "Clear filters",
+    page: "Page {{page}} of {{pages}} · {{total}} results",
+    previous: "Previous page",
+    next: "Next page",
+    select: "Select {{reference}}",
+    open: "Open {{reference}}",
+    noReference: "No reference",
+    invoices: "Customer invoices",
+    bills: "Supplier bills",
+    estimates: "Sales estimates",
+    heading: "Commercial documents",
+  },
   tags: {
     finance: "finance",
     vibeSense: "vibe-sense",
@@ -155,7 +177,9 @@ export const translations = {
     description:
       "Revenue vs upstream cost: provider balances, margin, alerts and thresholds.",
     response: {
-      lastIngestAt: "Last ingest",
+      lastIngestAt: "Last sync attempt",
+      lastSuccessfulIngestAt: "Last successful source sync",
+      asOf: "Status checked at",
       sources: "Sources",
       week: "Last 7 days",
       days: "Daily margin",
@@ -163,11 +187,18 @@ export const translations = {
       thresholds: "Thresholds",
     },
     widget: {
+      back: "Back",
       title: "Finance",
       refresh: "Refresh",
       runIngest: "Run ingest",
       loading: "Loading finance…",
-      lastIngest: "Last ingest: {{when}}",
+      lastIngest: "Last sync attempt {{when}}",
+      lastSuccessful: "Last successful sync {{when}}",
+      snapshot: "Last provider reading {{when}}",
+      stale: "Stale reading",
+      noBalance: "No balance reported",
+      missingCost: "No complete cost data",
+      noSources: "No financial sources have reported data.",
       never: "never",
       neverRun: "Not run yet",
       margin: {
@@ -179,8 +210,9 @@ export const translations = {
         pct: "Margin %",
         empty: "No rollups yet. Run an ingest.",
         costUnknown: "cost unknown",
+        missingPct: "No margin percentage",
         costIncomplete:
-          "Margin covers {{tracked}} of {{total}} days: only days with complete upstream cost count. Net revenue over all {{total}} days: {{revenue}}.",
+          "Cost is known for {{tracked}} of {{total}} days. Net revenue recorded across the period: {{revenue}}.",
       },
       providers: {
         title: "Provider balances",
@@ -196,7 +228,7 @@ export const translations = {
       },
       alerts: {
         title: "Recent alerts",
-        empty: "No alerts. Margin and balances look normal.",
+        empty: "No alerts recorded",
       },
       thresholds: {
         title: "Thresholds",

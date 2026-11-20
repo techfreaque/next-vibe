@@ -40,6 +40,7 @@ import {
 } from "@/chart-of-accounts/enum";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
+import { getDocumentCompanies } from "@/finance/document-company-scope";
 
 import { paymentInvoiceLines, paymentInvoices } from "../../db";
 import { InvoiceStatus } from "../../enum";
@@ -71,11 +72,24 @@ export class CreditNoteCreateRepository {
         return authResult;
       }
 
+      const [company] = await getDocumentCompanies(userId, data.companyId);
+      if (!company) {
+        return fail({
+          message: t("post.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+
       // Load the original invoice
       const [original] = await db
         .select()
         .from(paymentInvoices)
-        .where(eq(paymentInvoices.id, data.invoiceId))
+        .where(
+          and(
+            eq(paymentInvoices.id, data.invoiceId),
+            eq(paymentInvoices.companyId, data.companyId),
+          ),
+        )
         .limit(1);
 
       if (!original) {
@@ -328,7 +342,9 @@ export class CreditNoteCreateRepository {
     if (!finalRevenueAccount) {
       logger.debug(
         "No Revenue account node found — skipping credit note journal entry",
-        { companyId },
+        {
+          companyId,
+        },
       );
       return;
     }

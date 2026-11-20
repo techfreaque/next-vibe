@@ -18,30 +18,17 @@ import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
+import { getDocumentCompanies } from "@/finance/document-company-scope";
 
-import {
-  accountingPeriods,
-  accountNodes,
-  journalEntries,
-  journalEntryLines,
-} from "../db";
+import { accountingPeriods, accountNodes, journalEntries } from "../db";
 import { JournalEntryStatus, PeriodStatus } from "../enum";
-import type { AccountingDashboardRequestOutput } from "./definition";
+import type {
+  AccountingDashboardRequestOutput,
+  AccountingDashboardResponseOutput,
+} from "./definition";
 import { scopedTranslation } from "./i18n";
-
-interface DashboardData {
-  currentPeriodId: string | null;
-  currentPeriodName: string | null;
-  currentPeriodStatus: string | null;
-  currentPeriodStartDate: string | null;
-  currentPeriodEndDate: string | null;
-  accountCount: number;
-  draftEntryCount: number;
-  postedThisMonthCount: number;
-  hasSetup: boolean;
-  currency: string;
-}
 
 export class AccountingDashboardRepository {
   static async getDashboard(
@@ -49,11 +36,14 @@ export class AccountingDashboardRepository {
     logger: EndpointLogger,
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
-  ): Promise<ResponseType<DashboardData>> {
+  ): Promise<ResponseType<AccountingDashboardResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
 
     if (!data.companyId) {
       return success({
+        selectedCompanyId: null,
+        selectedCompanyName: null,
+        canConfigure: false,
         currentPeriodId: null,
         currentPeriodName: null,
         currentPeriodStatus: null,
@@ -79,6 +69,14 @@ export class AccountingDashboardRepository {
     }
 
     try {
+      const [company] = await getDocumentCompanies(user.id, data.companyId);
+      if (!company) {
+        return fail({
+          message: t("dashboard.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+
       // 1. Open period
       const openPeriods = await db
         .select({
@@ -141,24 +139,12 @@ export class AccountingDashboardRepository {
         );
       const postedThisMonthCount = postedCountRows[0]?.cnt ?? 0;
 
-      // 5. Detect primary currency from first posted journal entry line
-      const currencyRows = await db
-        .select({ currency: journalEntryLines.currency })
-        .from(journalEntryLines)
-        .innerJoin(
-          journalEntries,
-          eq(journalEntryLines.journalEntryId, journalEntries.id),
-        )
-        .where(
-          and(
-            eq(journalEntries.companyId, data.companyId),
-            eq(journalEntries.status, JournalEntryStatus.POSTED),
-          ),
-        )
-        .limit(1);
-      const currency = currencyRows[0]?.currency ?? "EUR";
-
       return success({
+        selectedCompanyId: company.id,
+        selectedCompanyName: company.name,
+        canConfigure:
+          authResult.data.role === CompanyMemberRole.ADMIN ||
+          authResult.data.role === CompanyMemberRole.OWNER,
         currentPeriodId: openPeriod?.id ?? null,
         currentPeriodName: openPeriod?.name ?? null,
         currentPeriodStatus: openPeriod?.status ?? null,
@@ -170,7 +156,7 @@ export class AccountingDashboardRepository {
         draftEntryCount: Number(draftEntryCount),
         postedThisMonthCount: Number(postedThisMonthCount),
         hasSetup: Number(accountCount) > 0,
-        currency,
+        currency: company.currency ?? "EUR",
       });
     } catch (error) {
       logger.error("Error loading accounting dashboard", parseError(error));

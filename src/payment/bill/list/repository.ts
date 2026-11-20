@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import { and, count, desc, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -17,10 +17,12 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { companyMembers } from "@/companies/db";
 import { CompanyAuthRepository } from "@/companies/repository";
+import { getDocumentCompanies } from "@/finance/document-company-scope";
+import { documentPage, documentSearchPattern } from "@/finance/document-list";
 
 import { paymentBills } from "../../db";
+import { BillStatus } from "../../enum";
 import type {
   BillListRequestOutput,
   BillListResponseOutput,
@@ -37,10 +39,7 @@ export class BillListRepository {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      let companyCondition;
-
       if (data.companyId) {
-        // Verify company membership (VIEWER+) for specific company
         const authResult = await CompanyAuthRepository.requireMember(
           userId,
           data.companyId,
@@ -51,44 +50,59 @@ export class BillListRepository {
         if (!authResult.success) {
           return authResult;
         }
-        companyCondition = eq(paymentBills.companyId, data.companyId);
-      } else {
-        // No company filter — scope to all companies the user belongs to
-        const memberRows = await db
-          .select({ companyId: companyMembers.companyId })
-          .from(companyMembers)
-          .where(
-            and(
-              eq(companyMembers.userId, userId),
-              eq(companyMembers.isActive, true),
-            ),
-          );
-        const companyIds = memberRows.map((r) => r.companyId);
-        if (companyIds.length === 0) {
-          return success({ totalCount: 0, bills: [] });
+      }
+
+      const selectedCompanies = await getDocumentCompanies(
+        userId,
+        data.companyId,
+      );
+      const companyNames = new Map(
+        selectedCompanies.map((company) => [company.id, company.name]),
+      );
+      const hasFilters = Boolean(data.companyId || data.status || data.search);
+      const pageSize = data.pageSize;
+      if (companyNames.size === 0) {
+        if (data.companyId) {
+          return fail({
+            message: t("get.errors.forbidden.title"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
         }
-        companyCondition = inArray(paymentBills.companyId, companyIds);
+        return success({
+          totalCount: 0,
+          bills: [],
+          ...documentPage(0, data.page, pageSize),
+          hasFilters,
+          selectedCompanyId: null,
+          selectedCompanyName: null,
+        });
       }
 
-      const page = data.page ?? 1;
-      const pageSize = data.pageSize ?? 20;
-      const offset = (page - 1) * pageSize;
-
-      const conditions = [companyCondition];
-      if (data.status) {
-        conditions.push(eq(paymentBills.status, data.status));
-      }
-
-      const whereClause = and(...conditions);
-
+      const pattern = data.search
+        ? documentSearchPattern(data.search)
+        : undefined;
+      const where = and(
+        inArray(paymentBills.companyId, [...companyNames.keys()]),
+        data.status ? eq(paymentBills.status, data.status) : undefined,
+        pattern
+          ? or(
+              ilike(paymentBills.billNumber, pattern),
+              ilike(paymentBills.supplierName, pattern),
+              ilike(sql`${paymentBills.id}::text`, pattern),
+            )
+          : undefined,
+      );
       const [{ value: total }] = await db
         .select({ value: count() })
         .from(paymentBills)
-        .where(whereClause);
+        .where(where);
+      const pagination = documentPage(total, data.page, pageSize);
+      const offset = (pagination.currentPage - 1) * pageSize;
 
       const rows = await db
         .select({
           id: paymentBills.id,
+          companyId: paymentBills.companyId,
           supplierName: paymentBills.supplierName,
           billNumber: paymentBills.billNumber,
           billDate: paymentBills.billDate,
@@ -99,14 +113,29 @@ export class BillListRepository {
           createdAt: paymentBills.createdAt,
         })
         .from(paymentBills)
-        .where(whereClause)
-        .orderBy(desc(paymentBills.billDate))
+        .where(where)
+        .orderBy(desc(paymentBills.billDate), paymentBills.id)
         .limit(pageSize)
         .offset(offset);
 
+      const now = new Date();
       return success({
-        totalCount: total ?? 0,
-        bills: rows,
+        totalCount: total,
+        ...pagination,
+        hasFilters,
+        selectedCompanyId: data.companyId ?? null,
+        selectedCompanyName: data.companyId
+          ? (companyNames.get(data.companyId) ?? null)
+          : null,
+        bills: rows.map((row) => ({
+          ...row,
+          companyName: companyNames.get(row.companyId) ?? null,
+          isOverdue:
+            (row.status === BillStatus.RECEIVED ||
+              row.status === BillStatus.APPROVED) &&
+            row.dueDate !== null &&
+            row.dueDate < now,
+        })),
       });
     } catch (error) {
       logger.error("Failed to list AP bills", parseError(error));

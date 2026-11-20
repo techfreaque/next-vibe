@@ -134,6 +134,7 @@ export const translations: typeof enTranslations = {
     none: "Aucune donnée de suivi pour cet utilisateur.",
   },
   referrals: {
+    noReferrer: "Aucun compte parrain",
     referredBy: "Parrainé par",
     viaCode: "Code {{code}}",
     signups: "Inscriptions parrainées",
@@ -157,19 +158,20 @@ export const translations: typeof enTranslations = {
     skillsHint: "{{count}} skills personnalisés",
   },
   billing: {
-    paymentsTitle: "Paiements",
+    paymentsTitle: "Transactions récentes des prestataires de paiement",
+    inspect: "Ouvrir la transaction",
+    inspectNamed: "Ouvrir la transaction de {{amount}} du {{date}}",
+    refund: "Examiner le remboursement",
+    refundNamed:
+      "Examiner le remboursement de {{amount}} pour la transaction du {{date}}",
+    openSubscriptions: "Ouvrir les abonnements de ce compte",
+    startedOn: "Début le {{date}}",
+    periodEndsOn: "Fin de période le {{date}}",
     subscriptionsTitle: "Historique des abonnements",
     succeeded: "Paiements réussis",
     ofAttempts: "sur {{count}} tentatives",
     failedPending: "Échoués / en attente",
     noPayments: "Aucune tentative de paiement",
-    date: "Date",
-    amount: "Montant",
-    status: "Statut",
-    kind: "Type",
-    provider: "Prestataire",
-    started: "Début",
-    periodEnd: "Fin de période",
     cancels: "résiliation en fin de période",
   },
   modelUsage: {
@@ -186,9 +188,12 @@ export const translations: typeof enTranslations = {
     openMonitor: "Ouvrir le moniteur d'erreurs",
   },
   widget: {
+    unavailable: "Compte indisponible",
+    chooseUser: "Choisissez un compte à consulter",
     loading: "Chargement de l'utilisateur...",
     never: "Jamais",
     actions: {
+      browse: "Parcourir les comptes",
       edit: "Modifier",
       addCredits: "Accorder des crédits",
       delete: "Supprimer l'utilisateur",
@@ -200,6 +205,7 @@ export const translations: typeof enTranslations = {
     unbanUser: "Débannir",
   },
   roles: {
+    removeNamed: "Retirer le rôle {{role}}",
     add: "Ajouter un rôle",
     remove: "Retirer un rôle",
   },
@@ -234,6 +240,8 @@ export const translations: typeof enTranslations = {
     lastPayment: "Dernier paiement",
   },
   connections: {
+    viewNamedUser: "Ouvrir le compte de {{name}}",
+    viewNamedLead: "Ouvrir le lead {{name}}",
     leadsTitle: "Leads liés",
     usersTitle: "Utilisateurs partageant un lead",
     noLeads: "Aucun lead lié",

@@ -23,6 +23,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { EstimateStatus } from "../../../enum";
 import { scopedTranslation } from "./i18n";
 
 const EstimateGetWidgetLazy = lazyWidget(() =>
@@ -53,7 +54,6 @@ const { GET } = createEndpoint({
         label: "estimateId.label" as const,
         description: "estimateId.description" as const,
         schema: z.uuid(),
-        hidden: true,
         listEndpoint: async () =>
           (await import("../../list/definition")).default.GET,
         labelField: "estimateNumber",
@@ -64,6 +64,16 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "post.response.success" as const,
         schema: z.string(),
+      }),
+      companyName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.message",
+        schema: z.string().nullable(),
+      }),
+      canManage: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.boolean(),
       }),
       companyId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -257,9 +267,11 @@ const { GET } = createEndpoint({
     responses: {
       default: {
         id: "456e7890-e89b-12d3-a456-426614174000",
+        companyName: "Harbour Ledger & Supply",
+        canManage: true,
         companyId: "00000000-0000-0000-0000-000000000001",
-        estimateNumber: "EST-2024-0001",
-        status: "DRAFT",
+        estimateNumber: "EST-3042",
+        status: EstimateStatus.ACCEPTED,
         customerId: null,
         customerEmail: null,
         customerName: null,

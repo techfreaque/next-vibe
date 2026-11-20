@@ -7,9 +7,10 @@ export const translations: typeof enTranslations = {
     ap: "zobowiązania",
   },
   get: {
-    title: "Faktury zakupowe",
-    titleShort: "Rachunki AP",
-    description: "Lista faktur dostawców dla firmy",
+    title: "Faktury od dostawców",
+    titleShort: "Faktury od dostawców",
+    description:
+      "Szukaj po numerze faktury, nazwie dostawcy lub identyfikatorze. Filtruj według firmy lub statusu.",
     errors: {
       validation: {
         title: "Błąd walidacji",
@@ -61,6 +62,12 @@ export const translations: typeof enTranslations = {
     description: "Filtruj wg firmy",
     placeholder: "UUID firmy",
   },
+  search: {
+    label: "Szukaj dokumentów",
+    description:
+      "Szukaj po numerze faktury, nazwie dostawcy lub identyfikatorze. Filtruj według firmy lub statusu.",
+    placeholder: "Numer faktury, dostawca lub identyfikator",
+  },
   status: {
     label: "Status",
     description: "Filtruj wg statusu faktury",
@@ -78,8 +85,9 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    pageCount: "Liczba stron",
     back: "Wróć",
-    title: "Faktury zakupowe",
+    title: "Faktury od dostawców",
     newBill: "Zarejestruj fakturę",
     loading: "Ładowanie faktur...",
     empty: {

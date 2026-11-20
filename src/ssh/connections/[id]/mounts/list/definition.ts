@@ -119,14 +119,14 @@ export const { GET } = createEndpoint({
       default: {
         mounts: [
           {
-            id: "mount-uuid-1",
+            id: "fd752285-c697-4a60-a16c-14cccf007ea1",
             name: "project",
             path: "/home/max/project",
             isDefault: true,
             createdAt: "2026-01-01T00:00:00Z",
           },
           {
-            id: "mount-uuid-2",
+            id: "fd752285-c697-4a60-a16c-14cccf007ea2",
             name: "logs",
             path: "/var/log",
             isDefault: false,

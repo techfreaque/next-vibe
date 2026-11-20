@@ -88,6 +88,9 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    previous: "Précédente",
+    next: "Suivante",
+    page: "Page {{page}} sur {{pages}}",
     title: "Rechercher des leads",
     filterLabel: "Filtre :",
     clearFilter: "Effacer",

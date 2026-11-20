@@ -6,7 +6,7 @@
 
 import "server-only";
 
-import { and, count, desc, eq, gte, ilike, lte, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, ilike, lte, or, sql } from "drizzle-orm";
 
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
@@ -21,27 +21,7 @@ import { db } from "../../../database";
 import type { EndpointLogger } from "../../types";
 import type { LoggerMetadata } from "../../types";
 import { errorLogs } from "../db";
-import type { ErrorLogsT } from "./i18n";
-
-/**
- * Metadata is JSONB — at rest it is plain JSON (Errors/Dates already
- * serialized), so it is WidgetData-shaped. Parse each entry through
- * WidgetDataSchema to get the response's WidgetData[] type honestly (validate,
- * don't cast). Returns null for an empty/absent payload.
- */
-function normalizeMetadata(
-  raw: LoggerMetadata[] | null | undefined,
-): WidgetData[] | null {
-  const arr = Array.isArray(raw)
-    ? raw
-    : raw !== null && raw !== undefined
-      ? [raw]
-      : null;
-  if (!arr || arr.length === 0) {
-    return null;
-  }
-  return arr.map((entry) => WidgetDataSchema.parse(entry));
-}
+import { ERROR_LOGS_PAGE_SIZE } from "./constants";
 import type {
   ErrorLogsPatchRequestOutput,
   ErrorLogsPatchResponseOutput,
@@ -49,17 +29,36 @@ import type {
   ErrorLogsResponseOutput,
 } from "./definition";
 import { ErrorLogStatusFilter } from "./enum";
+import type { ErrorLogsT } from "./i18n";
 
 export class ErrorLogsRepository {
+  /**
+   * Metadata is JSONB — at rest it is plain JSON (Errors/Dates already
+   * serialized). A malformed legacy entry should never hide its error group.
+   */
+  private static normalizeMetadata(
+    raw: LoggerMetadata[] | null | undefined,
+  ): WidgetData[] | null {
+    const arr = Array.isArray(raw)
+      ? raw
+      : raw !== null && raw !== undefined
+        ? [raw]
+        : null;
+    const valid = arr?.flatMap((entry) => {
+      const result = WidgetDataSchema.safeParse(entry);
+      return result.success ? [result.data] : [];
+    });
+    return valid?.length ? valid : null;
+  }
+
   static async getLogs(
     data: ErrorLogsRequestOutput,
     t: ErrorLogsT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ErrorLogsResponseOutput>> {
     try {
-      const limit =
-        data?.limit && Number(data.limit) > 0 ? Number(data.limit) : 50;
-      const offset = data?.offset ? Number(data.offset) : 0;
+      const limit = data.limit || ERROR_LOGS_PAGE_SIZE;
+      const offset = data.offset ?? 0;
 
       const conditions = [];
 
@@ -70,8 +69,16 @@ export class ErrorLogsRepository {
         conditions.push(eq(errorLogs.resolved, true));
       }
 
-      if (data?.search) {
-        conditions.push(ilike(errorLogs.message, `%${data.search}%`));
+      const search = data.search?.trim();
+      if (search) {
+        const term = search.replace(/[\\%_]/g, "\\$&");
+        conditions.push(
+          or(
+            ilike(errorLogs.message, `%${term}%`),
+            ilike(errorLogs.fingerprint, `${term}%`),
+            ilike(sql`${errorLogs.id}::text`, `${term}%`),
+          ),
+        );
       }
       if (data?.errorType) {
         conditions.push(ilike(errorLogs.errorType, `%${data.errorType}%`));
@@ -111,7 +118,7 @@ export class ErrorLogsRepository {
         })
         .from(errorLogs)
         .where(where)
-        .orderBy(desc(errorLogs.createdAt))
+        .orderBy(desc(errorLogs.createdAt), desc(errorLogs.id))
         .limit(limit)
         .offset(offset);
 
@@ -141,7 +148,7 @@ export class ErrorLogsRepository {
           // Dates already serialized), so it IS WidgetData-shaped. Normalize the
           // read value through a JSON round-trip to the response's WidgetData
           // type (faithful, not a cast — the wire/DB form is already JSON).
-          metadata: normalizeMetadata(row.metadata),
+          metadata: ErrorLogsRepository.normalizeMetadata(row.metadata),
           fingerprint: row.fingerprint,
           occurrences: row.occurrences,
           resolved: row.resolved,

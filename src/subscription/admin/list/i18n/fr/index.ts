@@ -59,6 +59,9 @@ export const translations: typeof enTranslations = {
       title: "Abonnements",
       description: "Abonnements correspondants",
       subscriptions: {
+        userId: "Identifiant client",
+        paymentFailedAt: "Premier échec de paiement",
+        gracePeriodEndsAt: "Fin du délai de grâce",
         id: "ID",
         userEmail: "E-mail",
         userName: "Nom",
@@ -127,6 +130,20 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    pick: "Sélectionner l’abonnement",
+    failedPayments: "Transactions échouées",
+    renewal: "Renouvellement prévu",
+    scheduledEnd: "Prend fin sans renouvellement",
+    notRecorded: "Non renseigné",
+    customer: "Ouvrir le compte client",
+    paymentAttempts: "Voir les tentatives de paiement",
+    apply: "Appliquer les filtres",
+    previous: "Précédente",
+    next: "Suivante",
+    pagination: "Page {{page}} sur {{pages}} · {{total}} abonnements",
+    loading: "Chargement des abonnements",
+    customerScope: "Client {{id}}",
+    clearScope: "Effacer la restriction",
     noSubscriptions: "Aucun abonnement trouvé.",
     noMatchingSubscriptions: "Aucun abonnement ne correspond à vos filtres.",
     searchPlaceholder: "Rechercher par e-mail ou nom...",
@@ -135,6 +152,8 @@ export const translations: typeof enTranslations = {
   },
   enums: {
     subscriptionStatusFilter: {
+      incomplete: "Incomplet",
+      incompleteExpired: "Expiré avant activation",
       all: "Tous",
       active: "Actif",
       trialing: "En essai",
@@ -154,6 +173,7 @@ export const translations: typeof enTranslations = {
       nowpayments: "NowPayments",
     },
     subscriptionSortField: {
+      periodEnd: "Fin de période",
       createdAt: "Date de création",
       status: "Statut",
       interval: "Périodicité",

@@ -53,6 +53,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    renewalDiagnostics: "Odnowienia i nieudane płatności",
     actions: "Szybkie akcje",
     mySubscription: "Moja subskrypcja",
     manage: "Zarządzaj",

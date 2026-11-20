@@ -1,6 +1,6 @@
 /**
  * /tools URL state - shared by the SSR loader and the client page so both
- * render the same filtered view (?q, ?sf, ?cat, ?p, ?ps, ?inst, ?prod, ?view).
+ * render the same filtered view.
  */
 
 import type { HelpGetRequestInput } from "next-vibe/help-tool/definition";
@@ -16,6 +16,7 @@ const STATS_FILTERS: readonly StatsFilter[] = [
   "pinned",
   "allowed",
   "all",
+  "web",
   "webPinned",
   "cliAllowed",
   "mcpPinned",
@@ -27,11 +28,51 @@ function isStatsFilter(value: string | null): value is StatsFilter {
 }
 
 function positiveInt(value: string | null): number | undefined {
-  if (!value) {
+  if (!value || !/^\d+$/.test(value)) {
     return undefined;
   }
-  const n = parseInt(value, 10);
-  return !isNaN(n) && n >= 1 ? n : undefined;
+  const n = Number(value);
+  return Number.isSafeInteger(n) && n >= 1 ? n : undefined;
+}
+
+const FILTER_PARAM_KEYS = [
+  "q",
+  "sf",
+  "prod",
+  "view",
+  "inst",
+  "p",
+  "ps",
+  "cat",
+  "sub",
+];
+
+export function copyCatalogSearchParams(
+  source: URLSearchParams,
+): URLSearchParams {
+  const filters = new URLSearchParams();
+  for (const key of FILTER_PARAM_KEYS) {
+    const value = source.get(key);
+    if (value !== null) {
+      filters.set(key, value);
+    }
+  }
+  return filters;
+}
+
+export function readEndpointSearchParams(
+  source: URLSearchParams,
+): Record<string, string> {
+  const args: Record<string, string> = {};
+  source.forEach((value, key) => {
+    if (key.startsWith("arg.")) {
+      args[key.slice(4)] = value;
+    } else if (!FILTER_PARAM_KEYS.includes(key) && !source.has(`arg.${key}`)) {
+      // Accept links already shared with bare endpoint arguments.
+      args[key] = value;
+    }
+  });
+  return args;
 }
 
 export function parseToolsInitialState(
@@ -69,6 +110,13 @@ export function parseToolsInitialState(
   const cat = searchParams.get("cat");
   if (cat) {
     state.category = cat;
+    const sub = searchParams.get("sub");
+    if (sub) {
+      state.subCategory = sub;
+    }
+    if (!isStatsFilter(sf)) {
+      state.statsFilter = "web";
+    }
   }
 
   const page = positiveInt(searchParams.get("p"));
@@ -77,7 +125,7 @@ export function parseToolsInitialState(
   }
 
   const pageSize = positiveInt(searchParams.get("ps"));
-  if (pageSize) {
+  if (pageSize && pageSize <= 1000) {
     state.pageSize = pageSize;
   }
 

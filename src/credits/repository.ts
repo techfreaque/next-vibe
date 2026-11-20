@@ -106,6 +106,7 @@ import {
   creditTransactions,
   type CreditWallet,
   creditWallets,
+  type PurchaseMetadata,
   type UsageUpstreamCost,
 } from "./db";
 import { getPoolBalance } from "./db-functions";
@@ -371,6 +372,7 @@ export class CreditRepository {
     logger: EndpointLogger,
     t: CreditsT,
     locale: CountryLanguage,
+    readOnly = false,
   ): Promise<ResponseType<CreditPool>> {
     try {
       // Lead connected to an account through strong links (login, same
@@ -378,7 +380,9 @@ export class CreditRepository {
       // pool. Sharing an IP never makes a guest part of an account.
       const ownerUserId = await CreditRepository.findPoolOwner(leadId);
       if (ownerUserId) {
-        return CreditRepository.getUserPool(ownerUserId, logger, t, locale);
+        return readOnly
+          ? CreditRepository.getUserPoolReadOnly(ownerUserId, logger, t)
+          : CreditRepository.getUserPool(ownerUserId, logger, t, locale);
       }
       const connectedLeadIds =
         await CreditRepository.findGuestPoolLeadIds(leadId);
@@ -390,7 +394,7 @@ export class CreditRepository {
         .where(inArray(creditWallets.leadId, connectedLeadIds));
 
       // If no wallets exist, create wallet for the PRIMARY lead only
-      if (leadWallets.length === 0) {
+      if (!readOnly && leadWallets.length === 0) {
         const walletResult = await CreditRepository.getOrCreateLeadWallet(
           leadId,
           logger,
@@ -2439,7 +2443,7 @@ export class CreditRepository {
   static async addUserCredits(
     userId: string,
     amount: number,
-    type: "subscription" | "permanent" | "free",
+    type: "subscription" | "permanent" | "free" | "bonus",
     logger: EndpointLogger,
     t: CreditsT,
     expiresAt?: Date,
@@ -2497,7 +2501,7 @@ export class CreditRepository {
               remaining: amount,
               type: packType,
               expiresAt: finalExpiresAt,
-              source: `${type}_purchase`,
+              source: type === "bonus" ? type : `${type}_purchase`,
               metadata: sessionId ? { sessionId } : {},
             })
             .onConflictDoNothing()
@@ -2518,9 +2522,11 @@ export class CreditRepository {
             .where(eq(creditWallets.id, wallet.id))
             .returning({ balance: creditWallets.balance });
 
-          const purchaseMetadata = sessionId
-            ? { sessionId, packQuantity: 1, totalPaid: 0, currency: "USD" }
-            : { packQuantity: 1 };
+          const purchaseMetadata: PurchaseMetadata = {
+            packQuantity: 1,
+            ...(sessionId && { sessionId, totalPaid: 0, currency: "USD" }),
+            ...(type === "bonus" && { bonusGrant: true }),
+          };
 
           await tx.insert(creditTransactions).values({
             walletId: wallet.id,
@@ -3580,10 +3586,14 @@ export class CreditRepository {
     );
 
     const transactions = await db
-      .select()
+      .select({
+        transaction: creditTransactions,
+        packSource: creditPacks.source,
+      })
       .from(creditTransactions)
+      .leftJoin(creditPacks, eq(creditPacks.id, creditTransactions.packId))
       .where(visible)
-      .orderBy(desc(creditTransactions.createdAt))
+      .orderBy(desc(creditTransactions.createdAt), desc(creditTransactions.id))
       .limit(adjustedLimit)
       .offset(adjustedOffset);
 
@@ -3593,9 +3603,13 @@ export class CreditRepository {
       .where(visible);
 
     const result: CreditTransactionOutput[] = transactions.map(
-      (transaction) => {
-        const grantLabel =
-          transaction.type === CreditTransactionType.FREE_GRANT
+      ({ transaction, packSource }) => {
+        const isBonusGrant =
+          transaction.type === CreditTransactionType.PURCHASE &&
+          (packSource === "bonus" || "bonusGrant" in transaction.metadata);
+        const grantLabel = isBonusGrant
+          ? t("history.get.bonusGrant")
+          : transaction.type === CreditTransactionType.FREE_GRANT
             ? CreditRepository.freeGrantLabel(transaction.metadata, t)
             : "signupCarryover" in transaction.metadata &&
                 transaction.metadata.signupCarryover
@@ -3784,6 +3798,7 @@ export class CreditRepository {
         logger,
         t,
         locale,
+        readOnly,
       );
       if (!poolResult.success) {
         return poolResult;
@@ -3795,7 +3810,9 @@ export class CreditRepository {
             logger,
             locale,
           );
-      const pool = await CreditRepository.refetchPoolWallets(poolResult.data);
+      const pool = readOnly
+        ? poolResult.data
+        : await CreditRepository.refetchPoolWallets(poolResult.data);
 
       const currentWallet = pool.leadWallets.find((w) => w.leadId === leadId);
       if (!currentWallet) {
@@ -4846,25 +4863,17 @@ export class CreditRepository {
     currency: "BTC" | "USDC" | "CREDITS",
     logger: EndpointLogger,
     t: CreditsT,
+    transaction?: Parameters<Parameters<typeof db.transaction>[0]>[0],
   ): Promise<ResponseType<void>> {
     try {
-      const walletResult = await CreditRepository.getOrCreateUserWallet(
-        userId,
-        logger,
-        t,
-      );
-      if (!walletResult.success) {
-        return walletResult;
-      }
-
-      const wallet = walletResult.data;
-
-      const txResult = await withTransaction(logger, async (tx) => {
+      const deduct = async (
+        tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+      ): Promise<ResponseType<void>> => {
         // Lock wallet row to prevent concurrent deductions
         const [lockedWallet] = await tx
           .select()
           .from(creditWallets)
-          .where(eq(creditWallets.id, wallet.id))
+          .where(eq(creditWallets.userId, userId))
           .for("update")
           .limit(1);
 
@@ -4881,7 +4890,7 @@ export class CreditRepository {
           .from(creditPacks)
           .where(
             and(
-              eq(creditPacks.walletId, wallet.id),
+              eq(creditPacks.walletId, lockedWallet.id),
               eq(creditPacks.type, CreditPackType.EARNED),
             ),
           )
@@ -4939,17 +4948,17 @@ export class CreditRepository {
             balance: sql`GREATEST(0, ${creditWallets.balance} - ${amountCents})`,
             updatedAt: new Date(),
           })
-          .where(eq(creditWallets.id, wallet.id));
+          .where(eq(creditWallets.id, lockedWallet.id));
 
         // Re-read for accurate balanceAfter
         const [updatedWallet] = await tx
           .select({ balance: creditWallets.balance })
           .from(creditWallets)
-          .where(eq(creditWallets.id, wallet.id));
+          .where(eq(creditWallets.id, lockedWallet.id));
 
         // Create REFERRAL_PAYOUT transaction
         await tx.insert(creditTransactions).values({
-          walletId: wallet.id,
+          walletId: lockedWallet.id,
           amount: -amountCents,
           balanceAfter: updatedWallet?.balance ?? 0,
           type: CreditTransactionType.REFERRAL_PAYOUT,
@@ -4962,8 +4971,11 @@ export class CreditRepository {
         });
 
         return success();
-      });
+      };
 
+      const txResult = await (transaction
+        ? deduct(transaction)
+        : withTransaction(logger, deduct));
       if (!txResult.success) {
         return txResult;
       }

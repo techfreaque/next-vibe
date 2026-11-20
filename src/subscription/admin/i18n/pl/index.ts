@@ -561,6 +561,8 @@ export const translations: typeof enTranslations = {
   },
   enums: {
     subscriptionStatusFilter: {
+      incomplete: "Nieukończona",
+      incompleteExpired: "Wygasła przed ukończeniem",
       all: "Wszystkie",
       active: "Aktywne",
       trialing: "Okres próbny",
@@ -580,6 +582,7 @@ export const translations: typeof enTranslations = {
       nowpayments: "NowPayments",
     },
     subscriptionSortField: {
+      periodEnd: "Koniec okresu",
       createdAt: "Data utworzenia",
       status: "Status",
       interval: "Okres",

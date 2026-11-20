@@ -51,6 +51,11 @@ export const translations: typeof enTranslations = {
   },
   estimateId: { label: "ID du devis", description: "Le devis concerné" },
   widget: {
+    send: "Envoyer le devis",
+    addLine: "Ajouter une ligne",
+    accept: "Enregistrer l’acceptation",
+    decline: "Enregistrer le refus",
+    openInvoice: "Ouvrir la facture",
     back: "Retour",
     submit: "Rechercher le devis",
     estimateNumber: "Devis",

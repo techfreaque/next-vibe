@@ -13,6 +13,7 @@ import {
   fail,
   success,
 } from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import { userLeadLinks } from "next-vibe/identity/lead/db";
 import { users } from "next-vibe/identity/user/db";
@@ -23,57 +24,84 @@ import { CreditRepository } from "../repository";
 import type {
   AdminAddCreditsPostRequestOutput,
   AdminAddCreditsPostResponseOutput,
+  GrantRecipientGetResponseOutput,
 } from "./definition";
 
 export class AdminAddCreditsRepository {
+  static async getRecipient(
+    targetUserId: string,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<GrantRecipientGetResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
+    try {
+      const [recipient] = await db
+        .select({
+          id: users.id,
+          email: users.email,
+          leadId: userLeadLinks.leadId,
+        })
+        .from(users)
+        .leftJoin(userLeadLinks, eq(userLeadLinks.userId, users.id))
+        .where(eq(users.id, targetUserId))
+        .limit(1);
+
+      if (!recipient) {
+        return fail({
+          message: t("adminAdd.post.errors.notFound.description"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      if (!recipient.leadId) {
+        return fail({
+          message: t("adminAdd.recipient.noLinkedDevice"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+
+      return success({ id: recipient.id, email: recipient.email });
+    } catch (error) {
+      logger.error(
+        "Failed to verify credit grant recipient",
+        parseError(error),
+        {
+          targetUserId,
+        },
+      );
+      return fail({
+        message: t("adminAdd.recipient.loadFailed"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+
   static async addCredits(
     data: AdminAddCreditsPostRequestOutput,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<AdminAddCreditsPostResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
-    // Verify the target user exists BEFORE touching wallets — otherwise wallet
-    // creation dies on the users FK and surfaces as an opaque 500 ("Failed to
-    // create wallet") instead of the honest NOT_FOUND.
-    const [targetUser] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.id, data.targetUserId))
-      .limit(1);
-    if (!targetUser) {
-      return fail({
-        message: t("adminAdd.post.errors.notFound.title"),
-        errorType: ErrorResponseTypes.NOT_FOUND,
-      });
+    const recipient = await AdminAddCreditsRepository.getRecipient(
+      data.targetUserId,
+      logger,
+      locale,
+    );
+    if (!recipient.success) {
+      return recipient;
     }
-    // Credit the user's REAL primary lead wallet — the same leadId the balance
-    // READ resolves (userLeadLinks[0], see CreditRepository.getBalance). Using
-    // targetUserId as the leadId funds a phantom wallet the read never sees, so
-    // the credited balance appears to vanish (and reads as Forbidden/empty when
-    // an AI tool queries it). The primary lead link is the first row for the user.
-    const [primaryLink] = await db
-      .select({ leadId: userLeadLinks.leadId })
-      .from(userLeadLinks)
-      .where(eq(userLeadLinks.userId, data.targetUserId))
-      .limit(1);
-    if (!primaryLink?.leadId) {
-      return fail({
-        message: t("adminAdd.post.errors.notFound.title"),
-        errorType: ErrorResponseTypes.NOT_FOUND,
-      });
-    }
-    const result = await CreditRepository.addCredits(
-      { userId: data.targetUserId, leadId: primaryLink.leadId },
+
+    const result = await CreditRepository.addUserCredits(
+      recipient.data.id,
       data.amount,
       "bonus",
       logger,
       t,
-      locale,
     );
     if (!result.success) {
       return result;
     }
     return success({
+      recipientId: recipient.data.id,
       message: t("repository.bonusCreditsAdded", { amount: data.amount }),
     });
   }

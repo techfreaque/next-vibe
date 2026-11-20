@@ -5,9 +5,10 @@ export const translations = {
     ap: "accounts-payable",
   },
   get: {
-    title: "AP Bills",
-    titleShort: "AP Bills",
-    description: "List supplier bills for a company",
+    title: "Supplier Bills",
+    titleShort: "Supplier Bills",
+    description:
+      "Search accounts payable by bill number, supplier name or bill ID, and filter by company or status.",
     errors: {
       validation: {
         title: "Validation Error",
@@ -53,6 +54,12 @@ export const translations = {
     description: "Filter by company",
     placeholder: "Company UUID",
   },
+  search: {
+    label: "Search documents",
+    description:
+      "Search accounts payable by bill number, supplier name or bill ID, and filter by company or status.",
+    placeholder: "Bill number, supplier or ID",
+  },
   status: {
     label: "Status",
     description: "Filter by bill status",
@@ -70,6 +77,7 @@ export const translations = {
     },
   },
   widget: {
+    pageCount: "Total pages",
     back: "Back",
     title: "Supplier Bills",
     newBill: "Record Bill",

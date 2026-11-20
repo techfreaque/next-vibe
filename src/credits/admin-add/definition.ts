@@ -27,6 +27,103 @@ const AdminAddCreditsContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.AdminAddCreditsContainer })),
 );
 
+const errorTypes = {
+  [EndpointErrorTypes.UNAUTHORIZED]: {
+    title: "adminAdd.post.errors.unauthorized.title" as const,
+    description: "adminAdd.post.errors.unauthorized.description" as const,
+  },
+  [EndpointErrorTypes.VALIDATION_FAILED]: {
+    title: "adminAdd.post.errors.validation.title" as const,
+    description: "adminAdd.post.errors.validation.description" as const,
+  },
+  [EndpointErrorTypes.FORBIDDEN]: {
+    title: "adminAdd.post.errors.forbidden.title" as const,
+    description: "adminAdd.post.errors.forbidden.description" as const,
+  },
+  [EndpointErrorTypes.NOT_FOUND]: {
+    title: "adminAdd.post.errors.notFound.title" as const,
+    description: "adminAdd.post.errors.notFound.description" as const,
+  },
+  [EndpointErrorTypes.CONFLICT]: {
+    title: "adminAdd.post.errors.conflict.title" as const,
+    description: "adminAdd.post.errors.conflict.description" as const,
+  },
+  [EndpointErrorTypes.NETWORK_ERROR]: {
+    title: "adminAdd.post.errors.network.title" as const,
+    description: "adminAdd.post.errors.network.description" as const,
+  },
+  [EndpointErrorTypes.UNSAVED_CHANGES]: {
+    title: "adminAdd.post.errors.unsavedChanges.title" as const,
+    description: "adminAdd.post.errors.unsavedChanges.description" as const,
+  },
+  [EndpointErrorTypes.SERVER_ERROR]: {
+    title: "adminAdd.post.errors.server.title" as const,
+    description: "adminAdd.post.errors.server.description" as const,
+  },
+  [EndpointErrorTypes.UNKNOWN_ERROR]: {
+    title: "adminAdd.post.errors.unknown.title" as const,
+    description: "adminAdd.post.errors.unknown.description" as const,
+  },
+};
+
+const GrantRecipientContainer = lazyWidget(() =>
+  import("./widget").then((m) => ({ default: m.GrantRecipientContainer })),
+);
+
+const { GET } = createEndpoint({
+  scopedTranslation,
+  method: Methods.GET,
+  path: ["credits", "admin-add"],
+  title: "adminAdd.recipient.title",
+  titleShort: "adminAdd.recipient.title",
+  description: "adminAdd.recipient.description",
+  category: "credits",
+  subCategory: "Management",
+  icon: "user",
+  tags: ["adminAdd.post.tag"],
+  allowedRoles: [UserRole.ADMIN],
+  fields: customWidgetObject({
+    render: GrantRecipientContainer,
+    usage: { request: "data", response: true },
+    children: {
+      targetUserId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "adminAdd.post.targetUserId.label",
+        description: "adminAdd.post.targetUserId.description",
+        schema: z.uuid(),
+        includeInCacheKey: true,
+      }),
+      id: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "adminAdd.recipient.accountId",
+        schema: z.uuid(),
+      }),
+      email: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "adminAdd.recipient.email",
+        schema: z.string(),
+      }),
+    },
+  }),
+  errorTypes,
+  successTypes: {
+    title: "adminAdd.recipient.title",
+    description: "adminAdd.recipient.description",
+  },
+  examples: {
+    requests: {
+      default: { targetUserId: "123e4567-e89b-12d3-a456-426614174000" },
+    },
+    responses: {
+      default: {
+        id: "123e4567-e89b-12d3-a456-426614174000",
+        email: "customer@example.test",
+      },
+    },
+  },
+});
+
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
@@ -76,7 +173,11 @@ const { POST } = createEndpoint({
         description: "adminAdd.post.amount.description" as const,
         placeholder: "adminAdd.post.amount.placeholder" as const,
         columns: 12,
-        schema: z.coerce.number().int().positive(),
+        schema: z.coerce.number().int().positive().max(9_999_999_999),
+      }),
+      recipientId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.uuid().optional(),
       }),
       message: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -100,44 +201,7 @@ const { POST } = createEndpoint({
     },
   }),
 
-  errorTypes: {
-    [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "adminAdd.post.errors.unauthorized.title" as const,
-      description: "adminAdd.post.errors.unauthorized.description" as const,
-    },
-    [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "adminAdd.post.errors.validation.title" as const,
-      description: "adminAdd.post.errors.validation.description" as const,
-    },
-    [EndpointErrorTypes.FORBIDDEN]: {
-      title: "adminAdd.post.errors.forbidden.title" as const,
-      description: "adminAdd.post.errors.forbidden.description" as const,
-    },
-    [EndpointErrorTypes.NOT_FOUND]: {
-      title: "adminAdd.post.errors.notFound.title" as const,
-      description: "adminAdd.post.errors.notFound.description" as const,
-    },
-    [EndpointErrorTypes.CONFLICT]: {
-      title: "adminAdd.post.errors.conflict.title" as const,
-      description: "adminAdd.post.errors.conflict.description" as const,
-    },
-    [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "adminAdd.post.errors.network.title" as const,
-      description: "adminAdd.post.errors.network.description" as const,
-    },
-    [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "adminAdd.post.errors.unsavedChanges.title" as const,
-      description: "adminAdd.post.errors.unsavedChanges.description" as const,
-    },
-    [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "adminAdd.post.errors.server.title" as const,
-      description: "adminAdd.post.errors.server.description" as const,
-    },
-    [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "adminAdd.post.errors.unknown.title" as const,
-      description: "adminAdd.post.errors.unknown.description" as const,
-    },
-  },
+  errorTypes,
 
   successTypes: {
     title: "adminAdd.post.success.title" as const,
@@ -150,6 +214,10 @@ const { POST } = createEndpoint({
         targetUserId: "123e4567-e89b-12d3-a456-426614174000",
         amount: 100,
       },
+      exactAmount: {
+        targetUserId: "123e4567-e89b-12d3-a456-426614174000",
+        amount: 137,
+      },
       large: {
         targetUserId: "123e4567-e89b-12d3-a456-426614174000",
         amount: 500,
@@ -157,15 +225,17 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
+        recipientId: "123e4567-e89b-12d3-a456-426614174000",
         message: "Successfully added 100 bonus credits",
       },
     },
   },
 });
 
+export type GrantRecipientGetResponseOutput = typeof GET.types.ResponseOutput;
 export type AdminAddCreditsPostRequestOutput = typeof POST.types.RequestOutput;
 export type AdminAddCreditsPostResponseOutput =
   typeof POST.types.ResponseOutput;
 
-const definitions = { POST };
+const definitions = { GET, POST };
 export default definitions;

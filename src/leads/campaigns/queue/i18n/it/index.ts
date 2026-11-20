@@ -12,31 +12,33 @@ export const translations: typeof enTranslations = {
       winback: "Winback",
       transactional: "Transazione",
       notification: "Notifica",
-      system: "Sistema"
+      system: "Sistema",
     },
     campaignTypeFilter: {
-      all: "Tutti"
-    }
+      all: "Tutti",
+    },
   },
   get: {
     title: "La campagna Quese",
     titleShort: "La campagna Quese",
-    description: "Visualizza l'elenco delle piste attualmente in campagne e-mail",
+    description:
+      "Visualizza l'elenco delle piste attualmente in campagne e-mail",
     fields: {
       page: {
         label: "Pagina",
-        description: "Numero di pagina"
+        description: "Numero di pagina",
       },
       pageSize: {
         label: "Dimensione della pagina",
-        description: "Numero di record per pagina"
+        description: "Numero di record per pagina",
       },
       campaignType: {
         label: "Tipo di campagna",
-        description: "Filtra per tipo di campagna"
-      }
+        description: "Filtra per tipo di campagna",
+      },
     },
     response: {
+      nextSubject: "Argomento programmato",
       leadId: "ID del contatto",
       leadEmail: "Email",
       businessName: "Affari",
@@ -51,52 +53,59 @@ export const translations: typeof enTranslations = {
       total: "Totale",
       page: "Pagina",
       pageSize: "Dimensione della pagina",
-      items: "Articoli di queue"
+      items: "Articoli di queue",
     },
     errors: {
       unauthorized: {
         title: "Autenticazione richiesta",
-        description: "Devi essere connesso per visualizzare la coda della campagna"
+        description:
+          "Devi essere connesso per visualizzare la coda della campagna",
       },
       forbidden: {
         title: "Accesso negato",
-        description: "Non hai il permesso di visualizzare la coda della campagna"
+        description:
+          "Non hai il permesso di visualizzare la coda della campagna",
       },
       server: {
         title: "Errore del server",
-        description: "Si è verificato un errore durante l'acquisizione della coda della campagna"
+        description:
+          "Si è verificato un errore durante l'acquisizione della coda della campagna",
       },
       unknown: {
         title: "Errore sconosciuto",
-        description: "Si è verificato un errore sconosciuto"
+        description: "Si è verificato un errore sconosciuto",
       },
       validation: {
         title: "Errore di convalida",
-        description: "Parametri di ingresso non validi"
-      }
+        description: "Parametri di ingresso non validi",
+      },
     },
     success: {
       title: "Rilevamento di queue",
-      description: "La coda della campagna recuperata con successo"
-    }
+      description: "La coda della campagna recuperata con successo",
+    },
   },
   widget: {
     title: "La campagna Quese",
     refresh: "Aggiorna",
     noData: "Nessuna coda di campagna",
-    emptyDescription: "Qui vengono visualizzate e-mail di queued e la campagna attiva.",
-    empty: "Nessun contatto trovato",
-    columnEmail: "Email",
-    columnBusiness: "Attività",
-    columnType: "Tipo",
-    columnStage: "Fase",
-    columnVariant: "Variante",
-    columnNext: "Prossima email",
-    columnSent: "Inviata",
-    columnOpen: "Aperta",
-    columnClick: "Clic sul link",
-    columnStarted: "Inizio",
-    never: "Mai",
-    pagination: "Pagina {{page}} di {{totalPages}} · {{total}} conduce"
-  }
+    emptyDescription:
+      "Qui vengono visualizzate e-mail di queued e la campagna attiva.",
+    back: "Indietro",
+    loading: "Caricamento della coda della campagna",
+    selectedLead: "Guida selezionata",
+    clearFilters: "Cancella filtri",
+    leadEmpty: "Nessuna voce di coda per questo comando",
+    firstPage: "Vai alla prima pagina",
+    scheduledFor: "Programmato per {{date}}",
+    noScheduledEmail: "Nessuna e-mail in programma",
+    deliveryStats:
+      "{{sent}} ha inviato · {{opened}} aperto · {{clicked}} cliccato",
+    startedOn: "Iniziato {{date}}",
+    openLead: "Apri la scheda del lead",
+    openLeadNamed: "Open lead {{recipient}}",
+    previous: "Precedente",
+    next: "Avanti",
+    pagination: "Pagina {{page}} di {{totalPages}} · {{total}} conduce",
+  },
 };

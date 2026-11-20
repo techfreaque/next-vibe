@@ -10,6 +10,7 @@
 
 import type { pathToAliasMap } from "@/generated/endpoints/alias-map-dev";
 
+import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
 import type { CountryLanguage } from "../core/i18n/core/config";
 import type { UserPermissionRole } from "../identity/roles/enum";
 import type { IconKey } from "../unified-ui/widgets/form-fields/icon-field/icons";
@@ -30,6 +31,20 @@ export interface SubcategoryDefinition {
   order: number;
   /** Display labels per locale */
   label: Partial<Record<CountryLanguage, string>>;
+}
+
+export interface RecordSearchDestination<
+  TEndpoint extends CreateApiEndpointAny = CreateApiEndpointAny,
+> {
+  alias: keyof typeof pathToAliasMap;
+  field: Extract<
+    {
+      [
+        TKey in keyof TEndpoint["types"]["RequestInput"]
+      ]: string extends TEndpoint["types"]["RequestInput"][TKey] ? TKey : never;
+    }[keyof TEndpoint["types"]["RequestInput"]],
+    string
+  >;
 }
 
 /**
@@ -60,6 +75,8 @@ export interface CategoryDefinition {
 
   /** Named sub-sections within this category */
   subcategories?: Record<string, SubcategoryDefinition>;
+  /** Optional local admin lookup into an existing GET list's string filter. */
+  recordSearch?: RecordSearchDestination;
 }
 
 /**
@@ -79,6 +96,7 @@ export interface CategoryDefinitionSerialized {
   defaultEntryAlias?: string;
   /** URL path to navigate to instead of opening an endpoint */
   defaultEntryLink?: string;
+  recordSearch?: { alias: string; field: string };
   subcategories?: Record<
     string,
     {

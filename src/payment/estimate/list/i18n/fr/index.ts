@@ -10,7 +10,8 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Devis",
     titleShort: "Devis",
-    description: "Obtenir la liste paginée des devis d'une entreprise",
+    description:
+      "Recherchez par numéro de devis, client, e-mail, titre ou identifiant. Filtrez par entreprise ou statut.",
     form: {
       title: "Filtres des devis",
       description: "Filtrer et paginer les devis",
@@ -78,6 +79,12 @@ export const translations: typeof enTranslations = {
     description: "Filtrer par entreprise",
     placeholder: "Saisissez l'ID de l'entreprise",
   },
+  search: {
+    label: "Rechercher des documents",
+    description:
+      "Recherchez par numéro de devis, client, e-mail, titre ou identifiant. Filtrez par entreprise ou statut.",
+    placeholder: "Numéro de devis, client ou titre",
+  },
   status: {
     label: "Statut",
     description: "Filtrer par statut",
@@ -97,6 +104,7 @@ export const translations: typeof enTranslations = {
     description: "Éléments par page",
   },
   widget: {
+    pageCount: "Nombre de pages",
     back: "Retour",
     title: "Devis",
     newEstimate: "Nouveau devis",

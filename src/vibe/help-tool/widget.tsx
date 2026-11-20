@@ -20,6 +20,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "next-vibe/ui/components/dropdown-menu";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { Bot } from "next-vibe/ui/components/icons/Bot";
 import { Check } from "next-vibe/ui/components/icons/Check";
@@ -40,6 +41,7 @@ import { Terminal } from "next-vibe/ui/components/icons/Terminal";
 import { X } from "next-vibe/ui/components/icons/X";
 import { Zap } from "next-vibe/ui/components/icons/Zap";
 import { Input } from "next-vibe/ui/components/input";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { AnimatePresence, MotionDiv } from "next-vibe/ui/components/motion";
 import { Pre } from "next-vibe/ui/components/pre";
 import { ResizableContainer } from "next-vibe/ui/components/resizable";
@@ -89,6 +91,11 @@ import {
 import { Logo } from "@/_pages/_components/logo";
 import { ThemeToggleDropdown } from "@/_pages/_components/theme-toggle";
 import {
+  copyCatalogSearchParams,
+  parseToolsInitialState,
+  readEndpointSearchParams,
+} from "@/_pages/tools/initial-state";
+import {
   ADMIN_GROUPS,
   CATEGORY_REGISTRY,
 } from "@/generated/categories/registry";
@@ -106,9 +113,12 @@ import favoritesListDefinition from "../agent/skills/favorites/definition";
 import { endpointToUrlSegment } from "../core/core-utils/path";
 import type { NavigationStackEntry } from "../core/definition/endpoint";
 import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
+import { coreClientEnv } from "../core/env-client";
 import { useTranslation } from "../core/i18n/core/client";
+import { permissionsRegistry } from "../core/permissions/registry";
+import { parseError } from "../core/utils/parse-error";
 import { EXECUTE_TOOL_ALIAS } from "../execute-tool/constants";
-import { UserPermissionRole } from "../identity/roles/enum";
+import { PlatformMarker, UserPermissionRole } from "../identity/roles/enum";
 import { Platform } from "../platforms/platforms";
 import { VibeFrameHost } from "../platforms/vibe-frame/VibeFrameHost";
 import remoteConnectionListDefinition from "../remote-connection/list/definition";
@@ -122,6 +132,7 @@ import {
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetPlatform,
+  useWidgetResponse,
   useWidgetUser,
   useWidgetValue,
 } from "../unified-ui/_shared/use-widget-context";
@@ -132,6 +143,7 @@ import { useUrlNavStack } from "../unified-ui/hooks/use-url-nav-stack";
 import { EndpointsPage } from "../unified-ui/renderers/web/EndpointsPage";
 import { Icon } from "../unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { IconKey } from "../unified-ui/widgets/form-fields/icon-field/icons";
+import { AdminCatalog, localizedLabel } from "./admin-catalog";
 import type { CategoryDefinitionSerialized } from "./category-types";
 import type definition from "./definition";
 import type {
@@ -139,47 +151,54 @@ import type {
   HelpToolMetadataSerialized,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
+import { resolveEffectiveUser } from "./repository/meta-filter";
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
-/** URL path segment for the tools browser (after locale prefix) */
-/**
- * Category labels are keyed by full locale ("fr-FR"). A country variant
- * without its own entry (fr-GLOBAL, de-PL) uses any label of its language.
- */
-function localizedLabel(
-  labels: Record<string, string>,
-  locale: string,
-): string | undefined {
-  const exact = labels[locale];
-  if (exact !== undefined) {
-    return exact;
-  }
-  const language = `${locale.split("-")[0]}-`;
-  const sameLanguage = Object.keys(labels).find((key) =>
-    key.startsWith(language),
-  );
-  return sameLanguage === undefined ? undefined : labels[sameLanguage];
-}
-
 const ADMIN_ENDPOINTS_PATH = "tools";
 
-/**
- * Search params that belong to the sidebar/filter state and must survive
- * when switching between tools. Everything else is endpoint-specific (e.g. "id")
- * and must be cleared when the user picks a different tool from the sidebar.
- */
-const FILTER_PARAM_KEYS = new Set([
-  "q",
-  "sf",
-  "prod",
-  "view",
-  "inst",
-  "p",
-  "ps",
-  "cat",
-  "sub",
-]);
+type StatsFilter = NonNullable<HelpGetRequestInput["statsFilter"]>;
+
+function toolAliasFromPathname(pathname: string): string {
+  const segments = pathname.split("/");
+  const mount = segments.indexOf(ADMIN_ENDPOINTS_PATH);
+  return mount === -1 ? "" : segments.slice(mount + 1).join("/");
+}
+
+function splitToolInputs(
+  endpoint: CreateApiEndpointAny,
+  args: Record<string, string>,
+): {
+  urlPathParams?: Record<string, string>;
+  data?: Record<string, string>;
+} {
+  const pathParamKeys = new Set(
+    endpoint.path
+      .filter((segment) => segment.startsWith("["))
+      .map((segment) => segment.slice(1, -1)),
+  );
+  const urlPathParams: Record<string, string> = {};
+  const data: Record<string, string> = {};
+  for (const [key, value] of Object.entries(args)) {
+    (pathParamKeys.has(key) ? urlPathParams : data)[key] = value;
+  }
+  return {
+    urlPathParams:
+      Object.keys(urlPathParams).length > 0 ? urlPathParams : undefined,
+    data: Object.keys(data).length > 0 ? data : undefined,
+  };
+}
+
+async function resolveCatalogEndpoint(
+  toolName: string,
+): Promise<CreateApiEndpointAny | null> {
+  const endpoint = await resolveEndpoint(toolName);
+  if (endpoint || coreClientEnv.NODE_ENV === "production") {
+    return endpoint;
+  }
+  const { getEndpoint } = await import("@/generated/endpoints/endpoint-dev");
+  return getEndpoint(toolName);
+}
 
 // Prevents the admin two-pane layout from rendering recursively when HelpToolsWidget
 // is mounted inside another HelpToolsWidget's EndpointsPage.
@@ -412,6 +431,31 @@ export function HelpToolsWidget(): JSX.Element {
   const onSubmit = useWidgetOnSubmit();
   const endpointMutations = useWidgetEndpointMutations();
   const disabled = useWidgetDisabled();
+  const isAdminUser =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+  const prodOnly = form.watch("includeProdOnly") ?? false;
+  const activeViewAsRole = isAdminUser ? form.watch("viewAsRole") : undefined;
+  const activeInstanceId = form.watch("instanceId");
+  const triggerRefetchRef = useRef<() => void>(() => undefined);
+  const canOpenLocalEndpoint = useCallback(
+    (endpoint: CreateApiEndpointAny): boolean => {
+      const values = form.getValues();
+      return (
+        !values.instanceId &&
+        (!values.includeProdOnly ||
+          !endpoint.allowedRoles.includes(PlatformMarker.PRODUCTION_OFF)) &&
+        permissionsRegistry.validateEndpointAccess(
+          endpoint,
+          resolveEffectiveUser(
+            user,
+            isAdminUser ? values.viewAsRole : undefined,
+          ),
+          platform,
+        ).allowed
+      );
+    },
+    [form, isAdminUser, platform, user],
+  );
 
   // Two-pane sidebar mode when on /tools path.
   // Disabled if this widget is nested inside another HelpToolsWidget's admin layout
@@ -420,14 +464,28 @@ export function HelpToolsWidget(): JSX.Element {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isAdminLayout =
-    !isInsideAdminLayout && (pathname?.includes("/tools") ?? false);
+    !isInsideAdminLayout && pathname.split("/").includes(ADMIN_ENDPOINTS_PATH);
   const [selectedAdminEndpoint, setSelectedAdminEndpointState] =
     useState<CreateApiEndpointAny | null>(null);
+  const [unavailableSelection, setUnavailableSelection] = useState(false);
+  const [isRestoringTool, setIsRestoringTool] = useState(
+    () => !!toolAliasFromPathname(pathname),
+  );
+  const [selectedGetInputs, setSelectedGetInputs] = useState<
+    ReturnType<typeof splitToolInputs>
+  >({});
   const selectedAdminEndpointRef = useRef<CreateApiEndpointAny | null>(null);
+  const selectionRevision = useRef(0);
   const setSelectedAdminEndpoint = useCallback(
-    (ep: CreateApiEndpointAny | null): void => {
+    (
+      ep: CreateApiEndpointAny | null,
+      args: Record<string, string> = {},
+    ): void => {
       selectedAdminEndpointRef.current = ep;
       setSelectedAdminEndpointState(ep);
+      setSelectedGetInputs(
+        ep?.method === "GET" ? splitToolInputs(ep, args) : {},
+      );
     },
     [],
   );
@@ -438,22 +496,10 @@ export function HelpToolsWidget(): JSX.Element {
 
   const silentHistory = useSilentHistory();
 
-  // Stable refs so callbacks always read current values without re-creating
-  const pathnameRef = useRef(pathname);
-  const searchParamsRef = useRef(searchParams);
-  // Declared before the mount effect below so the refs are current when it runs
-  useEffect(() => {
-    pathnameRef.current = pathname;
-    searchParamsRef.current = searchParams;
-  });
-
-  // Track the effective current pathname + search across silent pushState/replaceState calls.
-  // usePathname() / useSearchParams() only reflect router-aware navigations, not silent writes.
-  // Every silent push/replace must go through writeSilentUrl() which keeps these in sync.
+  // Router state can lag silent writes. Track the effective browser location explicitly.
+  const routerSearch = searchParams.toString();
   const effectivePathnameRef = useRef(pathname);
-  const effectiveSearchRef = useRef(
-    new URLSearchParams(searchParams.toString()),
-  );
+  const effectiveSearchRef = useRef(new URLSearchParams(routerSearch));
 
   // Single point for all silent URL writes — keeps effective refs in sync.
   const writeSilentUrl = useCallback(
@@ -471,83 +517,79 @@ export function HelpToolsWidget(): JSX.Element {
     [silentHistory],
   );
 
-  const parseAdminSidebarPath = useCallback(
-    (): string[] => parseSidebarPathFromSearch(effectiveSearchRef.current),
-    [],
-  );
-
   // Admin launcher sidebar navigation: path of [catKey] or [catKey, subKey]
   // Initialized from URL search params so state survives reload and back/forward.
   const [sidebarPath, setSidebarPathRaw] = useState<string[]>(() =>
     isAdminLayout ? parseSidebarPathFromSearch(searchParams) : [],
   );
 
-  // Ref so the mount effect (below) can access urlNavStack which is declared later.
   const urlNavStackRef = useRef<ReturnType<typeof useUrlNavStack>>(undefined);
-  // Guard so the seed-on-mount effect only runs once.
-  const didSeedRef = useRef(false);
 
-  // Resolve initial base endpoint from URL on mount.
-  // When the URL has endpoint-specific params (e.g. ?id=xxx after a page refresh
-  // at a deep path like leads/lead/[id]), seed the nav stack so the params are applied.
-  useEffect(() => {
-    if (didSeedRef.current) {
+  const restoreBaseTool = useCallback(async (): Promise<void> => {
+    const revision = ++selectionRevision.current;
+    const alias = toolAliasFromPathname(effectivePathnameRef.current);
+    setUnavailableSelection(false);
+    if (!alias) {
+      setSelectedAdminEndpoint(null);
+      setIsRestoringTool(false);
       return;
     }
-    didSeedRef.current = true;
-    if (!isAdminLayout) {
+    setIsRestoringTool(true);
+    let endpointDef: CreateApiEndpointAny | null = null;
+    try {
+      endpointDef = await resolveCatalogEndpoint(alias);
+    } catch (error) {
+      logger.warn("Could not load catalog endpoint", {
+        error: parseError(error).message,
+      });
+    }
+    if (revision !== selectionRevision.current) {
       return;
     }
-    const pathParts = pathnameRef.current.split("/");
-    const toolsIdx = pathParts.indexOf("tools");
-    const toolSlug =
-      toolsIdx !== -1 ? pathParts.slice(toolsIdx + 1).join("/") : "";
-    const toolToLoad = toolSlug || null;
-
-    if (toolToLoad) {
-      void (async (): Promise<void> => {
-        const endpointDef = await resolveEndpoint(toolToLoad);
-        if (endpointDef) {
-          setSelectedAdminEndpoint(endpointDef);
-          // Collect endpoint-specific params from search (non-filter keys).
-          const params: Record<string, string> = {};
-          searchParamsRef.current.forEach((v, k) => {
-            if (!FILTER_PARAM_KEYS.has(k)) {
-              params[k] = v;
-            }
-          });
-          if (Object.keys(params).length > 0) {
-            // Determine which params are path params vs data params.
-            const pathParamKeys = new Set(
-              endpointDef.path
-                .filter((s) => s.startsWith("["))
-                .map((s) => s.slice(1, -1)),
-            );
-            const urlPathParams: Record<string, string> = {};
-            const data: Record<string, string> = {};
-            for (const [k, v] of Object.entries(params)) {
-              if (pathParamKeys.has(k)) {
-                urlPathParams[k] = v;
-              } else {
-                data[k] = v;
-              }
-            }
-            urlNavStackRef.current?._seedStack({
-              endpoint: endpointDef,
-              params: {
-                urlPathParams:
-                  Object.keys(urlPathParams).length > 0
-                    ? urlPathParams
-                    : undefined,
-                data: Object.keys(data).length > 0 ? data : undefined,
-              },
-              timestamp: Date.now(),
-            });
-          }
-        }
-      })();
+    if (endpointDef && canOpenLocalEndpoint(endpointDef)) {
+      const params = readEndpointSearchParams(effectiveSearchRef.current);
+      setSelectedAdminEndpoint(endpointDef, params);
+      if (endpointDef.method !== "GET" && Object.keys(params).length > 0) {
+        urlNavStackRef.current?._seedStack({
+          endpoint: endpointDef,
+          params: splitToolInputs(endpointDef, params),
+          timestamp: Date.now(),
+        });
+      }
+    } else {
+      setSelectedAdminEndpoint(null);
+      setUnavailableSelection(true);
     }
-  }, [isAdminLayout, setSelectedAdminEndpoint]);
+    setIsRestoringTool(false);
+  }, [canOpenLocalEndpoint, logger, setSelectedAdminEndpoint]);
+
+  const restoreCatalogFilters = useCallback((): void => {
+    setSidebarPathRaw(parseSidebarPathFromSearch(effectiveSearchRef.current));
+    const filters = parseToolsInitialState(effectiveSearchRef.current);
+    const previous = form.getValues();
+    const changed =
+      previous.query !== filters.query ||
+      previous.category !== filters.category ||
+      previous.subCategory !== filters.subCategory ||
+      previous.statsFilter !== filters.statsFilter ||
+      previous.page !== filters.page ||
+      previous.pageSize !== filters.pageSize ||
+      previous.instanceId !== filters.instanceId ||
+      previous.includeProdOnly !== filters.includeProdOnly ||
+      previous.viewAsRole !== filters.viewAsRole;
+    if (changed) {
+      form.setValue("query", filters.query);
+      form.setValue("category", filters.category);
+      form.setValue("subCategory", filters.subCategory);
+      form.setValue("statsFilter", filters.statsFilter);
+      form.setValue("page", filters.page);
+      form.setValue("pageSize", filters.pageSize);
+      form.setValue("instanceId", filters.instanceId);
+      form.setValue("includeProdOnly", filters.includeProdOnly);
+      form.setValue("viewAsRole", filters.viewAsRole);
+      setTimeout(triggerRefetchRef.current, 50);
+    }
+  }, [form]);
 
   // ── Admin tool-pane navigation stack (URL-synced) ──────────────────────────
   // Each nav push/replace encodes the ACTIVE endpoint as:
@@ -565,10 +607,10 @@ export function HelpToolsWidget(): JSX.Element {
     (
       entry: { alias: string; params: Record<string, string> } | null,
     ): string => {
-      const sp = new URLSearchParams(effectiveSearchRef.current.toString());
       if (entry) {
+        const sp = copyCatalogSearchParams(effectiveSearchRef.current);
         for (const [k, v] of Object.entries(entry.params)) {
-          sp.set(k, v);
+          sp.set(`arg.${k}`, v);
         }
         const path = `/${locale}/${ADMIN_ENDPOINTS_PATH}/${entry.alias}`;
         // Update effective refs eagerly so other reads see the new state.
@@ -578,7 +620,9 @@ export function HelpToolsWidget(): JSX.Element {
       }
       return (
         effectivePathnameRef.current +
-        (sp.toString() ? `?${sp.toString()}` : "")
+        (effectiveSearchRef.current.size > 0
+          ? `?${effectiveSearchRef.current.toString()}`
+          : "")
       );
     },
     [locale, effectiveSearchRef, effectivePathnameRef],
@@ -590,20 +634,19 @@ export function HelpToolsWidget(): JSX.Element {
     alias: string;
     params: Record<string, string>;
   } | null => {
-    const pathParts = effectivePathnameRef.current.split("/");
-    const toolsIdx = pathParts.indexOf("tools");
-    // Collect all segments after /tools/ to support deep paths (path+method fallback)
-    const alias =
-      toolsIdx !== -1 ? pathParts.slice(toolsIdx + 1).join("/") : "";
+    const alias = toolAliasFromPathname(effectivePathnameRef.current);
     if (!alias) {
       return null;
     }
-    const params: Record<string, string> = {};
-    effectiveSearchRef.current.forEach((v, k) => {
-      if (!FILTER_PARAM_KEYS.has(k)) {
-        params[k] = v;
-      }
-    });
+    const params = readEndpointSearchParams(effectiveSearchRef.current);
+    const base = selectedAdminEndpointRef.current;
+    if (
+      !base ||
+      (alias === endpointToUrlSegment(base) &&
+        (base.method === "GET" || Object.keys(params).length === 0))
+    ) {
+      return null;
+    }
     return { alias, params };
   }, []);
 
@@ -632,6 +675,8 @@ export function HelpToolsWidget(): JSX.Element {
       // Restore effective refs from the real browser URL on back/forward.
       effectivePathnameRef.current = getCurrentPathname();
       effectiveSearchRef.current = new URLSearchParams(getCurrentSearch());
+      selectionRevision.current += 1;
+      setIsRestoringTool(!!toolAliasFromPathname(effectivePathnameRef.current));
       handler();
     };
     return addWindowListener("popstate", wrappedHandler);
@@ -645,45 +690,82 @@ export function HelpToolsWidget(): JSX.Element {
     onPopState: subscribePopState,
     onStackRestored: useCallback(
       (restored: NavigationStackEntry | null): void => {
-        setSidebarPathRaw(parseAdminSidebarPath());
+        restoreCatalogFilters();
         if (!restored) {
-          // Back at base — resolve base endpoint from path (join all segments after /tools/)
-          const pathParts = effectivePathnameRef.current.split("/");
-          const toolsIdx = pathParts.indexOf("tools");
-          const toolSlug =
-            toolsIdx !== -1 ? pathParts.slice(toolsIdx + 1).join("/") : "";
-          if (toolSlug) {
-            void (async (): Promise<void> => {
-              const endpointDef = await resolveEndpoint(toolSlug);
-              setSelectedAdminEndpoint(endpointDef ?? null);
-            })();
-          } else {
-            setSelectedAdminEndpoint(null);
-          }
+          void restoreBaseTool();
+          return;
         }
+        const allowed = canOpenLocalEndpoint(restored.endpoint);
+        if (!allowed) {
+          urlNavStackRef.current?._clearStack();
+          setSelectedAdminEndpoint(null);
+        }
+        setUnavailableSelection(!allowed);
+        setIsRestoringTool(false);
       },
-      [parseAdminSidebarPath, setSelectedAdminEndpoint],
+      [
+        canOpenLocalEndpoint,
+        restoreBaseTool,
+        restoreCatalogFilters,
+        setSelectedAdminEndpoint,
+      ],
     ),
   });
   useEffect(() => {
     urlNavStackRef.current = urlNavStack;
   });
 
-  // selectedAdminEndpoint is ONLY changed by:
-  //   1. handleOpenTool (sidebar click → sets base endpoint, clears nav stack)
-  //   2. onStackRestored (browser back → resolves base endpoint from URL)
-  //   3. Initial mount (resolveEndpoint from URL path)
-  //
-  // Sub-navigations within EndpointsPage (pickers, create forms) push to urlNavStack
-  // but must NOT change selectedAdminEndpoint — that would change the key prop and
-  // cause a full remount, wiping the UI state.
+  const lastRouterLocation = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (!isAdminLayout) {
+      return;
+    }
+    const observed = `${pathname}?${routerSearch}`;
+    const previous = lastRouterLocation.current;
+    if (observed === previous) {
+      return;
+    }
+    lastRouterLocation.current = observed;
+    const browserSearch = new URLSearchParams(getCurrentSearch());
+    if (
+      pathname !== getCurrentPathname() ||
+      routerSearch !== browserSearch.toString()
+    ) {
+      return;
+    }
+    if (
+      previous !== undefined &&
+      effectivePathnameRef.current === pathname &&
+      effectiveSearchRef.current.toString() === routerSearch
+    ) {
+      return;
+    }
+    // A loader or Link updated the router, independent of our silent history.
+    effectivePathnameRef.current = pathname;
+    effectiveSearchRef.current = browserSearch;
+    urlNavStackRef.current?._clearStack();
+    restoreCatalogFilters();
+    void restoreBaseTool();
+  }, [
+    isAdminLayout,
+    pathname,
+    restoreBaseTool,
+    restoreCatalogFilters,
+    routerSearch,
+  ]);
 
-  const [adminSidebarCollapsed, setAdminSidebarCollapsed] = useSidebarCollapsed(
-    "admin-endpoints-sidebar",
-  );
+  const [desktopSidebarCollapsed, setDesktopSidebarCollapsed] =
+    useSidebarCollapsed("admin-endpoints-sidebar");
   const [localeDialogOpen, setLocaleDialogOpen] = useState(false);
   const { width: windowWidth } = useWindowSize();
   const isMobile = windowWidth < 930;
+  const [mobileSidebarCollapsed, setMobileSidebarCollapsed] = useState(true);
+  const adminSidebarCollapsed = isMobile
+    ? mobileSidebarCollapsed
+    : desktopSidebarCollapsed;
+  const setAdminSidebarCollapsed = isMobile
+    ? setMobileSidebarCollapsed
+    : setDesktopSidebarCollapsed;
 
   const translationContext = useTranslation();
 
@@ -792,21 +874,20 @@ export function HelpToolsWidget(): JSX.Element {
   );
 
   // Load active favorite's tool config
+  const canReadFavorite = !user.isPublic && !!effectiveFavoriteId;
   const favoriteState = useEndpoint(
     favoriteByIdDefinition,
     useMemo(
       () => ({
         read: {
-          urlPathParams: effectiveFavoriteId
-            ? { id: effectiveFavoriteId }
-            : { id: "" },
+          urlPathParams: { id: effectiveFavoriteId ?? "" },
           queryOptions: {
-            enabled: !user?.isPublic && !!effectiveFavoriteId,
+            enabled: canReadFavorite,
             refetchOnWindowFocus: false,
           },
         },
       }),
-      [effectiveFavoriteId, user?.isPublic],
+      [canReadFavorite, effectiveFavoriteId],
     ),
     logger,
     user,
@@ -934,45 +1015,48 @@ export function HelpToolsWidget(): JSX.Element {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(),
   );
-  // Stable refs for functions declared later — allows setSidebarPath to call them
-  // without a forward-declaration error (all are assigned before any render call).
-  const syncFilterParamsToUrlRef = useRef<
-    (overrides?: Partial<HelpGetRequestInput>) => void
-  >(() => undefined);
-  const triggerRefetchRef = useRef<() => void>(() => undefined);
-  const handleOpenToolRef = useRef<(toolName: string) => Promise<void>>(
-    async () => undefined,
-  );
-
   const setSidebarPath = useCallback(
-    (path: string[], catValue?: string, defaultEntryAlias?: string): void => {
+    (path: string[], filter?: StatsFilter): void => {
       setSidebarPathRaw(path);
-      if (isAdminLayout) {
-        const sp = new URLSearchParams(effectiveSearchRef.current.toString());
-        if (path[0]) {
-          sp.set("cat", path[0]);
-        } else {
-          sp.delete("cat");
-        }
-        if (path[1]) {
-          sp.set("sub", path[1]);
-        } else {
-          sp.delete("sub");
-        }
-        writeSilentUrl(effectivePathnameRef.current, sp);
-        // Open the category's default endpoint in the main pane immediately.
-        if (defaultEntryAlias) {
-          void handleOpenToolRef.current(defaultEntryAlias);
-        }
+      const sp = copyCatalogSearchParams(effectiveSearchRef.current);
+      sp.delete("cat");
+      sp.delete("sub");
+      sp.delete("p");
+      if (path[0]) {
+        sp.set("cat", path[0]);
       }
-      // Sync category form field so the server filters tools for this category.
-      // catValue is the actual value to filter by (e.g. catDef.key or subCategory name).
-      // When clearing (path=[]), clear the category field too.
-      form.setValue("category", catValue ?? undefined);
-      syncFilterParamsToUrlRef.current({ category: catValue ?? undefined });
+      if (path[1]) {
+        sp.set("sub", path[1]);
+      }
+      const nextFilter = filter ?? form.getValues("statsFilter") ?? "webPinned";
+      if (nextFilter === "webPinned" && !path[0]) {
+        sp.delete("sf");
+      } else {
+        sp.set("sf", nextFilter);
+      }
+      form.setValue("category", path[0], { shouldDirty: true });
+      form.setValue("subCategory", path[1], { shouldDirty: true });
+      form.setValue("statsFilter", nextFilter, { shouldDirty: true });
+      form.setValue("page", undefined, { shouldDirty: true });
+      selectionRevision.current += 1;
+      setSelectedAdminEndpoint(null);
+      setUnavailableSelection(false);
+      setIsRestoringTool(false);
+      urlNavStackRef.current?._clearStack();
+      writeSilentUrl(`/${locale}/${ADMIN_ENDPOINTS_PATH}`, sp, true);
+      if (isMobile) {
+        setAdminSidebarCollapsed(true);
+      }
       setTimeout(triggerRefetchRef.current, 50);
     },
-    [isAdminLayout, writeSilentUrl, form],
+    [
+      form,
+      isMobile,
+      locale,
+      setAdminSidebarCollapsed,
+      setSelectedAdminEndpoint,
+      writeSilentUrl,
+    ],
   );
 
   // Browser Back/Forward is handled by useUrlNavStack hook.
@@ -987,6 +1071,7 @@ export function HelpToolsWidget(): JSX.Element {
   // SSR renders from a per-request query cache (QueryProvider
   // isolateServerRender), so the server and hydrating client agree.
   const response = useWidgetValue<typeof definition.GET>();
+  const endpointResponse = useWidgetResponse();
   const isFetching = endpointMutations?.read?.isFetching ?? false;
   const availableTools: HelpToolMetadataSerialized[] = useMemo(
     () => response?.tools ?? [],
@@ -1010,6 +1095,7 @@ export function HelpToolsWidget(): JSX.Element {
   const skillAllowedDefault: string[] | null =
     response?.skillAllowedDefault ?? null;
   const categories = response?.categories ?? [];
+  const webCategories = response?.webCategories ?? [];
   const hint = response?.hint;
 
   // Track whether there's ever been a successful response — used to distinguish
@@ -1024,18 +1110,7 @@ export function HelpToolsWidget(): JSX.Element {
   const currentPlatform = response?.currentPlatform;
   const currentEnv = response?.currentEnv;
 
-  // Check if user has admin role (for initial render before response comes back)
-  const isAdminUser = useMemo(
-    () => !user?.isPublic && user?.roles?.includes(UserPermissionRole.ADMIN),
-    [user],
-  );
-
-  // prodOnly / instanceId - read from form (already requestFields in definition)
-  const prodOnly = form.watch("includeProdOnly") ?? false;
-  const activeViewAsRole = form.watch("viewAsRole");
-
   // Instance switcher - fetch connected remote instances
-  const activeInstanceId = form.watch("instanceId");
   const endpointOptions = useMemo(() => {
     return {
       read: {
@@ -1163,71 +1238,6 @@ export function HelpToolsWidget(): JSX.Element {
     return map;
   }, []);
 
-  // Group tools by AdminGroup via direct category key match
-  const toolsByGroup = useMemo((): Map<
-    string,
-    {
-      catDef: CategoryDefinitionSerialized;
-      tools: HelpToolMetadataSerialized[];
-    }[]
-  > => {
-    const map = new Map<
-      string,
-      {
-        catDef: CategoryDefinitionSerialized;
-        tools: HelpToolMetadataSerialized[];
-      }[]
-    >();
-    const byCatKey = new Map<string, HelpToolMetadataSerialized[]>();
-
-    for (const tool of visibleTools) {
-      // Direct key match - category is now a plain key (e.g. "ai", "userAuth")
-      const registryKey: string | undefined = tool.category;
-      const catDef = registryKey ? categoryByKey.get(registryKey) : undefined;
-      const bucket = catDef?.key ?? "__other__";
-      if (!byCatKey.has(bucket)) {
-        byCatKey.set(bucket, []);
-      }
-      byCatKey.get(bucket)!.push(tool);
-    }
-
-    for (const group of ADMIN_GROUPS) {
-      const entries: {
-        catDef: CategoryDefinitionSerialized;
-        tools: HelpToolMetadataSerialized[];
-      }[] = [];
-      for (const catDef of CATEGORY_REGISTRY) {
-        if (catDef.group !== group) {
-          continue;
-        }
-        const tools = byCatKey.get(catDef.key) ?? [];
-        if (tools.length > 0) {
-          entries.push({ catDef, tools });
-        }
-      }
-      if (entries.length > 0) {
-        map.set(group, entries);
-      }
-    }
-
-    // Uncategorized → append to system group
-    const otherTools = byCatKey.get("__other__") ?? [];
-    if (otherTools.length > 0) {
-      const otherCat: CategoryDefinitionSerialized = {
-        key: "__other__",
-        label: "Other",
-        labels: {},
-        group: "system",
-        icon: "zap",
-        order: 999,
-      };
-      const existing = map.get("system") ?? [];
-      map.set("system", [...existing, { catDef: otherCat, tools: otherTools }]);
-    }
-
-    return map;
-  }, [visibleTools, categoryByKey]);
-
   // Stable counts that don't reset to 0 while a refetch is in progress.
   // Updated only when a settled (non-fetching) response arrives.
   // Remember the last settled response (adjust-state-during-render pattern);
@@ -1284,9 +1294,10 @@ export function HelpToolsWidget(): JSX.Element {
       (stableAiToolIds.length > 0 ? stableAiToolIds.length : stableTotalCount);
 
     // webPinned: always from local state (optimistically updated)
-    const webPinned = (
-      webPinnedTools ?? (user ? getDefaultWebPinnedIdsForUser(user) : [])
-    ).length;
+    const webPinned =
+      settledResponse?.webPinnedCount ??
+      (webPinnedTools ?? (user ? getDefaultWebPinnedIdsForUser(user) : []))
+        .length;
 
     return {
       pinned,
@@ -1306,6 +1317,7 @@ export function HelpToolsWidget(): JSX.Element {
     stableCliAllowedCount,
     stableMcpPinnedCount,
     stableMcpAllowedCount,
+    settledResponse?.webPinnedCount,
     stableTotalCount,
     stableAiToolIds,
   ]);
@@ -1577,11 +1589,21 @@ export function HelpToolsWidget(): JSX.Element {
   };
 
   const handleOpenTool = useCallback(
-    async (toolName: string): Promise<void> => {
+    async (
+      toolName: string,
+      recordSearch?: { field: string; value: string },
+    ): Promise<void> => {
+      const revision = ++selectionRevision.current;
       // Remote tool: instanceId__toolName → embed via vibe-frame if possible
       const sepIdx = toolName.indexOf("__");
       if (sepIdx !== -1) {
         const instanceId = toolName.slice(0, sepIdx);
+        if (
+          form.getValues("instanceId") !== instanceId ||
+          form.getValues("viewAsRole")
+        ) {
+          return;
+        }
         const bareToolName = toolName.slice(sepIdx + 2);
         const conn = connectedInstances.find(
           (c) => c.instanceId === instanceId,
@@ -1602,45 +1624,50 @@ export function HelpToolsWidget(): JSX.Element {
 
       // Admin layout: show endpoint in main pane + push URL history entry
       if (isAdminLayout) {
-        const endpointDef = await resolveEndpoint(toolName);
-        if (endpointDef) {
-          const alias = endpointToUrlSegment(endpointDef);
-          const current = selectedAdminEndpointRef.current;
-          const currentAlias = current ? endpointToUrlSegment(current) : null;
-
-          if (alias === currentAlias) {
-            // Same base tool — if a sub-navigation is stacked (e.g. viewing a lead
-            // while leads-list is the base), pop back to the base view.
-            if (urlNavStack?.canGoBack) {
-              urlNavStack._clearStack();
-              // Build a clean URL: keep only filter params, drop endpoint-specific ones.
-              const sp = new URLSearchParams();
-              effectiveSearchRef.current.forEach((v, k) => {
-                if (FILTER_PARAM_KEYS.has(k)) {
-                  sp.set(k, v);
-                }
-              });
-              const newPath = `/${locale}/${ADMIN_ENDPOINTS_PATH}/${alias}`;
-              writeSilentUrl(newPath, sp, true);
-            }
+        const endpointDef = await resolveCatalogEndpoint(toolName);
+        if (revision !== selectionRevision.current) {
+          return;
+        }
+        if (endpointDef && canOpenLocalEndpoint(endpointDef)) {
+          const data = recordSearch
+            ? { [recordSearch.field]: recordSearch.value }
+            : undefined;
+          if (
+            data &&
+            (!isAdminUser ||
+              form.getValues("viewAsRole") ||
+              endpointDef.method !== "GET" ||
+              !endpointDef.requestSchema.safeParse(data).success)
+          ) {
             return;
           }
-
-          setSelectedAdminEndpoint(endpointDef);
-          // Clear in-memory nav stack without triggering history.back().
-          // Using pop() would fire popstate which reads the (not yet updated) URL
-          // and immediately overwrite the endpoint we just set.
-          urlNavStack?._clearStack();
-          // Keep only filter params — endpoint-specific params (id, etc.) belong
-          // to the previous tool and must not leak into the new tool's URL.
-          const sp = new URLSearchParams();
-          effectiveSearchRef.current.forEach((v, k) => {
-            if (FILTER_PARAM_KEYS.has(k)) {
-              sp.set(k, v);
-            }
-          });
+          const alias = endpointToUrlSegment(endpointDef);
           const newPath = `/${locale}/${ADMIN_ENDPOINTS_PATH}/${alias}`;
+          if (isMobile) {
+            setAdminSidebarCollapsed(true);
+          }
+          if (
+            selectedAdminEndpointRef.current &&
+            effectivePathnameRef.current === newPath &&
+            !isRestoringTool &&
+            !data &&
+            !urlNavStack?.canGoBack
+          ) {
+            return;
+          }
+          setUnavailableSelection(false);
+          setIsRestoringTool(false);
+          setSelectedAdminEndpoint(endpointDef, data);
+          urlNavStack?._clearStack();
+          const sp = copyCatalogSearchParams(effectiveSearchRef.current);
+          if (recordSearch && data) {
+            sp.set(`arg.${recordSearch.field}`, recordSearch.value);
+          }
           writeSilentUrl(newPath, sp, true);
+        } else {
+          setSelectedAdminEndpoint(null);
+          setUnavailableSelection(true);
+          setIsRestoringTool(false);
         }
         return;
       }
@@ -1649,19 +1676,21 @@ export function HelpToolsWidget(): JSX.Element {
     },
     [
       connectedInstances,
+      canOpenLocalEndpoint,
+      form,
       isAdminLayout,
+      isAdminUser,
+      isMobile,
+      isRestoringTool,
       locale,
       navigate,
+      setAdminSidebarCollapsed,
       setSelectedAdminEndpoint,
       setVibeFrame,
       writeSilentUrl,
       urlNavStack,
     ],
   );
-
-  useEffect(() => {
-    handleOpenToolRef.current = handleOpenTool;
-  });
 
   // ── Admin navigation stack override ─────────────────────────────────────────
   // urlNavStack (from useUrlNavStack) is passed directly as navigationOverride
@@ -1694,7 +1723,10 @@ export function HelpToolsWidget(): JSX.Element {
       } else {
         sp.delete("q");
       }
-      if (values.statsFilter && values.statsFilter !== "webPinned") {
+      if (
+        values.statsFilter &&
+        (values.statsFilter !== "webPinned" || sp.has("cat"))
+      ) {
         sp.set("sf", values.statsFilter);
       } else {
         sp.delete("sf");
@@ -1728,15 +1760,13 @@ export function HelpToolsWidget(): JSX.Element {
     },
     [form, isAdminLayout, writeSilentUrl],
   );
-  useEffect(() => {
-    syncFilterParamsToUrlRef.current = syncFilterParamsToUrl;
-  });
 
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const setSearchQuery = useCallback(
     (value: string) => {
-      form.setValue("query", value || undefined);
-      syncFilterParamsToUrl({ query: value || undefined });
+      form.setValue("query", value || undefined, { shouldDirty: true });
+      form.setValue("page", undefined, { shouldDirty: true });
+      syncFilterParamsToUrl({ query: value || undefined, page: undefined });
       clearTimeout(searchDebounceRef.current);
       searchDebounceRef.current = setTimeout(triggerRefetch, 400);
     },
@@ -1758,10 +1788,39 @@ export function HelpToolsWidget(): JSX.Element {
         shouldDirty: true,
         shouldTouch: true,
       });
-      syncFilterParamsToUrl({ instanceId, statsFilter: newFilter });
+      if (isAdminLayout) {
+        const sp = copyCatalogSearchParams(effectiveSearchRef.current);
+        if (instanceId) {
+          sp.set("inst", instanceId);
+          sp.set("sf", newFilter);
+        } else {
+          sp.delete("inst");
+          sp.delete("sf");
+        }
+        sp.delete("cat");
+        sp.delete("sub");
+        sp.delete("p");
+        form.setValue("category", undefined, { shouldDirty: true });
+        form.setValue("subCategory", undefined, { shouldDirty: true });
+        form.setValue("page", undefined, { shouldDirty: true });
+        setSidebarPathRaw([]);
+        selectionRevision.current += 1;
+        setSelectedAdminEndpoint(null);
+        setUnavailableSelection(false);
+        setIsRestoringTool(false);
+        urlNavStackRef.current?._clearStack();
+        writeSilentUrl(`/${locale}/${ADMIN_ENDPOINTS_PATH}`, sp, true);
+      }
       setTimeout(triggerRefetch, 50);
     },
-    [form, syncFilterParamsToUrl, triggerRefetch, isAdminLayout],
+    [
+      form,
+      triggerRefetch,
+      isAdminLayout,
+      locale,
+      setSelectedAdminEndpoint,
+      writeSilentUrl,
+    ],
   );
 
   const handleProdToggle = useCallback(
@@ -1789,16 +1848,7 @@ export function HelpToolsWidget(): JSX.Element {
   );
 
   const handleStatsFilterChange = useCallback(
-    (
-      filter:
-        | "pinned"
-        | "allowed"
-        | "all"
-        | "webPinned"
-        | "cliAllowed"
-        | "mcpPinned"
-        | "mcpAllowed",
-    ): void => {
+    (filter: StatsFilter): void => {
       form.setValue("statsFilter", filter, {
         shouldValidate: true,
         shouldDirty: true,
@@ -1990,7 +2040,7 @@ export function HelpToolsWidget(): JSX.Element {
 
   const handleToggleWebPin = (toolId: string, e: ButtonMouseEvent): void => {
     e.stopPropagation();
-    if (!canPin) {
+    if (!canPin || activeInstanceId || activeViewAsRole) {
       return;
     }
     const current =
@@ -2003,6 +2053,32 @@ export function HelpToolsWidget(): JSX.Element {
     setTimeout(triggerRefetchRef.current, 300);
   };
 
+  const remoteToolOverlay = vibeFrame && (
+    <Div className="fixed inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-sm">
+      <Div className="flex items-center justify-between px-4 py-2 border-b shrink-0">
+        <Span className="text-sm font-medium text-muted-foreground font-mono">
+          {vibeFrame.endpoint}
+        </Span>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0"
+          onClick={() => setVibeFrame(null)}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </Div>
+      <Div className="flex-1 overflow-auto">
+        <VibeFrameHost
+          serverUrl={vibeFrame.serverUrl}
+          endpoint={vibeFrame.endpoint}
+          locale={locale}
+          onClose={() => setVibeFrame(null)}
+        />
+      </Div>
+    </Div>
+  );
+
   // Admin layout: two-pane sidebar browser
   if (isAdminLayout) {
     const selectedToolId = selectedAdminEndpoint
@@ -2011,17 +2087,89 @@ export function HelpToolsWidget(): JSX.Element {
 
     // ── Launcher sidebar helpers ───────────────────────────────────────────────
 
-    const isSearching = searchQuery.length > 0;
+    const isSearching = searchQuery.trim().length > 0;
     const activeCatKey = sidebarPath[0];
     const activeSubKey = sidebarPath[1];
     const activeCat = activeCatKey
       ? categoryByKey.get(activeCatKey)
       : undefined;
     const categoryEntry = activeCatKey
-      ? (toolsByGroup.get(activeCat?.group ?? "") ?? []).find(
-          (e) => e.catDef.key === activeCatKey,
-        )
+      ? toolsByCategory[activeCatKey]
       : undefined;
+    const searchBox = (
+      <Div className="flex w-full min-w-0 items-center gap-2 rounded-lg border bg-card px-2 focus-within:border-ring">
+        <Search className="size-4 shrink-0 text-muted-foreground" />
+        <Input
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              clearTimeout(searchDebounceRef.current);
+              triggerRefetch();
+            }
+          }}
+          aria-label={t("catalog.searchLabel")}
+          placeholder={t("aiTools.modal.searchPlaceholder")}
+          className="min-w-0 flex-1 border-none bg-transparent px-1 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+        />
+        {searchQuery && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label={t("catalog.clearSearch")}
+            onClick={() => setSearchQuery("")}
+          >
+            <X className="size-4" />
+          </Button>
+        )}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label={t("catalog.searchAction")}
+          onClick={() => {
+            clearTimeout(searchDebounceRef.current);
+            triggerRefetch();
+          }}
+        >
+          <ArrowRight className="size-4" />
+        </Button>
+      </Div>
+    );
+    const instanceControls = !activeViewAsRole &&
+      connectedInstances.length > 0 && (
+        <Div className="flex min-w-0 flex-wrap items-center gap-1">
+          <Button
+            type="button"
+            variant={activeInstanceId ? "outline" : "secondary"}
+            aria-pressed={!activeInstanceId}
+            size="sm"
+            onClick={() => handleInstanceChange(undefined)}
+          >
+            <Monitor className="size-4" />
+            {t("catalog.localInstance")}
+          </Button>
+          {connectedInstances.map((connection) => (
+            <Button
+              key={connection.instanceId}
+              type="button"
+              variant={
+                activeInstanceId === connection.instanceId
+                  ? "secondary"
+                  : "outline"
+              }
+              size="sm"
+              aria-pressed={activeInstanceId === connection.instanceId}
+              onClick={() => handleInstanceChange(connection.instanceId)}
+            >
+              <Globe className="size-4" />
+              {connection.instanceId}
+            </Button>
+          ))}
+        </Div>
+      );
 
     const renderToolCell = (tool: HelpToolMetadataSerialized): JSX.Element => {
       const toolId = tool.id ?? tool.name;
@@ -2033,6 +2181,8 @@ export function HelpToolsWidget(): JSX.Element {
       const isAllowed = !!enabledTool;
       const isAiPinned = enabledTool?.pinned ?? false;
       const requiresConfirm = enabledTool?.requiresConfirmation ?? false;
+      const isWebTool =
+        !tool.platforms || tool.platforms.includes(Platform.NEXT_PAGE);
 
       return (
         <Div key={toolId} className="relative group flex flex-col">
@@ -2040,6 +2190,8 @@ export function HelpToolsWidget(): JSX.Element {
             type="button"
             variant="ghost"
             size="unset"
+            disabled={!isWebTool}
+            aria-current={isSelected ? "page" : undefined}
             onClick={() => void handleOpenTool(toolId)}
             title={tool.description}
             className={cn(
@@ -2095,104 +2247,10 @@ export function HelpToolsWidget(): JSX.Element {
             </Span>
           </Button>
           {/* Controls row - overlays icon area on hover */}
-          <Div className="absolute inset-x-0 top-2 z-20 flex items-center justify-center gap-0.5 px-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-            <Div className="flex items-center gap-0.5 bg-card/95 backdrop-blur-sm rounded-lg shadow-sm border border-border/50 px-1 py-0.5 pointer-events-auto">
-              {/* Allow toggle */}
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="unset"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleEnabled(toolId);
-                      }}
-                      className={cn(
-                        "h-5 w-5 p-0 flex items-center justify-center rounded transition-all",
-                        isAllowed
-                          ? "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10"
-                          : "text-muted-foreground/50 hover:text-emerald-600 hover:bg-emerald-500/10",
-                      )}
-                    >
-                      <Check className="h-3 w-3" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="text-xs">
-                    {isAllowed
-                      ? "Remove — AI can no longer call this"
-                      : "Allow — AI can call this on demand"}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              {/* AI Pin toggle */}
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="unset"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleActive(toolId);
-                      }}
-                      className={cn(
-                        "h-5 w-5 p-0 flex items-center justify-center rounded transition-all",
-                        isAiPinned
-                          ? "text-primary hover:text-primary/70 hover:bg-primary/10"
-                          : "text-muted-foreground/50 hover:text-primary hover:bg-primary/10",
-                      )}
-                    >
-                      {isAiPinned ? (
-                        <Eye className="h-3 w-3" />
-                      ) : (
-                        <EyeOff className="h-3 w-3" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="text-xs">
-                    {isAiPinned
-                      ? t("aiTools.modal.activeOn")
-                      : t("aiTools.modal.activeOff")}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              {/* Confirm toggle */}
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="unset"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (isAllowed) {
-                          handleToggleConfirmation(toolId);
-                        }
-                      }}
-                      className={cn(
-                        "h-5 w-5 p-0 flex items-center justify-center rounded transition-all",
-                        requiresConfirm
-                          ? "text-warning hover:bg-warning/10"
-                          : "text-muted-foreground/50 hover:text-warning hover:bg-warning/10",
-                        !isAllowed && "cursor-default",
-                      )}
-                    >
-                      <Shield className="h-3 w-3" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="text-xs">
-                    {requiresConfirm
-                      ? t("aiTools.modal.confirmOn")
-                      : t("aiTools.modal.confirmOff")}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              {/* Web pin toggle */}
-              {canPin && (
+          {canPin && !activeInstanceId && !activeViewAsRole && (
+            <Div className="absolute inset-x-0 top-2 z-20 flex items-center justify-center gap-0.5 px-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity pointer-events-none">
+              <Div className="flex items-center gap-0.5 bg-card/95 backdrop-blur-sm rounded-lg shadow-sm border border-border/50 px-1 py-0.5 pointer-events-auto">
+                {/* Allow toggle */}
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -2200,29 +2258,143 @@ export function HelpToolsWidget(): JSX.Element {
                         type="button"
                         variant="ghost"
                         size="unset"
-                        onClick={(e) => handleToggleWebPin(toolId, e)}
+                        aria-label={
+                          isAllowed
+                            ? t("catalog.blockTool")
+                            : t("catalog.allowTool")
+                        }
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleEnabled(toolId);
+                        }}
                         className={cn(
                           "h-5 w-5 p-0 flex items-center justify-center rounded transition-all",
-                          isWebPinned
-                            ? "text-amber-500 hover:bg-amber-500/10"
-                            : "text-muted-foreground/50 hover:text-amber-500 hover:bg-amber-500/10",
+                          isAllowed
+                            ? "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10"
+                            : "text-muted-foreground/50 hover:text-emerald-600 hover:bg-emerald-500/10",
                         )}
                       >
-                        {isWebPinned ? (
-                          <PinOff className="h-3 w-3" />
+                        <Check className="h-3 w-3" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="text-xs">
+                      {isAllowed
+                        ? t("catalog.blockTool")
+                        : t("catalog.allowTool")}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                {/* AI Pin toggle */}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="unset"
+                        aria-label={t(
+                          isAiPinned
+                            ? "aiTools.modal.activeOn"
+                            : "aiTools.modal.activeOff",
+                        )}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleActive(toolId);
+                        }}
+                        className={cn(
+                          "h-5 w-5 p-0 flex items-center justify-center rounded transition-all",
+                          isAiPinned
+                            ? "text-primary hover:text-primary/70 hover:bg-primary/10"
+                            : "text-muted-foreground/50 hover:text-primary hover:bg-primary/10",
+                        )}
+                      >
+                        {isAiPinned ? (
+                          <Eye className="h-3 w-3" />
                         ) : (
-                          <Pin className="h-3 w-3" />
+                          <EyeOff className="h-3 w-3" />
                         )}
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="text-xs">
-                      {isWebPinned ? "Unpin from sidebar" : "Pin to sidebar"}
+                      {isAiPinned
+                        ? t("aiTools.modal.activeOn")
+                        : t("aiTools.modal.activeOff")}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-              )}
+                {/* Confirm toggle */}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="unset"
+                        aria-label={t(
+                          requiresConfirm
+                            ? "aiTools.modal.confirmOn"
+                            : "aiTools.modal.confirmOff",
+                        )}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (isAllowed) {
+                            handleToggleConfirmation(toolId);
+                          }
+                        }}
+                        className={cn(
+                          "h-5 w-5 p-0 flex items-center justify-center rounded transition-all",
+                          requiresConfirm
+                            ? "text-warning hover:bg-warning/10"
+                            : "text-muted-foreground/50 hover:text-warning hover:bg-warning/10",
+                          !isAllowed && "cursor-default",
+                        )}
+                      >
+                        <Shield className="h-3 w-3" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="text-xs">
+                      {requiresConfirm
+                        ? t("aiTools.modal.confirmOn")
+                        : t("aiTools.modal.confirmOff")}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                {/* Web pin toggle */}
+                {isWebTool && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="unset"
+                          aria-label={t(
+                            isWebPinned ? "catalog.unpinWeb" : "catalog.pinWeb",
+                          )}
+                          onClick={(e) => handleToggleWebPin(toolId, e)}
+                          className={cn(
+                            "h-5 w-5 p-0 flex items-center justify-center rounded transition-all",
+                            isWebPinned
+                              ? "text-amber-500 hover:bg-amber-500/10"
+                              : "text-muted-foreground/50 hover:text-amber-500 hover:bg-amber-500/10",
+                          )}
+                        >
+                          {isWebPinned ? (
+                            <PinOff className="h-3 w-3" />
+                          ) : (
+                            <Pin className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="text-xs">
+                        {t(isWebPinned ? "catalog.unpinWeb" : "catalog.pinWeb")}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </Div>
             </Div>
-          </Div>
+          )}
         </Div>
       );
     };
@@ -2242,12 +2414,12 @@ export function HelpToolsWidget(): JSX.Element {
     const isLoadingTransition = isFetching && hasLoadedOnce;
 
     const toolListSidebar = (
-      <Div className="flex flex-col h-full overflow-hidden pt-14 relative">
+      <Div className="relative flex h-full flex-col overflow-hidden pt-2">
         {/* ── Loading overlay — covers full sidebar during filter transitions ── */}
         {isLoadingTransition && (
           <Div className="absolute inset-0 z-20 pointer-events-none">
             {/* Spinner pinned to top of content area */}
-            <Div className="absolute top-28 left-0 right-0 flex justify-center">
+            <Div className="absolute inset-x-0 top-12 flex justify-center">
               <Div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-background/90 border border-border/60 shadow-sm text-[11px] text-muted-foreground backdrop-blur-sm">
                 <Div className="h-3 w-3 rounded-full border-2 border-muted-foreground/20 border-t-primary animate-spin shrink-0" />
                 <Span>{t("aiTools.modal.loading")}</Span>
@@ -2255,52 +2427,12 @@ export function HelpToolsWidget(): JSX.Element {
             </Div>
           </Div>
         )}
-        {/* ── Search ─────────────────────────────────────────────────── */}
-        <Div className="px-3 pt-1 pb-2 shrink-0">
-          <Div className="flex items-center h-9 rounded-xl border border-border bg-muted/40 focus-within:bg-background focus-within:border-ring/50 focus-within:ring-1 focus-within:ring-ring/20 transition-all gap-1 px-2">
-            <Search className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                if (e.target.value) {
-                  setSidebarPath([]);
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  clearTimeout(searchDebounceRef.current);
-                  triggerRefetch();
-                }
-              }}
-              placeholder={t("aiTools.modal.searchPlaceholder")}
-              className="flex-1 h-full border-none bg-transparent text-xs shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 px-1 placeholder:text-muted-foreground/60"
-            />
-            {isSearching && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="unset"
-                onClick={() => setSearchQuery("")}
-                className="h-5 w-5 p-0 flex items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-accent shrink-0"
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            )}
-            <Button
-              type="button"
-              variant="ghost"
-              size="unset"
-              onClick={() => {
-                clearTimeout(searchDebounceRef.current);
-                triggerRefetch();
-              }}
-              className="h-6 w-6 p-0 flex items-center justify-center rounded-lg bg-primary/10 hover:bg-primary/20 text-primary shrink-0"
-            >
-              <ArrowRight className="h-3 w-3" />
-            </Button>
-          </Div>
-        </Div>
+        {(selectedAdminEndpoint || isMobile) && (
+          <Div className="px-3 pb-2">{searchBox}</Div>
+        )}
+        {selectedAdminEndpoint && instanceControls && (
+          <Div className="px-3 pb-2">{instanceControls}</Div>
+        )}
 
         {/* ── Filter chips ��──────────────────────────────────────────── */}
         <Div className="flex flex-col gap-1 px-3 pb-2 shrink-0">
@@ -2340,8 +2472,7 @@ export function HelpToolsWidget(): JSX.Element {
                 variant="ghost"
                 size="unset"
                 onClick={() => {
-                  handleStatsFilterChange(key);
-                  setSidebarPath([]);
+                  setSidebarPath([], key);
                 }}
                 className={cn(
                   "flex-1 h-8 flex flex-col items-center justify-center gap-0 rounded-lg text-xs transition-all border",
@@ -2395,8 +2526,7 @@ export function HelpToolsWidget(): JSX.Element {
                     variant="ghost"
                     size="unset"
                     onClick={() => {
-                      handleStatsFilterChange(key);
-                      setSidebarPath([]);
+                      setSidebarPath([], key);
                     }}
                     className={cn(
                       "flex-1 h-8 flex flex-col items-center justify-center gap-0 rounded-lg text-xs transition-all border",
@@ -2451,7 +2581,9 @@ export function HelpToolsWidget(): JSX.Element {
               >
                 <ChevronRight className="h-3 w-3 rotate-180 shrink-0" />
                 <Span className="truncate max-w-[90px]">
-                  {activeSubKey ? (activeCat?.label ?? activeCatKey) : "All"}
+                  {activeSubKey
+                    ? (activeCat?.label ?? activeCatKey)
+                    : t("catalog.title")}
                 </Span>
               </Button>
               {activeSubKey && (
@@ -2500,94 +2632,8 @@ export function HelpToolsWidget(): JSX.Element {
               </Div>
             ))}
 
-          {/* Level 2: subcategory tools */}
-          {!isSearching && activeCatKey && activeSubKey && categoryEntry && (
-            <Div className="pt-1">
-              {toolGrid(
-                categoryEntry.tools.filter(
-                  (tool) => tool.subCategory === activeSubKey,
-                ),
-              )}
-            </Div>
-          )}
-
-          {/* Level 1: category — root tools first, then subcategory folders */}
-          {!isSearching && activeCatKey && !activeSubKey && categoryEntry && (
-            <Div className="pt-1">
-              {((): JSX.Element => {
-                const registeredSubKeys = new Set(
-                  Object.keys(activeCat?.subcategories ?? {}),
-                );
-                const hasSubcats =
-                  activeCat?.subcategories &&
-                  Object.keys(activeCat.subcategories).length > 0;
-
-                const rootTools: HelpToolMetadataSerialized[] = [];
-                const matchedBySubcat: Record<
-                  string,
-                  HelpToolMetadataSerialized[]
-                > = {};
-                for (const tool of categoryEntry.tools) {
-                  const sub = tool.subCategory;
-                  if (sub && registeredSubKeys.has(sub)) {
-                    (matchedBySubcat[sub] ??= []).push(tool);
-                  } else {
-                    rootTools.push(tool);
-                  }
-                }
-
-                if (!hasSubcats) {
-                  return toolGrid(categoryEntry.tools);
-                }
-
-                const sortedSubcats = Object.entries(
-                  activeCat!.subcategories!,
-                ).toSorted((a, b) => (a[1].order ?? 0) - (b[1].order ?? 0));
-
-                const folderSubcats: [string, (typeof sortedSubcats)[0][1]][] =
-                  [];
-                for (const [subKey, subDef] of sortedSubcats) {
-                  const tools = matchedBySubcat[subKey] ?? [];
-                  if (tools.length === 0) {
-                    continue;
-                  }
-                  folderSubcats.push([subKey, subDef]);
-                }
-
-                // If no folders, render everything flat
-                if (folderSubcats.length === 0) {
-                  return toolGrid(categoryEntry.tools);
-                }
-
-                return (
-                  <>
-                    {/* Root tools render directly — no folder nesting */}
-                    {rootTools.length > 0 && toolGrid(rootTools)}
-                    {/* Subcategory sections inline */}
-                    {folderSubcats.map(([subKey, subDef], idx) => (
-                      <Div
-                        key={subKey}
-                        className={
-                          idx === 0 && rootTools.length > 0
-                            ? "mb-5 mt-3"
-                            : "mb-5"
-                        }
-                      >
-                        <Div className="flex items-center gap-2 mb-2">
-                          <Span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
-                            {localizedLabel(subDef.labels, locale) ??
-                              subDef.label ??
-                              subKey}
-                          </Span>
-                          <Div className="flex-1 h-px bg-border/50" />
-                        </Div>
-                        {toolGrid(matchedBySubcat[subKey] ?? [])}
-                      </Div>
-                    ))}
-                  </>
-                );
-              })()}
-            </Div>
+          {!isSearching && activeCatKey && categoryEntry && (
+            <Div className="pt-1">{toolGrid(categoryEntry.tools)}</Div>
           )}
 
           {/* Level 0: root — unified tool view (all filters) */}
@@ -2628,13 +2674,13 @@ export function HelpToolsWidget(): JSX.Element {
                       <Span className="text-xs font-semibold text-foreground">
                         {isPinnedFilter
                           ? t("aiTools.modal.aiPinsTitle")
-                          : "Web sidebar"}
+                          : t("catalog.webSidebar")}
                       </Span>
                     </Div>
                     <Span className="block text-[11px] text-muted-foreground leading-snug mb-2">
                       {isPinnedFilter
                         ? t("aiTools.modal.aiPinsDescription")
-                        : "Tools pinned to your sidebar."}
+                        : t("catalog.webSidebarHint")}
                     </Span>
                     <Button
                       type="button"
@@ -2741,13 +2787,7 @@ export function HelpToolsWidget(): JSX.Element {
                               icon={catDef.icon}
                               label={label}
                               count={count}
-                              onClick={() =>
-                                setSidebarPath(
-                                  [catDef.key],
-                                  catDef.key,
-                                  catDef.defaultEntryAlias,
-                                )
-                              }
+                              onClick={() => setSidebarPath([catDef.key])}
                             />
                           );
                         })}
@@ -2761,65 +2801,158 @@ export function HelpToolsWidget(): JSX.Element {
       </Div>
     );
 
+    const selectedToolAllowed =
+      selectedAdminEndpoint &&
+      canOpenLocalEndpoint(selectedAdminEndpoint) &&
+      (!urlNavStack?.current ||
+        canOpenLocalEndpoint(urlNavStack.current.endpoint));
+    const toolPageProps = {
+      logger,
+      locale,
+      user,
+      platform,
+      navigationOverride: urlNavStack,
+      className: "flex flex-col flex-1 min-w-0",
+    };
+    const primaryTool = activeCat?.defaultEntryAlias
+      ? visibleTools.find(
+          (tool) =>
+            (tool.name === activeCat.defaultEntryAlias ||
+              tool.aliases?.includes(activeCat.defaultEntryAlias ?? "")) &&
+            (!tool.platforms || tool.platforms.includes(Platform.NEXT_PAGE)),
+        )
+      : undefined;
+
     const mainContent = (
-      <Div className="flex flex-col min-h-full w-full relative">
-        {selectedAdminEndpoint ? (
-          <HelpAdminLayoutActiveContext.Provider value={true}>
-            <EndpointsPage
-              logger={logger}
-              key={selectedToolId ?? "tool"}
-              endpoint={{
-                [selectedAdminEndpoint.method]: selectedAdminEndpoint,
-              }}
-              locale={locale}
-              user={user}
-              platform={platform}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic endpoint type
-              endpointOptions={{} as any}
-              navigationOverride={urlNavStack}
-              className="flex flex-col flex-1"
-            />
-          </HelpAdminLayoutActiveContext.Provider>
-        ) : isMobile ? (
-          // Phones: no tool picked yet → the tool list IS the page. An empty
-          // "Select a tool" pane with the list hidden in a drawer is a dead end.
-          <Div className="flex flex-col flex-1 w-full">{toolListSidebar}</Div>
-        ) : (
-          <Div className="flex flex-col items-center justify-center h-full text-center px-8 gap-4 min-h-[400px]">
-            <Div className="h-16 w-16 rounded-2xl bg-muted flex items-center justify-center">
-              <Zap className="h-8 w-8 text-muted-foreground" />
-            </Div>
-            <Div>
-              <Span className="text-lg font-semibold text-foreground block">
-                {t("aiTools.modal.selectTool")}
-              </Span>
-              <Span className="text-sm text-muted-foreground block mt-1">
-                {t("aiTools.modal.selectToolHint")}
-              </Span>
-            </Div>
+      <Div
+        id={
+          !isRestoringTool && selectedToolAllowed && selectedAdminEndpoint
+            ? `admin-tool-${endpointToUrlSegment(urlNavStack?.current?.endpoint ?? selectedAdminEndpoint)}`
+            : "admin-catalog"
+        }
+        className="flex min-h-full w-full min-w-0 flex-col relative"
+      >
+        {selectedToolAllowed && selectedAdminEndpoint && (
+          <Div
+            className={cn(
+              "flex min-w-0 flex-1 flex-col",
+              isRestoringTool && "hidden",
+            )}
+          >
+            <HelpAdminLayoutActiveContext.Provider value={true}>
+              {selectedAdminEndpoint.method === "GET" ? (
+                <EndpointsPage
+                  key={selectedToolId}
+                  {...toolPageProps}
+                  endpoint={{ GET: selectedAdminEndpoint }}
+                  endpointOptions={{
+                    read: {
+                      urlPathParams: selectedGetInputs.urlPathParams,
+                      initialState: selectedGetInputs.data,
+                    },
+                  }}
+                />
+              ) : (
+                <EndpointsPage
+                  key={selectedToolId}
+                  {...toolPageProps}
+                  endpoint={{
+                    [selectedAdminEndpoint.method]: selectedAdminEndpoint,
+                  }}
+                />
+              )}
+            </HelpAdminLayoutActiveContext.Provider>
           </Div>
+        )}
+        {isRestoringTool ? (
+          <LoadingBlock
+            className="mt-16"
+            message={t("aiTools.modal.loading")}
+          />
+        ) : selectedToolAllowed ? null : unavailableSelection ||
+          selectedAdminEndpoint ? (
+          <EmptyBlock
+            className="mt-16"
+            title={t("catalog.toolNotFound")}
+            action={{
+              label: t("catalog.browse"),
+              onClick: () => setSidebarPath(sidebarPath),
+            }}
+          />
+        ) : (
+          <AdminCatalog
+            locale={locale}
+            t={t}
+            categoryByKey={categoryByKey}
+            webCategories={webCategories}
+            activeCategory={activeCatKey}
+            activeSubCategory={activeSubKey}
+            tools={visibleTools}
+            primaryTool={primaryTool}
+            query={searchQuery}
+            search={searchBox}
+            layoutControls={instanceControls}
+            recordSearchTargets={
+              isAdminUser && !activeViewAsRole && !activeInstanceId
+                ? (response?.recordSearchTargets ?? [])
+                : []
+            }
+            loading={
+              isFetching || (!response && endpointResponse === undefined)
+            }
+            error={
+              endpointResponse?.success === false
+                ? endpointResponse.message
+                : undefined
+            }
+            currentPage={response?.currentPage ?? 1}
+            totalPages={response?.totalPages ?? 0}
+            onSelectCategory={(category, subCategory) => {
+              const path = category
+                ? [category, ...(subCategory ? [subCategory] : [])]
+                : [];
+              setSidebarPath(path, activeInstanceId ? "all" : "web");
+            }}
+            onOpenTool={(toolName) => void handleOpenTool(toolName)}
+            onRecordSearch={(alias, field, value) =>
+              void handleOpenTool(alias, { field, value })
+            }
+            onPage={(page) => {
+              form.setValue("page", page, { shouldDirty: true });
+              syncFilterParamsToUrl({ page });
+              triggerRefetch();
+            }}
+            onRetry={triggerRefetch}
+          />
         )}
       </Div>
     );
 
     return (
       <>
-        <Div className="flex flex-1 min-h-0 overflow-hidden bg-background">
-          {/* ── Floating Top Bar (like AI stream) ───────────────────── */}
+        <Div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background">
           <Dialog open={localeDialogOpen} onOpenChange={setLocaleDialogOpen}>
             <DialogContent className="max-w-md">
               <LocaleSelectorContent />
             </DialogContent>
           </Dialog>
 
-          <Div className="absolute top-4 left-4 z-[310] flex flex-row gap-1">
+          <Div
+            id="admin-tools-toolbar"
+            className="relative z-[310] flex shrink-0 flex-wrap items-center gap-1 border-b bg-background px-4 py-2"
+          >
             {/* Sidebar toggle */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setAdminSidebarCollapsed(!adminSidebarCollapsed)}
               className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9"
-              title={t("aiTools.modal.closeSidebar")}
+              aria-label={t(
+                adminSidebarCollapsed
+                  ? "catalog.openSidebar"
+                  : "aiTools.modal.closeSidebar",
+              )}
+              aria-expanded={!adminSidebarCollapsed}
             >
               <PanelLeft className="h-5 w-5" />
             </Button>
@@ -2920,11 +3053,22 @@ export function HelpToolsWidget(): JSX.Element {
 
             {/* Logo */}
             <Logo locale={locale} size="h-8" />
+            {selectedAdminEndpoint && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="ml-auto h-auto min-h-9 max-w-full whitespace-normal"
+                onClick={() => setSidebarPath(sidebarPath)}
+              >
+                {t("catalog.browse")}
+              </Button>
+            )}
           </Div>
 
           {/* ── Sidebar + Main Content ──────────────────────────────── */}
           {isMobile ? (
-            <Div className="flex flex-row flex-1 min-h-0 w-full">
+            <Div className="relative flex min-h-0 w-full flex-1">
               <AnimatePresence initial={false}>
                 {!adminSidebarCollapsed && (
                   <MotionDiv
@@ -2933,7 +3077,7 @@ export function HelpToolsWidget(): JSX.Element {
                     animate={{ x: 0 }}
                     exit={{ x: -260 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="fixed inset-y-0 left-0 z-[210] bg-background border-r border-border w-65"
+                    className="absolute inset-y-0 left-0 z-[210] w-65 max-w-full border-r border-border bg-background"
                   >
                     <Div className="h-full w-full bg-background">
                       {toolListSidebar}
@@ -2950,14 +3094,14 @@ export function HelpToolsWidget(): JSX.Element {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="fixed inset-0 bg-black/50 z-[200]"
+                    className="absolute inset-0 z-[200] bg-black/50"
                     onClick={() => setAdminSidebarCollapsed(true)}
                     aria-label={t("aiTools.modal.closeSidebar")}
                   />
                 )}
               </AnimatePresence>
 
-              <Div className="flex flex-col flex-1 min-h-0 w-full overflow-y-auto">
+              <Div className="flex flex-col flex-1 min-h-0 min-w-0 w-full overflow-y-auto">
                 {mainContent}
               </Div>
             </Div>
@@ -2994,6 +3138,7 @@ export function HelpToolsWidget(): JSX.Element {
             </Div>
           )}
         </Div>
+        {remoteToolOverlay}
       </>
     );
   }
@@ -3345,32 +3490,7 @@ export function HelpToolsWidget(): JSX.Element {
         </Div>
       </Div>
 
-      {/* Vibe-frame overlay for remote tool execution */}
-      {vibeFrame && (
-        <Div className="fixed inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-sm">
-          <Div className="flex items-center justify-between px-4 py-2 border-b shrink-0">
-            <Span className="text-sm font-medium text-muted-foreground font-mono">
-              {vibeFrame.endpoint}
-            </Span>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 w-7 p-0"
-              onClick={() => setVibeFrame(null)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </Div>
-          <Div className="flex-1 overflow-auto">
-            <VibeFrameHost
-              serverUrl={vibeFrame.serverUrl}
-              endpoint={vibeFrame.endpoint}
-              locale={locale}
-              onClose={() => setVibeFrame(null)}
-            />
-          </Div>
-        </Div>
-      )}
+      {remoteToolOverlay}
     </Div>
   );
 }

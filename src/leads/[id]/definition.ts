@@ -23,6 +23,7 @@ import {
   EmailCampaignStage,
   EmailCampaignStageOptions,
   EmailJourneyVariant,
+  EngagementTypes,
   LeadSource,
   LeadSourceOptions,
   LeadStatus,
@@ -34,15 +35,20 @@ import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   backButton,
   objectField,
+  objectOptionalField,
   requestField,
   requestUrlPathParamsField,
   responseArrayField,
+  responseArrayOptionalField,
   responseField,
   submitButton,
   widgetField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
+
+import { LeadAccountAssociation, LeadJourneyEvent } from "./enum";
 import { scopedTranslation } from "./i18n";
 
 const LeadDetailContainer = lazyWidget(() =>
@@ -726,6 +732,221 @@ const { GET } = createEndpoint({
         schema: z.uuid(),
       }),
 
+      review: objectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "journey.title",
+        usage: { response: true },
+        children: {
+          events: responseArrayField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: objectField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              usage: { response: true },
+              children: {
+                id: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.string(),
+                }),
+                kind: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.enum(LeadJourneyEvent),
+                }),
+                date: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: dateSchema,
+                }),
+                detail: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.string().optional(),
+                }),
+                engagementType: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.enum(EngagementTypes).optional(),
+                }),
+              },
+            }),
+          }),
+          nextEmailAt: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            schema: dateSchema.nullable(),
+          }),
+          attributedUserId: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            schema: z.uuid().nullable(),
+          }),
+          accountAssociations: responseArrayOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: objectField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              usage: { response: true },
+              children: {
+                leadId: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.uuid(),
+                }),
+                userId: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.uuid(),
+                }),
+                association: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.enum(LeadAccountAssociation),
+                }),
+                reason: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.string().nullable(),
+                }),
+                recordedAt: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: dateSchema.nullable(),
+                }),
+                email: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.string().nullable(),
+                }),
+                publicName: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.string().nullable(),
+                }),
+              },
+            }),
+          }),
+          relatedLeadEvidence: responseArrayOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: objectField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              usage: { response: true },
+              children: {
+                leadId: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.uuid(),
+                }),
+                source: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.enum(LeadSource),
+                }),
+                guestConsentAt: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: dateSchema.nullable(),
+                }),
+                guestConsentVersion: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.number().nullable(),
+                }),
+                attribution: objectOptionalField(scopedTranslation, {
+                  type: WidgetType.CONTAINER,
+                  usage: { response: true },
+                  children: {
+                    firstChannel: responseField(scopedTranslation, {
+                      type: WidgetType.TEXT,
+                      schema: z.string(),
+                    }),
+                    firstSource: responseField(scopedTranslation, {
+                      type: WidgetType.TEXT,
+                      schema: z.string().nullable(),
+                    }),
+                    firstCampaign: responseField(scopedTranslation, {
+                      type: WidgetType.TEXT,
+                      schema: z.string().nullable(),
+                    }),
+                    firstTouchAt: responseField(scopedTranslation, {
+                      type: WidgetType.TEXT,
+                      schema: dateSchema,
+                    }),
+                    lastChannel: responseField(scopedTranslation, {
+                      type: WidgetType.TEXT,
+                      schema: z.string(),
+                    }),
+                    lastSource: responseField(scopedTranslation, {
+                      type: WidgetType.TEXT,
+                      schema: z.string().nullable(),
+                    }),
+                    lastCampaign: responseField(scopedTranslation, {
+                      type: WidgetType.TEXT,
+                      schema: z.string().nullable(),
+                    }),
+                    lastTouchAt: responseField(scopedTranslation, {
+                      type: WidgetType.TEXT,
+                      schema: dateSchema,
+                    }),
+                  },
+                }),
+              },
+            }),
+          }),
+          wallets: responseArrayField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: objectField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              usage: { response: true },
+              children: {
+                id: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.uuid(),
+                }),
+                leadId: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.uuid().nullable(),
+                }),
+                userId: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.uuid().nullable(),
+                }),
+              },
+            }),
+          }),
+          newsletter: responseArrayField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: objectField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              usage: { response: true },
+              children: {
+                id: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.uuid(),
+                }),
+                email: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.string(),
+                }),
+                leadId: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.uuid().nullable(),
+                }),
+                userId: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.uuid().nullable(),
+                }),
+                confirmedAt: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: dateSchema.nullable(),
+                }),
+                unsubscribedDate: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: dateSchema.nullable().optional(),
+                }),
+                status: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.enum(NewsletterSubscriptionStatus),
+                }),
+                marketingConsent: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  schema: z.boolean(),
+                }),
+              },
+            }),
+          }),
+          guestConsentAt: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            schema: dateSchema.nullable(),
+          }),
+          guestConsentVersion: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            schema: z.number().nullable(),
+          }),
+        },
+      }),
+
       // === RESPONSE FIELDS ===
       lead: objectField(scopedTranslation, {
         type: WidgetType.CONTAINER,
@@ -1207,9 +1428,9 @@ const { GET } = createEndpoint({
         lead: {
           basicInfo: {
             id: "550e8400-e29b-41d4-a716-446655440000",
-            email: "contact@example.com",
-            businessName: "Example Business",
-            contactName: "John Doe",
+            email: "audit-lead@example.invalid",
+            businessName: "Harbor Studio",
+            contactName: "Ada Example",
             status: LeadStatus.CAMPAIGN_RUNNING,
           },
           contactDetails: {
@@ -1257,9 +1478,156 @@ const { GET } = createEndpoint({
             invalidAt: null,
             campaignStartedAt: new Date("2024-01-12T09:00:00Z"),
           },
-          linkedLeads: [],
-          linkedUsers: [],
+          linkedLeads: [
+            {
+              linkedLeadId: "550e8400-e29b-41d4-a716-446655440001",
+              linkReason: "ip_match",
+              linkedAt: new Date("2024-01-10T09:25:00Z"),
+              email: null,
+              businessName: "Guest browser",
+              status: LeadStatus.WEBSITE_USER,
+              ipAddress: "203.0.113.42",
+              userAgent: null,
+              createdAt: new Date("2024-01-10T08:55:00Z"),
+            },
+          ],
+          linkedUsers: [
+            {
+              userId: "123e4567-e89b-12d3-a456-426614174000",
+              linkReason: "login",
+              linkedAt: new Date("2024-01-16T14:30:00Z"),
+              email: "audit-account@example.invalid",
+              publicName: "Ada Example",
+            },
+          ],
           referralHistory: [],
+        },
+        review: {
+          events: [
+            {
+              id: "lead-created",
+              kind: LeadJourneyEvent.CREATED,
+              date: new Date("2024-01-10T09:00:00Z"),
+            },
+            {
+              id: "first-visit",
+              kind: LeadJourneyEvent.FIRST_TOUCH,
+              date: new Date("2024-01-10T09:01:00Z"),
+              detail: "partner · studio-launch",
+            },
+            {
+              id: "guest-device",
+              kind: LeadJourneyEvent.LEAD_LINK,
+              date: new Date("2024-01-10T09:25:00Z"),
+              detail: "Guest browser",
+            },
+            {
+              id: "campaign-start",
+              kind: LeadJourneyEvent.CAMPAIGN_STARTED,
+              date: new Date("2024-01-12T09:00:00Z"),
+            },
+            {
+              id: "welcome-email",
+              kind: LeadJourneyEvent.EMAIL_SENT,
+              date: new Date("2024-01-15T10:00:00Z"),
+              detail: "Welcome to Harbor Studio",
+            },
+            {
+              id: "newsletter-confirmed",
+              kind: LeadJourneyEvent.NEWSLETTER_CONFIRMED,
+              date: new Date("2024-01-16T11:15:00Z"),
+              detail: "audit-lead@example.invalid",
+            },
+            {
+              id: "email-click",
+              kind: LeadJourneyEvent.INTERACTION,
+              date: new Date("2024-01-16T14:29:00Z"),
+              engagementType: EngagementTypes.EMAIL_CLICK,
+              detail: "Welcome to Harbor Studio",
+            },
+            {
+              id: "account-login",
+              kind: LeadJourneyEvent.ACCOUNT_LINK,
+              date: new Date("2024-01-16T14:30:00Z"),
+              detail: "audit-account@example.invalid",
+            },
+          ],
+          nextEmailAt: new Date("2024-01-18T10:00:00Z"),
+          attributedUserId: null,
+          accountAssociations: [
+            {
+              leadId: "550e8400-e29b-41d4-a716-446655440000",
+              userId: "123e4567-e89b-12d3-a456-426614174000",
+              association: LeadAccountAssociation.LINK,
+              reason: "login",
+              recordedAt: new Date("2024-01-16T14:30:00Z"),
+              email: "audit-account@example.invalid",
+              publicName: "Ada Example",
+            },
+            {
+              leadId: "550e8400-e29b-41d4-a716-446655440001",
+              userId: "123e4567-e89b-12d3-a456-426614174001",
+              association: LeadAccountAssociation.LINK,
+              reason: "signup",
+              recordedAt: new Date("2024-01-19T15:00:00Z"),
+              email: "audit-related-account@example.invalid",
+              publicName: "Jules Example",
+            },
+          ],
+          relatedLeadEvidence: [
+            {
+              leadId: "550e8400-e29b-41d4-a716-446655440001",
+              source: LeadSource.WEBSITE,
+              guestConsentAt: new Date("2024-01-10T09:00:00Z"),
+              guestConsentVersion: 1,
+              attribution: {
+                firstChannel: "studio-community",
+                firstSource: "studio-forum",
+                firstCampaign: "harbor-intro",
+                firstTouchAt: new Date("2024-01-10T08:55:00Z"),
+                lastChannel: "studio-newsletter",
+                lastSource: "studio-email",
+                lastCampaign: "harbor-follow-up",
+                lastTouchAt: new Date("2024-01-19T14:00:00Z"),
+              },
+            },
+          ],
+          wallets: [
+            {
+              id: "550e8400-e29b-41d4-a716-446655440002",
+              leadId: "550e8400-e29b-41d4-a716-446655440000",
+              userId: null,
+            },
+            {
+              id: "550e8400-e29b-41d4-a716-446655440005",
+              leadId: null,
+              userId: "123e4567-e89b-12d3-a456-426614174001",
+            },
+          ],
+          newsletter: [
+            {
+              id: "550e8400-e29b-41d4-a716-446655440003",
+              leadId: "550e8400-e29b-41d4-a716-446655440000",
+              userId: null,
+              email: "audit-lead@example.invalid",
+              status: NewsletterSubscriptionStatus.SUBSCRIBED,
+              marketingConsent: true,
+              confirmedAt: new Date("2024-01-16T11:15:00Z"),
+              unsubscribedDate: null,
+            },
+            {
+              id: "550e8400-e29b-41d4-a716-446655440004",
+              leadId: null,
+              userId: "123e4567-e89b-12d3-a456-426614174001",
+              email: "audit-related-account@example.invalid",
+              status: NewsletterSubscriptionStatus.UNSUBSCRIBED,
+              marketingConsent: false,
+              confirmedAt: null,
+              unsubscribedDate: new Date("2024-01-20T11:15:00Z"),
+            },
+          ],
+          guestConsentAt: null,
+          guestConsentVersion: null,
         },
       },
     },

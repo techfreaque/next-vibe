@@ -310,6 +310,16 @@ export const translations: typeof enTranslations = {
   },
   history: {
     get: {
+      bonusGrant: "Attribution de crédits bonus",
+      relatedRecords: "Dossiers liés",
+      account: "Compte client",
+      lead: "Prospect",
+      openAccount: "Ouvrir le compte client",
+      openLead: "Ouvrir le prospect",
+      openPayouts: "Voir les versements du partenaire",
+      loading: "Chargement de l’historique des crédits…",
+      delta: "{{amount}} crédits",
+      entryBalance: "Solde après opération : {{count}} crédits",
       emptyHint: "Chaque crédit entrant et sortant apparaît ici.",
       title: "Voir l'historique des crédits",
       titleShort: "Historique des crédits",
@@ -502,6 +512,19 @@ export const translations: typeof enTranslations = {
     },
   },
   adminAdd: {
+    recipient: {
+      title: "Vérifier le destinataire",
+      description: "Vérifier que le compte peut recevoir des crédits bonus.",
+      accountId: "Identifiant du compte",
+      email: "E-mail du destinataire",
+      noLinkedDevice: "Aucun appareil n’est lié à ce compte.",
+      loadFailed: "Impossible de vérifier le destinataire.",
+      loading: "Vérification du destinataire…",
+      retry: "Réessayer",
+      openAccount: "Ouvrir le compte client",
+      change: "Choisir un autre destinataire",
+      verify: "Vérifier",
+    },
     post: {
       title: "Ajouter des crédits",
       titleShort: "Ajouter des crédits",
@@ -509,19 +532,20 @@ export const translations: typeof enTranslations = {
         "Ajouter des packs de crédits à un compte utilisateur (admin uniquement)",
       tag: "admin",
       container: {
-        title: "Ajouter des crédits à un utilisateur",
-        description: "Attribuer des crédits bonus à un compte précis",
+        title: "Accorder des crédits bonus",
+        description:
+          "Sélectionnez le destinataire et saisissez le nombre exact de crédits à ajouter à son portefeuille.",
         selfTitle: "Ajouter des crédits à votre compte",
-        selfDescription: "Vous attribuer des crédits bonus",
+        selfDescription: "Accordez des crédits bonus à votre compte",
       },
       targetUserId: {
-        label: "ID de l'utilisateur cible",
-        description: "L'utilisateur qui reçoit les crédits",
+        label: "Destinataire",
+        description: "Choisir un client dans l’annuaire des comptes.",
       },
       amount: {
-        label: "Montant",
-        description: "Nombre de crédits à ajouter",
-        placeholder: "Saisissez le nombre de crédits...",
+        label: "Montant en crédits",
+        description: "Saisissez un nombre entier de crédits bonus.",
+        placeholder: "137",
       },
       packType: {
         label: "Type de pack",
@@ -536,8 +560,8 @@ export const translations: typeof enTranslations = {
         label: "Retour",
       },
       submitButton: {
-        label: "Ajouter des crédits",
-        loadingText: "Ajout en cours...",
+        label: "Accorder les crédits bonus",
+        loadingText: "Attribution des crédits…",
       },
       success: {
         title: "Crédits ajoutés",

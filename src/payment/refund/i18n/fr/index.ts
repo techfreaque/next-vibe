@@ -31,7 +31,7 @@ export const translations: typeof enTranslations = {
       amount: {
         label: "Montant du remboursement",
         description:
-          "Montant à rembourser (facultatif, montant total par défaut)",
+          "Remboursement partiel facultatif dans la devise de la transaction",
         placeholder: "Saisir le montant",
       },
       reason: {
@@ -45,6 +45,32 @@ export const translations: typeof enTranslations = {
         placeholder: "Saisir les métadonnées en JSON",
       },
     },
+  },
+
+  widget: {
+    transactionDetails: "Transaction enregistrée",
+    customerEmail: "E-mail du client",
+    customerId: "Identifiant client",
+    originalAmount: "Montant initial",
+    enterTransaction:
+      "Saisissez un identifiant de transaction pour charger les données du paiement.",
+    lookupLoading: "Chargement de la transaction enregistrée",
+    transactionMissing: "Transaction introuvable",
+    lookupFailed: "Impossible de charger la transaction",
+    retryLookup: "Relancer la recherche",
+    amountExceedsCharge:
+      "Saisissez un montant inférieur ou égal au paiement initial.",
+    confirmRemaining: "Stripe remboursera le solde restant en {{currency}}.",
+    confirmAmount: "Remboursement partiel de {{amount}} ({{currency}}).",
+    title: "Examiner le remboursement Stripe",
+    amountHelp:
+      "Saisissez un montant partiel en {{currency}}. Laissez le champ vide pour rembourser le solde restant.",
+    review: "Vérifier le montant",
+    confirmTitle: "Confirmer le remboursement Stripe",
+    confirmDescription:
+      "Stripe remboursera la transaction {{transactionId}} pour {{email}}. Cette opération transfère de l’argent.",
+    confirm: "Émettre le remboursement",
+    cancel: "Annuler",
   },
 
   post: {
@@ -72,6 +98,7 @@ export const translations: typeof enTranslations = {
       validation: {
         title: "Erreur de validation",
         description: "Paramètres de remboursement invalides",
+        ineligible: "Cette transaction ne peut pas être remboursée via Stripe.",
       },
       unauthorized: {
         title: "Non autorisé",

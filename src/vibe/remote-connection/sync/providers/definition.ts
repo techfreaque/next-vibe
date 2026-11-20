@@ -6,6 +6,7 @@
  * hardcode provider keys — they fetch this list and render based on it.
  */
 
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { z } from "zod";
 
 import { createEndpoint } from "../../../core/definition/create-i18n";
@@ -18,6 +19,12 @@ import { UserRole } from "../../../identity/roles/enum";
 import { customWidgetObject } from "../../../unified-ui/_shared/utils";
 import { responseField } from "../../../unified-ui/_shared/utils-i18n";
 import { scopedTranslation } from "./i18n";
+
+const SyncProvidersWidget = lazyWidget(() =>
+  import("./widget").then((module) => ({
+    default: module.SyncProvidersWidget,
+  })),
+);
 
 export const { GET } = createEndpoint({
   scopedTranslation,
@@ -34,6 +41,7 @@ export const { GET } = createEndpoint({
   tags: ["tags.remoteConnection" as const],
 
   fields: customWidgetObject({
+    render: SyncProvidersWidget,
     usage: { response: true } as const,
     children: {
       providers: responseField(scopedTranslation, {

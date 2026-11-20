@@ -1,68 +1,117 @@
 "use client";
 
-import { Badge } from "next-vibe/ui/components/badge";
-import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
+import { formatDate } from "next-vibe/core/i18n/core/localization-utils";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { FilePlus } from "next-vibe/ui/components/icons/FilePlus";
-import { FolderX } from "next-vibe/ui/components/icons/FolderX";
-import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Span } from "next-vibe/ui/components/span";
-import { H3, P } from "next-vibe/ui/components/typography";
-import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
 import {
+  StatusPill,
+  type StatusPillVariant,
+} from "next-vibe/ui/components/status-pill";
+import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
+import {
+  useWidgetForm,
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetOnSubmit,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { type JSX } from "react";
+import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
+import type { JSX } from "react";
 
-import { EstimateStatus } from "@/payment/enum";
+import {
+  DocumentList,
+  DocumentScopePicker,
+  useDocumentListCopy,
+  useDocumentListHistory,
+} from "@/finance/document-list-ui";
 
+import { EstimateStatus } from "../../enum";
 import type definition from "./definition";
 
-function getStatusVariant(
-  status: string,
-): "default" | "secondary" | "destructive" | "outline" {
-  switch (status) {
-    case EstimateStatus.ACCEPTED:
-      return "default";
-    case EstimateStatus.SENT:
-      return "secondary";
-    case EstimateStatus.DECLINED:
-    case EstimateStatus.EXPIRED:
-      return "destructive";
-    default:
-      return "outline";
-  }
-}
+type Row = (typeof definition.GET.types.ResponseOutput)["estimates"][number];
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function EstimateListWidget(_props: {
+const statusVariants: Record<Row["status"], StatusPillVariant> = {
+  [EstimateStatus.DRAFT]: "muted",
+  [EstimateStatus.SENT]: "info",
+  [EstimateStatus.ACCEPTED]: "success",
+  [EstimateStatus.DECLINED]: "danger",
+  [EstimateStatus.EXPIRED]: "muted",
+  [EstimateStatus.CONVERTED]: "success",
+};
+
+export function EstimateListWidget({
+  field: { children },
+}: {
   field: (typeof definition.GET)["fields"];
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
-  const { push: navigate, pop, canGoBack } = useWidgetNavigation();
+  const form = useWidgetForm<typeof definition.GET>();
+  const onSubmit = useWidgetOnSubmit();
+  const { push } = useWidgetNavigation();
+  const openRelated = useRelatedEntityNavigation();
+  const rememberList = useDocumentListHistory("payment-estimate-list");
   const t = useWidgetTranslation<typeof definition.GET>();
+  const tDocument = useDocumentListCopy();
   const locale = useWidgetLocale();
-  const onPick =
-    usePickerCallback<
-      NonNullable<
-        (typeof definition.GET.types.ResponseOutput)["estimates"]
-      >[number]
-    >();
-  const isPickerMode = !!onPick;
+  const onPick = usePickerCallback<Row>();
+  const responseOnly = useWidgetResponseOnly();
+  const isInteractive = useWidgetIsInteractive() && !responseOnly;
+  const companyId = form.watch("companyId");
+  const customerId = form.watch("customerId");
+  const money = (amount: number, currency: string): string =>
+    new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+      currencyDisplay: "code",
+    }).format(amount);
 
-  const handleNewEstimate = (e: ButtonMouseEvent): void => {
-    e.stopPropagation();
+  const rememberFilters = (page: number): void => {
+    const values = form.getValues();
+    rememberList({
+      search: values.search,
+      status: values.status,
+      companyId: values.companyId,
+      customerId: values.customerId,
+      page,
+      pageSize: values.pageSize,
+    });
+  };
+
+  const setPage = (page: number): void => {
+    form.setValue("page", page, { shouldDirty: true });
+    rememberFilters(page);
+  };
+
+  const submitPage = (page: number): void => {
+    setPage(page);
+    onSubmit?.();
+  };
+
+  const clearFilters = (): void => {
+    form.reset({ page: 1, pageSize: data?.pageSizeApplied ?? 20 });
+    submitPage(1);
+  };
+
+  const createDocument = (): void => {
+    rememberFilters(data?.currentPage ?? 1);
     void (async (): Promise<void> => {
       const [createDef, getDef] = await Promise.all([
-        import("@/payment/estimate/create/definition"),
-        import("@/payment/estimate/[estimateId]/get/definition"),
+        import("../create/definition"),
+        import("../[estimateId]/get/definition"),
       ]);
-      navigate(createDef.default.POST, {
+      push(createDef.default.POST, {
         renderInModal: true,
+        data: data?.selectedCompanyId
+          ? { companyId: data.selectedCompanyId }
+          : undefined,
         replaceOnSuccess: {
           endpoint: getDef.default.GET,
           getUrlPathParams: (responseData) => ({
@@ -73,148 +122,127 @@ export function EstimateListWidget(_props: {
     })();
   };
 
-  const handleView =
-    (estimateId: string) =>
-    (e: ButtonMouseEvent): void => {
-      e.stopPropagation();
-      if (isPickerMode) {
-        const estimate = (data?.estimates ?? []).find(
-          (est) => est.id === estimateId,
-        );
-        if (estimate && onPick) {
-          onPick(estimate);
-          pop();
-        }
-        return;
-      }
-      void (async (): Promise<void> => {
-        const def =
-          await import("@/payment/estimate/[estimateId]/get/definition");
-        navigate(def.default.GET, { urlPathParams: { estimateId } });
-      })();
-    };
-
-  const estimates = data?.estimates;
+  const openDocument = (row: Row): void => {
+    if (onPick) {
+      onPick(row);
+      return;
+    }
+    rememberFilters(data?.currentPage ?? 1);
+    openRelated(
+      () =>
+        import("../[estimateId]/get/definition").then(
+          (module) => module.default.GET,
+        ),
+      { urlPathParams: { estimateId: row.id } },
+    );
+  };
 
   return (
-    <Div className="flex flex-col gap-4">
-      {canGoBack && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => pop()}
-          className="self-start gap-1.5 -ml-1"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {t("widget.back")}
-        </Button>
-      )}
-
-      <Div className="flex items-center justify-between">
-        <H3 className="text-base font-semibold">
-          {t("widget.title")}
-          {data && (
-            <Span className="ml-2 text-sm font-normal text-muted-foreground">
-              ({data.total})
-            </Span>
-          )}
-        </H3>
-        {!isPickerMode && (
+    <DocumentList
+      title={t("widget.title")}
+      backLabel={t("widget.back")}
+      loadingLabel={t("widget.loading")}
+      emptyTitle={t("widget.empty.title")}
+      emptyHint={onPick ? undefined : t("widget.empty.hint")}
+      filtered={data?.hasFilters ?? false}
+      filters={
+        isInteractive && onSubmit ? (
+          <>
+            <TextFieldWidget fieldName="search" field={children.search} />
+            <Div className="grid min-w-0 grid-cols-1 gap-3 @sm:grid-cols-2">
+              <SelectFieldWidget fieldName="status" field={children.status} />
+              <NumberFieldWidget
+                fieldName="pageSize"
+                field={children.pageSize}
+              />
+            </Div>
+            <Div className="flex min-w-0 flex-wrap items-center gap-2">
+              <DocumentScopePicker
+                kind="company"
+                value={companyId}
+                appliedLabel={
+                  data?.selectedCompanyId === companyId
+                    ? data?.selectedCompanyName
+                    : undefined
+                }
+                onSelect={(id) =>
+                  form.setValue("companyId", id, { shouldDirty: true })
+                }
+              />
+              <DocumentScopePicker
+                kind="customer"
+                value={customerId}
+                onSelect={(id) =>
+                  form.setValue("customerId", id, { shouldDirty: true })
+                }
+              />
+            </Div>
+          </>
+        ) : undefined
+      }
+      create={
+        isInteractive && !onPick ? (
           <Button
             type="button"
             size="sm"
-            onClick={handleNewEstimate}
-            className="gap-1.5"
+            onClick={createDocument}
+            className="gap-1.5 whitespace-normal"
           >
             <FilePlus className="h-4 w-4" />
             {t("widget.newEstimate")}
           </Button>
-        )}
-      </Div>
-
-      {!data && (
-        <Div className="flex items-center justify-center py-12 text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin mr-2" />
-          <Span className="text-sm">{t("widget.loading")}</Span>
-        </Div>
-      )}
-
-      {data && (!estimates || estimates.length === 0) && (
-        <Div className="py-14 text-center border border-dashed rounded-md flex flex-col items-center gap-4">
-          <FolderX className="h-8 w-8 text-muted-foreground" />
-          <Div className="flex flex-col gap-1">
-            <P className="text-sm font-medium">{t("widget.empty.title")}</P>
-            <P className="text-xs text-muted-foreground">
-              {t("widget.empty.hint")}
-            </P>
-          </Div>
-          {!isPickerMode && (
-            <Button type="button" size="sm" onClick={handleNewEstimate}>
-              {t("widget.empty.cta")}
-            </Button>
-          )}
-        </Div>
-      )}
-
-      {estimates && estimates.length > 0 && (
-        <Div className="flex flex-col divide-y divide-border rounded-lg border overflow-hidden">
-          {estimates.map((est) => (
-            <Div
-              key={est.id}
-              className="flex items-center justify-between px-4 py-3 bg-card hover:bg-muted/40 transition-colors cursor-pointer"
-              onClick={handleView(est.id)}
-            >
-              <Div className="flex flex-col gap-0.5 min-w-0">
-                <Div className="flex items-center gap-2">
-                  <Span className="font-mono text-sm font-semibold">
-                    {est.estimateNumber}
-                  </Span>
-                  {est.customerName && (
-                    <Span className="text-xs text-muted-foreground truncate">
-                      {est.customerName}
-                    </Span>
-                  )}
-                </Div>
-                <Div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <Span className="font-medium text-foreground">
-                    {new Intl.NumberFormat(locale, {
-                      style: "currency",
-                      currency: est.currency,
-                    }).format(est.total)}
-                  </Span>
-                  <Span>
-                    {est.lineCount}{" "}
-                    {est.lineCount !== 1 ? t("widget.lines") : t("widget.line")}
-                  </Span>
-                  {est.validUntil && (
-                    <Span>
-                      {t("widget.valid")}{" "}
-                      {new Date(est.validUntil).toLocaleDateString(locale)}
-                    </Span>
-                  )}
-                </Div>
-              </Div>
-
-              <Div className="flex items-center gap-3 shrink-0">
-                <Badge variant={getStatusVariant(est.status)}>
-                  {est.status === EstimateStatus.DRAFT
-                    ? t("widget.status.draft")
-                    : est.status === EstimateStatus.SENT
-                      ? t("widget.status.sent")
-                      : est.status === EstimateStatus.ACCEPTED
-                        ? t("widget.status.accepted")
-                        : est.status === EstimateStatus.DECLINED
-                          ? t("widget.status.declined")
-                          : est.status === EstimateStatus.EXPIRED
-                            ? t("widget.status.expired")
-                            : t("widget.status.converted")}
-                </Badge>
-              </Div>
-            </Div>
-          ))}
-        </Div>
-      )}
-    </Div>
+        ) : undefined
+      }
+      items={(data?.estimates ?? []).map((row) => {
+        const reference = row.estimateNumber;
+        const badges = (
+          <StatusPill
+            status={t(row.status)}
+            variant={statusVariants[row.status]}
+          />
+        );
+        const meta = (
+          <>
+            <Span className="font-semibold">
+              {money(row.total, row.currency)}
+            </Span>
+            {row.companyName && <Span>{row.companyName}</Span>}
+            {row.validUntil && (
+              <Span>
+                {t("widget.valid")} {formatDate(row.validUntil, locale, "PP")}
+              </Span>
+            )}
+          </>
+        );
+        return {
+          id: row.id,
+          title: reference,
+          subtitle: row.customerName ?? undefined,
+          badges,
+          meta,
+          action: isInteractive
+            ? {
+                label: tDocument(
+                  onPick ? "documents.select" : "documents.open",
+                  { reference },
+                ),
+                onClick: () => openDocument(row),
+              }
+            : undefined,
+        };
+      })}
+      pagination={
+        data
+          ? {
+              total: data.total,
+              currentPage: data.currentPage,
+              pageCount: data.pageCount,
+            }
+          : undefined
+      }
+      onApply={() => submitPage(1)}
+      onClear={clearFilters}
+      onPage={submitPage}
+    />
   );
 }

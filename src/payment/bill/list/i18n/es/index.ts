@@ -4,53 +4,48 @@ export const translations: typeof enTranslations = {
   tags: {
     payment: "pago",
     bill: "factura",
-    ap: "cuentas pagaderas"
+    ap: "cuentas pagaderas",
   },
   get: {
     title: "Proveedor de cuentas",
     titleShort: "Proveedor de cuentas",
-    description: "Cuentas de búsqueda pagadas por número de factura, nombre del proveedor o factura ID, y filtro por compañía o estado.",
+    description:
+      "Cuentas de búsqueda pagadas por número de factura, nombre del proveedor o factura ID, y filtro por compañía o estado.",
     errors: {
       validation: {
         title: "Error de validación",
-        description: "Parámetros de filtro"
+        description: "Parámetros de filtro",
       },
       unauthorized: {
         title: "No se registró",
-        description: "Inicie sesión para ver las facturas"
+        description: "Inicie sesión para ver las facturas",
       },
       forbidden: {
         title: "Acceso denegado",
-        description: "Usted no es miembro de esta empresa"
+        description: "Usted no es miembro de esta empresa",
       },
-      conflict: {
-        title: "Conflicto",
-        description: "Conflicto de datos"
-      },
+      conflict: { title: "Conflicto", description: "Conflicto de datos" },
       server: {
         title: "Error del servidor",
-        description: "No podía cargar las facturas"
+        description: "No podía cargar las facturas",
       },
       unknown: {
         title: "Error desconocido",
-        description: "Ocurrió un error inesperado"
+        description: "Ocurrió un error inesperado",
       },
-      network: {
-        title: "Error de red",
-        description: "Comprueba tu conexión"
-      },
+      network: { title: "Error de red", description: "Comprueba tu conexión" },
       notFound: {
         title: "No encontrado",
-        description: "Compañía no encontrada"
+        description: "Compañía no encontrada",
       },
       unsavedChanges: {
         title: "Cambios sin guardar",
-        description: "Tienes cambios sin guardar"
-      }
+        description: "Tienes cambios sin guardar",
+      },
     },
     success: {
       title: "Bills cargados",
-      description: "Facturas de proveedores recuperadas"
+      description: "Facturas de proveedores recuperadas",
     },
     response: {
       totalCount: "Total",
@@ -62,37 +57,38 @@ export const translations: typeof enTranslations = {
       currency: "Moneda",
       billTotal: "Monto",
       status: "Situación",
-      createdAt: "Creado"
-    }
+      createdAt: "Creado",
+    },
   },
   companyId: {
     label: "Company",
     description: "Filtro por empresa",
-    placeholder: "Company UUID"
+    placeholder: "Company UUID",
+  },
+  search: {
+    label: "Documentos de búsqueda",
+    description:
+      "Cuentas de búsqueda pagadas por número de factura, nombre del proveedor o factura ID, y filtro por compañía o estado.",
+    placeholder: "Número de factura, proveedor o ID",
   },
   status: {
     label: "Situación",
     description: "Filtro por estado de factura",
-    placeholder: "Cualquier condición"
+    placeholder: "Cualquier condición",
   },
-  page: {
-    label: "Página",
-    description: "Número de página"
-  },
-  pageSize: {
-    label: "Por página",
-    description: "Resultados por página"
-  },
+  page: { label: "Página", description: "Número de página" },
+  pageSize: { label: "Por página", description: "Resultados por página" },
   enums: {
     billStatus: {
       DRAFT: "Proyecto",
       RECEIVED: "Recibidos",
       APPROVED: "Aprobados",
       PAID: "Pagado",
-      DISPUTED: "Controversias"
-    }
+      DISPUTED: "Controversias",
+    },
   },
   widget: {
+    pageCount: "Páginas totales",
     back: "Atrás",
     title: "Proveedor de cuentas",
     newBill: "Bill.",
@@ -100,14 +96,14 @@ export const translations: typeof enTranslations = {
     empty: {
       title: "No hay facturas de proveedores",
       hint: "Registre una factura cuando reciba una factura de un proveedor.",
-      cta: "Bill."
+      cta: "Bill.",
     },
     company: {
       select: "Select Company",
-      selected: "Compañía seleccionada"
+      selected: "Compañía seleccionada",
     },
     due: "Sumas",
     overdue: "Atrasados",
-    view: "Vista"
-  }
+    view: "Vista",
+  },
 };

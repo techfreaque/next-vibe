@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
     remoteConnection: "Połączenie zdalne",
   },
   widget: {
+    loading: "Wczytywanie połączenia…",
     title: "Połączenie zdalne",
     signInDescription: "Zaloguj się, aby skonfigurować połączenie zdalne",
     back: "Wróć",
@@ -18,7 +19,7 @@ export const translations: typeof enTranslations = {
       remoteTransport: "Transport (przychodzący)",
       remoteInstance: "Zdalna instancja",
       capabilities: "Wersja capabilities",
-      lastSynced: "Pierwsza synchronizacja",
+      lastSynced: "Ostatnia wymiana synchronizacji",
       wsConnected: "Połączono od",
       refresh: "Odśwież",
       transportReverseWs: "Reverse WS (tunel)",
@@ -59,7 +60,9 @@ export const translations: typeof enTranslations = {
     disconnectConfirmCancel: "Anuluj",
     disconnectConfirmProceed: "Rozłącz",
     state: {
-      tunnelActive: "Tunel otwarty",
+      noSyncRecorded: "Brak zapisanej synchronizacji",
+      syncRecorded: "Zarejestrowano synchronizację",
+      tunnelActive: "WebSocket otwarty",
       bridgeActive: "Połączono",
       degraded: "Połączenie niestabilne",
       connectionLost: "Utracono połączenie",

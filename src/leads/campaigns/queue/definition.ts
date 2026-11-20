@@ -12,6 +12,10 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import {
+  EmailCampaignStage,
+  EmailJourneyVariant,
+} from "next-vibe/identity/lead/enum";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
@@ -24,6 +28,7 @@ import {
 import { z } from "zod";
 
 import {
+  CampaignType,
   CampaignTypeFilterDB,
   CampaignTypeFilterOptions,
 } from "../../../messenger/accounts/enum";
@@ -80,6 +85,13 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.enum(CampaignTypeFilterDB).optional(),
       }),
+      leadId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.response.leadId",
+        hidden: true,
+        schema: z.uuid().optional(),
+      }),
 
       // Response fields - named distinctly from request fields to avoid duplicate keys
       totalCount: responseField(scopedTranslation, {
@@ -113,7 +125,7 @@ const { GET } = createEndpoint({
             leadId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.leadId",
-              schema: z.string(),
+              schema: z.uuid(),
             }),
             leadEmail: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -128,21 +140,26 @@ const { GET } = createEndpoint({
             campaignType: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.campaignType",
-              schema: z.string(),
+              schema: z.union([z.enum(CampaignType), z.literal("")]),
             }),
             journeyVariant: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.journeyVariant",
-              schema: z.string(),
+              schema: z.union([z.enum(EmailJourneyVariant), z.literal("")]),
             }),
             currentStage: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.currentStage",
-              schema: z.string(),
+              schema: z.union([z.enum(EmailCampaignStage), z.literal("")]),
             }),
             nextScheduledAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.nextScheduledAt",
+              schema: z.string().nullable(),
+            }),
+            nextSubject: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.nextSubject",
               schema: z.string().nullable(),
             }),
             emailsSent: responseField(scopedTranslation, {
@@ -163,7 +180,7 @@ const { GET } = createEndpoint({
             startedAt: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.startedAt",
-              schema: dateSchema,
+              schema: dateSchema.nullable(),
             }),
           },
         }),
@@ -221,9 +238,35 @@ const { GET } = createEndpoint({
         page: 1,
         limit: 20,
       },
+      empty: {
+        page: 1,
+        limit: 20,
+        leadId: "550e8400-e29b-41d4-a716-446655440099",
+      },
     },
     responses: {
       default: {
+        totalCount: 1,
+        currentPage: 1,
+        pageSize: 20,
+        items: [
+          {
+            leadId: "550e8400-e29b-41d4-a716-446655440000",
+            leadEmail: "audit-lead@example.invalid",
+            businessName: "Harbor Studio",
+            campaignType: CampaignType.LEAD_CAMPAIGN,
+            journeyVariant: EmailJourneyVariant.UNCENSORED_CONVERT,
+            currentStage: EmailCampaignStage.FOLLOWUP_1,
+            nextScheduledAt: "2024-01-18T10:00:00.000Z",
+            nextSubject: "Harbor Studio follow-up",
+            emailsSent: 5,
+            emailsOpened: 3,
+            emailsClicked: 1,
+            startedAt: new Date("2024-01-12T09:00:00Z"),
+          },
+        ],
+      },
+      empty: {
         totalCount: 0,
         currentPage: 1,
         pageSize: 20,

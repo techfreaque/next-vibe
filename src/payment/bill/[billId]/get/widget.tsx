@@ -1,31 +1,27 @@
 "use client";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "next-vibe/ui/components/alert-dialog";
+import { formatDate } from "next-vibe/core/i18n/core/localization-utils";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ExternalLink } from "next-vibe/ui/components/icons/ExternalLink";
 import { Span } from "next-vibe/ui/components/span";
-import { H3, H4, P } from "next-vibe/ui/components/typography";
+import { H3, P } from "next-vibe/ui/components/typography";
 import {
+  useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import { type JSX, useState } from "react";
+import type { JSX } from "react";
 
+import { DocumentLineItems } from "@/finance/document-line-items";
 import { BillStatus } from "@/payment/enum";
 
 import type definition from "./definition";
@@ -33,13 +29,6 @@ import type definition from "./definition";
 /** Wall-clock comparison kept outside render so components stay pure. */
 function isInPast(date: Date | string | number): boolean {
   return new Date(date) < new Date();
-}
-
-function fmt(n: number): string {
-  return new Intl.NumberFormat(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(n);
 }
 
 function getStatusBadgeVariant(
@@ -67,7 +56,9 @@ export function BillGetWidget({
   const data = useWidgetValue<typeof definition.GET>();
   const { push: navigate, pop, canGoBack } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
-  const [pendingApprove, setPendingApprove] = useState(false);
+  const locale = useWidgetLocale();
+  const responseOnly = useWidgetResponseOnly();
+  const isInteractive = useWidgetIsInteractive() && !responseOnly;
 
   if (!data?.id) {
     return (
@@ -88,6 +79,7 @@ export function BillGetWidget({
           fieldName="billId"
           field={field.children.billId}
         />
+        <FormAlertWidget field={{}} />
         <SubmitButtonWidget<typeof definition.GET>
           field={{ text: "widget.submit" as const }}
         />
@@ -95,9 +87,15 @@ export function BillGetWidget({
     );
   }
 
+  const money = (amount: number): string =>
+    new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: data.currency,
+      currencyDisplay: "code",
+    }).format(amount);
+
   const isOverdue =
-    (data.status === BillStatus.DRAFT ||
-      data.status === BillStatus.RECEIVED ||
+    (data.status === BillStatus.RECEIVED ||
       data.status === BillStatus.APPROVED) &&
     data.dueDate !== null &&
     data.dueDate !== undefined &&
@@ -105,15 +103,11 @@ export function BillGetWidget({
 
   const handleApproveBill = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
-    setPendingApprove(true);
-  };
-
-  const handleConfirmApprove = (): void => {
-    setPendingApprove(false);
     void (async (): Promise<void> => {
       const def = await import("@/payment/bill/[billId]/approve/definition");
       navigate(def.default.POST, {
         urlPathParams: { billId: data.id },
+        renderInModal: true,
         popNavigationOnSuccess: 1,
       });
     })();
@@ -137,6 +131,7 @@ export function BillGetWidget({
       navigate(def.default.POST, {
         renderInModal: true,
         data: { billId: data.id },
+        popNavigationOnSuccess: 1,
       });
     })();
   };
@@ -172,7 +167,7 @@ export function BillGetWidget({
   }
 
   return (
-    <Div className="flex flex-col gap-6">
+    <Div className="@container flex min-w-0 flex-col gap-6">
       {canGoBack && (
         <Button
           type="button"
@@ -187,10 +182,10 @@ export function BillGetWidget({
       )}
 
       {/* Bill header */}
-      <Div className="flex items-start justify-between p-5 rounded-lg border bg-card">
-        <Div className="flex flex-col gap-2">
-          <Div className="flex items-center gap-3">
-            <H3 className="text-lg font-semibold">
+      <Div className="flex min-w-0 flex-wrap items-start justify-between gap-3 p-4 rounded-lg border bg-card">
+        <Div className="flex min-w-0 flex-col gap-2">
+          <Div className="flex flex-wrap items-center gap-3">
+            <H3 className="text-lg font-semibold [overflow-wrap:anywhere]">
               {t("widget.billNumber")} {data.billNumber ?? "—"}
             </H3>
             <Badge variant={getStatusBadgeVariant(data.status)}>
@@ -219,12 +214,12 @@ export function BillGetWidget({
           )}
 
           {/* Dates */}
-          <Div className="flex gap-6 text-sm text-muted-foreground">
+          <Div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
             <Div className="flex flex-col gap-0.5">
               <Span className="text-xs uppercase tracking-wide">
                 {t("widget.billDate")}
               </Span>
-              <Span>{new Date(data.billDate).toLocaleDateString()}</Span>
+              <Span>{formatDate(data.billDate, locale, "PP")}</Span>
             </Div>
             {data.dueDate ? (
               <Div className="flex flex-col gap-0.5">
@@ -234,7 +229,7 @@ export function BillGetWidget({
                 <Span
                   className={isOverdue ? "text-destructive font-medium" : ""}
                 >
-                  {new Date(data.dueDate).toLocaleDateString()}
+                  {formatDate(data.dueDate, locale, "PP")}
                 </Span>
               </Div>
             ) : null}
@@ -243,14 +238,16 @@ export function BillGetWidget({
                 <Span className="text-xs uppercase tracking-wide">
                   {t("widget.paidAt")}
                 </Span>
-                <Span>{new Date(data.paidAt).toLocaleDateString()}</Span>
+                <Span>{formatDate(data.paidAt, locale, "PP")}</Span>
               </Div>
             ) : null}
           </Div>
 
           {/* Notes */}
           {data.notes ? (
-            <P className="text-sm text-muted-foreground">{data.notes}</P>
+            <P className="text-sm text-muted-foreground [overflow-wrap:anywhere]">
+              {data.notes}
+            </P>
           ) : null}
         </Div>
 
@@ -263,103 +260,45 @@ export function BillGetWidget({
         ) : null}
       </Div>
 
-      {/* Line items table */}
-      {data.lines.length > 0 && (
-        <Div className="flex flex-col gap-1">
-          <H4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-            {t("widget.lineItems")}
-          </H4>
-
-          {/* Table header */}
-          <Div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide border-b">
-            <Span>{t("widget.description")}</Span>
-            <Span className="text-right">{t("widget.qty")}</Span>
-            <Span className="text-right">{t("widget.unitPrice")}</Span>
-            <Span className="text-right">{t("widget.tax")}</Span>
-            <Span className="text-right">{t("widget.total")}</Span>
-          </Div>
-
-          {data.lines.map((line) => (
-            <Div
-              key={line.id}
-              className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 px-4 py-2.5 text-sm border-b last:border-0"
-            >
-              <Span>{line.description}</Span>
-              <Span className="text-right font-mono">{line.quantity}</Span>
-              <Span className="text-right font-mono">
-                {data.currency} {fmt(line.unitPrice)}
-              </Span>
-              <Span className="text-right font-mono text-muted-foreground">
-                {data.currency} {fmt(line.taxAmount)}
-              </Span>
-              <Span className="text-right font-mono font-medium">
-                {data.currency} {fmt(line.lineTotal)}
-              </Span>
-            </Div>
-          ))}
-        </Div>
+      {data.companyName && (
+        <P className="text-sm text-muted-foreground [overflow-wrap:anywhere]">
+          {data.companyName}
+        </P>
       )}
-
-      {/* Summary */}
-      <Div className="flex justify-end">
-        <Div className="flex flex-col gap-1.5 min-w-[200px] text-sm">
-          {data.lines.length > 0 && (
-            <>
-              <Div className="flex justify-between">
-                <Span className="text-muted-foreground">
-                  {t("widget.subtotal")}
-                </Span>
-                <Span className="font-mono">
-                  {data.currency} {fmt(data.subtotal)}
-                </Span>
-              </Div>
-              {data.taxAmount > 0 && (
-                <Div className="flex justify-between">
-                  <Span className="text-muted-foreground">
-                    {t("widget.tax")}
-                  </Span>
-                  <Span className="font-mono">
-                    {data.currency} {fmt(data.taxAmount)}
-                  </Span>
-                </Div>
-              )}
-            </>
-          )}
-          <Div className="flex justify-between border-t pt-1.5 font-semibold">
-            <Span>{t("widget.total")}</Span>
-            <Span className="font-mono">
-              {data.currency} {fmt(data.total)}
-            </Span>
-          </Div>
-        </Div>
-      </Div>
 
       {/* Action buttons by status */}
       <Div className="flex flex-wrap gap-2 pt-2 border-t">
-        {(data.status === BillStatus.DRAFT ||
-          data.status === BillStatus.RECEIVED) && (
-          <>
-            <Button type="button" onClick={handleApproveBill}>
-              {t("widget.approveBill")}
-            </Button>
-            <Button type="button" variant="outline" onClick={handleAddLine}>
-              {t("widget.addLine")}
-            </Button>
-          </>
-        )}
+        {isInteractive &&
+          data.canManage &&
+          (data.status === BillStatus.DRAFT ||
+            data.status === BillStatus.RECEIVED) && (
+            <>
+              <Button type="button" onClick={handleApproveBill}>
+                {t(
+                  data.status === BillStatus.DRAFT
+                    ? "widget.markReceived"
+                    : "widget.approveBill",
+                )}
+              </Button>
+              {data.status === BillStatus.DRAFT && (
+                <Button type="button" variant="outline" onClick={handleAddLine}>
+                  {t("widget.addLine")}
+                </Button>
+              )}
+            </>
+          )}
 
-        {data.status === BillStatus.APPROVED && (
-          <>
-            <Button type="button" onClick={handlePayBill}>
-              {t("widget.payBill")}
-            </Button>
-            <Button type="button" variant="outline" onClick={handleAddLine}>
-              {t("widget.addLine")}
-            </Button>
-          </>
-        )}
+        {isInteractive &&
+          data.canManage &&
+          data.status === BillStatus.APPROVED && (
+            <>
+              <Button type="button" onClick={handlePayBill}>
+                {t("widget.payBill")}
+              </Button>
+            </>
+          )}
 
-        {data.status === BillStatus.PAID && data.journalEntryId ? (
+        {isInteractive && data.journalEntryId ? (
           <Button
             type="button"
             variant="outline"
@@ -371,26 +310,48 @@ export function BillGetWidget({
         ) : null}
       </Div>
 
-      <AlertDialog open={pendingApprove} onOpenChange={setPendingApprove}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {t("widget.approveConfirmTitle")}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("widget.approveConfirmDescription")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>
-              {t("widget.approveConfirmCancel")}
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmApprove}>
-              {t("widget.approveConfirmProceed")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Line items */}
+      {data.lines.length > 0 && (
+        <DocumentLineItems
+          title={t("widget.lineItems")}
+          lines={data.lines}
+          labels={{
+            quantity: t("widget.qty"),
+            unitPrice: t("widget.unitPrice"),
+            tax: t("widget.tax"),
+            total: t("widget.total"),
+          }}
+          money={money}
+        />
+      )}
+
+      {/* Summary */}
+      <Div className="flex justify-end">
+        <Div className="flex flex-col gap-1.5 w-full max-w-xs text-sm">
+          {data.lines.length > 0 && (
+            <>
+              <Div className="flex flex-wrap justify-between gap-2">
+                <Span className="text-muted-foreground">
+                  {t("widget.subtotal")}
+                </Span>
+                <Span className="font-mono">{money(data.subtotal)}</Span>
+              </Div>
+              {data.taxAmount > 0 && (
+                <Div className="flex flex-wrap justify-between gap-2">
+                  <Span className="text-muted-foreground">
+                    {t("widget.tax")}
+                  </Span>
+                  <Span className="font-mono">{money(data.taxAmount)}</Span>
+                </Div>
+              )}
+            </>
+          )}
+          <Div className="flex flex-wrap justify-between gap-2 border-t pt-1.5 font-semibold">
+            <Span>{t("widget.total")}</Span>
+            <Span className="font-mono">{money(data.total)}</Span>
+          </Div>
+        </Div>
+      </Div>
     </Div>
   );
 }

@@ -639,6 +639,7 @@ export const translations: typeof enTranslations = {
     openLead: "Otwórz leada",
     attributionOnly:
       "Powiązania atrybucji pomagają w weryfikacji. Z jednego IP lub linku śledzącego może korzystać kilka osób.",
+    recordedAccountLink: "Zapisane powiązanie konta",
     recordedConversion: "Konto zapisane przy konwersji",
     attributedAccount: "Konto zapisane w atrybucji",
     previewIpMatches: "Podejrzyj dopasowania IP leadów",

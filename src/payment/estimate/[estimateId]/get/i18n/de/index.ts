@@ -54,6 +54,11 @@ export const translations: typeof enTranslations = {
     description: "Das Angebot, auf das die Aktion angewendet wird",
   },
   widget: {
+    send: "Angebot senden",
+    addLine: "Position hinzufügen",
+    accept: "Annahme erfassen",
+    decline: "Ablehnung erfassen",
+    openInvoice: "Rechnung öffnen",
     back: "Zurück",
     submit: "Angebot abrufen",
     estimateNumber: "Angebot",

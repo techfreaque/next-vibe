@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, desc, eq, inArray, lte, ne, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, lte, ne, sql } from "drizzle-orm";
 import {
   type CountryLanguage,
   defaultLocale,
@@ -56,6 +56,7 @@ import {
 } from "./enum";
 import type { ReferralT } from "./i18n";
 import { scopedTranslation } from "./i18n";
+import { getAdminPayoutActions } from "./payout-actions";
 import type { StatsGetResponseOutput } from "./stats/definition";
 
 /** Placeholder until a lock's release resolver is assigned */
@@ -1764,7 +1765,12 @@ export class ReferralRepository {
    * Admin: List all payout requests
    */
   static async listPayoutRequests(
-    status: typeof PayoutStatusValue | null,
+    filters: {
+      status?: typeof PayoutStatusValue;
+      search?: string;
+      userId?: string;
+      requestId?: string;
+    },
     limit: number,
     offset: number,
     logger: EndpointLogger,
@@ -1788,9 +1794,18 @@ export class ReferralRepository {
     }>
   > {
     try {
-      const whereClause = status
-        ? eq(payoutRequests.status, status)
-        : undefined;
+      const email = filters.search?.replaceAll(
+        /[\\%_]/g,
+        (character) => `\\${character}`,
+      );
+      const whereClause = and(
+        filters.status ? eq(payoutRequests.status, filters.status) : undefined,
+        filters.userId ? eq(payoutRequests.userId, filters.userId) : undefined,
+        filters.requestId
+          ? eq(payoutRequests.id, filters.requestId)
+          : undefined,
+        email ? ilike(users.email, `%${email}%`) : undefined,
+      );
 
       const requests = await db
         .select({
@@ -1809,13 +1824,14 @@ export class ReferralRepository {
         .from(payoutRequests)
         .innerJoin(users, eq(payoutRequests.userId, users.id))
         .where(whereClause)
-        .orderBy(desc(payoutRequests.createdAt))
+        .orderBy(desc(payoutRequests.createdAt), desc(payoutRequests.id))
         .limit(limit)
         .offset(offset);
 
       const [countResult] = await db
         .select({ count: sql<number>`count(*)` })
         .from(payoutRequests)
+        .innerJoin(users, eq(payoutRequests.userId, users.id))
         .where(whereClause);
 
       return success({
@@ -1869,22 +1885,37 @@ export class ReferralRepository {
         });
       }
 
-      if (request.status !== PayoutStatus.PENDING) {
+      if (!getAdminPayoutActions(request).includes("approve")) {
         return fail({
           message: t("payout.errors.invalidStatus"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
 
-      await db
+      const [updated] = await db
         .update(payoutRequests)
         .set({
           status: PayoutStatus.APPROVED,
           adminNotes,
           processedByUserId: adminUserId,
+          processedAt: new Date(),
           updatedAt: new Date(),
         })
-        .where(eq(payoutRequests.id, requestId));
+        .where(
+          and(
+            eq(payoutRequests.id, requestId),
+            eq(payoutRequests.status, PayoutStatus.PENDING),
+            ne(payoutRequests.currency, PayoutCurrency.CREDITS),
+          ),
+        )
+        .returning({ id: payoutRequests.id });
+
+      if (!updated) {
+        return fail({
+          message: t("payout.errors.invalidStatus"),
+          errorType: ErrorResponseTypes.CONFLICT,
+        });
+      }
 
       logger.info("Payout request approved", { requestId, adminUserId });
       return success();
@@ -1922,14 +1953,14 @@ export class ReferralRepository {
         });
       }
 
-      if (request.status !== PayoutStatus.PENDING) {
+      if (!getAdminPayoutActions(request).includes("reject")) {
         return fail({
           message: t("payout.errors.invalidStatus"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
 
-      await db
+      const [updated] = await db
         .update(payoutRequests)
         .set({
           status: PayoutStatus.REJECTED,
@@ -1938,7 +1969,21 @@ export class ReferralRepository {
           processedAt: new Date(),
           updatedAt: new Date(),
         })
-        .where(eq(payoutRequests.id, requestId));
+        .where(
+          and(
+            eq(payoutRequests.id, requestId),
+            eq(payoutRequests.status, PayoutStatus.PENDING),
+            ne(payoutRequests.currency, PayoutCurrency.CREDITS),
+          ),
+        )
+        .returning({ id: payoutRequests.id });
+
+      if (!updated) {
+        return fail({
+          message: t("payout.errors.invalidStatus"),
+          errorType: ErrorResponseTypes.CONFLICT,
+        });
+      }
 
       logger.info("Payout request rejected", {
         requestId,
@@ -1968,61 +2013,57 @@ export class ReferralRepository {
   ): Promise<ResponseType<void>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const [request] = await db
-        .select()
-        .from(payoutRequests)
-        .where(eq(payoutRequests.id, requestId))
-        .limit(1);
+      const result = await withTransaction(logger, async (tx) => {
+        const [request] = await tx
+          .select()
+          .from(payoutRequests)
+          .where(eq(payoutRequests.id, requestId))
+          .for("update")
+          .limit(1);
 
-      if (!request) {
-        return fail({
-          message: t("payout.errors.notFound"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
+        if (!request) {
+          return fail({
+            message: t("payout.errors.notFound"),
+            errorType: ErrorResponseTypes.NOT_FOUND,
+          });
+        }
+        if (!getAdminPayoutActions(request).includes("complete")) {
+          return fail({
+            message: t("payout.errors.invalidStatus"),
+            errorType: ErrorResponseTypes.BAD_REQUEST,
+          });
+        }
 
-      if (request.status !== PayoutStatus.APPROVED) {
-        return fail({
-          message: t("payout.errors.invalidStatus"),
-          errorType: ErrorResponseTypes.BAD_REQUEST,
-        });
-      }
+        const deduction = await CreditRepository.deductEarnedCredits(
+          request.userId,
+          request.amountCents,
+          requestId,
+          request.currency === PayoutCurrency.BTC ? "BTC" : "USDC",
+          logger,
+          creditsT,
+          tx,
+        );
 
-      // Deduct from earned credits
-      const deductResult = await CreditRepository.deductEarnedCredits(
-        request.userId,
-        request.amountCents,
-        requestId,
-        request.currency as "BTC" | "USDC" | "CREDITS",
-        logger,
-        creditsT,
-      );
-
-      if (!deductResult.success) {
-        await db
+        const now = new Date();
+        await tx
           .update(payoutRequests)
           .set({
-            status: PayoutStatus.FAILED,
-            adminNotes: `Deduction failed: ${deductResult.message}`,
-            updatedAt: new Date(),
+            status: deduction.success
+              ? PayoutStatus.COMPLETED
+              : PayoutStatus.FAILED,
+            adminNotes: deduction.success ? adminNotes : deduction.message,
+            processedByUserId: adminUserId,
+            processedAt: now,
+            updatedAt: now,
           })
           .where(eq(payoutRequests.id, requestId));
-        return deductResult;
+        return deduction;
+      });
+
+      if (result.success) {
+        logger.info("Payout request completed", { requestId, adminUserId });
       }
-
-      await db
-        .update(payoutRequests)
-        .set({
-          status: PayoutStatus.COMPLETED,
-          adminNotes,
-          processedByUserId: adminUserId,
-          processedAt: new Date(),
-          updatedAt: new Date(),
-        })
-        .where(eq(payoutRequests.id, requestId));
-
-      logger.info("Payout request completed", { requestId, adminUserId });
-      return success();
+      return result;
     } catch (error) {
       logger.error("Failed to complete payout request", parseError(error));
       return fail({

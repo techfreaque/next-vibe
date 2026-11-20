@@ -321,7 +321,21 @@ export const translations: typeof enTranslations = {
         description: "Approuver, refuser ou finaliser une demande de versement",
       },
       fields: {
+        search: {
+          label: "E-mail du partenaire",
+          description: "Rechercher tout ou partie de l’adresse e-mail.",
+        },
+        userId: {
+          label: "Compte partenaire",
+        },
+        page: {
+          label: "Page",
+        },
+        limit: {
+          label: "Résultats par page",
+        },
         status: {
+          all: "Tous les statuts",
           label: "Filtre de statut",
           description: "Filtrer par statut de versement",
         },
@@ -343,7 +357,37 @@ export const translations: typeof enTranslations = {
         },
       },
       widget: {
-        empty: "Aucune demande de versement trouvée",
+        empty: "Aucune demande de versement",
+        emptyHint: "Essayez une autre adresse e-mail ou un autre statut.",
+        results: "Demandes de versement : {{count}}",
+        apply: "Appliquer les filtres",
+        clear: "Effacer les filtres",
+        refresh: "Actualiser",
+        loading: "Chargement des demandes de versement…",
+        amount: "{{credits}} crédits gagnés · équivalent de {{value}} en USD",
+        payoutSummary: "{{amount}} · Moyen de versement : {{currency}}",
+        requestedAt: "Demande du {{date}}",
+        processedAt: "Mis à jour le {{date}}",
+        rejectionReason: "Motif : {{reason}}",
+        adminNotes: "Notes : {{notes}}",
+        openPartner: "Ouvrir le compte partenaire",
+        openPartnerFor: "Ouvrir le compte partenaire de {{email}}",
+        actionFor: "{{action}} le versement pour {{email}}",
+        previous: "Page précédente",
+        next: "Page suivante",
+        page: "Page {{page}} sur {{total}}",
+        confirmAction: "Confirmer l’action",
+        lookupFailed: "Impossible de charger la demande de versement.",
+        state: "Statut",
+        valueLabel: "Montant demandé",
+        destinationLabel: "Moyen de versement",
+        actionSaved: "Action enregistrée.",
+        approveDetail:
+          "Après approbation, les crédits gagnés restent réservés à ce versement.",
+        rejectDetail:
+          "Le refus libère les crédits gagnés réservés à ce versement.",
+        completeDetail:
+          "Clôturez le versement après avoir effectué le transfert. Les crédits gagnés correspondants seront débités.",
         approve: "Approuver",
         reject: "Refuser",
         complete: "Finaliser",

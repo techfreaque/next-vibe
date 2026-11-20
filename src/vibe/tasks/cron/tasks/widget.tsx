@@ -18,9 +18,8 @@ import {
 import { Button } from "next-vibe/ui/components/button";
 import { Checkbox } from "next-vibe/ui/components/checkbox";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { BarChart3 } from "next-vibe/ui/components/icons/BarChart3";
-import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
-import { Circle } from "next-vibe/ui/components/icons/Circle";
 import { Clock } from "next-vibe/ui/components/icons/Clock";
 import { Eye } from "next-vibe/ui/components/icons/Eye";
 import { GitBranch } from "next-vibe/ui/components/icons/GitBranch";
@@ -33,7 +32,6 @@ import { Plus } from "next-vibe/ui/components/icons/Plus";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { Search } from "next-vibe/ui/components/icons/Search";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
-import { XCircle } from "next-vibe/ui/components/icons/XCircle";
 import { Input } from "next-vibe/ui/components/input";
 import {
   Select,
@@ -43,24 +41,27 @@ import {
   SelectValue,
 } from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
-import { useTouchDevice } from "next-vibe/ui/hooks/use-touch-device";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import React, { useCallback, useMemo, useState } from "react";
 
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { getDefaultTimezone } from "../../../core/i18n/core/localization-utils";
 import type { EndpointLogger } from "../../../logger/types";
 import { cn } from "../../../unified-ui/_shared/cn";
+import { useRelatedEntityNavigation } from "../../../unified-ui/_shared/related-entities";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
 } from "../../../unified-ui/_shared/use-widget-context";
 import { useApiMutation } from "../../../unified-ui/hooks/use-api-mutation";
+import { FormAlertWidget } from "../../../unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
 import { formatCronScheduleShort } from "../../cron-formatter";
 import type {
@@ -79,6 +80,7 @@ import {
 } from "../../enum";
 import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import bulkEndpoints from "../bulk/definition";
+import { CRON_LIST_PAGE_SIZE } from "./constants";
 import type endpoints from "./definition";
 import type { CronTaskListResponseOutput } from "./definition";
 import type { CronTasksTranslationKey } from "./i18n";
@@ -128,42 +130,19 @@ type StatusFilterKey =
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatDate(s: string | null): string {
-  if (!s) {
-    return "";
-  }
-  return s.slice(0, 16).replace("T", " ");
+function formatDate(
+  value: string | Date | null,
+  locale: CountryLanguage,
+): string | null {
+  return value
+    ? (value instanceof Date ? value : new Date(value)).toLocaleString(locale, {
+        timeZoneName: "short",
+      })
+    : null;
 }
 
-function formatDuration(ms: number | null): string {
-  if (ms === null) {
-    return "—";
-  }
-  if (ms < 1000) {
-    return `${ms}ms`;
-  }
-  if (ms < 60000) {
-    return `${Math.round(ms / 1000)}s`;
-  }
-  const minutes = Math.floor(ms / 60000);
-  const seconds = Math.round((ms % 60000) / 1000);
-  return `${minutes}m ${seconds}s`;
-}
-
-function successRate(task: Task): number {
-  return task.executionCount > 0
-    ? Math.round((task.successCount / task.executionCount) * 100)
-    : 0;
-}
-
-function getStatusColorClass(status: string | null): string {
-  if (!status) {
-    return "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400";
-  }
-  return (
-    STATUS_COLORS[status] ??
-    "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
-  );
+function getStatusColorClass(status: string): string {
+  return STATUS_COLORS[status] ?? "bg-muted text-muted-foreground";
 }
 
 // ---------------------------------------------------------------------------
@@ -174,7 +153,7 @@ function StatusBadge({
   status,
   tTasks,
 }: {
-  status: typeof CronTaskStatusValue | null;
+  status: typeof CronTaskStatusValue;
   tTasks: ReturnType<typeof tasksScopedTranslation.scopedT>["t"];
 }): React.JSX.Element {
   return (
@@ -184,22 +163,8 @@ function StatusBadge({
         getStatusColorClass(status),
       )}
     >
-      {status ? tTasks(status) : "—"}
+      {tTasks(status)}
     </Span>
-  );
-}
-
-function EnabledDot({ enabled }: { enabled: boolean }): React.JSX.Element {
-  return (
-    <Div
-      style={{
-        width: 8,
-        height: 8,
-        borderRadius: "50%",
-        flexShrink: 0,
-        backgroundColor: enabled ? "#22c55e" : "#9ca3af",
-      }}
-    />
   );
 }
 
@@ -226,7 +191,6 @@ function TaskRow({
   onRun,
   t,
   tTasks,
-  isTouch,
   locale,
   logger,
 }: {
@@ -240,23 +204,15 @@ function TaskRow({
   onRun: (task: Task) => void;
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
   tTasks: ReturnType<typeof tasksScopedTranslation.scopedT>["t"];
-  isTouch: boolean;
   locale: CountryLanguage;
   logger: EndpointLogger;
 }): React.JSX.Element {
-  const rate = successRate(task);
-  const lastRunText = formatDate(task.lastExecutedAt);
-  const nextRunText = formatDate(task.nextExecutionAt);
-  const avgDurText = formatDuration(task.averageExecutionTime);
-
-  const lastRunColorClass = task.lastExecutionStatus
-    ? getStatusColorClass(task.lastExecutionStatus)
-    : "";
-
+  const lastRunText = formatDate(task.lastExecutedAt, locale);
+  const nextRunText = formatDate(task.nextExecutionAt, locale);
   return (
     <Div
       className={cn(
-        "group flex items-start gap-3 px-4 py-3 hover:bg-muted/40 transition-colors border-b last:border-b-0",
+        "grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 px-4 py-3 hover:bg-muted/40 transition-colors border-b last:border-b-0",
         selected && "bg-primary/5",
       )}
     >
@@ -265,25 +221,20 @@ function TaskRow({
         <Checkbox
           checked={selected}
           onCheckedChange={() => onToggleSelect(task.id)}
-          aria-label={`Select ${task.displayName}`}
+          aria-label={t("widget.action.select", { task: task.displayName })}
         />
-      </Div>
-
-      {/* Enabled indicator dot */}
-      <Div className="flex-shrink-0 mt-1.5">
-        <EnabledDot enabled={task.enabled} />
       </Div>
 
       {/* Main content */}
       <Div className="flex-1 min-w-0">
         <Div className="flex flex-wrap items-center gap-2 mb-0.5">
-          <Span className="font-semibold text-sm truncate">
+          <Span className="font-semibold text-sm [overflow-wrap:anywhere]">
             {task.displayName}
           </Span>
           {/* routeId badge */}
           <Span
             className={cn(
-              "px-1.5 py-0.5 rounded text-xs font-mono",
+              "min-w-0 px-1.5 py-0.5 rounded text-xs font-mono [overflow-wrap:anywhere]",
               "bg-muted text-muted-foreground",
             )}
           >
@@ -317,11 +268,19 @@ function TaskRow({
               {tTasks(task.priority)}
             </Span>
           )}
+          <Span className="rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+            {task.enabled
+              ? t("widget.create.enabled")
+              : t("widget.create.disabled")}
+          </Span>
+          {task.lastExecutionStatus && (
+            <StatusBadge status={task.lastExecutionStatus} tTasks={tTasks} />
+          )}
           {task.hidden && <HiddenBadge t={t} />}
         </Div>
 
         {task.description && (
-          <Span className="text-xs text-muted-foreground block truncate mb-1">
+          <Span className="text-xs text-muted-foreground block mb-1 [overflow-wrap:anywhere]">
             {task.description}
           </Span>
         )}
@@ -335,65 +294,52 @@ function TaskRow({
           )}
         </Span>
 
-        {/* Stats row (hidden on small screens) */}
-        <Div className="hidden sm:flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+        <Div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
           <Span>
-            {t("widget.task.executions")}
-            {` ${task.executionCount}/${task.successCount}`}
+            {t("widget.task.runCount", {
+              count: task.executionCount.toLocaleString(locale),
+            })}
           </Span>
-          <Span>{`${rate}%`}</Span>
-          <Span>{avgDurText}</Span>
+          <Span>
+            {t("widget.task.successCount", {
+              count: task.successCount.toLocaleString(locale),
+            })}
+          </Span>
+          <Span>
+            {t("widget.task.failureCount", {
+              count: task.errorCount.toLocaleString(locale),
+            })}
+          </Span>
+        </Div>
+        <Div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          <Span>
+            {t("widget.task.lastRun")} {lastRunText ?? t("widget.task.never")}
+          </Span>
+          <Span>
+            {t("widget.task.nextRun")}{" "}
+            {nextRunText ?? t("widget.task.notScheduled")}
+          </Span>
         </Div>
       </Div>
 
-      {/* Last run */}
-      <Div className="hidden sm:flex flex-col items-end gap-1 flex-shrink-0 min-w-[100px]">
-        <Span className="text-xs text-muted-foreground">
-          {t("widget.task.lastRun")}
-        </Span>
-        {lastRunText ? (
-          <Span
-            className={cn("text-xs px-1 py-0.5 rounded", lastRunColorClass)}
-          >
-            {lastRunText}
-          </Span>
-        ) : (
-          <Span className="text-xs text-muted-foreground">
-            {t("widget.task.never")}
-          </Span>
-        )}
-      </Div>
-
-      {/* Next run */}
-      <Div className="hidden md:flex flex-col items-end gap-1 flex-shrink-0 min-w-[100px]">
-        <Span className="text-xs text-muted-foreground">
-          {t("widget.task.nextRun")}
-        </Span>
-        <Span className="text-xs">
-          {nextRunText || t("widget.task.notScheduled")}
-        </Span>
-      </Div>
-
-      {/* Status badge */}
-      <Div className="flex-shrink-0 flex items-center">
-        <StatusBadge status={task.lastExecutionStatus} tTasks={tTasks} />
-      </Div>
-
-      {/* Action buttons (appear on hover) */}
-      <Div
-        className={cn(
-          "flex-shrink-0 flex items-center gap-1",
-          isTouch
-            ? "opacity-100"
-            : "opacity-0 group-hover:opacity-100 transition-opacity",
-        )}
-      >
+      <Div className="col-start-2 flex min-w-0 flex-wrap items-center gap-1">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-8 gap-1.5 text-xs"
+          onClick={() => onHistory(task)}
+        >
+          <Clock className="h-3.5 w-3.5" />
+          {t("widget.action.history")}
+        </Button>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           className="h-7 w-7 p-0 text-success hover:text-success/80"
           onClick={() => onRun(task)}
+          aria-label={t("widget.action.runNow")}
           title={t("widget.action.runNow")}
         >
           <Play className="h-3.5 w-3.5" />
@@ -404,6 +350,7 @@ function TaskRow({
           size="sm"
           className="h-7 w-7 p-0"
           onClick={() => onView(task)}
+          aria-label={t("widget.action.view")}
           title={t("widget.action.view")}
         >
           <Eye className="h-3.5 w-3.5" />
@@ -413,17 +360,8 @@ function TaskRow({
           variant="ghost"
           size="sm"
           className="h-7 w-7 p-0"
-          onClick={() => onHistory(task)}
-          title={t("widget.action.history")}
-        >
-          <Clock className="h-3.5 w-3.5" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="h-7 w-7 p-0"
           onClick={() => onEdit(task)}
+          aria-label={t("widget.action.edit")}
           title={t("widget.action.edit")}
         >
           <Pencil className="h-3.5 w-3.5" />
@@ -434,6 +372,7 @@ function TaskRow({
           size="sm"
           className="h-7 w-7 p-0 text-destructive hover:text-destructive"
           onClick={() => onDelete(task)}
+          aria-label={t("widget.action.delete")}
           title={t("widget.action.delete")}
         >
           <Trash2 className="h-3.5 w-3.5" />
@@ -470,6 +409,7 @@ function FilterTab({
           : "text-muted-foreground hover:text-foreground",
       )}
       onClick={onClick}
+      aria-pressed={active}
     >
       {label}
       <Span
@@ -639,13 +579,14 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const data = useWidgetValue<typeof endpoints.GET>();
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
+  const navigateRelated = useRelatedEntityNavigation();
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const locale = useWidgetLocale();
   const { t: tTasks } = tasksScopedTranslation.scopedT(locale);
   const form = useWidgetForm<typeof endpoints.GET>();
 
-  const isLoading = endpointMutations?.read?.isLoading;
-  const isTouch = useTouchDevice();
+  const hasError = useWidgetResponse()?.success === false;
+  const isLoading = !hasError && (!data || endpointMutations?.read?.isLoading);
   const logger = useWidgetLogger();
   const user = useWidgetUser();
 
@@ -663,6 +604,14 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   // ── Search + sort from form state ─────────────────────────────────────
   const search = form.watch("search") ?? "";
   const sort = form.watch("sort") ?? "name_asc";
+  const offset = Math.max(
+    0,
+    Number.parseInt(form.watch("offset") ?? "", 10) || 0,
+  );
+  const pageSize = Math.max(
+    1,
+    Number.parseInt(form.watch("limit") ?? "", 10) || CRON_LIST_PAGE_SIZE,
+  );
 
   // ── Derive active tab from form state ──────────────────────────────────
   const enabledValue = form.watch("enabled");
@@ -747,103 +696,33 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     setSelectedIds(new Set());
   }, []);
 
-  // ── Bulk action executor ──────────────────────────────────────────────────
   const executeBulkAction = useCallback(
-    (action: "enable" | "disable" | "run" | "delete") => {
+    (action: "enable" | "disable" | "run" | "delete"): void => {
       const ids = [...selectedIds];
       void bulkMutation
         .mutateAsync({ requestData: { ids, action } })
         .then(async (result) => {
-          if (!result.success) {
-            return undefined;
-          }
-          handleClearSelection();
-          // Update caches optimistically - no refetch needed
-          const { apiClient } = await import("../../../unified-ui/hooks/store");
-          const tasksDef = await import("./definition");
-          const queueDef = await import("../queue/definition");
-          if (action === "delete") {
-            apiClient.updateEndpointData(
-              tasksDef.default.GET,
-              logger,
-              (old) => {
-                if (!old?.success) {
-                  return old;
-                }
-                return {
-                  success: true as const,
-                  data: {
-                    ...old.data,
-                    tasks: old.data.tasks.filter(
-                      (task) => !ids.includes(task.id),
-                    ),
-                    totalTasks: Math.max(0, old.data.totalTasks - ids.length),
-                  },
-                };
-              },
-            );
-            apiClient.updateEndpointData(
-              queueDef.default.GET,
-              logger,
-              (old) => {
-                if (!old?.success) {
-                  return old;
-                }
-                return {
-                  success: true as const,
-                  data: {
-                    ...old.data,
-                    tasks: old.data.tasks.filter(
-                      (task) => !ids.includes(task.id),
-                    ),
-                    totalTasks: Math.max(0, old.data.totalTasks - ids.length),
-                  },
-                };
-              },
-            );
-          } else if (action === "enable" || action === "disable") {
-            const enabled = action === "enable";
-            apiClient.updateEndpointData(
-              tasksDef.default.GET,
-              logger,
-              (old) => {
-                if (!old?.success) {
-                  return old;
-                }
-                return {
-                  success: true as const,
-                  data: {
-                    ...old.data,
-                    tasks: old.data.tasks.map((task) =>
-                      ids.includes(task.id) ? { ...task, enabled } : task,
-                    ),
-                  },
-                };
-              },
-            );
-            apiClient.updateEndpointData(
-              queueDef.default.GET,
-              logger,
-              (old) => {
-                if (!old?.success) {
-                  return old;
-                }
-                return {
-                  success: true as const,
-                  data: {
-                    ...old.data,
-                    tasks: old.data.tasks.map((task) =>
-                      ids.includes(task.id) ? { ...task, enabled } : task,
-                    ),
-                  },
-                };
-              },
-            );
+          if (result.success) {
+            handleClearSelection();
+            const [{ apiClient }, queue] = await Promise.all([
+              import("../../../unified-ui/hooks/store"),
+              import("../queue/definition"),
+            ]);
+            await Promise.all([
+              endpointMutations?.read?.refetch(),
+              apiClient.refetchEndpoint(queue.default.GET, logger),
+            ]);
           }
           return undefined;
         });
     },
-    [selectedIds, bulkMutation, handleClearSelection, logger],
+    [
+      selectedIds,
+      bulkMutation,
+      handleClearSelection,
+      endpointMutations,
+      logger,
+    ],
   );
 
   // ── Helper: update form fields - auto-submit handles the refetch ─────────
@@ -854,6 +733,8 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
       if (!form) {
         return;
       }
+      handleClearSelection();
+      form.setValue("offset", "0", { shouldDirty: true });
       if (patch.enabled !== undefined) {
         form.setValue("enabled", patch.enabled, {
           shouldValidate: true,
@@ -883,7 +764,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         });
       }
     },
-    [form],
+    [form, handleClearSelection],
   );
 
   // ── Status tab handler - updates server-side filters and refetches ───────
@@ -954,13 +835,15 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
       if (!form) {
         return;
       }
+      handleClearSelection();
+      form.setValue("offset", "0", { shouldDirty: true });
       form.setValue("hidden", value, {
         shouldValidate: true,
         shouldDirty: true,
         shouldTouch: true,
       });
     },
-    [form],
+    [form, handleClearSelection],
   );
 
   // ── Navigation handlers ──────────────────────────────────────────────────
@@ -1058,17 +941,20 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     [navigate],
   );
 
-  const handleTaskHistory = useCallback(
-    (task: Task): void => {
-      void (async (): Promise<void> => {
-        const m = await import("../history/definition");
-        navigate(m.default.GET, {
-          data: { taskId: task.id },
-        });
-      })();
-    },
-    [navigate],
-  );
+  const handleTaskHistory = (task: Task): void => {
+    navigateRelated(
+      async () => (await import("../history/definition")).default.GET,
+      {
+        data: {
+          taskId: task.id,
+          offset: 0,
+          taskName: "",
+          status: "",
+          priority: "",
+        },
+      },
+    );
+  };
 
   const handleRun = useCallback(
     (task: Task): void => {
@@ -1148,11 +1034,24 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     },
   ];
 
+  const hasFilters = !!(
+    search ||
+    priorityValue?.length ||
+    categoryValue?.length ||
+    activeHiddenFilter !== CronTaskHiddenFilter.VISIBLE ||
+    activeStatusTab !== "ALL"
+  );
+
+  const changePage = (newOffset: number): void => {
+    handleClearSelection();
+    form.setValue("offset", String(newOffset), { shouldDirty: true });
+  };
+
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <Div className="flex flex-col gap-0">
+    <WidgetShell padding="none" className="min-w-0 gap-0">
       {/* ── Header bar ─────────────────────────────────────────────── */}
-      <Div className="flex items-center gap-2 px-4 py-3 border-b">
+      <Div className="flex flex-wrap items-center gap-2 px-4 py-3 border-b">
         <NavigateButtonWidget field={children.backButton} />
 
         {/* Title + count */}
@@ -1166,13 +1065,14 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         </Div>
 
         {/* Right-side action buttons */}
-        <Div className="flex items-center gap-1.5 flex-shrink-0">
+        <Div className="flex min-w-0 flex-wrap items-center gap-1.5">
           <Button
             type="button"
             variant="ghost"
             size="sm"
             className="h-8 px-2.5 gap-1.5 text-xs"
             onClick={handleNavigateStats}
+            aria-label={t("widget.header.stats")}
           >
             <BarChart3 className="h-3.5 w-3.5" />
             <Span className="hidden sm:inline">{t("widget.header.stats")}</Span>
@@ -1183,6 +1083,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             size="sm"
             className="h-8 px-2.5 gap-1.5 text-xs"
             onClick={handleNavigateGraphs}
+            aria-label={t("widget.header.graphs")}
             title={t("widget.header.graphs")}
           >
             <GitBranch className="h-3.5 w-3.5" />
@@ -1196,6 +1097,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             size="sm"
             className="h-8 px-2.5 gap-1.5 text-xs"
             onClick={handleNavigateQueue}
+            aria-label={t("widget.header.queue")}
           >
             <Layers className="h-3.5 w-3.5" />
             <Span className="hidden sm:inline">{t("widget.header.queue")}</Span>
@@ -1206,6 +1108,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             size="sm"
             className="h-8 px-2.5 gap-1.5 text-xs"
             onClick={handleNavigateHistory}
+            aria-label={t("widget.header.history")}
           >
             <History className="h-3.5 w-3.5" />
             <Span className="hidden sm:inline">
@@ -1218,6 +1121,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             size="sm"
             className="h-8 w-8 p-0"
             onClick={handleRefresh}
+            aria-label={t("widget.header.refresh")}
             title={t("widget.header.refresh")}
           >
             <RefreshCw className="h-3.5 w-3.5" />
@@ -1228,6 +1132,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             size="sm"
             className="h-8 px-2.5 gap-1.5 text-xs"
             onClick={handleCreate}
+            aria-label={t("widget.header.create")}
           >
             <Plus className="h-3.5 w-3.5" />
             <Span className="hidden sm:inline">
@@ -1276,6 +1181,11 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         {/* Select-all checkbox */}
         <Checkbox
           checked={allFilteredSelected}
+          aria-label={t(
+            allFilteredSelected
+              ? "widget.bulk.clearSelection"
+              : "widget.bulk.selectAll",
+          )}
           onCheckedChange={
             allFilteredSelected ? handleClearSelection : handleSelectAll
           }
@@ -1289,13 +1199,16 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           <Input
             type="text"
             value={search}
-            onChangeText={(val) =>
+            aria-label={t("get.fields.search.label")}
+            onChangeText={(val) => {
+              handleClearSelection();
+              form.setValue("offset", "0", { shouldDirty: true });
               form.setValue("search", val, {
                 shouldValidate: true,
                 shouldDirty: true,
                 shouldTouch: true,
-              })
-            }
+              });
+            }}
             placeholder={t("widget.search.placeholder")}
             className="pl-8 h-8 text-sm"
           />
@@ -1352,13 +1265,15 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         {/* Sort */}
         <Select
           value={sort}
-          onValueChange={(val) =>
+          onValueChange={(val) => {
+            handleClearSelection();
+            form.setValue("offset", "0", { shouldDirty: true });
             form.setValue("sort", val, {
               shouldValidate: true,
               shouldDirty: true,
               shouldTouch: true,
-            })
-          }
+            });
+          }}
         >
           <SelectTrigger className="h-8 w-auto min-w-[120px] text-xs">
             <SelectValue />
@@ -1402,9 +1317,46 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         />
       )}
 
+      {bulkMutation.error && (
+        <Div
+          role="alert"
+          className="m-4 rounded-md border border-destructive/30 p-3 text-sm text-destructive [overflow-wrap:anywhere]"
+        >
+          {bulkMutation.error.message}
+        </Div>
+      )}
+      {bulkMutation.data?.success && (
+        <Div
+          aria-live="polite"
+          className="m-4 flex flex-col gap-1 rounded-md border p-3 text-sm"
+        >
+          <Span className="font-medium">
+            {t("widget.bulk.success", {
+              succeeded:
+                bulkMutation.data.data.succeeded.toLocaleString(locale),
+              failed: bulkMutation.data.data.failed.toLocaleString(locale),
+            })}
+          </Span>
+          {bulkMutation.data.data.errors.map(({ id, message }) => (
+            <Div
+              key={id}
+              className="flex flex-wrap gap-x-2 text-xs text-destructive [overflow-wrap:anywhere]"
+            >
+              <Span className="font-mono">{id}</Span>
+              <Span>{message}</Span>
+            </Div>
+          ))}
+        </Div>
+      )}
+
+      <FormAlertWidget field={{ className: "m-4" }} />
+
       {/* ── Loading state ───────────────────────────────────────────── */}
       {isLoading && (
-        <Div className="flex flex-col items-center justify-center gap-3 py-16">
+        <Div
+          aria-live="polite"
+          className="flex flex-col items-center justify-center gap-3 py-16"
+        >
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           <Span className="text-sm text-muted-foreground">
             {t("widget.loading")}
@@ -1413,7 +1365,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
       )}
 
       {/* ── Task list ──────────────────────────────────────────────── */}
-      {!isLoading && filteredTasks.length > 0 && (
+      {!hasError && !isLoading && filteredTasks.length > 0 && (
         <Div className="divide-y">
           {filteredTasks.map((task) => (
             <TaskRow
@@ -1428,7 +1380,6 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
               onRun={handleRun}
               t={t}
               tTasks={tTasks}
-              isTouch={isTouch}
               locale={locale}
               logger={logger}
             />
@@ -1436,50 +1387,57 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         </Div>
       )}
 
-      {/* ── Empty state ────────────────────────────────────────────── */}
-      {!isLoading && filteredTasks.length === 0 && (
-        <Div className="flex flex-col items-center justify-center gap-4 py-16 text-center px-4">
-          {tasks.length === 0 ? (
-            <Circle className="h-10 w-10 text-muted-foreground" />
-          ) : (
-            <XCircle className="h-10 w-10 text-muted-foreground" />
+      {!hasError && !isLoading && filteredTasks.length === 0 && (
+        <EmptyBlock
+          icon={<Clock className="size-8" />}
+          title={t(
+            hasFilters ? "widget.empty.noMatches" : "widget.empty.noTasks",
           )}
-          <Div className="flex flex-col gap-1">
-            <Span className="font-medium text-sm">
-              {tasks.length === 0
-                ? t("widget.empty.noTasks")
-                : t("widget.empty.noMatches")}
-            </Span>
-            <Span className="text-xs text-muted-foreground">
-              {tasks.length === 0
-                ? t("widget.empty.noTasksDesc")
-                : t("widget.empty.noMatchesDesc")}
-            </Span>
-          </Div>
-          <Div className="flex gap-2">
-            {tasks.length > 0 && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleClearFilters}
-              >
-                <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
-                {t("widget.empty.clearFilters")}
-              </Button>
-            )}
+          message={t(
+            hasFilters
+              ? "widget.empty.noMatchesDesc"
+              : "widget.empty.noTasksDesc",
+          )}
+          action={
+            hasFilters
+              ? {
+                  label: t("widget.empty.clearFilters"),
+                  onClick: handleClearFilters,
+                }
+              : { label: t("widget.header.create"), onClick: handleCreate }
+          }
+        />
+      )}
+      {!hasError && !isLoading && (offset > 0 || totalTasks > pageSize) && (
+        <Div className="flex flex-wrap items-center justify-between gap-2 border-t p-4">
+          <Span className="text-sm text-muted-foreground">
+            {t("widget.pagination.info", {
+              page: Math.floor(offset / pageSize) + 1,
+              totalPages: Math.max(1, Math.ceil(totalTasks / pageSize)),
+            })}
+          </Span>
+          <Div className="flex flex-wrap gap-2">
             <Button
               type="button"
-              variant="default"
+              variant="outline"
               size="sm"
-              onClick={handleCreate}
+              disabled={offset <= 0}
+              onClick={() => changePage(Math.max(0, offset - pageSize))}
             >
-              <Plus className="h-3.5 w-3.5 mr-1.5" />
-              {t("widget.header.create")}
+              {t("widget.pagination.prev")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={offset + pageSize >= totalTasks}
+              onClick={() => changePage(offset + pageSize)}
+            >
+              {t("widget.pagination.next")}
             </Button>
           </Div>
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

@@ -52,6 +52,9 @@ export const translations: typeof enTranslations = {
       title: "Subskrypcje",
       description: "Pasujące subskrypcje",
       subscriptions: {
+        userId: "Identyfikator klienta",
+        paymentFailedAt: "Pierwsza nieudana płatność",
+        gracePeriodEndsAt: "Koniec okresu karencji",
         id: "ID",
         userEmail: "Email",
         userName: "Nazwa",
@@ -110,6 +113,20 @@ export const translations: typeof enTranslations = {
     success: { title: "Sukces", description: "Subskrypcje pobrane" },
   },
   widget: {
+    pick: "Wybierz subskrypcję",
+    failedPayments: "Nieudane transakcje",
+    renewal: "Planowane odnowienie",
+    scheduledEnd: "Wygasa bez odnowienia",
+    notRecorded: "Brak danych",
+    customer: "Otwórz konto klienta",
+    paymentAttempts: "Sprawdź próby płatności",
+    apply: "Zastosuj filtry",
+    previous: "Poprzednia",
+    next: "Następna",
+    pagination: "Strona {{page}} z {{pages}} · liczba subskrypcji: {{total}}",
+    loading: "Wczytywanie subskrypcji",
+    customerScope: "Klient {{id}}",
+    clearScope: "Usuń ograniczenie",
     noSubscriptions: "Nie znaleziono subskrypcji.",
     noMatchingSubscriptions: "Żadne subskrypcje nie pasują do filtrów.",
     searchPlaceholder: "Szukaj po emailu lub nazwie...",
@@ -118,6 +135,8 @@ export const translations: typeof enTranslations = {
   },
   enums: {
     subscriptionStatusFilter: {
+      incomplete: "Nieukończona",
+      incompleteExpired: "Wygasła przed ukończeniem",
       all: "Wszystkie",
       active: "Aktywne",
       trialing: "Próbne",
@@ -137,6 +156,7 @@ export const translations: typeof enTranslations = {
       nowpayments: "NowPayments",
     },
     subscriptionSortField: {
+      periodEnd: "Koniec okresu",
       createdAt: "Data utworzenia",
       status: "Status",
       interval: "Interwał",

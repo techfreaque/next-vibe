@@ -397,6 +397,11 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    pagination: {
+      info: "Seite {{page}} von {{totalPages}}",
+      prev: "Zurück",
+      next: "Weiter",
+    },
     title: "Cron-Aufgaben",
     loading: "Aufgaben werden geladen...",
     header: {
@@ -431,6 +436,9 @@ export const translations: typeof enTranslations = {
       executionsMost: "Meiste Ausführungen",
     },
     task: {
+      runCount: "Läufe: {{count}}",
+      successCount: "Erfolgreich: {{count}}",
+      failureCount: "Fehlgeschlagen: {{count}}",
       executions: "Ausführungen:",
       lastRun: "Letzter Lauf:",
       never: "Nie",
@@ -449,6 +457,7 @@ export const translations: typeof enTranslations = {
       },
     },
     action: {
+      select: "{{task}} auswählen",
       view: "Details anzeigen",
       history: "Verlauf anzeigen",
       edit: "Aufgabe bearbeiten",
@@ -457,7 +466,7 @@ export const translations: typeof enTranslations = {
     },
     bulk: {
       selected: "{count} ausgewählt",
-      selectAll: "Alle auswählen",
+      selectAll: "Diese Seite auswählen",
       clearSelection: "Auswahl aufheben",
       enable: "Aktivieren",
       disable: "Deaktivieren",
@@ -467,7 +476,7 @@ export const translations: typeof enTranslations = {
       confirmDelete:
         "{count} Aufgabe(n) löschen? Dies kann nicht rückgängig gemacht werden.",
       cancel: "Abbrechen",
-      success: "{succeeded} erfolgreich, {failed} fehlgeschlagen",
+      success: "{{succeeded}} erfolgreich, {{failed}} fehlgeschlagen",
     },
     empty: {
       noTasks: "Keine Cron-Aufgaben",

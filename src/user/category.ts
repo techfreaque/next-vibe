@@ -3,10 +3,15 @@
  * Covers authentication, profile, sessions, directory, and remote connections.
  */
 
-import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
+import type {
+  CategoryDefinition,
+  RecordSearchDestination,
+} from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 import { USER_ME_ALIAS } from "@/user/private/me/constants";
+import { USERS_LIST_ALIAS } from "@/users/list/constants";
+import type userDirectory from "@/users/list/definition";
 
 export const category: CategoryDefinition = {
   key: "account",
@@ -23,10 +28,14 @@ export const category: CategoryDefinition = {
   icon: "user",
   order: 10,
   defaultEntry: {
-    [UserPermissionRole.ADMIN]: USER_ME_ALIAS,
+    [UserPermissionRole.ADMIN]: USERS_LIST_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
     [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
   },
+  recordSearch: {
+    alias: USERS_LIST_ALIAS,
+    field: "search",
+  } satisfies RecordSearchDestination<typeof userDirectory.GET>,
   subcategories: {
     login: {
       icon: "log-in",

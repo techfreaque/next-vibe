@@ -18,13 +18,10 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe/ui/components/card";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
-import { Activity } from "next-vibe/ui/components/icons/Activity";
-import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
-import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
-import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Link2 } from "next-vibe/ui/components/icons/Link2";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Lock } from "next-vibe/ui/components/icons/Lock";
@@ -37,10 +34,16 @@ import { Terminal } from "next-vibe/ui/components/icons/Terminal";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { WifiOff } from "next-vibe/ui/components/icons/WifiOff";
 import { Link } from "next-vibe/ui/components/link";
-import { Separator } from "next-vibe/ui/components/separator";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
+import {
+  StatusPill,
+  type StatusPillVariant,
+} from "next-vibe/ui/components/status-pill";
 import { Code, H3, P } from "next-vibe/ui/components/typography";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { usePathname } from "next-vibe/ui/hooks/use-pathname";
 import type { JSX } from "react";
 import { useState } from "react";
 
@@ -51,65 +54,50 @@ import { coreClientEnv as envClient } from "../../core/env-client";
 import { VibeMode } from "../../env/env-util";
 import { UserPermissionRole } from "../../identity/roles/enum";
 import { usePickerCallback } from "../../unified-ui/_shared/picker-context";
+import { useRelatedEntityNavigation } from "../../unified-ui/_shared/related-entities";
 import {
+  useWidgetEndpointMutations,
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetResponse,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
 } from "../../unified-ui/_shared/use-widget-context";
 import { apiClient } from "../../unified-ui/hooks/store";
+import { FormAlertWidget } from "../../unified-ui/widgets/interactive/form-alert/widget";
 import type endpoints from "./definition";
 import type { RemoteConnection } from "./definition";
 
-// ─── Health indicator ─────────────────────────────────────────────────────────
-
-type HealthStatus = "healthy" | "warning" | "critical" | "disconnected";
-
-function HealthDot({ health }: { health: HealthStatus }): JSX.Element {
-  if (health === "healthy") {
-    return <Activity className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />;
-  }
-  if (health === "warning") {
-    return (
-      <AlertTriangle className="h-3.5 w-3.5 text-amber-500 flex-shrink-0" />
-    );
-  }
-  if (health === "critical") {
-    return <AlertCircle className="h-3.5 w-3.5 text-red-500 flex-shrink-0" />;
-  }
-  return (
-    <WifiOff className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-  );
-}
-
-function healthLabel(
-  health: HealthStatus,
-  transportMode: string | null | undefined,
-  isReverseEntry: boolean,
+function connectionStatus(
+  conn: RemoteConnection,
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>,
-): string {
-  if (health === "disconnected") {
-    return t("widget.health.disconnected");
+): { label: string; variant: StatusPillVariant } {
+  if (!conn.hasToken && !conn.remoteUrl) {
+    return { label: t("widget.selfBadge"), variant: "muted" };
   }
-  if (health === "healthy") {
-    if (isReverseEntry) {
-      return t("widget.health.incomingActive");
-    }
-    return transportMode === "reverse-ws"
-      ? t("widget.health.tunnelOpen")
-      : t("widget.health.bridgeActive");
+  if (conn.requiresReauth) {
+    return { label: t("widget.health.reauthRequired"), variant: "danger" };
   }
-  if (health === "warning") {
-    return transportMode === "reverse-ws"
-      ? t("widget.health.tunnelWarning")
-      : t("widget.health.bridgeWarning");
+  if (!conn.isActive || conn.healthStatus === "disconnected") {
+    return { label: t("widget.health.disconnected"), variant: "muted" };
   }
-  // critical
-  return transportMode === "reverse-ws"
-    ? t("widget.health.tunnelLost")
-    : t("widget.health.bridgeFailed");
+  if (!conn.hasToken) {
+    return { label: t("widget.registeredBadge"), variant: "muted" };
+  }
+  if (conn.wsConnectedAt) {
+    return { label: t("widget.health.socketOpen"), variant: "success" };
+  }
+  if (conn.healthStatus === "critical") {
+    return { label: t("widget.health.bridgeFailed"), variant: "danger" };
+  }
+  if (!conn.lastSyncedAt) {
+    return { label: t("widget.health.noSyncRecorded"), variant: "warning" };
+  }
+  return { label: t("widget.health.syncRecorded"), variant: "info" };
 }
 
 // ─── Shared action buttons ────────────────────────────────────────────────────
@@ -385,124 +373,114 @@ function ConnectionRow({
   /** Settings (PATCH) are admin-only; customers view and disconnect. */
   canManage: boolean;
 }): JSX.Element {
+  const locale = useWidgetLocale();
+  const widgetIsInteractive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const isInteractive = widgetIsInteractive && !responseOnly;
+  const navigateRelated = useRelatedEntityNavigation();
   const isSelf = !conn.hasToken && conn.remoteUrl === "";
-  const health = conn.requiresReauth ? "critical" : conn.healthStatus;
-  const isIncoming = conn.isReverseEntry;
+  const status = connectionStatus(conn, t);
+  const remoteUrl = conn.remoteUrl || conn.localUrl;
+  const date = (value: string): string =>
+    new Date(value).toLocaleString(locale, { timeZoneName: "short" });
 
-  const handleRowClick =
-    isPickerMode && onPick
-      ? (): void => onPick(conn)
-      : (): void => {
-          void (async (): Promise<void> => {
-            const defs = await import("../[instanceId]/definition");
-            navigate(defs.default.GET, {
-              urlPathParams: { instanceId: conn.instanceId },
-            });
-          })();
-        };
-
-  const transportLabel =
-    conn.hasToken && !isIncoming
-      ? conn.isActive
-        ? null // shown via health status
-        : null
-      : null;
-
-  const statusText = isSelf
-    ? t("widget.selfBadge")
-    : !conn.hasToken
-      ? t("widget.registeredBadge")
-      : conn.requiresReauth
-        ? t("widget.health.reauthRequired")
-        : healthLabel(health, conn.transportMode, isIncoming, t);
+  const handleView = (): void => {
+    if (isPickerMode && onPick) {
+      onPick(conn);
+      return;
+    }
+    navigateRelated(
+      async () => (await import("../[instanceId]/definition")).default.GET,
+      {
+        urlPathParams: { instanceId: conn.instanceId },
+      },
+    );
+  };
 
   return (
-    <Div
-      className="flex items-center gap-3 px-4 py-3 hover:bg-muted/40 cursor-pointer transition-colors"
-      onClick={handleRowClick}
-    >
-      {/* Health / type indicator */}
-      {isSelf ? (
-        <Link2 className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-      ) : !conn.hasToken ? (
-        <Link2 className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-      ) : (
-        <HealthDot health={health} />
-      )}
-
-      <Div className="flex flex-col min-w-0 flex-1">
-        <Div className="flex items-center gap-2 flex-wrap">
-          <Span className="text-sm font-medium">{conn.instanceId}</Span>
-          {isSelf && (
-            <Badge variant="secondary" className="text-[10px]">
-              {t("widget.selfBadge")}
-            </Badge>
-          )}
-          {isIncoming && (
-            <Badge variant="outline" className="text-[10px]">
-              {t("widget.incomingBadge")}
-            </Badge>
-          )}
-          {conn.isInferenceProvider && (
-            <Badge variant="outline" className="text-[10px]">
-              {t("widget.inferenceProviderBadge")}
-            </Badge>
-          )}
-          {!isSelf && conn.hasToken && conn.transportMode && (
-            <Badge variant="outline" className="text-[10px]">
-              {t("widget.transportBadge", {
-                out:
-                  conn.transportMode === "reverse-ws"
-                    ? t("widget.transport.reverseWs")
-                    : t("widget.transport.directHttp"),
-                in:
-                  conn.remoteTransportMode === "reverse-ws"
-                    ? t("widget.transport.reverseWs")
-                    : t("widget.transport.directHttp"),
-              })}
-            </Badge>
-          )}
-        </Div>
-
-        <Div className="flex items-center gap-2 mt-0.5">
-          {!isSelf && conn.hasToken && (
-            <Span
-              className={`text-xs ${
-                health === "healthy"
-                  ? "text-emerald-600 dark:text-emerald-400"
-                  : health === "warning"
-                    ? "text-amber-600 dark:text-amber-400"
-                    : health === "critical"
-                      ? "text-red-600 dark:text-red-400"
-                      : "text-muted-foreground"
-              }`}
-            >
-              {statusText}
-            </Span>
-          )}
-          {!isSelf && (conn.remoteUrl || conn.localUrl) && (
-            <Span className="text-xs text-muted-foreground font-mono truncate">
-              {conn.remoteUrl || conn.localUrl}
-            </Span>
-          )}
-          {transportLabel}
-        </Div>
+    <Div className="flex min-w-0 flex-col gap-3 px-4 py-3">
+      <Div className="flex flex-wrap items-center gap-2">
+        <Span className="min-w-0 text-sm font-medium [overflow-wrap:anywhere]">
+          {conn.instanceId}
+        </Span>
+        <StatusPill status={status.label} variant={status.variant} />
+        {conn.isReverseEntry && (
+          <Badge variant="outline">{t("widget.incomingBadge")}</Badge>
+        )}
+        {conn.isInferenceProvider && (
+          <Badge variant="outline">{t("widget.inferenceProviderBadge")}</Badge>
+        )}
       </Div>
-
-      {!isPickerMode && (
-        <Div className="flex items-center gap-1 flex-shrink-0">
-          {canManage && !isSelf && conn.hasToken && !isIncoming && (
-            <ReconnectButton conn={conn} navigate={navigate} t={t} />
+      {!isSelf && (
+        <DetailGrid columns={2}>
+          {remoteUrl && (
+            <DetailField label={t("widget.remoteUrl")} value={remoteUrl} mono />
           )}
-          {canManage && <EditButton conn={conn} navigate={navigate} t={t} />}
-          {!isSelf && (
-            <DisconnectButton conn={conn} navigate={navigate} t={t} />
+          <DetailField
+            label={t("widget.lastSynced")}
+            value={
+              conn.lastSyncedAt ? date(conn.lastSyncedAt) : t("widget.never")
+            }
+          />
+          {conn.wsConnectedAt && (
+            <DetailField
+              label={t("widget.socketSince")}
+              value={date(conn.wsConnectedAt)}
+            />
+          )}
+          {(conn.transportMode || conn.remoteTransportMode) && (
+            <DetailField
+              label={t("widget.transportLabel")}
+              value={t("widget.transportBadge", {
+                out: conn.transportMode
+                  ? t(
+                      conn.transportMode === "reverse-ws"
+                        ? "widget.transport.reverseWs"
+                        : "widget.transport.directHttp",
+                    )
+                  : t("widget.transport.unknown"),
+                in: conn.remoteTransportMode
+                  ? t(
+                      conn.remoteTransportMode === "reverse-ws"
+                        ? "widget.transport.reverseWs"
+                        : "widget.transport.directHttp",
+                    )
+                  : t("widget.transport.unknown"),
+              })}
+            />
+          )}
+        </DetailGrid>
+      )}
+      {isInteractive && (
+        <Div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleView}
+            aria-label={t("widget.viewConnection", {
+              instance: conn.instanceId,
+            })}
+          >
+            {isPickerMode ? t("widget.pickConnection") : t("widget.viewButton")}
+          </Button>
+          {!isPickerMode && (
+            <>
+              {canManage &&
+                !isSelf &&
+                conn.hasToken &&
+                !conn.isReverseEntry && (
+                  <ReconnectButton conn={conn} navigate={navigate} t={t} />
+                )}
+              {canManage && (
+                <EditButton conn={conn} navigate={navigate} t={t} />
+              )}
+              {!isSelf && (
+                <DisconnectButton conn={conn} navigate={navigate} t={t} />
+              )}
+            </>
           )}
         </Div>
-      )}
-
-      {isPickerMode && (
-        <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
       )}
     </Div>
   );
@@ -573,6 +551,40 @@ function CloudView({
 
   return (
     <Div className="flex flex-col gap-6 p-4">
+      {/* Linked instances: view + disconnect (settings live on the instance) */}
+      <Div className="flex flex-col gap-4">
+        <Div className="flex flex-col gap-1">
+          <Span className="text-sm font-semibold">
+            {t("widget.cloud.alreadyHaveLocal")}
+          </Span>
+          <P className="m-0 text-xs text-muted-foreground">
+            {t("widget.cloud.alreadyHaveLocalSub")}
+          </P>
+        </Div>
+
+        {connections.length > 0 ? (
+          <Div className="flex flex-col divide-y overflow-hidden rounded-lg border">
+            {connections.map((conn) => (
+              <ConnectionRow
+                key={conn.instanceId}
+                conn={conn}
+                navigate={navigate}
+                t={t}
+                onPick={onPick}
+                isPickerMode={isPickerMode}
+                canManage={isAdmin}
+              />
+            ))}
+          </Div>
+        ) : (
+          <Div className="flex flex-col items-start gap-3 rounded-lg border border-dashed bg-muted/30 p-4">
+            <Div className="flex items-center gap-2 text-muted-foreground">
+              <WifiOff className="h-4 w-4" />
+              <P className="m-0 text-sm">{t("widget.emptyStateCloud")}</P>
+            </Div>
+          </Div>
+        )}
+      </Div>
       {!isPickerMode && (
         <>
           <Div className="flex flex-col gap-2">
@@ -678,45 +690,8 @@ function CloudView({
               />
             )}
           </Div>
-
-          <Separator />
         </>
       )}
-
-      {/* Linked instances: view + disconnect (settings live on the instance) */}
-      <Div className="flex flex-col gap-4">
-        <Div className="flex flex-col gap-1">
-          <Span className="text-sm font-semibold">
-            {t("widget.cloud.alreadyHaveLocal")}
-          </Span>
-          <P className="m-0 text-xs text-muted-foreground">
-            {t("widget.cloud.alreadyHaveLocalSub")}
-          </P>
-        </Div>
-
-        {connections.length > 0 ? (
-          <Div className="flex flex-col divide-y overflow-hidden rounded-lg border">
-            {connections.map((conn) => (
-              <ConnectionRow
-                key={conn.instanceId}
-                conn={conn}
-                navigate={navigate}
-                t={t}
-                onPick={onPick}
-                isPickerMode={isPickerMode}
-                canManage={isAdmin}
-              />
-            ))}
-          </Div>
-        ) : (
-          <Div className="flex flex-col items-start gap-3 rounded-lg border border-dashed bg-muted/30 p-4">
-            <Div className="flex items-center gap-2 text-muted-foreground">
-              <WifiOff className="h-4 w-4" />
-              <P className="m-0 text-sm">{t("widget.emptyStateCloud")}</P>
-            </Div>
-          </Div>
-        )}
-      </Div>
     </Div>
   );
 }
@@ -740,14 +715,47 @@ function LocalView({
   isPickerMode: boolean;
   isAdmin: boolean;
 }): JSX.Element {
-  const hasProblems = connections.some(
-    (c) =>
-      c.isActive &&
-      (c.healthStatus === "critical" || c.healthStatus === "warning"),
-  );
-
   return (
     <Div className="flex flex-col gap-0">
+      {/* Connection list header — only when there is a list to head */}
+      {connections.length > 0 && (
+        <Div className="flex items-center gap-2 px-4 py-3 border-b">
+          <Link2 className="h-4 w-4 text-muted-foreground" />
+          <Span className="font-semibold text-sm mr-auto">
+            {t("widget.local.connectionsTitle")}
+          </Span>
+        </Div>
+      )}
+
+      {connections.length > 0 ? (
+        <Div className="flex flex-col divide-y">
+          {connections.map((conn) => (
+            <ConnectionRow
+              key={conn.instanceId}
+              conn={conn}
+              navigate={navigate}
+              t={t}
+              onPick={onPick}
+              isPickerMode={isPickerMode}
+              canManage={isAdmin}
+            />
+          ))}
+        </Div>
+      ) : (
+        <Div className="flex flex-col items-center gap-3 rounded-xl border border-dashed bg-card px-6 py-10 text-center">
+          <Span className="flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
+            <WifiOff className="h-5 w-5" />
+          </Span>
+          <Div className="flex flex-col gap-1">
+            <Span className="text-sm font-semibold text-foreground">
+              {t("widget.local.noConnectionsYet")}
+            </Span>
+            <P className="m-0 max-w-sm text-sm text-muted-foreground">
+              {t("widget.emptyState")}
+            </P>
+          </Div>
+        </Div>
+      )}
       {/* Connect to cloud pitch — admins only */}
       {isAdmin && (
         <Card className="rounded-none border-0 border-b shadow-none">
@@ -791,9 +799,9 @@ function LocalView({
       {isAdmin && selfInstanceId && (
         <Card className="rounded-none border-0 border-b shadow-none">
           <CardHeader className="pb-3">
-            <Div className="flex items-center justify-between gap-3">
+            <Div className="flex flex-wrap items-center justify-between gap-3">
               <Div className="flex flex-col gap-1">
-                <Div className="flex items-center gap-2">
+                <Div className="flex flex-wrap items-center gap-2">
                   <Link2 className="h-4 w-4 text-muted-foreground" />
                   <CardTitle className="text-sm">
                     {t("widget.selfIdentity.title")}
@@ -811,47 +819,6 @@ function LocalView({
           </CardHeader>
         </Card>
       )}
-
-      {/* Connection list header — only when there is a list to head */}
-      {connections.length > 0 && (
-        <Div className="flex items-center gap-2 px-4 py-3 border-b">
-          <Link2 className="h-4 w-4 text-muted-foreground" />
-          <Span className="font-semibold text-sm mr-auto">
-            {t("widget.local.connectionsTitle")}
-          </Span>
-          {hasProblems && <AlertTriangle className="h-4 w-4 text-warning" />}
-        </Div>
-      )}
-
-      {connections.length > 0 ? (
-        <Div className="flex flex-col divide-y">
-          {connections.map((conn) => (
-            <ConnectionRow
-              key={conn.instanceId}
-              conn={conn}
-              navigate={navigate}
-              t={t}
-              onPick={onPick}
-              isPickerMode={isPickerMode}
-              canManage={isAdmin}
-            />
-          ))}
-        </Div>
-      ) : (
-        <Div className="flex flex-col items-center gap-3 rounded-xl border border-dashed bg-card px-6 py-10 text-center">
-          <Span className="flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <WifiOff className="h-5 w-5" />
-          </Span>
-          <Div className="flex flex-col gap-1">
-            <Span className="text-sm font-semibold text-foreground">
-              {t("widget.local.noConnectionsYet")}
-            </Span>
-            <P className="m-0 max-w-sm text-sm text-muted-foreground">
-              {t("widget.emptyState")}
-            </P>
-          </Div>
-        </Div>
-      )}
     </Div>
   );
 }
@@ -860,49 +827,86 @@ function LocalView({
 
 export function RemoteConnectionsListContainer(): JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
-  const { push: navigate } = useWidgetNavigation();
+  const { push: navigate, pop, canGoBack } = useWidgetNavigation();
   const data = useWidgetValue<typeof endpoints.GET>();
+  const response = useWidgetResponse();
+  const read = useWidgetEndpointMutations()?.read;
+  const widgetIsInteractive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const isInteractive = widgetIsInteractive && !responseOnly;
+  const [, firstSegment, secondSegment] = usePathname().split("/");
   const onPick = usePickerCallback<RemoteConnection>();
   const user = useWidgetUser();
   const isPickerMode = !!onPick;
-
-  const connections = data?.connections ?? [];
-  const selfInstanceId = data?.selfInstanceId ?? null;
   const isCloud = envClient.NEXT_PUBLIC_VIBE_MODE === VibeMode.CLOUD;
   const isAdmin =
     !user.isPublic && user.roles?.includes(UserPermissionRole.ADMIN) === true;
-
-  // Non-admins can only ever be connected TO (connect is admin-only), so they
-  // get the connect guide on any instance, not the admin's local panel.
-  if (isCloud || !isAdmin) {
-    return (
-      <WidgetShell>
-        <CreditsTabHeader activeTab="remote" />
-        <CloudView
-          connections={connections}
-          access={data?.access ?? { canConnect: isAdmin, maxConnections: null }}
-          navigate={navigate}
-          t={t}
-          onPick={onPick}
-          isPickerMode={isPickerMode}
-          isAdmin={isAdmin}
-        />
-      </WidgetShell>
-    );
-  }
+  const isToolsPage = firstSegment === "tools" || secondSegment === "tools";
+  const showBillingHeader =
+    isInteractive && !isPickerMode && !(isAdmin && isToolsPage);
+  const hasError = response?.success === false;
 
   return (
-    <WidgetShell>
-      <CreditsTabHeader activeTab="remote" />
-      <LocalView
-        connections={connections}
-        selfInstanceId={selfInstanceId}
-        navigate={navigate}
-        t={t}
-        onPick={onPick}
-        isPickerMode={isPickerMode}
-        isAdmin={isAdmin}
+    <WidgetShell className="min-w-0">
+      {showBillingHeader && <CreditsTabHeader activeTab="remote" />}
+      <WidgetHeader
+        title={t("widget.title")}
+        backButton={
+          canGoBack && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => pop()}
+            >
+              {t("widget.back")}
+            </Button>
+          )
+        }
+        actions={
+          isInteractive && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              aria-label={t("widget.refresh")}
+              onClick={() => void read?.refetch()}
+            >
+              <RefreshCw className="size-4" />
+            </Button>
+          )
+        }
       />
+      <FormAlertWidget field={{}} />
+      {!hasError && (!data || read?.isLoading) && (
+        <Div aria-live="polite">
+          <LoadingBlock message={t("widget.loading")} />
+        </Div>
+      )}
+      {data &&
+        !hasError &&
+        !read?.isLoading &&
+        (isCloud || !isAdmin ? (
+          <CloudView
+            connections={data.connections}
+            access={data.access}
+            navigate={navigate}
+            t={t}
+            onPick={onPick}
+            isPickerMode={isPickerMode}
+            isAdmin={isAdmin}
+          />
+        ) : (
+          <LocalView
+            connections={data.connections}
+            selfInstanceId={data.selfInstanceId}
+            navigate={navigate}
+            t={t}
+            onPick={onPick}
+            isPickerMode={isPickerMode}
+            isAdmin={isAdmin}
+          />
+        ))}
     </WidgetShell>
   );
 }

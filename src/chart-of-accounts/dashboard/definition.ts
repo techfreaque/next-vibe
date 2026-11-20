@@ -57,6 +57,21 @@ const { GET } = createEndpoint({
       }),
 
       // Response fields
+      selectedCompanyId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "dashboard.companyId.label",
+        schema: z.string().nullable(),
+      }),
+      selectedCompanyName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "dashboard.companyId.label",
+        schema: z.string().nullable(),
+      }),
+      canConfigure: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.boolean(),
+      }),
       accountCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "dashboard.response.accountCount" as const,
@@ -169,6 +184,9 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: {
+        selectedCompanyId: null,
+        selectedCompanyName: null,
+        canConfigure: false,
         currentPeriodId: null,
         currentPeriodName: null,
         currentPeriodStatus: null,

@@ -15,6 +15,7 @@ export type DetailFieldProps = {
   value?: React.ReactNode;
   mono?: boolean;
   copyable?: boolean;
+  copyLabel?: string;
 } & StyleType;
 
 const columnClasses: Record<DetailGridColumns, string> = {
@@ -31,7 +32,11 @@ export function DetailGrid({
 }: DetailGridProps): React.JSX.Element {
   return (
     <div
-      className={cn("grid gap-x-6 gap-y-3", columnClasses[columns], className)}
+      className={cn(
+        "grid min-w-0 gap-x-6 gap-y-3",
+        columnClasses[columns],
+        className,
+      )}
       style={style}
     >
       {children}
@@ -45,14 +50,20 @@ export function DetailField({
   value,
   mono = false,
   copyable = false,
+  copyLabel,
   className,
   style,
 }: DetailFieldProps): React.JSX.Element {
-  const handleCopy = (): void => {
-    if (copyable && value !== undefined && value !== null) {
-      void navigator.clipboard.writeText(String(value));
-    }
-  };
+  const text =
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "bigint"
+      ? String(value)
+      : null;
+  const valueClasses = cn(
+    "text-sm font-medium [overflow-wrap:anywhere]",
+    mono && "font-mono text-xs",
+  );
 
   return (
     <div
@@ -60,28 +71,21 @@ export function DetailField({
       style={style}
     >
       <span className="text-xs text-muted-foreground">{label}</span>
-      {copyable ? (
+      {copyable && text !== null ? (
         <button
           type="button"
           className={cn(
-            "text-sm font-medium truncate text-left",
-            mono && "font-mono text-xs",
-            "cursor-pointer hover:text-primary transition-colors",
+            valueClasses,
+            "cursor-pointer text-start hover:text-primary transition-colors",
           )}
-          onClick={handleCopy}
-          title="Click to copy"
+          onClick={() => void navigator.clipboard?.writeText(text)}
+          aria-label={copyLabel}
+          title={copyLabel ?? "Click to copy"}
         >
-          {value ?? "\u2014"}
+          {text}
         </button>
       ) : (
-        <span
-          className={cn(
-            "text-sm font-medium truncate",
-            mono && "font-mono text-xs",
-          )}
-        >
-          {value ?? "\u2014"}
-        </span>
+        <span className={valueClasses}>{value ?? "\u2013"}</span>
       )}
     </div>
   );

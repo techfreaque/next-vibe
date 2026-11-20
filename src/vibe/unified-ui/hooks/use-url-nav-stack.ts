@@ -11,6 +11,7 @@ import {
 import { endpointToUrlSegment } from "../../core/core-utils/path";
 import type { NavigationStackEntry } from "../../core/definition/endpoint";
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import { createUrlNavigationRestore } from "../_shared/url-navigation-restore";
 import { resolveEndpoint } from "./resolve-endpoint";
 import type { UseNavigationStackReturn } from "./use-navigation-stack";
 
@@ -63,7 +64,7 @@ async function reconstructEntry(
   alias: string,
   params: Record<string, string>,
 ): Promise<NavigationStackEntry | null> {
-  const endpoint = await resolveEndpoint(alias);
+  const endpoint = await resolveEndpoint(alias).catch((): null => null);
   if (!endpoint) {
     return null;
   }
@@ -165,6 +166,9 @@ export function useUrlNavStack(
   } = options;
 
   const [stack, setStack] = useState<NavigationStackEntry[]>([]);
+  const [navigationRestore] = useState(
+    createUrlNavigationRestore<NavigationStackEntry>,
+  );
   const stackRef = useRef<NavigationStackEntry[]>([]);
 
   const historyRef = useRef(history);
@@ -195,27 +199,35 @@ export function useUrlNavStack(
     const handler = (): void => {
       const active = readActiveEntryRef.current();
       if (active) {
-        void (async (): Promise<void> => {
-          const entry = await reconstructEntry(active.alias, active.params);
-          const next = entry ? [entry] : [];
-          stackRef.current = next;
-          setStack(next);
-          onStackRestoredRef.current?.(entry ?? null);
-        })();
+        void navigationRestore.restore(
+          () => reconstructEntry(active.alias, active.params),
+          (entry) => {
+            const next = entry ? [entry] : [];
+            stackRef.current = next;
+            setStack(next);
+            onStackRestoredRef.current?.(entry ?? null);
+          },
+        );
       } else {
+        navigationRestore.cancel();
         stackRef.current = [];
         setStack([]);
         onStackRestoredRef.current?.(null);
       }
     };
-    return subscribePopStateRef.current(handler);
-  }, [enabled]);
+    const unsubscribe = subscribePopStateRef.current(handler);
+    return (): void => {
+      navigationRestore.cancel();
+      unsubscribe();
+    };
+  }, [enabled, navigationRestore]);
 
   // ── Push ──────────────────────────────────────────────────────────────────
   type NavPushOptions = Parameters<UseNavigationStackReturn["push"]>[1];
 
   const push = useCallback<UseNavigationStackReturn["push"]>(
     (endpoint: CreateApiEndpointAny, opts?: NavPushOptions): void => {
+      navigationRestore.cancel();
       const entry: NavigationStackEntry = {
         endpoint,
         params: {
@@ -250,7 +262,7 @@ export function useUrlNavStack(
       const serialized = serializeEntry(entry);
       historyRef.current.pushState(buildUrlRef.current(serialized));
     },
-    [],
+    [navigationRestore],
   );
 
   // ── Pop: close the top modal, else real browser back ──────────────────────
@@ -270,21 +282,27 @@ export function useUrlNavStack(
   // Use when switching base endpoints from outside (e.g. sidebar click).
   // Does NOT call history.back() so no popstate fires.
   const clearStack = useCallback((): void => {
+    navigationRestore.cancel();
     stackRef.current = [];
     setStack([]);
-  }, []);
+  }, [navigationRestore]);
 
   // ── Seed: set initial stack entry without touching browser history ──────────
   // Use on mount when the URL already encodes endpoint params (e.g. page refresh
   // at leads/lead/[id]?id=xxx). Unlike push(), no pushState is emitted.
-  const seedStack = useCallback((entry: NavigationStackEntry): void => {
-    stackRef.current = [entry];
-    setStack([entry]);
-  }, []);
+  const seedStack = useCallback(
+    (entry: NavigationStackEntry): void => {
+      navigationRestore.cancel();
+      stackRef.current = [entry];
+      setStack([entry]);
+    },
+    [navigationRestore],
+  );
 
   // ── Replace ───────────────────────────────────────────────────────────────
   const replace = useCallback<UseNavigationStackReturn["replace"]>(
     (endpoint: CreateApiEndpointAny, opts?: NavPushOptions): void => {
+      navigationRestore.cancel();
       const entry: NavigationStackEntry = {
         endpoint,
         params: {
@@ -310,7 +328,7 @@ export function useUrlNavStack(
       const serialized = serializeEntry(entry);
       historyRef.current.replaceState(buildUrlRef.current(serialized));
     },
-    [],
+    [navigationRestore],
   );
 
   if (!enabled) {

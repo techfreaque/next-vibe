@@ -28,6 +28,8 @@ import {
 } from "next-vibe/ui/components/select";
 import { Span } from "next-vibe/ui/components/span";
 import { Switch } from "next-vibe/ui/components/switch";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { storage } from "next-vibe/ui/lib/storage";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
@@ -36,9 +38,12 @@ import { ServerFramework } from "../../platforms/web/enum";
 import { cn } from "../../unified-ui/_shared/cn";
 import {
   useWidgetContext,
+  useWidgetIsInteractive,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetNavigation,
   useWidgetPlatform,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetUser,
   useWidgetValue,
@@ -625,10 +630,30 @@ export function SystemSettingsWidget(): JSX.Element {
   );
 }
 
-/**
- * CLI-only interactive editor widget for PATCH endpoint.
- * Replaced at runtime by Bun's widget.cli plugin - this stub satisfies TypeScript.
- */
-export function SystemSettingsPatchWidget(): null {
-  return null;
+/** The CLI override provides its terminal editor. The web editor belongs to GET. */
+export function SystemSettingsPatchWidget(): JSX.Element {
+  const t = useWidgetTranslation<typeof endpoints.PATCH>();
+  const value = useWidgetValue<typeof endpoints.PATCH>();
+  const navigation = useWidgetNavigation();
+  const interactive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+
+  return (
+    <WidgetShell>
+      <WidgetHeader title={t("patch.title")} />
+      {value?.resultMessage && <Span>{value.resultMessage}</Span>}
+      {interactive && !responseOnly && (
+        <Button
+          type="button"
+          variant="outline"
+          onClick={async () => {
+            const settings = await import("./definition");
+            navigation.push(settings.default.GET, {});
+          }}
+        >
+          {t("get.title")}
+        </Button>
+      )}
+    </WidgetShell>
+  );
 }

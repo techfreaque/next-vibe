@@ -385,6 +385,11 @@ export const translations = {
     },
   },
   widget: {
+    pagination: {
+      info: "Page {{page}} of {{totalPages}}",
+      prev: "Previous",
+      next: "Next",
+    },
     title: "Cron Tasks",
     loading: "Loading tasks...",
     header: {
@@ -419,6 +424,9 @@ export const translations = {
       executionsMost: "Most Executions",
     },
     task: {
+      runCount: "{{count}} runs",
+      successCount: "{{count}} succeeded",
+      failureCount: "{{count}} failed",
       executions: "Executions:",
       lastRun: "Last run:",
       never: "Never",
@@ -437,6 +445,7 @@ export const translations = {
       },
     },
     action: {
+      select: "Select {{task}}",
       view: "View details",
       history: "View history",
       edit: "Edit task",
@@ -445,7 +454,7 @@ export const translations = {
     },
     bulk: {
       selected: "{count} selected",
-      selectAll: "Select all",
+      selectAll: "Select this page",
       clearSelection: "Clear selection",
       enable: "Enable",
       disable: "Disable",
@@ -454,7 +463,7 @@ export const translations = {
       confirmDeleteTitle: "Delete tasks?",
       confirmDelete: "Delete {count} task(s)? This cannot be undone.",
       cancel: "Cancel",
-      success: "{succeeded} succeeded, {failed} failed",
+      success: "{{succeeded}} succeeded, {{failed}} failed",
     },
     empty: {
       noTasks: "No cron tasks",

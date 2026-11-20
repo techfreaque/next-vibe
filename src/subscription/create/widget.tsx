@@ -203,7 +203,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
 
   // Admin-add credits endpoint
   const adminAddEndpoint = useEndpoint(
-    adminAddDefinitions,
+    { POST: adminAddDefinitions.POST },
     isAdmin
       ? {
           create: {

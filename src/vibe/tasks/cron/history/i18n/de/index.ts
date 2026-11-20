@@ -159,6 +159,11 @@ export const translations: typeof enTranslations = {
     unknownTask: "Unbekannter Task",
   },
   widget: {
+    runDetails: "Laufdetails",
+    runId: "Lauf-ID",
+    emptyFiltered:
+      "Keine Läufe passen. Ändere Aufgabe, Status, Priorität oder Zeitraum.",
+    emptyUnfiltered: "Sobald ein Lauf startet, erscheint er hier.",
     title: "Ausführungsverlauf",
     loading: "Verlauf wird geladen...",
     header: {
@@ -168,7 +173,7 @@ export const translations: typeof enTranslations = {
       refresh: "Aktualisieren",
     },
     summary: {
-      total: "Gesamt",
+      total: "Passende Läufe",
       successful: "Erfolgreich",
       failed: "Fehlgeschlagen",
       successRate: "Erfolgsrate",
@@ -178,6 +183,10 @@ export const translations: typeof enTranslations = {
       placeholder: "Aufgaben suchen...",
     },
     filter: {
+      clear: "Filter zurücksetzen",
+      allTasks: "Alle Aufgaben",
+      allPriorities: "Alle Prioritäten",
+      taskHistory: "Verlauf dieser Aufgabe",
       all: "Alle",
       running: "Laufend",
       completed: "Abgeschlossen",

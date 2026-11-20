@@ -17,6 +17,8 @@ export const {
   CANCELED: "enums.subscriptionStatusFilter.canceled",
   UNPAID: "enums.subscriptionStatusFilter.unpaid",
   PAUSED: "enums.subscriptionStatusFilter.paused",
+  INCOMPLETE: "enums.subscriptionStatusFilter.incomplete",
+  INCOMPLETE_EXPIRED: "enums.subscriptionStatusFilter.incompleteExpired",
 });
 export const SubscriptionStatusAdminFilterDB = [
   SubscriptionStatusAdminFilter.ALL,
@@ -26,6 +28,8 @@ export const SubscriptionStatusAdminFilterDB = [
   SubscriptionStatusAdminFilter.CANCELED,
   SubscriptionStatusAdminFilter.UNPAID,
   SubscriptionStatusAdminFilter.PAUSED,
+  SubscriptionStatusAdminFilter.INCOMPLETE,
+  SubscriptionStatusAdminFilter.INCOMPLETE_EXPIRED,
 ] as const;
 
 /**
@@ -76,12 +80,14 @@ export const {
   STATUS: "enums.subscriptionSortField.status",
   INTERVAL: "enums.subscriptionSortField.interval",
   USER_EMAIL: "enums.subscriptionSortField.userEmail",
+  PERIOD_END: "enums.subscriptionSortField.periodEnd",
 });
 export const SubscriptionSortFieldDB = [
   SubscriptionSortField.CREATED_AT,
   SubscriptionSortField.STATUS,
   SubscriptionSortField.INTERVAL,
   SubscriptionSortField.USER_EMAIL,
+  SubscriptionSortField.PERIOD_END,
 ] as const;
 
 /**

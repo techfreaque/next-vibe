@@ -644,6 +644,7 @@ export const translations: typeof enTranslations = {
     openLead: "Abrir ficha del prospecto",
     attributionOnly:
       "Los enlaces de atribución son pistas para revisar. Un IP compartido o una visita de seguimiento puede implicar a más de una persona.",
+    recordedAccountLink: "Vínculo de cuenta registrado",
     recordedConversion: "Cuenta registrada en conversión",
     attributedAccount: "Cuenta registrada en la atribución al crecimiento",
     previewIpMatches: "Vista previa IP que coincide con las pistas",

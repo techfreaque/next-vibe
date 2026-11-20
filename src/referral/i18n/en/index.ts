@@ -313,7 +313,21 @@ export const translations = {
         description: "Approve, reject, or complete a payout request",
       },
       fields: {
+        search: {
+          label: "Partner email",
+          description: "Search by full or partial email address.",
+        },
+        userId: {
+          label: "Partner account",
+        },
+        page: {
+          label: "Page",
+        },
+        limit: {
+          label: "Results per page",
+        },
         status: {
+          all: "All statuses",
           label: "Status Filter",
           description: "Filter by payout status",
         },
@@ -336,6 +350,36 @@ export const translations = {
       },
       widget: {
         empty: "No payout requests found",
+        emptyHint: "Try a different email or status.",
+        results: "{{count}} payout requests",
+        apply: "Apply filters",
+        clear: "Clear filters",
+        refresh: "Refresh",
+        loading: "Loading payout requests…",
+        amount: "{{credits}} earned credits · {{value}} USD value",
+        payoutSummary: "{{amount}} · Destination: {{currency}}",
+        requestedAt: "Requested {{date}}",
+        processedAt: "Updated {{date}}",
+        rejectionReason: "Reason: {{reason}}",
+        adminNotes: "Notes: {{notes}}",
+        openPartner: "Open partner",
+        openPartnerFor: "Open partner account for {{email}}",
+        actionFor: "{{action}} payout for {{email}}",
+        previous: "Previous page",
+        next: "Next page",
+        page: "Page {{page}} of {{total}}",
+        confirmAction: "Confirm action",
+        lookupFailed: "Unable to load the payout request.",
+        state: "Status",
+        valueLabel: "Requested value",
+        destinationLabel: "Destination",
+        actionSaved: "Payout action saved.",
+        approveDetail:
+          "Approval keeps the earned credits reserved for this payout.",
+        rejectDetail:
+          "Rejection releases the earned credits reserved for this payout.",
+        completeDetail:
+          "Mark the payout complete after sending the transfer. This deducts the corresponding earned credits.",
         approve: "Approve",
         reject: "Reject",
         complete: "Complete",

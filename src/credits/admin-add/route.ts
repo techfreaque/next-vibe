@@ -11,8 +11,12 @@ import { endpointsHandler } from "next-vibe/core/route/multi";
 import definitions from "./definition";
 import { AdminAddCreditsRepository } from "./repository";
 
-export const { POST, tools } = endpointsHandler({
+export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
+  [Methods.GET]: {
+    handler: ({ data, logger, locale }) =>
+      AdminAddCreditsRepository.getRecipient(data.targetUserId, logger, locale),
+  },
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, logger, locale }) =>

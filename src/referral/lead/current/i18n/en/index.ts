@@ -3,6 +3,7 @@ export const translations = {
   titleShort: "Lead Referral",
   description: "Returns the referral code linked to the current lead, if any",
   tag: "Referral",
+  noReferral: "No referral is linked to this lead",
   response: {
     referralCode: "Referral Code",
     referralLabel: "Referral Label",

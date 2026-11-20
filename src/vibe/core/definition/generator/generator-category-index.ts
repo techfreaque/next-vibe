@@ -195,8 +195,11 @@ function generateContent(
       const defaultEntryPart = defaultEntryAlias
         ? `\n    defaultEntryAlias: "${String(defaultEntryAlias)}",`
         : "";
+      const searchPart = c.def.recordSearch
+        ? `\n    recordSearch: ${jsonToTs({ ...c.def.recordSearch }, 2, "    recordSearch: ".length)},`
+        : "";
 
-      return `  {\n    key: "${key}",\n    label: "${labelFallback}",\n    labels: ${labelsJson},\n    group: "${group}",\n    icon: "${icon}",\n    order: ${order ?? 99},${defaultEntryPart}${subcatBlock}\n  },`;
+      return `  {\n    key: "${key}",\n    label: "${labelFallback}",\n    labels: ${labelsJson},\n    group: "${group}",\n    icon: "${icon}",\n    order: ${order ?? 99},${defaultEntryPart}${searchPart}${subcatBlock}\n  },`;
     })
     .join("\n");
 

@@ -7,6 +7,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 
+import { scopedTranslation } from "../../i18n";
 import { ReferralRepository } from "../../repository";
 import type {
   AdminPayoutsGetRequestOutput,
@@ -22,9 +23,9 @@ export const AdminPayoutsRepository = {
     logger: EndpointLogger,
   ): Promise<ResponseType<AdminPayoutsGetResponseOutput>> {
     const result = await ReferralRepository.listPayoutRequests(
-      data.status ?? null,
-      50,
-      0,
+      data,
+      data.limit,
+      (data.page - 1) * data.limit,
       logger,
       locale,
     );
@@ -34,6 +35,8 @@ export const AdminPayoutsRepository = {
     return success({
       items: result.data.requests,
       totalCount: result.data.totalCount,
+      resultPage: data.page,
+      pageSize: data.limit,
     });
   },
 
@@ -76,7 +79,9 @@ export const AdminPayoutsRepository = {
     }
     return success({
       success: true,
-      message: "Action completed successfully",
+      message: scopedTranslation
+        .scopedT(locale)
+        .t("admin.payouts.widget.actionSaved"),
     });
   },
 };

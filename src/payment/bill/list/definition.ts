@@ -60,6 +60,15 @@ const { GET } = createEndpoint({
         labelField: "name",
       }),
 
+      search: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "search.label",
+        placeholder: "search.placeholder",
+        description: "search.description",
+        schema: z.string().trim().max(160).optional(),
+      }),
+
       status: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -87,6 +96,37 @@ const { GET } = createEndpoint({
       }),
 
       // RESPONSE FIELDS
+      hasFilters: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.boolean(),
+      }),
+      currentPage: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "page.label",
+        schema: z.number(),
+      }),
+      pageSizeApplied: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "pageSize.label",
+        schema: z.number(),
+      }),
+      pageCount: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "widget.pageCount",
+        schema: z.number(),
+      }),
+      selectedCompanyId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "companyId.label",
+        schema: z.string().nullable(),
+      }),
+      selectedCompanyName: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "companyId.label",
+        schema: z.string().nullable(),
+      }),
+
       totalCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.totalCount" as const,
@@ -100,6 +140,21 @@ const { GET } = createEndpoint({
           layoutType: LayoutType.GRID_2_COLUMNS,
           usage: { response: true },
           children: {
+            companyId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "companyId.label",
+              schema: z.string().nullable(),
+            }),
+            companyName: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "companyId.label",
+              schema: z.string().nullable(),
+            }),
+            isOverdue: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "widget.overdue",
+              schema: z.boolean(),
+            }),
             id: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.id" as const,
@@ -155,6 +210,10 @@ const { GET } = createEndpoint({
     },
   }),
 
+  options: {
+    formOptions: { autoSubmit: false, persistForm: false },
+  },
+
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
       title: "get.errors.validation.title" as const,
@@ -206,23 +265,78 @@ const { GET } = createEndpoint({
         page: 1,
         pageSize: 20,
       },
+      secondPage: {
+        companyId: "00000000-0000-0000-0000-000000000001",
+        page: 2,
+        pageSize: 1,
+      },
+      emptyFilter: {
+        companyId: "00000000-0000-0000-0000-000000000001",
+        search: "ZZ-NO-MATCH",
+        page: 1,
+        pageSize: 20,
+      },
     },
     responses: {
       default: {
         totalCount: 1,
+        hasFilters: true,
+        currentPage: 1,
+        pageSizeApplied: 20,
+        pageCount: 1,
+        selectedCompanyId: "00000000-0000-0000-0000-000000000001",
+        selectedCompanyName: "Harbour Ledger & Supply",
         bills: [
           {
             id: "456e7890-e89b-12d3-a456-426614174000",
-            supplierName: "Acme GmbH",
-            billNumber: "INV-2024-001",
-            billDate: new Date("2024-01-15T00:00:00.000Z"),
-            dueDate: new Date("2024-02-15T00:00:00.000Z"),
+            companyId: "00000000-0000-0000-0000-000000000001",
+            companyName: "Harbour Ledger & Supply",
+            supplierName: "North Harbour Paper & Office Supplies",
+            billNumber: "BILL-2042",
+            billDate: new Date("2026-11-01T00:00:00.000Z"),
+            dueDate: new Date("2026-11-18T00:00:00.000Z"),
             currency: "EUR",
             billTotal: 1190,
-            status: BillStatus.DRAFT,
-            createdAt: new Date("2024-01-15T00:00:00.000Z"),
+            status: BillStatus.APPROVED,
+            isOverdue: true,
+            createdAt: new Date("2026-11-01T00:00:00.000Z"),
           },
         ],
+      },
+      secondPage: {
+        totalCount: 2,
+        hasFilters: true,
+        currentPage: 2,
+        pageSizeApplied: 1,
+        pageCount: 2,
+        selectedCompanyId: "00000000-0000-0000-0000-000000000001",
+        selectedCompanyName: "Harbour Ledger & Supply",
+        bills: [
+          {
+            id: "456e7890-e89b-12d3-a456-426614174000",
+            companyId: "00000000-0000-0000-0000-000000000001",
+            companyName: "Harbour Ledger & Supply",
+            supplierName: "North Harbour Paper & Office Supplies",
+            billNumber: "BILL-2042",
+            billDate: new Date("2026-11-01T00:00:00.000Z"),
+            dueDate: new Date("2026-11-18T00:00:00.000Z"),
+            currency: "EUR",
+            billTotal: 1190,
+            status: BillStatus.APPROVED,
+            isOverdue: true,
+            createdAt: new Date("2026-11-01T00:00:00.000Z"),
+          },
+        ],
+      },
+      emptyFilter: {
+        totalCount: 0,
+        hasFilters: true,
+        currentPage: 1,
+        pageSizeApplied: 20,
+        pageCount: 1,
+        selectedCompanyId: "00000000-0000-0000-0000-000000000001",
+        selectedCompanyName: "Harbour Ledger & Supply",
+        bills: [],
       },
     },
   },

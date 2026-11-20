@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
     remoteConnection: "Fernverbindung",
   },
   widget: {
+    loading: "Verbindung wird geladen …",
     title: "Fernverbindung",
     signInDescription:
       "Melde dich an, um deine Fernverbindung zu konfigurieren",
@@ -19,7 +20,7 @@ export const translations: typeof enTranslations = {
       remoteTransport: "Transport (eingehend)",
       remoteInstance: "Remote-Instanz",
       capabilities: "Capability-Version",
-      lastSynced: "Erstsynchronisierung",
+      lastSynced: "Letzter Synchronisierungsaustausch",
       wsConnected: "Verbunden seit",
       refresh: "Aktualisieren",
       transportReverseWs: "Reverse WS (Tunnel)",
@@ -61,7 +62,9 @@ export const translations: typeof enTranslations = {
     disconnectConfirmCancel: "Abbrechen",
     disconnectConfirmProceed: "Trennen",
     state: {
-      tunnelActive: "Tunnel offen",
+      noSyncRecorded: "Keine Synchronisierung erfasst",
+      syncRecorded: "Synchronisierung erfasst",
+      tunnelActive: "WebSocket offen",
       bridgeActive: "Verbunden",
       degraded: "Verbindung instabil",
       connectionLost: "Verbindung unterbrochen",

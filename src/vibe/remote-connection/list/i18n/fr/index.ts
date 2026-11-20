@@ -56,15 +56,22 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    loading: "Chargement des connexions…",
+    refresh: "Actualiser les connexions",
+    back: "Retour",
+    socketSince: "WebSocket ouvert depuis",
+    transportLabel: "Transport",
+    viewConnection: "Ouvrir la connexion {{instance}}",
+    pickConnection: "Choisir",
     title: "Connexions distantes",
     addButton: "Ajouter une connexion",
     emptyState:
-      "Reliez une autre instance : vos mémoires et vos outils se synchronisent dans les deux sens, chaque minute.",
+      "Aucune instance liée. Liez une instance pour partager les données et les outils choisis.",
     emptyStateCloud: "Aucune instance reliée pour l'instant.",
     connectedBadge: "Connectée",
     registeredBadge: "Enregistrée",
     selfBadge: "Cette instance",
-    lastSynced: "Synchro initiale",
+    lastSynced: "Dernier échange de synchronisation",
     never: "Jamais",
     connectButton: "Relier une instance locale",
     connectButtonLocal: "Se connecter au cloud",
@@ -73,6 +80,7 @@ export const translations: typeof enTranslations = {
     inferenceProviderBadge: "Inférence",
     transportBadge: "sortant {{out}} · entrant {{in}}",
     transport: {
+      unknown: "Inconnu",
       reverseWs: "WS",
       directHttp: "HTTP",
     },
@@ -83,13 +91,16 @@ export const translations: typeof enTranslations = {
     deleteButton: "Déconnecter",
     // ── Health status labels ───────────────────────────────────────────────────
     health: {
+      socketOpen: "WebSocket ouvert",
+      noSyncRecorded: "Aucune synchronisation enregistrée",
+      syncRecorded: "Synchronisation enregistrée",
       tunnelOpen: "Tunnel ouvert",
       bridgeActive: "Connectée",
       tunnelWarning: "Tunnel en connexion",
       bridgeWarning: "Synchronisation",
       tunnelLost: "Tunnel perdu",
       bridgeFailed: "Échec de la connexion",
-      disconnected: "Inactive",
+      disconnected: "Déconnecté",
       reauthRequired: "Connexion requise",
       incomingActive: "Active",
     },
@@ -139,7 +150,7 @@ export const translations: typeof enTranslations = {
     local: {
       cloudTitle: "Se connecter au cloud",
       cloudSubtitle:
-        "Reliez cette instance locale à unbottled.ai (ou à toute autre instance cloud). Une fois connectée, les mémoires se synchronisent toutes les 60 secondes et Thea peut découvrir et exécuter vos outils locaux.",
+        "Liez cette instance au cloud pour synchroniser les données choisies et lancer des outils locaux depuis le cloud.",
       benefit1:
         "Les mémoires se synchronisent dans les deux sens, automatiquement",
       benefit2: "L'IA cloud découvre et exécute vos outils locaux",

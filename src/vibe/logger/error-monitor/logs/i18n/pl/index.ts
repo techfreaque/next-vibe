@@ -31,9 +31,9 @@ export const translations: typeof enTranslations = {
         description: "Filtruj według statusu rozwiązania",
       },
       search: {
-        label: "Szukaj",
-        description: "Szukaj w komunikatach błędów",
-        placeholder: "Szukaj komunikatów...",
+        label: "Szukaj błędów",
+        description: "Szukaj po komunikacie, odcisku lub ID wpisu",
+        placeholder: "Szukaj po komunikacie, odcisku lub ID wpisu",
       },
       errorType: {
         label: "Typ błędu",
@@ -264,6 +264,13 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    emptyFiltered: "Żadna grupa nie pasuje. Zmień lub wyczyść filtry.",
+    emptyActive:
+      "Brak aktywnych grup. Wybierz „Wszystkie”, aby przejrzeć rozwiązane błędy.",
+    severity: {
+      error: "Błąd",
+      warning: "Ostrzeżenie",
+    },
     title: "Logi błędów",
     loading: "Ładowanie logów...",
     empty: "Nie znaleziono logów błędów",
@@ -271,7 +278,7 @@ export const translations: typeof enTranslations = {
       refresh: "Odśwież",
       runScan: "Uruchom skan",
       back: "Wstecz",
-      activeCount: "aktywnych",
+      activeCount: "Łącznie otwarte: {{count}}",
     },
     col: {
       message: "Wiadomość",
@@ -285,16 +292,20 @@ export const translations: typeof enTranslations = {
       resolved: "Rozwiązany",
     },
     action: {
+      confirm: "Zapisz stan",
+      clear: "Wyczyść filtry",
       resolve: "Rozwiąż",
       reopen: "Otwórz ponownie",
     },
     detail: {
+      context: "Szczegóły błędu",
       stackTrace: "Stack Trace",
       metadata: "Metadane",
       collapse: "Zwiń",
       resolved: "Rozwiązany",
     },
     pagination: {
+      matches: "Pasujące grupy: {{count}}",
       info: "Strona {{page}} z {{totalPages}} ({{total}} łącznie)",
       prev: "Poprzednia",
       next: "Następna",

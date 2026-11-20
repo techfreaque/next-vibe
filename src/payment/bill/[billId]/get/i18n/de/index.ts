@@ -81,6 +81,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    markReceived: "Als erhalten markieren",
     back: "Zurück",
     submit: "Rechnung abrufen",
     billNumber: "Rechnung",

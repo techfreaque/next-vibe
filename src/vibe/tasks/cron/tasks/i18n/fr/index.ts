@@ -394,6 +394,11 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    pagination: {
+      info: "Page {{page}} sur {{totalPages}}",
+      prev: "Précédente",
+      next: "Suivante",
+    },
     title: "Tâches cron",
     loading: "Chargement des tâches...",
     header: {
@@ -428,6 +433,9 @@ export const translations: typeof enTranslations = {
       executionsMost: "Plus d'exécutions",
     },
     task: {
+      runCount: "Exécutions : {{count}}",
+      successCount: "Réussies : {{count}}",
+      failureCount: "En échec : {{count}}",
       executions: "Exécutions :",
       lastRun: "Dernière exécution :",
       never: "Jamais",
@@ -446,6 +454,7 @@ export const translations: typeof enTranslations = {
       },
     },
     action: {
+      select: "Sélectionner {{task}}",
       view: "Voir les détails",
       history: "Voir l'historique",
       edit: "Modifier la tâche",
@@ -454,7 +463,7 @@ export const translations: typeof enTranslations = {
     },
     bulk: {
       selected: "{count} sélectionnée(s)",
-      selectAll: "Tout sélectionner",
+      selectAll: "Sélectionner cette page",
       clearSelection: "Effacer la sélection",
       enable: "Activer",
       disable: "Désactiver",
@@ -464,7 +473,7 @@ export const translations: typeof enTranslations = {
       confirmDelete:
         "Supprimer {count} tâche(s) ? Cette action est irréversible.",
       cancel: "Annuler",
-      success: "{succeeded} réussie(s), {failed} échouée(s)",
+      success: "{{succeeded}} réussie(s), {{failed}} échouée(s)",
     },
     empty: {
       noTasks: "Aucune tâche cron",

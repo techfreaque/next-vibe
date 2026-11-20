@@ -9,8 +9,11 @@ import { FilePlus } from "next-vibe/ui/components/icons/FilePlus";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
+  useWidgetIsInteractive,
   useWidgetNavigation,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
@@ -95,6 +98,9 @@ export function PaymentDashboardWidget(_props: {
   const data = useWidgetValue<typeof definition.GET>();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const openRelated = useRelatedEntityNavigation();
+  const responseOnly = useWidgetResponseOnly();
+  const isInteractive = useWidgetIsInteractive() && !responseOnly;
 
   const currency = data?.currency ?? "EUR";
 
@@ -173,6 +179,27 @@ export function PaymentDashboardWidget(_props: {
 
   return (
     <Div className="flex flex-col gap-6">
+      {isInteractive && (
+        <Div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
+          <Span className="font-semibold">
+            {t("widget.commercialDocuments")}
+          </Span>
+          <Button
+            type="button"
+            variant="outline"
+            className="whitespace-normal"
+            onClick={() =>
+              openRelated(() =>
+                import("../processor/definition").then(
+                  (module) => module.default.GET,
+                ),
+              )
+            }
+          >
+            {t("widget.processorDiagnostics")}
+          </Button>
+        </Div>
+      )}
       <FormAlertWidget field={{}} />
 
       {/* Loading state */}

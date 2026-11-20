@@ -1,109 +1,198 @@
-/**
- * Custom Widget for Credit History
- */
-
 "use client";
-import { formatSimpleDate } from "next-vibe/core/i18n/core/localization-utils";
+
+import { formatDate } from "next-vibe/core/i18n/core/localization-utils";
+import { UserRole } from "next-vibe/identity/roles/enum";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { Minus } from "next-vibe/ui/components/icons/Minus";
-import { Plus } from "next-vibe/ui/components/icons/Plus";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { Receipt } from "next-vibe/ui/components/icons/Receipt";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { withValue } from "next-vibe/unified-ui/_shared/field-helpers";
 import {
-  useWidgetContext,
+  RelatedEntitiesPanel,
+  useRelatedEntityNavigation,
+} from "next-vibe/unified-ui/_shared/related-entities";
+import {
   useWidgetForm,
+  useWidgetIsInteractive,
+  useWidgetLocale,
+  useWidgetResponse,
+  useWidgetResponseOnly,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { PaginationWidget } from "next-vibe/unified-ui/widgets/containers/pagination/widget";
+import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 
 import { CreditsTabHeader } from "../credits-tab-header";
 import { CreditTransactionTypeDB } from "../enum";
-import { scopedTranslation as creditsScopedTranslation } from "../i18n";
 import type definition from "./definition";
 
-interface CustomWidgetProps {
-  field: (typeof definition.GET)["fields"];
-}
-
 export function CreditHistoryContainer({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
-  const context = useWidgetContext();
-  const { locale } = context;
-  const tField = useWidgetTranslation<typeof definition.GET>();
+  field: { children },
+}: {
+  field: typeof definition.GET.fields;
+}): React.JSX.Element {
+  const locale = useWidgetLocale();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const value = useWidgetValue<typeof definition.GET>();
+  const response = useWidgetResponse();
   const form = useWidgetForm<typeof definition.GET>();
-  const children = field.children;
-  const creditsT = creditsScopedTranslation.scopedT(locale).t;
-
+  const user = useWidgetUser();
+  const navigate = useRelatedEntityNavigation();
+  const interactive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const isAdmin = !user.isPublic && user.roles.includes(UserRole.ADMIN);
+  const targetUserId = isAdmin ? form?.watch("targetUserId") : undefined;
+  const targetLeadId = isAdmin ? form?.watch("targetLeadId") : undefined;
+  const isTargeted = Boolean(targetUserId || targetLeadId);
   const transactions = value?.transactions ?? [];
-  const paginationInfo = value?.paginationInfo;
+  const pagination = value?.paginationInfo;
+  const numbers = new Intl.NumberFormat(locale.split("-")[0], {
+    maximumFractionDigits: 6,
+  });
+  const signedNumbers = new Intl.NumberFormat(locale.split("-")[0], {
+    maximumFractionDigits: 6,
+    signDisplay: "exceptZero",
+  });
 
-  // When an admin views ANOTHER entity's history (targetUserId/targetLeadId
-  // set by the user-view embed), the balance/subscription header reads the
-  // logged-in admin's OWN wallet - wrong owner. Suppress it; the target's
-  // balance is shown target-scoped by the embedding user-view overview.
-  const targetUserId = form?.watch("targetUserId");
-  const targetLeadId = form?.watch("targetLeadId");
-  const isAdminTargetView = Boolean(targetUserId ?? targetLeadId);
+  const payoutAction = targetUserId ? (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      onClick={() =>
+        navigate(
+          () =>
+            import("@/referral/admin/payouts/definition").then(
+              (module) => module.default.GET,
+            ),
+          { data: { userId: targetUserId } },
+        )
+      }
+    >
+      {t("history.get.openPayouts")}
+    </Button>
+  ) : undefined;
 
   return (
-    <WidgetShell className="gap-6">
-      {!isAdminTargetView && <CreditsTabHeader activeTab="history" />}
-
-      {transactions.length > 0 ? (
-        <Div className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border bg-card shadow-sm">
+    <WidgetShell className="gap-4">
+      {interactive &&
+        !responseOnly &&
+        (isTargeted ? (
+          <RelatedEntitiesPanel
+            title={t("history.get.relatedRecords")}
+            emptyTitle={t("history.get.emptyState")}
+            items={[
+              ...(targetUserId
+                ? [
+                    {
+                      id: targetUserId,
+                      title: t("history.get.account"),
+                      subtitle: targetUserId,
+                      action: {
+                        label: t("history.get.openAccount"),
+                        onClick: () =>
+                          navigate(
+                            () =>
+                              import("@/users/view/definition").then(
+                                (module) => module.default.GET,
+                              ),
+                            { data: { userId: targetUserId } },
+                          ),
+                      },
+                      meta: payoutAction,
+                    },
+                  ]
+                : []),
+              ...(targetLeadId
+                ? [
+                    {
+                      id: targetLeadId,
+                      title: t("history.get.lead"),
+                      subtitle: targetLeadId,
+                      action: {
+                        label: t("history.get.openLead"),
+                        onClick: () =>
+                          navigate(
+                            () =>
+                              import("@/leads/[id]/definition").then(
+                                (module) => module.default.GET,
+                              ),
+                            { urlPathParams: { id: targetLeadId } },
+                          ),
+                      },
+                    },
+                  ]
+                : []),
+            ]}
+          />
+        ) : (
+          <CreditsTabHeader activeTab="history" />
+        ))}
+      <FormAlertWidget field={{}} />
+      {!value && !response && (
+        <LoadingBlock message={t("history.get.loading")} />
+      )}
+      {value && transactions.length === 0 && (
+        <EmptyBlock
+          icon={<Receipt className="size-6" />}
+          title={t("history.get.emptyState")}
+          message={t("history.get.emptyHint")}
+        />
+      )}
+      {transactions.length > 0 && (
+        <Div className="rounded-xl border bg-card divide-y divide-border">
           {transactions.map((transaction) => {
-            const isPositive = transaction.amount > 0;
             const typeKey = CreditTransactionTypeDB.find(
               (key) => key === transaction.type,
             );
-            const typeLabel = typeKey ? creditsT(typeKey) : transaction.type;
-
+            const typeLabel =
+              transaction.type === "history.get.bonusGrant"
+                ? t("history.get.bonusGrant")
+                : typeKey
+                  ? t(typeKey)
+                  : transaction.type;
             return (
               <Div
                 key={transaction.id}
-                className="flex items-center gap-3 px-4 py-3.5 sm:px-5"
+                className="grid min-w-0 gap-2 p-3 @sm:grid-cols-2 @sm:px-4"
               >
-                <Span
-                  className={cn(
-                    "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
-                    isPositive
-                      ? "bg-success/10 text-success"
-                      : "bg-muted text-muted-foreground",
-                  )}
-                >
-                  {isPositive ? (
-                    <Plus className="h-4 w-4" />
-                  ) : (
-                    <Minus className="h-4 w-4" />
-                  )}
-                </Span>
-                <Div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                  <Span className="truncate text-sm font-medium">
+                <Div className="flex min-w-0 flex-col gap-1">
+                  <Span className="break-words text-sm font-medium">
                     {typeLabel}
                   </Span>
                   <Span className="text-xs text-muted-foreground">
-                    {formatSimpleDate(transaction.createdAt, locale)}
+                    {formatDate(
+                      new Date(transaction.createdAt),
+                      locale,
+                      "PP p",
+                    )}
                   </Span>
+                  {isTargeted && (
+                    <Span className="break-all font-mono text-xs text-muted-foreground">
+                      {transaction.id}
+                    </Span>
+                  )}
                 </Div>
-                <Div className="flex shrink-0 flex-col items-end gap-0.5">
+                <Div className="flex min-w-0 flex-col gap-1">
                   <Span
                     className={cn(
                       "text-sm font-semibold tabular-nums",
-                      isPositive ? "text-success" : "text-foreground",
+                      transaction.amount > 0 && "text-success",
                     )}
                   >
-                    {isPositive ? "+" : ""}
-                    {transaction.amount}
+                    {t("history.get.delta", {
+                      amount: signedNumbers.format(transaction.amount),
+                    })}
                   </Span>
                   <Span className="text-xs tabular-nums text-muted-foreground">
-                    {tField("history.get.balance", {
-                      count: transaction.balanceAfter,
+                    {t("history.get.entryBalance", {
+                      count: numbers.format(transaction.balanceAfter),
                     })}
                   </Span>
                 </Div>
@@ -111,29 +200,21 @@ export function CreditHistoryContainer({
             );
           })}
         </Div>
-      ) : (
-        <Div className="flex flex-col items-center gap-3 rounded-xl border border-dashed bg-card px-6 py-12 text-center">
-          <Span className="flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
-            <Receipt className="h-5 w-5" />
-          </Span>
-          <Div className="flex flex-col gap-1">
-            <Span className="text-sm font-semibold">
-              {tField("history.get.emptyState")}
-            </Span>
-            <Span className="text-sm text-muted-foreground">
-              {tField("history.get.emptyHint")}
-            </Span>
-          </Div>
-        </Div>
       )}
-
-      {/* Pagination */}
-      {paginationInfo && transactions.length > 0 && (
-        <PaginationWidget
-          field={withValue(children.paginationInfo, paginationInfo, value)}
-          fieldName={"paginationInfo"}
-        />
-      )}
+      {interactive &&
+        !responseOnly &&
+        pagination &&
+        (pagination.totalCount > 0 ||
+          form.watch("paginationInfo.page") > 1) && (
+          <PaginationWidget
+            field={withValue(
+              { ...children.paginationInfo, className: "flex-wrap gap-3" },
+              pagination,
+              value,
+            )}
+            fieldName="paginationInfo"
+          />
+        )}
     </WidgetShell>
   );
 }

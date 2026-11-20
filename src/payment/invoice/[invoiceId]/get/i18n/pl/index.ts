@@ -90,6 +90,7 @@ export const translations: typeof enTranslations = {
     placeholder: "Wprowadź ID faktury",
   },
   widget: {
+    createCreditNote: "Utwórz korektę",
     back: "Wróć",
     submit: "Wyszukaj fakturę",
     invoiceNumber: "Faktura",

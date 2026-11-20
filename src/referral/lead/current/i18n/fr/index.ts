@@ -6,6 +6,7 @@ export const translations: typeof enTranslations = {
   description:
     "Renvoie le code de parrainage associé au lead actuel, s'il y en a un",
   tag: "Parrainage",
+  noReferral: "Aucun parrainage associé à ce prospect",
   response: {
     referralCode: "Code de parrainage",
     referralLabel: "Libellé du parrainage",

@@ -20,7 +20,8 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Angebote",
     titleShort: "Angebote",
-    description: "Paginierte Angebotsliste eines Unternehmens abrufen",
+    description:
+      "Suche nach Angebotsnummer, Kundenname, E-Mail, Titel oder Angebots-ID. Filtere nach Unternehmen oder Status.",
     form: {
       title: "Angebotsfilter",
       description: "Angebote filtern und paginieren",
@@ -84,6 +85,12 @@ export const translations: typeof enTranslations = {
     description: "Nach Unternehmen filtern",
     placeholder: "Unternehmens-ID eingeben",
   },
+  search: {
+    label: "Dokumente suchen",
+    description:
+      "Suche nach Angebotsnummer, Kundenname, E-Mail, Titel oder Angebots-ID. Filtere nach Unternehmen oder Status.",
+    placeholder: "Angebotsnummer, Kunde oder Titel",
+  },
   status: {
     label: "Status",
     description: "Nach Status filtern",
@@ -103,6 +110,7 @@ export const translations: typeof enTranslations = {
     description: "Einträge pro Seite",
   },
   widget: {
+    pageCount: "Seiten insgesamt",
     back: "Zurück",
     title: "Angebote",
     newEstimate: "Neues Angebot",

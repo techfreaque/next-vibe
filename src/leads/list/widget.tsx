@@ -22,7 +22,6 @@ import { BarChart3 } from "next-vibe/ui/components/icons/BarChart3";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Download } from "next-vibe/ui/components/icons/Download";
-import { Eye } from "next-vibe/ui/components/icons/Eye";
 import { GitBranch } from "next-vibe/ui/components/icons/GitBranch";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Pencil } from "next-vibe/ui/components/icons/Pencil";
@@ -157,10 +156,7 @@ function LeadRow({
   const isConverted = Boolean(lead.convertedUserId);
 
   return (
-    <Div
-      className="group flex items-center gap-3 p-3 rounded-lg border hover:bg-accent cursor-pointer transition-colors"
-      onClick={() => onView(lead)}
-    >
+    <Div className="group relative flex min-w-0 flex-wrap items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors">
       {/* Avatar / Initials */}
       <Div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
         {(lead.businessName ?? lead.email ?? "?").slice(0, 2).toUpperCase()}
@@ -169,9 +165,16 @@ function LeadRow({
       {/* Main content */}
       <Div className="flex-1 min-w-0">
         <Div className="flex items-center gap-2 flex-wrap">
-          <Span className="font-semibold text-sm truncate">
-            {lead.businessName ?? lead.email ?? "—"}
-          </Span>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => onView(lead)}
+            className="h-auto min-w-0 p-0 font-semibold text-sm hover:bg-transparent hover:underline before:absolute before:inset-0 before:rounded-lg focus-visible:before:ring-2 focus-visible:before:ring-ring"
+          >
+            <Span className="truncate">
+              {lead.businessName || lead.email || lead.id}
+            </Span>
+          </Button>
           {lead.status && (
             <StatusPill
               status={leadsT(lead.status)}
@@ -199,7 +202,7 @@ function LeadRow({
             />
           )}
         </Div>
-        <Div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+        <Div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground mt-0.5">
           {lead.email && (
             <Span className="truncate max-w-[180px]">{lead.email}</Span>
           )}
@@ -254,28 +257,19 @@ function LeadRow({
       {!isPickerMode && (
         <Div
           className={cn(
-            "flex-shrink-0 flex gap-0.5",
+            "relative z-10 ms-auto flex-shrink-0 flex gap-0.5",
             isTouch
               ? "opacity-100"
-              : "opacity-0 group-hover:opacity-100 transition-opacity",
+              : "opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity",
           )}
-          onClick={(e) => e.stopPropagation()}
         >
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => onView(lead)}
-            title={t("widget.view")}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
           <Button
             type="button"
             variant="ghost"
             size="sm"
             onClick={() => onEdit(lead)}
             title={t("widget.edit")}
+            aria-label={t("widget.edit")}
           >
             <Pencil className="h-4 w-4" />
           </Button>
@@ -286,6 +280,7 @@ function LeadRow({
             className="text-destructive hover:text-destructive"
             onClick={() => onDelete(lead)}
             title={t("widget.delete")}
+            aria-label={t("widget.delete")}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -299,7 +294,7 @@ export function LeadsListContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const { endpointMutations } = useWidgetContext();
+  const { endpointMutations, response } = useWidgetContext();
   const locale = useWidgetLocale();
   const isTouch = useTouchDevice();
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -515,7 +510,7 @@ export function LeadsListContainer({
 
   const handlePageChange = useCallback(
     (newPage: number): void => {
-      form.setValue("paginationInfo.page", newPage);
+      form.setValue("paginationInfo.page", newPage, { shouldDirty: true });
       if (onSubmit) {
         onSubmit();
       }
@@ -524,8 +519,26 @@ export function LeadsListContainer({
   );
 
   const activeSources = form.watch("statusFilters.source") ?? [];
-  const hasActiveFilters =
-    activeStatuses.length > 0 || activeSources.length > 0;
+  const hasActiveFilters = Boolean(
+    activeStatuses.length ||
+    activeSources.length ||
+    form.watch("statusFilters.search")?.trim() ||
+    form.watch("statusFilters.currentCampaignStage")?.length ||
+    form.watch("locationFilters.country")?.length ||
+    form.watch("locationFilters.language")?.length,
+  );
+
+  const clearFilters = (): void => {
+    form.setValue("statusFilters.search", "", { shouldDirty: true });
+    form.setValue("statusFilters.status", [], { shouldDirty: true });
+    form.setValue("statusFilters.source", [], { shouldDirty: true });
+    form.setValue("statusFilters.currentCampaignStage", [], {
+      shouldDirty: true,
+    });
+    form.setValue("locationFilters.country", [], { shouldDirty: true });
+    form.setValue("locationFilters.language", [], { shouldDirty: true });
+    handlePageChange(1);
+  };
 
   const headerActions = (
     <Div className="flex items-center gap-1 flex-wrap">
@@ -540,6 +553,7 @@ export function LeadsListContainer({
             size="sm"
             onClick={handleStats}
             title={t("widget.stats")}
+            aria-label={t("widget.stats")}
             className="gap-1"
           >
             <BarChart3 className="h-4 w-4" />
@@ -551,6 +565,7 @@ export function LeadsListContainer({
             size="sm"
             onClick={handleGraphs}
             title={t("widget.graphs")}
+            aria-label={t("widget.graphs")}
             className="gap-1"
           >
             <GitBranch className="h-4 w-4" />
@@ -562,6 +577,7 @@ export function LeadsListContainer({
             size="sm"
             onClick={handleSearch}
             title={t("widget.search")}
+            aria-label={t("widget.search")}
             className="gap-1"
           >
             <Search className="h-4 w-4" />
@@ -573,6 +589,7 @@ export function LeadsListContainer({
             size="sm"
             onClick={handleExport}
             title={t("widget.export")}
+            aria-label={t("widget.export")}
             className="gap-1"
           >
             <Download className="h-4 w-4" />
@@ -584,6 +601,7 @@ export function LeadsListContainer({
             size="sm"
             onClick={handleImport}
             title={t("widget.import")}
+            aria-label={t("widget.import")}
             className="gap-1"
           >
             <Upload className="h-4 w-4" />
@@ -595,6 +613,7 @@ export function LeadsListContainer({
             size="sm"
             onClick={handleBatchUpdate}
             title={t("widget.batch")}
+            aria-label={t("widget.batch")}
             className="gap-1"
           >
             <Users className="h-4 w-4" />
@@ -606,6 +625,7 @@ export function LeadsListContainer({
             size="sm"
             onClick={handleRefresh}
             title={t("widget.refresh")}
+            aria-label={t("widget.refresh")}
           >
             <RefreshCw className="h-4 w-4" />
           </Button>
@@ -766,11 +786,17 @@ export function LeadsListContainer({
       {/* Lead list */}
       <Div
         className={cn(
-          "px-4 pb-2 overflow-y-auto max-h-[min(700px,calc(100dvh-320px))]",
+          "px-4 pb-2 overflow-y-auto @md:max-h-[min(700px,calc(100dvh-320px))]",
           isFetching && !isLoadingFresh && "opacity-50 pointer-events-none",
         )}
       >
-        {isLoading ? (
+        {response?.success === false ? (
+          <EmptyBlock
+            title={t("get.errors.server.title")}
+            message={response.message}
+            action={{ label: t("widget.refresh"), onClick: handleRefresh }}
+          />
+        ) : isLoading || !widgetData ? (
           <LoadingBlock />
         ) : leads.length > 0 ? (
           <Div className="flex flex-col gap-2">
@@ -795,12 +821,14 @@ export function LeadsListContainer({
               hasActiveFilters ? t("get.emptySearch") : t("get.emptyState")
             }
             action={
-              !hasActiveFilters && !isPickerMode
-                ? {
-                    label: t("widget.addLead"),
-                    onClick: handleCreate,
-                  }
-                : undefined
+              hasActiveFilters
+                ? { label: t("widget.clearFilters"), onClick: clearFilters }
+                : !isPickerMode
+                  ? {
+                      label: t("widget.addLead"),
+                      onClick: handleCreate,
+                    }
+                  : undefined
             }
           />
         )}

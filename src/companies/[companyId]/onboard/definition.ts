@@ -11,6 +11,7 @@ import {
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
   requestField,
@@ -20,6 +21,12 @@ import {
 import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";
+
+const CompanyOnboardWidget = lazyWidget(() =>
+  import("./widget").then((module) => ({
+    default: module.CompanyOnboardWidget,
+  })),
+);
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -39,6 +46,7 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
+    render: CompanyOnboardWidget,
     usage: { request: "data&urlPathParams", response: true },
     children: {
       // URL PATH PARAMS
@@ -47,7 +55,6 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.ENTITY_PICKER,
         label: "post.companyId.label" as const,
         description: "post.companyId.description" as const,
-        hidden: true,
         schema: z.uuid(),
         listEndpoint: async () =>
           (await import("@/companies/list/definition")).default.GET,

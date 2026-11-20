@@ -70,6 +70,7 @@ export const translations = {
     },
   },
   widget: {
+    markReceived: "Mark received",
     back: "Back",
     submit: "Look Up Bill",
     billNumber: "Bill",

@@ -29,9 +29,9 @@ export const translations = {
         description: "Filter by resolved status",
       },
       search: {
-        label: "Search",
-        description: "Search in error messages",
-        placeholder: "Search messages...",
+        label: "Search errors",
+        description: "Search messages, fingerprints, or log IDs",
+        placeholder: "Search messages, fingerprints, or log IDs",
       },
       errorType: {
         label: "Error Type",
@@ -260,6 +260,14 @@ export const translations = {
   },
 
   widget: {
+    emptyFiltered:
+      "No groups match these filters. Clear a filter and try again.",
+    emptyActive:
+      "There are no active error groups. Select All to review resolved errors.",
+    severity: {
+      error: "Error",
+      warning: "Warning",
+    },
     title: "Error Logs",
     loading: "Loading logs...",
     empty: "No error logs found",
@@ -267,7 +275,7 @@ export const translations = {
       refresh: "Refresh",
       runScan: "Run Scan",
       back: "Back",
-      activeCount: "active",
+      activeCount: "{{count}} open overall",
     },
     col: {
       message: "Message",
@@ -281,16 +289,20 @@ export const translations = {
       resolved: "Resolved",
     },
     action: {
+      confirm: "Save status",
+      clear: "Clear filters",
       resolve: "Resolve",
       reopen: "Reopen",
     },
     detail: {
+      context: "Error context",
       stackTrace: "Stack Trace",
       metadata: "Metadata",
       collapse: "Collapse",
       resolved: "Resolved",
     },
     pagination: {
+      matches: "{{count}} matching groups",
       info: "Page {{page}} of {{totalPages}} ({{total}} total)",
       prev: "Previous",
       next: "Next",

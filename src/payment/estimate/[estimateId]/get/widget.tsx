@@ -1,30 +1,29 @@
 "use client";
 
+import { formatDate } from "next-vibe/core/i18n/core/localization-utils";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Span } from "next-vibe/ui/components/span";
-import { H3, H4, P } from "next-vibe/ui/components/typography";
+import { H3, P } from "next-vibe/ui/components/typography";
 import {
+  useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { EntityPickerFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/entity-picker-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX } from "react";
 
+import { DocumentLineItems } from "@/finance/document-line-items";
 import { EstimateStatus } from "@/payment/enum";
 
 import type definition from "./definition";
-
-function fmt(n: number): string {
-  return new Intl.NumberFormat(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(n);
-}
 
 function getStatusBadgeVariant(
   status: string,
@@ -44,13 +43,17 @@ function getStatusBadgeVariant(
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function EstimateGetWidget(_props: {
+export function EstimateGetWidget({
+  field,
+}: {
   field: (typeof definition.GET)["fields"];
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
   const { push: navigate, pop, canGoBack } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const locale = useWidgetLocale();
+  const responseOnly = useWidgetResponseOnly();
+  const isInteractive = useWidgetIsInteractive() && !responseOnly;
 
   if (!data?.id) {
     return (
@@ -67,6 +70,10 @@ export function EstimateGetWidget(_props: {
             {t("widget.back")}
           </Button>
         )}
+        <EntityPickerFieldWidget
+          fieldName="estimateId"
+          field={field.children.estimateId}
+        />
         <FormAlertWidget field={{}} />
         <SubmitButtonWidget<typeof definition.GET>
           field={{ text: "widget.submit" as const }}
@@ -74,6 +81,13 @@ export function EstimateGetWidget(_props: {
       </Div>
     );
   }
+
+  const money = (amount: number): string =>
+    new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: data.currency,
+      currencyDisplay: "code",
+    }).format(amount);
 
   function getStatusLabel(status: string): string {
     switch (status) {
@@ -114,8 +128,47 @@ export function EstimateGetWidget(_props: {
     })();
   };
 
+  const openStatusAction = (action: "send" | "accept" | "decline"): void => {
+    void (async (): Promise<void> => {
+      const actionDefinition =
+        action === "send"
+          ? await import("../send/definition")
+          : action === "accept"
+            ? await import("../accept/definition")
+            : await import("../decline/definition");
+      navigate(actionDefinition.default.POST, {
+        urlPathParams: { estimateId: data.id },
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+    })();
+  };
+
+  const addLine = (): void => {
+    void import("../../line/add/definition").then((module) => {
+      navigate(module.default.POST, {
+        data: { estimateId: data.id },
+        renderInModal: true,
+        popNavigationOnSuccess: 1,
+      });
+      return undefined;
+    });
+  };
+
+  const invoiceId = data.invoiceId;
+  const openInvoice = (): void => {
+    if (invoiceId) {
+      void import("@/payment/invoice/[invoiceId]/get/definition").then(
+        (module) => {
+          navigate(module.default.GET, { urlPathParams: { invoiceId } });
+          return undefined;
+        },
+      );
+    }
+  };
+
   return (
-    <Div className="flex flex-col gap-6">
+    <Div className="@container flex min-w-0 flex-col gap-6">
       {/* Back button */}
       {canGoBack && (
         <Button
@@ -131,10 +184,10 @@ export function EstimateGetWidget(_props: {
       )}
 
       {/* Estimate header */}
-      <Div className="flex items-start justify-between p-5 rounded-lg border bg-card">
-        <Div className="flex flex-col gap-2">
-          <Div className="flex items-center gap-3">
-            <H3 className="text-lg font-semibold">
+      <Div className="flex min-w-0 flex-wrap items-start justify-between gap-3 p-4 rounded-lg border bg-card">
+        <Div className="flex min-w-0 flex-col gap-2">
+          <Div className="flex flex-wrap items-center gap-3">
+            <H3 className="text-lg font-semibold [overflow-wrap:anywhere]">
               {t("widget.estimateNumber")} {data.estimateNumber}
             </H3>
             <Badge variant={getStatusBadgeVariant(data.status)}>
@@ -143,13 +196,13 @@ export function EstimateGetWidget(_props: {
           </Div>
 
           {/* Meta */}
-          <Div className="flex gap-6 text-sm text-muted-foreground">
+          <Div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
             {data.validUntil && (
               <Div className="flex flex-col gap-0.5">
                 <Span className="text-xs uppercase tracking-wide">
                   {t("widget.valid")}
                 </Span>
-                <Span>{new Date(data.validUntil).toLocaleDateString()}</Span>
+                <Span>{formatDate(data.validUntil, locale, "PP")}</Span>
               </Div>
             )}
           </Div>
@@ -166,89 +219,109 @@ export function EstimateGetWidget(_props: {
 
           {/* Notes */}
           {data.notes && (
-            <P className="text-sm text-muted-foreground">{data.notes}</P>
+            <P className="text-sm text-muted-foreground [overflow-wrap:anywhere]">
+              {data.notes}
+            </P>
           )}
         </Div>
       </Div>
 
-      {/* Line items table */}
-      {data.lines.length > 0 && (
-        <Div className="flex flex-col gap-1">
-          <H4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-            {t("widget.lineItems")}
-          </H4>
+      {data.companyName && (
+        <P className="text-sm text-muted-foreground [overflow-wrap:anywhere]">
+          {data.companyName}
+        </P>
+      )}
 
-          {/* Table header */}
-          <Div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide border-b">
-            <Span>{t("widget.description")}</Span>
-            <Span className="text-right">{t("widget.qty")}</Span>
-            <Span className="text-right">{t("widget.unitPrice")}</Span>
-            <Span className="text-right">{t("widget.tax")}</Span>
-            <Span className="text-right">{t("widget.total")}</Span>
-          </Div>
-
-          {data.lines.map((line) => (
-            <Div
-              key={line.id}
-              className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 px-4 py-2.5 text-sm border-b last:border-0"
+      {/* Actions */}
+      <Div className="flex flex-wrap gap-2 pt-2 border-t">
+        {isInteractive &&
+          data.canManage &&
+          data.status === EstimateStatus.DRAFT && (
+            <>
+              <Button type="button" onClick={() => openStatusAction("send")}>
+                {t("widget.send")}
+              </Button>
+              <Button type="button" variant="outline" onClick={addLine}>
+                {t("widget.addLine")}
+              </Button>
+            </>
+          )}
+        {isInteractive &&
+          data.canManage &&
+          data.status === EstimateStatus.SENT && (
+            <>
+              <Button type="button" onClick={() => openStatusAction("accept")}>
+                {t("widget.accept")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => openStatusAction("decline")}
+              >
+                {t("widget.decline")}
+              </Button>
+            </>
+          )}
+        {isInteractive &&
+          data.canManage &&
+          (data.status === EstimateStatus.SENT ||
+            data.status === EstimateStatus.ACCEPTED) && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleConvertToInvoice}
             >
-              <Span>{line.description}</Span>
-              <Span className="text-right font-mono">{line.quantity}</Span>
-              <Span className="text-right font-mono">
-                {data.currency} {fmt(line.unitPrice)}
-              </Span>
-              <Span className="text-right font-mono text-muted-foreground">
-                {data.currency} {fmt(line.taxAmount)}
-              </Span>
-              <Span className="text-right font-mono font-medium">
-                {data.currency} {fmt(line.lineTotal)}
-              </Span>
-            </Div>
-          ))}
-        </Div>
+              {t("widget.convertToInvoice")}
+            </Button>
+          )}
+        {isInteractive && invoiceId && (
+          <Button type="button" variant="outline" onClick={openInvoice}>
+            {t("widget.openInvoice")}
+          </Button>
+        )}
+      </Div>
+
+      {/* Line items */}
+      {data.lines.length > 0 && (
+        <DocumentLineItems
+          title={t("widget.lineItems")}
+          lines={data.lines}
+          labels={{
+            quantity: t("widget.qty"),
+            unitPrice: t("widget.unitPrice"),
+            tax: t("widget.tax"),
+            total: t("widget.total"),
+          }}
+          money={money}
+        />
       )}
 
       {/* Summary */}
       <Div className="flex justify-end">
-        <Div className="flex flex-col gap-1.5 min-w-[200px] text-sm">
+        <Div className="flex flex-col gap-1.5 w-full max-w-xs text-sm">
           {data.lines.length > 0 && (
             <>
-              <Div className="flex justify-between">
+              <Div className="flex flex-wrap justify-between gap-2">
                 <Span className="text-muted-foreground">
                   {t("widget.subtotal")}
                 </Span>
-                <Span className="font-mono">
-                  {data.currency} {fmt(data.subtotal)}
-                </Span>
+                <Span className="font-mono">{money(data.subtotal)}</Span>
               </Div>
               {data.taxAmount > 0 && (
-                <Div className="flex justify-between">
+                <Div className="flex flex-wrap justify-between gap-2">
                   <Span className="text-muted-foreground">
                     {t("widget.tax")}
                   </Span>
-                  <Span className="font-mono">
-                    {data.currency} {fmt(data.taxAmount)}
-                  </Span>
+                  <Span className="font-mono">{money(data.taxAmount)}</Span>
                 </Div>
               )}
             </>
           )}
-          <Div className="flex justify-between border-t pt-1.5 font-semibold">
+          <Div className="flex flex-wrap justify-between gap-2 border-t pt-1.5 font-semibold">
             <Span>{t("widget.total")}</Span>
-            <Span className="font-mono">
-              {data.currency} {fmt(data.total)}
-            </Span>
+            <Span className="font-mono">{money(data.total)}</Span>
           </Div>
         </Div>
-      </Div>
-
-      {/* Action buttons by status */}
-      <Div className="flex flex-wrap gap-2 pt-2 border-t">
-        {data.status === EstimateStatus.ACCEPTED && (
-          <Button type="button" onClick={handleConvertToInvoice}>
-            {t("widget.convertToInvoice")}
-          </Button>
-        )}
       </Div>
     </Div>
   );

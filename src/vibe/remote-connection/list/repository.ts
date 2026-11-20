@@ -1,7 +1,7 @@
 /**
  * Remote Connection List Repository
  * Returns all connections for the logged-in user.
- * For admins, also includes the task-sync enabled state.
+ * Admins also see instance-wide sync and inference settings.
  */
 
 import { and, eq } from "drizzle-orm";
@@ -89,6 +89,7 @@ export class RemoteConnectionListRepository {
         isActive: r.isActive,
         isInferenceProvider: r.isInferenceProvider,
         lastSyncedAt: r.lastSyncedAt?.toISOString() ?? null,
+        wsConnectedAt: r.wsConnectedAt?.toISOString() ?? null,
         hasToken: !!r.token,
         requiresReauth: RemoteConnectionRepository.requiresReauth(r),
         healthStatus: RemoteConnectionRepository.getConnectionHealth(r),

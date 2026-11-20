@@ -12,10 +12,10 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
-    title: "Rechnung genehmigen",
-    titleShort: "Rechnung genehmigen",
+    title: "Rechnungsstatus prüfen",
+    titleShort: "Rechnungsstatus prüfen",
     description:
-      "Rechnungsstatus vorrücken: ENTWURF→EINGEGANGEN→GENEHMIGT und Buchungssatz erstellen",
+      "Ändert den Status einer Eingangsrechnung im Entwurf oder mit Status Erhalten.",
     billId: {
       label: "Rechnungs-ID",
       description: "Die zu genehmigende Rechnung",
@@ -65,13 +65,13 @@ export const translations: typeof enTranslations = {
     },
     widget: {
       back: "Zurück",
-      submit: "Rechnung genehmigen",
+      submit: "Statusänderung bestätigen",
       confirmTitle: "Rechnung genehmigen?",
       confirmDescription:
-        "Der Rechnungsstatus wird vorgerückt. Nach der Genehmigung wird ein Buchungssatz erstellt.",
+        "Ein Entwurf wechselt zu Erhalten. Eine erhaltene Rechnung wird freigegeben. Wenn die Buchhaltung eingerichtet ist, wird ein Buchungssatz erstellt.",
       confirmButton: "Ja, genehmigen",
       cancelButton: "Abbrechen",
-      approved: "Rechnung genehmigt",
+      approved: "Rechnungsstatus aktualisiert",
     },
   },
 };

@@ -7,227 +7,186 @@ export const translations: typeof enTranslations = {
     stats: "Estadísticas",
     list: "Lista",
     purchases: "Compras",
-    referrals: "Remisiones"
+    referrals: "Remisiones",
   },
+  // Stats endpoint translations
   stats: {
     get: {
       title: "Estadísticas de suscripción",
       description: "Ingresos, suscripción, crédito y métricas de remisión",
       form: {
         title: "Oficina de Estadística",
-        description: "métricas de negocio agregadas"
+        description: "métricas de negocio agregadas",
       },
       timePeriodOptions: {
         title: "Período de tiempo",
-        description: "Configurar el rango de tiempo"
+        description: "Configurar el rango de tiempo",
       },
       timePeriod: {
         label: "Período",
-        description: "Intervalo de agrupación"
+        description: "Intervalo de agrupación",
       },
       dateRangePreset: {
         label: "Fecha de rango",
-        description: "Rango de fecha predefinido"
+        description: "Rango de fecha predefinido",
       },
       response: {
         revenueStats: {
           title: "Ingresos",
           description: "Revenue metrics",
-          mrr: {
-            label: "MRR"
-          },
-          arr: {
-            label: "ARR"
-          },
-          totalRevenue: {
-            label: "Total de ingresos"
-          },
-          avgOrderValue: {
-            label: "Orden de Avg"
-          }
+          mrr: { label: "MRR" },
+          arr: { label: "ARR" },
+          totalRevenue: { label: "Total de ingresos" },
+          avgOrderValue: { label: "Orden de Avg" },
         },
         subscriptionStats: {
           title: "Suscripciones",
           description: "Cuentas de suscripción",
-          activeCount: {
-            label: "Activa"
-          },
-          trialingCount: {
-            label: "Juicio"
-          },
-          canceledCount: {
-            label: "Cancelado"
-          },
-          churnRate: {
-            label: "Tasa de Churn"
-          }
+          activeCount: { label: "Activa" },
+          trialingCount: { label: "Juicio" },
+          canceledCount: { label: "Cancelado" },
+          churnRate: { label: "Tasa de Churn" },
         },
         intervalStats: {
           title: "Intervalos de facturación",
           description: "Dividencia mensual vs anual",
-          monthlyCount: {
-            label: "Mensual"
-          },
-          yearlyCount: {
-            label: "Anual"
-          },
-          yearlyRevenuePct: {
-            label: "% Ingresos anuales"
-          }
+          monthlyCount: { label: "Mensual" },
+          yearlyCount: { label: "Anual" },
+          yearlyRevenuePct: { label: "% Ingresos anuales" },
         },
         creditStats: {
           title: "Créditos",
           description: "métricas del paquete de crédito",
-          totalPurchased: {
-            label: "Comprado"
-          },
-          totalSpent: {
-            label: "Gasto"
-          },
-          packsSold: {
-            label: "Paquetes vendidos"
-          },
-          avgPackSize: {
-            label: "Tamaño del paquete de Avg"
-          }
+          totalPurchased: { label: "Comprado" },
+          totalSpent: { label: "Gasto" },
+          packsSold: { label: "Paquetes vendidos" },
+          avgPackSize: { label: "Tamaño del paquete de Avg" },
         },
         referralStats: {
           title: "Remisiones",
           description: "Metrices de programas de referencia",
-          totalReferrals: {
-            label: "Total de referencias"
-          },
-          conversionRate: {
-            label: "Conversión"
-          },
-          totalEarned: {
-            label: "Total pendiente"
-          },
-          pendingPayouts: {
-            label: "Pagos pendientes"
-          }
+          totalReferrals: { label: "Total de referencias" },
+          conversionRate: { label: "Conversión" },
+          totalEarned: { label: "Total pendiente" },
+          pendingPayouts: { label: "Pagos pendientes" },
         },
         growthMetrics: {
           title: "Crecimiento",
           description: "Tendencias de ingresos y suscripción",
           revenueChart: {
             label: "Ingresos a través del tiempo",
-            description: "Tendencia de ingresos"
+            description: "Tendencia de ingresos",
           },
           subscriptionChart: {
             label: "Crecimiento de la suscripción",
-            description: "Tendencia de suscripción activa"
-          }
+            description: "Tendencia de suscripción activa",
+          },
         },
         businessInsights: {
           title: "Insights",
           description: "Metrices generadas",
-          generatedAt: {
-            label: "Generado en"
-          }
-        }
+          generatedAt: { label: "Generado en" },
+        },
       },
       errors: {
         unauthorized: {
           title: "Se requiere autenticación",
-          description: "Acceso requerido para ver estadísticas"
+          description: "Acceso requerido para ver estadísticas",
         },
         validation: {
           title: "Error de validación",
-          description: "Parámetros inválidos"
+          description: "Parámetros inválidos",
         },
         forbidden: {
           title: "Acceso denegado",
-          description: "Acceso de los administradores necesario"
+          description: "Acceso de los administradores necesario",
         },
         server: {
           title: "Error del servidor",
-          description: "Incapaz de generar estadísticas"
+          description: "Incapaz de generar estadísticas",
         },
         unknown: {
           title: "Error desconocido",
-          description: "Se produjo un error inesperado"
+          description: "Se produjo un error inesperado",
         },
-        conflict: {
-          title: "Conflicto",
-          description: "Conflicto de datos"
-        },
+        conflict: { title: "Conflicto", description: "Conflicto de datos" },
         network: {
           title: "Error de red",
-          description: "Incapaz de conectarse"
+          description: "Incapaz de conectarse",
         },
         notFound: {
           title: "No encontrado",
-          description: "Estadísticas no disponibles"
+          description: "Estadísticas no disponibles",
         },
         unsavedChanges: {
           title: "Cambios sin guardar",
-          description: "Tienes cambios sin guardar"
-        }
+          description: "Tienes cambios sin guardar",
+        },
       },
       success: {
         title: "Operación completada",
-        description: "Estadísticas generadas"
-      }
+        description: "Estadísticas generadas",
+      },
     },
     widget: {
       refresh: "Actualizar",
-      filters: "Filtros"
-    }
+      filters: "Filtros",
+    },
   },
+  // List endpoint translations
   list: {
     get: {
       title: "Lista de suscripciones",
       description: "Examine todas las suscripciones",
       form: {
         title: "Gestión de las suscripciones",
-        description: "Filtrar y navegar suscripciones"
+        description: "Filtrar y navegar suscripciones",
       },
       searchFilters: {
         title: "Búsqueda &quot; Filtros",
-        description: "Suscripciones de filtros"
+        description: "Suscripciones de filtros",
       },
       search: {
         label: "Buscar",
         description: "Buscar por correo electrónico o nombre del usuario",
-        placeholder: "Suscripciones de búsqueda..."
+        placeholder: "Suscripciones de búsqueda...",
       },
       status: {
         label: "Situación",
         description: "Filtro por estado de suscripción",
-        placeholder: "Seleccione el estado..."
+        placeholder: "Seleccione el estado...",
       },
       interval: {
         label: "Frecuencia de facturación",
         description: "Filtro por intervalo de facturación",
-        placeholder: "Cualquier intervalo"
+        placeholder: "Cualquier intervalo",
       },
       provider: {
         label: "Proveedor",
         description: "Filtro por proveedor de pago",
-        placeholder: "Cualquier proveedor"
+        placeholder: "Cualquier proveedor",
       },
       dateFrom: {
         label: "Desde",
-        description: "Filtro de fecha de inicio"
+        description: "Filtro de fecha de inicio",
       },
       dateTo: {
         label: "A",
-        description: "Filtro de fecha final"
+        description: "Filtro de fecha final",
       },
       sortingOptions: {
         title: "Clasificación",
-        description: "Configurar la clasificación de resultados"
+        description: "Configurar la clasificación de resultados",
       },
       sortBy: {
         label: "Ordenar por",
         description: "Campo tipo",
-        placeholder: "Seleccione el campo de clase..."
+        placeholder: "Seleccione el campo de clase...",
       },
       sortOrder: {
         label: "Ordenar orden",
         description: "Dirección",
-        placeholder: "Seleccione el orden..."
+        placeholder: "Seleccione el orden...",
       },
       response: {
         title: "Suscripciones",
@@ -245,116 +204,111 @@ export const translations: typeof enTranslations = {
           canceledAt: "Cancelado",
           cancellationReason: "Cancel Reason",
           provider: "Proveedor",
-          providerSubscriptionId: "Proveedor ID"
+          providerSubscriptionId: "Proveedor ID",
         },
         totalCount: "Suscripciones totales",
-        pageCount: "Total de páginas"
+        pageCount: "Total de páginas",
       },
-      page: {
-        label: "Página"
-      },
-      limit: {
-        label: "Por página"
-      },
+      page: { label: "Página" },
+      limit: { label: "Por página" },
       errors: {
         unauthorized: {
           title: "Se requiere autenticación",
-          description: "Acceso requerido"
+          description: "Acceso requerido",
         },
         validation: {
           title: "Error de validación",
-          description: "Parámetros inválidos"
+          description: "Parámetros inválidos",
         },
         forbidden: {
           title: "Acceso denegado",
-          description: "Acceso de los administradores necesario"
+          description: "Acceso de los administradores necesario",
         },
         server: {
           title: "Error del servidor",
-          description: "Incapaz de recuperar suscripciones"
+          description: "Incapaz de recuperar suscripciones",
         },
         unknown: {
           title: "Error desconocido",
-          description: "Error inesperado"
+          description: "Error inesperado",
         },
-        conflict: {
-          title: "Conflicto",
-          description: "Conflicto de datos"
-        },
+        conflict: { title: "Conflicto", description: "Conflicto de datos" },
         network: {
           title: "Error de red",
-          description: "Incapaz de conectarse"
+          description: "Incapaz de conectarse",
         },
         notFound: {
           title: "No encontrado",
-          description: "No se han encontrado suscripciones"
+          description: "No se han encontrado suscripciones",
         },
         unsavedChanges: {
           title: "Cambios sin guardar",
-          description: "Cambios sin guardar"
-        }
+          description: "Cambios sin guardar",
+        },
       },
       success: {
         title: "Operación completada",
-        description: "Suscripciones recuperadas"
-      }
+        description: "Suscripciones recuperadas",
+      },
     },
     widget: {
       noSubscriptions: "No se han encontrado suscripciones.",
-      noMatchingSubscriptions: "No hay suscripciones que coincidan con sus filtros.",
+      noMatchingSubscriptions:
+        "No hay suscripciones que coincidan con sus filtros.",
       searchPlaceholder: "Búsqueda por correo electrónico o nombre...",
       refresh: "Actualizar",
-      viewStats: "Estadísticas"
-    }
+      viewStats: "Estadísticas",
+    },
   },
+  // Purchases endpoint translations
   purchases: {
     get: {
       title: "Compras de crédito",
       description: "Historial de compra del paquete de crédito",
       form: {
         title: "Historia de compra",
-        description: "Ver las compras de paquetes de crédito"
+        description: "Ver las compras de paquetes de crédito",
       },
       searchFilters: {
         title: "Búsqueda &quot; Filtros",
-        description: "Compras de filtros"
+        description: "Compras de filtros",
       },
       search: {
         label: "Buscar",
         description: "Buscar por correo electrónico del usuario",
-        placeholder: "Compras de búsqueda..."
+        placeholder: "Compras de búsqueda...",
       },
       packType: {
         label: "Tipo de paquete",
         description: "Filtro por tipo de paquete de crédito",
-        placeholder: "Cualquier tipo"
+        placeholder: "Cualquier tipo",
       },
       source: {
         label: "Fuente",
         description: "Filtro por fuente de compra",
-        placeholder: "Cualquier fuente"
+        placeholder: "Cualquier fuente",
       },
       dateFrom: {
         label: "Desde",
-        description: "Filtro de fecha de inicio"
+        description: "Filtro de fecha de inicio",
       },
       dateTo: {
         label: "A",
-        description: "Filtro de fecha final"
+        description: "Filtro de fecha final",
       },
       sortingOptions: {
         title: "Clasificación",
-        description: "Configurar la clasificación de resultados"
+        description: "Configurar la clasificación de resultados",
       },
       sortBy: {
         label: "Ordenar por",
         description: "Campo tipo",
-        placeholder: "Seleccione el campo de clase..."
+        placeholder: "Seleccione el campo de clase...",
       },
       sortOrder: {
         label: "Ordenar orden",
         description: "Dirección",
-        placeholder: "Seleccione el orden..."
+        placeholder: "Seleccione el orden...",
       },
       response: {
         title: "Compras",
@@ -368,59 +322,52 @@ export const translations: typeof enTranslations = {
           originalAmount: "Monto",
           remaining: "Permaneciendo",
           expiresAt: "Expires",
-          createdAt: "Comprado"
+          createdAt: "Comprado",
         },
         totalCount: "Total de compras",
-        pageCount: "Total de páginas"
+        pageCount: "Total de páginas",
       },
-      page: {
-        label: "Página"
-      },
-      limit: {
-        label: "Por página"
-      },
+      page: { label: "Página" },
+      limit: { label: "Por página" },
       errors: {
         unauthorized: {
           title: "Se requiere autenticación",
-          description: "Acceso requerido"
+          description: "Acceso requerido",
         },
         validation: {
           title: "Error de validación",
-          description: "Parámetros inválidos"
+          description: "Parámetros inválidos",
         },
         forbidden: {
           title: "Acceso denegado",
-          description: "Acceso de los administradores necesario"
+          description: "Acceso de los administradores necesario",
         },
         server: {
           title: "Error del servidor",
-          description: "Incapaz de recuperar compras"
+          description: "Incapaz de recuperar compras",
         },
         unknown: {
           title: "Error desconocido",
-          description: "Error inesperado"
+          description: "Error inesperado",
         },
-        conflict: {
-          title: "Conflicto",
-          description: "Conflicto de datos"
-        },
+        conflict: { title: "Conflicto", description: "Conflicto de datos" },
         network: {
           title: "Error de red",
-          description: "Incapaz de conectarse"
+          description: "Incapaz de conectarse",
         },
         notFound: {
           title: "No encontrado",
-          description: "No se han encontrado compras"
+          description: "No se han encontrado compras",
         },
         unsavedChanges: {
           title: "Cambios sin guardar",
-          description: "Cambios sin guardar"
-        }
+          description: "Cambios sin guardar",
+        },
       },
       success: {
         title: "Operación completada",
-        description: "Compras recuperadas"
-      }
+        description: "Compras recuperadas",
+      },
     },
     widget: {
       noPurchases: "No se han encontrado compras de paquetes de crédito.",
@@ -428,52 +375,53 @@ export const translations: typeof enTranslations = {
       searchPlaceholder: "Búsqueda por correo electrónico...",
       refresh: "Actualizar",
       expired: "Gastos",
-      neverExpires: "Nunca."
-    }
+      neverExpires: "Nunca.",
+    },
   },
+  // Referrals endpoint translations
   referrals: {
     get: {
       title: "Panel de mando de referencia",
       description: "Códigos de referido, ingresos y pagos",
       form: {
         title: "Gestión de referencias",
-        description: "Gestionar el programa de remisión"
+        description: "Gestionar el programa de remisión",
       },
       searchFilters: {
         title: "Búsqueda &quot; Filtros",
-        description: "Datos de referencia del filtro"
+        description: "Datos de referencia del filtro",
       },
       search: {
         label: "Buscar",
         description: "Buscar por correo electrónico del usuario",
-        placeholder: "Remisiones de búsqueda..."
+        placeholder: "Remisiones de búsqueda...",
       },
       payoutStatus: {
         label: "Estado de pago",
         description: "Filtro por solicitud de pago",
-        placeholder: "Cualquier condición"
+        placeholder: "Cualquier condición",
       },
       dateFrom: {
         label: "Desde",
-        description: "Filtro de fecha de inicio"
+        description: "Filtro de fecha de inicio",
       },
       dateTo: {
         label: "A",
-        description: "Filtro de fecha final"
+        description: "Filtro de fecha final",
       },
       sortingOptions: {
         title: "Clasificación",
-        description: "Configurar la clasificación de resultados"
+        description: "Configurar la clasificación de resultados",
       },
       sortBy: {
         label: "Ordenar por",
         description: "Campo tipo",
-        placeholder: "Seleccione el campo de clase..."
+        placeholder: "Seleccione el campo de clase...",
       },
       sortOrder: {
         label: "Ordenar orden",
         description: "Dirección",
-        placeholder: "Seleccione el orden..."
+        placeholder: "Seleccione el orden...",
       },
       response: {
         title: "Remisiones",
@@ -481,21 +429,11 @@ export const translations: typeof enTranslations = {
         summary: {
           title: "Resumen",
           description: "Estadísticas de referencia agregadas",
-          totalCodes: {
-            label: "Total Codes"
-          },
-          totalSignups: {
-            label: "Total Signups"
-          },
-          totalEarned: {
-            label: "Total pendiente"
-          },
-          totalPaidOut: {
-            label: "Total pagado"
-          },
-          pendingPayouts: {
-            label: "Pagos pendientes"
-          }
+          totalCodes: { label: "Total Codes" },
+          totalSignups: { label: "Total Signups" },
+          totalEarned: { label: "Total pendiente" },
+          totalPaidOut: { label: "Total pagado" },
+          pendingPayouts: { label: "Pagos pendientes" },
         },
         codes: {
           code: "Código",
@@ -505,7 +443,7 @@ export const translations: typeof enTranslations = {
           totalSignups: "Signups",
           totalEarned: "Ganado",
           isActive: "Activa",
-          createdAt: "Creado"
+          createdAt: "Creado",
         },
         payoutRequests: {
           id: "ID",
@@ -517,135 +455,125 @@ export const translations: typeof enTranslations = {
           adminNotes: "Notas",
           rejectionReason: "Rechazo de rechazo",
           createdAt: "Solicitudes",
-          processedAt: "Procesado"
+          processedAt: "Procesado",
         },
         totalCount: "Total",
-        pageCount: "Total de páginas"
+        pageCount: "Total de páginas",
       },
-      page: {
-        label: "Página"
-      },
-      limit: {
-        label: "Por página"
-      },
+      page: { label: "Página" },
+      limit: { label: "Por página" },
       errors: {
         unauthorized: {
           title: "Se requiere autenticación",
-          description: "Acceso requerido"
+          description: "Acceso requerido",
         },
         validation: {
           title: "Error de validación",
-          description: "Parámetros inválidos"
+          description: "Parámetros inválidos",
         },
         forbidden: {
           title: "Acceso denegado",
-          description: "Acceso de los administradores necesario"
+          description: "Acceso de los administradores necesario",
         },
         server: {
           title: "Error del servidor",
-          description: "Incapaz de recuperar las referencias"
+          description: "Incapaz de recuperar las referencias",
         },
         unknown: {
           title: "Error desconocido",
-          description: "Error inesperado"
+          description: "Error inesperado",
         },
-        conflict: {
-          title: "Conflicto",
-          description: "Conflicto de datos"
-        },
+        conflict: { title: "Conflicto", description: "Conflicto de datos" },
         network: {
           title: "Error de red",
-          description: "Incapaz de conectarse"
+          description: "Incapaz de conectarse",
         },
         notFound: {
           title: "No encontrado",
-          description: "No se han encontrado datos de referencia"
+          description: "No se han encontrado datos de referencia",
         },
         unsavedChanges: {
           title: "Cambios sin guardar",
-          description: "Cambios sin guardar"
-        }
+          description: "Cambios sin guardar",
+        },
       },
       success: {
         title: "Operación completada",
-        description: "Remisiones recuperadas"
-      }
+        description: "Remisiones recuperadas",
+      },
     },
     post: {
       title: "Acción de pago",
       description: "Aprobar, rechazar o completar una solicitud de pago",
       form: {
         title: "Acción de pago",
-        description: "Procesar una solicitud de pago"
+        description: "Procesar una solicitud de pago",
       },
       requestId: {
         label: "Solicitud ID",
         description: "Solicitud de pago para procesar",
-        placeholder: "Ingrese solicitud ID..."
+        placeholder: "Ingrese solicitud ID...",
       },
       action: {
         label: "Medida",
         description: "Medidas adoptadas",
-        placeholder: "Seleccionar acción..."
+        placeholder: "Seleccionar acción...",
       },
       adminNotes: {
         label: "Admin Notes",
         description: "Notas opcionales",
-        placeholder: "Añada notas..."
+        placeholder: "Añada notas...",
       },
       rejectionReason: {
         label: "Rechazo de rechazo",
         description: "Se requiere cuando se rechaza",
-        placeholder: "Introdúzcase la razón..."
+        placeholder: "Introdúzcase la razón...",
       },
       response: {
         title: "Resultado",
         description: "Resultado de la acción",
         success: "Operación completada",
-        message: "Mensaje"
+        message: "Mensaje",
       },
       errors: {
         unauthorized: {
           title: "Se requiere autenticación",
-          description: "Acceso requerido"
+          description: "Acceso requerido",
         },
         validation: {
           title: "Error de validación",
-          description: "Parámetros inválidos"
+          description: "Parámetros inválidos",
         },
         forbidden: {
           title: "Acceso denegado",
-          description: "Acceso de los administradores necesario"
+          description: "Acceso de los administradores necesario",
         },
         server: {
           title: "Error del servidor",
-          description: "Incapaz de procesar el pago"
+          description: "Incapaz de procesar el pago",
         },
         unknown: {
           title: "Error desconocido",
-          description: "Error inesperado"
+          description: "Error inesperado",
         },
         conflict: {
           title: "Conflicto",
-          description: "Pagos ya procesados"
+          description: "Pagos ya procesados",
         },
         network: {
           title: "Error de red",
-          description: "Incapaz de conectarse"
+          description: "Incapaz de conectarse",
         },
         notFound: {
           title: "No encontrado",
-          description: "Solicitud de pago no encontrada"
+          description: "Solicitud de pago no encontrada",
         },
         unsavedChanges: {
           title: "Cambios sin guardar",
-          description: "Cambios sin guardar"
-        }
+          description: "Cambios sin guardar",
+        },
       },
-      success: {
-        title: "Operación completada",
-        description: "Pagos tratados"
-      }
+      success: { title: "Operación completada", description: "Pagos tratados" },
     },
     widget: {
       noReferrals: "No se encontraron códigos de referido.",
@@ -663,61 +591,66 @@ export const translations: typeof enTranslations = {
       earned: "ganado",
       confirm: {
         title: "Confirme la acción de pago",
-        description: "¿Estás seguro de que quieres proceder con esta acción de pago? Esto no puede ser deshecho.",
+        description:
+          "¿Estás seguro de que quieres proceder con esta acción de pago? Esto no puede ser deshecho.",
         cancel: "Cancelar",
-        proceed: "Procede"
-      }
-    }
+        proceed: "Procede",
+      },
+    },
   },
+  // Enum translations
   enums: {
     subscriptionStatusFilter: {
+      incomplete: "Incompleta",
+      incompleteExpired: "Incompleto expirado",
       all: "Todos",
       active: "Activa",
       trialing: "Juicio",
       pastDue: "Puestos atrasados",
       canceled: "Cancelado",
       unpaid: "No pagados",
-      paused: "Pausa"
+      paused: "Pausa",
     },
     billingIntervalFilter: {
       any: "Cualquiera",
       monthly: "Mensual",
-      yearly: "Anual"
+      yearly: "Anual",
     },
     providerFilter: {
       any: "Cualquiera",
       stripe: "Stripe",
-      nowpayments: "NowPayments"
+      nowpayments: "NowPayments",
     },
     subscriptionSortField: {
+      periodEnd: "Final del período",
       createdAt: "Creado en",
       status: "Situación",
       interval: "Interval",
-      userEmail: "Correo electrónico"
+      userEmail: "Correo electrónico",
     },
     sortOrder: {
       asc: "Ascendencia",
-      desc: "Descendiente"
+      desc: "Descendiente",
     },
     creditPackTypeFilter: {
       any: "Cualquiera",
       subscription: "Suscripción",
       permanent: "Permanente",
       bonus: "Bonus",
-      earned: "Ganado"
+      earned: "Ganado",
     },
     creditPackSourceFilter: {
       any: "Cualquiera",
       stripePurchase: "Stripe Purchase",
       stripeSubscription: "Subscripción",
       adminGrant: "Admin Grant",
-      referralEarning: "Pendientes de referencia"
+      referralEarning: "Pendientes de referencia",
     },
     purchaseSortField: {
       createdAt: "Creado en",
       amount: "Monto",
       type: "Tipo",
-      userEmail: "Correo electrónico"
+      userEmail: "Correo electrónico",
     },
     payoutStatusFilter: {
       all: "Todos",
@@ -726,17 +659,17 @@ export const translations: typeof enTranslations = {
       rejected: "Rechazado",
       processing: "Procesamiento",
       completed: "Completado",
-      failed: "Failed"
+      failed: "Failed",
     },
     referralSortField: {
       createdAt: "Creado en",
       earnings: "Total de recursos",
-      signups: "Signups"
+      signups: "Signups",
     },
     payoutAction: {
       approve: "Aprobar",
       reject: "Rechazo",
-      complete: "Completado"
-    }
-  }
+      complete: "Completado",
+    },
+  },
 };

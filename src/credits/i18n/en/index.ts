@@ -288,6 +288,16 @@ export const translations = {
   },
   history: {
     get: {
+      bonusGrant: "Bonus credit grant",
+      relatedRecords: "Related records",
+      account: "Customer",
+      lead: "Lead",
+      openAccount: "Open customer",
+      openLead: "Open lead",
+      openPayouts: "View partner payouts",
+      loading: "Loading credit history…",
+      delta: "{{amount}} credits",
+      entryBalance: "Balance after entry: {{count}} credits",
       emptyHint: "Every credit in and out lands here.",
       title: "Get Credit History",
       titleShort: "Credit History",
@@ -476,25 +486,39 @@ export const translations = {
     },
   },
   adminAdd: {
+    recipient: {
+      title: "Verify grant recipient",
+      description: "Find the account eligible to receive the bonus credits.",
+      accountId: "Account ID",
+      email: "Recipient email",
+      noLinkedDevice: "This account has no linked device.",
+      loadFailed: "Unable to verify the recipient.",
+      loading: "Verifying recipient…",
+      retry: "Try again",
+      openAccount: "Open customer",
+      change: "Choose another recipient",
+      verify: "Verify",
+    },
     post: {
       title: "Add Credits",
       titleShort: "Add Credits",
       description: "Add credit packs to a user account (admin only)",
       tag: "admin",
       container: {
-        title: "Add Credits to User",
-        description: "Grant bonus credits to a specific user account",
+        title: "Grant Bonus Credits",
+        description:
+          "Choose a recipient and enter the exact amount to grant to their wallet.",
         selfTitle: "Add Credits to Your Account",
         selfDescription: "Grant yourself bonus credits",
       },
       targetUserId: {
-        label: "Target User ID",
-        description: "The user to add credits to",
+        label: "Recipient",
+        description: "Choose a customer from the account directory.",
       },
       amount: {
-        label: "Amount",
-        description: "Number of credits to add",
-        placeholder: "Enter credit amount...",
+        label: "Amount in credits",
+        description: "Enter a whole number of bonus credits.",
+        placeholder: "137",
       },
       packType: {
         label: "Pack Type",
@@ -509,8 +533,8 @@ export const translations = {
         label: "Back",
       },
       submitButton: {
-        label: "Add Credits",
-        loadingText: "Adding...",
+        label: "Grant bonus credits",
+        loadingText: "Granting credits…",
       },
       success: {
         title: "Credits Added",

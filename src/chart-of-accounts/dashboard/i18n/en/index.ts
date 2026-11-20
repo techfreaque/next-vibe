@@ -76,7 +76,7 @@ export const translations = {
       companies: "Companies",
       invoices: "Invoices",
       bills: "Bills",
-      selectCompany: "Enter a Company ID to load the accounting dashboard.",
+      selectCompany: "Select a company to load its accounting records.",
     },
   },
   category: "Accounting",

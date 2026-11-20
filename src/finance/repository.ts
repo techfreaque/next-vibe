@@ -1866,11 +1866,13 @@ export class FinanceRepository {
     try {
       const now = FinanceRepository.deps.now();
       const providerRows = await db
-        .select()
+        .selectDistinctOn([financeProviderSnapshots.provider])
         .from(financeProviderSnapshots)
         .where(inArray(financeProviderSnapshots.provider, [...ProviderSources]))
-        .orderBy(desc(financeProviderSnapshots.capturedAt))
-        .limit(500);
+        .orderBy(
+          financeProviderSnapshots.provider,
+          desc(financeProviderSnapshots.capturedAt),
+        );
       const statusRows = await db.select().from(financeSourceStatus);
 
       const sources = [...ProviderSources, ...RevenueSources].map((source) => {
@@ -1898,11 +1900,19 @@ export class FinanceRepository {
         };
       });
 
-      const since = new Date(startOfUtcDay(now).getTime() - 7 * DAY_MS);
+      const expectedDays = 7;
+      const today = startOfUtcDay(now);
+      const since = new Date(today.getTime() - (expectedDays - 1) * DAY_MS);
+      const tomorrow = new Date(today.getTime() + DAY_MS);
       const rollups = await db
         .select()
         .from(financeDailyRollups)
-        .where(gte(financeDailyRollups.day, since))
+        .where(
+          and(
+            gte(financeDailyRollups.day, since),
+            lt(financeDailyRollups.day, tomorrow),
+          ),
+        )
         .orderBy(desc(financeDailyRollups.day));
       const days = rollups.map((r) => ({
         day: dayKey(r.day),
@@ -1925,7 +1935,7 @@ export class FinanceRepository {
       const net = tracked.reduce((a, r) => a + r.netRevenueUsd, 0);
       const fees = tracked.reduce((a, r) => a + r.processorFeesUsd, 0);
       const cost = tracked.reduce((a, r) => a + (r.upstreamCostUsd ?? 0), 0);
-      const costComplete = tracked.length === rollups.length;
+      const costComplete = tracked.length === expectedDays;
       const weekMargin = computeMargin({
         grossRevenueUsd: net,
         refundsUsd: 0,
@@ -1947,7 +1957,17 @@ export class FinanceRepository {
         null,
       );
 
+      const lastSuccessfulIngestAt = statusRows.reduce<Date | null>(
+        (latest, row) =>
+          row.lastOkAt && (latest === null || row.lastOkAt > latest)
+            ? row.lastOkAt
+            : latest,
+        null,
+      );
+
       return success({
+        asOf: now.toISOString(),
+        lastSuccessfulIngestAt: lastSuccessfulIngestAt?.toISOString() ?? null,
         lastIngestAt: lastIngestAt?.toISOString() ?? null,
         sources,
         week: {
@@ -1959,6 +1979,7 @@ export class FinanceRepository {
           costComplete,
           marginDays: tracked.length,
           totalDays: rollups.length,
+          expectedDays,
           netRevenueAllDaysUsd: round2(netAll),
         },
         days,

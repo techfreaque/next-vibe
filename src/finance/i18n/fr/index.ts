@@ -2,6 +2,28 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Finance",
+  documents: {
+    search: "Rechercher des documents",
+    matches: "Documents trouvés ({{count}})",
+    emptyTitle: "Aucun document ne correspond à ces filtres",
+    emptyHint: "Modifiez la recherche ou les filtres.",
+    allCompanies: "Toutes les entreprises auxquelles vous avez accès",
+    chooseCompany: "Choisir une entreprise",
+    allCustomers: "Tous les clients",
+    chooseCustomer: "Choisir un client",
+    apply: "Appliquer les filtres",
+    clear: "Effacer les filtres",
+    page: "Page {{page}} sur {{pages}} · {{total}} résultats",
+    previous: "Page précédente",
+    next: "Page suivante",
+    select: "Sélectionner {{reference}}",
+    open: "Ouvrir {{reference}}",
+    noReference: "Sans numéro de document",
+    invoices: "Factures clients",
+    bills: "Factures fournisseurs",
+    estimates: "Devis",
+    heading: "Documents commerciaux",
+  },
   tags: {
     finance: "finance",
     vibeSense: "vibe-sense",
@@ -164,7 +186,9 @@ export const translations: typeof enTranslations = {
     description:
       "Chiffre d'affaires face au coût fournisseurs : soldes fournisseurs, marge, alertes et seuils.",
     response: {
-      lastIngestAt: "Dernière collecte",
+      lastIngestAt: "Dernière tentative de synchronisation",
+      lastSuccessfulIngestAt: "Dernière synchronisation réussie",
+      asOf: "Date du bilan",
       sources: "Sources",
       week: "7 derniers jours",
       days: "Marge journalière",
@@ -172,11 +196,18 @@ export const translations: typeof enTranslations = {
       thresholds: "Seuils",
     },
     widget: {
+      back: "Retour",
       title: "Finance",
       refresh: "Actualiser",
       runIngest: "Lancer la collecte",
       loading: "Chargement des finances…",
-      lastIngest: "Dernière collecte : {{when}}",
+      lastIngest: "Dernière tentative {{when}}",
+      lastSuccessful: "Dernière synchronisation réussie {{when}}",
+      snapshot: "Dernier relevé du fournisseur {{when}}",
+      stale: "Relevé ancien",
+      noBalance: "Aucun solde communiqué",
+      missingCost: "Coûts complets indisponibles",
+      noSources: "Aucune source financière n’a communiqué de données.",
       never: "jamais",
       neverRun: "Jamais exécutée",
       margin: {
@@ -188,8 +219,9 @@ export const translations: typeof enTranslations = {
         pct: "Marge en %",
         empty: "Aucune consolidation pour l'instant. Lancez une collecte.",
         costUnknown: "coût inconnu",
+        missingPct: "Marge en pourcentage indisponible",
         costIncomplete:
-          "La marge couvre {{tracked}} jours sur {{total}} : seuls les jours avec un coût fournisseurs complet comptent. CA net sur les {{total}} jours : {{revenue}}.",
+          "Les coûts sont complets pour {{tracked}} jours sur {{total}}. Revenu net enregistré sur la période : {{revenue}}.",
       },
       providers: {
         title: "Soldes fournisseurs",
@@ -207,7 +239,7 @@ export const translations: typeof enTranslations = {
       },
       alerts: {
         title: "Alertes récentes",
-        empty: "Aucune alerte. Marge et soldes normaux.",
+        empty: "Aucune alerte enregistrée",
       },
       thresholds: {
         title: "Seuils",

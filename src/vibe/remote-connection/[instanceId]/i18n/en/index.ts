@@ -4,6 +4,7 @@ export const translations = {
     remoteConnection: "Remote Connection",
   },
   widget: {
+    loading: "Loading connection…",
     title: "Remote Connection",
     signInDescription: "Sign in to configure your remote connection",
     back: "Back",
@@ -17,7 +18,7 @@ export const translations = {
       remoteTransport: "Their transport",
       remoteInstance: "Remote instance",
       capabilities: "Capabilities version",
-      lastSynced: "Initial sync",
+      lastSynced: "Last sync exchange",
       wsConnected: "Connected since",
       refresh: "Refresh",
       transportReverseWs: "Reverse WS (tunnel)",
@@ -54,7 +55,9 @@ export const translations = {
     sshLink: "Open SSH connections",
     // ── Connection state banner ────────────────────────────────────────────
     state: {
-      tunnelActive: "Tunnel open",
+      noSyncRecorded: "No sync recorded",
+      syncRecorded: "Sync recorded",
+      tunnelActive: "WebSocket open",
       bridgeActive: "Connected",
       degraded: "Connection degraded",
       connectionLost: "Connection lost",

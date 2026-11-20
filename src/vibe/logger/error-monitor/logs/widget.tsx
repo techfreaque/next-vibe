@@ -1,440 +1,488 @@
-/**
- * Custom Widget for Error Logs
- * Card list with collapsible stack trace / metadata, resolve/reopen actions,
- * and pagination.
- */
-
 "use client";
+
 import { Button } from "next-vibe/ui/components/button";
+import { DatePicker } from "next-vibe/ui/components/date-picker";
+import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
-import { Check } from "next-vibe/ui/components/icons/Check";
-import { ChevronDown } from "next-vibe/ui/components/icons/ChevronDown";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
-import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
-import { ChevronUp } from "next-vibe/ui/components/icons/ChevronUp";
-import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
-import { RotateCcw } from "next-vibe/ui/components/icons/RotateCcw";
+import { Input } from "next-vibe/ui/components/input";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Pre } from "next-vibe/ui/components/pre";
 import { Span } from "next-vibe/ui/components/span";
-import React, { useCallback, useState } from "react";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { type JSX, useState } from "react";
 
-import { cn } from "../../../unified-ui/_shared/cn";
+import { Platform } from "../../../platforms/platforms";
+import { useRelatedEntityNavigation } from "../../../unified-ui/_shared/related-entities";
 import {
-  useWidgetContext,
+  useWidgetEndpointMutations,
   useWidgetForm,
+  useWidgetIsInteractive,
   useWidgetLocale,
-  useWidgetLogger,
+  useWidgetNavigation,
   useWidgetPlatform,
+  useWidgetResponse,
+  useWidgetResponseOnly,
   useWidgetTranslation,
-  useWidgetUser,
   useWidgetValue,
 } from "../../../unified-ui/_shared/use-widget-context";
-import { DateFieldWidget } from "../../../unified-ui/widgets/form-fields/date-field/widget";
-import { SelectFieldWidget } from "../../../unified-ui/widgets/form-fields/select-field/widget";
+import { BooleanFieldWidget } from "../../../unified-ui/widgets/form-fields/boolean-field/widget";
 import { TextFieldWidget } from "../../../unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "../../../unified-ui/widgets/interactive/form-alert/widget";
+import { SubmitButtonWidget } from "../../../unified-ui/widgets/interactive/submit-button/widget";
+import { ERROR_LOGS_PAGE_SIZE } from "./constants";
 import type endpoints from "./definition";
 import type { ErrorLogsResponseOutput } from "./definition";
+import { ErrorLogStatusFilter, ErrorLogStatusFilterOptions } from "./enum";
 
 type ErrorLog = ErrorLogsResponseOutput["logs"][number];
 
-interface WidgetProps {
-  field: (typeof endpoints.GET)["fields"];
-}
-
-const LIMIT = 50;
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function formatDate(s: string): string {
-  return s.slice(0, 19).replace("T", " ");
-}
-
-// ---------------------------------------------------------------------------
-// ErrorLogCard
-// ---------------------------------------------------------------------------
-
 function ErrorLogCard({
   log,
-  expandedSection,
-  onToggle,
-  onToggleResolved,
-  isUpdating,
-  isCli,
-  t,
+  onUpdate,
 }: {
   log: ErrorLog;
-  expandedSection: "stack" | "meta" | null;
-  onToggle: (section: "stack" | "meta") => void;
-  onToggleResolved: (fingerprint: string, resolved: boolean) => void;
-  isUpdating: boolean;
-  isCli: boolean;
-  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
-}): React.JSX.Element {
-  const hasStack = Boolean(log.stackTrace);
-  const hasMeta = log.metadata && log.metadata.length > 0;
+  onUpdate: () => void;
+}): JSX.Element {
+  const [expanded, setExpanded] = useState(false);
+  const t = useWidgetTranslation<typeof endpoints.GET>();
+  const locale = useWidgetLocale();
+  const platform = useWidgetPlatform();
+  const widgetIsInteractive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const isInteractive = widgetIsInteractive && !responseOnly;
+  const showDetails =
+    expanded || platform === Platform.CLI || platform === Platform.MCP;
+  const date = (value: string): string =>
+    new Date(value).toLocaleString(locale, { timeZoneName: "short" });
 
   return (
-    <Div className="rounded-lg border bg-card overflow-hidden">
-      {/* Main row */}
-      <Div className="flex items-start gap-3 p-3">
-        {/* Resolved badge */}
-        {log.resolved && (
-          <Span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 mt-0.5 bg-success/10 text-success">
-            <Check className="h-3 w-3" />
-            {t("widget.detail.resolved")}
+    <Div className="flex min-w-0 flex-col gap-3 rounded-lg border bg-card p-3">
+      <Div className="flex flex-wrap items-center gap-2">
+        <StatusPill
+          status={
+            log.resolved
+              ? t("widget.status.resolved")
+              : t("widget.status.active")
+          }
+          variant={log.resolved ? "success" : "warning"}
+        />
+        <StatusPill
+          status={
+            log.level === "warn"
+              ? t("widget.severity.warning")
+              : t("widget.severity.error")
+          }
+          variant={log.level === "warn" ? "warning" : "danger"}
+        />
+        {log.errorType && (
+          <Span className="min-w-0 font-mono text-xs text-muted-foreground [overflow-wrap:anywhere]">
+            {log.errorType}
           </Span>
         )}
-
-        {/* Occurrences badge */}
-        {log.occurrences > 1 && (
-          <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 mt-0.5 bg-muted text-muted-foreground">
-            {/* oxlint-disable-next-line i18n/no-literal-string -- simple count */}
-            {"x"}
-            {log.occurrences}
-          </Span>
-        )}
-
-        {/* Message + meta */}
-        <Div className="flex flex-col gap-0.5 flex-1 min-w-0">
-          <Span className="text-sm font-medium break-words">{log.message}</Span>
-          <Div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground font-mono">
-            <Span>
-              {t("widget.col.firstSeen")}:{" "}
-              {formatDate(
-                log.firstSeen < log.createdAt ? log.firstSeen : log.createdAt,
-              )}
-            </Span>
-            <Span>
-              {t("widget.col.createdAt")}:{" "}
-              {formatDate(
-                log.createdAt > log.firstSeen ? log.createdAt : log.firstSeen,
-              )}
-            </Span>
-            {log.level === "warn" && (
-              <Span className="bg-warning/10 text-warning px-1 rounded">
-                {"WARN"}
-              </Span>
-            )}
-            {log.errorType && (
-              <Span className="bg-muted px-1 rounded">{log.errorType}</Span>
-            )}
-            {isCli && (
-              <Span className="text-muted-foreground/60">
-                {log.fingerprint}
-              </Span>
-            )}
-          </Div>
-        </Div>
-
-        {/* Action buttons */}
-        <Div className="flex items-center gap-1 flex-shrink-0">
-          {/* Resolve / Reopen */}
+      </Div>
+      <Span className="text-sm font-medium [overflow-wrap:anywhere]">
+        {log.message}
+      </Span>
+      <DetailGrid columns={3}>
+        <DetailField
+          label={t("widget.col.occurrences")}
+          value={log.occurrences.toLocaleString(locale)}
+        />
+        <DetailField
+          label={t("widget.col.firstSeen")}
+          value={date(log.firstSeen)}
+        />
+        <DetailField
+          label={t("widget.col.createdAt")}
+          value={date(log.createdAt)}
+        />
+      </DetailGrid>
+      {isInteractive && (
+        <Div className="flex flex-wrap gap-2">
           <Button
             type="button"
-            variant="ghost"
+            variant="outline"
             size="sm"
-            disabled={isUpdating}
-            onClick={() => onToggleResolved(log.fingerprint, !log.resolved)}
-            className={cn(
-              "h-7 px-2 text-xs gap-1",
-              log.resolved
-                ? "text-orange-600 hover:text-orange-700 dark:text-orange-400"
-                : "text-success hover:text-success/80",
-            )}
+            aria-expanded={showDetails}
+            onClick={() => setExpanded(!expanded)}
           >
-            {isUpdating ? (
-              <Loader2 className="h-3 w-3 animate-spin" />
-            ) : log.resolved ? (
-              <RotateCcw className="h-3 w-3" />
-            ) : (
-              <Check className="h-3 w-3" />
-            )}
+            {t("widget.detail.context")}
+          </Button>
+          <Button type="button" variant="ghost" size="sm" onClick={onUpdate}>
             {log.resolved
               ? t("widget.action.reopen")
               : t("widget.action.resolve")}
           </Button>
-
-          {hasStack && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => onToggle("stack")}
-              className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
-            >
-              {t("widget.detail.stackTrace")}
-              {expandedSection === "stack" ? (
-                <ChevronUp className="h-3 w-3" />
-              ) : (
-                <ChevronDown className="h-3 w-3" />
-              )}
-            </Button>
-          )}
-          {hasMeta && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => onToggle("meta")}
-              className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
-            >
-              {t("widget.detail.metadata")}
-              {expandedSection === "meta" ? (
-                <ChevronUp className="h-3 w-3" />
-              ) : (
-                <ChevronDown className="h-3 w-3" />
-              )}
-            </Button>
-          )}
-        </Div>
-      </Div>
-
-      {/* Expanded: stack trace */}
-      {(expandedSection === "stack" || isCli) && hasStack && (
-        <Div className="border-t bg-muted/40 p-3">
-          <Pre className="text-xs font-mono text-foreground overflow-auto max-h-48 whitespace-pre-wrap break-words">
-            {log.stackTrace}
-          </Pre>
         </Div>
       )}
-
-      {/* Expanded: metadata */}
-      {(expandedSection === "meta" || isCli) && hasMeta && (
-        <Div className="border-t bg-muted/40 p-3">
-          <Pre className="text-xs font-mono text-foreground overflow-auto max-h-48 whitespace-pre-wrap break-words">
-            {JSON.stringify(log.metadata, null, 2)}
-          </Pre>
+      {showDetails && (
+        <Div className="flex min-w-0 flex-col gap-3 border-t pt-3">
+          <DetailGrid columns={2}>
+            <DetailField
+              label={t("patch.fields.id.label")}
+              value={log.id}
+              mono
+              copyable
+            />
+            <DetailField
+              label={t("patch.fields.fingerprint.label")}
+              value={log.fingerprint}
+              mono
+              copyable
+            />
+          </DetailGrid>
+          {log.stackTrace && (
+            <Div className="flex min-w-0 flex-col gap-1">
+              <Span className="text-xs font-medium">
+                {t("widget.detail.stackTrace")}
+              </Span>
+              <Pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-md bg-muted/50 p-3 text-xs [overflow-wrap:anywhere]">
+                {log.stackTrace}
+              </Pre>
+            </Div>
+          )}
+          {log.metadata && log.metadata.length > 0 && (
+            <Div className="flex min-w-0 flex-col gap-1">
+              <Span className="text-xs font-medium">
+                {t("widget.detail.metadata")}
+              </Span>
+              <Pre className="max-h-48 overflow-auto whitespace-pre-wrap rounded-md bg-muted/50 p-3 text-xs [overflow-wrap:anywhere]">
+                {JSON.stringify(log.metadata, null, 2)}
+              </Pre>
+            </Div>
+          )}
         </Div>
       )}
     </Div>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Main widget
-// ---------------------------------------------------------------------------
-
-export function ErrorLogsContainer({ field }: WidgetProps): React.JSX.Element {
+export function ErrorLogsContainer(): JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
-  const children = field.children;
-  const { endpointMutations } = useWidgetContext();
-  const form = useWidgetForm();
-  const user = useWidgetUser();
   const locale = useWidgetLocale();
-  const logger = useWidgetLogger();
-  const platform = useWidgetPlatform();
-  const isCli = platform === "cli";
-
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [updatingFingerprint, setUpdatingFingerprint] = useState<string | null>(
-    null,
-  );
-
-  const value = useWidgetValue<typeof endpoints.GET>();
-  const totalCount = value?.totalCount ?? 0;
-  const logs = value?.logs ?? [];
-
-  const activeCount = value?.unresolvedCount ?? 0;
-
+  const form = useWidgetForm<typeof endpoints.GET>();
+  const widgetIsInteractive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const isInteractive = widgetIsInteractive && !responseOnly;
+  const { pop, canGoBack } = useWidgetNavigation();
+  const navigateRelated = useRelatedEntityNavigation();
+  const read = useWidgetEndpointMutations()?.read;
+  const response = useWidgetResponse();
+  const data = useWidgetValue<typeof endpoints.GET>();
+  const [datePickerVersion, setDatePickerVersion] = useState(0);
+  const status = form.watch("status") ?? ErrorLogStatusFilter.ACTIVE;
+  const search = form.watch("search") ?? "";
+  const errorType = form.watch("errorType") ?? "";
+  const startDate = form.watch("startDate");
+  const endDate = form.watch("endDate");
+  const pageSize = form.watch("limit") || ERROR_LOGS_PAGE_SIZE;
   const offset = form.watch("offset") ?? 0;
-  const fingerprintFilter = form.watch("fingerprint");
-  const isLoading = endpointMutations?.read?.isLoading;
+  const setOffset = (value: number): void =>
+    form.setValue("offset", value, { shouldDirty: true });
+  const hasError = response?.success === false;
+  const isLoading = !hasError && (!data || read?.isLoading);
+  const hasFilters =
+    status !== ErrorLogStatusFilter.ACTIVE ||
+    !!(search || errorType || startDate || endDate);
 
-  const currentPage = Math.floor(offset / LIMIT) + 1;
-  const totalPages = Math.ceil(totalCount / LIMIT) || 1;
+  const clearFilters = (): void => {
+    setOffset(0);
+    form.setValue("status", ErrorLogStatusFilter.ACTIVE, { shouldDirty: true });
+    form.setValue("search", "", { shouldDirty: true });
+    form.setValue("errorType", "", { shouldDirty: true });
+    form.setValue("startDate", undefined, { shouldDirty: true });
+    form.setValue("endDate", undefined, { shouldDirty: true });
+    setDatePickerVersion(datePickerVersion + 1);
+  };
 
-  const handleRefresh = useCallback((): void => {
-    endpointMutations?.read?.refetch?.();
-  }, [endpointMutations]);
-
-  const handlePageChange = useCallback(
-    (newOffset: number): void => {
-      form.setValue("offset", newOffset);
-    },
-    [form],
-  );
-
-  const handleToggle = useCallback(
-    (logId: string, section: "stack" | "meta"): void => {
-      const key = `${logId}:${section}`;
-      setExpandedId((prev) => (prev === key ? null : key));
-    },
-    [],
-  );
-
-  const handleToggleResolved = useCallback(
-    async (fingerprint: string, resolved: boolean): Promise<void> => {
-      if (!user) {
-        return;
-      }
-      setUpdatingFingerprint(fingerprint);
-      try {
-        const { apiClient } = await import("../../../unified-ui/hooks/store");
-        const endpointsDef = await import("./definition");
-        await apiClient.mutate(
-          endpointsDef.PATCH,
-          logger,
-          user,
-          { fingerprint, resolved },
-          undefined,
-          locale,
-        );
-        // Refetch the logs list to reflect updated status
-        endpointMutations?.read?.refetch?.();
-      } finally {
-        setUpdatingFingerprint(null);
-      }
-    },
-    [user, logger, locale, endpointMutations],
-  );
+  const changeDate = (
+    field: "startDate" | "endDate",
+    date: Date | undefined,
+  ): void => {
+    setOffset(0);
+    if (date && field === "endDate") {
+      const end = new Date(date);
+      end.setHours(23, 59, 59, 999);
+      form.setValue(field, end, { shouldDirty: true });
+      return;
+    }
+    form.setValue(field, date, { shouldDirty: true });
+  };
 
   return (
-    <Div className="flex flex-col gap-0">
-      {/* -- Header -- */}
-      <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
-        <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-        <Span className="font-semibold text-base mr-auto">
-          {t("widget.title")}
-          {totalCount > 0 && (
-            <Span className="ml-2 text-sm text-muted-foreground font-normal">
-              ({totalCount})
-            </Span>
-          )}
-          {activeCount > 0 && (
-            <Span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-destructive/10 text-destructive">
-              {activeCount} {t("widget.header.activeCount")}
-            </Span>
-          )}
-          {fingerprintFilter && (
-            <Span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground font-mono">
-              {fingerprintFilter}
-            </Span>
-          )}
-        </Span>
-
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleRefresh}
-          title={t("widget.header.refresh")}
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-      </Div>
-
-      {/* -- Filters -- */}
-      {"status" in children && (
-        <Div className="flex flex-wrap items-end gap-3 px-4 py-3 border-b">
-          <Div className="w-40">
-            <SelectFieldWidget fieldName={"status"} field={children.status} />
-          </Div>
-          <Div className="w-56">
-            <TextFieldWidget fieldName={"search"} field={children.search} />
-          </Div>
-          <Div className="w-44">
-            <TextFieldWidget
-              fieldName={"errorType"}
-              field={children.errorType}
-            />
-          </Div>
-          <Div className="w-40">
-            <DateFieldWidget
-              fieldName={"startDate"}
-              field={children.startDate}
-            />
-          </Div>
-          <Div className="w-40">
-            <DateFieldWidget fieldName={"endDate"} field={children.endDate} />
-          </Div>
-        </Div>
-      )}
-
-      {/* -- Loading state -- */}
-      {isLoading && (
-        <Div className="flex items-center justify-center py-16">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </Div>
-      )}
-
-      {/* -- Card list -- */}
-      {!isLoading && (
-        <Div className="flex flex-col gap-2 px-4 py-3">
-          <FormAlertWidget field={{}} />
-          {logs.length === 0 ? (
-            <Div className="flex flex-col items-center justify-center py-14 gap-3 text-center">
-              <AlertTriangle className="h-8 w-8 text-muted-foreground" />
-              <Span className="text-sm text-muted-foreground">
-                {t("widget.empty")}
+    <WidgetShell className="min-w-0">
+      <WidgetHeader
+        title={t("widget.title")}
+        backButton={
+          canGoBack && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => pop()}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              {t("widget.header.back")}
+            </Button>
+          )
+        }
+        actions={
+          isInteractive && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              aria-label={t("widget.header.refresh")}
+              onClick={() => void read?.refetch()}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          )
+        }
+      />
+      {isInteractive && (
+        <Div className="flex min-w-0 flex-col gap-3">
+          <Div className="grid min-w-0 grid-cols-1 gap-3 @sm:grid-cols-2">
+            <Div className="flex min-w-0 flex-col gap-1">
+              <Span className="text-xs font-medium">
+                {t("get.fields.search.label")}
               </Span>
+              <Input
+                type="text"
+                name="search"
+                aria-label={t("get.fields.search.label")}
+                placeholder={t("get.fields.search.placeholder")}
+                value={search}
+                onChangeText={(value) => {
+                  setOffset(0);
+                  form.setValue("search", value, { shouldDirty: true });
+                }}
+              />
             </Div>
-          ) : (
-            logs.map((log) => {
-              const expandedSection = expandedId?.startsWith(log.id)
-                ? expandedId.split(":")[1]
-                : undefined;
-              const key: "stack" | "meta" | null =
-                expandedSection === "stack" || expandedSection === "meta"
-                  ? expandedSection
-                  : null;
-              return (
-                <ErrorLogCard
-                  key={log.id}
-                  log={log}
-                  expandedSection={key}
-                  onToggle={(section) => handleToggle(log.id, section)}
-                  onToggleResolved={handleToggleResolved}
-                  isUpdating={updatingFingerprint === log.fingerprint}
-                  isCli={isCli}
-                  t={t}
+            <Div className="flex min-w-0 flex-col gap-1">
+              <Span className="text-xs font-medium">
+                {t("get.fields.errorType.label")}
+              </Span>
+              <Input
+                type="text"
+                name="errorType"
+                aria-label={t("get.fields.errorType.label")}
+                placeholder={t("get.fields.errorType.placeholder")}
+                value={errorType}
+                onChangeText={(value) => {
+                  setOffset(0);
+                  form.setValue("errorType", value, { shouldDirty: true });
+                }}
+              />
+            </Div>
+            {(["startDate", "endDate"] as const).map((key) => (
+              <Div key={key} className="flex min-w-0 flex-col gap-1">
+                <Span className="text-xs font-medium">
+                  {t(`get.fields.${key}.label`)}
+                </Span>
+                <DatePicker
+                  key={datePickerVersion}
+                  name={key}
+                  placeholder={t(`get.fields.${key}.label`)}
+                  value={key === "startDate" ? startDate : endDate}
+                  onChange={(date) => changeDate(key, date)}
                 />
-              );
-            })
-          )}
+              </Div>
+            ))}
+          </Div>
+          <Div className="flex flex-wrap items-center gap-2">
+            {ErrorLogStatusFilterOptions.map(({ label, value }) => (
+              <Button
+                key={value}
+                type="button"
+                variant={status === value ? "secondary" : "outline"}
+                size="sm"
+                aria-pressed={status === value}
+                onClick={() => {
+                  setOffset(0);
+                  form.setValue("status", value, { shouldDirty: true });
+                }}
+              >
+                {t(label)}
+              </Button>
+            ))}
+            {hasFilters && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+              >
+                {t("widget.action.clear")}
+              </Button>
+            )}
+          </Div>
         </Div>
       )}
 
-      {/* -- Pagination footer -- */}
-      <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
-        <Span>
-          {t("widget.pagination.info", {
-            page: currentPage,
-            totalPages,
-            total: totalCount,
-          })}
-        </Span>
-        <Div className="flex gap-1">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            disabled={offset <= 0}
-            onClick={() => handlePageChange(Math.max(0, offset - LIMIT))}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            <Span className="hidden sm:inline ml-1">
-              {t("widget.pagination.prev")}
-            </Span>
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            disabled={currentPage >= totalPages}
-            onClick={() => handlePageChange(offset + LIMIT)}
-          >
-            <Span className="hidden sm:inline mr-1">
-              {t("widget.pagination.next")}
-            </Span>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+      <FormAlertWidget field={{}} />
+      {isLoading && (
+        <Div aria-live="polite">
+          <LoadingBlock message={t("widget.loading")} />
         </Div>
-      </Div>
-    </Div>
+      )}
+      {data && !hasError && !isLoading && (
+        <>
+          <Div
+            aria-live="polite"
+            className="flex flex-wrap gap-x-3 text-xs text-muted-foreground"
+          >
+            <Span>
+              {t("widget.pagination.matches", {
+                count: data.totalCount.toLocaleString(locale),
+              })}
+            </Span>
+            <Span>
+              {t("widget.header.activeCount", {
+                count: data.unresolvedCount.toLocaleString(locale),
+              })}
+            </Span>
+          </Div>
+          {data.logs.length === 0 ? (
+            <EmptyBlock
+              icon={<AlertTriangle className="size-8" />}
+              title={t("widget.empty")}
+              message={
+                hasFilters ? t("widget.emptyFiltered") : t("widget.emptyActive")
+              }
+            />
+          ) : (
+            data.logs.map((log) => (
+              <ErrorLogCard
+                key={log.id}
+                log={log}
+                onUpdate={() =>
+                  navigateRelated(
+                    async () => (await import("./definition")).PATCH,
+                    {
+                      data: {
+                        fingerprint: log.fingerprint,
+                        resolved: !log.resolved,
+                      },
+                      renderInModal: true,
+                      popNavigationOnSuccess: 1,
+                    },
+                  )
+                }
+              />
+            ))
+          )}
+          {isInteractive && (offset > 0 || data.hasMore) && (
+            <Div className="flex flex-wrap items-center justify-between gap-2 border-t pt-3">
+              <Span className="text-sm text-muted-foreground">
+                {t("widget.pagination.info", {
+                  page: Math.floor(offset / pageSize) + 1,
+                  totalPages: Math.max(
+                    1,
+                    Math.ceil(data.totalCount / pageSize),
+                  ),
+                  total: data.totalCount,
+                })}
+              </Span>
+              <Div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={offset <= 0}
+                  onClick={() => setOffset(Math.max(0, offset - pageSize))}
+                >
+                  {t("widget.pagination.prev")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={!data.hasMore}
+                  onClick={() => setOffset(offset + pageSize)}
+                >
+                  {t("widget.pagination.next")}
+                </Button>
+              </Div>
+            </Div>
+          )}
+        </>
+      )}
+    </WidgetShell>
+  );
+}
+
+export function UpdateErrorLogContainer({
+  field,
+}: {
+  field: (typeof endpoints.PATCH)["fields"];
+}): JSX.Element {
+  const t = useWidgetTranslation<typeof endpoints.PATCH>();
+  const data = useWidgetValue<typeof endpoints.PATCH>();
+  const widgetIsInteractive = useWidgetIsInteractive();
+  const responseOnly = useWidgetResponseOnly();
+  const isInteractive = widgetIsInteractive && !responseOnly;
+  const { pop, canGoBack } = useWidgetNavigation();
+  return (
+    <WidgetShell className="min-w-0">
+      <WidgetHeader
+        title={t("patch.title")}
+        backButton={
+          canGoBack && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => pop()}
+            >
+              {t("widget.header.back")}
+            </Button>
+          )
+        }
+      />
+      <FormAlertWidget field={{}} />
+      {isInteractive && (
+        <>
+          <TextFieldWidget
+            fieldName="fingerprint"
+            field={field.children.fingerprint}
+          />
+          <TextFieldWidget fieldName="id" field={field.children.id} />
+          <BooleanFieldWidget
+            fieldName="resolved"
+            field={field.children.resolved}
+          />
+          <SubmitButtonWidget field={field.children.submit} />
+        </>
+      )}
+      {data && (
+        <DetailGrid columns={2}>
+          <DetailField
+            label={t("patch.response.fingerprint.title")}
+            value={data.responseFingerprint}
+            mono
+            copyable
+          />
+          <DetailField
+            label={t("patch.response.resolved.title")}
+            value={
+              data.responseResolved
+                ? t("widget.status.resolved")
+                : t("widget.status.active")
+            }
+          />
+          <DetailField
+            label={t("patch.response.affectedRows.title")}
+            value={data.affectedRows.toString()}
+          />
+        </DetailGrid>
+      )}
+    </WidgetShell>
   );
 }

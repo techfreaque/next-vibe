@@ -84,6 +84,9 @@ export const translations = {
     },
   },
   widget: {
+    previous: "Previous",
+    next: "Next",
+    page: "Page {{page}} of {{pages}}",
     title: "Search Leads",
     filterLabel: "Filter:",
     clearFilter: "Clear",

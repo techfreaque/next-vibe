@@ -7,7 +7,7 @@ export const translations = {
       "Every account with what it paid, what it spends and when it was last active. Search, filter by revenue, activity, signup date or source, sort by any money column.",
     fields: {
       search: {
-        label: "Search",
+        label: "Search accounts",
         description: "Email, name, or the start of a user ID",
         placeholder: "Search email, name or ID...",
       },
@@ -190,6 +190,10 @@ export const translations = {
     never: "Never",
     referredBy: "via {{email}}",
     actions: {
+      open: "Open",
+      select: "Select",
+      openUser: "Open account for {{email}}",
+      selectUser: "Select {{email}}",
       stats: "Stats",
       refresh: "Refresh",
       newUser: "New user",
@@ -223,6 +227,9 @@ export const translations = {
       source: "Source",
       id: "ID",
     },
+    compact: {
+      credits: "{{count}} credits",
+    },
     flags: {
       admin: "admin",
       banned: "Banned",
@@ -234,6 +241,8 @@ export const translations = {
       filteredHint: "Loosen a filter or clear them all.",
     },
     pagination: {
+      previous: "Previous page",
+      next: "Next page",
       showing: "{{start}}-{{end}} of {{total}}",
     },
     text: {

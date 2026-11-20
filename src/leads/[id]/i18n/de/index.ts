@@ -641,6 +641,7 @@ export const translations: typeof enTranslations = {
     openLead: "Lead öffnen",
     attributionOnly:
       "Attributionslinks liefern Hinweise. Eine IP-Adresse oder ein Tracking-Besuch kann mehreren Personen zugeordnet sein.",
+    recordedAccountLink: "Erfasste Kontoverknüpfung",
     recordedConversion: "Bei Konversion erfasstes Konto",
     attributedAccount: "Konto in der Wachstumsattribution",
     previewIpMatches: "IP-Abgleich für Leads prüfen",

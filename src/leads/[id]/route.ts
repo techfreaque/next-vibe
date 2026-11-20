@@ -9,12 +9,13 @@ import { endpointsHandler } from "next-vibe/core/route/multi";
 import { LeadsRepository } from "next-vibe/identity/lead/repository";
 
 import definitions from "./definition";
+import { LeadDetailRepository } from "./repository";
 
 export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     handler: ({ urlPathParams, logger, locale }) =>
-      LeadsRepository.getLeadById(urlPathParams.id, logger, locale),
+      LeadDetailRepository.getLead(urlPathParams.id, logger, locale),
   },
   [Methods.PATCH]: {
     handler: ({ urlPathParams, data, logger, locale }) =>

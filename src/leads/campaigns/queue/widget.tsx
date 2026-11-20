@@ -1,346 +1,296 @@
-/**
- * Campaign Queue Widget
- * Table view of leads currently active in email campaigns
- */
-
 "use client";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+
+import { formatDate } from "next-vibe/core/i18n/core/localization-utils";
 import { scopedTranslation as leadsI18n } from "next-vibe/identity/lead/i18n";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { List } from "next-vibe/ui/components/icons/List";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { Mail } from "next-vibe/ui/components/icons/Mail";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
-import { Span } from "next-vibe/ui/components/span";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { ListItem } from "next-vibe/ui/components/list-item";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import {
-  useWidgetContext,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe/ui/components/select";
+import { Span } from "next-vibe/ui/components/span";
+import { StatusPill } from "next-vibe/ui/components/status-pill";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
+import {
+  useWidgetEndpointMutations,
+  useWidgetForm,
+  useWidgetIsInteractive,
   useWidgetLocale,
+  useWidgetNavigation,
+  useWidgetOnSubmit,
+  useWidgetResponse,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import React from "react";
+import type { JSX } from "react";
 
-import { scopedTranslation as messengerAccountsI18n } from "@/messenger/accounts/i18n";
+import {
+  CampaignTypeFilter,
+  CampaignTypeFilterDB,
+} from "@/messenger/accounts/enum";
 
 import type definition from "./definition";
 
-// ── Date formatter ────────────────────────────────────────────────────────────
-
-function formatDate(
-  iso: string | null | undefined,
-  locale: string,
-): string | null {
-  if (!iso) {
-    return null;
-  }
-  return new Date(iso).toLocaleDateString(locale, {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-// ── Badge ─────────────────────────────────────────────────────────────────────
-
-function Badge({
-  children,
-  variant,
-}: {
-  children: React.ReactNode;
-  variant: "blue" | "purple" | "green";
-}): React.JSX.Element {
-  return (
-    <Span
-      className={cn(
-        "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-        variant === "blue" && "bg-info/10 text-info",
-        variant === "purple" &&
-          "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300",
-        variant === "green" && "bg-success/10 text-success-foreground",
-      )}
-    >
-      {children}
-    </Span>
-  );
-}
-
-// ── Lead card (responsive mobile view) ────────────────────────────────────────
-
-type QueueItem = (typeof definition.GET.types.ResponseOutput)["items"][number];
-type QueueTranslation = ReturnType<
-  typeof useWidgetTranslation<typeof definition.GET>
->;
-
-function LeadCard({
-  item,
-  t,
-  leadsT,
-  messengerT,
-  locale,
-}: {
-  item: QueueItem;
-  t: QueueTranslation;
-  leadsT: ReturnType<typeof leadsI18n.scopedT>["t"];
-  messengerT: ReturnType<typeof messengerAccountsI18n.scopedT>["t"];
-  locale: CountryLanguage;
-}): React.JSX.Element {
-  return (
-    <Div className="rounded-lg border bg-card p-4 flex flex-col gap-3">
-      {/* Top: email + business */}
-      <Div className="flex flex-col gap-1">
-        <Span className="text-sm font-mono font-medium truncate">
-          {item.leadEmail ?? t("widget.never")}
-        </Span>
-        <Span className="text-xs text-muted-foreground truncate">
-          {item.businessName}
-        </Span>
-      </Div>
-
-      {/* Badges row */}
-      <Div className="flex flex-wrap gap-1.5">
-        <Badge variant="blue">
-          {messengerT(item.campaignType as Parameters<typeof messengerT>[0]) ??
-            item.campaignType}
-        </Badge>
-        <Badge variant="purple">
-          {leadsT(item.currentStage as Parameters<typeof leadsT>[0]) ??
-            item.currentStage}
-        </Badge>
-        <Badge variant="green">
-          {leadsT(item.journeyVariant as Parameters<typeof leadsT>[0]) ??
-            item.journeyVariant}
-        </Badge>
-      </Div>
-
-      {/* Stats row */}
-      <Div className="grid grid-cols-3 gap-2 text-center">
-        <Div className="flex flex-col">
-          <Span className="text-lg font-bold tabular-nums">
-            {item.emailsSent}
-          </Span>
-          <Span className="text-xs text-muted-foreground">
-            {t("widget.columnSent")}
-          </Span>
-        </Div>
-        <Div className="flex flex-col">
-          <Span className="text-lg font-bold tabular-nums text-success">
-            {item.emailsOpened}
-          </Span>
-          <Span className="text-xs text-muted-foreground">
-            {t("widget.columnOpen")}
-          </Span>
-        </Div>
-        <Div className="flex flex-col">
-          <Span className="text-lg font-bold tabular-nums text-info">
-            {item.emailsClicked}
-          </Span>
-          <Span className="text-xs text-muted-foreground">
-            {t("widget.columnClick")}
-          </Span>
-        </Div>
-      </Div>
-
-      {/* Dates */}
-      <Div className="flex justify-between text-xs text-muted-foreground">
-        <Span>
-          {t("widget.columnStarted")}:{" "}
-          {formatDate(item.startedAt.toISOString(), locale) ??
-            t("widget.never")}
-        </Span>
-        <Span>
-          {t("widget.columnNext")}:{" "}
-          {formatDate(item.nextScheduledAt, locale) ?? t("widget.never")}
-        </Span>
-      </Div>
-    </Div>
-  );
-}
-
-// ── Main component ────────────────────────────────────────────────────────────
-
-export function CampaignQueueWidget(): React.JSX.Element {
-  const { endpointMutations } = useWidgetContext();
+export function CampaignQueueWidget(): JSX.Element {
+  const read = useWidgetEndpointMutations()?.read;
+  const response = useWidgetResponse();
   const t = useWidgetTranslation<typeof definition.GET>();
   const data = useWidgetValue<typeof definition.GET>();
   const locale = useWidgetLocale();
+  const form = useWidgetForm<typeof definition.GET>();
+  const submit = useWidgetOnSubmit();
+  const interactive = useWidgetIsInteractive();
+  const navigate = useRelatedEntityNavigation();
+  const { canGoBack, pop } = useWidgetNavigation();
   const leadsT = leadsI18n.scopedT(locale).t;
-  const messengerT = messengerAccountsI18n.scopedT(locale).t;
 
+  const leadId = form.watch("leadId");
+  const campaignType = form.watch("campaignType") ?? CampaignTypeFilter.ANY;
   const items = data?.items ?? [];
+  const page = data?.currentPage ?? 1;
+  const totalPages = Math.max(
+    1,
+    Math.ceil((data?.totalCount ?? 0) / (data?.pageSize ?? 20)),
+  );
+
+  const changePage = (next: number): void => {
+    form.setValue("page", next, { shouldDirty: true });
+    submit?.();
+  };
+  const clearFilters = (): void => {
+    form.setValue("leadId", undefined, { shouldDirty: true });
+    form.setValue("campaignType", CampaignTypeFilter.ANY, {
+      shouldDirty: true,
+    });
+    changePage(1);
+  };
 
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      {/* Header */}
-      <Div className="flex items-center gap-2">
-        <List className="h-5 w-5 text-muted-foreground" />
-        <Span className="font-semibold text-base mr-auto">
-          {t("widget.title")}
-        </Span>
-        {data && (
-          <Span className="text-sm text-muted-foreground">
-            {data.totalCount} {t("get.response.total")}
-          </Span>
-        )}
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => endpointMutations?.read?.refetch?.()}
-          title={t("widget.refresh")}
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-      </Div>
-
-      {/* Empty state or content */}
-      {items.length === 0 ? (
-        <Div className="rounded-xl border bg-card p-12 text-center flex flex-col items-center gap-4">
-          <Div className="rounded-full bg-muted p-4">
-            <Mail className="h-8 w-8 text-muted-foreground" />
-          </Div>
-          <Div className="flex flex-col gap-2 max-w-md">
-            <Span className="font-semibold text-base">
-              {t("widget.noData")}
-            </Span>
-            <Span className="text-sm text-muted-foreground">
-              {t("widget.emptyDescription")}
-            </Span>
-          </Div>
-          <Div className="flex flex-row gap-2 mt-2">
+    <WidgetShell>
+      <WidgetHeader
+        title={t("widget.title")}
+        backButton={
+          canGoBack && interactive ? (
             <Button
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => endpointMutations?.read?.refetch?.()}
+              onClick={() => pop()}
             >
-              <RefreshCw className="h-4 w-4 mr-1" />
-              {t("widget.refresh")}
+              {t("widget.back")}
             </Button>
-          </Div>
+          ) : undefined
+        }
+        actions={
+          interactive && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              aria-label={t("widget.refresh")}
+              onClick={() => void read?.refetch?.()}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          )
+        }
+      />
+      {interactive && (
+        <Div className="flex min-w-0 flex-wrap items-center gap-2">
+          <Select
+            value={campaignType}
+            onValueChange={(value) => {
+              const selected = CampaignTypeFilterDB.find(
+                (option) => option === value,
+              );
+              if (selected) {
+                form.setValue("campaignType", selected, { shouldDirty: true });
+                changePage(1);
+              }
+            }}
+          >
+            <SelectTrigger
+              aria-label={t("get.fields.campaignType.label")}
+              className="w-full @sm:w-auto"
+            >
+              <SelectValue placeholder={t("get.fields.campaignType.label")} />
+            </SelectTrigger>
+            <SelectContent>
+              {CampaignTypeFilterDB.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {t(option)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {leadId && (
+            <StatusPill status={t("widget.selectedLead")} variant="info" />
+          )}
+          {(leadId || campaignType !== CampaignTypeFilter.ANY) && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={clearFilters}
+            >
+              {t("widget.clearFilters")}
+            </Button>
+          )}
         </Div>
-      ) : (
-        <>
-          {/* Mobile card view */}
-          <Div className="flex flex-col gap-3 md:hidden">
-            {items.map((item) => (
-              <LeadCard
-                key={item.leadId}
-                item={item}
-                t={t}
-                leadsT={leadsT}
-                messengerT={messengerT}
-                locale={locale}
-              />
-            ))}
-          </Div>
-
-          {/* Desktop table view */}
-          <Div className="hidden md:block rounded-lg border bg-card overflow-x-auto">
-            {/* Header row */}
-            <Div className="grid grid-cols-[2fr_1.5fr_1.2fr_1.2fr_1.2fr_1.2fr_1fr_1fr_1fr_1.2fr] border-b bg-muted/30 min-w-[900px]">
-              <Div className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t("widget.columnEmail")}
-              </Div>
-              <Div className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t("widget.columnBusiness")}
-              </Div>
-              <Div className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t("widget.columnType")}
-              </Div>
-              <Div className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t("widget.columnStage")}
-              </Div>
-              <Div className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t("widget.columnVariant")}
-              </Div>
-              <Div className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t("widget.columnNext")}
-              </Div>
-              <Div className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t("widget.columnSent")}
-              </Div>
-              <Div className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t("widget.columnOpen")}
-              </Div>
-              <Div className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t("widget.columnClick")}
-              </Div>
-              <Div className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                {t("widget.columnStarted")}
-              </Div>
-            </Div>
-
-            {/* Data rows */}
-            {items.map((item, idx) => (
-              <Div
-                key={item.leadId}
-                className={cn(
-                  "grid grid-cols-[2fr_1.5fr_1.2fr_1.2fr_1.2fr_1.2fr_1fr_1fr_1fr_1.2fr] border-b last:border-b-0 hover:bg-muted/20 transition-colors min-w-[900px]",
-                  idx % 2 === 0 ? "bg-card" : "bg-muted/10",
-                )}
-              >
-                <Div className="px-3 py-2 text-sm font-mono overflow-hidden text-ellipsis whitespace-nowrap">
-                  {item.leadEmail ?? t("widget.never")}
-                </Div>
-                <Div className="px-3 py-2 text-sm overflow-hidden text-ellipsis whitespace-nowrap">
-                  {item.businessName}
-                </Div>
-                <Div className="px-3 py-2 text-sm">
-                  <Badge variant="blue">
-                    {messengerT(
-                      item.campaignType as Parameters<typeof messengerT>[0],
-                    ) ?? item.campaignType}
-                  </Badge>
-                </Div>
-                <Div className="px-3 py-2 text-sm">
-                  <Badge variant="purple">
-                    {leadsT(
-                      item.currentStage as Parameters<typeof leadsT>[0],
-                    ) ?? item.currentStage}
-                  </Badge>
-                </Div>
-                <Div className="px-3 py-2 text-xs text-muted-foreground overflow-hidden text-ellipsis whitespace-nowrap">
-                  {leadsT(
-                    item.journeyVariant as Parameters<typeof leadsT>[0],
-                  ) ?? item.journeyVariant}
-                </Div>
-                <Div className="px-3 py-2 text-xs">
-                  {formatDate(item.nextScheduledAt, locale) ??
-                    t("widget.never")}
-                </Div>
-                <Div className="px-3 py-2 text-sm tabular-nums text-center">
-                  {item.emailsSent}
-                </Div>
-                <Div className="px-3 py-2 text-sm tabular-nums text-center text-success">
-                  {item.emailsOpened}
-                </Div>
-                <Div className="px-3 py-2 text-sm tabular-nums text-center text-info">
-                  {item.emailsClicked}
-                </Div>
-                <Div className="px-3 py-2 text-xs text-muted-foreground">
-                  {formatDate(item.startedAt.toISOString(), locale) ??
-                    t("widget.never")}
-                </Div>
-              </Div>
-            ))}
-          </Div>
-        </>
       )}
-
-      {/* Pagination info */}
+      {response?.success === false ? (
+        <EmptyBlock
+          title={t("get.errors.server.title")}
+          message={response.message}
+          action={
+            interactive
+              ? {
+                  label: t("widget.refresh"),
+                  onClick: () => void read?.refetch?.(),
+                }
+              : undefined
+          }
+        />
+      ) : !data ? (
+        <LoadingBlock message={t("widget.loading")} />
+      ) : items.length === 0 ? (
+        <EmptyBlock
+          icon={<Mail className="h-7 w-7" />}
+          title={leadId ? t("widget.leadEmpty") : t("widget.noData")}
+          message={t("widget.emptyDescription")}
+          action={
+            interactive && page > 1
+              ? {
+                  label: t("widget.firstPage"),
+                  onClick: () => changePage(1),
+                }
+              : undefined
+          }
+        />
+      ) : (
+        <Div className="flex min-w-0 flex-col gap-2">
+          {items.map((item) => {
+            const recipient =
+              item.leadEmail || item.businessName || item.leadId;
+            const schedule = item.nextScheduledAt
+              ? t("widget.scheduledFor", {
+                  date: formatDate(
+                    new Date(item.nextScheduledAt),
+                    locale,
+                    "PPp",
+                  ),
+                })
+              : t("widget.noScheduledEmail");
+            return (
+              <ListItem
+                key={item.leadId}
+                title={recipient}
+                subtitle={schedule}
+                className="min-w-0 [&_.truncate]:whitespace-normal [&_.truncate]:[overflow-wrap:anywhere]"
+                badges={
+                  item.campaignType && (
+                    <StatusPill status={t(item.campaignType)} variant="info" />
+                  )
+                }
+                meta={
+                  <Div className="flex w-full min-w-0 flex-col gap-2">
+                    {item.businessName && item.businessName !== recipient && (
+                      <Span className="break-words">{item.businessName}</Span>
+                    )}
+                    {item.nextSubject && (
+                      <Span className="break-words">{item.nextSubject}</Span>
+                    )}
+                    <Div className="flex flex-wrap gap-x-3 gap-y-1">
+                      {item.currentStage && (
+                        <Span>{leadsT(item.currentStage)}</Span>
+                      )}
+                      {item.journeyVariant && (
+                        <Span>{leadsT(item.journeyVariant)}</Span>
+                      )}
+                      <Span>
+                        {t("widget.deliveryStats", {
+                          sent: item.emailsSent,
+                          opened: item.emailsOpened,
+                          clicked: item.emailsClicked,
+                        })}
+                      </Span>
+                      {item.startedAt && (
+                        <Span>
+                          {t("widget.startedOn", {
+                            date: formatDate(item.startedAt, locale, "PP"),
+                          })}
+                        </Span>
+                      )}
+                    </Div>
+                    {interactive && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="w-fit"
+                        aria-label={t("widget.openLeadNamed", { recipient })}
+                        onClick={() =>
+                          navigate(
+                            async () =>
+                              (await import("@/leads/[id]/definition")).default
+                                .GET,
+                            { urlPathParams: { id: item.leadId } },
+                          )
+                        }
+                      >
+                        {t("widget.openLead")}
+                      </Button>
+                    )}
+                  </Div>
+                }
+              />
+            );
+          })}
+        </Div>
+      )}
       {data && data.totalCount > 0 && (
-        <Div className="flex justify-between items-center text-sm text-muted-foreground">
+        <Div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
           <Span>
             {t("widget.pagination", {
-              page: data.currentPage,
-              totalPages: Math.ceil(data.totalCount / data.pageSize),
+              page,
+              totalPages,
               total: data.totalCount,
             })}
           </Span>
+          {interactive && totalPages > 1 && (
+            <Div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={page <= 1 || read?.isFetching}
+                onClick={() => changePage(page - 1)}
+              >
+                {t("widget.previous")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={page >= totalPages || read?.isFetching}
+                onClick={() => changePage(page + 1)}
+              >
+                {t("widget.next")}
+              </Button>
+            </Div>
+          )}
         </Div>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

@@ -69,7 +69,6 @@ export function CompanyListContainer(_props: {
       e.stopPropagation();
       if (isPickerMode) {
         onPick({ id: company.id, name: company.name });
-        pop();
         return;
       }
       void (async (): Promise<void> => {
