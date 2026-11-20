@@ -29,6 +29,7 @@ import type {
   TransportMode,
 } from "./db";
 import { instanceIdentities, remoteConnections, SyncScopeSchema } from "./db";
+import { deriveDefaultSelfInstanceId } from "./instance-identity";
 
 interface ConnectToRemoteResult {
   remoteUrl: string;
@@ -177,21 +178,10 @@ export class RemoteConnectionRepository {
    * and by getLocalInstanceId as a fallback when no DB record exists.
    */
   static deriveDefaultSelfInstanceId(): string {
-    if (coreEnv.IS_PREVIEW_MODE) {
-      return "hermes";
-    }
-
-    try {
-      const parsed = new URL(envClient.NEXT_PUBLIC_APP_URL);
-      const hostname = parsed.hostname;
-      if (hostname !== "localhost" && hostname !== "127.0.0.1") {
-        return "thea";
-      }
-    } catch {
-      // ignore
-    }
-
-    return "atlas";
+    return deriveDefaultSelfInstanceId(
+      envClient.NEXT_PUBLIC_APP_URL,
+      coreEnv.IS_PREVIEW_MODE,
+    );
   }
 
   /**

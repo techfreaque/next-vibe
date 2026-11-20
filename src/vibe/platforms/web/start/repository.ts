@@ -1653,15 +1653,23 @@ export class ServerStartRepository {
       });
     }
 
-    const tanstackProcess = spawn("bun", [outputFile], {
-      stdio: "pipe",
-      env: {
-        ...process.env,
-        PORT: String(port),
-        NODE_ENV: "production",
-        VIBE_LOG_TARGET: resolveLogTarget(),
+    const tanstackProcess = spawn(
+      "bun",
+      [
+        "--preload",
+        "./src/vibe/agent/ai-stream/providers/shared/debug-file-logger.ts",
+        outputFile,
+      ],
+      {
+        stdio: "pipe",
+        env: {
+          ...process.env,
+          PORT: String(port),
+          NODE_ENV: "production",
+          VIBE_LOG_TARGET: resolveLogTarget(),
+        },
       },
-    });
+    );
 
     ServerStartRepository.runningProcesses.set("tanstack", tanstackProcess);
     // Record the child in the prod PID file, exactly as the Next.js branch does.

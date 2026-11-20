@@ -89,6 +89,9 @@ export async function register(): Promise<void> {
     return;
   }
 
+  // Evaluate the debug request logging policy before the first AI request.
+  await import("@/vibe/agent/ai-stream/providers/shared/debug-file-logger");
+
   // Bounded drain window. Long enough for a typical multi-step agent turn to
   // land, short enough that a deploy never stalls. Overridable via env.
   const parsed = Number.parseInt(
