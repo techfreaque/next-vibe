@@ -18,7 +18,9 @@
 import "server-only";
 
 import { OpenAICompatibleChatLanguageModel } from "@ai-sdk/openai-compatible";
+import { safeParseJSON } from "@ai-sdk/provider-utils";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
 import { agentEnv } from "../../env";
 import { ApiProvider } from "../../models/models";
@@ -31,36 +33,78 @@ import {
 
 const NANO_GPT_BASE_URL = "https://api.nano-gpt.com/api/v1";
 
-/** The `model` field of an OpenAI-style JSON request body, if readable. */
-function requestModelOf(body: BodyInit | null | undefined): string | undefined {
-  if (typeof body !== "string") {
-    return undefined;
-  }
-  const match = /"model"\s*:\s*"([^"]+)"/.exec(body);
-  return match?.[1];
-}
+const nanoGptRequestSchema = z.object({
+  model: z.string(),
+  messages: z.array(
+    z.object({
+      role: z.string(),
+      content: z
+        .union([z.string(), z.array(z.object({ type: z.string() }))])
+        .nullish(),
+    }),
+  ),
+  tools: z.array(z.object({})).optional(),
+  max_tokens: z.number().optional(),
+  max_completion_tokens: z.number().optional(),
+  tool_choice: z.json().optional(),
+  reasoning: z.json().optional(),
+  reasoning_effort: z.string().optional(),
+  temperature: z.number().optional(),
+});
 
 /**
  * Which optional features a request carried (no content): tools, images,
  * output cap, reasoning knobs, size. Enough to bisect a bare 400.
  */
-function describeRequestShape(
+async function describeRequestShape(
   body: BodyInit | null | undefined,
-): Record<string, string | number | boolean> | null {
+): Promise<{
+  model: string | undefined;
+  requestShape: Record<string, string | number | boolean> | null;
+}> {
   if (typeof body !== "string") {
-    return null;
+    return { model: undefined, requestShape: null };
   }
-  const maxTokens = /"max_(?:completion_)?tokens"\s*:\s*(\d+)/.exec(body);
+  const parsed = await safeParseJSON({
+    text: body,
+    schema: nanoGptRequestSchema,
+  });
+  if (!parsed.success) {
+    return {
+      model: undefined,
+      requestShape: { chars: body.length, parsed: false },
+    };
+  }
+  const request = parsed.value;
+  const multipart = request.messages.flatMap(({ content }) =>
+    Array.isArray(content) ? [content] : [],
+  );
+  const parts = multipart.flat();
   return {
-    chars: body.length,
-    messages: (body.match(/"role"\s*:/g) ?? []).length,
-    tools: (body.match(/"type"\s*:\s*"function"/g) ?? []).length,
-    toolMessages: (body.match(/"role"\s*:\s*"tool"/g) ?? []).length,
-    images: (body.match(/"type"\s*:\s*"image_url"/g) ?? []).length,
-    maxTokens: maxTokens ? Number(maxTokens[1]) : "none",
-    toolChoice: /"tool_choice"/.test(body),
-    reasoning: /"reasoning(?:_effort)?"\s*:/.test(body),
-    temperature: /"temperature"\s*:/.test(body),
+    model: request.model,
+    requestShape: {
+      chars: body.length,
+      parsed: true,
+      messages: request.messages.length,
+      tools: request.tools?.length ?? 0,
+      toolMessages: request.messages.filter(({ role }) => role === "tool")
+        .length,
+      multipartMessages: multipart.length,
+      textOnlyMultipartMessages: multipart.filter(
+        (content) =>
+          content.length > 0 && content.every(({ type }) => type === "text"),
+      ).length,
+      images: parts.filter(({ type }) => type === "image_url").length,
+      audio: parts.filter(({ type }) => type === "input_audio").length,
+      video: parts.filter(({ type }) => type === "video_url").length,
+      files: parts.filter(({ type }) => type === "file").length,
+      maxTokens: request.max_completion_tokens ?? request.max_tokens ?? "none",
+      toolChoice: request.tool_choice !== undefined,
+      reasoning:
+        request.reasoning !== undefined ||
+        request.reasoning_effort !== undefined,
+      temperature: request.temperature !== undefined,
+    },
   };
 }
 
@@ -97,12 +141,9 @@ export function createNanoGPT(
         cfRay: upstreamError.cfRay,
         providerRequestId: response.headers.get("x-request-id"),
         retryAfter: response.headers.get("retry-after"),
-        // Which model failed: an upstream outage is usually per model
-        // (e.g. 503 all_fallbacks_failed on one GLM variant).
-        model: requestModelOf(init?.body),
-        // A 400 "Invalid request parameters" names no parameter: record
-        // which optional request features were sent so it can be bisected.
-        requestShape: describeRequestShape(init?.body),
+        // Some upstreams report unsupported images for multipart requests.
+        // Record the actual wire shape and separate media from text arrays.
+        ...(await describeRequestShape(init?.body)),
       });
       return upstreamErrorResponse(response, upstreamError);
     }

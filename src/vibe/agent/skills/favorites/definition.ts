@@ -37,6 +37,7 @@ import { scopedTranslation } from "./i18n";
 const FavoritesListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.FavoritesListContainer })),
 );
+const knownChatModel = z.enum(ChatModelId);
 
 /**
  * One favorite card exactly as the list returns it. Single source for the
@@ -48,7 +49,16 @@ const favoriteCardSchema = z.object({
   skillId: z.string(),
   customVariantName: z.string().nullable(),
   variantName: z.string().optional(),
-  modelId: z.enum(ChatModelId).nullable(),
+  // A tab can outlive a rollout that adds a model. Keep the server-provided
+  // card display fields and let favorite selection resolve a local model.
+  modelId: z
+    .string()
+    .min(1)
+    .nullable()
+    .transform((id) => {
+      const model = knownChatModel.safeParse(id);
+      return model.success ? model.data : null;
+    }),
   voiceId: z.enum(TtsModelId).nullable(),
   position: z.number().int(),
   icon: iconSchema,
@@ -369,8 +379,18 @@ const { GET } = createEndpoint({
       allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
       payloadType: favoriteCreatedPayloadSchema,
       onEvent: async ({ payload: rawPayload, logger }) => {
-        // Explicit envelope parse (see favoriteCreatedPayloadSchema above).
-        const payload = favoriteCreatedPayloadSchema.parse(rawPayload);
+        const parsed = favoriteCreatedPayloadSchema.safeParse(rawPayload);
+        if (!parsed.success) {
+          logger.error("[Favorites] Invalid favorite-created payload", {
+            issueCount: parsed.error.issues.length,
+            issues: parsed.error.issues.slice(0, 8).map(({ code, path }) => ({
+              code,
+              path: path.map(String).join("."),
+            })),
+          });
+          return;
+        }
+        const payload = parsed.data;
         const [{ apiClient }, favoritesDefinition, charactersDefinition] =
           await Promise.all([
             import("next-vibe/unified-ui/hooks/store"),

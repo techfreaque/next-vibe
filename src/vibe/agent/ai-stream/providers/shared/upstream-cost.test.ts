@@ -7,7 +7,7 @@
  * provider fetch is faked.
  */
 
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it, spyOn } from "bun:test";
 import { generateText, streamText } from "ai";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -148,6 +148,51 @@ describe("NanoGPT chat model surfaces the real cost", () => {
       0.0000188,
     );
   });
+});
+
+it("NanoGPT distinguishes text arrays from media in rejected requests", async () => {
+  const errorLogger = createEndpointLogger(false, defaultLocale);
+  const report = spyOn(errorLogger, "error").mockImplementation(() => {});
+  const provider = createNanoGPT(
+    errorLogger,
+    fakeFetch(() =>
+      new Response(
+        JSON.stringify({ error: { message: "Model does not support image input" } }),
+        { status: 400, headers: { "content-type": "application/json" } },
+      ),
+    ),
+  );
+
+  try {
+    await expect(
+      generateText({
+        model: provider.chat("z-ai/glm-5.3-uncensored"),
+        messages: [{
+          role: "user",
+          content: [
+            { type: "text", text: "First part" },
+            { type: "text", text: 'Literal JSON: {"type":"image_url"}' },
+          ],
+        }],
+        maxRetries: 0,
+      }),
+    ).rejects.toBeDefined();
+    expect(report).toHaveBeenCalledWith(
+      "[NanoGPT] API Error",
+      expect.objectContaining({
+        model: "z-ai/glm-5.3-uncensored",
+        requestShape: expect.objectContaining({
+          parsed: true,
+          messages: 1,
+          multipartMessages: 1,
+          textOnlyMultipartMessages: 1,
+          images: 0,
+        }),
+      }),
+    );
+  } finally {
+    report.mockRestore();
+  }
 });
 
 describe("Venice chat model surfaces the real cost", () => {
