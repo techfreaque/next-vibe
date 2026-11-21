@@ -29,7 +29,10 @@ import {
 import { getCurrentPathname, reloadPage } from "next-vibe/ui/lib/location";
 import { getSessionItem, setSessionItem } from "next-vibe/ui/lib/storage";
 
-import { chunkLoadDiagnostics } from "./resource-diagnostics";
+import {
+  chunkLoadDiagnostics,
+  navigationTimingEvidence,
+} from "./resource-diagnostics";
 import type { EndpointLogger, ErrorLogLevel, LoggerMetadata } from "./types";
 
 /** sessionStorage key holding the last chunk-error reload (JSON). */
@@ -174,10 +177,11 @@ function logChunk(
   message: string,
   details: Record<string, LoggerMetadata>,
 ): void {
+  const report = { ...details, ...navigationTimingEvidence() };
   if (level === "warn") {
-    logger.warn(message, details);
+    logger.warn(message, report);
   } else {
-    logger.error(message, details);
+    logger.error(message, report);
   }
 }
 

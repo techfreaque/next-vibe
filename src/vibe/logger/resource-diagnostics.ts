@@ -64,7 +64,8 @@ export function navigationTimingEvidence(): {
   documentNavigationType: string | null;
 } {
   const entry =
-    typeof performance === "undefined"
+    typeof performance === "undefined" ||
+    typeof performance.getEntriesByType !== "function"
       ? undefined
       : performance.getEntriesByType("navigation")[0];
   if (

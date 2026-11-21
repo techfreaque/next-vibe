@@ -82,6 +82,7 @@ export function fileResponseSecurityHeaders(
 const REQUEST_ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
 const TRANSPORT_TRACE_ENDPOINTS = new Set([
   "credits",
+  "user/public/login",
   "user/public/signup",
   "leads/tracking",
   "vibe/agent/ai-stream/stream",
