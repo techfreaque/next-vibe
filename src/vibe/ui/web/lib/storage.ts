@@ -210,7 +210,7 @@ function freeLocalQuota(
               backend,
               "migrate",
               largeKey,
-              put.error,
+              put,
               logger,
               legacy.length,
             );
@@ -460,9 +460,21 @@ export function removeSessionItem(key: string, logger: EndpointLogger): void {
 // IndexedDB falls back to localStorage and moves the value over.
 
 /** Outcome of one key-value backend call - never thrown, never rejected. */
-export type LargeStoreResult<T> =
-  | { ok: true; value: T }
-  | { ok: false; error: Error | string };
+export type LargeStoreResult<T> = { ok: true; value: T } | LargeStoreFailure;
+
+interface LargeStoreFailure {
+  ok: false;
+  error: Error | string;
+  stage?:
+    | "open-call"
+    | "open-request"
+    | "open-blocked"
+    | "store-missing"
+    | "transaction-setup"
+    | "transaction-error"
+    | "transaction-abort"
+    | "read-request";
+}
 
 /** Minimal async key-value backend behind `largeStorage` (IndexedDB on web). */
 export interface LargeStoreBackend {
@@ -512,6 +524,7 @@ function createIndexedDbBackend(): LargeStoreBackend | null {
         resolve({
           ok: false,
           error: error instanceof Error ? error : String(error),
+          stage: "open-call",
         });
         return;
       }
@@ -526,7 +539,11 @@ function createIndexedDbBackend(): LargeStoreBackend | null {
           const nextVersion = db.version + 1;
           db.close();
           if (healAttempts <= 0) {
-            resolve({ ok: false, error: "indexedDB store missing" });
+            resolve({
+              ok: false,
+              error: "indexedDB store missing",
+              stage: "store-missing",
+            });
             return;
           }
           void openAt(nextVersion, healAttempts - 1).then(resolve);
@@ -546,10 +563,15 @@ function createIndexedDbBackend(): LargeStoreBackend | null {
         resolve({
           ok: false,
           error: domError(request.error, "indexedDB.open failed"),
+          stage: "open-request",
         });
       });
       request.addEventListener("blocked", () => {
-        resolve({ ok: false, error: "indexedDB.open blocked" });
+        resolve({
+          ok: false,
+          error: "indexedDB.open blocked",
+          stage: "open-blocked",
+        });
       });
     });
 
@@ -590,18 +612,21 @@ function createIndexedDbBackend(): LargeStoreBackend | null {
           resolve({
             ok: false,
             error: domError(tx.error, "transaction aborted"),
+            stage: "transaction-abort",
           }),
         );
         tx.addEventListener("error", () =>
           resolve({
             ok: false,
             error: domError(tx.error, "transaction error"),
+            stage: "transaction-error",
           }),
         );
       } catch (error) {
         resolve({
           ok: false,
           error: error instanceof Error ? error : String(error),
+          stage: "transaction-setup",
         });
       }
     });
@@ -628,12 +653,14 @@ function createIndexedDbBackend(): LargeStoreBackend | null {
             resolve({
               ok: false,
               error: domError(request.error, "get failed"),
+              stage: "read-request",
             });
           });
         } catch (error) {
           resolve({
             ok: false,
             error: error instanceof Error ? error : String(error),
+            stage: "transaction-setup",
           });
         }
       });
@@ -658,12 +685,12 @@ function createIndexedDbBackend(): LargeStoreBackend | null {
   };
 }
 
-/** Report an IndexedDB failure; writes carry origin usage/quota context. */
+/** Report the failing IndexedDB stage, with origin usage for quota failures. */
 async function reportIdb(
   backend: LargeStoreBackend,
   operation: "get" | "set" | "remove" | "migrate",
   key: string,
-  error: Error | string,
+  failure: LargeStoreFailure,
   logger: EndpointLogger,
   valueLength?: number,
 ): Promise<void> {
@@ -672,9 +699,13 @@ async function reportIdb(
     area: "indexedDB",
     operation,
     key,
-    error,
+    error: failure.error,
     valueLength,
-    usage: operation === "get" ? undefined : await backend.usage(),
+    usage:
+      operation !== "get" || isQuotaError(failure.error)
+        ? await backend.usage()
+        : undefined,
+    extra: { indexedDbStage: failure.stage ?? null },
   });
 }
 
@@ -693,7 +724,7 @@ export function createLargeStorage(
       }
       const stored = await backend.get(key);
       if (!stored.ok) {
-        await reportIdb(backend, "get", key, stored.error, logger);
+        await reportIdb(backend, "get", key, stored, logger);
         return getLocalItem(key, logger);
       }
       if (stored.value !== null) {
@@ -710,14 +741,7 @@ export function createLargeStorage(
         removeLocalItem(key, logger);
       } else {
         // Value stays readable from localStorage; the move retries next read
-        await reportIdb(
-          backend,
-          "migrate",
-          key,
-          moved.error,
-          logger,
-          legacy.length,
-        );
+        await reportIdb(backend, "migrate", key, moved, logger, legacy.length);
       }
       return legacy;
     },
@@ -732,14 +756,7 @@ export function createLargeStorage(
       if (!written.ok) {
         // No localStorage fallback: a stale IndexedDB copy would shadow it on
         // the next read. The write is lost, so it is reported as an error.
-        await reportIdb(
-          backend,
-          "set",
-          key,
-          written.error,
-          logger,
-          value.length,
-        );
+        await reportIdb(backend, "set", key, written, logger, value.length);
         return;
       }
       // Drop any pre-migration copy so it can never shadow or hog quota
@@ -751,7 +768,7 @@ export function createLargeStorage(
       if (backend) {
         const removed = await backend.delete(key);
         if (!removed.ok) {
-          await reportIdb(backend, "remove", key, removed.error, logger);
+          await reportIdb(backend, "remove", key, removed, logger);
         }
       }
       removeLocalItem(key, logger);

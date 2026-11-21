@@ -80,7 +80,11 @@ function createMemoryBackend(failPut = false): {
       get: (key) => ok(data.get(key) ?? null),
       put: (key, value) => {
         if (failPut) {
-          return Promise.resolve({ ok: false, error: "QuotaExceededError" });
+          return Promise.resolve({
+            ok: false,
+            error: "QuotaExceededError",
+            stage: "transaction-abort",
+          });
         }
         data.set(key, value);
         return ok(true);
@@ -174,6 +178,28 @@ describe("largeStorage (IndexedDB with localStorage migration)", () => {
       key: "incognito_messages",
       valueLength: 2,
       originQuotaBytes: 2,
+      indexedDbStage: "transaction-abort",
+    });
+  });
+
+  it("reports an IndexedDB open failure on reads and keeps legacy data readable", async () => {
+    const local = new FakeLocalStorage();
+    local.items.set("incognito_messages", "[legacy]");
+    installLocalStorage(local);
+    const { backend } = createMemoryBackend();
+    backend.get = () => Promise.resolve({
+      ok: false,
+      error: "QuotaExceededError",
+      stage: "open-request",
+    });
+    const store = createLargeStorage(() => backend);
+
+    expect(await store.getItem("incognito_messages", logger)).toBe("[legacy]");
+    expect(calls[0]?.context).toMatchObject({
+      quotaExceeded: true,
+      originUsageBytes: 1,
+      originQuotaBytes: 2,
+      indexedDbStage: "open-request",
     });
   });
 
