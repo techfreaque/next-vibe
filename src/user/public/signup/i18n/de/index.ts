@@ -11,6 +11,14 @@ export const translations: typeof enTranslations = {
     mailboxUnavailable:
       "Das Systempostfach konnte nicht auf unzustellbare Bestätigungsmails geprüft werden.",
   },
+  events: {
+    started: "Registrierung begonnen",
+    emailSent: "Bestätigungsmail gesendet",
+    sendFailed: "Bestätigungsmail fehlgeschlagen",
+    bounced: "Bestätigungsmail unzustellbar",
+    expired: "Bestätigung abgelaufen",
+    confirmed: "E-Mail bestätigt",
+  },
   confirmation: {
     bouncedTitle: "Die Bestätigungsmail kam nicht an",
     changeAddress: "E-Mail-Adresse ändern",

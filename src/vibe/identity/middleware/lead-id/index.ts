@@ -9,6 +9,7 @@ import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 
 import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
+import { clientIpFromHeaders, geoCountryForIp } from "@/leads/geo/lookup";
 import {
   extractTouch,
   isAcquisitionVisit,
@@ -165,13 +166,12 @@ export async function createLeadId(
 ): Promise<NextResponse> {
   const logger = createEndpointLogger(false, locale);
 
+  const ipAddress = clientIpFromHeaders(request.headers);
   const clientInfo = {
     userAgent: request.headers.get("user-agent") || undefined,
     referer: request.headers.get("referer") || undefined,
-    ipAddress:
-      request.headers.get("x-forwarded-for")?.split(",")[0] ||
-      request.headers.get("x-real-ip") ||
-      undefined,
+    ipAddress,
+    geoCountry: await geoCountryForIp(ipAddress, logger),
   };
 
   const leadId = await createAnonymousLead(clientInfo, locale, logger);
@@ -251,7 +251,11 @@ export async function recordAttributionTouch(
     return;
   }
   const { GrowthJourneyRepository } = await import("@/leads/growth/repository");
-  await GrowthJourneyRepository.recordTouch(leadId, touch, logger);
+  const geoCountry = await geoCountryForIp(
+    clientIpFromHeaders(request.headers),
+    logger,
+  );
+  await GrowthJourneyRepository.recordTouch(leadId, touch, logger, geoCountry);
 }
 
 /**

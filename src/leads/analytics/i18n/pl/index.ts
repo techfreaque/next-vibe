@@ -67,7 +67,8 @@ export const translations: typeof enTranslations = {
       referrerHost: "Referrer",
       landingPath: "Strona wejścia",
       refCode: "Kod ref.",
-      country: "Kraj",
+      country: "Kraj odwiedzającego",
+      localeCountry: "Region języka",
       device: "Urządzenie",
       browser: "Przeglądarka",
       os: "System",
@@ -112,8 +113,12 @@ export const translations: typeof enTranslations = {
         description: "Kod polecający z pierwszego kontaktu lub leada",
       },
       country: {
-        label: "Kraj",
-        description: "Kod kraju, np. DE",
+        label: "Kraj odwiedzającego",
+        description: "Kraj według IP, np. DE (ZZ = nieznany)",
+      },
+      localeCountry: {
+        label: "Region języka",
+        description: "Region wybranej wersji językowej, np. DE lub GLOBAL",
       },
       browser: {
         label: "Przeglądarka",
@@ -166,6 +171,7 @@ export const translations: typeof enTranslations = {
       firstSeen: "Pierwsza wizyta",
       lastSeen: "Ostatnia wizyta",
     },
+    unknownCountry: "Nieznany",
     none: "(brak)",
     noneHint: "Brak śledzenia: utworzone przez API lub bez user agenta",
     overviewFailed: "Nie udało się obliczyć przeglądu pozyskania.",

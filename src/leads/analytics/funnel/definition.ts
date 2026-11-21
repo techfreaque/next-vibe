@@ -44,6 +44,14 @@ const steps = [
   { key: "emailConfirmed", value: 30 },
   { key: "payers", value: 5 },
 ];
+const signupSteps = [
+  { key: "started", value: 49 },
+  { key: "emailSent", value: 49 },
+  { key: "sendFailed", value: 0 },
+  { key: "bounced", value: 2 },
+  { key: "expired", value: 11 },
+  { key: "confirmed", value: 38 },
+];
 const exampleResponse = {
   window: {
     from: "2026-10-23",
@@ -66,6 +74,14 @@ const exampleResponse = {
     buckets: ["2026-11-20", "2026-11-21"],
     series: [{ key: "humans", values: [12, 15] }],
   },
+  signupSteps,
+  previousSignupSteps: signupSteps,
+  signupSegments: [
+    {
+      key: "direct",
+      metrics: { started: 30, emailSent: 30, confirmed: 24, confirmRate: 0.8 },
+    },
+  ],
 };
 
 const { GET } = createEndpoint({
@@ -138,6 +154,21 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "get.response.trend",
         schema: timeSeriesSchema,
+      }),
+      signupSteps: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.signupSteps",
+        schema: funnelSchema,
+      }),
+      previousSignupSteps: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.previousSignupSteps",
+        schema: funnelSchema.nullable(),
+      }),
+      signupSegments: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.signupSegments",
+        schema: breakdownSchema,
       }),
     },
   }),

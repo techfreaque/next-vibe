@@ -24,6 +24,9 @@ export const translations: typeof enTranslations = {
       rates: "Tassi di conversione",
       segments: "Funnel per segmento",
       trend: "Andamento della coorte",
+      signupSteps: "Passaggi di registrazione nel periodo",
+      previousSignupSteps: "Passaggi di registrazione nel periodo precedente",
+      signupSegments: "Passaggi di registrazione per segmento",
     },
     errors: {
       unauthorized: {
@@ -66,6 +69,22 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    signupTitle: "Conferma della registrazione",
+    signupSubtitle:
+      "Lead per passaggio, datati al momento del passaggio. Il calo mostra dove si perdono le registrazioni.",
+    started: "Iniziate",
+    emailSent: "Email inviata",
+    sendFailed: "Invio non riuscito",
+    bounced: "Respinta",
+    expired: "Scadute",
+    confirmed: "Confermate",
+    confirmRate: "Tasso di conferma",
+    ofStarted: "{{count}} su {{total}} iniziate",
+    signupSegmentsTitle: "Passaggi di registrazione per segmento",
+    signupSegmentsSubtitle: "Gli stessi passaggi per la dimensione scelta.",
+    signupEmpty: "Nessuna registrazione in questo periodo.",
+    signupLost: "Perse all'email",
+    signupLostHint: "Respinte, non riuscite o scadute prima della conferma",
     loading: "Caricamento del funnel...",
     cohortHint: "su {{count}} lead creati",
     signupRate: "Tasso di registrazione",

@@ -11,6 +11,14 @@ export const translations: typeof enTranslations = {
     mailboxUnavailable:
       "Impossible de relever les avis de non-remise dans la boîte système.",
   },
+  events: {
+    started: "Inscription commencée",
+    emailSent: "E-mail de confirmation envoyé",
+    sendFailed: "Échec de l'e-mail de confirmation",
+    bounced: "E-mail de confirmation rejeté",
+    expired: "Confirmation expirée",
+    confirmed: "E-mail confirmé",
+  },
   confirmation: {
     bouncedTitle: "L’e-mail de confirmation n’a pas été remis",
     changeAddress: "Modifier l’adresse e-mail",

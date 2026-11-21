@@ -71,6 +71,7 @@ export function AcquisitionReportWidget(): JSX.Element {
     landingPath: form.watch("landingPath"),
     refCode: form.watch("refCode"),
     country: form.watch("country"),
+    localeCountry: form.watch("localeCountry"),
     device: form.watch("device"),
     browser: form.watch("browser"),
     os: form.watch("os"),

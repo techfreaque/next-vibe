@@ -138,9 +138,9 @@ export const translations = {
       placeholder: "All sources",
     },
     country: {
-      label: "Country",
-      description: "Filter by country",
-      placeholder: "All countries",
+      label: "Locale region",
+      description: "Filter by the region of the site locale the visitor chose",
+      placeholder: "All regions",
     },
     language: {
       label: "Language",

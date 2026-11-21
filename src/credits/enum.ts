@@ -100,3 +100,37 @@ export const {
   VERIFY_EMAIL: "enums.freeStatus.verifyEmail",
   SUBNET_LIMIT: "enums.freeStatus.subnetLimit",
 });
+
+/**
+ * Which funding bucket paid a usage debit (credit_transactions.funding_type),
+ * stamped at write time by the deduction walk. Null on non-usage rows.
+ * FREE_UNKNOWN / PACK_UNKNOWN only label historical rows whose bucket could
+ * not be derived exactly.
+ */
+export const {
+  enum: CreditFundingType,
+  options: CreditFundingTypeOptions,
+  Value: CreditFundingTypeValue,
+} = createEnumOptions(scopedTranslation, {
+  FREE_ALLOWANCE: "enums.fundingType.freeAllowance",
+  FREE_BONUS: "enums.fundingType.freeBonus",
+  REFERRAL: "enums.fundingType.referral",
+  PURCHASED: "enums.fundingType.purchased",
+  SUBSCRIPTION: "enums.fundingType.subscription",
+  ADMIN_GRANT: "enums.fundingType.adminGrant",
+  FREE_UNKNOWN: "enums.fundingType.freeUnknown",
+  PACK_UNKNOWN: "enums.fundingType.packUnknown",
+});
+
+export const CreditFundingTypeDB = [
+  CreditFundingType.FREE_ALLOWANCE,
+  CreditFundingType.FREE_BONUS,
+  CreditFundingType.REFERRAL,
+  CreditFundingType.PURCHASED,
+  CreditFundingType.SUBSCRIPTION,
+  CreditFundingType.ADMIN_GRANT,
+  CreditFundingType.FREE_UNKNOWN,
+  CreditFundingType.PACK_UNKNOWN,
+] as const;
+
+export type CreditFundingTypeDBValue = (typeof CreditFundingTypeDB)[number];

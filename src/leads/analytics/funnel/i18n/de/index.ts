@@ -24,6 +24,9 @@ export const translations: typeof enTranslations = {
       rates: "Konversionsraten",
       segments: "Funnel pro Segment",
       trend: "Kohortenverlauf",
+      signupSteps: "Registrierungsschritte im Zeitraum",
+      previousSignupSteps: "Registrierungsschritte im Vorzeitraum",
+      signupSegments: "Registrierungsschritte pro Segment",
     },
     errors: {
       unauthorized: {
@@ -66,6 +69,23 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    signupTitle: "Registrierungsbestätigung",
+    signupSubtitle:
+      "Leads pro Schritt, datiert auf den Schritt. Der Abfall zeigt, wo Registrierungen scheitern.",
+    started: "Begonnen",
+    emailSent: "Mail gesendet",
+    sendFailed: "Versand fehlgeschlagen",
+    bounced: "Unzustellbar",
+    expired: "Abgelaufen",
+    confirmed: "Bestätigt",
+    confirmRate: "Bestätigungsrate",
+    ofStarted: "{{count}} von {{total}} begonnen",
+    signupSegmentsTitle: "Registrierungsschritte pro Segment",
+    signupSegmentsSubtitle: "Dieselben Schritte nach gewählter Dimension.",
+    signupEmpty: "Keine Registrierungen in diesem Zeitraum.",
+    signupLost: "Verloren bei der Mail",
+    signupLostHint:
+      "Unzustellbar, fehlgeschlagen oder abgelaufen vor der Bestätigung",
     loading: "Funnel wird geladen...",
     cohortHint: "von {{count}} erstellten Leads",
     signupRate: "Registrierungsrate",

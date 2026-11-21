@@ -66,9 +66,10 @@ function parseIpv6(ip: string): number[] | null {
   return [...head, ...Array.from({ length: fill }, () => 0), ...tail];
 }
 
-type ParsedIp = { v: 4; octets: number[] } | { v: 6; hextets: number[] };
+export type ParsedIp = { v: 4; octets: number[] } | { v: 6; hextets: number[] };
 
-function parseIp(raw: string | null | undefined): ParsedIp | null {
+/** Parse an IPv4 / IPv6 address (IPv4-mapped IPv6 becomes IPv4), or null */
+export function parseIp(raw: string | null | undefined): ParsedIp | null {
   if (!raw) {
     return null;
   }

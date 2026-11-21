@@ -195,7 +195,8 @@ const { GET } = createEndpoint({
             label: z.string().nullable(),
             ipPrefix: z.string().nullable(),
             botFamily: z.enum(BotFamily),
-            country: z.string(),
+            /** Visitor country from the IP, null = not resolved */
+            country: z.string().nullable(),
             credits: z.number(),
             tx: z.number(),
             firstAt: z.string(),

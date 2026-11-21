@@ -66,7 +66,8 @@ export const translations: typeof enTranslations = {
       referrerHost: "Referrer",
       landingPath: "Landingpage",
       refCode: "Ref-Code",
-      country: "Land",
+      country: "Besucherland",
+      localeCountry: "Sprachregion",
       device: "Gerät",
       browser: "Browser",
       os: "Betriebssystem",
@@ -110,8 +111,12 @@ export const translations: typeof enTranslations = {
         description: "Empfehlungscode des ersten Kontakts oder des Leads",
       },
       country: {
-        label: "Land",
-        description: "Ländercode, z. B. DE",
+        label: "Besucherland",
+        description: "Land laut IP, z. B. DE (ZZ = unbekannt)",
+      },
+      localeCountry: {
+        label: "Sprachregion",
+        description: "Region der gewählten Seitensprache, z. B. DE oder GLOBAL",
       },
       browser: {
         label: "Browser",
@@ -164,6 +169,7 @@ export const translations: typeof enTranslations = {
       firstSeen: "Zuerst gesehen",
       lastSeen: "Zuletzt gesehen",
     },
+    unknownCountry: "Unbekannt",
     none: "(keine)",
     noneHint: "Nicht erfasst: per API erstellt oder ohne User Agent",
     overviewFailed: "Akquise-Übersicht konnte nicht berechnet werden.",

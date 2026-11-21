@@ -316,7 +316,7 @@ const { GET } = createEndpoint({
             { key: "allowance", values: [260, 220] },
             { key: "purchased", values: [120, 110] },
             { key: "subscription", values: [100, 90] },
-            { key: "grants", values: [20, 20] },
+            { key: "adminGrant", values: [20, 20] },
             { key: "packUnknown", values: [0, 0] },
           ],
         },

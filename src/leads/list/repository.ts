@@ -75,7 +75,7 @@ async function triageFor(ids: string[]): Promise<Map<string, Triage>> {
       f.landing_path AS "landingPath", f.ref_code AS "refCode",
       f.ip_prefix AS "ipPrefix", f.ua_fp AS "uaFingerprint",
       ${dimensionColumn(LeadDimension.DEVICE)} AS device,
-      f.browser, f.os,
+      f.browser, f.os, f.country AS "geoCountry",
       (f.signed_up_at IS NOT NULL) AS "signedUp",
       f.email_verified AS "emailConfirmed",
       (f.first_chat_at IS NOT NULL) AS chatted,

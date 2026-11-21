@@ -140,9 +140,9 @@ export const translations: typeof enTranslations = {
       placeholder: "Wszystkie źródła",
     },
     country: {
-      label: "Kraj",
-      description: "Filtruj po kraju",
-      placeholder: "Wszystkie kraje",
+      label: "Region języka",
+      description: "Filtruj po regionie wybranej wersji językowej",
+      placeholder: "Wszystkie regiony",
     },
     language: {
       label: "Język",

@@ -46,11 +46,14 @@ import {
 
 const DAY_MS = 86_400_000;
 const FEATURE_PREFIX = "feature:";
-const FUNDING_COLOR: Record<string, 1 | 2 | 3 | 4 | 5 | 7> = {
+const FUNDING_COLOR: Record<string, 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8> = {
   allowance: 2,
+  freeBonus: 6,
+  freeUnknown: 8,
   purchased: 1,
   subscription: 3,
-  grants: 4,
+  referral: 5,
+  adminGrant: 4,
   packUnknown: 7,
 };
 
@@ -281,12 +284,18 @@ export function CreditUsageReportWidget({
     switch (key) {
       case "allowance":
         return t("widget.extra.fundAllowance");
+      case "freeBonus":
+        return t("widget.extra.fundFreeBonus");
+      case "freeUnknown":
+        return t("widget.extra.fundFreeUnknown");
       case "purchased":
         return t("widget.extra.fundPurchased");
       case "subscription":
         return t("widget.extra.fundSubscription");
-      case "grants":
-        return t("widget.extra.fundGrants");
+      case "referral":
+        return t("widget.extra.fundEarned");
+      case "adminGrant":
+        return t("widget.extra.fundAdminGrant");
       default:
         return t("widget.extra.fundUnknown");
     }

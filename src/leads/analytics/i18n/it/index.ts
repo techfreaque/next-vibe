@@ -66,7 +66,8 @@ export const translations: typeof enTranslations = {
       referrerHost: "Referrer",
       landingPath: "Pagina di atterraggio",
       refCode: "Codice ref",
-      country: "Paese",
+      country: "Paese del visitatore",
+      localeCountry: "Regione della lingua",
       device: "Dispositivo",
       browser: "Browser",
       os: "Sistema operativo",
@@ -111,8 +112,12 @@ export const translations: typeof enTranslations = {
         description: "Codice referral del primo contatto o del lead",
       },
       country: {
-        label: "Paese",
-        description: "Codice paese, es. DE",
+        label: "Paese del visitatore",
+        description: "Paese secondo l'IP, es. DE (ZZ = sconosciuto)",
+      },
+      localeCountry: {
+        label: "Regione della lingua",
+        description: "Regione della lingua scelta sul sito, es. DE o GLOBAL",
       },
       browser: {
         label: "Browser",
@@ -165,6 +170,7 @@ export const translations: typeof enTranslations = {
       firstSeen: "Prima visita",
       lastSeen: "Ultima visita",
     },
+    unknownCountry: "Sconosciuto",
     none: "(nessuno)",
     noneHint: "Non tracciato: creato via API o senza user agent",
     overviewFailed: "Impossibile calcolare la panoramica di acquisizione.",

@@ -24,6 +24,9 @@ export const translations: typeof enTranslations = {
       rates: "Tasas de conversión",
       segments: "Embudo por segmento",
       trend: "Tendencia de la cohorte",
+      signupSteps: "Pasos de registro en el periodo",
+      previousSignupSteps: "Pasos de registro en el periodo anterior",
+      signupSegments: "Pasos de registro por segmento",
     },
     errors: {
       unauthorized: {
@@ -66,6 +69,22 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    signupTitle: "Confirmación de registro",
+    signupSubtitle:
+      "Prospectos por paso, fechados cuando ocurrió el paso. La caída muestra dónde se pierden los registros.",
+    started: "Iniciados",
+    emailSent: "Correo enviado",
+    sendFailed: "Envío fallido",
+    bounced: "Rebotado",
+    expired: "Caducados",
+    confirmed: "Confirmados",
+    confirmRate: "Tasa de confirmación",
+    ofStarted: "{{count}} de {{total}} iniciados",
+    signupSegmentsTitle: "Pasos de registro por segmento",
+    signupSegmentsSubtitle: "Los mismos pasos según la dimensión elegida.",
+    signupEmpty: "Sin registros en este periodo.",
+    signupLost: "Perdidos en el correo",
+    signupLostHint: "Rebotados, fallidos o caducados antes de confirmar",
     loading: "Cargando embudo...",
     cohortHint: "de {{count}} prospectos creados",
     signupRate: "Tasa de registro",

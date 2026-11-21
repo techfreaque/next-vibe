@@ -9,6 +9,14 @@ export const translations = {
     mailboxUnavailable:
       "Could not check the system inbox for failed signup emails.",
   },
+  events: {
+    started: "Signup started",
+    emailSent: "Confirmation email sent",
+    sendFailed: "Confirmation email failed",
+    bounced: "Confirmation email bounced",
+    expired: "Confirmation expired",
+    confirmed: "Email confirmed",
+  },
   confirmation: {
     bouncedTitle: "We couldn’t deliver your confirmation email",
     changeAddress: "Change email address",

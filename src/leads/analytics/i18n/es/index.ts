@@ -66,7 +66,8 @@ export const translations: typeof enTranslations = {
       referrerHost: "Referente",
       landingPath: "Página de entrada",
       refCode: "Código de referido",
-      country: "País",
+      country: "País del visitante",
+      localeCountry: "Región del idioma",
       device: "Dispositivo",
       browser: "Navegador",
       os: "Sistema operativo",
@@ -111,8 +112,13 @@ export const translations: typeof enTranslations = {
         description: "Código de referido del primer contacto o del prospecto",
       },
       country: {
-        label: "País",
-        description: "Código de país, p. ej. DE",
+        label: "País del visitante",
+        description: "País según la IP, p. ej. DE (ZZ = desconocido)",
+      },
+      localeCountry: {
+        label: "Región del idioma",
+        description:
+          "Región del idioma elegido en el sitio, p. ej. DE o GLOBAL",
       },
       browser: {
         label: "Navegador",
@@ -165,6 +171,7 @@ export const translations: typeof enTranslations = {
       firstSeen: "Visto por primera vez",
       lastSeen: "Visto por última vez",
     },
+    unknownCountry: "Desconocido",
     none: "(ninguno)",
     noneHint: "Sin seguimiento: creado por API o sin user agent",
     overviewFailed: "No se pudo calcular el resumen de adquisición.",

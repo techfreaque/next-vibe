@@ -10,12 +10,13 @@
 
 import "server-only";
 
-import { and, eq, gt, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
+import { and, eq, gt, isNotNull, lt, or, sql } from "drizzle-orm";
 import { defineDbFunction } from "next-vibe/database/db-functions/define";
 import type { Plv8Global } from "next-vibe/database/db-functions/types";
 import { db } from "next-vibe/database/index";
 
 import { creditPacks, creditTransactions, creditWallets } from "./db";
+import { spendablePacks } from "./funding";
 import { guestPoolLeadIdsSql, userPoolLeadIdsSql } from "./pool-members";
 
 // plv8 is a global injected by PostgreSQL's V8 engine at runtime.
@@ -170,37 +171,12 @@ export const getPoolBalance = defineDbFunction({
         )`,
       ),
 
-    /** Active (non-expired) packs for a user's pool */
-    activePacksForUser: db
-      .select({
-        type: creditPacks.type,
-        remaining: creditPacks.remaining,
-        originalAmount: creditPacks.originalAmount,
-        expiresAt: creditPacks.expiresAt,
-      })
-      .from(creditPacks)
-      .where(
-        and(
-          or(
-            sql`${creditPacks.walletId} IN (
-              SELECT id FROM ${creditWallets} WHERE user_id = ${p.p_user_id}
-            )`,
-            sql`${creditPacks.walletId} IN (
-              SELECT cw.id FROM ${creditWallets} cw
-              WHERE cw.lead_id IN (${userPoolLeadIdsSql(p.p_user_id)})
-            )`,
-          ),
-          // Include permanent packs (no expiry) and non-expired packs
-          or(
-            isNull(creditPacks.expiresAt),
-            sql`${creditPacks.expiresAt} >= NOW()`,
-          ),
-          gt(creditPacks.remaining, 0),
-        ),
-      ),
-
-    /** Active (non-expired) packs for a lead's pool */
-    activePacksForLead: db
+    /**
+     * Spendable packs of the user's pool: exactly what deductCredits walks
+     * (see ../funding.ts), so only packs on the USER wallet. Lead-wallet packs
+     * and wallet balance without a backing pack are never spendable.
+     */
+    spendablePacksForUser: db
       .select({
         type: creditPacks.type,
         remaining: creditPacks.remaining,
@@ -211,14 +187,9 @@ export const getPoolBalance = defineDbFunction({
       .where(
         and(
           sql`${creditPacks.walletId} IN (
-            SELECT cw.id FROM ${creditWallets} cw
-            WHERE cw.lead_id IN (${guestPoolLeadIdsSql(p.p_lead_id)})
+            SELECT id FROM ${creditWallets} WHERE user_id = ${p.p_user_id}
           )`,
-          // Include permanent packs (no expiry) and non-expired packs
-          or(
-            isNull(creditPacks.expiresAt),
-            sql`${creditPacks.expiresAt} >= NOW()`,
-          ),
+          spendablePacks(sql`NOW()`),
           gt(creditPacks.remaining, 0),
         ),
       ),
@@ -299,14 +270,14 @@ export const getPoolBalance = defineDbFunction({
     let totalFreeInWallets = 0;
 
     for (const w of wallets) {
-      totalPaid += Number(w.balance) || 0;
       if (w.leadId !== null) {
         totalFreeInWallets += Number(w.freeCreditsRemaining) || 0;
       }
     }
 
     // ── Step 4: Categorize active packs ──────────────────────────────────
-    const packs = isUserPool ? q.activePacksForUser() : q.activePacksForLead();
+    // Guest pools spend free credits only (deductCredits walks no packs).
+    const packs = isUserPool ? q.spendablePacksForUser() : [];
 
     let totalExpiring = 0;
     let totalPermanent = 0;
@@ -317,6 +288,7 @@ export const getPoolBalance = defineDbFunction({
     for (const pack of packs) {
       const rem = Number(pack.remaining) || 0;
       const orig = Number(pack.originalAmount) || 0;
+      totalPaid += rem;
       packCapacity += orig;
       if (
         pack.type === "enums.packType.subscription" &&

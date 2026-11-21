@@ -229,6 +229,7 @@ const { GET } = createEndpoint({
                       device: z.enum(LeadDeviceFilter),
                       browser: z.string().nullable(),
                       os: z.string().nullable(),
+                      geoCountry: z.string().nullable(),
                       signedUp: z.boolean(),
                       emailConfirmed: z.boolean(),
                       chatted: z.boolean(),

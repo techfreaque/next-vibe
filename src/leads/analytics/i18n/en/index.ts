@@ -64,7 +64,8 @@ export const translations = {
       referrerHost: "Referrer",
       landingPath: "Landing page",
       refCode: "Ref code",
-      country: "Country",
+      country: "Visitor country",
+      localeCountry: "Locale region",
       device: "Device",
       browser: "Browser",
       os: "OS",
@@ -108,8 +109,12 @@ export const translations = {
         description: "Referral code of the first touch or the lead",
       },
       country: {
-        label: "Country",
-        description: "Country code, e.g. DE",
+        label: "Visitor country",
+        description: "Visitor country from the IP, e.g. DE (ZZ = unknown)",
+      },
+      localeCountry: {
+        label: "Locale region",
+        description: "Region of the chosen site locale, e.g. DE or GLOBAL",
       },
       browser: {
         label: "Browser",
@@ -162,6 +167,7 @@ export const translations = {
       firstSeen: "First seen",
       lastSeen: "Last seen",
     },
+    unknownCountry: "Unknown",
     none: "(none)",
     noneHint: "Not tracked: API-created or no user agent",
     overviewFailed: "Acquisition overview could not be computed.",

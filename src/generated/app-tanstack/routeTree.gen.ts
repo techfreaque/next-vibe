@@ -341,6 +341,7 @@ import { Route as ApiLocaleLeadsDataSourcesLeadsNewsletterSubscribersRouteImport
 import { Route as ApiLocaleLeadsDataSourcesLeadsUnsubscribedRouteImport } from './routes/api.$locale.leads.data-sources.leads-unsubscribed'
 import { Route as ApiLocaleLeadsDataSourcesLeadsWebsiteUsersRouteImport } from './routes/api.$locale.leads.data-sources.leads-website-users'
 import { Route as ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRouteImport } from './routes/api.$locale.leads.data-sources.leads-website-visits'
+import { Route as ApiLocaleLeadsGeoUpdateRouteImport } from './routes/api.$locale.leads.geo.update'
 import { Route as ApiLocaleLeadsGrowthLinksRouteImport } from './routes/api.$locale.leads.growth.links'
 import { Route as ApiLocaleLeadsGrowthSpendRouteImport } from './routes/api.$locale.leads.growth.spend'
 import { Route as ApiLocaleLeadsImportProcessRouteImport } from './routes/api.$locale.leads.import.process'
@@ -2642,6 +2643,11 @@ const ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute =
     path: '/api/$locale/leads/data-sources/leads-website-visits',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleLeadsGeoUpdateRoute = ApiLocaleLeadsGeoUpdateRouteImport.update({
+  id: '/api/$locale/leads/geo/update',
+  path: '/api/$locale/leads/geo/update',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiLocaleLeadsGrowthLinksRoute =
   ApiLocaleLeadsGrowthLinksRouteImport.update({
     id: '/api/$locale/leads/growth/links',
@@ -5350,6 +5356,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/leads/data-sources/leads-unsubscribed': typeof ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute
   '/api/$locale/leads/data-sources/leads-website-users': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteUsersRoute
   '/api/$locale/leads/data-sources/leads-website-visits': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute
+  '/api/$locale/leads/geo/update': typeof ApiLocaleLeadsGeoUpdateRoute
   '/api/$locale/leads/growth/links': typeof ApiLocaleLeadsGrowthLinksRoute
   '/api/$locale/leads/growth/spend': typeof ApiLocaleLeadsGrowthSpendRoute
   '/api/$locale/leads/import/process': typeof ApiLocaleLeadsImportProcessRoute
@@ -6078,6 +6085,7 @@ export interface FileRoutesByTo {
   '/api/$locale/leads/data-sources/leads-unsubscribed': typeof ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute
   '/api/$locale/leads/data-sources/leads-website-users': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteUsersRoute
   '/api/$locale/leads/data-sources/leads-website-visits': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute
+  '/api/$locale/leads/geo/update': typeof ApiLocaleLeadsGeoUpdateRoute
   '/api/$locale/leads/growth/links': typeof ApiLocaleLeadsGrowthLinksRoute
   '/api/$locale/leads/growth/spend': typeof ApiLocaleLeadsGrowthSpendRoute
   '/api/$locale/leads/import/process': typeof ApiLocaleLeadsImportProcessRoute
@@ -6815,6 +6823,7 @@ export interface FileRoutesById {
   '/api/$locale/leads/data-sources/leads-unsubscribed': typeof ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute
   '/api/$locale/leads/data-sources/leads-website-users': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteUsersRoute
   '/api/$locale/leads/data-sources/leads-website-visits': typeof ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute
+  '/api/$locale/leads/geo/update': typeof ApiLocaleLeadsGeoUpdateRoute
   '/api/$locale/leads/growth/links': typeof ApiLocaleLeadsGrowthLinksRoute
   '/api/$locale/leads/growth/spend': typeof ApiLocaleLeadsGrowthSpendRoute
   '/api/$locale/leads/import/process': typeof ApiLocaleLeadsImportProcessRoute
@@ -7552,6 +7561,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/data-sources/leads-unsubscribed'
     | '/api/$locale/leads/data-sources/leads-website-users'
     | '/api/$locale/leads/data-sources/leads-website-visits'
+    | '/api/$locale/leads/geo/update'
     | '/api/$locale/leads/growth/links'
     | '/api/$locale/leads/growth/spend'
     | '/api/$locale/leads/import/process'
@@ -8280,6 +8290,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/data-sources/leads-unsubscribed'
     | '/api/$locale/leads/data-sources/leads-website-users'
     | '/api/$locale/leads/data-sources/leads-website-visits'
+    | '/api/$locale/leads/geo/update'
     | '/api/$locale/leads/growth/links'
     | '/api/$locale/leads/growth/spend'
     | '/api/$locale/leads/import/process'
@@ -9016,6 +9027,7 @@ export interface FileRouteTypes {
     | '/api/$locale/leads/data-sources/leads-unsubscribed'
     | '/api/$locale/leads/data-sources/leads-website-users'
     | '/api/$locale/leads/data-sources/leads-website-visits'
+    | '/api/$locale/leads/geo/update'
     | '/api/$locale/leads/growth/links'
     | '/api/$locale/leads/growth/spend'
     | '/api/$locale/leads/import/process'
@@ -9680,6 +9692,7 @@ export interface RootRouteChildren {
   ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute: typeof ApiLocaleLeadsDataSourcesLeadsUnsubscribedRoute
   ApiLocaleLeadsDataSourcesLeadsWebsiteUsersRoute: typeof ApiLocaleLeadsDataSourcesLeadsWebsiteUsersRoute
   ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute: typeof ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute
+  ApiLocaleLeadsGeoUpdateRoute: typeof ApiLocaleLeadsGeoUpdateRoute
   ApiLocaleLeadsGrowthLinksRoute: typeof ApiLocaleLeadsGrowthLinksRoute
   ApiLocaleLeadsGrowthSpendRoute: typeof ApiLocaleLeadsGrowthSpendRoute
   ApiLocaleLeadsLifecycleBackfillRoute: typeof ApiLocaleLeadsLifecycleBackfillRoute
@@ -12247,6 +12260,13 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/leads/data-sources/leads-website-visits'
       fullPath: '/api/$locale/leads/data-sources/leads-website-visits'
       preLoaderRoute: typeof ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/geo/update': {
+      id: '/api/$locale/leads/geo/update'
+      path: '/api/$locale/leads/geo/update'
+      fullPath: '/api/$locale/leads/geo/update'
+      preLoaderRoute: typeof ApiLocaleLeadsGeoUpdateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/leads/growth/links': {
@@ -16701,6 +16721,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleLeadsDataSourcesLeadsWebsiteUsersRoute,
   ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute:
     ApiLocaleLeadsDataSourcesLeadsWebsiteVisitsRoute,
+  ApiLocaleLeadsGeoUpdateRoute: ApiLocaleLeadsGeoUpdateRoute,
   ApiLocaleLeadsGrowthLinksRoute: ApiLocaleLeadsGrowthLinksRoute,
   ApiLocaleLeadsGrowthSpendRoute: ApiLocaleLeadsGrowthSpendRoute,
   ApiLocaleLeadsLifecycleBackfillRoute: ApiLocaleLeadsLifecycleBackfillRoute,

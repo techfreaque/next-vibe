@@ -66,7 +66,8 @@ export const translations: typeof enTranslations = {
       referrerHost: "Référent",
       landingPath: "Page d'arrivée",
       refCode: "Code parrain",
-      country: "Pays",
+      country: "Pays du visiteur",
+      localeCountry: "Région de langue",
       device: "Appareil",
       browser: "Navigateur",
       os: "Système",
@@ -111,8 +112,13 @@ export const translations: typeof enTranslations = {
         description: "Code de parrainage du premier contact ou du lead",
       },
       country: {
-        label: "Pays",
-        description: "Code pays, ex. DE",
+        label: "Pays du visiteur",
+        description: "Pays selon l'IP, ex. DE (ZZ = inconnu)",
+      },
+      localeCountry: {
+        label: "Région de langue",
+        description:
+          "Région de la langue choisie sur le site, ex. DE ou GLOBAL",
       },
       browser: {
         label: "Navigateur",
@@ -165,6 +171,7 @@ export const translations: typeof enTranslations = {
       firstSeen: "Vu en premier",
       lastSeen: "Vu en dernier",
     },
+    unknownCountry: "Inconnu",
     none: "(aucun)",
     noneHint: "Non suivi : créé par API ou sans user agent",
     overviewFailed: "Impossible de calculer l'aperçu d'acquisition.",

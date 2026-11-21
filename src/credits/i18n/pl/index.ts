@@ -117,6 +117,16 @@ export const translations: typeof enTranslations = {
       referralEarning: "Zarobki z polecenia",
       referralPayout: "Wypłata z polecenia",
     },
+    fundingType: {
+      freeAllowance: "Darmowy limit miesięczny",
+      freeBonus: "Bonus za konto / newsletter",
+      referral: "Kredyty polecające",
+      purchased: "Kupiony pakiet",
+      subscription: "Kredyty z subskrypcji",
+      adminGrant: "Przyznane przez admina",
+      freeUnknown: "Darmowe, poziom nieznany",
+      packUnknown: "Pakiet, źródło nieznane",
+    },
     packType: {
       subscription: "Subskrypcja",
       permanent: "Stałe",

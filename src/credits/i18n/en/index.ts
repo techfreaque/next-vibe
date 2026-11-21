@@ -40,6 +40,16 @@ export const translations = {
       referralEarning: "Referral earning",
       referralPayout: "Referral payout",
     },
+    fundingType: {
+      freeAllowance: "Free monthly allowance",
+      freeBonus: "Signup / newsletter bonus",
+      referral: "Referral credits",
+      purchased: "Purchased pack",
+      subscription: "Subscription credits",
+      adminGrant: "Admin grant",
+      freeUnknown: "Free, tier not recorded",
+      packUnknown: "Pack, origin not recorded",
+    },
     packType: {
       subscription: "Subscription",
       permanent: "Permanent",

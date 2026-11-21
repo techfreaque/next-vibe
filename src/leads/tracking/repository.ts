@@ -36,6 +36,7 @@ import { LeadsRepository } from "next-vibe/identity/lead/repository";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
+import { geoCountryForIp } from "@/leads/geo/lookup";
 import { emails } from "@/messenger/messages/db";
 import { ReferralRepository } from "@/referral/repository";
 
@@ -460,6 +461,7 @@ export class LeadTrackingRepository {
         currentCampaignStage: EmailCampaignStage.NOT_STARTED,
         // Identity columns - first-touch, written once
         ipAddress: clientInfo.ipAddress,
+        geoCountry: await geoCountryForIp(clientInfo.ipAddress, logger),
         userAgent: clientInfo.userAgent,
         deviceType: parsedDevice.deviceType,
         browser: parsedDevice.browser,

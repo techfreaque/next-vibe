@@ -124,6 +124,14 @@ export const leadSegmentFields = {
     columns: 3,
     schema: text,
   }),
+  localeCountry: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.TEXT,
+    label: "leadAnalytics.filters.localeCountry.label",
+    description: "leadAnalytics.filters.localeCountry.description",
+    columns: 3,
+    schema: text,
+  }),
   device: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
@@ -223,7 +231,10 @@ export interface LeadSegmentFilters {
   referrerHost?: string;
   landingPath?: string;
   refCode?: string;
+  /** Visitor country from the IP (ISO alpha-2, ZZ = unknown) */
   country?: string;
+  /** Region of the chosen site locale (e.g. DE, GLOBAL) */
+  localeCountry?: string;
   device?: (typeof LeadDeviceFilter)[keyof typeof LeadDeviceFilter];
   browser?: string;
   os?: string;
@@ -249,6 +260,7 @@ export const LEAD_SEGMENT_TEXT_KEYS = [
   "landingPath",
   "refCode",
   "country",
+  "localeCountry",
   "browser",
   "os",
   "ipPrefix",

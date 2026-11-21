@@ -41,7 +41,9 @@ import {
 } from "@/messenger/system-mailbox/imap-ops";
 
 import { SignupBounceReason } from "../bounce-reason";
-import { pendingSignups } from "../db";
+import { pendingSignups, signupEvents } from "../db";
+import { SignupEventType } from "../event-type";
+import { bounceDedupeKey, recordExpiredSignups } from "../events";
 import { scopedTranslation, type SignupT } from "../i18n";
 import type { SignupBounceSyncResponse } from "./definition";
 import { type DeliveryReport, parseDeliveryReport } from "./delivery-report";
@@ -164,6 +166,34 @@ async function loadMailbox(logger: EndpointLogger): Promise<{
   };
 }
 
+const BOUNCED_ROW = {
+  id: pendingSignups.id,
+  leadId: pendingSignups.leadId,
+  sentAt: pendingSignups.sentAt,
+};
+
+/** One BOUNCED funnel event per dispatch (a refined reason never re-counts). */
+async function recordBounces(
+  rows: ReadonlyArray<{ id: string; leadId: string; sentAt: Date }>,
+  receivedAt: Date,
+): Promise<void> {
+  if (rows.length === 0) {
+    return;
+  }
+  await db
+    .insert(signupEvents)
+    .values(
+      rows.map((row) => ({
+        leadId: row.leadId,
+        pendingId: row.id,
+        type: SignupEventType.BOUNCED,
+        occurredAt: receivedAt,
+        dedupeKey: bounceDedupeKey(row.id, row.sentAt),
+      })),
+    )
+    .onConflictDoNothing();
+}
+
 export async function recordSignupDeliveryReport(
   report: DeliveryReport,
   receivedAt: Date,
@@ -196,7 +226,8 @@ export async function recordSignupDeliveryReport(
             needsReason,
           ),
         )
-        .returning({ id: pendingSignups.id });
+        .returning(BOUNCED_ROW);
+      await recordBounces(matched, receivedAt);
       marked += matched.length;
       continue;
     }
@@ -243,7 +274,8 @@ export async function recordSignupDeliveryReport(
           needsReason,
         ),
       )
-      .returning({ id: pendingSignups.id });
+      .returning(BOUNCED_ROW);
+    await recordBounces(updated, receivedAt);
     marked += updated.length;
   }
   return marked;
@@ -259,6 +291,8 @@ export async function syncSignupBounces(
       errorType: ErrorResponseTypes.FORBIDDEN,
     });
   }
+  // Date confirmations that ran out (funnel drop-off), mailbox or not.
+  await recordExpiredSignups(logger);
   let imap: SystemMailboxConfig["imap"] | undefined;
   try {
     const mailbox = await loadMailbox(logger);

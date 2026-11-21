@@ -32,10 +32,17 @@ import { signupSubnetLimitHit } from "@/credits/anti-farming/signup-limit";
 
 import { SignupBounceReason } from "./bounce-reason";
 import { sendSignupChallenge } from "./confirmation-mail";
-import { type PendingSignup, pendingSignups, signupMailAttempts } from "./db";
+import {
+  type PendingSignup,
+  pendingSignups,
+  signupEvents,
+  signupMailAttempts,
+} from "./db";
 import type { SignupPatchResponseOutput } from "./definition";
 import { normalizedEmailSql } from "./email-guard";
 import { normalizeEmailForUniqueness } from "./email-identity";
+import { SignupEventType } from "./event-type";
+import { recordExpiredSignups, recordSignupEvents } from "./events";
 import type { SignupT } from "./i18n";
 
 const MINUTE = 60_000;
@@ -188,6 +195,8 @@ export async function issueSignupChallenge(
     }
     return success(pending);
   };
+  // A new challenge deletes the lead's previous row: date its expiry first.
+  await recordExpiredSignups(logger);
   const issued = isPglite ? await issue(db) : await db.transaction(issue);
   if (!issued.success) {
     return issued;
@@ -195,6 +204,28 @@ export async function issueSignupChallenge(
   const row = issued.data;
   const messageId = await deliver(row, { code, token }, row.locale, logger);
   const deliveryFailed = !messageId;
+  await recordSignupEvents(
+    [
+      ...(previous
+        ? []
+        : [
+            {
+              leadId: row.leadId,
+              pendingId: row.id,
+              type: SignupEventType.STARTED,
+              occurredAt: row.sentAt,
+            },
+          ]),
+      {
+        leadId: row.leadId,
+        pendingId: row.id,
+        type: deliveryFailed
+          ? SignupEventType.SEND_FAILED
+          : SignupEventType.EMAIL_SENT,
+      },
+    ],
+    logger,
+  );
   await db
     .update(pendingSignups)
     .set({ messageId, deliveryFailed })
@@ -314,6 +345,10 @@ export async function consumeSignupChallenge(
         UPDATE ${chatFolders} SET user_id = account.id FROM account WHERE lead_id = ${row.leadId} AND user_id IS NULL
       ), threads AS (
         UPDATE ${chatThreads} SET user_id = account.id FROM account WHERE lead_id = ${row.leadId} AND user_id IS NULL
+      ), confirmed AS (
+        INSERT INTO ${signupEvents} (lead_id,pending_id,type,occurred_at,dedupe_key)
+        SELECT ${row.leadId}::uuid,${row.id}::uuid,${SignupEventType.CONFIRMED}::text,${new Date().toISOString()}::timestamp,${`confirmed:${row.id}`}::text
+        FROM account ON CONFLICT (dedupe_key) DO NOTHING
       ) SELECT id FROM account`);
     return claimed.rows.length ? success({ pending: row, userId }) : invalid();
   };

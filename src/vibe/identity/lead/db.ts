@@ -65,6 +65,11 @@ export const leads = pgTable("leads", {
   // IP tracking for free tier credits
   ipAddress: text("ip_address"),
 
+  // Visitor country (ISO 3166-1 alpha-2) resolved offline from the client IP
+  // (leads/geo). "ZZ" = reserved/unknown range, null = not resolved yet.
+  // `country` above is the chosen locale's region, not where the visitor is.
+  geoCountry: text("geo_country"),
+
   // Device / browser identity (latest, from user agent parsing)
   userAgent: text("user_agent"),
   deviceType: text("device_type", { enum: DeviceTypeDB }),

@@ -26,6 +26,7 @@ import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/sele
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import type { JSX } from "react";
 
+import { UNKNOWN_COUNTRY } from "../geo/constants";
 import {
   BotFamily,
   LeadChannelFilter,
@@ -62,6 +63,9 @@ export function dimensionValueLabel(key: string | null, t: SharedT): string {
   }
   if (isValidEnumValue(LeadDeviceFilter, key)) {
     return t(key);
+  }
+  if (key === UNKNOWN_COUNTRY) {
+    return t("leadAnalytics.unknownCountry");
   }
   return key;
 }
@@ -105,6 +109,8 @@ export function dimensionFilter(
       return { refCode: text };
     case LeadDimension.COUNTRY:
       return { country: text };
+    case LeadDimension.LOCALE_COUNTRY:
+      return { localeCountry: text };
     case LeadDimension.BROWSER:
       return { browser: text };
     case LeadDimension.OS:
@@ -127,6 +133,7 @@ const CHIP_LABEL = {
   landingPath: "leadAnalytics.filters.landingPath.label",
   refCode: "leadAnalytics.filters.refCode.label",
   country: "leadAnalytics.filters.country.label",
+  localeCountry: "leadAnalytics.filters.localeCountry.label",
   browser: "leadAnalytics.filters.browser.label",
   os: "leadAnalytics.filters.os.label",
   ipPrefix: "leadAnalytics.filters.ipPrefix.label",
@@ -148,6 +155,7 @@ export const SEGMENT_KEYS = [
   "landingPath",
   "refCode",
   "country",
+  "localeCountry",
   "browser",
   "os",
   "ipPrefix",
@@ -164,6 +172,7 @@ export const DIMENSION_LABEL = {
   [LeadDimension.LANDING_PATH]: "leadAnalytics.dimension.landingPath",
   [LeadDimension.REF_CODE]: "leadAnalytics.dimension.refCode",
   [LeadDimension.COUNTRY]: "leadAnalytics.dimension.country",
+  [LeadDimension.LOCALE_COUNTRY]: "leadAnalytics.dimension.localeCountry",
   [LeadDimension.DEVICE]: "leadAnalytics.dimension.device",
   [LeadDimension.BROWSER]: "leadAnalytics.dimension.browser",
   [LeadDimension.OS]: "leadAnalytics.dimension.os",
@@ -294,6 +303,10 @@ export function SegmentFilterPanel({
           field={leadSegmentFields.country}
         />
         <TextFieldWidget
+          fieldName="localeCountry"
+          field={leadSegmentFields.localeCountry}
+        />
+        <TextFieldWidget
           fieldName="browser"
           field={leadSegmentFields.browser}
         />
@@ -361,6 +374,7 @@ export const DIMENSION_TABS = [
   LeadDimension.LANDING_PATH,
   LeadDimension.REF_CODE,
   LeadDimension.COUNTRY,
+  LeadDimension.LOCALE_COUNTRY,
   LeadDimension.DEVICE,
   LeadDimension.BROWSER,
   LeadDimension.OS,

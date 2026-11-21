@@ -12,6 +12,7 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 import type { PgUpdateSetSource } from "drizzle-orm/pg-core";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { leads } from "next-vibe/identity/lead/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { deriveChannel, hasCampaignSignal, type Touch } from "./attribution";
@@ -29,6 +30,7 @@ export class GrowthJourneyRepository {
     leadId: string,
     touch: Touch,
     logger: EndpointLogger,
+    geoCountry: string | null = null,
   ): Promise<void> {
     try {
       const linkId = await GrowthJourneyRepository.resolveLinkId(touch.linkId);
@@ -57,7 +59,15 @@ export class GrowthJourneyRepository {
           campaign: t.campaign,
           referrerHost: t.referrerHost,
           refCode: t.refCode,
+          geoCountry,
         });
+        if (geoCountry) {
+          // Leads created before geo resolution existed get it on their next visit.
+          await tx
+            .update(leads)
+            .set({ geoCountry })
+            .where(and(eq(leads.id, leadId), isNull(leads.geoCountry)));
+        }
         const insert = tx.insert(growthJourneys).values({
           leadId,
           firstChannel: t.channel,

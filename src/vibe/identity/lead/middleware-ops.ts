@@ -20,6 +20,8 @@ interface ClientInfo {
   userAgent?: string;
   ipAddress?: string;
   referer?: string;
+  /** Visitor country from the IP (ISO alpha-2), null when unresolved */
+  geoCountry?: string | null;
 }
 
 /**
@@ -90,6 +92,7 @@ export async function createAnonymousLead(
       website: null,
       country,
       language,
+      geoCountry: clientInfo.geoCountry ?? null,
       source: LeadSource.WEBSITE,
       status: LeadStatus.WEBSITE_USER,
       notes: null,

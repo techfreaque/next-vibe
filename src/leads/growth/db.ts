@@ -6,7 +6,8 @@
  * step can never be counted twice for the same journey.
  *
  * Privacy: no IP, no user agent, no full referrer URL, no query strings.
- * Only UTM values, the referrer HOST, the landing PATH and the ref code.
+ * Only UTM values, the referrer HOST, the landing PATH, the ref code and the
+ * visitor COUNTRY (resolved offline from the IP, the IP itself is not kept).
  */
 
 import {
@@ -40,6 +41,8 @@ export const growthVisits = pgTable(
     campaign: text("campaign"),
     referrerHost: text("referrer_host"),
     refCode: text("ref_code"),
+    /** Visitor country at this arrival (ISO 3166-1 alpha-2, "ZZ" unknown) */
+    geoCountry: text("geo_country"),
   },
   (table) => [
     index("idx_growth_visits_visited_at").on(table.visitedAt),

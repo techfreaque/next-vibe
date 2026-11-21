@@ -43,6 +43,16 @@ export const translations: typeof enTranslations = {
       referralEarning: "Gain de parrainage",
       referralPayout: "Versement de parrainage",
     },
+    fundingType: {
+      freeAllowance: "Quota gratuit mensuel",
+      freeBonus: "Bonus compte / newsletter",
+      referral: "Crédits de parrainage",
+      purchased: "Pack acheté",
+      subscription: "Crédits d'abonnement",
+      adminGrant: "Attribution admin",
+      freeUnknown: "Gratuit, palier non enregistré",
+      packUnknown: "Pack, origine non enregistrée",
+    },
     packType: {
       subscription: "Abonnement",
       permanent: "Permanent",

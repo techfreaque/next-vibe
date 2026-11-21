@@ -40,7 +40,6 @@ import {
   and,
   desc,
   eq,
-  gte,
   inArray,
   isNotNull,
   isNull,
@@ -70,6 +69,7 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { geoCountryForIp } from "@/leads/geo/lookup";
 import { paymentInvoices, paymentTransactions } from "@/payment/db";
 import type { CreditPackCheckoutSession } from "@/payment/providers/types";
 import { subscriptions } from "@/subscription/db";
@@ -114,6 +114,7 @@ import { getPoolBalance } from "./db-functions";
 import type { CreditsGetResponseOutput } from "./definition";
 import creditsDefinitions from "./definition";
 import {
+  CreditFundingType,
   CreditPackType,
   type CreditPackTypeValue,
   CreditTransactionType,
@@ -132,6 +133,14 @@ import {
   type FreeTier,
   poolHasConfirmedNewsletter,
 } from "./free-allowance";
+import {
+  packFundingType,
+  spendableEarnedPacks,
+  spendablePacks,
+  spendablePermanentPacks,
+  spendableSubscriptionPacks,
+  splitFreeDebit,
+} from "./funding";
 import type {
   CreditsHistoryGetRequestOutput,
   CreditsHistoryGetResponseOutput,
@@ -942,19 +951,20 @@ export class CreditRepository {
         totalFreeInWallets += wallet.freeCreditsRemaining;
       }
 
-      totalPaid += wallet.balance;
-
+      // Paid credits = exactly what deductCredits can walk: spendable packs
+      // on the pool's USER wallet (see ./funding.ts). wallet.balance is only
+      // a cached sum; a balance no spendable pack backs must never pass the
+      // pre-generation check, or the provider runs and the charge fails.
+      if (wallet.id !== pool.userWallet?.id) {
+        continue;
+      }
       const packs = await db
         .select()
         .from(creditPacks)
-        .where(
-          and(
-            eq(creditPacks.walletId, wallet.id),
-            or(isNull(creditPacks.expiresAt), gte(creditPacks.expiresAt, now)),
-          ),
-        );
+        .where(and(eq(creditPacks.walletId, wallet.id), spendablePacks(now)));
 
       for (const pack of packs) {
+        totalPaid += pack.remaining;
         packCapacity += pack.originalAmount;
         if (pack.type === CreditPackType.SUBSCRIPTION && pack.expiresAt) {
           totalExpiring += pack.remaining;
@@ -1487,6 +1497,8 @@ export class CreditRepository {
         amount: -carry,
         balanceAfter: freeAfter + userWallet.balance,
         type: CreditTransactionType.USAGE,
+        // Guest spend: a guest pool only ever holds the plain allowance.
+        fundingType: CreditFundingType.FREE_ALLOWANCE,
         freePeriodId: periodId,
         metadata: {
           cost: carry,
@@ -2279,6 +2291,7 @@ export class CreditRepository {
         .insert(leads)
         .values({
           ipAddress,
+          geoCountry: await geoCountryForIp(ipAddress, logger),
           businessName: "",
           country,
           language,
@@ -2942,26 +2955,42 @@ export class CreditRepository {
             // Record transaction
             // balanceAfter = remaining free in this wallet + user wallet's paid balance
             // This gives the user a meaningful "total credits after" value in history
-            const freeAfter = lockedWallet.freeCreditsRemaining - deduction;
+            // One row per funding bucket: the part inside the plain monthly
+            // allowance and the part drawn from the signup/newsletter bonus.
             const paidBalance = pool.userWallet?.balance ?? 0;
-            await tx.insert(creditTransactions).values({
-              walletId: lockedWallet.id,
-              amount: -deduction,
-              balanceAfter: freeAfter + paidBalance,
-              type: CreditTransactionType.USAGE,
-              modelId,
-              feature,
-              messageId,
-              freePeriodId: lockedWallet.freePeriodId,
-              metadata: {
-                cost: amount,
+            let freeLeft = lockedWallet.freeCreditsRemaining;
+            for (const part of splitFreeDebit(
+              freeCreditsSpentThisPeriod + freeCreditsDeducted,
+              deduction,
+            )) {
+              freeLeft -= part.amount;
+              // Both rows describe the same debit. Keep the reported cost
+              // proportional to the credits attributed to each bucket.
+              const costShare = part.amount / deduction;
+              await tx.insert(creditTransactions).values({
+                walletId: lockedWallet.id,
+                amount: -part.amount,
+                balanceAfter: freeLeft + paidBalance,
+                type: CreditTransactionType.USAGE,
+                fundingType: part.fundingType,
+                modelId,
+                feature,
                 messageId,
-                ...upstreamCost,
-                freeCreditsUsed: deduction,
-                packCreditsUsed: 0,
-                ...(currentLeadId ? { actorLeadId: currentLeadId } : {}),
-              },
-            });
+                freePeriodId: lockedWallet.freePeriodId,
+                metadata: {
+                  cost: amount,
+                  messageId,
+                  ...(upstreamCost && {
+                    ...upstreamCost,
+                    upstreamCostUsd: upstreamCost.upstreamCostUsd * costShare,
+                    fallbackCostUsd: upstreamCost.fallbackCostUsd * costShare,
+                  }),
+                  freeCreditsUsed: part.amount,
+                  packCreditsUsed: 0,
+                  ...(currentLeadId ? { actorLeadId: currentLeadId } : {}),
+                },
+              });
+            }
 
             remaining -= deduction;
             freeCreditsToDeduct -= deduction;
@@ -2978,9 +3007,7 @@ export class CreditRepository {
             .where(
               and(
                 inArray(creditPacks.walletId, expiringWalletIds),
-                eq(creditPacks.type, CreditPackType.SUBSCRIPTION),
-                not(isNull(creditPacks.expiresAt)),
-                gte(creditPacks.expiresAt, new Date()),
+                spendableSubscriptionPacks(new Date()),
               ),
             )
             .orderBy(sql`${creditPacks.expiresAt} ASC`)
@@ -3020,6 +3047,11 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
               type: CreditTransactionType.USAGE,
+              fundingType: packFundingType({
+                type: pack.type,
+                source: pack.source,
+                sessionId: pack.metadata.sessionId,
+              }),
               modelId,
               feature,
               messageId,
@@ -3060,7 +3092,7 @@ export class CreditRepository {
             .where(
               and(
                 inArray(creditPacks.walletId, earnedWalletIds),
-                eq(creditPacks.type, CreditPackType.EARNED),
+                spendableEarnedPacks(),
               ),
             )
             .orderBy(creditPacks.createdAt) // FIFO for earned credits
@@ -3100,6 +3132,11 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
               type: CreditTransactionType.USAGE,
+              fundingType: packFundingType({
+                type: pack.type,
+                source: pack.source,
+                sessionId: pack.metadata.sessionId,
+              }),
               modelId,
               feature,
               messageId,
@@ -3140,11 +3177,7 @@ export class CreditRepository {
             .where(
               and(
                 inArray(creditPacks.walletId, permanentWalletIds),
-                or(
-                  eq(creditPacks.type, CreditPackType.PERMANENT),
-                  eq(creditPacks.type, CreditPackType.BONUS),
-                ),
-                isNull(creditPacks.expiresAt),
+                spendablePermanentPacks(),
               ),
             )
             .orderBy(desc(creditPacks.createdAt))
@@ -3184,6 +3217,11 @@ export class CreditRepository {
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
               type: CreditTransactionType.USAGE,
+              fundingType: packFundingType({
+                type: pack.type,
+                source: pack.source,
+                sessionId: pack.metadata.sessionId,
+              }),
               modelId,
               feature,
               messageId,

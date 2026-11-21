@@ -12,6 +12,14 @@ export const translations: typeof enTranslations = {
     mailboxUnavailable:
       "Non poteva controllare la casella di posta del sistema per email di registrazione fallite.",
   },
+  events: {
+    started: "Registrazione iniziata",
+    emailSent: "Email di conferma inviata",
+    sendFailed: "Invio dell'email non riuscito",
+    bounced: "Email di conferma respinta",
+    expired: "Conferma scaduta",
+    confirmed: "Email confermata",
+  },
   confirmation: {
     bouncedTitle: "Non siamo riusciti a consegnare l’email di conferma",
     changeAddress: "Cambia indirizzo email",

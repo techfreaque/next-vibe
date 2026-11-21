@@ -36,7 +36,8 @@ beforeAll(async () => {
     CREATE TABLE leads (
       id uuid PRIMARY KEY, created_at timestamp, country text, email text, business_name text,
       device_type text, browser text, os text, ip_address text, user_agent text,
-      referral_code text, converted_user_id uuid, signed_up_at timestamp
+      referral_code text, converted_user_id uuid, signed_up_at timestamp,
+      geo_country text
     );
     CREATE TABLE users (id uuid PRIMARY KEY, created_at timestamp, email_verified boolean);
     CREATE TABLE growth_journeys (
@@ -74,6 +75,9 @@ beforeAll(async () => {
       SELECT ('00000000-0000-4000-8000-' || lpad(g::text, 12, '0'))::uuid, '2026-11-20 01:00:00'::timestamp + g * interval '1 minute',
         'US', 'burst', '203.0.113.' || g, 'python-requests/2.32.3'
       FROM generate_series(3, 14) g;
+    -- Visitor country from the IP differs from the locale region on purpose.
+    UPDATE leads SET geo_country = 'BR' WHERE id = '${id(1)}';
+    UPDATE leads SET geo_country = 'ZZ' WHERE id = '${id(2)}';
     INSERT INTO growth_journeys VALUES
       ('${id(1)}', '${id(901)}', 'google.com', 'enums.channelType.organic', NULL, NULL, NULL, 'google.com',
         '/en-US/story', NULL, '${day}', '${day}', '${day}', '2026-11-19 12:00:00'),
@@ -201,6 +205,31 @@ test("list drill-down ids match the report filters", async () => {
     ),
   ).toBe(1);
   expect(matchingLeadIdsSql({})).toBeNull();
+  // country = visitor country from the IP, localeCountry = chosen locale region
+  expect(await run(matchingLeadIdsSql({ country: "br" }))).toBe(1);
+  expect(await run(matchingLeadIdsSql({ country: "DE" }))).toBe(0);
+  expect(await run(matchingLeadIdsSql({ localeCountry: "de" }))).toBe(1);
+});
+
+test("country breakdown uses the visitor country, locale region stays its own dimension", async () => {
+  const { computeAcquisitionBreakdown } = await import(
+    "./acquisition/repository"
+  );
+  const countries = await computeAcquisitionBreakdown(
+    win,
+    {},
+    LeadDimension.COUNTRY,
+  );
+  const byCountry = new Map(countries.map((row) => [row.key, row.metrics.leads]));
+  expect(byCountry.get("BR")).toBe(1);
+  expect(byCountry.get("ZZ")).toBe(1);
+  expect(byCountry.get("DE")).toBeUndefined();
+  const locales = await computeAcquisitionBreakdown(
+    win,
+    {},
+    LeadDimension.LOCALE_COUNTRY,
+  );
+  expect(new Map(locales.map((row) => [row.key, row.metrics.leads])).get("DE")).toBe(1);
 });
 
 test("overview topSources reconcile with the overview totals", async () => {

@@ -129,6 +129,7 @@ export const {
   LANDING_PATH: "leadAnalytics.dimension.landingPath",
   REF_CODE: "leadAnalytics.dimension.refCode",
   COUNTRY: "leadAnalytics.dimension.country",
+  LOCALE_COUNTRY: "leadAnalytics.dimension.localeCountry",
   DEVICE: "leadAnalytics.dimension.device",
   BROWSER: "leadAnalytics.dimension.browser",
   OS: "leadAnalytics.dimension.os",

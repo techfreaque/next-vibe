@@ -88,6 +88,7 @@ export function FunnelReportWidget(): JSX.Element {
     landingPath: form.watch("landingPath"),
     refCode: form.watch("refCode"),
     country: form.watch("country"),
+    localeCountry: form.watch("localeCountry"),
     device: form.watch("device"),
     browser: form.watch("browser"),
     os: form.watch("os"),
@@ -286,6 +287,14 @@ export function FunnelReportWidget(): JSX.Element {
         />
       </Div>
 
+      <SignupStepsSection
+        value={value}
+        usedDimension={usedDimension}
+        t={t}
+        st={st}
+        locale={locale}
+      />
+
       <Div className="flex min-w-0 flex-col gap-2">
         <DimensionTabs
           value={usedDimension}
@@ -336,5 +345,123 @@ export function FunnelReportWidget(): JSX.Element {
         />
       </Div>
     </WidgetShell>
+  );
+}
+
+type FunnelValue = NonNullable<
+  ReturnType<typeof useWidgetValue<typeof definition.GET>>
+>;
+
+/** Signup confirmation steps: started, mail, bounce/expiry, confirmed. */
+function SignupStepsSection({
+  value,
+  usedDimension,
+  t,
+  st,
+  locale,
+}: {
+  value: FunnelValue;
+  usedDimension: FunnelValue["dimensionUsed"];
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  st: ReturnType<typeof useLeadAnalyticsT>;
+  locale: ReturnType<typeof useWidgetLocale>;
+}): JSX.Element {
+  const now = (key: string): number => step(value.signupSteps, key) ?? 0;
+  const prev = (key: string): number | null =>
+    step(value.previousSignupSteps, key);
+  const prevStarted = prev("started");
+  const prevConfirmed = prev("confirmed");
+  const label: Record<string, string> = {
+    started: t("widget.started"),
+    emailSent: t("widget.emailSent"),
+    sendFailed: t("widget.sendFailed"),
+    bounced: t("widget.bounced"),
+    expired: t("widget.expired"),
+    confirmed: t("widget.confirmed"),
+  };
+  return (
+    <SectionGroup
+      title={t("widget.signupTitle")}
+      subtitle={t("widget.signupSubtitle")}
+    >
+      <KpiGrid columns={4}>
+        <KpiTile
+          label={label.started}
+          value={now("started")}
+          previous={prevStarted}
+          locale={locale}
+        />
+        <KpiTile
+          label={t("widget.confirmRate")}
+          value={ratio(now("confirmed"), now("started"))}
+          previous={
+            prevStarted === null || prevConfirmed === null
+              ? null
+              : ratio(prevConfirmed, prevStarted)
+          }
+          format="percent"
+          hint={t("widget.ofStarted", {
+            count: now("confirmed").toLocaleString(locale),
+            total: now("started").toLocaleString(locale),
+          })}
+          tone="positive"
+          locale={locale}
+        />
+        <KpiTile
+          label={label.bounced}
+          value={now("bounced")}
+          previous={prev("bounced")}
+          hint={t("widget.signupLostHint")}
+          invertDelta
+          locale={locale}
+        />
+        <KpiTile
+          label={label.expired}
+          value={now("expired")}
+          previous={prev("expired")}
+          hint={`${label.sendFailed}: ${now("sendFailed").toLocaleString(locale)}`}
+          invertDelta
+          locale={locale}
+        />
+      </KpiGrid>
+      <Div className="grid min-w-0 grid-cols-1 gap-4 @3xl:grid-cols-2">
+        <FunnelChart
+          title={t("widget.signupTitle")}
+          locale={locale}
+          steps={["started", "emailSent", "confirmed"].map((key) => ({
+            key,
+            label: label[key] ?? key,
+            value: now(key),
+          }))}
+        />
+        <BreakdownTable
+          title={t("widget.signupSegmentsTitle")}
+          subtitle={t("widget.signupSegmentsSubtitle")}
+          dimensionLabel={st(DIMENSION_LABEL[usedDimension])}
+          locale={locale}
+          shareKey="started"
+          limit={10}
+          emptyLabel={t("widget.signupEmpty")}
+          columns={[
+            { key: "started", label: label.started },
+            { key: "emailSent", label: label.emailSent, secondary: true },
+            { key: "bounced", label: label.bounced, secondary: true },
+            { key: "expired", label: label.expired, secondary: true },
+            { key: "confirmed", label: label.confirmed },
+            {
+              key: "confirmRate",
+              label: t("widget.confirmRate"),
+              format: "percent",
+            },
+          ]}
+          rows={value.signupSegments.map((row) => ({
+            id: row.key ?? "(none)",
+            label: dimensionValueLabel(row.key, st),
+            sublabel: noneRowHint(row.key, st),
+            values: row.metrics,
+          }))}
+        />
+      </Div>
+    </SectionGroup>
   );
 }

@@ -24,6 +24,9 @@ export const translations: typeof enTranslations = {
       rates: "Wskaźniki konwersji",
       segments: "Lejek według segmentu",
       trend: "Trend kohorty",
+      signupSteps: "Kroki rejestracji w okresie",
+      previousSignupSteps: "Kroki rejestracji w poprzednim okresie",
+      signupSegments: "Kroki rejestracji według segmentu",
     },
     errors: {
       unauthorized: {
@@ -66,6 +69,22 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    signupTitle: "Potwierdzenie rejestracji",
+    signupSubtitle:
+      "Leady na krok, datowane momentem kroku. Spadek pokazuje, gdzie rejestracje odpadają.",
+    started: "Rozpoczęte",
+    emailSent: "E-mail wysłany",
+    sendFailed: "Wysyłka nieudana",
+    bounced: "Odbity",
+    expired: "Wygasłe",
+    confirmed: "Potwierdzone",
+    confirmRate: "Wskaźnik potwierdzeń",
+    ofStarted: "{{count}} z {{total}} rozpoczętych",
+    signupSegmentsTitle: "Kroki rejestracji według segmentu",
+    signupSegmentsSubtitle: "Te same kroki według wybranego wymiaru.",
+    signupEmpty: "Brak rejestracji w tym okresie.",
+    signupLost: "Utracone przy e-mailu",
+    signupLostHint: "Odbite, nieudane lub wygasłe przed potwierdzeniem",
     loading: "Wczytywanie lejka...",
     cohortHint: "z {{count}} utworzonych leadów",
     signupRate: "Wskaźnik rejestracji",

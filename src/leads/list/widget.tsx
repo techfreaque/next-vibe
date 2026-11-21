@@ -188,6 +188,7 @@ function LeadRow({
     : [];
   const client = triage
     ? [
+        triage.geoCountry ? dimensionValueLabel(triage.geoCountry, st) : null,
         dimensionValueLabel(triage.device, st),
         triage.browser,
         triage.os,
@@ -392,6 +393,7 @@ function DrillRow({
     : [];
   const client = triage
     ? [
+        triage.geoCountry ? dimensionValueLabel(triage.geoCountry, st) : null,
         dimensionValueLabel(triage.device, st),
         triage.browser,
         triage.ipPrefix,
@@ -690,6 +692,7 @@ export function LeadsListContainer({
     landingPath: form.watch("landingPath"),
     refCode: form.watch("refCode"),
     country: form.watch("country"),
+    localeCountry: form.watch("localeCountry"),
     device: form.watch("device"),
     browser: form.watch("browser"),
     os: form.watch("os"),
@@ -1205,6 +1208,7 @@ const DRILL_KEYS = [
   "landingPath",
   "refCode",
   "country",
+  "localeCountry",
   "device",
   "browser",
   "os",

@@ -65,6 +65,7 @@ export function AbuseReportWidget(): JSX.Element {
     landingPath: form.watch("landingPath"),
     refCode: form.watch("refCode"),
     country: form.watch("country"),
+    localeCountry: form.watch("localeCountry"),
     device: form.watch("device"),
     browser: form.watch("browser"),
     os: form.watch("os"),
@@ -329,13 +330,15 @@ export function AbuseReportWidget(): JSX.Element {
             [
               t("widget.noIp"),
               dimensionValueLabel(row.botFamily, st),
-              row.country,
-            ].join(" · "),
+              row.country ? dimensionValueLabel(row.country, st) : null,
+            ]
+              .filter((part): part is string => Boolean(part))
+              .join(" · "),
           sublabel: [
             row.leadId.slice(0, 8),
             row.ipPrefix,
             dimensionValueLabel(row.botFamily, st),
-            row.country,
+            row.country ? dimensionValueLabel(row.country, st) : null,
             row.lastAt,
           ]
             .filter((part): part is string => Boolean(part))

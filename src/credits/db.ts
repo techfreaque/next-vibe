@@ -32,7 +32,11 @@ import type {
   ImageVisionModelId,
   VideoVisionModelId,
 } from "../vibe/agent/ai-stream/vision-models";
-import { CreditPackTypeDB, CreditTransactionTypeDB } from "./enum";
+import {
+  CreditFundingTypeDB,
+  CreditPackTypeDB,
+  CreditTransactionTypeDB,
+} from "./enum";
 
 /**
  * Custom numeric type that returns numbers instead of strings
@@ -369,6 +373,10 @@ export const creditTransactions = pgTable(
 
     // Period tracking for free credit transactions
     freePeriodId: text("free_period_id"),
+
+    // Usage rows: which funding bucket paid this debit, stamped at write time
+    // (the pack row can be deleted later, so pack_id alone is not enough).
+    fundingType: text("funding_type", { enum: CreditFundingTypeDB }),
 
     // Journal entry reference (set after accounting entry is posted)
     journalEntryId: uuid("journal_entry_id"),

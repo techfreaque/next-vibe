@@ -24,6 +24,9 @@ export const translations: typeof enTranslations = {
       rates: "Taux de conversion",
       segments: "Entonnoir par segment",
       trend: "Tendance de la cohorte",
+      signupSteps: "Étapes d'inscription sur la période",
+      previousSignupSteps: "Étapes d'inscription sur la période précédente",
+      signupSegments: "Étapes d'inscription par segment",
     },
     errors: {
       unauthorized: {
@@ -66,6 +69,22 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    signupTitle: "Confirmation d'inscription",
+    signupSubtitle:
+      "Leads par étape, datés au moment de l'étape. La chute montre où les inscriptions se perdent.",
+    started: "Commencées",
+    emailSent: "E-mail envoyé",
+    sendFailed: "Envoi échoué",
+    bounced: "Rejeté",
+    expired: "Expirées",
+    confirmed: "Confirmées",
+    confirmRate: "Taux de confirmation",
+    ofStarted: "{{count}} sur {{total}} commencées",
+    signupSegmentsTitle: "Étapes d'inscription par segment",
+    signupSegmentsSubtitle: "Les mêmes étapes selon la dimension choisie.",
+    signupEmpty: "Aucune inscription sur cette période.",
+    signupLost: "Perdues à l'e-mail",
+    signupLostHint: "Rejetées, échouées ou expirées avant confirmation",
     loading: "Chargement de l'entonnoir...",
     cohortHint: "sur {{count}} leads créés",
     signupRate: "Taux d'inscription",

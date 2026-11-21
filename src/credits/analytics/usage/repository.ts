@@ -7,8 +7,11 @@
  * - Account vs guest: a row is account spend when the wallet belongs to a user,
  *   or the spending lead (metadata.actorLeadId, else the wallet lead) was linked
  *   to a user at the time of the spend. Everything else is guest spend.
- * - Free vs pack: metadata.freeCreditsUsed (lead wallet rows without it count
- *   as free). Pack credits cover purchases, subscriptions and admin grants.
+ * - Funding: credit_transactions.funding_type, stamped at write time by the
+ *   deduction walk (free allowance, signup/newsletter bonus, referral,
+ *   purchased pack, subscription, admin grant). Historical rows were
+ *   backfilled where exact; the rest is free_unknown / pack_unknown. Rows
+ *   without a stamp fall back to the pack join (origin missing when gone).
  * - Spend USD = credits x CREDIT_VALUE_USD (list value, not cash received).
  * - Upstream cost = metadata.upstreamCostUsd + fallbackCostUsd, only on rows
  *   that recorded it. Margin is computed over those rows only; costCoverage is
@@ -41,7 +44,11 @@ import type { QueryResultRow } from "pg";
 
 import { CREDIT_VALUE_USD } from "@/products/constants";
 
-import { CreditPackType, CreditTransactionType } from "../../enum";
+import {
+  CreditFundingType,
+  CreditPackType,
+  CreditTransactionType,
+} from "../../enum";
 import { notSignupCarryoverRaw } from "../../usage-filter";
 import type {
   CreditUsageReportRequestOutput,
@@ -54,43 +61,59 @@ type NumLike = string | number | null;
 
 const BREAKDOWN_LIMIT = 25;
 
-type FundingKey =
-  | "allowance"
-  | "purchased"
-  | "subscription"
-  | "grants"
-  | "packUnknown";
+/** Funding series key -> credit_transactions.funding_type value. */
+const FUNDING_TYPE = {
+  allowance: CreditFundingType.FREE_ALLOWANCE,
+  freeBonus: CreditFundingType.FREE_BONUS,
+  freeUnknown: CreditFundingType.FREE_UNKNOWN,
+  purchased: CreditFundingType.PURCHASED,
+  subscription: CreditFundingType.SUBSCRIPTION,
+  referral: CreditFundingType.REFERRAL,
+  adminGrant: CreditFundingType.ADMIN_GRANT,
+  packUnknown: CreditFundingType.PACK_UNKNOWN,
+} as const;
 
-const FUNDING_SOURCE: Record<
-  FundingKey,
-  "free" | "purchased" | "subscription" | "grants" | "pack_unknown"
-> = {
-  allowance: "free",
-  purchased: "purchased",
-  subscription: "subscription",
-  grants: "grants",
-  packUnknown: "pack_unknown",
-};
+type FundingKey = keyof typeof FUNDING_TYPE;
 
+const FREE_FUNDING: readonly FundingKey[] = [
+  "allowance",
+  "freeBonus",
+  "freeUnknown",
+];
+const GRANT_FUNDING: readonly FundingKey[] = ["referral", "adminGrant"];
 const PACK_FUNDING: readonly FundingKey[] = [
   "purchased",
   "subscription",
-  "grants",
+  ...GRANT_FUNDING,
   "packUnknown",
 ];
+
+const FUNDING_KEYS: readonly FundingKey[] = [...FREE_FUNDING, ...PACK_FUNDING];
 
 /** Funding series relevant to each credit-kind filter (no always-zero rows). */
 const FUNDING_SERIES: Record<
   CreditUsageReportRequestOutput["creditKind"],
   readonly FundingKey[]
 > = {
-  [UsageCreditKind.ALL]: ["allowance", ...PACK_FUNDING],
-  [UsageCreditKind.FREE]: ["allowance"],
+  [UsageCreditKind.ALL]: [...FREE_FUNDING, ...PACK_FUNDING],
+  [UsageCreditKind.FREE]: FREE_FUNDING,
   [UsageCreditKind.PACK]: PACK_FUNDING,
   [UsageCreditKind.PURCHASED]: ["purchased"],
   [UsageCreditKind.SUBSCRIPTION]: ["subscription"],
-  [UsageCreditKind.GRANTS]: ["grants"],
+  [UsageCreditKind.GRANTS]: GRANT_FUNDING,
 };
+
+function fundingList(keys: readonly FundingKey[]): SQL {
+  return sql.join(
+    keys.map((key) => sql`${FUNDING_TYPE[key]}`),
+    sql`, `,
+  );
+}
+
+/** sum(c) of the rows whose funding bucket is one of `keys`. */
+function fundingSum(keys: readonly FundingKey[], prefix = ""): SQL {
+  return sql`sum(${sql.raw(`${prefix}c`)}) FILTER (WHERE ${sql.raw(`${prefix}bucket`)} IN (${fundingList(keys)}))`;
+}
 const TOP_SPENDER_LIMIT = 25;
 
 function num(value: NumLike | undefined): number {
@@ -116,12 +139,9 @@ function ts(date: Date): SQL {
   return sql`(${date.toISOString()}::timestamptz AT TIME ZONE 'UTC')`;
 }
 
-/** Pack-funded part of a base row when its pack type is one of `types`. */
-function packPart(types: readonly string[]): SQL {
-  return sql`(CASE WHEN b.pack_type IN (${sql.join(
-    types.map((type) => sql`${type}`),
-    sql`, `,
-  )}) THEN b.credits - b.free_credits ELSE 0 END)`;
+/** Credits of a base row when its funding bucket is one of `keys`. */
+function fundedPart(keys: readonly FundingKey[]): SQL {
+  return sql`(CASE WHEN b.bucket IN (${fundingList(keys)}) THEN b.credits ELSE 0 END)`;
 }
 
 export interface CreditUsageFilters {
@@ -146,17 +166,9 @@ export function creditUsageCte(
   const usage = CreditTransactionType.USAGE;
   const realUsage = sql.raw(notSignupCarryoverRaw("t"));
   const credits: SQL =
-    filters.creditKind === UsageCreditKind.FREE
-      ? sql.raw("b.free_credits")
-      : filters.creditKind === UsageCreditKind.PACK
-        ? sql.raw("(b.credits - b.free_credits)")
-        : filters.creditKind === UsageCreditKind.PURCHASED
-          ? packPart([CreditPackType.PERMANENT])
-          : filters.creditKind === UsageCreditKind.SUBSCRIPTION
-            ? packPart([CreditPackType.SUBSCRIPTION])
-            : filters.creditKind === UsageCreditKind.GRANTS
-              ? packPart([CreditPackType.BONUS, CreditPackType.EARNED])
-              : sql.raw("b.credits");
+    filters.creditKind === UsageCreditKind.ALL
+      ? sql.raw("b.credits")
+      : fundedPart(FUNDING_SERIES[filters.creditKind]);
   const freePart =
     filters.creditKind === UsageCreditKind.ALL ||
     filters.creditKind === UsageCreditKind.FREE
@@ -186,23 +198,33 @@ export function creditUsageCte(
       SELECT
         t.created_at AS at,
         (-t.amount)::numeric AS credits,
-        LEAST(-t.amount, GREATEST(0, COALESCE(
-          (t.metadata->>'freeCreditsUsed')::numeric,
-          CASE WHEN w.lead_id IS NOT NULL THEN -t.amount ELSE 0 END
-        )))::numeric AS free_credits,
+        CASE WHEN fund.bucket IN (${fundingList(FREE_FUNDING)})
+          THEN -t.amount ELSE 0 END::numeric AS free_credits,
+        fund.bucket,
         t.model_id AS model,
         COALESCE(NULLIF(t.feature, ''), CASE WHEN t.model_id IS NOT NULL THEN 'chat' END) AS feature,
         NULLIF(t.metadata->>'upstreamProvider', '') AS provider,
         (t.metadata ? 'upstreamCostUsd' OR t.metadata ? 'fallbackCostUsd') AS has_cost,
         (COALESCE((t.metadata->>'upstreamCostUsd')::numeric, 0)
           + COALESCE((t.metadata->>'fallbackCostUsd')::numeric, 0)) AS cost_usd,
-        pk.type AS pack_type,
         COALESCE(w.user_id, link.user_id) AS user_id,
         CASE WHEN COALESCE(w.user_id, link.user_id) IS NULL
           THEN COALESCE(actor.lead_id, w.lead_id) END AS lead_id
       FROM credit_transactions t
       JOIN credit_wallets w ON w.id = t.wallet_id
       LEFT JOIN credit_packs pk ON pk.id = t.pack_id
+      LEFT JOIN LATERAL (
+        -- Unstamped rows (written by a build before funding_type existed).
+        SELECT COALESCE(t.funding_type, CASE
+          WHEN pk.type = ${CreditPackType.SUBSCRIPTION} THEN ${CreditFundingType.SUBSCRIPTION}
+          WHEN pk.type = ${CreditPackType.PERMANENT} THEN ${CreditFundingType.PURCHASED}
+          WHEN pk.type = ${CreditPackType.EARNED} THEN ${CreditFundingType.REFERRAL}
+          WHEN pk.type = ${CreditPackType.BONUS} THEN ${CreditFundingType.ADMIN_GRANT}
+          WHEN w.lead_id IS NOT NULL
+            AND COALESCE((t.metadata->>'packCreditsUsed')::numeric, 0) = 0
+            THEN ${CreditFundingType.FREE_UNKNOWN}
+          ELSE ${CreditFundingType.PACK_UNKNOWN} END) AS bucket
+      ) fund ON true
       LEFT JOIN LATERAL (
         SELECT CASE WHEN t.metadata->>'actorLeadId' ~ '^[0-9a-fA-F-]{36}$'
           THEN (t.metadata->>'actorLeadId')::uuid END AS lead_id
@@ -223,7 +245,7 @@ export function creditUsageCte(
     ),
     f AS (
       SELECT
-        b.at, b.model, b.feature, b.provider, b.has_cost, b.user_id, b.lead_id, b.pack_type,
+        b.at, b.model, b.feature, b.provider, b.has_cost, b.user_id, b.lead_id, b.bucket,
         ${credits} AS c,
         LEAST(${credits}, ${freePart}) AS fc,
         CASE WHEN b.credits > 0 THEN b.cost_usd * ${credits} / b.credits ELSE 0 END AS cost
@@ -325,8 +347,8 @@ export class CreditUsageReportRepository {
         sum(cost) FILTER (WHERE has_cost) AS cost,
         sum(c) FILTER (WHERE has_cost) AS costed,
         sum(CASE WHEN c > 0 THEN cost * fc / c ELSE 0 END) FILTER (WHERE has_cost) AS free_cost,
-        sum(c - fc) FILTER (WHERE pack_type IN (${CreditPackType.PERMANENT}, ${CreditPackType.SUBSCRIPTION})) AS paid,
-        sum(c - fc) FILTER (WHERE pack_type IS NULL) AS unknown,
+        ${fundingSum(["purchased", "subscription"])} AS paid,
+        ${fundingSum(["packUnknown"])} AS unknown,
         sum(fc) FILTER (WHERE has_cost) AS free_costed,
         count(DISTINCT COALESCE(user_id::text, 'lead:' || lead_id::text)) AS spenders
       FROM f
@@ -399,23 +421,22 @@ export class CreditUsageReportRepository {
             free: NumLike;
             pack: NumLike;
             spend: NumLike;
-            purchased: NumLike;
-            subscription: NumLike;
-            grants: NumLike;
-            pack_unknown: NumLike;
             costed: NumLike;
             cost: NumLike;
-          }
+          } & Record<`fund_${FundingKey}`, NumLike>
         >(sql`${cte}
           SELECT ${bucket} AS bucket,
             sum(c) FILTER (WHERE user_id IS NOT NULL) AS users,
             sum(c) FILTER (WHERE user_id IS NULL) AS guests,
             sum(fc) AS free,
             sum(c - fc) AS pack,
-            sum(c - fc) FILTER (WHERE pack_type = ${CreditPackType.PERMANENT}) AS purchased,
-            sum(c - fc) FILTER (WHERE pack_type = ${CreditPackType.SUBSCRIPTION}) AS subscription,
-            sum(c - fc) FILTER (WHERE pack_type IN (${CreditPackType.BONUS}, ${CreditPackType.EARNED})) AS grants,
-            sum(c - fc) FILTER (WHERE pack_type IS NULL) AS pack_unknown,
+            ${sql.join(
+              FUNDING_KEYS.map(
+                (key) =>
+                  sql`${fundingSum([key])} AS ${sql.identifier(`fund_${key}`)}`,
+              ),
+              sql`, `,
+            )},
             sum(c) AS spend,
             sum(c) FILTER (WHERE has_cost) AS costed,
             sum(cost) FILTER (WHERE has_cost) AS cost
@@ -447,10 +468,10 @@ export class CreditUsageReportRepository {
             sum(f.c) AS credits, sum(f.fc) AS free, count(*) AS tx,
             sum(f.cost) FILTER (WHERE f.has_cost) AS cost,
             sum(f.c) FILTER (WHERE f.has_cost) AS costed,
-            sum(f.c - f.fc) FILTER (WHERE f.pack_type = ${CreditPackType.PERMANENT}) AS purchased,
-            sum(f.c - f.fc) FILTER (WHERE f.pack_type = ${CreditPackType.SUBSCRIPTION}) AS subscription,
-            sum(f.c - f.fc) FILTER (WHERE f.pack_type IN (${CreditPackType.BONUS}, ${CreditPackType.EARNED})) AS grants,
-            sum(f.c - f.fc) FILTER (WHERE f.pack_type IS NULL) AS pack_unknown,
+            ${fundingSum(["purchased"], "f.")} AS purchased,
+            ${fundingSum(["subscription"], "f.")} AS subscription,
+            ${fundingSum(GRANT_FUNDING, "f.")} AS grants,
+            ${fundingSum(["packUnknown"], "f.")} AS pack_unknown,
             mode() WITHIN GROUP (ORDER BY COALESCE(f.model, f.feature)) AS top_model,
             to_char(max(f.at), 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS last
           FROM f LEFT JOIN users u ON u.id = f.user_id
@@ -468,10 +489,7 @@ export class CreditUsageReportRepository {
         | "spend"
         | "costed"
         | "cost"
-        | "purchased"
-        | "subscription"
-        | "grants"
-        | "pack_unknown",
+        | `fund_${FundingKey}`,
       factor = 1,
     ): number[] =>
       fillBuckets(
@@ -599,7 +617,7 @@ export class CreditUsageReportRepository {
         buckets: win.buckets,
         series: FUNDING_SERIES[filters.creditKind].map((key) => ({
           key,
-          values: pickSeries(FUNDING_SOURCE[key]),
+          values: pickSeries(`fund_${key}`),
         })),
       },
       spendByKind: {

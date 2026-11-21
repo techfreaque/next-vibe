@@ -609,6 +609,7 @@ export class LeadsRepository {
           createdAt: leads.createdAt,
           updatedAt: leads.updatedAt,
           ipAddress: leads.ipAddress,
+          geoCountry: leads.geoCountry,
           userAgent: leads.userAgent,
           deviceType: leads.deviceType,
           browser: leads.browser,

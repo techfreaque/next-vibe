@@ -39,7 +39,8 @@ type LeadDimensionValue = (typeof LeadDimension)[keyof typeof LeadDimension];
  */
 export function leadFactsSql(leadCondition: SQL = sql`TRUE`): SQL {
   return sql`
-    SELECT l.id, l.created_at, l.country, l.email, l.business_name,
+    SELECT l.id, l.created_at, l.geo_country AS country,
+      l.country AS locale_country, l.email, l.business_name,
       coalesce(l.device_type, ${DeviceType.UNKNOWN}) AS device,
       l.browser, l.os, l.ip_address AS ip, l.user_agent AS ua,
       ${botFamilySql(sql`l.user_agent`)} AS bot_family,
@@ -91,6 +92,7 @@ const TEXT_COLUMNS = {
   landingPath: sql`f.landing_path`,
   refCode: sql`f.ref_code`,
   country: sql`f.country`,
+  localeCountry: sql`f.locale_country`,
   browser: sql`f.browser`,
   os: sql`f.os`,
   ipPrefix: sql`f.ip_prefix`,
@@ -126,7 +128,9 @@ export function segmentConditions(filters: LeadSegmentFilters): SQL[] {
       conditions.push(
         matches(
           TEXT_COLUMNS[key],
-          key === "country" ? value.toUpperCase() : value,
+          key === "country" || key === "localeCountry"
+            ? value.toUpperCase()
+            : value,
         ),
       );
     }
@@ -266,6 +270,8 @@ export function dimensionColumn(dimension: LeadDimensionValue): SQL {
       return sql`f.ref_code`;
     case LeadDimension.COUNTRY:
       return sql`f.country`;
+    case LeadDimension.LOCALE_COUNTRY:
+      return sql`f.locale_country`;
     case LeadDimension.DEVICE:
       return deviceFilterKeySql;
     case LeadDimension.BROWSER:

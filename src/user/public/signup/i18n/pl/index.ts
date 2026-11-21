@@ -11,6 +11,14 @@ export const translations: typeof enTranslations = {
     mailboxUnavailable:
       "Nie udało się sprawdzić zwrotów w skrzynce systemowej.",
   },
+  events: {
+    started: "Rejestracja rozpoczęta",
+    emailSent: "Wysłano e-mail potwierdzający",
+    sendFailed: "Wysyłka e-maila nie powiodła się",
+    bounced: "E-mail potwierdzający odbity",
+    expired: "Potwierdzenie wygasło",
+    confirmed: "E-mail potwierdzony",
+  },
   confirmation: {
     bouncedTitle: "Nie udało się dostarczyć wiadomości",
     changeAddress: "Zmień adres e-mail",

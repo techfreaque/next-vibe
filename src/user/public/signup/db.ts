@@ -13,6 +13,7 @@ import { leads } from "next-vibe/identity/lead/db";
 
 import { SignupBounceReasonDB } from "./bounce-reason";
 import type { SignupPostRequestOutput } from "./definition";
+import { SignupEventTypeDB } from "./event-type";
 
 export const pendingSignups = pgTable(
   "pending_signups",
@@ -65,5 +66,32 @@ export const signupMailAttempts = pgTable(
   (table) => [
     index("signup_mail_scope_time_idx").on(table.scope, table.sentAt),
     index("signup_mail_time_idx").on(table.sentAt),
+  ],
+);
+
+/**
+ * Dated signup funnel steps (started, mail sent / failed, bounced, expired,
+ * confirmed). Pending rows are consumed or rotated, so these rows are the
+ * only durable record of drop-off per step. No address, no IP: the lead id
+ * links to the attribution already stored for the lead.
+ * `dedupeKey` makes replayed steps (bounce reason refinement, the expiry
+ * sweep) idempotent.
+ */
+export const signupEvents = pgTable(
+  "signup_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    leadId: uuid("lead_id").references(() => leads.id, {
+      onDelete: "cascade",
+    }),
+    /** pending_signups.id (no FK: the pending row is deleted on confirm) */
+    pendingId: uuid("pending_id").notNull(),
+    type: text("type", { enum: SignupEventTypeDB }).notNull(),
+    occurredAt: timestamp("occurred_at").defaultNow().notNull(),
+    dedupeKey: text("dedupe_key").unique(),
+  },
+  (table) => [
+    index("signup_events_occurred_idx").on(table.occurredAt, table.type),
+    index("signup_events_lead_idx").on(table.leadId),
   ],
 );

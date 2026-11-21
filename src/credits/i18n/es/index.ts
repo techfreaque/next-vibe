@@ -43,6 +43,16 @@ export const translations: typeof enTranslations = {
       referralEarning: "Ganancia por referido",
       referralPayout: "Retiro de ganancias por referidos",
     },
+    fundingType: {
+      freeAllowance: "Cupo gratuito mensual",
+      freeBonus: "Bono de cuenta / boletín",
+      referral: "Créditos de referidos",
+      purchased: "Paquete comprado",
+      subscription: "Créditos de suscripción",
+      adminGrant: "Asignación de admin",
+      freeUnknown: "Gratis, nivel no registrado",
+      packUnknown: "Paquete, origen no registrado",
+    },
     packType: {
       subscription: "Suscripción",
       permanent: "Permanent",

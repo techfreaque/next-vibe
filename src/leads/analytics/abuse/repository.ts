@@ -245,7 +245,7 @@ interface BurnerRow {
   label: string | null;
   ipPrefix: string | null;
   botFamily: (typeof BotFamily)[keyof typeof BotFamily];
-  country: string;
+  country: string | null;
   credits: number;
   tx: number;
   firstAt: string;

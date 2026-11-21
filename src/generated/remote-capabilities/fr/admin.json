@@ -113730,8 +113730,32 @@
         "country": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Pays",
-          "description": "Code pays, ex. DE",
+          "label": "Pays du visiteur",
+          "description": "Pays selon l'IP, ex. DE (ZZ = inconnu)",
+          "columns": 3,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "localeCountry": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Région de langue",
+          "description": "Région de la langue choisie sur le site, ex. DE ou GLOBAL",
           "columns": 3,
           "schema": {
             "def": {
@@ -114640,9 +114664,15 @@
                     },
                     "country": {
                       "def": {
-                        "type": "string"
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
                       },
-                      "type": "string"
+                      "type": "nullable"
                     },
                     "credits": {
                       "def": {
@@ -114762,9 +114792,15 @@
                   },
                   "country": {
                     "def": {
-                      "type": "string"
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
                     },
-                    "type": "string"
+                    "type": "nullable"
                   },
                   "credits": {
                     "def": {
@@ -115427,8 +115463,32 @@
         "country": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Pays",
-          "description": "Code pays, ex. DE",
+          "label": "Pays du visiteur",
+          "description": "Pays selon l'IP, ex. DE (ZZ = inconnu)",
+          "columns": 3,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "localeCountry": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Région de langue",
+          "description": "Région de la langue choisie sur le site, ex. DE ou GLOBAL",
           "columns": 3,
           "schema": {
             "def": {
@@ -115653,6 +115713,10 @@
               "label": "leadAnalytics.dimension.country"
             },
             {
+              "value": "leadAnalytics.dimension.localeCountry",
+              "label": "leadAnalytics.dimension.localeCountry"
+            },
+            {
               "value": "leadAnalytics.dimension.device",
               "label": "leadAnalytics.dimension.device"
             },
@@ -115686,6 +115750,7 @@
                     "LANDING_PATH": "leadAnalytics.dimension.landingPath",
                     "REF_CODE": "leadAnalytics.dimension.refCode",
                     "COUNTRY": "leadAnalytics.dimension.country",
+                    "LOCALE_COUNTRY": "leadAnalytics.dimension.localeCountry",
                     "DEVICE": "leadAnalytics.dimension.device",
                     "BROWSER": "leadAnalytics.dimension.browser",
                     "OS": "leadAnalytics.dimension.os",
@@ -115703,6 +115768,7 @@
                   "LANDING_PATH": "leadAnalytics.dimension.landingPath",
                   "REF_CODE": "leadAnalytics.dimension.refCode",
                   "COUNTRY": "leadAnalytics.dimension.country",
+                  "LOCALE_COUNTRY": "leadAnalytics.dimension.localeCountry",
                   "DEVICE": "leadAnalytics.dimension.device",
                   "BROWSER": "leadAnalytics.dimension.browser",
                   "OS": "leadAnalytics.dimension.os",
@@ -115718,6 +115784,7 @@
                   "leadAnalytics.dimension.landingPath",
                   "leadAnalytics.dimension.refCode",
                   "leadAnalytics.dimension.country",
+                  "leadAnalytics.dimension.localeCountry",
                   "leadAnalytics.dimension.device",
                   "leadAnalytics.dimension.browser",
                   "leadAnalytics.dimension.os",
@@ -117106,8 +117173,32 @@
         "country": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Pays",
-          "description": "Code pays, ex. DE",
+          "label": "Pays du visiteur",
+          "description": "Pays selon l'IP, ex. DE (ZZ = inconnu)",
+          "columns": 3,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "localeCountry": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Région de langue",
+          "description": "Région de la langue choisie sur le site, ex. DE ou GLOBAL",
           "columns": 3,
           "schema": {
             "def": {
@@ -117332,6 +117423,10 @@
               "label": "leadAnalytics.dimension.country"
             },
             {
+              "value": "leadAnalytics.dimension.localeCountry",
+              "label": "leadAnalytics.dimension.localeCountry"
+            },
+            {
               "value": "leadAnalytics.dimension.device",
               "label": "leadAnalytics.dimension.device"
             },
@@ -117365,6 +117460,7 @@
                     "LANDING_PATH": "leadAnalytics.dimension.landingPath",
                     "REF_CODE": "leadAnalytics.dimension.refCode",
                     "COUNTRY": "leadAnalytics.dimension.country",
+                    "LOCALE_COUNTRY": "leadAnalytics.dimension.localeCountry",
                     "DEVICE": "leadAnalytics.dimension.device",
                     "BROWSER": "leadAnalytics.dimension.browser",
                     "OS": "leadAnalytics.dimension.os",
@@ -117382,6 +117478,7 @@
                   "LANDING_PATH": "leadAnalytics.dimension.landingPath",
                   "REF_CODE": "leadAnalytics.dimension.refCode",
                   "COUNTRY": "leadAnalytics.dimension.country",
+                  "LOCALE_COUNTRY": "leadAnalytics.dimension.localeCountry",
                   "DEVICE": "leadAnalytics.dimension.device",
                   "BROWSER": "leadAnalytics.dimension.browser",
                   "OS": "leadAnalytics.dimension.os",
@@ -117397,6 +117494,7 @@
                   "leadAnalytics.dimension.landingPath",
                   "leadAnalytics.dimension.refCode",
                   "leadAnalytics.dimension.country",
+                  "leadAnalytics.dimension.localeCountry",
                   "leadAnalytics.dimension.device",
                   "leadAnalytics.dimension.browser",
                   "leadAnalytics.dimension.os",
@@ -117496,6 +117594,7 @@
                 "LANDING_PATH": "leadAnalytics.dimension.landingPath",
                 "REF_CODE": "leadAnalytics.dimension.refCode",
                 "COUNTRY": "leadAnalytics.dimension.country",
+                "LOCALE_COUNTRY": "leadAnalytics.dimension.localeCountry",
                 "DEVICE": "leadAnalytics.dimension.device",
                 "BROWSER": "leadAnalytics.dimension.browser",
                 "OS": "leadAnalytics.dimension.os",
@@ -117513,6 +117612,7 @@
               "LANDING_PATH": "leadAnalytics.dimension.landingPath",
               "REF_CODE": "leadAnalytics.dimension.refCode",
               "COUNTRY": "leadAnalytics.dimension.country",
+              "LOCALE_COUNTRY": "leadAnalytics.dimension.localeCountry",
               "DEVICE": "leadAnalytics.dimension.device",
               "BROWSER": "leadAnalytics.dimension.browser",
               "OS": "leadAnalytics.dimension.os",
@@ -117528,6 +117628,7 @@
               "leadAnalytics.dimension.landingPath",
               "leadAnalytics.dimension.refCode",
               "leadAnalytics.dimension.country",
+              "leadAnalytics.dimension.localeCountry",
               "leadAnalytics.dimension.device",
               "leadAnalytics.dimension.browser",
               "leadAnalytics.dimension.os",
@@ -117931,6 +118032,250 @@
               }
             },
             "type": "object"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "signupSteps": {
+          "type": "text",
+          "label": "Étapes d'inscription sur la période",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "key": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "value": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "key": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  "value": {
+                    "def": {
+                      "type": "number",
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  }
+                }
+              },
+              "type": "object"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "previousSignupSteps": {
+          "type": "text",
+          "label": "Étapes d'inscription sur la période précédente",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "key": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "value": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "key": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "value": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "signupSegments": {
+          "type": "text",
+          "label": "Étapes d'inscription par segment",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "key": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
+                    },
+                    "metrics": {
+                      "def": {
+                        "type": "record",
+                        "keyType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "valueType": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      },
+                      "type": "record",
+                      "keyType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "valueType": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "key": {
+                    "def": {
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    },
+                    "type": "nullable"
+                  },
+                  "metrics": {
+                    "def": {
+                      "type": "record",
+                      "keyType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "valueType": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    },
+                    "type": "record",
+                    "keyType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "valueType": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  }
+                }
+              },
+              "type": "object"
+            }
           },
           "usage": {
             "response": true
@@ -165014,8 +165359,32 @@
         "country": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Pays",
-          "description": "Code pays, ex. DE",
+          "label": "Pays du visiteur",
+          "description": "Pays selon l'IP, ex. DE (ZZ = inconnu)",
+          "columns": 3,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "localeCountry": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Région de langue",
+          "description": "Région de la langue choisie sur le site, ex. DE ou GLOBAL",
           "columns": 3,
           "schema": {
             "def": {
@@ -167283,6 +167652,18 @@
                                 "type": "nullable"
                               },
                               "os": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "geoCountry": {
                                 "def": {
                                   "type": "nullable",
                                   "innerType": {
