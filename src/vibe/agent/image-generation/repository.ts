@@ -33,6 +33,7 @@ import { getStorageAdapter } from "../chat/storage/index";
 import { parseStorageUrl } from "../chat/storage/url-utils";
 import { getEnvAvailability } from "../env-availability";
 import { MediaStudioRepository } from "../media-studio/repository";
+import { toStudioSettings } from "../media-studio/settings";
 import {
   ApiProvider,
   isModelOptionImageBased,
@@ -200,6 +201,7 @@ export class ImageGenerationRepository {
       kind: "image",
       model: data.model,
       title: data.prompt,
+      settings: toStudioSettings(data),
       user,
       locale,
       logger,

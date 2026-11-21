@@ -1,6 +1,16 @@
 import "server-only";
 
-import { and, desc, eq, inArray, isNull, ne, sql } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  inArray,
+  isNull,
+  ne,
+  type SQL,
+  sql,
+} from "drizzle-orm";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -22,6 +32,7 @@ import { TRANSCRIBE_AUDIO_ALIAS } from "../speech-to-text/constants";
 import { TEXT_TO_SPEECH_ALIAS } from "../text-to-speech/constants";
 import { VIDEO_GEN_ALIAS } from "../video-generation/constants";
 import { studioGenerations } from "./db";
+import { type StudioSettings, studioSettingsSchema } from "./settings";
 
 export interface StudioEntry {
   id: string;
@@ -32,6 +43,20 @@ export interface StudioEntry {
   url: string | null;
   transcript: string | null;
   credits: number | null;
+  /** Model or voice id the result was made with, when known. */
+  model: string | null;
+  /** Form values for "Run again" (studio: stored, chat: tool args, API: prompt). */
+  settings: StudioSettings | null;
+  /** Where it was made: the Studio page, a chat thread or the /v1 API. */
+  source: "studio" | "chat" | "api";
+  /** Chat results only: the thread that holds it. */
+  threadId: string | null;
+  rootFolderId: string | null;
+}
+
+export interface StudioHistoryPage {
+  items: StudioEntry[];
+  totalCount: number;
 }
 
 const TOOL_NAMES = {
@@ -52,38 +77,79 @@ const storedResult = z.object({
 const storedArgs = z.object({
   prompt: z.string().optional(),
   text: z.string().optional(),
+  model: z.string().optional(),
+  voiceId: z.string().optional(),
+  modelId: z.string().optional(),
 });
+
+function ownsThread(user: JwtPayloadType): SQL | undefined {
+  return user.isPublic
+    ? and(isNull(chatThreads.userId), eq(chatThreads.leadId, user.leadId))
+    : eq(chatThreads.userId, user.id);
+}
+
+function chatFilter(
+  user: JwtPayloadType,
+  kind: CreateKind | undefined,
+): SQL | undefined {
+  const tools = kind ? [TOOL_NAMES[kind]] : Object.values(TOOL_NAMES);
+  return and(
+    ownsThread(user),
+    ne(chatThreads.status, ThreadStatus.DELETED),
+    ne(chatThreads.rootFolderId, DefaultFolderId.INCOGNITO),
+    inArray(
+      sql<string>`${chatMessages.metadata}->'toolCall'->>'toolName'`,
+      tools,
+    ),
+    sql`${chatMessages.metadata}->'toolCall'->'result' IS NOT NULL`,
+  );
+}
+
+function studioFilter(
+  user: JwtPayloadType,
+  kind: CreateKind | undefined,
+): SQL | undefined {
+  return and(
+    user.isPublic
+      ? eq(studioGenerations.leadId, user.leadId)
+      : eq(studioGenerations.userId, user.id),
+    kind ? eq(studioGenerations.kind, kind) : undefined,
+  );
+}
+
+/** Only accounts have API jobs, and only video and music run as jobs. */
+function apiFilter(
+  user: JwtPayloadType,
+  kind: CreateKind | undefined,
+): SQL | undefined {
+  if (user.isPublic || (kind && kind !== "video" && kind !== "music")) {
+    return undefined;
+  }
+  return and(
+    eq(v1MediaJobs.userId, user.id),
+    eq(v1MediaJobs.status, "completed"),
+    kind ? eq(v1MediaJobs.kind, kind) : undefined,
+  );
+}
 
 async function chatHistory(
   user: JwtPayloadType,
   kind: CreateKind | undefined,
   limit: number,
 ): Promise<StudioEntry[]> {
-  const tools = kind ? [TOOL_NAMES[kind]] : Object.values(TOOL_NAMES);
   const rows = await db
     .select({
       id: chatMessages.id,
       metadata: chatMessages.metadata,
       createdAt: chatMessages.createdAt,
       title: chatThreads.title,
+      threadId: chatThreads.id,
+      rootFolderId: chatThreads.rootFolderId,
     })
     .from(chatThreads)
     .innerJoin(chatMessages, eq(chatMessages.threadId, chatThreads.id))
-    .where(
-      and(
-        user.isPublic
-          ? and(isNull(chatThreads.userId), eq(chatThreads.leadId, user.leadId))
-          : eq(chatThreads.userId, user.id),
-        ne(chatThreads.status, ThreadStatus.DELETED),
-        ne(chatThreads.rootFolderId, DefaultFolderId.INCOGNITO),
-        inArray(
-          sql<string>`${chatMessages.metadata}->'toolCall'->>'toolName'`,
-          tools,
-        ),
-        sql`${chatMessages.metadata}->'toolCall'->'result' IS NOT NULL`,
-      ),
-    )
-    .orderBy(desc(chatMessages.createdAt))
+    .where(chatFilter(user, kind))
+    .orderBy(desc(chatMessages.createdAt), desc(chatMessages.id))
     .limit(limit);
   return rows.flatMap((row) => {
     const call = row.metadata?.toolCall;
@@ -107,6 +173,7 @@ async function chatHistory(
       return [];
     }
     const args = storedArgs.safeParse(call.args);
+    const settings = studioSettingsSchema.safeParse(call.args);
     return [
       {
         id: row.id,
@@ -120,17 +187,52 @@ async function chatHistory(
         url,
         transcript,
         credits: creditCost ?? null,
+        model:
+          args.data?.model ?? args.data?.voiceId ?? args.data?.modelId ?? null,
+        settings: settings.success ? settings.data : null,
+        source: "chat" as const,
+        threadId: row.threadId,
+        rootFolderId: row.rootFolderId,
       },
     ];
   });
 }
 
-export async function recentStudioHistory(
+async function countRows(
   user: JwtPayloadType,
-  kind?: CreateKind,
-): Promise<StudioEntry[]> {
-  const limit = kind ? 24 : 6;
-  const [studio, chat, api] = await Promise.all([
+  kind: CreateKind | undefined,
+): Promise<number> {
+  const api = apiFilter(user, kind);
+  const [studio, chat, jobs] = await Promise.all([
+    db
+      .select({ n: count() })
+      .from(studioGenerations)
+      .where(studioFilter(user, kind)),
+    db
+      .select({ n: count() })
+      .from(chatThreads)
+      .innerJoin(chatMessages, eq(chatMessages.threadId, chatThreads.id))
+      .where(chatFilter(user, kind)),
+    api ? db.select({ n: count() }).from(v1MediaJobs).where(api) : [],
+  ]);
+  return (studio[0]?.n ?? 0) + (chat[0]?.n ?? 0) + (jobs[0]?.n ?? 0);
+}
+
+/**
+ * The visitor's generations across the Studio, chat threads and the /v1 API,
+ * newest first. Guests see what their lead made; incognito chats are never
+ * read (they live in the browser). Each source is read up to the end of the
+ * requested page, merged, then sliced, so pages stay stable across sources.
+ */
+export async function studioHistoryPage(
+  user: JwtPayloadType,
+  params: { kind?: CreateKind; page: number; limit: number },
+): Promise<StudioHistoryPage> {
+  const { kind, page, limit } = params;
+  const offset = (page - 1) * limit;
+  const depth = offset + limit;
+  const api = apiFilter(user, kind);
+  const [studio, chat, jobs, totalCount] = await Promise.all([
     db
       .select({
         id: studioGenerations.id,
@@ -141,20 +243,15 @@ export async function recentStudioHistory(
         url: studioGenerations.url,
         transcript: studioGenerations.transcript,
         credits: studioGenerations.credits,
+        model: studioGenerations.model,
+        settings: studioGenerations.settings,
       })
       .from(studioGenerations)
-      .where(
-        and(
-          user.isPublic
-            ? eq(studioGenerations.leadId, user.leadId)
-            : eq(studioGenerations.userId, user.id),
-          kind ? eq(studioGenerations.kind, kind) : undefined,
-        ),
-      )
+      .where(studioFilter(user, kind))
       .orderBy(desc(studioGenerations.createdAt), desc(studioGenerations.id))
-      .limit(limit),
-    chatHistory(user, kind, limit),
-    !user.isPublic && (!kind || kind === "video" || kind === "music")
+      .limit(depth),
+    chatHistory(user, kind, depth),
+    api
       ? db
           .select({
             id: v1MediaJobs.id,
@@ -163,22 +260,23 @@ export async function recentStudioHistory(
             createdAt: v1MediaJobs.createdAt,
             url: v1MediaJobs.resultUrl,
             credits: v1MediaJobs.creditsCharged,
+            model: v1MediaJobs.model,
           })
           .from(v1MediaJobs)
-          .where(
-            and(
-              eq(v1MediaJobs.userId, user.id),
-              eq(v1MediaJobs.status, "completed"),
-              kind ? eq(v1MediaJobs.kind, kind) : undefined,
-            ),
-          )
-          .orderBy(desc(v1MediaJobs.createdAt))
-          .limit(limit)
+          .where(api)
+          .orderBy(desc(v1MediaJobs.createdAt), desc(v1MediaJobs.id))
+          .limit(depth)
       : [],
+    countRows(user, kind),
   ]);
   const entries: StudioEntry[] = [
     ...studio.map((row) => ({
       ...row,
+      model: row.model || null,
+      settings: row.settings ?? null,
+      source: "studio" as const,
+      threadId: null,
+      rootFolderId: null,
       createdAt: row.createdAt.toISOString(),
       status:
         row.status !== "completed" &&
@@ -188,18 +286,38 @@ export async function recentStudioHistory(
           : row.status,
     })),
     ...chat,
-    ...api.map((row) => ({
+    ...jobs.map((row) => ({
       ...row,
       title: row.title.slice(0, 160),
       createdAt: row.createdAt.toISOString(),
       status: "completed" as const,
       transcript: null,
+      settings: { prompt: row.title, model: row.model },
+      source: "api" as const,
+      threadId: null,
+      rootFolderId: null,
     })),
   ];
-  return entries
-    .toSorted(
-      (a, b) =>
-        b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id),
-    )
-    .slice(0, limit);
+  return {
+    items: entries
+      .toSorted(
+        (a, b) =>
+          b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id),
+      )
+      .slice(offset, depth),
+    totalCount,
+  };
+}
+
+/** First page for the page loaders (SSR). */
+export async function recentStudioHistory(
+  user: JwtPayloadType,
+  kind?: CreateKind,
+): Promise<StudioEntry[]> {
+  const { items } = await studioHistoryPage(user, {
+    kind,
+    page: 1,
+    limit: kind ? 24 : 6,
+  });
+  return items;
 }

@@ -30973,6 +30973,600 @@
     "credits": 0
   },
   {
+    "toolName": "media-history",
+    "title": "Vos créations",
+    "titleShort": "Créations",
+    "description": "Images, vidéos, musique, voix et transcriptions créées dans le Studio, en chat ou via l'API. Les plus récentes d'abord.",
+    "fields": {
+      "usage": {
+        "request": "data",
+        "response": true
+      },
+      "children": {
+        "kind": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Type",
+          "description": "image, video, music, speech ou transcribe. Laissez vide pour tout voir.",
+          "options": [],
+          "includeInCacheKey": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "image": "image",
+                    "video": "video",
+                    "music": "music",
+                    "speech": "speech",
+                    "transcribe": "transcribe"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "image": "image",
+                  "video": "video",
+                  "music": "music",
+                  "speech": "speech",
+                  "transcribe": "transcribe"
+                },
+                "options": ["image", "video", "music", "speech", "transcribe"]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "items": {
+          "type": "container",
+          "child": {
+            "type": "container",
+            "usage": {
+              "response": true
+            },
+            "children": {
+              "id": {
+                "type": "text",
+                "label": "ID",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "kind": {
+                "type": "text",
+                "label": "Type",
+                "schema": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "image": "image",
+                      "video": "video",
+                      "music": "music",
+                      "speech": "speech",
+                      "transcribe": "transcribe"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "image": "image",
+                    "video": "video",
+                    "music": "music",
+                    "speech": "speech",
+                    "transcribe": "transcribe"
+                  },
+                  "options": ["image", "video", "music", "speech", "transcribe"]
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "title": {
+                "type": "text",
+                "label": "Prompt",
+                "schema": {
+                  "def": {
+                    "type": "string"
+                  },
+                  "type": "string"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "createdAt": {
+                "type": "text",
+                "label": "Créé le",
+                "schema": {
+                  "def": {
+                    "type": "pipe",
+                    "in": {
+                      "def": {
+                        "type": "union",
+                        "options": [
+                          {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          {
+                            "def": {
+                              "type": "date"
+                            },
+                            "type": "date"
+                          },
+                          {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        ]
+                      },
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "out": {
+                      "def": {
+                        "type": "transform"
+                      },
+                      "type": "transform"
+                    }
+                  },
+                  "type": "pipe",
+                  "in": {
+                    "def": {
+                      "type": "union",
+                      "options": [
+                        {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        {
+                          "def": {
+                            "type": "date"
+                          },
+                          "type": "date"
+                        },
+                        {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      ]
+                    },
+                    "type": "union",
+                    "options": [
+                      {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      {
+                        "def": {
+                          "type": "date"
+                        },
+                        "type": "date"
+                      },
+                      {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    ]
+                  },
+                  "out": {
+                    "def": {
+                      "type": "transform"
+                    },
+                    "type": "transform"
+                  }
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "status": {
+                "type": "text",
+                "label": "Statut",
+                "schema": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "queued": "queued",
+                      "running": "running",
+                      "saving": "saving",
+                      "completed": "completed",
+                      "failed": "failed"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "queued": "queued",
+                    "running": "running",
+                    "saving": "saving",
+                    "completed": "completed",
+                    "failed": "failed"
+                  },
+                  "options": [
+                    "queued",
+                    "running",
+                    "saving",
+                    "completed",
+                    "failed"
+                  ]
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "url": {
+                "type": "text",
+                "label": "Fichier",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "transcript": {
+                "type": "text",
+                "label": "Transcription",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "credits": {
+                "type": "text",
+                "label": "Crédits",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "model": {
+                "type": "text",
+                "label": "Modèle",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "settings": {
+                "type": "text",
+                "label": "Réglages",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "record",
+                        "keyType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "valueType": {
+                          "def": {
+                            "type": "lazy"
+                          },
+                          "type": "lazy"
+                        }
+                      },
+                      "type": "record",
+                      "keyType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "valueType": {
+                        "def": {
+                          "type": "lazy"
+                        },
+                        "type": "lazy"
+                      }
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "source": {
+                "type": "text",
+                "label": "Créé dans",
+                "schema": {
+                  "def": {
+                    "type": "enum",
+                    "entries": {
+                      "studio": "studio",
+                      "chat": "chat",
+                      "api": "api"
+                    }
+                  },
+                  "type": "enum",
+                  "enum": {
+                    "studio": "studio",
+                    "chat": "chat",
+                    "api": "api"
+                  },
+                  "options": ["studio", "chat", "api"]
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "threadId": {
+                "type": "text",
+                "label": "Conversation",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "rootFolderId": {
+                "type": "text",
+                "label": "Dossier",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              }
+            },
+            "schemaType": "object"
+          },
+          "schemaType": "array",
+          "usage": {
+            "response": true
+          }
+        },
+        "paginationInfo": {
+          "type": "pagination",
+          "schemaType": "object",
+          "order": 2,
+          "usage": {
+            "request": "data",
+            "response": true
+          },
+          "children": {
+            "page": {
+              "type": "form_field",
+              "fieldType": "number",
+              "schema": {
+                "def": {
+                  "type": "default",
+                  "innerType": {
+                    "def": {
+                      "type": "optional",
+                      "innerType": {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    },
+                    "type": "optional"
+                  },
+                  "defaultValue": 1
+                },
+                "type": "default"
+              },
+              "usage": {
+                "request": "data"
+              },
+              "schemaType": "primitive"
+            },
+            "limit": {
+              "type": "form_field",
+              "fieldType": "number",
+              "schema": {
+                "def": {
+                  "type": "default",
+                  "innerType": {
+                    "def": {
+                      "type": "optional",
+                      "innerType": {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    },
+                    "type": "optional"
+                  },
+                  "defaultValue": 50
+                },
+                "type": "default"
+              },
+              "usage": {
+                "request": "data"
+              },
+              "schemaType": "primitive"
+            },
+            "totalCount": {
+              "type": "text",
+              "schema": {
+                "def": {
+                  "type": "number",
+                  "coerce": true,
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "usage": {
+                "response": true
+              },
+              "schemaType": "primitive"
+            },
+            "pageCount": {
+              "type": "text",
+              "schema": {
+                "def": {
+                  "type": "number",
+                  "coerce": true,
+                  "checks": []
+                },
+                "type": "number",
+                "isFinite": true
+              },
+              "usage": {
+                "response": true
+              },
+              "schemaType": "primitive"
+            }
+          }
+        }
+      },
+      "type": "custom-widget",
+      "schemaType": "object"
+    },
+    "executionMode": "via-execute-route",
+    "isAsync": true,
+    "instanceId": "local",
+    "category": "ai",
+    "tags": ["Media Studio", "Historique"],
+    "aliases": ["media-history"],
+    "credits": 0
+  },
+  {
     "toolName": "models",
     "title": "Modèles",
     "titleShort": "Modèles d'IA",

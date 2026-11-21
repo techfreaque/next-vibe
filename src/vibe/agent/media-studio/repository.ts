@@ -16,6 +16,7 @@ import type { CreateKind } from "@/_pages/create/_shared/create-kinds";
 import { scopedTranslation } from "@/_pages/create/i18n";
 
 import { studioGenerations } from "./db";
+import type { StudioSettings } from "./settings";
 
 export type StudioProgress = (status: "running" | "saving") => Promise<void>;
 
@@ -35,6 +36,8 @@ export class MediaStudioRepository {
     kind: CreateKind;
     model: string | undefined;
     title: string;
+    /** Form values to prefill "Run again" with (see settings.ts). */
+    settings: StudioSettings;
     locale: CountryLanguage;
     logger: EndpointLogger;
     generate: (progress?: StudioProgress) => Promise<ResponseType<T>>;
@@ -42,37 +45,42 @@ export class MediaStudioRepository {
     if (!params.save) {
       return params.generate();
     }
-    const { user, kind, model, title, locale, logger } = params;
+    const { user, kind, model, title, settings, locale, logger } = params;
     const { t } = scopedTranslation.scopedT(locale);
     const id = crypto.randomUUID();
-    try {
+    type Row = Partial<typeof studioGenerations.$inferInsert>;
+    // The row is written once the run gets past its checks (first progress
+    // or the final result): a refusal (no credits, no consent) never shows
+    // up as a card, and nothing has to be deleted again.
+    let created = false;
+    const save = async (values: Row): Promise<void> => {
+      if (created) {
+        await db
+          .update(studioGenerations)
+          .set(values)
+          .where(eq(studioGenerations.id, id));
+        return;
+      }
+      created = true;
       await db.insert(studioGenerations).values({
         id,
         kind,
         model: model ?? "",
         title: title.trim().slice(0, 160),
-        status: kind === "video" || kind === "music" ? "queued" : "running",
+        settings,
+        status: "running",
         userId: user.isPublic ? null : user.id,
         leadId: user.isPublic ? user.leadId : null,
+        ...values,
       });
-    } catch (error) {
-      logger.error("Could not start Studio generation", parseError(error));
-      return fail({
-        message: t("historyError"),
-        errorType: ErrorResponseTypes.DATABASE_ERROR,
-      });
-    }
+    };
     const progress: StudioProgress = async (status) => {
-      await db
-        .update(studioGenerations)
-        .set({ status })
-        .where(eq(studioGenerations.id, id))
-        .catch((error: Error) => {
-          logger.warn("Could not update Studio progress", {
-            id,
-            error: error.message,
-          });
+      await save({ status }).catch((error: Error) => {
+        logger.warn("Could not update Studio progress", {
+          id,
+          error: error.message,
         });
+      });
     };
     const result = await params.generate(progress).catch((error: Error) => {
       logger.error("Studio generation failed", parseError(error));
@@ -81,30 +89,45 @@ export class MediaStudioRepository {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     });
+    const refused =
+      !result.success &&
+      (result.errorType.errorCode ===
+        ErrorResponseTypes.PAYMENT_REQUIRED.errorCode ||
+        result.errorType.errorCode === ErrorResponseTypes.FORBIDDEN.errorCode);
+    if (refused) {
+      if (created) {
+        await db
+          .delete(studioGenerations)
+          .where(eq(studioGenerations.id, id))
+          .catch((error: Error) => {
+            logger.warn("Could not drop refused Studio generation", {
+              id,
+              error: error.message,
+            });
+          });
+      }
+      return result;
+    }
     // A bookkeeping error after billing must not turn a delivered result into a retry.
-    await db
-      .update(studioGenerations)
-      .set(
-        result.success
-          ? {
-              status: "completed",
-              url:
-                result.data.imageUrl ??
-                result.data.videoUrl ??
-                result.data.audioUrl ??
-                null,
-              transcript: result.data.response?.text ?? null,
-              credits: result.data.creditCost ?? null,
-            }
-          : { status: "failed" },
-      )
-      .where(eq(studioGenerations.id, id))
-      .catch((error: Error) => {
-        logger.error("Could not save Studio result", {
-          id,
-          error: parseError(error).message,
-        });
+    await save(
+      result.success
+        ? {
+            status: "completed",
+            url:
+              result.data.imageUrl ??
+              result.data.videoUrl ??
+              result.data.audioUrl ??
+              null,
+            transcript: result.data.response?.text ?? null,
+            credits: result.data.creditCost ?? null,
+          }
+        : { status: "failed" },
+    ).catch((error: Error) => {
+      logger.error("Could not save Studio result", {
+        id,
+        error: parseError(error).message,
       });
+    });
     return result;
   }
 }

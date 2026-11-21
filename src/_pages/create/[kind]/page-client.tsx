@@ -17,7 +17,7 @@ import videoDefinitions from "next-vibe/agent/video-generation/definition";
 import { VideoGenModelId } from "next-vibe/agent/video-generation/models";
 import { Div } from "next-vibe/ui/components/div";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
-import { useRouter, useSearchParams } from "next-vibe/ui/hooks/use-navigation";
+import { useSearchParams } from "next-vibe/ui/hooks/use-navigation";
 import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage";
 import type { JSX } from "react";
 import { z } from "zod";
@@ -27,8 +27,12 @@ import {
   StudioSpeech,
   StudioTranscribe,
 } from "../_shared/audio-forms";
-import { CREATE_MODEL_PARAM } from "../_shared/create-kinds";
-import { StudioGallery } from "../_shared/studio-gallery";
+import {
+  CREATE_MODEL_PARAM,
+  CREATE_SETTINGS_PARAM,
+  parseSettingsParam,
+} from "../_shared/create-kinds";
+import { refreshStudioHistory, StudioHistory } from "../_shared/studio-history";
 import { StudioShell } from "../_shared/studio-shell";
 import { StudioImage, StudioVideo } from "../_shared/visual-forms";
 import { scopedTranslation } from "../i18n";
@@ -42,8 +46,13 @@ function GenerationForm({
   user,
 }: CreatePageData): JSX.Element {
   const logger = useLogger();
-  const router = useRouter();
-  const requested = useSearchParams().get(CREATE_MODEL_PARAM[kind]);
+  const search = useSearchParams();
+  const settings = parseSettingsParam(search.get(CREATE_SETTINGS_PARAM));
+  const requested =
+    search.get(CREATE_MODEL_PARAM[kind]) ??
+    (typeof settings?.[CREATE_MODEL_PARAM[kind]] === "string"
+      ? String(settings[CREATE_MODEL_PARAM[kind]])
+      : null);
   const model =
     models.find((m) => m.id === requested) ??
     models.find((m) => !m.requiresImage && !isUncensoredContent(m.content)) ??
@@ -57,12 +66,26 @@ function GenerationForm({
   }
   const props = { logger, locale, platform, user };
   const refresh = (): void => {
-    void router.refresh();
+    refreshStudioHistory(logger, kind);
+    refreshStudioHistory(logger, undefined);
   };
   const mutationOptions = { onSuccess: refresh, onError: refresh };
+  const prompt =
+    typeof settings?.prompt === "string" ? settings.prompt : undefined;
+  /** Presets only count with a model this visitor can use. */
+  const canUse = (id: string | undefined): boolean =>
+    models.some((m) => m.id === id);
   switch (kind) {
     case "image": {
       const id = z.enum(ImageGenModelId).parse(model.id);
+      const parsed = settings
+        ? imageDefinitions.POST.requestSchema.safeParse({
+            model: id,
+            ...settings,
+          })
+        : undefined;
+      const preset =
+        parsed?.success && canUse(parsed.data.model) ? parsed.data : undefined;
       return (
         <EndpointsPage
           {...props}
@@ -71,7 +94,9 @@ function GenerationForm({
           endpointOptions={{
             create: {
               formOptions: { persistForm: false },
-              initialState: { model: id, saveToStudio: true },
+              initialState: preset
+                ? { ...preset, saveToStudio: true }
+                : { model: id, prompt, saveToStudio: true },
               mutationOptions,
             },
           }}
@@ -80,6 +105,14 @@ function GenerationForm({
     }
     case "video": {
       const id = z.enum(VideoGenModelId).parse(model.id);
+      const parsed = settings
+        ? videoDefinitions.POST.requestSchema.safeParse({
+            model: id,
+            ...settings,
+          })
+        : undefined;
+      const preset =
+        parsed?.success && canUse(parsed.data.model) ? parsed.data : undefined;
       return (
         <EndpointsPage
           {...props}
@@ -88,7 +121,9 @@ function GenerationForm({
           endpointOptions={{
             create: {
               formOptions: { persistForm: false },
-              initialState: { model: id, saveToStudio: true },
+              initialState: preset
+                ? { ...preset, saveToStudio: true }
+                : { model: id, prompt, saveToStudio: true },
               mutationOptions,
             },
           }}
@@ -102,6 +137,15 @@ function GenerationForm({
         Object.values(MusicDuration).find((v) =>
           route?.supportedDurations?.includes(v),
         ) ?? MusicDuration.SHORT;
+      const parsed = settings
+        ? musicDefinitions.POST.requestSchema.safeParse({
+            model: id,
+            duration,
+            ...settings,
+          })
+        : undefined;
+      const preset =
+        parsed?.success && canUse(parsed.data.model) ? parsed.data : undefined;
       return (
         <EndpointsPage
           {...props}
@@ -110,7 +154,9 @@ function GenerationForm({
           endpointOptions={{
             create: {
               formOptions: { persistForm: false },
-              initialState: { model: id, duration, saveToStudio: true },
+              initialState: preset
+                ? { ...preset, saveToStudio: true }
+                : { model: id, duration, prompt, saveToStudio: true },
               mutationOptions,
             },
           }}
@@ -119,6 +165,8 @@ function GenerationForm({
     }
     case "speech": {
       const id = z.enum(TtsModelId).parse(model.id);
+      const text =
+        typeof settings?.text === "string" ? settings.text : undefined;
       return (
         <EndpointsPage
           {...props}
@@ -127,7 +175,7 @@ function GenerationForm({
           endpointOptions={{
             create: {
               formOptions: { persistForm: false },
-              initialState: { voiceId: id, saveToStudio: true },
+              initialState: { voiceId: id, text, saveToStudio: true },
               mutationOptions,
             },
           }}
@@ -136,6 +184,8 @@ function GenerationForm({
     }
     case "transcribe": {
       const id = z.enum(SttModelId).parse(model.id);
+      const language =
+        typeof settings?.language === "string" ? settings.language : undefined;
       return (
         <EndpointsPage
           {...props}
@@ -144,7 +194,7 @@ function GenerationForm({
           endpointOptions={{
             create: {
               formOptions: { persistForm: false },
-              initialState: { modelId: id, saveToStudio: true },
+              initialState: { modelId: id, language, saveToStudio: true },
               mutationOptions,
             },
           }}
@@ -155,17 +205,23 @@ function GenerationForm({
 }
 
 export function CreatePageClient(data: CreatePageData): JSX.Element {
+  // A new "Run again" preset remounts the form with those values.
+  const preset = useSearchParams().get(CREATE_SETTINGS_PARAM) ?? "";
   return (
     <StudioShell locale={data.locale} kind={data.kind}>
-      <Div className="grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] lg:gap-6">
-        <Div className="min-w-0 rounded-2xl border bg-card shadow-sm">
-          <GenerationForm key={data.kind} {...data} />
+      <Div className="grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-6">
+        <Div className="min-w-0 rounded-2xl border bg-card shadow-sm lg:sticky lg:top-20">
+          <GenerationForm key={`${data.kind}:${preset}`} {...data} />
         </Div>
-        <StudioGallery
-          locale={data.locale}
-          kind={data.kind}
-          history={data.history}
-        />
+        <Div className="min-w-0 rounded-2xl border bg-card p-4 sm:p-6">
+          <StudioHistory
+            locale={data.locale}
+            user={data.user}
+            platform={data.platform}
+            kind={data.kind}
+            initialData={data.history}
+          />
+        </Div>
       </Div>
     </StudioShell>
   );

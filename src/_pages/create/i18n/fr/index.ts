@@ -7,20 +7,39 @@ export const translations: typeof enTranslations = {
   },
   studio: "Studio de création",
   navName: "Studio",
-  overview: "Choisissez un format et retrouvez ici vos dernières créations.",
-  recent: "Créations récentes",
-  empty: "Vos images, clips et enregistrements apparaîtront ici.",
-  emptyKind: "Votre création apparaîtra ici dès qu’elle sera prête.",
-  download: "Télécharger",
+  hub: {
+    metaTitle: "Studio média IA : images, vidéo, musique et voix",
+    metaDescription:
+      "Générez des images, des clips vidéo, de la musique et des voix, ou transcrivez de l'audio. Modèles grand public et non censurés côte à côte. Vous payez au résultat.",
+    keywords:
+      "studio média IA, générateur d'images IA non censuré, générateur vidéo IA, générateur de musique IA, synthèse vocale, transcription audio",
+    title: "Studio média",
+    subtitle:
+      "Cinq outils. Tous les grands modèles, non censurés compris. Vous payez au résultat et gardez tout ce que vous créez.",
+    from: "Dès {{price}}",
+    free: "Gratuit",
+    models: "{{count}} modèles",
+    voices: "{{count}} voix",
+    open: "Ouvrir",
+  },
+  asyncProgress:
+    "En cours. La vidéo et la musique prennent souvent une à trois minutes. La progression s'affiche aussi dans votre historique.",
+  ooc: {
+    title: "Pas assez de crédits gratuits",
+    need: "Cette génération coûte {{amount}} crédits.",
+    description:
+      "Un compte gratuit reçoit {{signedIn}} crédits par mois, {{max}} avec la newsletter. Après l'inscription, vous revenez ici avec vos réglages intacts.",
+    signUp: "Créer un compte gratuit",
+    defaults: "Réglages moins chers",
+    haveAccount: "Déjà un compte ?",
+    logIn: "Se connecter",
+  },
   moreOptions: "Plus d’options",
-  modelDefault: "Par défaut",
+  modelDefault: "Auto",
   model: "Modèle",
   voice: "Voix",
   estimate: "Coût estimé",
   credits: "{{amount}} crédits",
-  queued: "En attente",
-  saving: "Enregistrement du fichier",
-  running: "En cours",
   failed: "La création a échoué",
   historyError: "Impossible d’ouvrir l’historique du studio. Réessayez.",
   unavailable: "Aucun modèle n’est disponible pour ce format pour le moment.",
@@ -43,6 +62,7 @@ export const translations: typeof enTranslations = {
   meteredCost:
     "Le coût final dépend de la consommation mesurée par le fournisseur.",
   estimatePending: "Ajoutez un enregistrement pour estimer son coût.",
+  needsCredits: "Requiert {{amount}} crédits",
   units: {
     image: "{{amount}} crédits / image",
     video: "{{amount}} crédits / s",
@@ -54,6 +74,9 @@ export const translations: typeof enTranslations = {
   kinds: {
     image: {
       label: "Image",
+      tab: "Image",
+      pitch:
+        "Du texte à l'image, ou la retouche d'une référence. Photoréaliste, anime, art : tout ce que vous décrivez.",
       title: "Créer une image",
       metaTitle: "Générateur d'images IA sans censure - {{appName}}",
       description: "Décrivez une scène et choisissez votre cadrage.",
@@ -61,6 +84,9 @@ export const translations: typeof enTranslations = {
     },
     video: {
       label: "Vidéo",
+      tab: "Vidéo",
+      pitch:
+        "Un texte ou une première image devient un clip. Vous choisissez durée, format et résolution.",
       title: "Créer une vidéo",
       metaTitle: "Générateur de vidéos IA - {{appName}}",
       description: "Animez votre scène, de la première à la dernière image.",
@@ -68,6 +94,9 @@ export const translations: typeof enTranslations = {
     },
     music: {
       label: "Musique",
+      tab: "Musique",
+      pitch:
+        "Un morceau complet à partir d'un prompt : ambiance, genre, instruments, durée.",
       title: "Composer un morceau",
       metaTitle: "Générateur de musique IA - {{appName}}",
       description:
@@ -76,6 +105,9 @@ export const translations: typeof enTranslations = {
     },
     speech: {
       label: "Voix",
+      tab: "Voix",
+      pitch:
+        "Votre texte lu par des voix naturelles, dans de nombreuses langues.",
       title: "Donner voix à un texte",
       metaTitle: "Synthèse vocale IA - {{appName}}",
       description: "Choisissez la voix qui lira votre texte à haute voix.",
@@ -83,6 +115,9 @@ export const translations: typeof enTranslations = {
     },
     transcribe: {
       label: "Transcription",
+      tab: "Texte",
+      pitch:
+        "Envoyez un enregistrement, récupérez un texte propre. Téléchargez-le en fichier.",
       title: "Transcrire un enregistrement",
       metaTitle: "Transcription IA - {{appName}}",
       description: "Transformez un enregistrement en texte à télécharger.",

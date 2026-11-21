@@ -1,5 +1,6 @@
 "use client";
 
+import { StudioMedia } from "next-vibe/agent/media-studio/history/widget";
 import {
   ApiProvider,
   calculateSttCreditCost,
@@ -34,7 +35,6 @@ import { useWatch } from "react-hook-form";
 
 import { scopedTranslation } from "../i18n";
 import { StudioForm, StudioSelect } from "./studio-form";
-import { StudioMedia } from "./studio-gallery";
 import type { StudioModel } from "./studio-types";
 
 const dirty = { shouldDirty: true };
@@ -87,17 +87,12 @@ export function StudioMusic({
         form?.setValue("inputMediaUrl", undefined, dirty);
       }}
       result={
-        <StudioMedia
-          kind="music"
-          locale={locale}
-          url={result?.audioUrl}
-          title={prompt}
-        />
+        <StudioMedia kind="music" url={result?.audioUrl} title={prompt} />
       }
     >
       <TextareaFieldWidget
         fieldName="prompt"
-        field={musicDefinitions.POST.fields.children.prompt}
+        field={{ ...musicDefinitions.POST.fields.children.prompt, rows: 4 }}
       />
       {route?.apiProvider !== ApiProvider.OPENROUTER && (
         <StudioSelect
@@ -133,7 +128,6 @@ export function StudioSpeech({
 }: {
   models: StudioModel[];
 }): JSX.Element {
-  const locale = useWidgetLocale();
   const form = useWidgetForm<typeof ttsDefinitions.POST>();
   const result = useWidgetValue<typeof ttsDefinitions.POST>();
   const id = useWatch({ control: form?.control, name: "voiceId" });
@@ -145,7 +139,7 @@ export function StudioSpeech({
       models={models}
       model={model}
       cost={
-        model
+        model && text.trim()
           ? calculateTtsCreditCost(
               { creditCostPerCharacter: model.providerRate },
               text.length,
@@ -159,18 +153,11 @@ export function StudioSpeech({
           form?.setValue("voiceId", next, dirty);
         }
       }}
-      result={
-        <StudioMedia
-          kind="speech"
-          locale={locale}
-          title={text}
-          url={result?.audioUrl}
-        />
-      }
+      result={<StudioMedia kind="speech" title={text} url={result?.audioUrl} />}
     >
       <TextareaFieldWidget
         fieldName="text"
-        field={ttsDefinitions.POST.fields.children.text}
+        field={{ ...ttsDefinitions.POST.fields.children.text, rows: 6 }}
       />
     </StudioForm>
   );
@@ -256,7 +243,6 @@ export function StudioTranscribe({
       result={
         <StudioMedia
           kind="transcribe"
-          locale={locale}
           transcript={result?.response?.text}
           title={file?.name ?? ""}
         />

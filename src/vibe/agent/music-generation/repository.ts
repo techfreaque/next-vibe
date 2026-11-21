@@ -27,6 +27,7 @@ import {
   MediaStudioRepository,
   type StudioProgress,
 } from "../media-studio/repository";
+import { toStudioSettings } from "../media-studio/settings";
 import { ApiProvider, calculateCreditCost } from "../models/models";
 import { UncensoredConsentRepository } from "../models/uncensored-consent/repository";
 import {
@@ -73,6 +74,7 @@ export class MusicGenerationRepository {
       kind: "music",
       model: data.model,
       title: data.prompt,
+      settings: toStudioSettings(data),
       user,
       locale,
       logger,

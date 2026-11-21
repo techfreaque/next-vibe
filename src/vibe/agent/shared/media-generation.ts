@@ -182,9 +182,17 @@ export async function deductMediaCredits(
       errorKey: deductResult.errorType.errorKey,
       causeKey: deductResult.cause?.errorType.errorKey,
     });
+    // An empty wallet stays a 402 so every client shows its top-up path.
+    const outOfCredits =
+      deductResult.errorType.errorCode ===
+      ErrorResponseTypes.PAYMENT_REQUIRED.errorCode;
     return fail({
-      message: tCredits("errors.deductCreditsFailed"),
-      errorType: ErrorResponseTypes.PAYMENT_ERROR,
+      message: outOfCredits
+        ? tCredits("errors.insufficientCredits", { cost: creditCost })
+        : tCredits("errors.deductCreditsFailed"),
+      errorType: outOfCredits
+        ? ErrorResponseTypes.PAYMENT_REQUIRED
+        : ErrorResponseTypes.PAYMENT_ERROR,
     });
   }
 

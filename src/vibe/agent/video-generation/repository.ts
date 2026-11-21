@@ -30,6 +30,7 @@ import {
   MediaStudioRepository,
   type StudioProgress,
 } from "../media-studio/repository";
+import { toStudioSettings } from "../media-studio/settings";
 import { ApiProvider } from "../models/models";
 import { UncensoredConsentRepository } from "../models/uncensored-consent/repository";
 import {
@@ -146,6 +147,7 @@ export class VideoGenerationRepository {
       kind: "video",
       model: data.model,
       title: data.prompt,
+      settings: toStudioSettings(data),
       user,
       locale,
       logger,

@@ -608,6 +608,7 @@ import { Route as ApiLocaleVibeAgentCortexTerminalsRouteImport } from './routes/
 import { Route as ApiLocaleVibeAgentCortexTreeRouteImport } from './routes/api.$locale.vibe.agent.cortex.tree'
 import { Route as ApiLocaleVibeAgentCortexWriteRouteImport } from './routes/api.$locale.vibe.agent.cortex.write'
 import { Route as ApiLocaleVibeAgentFetchUrlContentCleanupRouteImport } from './routes/api.$locale.vibe.agent.fetch-url-content.cleanup'
+import { Route as ApiLocaleVibeAgentMediaStudioHistoryRouteImport } from './routes/api.$locale.vibe.agent.media-studio.history'
 import { Route as ApiLocaleVibeAgentModelsListRouteImport } from './routes/api.$locale.vibe.agent.models.list'
 import { Route as ApiLocaleVibeAgentModelsModelCatalogScanRouteImport } from './routes/api.$locale.vibe.agent.models.model-catalog-scan'
 import { Route as ApiLocaleVibeAgentModelsUncensoredConsentRouteImport } from './routes/api.$locale.vibe.agent.models.uncensored-consent'
@@ -4232,6 +4233,12 @@ const ApiLocaleVibeAgentFetchUrlContentCleanupRoute =
     path: '/cleanup',
     getParentRoute: () => ApiLocaleVibeAgentFetchUrlContentRoute,
   } as any)
+const ApiLocaleVibeAgentMediaStudioHistoryRoute =
+  ApiLocaleVibeAgentMediaStudioHistoryRouteImport.update({
+    id: '/api/$locale/vibe/agent/media-studio/history',
+    path: '/api/$locale/vibe/agent/media-studio/history',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleVibeAgentModelsListRoute =
   ApiLocaleVibeAgentModelsListRouteImport.update({
     id: '/api/$locale/vibe/agent/models/list',
@@ -5649,6 +5656,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/vibe/agent/cortex/tree': typeof ApiLocaleVibeAgentCortexTreeRoute
   '/api/$locale/vibe/agent/cortex/write': typeof ApiLocaleVibeAgentCortexWriteRoute
   '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
+  '/api/$locale/vibe/agent/media-studio/history': typeof ApiLocaleVibeAgentMediaStudioHistoryRoute
   '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
   '/api/$locale/vibe/agent/models/model-catalog-scan': typeof ApiLocaleVibeAgentModelsModelCatalogScanRoute
   '/api/$locale/vibe/agent/models/uncensored-consent': typeof ApiLocaleVibeAgentModelsUncensoredConsentRoute
@@ -6376,6 +6384,7 @@ export interface FileRoutesByTo {
   '/api/$locale/vibe/agent/cortex/tree': typeof ApiLocaleVibeAgentCortexTreeRoute
   '/api/$locale/vibe/agent/cortex/write': typeof ApiLocaleVibeAgentCortexWriteRoute
   '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
+  '/api/$locale/vibe/agent/media-studio/history': typeof ApiLocaleVibeAgentMediaStudioHistoryRoute
   '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
   '/api/$locale/vibe/agent/models/model-catalog-scan': typeof ApiLocaleVibeAgentModelsModelCatalogScanRoute
   '/api/$locale/vibe/agent/models/uncensored-consent': typeof ApiLocaleVibeAgentModelsUncensoredConsentRoute
@@ -7112,6 +7121,7 @@ export interface FileRoutesById {
   '/api/$locale/vibe/agent/cortex/tree': typeof ApiLocaleVibeAgentCortexTreeRoute
   '/api/$locale/vibe/agent/cortex/write': typeof ApiLocaleVibeAgentCortexWriteRoute
   '/api/$locale/vibe/agent/fetch-url-content/cleanup': typeof ApiLocaleVibeAgentFetchUrlContentCleanupRoute
+  '/api/$locale/vibe/agent/media-studio/history': typeof ApiLocaleVibeAgentMediaStudioHistoryRoute
   '/api/$locale/vibe/agent/models/list': typeof ApiLocaleVibeAgentModelsListRoute
   '/api/$locale/vibe/agent/models/model-catalog-scan': typeof ApiLocaleVibeAgentModelsModelCatalogScanRoute
   '/api/$locale/vibe/agent/models/uncensored-consent': typeof ApiLocaleVibeAgentModelsUncensoredConsentRoute
@@ -7848,6 +7858,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/cortex/tree'
     | '/api/$locale/vibe/agent/cortex/write'
     | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
+    | '/api/$locale/vibe/agent/media-studio/history'
     | '/api/$locale/vibe/agent/models/list'
     | '/api/$locale/vibe/agent/models/model-catalog-scan'
     | '/api/$locale/vibe/agent/models/uncensored-consent'
@@ -8575,6 +8586,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/cortex/tree'
     | '/api/$locale/vibe/agent/cortex/write'
     | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
+    | '/api/$locale/vibe/agent/media-studio/history'
     | '/api/$locale/vibe/agent/models/list'
     | '/api/$locale/vibe/agent/models/model-catalog-scan'
     | '/api/$locale/vibe/agent/models/uncensored-consent'
@@ -9310,6 +9322,7 @@ export interface FileRouteTypes {
     | '/api/$locale/vibe/agent/cortex/tree'
     | '/api/$locale/vibe/agent/cortex/write'
     | '/api/$locale/vibe/agent/fetch-url-content/cleanup'
+    | '/api/$locale/vibe/agent/media-studio/history'
     | '/api/$locale/vibe/agent/models/list'
     | '/api/$locale/vibe/agent/models/model-catalog-scan'
     | '/api/$locale/vibe/agent/models/uncensored-consent'
@@ -9838,6 +9851,7 @@ export interface RootRouteChildren {
   ApiLocaleVibeAgentCortexTerminalsRoute: typeof ApiLocaleVibeAgentCortexTerminalsRoute
   ApiLocaleVibeAgentCortexTreeRoute: typeof ApiLocaleVibeAgentCortexTreeRoute
   ApiLocaleVibeAgentCortexWriteRoute: typeof ApiLocaleVibeAgentCortexWriteRoute
+  ApiLocaleVibeAgentMediaStudioHistoryRoute: typeof ApiLocaleVibeAgentMediaStudioHistoryRoute
   ApiLocaleVibeAgentModelsListRoute: typeof ApiLocaleVibeAgentModelsListRoute
   ApiLocaleVibeAgentModelsModelCatalogScanRoute: typeof ApiLocaleVibeAgentModelsModelCatalogScanRoute
   ApiLocaleVibeAgentModelsUncensoredConsentRoute: typeof ApiLocaleVibeAgentModelsUncensoredConsentRoute
@@ -14104,6 +14118,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleVibeAgentFetchUrlContentCleanupRouteImport
       parentRoute: typeof ApiLocaleVibeAgentFetchUrlContentRoute
     }
+    '/api/$locale/vibe/agent/media-studio/history': {
+      id: '/api/$locale/vibe/agent/media-studio/history'
+      path: '/api/$locale/vibe/agent/media-studio/history'
+      fullPath: '/api/$locale/vibe/agent/media-studio/history'
+      preLoaderRoute: typeof ApiLocaleVibeAgentMediaStudioHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/vibe/agent/models/list': {
       id: '/api/$locale/vibe/agent/models/list'
       path: '/api/$locale/vibe/agent/models/list'
@@ -16928,6 +16949,8 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleVibeAgentCortexTerminalsRoute,
   ApiLocaleVibeAgentCortexTreeRoute: ApiLocaleVibeAgentCortexTreeRoute,
   ApiLocaleVibeAgentCortexWriteRoute: ApiLocaleVibeAgentCortexWriteRoute,
+  ApiLocaleVibeAgentMediaStudioHistoryRoute:
+    ApiLocaleVibeAgentMediaStudioHistoryRoute,
   ApiLocaleVibeAgentModelsListRoute: ApiLocaleVibeAgentModelsListRoute,
   ApiLocaleVibeAgentModelsModelCatalogScanRoute:
     ApiLocaleVibeAgentModelsModelCatalogScanRoute,

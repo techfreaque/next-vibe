@@ -1,7 +1,6 @@
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/components/div";
 import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
-import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { FileText } from "next-vibe/ui/components/icons/FileText";
 import { Film } from "next-vibe/ui/components/icons/Film";
 import { Image as ImageIcon } from "next-vibe/ui/components/icons/Image";
@@ -10,7 +9,7 @@ import { Music } from "next-vibe/ui/components/icons/Music";
 import { Link } from "next-vibe/ui/components/link";
 import { Nav } from "next-vibe/ui/components/nav";
 import { Span } from "next-vibe/ui/components/span";
-import { H1, H2, P } from "next-vibe/ui/components/typography";
+import { H1, P } from "next-vibe/ui/components/typography";
 import type { JSX, ReactNode } from "react";
 
 import { scopedTranslation } from "../i18n";
@@ -23,7 +22,7 @@ export const STUDIO_ICONS = {
   speech: Mic,
   transcribe: FileText,
 };
-const PALETTES = {
+export const STUDIO_PALETTES = {
   image:
     "bg-orange-100 text-orange-900 dark:bg-orange-950 dark:text-orange-200",
   video:
@@ -59,20 +58,20 @@ export function StudioShell({
       <Div className="flex items-center gap-3 sm:gap-4">
         {kind && KindIcon && (
           <Span
-            className={`inline-flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-14 sm:rounded-2xl ${PALETTES[kind]}`}
+            className={`inline-flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-14 sm:rounded-2xl ${STUDIO_PALETTES[kind]}`}
           >
             <KindIcon className="size-5 sm:size-7" />
           </Span>
         )}
         <H1 className="m-0 text-3xl font-semibold leading-tight tracking-tight sm:text-5xl">
-          {kind ? t(`kinds.${kind}.title`) : t("studio")}
+          {kind ? t(`kinds.${kind}.title`) : t("hub.title")}
         </H1>
       </Div>
       <P className="mb-6 mt-2 max-w-2xl text-base leading-relaxed text-muted-foreground">
-        {kind ? t(`kinds.${kind}.description`) : t("overview")}
+        {kind ? t(`kinds.${kind}.description`) : t("hub.subtitle")}
       </P>
       {kind && (
-        <Nav className="mb-5 flex flex-wrap items-center justify-center gap-1 rounded-xl border bg-muted/40 p-1 sm:mb-6 sm:w-fit sm:gap-1.5">
+        <Nav className="mb-5 grid grid-cols-5 gap-1 rounded-xl border bg-muted/40 p-1 sm:mb-6 sm:flex sm:w-fit sm:gap-1.5">
           {CREATE_KINDS.map((item) => {
             const Icon = STUDIO_ICONS[item];
             return (
@@ -80,53 +79,21 @@ export function StudioShell({
                 key={item}
                 href={createHref(locale, item)}
                 aria-current={item === kind ? "page" : undefined}
-                className={`flex min-h-10 items-center justify-center gap-1.5 rounded-lg px-2.5 text-sm font-medium sm:px-4 ${item === kind ? `${PALETTES[item]} shadow-sm font-semibold` : "text-muted-foreground hover:bg-background hover:text-foreground"}`}
+                className={`flex min-h-12 min-w-0 flex-col items-center justify-center gap-1 rounded-lg px-1 text-[11px] font-medium leading-tight sm:min-h-10 sm:flex-row sm:gap-1.5 sm:px-4 sm:text-sm ${item === kind ? `${STUDIO_PALETTES[item]} shadow-sm font-semibold` : "text-muted-foreground hover:bg-background hover:text-foreground"}`}
               >
                 <Icon className="size-4 shrink-0" />
-                {t(`kinds.${item}.label`)}
+                <Span className="max-w-full truncate sm:hidden">
+                  {t(`kinds.${item}.tab`)}
+                </Span>
+                <Span className="hidden sm:inline">
+                  {t(`kinds.${item}.label`)}
+                </Span>
               </Link>
             );
           })}
         </Nav>
       )}
       {children}
-    </Div>
-  );
-}
-
-export function StudioCards({
-  locale,
-}: {
-  locale: CountryLanguage;
-}): JSX.Element {
-  const { t } = scopedTranslation.scopedT(locale);
-  return (
-    <Div className="grid gap-3 sm:grid-cols-6">
-      {CREATE_KINDS.map((kind, index) => {
-        const Icon = STUDIO_ICONS[kind];
-        return (
-          <Link
-            key={kind}
-            href={createHref(locale, kind)}
-            className={`group relative overflow-hidden rounded-2xl border bg-card p-5 shadow-sm transition-colors hover:border-foreground/40 sm:p-6 ${index < 2 ? "sm:col-span-3" : "sm:col-span-2"}`}
-          >
-            <Div className="mb-4 flex items-center justify-between">
-              <Span
-                className={`inline-flex size-12 items-center justify-center rounded-2xl ${PALETTES[kind]}`}
-              >
-                <Icon className="size-6" />
-              </Span>
-              <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
-            </Div>
-            <H2 className="m-0 text-lg font-semibold">
-              {t(`kinds.${kind}.title`)}
-            </H2>
-            <P className="mb-0 mt-1 text-sm leading-relaxed text-muted-foreground">
-              {t(`kinds.${kind}.description`)}
-            </P>
-          </Link>
-        );
-      })}
     </Div>
   );
 }

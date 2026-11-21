@@ -30,6 +30,7 @@ import {
 } from "../env-availability";
 import { getEnvAvailability } from "../env-availability";
 import { MediaStudioRepository } from "../media-studio/repository";
+import { toStudioSettings } from "../media-studio/settings";
 import {
   EDEN_AI_URLS,
   edenAiErrorMessage,
@@ -248,6 +249,10 @@ export class SpeechToTextRepository {
       kind: "transcribe",
       model: data.modelId,
       title: data.fileUpload.files[0]?.name ?? "",
+      settings: toStudioSettings({
+        modelId: data.modelId,
+        language: data.language,
+      }),
       user,
       locale,
       logger,

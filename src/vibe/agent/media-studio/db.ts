@@ -3,6 +3,7 @@ import {
   check,
   doublePrecision,
   index,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -12,6 +13,8 @@ import { leads } from "next-vibe/identity/lead/db";
 import { users } from "next-vibe/identity/user/db";
 
 import { CREATE_KINDS } from "@/_pages/create/_shared/create-kinds";
+
+import type { StudioSettings } from "./settings";
 
 export const studioGenerations = pgTable(
   "studio_generations",
@@ -29,6 +32,8 @@ export const studioGenerations = pgTable(
     url: text("url"),
     transcript: text("transcript"),
     credits: doublePrecision("credits"),
+    /** Request settings (model options, prompt) so a result can be run again. */
+    settings: jsonb("settings").$type<StudioSettings>(),
   },
   (table) => [
     check(

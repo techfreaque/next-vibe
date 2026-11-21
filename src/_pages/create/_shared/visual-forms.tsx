@@ -12,6 +12,7 @@ import {
   ImageGenModelId,
 } from "next-vibe/agent/image-generation/models";
 import { calculateImageCreditCost } from "next-vibe/agent/image-generation/pricing";
+import { StudioMedia } from "next-vibe/agent/media-studio/history/widget";
 import videoDefinitions from "next-vibe/agent/video-generation/definition";
 import { scopedTranslation as videoTranslation } from "next-vibe/agent/video-generation/i18n";
 import {
@@ -36,7 +37,6 @@ import { useWatch } from "react-hook-form";
 
 import { scopedTranslation } from "../i18n";
 import { StudioForm, StudioSelect } from "./studio-form";
-import { StudioMedia } from "./studio-gallery";
 import type { StudioModel } from "./studio-types";
 
 const dirty = { shouldDirty: true };
@@ -143,17 +143,12 @@ export function StudioImage({
         }
       }}
       result={
-        <StudioMedia
-          locale={locale}
-          kind="image"
-          url={result?.imageUrl}
-          title={prompt}
-        />
+        <StudioMedia kind="image" url={result?.imageUrl} title={prompt} />
       }
     >
       <TextareaFieldWidget
         fieldName="prompt"
-        field={imageDefinitions.POST.fields.children.prompt}
+        field={{ ...imageDefinitions.POST.fields.children.prompt, rows: 4 }}
       />
       {route?.inputs.includes("image") && (
         <ReferenceInput
@@ -279,17 +274,12 @@ export function StudioVideo({
         form?.setValue("negativePrompt", undefined, dirty);
       }}
       result={
-        <StudioMedia
-          kind="video"
-          locale={locale}
-          url={result?.videoUrl}
-          title={prompt}
-        />
+        <StudioMedia kind="video" url={result?.videoUrl} title={prompt} />
       }
     >
       <TextareaFieldWidget
         fieldName="prompt"
-        field={videoDefinitions.POST.fields.children.prompt}
+        field={{ ...videoDefinitions.POST.fields.children.prompt, rows: 4 }}
       />
       {model?.requiresImage ? (
         <ReferenceInput
@@ -298,7 +288,7 @@ export function StudioVideo({
           onChange={(url) => updateFrame("first", url)}
         />
       ) : null}
-      <Div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+      <Div className="grid grid-cols-3 gap-2 sm:gap-4">
         <StudioSelect
           label={t("duration")}
           value={String(seconds)}

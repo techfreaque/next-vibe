@@ -31,6 +31,7 @@ import { agentEnv } from "../env";
 import { PROVIDER_SETUP_INSTRUCTIONS } from "../env-availability";
 import { getEnvAvailability } from "../env-availability";
 import { MediaStudioRepository } from "../media-studio/repository";
+import { toStudioSettings } from "../media-studio/settings";
 import {
   EDEN_AI_URLS,
   edenAiErrorMessage,
@@ -453,6 +454,7 @@ export class TextToSpeechRepository {
       kind: "speech",
       model: data.voiceId,
       title: data.text,
+      settings: toStudioSettings(data),
       user,
       locale,
       logger,

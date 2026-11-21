@@ -3,14 +3,17 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
-import { Div } from "next-vibe/ui/components/div";
 import type { JSX } from "react";
 
 import { MODELS_OG_IMAGE } from "@/_pages/models/constants";
 
-import { studioData, type StudioPageData } from "./_shared/studio-data";
-import { StudioGallery } from "./_shared/studio-gallery";
-import { StudioCards, StudioShell } from "./_shared/studio-shell";
+import {
+  studioData,
+  type StudioKindSummary,
+  type StudioPageData,
+  studioSummaries,
+} from "./_shared/studio-data";
+import { StudioHub } from "./hub-client";
 import { scopedTranslation } from "./i18n";
 
 interface Props {
@@ -22,35 +25,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { t } = scopedTranslation.scopedT(locale);
   return metadataGenerator(locale, {
     path: "create",
-    title: t("studio"),
-    description: t("overview"),
+    title: t("hub.metaTitle"),
+    description: t("hub.metaDescription"),
     category: t("meta.category"),
     image: MODELS_OG_IMAGE,
     imageAlt: t("studio"),
-    keywords: [t("studio")],
+    keywords: [t("hub.keywords")],
   });
 }
 
+export type StudioHubData = Omit<StudioPageData, "models"> & {
+  summaries: StudioKindSummary[];
+};
+
 export async function tanstackLoader({
   params,
-}: Props): Promise<Pick<StudioPageData, "locale" | "history">> {
+}: Props): Promise<StudioHubData> {
   const { locale } = await params;
-  const { history } = await studioData(locale);
-  return { locale, history };
+  const data = await studioData(locale);
+  return {
+    user: data.user,
+    locale: data.locale,
+    platform: data.platform,
+    history: data.history,
+    summaries: await studioSummaries(data.user),
+  };
 }
 
-export function TanstackPage({
-  locale,
-  history,
-}: Awaited<ReturnType<typeof tanstackLoader>>): JSX.Element {
-  return (
-    <StudioShell locale={locale}>
-      <Div className="grid gap-6">
-        <StudioCards locale={locale} />
-        <StudioGallery locale={locale} history={history} />
-      </Div>
-    </StudioShell>
-  );
+export function TanstackPage(data: StudioHubData): JSX.Element {
+  return <StudioHub {...data} />;
 }
 
 export default async function StudioPage(props: Props): Promise<JSX.Element> {

@@ -7,21 +7,39 @@ export const translations: typeof enTranslations = {
   },
   studio: "Studio multimediów",
   navName: "Studio",
-  overview:
-    "Wybierz, co chcesz stworzyć. Tutaj wrócisz do swoich ostatnich prac.",
-  recent: "Ostatnie prace",
-  empty: "Tutaj pojawią się Twoje obrazy, filmy i nagrania.",
-  emptyKind: "Gdy praca będzie gotowa, znajdziesz ją tutaj.",
-  download: "Pobierz",
+  hub: {
+    metaTitle: "Studio mediów AI: obrazy, wideo, muzyka i głos",
+    metaDescription:
+      "Generuj obrazy, klipy wideo, muzykę i mowę albo transkrybuj nagrania. Popularne i nieocenzurowane modele obok siebie. Płacisz za wynik.",
+    keywords:
+      "studio mediów AI, nieocenzurowany generator obrazów AI, generator wideo AI, generator muzyki AI, tekst na mowę, mowa na tekst",
+    title: "Studio mediów",
+    subtitle:
+      "Pięć narzędzi. Wszystkie ważne modele, także nieocenzurowane. Płacisz za wynik, a wszystko, co stworzysz, zostaje u Ciebie.",
+    from: "Od {{price}}",
+    free: "Za darmo",
+    models: "Modele: {{count}}",
+    voices: "Głosy: {{count}}",
+    open: "Otwórz",
+  },
+  asyncProgress:
+    "Trwa generowanie. Wideo i muzyka zwykle zajmują od jednej do trzech minut. Postęp widać też w Twojej historii.",
+  ooc: {
+    title: "Za mało darmowych kredytów",
+    need: "To uruchomienie kosztuje {{amount}} kredytów.",
+    description:
+      "Darmowe konto dostaje {{signedIn}} kredytów miesięcznie, {{max}} z newsletterem. Po rejestracji wrócisz tutaj z tymi samymi ustawieniami.",
+    signUp: "Załóż darmowe konto",
+    defaults: "Tańsze ustawienia",
+    haveAccount: "Masz już konto?",
+    logIn: "Zaloguj się",
+  },
   moreOptions: "Więcej opcji",
-  modelDefault: "Domyślnie",
+  modelDefault: "Auto",
   model: "Model",
   voice: "Głos",
   estimate: "Szacowany koszt",
   credits: "{{amount}} kred.",
-  queued: "W kolejce",
-  saving: "Zapisywanie pliku",
-  running: "W trakcie",
   failed: "Nie udało się ukończyć pracy",
   historyError: "Nie można otworzyć historii studia. Spróbuj ponownie.",
   unavailable: "Żaden model dla tego formatu nie jest teraz dostępny.",
@@ -43,6 +61,7 @@ export const translations: typeof enTranslations = {
   submitTranscribe: "Transkrybuj nagranie",
   meteredCost: "Ostateczny koszt zależy od zużycia podanego przez dostawcę.",
   estimatePending: "Dodaj nagranie, aby oszacować koszt.",
+  needsCredits: "Wymaga {{amount}} kredytów",
   units: {
     image: "{{amount}} kred. / obraz",
     video: "{{amount}} kred. / s",
@@ -54,6 +73,9 @@ export const translations: typeof enTranslations = {
   kinds: {
     image: {
       label: "Obraz",
+      tab: "Obraz",
+      pitch:
+        "Tekst na obraz albo edycja zdjęcia. Fotorealizm, anime, sztuka, cokolwiek opiszesz.",
       title: "Stwórz obraz",
       metaTitle: "Generator obrazów AI bez cenzury - {{appName}}",
       description: "Opisz scenę i wybierz kadr.",
@@ -61,6 +83,9 @@ export const translations: typeof enTranslations = {
     },
     video: {
       label: "Wideo",
+      tab: "Wideo",
+      pitch:
+        "Z tekstu lub pierwszej klatki powstaje klip. Ty wybierasz długość, proporcje i rozdzielczość.",
       title: "Stwórz wideo",
       metaTitle: "Generator wideo AI - {{appName}}",
       description: "Wpraw scenę w ruch, od pierwszej do ostatniej klatki.",
@@ -68,6 +93,9 @@ export const translations: typeof enTranslations = {
     },
     music: {
       label: "Muzyka",
+      tab: "Muzyka",
+      pitch:
+        "Cały utwór z jednego promptu: nastrój, gatunek, instrumenty, długość.",
       title: "Skomponuj muzykę",
       metaTitle: "Generator muzyki AI - {{appName}}",
       description: "Dobierz nastrój, instrumenty i długość utworu.",
@@ -75,6 +103,8 @@ export const translations: typeof enTranslations = {
     },
     speech: {
       label: "Głos",
+      tab: "Głos",
+      pitch: "Twój tekst czytany naturalnymi głosami w wielu językach.",
       title: "Nadaj tekstowi głos",
       metaTitle: "Zamiana tekstu na mowę AI - {{appName}}",
       description: "Wybierz głos, który przeczyta Twój tekst.",
@@ -82,6 +112,8 @@ export const translations: typeof enTranslations = {
     },
     transcribe: {
       label: "Transkrypcja",
+      tab: "Tekst",
+      pitch: "Wgraj nagranie, odbierz czysty tekst. Pobierz go jako plik.",
       title: "Przepisz nagranie",
       metaTitle: "Transkrypcja AI - {{appName}}",
       description: "Zamień nagranie w tekst gotowy do pobrania.",
