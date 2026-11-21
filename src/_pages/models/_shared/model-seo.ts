@@ -273,7 +273,7 @@ const HAND_PICKED_LINES: Partial<Record<ChatModelId, PickKey>> = {
   [ChatModelId.CLAUDE_OPUS_5_5]: "claudeOpus",
   [ChatModelId.CLAUDE_SONNET_5_5]: "claudeSonnet",
   [ChatModelId.CLAUDE_HAIKU_5_5]: "claudeHaiku",
-  [ChatModelId.GPT_6_1_SOL]: "gptSol",
+  [ChatModelId.GPT_6_2_SOL]: "gptSol",
   [ChatModelId.GPT_6_LUNA]: "gptLuna",
   [ChatModelId.GEMINI_4_ARGON]: "geminiArgon",
   [ChatModelId.GEMINI_3_8_FLASH]: "geminiFlash",

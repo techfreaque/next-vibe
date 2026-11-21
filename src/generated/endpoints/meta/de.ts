@@ -18645,7 +18645,7 @@ export const endpointsMeta: EndpointMeta[] = [
           parentMessageId: null,
           content: "Write a marketing email for our new product launch",
           role: "user",
-          model: "gpt-6.1-sol",
+          model: "gpt-6.2-sol",
           skill: "professional",
           favoriteConfig: null,
           toolConfirmations: null,
@@ -22758,7 +22758,7 @@ export const endpointsMeta: EndpointMeta[] = [
               isDefault: true,
               modelSelection: {
                 selectionType: "enums.selectionType.manual",
-                manualModelId: "gpt-6.1-sol",
+                manualModelId: "gpt-6.2-sol",
               },
             },
           ],
@@ -22875,7 +22875,7 @@ export const endpointsMeta: EndpointMeta[] = [
                 {
                   skillId: "hermes-code-reviewer",
                   icon: "direct-hit",
-                  modelId: "gpt-6.1-sol",
+                  modelId: "gpt-6.2-sol",
                   category: "enums.category.coding",
                   name: "skills.hermes.name",
                   tagline: "skills.hermes.tagline",

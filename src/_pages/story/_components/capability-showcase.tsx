@@ -680,7 +680,7 @@ function buildModelsDemoGroup(
   const seq = `models-${activeId}-seq`;
   const model =
     activeId === "mainstream"
-      ? ChatModelId.GPT_6_1_SOL
+      ? ChatModelId.GPT_6_2_SOL
       : activeId === "open"
         ? DEFAULT_CHAT_MODEL_ID
         : ChatModelId.UNCENSORED_LM_V1_2;

@@ -103,6 +103,9 @@ export enum ImageVisionModelId {
   MINIMAX_M3_1_FLASH = "minimax-m3.1-flash",
   META_MUSE_EMBER = "meta-muse-ember",
   DRUMMER_ARTEMIS_31B = "drummer-artemis-31b",
+  GPT_6_2_SOL = "gpt-6.2-sol",
+  GPT_6_2_ASTRA = "gpt-6.2-astra",
+  SUPERGEMMA_4_26B = "supergemma4-26b-uncensored",
   QWEN_4_MAX = "qwen-4-max",
 }
 

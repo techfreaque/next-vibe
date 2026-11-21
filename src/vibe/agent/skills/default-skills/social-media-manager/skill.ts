@@ -136,7 +136,7 @@ export const socialMediaManagerSkill: Skill = {
         "skills.socialMediaManager.variantInfo.snappy.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GPT_6_1_SOL,
+        manualModelId: ChatModelId.GPT_6_2_SOL,
         intelligenceRange: {
           min: IntelligenceLevel.SMART,
           max: IntelligenceLevel.SMART,

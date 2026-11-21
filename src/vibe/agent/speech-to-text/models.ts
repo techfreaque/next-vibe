@@ -31,6 +31,7 @@ export enum SttModelId {
   OPENAI_WHISPER = "openai-whisper",
   DEEPGRAM_NOVA_2 = "deepgram-nova-2",
   WHISPER_LARGE_V3 = "whisper-large-v3",
+  VOXTRAL_SMALL_TRANSCRIBE = "voxtral-small-transcribe",
   VOXTRAL_MINI_TRANSCRIBE = "voxtral-mini-transcribe",
   NEMOTRON_ASR = "nemotron-asr",
   GPT4O_MINI_TRANSCRIBE = "gpt4o-mini-transcribe",
@@ -139,6 +140,33 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "whisper-large-v3",
         creditCostPerSecond: 0.0011, // updated: 2026-11-09 from unbottled.ai
+      },
+    ],
+  },
+  [SttModelId.VOXTRAL_SMALL_TRANSCRIBE]: {
+    name: "Voxtral Small Transcribe",
+    by: "mistralAI",
+    description: "speechToText.models.descriptions.voxtralSmall",
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "mic",
+    inputs: ["audio"],
+    outputs: ["text"],
+    utilities: [ModelUtility.STT],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: SttModelId.VOXTRAL_SMALL_TRANSCRIBE,
+        apiProvider: ApiProvider.NANO_GPT,
+        providerModel: "voxtral-small-transcribe-3-0",
+        creditCostPerSecond: 0.007333333333333333, // updated: 2026-11-21 from nano-gpt-api
       },
     ],
   },

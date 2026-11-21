@@ -879,11 +879,11 @@ export const translations: typeof enTranslations = {
       claudeFable52:
         "Claude Fable 5.2 - Le raisonneur de pointe d'Anthropic. Synthèse plus profonde et planification de longue haleine plus stable que Fable 5.1, pour moins cher. Contexte de 1M tokens.",
       gpt6Astra:
-        "GPT-6 Astra - Le modèle le plus capable d'OpenAI. Raisonnement maximal pour les problèmes les plus difficiles. Contexte de 1,05M tokens.",
+        "Cet ancien modèle phare de la gamme Astra accepte le texte et les images et utilise des outils. GPT-6.2 Astra lui succède.",
       gpt6AstraPro:
         "GPT-6 Astra Pro - GPT-6 Astra avec un effort de raisonnement étendu. Plus lent, plus minutieux. Contexte de 1,05M tokens.",
       gpt61Sol:
-        "GPT-6.1 Sol - Le raisonneur premium d'OpenAI. Performances de pointe pour une fraction du prix de GPT-5.6 Sol. Contexte de 1,05M tokens.",
+        "Cette version de Sol accepte le texte et les images et utilise des outils. GPT-6.2 Sol lui succède.",
       gpt61SolPro:
         "GPT-6.1 Sol Pro - GPT-6.1 Sol avec un effort de raisonnement étendu pour l'analyse et le code complexes. Contexte de 1,05M tokens.",
       gpt61Terra:
@@ -902,6 +902,18 @@ export const translations: typeof enTranslations = {
         "Grok 4.7 - Le dernier Grok de xAI. Raisonnement et code plus affûtés, politique de contenu ouverte, vision. Contexte de 500K tokens.",
       kimiK31Pro:
         "Kimi K3.1 Pro - Le modèle le plus puissant de Moonshot AI. Raisonnement multimodal et longues exécutions d'agent. Contexte de 1M tokens.",
+      gpt62Sol:
+        "Sol analyse textes et images, écrit du code et utilise des outils.",
+      gpt62Astra:
+        "Astra combine textes, images et outils pour les études techniques et les analyses complexes.",
+      superGemma426b:
+        "Cette version de Gemma 4 affinée par Jiunsong accepte du texte accompagné d’une image et peut utiliser des outils.",
+      deepseekV41FlashCsf:
+        "La version ablitérée de DeepSeek V4.1 Flash par jcartu raisonne sur du texte et utilise des outils.",
+      maiImage27:
+        "Le modèle de Microsoft crée ici des images en 1K à partir de texte.",
+      maiImage27Flash:
+        "Cette variante plus rapide de MAI Image 2.7 crée une image en 1K à partir de texte.",
       qwen4Max:
         "Qwen 4 Max - Le nouveau modèle phare d'Alibaba. Raisonnement, code et analyse de pointe, lit les images et la vidéo. Contexte de 1M tokens.",
       kimiK31ProUncensored:

@@ -1844,11 +1844,11 @@ export const translations: typeof enTranslations = {
         claudeFable52:
           "Le raisonneur de pointe d'Anthropic, et le Claude le plus cher. Conçu pour la synthèse approfondie, la recherche et la planification au long cours, avec une écriture solide. Lit les images, appelle des outils, contexte de 1M. Environ le double du prix d'Opus 5.5, filtres grand public. Pour le code, Claude Opus 5.5 offre un meilleur rapport qualité-prix.",
         gpt6Astra:
-          "Le modèle le plus capable d'OpenAI, conçu pour une profondeur de raisonnement maximale sur les problèmes les plus durs. Code, analyse et écriture, lit les images, appelle des outils, contexte de 1M. Le modèle le plus cher du catalogue, filtres grand public. GPT-6.1 Sol est au même niveau pour environ un cinquième du prix : essayez-le d'abord.",
+          "Cet ancien modèle phare de la gamme Astra accepte le texte et les images et utilise des outils. GPT-6.2 Astra lui succède.",
         gpt6AstraPro:
           "GPT-6 Astra Pro. GPT-6 Astra avec un effort de raisonnement étendu. Plus lent, plus rigoureux. Contexte de 1,05M tokens.",
         gpt61Sol:
-          "Le raisonneur premium d'OpenAI, son choix de pointe raisonnable. Fort en code, en analyse et en écriture, lit les images, appelle des outils, contexte de 1M. Filtres grand public, pas pour le jeu de rôle. Environ un cinquième du prix de GPT-6 Astra, et au même coût que Claude Sonnet 5.5 et Gemini 4 Argon.",
+          "Cette version de Sol accepte le texte et les images et utilise des outils. GPT-6.2 Sol lui succède.",
         gpt61SolPro:
           "GPT-6.1 Sol Pro. GPT-6.1 Sol avec un effort de raisonnement étendu pour l'analyse et le code complexes. Contexte de 1,05M tokens.",
         gpt61Terra:
@@ -1867,6 +1867,18 @@ export const translations: typeof enTranslations = {
           "Le Grok le plus récent de xAI. Raisonnement et code affûtés, lit les images, appelle des outils, contexte de 500K, la moitié de ce qu'offrent la plupart des modèles phares ici. Politique de contenu Ouvert : il répond à plus de choses que les grands laboratoires grand public, sans être totalement non censuré. Au prix de Qwen 3.8 Max. xAI n'a plus de niveau Fast bon marché : pour du chat rapide et peu coûteux avec des filtres Ouverts, essayez MiniMax M3.1 Flash ou Meta Muse Ember.",
         kimiK31Pro:
           "Le Kimi le plus fort de Moonshot AI. Raisonnement, code, écriture créative et longues exécutions d'agent au plus haut niveau, lit images et vidéos, appelle des outils, contexte de 1M. Filtres plus légers que les laboratoires américains. Au même prix que Claude Sonnet 5.5. Kimi K3 s'en approche pour un peu plus de la moitié du prix.",
+        gpt62Sol:
+          "Sol analyse textes et images, écrit du code et utilise des outils.",
+        gpt62Astra:
+          "Astra combine textes, images et outils pour les études techniques et les analyses complexes.",
+        superGemma426b:
+          "Cette version de Gemma 4 affinée par Jiunsong accepte du texte accompagné d’une image et peut utiliser des outils.",
+        deepseekV41FlashCsf:
+          "La version ablitérée de DeepSeek V4.1 Flash par jcartu raisonne sur du texte et utilise des outils.",
+        maiImage27:
+          "Le modèle de Microsoft crée ici des images en 1K à partir de texte.",
+        maiImage27Flash:
+          "Cette variante plus rapide de MAI Image 2.7 crée une image en 1K à partir de texte.",
         qwen4Max:
           "Le nouveau modèle phare d'Alibaba, et le premier Qwen 4. Raisonnement, code et analyse de niveau pointe, lit images et vidéos, appelle des outils, contexte de 1M. Filtres plus légers que les laboratoires américains. Il réfléchit avant chaque réponse : les réponses prennent un instant. Un quart moins cher que Qwen 3.8 Max, qu'il remplace.",
         kimiK31ProUncensored:
@@ -2474,6 +2486,8 @@ export const translations: typeof enTranslations = {
           "Deepgram Nova-2 : transcription rapide et précise, résistante au bruit",
         whisperLargeV3:
           "Whisper Large V3 : modèle open-weight d'OpenAI, 99 langues, bien moins cher que whisper-1 hébergé.",
+        voxtralSmall:
+          "Voxtral Small de Mistral transcrit la parole enregistrée.",
         voxtralMini:
           "Voxtral Mini Transcribe : transcription Mistral avec identification des locuteurs et horodatage par segment, jusqu'à 10 minutes.",
         nemotronAsr:
@@ -2626,6 +2640,8 @@ export const translations: typeof enTranslations = {
           "Kokoro Emma : modèle open-weight de 82M, voix féminine britannique. Aucun filtre de contenu.",
         kokoroGeorge:
           "Kokoro George : modèle open-weight de 82M, voix masculine britannique. Aucun filtre de contenu.",
+        voxtralPaul:
+          "Voxtral Mini lit les textes anglais avec la voix neutre de Paul.",
         inworldAshley:
           "Inworld Ashley : voix féminine rapide et bon marché, diction vive.",
         inworldCraig:

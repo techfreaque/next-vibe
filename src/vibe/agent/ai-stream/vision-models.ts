@@ -329,6 +329,15 @@ const imageVisionModelOptionsIndex: Record<
   [ImageVisionModelId.CLAUDE_FABLE_5_2]: makeImageVisionOption(
     ImageVisionModelId.CLAUDE_FABLE_5_2,
   ),
+  [ImageVisionModelId.GPT_6_2_SOL]: makeImageVisionOption(
+    ImageVisionModelId.GPT_6_2_SOL,
+  ),
+  [ImageVisionModelId.GPT_6_2_ASTRA]: makeImageVisionOption(
+    ImageVisionModelId.GPT_6_2_ASTRA,
+  ),
+  [ImageVisionModelId.SUPERGEMMA_4_26B]: makeImageVisionOption(
+    ImageVisionModelId.SUPERGEMMA_4_26B,
+  ),
   [ImageVisionModelId.GPT_6_ASTRA]: makeImageVisionOption(
     ImageVisionModelId.GPT_6_ASTRA,
   ),

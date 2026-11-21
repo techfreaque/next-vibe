@@ -16,7 +16,7 @@ export const translations = {
       titleMin: "{{model}} price & API",
       titleUncensored: "{{model}}: uncensored AI, price & API | {{appName}}",
       titleUncensoredShort: "{{model}}: uncensored AI, price & API",
-      titleUncensoredMin: "{{model}} uncensored: price & API",
+      titleUncensoredMin: "{{model}} uncensored AI pricing",
       titleLegacy: "{{model}} price & context (legacy) | {{appName}}",
       titleLegacyShort: "{{model}} price & context (legacy)",
       description:
@@ -219,7 +219,7 @@ export const translations = {
       claudeHaiku:
         "Fast, cheap Claude for quick answers, summaries and simple code. Reads screenshots too.",
       gptSol:
-        "OpenAI's flagship for reasoning, code and long analysis. The pick when you want GPT quality on hard problems.",
+        "Use Sol for daily coding, document analysis and tasks that need tools. It accepts text and images.",
       gptLuna:
         "OpenAI's fast, low-cost model for everyday chat and quick lookups.",
       geminiArgon:

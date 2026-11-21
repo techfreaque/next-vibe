@@ -149,6 +149,8 @@ export const translations: typeof enTranslations = {
         "Kokoro Emma - Otwarty model 82M, brytyjski głos kobiecy. Bez filtra treści.",
       kokoroGeorge:
         "Kokoro George - Otwarty model 82M, brytyjski głos męski. Bez filtra treści.",
+      voxtralPaul:
+        "Voxtral Mini czyta angielski tekst neutralnym głosem Paula.",
       inworldAshley:
         "Inworld Ashley - Szybki, tani głos kobiecy o żywej narracji.",
       inworldCraig: "Inworld Craig - Szybki, tani brytyjski głos męski.",

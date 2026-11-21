@@ -226,7 +226,7 @@ export const translations: typeof enTranslations = {
       claudeHaiku:
         "Un Claude rapide et économique pour les réponses courtes, les résumés et le code simple. Il lit aussi les captures d'écran.",
       gptSol:
-        "Le modèle phare d'OpenAI pour le raisonnement, le code et les longues analyses. Le choix pour la qualité GPT sur les problèmes durs.",
+        "Sol convient à la programmation au quotidien, à l’analyse de documents et aux tâches qui exigent des outils. Il accepte le texte et les images.",
       gptLuna:
         "Le modèle rapide et bon marché d'OpenAI pour le chat de tous les jours et les recherches rapides.",
       geminiArgon:

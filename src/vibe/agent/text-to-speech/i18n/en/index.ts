@@ -150,6 +150,8 @@ export const translations = {
         "Kokoro Emma - Open-weight 82M model, British female voice. No content filter.",
       kokoroGeorge:
         "Kokoro George - Open-weight 82M model, British male voice. No content filter.",
+      voxtralPaul:
+        "Read English text aloud in Paul’s neutral voice with Voxtral Mini.",
       inworldAshley:
         "Inworld Ashley - Fast, low-cost female voice with lively delivery.",
       inworldCraig: "Inworld Craig - Fast, low-cost British male voice.",

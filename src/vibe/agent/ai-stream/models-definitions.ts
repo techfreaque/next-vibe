@@ -153,6 +153,10 @@ export enum ChatModelId {
   // Uncensored models added 2026-11-13
   DRUMMER_ARTEMIS_31B = "drummer-artemis-31b",
   // Added 2026-11-16
+  GPT_6_2_SOL = "gpt-6.2-sol",
+  GPT_6_2_ASTRA = "gpt-6.2-astra",
+  SUPERGEMMA_4_26B = "supergemma4-26b-uncensored",
+  DEEPSEEK_V4_1_FLASH_CSF = "deepseek-v4.1-flash-1017-abliterated-csf",
   QWEN_4_MAX = "qwen-4-max",
   KIMI_K3_1_PRO_UNCENSORED = "kimi-k3.1-pro-uncensored",
 }
@@ -2523,7 +2527,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     by: "xiaomi",
     description: "chat.models.descriptions.mimoV2Pro",
     parameterCount: undefined,
-    contextWindow: 1024000,
+    contextWindow: 262144,
     icon: "si-xiaomi",
     inputs: ["text"], // updated: 2026-04-03 from openrouter-api
     outputs: ["text"], // updated: 2026-04-03 from openrouter-api
@@ -2533,9 +2537,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "xiaomi/mimo-v2.5-pro", // v2-pro deprecated by provider, redirected to v2.5-pro
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.44, // updated: 2026-11-15 from openrouter-api
-        outputTokenCost: 0.87, // updated: 2026-11-15 from openrouter-api
-        cacheReadTokenCost: 0.01, // updated: 2026-11-15 from openrouter-api
+        inputTokenCost: 0.48, // updated: 2026-11-21 from openrouter-endpoints
+        outputTokenCost: 1.8, // updated: 2026-11-21 from openrouter-endpoints
+        cacheReadTokenCost: 0.096, // updated: 2026-11-21 from openrouter-endpoints
       },
       {
         id: ChatModelId.MIMO_V2_PRO,
@@ -4407,9 +4411,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-5.2",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.01, // updated: 2026-11-07 from openrouter-api
+        inputTokenCost: 0.007, // updated: 2026-11-21 from openrouter-endpoints
         outputTokenCost: 6.8, // updated: 2026-11-07 from openrouter-api
-        cacheReadTokenCost: 0.01, // updated: 2026-11-07 from openrouter-api
+        cacheReadTokenCost: 0.006, // updated: 2026-11-21 from openrouter-endpoints
       },
       {
         id: ChatModelId.GLM_5_2,
@@ -4603,7 +4607,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     by: "xiaomi",
     description: "chat.models.descriptions.mimoV25Pro",
     parameterCount: undefined,
-    contextWindow: 1024000,
+    contextWindow: 262144,
     icon: "si-xiaomi",
     inputs: ["text"], // updated: 2026-11-07 from openrouter-api
     outputs: ["text"], // updated: 2026-11-07 from openrouter-api
@@ -4613,9 +4617,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "xiaomi/mimo-v2.5-pro",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.44, // updated: 2026-11-15 from openrouter-api
-        outputTokenCost: 0.87, // updated: 2026-11-15 from openrouter-api
-        cacheReadTokenCost: 0.01, // updated: 2026-11-15 from openrouter-api
+        inputTokenCost: 0.48, // updated: 2026-11-21 from openrouter-endpoints
+        outputTokenCost: 1.8, // updated: 2026-11-21 from openrouter-endpoints
+        cacheReadTokenCost: 0.096, // updated: 2026-11-21 from openrouter-endpoints
       },
       {
         id: ChatModelId.MIMO_V2_5_PRO,
@@ -5003,6 +5007,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       },
     ],
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,
@@ -5048,6 +5053,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
       },
     ],
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.ANALYSIS,
@@ -5944,6 +5950,153 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
   },
 
+  [ChatModelId.GPT_6_2_SOL]: {
+    name: "GPT-6.2 Sol",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt62Sol",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-openai",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GPT_6_2_SOL,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-6.2-sol",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2, // updated: 2026-11-21 from openrouter-api
+        outputTokenCost: 10, // updated: 2026-11-21 from openrouter-api
+        cacheReadTokenCost: 0.1, // updated: 2026-11-21 from openrouter-api
+        cacheWriteTokenCost: 2.5, // updated: 2026-11-21 from openrouter-api
+        longContextPricing: {
+          minPromptTokens: 272000,
+          inputTokenCost: 4,
+          outputTokenCost: 15,
+          cacheReadTokenCost: 0.2,
+          cacheWriteTokenCost: 5,
+        },
+        maxInputTokenCost: 4, // updated: 2026-11-21 from openrouter-api
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+      ModelUtility.VISION,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+  [ChatModelId.GPT_6_2_ASTRA]: {
+    name: "GPT-6.2 Astra",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt62Astra",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-openai",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.GPT_6_2_ASTRA,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-6.2-astra",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 8, // updated: 2026-11-21 from openrouter-api
+        outputTokenCost: 40, // updated: 2026-11-21 from openrouter-api
+        cacheReadTokenCost: 0.4, // updated: 2026-11-21 from openrouter-api
+        cacheWriteTokenCost: 10, // updated: 2026-11-21 from openrouter-api
+        longContextPricing: {
+          minPromptTokens: 272000,
+          inputTokenCost: 16,
+          outputTokenCost: 60,
+          cacheReadTokenCost: 0.8,
+          cacheWriteTokenCost: 20,
+        },
+        maxInputTokenCost: 16, // updated: 2026-11-21 from openrouter-api
+      },
+    ],
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+      ModelUtility.VISION,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+  [ChatModelId.SUPERGEMMA_4_26B]: {
+    name: "SuperGemma4 26B Uncensored",
+    by: "jiunsong",
+    description: "chat.models.descriptions.superGemma426b",
+    parameterCount: 26,
+    contextWindow: 256000,
+    icon: "brain",
+    inputs: ["text", "image"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.SUPERGEMMA_4_26B,
+        apiProvider: ApiProvider.NANO_GPT,
+        providerModel: "jiunsong/supergemma4-26b-uncensored",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.1625, // updated: 2026-11-21 from nano-gpt-api
+        outputTokenCost: 0.5, // updated: 2026-11-21 from nano-gpt-api
+        cacheReadTokenCost: 0.1625, // updated: 2026-11-21 from nano-gpt-api
+      },
+    ],
+    utilities: [
+      ModelUtility.UNCENSORED,
+      ModelUtility.CHAT,
+      ModelUtility.CREATIVE,
+      ModelUtility.VISION,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.UNCENSORED,
+    uncensoredMethod: "fineTuned",
+    features: { ...defaultFeatures, toolCalling: true },
+  },
+  [ChatModelId.DEEPSEEK_V4_1_FLASH_CSF]: {
+    name: "DeepSeek V4.1 Flash Abliterated CSF",
+    by: "jcartu",
+    description: "chat.models.descriptions.deepseekV41FlashCsf",
+    parameterCount: undefined,
+    contextWindow: 1048576,
+    icon: "si-deepseek",
+    inputs: ["text"],
+    outputs: ["text"],
+    providers: [
+      {
+        id: ChatModelId.DEEPSEEK_V4_1_FLASH_CSF,
+        apiProvider: ApiProvider.NANO_GPT,
+        providerModel:
+          "jcartu/deepseek-v4.1-flash-1017-abliterated-lossless-csf",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.315, // updated: 2026-11-21 from nano-gpt-api
+        outputTokenCost: 1.05, // updated: 2026-11-21 from nano-gpt-api
+        cacheReadTokenCost: 0.021, // updated: 2026-11-21 from nano-gpt-api
+      },
+    ],
+    utilities: [
+      ModelUtility.UNCENSORED,
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.UNCENSORED,
+    uncensoredMethod: "abliterated",
+    features: { ...defaultFeatures, toolCalling: true },
+  },
   [ChatModelId.QWEN_4_MAX]: {
     name: "Qwen 4 Max",
     by: "alibaba",
@@ -5997,7 +6150,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 4, // updated: 2026-11-16 from nano-gpt-api
         outputTokenCost: 15, // updated: 2026-11-16 from nano-gpt-api
-        cacheReadTokenCost: 0.4, // updated: 2026-11-16 from nano-gpt-api
+        cacheReadTokenCost: 4, // updated: 2026-11-21 from nano-gpt-api (Lyber hosted tariff, no cache discount)
       },
     ],
     utilities: [
@@ -6024,6 +6177,8 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
  * are NEVER deleted: stored messages and history still reference them.
  */
 export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
+  [ChatModelId.GPT_6_1_SOL]: ChatModelId.GPT_6_2_SOL,
+  [ChatModelId.GPT_6_ASTRA]: ChatModelId.GPT_6_2_ASTRA,
   [ChatModelId.CLAUDE_OPUS_4_5]: ChatModelId.CLAUDE_OPUS_5_5,
   [ChatModelId.CLAUDE_OPUS_4_6]: ChatModelId.CLAUDE_OPUS_5_5,
   [ChatModelId.CLAUDE_OPUS_4_7]: ChatModelId.CLAUDE_OPUS_5_5,
@@ -6036,10 +6191,10 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.CLAUDE_HAIKU_4_5]: ChatModelId.CLAUDE_HAIKU_5_5,
   [ChatModelId.CLAUDE_FABLE_5]: ChatModelId.CLAUDE_FABLE_5_2,
   [ChatModelId.CLAUDE_FABLE_5_1]: ChatModelId.CLAUDE_FABLE_5_2,
-  [ChatModelId.GPT_5]: ChatModelId.GPT_6_1_SOL,
-  [ChatModelId.GPT_5_1]: ChatModelId.GPT_6_1_SOL,
-  [ChatModelId.GPT_5_2]: ChatModelId.GPT_6_1_SOL,
-  [ChatModelId.GPT_5_4]: ChatModelId.GPT_6_1_SOL,
+  [ChatModelId.GPT_5]: ChatModelId.GPT_6_2_SOL,
+  [ChatModelId.GPT_5_1]: ChatModelId.GPT_6_2_SOL,
+  [ChatModelId.GPT_5_2]: ChatModelId.GPT_6_2_SOL,
+  [ChatModelId.GPT_5_4]: ChatModelId.GPT_6_2_SOL,
   // GPT image: gpt-5-image returns no image, gpt-5.4-image-2 502s upstream
   // (probed 2026-11-09); gpt-5-image-mini expires on OpenRouter 2026-12-01.
   // No OpenAI chat-image model remains (GPT Image 2.6 is images-API only), so
@@ -6050,13 +6205,13 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.GPT_5_IMAGE_MINI]: ChatModelId.GEMINI_NANO_BANANA_2_1,
   [ChatModelId.GEMINI_3_1_FLASH_IMAGE_PREVIEW]:
     ChatModelId.GEMINI_NANO_BANANA_2_1,
-  [ChatModelId.GPT_5_5]: ChatModelId.GPT_6_1_SOL,
-  [ChatModelId.GPT_5_6_SOL]: ChatModelId.GPT_6_1_SOL,
-  [ChatModelId.GPT_5_6_SOL_PRO]: ChatModelId.GPT_6_1_SOL,
-  [ChatModelId.GTP_5_PRO]: ChatModelId.GPT_6_ASTRA,
-  [ChatModelId.GPT_5_2_PRO]: ChatModelId.GPT_6_ASTRA,
-  [ChatModelId.GPT_5_4_PRO]: ChatModelId.GPT_6_ASTRA,
-  [ChatModelId.GPT_5_5_PRO]: ChatModelId.GPT_6_ASTRA,
+  [ChatModelId.GPT_5_5]: ChatModelId.GPT_6_2_SOL,
+  [ChatModelId.GPT_5_6_SOL]: ChatModelId.GPT_6_2_SOL,
+  [ChatModelId.GPT_5_6_SOL_PRO]: ChatModelId.GPT_6_2_SOL,
+  [ChatModelId.GTP_5_PRO]: ChatModelId.GPT_6_2_ASTRA,
+  [ChatModelId.GPT_5_2_PRO]: ChatModelId.GPT_6_2_ASTRA,
+  [ChatModelId.GPT_5_4_PRO]: ChatModelId.GPT_6_2_ASTRA,
+  [ChatModelId.GPT_5_5_PRO]: ChatModelId.GPT_6_2_ASTRA,
   [ChatModelId.GPT_5_2_CHAT]: ChatModelId.GPT_6_1_TERRA,
   [ChatModelId.GPT_5_3_CHAT]: ChatModelId.GPT_6_1_TERRA,
   [ChatModelId.GPT_5_6_TERRA]: ChatModelId.GPT_6_1_TERRA,
@@ -6066,8 +6221,8 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.GPT_5_6_LUNA]: ChatModelId.GPT_6_LUNA,
   [ChatModelId.GPT_5_6_LUNA_PRO]: ChatModelId.GPT_6_LUNA,
   [ChatModelId.GPT_5_NANO]: ChatModelId.GPT_6_LUNA,
-  [ChatModelId.GPT_5_CODEX]: ChatModelId.GPT_6_1_SOL,
-  [ChatModelId.GPT_5_1_CODEX]: ChatModelId.GPT_6_1_SOL,
+  [ChatModelId.GPT_5_CODEX]: ChatModelId.GPT_6_2_SOL,
+  [ChatModelId.GPT_5_1_CODEX]: ChatModelId.GPT_6_2_SOL,
   [ChatModelId.GEMINI_2_5_PRO]: ChatModelId.GEMINI_4_ARGON,
   [ChatModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS]: ChatModelId.GEMINI_4_ARGON,
   [ChatModelId.GEMINI_2_5_FLASH]: ChatModelId.GEMINI_3_8_FLASH,
@@ -6122,5 +6277,5 @@ export const chatModelSuccessors: Partial<Record<ChatModelId, ChatModelId>> = {
   [ChatModelId.DEEPSEEK_R1_DISTILL]: ChatModelId.DEEPSEEK_V4_1_FLASH,
   [ChatModelId.MISTRAL_MEDIUM_3_5]: ChatModelId.MISTRAL_LARGE_4,
   [ChatModelId.GPT_5_4_NANO]: ChatModelId.GPT_6_LUNA,
-  [ChatModelId.GPT_5_3_CODEX]: ChatModelId.GPT_6_1_SOL,
+  [ChatModelId.GPT_5_3_CODEX]: ChatModelId.GPT_6_2_SOL,
 };

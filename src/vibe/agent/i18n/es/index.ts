@@ -1859,11 +1859,11 @@ export const translations: typeof enTranslations = {
         claudeFable52:
           "Anthropic es el razonador de frontera y el Claude más pricito. Construido para una profunda síntesis, investigación y planificación larga-horizona, con fuerte escritura. Lee imágenes, llama herramientas, contexto 1M. Sobre el doble del precio de Opus 5.5, con filtros principales. Para código, Claude Opus 5.5 es el mejor valor.",
         gpt6Astra:
-          "OpenAI es el modelo más capaz, construido para la máxima profundidad de razonamiento en los problemas más difíciles. Código, análisis y escritura, lee imágenes, llama herramientas, contexto 1M. El modelo más caro del catálogo, con filtros principales. GPT-6.1 Sol se sienta en el mismo nivel por aproximadamente una quinta parte del precio, así que pruébalo primero.",
+          "El anterior modelo insignia de Astra admite texto, imágenes y herramientas. Su sucesor es GPT-6.2 Astra.",
         gpt6AstraPro:
           "GPT-6 Astra Pro - GPT-6 Astra con esfuerzo prolongado de razonamiento. Más lento, más minucioso. Contexto de token 1.05M.",
         gpt61Sol:
-          "OpenAI es el razonador premium y su elección de frontera sensible. Fuerte en código, análisis y escritura, lee imágenes, llama herramientas, contexto 1M. Filtros de corriente principal, no para el juego de roles. Aproximadamente una quinta parte del precio de GPT-6 Astra, y nivel a costo con Claude Sonnet 5.5 y Gemini 4 Argon.",
+          "La versión anterior de Sol admite texto, imágenes y herramientas. Su sucesor es GPT-6.2 Sol.",
         gpt61SolPro:
           "GPT-6.1 Sol Pro - GPT-6.1 Sol con amplio esfuerzo de razonamiento para el análisis complejo y el código. 1.05M-token context.",
         gpt61Terra:
@@ -1882,6 +1882,18 @@ export const translations: typeof enTranslations = {
           "El Grok más reciente de xAI. Razona con precisión y programa bien. Lee imágenes, usa herramientas y tiene contexto de 500K, cerca de la mitad de otros modelos insignia. Aplica filtros más leves que los grandes laboratorios y responde a más preguntas. Cuesta lo mismo que Qwen 3.8 Max. xAI retiró su variante Fast económica. Para un chat rápido con filtros leves, prueba MiniMax M3.1 Flash o Meta Muse Ember.",
         kimiK31Pro:
           "Moonshot AI es el Kimi más fuerte. El razonamiento de más alto nivel, el código, la escritura creativa y el agente largo corre, lee imágenes y vídeo, llama herramientas, contexto 1M. Filtros más ligeros que los laboratorios US. Nivel de precio con Claude Sonnet 5.5. Kimi K3 se acerca un poco más de la mitad del precio.",
+        gpt62Sol:
+          "Sol interpreta texto e imágenes, escribe código y usa herramientas.",
+        gpt62Astra:
+          "Astra combina texto, imágenes y herramientas para resolver tareas complejas de ingeniería y análisis.",
+        superGemma426b:
+          "La versión de Gemma 4 ajustada por Jiunsong acepta texto junto con una imagen y puede usar herramientas.",
+        deepseekV41FlashCsf:
+          "La versión abliterada de DeepSeek V4.1 Flash de jcartu razona sobre texto y usa herramientas.",
+        maiImage27:
+          "El modelo de Microsoft genera aquí imágenes en 1K a partir de texto.",
+        maiImage27Flash:
+          "Esta variante más rápida de MAI Image 2.7 genera imágenes en 1K a partir de texto.",
         qwen4Max:
           "El nuevo buque insignia de Alibaba y el primer Qwen 4. Razonamiento, código y análisis de vanguardia, lee imágenes y vídeos, llama herramientas, contexto 1M. Filtros más ligeros que los laboratorios US. Piensa antes de cada respuesta, así que las respuestas toman un momento. Un cuarto más barato que Qwen 3.8 Max, que reemplaza.",
         kimiK31ProUncensored:
@@ -2494,6 +2506,7 @@ export const translations: typeof enTranslations = {
           "Deepgram Nova-2 - El discurso a texto rápido y preciso con robustez de ruido",
         whisperLargeV3:
           "Whisper Large V3 - Modelo OpenAI de peso abierto, 99 idiomas, mucho más barato que los susurros anfitriones-1.",
+        voxtralSmall: "Voxtral Small de Mistral transcribe grabaciones de voz.",
         voxtralMini:
           "Transcribe Voxtral Mini - transcripción Mistral con diarización y horarios de segmento, hasta 10 minutos.",
         nemotronAsr:
@@ -2645,6 +2658,8 @@ export const translations: typeof enTranslations = {
           "Kokoro Emma - Modelo de 82M de peso abierto, voz femenina británica. Sin filtro de contenido.",
         kokoroGeorge:
           "Kokoro George - Modelo 82M de peso abierto, voz masculina británica. Sin filtro de contenido.",
+        voxtralPaul:
+          "Voxtral Mini lee textos en inglés con la voz neutra de Paul.",
         inworldAshley:
           "Inworld Ashley - Voz femenina rápida y de bajo costo con entrega animada.",
         inworldCraig:

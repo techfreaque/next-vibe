@@ -1834,11 +1834,11 @@ export const translations = {
         claudeFable52:
           "Anthropic's frontier reasoner and the priciest Claude. Built for deep synthesis, research and long-horizon planning, with strong writing. Reads images, calls tools, 1M context. About double the price of Opus 5.5, with mainstream filters. For code, Claude Opus 5.5 is the better value.",
         gpt6Astra:
-          "OpenAI's most capable model, built for maximum reasoning depth on the hardest problems. Code, analysis and writing, reads images, calls tools, 1M context. The most expensive model in the catalog, with mainstream filters. GPT-6.1 Sol sits in the same tier for about a fifth of the price, so try it first.",
+          "The previous Astra flagship supports text, images and tools. Its successor is GPT-6.2 Astra.",
         gpt6AstraPro:
           "GPT-6 Astra Pro - GPT-6 Astra with extended reasoning effort. Slower, more thorough. 1.05M-token context.",
         gpt61Sol:
-          "OpenAI's premium reasoner and its sensible frontier pick. Strong at code, analysis and writing, reads images, calls tools, 1M context. Mainstream filters, not for roleplay. About a fifth of GPT-6 Astra's price, and level on cost with Claude Sonnet 5.5 and Gemini 4 Argon.",
+          "The previous Sol release supports text, images and tools. Its successor is GPT-6.2 Sol.",
         gpt61SolPro:
           "GPT-6.1 Sol Pro - GPT-6.1 Sol with extended reasoning effort for complex analysis and code. 1.05M-token context.",
         gpt61Terra:
@@ -1857,6 +1857,17 @@ export const translations = {
           "xAI's newest Grok. Sharp reasoning and code, reads images, calls tools, 500K context, half of what most flagships here offer. Open content policy, so it answers more than the mainstream labs without being fully uncensored. Priced like Qwen 3.8 Max. xAI has no cheap Fast tier anymore: for quick, low-cost chat with open filters, try MiniMax M3.1 Flash or Meta Muse Ember.",
         kimiK31Pro:
           "Moonshot AI's strongest Kimi. Top-tier reasoning, code, creative writing and long agent runs, reads images and video, calls tools, 1M context. Lighter filters than the US labs. Priced level with Claude Sonnet 5.5. Kimi K3 gets close for a little over half the price.",
+        gpt62Sol: "Sol reads text and images, writes code and calls tools.",
+        gpt62Astra:
+          "Astra handles complex engineering and analysis with text, images and tools.",
+        superGemma426b:
+          "Jiunsong’s fine-tuned Gemma 4 reads one image alongside text and can call tools.",
+        deepseekV41FlashCsf:
+          "jcartu’s abliterated DeepSeek V4.1 Flash handles text, reasoning and tool calls.",
+        maiImage27:
+          "Microsoft’s text-to-image model renders at 1K on this route.",
+        maiImage27Flash:
+          "The faster MAI Image 2.7 variant renders a 1K image from text.",
         qwen4Max:
           "Alibaba's new flagship and the first Qwen 4. Frontier-tier reasoning, code and analysis, reads images and video, calls tools, 1M context. Lighter filters than the US labs. Thinks before every answer, so replies take a moment. A quarter cheaper than Qwen 3.8 Max, which it replaces.",
         kimiK31ProUncensored:
@@ -2462,6 +2473,8 @@ export const translations = {
           "Deepgram Nova-2 - Fast and accurate speech-to-text with noise robustness",
         whisperLargeV3:
           "Whisper Large V3 - Open-weight OpenAI model, 99 languages, far cheaper than hosted whisper-1.",
+        voxtralSmall:
+          "Transcribe recorded speech with Mistral’s Voxtral Small.",
         voxtralMini:
           "Voxtral Mini Transcribe - Mistral transcription with diarization and segment timestamps, up to 10 minutes.",
         nemotronAsr:
@@ -2611,6 +2624,8 @@ export const translations = {
           "Kokoro Emma - Open-weight 82M model, British female voice. No content filter.",
         kokoroGeorge:
           "Kokoro George - Open-weight 82M model, British male voice. No content filter.",
+        voxtralPaul:
+          "Read English text aloud in Paul’s neutral voice with Voxtral Mini.",
         inworldAshley:
           "Inworld Ashley - Fast, low-cost female voice with lively delivery.",
         inworldCraig: "Inworld Craig - Fast, low-cost British male voice.",

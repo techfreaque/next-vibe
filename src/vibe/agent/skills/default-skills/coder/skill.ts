@@ -147,7 +147,7 @@ export const coderSkill: Skill = {
       weakness: "skills.coder.variantInfo.sol.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GPT_6_1_SOL,
+        manualModelId: ChatModelId.GPT_6_2_SOL,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,
@@ -174,7 +174,7 @@ export const coderSkill: Skill = {
       weakness: "skills.coder.variantInfo.astra.weakness" as const,
       modelSelection: {
         selectionType: ModelSelectionType.MANUAL,
-        manualModelId: ChatModelId.GPT_6_ASTRA,
+        manualModelId: ChatModelId.GPT_6_2_ASTRA,
         intelligenceRange: {
           min: IntelligenceLevel.BRILLIANT,
           max: IntelligenceLevel.BRILLIANT,

@@ -51,6 +51,7 @@ export enum TtsModelId {
   KOKORO_MICHAEL = "kokoro-michael",
   KOKORO_EMMA = "kokoro-emma",
   KOKORO_GEORGE = "kokoro-george",
+  VOXTRAL_PAUL = "voxtral-paul",
   INWORLD_MINI_ASHLEY = "inworld-mini-ashley",
   INWORLD_MINI_CRAIG = "inworld-mini-craig",
   XAI_EVE = "xai-eve",
@@ -788,6 +789,34 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "kokoro-george",
         creditCostPerCharacter: 0.0002, // updated: 2026-11-09 from unbottled.ai
+      },
+    ],
+  },
+  [TtsModelId.VOXTRAL_PAUL]: {
+    name: "Paul (Voxtral Mini)",
+    by: "mistralAI",
+    description: "textToSpeech.models.descriptions.voxtralPaul",
+    contextWindow: 0,
+    parameterCount: undefined,
+    icon: "volume-2",
+    inputs: ["text"],
+    outputs: ["audio"],
+    voiceMeta: { gender: "male", style: "neutral", language: "en" },
+    utilities: [ModelUtility.TTS],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: TtsModelId.VOXTRAL_PAUL,
+        apiProvider: ApiProvider.NANO_GPT,
+        providerModel: "voxtral-mini-tts-3-0:en_paul_neutral",
+        creditCostPerCharacter: 0.00221, // updated: 2026-11-21 from nano-gpt-api
       },
     ],
   },

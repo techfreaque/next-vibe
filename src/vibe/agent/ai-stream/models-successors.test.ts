@@ -227,7 +227,7 @@ describe("MANUAL selections with a legacy model id", () => {
         publicUser,
         openRouterOnly,
       ),
-    ).toBe(ChatModelId.GPT_6_1_SOL);
+    ).toBe(ChatModelId.GPT_6_2_SOL);
     // Legacy Qwen 3.7 Flash now resolves to its successor 3.8 Flash.
     expect(
       resolveChatModelForUser(
@@ -309,7 +309,10 @@ describe("model browser", () => {
     const names = new Set(result.data.models.map((m) => m.name));
     for (const id of [
       ChatModelId.CLAUDE_OPUS_5_5,
-      ChatModelId.GPT_6_1_SOL,
+      ChatModelId.GPT_6_2_SOL,
+      ChatModelId.GPT_6_2_ASTRA,
+      ChatModelId.SUPERGEMMA_4_26B,
+      ChatModelId.DEEPSEEK_V4_1_FLASH_CSF,
       ChatModelId.GEMINI_4_ARGON,
       ChatModelId.GEMINI_4_CARBON,
       ChatModelId.GEMINI_4_HYDROGEN,
@@ -326,6 +329,8 @@ describe("model browser", () => {
     for (const id of [
       ChatModelId.CLAUDE_OPUS_5,
       ChatModelId.GPT_5_6_SOL,
+      ChatModelId.GPT_6_1_SOL,
+      ChatModelId.GPT_6_ASTRA,
       ChatModelId.GROK_4_6,
       ChatModelId.GROK_4_FAST,
       ChatModelId.MINIMAX_M3,

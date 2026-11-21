@@ -28,6 +28,7 @@ import {
   IntelligenceLevel,
   ModelSelectionType,
 } from "../skills/enum";
+import { ImageSize } from "./enum";
 
 export enum ImageGenModelId {
   FLUX_PRO = "flux-pro",
@@ -62,6 +63,9 @@ export enum ImageGenModelId {
   FLUX_3_KLEIN = "flux-3-klein",
   GPT_IMAGE_2_6_FLARE = "gpt-image-2.6-flare",
   GPT_IMAGE_2_6_SUNBURST = "gpt-image-2.6-sunburst",
+  // Media refresh 2026-11-21
+  MAI_IMAGE_2_7 = "mai-image-2.7",
+  MAI_IMAGE_2_7_FLASH = "mai-image-2.7-flash",
   // Media refresh 2026-11-16
   RECRAFT_V4_1 = "recraft-v4.1",
   RECRAFT_V4_1_PRO = "recraft-v4.1-pro",
@@ -1467,6 +1471,58 @@ export const imageGenModelDefinitions: Record<
       ...defaultFeatures,
       streaming: false,
     },
+  },
+  [ImageGenModelId.MAI_IMAGE_2_7]: {
+    name: "MAI Image 2.7",
+    by: "microsoft",
+    description: "chat.models.descriptions.maiImage27",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    inputs: ["text"],
+    outputs: ["image"],
+    providers: [
+      {
+        id: ImageGenModelId.MAI_IMAGE_2_7,
+        apiProvider: ApiProvider.VENICE_AI,
+        providerModel: "mai-image-2-7",
+        creditCostPerImage: 5, // updated: 2026-11-21 from venice-api (default 1K)
+        supportedSizes: [ImageSize.SQUARE_1024],
+        supportedAspectRatios: ["1:1"],
+        supportedQualities: [],
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.CREATIVE],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, streaming: false },
+  },
+  [ImageGenModelId.MAI_IMAGE_2_7_FLASH]: {
+    name: "MAI Image 2.7 Flash",
+    by: "microsoft",
+    description: "chat.models.descriptions.maiImage27Flash",
+    parameterCount: undefined,
+    contextWindow: 0,
+    icon: "image",
+    inputs: ["text"],
+    outputs: ["image"],
+    providers: [
+      {
+        id: ImageGenModelId.MAI_IMAGE_2_7_FLASH,
+        apiProvider: ApiProvider.VENICE_AI,
+        providerModel: "mai-image-2-7-flash",
+        creditCostPerImage: 2, // updated: 2026-11-21 from venice-api (default 1K)
+        supportedSizes: [ImageSize.SQUARE_1024],
+        supportedAspectRatios: ["1:1"],
+        supportedQualities: [],
+      },
+    ],
+    utilities: [ModelUtility.IMAGE_GEN, ModelUtility.FAST],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.MAINSTREAM,
+    features: { ...defaultFeatures, streaming: false },
   },
   [ImageGenModelId.LUSTIFY_V8]: {
     name: "Lustify v8",

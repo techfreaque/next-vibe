@@ -132,7 +132,16 @@ export const apiProviderDisplayNames: Record<ApiProvider, string> = {
 /**
  * Provider-specific config for a model variant
  */
+interface LongContextPricing {
+  minPromptTokens: number;
+  inputTokenCost: number;
+  outputTokenCost: number;
+  cacheReadTokenCost: number;
+  cacheWriteTokenCost: number;
+}
+
 export interface ModelProviderConfigTokenBased {
+  longContextPricing?: LongContextPricing;
   id: ChatModelId | ImageGenModelId | VideoGenModelId | MusicGenModelId;
   apiProvider: ApiProvider;
   providerModel: string;
@@ -400,6 +409,7 @@ export interface ModelOptionBase extends CreditCostInput {
   voiceMeta?: TtsVoiceMeta;
 }
 export interface ModelOptionTokenBased extends ModelOptionBase {
+  longContextPricing?: LongContextPricing;
   creditCost: typeof calculateCreditCost;
   inputTokenCost: number;
   /**
@@ -627,6 +637,9 @@ export const modelProviders: Record<string, ModelProvider> = {
     name: "Abliteration.ai",
     icon: "shield-off",
   },
+  jiunsong: { name: "Jiunsong", icon: "brain" },
+  jcartu: { name: "jcartu", icon: "si-deepseek" },
+  microsoft: { name: "Microsoft", icon: "image" },
   theDrummer: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "TheDrummer",
@@ -913,6 +926,7 @@ export function calculateSttCreditCost(
  * A structural type keeps provider configs independent of option builders.
  */
 interface CreditCostInput extends Pick<ModelOptionBase, "apiProvider"> {
+  longContextPricing?: LongContextPricing;
   creditCostPerImage?: number;
   creditCostPerClip?: number;
   creditCostPerSecond?: number;
@@ -937,6 +951,7 @@ interface CreditCostInput extends Pick<ModelOptionBase, "apiProvider"> {
 export function calculateTokenCostUsd(
   modelOption: Pick<
     CreditCostInput,
+    | "longContextPricing"
     | "inputTokenCost"
     | "outputTokenCost"
     | "cacheReadTokenCost"
@@ -949,18 +964,21 @@ export function calculateTokenCostUsd(
   cacheWriteTokens = 0,
   imageOutputTokens = 0,
 ): number {
-  const inputTokenCost = modelOption.inputTokenCost ?? 0;
-  const outputTokenCost = modelOption.outputTokenCost ?? 0;
+  const tier = modelOption.longContextPricing;
+  const rates =
+    tier && actualInputTokens >= tier.minPromptTokens ? tier : modelOption;
+  const inputTokenCost = rates.inputTokenCost ?? 0;
+  const outputTokenCost = rates.outputTokenCost ?? 0;
   const uncachedInputTokens = Math.max(
     0,
     actualInputTokens - cachedInputTokens,
   );
   const uncachedInputCost = (inputTokenCost / 1_000_000) * uncachedInputTokens;
   const cachedInputCost =
-    ((modelOption.cacheReadTokenCost ?? inputTokenCost) / 1_000_000) *
+    ((rates.cacheReadTokenCost ?? inputTokenCost) / 1_000_000) *
     cachedInputTokens;
   const cacheWriteCost =
-    ((modelOption.cacheWriteTokenCost ?? inputTokenCost) / 1_000_000) *
+    ((rates.cacheWriteTokenCost ?? inputTokenCost) / 1_000_000) *
     cacheWriteTokens;
   const imageTokens = Math.min(
     Math.max(0, imageOutputTokens),

@@ -154,6 +154,8 @@ export const translations: typeof enTranslations = {
         "Kokoro Emma - Modello 82M a peso aperto, voce femminile britannica. Nessun filtro dei contenuti.",
       kokoroGeorge:
         "Kokoro George - Modello di 82M a peso aperto, voce maschile britannica. Nessun filtro dei contenuti.",
+      voxtralPaul:
+        "Voxtral Mini legge testi inglesi con la voce neutra di Paul.",
       inworldAshley:
         "Inworld Ashley - Veloce, a basso costo voce femminile con consegna vivace.",
       inworldCraig:

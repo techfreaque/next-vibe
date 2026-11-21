@@ -258,6 +258,7 @@ export const translations: typeof enTranslations = {
         "Deepgram Nova-2 - Veloce e preciso discorso-to-text con robustezza del rumore",
       whisperLargeV3:
         "Whisper Large V3 - Modello OpenAI a peso aperto, 99 lingue, molto più economico di quello ospitato sussurro-1.",
+      voxtralSmall: "Voxtral Small di Mistral trascrive il parlato registrato.",
       voxtralMini:
         "Voxtral Mini Transcribe - Trascrizione Mistral con diarizzazione e timestamp segmenti, fino a 10 minuti.",
       nemotronAsr:

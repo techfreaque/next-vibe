@@ -881,11 +881,11 @@ export const translations: typeof enTranslations = {
       claudeFable52:
         "Claude Fable 5.2 - Il ragionatore di frontiera di Anthropic. Sintesi più profonda e pianificazione più stabile di lungo orizzonte rispetto a Fable 5.1, ad un prezzo più basso.",
       gpt6Astra:
-        "GPT-6 Astra - il modello più capace di OpenAI. Profondità massima di ragionamento per i problemi più difficili. contesto 1.05M-token.",
+        "Il precedente modello di punta Astra accetta testo e immagini e usa strumenti. Il suo successore è GPT-6.2 Astra.",
       gpt6AstraPro:
         "GPT-6 Astra Pro - GPT-6 Astra con un lungo sforzo di ragionamento. Più lento, più approfondito. 1.05M-token contesto.",
       gpt61Sol:
-        "GPT-6.1 Sol - Il ragionatore premium di OpenAI. Prestazioni frontali a una frazione del prezzo di GPT-5.6 Sol. contesto 1.05M-token.",
+        "La precedente versione di Sol accetta testo e immagini e usa strumenti. Il suo successore è GPT-6.2 Sol.",
       gpt61SolPro:
         "GPT-6.1 Sol Pro - GPT-6.1 Sol con un ampio sforzo di ragionamento per l'analisi e il codice complessi.",
       gpt61Terra:
@@ -904,6 +904,17 @@ export const translations: typeof enTranslations = {
         "Grok 4.7 - ultima Grok di xAI. Ragione e codice più nitidi, politica dei contenuti aperta, visione. contesto di 500K-token.",
       kimiK31Pro:
         "Kimi K3.1 Pro - Moonshot AI modello più forte. Il ragionamento multimodale e l'agente lungo corre. contesto 1M-token.",
+      gpt62Sol: "Sol legge testi e immagini, scrive codice e usa strumenti.",
+      gpt62Astra:
+        "Astra usa testi, immagini e strumenti per affrontare problemi complessi di ingegneria e analisi.",
+      superGemma426b:
+        "La versione di Gemma 4 affinata da Jiunsong legge testo e una singola immagine e può usare strumenti.",
+      deepseekV41FlashCsf:
+        "La variante abliterata di DeepSeek V4.1 Flash di jcartu ragiona su testi e usa strumenti.",
+      maiImage27:
+        "Il modello di Microsoft genera qui immagini in 1K a partire dal testo.",
+      maiImage27Flash:
+        "La variante più veloce di MAI Image 2.7 crea immagini in 1K a partire dal testo.",
       qwen4Max:
         "Qwen 4 Max - La nuova ammiraglia di Alibaba. Il ragionamento anteriore, il codice e l'analisi, legge immagini e video. 1M-token contesto.",
       kimiK31ProUncensored:

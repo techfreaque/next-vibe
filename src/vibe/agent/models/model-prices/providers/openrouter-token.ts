@@ -8,6 +8,7 @@ import "server-only";
 
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
 import { chatModelDefinitions, ChatModelId } from "../../../ai-stream/models";
 import {
@@ -49,22 +50,85 @@ function mapOpenRouterModality(orModality: string): Modality | undefined {
   }
 }
 
-interface OpenRouterModel {
-  id: string;
-  name: string;
-  context_length: number;
-  pricing: {
-    prompt: string;
-    completion: string;
-    input_cache_read?: string;
-    input_cache_write?: string;
-    /** USD per IMAGE output token (image-output models), 4-20x completion. */
-    image_output?: string;
-  };
-  architecture?: {
-    input_modalities?: string[];
-    output_modalities?: string[];
-  };
+const priceString = z
+  .string()
+  .refine(
+    (value) =>
+      value.trim() !== "" &&
+      Number.isFinite(Number(value)) &&
+      Number(value) >= 0,
+  );
+
+const pricingSchema = z.object({
+  prompt: priceString,
+  completion: priceString,
+  input_cache_read: priceString.optional(),
+  input_cache_write: priceString.optional(),
+  image_output: priceString.optional(),
+});
+
+const modelSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  context_length: z.number(),
+  pricing: pricingSchema,
+  architecture: z
+    .object({
+      input_modalities: z.array(z.string()).optional(),
+      output_modalities: z.array(z.string()).optional(),
+    })
+    .optional(),
+});
+type OpenRouterModel = z.infer<typeof modelSchema>;
+
+const endpointsSchema = z.object({
+  data: z.object({
+    endpoints: z.array(
+      z.object({
+        status: z.number(),
+        service_tier: z.string().nullish(),
+        pricing: pricingSchema,
+      }),
+    ),
+  }),
+});
+
+/** The bulk listing can quote a different host from the lowest-input route.
+ * Verify increases against live, standard-tier endpoints and keep every rate
+ * from the same endpoint. An unavailable quote cannot overwrite the catalog.
+ */
+async function fetchLowestInputPricing(
+  id: string,
+): Promise<OpenRouterModel["pricing"] | undefined> {
+  try {
+    // oxlint-disable-next-line restricted/no-raw-fetch -- external OpenRouter pricing API
+    const response = await fetch(
+      `https://openrouter.ai/api/v1/models/${id}/endpoints`,
+      {
+        signal: AbortSignal.timeout(5000),
+      },
+    );
+    if (!response.ok) {
+      return undefined;
+    }
+    const parsed = endpointsSchema.safeParse(await response.json());
+    if (!parsed.success) {
+      return undefined;
+    }
+    return parsed.data.data.endpoints
+      .filter(
+        (endpoint) =>
+          endpoint.status === 0 &&
+          (!endpoint.service_tier || endpoint.service_tier === "default"),
+      )
+      .toSorted(
+        (a, b) =>
+          Number(a.pricing.prompt) - Number(b.pricing.prompt) ||
+          Number(a.pricing.completion) - Number(b.pricing.completion),
+      )[0]?.pricing;
+  } catch {
+    return undefined;
+  }
 }
 
 export class OpenRouterTokenPriceFetcher extends PriceFetcher {
@@ -93,8 +157,14 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
           failedApiProviders: [ApiProvider.OPENROUTER],
         };
       }
-      const data = (await response.json()) as { data: OpenRouterModel[] };
-      rawModels = data.data;
+      // Variable-priced aliases can carry negative sentinel prices.
+      const data = z
+        .object({ data: z.array(z.json()) })
+        .parse(await response.json());
+      rawModels = data.data.flatMap((item) => {
+        const parsed = modelSchema.safeParse(item);
+        return parsed.success ? [parsed.data] : [];
+      });
       logger.debug("OpenRouter token API fetched", { count: rawModels.length });
     } catch (err) {
       return {
@@ -110,6 +180,10 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
 
     const modelMap = new Map(rawModels.map((m) => [m.id, m]));
 
+    const endpointPrices = new Map<
+      string,
+      OpenRouterModel["pricing"] | undefined
+    >();
     for (const def of [
       ...Object.values(chatModelDefinitions),
       ...Object.values(imageGenModelDefinitions),
@@ -132,29 +206,44 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
           continue;
         }
 
-        // USD per 1M tokens, rounded UP to the cent (never undercharge).
+        let pricing = raw.pricing;
+        if (
+          providerConfig.inputTokenCost !== undefined &&
+          Number(pricing.prompt) * 1_000_000 >
+            providerConfig.inputTokenCost + 0.00001
+        ) {
+          if (!endpointPrices.has(raw.id)) {
+            endpointPrices.set(raw.id, await fetchLowestInputPricing(raw.id));
+          }
+          const verified = endpointPrices.get(raw.id);
+          if (!verified) {
+            failures.push({
+              modelId: providerConfig.id,
+              provider: ApiProvider.OPENROUTER,
+              reason: `Could not verify live endpoint pricing for ${raw.id}`,
+            });
+            continue;
+          }
+          pricing = verified;
+        }
+
+        // USD per million tokens, preserving sub-cent cache tariffs.
         const inputTokenCost = roundUpPrice(
-          parseFloat(raw.pricing.prompt) * 1_000_000,
-          2,
+          parseFloat(pricing.prompt) * 1_000_000,
+          5,
         );
         const outputTokenCost = roundUpPrice(
-          parseFloat(raw.pricing.completion) * 1_000_000,
-          2,
+          parseFloat(pricing.completion) * 1_000_000,
+          5,
         );
-        const cacheReadTokenCost = raw.pricing.input_cache_read
-          ? roundUpPrice(
-              parseFloat(raw.pricing.input_cache_read) * 1_000_000,
-              2,
-            )
+        const cacheReadTokenCost = pricing.input_cache_read
+          ? roundUpPrice(parseFloat(pricing.input_cache_read) * 1_000_000, 5)
           : undefined;
-        const cacheWriteTokenCost = raw.pricing.input_cache_write
-          ? roundUpPrice(
-              parseFloat(raw.pricing.input_cache_write) * 1_000_000,
-              2,
-            )
+        const cacheWriteTokenCost = pricing.input_cache_write
+          ? roundUpPrice(parseFloat(pricing.input_cache_write) * 1_000_000, 5)
           : undefined;
-        const imageOutputTokenCost = raw.pricing.image_output
-          ? roundUpPrice(parseFloat(raw.pricing.image_output) * 1_000_000, 2)
+        const imageOutputTokenCost = pricing.image_output
+          ? roundUpPrice(parseFloat(pricing.image_output) * 1_000_000, 5)
           : undefined;
 
         // Find enum key for contextWindow update (check both chat and image gen enums)

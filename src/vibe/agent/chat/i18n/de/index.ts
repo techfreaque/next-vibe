@@ -880,11 +880,11 @@ export const translations: typeof enTranslations = {
       claudeFable52:
         "Claude Fable 5.2 - Anthropics Frontier-Denker. Tiefere Synthese und stabilere Langzeitplanung als Fable 5.1, zum niedrigeren Preis. 1M-Token-Kontext.",
       gpt6Astra:
-        "GPT-6 Astra - OpenAIs leistungsstärkstes Modell. Maximale Denktiefe für die schwierigsten Probleme. 1,05M-Token-Kontext.",
+        "Das frühere Astra-Spitzenmodell verarbeitet Text und Bilder und nutzt Werkzeuge. Sein Nachfolger ist GPT-6.2 Astra.",
       gpt6AstraPro:
         "GPT-6 Astra Pro - GPT-6 Astra mit erweitertem Denkaufwand. Langsamer, gründlicher. 1,05M-Token-Kontext.",
       gpt61Sol:
-        "GPT-6.1 Sol - OpenAIs Premium-Denker. Spitzenleistung zum Bruchteil des GPT-5.6-Sol-Preises. 1,05M-Token-Kontext.",
+        "Die frühere Sol-Version verarbeitet Text und Bilder und nutzt Werkzeuge. Ihr Nachfolger ist GPT-6.2 Sol.",
       gpt61SolPro:
         "GPT-6.1 Sol Pro - GPT-6.1 Sol mit erweitertem Denkaufwand für komplexe Analysen und Code. 1,05M-Token-Kontext.",
       gpt61Terra:
@@ -903,6 +903,18 @@ export const translations: typeof enTranslations = {
         "Grok 4.7 - xAIs neuester Grok. Schärfere Logik und Code, offene Inhaltsrichtlinie, Bildverständnis. 500K-Token-Kontext.",
       kimiK31Pro:
         "Kimi K3.1 Pro - Moonshot AIs stärkstes Modell. Multimodale Logik und lange Agentenläufe. 1M-Token-Kontext.",
+      gpt62Sol:
+        "Sol verarbeitet Text und Bilder, schreibt Code und ruft Werkzeuge auf.",
+      gpt62Astra:
+        "Astra nutzt Text, Bilder und Werkzeuge für anspruchsvolle Entwicklungs- und Analyseaufgaben.",
+      superGemma426b:
+        "Jiunsongs nachtrainiertes Gemma 4 verarbeitet Text mit einem Bild und kann Werkzeuge aufrufen.",
+      deepseekV41FlashCsf:
+        "jcartus abliterierte Variante von DeepSeek V4.1 Flash verarbeitet Text, löst Denkaufgaben und nutzt Werkzeuge.",
+      maiImage27:
+        "Microsofts Bildmodell erzeugt hier aus Text ein Bild in 1K-Auflösung.",
+      maiImage27Flash:
+        "Die schnellere Variante von MAI Image 2.7 erzeugt aus Text ein 1K-Bild.",
       qwen4Max:
         "Qwen 4 Max - Alibabas neues Flaggschiff. Reasoning, Code und Analyse auf Spitzenniveau, liest Bilder und Videos. 1M-Token-Kontext.",
       kimiK31ProUncensored:

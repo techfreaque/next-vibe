@@ -4653,6 +4653,10 @@
                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                           "META_MUSE_EMBER": "meta-muse-ember",
                           "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                          "GPT_6_2_SOL": "gpt-6.2-sol",
+                          "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                          "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                          "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                           "QWEN_4_MAX": "qwen-4-max",
                           "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                         }
@@ -4791,6 +4795,10 @@
                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                         "META_MUSE_EMBER": "meta-muse-ember",
                         "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                        "GPT_6_2_SOL": "gpt-6.2-sol",
+                        "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                        "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                        "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                         "QWEN_4_MAX": "qwen-4-max",
                         "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                       },
@@ -4927,6 +4935,10 @@
                         "minimax-m3.1-flash",
                         "meta-muse-ember",
                         "drummer-artemis-31b",
+                        "gpt-6.2-sol",
+                        "gpt-6.2-astra",
+                        "supergemma4-26b-uncensored",
+                        "deepseek-v4.1-flash-1017-abliterated-csf",
                         "qwen-4-max",
                         "kimi-k3.1-pro-uncensored"
                       ]
@@ -7808,6 +7820,10 @@
                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                               "META_MUSE_EMBER": "meta-muse-ember",
                               "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                              "GPT_6_2_SOL": "gpt-6.2-sol",
+                              "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                              "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                              "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                               "QWEN_4_MAX": "qwen-4-max",
                               "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                             }
@@ -7946,6 +7962,10 @@
                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                             "META_MUSE_EMBER": "meta-muse-ember",
                             "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                            "GPT_6_2_SOL": "gpt-6.2-sol",
+                            "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                            "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                            "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                             "QWEN_4_MAX": "qwen-4-max",
                             "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                           },
@@ -8082,6 +8102,10 @@
                             "minimax-m3.1-flash",
                             "meta-muse-ember",
                             "drummer-artemis-31b",
+                            "gpt-6.2-sol",
+                            "gpt-6.2-astra",
+                            "supergemma4-26b-uncensored",
+                            "deepseek-v4.1-flash-1017-abliterated-csf",
                             "qwen-4-max",
                             "kimi-k3.1-pro-uncensored"
                           ]
@@ -9033,6 +9057,22 @@
               "label": "models.names.DRUMMER_ARTEMIS_31B"
             },
             {
+              "value": "gpt-6.2-sol",
+              "label": "models.names.GPT_6_2_SOL"
+            },
+            {
+              "value": "gpt-6.2-astra",
+              "label": "models.names.GPT_6_2_ASTRA"
+            },
+            {
+              "value": "supergemma4-26b-uncensored",
+              "label": "models.names.SUPERGEMMA_4_26B"
+            },
+            {
+              "value": "deepseek-v4.1-flash-1017-abliterated-csf",
+              "label": "models.names.DEEPSEEK_V4_1_FLASH_CSF"
+            },
+            {
               "value": "qwen-4-max",
               "label": "models.names.QWEN_4_MAX"
             },
@@ -9182,6 +9222,10 @@
                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                     "META_MUSE_EMBER": "meta-muse-ember",
                     "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                    "GPT_6_2_SOL": "gpt-6.2-sol",
+                    "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                    "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                    "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                     "QWEN_4_MAX": "qwen-4-max",
                     "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                   }
@@ -9320,6 +9364,10 @@
                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                   "META_MUSE_EMBER": "meta-muse-ember",
                   "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                  "GPT_6_2_SOL": "gpt-6.2-sol",
+                  "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                  "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                  "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                   "QWEN_4_MAX": "qwen-4-max",
                   "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                 },
@@ -9456,6 +9504,10 @@
                   "minimax-m3.1-flash",
                   "meta-muse-ember",
                   "drummer-artemis-31b",
+                  "gpt-6.2-sol",
+                  "gpt-6.2-astra",
+                  "supergemma4-26b-uncensored",
+                  "deepseek-v4.1-flash-1017-abliterated-csf",
                   "qwen-4-max",
                   "kimi-k3.1-pro-uncensored"
                 ]
@@ -10812,6 +10864,8 @@
                                     "FLUX_3_KLEIN": "flux-3-klein",
                                     "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                     "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                    "MAI_IMAGE_2_7": "mai-image-2.7",
+                                    "MAI_IMAGE_2_7_FLASH": "mai-image-2.7-flash",
                                     "RECRAFT_V4_1": "recraft-v4.1",
                                     "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
                                     "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
@@ -10860,6 +10914,8 @@
                                   "FLUX_3_KLEIN": "flux-3-klein",
                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                  "MAI_IMAGE_2_7": "mai-image-2.7",
+                                  "MAI_IMAGE_2_7_FLASH": "mai-image-2.7-flash",
                                   "RECRAFT_V4_1": "recraft-v4.1",
                                   "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
                                   "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
@@ -10906,6 +10962,8 @@
                                   "flux-3-klein",
                                   "gpt-image-2.6-flare",
                                   "gpt-image-2.6-sunburst",
+                                  "mai-image-2.7",
+                                  "mai-image-2.7-flash",
                                   "recraft-v4.1",
                                   "recraft-v4.1-pro",
                                   "recraft-v4.1-flash",
@@ -11608,6 +11666,8 @@
                                   "FLUX_3_KLEIN": "flux-3-klein",
                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                  "MAI_IMAGE_2_7": "mai-image-2.7",
+                                  "MAI_IMAGE_2_7_FLASH": "mai-image-2.7-flash",
                                   "RECRAFT_V4_1": "recraft-v4.1",
                                   "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
                                   "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
@@ -11656,6 +11716,8 @@
                                 "FLUX_3_KLEIN": "flux-3-klein",
                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                "MAI_IMAGE_2_7": "mai-image-2.7",
+                                "MAI_IMAGE_2_7_FLASH": "mai-image-2.7-flash",
                                 "RECRAFT_V4_1": "recraft-v4.1",
                                 "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
                                 "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
@@ -11702,6 +11764,8 @@
                                 "flux-3-klein",
                                 "gpt-image-2.6-flare",
                                 "gpt-image-2.6-sunburst",
+                                "mai-image-2.7",
+                                "mai-image-2.7-flash",
                                 "recraft-v4.1",
                                 "recraft-v4.1-pro",
                                 "recraft-v4.1-flash",
@@ -20864,6 +20928,10 @@
                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                         "META_MUSE_EMBER": "meta-muse-ember",
                         "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                        "GPT_6_2_SOL": "gpt-6.2-sol",
+                        "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                        "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                        "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                         "QWEN_4_MAX": "qwen-4-max",
                         "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                       }
@@ -21002,6 +21070,10 @@
                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                       "META_MUSE_EMBER": "meta-muse-ember",
                       "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                      "GPT_6_2_SOL": "gpt-6.2-sol",
+                      "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                      "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                      "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                       "QWEN_4_MAX": "qwen-4-max",
                       "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                     },
@@ -21138,6 +21210,10 @@
                       "minimax-m3.1-flash",
                       "meta-muse-ember",
                       "drummer-artemis-31b",
+                      "gpt-6.2-sol",
+                      "gpt-6.2-astra",
+                      "supergemma4-26b-uncensored",
+                      "deepseek-v4.1-flash-1017-abliterated-csf",
                       "qwen-4-max",
                       "kimi-k3.1-pro-uncensored"
                     ]
@@ -23873,6 +23949,10 @@
                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                           "META_MUSE_EMBER": "meta-muse-ember",
                           "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                          "GPT_6_2_SOL": "gpt-6.2-sol",
+                          "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                          "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                          "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                           "QWEN_4_MAX": "qwen-4-max",
                           "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                         }
@@ -24011,6 +24091,10 @@
                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                         "META_MUSE_EMBER": "meta-muse-ember",
                         "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                        "GPT_6_2_SOL": "gpt-6.2-sol",
+                        "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                        "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                        "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                         "QWEN_4_MAX": "qwen-4-max",
                         "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                       },
@@ -24147,6 +24231,10 @@
                         "minimax-m3.1-flash",
                         "meta-muse-ember",
                         "drummer-artemis-31b",
+                        "gpt-6.2-sol",
+                        "gpt-6.2-astra",
+                        "supergemma4-26b-uncensored",
+                        "deepseek-v4.1-flash-1017-abliterated-csf",
                         "qwen-4-max",
                         "kimi-k3.1-pro-uncensored"
                       ]
@@ -25082,6 +25170,10 @@
                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                     "META_MUSE_EMBER": "meta-muse-ember",
                     "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                    "GPT_6_2_SOL": "gpt-6.2-sol",
+                    "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                    "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                    "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                     "QWEN_4_MAX": "qwen-4-max",
                     "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                   }
@@ -25220,6 +25312,10 @@
                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                   "META_MUSE_EMBER": "meta-muse-ember",
                   "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                  "GPT_6_2_SOL": "gpt-6.2-sol",
+                  "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                  "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                  "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                   "QWEN_4_MAX": "qwen-4-max",
                   "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                 },
@@ -25356,6 +25452,10 @@
                   "minimax-m3.1-flash",
                   "meta-muse-ember",
                   "drummer-artemis-31b",
+                  "gpt-6.2-sol",
+                  "gpt-6.2-astra",
+                  "supergemma4-26b-uncensored",
+                  "deepseek-v4.1-flash-1017-abliterated-csf",
                   "qwen-4-max",
                   "kimi-k3.1-pro-uncensored"
                 ]
@@ -26091,6 +26191,10 @@
                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                           "META_MUSE_EMBER": "meta-muse-ember",
                           "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                          "GPT_6_2_SOL": "gpt-6.2-sol",
+                          "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                          "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                          "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                           "QWEN_4_MAX": "qwen-4-max",
                           "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                         }
@@ -26229,6 +26333,10 @@
                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                         "META_MUSE_EMBER": "meta-muse-ember",
                         "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                        "GPT_6_2_SOL": "gpt-6.2-sol",
+                        "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                        "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                        "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                         "QWEN_4_MAX": "qwen-4-max",
                         "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                       },
@@ -26365,6 +26473,10 @@
                         "minimax-m3.1-flash",
                         "meta-muse-ember",
                         "drummer-artemis-31b",
+                        "gpt-6.2-sol",
+                        "gpt-6.2-astra",
+                        "supergemma4-26b-uncensored",
+                        "deepseek-v4.1-flash-1017-abliterated-csf",
                         "qwen-4-max",
                         "kimi-k3.1-pro-uncensored"
                       ]
@@ -29453,6 +29565,14 @@
               "label": "models.names.GPT_IMAGE_2_6_SUNBURST"
             },
             {
+              "value": "mai-image-2.7",
+              "label": "models.names.MAI_IMAGE_2_7"
+            },
+            {
+              "value": "mai-image-2.7-flash",
+              "label": "models.names.MAI_IMAGE_2_7_FLASH"
+            },
+            {
               "value": "recraft-v4.1",
               "label": "models.names.RECRAFT_V4_1"
             },
@@ -29543,6 +29663,8 @@
                     "FLUX_3_KLEIN": "flux-3-klein",
                     "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                     "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                    "MAI_IMAGE_2_7": "mai-image-2.7",
+                    "MAI_IMAGE_2_7_FLASH": "mai-image-2.7-flash",
                     "RECRAFT_V4_1": "recraft-v4.1",
                     "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
                     "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
@@ -29591,6 +29713,8 @@
                   "FLUX_3_KLEIN": "flux-3-klein",
                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                  "MAI_IMAGE_2_7": "mai-image-2.7",
+                  "MAI_IMAGE_2_7_FLASH": "mai-image-2.7-flash",
                   "RECRAFT_V4_1": "recraft-v4.1",
                   "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
                   "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
@@ -29637,6 +29761,8 @@
                   "flux-3-klein",
                   "gpt-image-2.6-flare",
                   "gpt-image-2.6-sunburst",
+                  "mai-image-2.7",
+                  "mai-image-2.7-flash",
                   "recraft-v4.1",
                   "recraft-v4.1-pro",
                   "recraft-v4.1-flash",
@@ -33351,6 +33477,10 @@
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                             "META_MUSE_EMBER": "meta-muse-ember",
                                             "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                            "GPT_6_2_SOL": "gpt-6.2-sol",
+                                            "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                            "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                            "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                             "QWEN_4_MAX": "qwen-4-max",
                                             "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                           }
@@ -33489,6 +33619,10 @@
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
                                           "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "GPT_6_2_SOL": "gpt-6.2-sol",
+                                          "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                          "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                          "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                           "QWEN_4_MAX": "qwen-4-max",
                                           "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                         },
@@ -33625,6 +33759,10 @@
                                           "minimax-m3.1-flash",
                                           "meta-muse-ember",
                                           "drummer-artemis-31b",
+                                          "gpt-6.2-sol",
+                                          "gpt-6.2-astra",
+                                          "supergemma4-26b-uncensored",
+                                          "deepseek-v4.1-flash-1017-abliterated-csf",
                                           "qwen-4-max",
                                           "kimi-k3.1-pro-uncensored"
                                         ]
@@ -34419,6 +34557,10 @@
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
                                           "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "GPT_6_2_SOL": "gpt-6.2-sol",
+                                          "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                          "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                          "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                           "QWEN_4_MAX": "qwen-4-max",
                                           "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                         }
@@ -34557,6 +34699,10 @@
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
                                         "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "GPT_6_2_SOL": "gpt-6.2-sol",
+                                        "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                        "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                        "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "QWEN_4_MAX": "qwen-4-max",
                                         "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       },
@@ -34693,6 +34839,10 @@
                                         "minimax-m3.1-flash",
                                         "meta-muse-ember",
                                         "drummer-artemis-31b",
+                                        "gpt-6.2-sol",
+                                        "gpt-6.2-astra",
+                                        "supergemma4-26b-uncensored",
+                                        "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "qwen-4-max",
                                         "kimi-k3.1-pro-uncensored"
                                       ]
@@ -36167,6 +36317,10 @@
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
                                           "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "GPT_6_2_SOL": "gpt-6.2-sol",
+                                          "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                          "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                          "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                           "QWEN_4_MAX": "qwen-4-max",
                                           "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                         }
@@ -36305,6 +36459,10 @@
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
                                         "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "GPT_6_2_SOL": "gpt-6.2-sol",
+                                        "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                        "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                        "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "QWEN_4_MAX": "qwen-4-max",
                                         "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       },
@@ -36441,6 +36599,10 @@
                                         "minimax-m3.1-flash",
                                         "meta-muse-ember",
                                         "drummer-artemis-31b",
+                                        "gpt-6.2-sol",
+                                        "gpt-6.2-astra",
+                                        "supergemma4-26b-uncensored",
+                                        "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "qwen-4-max",
                                         "kimi-k3.1-pro-uncensored"
                                       ]
@@ -37235,6 +37397,10 @@
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
                                         "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "GPT_6_2_SOL": "gpt-6.2-sol",
+                                        "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                        "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                        "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "QWEN_4_MAX": "qwen-4-max",
                                         "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
@@ -37373,6 +37539,10 @@
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
                                       "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "GPT_6_2_SOL": "gpt-6.2-sol",
+                                      "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                      "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                      "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                       "QWEN_4_MAX": "qwen-4-max",
                                       "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
@@ -37509,6 +37679,10 @@
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
                                       "drummer-artemis-31b",
+                                      "gpt-6.2-sol",
+                                      "gpt-6.2-astra",
+                                      "supergemma4-26b-uncensored",
+                                      "deepseek-v4.1-flash-1017-abliterated-csf",
                                       "qwen-4-max",
                                       "kimi-k3.1-pro-uncensored"
                                     ]
@@ -38889,6 +39063,8 @@
                                                   "FLUX_3_KLEIN": "flux-3-klein",
                                                   "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                   "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                  "MAI_IMAGE_2_7": "mai-image-2.7",
+                                                  "MAI_IMAGE_2_7_FLASH": "mai-image-2.7-flash",
                                                   "RECRAFT_V4_1": "recraft-v4.1",
                                                   "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
                                                   "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
@@ -38937,6 +39113,8 @@
                                                 "FLUX_3_KLEIN": "flux-3-klein",
                                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                "MAI_IMAGE_2_7": "mai-image-2.7",
+                                                "MAI_IMAGE_2_7_FLASH": "mai-image-2.7-flash",
                                                 "RECRAFT_V4_1": "recraft-v4.1",
                                                 "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
                                                 "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
@@ -38983,6 +39161,8 @@
                                                 "flux-3-klein",
                                                 "gpt-image-2.6-flare",
                                                 "gpt-image-2.6-sunburst",
+                                                "mai-image-2.7",
+                                                "mai-image-2.7-flash",
                                                 "recraft-v4.1",
                                                 "recraft-v4.1-pro",
                                                 "recraft-v4.1-flash",
@@ -39689,6 +39869,8 @@
                                                 "FLUX_3_KLEIN": "flux-3-klein",
                                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                "MAI_IMAGE_2_7": "mai-image-2.7",
+                                                "MAI_IMAGE_2_7_FLASH": "mai-image-2.7-flash",
                                                 "RECRAFT_V4_1": "recraft-v4.1",
                                                 "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
                                                 "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
@@ -39737,6 +39919,8 @@
                                               "FLUX_3_KLEIN": "flux-3-klein",
                                               "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                               "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                              "MAI_IMAGE_2_7": "mai-image-2.7",
+                                              "MAI_IMAGE_2_7_FLASH": "mai-image-2.7-flash",
                                               "RECRAFT_V4_1": "recraft-v4.1",
                                               "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
                                               "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
@@ -39783,6 +39967,8 @@
                                               "flux-3-klein",
                                               "gpt-image-2.6-flare",
                                               "gpt-image-2.6-sunburst",
+                                              "mai-image-2.7",
+                                              "mai-image-2.7-flash",
                                               "recraft-v4.1",
                                               "recraft-v4.1-pro",
                                               "recraft-v4.1-flash",
@@ -43499,6 +43685,7 @@
                                                   "KOKORO_MICHAEL": "kokoro-michael",
                                                   "KOKORO_EMMA": "kokoro-emma",
                                                   "KOKORO_GEORGE": "kokoro-george",
+                                                  "VOXTRAL_PAUL": "voxtral-paul",
                                                   "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
                                                   "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                   "XAI_EVE": "xai-eve",
@@ -43529,6 +43716,7 @@
                                                 "KOKORO_MICHAEL": "kokoro-michael",
                                                 "KOKORO_EMMA": "kokoro-emma",
                                                 "KOKORO_GEORGE": "kokoro-george",
+                                                "VOXTRAL_PAUL": "voxtral-paul",
                                                 "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
                                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                 "XAI_EVE": "xai-eve",
@@ -43557,6 +43745,7 @@
                                                 "kokoro-michael",
                                                 "kokoro-emma",
                                                 "kokoro-george",
+                                                "voxtral-paul",
                                                 "inworld-mini-ashley",
                                                 "inworld-mini-craig",
                                                 "xai-eve",
@@ -44245,6 +44434,7 @@
                                                 "KOKORO_MICHAEL": "kokoro-michael",
                                                 "KOKORO_EMMA": "kokoro-emma",
                                                 "KOKORO_GEORGE": "kokoro-george",
+                                                "VOXTRAL_PAUL": "voxtral-paul",
                                                 "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
                                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                 "XAI_EVE": "xai-eve",
@@ -44275,6 +44465,7 @@
                                               "KOKORO_MICHAEL": "kokoro-michael",
                                               "KOKORO_EMMA": "kokoro-emma",
                                               "KOKORO_GEORGE": "kokoro-george",
+                                              "VOXTRAL_PAUL": "voxtral-paul",
                                               "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
                                               "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                               "XAI_EVE": "xai-eve",
@@ -44303,6 +44494,7 @@
                                               "kokoro-michael",
                                               "kokoro-emma",
                                               "kokoro-george",
+                                              "voxtral-paul",
                                               "inworld-mini-ashley",
                                               "inworld-mini-craig",
                                               "xai-eve",
@@ -44991,6 +45183,7 @@
                                                   "OPENAI_WHISPER": "openai-whisper",
                                                   "DEEPGRAM_NOVA_2": "deepgram-nova-2",
                                                   "WHISPER_LARGE_V3": "whisper-large-v3",
+                                                  "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                   "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                   "NEMOTRON_ASR": "nemotron-asr",
                                                   "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
@@ -45001,6 +45194,7 @@
                                                 "OPENAI_WHISPER": "openai-whisper",
                                                 "DEEPGRAM_NOVA_2": "deepgram-nova-2",
                                                 "WHISPER_LARGE_V3": "whisper-large-v3",
+                                                "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                 "NEMOTRON_ASR": "nemotron-asr",
                                                 "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
@@ -45009,6 +45203,7 @@
                                                 "openai-whisper",
                                                 "deepgram-nova-2",
                                                 "whisper-large-v3",
+                                                "voxtral-small-transcribe",
                                                 "voxtral-mini-transcribe",
                                                 "nemotron-asr",
                                                 "gpt4o-mini-transcribe"
@@ -45677,6 +45872,7 @@
                                                 "OPENAI_WHISPER": "openai-whisper",
                                                 "DEEPGRAM_NOVA_2": "deepgram-nova-2",
                                                 "WHISPER_LARGE_V3": "whisper-large-v3",
+                                                "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                 "NEMOTRON_ASR": "nemotron-asr",
                                                 "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
@@ -45687,6 +45883,7 @@
                                               "OPENAI_WHISPER": "openai-whisper",
                                               "DEEPGRAM_NOVA_2": "deepgram-nova-2",
                                               "WHISPER_LARGE_V3": "whisper-large-v3",
+                                              "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                               "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                               "NEMOTRON_ASR": "nemotron-asr",
                                               "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
@@ -45695,6 +45892,7 @@
                                               "openai-whisper",
                                               "deepgram-nova-2",
                                               "whisper-large-v3",
+                                              "voxtral-small-transcribe",
                                               "voxtral-mini-transcribe",
                                               "nemotron-asr",
                                               "gpt4o-mini-transcribe"
@@ -46476,6 +46674,9 @@
                                                   "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                   "META_MUSE_EMBER": "meta-muse-ember",
                                                   "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                  "GPT_6_2_SOL": "gpt-6.2-sol",
+                                                  "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                                  "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                                   "QWEN_4_MAX": "qwen-4-max"
                                                 }
                                               },
@@ -46579,6 +46780,9 @@
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                 "META_MUSE_EMBER": "meta-muse-ember",
                                                 "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                "GPT_6_2_SOL": "gpt-6.2-sol",
+                                                "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                                "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                                 "QWEN_4_MAX": "qwen-4-max"
                                               },
                                               "options": [
@@ -46680,6 +46884,9 @@
                                                 "minimax-m3.1-flash",
                                                 "meta-muse-ember",
                                                 "drummer-artemis-31b",
+                                                "gpt-6.2-sol",
+                                                "gpt-6.2-astra",
+                                                "supergemma4-26b-uncensored",
                                                 "qwen-4-max"
                                               ]
                                             },
@@ -47441,6 +47648,9 @@
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                 "META_MUSE_EMBER": "meta-muse-ember",
                                                 "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                "GPT_6_2_SOL": "gpt-6.2-sol",
+                                                "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                                "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                                 "QWEN_4_MAX": "qwen-4-max"
                                               }
                                             },
@@ -47544,6 +47754,9 @@
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
                                               "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "GPT_6_2_SOL": "gpt-6.2-sol",
+                                              "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                              "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                               "QWEN_4_MAX": "qwen-4-max"
                                             },
                                             "options": [
@@ -47645,6 +47858,9 @@
                                               "minimax-m3.1-flash",
                                               "meta-muse-ember",
                                               "drummer-artemis-31b",
+                                              "gpt-6.2-sol",
+                                              "gpt-6.2-astra",
+                                              "supergemma4-26b-uncensored",
                                               "qwen-4-max"
                                             ]
                                           },
@@ -51535,6 +51751,10 @@
                                           "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                           "META_MUSE_EMBER": "meta-muse-ember",
                                           "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                          "GPT_6_2_SOL": "gpt-6.2-sol",
+                                          "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                          "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                          "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                           "QWEN_4_MAX": "qwen-4-max",
                                           "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                         }
@@ -51673,6 +51893,10 @@
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
                                         "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "GPT_6_2_SOL": "gpt-6.2-sol",
+                                        "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                        "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                        "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "QWEN_4_MAX": "qwen-4-max",
                                         "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       },
@@ -51809,6 +52033,10 @@
                                         "minimax-m3.1-flash",
                                         "meta-muse-ember",
                                         "drummer-artemis-31b",
+                                        "gpt-6.2-sol",
+                                        "gpt-6.2-astra",
+                                        "supergemma4-26b-uncensored",
+                                        "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "qwen-4-max",
                                         "kimi-k3.1-pro-uncensored"
                                       ]
@@ -52603,6 +52831,10 @@
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
                                         "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "GPT_6_2_SOL": "gpt-6.2-sol",
+                                        "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                        "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                        "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "QWEN_4_MAX": "qwen-4-max",
                                         "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
@@ -52741,6 +52973,10 @@
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
                                       "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "GPT_6_2_SOL": "gpt-6.2-sol",
+                                      "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                      "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                      "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                       "QWEN_4_MAX": "qwen-4-max",
                                       "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
@@ -52877,6 +53113,10 @@
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
                                       "drummer-artemis-31b",
+                                      "gpt-6.2-sol",
+                                      "gpt-6.2-astra",
+                                      "supergemma4-26b-uncensored",
+                                      "deepseek-v4.1-flash-1017-abliterated-csf",
                                       "qwen-4-max",
                                       "kimi-k3.1-pro-uncensored"
                                     ]
@@ -54349,6 +54589,10 @@
                                         "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                         "META_MUSE_EMBER": "meta-muse-ember",
                                         "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                        "GPT_6_2_SOL": "gpt-6.2-sol",
+                                        "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                        "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                        "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                         "QWEN_4_MAX": "qwen-4-max",
                                         "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                       }
@@ -54487,6 +54731,10 @@
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
                                       "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "GPT_6_2_SOL": "gpt-6.2-sol",
+                                      "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                      "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                      "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                       "QWEN_4_MAX": "qwen-4-max",
                                       "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     },
@@ -54623,6 +54871,10 @@
                                       "minimax-m3.1-flash",
                                       "meta-muse-ember",
                                       "drummer-artemis-31b",
+                                      "gpt-6.2-sol",
+                                      "gpt-6.2-astra",
+                                      "supergemma4-26b-uncensored",
+                                      "deepseek-v4.1-flash-1017-abliterated-csf",
                                       "qwen-4-max",
                                       "kimi-k3.1-pro-uncensored"
                                     ]
@@ -55415,6 +55667,10 @@
                                       "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                       "META_MUSE_EMBER": "meta-muse-ember",
                                       "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                      "GPT_6_2_SOL": "gpt-6.2-sol",
+                                      "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                      "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                      "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                       "QWEN_4_MAX": "qwen-4-max",
                                       "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                     }
@@ -55553,6 +55809,10 @@
                                     "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                     "META_MUSE_EMBER": "meta-muse-ember",
                                     "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                    "GPT_6_2_SOL": "gpt-6.2-sol",
+                                    "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                    "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                    "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                     "QWEN_4_MAX": "qwen-4-max",
                                     "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                                   },
@@ -55689,6 +55949,10 @@
                                     "minimax-m3.1-flash",
                                     "meta-muse-ember",
                                     "drummer-artemis-31b",
+                                    "gpt-6.2-sol",
+                                    "gpt-6.2-astra",
+                                    "supergemma4-26b-uncensored",
+                                    "deepseek-v4.1-flash-1017-abliterated-csf",
                                     "qwen-4-max",
                                     "kimi-k3.1-pro-uncensored"
                                   ]
@@ -57069,6 +57333,8 @@
                                                 "FLUX_3_KLEIN": "flux-3-klein",
                                                 "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                                 "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                                "MAI_IMAGE_2_7": "mai-image-2.7",
+                                                "MAI_IMAGE_2_7_FLASH": "mai-image-2.7-flash",
                                                 "RECRAFT_V4_1": "recraft-v4.1",
                                                 "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
                                                 "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
@@ -57117,6 +57383,8 @@
                                               "FLUX_3_KLEIN": "flux-3-klein",
                                               "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                               "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                              "MAI_IMAGE_2_7": "mai-image-2.7",
+                                              "MAI_IMAGE_2_7_FLASH": "mai-image-2.7-flash",
                                               "RECRAFT_V4_1": "recraft-v4.1",
                                               "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
                                               "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
@@ -57163,6 +57431,8 @@
                                               "flux-3-klein",
                                               "gpt-image-2.6-flare",
                                               "gpt-image-2.6-sunburst",
+                                              "mai-image-2.7",
+                                              "mai-image-2.7-flash",
                                               "recraft-v4.1",
                                               "recraft-v4.1-pro",
                                               "recraft-v4.1-flash",
@@ -57869,6 +58139,8 @@
                                               "FLUX_3_KLEIN": "flux-3-klein",
                                               "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                               "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                              "MAI_IMAGE_2_7": "mai-image-2.7",
+                                              "MAI_IMAGE_2_7_FLASH": "mai-image-2.7-flash",
                                               "RECRAFT_V4_1": "recraft-v4.1",
                                               "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
                                               "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
@@ -57917,6 +58189,8 @@
                                             "FLUX_3_KLEIN": "flux-3-klein",
                                             "GPT_IMAGE_2_6_FLARE": "gpt-image-2.6-flare",
                                             "GPT_IMAGE_2_6_SUNBURST": "gpt-image-2.6-sunburst",
+                                            "MAI_IMAGE_2_7": "mai-image-2.7",
+                                            "MAI_IMAGE_2_7_FLASH": "mai-image-2.7-flash",
                                             "RECRAFT_V4_1": "recraft-v4.1",
                                             "RECRAFT_V4_1_PRO": "recraft-v4.1-pro",
                                             "RECRAFT_V4_1_FLASH": "recraft-v4.1-flash",
@@ -57963,6 +58237,8 @@
                                             "flux-3-klein",
                                             "gpt-image-2.6-flare",
                                             "gpt-image-2.6-sunburst",
+                                            "mai-image-2.7",
+                                            "mai-image-2.7-flash",
                                             "recraft-v4.1",
                                             "recraft-v4.1-pro",
                                             "recraft-v4.1-flash",
@@ -61679,6 +61955,7 @@
                                                 "KOKORO_MICHAEL": "kokoro-michael",
                                                 "KOKORO_EMMA": "kokoro-emma",
                                                 "KOKORO_GEORGE": "kokoro-george",
+                                                "VOXTRAL_PAUL": "voxtral-paul",
                                                 "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
                                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                 "XAI_EVE": "xai-eve",
@@ -61709,6 +61986,7 @@
                                               "KOKORO_MICHAEL": "kokoro-michael",
                                               "KOKORO_EMMA": "kokoro-emma",
                                               "KOKORO_GEORGE": "kokoro-george",
+                                              "VOXTRAL_PAUL": "voxtral-paul",
                                               "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
                                               "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                               "XAI_EVE": "xai-eve",
@@ -61737,6 +62015,7 @@
                                               "kokoro-michael",
                                               "kokoro-emma",
                                               "kokoro-george",
+                                              "voxtral-paul",
                                               "inworld-mini-ashley",
                                               "inworld-mini-craig",
                                               "xai-eve",
@@ -62425,6 +62704,7 @@
                                               "KOKORO_MICHAEL": "kokoro-michael",
                                               "KOKORO_EMMA": "kokoro-emma",
                                               "KOKORO_GEORGE": "kokoro-george",
+                                              "VOXTRAL_PAUL": "voxtral-paul",
                                               "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
                                               "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                               "XAI_EVE": "xai-eve",
@@ -62455,6 +62735,7 @@
                                             "KOKORO_MICHAEL": "kokoro-michael",
                                             "KOKORO_EMMA": "kokoro-emma",
                                             "KOKORO_GEORGE": "kokoro-george",
+                                            "VOXTRAL_PAUL": "voxtral-paul",
                                             "INWORLD_MINI_ASHLEY": "inworld-mini-ashley",
                                             "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                             "XAI_EVE": "xai-eve",
@@ -62483,6 +62764,7 @@
                                             "kokoro-michael",
                                             "kokoro-emma",
                                             "kokoro-george",
+                                            "voxtral-paul",
                                             "inworld-mini-ashley",
                                             "inworld-mini-craig",
                                             "xai-eve",
@@ -63171,6 +63453,7 @@
                                                 "OPENAI_WHISPER": "openai-whisper",
                                                 "DEEPGRAM_NOVA_2": "deepgram-nova-2",
                                                 "WHISPER_LARGE_V3": "whisper-large-v3",
+                                                "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                 "NEMOTRON_ASR": "nemotron-asr",
                                                 "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
@@ -63181,6 +63464,7 @@
                                               "OPENAI_WHISPER": "openai-whisper",
                                               "DEEPGRAM_NOVA_2": "deepgram-nova-2",
                                               "WHISPER_LARGE_V3": "whisper-large-v3",
+                                              "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                               "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                               "NEMOTRON_ASR": "nemotron-asr",
                                               "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
@@ -63189,6 +63473,7 @@
                                               "openai-whisper",
                                               "deepgram-nova-2",
                                               "whisper-large-v3",
+                                              "voxtral-small-transcribe",
                                               "voxtral-mini-transcribe",
                                               "nemotron-asr",
                                               "gpt4o-mini-transcribe"
@@ -63857,6 +64142,7 @@
                                               "OPENAI_WHISPER": "openai-whisper",
                                               "DEEPGRAM_NOVA_2": "deepgram-nova-2",
                                               "WHISPER_LARGE_V3": "whisper-large-v3",
+                                              "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                               "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                               "NEMOTRON_ASR": "nemotron-asr",
                                               "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
@@ -63867,6 +64153,7 @@
                                             "OPENAI_WHISPER": "openai-whisper",
                                             "DEEPGRAM_NOVA_2": "deepgram-nova-2",
                                             "WHISPER_LARGE_V3": "whisper-large-v3",
+                                            "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                             "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                             "NEMOTRON_ASR": "nemotron-asr",
                                             "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
@@ -63875,6 +64162,7 @@
                                             "openai-whisper",
                                             "deepgram-nova-2",
                                             "whisper-large-v3",
+                                            "voxtral-small-transcribe",
                                             "voxtral-mini-transcribe",
                                             "nemotron-asr",
                                             "gpt4o-mini-transcribe"
@@ -64656,6 +64944,9 @@
                                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                                 "META_MUSE_EMBER": "meta-muse-ember",
                                                 "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                                "GPT_6_2_SOL": "gpt-6.2-sol",
+                                                "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                                "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                                 "QWEN_4_MAX": "qwen-4-max"
                                               }
                                             },
@@ -64759,6 +65050,9 @@
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
                                               "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "GPT_6_2_SOL": "gpt-6.2-sol",
+                                              "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                              "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                               "QWEN_4_MAX": "qwen-4-max"
                                             },
                                             "options": [
@@ -64860,6 +65154,9 @@
                                               "minimax-m3.1-flash",
                                               "meta-muse-ember",
                                               "drummer-artemis-31b",
+                                              "gpt-6.2-sol",
+                                              "gpt-6.2-astra",
+                                              "supergemma4-26b-uncensored",
                                               "qwen-4-max"
                                             ]
                                           },
@@ -65621,6 +65918,9 @@
                                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                               "META_MUSE_EMBER": "meta-muse-ember",
                                               "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                              "GPT_6_2_SOL": "gpt-6.2-sol",
+                                              "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                              "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                               "QWEN_4_MAX": "qwen-4-max"
                                             }
                                           },
@@ -65724,6 +66024,9 @@
                                             "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                             "META_MUSE_EMBER": "meta-muse-ember",
                                             "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                            "GPT_6_2_SOL": "gpt-6.2-sol",
+                                            "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                            "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
                                             "QWEN_4_MAX": "qwen-4-max"
                                           },
                                           "options": [
@@ -65825,6 +66128,9 @@
                                             "minimax-m3.1-flash",
                                             "meta-muse-ember",
                                             "drummer-artemis-31b",
+                                            "gpt-6.2-sol",
+                                            "gpt-6.2-astra",
+                                            "supergemma4-26b-uncensored",
                                             "qwen-4-max"
                                           ]
                                         },
@@ -70233,7 +70539,7 @@
           "variant": "muted",
           "label": "Choose from {{count}} models with fine-tuned control over intelligence, content, and cost",
           "contentParams": {
-            "count": 253
+            "count": 261
           },
           "usage": {
             "response": true
@@ -70756,6 +71062,10 @@
                                 "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                                 "META_MUSE_EMBER": "meta-muse-ember",
                                 "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                                "GPT_6_2_SOL": "gpt-6.2-sol",
+                                "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                                "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                                "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                                 "QWEN_4_MAX": "qwen-4-max",
                                 "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                               }
@@ -70894,6 +71204,10 @@
                               "MINIMAX_M3_1_FLASH": "minimax-m3.1-flash",
                               "META_MUSE_EMBER": "meta-muse-ember",
                               "DRUMMER_ARTEMIS_31B": "drummer-artemis-31b",
+                              "GPT_6_2_SOL": "gpt-6.2-sol",
+                              "GPT_6_2_ASTRA": "gpt-6.2-astra",
+                              "SUPERGEMMA_4_26B": "supergemma4-26b-uncensored",
+                              "DEEPSEEK_V4_1_FLASH_CSF": "deepseek-v4.1-flash-1017-abliterated-csf",
                               "QWEN_4_MAX": "qwen-4-max",
                               "KIMI_K3_1_PRO_UNCENSORED": "kimi-k3.1-pro-uncensored"
                             },
@@ -71030,6 +71344,10 @@
                               "minimax-m3.1-flash",
                               "meta-muse-ember",
                               "drummer-artemis-31b",
+                              "gpt-6.2-sol",
+                              "gpt-6.2-astra",
+                              "supergemma4-26b-uncensored",
+                              "deepseek-v4.1-flash-1017-abliterated-csf",
                               "qwen-4-max",
                               "kimi-k3.1-pro-uncensored"
                             ]

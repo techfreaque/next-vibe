@@ -5,6 +5,7 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import {
   ApiProvider,
   calculateCreditCost,
+  calculateTokenCostUsd,
   DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS,
   estimateTurnCredits,
   getEstimatedImageOutputTokens,
@@ -225,6 +226,18 @@ describe("TokenAccumulator multi-step billing", () => {
 
   it("unbilledCompletedSteps is null when no step finished", () => {
     expect(TokenAccumulator.unbilledCompletedSteps(freshCounters())).toBeNull();
+  });
+});
+
+describe("GPT-6.2 Sol long-context fallback pricing", () => {
+  it("switches the entire step to the higher tariff at 272,000 input tokens", () => {
+    const model = getChatModelById(ChatModelId.GPT_6_2_SOL);
+    expect(calculateTokenCostUsd(model, 271999, 100, 1000, 100)).toBeCloseTo(
+      (270999 * 2 + 1000 * 0.1 + 100 * 2.5 + 100 * 10) / 1_000_000, 12,
+    );
+    expect(calculateTokenCostUsd(model, 272000, 100, 1000, 100)).toBeCloseTo(
+      (271000 * 4 + 1000 * 0.2 + 100 * 5 + 100 * 15) / 1_000_000, 12,
+    );
   });
 });
 

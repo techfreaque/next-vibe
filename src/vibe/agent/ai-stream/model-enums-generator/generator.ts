@@ -29,6 +29,7 @@ export const generator: GeneratorDefinition = {
     const agentDir = join(getSrcDir(), "vibe", "agent");
     return [
       join(agentDir, "ai-stream", "models.ts"),
+      join(agentDir, "ai-stream", "models-definitions.ts"),
       join(agentDir, "image-generation", "models.ts"),
       join(agentDir, "video-generation", "models.ts"),
       join(agentDir, "music-generation", "models.ts"),

@@ -40,6 +40,7 @@ interface VeniceModel {
   id: string;
   model_spec?: {
     availableContextTokens?: number;
+    constraints?: { defaultResolution?: string };
     pricing?: {
       input?: VeniceUsdPrice;
       output?: VeniceUsdPrice;
@@ -49,6 +50,7 @@ interface VeniceModel {
       extended?: { context_token_threshold?: number };
       /** Image models: flat USD per generation */
       generation?: VeniceUsdPrice;
+      resolutions?: Record<string, VeniceUsdPrice>;
     };
     capabilities?: { supportsVision?: boolean };
   };
@@ -144,8 +146,13 @@ export class VenicePriceFetcher extends PriceFetcher {
         ) {
           continue;
         }
-        const usd = imageById.get(providerConfig.providerModel)?.model_spec
-          ?.pricing?.generation?.usd;
+        const spec = imageById.get(providerConfig.providerModel)?.model_spec;
+        const resolution = spec?.constraints?.defaultResolution;
+        const usd =
+          spec?.pricing?.generation?.usd ??
+          (resolution
+            ? spec?.pricing?.resolutions?.[resolution]?.usd
+            : undefined);
         if (usd === undefined) {
           failures.push({
             modelId: providerConfig.id,

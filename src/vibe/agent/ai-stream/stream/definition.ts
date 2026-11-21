@@ -674,7 +674,7 @@ const { POST } = createEndpoint({
         parentMessageId: null,
         content: "Write a marketing email for our new product launch",
         role: ChatMessageRole.USER,
-        model: ChatModelId.GPT_6_1_SOL,
+        model: ChatModelId.GPT_6_2_SOL,
         skill: "professional",
         favoriteConfig: null,
         toolConfirmations: null,

@@ -873,11 +873,11 @@ export const translations = {
       claudeFable52:
         "Claude Fable 5.2 - Anthropic's frontier reasoner. Deeper synthesis and steadier long-horizon planning than Fable 5.1, at a lower price. 1M-token context.",
       gpt6Astra:
-        "GPT-6 Astra - OpenAI's most capable model. Maximum reasoning depth for the hardest problems. 1.05M-token context.",
+        "The previous Astra flagship supports text, images and tools. Its successor is GPT-6.2 Astra.",
       gpt6AstraPro:
         "GPT-6 Astra Pro - GPT-6 Astra with extended reasoning effort. Slower, more thorough. 1.05M-token context.",
       gpt61Sol:
-        "GPT-6.1 Sol - OpenAI's premium reasoner. Frontier performance at a fraction of GPT-5.6 Sol's price. 1.05M-token context.",
+        "The previous Sol release supports text, images and tools. Its successor is GPT-6.2 Sol.",
       gpt61SolPro:
         "GPT-6.1 Sol Pro - GPT-6.1 Sol with extended reasoning effort for complex analysis and code. 1.05M-token context.",
       gpt61Terra:
@@ -896,6 +896,17 @@ export const translations = {
         "Grok 4.7 - xAI's latest Grok. Sharper reasoning and code, open content policy, vision. 500K-token context.",
       kimiK31Pro:
         "Kimi K3.1 Pro - Moonshot AI's strongest model. Multimodal reasoning and long agent runs. 1M-token context.",
+      gpt62Sol: "Sol reads text and images, writes code and calls tools.",
+      gpt62Astra:
+        "Astra handles complex engineering and analysis with text, images and tools.",
+      superGemma426b:
+        "Jiunsong’s fine-tuned Gemma 4 reads one image alongside text and can call tools.",
+      deepseekV41FlashCsf:
+        "jcartu’s abliterated DeepSeek V4.1 Flash handles text, reasoning and tool calls.",
+      maiImage27:
+        "Microsoft’s text-to-image model renders at 1K on this route.",
+      maiImage27Flash:
+        "The faster MAI Image 2.7 variant renders a 1K image from text.",
       qwen4Max:
         "Qwen 4 Max - Alibaba's new flagship. Frontier reasoning, code and analysis, reads images and video. 1M-token context.",
       kimiK31ProUncensored:

@@ -870,11 +870,11 @@ export const translations: typeof enTranslations = {
       claudeFable52:
         "Claude Fable 5.2 - Graniczny model rozumujący Anthropic. Głębsza synteza i pewniejsze planowanie długoterminowe niż Fable 5.1, w niższej cenie. Kontekst 1M tokenów.",
       gpt6Astra:
-        "GPT-6 Astra - Najpotężniejszy model OpenAI. Maksymalna głębia rozumowania na najtrudniejsze problemy. Kontekst 1,05M tokenów.",
+        "Poprzedni flagowy model Astra obsługuje tekst, obrazy i narzędzia. Jego następcą jest GPT-6.2 Astra.",
       gpt6AstraPro:
         "GPT-6 Astra Pro - GPT-6 Astra z rozszerzonym rozumowaniem. Wolniej, ale dokładniej. Kontekst 1,05M tokenów.",
       gpt61Sol:
-        "GPT-6.1 Sol - Premium model rozumujący OpenAI. Najwyższa wydajność za ułamek ceny GPT-5.6 Sol. Kontekst 1,05M tokenów.",
+        "Poprzednia wersja Sol obsługuje tekst, obrazy i narzędzia. Jej następcą jest GPT-6.2 Sol.",
       gpt61SolPro:
         "GPT-6.1 Sol Pro - GPT-6.1 Sol z rozszerzonym rozumowaniem do złożonej analizy i kodu. Kontekst 1,05M tokenów.",
       gpt61Terra:
@@ -893,6 +893,18 @@ export const translations: typeof enTranslations = {
         "Grok 4.7 - Najnowszy Grok od xAI. Ostrzejsze rozumowanie i kod, otwarta polityka treści, obrazy. Kontekst 500K tokenów.",
       kimiK31Pro:
         "Kimi K3.1 Pro - Najmocniejszy model Moonshot AI. Rozumowanie multimodalne i długie przebiegi agentów. Kontekst 1M tokenów.",
+      gpt62Sol:
+        "Sol analizuje tekst i obrazy, pisze kod i korzysta z narzędzi.",
+      gpt62Astra:
+        "Astra wykorzystuje tekst, obrazy i narzędzia do złożonych zadań inżynierskich i analitycznych.",
+      superGemma426b:
+        "Wersja Gemma 4 dostrojona przez Jiunsonga przyjmuje tekst z jednym obrazem i korzysta z narzędzi.",
+      deepseekV41FlashCsf:
+        "Wariant DeepSeek V4.1 Flash po abliteracji autorstwa jcartu analizuje tekst, rozumuje i korzysta z narzędzi.",
+      maiImage27:
+        "Model Microsoftu tworzy tu obrazy w rozdzielczości 1K na podstawie opisu.",
+      maiImage27Flash:
+        "Szybszy wariant MAI Image 2.7 tworzy obraz w rozdzielczości 1K na podstawie opisu.",
       qwen4Max:
         "Qwen 4 Max - Nowy flagowiec Alibaby. Rozumowanie, kod i analiza na najwyższym poziomie, czyta obrazy i wideo. Kontekst 1M tokenów.",
       kimiK31ProUncensored:

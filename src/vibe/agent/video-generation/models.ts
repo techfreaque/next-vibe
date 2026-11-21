@@ -86,45 +86,9 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
+    inputs: ["text"],
     outputs: ["video"], // updated: 2026-04-04 from video-gen-deterministic
     providers: [
-      {
-        id: VideoGenModelId.WAN_2_7_T2V,
-        apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "alibaba/wan-2.7",
-        creditCostPerSecond: 10, // updated: 2026-07-10 from openrouter.ai
-        allowedPassthroughParameters: [
-          "negative_prompt",
-          "prompt_extend",
-          "audio",
-          "ratio",
-          "last_image",
-          "video",
-          "videos",
-          "images",
-        ], // updated: 2026-11-09 from openrouter.ai
-        supportedSizes: [
-          "1280x720",
-          "720x1280",
-          "1920x1080",
-          "1080x1920",
-          "720x720",
-          "1080x1080",
-          "960x720",
-          "720x960",
-          "1440x1080",
-          "1080x1440",
-        ], // updated: 2026-11-09 from openrouter.ai
-        generateAudio: true, // updated: 2026-07-10 from openrouter.ai
-        supportedFrameImages: ["first_frame", "last_frame"], // updated: 2026-11-09 from openrouter.ai
-        maxDurationSeconds: 10, // updated: 2026-07-10 from openrouter.ai
-        minDurationSeconds: 2, // updated: 2026-07-10 from openrouter.ai
-        supportedDurations: ["2", "3", "4", "5", "6", "7", "8", "9", "10"], // updated: 2026-11-09 from openrouter.ai
-        supportedResolutions: ["720p", "1080p"], // updated: 2026-11-09 from openrouter.ai
-        supportedAspectRatios: ["16:9", "9:16", "1:1", "4:3", "3:4"], // updated: 2026-11-09 from openrouter.ai
-        defaultDurationSeconds: 5,
-      },
       {
         id: VideoGenModelId.WAN_2_7_T2V,
         apiProvider: ApiProvider.MODELSLAB,
@@ -187,32 +151,6 @@ export const videoGenModelDefinitions: Record<
     inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
-      {
-        id: VideoGenModelId.WAN_2_6_I2V,
-        apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "alibaba/wan-2.6",
-        // Image-to-video SKU: OpenRouter bills 0.10/0.15 $/s once a frame is
-        // attached (text-only 0.08/0.12). This is the I2V model, so bill the
-        // image rate and never under-bill.
-        creditCostPerSecond: 10, // updated: 2026-11-15 from openrouter.ai
-        allowedPassthroughParameters: [
-          "negative_prompt",
-          "enable_prompt_expansion",
-          "shot_type",
-          "audio",
-          "size",
-        ], // updated: 2026-11-09 from openrouter.ai
-        supportedSizes: ["1280x720", "1080x1920", "720x1280", "1920x1080"], // updated: 2026-11-09 from openrouter.ai
-        generateAudio: true, // updated: 2026-07-10 from openrouter.ai
-        supportedFrameImages: ["first_frame"], // updated: 2026-07-10 from openrouter.ai
-        maxDurationSeconds: 10, // updated: 2026-07-10 from openrouter.ai
-        minDurationSeconds: 5, // updated: 2026-07-10 from openrouter.ai
-        supportedDurations: ["5", "10"], // updated: 2026-11-09 from openrouter.ai
-        supportedResolutions: ["720p", "1080p"], // updated: 2026-11-09 from openrouter.ai
-        supportedAspectRatios: ["16:9", "9:16"], // updated: 2026-11-09 from openrouter.ai
-        pricingByResolution: { "720p": 10, "1080p": 15 }, // updated: 2026-11-15 from openrouter.ai
-        defaultDurationSeconds: 5,
-      },
       {
         id: VideoGenModelId.WAN_2_6_I2V,
         apiProvider: ApiProvider.MODELSLAB,
@@ -709,39 +647,9 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
+    inputs: ["text"],
     outputs: ["video"], // updated: 2026-04-03 from video-gen-deterministic
     providers: [
-      {
-        id: VideoGenModelId.KLING_3_0_T2V,
-        apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "kwaivgi/kling-v3.0-pro",
-        creditCostPerSecond: 16.8, // updated: 2026-11-15 from openrouter.ai (with-audio SKU; generate_audio is always sent)
-        allowedPassthroughParameters: ["negative_prompt", "cfg_scale"], // updated: 2026-11-09 from openrouter.ai
-        supportedSizes: ["1280x720", "720x1280", "720x720"], // updated: 2026-11-09 from openrouter.ai
-        generateAudio: true, // updated: 2026-07-10 from openrouter.ai
-        supportedFrameImages: ["first_frame", "last_frame"], // updated: 2026-11-09 from openrouter.ai
-        maxDurationSeconds: 15, // updated: 2026-07-10 from openrouter.ai
-        minDurationSeconds: 3, // updated: 2026-07-10 from openrouter.ai
-        supportedDurations: [
-          "3",
-          "4",
-          "5",
-          "6",
-          "7",
-          "8",
-          "9",
-          "10",
-          "11",
-          "12",
-          "13",
-          "14",
-          "15",
-        ], // updated: 2026-11-09 from openrouter.ai
-        supportedResolutions: ["720p"], // updated: 2026-07-10 from openrouter.ai
-        supportedAspectRatios: ["16:9", "9:16", "1:1"], // updated: 2026-11-09 from openrouter.ai
-        defaultDurationSeconds: 5,
-      },
       {
         id: VideoGenModelId.KLING_3_0_T2V,
         apiProvider: ApiProvider.MODELSLAB,
@@ -1409,39 +1317,9 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
+    inputs: ["text"],
     outputs: ["video"], // updated: 2026-07-10 from video-gen-deterministic
     providers: [
-      {
-        id: VideoGenModelId.KLING_V3_STD_T2V,
-        apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "kwaivgi/kling-v3.0-std",
-        creditCostPerSecond: 12.6, // updated: 2026-11-15 from openrouter.ai (with-audio SKU; generate_audio is always sent)
-        allowedPassthroughParameters: ["negative_prompt", "cfg_scale"], // updated: 2026-11-09 from openrouter.ai
-        supportedSizes: ["1280x720", "720x1280", "720x720"], // updated: 2026-11-09 from openrouter.ai
-        generateAudio: true, // updated: 2026-07-10 from openrouter.ai
-        supportedFrameImages: ["first_frame", "last_frame"], // updated: 2026-11-09 from openrouter.ai
-        maxDurationSeconds: 15, // updated: 2026-07-10 from openrouter.ai
-        minDurationSeconds: 3, // updated: 2026-07-10 from openrouter.ai
-        supportedDurations: [
-          "3",
-          "4",
-          "5",
-          "6",
-          "7",
-          "8",
-          "9",
-          "10",
-          "11",
-          "12",
-          "13",
-          "14",
-          "15",
-        ], // updated: 2026-11-09 from openrouter.ai
-        supportedResolutions: ["720p"], // updated: 2026-07-10 from openrouter.ai
-        supportedAspectRatios: ["16:9", "9:16", "1:1"], // updated: 2026-11-09 from openrouter.ai
-        defaultDurationSeconds: 5,
-      },
       {
         id: VideoGenModelId.KLING_V3_STD_T2V,
         apiProvider: ApiProvider.UNBOTTLED,
@@ -1470,7 +1348,11 @@ export const videoGenModelDefinitions: Record<
         supportedSizes: ["1280x720", "720x1280", "720x720"],
       },
     ],
-    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.VIDEO_GEN,
+      ModelUtility.CREATIVE,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.SMART,
     content: ContentLevel.OPEN,
@@ -1484,25 +1366,9 @@ export const videoGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "video",
-    inputs: ["text", "image"], // updated: 2026-11-13 from video-gen-provider-routes
+    inputs: ["text"],
     outputs: ["video"], // updated: 2026-07-10 from video-gen-deterministic
     providers: [
-      {
-        id: VideoGenModelId.KLING_VIDEO_O1,
-        apiProvider: ApiProvider.OPENROUTER,
-        providerModel: "kwaivgi/kling-video-o1",
-        creditCostPerSecond: 11.2, // updated: 2026-07-10 from openrouter.ai
-        allowedPassthroughParameters: ["negative_prompt"], // updated: 2026-07-10 from openrouter.ai
-        supportedSizes: ["1280x720", "720x1280", "720x720"], // updated: 2026-11-09 from openrouter.ai
-        generateAudio: true, // updated: 2026-07-10 from openrouter.ai
-        supportedFrameImages: ["first_frame", "last_frame"], // updated: 2026-11-09 from openrouter.ai
-        maxDurationSeconds: 10, // updated: 2026-07-10 from openrouter.ai
-        minDurationSeconds: 5, // updated: 2026-07-10 from openrouter.ai
-        supportedDurations: ["5", "10"], // updated: 2026-11-09 from openrouter.ai
-        supportedResolutions: ["720p"], // updated: 2026-07-10 from openrouter.ai
-        supportedAspectRatios: ["16:9", "9:16", "1:1"], // updated: 2026-11-09 from openrouter.ai
-        defaultDurationSeconds: 5,
-      },
       {
         id: VideoGenModelId.KLING_VIDEO_O1,
         apiProvider: ApiProvider.UNBOTTLED,
@@ -1517,7 +1383,11 @@ export const videoGenModelDefinitions: Record<
         supportedSizes: ["1280x720", "720x1280", "720x720"],
       },
     ],
-    utilities: [ModelUtility.VIDEO_GEN, ModelUtility.CREATIVE],
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.VIDEO_GEN,
+      ModelUtility.CREATIVE,
+    ],
     supportsTools: false,
     intelligence: IntelligenceLevel.BRILLIANT,
     content: ContentLevel.OPEN,

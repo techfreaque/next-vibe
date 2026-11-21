@@ -418,7 +418,7 @@ export const FEATURED_COMPARISON_PAIRS: readonly (readonly [
     ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
   ],
   // Own worldview vs the mainstream and open flagships.
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_1_SOL],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_2_SOL],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.CLAUDE_SONNET_5_5],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GROK_4_7],
 ];

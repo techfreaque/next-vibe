@@ -222,7 +222,7 @@ export const translations: typeof enTranslations = {
       claudeHaiku:
         "Schneller, günstiger Claude für kurze Antworten, Zusammenfassungen und einfachen Code. Liest auch Screenshots.",
       gptSol:
-        "OpenAIs Flaggschiff für Logik, Code und lange Analysen. Die Wahl für GPT-Qualität bei schweren Problemen.",
+        "Sol eignet sich für tägliche Programmieraufgaben, Dokumentanalysen und den Einsatz von Werkzeugen. Es verarbeitet Text und Bilder.",
       gptLuna:
         "OpenAIs schnelles, günstiges Modell für Alltagschat und kurze Recherchen.",
       geminiArgon:
