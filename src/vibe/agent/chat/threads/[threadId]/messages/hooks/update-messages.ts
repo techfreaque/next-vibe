@@ -225,7 +225,7 @@ export function addErrorMessageToChat(
   errorCode: string | null = null,
   sequenceId: string | null = null,
   logger: EndpointLogger,
-): void {
+): string {
   const msgs = getCachedMessages(threadId, rootFolderId, logger);
   // The leaf is the newest REAL message: the optimistic assistant placeholder
   // is removed below, so anchoring on it would leave the error bubble (and the
@@ -245,7 +245,7 @@ export function addErrorMessageToChat(
       errorMessage: content,
       errorCode,
     });
-    return;
+    return leafMsg.id;
   }
 
   for (const m of msgs) {
@@ -260,8 +260,9 @@ export function addErrorMessageToChat(
     removeMessage(threadId, rootFolderId, logger, leafMsg.id);
   }
 
+  const errorMessageId = crypto.randomUUID();
   upsertMessage(threadId, rootFolderId, logger, {
-    id: crypto.randomUUID(),
+    id: errorMessageId,
     threadId,
     role: ChatMessageRole.ERROR,
     content,
@@ -283,4 +284,5 @@ export function addErrorMessageToChat(
     createdAt: new Date(),
     updatedAt: new Date(),
   });
+  return errorMessageId;
 }

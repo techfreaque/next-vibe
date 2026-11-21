@@ -80,6 +80,13 @@ export function fileResponseSecurityHeaders(
 
 /** Client-minted ids are uuids; accept any short token, never arbitrary text. */
 const REQUEST_ID_PATTERN = /^[A-Za-z0-9_-]{8,64}$/;
+const TRANSPORT_TRACE_ENDPOINTS = new Set([
+  "credits",
+  "user/public/signup",
+  "leads/tracking",
+  "vibe/agent/ai-stream/stream",
+  "vibe/agent/skills/[id]",
+]);
 
 /**
  * Correlation id for this request: the browser's x-request-id when present
@@ -124,6 +131,8 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
   T["types"]["UrlVariablesOutput"]
 > {
   const { endpoint } = options;
+  const endpointPath = endpoint.path.join("/");
+  const traceTransport = TRANSPORT_TRACE_ENDPOINTS.has(endpointPath);
 
   // Create the shared generic handler (handles auth, permissions, validation, business logic, email)
   const genericHandler = createGenericHandler(options);
@@ -143,11 +152,22 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
     const urlPathParams = resolvedParams as T["types"]["UrlVariablesOutput"];
     const requestId = resolveRequestId(request);
     const logger = createEndpointLogger(false, locale, { requestId });
+    const traceStartedAt = traceTransport ? Date.now() : null;
+    const traceContext = {
+      requestId,
+      endpoint: endpointPath,
+      method: endpoint.method,
+    };
+    let traceStage = "csrf";
+    let responseStatus: number | null = null;
 
     // Counted until the handler returns: the deploy drain waits for these
     // (a recreate mid image-generation POST used to answer a bare 502).
     const endInFlight = trackInFlightRequest();
     try {
+      if (traceStartedAt !== null) {
+        logger.info("API transport entered handler", traceContext);
+      }
       // CSRF double-submit validation for mutating browser requests
       const csrfCheck = validateCsrf(request, endpoint.method);
       const csrfRetry = request.headers.get(CSRF_RETRY_HEADER_NAME) === "1";
@@ -189,6 +209,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         // once (a parallel response re-stamped the token between its cookie
         // read and the send).
         csrfResponse.headers.set(CSRF_REJECTED_HEADER_NAME, csrfCheck.reason);
+        responseStatus = csrfResponse.status;
         return csrfResponse;
       }
       if (csrfCheck.fetchMetadataFallback) {
@@ -219,7 +240,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           contentType: request.headers.get("content-type") ?? "(none)",
         });
         const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
-        return wrapErrorResponse(
+        const response = wrapErrorResponse(
           fail({
             message: sharedT("errors.uploadTooLargeDetail", {
               size: bytesToMegabytes(Number(contentLength)),
@@ -232,16 +253,20 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           endpoint,
           request,
         );
+        responseStatus = response.status;
+        return response;
       }
 
       // Extract raw request data WITHOUT validation
       // genericHandler will handle all validation
+      traceStage = "request-body";
       const requestData =
         endpoint.method === Methods.GET
           ? parseSearchParams(request.nextUrl.searchParams)
           : await parseRequestBody(request, logger);
 
       // Call shared generic handler (does auth, permissions, validation, business logic, email, SMS)
+      traceStage = "endpoint";
       const result = await genericHandler({
         data: requestData as T["types"]["RequestOutput"],
         urlPathParams,
@@ -288,6 +313,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
       // preserved (NextResponse + Blob/Uint8Array triggers chunked encoding,
       // which breaks <audio>/<video> elements that need Content-Length for duration).
       if (isFileResponse(result)) {
+        responseStatus = 200;
         logger.debug("Returning file response");
         const body = Buffer.isBuffer(result.buffer)
           ? Uint8Array.from(result.buffer)
@@ -306,12 +332,14 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
 
       // Handle streaming responses (Next.js-specific)
       if (isStreamingResponse(result)) {
+        responseStatus = result.response.status;
         logger.debug("Returning streaming response");
         return result.response;
       }
 
       // Handle content responses - return content blocks as JSON
       if (isContentResponse(result)) {
+        responseStatus = 200;
         logger.debug("Returning content response");
         // Keep the marker on the wire: EndpointRenderer only renders content
         // blocks (images!) when it sees `isContentResponse` in the data.
@@ -323,10 +351,19 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
 
       // Handle errors - wrap in NextResponse
       if (!result.success) {
-        return wrapErrorResponse(result, logger, locale, endpoint, request);
+        const response = wrapErrorResponse(
+          result,
+          logger,
+          locale,
+          endpoint,
+          request,
+        );
+        responseStatus = response.status;
+        return response;
       }
 
       // Wrap validated success result in NextResponse
+      responseStatus = 200;
       return wrapSuccessResponse(
         result.data as T["types"]["ResponseOutput"],
         200,
@@ -337,19 +374,21 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         logger.debug("ErrorResponseError caught", {
           errorType: error.errorResponse.errorType,
         });
-        return wrapErrorResponse(
+        const response = wrapErrorResponse(
           error.errorResponse,
           logger,
           locale,
           endpoint,
           request,
         );
+        responseStatus = response.status;
+        return response;
       }
 
       // Handle unexpected errors
       logger.error("Unexpected error in Next.js handler", parseError(error));
       const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
-      return wrapErrorResponse(
+      const response = wrapErrorResponse(
         // `errorTypes.internal_error` is the generic ErrorResponseTypes label
         // and renders param-free, so the thrown detail gets its own key.
         fail({
@@ -363,8 +402,19 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         endpoint,
         request,
       );
+      responseStatus = response.status;
+      return response;
     } finally {
       endInFlight();
+      if (traceStartedAt !== null) {
+        logger.info("API transport left handler", {
+          ...traceContext,
+          handlerStage: traceStage,
+          responseStatus,
+          clientDisconnected: request.signal.aborted,
+          elapsedMs: Date.now() - traceStartedAt,
+        });
+      }
     }
   };
 }

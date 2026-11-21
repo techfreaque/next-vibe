@@ -46,11 +46,14 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
   });
   const onlineDescriptor = Object.getOwnPropertyDescriptor(navigator, "onLine");
   const errors: LoggerMetadata[] = [];
+  const warnings: LoggerMetadata[] = [];
   const logger: EndpointLogger = {
     isDebugEnabled: false,
     debug: () => undefined,
     info: () => undefined,
-    warn: () => undefined,
+    warn: (message, context) => {
+      warnings.push({ message, context });
+    },
     vibe: () => undefined,
     error: (message, context) => {
       errors.push({ message, context });
@@ -132,6 +135,46 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     });
     TestSocket.sockets[3]?.open();
     expect(errors).toHaveLength(2);
+
+    Object.defineProperty(navigator, "onLine", { value: true });
+    fakeWindow.dispatchEvent(new Event("online"));
+    fakeDocument.visibilityState = "visible";
+    fakeDocument.dispatchEvent(new Event("visibilitychange"));
+    TestSocket.sockets[3]?.drop(1006, "connection interrupted");
+    for (const delay of [1000, 2000, 4000, 8000, 16000, 30000]) {
+      jest.advanceTimersByTime(delay);
+      TestSocket.sockets.at(-1)?.drop(1006, "retry failed");
+    }
+    expect(errors).toHaveLength(4);
+    expect(errors[3]).toMatchObject({
+      message: "[WS Client] Fast reconnect attempts exhausted",
+      context: {
+        attempts: 6,
+        failedHandshakesDuringDrop: 6,
+        noticeableDownMs: 61_000,
+        nextRetryMs: 60_000,
+      },
+    });
+    const exhaustedSocketCount = TestSocket.sockets.length;
+    jest.advanceTimersByTime(59_999);
+    expect(TestSocket.sockets).toHaveLength(exhaustedSocketCount);
+    jest.advanceTimersByTime(1);
+    expect(TestSocket.sockets).toHaveLength(exhaustedSocketCount + 1);
+    TestSocket.sockets.at(-1)?.drop(1006, "retry failed");
+    expect(errors).toHaveLength(4);
+
+    Object.defineProperty(navigator, "onLine", { value: false });
+    fakeWindow.dispatchEvent(new Event("offline"));
+    jest.advanceTimersByTime(60_000);
+    expect(TestSocket.sockets).toHaveLength(exhaustedSocketCount + 1);
+    Object.defineProperty(navigator, "onLine", { value: true });
+    fakeWindow.dispatchEvent(new Event("online"));
+    expect(TestSocket.sockets).toHaveLength(exhaustedSocketCount + 2);
+    TestSocket.sockets.at(-1)?.open();
+    expect(warnings.at(-1)).toMatchObject({
+      message: "[WS Client] Reconnected after disconnect",
+      context: { noticeableDownMs: 121_000, offlineMs: 181_000 },
+    });
   } finally {
     jest.useRealTimers();
     Object.defineProperty(globalThis, "WebSocket", {

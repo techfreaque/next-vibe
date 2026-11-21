@@ -15,8 +15,9 @@ import { createStandardPool } from "./pool";
 it("attributes a decoded result to its query and counts rows without recording values", async () => {
   const pg = new PGlite();
   await pg.exec(`
-    CREATE TABLE cron_tasks (id int);
-    INSERT INTO cron_tasks SELECT * FROM generate_series(1, 5000);
+    CREATE TABLE cron_tasks (id int, metadata text);
+    INSERT INTO cron_tasks
+      SELECT id, 'fixture-row-value' FROM generate_series(1, 5000) AS id;
   `);
   const server = startPgliteServer(pg, { port: 0 });
   await new Promise<void>((resolve) => server.once("listening", resolve));
@@ -32,7 +33,7 @@ it("attributes a decoded result to its query and counts rows without recording v
     const db = drizzle(pool, { logger: pgDiagnosticQueryLogger });
     const startedAt = Date.now();
     const response = await db.execute(
-      sql`SELECT id, 'from error_logs fixture-sql-literal'::text AS fixture FROM cron_tasks`,
+      sql`SELECT id, metadata, 'from error_logs fixture-sql-literal'::text AS fixture FROM cron_tasks`,
     );
     expect(response.rowCount).toBe(5_000);
     const summary = summarizePgResultDecodes(startedAt, Date.now());
@@ -41,11 +42,15 @@ it("attributes a decoded result to its query and counts rows without recording v
         queryName: "SELECT cron_tasks",
         queryId: expect.stringMatching(/^[0-9a-f]{16}$/),
         relationOids: [expect.any(Number)],
+        columnCount: 3,
+        payloadColumns: ["metadata"],
+        decodedPacketBytes: expect.any(Number),
         rowCount: 5_000,
         complete: true,
       }),
     ]);
     expect(JSON.stringify(summary)).not.toContain("fixture-sql-literal");
+    expect(JSON.stringify(summary)).not.toContain("fixture-row-value");
     expect(summarizePgResultDecodes(startedAt - 500, startedAt - 1)).toBeUndefined();
   } finally {
     await pool.end();

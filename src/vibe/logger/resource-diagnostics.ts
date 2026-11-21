@@ -57,6 +57,39 @@ interface ResourceTimingEvidence {
   edgeTimingNode: ReturnType<typeof readEdgeTimingNode>;
 }
 
+/** Attribution of the page document when a child resource has no timing. */
+export function navigationTimingEvidence(): {
+  documentEdgeTimingNode: ReturnType<typeof readEdgeTimingNode>;
+  documentProxyTimingStage: ProxyTimingStage | null;
+  documentNavigationType: string | null;
+} {
+  const entry =
+    typeof performance === "undefined"
+      ? undefined
+      : performance.getEntriesByType("navigation")[0];
+  if (
+    typeof PerformanceNavigationTiming === "undefined" ||
+    !(entry instanceof PerformanceNavigationTiming)
+  ) {
+    return {
+      documentEdgeTimingNode: null,
+      documentProxyTimingStage: null,
+      documentNavigationType: null,
+    };
+  }
+  return {
+    documentEdgeTimingNode: readEdgeTimingNode(
+      entry.serverTiming?.find(({ name }) => name === EDGE_TIMING_METRIC)
+        ?.description,
+    ),
+    documentProxyTimingStage: readProxyTimingStage(
+      entry.serverTiming?.find(({ name }) => name === PROXY_TIMING_METRIC)
+        ?.description,
+    ),
+    documentNavigationType: entry.type,
+  };
+}
+
 /** Classify evidence from failed loads without guessing why an opaque one failed. */
 export function classifyResourceFailure(
   status: number | null,

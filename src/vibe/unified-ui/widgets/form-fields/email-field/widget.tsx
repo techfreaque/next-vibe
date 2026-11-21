@@ -152,6 +152,7 @@ export function EmailFieldWidget<
                 )
               ) : (
                 <Input
+                  ref={formField.ref}
                   type="email"
                   value={String(formField.value ?? "")}
                   onChange={(e) => formField.onChange(e.target.value)}

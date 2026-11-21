@@ -179,6 +179,8 @@ export async function deductMediaCredits(
     logger.error("[MediaGen] Failed to deduct credits", {
       creditCost,
       feature,
+      errorKey: deductResult.errorType.errorKey,
+      causeKey: deductResult.cause?.errorType.errorKey,
     });
     return fail({
       message: tCredits("errors.deductCreditsFailed"),

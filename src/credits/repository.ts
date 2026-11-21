@@ -2805,8 +2805,23 @@ export class CreditRepository {
       // and can wrongly block free users. (withTransaction does not retry, so a
       // single-pass accumulator is safe.)
       let freeCreditsDeducted = 0;
-      // Execute deduction within a transaction for atomicity
-      const result = await withTransaction(logger, async (tx) => {
+      let availableForFullCharge = 0;
+      const onInsufficientCredits = (): ResponseType<{ partial: boolean }> => {
+        logger.warn("Insufficient credits for tool/endpoint", {
+          requested: amount,
+          available: availableForFullCharge,
+          poolId: pool.poolId,
+          feature,
+          rolledBack: true,
+        });
+        return fail({
+          message: t("errors.insufficientCredits", { cost: amount }),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      };
+      const deductFromWallets = async (
+        tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+      ): Promise<ResponseType<{ partial: boolean }>> => {
         let remaining = amount;
 
         // Enforce pool limit: max `freeAllowance` free credits can be spent per period
@@ -3196,30 +3211,18 @@ export class CreditRepository {
             // Return partial flag so callers can propagate it
             return success({ partial: true });
           }
-          // For tools/endpoints: insufficient credits, rollback without creating record
-          const availableCredits = [
-            ...(pool.userWallet ? [pool.userWallet] : []),
-            ...pool.leadWallets,
-          ].reduce(
-            (sum, wallet) =>
-              sum + wallet.balance + (wallet.freeCreditsRemaining ?? 0),
-            0,
-          );
-
-          logger.warn("Insufficient credits for tool/endpoint", {
-            requested: amount,
-            available: availableCredits,
-            poolId: pool.poolId,
-            feature,
-          });
-          return fail({
-            message: t("errors.insufficientCredits", { cost: amount }),
-            errorType: ErrorResponseTypes.BAD_REQUEST,
-          });
+          // Tools and endpoints require a full charge. Undo every debit.
+          availableForFullCharge = amount - remaining;
+          tx.rollback();
         }
 
         return success({ partial: false });
-      });
+      };
+      const result = await withTransaction(
+        logger,
+        deductFromWallets,
+        onInsufficientCredits,
+      );
 
       if (!result.success) {
         return result;
@@ -4051,6 +4054,7 @@ export class CreditRepository {
         return fail({
           message: t("errors.deductionFailed", { cost }),
           errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
+          cause: result,
         });
       }
 

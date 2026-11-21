@@ -171,16 +171,21 @@ export async function processStreamingResponseWithToolCalls(
     if (hasDetectedToolCalls && (!toolCalls || toolCalls.length === 0)) {
       // Markup that never parsed: nothing reaches the user from it, so make
       // the turn diagnosable (the loop reports it as an empty answer).
+      const markup = accumulatedContent.slice(toolMarkupStart);
+      const hasClosingTag = /<\/tool_calls?\s*>/.test(markup);
       logger.warn(`[${providerName}] Tool-call markup did not parse`, {
         model,
-        markupChars: accumulatedContent.length - toolMarkupStart,
-        hasClosingTag: /<\/tool_calls?\s*>/.test(
-          accumulatedContent.slice(toolMarkupStart),
-        ),
+        markupChars: markup.length,
+        hasClosingTag,
+        parseStage: runawayCutOff
+          ? "markup-limit"
+          : hasClosingTag
+            ? "closed-block-rejected"
+            : "incomplete-block",
+        containsNamedCall: /<tool_call(?:\s|>)|<function(?:\s|>)/i.test(markup),
         visibleOutputChars: toolMarkupStart,
         finishReason,
         runawayCutOff,
-        head: accumulatedContent.slice(toolMarkupStart, toolMarkupStart + 300),
       });
     }
 

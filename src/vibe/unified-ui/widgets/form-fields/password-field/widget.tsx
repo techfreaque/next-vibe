@@ -152,6 +152,7 @@ export function PasswordFieldWidget<
                 )
               ) : (
                 <Input
+                  ref={formField.ref}
                   name={formField.name}
                   value={formField.value || ""}
                   onChange={(e) => formField.onChange(e.target.value)}

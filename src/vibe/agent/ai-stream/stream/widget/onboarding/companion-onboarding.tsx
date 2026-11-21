@@ -17,6 +17,8 @@ import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
 import { useSearchParams } from "next-vibe/ui/hooks/use-navigation";
+import { getReferrer } from "next-vibe/ui/lib/dom";
+import { getCurrentOrigin } from "next-vibe/ui/lib/location";
 import { getLocalItem, setLocalItem } from "next-vibe/ui/lib/storage";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import {
@@ -207,9 +209,25 @@ export function CompanionOnboarding(): JSX.Element | null {
           pathParams: { id: baseId },
         });
         if (!response.success) {
-          logger.warn("Onboarding: arrival skill not found", {
+          const referrerUrl = getReferrer();
+          const referrer = referrerUrl ? new URL(referrerUrl) : null;
+          const source = !referrer
+            ? "unavailable"
+            : referrer.origin !== getCurrentOrigin()
+              ? "external"
+              : /(?:^|\/)skill\//.test(referrer.pathname)
+                ? "skill-page"
+                : "same-origin";
+          logger.warn("Onboarding: arrival skill lookup failed", {
             skillId: arrivalSkillParam,
-            errorType: response.errorType.errorKey,
+            hasVariant: variantId !== null,
+            errorKey: response.errorType.errorKey,
+            // A proxy may return an HTML 504, with no application status.
+            errorCode:
+              response.errorType.errorKey === "errorTypes.http_error"
+                ? null
+                : response.errorType.errorCode,
+            source,
           });
           return false;
         }

@@ -115,8 +115,9 @@ const { POST } = createEndpoint({
           .string({
             error: "fields.privateName.validation.required",
           })
-          .min(2, {
-            message: "fields.privateName.validation.minLength",
+          .trim()
+          .min(1, {
+            message: "fields.privateName.validation.required",
           })
           .max(100, {
             message: "fields.privateName.validation.maxLength",
@@ -139,8 +140,9 @@ const { POST } = createEndpoint({
           .string({
             error: "fields.publicName.validation.required",
           })
-          .min(2, {
-            message: "fields.publicName.validation.minLength",
+          .trim()
+          .min(1, {
+            message: "fields.publicName.validation.required",
           })
           .max(100, {
             message: "fields.publicName.validation.maxLength",

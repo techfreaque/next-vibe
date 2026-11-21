@@ -306,6 +306,30 @@ describe("free allowance pools (DB)", () => {
     expect(await freeBalance(guestUser(leadId))).toBe(guest);
   }, POOL_TEST_TIMEOUT_MS);
 
+  it("rolls back a feature charge that exceeds the spendable balance", async () => {
+    const leadId = await createGuestLead();
+    const user = guestUser(leadId);
+    const initialBalance = await freeBalance(user);
+    expect(initialBalance).toBeGreaterThan(0);
+    const feature = `partial-feature-charge-${leadId}`;
+    const result = await CreditRepository.deductCreditsForFeature(
+      user,
+      initialBalance + 1,
+      feature,
+      logger,
+      t,
+      defaultLocale,
+    );
+    expect(result.success).toBe(false);
+    expect(!result.success && result.cause?.errorType.errorCode).toBe(400);
+    expect(await freeBalance(user)).toBe(initialBalance);
+    const usage = await db
+      .select({ id: creditTransactions.id })
+      .from(creditTransactions)
+      .where(eq(creditTransactions.feature, feature));
+    expect(usage).toHaveLength(0);
+  }, POOL_TEST_TIMEOUT_MS);
+
   it("guest pool: even a confirmed newsletter adds nothing (account first)", async () => {
     const leadId = await createGuestLead();
     const user = guestUser(leadId);

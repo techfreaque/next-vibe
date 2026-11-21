@@ -156,6 +156,8 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
 
   let phase: "load-client" | "call-api" | "on-error" | "on-success" =
     "load-client";
+  let requestId: string | undefined;
+  let priorErrorKey: string | undefined;
   try {
     const callApi = await loadCallApi();
     phase = "call-api";
@@ -166,9 +168,13 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
       locale,
       requestData,
       pathParams,
+      (id) => {
+        requestId = id;
+      },
     );
 
     if (!response.success) {
+      priorErrorKey = response.errorType.errorKey;
       if (options.onError) {
         phase = "on-error";
         await options.onError({
@@ -212,6 +218,8 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
       endpoint: endpoint.path.join("/"),
       method: endpoint.method,
       phase,
+      requestId,
+      priorErrorKey,
       errorKey: errorResponse.errorType.errorKey,
       status: errorResponse.errorType.errorCode,
     });

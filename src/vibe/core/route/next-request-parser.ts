@@ -398,11 +398,14 @@ export async function parseRequestBody(
     | MergedObject[]
   >
 > {
+  let bodyStage = "read-body";
+  let receivedCharacters: number | null = null;
   try {
     const contentType = request.headers.get("content-type") || "";
 
     // Handle multipart/form-data (file uploads)
     if (contentType.includes("multipart/form-data")) {
+      bodyStage = "decode-multipart";
       const formData = await request.formData();
 
       // Check if there's a "data" field with JSON (mixed FormData + JSON pattern)
@@ -477,6 +480,7 @@ export async function parseRequestBody(
 
     // Handle JSON
     const bodyText = await request.text();
+    receivedCharacters = bodyText.length;
 
     // If body is empty or whitespace only, return empty object
     if (!bodyText || bodyText.trim() === "") {
@@ -500,6 +504,7 @@ export async function parseRequestBody(
     }
 
     // Parse the JSON body
+    bodyStage = "decode-json";
     const body = JSON.parse(bodyText) as Record<
       string,
       | string
@@ -520,7 +525,11 @@ export async function parseRequestBody(
       errorStack: parsed.stack,
       contentType,
       contentLength: request.headers.get("content-length") ?? "(none)",
-      url: request.url,
+      bodyStage,
+      receivedCharacters,
+      clientDisconnected: request.signal.aborted,
+      method: request.method,
+      pathname: request.nextUrl.pathname,
     });
     // If parsing fails, return empty object
     // genericHandler will handle validation errors

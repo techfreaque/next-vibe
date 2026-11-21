@@ -12,6 +12,12 @@ const DECODE_LIMIT = 48;
 const MIN_DECODE_MS = 10;
 const LARGE_BATCH_ROWS = 128;
 const QUERY_LABEL_SCAN_LIMIT = 16_384;
+const LOGGABLE_PAYLOAD_COLUMNS = new Set([
+  "content",
+  "error_message",
+  "metadata",
+  "search_vector",
+]);
 // Labels may include these application relations. Arbitrary identifiers,
 // comments, literals, and bound parameters stay out of error logs.
 const LOGGABLE_RELATIONS = new Set([
@@ -44,6 +50,8 @@ interface PgResult {
   queryName: string;
   caller: string | null;
   relationOids: number[];
+  columnCount: number;
+  payloadColumns: string[];
   rowCount: number;
   complete: boolean;
 }
@@ -54,6 +62,7 @@ interface DecodeBatch {
   endedAt: number;
   durationMs: number;
   rows: number;
+  packetBytes: number;
 }
 
 interface PgDecodeState {
@@ -182,6 +191,17 @@ export function observePgResultDecoding(client: PoolClient): void {
       relationOids: [...new Set(message.fields.map((field) => field.tableID))]
         .filter((oid) => oid > 0)
         .slice(0, 8),
+      columnCount: message.fields.length,
+      payloadColumns: [
+        ...new Set(
+          message.fields
+            .filter(
+              (field) =>
+                field.tableID > 0 && LOGGABLE_PAYLOAD_COLUMNS.has(field.name),
+            )
+            .map((field) => field.name),
+        ),
+      ],
       rowCount: 0,
       complete: false,
     };
@@ -204,7 +224,7 @@ export function observePgResultDecoding(client: PoolClient): void {
   connection.on("errorMessage", () => {
     result = undefined;
   });
-  stream.on("data", () => {
+  stream.on("data", (packet: Buffer) => {
     if (resultRows.size === 0) {
       return;
     }
@@ -218,6 +238,9 @@ export function observePgResultDecoding(client: PoolClient): void {
           startedAt: packetStartedAt,
           endedAt,
           durationMs,
+          // A packet can span multiple results. Count its bytes only
+          // when a single result contributed rows to this packet.
+          packetBytes: resultRows.size === 1 ? packet.byteLength : 0,
         });
       }
     }
@@ -235,7 +258,7 @@ export function summarizePgResultDecodes(
 ): LoggerMetadata[] | undefined {
   const matches = new Map<
     PgResult,
-    { rowsInBatches: number; batchMs: number }
+    { rowsInBatches: number; batchMs: number; decodedPacketBytes: number }
   >();
   for (const batch of globalThis.__vibePgDecodeDiagnostics?.batches ?? []) {
     if (batch.endedAt < startedAt || batch.startedAt > endedAt) {
@@ -244,9 +267,11 @@ export function summarizePgResultDecodes(
     const summary = matches.get(batch.result) ?? {
       rowsInBatches: 0,
       batchMs: 0,
+      decodedPacketBytes: 0,
     };
     summary.rowsInBatches += batch.rows;
     summary.batchMs += batch.durationMs;
+    summary.decodedPacketBytes += batch.packetBytes;
     matches.set(batch.result, summary);
   }
   if (matches.size === 0) {
@@ -258,6 +283,7 @@ export function summarizePgResultDecodes(
     .map(([result, summary]) => ({
       ...result,
       rowsInBatches: summary.rowsInBatches,
+      decodedPacketBytes: summary.decodedPacketBytes,
       batchMs: Math.round(summary.batchMs),
     }));
 }

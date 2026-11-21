@@ -184,6 +184,7 @@ export function TextFieldWidget<
               ) : (
                 // Render normal text input
                 <Input
+                  ref={formField.ref}
                   name={formField.name}
                   value={formField.value ? tField(formField.value) : ""}
                   onChange={(e) => formField.onChange(e.target.value)}

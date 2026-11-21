@@ -376,12 +376,15 @@ export class AudioQueueManager {
         resolve();
       };
 
+      let playRequested = false;
       const onError = (e: Event): void => {
         logger.error("[TTS-PLAY] Audio chunk playback error", {
           ...describeAudioElement(audio),
           ...describeAudioSource(audio, audioData),
           component: "AudioQueueManager",
           operation: "playAudio",
+          playRequested,
+          currentSourceMatches: audio.currentSrc === audio.src,
           chunkIndex,
           mediaErrorCode: audio.error?.code ?? null,
           mediaErrorMessage: audio.error?.message ?? null,
@@ -391,6 +394,7 @@ export class AudioQueueManager {
       };
 
       const startPlayback = (): void => {
+        playRequested = true;
         audio.play().catch((e: Error) => {
           // stop() pausing/releasing the element rejects a pending play()
           // with AbortError: that is our own teardown, not a playback failure.

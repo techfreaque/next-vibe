@@ -96,15 +96,18 @@ const WS_IDENTITY_CHANGED_CODE = 4001;
 const IDENTITY_RESUBSCRIBE_GRACE_MS = 3_000;
 /** Report an ongoing drop after this much wall-clock time. */
 const DROP_REPORT_AFTER_MS = 20_000;
-/** How often an open outage samples visibility/online state. */
+/** How often to check whether an open outage is due to be reported. */
 const DROP_CHECK_INTERVAL_MS = 5_000;
+/** Retry an exhausted connection slowly while the tab is visible and online. */
+const RECONNECT_COOLDOWN_MS = 60_000;
+const MAX_FAST_RECONNECT_ATTEMPTS = 6;
 
 // Shared connection state
 let sharedWs: WebSocket | null = null;
 let reconnectAttempts = 0;
-// When true, the reconnect loop is paused. A page visibility change or
-// a new subscribe/preWarm call resets this and restarts the loop.
+// Once fast retries run out, an active tab retries at a slower rate.
 let reconnectPaused = false;
+let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
 // Virtual channel subscriptions: channel → ChannelState
 const channels = new Map<string, ChannelState>();
@@ -153,16 +156,32 @@ interface DropInfo {
 // it lasted while the user could notice it (tab visible + browser online).
 let pendingDrop: DropInfo | null = null;
 let dropReported = false;
+let reconnectExhaustionReported = false;
 let dropReconnectCount = 0;
 let failedHandshakesDuringDrop = 0;
 let lastFailedHandshakeRequestId: string | null = null;
 let lastFailedHandshakeMs: number | null = null;
 let maxReconnectTimerOverrunMs = 0;
 let noticeableDownMs = 0;
+let noticeableSince: number | null = null;
 let dropCheckTimer: ReturnType<typeof setInterval> | null = null;
 
 function isTabVisible(): boolean {
   return typeof window === "undefined" || getVisibilityState() === "visible";
+}
+
+function currentNoticeableDownMs(): number {
+  return (
+    noticeableDownMs +
+    (noticeableSince === null ? 0 : Date.now() - noticeableSince)
+  );
+}
+
+function updateDropVisibility(): void {
+  if (disconnectedAt !== null) {
+    noticeableDownMs = currentNoticeableDownMs();
+    noticeableSince = isTabVisible() && isOnline() ? Date.now() : null;
+  }
 }
 
 function stopDropCheck(): void {
@@ -181,7 +200,7 @@ function reportDrop(logger: EndpointLogger, recovered: boolean): void {
   logger.error("[WS Client] Connection lost", {
     ...pendingDrop,
     offlineMs: Date.now() - disconnectedAt,
-    noticeableDownMs,
+    noticeableDownMs: currentNoticeableDownMs(),
     attempts: dropReconnectCount,
     failedHandshakesDuringDrop,
     lastFailedHandshakeRequestId,
@@ -197,9 +216,6 @@ function startDropCheck(logger: EndpointLogger): void {
     if (disconnectedAt === null || dropReported) {
       stopDropCheck();
       return;
-    }
-    if (isTabVisible() && isOnline()) {
-      noticeableDownMs += DROP_CHECK_INTERVAL_MS;
     }
     if (Date.now() - disconnectedAt >= DROP_REPORT_AFTER_MS) {
       reportDrop(logger, false);
@@ -238,7 +254,7 @@ function handleOpen(logger: EndpointLogger): void {
         lastFailedHandshakeMs,
         maxReconnectTimerOverrunMs,
         offlineMs: Date.now() - disconnectedAt,
-        noticeableDownMs,
+        noticeableDownMs: currentNoticeableDownMs(),
         channelCount: channels.size,
         recovered: true,
       });
@@ -249,14 +265,17 @@ function handleOpen(logger: EndpointLogger): void {
   disconnectedAt = null;
   pendingDrop = null;
   dropReported = false;
+  reconnectExhaustionReported = false;
   dropReconnectCount = 0;
   failedHandshakesDuringDrop = 0;
   lastFailedHandshakeRequestId = null;
   lastFailedHandshakeMs = null;
   maxReconnectTimerOverrunMs = 0;
   noticeableDownMs = 0;
+  noticeableSince = null;
   stopDropCheck();
   reconnectAttempts = 0;
+  reconnectPaused = false;
   // Re-subscribe to all active channels after reconnect, each with the last
   // seq it saw so the server replays the gap.
   let deferred = false;
@@ -346,6 +365,36 @@ function dispatch(msg: WsWireMessage, logger: EndpointLogger): void {
   }
 }
 
+function clearReconnectTimer(): void {
+  if (reconnectTimer !== null) {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+  }
+}
+
+function scheduleReconnect(logger: EndpointLogger, delay: number): void {
+  clearReconnectTimer();
+  const scheduledDrop = pendingDrop;
+  const reconnectDueAt = Date.now() + delay;
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null;
+    if (
+      channels.size === 0 ||
+      pageUnloading ||
+      (reconnectPaused && (!isTabVisible() || !isOnline()))
+    ) {
+      return;
+    }
+    if (scheduledDrop && pendingDrop === scheduledDrop) {
+      maxReconnectTimerOverrunMs = Math.max(
+        maxReconnectTimerOverrunMs,
+        Date.now() - reconnectDueAt,
+      );
+    }
+    connect(logger);
+  }, delay);
+}
+
 // The connection is shared across channels, but a logger is REQUIRED to open it.
 // It is threaded from the subscribe/preWarm caller's EndpointLogger and captured
 // in the socket's handlers (and the reconnect closure) so connection-level events
@@ -361,6 +410,7 @@ function connect(logger: EndpointLogger): void {
   if (typeof WebSocket === "undefined") {
     return;
   }
+  clearReconnectTimer();
 
   const protocol = getCurrentProtocol() === "https:" ? "wss:" : "ws:";
   const requestId = mintRequestId();
@@ -430,6 +480,7 @@ function connect(logger: EndpointLogger): void {
       dropReported = false;
       dropReconnectCount = 0;
       noticeableDownMs = 0;
+      updateDropVisibility();
       pendingDrop = {
         requestId,
         code: event.code,
@@ -456,28 +507,36 @@ function connect(logger: EndpointLogger): void {
       };
       startDropCheck(logger);
     }
-    // After 6 consecutive failures (~63s total), pause the loop and wait for
-    // a page focus/visibility event — persistent failures are likely a stale
-    // or missing cookie that only a page navigation will fix.
-    if (reconnectAttempts >= 6) {
+    // Report the end of the fast retries once. A foreground tab can still
+    // recover after a longer outage without waiting for another user action.
+    if (reconnectAttempts >= MAX_FAST_RECONNECT_ATTEMPTS) {
       reconnectPaused = true;
-      logger.error("[WS Client] Reconnect gave up - live updates paused", {
-        requestId,
-        attempts: reconnectAttempts,
-        lastCode: event.code,
-        lastReason: event.reason.slice(0, 200),
-        offlineMs: disconnectedAt === null ? null : Date.now() - disconnectedAt,
-        noticeableDownMs,
-        firstDropCode: pendingDrop?.code ?? null,
-        failedHandshakesDuringDrop,
-        lastFailedHandshakeRequestId,
-        lastFailedHandshakeMs,
-        maxReconnectTimerOverrunMs,
-        hiddenAtClose: pendingDrop?.hiddenAtClose ?? null,
-        channelCount: channels.size,
-        online: isOnline(),
-        visible: isTabVisible(),
-      });
+      const retryWhileActive = isTabVisible() && isOnline();
+      if (!reconnectExhaustionReported) {
+        reconnectExhaustionReported = true;
+        logger.error("[WS Client] Fast reconnect attempts exhausted", {
+          requestId,
+          attempts: reconnectAttempts,
+          lastCode: event.code,
+          lastReason: event.reason.slice(0, 200),
+          offlineMs:
+            disconnectedAt === null ? null : Date.now() - disconnectedAt,
+          noticeableDownMs: currentNoticeableDownMs(),
+          firstDropCode: pendingDrop?.code ?? null,
+          failedHandshakesDuringDrop,
+          lastFailedHandshakeRequestId,
+          lastFailedHandshakeMs,
+          maxReconnectTimerOverrunMs,
+          hiddenAtClose: pendingDrop?.hiddenAtClose ?? null,
+          channelCount: channels.size,
+          online: isOnline(),
+          visible: isTabVisible(),
+          nextRetryMs: retryWhileActive ? RECONNECT_COOLDOWN_MS : null,
+        });
+      }
+      if (retryWhileActive) {
+        scheduleReconnect(logger, RECONNECT_COOLDOWN_MS);
+      }
       return;
     }
     // 1012 "Service Restart" on the first drop = a deploy moved this node out
@@ -491,17 +550,7 @@ function connect(logger: EndpointLogger): void {
         ? 100 + Math.floor(Math.random() * 400)
         : Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
     reconnectAttempts++;
-    const scheduledDrop = pendingDrop;
-    const reconnectDueAt = Date.now() + delay;
-    setTimeout(() => {
-      if (scheduledDrop && pendingDrop === scheduledDrop) {
-        maxReconnectTimerOverrunMs = Math.max(
-          maxReconnectTimerOverrunMs,
-          Date.now() - reconnectDueAt,
-        );
-      }
-      connect(logger);
-    }, delay);
+    scheduleReconnect(logger, delay);
   };
 
   ws.addEventListener("open", () => {
@@ -514,40 +563,54 @@ function connect(logger: EndpointLogger): void {
   // onerror is followed by onclose, which triggers reconnect.
 }
 
-// On tab focus/visibility restore, kick a paused reconnect loop — the browser
-// may have refreshed cookies (e.g. via a background page fetch) since the loop
-// was paused, and the user is now actively looking at the tab.
+function resumeReconnect(): void {
+  if (
+    lastLogger &&
+    channels.size > 0 &&
+    !sharedWs &&
+    !pageUnloading &&
+    isTabVisible() &&
+    isOnline()
+  ) {
+    ensureConnected(lastLogger);
+  }
+}
+
 // Guard: this module is also loaded during SSR (TanStack/Vite), where `document`
 // doesn't exist. Only register the listener in a real browser context.
 if (typeof document !== "undefined") {
   addWindowListener("pagehide", () => {
     pageUnloading = true;
+    clearReconnectTimer();
+    noticeableDownMs = currentNoticeableDownMs();
+    noticeableSince = null;
     if (lastLogger) {
       reportDrop(lastLogger, false);
     }
   });
   addWindowListener("pageshow", () => {
     pageUnloading = false;
+    updateDropVisibility();
+    resumeReconnect();
   });
   addDocumentListener("visibilitychange", () => {
     lastVisibilityChangeAt = Date.now();
-    if (isTabVisible() && reconnectPaused) {
-      reconnectPaused = false;
-      reconnectAttempts = 0;
-      if (channels.size > 0 && !sharedWs) {
-        // No caller here: reuse the logger of the last connect(). Channels
-        // exist only after a subscribe, which always connects with a logger.
-        if (lastLogger) {
-          connect(lastLogger);
-        }
-      }
+    updateDropVisibility();
+    if (reconnectPaused) {
+      resumeReconnect();
     }
   });
-  const recordNetworkChange = (): void => {
+  addWindowListener("online", () => {
     lastNetworkChangeAt = Date.now();
-  };
-  addWindowListener("online", recordNetworkChange);
-  addWindowListener("offline", recordNetworkChange);
+    updateDropVisibility();
+    if (reconnectPaused) {
+      resumeReconnect();
+    }
+  });
+  addWindowListener("offline", () => {
+    lastNetworkChangeAt = Date.now();
+    updateDropVisibility();
+  });
 }
 
 function ensureConnected(logger: EndpointLogger): void {

@@ -12,6 +12,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 
+import { RunningTaskRegistry } from "../../../tasks/watchdog/registry";
 import { agentEnv } from "../../env";
 import type { FileMetadata, StorageAdapter } from "./index";
 import { buildStorageFileUrl } from "./url-utils";
@@ -46,6 +47,16 @@ export class S3StorageAdapter implements StorageAdapter {
         requestTimeout: 60_000,
       },
     });
+    this.client.middlewareStack.add(
+      (next, context) =>
+        (args): ReturnType<typeof next> => {
+          const endPhase = RunningTaskRegistry.beginPhase(
+            `s3:${context.commandName ?? "unknown"}`,
+          );
+          return next(args).finally(endPhase);
+        },
+      { step: "deserialize", name: "traceS3Lag" },
+    );
   }
 
   async uploadFile(

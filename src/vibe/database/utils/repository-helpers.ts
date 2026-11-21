@@ -1,5 +1,6 @@
 import "server-only";
 
+import { TransactionRollbackError } from "drizzle-orm";
 import { DatabaseError } from "pg";
 
 import { parseError } from "../../core/utils/parse-error";
@@ -14,15 +15,20 @@ import { db } from "..";
  * Execute a function within a transaction
  *
  * @param fn - The function to execute within the transaction
+ * @param onRollback - Return a result for a deliberate rollback
  * @returns The result of the function
  */
 export async function withTransaction<T>(
   logger: EndpointLogger,
   fn: (tx: Parameters<Parameters<typeof db.transaction>[0]>[0]) => Promise<T>,
+  onRollback?: () => T,
 ): Promise<T> {
   try {
     return await db.transaction(fn);
   } catch (error) {
+    if (error instanceof TransactionRollbackError && onRollback) {
+      return onRollback();
+    }
     logger.error("Transaction error", parseError(error));
     // Re-throw the error to maintain compatibility with Drizzle's transaction API
     // This is a low-level utility that must preserve the original error handling behavior

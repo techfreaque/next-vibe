@@ -45,6 +45,7 @@ import {
 import type { EndpointLogger } from "../logger/types";
 import { dropEnumValues } from "../platforms/ai/tool-json-schema";
 import { Platform } from "../platforms/platforms";
+import { RunningTaskRegistry } from "../tasks/watchdog/registry";
 import { generateSchemaForUsage } from "../unified-ui/_shared/utils";
 import type {
   HelpGetRequestOutput,
@@ -270,7 +271,10 @@ export class HelpRepository {
       it: () => import("@/generated/endpoints/meta/it"),
       es: () => import("@/generated/endpoints/meta/es"),
     };
-    const metaModule = await metadata[language]();
+    const endMetadataLoad = RunningTaskRegistry.beginPhase(
+      `help:metadata-import:${language}`,
+    );
+    const metaModule = await metadata[language]().finally(endMetadataLoad);
     const allMeta = metaModule.endpointsMeta;
 
     // Discovery platform - what platform context are we listing tools for?

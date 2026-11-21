@@ -28,6 +28,8 @@ import "../remote-event-bridge/repository";
 import type { ServerWebSocket } from "bun";
 import { z } from "zod";
 
+import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
+
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import { CountryLanguageValues } from "../../core/i18n/core/config";
 import { parseError } from "../../core/utils/parse-error";
@@ -577,6 +579,13 @@ export function startWebSocketServer(
           // its leadId query param, a browser one lost its cookies.
           logger.warn("[WS] Rejected upgrade - no lead id (cookie or query)", {
             requestId,
+            browserHandshake: req.headers.has("origin"),
+            fetchSite: req.headers.get("sec-fetch-site"),
+            hasLeadCookie: cookieHeader
+              .split(";")
+              .some((entry) =>
+                entry.trimStart().startsWith(`${LEAD_ID_COOKIE_NAME}=`),
+              ),
             userAgent: req.headers.get("user-agent") ?? undefined,
             origin: req.headers.get("origin") ?? undefined,
             ip:
@@ -749,8 +758,24 @@ export function startWebSocketServer(
                 msg.refreshGuestIdentity === true &&
                 ws.data.socketAuthSource === "guest" &&
                 identity.identityMismatch === "socket-guest-other-uid";
-              const notifyGuest =
-                shouldRefreshGuestIdentity && !ws.data.guestIdentityRefreshSent;
+              let guestIdentityRefreshNotice = shouldRefreshGuestIdentity
+                ? "already-sent"
+                : "not-applicable";
+              // Refresh through the loader without exposing the cookie or
+              // admitting the channel. A dropped frame can be retried by
+              // the next stale subscription on this socket.
+              if (
+                shouldRefreshGuestIdentity &&
+                !ws.data.guestIdentityRefreshSent
+              ) {
+                const frame: WsGuestIdentityChangedFrame = {
+                  type: "guest-identity-changed",
+                };
+                const sent = ws.send(JSON.stringify(frame));
+                ws.data.guestIdentityRefreshSent = sent !== 0;
+                guestIdentityRefreshNotice =
+                  sent === 0 ? "dropped" : sent < 0 ? "queued" : "sent";
+              }
               logger.warn(
                 "[WS] Subscribe denied - socket identity may not join channel",
                 {
@@ -765,22 +790,9 @@ export function startWebSocketServer(
                   guestIdentityRefreshRequested:
                     msg.refreshGuestIdentity === true,
                   staleRenderedGuestLead: shouldRefreshGuestIdentity,
-                  guestIdentityRefreshNotice: notifyGuest
-                    ? "sending"
-                    : shouldRefreshGuestIdentity
-                      ? "already-sent"
-                      : "not-applicable",
+                  guestIdentityRefreshNotice,
                 },
               );
-              // The cookie is HttpOnly. Refresh the page's identity through
-              // its loader without exposing the cookie or admitting the channel.
-              if (notifyGuest) {
-                ws.data.guestIdentityRefreshSent = true;
-                const frame: WsGuestIdentityChangedFrame = {
-                  type: "guest-identity-changed",
-                };
-                ws.send(JSON.stringify(frame));
-              }
               return;
             }
             subscribeToChannel(

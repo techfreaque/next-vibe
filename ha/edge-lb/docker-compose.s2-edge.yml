@@ -36,6 +36,22 @@ services:
     labels:
       caddy_internal_10: "https://unbottled.ai"
       caddy_internal_10.header: '+Server-Timing "vibe-edge;desc=\"s2\""'
+      # Mirror S1's 5xx access log. Only status, timing, and fixed categories.
+      caddy_internal_10.log: "unbottled_failures"
+      caddy_internal_10.log.level: "ERROR"
+      caddy_internal_10.log.format: "filter"
+      caddy_internal_10.log.format.wrap: "json"
+      caddy_internal_10.log.format.fields.request: "delete"
+      caddy_internal_10.log.format.fields.resp_headers: "delete"
+      caddy_internal_10.log.format.fields.user_id: "delete"
+      caddy_internal_10.@meta_crawler.header_regexp: "User-Agent (?i)facebookexternalhit|meta-externalagent|meta-externalfetcher"
+      caddy_internal_10.@next_asset.path: "/_next/*"
+      caddy_internal_10.@app_api.path: "/api/*"
+      caddy_internal_10.@realtime.path: "/ws*"
+      caddy_internal_10.0_log_append: "@meta_crawler automation meta-crawler"
+      caddy_internal_10.1_log_append: "@next_asset surface next-asset"
+      caddy_internal_10.2_log_append: "@app_api surface api"
+      caddy_internal_10.3_log_append: "@realtime surface websocket"
       caddy_internal_10.tls.issuer: "acme"
       caddy_internal_10.tls.issuer.disable_tlsalpn_challenge: ""
       # Deploy drain (scripts/ha-node-drain.sh edge-on s2 / swap): while

@@ -272,7 +272,8 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
         (errors) => {
           // Report the failing fields and rules without collecting form values.
           const endpointKey = `${endpoint.path.join("/")}/${endpoint.method}`;
-          const fields = Object.entries(errors).map(([field, error]) => ({
+          const errorEntries = Object.entries(errors);
+          const fields = errorEntries.map(([field, error]) => ({
             rule: `${field}: ${String(error?.type ?? "invalid")}`,
             message: String(error?.message ?? ""),
           }));
@@ -291,9 +292,17 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
             signature,
             count: blocked,
           };
+          const firstInvalidField = errorEntries[0];
+          const fieldRef = firstInvalidField?.[1]?.ref;
           const context = {
             endpoint: endpointKey,
             alias: endpoint.aliases?.[0] ?? null,
+            firstInvalidField: firstInvalidField?.[0] ?? null,
+            firstInvalidFieldHasFocusTarget:
+              typeof fieldRef === "object" &&
+              fieldRef !== null &&
+              "focus" in fieldRef &&
+              typeof fieldRef.focus === "function",
             fieldRules: signature.slice(0, 400),
             consecutiveBlockedSubmits: blocked,
             fields: fields

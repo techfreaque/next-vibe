@@ -9,8 +9,10 @@ import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test";
 import { hostname } from "node:os";
 
 import ledgerDefinition from "@/chart-of-accounts/ledger/[accountId]/definition";
+import creditsDefinition from "@/credits/definition";
 import { REQUEST_ID_HEADER_NAME } from "@/env/constants";
 
+import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import type { EndpointLogger, LoggerMetadata } from "../../logger/types";
 
 interface LogRow {
@@ -85,6 +87,7 @@ void mock.module("../../logger/db-persist", () => ({
 
 const originalFetch = globalThis.fetch;
 const sentHeaders: Array<Record<string, string>> = [];
+let fetchFailures = 0;
 
 describe("request id propagation", () => {
   beforeAll(() => {
@@ -98,6 +101,10 @@ describe("request id propagation", () => {
             ? { ...headers }
             : {},
         );
+        if (fetchFailures > 0) {
+          fetchFailures--;
+          return Promise.reject(new TypeError("Failed to fetch"));
+        }
         return Promise.resolve(
           new Response(
             JSON.stringify({
@@ -175,6 +182,74 @@ describe("request id propagation", () => {
     const [a, b] = sentHeaders.slice(-2).map((h) => h[REQUEST_ID_HEADER_NAME]);
     expect(a).toBeDefined();
     expect(a).not.toBe(b);
+  });
+
+  it("logs the transport failure and retries a visible credit read once", async () => {
+    const documentDescriptor = Object.getOwnPropertyDescriptor(
+      globalThis,
+      "document",
+    );
+    const navigatorDescriptor = Object.getOwnPropertyDescriptor(
+      navigator,
+      "onLine",
+    );
+    Object.defineProperty(globalThis, "document", {
+      configurable: true,
+      value: { visibilityState: "visible" },
+    });
+    Object.defineProperty(navigator, "onLine", {
+      configurable: true,
+      value: true,
+    });
+    try {
+      const { callApi } = await import("./call-api");
+      const rows: LogRow[] = [];
+      const before = sentHeaders.length;
+      fetchFailures = 2;
+      const result = await callApi<CreateApiEndpointAny>(
+        creditsDefinition.GET,
+        recordingLogger(rows),
+        {
+          isPublic: true,
+          leadId: "00000000-0000-4000-8000-000000000002",
+          roles: [],
+        },
+        "en-GLOBAL",
+        undefined,
+        undefined,
+      );
+      expect(result.success).toBe(false);
+      const ids = sentHeaders
+        .slice(before)
+        .map((headers) => headers[REQUEST_ID_HEADER_NAME]);
+      expect(ids).toHaveLength(2);
+      expect(ids[0]).not.toBe(ids[1]);
+      const failures = rows.filter(
+        (row) => row.message === "Endpoint transport failed: credits/GET",
+      );
+      expect(failures).toHaveLength(2);
+      expect(failures[1]?.metadata).toContainEqual(
+        expect.objectContaining({
+          errorCode: null,
+          responseReceived: false,
+          failurePhase: "fetch",
+          retryOfRequestId: ids[0],
+          requestId: ids[1],
+        }),
+      );
+    } finally {
+      fetchFailures = 0;
+      Object.defineProperty(
+        globalThis,
+        "document",
+        documentDescriptor ?? { configurable: true, value: undefined },
+      );
+      Object.defineProperty(
+        navigator,
+        "onLine",
+        navigatorDescriptor ?? { configurable: true, value: undefined },
+      );
+    }
   });
 
   it("server adopts a well-formed client id and mints one otherwise", async () => {

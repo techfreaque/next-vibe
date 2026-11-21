@@ -21,6 +21,7 @@ import {
 import { claimErrorReport } from "./client-context";
 import {
   describeUrl,
+  navigationTimingEvidence,
   resourceTiming,
   urlExtension,
 } from "./resource-diagnostics";
@@ -132,6 +133,7 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
         // Static requests from a tab that still runs an older build can
         // fail after a rollout even though the current assets are intact.
         pageBuildId: resource?.startsWith("/_next/") ? currentBuildId() : null,
+        ...navigationTimingEvidence(),
         ...resourceTiming(src),
       };
       logger.warn(`Resource failed to load: <${tag}>`, details);
@@ -147,6 +149,8 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
     file: describeUrl(event.filename),
     line: event.lineno,
     column: event.colno,
+    pageBuildId: currentBuildId(),
+    ...navigationTimingEvidence(),
     // Thrown from the page document itself (not a /_next/ chunk): an inline
     // script. Ours are only Next's data pushes; app logic lives in chunks, so
     // this is usually code injected by an extension (e.g. a wallet's

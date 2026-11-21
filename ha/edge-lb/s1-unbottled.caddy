@@ -78,6 +78,26 @@ http://unbottled.ai, http://www.unbottled.ai {
 unbottled.ai {
 	# Mark responses that reached this edge, including errors generated here.
 	header +Server-Timing "vibe-edge;desc=\"s1\""
+	# Keep a status and timestamp even when the client sees no response headers.
+	log unbottled_failures {
+		level ERROR
+		format filter {
+			wrap json
+			fields {
+				request delete
+				resp_headers delete
+				user_id delete
+			}
+		}
+	}
+	@meta_crawler header_regexp User-Agent (?i)facebookexternalhit|meta-externalagent|meta-externalfetcher
+	log_append @meta_crawler automation meta-crawler
+	@next_asset path /_next/*
+	log_append @next_asset surface next-asset
+	@app_api path /api/*
+	log_append @app_api surface api
+	@realtime path /ws*
+	log_append @realtime surface websocket
 	tls {
 		issuer acme {
 			disable_tlsalpn_challenge

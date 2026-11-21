@@ -656,6 +656,8 @@ export class LeadTrackingRepository {
                 from: currentStatus,
                 to: newStatus,
                 error: updateResult.message,
+                errorKey: updateResult.errorType.errorKey,
+                errorCode: updateResult.errorType.errorCode,
               });
               return fail({
                 message: t("tracking.errors.default"),

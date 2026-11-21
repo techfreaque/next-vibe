@@ -25,7 +25,10 @@ import {
   type ResponseType,
 } from "../../core/route/response.schema";
 import type { WidgetData } from "../../core/utils/json";
-import { parseError } from "../../core/utils/parse-error";
+import {
+  isBrowserNetworkLossMessage,
+  parseError,
+} from "../../core/utils/parse-error";
 import { scopedTranslation as authScopedTranslation } from "../../identity/auth/i18n";
 import { AuthClientRepository } from "../../identity/auth/repository-client";
 import type { JwtPayloadType } from "../../identity/auth/types";
@@ -201,6 +204,7 @@ async function readNonJsonBodyPreview(
  */
 interface CallDiagnostics {
   startedAt: number;
+  phase?: "prepare" | "fetch" | "response-body";
   status?: number;
   transport?: "http" | "client-route";
   redirected?: boolean;
@@ -209,6 +213,7 @@ interface CallDiagnostics {
   alreadyLogged?: boolean;
   /** Sent as x-request-id; the server stamps it on its rows for this call. */
   requestId: string;
+  retryOf?: string;
   /**
    * What the client actually put on the wire (JSON chars / multipart parts),
    * so a server that saw an empty body is provably a transit loss.
@@ -388,6 +393,7 @@ function reportApiFailure(
   }
   const status = diag.status ?? null;
   const isAbort = diag.thrown?.name === "AbortError";
+  const noHttpResponse = diag.phase === "fetch" && status === null;
   const isServerSide =
     !isAbort &&
     (diag.thrown !== undefined ||
@@ -399,7 +405,8 @@ function reportApiFailure(
     method: endpoint.method,
     status,
     errorKey,
-    errorCode,
+    errorCode: noHttpResponse ? null : errorCode,
+    failurePhase: diag.phase ?? null,
     // Translated, display-ready text (field list for validation errors)
     errorMessage: String(response.message).slice(0, 500),
     causeKey: response.cause?.errorType?.errorKey ?? null,
@@ -415,12 +422,15 @@ function reportApiFailure(
     isPublicUser: user.isPublic,
     // Match against the server's error_logs rows for the same request
     requestId: diag.requestId,
+    retryOfRequestId: diag.retryOf ?? null,
     csrfHeaderSent: diag.csrfHeaderSent ?? null,
-    ...(diag.thrown && !isAbort ? networkFailureContext(diag, durationMs) : {}),
+    ...(noHttpResponse && diag.thrown && !isAbort
+      ? networkFailureContext(diag, durationMs)
+      : {}),
   };
   if (isServerSide) {
     logger.error(
-      `Endpoint call failed: ${endpointPath}/${endpoint.method}`,
+      `${noHttpResponse ? "Endpoint transport failed" : "Endpoint call failed"}: ${endpointPath}/${endpoint.method}`,
       diag.thrown ?? context,
       ...(diag.thrown ? [context] : []),
     );
@@ -440,26 +450,30 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   locale: CountryLanguage,
   requestData: TEndpoint["types"]["RequestOutput"],
   pathParams: TEndpoint["types"]["UrlVariablesOutput"],
+  onRequestId?: (requestId: string) => void,
 ): Promise<ResponseType<TEndpoint["types"]["ResponseOutput"]>> {
-  const requestId = mintRequestId();
-  const diag: CallDiagnostics = {
-    requestId,
-    visibilityAtStart: currentVisibility(),
-    startedAt: Date.now(),
-  };
-  // Every log line of this call (non-JSON body, schema mismatch, central
-  // failure report, client-route handler logs) carries the request id.
-  const callLogger = withLogContext(logger, { requestId });
-  const result = await callApiInner(
-    endpoint,
-    callLogger,
-    user,
-    locale,
-    requestData,
-    pathParams,
-    diag,
-  );
-  if (!result.success) {
+  let retryOf: string | undefined;
+  for (;;) {
+    const requestId = mintRequestId();
+    onRequestId?.(requestId);
+    const diag: CallDiagnostics = {
+      requestId,
+      retryOf,
+      visibilityAtStart: currentVisibility(),
+      startedAt: Date.now(),
+    };
+    const result = await callApiInner(
+      endpoint,
+      withLogContext(logger, { requestId }),
+      user,
+      locale,
+      requestData,
+      pathParams,
+      diag,
+    );
+    if (result.success) {
+      return result;
+    }
     try {
       reportApiFailure(
         endpoint,
@@ -473,8 +487,24 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     } catch {
       // Reporting must never turn a handled failure into a thrown one
     }
+    // A failed credit read can be retried without replaying a mutation.
+    // Report the failed attempt even when the next attempt succeeds.
+    if (
+      retryOf === undefined &&
+      endpoint.method === Methods.GET &&
+      endpoint.path.join("/") === "credits" &&
+      diag.status === undefined &&
+      diag.phase === "fetch" &&
+      diag.thrown &&
+      isBrowserNetworkLossMessage(diag.thrown.message) &&
+      currentVisibility() === "visible" &&
+      browserOnline()
+    ) {
+      retryOf = requestId;
+      continue;
+    }
+    return result;
   }
-  return result;
 }
 
 async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
@@ -574,6 +604,7 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
     endpoint.method === Methods.GET ? null : describeRequestBody(postBody);
 
   try {
+    diag.phase = "prepare";
     const headers: Record<string, string> =
       postBody instanceof FormData
         ? {}
@@ -619,8 +650,10 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
       options.body = postBody;
     }
 
+    diag.phase = "fetch";
     // oxlint-disable-next-line restricted/no-raw-fetch
     let response = await fetch(url, options);
+    diag.status = response.status;
     // CSRF race: a parallel response (first visit, or the 1-day cookie expired
     // in an idle tab) stamped a new token after we read the cookie, so this
     // request carried a token we did not echo. Re-read and retry once when the
@@ -641,6 +674,7 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
     diag.status = response.status;
     diag.redirected = response.redirected;
     diag.via = response.headers.get("via");
+    diag.phase = "response-body";
     // A proxy/gateway error (502/503 "Service Unavailable") has a plain-text
     // body — report the HTTP status, not a JSON parse error.
     const isJsonBody = (response.headers.get("content-type") ?? "").includes(

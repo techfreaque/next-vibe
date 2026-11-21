@@ -51,6 +51,7 @@ type FetchResult<T> =
       error: string;
       isTimeout?: boolean;
       upstreamStatus?: number;
+      failureStage?: "proxy-headers" | "proxy-body" | "proxy-status";
       /** The caller's input was unfetchable (bad URL, scraper answered 4xx). */
       isCallerError?: boolean;
     };
@@ -384,6 +385,7 @@ class FetchUrlService {
     fetchImpl: typeof globalThis.fetch,
   ): Promise<FetchResult<ScrappeyResponse>> {
     const apiUrl = `${this.SCRAPPEY_API_URL}?key=${agentEnv.SCRAPPEY_API_KEY}`;
+    let upstreamStatus: number | undefined;
 
     try {
       const response = await fetchImpl(apiUrl, {
@@ -397,6 +399,7 @@ class FetchUrlService {
         }),
         signal,
       });
+      upstreamStatus = response.status;
 
       if (!response.ok) {
         // Scrappey's body names the reason (blocked, login wall, proxy
@@ -411,6 +414,7 @@ class FetchUrlService {
           // eslint-disable-next-line i18next/no-literal-string
           error: `Scrappey API error: ${response.status} ${response.statusText}${detail ? ` - ${detail}` : ""}`,
           upstreamStatus: response.status,
+          failureStage: "proxy-status",
           // Scrappey's status is about OUR API call, not the target page (a
           // page 404 comes back as 200 + solution.statusCode). Only a rejected
           // URL (400/422) is the caller's; 401/402/403/429 mean our key,
@@ -438,6 +442,9 @@ class FetchUrlService {
         ok: false,
         error: `Failed to fetch from Scrappey: ${errorMessage}`,
         isTimeout,
+        upstreamStatus,
+        failureStage:
+          upstreamStatus === undefined ? "proxy-headers" : "proxy-body",
       };
     }
   }
@@ -582,6 +589,7 @@ export class FetchUrlContentRepository {
           timeoutMs: fetchService.TIMEOUT,
           elapsedMs: Date.now() - startedAt,
           upstreamStatus: result.upstreamStatus,
+          failureStage: result.failureStage,
           targetHost: URL.canParse(url) ? new URL(url).hostname : null,
         },
       );

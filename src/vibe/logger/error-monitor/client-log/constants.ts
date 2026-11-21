@@ -18,6 +18,7 @@ export const CLIENT_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "tabId",
   // Per-call correlation id (matches the server rows of that request)
   "requestId",
+  "retryOfRequestId",
   CLIENT_LOG_OCCURRENCES_KEY,
   "dedupWindowMs",
   "userAgent",

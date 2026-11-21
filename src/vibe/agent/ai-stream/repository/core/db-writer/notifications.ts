@@ -160,6 +160,17 @@ export async function emitErrorMessage(
   const { threadId, errorType, error, parentId, sequenceId, user } = params;
   const errorMessageId = crypto.randomUUID();
   const serializedError = params.content ?? serializeError(error);
+  w.deps.logger.info("AI stream error bubble created", {
+    errorMessageId,
+    threadId,
+    parentId,
+    sequenceId,
+    streamErrorType: errorType,
+    errorKey: error.errorType.errorKey,
+    causeKey: error.cause?.errorType.errorKey ?? null,
+    incognito: w.deps.isIncognito,
+    willPersist: !w.deps.isIncognito && !params.skipDb,
+  });
 
   // SSE: MESSAGE_CREATED for the error message
   // The client's MESSAGE_CREATED handler adds this to the chat store with the

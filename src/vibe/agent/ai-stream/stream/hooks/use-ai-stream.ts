@@ -139,26 +139,27 @@ export function useAIStream(): UseAIStreamReturn {
       // sees an empty body. Stop here with the real reason.
       const uploadTooLargeMessage = getUploadTooLargeMessage(data, locale);
       if (uploadTooLargeMessage) {
+        const errorMessageId = data.threadId
+          ? addErrorMessageToChat(
+              data.threadId,
+              data.rootFolderId,
+              uploadTooLargeMessage,
+              "HTTP_ERROR",
+              null,
+              null,
+              logger,
+            )
+          : null;
         logger.warn("Stream request blocked: upload too large", {
           operation: data.operation,
           threadId: data.threadId,
+          errorMessageId,
           rootFolderId: data.rootFolderId,
           attachmentCount: data.attachments?.length ?? 0,
           uploadBytes:
             (data.attachments?.reduce((sum, file) => sum + file.size, 0) ?? 0) +
             (data.audioInput?.file?.size ?? 0),
         });
-        if (data.threadId) {
-          addErrorMessageToChat(
-            data.threadId,
-            data.rootFolderId,
-            uploadTooLargeMessage,
-            "HTTP_ERROR",
-            null,
-            null,
-            logger,
-          );
-        }
         toast({
           title: t("error.title"),
           description: uploadTooLargeMessage,
@@ -259,6 +260,19 @@ export function useAIStream(): UseAIStreamReturn {
           : isNonApiResponse
             ? "Stream request got a non-API response"
             : "Stream request rejected by server";
+        const activeThreadId = data.threadId;
+        const errorMessageId =
+          activeThreadId && !isCreditRefusal && !isConsentRefusal
+            ? addErrorMessageToChat(
+                activeThreadId,
+                data.rootFolderId,
+                failMessage,
+                "HTTP_ERROR",
+                null,
+                null,
+                logger,
+              )
+            : null;
         (isBrowserNetworkLoss || isCreditRefusal || isConsentRefusal
           ? logger.warn
           : logger.error
@@ -270,6 +284,7 @@ export function useAIStream(): UseAIStreamReturn {
           operation: data.operation,
           model: data.model,
           threadId: data.threadId,
+          errorMessageId,
           rootFolderId: data.rootFolderId,
           online: isOnline(),
         });
@@ -282,7 +297,6 @@ export function useAIStream(): UseAIStreamReturn {
           return false;
         }
 
-        const activeThreadId = data.threadId;
         // Credit refusal (402): the composer shows a sign-up / top-up card
         // (visible on new and existing threads alike) - no error bubble, no
         // destructive toast.
@@ -293,18 +307,6 @@ export function useAIStream(): UseAIStreamReturn {
           useAIStreamStore.getState().setCreditRefusal(true);
           return false;
         }
-        if (activeThreadId) {
-          addErrorMessageToChat(
-            activeThreadId,
-            data.rootFolderId,
-            failMessage,
-            "HTTP_ERROR",
-            null,
-            null,
-            logger,
-          );
-        }
-
         toast({
           title: t("error.title"),
           description: failMessage,

@@ -68,6 +68,7 @@ class ErrorRouter {
     parentId: string | null;
     content: string;
     errorType: string;
+    stage: "setup" | "stream-creation";
     rootFolderId: DefaultFolderId;
     user: JwtPayloadType;
     /** True only for authenticated users whose thread row may already exist. */
@@ -85,6 +86,15 @@ class ErrorRouter {
       logger,
     } = params;
     const errorMessageId = crypto.randomUUID();
+    logger.info("AI stream error bubble created", {
+      errorMessageId,
+      threadId,
+      parentId,
+      streamErrorType: errorType,
+      stage: params.stage,
+      rootFolderId,
+      willPersist: persist,
+    });
     try {
       if (persist) {
         try {
@@ -170,6 +180,7 @@ export async function emitSetupError(params: {
       ErrorResponseTypes.PAYMENT_REQUIRED.errorCode;
   await ErrorRouter.route({
     threadId,
+    stage: "setup",
     // Chain as child of the previous branch tip. Do NOT use userMessageId — the
     // user message is not persisted yet at setup time (invalid parent FK).
     parentId: data.parentMessageId || null,
@@ -215,6 +226,7 @@ export async function emitStreamCreationError(params: {
   }
   await ErrorRouter.route({
     threadId: errorThreadId,
+    stage: "stream-creation",
     parentId: errorParentId,
     content: aiStreamT("route.errors.streamCreationFailed"),
     errorType: StreamErrorType.STREAM_ERROR,
