@@ -11,8 +11,11 @@ import {
   desc,
   eq,
   exists,
+  isNotNull,
   isNull,
+  ne,
   or,
+  type SQL,
   sql,
 } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
@@ -26,15 +29,129 @@ import { db } from "next-vibe/database";
 import { emailCampaigns, leads } from "next-vibe/identity/lead/db";
 import { LeadStatus } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { utcSql } from "next-vibe/unified-ui/analytics/window-sql";
 
 import { mapCampaignTypeFilter } from "@/messenger/accounts/enum";
 import { MessageStatus } from "@/messenger/messages/enum";
 
+import { journeyVariantFromFilter, stageFromFilter } from "../filter-map";
 import type {
   CampaignQueueGetRequestOutput,
   CampaignQueueGetResponseOutput,
 } from "./definition";
+import { QueueDelivery } from "./enum";
 import type { CampaignQueueT } from "./i18n";
+
+function dayStart(value: Date): Date {
+  const d = new Date(value);
+  d.setUTCHours(0, 0, 0, 0);
+  return d;
+}
+
+function dayEnd(value: Date): Date {
+  const d = new Date(value);
+  d.setUTCHours(23, 59, 59, 999);
+  return d;
+}
+
+/** `column` inside the optional [eventFrom, eventTo] day window. */
+function inEventWindow(
+  column: SQL | typeof emailCampaigns.sentAt,
+  data: CampaignQueueGetRequestOutput,
+): SQL[] {
+  const out: SQL[] = [];
+  if (data.eventFrom) {
+    out.push(sql`${column} >= ${utcSql(dayStart(data.eventFrom))}`);
+  }
+  if (data.eventTo) {
+    out.push(sql`${column} <= ${utcSql(dayEnd(data.eventTo))}`);
+  }
+  return out;
+}
+
+/** Row-level conditions for the drill filters (delivery, variant, stage, locale). */
+function drillConditions(data: CampaignQueueGetRequestOutput): SQL[] {
+  const out: SQL[] = [];
+  const variant = journeyVariantFromFilter(data.journeyVariant);
+  if (variant) {
+    out.push(eq(emailCampaigns.journeyVariant, variant));
+  }
+  const stage = stageFromFilter(data.stage);
+  if (stage) {
+    out.push(eq(emailCampaigns.stage, stage));
+  }
+  const locale = data.locale?.trim().toLowerCase();
+  if (locale) {
+    const loc = sql`lower(coalesce(
+      (SELECT s.locale FROM email_send_log s WHERE s.campaign_id = ${emailCampaigns.id} LIMIT 1),
+      (SELECT l2.language || '-' || l2.country FROM leads l2 WHERE l2.id = ${emailCampaigns.leadId})
+    ))`;
+    out.push(sql`(${loc} = ${locale} OR ${loc} LIKE ${`${locale}-%`})`);
+  }
+  const nowUtc = sql`(now() AT TIME ZONE 'UTC')`;
+  const pending = and(
+    eq(emailCampaigns.status, MessageStatus.PENDING),
+    isNull(emailCampaigns.sentAt),
+  );
+  const sent = and(
+    isNotNull(emailCampaigns.sentAt),
+    ne(emailCampaigns.status, MessageStatus.FAILED),
+  );
+  switch (data.delivery) {
+    case QueueDelivery.DUE_NOW:
+      out.push(sql`${pending} AND ${emailCampaigns.scheduledAt} <= ${nowUtc}`);
+      break;
+    case QueueDelivery.OVERDUE:
+      out.push(
+        sql`${pending} AND ${emailCampaigns.scheduledAt} <= ${nowUtc} - interval '24 hours'`,
+      );
+      break;
+    case QueueDelivery.SCHEDULED:
+      out.push(sql`${pending} AND ${emailCampaigns.scheduledAt} > ${nowUtc}`);
+      break;
+    case QueueDelivery.FAILED:
+      out.push(
+        eq(emailCampaigns.status, MessageStatus.FAILED),
+        // Dedupe/status skips are not send errors (matches campaign-stats).
+        sql`NOT coalesce(${emailCampaigns.error} LIKE 'duplicate:%' OR ${emailCampaigns.error} LIKE 'status_change:%', false)`,
+        ...inEventWindow(sql`${emailCampaigns.updatedAt}`, data),
+      );
+      break;
+    case QueueDelivery.SENT:
+      out.push(sql`${sent}`, ...inEventWindow(emailCampaigns.sentAt, data));
+      break;
+    case QueueDelivery.OPENED:
+      out.push(
+        sql`${sent}`,
+        isNotNull(emailCampaigns.openedAt),
+        ...inEventWindow(emailCampaigns.sentAt, data),
+      );
+      break;
+    case QueueDelivery.CLICKED:
+      out.push(
+        sql`${sent}`,
+        isNotNull(emailCampaigns.clickedAt),
+        ...inEventWindow(emailCampaigns.sentAt, data),
+      );
+      break;
+    case QueueDelivery.UNSUBSCRIBED:
+      out.push(
+        isNotNull(emailCampaigns.unsubscribedAt),
+        ...inEventWindow(sql`${emailCampaigns.unsubscribedAt}`, data),
+      );
+      break;
+    case QueueDelivery.BOUNCED:
+      out.push(
+        isNotNull(emailCampaigns.bouncedAt),
+        ...inEventWindow(sql`${emailCampaigns.bouncedAt}`, data),
+      );
+      break;
+    case undefined:
+      out.push(...inEventWindow(emailCampaigns.sentAt, data));
+      break;
+  }
+  return out;
+}
 
 export class CampaignQueueRepository {
   static async getQueue(
@@ -64,15 +181,23 @@ export class CampaignQueueRepository {
         .select({ id: emailCampaigns.id })
         .from(emailCampaigns)
         .where(and(matchesCampaign, isPending));
+      const drill = drillConditions(data);
       const filter = and(
         data.leadId ? eq(leads.id, data.leadId) : undefined,
-        or(
-          exists(pendingDelivery),
-          and(
-            eq(leads.status, LeadStatus.CAMPAIGN_RUNNING),
-            campaignType ? exists(matchingDelivery) : undefined,
-          ),
-        ),
+        drill.length > 0
+          ? exists(
+              db
+                .select({ id: emailCampaigns.id })
+                .from(emailCampaigns)
+                .where(and(matchesCampaign, ...drill)),
+            )
+          : or(
+              exists(pendingDelivery),
+              and(
+                eq(leads.status, LeadStatus.CAMPAIGN_RUNNING),
+                campaignType ? exists(matchingDelivery) : undefined,
+              ),
+            ),
       );
 
       // A single matching row per lead keeps paging and counts consistent.
@@ -132,6 +257,7 @@ export class CampaignQueueRepository {
           .offset((page - 1) * pageSize),
       ]);
 
+      const nowMs = Date.now();
       return success({
         totalCount: countRow?.total ?? 0,
         currentPage: page,
@@ -149,6 +275,10 @@ export class CampaignQueueRepository {
             currentStage: deliveryStage ?? lead.currentStage ?? "",
             journeyVariant: deliveryVariant ?? lead.journeyVariant ?? "",
             nextScheduledAt: nextScheduledAt?.toISOString() ?? null,
+            daysOverdue:
+              nextScheduledAt && nextScheduledAt.getTime() < nowMs
+                ? Math.floor((nowMs - nextScheduledAt.getTime()) / 86_400_000)
+                : null,
           }),
         ),
       });

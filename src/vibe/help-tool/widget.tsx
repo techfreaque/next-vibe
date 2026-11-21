@@ -139,11 +139,13 @@ import {
 import { resolveEndpoint } from "../unified-ui/hooks/resolve-endpoint";
 import { apiClient } from "../unified-ui/hooks/store";
 import { useEndpoint } from "../unified-ui/hooks/use-endpoint";
+import type { NavigationOptions } from "../unified-ui/hooks/use-navigation-stack";
 import { useUrlNavStack } from "../unified-ui/hooks/use-url-nav-stack";
 import { EndpointsPage } from "../unified-ui/renderers/web/EndpointsPage";
 import { Icon } from "../unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { IconKey } from "../unified-ui/widgets/form-fields/icon-field/icons";
 import { AdminCatalog, localizedLabel } from "./admin-catalog";
+import { CatalogOverview } from "./catalog-overview";
 import type { CategoryDefinitionSerialized } from "./category-types";
 import type definition from "./definition";
 import type {
@@ -1692,6 +1694,54 @@ export function HelpToolsWidget(): JSX.Element {
     ],
   );
 
+  // ── Catalog overview drill-down ────────────────────────────────────────────
+  // The overview report is embedded in the catalog root. Its drill-downs open
+  // the target tool as the selected tool (URL /tools/<alias>?arg.*), so Back
+  // returns to the overview.
+  const catalogOverviewNavigation = useMemo(
+    () => ({
+      push: <TEndpoint extends CreateApiEndpointAny>(
+        endpointDef: TEndpoint,
+        options?: NavigationOptions<TEndpoint>,
+      ): void => {
+        if (!canOpenLocalEndpoint(endpointDef)) {
+          return;
+        }
+        const args: Record<string, string> = {};
+        for (const [key, value] of Object.entries({
+          ...options?.urlPathParams,
+          ...options?.data,
+        })) {
+          if (
+            typeof value === "string" ||
+            typeof value === "number" ||
+            typeof value === "boolean"
+          ) {
+            args[key] = String(value);
+          }
+        }
+        ++selectionRevision.current;
+        const newPath = `/${locale}/${ADMIN_ENDPOINTS_PATH}/${endpointToUrlSegment(endpointDef)}`;
+        setUnavailableSelection(false);
+        setIsRestoringTool(false);
+        setSelectedAdminEndpoint(endpointDef, args);
+        urlNavStack?._clearStack();
+        const sp = copyCatalogSearchParams(effectiveSearchRef.current);
+        for (const [key, value] of Object.entries(args)) {
+          sp.set(`arg.${key}`, value);
+        }
+        writeSilentUrl(newPath, sp, true);
+      },
+    }),
+    [
+      canOpenLocalEndpoint,
+      locale,
+      setSelectedAdminEndpoint,
+      urlNavStack,
+      writeSilentUrl,
+    ],
+  );
+
   // ── Admin navigation stack override ─────────────────────────────────────────
   // urlNavStack (from useUrlNavStack) is passed directly as navigationOverride
   // to EndpointsPage. It handles all push/pop/replace + URL sync.
@@ -2896,6 +2946,20 @@ export function HelpToolsWidget(): JSX.Element {
               isAdminUser && !activeViewAsRole && !activeInstanceId
                 ? (response?.recordSearchTargets ?? [])
                 : []
+            }
+            overview={
+              isAdminUser &&
+              !activeViewAsRole &&
+              !activeInstanceId &&
+              response?.catalogOverview ? (
+                <CatalogOverview
+                  alias={response.catalogOverview}
+                  pageProps={{
+                    ...toolPageProps,
+                    navigationOverride: catalogOverviewNavigation,
+                  }}
+                />
+              ) : undefined
             }
             loading={
               isFetching || (!response && endpointResponse === undefined)

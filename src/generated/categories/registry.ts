@@ -59,6 +59,7 @@ export type SubCategoryKey =
   | "messagesSearch"
   | "messagesFiles"
   | "tasksCron"
+  | "Business"
   | "Vibe Sense"
   | "Indicators"
   | "Evaluators"
@@ -80,6 +81,7 @@ export type SubCategoryKey =
   | "Management"
   | "subscriptionAnalytics"
   | "Credits"
+  | "Analytics"
   | "Import"
   | "Leads"
   | "emailCampaignsProcessing"
@@ -450,8 +452,23 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     group: "analytics",
     icon: "bar-chart-2",
     order: 10,
-    defaultEntryAlias: "vibe-sense-graphs",
+    defaultEntryAlias: "business-overview",
+    catalogOverview: "business-overview",
     subcategories: {
+      Business: {
+        icon: "briefcase",
+        order: -1,
+        label: "Business",
+        labels: {
+          "en-US": "Business",
+          "en-GLOBAL": "Business",
+          "de-DE": "Geschäft",
+          "pl-PL": "Biznes",
+          "fr-FR": "Activité",
+          "it-IT": "Attività",
+          "es-ES": "Negocio",
+        },
+      },
       "Vibe Sense": {
         icon: "activity",
         order: 0,
@@ -679,7 +696,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     group: "business",
     icon: "credit-card",
     order: 10,
-    defaultEntryAlias: "payment-dashboard",
+    defaultEntryAlias: "revenue-report",
     recordSearch: { alias: "payment-invoice-list", field: "search" },
     subcategories: {
       Transactions: {
@@ -727,7 +744,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     group: "business",
     icon: "refresh-cw",
     order: 12,
-    defaultEntryAlias: "subscription-dashboard",
+    defaultEntryAlias: "revenue-report",
     subcategories: {
       Subscriptions: {
         icon: "refresh-cw",
@@ -788,7 +805,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     group: "business",
     icon: "coins",
     order: 15,
-    defaultEntryAlias: "credits-balance",
+    defaultEntryAlias: "credit-usage-report",
     subcategories: {
       Credits: {
         icon: "coins",
@@ -835,9 +852,23 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     group: "business",
     icon: "target",
     order: 20,
-    defaultEntryAlias: "leads-dashboard",
+    defaultEntryAlias: "acquisition-report",
     recordSearch: { alias: "leads-search", field: "search" },
     subcategories: {
+      Analytics: {
+        icon: "bar-chart-2",
+        order: -1,
+        label: "Analytics",
+        labels: {
+          "en-US": "Analytics",
+          "en-GLOBAL": "Analytics",
+          "de-DE": "Analysen",
+          "pl-PL": "Analityka",
+          "fr-FR": "Analyses",
+          "it-IT": "Analisi",
+          "es-ES": "Análisis",
+        },
+      },
       Management: {
         icon: "users",
         order: 0,
@@ -1361,7 +1392,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     group: "business",
     icon: "share-2",
     order: 60,
-    defaultEntryAlias: "referral-stats",
+    defaultEntryAlias: "referral-overview",
     subcategories: {
       Program: {
         icon: "share-2",
@@ -1866,7 +1897,7 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
     group: "system",
     icon: "user",
     order: 10,
-    defaultEntryAlias: "users-list",
+    defaultEntryAlias: "users-stats",
     recordSearch: { alias: "users-list", field: "search" },
     subcategories: {
       login: {
@@ -1942,15 +1973,15 @@ export const CATEGORY_REGISTRY: CategoryDefinitionSerialized[] = [
       userStats: {
         icon: "bar-chart-2",
         order: 5,
-        label: "User Stats",
+        label: "Signups",
         labels: {
-          "en-US": "User Stats",
-          "en-GLOBAL": "User Stats",
-          "de-DE": "Nutzerstatistiken",
-          "pl-PL": "Statystyki użytkowników",
-          "fr-FR": "Stats des utilisateurs",
-          "it-IT": "Statistiche utenti",
-          "es-ES": "Estadísticas de usuarios",
+          "en-US": "Signups",
+          "en-GLOBAL": "Signups",
+          "de-DE": "Registrierungen",
+          "pl-PL": "Rejestracje",
+          "fr-FR": "Inscriptions",
+          "it-IT": "Iscrizioni",
+          "es-ES": "Registros",
         },
       },
       remoteInstances: {

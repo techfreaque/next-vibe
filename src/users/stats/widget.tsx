@@ -1,766 +1,885 @@
 /**
- * Users Stats Widget
- * Business dashboard. Web: KPI cards with change vs previous window, a
- * switchable bar chart and breakdown tables. CLI/MCP: a compact text report.
+ * Signups report widget (users-stats).
+ * Web: period toolbar with filter chips, KPI tiles, signup and activity
+ * charts, funnel, channel/ref-code/plan/locale breakdowns and free burners.
+ * Every tile, bar, step and row drills into users-list with the same filters.
+ * CLI/MCP: the analytics components render tables and compact text.
  */
 
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
+import {
+  type AnalyticsFilterChip,
+  AnalyticsToolbar,
+  BreakdownTable,
+  type BreakdownTableRow,
+  KpiGrid,
+  KpiTile,
+  TimeSeriesChart,
+  type TimeSeriesChartSeries,
+} from "next-vibe/ui/components/analytics";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
+import { Filter } from "next-vibe/ui/components/icons/Filter";
 import { Users } from "next-vibe/ui/components/icons/Users";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
-import { MetricCard } from "next-vibe/ui/components/metric-card";
-import { MetricGrid } from "next-vibe/ui/components/metric-grid";
 import { Pre } from "next-vibe/ui/components/pre";
-import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
-import { StatusPill } from "next-vibe/ui/components/status-pill";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "next-vibe/ui/components/table";
-import { P } from "next-vibe/ui/components/typography";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
-import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
-  useWidgetNavigation,
+  useWidgetOnSubmit,
   useWidgetPlatform,
-  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
-import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
+import type { AnalyticsBucket } from "next-vibe/unified-ui/analytics/enum";
+import { nextBucket } from "next-vibe/unified-ui/analytics/window";
+import { MultiSelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/multiselect-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import type React from "react";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
+import { SubscriptionPlan } from "@/subscription/enum";
+
+import { formatDay, subscriptionPlanLabel } from "../format";
+import { USERS_CHANNEL_NONE } from "../list/constants";
+import type { UserListRequestOutput } from "../list/definition";
 import {
-  cell,
-  formatDay,
-  formatMoney,
-  formatNumber,
-  formatPercent,
-  formatUsd,
-  subscriptionStatusLabel,
-  subscriptionStatusVariant,
-} from "../format";
+  AccountStateFilter,
+  ListSortOrder,
+  PayerFilter,
+  SubscriptionFilter,
+  UserListSortField,
+  UserPlanFilter,
+  UsersAudience,
+} from "../list/enum";
+import { scopedTranslation as listScopedTranslation } from "../list/i18n";
 import type definition from "./definition";
-import type { UserStatsResponseOutput } from "./definition";
-import { StatsRange } from "./enum";
 
 interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
 
-type StatsT = ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
-type SeriesRow = UserStatsResponseOutput["series"][number];
-type SeriesMetric =
-  | "signups"
-  | "activeUsers"
-  | "payingUsers"
-  | "revenueUsd"
-  | "creditsSpent";
+type ListDrill = Partial<UserListRequestOutput>;
 
-const CREDIT_USD = 0.01;
+const DAY_MS = 86_400_000;
 
-/** Relative change; null when there is no baseline. */
-function change(current: number, previous: number): number | null {
-  if (previous === 0) {
-    return current === 0 ? 0 : null;
-  }
-  return (current - previous) / previous;
+function dayDate(key: string): Date {
+  return new Date(`${key}T00:00:00.000Z`);
 }
 
-function trendOf(delta: number | null): "up" | "down" | "neutral" {
-  if (delta === null || delta === 0) {
-    return "neutral";
-  }
-  return delta > 0 ? "up" : "down";
+/** Last day (inclusive) of the bucket starting at `key`, clamped to `max`. */
+function bucketLastDay(
+  key: string,
+  bucket: AnalyticsBucket,
+  max: string,
+): Date {
+  const end = new Date(nextBucket(dayDate(key), bucket).getTime() - DAY_MS);
+  const cap = dayDate(max);
+  return end.getTime() > cap.getTime() ? cap : end;
 }
 
-function deltaText(
-  delta: number | null,
-  t: StatsT,
-  locale: CountryLanguage,
-): string {
-  if (delta === null) {
-    return t("widget.new");
-  }
-  const sign = delta > 0 ? "+" : "";
-  return `${sign}${formatPercent(delta, locale)}`;
-}
-
-function bucketLabel(
-  bucket: Date,
-  granularity: UserStatsResponseOutput["period"]["granularity"],
-  locale: CountryLanguage,
-): string {
-  const d = new Date(bucket);
-  const tag = locale.endsWith("-GLOBAL") ? locale.split("-")[0] : locale;
-  if (granularity === "month") {
-    return d.toLocaleDateString(tag, {
-      month: "short",
-      year: "2-digit",
-      timeZone: "UTC",
+function localeLabel(key: string, locale: CountryLanguage): string {
+  const [lang, country] = key.split("-");
+  try {
+    const names = new Intl.DisplayNames([locale.split("-")[0] ?? "en"], {
+      type: "language",
     });
+    const name = lang ? names.of(lang) : undefined;
+    return name ? `${name} (${country ?? ""})` : key;
+  } catch {
+    return key;
   }
-  return d.toLocaleDateString(tag, {
-    month: "short",
-    day: "numeric",
-    timeZone: "UTC",
-  });
 }
-
-function metricValue(row: SeriesRow, metric: SeriesMetric): number {
-  return row[metric];
-}
-
-function formatMetric(
-  value: number,
-  metric: SeriesMetric,
-  locale: CountryLanguage,
-): string {
-  return metric === "revenueUsd"
-    ? formatUsd(value, locale)
-    : formatNumber(value, locale);
-}
-
-function kpiRow(
-  label: string,
-  value: string,
-  prev: string,
-  delta: string,
-): string {
-  return `${cell(label, 22)} ${cell(value, 12)} ${cell(prev, 12)} ${delta}`;
-}
-
-// ─── CLI / MCP text report ──────────────────────────────────────────────────
-
-function renderText(
-  data: UserStatsResponseOutput,
-  t: StatsT,
-  locale: CountryLanguage,
-): string {
-  const { kpis, period } = data;
-  const lines: string[] = [];
-  lines.push(
-    t("widget.text.header", {
-      from: formatDay(period.from, locale, true),
-      to: formatDay(period.to, locale, true),
-      days: period.days,
-    }),
-  );
-  lines.push("");
-  lines.push(
-    kpiRow(
-      t("widget.text.metric"),
-      t("widget.text.current"),
-      t("widget.text.previous"),
-      t("widget.text.change"),
-    ),
-  );
-  lines.push(
-    kpiRow(
-      t("kpi.newUsers"),
-      formatNumber(kpis.newUsers, locale),
-      formatNumber(kpis.newUsersPrev, locale),
-      deltaText(change(kpis.newUsers, kpis.newUsersPrev), t, locale),
-    ),
-  );
-  lines.push(
-    kpiRow(
-      t("kpi.activeUsers"),
-      formatNumber(kpis.activeUsers, locale),
-      formatNumber(kpis.activeUsersPrev, locale),
-      deltaText(change(kpis.activeUsers, kpis.activeUsersPrev), t, locale),
-    ),
-  );
-  lines.push(
-    kpiRow(
-      t("kpi.payingUsers"),
-      formatNumber(kpis.payingUsers, locale),
-      formatNumber(kpis.payingUsersPrev, locale),
-      deltaText(change(kpis.payingUsers, kpis.payingUsersPrev), t, locale),
-    ),
-  );
-  lines.push(
-    kpiRow(
-      t("kpi.revenue"),
-      formatUsd(kpis.revenueUsd, locale),
-      formatUsd(kpis.revenuePrevUsd, locale),
-      deltaText(change(kpis.revenueUsd, kpis.revenuePrevUsd), t, locale),
-    ),
-  );
-  lines.push(
-    kpiRow(
-      t("kpi.creditsSpent"),
-      formatNumber(kpis.creditsSpent, locale),
-      formatNumber(kpis.creditsSpentPrev, locale),
-      deltaText(change(kpis.creditsSpent, kpis.creditsSpentPrev), t, locale),
-    ),
-  );
-  lines.push("");
-  lines.push(
-    `${t("kpi.mrr")}: ${formatUsd(kpis.mrrUsd, locale)} | ${t("kpi.activeSubscribers")}: ${kpis.activeSubscribers} | ${t("kpi.pastDue")}: ${kpis.pastDueSubscribers}`,
-  );
-  lines.push(
-    `${t("kpi.signupToPaid")}: ${formatPercent(kpis.signupToPaid.rate, locale)} (${kpis.signupToPaid.converted}/${kpis.signupToPaid.cohort}) | ${t("kpi.retentionD7")}: ${formatPercent(kpis.retentionD7.rate, locale)} (${kpis.retentionD7.converted}/${kpis.retentionD7.cohort})`,
-  );
-  lines.push(
-    `${t("kpi.totalUsers")}: ${formatNumber(kpis.totalUsers, locale)} | ${t("kpi.payingAllTime")}: ${kpis.payingUsersAllTime} | ${t("kpi.revenueAllTime")}: ${formatUsd(kpis.revenueAllTimeUsd, locale)} | ${t("kpi.refunds")}: ${formatUsd(kpis.refundsUsd, locale)} | ${t("kpi.anonymousActive")}: ${kpis.anonymousActive}`,
-  );
-
-  if (data.series.length > 0) {
-    lines.push("");
-    lines.push(
-      [
-        cell(t("widget.text.bucket"), 10),
-        cell(t("series.signups"), 8),
-        cell(t("series.activeUsers"), 8),
-        cell(t("series.payingUsers"), 8),
-        cell(t("series.revenueUsd"), 10),
-        t("series.creditsSpent"),
-      ].join(" "),
-    );
-    for (const r of data.series.slice(-40)) {
-      lines.push(
-        [
-          cell(bucketLabel(r.bucket, period.granularity, locale), 10),
-          cell(String(r.signups), 8),
-          cell(String(r.activeUsers), 8),
-          cell(String(r.payingUsers), 8),
-          cell(formatUsd(r.revenueUsd, locale), 10),
-          formatNumber(r.creditsSpent, locale),
-        ].join(" "),
-      );
-    }
-  }
-
-  if (data.channels.length > 0) {
-    lines.push("");
-    lines.push(t("sections.channels"));
-    for (const c of data.channels) {
-      lines.push(
-        `  ${cell(c.channel, 28)} ${cell(String(c.signups), 6)} ${t("widget.text.paying", { count: c.paying })}`,
-      );
-    }
-  }
-
-  if (data.revenueByCurrency.length > 0) {
-    lines.push("");
-    lines.push(t("sections.currencies"));
-    for (const c of data.revenueByCurrency) {
-      lines.push(
-        `  ${cell(formatMoney(c.amount, c.currency, locale), 14)} = ${cell(formatUsd(c.amountUsd, locale), 10)} ${t("widget.times", { count: c.count })}`,
-      );
-    }
-  }
-
-  if (data.topSpenders.length > 0) {
-    lines.push("");
-    lines.push(t("sections.topSpenders"));
-    for (const s of data.topSpenders) {
-      lines.push(
-        `  ${cell(s.email, 36)} ${cell(formatNumber(s.creditsSpent, locale), 9)} ${cell(s.totalPaidUsd > 0 ? formatUsd(s.totalPaidUsd, locale) : "-", 9)} ${s.userId}`,
-      );
-    }
-  }
-  lines.push("");
-  lines.push(t("widget.text.footer"));
-  return lines.join("\n");
-}
-
-// ─── Web pieces ─────────────────────────────────────────────────────────────
-
-function KpiCard({
-  label,
-  value,
-  current,
-  previous,
-  hint,
-  t,
-  locale,
-  variant,
-}: {
-  label: string;
-  value: string;
-  current: number;
-  previous: number;
-  hint?: string;
-  t: StatsT;
-  locale: CountryLanguage;
-  variant?: "default" | "success" | "info" | "warning" | "danger" | "muted";
-}): React.JSX.Element {
-  const delta = change(current, previous);
-  return (
-    <MetricCard
-      label={label}
-      value={value}
-      trend={trendOf(delta)}
-      trendValue={deltaText(delta, t, locale)}
-      description={hint}
-      variant={variant}
-    />
-  );
-}
-
-function SeriesChart({
-  data,
-  t,
-  locale,
-}: {
-  data: UserStatsResponseOutput;
-  t: StatsT;
-  locale: CountryLanguage;
-}): React.JSX.Element {
-  const [metric, setMetric] = useState<SeriesMetric>("signups");
-  const metrics: SeriesMetric[] = [
-    "signups",
-    "activeUsers",
-    "payingUsers",
-    "revenueUsd",
-    "creditsSpent",
-  ];
-  const rows = data.series;
-  const max = Math.max(1, ...rows.map((r) => metricValue(r, metric)));
-  const total = rows.reduce((acc, r) => acc + metricValue(r, metric), 0);
-  const labelEvery = Math.max(1, Math.ceil(rows.length / 8));
-
-  return (
-    <SectionGroup title={t("sections.trend")}>
-      <Div className="flex items-center gap-1 flex-wrap">
-        {metrics.map((m) => (
-          <Button
-            key={m}
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setMetric(m)}
-            className={cn(
-              "h-7 px-2.5 rounded-full text-xs border",
-              metric === m
-                ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
-                : "text-muted-foreground border-border",
-            )}
-          >
-            {t(`series.${m}`)}
-          </Button>
-        ))}
-        <Span className="ml-auto text-xs text-muted-foreground tabular-nums">
-          {t("widget.chartTotal", {
-            total: formatMetric(total, metric, locale),
-          })}
-        </Span>
-      </Div>
-      {rows.length === 0 ? (
-        <P className="text-sm text-muted-foreground">{t("widget.noData")}</P>
-      ) : (
-        <Div className="flex flex-col gap-1">
-          <Div className="flex items-end gap-[2px] h-40 border-b border-border">
-            {rows.map((r) => {
-              const v = metricValue(r, metric);
-              return (
-                <Div
-                  key={new Date(r.bucket).getTime()}
-                  className="flex-1 min-w-[3px] h-full flex flex-col justify-end group relative"
-                  title={`${bucketLabel(r.bucket, data.period.granularity, locale)}: ${formatMetric(v, metric, locale)}`}
-                >
-                  <Div
-                    style={{
-                      height:
-                        v > 0 ? `${Math.max(3, (v / max) * 100)}%` : "2px",
-                    }}
-                  >
-                    <Div
-                      className={cn(
-                        "h-full w-full rounded-t-sm transition-colors",
-                        v > 0
-                          ? "bg-primary/70 group-hover:bg-primary"
-                          : "bg-muted",
-                      )}
-                    />
-                  </Div>
-                </Div>
-              );
-            })}
-          </Div>
-          <Div className="flex gap-[2px]">
-            {rows.map((r, i) => (
-              <Span
-                key={new Date(r.bucket).getTime()}
-                className="flex-1 min-w-[3px] text-[10px] text-muted-foreground text-center whitespace-nowrap overflow-visible"
-              >
-                {i % labelEvery === 0
-                  ? bucketLabel(r.bucket, data.period.granularity, locale)
-                  : ""}
-              </Span>
-            ))}
-          </Div>
-        </Div>
-      )}
-    </SectionGroup>
-  );
-}
-
-// ─── Container ──────────────────────────────────────────────────────────────
 
 export function UsersStatsContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const t = useWidgetTranslation<typeof definition.GET>();
+  const { t: lt } = listScopedTranslation.scopedT(useWidgetLocale());
   const locale = useWidgetLocale();
   const platform = useWidgetPlatform();
-  const responseOnly = useWidgetResponseOnly();
-  const { endpointMutations } = useWidgetContext();
-  const { push: navigate } = useWidgetNavigation();
   const form = useWidgetForm<typeof definition.GET>();
-  const data = useWidgetValue<typeof definition.GET>();
-  const range = form.watch("range");
+  const onSubmit = useWidgetOnSubmit();
+  const value = useWidgetValue<typeof definition.GET>();
+  const { endpointMutations } = useWidgetContext();
+  const navigate = useRelatedEntityNavigation();
+  const [showFilters, setShowFilters] = useState(false);
 
-  const handleRefresh = useCallback((): void => {
-    endpointMutations?.read?.refetch?.();
-  }, [endpointMutations]);
+  const submit = (): void => {
+    onSubmit?.();
+  };
 
-  const handleUsers = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const listDef = await import("../list/definition");
-      navigate(listDef.default.GET);
-    })();
-  }, [navigate]);
+  // Current cohort filters, forwarded to every drill-down.
+  const audience = form.watch("audience") ?? UsersAudience.HUMANS;
+  const channel = form.watch("channel");
+  const channelType = form.watch("channelType");
+  const refCode = form.watch("refCode");
+  const payer = form.watch("payer");
+  const plan = form.watch("plan");
+  const accountState = form.watch("accountState");
+  const base: ListDrill = {
+    audience,
+    channel: channel || undefined,
+    channelType,
+    refCode: refCode || undefined,
+    payer,
+    plan,
+    accountState:
+      accountState && accountState.length > 0 ? accountState : undefined,
+  };
+  const period = value?.window;
+  const signupWindow: ListDrill = period
+    ? { signupFrom: dayDate(period.from), signupTo: dayDate(period.to) }
+    : {};
 
-  const handleViewUser = useCallback(
-    (userId: string): void => {
-      void (async (): Promise<void> => {
-        const viewDef = await import("../view/definition");
-        navigate(viewDef.default.GET, { data: { userId } });
-      })();
-    },
-    [navigate],
+  const openList = (extra: ListDrill): void => {
+    navigate(() => import("../list/definition").then((m) => m.default.GET), {
+      data: { ...base, ...extra },
+    });
+  };
+  const openUser = (userId: string): void => {
+    navigate(() => import("../view/definition").then((m) => m.GET), {
+      data: { userId },
+    });
+  };
+
+  const chips: AnalyticsFilterChip[] = [];
+  if (audience === UsersAudience.ALL) {
+    chips.push({
+      key: "audience",
+      label: lt("get.fields.audience.label"),
+      value: lt(UsersAudience.ALL),
+      onRemove: () => {
+        form.setValue("audience", UsersAudience.HUMANS, { shouldDirty: true });
+        submit();
+      },
+    });
+  }
+  if (channel) {
+    chips.push({
+      key: "channel",
+      label: lt("get.fields.channel.label"),
+      value: channel,
+      onRemove: () => {
+        form.setValue("channel", "", { shouldDirty: true });
+        submit();
+      },
+    });
+  }
+  if (channelType) {
+    chips.push({
+      key: "channelType",
+      label: lt("get.fields.channelType.label"),
+      value: lt(channelType),
+      onRemove: () => {
+        form.setValue("channelType", undefined, { shouldDirty: true });
+        submit();
+      },
+    });
+  }
+  if (refCode) {
+    chips.push({
+      key: "refCode",
+      label: lt("get.fields.refCode.label"),
+      value: refCode,
+      onRemove: () => {
+        form.setValue("refCode", "", { shouldDirty: true });
+        submit();
+      },
+    });
+  }
+  if (payer && payer !== PayerFilter.ANY) {
+    chips.push({
+      key: "payer",
+      label: lt("get.fields.payer.label"),
+      value: lt(payer),
+      onRemove: () => {
+        form.setValue("payer", undefined, { shouldDirty: true });
+        submit();
+      },
+    });
+  }
+  if (plan) {
+    chips.push({
+      key: "plan",
+      label: lt("get.fields.plan.label"),
+      value: lt(plan),
+      onRemove: () => {
+        form.setValue("plan", undefined, { shouldDirty: true });
+        submit();
+      },
+    });
+  }
+  if (accountState && accountState.length > 0) {
+    chips.push({
+      key: "accountState",
+      label: lt("get.fields.accountState.label"),
+      value: accountState.map((s) => lt(s)).join(", "),
+      onRemove: () => {
+        form.setValue("accountState", [], { shouldDirty: true });
+        submit();
+      },
+    });
+  }
+  const clearFilters = (): void => {
+    form.setValue("audience", UsersAudience.HUMANS, { shouldDirty: true });
+    form.setValue("channel", "", { shouldDirty: true });
+    form.setValue("channelType", undefined, { shouldDirty: true });
+    form.setValue("refCode", "", { shouldDirty: true });
+    form.setValue("payer", undefined, { shouldDirty: true });
+    form.setValue("plan", undefined, { shouldDirty: true });
+    form.setValue("accountState", [], { shouldDirty: true });
+    submit();
+  };
+
+  const toolbar = (
+    <AnalyticsToolbar
+      locale={locale}
+      period={period}
+      value={{
+        range: form.watch("range"),
+        granularity: form.watch("granularity"),
+        from: form.watch("from"),
+        to: form.watch("to"),
+      }}
+      onChange={(patch) => {
+        if (patch.range !== undefined) {
+          form.setValue("range", patch.range, { shouldDirty: true });
+        }
+        if (patch.granularity !== undefined) {
+          form.setValue("granularity", patch.granularity, {
+            shouldDirty: true,
+          });
+        }
+        if ("from" in patch) {
+          form.setValue("from", patch.from, { shouldDirty: true });
+        }
+        if ("to" in patch) {
+          form.setValue("to", patch.to, { shouldDirty: true });
+        }
+        submit();
+      }}
+      onRefresh={() => endpointMutations?.read?.refetch?.()}
+      isLoading={endpointMutations?.read?.isLoading === true}
+      filters={chips}
+      onClearFilters={clearFilters}
+    >
+      <Button
+        type="button"
+        variant={showFilters ? "secondary" : "outline"}
+        size="sm"
+        className="h-7 gap-1 text-xs"
+        onClick={() => setShowFilters((v) => !v)}
+        aria-expanded={showFilters}
+      >
+        <Filter className="h-3.5 w-3.5" />
+        {t("widget.filters")}
+      </Button>
+    </AnalyticsToolbar>
   );
 
-  if (responseOnly && (isCliPlatform(platform) || platform === Platform.MCP)) {
-    return data ? <Pre>{renderText(data, t, locale)}</Pre> : <Pre>{""}</Pre>;
+  if (!value) {
+    return (
+      <WidgetShell className="min-w-0">
+        <WidgetHeader
+          title={t("title")}
+          backButton={<NavigateButtonWidget field={children.backButton} />}
+        />
+        {toolbar}
+        <FormAlertWidget field={children.formAlert} />
+        {endpointMutations?.read?.isLoading !== false && (
+          <LoadingBlock message={t("widget.loading")} />
+        )}
+      </WidgetShell>
+    );
   }
 
-  const kpis = data?.kpis;
+  const { kpis, totals, signupTrend, activityTrend, funnel } = value;
+  const bucket = value.window.bucket;
+  const signupTotals: number[] = [];
+  for (let i = 0; i < signupTrend.buckets.length; i++) {
+    let sum = 0;
+    for (const series of signupTrend.series) {
+      sum += series.values[i] ?? 0;
+    }
+    signupTotals.push(sum);
+  }
+  const activeSeries =
+    activityTrend.series.find((s) => s.key === "active")?.values ?? [];
+  const activeWindow: ListDrill = {
+    activeFrom: dayDate(value.window.from),
+    activeTo: dayDate(value.window.to),
+  };
+  const paidWindow: ListDrill = {
+    paidFrom: dayDate(value.window.from),
+    paidTo: dayDate(value.window.to),
+  };
+  const bucketDrill = (key: string): ListDrill => ({
+    signupFrom: dayDate(key),
+    signupTo: bucketLastDay(key, bucket, value.window.to),
+  });
+
+  const signupLabel: Record<string, string> = {
+    paid: t("widget.series.paid"),
+    verified: t("widget.series.verified"),
+    unverified: t("widget.series.unverified"),
+  };
+  const activityLabel: Record<string, string> = {
+    active: t("widget.series.active"),
+    paying: t("widget.series.paying"),
+  };
+
+  const funnelMeta: Record<string, { label: string; drill: ListDrill }> = {
+    signups: { label: t("widget.funnel.signups"), drill: signupWindow },
+    verified: {
+      label: t("widget.funnel.verified"),
+      drill: { ...signupWindow, accountState: [AccountStateFilter.VERIFIED] },
+    },
+    paid: {
+      label: t("widget.funnel.paid"),
+      drill: { ...signupWindow, payer: PayerFilter.PAID },
+    },
+    active: {
+      label: t("widget.funnel.active"),
+      drill: { ...signupWindow, spentMin: 0.01 },
+    },
+  };
+
+  const kpiTiles = (
+    <Div className="flex flex-col gap-2">
+      <Span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {t("widget.groups.signups")}
+      </Span>
+      <KpiGrid columns={4}>
+        <KpiTile
+          label={t("widget.kpi.signups")}
+          value={kpis.signups.value}
+          previous={kpis.signups.previous}
+          locale={locale}
+          sparkline={signupTotals}
+          hint={t("widget.kpi.signupsHint", { total: totals.cohortUsers })}
+          onClick={() => openList(signupWindow)}
+        />
+        <KpiTile
+          label={t("widget.kpi.verifiedRate")}
+          value={kpis.verifiedRate.value}
+          previous={kpis.verifiedRate.previous}
+          format="percent"
+          locale={locale}
+          hint={t("widget.kpi.ofSignups", {
+            count: totals.verified,
+            total: kpis.signups.value,
+          })}
+          onClick={() =>
+            openList({
+              ...signupWindow,
+              accountState: [AccountStateFilter.VERIFIED],
+            })
+          }
+        />
+        <KpiTile
+          label={t("widget.kpi.activatedRate")}
+          value={kpis.activatedRate.value}
+          previous={kpis.activatedRate.previous}
+          format="percent"
+          locale={locale}
+          hint={t("widget.kpi.ofSignups", {
+            count: totals.activated,
+            total: kpis.signups.value,
+          })}
+          onClick={() => openList({ ...signupWindow, spentMin: 0.01 })}
+        />
+        <KpiTile
+          label={t("widget.kpi.paidConversion")}
+          value={kpis.paidConversion.value}
+          previous={kpis.paidConversion.previous}
+          format="percent"
+          locale={locale}
+          hint={t("widget.kpi.ofSignups", {
+            count: totals.converted,
+            total: kpis.signups.value,
+          })}
+          onClick={() => openList({ ...signupWindow, payer: PayerFilter.PAID })}
+        />
+      </KpiGrid>
+      <Span className="mt-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {t("widget.groups.accounts")}
+      </Span>
+      <KpiGrid columns={4}>
+        <KpiTile
+          label={t("widget.kpi.activeUsers")}
+          value={kpis.activeUsers.value}
+          previous={kpis.activeUsers.previous}
+          locale={locale}
+          sparkline={activeSeries}
+          hint={t("widget.kpi.activeHint")}
+          onClick={() =>
+            openList({ ...activeWindow, sortBy: UserListSortField.LAST_ACTIVE })
+          }
+        />
+        <KpiTile
+          label={t("widget.kpi.payingUsers")}
+          value={kpis.payingUsers.value}
+          previous={kpis.payingUsers.previous}
+          locale={locale}
+          hint={t("widget.kpi.payingHint")}
+          onClick={() =>
+            openList({ ...paidWindow, sortBy: UserListSortField.TOTAL_PAID })
+          }
+        />
+        <KpiTile
+          label={t("widget.kpi.revenuePeriod")}
+          value={kpis.revenueUsd.value}
+          previous={kpis.revenueUsd.previous}
+          format="currency"
+          currency="USD"
+          locale={locale}
+          tone="positive"
+          hint={t("widget.kpi.revenueHint")}
+          onClick={() =>
+            openList({
+              ...paidWindow,
+              sortBy: UserListSortField.TOTAL_PAID,
+              sortOrder: ListSortOrder.DESC,
+            })
+          }
+        />
+        <KpiTile
+          label={t("widget.kpi.revenuePerPayer")}
+          value={
+            kpis.payingUsers.value > 0
+              ? kpis.revenueUsd.value / kpis.payingUsers.value
+              : null
+          }
+          previous={
+            kpis.payingUsers.previous && kpis.revenueUsd.previous !== null
+              ? kpis.revenueUsd.previous / kpis.payingUsers.previous
+              : null
+          }
+          format="currency"
+          currency="USD"
+          locale={locale}
+          hint={t("widget.kpi.revenuePerPayerHint")}
+          onClick={() =>
+            openList({
+              ...paidWindow,
+              sortBy: UserListSortField.TOTAL_PAID,
+              sortOrder: ListSortOrder.DESC,
+            })
+          }
+        />
+      </KpiGrid>
+    </Div>
+  );
+
+  const abuseTiles = (
+    <Div className="flex flex-col gap-2">
+      <Span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {t("widget.groups.abuse")}
+      </Span>
+      <KpiGrid columns={2}>
+        <KpiTile
+          label={t("widget.kpi.banned")}
+          value={kpis.banned.value}
+          previous={kpis.banned.previous}
+          locale={locale}
+          invertDelta
+          tone={kpis.banned.value > 0 ? "negative" : "muted"}
+          hint={t("widget.kpi.bannedHint")}
+          onClick={() =>
+            openList({
+              ...signupWindow,
+              accountState: [AccountStateFilter.BANNED],
+            })
+          }
+        />
+        <KpiTile
+          label={t("widget.kpi.freeBurn")}
+          value={kpis.freeBurnCredits.value}
+          previous={kpis.freeBurnCredits.previous}
+          format="credits"
+          locale={locale}
+          invertDelta
+          tone="warning"
+          hint={t("widget.kpi.freeBurnHint", { count: totals.freeBurners })}
+          onClick={() =>
+            openList({
+              ...activeWindow,
+              payer: PayerFilter.FREE,
+              sortBy: UserListSortField.CREDITS_SPENT,
+              sortOrder: ListSortOrder.DESC,
+            })
+          }
+        />
+      </KpiGrid>
+    </Div>
+  );
+
+  const signupChart = (
+    <TimeSeriesChart
+      title={t("widget.charts.signups")}
+      subtitle={t("widget.charts.signupsHint")}
+      buckets={signupTrend.buckets}
+      bucket={bucket}
+      variant="stacked-bar"
+      series={signupTrend.series.map((s, i): TimeSeriesChartSeries => ({
+        key: s.key,
+        label: signupLabel[s.key] ?? s.key,
+        values: s.values,
+        color: i === 0 ? "positive" : i === 1 ? 1 : "muted",
+      }))}
+      locale={locale}
+      onBucketClick={(key) => openList(bucketDrill(key))}
+      emptyLabel={t("widget.empty")}
+    />
+  );
+
+  const activityChart = (
+    <TimeSeriesChart
+      title={t("widget.charts.activity")}
+      subtitle={t("widget.charts.activityHint")}
+      buckets={activityTrend.buckets}
+      bucket={bucket}
+      variant="line"
+      series={activityTrend.series.map((s, i): TimeSeriesChartSeries => ({
+        key: s.key,
+        label: activityLabel[s.key] ?? s.key,
+        values: s.values,
+        // Distinct accounts: the legend shows the true period total.
+        total:
+          s.key === "active"
+            ? kpis.activeUsers.value
+            : s.key === "paying"
+              ? kpis.payingUsers.value
+              : null,
+        color: i === 0 ? 1 : "positive",
+      }))}
+      locale={locale}
+      onBucketClick={(key) =>
+        openList({
+          activeFrom: dayDate(key),
+          activeTo: bucketLastDay(key, bucket, value.window.to),
+        })
+      }
+      emptyLabel={t("widget.empty")}
+    />
+  );
+
+  // Milestones as shares of the period's signups: every count matches a tile.
+  const funnelChart = (
+    <BreakdownTable
+      title={t("widget.charts.funnel")}
+      subtitle={t("widget.charts.funnelHint")}
+      dimensionLabel={t("widget.columns.milestone")}
+      columns={[
+        { key: "count", label: t("widget.columns.accounts") },
+        {
+          key: "share",
+          label: t("widget.columns.ofSignups"),
+          format: "percent",
+        },
+      ]}
+      showShare={false}
+      rows={funnel.map((step): BreakdownTableRow => ({
+        id: step.key,
+        label: funnelMeta[step.key]?.label ?? step.key,
+        values: {
+          count: step.value,
+          share:
+            kpis.signups.value > 0 ? step.value / kpis.signups.value : null,
+        },
+        onClick: () => openList(funnelMeta[step.key]?.drill ?? signupWindow),
+      }))}
+      locale={locale}
+    />
+  );
+
+  const attributionColumns = [
+    { key: "signups", label: t("widget.columns.signups") },
+    { key: "verified", label: t("widget.columns.verified"), secondary: true },
+    { key: "active", label: t("widget.columns.active") },
+    { key: "paid", label: t("widget.columns.paid") },
+    {
+      key: "conversion",
+      label: t("widget.columns.conversion"),
+      format: "percent" as const,
+    },
+    {
+      key: "revenueUsd",
+      label: t("widget.columns.revenue"),
+      format: "currency" as const,
+      currency: "USD",
+      secondary: true,
+    },
+  ];
+
+  const channelTable = (
+    <BreakdownTable
+      title={t("widget.charts.byChannel")}
+      subtitle={t("widget.charts.byChannelHint")}
+      dimensionLabel={t("widget.columns.channel")}
+      columns={attributionColumns}
+      shareKey="signups"
+      rows={value.byChannel.map((row): BreakdownTableRow => ({
+        id: row.key ?? USERS_CHANNEL_NONE,
+        label: row.key ?? t("widget.noJourney"),
+        values: row.metrics,
+        onClick: () =>
+          openList({ ...signupWindow, channel: row.key ?? USERS_CHANNEL_NONE }),
+      }))}
+      locale={locale}
+      emptyLabel={t("widget.empty")}
+    />
+  );
+
+  const refTable = (
+    <BreakdownTable
+      title={t("widget.charts.byRefCode")}
+      subtitle={t("widget.charts.byRefCodeHint")}
+      dimensionLabel={t("widget.columns.refCode")}
+      columns={attributionColumns}
+      shareKey="signups"
+      rows={value.byRefCode.flatMap((row): BreakdownTableRow[] =>
+        row.key
+          ? [
+              {
+                id: row.key,
+                label: row.key,
+                values: row.metrics,
+                onClick: () =>
+                  openList({ ...signupWindow, refCode: row.key ?? undefined }),
+              },
+            ]
+          : [],
+      )}
+      locale={locale}
+      emptyLabel={t("widget.noRefCodes")}
+    />
+  );
+
+  const planTable = (
+    <BreakdownTable
+      title={t("widget.charts.byPlan")}
+      subtitle={t("widget.charts.byPlanHint")}
+      dimensionLabel={t("widget.columns.plan")}
+      columns={[
+        { key: "subscribers", label: t("widget.columns.subscribers") },
+        {
+          key: "revenueUsd",
+          label: t("widget.columns.revenueWindow"),
+          format: "currency",
+          currency: "USD",
+        },
+      ]}
+      showShare={false}
+      rows={value.byPlan.map((row): BreakdownTableRow => ({
+        id: row.key ?? "none",
+        label:
+          row.key === "__packs"
+            ? t("widget.planPacks")
+            : row.key === "__lapsed"
+              ? t("widget.planLapsed")
+              : row.key
+                ? subscriptionPlanLabel(row.key, locale)
+                : "-",
+        values: row.metrics,
+        onClick: () =>
+          openList({
+            ...paidWindow,
+            ...(row.key === "__packs"
+              ? { subscription: SubscriptionFilter.NEVER }
+              : row.key === "__lapsed"
+                ? { subscription: SubscriptionFilter.HAD_ANY }
+                : {
+                    subscription: SubscriptionFilter.HAS_ACTIVE,
+                    plan: planFilter(row.key),
+                  }),
+          }),
+      }))}
+      locale={locale}
+      emptyLabel={t("widget.noSubscribers")}
+    />
+  );
+
+  const localeTable = (
+    <BreakdownTable
+      title={t("widget.charts.byLocale")}
+      dimensionLabel={t("widget.columns.locale")}
+      columns={[
+        { key: "signups", label: t("widget.columns.signups") },
+        { key: "paid", label: t("widget.columns.paid") },
+        {
+          key: "conversion",
+          label: t("widget.columns.conversion"),
+          format: "percent",
+        },
+      ]}
+      shareKey="signups"
+      limit={8}
+      rows={value.byLocale.map((row): BreakdownTableRow => ({
+        id: row.key ?? "none",
+        label: row.key ? localeLabel(row.key, locale) : "-",
+        values: row.metrics,
+      }))}
+      locale={locale}
+      emptyLabel={t("widget.empty")}
+    />
+  );
+
+  const burnerTable = (
+    <BreakdownTable
+      title={t("widget.charts.freeBurners")}
+      subtitle={t("widget.charts.freeBurnersHint")}
+      dimensionLabel={t("widget.columns.account")}
+      showShare={false}
+      columns={[
+        {
+          key: "creditsSpent",
+          label: t("widget.columns.creditsSpent"),
+          format: "credits",
+        },
+        {
+          key: "creditsGranted",
+          label: t("widget.columns.creditsGranted"),
+          format: "credits",
+        },
+        {
+          key: "creditsSpentTotal",
+          label: t("widget.columns.creditsSpentTotal"),
+          format: "credits",
+          secondary: true,
+        },
+        {
+          key: "creditBalance",
+          label: t("widget.columns.creditBalance"),
+          format: "credits",
+          secondary: true,
+        },
+      ]}
+      rows={value.freeBurners.map((row): BreakdownTableRow => ({
+        id: row.userId,
+        label: row.email,
+        sublabel: [
+          t("widget.signedUpOn", { date: formatDay(row.signedUpAt, locale) }),
+          row.isBanned ? t("widget.banned") : "",
+          row.emailVerified ? "" : t("widget.unverified"),
+        ]
+          .filter(Boolean)
+          .join(" · "),
+        values: {
+          creditsSpent: row.creditsSpent,
+          creditsSpentTotal: row.creditsSpentTotal,
+          creditBalance: row.creditBalance,
+          creditsGranted: row.creditsGranted,
+        },
+        onClick: () => openUser(row.userId),
+      }))}
+      locale={locale}
+      emptyLabel={t("widget.noBurners")}
+    />
+  );
+
+  // CLI / MCP: data components only (they render tables / compact text).
+  if (isCliPlatform(platform) || platform === Platform.MCP) {
+    return (
+      <Div className="flex flex-col gap-4">
+        {toolbar}
+        {kpiTiles}
+        {abuseTiles}
+        <Pre>
+          {t("widget.cliHint", {
+            from: value.window.from,
+            to: value.window.to,
+          })}
+        </Pre>
+        {signupChart}
+        {funnelChart}
+        {channelTable}
+        {refTable}
+        {planTable}
+        {burnerTable}
+      </Div>
+    );
+  }
 
   return (
-    <WidgetShell>
+    <WidgetShell className="min-w-0">
       <WidgetHeader
         title={t("title")}
         backButton={<NavigateButtonWidget field={children.backButton} />}
         actions={
-          <>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleUsers}
-              className="gap-1"
-            >
-              <Users className="h-4 w-4" />
-              <Span className="hidden sm:inline text-xs">
-                {t("widget.users")}
-              </Span>
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleRefresh}
-              title={t("widget.refresh")}
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => openList(signupWindow)}
+            className="gap-1"
+          >
+            <Users className="h-4 w-4" />
+            <Span className="text-xs">{t("widget.openUsers")}</Span>
+          </Button>
         }
       />
-
-      {/* Controls */}
-      <Div className="grid grid-cols-2 @lg:grid-cols-5 gap-3 items-end">
-        <SelectFieldWidget fieldName="range" field={children.range} />
-        <SelectFieldWidget
-          fieldName="granularity"
-          field={children.granularity}
-        />
-        {range === StatsRange.CUSTOM && (
-          <>
-            <DateFieldWidget fieldName="from" field={children.from} />
-            <DateFieldWidget fieldName="to" field={children.to} />
-          </>
-        )}
-        <BooleanFieldWidget
-          fieldName="includeInternal"
-          field={children.includeInternal}
-        />
-      </Div>
-
-      <FormAlertWidget field={children.formAlert} />
-
-      {!data || !kpis ? (
-        endpointMutations?.read?.isLoading !== false && (
-          <LoadingBlock message={t("widget.loading")} />
-        )
-      ) : (
-        <>
-          <P className="text-xs text-muted-foreground">
-            {t("widget.period", {
-              from: formatDay(data.period.from, locale, true),
-              to: formatDay(data.period.to, locale, true),
-              days: data.period.days,
-            })}
-          </P>
-
-          <MetricGrid columns={4}>
-            <KpiCard
-              label={t("kpi.revenue")}
-              value={formatUsd(kpis.revenueUsd, locale)}
-              current={kpis.revenueUsd}
-              previous={kpis.revenuePrevUsd}
-              hint={
-                kpis.refundsUsd > 0
-                  ? t("kpi.refundsHint", {
-                      amount: formatUsd(kpis.refundsUsd, locale),
-                    })
-                  : t("kpi.revenueHint")
-              }
-              t={t}
-              locale={locale}
-              variant="success"
-            />
-            <MetricCard
-              label={t("kpi.mrr")}
-              value={formatUsd(kpis.mrrUsd, locale)}
-              description={t("kpi.mrrHint", {
-                active: kpis.activeSubscribers,
-                pastDue: kpis.pastDueSubscribers,
-              })}
-              variant="info"
-            />
-            <KpiCard
-              label={t("kpi.payingUsers")}
-              value={formatNumber(kpis.payingUsers, locale)}
-              current={kpis.payingUsers}
-              previous={kpis.payingUsersPrev}
-              hint={t("kpi.payingAllTimeHint", {
-                count: kpis.payingUsersAllTime,
-              })}
-              t={t}
-              locale={locale}
-            />
-            <KpiCard
-              label={t("kpi.creditsSpent")}
-              value={formatNumber(kpis.creditsSpent, locale)}
-              current={kpis.creditsSpent}
-              previous={kpis.creditsSpentPrev}
-              hint={t("kpi.creditsHint", {
-                usd: formatUsd(kpis.creditsSpent * CREDIT_USD, locale),
-              })}
-              t={t}
-              locale={locale}
-            />
-            <KpiCard
-              label={t("kpi.newUsers")}
-              value={formatNumber(kpis.newUsers, locale)}
-              current={kpis.newUsers}
-              previous={kpis.newUsersPrev}
-              hint={t("kpi.totalUsersHint", {
-                count: formatNumber(kpis.totalUsers, locale),
-              })}
-              t={t}
-              locale={locale}
-            />
-            <KpiCard
-              label={t("kpi.activeUsers")}
-              value={formatNumber(kpis.activeUsers, locale)}
-              current={kpis.activeUsers}
-              previous={kpis.activeUsersPrev}
-              hint={t("kpi.anonymousHint", {
-                count: formatNumber(kpis.anonymousActive, locale),
-              })}
-              t={t}
-              locale={locale}
-            />
-            <MetricCard
-              label={t("kpi.signupToPaid")}
-              value={formatPercent(kpis.signupToPaid.rate, locale)}
-              description={t("kpi.ratioHint", {
-                converted: kpis.signupToPaid.converted,
-                cohort: kpis.signupToPaid.cohort,
-              })}
-            />
-            <MetricCard
-              label={t("kpi.retentionD7")}
-              value={formatPercent(kpis.retentionD7.rate, locale)}
-              description={t("kpi.retentionHint", {
-                converted: kpis.retentionD7.converted,
-                cohort: kpis.retentionD7.cohort,
-              })}
-            />
-          </MetricGrid>
-
-          <SeriesChart data={data} t={t} locale={locale} />
-
-          <Div className="grid grid-cols-1 @lg:grid-cols-2 gap-4">
-            <SectionGroup title={t("sections.channels")}>
-              {data.channels.length === 0 ? (
-                <P className="text-sm text-muted-foreground">
-                  {t("widget.noData")}
-                </P>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t("table.channel")}</TableHead>
-                      <TableHead className="text-right">
-                        {t("table.signups")}
-                      </TableHead>
-                      <TableHead className="text-right">
-                        {t("table.paying")}
-                      </TableHead>
-                      <TableHead className="text-right">
-                        {t("table.conversion")}
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data.channels.map((c) => (
-                      <TableRow key={c.channel}>
-                        <TableCell className="text-sm">{c.channel}</TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {c.signups}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums">
-                          {c.paying}
-                        </TableCell>
-                        <TableCell className="text-right tabular-nums text-muted-foreground">
-                          {formatPercent(
-                            c.signups > 0 ? c.paying / c.signups : 0,
-                            locale,
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </SectionGroup>
-
-            <SectionGroup title={t("sections.subscriptions")}>
-              {data.subscriptionsByStatus.length === 0 ? (
-                <P className="text-sm text-muted-foreground">
-                  {t("widget.noData")}
-                </P>
-              ) : (
-                <Div className="flex flex-col gap-2">
-                  {data.subscriptionsByStatus.map((s) => (
-                    <Div
-                      key={s.status}
-                      className="flex items-center justify-between"
-                    >
-                      <StatusPill
-                        status={s.status}
-                        label={subscriptionStatusLabel(s.status, locale)}
-                        variant={subscriptionStatusVariant(s.status)}
-                      />
-                      <Span className="tabular-nums text-sm">{s.count}</Span>
-                    </Div>
-                  ))}
-                </Div>
-              )}
-              {data.revenueByCurrency.length > 0 && (
-                <Div className="flex flex-col gap-1 pt-3 border-t">
-                  <Span className="text-xs font-medium text-muted-foreground">
-                    {t("sections.currencies")}
-                  </Span>
-                  {data.revenueByCurrency.map((c) => (
-                    <Div
-                      key={c.currency}
-                      className="flex items-center justify-between text-sm"
-                    >
-                      <Span>
-                        {formatMoney(c.amount, c.currency, locale)}
-                        <Span className="text-xs text-muted-foreground">
-                          {" "}
-                          {t("widget.times", { count: c.count })}
-                        </Span>
-                      </Span>
-                      <Span className="tabular-nums text-muted-foreground">
-                        {formatUsd(c.amountUsd, locale)}
-                      </Span>
-                    </Div>
-                  ))}
-                </Div>
-              )}
-            </SectionGroup>
-          </Div>
-
-          <SectionGroup title={t("sections.topSpenders")}>
-            {data.topSpenders.length === 0 ? (
-              <P className="text-sm text-muted-foreground">
-                {t("widget.noData")}
-              </P>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t("table.user")}</TableHead>
-                    <TableHead className="text-right">
-                      {t("table.creditsSpent")}
-                    </TableHead>
-                    <TableHead className="text-right">
-                      {t("table.lifetimePaid")}
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.topSpenders.map((s) => (
-                    <TableRow
-                      key={s.userId}
-                      className="cursor-pointer hover:bg-accent/50"
-                      onClick={() => handleViewUser(s.userId)}
-                    >
-                      <TableCell className="text-sm">{s.email}</TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {formatNumber(s.creditsSpent, locale)}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {s.totalPaidUsd > 0 ? (
-                          <Span className="text-success">
-                            {formatUsd(s.totalPaidUsd, locale)}
-                          </Span>
-                        ) : (
-                          <Span className="text-muted-foreground">-</Span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </SectionGroup>
-
-          <P className="text-xs text-muted-foreground">
-            {t("widget.definitions")}
-          </P>
-        </>
+      {toolbar}
+      {showFilters && (
+        <Div className="grid grid-cols-1 gap-3 rounded-lg border p-3 @sm:grid-cols-2 @3xl:grid-cols-4">
+          <SelectFieldWidget fieldName="audience" field={children.audience} />
+          <TextFieldWidget fieldName="channel" field={children.channel} />
+          <SelectFieldWidget
+            fieldName="channelType"
+            field={children.channelType}
+          />
+          <TextFieldWidget fieldName="refCode" field={children.refCode} />
+          <SelectFieldWidget fieldName="payer" field={children.payer} />
+          <SelectFieldWidget fieldName="plan" field={children.plan} />
+          <MultiSelectFieldWidget
+            fieldName="accountState"
+            field={children.accountState}
+          />
+        </Div>
       )}
+      <FormAlertWidget field={children.formAlert} />
+      {kpiTiles}
+      {signupChart}
+      {channelTable}
+      {refTable}
+      {abuseTiles}
+      {burnerTable}
+      {activityChart}
+      <Div className="grid grid-cols-1 gap-4 @4xl:grid-cols-2">
+        {planTable}
+        {localeTable}
+      </Div>
+      <Span className="text-xs text-muted-foreground">
+        {t("widget.definitions")}
+      </Span>
     </WidgetShell>
   );
+}
+
+function planFilter(key: string | null): ListDrill["plan"] {
+  switch (key) {
+    case SubscriptionPlan.SUBSCRIPTION:
+      return UserPlanFilter.SUBSCRIPTION;
+    case SubscriptionPlan.PLUS:
+      return UserPlanFilter.PLUS;
+    case SubscriptionPlan.PRO:
+      return UserPlanFilter.PRO;
+    case SubscriptionPlan.ULTRA:
+      return UserPlanFilter.ULTRA;
+    default:
+      return undefined;
+  }
 }

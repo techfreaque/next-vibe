@@ -171,6 +171,9 @@ export const translations: typeof enTranslations = {
       description: "Recuperare con successo le statistiche di riferimento",
     },
     widget: {
+      adminNotice:
+        "Questi sono i tuoi numeri personali sugli inviti. L'intero programma è nella panoramica inviti.",
+      openOverview: "Apri la panoramica inviti",
       emptyMessage:
         "Nessuna attività per ora. Condividi il link invito per iniziare a guadagnare.",
     },
@@ -337,6 +340,11 @@ export const translations: typeof enTranslations = {
           label: "Filtro di stato",
           description: "Filtra per lo stato di pagamento",
         },
+        currency: {
+          label: "Metodo di liquidazione",
+          description: "Filtra per metodo di liquidazione",
+          all: "Tutti i metodi",
+        },
         requestId: {
           label: "Richiesta ID",
           description: "Identificatore di richiesta di pagamento",
@@ -390,6 +398,31 @@ export const translations: typeof enTranslations = {
         reject: "Rifiuti",
         complete: "Completato",
         credits: "crediti",
+        partnerContext:
+          "Guadagnati {{confirmed}} confermati, {{pending}} in attesa · liquidati {{paid}}",
+        creditsLine: "{{credits}} crediti guadagnati",
+        freeLine: "Liberi dopo le richieste aperte: {{free}}",
+        overBalanceSingle:
+          "Questa richiesta è di {{amount}}, ma solo {{available}} sono confermati e non pagati. Non approvarla.",
+        partnerCodes: "Codici: {{codes}} · utenti invitati: {{referred}}",
+        partnerNoCodes: "Nessun codice proprio · utenti invitati: {{referred}}",
+        overBalance:
+          "{{count}} richieste aperte per {{open}}, ma solo {{available}} confermati e non pagati. Non approvarle tutte.",
+        possibleDuplicate:
+          "Possibile duplicato: altre {{count}} richieste aperte con stesso importo e wallet.",
+        headline: "{{value}} in {{currency}}",
+        overBalanceShort:
+          "Oltre il saldo confermato (vedi la prima richiesta di questo partner).",
+        approveOverBalance: "Approva comunque",
+        nextStep: {
+          failed:
+            "Il trasferimento non è riuscito e nessun credito è stato detratto. Il partner può inviare una nuova richiesta.",
+          processing:
+            "Trasferimento in corso. Si completa o fallisce da solo, nessuna azione richiesta.",
+          credits:
+            "Le liquidazioni in crediti vengono convertite automaticamente. Nessuna azione richiesta.",
+        },
+        codeReport: "Report del codice",
       },
     },
   },
@@ -426,7 +459,8 @@ export const translations: typeof enTranslations = {
       totalEarned: "Guadagni totali",
       available: "Disponibile",
       locked: "Bloccati",
-      credits: "crediti",
+      credits:
+        "Le liquidazioni in crediti vengono convertite alla richiesta, quindi una in attesa è bloccata. Rifiutala per liberare i guadagni; il partner può richiedere di nuovo.",
       readyForPayout: "disponibili per il prelievo",
       moreToUnlock: "mancanti per il prelievo",
       pendingConfirmation: "in attesa di conferma",

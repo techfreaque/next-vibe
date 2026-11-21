@@ -1,9 +1,15 @@
 export const translations = {
-  title: "Processor diagnostics",
-  short: "Processors",
+  title: "Processor transactions",
+  short: "Transactions",
   description:
     "Review checkout and renewal transactions, failed payments, and recorded webhook processing.",
   search: {
+    kind: "Paid for",
+    currency: "Currency",
+    from: "From",
+    to: "To",
+    dayFormat:
+      "Calendar day in UTC (YYYY-MM-DD). The range includes both days.",
     view: "View",
     userId: "Customer ID",
     transactionId: "Transaction ID",
@@ -15,9 +21,36 @@ export const translations = {
     limit: "Per page",
   },
   widget: {
+    invoiceRef: "Invoice ref",
+    refundBlocked: "Refund not available here: {{reason}}",
+    netLine: "Refunded {{refunded}} · Net {{net}}",
+    refundRule:
+      "Paid Stripe charges with a payment reference open refund review. Other paid rows show a disabled button and the reason.",
+    showFilters: "Show filters",
+    hideFiltersPhone: "Hide filters",
+    search: "Search",
+    matchingStatus: "Only {{status}}",
+    details: "Details",
+    hideDetails: "Hide details",
+    notRecorded: "Not recorded",
+    refundYes: "Yes, review possible",
+    refundNo: "No",
+    retry: "Try again",
+    filters: "Filters",
+    hideFilters: "Hide filters",
+    all: "All",
+    activeFilters: "Filtered by",
+    removeFilter: "Remove filter",
+    matching: "Matching transactions",
+    matchingHint: "All statuses, no filters",
+    collected: "Collected {{currency}}, gross",
+    collectedHint:
+      "{{succeeded}} paid · {{failed}} failed · {{refunded}} refunded",
+    emptyFiltered:
+      "Nothing matches these filters. Remove one to widen the list.",
+    emptyAll: "No payments recorded yet.",
     clearFilters: "Clear filters",
-    transactionSearch:
-      "Search customer email, transaction ID, or provider invoice reference.",
+    transactionSearch: "Email, transaction ID or invoice reference",
     webhookSearch: "Search event type or provider event reference.",
     processingDetail:
       "The processing marker shows whether the application marked the event complete.",
@@ -46,6 +79,17 @@ export const translations = {
     transactionScope: "Transaction {{id}}",
   },
   enums: {
+    refundBlock: {
+      notStripe: "Crypto payment: refund it with the provider",
+      noReference: "No Stripe payment reference recorded",
+      zeroAmount: "Nothing was charged",
+      setup: "Card setup, no charge",
+    },
+    kind: {
+      pack: "Credit pack",
+      newSubscription: "New subscription",
+      renewal: "Renewal",
+    },
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NOWPayments",
@@ -80,6 +124,7 @@ export const translations = {
   },
   successDescription: "The matching processor records are ready.",
   errors: {
+    dateRange: "The start day must be on or before the end day.",
     unauthorized: "Sign in to view processor records.",
     validation: "Check the filters and page number.",
     forbidden: "An administrator role is required.",
@@ -91,6 +136,15 @@ export const translations = {
     unsavedChanges: "Save or discard your changes.",
   },
   response: {
+    refundBlock: "Refund blocked",
+    refundedAmount: "Refunded amount",
+    gross: "Gross",
+    kind: "Paid for",
+    totals: "Totals by currency",
+    collected: "Collected",
+    succeeded: "Paid",
+    failed: "Failed",
+    refunded: "Refunded",
     view: "View",
     id: "Transaction ID",
     userId: "Customer ID",

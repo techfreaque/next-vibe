@@ -607,7 +607,7 @@
     "credits": 0
   },
   {
-    "toolName": "credits_history_GET",
+    "toolName": "credits-history",
     "title": "Pobierz historię kredytów",
     "titleShort": "Historia",
     "description": "Pobierz stronicowaną historię transakcji kredytowych",
@@ -683,6 +683,763 @@
           },
           "schemaType": "primitive"
         },
+        "target": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Klient",
+          "description": "E-mail konta, ID użytkownika lub ID leada",
+          "placeholder": "klient@example.com albo ID",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "includeInCacheKey": true,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "typeFilter": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Rodzaj",
+          "options": [
+            {
+              "value": "enums.transactionType.freeGrant",
+              "label": "enums.transactionType.freeGrant"
+            },
+            {
+              "value": "enums.transactionType.purchase",
+              "label": "enums.transactionType.purchase"
+            },
+            {
+              "value": "enums.transactionType.subscription",
+              "label": "enums.transactionType.subscription"
+            },
+            {
+              "value": "enums.transactionType.usage",
+              "label": "enums.transactionType.usage"
+            },
+            {
+              "value": "enums.transactionType.expiry",
+              "label": "enums.transactionType.expiry"
+            },
+            {
+              "value": "enums.transactionType.refund",
+              "label": "enums.transactionType.refund"
+            },
+            {
+              "value": "enums.transactionType.transfer",
+              "label": "enums.transactionType.transfer"
+            },
+            {
+              "value": "enums.transactionType.otherDevices",
+              "label": "enums.transactionType.otherDevices"
+            },
+            {
+              "value": "enums.transactionType.referralEarning",
+              "label": "enums.transactionType.referralEarning"
+            },
+            {
+              "value": "enums.transactionType.referralPayout",
+              "label": "enums.transactionType.referralPayout"
+            }
+          ],
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "FREE_GRANT": "enums.transactionType.freeGrant",
+                    "PURCHASE": "enums.transactionType.purchase",
+                    "SUBSCRIPTION": "enums.transactionType.subscription",
+                    "USAGE": "enums.transactionType.usage",
+                    "EXPIRY": "enums.transactionType.expiry",
+                    "REFUND": "enums.transactionType.refund",
+                    "TRANSFER": "enums.transactionType.transfer",
+                    "OTHER_DEVICES": "enums.transactionType.otherDevices",
+                    "REFERRAL_EARNING": "enums.transactionType.referralEarning",
+                    "REFERRAL_PAYOUT": "enums.transactionType.referralPayout"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "FREE_GRANT": "enums.transactionType.freeGrant",
+                  "PURCHASE": "enums.transactionType.purchase",
+                  "SUBSCRIPTION": "enums.transactionType.subscription",
+                  "USAGE": "enums.transactionType.usage",
+                  "EXPIRY": "enums.transactionType.expiry",
+                  "REFUND": "enums.transactionType.refund",
+                  "TRANSFER": "enums.transactionType.transfer",
+                  "OTHER_DEVICES": "enums.transactionType.otherDevices",
+                  "REFERRAL_EARNING": "enums.transactionType.referralEarning",
+                  "REFERRAL_PAYOUT": "enums.transactionType.referralPayout"
+                },
+                "options": [
+                  "enums.transactionType.freeGrant",
+                  "enums.transactionType.purchase",
+                  "enums.transactionType.subscription",
+                  "enums.transactionType.usage",
+                  "enums.transactionType.expiry",
+                  "enums.transactionType.refund",
+                  "enums.transactionType.transfer",
+                  "enums.transactionType.otherDevices",
+                  "enums.transactionType.referralEarning",
+                  "enums.transactionType.referralPayout"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "includeInCacheKey": true,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "from": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Od",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "includeInCacheKey": true,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "to": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Do",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "includeInCacheKey": true,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "currentBalance": {
+          "type": "text",
+          "label": "Obecne saldo",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "nullable",
+                  "innerType": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "paid": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "free": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "nullable"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "recent": {
+          "type": "text",
+          "label": "Ostatnia aktywność",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "id": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "def": {
+                            "type": "pipe",
+                            "in": {
+                              "def": {
+                                "type": "union",
+                                "options": [
+                                  {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  {
+                                    "def": {
+                                      "type": "date"
+                                    },
+                                    "type": "date"
+                                  },
+                                  {
+                                    "def": {
+                                      "type": "number",
+                                      "coerce": true,
+                                      "checks": []
+                                    },
+                                    "type": "number",
+                                    "isFinite": true
+                                  }
+                                ]
+                              },
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "date"
+                                  },
+                                  "type": "date"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "coerce": true,
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                }
+                              ]
+                            },
+                            "out": {
+                              "def": {
+                                "type": "transform"
+                              },
+                              "type": "transform"
+                            }
+                          },
+                          "type": "pipe",
+                          "in": {
+                            "def": {
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "date"
+                                  },
+                                  "type": "date"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "coerce": true,
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                }
+                              ]
+                            },
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "date"
+                                },
+                                "type": "date"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "coerce": true,
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            ]
+                          },
+                          "out": {
+                            "def": {
+                              "type": "transform"
+                            },
+                            "type": "transform"
+                          }
+                        },
+                        "amount": {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "label": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "detail": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        },
+                        "email": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        },
+                        "userId": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        },
+                        "leadId": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "id": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "def": {
+                          "type": "pipe",
+                          "in": {
+                            "def": {
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "date"
+                                  },
+                                  "type": "date"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "coerce": true,
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                }
+                              ]
+                            },
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "date"
+                                },
+                                "type": "date"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "coerce": true,
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            ]
+                          },
+                          "out": {
+                            "def": {
+                              "type": "transform"
+                            },
+                            "type": "transform"
+                          }
+                        },
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "date"
+                                },
+                                "type": "date"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "coerce": true,
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            ]
+                          },
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "amount": {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "label": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "detail": {
+                        "def": {
+                          "type": "nullable",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "nullable"
+                      },
+                      "email": {
+                        "def": {
+                          "type": "nullable",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "nullable"
+                      },
+                      "userId": {
+                        "def": {
+                          "type": "nullable",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "nullable"
+                      },
+                      "leadId": {
+                        "def": {
+                          "type": "nullable",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "nullable"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "totals": {
+          "type": "text",
+          "label": "Sumy",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "nullable",
+                  "innerType": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "spent": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "granted": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "nullable"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "resolvedTarget": {
+          "type": "text",
+          "label": "Historia konta",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "nullable",
+                  "innerType": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "userId": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        },
+                        "leadId": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        },
+                        "email": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        },
+                        "isPartner": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            }
+                          },
+                          "type": "optional"
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "nullable"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "transactions": {
           "type": "container",
           "child": {
@@ -750,6 +1507,98 @@
                         "type": "string"
                       },
                       "type": "string"
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "label": {
+                "type": "text",
+                "label": "Typ",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "paymentId": {
+                "type": "text",
+                "label": "Płatność",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "typeKey": {
+                "type": "text",
+                "label": "Typ",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "detail": {
+                "type": "text",
+                "label": "Model lub funkcja",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
                     }
                   },
                   "type": "optional"
@@ -1030,6 +1879,7 @@
     "instanceId": "local",
     "category": "credits",
     "tags": ["kredyty", "saldo"],
+    "aliases": ["credits-history"],
     "credits": 0
   },
   {
@@ -75011,6 +75861,35 @@
             "type": "optional"
           },
           "hiddenForPlatforms": ["ai", "mcp", "cron", "remote-skill"],
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "catalogOverview": {
+          "type": "text",
+          "label": "Przegląd biznesu",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "visibleFor": ["enums.userRole.admin"],
+          "hiddenForPlatforms": [
+            "ai",
+            "mcp",
+            "cron",
+            "remote-skill",
+            "cli",
+            "cli-package"
+          ],
           "usage": {
             "response": true
           },

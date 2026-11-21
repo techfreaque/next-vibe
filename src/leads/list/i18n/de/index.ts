@@ -1,8 +1,11 @@
 import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
 
+import { translations as leadAnalyticsTranslations } from "@/leads/analytics/i18n/de";
+
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  ...leadAnalyticsTranslations,
   filters: {
     search: {
       label: "Suche",
@@ -190,6 +193,7 @@ export const translations: typeof enTranslations = {
         title: "Lead-Details",
         description: "Einzelne Lead-Informationen",
         id: "Lead-ID",
+        triage: "Attribution und Traffic",
         email: "E-Mail-Adresse",
         businessName: "Firmenname",
         contactName: "Kontaktname",
@@ -266,6 +270,13 @@ export const translations: typeof enTranslations = {
     emptyState: "Noch keine Leads",
   },
   widget: {
+    colLead: "Lead",
+    colAgent: "Agent",
+    colOrigin: "Herkunft",
+    colClient: "Gerät und Netz",
+    colCreated: "Erstellt",
+    drillSummary:
+      "{{total}} Leads · {{humans}} menschlich · {{signups}} registriert · {{paid}} zahlend · User Agents: {{agents}}",
     clearFilters: "Filter zurücksetzen",
     converted: "Konvertiert",
     emailsSent: "{{count}} E-Mails gesendet",
@@ -303,6 +314,16 @@ export const translations: typeof enTranslations = {
     linkedCount: "{{count}} verknüpft",
     hasLinkedUser: "Nutzer",
     referralCode: "Ref-Code",
+    drillTitle: "Aus einem Bericht gefiltert",
+    drillCreated: "Erstellt",
+    drillReached: "Erreicht",
+    clearDrill: "Berichtsfilter zurücksetzen",
+    signedUp: "Registriert",
+    paid: "Bezahlt",
+    chatted: "Gechattet",
+    bot: "Bot",
+    analyticsFilters: "Weitere Filter",
+    apply: "Anwenden",
   },
   countries: {
     ...regionalCountryNames("de"),

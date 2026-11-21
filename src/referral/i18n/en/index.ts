@@ -167,6 +167,9 @@ export const translations = {
       description: "Successfully retrieved your referral statistics",
     },
     widget: {
+      adminNotice:
+        "These are your personal referral numbers. The whole program lives in the Referral Overview.",
+      openOverview: "Open Referral Overview",
       emptyMessage:
         "No activity yet - share your referral link to start earning",
     },
@@ -331,6 +334,11 @@ export const translations = {
           label: "Status Filter",
           description: "Filter by payout status",
         },
+        currency: {
+          label: "Payout method",
+          description: "Filter by payout method",
+          all: "All methods",
+        },
         requestId: {
           label: "Request ID",
           description: "Payout request identifier",
@@ -384,6 +392,31 @@ export const translations = {
         reject: "Reject",
         complete: "Complete",
         credits: "credits",
+        partnerContext:
+          "Earned {{confirmed}} confirmed, {{pending}} on hold · paid out {{paid}}",
+        creditsLine: "{{credits}} earned credits",
+        freeLine: "Free after open requests: {{free}}",
+        overBalanceSingle:
+          "This request is {{amount}}, but only {{available}} is confirmed and unpaid. Do not approve it.",
+        partnerCodes: "Codes: {{codes}} · referred users: {{referred}}",
+        partnerNoCodes: "No own code · referred users: {{referred}}",
+        overBalance:
+          "{{count}} open requests total {{open}}, but only {{available}} is confirmed and unpaid. Do not approve all of them.",
+        possibleDuplicate:
+          "Possible duplicate: {{count}} more open request(s) with the same amount and wallet.",
+        headline: "{{value}} to {{currency}}",
+        overBalanceShort:
+          "Over the confirmed balance (see the first request of this partner).",
+        approveOverBalance: "Approve anyway",
+        nextStep: {
+          failed:
+            "The transfer could not be completed and no credits were deducted. The partner can submit a new request.",
+          processing:
+            "Transfer in progress. It completes or fails on its own; no action needed.",
+          credits:
+            "Credits payouts convert when requested, so a pending one is stuck. Reject it to release the earnings; the partner can request again.",
+        },
+        codeReport: "Code report",
       },
     },
   },

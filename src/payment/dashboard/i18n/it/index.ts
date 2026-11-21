@@ -15,6 +15,8 @@ export const translations: typeof enTranslations = {
       description: "Panoramica dei pagamenti per la tua azienda",
     },
     response: {
+      estimates: "Preventivi",
+      byCurrency: "Totali per valuta",
       openInvoices: "Fatture aperte",
       overdueInvoices: "Più tardi.",
       unpaidBills: "Bills non retribuiti",
@@ -78,8 +80,18 @@ export const translations: typeof enTranslations = {
     placeholder: "Entra in azienda ID",
   },
   widget: {
+    subtitle:
+      "Fatture, preventivi e bollette che emetti. I pagamenti con carta e cripto sono nelle transazioni di pagamento.",
+    estimatesSent: "Preventivi inviati",
+    estimateDrafts: "{{count}} bozze",
+    recentEstimates: "Preventivi recenti",
+    noRecentEstimates: "Nessun preventivo finora",
+    validUntil: "Valido fino al {{date}}",
+    notInvoicesHint:
+      "I pagamenti con carta e cripto sono transazioni del fornitore, non fatture. Qui ci sono solo le fatture che emetti tu.",
+    openTransactions: "Apri le transazioni di pagamento",
     commercialDocuments: "Documenti commerciali",
-    processorDiagnostics: "Diagnostica del processore",
+    processorDiagnostics: "Transazioni di pagamento",
     loading: "Caricamento cruscotto...",
     noData: "Nessuna azienda selezionata.",
     noDataHint:
@@ -87,7 +99,7 @@ export const translations: typeof enTranslations = {
     openInvoices: "Fatture aperte",
     overdue: "Più tardi.",
     unpaidBills: "Bills non retribuiti",
-    draftInvoices: "Progetti",
+    draftInvoices: "Bozze di fattura",
     quickActions: "Azioni rapide",
     newInvoice: "Nuova fattura",
     allInvoices: "Tutte le fatture",
@@ -95,7 +107,7 @@ export const translations: typeof enTranslations = {
     allEstimates: "Stime",
     allBills: "Bills",
     recentInvoices: "Fatture recenti",
-    noRecentInvoices: "Nessuna fattura recente.",
+    noRecentInvoices: "Nessuna fattura emessa finora",
     view: "Vista",
     due: "Due",
     status: {

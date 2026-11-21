@@ -1,0 +1,181 @@
+import { translations as analyticsTranslations } from "next-vibe/unified-ui/analytics/i18n/pl";
+
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  ...analyticsTranslations,
+  category: "Polecenia",
+  tags: {
+    referral: "referral",
+    admin: "admin",
+    analytics: "analytics",
+  },
+  get: {
+    title: "Raport kodu polecającego",
+    titleShort: "Raport kodu",
+    description:
+      "Jeden kod polecający od A do Z: do kogo należy, jak kliknięcia zamieniają się w leady, rejestracje i płacących użytkowników, ile przyniósł pieniędzy, jaką prowizję wygenerował i jakie wypłaty dostał właściciel.",
+    fields: {
+      code: {
+        label: "Kod polecający",
+        description: "Kod do raportu (wielkość liter nie ma znaczenia)",
+        placeholder: "moemoe",
+      },
+    },
+    response: {
+      window: "Okres",
+      header: "Kod",
+      kpis: "Kluczowe liczby",
+      funnel: "Lejek",
+      trend: "Trend",
+      balance: "Saldo właściciela",
+      earningsByLevel: "Prowizja wg poziomu",
+      referredUsers: "Poleceni użytkownicy",
+      referredTotal: "Poleceni użytkownicy łącznie",
+      payouts: "Wypłaty właściciela",
+    },
+    widget: {
+      periodTitle: "Ten okres",
+      owner: "Właściciel",
+      ownerEmail: "E-mail właściciela",
+      openOwner: "Otwórz właściciela",
+      label: "Etykieta",
+      noLabel: "Brak etykiety",
+      bonus: "Bonus za rejestrację",
+      bonusValue: "+{{credits}} kredytów z pierwszym planem",
+      noBonus: "Brak",
+      status: "Status",
+      active: "Aktywny",
+      inactive: "Nieaktywny",
+      created: "Utworzono",
+      uses: "Przypisane rejestracje",
+      editBonus: "Zmień bonus",
+      reassign: "Przypisz kod komuś innemu",
+      kpi: {
+        clicks: "Kliknięcia",
+        leads: "Leady",
+        signups: "Rejestracje",
+        signupsHint: "{{rate}} kliknięć",
+        payers: "Płacący użytkownicy",
+        payersHint: "Poleceni, którzy zapłacili w tym okresie",
+        revenue: "Przychód",
+        commission: "Wygenerowana prowizja",
+        commissionHint:
+          "{{pending}} wstrzymane do końca okresu zwrotu, {{confirmed}} potwierdzone",
+      },
+      funnel: {
+        title: "Lejek",
+        subtitle: "Ten okres",
+        clicks: "Kliknięcia",
+        leads: "Leady",
+        signups: "Rejestracje",
+        payers: "Płacący użytkownicy",
+      },
+      chart: {
+        conversions: "Konwersje",
+        money: "Przychód i prowizja",
+        moneySub: "USD, wg daty płatności",
+      },
+      series: {
+        clicks: "Kliknięcia",
+        leads: "Leady",
+        signups: "Rejestracje",
+        payers: "Płacący użytkownicy",
+        revenue: "Przychód",
+        commission: "Prowizja",
+      },
+      balance: {
+        title: "Saldo właściciela (cały okres)",
+        confirmed: "Potwierdzone zarobki",
+        pending: "Wstrzymane (okres na zwroty)",
+        paidOut: "Wypłacono",
+        open: "W kolejce wypłat",
+        available: "Dostępne przed kolejką",
+        free: "Wolne do wypłaty po kolejce",
+        overCommitted:
+          "Otwarte wnioski przekraczają potwierdzone saldo. Nie zatwierdzaj wszystkich.",
+      },
+      levels: {
+        title: "Prowizja wg poziomu",
+        subtitle: "Wygenerowana przez użytkowników tego kodu, ten okres",
+        dimension: "Poziom",
+        direct: "Bezpośrednio (właściciel kodu)",
+        upline: "Upline {{level}}",
+        count: "Płatności",
+        total: "Zarobione",
+        pending: "Wstrzymane",
+        confirmed: "Potwierdzone",
+        canceled: "Anulowane",
+        empty: "Brak prowizji w tym okresie.",
+      },
+      users: {
+        title: "Poleceni użytkownicy",
+        subtitle:
+          "Cały okres, najwięcej płacący na górze. {{shown}} z {{total}}.",
+        dimension: "Użytkownik",
+        signedUp: "rejestracja {{date}}",
+        payments: "Płatności",
+        revenue: "Przychód",
+        commission: "Prowizja",
+        unpaid: "brak płatności",
+        empty: "Nikt jeszcze nie zarejestrował się z tym kodem.",
+      },
+      payouts: {
+        title: "Wypłaty właściciela",
+        subtitle: "Wszystkie wnioski tego partnera",
+        dimension: "Wniosek",
+        amount: "Kwota",
+        requested: "złożony {{date}}",
+        processed: "rozpatrzony {{date}}",
+        openAll: "Otwórz w wypłatach",
+        empty: "Ten partner nigdy nie złożył wniosku o wypłatę.",
+      },
+      notFound: "Kod {{code}} nie istnieje.",
+      pickCode: "Wpisz kod polecający, żeby zobaczyć jego raport.",
+      loading: "Wczytywanie raportu kodu",
+    },
+  },
+  errors: {
+    validation: {
+      title: "Nieprawidłowe dane",
+      description: "Sprawdź kod i okres",
+    },
+    unauthorized: {
+      title: "Nie zalogowano",
+      description: "Zaloguj się jako admin, żeby zobaczyć analitykę poleceń",
+    },
+    forbidden: {
+      title: "Tylko dla adminów",
+      description: "Analitykę poleceń widzą tylko admini",
+    },
+    notFound: {
+      title: "Nie znaleziono kodu",
+      description: "Żaden kod polecający nie pasuje",
+    },
+    conflict: {
+      title: "Konflikt",
+      description: "Dane zmieniły się podczas wczytywania, spróbuj ponownie",
+    },
+    server: {
+      title: "Błąd serwera",
+      description: "Nie udało się zbudować raportu kodu",
+    },
+    network: {
+      title: "Błąd sieci",
+      description: "Żądanie nie dotarło do serwera",
+    },
+    unknown: {
+      title: "Nieznany błąd",
+      description: "Coś nieoczekiwanie poszło nie tak",
+    },
+    unsavedChanges: {
+      title: "Niezapisane zmiany",
+      description: "Najpierw zapisz lub odrzuć zmiany",
+    },
+    codeNotFound: "Kod polecający {{code}} nie istnieje",
+  },
+  success: {
+    title: "Wczytano",
+    description: "Raport kodu wczytany",
+  },
+};

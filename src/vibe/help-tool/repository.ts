@@ -59,6 +59,7 @@ import {
   buildCategories,
   filterCatalogCategory,
   filterMetaForUser,
+  getCatalogOverview,
   getMetaPlatforms,
   getRecordSearchTargets,
   resolveEffectiveUser,
@@ -313,6 +314,10 @@ export class HelpRepository {
     const recordSearchTargets =
       isAdmin && isWebPlatform && !viewAsRole
         ? getRecordSearchTargets(CATEGORY_REGISTRY, webCatalog)
+        : undefined;
+    const catalogOverview =
+      isAdmin && isWebPlatform && !viewAsRole
+        ? getCatalogOverview(CATEGORY_REGISTRY, webCatalog)
         : undefined;
     const allAccessibleMeta =
       isAdmin && isWebPlatform
@@ -727,6 +732,7 @@ export class HelpRepository {
       categories,
       webCategories: isWebPlatform ? buildCategories(webCatalog) : undefined,
       recordSearchTargets,
+      catalogOverview,
       hint:
         totalPages > 1
           ? t("get.hints.cliList", {

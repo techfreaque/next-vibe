@@ -17,7 +17,19 @@ import { db } from "next-vibe/database";
 import { leads } from "next-vibe/identity/lead/db";
 import { LeadStatus } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { AnalyticsRange } from "next-vibe/unified-ui/analytics/enum";
+import { serializeWindow } from "next-vibe/unified-ui/analytics/window";
 
+import {
+  computeFlaggedSummary,
+  DEFAULT_MIN_LEADS,
+  flaggedTrend,
+} from "../analytics/abuse/repository";
+import {
+  computeAcquisitionCore,
+  resolveLeadWindow,
+} from "../analytics/acquisition/repository";
+import { AbuseGroupBy } from "../analytics/enum";
 import type { LeadsDashboardResponseOutput } from "./definition";
 import type { LeadsDashboardT } from "./i18n";
 
@@ -132,7 +144,38 @@ export class LeadsDashboardRepository {
         createdAt: row.createdAt.toISOString(),
       }));
 
+      const win = await resolveLeadWindow({
+        range: AnalyticsRange.LAST_7_DAYS,
+      });
+      const [core, abuse, flagged] = await Promise.all([
+        computeAcquisitionCore(win, {}),
+        computeFlaggedSummary(
+          win,
+          {},
+          AbuseGroupBy.IP_PREFIX,
+          DEFAULT_MIN_LEADS,
+        ),
+        flaggedTrend(win, {}, AbuseGroupBy.IP_PREFIX, DEFAULT_MIN_LEADS),
+      ]);
+      const series = (key: string): number[] =>
+        core.trend.series.find((entry) => entry.key === key)?.values ?? [];
+
       return success({
+        last7Days: {
+          window: serializeWindow(win),
+          humanLeads: core.kpis.humanLeads,
+          botLeads: core.kpis.botLeads,
+          signups: core.kpis.signups,
+          payers: core.kpis.payers,
+          flaggedNetworks: abuse.flaggedClusters,
+          humanTrend: series("humanLeads"),
+          signupTrend: series("signups"),
+          botTrend: series("botLeads"),
+          payerTrend: series("payers"),
+          flaggedTrend:
+            flagged.series.find((entry) => entry.key === "flagged")?.values ??
+            [],
+        },
         activeLeadsCount,
         newThisWeekCount,
         runningCampaignsCount,

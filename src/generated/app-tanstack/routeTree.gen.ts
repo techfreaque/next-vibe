@@ -227,6 +227,7 @@ import { Route as LocaleUserAccountSettingsIndexRouteImport } from './routes/$lo
 import { Route as LocaleUserAuthLoginIndexRouteImport } from './routes/$locale.user._auth.login.index'
 import { Route as LocaleUserAuthResetPasswordIndexRouteImport } from './routes/$locale.user._auth.reset-password.index'
 import { Route as LocaleUserAuthSignupIndexRouteImport } from './routes/$locale.user._auth.signup.index'
+import { Route as ApiLocaleAnalyticsBusinessOverviewRouteImport } from './routes/api.$locale.analytics.business.overview'
 import { Route as ApiLocaleAnalyticsEvaluatorsAndRouteImport } from './routes/api.$locale.analytics.evaluators.and'
 import { Route as ApiLocaleAnalyticsEvaluatorsCrossoverRouteImport } from './routes/api.$locale.analytics.evaluators.crossover'
 import { Route as ApiLocaleAnalyticsEvaluatorsDropRouteImport } from './routes/api.$locale.analytics.evaluators.drop'
@@ -264,6 +265,7 @@ import { Route as ApiLocaleChartOfAccountsReportsTrialBalanceRouteImport } from 
 import { Route as ApiLocaleCompaniesCompanyIdGetRouteImport } from './routes/api.$locale.companies.$companyId.get'
 import { Route as ApiLocaleCompaniesCompanyIdOnboardRouteImport } from './routes/api.$locale.companies.$companyId.onboard'
 import { Route as ApiLocaleCompaniesCompanyIdUpdateRouteImport } from './routes/api.$locale.companies.$companyId.update'
+import { Route as ApiLocaleCreditsAnalyticsUsageRouteImport } from './routes/api.$locale.credits.analytics.usage'
 import { Route as ApiLocaleCreditsAntiFarmingReportRouteImport } from './routes/api.$locale.credits.anti-farming.report'
 import { Route as ApiLocaleCreditsDataSourcesCreditsAvgTransactionRouteImport } from './routes/api.$locale.credits.data-sources.credits-avg-transaction'
 import { Route as ApiLocaleCreditsDataSourcesCreditsBalanceTotalRouteImport } from './routes/api.$locale.credits.data-sources.credits-balance-total'
@@ -313,6 +315,9 @@ import { Route as ApiLocaleLeadMagnetProvidersSalesmanagoRouteImport } from './r
 import { Route as ApiLocaleLeadMagnetProvidersShopifyRouteImport } from './routes/api.$locale.lead-magnet.providers.shopify'
 import { Route as ApiLocaleLeadMagnetProvidersSpotlerRouteImport } from './routes/api.$locale.lead-magnet.providers.spotler'
 import { Route as ApiLocaleLeadMagnetProvidersYouleadRouteImport } from './routes/api.$locale.lead-magnet.providers.youlead'
+import { Route as ApiLocaleLeadsAnalyticsAbuseRouteImport } from './routes/api.$locale.leads.analytics.abuse'
+import { Route as ApiLocaleLeadsAnalyticsAcquisitionRouteImport } from './routes/api.$locale.leads.analytics.acquisition'
+import { Route as ApiLocaleLeadsAnalyticsFunnelRouteImport } from './routes/api.$locale.leads.analytics.funnel'
 import { Route as ApiLocaleLeadsCampaignsBounceProcessorRouteImport } from './routes/api.$locale.leads.campaigns.bounce-processor'
 import { Route as ApiLocaleLeadsCampaignsCampaignStarterRouteImport } from './routes/api.$locale.leads.campaigns.campaign-starter'
 import { Route as ApiLocaleLeadsCampaignsEmailCampaignsRouteImport } from './routes/api.$locale.leads.campaigns.email-campaigns'
@@ -375,6 +380,7 @@ import { Route as ApiLocaleNewsletterDataSourcesNewsletterEventsTotalRouteImport
 import { Route as ApiLocaleNewsletterDataSourcesNewsletterSubscriptionsNewRouteImport } from './routes/api.$locale.newsletter.data-sources.newsletter-subscriptions-new'
 import { Route as ApiLocaleNewsletterDataSourcesNewsletterUnsubscribesRouteImport } from './routes/api.$locale.newsletter.data-sources.newsletter-unsubscribes'
 import { Route as ApiLocaleNewsletterUnsubscribeSyncRouteImport } from './routes/api.$locale.newsletter.unsubscribe.sync'
+import { Route as ApiLocalePaymentAnalyticsRevenueRouteImport } from './routes/api.$locale.payment.analytics.revenue'
 import { Route as ApiLocalePaymentBillCreateRouteImport } from './routes/api.$locale.payment.bill.create'
 import { Route as ApiLocalePaymentBillListRouteImport } from './routes/api.$locale.payment.bill.list'
 import { Route as ApiLocalePaymentCreditNoteCreateRouteImport } from './routes/api.$locale.payment.credit-note.create'
@@ -404,8 +410,10 @@ import { Route as ApiLocalePurchasingOrderCreateRouteImport } from './routes/api
 import { Route as ApiLocalePurchasingOrderListRouteImport } from './routes/api.$locale.purchasing.order.list'
 import { Route as ApiLocalePurchasingVendorCreateRouteImport } from './routes/api.$locale.purchasing.vendor.create'
 import { Route as ApiLocalePurchasingVendorListRouteImport } from './routes/api.$locale.purchasing.vendor.list'
+import { Route as ApiLocaleReferralAdminCodeRouteImport } from './routes/api.$locale.referral.admin.code'
 import { Route as ApiLocaleReferralAdminCodeBonusRouteImport } from './routes/api.$locale.referral.admin.code-bonus'
 import { Route as ApiLocaleReferralAdminCodeReassignRouteImport } from './routes/api.$locale.referral.admin.code-reassign'
+import { Route as ApiLocaleReferralAdminOverviewRouteImport } from './routes/api.$locale.referral.admin.overview'
 import { Route as ApiLocaleReferralAdminPayoutsRouteImport } from './routes/api.$locale.referral.admin.payouts'
 import { Route as ApiLocaleReferralCodesListRouteImport } from './routes/api.$locale.referral.codes.list'
 import { Route as ApiLocaleReferralDataSourcesReferralsCodesCreatedRouteImport } from './routes/api.$locale.referral.data-sources.referrals-codes-created'
@@ -1949,6 +1957,12 @@ const LocaleUserAuthSignupIndexRoute =
     path: '/',
     getParentRoute: () => LocaleUserAuthSignupRoute,
   } as any)
+const ApiLocaleAnalyticsBusinessOverviewRoute =
+  ApiLocaleAnalyticsBusinessOverviewRouteImport.update({
+    id: '/api/$locale/analytics/business/overview',
+    path: '/api/$locale/analytics/business/overview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiLocaleAnalyticsEvaluatorsAndRoute =
   ApiLocaleAnalyticsEvaluatorsAndRouteImport.update({
     id: '/api/$locale/analytics/evaluators/and',
@@ -2170,6 +2184,12 @@ const ApiLocaleCompaniesCompanyIdUpdateRoute =
     id: '/api/$locale/companies/$companyId/update',
     path: '/api/$locale/companies/$companyId/update',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleCreditsAnalyticsUsageRoute =
+  ApiLocaleCreditsAnalyticsUsageRouteImport.update({
+    id: '/analytics/usage',
+    path: '/analytics/usage',
+    getParentRoute: () => ApiLocaleCreditsRoute,
   } as any)
 const ApiLocaleCreditsAntiFarmingReportRoute =
   ApiLocaleCreditsAntiFarmingReportRouteImport.update({
@@ -2463,6 +2483,24 @@ const ApiLocaleLeadMagnetProvidersYouleadRoute =
   ApiLocaleLeadMagnetProvidersYouleadRouteImport.update({
     id: '/api/$locale/lead-magnet/providers/youlead',
     path: '/api/$locale/lead-magnet/providers/youlead',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsAnalyticsAbuseRoute =
+  ApiLocaleLeadsAnalyticsAbuseRouteImport.update({
+    id: '/api/$locale/leads/analytics/abuse',
+    path: '/api/$locale/leads/analytics/abuse',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsAnalyticsAcquisitionRoute =
+  ApiLocaleLeadsAnalyticsAcquisitionRouteImport.update({
+    id: '/api/$locale/leads/analytics/acquisition',
+    path: '/api/$locale/leads/analytics/acquisition',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiLocaleLeadsAnalyticsFunnelRoute =
+  ApiLocaleLeadsAnalyticsFunnelRouteImport.update({
+    id: '/api/$locale/leads/analytics/funnel',
+    path: '/api/$locale/leads/analytics/funnel',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiLocaleLeadsCampaignsBounceProcessorRoute =
@@ -2837,6 +2875,12 @@ const ApiLocaleNewsletterUnsubscribeSyncRoute =
     path: '/sync',
     getParentRoute: () => ApiLocaleNewsletterUnsubscribeRoute,
   } as any)
+const ApiLocalePaymentAnalyticsRevenueRoute =
+  ApiLocalePaymentAnalyticsRevenueRouteImport.update({
+    id: '/analytics/revenue',
+    path: '/analytics/revenue',
+    getParentRoute: () => ApiLocalePaymentRoute,
+  } as any)
 const ApiLocalePaymentBillCreateRoute =
   ApiLocalePaymentBillCreateRouteImport.update({
     id: '/bill/create',
@@ -3008,6 +3052,12 @@ const ApiLocalePurchasingVendorListRoute =
     path: '/api/$locale/purchasing/vendor/list',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiLocaleReferralAdminCodeRoute =
+  ApiLocaleReferralAdminCodeRouteImport.update({
+    id: '/admin/code',
+    path: '/admin/code',
+    getParentRoute: () => ApiLocaleReferralRoute,
+  } as any)
 const ApiLocaleReferralAdminCodeBonusRoute =
   ApiLocaleReferralAdminCodeBonusRouteImport.update({
     id: '/admin/code-bonus',
@@ -3018,6 +3068,12 @@ const ApiLocaleReferralAdminCodeReassignRoute =
   ApiLocaleReferralAdminCodeReassignRouteImport.update({
     id: '/admin/code-reassign',
     path: '/admin/code-reassign',
+    getParentRoute: () => ApiLocaleReferralRoute,
+  } as any)
+const ApiLocaleReferralAdminOverviewRoute =
+  ApiLocaleReferralAdminOverviewRouteImport.update({
+    id: '/admin/overview',
+    path: '/admin/overview',
     getParentRoute: () => ApiLocaleReferralRoute,
   } as any)
 const ApiLocaleReferralAdminPayoutsRoute =
@@ -5173,6 +5229,7 @@ export interface FileRoutesByFullPath {
   '/$locale/subscription/history/': typeof LocaleSubscriptionHistoryIndexRoute
   '/$locale/subscription/overview/': typeof LocaleSubscriptionOverviewIndexRoute
   '/$locale/subscription/remote/': typeof LocaleSubscriptionRemoteIndexRoute
+  '/api/$locale/analytics/business/overview': typeof ApiLocaleAnalyticsBusinessOverviewRoute
   '/api/$locale/analytics/evaluators/and': typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   '/api/$locale/analytics/evaluators/crossover': typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
   '/api/$locale/analytics/evaluators/drop': typeof ApiLocaleAnalyticsEvaluatorsDropRoute
@@ -5210,6 +5267,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/companies/$companyId/get': typeof ApiLocaleCompaniesCompanyIdGetRoute
   '/api/$locale/companies/$companyId/onboard': typeof ApiLocaleCompaniesCompanyIdOnboardRoute
   '/api/$locale/companies/$companyId/update': typeof ApiLocaleCompaniesCompanyIdUpdateRoute
+  '/api/$locale/credits/analytics/usage': typeof ApiLocaleCreditsAnalyticsUsageRoute
   '/api/$locale/credits/anti-farming/report': typeof ApiLocaleCreditsAntiFarmingReportRoute
   '/api/$locale/credits/data-sources/credits-avg-transaction': typeof ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute
   '/api/$locale/credits/data-sources/credits-balance-total': typeof ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute
@@ -5259,6 +5317,9 @@ export interface FileRoutesByFullPath {
   '/api/$locale/lead-magnet/providers/shopify': typeof ApiLocaleLeadMagnetProvidersShopifyRoute
   '/api/$locale/lead-magnet/providers/spotler': typeof ApiLocaleLeadMagnetProvidersSpotlerRoute
   '/api/$locale/lead-magnet/providers/youlead': typeof ApiLocaleLeadMagnetProvidersYouleadRoute
+  '/api/$locale/leads/analytics/abuse': typeof ApiLocaleLeadsAnalyticsAbuseRoute
+  '/api/$locale/leads/analytics/acquisition': typeof ApiLocaleLeadsAnalyticsAcquisitionRoute
+  '/api/$locale/leads/analytics/funnel': typeof ApiLocaleLeadsAnalyticsFunnelRoute
   '/api/$locale/leads/campaigns/bounce-processor': typeof ApiLocaleLeadsCampaignsBounceProcessorRoute
   '/api/$locale/leads/campaigns/campaign-starter': typeof ApiLocaleLeadsCampaignsCampaignStarterRoute
   '/api/$locale/leads/campaigns/email-campaigns': typeof ApiLocaleLeadsCampaignsEmailCampaignsRoute
@@ -5321,6 +5382,7 @@ export interface FileRoutesByFullPath {
   '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new': typeof ApiLocaleNewsletterDataSourcesNewsletterSubscriptionsNewRoute
   '/api/$locale/newsletter/data-sources/newsletter-unsubscribes': typeof ApiLocaleNewsletterDataSourcesNewsletterUnsubscribesRoute
   '/api/$locale/newsletter/unsubscribe/sync': typeof ApiLocaleNewsletterUnsubscribeSyncRoute
+  '/api/$locale/payment/analytics/revenue': typeof ApiLocalePaymentAnalyticsRevenueRoute
   '/api/$locale/payment/bill/create': typeof ApiLocalePaymentBillCreateRoute
   '/api/$locale/payment/bill/list': typeof ApiLocalePaymentBillListRoute
   '/api/$locale/payment/credit-note/create': typeof ApiLocalePaymentCreditNoteCreateRoute
@@ -5350,8 +5412,10 @@ export interface FileRoutesByFullPath {
   '/api/$locale/purchasing/order/list': typeof ApiLocalePurchasingOrderListRoute
   '/api/$locale/purchasing/vendor/create': typeof ApiLocalePurchasingVendorCreateRoute
   '/api/$locale/purchasing/vendor/list': typeof ApiLocalePurchasingVendorListRoute
+  '/api/$locale/referral/admin/code': typeof ApiLocaleReferralAdminCodeRoute
   '/api/$locale/referral/admin/code-bonus': typeof ApiLocaleReferralAdminCodeBonusRoute
   '/api/$locale/referral/admin/code-reassign': typeof ApiLocaleReferralAdminCodeReassignRoute
+  '/api/$locale/referral/admin/overview': typeof ApiLocaleReferralAdminOverviewRoute
   '/api/$locale/referral/admin/payouts': typeof ApiLocaleReferralAdminPayoutsRoute
   '/api/$locale/referral/codes/list': typeof ApiLocaleReferralCodesListRoute
   '/api/$locale/referral/data-sources/referrals-codes-created': typeof ApiLocaleReferralDataSourcesReferralsCodesCreatedRoute
@@ -5892,6 +5956,7 @@ export interface FileRoutesByTo {
   '/$locale/subscription/history': typeof LocaleSubscriptionHistoryIndexRoute
   '/$locale/subscription/overview': typeof LocaleSubscriptionOverviewIndexRoute
   '/$locale/subscription/remote': typeof LocaleSubscriptionRemoteIndexRoute
+  '/api/$locale/analytics/business/overview': typeof ApiLocaleAnalyticsBusinessOverviewRoute
   '/api/$locale/analytics/evaluators/and': typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   '/api/$locale/analytics/evaluators/crossover': typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
   '/api/$locale/analytics/evaluators/drop': typeof ApiLocaleAnalyticsEvaluatorsDropRoute
@@ -5929,6 +5994,7 @@ export interface FileRoutesByTo {
   '/api/$locale/companies/$companyId/get': typeof ApiLocaleCompaniesCompanyIdGetRoute
   '/api/$locale/companies/$companyId/onboard': typeof ApiLocaleCompaniesCompanyIdOnboardRoute
   '/api/$locale/companies/$companyId/update': typeof ApiLocaleCompaniesCompanyIdUpdateRoute
+  '/api/$locale/credits/analytics/usage': typeof ApiLocaleCreditsAnalyticsUsageRoute
   '/api/$locale/credits/anti-farming/report': typeof ApiLocaleCreditsAntiFarmingReportRoute
   '/api/$locale/credits/data-sources/credits-avg-transaction': typeof ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute
   '/api/$locale/credits/data-sources/credits-balance-total': typeof ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute
@@ -5978,6 +6044,9 @@ export interface FileRoutesByTo {
   '/api/$locale/lead-magnet/providers/shopify': typeof ApiLocaleLeadMagnetProvidersShopifyRoute
   '/api/$locale/lead-magnet/providers/spotler': typeof ApiLocaleLeadMagnetProvidersSpotlerRoute
   '/api/$locale/lead-magnet/providers/youlead': typeof ApiLocaleLeadMagnetProvidersYouleadRoute
+  '/api/$locale/leads/analytics/abuse': typeof ApiLocaleLeadsAnalyticsAbuseRoute
+  '/api/$locale/leads/analytics/acquisition': typeof ApiLocaleLeadsAnalyticsAcquisitionRoute
+  '/api/$locale/leads/analytics/funnel': typeof ApiLocaleLeadsAnalyticsFunnelRoute
   '/api/$locale/leads/campaigns/bounce-processor': typeof ApiLocaleLeadsCampaignsBounceProcessorRoute
   '/api/$locale/leads/campaigns/campaign-starter': typeof ApiLocaleLeadsCampaignsCampaignStarterRoute
   '/api/$locale/leads/campaigns/email-campaigns': typeof ApiLocaleLeadsCampaignsEmailCampaignsRoute
@@ -6040,6 +6109,7 @@ export interface FileRoutesByTo {
   '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new': typeof ApiLocaleNewsletterDataSourcesNewsletterSubscriptionsNewRoute
   '/api/$locale/newsletter/data-sources/newsletter-unsubscribes': typeof ApiLocaleNewsletterDataSourcesNewsletterUnsubscribesRoute
   '/api/$locale/newsletter/unsubscribe/sync': typeof ApiLocaleNewsletterUnsubscribeSyncRoute
+  '/api/$locale/payment/analytics/revenue': typeof ApiLocalePaymentAnalyticsRevenueRoute
   '/api/$locale/payment/bill/create': typeof ApiLocalePaymentBillCreateRoute
   '/api/$locale/payment/bill/list': typeof ApiLocalePaymentBillListRoute
   '/api/$locale/payment/credit-note/create': typeof ApiLocalePaymentCreditNoteCreateRoute
@@ -6069,8 +6139,10 @@ export interface FileRoutesByTo {
   '/api/$locale/purchasing/order/list': typeof ApiLocalePurchasingOrderListRoute
   '/api/$locale/purchasing/vendor/create': typeof ApiLocalePurchasingVendorCreateRoute
   '/api/$locale/purchasing/vendor/list': typeof ApiLocalePurchasingVendorListRoute
+  '/api/$locale/referral/admin/code': typeof ApiLocaleReferralAdminCodeRoute
   '/api/$locale/referral/admin/code-bonus': typeof ApiLocaleReferralAdminCodeBonusRoute
   '/api/$locale/referral/admin/code-reassign': typeof ApiLocaleReferralAdminCodeReassignRoute
+  '/api/$locale/referral/admin/overview': typeof ApiLocaleReferralAdminOverviewRoute
   '/api/$locale/referral/admin/payouts': typeof ApiLocaleReferralAdminPayoutsRoute
   '/api/$locale/referral/codes/list': typeof ApiLocaleReferralCodesListRoute
   '/api/$locale/referral/data-sources/referrals-codes-created': typeof ApiLocaleReferralDataSourcesReferralsCodesCreatedRoute
@@ -6620,6 +6692,7 @@ export interface FileRoutesById {
   '/$locale/subscription/history/': typeof LocaleSubscriptionHistoryIndexRoute
   '/$locale/subscription/overview/': typeof LocaleSubscriptionOverviewIndexRoute
   '/$locale/subscription/remote/': typeof LocaleSubscriptionRemoteIndexRoute
+  '/api/$locale/analytics/business/overview': typeof ApiLocaleAnalyticsBusinessOverviewRoute
   '/api/$locale/analytics/evaluators/and': typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   '/api/$locale/analytics/evaluators/crossover': typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
   '/api/$locale/analytics/evaluators/drop': typeof ApiLocaleAnalyticsEvaluatorsDropRoute
@@ -6657,6 +6730,7 @@ export interface FileRoutesById {
   '/api/$locale/companies/$companyId/get': typeof ApiLocaleCompaniesCompanyIdGetRoute
   '/api/$locale/companies/$companyId/onboard': typeof ApiLocaleCompaniesCompanyIdOnboardRoute
   '/api/$locale/companies/$companyId/update': typeof ApiLocaleCompaniesCompanyIdUpdateRoute
+  '/api/$locale/credits/analytics/usage': typeof ApiLocaleCreditsAnalyticsUsageRoute
   '/api/$locale/credits/anti-farming/report': typeof ApiLocaleCreditsAntiFarmingReportRoute
   '/api/$locale/credits/data-sources/credits-avg-transaction': typeof ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute
   '/api/$locale/credits/data-sources/credits-balance-total': typeof ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute
@@ -6706,6 +6780,9 @@ export interface FileRoutesById {
   '/api/$locale/lead-magnet/providers/shopify': typeof ApiLocaleLeadMagnetProvidersShopifyRoute
   '/api/$locale/lead-magnet/providers/spotler': typeof ApiLocaleLeadMagnetProvidersSpotlerRoute
   '/api/$locale/lead-magnet/providers/youlead': typeof ApiLocaleLeadMagnetProvidersYouleadRoute
+  '/api/$locale/leads/analytics/abuse': typeof ApiLocaleLeadsAnalyticsAbuseRoute
+  '/api/$locale/leads/analytics/acquisition': typeof ApiLocaleLeadsAnalyticsAcquisitionRoute
+  '/api/$locale/leads/analytics/funnel': typeof ApiLocaleLeadsAnalyticsFunnelRoute
   '/api/$locale/leads/campaigns/bounce-processor': typeof ApiLocaleLeadsCampaignsBounceProcessorRoute
   '/api/$locale/leads/campaigns/campaign-starter': typeof ApiLocaleLeadsCampaignsCampaignStarterRoute
   '/api/$locale/leads/campaigns/email-campaigns': typeof ApiLocaleLeadsCampaignsEmailCampaignsRoute
@@ -6768,6 +6845,7 @@ export interface FileRoutesById {
   '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new': typeof ApiLocaleNewsletterDataSourcesNewsletterSubscriptionsNewRoute
   '/api/$locale/newsletter/data-sources/newsletter-unsubscribes': typeof ApiLocaleNewsletterDataSourcesNewsletterUnsubscribesRoute
   '/api/$locale/newsletter/unsubscribe/sync': typeof ApiLocaleNewsletterUnsubscribeSyncRoute
+  '/api/$locale/payment/analytics/revenue': typeof ApiLocalePaymentAnalyticsRevenueRoute
   '/api/$locale/payment/bill/create': typeof ApiLocalePaymentBillCreateRoute
   '/api/$locale/payment/bill/list': typeof ApiLocalePaymentBillListRoute
   '/api/$locale/payment/credit-note/create': typeof ApiLocalePaymentCreditNoteCreateRoute
@@ -6797,8 +6875,10 @@ export interface FileRoutesById {
   '/api/$locale/purchasing/order/list': typeof ApiLocalePurchasingOrderListRoute
   '/api/$locale/purchasing/vendor/create': typeof ApiLocalePurchasingVendorCreateRoute
   '/api/$locale/purchasing/vendor/list': typeof ApiLocalePurchasingVendorListRoute
+  '/api/$locale/referral/admin/code': typeof ApiLocaleReferralAdminCodeRoute
   '/api/$locale/referral/admin/code-bonus': typeof ApiLocaleReferralAdminCodeBonusRoute
   '/api/$locale/referral/admin/code-reassign': typeof ApiLocaleReferralAdminCodeReassignRoute
+  '/api/$locale/referral/admin/overview': typeof ApiLocaleReferralAdminOverviewRoute
   '/api/$locale/referral/admin/payouts': typeof ApiLocaleReferralAdminPayoutsRoute
   '/api/$locale/referral/codes/list': typeof ApiLocaleReferralCodesListRoute
   '/api/$locale/referral/data-sources/referrals-codes-created': typeof ApiLocaleReferralDataSourcesReferralsCodesCreatedRoute
@@ -7348,6 +7428,7 @@ export interface FileRouteTypes {
     | '/$locale/subscription/history/'
     | '/$locale/subscription/overview/'
     | '/$locale/subscription/remote/'
+    | '/api/$locale/analytics/business/overview'
     | '/api/$locale/analytics/evaluators/and'
     | '/api/$locale/analytics/evaluators/crossover'
     | '/api/$locale/analytics/evaluators/drop'
@@ -7385,6 +7466,7 @@ export interface FileRouteTypes {
     | '/api/$locale/companies/$companyId/get'
     | '/api/$locale/companies/$companyId/onboard'
     | '/api/$locale/companies/$companyId/update'
+    | '/api/$locale/credits/analytics/usage'
     | '/api/$locale/credits/anti-farming/report'
     | '/api/$locale/credits/data-sources/credits-avg-transaction'
     | '/api/$locale/credits/data-sources/credits-balance-total'
@@ -7434,6 +7516,9 @@ export interface FileRouteTypes {
     | '/api/$locale/lead-magnet/providers/shopify'
     | '/api/$locale/lead-magnet/providers/spotler'
     | '/api/$locale/lead-magnet/providers/youlead'
+    | '/api/$locale/leads/analytics/abuse'
+    | '/api/$locale/leads/analytics/acquisition'
+    | '/api/$locale/leads/analytics/funnel'
     | '/api/$locale/leads/campaigns/bounce-processor'
     | '/api/$locale/leads/campaigns/campaign-starter'
     | '/api/$locale/leads/campaigns/email-campaigns'
@@ -7496,6 +7581,7 @@ export interface FileRouteTypes {
     | '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new'
     | '/api/$locale/newsletter/data-sources/newsletter-unsubscribes'
     | '/api/$locale/newsletter/unsubscribe/sync'
+    | '/api/$locale/payment/analytics/revenue'
     | '/api/$locale/payment/bill/create'
     | '/api/$locale/payment/bill/list'
     | '/api/$locale/payment/credit-note/create'
@@ -7525,8 +7611,10 @@ export interface FileRouteTypes {
     | '/api/$locale/purchasing/order/list'
     | '/api/$locale/purchasing/vendor/create'
     | '/api/$locale/purchasing/vendor/list'
+    | '/api/$locale/referral/admin/code'
     | '/api/$locale/referral/admin/code-bonus'
     | '/api/$locale/referral/admin/code-reassign'
+    | '/api/$locale/referral/admin/overview'
     | '/api/$locale/referral/admin/payouts'
     | '/api/$locale/referral/codes/list'
     | '/api/$locale/referral/data-sources/referrals-codes-created'
@@ -8067,6 +8155,7 @@ export interface FileRouteTypes {
     | '/$locale/subscription/history'
     | '/$locale/subscription/overview'
     | '/$locale/subscription/remote'
+    | '/api/$locale/analytics/business/overview'
     | '/api/$locale/analytics/evaluators/and'
     | '/api/$locale/analytics/evaluators/crossover'
     | '/api/$locale/analytics/evaluators/drop'
@@ -8104,6 +8193,7 @@ export interface FileRouteTypes {
     | '/api/$locale/companies/$companyId/get'
     | '/api/$locale/companies/$companyId/onboard'
     | '/api/$locale/companies/$companyId/update'
+    | '/api/$locale/credits/analytics/usage'
     | '/api/$locale/credits/anti-farming/report'
     | '/api/$locale/credits/data-sources/credits-avg-transaction'
     | '/api/$locale/credits/data-sources/credits-balance-total'
@@ -8153,6 +8243,9 @@ export interface FileRouteTypes {
     | '/api/$locale/lead-magnet/providers/shopify'
     | '/api/$locale/lead-magnet/providers/spotler'
     | '/api/$locale/lead-magnet/providers/youlead'
+    | '/api/$locale/leads/analytics/abuse'
+    | '/api/$locale/leads/analytics/acquisition'
+    | '/api/$locale/leads/analytics/funnel'
     | '/api/$locale/leads/campaigns/bounce-processor'
     | '/api/$locale/leads/campaigns/campaign-starter'
     | '/api/$locale/leads/campaigns/email-campaigns'
@@ -8215,6 +8308,7 @@ export interface FileRouteTypes {
     | '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new'
     | '/api/$locale/newsletter/data-sources/newsletter-unsubscribes'
     | '/api/$locale/newsletter/unsubscribe/sync'
+    | '/api/$locale/payment/analytics/revenue'
     | '/api/$locale/payment/bill/create'
     | '/api/$locale/payment/bill/list'
     | '/api/$locale/payment/credit-note/create'
@@ -8244,8 +8338,10 @@ export interface FileRouteTypes {
     | '/api/$locale/purchasing/order/list'
     | '/api/$locale/purchasing/vendor/create'
     | '/api/$locale/purchasing/vendor/list'
+    | '/api/$locale/referral/admin/code'
     | '/api/$locale/referral/admin/code-bonus'
     | '/api/$locale/referral/admin/code-reassign'
+    | '/api/$locale/referral/admin/overview'
     | '/api/$locale/referral/admin/payouts'
     | '/api/$locale/referral/codes/list'
     | '/api/$locale/referral/data-sources/referrals-codes-created'
@@ -8794,6 +8890,7 @@ export interface FileRouteTypes {
     | '/$locale/subscription/history/'
     | '/$locale/subscription/overview/'
     | '/$locale/subscription/remote/'
+    | '/api/$locale/analytics/business/overview'
     | '/api/$locale/analytics/evaluators/and'
     | '/api/$locale/analytics/evaluators/crossover'
     | '/api/$locale/analytics/evaluators/drop'
@@ -8831,6 +8928,7 @@ export interface FileRouteTypes {
     | '/api/$locale/companies/$companyId/get'
     | '/api/$locale/companies/$companyId/onboard'
     | '/api/$locale/companies/$companyId/update'
+    | '/api/$locale/credits/analytics/usage'
     | '/api/$locale/credits/anti-farming/report'
     | '/api/$locale/credits/data-sources/credits-avg-transaction'
     | '/api/$locale/credits/data-sources/credits-balance-total'
@@ -8880,6 +8978,9 @@ export interface FileRouteTypes {
     | '/api/$locale/lead-magnet/providers/shopify'
     | '/api/$locale/lead-magnet/providers/spotler'
     | '/api/$locale/lead-magnet/providers/youlead'
+    | '/api/$locale/leads/analytics/abuse'
+    | '/api/$locale/leads/analytics/acquisition'
+    | '/api/$locale/leads/analytics/funnel'
     | '/api/$locale/leads/campaigns/bounce-processor'
     | '/api/$locale/leads/campaigns/campaign-starter'
     | '/api/$locale/leads/campaigns/email-campaigns'
@@ -8942,6 +9043,7 @@ export interface FileRouteTypes {
     | '/api/$locale/newsletter/data-sources/newsletter-subscriptions-new'
     | '/api/$locale/newsletter/data-sources/newsletter-unsubscribes'
     | '/api/$locale/newsletter/unsubscribe/sync'
+    | '/api/$locale/payment/analytics/revenue'
     | '/api/$locale/payment/bill/create'
     | '/api/$locale/payment/bill/list'
     | '/api/$locale/payment/credit-note/create'
@@ -8971,8 +9073,10 @@ export interface FileRouteTypes {
     | '/api/$locale/purchasing/order/list'
     | '/api/$locale/purchasing/vendor/create'
     | '/api/$locale/purchasing/vendor/list'
+    | '/api/$locale/referral/admin/code'
     | '/api/$locale/referral/admin/code-bonus'
     | '/api/$locale/referral/admin/code-reassign'
+    | '/api/$locale/referral/admin/overview'
     | '/api/$locale/referral/admin/payouts'
     | '/api/$locale/referral/codes/list'
     | '/api/$locale/referral/data-sources/referrals-codes-created'
@@ -9470,6 +9574,7 @@ export interface RootRouteChildren {
   LocaleInvoiceInvoiceIdIndexRoute: typeof LocaleInvoiceInvoiceIdIndexRoute
   LocaleSharedTokenIndexRoute: typeof LocaleSharedTokenIndexRoute
   LocaleSkillSkillIdIndexRoute: typeof LocaleSkillSkillIdIndexRoute
+  ApiLocaleAnalyticsBusinessOverviewRoute: typeof ApiLocaleAnalyticsBusinessOverviewRoute
   ApiLocaleAnalyticsEvaluatorsAndRoute: typeof ApiLocaleAnalyticsEvaluatorsAndRoute
   ApiLocaleAnalyticsEvaluatorsCrossoverRoute: typeof ApiLocaleAnalyticsEvaluatorsCrossoverRoute
   ApiLocaleAnalyticsEvaluatorsDropRoute: typeof ApiLocaleAnalyticsEvaluatorsDropRoute
@@ -9536,6 +9641,9 @@ export interface RootRouteChildren {
   ApiLocaleLeadMagnetProvidersShopifyRoute: typeof ApiLocaleLeadMagnetProvidersShopifyRoute
   ApiLocaleLeadMagnetProvidersSpotlerRoute: typeof ApiLocaleLeadMagnetProvidersSpotlerRoute
   ApiLocaleLeadMagnetProvidersYouleadRoute: typeof ApiLocaleLeadMagnetProvidersYouleadRoute
+  ApiLocaleLeadsAnalyticsAbuseRoute: typeof ApiLocaleLeadsAnalyticsAbuseRoute
+  ApiLocaleLeadsAnalyticsAcquisitionRoute: typeof ApiLocaleLeadsAnalyticsAcquisitionRoute
+  ApiLocaleLeadsAnalyticsFunnelRoute: typeof ApiLocaleLeadsAnalyticsFunnelRoute
   ApiLocaleLeadsCampaignsBounceProcessorRoute: typeof ApiLocaleLeadsCampaignsBounceProcessorRoute
   ApiLocaleLeadsCampaignsCampaignStarterRoute: typeof ApiLocaleLeadsCampaignsCampaignStarterRoute
   ApiLocaleLeadsCampaignsEmailCampaignsRoute: typeof ApiLocaleLeadsCampaignsEmailCampaignsRoute
@@ -11329,6 +11437,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleUserAuthSignupIndexRouteImport
       parentRoute: typeof LocaleUserAuthSignupRoute
     }
+    '/api/$locale/analytics/business/overview': {
+      id: '/api/$locale/analytics/business/overview'
+      path: '/api/$locale/analytics/business/overview'
+      fullPath: '/api/$locale/analytics/business/overview'
+      preLoaderRoute: typeof ApiLocaleAnalyticsBusinessOverviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/$locale/analytics/evaluators/and': {
       id: '/api/$locale/analytics/evaluators/and'
       path: '/api/$locale/analytics/evaluators/and'
@@ -11587,6 +11702,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/$locale/companies/$companyId/update'
       preLoaderRoute: typeof ApiLocaleCompaniesCompanyIdUpdateRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/credits/analytics/usage': {
+      id: '/api/$locale/credits/analytics/usage'
+      path: '/analytics/usage'
+      fullPath: '/api/$locale/credits/analytics/usage'
+      preLoaderRoute: typeof ApiLocaleCreditsAnalyticsUsageRouteImport
+      parentRoute: typeof ApiLocaleCreditsRoute
     }
     '/api/$locale/credits/anti-farming/report': {
       id: '/api/$locale/credits/anti-farming/report'
@@ -11929,6 +12051,27 @@ declare module '@tanstack/react-router' {
       path: '/api/$locale/lead-magnet/providers/youlead'
       fullPath: '/api/$locale/lead-magnet/providers/youlead'
       preLoaderRoute: typeof ApiLocaleLeadMagnetProvidersYouleadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/analytics/abuse': {
+      id: '/api/$locale/leads/analytics/abuse'
+      path: '/api/$locale/leads/analytics/abuse'
+      fullPath: '/api/$locale/leads/analytics/abuse'
+      preLoaderRoute: typeof ApiLocaleLeadsAnalyticsAbuseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/analytics/acquisition': {
+      id: '/api/$locale/leads/analytics/acquisition'
+      path: '/api/$locale/leads/analytics/acquisition'
+      fullPath: '/api/$locale/leads/analytics/acquisition'
+      preLoaderRoute: typeof ApiLocaleLeadsAnalyticsAcquisitionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/$locale/leads/analytics/funnel': {
+      id: '/api/$locale/leads/analytics/funnel'
+      path: '/api/$locale/leads/analytics/funnel'
+      fullPath: '/api/$locale/leads/analytics/funnel'
+      preLoaderRoute: typeof ApiLocaleLeadsAnalyticsFunnelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/$locale/leads/campaigns/bounce-processor': {
@@ -12365,6 +12508,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocaleNewsletterUnsubscribeSyncRouteImport
       parentRoute: typeof ApiLocaleNewsletterUnsubscribeRoute
     }
+    '/api/$locale/payment/analytics/revenue': {
+      id: '/api/$locale/payment/analytics/revenue'
+      path: '/analytics/revenue'
+      fullPath: '/api/$locale/payment/analytics/revenue'
+      preLoaderRoute: typeof ApiLocalePaymentAnalyticsRevenueRouteImport
+      parentRoute: typeof ApiLocalePaymentRoute
+    }
     '/api/$locale/payment/bill/create': {
       id: '/api/$locale/payment/bill/create'
       path: '/bill/create'
@@ -12568,6 +12718,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiLocalePurchasingVendorListRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/$locale/referral/admin/code': {
+      id: '/api/$locale/referral/admin/code'
+      path: '/admin/code'
+      fullPath: '/api/$locale/referral/admin/code'
+      preLoaderRoute: typeof ApiLocaleReferralAdminCodeRouteImport
+      parentRoute: typeof ApiLocaleReferralRoute
+    }
     '/api/$locale/referral/admin/code-bonus': {
       id: '/api/$locale/referral/admin/code-bonus'
       path: '/admin/code-bonus'
@@ -12580,6 +12737,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/code-reassign'
       fullPath: '/api/$locale/referral/admin/code-reassign'
       preLoaderRoute: typeof ApiLocaleReferralAdminCodeReassignRouteImport
+      parentRoute: typeof ApiLocaleReferralRoute
+    }
+    '/api/$locale/referral/admin/overview': {
+      id: '/api/$locale/referral/admin/overview'
+      path: '/admin/overview'
+      fullPath: '/api/$locale/referral/admin/overview'
+      preLoaderRoute: typeof ApiLocaleReferralAdminOverviewRouteImport
       parentRoute: typeof ApiLocaleReferralRoute
     }
     '/api/$locale/referral/admin/payouts': {
@@ -15197,6 +15361,7 @@ interface ApiLocaleCreditsRouteChildren {
   ApiLocaleCreditsHistoryRoute: typeof ApiLocaleCreditsHistoryRoute
   ApiLocaleCreditsPublicCapRoute: typeof ApiLocaleCreditsPublicCapRoute
   ApiLocaleCreditsPurchaseRoute: typeof ApiLocaleCreditsPurchaseRoute
+  ApiLocaleCreditsAnalyticsUsageRoute: typeof ApiLocaleCreditsAnalyticsUsageRoute
   ApiLocaleCreditsAntiFarmingReportRoute: typeof ApiLocaleCreditsAntiFarmingReportRoute
   ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute: typeof ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute
   ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute: typeof ApiLocaleCreditsDataSourcesCreditsBalanceTotalRoute
@@ -15225,6 +15390,7 @@ const ApiLocaleCreditsRouteChildren: ApiLocaleCreditsRouteChildren = {
   ApiLocaleCreditsHistoryRoute: ApiLocaleCreditsHistoryRoute,
   ApiLocaleCreditsPublicCapRoute: ApiLocaleCreditsPublicCapRoute,
   ApiLocaleCreditsPurchaseRoute: ApiLocaleCreditsPurchaseRoute,
+  ApiLocaleCreditsAnalyticsUsageRoute: ApiLocaleCreditsAnalyticsUsageRoute,
   ApiLocaleCreditsAntiFarmingReportRoute:
     ApiLocaleCreditsAntiFarmingReportRoute,
   ApiLocaleCreditsDataSourcesCreditsAvgTransactionRoute:
@@ -15320,6 +15486,7 @@ interface ApiLocalePaymentRouteChildren {
   ApiLocalePaymentProcessorRoute: typeof ApiLocalePaymentProcessorRoute
   ApiLocalePaymentRefundRoute: typeof ApiLocalePaymentRefundRoute
   ApiLocalePaymentStripePricesRoute: typeof ApiLocalePaymentStripePricesRoute
+  ApiLocalePaymentAnalyticsRevenueRoute: typeof ApiLocalePaymentAnalyticsRevenueRoute
   ApiLocalePaymentBillCreateRoute: typeof ApiLocalePaymentBillCreateRoute
   ApiLocalePaymentBillListRoute: typeof ApiLocalePaymentBillListRoute
   ApiLocalePaymentCreditNoteCreateRoute: typeof ApiLocalePaymentCreditNoteCreateRoute
@@ -15357,6 +15524,7 @@ const ApiLocalePaymentRouteChildren: ApiLocalePaymentRouteChildren = {
   ApiLocalePaymentProcessorRoute: ApiLocalePaymentProcessorRoute,
   ApiLocalePaymentRefundRoute: ApiLocalePaymentRefundRoute,
   ApiLocalePaymentStripePricesRoute: ApiLocalePaymentStripePricesRoute,
+  ApiLocalePaymentAnalyticsRevenueRoute: ApiLocalePaymentAnalyticsRevenueRoute,
   ApiLocalePaymentBillCreateRoute: ApiLocalePaymentBillCreateRoute,
   ApiLocalePaymentBillListRoute: ApiLocalePaymentBillListRoute,
   ApiLocalePaymentCreditNoteCreateRoute: ApiLocalePaymentCreditNoteCreateRoute,
@@ -15411,8 +15579,10 @@ interface ApiLocaleReferralRouteChildren {
   ApiLocaleReferralLinksRoute: typeof ApiLocaleReferralLinksRoute
   ApiLocaleReferralPayoutRoute: typeof ApiLocaleReferralPayoutRoute
   ApiLocaleReferralStatsRoute: typeof ApiLocaleReferralStatsRoute
+  ApiLocaleReferralAdminCodeRoute: typeof ApiLocaleReferralAdminCodeRoute
   ApiLocaleReferralAdminCodeBonusRoute: typeof ApiLocaleReferralAdminCodeBonusRoute
   ApiLocaleReferralAdminCodeReassignRoute: typeof ApiLocaleReferralAdminCodeReassignRoute
+  ApiLocaleReferralAdminOverviewRoute: typeof ApiLocaleReferralAdminOverviewRoute
   ApiLocaleReferralAdminPayoutsRoute: typeof ApiLocaleReferralAdminPayoutsRoute
   ApiLocaleReferralCodesListRoute: typeof ApiLocaleReferralCodesListRoute
   ApiLocaleReferralDataSourcesReferralsCodesCreatedRoute: typeof ApiLocaleReferralDataSourcesReferralsCodesCreatedRoute
@@ -15430,9 +15600,11 @@ const ApiLocaleReferralRouteChildren: ApiLocaleReferralRouteChildren = {
   ApiLocaleReferralLinksRoute: ApiLocaleReferralLinksRoute,
   ApiLocaleReferralPayoutRoute: ApiLocaleReferralPayoutRoute,
   ApiLocaleReferralStatsRoute: ApiLocaleReferralStatsRoute,
+  ApiLocaleReferralAdminCodeRoute: ApiLocaleReferralAdminCodeRoute,
   ApiLocaleReferralAdminCodeBonusRoute: ApiLocaleReferralAdminCodeBonusRoute,
   ApiLocaleReferralAdminCodeReassignRoute:
     ApiLocaleReferralAdminCodeReassignRoute,
+  ApiLocaleReferralAdminOverviewRoute: ApiLocaleReferralAdminOverviewRoute,
   ApiLocaleReferralAdminPayoutsRoute: ApiLocaleReferralAdminPayoutsRoute,
   ApiLocaleReferralCodesListRoute: ApiLocaleReferralCodesListRoute,
   ApiLocaleReferralDataSourcesReferralsCodesCreatedRoute:
@@ -16343,6 +16515,8 @@ const rootRouteChildren: RootRouteChildren = {
   LocaleInvoiceInvoiceIdIndexRoute: LocaleInvoiceInvoiceIdIndexRoute,
   LocaleSharedTokenIndexRoute: LocaleSharedTokenIndexRoute,
   LocaleSkillSkillIdIndexRoute: LocaleSkillSkillIdIndexRoute,
+  ApiLocaleAnalyticsBusinessOverviewRoute:
+    ApiLocaleAnalyticsBusinessOverviewRoute,
   ApiLocaleAnalyticsEvaluatorsAndRoute: ApiLocaleAnalyticsEvaluatorsAndRoute,
   ApiLocaleAnalyticsEvaluatorsCrossoverRoute:
     ApiLocaleAnalyticsEvaluatorsCrossoverRoute,
@@ -16459,6 +16633,10 @@ const rootRouteChildren: RootRouteChildren = {
     ApiLocaleLeadMagnetProvidersSpotlerRoute,
   ApiLocaleLeadMagnetProvidersYouleadRoute:
     ApiLocaleLeadMagnetProvidersYouleadRoute,
+  ApiLocaleLeadsAnalyticsAbuseRoute: ApiLocaleLeadsAnalyticsAbuseRoute,
+  ApiLocaleLeadsAnalyticsAcquisitionRoute:
+    ApiLocaleLeadsAnalyticsAcquisitionRoute,
+  ApiLocaleLeadsAnalyticsFunnelRoute: ApiLocaleLeadsAnalyticsFunnelRoute,
   ApiLocaleLeadsCampaignsBounceProcessorRoute:
     ApiLocaleLeadsCampaignsBounceProcessorRoute,
   ApiLocaleLeadsCampaignsCampaignStarterRoute:

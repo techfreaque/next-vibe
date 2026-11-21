@@ -1,494 +1,514 @@
 /**
- * Campaign Stats Repository
- * Queries email campaign performance metrics from the DB.
+ * Campaign performance repository.
+ *
+ * Definitions (keep in sync with the widget hints):
+ * - Sent: campaign rows with sent_at in the period (status not failed).
+ * - Open / click rate: share of the rows sent in the period that have an
+ *   opened_at / clicked_at timestamp (any time after sending).
+ * - Unsubscribed / bounced: rows whose unsubscribed_at / bounced_at falls in
+ *   the period. Failed: failed rows last touched in the period.
+ * - Due now: pending, never sent, scheduled_at <= now. These only leave the
+ *   queue when the email-campaigns dispatcher task runs.
+ * - Locale: locale the mail was rendered in (email_send_log), else the lead's
+ *   language-country.
+ * All timestamps are UTC timestamp-without-time-zone.
  */
 
 import "server-only";
 
-import { and, count, desc, eq, gte, inArray, lt, sql } from "drizzle-orm";
-import { coreEnv } from "next-vibe/core/env";
-import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { CountryLanguageValues } from "next-vibe/core/i18n/core/config";
-import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
+import { inArray, type SQL, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
 } from "next-vibe/core/route/response.schema";
-import type { WidgetData } from "next-vibe/core/utils/json";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
-import { Environment } from "next-vibe/env/env-util";
-import {
-  emailCampaigns,
-  leadLeadLinks,
-  leads,
-} from "next-vibe/identity/lead/db";
-import {
-  EmailJourneyVariant,
-  EmailJourneyVariantFilter,
-  LeadStatus,
-} from "next-vibe/identity/lead/enum";
+import { emailCampaigns } from "next-vibe/identity/lead/db";
+import { EmailCampaignStage, LeadStatus } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTaskExecutions, cronTasks } from "next-vibe/tasks/cron/db";
-import { CronTasksRepository } from "next-vibe/tasks/cron/repository";
-import { getCronFrequencyMinutes } from "next-vibe/tasks/cron-formatter";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
-import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
+import {
+  fillBuckets,
+  resolveAnalyticsWindow,
+  serializeWindow,
+} from "next-vibe/unified-ui/analytics/window";
+import {
+  bucketSql,
+  inPreviousWindowSql,
+  inWindowSql,
+} from "next-vibe/unified-ui/analytics/window-sql";
+import type { QueryResultRow } from "pg";
 
 import { MessageStatus } from "@/messenger/messages/enum";
 
-import { campaignStarterConfigs } from "../campaign-starter/db";
+import { journeyVariantFromFilter, stageFromFilter } from "../filter-map";
 import type {
+  CampaignAutomation,
   CampaignStatsGetRequestOutput,
   CampaignStatsGetResponseOutput,
 } from "./definition";
 import type { CampaignStatsT } from "./i18n";
 
-function truncate(str: string, maxLen: number): string {
-  return str.length <= maxLen ? str : `${str.slice(0, maxLen - 3)}...`;
+type NumLike = string | number | null;
+
+/** The task that actually sends due campaign mail. */
+export const CAMPAIGN_DISPATCHER_TASK_ID = "email-campaigns";
+const CAMPAIGN_TASK_IDS = [
+  CAMPAIGN_DISPATCHER_TASK_ID,
+  "campaign-starter",
+  "bounce-processor",
+] as const;
+
+const BREAKDOWN_LIMIT = 20;
+/** Stages in journey order (stage breakdown sorts by this, not by volume). */
+const STAGE_ORDER = [
+  EmailCampaignStage.NOT_STARTED,
+  EmailCampaignStage.INITIAL,
+  EmailCampaignStage.FOLLOWUP_1,
+  EmailCampaignStage.FOLLOWUP_2,
+  EmailCampaignStage.FOLLOWUP_3,
+  EmailCampaignStage.NURTURE,
+  EmailCampaignStage.REACTIVATION,
+];
+const ERROR_LIMIT = 8;
+
+function num(value: NumLike | undefined): number {
+  return value === null || value === undefined ? 0 : Number(value);
 }
 
-function summariseResult(
-  result: Record<string, WidgetData> | null,
-): string | null {
-  if (!result) {
+function ratio(part: number, whole: number): number {
+  return whole > 0 ? part / whole : 0;
+}
+
+function iso(value: string | Date | null | undefined): string | null {
+  if (!value) {
     return null;
   }
-  const entries = Object.entries(result);
-  if (entries.length === 0) {
-    return null;
+  const date =
+    value instanceof Date
+      ? value
+      : new Date(value.includes("T") ? value : `${value.replace(" ", "T")}Z`);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+function daysSince(value: string | null): number {
+  if (!value) {
+    return 0;
   }
-  return truncate(
-    entries
-      .slice(0, 4)
-      .map(([k, v]) => `${k}:${String(v)}`)
-      .join(", "),
-    80,
+  return Math.max(
+    0,
+    Math.floor((Date.now() - new Date(value).getTime()) / 86_400_000),
   );
 }
 
+function truncate(value: string, max: number): string {
+  return value.length <= max ? value : `${value.slice(0, max - 1)}…`;
+}
+
+/** Campaign rows matching the request filters, with their render locale. */
+export function campaignRowsCte(filters: {
+  journeyVariant?: CampaignStatsGetRequestOutput["journeyVariant"];
+  stage?: CampaignStatsGetRequestOutput["stage"];
+  locale?: string;
+}): SQL {
+  const where: SQL[] = [sql`TRUE`];
+  const variant = journeyVariantFromFilter(filters.journeyVariant);
+  if (variant) {
+    where.push(sql`e.journey_variant = ${variant}`);
+  }
+  const stage = stageFromFilter(filters.stage);
+  if (stage) {
+    where.push(sql`e.stage = ${stage}`);
+  }
+  const locale = filters.locale?.trim().toLowerCase();
+  const localeWhere = locale
+    ? sql`WHERE lower(r.loc) = ${locale} OR lower(r.loc) LIKE ${`${locale}-%`}`
+    : sql``;
+  return sql`ec AS (
+    SELECT r.* FROM (
+      SELECT e.id, e.lead_id, e.status, e.stage, e.journey_variant, e.error,
+        e.scheduled_at, e.sent_at, e.opened_at, e.clicked_at, e.unsubscribed_at,
+        e.bounced_at, e.updated_at,
+        coalesce(
+          (SELECT s.locale FROM email_send_log s WHERE s.campaign_id = e.id LIMIT 1),
+          l.language || '-' || l.country
+        ) AS loc
+      FROM email_campaigns e JOIN leads l ON l.id = e.lead_id
+      WHERE ${sql.join(where, sql` AND `)}
+    ) r ${localeWhere}
+  )`;
+}
+
 export class CampaignStatsRepository {
+  private static async loadAutomation(): Promise<CampaignAutomation[]> {
+    const rows = await db
+      .select()
+      .from(cronTasks)
+      .where(inArray(cronTasks.id, [...CAMPAIGN_TASK_IDS]));
+    const lastFailures = await db
+      .select({
+        taskId: cronTaskExecutions.taskId,
+        error: cronTaskExecutions.error,
+        startedAt: cronTaskExecutions.startedAt,
+      })
+      .from(cronTaskExecutions)
+      .where(
+        sql`${cronTaskExecutions.taskId} IN (${sql.join(
+          CAMPAIGN_TASK_IDS.map((id) => sql`${id}`),
+          sql`, `,
+        )}) AND ${cronTaskExecutions.status} = ${CronTaskStatus.FAILED}`,
+      )
+      .orderBy(sql`${cronTaskExecutions.startedAt} DESC`)
+      .limit(CAMPAIGN_TASK_IDS.length * 3);
+
+    return CAMPAIGN_TASK_IDS.map((id): CampaignAutomation => {
+      const row = rows.find((r) => r.id === id);
+      if (!row) {
+        return {
+          id,
+          state: "missing",
+          schedule: null,
+          lastRunAt: null,
+          nextRunAt: null,
+          consecutiveFailures: 0,
+          lastError: null,
+        };
+      }
+      const failure = lastFailures.find((f) => f.taskId === id);
+      return {
+        id,
+        state: !row.enabled
+          ? "disabled"
+          : row.consecutiveFailures > 0
+            ? "failing"
+            : "running",
+        schedule: row.schedule,
+        lastRunAt: iso(row.lastExecutedAt),
+        nextRunAt: row.enabled ? iso(row.nextExecutionAt) : null,
+        consecutiveFailures: row.consecutiveFailures,
+        lastError:
+          row.consecutiveFailures > 0 && failure?.error?.message
+            ? truncate(String(failure.error.message), 160)
+            : null,
+      };
+    });
+  }
+
   static async getStats(
     data: CampaignStatsGetRequestOutput,
     logger: EndpointLogger,
     t: CampaignStatsT,
   ): Promise<ResponseType<CampaignStatsGetResponseOutput>> {
     try {
-      const variantValue =
-        data.journeyVariant &&
-        data.journeyVariant !== EmailJourneyVariantFilter.ALL &&
-        isValidEnumValue(EmailJourneyVariant, data.journeyVariant)
-          ? data.journeyVariant
-          : null;
-      const variantFilter = variantValue
-        ? eq(emailCampaigns.journeyVariant, variantValue)
-        : undefined;
-
-      // ── Aggregate overall counts in one query ───────────────────────────
-      const [overall] = await db
-        .select({
-          total: count(),
-          pending: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.PENDING} then 1 end)`,
-          sent: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.SENT} then 1 end)`,
-          delivered: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.DELIVERED} then 1 end)`,
-          opened: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.OPENED} then 1 end)`,
-          clicked: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.CLICKED} then 1 end)`,
-          failed: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.FAILED} then 1 end)`,
-        })
-        .from(emailCampaigns)
-        .where(variantFilter);
-
-      const rawTotals = overall ?? {
-        total: 0,
-        pending: 0,
-        sent: 0,
-        delivered: 0,
-        opened: 0,
-        clicked: 0,
-        failed: 0,
-      };
-      const totals = {
-        total: Number(rawTotals.total),
-        pending: Number(rawTotals.pending),
-        sent: Number(rawTotals.sent),
-        delivered: Number(rawTotals.delivered),
-        opened: Number(rawTotals.opened),
-        clicked: Number(rawTotals.clicked),
-        failed: Number(rawTotals.failed),
-      };
-
-      // Sent includes delivered+opened+clicked for rate calculation denominator
-      const sentBase =
-        totals.sent + totals.delivered + totals.opened + totals.clicked;
-      const openRate =
-        sentBase > 0 ? (totals.opened + totals.clicked) / sentBase : 0;
-      const clickRate = sentBase > 0 ? totals.clicked / sentBase : 0;
-      const deliveryRate =
-        sentBase > 0
-          ? (totals.delivered + totals.opened + totals.clicked) / sentBase
-          : 0;
-      const failureRate = totals.total > 0 ? totals.failed / totals.total : 0;
-
-      // ── Per-stage breakdown ─────────────────────────────────────────────
-      const stageRows = await db
-        .select({
-          stage: emailCampaigns.stage,
-          total: count(),
-          sent: sql<number>`count(case when ${emailCampaigns.status} in (${MessageStatus.SENT}, ${MessageStatus.DELIVERED}, ${MessageStatus.OPENED}, ${MessageStatus.CLICKED}) then 1 end)`,
-          opened: sql<number>`count(case when ${emailCampaigns.status} in (${MessageStatus.OPENED}, ${MessageStatus.CLICKED}) then 1 end)`,
-          clicked: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.CLICKED} then 1 end)`,
-          failed: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.FAILED} then 1 end)`,
-        })
-        .from(emailCampaigns)
-        .where(variantFilter)
-        .groupBy(emailCampaigns.stage);
-
-      const byStage = stageRows.map((r) => ({
-        stage: r.stage,
-        total: Number(r.total),
-        sent: Number(r.sent),
-        opened: Number(r.opened),
-        clicked: Number(r.clicked),
-        failed: Number(r.failed),
-      }));
-
-      // ── Per-variant breakdown ───────────────────────────────────────────
-      const variantRows = await db
-        .select({
-          variant: emailCampaigns.journeyVariant,
-          total: count(),
-          sent: sql<number>`count(case when ${emailCampaigns.status} in (${MessageStatus.SENT}, ${MessageStatus.DELIVERED}, ${MessageStatus.OPENED}, ${MessageStatus.CLICKED}) then 1 end)`,
-          opened: sql<number>`count(case when ${emailCampaigns.status} in (${MessageStatus.OPENED}, ${MessageStatus.CLICKED}) then 1 end)`,
-          clicked: sql<number>`count(case when ${emailCampaigns.status} = ${MessageStatus.CLICKED} then 1 end)`,
-        })
-        .from(emailCampaigns)
-        .where(variantFilter)
-        .groupBy(emailCampaigns.journeyVariant);
-
-      const byJourneyVariant = variantRows.map((r) => {
-        const vSentBase = Number(r.sent);
-        return {
-          variant: r.variant,
-          total: Number(r.total),
-          sent: vSentBase,
-          openRate: vSentBase > 0 ? Number(r.opened) / vSentBase : 0,
-          clickRate: vSentBase > 0 ? Number(r.clicked) / vSentBase : 0,
-        };
-      });
-
-      // ── Lead identity counts ─────────────────────────────────────────────
-      // Total leads (raw row count)
-      const [totalLeadsRow] = await db.select({ count: count() }).from(leads);
-      const totalLeads = Number(totalLeadsRow?.count ?? 0);
-
-      // Linked leads: unique lead IDs that appear in any link (either side)
-      const linkedLeadsResult = await db.execute(
-        sql`SELECT count(distinct v) as count FROM "lead_lead_links" ll, lateral unnest(array[ll.lead_id_1, ll.lead_id_2]) AS v`,
+      const [floor] = await db
+        .select({ first: sql<string | null>`min(${emailCampaigns.sentAt})` })
+        .from(emailCampaigns);
+      const win = resolveAnalyticsWindow(
+        data,
+        new Date(),
+        floor?.first
+          ? new Date(`${String(floor.first).replace(" ", "T")}Z`)
+          : null,
       );
-      const linkedLeadsCountRow = linkedLeadsResult.rows[0] as
-        | { count: number }
-        | undefined;
-      const linkedLeadsCount = Number(linkedLeadsCountRow?.count ?? 0);
-
-      // Unique persons estimate: total leads minus the "secondary" leads
-      // A secondary lead is one where it appears as lead_id_2 in a link
-      // (lead_id_1 is the earlier/primary one by convention of linking order).
-      // This is an estimate - exact deduplication would require graph traversal.
-      const [secondaryLeadsRow] = await db
-        .select({ count: sql<number>`count(distinct lead_id_2)` })
-        .from(leadLeadLinks);
-      const secondaryCount = Number(secondaryLeadsRow?.count ?? 0);
-      const uniquePersonsEstimate = Math.max(0, totalLeads - secondaryCount);
-
-      // ── Queue health ─────────────────────────────────────────────────────
-      const [pendingLeadsRow] = await db
-        .select({ count: count() })
-        .from(leads)
-        .where(eq(leads.status, LeadStatus.CAMPAIGN_RUNNING));
-
-      const now = new Date();
-      const todayStart = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
+      const cte = sql`WITH ${campaignRowsCte(data)}`;
+      const cur = (col: string): SQL => inWindowSql(sql.raw(col), win);
+      const prv = (col: string): SQL => inPreviousWindowSql(sql.raw(col), win);
+      const bucketOf = (col: string): SQL =>
+        bucketSql(sql.raw(col), win.bucket);
+      const failedStatus = MessageStatus.FAILED;
+      const pendingStatus = MessageStatus.PENDING;
+      // Dedupe/status skips are recorded as failed rows but are not send errors.
+      const skipped = sql.raw(
+        `(ec.error LIKE 'duplicate:%' OR ec.error LIKE 'status_change:%')`,
       );
-      const tomorrowStart = new Date(todayStart);
-      tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+      const realFailure = sql`ec.status = ${failedStatus} AND NOT coalesce(${skipped}, false)`;
+      const sentRow = sql.raw(
+        `ec.sent_at IS NOT NULL AND ec.status <> '${MessageStatus.FAILED}'`,
+      );
 
-      const [scheduledTodayRow] = await db
-        .select({ count: count() })
-        .from(emailCampaigns)
-        .where(
-          and(
-            gte(emailCampaigns.scheduledAt, todayStart),
-            lt(emailCampaigns.scheduledAt, tomorrowStart),
-          ),
-        );
+      const [
+        automation,
+        queueRows,
+        kpiRows,
+        sentSeries,
+        openSeries,
+        clickSeries,
+        problemSeries,
+        variantRows,
+        stageRows,
+        localeRows,
+        errorRows,
+      ] = await Promise.all([
+        CampaignStatsRepository.loadAutomation(),
 
-      const pendingLeadsCount = pendingLeadsRow?.count ?? 0;
-      const emailsScheduledToday = scheduledTodayRow?.count ?? 0;
+        db.execute<
+          QueryResultRow & {
+            dueNow: NumLike;
+            overdue: NumLike;
+            scheduled: NumLike;
+            next24h: NumLike;
+            failed7d: NumLike;
+            dueLeads: NumLike;
+            lastSent: string | null;
+            sent24h: NumLike;
+            oldestDue: string | null;
+            nextScheduled: string | null;
+            stuck: NumLike;
+            running: NumLike;
+          }
+        >(sql`${cte}
+          SELECT
+            count(*) FILTER (WHERE ec.status = ${pendingStatus} AND ec.sent_at IS NULL AND ec.scheduled_at <= now() AT TIME ZONE 'UTC') AS "dueNow",
+            count(*) FILTER (WHERE ec.status = ${pendingStatus} AND ec.sent_at IS NULL AND ec.scheduled_at <= (now() AT TIME ZONE 'UTC') - interval '24 hours') AS overdue,
+            count(*) FILTER (WHERE ec.status = ${pendingStatus} AND ec.sent_at IS NULL AND ec.scheduled_at > now() AT TIME ZONE 'UTC') AS scheduled,
+            count(*) FILTER (WHERE ec.status = ${pendingStatus} AND ec.sent_at IS NULL AND ec.scheduled_at > now() AT TIME ZONE 'UTC' AND ec.scheduled_at <= (now() AT TIME ZONE 'UTC') + interval '24 hours') AS "next24h",
+            count(*) FILTER (WHERE ${realFailure} AND ec.updated_at >= (now() AT TIME ZONE 'UTC') - interval '7 days') AS "failed7d",
+            count(DISTINCT ec.lead_id) FILTER (WHERE ec.status = ${pendingStatus} AND ec.sent_at IS NULL AND ec.scheduled_at <= now() AT TIME ZONE 'UTC') AS "dueLeads",
+            max(ec.sent_at) FILTER (WHERE ec.sent_at IS NOT NULL AND ec.status <> ${failedStatus})::text AS "lastSent",
+            count(*) FILTER (WHERE ec.sent_at >= (now() AT TIME ZONE 'UTC') - interval '24 hours' AND ec.status <> ${failedStatus}) AS "sent24h",
+            min(ec.scheduled_at) FILTER (WHERE ec.status = ${pendingStatus} AND ec.sent_at IS NULL AND ec.scheduled_at <= now() AT TIME ZONE 'UTC')::text AS "oldestDue",
+            min(ec.scheduled_at) FILTER (WHERE ec.status = ${pendingStatus} AND ec.sent_at IS NULL AND ec.scheduled_at > now() AT TIME ZONE 'UTC')::text AS "nextScheduled",
+            (SELECT count(*) FROM email_send_log s WHERE s.status = ${pendingStatus} AND s.claimed_at < (now() AT TIME ZONE 'UTC') - interval '1 hour') AS stuck,
+            (SELECT count(*) FROM leads WHERE status = ${LeadStatus.CAMPAIGN_RUNNING}) AS running
+          FROM ec`),
 
-      // ── Weekly quota progress ─────────────────────────────────────────────
-      const environment =
-        coreEnv.NODE_ENV === Environment.PRODUCTION
-          ? Environment.PRODUCTION
-          : Environment.DEVELOPMENT;
+        db.execute<
+          QueryResultRow & {
+            sent: NumLike;
+            opened: NumLike;
+            clicked: NumLike;
+            sentPrev: NumLike;
+            openedPrev: NumLike;
+            clickedPrev: NumLike;
+            unsub: NumLike;
+            unsubPrev: NumLike;
+            bounced: NumLike;
+            bouncedPrev: NumLike;
+            failed: NumLike;
+            failedPrev: NumLike;
+            skipped: NumLike;
+          }
+        >(sql`${cte}
+          SELECT
+            count(*) FILTER (WHERE ${sentRow} AND ${cur("ec.sent_at")}) AS sent,
+            count(*) FILTER (WHERE ${sentRow} AND ${cur("ec.sent_at")} AND ec.opened_at IS NOT NULL) AS opened,
+            count(*) FILTER (WHERE ${sentRow} AND ${cur("ec.sent_at")} AND ec.clicked_at IS NOT NULL) AS clicked,
+            count(*) FILTER (WHERE ${sentRow} AND ${prv("ec.sent_at")}) AS "sentPrev",
+            count(*) FILTER (WHERE ${sentRow} AND ${prv("ec.sent_at")} AND ec.opened_at IS NOT NULL) AS "openedPrev",
+            count(*) FILTER (WHERE ${sentRow} AND ${prv("ec.sent_at")} AND ec.clicked_at IS NOT NULL) AS "clickedPrev",
+            count(*) FILTER (WHERE ${cur("ec.unsubscribed_at")}) AS unsub,
+            count(*) FILTER (WHERE ${prv("ec.unsubscribed_at")}) AS "unsubPrev",
+            count(*) FILTER (WHERE ${cur("ec.bounced_at")}) AS bounced,
+            count(*) FILTER (WHERE ${prv("ec.bounced_at")}) AS "bouncedPrev",
+            count(*) FILTER (WHERE ${realFailure} AND ${cur("ec.updated_at")}) AS failed,
+            count(*) FILTER (WHERE ${realFailure} AND ${prv("ec.updated_at")}) AS "failedPrev",
+            count(*) FILTER (WHERE ec.status = ${failedStatus} AND coalesce(${skipped}, false) AND ${cur("ec.updated_at")}) AS skipped
+          FROM ec`),
 
-      const [starterConfig] = await db
-        .select()
-        .from(campaignStarterConfigs)
-        .where(eq(campaignStarterConfigs.environment, environment))
-        .limit(1);
+        db.execute<
+          QueryResultRow & { bucket: string; value: NumLike }
+        >(sql`${cte}
+          SELECT ${bucketOf("ec.sent_at")} AS bucket, count(*) AS value
+          FROM ec WHERE ${sentRow} AND ${cur("ec.sent_at")} GROUP BY 1`),
+        db.execute<
+          QueryResultRow & { bucket: string; value: NumLike }
+        >(sql`${cte}
+          SELECT ${bucketOf("ec.sent_at")} AS bucket, count(*) AS value
+          FROM ec WHERE ${sentRow} AND ${cur("ec.sent_at")} AND ec.opened_at IS NOT NULL GROUP BY 1`),
+        db.execute<
+          QueryResultRow & { bucket: string; value: NumLike }
+        >(sql`${cte}
+          SELECT ${bucketOf("ec.sent_at")} AS bucket, count(*) AS value
+          FROM ec WHERE ${sentRow} AND ${cur("ec.sent_at")} AND ec.clicked_at IS NOT NULL GROUP BY 1`),
 
-      const nowUtc = new Date();
-      const daysFromMonday =
-        nowUtc.getUTCDay() === 0 ? 6 : nowUtc.getUTCDay() - 1;
-      const startOfWeek = new Date(nowUtc);
-      startOfWeek.setUTCDate(nowUtc.getUTCDate() - daysFromMonday);
-      startOfWeek.setUTCHours(0, 0, 0, 0);
+        db.execute<
+          QueryResultRow & { bucket: string; kind: string; value: NumLike }
+        >(sql`${cte}
+          SELECT ${bucketOf("ec.updated_at")} AS bucket, 'failed' AS kind, count(*) AS value
+          FROM ec WHERE ${realFailure} AND ${cur("ec.updated_at")} GROUP BY 1
+          UNION ALL
+          SELECT ${bucketOf("ec.bounced_at")}, 'bounced', count(*)
+          FROM ec WHERE ${cur("ec.bounced_at")} GROUP BY 1
+          UNION ALL
+          SELECT ${bucketOf("ec.unsubscribed_at")}, 'unsubscribed', count(*)
+          FROM ec WHERE ${cur("ec.unsubscribed_at")} GROUP BY 1`),
 
-      const weeklyQuotaByLocale: Record<string, number> = Object.fromEntries(
-        Object.entries(starterConfig?.localeConfig ?? {}).map(
-          ([locale, cfg]) => [locale, cfg.leadsPerWeek],
+        ...(["journey_variant", "stage", "loc"] as const).map((dim) =>
+          db.execute<
+            QueryResultRow & {
+              key: string | null;
+              sent: NumLike;
+              opened: NumLike;
+              clicked: NumLike;
+              unsub: NumLike;
+              bounced: NumLike;
+              failed: NumLike;
+              due: NumLike;
+            }
+          >(sql`${cte}
+            SELECT ec.${sql.raw(dim)} AS key,
+              count(*) FILTER (WHERE ${sentRow} AND ${cur("ec.sent_at")}) AS sent,
+              count(*) FILTER (WHERE ${sentRow} AND ${cur("ec.sent_at")} AND ec.opened_at IS NOT NULL) AS opened,
+              count(*) FILTER (WHERE ${sentRow} AND ${cur("ec.sent_at")} AND ec.clicked_at IS NOT NULL) AS clicked,
+              count(*) FILTER (WHERE ${cur("ec.unsubscribed_at")}) AS unsub,
+              count(*) FILTER (WHERE ${cur("ec.bounced_at")}) AS bounced,
+              count(*) FILTER (WHERE ${realFailure} AND ${cur("ec.updated_at")}) AS failed,
+              count(*) FILTER (WHERE ec.status = ${pendingStatus} AND ec.sent_at IS NULL AND ec.scheduled_at <= now() AT TIME ZONE 'UTC') AS due
+            FROM ec GROUP BY 1
+            HAVING count(*) FILTER (WHERE (${sentRow} AND ${cur("ec.sent_at")}) OR (ec.status = ${pendingStatus} AND ec.sent_at IS NULL)) > 0
+            ORDER BY ${
+              dim === "stage"
+                ? sql`array_position(ARRAY[${sql.join(
+                    STAGE_ORDER.map((st) => sql`${st}`),
+                    sql`, `,
+                  )}]::text[], ec.stage), 1`
+                : sql`(count(*) FILTER (WHERE ${sentRow} AND ${cur("ec.sent_at")}) + count(*) FILTER (WHERE ec.status = ${pendingStatus} AND ec.sent_at IS NULL AND ec.scheduled_at <= now() AT TIME ZONE 'UTC')) DESC, 1`
+            }
+            LIMIT ${BREAKDOWN_LIMIT}`),
         ),
-      );
 
-      const quotaProgress: Array<{
-        locale: CountryLanguage;
-        weeklyQuota: number;
-        startedThisWeek: number;
-        remaining: number;
-        perRunBudget: number;
-        totalRunsPerWeek: number;
-        accumulator: number;
-      }> = [];
+        db.execute<QueryResultRow & { key: string; count: NumLike }>(sql`${cte}
+          SELECT left(coalesce(nullif(ec.error, ''), '-'), 120) AS key, count(*) AS count
+          FROM ec WHERE ${realFailure} AND ${cur("ec.updated_at")}
+          GROUP BY 1 ORDER BY 2 DESC LIMIT ${ERROR_LIMIT}`),
+      ]);
 
-      const [starterCronTask] = await db
-        .select({ schedule: cronTasks.schedule })
-        .from(cronTasks)
-        .where(eq(cronTasks.routeId, "campaign-starter"))
-        .limit(1);
-      const starterSchedule = starterCronTask?.schedule ?? "*/5 * * * *";
-      const frequencyMinutes = getCronFrequencyMinutes(starterSchedule, logger);
-      const runsPerHour = 60 / frequencyMinutes;
+      const variantTrendRows = await db.execute<
+        QueryResultRow & { bucket: string; key: string; value: NumLike }
+      >(sql`${cte}
+          SELECT ${bucketOf("ec.sent_at")} AS bucket, ec.journey_variant AS key, count(*) AS value
+          FROM ec WHERE ${sentRow} AND ${cur("ec.sent_at")}
+          GROUP BY 1, 2`);
 
-      for (const localeValue of Object.values(CountryLanguageValues)) {
-        const weeklyQuota = weeklyQuotaByLocale[localeValue] ?? 0;
-        const localeEntry = starterConfig?.localeConfig[localeValue];
-        const enabledHours = localeEntry?.enabledHours ?? { start: 0, end: 0 };
-        const enabledDays = localeEntry?.enabledDays ?? [];
-        const enabledHoursCount = Math.max(
-          0,
-          enabledHours.end - enabledHours.start,
+      const q = queueRows.rows[0];
+      const k = kpiRows.rows[0];
+      const buckets = win.buckets;
+      const series = (
+        rows: Array<{ bucket: string; value: NumLike }>,
+      ): number[] =>
+        fillBuckets(
+          buckets,
+          rows.map((r) => ({ bucket: r.bucket, value: num(r.value) })),
         );
-        const totalRunsPerWeek =
-          runsPerHour * enabledHoursCount * enabledDays.length;
-        const perRunBudget =
-          totalRunsPerWeek > 0 ? Math.floor(weeklyQuota / totalRunsPerWeek) : 0;
-
-        const languageCode = getLanguageFromLocale(localeValue);
-        const [weekRow] = await db
-          .select({ count: sql<number>`COUNT(*)::int` })
-          .from(leads)
-          .where(
-            and(
-              eq(leads.language, languageCode),
-              gte(leads.campaignStartedAt, startOfWeek),
-            ),
-          );
-        const startedThisWeek = Number(weekRow?.count ?? 0);
-        const accumulator = starterConfig?.localeAccumulators[localeValue] ?? 0;
-        quotaProgress.push({
-          locale: localeValue,
-          weeklyQuota,
-          startedThisWeek,
-          remaining: Math.max(0, weeklyQuota - startedThisWeek),
-          perRunBudget,
-          totalRunsPerWeek: Math.round(totalRunsPerWeek),
-          accumulator,
-        });
-      }
-
-      // ── Campaign cron task health ─────────────────────────────────────
-      const CAMPAIGN_TASK_IDS = [
-        "campaign-starter",
-        "email-campaigns",
-        "bounce-processor",
-      ];
-
-      const campaignTaskRows = await db
-        .select()
-        .from(cronTasks)
-        .where(inArray(cronTasks.id, CAMPAIGN_TASK_IDS));
-
-      const HISTORY_DEPTH = 5;
-      const recentExecs =
-        campaignTaskRows.length > 0
-          ? await db
-              .select({
-                taskId: cronTaskExecutions.taskId,
-                status: cronTaskExecutions.status,
-                completedAt: cronTaskExecutions.completedAt,
-                durationMs: cronTaskExecutions.durationMs,
-                result: cronTaskExecutions.result,
-                error: cronTaskExecutions.error,
-                startedAt: cronTaskExecutions.startedAt,
-              })
-              .from(cronTaskExecutions)
-              .where(inArray(cronTaskExecutions.taskId, CAMPAIGN_TASK_IDS))
-              .orderBy(desc(cronTaskExecutions.startedAt))
-              .limit(CAMPAIGN_TASK_IDS.length * HISTORY_DEPTH * 4)
-          : [];
-
-      const execsByTask = new Map<string, typeof recentExecs>();
-      for (const exec of recentExecs) {
-        const existing = execsByTask.get(exec.taskId) ?? [];
-        if (existing.length < HISTORY_DEPTH) {
-          existing.push(exec);
-          execsByTask.set(exec.taskId, existing);
-        }
-      }
-
-      const nowForStats = new Date();
-      const twentyFourHoursAgo = new Date(
-        nowForStats.getTime() - 24 * 60 * 60 * 1000,
-      );
-      const [statsResult] = await db
-        .select({
-          total: count(),
-          failed: count(
-            sql`CASE WHEN ${cronTaskExecutions.status} = ${CronTaskStatus.FAILED} THEN 1 END`,
-          ),
-        })
-        .from(cronTaskExecutions)
-        .where(
-          and(
-            gte(cronTaskExecutions.startedAt, twentyFourHoursAgo),
-            inArray(cronTaskExecutions.taskId, CAMPAIGN_TASK_IDS),
-          ),
-        );
-
-      const locale = "en-GLOBAL" as CountryLanguage;
-      const campaignTasks = await Promise.all(
-        campaignTaskRows.map(async (task) => {
-          const taskExecs = execsByTask.get(task.id) ?? [];
-          const lastSuccess = taskExecs.find(
-            (e) => e.status === CronTaskStatus.COMPLETED,
-          );
-
-          const recentExecutions = taskExecs.map((e) => ({
-            status: e.status,
-            completedAt: e.completedAt?.toISOString() ?? null,
-            durationMs: e.durationMs,
-            resultSnippet: e.result ? summariseResult(e.result) : null,
-            errorSnippet: e.error?.message
-              ? truncate(String(e.error.message), 60)
-              : null,
-          }));
-
-          const serialized = CronTasksRepository.serializeTask(task, logger);
-          const base = await CronTasksRepository.translateTaskFields(
-            serialized,
-            locale,
-          );
-
-          return {
-            ...base,
-            recentExecutions,
-            lastResultSummary: lastSuccess
-              ? summariseResult(lastSuccess.result)
-              : null,
-          };
-        }),
-      );
-
-      const alerts = campaignTasks
-        .filter(
-          (ft) =>
-            ft.consecutiveFailures > 0 &&
-            (ft.priority === "priority.critical" ||
-              ft.priority === "priority.high"),
-        )
-        .map((ft) => {
-          const taskExecs = execsByTask.get(ft.id) ?? [];
-          const lastFailed = taskExecs.find(
-            (e) => e.status === CronTaskStatus.FAILED,
-          );
-          return {
-            taskId: ft.id,
-            taskName: ft.displayName,
-            priority: ft.priority,
-            consecutiveFailures: ft.consecutiveFailures,
-            lastError: lastFailed?.error?.message
-              ? truncate(String(lastFailed.error.message), 120)
-              : null,
-            lastFailedAt: lastFailed?.startedAt?.toISOString() ?? null,
-          };
-        });
-
-      const total24h = statsResult?.total ?? 0;
-      const failed24h = statsResult?.failed ?? 0;
-      const successRate24h =
-        total24h > 0
-          ? Math.round(((total24h - failed24h) / total24h) * 1000) / 10
-          : null;
-
-      const criticalFailures = campaignTaskRows.some(
-        (row) =>
-          row.consecutiveFailures >= 3 && row.priority === "priority.critical",
-      );
-      const highFailures = campaignTaskRows.some(
-        (row) =>
-          row.consecutiveFailures >= 3 && row.priority === "priority.high",
-      );
-      const systemHealth = criticalFailures
-        ? ("critical" as const)
-        : highFailures || (successRate24h !== null && successRate24h < 80)
-          ? ("warning" as const)
-          : ("healthy" as const);
-
-      const taskStats = {
-        totalTasks: campaignTaskRows.length,
-        enabledTasks: campaignTaskRows.filter((r) => r.enabled).length,
-        disabledTasks: campaignTaskRows.filter((r) => !r.enabled).length,
-        successRate24h,
-        failedTasks24h: Number(failed24h),
-        systemHealth,
-      };
-
-      logger.debug("Campaign stats retrieved", {
-        total: totals.total,
-        openRate,
-        clickRate,
-        pendingLeadsCount,
-        emailsScheduledToday,
+      const problemOf = (kind: string): number[] =>
+        series(problemSeries.rows.filter((r) => r.kind === kind));
+      const hasPrevious = win.previousFrom !== null;
+      const kpi = (
+        value: number,
+        previous: number,
+      ): { value: number; previous: number | null } => ({
+        value,
+        previous: hasPrevious ? previous : null,
       });
+      const sent = num(k?.sent);
+      const sentPrev = num(k?.sentPrev);
+      const breakdown = (
+        rows: typeof variantRows.rows,
+      ): CampaignStatsGetResponseOutput["byVariant"] =>
+        rows.map((r) => ({
+          key: r.key,
+          metrics: {
+            sent: num(r.sent),
+            opened: num(r.opened),
+            clicked: num(r.clicked),
+            openRate: ratio(num(r.opened), num(r.sent)),
+            clickRate: ratio(num(r.clicked), num(r.sent)),
+            unsubscribed: num(r.unsub),
+            bounced: num(r.bounced),
+            failed: num(r.failed),
+            due: num(r.due),
+          },
+        }));
+
+      const dispatcher =
+        automation.find((a) => a.id === CAMPAIGN_DISPATCHER_TASK_ID) ??
+        automation[0];
+      if (!dispatcher) {
+        return fail({
+          message: t("get.errors.server.title"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
 
       return success({
-        total: totals.total,
-        pending: totals.pending,
-        sent: totals.sent,
-        delivered: totals.delivered,
-        opened: totals.opened,
-        clicked: totals.clicked,
-        failed: totals.failed,
-        openRate,
-        clickRate,
-        deliveryRate,
-        failureRate,
-        totalLeads,
-        linkedLeadsCount,
-        uniquePersonsEstimate,
-        pendingLeadsCount,
-        emailsScheduledToday,
-        byStage,
-        byJourneyVariant,
-        quotaProgress,
-        campaignTasks,
-        alerts,
-        taskStats,
+        window: serializeWindow(win),
+        engine: { dispatcher, tasks: automation },
+        queue: {
+          dueNow: num(q?.dueNow),
+          overdue24h: num(q?.overdue),
+          scheduled: num(q?.scheduled),
+          scheduledNext24h: num(q?.next24h),
+          failed7d: num(q?.failed7d),
+          dueLeads: num(q?.dueLeads),
+          lastSentAt: iso(q?.lastSent),
+          sent24h: num(q?.sent24h),
+          stuckClaims: num(q?.stuck),
+          oldestDueAt: iso(q?.oldestDue),
+          oldestDueDays: daysSince(iso(q?.oldestDue)),
+          nextScheduledAt: iso(q?.nextScheduled),
+          leadsInCampaign: num(q?.running),
+        },
+        kpis: {
+          sent: kpi(sent, sentPrev),
+          openRate: kpi(
+            ratio(num(k?.opened), sent),
+            ratio(num(k?.openedPrev), sentPrev),
+          ),
+          clickRate: kpi(
+            ratio(num(k?.clicked), sent),
+            ratio(num(k?.clickedPrev), sentPrev),
+          ),
+          unsubscribed: kpi(num(k?.unsub), num(k?.unsubPrev)),
+          bounced: kpi(num(k?.bounced), num(k?.bouncedPrev)),
+          failed: kpi(num(k?.failed), num(k?.failedPrev)),
+        },
+        totals: {
+          opened: num(k?.opened),
+          clicked: num(k?.clicked),
+          skipped: num(k?.skipped),
+        },
+        trend: {
+          buckets,
+          series: [
+            { key: "sent", values: series(sentSeries.rows) },
+            { key: "opened", values: series(openSeries.rows) },
+            { key: "clicked", values: series(clickSeries.rows) },
+          ],
+        },
+        problems: {
+          buckets,
+          series: [
+            { key: "failed", values: problemOf("failed") },
+            { key: "bounced", values: problemOf("bounced") },
+            { key: "unsubscribed", values: problemOf("unsubscribed") },
+          ],
+        },
+        funnel: [
+          { key: "sent", value: sent },
+          { key: "opened", value: num(k?.opened) },
+          { key: "clicked", value: num(k?.clicked) },
+        ],
+        variantTrend: {
+          buckets,
+          series: [...new Set(variantTrendRows.rows.map((r) => r.key))]
+            .toSorted()
+            .map((key) => ({
+              key,
+              values: series(
+                variantTrendRows.rows.filter((r) => r.key === key),
+              ),
+            })),
+        },
+        byVariant: breakdown(variantRows.rows),
+        byStage: breakdown(stageRows.rows),
+        byLocale: breakdown(localeRows.rows),
+        topErrors: errorRows.rows.map((r) => ({
+          key: r.key,
+          metrics: { count: num(r.count) },
+        })),
       });
     } catch (error) {
       logger.error("campaign.stats.error", parseError(error));

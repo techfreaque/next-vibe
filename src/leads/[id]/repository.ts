@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, desc, eq, inArray, isNull, or } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import { success } from "next-vibe/core/route/response.schema";
@@ -15,8 +15,13 @@ import {
 import { LeadsRepository } from "next-vibe/identity/lead/repository";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import type { QueryResultRow } from "pg";
 
 import { creditWallets } from "@/credits/db";
+import { CreditTransactionType } from "@/credits/enum";
+import { ipPrefixSql } from "@/leads/analytics/bot-sql";
+import { LeadDimension } from "@/leads/analytics/enum";
+import { dimensionColumn, leadFactsSql } from "@/leads/analytics/segment-sql";
 import { growthJourneys } from "@/leads/growth/db";
 import { MessageStatus } from "@/messenger/messages/enum";
 import { newsletterSubscriptions } from "@/newsletter/db";
@@ -395,6 +400,35 @@ async function getReview(lead: LeadDetail): Promise<Review> {
   };
 }
 
+type LeadTraffic = NonNullable<LeadGetResponseOutput["traffic"]>;
+
+/** Bot class, first touch, network and burst context of one lead. */
+async function getTraffic(leadId: string): Promise<LeadTraffic | undefined> {
+  const { rows } = await db.execute<QueryResultRow & LeadTraffic>(sql`
+    WITH f AS (${leadFactsSql(sql`l.id = ${leadId}`)})
+    SELECT f.bot_family AS "botFamily",
+      ${dimensionColumn(LeadDimension.CHANNEL_TYPE)} AS "channelType",
+      f.channel, f.source, f.medium, f.campaign,
+      f.referrer_host AS "referrerHost", f.landing_path AS "landingPath",
+      f.ref_code AS "refCode", f.ip_prefix AS "ipPrefix", f.ua_fp AS "uaFingerprint",
+      (SELECT count(*)::int FROM leads p
+        WHERE f.ip_prefix IS NOT NULL AND p.created_at >= now() - interval '30 days'
+          AND p.ip_address IS NOT NULL
+          AND ${ipPrefixSql(sql`p.ip_address`)} = f.ip_prefix) AS "prefixLeads30d",
+      (SELECT count(*)::int FROM leads p
+        WHERE f.ua IS NOT NULL AND p.created_at >= now() - interval '30 days'
+          AND p.user_agent = f.ua) AS "uaLeads30d",
+      coalesce((SELECT sum((t.metadata->>'freeCreditsUsed')::numeric)
+        FROM credit_transactions t JOIN credit_wallets w ON w.id = t.wallet_id
+        WHERE t.type = ${CreditTransactionType.USAGE}
+          AND (t.metadata->>'actorLeadId' = f.id::text
+            OR (t.metadata->>'actorLeadId' IS NULL AND w.lead_id = f.id))
+          AND (t.metadata->>'freeCreditsUsed') ~ '^[0-9.]+$'), 0)::float8 AS "freeCreditsBurned"
+    FROM f
+  `);
+  return rows[0];
+}
+
 export class LeadDetailRepository {
   static async getLead(
     id: string,
@@ -407,8 +441,11 @@ export class LeadDetailRepository {
     }
 
     try {
-      const review = await getReview(result.data.lead);
-      return success({ ...result.data, review });
+      const [review, traffic] = await Promise.all([
+        getReview(result.data.lead),
+        getTraffic(id),
+      ]);
+      return success({ ...result.data, review, traffic });
     } catch (error) {
       logger.error("Failed to load lead review", parseError(error));
       return success({ ...result.data, review: undefined });

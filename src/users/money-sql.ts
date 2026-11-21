@@ -31,3 +31,14 @@ export function usdAmountSql(amount: AnyColumn, currency: AnyColumn): SQL {
 export function roundMoney(value: number): number {
   return Math.round(value * 100) / 100;
 }
+
+/** Same conversion for raw SQL column names (e.g. "p.amount", "p.currency"). */
+export function usdAmountSqlRaw(amount: string, currency: string): SQL {
+  const cases = Object.entries(FINANCE_CONFIG.fxToUsd)
+    .filter(([code, rate]) => /^[a-z]{3}$/.test(code) && Number.isFinite(rate))
+    .map(([code, rate]) => `WHEN '${code}' THEN ${rate}`)
+    .join(" ");
+  return sql.raw(
+    `(${amount}::numeric * (CASE lower(${currency}) ${cases} ELSE 0 END))`,
+  );
+}

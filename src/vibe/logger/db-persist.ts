@@ -448,6 +448,14 @@ async function upsertErrorLog(row: PendingRow): Promise<void> {
           createdAt: sql`now()`,
         },
       });
+
+    // Per-day occurrence counter (charts + affected users in the error monitor)
+    const { recordErrorLogDaily } = await import("./error-monitor/daily");
+    await recordErrorLogDaily({
+      fingerprint: row.fingerprint,
+      occurrences: row.occurrences,
+      metadata: row.metadata,
+    });
   } catch {
     // Silently swallow - logging persistence must never cascade
   }

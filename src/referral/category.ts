@@ -6,6 +6,7 @@
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
+import { REFERRAL_OVERVIEW_ALIAS } from "@/referral/admin/overview/constants";
 import { REFERRAL_STATS_ALIAS } from "@/referral/stats/constants";
 import { USER_ME_ALIAS } from "@/user/private/me/constants";
 
@@ -24,7 +25,7 @@ export const category: CategoryDefinition = {
   icon: "share-2",
   order: 60,
   defaultEntry: {
-    [UserPermissionRole.ADMIN]: REFERRAL_STATS_ALIAS,
+    [UserPermissionRole.ADMIN]: REFERRAL_OVERVIEW_ALIAS,
     [UserPermissionRole.CUSTOMER]: REFERRAL_STATS_ALIAS,
     [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
   },
@@ -41,7 +42,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Programma",
         "es-ES": "Programa",
       },
-      // inherits parent defaultEntry (referral-stats)
+      // inherits parent defaultEntry (admins: referral-overview, customers: referral-stats)
     },
     Payouts: {
       icon: "banknote",

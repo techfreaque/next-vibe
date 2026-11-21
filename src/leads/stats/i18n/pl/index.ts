@@ -418,6 +418,9 @@ export const translations: typeof enTranslations = {
     description: "Statystyki leadów pobrane pomyślnie",
   },
   widget: {
+    openAcquisition: "Raport pozyskiwania",
+    openFunnel: "Lejek",
+    openAbuse: "Sygnały nadużyć",
     title: "Statystyki leadów",
     refresh: "Odśwież",
     viewAllLeads: "Wyświetl wszystkie leady",

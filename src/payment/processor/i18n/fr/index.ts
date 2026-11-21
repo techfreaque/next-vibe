@@ -1,11 +1,17 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Diagnostic des paiements",
-  short: "Prestataires de paiement",
+  title: "Transactions de paiement",
+  short: "Transactions",
   description:
     "Consultez les transactions et les renouvellements, les échecs de paiement et le traitement des webhooks enregistrés.",
   search: {
+    kind: "Objet du paiement",
+    currency: "Devise",
+    from: "Du",
+    to: "Au",
+    dayFormat:
+      "Jour calendaire en UTC (AAAA-MM-JJ). Les deux jours sont inclus.",
     view: "Vue",
     userId: "Identifiant client",
     transactionId: "Identifiant de transaction",
@@ -17,9 +23,36 @@ export const translations: typeof enTranslations = {
     limit: "Par page",
   },
   widget: {
+    invoiceRef: "Réf. facture",
+    refundBlocked: "Remboursement indisponible ici : {{reason}}",
+    netLine: "Remboursé {{refunded}} · Net {{net}}",
+    refundRule:
+      "Les paiements Stripe réglés avec une référence ouvrent l'examen de remboursement. Les autres lignes payées affichent un bouton désactivé et la raison.",
+    showFilters: "Afficher les filtres",
+    hideFiltersPhone: "Masquer les filtres",
+    search: "Rechercher",
+    matchingStatus: "Uniquement {{status}}",
+    details: "Détails",
+    hideDetails: "Masquer les détails",
+    notRecorded: "Non enregistré",
+    refundYes: "Oui, examen possible",
+    refundNo: "Non",
+    retry: "Réessayer",
+    filters: "Filtres",
+    hideFilters: "Masquer les filtres",
+    all: "Tous",
+    activeFilters: "Filtré par",
+    removeFilter: "Retirer le filtre",
+    matching: "Transactions trouvées",
+    matchingHint: "Tous les états, sans filtre",
+    collected: "Encaissé {{currency}}, brut",
+    collectedHint:
+      "{{succeeded}} payées · {{failed}} échouées · {{refunded}} remboursées",
+    emptyFiltered:
+      "Aucun résultat pour ces filtres. Retirez-en un pour élargir.",
+    emptyAll: "Aucun paiement enregistré pour l'instant.",
     clearFilters: "Effacer les filtres",
-    transactionSearch:
-      "Recherchez par adresse e-mail, identifiant de transaction ou référence de facture du prestataire.",
+    transactionSearch: "E-mail, ID de transaction ou réf. de facture",
     webhookSearch:
       "Recherchez par type d’événement ou référence du prestataire.",
     processingDetail:
@@ -49,6 +82,17 @@ export const translations: typeof enTranslations = {
     transactionScope: "Transaction {{id}}",
   },
   enums: {
+    refundBlock: {
+      notStripe: "Paiement crypto : remboursement chez le prestataire",
+      noReference: "Aucune référence de paiement Stripe",
+      zeroAmount: "Rien n'a été facturé",
+      setup: "Enregistrement de carte, sans paiement",
+    },
+    kind: {
+      pack: "Pack de crédits",
+      newSubscription: "Nouvel abonnement",
+      renewal: "Renouvellement",
+    },
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NOWPayments",
@@ -83,6 +127,7 @@ export const translations: typeof enTranslations = {
   },
   successDescription: "Les données correspondantes sont disponibles.",
   errors: {
+    dateRange: "Le jour de début doit précéder ou égaler le jour de fin.",
     unauthorized: "Connectez-vous pour consulter les données de paiement.",
     validation: "Vérifiez les filtres et le numéro de page.",
     forbidden: "Un rôle d’administrateur est requis.",
@@ -94,6 +139,15 @@ export const translations: typeof enTranslations = {
     unsavedChanges: "Enregistrez ou annulez vos modifications.",
   },
   response: {
+    refundBlock: "Remboursement bloqué",
+    refundedAmount: "Montant remboursé",
+    gross: "Brut",
+    kind: "Objet du paiement",
+    totals: "Totaux par devise",
+    collected: "Encaissé",
+    succeeded: "Payées",
+    failed: "Échouées",
+    refunded: "Remboursées",
     view: "Vue",
     id: "Identifiant de transaction",
     userId: "Identifiant client",

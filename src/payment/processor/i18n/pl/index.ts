@@ -1,11 +1,17 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Diagnostyka płatności",
-  short: "Operatorzy płatności",
+  title: "Transakcje płatności",
+  short: "Transakcje",
   description:
     "Sprawdź transakcje zakupu i odnowienia, nieudane płatności oraz stan przetwarzania zapisanych webhooków.",
   search: {
+    kind: "Za co",
+    currency: "Waluta",
+    from: "Od",
+    to: "Do",
+    dayFormat:
+      "Dzień kalendarzowy w UTC (RRRR-MM-DD). Zakres obejmuje oba dni.",
     view: "Widok",
     userId: "Identyfikator klienta",
     transactionId: "Identyfikator transakcji",
@@ -17,9 +23,36 @@ export const translations: typeof enTranslations = {
     limit: "Na stronę",
   },
   widget: {
+    invoiceRef: "Nr faktury",
+    refundBlocked: "Zwrot niedostępny tutaj: {{reason}}",
+    netLine: "Zwrócono {{refunded}} · Netto {{net}}",
+    refundRule:
+      "Opłacone płatności Stripe z identyfikatorem otwierają sprawdzenie zwrotu. Inne opłacone wiersze pokazują wyłączony przycisk z powodem.",
+    showFilters: "Pokaż filtry",
+    hideFiltersPhone: "Ukryj filtry",
+    search: "Szukaj",
+    matchingStatus: "Tylko: {{status}}",
+    details: "Szczegóły",
+    hideDetails: "Ukryj szczegóły",
+    notRecorded: "Brak danych",
+    refundYes: "Tak, można sprawdzić",
+    refundNo: "Nie",
+    retry: "Spróbuj ponownie",
+    filters: "Filtry",
+    hideFilters: "Ukryj filtry",
+    all: "Wszystkie",
+    activeFilters: "Filtry",
+    removeFilter: "Usuń filtr",
+    matching: "Pasujące transakcje",
+    matchingHint: "Wszystkie stany, bez filtrów",
+    collected: "Wpływy {{currency}}, brutto",
+    collectedHint:
+      "{{succeeded}} opłaconych · {{failed}} nieudanych · {{refunded}} zwróconych",
+    emptyFiltered:
+      "Nic nie pasuje do tych filtrów. Usuń jeden, aby zobaczyć więcej.",
+    emptyAll: "Brak zapisanych płatności.",
     clearFilters: "Wyczyść filtry",
-    transactionSearch:
-      "Szukaj według adresu e-mail klienta, identyfikatora transakcji lub numeru faktury u operatora.",
+    transactionSearch: "E-mail, ID transakcji lub numer faktury",
     webhookSearch:
       "Szukaj według typu zdarzenia lub identyfikatora zdarzenia u operatora.",
     processingDetail:
@@ -49,6 +82,17 @@ export const translations: typeof enTranslations = {
     transactionScope: "Transakcja {{id}}",
   },
   enums: {
+    refundBlock: {
+      notStripe: "Płatność krypto: zwrot u operatora",
+      noReference: "Brak identyfikatora płatności Stripe",
+      zeroAmount: "Nic nie pobrano",
+      setup: "Zapis karty, bez płatności",
+    },
+    kind: {
+      pack: "Pakiet kredytów",
+      newSubscription: "Nowa subskrypcja",
+      renewal: "Odnowienie",
+    },
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NOWPayments",
@@ -83,6 +127,7 @@ export const translations: typeof enTranslations = {
   },
   successDescription: "Pasujące dane płatności są dostępne.",
   errors: {
+    dateRange: "Dzień początkowy nie może być późniejszy niż końcowy.",
     unauthorized: "Zaloguj się, aby wyświetlić dane płatności.",
     validation: "Sprawdź filtry i numer strony.",
     forbidden: "Wymagane są uprawnienia administratora.",
@@ -94,6 +139,15 @@ export const translations: typeof enTranslations = {
     unsavedChanges: "Zapisz lub odrzuć zmiany.",
   },
   response: {
+    refundBlock: "Zwrot zablokowany",
+    refundedAmount: "Zwrócona kwota",
+    gross: "Brutto",
+    kind: "Za co",
+    totals: "Sumy według waluty",
+    collected: "Wpływy",
+    succeeded: "Opłacone",
+    failed: "Nieudane",
+    refunded: "Zwrócone",
     view: "Widok",
     id: "Identyfikator transakcji",
     userId: "Identyfikator klienta",

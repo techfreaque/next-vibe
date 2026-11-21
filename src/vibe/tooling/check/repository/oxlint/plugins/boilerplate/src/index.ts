@@ -784,9 +784,21 @@ const i18nPatternRule = {
     return {
       // ── en: no imports allowed ─────────────────────────────
       ImportDeclaration(node: OxlintASTNode): void {
+        const importSource = (node as ImportDeclaration).source.value;
+        // Shared vocabulary of the SAME locale (e.g. the analytics window
+        // labels) may be spread into an endpoint's locale file:
+        // `.../i18n/de/index.ts` may import `<absolute path>/i18n/de`.
+        const fileLocale = /\/i18n\/([a-z]{2})\/index\.ts$/.exec(
+          getFilename(context),
+        )?.[1];
+        const sharedVocab = /^(next-vibe|@)\/.+\/i18n\/([a-z]{2})$/.exec(
+          importSource,
+        );
         if (
-          (node as ImportDeclaration).source.value ===
-          "next-vibe/core/i18n/core/regions"
+          importSource === "next-vibe/core/i18n/core/regions" ||
+          (sharedVocab !== null &&
+            fileLocale !== undefined &&
+            sharedVocab[2] === fileLocale)
         ) {
           return;
         }

@@ -1,6 +1,13 @@
 import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
+    focus: {
+      label: "Nadchodzące",
+    },
+    plan: {
+      label: "Plan",
+      description: "Tylko subskrypcje w tym planie",
+    },
     title: "Subskrypcje",
     titleShort: "Lista subskrypcji",
     description: "Przeglądaj wszystkie subskrypcje",
@@ -49,9 +56,20 @@ export const translations: typeof enTranslations = {
       placeholder: "Wybierz...",
     },
     response: {
+      summary: {
+        title: "Podsumowanie",
+      },
+      statusCounts: {
+        status: "Stan",
+        count: "Subskrypcje",
+      },
       title: "Subskrypcje",
       description: "Pasujące subskrypcje",
       subscriptions: {
+        cancelAt: "Anulowanie z dniem",
+        lastPaymentAmount: "Ostatnia płatność",
+        lastPaymentCurrency: "Waluta płatności",
+        lastPaymentAt: "Ostatnio opłacone",
         userId: "Identyfikator klienta",
         paymentFailedAt: "Pierwsza nieudana płatność",
         gracePeriodEndsAt: "Koniec okresu karencji",
@@ -113,6 +131,48 @@ export const translations: typeof enTranslations = {
     success: { title: "Sukces", description: "Subskrypcje pobrane" },
   },
   widget: {
+    focusLabel: "Nadchodzące",
+    mrrScope:
+      "Liczy aktywne i próbne subskrypcje według ostatniej płatności. Bez zaległych, kończących się i bez żadnej płatności.",
+    search: "Szukaj",
+    endingChip: "Kończy się",
+    fxNote: "po stałych kursach: {{rates}}",
+    pastDueRetry: "Płatność nieudana, ponowna próba lub okres karencji",
+    mrr: "MRR, ok. USD",
+    renewingSoon: "Odnowienia w 7 dni",
+    renewingSoonHint: "Aktywne, okres kończy się w ciągu tygodnia",
+    ending: "Kończące się",
+    endingHint: "Zakończą się bez odnowienia",
+    pastDue: "Zaległe",
+    pastDueHint: "bez zapisanej płatności: {{count}}",
+    noChargeStep:
+      "Brak zapisanej płatności. Sprawdź metodę płatności przed {{date}}",
+    retry: "Spróbuj ponownie",
+    renewalOverdue: "Odnowienie zaległe od {{date}}",
+    filters: "Filtry",
+    hideFilters: "Ukryj filtry",
+    all: "Wszystkie",
+    allCount: "Wszystkie {{count}}",
+    activeFilters: "Filtry",
+    removeFilter: "Usuń filtr",
+    clearFilters: "Wyczyść wszystko",
+    customerFilter: "Klient",
+    startedFrom: "Start od",
+    startedTo: "Start do",
+    perMonth: "/ mies.",
+    perYear: "/ rok",
+    noCharge: "Brak płatności",
+    graceUntil: "Dostęp wygasa {{date}}, jeśli nie zapłaci",
+    canceledOn: "Anulowano {{date}}",
+    endsOn: "Kończy się {{date}}, bez odnowienia",
+    renewsOn: "Odnowienie {{date}}",
+    periodEnd: "Koniec okresu {{date}}",
+    startedOn: "Start {{date}}",
+    lastPaid: "Ostatnio opłacone {{date}}",
+    payments: "Płatności",
+    revenueReport: "Otwórz raport przychodów",
+    emptyFiltered:
+      "Nic nie pasuje do tych filtrów. Usuń jeden, aby zobaczyć więcej.",
     pick: "Wybierz subskrypcję",
     failedPayments: "Nieudane transakcje",
     renewal: "Planowane odnowienie",
@@ -134,6 +194,16 @@ export const translations: typeof enTranslations = {
     viewStats: "Statystyki",
   },
   enums: {
+    focus: {
+      renewingSoon: "Odnowienia w 7 dni",
+      ending: "Kończące się",
+    },
+    plan: {
+      subscription: "Starter",
+      plus: "Plus",
+      pro: "Pro",
+      ultra: "Ultra",
+    },
     subscriptionStatusFilter: {
       incomplete: "Nieukończona",
       incompleteExpired: "Wygasła przed ukończeniem",

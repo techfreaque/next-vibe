@@ -11,6 +11,7 @@ import {
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -78,6 +79,33 @@ export const errorLogs = pgTable(
       table.fingerprint,
     ),
     resolvedIdx: index("error_logs_resolved_idx").on(table.resolved),
+  }),
+);
+
+/**
+ * Error Log Daily Table
+ * Occurrences per fingerprint per UTC day, so the error monitor can chart
+ * occurrences over time (error_logs keeps only the running total and the
+ * latest sample). Also keeps the distinct users/leads that hit the error that
+ * day (capped, ids only, never PII). Rows go with their fingerprint.
+ */
+export const errorLogDaily = pgTable(
+  "error_log_daily",
+  {
+    fingerprint: text("fingerprint")
+      .notNull()
+      .references(() => errorLogs.fingerprint, { onDelete: "cascade" }),
+    /** UTC midnight of the day */
+    day: timestamp("day").notNull(),
+    occurrences: integer("occurrences").notNull().default(0),
+    /** Distinct user ids seen that day (capped) */
+    userIds: jsonb("user_ids").$type<string[]>().notNull().default([]),
+    /** Distinct lead ids seen that day (capped) */
+    leadIds: jsonb("lead_ids").$type<string[]>().notNull().default([]),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.fingerprint, table.day] }),
+    dayIdx: index("error_log_daily_day_idx").on(table.day),
   }),
 );
 

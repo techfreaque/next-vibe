@@ -14,7 +14,11 @@ import {
 } from "next-vibe/core/definition/enums";
 import {
   EmailCampaignStage,
+  EmailCampaignStageFilter,
+  EmailCampaignStageFilterOptions,
   EmailJourneyVariant,
+  EmailJourneyVariantFilter,
+  EmailJourneyVariantFilterOptions,
 } from "next-vibe/identity/lead/enum";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
@@ -33,6 +37,7 @@ import {
   CampaignTypeFilterOptions,
 } from "../../../messenger/accounts/enum";
 import { CAMPAIGN_QUEUE_ALIAS } from "./constants";
+import { QueueDelivery, QueueDeliveryOptions } from "./enum";
 import { scopedTranslation } from "./i18n";
 const CampaignQueueWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CampaignQueueWidget })),
@@ -84,6 +89,61 @@ const { GET } = createEndpoint({
         options: CampaignTypeFilterOptions,
         columns: 6,
         schema: z.enum(CampaignTypeFilterDB).optional(),
+      }),
+      delivery: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.fields.delivery.label",
+        description: "get.fields.delivery.description",
+        placeholder: "get.fields.delivery.placeholder",
+        options: QueueDeliveryOptions,
+        columns: 4,
+        schema: z.enum(QueueDelivery).optional(),
+      }),
+      journeyVariant: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.fields.journeyVariant.label",
+        description: "get.fields.journeyVariant.description",
+        placeholder: "get.fields.journeyVariant.placeholder",
+        options: EmailJourneyVariantFilterOptions,
+        columns: 4,
+        schema: z.enum(EmailJourneyVariantFilter).optional(),
+      }),
+      stage: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.fields.stage.label",
+        description: "get.fields.stage.description",
+        placeholder: "get.fields.stage.placeholder",
+        options: EmailCampaignStageFilterOptions,
+        columns: 4,
+        schema: z.enum(EmailCampaignStageFilter).optional(),
+      }),
+      locale: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.locale.label",
+        description: "get.fields.locale.description",
+        placeholder: "get.fields.locale.placeholder",
+        columns: 4,
+        schema: z.string().trim().max(20).optional(),
+      }),
+      eventFrom: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "get.fields.eventFrom.label",
+        description: "get.fields.eventFrom.description",
+        columns: 4,
+        schema: dateSchema.optional(),
+      }),
+      eventTo: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.DATE,
+        label: "get.fields.eventTo.label",
+        description: "get.fields.eventTo.description",
+        columns: 4,
+        schema: dateSchema.optional(),
       }),
       leadId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -157,6 +217,11 @@ const { GET } = createEndpoint({
               label: "get.response.nextScheduledAt",
               schema: z.string().nullable(),
             }),
+            daysOverdue: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.daysOverdue",
+              schema: z.number().nullable(),
+            }),
             nextSubject: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.nextSubject",
@@ -187,6 +252,13 @@ const { GET } = createEndpoint({
       }),
     },
   }),
+
+  options: {
+    formOptions: {
+      autoSubmit: true,
+      debounceMs: 300,
+    },
+  },
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
@@ -258,6 +330,7 @@ const { GET } = createEndpoint({
             journeyVariant: EmailJourneyVariant.UNCENSORED_CONVERT,
             currentStage: EmailCampaignStage.FOLLOWUP_1,
             nextScheduledAt: "2024-01-18T10:00:00.000Z",
+            daysOverdue: null,
             nextSubject: "Harbor Studio follow-up",
             emailsSent: 5,
             emailsOpened: 3,

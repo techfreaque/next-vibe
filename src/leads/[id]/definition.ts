@@ -48,6 +48,7 @@ import { z } from "zod";
 
 import { NewsletterSubscriptionStatus } from "@/newsletter/enum";
 
+import { BotFamily, LeadChannelFilter } from "../analytics/enum";
 import { LeadAccountAssociation, LeadJourneyEvent } from "./enum";
 import { scopedTranslation } from "./i18n";
 
@@ -730,6 +731,29 @@ const { GET } = createEndpoint({
         hidden: true,
 
         schema: z.uuid(),
+      }),
+
+      traffic: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "traffic.title",
+        schema: z
+          .object({
+            botFamily: z.enum(BotFamily),
+            channelType: z.enum(LeadChannelFilter),
+            channel: z.string().nullable(),
+            source: z.string().nullable(),
+            medium: z.string().nullable(),
+            campaign: z.string().nullable(),
+            referrerHost: z.string().nullable(),
+            landingPath: z.string().nullable(),
+            refCode: z.string().nullable(),
+            ipPrefix: z.string().nullable(),
+            uaFingerprint: z.string().nullable(),
+            prefixLeads30d: z.number(),
+            uaLeads30d: z.number(),
+            freeCreditsBurned: z.number(),
+          })
+          .optional(),
       }),
 
       review: objectOptionalField(scopedTranslation, {

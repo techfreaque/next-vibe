@@ -16,6 +16,10 @@ import {
   responseArrayField,
   responseField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
+import {
+  analyticsWindowSchema,
+  kpiSchema,
+} from "next-vibe/unified-ui/analytics/schema";
 import { z } from "zod";
 
 import { scopedTranslation } from "./i18n";
@@ -50,6 +54,23 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true },
     render: LeadsDashboardWidgetLazy,
     children: {
+      last7Days: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.last7Days" as const,
+        schema: z.object({
+          window: analyticsWindowSchema,
+          humanLeads: kpiSchema,
+          botLeads: kpiSchema,
+          signups: kpiSchema,
+          payers: kpiSchema,
+          flaggedNetworks: kpiSchema,
+          humanTrend: z.array(z.number()),
+          signupTrend: z.array(z.number()),
+          botTrend: z.array(z.number()),
+          payerTrend: z.array(z.number()),
+          flaggedTrend: z.array(z.number()),
+        }),
+      }),
       activeLeadsCount: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.activeLeadsCount" as const,
@@ -151,6 +172,25 @@ const { GET } = createEndpoint({
   examples: {
     responses: {
       default: {
+        last7Days: {
+          window: {
+            from: "2026-11-15",
+            to: "2026-11-21",
+            previousFrom: "2026-11-08",
+            previousTo: "2026-11-14",
+            bucket: "day" as const,
+          },
+          humanLeads: { value: 120, previous: 90 },
+          botLeads: { value: 400, previous: 380 },
+          signups: { value: 12, previous: 9 },
+          payers: { value: 2, previous: 1 },
+          flaggedNetworks: { value: 1, previous: 0 },
+          humanTrend: [10, 20, 15, 18, 22, 17, 18],
+          signupTrend: [1, 2, 1, 3, 2, 1, 2],
+          botTrend: [50, 60, 55, 58, 62, 57, 58],
+          payerTrend: [0, 1, 0, 0, 1, 0, 0],
+          flaggedTrend: [0, 0, 12, 0, 0, 3, 0],
+        },
         activeLeadsCount: 142,
         newThisWeekCount: 18,
         runningCampaignsCount: 3,
@@ -170,6 +210,25 @@ const { GET } = createEndpoint({
         ],
       },
       empty: {
+        last7Days: {
+          window: {
+            from: "2026-11-15",
+            to: "2026-11-21",
+            previousFrom: "2026-11-08",
+            previousTo: "2026-11-14",
+            bucket: "day" as const,
+          },
+          humanLeads: { value: 120, previous: 90 },
+          botLeads: { value: 400, previous: 380 },
+          signups: { value: 12, previous: 9 },
+          payers: { value: 2, previous: 1 },
+          flaggedNetworks: { value: 1, previous: 0 },
+          humanTrend: [10, 20, 15, 18, 22, 17, 18],
+          signupTrend: [1, 2, 1, 3, 2, 1, 2],
+          botTrend: [50, 60, 55, 58, 62, 57, 58],
+          payerTrend: [0, 1, 0, 0, 1, 0, 0],
+          flaggedTrend: [0, 0, 12, 0, 0, 3, 0],
+        },
         activeLeadsCount: 0,
         newThisWeekCount: 0,
         runningCampaignsCount: 0,

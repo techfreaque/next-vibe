@@ -1,5 +1,12 @@
 export const translations = {
   get: {
+    focus: {
+      label: "Upcoming",
+    },
+    plan: {
+      label: "Plan",
+      description: "Only subscriptions on this plan",
+    },
     title: "Subscriptions",
     titleShort: "Sub List",
     description: "Browse all subscriptions",
@@ -54,9 +61,20 @@ export const translations = {
       placeholder: "Select order...",
     },
     response: {
+      summary: {
+        title: "Summary",
+      },
+      statusCounts: {
+        status: "Status",
+        count: "Subscriptions",
+      },
       title: "Subscriptions",
       description: "Matching subscriptions",
       subscriptions: {
+        cancelAt: "Cancels on",
+        lastPaymentAmount: "Last charge",
+        lastPaymentCurrency: "Charge currency",
+        lastPaymentAt: "Last paid",
         userId: "Customer ID",
         paymentFailedAt: "First failed payment",
         gracePeriodEndsAt: "Grace period ends",
@@ -118,6 +136,48 @@ export const translations = {
     success: { title: "Success", description: "Subscriptions retrieved" },
   },
   widget: {
+    focusLabel: "Upcoming",
+    mrrScope:
+      "Counts active and trialing subscriptions by their last charge. Past due, ending and never-charged ones are excluded.",
+    search: "Search",
+    endingChip: "Ending",
+    fxNote: "at static rates: {{rates}}",
+    pastDueRetry: "Payment failed, retrying or in grace",
+    mrr: "MRR, approx. USD",
+    renewingSoon: "Renewing in 7 days",
+    renewingSoonHint: "Active, period ends within a week",
+    ending: "Ending",
+    endingHint: "Set to end without renewal",
+    pastDue: "Past due",
+    pastDueHint: "without a recorded charge: {{count}}",
+    noChargeStep:
+      "No charge recorded yet. Check the payment setup before {{date}}",
+    retry: "Try again",
+    renewalOverdue: "Renewal overdue since {{date}}",
+    filters: "Filters",
+    hideFilters: "Hide filters",
+    all: "All",
+    allCount: "All {{count}}",
+    activeFilters: "Filtered by",
+    removeFilter: "Remove filter",
+    clearFilters: "Clear all",
+    customerFilter: "Customer",
+    startedFrom: "Started from",
+    startedTo: "Started until",
+    perMonth: "/ mo",
+    perYear: "/ yr",
+    noCharge: "No charge yet",
+    graceUntil: "Access ends {{date}} unless paid",
+    canceledOn: "Canceled {{date}}",
+    endsOn: "Ends {{date}}, no renewal",
+    renewsOn: "Renews {{date}}",
+    periodEnd: "Period end {{date}}",
+    startedOn: "Started {{date}}",
+    lastPaid: "Last paid {{date}}",
+    payments: "Payments",
+    revenueReport: "Open revenue report",
+    emptyFiltered:
+      "Nothing matches these filters. Remove one to widen the list.",
     pick: "Select subscription",
     failedPayments: "Failed transactions",
     renewal: "Scheduled renewal",
@@ -139,6 +199,16 @@ export const translations = {
     viewStats: "Statistics",
   },
   enums: {
+    focus: {
+      renewingSoon: "Renewing in 7 days",
+      ending: "Ending",
+    },
+    plan: {
+      subscription: "Starter",
+      plus: "Plus",
+      pro: "Pro",
+      ultra: "Ultra",
+    },
     subscriptionStatusFilter: {
       incomplete: "Incomplete",
       incompleteExpired: "Incomplete expired",

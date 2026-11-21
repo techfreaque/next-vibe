@@ -415,6 +415,9 @@ export const translations = {
     description: "Lead statistics retrieved successfully",
   },
   widget: {
+    openAcquisition: "Acquisition report",
+    openFunnel: "Funnel",
+    openAbuse: "Abuse signals",
     title: "Leads Statistics",
     refresh: "Refresh",
     viewAllLeads: "View All Leads",

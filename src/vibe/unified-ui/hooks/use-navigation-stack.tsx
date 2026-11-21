@@ -29,7 +29,7 @@ async function preloadEndpointWidget(
 /**
  * Navigation options
  */
-interface NavigationOptions<TEndpoint extends CreateApiEndpointAny> {
+export interface NavigationOptions<TEndpoint extends CreateApiEndpointAny> {
   urlPathParams?: Partial<TEndpoint["types"]["UrlVariablesOutput"]>;
   data?: Partial<TEndpoint["types"]["RequestOutput"]>;
   prefillFromGet?: boolean;

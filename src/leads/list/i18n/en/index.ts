@@ -1,6 +1,9 @@
 import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
 
+import { translations as leadAnalyticsTranslations } from "@/leads/analytics/i18n/en";
+
 export const translations = {
+  ...leadAnalyticsTranslations,
   filters: {
     search: {
       label: "Search",
@@ -188,6 +191,7 @@ export const translations = {
         title: "Lead Details",
         description: "Individual lead information",
         id: "Lead ID",
+        triage: "Attribution and traffic",
         email: "Email Address",
         businessName: "Business Name",
         contactName: "Contact Name",
@@ -264,6 +268,13 @@ export const translations = {
     emptyState: "No leads yet",
   },
   widget: {
+    colLead: "Lead",
+    colAgent: "Agent",
+    colOrigin: "Origin",
+    colClient: "Device and network",
+    colCreated: "Created",
+    drillSummary:
+      "{{total}} leads · {{humans}} human · {{signups}} signed up · {{paid}} paid · user agents: {{agents}}",
     clearFilters: "Clear filters",
     converted: "Converted",
     emailsSent: "{{count}} emails sent",
@@ -301,6 +312,16 @@ export const translations = {
     linkedCount: "{{count}} linked",
     hasLinkedUser: "User",
     referralCode: "Ref Code",
+    drillTitle: "Filtered from a report",
+    drillCreated: "Created",
+    drillReached: "Reached",
+    clearDrill: "Clear report filters",
+    signedUp: "Signed up",
+    paid: "Paid",
+    chatted: "Chatted",
+    bot: "Bot",
+    analyticsFilters: "More filters",
+    apply: "Apply",
   },
   countries: {
     ...regionalCountryNames("en"),

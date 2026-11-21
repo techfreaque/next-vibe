@@ -1,0 +1,232 @@
+/**
+ * Users filter fields.
+ * One definition shared by users-list and the signups report (users-stats), so
+ * a report drill-down lands on the list with the exact same filter names and
+ * semantics. Labels live in the users-list i18n scope. Every field is optional
+ * and evaluated server-side (see filter-sql.ts).
+ */
+
+import { dateSchema } from "next-vibe/core/definition/common.schema";
+import { FieldDataType, WidgetType } from "next-vibe/core/definition/enums";
+import { requestField } from "next-vibe/unified-ui/_shared/utils-i18n";
+import { z } from "zod";
+
+import {
+  AccountStateFilter,
+  AccountStateFilterOptions,
+  LastActiveFilter,
+  LastActiveFilterOptions,
+  PayerFilter,
+  PayerFilterOptions,
+  ReferrerFilter,
+  ReferrerFilterOptions,
+  RoleFilter,
+  RoleFilterOptions,
+  SubscriptionFilter,
+  SubscriptionFilterOptions,
+  UserChannelTypeFilter,
+  UserChannelTypeFilterOptions,
+  UserPlanFilter,
+  UserPlanFilterOptions,
+  UsersAudience,
+  UsersAudienceOptions,
+} from "./enum";
+import { scopedTranslation } from "./i18n";
+
+/** Account attribute filters (no signup window): reused by the report. */
+export const userCohortFilterFields = {
+  audience: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.SELECT,
+    label: "get.fields.audience.label" as const,
+    description: "get.fields.audience.description" as const,
+    placeholder: "get.fields.audience.placeholder" as const,
+    options: UsersAudienceOptions,
+    columns: 4,
+    schema: z.enum(UsersAudience).optional(),
+  }),
+  channel: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.TEXT,
+    label: "get.fields.channel.label" as const,
+    description: "get.fields.channel.description" as const,
+    placeholder: "get.fields.channel.placeholder" as const,
+    columns: 4,
+    schema: z.string().trim().max(120).optional(),
+  }),
+  channelType: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.SELECT,
+    label: "get.fields.channelType.label" as const,
+    description: "get.fields.channelType.description" as const,
+    placeholder: "get.fields.channelType.placeholder" as const,
+    options: UserChannelTypeFilterOptions,
+    columns: 4,
+    schema: z.enum(UserChannelTypeFilter).optional(),
+  }),
+  refCode: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.TEXT,
+    label: "get.fields.refCode.label" as const,
+    description: "get.fields.refCode.description" as const,
+    placeholder: "get.fields.refCode.placeholder" as const,
+    columns: 4,
+    schema: z.string().trim().max(120).optional(),
+  }),
+  payer: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.SELECT,
+    label: "get.fields.payer.label" as const,
+    description: "get.fields.payer.description" as const,
+    placeholder: "get.fields.payer.placeholder" as const,
+    options: PayerFilterOptions,
+    columns: 4,
+    schema: z.enum(PayerFilter).optional(),
+  }),
+  plan: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.SELECT,
+    label: "get.fields.plan.label" as const,
+    description: "get.fields.plan.description" as const,
+    placeholder: "get.fields.plan.placeholder" as const,
+    options: UserPlanFilterOptions,
+    columns: 4,
+    schema: z.enum(UserPlanFilter).optional(),
+  }),
+  accountState: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.MULTISELECT,
+    label: "get.fields.accountState.label" as const,
+    description: "get.fields.accountState.description" as const,
+    placeholder: "get.fields.accountState.placeholder" as const,
+    options: AccountStateFilterOptions,
+    columns: 6,
+    schema: z.array(z.enum(AccountStateFilter)).optional(),
+  }),
+};
+
+/** Every users-list filter (cohort filters + windows, bounds, roles). */
+export const userFilterFields = {
+  ...userCohortFilterFields,
+  roles: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.MULTISELECT,
+    label: "get.fields.roles.label" as const,
+    description: "get.fields.roles.description" as const,
+    placeholder: "get.fields.roles.placeholder" as const,
+    options: RoleFilterOptions,
+    columns: 6,
+    schema: z.array(z.enum(RoleFilter)).optional(),
+  }),
+  subscription: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.SELECT,
+    label: "get.fields.subscription.label" as const,
+    description: "get.fields.subscription.description" as const,
+    placeholder: "get.fields.subscription.placeholder" as const,
+    options: SubscriptionFilterOptions,
+    columns: 4,
+    schema: z.enum(SubscriptionFilter).optional(),
+  }),
+  lastActive: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.SELECT,
+    label: "get.fields.lastActive.label" as const,
+    description: "get.fields.lastActive.description" as const,
+    placeholder: "get.fields.lastActive.placeholder" as const,
+    options: LastActiveFilterOptions,
+    columns: 4,
+    schema: z.enum(LastActiveFilter).optional(),
+  }),
+  signupFrom: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.DATE,
+    label: "get.fields.signupFrom.label" as const,
+    description: "get.fields.signupFrom.description" as const,
+    columns: 3,
+    schema: dateSchema.optional(),
+  }),
+  signupTo: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.DATE,
+    label: "get.fields.signupTo.label" as const,
+    description: "get.fields.signupTo.description" as const,
+    columns: 3,
+    schema: dateSchema.optional(),
+  }),
+  activeFrom: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.DATE,
+    label: "get.fields.activeFrom.label" as const,
+    description: "get.fields.activeFrom.description" as const,
+    columns: 3,
+    schema: dateSchema.optional(),
+  }),
+  activeTo: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.DATE,
+    label: "get.fields.activeTo.label" as const,
+    description: "get.fields.activeTo.description" as const,
+    columns: 3,
+    schema: dateSchema.optional(),
+  }),
+  paidFrom: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.DATE,
+    label: "get.fields.paidFrom.label" as const,
+    description: "get.fields.paidFrom.description" as const,
+    columns: 3,
+    schema: dateSchema.optional(),
+  }),
+  paidTo: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.DATE,
+    label: "get.fields.paidTo.label" as const,
+    description: "get.fields.paidTo.description" as const,
+    columns: 3,
+    schema: dateSchema.optional(),
+  }),
+  spentMin: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.NUMBER,
+    label: "get.fields.spentMin.label" as const,
+    description: "get.fields.spentMin.description" as const,
+    columns: 3,
+    schema: z.coerce.number().min(0).optional(),
+  }),
+  creditsMin: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.NUMBER,
+    label: "get.fields.creditsMin.label" as const,
+    description: "get.fields.creditsMin.description" as const,
+    columns: 3,
+    schema: z.coerce.number().min(0).optional(),
+  }),
+  creditsMax: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.NUMBER,
+    label: "get.fields.creditsMax.label" as const,
+    description: "get.fields.creditsMax.description" as const,
+    columns: 3,
+    schema: z.coerce.number().min(0).optional(),
+  }),
+  source: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.TEXT,
+    label: "get.fields.source.label" as const,
+    description: "get.fields.source.description" as const,
+    placeholder: "get.fields.source.placeholder" as const,
+    columns: 6,
+    schema: z.string().trim().max(200).optional(),
+  }),
+  referralActivity: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.SELECT,
+    label: "get.fields.referralActivity.label" as const,
+    description: "get.fields.referralActivity.description" as const,
+    placeholder: "get.fields.referralActivity.placeholder" as const,
+    options: ReferrerFilterOptions,
+    columns: 6,
+    schema: z.enum(ReferrerFilter).optional(),
+  }),
+};

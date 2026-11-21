@@ -77,6 +77,12 @@ export interface CategoryDefinition {
   subcategories?: Record<string, SubcategoryDefinition>;
   /** Optional local admin lookup into an existing GET list's string filter. */
   recordSearch?: RecordSearchDestination;
+  /**
+   * Alias of a GET report rendered at the top of the admin catalog root (the
+   * first thing an admin sees). The lowest-order category that declares one
+   * and that the viewer may open wins.
+   */
+  catalogOverview?: keyof typeof pathToAliasMap;
 }
 
 /**
@@ -97,6 +103,8 @@ export interface CategoryDefinitionSerialized {
   /** URL path to navigate to instead of opening an endpoint */
   defaultEntryLink?: string;
   recordSearch?: { alias: string; field: string };
+  /** Alias of the report shown at the catalog root (see CategoryDefinition). */
+  catalogOverview?: string;
   subcategories?: Record<
     string,
     {

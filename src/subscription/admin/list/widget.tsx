@@ -1,8 +1,13 @@
 "use client";
 
-import { formatDate } from "next-vibe/core/i18n/core/localization-utils";
+import {
+  formatCurrency,
+  formatDate,
+} from "next-vibe/core/i18n/core/localization-utils";
+import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { Span } from "next-vibe/ui/components/span";
 import {
@@ -11,11 +16,9 @@ import {
 } from "next-vibe/ui/components/status-pill";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { cn } from "next-vibe/unified-ui/_shared/cn";
 import { usePickerCallback } from "next-vibe/unified-ui/_shared/picker-context";
-import {
-  RelatedEntitiesPanel,
-  useRelatedEntityNavigation,
-} from "next-vibe/unified-ui/_shared/related-entities";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -23,29 +26,46 @@ import {
   useWidgetLocale,
   useWidgetNavigation,
   useWidgetOnSubmit,
+  useWidgetPlatform,
   useWidgetResponse,
   useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { DateTimeFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/datetime-field/widget";
-import { MultiSelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/multiselect-field/widget";
-import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
-import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
-import type { JSX } from "react";
+import { type JSX, useState } from "react";
 
-import { PaymentProvider, PaymentStatus } from "@/payment/enum";
+import { PaymentStatus } from "@/payment/enum";
 import { scopedTranslation as paymentTranslation } from "@/payment/i18n";
 import {
+  DayRangeInputs,
+  type FilterChip,
+  FilterChips,
+  SegmentGroup,
+} from "@/payment/processor/list-controls";
+import {
+  BillingInterval,
+  SubscriptionPlan,
+  type SubscriptionPlanValue,
   SubscriptionStatus,
   type SubscriptionStatusValue,
 } from "@/subscription/enum";
 import { scopedTranslation as subscriptionTranslation } from "@/subscription/i18n";
 
+import {
+  BillingIntervalAdminFilter,
+  type BillingIntervalAdminFilterValue,
+  ProviderAdminFilter,
+  type ProviderAdminFilterValue,
+  SortOrder,
+  SubscriptionSortField,
+  SubscriptionStatusAdminFilter,
+  type SubscriptionStatusAdminFilterValue,
+} from "../enum";
 import type definition from "./definition";
 import type { SubscriptionListResponseOutput } from "./definition";
+import { SubscriptionFocus, type SubscriptionFocusValue } from "./enum";
 
 type Subscription =
   SubscriptionListResponseOutput["response"]["subscriptions"][number];
@@ -63,6 +83,48 @@ const statusVariants: Record<
   [SubscriptionStatus.INCOMPLETE]: "warning",
   [SubscriptionStatus.INCOMPLETE_EXPIRED]: "muted",
 };
+
+/** Row status -> the admin filter value that selects it. */
+const statusFilterFor: Record<
+  typeof SubscriptionStatusValue,
+  typeof SubscriptionStatusAdminFilterValue
+> = {
+  [SubscriptionStatus.ACTIVE]: SubscriptionStatusAdminFilter.ACTIVE,
+  [SubscriptionStatus.TRIALING]: SubscriptionStatusAdminFilter.TRIALING,
+  [SubscriptionStatus.CANCELED]: SubscriptionStatusAdminFilter.CANCELED,
+  [SubscriptionStatus.PAST_DUE]: SubscriptionStatusAdminFilter.PAST_DUE,
+  [SubscriptionStatus.UNPAID]: SubscriptionStatusAdminFilter.UNPAID,
+  [SubscriptionStatus.PAUSED]: SubscriptionStatusAdminFilter.PAUSED,
+  [SubscriptionStatus.INCOMPLETE]: SubscriptionStatusAdminFilter.INCOMPLETE,
+  [SubscriptionStatus.INCOMPLETE_EXPIRED]:
+    SubscriptionStatusAdminFilter.INCOMPLETE_EXPIRED,
+};
+
+const PLANS = [
+  SubscriptionPlan.SUBSCRIPTION,
+  SubscriptionPlan.PLUS,
+  SubscriptionPlan.PRO,
+  SubscriptionPlan.ULTRA,
+] as const;
+const INTERVALS = [
+  BillingIntervalAdminFilter.MONTHLY,
+  BillingIntervalAdminFilter.YEARLY,
+] as const;
+const SORT_FIELDS = [
+  SubscriptionSortField.CREATED_AT,
+  SubscriptionSortField.PERIOD_END,
+  SubscriptionSortField.STATUS,
+  SubscriptionSortField.USER_EMAIL,
+] as const;
+
+/** Form Date -> YYYY-MM-DD for the day inputs. */
+const dayOf = (date: Date | undefined): string | undefined =>
+  date ? new Date(date).toISOString().slice(0, 10) : undefined;
+
+const PROVIDERS = [
+  ProviderAdminFilter.STRIPE,
+  ProviderAdminFilter.NOWPAYMENTS,
+] as const;
 
 export function SubscriptionListContainer({
   field: { children },
@@ -82,16 +144,272 @@ export function SubscriptionListContainer({
   const openRelated = useRelatedEntityNavigation();
   const { pop } = useWidgetNavigation();
   const onPick = usePickerCallback<Subscription>();
+  const platform = useWidgetPlatform();
+  const isText = isCliPlatform(platform) || platform === Platform.MCP;
   const data = useWidgetValue<typeof definition.GET>();
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  // Captured once per mount: "overdue" compares period ends to this instant.
+  const [renderedAt] = useState(() => Date.now());
   const userId = form.watch("userId");
+  const statuses = form.watch("searchFilters.status") ?? [];
+  const plan = form.watch("searchFilters.plan");
+  const interval = form.watch("searchFilters.interval");
+  const provider = form.watch("searchFilters.provider");
+  const search = form.watch("searchFilters.search");
+  const dateFrom = form.watch("searchFilters.dateFrom");
+  const dateTo = form.watch("searchFilters.dateTo");
+  const sortBy =
+    form.watch("sortingOptions.sortBy") ?? SubscriptionSortField.CREATED_AT;
+  const sortOrder = form.watch("sortingOptions.sortOrder") ?? SortOrder.DESC;
   const pagination = data?.paginationInfo;
   const isFetching = endpointMutations?.read?.isFetching ?? false;
   const canFilter = isInteractive && Boolean(onSubmit);
+  const subscriptions = data?.response.subscriptions ?? [];
+  const statusCounts = data?.response.statusCounts ?? [];
+  const countTotal = statusCounts.reduce((sum, row) => sum + row.count, 0);
 
   const changePage = (page: number): void => {
     form.setValue("paginationInfo.page", page, { shouldDirty: true });
     onSubmit?.();
   };
+  const setStatuses = (
+    next: (typeof SubscriptionStatusAdminFilterValue)[],
+  ): void => {
+    form.setValue("searchFilters.status", next, { shouldDirty: true });
+    changePage(1);
+  };
+  const setPlan = (next: typeof SubscriptionPlanValue | undefined): void => {
+    form.setValue("searchFilters.plan", next, { shouldDirty: true });
+    changePage(1);
+  };
+  const setInterval = (
+    next: typeof BillingIntervalAdminFilterValue | undefined,
+  ): void => {
+    form.setValue(
+      "searchFilters.interval",
+      next ?? BillingIntervalAdminFilter.ANY,
+      { shouldDirty: true },
+    );
+    changePage(1);
+  };
+  const setProvider = (
+    next: typeof ProviderAdminFilterValue | undefined,
+  ): void => {
+    form.setValue("searchFilters.provider", next ?? ProviderAdminFilter.ANY, {
+      shouldDirty: true,
+    });
+    changePage(1);
+  };
+  const setStartedDays = (patch: { from?: string; to?: string }): void => {
+    if (patch.from !== undefined) {
+      form.setValue(
+        "searchFilters.dateFrom",
+        patch.from ? new Date(`${patch.from}T00:00:00.000Z`) : undefined,
+        { shouldDirty: true },
+      );
+    }
+    if (patch.to !== undefined) {
+      form.setValue(
+        "searchFilters.dateTo",
+        patch.to ? new Date(`${patch.to}T23:59:59.999Z`) : undefined,
+        { shouldDirty: true },
+      );
+    }
+    changePage(1);
+  };
+  const focus = form.watch("searchFilters.focus");
+  const setFocus = (next: typeof SubscriptionFocusValue | undefined): void => {
+    form.setValue("searchFilters.focus", next, { shouldDirty: true });
+    changePage(1);
+  };
+  const clearAll = (): void => {
+    form.reset({
+      paginationInfo: { page: 1, limit: pagination?.limit ?? 20 },
+    });
+    onSubmit?.();
+  };
+
+  const chips: FilterChip[] = [];
+  if (userId) {
+    chips.push({
+      key: "userId",
+      label: t("widget.customerFilter"),
+      value: subscriptions[0]?.userEmail ?? userId.slice(0, 8),
+      onRemove: () => {
+        form.setValue("userId", undefined, { shouldDirty: true });
+        changePage(1);
+      },
+    });
+  }
+  for (const status of statuses) {
+    if (status !== SubscriptionStatusAdminFilter.ALL) {
+      chips.push({
+        key: `status-${status}`,
+        label: t("get.status.label"),
+        value: t(status),
+        onRemove: () =>
+          setStatuses(statuses.filter((current) => current !== status)),
+      });
+    }
+  }
+  if (focus) {
+    chips.push({
+      key: "focus",
+      label: t("widget.focusLabel"),
+      value: t(focus),
+      onRemove: () => setFocus(undefined),
+    });
+  }
+  if (plan) {
+    chips.push({
+      key: "plan",
+      label: t("get.plan.label"),
+      value: tSubscription(plan),
+      onRemove: () => setPlan(undefined),
+    });
+  }
+  if (interval && interval !== BillingIntervalAdminFilter.ANY) {
+    chips.push({
+      key: "interval",
+      label: t("get.interval.label"),
+      value: t(interval),
+      onRemove: () => setInterval(undefined),
+    });
+  }
+  if (provider && provider !== ProviderAdminFilter.ANY) {
+    chips.push({
+      key: "provider",
+      label: t("get.provider.label"),
+      value: t(provider),
+      onRemove: () => setProvider(undefined),
+    });
+  }
+  if (dateFrom) {
+    chips.push({
+      key: "dateFrom",
+      label: t("widget.startedFrom"),
+      value: formatDate(dateFrom, locale, "PP"),
+      onRemove: () => {
+        form.setValue("searchFilters.dateFrom", undefined, {
+          shouldDirty: true,
+        });
+        changePage(1);
+      },
+    });
+  }
+  if (dateTo) {
+    chips.push({
+      key: "dateTo",
+      label: t("widget.startedTo"),
+      value: formatDate(dateTo, locale, "PP"),
+      onRemove: () => {
+        form.setValue("searchFilters.dateTo", undefined, { shouldDirty: true });
+        changePage(1);
+      },
+    });
+  }
+  if (search) {
+    chips.push({
+      key: "search",
+      label: t("get.search.label"),
+      value: search,
+      onRemove: () => {
+        form.setValue("searchFilters.search", "", { shouldDirty: true });
+        changePage(1);
+      },
+    });
+  }
+
+  const priceLabel = (subscription: Subscription): string | null =>
+    subscription.lastPaymentAmount !== null && subscription.lastPaymentCurrency
+      ? `${formatCurrency(
+          subscription.lastPaymentAmount,
+          subscription.lastPaymentCurrency,
+          locale,
+        )} ${
+          subscription.billingInterval === BillingInterval.YEARLY
+            ? t("widget.perYear")
+            : t("widget.perMonth")
+        }`
+      : null;
+
+  /** One line answering "what happens next" for this subscription. */
+  const nextStep = (
+    subscription: Subscription,
+  ): { text: string; tone: "default" | "warning" | "danger" | "muted" } => {
+    const periodEnd = subscription.currentPeriodEnd
+      ? formatDate(subscription.currentPeriodEnd, locale, "PP")
+      : t("widget.notRecorded");
+    if (subscription.gracePeriodEndsAt) {
+      return {
+        text: t("widget.graceUntil", {
+          date: formatDate(subscription.gracePeriodEndsAt, locale, "PP"),
+        }),
+        tone: "danger",
+      };
+    }
+    if (subscription.status === SubscriptionStatus.CANCELED) {
+      const reason = subscription.cancellationReason
+        ? ` · ${tSubscription(subscription.cancellationReason)}`
+        : "";
+      return {
+        text: `${t("widget.canceledOn", {
+          date: subscription.canceledAt
+            ? formatDate(subscription.canceledAt, locale, "PP")
+            : periodEnd,
+        })}${reason}`,
+        tone: "muted",
+      };
+    }
+    if (subscription.cancelAtPeriodEnd || subscription.cancelAt) {
+      return {
+        text: t("widget.endsOn", {
+          date: subscription.cancelAt
+            ? formatDate(subscription.cancelAt, locale, "PP")
+            : periodEnd,
+        }),
+        tone: "warning",
+      };
+    }
+    if (
+      (subscription.status === SubscriptionStatus.ACTIVE ||
+        subscription.status === SubscriptionStatus.TRIALING) &&
+      subscription.lastPaymentAmount === null
+    ) {
+      return {
+        text: t("widget.noChargeStep", { date: periodEnd }),
+        tone: "warning",
+      };
+    }
+    if (
+      (subscription.status === SubscriptionStatus.ACTIVE ||
+        subscription.status === SubscriptionStatus.TRIALING) &&
+      subscription.currentPeriodEnd &&
+      new Date(subscription.currentPeriodEnd).getTime() < renderedAt
+    ) {
+      return {
+        text: t("widget.renewalOverdue", { date: periodEnd }),
+        tone: "warning",
+      };
+    }
+    if (
+      subscription.status === SubscriptionStatus.ACTIVE ||
+      subscription.status === SubscriptionStatus.TRIALING
+    ) {
+      return {
+        text: t("widget.renewsOn", { date: periodEnd }),
+        tone: "default",
+      };
+    }
+    return { text: t("widget.periodEnd", { date: periodEnd }), tone: "muted" };
+  };
+
+  const toneClass = {
+    default: "text-muted-foreground",
+    warning: "text-warning",
+    danger: "text-destructive font-medium",
+    muted: "text-muted-foreground",
+  } as const;
 
   return (
     <WidgetShell className="min-w-0">
@@ -102,12 +420,12 @@ export function SubscriptionListContainer({
         }
       />
       {canFilter && (
-        <>
+        <Div className="flex min-w-0 flex-col gap-3">
           {!onPick && (
-            <Div className="flex flex-wrap gap-2">
+            <Div className="flex flex-wrap gap-x-4 gap-y-1">
               <Button
                 type="button"
-                variant="outline"
+                variant="link"
                 size="sm"
                 className="whitespace-normal"
                 onClick={() =>
@@ -124,7 +442,21 @@ export function SubscriptionListContainer({
               </Button>
               <Button
                 type="button"
-                variant="ghost"
+                variant="link"
+                size="sm"
+                onClick={() =>
+                  openRelated(() =>
+                    import("@/payment/analytics/revenue/definition").then(
+                      (module) => module.default.GET,
+                    ),
+                  )
+                }
+              >
+                {t("widget.revenueReport")}
+              </Button>
+              <Button
+                type="button"
+                variant="link"
                 size="sm"
                 onClick={() =>
                   openRelated(() =>
@@ -138,196 +470,434 @@ export function SubscriptionListContainer({
               </Button>
             </Div>
           )}
-          {userId && (
-            <Div className="flex flex-wrap items-center gap-2 text-sm">
-              <Span className="break-all">
-                {t("widget.customerScope", { id: userId })}
-              </Span>
+          <Div className="flex min-w-0 flex-col gap-2 @md:flex-row @md:items-end">
+            <Div className="min-w-0 flex-1">
+              <TextFieldWidget
+                fieldName="searchFilters.search"
+                field={children.searchFilters.children.search}
+              />
+            </Div>
+            <Div className="flex gap-2">
               <Button
-                type="button"
-                variant="outline"
+                type="submit"
                 size="sm"
                 disabled={isFetching}
-                onClick={() => {
-                  form.reset({ ...form.getValues(), userId: undefined });
-                  changePage(1);
-                }}
+                onClick={() =>
+                  form.setValue("paginationInfo.page", 1, { shouldDirty: true })
+                }
               >
-                {t("widget.clearScope")}
+                {t("widget.search")}
+              </Button>
+              <Button
+                type="button"
+                variant={filtersOpen ? "secondary" : "outline"}
+                size="sm"
+                className="@3xl:hidden"
+                onClick={() => setFiltersOpen((open) => !open)}
+              >
+                {filtersOpen ? t("widget.hideFilters") : t("widget.filters")}
               </Button>
             </Div>
-          )}
-          <TextFieldWidget
-            fieldName="searchFilters.search"
-            field={children.searchFilters.children.search}
-          />
-          <Div className="grid min-w-0 grid-cols-1 gap-3 @md:grid-cols-3">
-            <MultiSelectFieldWidget
-              fieldName="searchFilters.status"
-              field={children.searchFilters.children.status}
-            />
-            <SelectFieldWidget
-              fieldName="searchFilters.interval"
-              field={children.searchFilters.children.interval}
-            />
-            <SelectFieldWidget
-              fieldName="searchFilters.provider"
-              field={children.searchFilters.children.provider}
-            />
           </Div>
-          <Div className="grid min-w-0 grid-cols-1 gap-3 @sm:grid-cols-2">
-            <DateTimeFieldWidget
-              fieldName="searchFilters.dateFrom"
-              field={children.searchFilters.children.dateFrom}
-            />
-            <DateTimeFieldWidget
-              fieldName="searchFilters.dateTo"
-              field={children.searchFilters.children.dateTo}
-            />
-            <SelectFieldWidget
-              fieldName="sortingOptions.sortBy"
-              field={children.sortingOptions.children.sortBy}
-            />
-            <SelectFieldWidget
-              fieldName="sortingOptions.sortOrder"
-              field={children.sortingOptions.children.sortOrder}
-            />
-          </Div>
-          <Div className="flex flex-wrap gap-2">
-            <Button
-              type="submit"
-              size="sm"
+          {statusCounts.length > 0 && (
+            <SegmentGroup
+              label={t("get.status.label")}
+              value={statuses.length === 1 ? statuses[0] : undefined}
               disabled={isFetching}
-              onClick={() =>
-                form.setValue("paginationInfo.page", 1, { shouldDirty: true })
-              }
+              onSelect={(next) => setStatuses(next ? [next] : [])}
+              options={[
+                {
+                  value: undefined,
+                  label: t("widget.allCount", { count: countTotal }),
+                },
+                ...statusCounts.map((row) => ({
+                  value: statusFilterFor[row.status],
+                  label: `${tSubscription(row.status)} ${row.count}`,
+                })),
+              ]}
+            />
+          )}
+          <SegmentGroup
+            label={t("get.plan.label")}
+            value={plan}
+            disabled={isFetching}
+            onSelect={setPlan}
+            options={[
+              { value: undefined, label: t("widget.all") },
+              ...PLANS.map((option) => ({
+                value: option,
+                label: `${tSubscription(option)} ${
+                  data?.response.planCounts.find((row) => row.plan === option)
+                    ?.count ?? 0
+                }`,
+              })),
+            ]}
+          />
+          {
+            <Div
+              className={cn(
+                "min-w-0 grid-cols-1 gap-x-6 gap-y-3 @3xl:grid @3xl:grid-cols-3",
+                filtersOpen ? "grid" : "hidden",
+              )}
             >
-              {t("widget.apply")}
-            </Button>
+              <SegmentGroup
+                label={t("get.interval.label")}
+                value={
+                  interval === BillingIntervalAdminFilter.ANY
+                    ? undefined
+                    : interval
+                }
+                disabled={isFetching}
+                onSelect={setInterval}
+                options={[
+                  { value: undefined, label: t("widget.all") },
+                  ...INTERVALS.map((option) => ({
+                    value: option,
+                    label: t(option),
+                  })),
+                ]}
+              />
+              <SegmentGroup
+                label={t("get.provider.label")}
+                value={
+                  provider === ProviderAdminFilter.ANY ? undefined : provider
+                }
+                disabled={isFetching}
+                onSelect={setProvider}
+                options={[
+                  { value: undefined, label: t("widget.all") },
+                  ...PROVIDERS.map((option) => ({
+                    value: option,
+                    label: t(option),
+                  })),
+                ]}
+              />
+              <DayRangeInputs
+                fromLabel={t("widget.startedFrom")}
+                toLabel={t("widget.startedTo")}
+                from={dayOf(dateFrom)}
+                to={dayOf(dateTo)}
+                disabled={isFetching}
+                onChange={setStartedDays}
+              />
+              <SegmentGroup
+                label={t("get.sortBy.label")}
+                value={sortBy}
+                disabled={isFetching}
+                onSelect={(next) => {
+                  form.setValue(
+                    "sortingOptions.sortBy",
+                    next ?? SubscriptionSortField.CREATED_AT,
+                    { shouldDirty: true },
+                  );
+                  changePage(1);
+                }}
+                options={SORT_FIELDS.map((option) => ({
+                  value: option,
+                  label: t(option),
+                }))}
+              />
+              <SegmentGroup
+                label={t("get.sortOrder.label")}
+                value={sortOrder}
+                disabled={isFetching}
+                onSelect={(next) => {
+                  form.setValue(
+                    "sortingOptions.sortOrder",
+                    next ?? SortOrder.DESC,
+                    { shouldDirty: true },
+                  );
+                  changePage(1);
+                }}
+                options={[SortOrder.DESC, SortOrder.ASC].map((option) => ({
+                  value: option,
+                  label: t(option),
+                }))}
+              />
+            </Div>
+          }
+          <FilterChips
+            title={t("widget.activeFilters")}
+            chips={chips}
+            clearLabel={t("widget.clearFilters")}
+            removeLabel={t("widget.removeFilter")}
+            disabled={isFetching}
+            onClear={clearAll}
+          />
+        </Div>
+      )}
+      {!data && response?.success === false && (
+        <EmptyBlock
+          className="rounded-xl border"
+          title={t("get.errors.server.title")}
+          message={response.message}
+          action={
+            isInteractive
+              ? {
+                  label: t("widget.retry"),
+                  onClick: () => void endpointMutations?.read?.refetch(),
+                }
+              : undefined
+          }
+        />
+      )}
+      {!data && response?.success !== false && (
+        <LoadingBlock message={t("widget.loading")} />
+      )}
+      {data && !isText && (
+        <Div className="grid min-w-0 grid-cols-2 gap-3 @3xl:grid-cols-4">
+          <Div className="flex min-w-0 flex-col gap-1 rounded-xl border bg-card p-4">
+            <Span className="text-xs text-muted-foreground">
+              {t("widget.mrr")}
+            </Span>
+            <Span className="text-2xl font-semibold tabular-nums">
+              {formatCurrency(data.response.summary.mrrUsd, "USD", locale)}
+            </Span>
+            <Span className="text-xs text-muted-foreground [overflow-wrap:anywhere]">
+              {data.response.summary.mrr.length > 0
+                ? data.response.summary.mrr
+                    .map((row) =>
+                      formatCurrency(row.amount, row.currency, locale),
+                    )
+                    .join(" + ")
+                : t("widget.noCharge")}
+              {data.response.summary.fxRates.length > 0 &&
+                ` · ${t("widget.fxNote", {
+                  rates: data.response.summary.fxRates
+                    .map((rate) => `${rate.currency} ${rate.usdRate}`)
+                    .join(", "),
+                })}`}
+              {data.response.summary.noCharge > 0 &&
+                ` · ${t("widget.pastDueHint", { count: data.response.summary.noCharge })}`}
+            </Span>
+            <Span className="text-xs text-muted-foreground">
+              {t("widget.mrrScope")}
+            </Span>
+          </Div>
+          {[
+            {
+              key: "renewing",
+              label: t("widget.renewingSoon"),
+              value: data.response.summary.renewingSoon,
+              hint: t("widget.renewingSoonHint"),
+              tone: "text-foreground",
+              onClick: (): void => setFocus(SubscriptionFocus.RENEWING_SOON),
+            },
+            {
+              key: "ending",
+              label: t("widget.ending"),
+              value: data.response.summary.ending,
+              hint: t("widget.endingHint"),
+              tone: "text-warning",
+              onClick: (): void => setFocus(SubscriptionFocus.ENDING),
+            },
+            {
+              key: "pastDue",
+              label: t("widget.pastDue"),
+              value: data.response.summary.pastDue,
+              hint: t("widget.pastDueRetry"),
+              tone: "text-destructive",
+              onClick: (): void =>
+                setStatuses([SubscriptionStatusAdminFilter.PAST_DUE]),
+            },
+          ].map((card) => (
             <Button
+              key={card.key}
               type="button"
               variant="ghost"
-              size="sm"
-              disabled={isFetching}
-              onClick={() => {
-                void endpointMutations?.read?.refetch();
-              }}
+              disabled={!canFilter}
+              className="flex h-auto min-w-0 flex-col items-start justify-start gap-1 rounded-xl border bg-card p-4 text-start font-normal disabled:opacity-100"
+              onClick={card.onClick}
             >
-              {t("widget.refresh")}
+              <Span className="text-xs text-muted-foreground">
+                {card.label}
+              </Span>
+              <Span
+                className={cn(
+                  "text-2xl font-semibold tabular-nums",
+                  card.value > 0 ? card.tone : "text-muted-foreground",
+                )}
+              >
+                {card.value}
+              </Span>
+              <Span className="whitespace-normal text-xs text-muted-foreground">
+                {card.hint}
+              </Span>
             </Button>
-          </Div>
-        </>
+          ))}
+        </Div>
       )}
-      <FormAlertWidget field={children.formAlert} />
-      {!data && !response && <LoadingBlock message={t("widget.loading")} />}
-      {data && (
-        <RelatedEntitiesPanel
-          title={t("get.response.title")}
-          emptyTitle={t("widget.noMatchingSubscriptions")}
-          items={data.response.subscriptions.map((subscription) => {
-            const renews =
-              subscription.provider === PaymentProvider.STRIPE &&
-              subscription.providerSubscriptionId &&
-              (subscription.status === SubscriptionStatus.ACTIVE ||
-                subscription.status === SubscriptionStatus.TRIALING);
-            const periodLabel = subscription.cancelAtPeriodEnd
-              ? "widget.scheduledEnd"
-              : renews
-                ? "widget.renewal"
-                : "get.response.subscriptions.currentPeriodEnd";
-
-            const badges = (
-              <StatusPill
-                status={tSubscription(subscription.status)}
-                variant={statusVariants[subscription.status]}
-              />
-            );
-            const details = [
+      {data && isText && (
+        <Span>
+          {[
+            `${t("widget.mrr")} ${formatCurrency(data.response.summary.mrrUsd, "USD", locale)}`,
+            `${t("widget.renewingSoon")} ${data.response.summary.renewingSoon}`,
+            `${t("widget.ending")} ${data.response.summary.ending}`,
+            `${t("widget.pastDue")} ${data.response.summary.pastDue}`,
+          ].join(" · ")}
+        </Span>
+      )}
+      {data && subscriptions.length === 0 && (
+        <EmptyBlock
+          className="rounded-xl border"
+          title={t("widget.noMatchingSubscriptions")}
+          message={
+            chips.length > 0
+              ? t("widget.emptyFiltered")
+              : t("widget.noSubscriptions")
+          }
+          action={
+            canFilter && chips.length > 0
+              ? { label: t("widget.clearFilters"), onClick: clearAll }
+              : undefined
+          }
+        />
+      )}
+      {data && isText && statusCounts.length > 0 && (
+        <Span>
+          {[
+            t("widget.allCount", { count: countTotal }),
+            ...statusCounts.map(
+              (row) => `${tSubscription(row.status)} ${row.count}`,
+            ),
+          ].join(" · ")}
+        </Span>
+      )}
+      {data && isText && subscriptions.length > 0 && (
+        <Div className="flex flex-col">
+          {subscriptions.map((subscription) => (
+            <Span key={subscription.id}>
+              {[
+                tSubscription(subscription.status),
+                subscription.userEmail,
+                `${tSubscription(subscription.planId)} ${tSubscription(subscription.billingInterval)}`,
+                priceLabel(subscription) ?? t("widget.noCharge"),
+                nextStep(subscription).text,
+                tPayment(subscription.provider),
+                subscription.id,
+              ].join(" · ")}
+            </Span>
+          ))}
+        </Div>
+      )}
+      {data && !isText && subscriptions.length > 0 && (
+        <Div
+          className={cn(
+            "min-w-0 divide-y divide-border overflow-hidden rounded-xl border bg-card",
+            isFetching && "opacity-60",
+          )}
+        >
+          {subscriptions.map((subscription) => {
+            const step = nextStep(subscription);
+            const price = priceLabel(subscription);
+            const meta = [
               tSubscription(subscription.planId),
               tSubscription(subscription.billingInterval),
               tPayment(subscription.provider),
-              `${t("get.response.subscriptions.createdAt")} ${formatDate(subscription.createdAt, locale, "PP")}`,
-              `${t(periodLabel)} ${
-                subscription.currentPeriodEnd
-                  ? formatDate(subscription.currentPeriodEnd, locale, "PP")
-                  : t("widget.notRecorded")
-              }`,
+              t("widget.startedOn", {
+                date: formatDate(subscription.createdAt, locale, "PP"),
+              }),
             ];
-            if (subscription.gracePeriodEndsAt) {
-              details.push(
-                `${t("get.response.subscriptions.gracePeriodEndsAt")} ${formatDate(subscription.gracePeriodEndsAt, locale, "PP p")}`,
+            if (subscription.lastPaymentAt) {
+              meta.push(
+                t("widget.lastPaid", {
+                  date: formatDate(subscription.lastPaymentAt, locale, "PP"),
+                }),
               );
             }
-            if (subscription.canceledAt) {
-              details.push(
-                `${t("get.response.subscriptions.canceledAt")} ${formatDate(subscription.canceledAt, locale, "PP")}`,
-              );
-            }
-            if (subscription.cancellationReason) {
-              details.push(tSubscription(subscription.cancellationReason));
-            }
-            const firstFailure = subscription.paymentFailedAt
-              ? ` · ${t("get.response.subscriptions.paymentFailedAt")} ${formatDate(subscription.paymentFailedAt, locale, "PP p")}`
-              : undefined;
-            const meta = (
-              <>
-                <Span>{details.join(" · ")}</Span>
-                {firstFailure && (
-                  <Span className="font-medium text-destructive">
-                    {firstFailure}
+            return (
+              <Div
+                key={subscription.id}
+                className="flex min-w-0 flex-col gap-2 px-3 py-2.5 @md:flex-row @md:items-center @md:gap-4 @md:px-4"
+              >
+                <Div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <Div className="flex min-w-0 items-baseline justify-between gap-3">
+                    <Span className="min-w-0 text-sm font-medium [overflow-wrap:anywhere]">
+                      {subscription.userEmail}
+                      {subscription.userName && (
+                        <Span className="ms-2 text-xs font-normal text-muted-foreground">
+                          {subscription.userName}
+                        </Span>
+                      )}
+                    </Span>
+                    <Span className="shrink-0 text-sm font-semibold tabular-nums @md:hidden">
+                      {price ?? t("widget.noCharge")}
+                    </Span>
+                  </Div>
+                  <Span className="text-xs text-muted-foreground [overflow-wrap:anywhere]">
+                    {meta.join(" · ")}
                   </Span>
-                )}
-                {isInteractive && !onPick && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="whitespace-normal"
-                    onClick={() =>
-                      openRelated(
-                        () =>
-                          import("@/payment/processor/definition").then(
-                            (module) => module.default.GET,
-                          ),
-                        { data: { userId: subscription.userId } },
-                      )
-                    }
-                  >
-                    {t("widget.paymentAttempts")}
-                  </Button>
-                )}
-              </>
-            );
-            return {
-              id: subscription.id,
-              title: subscription.userName || subscription.userEmail,
-              subtitle: subscription.userName
-                ? subscription.userEmail
-                : undefined,
-              badges,
-              meta,
-              action: isInteractive
-                ? {
-                    label: onPick ? t("widget.pick") : t("widget.customer"),
-                    onClick: () => {
-                      if (onPick) {
-                        onPick(subscription);
-                        pop();
-                        return;
+                  <Span className={cn("text-xs", toneClass[step.tone])}>
+                    {step.text}
+                    {subscription.paymentFailedAt &&
+                      ` · ${t("get.response.subscriptions.paymentFailedAt")} ${formatDate(subscription.paymentFailedAt, locale, "PP")}`}
+                  </Span>
+                </Div>
+                <Div className="flex min-w-0 flex-wrap items-center gap-2 @md:flex-nowrap">
+                  <StatusPill
+                    className="shrink-0"
+                    status={tSubscription(subscription.status)}
+                    variant={statusVariants[subscription.status]}
+                  />
+                  {(subscription.cancelAtPeriodEnd || subscription.cancelAt) &&
+                    subscription.status !== SubscriptionStatus.CANCELED && (
+                      <StatusPill
+                        className="shrink-0"
+                        status={t("widget.endingChip")}
+                        variant="warning"
+                      />
+                    )}
+                  <Span className="hidden min-w-28 whitespace-nowrap text-right text-sm font-semibold tabular-nums @md:inline">
+                    {price ?? t("widget.noCharge")}
+                  </Span>
+                  {isInteractive && !onPick && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2 text-xs"
+                      onClick={() =>
+                        openRelated(
+                          () =>
+                            import("@/payment/processor/definition").then(
+                              (module) => module.default.GET,
+                            ),
+                          { data: { userId: subscription.userId } },
+                        )
                       }
-                      openRelated(
-                        () =>
-                          import("@/users/view/definition").then(
-                            (module) => module.default.GET,
-                          ),
-                        { data: { userId: subscription.userId } },
-                      );
-                    },
-                  }
-                : undefined,
-            };
+                    >
+                      {t("widget.payments")}
+                    </Button>
+                  )}
+                  {isInteractive && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2 text-xs"
+                      onClick={() => {
+                        if (onPick) {
+                          onPick(subscription);
+                          pop();
+                          return;
+                        }
+                        openRelated(
+                          () =>
+                            import("@/users/view/definition").then(
+                              (module) => module.default.GET,
+                            ),
+                          { data: { userId: subscription.userId } },
+                        );
+                      }}
+                    >
+                      {onPick ? t("widget.pick") : t("widget.customer")}
+                    </Button>
+                  )}
+                </Div>
+              </Div>
+            );
           })}
-        />
+        </Div>
       )}
       {pagination && pagination.totalCount > 0 && (
         <Div className="flex flex-wrap items-center justify-between gap-2">

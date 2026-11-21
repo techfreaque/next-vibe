@@ -8,7 +8,7 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { scopedTranslation as rolesTranslation } from "next-vibe/identity/roles/i18n";
 import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
 
-import { SubscriptionStatus } from "@/subscription/enum";
+import { SubscriptionPlan, SubscriptionStatus } from "@/subscription/enum";
 import { scopedTranslation as subscriptionTranslation } from "@/subscription/i18n";
 
 const DASH = "-";
@@ -138,6 +138,17 @@ export function subscriptionStatusLabel(
     return subscriptionTranslation.scopedT(locale).t(status);
   }
   return status;
+}
+
+/** Translated label for a stored subscription plan ("enums.plan.plus"). */
+export function subscriptionPlanLabel(
+  plan: string,
+  locale: CountryLanguage,
+): string {
+  if (isValidEnumValue(SubscriptionPlan, plan)) {
+    return subscriptionTranslation.scopedT(locale).t(plan);
+  }
+  return plan;
 }
 
 export type PillVariant = "success" | "warning" | "danger" | "muted" | "info";

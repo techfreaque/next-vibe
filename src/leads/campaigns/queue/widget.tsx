@@ -32,6 +32,8 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
+import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import type { JSX } from "react";
 
 import {
@@ -41,7 +43,11 @@ import {
 
 import type definition from "./definition";
 
-export function CampaignQueueWidget(): JSX.Element {
+interface CustomWidgetProps {
+  field: (typeof definition.GET)["fields"];
+}
+
+export function CampaignQueueWidget({ field }: CustomWidgetProps): JSX.Element {
   const read = useWidgetEndpointMutations()?.read;
   const response = useWidgetResponse();
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -67,7 +73,28 @@ export function CampaignQueueWidget(): JSX.Element {
     form.setValue("page", next, { shouldDirty: true });
     submit?.();
   };
+  const delivery = form.watch("delivery");
+  const journeyVariant = form.watch("journeyVariant");
+  const stage = form.watch("stage");
+  const localeFilter = form.watch("locale");
+  const eventFrom = form.watch("eventFrom");
+  const eventTo = form.watch("eventTo");
+  const hasDrill = Boolean(
+    delivery ||
+    (journeyVariant &&
+      journeyVariant !== "enums.emailJourneyVariantFilter.all") ||
+    (stage && stage !== "enums.emailCampaignStageFilter.all") ||
+    localeFilter ||
+    eventFrom ||
+    eventTo,
+  );
   const clearFilters = (): void => {
+    form.setValue("delivery", undefined, { shouldDirty: true });
+    form.setValue("journeyVariant", undefined, { shouldDirty: true });
+    form.setValue("stage", undefined, { shouldDirty: true });
+    form.setValue("locale", "", { shouldDirty: true });
+    form.setValue("eventFrom", undefined, { shouldDirty: true });
+    form.setValue("eventTo", undefined, { shouldDirty: true });
     form.setValue("leadId", undefined, { shouldDirty: true });
     form.setValue("campaignType", CampaignTypeFilter.ANY, {
       shouldDirty: true,
@@ -78,7 +105,11 @@ export function CampaignQueueWidget(): JSX.Element {
   return (
     <WidgetShell>
       <WidgetHeader
-        title={t("widget.title")}
+        title={
+          data
+            ? t("widget.titleWithCount", { count: data.totalCount })
+            : t("widget.title")
+        }
         backButton={
           canGoBack && interactive ? (
             <Button
@@ -136,7 +167,17 @@ export function CampaignQueueWidget(): JSX.Element {
           {leadId && (
             <StatusPill status={t("widget.selectedLead")} variant="info" />
           )}
-          {(leadId || campaignType !== CampaignTypeFilter.ANY) && (
+          {(eventFrom || eventTo) && (
+            <StatusPill
+              status="window"
+              variant="info"
+              label={t("widget.eventWindow", {
+                from: eventFrom ? formatDate(eventFrom, locale, "PP") : "…",
+                to: eventTo ? formatDate(eventTo, locale, "PP") : "…",
+              })}
+            />
+          )}
+          {(leadId || hasDrill || campaignType !== CampaignTypeFilter.ANY) && (
             <Button
               type="button"
               variant="ghost"
@@ -146,6 +187,20 @@ export function CampaignQueueWidget(): JSX.Element {
               {t("widget.clearFilters")}
             </Button>
           )}
+        </Div>
+      )}
+      {interactive && (
+        <Div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @3xl:grid-cols-4">
+          <SelectFieldWidget
+            fieldName="delivery"
+            field={field.children.delivery}
+          />
+          <SelectFieldWidget
+            fieldName="journeyVariant"
+            field={field.children.journeyVariant}
+          />
+          <SelectFieldWidget fieldName="stage" field={field.children.stage} />
+          <TextFieldWidget fieldName="locale" field={field.children.locale} />
         </Div>
       )}
       {response?.success === false ? (
@@ -182,15 +237,18 @@ export function CampaignQueueWidget(): JSX.Element {
           {items.map((item) => {
             const recipient =
               item.leadEmail || item.businessName || item.leadId;
-            const schedule = item.nextScheduledAt
-              ? t("widget.scheduledFor", {
-                  date: formatDate(
-                    new Date(item.nextScheduledAt),
-                    locale,
-                    "PPp",
-                  ),
-                })
-              : t("widget.noScheduledEmail");
+            const schedule =
+              item.daysOverdue !== null && item.daysOverdue > 0
+                ? t("widget.overdueDays", { days: item.daysOverdue })
+                : item.nextScheduledAt
+                  ? t("widget.scheduledFor", {
+                      date: formatDate(
+                        new Date(item.nextScheduledAt),
+                        locale,
+                        "PPp",
+                      ),
+                    })
+                  : t("widget.noScheduledEmail");
             return (
               <ListItem
                 key={item.leadId}
@@ -210,28 +268,26 @@ export function CampaignQueueWidget(): JSX.Element {
                     {item.nextSubject && (
                       <Span className="break-words">{item.nextSubject}</Span>
                     )}
-                    <Div className="flex flex-wrap gap-x-3 gap-y-1">
-                      {item.currentStage && (
-                        <Span>{leadsT(item.currentStage)}</Span>
-                      )}
-                      {item.journeyVariant && (
-                        <Span>{leadsT(item.journeyVariant)}</Span>
-                      )}
-                      <Span>
-                        {t("widget.deliveryStats", {
-                          sent: item.emailsSent,
-                          opened: item.emailsOpened,
-                          clicked: item.emailsClicked,
-                        })}
-                      </Span>
-                      {item.startedAt && (
-                        <Span>
-                          {t("widget.startedOn", {
-                            date: formatDate(item.startedAt, locale, "PP"),
-                          })}
-                        </Span>
-                      )}
-                    </Div>
+                    <Span className="break-words">
+                      {[
+                        item.currentStage ? leadsT(item.currentStage) : "",
+                        item.journeyVariant ? leadsT(item.journeyVariant) : "",
+                        item.emailsSent > 0
+                          ? t("widget.deliveryStats", {
+                              sent: item.emailsSent,
+                              opened: item.emailsOpened,
+                              clicked: item.emailsClicked,
+                            })
+                          : "",
+                        item.startedAt
+                          ? t("widget.startedOn", {
+                              date: formatDate(item.startedAt, locale, "PP"),
+                            })
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </Span>
                     {interactive && (
                       <Button
                         type="button"

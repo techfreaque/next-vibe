@@ -58,7 +58,7 @@ export const translations: typeof enTranslations = {
     description: "Nutzerdetails geladen",
   },
   status: {
-    active: "Aktiv",
+    active: "Konto aktiviert",
     banned: "Gesperrt",
     inactive: "Inaktiv",
     verified: "Verifiziert",
@@ -239,6 +239,8 @@ export const translations: typeof enTranslations = {
     viewNamedUser: "Konto von {{name}} öffnen",
     viewNamedLead: "Lead {{name}} öffnen",
     leadsTitle: "Verknüpfte Leads",
+    leadsCapped:
+      "{{shown}} von {{total}} verknüpften Leads, direkte Verknüpfungen zuerst",
     usersTitle: "Nutzer mit gemeinsamem Lead",
     noLeads: "Keine verknüpften Leads",
     noUsers: "Keine weiteren Nutzer teilen diese Leads",

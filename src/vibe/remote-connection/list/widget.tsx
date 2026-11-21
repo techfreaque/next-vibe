@@ -9,6 +9,7 @@
 
 "use client";
 
+import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import {
@@ -61,6 +62,7 @@ import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetPlatform,
   useWidgetResponse,
   useWidgetResponseOnly,
   useWidgetTranslation,
@@ -71,6 +73,7 @@ import { apiClient } from "../../unified-ui/hooks/store";
 import { FormAlertWidget } from "../../unified-ui/widgets/interactive/form-alert/widget";
 import type endpoints from "./definition";
 import type { RemoteConnection } from "./definition";
+import { FleetHealthReport } from "./fleet-health";
 
 function connectionStatus(
   conn: RemoteConnection,
@@ -706,7 +709,10 @@ function LocalView({
   onPick,
   isPickerMode,
   isAdmin,
+  hideList = false,
 }: {
+  /** The fleet report above already lists every row (tools page). */
+  hideList?: boolean;
   connections: RemoteConnection[];
   selfInstanceId: string | null;
   navigate: ReturnType<typeof useWidgetNavigation>["push"];
@@ -718,7 +724,7 @@ function LocalView({
   return (
     <Div className="flex flex-col gap-0">
       {/* Connection list header — only when there is a list to head */}
-      {connections.length > 0 && (
+      {!hideList && connections.length > 0 && (
         <Div className="flex items-center gap-2 px-4 py-3 border-b">
           <Link2 className="h-4 w-4 text-muted-foreground" />
           <Span className="font-semibold text-sm mr-auto">
@@ -727,7 +733,7 @@ function LocalView({
         </Div>
       )}
 
-      {connections.length > 0 ? (
+      {hideList ? null : connections.length > 0 ? (
         <Div className="flex flex-col divide-y">
           {connections.map((conn) => (
             <ConnectionRow
@@ -756,8 +762,8 @@ function LocalView({
           </Div>
         </Div>
       )}
-      {/* Connect to cloud pitch — admins only */}
-      {isAdmin && (
+      {/* Connect to cloud pitch — admins only, not on the fleet health page */}
+      {isAdmin && !hideList && (
         <Card className="rounded-none border-0 border-b shadow-none">
           <CardHeader className="pb-3">
             <Div className="flex items-center gap-2">
@@ -845,6 +851,24 @@ export function RemoteConnectionsListContainer(): JSX.Element {
   const showBillingHeader =
     isInteractive && !isPickerMode && !(isAdmin && isToolsPage);
   const hasError = response?.success === false;
+  const platform = useWidgetPlatform();
+  const isTextSurface = isCliPlatform(platform) || platform === Platform.MCP;
+  // Admin fleet health: tools page, CLI and MCP. Never in picker mode or on
+  // the customer-facing subscription pages.
+  const fleet =
+    isAdmin && !isPickerMode && (isToolsPage || isTextSurface)
+      ? (data?.fleet ?? null)
+      : null;
+
+  if (fleet && isTextSurface) {
+    return (
+      <FleetHealthReport
+        fleet={fleet}
+        isLoading={read?.isLoading ?? false}
+        onRefresh={() => void read?.refetch()}
+      />
+    );
+  }
 
   return (
     <WidgetShell className="min-w-0">
@@ -883,6 +907,13 @@ export function RemoteConnectionsListContainer(): JSX.Element {
           <LoadingBlock message={t("widget.loading")} />
         </Div>
       )}
+      {fleet && !hasError && (
+        <FleetHealthReport
+          fleet={fleet}
+          isLoading={read?.isLoading ?? false}
+          onRefresh={() => void read?.refetch()}
+        />
+      )}
       {data &&
         !hasError &&
         !read?.isLoading &&
@@ -905,6 +936,7 @@ export function RemoteConnectionsListContainer(): JSX.Element {
             onPick={onPick}
             isPickerMode={isPickerMode}
             isAdmin={isAdmin}
+            hideList={fleet !== null}
           />
         ))}
     </WidgetShell>

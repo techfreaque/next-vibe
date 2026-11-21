@@ -2,6 +2,40 @@ export const translations = {
   title: "Campaign Queue",
   description: "Leads currently active in email campaigns",
   enums: {
+    delivery: {
+      dueNow: "Due now",
+      overdue: "Overdue 24h+",
+      scheduled: "Scheduled",
+      failed: "Failed",
+      sent: "Sent",
+      opened: "Sent and opened",
+      clicked: "Sent and clicked",
+      unsubscribed: "Unsubscribed",
+      bounced: "Bounced",
+    },
+    emailJourneyVariantFilter: {
+      all: "All",
+      uncensoredConvert: "Uncensored Convert",
+      sideHustle: "Side Hustle",
+      quietRecommendation: "Quiet Recommendation",
+      signupNurture: "Signup Nurture",
+      retention: "Retention",
+      winback: "Winback",
+      newsletterMay2026: "Newsletter May 2026",
+      newsletterNov2026: "Newsletter November 2026",
+    },
+    emailCampaignStageFilter: {
+      all: "All",
+    },
+    emailCampaignStage: {
+      notStarted: "Not Started",
+      initial: "Initial Contact",
+      followup1: "Follow-up 1",
+      followup2: "Follow-up 2",
+      followup3: "Follow-up 3",
+      nurture: "Nurture",
+      reactivation: "Reactivation",
+    },
     campaignType: {
       leadCampaign: "Lead Campaign",
       newsletter: "Newsletter",
@@ -21,6 +55,35 @@ export const translations = {
     titleShort: "Campaign Queue",
     description: "View paginated list of leads currently in email campaigns",
     fields: {
+      delivery: {
+        label: "Email state",
+        description:
+          "Leads with an email in this state. Sent, opened, clicked, unsubscribed, bounced and failed use the date window",
+        placeholder: "Any state",
+      },
+      journeyVariant: {
+        label: "Journey variant",
+        description: "Only emails of this journey",
+        placeholder: "Any journey",
+      },
+      stage: {
+        label: "Stage",
+        description: "Only emails of this campaign stage",
+        placeholder: "Any stage",
+      },
+      locale: {
+        label: "Locale",
+        description: "Rendered locale (de-DE) or language (de)",
+        placeholder: "Any locale",
+      },
+      eventFrom: {
+        label: "From",
+        description: "First day of the email event window",
+      },
+      eventTo: {
+        label: "To",
+        description: "Last day of the email event window",
+      },
       page: {
         label: "Page",
         description: "Page number",
@@ -35,6 +98,7 @@ export const translations = {
       },
     },
     response: {
+      daysOverdue: "Days overdue",
       nextSubject: "Scheduled subject",
       leadId: "Lead ID",
       leadEmail: "Email",
@@ -80,6 +144,9 @@ export const translations = {
     },
   },
   widget: {
+    overdueDays: "Overdue by {{days}} days, never sent",
+    titleWithCount: "Campaign queue ({{count}})",
+    eventWindow: "Email events {{from}} to {{to}}",
     title: "Campaign Queue",
     refresh: "Refresh",
     noData: "No campaign queue entries",

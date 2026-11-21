@@ -1,968 +1,1783 @@
 /**
- * Cron Stats Custom Widget
- * Complete, production-quality analytics dashboard for cron task statistics
+ * Task Health widget (cron-stats). One widget for web, CLI and MCP.
+ * Answers: what is failing, stuck, overdue, disabled or never ran right now,
+ * how runs, success rate and duration moved in the period, and which task to
+ * open in run history.
  */
 
 "use client";
+
+import {
+  AnalyticsToolbar,
+  KpiGrid,
+  KpiTile,
+  TimeSeriesChart,
+} from "next-vibe/ui/components/analytics";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { Activity } from "next-vibe/ui/components/icons/Activity";
-import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
-import { BarChart3 } from "next-vibe/ui/components/icons/BarChart3";
-import { CheckCircle } from "next-vibe/ui/components/icons/CheckCircle";
 import { Clock } from "next-vibe/ui/components/icons/Clock";
 import { List } from "next-vibe/ui/components/icons/List";
-import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
-import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
-import { TrendingDown } from "next-vibe/ui/components/icons/TrendingDown";
-import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
-import { XCircle } from "next-vibe/ui/components/icons/XCircle";
-import { Span } from "next-vibe/ui/components/span";
-import React, { useCallback, useMemo } from "react";
-
-import { cn } from "../../../unified-ui/_shared/cn";
+import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import {
-  useWidgetContext,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "next-vibe/ui/components/select";
+import { Span } from "next-vibe/ui/components/span";
+import {
+  StatusPill,
+  type StatusPillVariant,
+} from "next-vibe/ui/components/status-pill";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe/ui/components/table";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import type { JSX } from "react";
+
+import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { isAgentPlatform, isCliPlatform } from "../../../platforms/platforms";
+import { cn } from "../../../unified-ui/_shared/cn";
+import { useRelatedEntityNavigation } from "../../../unified-ui/_shared/related-entities";
+import {
+  useWidgetEndpointMutations,
+  useWidgetForm,
+  useWidgetIsInteractive,
+  useWidgetIsSubmitting,
   useWidgetLocale,
-  useWidgetNavigation,
+  useWidgetPlatform,
+  useWidgetResponse,
+  useWidgetResponseOnly,
   useWidgetTranslation,
   useWidgetValue,
 } from "../../../unified-ui/_shared/use-widget-context";
+import {
+  formatDuration,
+  sparkline,
+} from "../../../unified-ui/analytics/format";
+import { FormAlertWidget } from "../../../unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
+import { CronTaskStatus, type CronTaskStatusValue } from "../../enum";
 import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import type statsEndpoints from "./definition";
-import type { CronStatsGetResponseOutput } from "./definition";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type StatsData = CronStatsGetResponseOutput;
+import type {
+  CronHealthAttentionTask,
+  CronHealthTaskRow,
+  CronStatsGetResponseOutput,
+} from "./definition";
+import {
+  RECOVERY_RUNS,
+  TaskHealth,
+  TaskHealthFilter,
+  TaskHealthFilterOptions,
+  type TaskHealthFilterValue,
+  type TaskHealthValue,
+} from "./enum";
+import type { CronStatsT } from "./i18n";
 
 interface WidgetProps {
   field: (typeof statsEndpoints.GET)["fields"];
 }
 
-// ─── Format Helpers ───────────────────────────────────────────────────────────
+type Report = CronStatsGetResponseOutput;
 
-function formatDuration(ms: number | null | undefined): string {
-  if (ms === null || ms === undefined) {
-    return "—";
-  }
-  if (ms < 1000) {
-    return `${ms}ms`;
-  }
-  if (ms < 60000) {
-    return `${(ms / 1000).toFixed(1)}s`;
-  }
-  return `${Math.floor(ms / 60000)}m ${Math.round((ms % 60000) / 1000)}s`;
-}
+const FAILED_STATUSES = [
+  CronTaskStatus.FAILED,
+  CronTaskStatus.ERROR,
+  CronTaskStatus.TIMEOUT,
+] as const;
 
-function formatDate(s: string | null | undefined): string {
-  return s ? s.slice(0, 10) : "—";
-}
+const FAILED_STATUS_FILTER = [
+  CronTaskStatus.FAILED,
+  CronTaskStatus.ERROR,
+  CronTaskStatus.TIMEOUT,
+].join(",");
 
-import {
-  CronTaskPriority,
-  type CronTaskPriorityValue,
-  CronTaskStatus,
-  type CronTaskStatusValue,
-} from "../../enum";
-
-// ─── Priority color map ────────────────────────────────────────────────────────
-// Keyed on enum values (i18n key strings), not plain short strings
-
-const PRIORITY_COLORS: Record<string, string> = {
-  [CronTaskPriority.CRITICAL]: "#ef4444",
-  [CronTaskPriority.HIGH]: "#f97316",
-  [CronTaskPriority.MEDIUM]: "#3b82f6",
-  [CronTaskPriority.LOW]: "#22c55e",
-  [CronTaskPriority.BACKGROUND]: "#9ca3af",
+const HEALTH_VARIANT: Record<typeof TaskHealthValue, StatusPillVariant> = {
+  [TaskHealth.STUCK]: "danger",
+  [TaskHealth.FAILING]: "danger",
+  [TaskHealth.OVERDUE]: "warning",
+  [TaskHealth.FLAKY]: "warning",
+  [TaskHealth.RECOVERING]: "info",
+  [TaskHealth.RUNNING]: "info",
+  [TaskHealth.LOW_DATA]: "default",
+  [TaskHealth.NEVER_RAN]: "default",
+  [TaskHealth.HEALTHY]: "success",
+  [TaskHealth.DISABLED]: "muted",
 };
 
-function getPriorityColor(priority: string): string {
-  return PRIORITY_COLORS[priority] ?? "#9ca3af";
+const DAY_MS = 86_400_000;
+/** Failure palette: no green (green means success on this page). */
+const FAILURE_SLOTS = ["negative", 4, 5, 1, 3] as const;
+/** Days shown in the per-row success strip. */
+const STRIP_DAYS = 14;
+/** Below this many runs in the previous period, deltas are noise: hide them. */
+const MIN_DELTA_BASE = 10;
+
+function seriesColor(key: string): 1 | 3 | "negative" | "muted" | "positive" {
+  if (key === "failed") {
+    return "negative";
+  }
+  if (key === "other") {
+    return "muted";
+  }
+  if (key === "completed" || key === "successRate") {
+    return "positive";
+  }
+  return key === "p95" ? 3 : 1;
 }
 
-// ─── Status color map ─────────────────────────────────────────────────────────
-
-function getStatusColor(status: string): string {
-  if (status === CronTaskStatus.COMPLETED) {
-    return "#22c55e";
+/** Per-bucket sum of every series (total runs sparkline). */
+function sumSeries(
+  buckets: readonly string[],
+  series: ReadonlyArray<{ values: readonly number[] }>,
+): number[] {
+  const totals: number[] = [];
+  for (let i = 0; i < buckets.length; i += 1) {
+    let sum = 0;
+    for (const item of series) {
+      sum += item.values[i] ?? 0;
+    }
+    totals.push(sum);
   }
-  if (
-    status === CronTaskStatus.FAILED ||
-    status === CronTaskStatus.ERROR ||
-    status === CronTaskStatus.TIMEOUT
-  ) {
-    return "#ef4444";
-  }
-  if (status === CronTaskStatus.RUNNING) {
-    return "#3b82f6";
-  }
-  if (
-    status === CronTaskStatus.PENDING ||
-    status === CronTaskStatus.SCHEDULED
-  ) {
-    return "#f59e0b";
-  }
-  return "#9ca3af";
+  return totals;
 }
 
-// ─── StatCard ─────────────────────────────────────────────────────────────────
+function healthPill(state: typeof TaskHealthValue, label: string): JSX.Element {
+  return (
+    <StatusPill status={state} variant={HEALTH_VARIANT[state]} label={label} />
+  );
+}
 
-function StatCard({
-  label,
-  value,
-  icon,
-  variant = "default",
+// ─── Formatting ──────────────────────────────────────────────────────────────
+
+/** Age of an ISO time, same formatter as every duration on web and CLI. */
+function ageSince(
+  iso: string | null,
+  now: number,
+  locale: CountryLanguage,
+): string {
+  return iso
+    ? formatDuration(Math.max(0, now - new Date(iso).getTime()), locale)
+    : "";
+}
+
+function ageUntil(
+  iso: string | null,
+  now: number,
+  locale: CountryLanguage,
+): string {
+  return iso
+    ? formatDuration(Math.max(0, new Date(iso).getTime() - now), locale)
+    : "";
+}
+
+function formatMs(ms: number | null, locale: CountryLanguage): string {
+  return ms === null ? "–" : formatDuration(ms, locale);
+}
+
+function formatPct(value: number | null, locale: CountryLanguage): string {
+  return value === null
+    ? "–"
+    : new Intl.NumberFormat(locale, {
+        style: "percent",
+        maximumFractionDigits: 0,
+      }).format(value);
+}
+
+function statusLabel(
+  status: typeof CronTaskStatusValue | null,
+  locale: CountryLanguage,
+): string {
+  if (!status) {
+    return "";
+  }
+  return tasksScopedTranslation.scopedT(locale).t(status).toLowerCase();
+}
+
+/** One-line explanation of why a task needs attention. */
+function attentionDetail(
+  task: CronHealthAttentionTask,
+  now: number,
+  t: CronStatsT,
+  locale: CountryLanguage,
+): string {
+  if (task.state === TaskHealth.STUCK) {
+    const running = t("widget.attention.runningFor", {
+      age: ageSince(task.runStartedAt, now, locale),
+      timeout: formatMs(task.timeoutMs, locale),
+      limit: formatMs(task.stuckAfterMs, locale),
+    });
+    return task.lastRunAt
+      ? running
+      : `${running} · ${t("widget.attention.neverCompleted")}`;
+  }
+  if (task.state === TaskHealth.RECOVERING) {
+    return t("widget.attention.recoveringDetail", {
+      count: RECOVERY_RUNS,
+      rate: formatPct(task.successRate, locale),
+      runs: task.finishedInWindow,
+    });
+  }
+  if (task.state === TaskHealth.FLAKY) {
+    const parts = [
+      t("widget.attention.flakyDetail", {
+        rate: formatPct(task.successRate, locale),
+        runs: task.finishedInWindow,
+      }),
+    ];
+    if (task.lastRunAt) {
+      parts.push(
+        t("widget.attention.failedAgo", {
+          status: statusLabel(task.lastStatus, locale),
+          age: ageSince(task.lastRunAt, now, locale),
+        }),
+      );
+    }
+    return parts.join(" · ");
+  }
+  if (task.state === TaskHealth.OVERDUE) {
+    return t("widget.attention.missed", {
+      due: ageSince(task.dueAt, now, locale),
+      last: task.lastRunAt
+        ? t("widget.attention.lastAgo", {
+            age: ageSince(task.lastRunAt, now, locale),
+          })
+        : t("widget.attention.lastNever"),
+    });
+  }
+  const parts = [
+    t("widget.attention.failedAgo", {
+      status: statusLabel(task.lastStatus, locale),
+      age: ageSince(task.lastRunAt, now, locale),
+    }),
+  ];
+  if (task.consecutiveFailures > 1) {
+    parts.push(
+      t("widget.attention.streak", { count: task.consecutiveFailures }),
+    );
+  }
+  if (task.failuresInWindow > 0) {
+    parts.push(
+      t("widget.attention.failuresInPeriod", {
+        count: task.failuresInWindow,
+      }),
+    );
+  }
+  return parts.join(" · ");
+}
+
+function lastRunText(
+  task: CronHealthTaskRow,
+  now: number,
+  t: CronStatsT,
+  locale: CountryLanguage,
+): string {
+  if (task.orphanedRunSince) {
+    return t("widget.table.orphaned", {
+      age: ageSince(task.orphanedRunSince, now, locale),
+    });
+  }
+  if (task.lastStatus === CronTaskStatus.RUNNING) {
+    const running =
+      `${t("enums.taskHealth.running")} ${ageSince(task.runStartedAt, now, locale)}`.trim();
+    return task.lastRunAt
+      ? running
+      : `${running}, ${t("widget.attention.neverCompleted")}`;
+  }
+  if (!task.lastRunAt) {
+    return task.lastStatus
+      ? statusLabel(task.lastStatus, locale)
+      : t("widget.table.lastNever");
+  }
+  return t("widget.table.last", {
+    status: statusLabel(task.lastStatus, locale),
+    age: ageSince(task.lastRunAt, now, locale),
+  });
+}
+
+/** "failed 2.7 hr ago" (no repeated "Last"), for the narrow-screen line. */
+function compactLastRun(
+  task: CronHealthTaskRow,
+  now: number,
+  t: CronStatsT,
+  locale: CountryLanguage,
+): string {
+  if (
+    task.orphanedRunSince ||
+    task.lastStatus === CronTaskStatus.RUNNING ||
+    !task.lastRunAt ||
+    !task.lastStatus
+  ) {
+    return lastRunText(task, now, t, locale);
+  }
+  return `${statusLabel(task.lastStatus, locale)} ${t(
+    "widget.attention.lastAgo",
+    {
+      age: ageSince(task.lastRunAt, now, locale),
+    },
+  )}`;
+}
+
+function nextRunText(
+  task: CronHealthTaskRow,
+  now: number,
+  t: CronStatsT,
+  locale: CountryLanguage,
+): string {
+  if (task.blockedByRun) {
+    return t("widget.table.blocked");
+  }
+  if (!task.nextRunAt) {
+    return t("widget.table.nextNone");
+  }
+  return t("widget.table.next", { age: ageUntil(task.nextRunAt, now, locale) });
+}
+
+function taskSublabel(
+  task: CronHealthTaskRow,
+  now: number,
+  t: CronStatsT,
+  locale: CountryLanguage,
+): string {
+  const parts: string[] = [];
+  if (
+    task.displayName !== task.id &&
+    !task.displayName.includes(`(${task.id})`)
+  ) {
+    parts.push(task.id);
+  }
+  parts.push(task.scheduleLabel);
+  if (task.lastStatus === CronTaskStatus.SKIPPED) {
+    parts.push(t("widget.table.skippedHint"));
+  }
+  if (task.orphanedRunSince) {
+    parts.push(lastRunText(task, now, t, locale));
+  }
+  if (task.oneOff) {
+    parts.push(t("widget.table.oneOff"));
+  }
+  return parts.join(" · ");
+}
+
+/** Success-rate sparkline, only when there is something to see (failures). */
+function successSpark(task: CronHealthTaskRow): string {
+  return task.failures > 0 && task.successTrend.length > 1
+    ? sparkline(task.successTrend, 14)
+    : "";
+}
+
+/** Hide a delta whose base is too small to compare against. */
+function comparable(
+  previous: number | null,
+  base: number | null,
+): number | null | undefined {
+  return base === null || base < MIN_DELTA_BASE ? undefined : previous;
+}
+
+// ─── Drill-down ──────────────────────────────────────────────────────────────
+
+interface HistoryDrill {
+  taskId?: string;
+  status?: string;
+  from?: string;
+  to?: string;
+}
+
+function useHistoryDrill(
+  period: Report["window"] | undefined,
+): (drill: HistoryDrill) => void {
+  const navigate = useRelatedEntityNavigation();
+  return (drill) => {
+    const from = drill.from ?? period?.from;
+    const to = drill.to ?? period?.to;
+    navigate(async () => (await import("../history/definition")).default.GET, {
+      data: {
+        taskId: drill.taskId,
+        status: drill.status,
+        startDate: from ? new Date(`${from}T00:00:00.000Z`) : undefined,
+        endDate: to ? new Date(`${to}T23:59:59.999Z`) : undefined,
+      },
+    });
+  };
+}
+
+function bucketEnd(key: string, bucket: Report["window"]["bucket"]): string {
+  const start = new Date(`${key}T00:00:00.000Z`);
+  const next =
+    bucket === "day"
+      ? new Date(start.getTime() + DAY_MS)
+      : bucket === "week"
+        ? new Date(start.getTime() + 7 * DAY_MS)
+        : new Date(
+            Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 1, 1),
+          );
+  return new Date(next.getTime() - DAY_MS).toISOString().slice(0, 10);
+}
+
+// ─── Text surfaces (CLI + MCP) ───────────────────────────────────────────────
+
+function TextReport({
+  data,
+  t,
+  locale,
+  now,
 }: {
-  label: string;
-  value: string | number | null | undefined;
-  icon?: React.ReactNode;
-  variant?: "default" | "success" | "danger" | "warning" | "info";
-}): React.JSX.Element {
-  const variantClass = {
-    default: "text-foreground",
-    success: "text-success",
-    danger: "text-destructive",
-    warning: "text-warning",
-    info: "text-info",
-  }[variant];
-
-  const displayValue =
-    value === null || value === undefined
-      ? "—"
-      : typeof value === "number"
-        ? value.toLocaleString()
-        : value;
+  data: Report;
+  t: CronStatsT;
+  locale: CountryLanguage;
+  now: number;
+}): JSX.Element {
+  const s = data.summary;
+  const states = [
+    `${t("widget.tile.failing")} ${s.failing}`,
+    `${t("widget.tile.stuck")} ${s.stuck}`,
+    `${t("widget.tile.overdue")} ${s.overdue}`,
+    `${t("widget.tile.flaky")} ${s.flaky}`,
+    `${t("enums.taskHealth.recovering")} ${s.recovering}`,
+    `${t("widget.tile.lowData")} ${s.lowData}`,
+    `${t("widget.cli.runningOnTime")} ${s.running}`,
+    `${t("widget.tile.neverRan")} ${s.neverRan}`,
+    `${t("widget.tile.disabled")} ${s.disabled}`,
+    `${t("widget.tile.healthy")} ${s.healthy}/${s.enabled}`,
+  ].join(" · ");
 
   return (
-    <Div className="rounded-lg border bg-card p-4 flex flex-col gap-1">
-      <Div className="flex items-center gap-1.5">
-        {icon}
-        <Span className="text-xs text-muted-foreground">{label}</Span>
-      </Div>
-      <Span className={cn("text-2xl font-bold tabular-nums", variantClass)}>
-        {displayValue}
+    <Div className="flex flex-col">
+      {data.watchdog ? (
+        <Span>
+          {`!! ${data.watchdog.id}: ${t("widget.watchdogBanner", {
+            state: t(data.watchdog.state).toLowerCase(),
+          })}`}
+        </Span>
+      ) : null}
+      {data.tasks.length === 1 && data.summary.total === 1 && data.tasks[0] ? (
+        <Span>
+          {`${t("widget.cli.state")}: ${t(data.tasks[0].state).toUpperCase()}${
+            data.tasks[0].enabled
+              ? ""
+              : ` (${t("widget.tile.disabled").toLowerCase()})`
+          }`}
+        </Span>
+      ) : (
+        <Span>
+          {t("widget.cli.states")}: {states}
+        </Span>
+      )}
+      {data.disabledIncluded ? null : <Span>{t("widget.cli.scope")}</Span>}
+      {s.parked > 0 && !s.parkedShown ? (
+        <Span>{t("widget.cli.parkedHidden", { count: s.parked })}</Span>
+      ) : null}
+      {data.attention.length === 0 ? (
+        <Span>{t("widget.cli.noAttention")}</Span>
+      ) : (
+        <Div className="flex flex-col">
+          <Span>
+            {t("widget.cli.attention")} ({data.attention.length})
+          </Span>
+          {data.attention.map((task) => (
+            <Span key={task.id}>
+              {`- ${t(task.state).toUpperCase()} | ${task.id}${task.enabled ? "" : ` (${t("widget.attention.orphaned")})`} | ${attentionDetail(task, now, t, locale)}${
+                task.lastError
+                  ? ` | ${t("widget.attention.lastError")}: ${task.lastError.replaceAll(/\s+/g, " ").slice(0, 160)}`
+                  : ""
+              }`}
+            </Span>
+          ))}
+        </Div>
+      )}
+      <Span>{""}</Span>
+      <Span>
+        {t("widget.cli.tasks")} ({data.tasks.length})
+      </Span>
+      <Span>{t("widget.cli.header")}</Span>
+      {data.tasks.map((task) => (
+        <Span key={task.id}>
+          {[
+            t(task.state).toUpperCase(),
+            task.oneOff ? `${task.id} (${t("widget.table.oneOff")})` : task.id,
+            String(task.runs),
+            String(task.failures),
+            [formatPct(task.successRate, locale), successSpark(task)]
+              .filter(Boolean)
+              .join(" "),
+            formatMs(task.p50DurationMs, locale),
+            formatMs(task.p95DurationMs, locale),
+            lastRunText(task, now, t, locale),
+            nextRunText(task, now, t, locale),
+          ].join(" | ")}
+        </Span>
+      ))}
+      {data.summary.total === 1 ? (
+        <RecentRunsText data={data} t={t} locale={locale} now={now} />
+      ) : null}
+      <Span>
+        {data.tasks.length === 1 && data.tasks[0]
+          ? data.tasks[0].state === TaskHealth.STUCK
+            ? t("widget.cli.drillRunning", { id: data.tasks[0].id })
+            : t("widget.cli.drill").replace("<id>", data.tasks[0].id)
+          : t("widget.cli.drill")}
       </Span>
     </Div>
   );
 }
 
-// ─── SmallStatCard ────────────────────────────────────────────────────────────
-
-function SmallStatCard({
-  label,
-  value,
-  icon,
-}: {
-  label: string;
-  value: string | number | null | undefined;
-  icon?: React.ReactNode;
-}): React.JSX.Element {
-  const displayValue =
-    value === null || value === undefined
-      ? "—"
-      : typeof value === "number"
-        ? value.toLocaleString()
-        : value;
-
-  return (
-    <Div className="rounded-lg border bg-card p-3 flex flex-col gap-0.5">
-      <Div className="flex items-center gap-1">
-        {icon}
-        <Span className="text-xs text-muted-foreground">{label}</Span>
-      </Div>
-      <Span className="text-lg font-semibold tabular-nums">{displayValue}</Span>
-    </Div>
-  );
+function recentRunLine(
+  run: Report["recentRuns"][number],
+  now: number,
+  t: CronStatsT,
+  locale: CountryLanguage,
+): string {
+  const head = [
+    tasksScopedTranslation.scopedT(locale).t(run.status),
+    t("widget.attention.lastAgo", {
+      age: ageSince(run.startedAt, now, locale),
+    }),
+    formatMs(run.durationMs, locale),
+    `${t("widget.cli.runId")} ${run.executionId}`,
+  ].join(" | ");
+  return run.error
+    ? `${head}\n    ${t("widget.attention.lastError")}: ${run.error.slice(0, 140)}`
+    : head;
 }
 
-// ─── SuccessRateBar (full-width) ───────────────────────────────────────────────
-
-function SuccessRateBar({ rate }: { rate: number }): React.JSX.Element {
-  const pct = Math.min(100, Math.max(0, rate));
-  const color = pct > 80 ? "#22c55e" : pct > 50 ? "#f59e0b" : "#ef4444";
-
-  return (
-    <Div className="h-3 rounded-full bg-muted overflow-hidden">
-      <Div
-        style={{
-          width: `${pct}%`,
-          backgroundColor: color,
-          height: "100%",
-          borderRadius: "9999px",
-          transition: "width 0.5s",
-        }}
-      />
-    </Div>
-  );
-}
-
-// ─── MiniBar ──────────────────────────────────────────────────────────────────
-
-function MiniBar({
-  pct,
-  color,
-}: {
-  pct: number;
-  color: string;
-}): React.JSX.Element {
-  return (
-    <Div className="flex-1 h-2 rounded bg-muted overflow-hidden">
-      <Div
-        style={{
-          width: `${Math.min(100, Math.max(0, pct))}%`,
-          backgroundColor: color,
-          height: "100%",
-          borderRadius: "9999px",
-        }}
-      />
-    </Div>
-  );
-}
-
-// ─── StatusBadge ─────────────────────────────────────────────────────────────
-
-function StatusBadge({
-  status,
-}: {
-  status: typeof CronTaskStatusValue;
-}): React.JSX.Element {
-  const locale = useWidgetLocale();
-  const { t } = tasksScopedTranslation.scopedT(locale);
-  const cls =
-    status === CronTaskStatus.COMPLETED
-      ? "bg-success/10 text-success"
-      : status === CronTaskStatus.FAILED ||
-          status === CronTaskStatus.ERROR ||
-          status === CronTaskStatus.TIMEOUT
-        ? "bg-destructive/10 text-destructive"
-        : status === CronTaskStatus.RUNNING
-          ? "bg-info/10 text-info"
-          : status === CronTaskStatus.PENDING ||
-              status === CronTaskStatus.SCHEDULED
-            ? "bg-warning/10 text-warning"
-            : "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300";
-
-  return (
-    <Span
-      className={cn(
-        "inline-flex px-2 py-0.5 rounded-full text-xs font-medium",
-        cls,
-      )}
-    >
-      {t(status)}
-    </Span>
-  );
-}
-
-// ─── PriorityBadge ────────────────────────────────────────────────────────────
-
-function PriorityBadge({
-  priority,
-}: {
-  priority: typeof CronTaskPriorityValue;
-}): React.JSX.Element {
-  const locale = useWidgetLocale();
-  const { t } = tasksScopedTranslation.scopedT(locale);
-  const cls =
-    priority === CronTaskPriority.CRITICAL
-      ? "bg-destructive/10 text-destructive"
-      : priority === CronTaskPriority.HIGH
-        ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300"
-        : priority === CronTaskPriority.MEDIUM
-          ? "bg-info/10 text-info"
-          : priority === CronTaskPriority.LOW
-            ? "bg-success/10 text-success"
-            : "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300";
-
-  return (
-    <Span
-      className={cn(
-        "inline-flex px-2 py-0.5 rounded-full text-xs font-medium",
-        cls,
-      )}
-    >
-      {t(priority)}
-    </Span>
-  );
-}
-
-function renderStatusBadge(key: string): React.ReactNode {
-  return <StatusBadge status={key as typeof CronTaskStatusValue} />;
-}
-
-function renderPriorityBadge(key: string): React.ReactNode {
-  return <PriorityBadge priority={key as typeof CronTaskPriorityValue} />;
-}
-
-// ─── RecentActivityIcon ───────────────────────────────────────────────────────
-
-function RecentActivityIcon({ status }: { status: string }): React.JSX.Element {
-  if (status === CronTaskStatus.COMPLETED) {
-    return <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />;
-  }
-  if (
-    status === CronTaskStatus.FAILED ||
-    status === CronTaskStatus.ERROR ||
-    status === CronTaskStatus.TIMEOUT
-  ) {
-    return <XCircle className="h-4 w-4 text-destructive flex-shrink-0" />;
-  }
-  if (status === CronTaskStatus.RUNNING) {
-    return (
-      <Loader2 className="h-4 w-4 text-primary flex-shrink-0 animate-spin" />
-    );
-  }
-  if (
-    status === CronTaskStatus.PENDING ||
-    status === CronTaskStatus.SCHEDULED
-  ) {
-    return <Clock className="h-4 w-4 text-warning flex-shrink-0" />;
-  }
-  return <Activity className="h-4 w-4 text-muted-foreground flex-shrink-0" />;
-}
-
-// ─── DistributionSection ─────────────────────────────────────────────────────
-
-function DistributionSection({
-  title,
-  entries,
-  total,
-  getBadge,
-  getColor,
-}: {
-  title: string;
-  entries: Array<[string, number]>;
-  total: number;
-  getBadge: (key: string) => React.ReactNode;
-  getColor: (key: string) => string;
-}): React.JSX.Element {
-  return (
-    <Div className="rounded-lg border bg-card p-4">
-      <Span className="text-sm font-semibold mb-3 block">{title}</Span>
-      <Div className="flex flex-col gap-2">
-        {entries.map(([key, count]) => {
-          const pct = total > 0 ? (count / total) * 100 : 0;
-          return (
-            <Div key={key} className="flex items-center gap-2">
-              <Div className="w-28 flex-shrink-0">{getBadge(key)}</Div>
-              <MiniBar pct={pct} color={getColor(key)} />
-              <Span className="text-xs tabular-nums w-10 text-right">
-                {count}
-              </Span>
-            </Div>
-          );
-        })}
-      </Div>
-    </Div>
-  );
-}
-
-// ─── TopPerformingTable ───────────────────────────────────────────────────────
-
-function TopPerformingTable({
-  tasks,
+/** Per-bucket runs, success and durations; "–" where a bucket had no runs. */
+function TrendText({
+  data,
   t,
+  locale,
 }: {
-  tasks: NonNullable<StatsData["topPerformingTasks"]>;
-  t: ReturnType<typeof useWidgetTranslation<typeof statsEndpoints.GET>>;
-}): React.JSX.Element {
-  const sorted = useMemo(
-    () =>
-      [...tasks].toSorted((a, b) => b.successRate - a.successRate).slice(0, 10),
-    [tasks],
-  );
-
+  data: Report;
+  t: CronStatsT;
+  locale: CountryLanguage;
+}): JSX.Element {
+  const buckets = data.runsTrend.buckets;
+  const value = (
+    series: Report["successTrend"]["series"],
+    key: string,
+    i: number,
+  ): number => series.find((x) => x.key === key)?.values[i] ?? 0;
+  const finished = (i: number): number =>
+    value(data.runsTrend.series, "completed", i) +
+    value(data.runsTrend.series, "failed", i);
+  const recent = buckets.slice(-14);
+  const offset = buckets.length - recent.length;
   return (
-    <Div className="flex flex-col gap-1">
-      <Div className="grid grid-cols-4 gap-2 text-xs text-muted-foreground font-medium pb-1 border-b">
-        <Span>{t("widget.col.rank")}</Span>
-        <Span>{t("widget.col.taskName")}</Span>
-        <Span className="text-right">{t("widget.col.executions")}</Span>
-        <Span className="text-right">{t("widget.col.avgDuration")}</Span>
-      </Div>
-      {sorted.map((task, i) => {
-        const ratePct = Math.min(100, Math.max(0, task.successRate));
+    <Div className="flex flex-col">
+      <Span>{t("widget.cli.trendHeader")}</Span>
+      {recent.map((key, j) => {
+        const i = offset + j;
+        const has = finished(i) > 0;
         return (
-          <Div
-            key={task.taskName}
-            className="grid grid-cols-4 gap-2 py-1.5 border-b last:border-0 items-center"
-          >
-            <Span className="text-xs text-muted-foreground tabular-nums">
-              {i + 1}
-            </Span>
-            <Span className="text-xs truncate">{task.taskName}</Span>
-            <Div className="flex flex-col gap-0.5 items-end">
-              <Span className="text-xs tabular-nums">
-                {task.executions.toLocaleString()}
-              </Span>
-              <Div className="flex items-center gap-1 w-full justify-end">
-                <Div className="w-16 h-1.5 rounded bg-muted overflow-hidden">
-                  <Div
-                    style={{
-                      width: `${ratePct}%`,
-                      backgroundColor:
-                        ratePct > 80
-                          ? "#22c55e"
-                          : ratePct > 50
-                            ? "#f59e0b"
-                            : "#ef4444",
-                      height: "100%",
-                      borderRadius: "9999px",
-                    }}
-                  />
-                </Div>
-                <Span className="text-xs tabular-nums text-success">
-                  {Math.round(task.successRate)}
-                  {"%"}
-                </Span>
-              </Div>
-            </Div>
-            <Span className="text-xs tabular-nums text-right">
-              {formatDuration(task.avgDuration)}
-            </Span>
-          </Div>
+          <Span key={key}>
+            {[
+              key,
+              String(finished(i)),
+              has
+                ? formatPct(
+                    value(data.successTrend.series, "successRate", i),
+                    locale,
+                  )
+                : "–",
+              has
+                ? formatMs(value(data.durationTrend.series, "p50", i), locale)
+                : "–",
+              has
+                ? formatMs(value(data.durationTrend.series, "p95", i), locale)
+                : "–",
+            ].join(" | ")}
+          </Span>
         );
       })}
     </Div>
   );
 }
 
-// ─── ProblemTasksTable ────────────────────────────────────────────────────────
-
-function ProblemTasksTable({
-  tasks,
-  t,
-}: {
-  tasks: NonNullable<StatsData["problemTasks"]>;
-  t: ReturnType<typeof useWidgetTranslation<typeof statsEndpoints.GET>>;
-}): React.JSX.Element {
-  const sorted = useMemo(
-    () => [...tasks].toSorted((a, b) => b.failures - a.failures).slice(0, 10),
-    [tasks],
+function inFlightLine(
+  run: NonNullable<Report["inFlight"]>,
+  now: number,
+  t: CronStatsT,
+  locale: CountryLanguage,
+): string {
+  const parts: string[] = [
+    t("widget.inFlight.line", {
+      age: ageSince(run.startedAt, now, locale),
+      limit: formatMs(run.limitMs, locale),
+      timeout: formatMs(run.timeoutMs, locale),
+    }),
+  ];
+  if (run.stuck) {
+    parts.push(t("widget.inFlight.stuck"));
+  }
+  parts.push(
+    run.executionId
+      ? `${t("widget.inFlight.run")} ${run.executionId}`
+      : t("widget.inFlight.noRun"),
   );
-
-  return (
-    <Div className="flex flex-col gap-1">
-      <Div className="grid grid-cols-5 gap-2 text-xs text-muted-foreground font-medium pb-1 border-b">
-        <Span className="col-span-2">{t("widget.col.taskName")}</Span>
-        <Span className="text-right">{t("widget.col.failures")}</Span>
-        <Span className="text-right">{t("widget.col.executions")}</Span>
-        <Span className="text-right">{t("widget.col.failureRate")}</Span>
-      </Div>
-      {sorted.map((task) => {
-        const ratePct = Math.min(100, Math.max(0, task.failureRate));
-        return (
-          <Div
-            key={task.taskName}
-            className="grid grid-cols-5 gap-2 py-1.5 border-b last:border-0 items-start"
-          >
-            <Div className="col-span-2 flex flex-col min-w-0">
-              <Span className="text-xs truncate">{task.taskName}</Span>
-              {task.lastError && (
-                <Span className="text-xs text-muted-foreground truncate">
-                  {task.lastError}
-                </Span>
-              )}
-              {task.lastFailure && (
-                <Span className="text-xs text-muted-foreground">
-                  {formatDate(task.lastFailure)}
-                </Span>
-              )}
-            </Div>
-            <Span className="text-xs tabular-nums text-right text-destructive">
-              {task.failures.toLocaleString()}
-            </Span>
-            <Span className="text-xs tabular-nums text-right">
-              {task.executions.toLocaleString()}
-            </Span>
-            <Div className="flex flex-col gap-0.5 items-end">
-              <Div className="flex items-center gap-1">
-                <Div className="w-12 h-1.5 rounded bg-muted overflow-hidden">
-                  <Div
-                    style={{
-                      width: `${ratePct}%`,
-                      backgroundColor: "#ef4444",
-                      height: "100%",
-                      borderRadius: "9999px",
-                    }}
-                  />
-                </Div>
-                <Span className="text-xs tabular-nums text-destructive">
-                  {Math.round(task.failureRate)}
-                  {"%"}
-                </Span>
-              </Div>
-            </Div>
-          </Div>
-        );
-      })}
-    </Div>
-  );
+  return parts.join(" · ");
 }
 
-// ─── RecentActivityFeed ───────────────────────────────────────────────────────
-
-function RecentActivityFeed({
-  items,
+/** Compact CLI trend: one sparkline per series, no per-day tables. */
+function SparkSummary({
+  data,
+  t,
+  locale,
 }: {
-  items: NonNullable<StatsData["recentActivity"]>;
-}): React.JSX.Element {
+  data: Report;
+  t: CronStatsT;
+  locale: CountryLanguage;
+}): JSX.Element {
+  const total = (values: readonly number[]): string =>
+    new Intl.NumberFormat(locale).format(values.reduce((a, b) => a + b, 0));
+  const label: Record<string, string> = {
+    completed: t("widget.chart.completed"),
+    failed: t("widget.chart.failed"),
+    other: t("widget.chart.other"),
+  };
   return (
-    <Div className="flex flex-col divide-y">
-      {items.map((item) => (
-        <Div key={item.id} className="flex items-start gap-3 py-2">
-          <RecentActivityIcon status={item.status} />
-          <Div className="flex flex-col min-w-0 flex-1">
-            <Div className="flex items-center gap-2 flex-wrap">
-              <Span className="text-sm font-medium truncate">
-                {item.taskName}
-              </Span>
-              <Span className="text-xs text-muted-foreground">{item.type}</Span>
-              <StatusBadge status={item.status as typeof CronTaskStatusValue} />
-            </Div>
-            <Div className="flex items-center gap-3">
-              <Span className="text-xs text-muted-foreground">
-                {formatDate(item.timestamp)}
-              </Span>
-              {item.duration !== undefined && item.duration !== null && (
-                <Span className="text-xs text-muted-foreground">
-                  {formatDuration(item.duration)}
-                </Span>
-              )}
-            </Div>
-          </Div>
-        </Div>
+    <Div className="flex flex-col">
+      <Span>{`${t("widget.chart.runs")} (${t("widget.cli.byDay")})`}</Span>
+      {data.runsTrend.series.map((x) => (
+        <Span key={x.key}>
+          {`  ${(label[x.key] ?? x.key).padEnd(24)} ${sparkline(x.values, 30)}  ${total(x.values)}`}
+        </Span>
       ))}
+      {data.failuresByTask.series.length > 0 ? (
+        <>
+          <Span>{`${t("widget.chart.byTask")} (${t("widget.cli.byDay")})`}</Span>
+          {data.failuresByTask.series.map((x) => (
+            <Span key={x.key}>
+              {`  ${(data.taskOptions.some((o) => o.id === x.key) ? x.key : t("widget.chart.otherTasks")).padEnd(24)} ${sparkline(x.values, 30)}  ${total(x.values)}`}
+            </Span>
+          ))}
+        </>
+      ) : null}
+      <Span>{t("widget.cli.daysHint")}</Span>
     </Div>
   );
 }
 
-// ─── DailyStatsTable ─────────────────────────────────────────────────────────
-
-function DailyStatsTable({
-  rows,
+function RecentRunsText({
+  data,
   t,
+  locale,
+  now,
 }: {
-  rows: NonNullable<StatsData["dailyStats"]>;
-  t: ReturnType<typeof useWidgetTranslation<typeof statsEndpoints.GET>>;
-}): React.JSX.Element {
-  const last7 = rows.slice(-7);
+  data: Report;
+  t: CronStatsT;
+  locale: CountryLanguage;
+  now: number;
+}): JSX.Element {
   return (
-    <Div className="flex flex-col gap-1">
-      <Div className="grid grid-cols-6 gap-2 text-xs text-muted-foreground font-medium pb-1 border-b">
-        <Span>{t("widget.col.date")}</Span>
-        <Span className="text-right">{t("widget.col.executions")}</Span>
-        <Span className="text-right">{t("widget.col.successes")}</Span>
-        <Span className="text-right">{t("widget.col.failures")}</Span>
-        <Span className="text-right">{t("widget.col.avgDuration")}</Span>
-        <Span className="text-right">{t("widget.col.uniqueTasks")}</Span>
-      </Div>
-      {last7.map((row) => (
+    <Div className="flex flex-col">
+      <Span>{""}</Span>
+      {data.inFlight ? (
+        <Span>{`${t("widget.inFlight.title").toUpperCase()} | ${inFlightLine(data.inFlight, now, t, locale)}`}</Span>
+      ) : null}
+      <Span>
+        {t("widget.cli.recentRuns", { count: data.recentRuns.length })}
+      </Span>
+      {data.recentRuns.length === 0 ? (
+        <Span>{t("widget.cli.noRuns")}</Span>
+      ) : (
+        data.recentRuns.map((run) => (
+          <Span
+            key={run.startedAt}
+          >{`- ${recentRunLine(run, now, t, locale)}`}</Span>
+        ))
+      )}
+    </Div>
+  );
+}
+
+function RecentRunsPanel({
+  data,
+  t,
+  locale,
+  now,
+}: {
+  data: Report;
+  t: CronStatsT;
+  locale: CountryLanguage;
+  now: number;
+}): JSX.Element {
+  const tStatus = tasksScopedTranslation.scopedT(locale).t;
+  return (
+    <Div className="flex min-w-0 flex-col overflow-hidden rounded-lg border">
+      {data.inFlight ? (
         <Div
-          key={row.date}
-          className="grid grid-cols-6 gap-2 text-xs py-1.5 border-b last:border-0"
+          className={cn(
+            "flex min-w-0 flex-col gap-1 border-b px-3 py-2",
+            data.inFlight.stuck ? "bg-destructive/5" : "bg-info/5",
+          )}
         >
-          <Span className="tabular-nums">{formatDate(row.date)}</Span>
-          <Span className="text-right tabular-nums">
-            {row.executions.toLocaleString()}
-          </Span>
-          <Span className="text-right tabular-nums text-success">
-            {row.successes.toLocaleString()}
-          </Span>
-          <Span className="text-right tabular-nums text-destructive">
-            {row.failures.toLocaleString()}
-          </Span>
-          <Span className="text-right tabular-nums">
-            {formatDuration(row.avgDuration)}
-          </Span>
-          <Span className="text-right tabular-nums">
-            {row.uniqueTasks.toLocaleString()}
-          </Span>
+          <Div className="flex flex-wrap items-center gap-2">
+            <StatusPill
+              status={CronTaskStatus.RUNNING}
+              variant={data.inFlight.stuck ? "danger" : "info"}
+              label={t("widget.inFlight.title")}
+            />
+            <Span className="text-xs tabular-nums">
+              {inFlightLine(data.inFlight, now, t, locale)}
+            </Span>
+          </Div>
         </Div>
-      ))}
+      ) : null}
+      <Span className="border-b px-3 py-2 text-sm font-semibold">
+        {t("widget.cli.recentRuns", { count: data.recentRuns.length })}
+      </Span>
+      {data.recentRuns.length === 0 ? (
+        <Span className="px-3 py-2.5 text-sm text-muted-foreground">
+          {t("widget.cli.noRuns")}
+        </Span>
+      ) : (
+        <Div className="flex flex-col divide-y">
+          {data.recentRuns.map((run) => (
+            <Div
+              key={run.startedAt}
+              className="flex min-w-0 flex-col gap-1 px-3 py-2"
+            >
+              <Div className="flex flex-wrap items-center gap-2 text-xs tabular-nums">
+                <StatusPill
+                  status={run.status}
+                  variant={
+                    run.status === CronTaskStatus.COMPLETED
+                      ? "success"
+                      : FAILED_STATUSES.some((st) => st === run.status)
+                        ? "danger"
+                        : "muted"
+                  }
+                  label={tStatus(run.status)}
+                />
+                <Span className="text-muted-foreground">
+                  {t("widget.attention.lastAgo", {
+                    age: ageSince(run.startedAt, now, locale),
+                  })}
+                </Span>
+                <Span>{formatMs(run.durationMs, locale)}</Span>
+              </Div>
+              {run.error ? (
+                <Span className="line-clamp-2 break-words font-mono text-xs text-destructive">
+                  {run.error}
+                </Span>
+              ) : null}
+            </Div>
+          ))}
+        </Div>
+      )}
     </Div>
   );
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── Web sections ────────────────────────────────────────────────────────────
 
-export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
-  const children = field.children;
-  const { endpointMutations } = useWidgetContext();
-  const { push: navigate } = useWidgetNavigation();
-  const t = useWidgetTranslation<typeof statsEndpoints.GET>();
-
-  const data = useWidgetValue<typeof statsEndpoints.GET>();
-  const isLoading = endpointMutations?.read?.isLoading;
-
-  // ─── Callbacks ────────────────────────────────────────────────────────────
-
-  const handleRefresh = useCallback((): void => {
-    endpointMutations?.read?.refetch?.();
-  }, [endpointMutations]);
-
-  const handleViewTasks = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const m = await import("../tasks/definition");
-      navigate(m.default.GET, {});
-    })();
-  }, [navigate]);
-
-  const handleViewHistory = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const m = await import("../history/definition");
-      navigate(m.default.GET, {});
-    })();
-  }, [navigate]);
-
-  const handleViewPulse = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const m = await import("../../pulse/history/definition");
-      navigate(m.default.GET, {});
-    })();
-  }, [navigate]);
-
-  // ─── Derived values ───────────────────────────────────────────────────────
-
-  const successRate = useMemo(() => {
-    if (data === undefined || data === null) {
-      return null;
-    }
-    if (data.successRate !== undefined && data.successRate !== null) {
-      return data.successRate;
-    }
-    if (data.executedTasks > 0) {
-      return (data.successfulTasks / data.executedTasks) * 100;
-    }
-    return null;
-  }, [data]);
-
-  const tasksByStatus = data?.tasksByStatus;
-  const tasksByStatusEntries = useMemo(
-    () => (tasksByStatus ? Object.entries(tasksByStatus) : []),
-    [tasksByStatus],
+function SectionLabel({ children }: { children: string }): JSX.Element {
+  return (
+    <Span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      {children}
+    </Span>
   );
+}
 
-  const tasksByStatusTotal = useMemo(
-    () => tasksByStatusEntries.reduce((acc, [, v]) => acc + v, 0),
-    [tasksByStatusEntries],
-  );
-
-  const tasksByPriority = data?.tasksByPriority;
-  const tasksByPriorityEntries = useMemo(
-    () => (tasksByPriority ? Object.entries(tasksByPriority) : []),
-    [tasksByPriority],
-  );
-
-  const tasksByPriorityTotal = useMemo(
-    () => tasksByPriorityEntries.reduce((acc, [, v]) => acc + v, 0),
-    [tasksByPriorityEntries],
-  );
-
-  const topPerformingTasks = data?.topPerformingTasks ?? [];
-  const problemTasks = data?.problemTasks ?? [];
-  const recentActivity = data?.recentActivity ?? [];
-  const dailyStats = data?.dailyStats ?? [];
-
-  // ─── Loading ──────────────────────────────────────────────────────────────
-
-  if (isLoading && !data) {
+function AttentionPanel({
+  data,
+  t,
+  locale,
+  now,
+  onOpen,
+}: {
+  data: Report;
+  t: CronStatsT;
+  locale: CountryLanguage;
+  now: number;
+  onOpen: (drill: HistoryDrill) => void;
+}): JSX.Element {
+  if (data.attention.length === 0) {
     return (
-      <Div className="flex flex-col items-center justify-center gap-3 p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        <Span className="text-sm text-muted-foreground">
-          {t("widget.loading")}
+      <Div className="flex items-center gap-2 rounded-lg border border-success/30 bg-success/5 px-3 py-2.5">
+        <StatusPill
+          status={TaskHealth.HEALTHY}
+          variant="success"
+          label={t("enums.taskHealth.healthy")}
+        />
+        <Span className="text-sm">
+          {t("widget.attention.empty")}{" "}
+          <Span className="text-muted-foreground">
+            {t("widget.allHealthy", {
+              count: data.summary.healthy,
+            })}
+          </Span>
         </Span>
       </Div>
     );
   }
-
-  // ─── Render ───────────────────────────────────────────────────────────────
-
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <Div className="flex items-center gap-2 pb-2 border-b">
-        <NavigateButtonWidget field={children.backButton} />
-        <Div className="flex items-center gap-2 mr-auto">
-          <BarChart3 className="h-5 w-5 text-muted-foreground" />
-          <Span className="font-semibold text-base">{t("widget.title")}</Span>
-        </Div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleViewTasks}
-        >
-          <List className="h-4 w-4 mr-1" />
-          {t("widget.viewTasks")}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleViewHistory}
-        >
-          <Clock className="h-4 w-4 mr-1" />
-          {t("widget.viewHistory")}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleViewPulse}
-        >
-          <Activity className="h-4 w-4 mr-1" />
-          {t("widget.viewPulse")}
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleRefresh}
-          title={t("widget.refresh")}
-        >
-          <RefreshCw className="h-4 w-4" />
-        </Button>
+    <Div className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-destructive/30">
+      <Div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 border-b border-destructive/20 bg-destructive/5 px-3 py-2">
+        <Span className="text-sm font-semibold">
+          {t("widget.attention.title")} ({data.attention.length})
+        </Span>
+        <Span className="text-xs text-muted-foreground">
+          {t("widget.attention.subtitle")}
+        </Span>
       </Div>
-
-      {/* ── System Status Banner ───────────────────────────────────────────── */}
-      {data?.systemStatus && (
-        <Div
-          className={cn(
-            "flex items-center gap-3 rounded-lg border px-4 py-2.5",
-            data.systemStatus === "healthy"
-              ? "bg-success/10 border-success/30"
-              : data.systemStatus === "warning"
-                ? "bg-warning/10 border-warning/30"
-                : "bg-destructive/10 border-destructive/30",
-          )}
-        >
-          {data.systemStatus === "healthy" ? (
-            <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
-          ) : data.systemStatus === "warning" ? (
-            <AlertTriangle className="h-4 w-4 text-warning flex-shrink-0" />
-          ) : (
-            <XCircle className="h-4 w-4 text-destructive flex-shrink-0" />
-          )}
-          <Span
-            className={cn(
-              "text-sm font-semibold uppercase tracking-wide",
-              data.systemStatus === "healthy"
-                ? "text-success-foreground"
-                : data.systemStatus === "warning"
-                  ? "text-warning"
-                  : "text-destructive",
-            )}
+      <Div className="flex flex-col divide-y">
+        {data.attention.map((task) => (
+          <Div
+            key={task.id}
+            className="flex min-w-0 flex-col gap-2 px-3 py-2.5 @md:flex-row @md:items-start @md:justify-between"
           >
-            {t(`widget.systemStatus.${data.systemStatus}`)}
-          </Span>
-          {data.uptime && (
-            <Span className="text-xs text-muted-foreground ml-auto">
-              {t("widget.uptime")}
-              {`: ${data.uptime}`}
-            </Span>
-          )}
-        </Div>
-      )}
-
-      {/* ── Primary KPI Cards ──────────────────────────────────────────────── */}
-      <Div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <StatCard
-          label={t("widget.totalTasks")}
-          value={
-            data?.activeTasks !== undefined && data?.totalTasks !== undefined
-              ? `${data.activeTasks}/${data.totalTasks}`
-              : data?.totalTasks
-          }
-          icon={<Activity className="h-3.5 w-3.5 text-muted-foreground" />}
-        />
-        <StatCard
-          label={t("widget.executedTasks")}
-          value={data?.executedTasks}
-          icon={<TrendingUp className="h-3.5 w-3.5 text-primary" />}
-          variant="info"
-        />
-        <StatCard
-          label={t("widget.successfulTasks")}
-          value={data?.successfulTasks}
-          icon={<CheckCircle className="h-3.5 w-3.5 text-success" />}
-          variant="success"
-        />
-        <StatCard
-          label={t("widget.failedTasks")}
-          value={data?.failedTasks}
-          icon={<XCircle className="h-3.5 w-3.5 text-destructive" />}
-          variant="danger"
-        />
-        <StatCard
-          label={t("widget.successRate")}
-          value={
-            successRate !== null
-              ? `${Math.round(
-                  data?.successRate ??
-                    ((data?.successfulTasks ?? 0) /
-                      Math.max(data?.executedTasks ?? 1, 1)) *
-                      100,
-                )}%`
-              : "—"
-          }
-          icon={<TrendingUp className="h-3.5 w-3.5 text-success" />}
-          variant="success"
-        />
-        <StatCard
-          label={t("widget.avgDuration")}
-          value={formatDuration(data?.averageExecutionTime)}
-          icon={<Clock className="h-3.5 w-3.5 text-muted-foreground" />}
-        />
+            <Div className="flex min-w-0 flex-col gap-1">
+              <Div className="flex min-w-0 flex-wrap items-center gap-2">
+                <StatusPill
+                  status={task.state}
+                  variant={HEALTH_VARIANT[task.state]}
+                  label={t(task.state)}
+                />
+                <Span className="truncate text-sm font-medium">
+                  {task.displayName}
+                </Span>
+                {task.displayName !== task.id &&
+                !task.displayName.includes(`(${task.id})`) ? (
+                  <Span className="truncate font-mono text-xs text-muted-foreground">
+                    {task.id}
+                  </Span>
+                ) : null}
+                {task.enabled ? null : (
+                  <StatusPill
+                    status={TaskHealth.DISABLED}
+                    variant="muted"
+                    label={t("widget.attention.orphaned")}
+                  />
+                )}
+              </Div>
+              <Span className="text-xs text-muted-foreground tabular-nums">
+                {attentionDetail(task, now, t, locale)}
+              </Span>
+              {task.state === TaskHealth.FAILING ||
+              ((task.state === TaskHealth.FLAKY ||
+                task.state === TaskHealth.RECOVERING) &&
+                task.lastError) ? (
+                <Span className="line-clamp-2 break-words font-mono text-xs text-destructive">
+                  {task.lastError ?? t("widget.attention.noError")}
+                </Span>
+              ) : null}
+            </Div>
+            <Div className="flex shrink-0 gap-1.5">
+              {task.state === TaskHealth.FAILING ||
+              task.state === TaskHealth.FLAKY ||
+              task.state === TaskHealth.RECOVERING ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={(): void =>
+                    onOpen({ taskId: task.id, status: FAILED_STATUS_FILTER })
+                  }
+                >
+                  {t("widget.attention.openFailures")}
+                </Button>
+              ) : null}
+              {task.state === TaskHealth.STUCK ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={(): void =>
+                    onOpen({
+                      taskId: task.id,
+                      status: CronTaskStatus.RUNNING,
+                      from: task.runStartedAt?.slice(0, 10),
+                    })
+                  }
+                >
+                  {t("widget.attention.openRunning")}
+                </Button>
+              ) : null}
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={(): void => onOpen({ taskId: task.id })}
+              >
+                {t("widget.attention.openRuns")}
+              </Button>
+            </Div>
+          </Div>
+        ))}
       </Div>
+    </Div>
+  );
+}
 
-      {/* ── Success Rate Bar ───────────────────────────────────────────────── */}
-      {successRate !== null && (
-        <Div className="rounded-lg border bg-card p-4">
-          <Div className="flex items-center justify-between mb-2">
-            <Span className="text-sm font-semibold">
-              {t("widget.overallSuccessRate")}
-            </Span>
-            <Span className="text-sm font-bold tabular-nums">
-              {Math.round(successRate)}
-              {"%"}
-            </Span>
-          </Div>
-          <SuccessRateBar rate={successRate} />
+/** Colour of one bucket in the success strip. */
+function stripTone(rate: number, disabled: boolean): string {
+  if (disabled) {
+    return "bg-muted-foreground/40";
+  }
+  if (rate >= 1) {
+    return "bg-success";
+  }
+  return rate >= 0.5 ? "bg-warning" : "bg-destructive";
+}
+
+/**
+ * Success strip: one full-height block per day that had runs, green when all
+ * passed, amber for some failures, red for mostly or all failed. A 0% day is
+ * a solid red block, never a thin line.
+ */
+function SuccessTrendCell({
+  task,
+  t,
+  locale,
+}: {
+  task: CronHealthTaskRow;
+  t: CronStatsT;
+  locale: CountryLanguage;
+}): JSX.Element {
+  const disabled = task.state === TaskHealth.DISABLED;
+  const stuck = task.state === TaskHealth.STUCK;
+  const strip = task.successTrend.slice(
+    stuck ? -(STRIP_DAYS - 1) : -STRIP_DAYS,
+  );
+  return (
+    <Div className="flex items-center justify-end gap-2">
+      {strip.length > 0 || stuck ? (
+        <Div aria-hidden className="flex h-4 items-stretch gap-px">
+          {strip.map((rate, index) => (
+            <Span
+              key={`${task.id}-${String(index)}`}
+              className={cn("w-1.5 rounded-[1px]", stripTone(rate, disabled))}
+            />
+          ))}
+          {stuck ? (
+            // The current run: hung past its limit, whatever the history says.
+            <Span className="ms-0.5 w-1.5 animate-pulse rounded-[1px] bg-destructive" />
+          ) : null}
         </Div>
-      )}
-
-      {/* ── Secondary Metrics ──────────────────────────────────────────────── */}
-      {data !== undefined && data !== null && (
-        <Div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {data.activeTasks !== undefined && (
-            <SmallStatCard
-              label={t("widget.activeTasks")}
-              value={data.activeTasks}
-              icon={<Activity className="h-3 w-3 text-muted-foreground" />}
-            />
-          )}
-          {data.runningExecutions !== undefined && (
-            <SmallStatCard
-              label={t("widget.runningExecutions")}
-              value={data.runningExecutions}
-              icon={<TrendingUp className="h-3 w-3 text-primary" />}
-            />
-          )}
-          {data.pendingExecutions !== undefined && (
-            <SmallStatCard
-              label={t("widget.pendingExecutions")}
-              value={data.pendingExecutions}
-              icon={<Clock className="h-3 w-3 text-warning" />}
-            />
-          )}
-          {data.healthyTasks !== undefined && (
-            <SmallStatCard
-              label={t("widget.healthyTasks")}
-              value={data.healthyTasks}
-              icon={<CheckCircle className="h-3 w-3 text-success" />}
-            />
-          )}
-          {data.degradedTasks !== undefined && (
-            <SmallStatCard
-              label={t("widget.degradedTasks")}
-              value={data.degradedTasks}
-              icon={<AlertTriangle className="h-3 w-3 text-warning" />}
-            />
-          )}
-          {data.systemLoad !== undefined && (
-            <SmallStatCard
-              label={t("widget.systemLoad")}
-              value={`${Math.round(data.systemLoad)}%`}
-              icon={<TrendingDown className="h-3 w-3 text-muted-foreground" />}
-            />
-          )}
-          {data.queueSize !== undefined && (
-            <SmallStatCard
-              label={t("widget.queueSize")}
-              value={data.queueSize}
-            />
-          )}
-          {data.executionsLast24h !== undefined && (
-            <SmallStatCard
-              label={t("widget.executionsLast24h")}
-              value={data.executionsLast24h}
-              icon={<Activity className="h-3 w-3 text-primary" />}
-            />
-          )}
-        </Div>
-      )}
-
-      {/* ── Tasks By Status ────────────────────────────────────────────────── */}
-      {tasksByStatusEntries.length > 0 && (
-        <DistributionSection
-          title={t("widget.tasksByStatus")}
-          entries={tasksByStatusEntries}
-          total={tasksByStatusTotal}
-          getBadge={renderStatusBadge}
-          getColor={getStatusColor}
-        />
-      )}
-
-      {/* ── Tasks By Priority ──────────────────────────────────────────────── */}
-      {tasksByPriorityEntries.length > 0 && (
-        <DistributionSection
-          title={t("widget.tasksByPriority")}
-          entries={tasksByPriorityEntries}
-          total={tasksByPriorityTotal}
-          getBadge={renderPriorityBadge}
-          getColor={getPriorityColor}
-        />
-      )}
-
-      {/* ── Top Performing Tasks ───────────────────────────────────────────── */}
-      {topPerformingTasks.length > 0 && (
-        <Div className="rounded-lg border bg-card p-4">
-          <Div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="h-4 w-4 text-success" />
-            <Span className="text-sm font-semibold">
-              {t("widget.topPerforming")}
-            </Span>
-          </Div>
-          <TopPerformingTable tasks={topPerformingTasks} t={t} />
-        </Div>
-      )}
-
-      {/* ── Problem Tasks ──────────────────────────────────────────────────── */}
-      {problemTasks.length > 0 && (
-        <Div className="rounded-lg border bg-card p-4">
-          <Div className="flex items-center gap-2 mb-3">
-            <AlertTriangle className="h-4 w-4 text-destructive" />
-            <Span className="text-sm font-semibold">
-              {t("widget.problemTasks")}
-            </Span>
-          </Div>
-          <ProblemTasksTable tasks={problemTasks} t={t} />
-        </Div>
-      )}
-
-      {/* ── Recent Activity ────────────────────────────────────────────────── */}
-      {recentActivity.length > 0 && (
-        <Div className="rounded-lg border bg-card p-4">
-          <Span className="text-sm font-semibold mb-3 block">
-            {t("widget.recentActivity")}
-          </Span>
-          <RecentActivityFeed items={recentActivity} />
-        </Div>
-      )}
-
-      {/* ── Daily Stats ────────────────────────────────────────────────────── */}
-      {dailyStats.length > 0 && (
-        <Div className="rounded-lg border bg-card p-4">
-          <Span className="text-sm font-semibold mb-3 block">
-            {t("widget.dailyStats")}
-          </Span>
-          <DailyStatsTable rows={dailyStats} t={t} />
-        </Div>
+      ) : null}
+      {stuck ? (
+        <Span className="whitespace-nowrap text-right text-xs font-medium text-destructive">
+          {t("widget.table.runningTooLong")}
+        </Span>
+      ) : (
+        <Span className="w-10 whitespace-nowrap text-right tabular-nums">
+          {formatPct(task.successRate, locale)}
+        </Span>
       )}
     </Div>
+  );
+}
+
+function LastRunCell({
+  task,
+  now,
+  t,
+  locale,
+}: {
+  task: CronHealthTaskRow;
+  now: number;
+  t: CronStatsT;
+  locale: CountryLanguage;
+}): JSX.Element {
+  const tStatus = tasksScopedTranslation.scopedT(locale).t;
+  if (!task.lastStatus) {
+    return (
+      <Span className="text-xs text-muted-foreground">
+        {t("widget.table.lastNever")}
+      </Span>
+    );
+  }
+  const variant: StatusPillVariant =
+    task.state === TaskHealth.DISABLED
+      ? "muted"
+      : task.lastStatus === CronTaskStatus.COMPLETED
+        ? "success"
+        : FAILED_STATUSES.some((st) => st === task.lastStatus)
+          ? "danger"
+          : task.lastStatus === CronTaskStatus.RUNNING
+            ? "info"
+            : "muted";
+  const age =
+    task.lastStatus === CronTaskStatus.RUNNING
+      ? ageSince(task.runStartedAt, now, locale)
+      : ageSince(task.lastRunAt, now, locale);
+  return (
+    <Div className="flex flex-wrap items-center justify-end gap-1.5">
+      <StatusPill
+        status={task.lastStatus}
+        variant={variant}
+        label={tStatus(task.lastStatus)}
+      />
+      {age ? (
+        <Span className="text-xs tabular-nums text-muted-foreground">
+          {age}
+        </Span>
+      ) : null}
+    </Div>
+  );
+}
+
+function TaskTable({
+  className,
+  tasks,
+  t,
+  locale,
+  now,
+  onOpen,
+}: {
+  className?: string;
+  tasks: readonly CronHealthTaskRow[];
+  t: CronStatsT;
+  locale: CountryLanguage;
+  now: number;
+  onOpen?: (taskId: string) => void;
+}): JSX.Element {
+  return (
+    <Div
+      className={cn(
+        "flex min-w-0 flex-col overflow-hidden rounded-lg border",
+        className,
+      )}
+    >
+      <Div className="flex flex-col gap-0.5 border-b px-3 py-2">
+        <Span className="text-sm font-semibold">{t("widget.table.title")}</Span>
+        <Span className="text-xs text-muted-foreground">
+          {t("widget.table.subtitle")}
+        </Span>
+      </Div>
+      {tasks.length === 0 ? (
+        <Span className="px-3 py-4 text-sm text-muted-foreground">
+          {t("widget.table.empty")}
+        </Span>
+      ) : (
+        <Table scrollLabel={t("widget.table.title")}>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t("widget.table.dimension")}</TableHead>
+              <TableHead className="hidden text-right @2xl:table-cell">
+                {t("widget.table.runs")}
+              </TableHead>
+              <TableHead className="hidden text-right @2xl:table-cell">
+                {t("widget.table.failures")}
+              </TableHead>
+              <TableHead className="text-right">
+                {t("widget.table.trendCol")}
+              </TableHead>
+              <TableHead className="hidden text-right @4xl:table-cell">
+                {t("widget.table.p50")}
+              </TableHead>
+              <TableHead className="hidden text-right @4xl:table-cell">
+                {t("widget.table.p95")}
+              </TableHead>
+              <TableHead className="hidden text-right @xl:table-cell">
+                {t("widget.table.lastRun")}
+              </TableHead>
+              <TableHead className="hidden text-right @3xl:table-cell">
+                {t("widget.table.nextRun")}
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tasks.map((task) => {
+              const sub = taskSublabel(task, now, t, locale);
+              return (
+                <TableRow
+                  key={task.id}
+                  className={cn(
+                    onOpen && "cursor-pointer",
+                    task.state === TaskHealth.DISABLED &&
+                      "text-muted-foreground",
+                  )}
+                  onClick={onOpen ? (): void => onOpen(task.id) : undefined}
+                >
+                  <TableCell className="min-w-0">
+                    <Div className="flex min-w-0 items-start gap-2">
+                      {healthPill(task.state, t(task.state))}
+                      <Div className="flex min-w-0 flex-col">
+                        <Span className="break-words text-sm font-medium">
+                          {task.displayName}
+                        </Span>
+                        {sub ? (
+                          <Span className="break-words text-xs text-muted-foreground">
+                            {sub}
+                          </Span>
+                        ) : null}
+                        {task.orphanedRunSince ? null : (
+                          <Span className="text-xs text-muted-foreground @xl:hidden">
+                            {t("widget.table.lastLine", {
+                              last: compactLastRun(task, now, t, locale),
+                              next: nextRunText(task, now, t, locale),
+                            })}
+                            {task.failures > 0
+                              ? ` · ${t("widget.table.failedCount", { count: task.failures })}`
+                              : ""}
+                          </Span>
+                        )}
+                      </Div>
+                    </Div>
+                  </TableCell>
+                  <TableCell className="hidden text-right tabular-nums @2xl:table-cell">
+                    {new Intl.NumberFormat(locale).format(task.runs)}
+                  </TableCell>
+                  <TableCell
+                    className={cn(
+                      "hidden text-right tabular-nums @2xl:table-cell",
+                      task.failures > 0 &&
+                        task.state !== TaskHealth.DISABLED &&
+                        "text-destructive",
+                    )}
+                  >
+                    {new Intl.NumberFormat(locale).format(task.failures)}
+                  </TableCell>
+                  <TableCell>
+                    <SuccessTrendCell task={task} t={t} locale={locale} />
+                  </TableCell>
+                  <TableCell className="hidden whitespace-nowrap text-right tabular-nums @4xl:table-cell">
+                    {formatMs(task.p50DurationMs, locale)}
+                  </TableCell>
+                  <TableCell className="hidden whitespace-nowrap text-right tabular-nums @4xl:table-cell">
+                    <Span className="inline-flex items-center justify-end gap-1.5">
+                      {task.durationTrend.length > 1 ? (
+                        <Span
+                          aria-hidden
+                          className="font-mono text-[10px] leading-none tracking-tighter text-muted-foreground"
+                        >
+                          {sparkline(task.durationTrend, 10)}
+                        </Span>
+                      ) : null}
+                      {formatMs(task.p95DurationMs, locale)}
+                    </Span>
+                  </TableCell>
+                  <TableCell className="hidden @xl:table-cell">
+                    <LastRunCell task={task} now={now} t={t} locale={locale} />
+                  </TableCell>
+                  <TableCell className="hidden text-right text-xs tabular-nums @3xl:table-cell">
+                    {task.blockedByRun
+                      ? t("widget.table.blocked")
+                      : task.nextRunAt
+                        ? ageUntil(task.nextRunAt, now, locale)
+                        : t("widget.table.nextNone")}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      )}
+    </Div>
+  );
+}
+
+// ─── Main ────────────────────────────────────────────────────────────────────
+
+export function CronStatsContainer({ field }: WidgetProps): JSX.Element {
+  const data = useWidgetValue<typeof statsEndpoints.GET>();
+  const form = useWidgetForm<typeof statsEndpoints.GET>();
+  const t = useWidgetTranslation<typeof statsEndpoints.GET>();
+  const locale = useWidgetLocale();
+  const platform = useWidgetPlatform();
+  const responseOnly = useWidgetResponseOnly();
+  const interactive = useWidgetIsInteractive() && !responseOnly;
+  const isSubmitting = useWidgetIsSubmitting() ?? false;
+  const read = useWidgetEndpointMutations()?.read;
+  const response = useWidgetResponse();
+  const navigate = useRelatedEntityNavigation();
+  const openHistory = useHistoryDrill(data?.window);
+  const textMode = isCliPlatform(platform) || isAgentPlatform(platform);
+
+  const taskId = form?.watch("taskId") ?? "";
+  const health = form?.watch("health") ?? TaskHealthFilter.ALL;
+  const includeParked = form?.watch("includeParked") ?? false;
+  const includeDisabled = form?.watch("includeDisabled") ?? false;
+
+  const setTask = (value: string): void => {
+    form?.setValue("taskId", value, { shouldDirty: true });
+  };
+  const setHealth = (value: typeof TaskHealthFilterValue): void => {
+    form?.setValue("health", value, { shouldDirty: true });
+  };
+  const setIncludeDisabled = (value: boolean): void => {
+    form?.setValue("includeDisabled", value, { shouldDirty: true });
+  };
+  const setIncludeParked = (value: boolean): void => {
+    form?.setValue("includeParked", value, { shouldDirty: true });
+  };
+
+  if (!data) {
+    // A failed load shows the error (with retry via refresh), never an endless spinner.
+    return (
+      <WidgetShell>
+        <FormAlertWidget field={{}} />
+        {response?.success === false ? (
+          interactive ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="self-start"
+              onClick={(): void => void read?.refetch()}
+            >
+              {t("widget.refresh")}
+            </Button>
+          ) : null
+        ) : (
+          <LoadingBlock message={t("widget.title")} />
+        )}
+      </WidgetShell>
+    );
+  }
+
+  const now = Date.parse(data.generatedAt);
+  const showDays = data.dayTables;
+  const k = data.kpis;
+  const runsSeries = data.runsTrend.series;
+  const sparkFor = (key: string): readonly number[] | undefined =>
+    runsSeries.find((s) => s.key === key)?.values;
+  const totalRunsSpark = sumSeries(data.runsTrend.buckets, runsSeries);
+  const hasCompleted = (
+    runsSeries.find((x) => x.key === "completed")?.values ?? []
+  ).some((v) => v > 0);
+  const seriesLabel: Record<string, string> = {
+    completed: t("widget.chart.completed"),
+    failed: t("widget.chart.failed"),
+    other: t("widget.chart.other"),
+    successRate: t("widget.chart.successRate"),
+    p50: t("widget.chart.p50"),
+    p95: t("widget.chart.p95"),
+  };
+
+  const selectedTaskName = data.taskOptions.find((o) => o.id === taskId)?.name;
+  const filters = [
+    ...(taskId
+      ? [
+          {
+            key: "taskId",
+            label: t("widget.filter.task"),
+            value: selectedTaskName ?? taskId,
+            onRemove: (): void => setTask(""),
+          },
+        ]
+      : []),
+    ...(health !== TaskHealthFilter.ALL
+      ? [
+          {
+            key: "health",
+            label: t("widget.filter.state"),
+            value: t(health),
+            onRemove: (): void => setHealth(TaskHealthFilter.ALL),
+          },
+        ]
+      : []),
+    ...(includeParked
+      ? [
+          {
+            key: "includeParked",
+            label: t("widget.tile.parked"),
+            value: t("widget.tile.parkedShownHint"),
+            onRemove: (): void => setIncludeParked(false),
+          },
+        ]
+      : []),
+  ];
+
+  const toolbar = (
+    <AnalyticsToolbar
+      locale={locale}
+      period={data.window}
+      value={{
+        range: form?.watch("range"),
+        granularity: form?.watch("granularity"),
+        from: form?.watch("from"),
+        to: form?.watch("to"),
+      }}
+      onChange={(patch): void => {
+        if (patch.range !== undefined) {
+          form?.setValue("range", patch.range, { shouldDirty: true });
+        }
+        if (patch.granularity !== undefined) {
+          form?.setValue("granularity", patch.granularity, {
+            shouldDirty: true,
+          });
+        }
+        if ("from" in patch) {
+          form?.setValue("from", patch.from, { shouldDirty: true });
+        }
+        if ("to" in patch) {
+          form?.setValue("to", patch.to, { shouldDirty: true });
+        }
+      }}
+      onRefresh={interactive ? (): void => void read?.refetch() : undefined}
+      isLoading={isSubmitting}
+      filters={filters}
+      onClearFilters={(): void => {
+        setTask("");
+        setHealth(TaskHealthFilter.ALL);
+        setIncludeParked(false);
+        setIncludeDisabled(false);
+      }}
+    >
+      {interactive ? (
+        <>
+          <Select
+            value={taskId || "all"}
+            onValueChange={(value): void =>
+              setTask(value === "all" ? "" : value)
+            }
+          >
+            <SelectTrigger
+              className="h-7 w-auto min-w-0 max-w-48 text-xs"
+              aria-label={t("widget.filter.task")}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("widget.filter.allTasks")}</SelectItem>
+              {data.taskOptions.map((option) => (
+                <SelectItem key={option.id} value={option.id}>
+                  {option.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={health}
+            onValueChange={(value): void => {
+              const next = TaskHealthFilterOptions.find(
+                (o) => o.value === value,
+              );
+              if (next) {
+                setHealth(next.value);
+              }
+            }}
+          >
+            <SelectTrigger
+              className="h-7 w-auto min-w-0 max-w-44 text-xs"
+              aria-label={t("widget.filter.state")}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {TaskHealthFilterOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {t(option.label)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </>
+      ) : null}
+    </AnalyticsToolbar>
+  );
+
+  const periodTiles = (
+    <KpiGrid columns={6}>
+      <KpiTile
+        label={t("widget.tile.runs")}
+        value={k.runs.value}
+        previous={comparable(k.runs.previous, k.runs.previous)}
+        locale={locale}
+        sparkline={totalRunsSpark}
+        onClick={interactive ? (): void => openHistory({ taskId }) : undefined}
+      />
+      <KpiTile
+        label={t("widget.tile.failedRuns")}
+        value={k.failedRuns.value}
+        previous={comparable(k.failedRuns.previous, k.failedRuns.previous)}
+        invertDelta
+        tone={k.failedRuns.value > 0 ? "negative" : "default"}
+        locale={locale}
+        sparkline={sparkFor("failed")}
+        onClick={
+          interactive
+            ? (): void => openHistory({ taskId, status: FAILED_STATUS_FILTER })
+            : undefined
+        }
+      />
+      <KpiTile
+        label={t("widget.tile.successRate")}
+        value={k.successRate.value}
+        previous={comparable(k.successRate.previous, k.runs.previous)}
+        format="percent"
+        hint={t("widget.tile.successRateHint")}
+        locale={locale}
+      />
+      <KpiTile
+        label={t("widget.tile.tasksWithFailures")}
+        value={data.tasksWithFailures.value}
+        hint={t("widget.tile.tasksWithFailuresHint", {
+          total: data.tasksWithFailures.total,
+        })}
+        tone={data.tasksWithFailures.value > 0 ? "negative" : "default"}
+        locale={locale}
+        onClick={
+          interactive
+            ? (): void => setHealth(TaskHealthFilter.ATTENTION)
+            : undefined
+        }
+      />
+      <KpiTile
+        label={t("widget.tile.p50Duration")}
+        value={hasCompleted ? k.p50DurationMs.value : null}
+        previous={comparable(k.p50DurationMs.previous, k.runs.previous)}
+        format="duration"
+        hint={
+          hasCompleted
+            ? t("widget.tile.completedOnly")
+            : t("widget.tile.noCompleted")
+        }
+        invertDelta
+        locale={locale}
+      />
+      <KpiTile
+        label={t("widget.tile.p95Duration")}
+        value={hasCompleted ? k.p95DurationMs.value : null}
+        previous={comparable(k.p95DurationMs.previous, k.runs.previous)}
+        format="duration"
+        invertDelta
+        locale={locale}
+      />
+    </KpiGrid>
+  );
+
+  const runsChart = (
+    <TimeSeriesChart
+      title={t("widget.chart.runs")}
+      subtitle={interactive ? t("widget.chart.runsSubtitle") : undefined}
+      buckets={data.runsTrend.buckets}
+      bucket={data.window.bucket}
+      series={runsSeries.map((s) => ({
+        key: s.key,
+        label: seriesLabel[s.key] ?? s.key,
+        values: s.values,
+        color: seriesColor(s.key),
+      }))}
+      variant="stacked-bar"
+      locale={locale}
+      height={200}
+      onBucketClick={
+        interactive
+          ? (key): void =>
+              openHistory({
+                taskId,
+                from: key,
+                to: bucketEnd(key, data.window.bucket),
+              })
+          : undefined
+      }
+    />
+  );
+
+  const successChart = (
+    <TimeSeriesChart
+      title={t("widget.chart.successRate")}
+      subtitle={t("widget.chart.successRateSubtitle")}
+      buckets={data.successTrend.buckets}
+      bucket={data.window.bucket}
+      series={data.successTrend.series.map((s) => ({
+        key: s.key,
+        label: seriesLabel[s.key] ?? s.key,
+        values: s.values,
+        color: seriesColor(s.key),
+        total: k.successRate.value,
+      }))}
+      variant="bar"
+      format="percent"
+      locale={locale}
+      height={160}
+    />
+  );
+
+  const durationSeries = (key: "p50" | "p95"): readonly number[] =>
+    data.durationTrend.series.find((x) => x.key === key)?.values ?? [];
+  const durationChart = (key: "p50" | "p95"): JSX.Element => (
+    <TimeSeriesChart
+      title={
+        key === "p50"
+          ? t("widget.tile.p50Duration")
+          : t("widget.tile.p95Duration")
+      }
+      subtitle={t("widget.chart.durationSplitSubtitle")}
+      buckets={data.durationTrend.buckets}
+      bucket={data.window.bucket}
+      series={[
+        {
+          key,
+          label: seriesLabel[key] ?? key,
+          values: durationSeries(key),
+          color: key === "p50" ? 1 : 4,
+          total: key === "p95" ? k.p95DurationMs.value : k.p50DurationMs.value,
+        },
+      ]}
+      variant="bar"
+      format="duration"
+      locale={locale}
+      height={150}
+    />
+  );
+
+  const nameById = new Map(data.taskOptions.map((o) => [o.id, o.name]));
+  const byTaskChart =
+    data.failuresByTask.series.length > 0 ? (
+      <TimeSeriesChart
+        title={t("widget.chart.byTask")}
+        subtitle={t("widget.chart.byTaskSubtitle")}
+        buckets={data.failuresByTask.buckets}
+        bucket={data.window.bucket}
+        series={data.failuresByTask.series.map((s, index) => ({
+          key: s.key,
+          label: nameById.has(s.key) ? s.key : t("widget.chart.otherTasks"),
+          values: s.values,
+          color: FAILURE_SLOTS[index] ?? "muted",
+        }))}
+        variant="stacked-bar"
+        locale={locale}
+        height={180}
+      />
+    ) : null;
+
+  if (textMode) {
+    return (
+      <Div className="flex flex-col">
+        {toolbar}
+        <TextReport data={data} t={t} locale={locale} now={now} />
+        <Span>{""}</Span>
+        <Span>{t("widget.inPeriod")}</Span>
+        {periodTiles}
+        <Span>{""}</Span>
+        {showDays ? (
+          <>
+            {runsChart}
+            {byTaskChart}
+            {data.summary.total === 1 ? (
+              <TrendText data={data} t={t} locale={locale} />
+            ) : null}
+          </>
+        ) : (
+          <SparkSummary data={data} t={t} locale={locale} />
+        )}
+      </Div>
+    );
+  }
+
+  const s = data.summary;
+  const stateTile = (
+    label: string,
+    value: number,
+    hint: string,
+    tone: "negative" | "warning" | "muted" | "positive" | "default",
+    filter: typeof TaskHealthFilterValue,
+  ): JSX.Element => (
+    <KpiTile
+      label={label}
+      value={value}
+      hint={hint}
+      tone={tone}
+      locale={locale}
+      onClick={interactive ? (): void => setHealth(filter) : undefined}
+    />
+  );
+
+  return (
+    <WidgetShell className="min-w-0 gap-4">
+      <WidgetHeader
+        title={t("widget.title")}
+        backButton={<NavigateButtonWidget field={field.children.backButton} />}
+        actions={
+          interactive ? (
+            <Div className="flex gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={(): void =>
+                  navigate(
+                    async () =>
+                      (await import("../tasks/definition")).default.GET,
+                  )
+                }
+              >
+                <List className="size-4" />
+                {t("widget.viewTasks")}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={(): void => openHistory({})}
+              >
+                <Clock className="size-4" />
+                {t("widget.viewHistory")}
+              </Button>
+            </Div>
+          ) : undefined
+        }
+      />
+
+      {toolbar}
+      {data.watchdog ? (
+        <Div
+          role="alert"
+          className="flex flex-wrap items-center gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm"
+        >
+          {healthPill(data.watchdog.state, t(data.watchdog.state))}
+          <Span className="font-mono text-xs">{data.watchdog.id}</Span>
+          <Span>
+            {t("widget.watchdogBanner", {
+              state: t(data.watchdog.state).toLowerCase(),
+            })}
+          </Span>
+        </Div>
+      ) : null}
+
+      <Div className="flex min-w-0 flex-col gap-2">
+        <SectionLabel>{t("widget.now")}</SectionLabel>
+        <KpiGrid columns={5}>
+          {stateTile(
+            t("widget.tile.failing"),
+            s.failing,
+            t("widget.tile.failingHint"),
+            s.failing > 0 ? "negative" : "default",
+            TaskHealthFilter.FAILING,
+          )}
+          {stateTile(
+            t("widget.tile.stuck"),
+            s.stuck,
+            s.orphanedRuns > 0
+              ? `${t("widget.tile.stuckHint")} · ${t("widget.tile.stuckDisabled", { count: s.orphanedRuns })}`
+              : t("widget.tile.stuckHint"),
+            s.stuck > 0 ? "negative" : "default",
+            TaskHealthFilter.STUCK,
+          )}
+          {stateTile(
+            t("widget.tile.flaky"),
+            s.flaky,
+            t("widget.tile.flakyHint"),
+            s.flaky > 0 ? "warning" : "default",
+            TaskHealthFilter.FLAKY,
+          )}
+          {stateTile(
+            t("widget.tile.recovering"),
+            s.recovering,
+            t("widget.tile.recoveringHint"),
+            "default",
+            TaskHealthFilter.RECOVERING,
+          )}
+          {stateTile(
+            t("widget.tile.overdue"),
+            s.overdue,
+            t("widget.tile.overdueHint"),
+            s.overdue > 0 ? "warning" : "default",
+            TaskHealthFilter.OVERDUE,
+          )}
+        </KpiGrid>
+        <KpiGrid columns={5}>
+          {stateTile(
+            t("widget.tile.healthy"),
+            s.healthy,
+            t("widget.tile.healthyHint", { total: s.enabled }),
+            "positive",
+            TaskHealthFilter.HEALTHY,
+          )}
+          {stateTile(
+            t("widget.tile.lowData"),
+            s.lowData,
+            t("widget.tile.lowDataHint"),
+            "default",
+            TaskHealthFilter.LOW_DATA,
+          )}
+          {stateTile(
+            t("widget.tile.neverRan"),
+            s.neverRan,
+            t("widget.tile.neverRanHint"),
+            "default",
+            TaskHealthFilter.NEVER_RAN,
+          )}
+          {stateTile(
+            t("widget.tile.disabled"),
+            s.disabled,
+            t("widget.tile.disabledHint"),
+            "muted",
+            TaskHealthFilter.DISABLED,
+          )}
+          <KpiTile
+            label={t("widget.tile.parked")}
+            value={s.parked}
+            hint={
+              s.parkedShown
+                ? t("widget.tile.parkedShownHint")
+                : t("widget.tile.parkedHint")
+            }
+            tone="muted"
+            locale={locale}
+            onClick={
+              interactive
+                ? (): void => setIncludeParked(!includeParked)
+                : undefined
+            }
+          />
+        </KpiGrid>
+        <AttentionPanel
+          data={data}
+          t={t}
+          locale={locale}
+          now={now}
+          onOpen={openHistory}
+        />
+      </Div>
+
+      <Div className="flex min-w-0 flex-col gap-4">
+        <Div className="order-2 flex min-w-0 flex-col gap-2 @3xl:order-1">
+          <Div className="flex flex-wrap items-center justify-between gap-2">
+            <SectionLabel>
+              {`${t("widget.inPeriod")} · ${
+                data.disabledIncluded
+                  ? t("widget.filter.scopeAll")
+                  : t("widget.filter.scopeEnabled")
+              }`}
+            </SectionLabel>
+            {interactive && !taskId ? (
+              <Button
+                type="button"
+                size="sm"
+                variant={includeDisabled ? "secondary" : "ghost"}
+                onClick={(): void => setIncludeDisabled(!includeDisabled)}
+              >
+                {t("widget.filter.includeDisabled")}
+              </Button>
+            ) : null}
+          </Div>
+          {periodTiles}
+          {runsChart}
+          {byTaskChart}
+          <Div className="grid min-w-0 grid-cols-1 gap-3 @3xl:grid-cols-3">
+            {successChart}
+            {durationChart("p50")}
+            {durationChart("p95")}
+          </Div>
+          {taskId ? (
+            <RecentRunsPanel data={data} t={t} locale={locale} now={now} />
+          ) : null}
+        </Div>
+
+        <TaskTable
+          className="order-1 @3xl:order-2"
+          tasks={data.tasks}
+          t={t}
+          locale={locale}
+          now={now}
+          onOpen={
+            interactive ? (id): void => openHistory({ taskId: id }) : undefined
+          }
+        />
+      </Div>
+    </WidgetShell>
   );
 }

@@ -1,0 +1,237 @@
+import { translations as analyticsTranslations } from "next-vibe/unified-ui/analytics/i18n/en";
+
+export const translations = {
+  ...analyticsTranslations,
+  get: {
+    title: "Credit usage",
+    titleShort: "Usage",
+    description:
+      "Credit spend over time: accounts vs guests, free vs pack credits, by model, feature and provider, with provider cost, margin and top spenders.",
+    tags: {
+      usage: "credit usage",
+      margin: "margin",
+    },
+    fields: {
+      actor: {
+        label: "Spender",
+        description: "Accounts, guests (no account), or both",
+      },
+      creditKind: {
+        label: "Credits",
+        description: "Free monthly allowance, pack credits, or both",
+      },
+      model: {
+        label: "Model",
+        description: "Only spend on this model id",
+      },
+      feature: {
+        label: "Feature",
+        description: "Only spend on this feature (chat, Generate Image, ...)",
+      },
+      provider: {
+        label: "Upstream provider",
+        description: "Only spend served by this upstream provider",
+      },
+      includeInternal: {
+        label: "Include admin accounts",
+        description: "Count spend by admin accounts too",
+      },
+    },
+    response: {
+      window: "Period",
+      appliedFilters: "Applied filters",
+      kpis: "Key figures",
+      spendByActor: "Spend by spender",
+      spendByKind: "Spend by credit kind",
+      costVsSpend: "Spend value vs provider cost",
+      byModel: "By model",
+      byFeature: "By feature",
+      byProvider: "By upstream provider",
+      topSpenders: "Top spenders",
+    },
+    errors: {
+      validation: {
+        title: "Invalid filters",
+        description: "Check the period and filters and try again.",
+      },
+      unauthorized: {
+        title: "Sign in required",
+        description: "Sign in as an admin to see credit usage.",
+      },
+      forbidden: {
+        title: "Admins only",
+        description: "Only admins can see credit usage.",
+      },
+      notFound: {
+        title: "Nothing found",
+        description: "No usage data matches this request.",
+      },
+      server: {
+        title: "Report failed",
+        description: "The credit usage report could not be built. Try again.",
+      },
+      unknown: {
+        title: "Unexpected error",
+        description: "Something went wrong while loading the report.",
+      },
+      network: {
+        title: "Connection error",
+        description: "The server could not be reached.",
+      },
+      unsavedChanges: {
+        title: "Unsaved changes",
+        description: "Apply or discard your filter changes first.",
+      },
+      conflict: {
+        title: "Data conflict",
+        description: "The data changed while loading. Refresh the report.",
+      },
+    },
+    success: {
+      title: "Report ready",
+      description: "Credit usage loaded",
+    },
+  },
+  widget: {
+    extra: {
+      nothingRecorded: "Nothing recorded",
+      paidShareHint2:
+        "Purchased packs and subscriptions, of spend with known funding; {{missing}} has origin missing",
+      costedPct: "Costed %",
+      paidShare: "Paid share",
+      paidShareHint:
+        "Spend from purchased packs and subscriptions; total value {{value}}",
+      freeCostHint3:
+        "Provider cost of {{credits}} free credits; cost recorded on {{coverage}} of spend",
+      fundGrants: "Grants",
+      boughtPct: "Purchased %",
+      subPct: "Sub %",
+      grantsPct: "Grants %",
+      unknownPct: "Origin missing %",
+      fundingChart: "Spend by funding",
+      fundingNote:
+        "Free allowance and the pack type each charge drew from. Pack origin missing = the pack was used up and deleted.",
+      fundAllowance: "Free allowance",
+      fundPurchased: "Purchased",
+      fundSubscription: "Subscription",
+      fundBonus: "Bonus grants",
+      fundEarned: "Referral earnings",
+      fundUnknown: "Origin missing",
+      change: "vs prev.",
+      paidPct: "Paid %",
+      topModel: "mostly {{model}}",
+      spendersHint: "by {{count}} spenders",
+      accountTag: "account",
+      freeCostHint2:
+        "Provider cost of free-allowance usage; cost recorded on {{coverage}} of spend",
+      notLoaded: "Report not loaded. Refresh to try again.",
+      freeCost: "Cost of free spend",
+      freeCostHint: "Provider cost of free-allowance usage, where recorded",
+      markup: "Gross profit (costed)",
+      markupPct: "Margin",
+      markupPctHint:
+        "Kept after provider cost, at list value ($0.01/credit), not cash",
+      kindNote2:
+        "Pack credits combine purchases, subscriptions and admin grants; usage does not record which.",
+      modelNotRecorded: "model not recorded",
+      costedSpend: "Spend with recorded cost",
+      costChart: "Spend with recorded cost vs provider cost",
+      marginHint2: "On {{value}} of spend with recorded cost",
+      marginHint:
+        "{{value}} of spend value has cost data; margin is that minus provider cost",
+      guestPct: "Guest %",
+      freePct: "Free %",
+      noCost: "no cost data",
+    },
+    kpi: {
+      creditsSpent: "Credits spent",
+      spendUsd: "Spend value",
+      guestShare: "Guest share",
+      freeShare: "Free share",
+      upstreamCostUsd: "Provider cost",
+      marginUsd: "Gross margin",
+      marginPct: "Margin",
+      activeSpenders: "Active spenders",
+    },
+    hint: {
+      spendUsd: "List value at $0.01 per credit, not cash received",
+      guestShare: "Spent by visitors without an account",
+      freeShare: "Paid from the monthly free allowance",
+      upstreamCostUsd: "Recorded on {{coverage}} of spend",
+      marginUsd: "Value minus provider cost, on rows with cost data",
+      marginPct: "Of spend value with cost data",
+      activeSpenders: "Accounts and guests with any spend",
+    },
+    chart: {
+      actor: "Spend: accounts vs guests",
+      kind: "Spend: free allowance vs pack credits",
+      kindNote: "Pack credits cover purchases, subscriptions and admin grants.",
+      cost: "Spend value vs provider cost",
+      costNote: "Provider cost only exists where the charge recorded it.",
+    },
+    series: {
+      users: "Accounts",
+      guests: "Guests",
+      free: "Free allowance",
+      pack: "Pack credits",
+      spendUsd: "Spend value",
+      upstreamCostUsd: "Provider cost",
+    },
+    breakdown: {
+      model: "Model",
+      feature: "Feature",
+      provider: "Provider",
+      spender: "Spender",
+      byModel: "By model",
+      byFeature: "By feature",
+      byProvider: "By upstream provider",
+      topSpenders: "Top spenders",
+      topSpendersHint: "Click a row to open the account or guest.",
+      drillHint: "Click a row to filter the report.",
+    },
+    column: {
+      credits: "Credits",
+      usd: "Value",
+      costUsd: "Cost",
+      marginPct: "Margin",
+      spenders: "Spenders",
+      guestShare: "Guests",
+      freeShare: "Free",
+      transactions: "Charges",
+    },
+    label: {
+      noModel: "Tools and media",
+      noFeature: "Not recorded",
+      noProvider: "Not recorded",
+      chat: "Chat",
+      guest: "Guest {{id}}",
+      guestTag: "guest",
+      lastActivity: "last spend {{date}}",
+    },
+    filter: {
+      actor: "Spender",
+      creditKind: "Credits",
+      model: "Model",
+      feature: "Feature",
+      provider: "Provider",
+      internal: "Admins included",
+    },
+    empty: "No credit spend in this period.",
+    includeInternal: "Include admins",
+  },
+  enums: {
+    actor: {
+      all: "Everyone",
+      users: "Accounts",
+      guests: "Guests",
+    },
+    creditKind: {
+      all: "All credits",
+      free: "Free",
+      pack: "All packs",
+      purchased: "Purchased",
+      subscription: "Subscription",
+      grants: "Grants",
+    },
+  },
+};

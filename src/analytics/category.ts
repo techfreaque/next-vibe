@@ -3,11 +3,12 @@
  * Covers pipeline graphs, KPI indicators, evaluators, transformers, and data sources.
  */
 
-import { VIBE_SENSE_GRAPHS_ALIAS } from "next-vibe/dataflow/graphs/constants";
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
 import { USER_ME_ALIAS } from "@/user/private/me/constants";
+
+import { BUSINESS_OVERVIEW_ALIAS } from "./business/overview/constants";
 
 export const category: CategoryDefinition = {
   key: "analytics",
@@ -24,11 +25,25 @@ export const category: CategoryDefinition = {
   icon: "bar-chart-2",
   order: 10,
   defaultEntry: {
-    [UserPermissionRole.ADMIN]: VIBE_SENSE_GRAPHS_ALIAS,
+    [UserPermissionRole.ADMIN]: BUSINESS_OVERVIEW_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
     [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
   },
+  catalogOverview: BUSINESS_OVERVIEW_ALIAS,
   subcategories: {
+    Business: {
+      icon: "briefcase",
+      order: -1,
+      label: {
+        "en-US": "Business",
+        "en-GLOBAL": "Business",
+        "de-DE": "Geschäft",
+        "pl-PL": "Biznes",
+        "fr-FR": "Activité",
+        "it-IT": "Attività",
+        "es-ES": "Negocio",
+      },
+    },
     "Vibe Sense": {
       icon: "activity",
       order: 0,

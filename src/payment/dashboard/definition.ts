@@ -23,6 +23,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
+import { EstimateStatus } from "../enum";
 import { scopedTranslation } from "./i18n";
 
 const PaymentDashboardWidget = lazyWidget(() =>
@@ -65,6 +66,41 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "get.response.currency" as const,
         schema: z.string(),
+      }),
+
+      estimates: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.estimates" as const,
+        schema: z.object({
+          sentCount: z.number(),
+          draftCount: z.number(),
+          sentByCurrency: z.array(
+            z.object({ currency: z.string(), total: z.number() }),
+          ),
+          recent: z.array(
+            z.object({
+              id: z.string(),
+              estimateNumber: z.string(),
+              status: z.enum(EstimateStatus),
+              total: z.number(),
+              currency: z.string(),
+              validUntil: dateSchema.nullable(),
+            }),
+          ),
+        }),
+      }),
+
+      byCurrency: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.byCurrency" as const,
+        schema: z.array(
+          z.object({
+            currency: z.string(),
+            open: z.number(),
+            overdue: z.number(),
+            unpaid: z.number(),
+          }),
+        ),
       }),
 
       openInvoices: objectField(scopedTranslation, {
@@ -251,6 +287,15 @@ const { GET } = createEndpoint({
         unpaidBills: { count: 2, total: 800 },
         draftInvoices: { count: 5 },
         currency: "EUR",
+        byCurrency: [
+          { currency: "EUR", open: 4500, overdue: 1200, unpaid: 800 },
+        ],
+        estimates: {
+          sentCount: 0,
+          draftCount: 0,
+          sentByCurrency: [],
+          recent: [],
+        },
         recentInvoices: [],
       },
     },

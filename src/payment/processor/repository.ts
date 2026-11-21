@@ -1,6 +1,16 @@
 import "server-only";
 
-import { and, count, desc, eq, ilike, or, sql } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  ilike,
+  ne,
+  or,
+  type SQL,
+  sql,
+} from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -13,14 +23,85 @@ import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { paymentTransactions, paymentWebhooks } from "../db";
-import { PaymentProvider, type PaymentProviderValue } from "../enum";
+import {
+  CheckoutMode,
+  PaymentProvider,
+  type PaymentProviderValue,
+  PaymentStatus,
+} from "../enum";
 import { canStartStripeRefund } from "../refund/eligibility";
 import type {
   PaymentProcessorRequest,
   PaymentProcessorResponse,
 } from "./definition";
-import { ProcessorView, WebhookProcessing } from "./enum";
+import {
+  ProcessorKind,
+  type ProcessorKindValue,
+  ProcessorView,
+  RefundBlock,
+  type RefundBlockValue,
+  WebhookProcessing,
+} from "./enum";
 import type { PaymentProcessorT } from "./i18n";
+
+const isRenewal = sql<boolean>`coalesce(${paymentTransactions.metadata}->>'type' = 'subscription_renewal', false)`;
+
+/** SQL condition for one payment kind (pack, first subscription, renewal). */
+function kindCondition(kind: typeof ProcessorKindValue): SQL | undefined {
+  switch (kind) {
+    case ProcessorKind.PACK:
+      return eq(paymentTransactions.mode, CheckoutMode.PAYMENT);
+    case ProcessorKind.RENEWAL:
+      return sql`${isRenewal}`;
+    case ProcessorKind.NEW_SUBSCRIPTION:
+      return and(
+        eq(paymentTransactions.mode, CheckoutMode.SUBSCRIPTION),
+        sql`not ${isRenewal}`,
+      );
+    default:
+      return undefined;
+  }
+}
+
+function rowKind(
+  mode: string,
+  renewal: boolean,
+): typeof ProcessorKindValue | null {
+  if (renewal) {
+    return ProcessorKind.RENEWAL;
+  }
+  if (mode === CheckoutMode.PAYMENT) {
+    return ProcessorKind.PACK;
+  }
+  if (mode === CheckoutMode.SUBSCRIPTION) {
+    return ProcessorKind.NEW_SUBSCRIPTION;
+  }
+  return null;
+}
+
+/** Reason a settled payment cannot open refund review (null = eligible or not settled). */
+function refundBlockFor(row: {
+  provider: string;
+  status: string;
+  mode: string;
+  amount: string | number;
+  providerPaymentIntentId: string | null;
+  providerSessionId: string | null;
+}): typeof RefundBlockValue | null {
+  if (row.status !== PaymentStatus.SUCCEEDED || canStartStripeRefund(row)) {
+    return null;
+  }
+  if (row.provider !== PaymentProvider.STRIPE) {
+    return RefundBlock.NOT_STRIPE;
+  }
+  if (row.mode === CheckoutMode.SETUP) {
+    return RefundBlock.SETUP;
+  }
+  if (!(Number(row.amount) > 0)) {
+    return RefundBlock.ZERO_AMOUNT;
+  }
+  return RefundBlock.NO_REFERENCE;
+}
 
 export class PaymentProcessorRepository {
   static async list(
@@ -38,6 +119,12 @@ export class PaymentProcessorRepository {
         }
         return success(await this.listWebhooks(input));
       }
+      if (input.from && input.to && input.from > input.to) {
+        return fail({
+          message: t("errors.dateRange"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
       return success(await this.listTransactions(input));
     } catch (error) {
       logger.error("Failed to load processor records", parseError(error));
@@ -51,14 +138,31 @@ export class PaymentProcessorRepository {
   private static async listTransactions(
     input: PaymentProcessorRequest,
   ): Promise<PaymentProcessorResponse> {
-    const { userId, transactionId, status, provider, query, page, limit } =
-      input;
+    const {
+      userId,
+      transactionId,
+      status,
+      provider,
+      kind,
+      currency,
+      from,
+      to,
+      query,
+      page,
+      limit,
+    } = input;
     const match = `%${(query ?? "").replaceAll(/[\\%_]/g, (char) => `\\${char}`)}%`;
     const where = and(
       userId ? eq(paymentTransactions.userId, userId) : undefined,
       transactionId ? eq(paymentTransactions.id, transactionId) : undefined,
       status ? eq(paymentTransactions.status, status) : undefined,
       provider ? eq(paymentTransactions.provider, provider) : undefined,
+      kind ? kindCondition(kind) : undefined,
+      currency ? eq(paymentTransactions.currency, currency) : undefined,
+      from ? sql`${paymentTransactions.createdAt} >= ${from}::date` : undefined,
+      to
+        ? sql`${paymentTransactions.createdAt} < (${to}::date + interval '1 day')`
+        : undefined,
       query
         ? or(
             ilike(users.email, match),
@@ -67,12 +171,26 @@ export class PaymentProcessorRepository {
           )
         : undefined,
     );
-    const [counts, rows] = await Promise.all([
+    const [counts, totals, rows] = await Promise.all([
       db
         .select({ total: count() })
         .from(paymentTransactions)
         .innerJoin(users, eq(paymentTransactions.userId, users.id))
         .where(where),
+      db
+        .select({
+          currency: paymentTransactions.currency,
+          collected: sql<string>`coalesce(sum(${paymentTransactions.amount}) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED}), 0)`,
+          succeeded: sql<number>`count(*) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED})::int`,
+          failed: sql<number>`count(*) filter (where ${paymentTransactions.status} = ${PaymentStatus.FAILED})::int`,
+          refunded: sql<number>`count(*) filter (where ${paymentTransactions.status} = ${PaymentStatus.REFUNDED})::int`,
+          refundedAmount: sql<string>`coalesce(sum(${paymentTransactions.amount}) filter (where ${paymentTransactions.status} = ${PaymentStatus.REFUNDED}), 0)`,
+        })
+        .from(paymentTransactions)
+        .innerJoin(users, eq(paymentTransactions.userId, users.id))
+        .where(and(where, ne(paymentTransactions.mode, CheckoutMode.SETUP)))
+        .groupBy(paymentTransactions.currency)
+        .orderBy(paymentTransactions.currency),
       db
         .select({
           id: paymentTransactions.id,
@@ -83,7 +201,7 @@ export class PaymentProcessorRepository {
           status: paymentTransactions.status,
           provider: paymentTransactions.provider,
           mode: paymentTransactions.mode,
-          renewal: sql<boolean>`coalesce(${paymentTransactions.metadata}->>'type' = 'subscription_renewal', false)`,
+          renewal: isRenewal,
           providerInvoiceId: paymentTransactions.providerInvoiceId,
           providerPaymentIntentId: paymentTransactions.providerPaymentIntentId,
           providerSessionId: paymentTransactions.providerSessionId,
@@ -114,12 +232,24 @@ export class PaymentProcessorRepository {
         provider: row.provider,
         mode: row.mode,
         renewal: row.renewal,
+        kind: rowKind(row.mode, row.renewal),
         providerInvoiceId: row.providerInvoiceId,
         refundEligible: canStartStripeRefund(row),
+        refundBlock: refundBlockFor(row),
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
       })),
       webhooks: [],
+      totals: totals.map((row) => ({
+        currency: row.currency,
+        collected: Number(row.collected),
+        succeeded: Number(row.succeeded),
+        failed: Number(row.failed),
+        refunded: Number(row.refunded),
+        refundedAmount: Number(row.refundedAmount),
+        // Gross = everything that was charged (later refunds included)
+        gross: Number(row.collected) + Number(row.refundedAmount),
+      })),
       currentPage: page,
       pageCount: Math.ceil(total / limit),
       total,
@@ -179,6 +309,7 @@ export class PaymentProcessorRepository {
       resultView: ProcessorView.WEBHOOKS,
       transactions: [],
       webhooks,
+      totals: [],
       currentPage: page,
       pageCount: Math.ceil(total / limit),
       total,

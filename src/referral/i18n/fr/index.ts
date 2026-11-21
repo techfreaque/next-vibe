@@ -170,6 +170,9 @@ export const translations: typeof enTranslations = {
       description: "Vos statistiques de parrainage ont été récupérées",
     },
     widget: {
+      adminNotice:
+        "Ce sont vos chiffres de parrainage personnels. Le programme complet se trouve dans la vue d'ensemble du parrainage.",
+      openOverview: "Ouvrir la vue d'ensemble",
       emptyMessage:
         "Aucune activité pour l'instant. Partagez votre lien de parrainage pour commencer à gagner.",
     },
@@ -339,6 +342,11 @@ export const translations: typeof enTranslations = {
           label: "Filtre de statut",
           description: "Filtrer par statut de versement",
         },
+        currency: {
+          label: "Mode de versement",
+          description: "Filtrer par mode de versement",
+          all: "Tous les modes",
+        },
         requestId: {
           label: "ID de la demande",
           description: "Identifiant de la demande de versement",
@@ -392,6 +400,32 @@ export const translations: typeof enTranslations = {
         reject: "Refuser",
         complete: "Finaliser",
         credits: "crédits",
+        partnerContext:
+          "Gagné {{confirmed}} confirmés, {{pending}} en attente · versé {{paid}}",
+        creditsLine: "{{credits}} crédits gagnés",
+        freeLine: "Libre après demandes ouvertes : {{free}}",
+        overBalanceSingle:
+          "Cette demande est de {{amount}}, mais seulement {{available}} sont confirmés et non versés. Ne l'approuvez pas.",
+        partnerCodes: "Codes : {{codes}} · filleuls : {{referred}}",
+        partnerNoCodes:
+          "Aucun code propre · {{referred}} utilisateurs parrainés",
+        overBalance:
+          "{{count}} demandes ouvertes pour {{open}}, mais seulement {{available}} confirmés et non versés. Ne les approuvez pas toutes.",
+        possibleDuplicate:
+          "Doublon possible : {{count}} autre(s) demande(s) ouverte(s) avec le même montant et le même portefeuille.",
+        headline: "{{value}} en {{currency}}",
+        overBalanceShort:
+          "Au-delà du solde confirmé (voir la première demande de ce partenaire).",
+        approveOverBalance: "Approuver quand même",
+        nextStep: {
+          failed:
+            "Le virement a échoué et aucun crédit n'a été déduit. Le partenaire peut soumettre une nouvelle demande.",
+          processing:
+            "Virement en cours. Il aboutit ou échoue seul, rien à faire.",
+          credits:
+            "Les versements en crédits sont convertis automatiquement. Rien à faire.",
+        },
+        codeReport: "Rapport du code",
       },
     },
   },
@@ -429,7 +463,8 @@ export const translations: typeof enTranslations = {
       totalEarned: "Total gagné",
       available: "Disponible",
       locked: "Bloqué",
-      credits: "crédits",
+      credits:
+        "Les versements en crédits sont convertis à la demande, une demande en attente est donc bloquée. Rejetez-la pour libérer les gains ; le partenaire peut redemander.",
       readyForPayout: "prêts pour un versement",
       moreToUnlock: "restants avant déblocage",
       pendingConfirmation: "en attente de confirmation",

@@ -110,6 +110,7 @@ export function AdminCatalog({
   search,
   layoutControls,
   recordSearchTargets,
+  overview,
   loading,
   error,
   currentPage,
@@ -134,6 +135,8 @@ export function AdminCatalog({
   recordSearchTargets: NonNullable<
     HelpGetResponseOutput["recordSearchTargets"]
   >;
+  /** Business overview report shown first at the catalog root. */
+  overview?: ReactNode;
   loading: boolean;
   error?: string;
   currentPage: number;
@@ -170,8 +173,21 @@ export function AdminCatalog({
     groups.set(group, items);
   }
 
+  const showOverview = !!overview && !activeCategory && !isSearching;
+
   return (
     <Div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-8 pt-6 sm:px-8">
+      {showOverview && (
+        <Div className="flex flex-col gap-3">
+          <Div className="flex flex-wrap items-center justify-between gap-3">
+            <H1 className="min-w-0 break-words text-2xl font-semibold sm:text-3xl">
+              {t("catalog.overview")}
+            </H1>
+            {layoutControls}
+          </Div>
+          {overview}
+        </Div>
+      )}
       <Div className="flex flex-col gap-3">
         {activeLabel && (
           <Button
@@ -185,12 +201,18 @@ export function AdminCatalog({
             {t("catalog.title")}
           </Button>
         )}
-        <Div className="flex flex-wrap items-center justify-between gap-3">
-          <H1 className="min-w-0 break-words text-2xl font-semibold sm:text-3xl">
-            {activeLabel ?? t("catalog.title")}
-          </H1>
-          {layoutControls}
-        </Div>
+        {showOverview ? (
+          <H2 className="min-w-0 break-words pt-2 text-lg font-semibold">
+            {t("catalog.allTools")}
+          </H2>
+        ) : (
+          <Div className="flex flex-wrap items-center justify-between gap-3">
+            <H1 className="min-w-0 break-words text-2xl font-semibold sm:text-3xl">
+              {activeLabel ?? t("catalog.title")}
+            </H1>
+            {layoutControls}
+          </Div>
+        )}
         {search}
       </Div>
       {!activeCategory && !isSearching && recordSearchTargets.length > 0 && (

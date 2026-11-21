@@ -4,13 +4,15 @@ import { UserRole } from "next-vibe/identity/roles/enum";
 import { Platform } from "next-vibe/platforms/platforms";
 import { describe, expect, it } from "vitest";
 
+import { SubscriptionStatusAdminFilter } from "@/subscription/admin/enum";
 import subscriptionDefinitions from "@/subscription/admin/list/definition";
+import { SubscriptionPlan } from "@/subscription/enum";
 
 import { CheckoutMode, PaymentProvider, PaymentStatus } from "../enum";
 import refundDefinitions from "../refund/definition";
 import { canStartStripeRefund } from "../refund/eligibility";
 import definitions from "./definition";
-import { ProcessorView, WebhookProcessing } from "./enum";
+import { ProcessorKind, ProcessorView, WebhookProcessing } from "./enum";
 
 const customer: JwtPrivatePayloadType = {
   isPublic: false,
@@ -117,5 +119,49 @@ describe("admin payment diagnostics", () => {
       refundEligible: true,
     });
     expect(partial?.amount).toBe(7.5);
+  });
+
+  it("accepts the revenue report drill fields and rejects malformed days", () => {
+    const drill = definitions.GET.requestSchema.safeParse({
+      status: PaymentStatus.SUCCEEDED,
+      kind: ProcessorKind.RENEWAL,
+      currency: "EUR",
+      from: "2026-11-01",
+      to: "2026-11-21",
+    });
+    expect(drill.data).toMatchObject({
+      kind: ProcessorKind.RENEWAL,
+      currency: "EUR",
+      from: "2026-11-01",
+      to: "2026-11-21",
+      page: 1,
+    });
+    expect(definitions.GET.requestSchema.safeParse({ from: "2026-11" }).success).toBe(false);
+    expect(definitions.GET.requestSchema.safeParse({ currency: "GBP" }).success).toBe(false);
+    expect(definitions.GET.requestSchema.safeParse({ kind: "pack" }).success).toBe(false);
+    for (const response of Object.values(definitions.GET.examples.responses ?? {})) {
+      expect(definitions.GET.responseSchema.safeParse(response).success).toBe(true);
+    }
+  });
+
+  it("prefilters subscriptions by status and plan from a drill", () => {
+    const input = subscriptionDefinitions.GET.requestSchema.safeParse({
+      searchFilters: {
+        status: [SubscriptionStatusAdminFilter.ACTIVE],
+        plan: SubscriptionPlan.PRO,
+      },
+    });
+    expect(input.data?.searchFilters).toMatchObject({
+      status: [SubscriptionStatusAdminFilter.ACTIVE],
+      plan: SubscriptionPlan.PRO,
+    });
+    expect(
+      subscriptionDefinitions.GET.requestSchema.safeParse({
+        searchFilters: { plan: "gold" },
+      }).success,
+    ).toBe(false);
+    for (const response of Object.values(subscriptionDefinitions.GET.examples.responses ?? {})) {
+      expect(subscriptionDefinitions.GET.responseSchema.safeParse(response).success).toBe(true);
+    }
   });
 });

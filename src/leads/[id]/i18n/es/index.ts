@@ -3,6 +3,23 @@ import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  traffic: {
+    burstNetwork: "Red en pico: {{count}} prospectos en 30 días",
+    sharedAgent: "User agent compartido: {{count}} prospectos",
+    title: "Tráfico y red",
+    subtitle:
+      "Tipo de agente, primer contacto y cuántos prospectos comparten esta red o este agente.",
+    agent: "Agente",
+    firstTouch: "Primer contacto",
+    referrer: "Referente",
+    landingPath: "Página de entrada",
+    refCode: "Código de referido",
+    freeCredits: "Créditos gratis consumidos",
+    network: "Red",
+    sameAgent: "Mismo user agent",
+    agentLeadsIn30d: "{{count}} prospectos en 30 días",
+    openLeads: "Abrir prospectos",
+  },
   category: "Contactos",
   tags: {
     leads: "Contactos",

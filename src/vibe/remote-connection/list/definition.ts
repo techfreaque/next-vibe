@@ -20,9 +20,111 @@ import {
   requestField,
   responseField,
 } from "../../unified-ui/_shared/utils-i18n";
-import { ConnectionHealthSchema, TransportModeSchema } from "../db";
+import { analyticsWindowFields } from "../../unified-ui/analytics/fields";
+import {
+  analyticsWindowSchema,
+  breakdownSchema,
+  kpiSchema,
+  timeSeriesSchema,
+} from "../../unified-ui/analytics/schema";
+import {
+  ConnectionHealthSchema,
+  RemoteConnectionAuditActionSchema,
+  SyncScopeSchema,
+  TransportModeSchema,
+} from "../db";
+import { CONNECTION_ISSUES, LOOP_LOCATIONS } from "../health-types";
 import { REMOTE_CONNECTIONS_ALIAS } from "./constants";
+import { FleetStatusFilter, FleetStatusFilterOptions } from "./enum";
 import { scopedTranslation } from "./i18n";
+
+/**
+ * Admin fleet health report: every peer connection on this instance (all
+ * owners), stored state only. Null for non-admins.
+ */
+const fleetSchema = z
+  .object({
+    window: analyticsWindowSchema,
+    localCapabilitiesVersion: z.string(),
+    /** This instance's own label (names "us" in mismatch messages). */
+    selfInstanceId: z.string(),
+    counts: z.object({
+      total: z.number(),
+      active: z.number(),
+      healthy: z.number(),
+      warning: z.number(),
+      critical: z.number(),
+      disconnected: z.number(),
+      unhealthy: z.number(),
+    }),
+    rows: z.array(
+      z.object({
+        id: z.string(),
+        instanceId: z.string(),
+        ownerUserId: z.string(),
+        ownerEmail: z.string(),
+        ownerName: z.string(),
+        ownerIsAdmin: z.boolean(),
+        isMine: z.boolean(),
+        remoteUrl: z.string(),
+        status: ConnectionHealthSchema,
+        issues: z.array(z.enum(CONNECTION_ISSUES)),
+        isActive: z.boolean(),
+        isReverseEntry: z.boolean(),
+        hasToken: z.boolean(),
+        transportMode: TransportModeSchema,
+        remoteTransportMode: TransportModeSchema,
+        lastTransportUsed: TransportModeSchema.nullable(),
+        lastTransportUsedAt: z.string().nullable(),
+        wsConnectedAt: z.string().nullable(),
+        lastSyncedAt: z.string().nullable(),
+        lastContactAt: z.string().nullable(),
+        /** Latest "disconnected" audit event (serving side) for this row. */
+        lastDisconnectAt: z.string().nullable(),
+        capabilitiesCount: z.number(),
+        capabilitiesVersion: z.string().nullable(),
+        sentCapabilitiesVersion: z.string().nullable(),
+        isInferenceProvider: z.boolean(),
+        forceSystemProvider: z.boolean(),
+        syncScope: SyncScopeSchema,
+        loopLocation: z.enum(LOOP_LOCATIONS),
+        createdAt: z.string(),
+        /** The other side's row when both live in this DB (else null). */
+        pairedPeer: z
+          .object({
+            instanceId: z.string(),
+            transportMode: TransportModeSchema,
+            remoteTransportMode: TransportModeSchema,
+          })
+          .nullable(),
+        /** Latest denied / rate-limited audit event for this owner + instance. */
+        lastDenial: z
+          .object({
+            action: RemoteConnectionAuditActionSchema,
+            reason: z.string().nullable(),
+            createdAt: z.string(),
+          })
+          .nullable(),
+      }),
+    ),
+    audit: z.object({
+      events: kpiSchema,
+      failures: kpiSchema,
+      trend: timeSeriesSchema,
+      byReason: breakdownSchema,
+      recent: z.array(
+        z.object({
+          id: z.string(),
+          createdAt: z.string(),
+          action: RemoteConnectionAuditActionSchema,
+          reason: z.string().nullable(),
+          instanceId: z.string().nullable(),
+          ownerEmail: z.string(),
+        }),
+      ),
+    }),
+  })
+  .nullable();
 
 const RemoteConnectionsListContainer = lazyWidget(() =>
   import("./widget").then((m) => ({
@@ -47,6 +149,13 @@ export const { GET } = createEndpoint({
   tags: ["tags.remoteConnection" as const],
   aliases: [REMOTE_CONNECTIONS_ALIAS] as const,
 
+  options: {
+    formOptions: {
+      autoSubmit: true,
+      debounceMs: 0,
+    },
+  },
+
   fields: customWidgetObject({
     render: RemoteConnectionsListContainer,
     usage: { request: "data", response: true } as const,
@@ -58,6 +167,29 @@ export const { GET } = createEndpoint({
         description: "get.fields.activeOnly.description",
         hidden: true,
         schema: z.boolean().optional(),
+      }),
+      ...analyticsWindowFields,
+      // Existing callers may omit the analytics fields and use their defaults.
+      range: {
+        ...analyticsWindowFields.range,
+        schema: analyticsWindowFields.range.schema.optional(),
+      },
+      granularity: {
+        ...analyticsWindowFields.granularity,
+        schema: analyticsWindowFields.granularity.schema.optional(),
+      },
+      fleetStatus: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.fields.fleetStatus.label",
+        description: "get.fields.fleetStatus.description",
+        options: FleetStatusFilterOptions,
+        hidden: true,
+        schema: z.enum(FleetStatusFilter).optional(),
+      }),
+      fleet: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: fleetSchema,
       }),
       connections: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -154,6 +286,92 @@ export const { GET } = createEndpoint({
     requests: { default: {} },
     responses: {
       default: {
+        fleet: {
+          window: {
+            from: "2026-10-22",
+            to: "2026-11-21",
+            previousFrom: "2026-09-22",
+            previousTo: "2026-10-22",
+            bucket: "day",
+          },
+          localCapabilitiesVersion: "7f6bd2bbbcdb",
+          selfInstanceId: "thea",
+          counts: {
+            total: 2,
+            active: 1,
+            healthy: 1,
+            warning: 0,
+            critical: 0,
+            disconnected: 1,
+            unhealthy: 0,
+          },
+          rows: [
+            {
+              id: "5f0c7c1e-0000-4000-8000-000000000001",
+              instanceId: "hermes",
+              ownerUserId: "5f0c7c1e-0000-4000-8000-0000000000aa",
+              ownerEmail: "owner@example.com",
+              ownerName: "owner",
+              ownerIsAdmin: false,
+              isMine: false,
+              remoteUrl: "https://hermes.example.invalid",
+              status: "healthy",
+              issues: [],
+              isActive: true,
+              isReverseEntry: true,
+              hasToken: true,
+              transportMode: "reverse-ws",
+              remoteTransportMode: "direct-http",
+              lastTransportUsed: "reverse-ws",
+              lastTransportUsedAt: "2026-11-21T11:58:00.000Z",
+              wsConnectedAt: null,
+              lastSyncedAt: "2026-11-21T11:50:00.000Z",
+              lastContactAt: "2026-11-21T11:58:00.000Z",
+              lastDisconnectAt: null,
+              capabilitiesCount: 140,
+              capabilitiesVersion: "3.3.3",
+              sentCapabilitiesVersion: null,
+              isInferenceProvider: false,
+              forceSystemProvider: false,
+              syncScope: {
+                memories: true,
+                documents: true,
+                skills: true,
+                favorites: true,
+                threads: false,
+              },
+              loopLocation: "target",
+              createdAt: "2026-11-01T09:00:00.000Z",
+              pairedPeer: null,
+              lastDenial: null,
+            },
+          ],
+          audit: {
+            events: { value: 4, previous: 2 },
+            failures: { value: 1, previous: 0 },
+            trend: {
+              buckets: ["2026-11-20", "2026-11-21"],
+              series: [
+                { key: "registered", values: [1, 2] },
+                { key: "denied", values: [0, 1] },
+              ],
+            },
+            byReason: [
+              { key: "registered", metrics: { events: 3 } },
+              { key: "denied:sync:notPaid", metrics: { events: 1 } },
+            ],
+            recent: [
+              {
+                id: "5f0c7c1e-0000-4000-8000-0000000000b1",
+                createdAt: "2026-11-21T10:00:00.000Z",
+                action: "denied",
+                reason: "sync:notPaid",
+                instanceId: "laptop",
+                ownerEmail: "owner@example.com",
+              },
+            ],
+          },
+        },
         connections: [
           {
             instanceId: "hermes",
@@ -177,6 +395,7 @@ export const { GET } = createEndpoint({
         access: { canConnect: true, maxConnections: 3 },
       },
       disconnected: {
+        fleet: null,
         connections: [
           {
             instanceId: "audit-preview-peer",
@@ -218,6 +437,7 @@ export const { GET } = createEndpoint({
   },
 });
 
+export type RemoteConnectionsListRequestOutput = typeof GET.types.RequestOutput;
 export type RemoteConnectionsListResponseOutput =
   typeof GET.types.ResponseOutput;
 export type RemoteConnection =

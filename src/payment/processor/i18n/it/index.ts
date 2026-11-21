@@ -1,14 +1,20 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Diagnostica del processore",
-  short: "Processori",
+  title: "Transazioni di pagamento",
+  short: "Transazioni",
   description:
     "Verificare le transazioni di checkout e rinnovo, i pagamenti falliti e l'elaborazione webhook registrata.",
   search: {
+    kind: "Pagato per",
+    currency: "Valuta",
+    from: "Dal",
+    to: "Al",
+    dayFormat:
+      "Giorno di calendario in UTC (AAAA-MM-GG). L'intervallo include entrambi i giorni.",
     view: "Vista",
-    userId: "Cliente ID",
-    transactionId: "Transazione ID",
+    userId: "ID cliente",
+    transactionId: "ID transazione",
     status: "Stato di pagamento",
     provider: "Fornitore di pagamento",
     processing: "Trattamento Webhook",
@@ -17,9 +23,36 @@ export const translations: typeof enTranslations = {
     limit: "Per pagina",
   },
   widget: {
+    invoiceRef: "Rif. fattura",
+    refundBlocked: "Rimborso non disponibile qui: {{reason}}",
+    netLine: "Rimborsato {{refunded}} · Netto {{net}}",
+    refundRule:
+      "I pagamenti Stripe saldati con riferimento aprono la verifica del rimborso. Le altre righe pagate mostrano un pulsante disattivato con il motivo.",
+    showFilters: "Mostra filtri",
+    hideFiltersPhone: "Nascondi filtri",
+    search: "Cerca",
+    matchingStatus: "Solo {{status}}",
+    details: "Dettagli",
+    hideDetails: "Nascondi dettagli",
+    notRecorded: "Non registrato",
+    refundYes: "Sì, verifica possibile",
+    refundNo: "No",
+    retry: "Riprova",
+    filters: "Filtri",
+    hideFilters: "Nascondi filtri",
+    all: "Tutti",
+    activeFilters: "Filtrato per",
+    removeFilter: "Rimuovi filtro",
+    matching: "Transazioni trovate",
+    matchingHint: "Tutti gli stati, nessun filtro",
+    collected: "Incassato {{currency}}, lordo",
+    collectedHint:
+      "{{succeeded}} pagate · {{failed}} fallite · {{refunded}} rimborsate",
+    emptyFiltered:
+      "Nessun risultato con questi filtri. Rimuovine uno per allargare.",
+    emptyAll: "Nessun pagamento registrato finora.",
     clearFilters: "Cancella filtri",
-    transactionSearch:
-      "Cerca email del cliente, transazione ID, o riferimento della fattura del fornitore.",
+    transactionSearch: "E-mail, ID transazione o rif. fattura",
     webhookSearch:
       "Tipo di evento di ricerca o riferimento dell'evento del fornitore.",
     processingDetail:
@@ -49,6 +82,17 @@ export const translations: typeof enTranslations = {
     transactionScope: "Transazione {{id}}",
   },
   enums: {
+    refundBlock: {
+      notStripe: "Pagamento cripto: rimborso presso il fornitore",
+      noReference: "Nessun riferimento di pagamento Stripe",
+      zeroAmount: "Nessun addebito",
+      setup: "Registrazione carta, nessun addebito",
+    },
+    kind: {
+      pack: "Pacchetto crediti",
+      newSubscription: "Nuovo abbonamento",
+      renewal: "Rinnovo",
+    },
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NOWPayments",
@@ -83,6 +127,8 @@ export const translations: typeof enTranslations = {
   },
   successDescription: "I registri dei processori corrispondenti sono pronti.",
   errors: {
+    dateRange:
+      "Il giorno di inizio deve precedere o coincidere con quello di fine.",
     unauthorized: "Accedi per visualizzare i record del processore.",
     validation: "Controllare i filtri e il numero di pagina.",
     forbidden: "È richiesto un ruolo di amministratore.",
@@ -94,9 +140,18 @@ export const translations: typeof enTranslations = {
     unsavedChanges: "Salvare o scartare le modifiche.",
   },
   response: {
+    refundBlock: "Rimborso bloccato",
+    refundedAmount: "Importo rimborsato",
+    gross: "Lordo",
+    kind: "Pagato per",
+    totals: "Totali per valuta",
+    collected: "Incassato",
+    succeeded: "Pagate",
+    failed: "Fallite",
+    refunded: "Rimborsate",
     view: "Vista",
-    id: "Transazione ID",
-    userId: "Cliente ID",
+    id: "ID transazione",
+    userId: "ID cliente",
     userEmail: "E-mail cliente",
     amount: "Importo",
     currency: "Valuta",

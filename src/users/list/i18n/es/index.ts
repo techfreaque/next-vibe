@@ -35,8 +35,7 @@ export const translations: typeof enTranslations = {
       },
       lastActive: {
         label: "Último activo",
-        description:
-          "Actividad = gasto de crédito (carpetas de contacto propias o vinculadas) o un nuevo login",
+        description: "Actividad = gasto de créditos, inicio de sesión o pago",
         placeholder: "Cuando quieras",
       },
       signupFrom: {
@@ -66,6 +65,55 @@ export const translations: typeof enTranslations = {
         description:
           "Usuarios que comparten un enlace de referencia y lo que produjo",
         placeholder: "Cualquiera",
+      },
+      audience: {
+        label: "Audiencia",
+        description:
+          "Solo personas excluye admins y direcciones de prueba (example.com, .invalid, fixtures .test)",
+        placeholder: "Todos",
+      },
+      channel: {
+        label: "Canal",
+        description:
+          "Canal del primer contacto, exacto (google, youtube, direct). none = cuentas sin recorrido",
+        placeholder: "youtube",
+      },
+      channelType: {
+        label: "Tipo de canal",
+        description: "Cómo llegó el primer contacto",
+        placeholder: "Cualquier tipo",
+      },
+      refCode: {
+        label: "Código de referido",
+        description:
+          "Código de la primera visita o del referido acreditado, exacto",
+        placeholder: "FRIEND2024",
+      },
+      plan: {
+        label: "Plan",
+        description: "Suscripción activa o en prueba en este plan",
+        placeholder: "Cualquier plan",
+      },
+      activeFrom: {
+        label: "Gastó créditos desde",
+        description: "Consumo de créditos ese día o después",
+      },
+      activeTo: {
+        label: "Gastó créditos hasta",
+        description: "Consumo de créditos ese día o antes",
+      },
+      spentMin: {
+        label: "Gastó al menos",
+        description:
+          "Créditos gastados en total. Con Nunca pagó encuentras a quien quema créditos gratis",
+      },
+      paidFrom: {
+        label: "Pagó desde",
+        description: "Pago exitoso ese día o después",
+      },
+      paidTo: {
+        label: "Pagó hasta",
+        description: "Pago exitoso ese día o antes",
       },
       sortBy: {
         label: "Ordenar por",
@@ -133,6 +181,22 @@ export const translations: typeof enTranslations = {
     },
   },
   enums: {
+    audience: {
+      all: "Todos",
+      humans: "Solo personas",
+    },
+    channelType: {
+      campaign: "Campaña",
+      referral: "Referido",
+      organic: "Orgánico",
+      direct: "Directo",
+    },
+    plan: {
+      subscription: "Starter",
+      plus: "Plus",
+      pro: "Pro",
+      ultra: "Ultra",
+    },
     sortOrder: {
       asc: "Ascendencia",
       desc: "Descendiente",
@@ -188,6 +252,16 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    spent30d: "{{count}} en 30 d",
+    notTracked: "sin seguimiento",
+    oneOff: "Solo créditos",
+    refCode: "ref:{{code}}",
+    chips: {
+      paid: "Pagó",
+      signedUp: "Registro",
+      spentCredits: "Gastó créditos",
+      remove: "Quitar filtro {{label}}",
+    },
     creditsAny: "Cualquiera",
     titleWithCount: "Usuarios ({{count}})",
     loading: "Cargando usuarios...",
@@ -198,13 +272,19 @@ export const translations: typeof enTranslations = {
       select: "Seleccione",
       openUser: "Cuenta abierta para {{email}}",
       selectUser: "Seleccione {{email}}",
-      stats: "Stats",
+      stats: "Informe de registros",
       refresh: "Actualizar",
       newUser: "Nuevo usuario",
       clearFilters: "Filtros claros",
       moreFilters: "Filtros",
     },
     kpi: {
+      activeSpentHint: "{{credits}} créditos gastados en 30 días",
+      matchingHint:
+        "Registros por semana, últimas 12 semanas completas. Semana pasada: {{last}}, esta hasta ahora: {{count}}",
+      verified: "Email verificado",
+      verifiedHint: "{{count}} cuentas",
+      active: "Activos 30 d",
       matching: "Usuarios emparejados",
       paying: "Pagar",
       payingShare: "{{percent}} % de coincidencia",
@@ -214,27 +294,37 @@ export const translations: typeof enTranslations = {
       creditsHint: "Suma de saldos de cartera",
     },
     quick: {
-      paying: "Pagar",
+      freeBurn: "Gasto gratis {{min}}+ ({{count}})",
+      banned: "Bloqueados ({{count}})",
+      humans: "Solo personas",
+      paying: "De pago ({{count}})",
       free: "Nunca pagaste",
       activeWeek: "Activo 7d",
       dormant: "Dormant 30d+",
       never: "Nunca activo",
     },
     columns: {
+      flags: "Señales",
       user: "Usuario",
       joined: "Únete",
       lastActive: "Último activo",
-      credits: "Créditos",
-      spent: "Gasto",
+      credits: "Saldo",
+      spent: "Gastado (total)",
       paid: "Pagado",
       subscription: "Plan",
       source: "Fuente",
       id: "ID",
     },
     compact: {
-      credits: "{{count}} créditos",
+      joined: "registrado el {{date}}",
+      active: "activo {{when}}",
+      neverActive: "nunca activo",
+      paid: "pagó {{amount}}",
+      free: "nunca pagó",
+      spent: "{{count}} créditos gastados",
     },
     flags: {
+      freeBurn: "Gasto gratis",
       admin: "admin",
       banned: "Banned",
       unverified: "Unverified",
@@ -250,6 +340,8 @@ export const translations: typeof enTranslations = {
       showing: "{{start}} - {{end}} de {{total}}",
     },
     text: {
+      subheader:
+        "{{verified}} verificados | {{active}} activos 30 d | {{banned}} bloqueados | registros/semana (12 sem.): {{weekly}}",
       header:
         "Los usuarios de {{total}} vivieron {{paying}} pagando los ingresos por vida de {{paid}}",
       pageHint: "Página {{page}} / {{pages}}. Siguiente: --page= {{next}}",

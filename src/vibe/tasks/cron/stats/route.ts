@@ -11,7 +11,7 @@ import { CronStatsRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ data, user, t, logger }) =>
-      CronStatsRepository.getStats(data, user, t, logger),
+    handler: ({ data, user, locale, t, logger }) =>
+      CronStatsRepository.getStats(data, user, locale, t, logger),
   },
 });

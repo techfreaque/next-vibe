@@ -56,7 +56,7 @@ export const translations = {
     description: "User details loaded",
   },
   status: {
-    active: "Active",
+    active: "Account enabled",
     banned: "Banned",
     inactive: "Inactive",
     verified: "Verified",
@@ -237,6 +237,8 @@ export const translations = {
     viewNamedUser: "Open account for {{name}}",
     viewNamedLead: "Open lead {{name}}",
     leadsTitle: "Linked leads",
+    leadsCapped:
+      "Showing {{shown}} of {{total}} linked leads, direct links first",
     usersTitle: "Users sharing a lead",
     noLeads: "No linked leads",
     noUsers: "No other users share these leads",

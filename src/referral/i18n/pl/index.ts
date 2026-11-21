@@ -168,6 +168,9 @@ export const translations: typeof enTranslations = {
       description: "Pomyślnie pobrano Twoje statystyki poleceń",
     },
     widget: {
+      adminNotice:
+        "To Twoje osobiste wyniki poleceń. Cały program znajdziesz w przeglądzie poleceń.",
+      openOverview: "Otwórz przegląd poleceń",
       emptyMessage:
         "Brak aktywności - udostępnij link polecający, aby zacząć zarabiać",
     },
@@ -333,6 +336,11 @@ export const translations: typeof enTranslations = {
           label: "Filtr statusu",
           description: "Filtruj według statusu wypłaty",
         },
+        currency: {
+          label: "Metoda wypłaty",
+          description: "Filtruj według metody wypłaty",
+          all: "Wszystkie metody",
+        },
         requestId: {
           label: "ID żądania",
           description: "Identyfikator żądania wypłaty",
@@ -386,6 +394,32 @@ export const translations: typeof enTranslations = {
         reject: "Odrzuć",
         complete: "Zakończ",
         credits: "kredytów",
+        partnerContext:
+          "Zarobione {{confirmed}} potwierdzone, {{pending}} w okresie karencji · wypłacone {{paid}}",
+        creditsLine: "{{credits}} zarobionych kredytów",
+        freeLine: "Wolne po otwartych wnioskach: {{free}}",
+        overBalanceSingle:
+          "Ten wniosek to {{amount}}, a potwierdzone i niewypłacone jest tylko {{available}}. Nie zatwierdzaj go.",
+        partnerCodes: "Kody: {{codes}} · poleceni użytkownicy: {{referred}}",
+        partnerNoCodes:
+          "Brak własnego kodu · {{referred}} poleconych użytkowników",
+        overBalance:
+          "{{count}} otwartych wniosków na {{open}}, a potwierdzone i niewypłacone jest tylko {{available}}. Nie zatwierdzaj wszystkich.",
+        possibleDuplicate:
+          "Możliwy duplikat: {{count}} kolejnych otwartych wniosków z tą samą kwotą i portfelem.",
+        headline: "{{value}} na {{currency}}",
+        overBalanceShort:
+          "Ponad potwierdzone saldo (zobacz pierwszy wniosek tego partnera).",
+        approveOverBalance: "Zatwierdź mimo to",
+        nextStep: {
+          failed:
+            "Przelew się nie udał, nie pobrano żadnych kredytów. Partner może złożyć nowy wniosek.",
+          processing:
+            "Przelew w toku. Zakończy się lub nie powiedzie sam, nic nie trzeba robić.",
+          credits:
+            "Wypłaty w kredytach są przeliczane automatycznie. Nic nie trzeba robić.",
+        },
+        codeReport: "Raport kodu",
       },
     },
   },
@@ -422,7 +456,8 @@ export const translations: typeof enTranslations = {
       totalEarned: "Łącznie zarobione",
       available: "Dostępne",
       locked: "Zablokowane",
-      credits: "kredytów",
+      credits:
+        "Wypłaty w kredytach są przeliczane przy złożeniu wniosku, więc oczekujący wniosek utknął. Odrzuć go, by zwolnić środki; partner może złożyć nowy.",
       readyForPayout: "gotowe do wypłaty",
       moreToUnlock: "więcej potrzeba",
       pendingConfirmation: "oczekuje na potwierdzenie",

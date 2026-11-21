@@ -91,6 +91,31 @@ export function getRecordSearchTargets(
   });
 }
 
+/** Alias of the catalog-root overview report the viewer may open (lowest category order wins). */
+export function getCatalogOverview(
+  categories: readonly { order: number; catalogOverview?: string }[],
+  webCatalog: EndpointMeta[],
+): string | undefined {
+  const candidates = categories
+    .filter(
+      (category): category is { order: number; catalogOverview: string } =>
+        typeof category.catalogOverview === "string",
+    )
+    .toSorted((a, b) => a.order - b.order);
+  for (const { catalogOverview } of candidates) {
+    const endpoint = webCatalog.find(
+      (tool) =>
+        tool.method === "GET" &&
+        (tool.toolName === catalogOverview ||
+          tool.aliases.includes(catalogOverview)),
+    );
+    if (endpoint) {
+      return catalogOverview;
+    }
+  }
+  return undefined;
+}
+
 interface CatalogMetadata {
   category?: string;
   subCategory?: string;

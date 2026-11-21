@@ -421,6 +421,9 @@ export const translations: typeof enTranslations = {
     description: "Estadísticas de contacto recuperadas con éxito",
   },
   widget: {
+    openAcquisition: "Informe de captación",
+    openFunnel: "Embudo",
+    openAbuse: "Señales de abuso",
     title: "Principales estadísticas",
     refresh: "Actualizar",
     viewAllLeads: "Ver todos los contactos",

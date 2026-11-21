@@ -1,0 +1,172 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  leadAnalytics: {
+    traffic: {
+      label: "Traffico",
+      description: "Persone, bot o entrambi (riconosciuti dallo user agent)",
+      all: "Tutto il traffico",
+      humans: "Persone",
+      bots: "Bot",
+    },
+    botFamily: {
+      label: "Agente",
+      description:
+        "Famiglia di user agent. Persona è ogni agente che nessuna regola bot riconosce.",
+      human: "Persona",
+      meta: "Crawler Meta",
+      google: "Googlebot",
+      bing: "Bingbot",
+      openai: "Bot OpenAI",
+      anthropic: "Bot Claude",
+      perplexity: "Bot Perplexity",
+      otherAi: "Altri crawler IA",
+      socialPreview: "Anteprime link",
+      automation: "Script e headless",
+      otherBot: "Altri bot",
+      noUa: "Nessuno user agent",
+    },
+    channel: {
+      label: "Tipo di canale",
+      description: "Come è arrivato il lead la prima volta",
+      all: "Tutti i canali",
+      campaign: "Campagna",
+      referral: "Referral",
+      organic: "Organico",
+      direct: "Diretto",
+      unattributed: "Non tracciato",
+    },
+    device: {
+      label: "Dispositivo",
+      description: "Tipo di dispositivo ricavato dallo user agent",
+      desktop: "Desktop",
+      mobile: "Mobile",
+      tablet: "Tablet",
+      bot: "Bot",
+      unknown: "Sconosciuto",
+    },
+    reach: {
+      label: "Fase raggiunta",
+      description: "Solo i lead arrivati almeno fin qui",
+      any: "Qualsiasi",
+      visited: "Visita tracciata",
+      signedUp: "Registrato",
+      emailConfirmed: "Email confermata",
+      firstChat: "Prima chat",
+      paid: "Pagante",
+    },
+    dimension: {
+      label: "Suddividi per",
+      description: "Dimensione della tabella di suddivisione",
+      channelType: "Tipo di canale",
+      channel: "Canale",
+      source: "Sorgente UTM",
+      medium: "Mezzo UTM",
+      campaign: "Campagna UTM",
+      referrerHost: "Referrer",
+      landingPath: "Pagina di atterraggio",
+      refCode: "Codice ref",
+      country: "Paese",
+      device: "Dispositivo",
+      browser: "Browser",
+      os: "Sistema operativo",
+      botFamily: "Agente",
+    },
+    abuse: {
+      groupBy: {
+        label: "Raggruppa per",
+        description:
+          "Raggruppa i lead per prefisso di rete o per user agent esatto",
+        ipPrefix: "Prefisso IP (/24, /48)",
+        uaFingerprint: "User agent",
+      },
+    },
+    filters: {
+      channel: {
+        label: "Canale",
+        description: "Canale del primo contatto, es. direct o ref:CODE",
+      },
+      source: {
+        label: "Sorgente UTM",
+        description: "utm_source del primo contatto, es. google",
+      },
+      medium: {
+        label: "Mezzo UTM",
+        description: "utm_medium del primo contatto, es. cpc",
+      },
+      campaign: {
+        label: "Campagna UTM",
+        description: "utm_campaign del primo contatto",
+      },
+      referrerHost: {
+        label: "Referrer",
+        description: "Host referrer del primo contatto, es. reddit.com",
+      },
+      landingPath: {
+        label: "Pagina di atterraggio",
+        description: "Prima pagina vista, es. /en-US/story",
+      },
+      refCode: {
+        label: "Codice ref",
+        description: "Codice referral del primo contatto o del lead",
+      },
+      country: {
+        label: "Paese",
+        description: "Codice paese, es. DE",
+      },
+      browser: {
+        label: "Browser",
+        description: "Nome del browser, es. Chrome",
+      },
+      os: {
+        label: "Sistema operativo",
+        description: "Sistema operativo, es. Android",
+      },
+      ipPrefix: {
+        label: "Prefisso IP",
+        description: "Rete, es. 203.0.113.0/24 o 2001:db8:1::/48",
+      },
+      uaFingerprint: {
+        label: "ID user agent",
+        description: "Impronta di 10 caratteri dello user agent esatto",
+      },
+      createdFrom: {
+        label: "Creato dal",
+        description: "Lead creati in questo giorno o dopo (YYYY-MM-DD)",
+      },
+      createdTo: {
+        label: "Creato fino al",
+        description: "Lead creati in questo giorno o prima (YYYY-MM-DD)",
+      },
+      reachedFrom: {
+        label: "Fase dal",
+        description: "Fase raggiunta in questo giorno o dopo",
+      },
+      reachedTo: {
+        label: "Fase fino al",
+        description: "Fase raggiunta in questo giorno o prima",
+      },
+    },
+    metrics: {
+      visits: "Visite",
+      visitors: "Visitatori",
+      leads: "Lead",
+      humanLeads: "Lead umani",
+      botLeads: "Lead bot",
+      signups: "Registrazioni",
+      emailConfirmed: "Confermati",
+      firstChats: "Hanno chattato",
+      payers: "Paganti",
+      signupRate: "Tasso di registrazione",
+      payRate: "Tasso di pagamento",
+      botShare: "Quota bot",
+      distinctUas: "Agenti",
+      freeCredits: "Crediti gratuiti",
+      firstSeen: "Prima visita",
+      lastSeen: "Ultima visita",
+    },
+    none: "(nessuno)",
+    noneHint: "Non tracciato: creato via API o senza user agent",
+    overviewFailed: "Impossibile calcolare la panoramica di acquisizione.",
+  },
+};

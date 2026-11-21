@@ -9,7 +9,7 @@ import type {
 } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { PAYMENT_DASHBOARD_ALIAS } from "@/payment/dashboard/constants";
+import { REVENUE_REPORT_ALIAS } from "@/payment/analytics/revenue/constants";
 import type invoiceList from "@/payment/invoice/list/definition";
 import { USER_ME_ALIAS } from "@/user/private/me/constants";
 
@@ -28,7 +28,7 @@ export const category: CategoryDefinition = {
   icon: "credit-card",
   order: 10,
   defaultEntry: {
-    [UserPermissionRole.ADMIN]: PAYMENT_DASHBOARD_ALIAS,
+    [UserPermissionRole.ADMIN]: REVENUE_REPORT_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
     [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
   },

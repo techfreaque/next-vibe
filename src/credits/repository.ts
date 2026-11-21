@@ -67,16 +67,17 @@ import {
 } from "next-vibe/identity/lead/db";
 import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
 import { UserRole } from "next-vibe/identity/roles/enum";
+import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { paymentInvoices } from "@/payment/db";
+import { paymentInvoices, paymentTransactions } from "@/payment/db";
 import type { CreditPackCheckoutSession } from "@/payment/providers/types";
 import { subscriptions } from "@/subscription/db";
 import { SubscriptionStatus } from "@/subscription/enum";
 
 import { FREE_CREDIT_ALLOWANCE } from "../products/constants";
 import { ProductIds, productsRepository } from "../products/repository-client";
-import { payoutRequests } from "../referral/db";
+import { payoutRequests, referralCodes } from "../referral/db";
 import { PayoutStatus } from "../referral/enum";
 import {
   type ChatModelId,
@@ -116,6 +117,7 @@ import {
   CreditPackType,
   type CreditPackTypeValue,
   CreditTransactionType,
+  type CreditTransactionTypeValue,
   FreeCreditsStatus,
   type FreeCreditsStatusValue,
 } from "./enum";
@@ -155,9 +157,24 @@ export interface CreditTransactionOutput {
   amount: number;
   balanceAfter: number;
   type: string;
+  /** Type label without the model/feature suffix (admin ledger column) */
+  label?: string;
+  /** Model or feature the credits were spent on (admin ledger column) */
+  detail?: string | null;
+  /** Raw transaction type (admin ledger colour/filter) */
+  typeKey?: string;
+  /** Processor payment behind a pack-backed entry (admin ledger link) */
+  paymentId?: string | null;
   modelId?: string | null;
   messageId: string | null;
   createdAt: Date;
+}
+
+/** Admin ledger filters (type + inclusive UTC day range). */
+interface LedgerFilter {
+  type?: typeof CreditTransactionTypeValue;
+  from?: string;
+  to?: string;
 }
 
 interface GetOrCreateLeadByIpResult {
@@ -3283,10 +3300,12 @@ export class CreditRepository {
     t: CreditsT,
     locale: CountryLanguage,
     readOnly: boolean,
+    filter?: LedgerFilter,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];
       totalCount: number;
+      totals?: { spent: number; granted: number };
     }>
   > {
     try {
@@ -3337,6 +3356,7 @@ export class CreditRepository {
           limit,
           offset,
           t,
+          filter,
         }),
       );
     } catch (error) {
@@ -3503,6 +3523,7 @@ export class CreditRepository {
     limit,
     offset,
     t,
+    filter,
   }: {
     pool: CreditPool;
     /** Wallets whose rows are this viewer's own (paid wallet, this device) */
@@ -3517,7 +3538,13 @@ export class CreditRepository {
     limit: number;
     offset: number;
     t: CreditsT;
-  }): Promise<{ transactions: CreditTransactionOutput[]; totalCount: number }> {
+    /** Admin ledger filters: when set, synthetic summary rows are left out */
+    filter?: LedgerFilter;
+  }): Promise<{
+    transactions: CreditTransactionOutput[];
+    totalCount: number;
+    totals?: { spent: number; granted: number };
+  }> {
     const now = new Date();
     const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
     const poolLeadWalletIds = pool.leadWallets.map((w) => w.id);
@@ -3618,18 +3645,30 @@ export class CreditRepository {
       null,
     );
 
-    const syntheticCount = (otherSpending > 0 ? 1 : 0) + (overCap > 0 ? 1 : 0);
+    const isFiltered = Boolean(filter?.type || filter?.from || filter?.to);
+    const syntheticCount = isFiltered
+      ? 0
+      : (otherSpending > 0 ? 1 : 0) + (overCap > 0 ? 1 : 0);
     const adjustedOffset =
       offset > 0 ? Math.max(0, offset - syntheticCount) : offset;
     const adjustedLimit = offset === 0 ? limit - syntheticCount : limit;
 
-    const visible = or(
-      ownRow,
-      poolLeadWalletIds.length > 0
-        ? and(
-            inArray(creditTransactions.walletId, poolLeadWalletIds),
-            eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
-          )
+    const visible = and(
+      or(
+        ownRow,
+        poolLeadWalletIds.length > 0
+          ? and(
+              inArray(creditTransactions.walletId, poolLeadWalletIds),
+              eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
+            )
+          : undefined,
+      ),
+      filter?.type ? eq(creditTransactions.type, filter.type) : undefined,
+      filter?.from
+        ? sql`${creditTransactions.createdAt} >= ${filter.from}::date`
+        : undefined,
+      filter?.to
+        ? sql`${creditTransactions.createdAt} < (${filter.to}::date + interval '1 day')`
         : undefined,
     );
 
@@ -3637,6 +3676,14 @@ export class CreditRepository {
       .select({
         transaction: creditTransactions,
         packSource: creditPacks.source,
+        // Processor payment behind a pack-backed entry (matched by its key)
+        paymentId: sql<string | null>`(
+          select ${paymentTransactions.id} from ${paymentTransactions}
+          where ${creditPacks.metadata}->>'sessionId' is not null
+            and (${paymentTransactions.providerSessionId} = ${creditPacks.metadata}->>'sessionId'
+              or ${paymentTransactions.providerInvoiceId} = ${creditPacks.metadata}->>'sessionId')
+          limit 1
+        )`,
       })
       .from(creditTransactions)
       .leftJoin(creditPacks, eq(creditPacks.id, creditTransactions.packId))
@@ -3645,13 +3692,17 @@ export class CreditRepository {
       .limit(adjustedLimit)
       .offset(adjustedOffset);
 
-    const [{ count }] = await db
-      .select({ count: sql<number>`count(*)` })
+    const [{ count, spent, granted }] = await db
+      .select({
+        count: sql<number>`count(*)`,
+        spent: sql<number>`coalesce(sum(-${creditTransactions.amount}) filter (where ${creditTransactions.amount} < 0), 0)`,
+        granted: sql<number>`coalesce(sum(${creditTransactions.amount}) filter (where ${creditTransactions.amount} > 0), 0)`,
+      })
       .from(creditTransactions)
       .where(visible);
 
     const result: CreditTransactionOutput[] = transactions.map(
-      ({ transaction, packSource }) => {
+      ({ transaction, packSource, paymentId }) => {
         const isBonusGrant =
           transaction.type === CreditTransactionType.PURCHASE &&
           (packSource === "bonus" || "bonusGrant" in transaction.metadata);
@@ -3676,6 +3727,13 @@ export class CreditRepository {
             (featureLabel
               ? `${t(transaction.type)} (${featureLabel})`
               : t(transaction.type)),
+          label: grantLabel ?? t(transaction.type),
+          detail: CreditRepository.detailLabel(
+            transaction.modelId,
+            transaction.feature,
+          ),
+          typeKey: transaction.type,
+          paymentId,
           modelId: transaction.modelId,
           messageId: transaction.messageId,
           createdAt: transaction.createdAt,
@@ -3696,7 +3754,7 @@ export class CreditRepository {
               0,
             ),
           }));
-    if (offset === 0 && overCap > 0) {
+    if (!isFiltered && offset === 0 && overCap > 0) {
       result.unshift({
         id: "shared-limit-adjustment",
         amount: -overCap,
@@ -3706,7 +3764,7 @@ export class CreditRepository {
         createdAt: lastGrantAt ?? now,
       });
     }
-    if (offset === 0 && otherSpending > 0) {
+    if (!isFiltered && offset === 0 && otherSpending > 0) {
       result.unshift({
         id: "other-devices-summary",
         amount: -otherSpending,
@@ -3720,7 +3778,27 @@ export class CreditRepository {
     return {
       transactions: result,
       totalCount: Number(count) + syntheticCount,
+      totals: { spent: Number(spent), granted: Number(granted) },
     };
+  }
+
+  /** Admin ledger detail: feature and model when both are recorded. */
+  private static detailLabel(
+    modelId:
+      | ChatModelId
+      | ImageVisionModelId
+      | VideoVisionModelId
+      | AudioVisionModelId
+      | null,
+    featureName: string | null,
+  ): string | null {
+    const modelName = modelId
+      ? (chatModelOptionsIndex[modelId]?.name ?? modelId)
+      : null;
+    if (featureName && modelName) {
+      return `${featureName} · ${modelName}`;
+    }
+    return modelName ?? featureName;
   }
 
   private static getFetaureLabel(
@@ -3739,6 +3817,138 @@ export class CreditRepository {
       : featureName;
   }
 
+  /** Last 10 ledger entries platform-wide, with who they belong to. */
+  private static async recentLedgerActivity(t: CreditsT): Promise<
+    Array<{
+      id: string;
+      createdAt: Date;
+      amount: number;
+      label: string;
+      detail: string | null;
+      email: string | null;
+      userId: string | null;
+      leadId: string | null;
+    }>
+  > {
+    const linkedUser = sql<string | null>`(
+      select ${userLeadLinks.userId} from ${userLeadLinks}
+      where ${userLeadLinks.leadId} = ${creditWallets.leadId} limit 1
+    )`;
+    const rows = await db
+      .select({
+        id: creditTransactions.id,
+        createdAt: creditTransactions.createdAt,
+        amount: creditTransactions.amount,
+        type: creditTransactions.type,
+        modelId: creditTransactions.modelId,
+        feature: creditTransactions.feature,
+        userId: sql<
+          string | null
+        >`coalesce(${creditWallets.userId}, ${linkedUser})`,
+        leadId: creditWallets.leadId,
+        email: sql<string | null>`(
+          select ${users.email} from ${users}
+          where ${users.id} = coalesce(${creditWallets.userId}, ${linkedUser})
+        )`,
+      })
+      .from(creditTransactions)
+      .innerJoin(
+        creditWallets,
+        eq(creditWallets.id, creditTransactions.walletId),
+      )
+      // Guest first-visit grants are noise here: hidden
+      .where(
+        sql`not (${creditTransactions.type} = ${CreditTransactionType.FREE_GRANT} and coalesce(${creditWallets.userId}, ${linkedUser}) is null)`,
+      )
+      .orderBy(desc(creditTransactions.createdAt), desc(creditTransactions.id))
+      .limit(10);
+    return rows.map((row) => ({
+      id: row.id,
+      createdAt: row.createdAt,
+      amount: row.amount,
+      label: t(row.type),
+      detail: CreditRepository.detailLabel(row.modelId, row.feature),
+      email: row.email,
+      userId: row.userId,
+      leadId: row.leadId,
+    }));
+  }
+
+  /**
+   * Admin view: what the pool holds now. Paid = account wallet balance; free =
+   * free credits left on the account wallet and every linked device wallet
+   * (or on the one lead wallet when no account is targeted).
+   */
+  static async adminPoolBalance(
+    userId: string | undefined,
+    leadId: string | undefined,
+  ): Promise<{ paid: number; free: number }> {
+    const where = userId
+      ? or(
+          eq(creditWallets.userId, userId),
+          inArray(
+            creditWallets.leadId,
+            db
+              .select({ id: userLeadLinks.leadId })
+              .from(userLeadLinks)
+              .where(eq(userLeadLinks.userId, userId)),
+          ),
+        )
+      : leadId
+        ? eq(creditWallets.leadId, leadId)
+        : sql`false`;
+    const [row] = await db
+      .select({
+        paid: sql<number>`coalesce(sum(${creditWallets.balance}), 0)`,
+        free: sql<number>`coalesce(sum(${creditWallets.freeCreditsRemaining}), 0)`,
+      })
+      .from(creditWallets)
+      .where(where);
+    return { paid: Number(row?.paid ?? 0), free: Number(row?.free ?? 0) };
+  }
+
+  /**
+   * Admin ledger lookup: an exact account email, a user ID or a lead ID.
+   * Returns null when nothing matches (the caller reports "not found").
+   */
+  private static async resolveLedgerTarget(
+    target: string,
+    logger: EndpointLogger,
+  ): Promise<{ userId: string | null; leadId: string | null } | null> {
+    try {
+      const value = target.trim();
+      const isUuid =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          value,
+        );
+      if (!isUuid) {
+        const [account] = await db
+          .select({ id: users.id })
+          .from(users)
+          .where(sql`lower(${users.email}) = lower(${value})`)
+          .limit(1);
+        return account ? { userId: account.id, leadId: null } : null;
+      }
+      const [account] = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, value))
+        .limit(1);
+      if (account) {
+        return { userId: account.id, leadId: null };
+      }
+      const [lead] = await db
+        .select({ id: leads.id })
+        .from(leads)
+        .where(eq(leads.id, value))
+        .limit(1);
+      return lead ? { userId: null, leadId: lead.id } : null;
+    } catch (error) {
+      logger.error("Failed to resolve ledger target", parseError(error));
+      return null;
+    }
+  }
+
   /**
    * Get transaction history (unified method for route handler)
    * Handles both authenticated users and public users
@@ -3752,16 +3962,65 @@ export class CreditRepository {
   ): Promise<ResponseType<CreditsHistoryGetResponseOutput>> {
     const { page, limit } = data.paginationInfo;
     const offset = (page - 1) * limit;
+    const hasAdminRole =
+      !user.isPublic && (user.roles?.includes(UserRole.ADMIN) ?? false);
+
+    // Admin lookup by email, user ID or lead ID resolves to a target first
+    if (
+      hasAdminRole &&
+      data.target &&
+      !data.targetUserId &&
+      !data.targetLeadId
+    ) {
+      const resolved = await CreditRepository.resolveLedgerTarget(
+        data.target,
+        logger,
+      );
+      if (!resolved) {
+        return fail({
+          message: t("history.get.targetNotFound", { target: data.target }),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      return CreditRepository.getTransactionHistory(
+        {
+          ...data,
+          target: undefined,
+          targetUserId: resolved.userId ?? undefined,
+          targetLeadId: resolved.userId
+            ? undefined
+            : (resolved.leadId ?? undefined),
+        },
+        user,
+        logger,
+        t,
+        locale,
+      );
+    }
+
+    // Admin without a target: platform-wide recent entries to pick from
+    if (
+      hasAdminRole &&
+      !data.target &&
+      !data.targetUserId &&
+      !data.targetLeadId
+    ) {
+      return success({
+        transactions: [],
+        paginationInfo: { totalCount: 0, pageCount: 0 },
+        recent: await CreditRepository.recentLedgerActivity(t),
+      });
+    }
 
     // Only admins may use targetUserId / targetLeadId to view another entity's history
-    const isAdmin = user.isPublic
-      ? false
-      : ((user.roles?.includes(UserRole.ADMIN) &&
-          (data.targetLeadId ?? data.targetUserId)) ??
-        false);
+    const isAdmin =
+      hasAdminRole && Boolean(data.targetLeadId ?? data.targetUserId);
     // When admin views a specific user, use the target lead if provided,
     // otherwise undefined means show all leads in the user's pool
     const effectiveLeadId = isAdmin ? data.targetLeadId : user.leadId;
+    const ledgerFilter: LedgerFilter | undefined = isAdmin
+      ? { type: data.typeFilter, from: data.from, to: data.to }
+      : undefined;
     const effectiveUserId =
       (isAdmin ? data.targetUserId : user.id) || undefined;
 
@@ -3776,6 +4035,7 @@ export class CreditRepository {
             t,
             locale,
             Boolean(isAdmin),
+            ledgerFilter,
           )
         : effectiveLeadId !== undefined
           ? await CreditRepository.getTransactionsByLeadId(
@@ -3786,6 +4046,7 @@ export class CreditRepository {
               t,
               locale,
               Boolean(isAdmin),
+              ledgerFilter,
             )
           : fail({
               message: t("errors.invalidIdentifier"),
@@ -3797,10 +4058,44 @@ export class CreditRepository {
     }
 
     const totalPages = Math.ceil(result.data.totalCount / limit);
+    const resolvedTarget = isAdmin
+      ? {
+          userId: data.targetUserId ?? null,
+          leadId: data.targetLeadId ?? null,
+          email: data.targetUserId
+            ? ((
+                await db
+                  .select({ email: users.email })
+                  .from(users)
+                  .where(eq(users.id, data.targetUserId))
+                  .limit(1)
+              )[0]?.email ?? null)
+            : null,
+          isPartner: data.targetUserId
+            ? (
+                await db
+                  .select({ id: referralCodes.id })
+                  .from(referralCodes)
+                  .where(eq(referralCodes.ownerUserId, data.targetUserId))
+                  .limit(1)
+              ).length > 0
+            : false,
+        }
+      : null;
+
+    const currentBalance = isAdmin
+      ? await CreditRepository.adminPoolBalance(
+          data.targetUserId,
+          data.targetLeadId,
+        )
+      : null;
 
     return {
       success: true,
       data: {
+        resolvedTarget,
+        currentBalance,
+        totals: isAdmin ? (result.data.totals ?? null) : null,
         transactions: result.data.transactions,
         paginationInfo: {
           totalCount: result.data.totalCount,
@@ -3827,10 +4122,12 @@ export class CreditRepository {
     t: CreditsT,
     locale: CountryLanguage,
     readOnly: boolean,
+    filter?: LedgerFilter,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];
       totalCount: number;
+      totals?: { spent: number; granted: number };
     }>
   > {
     try {
@@ -3879,6 +4176,7 @@ export class CreditRepository {
           summaryBalance: 0,
           cap,
           limit,
+          filter,
           offset,
           t,
         }),

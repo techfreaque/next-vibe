@@ -6,6 +6,7 @@ import {
   formatDate,
 } from "next-vibe/core/i18n/core/localization-utils";
 import { Alert } from "next-vibe/ui/components/alert";
+import { KpiGrid, KpiTile } from "next-vibe/ui/components/analytics";
 import { Button } from "next-vibe/ui/components/button";
 import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
 import { Div } from "next-vibe/ui/components/div";
@@ -44,7 +45,12 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/n
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import { type JSX, useMemo } from "react";
 
-import { PayoutStatus, type PayoutStatusValue } from "../../enum";
+import {
+  PayoutCurrency,
+  PayoutStatus,
+  PayoutStatusDB,
+  type PayoutStatusValue,
+} from "../../enum";
 import type { ReferralT } from "../../i18n";
 import { getAdminPayoutActions } from "../../payout-actions";
 import definitions, { type AdminPayoutsGetResponseOutput } from "./definition";
@@ -71,6 +77,44 @@ const actionDescriptions = {
   reject: "admin.payouts.widget.rejectDetail",
   complete: "admin.payouts.widget.completeDetail",
 } as const;
+
+function isOpenStatus(status: typeof PayoutStatusValue): boolean {
+  return (
+    status === PayoutStatus.PENDING ||
+    status === PayoutStatus.APPROVED ||
+    status === PayoutStatus.PROCESSING
+  );
+}
+
+function nextStepKey(
+  item: Payout,
+):
+  | "admin.payouts.widget.nextStep.failed"
+  | "admin.payouts.widget.nextStep.processing"
+  | "admin.payouts.widget.nextStep.credits"
+  | null {
+  if (item.status === PayoutStatus.FAILED) {
+    return "admin.payouts.widget.nextStep.failed";
+  }
+  if (item.status === PayoutStatus.PROCESSING) {
+    return "admin.payouts.widget.nextStep.processing";
+  }
+  if (
+    item.currency === PayoutCurrency.CREDITS &&
+    item.status === PayoutStatus.PENDING
+  ) {
+    return "admin.payouts.widget.nextStep.credits";
+  }
+  return null;
+}
+
+function summaryByStatus(
+  summary: AdminPayoutsGetResponseOutput["summary"],
+  status: typeof PayoutStatusValue,
+): { count: number; amountCents: number } {
+  const row = summary.find((candidate) => candidate.status === status);
+  return { count: row?.count ?? 0, amountCents: row?.amountCents ?? 0 };
+}
 
 function formatPayoutValue(
   item: Payout,
@@ -101,6 +145,7 @@ export function AdminPayoutsContainer({
   const isFetching = read?.isFetching ?? false;
   const canFilter = interactive && !responseOnly && Boolean(onSubmit);
   const userId = form?.watch("userId");
+  const activeStatus = form?.watch("status");
   const requestId = form?.watch("requestId");
   const page = data?.resultPage ?? 1;
   const pageCount = data
@@ -117,7 +162,20 @@ export function AdminPayoutsContainer({
     onSubmit?.();
   }
 
+  const firstOpenIds = new Set<string>();
+  const seenPartners = new Set<string>();
+  for (const candidate of data?.items ?? []) {
+    if (isOpenStatus(candidate.status) && !seenPartners.has(candidate.userId)) {
+      seenPartners.add(candidate.userId);
+      firstOpenIds.add(candidate.id);
+    }
+  }
+
   function buildRow(item: Payout): RelatedEntityItem {
+    const overCommitted =
+      isOpenStatus(item.status) && item.partner.freeCents < 0;
+    const firstOpenOfPartner = firstOpenIds.has(item.id);
+    const nextStep = nextStepKey(item);
     const badges = (
       <StatusPill
         status={t(item.status)}
@@ -126,7 +184,17 @@ export function AdminPayoutsContainer({
     );
     const meta = (
       <Div className="flex w-full min-w-0 flex-col gap-2 text-sm">
-        <Span className="block break-all font-mono text-xs">{item.id}</Span>
+        <Span className="text-lg font-bold tabular-nums text-foreground">
+          {t("admin.payouts.widget.headline", {
+            value: formatCurrency(item.amountCents / 100, "USD", locale),
+            currency: t(item.currency),
+          })}
+        </Span>
+        <Span className="text-xs text-muted-foreground">
+          {t("admin.payouts.widget.creditsLine", {
+            credits: item.amountCents.toLocaleString(locale.split("-")[0]),
+          })}
+        </Span>
         <Div className="grid min-w-0 gap-1 @sm:grid-cols-2">
           <Span>
             {t("admin.payouts.widget.requestedAt", {
@@ -141,24 +209,120 @@ export function AdminPayoutsContainer({
             </Span>
           )}
         </Div>
-        {item.walletAddress && (
-          <Span className="block break-all font-mono text-xs">
-            {item.walletAddress}
-          </Span>
-        )}
-        {item.rejectionReason && (
-          <Span className="break-words">
-            {t("admin.payouts.widget.rejectionReason", {
-              reason: item.rejectionReason,
-            })}
-          </Span>
-        )}
-        {item.adminNotes && (
-          <Span className="break-words">
-            {t("admin.payouts.widget.adminNotes", {
-              notes: item.adminNotes,
-            })}
-          </Span>
+        <Div className="grid min-w-0 gap-3 @md:grid-cols-2">
+          <Div className="flex min-w-0 flex-col gap-1">
+            <Span
+              className={
+                item.partner.freeCents < 0
+                  ? "font-semibold text-destructive"
+                  : "font-semibold text-foreground"
+              }
+            >
+              {t("admin.payouts.widget.freeLine", {
+                free: formatCurrency(
+                  item.partner.freeCents / 100,
+                  "USD",
+                  locale,
+                ),
+              })}
+            </Span>
+            {overCommitted && firstOpenOfPartner && (
+              <Span className="font-medium text-destructive">
+                {item.partner.openCount > 1
+                  ? t("admin.payouts.widget.overBalance", {
+                      count: item.partner.openCount,
+                      open: formatCurrency(
+                        item.partner.openCents / 100,
+                        "USD",
+                        locale,
+                      ),
+                      available: formatCurrency(
+                        item.partner.availableCents / 100,
+                        "USD",
+                        locale,
+                      ),
+                    })
+                  : t("admin.payouts.widget.overBalanceSingle", {
+                      amount: formatCurrency(
+                        item.amountCents / 100,
+                        "USD",
+                        locale,
+                      ),
+                      available: formatCurrency(
+                        item.partner.availableCents / 100,
+                        "USD",
+                        locale,
+                      ),
+                    })}
+              </Span>
+            )}
+            {overCommitted && !firstOpenOfPartner && (
+              <Span className="font-medium text-destructive">
+                {t("admin.payouts.widget.overBalanceShort")}
+              </Span>
+            )}
+            {item.duplicateCount > 0 && firstOpenOfPartner && (
+              <Span className="font-medium text-destructive">
+                {t("admin.payouts.widget.possibleDuplicate", {
+                  count: item.duplicateCount,
+                })}
+              </Span>
+            )}
+            {item.rejectionReason && (
+              <Span className="break-words">
+                {t("admin.payouts.widget.rejectionReason", {
+                  reason: item.rejectionReason,
+                })}
+              </Span>
+            )}
+            {item.adminNotes && (
+              <Span className="break-words">
+                {t("admin.payouts.widget.adminNotes", {
+                  notes: item.adminNotes,
+                })}
+              </Span>
+            )}
+            <Span className="text-muted-foreground">
+              {t("admin.payouts.widget.partnerContext", {
+                confirmed: formatCurrency(
+                  item.partner.confirmedCents / 100,
+                  "USD",
+                  locale,
+                ),
+                pending: formatCurrency(
+                  item.partner.pendingCents / 100,
+                  "USD",
+                  locale,
+                ),
+                paid: formatCurrency(
+                  item.partner.paidOutCents / 100,
+                  "USD",
+                  locale,
+                ),
+              })}
+            </Span>
+            <Span className="text-muted-foreground">
+              {item.partnerCodes.length > 0
+                ? t("admin.payouts.widget.partnerCodes", {
+                    codes: item.partnerCodes.join(", "),
+                    referred: item.partner.referredUsers,
+                  })
+                : t("admin.payouts.widget.partnerNoCodes", {
+                    referred: item.partner.referredUsers,
+                  })}
+            </Span>
+          </Div>
+          <Div className="flex min-w-0 flex-col gap-1 text-xs text-muted-foreground">
+            {item.walletAddress && (
+              <Span className="block break-all font-mono">
+                {item.walletAddress}
+              </Span>
+            )}
+            <Span className="block break-all font-mono">{item.id}</Span>
+          </Div>
+        </Div>
+        {nextStep && (
+          <Span className="text-muted-foreground">{t(nextStep)}</Span>
         )}
         {canFilter && (
           <Div className="flex flex-wrap gap-2">
@@ -167,7 +331,11 @@ export function AdminPayoutsContainer({
                 key={action}
                 type="button"
                 size="sm"
-                variant={action === "reject" ? "destructive" : "outline"}
+                variant={
+                  action === "reject" || (action === "approve" && overCommitted)
+                    ? "outline"
+                    : "default"
+                }
                 aria-label={t("admin.payouts.widget.actionFor", {
                   action: t(actionLabels[action]),
                   email: item.userEmail,
@@ -180,40 +348,59 @@ export function AdminPayoutsContainer({
                   })
                 }
               >
-                {t(actionLabels[action])}
+                {action === "approve" && overCommitted
+                  ? t("admin.payouts.widget.approveOverBalance")
+                  : t(actionLabels[action])}
               </Button>
             ))}
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              aria-label={t("admin.payouts.widget.openPartnerFor", {
+                email: item.userEmail,
+              })}
+              onClick={() =>
+                navigate(
+                  () =>
+                    import("@/users/view/definition").then(
+                      (module) => module.default.GET,
+                    ),
+                  { data: { userId: item.userId } },
+                )
+              }
+            >
+              {t("admin.payouts.widget.openPartner")}
+            </Button>
+            {item.partnerCodes[0] && (
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={() =>
+                  navigate(
+                    () =>
+                      import("../code/definition").then(
+                        (module) => module.default.GET,
+                      ),
+                    { data: { code: item.partnerCodes[0] } },
+                  )
+                }
+              >
+                {t("admin.payouts.widget.codeReport")}
+              </Button>
+            )}
           </Div>
         )}
       </Div>
     );
     return {
       id: item.id,
-      title: item.userEmail,
-      subtitle: t("admin.payouts.widget.payoutSummary", {
-        amount: formatPayoutValue(item, locale, t),
-        currency: t(item.currency),
-      }),
+      title: item.partnerName
+        ? `${item.partnerName} · ${item.userEmail}`
+        : item.userEmail,
       badges,
       meta,
-      action: canFilter
-        ? {
-            label: t("admin.payouts.widget.openPartner"),
-            ariaLabel: t("admin.payouts.widget.openPartnerFor", {
-              email: item.userEmail,
-            }),
-            onClick: () =>
-              navigate(
-                () =>
-                  import("@/users/view/definition").then(
-                    (module) => module.default.GET,
-                  ),
-                {
-                  data: { userId: item.userId },
-                },
-              ),
-          }
-        : undefined,
     };
   }
 
@@ -235,9 +422,10 @@ export function AdminPayoutsContainer({
               </Span>
             </Div>
           )}
-          <Div className="grid min-w-0 gap-3 @sm:grid-cols-2">
+          <Div className="grid min-w-0 gap-3 @sm:grid-cols-3">
             <TextFieldWidget fieldName="search" field={children.search} />
             <SelectFieldWidget fieldName="status" field={children.status} />
+            <SelectFieldWidget fieldName="currency" field={children.currency} />
           </Div>
           <Div className="flex flex-wrap items-center gap-2">
             <Button
@@ -272,6 +460,41 @@ export function AdminPayoutsContainer({
         </>
       )}
       <FormAlertWidget field={{}} />
+      {data && (
+        <KpiGrid columns={6}>
+          {PayoutStatusDB.map((status) => {
+            const row = summaryByStatus(data.summary, status);
+            return (
+              <KpiTile
+                key={status}
+                label={t(status)}
+                value={row.count}
+                hint={formatCurrency(row.amountCents / 100, "USD", locale)}
+                tone={
+                  status === PayoutStatus.PENDING && row.count > 0
+                    ? "warning"
+                    : status === PayoutStatus.FAILED && row.count > 0
+                      ? "negative"
+                      : "default"
+                }
+                locale={locale}
+                onClick={
+                  canFilter
+                    ? () => {
+                        form.setValue(
+                          "status",
+                          activeStatus === status ? undefined : status,
+                        );
+                        form.setValue("page", 1);
+                        onSubmit?.();
+                      }
+                    : undefined
+                }
+              />
+            );
+          })}
+        </KpiGrid>
+      )}
       {((!data && !response) || isFetching) && (
         <LoadingBlock message={t("admin.payouts.widget.loading")} size="sm" />
       )}

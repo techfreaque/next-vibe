@@ -320,6 +320,21 @@ const { GET } = createEndpoint({
         ],
       }),
 
+      catalogOverview: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "catalog.overview",
+        schema: z.string().optional(),
+        visibleFor: [UserPermissionRole.ADMIN],
+        hiddenForPlatforms: [
+          Platform.AI,
+          Platform.MCP,
+          Platform.CRON,
+          Platform.REMOTE_SKILL,
+          Platform.CLI,
+          Platform.CLI_PACKAGE,
+        ],
+      }),
+
       recordSearchTargets: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "catalog.findRecord",

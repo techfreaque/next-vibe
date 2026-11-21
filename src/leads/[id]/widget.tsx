@@ -114,6 +114,12 @@ import leadsListDefinitions from "@/leads/list/definition";
 import leadsSearchDefinitions from "@/leads/search/definition";
 import { scopedTranslation as newsletterI18n } from "@/newsletter/i18n";
 
+import { BotFamily } from "../analytics/enum";
+import {
+  dimensionValueLabel,
+  useLeadAnalyticsT,
+  useLeadDrill,
+} from "../analytics/widget-parts";
 import type { LeadGetResponseOutput } from "./definition";
 import definition from "./definition";
 import { LeadLinkEvidence } from "./enum";
@@ -901,6 +907,143 @@ function JourneyOverview({
   );
 }
 
+/** Same threshold as the abuse report default. */
+const BURST_MIN_LEADS = 10;
+
+/** First day of the trailing 30-day window (called from click handlers). */
+function since(): string {
+  return new Date(Date.now() - 30 * 86_400_000).toISOString().slice(0, 10);
+}
+
+function TrafficSection({
+  traffic,
+  locale,
+  t,
+}: {
+  traffic: NonNullable<LeadGetResponseOutput["traffic"]>;
+  locale: CountryLanguage;
+  t: DetailT;
+}): React.JSX.Element {
+  const st = useLeadAnalyticsT(locale);
+  const drill = useLeadDrill();
+  const isBot = traffic.botFamily !== BotFamily.HUMAN;
+  const firstTouch = [
+    dimensionValueLabel(traffic.channelType, st),
+    traffic.channel && traffic.channel !== "direct" ? traffic.channel : null,
+    traffic.source,
+    traffic.medium,
+    traffic.campaign,
+  ].filter((part): part is string => Boolean(part));
+  return (
+    <SectionGroup title={t("traffic.title")} subtitle={t("traffic.subtitle")}>
+      <DetailGrid columns={2}>
+        <Div>
+          <P className="text-xs text-muted-foreground">{t("traffic.agent")}</P>
+          <Div className="mt-0.5 flex flex-wrap gap-1">
+            <StatusPill
+              status={dimensionValueLabel(traffic.botFamily, st)}
+              variant={isBot ? "danger" : "success"}
+            />
+            {traffic.prefixLeads30d >= BURST_MIN_LEADS && (
+              <StatusPill
+                status={t("traffic.burstNetwork", {
+                  count: traffic.prefixLeads30d,
+                })}
+                variant="warning"
+              />
+            )}
+            {traffic.uaLeads30d >= BURST_MIN_LEADS && (
+              <StatusPill
+                status={t("traffic.sharedAgent", {
+                  count: traffic.uaLeads30d,
+                })}
+                variant="warning"
+              />
+            )}
+          </Div>
+        </Div>
+        <DetailField
+          label={t("traffic.firstTouch")}
+          value={firstTouch.join(" · ")}
+        />
+        <DetailField
+          label={t("traffic.referrer")}
+          value={traffic.referrerHost}
+        />
+        <DetailField
+          label={t("traffic.landingPath")}
+          value={traffic.landingPath}
+          mono
+        />
+        <DetailField
+          label={t("traffic.refCode")}
+          value={traffic.refCode}
+          mono
+        />
+        <DetailField
+          label={t("traffic.freeCredits")}
+          value={traffic.freeCreditsBurned.toLocaleString(locale, {
+            maximumFractionDigits: 2,
+          })}
+        />
+        {traffic.ipPrefix && (
+          <Div className="flex items-end justify-between gap-2">
+            <DetailField
+              label={t("traffic.network")}
+              value={
+                <Span className="flex flex-col">
+                  <Span className="font-mono">{traffic.ipPrefix}</Span>
+                  <Span className="text-xs text-muted-foreground">
+                    {t("traffic.agentLeadsIn30d", {
+                      count: traffic.prefixLeads30d,
+                    })}
+                  </Span>
+                </Span>
+              }
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                drill({
+                  ipPrefix: traffic.ipPrefix ?? undefined,
+                  createdFrom: since(),
+                })
+              }
+            >
+              {t("traffic.openLeads")}
+            </Button>
+          </Div>
+        )}
+        {traffic.uaFingerprint && (
+          <Div className="flex items-end justify-between gap-2">
+            <DetailField
+              label={t("traffic.sameAgent")}
+              value={t("traffic.agentLeadsIn30d", {
+                count: traffic.uaLeads30d,
+              })}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                drill({
+                  uaFingerprint: traffic.uaFingerprint ?? undefined,
+                  createdFrom: since(),
+                })
+              }
+            >
+              {t("traffic.openLeads")}
+            </Button>
+          </Div>
+        )}
+      </DetailGrid>
+    </SectionGroup>
+  );
+}
+
 function LinkedIdentitiesTab({
   data,
   review,
@@ -1568,6 +1711,13 @@ export function LeadDetailContainer(): React.JSX.Element {
               t={t}
               leadsT={leadsT}
             />
+            {fieldValue.traffic && (
+              <TrafficSection
+                traffic={fieldValue.traffic}
+                locale={locale}
+                t={t}
+              />
+            )}
             <OverviewTab
               data={data}
               locale={locale}

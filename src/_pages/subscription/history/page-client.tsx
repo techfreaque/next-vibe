@@ -68,6 +68,10 @@ export function HistoryPageClient({
             initialState: {
               targetUserId: undefined,
               targetLeadId: undefined,
+              target: undefined,
+              typeFilter: undefined,
+              from: undefined,
+              to: undefined,
               paginationInfo: { page: 1, limit: 20 },
             },
             queryOptions: { staleTime: 0 },

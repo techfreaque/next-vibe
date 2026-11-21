@@ -4,6 +4,40 @@ export const translations: typeof enTranslations = {
   title: "La campagna Quese",
   description: "I risultati attualmente attivi nelle campagne di e-mail",
   enums: {
+    delivery: {
+      dueNow: "In scadenza ora",
+      overdue: "In ritardo 24 h+",
+      scheduled: "Pianificate",
+      failed: "Fallite",
+      sent: "Inviate",
+      opened: "Inviate e aperte",
+      clicked: "Inviate e cliccate",
+      unsubscribed: "Disiscritti",
+      bounced: "Rimbalzate",
+    },
+    emailJourneyVariantFilter: {
+      all: "Tutti",
+      uncensoredConvert: "Conversione ai modelli senza censura",
+      sideHustle: "Hustle laterali",
+      quietRecommendation: "Raccomandazioni silenziose",
+      signupNurture: "Nurture di iscrizione",
+      retention: "Retenzione",
+      winback: "Winback",
+      newsletterMay2026: "Newsletter maggio 2026",
+      newsletterNov2026: "Newsletter Novembre 2026",
+    },
+    emailCampaignStageFilter: {
+      all: "Tutti",
+    },
+    emailCampaignStage: {
+      notStarted: "Non iniziato",
+      initial: "Contatto iniziale",
+      followup1: "Seguito 1",
+      followup2: "Seguito 2",
+      followup3: "Seguito 3",
+      nurture: "Nurture",
+      reactivation: "Riattivazione",
+    },
     campaignType: {
       leadCampaign: "Campagna di acquisizione contatti",
       newsletter: "Newsletter",
@@ -24,6 +58,35 @@ export const translations: typeof enTranslations = {
     description:
       "Visualizza l'elenco delle piste attualmente in campagne e-mail",
     fields: {
+      delivery: {
+        label: "Stato email",
+        description:
+          "Lead con un'email in questo stato. Inviata, aperta, cliccata, disiscritta, rimbalzata e fallita usano la finestra di date",
+        placeholder: "Qualsiasi stato",
+      },
+      journeyVariant: {
+        label: "Variante di percorso",
+        description: "Solo email di questo percorso",
+        placeholder: "Qualsiasi percorso",
+      },
+      stage: {
+        label: "Fase",
+        description: "Solo email di questa fase",
+        placeholder: "Qualsiasi fase",
+      },
+      locale: {
+        label: "Lingua",
+        description: "Locale renderizzata (de-DE) o lingua (de)",
+        placeholder: "Qualsiasi lingua",
+      },
+      eventFrom: {
+        label: "Dal",
+        description: "Primo giorno della finestra eventi",
+      },
+      eventTo: {
+        label: "Al",
+        description: "Ultimo giorno della finestra eventi",
+      },
       page: {
         label: "Pagina",
         description: "Numero di pagina",
@@ -38,6 +101,7 @@ export const translations: typeof enTranslations = {
       },
     },
     response: {
+      daysOverdue: "Giorni di ritardo",
       nextSubject: "Argomento programmato",
       leadId: "ID del contatto",
       leadEmail: "Email",
@@ -86,6 +150,9 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    overdueDays: "In ritardo di {{days}} giorni, mai inviata",
+    titleWithCount: "Coda campagne ({{count}})",
+    eventWindow: "Eventi email dal {{from}} al {{to}}",
     title: "La campagna Quese",
     refresh: "Aggiorna",
     noData: "Nessuna coda di campagna",

@@ -1,6 +1,9 @@
+import { translations as analyticsTranslations } from "next-vibe/unified-ui/analytics/i18n/it";
+
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  ...analyticsTranslations,
   category: "Sistema",
 
   errors: {
@@ -15,19 +18,45 @@ export const translations: typeof enTranslations = {
 
   statusFilter: {
     all: "Tutti",
-    active: "Attivo",
+    active: "Irrisolte",
     resolved: "Risolto",
+  },
+  levelFilter: {
+    all: "Tutti i livelli",
+    error: "Errori",
+    warn: "Avvisi",
+  },
+  sourceFilter: {
+    all: "Tutte le fonti",
+    client: "Browser",
+    server: "Server",
+  },
+  trendSplit: {
+    newVsRecurring: "Nuovi vs ricorrenti",
+    level: "Livello",
+    source: "Fonte",
+  },
+  sort: {
+    windowOccurrences: "Più occorrenze nel periodo",
+    lastSeen: "Visti di recente",
+    firstSeen: "Più recenti",
+    totalOccurrences: "Più occorrenze in totale",
   },
 
   get: {
     title: "Log di errore",
     titleShort: "Log di errore",
     description:
-      "Sfoglia i log degli errori backend con filtraggio e impaginazione",
+      "Classi di errore con il numero esatto di irrisolti, occorrenze nel tempo, principali colpevoli e utenti colpiti. Filtra per periodo, stato, livello, fonte, endpoint o testo; risolvi con un clic.",
     tags: {
       monitoring: "Monitoraggio",
     },
     fields: {
+      group: {
+        label: "Raggruppa simili",
+        description:
+          "Una riga per messaggio: le varianti su route diverse contano insieme",
+      },
       status: {
         label: "Stato",
         description: "Filtra per stato risolto",
@@ -42,13 +71,32 @@ export const translations: typeof enTranslations = {
         description: "Filtra per classificazione di tipo di errore",
         placeholder: "ad es. INTERNAL_ERROR",
       },
-      startDate: {
-        label: "Da",
-        description: "Mostra gli errori dopo questa data",
+      level: {
+        label: "Livello",
+        description: "Errori o avvisi",
       },
-      endDate: {
-        label: "A",
-        description: "Mostra gli errori prima di questa data",
+      source: {
+        label: "Fonte",
+        description: "Generato nel browser (client log) o sul server",
+      },
+      endpoint: {
+        label: "Endpoint o route",
+        description:
+          "Il percorso endpoint, l'alias o la route della pagina contiene questo testo",
+        placeholder: "es. payment/providers",
+      },
+      fingerprint: {
+        label: "Fingerprint",
+        description: "Mostra una sola classe di errore",
+        placeholder: "Fingerprint",
+      },
+      split: {
+        label: "Suddivisione grafico",
+        description: "Come il grafico delle occorrenze impila",
+      },
+      sort: {
+        label: "Ordinamento",
+        description: "Ordine della lista",
       },
       limit: {
         label: "Limite",
@@ -73,6 +121,21 @@ export const translations: typeof enTranslations = {
       },
       unresolvedCount: {
         title: "Contatore irrisolto",
+      },
+      window: {
+        title: "Periodo",
+      },
+      kpis: {
+        title: "Numeri chiave",
+      },
+      trend: {
+        title: "Occorrenze nel tempo",
+      },
+      byEndpoint: {
+        title: "Per endpoint",
+      },
+      historySince: {
+        title: "Storico dal",
       },
     },
     success: {
@@ -129,6 +192,16 @@ export const translations: typeof enTranslations = {
       monitoring: "Monitoraggio",
     },
     fields: {
+      similarTo: {
+        label: "Stesso messaggio di",
+        description:
+          "Risolvi o riapri ogni classe con lo stesso messaggio di questo fingerprint",
+      },
+      fingerprints: {
+        label: "Fingerprint",
+        description:
+          "Più fingerprint insieme (risoluzione o riapertura in blocco, max 200)",
+      },
       fingerprint: {
         label: "Impronte per la stampa",
         description:
@@ -268,6 +341,102 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    kpi: {
+      unresolvedMessages: "{{messages}} messaggi · {{occurrences}} occorrenze",
+      unresolvedMatching: "{{count}} irrisolte corrispondono ai filtri",
+      unresolved: "Classi irrisolte (totale)",
+      unresolvedHint: "{{occurrences}} occorrenze in totale",
+      unresolvedOutside: "{{count}} non viste in questo periodo",
+      occurrences: "Occorrenze",
+      newClasses: "Nuove classi",
+      activeClasses: "Classi colpite",
+      affectedUsers: "Utenti colpiti",
+      affectedLeads: "Visitatori colpiti",
+    },
+    chart: {
+      noEndpoint: "Nessun endpoint registrato",
+      emptyFiltered:
+        "Nessuna occorrenza corrisponde ai filtri in questo periodo.",
+      trendTitle: "Occorrenze",
+      trendSubtitle: "Clicca una barra per restringere il periodo",
+      endpointTitle: "Dove si rompe",
+      endpointSubtitle:
+        "Endpoint e route per occorrenze. Clicca una riga per filtrare.",
+      endpoint: "Endpoint / route",
+      occurrences: "Occorrenze",
+      classes: "Classi",
+      unresolved: "Aperte",
+      historyNote:
+        "Storico giornaliero dal {{date}}. Le occorrenze precedenti contano solo nei totali.",
+      historyNone:
+        "Nessuno storico giornaliero ancora. I totali per classe restano esatti.",
+    },
+    series: {
+      new: "Nuovi",
+      recurring: "Ricorrenti",
+      error: "Errori",
+      warn: "Avvisi",
+      client: "Browser",
+      server: "Server",
+    },
+    list: {
+      viewGroup: "Vedi {{count}}",
+      noSession: "Nessun contesto di sessione",
+      cliAct:
+        "azione: vibe update-error-log --fingerprint={{fingerprint}} --resolved={{resolved}}",
+      cliStatus: "Stato: {{status}}",
+      groupSize: "{{count}} classi",
+      resolveGroup: "Risolvi tutte ({{count}})",
+      reopenGroup: "Riapri tutte ({{count}})",
+      groupHint: "Raggruppato per messaggio",
+      subtitleGrouped: "{{count}} messaggi visti in questo periodo",
+      bulkResolveOf: "Risolvi {{shown}} di {{total}} corrispondenti",
+      cliGroup:
+        '{{count}} classi. Elenca: vibe error-logs --group=false --search="{{search}}" · Tutte: vibe update-error-log --similarTo={{fingerprint}} --resolved=true',
+      allClear: "Niente di aperto corrisponde a questi filtri.",
+      allClearHint: "Rimuovi i filtri per vedere il resto.",
+      similar: "+{{count}} simili",
+      cliFilters:
+        "Filtri (i valori sono le chiavi enum mostrate): --range=analytics.range.last7Days --status=statusFilter.all --level=levelFilter.error --source=sourceFilter.server --endpoint=<testo> --search=<testo>. In blocco: vibe update-error-log --fingerprints=<a>,<b> --resolved=true",
+      more: "+{{count}} altri",
+      doneResolved: "Risolta: {{label}}",
+      doneReopened: "Riaperta: {{label}}",
+      doneResolvedMany: "{{count}} classi risolte",
+      doneReopenedMany: "{{count}} classi riaperte",
+      undo: "Annulla",
+      dismiss: "Chiudi",
+      bulkResolve: "Risolvi tutte le {{count}} mostrate",
+      bulkConfirm: "Conferma: risolvi {{count}}",
+      cliHits: "{{period}} nel periodo / {{total}} in totale",
+      resolveFailed: "Non salvato. Riprova.",
+      cliResolve:
+        "Azione: vibe update-error-log --fingerprint={{fingerprint}} --resolved={{resolved}}",
+      cliHint:
+        "Risolvi: vibe update-error-log --fingerprint=<fingerprint> --resolved=true. Dettaglio: --fingerprint=<fingerprint>. Pagina successiva: --offset={{next}}",
+      title: "Classi di errore",
+      subtitle: "{{count}} viste in questo periodo",
+      hitsPeriod: "{{count}} nel periodo",
+      hitsTotal: "{{count}} in totale",
+      users: "Utenti {{count}}",
+      leads: "Visitatori {{count}}",
+      firstSeen: "prima {{date}}",
+      lastSeen: "ultima {{date}}",
+      open: "Dettagli",
+      close: "Nascondi",
+      focus: "Solo questa",
+      affected: "Utenti colpiti",
+      affectedLeads: "Visitatori colpiti",
+      resolving: "Salvataggio...",
+    },
+    filter: {
+      fingerprint: "Classe",
+      endpoint: "Endpoint",
+      search: "Cerca",
+      errorType: "Tipo",
+      status: "Stato",
+      level: "Livello",
+      source: "Fonte",
+    },
     emptyFiltered:
       "Nessun gruppo corrisponde ai filtri. Rimuovi un filtro e riprova.",
     emptyActive:
@@ -293,7 +462,7 @@ export const translations: typeof enTranslations = {
       createdAt: "Ultimo accesso",
     },
     status: {
-      active: "Attivo",
+      active: "Irrisolte",
       resolved: "Risolto",
     },
     action: {
@@ -308,6 +477,10 @@ export const translations: typeof enTranslations = {
       metadata: "Metadati",
       collapse: "Colpo",
       resolved: "Risolto",
+    },
+    source: {
+      client: "Browser",
+      server: "Server",
     },
     pagination: {
       matches: "Gruppi corrispondenti: {{count}}",

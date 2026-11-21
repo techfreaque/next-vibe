@@ -12,6 +12,7 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { USER_ME_ALIAS } from "@/user/private/me/constants";
 import { USERS_LIST_ALIAS } from "@/users/list/constants";
 import type userDirectory from "@/users/list/definition";
+import { USERS_STATS_ALIAS } from "@/users/stats/constants";
 
 export const category: CategoryDefinition = {
   key: "account",
@@ -28,7 +29,8 @@ export const category: CategoryDefinition = {
   icon: "user",
   order: 10,
   defaultEntry: {
-    [UserPermissionRole.ADMIN]: USERS_LIST_ALIAS,
+    // Admins land on the signups report; record search goes to users-list.
+    [UserPermissionRole.ADMIN]: USERS_STATS_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
     [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
   },
@@ -106,13 +108,13 @@ export const category: CategoryDefinition = {
       icon: "bar-chart-2",
       order: 5,
       label: {
-        "en-US": "User Stats",
-        "en-GLOBAL": "User Stats",
-        "de-DE": "Nutzerstatistiken",
-        "pl-PL": "Statystyki użytkowników",
-        "fr-FR": "Stats des utilisateurs",
-        "it-IT": "Statistiche utenti",
-        "es-ES": "Estadísticas de usuarios",
+        "en-US": "Signups",
+        "en-GLOBAL": "Signups",
+        "de-DE": "Registrierungen",
+        "pl-PL": "Rejestracje",
+        "fr-FR": "Inscriptions",
+        "it-IT": "Iscrizioni",
+        "es-ES": "Registros",
       },
     },
     remoteInstances: {

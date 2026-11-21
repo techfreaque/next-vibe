@@ -21,7 +21,8 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { creditPacks, creditWallets } from "@/credits/db";
+import { creditPacks, creditTransactions, creditWallets } from "@/credits/db";
+import { CreditPackType, CreditTransactionType } from "@/credits/enum";
 import { financeRevenueEvents } from "@/finance/db";
 import { RevenueEventKind } from "@/finance/enum";
 import { paymentTransactions } from "@/payment/db";
@@ -267,10 +268,13 @@ export class SubscriptionAdminStatsRepository {
     const mrr = Math.round(Number(mrrResult?.mrrUsd ?? 0) * 100);
     const arr = mrr * 12;
 
-    // Subscription counts (active = live as defined for MRR above)
+    // Subscription counts by status, the same definition as the subscription
+    // list (status only). Churn = canceled share of active + trialing + past
+    // due + canceled, the population shown on the tiles.
     const [subCounts] = await db
       .select({
-        activeCount: sql<number>`count(*) filter (where ${subscriptions.status} = ${SubscriptionStatus.ACTIVE} and ${subscriptions.currentPeriodEnd} >= ${now})::int`,
+        activeCount: sql<number>`count(*) filter (where ${subscriptions.status} = ${SubscriptionStatus.ACTIVE})::int`,
+        pastDueCount: sql<number>`count(*) filter (where ${subscriptions.status} = ${SubscriptionStatus.PAST_DUE})::int`,
         trialingCount: sql<number>`count(*) filter (where ${subscriptions.status} = ${SubscriptionStatus.TRIALING})::int`,
         canceledCount: sql<number>`count(*) filter (where ${subscriptions.status} = ${SubscriptionStatus.CANCELED})::int`,
         totalCount: sql<number>`count(*)::int`,
@@ -280,8 +284,10 @@ export class SubscriptionAdminStatsRepository {
     const activeCount = subCounts?.activeCount ?? 0;
     const trialingCount = subCounts?.trialingCount ?? 0;
     const canceledCount = subCounts?.canceledCount ?? 0;
-    const totalSubCount = subCounts?.totalCount ?? 0;
-    const churnRate = totalSubCount > 0 ? canceledCount / totalSubCount : 0;
+    const pastDueCount = subCounts?.pastDueCount ?? 0;
+    const churnBase =
+      activeCount + trialingCount + pastDueCount + canceledCount;
+    const churnRate = churnBase > 0 ? canceledCount / churnBase : 0;
 
     // Interval stats
     const [intervalResult] = await db
@@ -291,7 +297,7 @@ export class SubscriptionAdminStatsRepository {
       })
       .from(subscriptions)
       .where(
-        sql`${subscriptions.status} IN (${SubscriptionStatus.ACTIVE}, ${SubscriptionStatus.TRIALING}) and ${subscriptions.currentPeriodEnd} >= ${now}`,
+        sql`${subscriptions.status} IN (${SubscriptionStatus.ACTIVE}, ${SubscriptionStatus.TRIALING}, ${SubscriptionStatus.PAST_DUE})`,
       );
 
     const monthlyCount = intervalResult?.monthlyCount ?? 0;
@@ -310,10 +316,32 @@ export class SubscriptionAdminStatsRepository {
       })
       .from(creditPacks)
       .innerJoin(creditWallets, eq(creditPacks.walletId, creditWallets.id))
-      .where(sql`${creditWallets.userId} IS NOT NULL`);
+      // Sold = subscription and bought packs only (grants and referral
+      // earnings are not sales)
+      .where(
+        sql`${creditWallets.userId} IS NOT NULL and ${creditPacks.type} in (${CreditPackType.SUBSCRIPTION}, ${CreditPackType.PERMANENT})`,
+      );
 
     const totalPurchased = creditResult?.totalPurchased ?? 0;
-    const totalSpent = creditResult?.totalSpent ?? 0;
+    // Spent = credits actually consumed (usage ledger), not pack remainders,
+    // which free-credit draws and pool merges never touch.
+    const [spentResult] = await db
+      .select({
+        spent: sql<number>`coalesce(round(sum(-${creditTransactions.amount})), 0)::int`,
+      })
+      .from(creditTransactions)
+      .where(eq(creditTransactions.type, CreditTransactionType.USAGE));
+    const [packsUsedResult] = await db
+      .select({
+        used: sql<number>`coalesce(round(sum(${creditPacks.originalAmount}::numeric - ${creditPacks.remaining}::numeric)), 0)::int`,
+      })
+      .from(creditPacks)
+      .innerJoin(creditWallets, eq(creditPacks.walletId, creditWallets.id))
+      .where(sql`${creditWallets.userId} IS NOT NULL`);
+    const totalSpent = Math.max(
+      spentResult?.spent ?? 0,
+      creditResult?.totalSpent ?? 0,
+    );
     const packsSold = creditResult?.packsSold ?? 0;
     const avgPackSize = creditResult?.avgPackSize ?? 0;
 
@@ -445,6 +473,7 @@ export class SubscriptionAdminStatsRepository {
       subscriptionStats: {
         activeCount,
         trialingCount,
+        pastDueCount,
         canceledCount,
         churnRate,
       },
@@ -456,6 +485,9 @@ export class SubscriptionAdminStatsRepository {
       creditStats: {
         totalPurchased,
         totalSpent,
+        // Same source as the credit packs list: pack size minus remaining over
+        // every account pack. The rest of the usage came from free allowances.
+        spentFromFree: Math.max(totalSpent - (packsUsedResult?.used ?? 0), 0),
         packsSold,
         avgPackSize,
       },

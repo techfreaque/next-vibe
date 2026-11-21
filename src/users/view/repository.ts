@@ -47,6 +47,9 @@ import { roundMoney, usdAmountSql } from "../money-sql";
 import type { UserViewResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
+/** Connected leads listed in the view (the total is reported separately). */
+const MAX_CONNECTED_LEADS = 200;
+
 export class UserViewRepository {
   /**
    * Get comprehensive user view data
@@ -153,6 +156,7 @@ export class UserViewRepository {
         modelUsageStats,
         connectedLeads: connections.connectedLeads,
         connectedUsers: connections.connectedUsers,
+        connectedLeadsTotal: connections.connectedLeadsTotal,
       });
     } catch (error) {
       logger.error("Error fetching user view data", parseError(error), {
@@ -819,6 +823,23 @@ export class UserViewRepository {
   }
 
   /**
+   * Every lead connected to the user: leads linked to the account plus the
+   * whole lead-lead link component around them, in one recursive query.
+   */
+  private static async connectedLeadIds(userId: string): Promise<string[]> {
+    const result = await db.execute<{ id: string }>(sql`
+      WITH RECURSIVE component(id) AS (
+        SELECT ul.lead_id FROM user_lead_links ul WHERE ul.user_id = ${userId}
+        UNION
+        SELECT CASE WHEN l.lead_id_1 = c.id THEN l.lead_id_2 ELSE l.lead_id_1 END
+        FROM lead_lead_links l
+        JOIN component c ON l.lead_id_1 = c.id OR l.lead_id_2 = c.id
+      )
+      SELECT id FROM component`);
+    return result.rows.map((row) => row.id);
+  }
+
+  /**
    * Get model usage statistics for user - includes all connected lead wallets
    */
   private static async getModelUsageStats(
@@ -836,45 +857,16 @@ export class UserViewRepository {
       return [];
     }
 
-    // Find all leads linked to this user
-    const linkedLeads = await db
-      .select({ leadId: userLeadLinks.leadId })
-      .from(userLeadLinks)
-      .where(eq(userLeadLinks.userId, userId));
-
-    const linkedLeadIds = linkedLeads.map((l) => l.leadId);
-
-    // Find all leads connected via lead-lead links (graph traversal)
-    const allLeadIds = new Set<string>(linkedLeadIds);
-    const queue = [...linkedLeadIds];
-    while (queue.length > 0) {
-      const currentLeadId = queue.shift()!;
-      const links = await db
-        .select()
-        .from(leadLeadLinks)
-        .where(
-          or(
-            eq(leadLeadLinks.leadId1, currentLeadId),
-            eq(leadLeadLinks.leadId2, currentLeadId),
-          ),
-        );
-      for (const link of links) {
-        const otherId =
-          link.leadId1 === currentLeadId ? link.leadId2 : link.leadId1;
-        if (!allLeadIds.has(otherId)) {
-          allLeadIds.add(otherId);
-          queue.push(otherId);
-        }
-      }
-    }
+    // All leads connected to this user (user links + lead-lead link graph)
+    const allLeadIds = await UserViewRepository.connectedLeadIds(userId);
 
     // Get all wallets: user wallet + all connected lead wallets
     const leadWallets =
-      allLeadIds.size > 0
+      allLeadIds.length > 0
         ? await db
             .select({ id: creditWallets.id })
             .from(creditWallets)
-            .where(inArray(creditWallets.leadId, [...allLeadIds]))
+            .where(inArray(creditWallets.leadId, allLeadIds))
         : [];
 
     const allWalletIds = [wallet.id, ...leadWallets.map((w) => w.id)];
@@ -923,7 +915,9 @@ export class UserViewRepository {
       linkReason: string | null;
       linkedAt: Date;
     }>;
+    connectedLeadsTotal: number;
   }> {
+    let connectedLeadsTotal = 0;
     // Get all directly linked leads
     const directLinks = await db
       .select({
@@ -935,7 +929,7 @@ export class UserViewRepository {
       .where(eq(userLeadLinks.userId, userId));
 
     if (directLinks.length === 0) {
-      return { connectedLeads: [], connectedUsers: [] };
+      return { connectedLeads: [], connectedUsers: [], connectedLeadsTotal: 0 };
     }
 
     const directLeadIds = directLinks.map((l) => l.leadId);
@@ -949,37 +943,52 @@ export class UserViewRepository {
       ]),
     );
 
-    // Traverse lead-lead links to find all connected leads
-    const allLeadIds = new Set<string>(directLeadIds);
-    const queue = [...directLeadIds];
-    while (queue.length > 0) {
-      const currentLeadId = queue.shift()!;
-      const links = await db
-        .select()
-        .from(leadLeadLinks)
-        .where(
-          or(
-            eq(leadLeadLinks.leadId1, currentLeadId),
-            eq(leadLeadLinks.leadId2, currentLeadId),
-          ),
-        );
-      for (const link of links) {
-        const otherId =
-          link.leadId1 === currentLeadId ? link.leadId2 : link.leadId1;
-        if (!allLeadIds.has(otherId)) {
-          allLeadIds.add(otherId);
-          // Use the lead-lead link info for indirect connections
-          linkInfoByLeadId.set(otherId, {
+    // Whole connected component in one recursive query (ip-match chains can
+    // reach thousands of leads; a per-lead loop took minutes).
+    const allLeadIds = await UserViewRepository.connectedLeadIds(userId);
+    connectedLeadsTotal = allLeadIds.length;
+    const indirectIds = allLeadIds.filter((id) => !linkInfoByLeadId.has(id));
+    const indirectLinks =
+      indirectIds.length > 0
+        ? await db
+            .select({
+              leadId1: leadLeadLinks.leadId1,
+              leadId2: leadLeadLinks.leadId2,
+              linkReason: leadLeadLinks.linkReason,
+              linkedAt: leadLeadLinks.linkedAt,
+            })
+            .from(leadLeadLinks)
+            .where(
+              or(
+                inArray(
+                  leadLeadLinks.leadId1,
+                  indirectIds.slice(0, MAX_CONNECTED_LEADS),
+                ),
+                inArray(
+                  leadLeadLinks.leadId2,
+                  indirectIds.slice(0, MAX_CONNECTED_LEADS),
+                ),
+              ),
+            )
+            .orderBy(desc(leadLeadLinks.linkedAt))
+        : [];
+    for (const link of indirectLinks) {
+      for (const id of [link.leadId1, link.leadId2]) {
+        if (!linkInfoByLeadId.has(id)) {
+          linkInfoByLeadId.set(id, {
             linkReason: link.linkReason,
             linkedAt: link.linkedAt,
           });
-          queue.push(otherId);
         }
       }
     }
 
-    // Fetch lead details
-    const allLeadIdsArr = [...allLeadIds];
+    // Fetch lead details: direct links first, then the most recent indirect
+    // ones, capped so a huge component never floods the response.
+    const allLeadIdsArr = [
+      ...directLeadIds,
+      ...indirectIds.filter((id) => linkInfoByLeadId.has(id)),
+    ].slice(0, MAX_CONNECTED_LEADS);
     const leadDetails = await db
       .select({
         id: leads.id,
@@ -1021,13 +1030,13 @@ export class UserViewRepository {
       .from(userLeadLinks)
       .where(
         and(
-          inArray(userLeadLinks.leadId, allLeadIdsArr),
+          inArray(userLeadLinks.leadId, allLeadIds),
           sql`${userLeadLinks.userId} != ${userId}`,
         ),
       );
 
     if (connectedUserLinks.length === 0) {
-      return { connectedLeads, connectedUsers: [] };
+      return { connectedLeads, connectedUsers: [], connectedLeadsTotal };
     }
 
     const connectedUserIds = [
@@ -1068,6 +1077,6 @@ export class UserViewRepository {
       };
     });
 
-    return { connectedLeads, connectedUsers };
+    return { connectedLeads, connectedUsers, connectedLeadsTotal };
   }
 }

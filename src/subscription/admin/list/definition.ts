@@ -12,6 +12,7 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
@@ -32,6 +33,7 @@ import {
   BillingInterval,
   CancellationReason,
   SubscriptionPlan,
+  SubscriptionPlanOptions,
   SubscriptionStatus,
 } from "@/subscription/enum";
 
@@ -48,6 +50,7 @@ import {
   SubscriptionStatusAdminFilterOptions,
 } from "../enum";
 import { SUBSCRIPTION_ADMIN_LIST_ALIAS } from "./constants";
+import { SubscriptionFocus, SubscriptionFocusOptions } from "./enum";
 import { scopedTranslation } from "./i18n";
 
 const SubscriptionListContainer = lazyWidget(() =>
@@ -118,6 +121,23 @@ const { GET } = createEndpoint({
             options: SubscriptionStatusAdminFilterOptions,
             columns: 6,
             schema: z.array(z.enum(SubscriptionStatusAdminFilter)).optional(),
+          }),
+          plan: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "get.plan.label" as const,
+            description: "get.plan.description" as const,
+            options: SubscriptionPlanOptions,
+            columns: 6,
+            schema: z.enum(SubscriptionPlan).optional(),
+          }),
+          focus: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "get.focus.label" as const,
+            options: SubscriptionFocusOptions,
+            columns: 6,
+            schema: z.enum(SubscriptionFocus).optional(),
           }),
           interval: requestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
@@ -279,6 +299,28 @@ const { GET } = createEndpoint({
                   label: "get.response.subscriptions.gracePeriodEndsAt",
                   schema: z.coerce.date().nullable(),
                 }),
+                cancelAt: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  label: "get.response.subscriptions.cancelAt",
+                  schema: z.coerce.date().nullable(),
+                }),
+                lastPaymentAmount: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.subscriptions.lastPaymentAmount",
+                  schema: z.number().nullable(),
+                }),
+                lastPaymentCurrency: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.subscriptions.lastPaymentCurrency",
+                  schema: z.enum(CurrenciesArr).nullable(),
+                }),
+                lastPaymentAt: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  fieldType: FieldDataType.DATETIME,
+                  label: "get.response.subscriptions.lastPaymentAt",
+                  schema: z.coerce.date().nullable(),
+                }),
                 cancelAtPeriodEnd: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
                   text: "get.response.subscriptions.cancelAtPeriodEnd" as const,
@@ -306,6 +348,66 @@ const { GET } = createEndpoint({
                   content:
                     "get.response.subscriptions.providerSubscriptionId" as const,
                   schema: z.string().nullable(),
+                }),
+              },
+            }),
+          }),
+          summary: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "get.response.summary.title",
+            schema: z.object({
+              mrrUsd: z.number(),
+              mrr: z.array(
+                z.object({
+                  currency: z.enum(CurrenciesArr),
+                  amount: z.number(),
+                }),
+              ),
+              renewingSoon: z.number(),
+              ending: z.number(),
+              pastDue: z.number(),
+              noCharge: z.number(),
+              fxRates: z.array(
+                z.object({ currency: z.string(), usdRate: z.number() }),
+              ),
+            }),
+          }),
+          planCounts: responseArrayField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            columns: 12,
+            child: objectField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              usage: { response: true },
+              children: {
+                plan: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.plan.label",
+                  schema: z.enum(SubscriptionPlan),
+                }),
+                count: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.statusCounts.count",
+                  schema: z.number(),
+                }),
+              },
+            }),
+          }),
+          statusCounts: responseArrayField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            columns: 12,
+            child: objectField(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              usage: { response: true },
+              children: {
+                status: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.statusCounts.status",
+                  schema: z.enum(SubscriptionStatus),
+                }),
+                count: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.statusCounts.count",
+                  schema: z.number(),
                 }),
               },
             }),
@@ -399,6 +501,12 @@ const { GET } = createEndpoint({
 
   examples: {
     requests: {
+      activeOnly: {
+        searchFilters: {
+          status: [SubscriptionStatusAdminFilter.ACTIVE],
+          plan: SubscriptionPlan.PLUS,
+        },
+      },
       default: {
         searchFilters: {
           status: [],
@@ -419,6 +527,17 @@ const { GET } = createEndpoint({
       default: {
         response: {
           subscriptions: [],
+          statusCounts: [],
+          planCounts: [],
+          summary: {
+            mrrUsd: 0,
+            mrr: [],
+            renewingSoon: 0,
+            ending: 0,
+            pastDue: 0,
+            noCharge: 0,
+            fxRates: [],
+          },
         },
         paginationInfo: {
           totalCount: 0,
@@ -442,6 +561,10 @@ const { GET } = createEndpoint({
               currentPeriodEnd: new Date("2026-11-19T09:30:00.000Z"),
               paymentFailedAt: new Date("2026-11-19T09:30:02.000Z"),
               gracePeriodEndsAt: new Date("2026-11-26T09:30:02.000Z"),
+              cancelAt: null,
+              lastPaymentAmount: 20,
+              lastPaymentCurrency: "EUR",
+              lastPaymentAt: new Date("2026-10-19T09:30:00.000Z"),
               cancelAtPeriodEnd: false,
               canceledAt: null,
               cancellationReason: null,
@@ -449,6 +572,17 @@ const { GET } = createEndpoint({
               providerSubscriptionId: "sub_audit_example",
             },
           ],
+          statusCounts: [{ status: SubscriptionStatus.PAST_DUE, count: 1 }],
+          planCounts: [{ plan: SubscriptionPlan.PLUS, count: 1 }],
+          summary: {
+            mrrUsd: 0,
+            mrr: [],
+            renewingSoon: 0,
+            ending: 0,
+            pastDue: 1,
+            noCharge: 0,
+            fxRates: [],
+          },
         },
         paginationInfo: { totalCount: 1, pageCount: 1, page: 1, limit: 20 },
       },

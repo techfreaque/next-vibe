@@ -35,8 +35,7 @@ export const translations: typeof enTranslations = {
       },
       lastActive: {
         label: "Dernière activité",
-        description:
-          "Activité = dépense de crédits (portefeuille propre ou de leads liés) ou nouvelle connexion",
+        description: "Activité = crédits dépensés, connexion ou paiement",
         placeholder: "Toute période",
       },
       signupFrom: {
@@ -66,6 +65,55 @@ export const translations: typeof enTranslations = {
         description:
           "Utilisateurs qui partagent un lien de parrainage et ce qu'il a rapporté",
         placeholder: "Tous",
+      },
+      audience: {
+        label: "Public",
+        description:
+          "Humains seulement exclut les admins et les adresses de test (example.com, .invalid, fixtures .test)",
+        placeholder: "Tout le monde",
+      },
+      channel: {
+        label: "Canal",
+        description:
+          "Canal du premier contact, exact (google, youtube, direct). none = comptes sans parcours",
+        placeholder: "youtube",
+      },
+      channelType: {
+        label: "Type de canal",
+        description: "Comment le premier contact est arrivé",
+        placeholder: "Tous types",
+      },
+      refCode: {
+        label: "Code de parrainage",
+        description:
+          "Code de la première visite ou du parrainage crédité, exact",
+        placeholder: "FRIEND2024",
+      },
+      plan: {
+        label: "Formule",
+        description: "Abonnement actif ou en essai sur cette formule",
+        placeholder: "Toute formule",
+      },
+      activeFrom: {
+        label: "Crédits utilisés depuis",
+        description: "Consommation de crédits ce jour ou après",
+      },
+      activeTo: {
+        label: "Crédits utilisés jusqu'au",
+        description: "Consommation de crédits ce jour ou avant",
+      },
+      spentMin: {
+        label: "Dépensé au moins",
+        description:
+          "Crédits dépensés au total. Avec Jamais payé, repère les gros consommateurs gratuits",
+      },
+      paidFrom: {
+        label: "Payé depuis",
+        description: "Paiement réussi ce jour ou après",
+      },
+      paidTo: {
+        label: "Payé jusqu'au",
+        description: "Paiement réussi ce jour ou avant",
       },
       sortBy: {
         label: "Trier par",
@@ -132,6 +180,22 @@ export const translations: typeof enTranslations = {
     },
   },
   enums: {
+    audience: {
+      all: "Tout le monde",
+      humans: "Humains seulement",
+    },
+    channelType: {
+      campaign: "Campagne",
+      referral: "Parrainage",
+      organic: "Organique",
+      direct: "Direct",
+    },
+    plan: {
+      subscription: "Starter",
+      plus: "Plus",
+      pro: "Pro",
+      ultra: "Ultra",
+    },
     sortOrder: {
       asc: "Croissant",
       desc: "Décroissant",
@@ -187,6 +251,16 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    spent30d: "{{count}} sur 30 j",
+    notTracked: "non suivi",
+    oneOff: "Crédits seuls",
+    refCode: "ref:{{code}}",
+    chips: {
+      paid: "Payé",
+      signedUp: "Inscrit",
+      spentCredits: "Crédits utilisés",
+      remove: "Retirer le filtre {{label}}",
+    },
     creditsAny: "Tous",
     titleWithCount: "Utilisateurs ({{count}})",
     loading: "Chargement des utilisateurs...",
@@ -197,13 +271,19 @@ export const translations: typeof enTranslations = {
       select: "Sélectionner",
       openUser: "Ouvrir le compte de {{email}}",
       selectUser: "Sélectionner {{email}}",
-      stats: "Stats",
+      stats: "Rapport inscriptions",
       refresh: "Actualiser",
       newUser: "Nouvel utilisateur",
       clearFilters: "Effacer les filtres",
       moreFilters: "Filtres",
     },
     kpi: {
+      activeSpentHint: "{{credits}} crédits dépensés en 30 jours",
+      matchingHint:
+        "Inscriptions par semaine, 12 dernières semaines complètes. Semaine passée : {{last}}, cette semaine pour l'instant : {{count}}",
+      verified: "E-mail vérifié",
+      verifiedHint: "{{count}} comptes",
+      active: "Actifs 30 j",
       matching: "Utilisateurs correspondants",
       paying: "Payants",
       payingShare: "{{percent}} % des correspondants",
@@ -213,27 +293,37 @@ export const translations: typeof enTranslations = {
       creditsHint: "Somme des soldes de portefeuille",
     },
     quick: {
-      paying: "Payants",
+      freeBurn: "Conso gratuite {{min}}+ ({{count}})",
+      banned: "Bannis ({{count}})",
+      humans: "Humains seulement",
+      paying: "Payants ({{count}})",
       free: "Jamais payé",
       activeWeek: "Actifs 7 j",
       dormant: "Inactifs 30 j+",
       never: "Jamais actifs",
     },
     columns: {
+      flags: "Signaux",
       user: "Utilisateur",
       joined: "Inscrit",
       lastActive: "Dernière activité",
-      credits: "Crédits",
-      spent: "Dépensé",
+      credits: "Solde",
+      spent: "Dépensé (total)",
       paid: "Payé",
       subscription: "Formule",
       source: "Source",
       id: "ID",
     },
     compact: {
-      credits: "{{count}} crédits",
+      joined: "inscrit le {{date}}",
+      active: "actif {{when}}",
+      neverActive: "jamais actif",
+      paid: "a payé {{amount}}",
+      free: "jamais payé",
+      spent: "{{count}} crédits dépensés",
     },
     flags: {
+      freeBurn: "Conso gratuite",
       admin: "admin",
       banned: "Banni",
       unverified: "Non vérifié",
@@ -249,6 +339,8 @@ export const translations: typeof enTranslations = {
       showing: "{{start}}-{{end}} sur {{total}}",
     },
     text: {
+      subheader:
+        "{{verified}} vérifiés | {{active}} actifs 30 j | {{banned}} bannis | inscriptions/semaine (12 sem.) : {{weekly}}",
       header:
         "{{total}} utilisateurs | {{paying}} payants | {{paid}} de revenu cumulé",
       pageHint: "Page {{page}}/{{pages}}. Suivante : --page={{next}}",

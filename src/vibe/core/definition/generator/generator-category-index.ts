@@ -199,7 +199,11 @@ function generateContent(
         ? `\n    recordSearch: ${jsonToTs({ ...c.def.recordSearch }, 2, "    recordSearch: ".length)},`
         : "";
 
-      return `  {\n    key: "${key}",\n    label: "${labelFallback}",\n    labels: ${labelsJson},\n    group: "${group}",\n    icon: "${icon}",\n    order: ${order ?? 99},${defaultEntryPart}${searchPart}${subcatBlock}\n  },`;
+      const overviewPart = c.def.catalogOverview
+        ? `\n    catalogOverview: "${String(c.def.catalogOverview)}",`
+        : "";
+
+      return `  {\n    key: "${key}",\n    label: "${labelFallback}",\n    labels: ${labelsJson},\n    group: "${group}",\n    icon: "${icon}",\n    order: ${order ?? 99},${defaultEntryPart}${searchPart}${overviewPart}${subcatBlock}\n  },`;
     })
     .join("\n");
 

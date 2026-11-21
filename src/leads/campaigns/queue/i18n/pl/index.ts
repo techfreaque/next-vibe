@@ -4,6 +4,40 @@ export const translations: typeof enTranslations = {
   title: "Kolejka kampanii",
   description: "Leady aktualnie aktywne w kampaniach e-mail",
   enums: {
+    delivery: {
+      dueNow: "Do wysłania teraz",
+      overdue: "Spóźnione 24 h+",
+      scheduled: "Zaplanowane",
+      failed: "Błędy",
+      sent: "Wysłane",
+      opened: "Wysłane i otwarte",
+      clicked: "Wysłane i kliknięte",
+      unsubscribed: "Wypisani",
+      bounced: "Odbite",
+    },
+    emailJourneyVariantFilter: {
+      all: "Wszystkie",
+      uncensoredConvert: "Niecenzurowana konwersja",
+      sideHustle: "Dodatkowy zarobek",
+      quietRecommendation: "Cicha rekomendacja",
+      signupNurture: "Pielęgnacja po rejestracji",
+      retention: "Utrzymanie klienta",
+      winback: "Odzyskanie klienta",
+      newsletterMay2026: "Newsletter maj 2026",
+      newsletterNov2026: "Newsletter listopad 2026",
+    },
+    emailCampaignStageFilter: {
+      all: "Wszystkie",
+    },
+    emailCampaignStage: {
+      notStarted: "Nie rozpoczęto",
+      initial: "Pierwszy kontakt",
+      followup1: "Kontynuacja 1",
+      followup2: "Kontynuacja 2",
+      followup3: "Kontynuacja 3",
+      nurture: "Pielęgnacja",
+      reactivation: "Reaktywacja",
+    },
     campaignType: {
       leadCampaign: "Kampania leadów",
       newsletter: "Newsletter",
@@ -24,6 +58,35 @@ export const translations: typeof enTranslations = {
     description:
       "Wyświetl paginowaną listę leadów aktualnie w kampaniach e-mail",
     fields: {
+      delivery: {
+        label: "Stan maila",
+        description:
+          "Leady z mailem w tym stanie. Wysłane, otwarte, kliknięte, wypisania, odbicia i błędy używają okna dat",
+        placeholder: "Dowolny stan",
+      },
+      journeyVariant: {
+        label: "Wariant ścieżki",
+        description: "Tylko maile tej ścieżki",
+        placeholder: "Dowolna ścieżka",
+      },
+      stage: {
+        label: "Etap",
+        description: "Tylko maile tego etapu kampanii",
+        placeholder: "Dowolny etap",
+      },
+      locale: {
+        label: "Język",
+        description: "Wyrenderowana lokalizacja (de-DE) lub język (de)",
+        placeholder: "Dowolny język",
+      },
+      eventFrom: {
+        label: "Od",
+        description: "Pierwszy dzień okna zdarzeń",
+      },
+      eventTo: {
+        label: "Do",
+        description: "Ostatni dzień okna zdarzeń",
+      },
       page: {
         label: "Strona",
         description: "Numer strony",
@@ -38,6 +101,7 @@ export const translations: typeof enTranslations = {
       },
     },
     response: {
+      daysOverdue: "Dni opóźnienia",
       nextSubject: "Zaplanowany temat",
       leadId: "ID leada",
       leadEmail: "E-mail",
@@ -83,6 +147,9 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    overdueDays: "Spóźnione o {{days}} dni, nigdy nie wysłane",
+    titleWithCount: "Kolejka kampanii ({{count}})",
+    eventWindow: "Zdarzenia mailowe {{from}} do {{to}}",
     title: "Kolejka kampanii",
     refresh: "Odśwież",
     noData: "Brak wpisów w kolejce kampanii",

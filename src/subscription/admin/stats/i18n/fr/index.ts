@@ -48,6 +48,7 @@ export const translations: typeof enTranslations = {
         trialingCount: {
           label: "En essai",
         },
+        pastDueCount: { label: "En retard" },
         canceledCount: {
           label: "Annulés",
         },
@@ -74,6 +75,7 @@ export const translations: typeof enTranslations = {
         totalPurchased: {
           label: "Achetés",
         },
+        spentFromFree: { label: "Depuis l'allocation gratuite" },
         totalSpent: {
           label: "Dépensés",
         },
@@ -165,6 +167,43 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    paidPacks: "Packs payés : abonnement + achetés",
+    canceledShare: "Part résiliée, depuis le début",
+    spentSplit:
+      "{{packs}} prélevés sur les packs (comme dans Packs de crédits) · {{free}} sur les allocations gratuites",
+    creditsSold: "Crédits vendus",
+    creditsSoldHint:
+      "Packs d'abonnement et achetés. Hors crédits offerts et gains de parrainage.",
+    pastDueHint: "Paiement échoué, toujours compté comme abonné",
+    yearlyShare: "Formules annuelles",
+    yearlyShareHint:
+      "Part des abonnements actifs, en essai et en retard facturés à l'année",
+    showLegacy: "Afficher l'ancien aperçu des revenus",
+    hideLegacy: "Masquer l'ancien aperçu des revenus",
+    approxUsd: "env. USD",
+    openLabel: "Ouvrir :",
+    linkSubscriptions: "Liste des abonnements",
+    linkPurchases: "Packs de crédits",
+    linkReferrals: "Parrainages",
+    apply: "Appliquer",
+    sectionSubscriptions: "Abonnements",
+    sectionSubscriptionsHint: "État actuel, toute la période",
+    activePaid: "Actifs",
+    activePaidHint: "Statut actif. Même nombre que la liste des abonnements.",
+    churnHint:
+      "Résiliés parmi actifs, en essai, en retard et résiliés. Pas un churn mensuel.",
+    sectionCredits: "Crédits",
+    purchasedHint: "Crédits dans les packs des comptes",
+    spentHint: "Crédits consommés",
+    sectionReferrals: "Parrainages",
+    sectionLegacy: "Ancien aperçu des revenus",
+    sectionLegacyHint:
+      "Remplacé par le rapport de revenus. Converti en env. USD.",
+    revenueReportTitle:
+      "Revenus, MRR et churn sont désormais dans le rapport de revenus",
+    revenueReportHint:
+      "L'argent réellement encaissé par jour, par devise et par type, jusqu'au détail de chaque paiement.",
+    openRevenueReport: "Ouvrir le rapport de revenus",
     refresh: "Actualiser",
     filters: "Filtres",
   },

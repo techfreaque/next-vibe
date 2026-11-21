@@ -150,9 +150,9 @@ function ExecutionCard({
           {execution.taskDisplayName || execution.taskName}
         </Span>
         {execution.taskDisplayName &&
-          execution.taskDisplayName !== execution.taskName && (
+          execution.taskDisplayName !== execution.taskId && (
             <Span className="font-mono text-xs text-muted-foreground [overflow-wrap:anywhere]">
-              {execution.taskName}
+              {execution.taskId}
             </Span>
           )}
       </Div>

@@ -2,6 +2,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   get: {
+    focus: {
+      label: "À venir",
+    },
+    plan: {
+      label: "Formule",
+      description: "Uniquement les abonnements de cette formule",
+    },
     title: "Abonnements",
     titleShort: "Liste abos",
     description: "Parcourir tous les abonnements",
@@ -56,9 +63,20 @@ export const translations: typeof enTranslations = {
       placeholder: "Sélectionner l'ordre...",
     },
     response: {
+      summary: {
+        title: "Synthèse",
+      },
+      statusCounts: {
+        status: "État",
+        count: "Abonnements",
+      },
       title: "Abonnements",
       description: "Abonnements correspondants",
       subscriptions: {
+        cancelAt: "Résiliation le",
+        lastPaymentAmount: "Dernier prélèvement",
+        lastPaymentCurrency: "Devise du prélèvement",
+        lastPaymentAt: "Dernier paiement",
         userId: "Identifiant client",
         paymentFailedAt: "Premier échec de paiement",
         gracePeriodEndsAt: "Fin du délai de grâce",
@@ -130,6 +148,48 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    focusLabel: "À venir",
+    mrrScope:
+      "Compte les abonnements actifs et en essai selon leur dernier prélèvement. Hors retards, fins prévues et jamais prélevés.",
+    search: "Rechercher",
+    endingChip: "Fin prévue",
+    fxNote: "à taux fixes : {{rates}}",
+    pastDueRetry: "Paiement échoué, nouvelle tentative ou délai de grâce",
+    mrr: "MRR, env. USD",
+    renewingSoon: "Renouvellements sous 7 jours",
+    renewingSoonHint: "Actifs, période terminée dans la semaine",
+    ending: "Fin prévue",
+    endingHint: "Prendront fin sans renouvellement",
+    pastDue: "En retard",
+    pastDueHint: "sans prélèvement enregistré : {{count}}",
+    noChargeStep:
+      "Aucun prélèvement enregistré. Vérifiez le moyen de paiement avant le {{date}}",
+    retry: "Réessayer",
+    renewalOverdue: "Renouvellement en retard depuis le {{date}}",
+    filters: "Filtres",
+    hideFilters: "Masquer les filtres",
+    all: "Tous",
+    allCount: "Tous {{count}}",
+    activeFilters: "Filtré par",
+    removeFilter: "Retirer le filtre",
+    clearFilters: "Tout effacer",
+    customerFilter: "Client",
+    startedFrom: "Démarré depuis",
+    startedTo: "Démarré jusqu'au",
+    perMonth: "/ mois",
+    perYear: "/ an",
+    noCharge: "Aucun prélèvement",
+    graceUntil: "Accès coupé le {{date}} sans paiement",
+    canceledOn: "Résilié le {{date}}",
+    endsOn: "Prend fin le {{date}}, sans renouvellement",
+    renewsOn: "Renouvellement le {{date}}",
+    periodEnd: "Fin de période {{date}}",
+    startedOn: "Démarré le {{date}}",
+    lastPaid: "Dernier paiement {{date}}",
+    payments: "Paiements",
+    revenueReport: "Ouvrir le rapport de revenus",
+    emptyFiltered:
+      "Aucun résultat pour ces filtres. Retirez-en un pour élargir.",
     pick: "Sélectionner l’abonnement",
     failedPayments: "Transactions échouées",
     renewal: "Renouvellement prévu",
@@ -151,6 +211,16 @@ export const translations: typeof enTranslations = {
     viewStats: "Statistiques",
   },
   enums: {
+    focus: {
+      renewingSoon: "Renouvellements sous 7 jours",
+      ending: "Fin prévue",
+    },
+    plan: {
+      subscription: "Starter",
+      plus: "Plus",
+      pro: "Pro",
+      ultra: "Ultra",
+    },
     subscriptionStatusFilter: {
       incomplete: "Incomplet",
       incompleteExpired: "Expiré avant activation",

@@ -1,8 +1,9 @@
 "use client";
 
-import { LeadStatus } from "next-vibe/identity/lead/enum";
+import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
 import { scopedTranslation as leadsScopedTranslation } from "next-vibe/identity/lead/i18n";
 import { ActionCard } from "next-vibe/ui/components/action-card";
+import { KpiGrid, KpiTile } from "next-vibe/ui/components/analytics";
 import { Button, type ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
@@ -19,6 +20,7 @@ import { ProgressBlock } from "next-vibe/ui/components/progress-block";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
 import {
   useWidgetLocale,
   useWidgetNavigation,
@@ -97,6 +99,27 @@ export function LeadsDashboardWidget(_props: {
     })();
   };
 
+  const handleNavAcquisition = (): void => {
+    void (async (): Promise<void> => {
+      const def = await import("@/leads/analytics/acquisition/definition");
+      navigate(def.default.GET, {});
+    })();
+  };
+
+  const handleNavFunnel = (): void => {
+    void (async (): Promise<void> => {
+      const def = await import("@/leads/analytics/funnel/definition");
+      navigate(def.default.GET, {});
+    })();
+  };
+
+  const handleNavAbuse = (): void => {
+    void (async (): Promise<void> => {
+      const def = await import("@/leads/analytics/abuse/definition");
+      navigate(def.default.GET, {});
+    })();
+  };
+
   const handleNavLeadDetail = (leadId: string) => (): void => {
     void (async (): Promise<void> => {
       const def = await import("@/leads/[id]/definition");
@@ -121,65 +144,116 @@ export function LeadsDashboardWidget(_props: {
         />
       ) : (
         <>
-          {/* KPI Cards */}
-          <MetricGrid columns={4}>
+          {/* Acquisition snapshot: last 7 days, opens the analytics reports */}
+          <SectionGroup title={t("widget.last7Days")}>
+            <KpiGrid columns={5}>
+              <KpiTile
+                label={t("widget.humanLeads")}
+                value={data.last7Days.humanLeads.value}
+                previous={data.last7Days.humanLeads.previous}
+                sparkline={data.last7Days.humanTrend}
+                locale={locale}
+                onClick={handleNavAcquisition}
+              />
+              <KpiTile
+                label={t("widget.botLeads")}
+                value={data.last7Days.botLeads.value}
+                previous={data.last7Days.botLeads.previous}
+                sparkline={data.last7Days.botTrend}
+                invertDelta
+                locale={locale}
+                onClick={handleNavAcquisition}
+              />
+              <KpiTile
+                label={t("widget.signups")}
+                value={data.last7Days.signups.value}
+                previous={data.last7Days.signups.previous}
+                sparkline={data.last7Days.signupTrend}
+                locale={locale}
+                onClick={handleNavFunnel}
+              />
+              <KpiTile
+                label={t("widget.payers")}
+                value={data.last7Days.payers.value}
+                previous={data.last7Days.payers.previous}
+                sparkline={data.last7Days.payerTrend}
+                tone="positive"
+                locale={locale}
+                onClick={handleNavFunnel}
+              />
+              <KpiTile
+                label={t("widget.flaggedNetworks")}
+                value={data.last7Days.flaggedNetworks.value}
+                previous={data.last7Days.flaggedNetworks.previous}
+                sparkline={data.last7Days.flaggedTrend}
+                invertDelta
+                tone={
+                  data.last7Days.flaggedNetworks.value > 0
+                    ? "warning"
+                    : undefined
+                }
+                locale={locale}
+                onClick={handleNavAbuse}
+              />
+            </KpiGrid>
+          </SectionGroup>
+
+          {/* Lead base (all time, includes bots) */}
+          <MetricGrid columns={2}>
             <MetricCard
               label={t("widget.totalLeads")}
               value={data.totalLeadsCount}
             />
             <MetricCard
-              label={t("widget.activeLeads")}
-              value={data.activeLeadsCount}
-              variant="info"
-            />
-            <MetricCard
-              label={t("widget.newThisWeek")}
-              value={data.newThisWeekCount}
-              variant={data.newThisWeekCount > 0 ? "success" : "default"}
-            />
-            <MetricCard
-              label={t("widget.conversionRate")}
-              value={data.conversionRate}
-              format="percentage"
-              variant={data.conversionRate > 10 ? "success" : "warning"}
-            />
-          </MetricGrid>
-
-          {/* Second row: campaign + converted */}
-          <MetricGrid columns={2}>
-            <MetricCard
               label={t("widget.runningCampaigns")}
               value={data.runningCampaignsCount}
               variant="info"
             />
-            <MetricCard
-              label={t("widget.converted")}
-              value={data.convertedCount}
-              variant="success"
-            />
           </MetricGrid>
 
-          {/* Quick Actions */}
-          <SectionGroup title={t("widget.quickActions")}>
-            <Div className="grid grid-cols-1 gap-2 @sm:grid-cols-2 @lg:grid-cols-3">
+          <SectionGroup title={t("widget.reports")}>
+            <Div className="grid grid-cols-1 gap-2 @sm:grid-cols-2 @lg:grid-cols-4">
               <ActionCard
-                icon={<Plus className="h-4 w-4" />}
-                title={t("widget.newLead")}
-                description={t("widget.newLeadDesc")}
-                onClick={handleNavNewLead}
+                icon={<BarChart className="h-4 w-4" />}
+                title={t("widget.acquisition")}
+                description={t("widget.acquisitionDesc")}
+                onClick={handleNavAcquisition}
                 variant="primary"
               />
               <ActionCard
+                icon={<ArrowRight className="h-4 w-4" />}
+                title={t("widget.funnel")}
+                description={t("widget.funnelDesc")}
+                onClick={handleNavFunnel}
+              />
+              <ActionCard
                 icon={<UserSearch className="h-4 w-4" />}
-                title={t("widget.searchLeads")}
-                description={t("widget.searchLeadsDesc")}
-                onClick={handleNavSearch}
+                title={t("widget.abuse")}
+                description={t("widget.abuseDesc")}
+                onClick={handleNavAbuse}
               />
               <ActionCard
                 icon={<BarChart className="h-4 w-4" />}
                 title={t("widget.campaignStats")}
                 description={t("widget.campaignStatsDesc")}
                 onClick={handleNavCampaignStats}
+              />
+            </Div>
+          </SectionGroup>
+
+          <SectionGroup title={t("widget.quickActions")}>
+            <Div className="grid grid-cols-1 gap-2 @sm:grid-cols-2 @lg:grid-cols-4">
+              <ActionCard
+                icon={<Plus className="h-4 w-4" />}
+                title={t("widget.newLead")}
+                description={t("widget.newLeadDesc")}
+                onClick={handleNavNewLead}
+              />
+              <ActionCard
+                icon={<UserSearch className="h-4 w-4" />}
+                title={t("widget.searchLeads")}
+                description={t("widget.searchLeadsDesc")}
+                onClick={handleNavSearch}
               />
               <ActionCard
                 icon={<ArrowRight className="h-4 w-4" />}
@@ -219,7 +293,7 @@ export function LeadsDashboardWidget(_props: {
                         <ProgressBlock
                           value={statusCount}
                           max={data.totalLeadsCount}
-                          label={String(statusCount)}
+                          label={statusCount.toLocaleString(locale)}
                           showPercentage={false}
                           className="flex-1 max-w-48"
                         />
@@ -269,7 +343,14 @@ export function LeadsDashboardWidget(_props: {
                       title={
                         lead.businessName || lead.email || lead.id.slice(0, 8)
                       }
-                      subtitle={lead.businessName ? lead.email : undefined}
+                      subtitle={[
+                        lead.businessName ? lead.email : null,
+                        isValidEnumValue(LeadSource, lead.source)
+                          ? tLeads(lead.source)
+                          : lead.source,
+                      ]
+                        .filter((part): part is string => Boolean(part))
+                        .join(" · ")}
                       badges={
                         <StatusPill
                           status={tLeads(

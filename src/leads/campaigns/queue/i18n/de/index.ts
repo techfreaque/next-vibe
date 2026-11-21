@@ -4,6 +4,40 @@ export const translations: typeof enTranslations = {
   title: "Kampagnen-Warteschlange",
   description: "Leads, die aktuell in E-Mail-Kampagnen aktiv sind",
   enums: {
+    delivery: {
+      dueNow: "Jetzt fällig",
+      overdue: "Überfällig 24 h+",
+      scheduled: "Geplant",
+      failed: "Fehlgeschlagen",
+      sent: "Gesendet",
+      opened: "Gesendet und geöffnet",
+      clicked: "Gesendet und geklickt",
+      unsubscribed: "Abgemeldet",
+      bounced: "Gebounct",
+    },
+    emailJourneyVariantFilter: {
+      all: "Alle",
+      uncensoredConvert: "Unzensierter Konverter",
+      sideHustle: "Nebenverdienst",
+      quietRecommendation: "Stille Empfehlung",
+      signupNurture: "Anmeldungs-Nurturing",
+      retention: "Kundenbindung",
+      winback: "Rückgewinnung",
+      newsletterMay2026: "Newsletter Mai 2026",
+      newsletterNov2026: "Newsletter November 2026",
+    },
+    emailCampaignStageFilter: {
+      all: "Alle",
+    },
+    emailCampaignStage: {
+      notStarted: "Nicht gestartet",
+      initial: "Erster Kontakt",
+      followup1: "Nachfassung 1",
+      followup2: "Nachfassung 2",
+      followup3: "Nachfassung 3",
+      nurture: "Pflege",
+      reactivation: "Reaktivierung",
+    },
     campaignType: {
       leadCampaign: "Lead-Kampagne",
       newsletter: "Newsletter",
@@ -24,6 +58,35 @@ export const translations: typeof enTranslations = {
     description:
       "Paginierte Liste der Leads anzeigen, die aktuell in E-Mail-Kampagnen sind",
     fields: {
+      delivery: {
+        label: "E-Mail-Status",
+        description:
+          "Leads mit einer E-Mail in diesem Status. Gesendet, geöffnet, geklickt, abgemeldet, gebounct und fehlgeschlagen nutzen das Datumsfenster",
+        placeholder: "Jeder Status",
+      },
+      journeyVariant: {
+        label: "Journey-Variante",
+        description: "Nur E-Mails dieser Journey",
+        placeholder: "Jede Journey",
+      },
+      stage: {
+        label: "Stufe",
+        description: "Nur E-Mails dieser Kampagnenstufe",
+        placeholder: "Jede Stufe",
+      },
+      locale: {
+        label: "Sprache",
+        description: "Gerenderte Locale (de-DE) oder Sprache (de)",
+        placeholder: "Jede Sprache",
+      },
+      eventFrom: {
+        label: "Von",
+        description: "Erster Tag des Ereignisfensters",
+      },
+      eventTo: {
+        label: "Bis",
+        description: "Letzter Tag des Ereignisfensters",
+      },
       page: {
         label: "Seite",
         description: "Seitenzahl",
@@ -38,6 +101,7 @@ export const translations: typeof enTranslations = {
       },
     },
     response: {
+      daysOverdue: "Tage überfällig",
       nextSubject: "Geplanter Betreff",
       leadId: "Lead-ID",
       leadEmail: "E-Mail",
@@ -86,6 +150,9 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    overdueDays: "Seit {{days}} Tagen überfällig, nie gesendet",
+    titleWithCount: "Kampagnen-Queue ({{count}})",
+    eventWindow: "E-Mail-Ereignisse {{from}} bis {{to}}",
     title: "Kampagnen-Warteschlange",
     refresh: "Aktualisieren",
     noData: "Keine Einträge in der Kampagnenwarteschlange",

@@ -1,11 +1,16 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Zahlungsdiagnose",
-  short: "Zahlungsanbieter",
+  title: "Zahlungstransaktionen",
+  short: "Transaktionen",
   description:
     "Prüfe Checkout- und Verlängerungszahlungen, fehlgeschlagene Zahlungen und die Verarbeitung gespeicherter Webhooks.",
   search: {
+    kind: "Bezahlt für",
+    currency: "Währung",
+    from: "Von",
+    to: "Bis",
+    dayFormat: "Kalendertag in UTC (JJJJ-MM-TT). Beide Tage zählen mit.",
     view: "Ansicht",
     userId: "Kunden-ID",
     transactionId: "Transaktions-ID",
@@ -17,9 +22,36 @@ export const translations: typeof enTranslations = {
     limit: "Pro Seite",
   },
   widget: {
+    invoiceRef: "Rechnungsref.",
+    refundBlocked: "Erstattung hier nicht möglich: {{reason}}",
+    netLine: "Erstattet {{refunded}} · Netto {{net}}",
+    refundRule:
+      "Bezahlte Stripe-Zahlungen mit Zahlungsreferenz öffnen die Erstattungsprüfung. Andere bezahlte Zeilen zeigen einen gesperrten Button mit Grund.",
+    showFilters: "Filter zeigen",
+    hideFiltersPhone: "Filter ausblenden",
+    search: "Suchen",
+    matchingStatus: "Nur {{status}}",
+    details: "Details",
+    hideDetails: "Details ausblenden",
+    notRecorded: "Nicht erfasst",
+    refundYes: "Ja, Prüfung möglich",
+    refundNo: "Nein",
+    retry: "Erneut versuchen",
+    filters: "Filter",
+    hideFilters: "Filter ausblenden",
+    all: "Alle",
+    activeFilters: "Gefiltert nach",
+    removeFilter: "Filter entfernen",
+    matching: "Treffer",
+    matchingHint: "Alle Status, keine Filter",
+    collected: "Eingenommen {{currency}}, brutto",
+    collectedHint:
+      "{{succeeded}} bezahlt · {{failed}} fehlgeschlagen · {{refunded}} erstattet",
+    emptyFiltered:
+      "Kein Treffer für diese Filter. Entferne einen, um mehr zu sehen.",
+    emptyAll: "Noch keine Zahlungen erfasst.",
     clearFilters: "Filter zurücksetzen",
-    transactionSearch:
-      "Suche nach E-Mail, Transaktions-ID oder Rechnungsreferenz des Anbieters.",
+    transactionSearch: "E-Mail, Transaktions-ID oder Rechnungsreferenz",
     webhookSearch:
       "Suche nach Ereignistyp oder Ereignisreferenz des Anbieters.",
     processingDetail:
@@ -49,6 +81,17 @@ export const translations: typeof enTranslations = {
     transactionScope: "Transaktions-ID {{id}}",
   },
   enums: {
+    refundBlock: {
+      notStripe: "Kryptozahlung: Erstattung beim Anbieter",
+      noReference: "Keine Stripe-Zahlungsreferenz erfasst",
+      zeroAmount: "Nichts berechnet",
+      setup: "Kartenhinterlegung, keine Zahlung",
+    },
+    kind: {
+      pack: "Credit-Paket",
+      newSubscription: "Neues Abo",
+      renewal: "Verlängerung",
+    },
     paymentProvider: {
       stripe: "Stripe",
       nowpayments: "NOWPayments",
@@ -83,6 +126,7 @@ export const translations: typeof enTranslations = {
   },
   successDescription: "Die passenden Zahlungsdaten sind verfügbar.",
   errors: {
+    dateRange: "Der Starttag muss vor oder auf dem Endtag liegen.",
     unauthorized: "Melde dich an, um Zahlungsdaten anzuzeigen.",
     validation: "Prüfe die Filter und die Seitenzahl.",
     forbidden: "Für Zahlungsdaten ist die Administratorrolle erforderlich.",
@@ -94,6 +138,15 @@ export const translations: typeof enTranslations = {
     unsavedChanges: "Speichere oder verwirf deine Änderungen.",
   },
   response: {
+    refundBlock: "Erstattung gesperrt",
+    refundedAmount: "Erstatteter Betrag",
+    gross: "Brutto",
+    kind: "Bezahlt für",
+    totals: "Summen je Währung",
+    collected: "Eingenommen",
+    succeeded: "Bezahlt",
+    failed: "Fehlgeschlagen",
+    refunded: "Erstattet",
     view: "Ansicht",
     id: "Transaktions-ID",
     userId: "Kunden-ID",

@@ -9,9 +9,11 @@ import { FilePlus } from "next-vibe/ui/components/icons/FilePlus";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetIsInteractive,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetResponseOnly,
   useWidgetTranslation,
@@ -21,6 +23,7 @@ import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-a
 import { type JSX } from "react";
 
 import { InvoiceStatus } from "../enum";
+import { scopedTranslation as paymentTranslation } from "../i18n";
 import type definition from "./definition";
 import type { PaymentDashboardResponseOutput } from "./definition";
 
@@ -56,12 +59,15 @@ function KpiCard({
   total,
   currency,
   highlight,
+  amounts,
 }: {
   label: string;
   count: number;
   total?: number;
   currency: string;
   highlight?: boolean;
+  /** Per-currency amounts, preferred over a single total when present */
+  amounts?: string;
 }): JSX.Element {
   return (
     <Div
@@ -72,7 +78,7 @@ function KpiCard({
           <AlertTriangle className="h-3.5 w-3.5 text-destructive shrink-0" />
         )}
         <Span
-          className={`text-xs font-medium uppercase tracking-wide ${highlight ? "text-destructive" : "text-muted-foreground"}`}
+          className={`text-xs font-medium ${highlight ? "text-destructive" : "text-muted-foreground"}`}
         >
           {label}
         </Span>
@@ -83,8 +89,8 @@ function KpiCard({
         {count}
       </Span>
       {total !== undefined && (
-        <Span className="text-sm text-muted-foreground font-mono">
-          {fmtAmount(total, currency)}
+        <Span className="text-sm tabular-nums text-muted-foreground">
+          {amounts ?? fmtAmount(total, currency)}
         </Span>
       )}
     </Div>
@@ -96,6 +102,8 @@ export function PaymentDashboardWidget(_props: {
   field: (typeof definition.GET)["fields"];
 }): JSX.Element {
   const data = useWidgetValue<typeof definition.GET>();
+  const locale = useWidgetLocale();
+  const { t: tPayment } = paymentTranslation.scopedT(locale);
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const openRelated = useRelatedEntityNavigation();
@@ -177,16 +185,31 @@ export function PaymentDashboardWidget(_props: {
       })();
     };
 
+  const perCurrency = (
+    key: "open" | "overdue" | "unpaid",
+  ): string | undefined =>
+    data && data.byCurrency.length > 0
+      ? data.byCurrency
+          .map((row) => fmtAmount(row[key], row.currency))
+          .join(" + ")
+      : undefined;
+
   return (
-    <Div className="flex flex-col gap-6">
+    <WidgetShell className="min-w-0 gap-6">
       {isInteractive && (
-        <Div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3">
-          <Span className="font-semibold">
-            {t("widget.commercialDocuments")}
-          </Span>
+        <Div className="flex flex-wrap items-center justify-between gap-3">
+          <Div className="flex min-w-0 flex-col gap-0.5">
+            <Span className="text-base font-semibold">
+              {t("widget.commercialDocuments")}
+            </Span>
+            <Span className="text-xs text-muted-foreground">
+              {t("widget.subtitle")}
+            </Span>
+          </Div>
           <Button
             type="button"
             variant="outline"
+            size="sm"
             className="whitespace-normal"
             onClick={() =>
               openRelated(() =>
@@ -213,18 +236,20 @@ export function PaymentDashboardWidget(_props: {
       {data && (
         <>
           {/* KPI Cards */}
-          <Div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <Div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
             <KpiCard
               label={t("widget.openInvoices")}
               count={data.openInvoices.count}
               total={data.openInvoices.total}
               currency={currency}
+              amounts={perCurrency("open")}
             />
             <KpiCard
               label={t("widget.overdue")}
               count={data.overdueInvoices.count}
               total={data.overdueInvoices.total}
               currency={currency}
+              amounts={perCurrency("overdue")}
               highlight={data.overdueInvoices.count > 0}
             />
             <KpiCard
@@ -232,17 +257,35 @@ export function PaymentDashboardWidget(_props: {
               count={data.unpaidBills.count}
               total={data.unpaidBills.total}
               currency={currency}
+              amounts={perCurrency("unpaid")}
             />
             <KpiCard
               label={t("widget.draftInvoices")}
               count={data.draftInvoices.count}
               currency={currency}
             />
+            <KpiCard
+              label={t("widget.estimatesSent")}
+              count={data.estimates.sentCount}
+              currency={currency}
+              amounts={[
+                ...(data.estimates.sentByCurrency.length > 0
+                  ? [
+                      data.estimates.sentByCurrency
+                        .map((row) => fmtAmount(row.total, row.currency))
+                        .join(" + "),
+                    ]
+                  : [fmtAmount(0, currency)]),
+                t("widget.estimateDrafts", {
+                  count: data.estimates.draftCount,
+                }),
+              ].join(" · ")}
+            />
           </Div>
 
           {/* Quick Actions */}
           <Div className="flex flex-col gap-2">
-            <H3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+            <H3 className="text-sm font-semibold text-muted-foreground">
               {t("widget.quickActions")}
             </H3>
             <Div className="flex flex-wrap gap-2">
@@ -267,6 +310,7 @@ export function PaymentDashboardWidget(_props: {
               </Button>
               <Button
                 type="button"
+                variant="outline"
                 size="sm"
                 onClick={handleNavNewEstimate}
                 className="gap-1.5"
@@ -297,15 +341,100 @@ export function PaymentDashboardWidget(_props: {
             </Div>
           </Div>
 
+          {/* Recent Estimates */}
+          <Div className="flex flex-col gap-2">
+            <H3 className="text-sm font-semibold text-muted-foreground">
+              {t("widget.recentEstimates")}
+            </H3>
+            {data.estimates.recent.length === 0 ? (
+              <Div className="rounded-md border border-dashed px-4 py-6 text-center">
+                <P className="text-sm text-muted-foreground">
+                  {t("widget.noRecentEstimates")}
+                </P>
+              </Div>
+            ) : (
+              <Div className="flex flex-col divide-y divide-border overflow-hidden rounded-lg border">
+                {data.estimates.recent.map((estimate) => (
+                  <Div
+                    key={estimate.id}
+                    className="flex flex-wrap items-center justify-between gap-2 bg-card px-4 py-3"
+                  >
+                    <Div className="flex min-w-0 flex-col gap-0.5">
+                      <Span className="font-mono text-sm font-semibold">
+                        {estimate.estimateNumber}
+                      </Span>
+                      <Span className="text-xs text-muted-foreground">
+                        {[
+                          tPayment(estimate.status),
+                          ...(estimate.validUntil
+                            ? [
+                                t("widget.validUntil", {
+                                  date: new Date(
+                                    estimate.validUntil,
+                                  ).toLocaleDateString(locale),
+                                }),
+                              ]
+                            : []),
+                        ].join(" · ")}
+                      </Span>
+                    </Div>
+                    <Div className="flex items-center gap-3">
+                      <Span className="text-sm font-medium tabular-nums">
+                        {fmtAmount(estimate.total, estimate.currency)}
+                      </Span>
+                      {isInteractive && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            openRelated(
+                              () =>
+                                import("@/payment/estimate/[estimateId]/get/definition").then(
+                                  (module) => module.default.GET,
+                                ),
+                              { urlPathParams: { estimateId: estimate.id } },
+                            )
+                          }
+                        >
+                          {t("widget.view")}
+                        </Button>
+                      )}
+                    </Div>
+                  </Div>
+                ))}
+              </Div>
+            )}
+          </Div>
+
           {/* Recent Invoices */}
           <Div className="flex flex-col gap-2">
-            <H3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+            <H3 className="text-sm font-semibold text-muted-foreground">
               {t("widget.recentInvoices")}
             </H3>
 
             {data.recentInvoices.length === 0 ? (
-              <Div className="py-8 text-center border border-dashed rounded-md text-muted-foreground">
-                <P className="text-sm">{t("widget.noRecentInvoices")}</P>
+              <Div className="flex flex-col items-center gap-2 rounded-md border border-dashed px-4 py-8 text-center">
+                <P className="text-sm font-medium">
+                  {t("widget.noRecentInvoices")}
+                </P>
+                <P className="max-w-prose text-sm text-muted-foreground">
+                  {t("widget.notInvoicesHint")}
+                </P>
+                <Button
+                  type="button"
+                  variant="link"
+                  size="sm"
+                  onClick={() =>
+                    openRelated(() =>
+                      import("../processor/definition").then(
+                        (module) => module.default.GET,
+                      ),
+                    )
+                  }
+                >
+                  {t("widget.openTransactions")}
+                </Button>
               </Div>
             ) : (
               <Div className="flex flex-col divide-y divide-border rounded-lg border overflow-hidden">
@@ -326,7 +455,7 @@ export function PaymentDashboardWidget(_props: {
                         )}
                       </Div>
                       <Div className="flex items-center gap-3 text-xs text-muted-foreground">
-                        <Span className="font-medium text-foreground font-mono">
+                        <Span className="font-medium tabular-nums text-foreground">
                           {fmtAmount(parseFloat(inv.amount), inv.currency)}
                         </Span>
                         {inv.dueDate && (
@@ -377,6 +506,6 @@ export function PaymentDashboardWidget(_props: {
           </Div>
         </>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

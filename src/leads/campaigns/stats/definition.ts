@@ -1,37 +1,67 @@
 /**
- * Campaign Stats API Definition
- * GET endpoint for email campaign performance statistics
+ * Campaign performance report (alias campaign-stats).
+ * Is the email engine running, what is stuck in the queue, and how do the
+ * journeys perform: sent, opened, clicked, unsubscribed, bounced and failed
+ * over time, per journey variant, stage and locale. Every tile, bar and row
+ * drills into the campaign queue (leads) with the same filters.
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
 import {
+  EmailCampaignStageFilter,
+  EmailCampaignStageFilterOptions,
   EmailJourneyVariantFilter,
   EmailJourneyVariantFilterOptions,
 } from "next-vibe/identity/lead/enum";
 import { UserRole } from "next-vibe/identity/roles/enum";
-import { CronTaskPriorityDB, CronTaskStatusDB } from "next-vibe/tasks/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
-  objectField,
+  backButton,
   requestField,
-  responseArrayField,
   responseField,
+  widgetField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
+import { analyticsWindowFields } from "next-vibe/unified-ui/analytics/fields";
+import {
+  analyticsWindowSchema,
+  breakdownSchema,
+  funnelSchema,
+  kpiSchema,
+  timeSeriesSchema,
+} from "next-vibe/unified-ui/analytics/schema";
 import { z } from "zod";
 
 import { CAMPAIGN_STATS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
+
 const CampaignStatsWidget = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CampaignStatsWidget })),
 );
+
+/** Scheduler state of one campaign cron task. */
+export const CAMPAIGN_TASK_STATES = [
+  "missing",
+  "disabled",
+  "failing",
+  "running",
+] as const;
+
+const automationSchema = z.object({
+  id: z.string(),
+  state: z.enum(CAMPAIGN_TASK_STATES),
+  schedule: z.string().nullable(),
+  lastRunAt: z.string().nullable(),
+  nextRunAt: z.string().nullable(),
+  consecutiveFailures: z.number(),
+  lastError: z.string().nullable(),
+});
 
 const { GET } = createEndpoint({
   scopedTranslation,
@@ -52,439 +82,151 @@ const { GET } = createEndpoint({
     render: CampaignStatsWidget,
     usage: { request: "data", response: true } as const,
     children: {
+      backButton: backButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
+      ...analyticsWindowFields,
       journeyVariant: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
         label: "get.fields.journeyVariant.label",
         description: "get.fields.journeyVariant.description",
+        placeholder: "get.fields.journeyVariant.placeholder",
         options: EmailJourneyVariantFilterOptions,
-        columns: 6,
+        columns: 4,
         schema: z.enum(EmailJourneyVariantFilter).optional(),
       }),
-
-      // Top-level counts
-      total: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "get.response.total",
-        schema: z.number(),
+      stage: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.fields.stage.label",
+        description: "get.fields.stage.description",
+        placeholder: "get.fields.stage.placeholder",
+        options: EmailCampaignStageFilterOptions,
+        columns: 4,
+        schema: z.enum(EmailCampaignStageFilter).optional(),
       }),
-      pending: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "get.response.pending",
-        schema: z.number(),
-      }),
-      sent: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "get.response.sent",
-        schema: z.number(),
-      }),
-      delivered: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "get.response.delivered",
-        schema: z.number(),
-      }),
-      opened: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "get.response.opened",
-        schema: z.number(),
-      }),
-      clicked: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "get.response.clicked",
-        schema: z.number(),
-      }),
-      failed: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "get.response.failed",
-        schema: z.number(),
+      locale: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.locale.label",
+        description: "get.fields.locale.description",
+        placeholder: "get.fields.locale.placeholder",
+        columns: 4,
+        schema: z.string().trim().max(20).optional(),
       }),
 
-      // Total leads & unique persons
-      totalLeads: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "get.response.totalLeads",
-        schema: z.number(),
-      }),
-      linkedLeadsCount: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "get.response.linkedLeadsCount",
-        schema: z.number(),
-      }),
-      uniquePersonsEstimate: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "get.response.uniquePersonsEstimate",
-        schema: z.number(),
+      formAlert: widgetField(scopedTranslation, {
+        type: WidgetType.FORM_ALERT,
+        usage: { request: "data" },
       }),
 
-      // Queue health
-      pendingLeadsCount: responseField(scopedTranslation, {
+      window: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        label: "get.response.pendingLeadsCount",
-        schema: z.number(),
+        label: "get.response.window",
+        schema: analyticsWindowSchema,
       }),
-      emailsScheduledToday: responseField(scopedTranslation, {
+      engine: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        label: "get.response.emailsScheduledToday",
-        schema: z.number(),
-      }),
-
-      // Derived rates (0–1 fractions)
-      openRate: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "get.response.openRate",
-        schema: z.number(),
-      }),
-      clickRate: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "get.response.clickRate",
-        schema: z.number(),
-      }),
-      deliveryRate: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "get.response.deliveryRate",
-        schema: z.number(),
-      }),
-      failureRate: responseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        label: "get.response.failureRate",
-        schema: z.number(),
-      }),
-
-      // Breakdowns
-      byStage: responseArrayField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "get.response.byStage",
-        description: "get.response.byStage",
-        child: objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-          usage: { response: true },
-          children: {
-            stage: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.byStage",
-              schema: z.string(),
-            }),
-            total: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.total",
-              schema: z.number(),
-            }),
-            sent: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.sent",
-              schema: z.number(),
-            }),
-            opened: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.opened",
-              schema: z.number(),
-            }),
-            clicked: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.clicked",
-              schema: z.number(),
-            }),
-            failed: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.failed",
-              schema: z.number(),
-            }),
-          },
+        label: "get.response.engine",
+        schema: z.object({
+          /** Dispatcher (email-campaigns task) state: the one that sends. */
+          dispatcher: automationSchema,
+          tasks: z.array(automationSchema),
         }),
       }),
-
-      quotaProgress: responseArrayField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "get.response.quotaProgress",
-        description: "get.response.quotaProgress",
-        child: objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-          usage: { response: true },
-          children: {
-            locale: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.quotaProgress",
-              schema: z.string(),
-            }),
-            weeklyQuota: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.total",
-              schema: z.number(),
-            }),
-            startedThisWeek: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.sent",
-              schema: z.number(),
-            }),
-            remaining: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.pending",
-              schema: z.number(),
-            }),
-            perRunBudget: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.quotaProgress",
-              schema: z.number(),
-            }),
-            totalRunsPerWeek: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.quotaProgress",
-              schema: z.number(),
-            }),
-            accumulator: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.quotaProgress",
-              schema: z.number(),
-            }),
-          },
+      queue: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.queue",
+        schema: z.object({
+          dueNow: z.number(),
+          overdue24h: z.number(),
+          scheduled: z.number(),
+          scheduledNext24h: z.number(),
+          failed7d: z.number(),
+          /** Distinct leads behind dueNow (what campaign-queue lists). */
+          dueLeads: z.number(),
+          lastSentAt: z.string().nullable(),
+          sent24h: z.number(),
+          stuckClaims: z.number(),
+          oldestDueAt: z.string().nullable(),
+          /** Whole days since the oldest due email was scheduled (0 = none). */
+          oldestDueDays: z.number(),
+          nextScheduledAt: z.string().nullable(),
+          leadsInCampaign: z.number(),
         }),
       }),
-
-      campaignTasks: responseArrayField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "get.response.campaignTasks",
-        description: "get.response.campaignTasks",
-        child: objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-          usage: { response: true },
-          children: {
-            id: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.campaignTasks",
-              schema: z.string(),
-            }),
-            shortId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.campaignTasks",
-              schema: z.string(),
-            }),
-            routeId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.campaignTasks",
-              schema: z.string(),
-            }),
-            displayName: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.campaignTasks",
-              schema: z.string(),
-            }),
-            schedule: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.campaignTasks",
-              schema: z.string(),
-            }),
-            enabled: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.campaignTasks",
-              schema: z.boolean(),
-            }),
-            priority: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.campaignTasks",
-              schema: z.enum(CronTaskPriorityDB),
-            }),
-            lastExecutedAt: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.campaignTasks",
-              schema: z.string().nullable(),
-            }),
-            nextExecutionAt: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.campaignTasks",
-              schema: z.string().nullable(),
-            }),
-            executionCount: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.campaignTasks",
-              schema: z.number(),
-            }),
-            successCount: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.campaignTasks",
-              schema: z.number(),
-            }),
-            averageExecutionTime: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.campaignTasks",
-              schema: z.number().nullable(),
-            }),
-            lastResultSummary: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.campaignTasks",
-              schema: z.string().nullable(),
-            }),
-            recentExecutions: responseArrayField(scopedTranslation, {
-              type: WidgetType.CONTAINER,
-              title: "get.response.campaignTasks",
-              description: "get.response.campaignTasks",
-              child: objectField(scopedTranslation, {
-                type: WidgetType.CONTAINER,
-                layoutType: LayoutType.GRID,
-                columns: 12,
-                usage: { response: true },
-                children: {
-                  status: responseField(scopedTranslation, {
-                    type: WidgetType.TEXT,
-                    label: "get.response.campaignTasks",
-                    schema: z.enum(CronTaskStatusDB),
-                  }),
-                  completedAt: responseField(scopedTranslation, {
-                    type: WidgetType.TEXT,
-                    label: "get.response.campaignTasks",
-                    schema: z.string().nullable(),
-                  }),
-                  durationMs: responseField(scopedTranslation, {
-                    type: WidgetType.TEXT,
-                    label: "get.response.campaignTasks",
-                    schema: z.number().nullable(),
-                  }),
-                  resultSnippet: responseField(scopedTranslation, {
-                    type: WidgetType.TEXT,
-                    label: "get.response.campaignTasks",
-                    schema: z.string().nullable(),
-                  }),
-                  errorSnippet: responseField(scopedTranslation, {
-                    type: WidgetType.TEXT,
-                    label: "get.response.campaignTasks",
-                    schema: z.string().nullable(),
-                  }),
-                },
-              }),
-            }),
-          },
+      kpis: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.kpis",
+        schema: z.object({
+          sent: kpiSchema,
+          openRate: kpiSchema,
+          clickRate: kpiSchema,
+          unsubscribed: kpiSchema,
+          bounced: kpiSchema,
+          failed: kpiSchema,
         }),
       }),
-
-      alerts: responseArrayField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "get.response.alerts",
-        description: "get.response.alerts",
-        child: objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-          usage: { response: true },
-          children: {
-            taskId: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.alerts",
-              schema: z.string(),
-            }),
-            taskName: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.alerts",
-              schema: z.string(),
-            }),
-            priority: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.alerts",
-              schema: z.enum(CronTaskPriorityDB),
-            }),
-            consecutiveFailures: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.alerts",
-              schema: z.number(),
-            }),
-            lastError: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.alerts",
-              schema: z.string().nullable(),
-            }),
-            lastFailedAt: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.alerts",
-              schema: z.string().nullable(),
-            }),
-          },
+      totals: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.totals",
+        schema: z.object({
+          opened: z.number(),
+          clicked: z.number(),
+          /** Failed rows that are dedupe/status skips, not send errors. */
+          skipped: z.number(),
         }),
       }),
-
-      taskStats: objectField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        layoutType: LayoutType.GRID,
-        columns: 12,
-        usage: { response: true },
-        children: {
-          totalTasks: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            label: "get.response.taskStats",
-            schema: z.number(),
-          }),
-          enabledTasks: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            label: "get.response.taskStats",
-            schema: z.number(),
-          }),
-          disabledTasks: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            label: "get.response.taskStats",
-            schema: z.number(),
-          }),
-          successRate24h: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            label: "get.response.taskStats",
-            schema: z.number().nullable(),
-          }),
-          failedTasks24h: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            label: "get.response.taskStats",
-            schema: z.number(),
-          }),
-          // eslint-disable-next-line i18next/no-literal-string
-          systemHealth: responseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            label: "get.response.taskStats",
-            schema: z.enum(["healthy", "warning", "critical"]),
-          }),
-        },
+      trend: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.trend",
+        schema: timeSeriesSchema,
       }),
-
-      byJourneyVariant: responseArrayField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "get.response.byJourneyVariant",
-        description: "get.response.byJourneyVariant",
-        child: objectField(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-          usage: { response: true },
-          children: {
-            variant: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.byJourneyVariant",
-              schema: z.string(),
-            }),
-            total: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.total",
-              schema: z.number(),
-            }),
-            sent: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.sent",
-              schema: z.number(),
-            }),
-            openRate: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.openRate",
-              schema: z.number(),
-            }),
-            clickRate: responseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              label: "get.response.clickRate",
-              schema: z.number(),
-            }),
-          },
-        }),
+      problems: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.problems",
+        schema: timeSeriesSchema,
+      }),
+      variantTrend: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.variantTrend",
+        schema: timeSeriesSchema,
+      }),
+      funnel: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.funnel",
+        schema: funnelSchema,
+      }),
+      byVariant: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.byVariant",
+        schema: breakdownSchema,
+      }),
+      byStage: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.byStage",
+        schema: breakdownSchema,
+      }),
+      byLocale: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.byLocale",
+        schema: breakdownSchema,
+      }),
+      topErrors: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.topErrors",
+        schema: breakdownSchema,
       }),
     },
   }),
+
+  options: {
+    formOptions: {
+      autoSubmit: true,
+      debounceMs: 0,
+    },
+  },
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
@@ -531,38 +273,155 @@ const { GET } = createEndpoint({
   },
 
   examples: {
-    requests: { default: {} },
+    requests: {
+      default: {},
+      sideHustle: {
+        journeyVariant: EmailJourneyVariantFilter.SIDE_HUSTLE,
+      },
+    },
     responses: {
       default: {
-        total: 0,
-        pending: 0,
-        sent: 0,
-        delivered: 0,
-        opened: 0,
-        clicked: 0,
-        failed: 0,
-        openRate: 0,
-        clickRate: 0,
-        deliveryRate: 0,
-        failureRate: 0,
-        totalLeads: 0,
-        linkedLeadsCount: 0,
-        uniquePersonsEstimate: 0,
-        pendingLeadsCount: 0,
-        emailsScheduledToday: 0,
-        byStage: [],
-        byJourneyVariant: [],
-        quotaProgress: [],
-        campaignTasks: [],
-        alerts: [],
-        taskStats: {
-          totalTasks: 0,
-          enabledTasks: 0,
-          disabledTasks: 0,
-          successRate24h: null,
-          failedTasks24h: 0,
-          systemHealth: "healthy" as const,
+        window: {
+          from: "2026-10-23",
+          to: "2026-11-21",
+          previousFrom: "2026-09-23",
+          previousTo: "2026-10-22",
+          bucket: "day",
         },
+        engine: {
+          dispatcher: {
+            id: "email-campaigns",
+            state: "missing",
+            schedule: null,
+            lastRunAt: null,
+            nextRunAt: null,
+            consecutiveFailures: 0,
+            lastError: null,
+          },
+          tasks: [],
+        },
+        queue: {
+          dueNow: 1200,
+          overdue24h: 1100,
+          scheduled: 40,
+          scheduledNext24h: 12,
+          failed7d: 3,
+          dueLeads: 480,
+          lastSentAt: "2026-11-02T09:00:00.000Z",
+          sent24h: 0,
+          stuckClaims: 0,
+          oldestDueAt: "2026-10-02T00:34:57.889Z",
+          oldestDueDays: 50,
+          nextScheduledAt: "2026-11-22T08:00:00.000Z",
+          leadsInCampaign: 89,
+        },
+        kpis: {
+          sent: { value: 420, previous: 380 },
+          openRate: { value: 0.41, previous: 0.38 },
+          clickRate: { value: 0.12, previous: 0.1 },
+          unsubscribed: { value: 3, previous: 5 },
+          bounced: { value: 2, previous: 1 },
+          failed: { value: 4, previous: 0 },
+        },
+        totals: { opened: 172, clicked: 50, skipped: 12 },
+        trend: {
+          buckets: ["2026-11-20", "2026-11-21"],
+          series: [
+            { key: "sent", values: [20, 18] },
+            { key: "opened", values: [8, 9] },
+            { key: "clicked", values: [2, 3] },
+          ],
+        },
+        problems: {
+          buckets: ["2026-11-20", "2026-11-21"],
+          series: [
+            { key: "failed", values: [0, 1] },
+            { key: "bounced", values: [0, 0] },
+            { key: "unsubscribed", values: [1, 0] },
+          ],
+        },
+        variantTrend: {
+          buckets: ["2026-11-20", "2026-11-21"],
+          series: [
+            { key: "enums.emailJourneyVariant.sideHustle", values: [8, 6] },
+          ],
+        },
+        funnel: [
+          { key: "sent", value: 420 },
+          { key: "opened", value: 172 },
+          { key: "clicked", value: 50 },
+        ],
+        byVariant: [
+          {
+            key: "enums.emailJourneyVariant.sideHustle",
+            metrics: {
+              sent: 140,
+              opened: 60,
+              clicked: 20,
+              openRate: 0.43,
+              clickRate: 0.14,
+              unsubscribed: 1,
+              bounced: 0,
+              due: 300,
+            },
+          },
+        ],
+        byStage: [],
+        byLocale: [],
+        topErrors: [{ key: "SMTP timeout", metrics: { count: 4 } }],
+      },
+      sideHustle: {
+        window: {
+          from: "2026-10-23",
+          to: "2026-11-21",
+          previousFrom: "2026-09-23",
+          previousTo: "2026-10-22",
+          bucket: "day",
+        },
+        engine: {
+          dispatcher: {
+            id: "email-campaigns",
+            state: "running",
+            schedule: "*/5 * * * *",
+            lastRunAt: "2026-11-21T10:00:00.000Z",
+            nextRunAt: "2026-11-21T10:05:00.000Z",
+            consecutiveFailures: 0,
+            lastError: null,
+          },
+          tasks: [],
+        },
+        queue: {
+          dueNow: 0,
+          overdue24h: 0,
+          scheduled: 0,
+          scheduledNext24h: 0,
+          failed7d: 0,
+          dueLeads: 0,
+          lastSentAt: "2026-11-21T10:00:00.000Z",
+          sent24h: 120,
+          stuckClaims: 0,
+          oldestDueAt: null,
+          oldestDueDays: 0,
+          nextScheduledAt: null,
+          leadsInCampaign: 0,
+        },
+        kpis: {
+          sent: { value: 0, previous: 0 },
+          openRate: { value: 0, previous: 0 },
+          clickRate: { value: 0, previous: 0 },
+          unsubscribed: { value: 0, previous: 0 },
+          bounced: { value: 0, previous: 0 },
+          failed: { value: 0, previous: 0 },
+        },
+        totals: { opened: 0, clicked: 0, skipped: 0 },
+        trend: { buckets: [], series: [] },
+        problems: { buckets: [], series: [] },
+        variantTrend: { buckets: [], series: [] },
+        funnel: [],
+        byVariant: [],
+        byStage: [],
+        byLocale: [],
+        topErrors: [],
       },
     },
   },
@@ -570,6 +429,8 @@ const { GET } = createEndpoint({
 
 export type CampaignStatsGetRequestOutput = typeof GET.types.RequestOutput;
 export type CampaignStatsGetResponseOutput = typeof GET.types.ResponseOutput;
+export type CampaignAutomation =
+  CampaignStatsGetResponseOutput["engine"]["dispatcher"];
 
 const definitions = { GET };
 export default definitions;

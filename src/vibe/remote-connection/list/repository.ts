@@ -16,19 +16,25 @@ import type { EndpointLogger } from "../../logger/types";
 import { cronTasks } from "../../tasks/cron/db";
 import { REMOTE_CUSTOMER_LIMITS } from "../customer-access/access";
 import { remoteConnections } from "../db";
+import { assessStoredConnection } from "../health-summary";
 import { RemoteConnectionRepository } from "../repository";
-import type { RemoteConnectionsListResponseOutput } from "./definition";
+import type {
+  RemoteConnectionsListRequestOutput,
+  RemoteConnectionsListResponseOutput,
+} from "./definition";
+import { buildFleetReport } from "./fleet-report";
 
 export class RemoteConnectionListRepository {
   private static readonly TASK_SYNC_PULL_ID = "task-sync-pull";
   static async listRemoteConnections(
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
-    activeOnly: boolean,
+    data: RemoteConnectionsListRequestOutput,
   ): Promise<ResponseType<RemoteConnectionsListResponseOutput>> {
     const isAdmin = user.roles.includes(UserPermissionRole.ADMIN);
+    const activeOnly = data.activeOnly ?? false;
 
-    const [rows, syncRow, selfInstanceId, inferenceRows, paid] =
+    const [rows, syncRow, selfInstanceId, inferenceRows, paid, fleet] =
       await Promise.all([
         db
           .select()
@@ -66,6 +72,21 @@ export class RemoteConnectionListRepository {
               .where(eq(remoteConnections.isActive, true))
           : Promise.resolve([]),
         isAdmin ? Promise.resolve(true) : isPaidUser(user.id),
+        // Admin fleet health: all owners, stored state only (no remote calls).
+        isAdmin
+          ? buildFleetReport({
+              viewerUserId: user.id,
+              selfInstanceId:
+                await RemoteConnectionRepository.getLocalInstanceId(user.id),
+              window: {
+                range: data.range,
+                granularity: data.granularity,
+                from: data.from,
+                to: data.to,
+              },
+              fleetStatus: data.fleetStatus,
+            })
+          : Promise.resolve(null),
       ]);
 
     logger.debug("Listed remote connections", {
@@ -82,6 +103,7 @@ export class RemoteConnectionListRepository {
     );
 
     return success({
+      fleet,
       connections: rows.map((r) => ({
         instanceId: r.instanceId,
         remoteUrl: r.remoteUrl,
@@ -92,7 +114,7 @@ export class RemoteConnectionListRepository {
         wsConnectedAt: r.wsConnectedAt?.toISOString() ?? null,
         hasToken: !!r.token,
         requiresReauth: RemoteConnectionRepository.requiresReauth(r),
-        healthStatus: RemoteConnectionRepository.getConnectionHealth(r),
+        healthStatus: assessStoredConnection(r).status,
         isReverseEntry: r.isReverseEntry,
         transportMode: r.transportMode,
         remoteTransportMode: r.remoteTransportMode ?? null,

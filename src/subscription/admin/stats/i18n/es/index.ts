@@ -35,6 +35,7 @@ export const translations: typeof enTranslations = {
         description: "Cuentas de suscripción",
         activeCount: { label: "Activa" },
         trialingCount: { label: "Juicio" },
+        pastDueCount: { label: "Vencidas" },
         canceledCount: { label: "Cancelado" },
         churnRate: { label: "Tasa de Churn" },
       },
@@ -49,6 +50,7 @@ export const translations: typeof enTranslations = {
         title: "Créditos",
         description: "métricas del paquete de crédito",
         totalPurchased: { label: "Comprado" },
+        spentFromFree: { label: "De la asignación gratis" },
         totalSpent: { label: "Gasto" },
         packsSold: { label: "Paquetes vendidos" },
         avgPackSize: { label: "Tamaño del paquete de Avg" },
@@ -121,6 +123,44 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    paidPacks: "Paquetes pagados: suscripción + comprados",
+    canceledShare: "Proporción cancelada, total",
+    spentSplit:
+      "{{packs}} de paquetes (como en Paquetes de créditos) · {{free}} de asignaciones gratis",
+    creditsSold: "Créditos vendidos",
+    creditsSoldHint:
+      "Paquetes de suscripción y comprados. Sin bonificaciones ni ganancias por referidos.",
+    pastDueHint: "Pago fallido, sigue contando como suscriptor",
+    yearlyShare: "Planes anuales",
+    yearlyShareHint:
+      "Proporción de suscripciones activas, de prueba y vencidas con facturación anual",
+    showLegacy: "Mostrar el resumen de ingresos antiguo",
+    hideLegacy: "Ocultar el resumen de ingresos antiguo",
+    approxUsd: "aprox. USD",
+    openLabel: "Abrir:",
+    linkSubscriptions: "Lista de suscripciones",
+    linkPurchases: "Paquetes de créditos",
+    linkReferrals: "Referidos",
+    apply: "Aplicar",
+    sectionSubscriptions: "Suscripciones",
+    sectionSubscriptionsHint: "Estado actual, todo el periodo",
+    activePaid: "Activas",
+    activePaidHint:
+      "Estado activo. Mismo número que la lista de suscripciones.",
+    churnHint:
+      "Canceladas sobre activas, de prueba, vencidas y canceladas. No es un churn mensual.",
+    sectionCredits: "Créditos",
+    purchasedHint: "Créditos en paquetes de cuentas",
+    spentHint: "Créditos consumidos",
+    sectionReferrals: "Referidos",
+    sectionLegacy: "Resumen de ingresos antiguo",
+    sectionLegacyHint:
+      "Sustituido por el informe de ingresos. Convertido a aprox. USD.",
+    revenueReportTitle:
+      "Ingresos, MRR y churn ahora están en el informe de ingresos",
+    revenueReportHint:
+      "Dinero cobrado de verdad por día, por moneda y tipo, hasta el detalle de cada pago.",
+    openRevenueReport: "Abrir informe de ingresos",
     refresh: "Actualizar",
     filters: "Filtros",
   },

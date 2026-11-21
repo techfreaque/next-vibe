@@ -1,6 +1,23 @@
 import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
 
 export const translations = {
+  traffic: {
+    burstNetwork: "Burst network: {{count}} leads in 30 days",
+    sharedAgent: "Shared user agent: {{count}} leads",
+    title: "Traffic and network",
+    subtitle:
+      "Agent class, first touch and how many leads share this network or agent.",
+    agent: "Agent",
+    firstTouch: "First touch",
+    referrer: "Referrer",
+    landingPath: "Landing page",
+    refCode: "Ref code",
+    freeCredits: "Free credits burned",
+    network: "Network",
+    sameAgent: "Same user agent",
+    agentLeadsIn30d: "{{count}} leads in 30 days",
+    openLeads: "Open leads",
+  },
   category: "Leads",
   tags: {
     leads: "Leads",

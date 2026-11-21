@@ -9,6 +9,8 @@ export const translations: typeof enTranslations = {
     searchLabel: "Przeszukaj katalog narzędzi",
     searchAction: "Szukaj narzędzi",
     clearSearch: "Wyczyść wyszukiwanie",
+    overview: "Przegląd biznesu",
+    allTools: "Wszystkie narzędzia",
     findRecord: "Znajdź rekord",
     recordPlaceholder: "Nazwa, adres e-mail lub numer dokumentu",
     loadError: "Nie udało się wczytać katalogu",

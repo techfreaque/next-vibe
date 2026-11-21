@@ -171,6 +171,9 @@ export const translations: typeof enTranslations = {
       description: "Recuperado exitosamente sus estadísticas de referencia",
     },
     widget: {
+      adminNotice:
+        "Estas son tus cifras personales de referidos. El programa completo está en el resumen de referidos.",
+      openOverview: "Abrir resumen de referidos",
       emptyMessage:
         "Aún no hay actividad. Comparte tu enlace de referido para empezar a ganar.",
     },
@@ -337,6 +340,11 @@ export const translations: typeof enTranslations = {
           label: "Filtro de estado",
           description: "Filtro por estado de pago",
         },
+        currency: {
+          label: "Método de pago",
+          description: "Filtrar por método de pago",
+          all: "Todos los métodos",
+        },
         requestId: {
           label: "Solicitud ID",
           description: "Nombre de solicitud de pago",
@@ -390,6 +398,31 @@ export const translations: typeof enTranslations = {
         reject: "Rechazo",
         complete: "Completado",
         credits: "Créditos",
+        partnerContext:
+          "Ganado {{confirmed}} confirmado, {{pending}} en espera · pagado {{paid}}",
+        creditsLine: "{{credits}} créditos ganados",
+        freeLine: "Libre tras solicitudes abiertas: {{free}}",
+        overBalanceSingle:
+          "Esta solicitud es de {{amount}}, pero solo {{available}} está confirmado y sin pagar. No la apruebes.",
+        partnerCodes: "Códigos: {{codes}} · usuarios referidos: {{referred}}",
+        partnerNoCodes: "Sin código propio · usuarios referidos: {{referred}}",
+        overBalance:
+          "{{count}} solicitudes abiertas por {{open}}, pero solo {{available}} está confirmado y sin pagar. No las apruebes todas.",
+        possibleDuplicate:
+          "Posible duplicado: {{count}} solicitud(es) abierta(s) más con el mismo importe y monedero.",
+        headline: "{{value}} en {{currency}}",
+        overBalanceShort:
+          "Por encima del saldo confirmado (ver la primera solicitud de este socio).",
+        approveOverBalance: "Aprobar igualmente",
+        nextStep: {
+          failed:
+            "La transferencia falló y no se descontaron créditos. El socio puede enviar una nueva solicitud.",
+          processing:
+            "Transferencia en curso. Se completa o falla sola, no hace falta hacer nada.",
+          credits:
+            "Los pagos en créditos se convierten automáticamente. No hace falta hacer nada.",
+        },
+        codeReport: "Informe del código",
       },
     },
   },
@@ -426,7 +459,8 @@ export const translations: typeof enTranslations = {
       totalEarned: "Ganancias totales",
       available: "Disponible",
       locked: "Bloqueados",
-      credits: "Créditos",
+      credits:
+        "Los pagos en créditos se convierten al solicitarlos, así que uno pendiente está atascado. Recházalo para liberar las ganancias; el socio puede volver a solicitar.",
       readyForPayout: "disponibles para retirar",
       moreToUnlock: "para habilitar el retiro",
       pendingConfirmation: "pendientes de confirmación",

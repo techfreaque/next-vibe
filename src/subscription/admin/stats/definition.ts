@@ -185,6 +185,14 @@ const { GET } = createEndpoint({
             format: "compact",
             schema: z.coerce.number().describe("Trialing subscriptions"),
           }),
+          pastDueCount: responseField(scopedTranslation, {
+            type: WidgetType.STAT,
+            label: "get.response.subscriptionStats.pastDueCount.label" as const,
+            icon: "alert-triangle",
+            variant: "danger",
+            format: "compact",
+            schema: z.coerce.number().describe("Past due subscriptions"),
+          }),
           canceledCount: responseField(scopedTranslation, {
             type: WidgetType.STAT,
             label:
@@ -273,6 +281,16 @@ const { GET } = createEndpoint({
             variant: "warning",
             format: "compact",
             schema: z.coerce.number().describe("Total credits spent"),
+          }),
+          spentFromFree: responseField(scopedTranslation, {
+            type: WidgetType.STAT,
+            label: "get.response.creditStats.spentFromFree.label" as const,
+            icon: "gift",
+            variant: "info",
+            format: "compact",
+            schema: z.coerce
+              .number()
+              .describe("Credits spent from the free allowance"),
           }),
           packsSold: responseField(scopedTranslation, {
             type: WidgetType.STAT,
@@ -482,6 +500,7 @@ const { GET } = createEndpoint({
         subscriptionStats: {
           activeCount: 850,
           trialingCount: 45,
+          pastDueCount: 3,
           canceledCount: 120,
           churnRate: 0.034,
         },
@@ -493,6 +512,7 @@ const { GET } = createEndpoint({
         creditStats: {
           totalPurchased: 500000,
           totalSpent: 320000,
+          spentFromFree: 120000,
           packsSold: 1200,
           avgPackSize: 417,
         },

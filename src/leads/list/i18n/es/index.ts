@@ -1,8 +1,11 @@
 import { regionalCountryNames } from "next-vibe/core/i18n/core/regions";
 
+import { translations as leadAnalyticsTranslations } from "@/leads/analytics/i18n/es";
+
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  ...leadAnalyticsTranslations,
   filters: {
     search: {
       label: "Buscar",
@@ -190,6 +193,7 @@ export const translations: typeof enTranslations = {
         title: "Detalles del contacto",
         description: "Información individual sobre el contacto",
         id: "ID del contacto",
+        triage: "Atribución y tráfico",
         email: "Dirección de correo electrónico",
         businessName: "Nombre del negocio",
         contactName: "Nombre de contacto",
@@ -270,7 +274,14 @@ export const translations: typeof enTranslations = {
     emptyState: "Aún no hay pistas.",
   },
   widget: {
-    clearFilters: "Filtros claros",
+    colLead: "Prospecto",
+    colAgent: "Agente",
+    colOrigin: "Origen",
+    colClient: "Dispositivo y red",
+    colCreated: "Creado",
+    drillSummary:
+      "{{total}} prospectos · {{humans}} humanos · {{signups}} registrados · {{paid}} de pago · user agents: {{agents}}",
+    clearFilters: "Borrar filtros",
     converted: "Conversión",
     emailsSent: "Correos electrónicos {{count}} enviados",
     openRate: "Tasa de apertura {{percent}} %",
@@ -304,9 +315,19 @@ export const translations: typeof enTranslations = {
     sortEmailsSentLow: "Correos electrónicos enviados (bajo)",
     sortBusinessNameAZ: "Nombre de empresa (A-Z)",
     sortBusinessNameZA: "Nombre de empresa (Z-A)",
-    linkedCount: "{{count}} linked",
+    linkedCount: "{{count}} vinculados",
     hasLinkedUser: "Usuario",
     referralCode: "Código de referencia",
+    drillTitle: "Filtrado desde un informe",
+    drillCreated: "Creado",
+    drillReached: "Alcanzado",
+    clearDrill: "Borrar filtros del informe",
+    signedUp: "Registrado",
+    paid: "Pagó",
+    chatted: "Chateó",
+    bot: "Bot",
+    analyticsFilters: "Más filtros",
+    apply: "Aplicar",
   },
   countries: {
     ...regionalCountryNames("es"),

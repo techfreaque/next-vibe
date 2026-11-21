@@ -1,6 +1,13 @@
 import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   get: {
+    focus: {
+      label: "Anstehend",
+    },
+    plan: {
+      label: "Tarif",
+      description: "Nur Abos in diesem Tarif",
+    },
     title: "Abonnements",
     titleShort: "Abo-Liste",
     description: "Alle Abonnements durchsuchen",
@@ -49,9 +56,20 @@ export const translations: typeof enTranslations = {
       placeholder: "Reihenfolge...",
     },
     response: {
+      summary: {
+        title: "Übersicht",
+      },
+      statusCounts: {
+        status: "Status",
+        count: "Abos",
+      },
       title: "Abonnements",
       description: "Passende Abonnements",
       subscriptions: {
+        cancelAt: "Kündigung zum",
+        lastPaymentAmount: "Letzte Abbuchung",
+        lastPaymentCurrency: "Währung der Abbuchung",
+        lastPaymentAt: "Zuletzt bezahlt",
         userId: "Kunden-ID",
         paymentFailedAt: "Erster fehlgeschlagener Einzug",
         gracePeriodEndsAt: "Kulanzfrist endet",
@@ -113,6 +131,48 @@ export const translations: typeof enTranslations = {
     success: { title: "Erfolg", description: "Abonnements abgerufen" },
   },
   widget: {
+    focusLabel: "Anstehend",
+    mrrScope:
+      "Zählt aktive und Test-Abos nach ihrer letzten Abbuchung. Überfällige, endende und nie abgebuchte sind ausgenommen.",
+    search: "Suchen",
+    endingChip: "Endet",
+    fxNote: "zu festen Kursen: {{rates}}",
+    pastDueRetry: "Zahlung fehlgeschlagen, Wiederholung oder Kulanzzeit",
+    mrr: "MRR, ca. USD",
+    renewingSoon: "Verlängern in 7 Tagen",
+    renewingSoonHint: "Aktiv, Laufzeit endet binnen einer Woche",
+    ending: "Endet",
+    endingHint: "Läuft ohne Verlängerung aus",
+    pastDue: "Überfällig",
+    pastDueHint: "ohne erfasste Abbuchung: {{count}}",
+    noChargeStep:
+      "Noch keine Abbuchung erfasst. Zahlungsweg vor dem {{date}} prüfen",
+    retry: "Erneut versuchen",
+    renewalOverdue: "Verlängerung überfällig seit {{date}}",
+    filters: "Filter",
+    hideFilters: "Filter ausblenden",
+    all: "Alle",
+    allCount: "Alle {{count}}",
+    activeFilters: "Gefiltert nach",
+    removeFilter: "Filter entfernen",
+    clearFilters: "Alle entfernen",
+    customerFilter: "Kunde",
+    startedFrom: "Gestartet ab",
+    startedTo: "Gestartet bis",
+    perMonth: "/ Monat",
+    perYear: "/ Jahr",
+    noCharge: "Noch keine Abbuchung",
+    graceUntil: "Zugang endet am {{date}}, falls unbezahlt",
+    canceledOn: "Gekündigt am {{date}}",
+    endsOn: "Endet am {{date}}, keine Verlängerung",
+    renewsOn: "Verlängert sich am {{date}}",
+    periodEnd: "Laufzeitende {{date}}",
+    startedOn: "Gestartet {{date}}",
+    lastPaid: "Zuletzt bezahlt {{date}}",
+    payments: "Zahlungen",
+    revenueReport: "Umsatzbericht öffnen",
+    emptyFiltered:
+      "Kein Treffer für diese Filter. Entferne einen, um mehr zu sehen.",
     pick: "Abonnement auswählen",
     failedPayments: "Fehlgeschlagene Transaktionen",
     renewal: "Geplante Verlängerung",
@@ -134,6 +194,16 @@ export const translations: typeof enTranslations = {
     viewStats: "Statistiken",
   },
   enums: {
+    focus: {
+      renewingSoon: "Verlängern in 7 Tagen",
+      ending: "Endet",
+    },
+    plan: {
+      subscription: "Starter",
+      plus: "Plus",
+      pro: "Pro",
+      ultra: "Ultra",
+    },
     subscriptionStatusFilter: {
       incomplete: "Unvollständig",
       incompleteExpired: "Unvollständig abgelaufen",

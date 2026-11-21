@@ -1768,6 +1768,7 @@ export class ReferralRepository {
   static async listPayoutRequests(
     filters: {
       status?: typeof PayoutStatusValue;
+      currency?: typeof PayoutCurrencyValue;
       search?: string;
       userId?: string;
       requestId?: string;
@@ -1801,6 +1802,9 @@ export class ReferralRepository {
       );
       const whereClause = and(
         filters.status ? eq(payoutRequests.status, filters.status) : undefined,
+        filters.currency
+          ? eq(payoutRequests.currency, filters.currency)
+          : undefined,
         filters.userId ? eq(payoutRequests.userId, filters.userId) : undefined,
         filters.requestId
           ? eq(payoutRequests.id, filters.requestId)
@@ -1825,7 +1829,18 @@ export class ReferralRepository {
         .from(payoutRequests)
         .innerJoin(users, eq(payoutRequests.userId, users.id))
         .where(whereClause)
-        .orderBy(desc(payoutRequests.createdAt), desc(payoutRequests.id))
+        // Work queue first (pending, approved, processing; oldest first),
+        // then history newest first.
+        .orderBy(
+          sql`CASE ${payoutRequests.status}
+            WHEN ${PayoutStatus.PENDING} THEN 0
+            WHEN ${PayoutStatus.APPROVED} THEN 1
+            WHEN ${PayoutStatus.PROCESSING} THEN 2
+            ELSE 3 END`,
+          sql`CASE WHEN ${payoutRequests.status} IN (${PayoutStatus.PENDING}, ${PayoutStatus.APPROVED}, ${PayoutStatus.PROCESSING})
+            THEN extract(epoch FROM ${payoutRequests.createdAt}) ELSE -extract(epoch FROM ${payoutRequests.createdAt}) END`,
+          desc(payoutRequests.id),
+        )
         .limit(limit)
         .offset(offset);
 

@@ -33,8 +33,7 @@ export const translations = {
       },
       lastActive: {
         label: "Last active",
-        description:
-          "Activity = credit spend (own or linked lead wallets) or a new login",
+        description: "Activity = credit spend, a login or a payment",
         placeholder: "Any time",
       },
       signupFrom: {
@@ -63,6 +62,55 @@ export const translations = {
         label: "As referrer",
         description: "Users who share a referral link and what it produced",
         placeholder: "Any",
+      },
+      audience: {
+        label: "Audience",
+        description:
+          "Humans only drops admins and test addresses (example.com, .invalid, .test fixtures)",
+        placeholder: "Everyone",
+      },
+      channel: {
+        label: "Channel",
+        description:
+          "First-touch channel, exact match (google, youtube, direct). Use none for accounts without a journey",
+        placeholder: "youtube",
+      },
+      channelType: {
+        label: "Channel type",
+        description: "How the first touch reached us",
+        placeholder: "Any type",
+      },
+      refCode: {
+        label: "Ref code",
+        description:
+          "Referral code from the first visit or the credited referral, exact match",
+        placeholder: "FRIEND2024",
+      },
+      plan: {
+        label: "Plan",
+        description: "Active or trialing subscription on this plan",
+        placeholder: "Any plan",
+      },
+      activeFrom: {
+        label: "Spent credits from",
+        description: "Had credit usage on or after this day",
+      },
+      activeTo: {
+        label: "Spent credits to",
+        description: "Had credit usage on or before this day",
+      },
+      spentMin: {
+        label: "Spent at least",
+        description:
+          "Lifetime credits spent. Combine with Never paid to find free burners",
+      },
+      paidFrom: {
+        label: "Paid from",
+        description: "Had a successful payment on or after this day",
+      },
+      paidTo: {
+        label: "Paid to",
+        description: "Had a successful payment on or before this day",
       },
       sortBy: {
         label: "Sort by",
@@ -129,6 +177,22 @@ export const translations = {
     },
   },
   enums: {
+    audience: {
+      all: "Everyone",
+      humans: "Humans only",
+    },
+    channelType: {
+      campaign: "Campaign",
+      referral: "Referral",
+      organic: "Organic",
+      direct: "Direct",
+    },
+    plan: {
+      subscription: "Starter",
+      plus: "Plus",
+      pro: "Pro",
+      ultra: "Ultra",
+    },
     sortOrder: {
       asc: "Ascending",
       desc: "Descending",
@@ -184,6 +248,16 @@ export const translations = {
     },
   },
   widget: {
+    spent30d: "{{count}} in 30d",
+    notTracked: "not tracked",
+    oneOff: "Credits only",
+    refCode: "ref:{{code}}",
+    chips: {
+      paid: "Paid",
+      signedUp: "Signed up",
+      spentCredits: "Spent credits",
+      remove: "Remove filter {{label}}",
+    },
     creditsAny: "Any",
     titleWithCount: "Users ({{count}})",
     loading: "Loading users...",
@@ -194,13 +268,19 @@ export const translations = {
       select: "Select",
       openUser: "Open account for {{email}}",
       selectUser: "Select {{email}}",
-      stats: "Stats",
+      stats: "Signups report",
       refresh: "Refresh",
       newUser: "New user",
       clearFilters: "Clear filters",
       moreFilters: "Filters",
     },
     kpi: {
+      activeSpentHint: "{{credits}} credits spent in 30 days",
+      matchingHint:
+        "Signups per week, last 12 full weeks. Last week: {{last}}, this week so far: {{count}}",
+      verified: "Email verified",
+      verifiedHint: "{{count}} accounts",
+      active: "Active 30d",
       matching: "Matching users",
       paying: "Paying",
       payingShare: "{{percent}}% of matching",
@@ -210,27 +290,37 @@ export const translations = {
       creditsHint: "Sum of wallet balances",
     },
     quick: {
-      paying: "Paying",
+      freeBurn: "Free burn {{min}}+ ({{count}})",
+      banned: "Banned ({{count}})",
+      humans: "Humans only",
+      paying: "Paying ({{count}})",
       free: "Never paid",
       activeWeek: "Active 7d",
       dormant: "Dormant 30d+",
       never: "Never active",
     },
     columns: {
+      flags: "Flags",
       user: "User",
       joined: "Joined",
       lastActive: "Last active",
-      credits: "Credits",
-      spent: "Spent",
+      credits: "Balance",
+      spent: "Spent (lifetime)",
       paid: "Paid",
       subscription: "Plan",
       source: "Source",
       id: "ID",
     },
     compact: {
-      credits: "{{count}} credits",
+      joined: "joined {{date}}",
+      active: "active {{when}}",
+      neverActive: "never active",
+      paid: "paid {{amount}}",
+      free: "never paid",
+      spent: "{{count}} credits spent",
     },
     flags: {
+      freeBurn: "Free burn",
       admin: "admin",
       banned: "Banned",
       unverified: "Unverified",
@@ -246,6 +336,8 @@ export const translations = {
       showing: "{{start}}-{{end}} of {{total}}",
     },
     text: {
+      subheader:
+        "{{verified}} verified | {{active}} active 30d | {{banned}} banned | signups/week (12w): {{weekly}}",
       header: "{{total}} users | {{paying}} paying | {{paid}} lifetime revenue",
       pageHint: "Page {{page}}/{{pages}}. Next: --page={{next}}",
       detailHint: "Details: vibe users-view --userId=<ID>",

@@ -12,7 +12,9 @@ export function getAdminPayoutActions(request: {
   currency: typeof PayoutCurrencyValue;
 }): readonly (typeof adminPayoutActions)[number][] {
   if (request.currency === PayoutCurrency.CREDITS) {
-    return [];
+    // Credits payouts convert when requested; a pending one is stuck and can
+    // only be rejected (releases the reserved earnings).
+    return request.status === PayoutStatus.PENDING ? ["reject"] : [];
   }
   if (request.status === PayoutStatus.PENDING) {
     return ["approve", "reject"];

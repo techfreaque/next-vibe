@@ -4,6 +4,8 @@
 
 "use client";
 
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { DollarSign } from "next-vibe/ui/components/icons/DollarSign";
 import { Link2 } from "next-vibe/ui/components/icons/Link2";
@@ -12,8 +14,11 @@ import { Users } from "next-vibe/ui/components/icons/Users";
 import { Wallet } from "next-vibe/ui/components/icons/Wallet";
 import { Span } from "next-vibe/ui/components/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
+  useWidgetIsInteractive,
   useWidgetTranslation,
+  useWidgetUser,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 
@@ -89,6 +94,11 @@ function StatCard({
 export function ReferralStatsContainer(): React.JSX.Element {
   const stats = useWidgetValue<typeof definition.GET>();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const user = useWidgetUser();
+  const interactive = useWidgetIsInteractive();
+  const navigate = useRelatedEntityNavigation();
+  const isAdmin =
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
 
   if (!stats) {
     return <Div />;
@@ -102,7 +112,29 @@ export function ReferralStatsContainer(): React.JSX.Element {
 
   return (
     <Div className="flex flex-col gap-3">
-      {allZero && (
+      {isAdmin && (
+        <Div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
+          <Span>{t("stats.widget.adminNotice")}</Span>
+          {interactive && (
+            <Button
+              type="button"
+              size="sm"
+              onClick={() =>
+                navigate(
+                  () =>
+                    import("../admin/overview/definition").then(
+                      (module) => module.default.GET,
+                    ),
+                  {},
+                )
+              }
+            >
+              {t("stats.widget.openOverview")}
+            </Button>
+          )}
+        </Div>
+      )}
+      {allZero && !isAdmin && (
         <Div className="flex items-center gap-3 rounded-lg border border-dashed bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
           <Link2 className="h-4 w-4 shrink-0 text-primary" />
           <Div>{t("stats.widget.emptyMessage")}</Div>

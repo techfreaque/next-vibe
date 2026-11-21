@@ -14,6 +14,8 @@ export const translations: typeof enTranslations = {
       description: "Zahlungsübersicht für Ihr Unternehmen",
     },
     response: {
+      estimates: "Angebote",
+      byCurrency: "Summen je Währung",
       openInvoices: "Offene Rechnungen",
       overdueInvoices: "Überfällig",
       unpaidBills: "Unbezahlte Verbindlichkeiten",
@@ -77,8 +79,18 @@ export const translations: typeof enTranslations = {
     placeholder: "Firmen-ID eingeben",
   },
   widget: {
+    subtitle:
+      "Rechnungen, Angebote und Belege, die du ausstellst. Karten- und Kryptozahlungen stehen bei den Zahlungstransaktionen.",
+    estimatesSent: "Versendete Angebote",
+    estimateDrafts: "{{count}} Entwürfe",
+    recentEstimates: "Letzte Angebote",
+    noRecentEstimates: "Noch keine Angebote",
+    validUntil: "Gültig bis {{date}}",
+    notInvoicesHint:
+      "Karten- und Krypto-Zahlungen sind Transaktionen beim Zahlungsanbieter, keine Rechnungen. Hier stehen nur Rechnungen, die du selbst ausstellst.",
+    openTransactions: "Zahlungstransaktionen öffnen",
     commercialDocuments: "Geschäftsbelege",
-    processorDiagnostics: "Zahlungsdiagnose",
+    processorDiagnostics: "Zahlungstransaktionen",
     loading: "Übersicht wird geladen...",
     noData: "Kein Unternehmen ausgewählt.",
     noDataHint:
@@ -86,15 +98,15 @@ export const translations: typeof enTranslations = {
     openInvoices: "Offene Rechnungen",
     overdue: "Überfällig",
     unpaidBills: "Offene Verbindlichkeiten",
-    draftInvoices: "Entwürfe",
-    quickActions: "Schnellzugriff",
+    draftInvoices: "Rechnungsentwürfe",
+    quickActions: "Schnellaktionen",
     newInvoice: "Neue Rechnung",
     allInvoices: "Alle Rechnungen",
     newEstimate: "Neues Angebot",
     allEstimates: "Angebote",
     allBills: "Verbindlichkeiten",
     recentInvoices: "Letzte Rechnungen",
-    noRecentInvoices: "Keine aktuellen Rechnungen.",
+    noRecentInvoices: "Noch keine Rechnungen ausgestellt",
     view: "Ansehen",
     due: "Fällig",
     status: {

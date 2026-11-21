@@ -4,6 +4,40 @@ export const translations: typeof enTranslations = {
   title: "Campaign Queue",
   description: "Líderes actualmente activos en campañas de correo electrónico",
   enums: {
+    delivery: {
+      dueNow: "Pendientes ya",
+      overdue: "Atrasados 24 h+",
+      scheduled: "Programados",
+      failed: "Fallidos",
+      sent: "Enviados",
+      opened: "Enviados y abiertos",
+      clicked: "Enviados con clic",
+      unsubscribed: "Bajas",
+      bounced: "Rebotados",
+    },
+    emailJourneyVariantFilter: {
+      all: "Todos",
+      uncensoredConvert: "Conversión a modelos sin censura",
+      sideHustle: "Hustle lateral",
+      quietRecommendation: "Recomendación silenciosa",
+      signupNurture: "Nutrición de registro",
+      retention: "Retención",
+      winback: "Winback",
+      newsletterMay2026: "Boletín May 2026",
+      newsletterNov2026: "Boletín de noviembre 2026",
+    },
+    emailCampaignStageFilter: {
+      all: "Todos",
+    },
+    emailCampaignStage: {
+      notStarted: "No empezó",
+      initial: "Contacto inicial",
+      followup1: "Seguimiento 1",
+      followup2: "Seguimiento 2",
+      followup3: "Seguimiento 3",
+      nurture: "Nutrición",
+      reactivation: "Reactivación",
+    },
     campaignType: {
       leadCampaign: "Campaña de captación de contactos",
       newsletter: "Boletín",
@@ -24,6 +58,35 @@ export const translations: typeof enTranslations = {
     description:
       "Ver lista paginada de leads actualmente en campañas de correo electrónico",
     fields: {
+      delivery: {
+        label: "Estado del correo",
+        description:
+          "Leads con un correo en este estado. Enviado, abierto, clic, baja, rebote y fallo usan la ventana de fechas",
+        placeholder: "Cualquier estado",
+      },
+      journeyVariant: {
+        label: "Variante de recorrido",
+        description: "Solo correos de este recorrido",
+        placeholder: "Cualquier recorrido",
+      },
+      stage: {
+        label: "Etapa",
+        description: "Solo correos de esta etapa",
+        placeholder: "Cualquier etapa",
+      },
+      locale: {
+        label: "Idioma",
+        description: "Locale renderizado (de-DE) o idioma (de)",
+        placeholder: "Cualquier idioma",
+      },
+      eventFrom: {
+        label: "Desde",
+        description: "Primer día de la ventana de eventos",
+      },
+      eventTo: {
+        label: "Hasta",
+        description: "Último día de la ventana de eventos",
+      },
       page: {
         label: "Página",
         description: "Número de página",
@@ -38,6 +101,7 @@ export const translations: typeof enTranslations = {
       },
     },
     response: {
+      daysOverdue: "Días de retraso",
       nextSubject: "Tema programado",
       leadId: "ID del contacto",
       leadEmail: "Correo electrónico",
@@ -83,6 +147,9 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    overdueDays: "Atrasado {{days}} días, nunca enviado",
+    titleWithCount: "Cola de campañas ({{count}})",
+    eventWindow: "Eventos de correo del {{from}} al {{to}}",
     title: "Campaign Queue",
     refresh: "Actualizar",
     noData: "No hay entradas de cola de campaña",

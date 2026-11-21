@@ -19,6 +19,10 @@ import {
   sql,
 } from "drizzle-orm";
 
+import {
+  type CountryLanguage,
+  defaultLocale,
+} from "../../../core/i18n/core/config";
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -36,6 +40,7 @@ import {
   CronTaskStatusDB,
 } from "../../enum";
 import { cronTaskExecutions, cronTasks } from "../db";
+import { translateTaskNames } from "../task-names";
 import { CRON_HISTORY_PAGE_SIZE } from "./constants";
 import type {
   CronHistoryExecution,
@@ -53,6 +58,7 @@ export class CronHistoryRepository {
     user: JwtPayloadType,
     t: CronHistoryT,
     logger: EndpointLogger,
+    locale: CountryLanguage = defaultLocale,
   ): Promise<ResponseType<CronHistoryResponseOutput>> {
     const limit = data.limit || CRON_HISTORY_PAGE_SIZE;
 
@@ -80,20 +86,22 @@ export class CronHistoryRepository {
         }
       }
 
-      // Hidden tasks are excluded from history, UNLESS they failed (so errors are never silently hidden)
-      baseConditions.push(
-        or(
-          eq(cronTasks.hidden, false),
-          inArray(cronTaskExecutions.status, [
-            CronTaskStatus.FAILED,
-            CronTaskStatus.TIMEOUT,
-            CronTaskStatus.ERROR,
-          ]),
-        ),
-      );
-
       if (data?.taskId) {
+        // An explicit task drill-down (e.g. from Task Health) shows every run,
+        // hidden system tasks included.
         baseConditions.push(eq(cronTaskExecutions.taskId, data.taskId));
+      } else {
+        // Unscoped lists hide hidden tasks, UNLESS they failed (so errors are never silently hidden)
+        baseConditions.push(
+          or(
+            eq(cronTasks.hidden, false),
+            inArray(cronTaskExecutions.status, [
+              CronTaskStatus.FAILED,
+              CronTaskStatus.TIMEOUT,
+              CronTaskStatus.ERROR,
+            ]),
+          ),
+        );
       }
 
       const taskName = data.taskName?.trim();
@@ -148,6 +156,7 @@ export class CronHistoryRepository {
           taskId: cronTaskExecutions.taskId,
           taskName: cronTaskExecutions.taskName,
           taskDisplayName: cronTasks.displayName,
+          taskRouteId: cronTasks.routeId,
           status: cronTaskExecutions.status,
           priority: cronTaskExecutions.priority,
           startedAt: cronTaskExecutions.startedAt,
@@ -173,7 +182,11 @@ export class CronHistoryRepository {
       const [selectedTask] =
         data.taskId && (isAdmin || userId)
           ? await db
-              .select({ id: cronTasks.id, name: cronTasks.displayName })
+              .select({
+                id: cronTasks.id,
+                name: cronTasks.displayName,
+                routeId: cronTasks.routeId,
+              })
               .from(cronTasks)
               .where(
                 and(
@@ -239,6 +252,32 @@ export class CronHistoryRepository {
         `Fetched ${executions.length.toString()} cron task execution records`,
       );
 
+      const names = await translateTaskNames(
+        [
+          ...executions.flatMap((exec) =>
+            exec.taskDisplayName && exec.taskRouteId
+              ? [
+                  {
+                    id: exec.taskId,
+                    routeId: exec.taskRouteId,
+                    displayName: exec.taskDisplayName,
+                  },
+                ]
+              : [],
+          ),
+          ...(selectedTask
+            ? [
+                {
+                  id: selectedTask.id,
+                  routeId: selectedTask.routeId,
+                  displayName: selectedTask.name,
+                },
+              ]
+            : []),
+        ],
+        locale,
+      );
+
       // Database already returns correct enum types, no parsing needed
       const response: CronHistoryResponseOutput = {
         executions: executions.map((exec) => {
@@ -246,7 +285,7 @@ export class CronHistoryRepository {
             id: exec.id,
             taskId: exec.taskId,
             taskName: exec.taskName,
-            taskDisplayName: exec.taskDisplayName ?? undefined,
+            taskDisplayName: names.get(exec.taskId) ?? undefined,
             status: exec.status,
             priority: exec.priority,
             startedAt: exec.startedAt.toISOString(),
@@ -268,7 +307,12 @@ export class CronHistoryRepository {
           };
           return execution;
         }),
-        selectedTask,
+        selectedTask: selectedTask
+          ? {
+              id: selectedTask.id,
+              name: names.get(selectedTask.id) ?? selectedTask.name,
+            }
+          : undefined,
         totalCount,
         hasMore: totalCount > offset + limit,
         statusCounts: {

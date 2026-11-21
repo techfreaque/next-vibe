@@ -123,3 +123,44 @@ export const {
   HAS_SIGNUPS: "enums.referrer.hasSignups",
   HAS_SUBSCRIBERS: "enums.referrer.hasSubscribers",
 });
+
+/**
+ * Who counts. HUMANS drops admins and reserved test domains so report numbers
+ * and the drilled list agree; ALL is the raw directory.
+ */
+export const {
+  enum: UsersAudience,
+  options: UsersAudienceOptions,
+  Value: UsersAudienceValue,
+} = createEnumOptions(scopedTranslation, {
+  ALL: "enums.audience.all",
+  HUMANS: "enums.audience.humans",
+});
+
+/**
+ * First-touch channel type (growth_journeys.first_channel_type)
+ */
+export const {
+  enum: UserChannelTypeFilter,
+  options: UserChannelTypeFilterOptions,
+  Value: UserChannelTypeFilterValue,
+} = createEnumOptions(scopedTranslation, {
+  CAMPAIGN: "enums.channelType.campaign",
+  REFERRAL: "enums.channelType.referral",
+  ORGANIC: "enums.channelType.organic",
+  DIRECT: "enums.channelType.direct",
+});
+
+/**
+ * Plan of the user's active or trialing subscription
+ */
+export const {
+  enum: UserPlanFilter,
+  options: UserPlanFilterOptions,
+  Value: UserPlanFilterValue,
+} = createEnumOptions(scopedTranslation, {
+  SUBSCRIPTION: "enums.plan.subscription",
+  PLUS: "enums.plan.plus",
+  PRO: "enums.plan.pro",
+  ULTRA: "enums.plan.ultra",
+});

@@ -27,12 +27,21 @@ import {
   PaymentStatusOptions,
 } from "../enum";
 import {
+  ProcessorKind,
+  ProcessorKindOptions,
   ProcessorView,
   ProcessorViewOptions,
+  RefundBlock,
   WebhookProcessing,
   WebhookProcessingOptions,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
+
+/** Calendar day in UTC, inclusive on both ends of a range. */
+const dayString = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .optional();
 
 const PaymentProcessorWidget = lazyWidget(() =>
   import("./widget").then((module) => ({
@@ -97,6 +106,37 @@ const { GET } = createEndpoint({
         options: PaymentProviderOptions,
         includeInCacheKey: true,
         schema: z.enum(PaymentProvider).optional(),
+      }),
+      kind: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "search.kind",
+        options: ProcessorKindOptions,
+        includeInCacheKey: true,
+        schema: z.enum(ProcessorKind).optional(),
+      }),
+      currency: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "search.currency",
+        includeInCacheKey: true,
+        schema: z.enum(CurrenciesArr).optional(),
+      }),
+      from: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "search.from",
+        description: "search.dayFormat",
+        includeInCacheKey: true,
+        schema: dayString,
+      }),
+      to: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "search.to",
+        description: "search.dayFormat",
+        includeInCacheKey: true,
+        schema: dayString,
       }),
       processing: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -179,6 +219,16 @@ const { GET } = createEndpoint({
               label: "response.renewal",
               schema: z.boolean(),
             }),
+            kind: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "response.kind",
+              schema: z.enum(ProcessorKind).nullable(),
+            }),
+            refundBlock: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "response.refundBlock",
+              schema: z.enum(RefundBlock).nullable(),
+            }),
             providerInvoiceId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "response.providerInvoiceId",
@@ -243,6 +293,51 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               label: "response.processedAt",
               schema: dateSchema.nullable(),
+            }),
+          },
+        }),
+      }),
+      totals: responseArrayField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.totals",
+        child: objectField(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          usage: { response: true },
+          children: {
+            currency: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "response.currency",
+              schema: z.enum(CurrenciesArr),
+            }),
+            collected: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "response.collected",
+              schema: z.number(),
+            }),
+            succeeded: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "response.succeeded",
+              schema: z.number(),
+            }),
+            failed: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "response.failed",
+              schema: z.number(),
+            }),
+            refunded: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "response.refunded",
+              schema: z.number(),
+            }),
+            refundedAmount: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "response.refundedAmount",
+              schema: z.number(),
+            }),
+            gross: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "response.gross",
+              schema: z.number(),
             }),
           },
         }),
@@ -328,12 +423,23 @@ const { GET } = createEndpoint({
         page: 1,
         limit: 20,
       },
+      revenueDrill: {
+        view: ProcessorView.TRANSACTIONS,
+        status: PaymentStatus.SUCCEEDED,
+        kind: ProcessorKind.RENEWAL,
+        currency: "EUR",
+        from: "2026-11-01",
+        to: "2026-11-21",
+        page: 1,
+        limit: 20,
+      },
     },
     responses: {
       empty: {
         resultView: ProcessorView.TRANSACTIONS,
         transactions: [],
         webhooks: [],
+        totals: [],
         currentPage: 1,
         pageCount: 0,
         total: 0,
@@ -352,13 +458,26 @@ const { GET } = createEndpoint({
             provider: PaymentProvider.STRIPE,
             mode: CheckoutMode.SUBSCRIPTION,
             renewal: true,
+            kind: ProcessorKind.RENEWAL,
             providerInvoiceId: "in_audit_example",
             refundEligible: false,
+            refundBlock: null,
             createdAt: "2026-11-19T09:30:00.000Z",
             updatedAt: "2026-11-19T09:30:02.000Z",
           },
         ],
         webhooks: [],
+        totals: [
+          {
+            currency: "EUR",
+            collected: 0,
+            succeeded: 0,
+            failed: 1,
+            refunded: 0,
+            refundedAmount: 0,
+            gross: 0,
+          },
+        ],
         currentPage: 1,
         pageCount: 1,
         total: 1,
@@ -377,13 +496,26 @@ const { GET } = createEndpoint({
             provider: PaymentProvider.STRIPE,
             mode: CheckoutMode.SUBSCRIPTION,
             renewal: true,
+            kind: ProcessorKind.RENEWAL,
             providerInvoiceId: "in_audit_eligible",
             refundEligible: true,
+            refundBlock: null,
             createdAt: "2026-11-12T09:30:00.000Z",
             updatedAt: "2026-11-12T09:30:00.000Z",
           },
         ],
         webhooks: [],
+        totals: [
+          {
+            currency: "EUR",
+            collected: 29,
+            succeeded: 1,
+            failed: 0,
+            refunded: 0,
+            refundedAmount: 0,
+            gross: 0,
+          },
+        ],
         currentPage: 1,
         pageCount: 1,
         total: 1,
@@ -403,6 +535,7 @@ const { GET } = createEndpoint({
             processedAt: null,
           },
         ],
+        totals: [],
         currentPage: 1,
         pageCount: 1,
         total: 1,

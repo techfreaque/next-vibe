@@ -21,8 +21,8 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { CompanyMemberRole } from "@/companies/enum";
 import { CompanyAuthRepository } from "@/companies/repository";
 
-import { paymentBills, paymentInvoices } from "../db";
-import { InvoiceStatus } from "../enum";
+import { paymentBills, paymentEstimates, paymentInvoices } from "../db";
+import { EstimateStatus, InvoiceStatus } from "../enum";
 import type {
   PaymentDashboardRequestOutput,
   PaymentDashboardResponseOutput,
@@ -46,6 +46,13 @@ export class PaymentDashboardRepository {
           unpaidBills: { count: 0, total: 0 },
           draftInvoices: { count: 0 },
           currency: "EUR",
+          byCurrency: [],
+          estimates: {
+            sentCount: 0,
+            draftCount: 0,
+            sentByCurrency: [],
+            recent: [],
+          },
           recentInvoices: [],
         });
       }
@@ -141,6 +148,95 @@ export class PaymentDashboardRepository {
 
       const currency = currencyRows[0]?.currency ?? "EUR";
 
+      // Totals per currency: invoices and bills are never summed across
+      // currencies (the single-currency cards above are the first currency).
+      const [invoiceTotals, billTotals] = await Promise.all([
+        db
+          .select({
+            currency: paymentInvoices.currency,
+            open: sql<string>`COALESCE(SUM(${paymentInvoices.amount}::numeric) FILTER (WHERE ${paymentInvoices.status} = ${InvoiceStatus.OPEN}), 0)`,
+            overdue: sql<string>`COALESCE(SUM(${paymentInvoices.amount}::numeric) FILTER (WHERE ${paymentInvoices.status} = ${InvoiceStatus.OPEN} AND ${paymentInvoices.dueDate} < ${now}), 0)`,
+          })
+          .from(paymentInvoices)
+          .where(eq(paymentInvoices.companyId, data.companyId))
+          .groupBy(paymentInvoices.currency),
+        db
+          .select({
+            currency: paymentBills.currency,
+            unpaid: sql<string>`COALESCE(SUM(${paymentBills.total}::numeric) FILTER (WHERE ${paymentBills.status} != 'PAID'), 0)`,
+          })
+          .from(paymentBills)
+          .where(eq(paymentBills.companyId, data.companyId))
+          .groupBy(paymentBills.currency),
+      ]);
+      const currencies = [
+        ...new Set([
+          ...invoiceTotals.map((row) => row.currency),
+          ...billTotals.map((row) => row.currency),
+        ]),
+      ];
+      const byCurrency = currencies.map((code) => {
+        const invoice = invoiceTotals.find((row) => row.currency === code);
+        const bill = billTotals.find((row) => row.currency === code);
+        return {
+          currency: code,
+          open: parseFloat(invoice?.open ?? "0"),
+          overdue: parseFloat(invoice?.overdue ?? "0"),
+          unpaid: parseFloat(bill?.unpaid ?? "0"),
+        };
+      });
+
+      // Estimates: sent and awaiting an answer, drafts, last 5
+      const [estimateCounts, estimateTotals, recentEstimates] =
+        await Promise.all([
+          db
+            .select({
+              sent: sql<number>`count(*) filter (where ${paymentEstimates.status} = ${EstimateStatus.SENT})::int`,
+              draft: sql<number>`count(*) filter (where ${paymentEstimates.status} = ${EstimateStatus.DRAFT})::int`,
+            })
+            .from(paymentEstimates)
+            .where(eq(paymentEstimates.companyId, data.companyId)),
+          db
+            .select({
+              currency: paymentEstimates.currency,
+              total: sql<string>`COALESCE(SUM(${paymentEstimates.total}::numeric), 0)`,
+            })
+            .from(paymentEstimates)
+            .where(
+              and(
+                eq(paymentEstimates.companyId, data.companyId),
+                eq(paymentEstimates.status, EstimateStatus.SENT),
+              ),
+            )
+            .groupBy(paymentEstimates.currency),
+          db
+            .select({
+              id: paymentEstimates.id,
+              estimateNumber: paymentEstimates.estimateNumber,
+              status: paymentEstimates.status,
+              total: paymentEstimates.total,
+              currency: paymentEstimates.currency,
+              validUntil: paymentEstimates.validUntil,
+            })
+            .from(paymentEstimates)
+            .where(eq(paymentEstimates.companyId, data.companyId))
+            .orderBy(sql`${paymentEstimates.createdAt} DESC`)
+            .limit(5),
+        ]);
+      const estimates = {
+        sentCount: estimateCounts[0]?.sent ?? 0,
+        draftCount: estimateCounts[0]?.draft ?? 0,
+        sentByCurrency: estimateTotals.map((row) => ({
+          currency: row.currency,
+          total: parseFloat(row.total),
+        })),
+        recent: recentEstimates.map((row) => ({
+          ...row,
+          total: Number(row.total),
+          validUntil: row.validUntil ?? null,
+        })),
+      };
+
       // Recent invoices (last 5, any status)
       const recentRows = await db
         .select({
@@ -177,6 +273,8 @@ export class PaymentDashboardRepository {
         unpaidBills: { count: unpaidCount, total: unpaidTotal },
         draftInvoices: { count: draftCount },
         currency,
+        byCurrency,
+        estimates,
         recentInvoices,
       });
     } catch (error) {

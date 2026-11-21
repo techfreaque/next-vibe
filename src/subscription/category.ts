@@ -6,6 +6,7 @@
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
+import { REVENUE_REPORT_ALIAS } from "@/payment/analytics/revenue/constants";
 import { SUBSCRIPTION_DASHBOARD_ALIAS } from "@/subscription/dashboard/constants";
 import { USER_ME_ALIAS } from "@/user/private/me/constants";
 
@@ -24,7 +25,7 @@ export const category: CategoryDefinition = {
   icon: "refresh-cw",
   order: 12,
   defaultEntry: {
-    [UserPermissionRole.ADMIN]: SUBSCRIPTION_DASHBOARD_ALIAS,
+    [UserPermissionRole.ADMIN]: REVENUE_REPORT_ALIAS,
     [UserPermissionRole.CUSTOMER]: SUBSCRIPTION_DASHBOARD_ALIAS,
     [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
   },

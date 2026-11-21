@@ -607,7 +607,7 @@
     "credits": 0
   },
   {
-    "toolName": "credits_history_GET",
+    "toolName": "credits-history",
     "title": "Voir l'historique des crédits",
     "titleShort": "Historique des crédits",
     "description": "Récupérer l'historique paginé des transactions de crédits",
@@ -683,6 +683,763 @@
           },
           "schemaType": "primitive"
         },
+        "target": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Client",
+          "description": "E-mail du compte, ID utilisateur ou ID de lead",
+          "placeholder": "client@example.com ou un ID",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "includeInCacheKey": true,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "typeFilter": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Type",
+          "options": [
+            {
+              "value": "enums.transactionType.freeGrant",
+              "label": "enums.transactionType.freeGrant"
+            },
+            {
+              "value": "enums.transactionType.purchase",
+              "label": "enums.transactionType.purchase"
+            },
+            {
+              "value": "enums.transactionType.subscription",
+              "label": "enums.transactionType.subscription"
+            },
+            {
+              "value": "enums.transactionType.usage",
+              "label": "enums.transactionType.usage"
+            },
+            {
+              "value": "enums.transactionType.expiry",
+              "label": "enums.transactionType.expiry"
+            },
+            {
+              "value": "enums.transactionType.refund",
+              "label": "enums.transactionType.refund"
+            },
+            {
+              "value": "enums.transactionType.transfer",
+              "label": "enums.transactionType.transfer"
+            },
+            {
+              "value": "enums.transactionType.otherDevices",
+              "label": "enums.transactionType.otherDevices"
+            },
+            {
+              "value": "enums.transactionType.referralEarning",
+              "label": "enums.transactionType.referralEarning"
+            },
+            {
+              "value": "enums.transactionType.referralPayout",
+              "label": "enums.transactionType.referralPayout"
+            }
+          ],
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "FREE_GRANT": "enums.transactionType.freeGrant",
+                    "PURCHASE": "enums.transactionType.purchase",
+                    "SUBSCRIPTION": "enums.transactionType.subscription",
+                    "USAGE": "enums.transactionType.usage",
+                    "EXPIRY": "enums.transactionType.expiry",
+                    "REFUND": "enums.transactionType.refund",
+                    "TRANSFER": "enums.transactionType.transfer",
+                    "OTHER_DEVICES": "enums.transactionType.otherDevices",
+                    "REFERRAL_EARNING": "enums.transactionType.referralEarning",
+                    "REFERRAL_PAYOUT": "enums.transactionType.referralPayout"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "FREE_GRANT": "enums.transactionType.freeGrant",
+                  "PURCHASE": "enums.transactionType.purchase",
+                  "SUBSCRIPTION": "enums.transactionType.subscription",
+                  "USAGE": "enums.transactionType.usage",
+                  "EXPIRY": "enums.transactionType.expiry",
+                  "REFUND": "enums.transactionType.refund",
+                  "TRANSFER": "enums.transactionType.transfer",
+                  "OTHER_DEVICES": "enums.transactionType.otherDevices",
+                  "REFERRAL_EARNING": "enums.transactionType.referralEarning",
+                  "REFERRAL_PAYOUT": "enums.transactionType.referralPayout"
+                },
+                "options": [
+                  "enums.transactionType.freeGrant",
+                  "enums.transactionType.purchase",
+                  "enums.transactionType.subscription",
+                  "enums.transactionType.usage",
+                  "enums.transactionType.expiry",
+                  "enums.transactionType.refund",
+                  "enums.transactionType.transfer",
+                  "enums.transactionType.otherDevices",
+                  "enums.transactionType.referralEarning",
+                  "enums.transactionType.referralPayout"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "includeInCacheKey": true,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "from": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Du",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "includeInCacheKey": true,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "to": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Au",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "includeInCacheKey": true,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "currentBalance": {
+          "type": "text",
+          "label": "Solde actuel",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "nullable",
+                  "innerType": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "paid": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "free": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "nullable"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "recent": {
+          "type": "text",
+          "label": "Activité récente",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "id": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "def": {
+                            "type": "pipe",
+                            "in": {
+                              "def": {
+                                "type": "union",
+                                "options": [
+                                  {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  {
+                                    "def": {
+                                      "type": "date"
+                                    },
+                                    "type": "date"
+                                  },
+                                  {
+                                    "def": {
+                                      "type": "number",
+                                      "coerce": true,
+                                      "checks": []
+                                    },
+                                    "type": "number",
+                                    "isFinite": true
+                                  }
+                                ]
+                              },
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "date"
+                                  },
+                                  "type": "date"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "coerce": true,
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                }
+                              ]
+                            },
+                            "out": {
+                              "def": {
+                                "type": "transform"
+                              },
+                              "type": "transform"
+                            }
+                          },
+                          "type": "pipe",
+                          "in": {
+                            "def": {
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "date"
+                                  },
+                                  "type": "date"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "coerce": true,
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                }
+                              ]
+                            },
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "date"
+                                },
+                                "type": "date"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "coerce": true,
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            ]
+                          },
+                          "out": {
+                            "def": {
+                              "type": "transform"
+                            },
+                            "type": "transform"
+                          }
+                        },
+                        "amount": {
+                          "def": {
+                            "type": "number",
+                            "coerce": true,
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "label": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "detail": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        },
+                        "email": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        },
+                        "userId": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        },
+                        "leadId": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "id": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "def": {
+                          "type": "pipe",
+                          "in": {
+                            "def": {
+                              "type": "union",
+                              "options": [
+                                {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                },
+                                {
+                                  "def": {
+                                    "type": "date"
+                                  },
+                                  "type": "date"
+                                },
+                                {
+                                  "def": {
+                                    "type": "number",
+                                    "coerce": true,
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                }
+                              ]
+                            },
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "date"
+                                },
+                                "type": "date"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "coerce": true,
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            ]
+                          },
+                          "out": {
+                            "def": {
+                              "type": "transform"
+                            },
+                            "type": "transform"
+                          }
+                        },
+                        "type": "pipe",
+                        "in": {
+                          "def": {
+                            "type": "union",
+                            "options": [
+                              {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              {
+                                "def": {
+                                  "type": "date"
+                                },
+                                "type": "date"
+                              },
+                              {
+                                "def": {
+                                  "type": "number",
+                                  "coerce": true,
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            ]
+                          },
+                          "type": "union",
+                          "options": [
+                            {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            {
+                              "def": {
+                                "type": "date"
+                              },
+                              "type": "date"
+                            },
+                            {
+                              "def": {
+                                "type": "number",
+                                "coerce": true,
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            }
+                          ]
+                        },
+                        "out": {
+                          "def": {
+                            "type": "transform"
+                          },
+                          "type": "transform"
+                        }
+                      },
+                      "amount": {
+                        "def": {
+                          "type": "number",
+                          "coerce": true,
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "label": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "detail": {
+                        "def": {
+                          "type": "nullable",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "nullable"
+                      },
+                      "email": {
+                        "def": {
+                          "type": "nullable",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "nullable"
+                      },
+                      "userId": {
+                        "def": {
+                          "type": "nullable",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "nullable"
+                      },
+                      "leadId": {
+                        "def": {
+                          "type": "nullable",
+                          "innerType": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          }
+                        },
+                        "type": "nullable"
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "totals": {
+          "type": "text",
+          "label": "Totaux",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "nullable",
+                  "innerType": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "spent": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        },
+                        "granted": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "nullable"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "resolvedTarget": {
+          "type": "text",
+          "label": "Registre de",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "nullable",
+                  "innerType": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "userId": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        },
+                        "leadId": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        },
+                        "email": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        },
+                        "isPartner": {
+                          "def": {
+                            "type": "optional",
+                            "innerType": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            }
+                          },
+                          "type": "optional"
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "nullable"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "transactions": {
           "type": "container",
           "child": {
@@ -750,6 +1507,98 @@
                         "type": "string"
                       },
                       "type": "string"
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "label": {
+                "type": "text",
+                "label": "Type",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "paymentId": {
+                "type": "text",
+                "label": "Paiement",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "typeKey": {
+                "type": "text",
+                "label": "Type",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "optional"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "detail": {
+                "type": "text",
+                "label": "Modèle ou fonction",
+                "schema": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
                     }
                   },
                   "type": "optional"
@@ -1030,6 +1879,7 @@
     "instanceId": "local",
     "category": "credits",
     "tags": ["crédits", "solde"],
+    "aliases": ["credits-history"],
     "credits": 0
   },
   {
@@ -287201,6 +288051,35 @@
           },
           "schemaType": "primitive"
         },
+        "catalogOverview": {
+          "type": "text",
+          "label": "Vue d'ensemble",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "visibleFor": ["enums.userRole.admin"],
+          "hiddenForPlatforms": [
+            "ai",
+            "mcp",
+            "cron",
+            "remote-skill",
+            "cli",
+            "cli-package"
+          ],
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "recordSearchTargets": {
           "type": "text",
           "label": "Trouver une fiche",
@@ -288800,7 +289679,7 @@
     "toolName": "remote-connections",
     "title": "Connexions distantes",
     "titleShort": "Connexions",
-    "description": "Lister toutes les connexions distantes de votre compte",
+    "description": "Vos instances liées. Les admins voient aussi l'état de chaque connexion sur ce serveur.",
     "fields": {
       "usage": {
         "request": "data",
@@ -288827,6 +289706,1964 @@
           },
           "usage": {
             "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "range": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Période",
+          "description": "Fenêtre de temps du rapport",
+          "options": [
+            {
+              "value": "analytics.range.last7Days",
+              "label": "analytics.range.last7Days"
+            },
+            {
+              "value": "analytics.range.last30Days",
+              "label": "analytics.range.last30Days"
+            },
+            {
+              "value": "analytics.range.last90Days",
+              "label": "analytics.range.last90Days"
+            },
+            {
+              "value": "analytics.range.last6Months",
+              "label": "analytics.range.last6Months"
+            },
+            {
+              "value": "analytics.range.last12Months",
+              "label": "analytics.range.last12Months"
+            },
+            {
+              "value": "analytics.range.allTime",
+              "label": "analytics.range.allTime"
+            },
+            {
+              "value": "analytics.range.custom",
+              "label": "analytics.range.custom"
+            }
+          ],
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "default",
+                  "innerType": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "LAST_7_DAYS": "analytics.range.last7Days",
+                        "LAST_30_DAYS": "analytics.range.last30Days",
+                        "LAST_90_DAYS": "analytics.range.last90Days",
+                        "LAST_6_MONTHS": "analytics.range.last6Months",
+                        "LAST_12_MONTHS": "analytics.range.last12Months",
+                        "ALL_TIME": "analytics.range.allTime",
+                        "CUSTOM": "analytics.range.custom"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "LAST_7_DAYS": "analytics.range.last7Days",
+                      "LAST_30_DAYS": "analytics.range.last30Days",
+                      "LAST_90_DAYS": "analytics.range.last90Days",
+                      "LAST_6_MONTHS": "analytics.range.last6Months",
+                      "LAST_12_MONTHS": "analytics.range.last12Months",
+                      "ALL_TIME": "analytics.range.allTime",
+                      "CUSTOM": "analytics.range.custom"
+                    },
+                    "options": [
+                      "analytics.range.last7Days",
+                      "analytics.range.last30Days",
+                      "analytics.range.last90Days",
+                      "analytics.range.last6Months",
+                      "analytics.range.last12Months",
+                      "analytics.range.allTime",
+                      "analytics.range.custom"
+                    ]
+                  },
+                  "defaultValue": "analytics.range.last30Days"
+                },
+                "type": "default"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "granularity": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Regrouper par",
+          "description": "Intervalle des graphiques",
+          "options": [
+            {
+              "value": "analytics.granularity.auto",
+              "label": "analytics.granularity.auto"
+            },
+            {
+              "value": "analytics.granularity.day",
+              "label": "analytics.granularity.day"
+            },
+            {
+              "value": "analytics.granularity.week",
+              "label": "analytics.granularity.week"
+            },
+            {
+              "value": "analytics.granularity.month",
+              "label": "analytics.granularity.month"
+            }
+          ],
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "default",
+                  "innerType": {
+                    "def": {
+                      "type": "enum",
+                      "entries": {
+                        "AUTO": "analytics.granularity.auto",
+                        "DAY": "analytics.granularity.day",
+                        "WEEK": "analytics.granularity.week",
+                        "MONTH": "analytics.granularity.month"
+                      }
+                    },
+                    "type": "enum",
+                    "enum": {
+                      "AUTO": "analytics.granularity.auto",
+                      "DAY": "analytics.granularity.day",
+                      "WEEK": "analytics.granularity.week",
+                      "MONTH": "analytics.granularity.month"
+                    },
+                    "options": [
+                      "analytics.granularity.auto",
+                      "analytics.granularity.day",
+                      "analytics.granularity.week",
+                      "analytics.granularity.month"
+                    ]
+                  },
+                  "defaultValue": "analytics.granularity.auto"
+                },
+                "type": "default"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "from": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Du",
+          "description": "Date de début (période personnalisée, incluse)",
+          "columns": 2,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "to": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Au",
+          "description": "Date de fin (période personnalisée, incluse)",
+          "columns": 2,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "fleetStatus": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "État",
+          "description": "Afficher uniquement les connexions dans cet état",
+          "options": [
+            {
+              "value": "enums.fleetStatus.all",
+              "label": "enums.fleetStatus.all"
+            },
+            {
+              "value": "enums.fleetStatus.unhealthy",
+              "label": "enums.fleetStatus.unhealthy"
+            },
+            {
+              "value": "enums.fleetStatus.critical",
+              "label": "enums.fleetStatus.critical"
+            },
+            {
+              "value": "enums.fleetStatus.warning",
+              "label": "enums.fleetStatus.warning"
+            },
+            {
+              "value": "enums.fleetStatus.disconnected",
+              "label": "enums.fleetStatus.disconnected"
+            },
+            {
+              "value": "enums.fleetStatus.healthy",
+              "label": "enums.fleetStatus.healthy"
+            }
+          ],
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "ALL": "enums.fleetStatus.all",
+                    "UNHEALTHY": "enums.fleetStatus.unhealthy",
+                    "CRITICAL": "enums.fleetStatus.critical",
+                    "WARNING": "enums.fleetStatus.warning",
+                    "DISCONNECTED": "enums.fleetStatus.disconnected",
+                    "HEALTHY": "enums.fleetStatus.healthy"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "ALL": "enums.fleetStatus.all",
+                  "UNHEALTHY": "enums.fleetStatus.unhealthy",
+                  "CRITICAL": "enums.fleetStatus.critical",
+                  "WARNING": "enums.fleetStatus.warning",
+                  "DISCONNECTED": "enums.fleetStatus.disconnected",
+                  "HEALTHY": "enums.fleetStatus.healthy"
+                },
+                "options": [
+                  "enums.fleetStatus.all",
+                  "enums.fleetStatus.unhealthy",
+                  "enums.fleetStatus.critical",
+                  "enums.fleetStatus.warning",
+                  "enums.fleetStatus.disconnected",
+                  "enums.fleetStatus.healthy"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "fleet": {
+          "type": "text",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "window": {
+                      "def": {
+                        "type": "object",
+                        "shape": {
+                          "from": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "to": {
+                            "def": {
+                              "type": "string"
+                            },
+                            "type": "string"
+                          },
+                          "previousFrom": {
+                            "def": {
+                              "type": "nullable",
+                              "innerType": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              }
+                            },
+                            "type": "nullable"
+                          },
+                          "previousTo": {
+                            "def": {
+                              "type": "nullable",
+                              "innerType": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              }
+                            },
+                            "type": "nullable"
+                          },
+                          "bucket": {
+                            "def": {
+                              "type": "enum",
+                              "entries": {
+                                "day": "day",
+                                "week": "week",
+                                "month": "month"
+                              }
+                            },
+                            "type": "enum",
+                            "enum": {
+                              "day": "day",
+                              "week": "week",
+                              "month": "month"
+                            },
+                            "options": ["day", "week", "month"]
+                          }
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "localCapabilitiesVersion": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "selfInstanceId": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "counts": {
+                      "def": {
+                        "type": "object",
+                        "shape": {
+                          "total": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          },
+                          "active": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          },
+                          "healthy": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          },
+                          "warning": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          },
+                          "critical": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          },
+                          "disconnected": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          },
+                          "unhealthy": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "rows": {
+                      "def": {
+                        "type": "array",
+                        "element": {
+                          "def": {
+                            "type": "object",
+                            "shape": {
+                              "id": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "instanceId": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "ownerUserId": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "ownerEmail": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "ownerName": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "ownerIsAdmin": {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              "isMine": {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              "remoteUrl": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "status": {
+                                "def": {
+                                  "type": "enum",
+                                  "entries": {
+                                    "healthy": "healthy",
+                                    "warning": "warning",
+                                    "critical": "critical",
+                                    "disconnected": "disconnected"
+                                  }
+                                },
+                                "type": "enum",
+                                "enum": {
+                                  "healthy": "healthy",
+                                  "warning": "warning",
+                                  "critical": "critical",
+                                  "disconnected": "disconnected"
+                                },
+                                "options": [
+                                  "healthy",
+                                  "warning",
+                                  "critical",
+                                  "disconnected"
+                                ]
+                              },
+                              "issues": {
+                                "def": {
+                                  "type": "array",
+                                  "element": {
+                                    "def": {
+                                      "type": "enum",
+                                      "entries": {
+                                        "reauthRequired": "reauthRequired",
+                                        "inactive": "inactive",
+                                        "noToken": "noToken",
+                                        "accessDenied": "accessDenied",
+                                        "neverSynced": "neverSynced",
+                                        "transportDrift": "transportDrift",
+                                        "transportMismatch": "transportMismatch",
+                                        "peerToolsStale": "peerToolsStale"
+                                      }
+                                    },
+                                    "type": "enum",
+                                    "enum": {
+                                      "reauthRequired": "reauthRequired",
+                                      "inactive": "inactive",
+                                      "noToken": "noToken",
+                                      "accessDenied": "accessDenied",
+                                      "neverSynced": "neverSynced",
+                                      "transportDrift": "transportDrift",
+                                      "transportMismatch": "transportMismatch",
+                                      "peerToolsStale": "peerToolsStale"
+                                    },
+                                    "options": [
+                                      "reauthRequired",
+                                      "inactive",
+                                      "noToken",
+                                      "accessDenied",
+                                      "neverSynced",
+                                      "transportDrift",
+                                      "transportMismatch",
+                                      "peerToolsStale"
+                                    ]
+                                  }
+                                },
+                                "type": "array",
+                                "element": {
+                                  "def": {
+                                    "type": "enum",
+                                    "entries": {
+                                      "reauthRequired": "reauthRequired",
+                                      "inactive": "inactive",
+                                      "noToken": "noToken",
+                                      "accessDenied": "accessDenied",
+                                      "neverSynced": "neverSynced",
+                                      "transportDrift": "transportDrift",
+                                      "transportMismatch": "transportMismatch",
+                                      "peerToolsStale": "peerToolsStale"
+                                    }
+                                  },
+                                  "type": "enum",
+                                  "enum": {
+                                    "reauthRequired": "reauthRequired",
+                                    "inactive": "inactive",
+                                    "noToken": "noToken",
+                                    "accessDenied": "accessDenied",
+                                    "neverSynced": "neverSynced",
+                                    "transportDrift": "transportDrift",
+                                    "transportMismatch": "transportMismatch",
+                                    "peerToolsStale": "peerToolsStale"
+                                  },
+                                  "options": [
+                                    "reauthRequired",
+                                    "inactive",
+                                    "noToken",
+                                    "accessDenied",
+                                    "neverSynced",
+                                    "transportDrift",
+                                    "transportMismatch",
+                                    "peerToolsStale"
+                                  ]
+                                }
+                              },
+                              "isActive": {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              "isReverseEntry": {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              "hasToken": {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              "transportMode": {
+                                "def": {
+                                  "type": "enum",
+                                  "entries": {
+                                    "reverse-ws": "reverse-ws",
+                                    "direct-http": "direct-http"
+                                  }
+                                },
+                                "type": "enum",
+                                "enum": {
+                                  "reverse-ws": "reverse-ws",
+                                  "direct-http": "direct-http"
+                                },
+                                "options": ["reverse-ws", "direct-http"]
+                              },
+                              "remoteTransportMode": {
+                                "def": {
+                                  "type": "enum",
+                                  "entries": {
+                                    "reverse-ws": "reverse-ws",
+                                    "direct-http": "direct-http"
+                                  }
+                                },
+                                "type": "enum",
+                                "enum": {
+                                  "reverse-ws": "reverse-ws",
+                                  "direct-http": "direct-http"
+                                },
+                                "options": ["reverse-ws", "direct-http"]
+                              },
+                              "lastTransportUsed": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "enum",
+                                      "entries": {
+                                        "reverse-ws": "reverse-ws",
+                                        "direct-http": "direct-http"
+                                      }
+                                    },
+                                    "type": "enum",
+                                    "enum": {
+                                      "reverse-ws": "reverse-ws",
+                                      "direct-http": "direct-http"
+                                    },
+                                    "options": ["reverse-ws", "direct-http"]
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "lastTransportUsedAt": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "wsConnectedAt": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "lastSyncedAt": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "lastContactAt": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "lastDisconnectAt": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "capabilitiesCount": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              },
+                              "capabilitiesVersion": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "sentCapabilitiesVersion": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "isInferenceProvider": {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              "forceSystemProvider": {
+                                "def": {
+                                  "type": "boolean"
+                                },
+                                "type": "boolean"
+                              },
+                              "syncScope": {
+                                "def": {
+                                  "type": "object",
+                                  "shape": {
+                                    "memories": {
+                                      "def": {
+                                        "type": "default",
+                                        "innerType": {
+                                          "def": {
+                                            "type": "boolean"
+                                          },
+                                          "type": "boolean"
+                                        },
+                                        "defaultValue": true
+                                      },
+                                      "type": "default"
+                                    },
+                                    "documents": {
+                                      "def": {
+                                        "type": "default",
+                                        "innerType": {
+                                          "def": {
+                                            "type": "boolean"
+                                          },
+                                          "type": "boolean"
+                                        },
+                                        "defaultValue": true
+                                      },
+                                      "type": "default"
+                                    },
+                                    "skills": {
+                                      "def": {
+                                        "type": "default",
+                                        "innerType": {
+                                          "def": {
+                                            "type": "boolean"
+                                          },
+                                          "type": "boolean"
+                                        },
+                                        "defaultValue": true
+                                      },
+                                      "type": "default"
+                                    },
+                                    "favorites": {
+                                      "def": {
+                                        "type": "default",
+                                        "innerType": {
+                                          "def": {
+                                            "type": "boolean"
+                                          },
+                                          "type": "boolean"
+                                        },
+                                        "defaultValue": true
+                                      },
+                                      "type": "default"
+                                    },
+                                    "threads": {
+                                      "def": {
+                                        "type": "default",
+                                        "innerType": {
+                                          "def": {
+                                            "type": "boolean"
+                                          },
+                                          "type": "boolean"
+                                        },
+                                        "defaultValue": false
+                                      },
+                                      "type": "default"
+                                    }
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "loopLocation": {
+                                "def": {
+                                  "type": "enum",
+                                  "entries": {
+                                    "target": "target",
+                                    "caller": "caller"
+                                  }
+                                },
+                                "type": "enum",
+                                "enum": {
+                                  "target": "target",
+                                  "caller": "caller"
+                                },
+                                "options": ["target", "caller"]
+                              },
+                              "createdAt": {
+                                "def": {
+                                  "type": "string"
+                                },
+                                "type": "string"
+                              },
+                              "pairedPeer": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "object",
+                                      "shape": {
+                                        "instanceId": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "transportMode": {
+                                          "def": {
+                                            "type": "enum",
+                                            "entries": {
+                                              "reverse-ws": "reverse-ws",
+                                              "direct-http": "direct-http"
+                                            }
+                                          },
+                                          "type": "enum",
+                                          "enum": {
+                                            "reverse-ws": "reverse-ws",
+                                            "direct-http": "direct-http"
+                                          },
+                                          "options": [
+                                            "reverse-ws",
+                                            "direct-http"
+                                          ]
+                                        },
+                                        "remoteTransportMode": {
+                                          "def": {
+                                            "type": "enum",
+                                            "entries": {
+                                              "reverse-ws": "reverse-ws",
+                                              "direct-http": "direct-http"
+                                            }
+                                          },
+                                          "type": "enum",
+                                          "enum": {
+                                            "reverse-ws": "reverse-ws",
+                                            "direct-http": "direct-http"
+                                          },
+                                          "options": [
+                                            "reverse-ws",
+                                            "direct-http"
+                                          ]
+                                        }
+                                      }
+                                    },
+                                    "type": "object"
+                                  }
+                                },
+                                "type": "nullable"
+                              },
+                              "lastDenial": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "object",
+                                      "shape": {
+                                        "action": {
+                                          "def": {
+                                            "type": "enum",
+                                            "entries": {
+                                              "registered": "registered",
+                                              "reregistered": "reregistered",
+                                              "disconnected": "disconnected",
+                                              "denied": "denied",
+                                              "rate_limited": "rate_limited"
+                                            }
+                                          },
+                                          "type": "enum",
+                                          "enum": {
+                                            "registered": "registered",
+                                            "reregistered": "reregistered",
+                                            "disconnected": "disconnected",
+                                            "denied": "denied",
+                                            "rate_limited": "rate_limited"
+                                          },
+                                          "options": [
+                                            "registered",
+                                            "reregistered",
+                                            "disconnected",
+                                            "denied",
+                                            "rate_limited"
+                                          ]
+                                        },
+                                        "reason": {
+                                          "def": {
+                                            "type": "nullable",
+                                            "innerType": {
+                                              "def": {
+                                                "type": "string"
+                                              },
+                                              "type": "string"
+                                            }
+                                          },
+                                          "type": "nullable"
+                                        },
+                                        "createdAt": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "type": "object"
+                                  }
+                                },
+                                "type": "nullable"
+                              }
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "array",
+                      "element": {
+                        "def": {
+                          "type": "object",
+                          "shape": {
+                            "id": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "instanceId": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "ownerUserId": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "ownerEmail": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "ownerName": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "ownerIsAdmin": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            },
+                            "isMine": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            },
+                            "remoteUrl": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "status": {
+                              "def": {
+                                "type": "enum",
+                                "entries": {
+                                  "healthy": "healthy",
+                                  "warning": "warning",
+                                  "critical": "critical",
+                                  "disconnected": "disconnected"
+                                }
+                              },
+                              "type": "enum",
+                              "enum": {
+                                "healthy": "healthy",
+                                "warning": "warning",
+                                "critical": "critical",
+                                "disconnected": "disconnected"
+                              },
+                              "options": [
+                                "healthy",
+                                "warning",
+                                "critical",
+                                "disconnected"
+                              ]
+                            },
+                            "issues": {
+                              "def": {
+                                "type": "array",
+                                "element": {
+                                  "def": {
+                                    "type": "enum",
+                                    "entries": {
+                                      "reauthRequired": "reauthRequired",
+                                      "inactive": "inactive",
+                                      "noToken": "noToken",
+                                      "accessDenied": "accessDenied",
+                                      "neverSynced": "neverSynced",
+                                      "transportDrift": "transportDrift",
+                                      "transportMismatch": "transportMismatch",
+                                      "peerToolsStale": "peerToolsStale"
+                                    }
+                                  },
+                                  "type": "enum",
+                                  "enum": {
+                                    "reauthRequired": "reauthRequired",
+                                    "inactive": "inactive",
+                                    "noToken": "noToken",
+                                    "accessDenied": "accessDenied",
+                                    "neverSynced": "neverSynced",
+                                    "transportDrift": "transportDrift",
+                                    "transportMismatch": "transportMismatch",
+                                    "peerToolsStale": "peerToolsStale"
+                                  },
+                                  "options": [
+                                    "reauthRequired",
+                                    "inactive",
+                                    "noToken",
+                                    "accessDenied",
+                                    "neverSynced",
+                                    "transportDrift",
+                                    "transportMismatch",
+                                    "peerToolsStale"
+                                  ]
+                                }
+                              },
+                              "type": "array",
+                              "element": {
+                                "def": {
+                                  "type": "enum",
+                                  "entries": {
+                                    "reauthRequired": "reauthRequired",
+                                    "inactive": "inactive",
+                                    "noToken": "noToken",
+                                    "accessDenied": "accessDenied",
+                                    "neverSynced": "neverSynced",
+                                    "transportDrift": "transportDrift",
+                                    "transportMismatch": "transportMismatch",
+                                    "peerToolsStale": "peerToolsStale"
+                                  }
+                                },
+                                "type": "enum",
+                                "enum": {
+                                  "reauthRequired": "reauthRequired",
+                                  "inactive": "inactive",
+                                  "noToken": "noToken",
+                                  "accessDenied": "accessDenied",
+                                  "neverSynced": "neverSynced",
+                                  "transportDrift": "transportDrift",
+                                  "transportMismatch": "transportMismatch",
+                                  "peerToolsStale": "peerToolsStale"
+                                },
+                                "options": [
+                                  "reauthRequired",
+                                  "inactive",
+                                  "noToken",
+                                  "accessDenied",
+                                  "neverSynced",
+                                  "transportDrift",
+                                  "transportMismatch",
+                                  "peerToolsStale"
+                                ]
+                              }
+                            },
+                            "isActive": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            },
+                            "isReverseEntry": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            },
+                            "hasToken": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            },
+                            "transportMode": {
+                              "def": {
+                                "type": "enum",
+                                "entries": {
+                                  "reverse-ws": "reverse-ws",
+                                  "direct-http": "direct-http"
+                                }
+                              },
+                              "type": "enum",
+                              "enum": {
+                                "reverse-ws": "reverse-ws",
+                                "direct-http": "direct-http"
+                              },
+                              "options": ["reverse-ws", "direct-http"]
+                            },
+                            "remoteTransportMode": {
+                              "def": {
+                                "type": "enum",
+                                "entries": {
+                                  "reverse-ws": "reverse-ws",
+                                  "direct-http": "direct-http"
+                                }
+                              },
+                              "type": "enum",
+                              "enum": {
+                                "reverse-ws": "reverse-ws",
+                                "direct-http": "direct-http"
+                              },
+                              "options": ["reverse-ws", "direct-http"]
+                            },
+                            "lastTransportUsed": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "enum",
+                                    "entries": {
+                                      "reverse-ws": "reverse-ws",
+                                      "direct-http": "direct-http"
+                                    }
+                                  },
+                                  "type": "enum",
+                                  "enum": {
+                                    "reverse-ws": "reverse-ws",
+                                    "direct-http": "direct-http"
+                                  },
+                                  "options": ["reverse-ws", "direct-http"]
+                                }
+                              },
+                              "type": "nullable"
+                            },
+                            "lastTransportUsedAt": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              },
+                              "type": "nullable"
+                            },
+                            "wsConnectedAt": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              },
+                              "type": "nullable"
+                            },
+                            "lastSyncedAt": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              },
+                              "type": "nullable"
+                            },
+                            "lastContactAt": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              },
+                              "type": "nullable"
+                            },
+                            "lastDisconnectAt": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              },
+                              "type": "nullable"
+                            },
+                            "capabilitiesCount": {
+                              "def": {
+                                "type": "number",
+                                "checks": []
+                              },
+                              "type": "number",
+                              "isFinite": true
+                            },
+                            "capabilitiesVersion": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              },
+                              "type": "nullable"
+                            },
+                            "sentCapabilitiesVersion": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "string"
+                                  },
+                                  "type": "string"
+                                }
+                              },
+                              "type": "nullable"
+                            },
+                            "isInferenceProvider": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            },
+                            "forceSystemProvider": {
+                              "def": {
+                                "type": "boolean"
+                              },
+                              "type": "boolean"
+                            },
+                            "syncScope": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "memories": {
+                                    "def": {
+                                      "type": "default",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "boolean"
+                                        },
+                                        "type": "boolean"
+                                      },
+                                      "defaultValue": true
+                                    },
+                                    "type": "default"
+                                  },
+                                  "documents": {
+                                    "def": {
+                                      "type": "default",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "boolean"
+                                        },
+                                        "type": "boolean"
+                                      },
+                                      "defaultValue": true
+                                    },
+                                    "type": "default"
+                                  },
+                                  "skills": {
+                                    "def": {
+                                      "type": "default",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "boolean"
+                                        },
+                                        "type": "boolean"
+                                      },
+                                      "defaultValue": true
+                                    },
+                                    "type": "default"
+                                  },
+                                  "favorites": {
+                                    "def": {
+                                      "type": "default",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "boolean"
+                                        },
+                                        "type": "boolean"
+                                      },
+                                      "defaultValue": true
+                                    },
+                                    "type": "default"
+                                  },
+                                  "threads": {
+                                    "def": {
+                                      "type": "default",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "boolean"
+                                        },
+                                        "type": "boolean"
+                                      },
+                                      "defaultValue": false
+                                    },
+                                    "type": "default"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            },
+                            "loopLocation": {
+                              "def": {
+                                "type": "enum",
+                                "entries": {
+                                  "target": "target",
+                                  "caller": "caller"
+                                }
+                              },
+                              "type": "enum",
+                              "enum": {
+                                "target": "target",
+                                "caller": "caller"
+                              },
+                              "options": ["target", "caller"]
+                            },
+                            "createdAt": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            },
+                            "pairedPeer": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "object",
+                                    "shape": {
+                                      "instanceId": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      },
+                                      "transportMode": {
+                                        "def": {
+                                          "type": "enum",
+                                          "entries": {
+                                            "reverse-ws": "reverse-ws",
+                                            "direct-http": "direct-http"
+                                          }
+                                        },
+                                        "type": "enum",
+                                        "enum": {
+                                          "reverse-ws": "reverse-ws",
+                                          "direct-http": "direct-http"
+                                        },
+                                        "options": ["reverse-ws", "direct-http"]
+                                      },
+                                      "remoteTransportMode": {
+                                        "def": {
+                                          "type": "enum",
+                                          "entries": {
+                                            "reverse-ws": "reverse-ws",
+                                            "direct-http": "direct-http"
+                                          }
+                                        },
+                                        "type": "enum",
+                                        "enum": {
+                                          "reverse-ws": "reverse-ws",
+                                          "direct-http": "direct-http"
+                                        },
+                                        "options": ["reverse-ws", "direct-http"]
+                                      }
+                                    }
+                                  },
+                                  "type": "object"
+                                }
+                              },
+                              "type": "nullable"
+                            },
+                            "lastDenial": {
+                              "def": {
+                                "type": "nullable",
+                                "innerType": {
+                                  "def": {
+                                    "type": "object",
+                                    "shape": {
+                                      "action": {
+                                        "def": {
+                                          "type": "enum",
+                                          "entries": {
+                                            "registered": "registered",
+                                            "reregistered": "reregistered",
+                                            "disconnected": "disconnected",
+                                            "denied": "denied",
+                                            "rate_limited": "rate_limited"
+                                          }
+                                        },
+                                        "type": "enum",
+                                        "enum": {
+                                          "registered": "registered",
+                                          "reregistered": "reregistered",
+                                          "disconnected": "disconnected",
+                                          "denied": "denied",
+                                          "rate_limited": "rate_limited"
+                                        },
+                                        "options": [
+                                          "registered",
+                                          "reregistered",
+                                          "disconnected",
+                                          "denied",
+                                          "rate_limited"
+                                        ]
+                                      },
+                                      "reason": {
+                                        "def": {
+                                          "type": "nullable",
+                                          "innerType": {
+                                            "def": {
+                                              "type": "string"
+                                            },
+                                            "type": "string"
+                                          }
+                                        },
+                                        "type": "nullable"
+                                      },
+                                      "createdAt": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "type": "object"
+                                }
+                              },
+                              "type": "nullable"
+                            }
+                          }
+                        },
+                        "type": "object"
+                      }
+                    },
+                    "audit": {
+                      "def": {
+                        "type": "object",
+                        "shape": {
+                          "events": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "value": {
+                                  "def": {
+                                    "type": "number",
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                },
+                                "previous": {
+                                  "def": {
+                                    "type": "nullable",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "number",
+                                        "checks": []
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    }
+                                  },
+                                  "type": "nullable"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "failures": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "value": {
+                                  "def": {
+                                    "type": "number",
+                                    "checks": []
+                                  },
+                                  "type": "number",
+                                  "isFinite": true
+                                },
+                                "previous": {
+                                  "def": {
+                                    "type": "nullable",
+                                    "innerType": {
+                                      "def": {
+                                        "type": "number",
+                                        "checks": []
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    }
+                                  },
+                                  "type": "nullable"
+                                }
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "trend": {
+                            "def": {
+                              "type": "object",
+                              "shape": {
+                                "buckets": {
+                                  "def": {
+                                    "type": "array",
+                                    "element": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "array",
+                                  "element": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "series": {
+                                  "def": {
+                                    "type": "array",
+                                    "element": {
+                                      "def": {
+                                        "type": "object",
+                                        "shape": {
+                                          "key": {
+                                            "def": {
+                                              "type": "string"
+                                            },
+                                            "type": "string"
+                                          },
+                                          "values": {
+                                            "def": {
+                                              "type": "array",
+                                              "element": {
+                                                "def": {
+                                                  "type": "number",
+                                                  "checks": []
+                                                },
+                                                "type": "number",
+                                                "isFinite": true
+                                              }
+                                            },
+                                            "type": "array",
+                                            "element": {
+                                              "def": {
+                                                "type": "number",
+                                                "checks": []
+                                              },
+                                              "type": "number",
+                                              "isFinite": true
+                                            }
+                                          }
+                                        }
+                                      },
+                                      "type": "object"
+                                    }
+                                  },
+                                  "type": "array",
+                                  "element": {
+                                    "def": {
+                                      "type": "object",
+                                      "shape": {
+                                        "key": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "values": {
+                                          "def": {
+                                            "type": "array",
+                                            "element": {
+                                              "def": {
+                                                "type": "number",
+                                                "checks": []
+                                              },
+                                              "type": "number",
+                                              "isFinite": true
+                                            }
+                                          },
+                                          "type": "array",
+                                          "element": {
+                                            "def": {
+                                              "type": "number",
+                                              "checks": []
+                                            },
+                                            "type": "number",
+                                            "isFinite": true
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "type": "object"
+                                  }
+                                }
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "byReason": {
+                            "def": {
+                              "type": "array",
+                              "element": {
+                                "def": {
+                                  "type": "object",
+                                  "shape": {
+                                    "key": {
+                                      "def": {
+                                        "type": "nullable",
+                                        "innerType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      },
+                                      "type": "nullable"
+                                    },
+                                    "metrics": {
+                                      "def": {
+                                        "type": "record",
+                                        "keyType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        },
+                                        "valueType": {
+                                          "def": {
+                                            "type": "number",
+                                            "checks": []
+                                          },
+                                          "type": "number",
+                                          "isFinite": true
+                                        }
+                                      },
+                                      "type": "record",
+                                      "keyType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      },
+                                      "valueType": {
+                                        "def": {
+                                          "type": "number",
+                                          "checks": []
+                                        },
+                                        "type": "number",
+                                        "isFinite": true
+                                      }
+                                    }
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "key": {
+                                    "def": {
+                                      "type": "nullable",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "nullable"
+                                  },
+                                  "metrics": {
+                                    "def": {
+                                      "type": "record",
+                                      "keyType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      },
+                                      "valueType": {
+                                        "def": {
+                                          "type": "number",
+                                          "checks": []
+                                        },
+                                        "type": "number",
+                                        "isFinite": true
+                                      }
+                                    },
+                                    "type": "record",
+                                    "keyType": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    },
+                                    "valueType": {
+                                      "def": {
+                                        "type": "number",
+                                        "checks": []
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    }
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          },
+                          "recent": {
+                            "def": {
+                              "type": "array",
+                              "element": {
+                                "def": {
+                                  "type": "object",
+                                  "shape": {
+                                    "id": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    },
+                                    "createdAt": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    },
+                                    "action": {
+                                      "def": {
+                                        "type": "enum",
+                                        "entries": {
+                                          "registered": "registered",
+                                          "reregistered": "reregistered",
+                                          "disconnected": "disconnected",
+                                          "denied": "denied",
+                                          "rate_limited": "rate_limited"
+                                        }
+                                      },
+                                      "type": "enum",
+                                      "enum": {
+                                        "registered": "registered",
+                                        "reregistered": "reregistered",
+                                        "disconnected": "disconnected",
+                                        "denied": "denied",
+                                        "rate_limited": "rate_limited"
+                                      },
+                                      "options": [
+                                        "registered",
+                                        "reregistered",
+                                        "disconnected",
+                                        "denied",
+                                        "rate_limited"
+                                      ]
+                                    },
+                                    "reason": {
+                                      "def": {
+                                        "type": "nullable",
+                                        "innerType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      },
+                                      "type": "nullable"
+                                    },
+                                    "instanceId": {
+                                      "def": {
+                                        "type": "nullable",
+                                        "innerType": {
+                                          "def": {
+                                            "type": "string"
+                                          },
+                                          "type": "string"
+                                        }
+                                      },
+                                      "type": "nullable"
+                                    },
+                                    "ownerEmail": {
+                                      "def": {
+                                        "type": "string"
+                                      },
+                                      "type": "string"
+                                    }
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "type": "array",
+                            "element": {
+                              "def": {
+                                "type": "object",
+                                "shape": {
+                                  "id": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "createdAt": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  },
+                                  "action": {
+                                    "def": {
+                                      "type": "enum",
+                                      "entries": {
+                                        "registered": "registered",
+                                        "reregistered": "reregistered",
+                                        "disconnected": "disconnected",
+                                        "denied": "denied",
+                                        "rate_limited": "rate_limited"
+                                      }
+                                    },
+                                    "type": "enum",
+                                    "enum": {
+                                      "registered": "registered",
+                                      "reregistered": "reregistered",
+                                      "disconnected": "disconnected",
+                                      "denied": "denied",
+                                      "rate_limited": "rate_limited"
+                                    },
+                                    "options": [
+                                      "registered",
+                                      "reregistered",
+                                      "disconnected",
+                                      "denied",
+                                      "rate_limited"
+                                    ]
+                                  },
+                                  "reason": {
+                                    "def": {
+                                      "type": "nullable",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "nullable"
+                                  },
+                                  "instanceId": {
+                                    "def": {
+                                      "type": "nullable",
+                                      "innerType": {
+                                        "def": {
+                                          "type": "string"
+                                        },
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "nullable"
+                                  },
+                                  "ownerEmail": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "type": "object"
+                            }
+                          }
+                        }
+                      },
+                      "type": "object"
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
           },
           "schemaType": "primitive"
         },

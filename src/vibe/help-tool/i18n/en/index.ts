@@ -7,6 +7,8 @@ export const translations = {
     searchLabel: "Search the tool catalog",
     searchAction: "Search tools",
     clearSearch: "Clear tool search",
+    overview: "Business overview",
+    allTools: "All tools",
     findRecord: "Find a record",
     recordPlaceholder: "Name, email or reference",
     loadError: "The catalog could not load",

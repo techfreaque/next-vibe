@@ -11,10 +11,12 @@ import {
   Methods,
   WidgetType,
 } from "next-vibe/core/definition/enums";
+import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { lazyWidget } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { customWidgetObject } from "next-vibe/unified-ui/_shared/utils";
 import {
+  backButton,
   objectField,
   objectOptionalField,
   requestField,
@@ -24,6 +26,8 @@ import {
   widgetField,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
+
+import { SubscriptionPlan } from "@/subscription/enum";
 
 import {
   CreditPackSourceAdminFilter,
@@ -36,6 +40,7 @@ import {
   SortOrderOptions,
 } from "../enum";
 import { SUBSCRIPTION_ADMIN_PURCHASES_ALIAS } from "./constants";
+import { PackRemainingFilter, PackRemainingFilterOptions } from "./enum";
 import { scopedTranslation } from "./i18n";
 
 const PurchasesContainer = lazyWidget(() =>
@@ -66,6 +71,9 @@ const { GET } = createEndpoint({
     render: PurchasesContainer,
     usage: { request: "data", response: true } as const,
     children: {
+      backButton: backButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
       // === SEARCH & FILTERS ===
       searchFilters: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
@@ -121,11 +129,19 @@ const { GET } = createEndpoint({
             columns: 6,
             schema: z.coerce.date().optional(),
           }),
+          remaining: requestField(scopedTranslation, {
+            type: WidgetType.FORM_FIELD,
+            fieldType: FieldDataType.SELECT,
+            label: "get.hasRemaining.label" as const,
+            options: PackRemainingFilterOptions,
+            columns: 6,
+            schema: z.enum(PackRemainingFilter).optional(),
+          }),
         },
       }),
 
       // === SORTING OPTIONS ===
-      sortingOptions: objectField(scopedTranslation, {
+      sortingOptions: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.sortingOptions.title" as const,
         description: "get.sortingOptions.description" as const,
@@ -189,6 +205,11 @@ const { GET } = createEndpoint({
                   label: "get.response.purchases.id" as const,
                   schema: z.string(),
                 }),
+                userId: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.purchases.userId" as const,
+                  schema: z.string(),
+                }),
                 userEmail: responseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   label: "get.response.purchases.userEmail" as const,
@@ -231,14 +252,61 @@ const { GET } = createEndpoint({
                   label: "get.response.purchases.createdAt" as const,
                   schema: z.coerce.date(),
                 }),
+                paidAmount: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.purchases.paidAmount" as const,
+                  schema: z.number().nullable(),
+                }),
+                paymentId: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.purchases.paymentId" as const,
+                  schema: z.string().nullable(),
+                }),
+                paidCurrency: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.purchases.paidCurrency" as const,
+                  schema: z.enum(CurrenciesArr).nullable(),
+                }),
+                planId: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.purchases.planId" as const,
+                  schema: z.enum(SubscriptionPlan).nullable(),
+                }),
               },
+            }),
+          }),
+          summary: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "get.response.summary" as const,
+            schema: z.object({
+              credits: z.number(),
+              remaining: z.number(),
+              paid: z.array(
+                z.object({
+                  currency: z.enum(CurrenciesArr),
+                  amount: z.number(),
+                }),
+              ),
+              paidSubscriptions: z.array(
+                z.object({
+                  currency: z.enum(CurrenciesArr),
+                  amount: z.number(),
+                }),
+              ),
+              paidPacks: z.array(
+                z.object({
+                  currency: z.enum(CurrenciesArr),
+                  amount: z.number(),
+                }),
+              ),
+              unmatchedPaidPacks: z.number(),
             }),
           }),
         },
       }),
 
       // === PAGINATION INFO ===
-      paginationInfo: objectField(scopedTranslation, {
+      paginationInfo: objectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         layoutType: LayoutType.HORIZONTAL,
         noCard: true,
@@ -339,6 +407,14 @@ const { GET } = createEndpoint({
       default: {
         response: {
           purchases: [],
+          summary: {
+            credits: 0,
+            remaining: 0,
+            paid: [],
+            paidSubscriptions: [],
+            paidPacks: [],
+            unmatchedPaidPacks: 0,
+          },
         },
         paginationInfo: {
           totalCount: 0,

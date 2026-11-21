@@ -9,7 +9,7 @@ import type {
 } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
-import { LEADS_DASHBOARD_ALIAS } from "@/leads/dashboard/constants";
+import { ACQUISITION_REPORT_ALIAS } from "@/leads/analytics/acquisition/constants";
 import { LEADS_SEARCH_ALIAS } from "@/leads/search/constants";
 import type leadSearch from "@/leads/search/definition";
 import { USER_ME_ALIAS } from "@/user/private/me/constants";
@@ -29,7 +29,7 @@ export const category: CategoryDefinition = {
   icon: "target",
   order: 20,
   defaultEntry: {
-    [UserPermissionRole.ADMIN]: LEADS_DASHBOARD_ALIAS,
+    [UserPermissionRole.ADMIN]: ACQUISITION_REPORT_ALIAS,
     [UserPermissionRole.CUSTOMER]: USER_ME_ALIAS,
     [UserPermissionRole.PUBLIC]: USER_ME_ALIAS,
   },
@@ -38,6 +38,19 @@ export const category: CategoryDefinition = {
     field: "search",
   } satisfies RecordSearchDestination<typeof leadSearch.GET>,
   subcategories: {
+    Analytics: {
+      icon: "bar-chart-2",
+      order: -1,
+      label: {
+        "en-US": "Analytics",
+        "en-GLOBAL": "Analytics",
+        "de-DE": "Analysen",
+        "pl-PL": "Analityka",
+        "fr-FR": "Analyses",
+        "it-IT": "Analisi",
+        "es-ES": "Análisis",
+      },
+    },
     Management: {
       icon: "users",
       order: 0,
@@ -50,7 +63,7 @@ export const category: CategoryDefinition = {
         "it-IT": "Gestione",
         "es-ES": "Gestión",
       },
-      // inherits parent defaultEntry (leads-dashboard)
+      // inherits parent defaultEntry (acquisition-report)
     },
     Import: {
       icon: "upload",

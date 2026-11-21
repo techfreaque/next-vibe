@@ -1,135 +1,108 @@
 /**
  * Subscription Admin Stats Custom Widget
- * Revenue, subscription, credit and referral analytics dashboard
+ * Legacy all-time snapshot of subscriptions, credits and referrals. Money
+ * questions belong to the revenue report, linked at the top.
  */
 
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import {
+  type AnalyticsTone,
+  KpiGrid,
+  KpiTile,
+} from "next-vibe/ui/components/analytics";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { BarChart3 } from "next-vibe/ui/components/icons/BarChart3";
-import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { Span } from "next-vibe/ui/components/span";
+import { WidgetHeader } from "next-vibe/ui/components/widget-header";
+import { WidgetShell } from "next-vibe/ui/components/widget-shell";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetContext,
   useWidgetLocale,
-  useWidgetNavigation,
-  useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
-import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useState } from "react";
 
+import { SubscriptionStatusAdminFilter } from "../enum";
 import type definition from "./definition";
 
 interface CustomWidgetProps {
   field: (typeof definition.GET)["fields"];
 }
 
-const variantColorMap: Record<
-  "default" | "success" | "warning" | "danger" | "info",
-  string | undefined
-> = {
-  default: undefined,
-  success: "#16a34a",
-  warning: "#ca8a04",
-  danger: "#dc2626",
-  info: "#2563eb",
-};
+/** Cents (approx. USD) -> dollars for the KPI tiles. */
+const dollars = (cents: number | null | undefined): number | null =>
+  cents === null || cents === undefined ? null : cents / 100;
 
-function StatCard({
-  label,
-  value,
-  format = "number",
-  variant = "default",
-  locale,
+function Section({
+  title,
+  hint,
+  children,
 }: {
-  label: string;
-  value: number | null | undefined;
-  format?: "number" | "percent" | "compact" | "currency";
-  variant?: "default" | "success" | "warning" | "danger" | "info";
-  locale: CountryLanguage;
+  title: string;
+  hint?: string;
+  children: React.ReactNode;
 }): React.JSX.Element {
-  const variantColor = variantColorMap[variant];
-
-  const formatted = useMemo(() => {
-    if (value === null || value === undefined) {
-      return "\u2014";
-    }
-    if (format === "percent") {
-      return `${(value * 100).toFixed(1)}%`;
-    }
-    if (format === "currency") {
-      return `$${(value / 100).toFixed(2)}`;
-    }
-    if (format === "compact" && value >= 1000) {
-      return `${(value / 1000).toFixed(1)}k`;
-    }
-    return value.toLocaleString(locale);
-  }, [value, format, locale]);
-
   return (
-    <Div className="rounded-lg border bg-card p-4 flex flex-col gap-1">
-      <Div className="text-xs text-muted-foreground">{label}</Div>
-      <Div
-        style={{
-          fontSize: "1.5rem",
-          fontWeight: 700,
-          fontVariantNumeric: "tabular-nums",
-          ...(variantColor !== undefined ? { color: variantColor } : {}),
-        }}
-      >
-        {formatted}
+    <Div className="flex min-w-0 flex-col gap-2">
+      <Div className="flex min-w-0 flex-col">
+        <Span className="text-sm font-semibold">{title}</Span>
+        {hint && <Span className="text-xs text-muted-foreground">{hint}</Span>}
       </Div>
+      {children}
     </Div>
   );
 }
 
-function BarChartSection({
+function BarList({
   title,
   items,
   locale,
+  currency,
 }: {
   title: string;
   items: Array<{ x: string; y: number; label?: string }> | undefined;
   locale: CountryLanguage;
+  currency: boolean;
 }): React.JSX.Element | null {
   if (!items?.length) {
     return null;
   }
-  const top = items.slice(0, 8);
-  const max = Math.max(...top.map((i) => i.y), 1);
-
+  const top = items.slice(-8);
+  const max = Math.max(...top.map((item) => item.y), 1);
+  const money = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+  const numbers = new Intl.NumberFormat(locale);
   return (
-    <Div className="rounded-lg border bg-card p-4">
-      <Span className="text-sm font-semibold mb-3 block">{title}</Span>
-      <Div className="flex flex-col gap-2">
-        {top.map((item) => (
-          <Div key={item.x} className="flex items-center gap-2">
-            <Span className="text-xs text-muted-foreground w-28 truncate flex-shrink-0">
-              {(item.label ?? item.x).replaceAll("_", " ")}
-            </Span>
-            <Div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
-              <Div
-                style={{
-                  width: `${(item.y / max) * 100}%`,
-                  height: "100%",
-                  borderRadius: "9999px",
-                  backgroundColor: "#3b82f6",
-                }}
-              />
-            </Div>
-            <Span className="text-xs tabular-nums w-16 text-right">
-              {item.y >= 100
-                ? `$${(item.y / 100).toFixed(0)}`
-                : item.y.toLocaleString(locale)}
-            </Span>
+    <Div className="flex min-w-0 flex-col gap-2 rounded-xl border bg-card p-4">
+      <Span className="text-sm font-semibold">{title}</Span>
+      {top.map((item) => (
+        <Div key={item.x} className="flex min-w-0 items-center gap-2">
+          <Span className="w-20 shrink-0 truncate text-xs text-muted-foreground">
+            {item.label ?? item.x}
+          </Span>
+          <Div className="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-muted">
+            <Div
+              style={{
+                width: `${(item.y / max) * 100}%`,
+                height: "100%",
+                borderRadius: "9999px",
+                backgroundColor: "hsl(var(--primary))",
+              }}
+            />
           </Div>
-        ))}
-      </Div>
+          <Span className="w-20 shrink-0 text-right text-xs tabular-nums">
+            {currency ? money.format(item.y / 100) : numbers.format(item.y)}
+          </Span>
+        </Div>
+      ))}
     </Div>
   );
 }
@@ -139,46 +112,12 @@ export function SubscriptionStatsContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
-  const { push: navigate } = useWidgetNavigation();
+  const openRelated = useRelatedEntityNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
-  const onSubmit = useWidgetOnSubmit();
-  const [filtersOpen, setFiltersOpen] = useState(false);
-
+  const [legacyOpen, setLegacyOpen] = useState(false);
   const data = useWidgetValue<typeof definition.GET>();
-
-  const handleRefresh = useCallback((): void => {
-    endpointMutations?.read?.refetch?.();
-  }, [endpointMutations]);
-
-  const handleViewList = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const listDef = await import("../list/definition");
-      navigate(listDef.default.GET);
-    })();
-  }, [navigate]);
-
-  const handleViewPurchases = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const purchasesDef = await import("../purchases/definition");
-      navigate(purchasesDef.default.GET);
-    })();
-  }, [navigate]);
-
-  const handleViewReferrals = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const referralsDef = await import("../referrals/definition");
-      navigate(referralsDef.default.GET);
-    })();
-  }, [navigate]);
-
-  const handleApplyFilters = useCallback((): void => {
-    if (onSubmit) {
-      onSubmit();
-    } else {
-      endpointMutations?.read?.refetch?.();
-    }
-  }, [onSubmit, endpointMutations]);
+  const isFetching = endpointMutations?.read?.isFetching ?? false;
 
   const revenueStats = data?.revenueStats;
   const subscriptionStats = data?.subscriptionStats;
@@ -187,262 +126,298 @@ export function SubscriptionStatsContainer({
   const referralStats = data?.referralStats;
   const growthMetrics = data?.growthMetrics;
   const generatedAt = data?.businessInsights?.generatedAt;
+  const usdHint = t("widget.approxUsd");
+
+  const openList = (
+    status?:
+      | typeof SubscriptionStatusAdminFilter.ACTIVE
+      | typeof SubscriptionStatusAdminFilter.CANCELED
+      | typeof SubscriptionStatusAdminFilter.TRIALING
+      | typeof SubscriptionStatusAdminFilter.PAST_DUE,
+  ): void =>
+    openRelated(
+      () => import("../list/definition").then((module) => module.default.GET),
+      status ? { data: { searchFilters: { status: [status] } } } : undefined,
+    );
+
+  const tile = (
+    label: string,
+    value: number | null | undefined,
+    options: {
+      format?: "number" | "percent" | "currency" | "compact";
+      hint?: string;
+      tone?: AnalyticsTone;
+      onClick?: () => void;
+    } = {},
+  ): React.JSX.Element => (
+    <KpiTile
+      label={label}
+      value={value ?? null}
+      format={options.format ?? "number"}
+      currency={options.format === "currency" ? "USD" : undefined}
+      locale={locale}
+      hint={options.hint}
+      tone={options.tone}
+      onClick={options.onClick}
+    />
+  );
 
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      {/* Header */}
-      <Div className="flex items-center gap-2">
-        <NavigateButtonWidget field={children.backButton} />
-        <Div className="flex items-center gap-2 mr-auto">
-          <BarChart3 className="h-5 w-5 text-muted-foreground" />
-          <Span className="font-semibold text-base">{t("get.title")}</Span>
+    <WidgetShell className="min-w-0 gap-5">
+      <WidgetHeader
+        title={t("get.title")}
+        backButton={<NavigateButtonWidget field={children.backButton} />}
+      />
+      <Div className="flex flex-col gap-2 rounded-lg border border-primary/30 bg-primary/5 p-3 sm:flex-row sm:items-center sm:justify-between">
+        <Div className="flex min-w-0 flex-col gap-0.5">
+          <Span className="text-sm font-medium">
+            {t("widget.revenueReportTitle")}
+          </Span>
+          <Span className="text-xs text-muted-foreground">
+            {t("widget.revenueReportHint")}
+          </Span>
         </Div>
         <Button
           type="button"
-          variant="ghost"
           size="sm"
-          onClick={() => {
-            setFiltersOpen((v) => !v);
-          }}
-          title={t("widget.filters")}
+          className="self-start sm:self-auto"
+          onClick={() =>
+            openRelated(() =>
+              import("@/payment/analytics/revenue/definition").then(
+                (module) => module.default.GET,
+              ),
+            )
+          }
         >
-          <BarChart3 className="h-4 w-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleRefresh}
-          title={t("widget.refresh")}
-        >
-          <RefreshCw className="h-4 w-4" />
+          {t("widget.openRevenueReport")}
         </Button>
       </Div>
 
-      {/* Filter panel */}
-      {filtersOpen && (
-        <Div className="rounded-lg border p-4 flex flex-col gap-3">
-          <Span className="text-sm font-semibold">
-            {t("get.timePeriodOptions.title")}
-          </Span>
-          <Div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <SelectFieldWidget
-              fieldName={"timePeriodOptions.timePeriod"}
-              field={children.timePeriodOptions.children.timePeriod}
+      <Div className="flex flex-wrap items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={isFetching}
+          onClick={() => void endpointMutations?.read?.refetch?.()}
+        >
+          {t("widget.refresh")}
+        </Button>
+        <Span className="ms-auto text-xs text-muted-foreground">
+          {t("widget.openLabel")}
+        </Span>
+        <Button
+          type="button"
+          variant="link"
+          size="sm"
+          className="h-7 px-1"
+          onClick={() => openList()}
+        >
+          {t("widget.linkSubscriptions")}
+        </Button>
+        <Button
+          type="button"
+          variant="link"
+          size="sm"
+          className="h-7 px-1"
+          onClick={() =>
+            openRelated(() =>
+              import("../purchases/definition").then(
+                (module) => module.default.GET,
+              ),
+            )
+          }
+        >
+          {t("widget.linkPurchases")}
+        </Button>
+        <Button
+          type="button"
+          variant="link"
+          size="sm"
+          className="h-7 px-1"
+          onClick={() =>
+            openRelated(() =>
+              import("../referrals/definition").then(
+                (module) => module.default.GET,
+              ),
+            )
+          }
+        >
+          {t("widget.linkReferrals")}
+        </Button>
+      </Div>
+
+      <Section
+        title={t("widget.sectionSubscriptions")}
+        hint={t("widget.sectionSubscriptionsHint")}
+      >
+        <KpiGrid columns={4}>
+          {tile(t("widget.activePaid"), subscriptionStats?.activeCount, {
+            tone: "positive",
+            hint: t("widget.activePaidHint"),
+            onClick: () => openList(SubscriptionStatusAdminFilter.ACTIVE),
+          })}
+          {tile(
+            t("get.response.subscriptionStats.pastDueCount.label"),
+            subscriptionStats?.pastDueCount,
+            {
+              tone: "negative",
+              hint: t("widget.pastDueHint"),
+              onClick: () => openList(SubscriptionStatusAdminFilter.PAST_DUE),
+            },
+          )}
+          {tile(
+            t("get.response.subscriptionStats.trialingCount.label"),
+            subscriptionStats?.trialingCount,
+            {
+              onClick:
+                (subscriptionStats?.trialingCount ?? 0) > 0
+                  ? (): void => openList(SubscriptionStatusAdminFilter.TRIALING)
+                  : undefined,
+            },
+          )}
+          {tile(
+            t("get.response.subscriptionStats.canceledCount.label"),
+            subscriptionStats?.canceledCount,
+            {
+              tone: "warning",
+              onClick: () => openList(SubscriptionStatusAdminFilter.CANCELED),
+            },
+          )}
+          {tile(t("widget.canceledShare"), subscriptionStats?.churnRate, {
+            format: "percent",
+            tone: "warning",
+            hint: t("widget.churnHint"),
+          })}
+          {tile(
+            t("get.response.intervalStats.monthlyCount.label"),
+            intervalStats?.monthlyCount,
+          )}
+          {tile(
+            t("get.response.intervalStats.yearlyCount.label"),
+            intervalStats?.yearlyCount,
+          )}
+          {tile(t("widget.yearlyShare"), intervalStats?.yearlyRevenuePct, {
+            format: "percent",
+            hint: t("widget.yearlyShareHint"),
+          })}
+        </KpiGrid>
+      </Section>
+
+      <Section title={t("widget.sectionCredits")}>
+        <KpiGrid columns={4}>
+          {tile(t("widget.creditsSold"), creditStats?.totalPurchased, {
+            hint: t("widget.creditsSoldHint"),
+          })}
+          {tile(
+            t("get.response.creditStats.totalSpent.label"),
+            creditStats?.totalSpent,
+            {
+              hint: t("widget.spentSplit", {
+                packs: new Intl.NumberFormat(locale).format(
+                  Math.max(
+                    (creditStats?.totalSpent ?? 0) -
+                      (creditStats?.spentFromFree ?? 0),
+                    0,
+                  ),
+                ),
+                free: new Intl.NumberFormat(locale).format(
+                  creditStats?.spentFromFree ?? 0,
+                ),
+              }),
+            },
+          )}
+          {tile(t("widget.paidPacks"), creditStats?.packsSold)}
+          {tile(
+            t("get.response.creditStats.avgPackSize.label"),
+            creditStats?.avgPackSize,
+          )}
+        </KpiGrid>
+      </Section>
+
+      <Section title={t("widget.sectionReferrals")} hint={usdHint}>
+        <KpiGrid columns={4}>
+          {tile(
+            t("get.response.referralStats.totalReferrals.label"),
+            referralStats?.totalReferrals,
+          )}
+          {tile(
+            t("get.response.referralStats.conversionRate.label"),
+            referralStats?.conversionRate,
+            { format: "percent" },
+          )}
+          {tile(
+            t("get.response.referralStats.totalEarned.label"),
+            dollars(referralStats?.totalEarned),
+            { format: "currency" },
+          )}
+          {tile(
+            t("get.response.referralStats.pendingPayouts.label"),
+            dollars(referralStats?.pendingPayouts),
+            { format: "currency", tone: "warning" },
+          )}
+        </KpiGrid>
+      </Section>
+
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="self-start"
+        onClick={() => setLegacyOpen((open) => !open)}
+      >
+        {legacyOpen ? t("widget.hideLegacy") : t("widget.showLegacy")}
+      </Button>
+      {legacyOpen && (
+        <Section
+          title={t("widget.sectionLegacy")}
+          hint={t("widget.sectionLegacyHint")}
+        >
+          <KpiGrid columns={4}>
+            {tile(
+              t("get.response.revenueStats.mrr.label"),
+              dollars(revenueStats?.mrr),
+              { format: "currency", tone: "muted", hint: usdHint },
+            )}
+            {tile(
+              t("get.response.revenueStats.arr.label"),
+              dollars(revenueStats?.arr),
+              { format: "currency", tone: "muted", hint: usdHint },
+            )}
+            {tile(
+              t("get.response.revenueStats.totalRevenue.label"),
+              dollars(revenueStats?.totalRevenue),
+              { format: "currency", tone: "muted", hint: usdHint },
+            )}
+            {tile(
+              t("get.response.revenueStats.avgOrderValue.label"),
+              dollars(revenueStats?.avgOrderValue),
+              { format: "currency", tone: "muted", hint: usdHint },
+            )}
+          </KpiGrid>
+          <Div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <BarList
+              title={`${t("get.response.growthMetrics.revenueChart.label")} (${usdHint})`}
+              items={growthMetrics?.revenueChart}
+              locale={locale}
+              currency
             />
-            <SelectFieldWidget
-              fieldName={"timePeriodOptions.dateRangePreset"}
-              field={children.timePeriodOptions.children.dateRangePreset}
+            <BarList
+              title={t("get.response.growthMetrics.subscriptionChart.label")}
+              items={growthMetrics?.subscriptionChart}
+              locale={locale}
+              currency={false}
             />
           </Div>
-          <Button
-            type="button"
-            variant="default"
-            size="sm"
-            onClick={handleApplyFilters}
-            className="self-start"
-          >
-            {t("widget.refresh")}
-          </Button>
-        </Div>
+        </Section>
       )}
 
-      {/* Action buttons */}
-      <Div className="flex items-center gap-2 flex-wrap">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleViewList}
-        >
-          {t("get.response.subscriptionStats.title")}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleViewPurchases}
-        >
-          {t("get.response.creditStats.title")}
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={handleViewReferrals}
-        >
-          {t("get.response.referralStats.title")}
-        </Button>
-      </Div>
-
-      {/* Revenue KPIs */}
-      <Div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard
-          label={t("get.response.revenueStats.mrr.label")}
-          value={revenueStats?.mrr}
-          format="currency"
-          variant="success"
-          locale={locale}
-        />
-        <StatCard
-          label={t("get.response.revenueStats.arr.label")}
-          value={revenueStats?.arr}
-          format="currency"
-          variant="success"
-          locale={locale}
-        />
-        <StatCard
-          label={t("get.response.revenueStats.totalRevenue.label")}
-          value={revenueStats?.totalRevenue}
-          format="currency"
-          variant="info"
-          locale={locale}
-        />
-        <StatCard
-          label={t("get.response.revenueStats.avgOrderValue.label")}
-          value={revenueStats?.avgOrderValue}
-          format="currency"
-          variant="info"
-          locale={locale}
-        />
-      </Div>
-
-      {/* Subscription KPIs */}
-      <Div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard
-          label={t("get.response.subscriptionStats.activeCount.label")}
-          value={subscriptionStats?.activeCount}
-          variant="success"
-          locale={locale}
-        />
-        <StatCard
-          label={t("get.response.subscriptionStats.trialingCount.label")}
-          value={subscriptionStats?.trialingCount}
-          variant="info"
-          locale={locale}
-        />
-        <StatCard
-          label={t("get.response.subscriptionStats.canceledCount.label")}
-          value={subscriptionStats?.canceledCount}
-          variant="warning"
-          locale={locale}
-        />
-        <StatCard
-          label={t("get.response.subscriptionStats.churnRate.label")}
-          value={subscriptionStats?.churnRate}
-          format="percent"
-          variant="warning"
-          locale={locale}
-        />
-      </Div>
-
-      {/* Interval breakdown */}
-      <Div className="grid grid-cols-3 gap-3">
-        <StatCard
-          label={t("get.response.intervalStats.monthlyCount.label")}
-          value={intervalStats?.monthlyCount}
-          variant="info"
-          locale={locale}
-        />
-        <StatCard
-          label={t("get.response.intervalStats.yearlyCount.label")}
-          value={intervalStats?.yearlyCount}
-          variant="success"
-          locale={locale}
-        />
-        <StatCard
-          label={t("get.response.intervalStats.yearlyRevenuePct.label")}
-          value={intervalStats?.yearlyRevenuePct}
-          format="percent"
-          variant="info"
-          locale={locale}
-        />
-      </Div>
-
-      {/* Credit KPIs */}
-      <Div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard
-          label={t("get.response.creditStats.totalPurchased.label")}
-          value={creditStats?.totalPurchased}
-          format="compact"
-          variant="success"
-          locale={locale}
-        />
-        <StatCard
-          label={t("get.response.creditStats.totalSpent.label")}
-          value={creditStats?.totalSpent}
-          format="compact"
-          variant="warning"
-          locale={locale}
-        />
-        <StatCard
-          label={t("get.response.creditStats.packsSold.label")}
-          value={creditStats?.packsSold}
-          format="compact"
-          variant="info"
-          locale={locale}
-        />
-        <StatCard
-          label={t("get.response.creditStats.avgPackSize.label")}
-          value={creditStats?.avgPackSize}
-          format="compact"
-          variant="info"
-          locale={locale}
-        />
-      </Div>
-
-      {/* Referral KPIs */}
-      <Div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <StatCard
-          label={t("get.response.referralStats.totalReferrals.label")}
-          value={referralStats?.totalReferrals}
-          variant="info"
-          locale={locale}
-        />
-        <StatCard
-          label={t("get.response.referralStats.conversionRate.label")}
-          value={referralStats?.conversionRate}
-          format="percent"
-          variant="info"
-          locale={locale}
-        />
-        <StatCard
-          label={t("get.response.referralStats.totalEarned.label")}
-          value={referralStats?.totalEarned}
-          format="currency"
-          variant="success"
-          locale={locale}
-        />
-        <StatCard
-          label={t("get.response.referralStats.pendingPayouts.label")}
-          value={referralStats?.pendingPayouts}
-          format="currency"
-          variant="warning"
-          locale={locale}
-        />
-      </Div>
-
-      {/* Charts */}
-      <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <BarChartSection
-          title={t("get.response.growthMetrics.revenueChart.label")}
-          items={growthMetrics?.revenueChart}
-          locale={locale}
-        />
-        <BarChartSection
-          title={t("get.response.growthMetrics.subscriptionChart.label")}
-          items={growthMetrics?.subscriptionChart}
-          locale={locale}
-        />
-      </Div>
-
-      {/* Generated at */}
       {generatedAt && (
-        <Div className="text-xs text-muted-foreground text-right">
+        <Span className="text-right text-xs text-muted-foreground">
           {t("get.response.businessInsights.generatedAt.label")}{" "}
           {generatedAt.toLocaleString(locale)}
-        </Div>
+        </Span>
       )}
-    </Div>
+    </WidgetShell>
   );
 }

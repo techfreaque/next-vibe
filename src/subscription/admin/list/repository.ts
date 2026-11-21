@@ -17,7 +17,9 @@ import {
   lte,
   or,
   type SQL,
+  sql,
 } from "drizzle-orm";
+import { CurrenciesArr } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -29,7 +31,9 @@ import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { PaymentProvider } from "@/payment/enum";
+import { REVENUE_FX_RATES } from "@/payment/analytics/money-sql";
+import { paymentTransactions } from "@/payment/db";
+import { CheckoutMode, PaymentProvider, PaymentStatus } from "@/payment/enum";
 import { subscriptions } from "@/subscription/db";
 import {
   BillingInterval,
@@ -48,6 +52,7 @@ import type {
   SubscriptionListRequestOutput,
   SubscriptionListResponseOutput,
 } from "./definition";
+import { SubscriptionFocus } from "./enum";
 import type { SubscriptionAdminListT } from "./i18n";
 
 const statusMap = {
@@ -74,6 +79,25 @@ const providerMap = {
   [ProviderAdminFilter.STRIPE]: PaymentProvider.STRIPE,
   [ProviderAdminFilter.NOWPAYMENTS]: PaymentProvider.NOWPAYMENTS,
 };
+
+// Latest successful charge for a subscription (falls back to the customer's
+// latest subscription charge when the row has no provider link).
+const lastPaymentSql = sql<{
+  amount: string | number;
+  currency: string;
+  at: string;
+} | null>`(
+            select json_build_object('amount', ${paymentTransactions.amount}, 'currency', ${paymentTransactions.currency}, 'at', ${paymentTransactions.createdAt})
+            from ${paymentTransactions}
+            where ${paymentTransactions.userId} = ${subscriptions.userId}
+              and ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED}
+              and ${paymentTransactions.mode} = ${CheckoutMode.SUBSCRIPTION}
+            order by coalesce(${paymentTransactions.metadata}->>'subscriptionId' = ${subscriptions.providerSubscriptionId}, false) desc,
+              ${paymentTransactions.createdAt} desc
+            limit 1
+          )`;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 export class SubscriptionAdminListRepository {
   /**
@@ -134,14 +158,26 @@ export class SubscriptionAdminListRepository {
         }
       }
 
-      // Status filter
+      // Plan filter (kept apart: the plan counts ignore it)
+      const planCondition = searchFilters?.plan
+        ? eq(subscriptions.planId, searchFilters.plan)
+        : undefined;
+
+      // Summary-card drill: renewing within 7 days / set to end
+      const liveSql = sql`${subscriptions.status} in (${SubscriptionStatus.ACTIVE}, ${SubscriptionStatus.TRIALING})`;
+      const endingSql = sql`(${subscriptions.cancelAtPeriodEnd} or ${subscriptions.cancelAt} is not null)`;
+      const focusCondition =
+        searchFilters?.focus === SubscriptionFocus.ENDING
+          ? sql`${liveSql} and ${endingSql}`
+          : searchFilters?.focus === SubscriptionFocus.RENEWING_SOON
+            ? sql`${liveSql} and not ${endingSql} and ${subscriptions.currentPeriodEnd} >= now() and ${subscriptions.currentPeriodEnd} <= now() + interval '7 days'`
+            : undefined;
+
+      // Status filter (kept apart: the status counts ignore it)
       const statusCondition =
         SubscriptionAdminListRepository.convertStatusFilters(
           searchFilters?.status,
         );
-      if (statusCondition) {
-        whereConditions.push(statusCondition);
-      }
 
       // Interval filter
       const interval =
@@ -180,18 +216,113 @@ export class SubscriptionAdminListRepository {
         );
       }
 
-      const whereClause =
+      const baseClause =
         whereConditions.length > 0 ? and(...whereConditions) : undefined;
+      const whereClause = and(
+        baseClause,
+        statusCondition ?? undefined,
+        planCondition,
+        focusCondition,
+      );
 
-      // Count total
-      const [countResult] = await db
-        .select({ total: count() })
-        .from(subscriptions)
-        .leftJoin(users, eq(subscriptions.userId, users.id))
-        .where(whereClause);
+      // Count total + per status (status counts ignore the status filter)
+      const [[countResult], statusRows, planRows] = await Promise.all([
+        db
+          .select({ total: count() })
+          .from(subscriptions)
+          .leftJoin(users, eq(subscriptions.userId, users.id))
+          .where(whereClause),
+        db
+          .select({ status: subscriptions.status, count: count() })
+          .from(subscriptions)
+          .leftJoin(users, eq(subscriptions.userId, users.id))
+          .where(and(baseClause, planCondition))
+          .groupBy(subscriptions.status)
+          .orderBy(desc(count())),
+        db
+          .select({ plan: subscriptions.planId, count: count() })
+          .from(subscriptions)
+          .leftJoin(users, eq(subscriptions.userId, users.id))
+          .where(and(baseClause, statusCondition ?? undefined))
+          .groupBy(subscriptions.planId)
+          .orderBy(desc(count())),
+      ]);
 
       const totalCount = countResult?.total ?? 0;
       const pageCount = Math.ceil(totalCount / limit);
+
+      // Summary over the same filters (status ignored): what is coming up
+      const summaryRows = await db
+        .select({
+          status: subscriptions.status,
+          billingInterval: subscriptions.billingInterval,
+          currentPeriodEnd: subscriptions.currentPeriodEnd,
+          cancelAtPeriodEnd: subscriptions.cancelAtPeriodEnd,
+          cancelAt: subscriptions.cancelAt,
+          lastPayment: lastPaymentSql,
+        })
+        .from(subscriptions)
+        .leftJoin(users, eq(subscriptions.userId, users.id))
+        .where(baseClause);
+      const now = Date.now();
+      const mrrByCurrency = new Map<(typeof CurrenciesArr)[number], number>();
+      let renewingSoon = 0;
+      let ending = 0;
+      let pastDue = 0;
+      let noCharge = 0;
+      for (const row of summaryRows) {
+        const live =
+          row.status === SubscriptionStatus.ACTIVE ||
+          row.status === SubscriptionStatus.TRIALING;
+        if (row.status === SubscriptionStatus.PAST_DUE) {
+          pastDue += 1;
+        }
+        if (!live) {
+          continue;
+        }
+        const endsAt = row.currentPeriodEnd?.getTime();
+        if (row.cancelAtPeriodEnd || row.cancelAt) {
+          ending += 1;
+        } else if (
+          endsAt !== undefined &&
+          endsAt >= now &&
+          endsAt - now <= 7 * DAY_MS
+        ) {
+          renewingSoon += 1;
+        }
+        const currency = CurrenciesArr.find(
+          (code) => code === row.lastPayment?.currency,
+        );
+        if (!row.lastPayment || !currency) {
+          noCharge += 1;
+          continue;
+        }
+        if (row.cancelAtPeriodEnd || row.cancelAt) {
+          continue;
+        }
+        const monthly =
+          Number(row.lastPayment.amount) /
+          (row.billingInterval === BillingInterval.YEARLY ? 12 : 1);
+        mrrByCurrency.set(
+          currency,
+          (mrrByCurrency.get(currency) ?? 0) + monthly,
+        );
+      }
+      const mrr = [...mrrByCurrency.entries()].map(([currency, amount]) => ({
+        currency,
+        amount: Math.round(amount * 100) / 100,
+      }));
+      const mrrUsd =
+        Math.round(
+          mrr.reduce(
+            (sum, row) =>
+              sum +
+              row.amount *
+                (REVENUE_FX_RATES.find((rate) => rate.currency === row.currency)
+                  ?.usdRate ?? 0),
+            0,
+          ) * 100,
+        ) / 100;
 
       // Determine sort
       const sortBy = sortingOptions?.sortBy ?? SubscriptionSortField.CREATED_AT;
@@ -237,6 +368,10 @@ export class SubscriptionAdminListRepository {
           cancellationReason: subscriptions.cancellationReason,
           provider: subscriptions.provider,
           providerSubscriptionId: subscriptions.providerSubscriptionId,
+          cancelAt: subscriptions.cancelAt,
+          // Latest successful charge for this subscription (falls back to the
+          // customer's latest subscription charge when the row has no link).
+          lastPayment: lastPaymentSql,
         })
         .from(subscriptions)
         .leftJoin(users, eq(subscriptions.userId, users.id))
@@ -264,6 +399,39 @@ export class SubscriptionAdminListRepository {
             cancellationReason: row.cancellationReason ?? null,
             provider: row.provider,
             providerSubscriptionId: row.providerSubscriptionId ?? null,
+            cancelAt: row.cancelAt ?? null,
+            lastPaymentAmount: row.lastPayment
+              ? Number(row.lastPayment.amount)
+              : null,
+            lastPaymentCurrency:
+              CurrenciesArr.find(
+                (currency) => currency === row.lastPayment?.currency,
+              ) ?? null,
+            lastPaymentAt: row.lastPayment
+              ? new Date(row.lastPayment.at)
+              : null,
+          })),
+          summary: {
+            mrrUsd,
+            mrr,
+            renewingSoon,
+            ending,
+            pastDue,
+            noCharge,
+            // Only the rates actually used for this MRR, so the note stays short
+            fxRates: REVENUE_FX_RATES.filter(
+              (rate) =>
+                rate.currency !== "USD" &&
+                mrr.some((row) => row.currency === rate.currency),
+            ),
+          },
+          planCounts: planRows.map((row) => ({
+            plan: row.plan,
+            count: Number(row.count),
+          })),
+          statusCounts: statusRows.map((row) => ({
+            status: row.status,
+            count: Number(row.count),
           })),
         },
         paginationInfo: {

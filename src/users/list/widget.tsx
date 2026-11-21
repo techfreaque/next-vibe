@@ -8,6 +8,7 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { isCliPlatform, Platform } from "next-vibe/platforms/platforms";
+import { KpiGrid, KpiTile } from "next-vibe/ui/components/analytics";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
@@ -20,11 +21,10 @@ import { Filter } from "next-vibe/ui/components/icons/Filter";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { UserPlus } from "next-vibe/ui/components/icons/UserPlus";
 import { Users } from "next-vibe/ui/components/icons/Users";
+import { X } from "next-vibe/ui/components/icons/X";
 import { Input } from "next-vibe/ui/components/input";
 import { Label } from "next-vibe/ui/components/label";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
-import { MetricCard } from "next-vibe/ui/components/metric-card";
-import { MetricGrid } from "next-vibe/ui/components/metric-grid";
 import { Pre } from "next-vibe/ui/components/pre";
 import { Span } from "next-vibe/ui/components/span";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
@@ -74,17 +74,20 @@ import {
   formatRelative,
   formatUsd,
   roleLabel,
+  subscriptionPlanLabel,
   subscriptionStatusLabel,
   subscriptionStatusVariant,
 } from "../format";
-import { USERS_LIST_ALIAS } from "./constants";
+import { FREE_BURN_MIN_CREDITS, USERS_LIST_ALIAS } from "./constants";
 import type definition from "./definition";
 import type { UserListResponseOutput, UserListRow } from "./definition";
 import {
+  AccountStateFilter,
   LastActiveFilter,
   ListSortOrder,
   PayerFilter,
   UserListSortField,
+  UsersAudience,
 } from "./enum";
 
 interface CustomWidgetProps {
@@ -98,6 +101,42 @@ type PayerValue = (typeof PayerFilter)[keyof typeof PayerFilter];
 type LastActiveValue = (typeof LastActiveFilter)[keyof typeof LastActiveFilter];
 
 const ADMIN_ROLE = "enums.userRole.admin";
+
+/** One line of attribution: channel / campaign, plus the ref code once. */
+function sourceText(user: UserListRow, t: ListT): string {
+  const code = user.referralCode ?? user.firstRefCode;
+  if (!user.source && code) {
+    return t("widget.refCode", { code });
+  }
+  const source =
+    user.source ??
+    (user.referredByEmail
+      ? t("widget.referredBy", { email: user.referredByEmail })
+      : "");
+  if (code && !source.toLowerCase().includes(code.toLowerCase())) {
+    return [source, t("widget.refCode", { code })].filter(Boolean).join(" · ");
+  }
+  return source;
+}
+
+/** Shorten from the middle so the email domain stays visible. */
+function middleTruncate(value: string, width: number): string {
+  if (value.length <= width) {
+    return value;
+  }
+  const keep = width - 1;
+  const head = Math.ceil(keep / 2);
+  return `${value.slice(0, head)}~${value.slice(value.length - (keep - head))}`;
+}
+
+/** Never paid but spent at least the free-burn threshold. */
+function isFreeBurner(user: UserListRow): boolean {
+  return (
+    !user.roles.includes(ADMIN_ROLE) &&
+    user.totalPaidUsd === 0 &&
+    user.creditsSpent >= FREE_BURN_MIN_CREDITS
+  );
+}
 
 function displayName(user: UserListRow): string {
   return user.privateName || user.publicName || user.email;
@@ -119,6 +158,14 @@ function renderText(
       paid: formatUsd(summary.totalPaidUsd, locale),
     }),
   );
+  lines.push(
+    t("widget.text.subheader", {
+      verified: summary.verifiedCount,
+      active: summary.activeMonthCount,
+      banned: summary.bannedCount,
+      weekly: summary.signupsByWeek.join(" "),
+    }),
+  );
   if (users.length === 0) {
     lines.push(t("widget.empty.filtered"));
     return lines.join("\n");
@@ -126,13 +173,15 @@ function renderText(
   lines.push("");
   lines.push(
     [
-      cell(t("widget.columns.user"), 40),
+      cell(t("widget.columns.user"), 44),
+      cell(t("widget.columns.flags"), 28),
       cell(t("widget.columns.joined"), 12),
       cell(t("widget.columns.lastActive"), 14),
       cell(t("widget.columns.credits"), 9),
-      cell(t("widget.columns.spent"), 8),
+      cell(t("widget.columns.spent"), 20),
       cell(t("widget.columns.paid"), 9),
       cell(t("widget.columns.subscription"), 10),
+      cell(t("widget.columns.source"), 22),
       t("widget.columns.id"),
     ].join(" "),
   );
@@ -140,26 +189,40 @@ function renderText(
     const flags = [
       user.roles.includes(ADMIN_ROLE) ? t("widget.flags.admin") : "",
       user.isBanned ? t("widget.flags.banned") : "",
+      user.emailVerified ? "" : t("widget.flags.unverified"),
+      isFreeBurner(user) ? t("widget.flags.freeBurn") : "",
     ]
       .filter(Boolean)
       .join(",");
     lines.push(
       [
-        cell(`${user.email}${flags ? ` [${flags}]` : ""}`, 40),
+        cell(middleTruncate(user.email, 44), 44),
+        cell(flags || "-", 28),
         cell(formatDay(user.createdAt, locale), 12),
-        cell(formatRelative(user.lastActiveAt, locale), 14),
+        cell(
+          user.lastActiveAt
+            ? formatRelative(user.lastActiveAt, locale)
+            : t("widget.never"),
+          14,
+        ),
         cell(formatNumber(user.creditBalance, locale), 9),
-        cell(formatNumber(user.creditsSpent, locale), 8),
+        cell(
+          `${formatNumber(user.creditsSpent, locale)} (${formatNumber(user.creditsSpent30d, locale)} 30d)`,
+          20,
+        ),
         cell(
           user.totalPaidUsd > 0 ? formatUsd(user.totalPaidUsd, locale) : "-",
           9,
         ),
         cell(
-          user.subscriptionStatus
-            ? subscriptionStatusLabel(user.subscriptionStatus, locale)
-            : "-",
+          user.plan
+            ? subscriptionPlanLabel(user.plan, locale)
+            : user.subscriptionStatus
+              ? subscriptionStatusLabel(user.subscriptionStatus, locale)
+              : "-",
           10,
         ),
+        cell(sourceText(user, t) || t("widget.notTracked"), 22),
         user.id,
       ].join(" "),
     );
@@ -240,9 +303,6 @@ function UserCell({
 }): React.JSX.Element {
   return (
     <Div className="flex items-start gap-3 min-w-0">
-      <Div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
-        {displayName(user).slice(0, 2).toUpperCase()}
-      </Div>
       <Div className="min-w-0">
         <Div className="flex items-center gap-1.5 flex-wrap">
           <Span className="font-medium text-sm break-all @3xl:truncate @3xl:max-w-[220px]">
@@ -265,6 +325,13 @@ function UserCell({
               variant="danger"
             />
           )}
+          {isFreeBurner(user) && (
+            <StatusPill
+              status="free-burn"
+              label={t("widget.flags.freeBurn")}
+              variant="warning"
+            />
+          )}
           {!user.emailVerified && (
             <StatusPill
               status="unverified"
@@ -273,7 +340,7 @@ function UserCell({
             />
           )}
         </Div>
-        <Span className="block text-xs text-muted-foreground break-all @3xl:truncate @3xl:max-w-[260px]">
+        <Span className="block text-xs text-muted-foreground break-all @3xl:truncate @3xl:max-w-[320px]">
           {user.email}
         </Span>
       </Div>
@@ -306,6 +373,36 @@ function QuickChip({
     >
       {label}
     </Button>
+  );
+}
+
+/** Active filter shown as a removable chip (drill-downs land with these set). */
+function ActiveFilterChip({
+  label,
+  value,
+  removeLabel,
+  onRemove,
+}: {
+  label: string;
+  value: string;
+  removeLabel: string;
+  onRemove: () => void;
+}): React.JSX.Element {
+  return (
+    <Span className="inline-flex max-w-full items-center gap-1 rounded-full border border-primary/30 bg-primary/5 py-0.5 pe-1 ps-2.5 text-xs">
+      <Span className="text-muted-foreground">{label}</Span>
+      <Span className="truncate font-medium text-foreground">{value}</Span>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={onRemove}
+        aria-label={removeLabel}
+        className="h-5 w-5 rounded-full p-0 text-muted-foreground hover:text-foreground"
+      >
+        <X className="h-3 w-3" />
+      </Button>
+    </Span>
   );
 }
 
@@ -447,6 +544,16 @@ export function UsersListContainer({
     form.setValue("creditsMax", undefined, { shouldDirty: true });
     form.setValue("source", "", { shouldDirty: true });
     form.setValue("referralActivity", undefined, { shouldDirty: true });
+    form.setValue("audience", undefined, { shouldDirty: true });
+    form.setValue("channel", "", { shouldDirty: true });
+    form.setValue("channelType", undefined, { shouldDirty: true });
+    form.setValue("refCode", "", { shouldDirty: true });
+    form.setValue("plan", undefined, { shouldDirty: true });
+    form.setValue("activeFrom", undefined, { shouldDirty: true });
+    form.setValue("activeTo", undefined, { shouldDirty: true });
+    form.setValue("spentMin", undefined, { shouldDirty: true });
+    form.setValue("paidFrom", undefined, { shouldDirty: true });
+    form.setValue("paidTo", undefined, { shouldDirty: true });
     resetPageAndSubmit();
   }, [form, resetPageAndSubmit]);
 
@@ -490,11 +597,72 @@ export function UsersListContainer({
   }, [endpointMutations]);
 
   const handleViewStats = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const statsDef = await import("../stats/definition");
-      navigate(statsDef.default.GET);
-    })();
-  }, [navigate]);
+    openRelated(
+      () => import("../stats/definition").then((m) => m.default.GET),
+      {
+        data: {
+          audience: form.getValues("audience"),
+          channel: form.getValues("channel") || undefined,
+          channelType: form.getValues("channelType"),
+          refCode: form.getValues("refCode") || undefined,
+          payer: form.getValues("payer"),
+          plan: form.getValues("plan"),
+          accountState: form.getValues("accountState"),
+        },
+      },
+    );
+  }, [openRelated, form]);
+
+  const audience = form.watch("audience");
+  const watchedAccountState = form.watch("accountState");
+  const accountState = watchedAccountState ?? [];
+  const toggleHumans = useCallback((): void => {
+    form.setValue(
+      "audience",
+      audience === UsersAudience.HUMANS ? undefined : UsersAudience.HUMANS,
+      { shouldDirty: true },
+    );
+    resetPageAndSubmit();
+  }, [form, audience, resetPageAndSubmit]);
+  const toggleBanned = useCallback((): void => {
+    const only =
+      watchedAccountState?.length === 1 &&
+      watchedAccountState[0] === AccountStateFilter.BANNED;
+    form.setValue("accountState", only ? [] : [AccountStateFilter.BANNED], {
+      shouldDirty: true,
+    });
+    resetPageAndSubmit();
+  }, [form, watchedAccountState, resetPageAndSubmit]);
+  const toggleFreeBurn = useCallback((): void => {
+    const on =
+      form.getValues("payer") === PayerFilter.FREE &&
+      Number(form.getValues("spentMin")) === FREE_BURN_MIN_CREDITS;
+    form.setValue("payer", on ? undefined : PayerFilter.FREE, {
+      shouldDirty: true,
+    });
+    form.setValue("spentMin", on ? undefined : FREE_BURN_MIN_CREDITS, {
+      shouldDirty: true,
+    });
+    form.setValue("audience", on ? undefined : UsersAudience.HUMANS, {
+      shouldDirty: true,
+    });
+    if (!on) {
+      form.setValue("sortBy", UserListSortField.CREDITS_SPENT, {
+        shouldDirty: true,
+      });
+      form.setValue("sortOrder", ListSortOrder.DESC, { shouldDirty: true });
+    }
+    resetPageAndSubmit();
+  }, [form, resetPageAndSubmit]);
+  const toggleVerified = useCallback((): void => {
+    const only =
+      watchedAccountState?.length === 1 &&
+      watchedAccountState[0] === AccountStateFilter.VERIFIED;
+    form.setValue("accountState", only ? [] : [AccountStateFilter.VERIFIED], {
+      shouldDirty: true,
+    });
+    resetPageAndSubmit();
+  }, [form, watchedAccountState, resetPageAndSubmit]);
 
   // CLI / MCP: plain text table
   if (responseOnly && (isCliPlatform(platform) || platform === Platform.MCP)) {
@@ -511,6 +679,181 @@ export function UsersListContainer({
   const rangeEnd = Math.min(currentPage * (summary?.limit ?? 0), totalCount);
 
   const search = form.watch("search") ?? "";
+  const chips: Array<{
+    key: string;
+    label: string;
+    value: string;
+    clear: () => void;
+  }> = [];
+  const clearAnd = (apply: () => void) => (): void => {
+    apply();
+    resetPageAndSubmit();
+  };
+  if (audience) {
+    chips.push({
+      key: "audience",
+      label: t("get.fields.audience.label"),
+      value: t(audience),
+      clear: clearAnd(() =>
+        form.setValue("audience", undefined, { shouldDirty: true }),
+      ),
+    });
+  }
+  if (payer && payer !== PayerFilter.ANY) {
+    chips.push({
+      key: "payer",
+      label: t("get.fields.payer.label"),
+      value: t(payer),
+      clear: clearAnd(() =>
+        form.setValue("payer", undefined, { shouldDirty: true }),
+      ),
+    });
+  }
+  if (lastActive && lastActive !== LastActiveFilter.ANY) {
+    chips.push({
+      key: "lastActive",
+      label: t("get.fields.lastActive.label"),
+      value: t(lastActive),
+      clear: clearAnd(() =>
+        form.setValue("lastActive", undefined, { shouldDirty: true }),
+      ),
+    });
+  }
+  const channel = form.watch("channel");
+  if (channel) {
+    chips.push({
+      key: "channel",
+      label: t("get.fields.channel.label"),
+      value: channel,
+      clear: clearAnd(() =>
+        form.setValue("channel", "", { shouldDirty: true }),
+      ),
+    });
+  }
+  const channelType = form.watch("channelType");
+  if (channelType) {
+    chips.push({
+      key: "channelType",
+      label: t("get.fields.channelType.label"),
+      value: t(channelType),
+      clear: clearAnd(() =>
+        form.setValue("channelType", undefined, { shouldDirty: true }),
+      ),
+    });
+  }
+  const refCode = form.watch("refCode");
+  if (refCode) {
+    chips.push({
+      key: "refCode",
+      label: t("get.fields.refCode.label"),
+      value: refCode,
+      clear: clearAnd(() =>
+        form.setValue("refCode", "", { shouldDirty: true }),
+      ),
+    });
+  }
+  const plan = form.watch("plan");
+  if (plan) {
+    chips.push({
+      key: "plan",
+      label: t("get.fields.plan.label"),
+      value: t(plan),
+      clear: clearAnd(() =>
+        form.setValue("plan", undefined, { shouldDirty: true }),
+      ),
+    });
+  }
+  const signupFrom = form.watch("signupFrom");
+  const signupTo = form.watch("signupTo");
+  if (signupFrom || signupTo) {
+    chips.push({
+      key: "signup",
+      label: t("widget.chips.signedUp"),
+      value: `${signupFrom ? formatDay(signupFrom, locale, true) : "…"} → ${signupTo ? formatDay(signupTo, locale, true) : "…"}`,
+      clear: clearAnd(() => {
+        form.setValue("signupFrom", undefined, { shouldDirty: true });
+        form.setValue("signupTo", undefined, { shouldDirty: true });
+      }),
+    });
+  }
+  const activeFrom = form.watch("activeFrom");
+  const activeTo = form.watch("activeTo");
+  if (activeFrom || activeTo) {
+    chips.push({
+      key: "active",
+      label: t("widget.chips.spentCredits"),
+      value: `${activeFrom ? formatDay(activeFrom, locale, true) : "…"} → ${activeTo ? formatDay(activeTo, locale, true) : "…"}`,
+      clear: clearAnd(() => {
+        form.setValue("activeFrom", undefined, { shouldDirty: true });
+        form.setValue("activeTo", undefined, { shouldDirty: true });
+      }),
+    });
+  }
+  const paidFrom = form.watch("paidFrom");
+  const paidTo = form.watch("paidTo");
+  if (paidFrom || paidTo) {
+    chips.push({
+      key: "paid",
+      label: t("widget.chips.paid"),
+      value: `${paidFrom ? formatDay(paidFrom, locale, true) : "…"} → ${paidTo ? formatDay(paidTo, locale, true) : "…"}`,
+      clear: clearAnd(() => {
+        form.setValue("paidFrom", undefined, { shouldDirty: true });
+        form.setValue("paidTo", undefined, { shouldDirty: true });
+      }),
+    });
+  }
+  const spentMin = form.watch("spentMin");
+  if (spentMin !== undefined) {
+    chips.push({
+      key: "spentMin",
+      label: t("get.fields.spentMin.label"),
+      value: formatNumber(spentMin, locale),
+      clear: clearAnd(() =>
+        form.setValue("spentMin", undefined, { shouldDirty: true }),
+      ),
+    });
+  }
+  const subscription = form.watch("subscription");
+  if (subscription) {
+    chips.push({
+      key: "subscription",
+      label: t("get.fields.subscription.label"),
+      value: t(subscription),
+      clear: clearAnd(() =>
+        form.setValue("subscription", undefined, { shouldDirty: true }),
+      ),
+    });
+  }
+  if (accountState.length > 0) {
+    chips.push({
+      key: "accountState",
+      label: t("get.fields.accountState.label"),
+      value: accountState.map((state) => t(state)).join(", "),
+      clear: clearAnd(() =>
+        form.setValue("accountState", [], { shouldDirty: true }),
+      ),
+    });
+  }
+  const source = form.watch("source");
+  if (source) {
+    chips.push({
+      key: "source",
+      label: t("get.fields.source.label"),
+      value: source,
+      clear: clearAnd(() => form.setValue("source", "", { shouldDirty: true })),
+    });
+  }
+  const referralActivity = form.watch("referralActivity");
+  if (referralActivity) {
+    chips.push({
+      key: "referralActivity",
+      label: t("get.fields.referralActivity.label"),
+      value: t(referralActivity),
+      clear: clearAnd(() =>
+        form.setValue("referralActivity", undefined, { shouldDirty: true }),
+      ),
+    });
+  }
   const hasActiveFilters = Boolean(
     search ||
     (form.watch("roles") ?? []).length > 0 ||
@@ -522,8 +865,8 @@ export function UsersListContainer({
     form.watch("signupTo") ||
     form.watch("creditsMin") !== undefined ||
     form.watch("creditsMax") !== undefined ||
-    form.watch("source") ||
-    form.watch("referralActivity"),
+    chips.length > 0 ||
+    audience,
   );
 
   return (
@@ -599,16 +942,24 @@ export function UsersListContainer({
 
       {/* KPI strip for the current filter */}
       {!isPickerMode && summary && (
-        <MetricGrid columns={4}>
-          <MetricCard
+        <KpiGrid columns={5}>
+          <KpiTile
             label={t("widget.kpi.matching")}
-            value={formatNumber(summary.totalCount, locale)}
-            icon={<Users className="h-4 w-4" />}
+            value={summary.totalCount}
+            locale={locale}
+            hint={t("widget.kpi.matchingHint", {
+              count: formatNumber(summary.signupsThisWeek, locale),
+              last: formatNumber(summary.signupsByWeek.at(-1) ?? 0, locale),
+            })}
+            sparkline={summary.signupsByWeek}
+            onClick={handleViewStats}
           />
-          <MetricCard
+          <KpiTile
             label={t("widget.kpi.paying")}
-            value={formatNumber(summary.payingCount, locale)}
-            description={
+            value={summary.payingCount}
+            locale={locale}
+            tone="positive"
+            hint={
               summary.totalCount > 0
                 ? t("widget.kpi.payingShare", {
                     percent: Math.round(
@@ -617,27 +968,58 @@ export function UsersListContainer({
                   })
                 : undefined
             }
-            variant="success"
+            onClick={() => togglePayer(PayerFilter.PAID)}
           />
-          <MetricCard
+          <KpiTile
+            className="hidden @md:flex"
+            label={t("widget.kpi.verified")}
+            value={
+              summary.totalCount > 0
+                ? summary.verifiedCount / summary.totalCount
+                : null
+            }
+            format="percent"
+            locale={locale}
+            hint={t("widget.kpi.verifiedHint", {
+              count: formatNumber(summary.verifiedCount, locale),
+            })}
+            onClick={toggleVerified}
+          />
+          <KpiTile
+            label={t("widget.kpi.active")}
+            value={summary.activeMonthCount}
+            locale={locale}
+            hint={t("widget.kpi.activeSpentHint", {
+              credits: formatNumber(summary.creditsSpent30d, locale),
+            })}
+            onClick={() => toggleLastActive(LastActiveFilter.MONTH)}
+          />
+          <KpiTile
+            className="hidden @md:flex"
             label={t("widget.kpi.revenue")}
-            value={formatUsd(summary.totalPaidUsd, locale)}
-            description={t("widget.kpi.revenueHint")}
-            variant="info"
+            value={summary.totalPaidUsd}
+            format="currency"
+            currency="USD"
+            locale={locale}
+            hint={t("widget.kpi.revenueHint")}
+            onClick={() => togglePayer(PayerFilter.PAID)}
           />
-          <MetricCard
-            label={t("widget.kpi.credits")}
-            value={formatNumber(summary.creditBalance, locale)}
-            description={t("widget.kpi.creditsHint")}
-          />
-        </MetricGrid>
+        </KpiGrid>
       )}
 
       {/* Quick filters */}
       {!isPickerMode && (
         <Div className="flex items-center gap-1.5 flex-wrap">
           <QuickChip
-            label={t("widget.quick.paying")}
+            label={t("widget.quick.humans")}
+            active={audience === UsersAudience.HUMANS}
+            onClick={toggleHumans}
+          />
+          <Span className="mx-1 h-4 w-px bg-border" />
+          <QuickChip
+            label={t("widget.quick.paying", {
+              count: formatNumber(summary?.payingCount ?? 0, locale),
+            })}
             active={payer === PayerFilter.PAID}
             onClick={() => togglePayer(PayerFilter.PAID)}
           />
@@ -656,6 +1038,27 @@ export function UsersListContainer({
             label={t("widget.quick.dormant")}
             active={lastActive === LastActiveFilter.DORMANT}
             onClick={() => toggleLastActive(LastActiveFilter.DORMANT)}
+          />
+          <QuickChip
+            label={t("widget.quick.freeBurn", {
+              min: formatNumber(FREE_BURN_MIN_CREDITS, locale),
+              count: formatNumber(summary?.freeBurnCount ?? 0, locale),
+            })}
+            active={
+              payer === PayerFilter.FREE &&
+              Number(form.watch("spentMin")) === FREE_BURN_MIN_CREDITS
+            }
+            onClick={toggleFreeBurn}
+          />
+          <QuickChip
+            label={t("widget.quick.banned", {
+              count: formatNumber(summary?.bannedCount ?? 0, locale),
+            })}
+            active={
+              accountState.length === 1 &&
+              accountState[0] === AccountStateFilter.BANNED
+            }
+            onClick={toggleBanned}
           />
           <QuickChip
             label={t("widget.quick.never")}
@@ -689,9 +1092,32 @@ export function UsersListContainer({
         </Div>
       )}
 
+      {/* Active filters (drill-downs from reports land here) */}
+      {!isPickerMode && chips.length > 0 && (
+        <Div className="flex flex-wrap items-center gap-1.5">
+          {chips.map((chip) => (
+            <ActiveFilterChip
+              key={chip.key}
+              label={chip.label}
+              value={chip.value}
+              removeLabel={t("widget.chips.remove", { label: chip.label })}
+              onRemove={chip.clear}
+            />
+          ))}
+        </Div>
+      )}
+
       {/* Full filter panel */}
       {!isPickerMode && showFilters && (
         <Div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-4 gap-3 rounded-lg border p-3">
+          <SelectFieldWidget fieldName="audience" field={children.audience} />
+          <TextFieldWidget fieldName="channel" field={children.channel} />
+          <SelectFieldWidget
+            fieldName="channelType"
+            field={children.channelType}
+          />
+          <TextFieldWidget fieldName="refCode" field={children.refCode} />
+          <SelectFieldWidget fieldName="plan" field={children.plan} />
           <MultiSelectFieldWidget fieldName="roles" field={children.roles} />
           <MultiSelectFieldWidget
             fieldName="accountState"
@@ -707,6 +1133,19 @@ export function UsersListContainer({
           />
           <DateFieldWidget fieldName="signupFrom" field={children.signupFrom} />
           <DateFieldWidget fieldName="signupTo" field={children.signupTo} />
+          <DateFieldWidget fieldName="activeFrom" field={children.activeFrom} />
+          <DateFieldWidget fieldName="activeTo" field={children.activeTo} />
+          <DateFieldWidget fieldName="paidFrom" field={children.paidFrom} />
+          <DateFieldWidget fieldName="paidTo" field={children.paidTo} />
+          <CreditBoundInput
+            label={t("get.fields.spentMin.label")}
+            placeholder={t("widget.creditsAny")}
+            value={form.watch("spentMin")}
+            onCommit={(next) => {
+              form.setValue("spentMin", next, { shouldDirty: true });
+              resetPageAndSubmit();
+            }}
+          />
           <CreditBoundInput
             label={t("get.fields.creditsMin.label")}
             placeholder={t("widget.creditsAny")}
@@ -741,8 +1180,17 @@ export function UsersListContainer({
 
       {/* Table */}
       {!data ? (
-        endpointMutations?.read?.isLoading !== false && (
+        endpointMutations?.read?.isLoading !== false ? (
           <LoadingBlock message={t("widget.loading")} />
+        ) : (
+          <EmptyBlock
+            icon={<Users className="h-8 w-8" />}
+            title={t("get.errors.server.title")}
+            action={{
+              label: t("widget.actions.refresh"),
+              onClick: handleRefresh,
+            }}
+          />
         )
       ) : users.length === 0 ? (
         <EmptyBlock
@@ -767,7 +1215,11 @@ export function UsersListContainer({
       ) : (
         <Div className="rounded-lg border overflow-x-auto">
           <Table>
-            <TableHeader>
+            <TableHeader
+              className={
+                isPickerMode ? undefined : "hidden @3xl:table-header-group"
+              }
+            >
               <TableRow>
                 <SortHeader
                   label={t("widget.columns.user")}
@@ -824,6 +1276,11 @@ export function UsersListContainer({
                     <TableHead className="hidden text-xs @3xl:table-cell">
                       {t("widget.columns.source")}
                     </TableHead>
+                    <TableHead className="hidden w-10 @3xl:table-cell">
+                      <Span className="sr-only">
+                        {t("widget.actions.open")}
+                      </Span>
+                    </TableHead>
                   </>
                 )}
               </TableRow>
@@ -839,27 +1296,47 @@ export function UsersListContainer({
                     <Div className="flex flex-col items-start gap-2">
                       <UserCell user={user} t={t} locale={locale} />
                       {!isPickerMode && (
-                        <Div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground @3xl:hidden">
-                          <Span>
-                            {t("widget.compact.credits", {
-                              count: formatNumber(user.creditBalance, locale),
-                            })}
-                          </Span>
-                          {user.subscriptionStatus && (
-                            <Span>
-                              {subscriptionStatusLabel(
-                                user.subscriptionStatus,
-                                locale,
-                              )}
-                            </Span>
-                          )}
-                        </Div>
+                        <Span className="block text-xs text-muted-foreground @3xl:hidden">
+                          {[
+                            t("widget.compact.joined", {
+                              date: formatDay(user.createdAt, locale),
+                            }),
+                            user.lastActiveAt
+                              ? t("widget.compact.active", {
+                                  when: formatRelative(
+                                    user.lastActiveAt,
+                                    locale,
+                                  ),
+                                })
+                              : t("widget.compact.neverActive"),
+                            user.totalPaidUsd > 0
+                              ? t("widget.compact.paid", {
+                                  amount: formatUsd(user.totalPaidUsd, locale),
+                                })
+                              : t("widget.compact.free"),
+                            user.plan
+                              ? subscriptionPlanLabel(user.plan, locale)
+                              : "",
+                            t("widget.compact.spent", {
+                              count: formatNumber(user.creditsSpent, locale),
+                            }),
+                            t("widget.spent30d", {
+                              count: formatNumber(user.creditsSpent30d, locale),
+                            }),
+                            sourceText(user, t),
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </Span>
                       )}
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="h-auto min-h-9 whitespace-normal"
+                        className={cn(
+                          "h-auto min-h-9 whitespace-normal",
+                          !isPickerMode && "hidden",
+                        )}
                         aria-label={t(
                           isPickerMode
                             ? "widget.actions.selectUser"
@@ -896,8 +1373,20 @@ export function UsersListContainer({
                       <TableCell className="hidden text-right tabular-nums text-sm @3xl:table-cell">
                         {formatNumber(user.creditBalance, locale)}
                       </TableCell>
-                      <TableCell className="hidden text-right tabular-nums text-sm text-muted-foreground @3xl:table-cell">
+                      <TableCell
+                        className={cn(
+                          "hidden text-right tabular-nums text-sm @3xl:table-cell",
+                          isFreeBurner(user)
+                            ? "font-medium text-warning"
+                            : "text-muted-foreground",
+                        )}
+                      >
                         {formatNumber(user.creditsSpent, locale)}
+                        <Span className="block text-[11px] font-normal text-muted-foreground">
+                          {t("widget.spent30d", {
+                            count: formatNumber(user.creditsSpent30d, locale),
+                          })}
+                        </Span>
                       </TableCell>
                       <TableCell className="hidden text-right tabular-nums text-sm @3xl:table-cell">
                         {user.totalPaidUsd > 0 ? (
@@ -910,28 +1399,50 @@ export function UsersListContainer({
                       </TableCell>
                       <TableCell className="hidden @3xl:table-cell">
                         {user.subscriptionStatus ? (
-                          <StatusPill
-                            status={user.subscriptionStatus}
-                            label={subscriptionStatusLabel(
-                              user.subscriptionStatus,
-                              locale,
+                          <Div className="flex flex-col items-start gap-0.5">
+                            {user.plan && (
+                              <Span className="text-xs font-medium">
+                                {subscriptionPlanLabel(user.plan, locale)}
+                              </Span>
                             )}
-                            variant={subscriptionStatusVariant(
-                              user.subscriptionStatus,
-                            )}
-                          />
+                            <StatusPill
+                              status={user.subscriptionStatus}
+                              label={subscriptionStatusLabel(
+                                user.subscriptionStatus,
+                                locale,
+                              )}
+                              variant={subscriptionStatusVariant(
+                                user.subscriptionStatus,
+                              )}
+                            />
+                          </Div>
                         ) : (
-                          <Span className="text-xs text-muted-foreground">
-                            -
+                          <Span className="whitespace-nowrap text-xs text-muted-foreground">
+                            {user.totalPaidUsd > 0 ? t("widget.oneOff") : "-"}
                           </Span>
                         )}
                       </TableCell>
-                      <TableCell className="hidden text-xs text-muted-foreground max-w-[180px] truncate @3xl:table-cell">
-                        {user.referredByEmail
-                          ? t("widget.referredBy", {
-                              email: user.referredByEmail,
-                            })
-                          : (user.source ?? "-")}
+                      <TableCell className="hidden text-xs text-muted-foreground max-w-[200px] @3xl:table-cell">
+                        <Span className="block truncate">
+                          {sourceText(user, t) || t("widget.notTracked")}
+                        </Span>
+                      </TableCell>
+                      <TableCell className="hidden w-10 @3xl:table-cell">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-muted-foreground"
+                          aria-label={t("widget.actions.openUser", {
+                            email: user.email,
+                          })}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleRowClick(user);
+                          }}
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </>
                   )}

@@ -6,6 +6,7 @@
 import type { CategoryDefinition } from "next-vibe/help-tool/category-types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 
+import { CREDIT_USAGE_REPORT_ALIAS } from "./analytics/usage/constants";
 import { CREDITS_ALIAS } from "./constants";
 
 export const category: CategoryDefinition = {
@@ -23,7 +24,7 @@ export const category: CategoryDefinition = {
   icon: "coins",
   order: 15,
   defaultEntry: {
-    [UserPermissionRole.ADMIN]: CREDITS_ALIAS,
+    [UserPermissionRole.ADMIN]: CREDIT_USAGE_REPORT_ALIAS,
     [UserPermissionRole.CUSTOMER]: CREDITS_ALIAS,
     [UserPermissionRole.PUBLIC]: CREDITS_ALIAS,
   },

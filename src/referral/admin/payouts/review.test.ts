@@ -36,7 +36,7 @@ describe("credit grants and partner payout review", () => {
 
   test("uses the verified account ID and preserves an exact whole-credit grant", () => {
     const recipient = grant.GET.responseSchema.parse(grant.GET.examples.responses?.default);
-    expect(recipient).toEqual({ id: customer.id, email: "customer@example.test" });
+    expect(recipient).toMatchObject({ id: customer.id, email: "customer@example.test" });
     expect(grant.POST.requestSchema.parse({ targetUserId: recipient.id, amount: "137" })).toEqual({
       targetUserId: recipient.id,
       amount: 137,
@@ -83,7 +83,7 @@ describe("credit grants and partner payout review", () => {
     );
   });
 
-  test("limits manual actions to pending or approved crypto payouts", () => {
+  test("limits manual actions to pending or approved crypto payouts and stuck credit payouts", () => {
     expect(
       getAdminPayoutActions({ currency: PayoutCurrency.USDC, status: PayoutStatus.PENDING }),
     ).toEqual(["approve", "reject"]);
@@ -98,9 +98,10 @@ describe("credit grants and partner payout review", () => {
     ]) {
       expect(getAdminPayoutActions({ currency: PayoutCurrency.USDC, status })).toEqual([]);
     }
+    // A credits payout converts on request; one stuck in PENDING can only be rejected.
     expect(
       getAdminPayoutActions({ currency: PayoutCurrency.CREDITS, status: PayoutStatus.PENDING }),
-    ).toEqual([]);
+    ).toEqual(["reject"]);
     expect(
       getAdminPayoutActions({ currency: PayoutCurrency.CREDITS, status: PayoutStatus.APPROVED }),
     ).toEqual([]);

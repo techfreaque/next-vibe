@@ -11,7 +11,7 @@ import { CronHistoryRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ data, user, t, logger }) =>
-      CronHistoryRepository.getTaskHistory(data, user, t, logger),
+    handler: ({ data, user, locale, t, logger }) =>
+      CronHistoryRepository.getTaskHistory(data, user, t, logger, locale),
   },
 });

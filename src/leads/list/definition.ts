@@ -42,6 +42,12 @@ import {
 import { paginationField } from "next-vibe/unified-ui/widgets/containers/pagination/types";
 import { z } from "zod";
 
+import {
+  BotFamily,
+  LeadChannelFilter,
+  LeadDeviceFilter,
+} from "../analytics/enum";
+import { leadDrillFields, leadSegmentFields } from "../analytics/filters";
 import { acquisitionLeadRow } from "../growth/acquisition";
 import {
   acquisitionCurrencyField,
@@ -132,6 +138,10 @@ const { GET } = createEndpoint({
       }),
       acquisitionCurrency: acquisitionCurrencyField,
 
+      // === ANALYTICS DRILL-DOWN FILTERS (same names as the lead reports) ===
+      ...leadSegmentFields,
+      ...leadDrillFields,
+
       // === SORTING OPTIONS ===
       sortingOptions: leadsSortingOptionsContainer,
 
@@ -201,6 +211,30 @@ const { GET } = createEndpoint({
                   type: WidgetType.TEXT,
                   label: "acquisition.title",
                   schema: acquisitionLeadRow.optional(),
+                }),
+                triage: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "get.response.leads.triage",
+                  schema: z
+                    .object({
+                      botFamily: z.enum(BotFamily),
+                      channelType: z.enum(LeadChannelFilter),
+                      channel: z.string().nullable(),
+                      source: z.string().nullable(),
+                      referrerHost: z.string().nullable(),
+                      landingPath: z.string().nullable(),
+                      refCode: z.string().nullable(),
+                      ipPrefix: z.string().nullable(),
+                      uaFingerprint: z.string().nullable(),
+                      device: z.enum(LeadDeviceFilter),
+                      browser: z.string().nullable(),
+                      os: z.string().nullable(),
+                      signedUp: z.boolean(),
+                      emailConfirmed: z.boolean(),
+                      chatted: z.boolean(),
+                      paid: z.boolean(),
+                    })
+                    .optional(),
                 }),
                 currentCampaignStage: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
@@ -309,6 +343,21 @@ const { GET } = createEndpoint({
       // === PAGINATION INFO (Editable controls + display in one row) ===
       paginationInfo: paginationField({
         order: 5,
+      }),
+
+      // === DRILL SUMMARY (only when report filters are active) ===
+      drillSummary: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "widget.drillTitle",
+        schema: z
+          .object({
+            total: z.number(),
+            humans: z.number(),
+            signups: z.number(),
+            paid: z.number(),
+            agents: z.number(),
+          })
+          .optional(),
       }),
 
       // === PER-STATUS COUNTS (independent of active status filter) ===

@@ -470,6 +470,17 @@ export function LeadsStatsContainer({
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
+  const openReport = (report: "acquisition" | "funnel" | "abuse"): void => {
+    void (async (): Promise<void> => {
+      const def =
+        report === "acquisition"
+          ? await import("@/leads/analytics/acquisition/definition")
+          : report === "funnel"
+            ? await import("@/leads/analytics/funnel/definition")
+            : await import("@/leads/analytics/abuse/definition");
+      navigate(def.default.GET, {});
+    })();
+  };
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
   const leadsT = leadsScopedTranslation.scopedT(locale).t;
@@ -649,6 +660,33 @@ export function LeadsStatsContainer({
 
       {/* Quick action buttons */}
       <Div className="flex flex-wrap gap-2">
+        <Button
+          type="button"
+          variant="default"
+          size="sm"
+          onClick={() => openReport("acquisition")}
+          className="h-8 text-xs"
+        >
+          {t("widget.openAcquisition")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => openReport("funnel")}
+          className="h-8 text-xs"
+        >
+          {t("widget.openFunnel")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => openReport("abuse")}
+          className="h-8 text-xs"
+        >
+          {t("widget.openAbuse")}
+        </Button>
         <Button
           type="button"
           variant="default"

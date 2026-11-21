@@ -3,6 +3,7 @@
  * POST endpoint to add credit packs to a user account (admin only)
  */
 
+import { dateSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -20,6 +21,8 @@ import {
   submitButton,
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
+
+import { SubscriptionPlan, SubscriptionStatus } from "@/subscription/enum";
 
 import { scopedTranslation } from "../i18n";
 
@@ -104,6 +107,52 @@ const { GET } = createEndpoint({
         label: "adminAdd.recipient.email",
         schema: z.string(),
       }),
+      name: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "adminAdd.recipient.name",
+        schema: z.string().nullable(),
+      }),
+      balance: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "adminAdd.recipient.balance",
+        schema: z.number(),
+      }),
+      freeBalance: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "adminAdd.recipient.freeBalance",
+        schema: z.number(),
+      }),
+      joinedAt: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "adminAdd.recipient.joinedAt",
+        schema: dateSchema,
+      }),
+      subscription: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "adminAdd.recipient.subscription",
+        schema: z
+          .object({
+            planId: z.enum(SubscriptionPlan),
+            status: z.enum(SubscriptionStatus),
+            currentPeriodEnd: dateSchema.nullable(),
+            cancelAtPeriodEnd: z.boolean(),
+            lastChargeAmount: z.number().nullable(),
+            lastChargeCurrency: z.string().nullable(),
+          })
+          .nullable(),
+      }),
+      linkedDevices: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "adminAdd.recipient.linkedDevices",
+        schema: z.number(),
+      }),
+      recentGrants: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "adminAdd.recipient.recentGrants",
+        schema: z.array(
+          z.object({ amount: z.number(), createdAt: dateSchema }),
+        ),
+      }),
     },
   }),
   errorTypes,
@@ -119,6 +168,20 @@ const { GET } = createEndpoint({
       default: {
         id: "123e4567-e89b-12d3-a456-426614174000",
         email: "customer@example.test",
+        name: "Customer Example",
+        balance: 1250,
+        freeBalance: 10,
+        joinedAt: "2026-10-02T09:00:00.000Z",
+        subscription: {
+          planId: SubscriptionPlan.PLUS,
+          status: SubscriptionStatus.ACTIVE,
+          currentPeriodEnd: "2026-12-02T09:00:00.000Z",
+          cancelAtPeriodEnd: false,
+          lastChargeAmount: 20,
+          lastChargeCurrency: "EUR",
+        },
+        linkedDevices: 2,
+        recentGrants: [{ amount: 3000, createdAt: "2026-11-17T10:00:00.000Z" }],
       },
     },
   },

@@ -475,7 +475,7 @@ export function UserViewContainer({
     {
       id: "connections",
       label: t("tabs.connections"),
-      count: data.connectedLeads.length + data.connectedUsers.length,
+      count: data.connectedLeadsTotal + data.connectedUsers.length,
     },
     {
       id: "favorites",
@@ -811,6 +811,7 @@ export function UserViewContainer({
       {activeTab === "connections" && (
         <ConnectionsTab
           connectedLeads={data.connectedLeads}
+          connectedLeadsTotal={data.connectedLeadsTotal}
           connectedUsers={data.connectedUsers}
           t={t}
           locale={locale}
@@ -1564,11 +1565,13 @@ function ActivityTab({
  */
 function ConnectionsTab({
   connectedLeads,
+  connectedLeadsTotal,
   connectedUsers,
   t,
   locale,
 }: {
   connectedLeads: UserViewResponseOutput["connectedLeads"];
+  connectedLeadsTotal: number;
   connectedUsers: UserViewResponseOutput["connectedUsers"];
   t: ViewT;
   locale: CountryLanguage;
@@ -1580,6 +1583,14 @@ function ConnectionsTab({
     <Div className="flex flex-col gap-4">
       <RelatedEntitiesPanel
         title={t("connections.leadsTitle")}
+        subtitle={
+          connectedLeadsTotal > connectedLeads.length
+            ? t("connections.leadsCapped", {
+                shown: connectedLeads.length,
+                total: connectedLeadsTotal,
+              })
+            : undefined
+        }
         emptyTitle={t("connections.noLeads")}
         items={connectedLeads.map((lead) => {
           const title = lead.email || lead.businessName || lead.id;

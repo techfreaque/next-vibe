@@ -1,0 +1,236 @@
+import { translations as analyticsTranslations } from "next-vibe/unified-ui/analytics/i18n/en";
+
+export const translations = {
+  ...analyticsTranslations,
+  get: {
+    title: "Revenue",
+    titleShort: "Revenue",
+    description:
+      "Revenue from credit packs, new subscriptions and renewals by processor, plan and currency, with refunds, disputes, MRR, active subscriptions and churn.",
+    tags: {
+      revenue: "revenue",
+      mrr: "MRR",
+    },
+    fields: {
+      kind: {
+        label: "Kind",
+        description: "Credit packs, new subscriptions, renewals, or all",
+      },
+      provider: {
+        label: "Processor",
+        description: "Only payments through this processor",
+      },
+      currency: {
+        label: "Currency",
+        description: "Only payments in this currency (USD, EUR, PLN)",
+      },
+      plan: {
+        label: "Plan",
+        description: "Only payments and subscriptions on this plan",
+      },
+      includeInternal: {
+        label: "Include admin accounts",
+        description: "Count payments by admin accounts too",
+      },
+    },
+    response: {
+      window: "Period",
+      appliedFilters: "Applied filters",
+      kpis: "Key figures",
+      revenueByKind: "Revenue by kind",
+      revenueByProcessor: "Revenue by processor",
+      subscriptionFlow: "New vs churned subscriptions",
+      byPlan: "By plan or product",
+      byCurrency: "By currency",
+      byProcessor: "By processor",
+      recentPayments: "Recent payments",
+      fxRates: "FX rates to USD",
+    },
+    errors: {
+      validation: {
+        title: "Invalid filters",
+        description: "Check the period and filters and try again.",
+      },
+      unauthorized: {
+        title: "Sign in required",
+        description: "Sign in as an admin to see revenue.",
+      },
+      forbidden: {
+        title: "Admins only",
+        description: "Only admins can see revenue.",
+      },
+      notFound: {
+        title: "Nothing found",
+        description: "No payments match this request.",
+      },
+      server: {
+        title: "Report failed",
+        description: "The revenue report could not be built. Try again.",
+      },
+      unknown: {
+        title: "Unexpected error",
+        description: "Something went wrong while loading the report.",
+      },
+      network: {
+        title: "Connection error",
+        description: "The server could not be reached.",
+      },
+      unsavedChanges: {
+        title: "Unsaved changes",
+        description: "Apply or discard your filter changes first.",
+      },
+      conflict: {
+        title: "Data conflict",
+        description: "The data changed while loading. Refresh the report.",
+      },
+    },
+    success: {
+      title: "Report ready",
+      description: "Revenue loaded",
+    },
+  },
+  widget: {
+    extra: {
+      grossHint: "Subscriptions {{subs}} · packs {{packs}} · approx. USD",
+      newSubsHint:
+        "Subscriptions started in the period · {{count}} first payments",
+      churn30Hint: "Ended in the period · 30-day churn {{rate}}",
+      notLoaded: "Report not loaded. Refresh to try again.",
+      firstPayments: "First subscription payments",
+      openAll: "Open all payments",
+      churnChart: "30-day churn rate",
+      churnNote:
+        "Subscriptions ended in the 30 days before each point ÷ active at the start of those 30 days",
+      kindPack: "Credit pack",
+      kindNew: "First subscription payment",
+      kindRenewal: "Renewal",
+      paid: "Paid",
+      subscriptionNote:
+        "Subscription figures ignore the kind and currency filters.",
+      netHint:
+        "Gross minus refunds in the period; disputes and processor fees not deducted",
+      mrrHint: "Subscriptions running at period end, annual plans ÷ 12",
+      mrrChart: "MRR over time",
+      mrrNote: "Recurring revenue of the subscriptions running at each point.",
+      churnRate: "{{rate}} of subscriptions active at period start",
+      seriesMrr: "MRR",
+      seriesActive: "Active subscriptions",
+      packUnknown: "Credit pack, size not recorded",
+      filterIgnored: "Not affected by the kind or currency filter",
+      processorAll: "All processors",
+      currencyAll: "All currencies",
+    },
+    group: {
+      money: "Money",
+      customers: "Customers and subscriptions",
+      volume: "Payment volume",
+    },
+    kpi: {
+      grossRevenueUsd: "Gross revenue",
+      netRevenueUsd: "Net revenue",
+      refundsUsd: "Refunds",
+      mrrUsd: "MRR",
+      payingCustomers: "Paying customers",
+      activeSubscriptions: "Active subscriptions",
+      newSubscriptions: "New subscriptions",
+      churnedSubscriptions: "Churned",
+      renewals: "Renewals",
+      packPurchases: "Pack purchases",
+      disputes: "Disputes",
+      failedPayments: "Failed payments",
+    },
+    hint: {
+      grossRevenueUsd: "Collected payments, approx. USD",
+      netRevenueUsd: "Gross minus refunds issued in the period",
+      refundsUsd: "Refunds issued in the period",
+      mrrUsd: "Active subscriptions at period end, yearly / 12",
+      payingCustomers: "Accounts with at least one collected payment",
+      activeSubscriptions: "Running at period end",
+      newSubscriptions: "Subscriptions started in the period",
+      churnedSubscriptions: "Subscriptions that ended in the period",
+      renewals: "Collected renewal payments",
+      packPurchases: "Collected credit pack payments",
+      disputes: "Chargebacks opened in the period",
+      failedPayments: "Payments that failed in the period",
+    },
+    chart: {
+      kind: "Revenue by kind",
+      processor: "Revenue by processor",
+      flow: "Subscriptions: new vs churned",
+    },
+    series: {
+      pack: "Credit packs",
+      newSubscription: "New subscriptions",
+      renewal: "Renewals",
+      new: "New",
+      churned: "Churned",
+    },
+    breakdown: {
+      byPlan: "By plan or product",
+      byCurrency: "By currency",
+      byProcessor: "By processor",
+      recent: "Recent payments",
+      recentHint: "Click a payment to open it in processor transactions.",
+      drillHint: "Click a row to filter the report.",
+      plan: "Plan or product",
+      currency: "Currency",
+      processor: "Processor",
+      payment: "Payment",
+    },
+    column: {
+      revenueUsd: "Revenue",
+      amount: "Native amount",
+      payments: "Payments",
+      customers: "Customers",
+      failed: "Failed",
+      refundsUsd: "Refunded",
+      usd: "USD",
+    },
+    label: {
+      creditPack: "Credit pack (500)",
+      creditPackLarge: "Credit pack (2,500)",
+      pack: "Credit pack",
+      newSubscription: "New subscription, plan not recorded",
+      renewal: "Renewal, plan not recorded",
+      rate: "1 {{currency}} = {{rate}} USD",
+    },
+    fxNote: "Totals in approx. USD at static rates: {{rates}}.",
+    subscriptionNote:
+      "Subscription figures follow the processor and plan filters only.",
+    filter: {
+      kind: "Kind",
+      provider: "Processor",
+      currency: "Currency",
+      plan: "Plan",
+      internal: "Admins included",
+    },
+    empty: "No payments in this period.",
+    includeInternal: "Include admins",
+  },
+  enums: {
+    kind: {
+      all: "All",
+      pack: "Packs",
+      newSubscription: "First payments",
+      renewal: "Renewals",
+    },
+    paymentProvider: {
+      stripe: "Stripe",
+      nowpayments: "NOWPayments",
+    },
+    paymentStatus: {
+      pending: "Pending",
+      processing: "Processing",
+      succeeded: "Succeeded",
+      failed: "Failed",
+      canceled: "Canceled",
+      refunded: "Refunded",
+    },
+    plan: {
+      subscription: "Starter",
+      plus: "Plus",
+      pro: "Pro",
+      ultra: "Ultra",
+    },
+  },
+};

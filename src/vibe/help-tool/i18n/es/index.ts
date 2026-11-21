@@ -9,6 +9,8 @@ export const translations: typeof enTranslations = {
     searchLabel: "Buscar en el catálogo de herramientas",
     searchAction: "Herramientas de búsqueda",
     clearSearch: "Búsqueda de herramientas claras",
+    overview: "Resumen del negocio",
+    allTools: "Todas las herramientas",
     findRecord: "Encontrar un registro",
     recordPlaceholder: "Nombre, correo electrónico o referencia",
     loadError: "El catálogo no podía cargar",

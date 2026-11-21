@@ -25,8 +25,9 @@ import {
 import { paginationField } from "next-vibe/unified-ui/widgets/containers/pagination/types";
 import { z } from "zod";
 
-import { CreditTransactionType } from "../enum";
+import { CreditTransactionType, CreditTransactionTypeOptions } from "../enum";
 import { scopedTranslation } from "../i18n";
+import { CREDITS_HISTORY_ALIAS } from "./constants";
 
 const CreditHistoryContainer = lazyWidget(() =>
   import("./widget").then((m) => ({ default: m.CreditHistoryContainer })),
@@ -39,6 +40,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["credits", "history"],
+  aliases: [CREDITS_HISTORY_ALIAS],
   title: "history.get.title" as const,
   titleShort: "history.get.titleShort" as const,
   description: "history.get.description" as const,
@@ -76,6 +78,106 @@ const { GET } = createEndpoint({
         includeInCacheKey: true,
       }),
 
+      // === ADMIN: look up a ledger by email, user ID or lead ID ===
+      target: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "history.get.target.label" as const,
+        description: "history.get.target.description" as const,
+        placeholder: "history.get.target.placeholder" as const,
+        hidden: true,
+        schema: z.string().trim().max(254).optional(),
+        includeInCacheKey: true,
+      }),
+
+      // === ADMIN: ledger filters (applied server-side for targeted views) ===
+      typeFilter: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "history.get.typeFilter.label" as const,
+        options: CreditTransactionTypeOptions,
+        hidden: true,
+        schema: z.enum(CreditTransactionType).optional(),
+        includeInCacheKey: true,
+      }),
+      from: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "history.get.from" as const,
+        hidden: true,
+        schema: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/)
+          .optional(),
+        includeInCacheKey: true,
+      }),
+      to: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "history.get.to" as const,
+        hidden: true,
+        schema: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/)
+          .optional(),
+        includeInCacheKey: true,
+      }),
+
+      // === CURRENT POOL BALANCE (admin targeted views) ===
+      currentBalance: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "history.get.currentBalance" as const,
+        schema: z
+          .object({ paid: z.number(), free: z.number() })
+          .nullable()
+          .optional(),
+      }),
+
+      // === RECENT PLATFORM ACTIVITY (admin without a target) ===
+      recent: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "history.get.recent" as const,
+        schema: z
+          .array(
+            z.object({
+              id: z.string(),
+              createdAt: dateSchema,
+              amount: z.coerce.number(),
+              label: z.string(),
+              detail: z.string().nullable(),
+              email: z.string().nullable(),
+              userId: z.string().nullable(),
+              leadId: z.string().nullable(),
+            }),
+          )
+          .optional(),
+      }),
+
+      // === PERIOD TOTALS (admin targeted views, same filters as the list) ===
+      totals: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "history.get.totals" as const,
+        schema: z
+          .object({ spent: z.number(), granted: z.number() })
+          .nullable()
+          .optional(),
+      }),
+
+      // === RESOLVED ADMIN TARGET (echo, so the view names who it shows) ===
+      resolvedTarget: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "history.get.resolvedTarget" as const,
+        schema: z
+          .object({
+            userId: z.string().nullable(),
+            leadId: z.string().nullable(),
+            email: z.string().nullable(),
+            isPartner: z.boolean().optional(),
+          })
+          .nullable()
+          .optional(),
+      }),
+
       // === TRANSACTION LIST ===
       transactions: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
@@ -102,6 +204,26 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               label: "history.get.type" as const,
               schema: z.string().optional(),
+            }),
+            label: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "history.get.type" as const,
+              schema: z.string().optional(),
+            }),
+            paymentId: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "history.get.payment" as const,
+              schema: z.string().nullable().optional(),
+            }),
+            typeKey: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "history.get.type" as const,
+              schema: z.string().optional(),
+            }),
+            detail: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "history.get.detail" as const,
+              schema: z.string().nullable().optional(),
             }),
             messageId: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -178,6 +300,13 @@ const { GET } = createEndpoint({
           limit: 50,
         },
       },
+      adminLookup: {
+        target: "customer@example.test",
+        paginationInfo: {
+          page: 1,
+          limit: 50,
+        },
+      },
       adminView: {
         targetLeadId: "123e4567-e89b-12d3-a456-426614174001",
         targetUserId: "123e4567-e89b-12d3-a456-426614174000",
@@ -203,6 +332,8 @@ const { GET } = createEndpoint({
             amount: -0.176985,
             balanceAfter: 2716.823015,
             type: CreditTransactionType.USAGE,
+            label: CreditTransactionType.USAGE,
+            detail: ChatModelId.GPT_5_MINI,
             messageId: "msg-423e4567-e89b-12d3-a456-426614174000",
             createdAt: "2026-11-18T14:00:00.000Z",
           },

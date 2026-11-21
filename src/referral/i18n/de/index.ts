@@ -169,6 +169,9 @@ export const translations: typeof enTranslations = {
       description: "Ihre Empfehlungsstatistiken erfolgreich abgerufen",
     },
     widget: {
+      adminNotice:
+        "Das sind deine persönlichen Empfehlungszahlen. Das gesamte Programm siehst du in der Empfehlungsübersicht.",
+      openOverview: "Empfehlungsübersicht öffnen",
       emptyMessage:
         "Noch keine Aktivität - teilen Sie Ihren Empfehlungslink, um zu verdienen",
     },
@@ -335,6 +338,11 @@ export const translations: typeof enTranslations = {
           label: "Statusfilter",
           description: "Nach Auszahlungsstatus filtern",
         },
+        currency: {
+          label: "Auszahlungsweg",
+          description: "Nach Auszahlungsweg filtern",
+          all: "Alle Wege",
+        },
         requestId: {
           label: "Anfrage-ID",
           description: "Kennung der Auszahlungsanfrage",
@@ -388,6 +396,31 @@ export const translations: typeof enTranslations = {
         reject: "Ablehnen",
         complete: "Abschließen",
         credits: "Credits",
+        partnerContext:
+          "Verdient {{confirmed}} bestätigt, {{pending}} in Wartezeit · ausgezahlt {{paid}}",
+        creditsLine: "{{credits}} verdiente Credits",
+        freeLine: "Frei nach offenen Anfragen: {{free}}",
+        overBalanceSingle:
+          "Diese Anfrage beträgt {{amount}}, bestätigt und unbezahlt sind nur {{available}}. Nicht freigeben.",
+        partnerCodes: "Codes: {{codes}} · geworbene Nutzer: {{referred}}",
+        partnerNoCodes: "Kein eigener Code · geworbene Nutzer: {{referred}}",
+        overBalance:
+          "{{count}} offene Anfragen über {{open}}, bestätigt und unbezahlt sind nur {{available}}. Nicht alle freigeben.",
+        possibleDuplicate:
+          "Mögliches Duplikat: {{count}} weitere offene Anfrage(n) mit gleichem Betrag und gleicher Wallet.",
+        headline: "{{value}} per {{currency}}",
+        overBalanceShort:
+          "Über dem bestätigten Guthaben (siehe erste Anfrage dieses Partners).",
+        approveOverBalance: "Trotzdem freigeben",
+        nextStep: {
+          failed:
+            "Die Überweisung ist fehlgeschlagen, es wurden keine Credits abgezogen. Der Partner kann eine neue Anfrage stellen.",
+          processing:
+            "Überweisung läuft. Sie wird von selbst abgeschlossen oder schlägt fehl, nichts zu tun.",
+          credits:
+            "Credit-Auszahlungen werden automatisch umgewandelt. Nichts zu tun.",
+        },
+        codeReport: "Code-Bericht",
       },
     },
   },
@@ -424,7 +457,8 @@ export const translations: typeof enTranslations = {
       totalEarned: "Gesamt verdient",
       available: "Verfügbar",
       locked: "Gesperrt",
-      credits: "Credits",
+      credits:
+        "Credit-Auszahlungen werden bei der Anfrage umgewandelt, eine offene hängt also fest. Ablehnen gibt die Einnahmen frei, der Partner kann neu anfragen.",
       readyForPayout: "bereit für Auszahlung",
       moreToUnlock: "mehr benötigt",
       pendingConfirmation: "ausstehende Bestätigung",

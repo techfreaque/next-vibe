@@ -26,6 +26,7 @@ import { z } from "zod";
 import {
   PayoutCurrency,
   PayoutCurrencyDB,
+  PayoutCurrencyOptions,
   PayoutStatus,
   PayoutStatusDB,
   PayoutStatusOptions,
@@ -53,7 +54,25 @@ const payoutExample = {
   rejectionReason: null,
   createdAt: "2026-11-18T15:20:00.000Z",
   processedAt: null,
+  partnerName: "MoeMoe AI",
+  duplicateCount: 0,
+  partnerCodes: ["moemoe"],
+  partner: {
+    confirmedCents: 12000,
+    pendingCents: 1600,
+    paidOutCents: 4000,
+    availableCents: 8000,
+    freeCents: 5495,
+    openCents: 2505,
+    openCount: 1,
+    referredUsers: 41,
+  },
 };
+
+const summaryExample = [
+  { status: PayoutStatus.PENDING, count: 1, amountCents: 2505 },
+  { status: PayoutStatus.APPROVED, count: 1, amountCents: 5030 },
+];
 
 /**
  * GET: list all payout requests
@@ -124,6 +143,25 @@ export const { GET } = createEndpoint({
         schema: z.enum(PayoutStatusDB).optional(),
         options: PayoutStatusOptions,
       }),
+      currency: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "admin.payouts.fields.currency.label" as const,
+        description: "admin.payouts.fields.currency.description" as const,
+        placeholder: "admin.payouts.fields.currency.all",
+        schema: z.enum(PayoutCurrencyDB).optional(),
+        options: PayoutCurrencyOptions,
+      }),
+      summary: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.array(
+          z.object({
+            status: z.enum(PayoutStatusDB),
+            count: z.coerce.number(),
+            amountCents: z.coerce.number(),
+          }),
+        ),
+      }),
       items: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.array(
@@ -139,6 +177,20 @@ export const { GET } = createEndpoint({
             rejectionReason: z.string().nullable(),
             createdAt: z.string(),
             processedAt: z.string().nullable(),
+            partnerName: z.string().nullable(),
+            /** Other open requests of the partner with the same amount, currency and wallet. */
+            duplicateCount: z.coerce.number(),
+            partnerCodes: z.array(z.string()),
+            partner: z.object({
+              confirmedCents: z.coerce.number(),
+              pendingCents: z.coerce.number(),
+              paidOutCents: z.coerce.number(),
+              availableCents: z.coerce.number(),
+              freeCents: z.coerce.number(),
+              openCents: z.coerce.number(),
+              openCount: z.coerce.number(),
+              referredUsers: z.coerce.number(),
+            }),
           }),
         ),
       }),
@@ -161,6 +213,7 @@ export const { GET } = createEndpoint({
     requests: {
       default: {},
       pending: { status: PayoutStatus.PENDING },
+      usdc: { currency: PayoutCurrency.USDC },
       approved: { status: PayoutStatus.APPROVED },
       empty: { search: "no-match@example.test" },
       secondPage: { page: 2, limit: 1 },
@@ -180,12 +233,14 @@ export const { GET } = createEndpoint({
             processedAt: "2026-11-18T08:00:00.000Z",
           },
         ],
+        summary: summaryExample,
         totalCount: 2,
         resultPage: 1,
         pageSize: 20,
       },
       pending: {
         items: [payoutExample],
+        summary: summaryExample,
         totalCount: 1,
         resultPage: 1,
         pageSize: 20,
@@ -202,11 +257,25 @@ export const { GET } = createEndpoint({
             processedAt: "2026-11-18T08:00:00.000Z",
           },
         ],
+        summary: summaryExample,
         totalCount: 1,
         resultPage: 1,
         pageSize: 20,
       },
-      empty: { items: [], totalCount: 0, resultPage: 1, pageSize: 20 },
+      usdc: {
+        items: [payoutExample],
+        summary: summaryExample,
+        totalCount: 1,
+        resultPage: 1,
+        pageSize: 20,
+      },
+      empty: {
+        items: [],
+        summary: [],
+        totalCount: 0,
+        resultPage: 1,
+        pageSize: 20,
+      },
       secondPage: {
         items: [
           {
@@ -218,6 +287,7 @@ export const { GET } = createEndpoint({
             processedAt: "2026-11-18T16:20:00.000Z",
           },
         ],
+        summary: summaryExample,
         totalCount: 2,
         resultPage: 2,
         pageSize: 1,

@@ -337,6 +337,12 @@ export const { GET } = createEndpoint({
         ),
       }),
 
+      // Size of the whole connected lead component (connectedLeads is capped)
+      connectedLeadsTotal: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.coerce.number(),
+      }),
+
       // Connected Users (user -> lead -> lead -> user)
       connectedUsers: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -547,6 +553,7 @@ export const { GET } = createEndpoint({
           },
         ],
         connectedUsers: [],
+        connectedLeadsTotal: 1,
       },
     },
   },

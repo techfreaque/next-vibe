@@ -18,6 +18,7 @@ import {
   type LeadsTranslationKey,
   scopedTranslation as leadsScopedTranslation,
 } from "next-vibe/identity/lead/i18n";
+import type { AnalyticsFilterChip } from "next-vibe/ui/components/analytics";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { EmptyBlock } from "next-vibe/ui/components/empty-block";
@@ -34,6 +35,7 @@ import { Search } from "next-vibe/ui/components/icons/Search";
 import { Trash2 } from "next-vibe/ui/components/icons/Trash2";
 import { Upload } from "next-vibe/ui/components/icons/Upload";
 import { Users } from "next-vibe/ui/components/icons/Users";
+import { X } from "next-vibe/ui/components/icons/X";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
 import { SectionGroup } from "next-vibe/ui/components/section-group";
 import { Span } from "next-vibe/ui/components/span";
@@ -58,6 +60,14 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useMemo } from "react";
 
+import { BotFamily, FunnelReach } from "../analytics/enum";
+import type { LeadDrillFilters } from "../analytics/filters";
+import {
+  dimensionValueLabel,
+  segmentChips,
+  SegmentFilterPanel,
+  useLeadAnalyticsT,
+} from "../analytics/widget-parts";
 import { AcquisitionSourceFilter } from "../growth/acquisition";
 import { AcquisitionFilterInputs } from "../growth/acquisition-filter-inputs";
 import type definition from "./definition";
@@ -144,6 +154,8 @@ interface LeadRowProps {
   onDelete: (lead: Lead) => void;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
   leadsT: ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
+  st: ReturnType<typeof useLeadAnalyticsT>;
+  isDrill: boolean;
   isTouch: boolean;
   isPickerMode: boolean;
 }
@@ -156,43 +168,32 @@ function LeadRow({
   onDelete,
   t,
   leadsT,
+  st,
+  isDrill,
   isTouch,
   isPickerMode,
 }: LeadRowProps): React.JSX.Element {
   const isConverted = Boolean(lead.convertedUserId);
   const acquisition = lead.acquisition;
-  const acquisitionColumns = acquisition && [
-    { label: t("acquisition.fields.type"), value: t(acquisition.sourceType) },
-    { label: t("acquisition.fields.refCode"), value: acquisition.refCode },
-    {
-      label: t("acquisition.fields.referrerHost"),
-      value: acquisition.referrerHost,
-    },
-    { label: t("acquisition.fields.source"), value: acquisition.source },
-    { label: t("acquisition.fields.medium"), value: acquisition.medium },
-    { label: t("acquisition.fields.campaign"), value: acquisition.campaign },
-    {
-      label: t("acquisition.metrics.visits"),
-      value: acquisition.visits.toLocaleString(locale),
-    },
-    {
-      label: t("acquisition.metrics.signups"),
-      value: acquisition.signups.toLocaleString(locale),
-    },
-    {
-      label: t("acquisition.metrics.firstChats"),
-      value: acquisition.firstChats.toLocaleString(locale),
-    },
-    {
-      label: t("acquisition.metrics.payers"),
-      value: acquisition.payers.toLocaleString(locale),
-    },
-    {
-      label: t("acquisition.metrics.revenue"),
-      value: formatCurrency(acquisition.revenue, acquisition.currency, locale),
-    },
-  ];
-
+  const triage = lead.triage;
+  const isBot = triage ? triage.botFamily !== BotFamily.HUMAN : false;
+  const origin = triage
+    ? [
+        dimensionValueLabel(triage.channelType, st),
+        triage.channel && triage.channel !== "direct" ? triage.channel : null,
+        triage.source,
+        triage.referrerHost,
+        triage.landingPath,
+      ].filter((part): part is string => Boolean(part))
+    : [];
+  const client = triage
+    ? [
+        dimensionValueLabel(triage.device, st),
+        triage.browser,
+        triage.os,
+        triage.ipPrefix,
+      ].filter((part): part is string => Boolean(part))
+    : [];
   return (
     <Div className="group relative flex min-w-0 flex-wrap items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors">
       {/* Avatar / Initials */}
@@ -219,8 +220,21 @@ function LeadRow({
               variant={STATUS_VARIANT[lead.status] ?? "default"}
             />
           )}
-          {isConverted && (
+          {triage && (
+            <StatusPill
+              status={dimensionValueLabel(triage.botFamily, st)}
+              variant={isBot ? "danger" : "default"}
+            />
+          )}
+          {triage?.paid ? (
+            <StatusPill status={t("widget.paid")} variant="success" />
+          ) : triage?.signedUp ? (
+            <StatusPill status={t("widget.signedUp")} variant="success" />
+          ) : isConverted ? (
             <StatusPill status={t("widget.converted")} variant="warning" />
+          ) : null}
+          {triage?.chatted && !triage.signedUp && (
+            <StatusPill status={t("widget.chatted")} variant="info" />
           )}
           {lead.linkedLeadsCount > 0 && (
             <StatusPill
@@ -231,7 +245,7 @@ function LeadRow({
           {lead.hasLinkedUser && (
             <StatusPill status={t("widget.hasLinkedUser")} variant="info" />
           )}
-          {lead.currentCampaignStage && (
+          {!isDrill && lead.currentCampaignStage && (
             <StatusPill
               status={leadsT(lead.currentCampaignStage)}
               variant={
@@ -251,24 +265,50 @@ function LeadRow({
             <Span className="flex-shrink-0">{leadsT(lead.source)}</Span>
           )}
         </Div>
-        {lead.createdAt && (
-          <Div className="text-xs text-muted-foreground mt-0.5">
-            {formatSimpleDate(lead.createdAt, locale)}
+        {origin.length > 0 && (
+          <Div className="mt-0.5 truncate text-xs text-foreground/80">
+            {origin.join(" · ")}
           </Div>
         )}
+        <Div className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-muted-foreground tabular-nums">
+          {lead.createdAt && (
+            <Span>
+              {isDrill
+                ? `${new Date(lead.createdAt).toISOString().slice(0, 16).replace("T", " ")} UTC`
+                : formatSimpleDate(lead.createdAt, locale)}
+            </Span>
+          )}
+          {client.length > 0 && (
+            <Span className="truncate">{client.join(" · ")}</Span>
+          )}
+        </Div>
       </Div>
 
       {/* Stats */}
-      <Div className="hidden @md:flex flex-col items-end gap-1 flex-shrink-0 text-xs text-muted-foreground">
-        {lead.emailsSent !== null && lead.emailsSent !== undefined && (
-          <Span>
-            {t("widget.emailsSent", {
-              count: lead.emailsSent,
-            })}
+      <Div className="hidden @md:flex flex-col items-end gap-1 flex-shrink-0 text-xs text-muted-foreground tabular-nums">
+        {acquisition && acquisition.revenue > 0 && (
+          <Span className="font-medium text-foreground">
+            {formatCurrency(acquisition.revenue, acquisition.currency, locale)}
           </Span>
         )}
+        {acquisition && acquisition.visits > 0 && (
+          <Span>
+            {st("leadAnalytics.metrics.visits")}:{" "}
+            {acquisition.visits.toLocaleString(locale)}
+          </Span>
+        )}
+        {!isDrill &&
+          lead.emailsSent !== null &&
+          lead.emailsSent !== undefined && (
+            <Span>
+              {t("widget.emailsSent", {
+                count: lead.emailsSent,
+              })}
+            </Span>
+          )}
         {lead.emailsOpened !== null &&
           lead.emailsOpened !== undefined &&
+          !isDrill &&
           lead.emailsSent !== null &&
           lead.emailsSent !== undefined && (
             <Span>
@@ -324,19 +364,76 @@ function LeadRow({
           </Button>
         </Div>
       )}
-      {!isPickerMode && acquisitionColumns && (
-        <Div className="grid w-full grid-cols-2 gap-x-4 gap-y-2 border-t pt-2 @sm:grid-cols-3 @lg:grid-cols-6">
-          {acquisitionColumns.map(({ label, value }) => (
-            <Div key={label} className="min-w-0 text-xs">
-              <Span className="block text-muted-foreground">{label}</Span>
-              <Span className="block break-words font-medium">
-                {value ?? "·"}
-              </Span>
-            </Div>
-          ))}
-        </Div>
-      )}
     </Div>
+  );
+}
+
+/** Dense one-line row for report drill-downs: who, what agent, from where. */
+function DrillRow({
+  lead,
+  onView,
+  t,
+  st,
+}: {
+  lead: Lead;
+  onView: (lead: Lead) => void;
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  st: ReturnType<typeof useLeadAnalyticsT>;
+}): React.JSX.Element {
+  const triage = lead.triage;
+  const isBot = triage ? triage.botFamily !== BotFamily.HUMAN : false;
+  const origin = triage
+    ? [
+        dimensionValueLabel(triage.channelType, st),
+        triage.channel && triage.channel !== "direct" ? triage.channel : null,
+        triage.referrerHost,
+        triage.landingPath,
+      ].filter((part): part is string => Boolean(part))
+    : [];
+  const client = triage
+    ? [
+        dimensionValueLabel(triage.device, st),
+        triage.browser,
+        triage.ipPrefix,
+      ].filter((part): part is string => Boolean(part))
+    : [];
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      onClick={() => onView(lead)}
+      className="grid h-auto w-full grid-cols-1 items-center gap-1 rounded-md border px-3 py-2 text-left text-xs font-normal @3xl:grid-cols-[minmax(0,2.2fr)_minmax(0,1.3fr)_minmax(0,1.6fr)_minmax(0,1.4fr)_minmax(0,1fr)] @3xl:gap-3"
+    >
+      <Span className="flex min-w-0 items-center gap-1.5">
+        <Span className="truncate text-sm font-medium text-foreground">
+          {lead.email ?? lead.businessName ?? lead.id.slice(0, 8)}
+        </Span>
+        {triage?.paid ? (
+          <StatusPill status={t("widget.paid")} variant="success" />
+        ) : triage?.signedUp ? (
+          <StatusPill status={t("widget.signedUp")} variant="success" />
+        ) : triage?.chatted ? (
+          <StatusPill status={t("widget.chatted")} variant="info" />
+        ) : null}
+      </Span>
+      <Span className="min-w-0">
+        {triage && (
+          <StatusPill
+            status={dimensionValueLabel(triage.botFamily, st)}
+            variant={isBot ? "danger" : "default"}
+          />
+        )}
+      </Span>
+      <Span className="truncate text-muted-foreground">
+        {origin.join(" · ")}
+      </Span>
+      <Span className="truncate text-muted-foreground">
+        {client.join(" · ")}
+      </Span>
+      <Span className="tabular-nums text-muted-foreground @3xl:text-right">
+        {`${new Date(lead.createdAt).toISOString().slice(0, 16).replace("T", " ")} UTC`}
+      </Span>
+    </Button>
   );
 }
 
@@ -349,6 +446,7 @@ export function LeadsListContainer({
   const isTouch = useTouchDevice();
   const t = useWidgetTranslation<typeof definition.GET>();
   const leadsT = leadsScopedTranslation.scopedT(locale).t;
+  const st = useLeadAnalyticsT(locale);
   const form = useWidgetForm<typeof definition.GET>();
   const navigation = useWidgetNavigation();
   const widgetData = useWidgetValue<typeof definition.GET>();
@@ -396,6 +494,14 @@ export function LeadsListContainer({
     }
     return counts;
   }, [serverCountsByStatus, leads]);
+
+  // "All" tab: every lead matching the non-status filters (not just this page).
+  const allStatusesCount = serverCountsByStatus
+    ? Object.values(serverCountsByStatus).reduce(
+        (total, count) => total + count,
+        0,
+      )
+    : leads.length;
 
   const handleToggleStatus = useCallback(
     (status: string): void => {
@@ -571,6 +677,52 @@ export function LeadsListContainer({
   const { sourceType, ...acquisitionFilters } =
     form.watch("acquisitionFilters") ?? {};
   const activeSources = form.watch("statusFilters.source") ?? [];
+
+  const drillValues: LeadDrillFilters = {
+    traffic: form.watch("traffic"),
+    botFamily: form.watch("botFamily"),
+    channelType: form.watch("channelType"),
+    channel: form.watch("channel"),
+    source: form.watch("source"),
+    medium: form.watch("medium"),
+    campaign: form.watch("campaign"),
+    referrerHost: form.watch("referrerHost"),
+    landingPath: form.watch("landingPath"),
+    refCode: form.watch("refCode"),
+    country: form.watch("country"),
+    device: form.watch("device"),
+    browser: form.watch("browser"),
+    os: form.watch("os"),
+    ipPrefix: form.watch("ipPrefix"),
+    uaFingerprint: form.watch("uaFingerprint"),
+    createdFrom: form.watch("createdFrom"),
+    createdTo: form.watch("createdTo"),
+    reached: form.watch("reached"),
+    reachedFrom: form.watch("reachedFrom"),
+    reachedTo: form.watch("reachedTo"),
+  };
+  const removeDrill = (key: DrillKey): void => {
+    form.setValue(key, undefined, { shouldDirty: true });
+    if (key === "createdFrom") {
+      form.setValue("createdTo", undefined, { shouldDirty: true });
+    }
+    if (key === "reached") {
+      form.setValue("reachedFrom", undefined, { shouldDirty: true });
+      form.setValue("reachedTo", undefined, { shouldDirty: true });
+    }
+    handlePageChange(1);
+  };
+  const drillChips = [
+    ...segmentChips(drillValues, st, removeDrill),
+    ...drillRangeChips(drillValues, st, t, removeDrill),
+  ];
+  const clearDrill = (): void => {
+    for (const key of DRILL_KEYS) {
+      form.setValue(key, undefined, { shouldDirty: true });
+    }
+    handlePageChange(1);
+  };
+
   const hasActiveFilters = Boolean(
     (sourceType && sourceType !== AcquisitionSourceFilter.ALL) ||
     Object.values(acquisitionFilters).some(Boolean) ||
@@ -579,7 +731,8 @@ export function LeadsListContainer({
     form.watch("statusFilters.search")?.trim() ||
     form.watch("statusFilters.currentCampaignStage")?.length ||
     form.watch("locationFilters.country")?.length ||
-    form.watch("locationFilters.language")?.length,
+    form.watch("locationFilters.language")?.length ||
+    drillChips.length,
   );
 
   const clearFilters = (): void => {
@@ -592,6 +745,9 @@ export function LeadsListContainer({
     form.setValue("locationFilters.country", [], { shouldDirty: true });
     form.setValue("locationFilters.language", [], { shouldDirty: true });
     form.setValue("acquisitionFilters", {}, { shouldDirty: true });
+    for (const key of DRILL_KEYS) {
+      form.setValue(key, undefined, { shouldDirty: true });
+    }
     handlePageChange(1);
   };
 
@@ -721,7 +877,7 @@ export function LeadsListContainer({
             const count =
               tab.value !== null
                 ? (statusCounts[tab.value] ?? 0)
-                : leads.length;
+                : allStatusesCount;
             return (
               <Button
                 key={tab.value ?? "all"}
@@ -771,7 +927,7 @@ export function LeadsListContainer({
           fieldName="statusFilters.search"
           field={children.statusFilters.children.search}
         />
-        {!isPickerMode && (
+        {!isPickerMode && drillChips.length === 0 && (
           <>
             <MultiSelectFieldWidget
               fieldName="statusFilters.source"
@@ -801,59 +957,133 @@ export function LeadsListContainer({
         )}
       </Div>
 
-      {!isPickerMode && (
-        <Div className="px-4 py-2">
-          <SectionGroup title={t("acquisition.title")}>
-            <AcquisitionFilterInputs />
+      {!isPickerMode && drillChips.length > 0 && (
+        <Div className="px-4 pt-2">
+          <Div className="flex flex-wrap items-center gap-1.5 rounded-md border border-dashed bg-muted/30 px-2 py-1.5">
+            <Span className="text-xs font-medium text-muted-foreground">
+              {t("widget.drillTitle")}
+            </Span>
+            {drillChips.map((chip) => (
+              <Button
+                key={chip.key}
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={chip.onRemove}
+                className="h-6 gap-1 rounded-full px-2 text-xs"
+                title={t("widget.clearDrill")}
+              >
+                <Span className="text-muted-foreground">{chip.label}:</Span>
+                <Span className="max-w-[220px] truncate font-medium">
+                  {chip.value}
+                </Span>
+                <X className="h-3 w-3" />
+              </Button>
+            ))}
             <Button
               type="button"
-              variant="secondary"
+              variant="ghost"
               size="sm"
-              disabled={isFetching}
-              onClick={() => handlePageChange(1)}
+              onClick={clearDrill}
+              className="h-6 px-2 text-xs"
             >
-              {t("acquisition.apply")}
+              {t("widget.clearDrill")}
             </Button>
+          </Div>
+          {widgetData?.drillSummary && (
+            <Div className="px-1 pt-1.5 text-xs tabular-nums text-muted-foreground">
+              {t("widget.drillSummary", {
+                total: widgetData.drillSummary.total.toLocaleString(locale),
+                humans: widgetData.drillSummary.humans.toLocaleString(locale),
+                signups: widgetData.drillSummary.signups.toLocaleString(locale),
+                paid: widgetData.drillSummary.paid.toLocaleString(locale),
+                agents: widgetData.drillSummary.agents.toLocaleString(locale),
+              })}
+            </Div>
+          )}
+        </Div>
+      )}
+
+      {!isPickerMode && (
+        <Div className="flex flex-col gap-2 px-4 py-2">
+          <SectionGroup
+            title={t("widget.analyticsFilters")}
+            collapsible
+            defaultOpen={false}
+          >
+            <SegmentFilterPanel
+              onApply={() => handlePageChange(1)}
+              applyLabel={t("widget.apply")}
+            />
+            <Div className="mt-3 grid grid-cols-1 gap-3 @sm:grid-cols-2 @lg:grid-cols-4">
+              <TextFieldWidget
+                fieldName="createdFrom"
+                field={children.createdFrom}
+              />
+              <TextFieldWidget
+                fieldName="createdTo"
+                field={children.createdTo}
+              />
+              <SelectFieldWidget fieldName="reached" field={children.reached} />
+            </Div>
+            <Div className="mt-4 border-t pt-3">
+              <Span className="mb-2 block text-xs font-medium text-muted-foreground">
+                {t("acquisition.title")}
+              </Span>
+              <AcquisitionFilterInputs />
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={isFetching}
+                onClick={() => handlePageChange(1)}
+              >
+                {t("acquisition.apply")}
+              </Button>
+            </Div>
           </SectionGroup>
         </Div>
       )}
 
       {/* Status breakdown subtitle — full mode only */}
-      {!isPickerMode && !isLoading && leads.length > 0 && (
-        <Div className="px-4 pb-1 flex items-center gap-3 flex-wrap">
-          {objectEntries(statusCounts)
-            .toSorted(([, a], [, b]) => b - a)
-            .slice(0, 5)
-            .map(([status, count]) => {
-              const filterKey = status.replace(
-                "enums.leadStatus.",
-                "enums.leadStatusFilter.",
-              ) as (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter];
-              return (
-                <Button
-                  key={status}
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleToggleStatus(status)}
-                  className={cn(
-                    "text-xs text-muted-foreground hover:text-foreground transition-colors",
-                    activeStatuses.includes(filterKey) &&
-                      "text-foreground font-medium",
-                  )}
-                >
-                  <Span
+      {!isPickerMode &&
+        !isLoading &&
+        leads.length > 0 &&
+        drillChips.length === 0 && (
+          <Div className="px-4 pb-1 flex items-center gap-3 flex-wrap">
+            {objectEntries(statusCounts)
+              .toSorted(([, a], [, b]) => b - a)
+              .slice(0, 5)
+              .map(([status, count]) => {
+                const filterKey = status.replace(
+                  "enums.leadStatus.",
+                  "enums.leadStatusFilter.",
+                ) as (typeof LeadStatusFilter)[keyof typeof LeadStatusFilter];
+                return (
+                  <Button
+                    key={status}
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleToggleStatus(status)}
                     className={cn(
-                      "inline-block w-2 h-2 rounded-full mr-1",
-                      STATUS_DOT_COLORS[status] ?? "bg-gray-400",
+                      "text-xs text-muted-foreground hover:text-foreground transition-colors",
+                      activeStatuses.includes(filterKey) &&
+                        "text-foreground font-medium",
                     )}
-                  />
-                  {leadsT(status)}: {count}
-                </Button>
-              );
-            })}
-        </Div>
-      )}
+                  >
+                    <Span
+                      className={cn(
+                        "inline-block w-2 h-2 rounded-full mr-1",
+                        STATUS_DOT_COLORS[status] ?? "bg-gray-400",
+                      )}
+                    />
+                    {leadsT(status)}: {count}
+                  </Button>
+                );
+              })}
+          </Div>
+        )}
 
       {/* Lead list */}
       <Div
@@ -872,20 +1102,41 @@ export function LeadsListContainer({
           <LoadingBlock />
         ) : leads.length > 0 ? (
           <Div className="flex flex-col gap-2">
-            {leads.map((lead) => (
-              <LeadRow
-                key={lead.id}
-                lead={lead}
-                locale={locale}
-                onView={handleView}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                t={t}
-                leadsT={leadsT}
-                isTouch={isTouch}
-                isPickerMode={isPickerMode}
-              />
-            ))}
+            {drillChips.length > 0 && (
+              <Div className="hidden @3xl:grid grid-cols-[minmax(0,2.2fr)_minmax(0,1.3fr)_minmax(0,1.6fr)_minmax(0,1.4fr)_minmax(0,1fr)] gap-3 border-b px-3 pb-1.5 text-xs font-medium text-muted-foreground">
+                <Span>{t("widget.colLead")}</Span>
+                <Span>{t("widget.colAgent")}</Span>
+                <Span>{t("widget.colOrigin")}</Span>
+                <Span>{t("widget.colClient")}</Span>
+                <Span className="text-right">{t("widget.colCreated")}</Span>
+              </Div>
+            )}
+            {drillChips.length > 0
+              ? leads.map((lead) => (
+                  <DrillRow
+                    key={lead.id}
+                    lead={lead}
+                    onView={handleView}
+                    t={t}
+                    st={st}
+                  />
+                ))
+              : leads.map((lead) => (
+                  <LeadRow
+                    key={lead.id}
+                    lead={lead}
+                    locale={locale}
+                    onView={handleView}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    t={t}
+                    leadsT={leadsT}
+                    st={st}
+                    isDrill={drillChips.length > 0}
+                    isTouch={isTouch}
+                    isPickerMode={isPickerMode}
+                  />
+                ))}
           </Div>
         ) : (
           <EmptyBlock
@@ -940,4 +1191,62 @@ export function LeadsListContainer({
       )}
     </WidgetShell>
   );
+}
+
+const DRILL_KEYS = [
+  "traffic",
+  "botFamily",
+  "channelType",
+  "channel",
+  "source",
+  "medium",
+  "campaign",
+  "referrerHost",
+  "landingPath",
+  "refCode",
+  "country",
+  "device",
+  "browser",
+  "os",
+  "ipPrefix",
+  "uaFingerprint",
+  "createdFrom",
+  "createdTo",
+  "reached",
+  "reachedFrom",
+  "reachedTo",
+] as const;
+
+type DrillKey = (typeof DRILL_KEYS)[number];
+
+function range(from?: string, to?: string): string {
+  return from && to && from !== to ? `${from} → ${to}` : (from ?? to ?? "");
+}
+
+/** Chips for the creation window and the reached step (with its window). */
+function drillRangeChips(
+  values: LeadDrillFilters,
+  st: ReturnType<typeof useLeadAnalyticsT>,
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>,
+  onRemove: (key: DrillKey) => void,
+): AnalyticsFilterChip[] {
+  const chips: AnalyticsFilterChip[] = [];
+  if (values.createdFrom || values.createdTo) {
+    chips.push({
+      key: "createdFrom",
+      label: t("widget.drillCreated"),
+      value: range(values.createdFrom, values.createdTo),
+      onRemove: () => onRemove("createdFrom"),
+    });
+  }
+  if (values.reached && values.reached !== FunnelReach.ANY) {
+    const when = range(values.reachedFrom, values.reachedTo);
+    chips.push({
+      key: "reached",
+      label: t("widget.drillReached"),
+      value: when ? `${st(values.reached)} (${when})` : st(values.reached),
+      onRemove: () => onRemove("reached"),
+    });
+  }
+  return chips;
 }
