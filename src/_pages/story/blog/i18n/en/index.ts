@@ -14,6 +14,34 @@ export const translations = {
     },
   },
   posts: {
+    noGpu: {
+      title: "Uncensored LLM online. No GPU. No install.",
+      category: "Model Guide",
+      excerpt:
+        "What local uncensored models really need in VRAM, when local still wins, and every uncensored model you can run in a browser tab, with context and price per message.",
+      readTime: "8 min read",
+    },
+    uncensoredApi: {
+      title: "Uncensored LLM API. Your SDK. No refusal reflex.",
+      category: "Developer Guide",
+      excerpt:
+        "Abliterated and uncensored models over OpenAI and Anthropic compatible endpoints. Model ids, prices, a working curl and Python example, limits and the 18+ step.",
+      readTime: "8 min read",
+    },
+    jailbreak: {
+      title: "ChatGPT jailbreaks keep breaking. Stop jailbreaking.",
+      category: "Model Guide",
+      excerpt:
+        "Why DAN and every prompt after it fails, what a jailbreak really costs you, and the uncensored models that answer without one. With a side-by-side test.",
+      readTime: "7 min read",
+    },
+    veniceAlternatives: {
+      title: "Venice AI alternatives. Private, uncensored, checked.",
+      category: "Comparison",
+      excerpt:
+        "NanoGPT, uncensored.ai, FreedomGPT, Gab AI, OpenRouter, LM Studio and us, compared on their own pricing, privacy and filter pages. Where Venice still wins.",
+      readTime: "9 min read",
+    },
     characterAiAlternatives: {
       title:
         "Character.AI alternatives without the filter. Checked, not guessed.",

@@ -189,6 +189,7 @@ import { Route as LocaleStoryBlogAiRoleplayWithoutFilterIndexRouteImport } from 
 import { Route as LocaleStoryBlogAiVideoGeneratorsComparedIndexRouteImport } from './routes/$locale.story.blog.ai-video-generators-compared.index'
 import { Route as LocaleStoryBlogCharacterAiAlternativesIndexRouteImport } from './routes/$locale.story.blog.character-ai-alternatives.index'
 import { Route as LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRouteImport } from './routes/$locale.story.blog.chatgpt-alternative-without-filters.index'
+import { Route as LocaleStoryBlogChatgptJailbreakAlternativeIndexRouteImport } from './routes/$locale.story.blog.chatgpt-jailbreak-alternative.index'
 import { Route as LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport } from './routes/$locale.story.blog.dead-trading-bot-to-monitoring-engine.index'
 import { Route as LocaleStoryBlogE2eTestsFoundRealBugsIndexRouteImport } from './routes/$locale.story.blog.e2e-tests-found-real-bugs.index'
 import { Route as LocaleStoryBlogHermesTheaTwoWayRemoteIndexRouteImport } from './routes/$locale.story.blog.hermes-thea-two-way-remote.index'
@@ -204,7 +205,10 @@ import { Route as LocaleStoryBlogSkillSharingEconomyIndexRouteImport } from './r
 import { Route as LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRouteImport } from './routes/$locale.story.blog.type-checker-made-ai-stop-lying.index'
 import { Route as LocaleStoryBlogUnbottledApiInCodingToolsIndexRouteImport } from './routes/$locale.story.blog.unbottled-api-in-coding-tools.index'
 import { Route as LocaleStoryBlogUncensoredAiImageGeneratorIndexRouteImport } from './routes/$locale.story.blog.uncensored-ai-image-generator.index'
+import { Route as LocaleStoryBlogUncensoredLlmApiIndexRouteImport } from './routes/$locale.story.blog.uncensored-llm-api.index'
+import { Route as LocaleStoryBlogUncensoredLlmWithoutGpuIndexRouteImport } from './routes/$locale.story.blog.uncensored-llm-without-gpu.index'
 import { Route as LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRouteImport } from './routes/$locale.story.blog.uncensored-models-what-each-is-good-at.index'
+import { Route as LocaleStoryBlogVeniceAiAlternativesIndexRouteImport } from './routes/$locale.story.blog.venice-ai-alternatives.index'
 import { Route as LocaleStoryBlogWhatsNewApril2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-april-2026.index'
 import { Route as LocaleStoryBlogWhatsNewMay2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-may-2026.index'
 import { Route as LocaleStoryBlogWhatsNewNovember2026IndexRouteImport } from './routes/$locale.story.blog.whats-new-november-2026.index'
@@ -1717,6 +1721,12 @@ const LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute =
     path: '/blog/chatgpt-alternative-without-filters/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
+const LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute =
+  LocaleStoryBlogChatgptJailbreakAlternativeIndexRouteImport.update({
+    id: '/blog/chatgpt-jailbreak-alternative/',
+    path: '/blog/chatgpt-jailbreak-alternative/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute =
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport.update({
     id: '/blog/dead-trading-bot-to-monitoring-engine/',
@@ -1807,10 +1817,28 @@ const LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute =
     path: '/blog/uncensored-ai-image-generator/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
+const LocaleStoryBlogUncensoredLlmApiIndexRoute =
+  LocaleStoryBlogUncensoredLlmApiIndexRouteImport.update({
+    id: '/blog/uncensored-llm-api/',
+    path: '/blog/uncensored-llm-api/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogUncensoredLlmWithoutGpuIndexRoute =
+  LocaleStoryBlogUncensoredLlmWithoutGpuIndexRouteImport.update({
+    id: '/blog/uncensored-llm-without-gpu/',
+    path: '/blog/uncensored-llm-without-gpu/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute =
   LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRouteImport.update({
     id: '/blog/uncensored-models-what-each-is-good-at/',
     path: '/blog/uncensored-models-what-each-is-good-at/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogVeniceAiAlternativesIndexRoute =
+  LocaleStoryBlogVeniceAiAlternativesIndexRouteImport.update({
+    id: '/blog/venice-ai-alternatives/',
+    path: '/blog/venice-ai-alternatives/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogWhatsNewApril2026IndexRoute =
@@ -5410,6 +5438,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/ai-video-generators-compared/': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   '/$locale/story/blog/character-ai-alternatives/': typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters/': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
+  '/$locale/story/blog/chatgpt-jailbreak-alternative/': typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
   '/$locale/story/blog/hermes-thea-two-way-remote/': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
@@ -5425,7 +5454,10 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/type-checker-made-ai-stop-lying/': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   '/$locale/story/blog/unbottled-api-in-coding-tools/': typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
   '/$locale/story/blog/uncensored-ai-image-generator/': typeof LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute
+  '/$locale/story/blog/uncensored-llm-api/': typeof LocaleStoryBlogUncensoredLlmApiIndexRoute
+  '/$locale/story/blog/uncensored-llm-without-gpu/': typeof LocaleStoryBlogUncensoredLlmWithoutGpuIndexRoute
   '/$locale/story/blog/uncensored-models-what-each-is-good-at/': typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
+  '/$locale/story/blog/venice-ai-alternatives/': typeof LocaleStoryBlogVeniceAiAlternativesIndexRoute
   '/$locale/story/blog/whats-new-april-2026/': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026/': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
   '/$locale/story/blog/whats-new-november-2026/': typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
@@ -6125,6 +6157,7 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/ai-video-generators-compared': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   '/$locale/story/blog/character-ai-alternatives': typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
+  '/$locale/story/blog/chatgpt-jailbreak-alternative': typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
   '/$locale/story/blog/hermes-thea-two-way-remote': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
@@ -6140,7 +6173,10 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/type-checker-made-ai-stop-lying': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   '/$locale/story/blog/unbottled-api-in-coding-tools': typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
   '/$locale/story/blog/uncensored-ai-image-generator': typeof LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute
+  '/$locale/story/blog/uncensored-llm-api': typeof LocaleStoryBlogUncensoredLlmApiIndexRoute
+  '/$locale/story/blog/uncensored-llm-without-gpu': typeof LocaleStoryBlogUncensoredLlmWithoutGpuIndexRoute
   '/$locale/story/blog/uncensored-models-what-each-is-good-at': typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
+  '/$locale/story/blog/venice-ai-alternatives': typeof LocaleStoryBlogVeniceAiAlternativesIndexRoute
   '/$locale/story/blog/whats-new-april-2026': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
   '/$locale/story/blog/whats-new-november-2026': typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
@@ -6849,6 +6885,7 @@ export interface FileRoutesById {
   '/$locale/story/blog/ai-video-generators-compared/': typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   '/$locale/story/blog/character-ai-alternatives/': typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters/': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
+  '/$locale/story/blog/chatgpt-jailbreak-alternative/': typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
   '/$locale/story/blog/hermes-thea-two-way-remote/': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
@@ -6864,7 +6901,10 @@ export interface FileRoutesById {
   '/$locale/story/blog/type-checker-made-ai-stop-lying/': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   '/$locale/story/blog/unbottled-api-in-coding-tools/': typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
   '/$locale/story/blog/uncensored-ai-image-generator/': typeof LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute
+  '/$locale/story/blog/uncensored-llm-api/': typeof LocaleStoryBlogUncensoredLlmApiIndexRoute
+  '/$locale/story/blog/uncensored-llm-without-gpu/': typeof LocaleStoryBlogUncensoredLlmWithoutGpuIndexRoute
   '/$locale/story/blog/uncensored-models-what-each-is-good-at/': typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
+  '/$locale/story/blog/venice-ai-alternatives/': typeof LocaleStoryBlogVeniceAiAlternativesIndexRoute
   '/$locale/story/blog/whats-new-april-2026/': typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   '/$locale/story/blog/whats-new-may-2026/': typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
   '/$locale/story/blog/whats-new-november-2026/': typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
@@ -7573,6 +7613,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/ai-video-generators-compared/'
     | '/$locale/story/blog/character-ai-alternatives/'
     | '/$locale/story/blog/chatgpt-alternative-without-filters/'
+    | '/$locale/story/blog/chatgpt-jailbreak-alternative/'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
     | '/$locale/story/blog/e2e-tests-found-real-bugs/'
     | '/$locale/story/blog/hermes-thea-two-way-remote/'
@@ -7588,7 +7629,10 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/type-checker-made-ai-stop-lying/'
     | '/$locale/story/blog/unbottled-api-in-coding-tools/'
     | '/$locale/story/blog/uncensored-ai-image-generator/'
+    | '/$locale/story/blog/uncensored-llm-api/'
+    | '/$locale/story/blog/uncensored-llm-without-gpu/'
     | '/$locale/story/blog/uncensored-models-what-each-is-good-at/'
+    | '/$locale/story/blog/venice-ai-alternatives/'
     | '/$locale/story/blog/whats-new-april-2026/'
     | '/$locale/story/blog/whats-new-may-2026/'
     | '/$locale/story/blog/whats-new-november-2026/'
@@ -8288,6 +8332,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/ai-video-generators-compared'
     | '/$locale/story/blog/character-ai-alternatives'
     | '/$locale/story/blog/chatgpt-alternative-without-filters'
+    | '/$locale/story/blog/chatgpt-jailbreak-alternative'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine'
     | '/$locale/story/blog/e2e-tests-found-real-bugs'
     | '/$locale/story/blog/hermes-thea-two-way-remote'
@@ -8303,7 +8348,10 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/type-checker-made-ai-stop-lying'
     | '/$locale/story/blog/unbottled-api-in-coding-tools'
     | '/$locale/story/blog/uncensored-ai-image-generator'
+    | '/$locale/story/blog/uncensored-llm-api'
+    | '/$locale/story/blog/uncensored-llm-without-gpu'
     | '/$locale/story/blog/uncensored-models-what-each-is-good-at'
+    | '/$locale/story/blog/venice-ai-alternatives'
     | '/$locale/story/blog/whats-new-april-2026'
     | '/$locale/story/blog/whats-new-may-2026'
     | '/$locale/story/blog/whats-new-november-2026'
@@ -9011,6 +9059,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/ai-video-generators-compared/'
     | '/$locale/story/blog/character-ai-alternatives/'
     | '/$locale/story/blog/chatgpt-alternative-without-filters/'
+    | '/$locale/story/blog/chatgpt-jailbreak-alternative/'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
     | '/$locale/story/blog/e2e-tests-found-real-bugs/'
     | '/$locale/story/blog/hermes-thea-two-way-remote/'
@@ -9026,7 +9075,10 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/type-checker-made-ai-stop-lying/'
     | '/$locale/story/blog/unbottled-api-in-coding-tools/'
     | '/$locale/story/blog/uncensored-ai-image-generator/'
+    | '/$locale/story/blog/uncensored-llm-api/'
+    | '/$locale/story/blog/uncensored-llm-without-gpu/'
     | '/$locale/story/blog/uncensored-models-what-each-is-good-at/'
+    | '/$locale/story/blog/venice-ai-alternatives/'
     | '/$locale/story/blog/whats-new-april-2026/'
     | '/$locale/story/blog/whats-new-may-2026/'
     | '/$locale/story/blog/whats-new-november-2026/'
@@ -11011,6 +11063,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
+    '/$locale/story/blog/chatgpt-jailbreak-alternative/': {
+      id: '/$locale/story/blog/chatgpt-jailbreak-alternative/'
+      path: '/blog/chatgpt-jailbreak-alternative'
+      fullPath: '/$locale/story/blog/chatgpt-jailbreak-alternative/'
+      preLoaderRoute: typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': {
       id: '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
       path: '/blog/dead-trading-bot-to-monitoring-engine'
@@ -11116,11 +11175,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleStoryBlogUncensoredAiImageGeneratorIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
+    '/$locale/story/blog/uncensored-llm-api/': {
+      id: '/$locale/story/blog/uncensored-llm-api/'
+      path: '/blog/uncensored-llm-api'
+      fullPath: '/$locale/story/blog/uncensored-llm-api/'
+      preLoaderRoute: typeof LocaleStoryBlogUncensoredLlmApiIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/uncensored-llm-without-gpu/': {
+      id: '/$locale/story/blog/uncensored-llm-without-gpu/'
+      path: '/blog/uncensored-llm-without-gpu'
+      fullPath: '/$locale/story/blog/uncensored-llm-without-gpu/'
+      preLoaderRoute: typeof LocaleStoryBlogUncensoredLlmWithoutGpuIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/blog/uncensored-models-what-each-is-good-at/': {
       id: '/$locale/story/blog/uncensored-models-what-each-is-good-at/'
       path: '/blog/uncensored-models-what-each-is-good-at'
       fullPath: '/$locale/story/blog/uncensored-models-what-each-is-good-at/'
       preLoaderRoute: typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/venice-ai-alternatives/': {
+      id: '/$locale/story/blog/venice-ai-alternatives/'
+      path: '/blog/venice-ai-alternatives'
+      fullPath: '/$locale/story/blog/venice-ai-alternatives/'
+      preLoaderRoute: typeof LocaleStoryBlogVeniceAiAlternativesIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/whats-new-april-2026/': {
@@ -14879,6 +14959,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute: typeof LocaleStoryBlogAiVideoGeneratorsComparedIndexRoute
   LocaleStoryBlogCharacterAiAlternativesIndexRoute: typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute: typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
+  LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute: typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute: typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
   LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute: typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
   LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute: typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
@@ -14894,7 +14975,10 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute: typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
   LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute: typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
   LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute: typeof LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute
+  LocaleStoryBlogUncensoredLlmApiIndexRoute: typeof LocaleStoryBlogUncensoredLlmApiIndexRoute
+  LocaleStoryBlogUncensoredLlmWithoutGpuIndexRoute: typeof LocaleStoryBlogUncensoredLlmWithoutGpuIndexRoute
   LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute: typeof LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute
+  LocaleStoryBlogVeniceAiAlternativesIndexRoute: typeof LocaleStoryBlogVeniceAiAlternativesIndexRoute
   LocaleStoryBlogWhatsNewApril2026IndexRoute: typeof LocaleStoryBlogWhatsNewApril2026IndexRoute
   LocaleStoryBlogWhatsNewMay2026IndexRoute: typeof LocaleStoryBlogWhatsNewMay2026IndexRoute
   LocaleStoryBlogWhatsNewNovember2026IndexRoute: typeof LocaleStoryBlogWhatsNewNovember2026IndexRoute
@@ -14941,6 +15025,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogCharacterAiAlternativesIndexRoute,
   LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute:
     LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute,
+  LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute:
+    LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute,
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute:
     LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute,
   LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute:
@@ -14971,8 +15057,14 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute,
   LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute:
     LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute,
+  LocaleStoryBlogUncensoredLlmApiIndexRoute:
+    LocaleStoryBlogUncensoredLlmApiIndexRoute,
+  LocaleStoryBlogUncensoredLlmWithoutGpuIndexRoute:
+    LocaleStoryBlogUncensoredLlmWithoutGpuIndexRoute,
   LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute:
     LocaleStoryBlogUncensoredModelsWhatEachIsGoodAtIndexRoute,
+  LocaleStoryBlogVeniceAiAlternativesIndexRoute:
+    LocaleStoryBlogVeniceAiAlternativesIndexRoute,
   LocaleStoryBlogWhatsNewApril2026IndexRoute:
     LocaleStoryBlogWhatsNewApril2026IndexRoute,
   LocaleStoryBlogWhatsNewMay2026IndexRoute:
