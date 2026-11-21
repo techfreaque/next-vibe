@@ -1,10 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Czat AI z modelami abliterowanymi",
-  metaTitle: "Wypróbuj abliterowane modele AI na czacie | {{appName}}",
+  title: "Abliterowane modele AI do wypróbowania online",
+  metaTitle: "Abliterowane modele AI online | {{appName}}",
   description:
-    "Wypróbuj abliterowane modele AI w przeglądarce. Porównaj okna kontekstu i szacunkowy koszt wymiany wiadomości, a potem otwórz czat z wybranym modelem.",
+    "Porównaj okna kontekstu i szacunkowe koszty abliterowanych LLM. Wypróbuj je w przeglądarce i porównaj z modelem bazowym, jeśli jest dostępny.",
   intro:
     "Wypróbuj modele zmodyfikowane tak, by rzadziej odmawiały odpowiedzi. Wybierz jeden i otwórz czat w przeglądarce. Model będzie już ustawiony.",
   models: "Dostępne modele abliterowane",
@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
   context: "Okno kontekstu obejmuje {{tokens}} tokenów",
   price: "Około {{credits}} kredytów za wymianę wiadomości",
   chat: "Wypróbuj {{model}}",
+  compareBase: "Porównaj z {{model}}",
   trial: {
     title: "Zadaj to samo polecenie w dwóch czatach",
     start:
@@ -25,9 +26,13 @@ export const translations: typeof enTranslations = {
   },
   questions: "Częste pytania",
   faq: {
+    meaning: {
+      q: "Czym jest abliterowany LLM?",
+      a: "Abliteracja zmienia wagi modelu, aby osłabić mechanizmy związane z odmowami. W naszym katalogu modele z tej listy mają udokumentowane użycie tej metody. Każdy dostępny model możesz wypróbować w przeglądarce.",
+    },
     access: {
       q: "Czy mogę wypróbować model abliterowany bez konta?",
-      a: "Tak. Jako gość masz co miesiąc {{credits}} darmowych kredytów. Przed pierwszym użyciem modelu bez cenzury potwierdź, że masz co najmniej 18 lat i akceptujesz odpowiedzi bez filtrów.",
+      a: "Tak. Jako gość możesz wykorzystać do {{credits}} darmowych kredytów miesięcznie. Przed pierwszym użyciem modelu bez cenzury potwierdź, że masz co najmniej 18 lat i akceptujesz odpowiedzi bez filtrów.",
     },
     refusals: {
       q: "Czy model abliterowany może odmówić odpowiedzi?",

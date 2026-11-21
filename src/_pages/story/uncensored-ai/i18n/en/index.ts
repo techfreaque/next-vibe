@@ -2,10 +2,11 @@ export const translations = {
   title: "Uncensored AI chat in your browser",
   metaTitle: "Uncensored AI chat without signup | {{appName}}",
   description:
-    "Try an uncensored AI chatbot without an account. Compare models by context window and estimated cost, then ask your own question in the browser.",
+    "Try an uncensored AI chatbot in your browser with free guest credits. Compare models by context window and estimated cost, or start chatting right away.",
   intro:
-    "Ask an uncensored AI chatbot directly from your browser. You can start as a guest.",
-  chooseModel: "Find a chat model",
+    "Start an uncensored AI chat as a guest. Pick a model for your question or try the one with the lowest estimated cost per exchange.",
+  tryModel: "Try {{model}}",
+  chooseModel: "Compare chat models",
   choose:
     "For a short question, start near the top of the list to keep costs down. For a long document or conversation, choose a larger context window so the model can work with more text at once.",
   start:
@@ -22,7 +23,11 @@ export const translations = {
   faq: {
     access: {
       q: "Can I try uncensored AI chat for free?",
-      a: "Guests get {{credits}} free credits per month. The number of messages you can send depends on the model and the length of the conversation.",
+      a: "Guests can get up to {{credits}} free credits per month. The number of messages you can send depends on the model and the length of the conversation.",
+    },
+    outOfCredits: {
+      q: "What happens when I run out of guest credits?",
+      a: "You can wait for the next month’s allowance or create a free account and verify your email. A verified account can get up to {{credits}} free credits per month. Any guest credits you’ve already spent that month count toward that total.",
     },
     filters: {
       q: "What does unfiltered AI chat mean here?",

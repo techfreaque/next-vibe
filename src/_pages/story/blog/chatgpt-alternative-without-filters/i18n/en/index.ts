@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "ChatGPT Alternative Without Filters | {{appName}}",
     description:
-      "An unfiltered ChatGPT alternative: {{modelCount}} models from mainstream to uncensored. You pick the filter level per chat. Free to start, no account.",
+      "Looking for ChatGPT without filters? See which safeguards GPT keeps, compare open and uncensored models, and try a different chatbot without an account.",
     category: "Guide",
     imageAlt: "{{appName}}: a ChatGPT alternative without filters",
     keywords:
@@ -12,71 +12,70 @@ export const translations = {
     backToBlog: "Back to Blog",
     category: "Guide",
     readTime: "7 min read",
-    title: "A ChatGPT alternative without filters. You set the level.",
+    title: "A ChatGPT alternative with uncensored models",
     subtitle:
-      "Claude, GPT and Gemini next to open and uncensored models, in one chat on {{appName}}. The honest version: what changes, what does not, and what it costs.",
+      "Compare mainstream, open and uncensored AI models on {{appName}}. See how switching models affects your chat and what each option costs.",
   },
   intro: {
-    lead: "You asked a normal question. ChatGPT answered with a disclaimer, a lecture or a polite no. A medical detail, a crime novel scene, a security question, a political take outside the consensus. The refusal is a policy decision, made for you before you typed a word.",
-    p2: "This is what an unfiltered alternative actually looks like on {{appName}}: {{modelCount}} models, three filter levels, one balance. Plus two kinds of uncensored: mainstream models that stopped refusing, and one with its own worldview. What it does well, where it falls short, and when ChatGPT is still the better pick.",
+    lead: "ChatGPT uses OpenAI’s safeguards. GPT keeps its provider safeguards on {{appName}} too. If you want a less restrictive chat, choose a different model. It can still decline a request or get the answer wrong.",
+    p2: "{{appName}} lets you choose among {{modelCount}} chat models across three content tiers, using one credit balance.",
   },
   exists: {
     title: "Is there a ChatGPT without filters?",
-    p1: "Not from OpenAI. GPT models follow OpenAI's usage policies wherever you run them. Claude and Gemini follow their own vendors' rules. Any app that promises an unfiltered GPT is overselling.",
-    p2: "What a real alternative does is put other models next to them. {{appName}} runs the mainstream models and, in the same chat, open models with light filters and uncensored models with no filter at all. Most of those are mainstream models with the refusals cut out. One, UncensoredLM, has its own worldview. You decide which one answers.",
+    p1: "ChatGPT uses OpenAI’s safeguards. On {{appName}}, selecting GPT still gives you a GPT model with its provider safeguards.",
+    p2: "To try a less restrictive chat, pick a different model from the uncensored tier on {{appName}}. You can start in your browser as a guest.",
   },
   tiers: {
     title: 'What does "without filters" actually mean?',
     intro: "Every model carries a content level. There are three.",
-    mainstream:
-      "Mainstream ({{count}} models): Claude, GPT, Gemini, Mistral. Big-lab safety filters. They decline sensitive topics.",
-    open: "Open ({{count}} models): DeepSeek, Kimi, GLM, Qwen, Grok, MiniMax and more. Light filters. They take on most edgy topics.",
+    mainstream: "Mainstream ({{count}} models). Provider safeguards apply.",
+    open: "Open ({{count}} models). Refusal behavior varies by model.",
     uncensored:
-      "Uncensored ({{count}} models), two kinds. Uncensored builds of GLM, Qwen, Gemma and DeepSeek, plus Venice: mainstream models with the refusals cut out, same worldview. And UncensoredLM: trained on books and documents banned from the mainstream internet, its own worldview. No filter. You set the limits.",
+      "Uncensored ({{count}} models). These models are grouped by how they handle sensitive topics.",
     vendorRefusals:
-      "Mainstream models keep their vendor's filters here too. GPT on {{appName}} refuses what GPT refuses everywhere. The difference is what sits next to it.",
+      "On {{appName}}, changing models changes which model answers. Its own safeguards still apply.",
     twoKinds:
-      "Uncensored comes in two kinds. Most started as a mainstream or open model and had the refusal reflex cut out, by abliteration or a decensoring fine-tune. They stop saying no. Their training data and their worldview stay: on politics they answer the way the base model sees it, just without the dodge, and in dark fiction they can soften the scene. Unlocked, not changed. UncensoredLM is the other kind. Uncensored.ai trains it on books and documents banned from the mainstream internet. The result is a different worldview: political takes that run against the mainstream, no lecture, no nudge back to the consensus line.",
+      "Some uncensored models use abliteration or fine-tuning to reduce refusals. UncensoredLM is trained on books and documents banned from the mainstream internet, giving it political views that diverge from the mainstream. Check factual claims against your sources.",
     modelsLink: "Browse every model by filter level",
   },
   switch: {
     title: "Can I switch models in the middle of a chat?",
-    intro: "Yes. You pick the model per message, not per account.",
-    p1: "Start a thread with Claude. Hit a refusal. Pick an uncensored model and send the next message. The thread keeps its history, and the new model reads all of it.",
-    p2: "It works the other way too. Draft with an uncensored model, then hand the result to a frontier model for structure and polish.",
+    intro: "Yes. You can choose a model for the next message.",
+    p1: "Switch models in an existing conversation to keep the thread. The new model can only use the history that fits in its context window.",
+    p2: "You can draft with one model and ask a different model to revise the draft in the same chat.",
     caveat:
-      "The filter lives in the model, not in the thread. A mainstream model reading an uncensored draft can still refuse to continue it.",
+      "Each model applies its own safeguards to the draft and your next request.",
   },
   picks: {
     title: "Which model should I use instead of ChatGPT?",
     intro:
       "Start from the job. Each name links to the model's page with price and specs.",
     builtUncensored: {
-      title: "Politics, other viewpoints, dark roleplay: its own worldview",
-      body: "UncensoredLM is the one model here that is not a mainstream model unlocked. It has its own worldview. Political and controversial questions get takes the mainstream will not give you. Heterodox views get argued in full. Dark and taboo roleplay stays dark. No moralizing, no steer back to the consensus. The catch: 32K context, text only, not for code, and it states contested claims as plainly as settled ones. Check the facts it gives you.",
+      title: "Politics and viewpoints",
+      body: "UncensoredLM can offer a different perspective on political and controversial topics. Check its factual claims against your sources.",
     },
     everyday: {
-      title: "Everyday work, mainstream filters",
-      body: "Writing, research, code, analysis. The closest match to ChatGPT, with the same kind of filters.",
+      title: "Everyday work",
+      body: "Try these mainstream models for writing, coding and analysis.",
     },
     open: {
-      title: "Smart, fewer refusals",
-      body: "Strong open models with light filters. They answer most of what a mainstream model dodges and hold up on code and reasoning.",
+      title: "Open models for code and reasoning",
+      body: "Try these open models for coding and reasoning. Compare how each handles the same prompt.",
     },
     unfiltered: {
-      title: "No refusals, real reasoning",
-      body: "The heavy hitters among the refusal-stripped models. Strong base models with the refusals removed: code, analysis and long writing on topics other models flag. Same training, same worldview, so for political takes against the mainstream start with UncensoredLM.",
+      title: "Uncensored models for analysis",
+      body: "Try these models for analysis, coding or long-form writing. They can still decline requests.",
     },
     fiction: {
       title: "Roleplay and dark fiction",
-      body: "UncensoredLM leads for dark and taboo scenes: its training material sits outside the safe consensus, so nothing softens the story. Venice Role Play for long campaigns (128K context) and image input. Venice Uncensored as the cheap all-rounder.",
+      body: "For an ongoing story, compare context windows and check whether a model supports image input.",
     },
     cheap: {
-      title: "Cheap and fast",
-      body: "High volume at a low price. Three refusal-stripped flash models, plus Claude Haiku for when a filter is fine.",
+      title: "Lower-cost models",
+      body: "Check the estimated cost on each model page. Longer inputs and outputs can use more credits.",
     },
     compare:
-      "Torn between two? Put price, context window and capabilities side by side. Start with UncensoredLM against ChatGPT's model, against Venice Role Play and against a refusal-stripped flagship.",
+      "Compare the available pairs by price, context window and capabilities.",
     compareLink: "Compare {{a}} with {{b}}",
     guideLink: "Read the guide to every uncensored model",
   },
@@ -126,11 +125,15 @@ export const translations = {
     tools:
       "Not every uncensored model supports tool calls. Check the model page before you count on web search or other tools.",
     vendor:
-      "Mainstream models keep their own refusals. If Claude says no, switch models instead of arguing with it.",
+      "Mainstream models retain their provider safeguards. Uncensored models can also decline a request.",
     responsibility:
-      "No filter means no safety net. What you generate and publish is on you, and the law where you live still applies.",
+      "Check important claims and consider the consequences before sharing or acting on a response.",
   },
   faq: {
+    filters: {
+      q: "Can I turn off GPT’s safeguards in a ChatGPT alternative?",
+      a: "GPT keeps its provider safeguards on {{appName}}. An uncensored model is a separate option with its own behavior. Selecting it changes which model replies.",
+    },
     title: "FAQ",
     free: {
       q: "Is {{appName}} free?",
@@ -156,10 +159,10 @@ export const translations = {
     link: "See the partner program",
   },
   cta: {
-    title: "Pick your filter. Ask your question.",
+    title: "Choose a model and start chatting",
     subtitle:
-      "{{guestCredits}} free credits a month, no account needed. Mainstream, open or uncensored: switch any time.",
-    chat: "Start an unfiltered chat",
+      "Start without an account with up to {{guestCredits}} free credits a month.",
+    chat: "Try uncensored AI chat",
     models: "Compare all models",
   },
 };

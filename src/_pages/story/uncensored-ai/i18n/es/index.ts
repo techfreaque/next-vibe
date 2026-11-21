@@ -4,10 +4,11 @@ export const translations: typeof enTranslations = {
   title: "Chat de IA sin censura en tu navegador",
   metaTitle: "Chat de IA sin censura y sin registro | {{appName}}",
   description:
-    "Prueba un chatbot sin censura sin crear una cuenta. Compara el contexto y el costo estimado de los modelos, y haz tu pregunta en el navegador.",
+    "Prueba un chatbot sin censura en tu navegador con créditos gratis para visitantes. Compara el contexto y el costo estimado de los modelos o empieza a chatear.",
   intro:
-    "Hazle tu pregunta a un chatbot sin censura desde el navegador. Puedes empezar sin crear una cuenta.",
-  chooseModel: "Encuentra un modelo para chatear",
+    "Empieza sin crear una cuenta. Elige un modelo para tu pregunta o prueba el que tenga el costo estimado más bajo por intercambio.",
+  tryModel: "Prueba {{model}}",
+  chooseModel: "Compara los modelos",
   choose:
     "Para una pregunta corta, empieza con uno de los modelos más económicos al inicio de la lista. Para documentos o conversaciones largas, elige una ventana de contexto mayor para que el modelo pueda usar más texto a la vez.",
   start:
@@ -24,7 +25,11 @@ export const translations: typeof enTranslations = {
   faq: {
     access: {
       q: "¿Puedo probar gratis un chat de IA sin censura?",
-      a: "Como visitante tienes {{credits}} créditos gratis al mes. La cantidad de mensajes depende del modelo y de la longitud de la conversación.",
+      a: "Sin cuenta puedes recibir hasta {{credits}} créditos gratis al mes. La cantidad de mensajes depende del modelo y de la duración de la conversación.",
+    },
+    outOfCredits: {
+      q: "¿Qué pasa si se me acaban los créditos como visitante?",
+      a: "Puedes esperar al mes siguiente o crear una cuenta gratuita y verificar tu correo electrónico. Con el correo verificado puedes recibir hasta {{credits}} créditos gratis al mes. Los créditos que ya usaste sin cuenta ese mes cuentan para ese límite.",
     },
     filters: {
       q: "¿Qué significa aquí chat de IA sin filtros?",

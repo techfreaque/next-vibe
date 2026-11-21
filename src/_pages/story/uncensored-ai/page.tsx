@@ -20,10 +20,16 @@ import {
   chatHref,
   formatNumber,
   modelHref,
+  type UncensoredKind,
+  uncensoredKind,
 } from "@/_pages/models/_shared/model-format";
 import { MODELS_OG_IMAGE } from "@/_pages/models/constants";
+import { scopedTranslation as modelsScopedTranslation } from "@/_pages/models/i18n";
 import { configScopedTranslation } from "@/env/i18n";
-import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
+import {
+  FREE_CREDIT_ALLOWANCE,
+  FREE_CREDIT_SIGNED_IN_TOTAL,
+} from "@/products/constants";
 
 import { CardLink, Cta, PageHero, PageSection } from "../_shared/marketing";
 import { COMPARE_HUB_PATH } from "../compare/_shared/platforms";
@@ -38,6 +44,7 @@ interface Props {
 interface ChatChoice extends ModelRef {
   contextWindow: number;
   creditsPerMessage: number;
+  kind: UncensoredKind;
 }
 
 interface PageData {
@@ -55,12 +62,13 @@ export async function tanstackLoader({ params }: Props): Promise<PageData> {
         a.creditsPerMessage - b.creditsPerMessage ||
         a.name.localeCompare(b.name),
     )
-    .map(({ id, slug, name, contextWindow, creditsPerMessage }) => ({
-      id,
-      slug,
-      name: name.trim(),
-      contextWindow,
-      creditsPerMessage,
+    .map((model) => ({
+      id: model.id,
+      slug: model.slug,
+      name: model.name.trim(),
+      contextWindow: model.contextWindow,
+      creditsPerMessage: model.creditsPerMessage,
+      kind: uncensoredKind(model) ?? "unlisted",
     }));
   return { locale, models };
 }
@@ -82,11 +90,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export function TanstackPage({ locale, models }: PageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: modelsT } = modelsScopedTranslation.scopedT(locale);
+  const firstModel = models[0];
   const faq = [
     {
       question: t("faq.access.q"),
       answer: t("faq.access.a", {
         credits: formatNumber(FREE_CREDIT_ALLOWANCE.guest, locale),
+      }),
+    },
+    {
+      question: t("faq.outOfCredits.q"),
+      answer: t("faq.outOfCredits.a", {
+        credits: formatNumber(FREE_CREDIT_SIGNED_IN_TOTAL, locale),
       }),
     },
     {
@@ -105,16 +121,24 @@ export function TanstackPage({ locale, models }: PageData): JSX.Element {
         title={t("title")}
         subtitle={t("intro")}
         actions={
-          models.length > 0 ? (
-            <Button
-              asChild
-              size="lg"
-              className="h-12 w-full px-6 text-base font-medium sm:w-auto"
-            >
-              <ExternalLink href="#chat-models">
-                {t("chooseModel")}
-              </ExternalLink>
-            </Button>
+          firstModel !== undefined ? (
+            <>
+              <Cta
+                href={chatHref(locale, firstModel)}
+                label={t("tryModel", { model: firstModel.name })}
+                className="h-auto min-h-12 whitespace-normal py-2 text-center"
+              />
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="h-12 w-full bg-card px-6 text-base font-medium sm:w-auto"
+              >
+                <ExternalLink href="#chat-models">
+                  {t("chooseModel")}
+                </ExternalLink>
+              </Button>
+            </>
           ) : undefined
         }
       />
@@ -154,6 +178,9 @@ export function TanstackPage({ locale, models }: PageData): JSX.Element {
                   {model.name}
                 </Link>
               </H3>
+              <P className="text-sm text-muted-foreground">
+                {modelsT(`uncensoredKind.${model.kind}.name`)}
+              </P>
               <P className="text-sm text-muted-foreground">
                 {t("context", {
                   tokens: formatNumber(model.contextWindow, locale),

@@ -10,6 +10,8 @@ import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
 import {
+  canonicalComparisonPath,
+  isUncensoredVariantOf,
   listModelFacts,
   type ModelRef,
 } from "@/_pages/models/_shared/model-facts";
@@ -34,6 +36,7 @@ interface Props {
 interface ChatChoice extends ModelRef {
   contextWindow: number;
   creditsPerMessage: number;
+  comparison: { name: string; path: string } | null;
 }
 
 interface PageData {
@@ -43,22 +46,36 @@ interface PageData {
 
 export async function tanstackLoader({ params }: Props): Promise<PageData> {
   const { locale } = await params;
-  const models = listModelFacts(await getEnvAvailability())
-    .filter(
-      (model) => !model.isLegacy && model.uncensoredMethod === "abliterated",
-    )
+  const available = listModelFacts(await getEnvAvailability()).filter(
+    (model) => !model.isLegacy,
+  );
+  const models = available
+    .filter((model) => model.uncensoredMethod === "abliterated")
     .toSorted(
       (a, b) =>
         a.creditsPerMessage - b.creditsPerMessage ||
         a.name.localeCompare(b.name),
     )
-    .map(({ id, slug, name, contextWindow, creditsPerMessage }) => ({
-      id,
-      slug,
-      name: name.trim(),
-      contextWindow,
-      creditsPerMessage,
-    }));
+    .map((model) => {
+      const base = available.find(
+        (candidate) =>
+          candidate.outputs.join() === model.outputs.join() &&
+          isUncensoredVariantOf(model, candidate),
+      );
+      return {
+        id: model.id,
+        slug: model.slug,
+        name: model.name.trim(),
+        contextWindow: model.contextWindow,
+        creditsPerMessage: model.creditsPerMessage,
+        comparison: base
+          ? {
+              name: base.name.trim(),
+              path: canonicalComparisonPath(base, model),
+            }
+          : null,
+      };
+    });
   return { locale, models };
 }
 
@@ -82,6 +99,7 @@ export async function generateMetadata({
 export function TanstackPage({ locale, models }: PageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const faq = [
+    { question: t("faq.meaning.q"), answer: t("faq.meaning.a") },
     {
       question: t("faq.access.q"),
       answer: t("faq.access.a", {
@@ -139,6 +157,14 @@ export function TanstackPage({ locale, models }: PageData): JSX.Element {
                       })}
                     </P>
                   </Div>
+                  {model.comparison && (
+                    <Link
+                      href={`/${locale}${model.comparison.path}`}
+                      className="mt-2 inline-block text-sm font-medium text-primary underline-offset-4 hover:underline"
+                    >
+                      {t("compareBase", { model: model.comparison.name })}
+                    </Link>
+                  )}
                 </Div>
                 <Cta
                   href={chatHref(locale, model)}

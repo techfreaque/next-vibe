@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternatywa dla ChatGPT bez filtrów | {{appName}}",
     description:
-      "Alternatywa dla ChatGPT bez narzuconych filtrów: dostęp do {{modelCount}} modeli, od mainstreamu po niecenzurowane. Poziom filtra wybierasz ty. Za darmo, bez konta.",
+      "Szukasz ChatGPT bez filtrów? Sprawdź, jakie zabezpieczenia zachowuje GPT, porównaj modele otwarte i bez cenzury i wypróbuj inny chatbot bez konta.",
     category: "Poradnik",
     imageAlt: "{{appName}}: alternatywa dla ChatGPT bez filtrów",
     keywords:
@@ -14,72 +14,70 @@ export const translations: typeof enTranslations = {
     backToBlog: "Wróć do bloga",
     category: "Poradnik",
     readTime: "7 min czytania",
-    title: "Alternatywa dla ChatGPT bez filtrów. Poziom ustawiasz ty.",
+    title: "Alternatywa dla ChatGPT z modelami bez cenzury",
     subtitle:
-      "Claude, GPT i Gemini obok modeli otwartych i niecenzurowanych, w jednym czacie na {{appName}}. Uczciwie: co się zmienia, co zostaje i ile to kosztuje.",
+      "Porównaj popularne modele, modele otwarte i modele bez cenzury w {{appName}}. Sprawdź, jak zmiana modelu wpływa na rozmowę i ile kosztują poszczególne opcje.",
   },
   intro: {
-    lead: "Zadajesz zwykłe pytanie. ChatGPT odpowiada zastrzeżeniem, pouczeniem albo uprzejmą odmową. Szczegół medyczny, scena do kryminału, pytanie o bezpieczeństwo, poglądy spoza głównego nurtu. Odmowa to decyzja regulaminu, podjęta za ciebie, zanim padło choć jedno słowo.",
-    p2: "Tak naprawdę wygląda alternatywa bez filtrów na {{appName}}: dostęp do {{modelCount}} modeli, trzy poziomy filtrowania, jedno saldo. Do tego dwa rodzaje braku cenzury: modele z głównego nurtu, które przestały odmawiać, i jeden z własnym światopoglądem. Co robi dobrze, gdzie ma słabsze strony i kiedy ChatGPT nadal jest lepszym wyborem.",
+    lead: "ChatGPT korzysta z zabezpieczeń OpenAI. GPT w {{appName}} również je zachowuje. Jeśli szukasz czatu z mniejszą liczbą ograniczeń, wybierz inny model. On też może odmówić odpowiedzi albo się pomylić.",
+    p2: "W {{appName}} masz do wyboru {{modelCount}} modeli w trzech kategoriach. Wszystkie korzystają z tego samego salda kredytów.",
   },
   exists: {
     title: "Czy istnieje ChatGPT bez filtrów?",
-    p1: "Nie od OpenAI. Modele GPT podlegają zasadom OpenAI, gdziekolwiek działają. Claude i Gemini podlegają zasadom swoich twórców. Kto obiecuje GPT bez filtrów, obiecuje za dużo.",
-    p2: "Prawdziwa alternatywa stawia obok nich inne modele. {{appName}} daje ci modele mainstreamowe, a w tym samym czacie także modele otwarte z lekkimi filtrami i niecenzurowane bez żadnych. Większość z nich to modele z głównego nurtu z wyciętymi odmowami. Jeden, UncensoredLM, ma własny światopogląd. To ty decydujesz, który odpowie.",
+    p1: "ChatGPT korzysta z zabezpieczeń OpenAI. Jeśli wybierzesz GPT w {{appName}}, nadal obowiązują zabezpieczenia dostawcy.",
+    p2: "Aby wypróbować czat z mniejszą liczbą ograniczeń, wybierz w {{appName}} model z kategorii bez cenzury. Możesz zacząć jako gość w przeglądarce.",
   },
   tiers: {
     title: "Co właściwie znaczy „bez filtrów”?",
     intro: "Każdy model ma poziom treści. Są trzy.",
-    mainstream:
-      "Mainstream (liczba modeli: {{count}}): Claude, GPT, Gemini, Mistral. Filtry bezpieczeństwa wielkich laboratoriów. Drażliwe tematy odrzucają.",
-    open: "Otwarte (liczba modeli: {{count}}): DeepSeek, Kimi, GLM, Qwen, Grok, MiniMax i inne. Lekkie filtry. Podejmują większość kontrowersyjnych tematów.",
+    mainstream: "Popularne ({{count}}). Obowiązują zabezpieczenia dostawcy.",
+    open: "Otwarte ({{count}}). To, na jakie pytania dostaniesz odpowiedź, zależy od modelu.",
     uncensored:
-      "Niecenzurowane (liczba modeli: {{count}}), dwa rodzaje. Niecenzurowane wersje GLM, Qwen, Gemma i DeepSeek oraz Venice: modele z głównego nurtu z wyciętymi odmowami, ten sam światopogląd. I UncensoredLM: trenowany na książkach i dokumentach zakazanych w mainstreamowym internecie, własny światopogląd. Zero filtra. Granice wyznaczasz ty.",
+      "Bez cenzury ({{count}}). W tej kategorii zebraliśmy modele według tego, jak podchodzą do drażliwych tematów.",
     vendorRefusals:
-      "Modele mainstreamowe zachowują filtry swoich twórców także tutaj. GPT na {{appName}} odmawia tego samego, czego odmawia wszędzie. Różnica polega na tym, co masz obok.",
+      "Gdy zmieniasz model w {{appName}}, wybierasz, który model odpowie. Nadal obowiązują zabezpieczenia wybranego modelu.",
     twoKinds:
-      "Modele niecenzurowane są dwojakiego rodzaju. Większość zaczynała jako model mainstreamowy albo otwarty, któremu wycięto odruch odmowy, przez abliterację albo dostrajanie znoszące cenzurę. Przestają mówić nie. Dane treningowe i światopogląd zostają: w polityce odpowiadają tak, jak widzi to model bazowy, tylko bez wykrętów, a w mrocznej fikcji potrafią złagodzić scenę. Odblokowane, nie zmienione. UncensoredLM to drugi rodzaj. Uncensored.ai trenuje go na książkach i dokumentach zakazanych w mainstreamowym internecie. Efekt to inny światopogląd: poglądy polityczne pod prąd mainstreamu, bez pouczania, bez zawracania do linii konsensusu.",
+      "W niektórych modelach bez cenzury abliteracja lub dostrajanie ogranicza liczbę odmów. UncensoredLM trenowano na książkach i dokumentach zakazanych w głównym nurcie internetu. Dlatego model przedstawia poglądy polityczne odbiegające od głównego nurtu. Sprawdzaj jego twierdzenia w źródłach.",
     modelsLink: "Zobacz wszystkie modele według poziomu filtra",
   },
   switch: {
     title: "Czy mogę zmienić model w trakcie rozmowy?",
-    intro:
-      "Tak. Model wybierasz przy każdej wiadomości, nie raz na całe konto.",
-    p1: "Zaczynasz wątek z Claude i trafiasz na odmowę. Wybierasz model niecenzurowany i wysyłasz kolejną wiadomość. Wątek zachowuje historię, a nowy model czyta ją w całości.",
-    p2: "Działa to też w drugą stronę. Szkic piszesz modelem niecenzurowanym, a strukturę i szlif oddajesz modelowi z czołówki.",
+    intro: "Tak. Przy kolejnej wiadomości możesz wybrać inny model.",
+    p1: "Zmień model w trakcie rozmowy, aby zachować jej historię. Nowy model może uwzględnić tyle poprzednich wiadomości, ile mieści się w jego oknie kontekstowym.",
+    p2: "Możesz napisać szkic z pomocą jednego modelu i poprosić inny o jego poprawienie w tym samym czacie.",
     caveat:
-      "Filtr siedzi w modelu, nie w wątku. Model mainstreamowy, który czyta niecenzurowany szkic, nadal może odmówić jego kontynuacji.",
+      "Każdy model stosuje własne zabezpieczenia do szkicu i kolejnej prośby.",
   },
   picks: {
     title: "Jakiego modelu używać zamiast ChatGPT?",
     intro:
       "Zacznij od zadania. Każda nazwa prowadzi do strony modelu z ceną i parametrami.",
     builtUncensored: {
-      title: "Polityka, inne poglądy, mroczny roleplay: własny światopogląd",
-      body: "UncensoredLM to jedyny model tutaj, który nie jest odblokowanym modelem z głównego nurtu. Ma własny światopogląd. Na pytania polityczne i kontrowersyjne daje odpowiedzi, których mainstream ci nie da. Nieortodoksyjne poglądy wykłada do końca. Mroczny roleplay i tematy tabu zostają mroczne. Bez moralizowania, bez zawracania do konsensusu. Haczyk: 32K kontekstu, tylko tekst, nie do kodu, a sporne twierdzenia podaje tak pewnie jak ustalone fakty. Sprawdzaj to, co ci poda.",
+      title: "Polityka i różne punkty widzenia",
+      body: "UncensoredLM może zaproponować inne spojrzenie na politykę i sporne tematy. Porównuj jego twierdzenia z własnymi źródłami.",
     },
     everyday: {
-      title: "Codzienna praca, filtry mainstreamowe",
-      body: "Teksty, research, kod, analiza. Najbliżej ChatGPT, z tym samym rodzajem filtrów.",
+      title: "Codzienne zadania",
+      body: "Wypróbuj te popularne modele do pisania, programowania i analizy.",
     },
     open: {
-      title: "Mocne, z mniejszą liczbą odmów",
-      body: "Mocne modele otwarte z lekkimi filtrami. Odpowiadają na większość tego, czego modele mainstreamowe unikają, i dobrze radzą sobie z kodem i rozumowaniem.",
+      title: "Modele otwarte do kodu i rozumowania",
+      body: "Wypróbuj te otwarte modele do kodowania i zadań wymagających rozumowania. Porównaj odpowiedzi na to samo pytanie.",
     },
     unfiltered: {
-      title: "Bez odmów, z prawdziwym rozumowaniem",
-      body: "Najcięższa artyleria wśród modeli z usuniętymi odmowami. Mocne modele bazowe bez odruchu odmowy: kod, analiza i długie teksty na tematy, które inne modele blokują. Ten sam trening, ten sam światopogląd, więc po poglądy polityczne pod prąd mainstreamu zacznij od UncensoredLM.",
+      title: "Modele bez cenzury do analizy",
+      body: "Wypróbuj te modele do analiz, kodowania i dłuższych tekstów. One też mogą odmówić odpowiedzi.",
     },
     fiction: {
-      title: "Roleplay i mroczna fikcja",
-      body: "W mrocznych scenach i tematach tabu prowadzi UncensoredLM: trenowano go na materiale spoza bezpiecznego konsensusu, więc nic nie łagodzi historii. Venice Role Play do długich kampanii (kontekst 128K) i pracy z obrazami. Venice Uncensored jako tani model do wszystkiego.",
+      title: "Odgrywanie ról i mroczna fikcja",
+      body: "Przy dłuższej historii porównaj okna kontekstowe. Sprawdź też, czy model przyjmuje obrazy.",
     },
     cheap: {
-      title: "Tanio i szybko",
-      body: "Duża skala za małe pieniądze. Trzy modele flash z usuniętymi odmowami, a do tego Claude Haiku, gdy filtr ci nie przeszkadza.",
+      title: "Tańsze modele",
+      body: "Szacowany koszt znajdziesz na stronie modelu. Dłuższe pytania i odpowiedzi mogą zużyć więcej kredytów.",
     },
     compare:
-      "Wahasz się między dwoma? Porównaj cenę, okno kontekstu i możliwości obok siebie. Zacznij od UncensoredLM kontra model ChatGPT, kontra Venice Role Play i kontra flagowiec z usuniętymi odmowami.",
+      "Porównaj ceny, okna kontekstowe i możliwości dostępnych par modeli.",
     compareLink: "Porównaj {{a}} z {{b}}",
     guideLink: "Przeczytaj przewodnik po wszystkich modelach niecenzurowanych",
   },
@@ -129,11 +127,15 @@ export const translations: typeof enTranslations = {
     tools:
       "Nie każdy model niecenzurowany obsługuje wywołania narzędzi. Sprawdź stronę modelu, zanim oprzesz się na wyszukiwaniu w sieci albo innych narzędziach.",
     vendor:
-      "Modele mainstreamowe zachowują własne odmowy. Jeśli Claude mówi nie, zmień model zamiast się z nim kłócić.",
+      "Popularne modele zachowują zabezpieczenia dostawcy. Modele bez cenzury też mogą odmówić odpowiedzi.",
     responsibility:
-      "Brak filtra to brak siatki bezpieczeństwa. Za to, co generujesz i publikujesz, odpowiadasz ty, a prawo twojego kraju nadal obowiązuje.",
+      "Zweryfikuj ważne informacje, zanim udostępnisz odpowiedź lub zaczniesz działać na jej podstawie.",
   },
   faq: {
+    filters: {
+      q: "Czy w alternatywie dla ChatGPT mogę wyłączyć zabezpieczenia GPT?",
+      a: "GPT w {{appName}} zachowuje zabezpieczenia dostawcy. Gdy wybierzesz model bez cenzury, na twoją wiadomość odpowie inny model, który ma własne reguły.",
+    },
     title: "Najczęstsze pytania",
     free: {
       q: "Czy {{appName}} jest darmowe?",
@@ -159,10 +161,10 @@ export const translations: typeof enTranslations = {
     link: "Poznaj program partnerski",
   },
   cta: {
-    title: "Wybierz filtr. Zadaj pytanie.",
+    title: "Wybierz model i zacznij rozmowę",
     subtitle:
-      "{{guestCredits}} darmowych kredytów miesięcznie, bez konta. Mainstream, otwarte albo niecenzurowane: zmieniasz, kiedy chcesz.",
-    chat: "Zacznij czat bez filtrów",
+      "Zacznij bez konta z pulą do {{guestCredits}} darmowych kredytów miesięcznie.",
+    chat: "Wypróbuj czat AI bez cenzury",
     models: "Porównaj wszystkie modele",
   },
 };

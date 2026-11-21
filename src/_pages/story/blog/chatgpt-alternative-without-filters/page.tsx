@@ -8,10 +8,7 @@
  */
 
 import type { Metadata } from "next";
-import {
-  chatModelDefinitions,
-  ChatModelId,
-} from "next-vibe/agent/ai-stream/models";
+import { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import {
   getAvailableChatModelCount,
@@ -33,7 +30,12 @@ import { Span } from "next-vibe/ui/components/span";
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
-import { toModelSlug } from "@/_pages/models/_shared/model-facts";
+import {
+  canonicalComparisonPath,
+  listModelFacts,
+  type ModelRef,
+} from "@/_pages/models/_shared/model-facts";
+import { modelHref } from "@/_pages/models/_shared/model-format";
 import { configScopedTranslation } from "@/env/i18n";
 import {
   FREE_CREDIT_ALLOWANCE,
@@ -60,6 +62,7 @@ import { scopedTranslation } from "./i18n";
 export const revalidate = 3600;
 
 const SLUG = "chatgpt-alternative-without-filters";
+const UNCENSORED_CHAT_PATH = "/story/uncensored-ai";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -72,15 +75,11 @@ export const generateMetadata = async ({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const modelCount = getAvailableChatModelCount(
-    false,
-    await getEnvAvailability(),
-  );
   return metadataGenerator(locale, {
     path: `story/blog/${SLUG}`,
     title: t("meta.title", { appName }),
     category: t("meta.category"),
-    description: t("meta.description", { appName, modelCount }),
+    description: t("meta.description"),
     image:
       "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070",
     imageAlt: t("meta.imageAlt", { appName }),
@@ -109,7 +108,7 @@ const PICKS: readonly { key: PickGroup; models: readonly ChatModelId[] }[] = [
     key: "everyday",
     models: [
       ChatModelId.CLAUDE_SONNET_5_5,
-      ChatModelId.GPT_6_1_SOL,
+      ChatModelId.GPT_6_2_SOL,
       ChatModelId.GEMINI_4_ARGON,
     ],
   },
@@ -150,23 +149,24 @@ const PICKS: readonly { key: PickGroup; models: readonly ChatModelId[] }[] = [
 
 /**
  * Side-by-side pairs worth a look: the own-worldview uncensored model against
- * ChatGPT's model, the roleplay pick and a refusal-stripped flagship, then a mainstream pick vs
- * its unfiltered rival. Same URL order as the sitemap (FEATURED_COMPARISON_PAIRS).
+ * ChatGPT's model, the roleplay pick and an uncensored flagship, plus other
+ * mainstream and alternative pairs.
  */
 const COMPARE_PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
-  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_1_SOL],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_2_SOL],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED_ROLEPLAY],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GLM_5_3_UNCENSORED],
   [ChatModelId.CLAUDE_SONNET_5_5, ChatModelId.GLM_5_3_UNCENSORED],
-  [ChatModelId.GPT_6_1_SOL, ChatModelId.KIMI_K3_1_PRO],
+  [ChatModelId.GPT_6_2_SOL, ChatModelId.KIMI_K3_1_PRO],
 ];
 
-const FAQ_KEYS: readonly ("free" | "account" | "api" | "openSource")[] = [
-  "free",
-  "account",
-  "api",
-  "openSource",
-];
+const FAQ_KEYS: readonly (
+  | "filters"
+  | "free"
+  | "account"
+  | "api"
+  | "openSource"
+)[] = ["filters", "free", "account", "api", "openSource"];
 
 export interface ChatgptAlternativePostPageData {
   locale: CountryLanguage;
@@ -176,6 +176,8 @@ export interface ChatgptAlternativePostPageData {
   subCredits: number;
   packPrice: string;
   packCredits: number;
+  picks: { key: PickGroup; models: ModelRef[] }[];
+  comparisons: { path: string; a: string; b: string }[];
 }
 
 export async function tanstackLoader({
@@ -186,6 +188,11 @@ export async function tanstackLoader({
   const products = productsRepository.getProducts(locale);
   const subscription = products[ProductIds.SUBSCRIPTION];
   const pack = products[ProductIds.CREDIT_PACK];
+  const availableModels = new Map(
+    listModelFacts(availability)
+      .filter((model) => !model.isLegacy)
+      .map(({ id, slug, name }) => [id, { id, slug, name: name.trim() }]),
+  );
   return {
     locale,
     modelCount: getAvailableChatModelCount(false, availability),
@@ -194,25 +201,44 @@ export async function tanstackLoader({
     subCredits: subscription.credits,
     packPrice: formatCurrency(pack.price, pack.currency, locale),
     packCredits: pack.credits,
+    picks: PICKS.map(({ key, models }) => ({
+      key,
+      models: models
+        .map((id) => availableModels.get(id))
+        .filter((model) => model !== undefined),
+    })).filter(({ models }) => models.length > 0),
+    comparisons: COMPARE_PAIRS.flatMap(([a, b]) => {
+      const left = availableModels.get(a);
+      const right = availableModels.get(b);
+      return left === undefined || right === undefined
+        ? []
+        : [
+            {
+              path: canonicalComparisonPath(left, right),
+              a: left.name,
+              b: right.name,
+            },
+          ];
+    }),
   };
 }
 
 function ModelPick({
-  id,
+  model,
   locale,
 }: {
-  id: ChatModelId;
+  model: ModelRef;
   locale: CountryLanguage;
 }): JSX.Element {
   return (
     <Span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
       <Link
-        href={`/${locale}/models/${toModelSlug(id)}`}
+        href={modelHref(locale, model.slug)}
         className="font-medium text-primary underline-offset-4 hover:underline"
       >
-        {chatModelDefinitions[id].name}
+        {model.name}
       </Link>
-      <InlineCode>{id}</InlineCode>
+      <InlineCode>{model.id}</InlineCode>
     </Span>
   );
 }
@@ -225,6 +251,8 @@ export function TanstackPage({
   subCredits,
   packPrice,
   packCredits,
+  picks,
+  comparisons,
 }: ChatgptAlternativePostPageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
@@ -239,6 +267,11 @@ export function TanstackPage({
     packPrice,
     packCredits,
   };
+  const uncensoredChatHref = `/${locale}${UNCENSORED_CHAT_PATH}`;
+  const faq = FAQ_KEYS.map((key) => ({
+    question: t(`faq.${key}.q`, { appName }),
+    answer: t(`faq.${key}.a`, { ...prices, appName }),
+  }));
 
   return (
     <Div className="min-h-screen bg-background">
@@ -253,13 +286,14 @@ export function TanstackPage({
 
       <ArticleBody>
         <Div className="flex flex-col gap-5">
-          <ArticleLead>{t("intro.lead")}</ArticleLead>
+          <ArticleLead>{t("intro.lead", { appName })}</ArticleLead>
           <ArticleP>{t("intro.p2", { appName, modelCount })}</ArticleP>
         </Div>
 
         <ArticleSection title={t("exists.title")}>
-          <ArticleP>{t("exists.p1")}</ArticleP>
+          <ArticleP>{t("exists.p1", { appName })}</ArticleP>
           <ArticleP>{t("exists.p2", { appName })}</ArticleP>
+          <CardLink href={uncensoredChatHref} label={t("cta.chat")} />
         </ArticleSection>
 
         <ArticleSection title={t("tiers.title")} intro={t("tiers.intro")}>
@@ -285,28 +319,28 @@ export function TanstackPage({
           </Callout>
         </ArticleSection>
 
-        <ArticleSection title={t("picks.title")} intro={t("picks.intro")}>
-          {PICKS.map((group) => (
+        <ArticleSection
+          title={t("picks.title")}
+          intro={picks.length > 0 ? t("picks.intro") : undefined}
+        >
+          {picks.map((group) => (
             <Div key={group.key} className="flex flex-col gap-3">
               <ArticleH3>{t(`picks.${group.key}.title`)}</ArticleH3>
               <ArticleP>{t(`picks.${group.key}.body`)}</ArticleP>
               <ArticleList
-                items={group.models.map((id) => (
-                  <ModelPick key={id} id={id} locale={locale} />
+                items={group.models.map((model) => (
+                  <ModelPick key={model.id} model={model} locale={locale} />
                 ))}
               />
             </Div>
           ))}
-          <ArticleP>{t("picks.compare")}</ArticleP>
+          {comparisons.length > 0 && <ArticleP>{t("picks.compare")}</ArticleP>}
           <Div className="flex flex-col">
-            {COMPARE_PAIRS.map(([a, b]) => (
+            {comparisons.map(({ path, a, b }) => (
               <CardLink
-                key={`${a}-${b}`}
-                href={`/${locale}/models/compare/${toModelSlug(a)}/${toModelSlug(b)}`}
-                label={t("picks.compareLink", {
-                  a: chatModelDefinitions[a].name,
-                  b: chatModelDefinitions[b].name,
-                })}
+                key={path}
+                href={`/${locale}${path}`}
+                label={t("picks.compareLink", { a, b })}
               />
             ))}
             <CardLink
@@ -372,19 +406,11 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleSection title={t("faq.title")}>
-          <JsonLd
-            id="faq-structured-data"
-            data={buildFaqStructuredData(
-              FAQ_KEYS.map((key) => ({
-                question: t(`faq.${key}.q`, { appName }),
-                answer: t(`faq.${key}.a`, { ...prices, appName }),
-              })),
-            )}
-          />
-          {FAQ_KEYS.map((key) => (
-            <Div key={key} className="flex flex-col gap-2">
-              <ArticleH3>{t(`faq.${key}.q`, { appName })}</ArticleH3>
-              <ArticleP>{t(`faq.${key}.a`, { ...prices, appName })}</ArticleP>
+          <JsonLd id="faq-structured-data" data={buildFaqStructuredData(faq)} />
+          {faq.map(({ question, answer }) => (
+            <Div key={question} className="flex flex-col gap-2">
+              <ArticleH3>{question}</ArticleH3>
+              <ArticleP>{answer}</ArticleP>
             </Div>
           ))}
           <Div className="flex flex-col">
@@ -420,7 +446,7 @@ export function TanstackPage({
           actions={
             <>
               <Cta
-                href={`/${locale}/threads/incognito`}
+                href={uncensoredChatHref}
                 label={t("cta.chat")}
                 icon={MessageSquare}
               />

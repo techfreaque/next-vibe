@@ -4,10 +4,11 @@ export const translations: typeof enTranslations = {
   title: "Chat AI senza censura nel browser",
   metaTitle: "Chat AI senza censura e senza registrazione | {{appName}}",
   description:
-    "Prova un chatbot senza censura senza registrarti. Confronta contesto e costi stimati dei modelli, poi fai la tua domanda nel browser.",
+    "Prova un chatbot senza censura nel browser con i crediti gratuiti per gli ospiti. Confronta contesto e costi stimati dei modelli o inizia subito a chattare.",
   intro:
-    "Fai la tua domanda a un chatbot senza censura direttamente dal browser. Puoi iniziare come ospite.",
-  chooseModel: "Trova un modello per la chat",
+    "Inizia senza registrarti. Scegli un modello adatto alla tua domanda o prova quello con il costo stimato più basso per scambio.",
+  tryModel: "Prova {{model}}",
+  chooseModel: "Confronta i modelli",
   choose:
     "Per una domanda breve, parti dai modelli più economici in cima alla lista. Per documenti o conversazioni lunghi, scegli una finestra di contesto più ampia così il modello può elaborare più testo per volta.",
   start:
@@ -24,7 +25,11 @@ export const translations: typeof enTranslations = {
   faq: {
     access: {
       q: "Posso provare gratis una chat AI senza censura?",
-      a: "Come ospite hai {{credits}} crediti gratuiti al mese. Il numero di messaggi dipende dal modello e dalla lunghezza della conversazione.",
+      a: "Come ospite puoi ricevere fino a {{credits}} crediti gratuiti al mese. Il numero di messaggi dipende dal modello e dalla lunghezza della conversazione.",
+    },
+    outOfCredits: {
+      q: "Cosa succede quando esaurisco i crediti da ospite?",
+      a: "Puoi aspettare il mese successivo oppure creare un account gratuito e verificare il tuo indirizzo email. Dopo la verifica puoi ricevere fino a {{credits}} crediti gratuiti al mese. I crediti che hai già usato come ospite nello stesso mese contano per quel totale.",
     },
     filters: {
       q: "Cosa significa qui chat AI senza filtri?",

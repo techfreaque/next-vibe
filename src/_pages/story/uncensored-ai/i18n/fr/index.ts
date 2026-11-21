@@ -4,10 +4,11 @@ export const translations: typeof enTranslations = {
   title: "Chat IA sans censure dans votre navigateur",
   metaTitle: "Chat IA sans censure et sans compte | {{appName}}",
   description:
-    "Essayez un chatbot sans censure sans créer de compte. Comparez le contexte et le coût estimé des modèles, puis posez votre question dans le navigateur.",
+    "Essayez un chatbot sans censure dans votre navigateur avec des crédits gratuits sans compte. Comparez le contexte et le coût estimé des modèles ou lancez la discussion.",
   intro:
-    "Posez votre question à un chatbot sans censure depuis votre navigateur. Vous pouvez commencer sans créer de compte.",
-  chooseModel: "Trouver un modèle de chat",
+    "Commencez à discuter sans créer de compte. Choisissez un modèle adapté à votre question ou essayez celui dont le coût estimé par échange est le plus bas.",
+  tryModel: "Essayer {{model}}",
+  chooseModel: "Comparer les modèles",
   choose:
     "Pour une question courte, essayez un modèle économique en haut de la liste. Pour un long document ou une longue conversation, une fenêtre de contexte plus large permet au modèle de traiter davantage de texte à la fois.",
   start:
@@ -24,7 +25,11 @@ export const translations: typeof enTranslations = {
   faq: {
     access: {
       q: "Puis-je essayer gratuitement un chat IA sans censure ?",
-      a: "Sans compte, vous disposez de {{credits}} crédits gratuits par mois. Le nombre de messages dépend du modèle et de la longueur de la conversation.",
+      a: "Sans compte, vous pouvez recevoir jusqu’à {{credits}} crédits gratuits par mois. Le nombre de messages dépend du modèle et de la longueur de la conversation.",
+    },
+    outOfCredits: {
+      q: "Que se passe-t-il quand j’ai épuisé mes crédits sans compte ?",
+      a: "Vous pouvez attendre le mois suivant ou créer un compte gratuit et confirmer votre adresse e-mail. Une fois l’adresse confirmée, vous pouvez recevoir jusqu’à {{credits}} crédits gratuits par mois. Les crédits déjà dépensés sans compte au cours du même mois sont déduits de ce total.",
     },
     filters: {
       q: "Que signifie ici « chat IA sans filtre » ?",

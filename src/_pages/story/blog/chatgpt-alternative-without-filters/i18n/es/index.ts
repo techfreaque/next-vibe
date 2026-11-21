@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Una alternativa a ChatGPT sin filtros | {{appName}}",
     description:
-      "Una alternativa ChatGPT sin filtrar: modelos {{modelCount}} de la corriente principal a la no censurada. Elige el nivel de filtro por chat. Libre de empezar, sin cuenta.",
+      "¿Buscas ChatGPT sin filtros? Descubre qué protecciones mantiene GPT, compara modelos abiertos y sin censura y prueba otro chatbot sin cuenta.",
     category: "Guía",
     imageAlt: "{{appName}} : una alternativa ChatGPT sin filtros",
     keywords:
@@ -14,72 +14,71 @@ export const translations: typeof enTranslations = {
     backToBlog: "Volver al Blog",
     category: "Guía",
     readTime: "7 min leer",
-    title: "Una alternativa a ChatGPT sin filtros. Tú eliges el nivel.",
+    title: "Una alternativa a ChatGPT con modelos sin censura",
     subtitle:
-      "Claude, GPT y Gemini junto a modelos abiertos y sin censura, en un solo chat en {{appName}}. Qué cambia, qué se mantiene y cuánto cuesta.",
+      "Compara modelos convencionales, abiertos y sin censura en {{appName}}. Descubre cómo cambia la conversación al elegir otro modelo y cuánto cuesta cada opción.",
   },
   intro: {
-    lead: "Usted hizo una pregunta normal. ChatGPT respondió con una renuncia, una conferencia o un educado no. Un detalle médico, una escena novedosa del crimen, una cuestión de seguridad, una toma política fuera del consenso. La negativa es una decisión de política, hecha para usted antes de escribir una palabra.",
-    p2: "Así funciona una alternativa sin filtros en {{appName}}: {{modelCount}} modelos, tres niveles de filtrado, un solo saldo. Hay dos tipos de modelos sin censura: los convencionales modificados para reducir los rechazos y uno con una visión del mundo propia. Qué funciona, cuáles son los límites y cuándo sigue conviniendo ChatGPT.",
+    lead: "ChatGPT usa las medidas de seguridad de OpenAI. GPT las conserva también en {{appName}}. Si buscas un chat con menos restricciones, elige otro modelo. Aun así, puede rechazar una solicitud o equivocarse.",
+    p2: "En {{appName}} puedes elegir entre {{modelCount}} modelos de chat de tres categorías. Todos usan el mismo saldo de créditos.",
   },
   exists: {
     title: "¿Hay un ChatGPT sin filtros?",
-    p1: "No de OpenAI. Los modelos GPT siguen las políticas de uso de OpenAI dondequiera que los ejecute. Claude y Gemini siguen las reglas de sus propios proveedores. Cualquier aplicación que promete un GPT sin filtrar está exagerando.",
-    p2: "Lo que una alternativa real hace es poner otros modelos a su lado. {{appName}} ejecuta los modelos principales y, en el mismo chat, los modelos abiertos con filtros de luz y modelos sin censura sin filtro en absoluto. La mayoría de ellos son modelos principales con los rechazos cortados. Uno, UncensoredLM, tiene su propia visión del mundo. Tú decides cuál responde.",
+    p1: "ChatGPT usa las medidas de seguridad de OpenAI. Al elegir GPT en {{appName}}, esas medidas siguen vigentes.",
+    p2: "Para chatear con menos restricciones, elige un modelo de la categoría sin censura en {{appName}}. Puedes empezar desde el navegador, sin crear una cuenta.",
   },
   tiers: {
     title: '¿Qué significa "sin filtros"?',
     intro: "Cada modelo tiene un nivel de contenido. Hay tres.",
     mainstream:
-      "Mainstream ({{count}} modelos): Claude, GPT, Gemini, Mistral. Filtros de seguridad de la placa grande. Declinan temas sensibles.",
-    open: "Abierto (Modelos {{count}}): DeepSeek, Kimi, GLM, Qwen, Grok, MiniMax y más. Filtros de luz. Ellos toman la mayoría de temas lódicos.",
+      "Convencionales ({{count}} modelos). Se aplican las medidas de seguridad del proveedor.",
+    open: "Abiertos ({{count}} modelos). Los rechazos dependen de cada modelo.",
     uncensored:
-      "Sin censura (modelos {{count}}), dos tipos. Construcciones no censuradas de GLM, Qwen, Gemma y DeepSeek, más Venice : modelos principales con los rechazos cortados, la misma cosmovisión. Y UncensoredLM : entrenado en libros y documentos prohibidos de Internet, su propia cosmovisión. Sin filtro. Tú fijas los límites.",
+      "Sin censura ({{count}} modelos). Esta categoría agrupa modelos según cómo tratan temas delicados.",
     vendorRefusals:
-      "Los modelos Mainstream también mantienen los filtros de su proveedor aquí. GPT en {{appName}} rechaza lo que GPT se niega por todas partes. La diferencia es lo que se encuentra a su lado.",
+      "Al cambiar de modelo en {{appName}}, eliges cuál responde. Se siguen aplicando las medidas de seguridad del modelo elegido.",
     twoKinds:
-      "Uncensored viene en dos tipos. La mayoría comenzó como un modelo convencional o abierto y tuvo el reflejo de rechazo cortado, por la abliteración o una descensura fina. Dejan de decir que no. Sus datos de entrenamiento y su estancia en la cosmovisión: en política responden a la forma en que el modelo base lo ve, sólo sin el estiércol, y en ficción oscura pueden suavizar la escena. Desbloqueado, no cambiado. UncensoredLM es el otro tipo. Uncensored.ai lo entrena en libros y documentos prohibidos desde Internet corriente. El resultado es una visión del mundo diferente: tomas políticas que corren contra la corriente principal, sin conferencia, sin rejuzgar a la línea de consenso.",
+      "Algunos modelos sin censura usan la ablación o el ajuste fino para reducir los rechazos. UncensoredLM se entrenó con libros y documentos prohibidos en el internet convencional. Por eso expresa opiniones políticas que se apartan de la corriente dominante. Contrasta sus afirmaciones con tus fuentes.",
     modelsLink: "Examine cada modelo por nivel de filtro",
   },
   switch: {
     title: "¿Puedo cambiar modelos en medio de un chat?",
-    intro: "Sí. Escoge el modelo por mensaje, no por cuenta.",
-    p1: "Comience un hilo con Claude. Ataque a un rechazo. Escoge un modelo sin censura y envía el siguiente mensaje. El hilo guarda su historia, y el nuevo modelo lee todo.",
-    p2: "También funciona de otra manera. Borrar con un modelo sin censura, luego entregar el resultado a un modelo fronterizo para estructura y pulido.",
+    intro: "Sí. Puedes elegir otro modelo para el siguiente mensaje.",
+    p1: "Si cambias de modelo durante una conversación, el historial se conserva. El nuevo modelo puede usar la parte que cabe en su ventana de contexto.",
+    p2: "Puedes redactar un borrador con un modelo y pedirle a otro que lo revise en el mismo chat.",
     caveat:
-      "El filtro vive en el modelo, no en el hilo. Un modelo dominante que lee un borrador sin censura todavía puede negarse a continuarlo.",
+      "Cada modelo aplica sus propias medidas de seguridad al borrador y a tu próxima solicitud.",
   },
   picks: {
     title: "¿Qué modelo debería usar en lugar de ChatGPT?",
     intro:
       "Empieza por el trabajo. Cada nombre vincula a la página del modelo con precios y especificaciones.",
     builtUncensored: {
-      title:
-        "Política, otros puntos de vista, juego de roles oscuro: su propia visión del mundo",
-      body: "UncensoredLM es el único modelo que no es un modelo estándar desbloqueado. Tiene su propia visión del mundo. Las preguntas políticas y controvertidas hacen que la corriente principal no te dé. Las opiniones heterodoxas se argumentan en su totalidad. El juego de roles oscuro y tabú permanece oscuro. Sin moralizar, sin dirigir de nuevo al consenso. La captura: contexto de 32K, texto solamente, no para código, y afirma reclamaciones impugnadas tan claramente como resueltas. Revisa los hechos que te da.",
+      title: "Política y puntos de vista",
+      body: "UncensoredLM puede aportar otra perspectiva sobre temas políticos o polémicos. Contrasta sus afirmaciones con tus fuentes.",
     },
     everyday: {
-      title: "Trabajos diarios, filtros de corriente",
-      body: "Escribir, investigar, código, análisis. El partido más cercano a ChatGPT, con el mismo tipo de filtros.",
+      title: "Tareas cotidianas",
+      body: "Prueba estos modelos convencionales para escribir, programar y analizar información.",
     },
     open: {
-      title: "Inteligente, menos rechazos",
-      body: "Modelos abiertos fuertes con filtros de luz. Responden a la mayoría de lo que un modelo dominante esquiva y sostienen el código y el razonamiento.",
+      title: "Modelos abiertos para código y razonamiento",
+      body: "Prueba estos modelos abiertos para programar o resolver problemas. Compara cómo responden a la misma pregunta.",
     },
     unfiltered: {
-      title: "No hay rechazos, razonamiento real",
-      body: "Los pesados hitters entre los modelos de rechazo. Modelos de base fuertes con los rechazos eliminados: código, análisis y escritura larga sobre temas otros modelos bandera. Mismo entrenamiento, la misma visión del mundo, así que para tomas políticas contra el comienzo principal con UncensoredLM.",
+      title: "Modelos sin censura para análisis",
+      body: "Prueba estos modelos para analizar, programar o escribir textos largos. Pueden rechazar solicitudes.",
     },
     fiction: {
-      title: "Roleplay y ficción oscura",
-      body: "UncensoredLM conduce a escenas oscuras y tabú: su material de entrenamiento se encuentra fuera del consenso seguro, así que nada suaviza la historia. Venice Role Play para campañas largas (128K context) e imagen de entrada. Venice Sin censura como el todo-redondeado barato.",
+      title: "Juego de rol y ficción oscura",
+      body: "Para seguir una historia durante varias sesiones, compara las ventanas de contexto. Revisa también si el modelo admite imágenes como entrada.",
     },
     cheap: {
-      title: "Barato y rápido",
-      body: "Alto volumen a un precio bajo. Tres modelos flash deshuesados, más Claude Haiku para cuando un filtro está bien.",
+      title: "Modelos más económicos",
+      body: "Consulta el costo estimado en la ficha del modelo. Las consultas y respuestas más largas pueden consumir más créditos.",
     },
     compare:
-      "¿Torn entre dos? Ponga el precio, la ventana de contexto y las capacidades lado a lado. Comience con UncensoredLM contra el modelo ChatGPT 's, contra Venice Role Play y contra un buque insignia de rechazo.",
+      "Compara las parejas disponibles por precio, ventana de contexto y funciones.",
     compareLink: "Comparar {{a}} con {{b}}",
     guideLink: "Lea la guía de cada modelo sin censura",
   },
@@ -129,11 +128,15 @@ export const translations: typeof enTranslations = {
     tools:
       "No todos los modelos no censurados soportan llamadas de herramientas. Compruebe la página modelo antes de contar con la búsqueda web u otras herramientas.",
     vendor:
-      "Los modelos de corriente principal mantienen sus propios rechazos. Si Claude dice que no, cambie modelos en lugar de discutir con él.",
+      "Los modelos convencionales conservan las medidas de seguridad de su proveedor. Los modelos sin censura también pueden rechazar solicitudes.",
     responsibility:
-      "Ningún filtro significa que no hay red de seguridad. Lo que generas y publicas es sobre ti, y la ley donde vives sigue vigente.",
+      "Verifica los datos importantes antes de compartir una respuesta o tomar una decisión a partir de ella.",
   },
   faq: {
+    filters: {
+      q: "¿Se pueden desactivar las medidas de seguridad de GPT en una alternativa a ChatGPT?",
+      a: "En {{appName}}, GPT mantiene las medidas de seguridad de su proveedor. Si eliges un modelo sin censura, te responde ese otro modelo, que tiene su propio comportamiento.",
+    },
     title: "FAQ",
     free: {
       q: "¿Está libre {{appName}}?",
@@ -159,10 +162,10 @@ export const translations: typeof enTranslations = {
     link: "Ver el programa de socios",
   },
   cta: {
-    title: "Escoge tu filtro. Haz tu pregunta.",
+    title: "Elige un modelo y empieza a chatear",
     subtitle:
-      "Créditos gratis {{guestCredits}} al mes, sin cuenta necesaria. Incorporación, abierta o no censurada: cambie en cualquier momento.",
-    chat: "Iniciar una charla sin filtrar",
+      "Empieza sin cuenta con hasta {{guestCredits}} créditos gratis al mes.",
+    chat: "Prueba el chat de IA sin censura",
     models: "Compare todos los modelos",
   },
 };

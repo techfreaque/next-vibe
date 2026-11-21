@@ -1,8 +1,8 @@
 export const translations = {
-  title: "Abliterated AI chat",
-  metaTitle: "Try Abliterated AI Chat Online | {{appName}}",
+  title: "Abliterated AI models you can try online",
+  metaTitle: "Abliterated AI Models You Can Try Online | {{appName}}",
   description:
-    "Try abliterated AI models in your browser. Compare context windows and estimated credits per turn, then open a chat with the model you choose.",
+    "Compare abliterated LLMs by context window and estimated cost. Try models in your browser and compare with the original where available.",
   intro:
     "Test models modified to refuse fewer prompts. Pick one to open a browser chat with that model already selected.",
   models: "Available abliterated models",
@@ -12,6 +12,7 @@ export const translations = {
   context: "Context window of {{tokens}} tokens",
   price: "About {{credits}} credits per turn",
   chat: "Try {{model}}",
+  compareBase: "Compare with {{model}}",
   trial: {
     title: "Test the same prompt in two chats",
     start:
@@ -23,9 +24,13 @@ export const translations = {
   },
   questions: "Frequently asked questions",
   faq: {
+    meaning: {
+      q: "What is an abliterated LLM?",
+      a: "Abliteration modifies model weights to weaken patterns associated with refusals. The models listed here have a documented abliteration method in our catalog. You can open a browser chat with each available model.",
+    },
     access: {
       q: "Can I try abliterated AI without an account?",
-      a: "Yes. Guests get {{credits}} free credits per month. Before using an uncensored model, confirm once that you are 18 or older and accept unfiltered replies.",
+      a: "Yes. Guests can use up to {{credits}} free credits per month. Before using an uncensored model, confirm once that you are 18 or older and accept unfiltered replies.",
     },
     refusals: {
       q: "Can an abliterated model still refuse a prompt?",

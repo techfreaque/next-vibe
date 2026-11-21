@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternative à ChatGPT sans filtres | {{appName}}",
     description:
-      "Une alternative à ChatGPT sans filtres : {{modelCount}} modèles, du grand public au non censuré. Vous choisissez le niveau de filtrage à chaque discussion. Gratuit pour commencer, sans compte.",
+      "Vous cherchez un ChatGPT sans filtre ? Voyez quelles protections GPT conserve, comparez les modèles ouverts et sans censure et essayez un autre chatbot sans compte.",
     category: "Guide",
     imageAlt: "{{appName}} : une alternative à ChatGPT sans filtres",
     keywords:
@@ -14,74 +14,71 @@ export const translations: typeof enTranslations = {
     backToBlog: "Retour au blog",
     category: "Guide",
     readTime: "7 min de lecture",
-    title:
-      "Une alternative à ChatGPT sans filtres. C'est vous qui réglez le niveau.",
+    title: "Une alternative à ChatGPT avec des modèles sans censure",
     subtitle:
-      "Claude, GPT et Gemini à côté de modèles open source et non censurés, dans un seul chat sur {{appName}}. La version honnête : ce qui change, ce qui ne change pas, et ce que ça coûte.",
+      "Comparez les modèles grand public, ouverts et sans censure sur {{appName}}. Voyez ce que change le choix du modèle et combien coûte chaque option.",
   },
   intro: {
-    lead: "Vous avez posé une question normale. ChatGPT a répondu par un avertissement, une leçon de morale ou un refus poli. Un détail médical, une scène de polar, une question de sécurité informatique, une opinion politique hors consensus. Ce refus est une décision de politique interne, prise à votre place avant même que vous tapiez un mot.",
-    p2: "Voici à quoi ressemble concrètement une alternative sans filtres sur {{appName}} : {{modelCount}} modèles, trois niveaux de filtrage, un seul solde. Et deux sortes de non-censuré : des modèles grand public qui ont cessé de refuser, et un modèle qui a sa propre vision du monde. Ce qu'il fait bien, où il montre ses limites, et quand ChatGPT reste le meilleur choix.",
+    lead: "ChatGPT applique les protections d’OpenAI. GPT les conserve sur {{appName}}. Pour discuter avec moins de restrictions, choisissez un autre modèle. Il peut lui aussi refuser une demande ou se tromper.",
+    p2: "{{appName}} réunit {{modelCount}} modèles de chat répartis en trois catégories, avec un solde de crédits commun.",
   },
   exists: {
     title: "Existe-t-il un ChatGPT sans filtres ?",
-    p1: "Pas chez OpenAI. Les modèles GPT suivent les règles d'utilisation d'OpenAI, où que vous les utilisiez. Claude et Gemini suivent les règles de leurs propres éditeurs. Toute appli qui promet un GPT sans filtre en promet trop.",
-    p2: "Une vraie alternative place d'autres modèles à côté d'eux. {{appName}} fait tourner les modèles grand public et, dans le même chat, des modèles open source aux filtres légers et des modèles non censurés sans aucun filtre. La plupart sont des modèles grand public dont on a retiré les refus. Un seul, UncensoredLM, a sa propre vision du monde. C'est vous qui décidez lequel répond.",
+    p1: "ChatGPT applique les protections d’OpenAI. Sur {{appName}}, elles continuent de s’appliquer lorsque vous choisissez GPT.",
+    p2: "Pour discuter avec moins de restrictions, choisissez un modèle de la catégorie sans censure sur {{appName}}. Vous pouvez commencer dans votre navigateur sans créer de compte.",
   },
   tiers: {
     title: "Que veut vraiment dire « sans filtres » ?",
     intro: "Chaque modèle a un niveau de contenu. Il y en a trois.",
     mainstream:
-      "Grand public ({{count}} modèles) : Claude, GPT, Gemini, Mistral. Les filtres de sécurité des grands labos. Ils déclinent les sujets sensibles.",
-    open: "Open source ({{count}} modèles) : DeepSeek, Kimi, GLM, Qwen, Grok, MiniMax et d'autres. Filtres légers. Ils abordent la plupart des sujets délicats.",
+      "Grand public ({{count}} modèles). Les protections du fournisseur s’appliquent.",
+    open: "Ouverts ({{count}} modèles). Les refus dépendent du modèle.",
     uncensored:
-      "Non censuré ({{count}} modèles), de deux sortes. Des versions non censurées de GLM, Qwen, Gemma et DeepSeek, plus Venice : des modèles grand public dont on a retiré les refus, avec la même vision du monde. Et UncensoredLM : entraîné sur des livres et des documents bannis de l'internet grand public, sa propre vision du monde. Aucun filtre. C'est vous qui fixez les limites.",
+      "Sans censure ({{count}} modèles). Ces modèles sont regroupés selon leur façon d’aborder les sujets sensibles.",
     vendorRefusals:
-      "Les modèles grand public gardent ici aussi les filtres de leur éditeur. GPT sur {{appName}} refuse ce que GPT refuse partout. La différence, c'est ce qu'il y a à côté.",
+      "Sur {{appName}}, vous choisissez quel modèle répond. Les protections propres à ce modèle continuent de s’appliquer.",
     twoKinds:
-      "Le non-censuré existe en deux versions. La plupart des modèles sont partis d'un modèle grand public ou open source dont on a supprimé le réflexe de refus, par abliteration (on retire la « direction du refus » des poids du modèle) ou par un fine-tuning de décensure. Ils arrêtent de dire non. Leurs données d'entraînement et leur vision du monde restent les mêmes : en politique, ils répondent comme le voit le modèle de base, simplement sans esquiver, et dans la fiction sombre ils peuvent adoucir la scène. Débloqués, pas transformés. UncensoredLM est l'autre sorte. Uncensored.ai l'entraîne sur des livres et des documents bannis de l'internet grand public. Résultat : une autre vision du monde, des opinions politiques à contre-courant, pas de sermon, pas de retour forcé vers la ligne consensuelle.",
+      "Certains modèles sans censure utilisent l’ablitération ou un entraînement complémentaire pour réduire les refus. UncensoredLM a été entraîné sur des livres et des documents bannis de l’internet grand public. Il exprime ainsi des opinions politiques à contre-courant. Vérifiez ses affirmations auprès de vos sources.",
     modelsLink: "Parcourir tous les modèles par niveau de filtrage",
   },
   switch: {
     title: "Puis-je changer de modèle en pleine discussion ?",
-    intro:
-      "Oui. Vous choisissez le modèle à chaque message, pas pour tout le compte.",
-    p1: "Commencez un fil avec Claude. Vous tombez sur un refus. Choisissez un modèle non censuré et envoyez le message suivant. Le fil garde son historique, et le nouveau modèle le lit en entier.",
-    p2: "Ça marche aussi dans l'autre sens. Faites un premier jet avec un modèle non censuré, puis confiez le résultat à un modèle de pointe pour la structure et la finition.",
+    intro: "Oui. Vous pouvez choisir un autre modèle pour le prochain message.",
+    p1: "Lorsque vous changez de modèle dans une discussion, vous gardez l’historique. Le nouveau modèle peut utiliser la partie qui tient dans sa fenêtre de contexte.",
+    p2: "Vous pouvez rédiger un premier jet avec un modèle et en choisir un autre pour le retravailler dans le même chat.",
     caveat:
-      "Le filtre est dans le modèle, pas dans le fil. Un modèle grand public qui lit un brouillon non censuré peut quand même refuser de le poursuivre.",
+      "Chaque modèle applique ses propres protections au brouillon et à votre prochaine demande.",
   },
   picks: {
     title: "Quel modèle utiliser à la place de ChatGPT ?",
     intro:
       "Partez de la tâche. Chaque nom renvoie à la page du modèle, avec prix et specs.",
     builtUncensored: {
-      title:
-        "Politique, autres points de vue, jeu de rôle sombre : sa propre vision du monde",
-      body: "UncensoredLM est le seul modèle ici qui ne soit pas un modèle grand public débloqué. Il a sa propre vision du monde. Les questions politiques et controversées obtiennent des réponses que les modèles grand public ne vous donneront pas. Les opinions hétérodoxes sont défendues jusqu'au bout. Le jeu de rôle sombre ou tabou reste sombre. Pas de moralisation, pas de retour au consensus. La limite : 32K de contexte, texte uniquement, pas fait pour le code, et il énonce les affirmations contestées aussi nettement que les faits établis. Vérifiez ce qu'il vous dit.",
+      title: "Politique et points de vue",
+      body: "UncensoredLM peut offrir un autre point de vue sur les sujets politiques ou controversés. Vérifiez ses affirmations auprès de vos sources.",
     },
     everyday: {
-      title: "Travail quotidien, filtres grand public",
-      body: "Rédaction, recherche, code, analyse. Le plus proche de ChatGPT, avec le même type de filtres.",
+      title: "Tâches du quotidien",
+      body: "Essayez ces modèles grand public pour la rédaction, le code et l’analyse.",
     },
     open: {
-      title: "Intelligents, moins de refus",
-      body: "Des modèles open source solides aux filtres légers. Ils répondent à la plupart des questions qu'un modèle grand public esquive et tiennent la route en code et en raisonnement.",
+      title: "Modèles ouverts pour le code et le raisonnement",
+      body: "Essayez ces modèles ouverts pour programmer ou résoudre un problème. Comparez leurs réponses à la même question.",
     },
     unfiltered: {
-      title: "Aucun refus, du vrai raisonnement",
-      body: "Les poids lourds parmi les modèles débarrassés de leurs refus. De solides modèles de base sans refus : code, analyse et longs textes sur des sujets que d'autres modèles signalent. Même entraînement, même vision du monde : pour des opinions politiques à contre-courant, commencez plutôt par UncensoredLM.",
+      title: "Modèles sans censure pour l’analyse",
+      body: "Essayez ces modèles pour l’analyse, le code ou les textes longs. Ils peuvent encore refuser une demande.",
     },
     fiction: {
       title: "Jeu de rôle et fiction sombre",
-      body: "UncensoredLM est en tête pour les scènes sombres et taboues : ses données d'entraînement sortent du consensus prudent, rien n'adoucit l'histoire. Venice Role Play pour les longues campagnes (128K de contexte) et l'entrée d'images. Venice Uncensored comme polyvalent bon marché.",
+      body: "Pour suivre une histoire au fil des échanges, comparez les fenêtres de contexte. Vérifiez si le modèle accepte aussi les images en entrée.",
     },
     cheap: {
-      title: "Pas cher et rapide",
-      body: "Gros volume à petit prix. Trois modèles flash débarrassés de leurs refus, plus Claude Haiku quand un filtre ne vous gêne pas.",
+      title: "Modèles plus économiques",
+      body: "Consultez le coût estimé sur chaque fiche. Des demandes et réponses plus longues peuvent consommer davantage de crédits.",
     },
     compare:
-      "Vous hésitez entre deux ? Comparez prix, fenêtre de contexte et capacités côte à côte. Commencez par UncensoredLM face au modèle de ChatGPT, face à Venice Role Play et face à un modèle phare débarrassé de ses refus.",
+      "Comparez les paires disponibles selon le prix, la fenêtre de contexte et les fonctionnalités.",
     compareLink: "Comparer {{a}} et {{b}}",
     guideLink: "Lire le guide de tous les modèles non censurés",
   },
@@ -132,11 +129,15 @@ export const translations: typeof enTranslations = {
     tools:
       "Tous les modèles non censurés ne prennent pas en charge les appels d'outils. Vérifiez la page du modèle avant de compter sur la recherche web ou d'autres outils.",
     vendor:
-      "Les modèles grand public gardent leurs propres refus. Si Claude dit non, changez de modèle au lieu de négocier avec lui.",
+      "Les modèles grand public conservent les protections de leur fournisseur. Les modèles sans censure peuvent aussi refuser une demande.",
     responsibility:
-      "Pas de filtre, pas de filet de sécurité. Ce que vous générez et publiez relève de votre responsabilité, et la loi de votre pays s'applique toujours.",
+      "Vérifiez les informations importantes avant de partager une réponse ou de prendre une décision sur cette base.",
   },
   faq: {
+    filters: {
+      q: "Peut-on désactiver les protections de GPT dans une alternative à ChatGPT ?",
+      a: "Sur {{appName}}, GPT conserve les protections de son fournisseur. Si vous choisissez un modèle sans censure, c’est cet autre modèle qui répond, avec son propre fonctionnement.",
+    },
     title: "FAQ",
     free: {
       q: "{{appName}} est-il gratuit ?",
@@ -162,10 +163,10 @@ export const translations: typeof enTranslations = {
     link: "Voir le programme partenaire",
   },
   cta: {
-    title: "Choisissez votre filtre. Posez votre question.",
+    title: "Choisissez un modèle et lancez la discussion",
     subtitle:
-      "{{guestCredits}} crédits gratuits par mois, sans compte. Grand public, open source ou non censuré : changez quand vous voulez.",
-    chat: "Lancer un chat sans filtre",
+      "Commencez sans compte avec jusqu’à {{guestCredits}} crédits gratuits par mois.",
+    chat: "Essayer un chat IA sans censure",
     models: "Comparer tous les modèles",
   },
 };

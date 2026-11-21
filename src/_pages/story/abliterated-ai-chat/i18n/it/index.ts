@@ -1,10 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Chat AI con modelli abliterati",
-  metaTitle: "Prova in chat i modelli AI abliterati | {{appName}}",
+  title: "Modelli AI abliterati da provare online",
+  metaTitle: "Modelli AI abliterati da provare online | {{appName}}",
   description:
-    "Prova i modelli AI abliterati nel browser. Confronta le finestre di contesto e il costo stimato per scambio, poi apri una chat con il modello che scegli.",
+    "Confronta i modelli abliterati per finestra di contesto e costo stimato. Provali nel browser e confrontali con il modello di base, se disponibile.",
   intro:
     "Prova modelli modificati per rifiutare meno richieste. Scegline uno e apri una chat nel browser con quel modello già selezionato.",
   models: "Modelli disponibili",
@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
   context: "Finestra di contesto di {{tokens}} token",
   price: "Circa {{credits}} crediti per scambio",
   chat: "Prova {{model}}",
+  compareBase: "Confronta con {{model}}",
   trial: {
     title: "Prova la stessa richiesta in due chat",
     start:
@@ -25,9 +26,13 @@ export const translations: typeof enTranslations = {
   },
   questions: "Domande frequenti",
   faq: {
+    meaning: {
+      q: "Che cos’è un LLM abliterato?",
+      a: "L’ablazione modifica i pesi del modello per indebolire i meccanismi legati ai rifiuti. Il nostro catalogo documenta l’uso di questa tecnica per i modelli elencati qui. Puoi provare ogni modello disponibile nel browser.",
+    },
     access: {
       q: "Posso provare questi modelli senza un account?",
-      a: "Sì. Come ospite hai {{credits}} crediti gratuiti al mese. Prima di usare un modello senza censura, conferma una sola volta di avere almeno 18 anni e di accettare risposte senza filtri.",
+      a: "Sì. Come ospite puoi usare fino a {{credits}} crediti gratuiti al mese. Prima di usare un modello senza censura, conferma una sola volta di avere almeno 18 anni e di accettare risposte senza filtri.",
     },
     refusals: {
       q: "Un modello abliterato può ancora rifiutare una richiesta?",

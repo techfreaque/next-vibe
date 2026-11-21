@@ -1,10 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "KI-Chat mit abliterierten Modellen",
-  metaTitle: "Abliterierte KI im Chat testen | {{appName}}",
+  title: "Abliterierte KI-Modelle online testen",
+  metaTitle: "Abliterierte KI-Modelle online testen | {{appName}}",
   description:
-    "Teste abliterierte KI-Modelle im Browser. Vergleiche Kontextfenster und geschätzte Kosten pro Chat-Runde und starte direkt mit dem Modell deiner Wahl.",
+    "Vergleiche abliterierte LLMs nach Kontextfenster und geschätzten Kosten. Teste sie im Browser und vergleiche sie mit dem Basismodell, sofern verfügbar.",
   intro:
     "Teste Modelle, die so angepasst wurden, dass sie seltener Anfragen ablehnen. Wähle eins aus und öffne einen Browser-Chat mit genau diesem Modell.",
   models: "Verfügbare abliterierte Modelle",
@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
   context: "Kontextfenster mit {{tokens}} Tokens",
   price: "Rund {{credits}} Credits pro Chat-Runde",
   chat: "{{model}} testen",
+  compareBase: "Mit {{model}} vergleichen",
   trial: {
     title: "Dieselbe Anfrage in zwei Chats testen",
     start:
@@ -25,9 +26,13 @@ export const translations: typeof enTranslations = {
   },
   questions: "Häufige Fragen",
   faq: {
+    meaning: {
+      q: "Was ist ein abliteriertes LLM?",
+      a: "Bei der Abliteration werden Modellgewichte verändert, um Muster abzuschwächen, die mit Ablehnungen zusammenhängen. Für die Modelle in dieser Liste ist das Verfahren in unserem Katalog dokumentiert. Jedes verfügbare Modell kannst du im Browser testen.",
+    },
     access: {
       q: "Kann ich abliterierte KI ohne Konto testen?",
-      a: "Ja. Als Gast bekommst du monatlich {{credits}} kostenlose Credits. Bevor du ein unzensiertes Modell nutzt, bestätigst du einmalig, dass du mindestens 18 bist und ungefilterte Antworten akzeptierst.",
+      a: "Ja. Als Gast kannst du monatlich bis zu {{credits}} kostenlose Credits nutzen. Bevor du ein unzensiertes Modell nutzt, bestätigst du einmalig, dass du mindestens 18 bist und ungefilterte Antworten akzeptierst.",
     },
     refusals: {
       q: "Kann ein abliteriertes Modell eine Anfrage noch ablehnen?",

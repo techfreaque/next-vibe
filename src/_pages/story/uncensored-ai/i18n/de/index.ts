@@ -4,10 +4,11 @@ export const translations: typeof enTranslations = {
   title: "Unzensierter KI-Chat im Browser",
   metaTitle: "Unzensierter KI-Chat ohne Anmeldung | {{appName}}",
   description:
-    "Teste einen unzensierten KI-Chat ohne Konto. Vergleiche Modelle nach Kontextfenster und geschätzten Kosten und stell deine Frage direkt im Browser.",
+    "Teste einen unzensierten KI-Chat im Browser mit Gratis-Credits für Gäste. Vergleiche Kontextfenster und geschätzte Kosten oder chatte direkt los.",
   intro:
-    "Stell deine Frage direkt im Browser. Du kannst als Gast mit einem unzensierten KI-Modell chatten.",
-  chooseModel: "Chatmodell finden",
+    "Starte ohne Konto. Such dir ein Chatmodell für deine Frage aus oder teste das Modell mit den niedrigsten geschätzten Kosten pro Gesprächsrunde.",
+  tryModel: "{{model}} ausprobieren",
+  chooseModel: "Chatmodelle vergleichen",
   choose:
     "Für kurze Fragen findest du die günstigsten Modelle oben in der Liste. Wähle für lange Dokumente oder Gespräche ein größeres Kontextfenster, damit das Modell mehr Text auf einmal verarbeiten kann.",
   start:
@@ -24,7 +25,11 @@ export const translations: typeof enTranslations = {
   faq: {
     access: {
       q: "Kann ich einen unzensierten KI-Chat kostenlos testen?",
-      a: "Als Gast erhältst du monatlich {{credits}} kostenlose Credits. Wie viele Nachrichten das sind, hängt vom Modell und von der Gesprächslänge ab.",
+      a: "Als Gast kannst du bis zu {{credits}} Gratis-Credits pro Monat erhalten. Wie viele Nachrichten du damit senden kannst, hängt vom Modell und von der Gesprächslänge ab.",
+    },
+    outOfCredits: {
+      q: "Was passiert, wenn meine Gratis-Credits als Gast aufgebraucht sind?",
+      a: "Du kannst bis zum nächsten Monat warten oder ein kostenloses Konto anlegen und deine E-Mail-Adresse bestätigen. Mit bestätigter Adresse kannst du bis zu {{credits}} Gratis-Credits pro Monat erhalten. Was du im selben Monat als Gast verbraucht hast, zählt mit.",
     },
     filters: {
       q: "Was bedeutet KI-Chat ohne Filter hier?",

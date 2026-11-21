@@ -1,10 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Chat IA avec des modèles abliterated",
+  title: "Modèles IA abliterated à tester en ligne",
   metaTitle: "Modèles IA abliterated à tester en ligne | {{appName}}",
   description:
-    "Testez des modèles abliterated dans votre navigateur. Comparez les fenêtres de contexte et le coût estimé par échange, puis ouvrez un chat avec le modèle choisi.",
+    "Comparez les LLM abliterated par fenêtre de contexte et coût estimé. Essayez-les dans votre navigateur et comparez-les au modèle de base quand il est disponible.",
   intro:
     "Testez des modèles modifiés pour refuser moins de demandes. Choisissez-en un et ouvrez un chat dans votre navigateur avec ce modèle déjà sélectionné.",
   models: "Modèles abliterated disponibles",
@@ -14,6 +14,7 @@ export const translations: typeof enTranslations = {
   context: "Fenêtre de contexte de {{tokens}} tokens",
   price: "Environ {{credits}} crédits par échange",
   chat: "Tester {{model}}",
+  compareBase: "Comparer avec {{model}}",
   trial: {
     title: "Essayez la même consigne dans deux chats",
     start:
@@ -25,9 +26,13 @@ export const translations: typeof enTranslations = {
   },
   questions: "Questions fréquentes",
   faq: {
+    meaning: {
+      q: "Qu’est-ce qu’un LLM abliterated ?",
+      a: "L’ablitération modifie les poids d’un modèle pour atténuer les mécanismes associés aux refus. Notre catalogue documente cette méthode pour les modèles de cette liste. Vous pouvez tester chaque modèle disponible dans votre navigateur.",
+    },
     access: {
       q: "Puis-je tester un modèle abliterated sans compte ?",
-      a: "Oui. Vous disposez de {{credits}} crédits gratuits par mois en tant qu’invité. Avant d’utiliser un modèle non censuré, confirmez une seule fois que vous avez au moins 18 ans et que vous acceptez les réponses sans filtre.",
+      a: "Oui. Vous pouvez utiliser jusqu’à {{credits}} crédits gratuits par mois en tant qu’invité. Avant d’utiliser un modèle non censuré, confirmez une seule fois que vous avez au moins 18 ans et que vous acceptez les réponses sans filtre.",
     },
     refusals: {
       q: "Un modèle abliterated peut-il encore refuser une demande ?",

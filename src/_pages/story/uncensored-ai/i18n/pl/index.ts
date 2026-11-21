@@ -4,10 +4,11 @@ export const translations: typeof enTranslations = {
   title: "Czat AI bez cenzury w przeglądarce",
   metaTitle: "Czat AI bez cenzury i bez rejestracji | {{appName}}",
   description:
-    "Wypróbuj czat AI bez cenzury i bez konta. Porównaj okna kontekstowe i szacowane koszty modeli, a potem zadaj własne pytanie w przeglądarce.",
+    "Wypróbuj czat AI bez cenzury w przeglądarce z darmowymi kredytami dla gości. Porównaj okna kontekstowe i szacowane koszty lub od razu zacznij rozmowę.",
   intro:
-    "Porozmawiaj z chatbotem bez cenzury w przeglądarce. Możesz zacząć jako gość.",
-  chooseModel: "Znajdź model do rozmowy",
+    "Zacznij rozmowę bez konta. Dobierz model do swojego pytania lub wypróbuj ten o najniższym szacowanym koszcie wymiany wiadomości.",
+  tryModel: "Wypróbuj {{model}}",
+  chooseModel: "Porównaj modele do czatu",
   choose:
     "Do krótkiego pytania wybierz tańszy model z początku listy. Przy długich dokumentach lub rozmowach większe okno kontekstowe pozwoli modelowi uwzględnić więcej tekstu naraz.",
   start:
@@ -24,7 +25,11 @@ export const translations: typeof enTranslations = {
   faq: {
     access: {
       q: "Czy mogę wypróbować czat AI bez cenzury za darmo?",
-      a: "Miesięczna pula darmowych kredytów dla gości wynosi {{credits}}. Liczba wiadomości zależy od modelu i długości rozmowy.",
+      a: "Jako gość możesz otrzymać do {{credits}} darmowych kredytów miesięcznie. Liczba wiadomości zależy od modelu i długości rozmowy.",
+    },
+    outOfCredits: {
+      q: "Co się stanie, gdy skończą mi się kredyty gościa?",
+      a: "Możesz poczekać na pulę na kolejny miesiąc albo założyć darmowe konto i potwierdzić adres e-mail. Po weryfikacji możesz otrzymać do {{credits}} darmowych kredytów miesięcznie. Kredyty wykorzystane w tym samym miesiącu jako gość wliczają się do tej puli.",
     },
     filters: {
       q: "Co tutaj znaczy czat AI bez filtrów?",
