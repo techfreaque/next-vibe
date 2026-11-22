@@ -21,6 +21,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { isValidEnumValue } from "next-vibe/unified-ui/_shared/enum";
 import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import type { AnalyticsBucket } from "next-vibe/unified-ui/analytics/enum";
+import { AnalyticsFilterPanel } from "next-vibe/unified-ui/analytics/filter-panel";
 import { nextBucket, toDayKey } from "next-vibe/unified-ui/analytics/window";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
@@ -41,6 +42,7 @@ import {
   LEAD_SEGMENT_TEXT_KEYS,
   leadSegmentFields,
   pickSegmentFilters,
+  SEGMENT_KEYS,
   type SegmentFilterKey,
 } from "./filters";
 import { scopedTranslation } from "./i18n";
@@ -221,73 +223,63 @@ export function SegmentFilterPanel({
   applyLabel: string;
 }): JSX.Element {
   return (
-    <Div className="flex flex-col gap-3">
-      <Div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @lg:grid-cols-4">
-        <SelectFieldWidget
-          fieldName="traffic"
-          field={leadSegmentFields.traffic}
-        />
-        <SelectFieldWidget
-          fieldName="botFamily"
-          field={leadSegmentFields.botFamily}
-        />
-        <SelectFieldWidget
-          fieldName="channelType"
-          field={leadSegmentFields.channelType}
-        />
-        <SelectFieldWidget
-          fieldName="device"
-          field={leadSegmentFields.device}
-        />
-        <TextFieldWidget
-          fieldName="channel"
-          field={leadSegmentFields.channel}
-        />
-        <TextFieldWidget fieldName="source" field={leadSegmentFields.source} />
-        <TextFieldWidget fieldName="medium" field={leadSegmentFields.medium} />
-        <TextFieldWidget
-          fieldName="campaign"
-          field={leadSegmentFields.campaign}
-        />
-        <TextFieldWidget
-          fieldName="referrerHost"
-          field={leadSegmentFields.referrerHost}
-        />
-        <TextFieldWidget
-          fieldName="landingPath"
-          field={leadSegmentFields.landingPath}
-        />
-        <TextFieldWidget
-          fieldName="refCode"
-          field={leadSegmentFields.refCode}
-        />
-        <TextFieldWidget
-          fieldName="country"
-          field={leadSegmentFields.country}
-        />
-        <TextFieldWidget
-          fieldName="localeCountry"
-          field={leadSegmentFields.localeCountry}
-        />
-        <TextFieldWidget
-          fieldName="browser"
-          field={leadSegmentFields.browser}
-        />
-        <TextFieldWidget fieldName="os" field={leadSegmentFields.os} />
-        <TextFieldWidget
-          fieldName="ipPrefix"
-          field={leadSegmentFields.ipPrefix}
-        />
-        <TextFieldWidget
-          fieldName="uaFingerprint"
-          field={leadSegmentFields.uaFingerprint}
-        />
-      </Div>
-      <Div>
-        <Button type="button" variant="secondary" size="sm" onClick={onApply}>
-          {applyLabel}
-        </Button>
-      </Div>
+    <AnalyticsFilterPanel
+      fields={SEGMENT_KEYS}
+      onApply={onApply}
+      applyLabel={applyLabel}
+    >
+      <SegmentFilterInputs />
+    </AnalyticsFilterPanel>
+  );
+}
+
+export function SegmentFilterInputs(): JSX.Element {
+  return (
+    <Div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @lg:grid-cols-4">
+      <SelectFieldWidget
+        fieldName="traffic"
+        field={leadSegmentFields.traffic}
+      />
+      <SelectFieldWidget
+        fieldName="botFamily"
+        field={leadSegmentFields.botFamily}
+      />
+      <SelectFieldWidget
+        fieldName="channelType"
+        field={leadSegmentFields.channelType}
+      />
+      <SelectFieldWidget fieldName="device" field={leadSegmentFields.device} />
+      <TextFieldWidget fieldName="channel" field={leadSegmentFields.channel} />
+      <TextFieldWidget fieldName="source" field={leadSegmentFields.source} />
+      <TextFieldWidget fieldName="medium" field={leadSegmentFields.medium} />
+      <TextFieldWidget
+        fieldName="campaign"
+        field={leadSegmentFields.campaign}
+      />
+      <TextFieldWidget
+        fieldName="referrerHost"
+        field={leadSegmentFields.referrerHost}
+      />
+      <TextFieldWidget
+        fieldName="landingPath"
+        field={leadSegmentFields.landingPath}
+      />
+      <TextFieldWidget fieldName="refCode" field={leadSegmentFields.refCode} />
+      <TextFieldWidget fieldName="country" field={leadSegmentFields.country} />
+      <TextFieldWidget
+        fieldName="localeCountry"
+        field={leadSegmentFields.localeCountry}
+      />
+      <TextFieldWidget fieldName="browser" field={leadSegmentFields.browser} />
+      <TextFieldWidget fieldName="os" field={leadSegmentFields.os} />
+      <TextFieldWidget
+        fieldName="ipPrefix"
+        field={leadSegmentFields.ipPrefix}
+      />
+      <TextFieldWidget
+        fieldName="uaFingerprint"
+        field={leadSegmentFields.uaFingerprint}
+      />
     </Div>
   );
 }

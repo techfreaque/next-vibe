@@ -21,6 +21,7 @@ export interface WidgetContextProviderProps<
 > {
   context: ReactWidgetContext<TEndpoint>;
   children: ReactNode;
+  exposeFormForE2E?: boolean;
 }
 
 /**
@@ -31,6 +32,7 @@ export interface WidgetContextProviderProps<
 export function WidgetContextProvider<TEndpoint extends CreateApiEndpointAny>({
   context,
   children,
+  exposeFormForE2E = true,
 }: WidgetContextProviderProps<TEndpoint>): ReactElement {
   // Create store instance once (lazy initializer) and initialize with context
   // immediately so the first render already sees it.
@@ -51,7 +53,7 @@ export function WidgetContextProvider<TEndpoint extends CreateApiEndpointAny>({
   // Expose form.setValue on window for browser E2E tests so programmatic
   // field filling can bypass custom UI components (e.g. Radix Select).
   useEffect((): (() => void) | void => {
-    if (typeof window === "undefined" || !context.form) {
+    if (!exposeFormForE2E || typeof window === "undefined" || !context.form) {
       return;
     }
     type SetValueFn = (
@@ -71,7 +73,7 @@ export function WidgetContextProvider<TEndpoint extends CreateApiEndpointAny>({
         delete (window as E2EWindow).__formSetValue;
       }
     };
-  }, [context.form]);
+  }, [context.form, exposeFormForE2E]);
 
   return (
     <WidgetContextStoreContext.Provider value={store}>

@@ -54,6 +54,7 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { AnalyticsFilterPanel } from "next-vibe/unified-ui/analytics/filter-panel";
 import { MultiSelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/multiselect-field/widget";
 import { SelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/select-field/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
@@ -61,11 +62,11 @@ import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/n
 import React, { useCallback, useMemo } from "react";
 
 import { BotFamily, FunnelReach } from "../analytics/enum";
-import type { LeadDrillFilters } from "../analytics/filters";
+import { type LeadDrillFilters, SEGMENT_KEYS } from "../analytics/filters";
 import {
   dimensionValueLabel,
   segmentChips,
-  SegmentFilterPanel,
+  SegmentFilterInputs,
   useLeadAnalyticsT,
 } from "../analytics/widget-parts";
 import { AcquisitionSourceFilter } from "../growth/acquisition";
@@ -1014,36 +1015,33 @@ export function LeadsListContainer({
             collapsible
             defaultOpen={false}
           >
-            <SegmentFilterPanel
+            <AnalyticsFilterPanel
+              fields={ADVANCED_FILTER_FIELDS}
               onApply={() => handlePageChange(1)}
               applyLabel={t("widget.apply")}
-            />
-            <Div className="mt-3 grid grid-cols-1 gap-3 @sm:grid-cols-2 @lg:grid-cols-4">
-              <TextFieldWidget
-                fieldName="createdFrom"
-                field={children.createdFrom}
-              />
-              <TextFieldWidget
-                fieldName="createdTo"
-                field={children.createdTo}
-              />
-              <SelectFieldWidget fieldName="reached" field={children.reached} />
-            </Div>
-            <Div className="mt-4 border-t pt-3">
-              <Span className="mb-2 block text-xs font-medium text-muted-foreground">
-                {t("acquisition.title")}
-              </Span>
-              <AcquisitionFilterInputs />
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                disabled={isFetching}
-                onClick={() => handlePageChange(1)}
-              >
-                {t("acquisition.apply")}
-              </Button>
-            </Div>
+            >
+              <SegmentFilterInputs />
+              <Div className="grid grid-cols-1 gap-3 @sm:grid-cols-2 @lg:grid-cols-4">
+                <TextFieldWidget
+                  fieldName="createdFrom"
+                  field={children.createdFrom}
+                />
+                <TextFieldWidget
+                  fieldName="createdTo"
+                  field={children.createdTo}
+                />
+                <SelectFieldWidget
+                  fieldName="reached"
+                  field={children.reached}
+                />
+              </Div>
+              <Div className="border-t pt-3">
+                <Span className="mb-2 block text-xs font-medium text-muted-foreground">
+                  {t("acquisition.title")}
+                </Span>
+                <AcquisitionFilterInputs />
+              </Div>
+            </AnalyticsFilterPanel>
           </SectionGroup>
         </Div>
       )}
@@ -1196,24 +1194,17 @@ export function LeadsListContainer({
   );
 }
 
+const ADVANCED_FILTER_FIELDS = [
+  ...SEGMENT_KEYS,
+  "createdFrom",
+  "createdTo",
+  "reached",
+  "acquisitionFilters",
+  "acquisitionCurrency",
+] as const;
+
 const DRILL_KEYS = [
-  "traffic",
-  "botFamily",
-  "channelType",
-  "channel",
-  "source",
-  "medium",
-  "campaign",
-  "referrerHost",
-  "landingPath",
-  "refCode",
-  "country",
-  "localeCountry",
-  "device",
-  "browser",
-  "os",
-  "ipPrefix",
-  "uaFingerprint",
+  ...SEGMENT_KEYS,
   "createdFrom",
   "createdTo",
   "reached",
