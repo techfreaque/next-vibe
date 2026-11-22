@@ -22,8 +22,14 @@ import { Ul } from "next-vibe/ui/components/ul";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 
+import { configScopedTranslation } from "@/env/i18n";
+
 import { buildBlogPostStructuredData } from "../../_components/structured-data";
+import { RelatedGuides } from "../blog/guide-links";
+import { scopedTranslation as blogScopedTranslation } from "../blog/i18n";
+import { getBlogPostCard } from "../blog/posts-cards";
 import { type BlogPostSlug, formatPostDate } from "../blog/posts-meta";
+import { BreadcrumbTrail } from "./breadcrumbs";
 import { CtaRow } from "./marketing";
 
 /** Reading column: 16px gutters on phones, 3xl measure on desktop. */
@@ -57,19 +63,24 @@ export function ArticleHeader({
 }: ArticleHeaderProps): JSX.Element {
   const structuredData =
     post === undefined ? null : buildBlogPostStructuredData(post);
+  const trail = post === undefined ? null : postBreadcrumbs(post);
   return (
     <Div className="border-b border-border bg-linear-to-b from-primary/[0.05] to-background">
       {structuredData !== null && (
         <JsonLd id="article-structured-data" data={structuredData} />
       )}
       <Div className={cn(READING_COLUMN, "pt-8 pb-12 md:pt-14 md:pb-16")}>
-        <Link
-          href={back.href}
-          className="-ml-1 mb-8 inline-flex min-h-11 items-center gap-2 rounded-md px-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground md:mb-10"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {back.label}
-        </Link>
+        {trail === null ? (
+          <Link
+            href={back.href}
+            className="-ml-1 mb-8 inline-flex min-h-11 items-center gap-2 rounded-md px-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground md:mb-10"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {back.label}
+          </Link>
+        ) : (
+          <BreadcrumbTrail items={trail} className="mb-6 md:mb-8" />
+        )}
         <ArticleMeta
           category={category}
           readTime={readTime}
@@ -88,6 +99,30 @@ export function ArticleHeader({
       </Div>
     </Div>
   );
+}
+
+/**
+ * Visible trail matching the post's BreadcrumbList JSON-LD:
+ * {appName} → blog → post.
+ */
+function postBreadcrumbs({
+  slug,
+  locale,
+}: {
+  slug: BlogPostSlug;
+  locale: CountryLanguage;
+}): { name: string; href?: string }[] | null {
+  const card = getBlogPostCard(slug, locale);
+  if (card === undefined) {
+    return null;
+  }
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const { t: blogT } = blogScopedTranslation.scopedT(locale);
+  return [
+    { name: configT("appName"), href: `/${locale}/story` },
+    { name: blogT("page.title"), href: `/${locale}/story/blog` },
+    { name: card.title },
+  ];
 }
 
 export function ArticleMeta({
@@ -346,14 +381,20 @@ export function ArticleEnd({
   subtitle,
   actions,
   back,
+  post,
 }: {
   title: ReactNode;
   subtitle?: ReactNode;
   actions?: ReactNode;
   back: { href: string; label: string };
+  /** Blog post this ends: adds its hub and sibling guides. */
+  post?: { slug: BlogPostSlug; locale: CountryLanguage };
 }): JSX.Element {
   return (
     <Div className="flex flex-col gap-8 border-t border-border pt-12">
+      {post !== undefined && (
+        <RelatedGuides locale={post.locale} slug={post.slug} />
+      )}
       <Div className="rounded-2xl border border-primary/20 bg-linear-to-b from-primary/[0.07] to-card p-6 md:p-10">
         <H2 className="border-none pb-0 text-2xl font-semibold tracking-tight text-balance md:text-3xl">
           {title}

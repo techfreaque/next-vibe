@@ -40,6 +40,9 @@ export const translations: typeof enTranslations = {
     },
   },
   guides: "Poznaj AI bez cenzury",
-  methodGuide: "Sprawdź, czym abliteracja różni się od innych metod",
   allModels: "Zobacz wszystkie modele czatu bez cenzury",
+  breadcrumb: "Abliterowana AI",
+  guidesTitle: "Poradniki o abliteracji",
+  guidesIntro:
+    "Jak abliteracja usuwa odmowy, gdzie ma granice i który model wybrać do jakiego zadania.",
 };

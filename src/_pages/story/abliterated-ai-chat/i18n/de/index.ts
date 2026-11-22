@@ -40,6 +40,9 @@ export const translations: typeof enTranslations = {
     },
   },
   guides: "Mehr über unzensierte KI",
-  methodGuide: "Was Abliteration von anderen Methoden unterscheidet",
   allModels: "Alle unzensierten Chatmodelle ansehen",
+  breadcrumb: "Abliterierte KI",
+  guidesTitle: "Ratgeber zur Abliteration",
+  guidesIntro:
+    "Wie Abliteration Ablehnungen entfernt, wo sie an Grenzen stößt und welches Modell für welche Aufgabe passt.",
 };

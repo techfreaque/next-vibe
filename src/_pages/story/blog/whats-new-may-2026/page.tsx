@@ -231,6 +231,7 @@ export function TanstackPage({ locale }: WhatsNewMay2026PageData): JSX.Element {
         </ArticleSection>
 
         <ArticleEnd
+          post={{ slug: "whats-new-may-2026", locale }}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle")}

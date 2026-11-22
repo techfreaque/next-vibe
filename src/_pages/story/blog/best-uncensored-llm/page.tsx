@@ -456,6 +456,7 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleEnd
+          post={{ slug: SLUG, locale }}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle", stats)}

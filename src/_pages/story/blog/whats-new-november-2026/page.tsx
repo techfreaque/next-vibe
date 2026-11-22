@@ -281,6 +281,7 @@ export function TanstackPage({
         </Group>
 
         <ArticleEnd
+          post={{ slug: "whats-new-november-2026", locale }}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle", { appName })}

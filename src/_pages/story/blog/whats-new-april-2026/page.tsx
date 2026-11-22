@@ -349,6 +349,7 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleEnd
+          post={{ slug: "whats-new-april-2026", locale }}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle")}

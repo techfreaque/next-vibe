@@ -278,5 +278,37 @@ export const translations: typeof enTranslations = {
     readMore: "Weiterlesen",
     allPosts: "Alle Beiträge",
     featured: "Empfohlen",
+    relatedGuides: "Passende Ratgeber",
+    startHere: "Hier starten",
+  },
+  topics: {
+    uncensored: {
+      title: "Unzensierte KI",
+      intro:
+        "Welches unzensierte Modell passt, wie Abliteration funktioniert und wo du ohne Filter und ohne Konto chattest.",
+    },
+    media: {
+      title: "Bild, Video und Stimme",
+      intro:
+        "Bild-, Video-, Musik- und Sprachgeneratoren im Vergleich, mit Preis pro Ergebnis.",
+    },
+    developers: {
+      title: "API und Coding-Tools",
+      intro:
+        "Unzensierte und Mainstream-Modelle direkt aus eigenem Code, Skripten und Coding-Agenten nutzen.",
+    },
+    updates: {
+      title: "Produkt-Updates",
+      intro: "Was neu ist, Monat für Monat.",
+    },
+    engineering: {
+      title: "Engineering",
+      intro: "Wie next-vibe entsteht. Architektur, Bugs, Lösungen.",
+    },
+    referral: {
+      title: "Empfehlen und verdienen",
+      intro:
+        "Wie das Empfehlungsprogramm auszahlt und wie du mit Skills verdienst.",
+    },
   },
 };

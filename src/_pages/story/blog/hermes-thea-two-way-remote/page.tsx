@@ -250,6 +250,7 @@ export function TanstackPage({ locale }: HermesTheaPageData): JSX.Element {
         </ArticleSection>
 
         <ArticleEnd
+          post={{ slug: "hermes-thea-two-way-remote", locale }}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle")}

@@ -77,7 +77,7 @@ export function UserMenu({
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className="cursor-pointer">
-          <Link href={`/${locale}/subscription`}>
+          <Link href={`/${locale}/subscription/overview`}>
             <Settings className="mr-2 h-4 w-4" />
             <Span>{t("nav.pricing")}</Span>
           </Link>

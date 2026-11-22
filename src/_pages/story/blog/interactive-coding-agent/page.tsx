@@ -183,6 +183,7 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleEnd
+          post={{ slug: "interactive-coding-agent", locale }}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle")}

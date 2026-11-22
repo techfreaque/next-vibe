@@ -564,7 +564,7 @@ export function TanstackPage({
             items={[t("billing.sub", prices), t("billing.pack", prices)]}
           />
           <CardLink
-            href={`/${locale}/subscription`}
+            href={`/${locale}/subscription/overview`}
             label={t("billing.link")}
           />
         </ArticleSection>
@@ -639,7 +639,7 @@ export function TanstackPage({
           <Div className="flex flex-col">
             <CardLink href={`/${locale}/docs/api`} label={t("faq.docsLink")} />
             <CardLink
-              href={`/${locale}/subscription`}
+              href={`/${locale}/subscription/overview`}
               label={t("faq.pricingLink")}
             />
           </Div>
@@ -656,6 +656,7 @@ export function TanstackPage({
         </Callout>
 
         <ArticleEnd
+          post={{ slug: SLUG, locale }}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle")}

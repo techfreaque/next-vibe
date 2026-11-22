@@ -33,7 +33,8 @@ import {
 } from "../compare/_shared/platforms";
 import { scopedTranslation as compareScopedTranslation } from "../compare/i18n";
 import { scopedTranslation } from "./i18n";
-import { listBlogPostCards } from "./posts-cards";
+import { type BlogPostCard, listBlogPostCards } from "./posts-cards";
+import { BLOG_TOPICS, POST_TOPICS } from "./topics";
 
 // Per-visitor newsletter CTA (the story layout is force-dynamic anyway)
 export const dynamic = "force-dynamic";
@@ -180,16 +181,18 @@ export function TanstackPage({
 
   const { t: compareT } = compareScopedTranslation.scopedT(locale);
   const postCards = listBlogPostCards(locale);
-  const [newest, ...older] = postCards.map((card): BlogCardData => ({
+  const toCardData = (card: BlogPostCard): BlogCardData => ({
     href: `/${locale}${card.path}`,
     date: card.date,
     title: card.title,
     category: card.category,
     excerpt: card.excerpt,
     readTime: card.readTime,
-  }));
-  // The platform comparison is a standing page, not a dated post: it sits
-  // first in the grid, right under the featured post.
+  });
+  const [newest, ...older] = postCards;
+  const featured = newest === undefined ? undefined : toCardData(newest);
+  // The platform comparison is a standing page, not a dated post: it leads
+  // the uncensored section. The referral landing closes the referral one.
   const compareCard: BlogCardData = {
     href: `/${locale}${COMPARE_HUB_PATH}`,
     date: formatCompareDate(COMPARE_CHECKED_DATE, locale),
@@ -198,23 +201,30 @@ export function TanstackPage({
     excerpt: compareT("links.hubDesc"),
     readTime: compareT("hub.hero.readTime"),
   };
+  const earnCard: BlogCardData = {
+    href: `/${locale}/story/earn`,
+    date: undefined,
+    title: t("posts.referralLanding.title"),
+    category: t("posts.referralLanding.category"),
+    excerpt: t("posts.referralLanding.excerpt"),
+    readTime: t("posts.referralLanding.readTime"),
+  };
+  // Newest first inside each topic; the featured post is not repeated.
+  const sections = BLOG_TOPICS.map((topic) => {
+    const posts = older
+      .filter((card) => POST_TOPICS[card.slug] === topic)
+      .map(toCardData);
+    return {
+      topic,
+      posts:
+        topic === "uncensored"
+          ? [compareCard, ...posts]
+          : topic === "referral"
+            ? [...posts, earnCard]
+            : posts,
+    };
+  }).filter((section) => section.posts.length > 0);
 
-  // Newest first; product updates lead, deep dives and referral guides follow.
-  const posts: BlogCardData[] = [
-    ...(newest === undefined ? [] : [newest]),
-    compareCard,
-    ...older,
-    {
-      href: `/${locale}/story/earn`,
-      date: undefined,
-      title: t("posts.referralLanding.title"),
-      category: t("posts.referralLanding.category"),
-      excerpt: t("posts.referralLanding.excerpt"),
-      readTime: t("posts.referralLanding.readTime"),
-    },
-  ];
-
-  const [featured, ...rest] = posts;
   const readMore = t("labels.readMore");
 
   return (
@@ -251,9 +261,21 @@ export function TanstackPage({
               <FeaturedPostCard post={featured} readMore={readMore} />
             </Div>
           )}
-          <Div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
-            {rest.map((item) => (
-              <PostCard key={item.href} post={item} readMore={readMore} />
+          <Div className="flex flex-col gap-14 md:gap-20">
+            {sections.map(({ topic, posts }) => (
+              <Section key={topic} id={topic} className="scroll-mt-20">
+                <H2 className="border-none pb-0 text-2xl font-semibold tracking-tight md:text-3xl">
+                  {t(`topics.${topic}.title`)}
+                </H2>
+                <P className="mt-2 max-w-2xl text-base leading-relaxed text-muted-foreground">
+                  {t(`topics.${topic}.intro`)}
+                </P>
+                <Div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
+                  {posts.map((item) => (
+                    <PostCard key={item.href} post={item} readMore={readMore} />
+                  ))}
+                </Div>
+              </Section>
             ))}
           </Div>
         </Div>

@@ -40,7 +40,7 @@ export function Navbar({
       <Div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-2 px-4 sm:px-6">
         {/* Logo */}
         <Div className="flex items-center gap-2 shrink-0">
-          <Logo locale={locale} pathName="" />
+          <Logo locale={locale} pathName="/story" />
         </Div>
 
         {/* Desktop Navigation - overflow-aware, hidden on mobile */}

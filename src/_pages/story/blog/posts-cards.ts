@@ -48,6 +48,11 @@ const POST_CARD_KEYS = [
   ["referral-for-affiliate-pros", "referralAffiliatePros"],
 ] as const satisfies readonly (readonly [BlogPostSlug, string])[];
 
+/** Every post slug, newest first. */
+export const BLOG_POST_SLUGS: readonly BlogPostSlug[] = POST_CARD_KEYS.map(
+  ([slug]) => slug,
+);
+
 /** Compile-time guard: a post added to posts-meta must get a card here. */
 type MissingCard = Exclude<BlogPostSlug, (typeof POST_CARD_KEYS)[number][0]>;
 const EVERY_POST_HAS_A_CARD: [MissingCard] extends [never] ? true : never =

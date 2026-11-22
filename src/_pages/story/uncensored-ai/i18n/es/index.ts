@@ -42,7 +42,14 @@ export const translations: typeof enTranslations = {
   },
   guides: "Compara modelos y plataformas",
   abliteratedChat: "Prueba en el chat un modelo con ablación de rechazos",
-  abliteration: "Cómo cambia un modelo de lenguaje con la ablación de rechazos",
   compare: "Compara plataformas de chat de IA sin censura",
   benchmark: "Consulta las respuestas de varios modelos a las mismas preguntas",
+  breadcrumb: "IA sin censura",
+  guidesTitle: "Guías de IA sin censura",
+  guidesIntro:
+    "Qué modelo sirve para cada tarea, qué cambia la ablación en un modelo y cómo chatear o usar una API sin GPU ni cuenta.",
+  comparisons: "Comparativas cara a cara",
+  comparisonsIntro:
+    "Dos modelos por página, lado a lado. Mira en qué se diferencian antes de elegir.",
+  versus: "{{a}} vs. {{b}}",
 };

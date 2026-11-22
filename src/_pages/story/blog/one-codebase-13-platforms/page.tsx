@@ -462,6 +462,7 @@ export async function explainToMyBoss(
         </Div>
 
         <ArticleEnd
+          post={{ slug: "one-codebase-13-platforms", locale }}
           back={back}
           title={t("closing.title")}
           subtitle={t("closing.para")}

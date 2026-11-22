@@ -40,7 +40,14 @@ export const translations = {
   },
   guides: "Compare models and platforms",
   abliteratedChat: "Try an abliterated AI model in chat",
-  abliteration: "How abliterated models differ from other uncensored models",
   compare: "Compare uncensored AI chat platforms",
   benchmark: "See which models answered the same benchmark questions",
+  breadcrumb: "Uncensored AI",
+  guidesTitle: "Uncensored AI guides",
+  guidesIntro:
+    "Which model fits which job, what abliteration changes in a model, and how to chat or call an API without a GPU or an account.",
+  comparisons: "Head-to-head comparisons",
+  comparisonsIntro:
+    "Two models per page, side by side. See where they differ before you pick one.",
+  versus: "{{a}} vs {{b}}",
 };

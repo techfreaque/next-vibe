@@ -273,6 +273,7 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleEnd
+          post={{ slug: "skill-sharing-economy", locale }}
           back={back}
           title={t("close.title")}
           subtitle={`${t("close.p1")} ${t("close.p2")}`}

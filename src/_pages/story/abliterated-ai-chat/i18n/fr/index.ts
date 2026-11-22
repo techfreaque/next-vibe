@@ -40,6 +40,9 @@ export const translations: typeof enTranslations = {
     },
   },
   guides: "Découvrir l’IA non censurée",
-  methodGuide: "Comprendre ce qui distingue l’ablitération des autres méthodes",
   allModels: "Voir tous les modèles de chat non censurés",
+  breadcrumb: "IA abliterated",
+  guidesTitle: "Guides sur l’ablitération",
+  guidesIntro:
+    "Comment l’ablitération supprime les refus, où elle atteint ses limites, et quel modèle choisir pour chaque tâche.",
 };

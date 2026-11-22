@@ -40,6 +40,9 @@ export const translations: typeof enTranslations = {
     },
   },
   guides: "Explora la IA sin censura",
-  methodGuide: "Descubre cómo se distingue la ablación de otros métodos",
   allModels: "Explora todos los modelos de chat sin censura",
+  breadcrumb: "IA abliterada",
+  guidesTitle: "Guías sobre la ablación",
+  guidesIntro:
+    "Cómo la ablación elimina las negativas, dónde se queda corta y qué modelo elegir para cada tarea.",
 };

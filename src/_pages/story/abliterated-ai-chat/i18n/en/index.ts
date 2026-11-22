@@ -38,6 +38,9 @@ export const translations = {
     },
   },
   guides: "Explore uncensored AI",
-  methodGuide: "Learn how abliteration differs from other methods",
   allModels: "Browse all uncensored chat models",
+  breadcrumb: "Abliterated AI",
+  guidesTitle: "Guides on abliteration",
+  guidesIntro:
+    "How abliteration removes refusals, where it falls short, and which model to try for each job.",
 };

@@ -19,6 +19,8 @@ import type { IconComponent } from "next-vibe/ui/lib/helper";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 
+import { BreadcrumbTrail, type BreadcrumbTrailItem } from "./breadcrumbs";
+
 /** Shared page container: 16px gutters on phones, max-w-6xl on desktop. */
 export const CONTAINER = "mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8";
 
@@ -159,6 +161,8 @@ export interface PageHeroProps {
   actions?: ReactNode;
   centered?: boolean;
   back?: { href: string; label: string };
+  /** Visible breadcrumb trail; pair with BreadcrumbList JSON-LD. */
+  breadcrumbs?: readonly BreadcrumbTrailItem[];
   /** Extra content under the CTAs (stats, meta row). */
   children?: ReactNode;
 }
@@ -171,6 +175,7 @@ export function PageHero({
   actions,
   centered = false,
   back,
+  breadcrumbs,
   children,
 }: PageHeroProps): JSX.Element {
   return (
@@ -190,6 +195,12 @@ export function PageHero({
             <ArrowLeft className="h-4 w-4" />
             {back.label}
           </Link>
+        )}
+        {breadcrumbs !== undefined && (
+          <BreadcrumbTrail
+            items={breadcrumbs}
+            className={cn("mb-6 md:mb-8", centered && "flex justify-center")}
+          />
         )}
         <Div className={cn("max-w-3xl", centered && "mx-auto")}>
           {eyebrow !== undefined && (

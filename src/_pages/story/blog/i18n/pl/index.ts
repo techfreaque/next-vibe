@@ -281,5 +281,36 @@ export const translations: typeof enTranslations = {
     readMore: "Czytaj więcej",
     allPosts: "Wszystkie posty",
     featured: "Wyróżniony",
+    relatedGuides: "Powiązane poradniki",
+    startHere: "Zacznij tutaj",
+  },
+  topics: {
+    uncensored: {
+      title: "Nieocenzurowana AI",
+      intro:
+        "Który nieocenzurowany model wybrać, jak działa abliteracja i gdzie czatować bez filtrów i bez konta.",
+    },
+    media: {
+      title: "Obrazy, wideo i głos",
+      intro:
+        "Generatory obrazów, wideo, muzyki i mowy w porównaniu, z ceną za wynik.",
+    },
+    developers: {
+      title: "API i narzędzia dla programistów",
+      intro:
+        "Wywołuj nieocenzurowane i popularne modele z własnego kodu, skryptów i agentów kodujących.",
+    },
+    updates: {
+      title: "Nowości",
+      intro: "Co weszło, miesiąc po miesiącu.",
+    },
+    engineering: {
+      title: "Inżynieria",
+      intro: "Jak powstaje next-vibe. Architektura, błędy, poprawki.",
+    },
+    referral: {
+      title: "Polecenia i zarobki",
+      intro: "Jak płaci program poleceń i jak zarabiać na skillach.",
+    },
   },
 };

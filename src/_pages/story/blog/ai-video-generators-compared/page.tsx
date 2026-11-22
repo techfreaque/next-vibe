@@ -764,7 +764,7 @@ export function TanstackPage({
             items={[t("pricing.sub", stats), t("pricing.pack", stats)]}
           />
           <CardLink
-            href={`/${locale}/subscription`}
+            href={`/${locale}/subscription/overview`}
             label={t("pricing.link")}
           />
         </ArticleSection>
@@ -825,7 +825,7 @@ export function TanstackPage({
               label={t("faq.modelsLink", stats)}
             />
             <CardLink
-              href={`/${locale}/subscription`}
+              href={`/${locale}/subscription/overview`}
               label={t("faq.pricingLink")}
             />
           </Div>
@@ -839,6 +839,7 @@ export function TanstackPage({
         </Callout>
 
         <ArticleEnd
+          post={{ slug: SLUG, locale }}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle", stats)}

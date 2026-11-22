@@ -366,6 +366,7 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleEnd
+          post={{ slug: "model-refresh-uncensored-providers", locale }}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle")}

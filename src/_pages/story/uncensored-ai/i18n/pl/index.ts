@@ -42,7 +42,14 @@ export const translations: typeof enTranslations = {
   },
   guides: "Porównaj modele i platformy",
   abliteratedChat: "Wypróbuj model po abliteracji na czacie",
-  abliteration: "Jak abliteracja zmienia model językowy",
   compare: "Porównaj platformy do czatu AI bez cenzury",
   benchmark: "Zobacz odpowiedzi modeli na te same pytania testowe",
+  breadcrumb: "Nieocenzurowana AI",
+  guidesTitle: "Poradniki o nieocenzurowanej AI",
+  guidesIntro:
+    "Który model pasuje do jakiego zadania, co abliteracja zmienia w modelu i jak czatować lub korzystać z API bez GPU i bez konta.",
+  comparisons: "Porównania jeden na jeden",
+  comparisonsIntro:
+    "Dwa modele na jednej stronie, obok siebie. Zobacz różnice, zanim wybierzesz.",
+  versus: "{{a}} vs {{b}}",
 };

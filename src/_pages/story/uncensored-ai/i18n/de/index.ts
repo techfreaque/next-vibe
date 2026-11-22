@@ -42,7 +42,14 @@ export const translations: typeof enTranslations = {
   },
   guides: "Modelle und Plattformen vergleichen",
   abliteratedChat: "Ein Modell mit Abliteration im Chat testen",
-  abliteration: "Was Abliteration bei einem Sprachmodell verändert",
   compare: "Plattformen für unzensierten KI-Chat vergleichen",
   benchmark: "Antworten verschiedener Modelle auf dieselben Testfragen ansehen",
+  breadcrumb: "Unzensierte KI",
+  guidesTitle: "Ratgeber zu unzensierter KI",
+  guidesIntro:
+    "Welches Modell zu welcher Aufgabe passt, was Abliteration an einem Modell ändert und wie du ohne GPU und ohne Konto chattest oder eine API nutzt.",
+  comparisons: "Direktvergleiche",
+  comparisonsIntro:
+    "Zwei Modelle pro Seite, direkt nebeneinander. Sieh die Unterschiede, bevor du dich entscheidest.",
+  versus: "{{a}} vs. {{b}}",
 };

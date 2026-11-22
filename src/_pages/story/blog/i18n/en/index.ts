@@ -272,5 +272,36 @@ export const translations = {
     readMore: "Read more",
     allPosts: "All posts",
     featured: "Featured",
+    relatedGuides: "Related guides",
+    startHere: "Start here",
+  },
+  topics: {
+    uncensored: {
+      title: "Uncensored AI",
+      intro:
+        "Which uncensored model to pick, how abliteration works, and where to chat without filters or an account.",
+    },
+    media: {
+      title: "Images, video and voice",
+      intro:
+        "Image, video, music and speech generators compared, with prices per output.",
+    },
+    developers: {
+      title: "API and coding tools",
+      intro:
+        "Call uncensored and mainstream models from your own code, scripts and coding agents.",
+    },
+    updates: {
+      title: "Product updates",
+      intro: "What shipped, month by month.",
+    },
+    engineering: {
+      title: "Engineering",
+      intro: "How next-vibe gets built. The architecture, the bugs, the fixes.",
+    },
+    referral: {
+      title: "Referrals and earning",
+      intro: "How the referral program pays, and how to earn with skills.",
+    },
   },
 };

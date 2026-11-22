@@ -150,6 +150,7 @@ export function TanstackPage({
         <ArticleCode code={t("cta.clone")} language="bash" />
 
         <ArticleEnd
+          post={{ slug: "one-endpoint-every-surface", locale }}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle")}

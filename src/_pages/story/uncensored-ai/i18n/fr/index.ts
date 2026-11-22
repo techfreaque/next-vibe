@@ -42,7 +42,14 @@ export const translations: typeof enTranslations = {
   },
   guides: "Comparer les modèles et les plateformes",
   abliteratedChat: "Essayer en chat un modèle modifié par ablitération",
-  abliteration: "Comprendre l’ablitération des modèles de langage",
   compare: "Comparer les plateformes de chat IA sans censure",
   benchmark: "Voir comment les modèles répondent aux mêmes questions",
+  breadcrumb: "IA non censurée",
+  guidesTitle: "Guides sur l’IA non censurée",
+  guidesIntro:
+    "Quel modèle pour quelle tâche, ce que l’ablitération change dans un modèle, et comment discuter ou appeler une API sans GPU ni compte.",
+  comparisons: "Comparatifs face à face",
+  comparisonsIntro:
+    "Deux modèles par page, côte à côte. Voyez ce qui les distingue avant de choisir.",
+  versus: "{{a}} vs {{b}}",
 };

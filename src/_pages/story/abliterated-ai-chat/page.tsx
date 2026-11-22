@@ -9,6 +9,7 @@ import { H3, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { buildBreadcrumbList } from "@/_pages/_components/structured-data";
 import {
   canonicalComparisonPath,
   isUncensoredVariantOf,
@@ -25,6 +26,9 @@ import { configScopedTranslation } from "@/env/i18n";
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
 import { CardLink, Cta, PageHero, PageSection } from "../_shared/marketing";
+import { GuideCardGrid } from "../blog/guide-links";
+import { HUB_GUIDES, TOPIC_HUB_PATHS } from "../blog/topics";
+import { scopedTranslation as uncensoredScopedTranslation } from "../uncensored-ai/i18n";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -98,6 +102,8 @@ export async function generateMetadata({
 
 export function TanstackPage({ locale, models }: PageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: uncensoredT } = uncensoredScopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
   const faq = [
     { question: t("faq.meaning.q"), answer: t("faq.meaning.a") },
     {
@@ -111,7 +117,31 @@ export function TanstackPage({ locale, models }: PageData): JSX.Element {
 
   return (
     <>
-      <PageHero title={t("title")} subtitle={t("intro")} />
+      <JsonLd
+        id="abliterated-chat-breadcrumbs"
+        data={{
+          "@context": "https://schema.org",
+          ...buildBreadcrumbList(locale, [
+            {
+              name: uncensoredT("breadcrumb"),
+              path: TOPIC_HUB_PATHS.uncensored,
+            },
+            { name: t("breadcrumb"), path: TOPIC_HUB_PATHS.abliterated },
+          ]),
+        }}
+      />
+      <PageHero
+        breadcrumbs={[
+          { name: configT("appName"), href: `/${locale}/story` },
+          {
+            name: uncensoredT("breadcrumb"),
+            href: `/${locale}${TOPIC_HUB_PATHS.uncensored}`,
+          },
+          { name: t("breadcrumb") },
+        ]}
+        title={t("title")}
+        subtitle={t("intro")}
+      />
       <PageSection
         title={t("models")}
         intro={
@@ -203,15 +233,27 @@ export function TanstackPage({ locale, models }: PageData): JSX.Element {
           ))}
         </Div>
       </PageSection>
-      <PageSection title={t("guides")} tone="muted" narrow>
+      <PageSection
+        id="guides"
+        title={t("guidesTitle")}
+        intro={t("guidesIntro")}
+        tone="muted"
+      >
+        <GuideCardGrid locale={locale} slugs={HUB_GUIDES.abliterated} />
+      </PageSection>
+      <PageSection title={t("guides")} narrow>
         <Div className="flex flex-col items-start">
           <CardLink
-            href={`/${locale}/story/blog/abliterated-vs-uncensored-models`}
-            label={t("methodGuide")}
+            href={`/${locale}${TOPIC_HUB_PATHS.uncensored}`}
+            label={t("allModels")}
           />
           <CardLink
-            href={`/${locale}/story/uncensored-ai`}
-            label={t("allModels")}
+            href={`/${locale}/story/compare/uncensored-ai-platforms`}
+            label={uncensoredT("compare")}
+          />
+          <CardLink
+            href={`/${locale}/story/refusal-index`}
+            label={uncensoredT("benchmark")}
           />
         </Div>
       </PageSection>

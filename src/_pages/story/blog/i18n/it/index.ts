@@ -278,5 +278,36 @@ export const translations: typeof enTranslations = {
     readMore: "Continua a leggere",
     allPosts: "Tutti gli articoli",
     featured: "In evidenza",
+    relatedGuides: "Guide correlate",
+    startHere: "Inizia da qui",
+  },
+  topics: {
+    uncensored: {
+      title: "IA senza censura",
+      intro:
+        "Quale modello senza censura scegliere, come funziona l’ablazione e dove chattare senza filtri né account.",
+    },
+    media: {
+      title: "Immagini, video e voce",
+      intro:
+        "Generatori di immagini, video, musica e voce a confronto, con il prezzo per risultato.",
+    },
+    developers: {
+      title: "API e strumenti di coding",
+      intro:
+        "Usa modelli senza censura e mainstream dal tuo codice, dai tuoi script e dai tuoi agenti di coding.",
+    },
+    updates: {
+      title: "Novità del prodotto",
+      intro: "Cosa è uscito, mese per mese.",
+    },
+    engineering: {
+      title: "Ingegneria",
+      intro: "Come nasce next-vibe. Architettura, bug, soluzioni.",
+    },
+    referral: {
+      title: "Referral e guadagni",
+      intro: "Come paga il programma referral e come guadagnare con le skill.",
+    },
   },
 };

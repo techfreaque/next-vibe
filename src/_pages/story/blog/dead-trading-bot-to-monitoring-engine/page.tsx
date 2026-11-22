@@ -698,6 +698,7 @@ export function TanstackPage({ locale }: TradingBotPageData): JSX.Element {
         </ArticleSection>
 
         <ArticleEnd
+          post={{ slug: "dead-trading-bot-to-monitoring-engine", locale }}
           back={{ href: back.href, label: t("vision.cta.secondary") }}
           title={t("vision.closeTagline")}
           actions={

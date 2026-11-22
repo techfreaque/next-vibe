@@ -392,6 +392,7 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleEnd
+          post={{ slug: "uncensored-models-what-each-is-good-at", locale }}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle")}

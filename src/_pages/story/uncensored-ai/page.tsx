@@ -12,7 +12,10 @@ import { H3, P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
+import { buildBreadcrumbList } from "@/_pages/_components/structured-data";
 import {
+  canonicalComparisonPath,
+  FEATURED_COMPARISON_PAIRS,
   listModelFacts,
   type ModelRef,
 } from "@/_pages/models/_shared/model-facts";
@@ -32,6 +35,8 @@ import {
 } from "@/products/constants";
 
 import { CardLink, Cta, PageHero, PageSection } from "../_shared/marketing";
+import { GuideCardGrid } from "../blog/guide-links";
+import { HUB_GUIDES, TOPIC_HUB_PATHS } from "../blog/topics";
 import { COMPARE_HUB_PATH } from "../compare/_shared/platforms";
 import { scopedTranslation } from "./i18n";
 
@@ -47,14 +52,35 @@ interface ChatChoice extends ModelRef {
   kind: UncensoredKind;
 }
 
+interface Comparison {
+  a: string;
+  b: string;
+  path: string;
+}
+
 interface PageData {
   locale: CountryLanguage;
   models: ChatChoice[];
+  comparisons: Comparison[];
 }
 
 export async function tanstackLoader({ params }: Props): Promise<PageData> {
   const { locale } = await params;
   const facts = listModelFacts(await getEnvAvailability());
+  const live = facts.filter((model) => !model.isLegacy);
+  // Featured head-to-heads where both models are live, canonical order.
+  const comparisons = FEATURED_COMPARISON_PAIRS.flatMap(([leftId, rightId]) => {
+    const left = live.find((model) => model.id === leftId);
+    const right = live.find((model) => model.id === rightId);
+    if (left === undefined || right === undefined) {
+      return [];
+    }
+    const path = canonicalComparisonPath(left, right);
+    const [first, second] = path.endsWith(`/${right.slug}`)
+      ? [left, right]
+      : [right, left];
+    return [{ a: first.name.trim(), b: second.name.trim(), path }];
+  });
   const models = facts
     .filter((model) => !model.isLegacy && isUncensoredContent(model.content))
     .toSorted(
@@ -70,7 +96,7 @@ export async function tanstackLoader({ params }: Props): Promise<PageData> {
       creditsPerMessage: model.creditsPerMessage,
       kind: uncensoredKind(model) ?? "unlisted",
     }));
-  return { locale, models };
+  return { locale, models, comparisons };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -88,9 +114,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export function TanstackPage({ locale, models }: PageData): JSX.Element {
+export function TanstackPage({
+  locale,
+  models,
+  comparisons,
+}: PageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: modelsT } = modelsScopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
   const firstModel = models[0];
   const faq = [
     {
@@ -117,7 +148,20 @@ export function TanstackPage({ locale, models }: PageData): JSX.Element {
 
   return (
     <>
+      <JsonLd
+        id="uncensored-chat-breadcrumbs"
+        data={{
+          "@context": "https://schema.org",
+          ...buildBreadcrumbList(locale, [
+            { name: t("breadcrumb"), path: TOPIC_HUB_PATHS.uncensored },
+          ]),
+        }}
+      />
       <PageHero
+        breadcrumbs={[
+          { name: configT("appName"), href: `/${locale}/story` },
+          { name: t("breadcrumb") },
+        ]}
         title={t("title")}
         subtitle={t("intro")}
         actions={
@@ -212,15 +256,36 @@ export function TanstackPage({ locale, models }: PageData): JSX.Element {
           ))}
         </Div>
       </PageSection>
+      <PageSection
+        id="guides"
+        title={t("guidesTitle")}
+        intro={t("guidesIntro")}
+      >
+        <GuideCardGrid locale={locale} slugs={HUB_GUIDES.uncensored} />
+      </PageSection>
+      {comparisons.length > 0 && (
+        <PageSection
+          id="comparisons"
+          title={t("comparisons")}
+          intro={t("comparisonsIntro")}
+          tone="muted"
+        >
+          <Div className="grid gap-x-6 sm:grid-cols-2 lg:grid-cols-3">
+            {comparisons.map((pair) => (
+              <CardLink
+                key={pair.path}
+                href={`/${locale}${pair.path}`}
+                label={t("versus", { a: pair.a, b: pair.b })}
+              />
+            ))}
+          </Div>
+        </PageSection>
+      )}
       <PageSection title={t("guides")} narrow>
         <Div className="flex flex-col items-start gap-1">
           <CardLink
-            href={`/${locale}/story/abliterated-ai-chat`}
+            href={`/${locale}${TOPIC_HUB_PATHS.abliterated}`}
             label={t("abliteratedChat")}
-          />
-          <CardLink
-            href={`/${locale}/story/blog/abliterated-vs-uncensored-models`}
-            label={t("abliteration")}
           />
           <CardLink
             href={`/${locale}${COMPARE_HUB_PATH}`}
@@ -230,6 +295,7 @@ export function TanstackPage({ locale, models }: PageData): JSX.Element {
             href={`/${locale}/story/refusal-index`}
             label={t("benchmark")}
           />
+          <CardLink href={`/${locale}/models`} label={t("chooseModel")} />
         </Div>
       </PageSection>
     </>

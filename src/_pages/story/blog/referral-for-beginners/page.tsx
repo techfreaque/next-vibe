@@ -270,6 +270,7 @@ export function TanstackPage({
         </ArticleSection>
 
         <ArticleEnd
+          post={{ slug: "referral-for-beginners", locale }}
           back={back}
           title={t("close.title")}
           subtitle={`${t("close.p1")} ${t("close.p2")}`}

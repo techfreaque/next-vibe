@@ -262,6 +262,7 @@ export function TanstackPage({ locale }: E2ETestsPageData): JSX.Element {
         </ArticleSection>
 
         <ArticleEnd
+          post={{ slug: "e2e-tests-found-real-bugs", locale }}
           back={back}
           title={t("cta.title")}
           subtitle={t("cta.subtitle")}

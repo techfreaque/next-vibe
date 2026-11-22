@@ -637,6 +637,7 @@ export function TanstackPage({ locale }: TypeCheckerPageData): JSX.Element {
         </ArticleSection>
 
         <ArticleEnd
+          post={{ slug: "type-checker-made-ai-stop-lying", locale }}
           back={back}
           title={t("closing.finalQuote")}
           actions={
