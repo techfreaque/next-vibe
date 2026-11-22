@@ -816,7 +816,9 @@ export class AbortControllerSetup {
     // Abort our controller when timeout fires
     const timeoutAbortHandler = (): void => {
       streamAbortController.abort(
-        new StreamAbortError(AbortReason.STREAM_TIMEOUT),
+        new StreamAbortError(AbortReason.STREAM_TIMEOUT, {
+          maxDurationSeconds: maxDuration,
+        }),
       );
     };
     timeoutAbortController.addEventListener("abort", timeoutAbortHandler, {

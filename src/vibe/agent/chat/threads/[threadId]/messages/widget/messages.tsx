@@ -279,6 +279,25 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
     voteMessage,
   } = messageOps;
 
+  /** Error bubble "Continue": a short user message under the error row picks
+   *  up a reply that broke off (what users typed by hand before). */
+  const continueAfterError = useCallback(
+    async (errorMessageId: string): Promise<void> => {
+      await sendMessage({
+        content: scopedTranslation
+          .scopedT(locale)
+          .t("errorActions.continuePrompt"),
+        parentId: errorMessageId,
+        attachments: [],
+      });
+    },
+    [sendMessage, locale],
+  );
+  const errorActions = useMemo(
+    () => ({ retryMessage, continueAfterError }),
+    [retryMessage, continueAfterError],
+  );
+
   /** Cancel a queued message: delete it and restore its content to the input field */
   const cancelQueuedMessage = useCallback(
     (messageId: string, content: string) => {
@@ -1081,7 +1100,7 @@ export function ChatMessages({ showBranding }: ChatMessagesProps): JSX.Element {
   });
 
   return (
-    <ErrorRetryContext.Provider value={retryMessage}>
+    <ErrorRetryContext.Provider value={errorActions}>
       <Div className="flex flex-col flex-1 min-h-0 relative">
         <Div
           ref={messagesContainerRef}

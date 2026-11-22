@@ -562,6 +562,8 @@ export const translations: typeof enTranslations = {
       "Stopped: questo compito di sfondo ha raggiunto il suo tappo di credito. Alzare il berretto in Task Budget Caps per lasciare che continui.",
     taskWatchdog:
       "Fermato: il task watchdog ha concluso questa corsa perché ha superato il suo tempo, turno o limite di chiamata strumento.",
+    streamTimeLimit:
+      "Interrotta: questa risposta ha raggiunto il limite di {{minutes}} minuti. Tutto ciò che è stato scritto è salvato. Premi Continua per riprendere da lì.",
   },
   errors: {
     toolExecutionError:
@@ -587,6 +589,8 @@ export const translations: typeof enTranslations = {
       "Il modello si è concluso senza scrivere una risposta. Hai pagato solo ciò che il fornitore ha addebitato, nessuna tassa di piattaforma. Prova di nuovo o scegli un altro modello.",
     contentFiltered:
       "Questa risposta è stata bloccata dal filtro dei contenuti del fornitore. Prova un modello diverso.",
+    malformedToolCall:
+      "Il modello ha inviato una chiamata a uno strumento non valida, quindi non è stata eseguita. Premi Continua e riproverà.",
     providerBusy:
       "Questo modello è sovraccaricato in questo momento. Riprovare in pochi secondi o scegliere un altro modello.",
     modelUnavailable:

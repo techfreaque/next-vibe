@@ -43,6 +43,9 @@ export const translations: typeof enTranslations = {
   errorActions: {
     retry: "Ponów",
     tryAnotherModel: "Wybierz inny model",
+    continue: "Kontynuuj",
+    /** Sent as the user message when Continue is pressed */
+    continuePrompt: "Kontynuuj",
   },
   streamInterrupted: {
     label: "Generowanie zatrzymane",

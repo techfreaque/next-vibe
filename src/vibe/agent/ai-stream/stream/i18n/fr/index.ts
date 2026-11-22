@@ -559,6 +559,8 @@ export const translations: typeof enTranslations = {
       "Arrêté : cette tâche en arrière-plan a atteint son plafond de crédits. Relevez le plafond dans Task Budget Caps pour la laisser continuer.",
     taskWatchdog:
       "Arrêté : le chien de garde des tâches a stoppé cette exécution, qui a dépassé sa limite de durée, de tours ou d'appels d'outils.",
+    streamTimeLimit:
+      "Arrêté : cette réponse a atteint la limite de {{minutes}} minutes. Tout ce qui a été écrit est enregistré. Cliquez sur Continuer pour reprendre là où elle s'est arrêtée.",
   },
   errors: {
     toolExecutionError:
@@ -582,6 +584,8 @@ export const translations: typeof enTranslations = {
       "Le modèle s'est arrêté sans écrire de réponse. Vous n'avez payé que ce que le fournisseur a facturé, sans frais de plateforme. Réessayez ou choisissez un autre modèle.",
     contentFiltered:
       "Cette réponse a été bloquée par le filtre de contenu du fournisseur. Essayez un autre modèle.",
+    malformedToolCall:
+      "Le modèle a envoyé un appel d'outil invalide, il n'a donc pas été exécuté. Cliquez sur Continuer et il réessaiera.",
     providerBusy:
       "Ce modèle est surchargé en ce moment. Réessayez dans quelques secondes ou choisissez un autre modèle.",
     modelUnavailable:

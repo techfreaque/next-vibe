@@ -563,6 +563,8 @@ export const translations: typeof enTranslations = {
       "Das Modell hat ohne Antwort beendet. Berechnet wurden nur die Kosten des Anbieters, keine Plattformgebühr. Versuchen Sie es erneut oder wählen Sie ein anderes Modell.",
     contentFiltered:
       "Diese Antwort wurde vom Inhaltsfilter des Anbieters blockiert. Versuche ein anderes Modell.",
+    malformedToolCall:
+      "Das Modell hat einen fehlerhaften Tool-Aufruf gesendet, er wurde nicht ausgeführt. Mit „Weiter“ versucht es das Modell erneut.",
     providerBusy:
       "Dieses Modell ist gerade überlastet. Versuchen Sie es in ein paar Sekunden erneut oder wählen Sie ein anderes Modell.",
     modelUnavailable:
@@ -594,6 +596,8 @@ export const translations: typeof enTranslations = {
       "Gestoppt: Dieser Hintergrund-Task hat sein Credit-Limit erreicht. Erhöhen Sie das Limit unter Task-Budgetgrenzen, damit er weiterläuft.",
     taskWatchdog:
       "Gestoppt: Der Task-Wächter hat diesen Lauf beendet, weil er sein Zeit-, Runden- oder Tool-Aufruf-Limit überschritten hat.",
+    streamTimeLimit:
+      "Gestoppt: Diese Antwort hat das Limit von {{minutes}} Minuten erreicht. Alles bisher Geschriebene ist gespeichert. Mit „Weiter“ geht es genau dort weiter.",
   },
   headless: {
     errors: {

@@ -41,6 +41,9 @@ export const translations = {
   errorActions: {
     retry: "Retry",
     tryAnotherModel: "Try another model",
+    continue: "Continue",
+    /** Sent as the user message when Continue is pressed */
+    continuePrompt: "Continue",
   },
   streamInterrupted: {
     label: "Generation stopped",

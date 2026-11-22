@@ -555,6 +555,8 @@ export const translations: typeof enTranslations = {
       "Model zakończył bez odpowiedzi. Płacisz tylko koszt dostawcy, bez opłaty platformy. Spróbuj ponownie albo wybierz inny model.",
     contentFiltered:
       "Ta odpowiedź została zablokowana przez filtr treści dostawcy. Spróbuj innego modelu.",
+    malformedToolCall:
+      "Model wysłał uszkodzone wywołanie narzędzia, więc nie zostało wykonane. Kliknij „Kontynuuj”, a spróbuje ponownie.",
     providerBusy:
       "Ten model jest teraz przeciążony. Spróbuj ponownie za kilka sekund albo wybierz inny model.",
     modelUnavailable:
@@ -586,6 +588,8 @@ export const translations: typeof enTranslations = {
       "Zatrzymano: to zadanie w tle osiągnęło limit kredytów. Podnieś limit w Limitach budżetu zadań, aby mogło działać dalej.",
     taskWatchdog:
       "Zatrzymano: strażnik zadań zakończył to uruchomienie, bo przekroczyło limit czasu, tur lub wywołań narzędzi.",
+    streamTimeLimit:
+      "Zatrzymano: ta odpowiedź przekroczyła limit {{minutes}} minut. Wszystko, co już powstało, jest zapisane. Kliknij „Kontynuuj”, a model ruszy dokładnie od tego miejsca.",
   },
   headless: {
     errors: {

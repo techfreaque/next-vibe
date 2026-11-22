@@ -42,12 +42,22 @@ describe("providerErrorTranslationKey", () => {
     ).toBe("errors.modelUnavailable");
   });
 
-  it("unknown or missing provider errors fall back to the caller's message", () => {
-    expect(providerErrorTranslationKey(null)).toBeNull();
+  it("a malformed tool call says the partial reply is saved and to continue", () => {
+    // NanoGPT, prod 2026-11-20 (GLM 5.3 Uncensored, two support reports)
     expect(
       providerErrorTranslationKey(
         "Partial response received, but the final tool call was malformed and was not executed.",
       ),
+    ).toBe("errors.malformedToolCall");
+    expect(
+      providerErrorTranslationKey("Invalid tool call: arguments are not JSON"),
+    ).toBe("errors.malformedToolCall");
+  });
+
+  it("unknown or missing provider errors fall back to the caller's message", () => {
+    expect(providerErrorTranslationKey(null)).toBeNull();
+    expect(
+      providerErrorTranslationKey("Something unexpected happened upstream."),
     ).toBeNull();
   });
 });

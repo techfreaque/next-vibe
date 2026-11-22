@@ -559,6 +559,8 @@ export const translations: typeof enTranslations = {
       "Detenido: esta tarea de fondo alcanzó su límite de crédito. Aumente la tapa en los Caps de Presupuesto de Tareas para permitir que continúe.",
     taskWatchdog:
       "Se detuvo: el reloj de tarea terminó esta carrera porque superó su tiempo, su turno o límite de llamada de herramientas.",
+    streamTimeLimit:
+      "Detenido: esta respuesta alcanzó el límite de {{minutes}} minutos. Todo lo escrito hasta ahora está guardado. Pulsa Continuar para seguir desde ahí.",
   },
   errors: {
     toolExecutionError:
@@ -584,8 +586,10 @@ export const translations: typeof enTranslations = {
       "El modelo terminó sin escribir una respuesta. Usted pagó sólo lo que el proveedor cobraba, sin cuota de plataforma. Prueba de nuevo o elige otro modelo.",
     contentFiltered:
       "Esta respuesta fue bloqueada por el filtro de contenido del proveedor. Pruebe un modelo diferente.",
+    malformedToolCall:
+      "El modelo envió una llamada a herramienta defectuosa y no se ejecutó. Pulsa Continuar y lo volverá a intentar.",
     providerBusy:
-      "Este modelo está sobrecargado ahora mismo. Retrocede en unos segundos o elige otro modelo.",
+      "Este modelo está sobrecargado ahora mismo. Reinténtalo en unos segundos o elige otro modelo.",
     modelUnavailable:
       "El modelo AI seleccionado no está disponible actualmente. Por favor, prueba un modelo diferente.",
     rateLimitExceeded:

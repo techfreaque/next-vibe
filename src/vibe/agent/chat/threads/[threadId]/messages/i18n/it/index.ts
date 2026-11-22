@@ -41,8 +41,11 @@ export const translations: typeof enTranslations = {
   },
   errorCode: "Codice di errore",
   errorActions: {
-    retry: "Recuperare",
+    retry: "Riprova",
     tryAnotherModel: "Prova un altro modello",
+    continue: "Continua",
+    /** Sent as the user message when Continue is pressed */
+    continuePrompt: "Continua",
   },
   streamInterrupted: {
     label: "La generazione si è fermata",

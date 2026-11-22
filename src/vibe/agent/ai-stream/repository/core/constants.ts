@@ -79,11 +79,18 @@ export enum AbortReason {
  */
 export class StreamAbortError extends Error {
   readonly reason: AbortReason;
+  /**
+   * STREAM_TIMEOUT from the turn's overall duration limit (seconds). Unset for
+   * the other STREAM_TIMEOUT sources (first-part watchdog, remote-result wait),
+   * so only a turn that really ran out of time says "time limit, continue".
+   */
+  readonly maxDurationSeconds: number | undefined;
 
-  constructor(reason: AbortReason) {
+  constructor(reason: AbortReason, options?: { maxDurationSeconds?: number }) {
     super(reason);
     this.name = "AbortError";
     this.reason = reason;
+    this.maxDurationSeconds = options?.maxDurationSeconds;
   }
 
   get isToolPause(): boolean {

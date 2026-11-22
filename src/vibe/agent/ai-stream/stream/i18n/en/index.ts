@@ -551,6 +551,8 @@ export const translations = {
       "Stopped: this background task reached its credit cap. Raise the cap in Task Budget Caps to let it continue.",
     taskWatchdog:
       "Stopped: the task watchdog ended this run because it exceeded its time, turn or tool-call limit.",
+    streamTimeLimit:
+      "Stopped: this reply hit the {{minutes}} minute limit. Everything written so far is saved. Press Continue to pick up where it left off.",
   },
   errors: {
     toolExecutionError: "A tool failed to execute properly. Please try again.",
@@ -573,6 +575,8 @@ export const translations = {
       "The model ended without writing an answer. You paid only what the provider charged, no platform fee. Try again or pick another model.",
     contentFiltered:
       "This response was blocked by the provider's content filter. Try a different model.",
+    malformedToolCall:
+      "The model sent a broken tool call, so it was not run. Press Continue and it will try again.",
     providerBusy:
       "This model is overloaded right now. Retry in a few seconds or pick another model.",
     modelUnavailable:

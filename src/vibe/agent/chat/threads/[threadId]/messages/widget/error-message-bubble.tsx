@@ -9,6 +9,7 @@ import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
+import { Play } from "next-vibe/ui/components/icons/Play";
 import { RotateCcw } from "next-vibe/ui/components/icons/RotateCcw";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { StopCircle } from "next-vibe/ui/components/icons/StopCircle";
@@ -39,7 +40,7 @@ import { useModelSelectorState } from "../../../../model-selector-state";
 import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
-import { useErrorRetry } from "./error-retry-context";
+import { useErrorContinue, useErrorRetry } from "./error-retry-context";
 import { MessageActionButton } from "./message-action-button";
 
 /**
@@ -80,6 +81,7 @@ export function ErrorMessageBubble({
   const [contactPrefill, setContactPrefill] =
     useState<Partial<ContactRequest> | null>(null);
   const retryMessage = useErrorRetry();
+  const continueAfterError = useErrorContinue();
   const setModelSelectorOpen = useModelSelectorState(
     (state) => state.setModelSelectorOpen,
   );
@@ -162,6 +164,17 @@ export function ErrorMessageBubble({
     }
   };
 
+  // The turn broke off after writing something (time limit, malformed tool
+  // call, restart): Continue picks it up, Retry would start over.
+  const canContinue =
+    continueAfterError !== null && followsPartialAnswer(message, messages);
+
+  const handleContinue = (): void => {
+    if (continueAfterError) {
+      void continueAfterError(message.id);
+    }
+  };
+
   // Stopped streams (user stop, server restart mid-answer) get a compact
   // "stopped" indicator with a retry, not an error bubble
   if (message.errorType === StreamErrorType.STREAM_INTERRUPTED) {
@@ -184,6 +197,18 @@ export function ErrorMessageBubble({
                   {ts("streamInterrupted.hint")}
                 </Span>
               </Div>
+              {canContinue && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 gap-1.5 px-2 flex-shrink-0"
+                  onClick={handleContinue}
+                >
+                  <Play className="h-3.5 w-3.5" />
+                  {ts("errorActions.continue")}
+                </Button>
+              )}
               {canRetry && (
                 <Button
                   type="button"
@@ -378,29 +403,45 @@ export function ErrorMessageBubble({
             </Div>
           </Div>
 
-          {/* The way forward: retry the turn or switch models */}
-          {canRetry && (
+          {/* The way forward: continue, retry the turn or switch models */}
+          {(canRetry || canContinue) && (
             <Div className="mt-3 flex flex-wrap items-center gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="h-8 gap-1.5"
-                onClick={handleRetry}
-              >
-                <RotateCcw className="h-3.5 w-3.5" />
-                {ts("errorActions.retry")}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                className="h-8 gap-1.5"
-                onClick={handleTryAnotherModel}
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-                {ts("errorActions.tryAnotherModel")}
-              </Button>
+              {canContinue && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 gap-1.5"
+                  onClick={handleContinue}
+                >
+                  <Play className="h-3.5 w-3.5" />
+                  {ts("errorActions.continue")}
+                </Button>
+              )}
+              {canRetry && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 gap-1.5"
+                  onClick={handleRetry}
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  {ts("errorActions.retry")}
+                </Button>
+              )}
+              {canRetry && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 gap-1.5"
+                  onClick={handleTryAnotherModel}
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  {ts("errorActions.tryAnotherModel")}
+                </Button>
+              )}
             </Div>
           )}
 
@@ -484,6 +525,22 @@ function findParentUserMessageId(
     parentId = parent.parentId;
   }
   return null;
+}
+
+/**
+ * True when the error row hangs under assistant output (text or a tool call)
+ * rather than directly under the user's message: something was written, so
+ * the turn can be continued instead of redone.
+ */
+function followsPartialAnswer(
+  message: Pick<ChatMessage, "parentId">,
+  messages: Pick<ChatMessage, "id" | "role">[] | undefined,
+): boolean {
+  if (!messages || !message.parentId) {
+    return false;
+  }
+  const parent = messages.find((m) => m.id === message.parentId);
+  return parent?.role === "assistant" || parent?.role === "tool";
 }
 
 function translateErrorRecursive(

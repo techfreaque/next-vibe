@@ -20,11 +20,23 @@ const BUSY_PATTERN =
 const UNAVAILABLE_PATTERN =
   /requires more credits|can only afford|insufficient (balance|quota|funds)|\b403\b|forbidden|cloudflare|model.{0,40}(not found|unavailable|does not exist)/i;
 
+/**
+ * The provider could not parse the model's tool call (NanoGPT: "Partial
+ * response received, but the final tool call was malformed and was not
+ * executed.", prod 2026-11-20, GLM 5.3 Uncensored writing a large cortex
+ * file). The partial reply is saved and a Continue usually succeeds.
+ */
+const MALFORMED_TOOL_CALL_PATTERN =
+  /tool.?call.{0,40}(malformed|invalid|could not be parsed|failed to parse)|(malformed|invalid) tool.?call/i;
+
 export function providerErrorTranslationKey(
   providerErrorText: string | null,
 ): AiStreamTranslationKey | null {
   if (!providerErrorText) {
     return null;
+  }
+  if (MALFORMED_TOOL_CALL_PATTERN.test(providerErrorText)) {
+    return "errors.malformedToolCall";
   }
   if (CONTENT_FILTER_PATTERN.test(providerErrorText)) {
     return "errors.contentFiltered";

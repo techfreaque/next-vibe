@@ -44,6 +44,9 @@ export const translations: typeof enTranslations = {
   errorActions: {
     retry: "Réessayer",
     tryAnotherModel: "Essayer un autre modèle",
+    continue: "Continuer",
+    /** Sent as the user message when Continue is pressed */
+    continuePrompt: "Continue",
   },
   streamInterrupted: {
     label: "Génération interrompue",

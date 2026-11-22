@@ -40,6 +40,7 @@ import {
   billsUpstreamCost,
   estimateCutOffStepCost,
 } from "../loop/token-accumulator";
+import { abortInterruptionMessage } from "./abort-message";
 import { serializeError } from "./error-utils";
 import { providerErrorTranslationKey } from "./provider-error-key";
 
@@ -612,14 +613,7 @@ export class AbortErrorHandler {
             streamAbort?.reason === AbortReason.SERVER_SHUTDOWN
               ? StreamErrorType.STREAM_INTERRUPTED
               : StreamErrorType.STREAM_ERROR;
-          const interruptionMessage =
-            streamAbort?.reason === AbortReason.BILLING_FAILED
-              ? t("info.billingFailed")
-              : streamAbort?.reason === AbortReason.BUDGET_EXCEEDED
-                ? t("info.budgetExceeded")
-                : streamAbort?.reason === AbortReason.TASK_WATCHDOG
-                  ? t("info.taskWatchdog")
-                  : t("info.streamInterrupted");
+          const interruptionMessage = abortInterruptionMessage(streamAbort, t);
           await ctx.dbWriter.emitErrorMessage({
             threadId,
             errorType: emitErrorType,
@@ -632,6 +626,19 @@ export class AbortErrorHandler {
             sequenceId: ctx.sequenceId,
             user,
           });
+
+          if (
+            streamAbort?.reason === AbortReason.STREAM_TIMEOUT &&
+            streamAbort.maxDurationSeconds !== undefined
+          ) {
+            // Was silent before: a 15-minute answer cut off left no trace.
+            logger.warn("[AI Stream] Turn hit the overall time limit", {
+              threadId,
+              model,
+              maxDurationSeconds: streamAbort.maxDurationSeconds,
+              partialContentLength: ctx.currentAssistantContent.length,
+            });
+          }
 
           logger.debug("[AI Stream] Emitted interruption error message", {
             isIncognito,
