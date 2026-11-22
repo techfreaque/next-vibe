@@ -1015,7 +1015,7 @@ export const translations = {
       tagline: "Anonymous & Unfiltered",
       shortDesc: "Anonymous imageboard culture style",
       suggestedPrompts: {
-        0: "Whats wrong with the world?",
+        0: "What's wrong with the world?",
         1: "Why are there so many Nazis on 4chan?",
         2: "Tell me some greentext stories to fall asleep to",
         3: "What is the best way to save the world?",
@@ -1275,6 +1275,12 @@ export const translations = {
             "Everyday Hermes. Brilliant reasoning, long memory, sees images and video.",
           strength: "Top-tier smarts at an everyday price",
           weakness: "This model hedges on politics",
+        },
+        hacker: {
+          description:
+            "Hermes on security, attack and defense. No refusals on exploits or recon.",
+          strength: "Uncensored, top-tier smarts, long memory, tools",
+          weakness: "GLM's worldview on politics. Text only",
         },
         oracle: {
           description:

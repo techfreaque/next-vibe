@@ -1302,6 +1302,12 @@ export const translations: typeof enTranslations = {
             "Une intelligence haut de gamme à un prix de tous les jours",
           weakness: "Ce modèle esquive la politique",
         },
+        hacker: {
+          description:
+            "Hermes pour la sécurité, en attaque comme en défense. Aucun refus sur les exploits ou la recon.",
+          strength: "Non censuré, haut de gamme, longue mémoire, outils",
+          weakness: "La vision politique de GLM. Texte uniquement",
+        },
         oracle: {
           description:
             "Hermes classique. Des conseils posés et équilibrés pour le quotidien.",

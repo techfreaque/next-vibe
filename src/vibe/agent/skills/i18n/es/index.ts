@@ -1292,6 +1292,13 @@ export const translations: typeof enTranslations = {
           strength: "Los mejores inteligentes a un precio diario",
           weakness: "Este modelo se ocupa de la política",
         },
+        hacker: {
+          description:
+            "Hermes para seguridad, ataque y defensa. Sin negativas con exploits ni reconocimiento.",
+          strength:
+            "Sin censura, razonamiento de primer nivel, memoria larga, herramientas",
+          weakness: "En política, la visión del mundo de GLM. Solo texto",
+        },
         oracle: {
           description:
             "Clásico Hermes. Un consejo sano y equilibrado para preguntas diarias.",

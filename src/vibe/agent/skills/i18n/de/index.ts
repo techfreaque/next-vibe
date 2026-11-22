@@ -1284,6 +1284,12 @@ export const translations: typeof enTranslations = {
           strength: "Spitzenintelligenz zum Alltagspreis",
           weakness: "Dieses Modell weicht bei Politik aus",
         },
+        hacker: {
+          description:
+            "Hermes für Security, Angriff wie Verteidigung. Exploits und Recon ohne Verweigerung.",
+          strength: "Unzensiert, Spitzenklasse, langes Gedächtnis, Tools",
+          weakness: "Bei Politik GLMs Weltbild. Nur Text",
+        },
         oracle: {
           description:
             "Hermes klassisch. Ruhiger, ausgewogener Rat für Alltagsfragen.",

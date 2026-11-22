@@ -1298,6 +1298,13 @@ export const translations: typeof enTranslations = {
           strength: "Smarts di livello superiore a un prezzo quotidiano",
           weakness: "Questo modello si trova sulla politica",
         },
+        hacker: {
+          description:
+            "Hermes per la sicurezza, attacco e difesa. Nessun rifiuto su exploit o ricognizione.",
+          strength:
+            "Senza censura, ragionamento di alto livello, memoria lunga, strumenti",
+          weakness: "In politica, la visione del mondo di GLM. Solo testo",
+        },
         oracle: {
           description:
             "Classic Hermes. Consulente stabile e bilanciato per le domande quotidiane.",

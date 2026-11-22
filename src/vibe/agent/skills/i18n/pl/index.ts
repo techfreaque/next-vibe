@@ -1275,6 +1275,12 @@ export const translations: typeof enTranslations = {
           strength: "Najwyższa klasa w codziennej cenie",
           weakness: "Ten model unika polityki",
         },
+        hacker: {
+          description:
+            "Hermes do bezpieczeństwa, ataku i obrony. Bez odmów przy exploitach i rekonesansie.",
+          strength: "Bez cenzury, najwyższa klasa, długa pamięć, narzędzia",
+          weakness: "W polityce światopogląd GLM. Tylko tekst",
+        },
         oracle: {
           description:
             "Klasyczny Hermes. Spokojna, wyważona rada na codzienne pytania.",
