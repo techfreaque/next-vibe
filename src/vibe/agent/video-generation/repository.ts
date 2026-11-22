@@ -392,6 +392,7 @@ export class VideoGenerationRepository {
           locale,
           logger,
           creditFeature: VIDEO_GEN_ALIAS,
+          modelId: videoModel.id,
           toolExecutionContext,
           platform,
         });
@@ -534,6 +535,7 @@ export class VideoGenerationRepository {
         locale,
         logger,
         tCredits,
+        { modelId: videoModel.id, apiProvider: videoModel.apiProvider },
       );
       if (!deductResult.success) {
         return deductResult;

@@ -273,6 +273,7 @@ export class MusicGenerationRepository {
           locale,
           logger,
           creditFeature: MUSIC_GEN_ALIAS,
+          modelId: audioModel.id,
           toolExecutionContext,
           platform,
         });
@@ -369,6 +370,7 @@ export class MusicGenerationRepository {
         locale,
         logger,
         tCredits,
+        { modelId: audioModel.id, apiProvider: audioModel.apiProvider },
       );
       if (!deductResult.success) {
         return deductResult;

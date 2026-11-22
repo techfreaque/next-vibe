@@ -536,6 +536,7 @@ export class SpeechToTextRepository {
         logger,
         tCredits,
         locale,
+        { modelId: modelOption.id, apiProvider: modelOption.apiProvider },
       );
 
       if (!deductResult.success) {

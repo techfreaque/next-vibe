@@ -10,7 +10,7 @@ import type { Platform } from "next-vibe/platforms/platforms";
 
 import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
-import { roundMediaCost } from "../../models/models";
+import { ApiProvider, roundMediaCost } from "../../models/models";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -18,9 +18,11 @@ import {
 import definitions, {
   type VideoGenerationPostRequestOutput,
 } from "../definition";
+import type { VideoGenModelId } from "../models";
 
 export async function generateVideoWithUnbottled(params: {
   input: VideoGenerationPostRequestOutput;
+  modelId: VideoGenModelId;
   user: JwtPayloadType;
   logger: EndpointLogger;
   locale: CountryLanguage;
@@ -38,6 +40,7 @@ export async function generateVideoWithUnbottled(params: {
 > {
   const {
     input,
+    modelId,
     user,
     logger,
     locale,
@@ -83,6 +86,7 @@ export async function generateVideoWithUnbottled(params: {
     locale,
     logger,
     balanceCheck.data.tCredits,
+    { modelId, apiProvider: ApiProvider.UNBOTTLED },
   );
   if (!deductResult.success) {
     return deductResult;

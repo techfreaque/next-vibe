@@ -14,6 +14,10 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import {
+  TOOL_COST_PROVIDERS,
+  type ToolChargeAttribution,
+} from "@/credits/tool-cost-providers";
 import { FEATURE_COSTS } from "@/products/repository-client";
 
 import { agentPublicFlags } from "../env";
@@ -54,6 +58,7 @@ export interface WebSearchOptions {
  */
 export interface SearchProviderConfig {
   id: SearchProviderValue;
+  creditAttribution: ToolChargeAttribution;
   isAvailable: () => boolean;
   creditCost: number;
   search: (
@@ -71,6 +76,7 @@ export interface SearchProviderConfig {
  */
 const braveProvider: SearchProviderConfig = {
   id: SearchProvider.BRAVE,
+  creditAttribution: TOOL_COST_PROVIDERS.BRAVE,
   isAvailable: (): boolean => agentPublicFlags.NEXT_PUBLIC_AGENT_BRAVE_SEARCH,
   creditCost: FEATURE_COSTS.BRAVE_SEARCH,
   search: async (
@@ -114,6 +120,7 @@ const braveProvider: SearchProviderConfig = {
  */
 const kagiProvider: SearchProviderConfig = {
   id: SearchProvider.KAGI,
+  creditAttribution: TOOL_COST_PROVIDERS.KAGI,
   isAvailable: (): boolean => agentPublicFlags.NEXT_PUBLIC_AGENT_KAGI_SEARCH,
   creditCost: FEATURE_COSTS.KAGI_SEARCH,
   search: async (

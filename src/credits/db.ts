@@ -26,17 +26,13 @@ import { leads } from "next-vibe/identity/lead/db";
 import { users } from "next-vibe/identity/user/db";
 import type { z } from "zod";
 
-import type { ChatModelId } from "../vibe/agent/ai-stream/models";
-import type {
-  AudioVisionModelId,
-  ImageVisionModelId,
-  VideoVisionModelId,
-} from "../vibe/agent/ai-stream/vision-models";
+import type { AnyModelId, ApiProvider } from "../vibe/agent/models/models";
 import {
   CreditFundingTypeDB,
   CreditPackTypeDB,
   CreditTransactionTypeDB,
 } from "./enum";
+import type { ToolChargeAttribution } from "./tool-cost-providers";
 
 /**
  * Custom numeric type that returns numbers instead of strings
@@ -129,8 +125,15 @@ export interface UsageUpstreamCost {
   billingBasis: UsageBillingBasis;
 }
 
+export interface UsageAttribution {
+  modelId: AnyModelId | ToolChargeAttribution["modelId"];
+  /** API that billed the instance, as distinct from an API's upstream endpoint. */
+  apiProvider: ApiProvider | ToolChargeAttribution["apiProvider"];
+}
+
 export interface UsageMetadata extends Partial<UsageUpstreamCost> {
   cost: number;
+  apiProvider?: UsageAttribution["apiProvider"];
   messageId?: string;
   freeCreditsUsed?: number;
   packCreditsUsed?: number;
@@ -360,9 +363,7 @@ export const creditTransactions = pgTable(
     }).notNull(),
 
     // Context for usage transactions
-    modelId: text("model_id").$type<
-      ChatModelId | ImageVisionModelId | VideoVisionModelId | AudioVisionModelId
-    >(),
+    modelId: text("model_id").$type<UsageAttribution["modelId"]>(),
     feature: text("feature"),
     messageId: uuid("message_id"),
 

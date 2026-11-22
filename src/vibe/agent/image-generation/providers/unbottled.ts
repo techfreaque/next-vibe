@@ -10,7 +10,7 @@ import type { Platform } from "next-vibe/platforms/platforms";
 
 import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
-import { roundMediaCost } from "../../models/models";
+import { ApiProvider, roundMediaCost } from "../../models/models";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -18,9 +18,11 @@ import {
 import definitions, {
   type ImageGenerationPostRequestOutput,
 } from "../definition";
+import type { ImageGenModelId } from "../models";
 
 export async function generateImageWithUnbottled(params: {
   input: ImageGenerationPostRequestOutput;
+  modelId: ImageGenModelId;
   user: JwtPayloadType;
   logger: EndpointLogger;
   locale: CountryLanguage;
@@ -32,6 +34,7 @@ export async function generateImageWithUnbottled(params: {
 }): Promise<ResponseType<{ imageUrl: string; creditCost: number }>> {
   const {
     input,
+    modelId,
     user,
     logger,
     locale,
@@ -77,6 +80,7 @@ export async function generateImageWithUnbottled(params: {
     locale,
     logger,
     balanceCheck.data.tCredits,
+    { modelId, apiProvider: ApiProvider.UNBOTTLED },
   );
   if (!deductResult.success) {
     return deductResult;

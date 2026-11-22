@@ -113,6 +113,8 @@ import {
   type CreditWallet,
   creditWallets,
   type PurchaseMetadata,
+  type UsageAttribution,
+  type UsageMetadata,
   type UsageUpstreamCost,
 } from "./db";
 import { getPoolBalance } from "./db-functions";
@@ -2694,12 +2696,7 @@ export class CreditRepository {
   private static async deductCredits(
     identifier: CreditIdentifier,
     amount: number,
-    modelId:
-      | ChatModelId
-      | ImageVisionModelId
-      | VideoVisionModelId
-      | AudioVisionModelId
-      | undefined,
+    modelId: UsageAttribution["modelId"] | undefined,
     feature: string | undefined,
     messageId: string,
     logger: EndpointLogger,
@@ -2707,6 +2704,7 @@ export class CreditRepository {
     locale: CountryLanguage,
     allowPartial = false, //  allow deducting less than requested
     upstreamCost?: UsageUpstreamCost,
+    apiProvider?: UsageAttribution["apiProvider"],
   ): Promise<ResponseType<DeductCreditsResult>> {
     // Round amount to 6 decimal places to avoid floating point precision artifacts
     const roundedAmount = Math.round(amount * 1_000_000) / 1_000_000;
@@ -2728,6 +2726,11 @@ export class CreditRepository {
 
     // Use rounded amount for all further calculations
     amount = roundedAmount;
+    const usageMetadata: UsageMetadata = {
+      cost: amount,
+      messageId,
+      apiProvider,
+    };
 
     try {
       // Get pool for this identifier
@@ -2998,8 +3001,7 @@ export class CreditRepository {
                 messageId,
                 freePeriodId: lockedWallet.freePeriodId,
                 metadata: {
-                  cost: amount,
-                  messageId,
+                  ...usageMetadata,
                   ...(upstreamCost && {
                     ...upstreamCost,
                     upstreamCostUsd: upstreamCost.upstreamCostUsd * costShare,
@@ -3078,8 +3080,7 @@ export class CreditRepository {
               packId: pack.id,
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
-                cost: amount,
-                messageId,
+                ...usageMetadata,
                 ...upstreamCost,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
@@ -3163,8 +3164,7 @@ export class CreditRepository {
               packId: pack.id,
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
-                cost: amount,
-                messageId,
+                ...usageMetadata,
                 ...upstreamCost,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
@@ -3248,8 +3248,7 @@ export class CreditRepository {
               packId: pack.id,
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
-                cost: amount,
-                messageId,
+                ...usageMetadata,
                 ...upstreamCost,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
@@ -3852,12 +3851,7 @@ export class CreditRepository {
 
   /** Admin ledger detail: feature and model when both are recorded. */
   private static detailLabel(
-    modelId:
-      | ChatModelId
-      | ImageVisionModelId
-      | VideoVisionModelId
-      | AudioVisionModelId
-      | null,
+    modelId: UsageAttribution["modelId"] | null,
     featureName: string | null,
   ): string | null {
     const modelName = modelId
@@ -3870,16 +3864,9 @@ export class CreditRepository {
   }
 
   private static getFetaureLabel(
-    modelId:
-      | ChatModelId
-      | ImageVisionModelId
-      | VideoVisionModelId
-      | AudioVisionModelId
-      | null,
+    modelId: UsageAttribution["modelId"] | null,
     featureName: string | null,
   ): string | null {
-    // Vision model IDs are a subset of ChatModelId string values,
-    // so chatModelOptionsIndex covers all cases (chat + vision).
     return modelId
       ? (chatModelOptionsIndex[modelId]?.name ?? featureName)
       : featureName;
@@ -4378,6 +4365,7 @@ export class CreditRepository {
     t: CreditsT,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
+    attribution?: UsageAttribution,
   ): Promise<ResponseType<DeductForModelResult>> {
     if (cost <= 0) {
       logger.debug("Skipping credit deduction - zero or negative cost", {
@@ -4411,12 +4399,15 @@ export class CreditRepository {
       const result = await CreditRepository.deductCredits(
         identifier,
         cost,
-        undefined,
+        attribution?.modelId,
         feature,
         creditMessageId,
         logger,
         t,
         locale,
+        false,
+        undefined,
+        attribution?.apiProvider,
       );
 
       if (!result.success) {
@@ -4465,6 +4456,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
     t: CreditsT,
+    attribution?: UsageAttribution,
   ): Promise<ResponseType<DeductForModelResult>> {
     if (cost <= 0) {
       logger.debug("Skipping TTS credit deduction - zero cost", { cost });
@@ -4491,13 +4483,15 @@ export class CreditRepository {
       const result = await CreditRepository.deductCredits(
         identifier,
         cost,
-        undefined,
+        attribution?.modelId,
         CreditFeature.TEXT_TO_SPEECH, // ledger id, translated when shown
         creditMessageId,
         logger,
         t,
         locale,
         true, // allowPartial = true for TTS
+        undefined,
+        attribution?.apiProvider,
       );
 
       if (!result.success) {
@@ -4542,6 +4536,7 @@ export class CreditRepository {
     t: CreditsT,
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
+    attribution?: UsageAttribution,
   ): Promise<ResponseType<DeductForModelResult>> {
     if (cost <= 0) {
       logger.debug("Skipping STT credit deduction - zero cost", { cost });
@@ -4568,13 +4563,15 @@ export class CreditRepository {
       const result = await CreditRepository.deductCredits(
         identifier,
         cost,
-        undefined,
+        attribution?.modelId,
         CreditFeature.SPEECH_TO_TEXT, // ledger id, translated when shown
         creditMessageId,
         logger,
         t,
         locale,
         true, // allowPartial = true for STT
+        undefined,
+        attribution?.apiProvider,
       );
 
       if (!result.success) {

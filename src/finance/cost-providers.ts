@@ -1,17 +1,16 @@
 /**
- * Finance cost providers, derived from the model registry.
+ * Finance cost providers, derived from model routes and billable tool services.
  *
  * Every API provider any model routes to is a cost provider: a provider added
  * to a model definition shows up in the finance dashboard without touching
- * this module. Usage rows are attributed to a provider by the route their
- * model id resolves to (the same cheapest-route rule the runtime uses for a
- * non-admin pick). A row whose model id resolves to nothing (tool calls, media
- * rows written without a model id) lands in UNATTRIBUTED, so the provider
- * parts always add up to the total.
+ * this module. Finance uses the provider stamped on the ledger, falling back
+ * to the model's cheapest route for older rows. Rows without a resolvable
+ * provider land in UNATTRIBUTED.
  *
  * Client+server safe. No server imports.
  */
 
+import { TOOL_COST_PROVIDERS } from "@/credits/tool-cost-providers";
 import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 import {
   audioVisionModelOptions,
@@ -73,16 +72,21 @@ function buildModelProviderIndex(): ReadonlyMap<string, string> {
 
 const MODEL_PROVIDER_INDEX = buildModelProviderIndex();
 
-/** Every API provider the registry routes to, minus self routes, sorted. */
+const toolServices = Object.values(TOOL_COST_PROVIDERS);
+
+/** Model API providers and billable tool providers, excluding self routes. */
 export const COST_PROVIDERS: readonly string[] = [
-  ...new Set(
-    allModelDefinitions.flatMap((d) => d.providers.map((p) => p.apiProvider)),
-  ),
+  ...new Set([
+    ...allModelDefinitions.flatMap((d) =>
+      d.providers.map((p) => p.apiProvider),
+    ),
+    ...toolServices.map((service) => service.apiProvider),
+  ]),
 ]
   .filter((p) => !SELF_ROUTES.has(p))
   .toSorted();
 
-/** Cost series keys: every registry provider plus the unattributed bucket. */
+/** Cost series keys including the unattributed bucket. */
 export const COST_PROVIDER_KEYS: readonly string[] = [
   ...COST_PROVIDERS,
   UNATTRIBUTED_PROVIDER,
@@ -98,6 +102,10 @@ export function resolveModelProvider(modelId: string | null): string {
 
 /** Display name of a cost provider key. */
 export function costProviderLabel(key: string): string {
+  const service = toolServices.find(({ apiProvider }) => apiProvider === key);
+  if (service) {
+    return service.label;
+  }
   const match = Object.values(ApiProvider).find((p) => p === key);
   // eslint-disable-next-line i18next/no-literal-string -- operator-facing label
   return match ? apiProviderDisplayNames[match] : "Unattributed";

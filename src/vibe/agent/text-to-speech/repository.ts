@@ -730,6 +730,7 @@ export class TextToSpeechRepository {
         logger,
         locale,
         tCredits,
+        { modelId: modelOption.id, apiProvider: modelOption.apiProvider },
       );
 
       if (!deductResult.success) {

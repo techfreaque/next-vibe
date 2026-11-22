@@ -16,6 +16,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { Platform } from "next-vibe/platforms/platforms";
 
+import type { UsageAttribution } from "@/credits/db";
 import type { CreditsT } from "@/credits/i18n";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
@@ -165,6 +166,7 @@ export async function deductMediaCredits(
   locale: CountryLanguage,
   logger: EndpointLogger,
   tCredits: CreditsT,
+  attribution: UsageAttribution,
 ): Promise<ResponseType<void>> {
   const deductResult = await CreditRepository.deductCreditsForFeature(
     user,
@@ -173,6 +175,7 @@ export async function deductMediaCredits(
     logger,
     tCredits,
     locale,
+    attribution,
   );
 
   if (!deductResult.success) {

@@ -10,7 +10,7 @@ import type { Platform } from "next-vibe/platforms/platforms";
 
 import { STANDARD_MARKUP_PERCENTAGE } from "@/products/constants";
 
-import { roundMediaCost } from "../../models/models";
+import { ApiProvider, roundMediaCost } from "../../models/models";
 import {
   checkMediaBalance,
   deductMediaCredits,
@@ -18,9 +18,11 @@ import {
 import definitions, {
   type MusicGenerationPostRequestOutput,
 } from "../definition";
+import type { MusicGenModelId } from "../models";
 
 export async function generateMusicWithUnbottled(params: {
   input: MusicGenerationPostRequestOutput;
+  modelId: MusicGenModelId;
   user: JwtPayloadType;
   logger: EndpointLogger;
   locale: CountryLanguage;
@@ -37,6 +39,7 @@ export async function generateMusicWithUnbottled(params: {
 > {
   const {
     input,
+    modelId,
     user,
     logger,
     locale,
@@ -82,6 +85,7 @@ export async function generateMusicWithUnbottled(params: {
     locale,
     logger,
     balanceCheck.data.tCredits,
+    { modelId, apiProvider: ApiProvider.UNBOTTLED },
   );
   if (!deductResult.success) {
     return deductResult;

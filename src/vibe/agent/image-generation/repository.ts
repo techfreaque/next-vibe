@@ -485,6 +485,7 @@ export class ImageGenerationRepository {
           locale,
           logger,
           creditFeature: IMAGE_GEN_ALIAS,
+          modelId: imageModel.id,
           platform,
           // The media-gen context is a narrowed shape — rebuild a headless
           // context carrying its abort wiring + fixture chain for dispatch.
@@ -600,6 +601,7 @@ export class ImageGenerationRepository {
         locale,
         logger,
         tCredits,
+        { modelId: imageModel.id, apiProvider: imageModel.apiProvider },
       );
       if (!deductResult.success) {
         return deductResult;

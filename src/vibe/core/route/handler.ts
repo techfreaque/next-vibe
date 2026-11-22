@@ -425,13 +425,20 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
 
       // Ledger stores the endpoint's stable tool name; reports translate it
       // into the viewer's locale when shown (credits/feature-label.ts).
+      const feature = getPreferredToolName(endpoint);
+      const { resolveToolChargeAttribution, toolChargeRequestSchema } =
+        await import("@/credits/tool-charge-attribution");
+      const chargeRequest = toolChargeRequestSchema.safeParse(
+        validationResult.data.requestData,
+      );
       const deductResult = await CreditRepository.deductCreditsForFeature(
         user,
         endpoint.credits,
-        getPreferredToolName(endpoint),
+        feature,
         logger,
         tCredits,
         locale,
+        resolveToolChargeAttribution(feature, chargeRequest.data),
       );
 
       if (!deductResult.success) {

@@ -15,11 +15,23 @@ import "server-only";
 
 import { and, eq, inArray, or } from "drizzle-orm";
 import { ChatModelId } from "next-vibe/agent/ai-stream/models";
-import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
+import { FETCH_URL_ALIAS } from "next-vibe/agent/fetch-url-content/constants";
+import fetchUrlDefinitions from "next-vibe/agent/fetch-url-content/definition";
+import { IMAGE_GEN_ALIAS } from "next-vibe/agent/image-generation/constants";
+import { ImageGenModelId } from "next-vibe/agent/image-generation/models";
+import { ApiProvider } from "next-vibe/agent/models/models";
+import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-base";
+import { makeHeadlessContext } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { createGenericHandler } from "next-vibe/core/route/handler";
+import {
+  ErrorResponseTypes,
+  success,
+} from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
 import { userLeadLinks } from "next-vibe/identity/lead/db";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import {
   createTestUser,
   deleteTestUser,
@@ -27,8 +39,11 @@ import {
 } from "next-vibe/tooling/testing/testing-suite/test-users";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { checkMediaBalance } from "../vibe/agent/shared/media-generation";
-import { creditTransactions, creditWallets } from "./db";
+import {
+  checkMediaBalance,
+  deductMediaCredits,
+} from "../vibe/agent/shared/media-generation";
+import { type CreditTransaction, creditTransactions, creditWallets } from "./db";
 import {
   CreditFundingType,
   CreditPackType,
@@ -37,6 +52,7 @@ import {
 import { FREE_ALLOWANCE_BASE, packFundingType, splitFreeDebit } from "./funding";
 import { scopedTranslation as creditsScopedTranslation } from "./i18n";
 import { CreditRepository } from "./repository";
+import { TOOL_COST_PROVIDERS } from "./tool-cost-providers";
 
 const logger = createEndpointLogger(false, defaultLocale);
 const creditsT = creditsScopedTranslation.scopedT(defaultLocale).t;
@@ -127,15 +143,10 @@ async function walletIds(userId: string): Promise<string[]> {
   return rows.map((row) => row.id);
 }
 
-async function usageRows(
-  userId: string,
-): Promise<Array<{ amount: number; fundingType: string | null }>> {
+async function usageRows(userId: string): Promise<CreditTransaction[]> {
   const ids = await walletIds(userId);
   return db
-    .select({
-      amount: creditTransactions.amount,
-      fundingType: creditTransactions.fundingType,
-    })
+    .select()
     .from(creditTransactions)
     .where(
       and(
@@ -145,6 +156,41 @@ async function usageRows(
     )
     .orderBy(creditTransactions.createdAt);
 }
+
+it("records the service on a generic tool charge", async () => {
+  const created = await createTestUser(`tool-cost-${stamp}@example.com`);
+  expect(created.success).toBe(true);
+  if (!created.success) {
+    return;
+  }
+  const { user } = created.data;
+  try {
+    const endpoint = fetchUrlDefinitions.GET;
+    const handler = createGenericHandler<CreateApiEndpointAny>({
+      endpoint,
+      handler: () => success(endpoint.examples.responses.default),
+    });
+    const result = await handler({
+      data: { url: "https://example.com" },
+      urlPathParams: { locale: defaultLocale },
+      user,
+      locale: defaultLocale,
+      logger,
+      platform: Platform.CLI,
+      toolExecutionContext: makeHeadlessContext(undefined, undefined, "UTC"),
+    });
+    expect(result).toMatchObject({ success: true });
+
+    const [row] = await usageRows(user.id);
+    expect(row).toMatchObject({
+      feature: FETCH_URL_ALIAS,
+      modelId: TOOL_COST_PROVIDERS.SCRAPPEY.modelId,
+      metadata: { apiProvider: TOOL_COST_PROVIDERS.SCRAPPEY.apiProvider },
+    });
+  } finally {
+    await deleteTestUser(user.id);
+  }
+});
 
 function sumBy(
   rows: ReadonlyArray<{ amount: number; fundingType: string | null }>,
@@ -179,7 +225,7 @@ describe("deduction walk stamps the funding bucket", () => {
     await deleteTestUser(spender.user.id);
   });
 
-  it("writes one row per bucket across free credits and three packs", async () => {
+  it("stamps the media model and provider across free credits and three packs", async () => {
     const userId = spender.user.id;
     const grant = async (
       amount: number,
@@ -219,17 +265,27 @@ describe("deduction walk stamps the funding bucket", () => {
     // Free credits, then subscription (5), then permanent/bonus newest
     // first: the purchased pack (4), then 1 of the admin bonus (3).
     const cost = free + 10;
-    const charged = await CreditRepository.deductCreditsForFeature(
+    const attribution = {
+      modelId: ImageGenModelId.FLUX_2_MAX,
+      apiProvider: ApiProvider.MODELSLAB,
+    };
+    const charged = await deductMediaCredits(
       spender.user,
       cost,
-      `funding-test-${stamp}`,
+      IMAGE_GEN_ALIAS,
+      defaultLocale,
       logger,
       creditsT,
-      defaultLocale,
+      attribution,
     );
     expect(charged.success).toBe(true);
 
     const rows = await usageRows(userId);
+    for (const row of rows) {
+      expect(row.feature).toBe(IMAGE_GEN_ALIAS);
+      expect(row.modelId).toBe(attribution.modelId);
+      expect(row.metadata).toMatchObject({ apiProvider: attribution.apiProvider });
+    }
     expect(rows.every((row) => row.fundingType !== null)).toBe(true);
     const total = rows.reduce((sum, row) => sum - row.amount, 0);
     expect(Math.round(total * 1_000_000) / 1_000_000).toBe(cost);

@@ -5,6 +5,8 @@
 import { describe, expect, it } from "vitest";
 
 import { CreditFundingType } from "@/credits/enum";
+import { TOOL_COST_PROVIDERS } from "@/credits/tool-cost-providers";
+import { ImageGenModelId } from "@/vibe/agent/image-generation/models";
 import { allModelDefinitions } from "@/vibe/agent/models/all-models";
 import { ApiProvider } from "@/vibe/agent/models/models";
 
@@ -42,11 +44,12 @@ function group(over: Partial<ConsumptionGroup>): ConsumptionGroup {
 
 const noFees = (): Record<string, number> => ({});
 
-describe("cost providers come from the model registry", () => {
-  it("lists every provider any model routes to, minus the self route", () => {
-    const fromRegistry = new Set(
-      allModelDefinitions.flatMap((d) => d.providers.map((p) => p.apiProvider)),
-    );
+describe("cost providers", () => {
+  it("lists model and billable tool providers, excluding the self route", () => {
+    const fromRegistry = new Set([
+      ...allModelDefinitions.flatMap((d) => d.providers.map((p) => p.apiProvider)),
+      ...Object.values(TOOL_COST_PROVIDERS).map((p) => p.apiProvider),
+    ]);
     fromRegistry.delete(ApiProvider.UNBOTTLED);
     expect(new Set(COST_PROVIDERS)).toEqual(fromRegistry);
     // The providers the old dashboard missed are all there.
@@ -199,22 +202,32 @@ describe("valueConsumption", () => {
     );
   });
 
-  it("prefers a provider stamped on the row over the registry route", () => {
-    const [day] = valueConsumption({
+  it("moves a media and a tool charge from unattributed to their recorded providers", () => {
+    const media = group({ credits: 13, uncostedCredits: 13 });
+    const tool = group({ credits: 1.3, uncostedCredits: 1.3 });
+    const input = {
       buckets: [DAY],
       packPrices: new Map(),
       fixedFees: noFees,
+    };
+    const [before] = valueConsumption({ ...input, groups: [media, tool] });
+    const [after] = valueConsumption({
+      ...input,
       groups: [
-        group({
-          modelId: openRouterOnly,
-          apiProvider: ApiProvider.NANO_GPT,
-          credits: 13,
-          uncostedCredits: 13,
-        }),
+        {
+          ...media,
+          modelId: ImageGenModelId.FLUX_2_MAX,
+          apiProvider: ApiProvider.MODELSLAB,
+        },
+        { ...tool, ...TOOL_COST_PROVIDERS.KAGI },
       ],
     });
-    expect(day?.costByProvider[ApiProvider.NANO_GPT]).toBeCloseTo(0.1, 10);
-    expect(day?.costByProvider[ApiProvider.OPENROUTER]).toBeUndefined();
+    expect(resolveModelProvider(ImageGenModelId.FLUX_2_MAX)).toBe(ApiProvider.OPENROUTER);
+    expect(before?.costByProvider[UNATTRIBUTED_PROVIDER]).toBeCloseTo(0.11, 10);
+    expect(after?.costByProvider[UNATTRIBUTED_PROVIDER] ?? 0).toBe(0);
+    expect(after?.costByProvider[ApiProvider.MODELSLAB]).toBeCloseTo(0.1, 10);
+    expect(after?.costByProvider[TOOL_COST_PROVIDERS.KAGI.apiProvider]).toBeCloseTo(0.01, 10);
+    expect(after?.costTotalUsd).toBeCloseTo(before?.costTotalUsd ?? 0, 10);
   });
 });
 
