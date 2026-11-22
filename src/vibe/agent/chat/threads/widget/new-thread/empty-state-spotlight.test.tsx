@@ -45,8 +45,17 @@ const availability: AgentEnvAvailability = {
   unbottledForce: false,
 };
 
+interface FavoriteStub {
+  id: string;
+  skillId: string;
+  position: number;
+}
+let favoritesStub: FavoriteStub[] = [];
 void mock.module("../../../../skills/favorites/hooks/hooks", () => ({
-  useChatFavorites: (): { favorites: [] } => ({ favorites: [] }),
+  useChatFavorites: (): {
+    favorites: FavoriteStub[];
+    isInitialLoading: boolean;
+  } => ({ favorites: favoritesStub, isInitialLoading: false }),
 }));
 void mock.module("../../../settings/hooks", () => ({
   useChatSettings: (): { settings: null; isLoading: boolean } => ({
@@ -92,6 +101,34 @@ describe("new-chat spotlight", () => {
     expect(markup).toContain("Good at:");
     expect(markup).toContain("Weak at:");
     expect(markup).toContain("Switch to Thea for more modes");
+  });
+
+  it("offers the user's own companion from favorites, not Thea", () => {
+    favoritesStub = [
+      { id: "fav-4chan", skillId: "4chan", position: 0 },
+      { id: "fav-hermes", skillId: "hermes__cheap", position: 1 },
+      { id: "fav-hermes-2", skillId: "hermes__hacker", position: 2 },
+    ];
+    try {
+      const markup = renderSpotlight("4chan");
+      expect(markup).toContain("Switch to Hermes for more modes");
+      expect(markup).not.toContain("Switch to Thea");
+    } finally {
+      favoritesStub = [];
+    }
+  });
+
+  it("picks the top-most companion when the user has several", () => {
+    favoritesStub = [
+      { id: "fav-thea", skillId: "thea__cheap", position: 3 },
+      { id: "fav-hermes", skillId: "hermes", position: 1 },
+    ];
+    try {
+      const markup = renderSpotlight("4chan");
+      expect(markup).toContain("Switch to Hermes for more modes");
+    } finally {
+      favoritesStub = [];
+    }
   });
 
   it("shows Thea's current mode and mode grid", () => {

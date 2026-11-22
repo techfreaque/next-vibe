@@ -185,7 +185,7 @@ interface CompanionView {
 
 type SkillView = CompanionView | { kind: "none" } | { kind: "custom" };
 
-interface CompanionOption {
+export interface CompanionOption {
   id: string;
   name: string;
   tagline: string;
@@ -896,6 +896,34 @@ function LoadingPlaceholder(): JSX.Element {
   );
 }
 
+/**
+ * The companion the "switch to" link offers: the user's own companion first
+ * (the top-most companion in their favorites, which holds their order for
+ * guests and signed-in users alike), else the first companion with a mode
+ * for politics. So a Hermes user sees "Switch to Hermes", never Thea.
+ */
+export function pickSwitchCompanion(params: {
+  companions: CompanionOption[];
+  /** Favorite skill ids (composites allowed), in the user's order. */
+  favoriteSkillIds: string[];
+  currentSkillId: string;
+}): CompanionOption | null {
+  const { companions, favoriteSkillIds, currentSkillId } = params;
+  for (const favoriteSkillId of favoriteSkillIds) {
+    const baseId = parseSkillId(favoriteSkillId).skillId;
+    if (baseId === currentSkillId) {
+      continue;
+    }
+    const own = companions.find((c) => c.id === baseId);
+    if (own) {
+      return own;
+    }
+  }
+  return (
+    companions.find((c) => c.id !== currentSkillId && c.hasPolitics) ?? null
+  );
+}
+
 /* ========================================================================== *
  * ENTRY
  * ========================================================================== */
@@ -925,7 +953,10 @@ export function SpotlightEmptyState({
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const availability = useProviderAvailability();
-  const { favorites } = useChatFavorites(logger, { activeFavoriteId: null });
+  const { favorites, isInitialLoading: favoritesLoading } = useChatFavorites(
+    logger,
+    { activeFavoriteId: null },
+  );
   const { settings, isLoading: settingsLoading } = useChatSettings(
     user,
     logger,
@@ -1018,8 +1049,16 @@ export function SpotlightEmptyState({
       hasPolitics: modes.some((m) => m.use === "politics"),
     };
   });
-  const fallbackCompanion =
-    companions.find((c) => c.id !== parsed.skillId && c.hasPolitics) ?? null;
+  // Wait for favorites so the link never flashes the wrong companion.
+  const fallbackCompanion = favoritesLoading
+    ? null
+    : pickSwitchCompanion({
+        companions,
+        favoriteSkillIds: favorites
+          .toSorted((a, b) => a.position - b.position)
+          .map((f) => f.skillId),
+        currentSkillId: parsed.skillId,
+      });
   const plainModelName = settings?.selectedModel
     ? getChatModelById(settings.selectedModel).name
     : null;
