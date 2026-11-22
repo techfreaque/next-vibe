@@ -16,6 +16,35 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    deepseekUncensored: {
+      title: "DeepSeek unzensiert. Was den Filter wirklich entfernt.",
+      category: "Modell-Guide",
+      excerpt:
+        "DeepSeeks Zensur sitzt in zwei Schichten. Ein anderer Host entfernt nur eine. Hier steht, was die zweite entfernt, plus die unzensierten DeepSeek-Builds, mit denen du heute chatten kannst.",
+      readTime: "7 Min. Lesezeit",
+    },
+    grokAlternative: {
+      title: "Grok-Alternativen. Wenn frech nicht reicht.",
+      category: "Vergleich",
+      excerpt:
+        "Ist Grok unzensiert? Nicht ganz. Wie weit Grok wirklich geht, Alternativen nach Einsatzzweck und Grok neben abliterierten Modellen in einem Chat.",
+      readTime: "7 Min. Lesezeit",
+    },
+    claudeWithoutFilters: {
+      title:
+        "Claude ohne Filter. Warum es das nicht gibt und was stattdessen funktioniert.",
+      category: "Modell-Guide",
+      excerpt:
+        'Kein Schalter stellt Claudes Verweigerungen ab, und jedes "unzensierte Claude" ist ein Trick. Claude für die Prosa behalten, den Rest an unzensierte Modelle im selben Thread geben.',
+      readTime: "7 Min. Lesezeit",
+    },
+    openrouterAlternatives: {
+      title: "OpenRouter-Alternativen. Ein Schlüssel, weniger Verweigerungen.",
+      category: "Entwickler-Guide",
+      excerpt:
+        "Sechs OpenRouter-Alternativen, geprüft an ihren eigenen Docs: API-Formate, unzensierte Modelle, Gebühren. Dazu die zwei Zeilen, die sich beim Umzug deines OpenAI-SDK-Clients ändern.",
+      readTime: "9 Min. Lesezeit",
+    },
     bestUncensoredLlm: {
       title:
         "Das beste unzensierte LLM. Nach Aufgabe gewählt, nicht nach Hype.",

@@ -16,6 +16,35 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    deepseekUncensored: {
+      title: "DeepSeek bez cenzury. Co naprawdę zdejmuje filtr.",
+      category: "Przewodnik po modelach",
+      excerpt:
+        "Cenzura DeepSeeka siedzi w dwóch warstwach. Inny hosting zdejmuje tylko jedną. Tu dowiesz się, co zdejmuje drugą, i znajdziesz nieocenzurowane buildy DeepSeeka, z którymi pogadasz już dziś.",
+      readTime: "7 min czytania",
+    },
+    grokAlternative: {
+      title: "Alternatywy dla Groka. Gdy zadziorność to za mało.",
+      category: "Porównanie",
+      excerpt:
+        "Czy Grok jest bez cenzury? Nie do końca. Jak daleko Grok naprawdę się posuwa, alternatywy według potrzeb i Grok obok modeli abliterowanych w jednym czacie.",
+      readTime: "7 min czytania",
+    },
+    claudeWithoutFilters: {
+      title:
+        "Claude bez filtrów. Dlaczego to niemożliwe i co działa zamiast tego.",
+      category: "Przewodnik po modelach",
+      excerpt:
+        "Żaden przełącznik nie wyłącza odmów Claude'a, a każdy \"Claude bez cenzury\" to sztuczka. Zostaw Claude'a do prozy, resztę oddaj modelom bez cenzury w tym samym wątku.",
+      readTime: "7 min czytania",
+    },
+    openrouterAlternatives: {
+      title: "Alternatywy dla OpenRoutera. Jeden klucz, mniej odmów.",
+      category: "Przewodnik dla deweloperów",
+      excerpt:
+        "Sześć alternatyw dla OpenRoutera, sprawdzonych w ich własnej dokumentacji: formaty API, modele bez cenzury, opłaty. Plus dwie linijki, które zmieniasz, przenosząc klienta OpenAI SDK.",
+      readTime: "9 min czytania",
+    },
     bestUncensoredLlm: {
       title:
         "Najlepszy nieocenzurowany LLM. Według zadania, nie według hype'u.",

@@ -192,14 +192,18 @@ import { Route as LocaleStoryBlogBestUncensoredLlmIndexRouteImport } from './rou
 import { Route as LocaleStoryBlogCharacterAiAlternativesIndexRouteImport } from './routes/$locale.story.blog.character-ai-alternatives.index'
 import { Route as LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRouteImport } from './routes/$locale.story.blog.chatgpt-alternative-without-filters.index'
 import { Route as LocaleStoryBlogChatgptJailbreakAlternativeIndexRouteImport } from './routes/$locale.story.blog.chatgpt-jailbreak-alternative.index'
+import { Route as LocaleStoryBlogClaudeWithoutFiltersIndexRouteImport } from './routes/$locale.story.blog.claude-without-filters.index'
 import { Route as LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport } from './routes/$locale.story.blog.dead-trading-bot-to-monitoring-engine.index'
+import { Route as LocaleStoryBlogDeepseekUncensoredIndexRouteImport } from './routes/$locale.story.blog.deepseek-uncensored.index'
 import { Route as LocaleStoryBlogE2eTestsFoundRealBugsIndexRouteImport } from './routes/$locale.story.blog.e2e-tests-found-real-bugs.index'
+import { Route as LocaleStoryBlogGrokAlternativeIndexRouteImport } from './routes/$locale.story.blog.grok-alternative.index'
 import { Route as LocaleStoryBlogHermesTheaTwoWayRemoteIndexRouteImport } from './routes/$locale.story.blog.hermes-thea-two-way-remote.index'
 import { Route as LocaleStoryBlogInteractiveCodingAgentIndexRouteImport } from './routes/$locale.story.blog.interactive-coding-agent.index'
 import { Route as LocaleStoryBlogModelRefreshUncensoredProvidersIndexRouteImport } from './routes/$locale.story.blog.model-refresh-uncensored-providers.index'
 import { Route as LocaleStoryBlogOneCodebase13PlatformsIndexRouteImport } from './routes/$locale.story.blog.one-codebase-13-platforms.index'
 import { Route as LocaleStoryBlogOneEndpointEverySurfaceIndexRouteImport } from './routes/$locale.story.blog.one-endpoint-every-surface.index'
 import { Route as LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRouteImport } from './routes/$locale.story.blog.openai-anthropic-compatible-api.index'
+import { Route as LocaleStoryBlogOpenrouterAlternativesIndexRouteImport } from './routes/$locale.story.blog.openrouter-alternatives.index'
 import { Route as LocaleStoryBlogReferralForAffiliateProsIndexRouteImport } from './routes/$locale.story.blog.referral-for-affiliate-pros.index'
 import { Route as LocaleStoryBlogReferralForBeginnersIndexRouteImport } from './routes/$locale.story.blog.referral-for-beginners.index'
 import { Route as LocaleStoryBlogReferralForDevelopersIndexRouteImport } from './routes/$locale.story.blog.referral-for-developers.index'
@@ -1753,16 +1757,34 @@ const LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute =
     path: '/blog/chatgpt-jailbreak-alternative/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
+const LocaleStoryBlogClaudeWithoutFiltersIndexRoute =
+  LocaleStoryBlogClaudeWithoutFiltersIndexRouteImport.update({
+    id: '/blog/claude-without-filters/',
+    path: '/blog/claude-without-filters/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute =
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport.update({
     id: '/blog/dead-trading-bot-to-monitoring-engine/',
     path: '/blog/dead-trading-bot-to-monitoring-engine/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
+const LocaleStoryBlogDeepseekUncensoredIndexRoute =
+  LocaleStoryBlogDeepseekUncensoredIndexRouteImport.update({
+    id: '/blog/deepseek-uncensored/',
+    path: '/blog/deepseek-uncensored/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
 const LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute =
   LocaleStoryBlogE2eTestsFoundRealBugsIndexRouteImport.update({
     id: '/blog/e2e-tests-found-real-bugs/',
     path: '/blog/e2e-tests-found-real-bugs/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogGrokAlternativeIndexRoute =
+  LocaleStoryBlogGrokAlternativeIndexRouteImport.update({
+    id: '/blog/grok-alternative/',
+    path: '/blog/grok-alternative/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute =
@@ -1799,6 +1821,12 @@ const LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute =
   LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRouteImport.update({
     id: '/blog/openai-anthropic-compatible-api/',
     path: '/blog/openai-anthropic-compatible-api/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogOpenrouterAlternativesIndexRoute =
+  LocaleStoryBlogOpenrouterAlternativesIndexRouteImport.update({
+    id: '/blog/openrouter-alternatives/',
+    path: '/blog/openrouter-alternatives/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogReferralForAffiliateProsIndexRoute =
@@ -5547,14 +5575,18 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/character-ai-alternatives/': typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters/': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/chatgpt-jailbreak-alternative/': typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute
+  '/$locale/story/blog/claude-without-filters/': typeof LocaleStoryBlogClaudeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
+  '/$locale/story/blog/deepseek-uncensored/': typeof LocaleStoryBlogDeepseekUncensoredIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
+  '/$locale/story/blog/grok-alternative/': typeof LocaleStoryBlogGrokAlternativeIndexRoute
   '/$locale/story/blog/hermes-thea-two-way-remote/': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
   '/$locale/story/blog/interactive-coding-agent/': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
   '/$locale/story/blog/model-refresh-uncensored-providers/': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms/': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface/': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   '/$locale/story/blog/openai-anthropic-compatible-api/': typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
+  '/$locale/story/blog/openrouter-alternatives/': typeof LocaleStoryBlogOpenrouterAlternativesIndexRoute
   '/$locale/story/blog/referral-for-affiliate-pros/': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   '/$locale/story/blog/referral-for-beginners/': typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   '/$locale/story/blog/referral-for-developers/': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
@@ -6280,14 +6312,18 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/character-ai-alternatives': typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/chatgpt-jailbreak-alternative': typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute
+  '/$locale/story/blog/claude-without-filters': typeof LocaleStoryBlogClaudeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
+  '/$locale/story/blog/deepseek-uncensored': typeof LocaleStoryBlogDeepseekUncensoredIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
+  '/$locale/story/blog/grok-alternative': typeof LocaleStoryBlogGrokAlternativeIndexRoute
   '/$locale/story/blog/hermes-thea-two-way-remote': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
   '/$locale/story/blog/interactive-coding-agent': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
   '/$locale/story/blog/model-refresh-uncensored-providers': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   '/$locale/story/blog/openai-anthropic-compatible-api': typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
+  '/$locale/story/blog/openrouter-alternatives': typeof LocaleStoryBlogOpenrouterAlternativesIndexRoute
   '/$locale/story/blog/referral-for-affiliate-pros': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   '/$locale/story/blog/referral-for-beginners': typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   '/$locale/story/blog/referral-for-developers': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
@@ -7022,14 +7058,18 @@ export interface FileRoutesById {
   '/$locale/story/blog/character-ai-alternatives/': typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   '/$locale/story/blog/chatgpt-alternative-without-filters/': typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   '/$locale/story/blog/chatgpt-jailbreak-alternative/': typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute
+  '/$locale/story/blog/claude-without-filters/': typeof LocaleStoryBlogClaudeWithoutFiltersIndexRoute
   '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
+  '/$locale/story/blog/deepseek-uncensored/': typeof LocaleStoryBlogDeepseekUncensoredIndexRoute
   '/$locale/story/blog/e2e-tests-found-real-bugs/': typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
+  '/$locale/story/blog/grok-alternative/': typeof LocaleStoryBlogGrokAlternativeIndexRoute
   '/$locale/story/blog/hermes-thea-two-way-remote/': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
   '/$locale/story/blog/interactive-coding-agent/': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
   '/$locale/story/blog/model-refresh-uncensored-providers/': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms/': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface/': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   '/$locale/story/blog/openai-anthropic-compatible-api/': typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
+  '/$locale/story/blog/openrouter-alternatives/': typeof LocaleStoryBlogOpenrouterAlternativesIndexRoute
   '/$locale/story/blog/referral-for-affiliate-pros/': typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   '/$locale/story/blog/referral-for-beginners/': typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   '/$locale/story/blog/referral-for-developers/': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
@@ -7764,14 +7804,18 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/character-ai-alternatives/'
     | '/$locale/story/blog/chatgpt-alternative-without-filters/'
     | '/$locale/story/blog/chatgpt-jailbreak-alternative/'
+    | '/$locale/story/blog/claude-without-filters/'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
+    | '/$locale/story/blog/deepseek-uncensored/'
     | '/$locale/story/blog/e2e-tests-found-real-bugs/'
+    | '/$locale/story/blog/grok-alternative/'
     | '/$locale/story/blog/hermes-thea-two-way-remote/'
     | '/$locale/story/blog/interactive-coding-agent/'
     | '/$locale/story/blog/model-refresh-uncensored-providers/'
     | '/$locale/story/blog/one-codebase-13-platforms/'
     | '/$locale/story/blog/one-endpoint-every-surface/'
     | '/$locale/story/blog/openai-anthropic-compatible-api/'
+    | '/$locale/story/blog/openrouter-alternatives/'
     | '/$locale/story/blog/referral-for-affiliate-pros/'
     | '/$locale/story/blog/referral-for-beginners/'
     | '/$locale/story/blog/referral-for-developers/'
@@ -8497,14 +8541,18 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/character-ai-alternatives'
     | '/$locale/story/blog/chatgpt-alternative-without-filters'
     | '/$locale/story/blog/chatgpt-jailbreak-alternative'
+    | '/$locale/story/blog/claude-without-filters'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine'
+    | '/$locale/story/blog/deepseek-uncensored'
     | '/$locale/story/blog/e2e-tests-found-real-bugs'
+    | '/$locale/story/blog/grok-alternative'
     | '/$locale/story/blog/hermes-thea-two-way-remote'
     | '/$locale/story/blog/interactive-coding-agent'
     | '/$locale/story/blog/model-refresh-uncensored-providers'
     | '/$locale/story/blog/one-codebase-13-platforms'
     | '/$locale/story/blog/one-endpoint-every-surface'
     | '/$locale/story/blog/openai-anthropic-compatible-api'
+    | '/$locale/story/blog/openrouter-alternatives'
     | '/$locale/story/blog/referral-for-affiliate-pros'
     | '/$locale/story/blog/referral-for-beginners'
     | '/$locale/story/blog/referral-for-developers'
@@ -9238,14 +9286,18 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/character-ai-alternatives/'
     | '/$locale/story/blog/chatgpt-alternative-without-filters/'
     | '/$locale/story/blog/chatgpt-jailbreak-alternative/'
+    | '/$locale/story/blog/claude-without-filters/'
     | '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
+    | '/$locale/story/blog/deepseek-uncensored/'
     | '/$locale/story/blog/e2e-tests-found-real-bugs/'
+    | '/$locale/story/blog/grok-alternative/'
     | '/$locale/story/blog/hermes-thea-two-way-remote/'
     | '/$locale/story/blog/interactive-coding-agent/'
     | '/$locale/story/blog/model-refresh-uncensored-providers/'
     | '/$locale/story/blog/one-codebase-13-platforms/'
     | '/$locale/story/blog/one-endpoint-every-surface/'
     | '/$locale/story/blog/openai-anthropic-compatible-api/'
+    | '/$locale/story/blog/openrouter-alternatives/'
     | '/$locale/story/blog/referral-for-affiliate-pros/'
     | '/$locale/story/blog/referral-for-beginners/'
     | '/$locale/story/blog/referral-for-developers/'
@@ -11271,6 +11323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
+    '/$locale/story/blog/claude-without-filters/': {
+      id: '/$locale/story/blog/claude-without-filters/'
+      path: '/blog/claude-without-filters'
+      fullPath: '/$locale/story/blog/claude-without-filters/'
+      preLoaderRoute: typeof LocaleStoryBlogClaudeWithoutFiltersIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/': {
       id: '/$locale/story/blog/dead-trading-bot-to-monitoring-engine/'
       path: '/blog/dead-trading-bot-to-monitoring-engine'
@@ -11278,11 +11337,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
+    '/$locale/story/blog/deepseek-uncensored/': {
+      id: '/$locale/story/blog/deepseek-uncensored/'
+      path: '/blog/deepseek-uncensored'
+      fullPath: '/$locale/story/blog/deepseek-uncensored/'
+      preLoaderRoute: typeof LocaleStoryBlogDeepseekUncensoredIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
     '/$locale/story/blog/e2e-tests-found-real-bugs/': {
       id: '/$locale/story/blog/e2e-tests-found-real-bugs/'
       path: '/blog/e2e-tests-found-real-bugs'
       fullPath: '/$locale/story/blog/e2e-tests-found-real-bugs/'
       preLoaderRoute: typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/grok-alternative/': {
+      id: '/$locale/story/blog/grok-alternative/'
+      path: '/blog/grok-alternative'
+      fullPath: '/$locale/story/blog/grok-alternative/'
+      preLoaderRoute: typeof LocaleStoryBlogGrokAlternativeIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/hermes-thea-two-way-remote/': {
@@ -11325,6 +11398,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/openai-anthropic-compatible-api'
       fullPath: '/$locale/story/blog/openai-anthropic-compatible-api/'
       preLoaderRoute: typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/openrouter-alternatives/': {
+      id: '/$locale/story/blog/openrouter-alternatives/'
+      path: '/blog/openrouter-alternatives'
+      fullPath: '/$locale/story/blog/openrouter-alternatives/'
+      preLoaderRoute: typeof LocaleStoryBlogOpenrouterAlternativesIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/referral-for-affiliate-pros/': {
@@ -15247,14 +15327,18 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogCharacterAiAlternativesIndexRoute: typeof LocaleStoryBlogCharacterAiAlternativesIndexRoute
   LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute: typeof LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute
   LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute: typeof LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute
+  LocaleStoryBlogClaudeWithoutFiltersIndexRoute: typeof LocaleStoryBlogClaudeWithoutFiltersIndexRoute
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute: typeof LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute
+  LocaleStoryBlogDeepseekUncensoredIndexRoute: typeof LocaleStoryBlogDeepseekUncensoredIndexRoute
   LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute: typeof LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute
+  LocaleStoryBlogGrokAlternativeIndexRoute: typeof LocaleStoryBlogGrokAlternativeIndexRoute
   LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute: typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
   LocaleStoryBlogInteractiveCodingAgentIndexRoute: typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
   LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute: typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   LocaleStoryBlogOneCodebase13PlatformsIndexRoute: typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   LocaleStoryBlogOneEndpointEverySurfaceIndexRoute: typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute: typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
+  LocaleStoryBlogOpenrouterAlternativesIndexRoute: typeof LocaleStoryBlogOpenrouterAlternativesIndexRoute
   LocaleStoryBlogReferralForAffiliateProsIndexRoute: typeof LocaleStoryBlogReferralForAffiliateProsIndexRoute
   LocaleStoryBlogReferralForBeginnersIndexRoute: typeof LocaleStoryBlogReferralForBeginnersIndexRoute
   LocaleStoryBlogReferralForDevelopersIndexRoute: typeof LocaleStoryBlogReferralForDevelopersIndexRoute
@@ -15320,10 +15404,16 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogChatgptAlternativeWithoutFiltersIndexRoute,
   LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute:
     LocaleStoryBlogChatgptJailbreakAlternativeIndexRoute,
+  LocaleStoryBlogClaudeWithoutFiltersIndexRoute:
+    LocaleStoryBlogClaudeWithoutFiltersIndexRoute,
   LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute:
     LocaleStoryBlogDeadTradingBotToMonitoringEngineIndexRoute,
+  LocaleStoryBlogDeepseekUncensoredIndexRoute:
+    LocaleStoryBlogDeepseekUncensoredIndexRoute,
   LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute:
     LocaleStoryBlogE2eTestsFoundRealBugsIndexRoute,
+  LocaleStoryBlogGrokAlternativeIndexRoute:
+    LocaleStoryBlogGrokAlternativeIndexRoute,
   LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute:
     LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute,
   LocaleStoryBlogInteractiveCodingAgentIndexRoute:
@@ -15336,6 +15426,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogOneEndpointEverySurfaceIndexRoute,
   LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute:
     LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute,
+  LocaleStoryBlogOpenrouterAlternativesIndexRoute:
+    LocaleStoryBlogOpenrouterAlternativesIndexRoute,
   LocaleStoryBlogReferralForAffiliateProsIndexRoute:
     LocaleStoryBlogReferralForAffiliateProsIndexRoute,
   LocaleStoryBlogReferralForBeginnersIndexRoute:

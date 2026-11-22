@@ -16,6 +16,34 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    deepseekUncensored: {
+      title: "DeepSeek sin censura. Lo que de verdad quita el filtro.",
+      category: "Guía de modelos",
+      excerpt:
+        "La censura de DeepSeek vive en dos capas. Cambiar de proveedor solo quita una. Aquí está lo que quita la otra, más las versiones sin censura de DeepSeek con las que puedes chatear hoy.",
+      readTime: "7 min de lectura",
+    },
+    grokAlternative: {
+      title: "Alternativas a Grok. Cuando el descaro no alcanza.",
+      category: "Comparativa",
+      excerpt:
+        "¿Grok es sin censura? No del todo. Hasta dónde llega Grok de verdad, alternativas según lo que buscas y Grok junto a modelos abliterated en un mismo chat.",
+      readTime: "7 min de lectura",
+    },
+    claudeWithoutFilters: {
+      title: "Claude sin filtros. Por qué no existe y qué funciona.",
+      category: "Guía de modelos",
+      excerpt:
+        'Ningún interruptor apaga los rechazos de Claude, y todo "Claude sin censura" es un truco. Quédate con Claude para la prosa y pasa el resto a modelos sin censura en el mismo hilo.',
+      readTime: "7 min de lectura",
+    },
+    openrouterAlternatives: {
+      title: "Alternativas a OpenRouter. Una clave, menos rechazos.",
+      category: "Guía para desarrolladores",
+      excerpt:
+        "Seis alternativas a OpenRouter, revisadas en su propia documentación: formatos de API, modelos sin censura, comisiones. Y las dos líneas que cambias para mover tu cliente de OpenAI SDK.",
+      readTime: "9 min de lectura",
+    },
     bestUncensoredLlm: {
       title: "El mejor LLM sin censura. Elegido por tarea, no por hype.",
       category: "Guía de modelos",

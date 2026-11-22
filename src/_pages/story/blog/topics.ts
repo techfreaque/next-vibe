@@ -22,6 +22,10 @@ export type BlogTopic = (typeof BLOG_TOPICS)[number];
 
 /** Section of each post on the blog index. Exhaustive: a new post needs one. */
 export const POST_TOPICS: Record<BlogPostSlug, BlogTopic> = {
+  "deepseek-uncensored": "uncensored",
+  "grok-alternative": "uncensored",
+  "claude-without-filters": "uncensored",
+  "openrouter-alternatives": "developers",
   "best-uncensored-llm": "uncensored",
   "uncensored-ai-writer": "uncensored",
   "unbiased-ai-chatbot": "uncensored",
@@ -74,6 +78,9 @@ export const HUB_GUIDES: Record<TopicHub, readonly BlogPostSlug[]> = {
     "abliterated-vs-uncensored-models",
     "chatgpt-alternative-without-filters",
     "chatgpt-jailbreak-alternative",
+    "claude-without-filters",
+    "grok-alternative",
+    "deepseek-uncensored",
     "unbiased-ai-chatbot",
     "uncensored-ai-writer",
     "ai-roleplay-without-filter",
@@ -88,6 +95,7 @@ export const HUB_GUIDES: Record<TopicHub, readonly BlogPostSlug[]> = {
   abliterated: [
     "abliterated-vs-uncensored-models",
     "best-uncensored-llm",
+    "deepseek-uncensored",
     "uncensored-models-what-each-is-good-at",
     "unbiased-ai-chatbot",
     "chatgpt-jailbreak-alternative",
@@ -103,6 +111,38 @@ interface RelatedGuideSet {
 
 /** Curated hub + siblings. Posts not listed fall back to their topic. */
 const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
+  "deepseek-uncensored": {
+    hub: "abliterated",
+    related: [
+      "abliterated-vs-uncensored-models",
+      "best-uncensored-llm",
+      "uncensored-llm-without-gpu",
+    ],
+  },
+  "grok-alternative": {
+    hub: "uncensored",
+    related: [
+      "chatgpt-alternative-without-filters",
+      "claude-without-filters",
+      "best-uncensored-llm",
+    ],
+  },
+  "claude-without-filters": {
+    hub: "uncensored",
+    related: [
+      "uncensored-ai-writer",
+      "chatgpt-jailbreak-alternative",
+      "ai-roleplay-without-filter",
+    ],
+  },
+  "openrouter-alternatives": {
+    hub: null,
+    related: [
+      "uncensored-llm-api",
+      "openai-anthropic-compatible-api",
+      "venice-ai-alternatives",
+    ],
+  },
   "best-uncensored-llm": {
     hub: "uncensored",
     related: [
@@ -115,8 +155,8 @@ const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
     hub: "uncensored",
     related: [
       "ai-roleplay-without-filter",
+      "claude-without-filters",
       "best-uncensored-llm",
-      "character-ai-alternatives",
     ],
   },
   "unbiased-ai-chatbot": {
@@ -147,16 +187,16 @@ const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
     hub: "uncensored",
     related: [
       "openai-anthropic-compatible-api",
+      "openrouter-alternatives",
       "unbottled-api-in-coding-tools",
-      "uncensored-llm-without-gpu",
     ],
   },
   "chatgpt-jailbreak-alternative": {
     hub: "uncensored",
     related: [
       "chatgpt-alternative-without-filters",
+      "claude-without-filters",
       "abliterated-vs-uncensored-models",
-      "best-uncensored-llm",
     ],
   },
   "venice-ai-alternatives": {
@@ -179,8 +219,8 @@ const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
     hub: "abliterated",
     related: [
       "best-uncensored-llm",
+      "deepseek-uncensored",
       "uncensored-models-what-each-is-good-at",
-      "unbiased-ai-chatbot",
     ],
   },
   "uncensored-models-what-each-is-good-at": {
@@ -195,8 +235,8 @@ const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
     hub: "uncensored",
     related: [
       "chatgpt-jailbreak-alternative",
+      "grok-alternative",
       "venice-ai-alternatives",
-      "best-uncensored-llm",
     ],
   },
   "ai-roleplay-without-filter": {

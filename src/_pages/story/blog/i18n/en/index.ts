@@ -14,6 +14,34 @@ export const translations = {
     },
   },
   posts: {
+    deepseekUncensored: {
+      title: "DeepSeek uncensored. What actually removes the filter.",
+      category: "Model Guide",
+      excerpt:
+        "DeepSeek's censorship sits in two layers. Hosting it elsewhere removes one. Here is what removes the other, plus the uncensored DeepSeek builds you can chat with today.",
+      readTime: "7 min read",
+    },
+    grokAlternative: {
+      title: "Grok alternatives. For when edgy is not enough.",
+      category: "Comparison",
+      excerpt:
+        "Is Grok uncensored? Not quite. How far Grok really goes, alternatives sorted by what you want, and Grok next to abliterated models in one chat.",
+      readTime: "7 min read",
+    },
+    claudeWithoutFilters: {
+      title: "Claude without filters. Why it can't exist, and what works.",
+      category: "Model Guide",
+      excerpt:
+        'No switch turns Claude\'s refusals off, and every "uncensored Claude" is a trick. Keep Claude for prose and hand the rest to uncensored models in the same thread.',
+      readTime: "7 min read",
+    },
+    openrouterAlternatives: {
+      title: "OpenRouter alternatives. One key, fewer refusals.",
+      category: "Developer Guide",
+      excerpt:
+        "Six OpenRouter alternatives from their own docs: API formats, uncensored coverage, fees. Plus the two lines that change when your OpenAI SDK client moves over.",
+      readTime: "9 min read",
+    },
     bestUncensoredLlm: {
       title: "The best uncensored LLM. Picked by job, not by hype.",
       category: "Model Guide",
