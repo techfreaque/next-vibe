@@ -3134,7 +3134,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ChatModelId.QWEN3_235B_FREE]: {
-    name: "Qwen3 235B ",
+    name: "Qwen3 235B",
     by: "alibaba",
     description: "chat.models.descriptions.qwen3235bFree",
     parameterCount: 235,

@@ -77,6 +77,17 @@ function fitTitle(
   return candidates[candidates.length - 1] ?? first;
 }
 
+/** Google cuts snippets at ~160 characters. */
+const DESCRIPTION_MAX_CHARS = 160;
+
+/** The full description when it fits a snippet, else the shorter one. */
+function fitDescription(
+  full: TranslatedKeyType,
+  short: TranslatedKeyType,
+): TranslatedKeyType {
+  return full.length <= DESCRIPTION_MAX_CHARS ? full : short;
+}
+
 export interface PageMeta {
   title: TranslatedKeyType;
   description: TranslatedKeyType;
@@ -193,8 +204,10 @@ export function compareMeta(
     appName: configT("appName"),
     a: left.name,
     b: right.name,
-    creditsA: formatNumber(left.creditsPerMessage, locale),
-    creditsB: formatNumber(right.creditsPerMessage, locale),
+    moneyA: formatMoney(left.creditsPerMessage, locale),
+    moneyB: formatMoney(right.creditsPerMessage, locale),
+    tierA: tierName(left.content, locale),
+    tierB: tierName(right.content, locale),
     contextA: formatTokenCount(left.contextWindow),
     contextB: formatTokenCount(right.contextWindow),
   };
@@ -204,7 +217,10 @@ export function compareMeta(
       t("meta.compare.titleShort", vars),
       t("meta.compare.titleMin", vars),
     ),
-    description: t("meta.compare.description", vars),
+    description: fitDescription(
+      t("meta.compare.description", vars),
+      t("meta.compare.descriptionShort", vars),
+    ),
   };
 }
 
@@ -578,6 +594,40 @@ export function findRelatedMediaModels(
 
 // ─── FAQ ─────────────────────────────────────────────────────────────────────
 
+/** "Is <model> uncensored?" answer, shared by model and compare pages. */
+export function uncensoredAnswer(
+  facts: ModelFacts,
+  locale: CountryLanguage,
+): string {
+  const { t } = scopedTranslation.scopedT(locale);
+  const kind = uncensoredKind(facts);
+  if (kind !== null) {
+    return `${t("faq.uncensored.yes")} ${t(`uncensoredKind.${kind}.line`)} ${t("faq.uncensored.consent")}`;
+  }
+  return facts.content === ContentLevel.OPEN
+    ? t("faq.uncensored.open", { model: facts.name })
+    : t("faq.uncensored.mainstream", { model: facts.name, lab: facts.labName });
+}
+
+/** "Can I use <model> via API?" answer, shared by model and compare pages. */
+export function apiAnswer(facts: ModelFacts, locale: CountryLanguage): string {
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  if (isApiCallable(facts)) {
+    return t("faq.api.a", { id: facts.id, appName: configT("appName") });
+  }
+  if (!facts.isLegacy) {
+    return t("facts.apiIdUnsupported");
+  }
+  return facts.successor === null
+    ? t("faq.api.legacyNoSuccessor", { model: facts.name })
+    : t("faq.api.legacy", {
+        model: facts.name,
+        successor: facts.successor.name,
+        id: facts.successor.id,
+      });
+}
+
 /** Visible FAQ for a chat model page; the FAQPage JSON-LD uses the same items. */
 export function chatModelFaq(
   facts: ModelFacts,
@@ -585,7 +635,6 @@ export function chatModelFaq(
   related: readonly RelatedModel[] = [],
 ): FaqItem[] {
   const { t } = scopedTranslation.scopedT(locale);
-  const { t: configT } = configScopedTranslation.scopedT(locale);
   const model = facts.name;
   const credits = formatNumber(facts.creditsPerMessage, locale);
   const money = formatMoney(facts.creditsPerMessage, locale);
@@ -607,25 +656,6 @@ export function chatModelFaq(
             output: formatMoney(facts.tokenPrice.outputCredits, locale),
           });
 
-  const kind = uncensoredKind(facts);
-  const uncensoredAnswer =
-    kind !== null
-      ? `${t("faq.uncensored.yes")} ${t(`uncensoredKind.${kind}.line`)} ${t("faq.uncensored.consent")}`
-      : facts.content === ContentLevel.OPEN
-        ? t("faq.uncensored.open", { model })
-        : t("faq.uncensored.mainstream", { model, lab: facts.labName });
-
-  const apiAnswer = isApiCallable(facts)
-    ? t("faq.api.a", { id: facts.id, appName: configT("appName") })
-    : !facts.isLegacy
-      ? t("facts.apiIdUnsupported")
-      : facts.successor === null
-        ? t("faq.api.legacyNoSuccessor", { model })
-        : t("faq.api.legacy", {
-            model,
-            successor: facts.successor.name,
-            id: facts.successor.id,
-          });
   const modalitiesSentence = t("faq.inputs.modalities", {
     inputs: modalityList(facts.inputs, t),
     outputs: modalityList(facts.outputs, t),
@@ -642,8 +672,11 @@ export function chatModelFaq(
           ? priceAnswer
           : `${priceAnswer} ${referenceTurnText(facts, locale, t)}`,
     },
-    { question: t("faq.uncensored.q", { model }), answer: uncensoredAnswer },
-    { question: t("faq.api.q", { model }), answer: apiAnswer },
+    {
+      question: t("faq.uncensored.q", { model }),
+      answer: uncensoredAnswer(facts, locale),
+    },
+    { question: t("faq.api.q", { model }), answer: apiAnswer(facts, locale) },
     {
       question: t("faq.context.q", { model }),
       answer: t("faq.context.a", {
@@ -714,7 +747,7 @@ export function mediaModelFaq(
           unit: mediaUnitText(facts.price, t),
           provider: facts.price.provider,
         });
-  const uncensoredAnswer =
+  const mediaUncensoredAnswer =
     facts.content === ContentLevel.UNCENSORED
       ? facts.type === "image"
         ? `${t("mediaFaq.uncensored.uncensored", { model })} ${t("mediaFaq.uncensored.consent")}`
@@ -740,7 +773,7 @@ export function mediaModelFaq(
     },
     {
       question: t("mediaFaq.uncensored.q", { model }),
-      answer: uncensoredAnswer,
+      answer: mediaUncensoredAnswer,
     },
     {
       question: t("faq.providers.q", { model }),

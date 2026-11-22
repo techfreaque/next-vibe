@@ -56,7 +56,9 @@ export const translations: typeof enTranslations = {
       titleShort: "{{a}} vs {{b}} : prix et contexte",
       titleMin: "{{a}} vs {{b}}",
       description:
-        "{{a}} vs {{b}} : ~{{creditsA}} contre ~{{creditsB}} crédits par message, contexte de {{contextA}} contre {{contextB}}. Entrées, outils, filtres et API côte à côte.",
+        "{{a}} ({{tierA}}) vs {{b}} ({{tierB}}) : ~{{moneyA}} contre ~{{moneyB}} par message, contexte de {{contextA}} contre {{contextB}}. Lequel choisir, les faits côte à côte.",
+      descriptionShort:
+        "{{a}} ({{tierA}}) vs {{b}} ({{tierB}}) : ~{{moneyA}} contre ~{{moneyB}} par message, contexte de {{contextA}} contre {{contextB}}.",
       imageAlt: "{{a}} vs {{b}} sur {{appName}}",
       keywords:
         "{{a}} vs {{b}}, {{a}}, {{b}}, comparatif de modèles d'IA, {{appName}}",
@@ -455,10 +457,93 @@ export const translations: typeof enTranslations = {
     samePrice: "Les deux coûtent à peu près pareil par message.",
     biggerContext: "{{model}} tient {{times}}× plus de contexte.",
     sameContext: "Les deux tiennent autant de contexte.",
-    chatWith: "Discuter avec {{model}}",
     modelPage: "Détails de {{model}}",
     swap: "Inverser",
-    sameModel: "Choisissez deux modèles différents à comparer.",
+    cheaperFree: "{{model}} ne coûte aucun crédit par message.",
+    tierLine:
+      "{{model}} est dans la catégorie {{tier}}, {{other}} dans la catégorie {{otherTier}}.",
+    verdictHeading: "Lequel choisir ?",
+    verdictIntro:
+      "Directement tiré des données : prix, contexte, filtres, entrées. Aucune promesse de benchmark.",
+    edge: "Là où {{model}} prend l’avantage",
+    noEdge: "Aucun avantage sur {{other}} selon les données que nous suivons.",
+    similar:
+      "Sur le papier, {{a}} et {{b}} se valent : mêmes filtres, prix proche, contexte proche. Envoyez le même prompt aux deux et gardez celui qui vous convient.",
+    moreHeading: "Autres comparatifs",
+    moreWith: "Autres comparatifs avec {{model}}",
+    both: "{{a}} et {{b}}",
+    pick: {
+      cheaper:
+        "Moins cher : {{money}} au lieu de {{otherMoney}} par message, {{times}}× moins.",
+      free: "Aucun crédit par message.",
+      context:
+        "Plus de contexte : {{tokens}} tokens (environ {{pages}} pages) au lieu de {{otherTokens}}.",
+      lessFiltered:
+        "Moins de filtres : catégorie {{tier}} au lieu de {{otherTier}}.",
+      mainstream:
+        "Filtres de sécurité de {{lab}}, pensé pour le travail et la recherche.",
+      kind: {
+        ownWorldview:
+          "Sa propre vision du monde : entraîné sur des livres et documents bannis de l’internet grand public.",
+        abliterated:
+          "Avec ablation : les poids du modèle de base ont été modifiés pour réduire les refus.",
+        fineTuned: "Entraînement ciblé pour des réponses moins restreintes.",
+      },
+      smarter:
+        "Niveau d’intelligence supérieur : {{level}} au lieu de {{otherLevel}}.",
+      fast: "Vitesse : les réponses rapides sont un point fort déclaré.",
+      strengths: "Réputé pour : {{list}}. {{other}} ne le revendique pas.",
+      inputs: "Lit : {{list}}. {{other}} non.",
+      imageOutput: "Génère des images directement dans le chat.",
+      tools: "Appels d’outils pour le travail en agent. {{other}} n’en a pas.",
+      current: "Modèle actuel. {{other}} est un ancien modèle.",
+    },
+  },
+  compareFaq: {
+    cheaper: {
+      q: "Lequel est le moins cher, {{a}} ou {{b}} ?",
+      same: "À peu près pareil. {{a}} coûte environ {{creditsA}} crédits ({{moneyA}}) par message, {{b}} environ {{creditsB}} crédits ({{moneyB}}).",
+      diff: "{{cheap}}. Il coûte environ {{cheapCredits}} crédits ({{cheapMoney}}) par message, contre environ {{dearCredits}} crédits ({{dearMoney}}) pour {{dear}} : {{times}}× plus.",
+      diffFree:
+        "{{cheap}}. Il ne coûte aucun crédit par message, contre environ {{dearCredits}} crédits ({{dearMoney}}) pour {{dear}}.",
+      reference:
+        "L’estimation porte sur un message de référence de {{input}} tokens en entrée et {{output}} tokens en sortie. Vous payez les tokens réellement utilisés.",
+      rates:
+        "{{model}} via {{provider}} : {{input}} par million de tokens en entrée, {{output}} par million de tokens en sortie.",
+      fixed: "{{model}} via {{provider}} : prix fixe par message.",
+      credit: "Un crédit vaut {{value}} au tarif des packs de crédits.",
+    },
+    context: {
+      q: "Lequel a le plus de contexte, {{a}} ou {{b}} ?",
+      diff: "{{big}} : {{bigTokens}} tokens (environ {{bigPages}} pages) contre {{smallTokens}} tokens (environ {{smallPages}} pages) pour {{small}}. Soit {{times}}× plus.",
+      same: "Pas de grande différence. {{big}} tient {{bigTokens}} tokens (environ {{bigPages}} pages), {{small}} {{smallTokens}} tokens (environ {{smallPages}} pages).",
+      equal:
+        "Autant l’un que l’autre : {{bigTokens}} tokens chacun, environ {{bigPages}} pages de texte.",
+    },
+    smarter: {
+      q: "Lequel est le meilleur pour les tâches difficiles, {{a}} ou {{b}} ?",
+      diff: "{{model}} a le niveau d’intelligence le plus élevé : {{level}} contre {{otherLevel}} pour {{other}}.",
+      same: "Les deux ont le même niveau d’intelligence : {{level}}.",
+      known: "{{model}} est réputé pour : {{list}}.",
+      knownBoth: "Les deux sont réputés pour : {{list}}.",
+      source:
+        "Niveaux et points forts viennent de notre catalogue de modèles, pas d’un benchmark.",
+    },
+    inputs: {
+      q: "Que peuvent lire et produire {{a}} et {{b}} ?",
+      line: "{{model}} : entrée {{inputs}}, sortie {{outputs}}, {{tools}}.",
+      toolsYes: "avec appels d’outils",
+      toolsNo: "sans appels d’outils",
+    },
+    api: {
+      q: "Puis-je utiliser {{a}} et {{b}} via l’API ?",
+      both: "Oui. Appelez {{idA}} ou {{idB}} sur l’API {{appName}}, compatible avec les formats OpenAI et Anthropic. Une seule clé pour les deux. L’API demande un compte payant : n’importe quelle offre.",
+      one: "{{model}} est disponible sur l’API sous l’ID {{id}} (compte payant, n’importe quelle offre).",
+    },
+    try: {
+      q: "Comment essayer {{a}} et {{b}} ?",
+      a: "Ouvrez un chat avec l’un des deux modèles et changez en pleine conversation via le sélecteur de modèle. Les nouveaux visiteurs reçoivent des crédits offerts pour commencer, sans carte.",
+    },
   },
   picker: {
     change: "Changer de modèle",

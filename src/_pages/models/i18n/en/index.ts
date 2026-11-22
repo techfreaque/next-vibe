@@ -54,7 +54,9 @@ export const translations = {
       titleShort: "{{a}} vs {{b}}: price & context",
       titleMin: "{{a}} vs {{b}}",
       description:
-        "{{a}} vs {{b}}: ~{{creditsA}} vs ~{{creditsB}} credits per message, {{contextA}} vs {{contextB}} context. Inputs, tools, filters and API side by side.",
+        "{{a}} ({{tierA}}) vs {{b}} ({{tierB}}): ~{{moneyA}} vs ~{{moneyB}} per message, {{contextA}} vs {{contextB}} context. When to pick which, facts side by side.",
+      descriptionShort:
+        "{{a}} ({{tierA}}) vs {{b}} ({{tierB}}): ~{{moneyA}} vs ~{{moneyB}} per message, {{contextA}} vs {{contextB}} context.",
       imageAlt: "{{a}} vs {{b}} on {{appName}}",
       keywords:
         "{{a}} vs {{b}}, {{a}}, {{b}}, AI model comparison, {{appName}}",
@@ -441,10 +443,90 @@ export const translations = {
     samePrice: "Both cost about the same per message.",
     biggerContext: "{{model}} holds {{times}}× more context.",
     sameContext: "Both hold the same amount of context.",
-    chatWith: "Chat with {{model}}",
     modelPage: "{{model}} details",
     swap: "Swap sides",
-    sameModel: "Pick two different models to compare.",
+    cheaperFree: "{{model}} costs no credits per message.",
+    tierLine:
+      "{{model}} sits in the {{tier}} tier, {{other}} in {{otherTier}}.",
+    verdictHeading: "Which one should you pick?",
+    verdictIntro:
+      "Straight from the specs: price, context, filters, inputs. No benchmark claims.",
+    edge: "Where {{model}} has the edge",
+    noEdge: "No edge over {{other}} on the facts we track.",
+    similar:
+      "On paper, {{a}} and {{b}} are close: same filters, similar price, similar context. Send both the same prompt and keep the one you prefer.",
+    moreHeading: "More comparisons",
+    moreWith: "More {{model}} comparisons",
+    both: "{{a}} and {{b}}",
+    pick: {
+      cheaper:
+        "Lower price: {{money}} vs {{otherMoney}} per message, {{times}}× less.",
+      free: "No credits per message.",
+      context:
+        "More context: {{tokens}} tokens (about {{pages}} pages) vs {{otherTokens}}.",
+      lessFiltered: "Fewer filters: {{tier}} tier vs {{otherTier}}.",
+      mainstream: "Safety filters from {{lab}}, built for work and research.",
+      kind: {
+        ownWorldview:
+          "Own worldview: trained on books and documents banned from the mainstream internet.",
+        abliterated:
+          "Abliterated: the base model's weights were changed to cut refusals.",
+        fineTuned: "Fine-tuned for less restricted answers.",
+      },
+      smarter: "Higher intelligence rating: {{level}} vs {{otherLevel}}.",
+      fast: "Speed: quick replies are a listed strength.",
+      strengths: "Known for {{list}}, which {{other}} does not list.",
+      inputs: "Reads {{list}}. {{other}} does not.",
+      imageOutput: "Generates images right in the chat.",
+      tools: "Tool calling for agent work. {{other}} has none.",
+      current: "Current model. {{other}} is legacy.",
+    },
+  },
+  compareFaq: {
+    cheaper: {
+      q: "Which is cheaper, {{a}} or {{b}}?",
+      same: "About the same. {{a}} costs ~{{creditsA}} credits ({{moneyA}}) per message, {{b}} ~{{creditsB}} credits ({{moneyB}}).",
+      diff: "{{cheap}}. It costs ~{{cheapCredits}} credits ({{cheapMoney}}) per message, {{dear}} ~{{dearCredits}} credits ({{dearMoney}}): {{times}}× more.",
+      diffFree:
+        "{{cheap}}. It costs no credits per message, {{dear}} ~{{dearCredits}} credits ({{dearMoney}}).",
+      reference:
+        "Estimates assume a reference message with {{input}} input and {{output}} output tokens. You pay for the tokens you actually use.",
+      rates:
+        "{{model}} via {{provider}}: {{input}} per 1M input tokens, {{output}} per 1M output tokens.",
+      fixed: "{{model}} via {{provider}}: fixed price per message.",
+      credit: "One credit is {{value}} at the credit pack rate.",
+    },
+    context: {
+      q: "Which has more context, {{a}} or {{b}}?",
+      diff: "{{big}}: {{bigTokens}} tokens (about {{bigPages}} pages) vs {{smallTokens}} tokens (about {{smallPages}} pages) for {{small}}. That is {{times}}× more.",
+      same: "Neither by much. {{big}} holds {{bigTokens}} tokens (about {{bigPages}} pages), {{small}} {{smallTokens}} tokens (about {{smallPages}} pages).",
+      equal:
+        "The same: {{bigTokens}} tokens each, about {{bigPages}} pages of text.",
+    },
+    smarter: {
+      q: "Which is better for hard tasks, {{a}} or {{b}}?",
+      diff: "{{model}} carries the higher intelligence rating: {{level}} vs {{otherLevel}} for {{other}}.",
+      same: "Both carry the same intelligence rating: {{level}}.",
+      known: "{{model}} is known for: {{list}}.",
+      knownBoth: "Both are known for: {{list}}.",
+      source:
+        "Ratings and strengths come from our model catalog, not from a benchmark.",
+    },
+    inputs: {
+      q: "What can {{a}} and {{b}} read and write?",
+      line: "{{model}}: input {{inputs}}, output {{outputs}}, {{tools}}.",
+      toolsYes: "tool calling",
+      toolsNo: "no tool calling",
+    },
+    api: {
+      q: "Can I use {{a}} and {{b}} via API?",
+      both: "Yes. Call {{idA}} or {{idB}} on the {{appName}} API, which speaks the OpenAI and Anthropic formats. One key covers both. The API needs a paid account: any plan.",
+      one: "{{model}} is on the API as {{id}} (paid account, any plan).",
+    },
+    try: {
+      q: "How can I try {{a}} and {{b}}?",
+      a: "Open a chat with either model selected and switch in the model selector mid-conversation. New visitors get free credits to start, no card needed.",
+    },
   },
   picker: {
     change: "Change model",

@@ -65,25 +65,19 @@ function modelOffer(
   };
 }
 
-function modelGraph(
+interface ServiceInput {
+  path: string;
+  name: string;
+  description: string;
+  labName: string;
+  category: string;
+  offer: JsonLdNode | null;
+}
+
+function serviceNode(
   locale: CountryLanguage,
-  {
-    path,
-    name,
-    description,
-    labName,
-    category,
-    offer,
-  }: {
-    path: string;
-    name: string;
-    description: string;
-    labName: string;
-    category: string;
-    offer: JsonLdNode | null;
-  },
+  { path, name, description, labName, category, offer }: ServiceInput,
 ): JsonLdNode {
-  const { t } = scopedTranslation.scopedT(locale);
   const url = pageUrl(locale, path);
   const service: JsonLdNode = {
     "@type": "Service",
@@ -95,20 +89,25 @@ function modelGraph(
     provider: { "@id": organizationId(locale) },
     serviceType: category,
   };
+  return offer === null ? service : { ...service, offers: offer };
+}
+
+function modelGraph(locale: CountryLanguage, input: ServiceInput): JsonLdNode {
+  const { t } = scopedTranslation.scopedT(locale);
   return {
     "@context": SCHEMA_CONTEXT,
     "@graph": [
-      offer === null ? service : { ...service, offers: offer },
+      serviceNode(locale, input),
       buildBreadcrumbList(locale, [
         { name: t("breadcrumb.models"), path: "/models" },
-        { name, path },
+        { name: input.name, path: input.path },
       ]),
     ],
   };
 }
 
-/** Service + BreadcrumbList for a chat model page. */
-export function buildChatModelStructuredData(
+/** The Service node (with offers) for a chat model, keyed by its model page. */
+function chatModelService(
   facts: ModelFacts,
   locale: CountryLanguage,
   description: string,
@@ -134,7 +133,7 @@ export function buildChatModelStructuredData(
       ),
     );
   }
-  return modelGraph(locale, {
+  return serviceNode(locale, {
     path,
     name: facts.name,
     description,
@@ -147,6 +146,26 @@ export function buildChatModelStructuredData(
       specs,
     ),
   });
+}
+
+/** Service + BreadcrumbList for a chat model page. */
+export function buildChatModelStructuredData(
+  facts: ModelFacts,
+  locale: CountryLanguage,
+  description: string,
+): JsonLdNode {
+  const { t } = scopedTranslation.scopedT(locale);
+  const path = `/models/${facts.slug}`;
+  return {
+    "@context": SCHEMA_CONTEXT,
+    "@graph": [
+      chatModelService(facts, locale, description),
+      buildBreadcrumbList(locale, [
+        { name: t("breadcrumb.models"), path: "/models" },
+        { name: facts.name, path },
+      ]),
+    ],
+  };
 }
 
 /** Service + BreadcrumbList for an image/video/music/voice model page. */
@@ -174,18 +193,27 @@ export function buildMediaModelStructuredData(
   });
 }
 
-/** BreadcrumbList for a compare page: Home > Models > A vs B. */
+/**
+ * Compare page: one Service per model (same @id as on its model page, so
+ * both pages describe the same entity) + BreadcrumbList Home > Models > A vs B.
+ */
 export function buildCompareStructuredData(
   locale: CountryLanguage,
   name: string,
   path: string,
+  models: readonly { facts: ModelFacts; description: string }[],
 ): JsonLdNode {
   const { t } = scopedTranslation.scopedT(locale);
   return {
     "@context": SCHEMA_CONTEXT,
-    ...buildBreadcrumbList(locale, [
-      { name: t("breadcrumb.models"), path: "/models" },
-      { name, path },
-    ]),
+    "@graph": [
+      ...models.map(({ facts, description }) =>
+        chatModelService(facts, locale, description),
+      ),
+      buildBreadcrumbList(locale, [
+        { name: t("breadcrumb.models"), path: "/models" },
+        { name, path },
+      ]),
+    ],
   };
 }

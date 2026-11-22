@@ -2,24 +2,29 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/components/div";
+import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
+import { Check } from "next-vibe/ui/components/icons/Check";
 import { Repeat } from "next-vibe/ui/components/icons/Repeat";
+import { Li } from "next-vibe/ui/components/li";
 import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
-import { P } from "next-vibe/ui/components/typography";
-import type { JSX } from "react";
+import { H3, P } from "next-vibe/ui/components/typography";
+import { Ul } from "next-vibe/ui/components/ul";
+import type { JSX, ReactNode } from "react";
 
 import {
   CardLink,
   CONTAINER,
   Cta,
   PageHero,
+  PageSection,
 } from "../../../../story/_shared/marketing";
+import type { CompareLink } from "../../../_shared/model-compare";
 import type { ModelFacts, PickerModel } from "../../../_shared/model-facts";
 import {
   buildFactRows,
   chatHref,
   compareHref,
-  formatNumber,
   modelHref,
   priceFootnote,
 } from "../../../_shared/model-format";
@@ -28,53 +33,7 @@ import { ModelIcon, TierBadge } from "../../../_shared/model-ui";
 import { scopedTranslation } from "../../../i18n";
 import type { ComparePageData } from "./page";
 
-/** Ratios under this read as "about the same". */
-const SAME_RATIO = 1.1;
-
 type ModelsT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-function ratio(a: number, b: number): number {
-  const low = Math.min(a, b);
-  const high = Math.max(a, b);
-  return low <= 0 ? Number.POSITIVE_INFINITY : high / low;
-}
-
-function verdicts(
-  left: ModelFacts,
-  right: ModelFacts,
-  locale: CountryLanguage,
-  t: ModelsT,
-): string[] {
-  const lines: string[] = [];
-
-  const priceRatio = ratio(left.creditsPerMessage, right.creditsPerMessage);
-  if (priceRatio < SAME_RATIO || !Number.isFinite(priceRatio)) {
-    lines.push(t("compare.samePrice"));
-  } else {
-    const cheaper =
-      left.creditsPerMessage < right.creditsPerMessage ? left : right;
-    lines.push(
-      t("compare.cheaper", {
-        model: cheaper.name,
-        times: formatNumber(Math.round(priceRatio * 10) / 10, locale),
-      }),
-    );
-  }
-
-  const contextRatio = ratio(left.contextWindow, right.contextWindow);
-  if (contextRatio < SAME_RATIO) {
-    lines.push(t("compare.sameContext"));
-  } else {
-    const bigger = left.contextWindow > right.contextWindow ? left : right;
-    lines.push(
-      t("compare.biggerContext", {
-        model: bigger.name,
-        times: formatNumber(Math.round(contextRatio * 10) / 10, locale),
-      }),
-    );
-  }
-  return lines;
-}
 
 function ModelHeader({
   facts,
@@ -110,10 +69,6 @@ function ModelHeader({
         locale={locale}
         className="self-start"
       />
-      <CardLink
-        href={chatHref(locale, facts)}
-        label={t("compare.chatWith", { model: facts.name })}
-      />
       <ModelPicker
         locale={locale}
         models={pickerModels}
@@ -126,17 +81,124 @@ function ModelHeader({
   );
 }
 
+/** Try-in-chat button: legacy models open their successor, none without one. */
+function TryCta({
+  facts,
+  locale,
+  t,
+}: {
+  facts: ModelFacts;
+  locale: CountryLanguage;
+  t: ModelsT;
+}): JSX.Element | null {
+  const chatModel = facts.isLegacy ? facts.successor : facts;
+  if (chatModel === null) {
+    return null;
+  }
+  return (
+    <Cta
+      href={chatHref(locale, chatModel)}
+      label={t("model.chatCta", { model: chatModel.name })}
+    />
+  );
+}
+
+function EdgeCard({
+  facts,
+  other,
+  reasons,
+  locale,
+  t,
+}: {
+  facts: ModelFacts;
+  other: ModelFacts;
+  reasons: string[];
+  locale: CountryLanguage;
+  t: ModelsT;
+}): JSX.Element {
+  return (
+    <Div
+      data-testid="compare-edge"
+      className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5 shadow-xs md:p-6"
+    >
+      <Div className="flex min-w-0 items-center gap-3">
+        <ModelIcon facts={facts} size="sm" />
+        <H3 className="m-0 text-lg font-semibold text-foreground [overflow-wrap:anywhere]">
+          {t("compare.edge", { model: facts.name })}
+        </H3>
+      </Div>
+      {reasons.length > 0 ? (
+        <Ul className="m-0 flex list-none flex-col gap-3 p-0">
+          {reasons.map((reason) => (
+            <Li key={reason} className="flex items-start gap-2 text-sm">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+              <Span className="leading-relaxed">{reason}</Span>
+            </Li>
+          ))}
+        </Ul>
+      ) : (
+        <P className="m-0 text-sm leading-relaxed text-muted-foreground">
+          {t("compare.noEdge", { other: other.name })}
+        </P>
+      )}
+      <Div className="mt-auto">
+        <TryCta facts={facts} locale={locale} t={t} />
+      </Div>
+    </Div>
+  );
+}
+
+function MoreList({
+  title,
+  links,
+  locale,
+  t,
+}: {
+  title: string;
+  links: CompareLink[];
+  locale: CountryLanguage;
+  t: ModelsT;
+}): JSX.Element {
+  return (
+    <Div className="flex flex-col gap-3">
+      <H3 className="m-0 text-base font-semibold">{title}</H3>
+      <Ul className="m-0 flex list-none flex-col gap-3 p-0" aria-label={title}>
+        {links.map((link) => (
+          <Li key={link.path} className="flex">
+            <Link
+              href={`/${locale}${link.path}`}
+              className="group flex min-h-11 w-full items-center justify-between gap-3 rounded-xl border border-border bg-card p-4 font-medium shadow-xs transition-colors hover:border-primary/40"
+            >
+              <Span className="min-w-0 [overflow-wrap:anywhere]">
+                {t("compare.title", { a: link.a, b: link.b })}
+              </Span>
+              <ArrowRight className="h-4 w-4 shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </Li>
+        ))}
+      </Ul>
+    </Div>
+  );
+}
+
+/**
+ * `sections`: the server-rendered FAQ (+ FAQPage JSON-LD) and read-more
+ * cards (model-seo-sections), placed after the comparison links.
+ */
 export function ComparePageClient({
   locale,
   left,
   right,
   leftPicker,
   rightPicker,
-}: ComparePageData): JSX.Element {
+  verdict,
+  moreLeft,
+  moreRight,
+  sections,
+}: ComparePageData & { sections: ReactNode }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const leftRows = buildFactRows(left, locale);
   const rightRows = buildFactRows(right, locale);
-  const isSameModel = left.id === right.id;
 
   return (
     <Div>
@@ -155,20 +217,56 @@ export function ComparePageClient({
           />
         }
       >
-        <Div className="mt-8 flex flex-col gap-2">
-          {isSameModel ? (
-            <P className="m-0 font-medium">{t("compare.sameModel")}</P>
-          ) : (
-            verdicts(left, right, locale, t).map((line) => (
-              <P key={line} className="m-0 text-base font-medium md:text-lg">
-                {line}
-              </P>
-            ))
-          )}
+        <Div
+          className="mt-8 flex flex-col gap-2"
+          data-testid="compare-headline"
+        >
+          {verdict.headline.map((line) => (
+            <P key={line} className="m-0 text-base font-medium md:text-lg">
+              {line}
+            </P>
+          ))}
         </Div>
       </PageHero>
 
-      <Div className={`${CONTAINER} py-12 md:py-16`}>
+      <PageSection
+        title={t("compare.verdictHeading")}
+        intro={t("compare.verdictIntro")}
+      >
+        {verdict.similar ? (
+          <Div
+            data-testid="compare-similar"
+            className="flex flex-col gap-6 rounded-xl border border-border bg-card p-5 shadow-xs md:p-6"
+          >
+            <P className="m-0 text-base leading-relaxed text-pretty">
+              {t("compare.similar", { a: left.name, b: right.name })}
+            </P>
+            <Div className="flex flex-col gap-3 sm:flex-row">
+              <TryCta facts={left} locale={locale} t={t} />
+              <TryCta facts={right} locale={locale} t={t} />
+            </Div>
+          </Div>
+        ) : (
+          <Div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <EdgeCard
+              facts={left}
+              other={right}
+              reasons={verdict.left}
+              locale={locale}
+              t={t}
+            />
+            <EdgeCard
+              facts={right}
+              other={left}
+              reasons={verdict.right}
+              locale={locale}
+              t={t}
+            />
+          </Div>
+        )}
+      </PageSection>
+
+      <Div className={`${CONTAINER} pb-16 md:pb-24`}>
         <Div
           className="overflow-hidden rounded-xl border border-border bg-card"
           data-testid="compare-table"
@@ -240,6 +338,31 @@ export function ComparePageClient({
           />
         </Div>
       </Div>
+
+      {(moreLeft.length > 0 || moreRight.length > 0) && (
+        <PageSection title={t("compare.moreHeading")} tone="muted">
+          <Div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+            {moreLeft.length > 0 && (
+              <MoreList
+                title={t("compare.moreWith", { model: left.name })}
+                links={moreLeft}
+                locale={locale}
+                t={t}
+              />
+            )}
+            {moreRight.length > 0 && (
+              <MoreList
+                title={t("compare.moreWith", { model: right.name })}
+                links={moreRight}
+                locale={locale}
+                t={t}
+              />
+            )}
+          </Div>
+        </PageSection>
+      )}
+
+      {sections}
     </Div>
   );
 }

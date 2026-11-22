@@ -1,6 +1,9 @@
 /**
  * Public model comparison: /[locale]/models/compare/[a]/[b]
- * Side-by-side fact sheet for two chat models.
+ * Verdict, side-by-side fact sheet, FAQ and further comparisons for two chat
+ * models. All content is computed server-side from the model registry
+ * (../../../_shared/model-compare via model-page-loaders) and rendered in the
+ * initial HTML.
  */
 
 import type { Metadata } from "next";
@@ -13,15 +16,25 @@ import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
+import type {
+  CompareLink,
+  CompareVerdict,
+} from "../../../_shared/model-compare";
 import {
   buildPickerModels,
   canonicalComparisonPath,
   type ModelFacts,
   type PickerModel,
 } from "../../../_shared/model-facts";
-import { resolveComparePair } from "../../../_shared/model-page-loaders";
+import {
+  buildComparePageSeo,
+  resolveComparePair,
+} from "../../../_shared/model-page-loaders";
 import { compareMeta } from "../../../_shared/model-seo";
-import { buildCompareStructuredData } from "../../../_shared/model-structured-data";
+import {
+  type ModelSeoContent,
+  ModelSeoSections,
+} from "../../../_shared/model-seo-sections";
 import { MODELS_OG_IMAGE } from "../../../constants";
 import { scopedTranslation } from "../../../i18n";
 import { ComparePageClient } from "./page-client";
@@ -67,7 +80,12 @@ export interface ComparePageData {
   /** Replacement candidates for the left column (anchored on the right). */
   leftPicker: PickerModel[];
   rightPicker: PickerModel[];
-  /** BreadcrumbList JSON-LD: Home > Models > A vs B. */
+  verdict: CompareVerdict;
+  moreLeft: CompareLink[];
+  moreRight: CompareLink[];
+  /** FAQ + read-more cards (FAQPage JSON-LD comes from the visible FAQ). */
+  seo: ModelSeoContent;
+  /** Service per model + BreadcrumbList JSON-LD: Home > Models > A vs B. */
   structuredData: JsonLdNode;
 }
 
@@ -80,14 +98,9 @@ export async function tanstackLoader({
   if (pair === null) {
     notFound();
   }
-  const { t } = scopedTranslation.scopedT(locale);
   return {
     locale,
-    structuredData: buildCompareStructuredData(
-      locale,
-      t("compare.title", { a: pair.left.name, b: pair.right.name }),
-      canonicalComparisonPath(pair.left, pair.right),
-    ),
+    ...buildComparePageSeo(pair.left, pair.right, locale, availability),
     left: pair.left,
     right: pair.right,
     leftPicker: buildPickerModels(pair.right, availability, [pair.left.id]),
@@ -99,7 +112,18 @@ export function TanstackPage(data: ComparePageData): JSX.Element {
   return (
     <>
       <JsonLd id="compare-structured-data" data={data.structuredData} />
-      <ComparePageClient {...data} />
+      <ComparePageClient
+        {...data}
+        sections={
+          <ModelSeoSections
+            locale={data.locale}
+            model={scopedTranslation
+              .scopedT(data.locale)
+              .t("compare.title", { a: data.left.name, b: data.right.name })}
+            content={data.seo}
+          />
+        }
+      />
     </>
   );
 }

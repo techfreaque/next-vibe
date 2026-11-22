@@ -17,6 +17,15 @@ import { getBlogPostCard } from "../../story/blog/posts-cards";
 import type { BlogPostSlug } from "../../story/blog/posts-meta";
 import { scopedTranslation } from "../i18n";
 import {
+  compareFaq,
+  type CompareLink,
+  compareReadMore,
+  type CompareVerdict,
+  compareVerdict,
+  moreComparisons,
+} from "./model-compare";
+import {
+  canonicalComparisonPath,
   findPublicModelId,
   getModelFacts,
   type ModelFacts,
@@ -41,6 +50,7 @@ import {
 import type { BlogLink, ModelSeoContent } from "./model-seo-sections";
 import {
   buildChatModelStructuredData,
+  buildCompareStructuredData,
   buildMediaModelStructuredData,
 } from "./model-structured-data";
 
@@ -186,6 +196,50 @@ export function buildMediaModelPageSeo(
       locale,
       mediaModelMeta(facts, locale).description,
       facts.price === null ? null : mediaUnitText(facts.price, t),
+    ),
+  };
+}
+
+export interface ComparePageSeo {
+  verdict: CompareVerdict;
+  /** Other comparisons of the left / right model (canonical URLs). */
+  moreLeft: CompareLink[];
+  moreRight: CompareLink[];
+  /** FAQ + read-more cards, rendered by ModelSeoSections. */
+  seo: ModelSeoContent;
+  /** Service per model + BreadcrumbList JSON-LD. */
+  structuredData: JsonLdNode;
+}
+
+export function buildComparePageSeo(
+  left: ModelFacts,
+  right: ModelFacts,
+  locale: CountryLanguage,
+  availability: AgentEnvAvailability,
+): ComparePageSeo {
+  const { t } = scopedTranslation.scopedT(locale);
+  const readMore = compareReadMore(left, right);
+  return {
+    verdict: compareVerdict(left, right, locale),
+    moreLeft: moreComparisons(left, right, availability),
+    moreRight: moreComparisons(right, left, availability),
+    seo: {
+      bestFor: null,
+      related: [],
+      faq: compareFaq(left, right, locale),
+      blog: [
+        ...readMore.landings.flatMap((key) => landingLink(key, locale)),
+        ...blogLinks(readMore.posts, locale),
+      ],
+    },
+    structuredData: buildCompareStructuredData(
+      locale,
+      t("compare.title", { a: left.name, b: right.name }),
+      canonicalComparisonPath(left, right),
+      [left, right].map((facts) => ({
+        facts,
+        description: chatModelMeta(facts, locale).description,
+      })),
     ),
   };
 }
