@@ -47,6 +47,7 @@ import { bounceDedupeKey, recordExpiredSignups } from "../events";
 import { scopedTranslation, type SignupT } from "../i18n";
 import type { SignupBounceSyncResponse } from "./definition";
 import { type DeliveryReport, parseDeliveryReport } from "./delivery-report";
+import { signupMailboxConfigs } from "./mailbox";
 
 const MINUTE = 60_000;
 const LOOKBACK = 7 * 24 * 60 * MINUTE;
@@ -54,45 +55,12 @@ const LOOKBACK = 7 * 24 * 60 * MINUTE;
 export const isSignupBounceProductionInstance =
   coreEnv.NODE_ENV === Environment.PRODUCTION && !coreEnv.IS_PREVIEW_MODE;
 
-// An IMAP host that is not a hostname (e.g. a mailbox address pasted into
-// IMAP_SEED_HOST) fails DNS on every run. Skip it so the next configured
-// source (ops mailbox host, SMTP host) is tried instead.
-const HOSTNAME =
-  /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*$/i;
-
 // Once per process: the task runs every minute.
 const warnedHostSources = new Set<string>();
 
-function pickHost(
-  logger: EndpointLogger,
-  candidates: [source: string, host: string | null | undefined][],
-): string | undefined {
-  for (const [source, host] of candidates) {
-    if (!host) {
-      continue;
-    }
-    if (HOSTNAME.test(host)) {
-      return host;
-    }
-    if (warnedHostSources.has(source)) {
-      continue;
-    }
-    warnedHostSources.add(source);
-    logger.warn(
-      "Signup bounce sync skipped an IMAP host that is not a hostname",
-      {
-        source,
-        containsAt: host.includes("@"),
-        length: host.length,
-      },
-    );
-  }
-  return undefined;
-}
-
 async function loadMailbox(logger: EndpointLogger): Promise<{
   address: string;
-  imap: SystemMailboxConfig["imap"];
+  configs: SystemMailboxConfig["imap"][];
 } | null> {
   // Signup uses the SMTP sender selected for CampaignType.SYSTEM. The
   // ops mailbox row (isSystem) is a separate sender with separate credentials.
@@ -124,46 +92,64 @@ async function loadMailbox(logger: EndpointLogger): Promise<{
     address.toLowerCase() === messengerEnv.EMAIL_FROM_EMAIL.toLowerCase();
   const opsMatches =
     address.toLowerCase() === systemMailboxEnv.THEA_MAIL_ADDRESS?.toLowerCase();
-  const host = pickHost(logger, [
-    ["messenger_accounts.imap_host", account?.imapHost],
-    ["IMAP_HOST", envMatches ? messengerEnv.IMAP_HOST : undefined],
-    ["IMAP_SEED_HOST", envMatches ? imapClientEnv.IMAP_SEED_HOST : undefined],
+  const legacyMatches = imapClientEnv.IMAP_SEED_EMAIL
+    ? address.toLowerCase() === imapClientEnv.IMAP_SEED_EMAIL.toLowerCase()
+    : envMatches;
+  const configs = signupMailboxConfigs(
     [
-      "THEA_MAIL_HOST",
-      opsMatches ? systemMailboxEnv.THEA_MAIL_HOST : undefined,
+      {
+        source: "messenger_accounts.imap_host",
+        host: account?.imapHost,
+        username: account?.imapUsername,
+        password: account?.imapPassword,
+        port: account?.imapPort,
+        secure: account?.imapSecure,
+      },
+      {
+        source: "IMAP_HOST",
+        host: envMatches ? messengerEnv.IMAP_HOST : undefined,
+        username: messengerEnv.IMAP_USER,
+        password: messengerEnv.IMAP_PASS,
+        port: messengerEnv.IMAP_PORT,
+        secure: messengerEnv.IMAP_SECURE,
+      },
+      {
+        source: "IMAP_SEED_HOST",
+        host: legacyMatches ? imapClientEnv.IMAP_SEED_HOST : undefined,
+        username: imapClientEnv.IMAP_SEED_USERNAME,
+        password: imapClientEnv.IMAP_SEED_PASSWORD,
+        port: imapClientEnv.IMAP_SEED_PORT,
+        secure: imapClientEnv.IMAP_SEED_SECURE,
+      },
+      {
+        source: "THEA_MAIL_HOST",
+        host: opsMatches ? systemMailboxEnv.THEA_MAIL_HOST : undefined,
+        username: systemMailboxEnv.THEA_MAIL_ADDRESS,
+        password: systemMailboxEnv.THEA_MAIL_PASSWORD,
+      },
+      {
+        source: "messenger_accounts.smtp_host",
+        host: account?.smtpHost,
+        username: account?.smtpUsername,
+        password: account?.smtpPassword,
+      },
+      {
+        source: "EMAIL_HOST",
+        host: envMatches ? messengerEnv.EMAIL_HOST : undefined,
+        username: messengerEnv.EMAIL_USER,
+        password: messengerEnv.EMAIL_PASS,
+      },
     ],
-    ["messenger_accounts.smtp_host", account?.smtpHost],
-    ["EMAIL_HOST", envMatches ? messengerEnv.EMAIL_HOST : undefined],
-  ]);
-  const username =
-    account?.imapUsername ??
-    (envMatches
-      ? (messengerEnv.IMAP_USER ?? imapClientEnv.IMAP_SEED_USERNAME)
-      : undefined) ??
-    (opsMatches ? systemMailboxEnv.THEA_MAIL_ADDRESS : undefined) ??
-    account?.smtpUsername ??
-    (envMatches ? messengerEnv.EMAIL_USER : undefined);
-  const password =
-    account?.imapPassword ??
-    (envMatches
-      ? (messengerEnv.IMAP_PASS ?? imapClientEnv.IMAP_SEED_PASSWORD)
-      : undefined) ??
-    (opsMatches ? systemMailboxEnv.THEA_MAIL_PASSWORD : undefined) ??
-    account?.smtpPassword ??
-    (envMatches ? messengerEnv.EMAIL_PASS : undefined);
-  const port = account?.imapPort ?? messengerEnv.IMAP_PORT;
-  if (
-    !host ||
-    !username ||
-    !password ||
-    (port !== 993 && !(account?.imapSecure ?? messengerEnv.IMAP_SECURE))
-  ) {
-    return null;
-  }
-  return {
-    address: address.toLowerCase(),
-    imap: { host, username, password, port, secure: true },
-  };
+    (source) => {
+      if (!warnedHostSources.has(source)) {
+        warnedHostSources.add(source);
+        logger.warn("Signup bounce sync skipped an invalid IMAP hostname", {
+          source,
+        });
+      }
+    },
+  );
+  return configs.length ? { address: address.toLowerCase(), configs } : null;
 }
 
 const BOUNCED_ROW = {
@@ -293,7 +279,6 @@ export async function syncSignupBounces(
   }
   // Date confirmations that ran out (funnel drop-off), mailbox or not.
   await recordExpiredSignups(logger);
-  let imap: SystemMailboxConfig["imap"] | undefined;
   try {
     const mailbox = await loadMailbox(logger);
     if (!mailbox) {
@@ -303,11 +288,20 @@ export async function syncSignupBounces(
         errorType: ErrorResponseTypes.EMAIL_ERROR,
       });
     }
-    imap = mailbox.imap;
     const now = Date.now();
     let marked = 0;
-    await visitDeliveryReports(
-      imap,
+    let lastConnectionFailure:
+      | ReturnType<typeof describeImapFailure>
+      | undefined;
+    const scanned = await visitDeliveryReports(
+      mailbox.configs,
+      (config, error) => {
+        lastConnectionFailure = describeImapFailure(config, error);
+        logger.debug(
+          "Signup bounce sync could not connect to IMAP",
+          lastConnectionFailure,
+        );
+      },
       new Date(now - LOOKBACK),
       async ({ uid, raw, receivedAt }) => {
         const report = await parseDeliveryReport(raw).catch((error: Error) => {
@@ -333,16 +327,22 @@ export async function syncSignupBounces(
         return { markSeen: true };
       },
     );
+    if (!scanned) {
+      logger.error(
+        "Signup bounce sync could not connect to any configured mailbox",
+        lastConnectionFailure,
+      );
+      return fail({
+        message: t("bounceSync.mailboxUnavailable"),
+        errorType: ErrorResponseTypes.EMAIL_ERROR,
+      });
+    }
     if (marked) {
       logger.info("Recorded signup delivery failures", { marked });
     }
     return success({ marked });
   } catch (error) {
-    const cause = parseError(error);
-    logger.error(
-      "Signup bounce sync failed",
-      imap ? describeImapFailure(imap, cause) : cause,
-    );
+    logger.error("Signup bounce sync failed", parseError(error));
     return fail({
       message: t("bounceSync.mailboxUnavailable"),
       errorType: ErrorResponseTypes.EMAIL_ERROR,

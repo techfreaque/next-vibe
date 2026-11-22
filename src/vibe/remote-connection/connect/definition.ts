@@ -24,6 +24,7 @@ import {
   widgetField,
 } from "../../unified-ui/_shared/utils-i18n";
 import { SyncScopeSchema } from "../db";
+import { getSyncHealthIssue } from "../health-types";
 import type { RemoteConnectionsListResponseOutput } from "../list/definition";
 import { scopedTranslation } from "./i18n";
 const RemoteConnectWidget = lazyWidget(() =>
@@ -213,10 +214,10 @@ const { POST } = createEndpoint({
                 isActive: true,
                 isInferenceProvider:
                   data.requestData.isInferenceProvider ?? false,
-                lastSyncedAt: new Date().toISOString(),
+                lastSyncedAt: null,
                 hasToken: true,
                 requiresReauth: false,
-                healthStatus: "healthy",
+                healthStatus: "warning",
                 isReverseEntry: false,
                 // Fresh connect starts on the socket-free leg both ways; transport
                 // detection PATCHes reverse-ws afterwards if applicable.
@@ -239,9 +240,13 @@ const { POST } = createEndpoint({
                             ...c,
                             isActive: true,
                             requiresReauth: false,
-                            healthStatus: c.lastSyncedAt
-                              ? "healthy"
-                              : "warning",
+                            healthStatus: getSyncHealthIssue(
+                              c.lastSyncedAt
+                                ? Date.parse(c.lastSyncedAt)
+                                : null,
+                            )
+                              ? "warning"
+                              : "healthy",
                           }
                         : c,
                     )

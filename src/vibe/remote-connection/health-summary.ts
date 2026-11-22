@@ -19,7 +19,7 @@ import {
   type RemoteConnectionAuditAction,
   remoteConnections,
 } from "./db";
-import type { ConnectionIssue } from "./health-types";
+import { type ConnectionIssue, getSyncHealthIssue } from "./health-types";
 
 /** Severity of each issue. Only critical/warning make an active row unhealthy. */
 const ISSUE_SEVERITY: Record<ConnectionIssue, "critical" | "warning" | "info"> =
@@ -29,6 +29,7 @@ const ISSUE_SEVERITY: Record<ConnectionIssue, "critical" | "warning" | "info"> =
     noToken: "critical",
     accessDenied: "critical",
     neverSynced: "warning",
+    staleSync: "warning",
     transportDrift: "warning",
     transportMismatch: "warning",
     peerToolsStale: "info",
@@ -64,6 +65,7 @@ export function assessConnectionHealth(
   row: HealthInputRow,
   localCapabilitiesVersion: string,
   pairMismatch: boolean,
+  now = Date.now(),
 ): HealthAssessment {
   const issues: ConnectionIssue[] = [];
   if (!row.isActive) {
@@ -78,12 +80,16 @@ export function assessConnectionHealth(
   if (!row.hasToken) {
     issues.push("noToken");
   }
-  if (!row.lastSyncedAt) {
-    issues.push("neverSynced");
+  const syncIssue = getSyncHealthIssue(
+    row.lastSyncedAt?.getTime() ?? null,
+    now,
+  );
+  if (syncIssue) {
+    issues.push(syncIssue);
   }
   if (
     row.lastDeniedAt &&
-    Date.now() - row.lastDeniedAt.getTime() < OPEN_DENIAL_MS &&
+    now - row.lastDeniedAt.getTime() < OPEN_DENIAL_MS &&
     (!row.lastContactAt || row.lastDeniedAt > row.lastContactAt)
   ) {
     issues.push("accessDenied");

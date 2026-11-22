@@ -29,6 +29,7 @@ import type {
   TransportMode,
 } from "./db";
 import { instanceIdentities, remoteConnections, SyncScopeSchema } from "./db";
+import { getSyncHealthIssue } from "./health-types";
 import { deriveDefaultSelfInstanceId } from "./instance-identity";
 
 interface ConnectToRemoteResult {
@@ -156,14 +157,9 @@ export class RemoteConnectionRepository {
     if (!conn.isActive) {
       return "disconnected";
     }
-    // Synced at least once = healthy. Connections are event-driven after the
-    // initial pull-on-connect, so lastSyncedAt age is not a liveness signal —
-    // silence just means nothing changed on the remote side.
-    if (conn.lastSyncedAt) {
-      return "healthy";
-    }
-    // Never synced = initial pull hasn't completed yet.
-    return "warning";
+    return getSyncHealthIssue(conn.lastSyncedAt?.getTime() ?? null)
+      ? "warning"
+      : "healthy";
   }
 
   // ─── Instance Identities ──────────────────────────────────────────────────────

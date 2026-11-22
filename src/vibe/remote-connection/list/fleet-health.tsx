@@ -75,6 +75,7 @@ const ISSUE_TONE: Record<ConnectionIssue, string> = {
   accessDenied: "text-destructive",
   inactive: "text-muted-foreground",
   neverSynced: "text-warning",
+  staleSync: "text-warning",
   transportDrift: "text-warning",
   transportMismatch: "text-warning",
   peerToolsStale: "text-muted-foreground",

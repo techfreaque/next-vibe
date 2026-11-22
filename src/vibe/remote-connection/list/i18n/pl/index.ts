@@ -45,6 +45,7 @@ export const translations: typeof enTranslations = {
       disconnectedAt: "Rozłączenie zapisane {{at}}",
       noToken: "Brak tokenu, wywołania nie przejdą uwierzytelnienia",
       neverSynced: "Nigdy nie zsynchronizowano, połączono {{at}}",
+      staleSync: "Od ostatniej synchronizacji minęło zbyt dużo czasu",
       transportDrift:
         "Ostatnie wywołanie przez {{used}}, ustawione {{configured}}",
       transportMismatch: "Strony nie zgadzają się co do transportu",
@@ -57,8 +58,7 @@ export const translations: typeof enTranslations = {
       instance: "Połączenie",
       trustTools: "Uprawnienia i narzędzia",
       title: "Połączenia",
-      subtitle:
-        "Najpierw problemy, potem najnowszy kontakt. Synchronizacja reaguje na zdarzenia: sama cisza to nie błąd.",
+      subtitle: "Najpierw problemy, potem najnowszy kontakt.",
       empty: "Brak połączeń w tym stanie.",
       emptyAll: "Żadna instancja nie jest połączona z tym serwerem.",
       count: "{{shown}} z {{total}}",

@@ -71,6 +71,7 @@ import {
 } from "../../unified-ui/_shared/use-widget-context";
 import { apiClient } from "../../unified-ui/hooks/store";
 import { FormAlertWidget } from "../../unified-ui/widgets/interactive/form-alert/widget";
+import { getSyncHealthIssue } from "../health-types";
 import type endpoints from "./definition";
 import type { RemoteConnection } from "./definition";
 import { FleetHealthReport } from "./fleet-health";
@@ -91,14 +92,17 @@ function connectionStatus(
   if (!conn.hasToken) {
     return { label: t("widget.registeredBadge"), variant: "muted" };
   }
-  if (conn.wsConnectedAt) {
-    return { label: t("widget.health.socketOpen"), variant: "success" };
-  }
   if (conn.healthStatus === "critical") {
     return { label: t("widget.health.bridgeFailed"), variant: "danger" };
   }
   if (!conn.lastSyncedAt) {
     return { label: t("widget.health.noSyncRecorded"), variant: "warning" };
+  }
+  if (getSyncHealthIssue(Date.parse(conn.lastSyncedAt))) {
+    return { label: t("fleet.issue.staleSync"), variant: "warning" };
+  }
+  if (conn.wsConnectedAt) {
+    return { label: t("widget.health.socketOpen"), variant: "success" };
   }
   return { label: t("widget.health.syncRecorded"), variant: "info" };
 }

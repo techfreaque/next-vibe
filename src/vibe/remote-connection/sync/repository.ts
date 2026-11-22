@@ -227,9 +227,7 @@ export class TaskSyncRepository {
       phaseStart = Date.now();
     };
 
-    // ── 1. Process incoming capability snapshot + always touch lastSyncedAt ────
-    // touchLastSynced is called unconditionally so tests can poll lastSyncedAt to
-    // confirm a sync completed. Capabilities opts are merged in only when version changed.
+    // ── 1. Process incoming capability snapshot ─────────────────────────────
     let capabilityOpts:
       | {
           capabilities: z.infer<typeof RemoteToolCapabilitySchema>[];
@@ -270,7 +268,6 @@ export class TaskSyncRepository {
         logger.warn("Failed to store capabilities snapshot", parseError(error));
       }
     }
-    await RemoteRepoReport.touchLastSynced(user.id, instanceId, capabilityOpts);
     markPhase("capabilities");
 
     // ── 2. Parse incoming cursors ─────────────────────────────────────────────
@@ -308,6 +305,7 @@ export class TaskSyncRepository {
     // Bidirectional push-pull in one round trip (sync/spec.md): the caller's
     // changes land first, then we serialize ours. Scope is enforced on the
     // serving side too — disabled domains are dropped.
+    let pushSucceeded = true;
     if (data.pushPayloads) {
       try {
         const pushedSchema = z.record(z.string(), z.string());
@@ -327,6 +325,7 @@ export class TaskSyncRepository {
         );
         logger.debug("Applied pushed payloads", { instanceId, counts });
       } catch (error) {
+        pushSucceeded = false;
         logger.warn("Failed to apply pushed payloads", parseError(error));
       }
     }
@@ -378,6 +377,13 @@ export class TaskSyncRepository {
       }
     }
 
+    if (pushSucceeded) {
+      await RemoteRepoReport.touchLastSynced(
+        user.id,
+        instanceId,
+        capabilityOpts,
+      );
+    }
     const serverTime = new Date();
 
     return success({

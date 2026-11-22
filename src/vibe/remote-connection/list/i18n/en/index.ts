@@ -43,6 +43,7 @@ export const translations = {
       disconnectedAt: "Disconnect recorded {{at}}",
       noToken: "No token stored, calls cannot authenticate",
       neverSynced: "Never synced, linked {{at}}",
+      staleSync: "Last sync is overdue",
       transportDrift:
         "Configured {{configured}}, but the last call went over {{used}}",
       transportMismatch: "Both sides disagree on transport",
@@ -54,8 +55,7 @@ export const translations = {
       instance: "Connection",
       trustTools: "Trust and tools",
       title: "Connections",
-      subtitle:
-        "Problems first, then most recent contact. Sync is event driven: silence alone is not a fault.",
+      subtitle: "Problems first, then most recent contact.",
       empty: "No connection has this status.",
       emptyAll: "No instance is linked to this server.",
       count: "{{shown}} of {{total}}",

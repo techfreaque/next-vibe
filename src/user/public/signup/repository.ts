@@ -399,30 +399,8 @@ export class SignupRepository {
       locale,
       logger,
     );
-    // Auto-login: Create session and store auth token
-    // Link leadId to user
     const { LeadAuthRepository } =
       await import("next-vibe/identity/lead/device-auth");
-    // The link is what pools the pre-signup lead wallet into the user's
-    // credits — retry once, then record loudly (account already exists).
-    let leadLink = await LeadAuthRepository.linkLeadToUser(
-      leadId,
-      userId,
-      logger,
-    );
-    if (!leadLink.success) {
-      leadLink = await LeadAuthRepository.linkLeadToUser(
-        leadId,
-        userId,
-        logger,
-      );
-    }
-    if (!leadLink.success) {
-      logger.error(
-        "CRITICAL: lead not linked to new user — pre-signup credits not pooled, link manually",
-        { userId: userId, leadId: leadId },
-      );
-    }
 
     // A guest who already confirmed the uncensored-model consent keeps it.
     const { UncensoredConsentRepository } =
@@ -509,9 +487,8 @@ export class SignupRepository {
       leadId,
       logger,
     );
-    // The pool is derived from userLeadLinks on every balance read, so a
-    // failed eager merge self-heals on the next read/login as long as the
-    // lead link above landed. Retry once; log with full context otherwise.
+    // The account and its lead link have committed together. The pool derives
+    // from those links on every balance read if this eager merge fails.
     const mergeLeadIds = [leadId, ...linkedLeadIds];
     let mergeResult = await CreditRepository.mergePendingLeadWallets(
       userId,
@@ -534,11 +511,7 @@ export class SignupRepository {
         userId: userId,
         leadId: leadId,
         leadIds: mergeLeadIds,
-        leadLinked: leadLink.success,
         error: mergeResult.message,
-        action: leadLink.success
-          ? "Self-heals on next balance read (pool derives from lead links)"
-          : "Lead link missing too — pre-signup credits need a manual link",
       });
     }
 
@@ -863,7 +836,7 @@ export class SignupRepository {
         await import("next-vibe/identity/lead/repository");
       const convertResult = await LeadsRepository.convertLead(
         leadId,
-        { email, userId },
+        { email, userId, completeSignup: true },
         logger,
         leadsT,
       );

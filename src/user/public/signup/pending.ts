@@ -11,6 +11,7 @@ import {
 
 import { and, eq, lt, sql } from "drizzle-orm";
 import { chatFolders, chatThreads } from "next-vibe/agent/chat/db";
+import { getLanguageAndCountryFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import type {
   ErrorResponseType,
   ResponseType,
@@ -22,13 +23,15 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { db, isPglite } from "next-vibe/database";
 import { identityEnv } from "next-vibe/identity/env";
-import { userLeadLinks } from "next-vibe/identity/lead/db";
+import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
+import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
 import { ipPoolKey, ipSubnetKey } from "next-vibe/identity/lead/ip-key";
 import { UserRole } from "next-vibe/identity/roles/enum";
 import { userRoles, users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { signupSubnetLimitHit } from "@/credits/anti-farming/signup-limit";
+import { growthJourneys } from "@/leads/growth/db";
 
 import { SignupBounceReason } from "./bounce-reason";
 import { sendSignupChallenge } from "./confirmation-mail";
@@ -238,8 +241,8 @@ export async function issueSignupChallenge(
   return success({ ...row, deliveryFailed, messageId });
 }
 
-/** Lock the pending challenge and consume it in the transaction that creates
- * the account and its role. Invalid guesses commit their attempt count. */
+/** Consume the challenge and create the account, role and owned lead together.
+ * Invalid guesses commit their attempt count. */
 export async function consumeSignupChallenge(
   proof: { token?: string; pendingId?: string; code?: string },
   leadId: string,
@@ -324,9 +327,11 @@ export async function consumeSignupChallenge(
     }
     // The PGlite proxy shares one SQL session between clients. Keep all of
     // these writes in one statement, including the compare-and-delete. A
-    // racing click or correction can never create a second account.
+    // racing click or correction can never create a second account. Reserving
+    // converted_user_id also makes competing signups contend on the lead row.
     const userId = randomUUID();
-    const claimed = await tx.execute<{ id: string }>(sql`
+    const { country, language } = getLanguageAndCountryFromLocale(row.locale);
+    const claimed = await tx.execute<{ lead_id: string }>(sql`
       WITH consumed AS (
         DELETE FROM ${pendingSignups} WHERE id = ${row.id}
           AND token_hash = ${row.tokenHash} AND expires_at > ${new Date().toISOString()}::timestamp
@@ -339,18 +344,40 @@ export async function consumeSignupChallenge(
         FROM consumed RETURNING id
       ), role AS (
         INSERT INTO ${userRoles} (user_id,role) SELECT id,${UserRole.CUSTOMER} FROM account
+      ), visitor_lead AS (
+        UPDATE ${leads} AS l
+        SET converted_user_id = account.id, converted_at = now(), signed_up_at = now(),
+          status = ${LeadStatus.SIGNED_UP}, updated_at = now()
+        FROM account
+        WHERE l.id = ${row.leadId}::uuid AND l.converted_user_id IS NULL
+          AND NOT EXISTS (SELECT 1 FROM ${userLeadLinks} AS ll WHERE ll.lead_id = l.id)
+          AND NOT EXISTS (SELECT 1 FROM ${growthJourneys} AS g WHERE g.lead_id = l.id AND g.user_id IS NOT NULL)
+        RETURNING l.id
+      ), separate_lead AS (
+        INSERT INTO ${leads} (business_name,country,language,status,source,converted_user_id,converted_at,signed_up_at,ip_address,metadata)
+        SELECT '',${country},${language},${LeadStatus.SIGNED_UP},${LeadSource.WEBSITE},id,now(),now(),${row.signupIp},'{"anonymous":true}'::jsonb
+        FROM account WHERE NOT EXISTS (SELECT 1 FROM visitor_lead)
+        RETURNING id
       ), link AS (
-        INSERT INTO ${userLeadLinks} (user_id,lead_id,link_reason) SELECT id,${row.leadId}::uuid,'signup' FROM account
+        INSERT INTO ${userLeadLinks} (user_id,lead_id,link_reason)
+        SELECT account.id, owned.id, 'signup' FROM account
+        CROSS JOIN (SELECT id FROM visitor_lead UNION ALL SELECT id FROM separate_lead) AS owned
+        RETURNING lead_id
       ), folders AS (
-        UPDATE ${chatFolders} SET user_id = account.id FROM account WHERE lead_id = ${row.leadId} AND user_id IS NULL
+        UPDATE ${chatFolders} SET user_id = account.id FROM account, visitor_lead
+        WHERE lead_id = visitor_lead.id AND user_id IS NULL
       ), threads AS (
-        UPDATE ${chatThreads} SET user_id = account.id FROM account WHERE lead_id = ${row.leadId} AND user_id IS NULL
+        UPDATE ${chatThreads} SET user_id = account.id FROM account, visitor_lead
+        WHERE lead_id = visitor_lead.id AND user_id IS NULL
       ), confirmed AS (
         INSERT INTO ${signupEvents} (lead_id,pending_id,type,occurred_at,dedupe_key)
         SELECT ${row.leadId}::uuid,${row.id}::uuid,${SignupEventType.CONFIRMED}::text,${new Date().toISOString()}::timestamp,${`confirmed:${row.id}`}::text
         FROM account ON CONFLICT (dedupe_key) DO NOTHING
-      ) SELECT id FROM account`);
-    return claimed.rows.length ? success({ pending: row, userId }) : invalid();
+      ) SELECT lead_id FROM link`);
+    const [link] = claimed.rows;
+    return link
+      ? success({ pending: { ...row, leadId: link.lead_id }, userId })
+      : invalid();
   };
   return isPglite ? claim(db) : db.transaction(claim);
 }

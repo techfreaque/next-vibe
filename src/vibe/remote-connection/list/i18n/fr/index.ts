@@ -45,6 +45,7 @@ export const translations: typeof enTranslations = {
       disconnectedAt: "Déconnexion enregistrée {{at}}",
       noToken: "Aucun jeton, les appels ne peuvent pas s'authentifier",
       neverSynced: "Jamais synchronisée, liée {{at}}",
+      staleSync: "La dernière synchronisation est trop ancienne",
       transportDrift:
         "Configuré {{configured}}, mais le dernier appel est passé par {{used}}",
       transportMismatch: "Les deux côtés divergent sur le transport",
@@ -56,8 +57,7 @@ export const translations: typeof enTranslations = {
       instance: "Connexion",
       trustTools: "Droits et outils",
       title: "Connexions",
-      subtitle:
-        "Problèmes d'abord, puis contact le plus récent. La synchro suit les événements : le silence seul n'est pas une panne.",
+      subtitle: "Les problèmes d’abord, puis les contacts les plus récents.",
       empty: "Aucune connexion dans cet état.",
       emptyAll: "Aucune instance n'est liée à ce serveur.",
       count: "{{shown}} sur {{total}}",

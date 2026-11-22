@@ -142,14 +142,21 @@ export async function backfillLeadCountries(
     );
     return { backfilled: 0, unresolved: rows[0]?.n ?? 0 };
   }
+  // PostgreSQL can recheck the email index even on a country-only update.
+  // Leave existing duplicate emails for repair without blocking other leads.
   const { rows } = await db.execute<
     QueryResultRow & { id: string; ip: string }
   >(sql`
     SELECT l.id, ${LEAD_IP_SQL} AS ip FROM leads l
     WHERE ${open}
+      AND NOT EXISTS (
+        SELECT 1 FROM leads duplicate
+        WHERE duplicate.email = l.email AND duplicate.id <> l.id
+      )
     ORDER BY l.created_at DESC
     LIMIT ${limit}
   `);
+  let backfilled = 0;
   if (rows.length > 0) {
     const values = sql.join(
       rows.map(
@@ -157,16 +164,22 @@ export async function backfillLeadCountries(
       ),
       sql`, `,
     );
-    await db.execute(sql`
-      UPDATE leads SET geo_country = v.country
-      FROM (VALUES ${values}) AS v(id, country)
-      WHERE leads.id = v.id AND leads.geo_country IS NULL
+    const { rows: changed } = await db.execute<
+      QueryResultRow & { n: number }
+    >(sql`
+      WITH updated AS (
+        UPDATE leads SET geo_country = v.country
+        FROM (VALUES ${values}) AS v(id, country)
+        WHERE leads.id = v.id AND leads.geo_country IS NULL
+        RETURNING 1
+      ) SELECT count(*)::int AS n FROM updated
     `);
+    backfilled = changed[0]?.n ?? 0;
   }
   const { rows: remaining } = await db.execute<QueryResultRow & { n: number }>(
     sql`SELECT count(*)::int AS n FROM leads l WHERE ${open}`,
   );
-  return { backfilled: rows.length, unresolved: remaining[0]?.n ?? 0 };
+  return { backfilled, unresolved: remaining[0]?.n ?? 0 };
 }
 
 export class GeoUpdateRepository {

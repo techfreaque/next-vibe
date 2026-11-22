@@ -45,6 +45,7 @@ export const translations: typeof enTranslations = {
       disconnectedAt: "Trennung protokolliert {{at}}",
       noToken: "Kein Token gespeichert, Aufrufe scheitern an der Anmeldung",
       neverSynced: "Nie synchronisiert, verknüpft {{at}}",
+      staleSync: "Letzte Synchronisierung liegt zu lange zurück",
       transportDrift:
         "Letzter Aufruf lief über {{used}}, eingestellt ist {{configured}}",
       transportMismatch: "Beide Seiten widersprechen sich beim Transport",
@@ -57,8 +58,7 @@ export const translations: typeof enTranslations = {
       instance: "Verbindung",
       trustTools: "Rechte und Tools",
       title: "Verbindungen",
-      subtitle:
-        "Probleme zuerst, dann jüngster Kontakt. Sync läuft ereignisgesteuert: Stille allein ist kein Fehler.",
+      subtitle: "Probleme zuerst, dann nach letztem Kontakt.",
       empty: "Keine Verbindung mit diesem Zustand.",
       emptyAll: "Mit diesem Server ist keine Instanz verknüpft.",
       count: "{{shown}} von {{total}}",

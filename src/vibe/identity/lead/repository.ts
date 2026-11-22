@@ -686,6 +686,7 @@ export class LeadsRepository {
     options: {
       userId: string;
       email: string;
+      completeSignup?: boolean;
       additionalData?: {
         businessName?: string;
         contactName?: string;
@@ -1145,6 +1146,7 @@ export class LeadsRepository {
     options: {
       userId: string;
       email: string;
+      completeSignup?: boolean;
       additionalData?: {
         businessName?: string;
         contactName?: string;
@@ -1202,7 +1204,14 @@ export class LeadsRepository {
           }
 
           // Check if lead is already converted to a user
-          if (existingLead.convertedUserId && options.userId) {
+          if (
+            existingLead.convertedUserId &&
+            options.userId &&
+            !(
+              options.completeSignup &&
+              existingLead.convertedUserId === options.userId
+            )
+          ) {
             logger.debug("Lead already converted to user (internal)", {
               leadId,
               existingUserId: existingLead.convertedUserId,
@@ -1285,8 +1294,8 @@ export class LeadsRepository {
           if (options.userId) {
             updateData.status = LeadStatus.SIGNED_UP;
             updateData.convertedUserId = options.userId;
-            updateData.convertedAt = new Date();
-            updateData.signedUpAt = new Date();
+            updateData.convertedAt = existingLead.convertedAt ?? new Date();
+            updateData.signedUpAt = existingLead.signedUpAt ?? new Date();
 
             // Check if user-lead relationship already exists
             const [existingRelationship] = await tx

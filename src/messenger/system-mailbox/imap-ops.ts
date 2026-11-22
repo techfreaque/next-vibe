@@ -78,6 +78,7 @@ export function describeImapFailure(
 function connect(
   config: SystemMailboxConfig["imap"],
   verifyTls: boolean,
+  deadlineMs = CONNECT_DEADLINE_MS,
 ): Promise<Imap> {
   return new Promise<Imap>((resolve, reject) => {
     const options = {
@@ -87,29 +88,37 @@ function connect(
       port: config.port,
       tls: config.secure,
       tlsOptions: { rejectUnauthorized: verifyTls, servername: config.host },
-      connTimeout: 15000,
-      authTimeout: 10000,
+      connTimeout: Math.min(15_000, deadlineMs),
+      authTimeout: Math.min(10_000, deadlineMs),
       socketTimeout: 15000,
     };
     const imap = createImap(options);
     // Hard deadline: a DNS lookup that never settles must not hold a task
     // for the watchdog's 15 minutes (seen in prod with an invalid host).
-    const deadline = setTimeout(() => {
-      reject(
-        new Error(
-          `IMAP connect to ${config.host}:${config.port} did not finish within ${CONNECT_DEADLINE_MS} ms`,
-        ),
-      );
-      imap.destroy();
-    }, CONNECT_DEADLINE_MS);
-    imap.once("ready", () => {
+    const cleanup = (): void => {
       clearTimeout(deadline);
+      imap.off("ready", ready);
+      imap.off("error", failed);
+      imap.off("close", closed);
+    };
+    const ready = (): void => {
+      cleanup();
       resolve(imap);
-    });
-    imap.once("error", (err: Error) => {
-      clearTimeout(deadline);
-      reject(err);
-    });
+    };
+    const failed = (error: Error): void => {
+      cleanup();
+      reject(error);
+      imap.destroy();
+    };
+    const closed = (): void => {
+      failed(new Error("IMAP connection closed before login"));
+    };
+    const deadline = setTimeout(() => {
+      failed(new Error(`IMAP login did not finish within ${deadlineMs} ms`));
+    }, deadlineMs);
+    imap.once("ready", ready);
+    imap.once("error", failed);
+    imap.once("close", closed);
     imap.connect();
   });
 }
@@ -120,6 +129,13 @@ async function withImap<T>(
   verifyTls = false,
 ): Promise<T> {
   const imap = await connect(config, verifyTls);
+  return withConnectedImap(imap, fn);
+}
+
+async function withConnectedImap<T>(
+  imap: Imap,
+  fn: (imap: Imap) => Promise<T>,
+): Promise<T> {
   try {
     const disconnected = Promise.withResolvers<never>();
     imap.once("error", disconnected.reject);
@@ -311,62 +327,88 @@ export function readInboxMessage(
 const DELIVERY_REPORT_CHECKED = "SignupDsnChecked";
 const DELIVERY_REPORT_LIMIT = 50;
 const DELIVERY_REPORT_MAX_BYTES = 512_000;
+const DELIVERY_REPORT_CONNECT_MS = 24_000;
 
 /** Reads by UID without changing flags until the caller has processed the report. */
-export function visitDeliveryReports(
-  config: SystemMailboxConfig["imap"],
+export async function visitDeliveryReports(
+  configs: readonly SystemMailboxConfig["imap"][],
+  onConnectionFailure: (
+    config: SystemMailboxConfig["imap"],
+    error: Error,
+  ) => void,
   since: Date,
   visit: (message: FetchedRaw) => Promise<{ markSeen: boolean } | null>,
-): Promise<void> {
-  return withImap(
-    config,
-    async (imap) => {
-      const box = await openInbox(imap, false);
-      const supportsKeyword = box.newKeywords;
-      const candidates = (
-        await searchUids(imap, [
-          ["SINCE", since],
-          ["SMALLER", DELIVERY_REPORT_MAX_BYTES],
-          supportsKeyword ? ["UNKEYWORD", DELIVERY_REPORT_CHECKED] : "UNSEEN",
+): Promise<boolean> {
+  let connection: Imap | null = null;
+  // Share one connection budget across all candidates. Keep time for a scan
+  // under the one-minute cron timeout, even when a provider never responds.
+  const deadline = Date.now() + DELIVERY_REPORT_CONNECT_MS;
+  for (let index = 0; index < configs.length; index++) {
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) {
+      break;
+    }
+    const config = configs[index];
+    const attemptMs = Math.ceil(remaining / (configs.length - index));
+    connection = await connect(config, true, attemptMs).catch(
+      (error: Error) => {
+        onConnectionFailure(config, error);
+        return null;
+      },
+    );
+    if (connection) {
+      break;
+    }
+  }
+  if (!connection) {
+    return false;
+  }
+  await withConnectedImap(connection, async (imap) => {
+    const box = await openInbox(imap, false);
+    const supportsKeyword = box.newKeywords;
+    const candidates = (
+      await searchUids(imap, [
+        ["SINCE", since],
+        ["SMALLER", DELIVERY_REPORT_MAX_BYTES],
+        supportsKeyword ? ["UNKEYWORD", DELIVERY_REPORT_CHECKED] : "UNSEEN",
+        [
+          "OR",
+          ["HEADER", "Content-Type", "multipart/report"],
           [
             "OR",
-            ["HEADER", "Content-Type", "multipart/report"],
-            [
-              "OR",
-              ["HEADER", "X-Failed-Recipients", ""],
-              ["OR", ["FROM", "mailer-daemon"], ["FROM", "postmaster"]],
-            ],
+            ["HEADER", "X-Failed-Recipients", ""],
+            ["OR", ["FROM", "mailer-daemon"], ["FROM", "postmaster"]],
           ],
-        ])
-      ).toSorted((a, b) => b - a);
-      for (
-        let offset = 0;
-        offset < Math.min(candidates.length, DELIVERY_REPORT_LIMIT);
-        offset += 5
-      ) {
-        const messages = await fetchRaw(
-          imap,
-          candidates.slice(offset, offset + 5),
-        );
-        for (const message of messages) {
-          const outcome = await visit(message);
-          if (outcome?.markSeen && !message.flags.includes("\\Seen")) {
-            await new Promise<void>((resolve, reject) => {
-              imap.addFlags(message.uid, "\\Seen", (err) =>
-                err ? reject(err) : resolve(),
-              );
-            });
-          }
-          if (outcome && supportsKeyword) {
-            await new Promise<void>((resolve, reject) => {
-              imap.addKeywords(message.uid, DELIVERY_REPORT_CHECKED, (err) =>
-                err ? reject(err) : resolve(),
-              );
-            });
-          }
+        ],
+      ])
+    ).toSorted((a, b) => b - a);
+    for (
+      let offset = 0;
+      offset < Math.min(candidates.length, DELIVERY_REPORT_LIMIT);
+      offset += 5
+    ) {
+      const messages = await fetchRaw(
+        imap,
+        candidates.slice(offset, offset + 5),
+      );
+      for (const message of messages) {
+        const outcome = await visit(message);
+        if (outcome?.markSeen && !message.flags.includes("\\Seen")) {
+          await new Promise<void>((resolve, reject) => {
+            imap.addFlags(message.uid, "\\Seen", (err) =>
+              err ? reject(err) : resolve(),
+            );
+          });
+        }
+        if (outcome && supportsKeyword) {
+          await new Promise<void>((resolve, reject) => {
+            imap.addKeywords(message.uid, DELIVERY_REPORT_CHECKED, (err) =>
+              err ? reject(err) : resolve(),
+            );
+          });
         }
       }
-    },
-    true,
-  );
+    }
+  });
+  return true;
 }

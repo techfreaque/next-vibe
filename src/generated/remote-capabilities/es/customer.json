@@ -290814,6 +290814,7 @@
                                         "noToken": "noToken",
                                         "accessDenied": "accessDenied",
                                         "neverSynced": "neverSynced",
+                                        "staleSync": "staleSync",
                                         "transportDrift": "transportDrift",
                                         "transportMismatch": "transportMismatch",
                                         "peerToolsStale": "peerToolsStale"
@@ -290826,6 +290827,7 @@
                                       "noToken": "noToken",
                                       "accessDenied": "accessDenied",
                                       "neverSynced": "neverSynced",
+                                      "staleSync": "staleSync",
                                       "transportDrift": "transportDrift",
                                       "transportMismatch": "transportMismatch",
                                       "peerToolsStale": "peerToolsStale"
@@ -290836,6 +290838,7 @@
                                       "noToken",
                                       "accessDenied",
                                       "neverSynced",
+                                      "staleSync",
                                       "transportDrift",
                                       "transportMismatch",
                                       "peerToolsStale"
@@ -290852,6 +290855,7 @@
                                       "noToken": "noToken",
                                       "accessDenied": "accessDenied",
                                       "neverSynced": "neverSynced",
+                                      "staleSync": "staleSync",
                                       "transportDrift": "transportDrift",
                                       "transportMismatch": "transportMismatch",
                                       "peerToolsStale": "peerToolsStale"
@@ -290864,6 +290868,7 @@
                                     "noToken": "noToken",
                                     "accessDenied": "accessDenied",
                                     "neverSynced": "neverSynced",
+                                    "staleSync": "staleSync",
                                     "transportDrift": "transportDrift",
                                     "transportMismatch": "transportMismatch",
                                     "peerToolsStale": "peerToolsStale"
@@ -290874,6 +290879,7 @@
                                     "noToken",
                                     "accessDenied",
                                     "neverSynced",
+                                    "staleSync",
                                     "transportDrift",
                                     "transportMismatch",
                                     "peerToolsStale"
@@ -291356,6 +291362,7 @@
                                       "noToken": "noToken",
                                       "accessDenied": "accessDenied",
                                       "neverSynced": "neverSynced",
+                                      "staleSync": "staleSync",
                                       "transportDrift": "transportDrift",
                                       "transportMismatch": "transportMismatch",
                                       "peerToolsStale": "peerToolsStale"
@@ -291368,6 +291375,7 @@
                                     "noToken": "noToken",
                                     "accessDenied": "accessDenied",
                                     "neverSynced": "neverSynced",
+                                    "staleSync": "staleSync",
                                     "transportDrift": "transportDrift",
                                     "transportMismatch": "transportMismatch",
                                     "peerToolsStale": "peerToolsStale"
@@ -291378,6 +291386,7 @@
                                     "noToken",
                                     "accessDenied",
                                     "neverSynced",
+                                    "staleSync",
                                     "transportDrift",
                                     "transportMismatch",
                                     "peerToolsStale"
@@ -291394,6 +291403,7 @@
                                     "noToken": "noToken",
                                     "accessDenied": "accessDenied",
                                     "neverSynced": "neverSynced",
+                                    "staleSync": "staleSync",
                                     "transportDrift": "transportDrift",
                                     "transportMismatch": "transportMismatch",
                                     "peerToolsStale": "peerToolsStale"
@@ -291406,6 +291416,7 @@
                                   "noToken": "noToken",
                                   "accessDenied": "accessDenied",
                                   "neverSynced": "neverSynced",
+                                  "staleSync": "staleSync",
                                   "transportDrift": "transportDrift",
                                   "transportMismatch": "transportMismatch",
                                   "peerToolsStale": "peerToolsStale"
@@ -291416,6 +291427,7 @@
                                   "noToken",
                                   "accessDenied",
                                   "neverSynced",
+                                  "staleSync",
                                   "transportDrift",
                                   "transportMismatch",
                                   "peerToolsStale"
