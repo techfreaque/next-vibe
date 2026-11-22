@@ -113,6 +113,10 @@ export function CreditUsageReportWidget({
   const includeInternal =
     applied?.includeInternal ?? form.watch("includeInternal") ?? false;
 
+  /** Ledger feature id -> label in the viewer's locale (server-translated). */
+  const featureName = (id: string): string =>
+    id === "chat" ? t("widget.label.chat") : (value?.featureLabels[id] ?? id);
+
   const submit = (): void => {
     onSubmit?.();
   };
@@ -176,7 +180,7 @@ export function CreditUsageReportWidget({
     filters.push({
       key: "feature",
       label: t("widget.filter.feature"),
-      value: feature === "chat" ? t("widget.label.chat") : feature,
+      value: featureName(feature),
       onRemove: () => setText("feature", undefined),
     });
   }
@@ -260,9 +264,9 @@ export function CreditUsageReportWidget({
         rowKey === null
           ? noneLabel
           : featureOnly !== null
-            ? featureOnly
-            : key === "feature" && rowKey === "chat"
-              ? t("widget.label.chat")
+            ? featureName(featureOnly)
+            : key === "feature"
+              ? featureName(rowKey)
               : rowKey;
       return {
         id: rowKey ?? "none",
@@ -319,7 +323,9 @@ export function CreditUsageReportWidget({
         sublabel: [
           userId ? t("widget.extra.accountTag") : t("widget.label.guestTag"),
           row.topModel
-            ? t("widget.extra.topModel", { model: row.topModel })
+            ? t("widget.extra.topModel", {
+                model: value?.featureLabels[row.topModel] ?? row.topModel,
+              })
             : t("widget.extra.modelNotRecorded"),
           t("widget.label.lastActivity", { date: last }),
         ]

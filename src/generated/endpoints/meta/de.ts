@@ -45,8 +45,10 @@ export const endpointsMeta: EndpointMeta[] = [
             kpis: {
               visits: { value: 4210, previous: 3180 },
               botVisits: { value: 9800, previous: 450 },
+              unknownVisits: { value: 3, previous: 5 },
               humanLeads: { value: 1320, previous: 1105 },
               botLeads: { value: 2890, previous: 140 },
+              unknownLeads: { value: 12, previous: 30 },
               signups: { value: 96, previous: 81 },
               firstChats: { value: 870, previous: 702 },
               payers: { value: 7, previous: 5 },
@@ -119,6 +121,7 @@ export const endpointsMeta: EndpointMeta[] = [
           ops: {
             unresolvedErrors: 4,
             errorOccurrences: { value: 37, previous: 52 },
+            errorOccurrencesSince: null,
             failingTasks: 1,
             unhealthyConnections: 0,
           },
@@ -3146,6 +3149,7 @@ export const endpointsMeta: EndpointMeta[] = [
               },
             },
           ],
+          featureLabels: { generate_image: "Generate Image" },
           topSpenders: [
             {
               userId: "123e4567-e89b-12d3-a456-426614174000",
@@ -6421,9 +6425,11 @@ export const endpointsMeta: EndpointMeta[] = [
             visits: { value: 1840, previous: 1510 },
             humanVisits: { value: 1700, previous: 1400 },
             botVisits: { value: 140, previous: 110 },
+            unknownVisits: { value: 4, previous: 6 },
             visitors: { value: 1320, previous: 1105 },
             humanLeads: { value: 120, previous: 100 },
             botLeads: { value: 640, previous: 410 },
+            unknownLeads: { value: 12, previous: 9 },
             signups: { value: 38, previous: 31 },
             firstChats: { value: 210, previous: 180 },
             payers: { value: 6, previous: 4 },
@@ -6462,9 +6468,11 @@ export const endpointsMeta: EndpointMeta[] = [
             visits: { value: 1840, previous: 1510 },
             humanVisits: { value: 1700, previous: 1400 },
             botVisits: { value: 140, previous: 110 },
+            unknownVisits: { value: 4, previous: 6 },
             visitors: { value: 1320, previous: 1105 },
             humanLeads: { value: 120, previous: 100 },
             botLeads: { value: 640, previous: 410 },
+            unknownLeads: { value: 12, previous: 9 },
             signups: { value: 38, previous: 31 },
             firstChats: { value: 210, previous: 180 },
             payers: { value: 6, previous: 4 },
@@ -6573,6 +6581,7 @@ export const endpointsMeta: EndpointMeta[] = [
             { key: "expired", value: 11 },
             { key: "confirmed", value: 38 },
           ],
+          signupTrackedSince: "2026-11-22",
           signupSegments: [
             {
               key: "direct",
@@ -6642,6 +6651,7 @@ export const endpointsMeta: EndpointMeta[] = [
             { key: "expired", value: 11 },
             { key: "confirmed", value: 38 },
           ],
+          signupTrackedSince: "2026-11-22",
           signupSegments: [
             {
               key: "direct",

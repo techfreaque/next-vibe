@@ -22,6 +22,7 @@ import type { AnalyticsWindow } from "next-vibe/unified-ui/analytics/window";
 import {
   fillBuckets,
   serializeWindow,
+  toDayKey,
 } from "next-vibe/unified-ui/analytics/window";
 import {
   bucketSql,
@@ -36,7 +37,8 @@ import { SignupEventType } from "@/user/public/signup/event-type";
 import { expiryDedupeKeySql } from "@/user/public/signup/events";
 
 import { resolveLeadWindow } from "../acquisition/repository";
-import { BotFamily, LeadDimension } from "../enum";
+import { notBotFamilySql } from "../bot-sql";
+import { LeadDimension } from "../enum";
 import type { LeadSegmentFilters } from "../filters";
 import {
   andAll,
@@ -60,18 +62,36 @@ export const FUNNEL_STEPS = [
   "payers",
 ] as const;
 
-/** Steps after "humans" only count human leads, so the funnel is monotonic. */
+/**
+ * Funnel steps of a lead cohort.
+ *
+ * leads / humans count lead rows. Every later step counts PEOPLE: a returning
+ * account gets a new lead per device or session, so per-lead counting showed
+ * one paying customer as dozens of "payers". A lead converts when its account
+ * was created at or after the lead (an older account that only logged in on a
+ * new device is not a conversion of that lead); each account counts once.
+ *
+ * Steps after "humans" only count leads that are not known bots (browser user
+ * agent, or none recorded). Unknown stays in: many signup leads were written
+ * without a user agent, and dropping them would hide real signups and payers.
+ */
 function stepCounts(prefix: SQL): SQL {
-  const human = sql`${prefix}bot_family = ${BotFamily.HUMAN}`;
+  const human = notBotFamilySql(sql`${prefix}bot_family`);
+  const converted = sql`(${prefix}user_id IS NOT NULL AND ${prefix}signed_up_at >= ${prefix}created_at - interval '10 minutes')`;
+  const account = sql`CASE WHEN ${converted} THEN ${prefix}user_id END`;
+  const person = sql`coalesce(${account}::text, ${prefix}id::text)`;
   return sql`
     count(*)::int AS leads,
     count(*) FILTER (WHERE ${human})::int AS humans,
-    count(*) FILTER (WHERE ${human} AND ${prefix}first_chat_at IS NOT NULL)::int AS "firstChats",
-    count(*) FILTER (WHERE ${human} AND ${prefix}signed_up_at IS NOT NULL)::int AS signups,
-    count(*) FILTER (WHERE ${human} AND ${prefix}email_verified)::int AS "emailConfirmed",
-    count(*) FILTER (WHERE ${human} AND ${prefix}first_paid_at IS NOT NULL)::int AS payers
+    count(DISTINCT ${person}) FILTER (WHERE ${human} AND (${prefix}lead_first_chat_at IS NOT NULL OR (${converted} AND ${prefix}first_chat_at IS NOT NULL)))::int AS "firstChats",
+    count(DISTINCT ${account}) FILTER (WHERE ${human})::int AS signups,
+    count(DISTINCT ${account}) FILTER (WHERE ${human} AND ${prefix}email_verified)::int AS "emailConfirmed",
+    count(DISTINCT ${account}) FILTER (WHERE ${human} AND ${prefix}first_paid_at IS NOT NULL)::int AS payers
   `;
 }
+
+/** The lead's account was created at or after the lead (a conversion). */
+const CONVERTED = sql`(user_id IS NOT NULL AND signed_up_at >= created_at - interval '10 minutes')`;
 
 type StepRow = Record<(typeof FUNNEL_STEPS)[number], number>;
 
@@ -101,6 +121,28 @@ const SIGNUP_STEP_OF_EVENT: Record<string, SignupStep> = {
  * segment. Pending rows that expired but were not swept yet count as EXPIRED
  * at their expiry (read-only, the bounce sync writes the real event).
  */
+/**
+ * Pending signups whose start was recorded live. The migration that added
+ * signup_events backfilled only the pending rows still present (failures:
+ * expired, bounced, unconfirmed); confirmed ones were already consumed, so
+ * counting backfilled starts would show a fake 20% confirm rate. Every step
+ * counts only for these tracked signups.
+ */
+const TRACKED_PENDING = sql`SELECT te.pending_id FROM ${signupEvents} te
+  WHERE te.type = ${SignupEventType.STARTED}
+    AND (te.dedupe_key IS NULL OR te.dedupe_key NOT LIKE 'backfill-%')`;
+
+/** First live-tracked signup start (null = nothing tracked yet). */
+async function signupTrackingSince(): Promise<Date | null> {
+  const { rows } = await db.execute<QueryResultRow & { since: string | null }>(
+    sql`SELECT min(te.occurred_at)::text AS since FROM ${signupEvents} te
+      WHERE te.type = ${SignupEventType.STARTED}
+        AND (te.dedupe_key IS NULL OR te.dedupe_key NOT LIKE 'backfill-%')`,
+  );
+  const since = rows[0]?.since;
+  return since ? new Date(`${since.replace(" ", "T")}Z`) : null;
+}
+
 function signupEventsCte(
   win: AnalyticsWindow,
   filters: LeadSegmentFilters,
@@ -110,10 +152,12 @@ function signupEventsCte(
   return sql`ev AS (
     SELECT e.lead_id, e.type, e.occurred_at FROM ${signupEvents} e
     WHERE e.lead_id IS NOT NULL AND e.occurred_at >= ${start} AND e.occurred_at < ${end}
+      AND e.pending_id IN (${TRACKED_PENDING})
     UNION ALL
     SELECT p.lead_id, ${SignupEventType.EXPIRED}::text, p.expires_at FROM ${pendingSignups} p
     WHERE p.expires_at <= ${utcSql(new Date())}
       AND p.expires_at >= ${start} AND p.expires_at < ${end}
+      AND p.id IN (${TRACKED_PENDING})
       AND NOT EXISTS (
         SELECT 1 FROM ${signupEvents} x
         WHERE x.dedupe_key = ${expiryDedupeKeySql(sql`p.id`, sql`p.expires_at`)}
@@ -175,6 +219,7 @@ export class FunnelReportRepository {
       const evCte = signupEventsCte(win, data);
       const evNow = inWindowSql(sql`occurred_at`, win);
       const evPrev = inPreviousWindowSql(sql`occurred_at`, win);
+      const trackedSince = await signupTrackingSince();
       const [signupPeriods, signupSegmentRows] = await Promise.all([
         db.execute<
           QueryResultRow & { current: boolean; type: string; leads: number }
@@ -204,7 +249,13 @@ export class FunnelReportRepository {
         return totals;
       };
       const signupNow = signupTotals(true);
-      const signupPrev = win.previousFrom ? signupTotals(false) : null;
+      // No comparison when the previous period predates live tracking.
+      const signupPrev =
+        win.previousFrom &&
+        trackedSince &&
+        trackedSince.getTime() <= win.previousFrom.getTime()
+          ? signupTotals(false)
+          : null;
       const signupByKey = new Map<string | null, Record<SignupStep, number>>();
       for (const row of signupSegmentRows.rows) {
         const step = SIGNUP_STEP_OF_EVENT[row.type];
@@ -248,13 +299,19 @@ export class FunnelReportRepository {
         >(sql`
             WITH ${cte}
             SELECT 'humans' AS key, ${bucketSql(sql`created_at`, win.bucket)} AS bucket, count(*)::int AS value
-              FROM seg WHERE ${now} AND bot_family = ${BotFamily.HUMAN} GROUP BY 2
+              FROM seg WHERE ${now} AND ${notBotFamilySql(sql`bot_family`)} GROUP BY 2
             UNION ALL
-            SELECT 'signups', ${bucketSql(sql`created_at`, win.bucket)}, count(*)::int
-              FROM seg WHERE ${now} AND bot_family = ${BotFamily.HUMAN} AND signed_up_at IS NOT NULL GROUP BY 2
+            SELECT 'signups', bucket, count(*)::int FROM (
+              SELECT DISTINCT ON (user_id) user_id, ${bucketSql(sql`created_at`, win.bucket)} AS bucket
+              FROM seg WHERE ${now} AND ${notBotFamilySql(sql`bot_family`)} AND ${CONVERTED}
+              ORDER BY user_id, created_at
+            ) s GROUP BY 2
             UNION ALL
-            SELECT 'payers', ${bucketSql(sql`created_at`, win.bucket)}, count(*)::int
-              FROM seg WHERE ${now} AND bot_family = ${BotFamily.HUMAN} AND first_paid_at IS NOT NULL GROUP BY 2
+            SELECT 'payers', bucket, count(*)::int FROM (
+              SELECT DISTINCT ON (user_id) user_id, ${bucketSql(sql`created_at`, win.bucket)} AS bucket
+              FROM seg WHERE ${now} AND ${notBotFamilySql(sql`bot_family`)} AND ${CONVERTED} AND first_paid_at IS NOT NULL
+              ORDER BY user_id, created_at
+            ) p GROUP BY 2
           `),
       ]);
 
@@ -326,6 +383,7 @@ export class FunnelReportRepository {
         previousSignupSteps: signupPrev
           ? SIGNUP_STEPS.map((key) => ({ key, value: signupPrev[key] }))
           : null,
+        signupTrackedSince: trackedSince ? toDayKey(trackedSince) : null,
         signupSegments,
       });
     } catch (error) {

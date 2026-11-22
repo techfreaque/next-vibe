@@ -29,6 +29,14 @@ export const translations = {
         humanLeads: "New leads",
         botLeadsHint: "{{count}} bot leads excluded",
         botVisitsHint: "{{count}} bot visits excluded",
+        excludedLeadsHint:
+          "{{bots}} bot and {{unknown}} unknown leads excluded",
+        excludedVisitsHint:
+          "{{bots}} bot and {{unknown}} unknown visits excluded",
+        creditSpendHintNoPrevCost:
+          "Provider cost {{cost}} (not recorded in the previous period). {{guests}} by guests.",
+        creditSpendHintNoCompare:
+          "Provider cost {{cost}}. {{guests}} by guests.",
         payersHint: "Distinct payers in period",
         signups: "Signups",
         signupRateHint: "{{rate}} of new leads",
@@ -104,6 +112,8 @@ export const translations = {
         unattributed: "{{share}} of revenue has no known source ({{amount}})",
         errors:
           "{{count}} unresolved errors, {{occurrences}} occurrences in period",
+        errorsSince:
+          "{{count}} unresolved errors, {{occurrences}} occurrences since {{date}} (daily counts start then)",
       },
       open: {
         acquisition: "Acquisition report",

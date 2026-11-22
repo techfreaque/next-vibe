@@ -31,6 +31,7 @@ import {
   AbuseGroupByOptions,
   BotFamily,
   TrafficFilter,
+  TrafficFilterOptions,
 } from "../enum";
 import { leadSegmentFields } from "../filters";
 import { ABUSE_REPORT_ALIAS } from "./constants";
@@ -120,6 +121,17 @@ const { GET } = createEndpoint({
     children: {
       ...analyticsWindowFields,
       ...leadSegmentFields,
+      // Crawler ranges (Meta, Google, Bing) burst by design and are counted
+      // as bots elsewhere; abuse starts on everything that is not a known bot.
+      traffic: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "leadAnalytics.traffic.label",
+        description: "leadAnalytics.traffic.description",
+        options: TrafficFilterOptions,
+        columns: 3,
+        schema: z.enum(TrafficFilter).default(TrafficFilter.NOT_BOTS),
+      }),
       groupBy: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,

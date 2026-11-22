@@ -9,12 +9,22 @@ import "server-only";
  * grow after the period ends.
  */
 import { type SQL, sql } from "drizzle-orm";
-import { DeviceType } from "next-vibe/identity/lead/enum";
 import { utcSql } from "next-vibe/unified-ui/analytics/window-sql";
 
 import { PaymentStatus } from "@/payment/enum";
 
-import { botFamilySql, ipPrefixSql, uaFingerprintSql } from "./bot-sql";
+import {
+  botFamilySql,
+  ipPrefixSql,
+  isBotFamilySql,
+  leadBrowserSql,
+  leadDeviceSql,
+  leadIpSql,
+  leadOsSql,
+  leadUserAgentSql,
+  notBotFamilySql,
+  uaFingerprintSql,
+} from "./bot-sql";
 import {
   BotFamily,
   CHANNEL_FILTER_TO_TYPE,
@@ -41,23 +51,33 @@ export function leadFactsSql(leadCondition: SQL = sql`TRUE`): SQL {
   return sql`
     SELECT l.id, l.created_at, l.geo_country AS country,
       l.country AS locale_country, l.email, l.business_name,
-      coalesce(l.device_type, ${DeviceType.UNKNOWN}) AS device,
-      l.browser, l.os, l.ip_address AS ip, l.user_agent AS ua,
-      ${botFamilySql(sql`l.user_agent`)} AS bot_family,
-      ${ipPrefixSql(sql`l.ip_address`)} AS ip_prefix,
-      ${uaFingerprintSql(sql`l.user_agent`)} AS ua_fp,
+      ${leadDeviceSql(sql`l.device_type`, sql`ident.ua`, sql`fam.bot_family`)} AS device,
+      ${leadBrowserSql(sql`l.browser`, sql`ident.ua`)} AS browser,
+      ${leadOsSql(sql`l.os`, sql`ident.ua`)} AS os,
+      ident.ip, ident.ua, fam.bot_family,
+      ${ipPrefixSql(sql`ident.ip`)} AS ip_prefix,
+      ${uaFingerprintSql(sql`ident.ua`)} AS ua_fp,
       j.first_channel_type AS channel_type, j.first_channel AS channel,
       j.first_source AS source, j.first_medium AS medium,
       j.first_campaign AS campaign, j.first_referrer_host AS referrer_host,
       j.first_landing_path AS landing_path,
       coalesce(j.first_ref_code, l.referral_code) AS ref_code,
       u.id AS user_id,
-      CASE WHEN u.id IS NOT NULL
-        THEN coalesce(j.signed_up_at, l.signed_up_at, u.created_at) END AS signed_up_at,
+      -- Account creation is the signup. growth_journeys.signed_up_at is
+      -- stamped when an account first attaches to a journey, which for an
+      -- existing account (login on a new device) is long after its signup.
+      u.created_at AS signed_up_at,
       coalesce(u.email_verified, false) AS email_verified,
       coalesce(j.first_chat_at, lead_chat.first_at, user_chat.first_at) AS first_chat_at,
+      coalesce(j.first_chat_at, lead_chat.first_at) AS lead_first_chat_at,
       coalesce(j.first_paid_at, pay.first_at) AS first_paid_at
     FROM leads l
+    CROSS JOIN LATERAL (
+      SELECT ${leadUserAgentSql("l")} AS ua, ${leadIpSql("l")} AS ip
+    ) ident
+    CROSS JOIN LATERAL (
+      SELECT ${botFamilySql(sql`ident.ua`)} AS bot_family
+    ) fam
     LEFT JOIN growth_journeys j ON j.lead_id = l.id
     LEFT JOIN users u ON u.id = coalesce(j.user_id, l.converted_user_id)
     LEFT JOIN (
@@ -106,7 +126,11 @@ export function segmentConditions(filters: LeadSegmentFilters): SQL[] {
   if (picked.traffic === TrafficFilter.HUMANS) {
     conditions.push(sql`f.bot_family = ${BotFamily.HUMAN}`);
   } else if (picked.traffic === TrafficFilter.BOTS) {
-    conditions.push(sql`f.bot_family <> ${BotFamily.HUMAN}`);
+    conditions.push(isBotFamilySql(sql`f.bot_family`));
+  } else if (picked.traffic === TrafficFilter.UNKNOWN) {
+    conditions.push(sql`f.bot_family = ${BotFamily.NO_UA}`);
+  } else if (picked.traffic === TrafficFilter.NOT_BOTS) {
+    conditions.push(notBotFamilySql(sql`f.bot_family`));
   }
   if (picked.botFamily) {
     conditions.push(sql`f.bot_family = ${picked.botFamily}`);

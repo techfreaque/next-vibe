@@ -24,7 +24,8 @@ export async function generateVideoWithUnbottled(params: {
   user: JwtPayloadType;
   logger: EndpointLogger;
   locale: CountryLanguage;
-  featureLabel: string;
+  /** Ledger feature id (endpoint alias), translated when shown. */
+  creditFeature: string;
   /** Caller's tool-execution context — the fixture chain rides it into the provider dispatch. */
   toolExecutionContext: ToolExecutionContext;
   platform: Platform;
@@ -40,7 +41,7 @@ export async function generateVideoWithUnbottled(params: {
     user,
     logger,
     locale,
-    featureLabel,
+    creditFeature,
     toolExecutionContext,
     platform,
   } = params;
@@ -78,7 +79,7 @@ export async function generateVideoWithUnbottled(params: {
   const deductResult = await deductMediaCredits(
     user,
     creditCost,
-    featureLabel,
+    creditFeature,
     locale,
     logger,
     balanceCheck.data.tCredits,

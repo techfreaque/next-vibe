@@ -52,6 +52,7 @@ export const translations = {
     humanVisits: "Human visits",
     botVisits: "Bot visits",
     botVisitsHint: "{{count}} bot visits",
+    unknownLeadsHint: "{{count}} more without a user agent (unknown)",
     botsTitle: "Bot leads",
     botsSubtitle: "Crawlers, previews and scripts. Click a bar for its leads.",
     loading: "Loading acquisition report...",

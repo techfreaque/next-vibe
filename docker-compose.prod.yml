@@ -8,6 +8,10 @@ services:
     # a container-name clash. Default keeps Server 1 EXACTLY as before.
     container_name: ${PG_CONTAINER_NAME:-prod-postgres}
     restart: unless-stopped
+    # Parallel query workers use /dev/shm; Docker's 64 MB default runs out on
+    # the admin analytics reports ("could not resize shared memory segment").
+    # Applies on the next postgres container recreate.
+    shm_size: ${PG_SHM_SIZE:-512m}
     # Bound the json-file log on disk so prod can never fill the disk with logs.
     # These are the EPHEMERAL per-container logs (wiped on recreate); durable
     # archival of the app's outgoing logs is handled by the deploy scripts, which

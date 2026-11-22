@@ -22,6 +22,7 @@
 import "server-only";
 
 import { type SQL, sql } from "drizzle-orm";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
@@ -49,6 +50,11 @@ import {
   CreditPackType,
   CreditTransactionType,
 } from "../../enum";
+import {
+  creditFeatureLabels,
+  LEGACY_FEATURE_IDS,
+  normalizeCreditFeature,
+} from "../../feature-label";
 import { notSignupCarryoverRaw } from "../../usage-filter";
 import type {
   CreditUsageReportRequestOutput,
@@ -116,6 +122,11 @@ function fundingSum(keys: readonly FundingKey[], prefix = ""): SQL {
 }
 const TOP_SPENDER_LIMIT = 25;
 
+/** Model breakdown key of a charge without a model (media, tools). */
+const FEATURE_KEY_PREFIX = "feature:";
+/** Feature of model charges without a ledger feature (translated in the widget). */
+const CHAT_FEATURE = "chat";
+
 function num(value: NumLike | undefined): number {
   return value === null || value === undefined ? 0 : Number(value);
 }
@@ -142,6 +153,19 @@ function ts(date: Date): SQL {
 /** Credits of a base row when its funding bucket is one of `keys`. */
 function fundedPart(keys: readonly FundingKey[]): SQL {
   return sql`(CASE WHEN b.bucket IN (${fundingList(keys)}) THEN b.credits ELSE 0 END)`;
+}
+
+/**
+ * Ledger feature id: legacy rows stored a localized label, folded onto the
+ * stable id here so one feature is one row (credits/feature-label.ts).
+ */
+function featureIdSql(feature: SQL): SQL {
+  return sql`(CASE ${feature} ${sql.join(
+    Object.entries(LEGACY_FEATURE_IDS).map(
+      ([legacy, id]) => sql`WHEN ${legacy} THEN ${id}`,
+    ),
+    sql` `,
+  )} ELSE ${feature} END)`;
 }
 
 export interface CreditUsageFilters {
@@ -202,7 +226,7 @@ export function creditUsageCte(
           THEN -t.amount ELSE 0 END::numeric AS free_credits,
         fund.bucket,
         t.model_id AS model,
-        COALESCE(NULLIF(t.feature, ''), CASE WHEN t.model_id IS NOT NULL THEN 'chat' END) AS feature,
+        COALESCE(NULLIF(${featureIdSql(sql`t.feature`)}, ''), CASE WHEN t.model_id IS NOT NULL THEN 'chat' END) AS feature,
         NULLIF(t.metadata->>'upstreamProvider', '') AS provider,
         (t.metadata ? 'upstreamCostUsd' OR t.metadata ? 'fallbackCostUsd') AS has_cost,
         (COALESCE((t.metadata->>'upstreamCostUsd')::numeric, 0)
@@ -288,6 +312,7 @@ export class CreditUsageReportRepository {
     data: CreditUsageReportRequestOutput,
     logger: EndpointLogger,
     t: CreditUsageReportT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CreditUsageReportResponseOutput>> {
     try {
       const floor = await db.execute<QueryResultRow & { first: string | null }>(
@@ -302,11 +327,28 @@ export class CreditUsageReportRepository {
         actor: data.actor,
         creditKind: data.creditKind,
         model: data.model || undefined,
-        feature: data.feature || undefined,
+        feature: data.feature
+          ? normalizeCreditFeature(data.feature)
+          : undefined,
         provider: data.provider || undefined,
         includeInternal: data.includeInternal,
       };
-      return success(await CreditUsageReportRepository.build(win, filters));
+      const report = await CreditUsageReportRepository.build(win, filters);
+      // Feature ids -> labels in the viewer's locale (display time).
+      const featureIds = [
+        ...report.byFeature.map((row) => row.key),
+        ...report.byModel.map((row) =>
+          row.key?.startsWith(FEATURE_KEY_PREFIX)
+            ? row.key.slice(FEATURE_KEY_PREFIX.length)
+            : null,
+        ),
+        ...report.topSpenders.map((row) => row.topModel),
+        filters.feature ?? null,
+      ].filter((id): id is string => id !== null && id !== CHAT_FEATURE);
+      return success({
+        ...report,
+        featureLabels: await creditFeatureLabels(featureIds, locale),
+      });
     } catch (error) {
       logger.error("Failed to build credit usage report", parseError(error));
       return fail({
@@ -377,7 +419,7 @@ export class CreditUsageReportRepository {
   static async build(
     win: AnalyticsWindow,
     filters: CreditUsageFilters,
-  ): Promise<CreditUsageReportResponseOutput> {
+  ): Promise<Omit<CreditUsageReportResponseOutput, "featureLabels">> {
     const cte = creditUsageCte(win.from, win.to, filters);
     const bucket = bucketSql(sql.raw("at"), win.bucket);
 
@@ -531,8 +573,11 @@ export class CreditUsageReportRepository {
 
     const cur = totals.current;
     const prev = totals.previous;
+    // Provider cost is only recorded since mid-Nov 2026: a previous period
+    // without any costed row has no cost data, which is not "$0 cost".
+    const prevCost = prev && prev.costedCredits > 0 ? prev : null;
     const curMargin = marginUsd(cur);
-    const prevMargin = prev ? marginUsd(prev) : null;
+    const prevMargin = prevCost ? marginUsd(prevCost) : null;
 
     return {
       window: serializeWindow(win),
@@ -560,8 +605,8 @@ export class CreditUsageReportRepository {
           prev ? ratio(prev.freeCredits, prev.credits) : null,
           4,
         ),
-        upstreamCostUsd: kpi(cur.costUsd, prev?.costUsd ?? null),
-        freeCostUsd: kpi(cur.freeCostUsd, prev?.freeCostUsd ?? null),
+        upstreamCostUsd: kpi(cur.costUsd, prevCost?.costUsd ?? null),
+        freeCostUsd: kpi(cur.freeCostUsd, prevCost?.freeCostUsd ?? null),
         // Share of spend with a known funding source (origin-missing excluded).
         paidShare: kpi(
           ratio(cur.paidCredits, cur.credits - cur.unknownCredits),
@@ -578,18 +623,20 @@ export class CreditUsageReportRepository {
         freeCredits: kpi(cur.freeCredits, prev?.freeCredits ?? null),
         freeCostCoverage: kpi(
           ratio(cur.freeCostedCredits, cur.freeCredits),
-          prev ? ratio(prev.freeCostedCredits, prev.freeCredits) : null,
+          prevCost
+            ? ratio(prevCost.freeCostedCredits, prevCost.freeCredits)
+            : null,
           4,
         ),
         costedSpendUsd: kpi(
           cur.costedCredits * CREDIT_VALUE_USD,
-          prev ? prev.costedCredits * CREDIT_VALUE_USD : null,
+          prevCost ? prevCost.costedCredits * CREDIT_VALUE_USD : null,
         ),
         marginUsd: kpi(curMargin, prevMargin),
         marginPct: kpi(
           ratio(curMargin, cur.costedCredits * CREDIT_VALUE_USD),
-          prev && prevMargin !== null && prev.costedCredits > 0
-            ? ratio(prevMargin, prev.costedCredits * CREDIT_VALUE_USD)
+          prevCost && prevMargin !== null
+            ? ratio(prevMargin, prevCost.costedCredits * CREDIT_VALUE_USD)
             : null,
           4,
         ),

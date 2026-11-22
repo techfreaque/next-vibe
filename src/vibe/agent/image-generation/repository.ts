@@ -57,6 +57,7 @@ import {
   parseAspectRatio,
   snapAspectRatio,
 } from "./aspect-ratio";
+import { IMAGE_GEN_ALIAS } from "./constants";
 import {
   type ImageGenerationPostRequestInput,
   type ImageGenerationPostRequestOutput,
@@ -483,7 +484,7 @@ export class ImageGenerationRepository {
           user,
           locale,
           logger,
-          featureLabel: t("post.title"),
+          creditFeature: IMAGE_GEN_ALIAS,
           platform,
           // The media-gen context is a narrowed shape — rebuild a headless
           // context carrying its abort wiring + fixture chain for dispatch.
@@ -595,7 +596,7 @@ export class ImageGenerationRepository {
       const deductResult = await deductMediaCredits(
         user,
         finalCreditCost,
-        t("post.title"),
+        IMAGE_GEN_ALIAS, // ledger id, translated when shown
         locale,
         logger,
         tCredits,

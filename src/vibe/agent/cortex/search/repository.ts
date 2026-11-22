@@ -22,7 +22,11 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { truncateContent } from "../_shared/text-utils";
 import { cosineSimilarity } from "../_shared/vector-utils";
 import { cortexNodes } from "../db";
-import { CortexCreditFeature, CortexNodeType } from "../enum";
+import {
+  CORTEX_CREDIT_FEATURE,
+  CortexCreditFeature,
+  CortexNodeType,
+} from "../enum";
 import { isValidPath, normalizePath } from "../repository";
 import type { CortexSearchResponseOutput } from "./definition";
 import type { CortexSearchT } from "./i18n";
@@ -238,13 +242,11 @@ async function runVectorSearch(
     const { scopedTranslation: creditsScopedTranslation } =
       await import("@/credits/i18n");
     const { t: tCredits } = creditsScopedTranslation.scopedT(locale);
-    const { scopedTranslation: cortexScopedTranslation } =
-      await import("../i18n");
-    const { t: tCortex } = cortexScopedTranslation.scopedT(locale);
+    // Ledger stores a stable feature id; it is translated when shown.
     await CreditRepository.deductCreditsForFeature(
       user,
       embeddingCreditsForCost(queryResult.costUsd),
-      tCortex(CortexCreditFeature.SEARCH),
+      CORTEX_CREDIT_FEATURE[CortexCreditFeature.SEARCH],
       logger,
       tCredits,
       locale,

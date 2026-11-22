@@ -76,6 +76,7 @@ const exampleResponse = {
   },
   signupSteps,
   previousSignupSteps: signupSteps,
+  signupTrackedSince: "2026-11-22",
   signupSegments: [
     {
       key: "direct",
@@ -169,6 +170,11 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "get.response.signupSegments",
         schema: breakdownSchema,
+      }),
+      signupTrackedSince: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.signupTrackedSince",
+        schema: z.string().nullable(),
       }),
     },
   }),

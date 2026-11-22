@@ -25,6 +25,14 @@ export const translations = {
       userSubscription: "User Subscription Credits",
       leadFree: "Lead Free Tier Credits",
     },
+    creditFeature: {
+      textToSpeech: "Text-to-Speech",
+      speechToText: "Speech-to-Text",
+      memoryWrite: "Memory write",
+      memoryEdit: "Memory edit",
+      memorySearch: "Memory search",
+      memoryEmbedding: "Memory embedding",
+    },
     transactionType: {
       purchase: "Purchase",
       subscription: "Subscription",

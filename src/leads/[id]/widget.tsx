@@ -114,7 +114,7 @@ import leadsListDefinitions from "@/leads/list/definition";
 import leadsSearchDefinitions from "@/leads/search/definition";
 import { scopedTranslation as newsletterI18n } from "@/newsletter/i18n";
 
-import { BotFamily } from "../analytics/enum";
+import { isBotFamily } from "../analytics/enum";
 import {
   dimensionValueLabel,
   useLeadAnalyticsT,
@@ -926,7 +926,7 @@ function TrafficSection({
 }): React.JSX.Element {
   const st = useLeadAnalyticsT(locale);
   const drill = useLeadDrill();
-  const isBot = traffic.botFamily !== BotFamily.HUMAN;
+  const isBot = isBotFamily(traffic.botFamily);
   const firstTouch = [
     dimensionValueLabel(traffic.channelType, st),
     traffic.channel && traffic.channel !== "direct" ? traffic.channel : null,

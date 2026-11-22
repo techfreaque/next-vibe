@@ -211,6 +211,11 @@ const { GET } = createEndpoint({
         label: "get.response.byProvider" as const,
         schema: breakdownSchema,
       }),
+      featureLabels: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.featureLabels" as const,
+        schema: z.record(z.string(), z.string()),
+      }),
       topSpenders: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.topSpenders" as const,
@@ -373,6 +378,7 @@ const { GET } = createEndpoint({
             },
           },
         ],
+        featureLabels: { generate_image: "Generate Image" },
         topSpenders: [
           {
             userId: "123e4567-e89b-12d3-a456-426614174000",

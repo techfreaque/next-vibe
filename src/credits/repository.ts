@@ -119,6 +119,7 @@ import { getPoolBalance } from "./db-functions";
 import type { CreditsGetResponseOutput } from "./definition";
 import creditsDefinitions from "./definition";
 import {
+  CreditFeature,
   CreditFundingType,
   CreditPackType,
   type CreditPackTypeValue,
@@ -127,6 +128,7 @@ import {
   FreeCreditsStatus,
   type FreeCreditsStatusValue,
 } from "./enum";
+import { creditFeatureLabels } from "./feature-label";
 import {
   computeFreeAllowance,
   computeFreeAvailable,
@@ -3412,6 +3414,7 @@ export class CreditRepository {
           limit,
           offset,
           t,
+          locale,
           filter,
         }),
       );
@@ -3579,6 +3582,7 @@ export class CreditRepository {
     limit,
     offset,
     t,
+    locale,
     filter,
   }: {
     pool: CreditPool;
@@ -3594,6 +3598,8 @@ export class CreditRepository {
     limit: number;
     offset: number;
     t: CreditsT;
+    /** Viewer locale: feature ids are translated into it. */
+    locale: CountryLanguage;
     /** Admin ledger filters: when set, synthetic summary rows are left out */
     filter?: LedgerFilter;
   }): Promise<{
@@ -3757,6 +3763,12 @@ export class CreditRepository {
       .from(creditTransactions)
       .where(visible);
 
+    const featureLabels = await creditFeatureLabels(
+      transactions.flatMap(({ transaction }) =>
+        transaction.feature ? [transaction.feature] : [],
+      ),
+      locale,
+    );
     const result: CreditTransactionOutput[] = transactions.map(
       ({ transaction, packSource, paymentId }) => {
         const isBonusGrant =
@@ -3770,9 +3782,12 @@ export class CreditRepository {
                 transaction.metadata.signupCarryover
               ? t("historyLabels.signupCarryover")
               : null;
+        const feature = transaction.feature
+          ? (featureLabels[transaction.feature] ?? transaction.feature)
+          : null;
         const featureLabel = CreditRepository.getFetaureLabel(
           transaction.modelId,
-          transaction.feature,
+          feature,
         );
         return {
           id: transaction.id,
@@ -3784,10 +3799,7 @@ export class CreditRepository {
               ? `${t(transaction.type)} (${featureLabel})`
               : t(transaction.type)),
           label: grantLabel ?? t(transaction.type),
-          detail: CreditRepository.detailLabel(
-            transaction.modelId,
-            transaction.feature,
-          ),
+          detail: CreditRepository.detailLabel(transaction.modelId, feature),
           typeKey: transaction.type,
           paymentId,
           modelId: transaction.modelId,
@@ -3874,7 +3886,10 @@ export class CreditRepository {
   }
 
   /** Last 10 ledger entries platform-wide, with who they belong to. */
-  private static async recentLedgerActivity(t: CreditsT): Promise<
+  private static async recentLedgerActivity(
+    t: CreditsT,
+    locale: CountryLanguage,
+  ): Promise<
     Array<{
       id: string;
       createdAt: Date;
@@ -3918,12 +3933,19 @@ export class CreditRepository {
       )
       .orderBy(desc(creditTransactions.createdAt), desc(creditTransactions.id))
       .limit(10);
+    const featureLabels = await creditFeatureLabels(
+      rows.flatMap((row) => (row.feature ? [row.feature] : [])),
+      locale,
+    );
     return rows.map((row) => ({
       id: row.id,
       createdAt: row.createdAt,
       amount: row.amount,
       label: t(row.type),
-      detail: CreditRepository.detailLabel(row.modelId, row.feature),
+      detail: CreditRepository.detailLabel(
+        row.modelId,
+        row.feature ? (featureLabels[row.feature] ?? row.feature) : null,
+      ),
       email: row.email,
       userId: row.userId,
       leadId: row.leadId,
@@ -4064,7 +4086,7 @@ export class CreditRepository {
       return success({
         transactions: [],
         paginationInfo: { totalCount: 0, pageCount: 0 },
-        recent: await CreditRepository.recentLedgerActivity(t),
+        recent: await CreditRepository.recentLedgerActivity(t, locale),
       });
     }
 
@@ -4235,6 +4257,7 @@ export class CreditRepository {
           filter,
           offset,
           t,
+          locale,
         }),
       );
     } catch (error) {
@@ -4469,7 +4492,7 @@ export class CreditRepository {
         identifier,
         cost,
         undefined,
-        t("repository.tts"),
+        CreditFeature.TEXT_TO_SPEECH, // ledger id, translated when shown
         creditMessageId,
         logger,
         t,
@@ -4546,7 +4569,7 @@ export class CreditRepository {
         identifier,
         cost,
         undefined,
-        t("repository.stt"),
+        CreditFeature.SPEECH_TO_TEXT, // ledger id, translated when shown
         creditMessageId,
         logger,
         t,

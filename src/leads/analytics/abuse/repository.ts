@@ -31,7 +31,9 @@ import type { QueryResultRow } from "pg";
 import { CreditTransactionType } from "@/credits/enum";
 
 import { resolveLeadWindow } from "../acquisition/repository";
-import { AbuseGroupBy, BotFamily } from "../enum";
+import { isBotFamilySql } from "../bot-sql";
+import type { BotFamily } from "../enum";
+import { AbuseGroupBy } from "../enum";
 import type { LeadSegmentFilters } from "../filters";
 import { andAll, leadFactsSql, segmentConditions } from "../segment-sql";
 import type {
@@ -119,7 +121,7 @@ async function clusters(
       count(DISTINCT ${other})::int AS "distinctOther",
       count(DISTINCT user_id) FILTER (WHERE signed_up_at IS NOT NULL)::int AS signups,
       round(coalesce(sum(burn.credits_now), 0))::float8 AS "freeCredits",
-      (count(*) FILTER (WHERE bot_family <> ${BotFamily.HUMAN}))::float8 / count(*) AS "botShare",
+      (count(*) FILTER (WHERE ${isBotFamilySql(sql`bot_family`)}))::float8 / count(*) AS "botShare",
       round((count(*) / greatest(1, extract(epoch FROM max(created_at) - min(created_at)) / 3600))::numeric, 1)::float8 AS "perHour",
       to_char(min(created_at), 'YYYY-MM-DD HH24:MI') AS "firstSeen",
       to_char(max(created_at), 'YYYY-MM-DD HH24:MI') AS "lastSeen"

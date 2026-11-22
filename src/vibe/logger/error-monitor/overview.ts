@@ -28,6 +28,7 @@ import {
   inWindowSql,
 } from "../../unified-ui/analytics/window-sql";
 import type { EndpointLogger } from "../types";
+import { dailyHistoryWindow } from "./daily";
 import { errorLogDaily, errorLogs } from "./db";
 import { scopedTranslation } from "./logs/i18n";
 
@@ -36,25 +37,37 @@ export interface OpsOverview {
   unresolvedErrors: number;
   /** Error occurrences in the period, previous = same-length period before. */
   errorOccurrences: Kpi;
+  /**
+   * First day the occurrences cover (YYYY-MM-DD) when live daily history
+   * starts inside the period, else null (the whole period is covered).
+   */
+  errorOccurrencesSince: string | null;
   /** Enabled cron tasks whose last run failed, errored or timed out. */
   failingTasks: number;
   /** Remote connections disconnected or never synced. */
   unhealthyConnections: number;
 }
 
-/** Occurrences in [period) and in the previous period, from the daily table. */
+/**
+ * Occurrences of UNRESOLVED error classes in [period) and in the previous
+ * period, from live daily history only (the alert pairs this with the
+ * unresolved count; the error-logs report shows the same number by default).
+ */
 export async function getErrorOccurrencesKpi(
   win: Pick<AnalyticsWindow, "from" | "to" | "previousFrom" | "previousTo">,
 ): Promise<Kpi> {
+  const daily = dailyHistoryWindow(win);
   const [row] = await db
     .select({
-      current: sql<string>`COALESCE(SUM(${errorLogDaily.occurrences}) FILTER (WHERE ${inWindowSql(errorLogDaily.day, win)}), 0)`,
-      previous: sql<string>`COALESCE(SUM(${errorLogDaily.occurrences}) FILTER (WHERE ${inPreviousWindowSql(errorLogDaily.day, win)}), 0)`,
+      current: sql<string>`COALESCE(SUM(${errorLogDaily.occurrences}) FILTER (WHERE ${inWindowSql(errorLogDaily.day, daily)}), 0)`,
+      previous: sql<string>`COALESCE(SUM(${errorLogDaily.occurrences}) FILTER (WHERE ${inPreviousWindowSql(errorLogDaily.day, daily)}), 0)`,
     })
-    .from(errorLogDaily);
+    .from(errorLogDaily)
+    .innerJoin(errorLogs, eq(errorLogs.fingerprint, errorLogDaily.fingerprint))
+    .where(eq(errorLogs.resolved, false));
   return {
     value: Number(row?.current ?? 0),
-    previous: win.previousFrom ? Number(row?.previous ?? 0) : null,
+    previous: daily.previousFrom ? Number(row?.previous ?? 0) : null,
   };
 }
 
@@ -75,9 +88,14 @@ export async function getOpsOverview(
         getFailingTaskCount(),
         getUnhealthyConnectionCount(),
       ]);
+    const daily = dailyHistoryWindow(win);
     return success({
       unresolvedErrors: unresolved,
       errorOccurrences,
+      errorOccurrencesSince:
+        daily.from.getTime() > win.from.getTime()
+          ? daily.from.toISOString().slice(0, 10)
+          : null,
       failingTasks,
       unhealthyConnections,
     });

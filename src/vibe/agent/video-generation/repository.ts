@@ -40,6 +40,7 @@ import {
   keepsExplicitMediaModel,
   resolveMediaReference,
 } from "../shared/media-generation";
+import { VIDEO_GEN_ALIAS } from "./constants";
 import {
   type VideoGenerationPostRequestInput,
   type VideoGenerationPostRequestOutput,
@@ -390,7 +391,7 @@ export class VideoGenerationRepository {
           user,
           locale,
           logger,
-          featureLabel: t("post.title"),
+          creditFeature: VIDEO_GEN_ALIAS,
           toolExecutionContext,
           platform,
         });
@@ -529,7 +530,7 @@ export class VideoGenerationRepository {
       const deductResult = await deductMediaCredits(
         user,
         finalCreditCost,
-        t("post.title"),
+        VIDEO_GEN_ALIAS, // ledger id, translated when shown
         locale,
         logger,
         tCredits,

@@ -69,6 +69,7 @@ export const translations: typeof enTranslations = {
     humanVisits: "Menschliche Besuche",
     botVisits: "Bot-Besuche",
     botVisitsHint: "{{count}} Bot-Besuche",
+    unknownLeadsHint: "Dazu {{count}} ohne User Agent (unbekannt)",
     botsTitle: "Bot-Leads",
     botsSubtitle:
       "Crawler, Link-Vorschauen und Skripte. Klick auf einen Balken zeigt die Leads.",

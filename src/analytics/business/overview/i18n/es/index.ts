@@ -31,6 +31,14 @@ export const translations: typeof enTranslations = {
         humanLeads: "Leads nuevos",
         botLeadsHint: "{{count}} leads de bots excluidos",
         botVisitsHint: "{{count}} visitas de bots excluidas",
+        excludedLeadsHint:
+          "{{bots}} prospectos bot y {{unknown}} desconocidos excluidos",
+        excludedVisitsHint:
+          "{{bots}} visitas bot y {{unknown}} desconocidas excluidas",
+        creditSpendHintNoPrevCost:
+          "Coste del proveedor {{cost}} (sin registro en el periodo anterior). {{guests}} de invitados.",
+        creditSpendHintNoCompare:
+          "Coste del proveedor {{cost}}. {{guests}} de invitados.",
         payersHint: "Pagadores distintos en el periodo",
         signups: "Registros",
         signupRateHint: "{{rate}} de los leads nuevos",
@@ -108,6 +116,8 @@ export const translations: typeof enTranslations = {
           "{{share}} de los ingresos sin fuente conocida ({{amount}})",
         errors:
           "{{count}} errores sin resolver, {{occurrences}} ocurrencias en el periodo",
+        errorsSince:
+          "{{count}} errores sin resolver, {{occurrences}} ocurrencias desde {{date}} (conteo diario desde entonces)",
       },
       open: {
         acquisition: "Informe de captación",

@@ -14,7 +14,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ data, logger, t }) =>
-      CreditUsageReportRepository.getReport(data, logger, t),
+    handler: ({ data, logger, t, locale }) =>
+      CreditUsageReportRepository.getReport(data, logger, t, locale),
   },
 });

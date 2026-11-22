@@ -608,9 +608,14 @@ export class LeadsRepository {
           metadata: leads.metadata,
           createdAt: leads.createdAt,
           updatedAt: leads.updatedAt,
-          ipAddress: leads.ipAddress,
+          // Middleware-created leads keep IP / UA only in metadata.
+          ipAddress: sql<
+            string | null
+          >`coalesce(nullif(${leads.ipAddress}, ''), nullif(${leads.metadata}->>'ipAddress', ''))`,
           geoCountry: leads.geoCountry,
-          userAgent: leads.userAgent,
+          userAgent: sql<
+            string | null
+          >`coalesce(nullif(${leads.userAgent}, ''), nullif(${leads.metadata}->>'userAgent', ''))`,
           deviceType: leads.deviceType,
           browser: leads.browser,
           os: leads.os,

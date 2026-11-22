@@ -27,6 +27,7 @@ export const translations: typeof enTranslations = {
       signupSteps: "Passaggi di registrazione nel periodo",
       previousSignupSteps: "Passaggi di registrazione nel periodo precedente",
       signupSegments: "Passaggi di registrazione per segmento",
+      signupTrackedSince: "Passaggi di iscrizione tracciati dal",
     },
     errors: {
       unauthorized: {
@@ -72,6 +73,8 @@ export const translations: typeof enTranslations = {
     signupTitle: "Conferma della registrazione",
     signupSubtitle:
       "Lead per passaggio, datati al momento del passaggio. Il calo mostra dove si perdono le registrazioni.",
+    signupTrackedHint:
+      "Tracciato dal {{date}}: delle iscrizioni precedenti restano solo i fallimenti.",
     started: "Iniziate",
     emailSent: "Email inviata",
     sendFailed: "Invio non riuscito",
@@ -89,16 +92,18 @@ export const translations: typeof enTranslations = {
     cohortHint: "su {{count}} lead creati",
     signupRate: "Tasso di registrazione",
     payRate: "Tasso di pagamento",
-    overallRate: "Da persona a pagante",
+    overallRate: "Da lead a pagante",
     overallShort: "A pagante",
-    ofHumans: "{{count}} su {{total}} lead umani",
+    ofHumans: "{{count}} su {{total}} lead senza bot",
     ofSignups: "{{count}} su {{total}} iscrizioni",
     funnelTitle: "Funnel della coorte",
-    funnelSubtitle: "Funnel dai lead umani. Bot e lead totali: prima scheda.",
+    funnelSubtitle:
+      "Funnel dai lead senza bot (browser o senza user agent). Bot e lead totali: prima scheda.",
     trendTitle: "Coorte per giorno di creazione",
-    trendSubtitle: "Lead umani e quanti di loro hanno convertito.",
+    trendSubtitle: "Lead senza bot e quanti di loro hanno convertito.",
     segmentsTitle: "Funnel per segmento",
-    segmentsSubtitle: "Tassi per lead umano. Clicca una riga per i suoi lead.",
+    segmentsSubtitle:
+      "Tassi per lead senza bot. Clicca una riga per i suoi lead.",
     filtersTitle: "Segmento",
     filtersSubtitle: "Restringe ogni numero di questa pagina.",
     apply: "Applica",

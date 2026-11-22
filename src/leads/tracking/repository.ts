@@ -23,7 +23,6 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { leads } from "next-vibe/identity/lead/db";
 import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
 import {
-  DeviceType,
   EmailCampaignStage,
   EngagementTypes,
   isStatusTransitionAllowed,
@@ -33,6 +32,7 @@ import {
 import type { LeadsT } from "next-vibe/identity/lead/i18n";
 import { scopedTranslation } from "next-vibe/identity/lead/i18n";
 import { LeadsRepository } from "next-vibe/identity/lead/repository";
+import { parseLeadUserAgent } from "next-vibe/identity/lead/user-agent";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { NextRequest } from "next-vibe/ui/lib/request";
@@ -90,85 +90,6 @@ export class LeadTrackingRepository {
     }
     const value = meta[key];
     return typeof value === "number" ? value : 0;
-  }
-
-  /**
-   * Parse basic device type, browser and OS from user agent string
-   */
-  private static parseUserAgent(userAgent: string): {
-    deviceType: (typeof DeviceType)[keyof typeof DeviceType];
-    browser: string;
-    os: string;
-  } {
-    const ua = userAgent.toLowerCase();
-
-    // Device type detection
-    let deviceType: (typeof DeviceType)[keyof typeof DeviceType] =
-      DeviceType.UNKNOWN;
-    if (
-      ua.includes("bot") ||
-      ua.includes("crawler") ||
-      ua.includes("spider") ||
-      ua.includes("googlebot") ||
-      ua.includes("bingbot") ||
-      ua.includes("slurp") ||
-      ua.includes("duckduckbot") ||
-      ua.includes("baidu") ||
-      ua.includes("yandex")
-    ) {
-      deviceType = DeviceType.BOT;
-    } else if (ua.includes("tablet") || ua.includes("ipad")) {
-      deviceType = DeviceType.TABLET;
-    } else if (
-      ua.includes("mobile") ||
-      ua.includes("android") ||
-      ua.includes("iphone") ||
-      ua.includes("ipod") ||
-      ua.includes("blackberry") ||
-      ua.includes("windows phone")
-    ) {
-      deviceType = DeviceType.MOBILE;
-    } else if (ua.length > 0) {
-      deviceType = DeviceType.DESKTOP;
-    }
-
-    // Browser detection
-    let browser = "Unknown";
-    if (ua.includes("firefox")) {
-      browser = "Firefox";
-    } else if (ua.includes("edg/")) {
-      browser = "Edge";
-    } else if (ua.includes("opr/") || ua.includes("opera")) {
-      browser = "Opera";
-    } else if (ua.includes("chrome") && !ua.includes("chromium")) {
-      browser = "Chrome";
-    } else if (ua.includes("safari") && !ua.includes("chrome")) {
-      browser = "Safari";
-    } else if (ua.includes("msie") || ua.includes("trident/")) {
-      browser = "Internet Explorer";
-    }
-
-    // OS detection
-    let os = "Unknown";
-    if (ua.includes("windows nt")) {
-      os = "Windows";
-    } else if (ua.includes("mac os x") || ua.includes("macos")) {
-      os = "macOS";
-    } else if (ua.includes("android")) {
-      os = "Android";
-    } else if (
-      ua.includes("ios") ||
-      ua.includes("iphone") ||
-      ua.includes("ipad")
-    ) {
-      os = "iOS";
-    } else if (ua.includes("linux")) {
-      os = "Linux";
-    } else if (ua.includes("cros")) {
-      os = "ChromeOS";
-    }
-
-    return { deviceType, browser, os };
   }
 
   /**
@@ -444,9 +365,7 @@ export class LeadTrackingRepository {
       const country = getCountryFromLocale(locale);
       const language = getLanguageFromLocale(locale);
 
-      const parsedDevice = LeadTrackingRepository.parseUserAgent(
-        clientInfo.userAgent,
-      );
+      const parsedDevice = parseLeadUserAgent(clientInfo.userAgent);
 
       const newLead = {
         email: `anonymous-${crypto.randomUUID()}@tracking.local`,

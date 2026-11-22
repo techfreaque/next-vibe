@@ -19,7 +19,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { cortexNodes } from "../db";
 import type { CortexCreditFeatureValue } from "../enum";
-import { CortexCreditFeature } from "../enum";
+import { CORTEX_CREDIT_FEATURE, CortexCreditFeature } from "../enum";
 import {
   computeEmbeddingHash,
   embeddingCreditsForCost,
@@ -163,15 +163,13 @@ async function deductEmbeddingCredits(
     const { scopedTranslation: creditsScopedTranslation } =
       await import("@/credits/i18n");
     const { t: tCredits } = creditsScopedTranslation.scopedT(options.locale!);
-    const { scopedTranslation: cortexScopedTranslation } =
-      await import("../i18n");
-    const { t: tCortex } = cortexScopedTranslation.scopedT(options.locale!);
     const featureKey = options.feature ?? CortexCreditFeature.EMBEDDING;
 
+    // Ledger stores a stable feature id; it is translated when shown.
     await CreditRepository.deductCreditsForFeature(
       options.user!,
       embeddingCreditsForCost(costUsd),
-      tCortex(featureKey),
+      CORTEX_CREDIT_FEATURE[featureKey],
       options.logger!,
       tCredits,
       options.locale!,

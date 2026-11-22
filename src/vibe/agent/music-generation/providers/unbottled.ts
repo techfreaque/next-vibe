@@ -24,7 +24,8 @@ export async function generateMusicWithUnbottled(params: {
   user: JwtPayloadType;
   logger: EndpointLogger;
   locale: CountryLanguage;
-  featureLabel: string;
+  /** Ledger feature id (endpoint alias), translated when shown. */
+  creditFeature: string;
   toolExecutionContext: ToolExecutionContext;
   platform: Platform;
 }): Promise<
@@ -39,7 +40,7 @@ export async function generateMusicWithUnbottled(params: {
     user,
     logger,
     locale,
-    featureLabel,
+    creditFeature,
     toolExecutionContext,
     platform,
   } = params;
@@ -77,7 +78,7 @@ export async function generateMusicWithUnbottled(params: {
   const deductResult = await deductMediaCredits(
     user,
     creditCost,
-    featureLabel,
+    creditFeature,
     locale,
     logger,
     balanceCheck.data.tCredits,

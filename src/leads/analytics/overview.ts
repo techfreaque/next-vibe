@@ -48,11 +48,14 @@ import { scopedTranslation } from "./i18n";
 
 export interface AcquisitionOverview {
   kpis: {
-    /** Human visits (lead not classified as bot). */
+    /** Human visits (lead has a browser user agent). */
     visits: Kpi;
     botVisits: Kpi;
+    /** Visits of leads with no recorded user agent (neither human nor bot). */
+    unknownVisits: Kpi;
     humanLeads: Kpi;
     botLeads: Kpi;
+    unknownLeads: Kpi;
     signups: Kpi;
     firstChats: Kpi;
     payers: Kpi;
@@ -146,7 +149,14 @@ export async function getAcquisitionOverview(
       ),
       computeSignupsByChannel(win),
       paymentsByChannel(win),
-      computeFlaggedSummary(win, {}, AbuseGroupBy.IP_PREFIX, DEFAULT_MIN_LEADS),
+      // Crawler ranges (Meta, Bing, ...) are counted as bots above; the
+      // abuse alert is about bursts that are not known bots.
+      computeFlaggedSummary(
+        win,
+        { traffic: TrafficFilter.NOT_BOTS },
+        AbuseGroupBy.IP_PREFIX,
+        DEFAULT_MIN_LEADS,
+      ),
     ]);
     const humanLeads = new Map(
       sources.map((row) => [
@@ -164,8 +174,10 @@ export async function getAcquisitionOverview(
       kpis: {
         visits: core.kpis.humanVisits,
         botVisits: core.kpis.botVisits,
+        unknownVisits: core.kpis.unknownVisits,
         humanLeads: core.kpis.humanLeads,
         botLeads: core.kpis.botLeads,
+        unknownLeads: core.kpis.unknownLeads,
         signups: core.kpis.signups,
         firstChats: core.kpis.firstChats,
         payers: core.kpis.payers,

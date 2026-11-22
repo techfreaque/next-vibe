@@ -103,6 +103,14 @@ export const translations: typeof enTranslations = {
       userSubscription: "Benutzer-Abonnement-Credits",
       leadFree: "Lead-Gratis-Credits",
     },
+    creditFeature: {
+      textToSpeech: "Text-zu-Sprache",
+      speechToText: "Sprache-zu-Text",
+      memoryWrite: "Gedächtnis schreiben",
+      memoryEdit: "Gedächtnis bearbeiten",
+      memorySearch: "Gedächtnis durchsuchen",
+      memoryEmbedding: "Gedächtnis-Einbettung",
+    },
     transactionType: {
       purchase: "Kauf",
       subscription: "Abonnement",

@@ -21,6 +21,7 @@ import {
   collectServerDefaults,
   generateRoleFilteredRequestSchema,
 } from "../../unified-ui/_shared/utils";
+import { getPreferredToolName } from "../core-utils/path";
 import { DEFAULT_ENDPOINT_TIMEOUT_MS } from "../definition/create";
 import type { CreateApiEndpointAny } from "../definition/endpoint-base";
 import type { CountryLanguage } from "../i18n/core/config";
@@ -422,10 +423,12 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
         };
       }
 
+      // Ledger stores the endpoint's stable tool name; reports translate it
+      // into the viewer's locale when shown (credits/feature-label.ts).
       const deductResult = await CreditRepository.deductCreditsForFeature(
         user,
         endpoint.credits,
-        t(endpoint.title),
+        getPreferredToolName(endpoint),
         logger,
         tCredits,
         locale,

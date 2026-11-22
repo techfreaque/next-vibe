@@ -102,6 +102,14 @@ export const translations: typeof enTranslations = {
       userSubscription: "Kredyty subskrypcji użytkownika",
       leadFree: "Darmowe kredyty leada",
     },
+    creditFeature: {
+      textToSpeech: "Tekst na mowę",
+      speechToText: "Mowa na tekst",
+      memoryWrite: "Zapis w pamięci",
+      memoryEdit: "Edycja pamięci",
+      memorySearch: "Wyszukiwanie w pamięci",
+      memoryEmbedding: "Osadzanie pamięci",
+    },
     transactionType: {
       purchase: "Zakup",
       subscription: "Subskrypcja",

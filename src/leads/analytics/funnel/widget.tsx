@@ -45,17 +45,17 @@ import type definition from "./definition";
 
 const STEP_DRILL: Record<string, LeadDrillFilters> = {
   leads: {},
-  humans: { traffic: TrafficFilter.HUMANS },
+  humans: { traffic: TrafficFilter.NOT_BOTS },
   firstChats: {
-    traffic: TrafficFilter.HUMANS,
+    traffic: TrafficFilter.NOT_BOTS,
     reached: FunnelReach.FIRST_CHAT,
   },
-  signups: { traffic: TrafficFilter.HUMANS, reached: FunnelReach.SIGNED_UP },
+  signups: { traffic: TrafficFilter.NOT_BOTS, reached: FunnelReach.SIGNED_UP },
   emailConfirmed: {
-    traffic: TrafficFilter.HUMANS,
+    traffic: TrafficFilter.NOT_BOTS,
     reached: FunnelReach.EMAIL_CONFIRMED,
   },
-  payers: { traffic: TrafficFilter.HUMANS, reached: FunnelReach.PAID },
+  payers: { traffic: TrafficFilter.NOT_BOTS, reached: FunnelReach.PAID },
 };
 
 function ratio(numerator: number, denominator: number): number {
@@ -162,7 +162,7 @@ export function FunnelReportWidget(): JSX.Element {
 
   const stepLabel: Record<string, string> = {
     leads: st("leadAnalytics.metrics.leads"),
-    humans: st("leadAnalytics.metrics.humanLeads"),
+    humans: st("leadAnalytics.metrics.notBotLeads"),
     firstChats: st("leadAnalytics.metrics.firstChats"),
     signups: st("leadAnalytics.metrics.signups"),
     emailConfirmed: st("leadAnalytics.metrics.emailConfirmed"),
@@ -385,7 +385,11 @@ function SignupStepsSection({
   return (
     <SectionGroup
       title={t("widget.signupTitle")}
-      subtitle={t("widget.signupSubtitle")}
+      subtitle={
+        value.signupTrackedSince && value.signupTrackedSince > value.window.from
+          ? t("widget.signupTrackedHint", { date: value.signupTrackedSince })
+          : t("widget.signupSubtitle")
+      }
     >
       <KpiGrid columns={4}>
         <KpiTile

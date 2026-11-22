@@ -30,6 +30,7 @@ async function report(
     parsed.data,
     logger,
     t,
+    defaultLocale,
   );
   if (!res.success) {
     return expect.unreachable(res.message);

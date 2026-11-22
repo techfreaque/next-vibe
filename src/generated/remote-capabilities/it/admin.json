@@ -362,6 +362,42 @@
                             },
                             "type": "optional"
                           },
+                          "unknownVisits": {
+                            "def": {
+                              "type": "optional",
+                              "innerType": {
+                                "def": {
+                                  "type": "object",
+                                  "shape": {
+                                    "value": {
+                                      "def": {
+                                        "type": "number",
+                                        "checks": []
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    },
+                                    "previous": {
+                                      "def": {
+                                        "type": "nullable",
+                                        "innerType": {
+                                          "def": {
+                                            "type": "number",
+                                            "checks": []
+                                          },
+                                          "type": "number",
+                                          "isFinite": true
+                                        }
+                                      },
+                                      "type": "nullable"
+                                    }
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "type": "optional"
+                          },
                           "humanLeads": {
                             "def": {
                               "type": "object",
@@ -421,6 +457,42 @@
                               }
                             },
                             "type": "object"
+                          },
+                          "unknownLeads": {
+                            "def": {
+                              "type": "optional",
+                              "innerType": {
+                                "def": {
+                                  "type": "object",
+                                  "shape": {
+                                    "value": {
+                                      "def": {
+                                        "type": "number",
+                                        "checks": []
+                                      },
+                                      "type": "number",
+                                      "isFinite": true
+                                    },
+                                    "previous": {
+                                      "def": {
+                                        "type": "nullable",
+                                        "innerType": {
+                                          "def": {
+                                            "type": "number",
+                                            "checks": []
+                                          },
+                                          "type": "number",
+                                          "isFinite": true
+                                        }
+                                      },
+                                      "type": "nullable"
+                                    }
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "type": "optional"
                           },
                           "signups": {
                             "def": {
@@ -1557,6 +1629,24 @@
                         }
                       },
                       "type": "object"
+                    },
+                    "errorOccurrencesSince": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "nullable",
+                            "innerType": {
+                              "def": {
+                                "type": "string"
+                              },
+                              "type": "string"
+                            }
+                          },
+                          "type": "nullable"
+                        }
+                      },
+                      "type": "optional"
                     },
                     "failingTasks": {
                       "def": {
@@ -63439,6 +63529,44 @@
           },
           "schemaType": "primitive"
         },
+        "featureLabels": {
+          "type": "text",
+          "label": "Nomi delle funzioni",
+          "schema": {
+            "def": {
+              "type": "record",
+              "keyType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              },
+              "valueType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "record",
+            "keyType": {
+              "def": {
+                "type": "string"
+              },
+              "type": "string"
+            },
+            "valueType": {
+              "def": {
+                "type": "string"
+              },
+              "type": "string"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "topSpenders": {
           "type": "text",
           "label": "Maggiori consumatori",
@@ -113401,7 +113529,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Traffico",
-          "description": "Persone, bot o entrambi (riconosciuti dallo user agent)",
+          "description": "Persone, bot o sconosciuto (riconosciuti dallo user agent)",
           "options": [
             {
               "value": "leadAnalytics.traffic.all",
@@ -113414,35 +113542,50 @@
             {
               "value": "leadAnalytics.traffic.bots",
               "label": "leadAnalytics.traffic.bots"
+            },
+            {
+              "value": "leadAnalytics.traffic.unknown",
+              "label": "leadAnalytics.traffic.unknown"
+            },
+            {
+              "value": "leadAnalytics.traffic.notBots",
+              "label": "leadAnalytics.traffic.notBots"
             }
           ],
           "columns": 3,
           "schema": {
             "def": {
-              "type": "optional",
+              "type": "default",
               "innerType": {
                 "def": {
                   "type": "enum",
                   "entries": {
                     "ALL": "leadAnalytics.traffic.all",
                     "HUMANS": "leadAnalytics.traffic.humans",
-                    "BOTS": "leadAnalytics.traffic.bots"
+                    "BOTS": "leadAnalytics.traffic.bots",
+                    "UNKNOWN": "leadAnalytics.traffic.unknown",
+                    "NOT_BOTS": "leadAnalytics.traffic.notBots"
                   }
                 },
                 "type": "enum",
                 "enum": {
                   "ALL": "leadAnalytics.traffic.all",
                   "HUMANS": "leadAnalytics.traffic.humans",
-                  "BOTS": "leadAnalytics.traffic.bots"
+                  "BOTS": "leadAnalytics.traffic.bots",
+                  "UNKNOWN": "leadAnalytics.traffic.unknown",
+                  "NOT_BOTS": "leadAnalytics.traffic.notBots"
                 },
                 "options": [
                   "leadAnalytics.traffic.all",
                   "leadAnalytics.traffic.humans",
-                  "leadAnalytics.traffic.bots"
+                  "leadAnalytics.traffic.bots",
+                  "leadAnalytics.traffic.unknown",
+                  "leadAnalytics.traffic.notBots"
                 ]
-              }
+              },
+              "defaultValue": "leadAnalytics.traffic.notBots"
             },
-            "type": "optional"
+            "type": "default"
           },
           "usage": {
             "request": "data"
@@ -115134,7 +115277,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Traffico",
-          "description": "Persone, bot o entrambi (riconosciuti dallo user agent)",
+          "description": "Persone, bot o sconosciuto (riconosciuti dallo user agent)",
           "options": [
             {
               "value": "leadAnalytics.traffic.all",
@@ -115147,6 +115290,14 @@
             {
               "value": "leadAnalytics.traffic.bots",
               "label": "leadAnalytics.traffic.bots"
+            },
+            {
+              "value": "leadAnalytics.traffic.unknown",
+              "label": "leadAnalytics.traffic.unknown"
+            },
+            {
+              "value": "leadAnalytics.traffic.notBots",
+              "label": "leadAnalytics.traffic.notBots"
             }
           ],
           "columns": 3,
@@ -115159,19 +115310,25 @@
                   "entries": {
                     "ALL": "leadAnalytics.traffic.all",
                     "HUMANS": "leadAnalytics.traffic.humans",
-                    "BOTS": "leadAnalytics.traffic.bots"
+                    "BOTS": "leadAnalytics.traffic.bots",
+                    "UNKNOWN": "leadAnalytics.traffic.unknown",
+                    "NOT_BOTS": "leadAnalytics.traffic.notBots"
                   }
                 },
                 "type": "enum",
                 "enum": {
                   "ALL": "leadAnalytics.traffic.all",
                   "HUMANS": "leadAnalytics.traffic.humans",
-                  "BOTS": "leadAnalytics.traffic.bots"
+                  "BOTS": "leadAnalytics.traffic.bots",
+                  "UNKNOWN": "leadAnalytics.traffic.unknown",
+                  "NOT_BOTS": "leadAnalytics.traffic.notBots"
                 },
                 "options": [
                   "leadAnalytics.traffic.all",
                   "leadAnalytics.traffic.humans",
-                  "leadAnalytics.traffic.bots"
+                  "leadAnalytics.traffic.bots",
+                  "leadAnalytics.traffic.unknown",
+                  "leadAnalytics.traffic.notBots"
                 ]
               }
             },
@@ -116105,6 +116262,36 @@
                   },
                   "type": "object"
                 },
+                "unknownVisits": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "value": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "previous": {
+                        "def": {
+                          "type": "nullable",
+                          "innerType": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        },
+                        "type": "nullable"
+                      }
+                    }
+                  },
+                  "type": "object"
+                },
                 "visitors": {
                   "def": {
                     "type": "object",
@@ -116166,6 +116353,36 @@
                   "type": "object"
                 },
                 "botLeads": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "value": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      },
+                      "previous": {
+                        "def": {
+                          "type": "nullable",
+                          "innerType": {
+                            "def": {
+                              "type": "number",
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        },
+                        "type": "nullable"
+                      }
+                    }
+                  },
+                  "type": "object"
+                },
+                "unknownLeads": {
                   "def": {
                     "type": "object",
                     "shape": {
@@ -116906,7 +117123,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Traffico",
-          "description": "Persone, bot o entrambi (riconosciuti dallo user agent)",
+          "description": "Persone, bot o sconosciuto (riconosciuti dallo user agent)",
           "options": [
             {
               "value": "leadAnalytics.traffic.all",
@@ -116919,6 +117136,14 @@
             {
               "value": "leadAnalytics.traffic.bots",
               "label": "leadAnalytics.traffic.bots"
+            },
+            {
+              "value": "leadAnalytics.traffic.unknown",
+              "label": "leadAnalytics.traffic.unknown"
+            },
+            {
+              "value": "leadAnalytics.traffic.notBots",
+              "label": "leadAnalytics.traffic.notBots"
             }
           ],
           "columns": 3,
@@ -116931,19 +117156,25 @@
                   "entries": {
                     "ALL": "leadAnalytics.traffic.all",
                     "HUMANS": "leadAnalytics.traffic.humans",
-                    "BOTS": "leadAnalytics.traffic.bots"
+                    "BOTS": "leadAnalytics.traffic.bots",
+                    "UNKNOWN": "leadAnalytics.traffic.unknown",
+                    "NOT_BOTS": "leadAnalytics.traffic.notBots"
                   }
                 },
                 "type": "enum",
                 "enum": {
                   "ALL": "leadAnalytics.traffic.all",
                   "HUMANS": "leadAnalytics.traffic.humans",
-                  "BOTS": "leadAnalytics.traffic.bots"
+                  "BOTS": "leadAnalytics.traffic.bots",
+                  "UNKNOWN": "leadAnalytics.traffic.unknown",
+                  "NOT_BOTS": "leadAnalytics.traffic.notBots"
                 },
                 "options": [
                   "leadAnalytics.traffic.all",
                   "leadAnalytics.traffic.humans",
-                  "leadAnalytics.traffic.bots"
+                  "leadAnalytics.traffic.bots",
+                  "leadAnalytics.traffic.unknown",
+                  "leadAnalytics.traffic.notBots"
                 ]
               }
             },
@@ -118416,6 +118647,26 @@
               },
               "type": "object"
             }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "signupTrackedSince": {
+          "type": "text",
+          "label": "Passaggi di iscrizione tracciati dal",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
           },
           "usage": {
             "response": true
@@ -165092,7 +165343,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Traffico",
-          "description": "Persone, bot o entrambi (riconosciuti dallo user agent)",
+          "description": "Persone, bot o sconosciuto (riconosciuti dallo user agent)",
           "options": [
             {
               "value": "leadAnalytics.traffic.all",
@@ -165105,6 +165356,14 @@
             {
               "value": "leadAnalytics.traffic.bots",
               "label": "leadAnalytics.traffic.bots"
+            },
+            {
+              "value": "leadAnalytics.traffic.unknown",
+              "label": "leadAnalytics.traffic.unknown"
+            },
+            {
+              "value": "leadAnalytics.traffic.notBots",
+              "label": "leadAnalytics.traffic.notBots"
             }
           ],
           "columns": 3,
@@ -165117,19 +165376,25 @@
                   "entries": {
                     "ALL": "leadAnalytics.traffic.all",
                     "HUMANS": "leadAnalytics.traffic.humans",
-                    "BOTS": "leadAnalytics.traffic.bots"
+                    "BOTS": "leadAnalytics.traffic.bots",
+                    "UNKNOWN": "leadAnalytics.traffic.unknown",
+                    "NOT_BOTS": "leadAnalytics.traffic.notBots"
                   }
                 },
                 "type": "enum",
                 "enum": {
                   "ALL": "leadAnalytics.traffic.all",
                   "HUMANS": "leadAnalytics.traffic.humans",
-                  "BOTS": "leadAnalytics.traffic.bots"
+                  "BOTS": "leadAnalytics.traffic.bots",
+                  "UNKNOWN": "leadAnalytics.traffic.unknown",
+                  "NOT_BOTS": "leadAnalytics.traffic.notBots"
                 },
                 "options": [
                   "leadAnalytics.traffic.all",
                   "leadAnalytics.traffic.humans",
-                  "leadAnalytics.traffic.bots"
+                  "leadAnalytics.traffic.bots",
+                  "leadAnalytics.traffic.unknown",
+                  "leadAnalytics.traffic.notBots"
                 ]
               }
             },

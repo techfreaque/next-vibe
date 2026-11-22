@@ -15,6 +15,7 @@ import {
   IP_LINK_EXEMPT_METADATA_KEY,
   ipPoolKey,
 } from "./ip-key";
+import { parseLeadUserAgent } from "./user-agent";
 
 interface ClientInfo {
   userAgent?: string;
@@ -81,6 +82,11 @@ export async function createAnonymousLead(
   }
 
   const { language, country } = getLanguageAndCountryFromLocale(locale);
+  // Typed identity columns (lead analytics, list, detail) plus the metadata
+  // copy the duplicate check above and older readers use.
+  const parsed = clientInfo.userAgent
+    ? parseLeadUserAgent(clientInfo.userAgent)
+    : null;
 
   const [newLead] = await db
     .insert(leads)
@@ -93,6 +99,11 @@ export async function createAnonymousLead(
       country,
       language,
       geoCountry: clientInfo.geoCountry ?? null,
+      ipAddress: clientInfo.ipAddress ?? null,
+      userAgent: clientInfo.userAgent ?? null,
+      deviceType: parsed?.deviceType ?? null,
+      browser: parsed?.browser ?? null,
+      os: parsed?.os ?? null,
       source: LeadSource.WEBSITE,
       status: LeadStatus.WEBSITE_USER,
       notes: null,

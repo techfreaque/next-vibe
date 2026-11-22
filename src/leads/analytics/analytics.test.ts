@@ -38,7 +38,7 @@ beforeAll(async () => {
       id uuid PRIMARY KEY, created_at timestamp, country text, email text, business_name text,
       device_type text, browser text, os text, ip_address text, user_agent text,
       referral_code text, converted_user_id uuid, signed_up_at timestamp,
-      geo_country text
+      geo_country text, metadata jsonb NOT NULL DEFAULT '{}'::jsonb
     );
     CREATE TABLE users (id uuid PRIMARY KEY, created_at timestamp, email_verified boolean);
     CREATE TABLE growth_journeys (
@@ -54,6 +54,8 @@ beforeAll(async () => {
     CREATE TABLE credit_transactions (wallet_id uuid, type text, metadata jsonb, created_at timestamp);
     CREATE TABLE user_lead_links (lead_id uuid, user_id uuid);
     CREATE TABLE user_roles (user_id uuid, role text);
+    CREATE TABLE signup_events (lead_id uuid, pending_id uuid, type text, occurred_at timestamp, dedupe_key text);
+    CREATE TABLE pending_signups (id uuid PRIMARY KEY, lead_id uuid, expires_at timestamp);
   `);
   const day = "2026-11-19 10:00:00";
   // 1: human via google, signed up + verified + paid
@@ -102,7 +104,9 @@ test("acquisition core counts humans, bots and funnel events in the window", asy
   const { computeAcquisitionCore } = await import("./acquisition/repository");
   const core = await computeAcquisitionCore(win, {});
   expect(core.kpis.humanLeads.value).toBe(2);
-  expect(core.kpis.botLeads.value).toBe(14);
+  // 12 scripts + Meta; the lead without a user agent is unknown, not a bot.
+  expect(core.kpis.botLeads.value).toBe(13);
+  expect(core.kpis.unknownLeads.value).toBe(1);
   expect(core.kpis.botLeads.previous).toBe(1);
   expect(core.kpis.visits.value).toBe(3);
   expect(core.kpis.visitors.value).toBe(2);
@@ -247,7 +251,17 @@ test("list drill-down ids match the report filters", async () => {
     await run(
       matchingLeadIdsSql({ createdFrom: "2026-11-15", createdTo: "2026-11-21", traffic: TrafficFilter.BOTS }),
     ),
-  ).toBe(14);
+  ).toBe(13);
+  expect(
+    await run(
+      matchingLeadIdsSql({ createdFrom: "2026-11-15", createdTo: "2026-11-21", traffic: TrafficFilter.UNKNOWN }),
+    ),
+  ).toBe(1);
+  expect(
+    await run(
+      matchingLeadIdsSql({ createdFrom: "2026-11-15", createdTo: "2026-11-21", traffic: TrafficFilter.NOT_BOTS }),
+    ),
+  ).toBe(3);
   expect(await run(matchingLeadIdsSql({ ipPrefix: "203.0.113.0/24" }))).toBe(12);
   expect(await run(matchingLeadIdsSql({ ipPrefix: "2001:db8:42::/48" }))).toBe(1);
   expect(
@@ -311,4 +325,134 @@ test("overview topSources reconcile with the overview totals", async () => {
   expect(total("signups")).toBe(core.kpis.signups.value);
   expect(total("payers")).toBe(1);
   expect(total("revenueUsd")).toBe(8);
+});
+
+/**
+ * Production shape (2026-11-22): the lead-id middleware stored the user agent
+ * and IP only in leads.metadata, the typed columns stayed NULL on every row.
+ * Window Oct 1-7 (previous Sep 24-30) keeps these rows out of the tests above.
+ */
+const octWin = resolveAnalyticsWindow(
+  { range: AnalyticsRange.CUSTOM, from: "2026-10-01", to: "2026-10-07" },
+  now,
+);
+
+async function seedProductionShape(): Promise<void> {
+  const chrome =
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/158.0.0.0 Safari/537.36";
+  const meta = "meta-externalagent/1.1 (+https://developers.facebook.com/docs/sharing/webmasters/crawler)";
+  const lead = (n: number, at: string, ua: string | null, ip: string): string =>
+    `('${id(n)}', '${at}', 'US', '', '${JSON.stringify({ anonymous: true, userAgent: ua, ipAddress: ip })}'::jsonb)`;
+  await pg.exec(`
+    INSERT INTO leads (id, created_at, country, business_name, metadata) VALUES
+      ${lead(101, "2026-10-02 10:00:00", chrome, "198.51.100.7")},
+      ${lead(102, "2026-10-02 11:00:00", chrome, "198.51.100.8")},
+      ${lead(103, "2026-10-03 09:00:00", chrome, "198.51.100.9")},
+      ${lead(104, "2026-10-03 09:30:00", chrome, "198.51.100.10")},
+      ${lead(105, "2026-10-03 10:00:00", meta, "57.141.20.5")},
+      ${lead(106, "2026-10-03 10:01:00", meta, "57.141.20.6")},
+      ${lead(107, "2026-10-04 08:00:00", null, "192.0.2.1")},
+      ${lead(108, "2026-10-05 08:00:00", chrome, "198.51.100.11")},
+      ${lead(111, "2026-09-25 10:00:00", chrome, "198.51.100.20")},
+      ${lead(112, "2026-09-25 10:00:00", meta, "57.141.20.7")},
+      ${lead(113, "2026-09-26 10:00:00", meta, "57.141.20.8")};
+    -- 904: one person on three devices (three leads), signed up and paid.
+    INSERT INTO users VALUES ('${id(904)}', '2026-10-02 10:05:00', true);
+    UPDATE leads SET converted_user_id = '${id(904)}' WHERE id IN ('${id(101)}', '${id(102)}', '${id(103)}');
+    INSERT INTO payment_transactions (user_id, amount, currency, status, created_at)
+      VALUES ('${id(904)}', 20, 'USD', '${PaymentStatus.SUCCEEDED}', '2026-10-02 12:00:00');
+    -- 903: account from August that only logged in on a new device in October.
+    -- Attaching it to that journey stamps signed_up_at, which is not a signup.
+    INSERT INTO users VALUES ('${id(903)}', '2026-08-01 10:00:00', true);
+    INSERT INTO growth_journeys (lead_id, user_id, first_channel, first_channel_type, first_touch_at, signed_up_at)
+      VALUES ('${id(104)}', '${id(903)}', 'direct', 'enums.channelType.direct', '2026-10-03 09:30:00', '2026-10-03 09:31:00');
+    -- 905: account with no lead at all (confirmation opened elsewhere).
+    INSERT INTO users VALUES ('${id(905)}', '2026-10-04 12:00:00', false);
+    -- Signup steps: backfill rows (failures only) before live tracking began
+    -- on Oct 3, then one live signup that confirmed.
+    INSERT INTO pending_signups VALUES ('${id(701)}', '${id(108)}', '2026-10-05 09:00:00');
+    INSERT INTO signup_events VALUES
+      ('${id(107)}', '${id(702)}', 'events.started', '2026-10-01 08:00:00', 'backfill-started:${id(702)}'),
+      ('${id(107)}', '${id(702)}', 'events.expired', '2026-10-01 09:00:00', 'expired:${id(702)}:1'),
+      ('${id(108)}', '${id(703)}', 'events.started', '2026-10-05 08:01:00', NULL),
+      ('${id(108)}', '${id(703)}', 'events.emailSent', '2026-10-05 08:01:01', NULL),
+      ('${id(108)}', '${id(703)}', 'events.confirmed', '2026-10-05 08:03:00', 'confirmed:${id(703)}');
+  `);
+}
+
+test("metadata-only user agents: humans, bots and unknown with previous period", async () => {
+  await seedProductionShape();
+  const { computeAcquisitionCore, computeAcquisitionBreakdown } = await import(
+    "./acquisition/repository"
+  );
+  const core = await computeAcquisitionCore(octWin, {});
+  expect(core.kpis.humanLeads.value).toBe(5);
+  expect(core.kpis.botLeads.value).toBe(2);
+  expect(core.kpis.unknownLeads.value).toBe(1);
+  expect(core.kpis.humanLeads.previous).toBe(1);
+  expect(core.kpis.botLeads.previous).toBe(2);
+  expect(core.kpis.unknownLeads.previous).toBe(0);
+  // Account creation is the signup: 904 and the lead-less 905, not 903.
+  expect(core.kpis.signups.value).toBe(2);
+  expect(core.kpis.signups.previous).toBe(0);
+  expect(core.kpis.payers.value).toBe(1);
+
+  const agents = await computeAcquisitionBreakdown(
+    octWin,
+    {},
+    LeadDimension.BOT_FAMILY,
+  );
+  const byKey = new Map(agents.map((row) => [row.key, row.metrics.leads]));
+  expect(byKey.get(BotFamily.HUMAN)).toBe(5);
+  expect(byKey.get(BotFamily.META)).toBe(2);
+  expect(byKey.get(BotFamily.NO_UA)).toBe(1);
+
+  const devices = await computeAcquisitionBreakdown(
+    octWin,
+    {},
+    LeadDimension.DEVICE,
+  );
+  const deviceKeys = new Map(devices.map((row) => [row.key, row.metrics.leads]));
+  expect(deviceKeys.get("leadAnalytics.device.desktop")).toBe(5);
+  expect(deviceKeys.get("leadAnalytics.device.bot")).toBe(2);
+
+  const { matchingLeadIdsSql } = await import("./segment-sql");
+  const { db } = await import("next-vibe/database");
+  const prefix = matchingLeadIdsSql({ ipPrefix: "57.141.20.0/24" });
+  expect(prefix ? (await db.execute(prefix)).rows.length : -1).toBe(4);
+});
+
+test("funnel counts people once and tracked signup steps only", async () => {
+  const { FunnelReportRepository } = await import("./funnel/repository");
+  const { default: definition } = await import("./funnel/definition");
+  const logger = createEndpointLogger(false, defaultLocale);
+  const { t } = definition.GET.scopedTranslation.scopedT(defaultLocale);
+  const result = await FunnelReportRepository.getReport(
+    definition.GET.requestSchema.parse({
+      range: AnalyticsRange.CUSTOM,
+      from: "2026-10-01",
+      to: "2026-10-07",
+    }),
+    t,
+    logger,
+  );
+  expect(result.success).toBe(true);
+  if (!result.success) {
+    return;
+  }
+  const step = (key: string): number | undefined =>
+    result.data.steps.find((entry) => entry.key === key)?.value;
+  expect(step("leads")).toBe(8);
+  expect(step("humans")).toBe(6);
+  // Three leads of one paying account: one signup, one payer. The August
+  // account logging in on a new device is not a conversion.
+  expect(step("signups")).toBe(1);
+  expect(step("payers")).toBe(1);
+  const signup = (key: string): number | undefined =>
+    result.data.signupSteps.find((entry) => entry.key === key)?.value;
+  expect(signup("started")).toBe(1);
+  expect(signup("confirmed")).toBe(1);
+  expect(signup("expired")).toBe(0);
+  expect(result.data.signupTrackedSince).toBe("2026-10-05");
+  expect(result.data.previousSignupSteps).toBeNull();
 });

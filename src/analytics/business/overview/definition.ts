@@ -39,8 +39,10 @@ export const acquisitionSectionSchema = z.object({
   kpis: z.object({
     visits: kpiSchema,
     botVisits: kpiSchema.optional(),
+    unknownVisits: kpiSchema.optional(),
     humanLeads: kpiSchema,
     botLeads: kpiSchema,
+    unknownLeads: kpiSchema.optional(),
     signups: kpiSchema,
     firstChats: kpiSchema,
     payers: kpiSchema,
@@ -87,6 +89,7 @@ export const moneySectionSchema = z.object({
 export const opsSectionSchema = z.object({
   unresolvedErrors: z.number(),
   errorOccurrences: kpiSchema,
+  errorOccurrencesSince: z.string().nullable().optional(),
   failingTasks: z.number(),
   unhealthyConnections: z.number(),
 });
@@ -216,8 +219,10 @@ const { GET } = createEndpoint({
           kpis: {
             visits: { value: 4210, previous: 3180 },
             botVisits: { value: 9800, previous: 450 },
+            unknownVisits: { value: 3, previous: 5 },
             humanLeads: { value: 1320, previous: 1105 },
             botLeads: { value: 2890, previous: 140 },
+            unknownLeads: { value: 12, previous: 30 },
             signups: { value: 96, previous: 81 },
             firstChats: { value: 870, previous: 702 },
             payers: { value: 7, previous: 5 },
@@ -279,6 +284,7 @@ const { GET } = createEndpoint({
         ops: {
           unresolvedErrors: 4,
           errorOccurrences: { value: 37, previous: 52 },
+          errorOccurrencesSince: null,
           failingTasks: 1,
           unhealthyConnections: 0,
         },

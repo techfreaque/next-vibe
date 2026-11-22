@@ -37,6 +37,7 @@ import {
   keepsExplicitMediaModel,
   resolveMediaReference,
 } from "../shared/media-generation";
+import { MUSIC_GEN_ALIAS } from "./constants";
 import {
   type MusicGenerationPostRequestInput,
   type MusicGenerationPostRequestOutput,
@@ -271,7 +272,7 @@ export class MusicGenerationRepository {
           user,
           locale,
           logger,
-          featureLabel: t("post.title"),
+          creditFeature: MUSIC_GEN_ALIAS,
           toolExecutionContext,
           platform,
         });
@@ -364,7 +365,7 @@ export class MusicGenerationRepository {
       const deductResult = await deductMediaCredits(
         user,
         finalCreditCost,
-        t("post.title"),
+        MUSIC_GEN_ALIAS, // ledger id, translated when shown
         locale,
         logger,
         tCredits,

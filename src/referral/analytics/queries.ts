@@ -24,6 +24,20 @@ import { PaymentStatus } from "@/payment/enum";
 
 import { PayoutStatus, ReferralEarningStatus } from "../enum";
 
+/**
+ * Visits carrying a ref code, each attributed to ONE code: the exact-case
+ * match, else the oldest case-insensitive one. Codes can differ only by case
+ * (KRYSALID / krysalid), and a plain lower() join counted such a click once
+ * per code.
+ */
+const CLICKED_CODE = sql`growth_visits v
+  CROSS JOIN LATERAL (
+    SELECT rc.id AS code_id FROM referral_codes rc
+    WHERE lower(rc.code) = lower(v.ref_code)
+    ORDER BY (rc.code = v.ref_code) DESC, rc.created_at, rc.id
+    LIMIT 1
+  ) vc`;
+
 export interface ReferralScopeFilters {
   /** Matches code, label or owner email (case-insensitive substring). */
   search?: string;
@@ -183,7 +197,7 @@ export async function queryCodeMetrics(
     WITH scope AS (${scopeSql(filters)}),
     clicks AS (
       SELECT s.id AS code_id, count(*)::int AS n
-      FROM growth_visits v JOIN scope s ON lower(v.ref_code) = s.code_key
+      FROM ${CLICKED_CODE} JOIN scope s ON s.id = vc.code_id
       WHERE ${span(sql`v.visited_at`, range)}
       GROUP BY 1
     ),
@@ -276,7 +290,7 @@ export async function queryTotals(
   >(sql`
     WITH scope AS (${scopeSql(filters)})
     SELECT
-      (SELECT count(*)::int FROM growth_visits v JOIN scope s ON lower(v.ref_code) = s.code_key
+      (SELECT count(*)::int FROM ${CLICKED_CODE} JOIN scope s ON s.id = vc.code_id
         WHERE ${span(sql`v.visited_at`, range)}) AS clicks,
       (SELECT count(DISTINCT lr.lead_id)::int FROM lead_referrals lr JOIN scope s ON s.id = lr.referral_code_id
         WHERE ${span(sql`lr.created_at`, range)}) AS leads,
@@ -329,7 +343,7 @@ export async function querySeries(
   >(sql`
     WITH scope AS (${scopeSql(filters)})
     SELECT 'clicks' AS metric, ${bucketSql(sql`v.visited_at`, bucket)} AS bucket, count(*)::float8 AS value
-      FROM growth_visits v JOIN scope s ON lower(v.ref_code) = s.code_key
+      FROM ${CLICKED_CODE} JOIN scope s ON s.id = vc.code_id
       WHERE ${span(sql`v.visited_at`, range)} GROUP BY 2
     UNION ALL
     SELECT 'leads', ${bucketSql(sql`lr.created_at`, bucket)}, count(DISTINCT lr.lead_id)::float8

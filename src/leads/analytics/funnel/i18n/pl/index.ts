@@ -27,6 +27,7 @@ export const translations: typeof enTranslations = {
       signupSteps: "Kroki rejestracji w okresie",
       previousSignupSteps: "Kroki rejestracji w poprzednim okresie",
       signupSegments: "Kroki rejestracji według segmentu",
+      signupTrackedSince: "Kroki rejestracji śledzone od",
     },
     errors: {
       unauthorized: {
@@ -72,6 +73,8 @@ export const translations: typeof enTranslations = {
     signupTitle: "Potwierdzenie rejestracji",
     signupSubtitle:
       "Leady na krok, datowane momentem kroku. Spadek pokazuje, gdzie rejestracje odpadają.",
+    signupTrackedHint:
+      "Śledzone od {{date}}: z wcześniejszych rejestracji zapisane są tylko niepowodzenia.",
     started: "Rozpoczęte",
     emailSent: "E-mail wysłany",
     sendFailed: "Wysyłka nieudana",
@@ -89,18 +92,18 @@ export const translations: typeof enTranslations = {
     cohortHint: "z {{count}} utworzonych leadów",
     signupRate: "Wskaźnik rejestracji",
     payRate: "Wskaźnik płatności",
-    overallRate: "Od człowieka do płacącego",
+    overallRate: "Od leada do płacącego",
     overallShort: "Do płacącego",
-    ofHumans: "{{count}} z {{total}} leadów od ludzi",
+    ofHumans: "{{count}} z {{total}} leadów bez botów",
     ofSignups: "{{count}} z {{total}} rejestracji",
     funnelTitle: "Lejek kohorty",
     funnelSubtitle:
-      "Lejek od leadów od ludzi. Boty i wszystkie leady: pierwsza karta.",
+      "Lejek od leadów bez botów (przeglądarka lub brak user agenta). Boty i wszystkie leady: pierwsza karta.",
     trendTitle: "Kohorta według dnia utworzenia",
-    trendSubtitle: "Leady ludzi i ile z nich skonwertowało.",
+    trendSubtitle: "Leady bez botów i ile z nich skonwertowało.",
     segmentsTitle: "Lejek według segmentu",
     segmentsSubtitle:
-      "Wskaźniki na lead człowieka. Kliknij wiersz, aby zobaczyć leady.",
+      "Wskaźniki na lead bez botów. Kliknij wiersz, aby zobaczyć leady.",
     filtersTitle: "Segment",
     filtersSubtitle: "Zawęża każdą liczbę na tej stronie.",
     apply: "Zastosuj",

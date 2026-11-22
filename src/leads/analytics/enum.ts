@@ -9,7 +9,10 @@ import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
 import { ChannelType } from "../growth/enum";
 import { scopedTranslation } from "./i18n";
 
-/** Human vs bot traffic split, from leads.user_agent (see bot-sql.ts). */
+/**
+ * Human vs bot traffic split from the lead's user agent (see bot-sql.ts).
+ * UNKNOWN = no user agent recorded: neither human nor bot.
+ */
 export const {
   enum: TrafficFilter,
   options: TrafficFilterOptions,
@@ -18,9 +21,11 @@ export const {
   ALL: "leadAnalytics.traffic.all",
   HUMANS: "leadAnalytics.traffic.humans",
   BOTS: "leadAnalytics.traffic.bots",
+  UNKNOWN: "leadAnalytics.traffic.unknown",
+  NOT_BOTS: "leadAnalytics.traffic.notBots",
 });
 
-/** User agent family. HUMAN is the only non-bot family. */
+/** User agent family. HUMAN and NO_UA (unknown) are the non-bot families. */
 export const {
   enum: BotFamily,
   options: BotFamilyOptions,
@@ -39,6 +44,13 @@ export const {
   OTHER_BOT: "leadAnalytics.botFamily.otherBot",
   NO_UA: "leadAnalytics.botFamily.noUa",
 });
+
+/** A known bot family (HUMAN and NO_UA = unknown are not bots). */
+export function isBotFamily(
+  family: (typeof BotFamily)[keyof typeof BotFamily],
+): boolean {
+  return family !== BotFamily.HUMAN && family !== BotFamily.NO_UA;
+}
 
 /** First-touch channel type of the lead's journey; UNATTRIBUTED = no journey. */
 export const {

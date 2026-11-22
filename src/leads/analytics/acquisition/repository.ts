@@ -37,8 +37,10 @@ import type { QueryResultRow } from "pg";
 import { usdSql } from "@/payment/analytics/money-sql";
 import { PaymentStatus } from "@/payment/enum";
 
-import { BotFamily, LeadDimension } from "../enum";
+import { isBotFamilySql } from "../bot-sql";
+import { BotFamily, LeadChannelFilter, LeadDimension } from "../enum";
 import type { LeadSegmentFilters } from "../filters";
+import { hasSegmentFilters } from "../filters";
 import {
   andAll,
   dimensionColumn,
@@ -58,9 +60,12 @@ export interface AcquisitionKpis {
   visits: Kpi;
   humanVisits: Kpi;
   botVisits: Kpi;
+  /** Visits of leads without a recorded user agent (neither human nor bot). */
+  unknownVisits: Kpi;
   visitors: Kpi;
   humanLeads: Kpi;
   botLeads: Kpi;
+  unknownLeads: Kpi;
   signups: Kpi;
   firstChats: Kpi;
   payers: Kpi;
@@ -84,9 +89,47 @@ function segmentCte(win: AnalyticsWindow, filters: LeadSegmentFilters): SQL {
 }
 
 const HUMAN = BotFamily.HUMAN;
+/** One person: the account when the lead has one, else the lead. */
+const PERSON = sql`coalesce(user_id::text, id::text)`;
+const NO_UA = BotFamily.NO_UA;
+/** Known bot (unknown / no user agent is neither human nor bot). */
+const isBot = (family: SQL): SQL => isBotFamilySql(family);
 
 function kpi(value: number, previous: number, win: AnalyticsWindow): Kpi {
   return { value, previous: win.previousFrom ? previous : null };
+}
+
+/**
+ * Accounts with no lead at all (no journey, no converted lead): the lead facts
+ * cannot see them, so unfiltered signup counts add them as UNATTRIBUTED.
+ */
+const UNLINKED_USERS = sql`users u
+  WHERE NOT EXISTS (SELECT 1 FROM growth_journeys uj WHERE uj.user_id = u.id)
+    AND NOT EXISTS (SELECT 1 FROM leads ul WHERE ul.converted_user_id = u.id)`;
+
+async function unlinkedSignups(win: AnalyticsWindow): Promise<{
+  current: number;
+  previous: number;
+  buckets: { bucket: string; value: number }[];
+}> {
+  const w = inWindowSql(sql`u.created_at`, win);
+  const p = inPreviousWindowSql(sql`u.created_at`, win);
+  const [totals, buckets] = await Promise.all([
+    db.execute<QueryResultRow & { current: number; previous: number }>(sql`
+      SELECT count(*) FILTER (WHERE ${w})::int AS current,
+        count(*) FILTER (WHERE ${p})::int AS previous
+      FROM ${UNLINKED_USERS}
+    `),
+    db.execute<QueryResultRow & { bucket: string; value: number }>(sql`
+      SELECT ${bucketSql(sql`u.created_at`, win.bucket)} AS bucket, count(*)::int AS value
+      FROM ${UNLINKED_USERS} AND ${w} GROUP BY 1
+    `),
+  ]);
+  return {
+    current: totals.rows[0]?.current ?? 0,
+    previous: totals.rows[0]?.previous ?? 0,
+    buckets: buckets.rows,
+  };
 }
 
 export async function computeAcquisitionCore(
@@ -123,6 +166,10 @@ export async function computeAcquisitionCore(
       prevHumanVisits: number;
       botVisits: number;
       prevBotVisits: number;
+      unknownLeads: number;
+      prevUnknownLeads: number;
+      unknownVisits: number;
+      prevUnknownVisits: number;
     }
   >(sql`
     WITH ${segmentCte(win, filters)},
@@ -134,20 +181,24 @@ export async function computeAcquisitionCore(
         count(DISTINCT v.lead_id) FILTER (WHERE ${p(visited)})::int AS "prevVisitors",
         count(*) FILTER (WHERE ${w(visited)} AND seg.bot_family = ${HUMAN})::int AS "humanVisits",
         count(*) FILTER (WHERE ${p(visited)} AND seg.bot_family = ${HUMAN})::int AS "prevHumanVisits",
-        count(*) FILTER (WHERE ${w(visited)} AND seg.bot_family <> ${HUMAN})::int AS "botVisits",
-        count(*) FILTER (WHERE ${p(visited)} AND seg.bot_family <> ${HUMAN})::int AS "prevBotVisits"
+        count(*) FILTER (WHERE ${w(visited)} AND ${isBot(sql`seg.bot_family`)})::int AS "botVisits",
+        count(*) FILTER (WHERE ${p(visited)} AND ${isBot(sql`seg.bot_family`)})::int AS "prevBotVisits",
+        count(*) FILTER (WHERE ${w(visited)} AND seg.bot_family = ${NO_UA})::int AS "unknownVisits",
+        count(*) FILTER (WHERE ${p(visited)} AND seg.bot_family = ${NO_UA})::int AS "prevUnknownVisits"
       FROM growth_visits v JOIN seg ON seg.id = v.lead_id
     )
     SELECT
       count(*) FILTER (WHERE ${w(created)} AND bot_family = ${HUMAN})::int AS "humanLeads",
-      count(*) FILTER (WHERE ${w(created)} AND bot_family <> ${HUMAN})::int AS "botLeads",
+      count(*) FILTER (WHERE ${w(created)} AND ${isBot(sql`bot_family`)})::int AS "botLeads",
+      count(*) FILTER (WHERE ${w(created)} AND bot_family = ${NO_UA})::int AS "unknownLeads",
       (SELECT count(*)::int FROM seg_users WHERE ${w(signed)}) AS signups,
-      count(*) FILTER (WHERE ${w(chat)})::int AS "firstChats",
+      count(DISTINCT ${PERSON}) FILTER (WHERE ${w(chat)})::int AS "firstChats",
       (SELECT count(*)::int FROM seg_users WHERE ${w(paid)}) AS payers,
       count(*) FILTER (WHERE ${p(created)} AND bot_family = ${HUMAN})::int AS "prevHumanLeads",
-      count(*) FILTER (WHERE ${p(created)} AND bot_family <> ${HUMAN})::int AS "prevBotLeads",
+      count(*) FILTER (WHERE ${p(created)} AND ${isBot(sql`bot_family`)})::int AS "prevBotLeads",
+      count(*) FILTER (WHERE ${p(created)} AND bot_family = ${NO_UA})::int AS "prevUnknownLeads",
       (SELECT count(*)::int FROM seg_users WHERE ${p(signed)}) AS "prevSignups",
-      count(*) FILTER (WHERE ${p(chat)})::int AS "prevFirstChats",
+      count(DISTINCT ${PERSON}) FILTER (WHERE ${p(chat)})::int AS "prevFirstChats",
       (SELECT count(*)::int FROM seg_users WHERE ${p(paid)}) AS "prevPayers",
       (SELECT visits FROM visit_totals) AS visits,
       (SELECT visitors FROM visit_totals) AS visitors,
@@ -156,7 +207,9 @@ export async function computeAcquisitionCore(
       (SELECT "humanVisits" FROM visit_totals) AS "humanVisits",
       (SELECT "prevHumanVisits" FROM visit_totals) AS "prevHumanVisits",
       (SELECT "botVisits" FROM visit_totals) AS "botVisits",
-      (SELECT "prevBotVisits" FROM visit_totals) AS "prevBotVisits"
+      (SELECT "prevBotVisits" FROM visit_totals) AS "prevBotVisits",
+      (SELECT "unknownVisits" FROM visit_totals) AS "unknownVisits",
+      (SELECT "prevUnknownVisits" FROM visit_totals) AS "prevUnknownVisits"
     FROM seg
   `);
 
@@ -169,12 +222,12 @@ export async function computeAcquisitionCore(
       FROM seg WHERE ${w(created)} AND bot_family = ${HUMAN} GROUP BY 2
     UNION ALL
     SELECT 'botLeads', ${bucketSql(created, bucket)}, count(*)::int
-      FROM seg WHERE ${w(created)} AND bot_family <> ${HUMAN} GROUP BY 2
+      FROM seg WHERE ${w(created)} AND ${isBot(sql`bot_family`)} GROUP BY 2
     UNION ALL
     SELECT 'signups', ${bucketSql(signed, bucket)}, count(*)::int
       FROM seg_users WHERE ${w(signed)} GROUP BY 2
     UNION ALL
-    SELECT 'firstChats', ${bucketSql(chat, bucket)}, count(*)::int
+    SELECT 'firstChats', ${bucketSql(chat, bucket)}, count(DISTINCT ${PERSON})::int
       FROM seg WHERE ${w(chat)} GROUP BY 2
     UNION ALL
     SELECT 'payers', ${bucketSql(paid, bucket)}, count(*)::int
@@ -187,11 +240,20 @@ export async function computeAcquisitionCore(
       FROM growth_visits v JOIN seg ON seg.id = v.lead_id WHERE ${w(visited)} AND seg.bot_family = ${HUMAN} GROUP BY 2
     UNION ALL
     SELECT 'botVisits', ${bucketSql(visited, bucket)}, count(*)::int
-      FROM growth_visits v JOIN seg ON seg.id = v.lead_id WHERE ${w(visited)} AND seg.bot_family <> ${HUMAN} GROUP BY 2
+      FROM growth_visits v JOIN seg ON seg.id = v.lead_id WHERE ${w(visited)} AND ${isBot(sql`seg.bot_family`)} GROUP BY 2
     UNION ALL
     SELECT 'visitors', ${bucketSql(visited, bucket)}, count(DISTINCT v.lead_id)::int
       FROM growth_visits v JOIN seg ON seg.id = v.lead_id WHERE ${w(visited)} GROUP BY 2
   `);
+
+  // Unfiltered signups include accounts without any lead (UNATTRIBUTED).
+  const unlinked = hasSegmentFilters(filters)
+    ? { current: 0, previous: 0, buckets: [] }
+    : await unlinkedSignups(win);
+  const seriesRows = [
+    ...series,
+    ...unlinked.buckets.map((row) => ({ key: "signups", ...row })),
+  ];
 
   const seriesKeys = [
     "humanLeads",
@@ -210,10 +272,16 @@ export async function computeAcquisitionCore(
       visits: kpi(totals.visits, totals.prevVisits, win),
       humanVisits: kpi(totals.humanVisits, totals.prevHumanVisits, win),
       botVisits: kpi(totals.botVisits, totals.prevBotVisits, win),
+      unknownVisits: kpi(totals.unknownVisits, totals.prevUnknownVisits, win),
       visitors: kpi(totals.visitors, totals.prevVisitors, win),
       humanLeads: kpi(totals.humanLeads, totals.prevHumanLeads, win),
       botLeads: kpi(totals.botLeads, totals.prevBotLeads, win),
-      signups: kpi(totals.signups, totals.prevSignups, win),
+      unknownLeads: kpi(totals.unknownLeads, totals.prevUnknownLeads, win),
+      signups: kpi(
+        totals.signups + unlinked.current,
+        totals.prevSignups + unlinked.previous,
+        win,
+      ),
       firstChats: kpi(totals.firstChats, totals.prevFirstChats, win),
       payers: kpi(totals.payers, totals.prevPayers, win),
     },
@@ -223,7 +291,7 @@ export async function computeAcquisitionCore(
         key,
         values: fillBuckets(
           win.buckets,
-          series.filter((row) => row.key === key),
+          seriesRows.filter((row) => row.key === key),
         ),
       })),
     },
@@ -278,7 +346,7 @@ export async function computeAcquisitionBreakdown(
         coalesce(sum(vc.n), 0)::int AS visits,
         count(*) FILTER (WHERE ${w(sql`f.created_at`)})::int AS leads,
         count(*) FILTER (WHERE ${w(sql`f.created_at`)} AND f.bot_family = ${HUMAN})::int AS "humanLeads",
-        count(*) FILTER (WHERE ${w(sql`f.created_at`)} AND f.bot_family <> ${HUMAN})::int AS "botLeads",
+        count(*) FILTER (WHERE ${w(sql`f.created_at`)} AND ${isBot(sql`f.bot_family`)})::int AS "botLeads",
         count(DISTINCT f.user_id) FILTER (WHERE ${w(sql`f.signed_up_at`)})::int AS signups,
         count(DISTINCT f.user_id) FILTER (WHERE ${w(sql`f.first_paid_at`)})::int AS payers
       FROM keyed f
@@ -327,7 +395,15 @@ export async function computeSignupsByChannel(
     WHERE ${inWindowSql(sql`signed_up_at`, win)}
     GROUP BY key
   `);
-  return new Map(rows.map((row) => [row.key, row.signups]));
+  const result = new Map(rows.map((row) => [row.key, row.signups]));
+  const unlinked = await unlinkedSignups(win);
+  if (unlinked.current > 0) {
+    result.set(
+      LeadChannelFilter.UNATTRIBUTED,
+      (result.get(LeadChannelFilter.UNATTRIBUTED) ?? 0) + unlinked.current,
+    );
+  }
+  return result;
 }
 
 /** Earliest tracked visit / journey (tells the operator what the data covers). */

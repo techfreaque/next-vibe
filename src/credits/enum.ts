@@ -19,6 +19,25 @@ export const {
 });
 
 /**
+ * Stable id of a usage charge that has no endpoint of its own, stored in
+ * credit_transactions.feature and translated in the viewer's locale when
+ * shown. Charges made by an endpoint store that endpoint's preferred tool
+ * name instead (see feature-label.ts).
+ */
+export const {
+  enum: CreditFeature,
+  options: CreditFeatureOptions,
+  Value: CreditFeatureValue,
+} = createEnumOptions(scopedTranslation, {
+  TEXT_TO_SPEECH: "enums.creditFeature.textToSpeech",
+  SPEECH_TO_TEXT: "enums.creditFeature.speechToText",
+  MEMORY_WRITE: "enums.creditFeature.memoryWrite",
+  MEMORY_EDIT: "enums.creditFeature.memoryEdit",
+  MEMORY_SEARCH: "enums.creditFeature.memorySearch",
+  MEMORY_EMBEDDING: "enums.creditFeature.memoryEmbedding",
+});
+
+/**
  * Credit transaction type for tracking credit movements
  */
 export const {

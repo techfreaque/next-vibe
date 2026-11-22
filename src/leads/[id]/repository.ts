@@ -19,7 +19,11 @@ import type { QueryResultRow } from "pg";
 
 import { creditWallets } from "@/credits/db";
 import { CreditTransactionType } from "@/credits/enum";
-import { ipPrefixSql } from "@/leads/analytics/bot-sql";
+import {
+  ipPrefixSql,
+  leadIpSql,
+  leadUserAgentSql,
+} from "@/leads/analytics/bot-sql";
 import { LeadDimension } from "@/leads/analytics/enum";
 import { dimensionColumn, leadFactsSql } from "@/leads/analytics/segment-sql";
 import { growthJourneys } from "@/leads/growth/db";
@@ -413,11 +417,11 @@ async function getTraffic(leadId: string): Promise<LeadTraffic | undefined> {
       f.ref_code AS "refCode", f.ip_prefix AS "ipPrefix", f.ua_fp AS "uaFingerprint",
       (SELECT count(*)::int FROM leads p
         WHERE f.ip_prefix IS NOT NULL AND p.created_at >= now() - interval '30 days'
-          AND p.ip_address IS NOT NULL
-          AND ${ipPrefixSql(sql`p.ip_address`)} = f.ip_prefix) AS "prefixLeads30d",
+          AND ${leadIpSql("p")} IS NOT NULL
+          AND ${ipPrefixSql(leadIpSql("p"))} = f.ip_prefix) AS "prefixLeads30d",
       (SELECT count(*)::int FROM leads p
         WHERE f.ua IS NOT NULL AND p.created_at >= now() - interval '30 days'
-          AND p.user_agent = f.ua) AS "uaLeads30d",
+          AND ${leadUserAgentSql("p")} = f.ua) AS "uaLeads30d",
       coalesce((SELECT sum((t.metadata->>'freeCreditsUsed')::numeric)
         FROM credit_transactions t JOIN credit_wallets w ON w.id = t.wallet_id
         WHERE t.type = ${CreditTransactionType.USAGE}

@@ -4,10 +4,12 @@ export const translations: typeof enTranslations = {
   leadAnalytics: {
     traffic: {
       label: "Traffic",
-      description: "Menschen, Bots oder beide (erkannt am User Agent)",
+      description: "Menschen, Bots oder unbekannt (erkannt am User Agent)",
       all: "Gesamter Traffic",
       humans: "Menschen",
       bots: "Bots",
+      unknown: "Unbekannt (kein User Agent)",
+      notBots: "Keine Bots (Menschen + unbekannt)",
     },
     botFamily: {
       label: "Agent",
@@ -156,6 +158,7 @@ export const translations: typeof enTranslations = {
       visitors: "Besucher",
       leads: "Leads",
       humanLeads: "Menschliche Leads",
+      notBotLeads: "Leads ohne Bots",
       botLeads: "Bot-Leads",
       signups: "Registrierungen",
       emailConfirmed: "Bestätigt",

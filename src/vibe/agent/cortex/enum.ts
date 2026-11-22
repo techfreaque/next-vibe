@@ -5,6 +5,8 @@
 
 import { createEnumOptions } from "next-vibe/unified-ui/_shared/enum";
 
+import { CreditFeature, type CreditFeatureValue } from "@/credits/enum";
+
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -85,3 +87,14 @@ export const {
 } as const);
 
 export type CortexCreditFeatureValue = typeof CortexCreditFeatureValue;
+
+/** Ledger feature id (credit_transactions.feature) of each cortex operation. */
+export const CORTEX_CREDIT_FEATURE: Record<
+  CortexCreditFeatureValue,
+  typeof CreditFeatureValue
+> = {
+  [CortexCreditFeature.WRITE]: CreditFeature.MEMORY_WRITE,
+  [CortexCreditFeature.EDIT]: CreditFeature.MEMORY_EDIT,
+  [CortexCreditFeature.SEARCH]: CreditFeature.MEMORY_SEARCH,
+  [CortexCreditFeature.EMBEDDING]: CreditFeature.MEMORY_EMBEDDING,
+};

@@ -27,6 +27,14 @@ export const translations: typeof enTranslations = {
       userSubscription: "Crediti per l'abbonamento utente",
       leadFree: "Condurre crediti di livello libero",
     },
+    creditFeature: {
+      textToSpeech: "Sintesi vocale",
+      speechToText: "Trascrizione vocale",
+      memoryWrite: "Scrittura in memoria",
+      memoryEdit: "Modifica della memoria",
+      memorySearch: "Ricerca in memoria",
+      memoryEmbedding: "Embedding della memoria",
+    },
     transactionType: {
       purchase: "Acquisto",
       subscription: "Abbonamento",

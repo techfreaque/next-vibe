@@ -47,6 +47,7 @@ export const translations = {
       byModel: "By model",
       byFeature: "By feature",
       byProvider: "By upstream provider",
+      featureLabels: "Feature names",
       topSpenders: "Top spenders",
     },
     errors: {

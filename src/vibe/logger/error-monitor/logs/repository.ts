@@ -45,6 +45,7 @@ import {
 } from "../../../unified-ui/analytics/window-sql";
 import type { EndpointLogger } from "../../types";
 import type { LoggerMetadata } from "../../types";
+import { dailyHistoryWindow, ERROR_LOG_DAILY_SINCE } from "../daily";
 import { errorLogDaily, errorLogs } from "../db";
 import {
   ERROR_LOGS_ENDPOINT_LIMIT,
@@ -216,23 +217,29 @@ export class ErrorLogsRepository {
         ErrorLogsRepository.seenInWindowSql(win),
       );
       const dailyJoin = eq(errorLogDaily.fingerprint, errorLogs.fingerprint);
-      const dailyInWindow = sql`${inWindowSql(errorLogDaily.day, win)}`;
-      const dailyInPrevious = sql`${inPreviousWindowSql(errorLogDaily.day, win)}`;
+      // Per-day numbers only from live daily history (see ERROR_LOG_DAILY_SINCE).
+      const dailyWin = dailyHistoryWindow(win);
+      const dailyInWindow = sql`${inWindowSql(errorLogDaily.day, dailyWin)}`;
+      const dailyInPrevious = sql`${inPreviousWindowSql(errorLogDaily.day, dailyWin)}`;
       const hasPrevious = win.previousFrom !== null;
       const kpi = (current: number, previous: number): Kpi => ({
         value: current,
         previous: hasPrevious ? previous : null,
       });
+      const dailyKpi = (current: number, previous: number): Kpi => ({
+        value: current,
+        previous: dailyWin.previousFrom !== null ? previous : null,
+      });
 
       const grouped = data.group;
-      const windowOccurrences = sql<number>`COALESCE((SELECT SUM(d.occurrences) FROM ${errorLogDaily} d WHERE d.fingerprint = "error_logs"."fingerprint" AND ${inWindowSql(sql`d.day`, win)}), 0)::int`;
+      const windowOccurrences = sql<number>`COALESCE((SELECT SUM(d.occurrences) FROM ${errorLogDaily} d WHERE d.fingerprint = "error_logs"."fingerprint" AND ${inWindowSql(sql`d.day`, dailyWin)}), 0)::int`;
       // Grouped: one row per message + resolved state, represented by its
       // biggest class; ranking and numbers cover the whole group. One pass
       // with GROUP BY (no per-row subqueries).
       const groupPage = grouped
         ? await ErrorLogsRepository.groupPage(
             listWhere ?? sql`TRUE`,
-            win,
+            dailyWin,
             data.sort,
             limit,
             offset,
@@ -309,8 +316,8 @@ export class ErrorLogsRepository {
           })
           .from(errorLogs)
           .where(filterSql),
-        ErrorLogsRepository.affectedKpi("user_ids", filterSql, win),
-        ErrorLogsRepository.affectedKpi("lead_ids", filterSql, win),
+        ErrorLogsRepository.affectedKpi("user_ids", filterSql, dailyWin),
+        ErrorLogsRepository.affectedKpi("lead_ids", filterSql, dailyWin),
         db
           .select({
             bucket: bucketSql(errorLogDaily.day, win.bucket),
@@ -398,8 +405,16 @@ export class ErrorLogsRepository {
                   ),
                 )
                 .groupBy(sql`1`, sql`2`),
-              ErrorLogsRepository.affectedIds("user_ids", fingerprints, win),
-              ErrorLogsRepository.affectedIds("lead_ids", fingerprints, win),
+              ErrorLogsRepository.affectedIds(
+                "user_ids",
+                fingerprints,
+                dailyWin,
+              ),
+              ErrorLogsRepository.affectedIds(
+                "lead_ids",
+                fingerprints,
+                dailyWin,
+              ),
             ]);
 
       const series = ErrorLogsRepository.seriesKeys(data.split).map((key) => ({
@@ -422,7 +437,7 @@ export class ErrorLogsRepository {
           unresolvedOutsideWindow: Number(unresolvedRow?.outside ?? 0),
           unresolvedMessages: Number(unresolvedRow?.messages ?? 0),
           unresolvedMatching: Number(unresolvedRow?.matching ?? 0),
-          occurrences: kpi(
+          occurrences: dailyKpi(
             Number(occurrenceRow?.current ?? 0),
             Number(occurrenceRow?.previous ?? 0),
           ),
@@ -430,15 +445,15 @@ export class ErrorLogsRepository {
             Number(newClassesRow?.current ?? 0),
             Number(newClassesRow?.previous ?? 0),
           ),
-          activeClasses: kpi(
+          activeClasses: dailyKpi(
             Number(occurrenceRow?.activeCurrent ?? 0),
             Number(occurrenceRow?.activePrevious ?? 0),
           ),
-          affectedUsers: kpi(
+          affectedUsers: dailyKpi(
             Number(affectedUsersRow?.current ?? 0),
             Number(affectedUsersRow?.previous ?? 0),
           ),
-          affectedLeads: kpi(
+          affectedLeads: dailyKpi(
             Number(affectedLeadsRow?.current ?? 0),
             Number(affectedLeadsRow?.previous ?? 0),
           ),
@@ -453,7 +468,14 @@ export class ErrorLogsRepository {
           },
         })),
         historySince: historyRow?.since
-          ? historyRow.since.toISOString().slice(0, 10)
+          ? new Date(
+              Math.max(
+                historyRow.since.getTime(),
+                ERROR_LOG_DAILY_SINCE.getTime(),
+              ),
+            )
+              .toISOString()
+              .slice(0, 10)
           : null,
         logs: rows.map((row) => {
           const members = membersOf(row);

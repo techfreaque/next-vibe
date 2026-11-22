@@ -155,7 +155,9 @@ export function AcquisitionReportWidget(): JSX.Element {
   const { kpis, trend, coverage } = value;
   const series = (key: string): number[] =>
     trend.series.find((entry) => entry.key === key)?.values ?? [];
-  const leadsTotal = kpis.humanLeads.value + kpis.botLeads.value;
+  // Bot share of ALL leads: unknown (no user agent) is neither human nor bot.
+  const leadsTotal =
+    kpis.humanLeads.value + kpis.botLeads.value + kpis.unknownLeads.value;
   const botShare = leadsTotal > 0 ? kpis.botLeads.value / leadsTotal : 0;
   const metricLabel = {
     visits: t("widget.humanVisits"),
@@ -232,6 +234,15 @@ export function AcquisitionReportWidget(): JSX.Element {
           label={metricLabel.humanLeads}
           value={kpis.humanLeads.value}
           previous={kpis.humanLeads.previous}
+          hint={
+            kpis.unknownLeads.value > 0
+              ? t("widget.unknownLeadsHint", {
+                  count: formatAnalyticsValue(kpis.unknownLeads.value, {
+                    locale,
+                  }),
+                })
+              : undefined
+          }
           sparkline={series("humanLeads")}
           locale={locale}
           onClick={() =>

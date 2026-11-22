@@ -238,21 +238,49 @@ function OverviewBody({
       ? ratio(costed.value, money.kpis.creditSpendUsd.value)
       : null;
 
+  // Share of ALL new leads (human + bot + unknown) that are known bots.
   const botShare = acquisition
     ? ratio(
         acquisition.kpis.botLeads.value,
-        acquisition.kpis.botLeads.value + acquisition.kpis.humanLeads.value,
+        acquisition.kpis.botLeads.value +
+          acquisition.kpis.humanLeads.value +
+          (acquisition.kpis.unknownLeads?.value ?? 0),
       )
     : null;
   const prevBot = acquisition?.kpis.botLeads.previous;
   const prevHuman = acquisition?.kpis.humanLeads.previous;
+  const prevUnknown = acquisition?.kpis.unknownLeads?.previous ?? 0;
   const botSharePrevious =
     prevBot === null ||
     prevBot === undefined ||
     prevHuman === null ||
     prevHuman === undefined
       ? null
-      : ratio(prevBot, prevBot + prevHuman);
+      : ratio(prevBot, prevBot + prevHuman + prevUnknown);
+
+  /** "N bot (and M unknown) leads/visits excluded", undefined when none. */
+  const excludedHint = (
+    bots: number,
+    unknown: number,
+    kind: "leads" | "visits",
+  ): string | undefined => {
+    if (bots <= 0 && unknown <= 0) {
+      return undefined;
+    }
+    const count = formatAnalyticsValue(bots, { locale });
+    if (unknown <= 0) {
+      return kind === "leads"
+        ? t("get.widget.kpi.botLeadsHint", { count })
+        : t("get.widget.kpi.botVisitsHint", { count });
+    }
+    const params = {
+      bots: count,
+      unknown: formatAnalyticsValue(unknown, { locale }),
+    };
+    return kind === "leads"
+      ? t("get.widget.kpi.excludedLeadsHint", params)
+      : t("get.widget.kpi.excludedVisitsHint", params);
+  };
 
   const sparkOf = (key: string): number[] | undefined =>
     traffic?.series.find((s) => s.key === key)?.values;
@@ -302,12 +330,20 @@ function OverviewBody({
       key: "errors",
       target: TARGET.errors,
       severity: "high",
-      text: t("get.widget.alerts.errors", {
-        count: formatAnalyticsValue(ops.unresolvedErrors, { locale }),
-        occurrences: formatAnalyticsValue(ops.errorOccurrences.value, {
-          locale,
-        }),
-      }),
+      text: ops.errorOccurrencesSince
+        ? t("get.widget.alerts.errorsSince", {
+            count: formatAnalyticsValue(ops.unresolvedErrors, { locale }),
+            occurrences: formatAnalyticsValue(ops.errorOccurrences.value, {
+              locale,
+            }),
+            date: ops.errorOccurrencesSince,
+          })
+        : t("get.widget.alerts.errors", {
+            count: formatAnalyticsValue(ops.unresolvedErrors, { locale }),
+            occurrences: formatAnalyticsValue(ops.errorOccurrences.value, {
+              locale,
+            }),
+          }),
       onOpen: () => drill(TARGET.errors),
     });
   }
@@ -393,17 +429,11 @@ function OverviewBody({
               value={acquisition.kpis.visits.value}
               previous={acquisition.kpis.visits.previous}
               locale={locale}
-              hint={
-                acquisition.kpis.botVisits &&
-                acquisition.kpis.botVisits.value > 0
-                  ? t("get.widget.kpi.botVisitsHint", {
-                      count: formatAnalyticsValue(
-                        acquisition.kpis.botVisits.value,
-                        { locale },
-                      ),
-                    })
-                  : undefined
-              }
+              hint={excludedHint(
+                acquisition.kpis.botVisits?.value ?? 0,
+                acquisition.kpis.unknownVisits?.value ?? 0,
+                "visits",
+              )}
               sparkline={sparkOf("visits")}
               onClick={() =>
                 drill(TARGET.acquisition, {
@@ -417,16 +447,11 @@ function OverviewBody({
               value={acquisition.kpis.humanLeads.value}
               previous={acquisition.kpis.humanLeads.previous}
               locale={locale}
-              hint={
-                acquisition.kpis.botLeads.value > 0
-                  ? t("get.widget.kpi.botLeadsHint", {
-                      count: formatAnalyticsValue(
-                        acquisition.kpis.botLeads.value,
-                        { locale },
-                      ),
-                    })
-                  : undefined
-              }
+              hint={excludedHint(
+                acquisition.kpis.botLeads.value,
+                acquisition.kpis.unknownLeads?.value ?? 0,
+                "leads",
+              )}
               sparkline={sparkOf("leads")}
               onClick={() =>
                 drill(TARGET.acquisition, {
@@ -484,20 +509,38 @@ function OverviewBody({
               previous={money.kpis.creditSpendUsd.previous}
               format="currency"
               locale={locale}
-              hint={t("get.widget.kpi.creditSpendHint", {
-                cost: formatAnalyticsValue(money.kpis.upstreamCostUsd.value, {
-                  format: "currency",
-                  locale,
-                }),
-                previous: formatAnalyticsValue(
-                  money.kpis.upstreamCostUsd.previous,
-                  { format: "currency", locale },
-                ),
-                guests: formatAnalyticsValue(money.kpis.guestSpendUsd.value, {
-                  format: "currency",
-                  locale,
-                }),
-              })}
+              hint={
+                money.kpis.upstreamCostUsd.previous === null
+                  ? t(
+                      period.previousFrom === null
+                        ? "get.widget.kpi.creditSpendHintNoCompare"
+                        : "get.widget.kpi.creditSpendHintNoPrevCost",
+                      {
+                        cost: formatAnalyticsValue(
+                          money.kpis.upstreamCostUsd.value,
+                          { format: "currency", locale },
+                        ),
+                        guests: formatAnalyticsValue(
+                          money.kpis.guestSpendUsd.value,
+                          { format: "currency", locale },
+                        ),
+                      },
+                    )
+                  : t("get.widget.kpi.creditSpendHint", {
+                      cost: formatAnalyticsValue(
+                        money.kpis.upstreamCostUsd.value,
+                        { format: "currency", locale },
+                      ),
+                      previous: formatAnalyticsValue(
+                        money.kpis.upstreamCostUsd.previous,
+                        { format: "currency", locale },
+                      ),
+                      guests: formatAnalyticsValue(
+                        money.kpis.guestSpendUsd.value,
+                        { format: "currency", locale },
+                      ),
+                    })
+              }
               sparkline={moneySpark("spendUsd")}
               onClick={() => drill(TARGET.usage)}
             />

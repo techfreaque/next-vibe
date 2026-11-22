@@ -27,6 +27,7 @@ export const translations: typeof enTranslations = {
       signupSteps: "Étapes d'inscription sur la période",
       previousSignupSteps: "Étapes d'inscription sur la période précédente",
       signupSegments: "Étapes d'inscription par segment",
+      signupTrackedSince: "Étapes d'inscription suivies depuis",
     },
     errors: {
       unauthorized: {
@@ -72,6 +73,8 @@ export const translations: typeof enTranslations = {
     signupTitle: "Confirmation d'inscription",
     signupSubtitle:
       "Leads par étape, datés au moment de l'étape. La chute montre où les inscriptions se perdent.",
+    signupTrackedHint:
+      "Suivi depuis le {{date}} : des inscriptions antérieures, seuls les échecs sont enregistrés.",
     started: "Commencées",
     emailSent: "E-mail envoyé",
     sendFailed: "Envoi échoué",
@@ -89,18 +92,18 @@ export const translations: typeof enTranslations = {
     cohortHint: "sur {{count}} leads créés",
     signupRate: "Taux d'inscription",
     payRate: "Taux de paiement",
-    overallRate: "D'humain à payeur",
+    overallRate: "De lead à payeur",
     overallShort: "Vers payeur",
-    ofHumans: "{{count}} sur {{total}} leads humains",
+    ofHumans: "{{count}} sur {{total}} leads hors bots",
     ofSignups: "{{count}} sur {{total}} inscriptions",
     funnelTitle: "Entonnoir de cohorte",
     funnelSubtitle:
-      "Entonnoir à partir des leads humains. Bots et leads bruts : première carte.",
+      "Entonnoir à partir des leads hors bots (navigateur ou sans user agent). Bots et leads bruts : première carte.",
     trendTitle: "Cohorte par jour de création",
-    trendSubtitle: "Leads humains et combien d'entre eux ont converti.",
+    trendSubtitle: "Leads hors bots et combien d'entre eux ont converti.",
     segmentsTitle: "Entonnoir par segment",
     segmentsSubtitle:
-      "Taux par lead humain. Cliquez sur une ligne pour ses leads.",
+      "Taux par lead hors bots. Cliquez sur une ligne pour ses leads.",
     filtersTitle: "Segment",
     filtersSubtitle: "Affine chaque chiffre de cette page.",
     apply: "Appliquer",

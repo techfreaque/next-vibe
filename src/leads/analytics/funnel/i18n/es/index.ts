@@ -27,6 +27,7 @@ export const translations: typeof enTranslations = {
       signupSteps: "Pasos de registro en el periodo",
       previousSignupSteps: "Pasos de registro en el periodo anterior",
       signupSegments: "Pasos de registro por segmento",
+      signupTrackedSince: "Pasos de registro registrados desde",
     },
     errors: {
       unauthorized: {
@@ -72,6 +73,8 @@ export const translations: typeof enTranslations = {
     signupTitle: "Confirmación de registro",
     signupSubtitle:
       "Prospectos por paso, fechados cuando ocurrió el paso. La caída muestra dónde se pierden los registros.",
+    signupTrackedHint:
+      "Registrado desde {{date}}: de los registros anteriores solo constan los fallos.",
     started: "Iniciados",
     emailSent: "Correo enviado",
     sendFailed: "Envío fallido",
@@ -89,18 +92,18 @@ export const translations: typeof enTranslations = {
     cohortHint: "de {{count}} prospectos creados",
     signupRate: "Tasa de registro",
     payRate: "Tasa de pago",
-    overallRate: "De persona a pagador",
+    overallRate: "De prospecto a pagador",
     overallShort: "A pagador",
-    ofHumans: "{{count}} de {{total}} prospectos humanos",
+    ofHumans: "{{count}} de {{total}} prospectos sin bots",
     ofSignups: "{{count}} de {{total}} registros",
     funnelTitle: "Embudo de la cohorte",
     funnelSubtitle:
-      "Embudo desde prospectos humanos. Bots y total: primera tarjeta.",
+      "Embudo desde prospectos sin bots (navegador o sin user agent). Bots y total: primera tarjeta.",
     trendTitle: "Cohorte por día de creación",
-    trendSubtitle: "Prospectos humanos y cuántos de ellos convirtieron.",
+    trendSubtitle: "Prospectos sin bots y cuántos de ellos convirtieron.",
     segmentsTitle: "Embudo por segmento",
     segmentsSubtitle:
-      "Tasas por prospecto humano. Haz clic en una fila para ver sus prospectos.",
+      "Tasas por prospecto sin bots. Haz clic en una fila para ver sus prospectos.",
     filtersTitle: "Segmento",
     filtersSubtitle: "Acota cada número de esta página.",
     apply: "Aplicar",

@@ -27,6 +27,7 @@ export const translations: typeof enTranslations = {
       signupSteps: "Registrierungsschritte im Zeitraum",
       previousSignupSteps: "Registrierungsschritte im Vorzeitraum",
       signupSegments: "Registrierungsschritte pro Segment",
+      signupTrackedSince: "Registrierungsschritte erfasst seit",
     },
     errors: {
       unauthorized: {
@@ -72,6 +73,8 @@ export const translations: typeof enTranslations = {
     signupTitle: "Registrierungsbestätigung",
     signupSubtitle:
       "Leads pro Schritt, datiert auf den Schritt. Der Abfall zeigt, wo Registrierungen scheitern.",
+    signupTrackedHint:
+      "Erfasst seit {{date}}: von früheren Registrierungen sind nur die Fehlschläge gespeichert.",
     started: "Begonnen",
     emailSent: "Mail gesendet",
     sendFailed: "Versand fehlgeschlagen",
@@ -90,18 +93,18 @@ export const translations: typeof enTranslations = {
     cohortHint: "von {{count}} erstellten Leads",
     signupRate: "Registrierungsrate",
     payRate: "Zahlungsrate",
-    overallRate: "Mensch zu Zahlendem",
+    overallRate: "Lead zu Zahlendem",
     overallShort: "Zu Zahlendem",
-    ofHumans: "{{count}} von {{total}} menschlichen Leads",
+    ofHumans: "{{count}} von {{total}} Leads ohne Bots",
     ofSignups: "{{count}} von {{total}} Registrierungen",
     funnelTitle: "Kohorten-Funnel",
     funnelSubtitle:
-      "Funnel ab menschlichen Leads. Bots und alle Leads: siehe erste Karte.",
+      "Funnel ab Leads ohne Bots (Browser oder kein User Agent). Bots und alle Leads: siehe erste Karte.",
     trendTitle: "Kohorte nach Erstellungstag",
-    trendSubtitle: "Menschliche Leads und wie viele davon konvertierten.",
+    trendSubtitle: "Leads ohne Bots und wie viele davon konvertierten.",
     segmentsTitle: "Funnel pro Segment",
     segmentsSubtitle:
-      "Raten pro menschlichem Lead. Zeile anklicken für die Leads.",
+      "Raten pro Lead ohne Bots. Zeile anklicken für die Leads.",
     filtersTitle: "Segment",
     filtersSubtitle: "Grenzt jede Zahl auf dieser Seite ein.",
     apply: "Anwenden",

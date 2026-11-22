@@ -61,7 +61,7 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import React, { useCallback, useMemo } from "react";
 
-import { BotFamily, FunnelReach } from "../analytics/enum";
+import { FunnelReach, isBotFamily } from "../analytics/enum";
 import { type LeadDrillFilters, SEGMENT_KEYS } from "../analytics/filters";
 import {
   dimensionValueLabel,
@@ -177,7 +177,7 @@ function LeadRow({
   const isConverted = Boolean(lead.convertedUserId);
   const acquisition = lead.acquisition;
   const triage = lead.triage;
-  const isBot = triage ? triage.botFamily !== BotFamily.HUMAN : false;
+  const isBot = triage ? isBotFamily(triage.botFamily) : false;
   const origin = triage
     ? [
         dimensionValueLabel(triage.channelType, st),
@@ -383,7 +383,7 @@ function DrillRow({
   st: ReturnType<typeof useLeadAnalyticsT>;
 }): React.JSX.Element {
   const triage = lead.triage;
-  const isBot = triage ? triage.botFamily !== BotFamily.HUMAN : false;
+  const isBot = triage ? isBotFamily(triage.botFamily) : false;
   const origin = triage
     ? [
         dimensionValueLabel(triage.channelType, st),

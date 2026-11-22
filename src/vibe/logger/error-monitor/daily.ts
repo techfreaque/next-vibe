@@ -10,8 +10,44 @@
 
 import "server-only";
 
+import type { AnalyticsWindow } from "../../unified-ui/analytics/window";
 import type { LoggerMetadata } from "../types";
 import { errorLogDaily } from "./db";
+
+/**
+ * First day of live per-day counting. The migration that created
+ * error_log_daily (deployed 2026-11-21 23:40 UTC) backfilled each class's
+ * lifetime total onto its last-seen day, so rows before this day are lumps,
+ * not a daily history: reports must never count them as "in period".
+ */
+export const ERROR_LOG_DAILY_SINCE = new Date("2026-11-22T00:00:00.000Z");
+
+type WindowBounds = Pick<
+  AnalyticsWindow,
+  "from" | "to" | "previousFrom" | "previousTo"
+>;
+
+/**
+ * The window clamped to live daily history: `from` never before
+ * ERROR_LOG_DAILY_SINCE, and no previous period unless it is fully tracked
+ * (an untracked previous period is "no data", not zero).
+ */
+export function dailyHistoryWindow<TWindow extends WindowBounds>(
+  win: TWindow,
+): TWindow {
+  const since = ERROR_LOG_DAILY_SINCE.getTime();
+  const from = new Date(
+    Math.min(Math.max(win.from.getTime(), since), win.to.getTime()),
+  );
+  const previousTracked =
+    win.previousFrom !== null && win.previousFrom.getTime() >= since;
+  return {
+    ...win,
+    from,
+    previousFrom: previousTracked ? win.previousFrom : null,
+    previousTo: previousTracked ? win.previousTo : null,
+  };
+}
 
 /** Distinct ids kept per fingerprint per day (bounded row size). */
 export const ERROR_LOG_DAILY_MAX_IDS = 100;

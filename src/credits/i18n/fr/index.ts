@@ -28,6 +28,14 @@ export const translations: typeof enTranslations = {
       userSubscription: "Crédits d'abonnement utilisateur",
       leadFree: "Crédits gratuits du lead",
     },
+    creditFeature: {
+      textToSpeech: "Synthèse vocale",
+      speechToText: "Reconnaissance vocale",
+      memoryWrite: "Écriture en mémoire",
+      memoryEdit: "Modification de la mémoire",
+      memorySearch: "Recherche dans la mémoire",
+      memoryEmbedding: "Embedding de la mémoire",
+    },
     transactionType: {
       purchase: "Achat",
       subscription: "Abonnement",

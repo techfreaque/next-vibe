@@ -50,6 +50,7 @@ export const translations: typeof enTranslations = {
       byModel: "Por modelo",
       byFeature: "Por función",
       byProvider: "Por proveedor upstream",
+      featureLabels: "Nombres de funciones",
       topSpenders: "Mayores consumidores",
     },
     errors: {

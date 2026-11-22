@@ -2,10 +2,12 @@ export const translations = {
   leadAnalytics: {
     traffic: {
       label: "Traffic",
-      description: "Humans, bots, or both (classified from the user agent)",
+      description: "Humans, bots, or unknown (classified from the user agent)",
       all: "All traffic",
       humans: "Humans",
       bots: "Bots",
+      unknown: "Unknown (no user agent)",
+      notBots: "Not bots (humans + unknown)",
     },
     botFamily: {
       label: "Agent",
@@ -154,6 +156,7 @@ export const translations = {
       visitors: "Visitors",
       leads: "Leads",
       humanLeads: "Human leads",
+      notBotLeads: "Non-bot leads",
       botLeads: "Bot leads",
       signups: "Signups",
       emailConfirmed: "Confirmed",
