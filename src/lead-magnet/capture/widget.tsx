@@ -33,8 +33,11 @@ export function LeadCaptureForm({
   skillId,
   headline,
   buttonText,
+  layout = "stacked",
 }: {
   skillId: string;
+  /** "inline": headline beside a one-row form, for wide landing sections. */
+  layout?: "stacked" | "inline";
   /** Creator's configured copy — falls back to the default when not set. */
   headline: string | null;
   buttonText: string | null;
@@ -93,60 +96,87 @@ export function LeadCaptureForm({
     );
   }
 
+  const inline = layout === "inline";
+  const fields = (
+    <Div
+      className={
+        inline
+          ? "flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap lg:flex-nowrap"
+          : "flex w-full max-w-[340px] flex-col gap-2"
+      }
+    >
+      <Input
+        name="firstName"
+        autoComplete="given-name"
+        value={firstName}
+        onChange={(e): void => setFirstName(e.target.value)}
+        placeholder={t("form.namePlaceholder")}
+        aria-label={t("submit.fields.firstName.label")}
+        aria-invalid={nameInvalid}
+        disabled={state === "submitting"}
+        className={
+          nameInvalid ? "border-destructive bg-background" : "bg-background"
+        }
+      />
+      <Input<"email">
+        type="email"
+        name="email"
+        autoComplete="email"
+        value={email}
+        onChange={(e): void => setEmail(e.target.value)}
+        onKeyDown={(e): void => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            handleSubmit();
+          }
+        }}
+        placeholder={t("form.emailPlaceholder")}
+        aria-label={t("submit.fields.email.label")}
+        aria-invalid={emailInvalid}
+        disabled={state === "submitting"}
+        className={
+          emailInvalid ? "border-destructive bg-background" : "bg-background"
+        }
+      />
+      <Button
+        type="button"
+        onClick={handleSubmit}
+        disabled={state === "submitting"}
+      >
+        {state === "submitting"
+          ? t("form.sending")
+          : (buttonText ?? t("form.send"))}
+      </Button>
+      {state === "error" && (
+        <Span role="alert" className="text-xs text-destructive">
+          {t("form.error")}
+        </Span>
+      )}
+    </Div>
+  );
+
+  if (inline) {
+    return (
+      <Div className="grid gap-4 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-center md:gap-8">
+        <Div className="flex flex-col gap-1">
+          <Span className="text-base font-semibold text-foreground">
+            {headline ?? t("form.headline")}
+          </Span>
+          <Span className="text-sm text-muted-foreground">
+            {t("form.finePrint")}
+          </Span>
+        </Div>
+        {fields}
+      </Div>
+    );
+  }
+
   return (
     <Div className="flex flex-col items-center gap-3 text-center">
       <Span className="text-base font-semibold text-foreground">
         {headline ?? t("form.headline")}
       </Span>
-      <Div className="flex w-full max-w-[340px] flex-col gap-2">
-        <Input
-          name="firstName"
-          autoComplete="given-name"
-          value={firstName}
-          onChange={(e): void => setFirstName(e.target.value)}
-          placeholder={t("form.namePlaceholder")}
-          aria-label={t("submit.fields.firstName.label")}
-          aria-invalid={nameInvalid}
-          disabled={state === "submitting"}
-          className={
-            nameInvalid ? "border-destructive bg-background" : "bg-background"
-          }
-        />
-        <Input<"email">
-          type="email"
-          name="email"
-          autoComplete="email"
-          value={email}
-          onChange={(e): void => setEmail(e.target.value)}
-          onKeyDown={(e): void => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleSubmit();
-            }
-          }}
-          placeholder={t("form.emailPlaceholder")}
-          aria-label={t("submit.fields.email.label")}
-          aria-invalid={emailInvalid}
-          disabled={state === "submitting"}
-          className={
-            emailInvalid ? "border-destructive bg-background" : "bg-background"
-          }
-        />
-        <Button
-          type="button"
-          onClick={handleSubmit}
-          disabled={state === "submitting"}
-        >
-          {state === "submitting"
-            ? t("form.sending")
-            : (buttonText ?? t("form.send"))}
-        </Button>
-        {state === "error" && (
-          <Span role="alert" className="text-xs text-destructive">
-            {t("form.error")}
-          </Span>
-        )}
-      </Div>
+      {fields}
       <Span className="text-[11px] text-muted-foreground">
         {t("form.finePrint")}
       </Span>

@@ -2,10 +2,11 @@
  * Public Skill Landing Page
  * URL: /[locale]/skill/[skillId]   (variant URLs: /skill/<skill>__<variant>)
  *
- * Server-rendered landing: hero with real sample answers, the model that runs
- * the skill, example prompts that open the chat, related skills. Everything a
- * crawler needs is in the initial HTML. Data + metadata live in ./loader.ts;
- * this file stays thin so the client bundle never sees server code.
+ * Server-rendered "Launchpad" landing: who the skill is on the left, a start
+ * card with model, real per-message price and content tier on the right,
+ * first messages that open the chat, related skills. Everything a crawler
+ * needs is in the initial HTML. Data + metadata live in ./loader.ts; this
+ * file stays thin so the client bundle never sees server code.
  */
 
 export const dynamic = "force-dynamic";
