@@ -49,6 +49,7 @@ import { ChatMessageRole } from "../../../chat/enum";
 import { NO_SKILL_ID } from "../../../skills/constants";
 import { DEFAULT_CHAT_MODEL_ID } from "../../constants";
 import { AiStreamRepository } from "../../repository";
+import { isThreadRenameCall } from "../../repository/loop/helpers";
 import { seedFixtureThread } from "../../testing/fixture-seed";
 import {
   fetchThreadMessages,
@@ -66,6 +67,26 @@ import { scopedTranslation } from "../i18n";
 const TEST_TIMEOUT = 120_000;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+/**
+ * A silent rename-thread side-action row, direct or via execute-tool. The
+ * model picks the callbackMode (endLoop when it follows the prompt, wait when
+ * it omits it, as the mq1 recording does), so only the tool identifies it.
+ */
+function isRenameSideAction(m: SlimMessage): boolean {
+  const args = m.toolCall?.args;
+  const wrapped =
+    typeof args === "object" &&
+    args !== null &&
+    !Array.isArray(args) &&
+    !(args instanceof Date) &&
+    typeof args["toolName"] === "string"
+      ? args["toolName"]
+      : undefined;
+  return (
+    m.role === "tool" && isThreadRenameCall(m.toolCall?.toolName ?? "", wrapped)
+  );
+}
 
 /** Build parent→children adjacency map. Root messages keyed under "__root__". */
 function buildChildMap(messages: SlimMessage[]): Map<string, string[]> {
@@ -486,33 +507,47 @@ describe("Mid-Stream Queue - chain integrity", () => {
           const next = messages.find((m) => m.parentId === cur!.id);
           cur = next;
         }
-        const chainDesc = orderedChain.map((m) => m.role).join(" → ");
+        // A silent rename-thread side-action (mandated on an untitled
+        // thread) trails its answer as a tool row, and the next turn chains
+        // after it as the UI does (69553d7dd9, tipAfterAnswer in route-base).
+        // It is housekeeping, not an answer turn: allowed only right after an
+        // assistant, and excluded from the answer-turn shape below.
+        const chainDesc = orderedChain.map(msgDesc).join(" → ");
+        orderedChain.forEach((m, i) => {
+          if (m.role === "tool") {
+            expect(
+              isRenameSideAction(m) && orderedChain[i - 1]?.role === "assistant",
+              `MQ1: chain[${String(i)}] tool row must be a rename-thread side-action right after an assistant: ${chainDesc}`,
+            ).toBe(true);
+          }
+        });
+        const answerChain = orderedChain.filter((m) => !isRenameSideAction(m));
         expect(
-          orderedChain.length,
-          `MQ1: expected exactly 4 messages, got ${String(orderedChain.length)}: ${chainDesc}`,
+          answerChain.length,
+          `MQ1: expected exactly 4 answer-turn messages, got ${String(answerChain.length)}: ${chainDesc}`,
         ).toBe(4);
-        expect(orderedChain[0]!.id, "MQ1: chain[0] must be user1").toBe(
+        expect(answerChain[0]!.id, "MQ1: chain[0] must be user1").toBe(
           user1MsgId,
         );
-        expect(orderedChain[0]!.role, "MQ1: chain[0] must be user").toBe(
+        expect(answerChain[0]!.role, "MQ1: chain[0] must be user").toBe(
           "user",
         );
         expect(
-          orderedChain[1]!.role,
+          answerChain[1]!.role,
           "MQ1: chain[1] must be assistant (ai1)",
         ).toBe("assistant");
-        expect(orderedChain[2]!.id, "MQ1: chain[2] must be queuedUser").toBe(
+        expect(answerChain[2]!.id, "MQ1: chain[2] must be queuedUser").toBe(
           queued2MsgId,
         );
-        expect(orderedChain[2]!.role, "MQ1: chain[2] must be user").toBe(
+        expect(answerChain[2]!.role, "MQ1: chain[2] must be user").toBe(
           "user",
         );
         expect(
-          orderedChain[3]!.role,
+          answerChain[3]!.role,
           "MQ1: chain[3] must be assistant (ai2)",
         ).toBe("assistant");
         expect(
-          orderedChain[3]!.content,
+          answerChain[3]!.content,
           "MQ1: ai2 must contain QUEUED_DONE",
         ).toContain("QUEUED_DONE");
         // createdAt order must match parentId chain order

@@ -4,10 +4,12 @@ import { confirmedTestSignup } from "next-vibe/tooling/testing/testing-suite/con
  * Real DB (test instance), no mail sent (signup mail failures are non-blocking).
  */
 
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { leads } from "next-vibe/identity/lead/db";
+import { createAnonymousLead } from "next-vibe/identity/lead/middleware-ops";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { users } from "next-vibe/identity/user/db";
 import { UserDetailLevel } from "next-vibe/identity/user/enum";
@@ -32,6 +34,7 @@ const logger = createEndpointLogger(false, defaultLocale);
 describe("two-factor", () => {
   let admin: JwtPrivatePayloadType;
   const emails: string[] = [];
+  const leadIds: string[] = [];
 
   beforeAll(async () => {
     admin = await resolveTestAdminUser();
@@ -55,6 +58,9 @@ describe("two-factor", () => {
         });
       }
     }
+    if (leadIds.length > 0) {
+      await db.delete(leads).where(inArray(leads.id, leadIds));
+    }
   });
 
   const publicUser = () => ({
@@ -70,6 +76,15 @@ describe("two-factor", () => {
   }> {
     const email = `test-2fa-${Date.now()}-${Math.floor(Math.random() * 100000)}@example-test.invalid`;
     emails.push(email);
+    // Own lead per signup: confirmation mails are budgeted per lead (5/hour,
+    // signup/pending.ts since 6374986a06), so signing every test user up on
+    // the shared admin lead hit "Too many requests" after a few runs.
+    const leadId = await createAnonymousLead(
+      { userAgent: `two-factor-test-${email}` },
+      defaultLocale,
+      logger,
+    );
+    leadIds.push(leadId);
     const res = await confirmedTestSignup(
       {
         privateName: "TwoFa Test",
@@ -80,7 +95,7 @@ describe("two-factor", () => {
         acceptTerms: true,
         subscribeToNewsletter: false,
       },
-      publicUser(),
+      { isPublic: true, leadId, roles: [UserPermissionRole.PUBLIC] },
     );
     expect(res.success, JSON.stringify(res)).toBe(true);
     const found = await UserRepository.getUserByEmail(
@@ -97,7 +112,7 @@ describe("two-factor", () => {
       email,
       asUser: {
         id: found.data.id,
-        leadId: admin.leadId,
+        leadId,
         isPublic: false,
         roles: [UserPermissionRole.CUSTOMER],
       },

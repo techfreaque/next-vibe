@@ -145,6 +145,16 @@ export class LocalExecutionAsync {
       effectiveToolMessageId,
     });
 
+    // Fixture runs start the goroutine at the dispatching turn's end so its
+    // external calls never race that turn for the replay ordinal. Captured
+    // here, while the turn still holds its claim (testing/fixture-wakeup.ts).
+    const fixtureTurnGate = await (
+      await import("../../agent/ai-stream/testing/fixture-wakeup")
+    ).captureFixtureTurnGate({
+      threadId: effectiveThreadId,
+      parentThreadId: toolExecutionContext.parentThreadId,
+    });
+
     // RUNNING from creation: the goroutine below is already executing.
     // Streams and await-task discover in-flight work by this status.
     await LocalExecutionAsync.createLocalTask({
@@ -216,6 +226,7 @@ export class LocalExecutionAsync {
       );
 
       try {
+        await fixtureTurnGate(goroutineAbortController.signal);
         const executed = await LocalExecutionAsync.executeInGoroutine({
           ctx,
           input,

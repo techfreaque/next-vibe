@@ -15,7 +15,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { and, desc, eq, gte } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, or } from "drizzle-orm";
 import {
   createE2ECreditUser,
   type E2ECreditUser,
@@ -37,7 +37,7 @@ import {
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
-  fail,
+  failInline,
   success,
 } from "next-vibe/core/route/response.schema";
 import { db } from "next-vibe/database";
@@ -45,6 +45,7 @@ import type {
   JwtPrivatePayloadType,
   JWTPublicPayloadType,
 } from "next-vibe/identity/auth/types";
+import { userLeadLinks } from "next-vibe/identity/lead/db";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
@@ -204,12 +205,26 @@ async function fixtureContext(prefix: string): Promise<ToolExecutionContext> {
 
 /** Usage ledger rows of `user` since `since` (negative amounts). */
 async function chargedSince(user: JwtPrivatePayloadType, since: Date): Promise<number> {
+  // The account's pool: its user wallet AND every linked lead wallet. The free
+  // allowance lives on the lead wallets and is spent first (one free pool per
+  // account, 94002a48bd), so a user-wallet-only query misses those debits.
+  const leadIds = (
+    await db
+      .select({ leadId: userLeadLinks.leadId })
+      .from(userLeadLinks)
+      .where(eq(userLeadLinks.userId, user.id))
+  ).map((r) => r.leadId);
   const rows = await db
     .select({ amount: creditTransactions.amount })
     .from(creditTransactions)
     .innerJoin(creditWallets, eq(creditTransactions.walletId, creditWallets.id))
     .where(
-      and(eq(creditWallets.userId, user.id), gte(creditTransactions.createdAt, since)),
+      and(
+        leadIds.length > 0
+          ? or(eq(creditWallets.userId, user.id), inArray(creditWallets.leadId, leadIds))
+          : eq(creditWallets.userId, user.id),
+        gte(creditTransactions.createdAt, since),
+      ),
     )
     .orderBy(desc(creditTransactions.createdAt));
   const total = rows.reduce((sum, row) => sum + (row.amount < 0 ? -row.amount : 0), 0);
@@ -615,7 +630,8 @@ describe("OpenAI-compatible media API", () => {
         data: { model: MusicGenModelId.LYRIA_3_CLIP_PREVIEW, prompt: "x" },
         generate: () =>
           Promise.resolve(
-            fail({
+            // A provider's raw refusal text, as a tool repository passes it on.
+            failInline({
               message: "Request blocked by safety system: content policy violation",
               errorType: ErrorResponseTypes.BAD_REQUEST,
             }),

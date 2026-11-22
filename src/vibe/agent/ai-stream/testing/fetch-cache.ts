@@ -189,6 +189,13 @@ const compactingBodySchema = z
  * thread, wall-clock times), which grows run to run, so a raw-body hash
  * missed on every run and went live. The conversation being summarized plus
  * the summarizer instructions identify the call; system messages are dropped.
+ * Tool-result contents are dropped too (role + tool_call_id stay): they are
+ * live local executions, not replayed model output, so they track the
+ * environment rather than the conversation. A tool-help result lists the
+ * whole tool catalog, which every new endpoint changes (compacting-first-tool
+ * C1: totalCount 591 -> 608; compacting-mid-stream C2: new payments tools);
+ * hashing it orphaned every compacting recording each time a route landed.
+ * Replayed assistant turns + user prompts still pin the call's position.
  */
 export function normalizeCompactingBodyForHash(bodyStr: string): string {
   let parsedJson: WidgetData;
@@ -207,7 +214,13 @@ export function normalizeCompactingBodyForHash(bodyStr: string): string {
   return normalizeEmbeddingBodyForHash(
     JSON.stringify({
       ...parsed.data,
-      messages: parsed.data.messages.filter((m) => m.role !== "system"),
+      messages: parsed.data.messages
+        .filter((m) => m.role !== "system")
+        .map((m) =>
+          m.role === "tool"
+            ? { role: m.role, tool_call_id: m["tool_call_id"] }
+            : m,
+        ),
       provider: undefined,
     }),
   );
@@ -356,10 +369,13 @@ export async function resolveInstanceName(): Promise<string> {
  * for stream identity. Returns null when no ancestor is a fixture run (prod).
  * Bounded depth guards against a cycle. Called ONCE per bound fetch.
  */
-async function resolveFixtureRootThreadId(
+export async function resolveFixtureRootThreadId(
   threadId: string,
   contextParentThreadId: string | undefined,
 ): Promise<string | null> {
+  if (!fixturesEnabled()) {
+    return null;
+  }
   const { db } = await import("next-vibe/database");
   const { fixtures } = await import("./fixtures.db");
   const { chatThreads } = await import("../../chat/db");

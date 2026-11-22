@@ -15,11 +15,12 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { withTransaction } from "next-vibe/database/utils/repository-helpers";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { leads, userLeadLinks } from "next-vibe/identity/lead/db";
 import { UserRolesRepository } from "next-vibe/identity/roles/repository";
 import { sessions } from "next-vibe/identity/session/db";
-import { users } from "next-vibe/identity/user/db";
+import { userRoles as userRoleRows, users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { userApiKeys } from "@/api-keys/db";
@@ -421,14 +422,32 @@ export class UserByIdRepository {
         requestingUser: user.id,
       });
 
-      // Check if user exists
-      const [existingUser] = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, urlPathParams.id))
-        .limit(1);
+      // Hold the user row lock through cleanup so a concurrent lead conversion
+      // cannot add a reference between nullifying leads and deleting the user.
+      const deleted = await withTransaction(logger, async (tx) => {
+        const [target] = await tx
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.id, urlPathParams.id))
+          .for("update");
+        if (!target) {
+          return false;
+        }
 
-      if (!existingUser) {
+        await tx.delete(userRoleRows).where(eq(userRoleRows.userId, target.id));
+        await tx
+          .update(leads)
+          .set({ convertedUserId: null })
+          .where(eq(leads.convertedUserId, target.id));
+
+        // Pending password-reset tokens use a foreign key with no cascade.
+        await tx
+          .delete(passwordResets)
+          .where(eq(passwordResets.userId, target.id));
+        await tx.delete(users).where(eq(users.id, target.id));
+        return true;
+      });
+      if (!deleted) {
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
           message: t("id.delete.errors.notFound.detail", {
@@ -437,27 +456,6 @@ export class UserByIdRepository {
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
-
-      // Nullify converted_user_id in leads to satisfy FK constraint
-      await db
-        .update(leads)
-        .set({ convertedUserId: null })
-        .where(eq(leads.convertedUserId, urlPathParams.id));
-
-      // Pending password-reset tokens block the delete (FK, no cascade)
-      await db
-        .delete(passwordResets)
-        .where(eq(passwordResets.userId, urlPathParams.id));
-
-      // Delete user roles first to satisfy FK constraint
-      await UserRolesRepository.deleteByUserId(
-        urlPathParams.id,
-        logger,
-        locale,
-      );
-
-      // Delete user
-      await db.delete(users).where(eq(users.id, urlPathParams.id));
 
       logger.debug("User deleted successfully", { userId: urlPathParams.id });
 
