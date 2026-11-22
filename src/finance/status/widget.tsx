@@ -121,10 +121,10 @@ export function FinanceStatusWidget(): JSX.Element {
   const readingIsStale = (timestamp: string | null, cadence: number): boolean =>
     timestamp !== null &&
     new Date(data.asOf).getTime() - new Date(timestamp).getTime() > 2 * cadence;
-  const marginValue = (amount: number): string =>
-    data.week.marginDays > 0
-      ? money.format(amount)
-      : t("status.widget.missingCost");
+  const pctValue = (value: number | null): string =>
+    value === null
+      ? t("status.widget.margin.missingPct")
+      : `${pct.format(value)}%`;
 
   const revenue = data.sources.filter((s) => isRevenue(s.source));
   const provs = data.sources.filter((s) => !isRevenue(s.source));
@@ -232,41 +232,40 @@ export function FinanceStatusWidget(): JSX.Element {
           <>
             <Div className="grid grid-cols-2 gap-2 @md:grid-cols-3 @xl:grid-cols-5">
               <Stat
-                label={t("status.widget.margin.revenue")}
-                value={marginValue(data.week.netRevenueUsd)}
-              />
-              <Stat
-                label={t("status.widget.margin.fees")}
-                value={marginValue(data.week.processorFeesUsd)}
+                label={t("status.widget.margin.earned")}
+                value={money.format(data.week.earnedUsd)}
               />
               <Stat
                 label={t("status.widget.margin.cost")}
-                value={marginValue(data.week.upstreamCostUsd)}
+                value={money.format(data.week.providerCostUsd)}
               />
               <Stat
                 label={t("status.widget.margin.margin")}
-                value={marginValue(data.week.grossMarginUsd)}
-                negative={data.week.grossMarginUsd < 0}
+                value={money.format(data.week.aiMarginUsd)}
+                negative={data.week.aiMarginUsd < 0}
               />
               <Stat
                 label={t("status.widget.margin.pct")}
-                value={
-                  data.week.grossMarginPct === null
-                    ? t("status.widget.margin.missingPct")
-                    : `${pct.format(data.week.grossMarginPct)}%`
-                }
-                negative={(data.week.grossMarginPct ?? 0) < 0}
+                value={pctValue(data.week.aiMarginPct)}
+                negative={(data.week.aiMarginPct ?? 0) < 0}
+              />
+              <Stat
+                label={t("status.widget.margin.paidPct")}
+                value={pctValue(data.week.paidMarginPct)}
+                negative={(data.week.paidMarginPct ?? 0) < 0}
               />
             </Div>
-            {data.week.totalDays > 0 && !data.week.costComplete && (
-              <P className="text-xs text-muted-foreground">
-                {t("status.widget.margin.costIncomplete", {
-                  tracked: data.week.marginDays,
-                  total: data.week.expectedDays,
-                  revenue: money.format(data.week.netRevenueAllDaysUsd),
-                })}
-              </P>
-            )}
+            <P className="text-xs text-muted-foreground">
+              {t("status.widget.margin.basis", {
+                free: money.format(data.week.freeListUsd),
+              })}
+            </P>
+            <P className="text-xs text-muted-foreground">
+              {t("status.widget.margin.cash", {
+                net: money.format(data.week.cashNetUsd),
+                fees: money.format(data.week.processorFeesUsd),
+              })}
+            </P>
             {data.days.length === 0 ? (
               <Empty text={t("status.widget.margin.empty")} />
             ) : (
@@ -278,28 +277,25 @@ export function FinanceStatusWidget(): JSX.Element {
                   >
                     <Span className="font-medium">{d.day}</Span>
                     <Span className="text-muted-foreground">
-                      {money.format(d.netRevenueUsd)} -{" "}
-                      {d.processorFeesUsd > 0
-                        ? `${money.format(d.processorFeesUsd)} - `
-                        : ""}
-                      {d.upstreamCostUsd === null
-                        ? t("status.widget.margin.costUnknown")
-                        : money.format(d.upstreamCostUsd)}
+                      {money.format(d.earnedUsd)} -{" "}
+                      {money.format(d.providerCostUsd)}
                     </Span>
                     <Span
                       className={
-                        (d.grossMarginUsd ?? 0) < 0
+                        d.aiMarginUsd < 0
                           ? "text-destructive font-semibold"
                           : "font-semibold"
                       }
                     >
-                      {d.grossMarginUsd === null
-                        ? t(d.costCoverage)
-                        : `${money.format(d.grossMarginUsd)}${
-                            d.grossMarginPct === null
-                              ? ""
-                              : ` (${pct.format(d.grossMarginPct)}%)`
-                          }`}
+                      {money.format(d.aiMarginUsd)}
+                      {d.aiMarginPct === null
+                        ? ""
+                        : ` (${pct.format(d.aiMarginPct)}%)`}
+                    </Span>
+                    <Span className="w-full text-xs text-muted-foreground @md:w-auto">
+                      {t("status.widget.margin.cashDay", {
+                        net: money.format(d.cashNetUsd),
+                      })}
                     </Span>
                   </Div>
                 ))}

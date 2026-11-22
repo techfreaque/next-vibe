@@ -20,6 +20,8 @@ export const {
   UNCENSORED_AI: "enums.source.uncensoredAi",
   GAB: "enums.source.gab",
   FREEDOM_GPT: "enums.source.freedomGpt",
+  MODELSLAB: "enums.source.modelsLab",
+  EDEN_AI: "enums.source.edenAi",
 });
 
 export const FinanceSourceDB = [
@@ -31,6 +33,8 @@ export const FinanceSourceDB = [
   FinanceSource.UNCENSORED_AI,
   FinanceSource.GAB,
   FinanceSource.FREEDOM_GPT,
+  FinanceSource.MODELSLAB,
+  FinanceSource.EDEN_AI,
 ] as const;
 
 export const RevenueSources = [
@@ -45,6 +49,8 @@ export const ProviderSources = [
   FinanceSource.UNCENSORED_AI,
   FinanceSource.GAB,
   FinanceSource.FREEDOM_GPT,
+  FinanceSource.MODELSLAB,
+  FinanceSource.EDEN_AI,
 ] as const;
 
 /** Provider filter for per-provider series: one provider or all. */
@@ -60,6 +66,8 @@ export const {
   UNCENSORED_AI: "enums.source.uncensoredAi",
   GAB: "enums.source.gab",
   FREEDOM_GPT: "enums.source.freedomGpt",
+  MODELSLAB: "enums.source.modelsLab",
+  EDEN_AI: "enums.source.edenAi",
 });
 
 /** What one raw revenue row is. */
@@ -177,6 +185,8 @@ export const {
     "enums.threshold.nanoGptAutoTopUpGraceHours",
   VENICE_AUTO_TOP_UP_FLOOR_USD: "enums.threshold.veniceAutoTopUpFloorUsd",
   VENICE_AUTO_TOP_UP_GRACE_HOURS: "enums.threshold.veniceAutoTopUpGraceHours",
+  MODELSLAB_LOW_BALANCE_USD: "enums.threshold.modelsLabLowBalanceUsd",
+  EDEN_AI_LOW_BALANCE_USD: "enums.threshold.edenAiLowBalanceUsd",
 });
 
 export const ThresholdKeyDB = [
@@ -201,6 +211,8 @@ export const ThresholdKeyDB = [
   ThresholdKey.NANO_GPT_AUTO_TOP_UP_GRACE_HOURS,
   ThresholdKey.VENICE_AUTO_TOP_UP_FLOOR_USD,
   ThresholdKey.VENICE_AUTO_TOP_UP_GRACE_HOURS,
+  ThresholdKey.MODELSLAB_LOW_BALANCE_USD,
+  ThresholdKey.EDEN_AI_LOW_BALANCE_USD,
 ] as const;
 
 /** Which part of an ingest to run. */
@@ -253,5 +265,17 @@ export const {
   GROSS_MARGIN_PCT: "enums.metric.grossMarginPct",
   PROVIDER_SPEND: "enums.metric.providerSpend",
   PROVIDER_BALANCE: "enums.metric.providerBalance",
+  PROVIDER_BALANCE_NATIVE: "enums.metric.providerBalanceNative",
   ALERTS: "enums.metric.alerts",
+  PROVIDER_COST: "enums.metric.providerCost",
+  COST_TOTAL: "enums.metric.costTotal",
+  COST_PAID: "enums.metric.costPaid",
+  COST_FREE: "enums.metric.costFree",
+  CONSUMED_LIST: "enums.metric.consumedList",
+  EARNED: "enums.metric.earned",
+  FREE_LIST: "enums.metric.freeList",
+  AI_MARGIN_USD: "enums.metric.aiMarginUsd",
+  AI_MARGIN_PCT: "enums.metric.aiMarginPct",
+  PAID_MARGIN_USD: "enums.metric.paidMarginUsd",
+  PAID_MARGIN_PCT: "enums.metric.paidMarginPct",
 });

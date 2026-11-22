@@ -64,12 +64,14 @@ describe("finance digest", () => {
     const body = lines.join("\n");
     expect(body).toContain("Revenue MTD (net): $200.00");
     expect(body).toContain("NOWPayments: awaiting NOWPAYMENTS_API_KEY, not counted");
-    expect(body).toContain("Gross margin MTD: $150.00 (75.0%)");
+    // Cash in minus provider cost is not a margin: never printed as one.
+    expect(body).not.toContain("Gross margin MTD");
+    expect(body).toContain("Margin: see AI margin in the Finance graph");
     expect(body).toContain("Provider spend 24h: $4.50");
     expect(body).toContain("CRITICAL: drain on OpenRouter");
   });
 
-  it("flags fallback revenue, nets fees, and names the flat Gab plan", async () => {
+  it("flags fallback revenue, lists fees, and names the flat Gab plan", async () => {
     const lines = await collectFinanceDigestLines(
       runner({
         "FROM finance_source_status": [
@@ -92,7 +94,7 @@ describe("finance digest", () => {
     expect(body).toContain("NOWPAYMENTS_API_KEY + NOWPAYMENTS_EMAIL + NOWPAYMENTS_PASSWORD");
     expect(body).not.toContain("Stripe: FALLBACK");
     expect(body).toContain("Processor fees MTD: $5.00");
-    expect(body).toContain("Gross margin MTD: $65.00 (65.0%)");
+    expect(body).not.toContain("Gross margin MTD");
     expect(body).toContain("Gab AI: flat-rate plan $16.67/month (counted in cost)");
     expect(body).toContain("uncensored.ai: no API, spend estimated from 351 billed calls");
   });

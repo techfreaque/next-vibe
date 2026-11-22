@@ -45,8 +45,12 @@ export class RunConfigRepository {
         to: new Date(data.rangeTo),
       };
 
+      // An inline config has no graph row: its synthetic id is not a uuid, so
+      // persisting datapoints / signals for it can only fail. Run read-only.
       const graphId = `inline-${Date.now().toString()}`;
-      const result = await runGraph(graphId, parsed.data, range);
+      const result = await runGraph(graphId, parsed.data, range, undefined, {
+        readOnly: true,
+      });
 
       return success({
         nodeCount: result.series.size + result.signals.size,

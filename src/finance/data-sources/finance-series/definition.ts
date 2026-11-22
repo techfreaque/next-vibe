@@ -1,8 +1,9 @@
 /**
  * Finance Series - Data Source Definition
- * One endpoint, many series: pick the metric per graph node (revenue by
- * processor, net revenue, refunds, upstream cost, margin, provider spend and
- * balance, alerts). Client+server safe. No server imports.
+ * One endpoint, many series: pick the metric per graph node. Cash flow
+ * (revenue by processor, net, refunds), consumption (credits consumed, earned
+ * from paid credits, free usage), provider cost per registry provider from our
+ * own usage records, AI margin, provider balances, alerts. Client+server safe. No server imports.
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
@@ -88,6 +89,14 @@ const { POST } = createEndpoint({
         schema: z.enum(ProviderFilter).default(ProviderFilter.ALL),
         columns: 6,
       }),
+      costProvider: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "series.fields.costProvider.label",
+        description: "series.fields.costProvider.description",
+        schema: z.string().trim().min(1).optional(),
+        columns: 6,
+      }),
       result: timeSeriesResponseField(scopedTranslation, {
         label: "series.fields.result.label",
         description: "series.fields.result.description",
@@ -114,6 +123,15 @@ const { POST } = createEndpoint({
         range: { from: new Date("2026-10-01"), to: new Date("2026-10-31") },
         metric: FinanceMetric.PROVIDER_SPEND,
         provider: ProviderFilter.OPENROUTER,
+      },
+      uncensoredAiCost: {
+        range: { from: new Date("2026-10-01"), to: new Date("2026-10-31") },
+        metric: FinanceMetric.PROVIDER_COST,
+        costProvider: "uncensored-ai",
+      },
+      aiMargin: {
+        range: { from: new Date("2026-10-01"), to: new Date("2026-10-31") },
+        metric: FinanceMetric.AI_MARGIN_USD,
       },
     },
     responses: {

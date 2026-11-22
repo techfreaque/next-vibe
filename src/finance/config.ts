@@ -109,5 +109,8 @@ export const FINANCE_CONFIG = {
     nanoGptAutoTopUpGraceHours: 1,
     veniceAutoTopUpFloorUsd: 5,
     veniceAutoTopUpGraceHours: 1,
+    // Prepaid USD wallets without auto top-up: alert below this balance.
+    modelsLabLowBalanceUsd: 5,
+    edenAiLowBalanceUsd: 5,
   },
 } as const;

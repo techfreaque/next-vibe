@@ -46,6 +46,8 @@ export interface Thresholds {
   nanoGptAutoTopUpGraceHours: number;
   veniceAutoTopUpFloorUsd: number;
   veniceAutoTopUpGraceHours: number;
+  modelsLabLowBalanceUsd: number;
+  edenAiLowBalanceUsd: number;
 }
 
 export const DEFAULT_THRESHOLDS: Thresholds = {
@@ -80,6 +82,8 @@ export const THRESHOLD_FIELD: Readonly<
   [ThresholdKey.NANO_GPT_AUTO_TOP_UP_GRACE_HOURS]: "nanoGptAutoTopUpGraceHours",
   [ThresholdKey.VENICE_AUTO_TOP_UP_FLOOR_USD]: "veniceAutoTopUpFloorUsd",
   [ThresholdKey.VENICE_AUTO_TOP_UP_GRACE_HOURS]: "veniceAutoTopUpGraceHours",
+  [ThresholdKey.MODELSLAB_LOW_BALANCE_USD]: "modelsLabLowBalanceUsd",
+  [ThresholdKey.EDEN_AI_LOW_BALANCE_USD]: "edenAiLowBalanceUsd",
 };
 
 export interface ThresholdOverride {
@@ -417,15 +421,26 @@ export const CREDIT_BALANCE_THRESHOLDS: Partial<
   [FinanceSource.GAB]: "gabLowBalanceCredits",
   [FinanceSource.UNCENSORED_AI]: "uncensoredAiLowBalanceCredits",
   [FinanceSource.FREEDOM_GPT]: "freedomGptLowBalanceCredits",
+  // USD wallets without auto top-up: same floor logic, the unit is dollars.
+  [FinanceSource.MODELSLAB]: "modelsLabLowBalanceUsd",
+  [FinanceSource.EDEN_AI]: "edenAiLowBalanceUsd",
 };
+
+/** Providers whose CREDIT_BALANCE_THRESHOLDS floor is in USD, not credits. */
+export const USD_BALANCE_FLOOR_SOURCES: ReadonlySet<typeof FinanceSourceValue> =
+  new Set([FinanceSource.MODELSLAB, FinanceSource.EDEN_AI]);
 
 export function detectCreditLowBalance(input: {
   provider: typeof FinanceSourceValue;
   providerLabel: string;
   balanceCredits: number;
   warningCredits: number;
+  /** "usd" for a dollar wallet; credits otherwise */
+  unit?: "usd" | "credits";
 }): AlertCandidate | null {
   const { provider, providerLabel, balanceCredits, warningCredits } = input;
+  const amount = (value: number): string =>
+    input.unit === "usd" ? money(value) : `${value} credits`;
   if (warningCredits <= 0 || balanceCredits >= warningCredits) {
     return null;
   }
@@ -438,7 +453,7 @@ export function detectCreditLowBalance(input: {
     severity: critical ? AlertSeverity.CRITICAL : AlertSeverity.WARNING,
     subject: provider,
     dedupKey: `low-balance:${provider}:${critical ? "critical" : "warning"}`,
-    message: `Low ${providerLabel} balance: ${balanceCredits} credits remaining, below ${thresholdCredits}. Check the account's credits and top-up settings.`,
+    message: `Low ${providerLabel} balance: ${amount(balanceCredits)} remaining, below ${amount(thresholdCredits)}. Check the account's credits and top-up settings.`,
     metadata: { balanceCredits, thresholdCredits },
   };
 }

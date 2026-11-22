@@ -32,6 +32,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { GraphResolution } from "next-vibe/dataflow/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { creditTransactions, creditWallets } from "@/credits/db";
@@ -45,6 +46,7 @@ import { paymentEnv } from "@/payment/env";
 import { agentEnv } from "@/vibe/agent/env";
 
 import { FINANCE_CONFIG } from "./config";
+import { ConsumptionRepository } from "./consumption-repository";
 import {
   financeAlerts,
   financeDailyRollups,
@@ -95,6 +97,7 @@ import {
   type Thresholds,
   type TrailingRate,
   trailingSpendRate,
+  USD_BALANCE_FLOOR_SOURCES,
 } from "./logic";
 import {
   type DashboardCredentials,
@@ -199,6 +202,10 @@ export const defaultFinanceDeps: FinanceDeps = {
         return nonEmpty(paymentEnv.STRIPE_SECRET_KEY);
       case FinanceSource.NOWPAYMENTS:
         return nonEmpty(paymentEnv.NOWPAYMENTS_API_KEY);
+      case FinanceSource.MODELSLAB:
+        return nonEmpty(agentEnv.MODELSLAB_API_KEY);
+      case FinanceSource.EDEN_AI:
+        return nonEmpty(agentEnv.EDEN_AI_API_KEY);
       default:
         return undefined;
     }
@@ -856,6 +863,7 @@ export class FinanceRepository {
               providerLabel: adapter.label,
               balanceCredits: balanceNative,
               warningCredits: thresholds[creditFloor],
+              unit: USD_BALANCE_FLOOR_SOURCES.has(provider) ? "usd" : "credits",
             }),
           });
         }
@@ -1917,36 +1925,34 @@ export class FinanceRepository {
           ),
         )
         .orderBy(desc(financeDailyRollups.day));
-      const days = rollups.map((r) => ({
-        day: dayKey(r.day),
-        netRevenueUsd: r.netRevenueUsd,
-        processorFeesUsd: r.processorFeesUsd,
-        upstreamCostUsd: r.upstreamCostUsd,
-        grossMarginUsd: r.grossMarginUsd,
-        grossMarginPct: r.grossMarginPct,
-        billingGapPct: r.billingGapPct,
-        costCoverage: r.costCoverage,
-      }));
-      // The week margin is judged ONLY over days with COMPLETE cost coverage:
-      // mixing in revenue from a day whose cost is unknown (or partial) inflates
-      // the margin with cost that was never measured. Revenue over every day is
-      // reported separately so nothing is hidden.
-      const tracked = rollups.filter(
-        (r) => r.costCoverage === CostCoverage.COMPLETE,
+      // AI economics come from consumption (credits consumed at their paid
+      // price vs provider cost of that usage), never from cash: payments
+      // arrive in monthly / yearly lumps, provider cost arrives per call.
+      const consumption = await ConsumptionRepository.valued(
+        GraphResolution.ONE_DAY,
+        { from: since, to: now },
+        now,
       );
-      const netAll = rollups.reduce((a, r) => a + r.netRevenueUsd, 0);
-      const net = tracked.reduce((a, r) => a + r.netRevenueUsd, 0);
-      const fees = tracked.reduce((a, r) => a + r.processorFeesUsd, 0);
-      const cost = tracked.reduce((a, r) => a + (r.upstreamCostUsd ?? 0), 0);
-      const costComplete = tracked.length === expectedDays;
-      const weekMargin = computeMargin({
-        grossRevenueUsd: net,
-        refundsUsd: 0,
-        disputesUsd: 0,
-        processorFeesUsd: fees,
-        upstreamCostUsd: cost,
-        internalBilledUsd: 0,
-      });
+      const cashByDay = new Map(
+        rollups.map((r) => [dayKey(r.day), r.netRevenueUsd]),
+      );
+      const days = consumption
+        .map((c) => ({
+          day: c.bucket.slice(0, 10),
+          cashNetUsd: round2(cashByDay.get(c.bucket.slice(0, 10)) ?? 0),
+          earnedUsd: round2(c.earnedUsd),
+          providerCostUsd: round2(c.costTotalUsd),
+          aiMarginUsd: round2(c.aiMarginUsd),
+          aiMarginPct: c.aiMarginPct === null ? null : round2(c.aiMarginPct),
+        }))
+        .toReversed();
+      const sum = (pick: (c: (typeof consumption)[number]) => number): number =>
+        consumption.reduce((a, c) => a + pick(c), 0);
+      const earned = sum((c) => c.earnedUsd);
+      const providerCost = sum((c) => c.costTotalUsd);
+      const costPaid = sum((c) => c.costPaidUsd);
+      const aiMargin = earned - providerCost;
+      const paidMargin = earned - costPaid;
 
       const alertRows = await db
         .select()
@@ -1974,16 +1980,18 @@ export class FinanceRepository {
         lastIngestAt: lastIngestAt?.toISOString() ?? null,
         sources,
         week: {
-          netRevenueUsd: round2(net),
-          processorFeesUsd: round2(fees),
-          upstreamCostUsd: round2(cost),
-          grossMarginUsd: weekMargin.grossMarginUsd,
-          grossMarginPct: weekMargin.grossMarginPct,
-          costComplete,
-          marginDays: tracked.length,
-          totalDays: rollups.length,
-          expectedDays,
-          netRevenueAllDaysUsd: round2(netAll),
+          earnedUsd: round2(earned),
+          providerCostUsd: round2(providerCost),
+          aiMarginUsd: round2(aiMargin),
+          aiMarginPct: earned > 0 ? round2((aiMargin / earned) * 100) : null,
+          paidMarginPct:
+            earned > 0 ? round2((paidMargin / earned) * 100) : null,
+          freeListUsd: round2(sum((c) => c.freeListUsd)),
+          cashNetUsd: round2(rollups.reduce((a, r) => a + r.netRevenueUsd, 0)),
+          processorFeesUsd: round2(
+            rollups.reduce((a, r) => a + r.processorFeesUsd, 0),
+          ),
+          days: consumption.length,
         },
         days,
         alerts: alertRows.map((a) => ({

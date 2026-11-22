@@ -15,8 +15,6 @@ import { z } from "zod";
 import { FINANCE_STATUS_ALIAS } from "../constants";
 import {
   AlertSeverityDB,
-  CostCoverage,
-  CostCoverageDB,
   FinanceAlertTypeDB,
   FinanceSource,
   FinanceSourceDB,
@@ -47,15 +45,20 @@ const sourceSchema = z.object({
   lastSpendNative: z.number().nullable(),
 });
 
+/**
+ * One day of AI economics (consumption-based) plus that day's cash, shown
+ * side by side and never netted: cash arrives in plan / pack lumps.
+ */
 const daySchema = z.object({
   day: z.string(),
-  netRevenueUsd: z.number(),
-  processorFeesUsd: z.number(),
-  upstreamCostUsd: z.number().nullable(),
-  grossMarginUsd: z.number().nullable(),
-  grossMarginPct: z.number().nullable(),
-  billingGapPct: z.number().nullable(),
-  costCoverage: z.enum(CostCoverageDB),
+  /** Net cash received that day (Stripe + NOWPayments - refunds) */
+  cashNetUsd: z.number(),
+  /** Paid credits consumed x what was paid per credit */
+  earnedUsd: z.number(),
+  /** Provider cost of all usage that day (our own records + flat plans) */
+  providerCostUsd: z.number(),
+  aiMarginUsd: z.number(),
+  aiMarginPct: z.number().nullable(),
 });
 
 const alertSchema = z.object({
@@ -118,18 +121,20 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "status.response.week",
         schema: z.object({
-          // Revenue / fees / cost / margin over the COMPLETE-cost days only.
-          netRevenueUsd: z.number(),
+          // AI economics from consumption: earned = paid credits consumed at
+          // their paid price; AI margin = earned - provider cost of all usage.
+          earnedUsd: z.number(),
+          providerCostUsd: z.number(),
+          aiMarginUsd: z.number(),
+          aiMarginPct: z.number().nullable(),
+          /** earned - provider cost of PAID usage only (pricing health) */
+          paidMarginPct: z.number().nullable(),
+          /** Free / bonus / admin credits consumed at list price */
+          freeListUsd: z.number(),
+          // Cash flow, reported separately and never netted against cost.
+          cashNetUsd: z.number(),
           processorFeesUsd: z.number(),
-          upstreamCostUsd: z.number(),
-          grossMarginUsd: z.number(),
-          grossMarginPct: z.number().nullable(),
-          costComplete: z.boolean(),
-          marginDays: z.number(),
-          totalDays: z.number(),
-          expectedDays: z.number(),
-          // Net revenue over every day in the window, tracked cost or not.
-          netRevenueAllDaysUsd: z.number(),
+          days: z.number(),
         }),
       }),
       days: responseField(scopedTranslation, {
@@ -192,27 +197,24 @@ const { GET } = createEndpoint({
           },
         ],
         week: {
-          netRevenueUsd: 0,
-          processorFeesUsd: 0,
-          upstreamCostUsd: 0,
-          grossMarginUsd: 0,
-          grossMarginPct: null,
-          costComplete: false,
-          marginDays: 0,
-          totalDays: 1,
-          expectedDays: 7,
-          netRevenueAllDaysUsd: 120,
+          earnedUsd: 4.72,
+          providerCostUsd: 10.7,
+          aiMarginUsd: -5.98,
+          aiMarginPct: -126.69,
+          paidMarginPct: 23.84,
+          freeListUsd: 7.94,
+          cashNetUsd: 120,
+          processorFeesUsd: 6,
+          days: 1,
         },
         days: [
           {
             day: "2026-11-18",
-            netRevenueUsd: 120,
-            processorFeesUsd: 6,
-            upstreamCostUsd: null,
-            grossMarginUsd: null,
-            grossMarginPct: null,
-            billingGapPct: null,
-            costCoverage: CostCoverage.NONE,
+            cashNetUsd: 120,
+            earnedUsd: 4.72,
+            providerCostUsd: 10.7,
+            aiMarginUsd: -5.98,
+            aiMarginPct: -126.69,
           },
         ],
         alerts: [],
@@ -224,16 +226,15 @@ const { GET } = createEndpoint({
         lastSuccessfulIngestAt: null,
         sources: [],
         week: {
-          netRevenueUsd: 0,
+          earnedUsd: 0,
+          providerCostUsd: 0,
+          aiMarginUsd: 0,
+          aiMarginPct: null,
+          paidMarginPct: null,
+          freeListUsd: 0,
+          cashNetUsd: 0,
           processorFeesUsd: 0,
-          upstreamCostUsd: 0,
-          grossMarginUsd: 0,
-          grossMarginPct: null,
-          costComplete: false,
-          marginDays: 0,
-          totalDays: 0,
-          expectedDays: 7,
-          netRevenueAllDaysUsd: 0,
+          days: 0,
         },
         days: [],
         alerts: [],

@@ -91119,8 +91119,56 @@
               "label": "enums.metric.providerBalance"
             },
             {
+              "value": "enums.metric.providerBalanceNative",
+              "label": "enums.metric.providerBalanceNative"
+            },
+            {
               "value": "enums.metric.alerts",
               "label": "enums.metric.alerts"
+            },
+            {
+              "value": "enums.metric.providerCost",
+              "label": "enums.metric.providerCost"
+            },
+            {
+              "value": "enums.metric.costTotal",
+              "label": "enums.metric.costTotal"
+            },
+            {
+              "value": "enums.metric.costPaid",
+              "label": "enums.metric.costPaid"
+            },
+            {
+              "value": "enums.metric.costFree",
+              "label": "enums.metric.costFree"
+            },
+            {
+              "value": "enums.metric.consumedList",
+              "label": "enums.metric.consumedList"
+            },
+            {
+              "value": "enums.metric.earned",
+              "label": "enums.metric.earned"
+            },
+            {
+              "value": "enums.metric.freeList",
+              "label": "enums.metric.freeList"
+            },
+            {
+              "value": "enums.metric.aiMarginUsd",
+              "label": "enums.metric.aiMarginUsd"
+            },
+            {
+              "value": "enums.metric.aiMarginPct",
+              "label": "enums.metric.aiMarginPct"
+            },
+            {
+              "value": "enums.metric.paidMarginUsd",
+              "label": "enums.metric.paidMarginUsd"
+            },
+            {
+              "value": "enums.metric.paidMarginPct",
+              "label": "enums.metric.paidMarginPct"
             }
           ],
           "schema": {
@@ -91140,7 +91188,19 @@
                     "GROSS_MARGIN_PCT": "enums.metric.grossMarginPct",
                     "PROVIDER_SPEND": "enums.metric.providerSpend",
                     "PROVIDER_BALANCE": "enums.metric.providerBalance",
-                    "ALERTS": "enums.metric.alerts"
+                    "PROVIDER_BALANCE_NATIVE": "enums.metric.providerBalanceNative",
+                    "ALERTS": "enums.metric.alerts",
+                    "PROVIDER_COST": "enums.metric.providerCost",
+                    "COST_TOTAL": "enums.metric.costTotal",
+                    "COST_PAID": "enums.metric.costPaid",
+                    "COST_FREE": "enums.metric.costFree",
+                    "CONSUMED_LIST": "enums.metric.consumedList",
+                    "EARNED": "enums.metric.earned",
+                    "FREE_LIST": "enums.metric.freeList",
+                    "AI_MARGIN_USD": "enums.metric.aiMarginUsd",
+                    "AI_MARGIN_PCT": "enums.metric.aiMarginPct",
+                    "PAID_MARGIN_USD": "enums.metric.paidMarginUsd",
+                    "PAID_MARGIN_PCT": "enums.metric.paidMarginPct"
                   }
                 },
                 "type": "enum",
@@ -91155,7 +91215,19 @@
                   "GROSS_MARGIN_PCT": "enums.metric.grossMarginPct",
                   "PROVIDER_SPEND": "enums.metric.providerSpend",
                   "PROVIDER_BALANCE": "enums.metric.providerBalance",
-                  "ALERTS": "enums.metric.alerts"
+                  "PROVIDER_BALANCE_NATIVE": "enums.metric.providerBalanceNative",
+                  "ALERTS": "enums.metric.alerts",
+                  "PROVIDER_COST": "enums.metric.providerCost",
+                  "COST_TOTAL": "enums.metric.costTotal",
+                  "COST_PAID": "enums.metric.costPaid",
+                  "COST_FREE": "enums.metric.costFree",
+                  "CONSUMED_LIST": "enums.metric.consumedList",
+                  "EARNED": "enums.metric.earned",
+                  "FREE_LIST": "enums.metric.freeList",
+                  "AI_MARGIN_USD": "enums.metric.aiMarginUsd",
+                  "AI_MARGIN_PCT": "enums.metric.aiMarginPct",
+                  "PAID_MARGIN_USD": "enums.metric.paidMarginUsd",
+                  "PAID_MARGIN_PCT": "enums.metric.paidMarginPct"
                 },
                 "options": [
                   "enums.metric.stripeRevenue",
@@ -91168,7 +91240,19 @@
                   "enums.metric.grossMarginPct",
                   "enums.metric.providerSpend",
                   "enums.metric.providerBalance",
-                  "enums.metric.alerts"
+                  "enums.metric.providerBalanceNative",
+                  "enums.metric.alerts",
+                  "enums.metric.providerCost",
+                  "enums.metric.costTotal",
+                  "enums.metric.costPaid",
+                  "enums.metric.costFree",
+                  "enums.metric.consumedList",
+                  "enums.metric.earned",
+                  "enums.metric.freeList",
+                  "enums.metric.aiMarginUsd",
+                  "enums.metric.aiMarginPct",
+                  "enums.metric.paidMarginUsd",
+                  "enums.metric.paidMarginPct"
                 ]
               },
               "defaultValue": "enums.metric.netRevenue"
@@ -91214,6 +91298,14 @@
             {
               "value": "enums.source.freedomGpt",
               "label": "enums.source.freedomGpt"
+            },
+            {
+              "value": "enums.source.modelsLab",
+              "label": "enums.source.modelsLab"
+            },
+            {
+              "value": "enums.source.edenAi",
+              "label": "enums.source.edenAi"
             }
           ],
           "schema": {
@@ -91229,7 +91321,9 @@
                     "VENICE": "enums.source.venice",
                     "UNCENSORED_AI": "enums.source.uncensoredAi",
                     "GAB": "enums.source.gab",
-                    "FREEDOM_GPT": "enums.source.freedomGpt"
+                    "FREEDOM_GPT": "enums.source.freedomGpt",
+                    "MODELSLAB": "enums.source.modelsLab",
+                    "EDEN_AI": "enums.source.edenAi"
                   }
                 },
                 "type": "enum",
@@ -91240,7 +91334,9 @@
                   "VENICE": "enums.source.venice",
                   "UNCENSORED_AI": "enums.source.uncensoredAi",
                   "GAB": "enums.source.gab",
-                  "FREEDOM_GPT": "enums.source.freedomGpt"
+                  "FREEDOM_GPT": "enums.source.freedomGpt",
+                  "MODELSLAB": "enums.source.modelsLab",
+                  "EDEN_AI": "enums.source.edenAi"
                 },
                 "options": [
                   "enums.provider.all",
@@ -91249,12 +91345,38 @@
                   "enums.source.venice",
                   "enums.source.uncensoredAi",
                   "enums.source.gab",
-                  "enums.source.freedomGpt"
+                  "enums.source.freedomGpt",
+                  "enums.source.modelsLab",
+                  "enums.source.edenAi"
                 ]
               },
               "defaultValue": "enums.provider.all"
             },
             "type": "default"
+          },
+          "columns": 6,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "costProvider": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Fournisseur de coût",
+          "description": "ID du fournisseur API pour le coût, par ex. openrouter, nano-gpt ou unattributed",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
           },
           "columns": 6,
           "usage": {
@@ -92187,7 +92309,9 @@
                           "enums.source.venice": "enums.source.venice",
                           "enums.source.uncensoredAi": "enums.source.uncensoredAi",
                           "enums.source.gab": "enums.source.gab",
-                          "enums.source.freedomGpt": "enums.source.freedomGpt"
+                          "enums.source.freedomGpt": "enums.source.freedomGpt",
+                          "enums.source.modelsLab": "enums.source.modelsLab",
+                          "enums.source.edenAi": "enums.source.edenAi"
                         }
                       },
                       "type": "enum",
@@ -92199,7 +92323,9 @@
                         "enums.source.venice": "enums.source.venice",
                         "enums.source.uncensoredAi": "enums.source.uncensoredAi",
                         "enums.source.gab": "enums.source.gab",
-                        "enums.source.freedomGpt": "enums.source.freedomGpt"
+                        "enums.source.freedomGpt": "enums.source.freedomGpt",
+                        "enums.source.modelsLab": "enums.source.modelsLab",
+                        "enums.source.edenAi": "enums.source.edenAi"
                       },
                       "options": [
                         "enums.source.stripe",
@@ -92209,7 +92335,9 @@
                         "enums.source.venice",
                         "enums.source.uncensoredAi",
                         "enums.source.gab",
-                        "enums.source.freedomGpt"
+                        "enums.source.freedomGpt",
+                        "enums.source.modelsLab",
+                        "enums.source.edenAi"
                       ]
                     },
                     "kind": {
@@ -92323,7 +92451,9 @@
                         "enums.source.venice": "enums.source.venice",
                         "enums.source.uncensoredAi": "enums.source.uncensoredAi",
                         "enums.source.gab": "enums.source.gab",
-                        "enums.source.freedomGpt": "enums.source.freedomGpt"
+                        "enums.source.freedomGpt": "enums.source.freedomGpt",
+                        "enums.source.modelsLab": "enums.source.modelsLab",
+                        "enums.source.edenAi": "enums.source.edenAi"
                       }
                     },
                     "type": "enum",
@@ -92335,7 +92465,9 @@
                       "enums.source.venice": "enums.source.venice",
                       "enums.source.uncensoredAi": "enums.source.uncensoredAi",
                       "enums.source.gab": "enums.source.gab",
-                      "enums.source.freedomGpt": "enums.source.freedomGpt"
+                      "enums.source.freedomGpt": "enums.source.freedomGpt",
+                      "enums.source.modelsLab": "enums.source.modelsLab",
+                      "enums.source.edenAi": "enums.source.edenAi"
                     },
                     "options": [
                       "enums.source.stripe",
@@ -92345,7 +92477,9 @@
                       "enums.source.venice",
                       "enums.source.uncensoredAi",
                       "enums.source.gab",
-                      "enums.source.freedomGpt"
+                      "enums.source.freedomGpt",
+                      "enums.source.modelsLab",
+                      "enums.source.edenAi"
                     ]
                   },
                   "kind": {
@@ -93021,7 +93155,9 @@
                           "enums.source.venice": "enums.source.venice",
                           "enums.source.uncensoredAi": "enums.source.uncensoredAi",
                           "enums.source.gab": "enums.source.gab",
-                          "enums.source.freedomGpt": "enums.source.freedomGpt"
+                          "enums.source.freedomGpt": "enums.source.freedomGpt",
+                          "enums.source.modelsLab": "enums.source.modelsLab",
+                          "enums.source.edenAi": "enums.source.edenAi"
                         }
                       },
                       "type": "enum",
@@ -93033,7 +93169,9 @@
                         "enums.source.venice": "enums.source.venice",
                         "enums.source.uncensoredAi": "enums.source.uncensoredAi",
                         "enums.source.gab": "enums.source.gab",
-                        "enums.source.freedomGpt": "enums.source.freedomGpt"
+                        "enums.source.freedomGpt": "enums.source.freedomGpt",
+                        "enums.source.modelsLab": "enums.source.modelsLab",
+                        "enums.source.edenAi": "enums.source.edenAi"
                       },
                       "options": [
                         "enums.source.stripe",
@@ -93043,7 +93181,9 @@
                         "enums.source.venice",
                         "enums.source.uncensoredAi",
                         "enums.source.gab",
-                        "enums.source.freedomGpt"
+                        "enums.source.freedomGpt",
+                        "enums.source.modelsLab",
+                        "enums.source.edenAi"
                       ]
                     },
                     "status": {
@@ -93216,7 +93356,9 @@
                         "enums.source.venice": "enums.source.venice",
                         "enums.source.uncensoredAi": "enums.source.uncensoredAi",
                         "enums.source.gab": "enums.source.gab",
-                        "enums.source.freedomGpt": "enums.source.freedomGpt"
+                        "enums.source.freedomGpt": "enums.source.freedomGpt",
+                        "enums.source.modelsLab": "enums.source.modelsLab",
+                        "enums.source.edenAi": "enums.source.edenAi"
                       }
                     },
                     "type": "enum",
@@ -93228,7 +93370,9 @@
                       "enums.source.venice": "enums.source.venice",
                       "enums.source.uncensoredAi": "enums.source.uncensoredAi",
                       "enums.source.gab": "enums.source.gab",
-                      "enums.source.freedomGpt": "enums.source.freedomGpt"
+                      "enums.source.freedomGpt": "enums.source.freedomGpt",
+                      "enums.source.modelsLab": "enums.source.modelsLab",
+                      "enums.source.edenAi": "enums.source.edenAi"
                     },
                     "options": [
                       "enums.source.stripe",
@@ -93238,7 +93382,9 @@
                       "enums.source.venice",
                       "enums.source.uncensoredAi",
                       "enums.source.gab",
-                      "enums.source.freedomGpt"
+                      "enums.source.freedomGpt",
+                      "enums.source.modelsLab",
+                      "enums.source.edenAi"
                     ]
                   },
                   "status": {
@@ -93407,7 +93553,67 @@
             "def": {
               "type": "object",
               "shape": {
-                "netRevenueUsd": {
+                "earnedUsd": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "providerCostUsd": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "aiMarginUsd": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "aiMarginPct": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "paidMarginPct": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "freeListUsd": {
+                  "def": {
+                    "type": "number",
+                    "checks": []
+                  },
+                  "type": "number",
+                  "isFinite": true
+                },
+                "cashNetUsd": {
                   "def": {
                     "type": "number",
                     "checks": []
@@ -93423,67 +93629,7 @@
                   "type": "number",
                   "isFinite": true
                 },
-                "upstreamCostUsd": {
-                  "def": {
-                    "type": "number",
-                    "checks": []
-                  },
-                  "type": "number",
-                  "isFinite": true
-                },
-                "grossMarginUsd": {
-                  "def": {
-                    "type": "number",
-                    "checks": []
-                  },
-                  "type": "number",
-                  "isFinite": true
-                },
-                "grossMarginPct": {
-                  "def": {
-                    "type": "nullable",
-                    "innerType": {
-                      "def": {
-                        "type": "number",
-                        "checks": []
-                      },
-                      "type": "number",
-                      "isFinite": true
-                    }
-                  },
-                  "type": "nullable"
-                },
-                "costComplete": {
-                  "def": {
-                    "type": "boolean"
-                  },
-                  "type": "boolean"
-                },
-                "marginDays": {
-                  "def": {
-                    "type": "number",
-                    "checks": []
-                  },
-                  "type": "number",
-                  "isFinite": true
-                },
-                "totalDays": {
-                  "def": {
-                    "type": "number",
-                    "checks": []
-                  },
-                  "type": "number",
-                  "isFinite": true
-                },
-                "expectedDays": {
-                  "def": {
-                    "type": "number",
-                    "checks": []
-                  },
-                  "type": "number",
-                  "isFinite": true
-                },
-                "netRevenueAllDaysUsd": {
+                "days": {
                   "def": {
                     "type": "number",
                     "checks": []
@@ -93516,7 +93662,7 @@
                       },
                       "type": "string"
                     },
-                    "netRevenueUsd": {
+                    "cashNetUsd": {
                       "def": {
                         "type": "number",
                         "checks": []
@@ -93524,7 +93670,7 @@
                       "type": "number",
                       "isFinite": true
                     },
-                    "processorFeesUsd": {
+                    "earnedUsd": {
                       "def": {
                         "type": "number",
                         "checks": []
@@ -93532,7 +93678,23 @@
                       "type": "number",
                       "isFinite": true
                     },
-                    "upstreamCostUsd": {
+                    "providerCostUsd": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "aiMarginUsd": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    "aiMarginPct": {
                       "def": {
                         "type": "nullable",
                         "innerType": {
@@ -93545,69 +93707,6 @@
                         }
                       },
                       "type": "nullable"
-                    },
-                    "grossMarginUsd": {
-                      "def": {
-                        "type": "nullable",
-                        "innerType": {
-                          "def": {
-                            "type": "number",
-                            "checks": []
-                          },
-                          "type": "number",
-                          "isFinite": true
-                        }
-                      },
-                      "type": "nullable"
-                    },
-                    "grossMarginPct": {
-                      "def": {
-                        "type": "nullable",
-                        "innerType": {
-                          "def": {
-                            "type": "number",
-                            "checks": []
-                          },
-                          "type": "number",
-                          "isFinite": true
-                        }
-                      },
-                      "type": "nullable"
-                    },
-                    "billingGapPct": {
-                      "def": {
-                        "type": "nullable",
-                        "innerType": {
-                          "def": {
-                            "type": "number",
-                            "checks": []
-                          },
-                          "type": "number",
-                          "isFinite": true
-                        }
-                      },
-                      "type": "nullable"
-                    },
-                    "costCoverage": {
-                      "def": {
-                        "type": "enum",
-                        "entries": {
-                          "enums.costCoverage.complete": "enums.costCoverage.complete",
-                          "enums.costCoverage.partial": "enums.costCoverage.partial",
-                          "enums.costCoverage.none": "enums.costCoverage.none"
-                        }
-                      },
-                      "type": "enum",
-                      "enum": {
-                        "enums.costCoverage.complete": "enums.costCoverage.complete",
-                        "enums.costCoverage.partial": "enums.costCoverage.partial",
-                        "enums.costCoverage.none": "enums.costCoverage.none"
-                      },
-                      "options": [
-                        "enums.costCoverage.complete",
-                        "enums.costCoverage.partial",
-                        "enums.costCoverage.none"
-                      ]
                     }
                   }
                 },
@@ -93625,7 +93724,7 @@
                     },
                     "type": "string"
                   },
-                  "netRevenueUsd": {
+                  "cashNetUsd": {
                     "def": {
                       "type": "number",
                       "checks": []
@@ -93633,7 +93732,7 @@
                     "type": "number",
                     "isFinite": true
                   },
-                  "processorFeesUsd": {
+                  "earnedUsd": {
                     "def": {
                       "type": "number",
                       "checks": []
@@ -93641,7 +93740,23 @@
                     "type": "number",
                     "isFinite": true
                   },
-                  "upstreamCostUsd": {
+                  "providerCostUsd": {
+                    "def": {
+                      "type": "number",
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "aiMarginUsd": {
+                    "def": {
+                      "type": "number",
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  },
+                  "aiMarginPct": {
                     "def": {
                       "type": "nullable",
                       "innerType": {
@@ -93654,69 +93769,6 @@
                       }
                     },
                     "type": "nullable"
-                  },
-                  "grossMarginUsd": {
-                    "def": {
-                      "type": "nullable",
-                      "innerType": {
-                        "def": {
-                          "type": "number",
-                          "checks": []
-                        },
-                        "type": "number",
-                        "isFinite": true
-                      }
-                    },
-                    "type": "nullable"
-                  },
-                  "grossMarginPct": {
-                    "def": {
-                      "type": "nullable",
-                      "innerType": {
-                        "def": {
-                          "type": "number",
-                          "checks": []
-                        },
-                        "type": "number",
-                        "isFinite": true
-                      }
-                    },
-                    "type": "nullable"
-                  },
-                  "billingGapPct": {
-                    "def": {
-                      "type": "nullable",
-                      "innerType": {
-                        "def": {
-                          "type": "number",
-                          "checks": []
-                        },
-                        "type": "number",
-                        "isFinite": true
-                      }
-                    },
-                    "type": "nullable"
-                  },
-                  "costCoverage": {
-                    "def": {
-                      "type": "enum",
-                      "entries": {
-                        "enums.costCoverage.complete": "enums.costCoverage.complete",
-                        "enums.costCoverage.partial": "enums.costCoverage.partial",
-                        "enums.costCoverage.none": "enums.costCoverage.none"
-                      }
-                    },
-                    "type": "enum",
-                    "enum": {
-                      "enums.costCoverage.complete": "enums.costCoverage.complete",
-                      "enums.costCoverage.partial": "enums.costCoverage.partial",
-                      "enums.costCoverage.none": "enums.costCoverage.none"
-                    },
-                    "options": [
-                      "enums.costCoverage.complete",
-                      "enums.costCoverage.partial",
-                      "enums.costCoverage.none"
-                    ]
                   }
                 }
               },
@@ -93974,7 +94026,9 @@
                           "enums.threshold.nanoGptAutoTopUpFloorUsd": "enums.threshold.nanoGptAutoTopUpFloorUsd",
                           "enums.threshold.nanoGptAutoTopUpGraceHours": "enums.threshold.nanoGptAutoTopUpGraceHours",
                           "enums.threshold.veniceAutoTopUpFloorUsd": "enums.threshold.veniceAutoTopUpFloorUsd",
-                          "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours"
+                          "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours",
+                          "enums.threshold.modelsLabLowBalanceUsd": "enums.threshold.modelsLabLowBalanceUsd",
+                          "enums.threshold.edenAiLowBalanceUsd": "enums.threshold.edenAiLowBalanceUsd"
                         }
                       },
                       "type": "enum",
@@ -93999,7 +94053,9 @@
                         "enums.threshold.nanoGptAutoTopUpFloorUsd": "enums.threshold.nanoGptAutoTopUpFloorUsd",
                         "enums.threshold.nanoGptAutoTopUpGraceHours": "enums.threshold.nanoGptAutoTopUpGraceHours",
                         "enums.threshold.veniceAutoTopUpFloorUsd": "enums.threshold.veniceAutoTopUpFloorUsd",
-                        "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours"
+                        "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours",
+                        "enums.threshold.modelsLabLowBalanceUsd": "enums.threshold.modelsLabLowBalanceUsd",
+                        "enums.threshold.edenAiLowBalanceUsd": "enums.threshold.edenAiLowBalanceUsd"
                       },
                       "options": [
                         "enums.threshold.marginFloorPct",
@@ -94022,7 +94078,9 @@
                         "enums.threshold.nanoGptAutoTopUpFloorUsd",
                         "enums.threshold.nanoGptAutoTopUpGraceHours",
                         "enums.threshold.veniceAutoTopUpFloorUsd",
-                        "enums.threshold.veniceAutoTopUpGraceHours"
+                        "enums.threshold.veniceAutoTopUpGraceHours",
+                        "enums.threshold.modelsLabLowBalanceUsd",
+                        "enums.threshold.edenAiLowBalanceUsd"
                       ]
                     },
                     "value": {
@@ -94093,7 +94151,9 @@
                         "enums.threshold.nanoGptAutoTopUpFloorUsd": "enums.threshold.nanoGptAutoTopUpFloorUsd",
                         "enums.threshold.nanoGptAutoTopUpGraceHours": "enums.threshold.nanoGptAutoTopUpGraceHours",
                         "enums.threshold.veniceAutoTopUpFloorUsd": "enums.threshold.veniceAutoTopUpFloorUsd",
-                        "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours"
+                        "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours",
+                        "enums.threshold.modelsLabLowBalanceUsd": "enums.threshold.modelsLabLowBalanceUsd",
+                        "enums.threshold.edenAiLowBalanceUsd": "enums.threshold.edenAiLowBalanceUsd"
                       }
                     },
                     "type": "enum",
@@ -94118,7 +94178,9 @@
                       "enums.threshold.nanoGptAutoTopUpFloorUsd": "enums.threshold.nanoGptAutoTopUpFloorUsd",
                       "enums.threshold.nanoGptAutoTopUpGraceHours": "enums.threshold.nanoGptAutoTopUpGraceHours",
                       "enums.threshold.veniceAutoTopUpFloorUsd": "enums.threshold.veniceAutoTopUpFloorUsd",
-                      "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours"
+                      "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours",
+                      "enums.threshold.modelsLabLowBalanceUsd": "enums.threshold.modelsLabLowBalanceUsd",
+                      "enums.threshold.edenAiLowBalanceUsd": "enums.threshold.edenAiLowBalanceUsd"
                     },
                     "options": [
                       "enums.threshold.marginFloorPct",
@@ -94141,7 +94203,9 @@
                       "enums.threshold.nanoGptAutoTopUpFloorUsd",
                       "enums.threshold.nanoGptAutoTopUpGraceHours",
                       "enums.threshold.veniceAutoTopUpFloorUsd",
-                      "enums.threshold.veniceAutoTopUpGraceHours"
+                      "enums.threshold.veniceAutoTopUpGraceHours",
+                      "enums.threshold.modelsLabLowBalanceUsd",
+                      "enums.threshold.edenAiLowBalanceUsd"
                     ]
                   },
                   "value": {
@@ -94300,6 +94364,14 @@
             {
               "value": "enums.threshold.veniceAutoTopUpGraceHours",
               "label": "enums.threshold.veniceAutoTopUpGraceHours"
+            },
+            {
+              "value": "enums.threshold.modelsLabLowBalanceUsd",
+              "label": "enums.threshold.modelsLabLowBalanceUsd"
+            },
+            {
+              "value": "enums.threshold.edenAiLowBalanceUsd",
+              "label": "enums.threshold.edenAiLowBalanceUsd"
             }
           ],
           "columns": 6,
@@ -94327,7 +94399,9 @@
                 "enums.threshold.nanoGptAutoTopUpFloorUsd": "enums.threshold.nanoGptAutoTopUpFloorUsd",
                 "enums.threshold.nanoGptAutoTopUpGraceHours": "enums.threshold.nanoGptAutoTopUpGraceHours",
                 "enums.threshold.veniceAutoTopUpFloorUsd": "enums.threshold.veniceAutoTopUpFloorUsd",
-                "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours"
+                "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours",
+                "enums.threshold.modelsLabLowBalanceUsd": "enums.threshold.modelsLabLowBalanceUsd",
+                "enums.threshold.edenAiLowBalanceUsd": "enums.threshold.edenAiLowBalanceUsd"
               }
             },
             "type": "enum",
@@ -94352,7 +94426,9 @@
               "enums.threshold.nanoGptAutoTopUpFloorUsd": "enums.threshold.nanoGptAutoTopUpFloorUsd",
               "enums.threshold.nanoGptAutoTopUpGraceHours": "enums.threshold.nanoGptAutoTopUpGraceHours",
               "enums.threshold.veniceAutoTopUpFloorUsd": "enums.threshold.veniceAutoTopUpFloorUsd",
-              "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours"
+              "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours",
+              "enums.threshold.modelsLabLowBalanceUsd": "enums.threshold.modelsLabLowBalanceUsd",
+              "enums.threshold.edenAiLowBalanceUsd": "enums.threshold.edenAiLowBalanceUsd"
             },
             "options": [
               "enums.threshold.marginFloorPct",
@@ -94375,7 +94451,9 @@
               "enums.threshold.nanoGptAutoTopUpFloorUsd",
               "enums.threshold.nanoGptAutoTopUpGraceHours",
               "enums.threshold.veniceAutoTopUpFloorUsd",
-              "enums.threshold.veniceAutoTopUpGraceHours"
+              "enums.threshold.veniceAutoTopUpGraceHours",
+              "enums.threshold.modelsLabLowBalanceUsd",
+              "enums.threshold.edenAiLowBalanceUsd"
             ]
           },
           "usage": {
@@ -94477,7 +94555,9 @@
                 "enums.threshold.nanoGptAutoTopUpFloorUsd": "enums.threshold.nanoGptAutoTopUpFloorUsd",
                 "enums.threshold.nanoGptAutoTopUpGraceHours": "enums.threshold.nanoGptAutoTopUpGraceHours",
                 "enums.threshold.veniceAutoTopUpFloorUsd": "enums.threshold.veniceAutoTopUpFloorUsd",
-                "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours"
+                "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours",
+                "enums.threshold.modelsLabLowBalanceUsd": "enums.threshold.modelsLabLowBalanceUsd",
+                "enums.threshold.edenAiLowBalanceUsd": "enums.threshold.edenAiLowBalanceUsd"
               }
             },
             "type": "enum",
@@ -94502,7 +94582,9 @@
               "enums.threshold.nanoGptAutoTopUpFloorUsd": "enums.threshold.nanoGptAutoTopUpFloorUsd",
               "enums.threshold.nanoGptAutoTopUpGraceHours": "enums.threshold.nanoGptAutoTopUpGraceHours",
               "enums.threshold.veniceAutoTopUpFloorUsd": "enums.threshold.veniceAutoTopUpFloorUsd",
-              "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours"
+              "enums.threshold.veniceAutoTopUpGraceHours": "enums.threshold.veniceAutoTopUpGraceHours",
+              "enums.threshold.modelsLabLowBalanceUsd": "enums.threshold.modelsLabLowBalanceUsd",
+              "enums.threshold.edenAiLowBalanceUsd": "enums.threshold.edenAiLowBalanceUsd"
             },
             "options": [
               "enums.threshold.marginFloorPct",
@@ -94525,7 +94607,9 @@
               "enums.threshold.nanoGptAutoTopUpFloorUsd",
               "enums.threshold.nanoGptAutoTopUpGraceHours",
               "enums.threshold.veniceAutoTopUpFloorUsd",
-              "enums.threshold.veniceAutoTopUpGraceHours"
+              "enums.threshold.veniceAutoTopUpGraceHours",
+              "enums.threshold.modelsLabLowBalanceUsd",
+              "enums.threshold.edenAiLowBalanceUsd"
             ]
           },
           "usage": {

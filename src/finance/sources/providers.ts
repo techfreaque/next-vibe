@@ -8,7 +8,11 @@
  *  - Venice      GET  /api/v1/api_keys/rate_limits    documented  data.balances.USD
  *  - Gab         GET  /v1/credits and /v1/usage       documented balance and charges in credits
  *                The Gab Plus plan fee is booked separately in the USD rollup.
+ *  - ModelsLab   POST /api/wallet_balance             documented  data.balance (USD), key in the body
+ *  - Eden AI     GET  /v2/cost_management/credits/    credits (USD); the v3 billing
+ *                endpoint refuses inference keys, this one accepts EDEN_AI_API_KEY
  *  - uncensored.ai and FreedomGPT use signed-in dashboard reads (dashboard.ts).
+ * Every balance read is free: none of these endpoints bills a call.
  * The usage ledger supplies a USD estimate whenever dashboard usage cannot be
  * measured in dollars.
  */
@@ -356,6 +360,82 @@ const gab: ProviderAdapter = {
   },
 };
 
+const modelsLabSchema = z.object({
+  status: z.string().optional(),
+  data: z.object({ balance: numeric, currency: z.string().optional() }),
+});
+
+const modelsLab: ProviderAdapter = {
+  source: FinanceSource.MODELSLAB,
+  label: "ModelsLab",
+  endpoint: "https://modelslab.com/api/wallet_balance",
+  noEndpointReason: null,
+  spendBasis: "provider-api",
+  ledgerBreakdown: null,
+  async fetchBalance(http, apiKey) {
+    const res = await http({
+      url: "https://modelslab.com/api/wallet_balance",
+      method: "POST",
+      headers: {},
+      body: { key: apiKey },
+    });
+    if (res.status !== 200) {
+      return httpFailure(res.status);
+    }
+    const parsed = modelsLabSchema.safeParse(res.json);
+    if (
+      !parsed.success ||
+      Number.isNaN(parsed.data.data.balance) ||
+      (parsed.data.data.currency !== undefined &&
+        parsed.data.data.currency.toLowerCase() !== "usd")
+    ) {
+      return unexpectedShape("ModelsLab");
+    }
+    const usd = parsed.data.data.balance;
+    return {
+      status: "ok",
+      balanceUsd: usd,
+      balanceNative: usd,
+      unit: "usd",
+      cumulativeUsageUsd: null,
+    };
+  },
+};
+
+const edenAiSchema = z.object({ credits: numeric });
+
+const edenAi: ProviderAdapter = {
+  source: FinanceSource.EDEN_AI,
+  label: "Eden AI",
+  endpoint: "https://api.edenai.run/v2/cost_management/credits/",
+  noEndpointReason: null,
+  spendBasis: "provider-api",
+  ledgerBreakdown: null,
+  async fetchBalance(http, apiKey) {
+    const res = await http({
+      url: "https://api.edenai.run/v2/cost_management/credits/",
+      method: "GET",
+      headers: bearer(apiKey),
+    });
+    if (res.status !== 200) {
+      return httpFailure(res.status);
+    }
+    const parsed = edenAiSchema.safeParse(res.json);
+    if (!parsed.success || Number.isNaN(parsed.data.credits)) {
+      return unexpectedShape("Eden AI");
+    }
+    // Eden AI credits are US dollars.
+    const usd = parsed.data.credits;
+    return {
+      status: "ok",
+      balanceUsd: usd,
+      balanceNative: usd,
+      unit: "usd",
+      cumulativeUsageUsd: null,
+    };
+  },
+};
+
 /** Model ids served by a provider and its raw per-call price (USD). */
 export interface UsagePricing {
   modelIds: ChatModelId[];
@@ -462,6 +542,8 @@ export const PROVIDER_ADAPTERS: readonly ProviderAdapter[] = [
   gab,
   uncensoredAi,
   freedomGpt,
+  modelsLab,
+  edenAi,
 ];
 
 export function providerLabel(source: typeof FinanceSourceValue): string {

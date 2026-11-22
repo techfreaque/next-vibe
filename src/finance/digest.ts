@@ -45,6 +45,8 @@ const LABELS: Readonly<Record<string, string>> = {
   [FinanceSource.UNCENSORED_AI]: "uncensored.ai",
   [FinanceSource.GAB]: "Gab AI",
   [FinanceSource.FREEDOM_GPT]: "FreedomGPT",
+  [FinanceSource.MODELSLAB]: "ModelsLab",
+  [FinanceSource.EDEN_AI]: "Eden AI",
 };
 
 function num(row: DigestRow | undefined, key: string): number | null {
@@ -140,12 +142,13 @@ export async function collectFinanceDigestLines(
   if (fees > 0) {
     lines.push(`Processor fees MTD: ${usd(fees)}`);
   }
-  if (net > 0) {
-    const margin = net - fees - cost;
-    lines.push(
-      `Gross margin MTD: ${usd(margin)} (${((margin / net) * 100).toFixed(1)}%)`,
-    );
-  }
+  // Cash arrives in lumps (monthly / yearly plans, packs) while providers bill
+  // per call, so cash in minus provider cost is not a margin. The AI margin
+  // (credits consumed at their paid price minus provider cost) is in the
+  // Finance graph.
+  lines.push(
+    "Margin: see AI margin in the Finance graph (consumption-based; cash and provider cost are never netted)",
+  );
 
   // Provider spend (last window) + latest balances.
   const [spend] = await run.rows(

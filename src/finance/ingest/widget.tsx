@@ -141,19 +141,16 @@ export function FinanceIngestContainer({
                 >
                   <Span className="font-medium">{d.day}</Span>
                   <Span className="text-muted-foreground">
-                    {money.format(d.netRevenueUsd)} -{" "}
-                    {d.upstreamCostUsd === null
-                      ? t("ingest.widget.costUnknown")
-                      : money.format(d.upstreamCostUsd)}
+                    {t("ingest.widget.dayLine", {
+                      cash: money.format(d.netRevenueUsd),
+                      cost:
+                        d.upstreamCostUsd === null
+                          ? t("ingest.widget.costUnknown")
+                          : money.format(d.upstreamCostUsd),
+                    })}
                   </Span>
-                  <Span className="font-semibold">
-                    {d.grossMarginUsd === null
-                      ? t(d.costCoverage)
-                      : `${money.format(d.grossMarginUsd)}${
-                          d.grossMarginPct === null
-                            ? ""
-                            : ` (${d.grossMarginPct.toFixed(1)}%)`
-                        }`}
+                  <Span className="text-xs text-muted-foreground">
+                    {t(d.costCoverage)}
                   </Span>
                 </Div>
               ))}
