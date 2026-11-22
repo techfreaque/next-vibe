@@ -93,6 +93,7 @@ export function priceText(
   return facts.creditsPerMessage > 0
     ? t("facts.priceValue", {
         credits: formatNumber(facts.creditsPerMessage, locale),
+        money: formatMoney(facts.creditsPerMessage, locale),
       })
     : t("facts.priceFree");
 }

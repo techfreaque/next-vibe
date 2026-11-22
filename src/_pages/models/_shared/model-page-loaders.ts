@@ -28,6 +28,7 @@ import {
   bestForContent,
   chatModelBlogSlugs,
   chatModelFaq,
+  chatModelLanding,
   chatModelMeta,
   findRelatedMediaModels,
   findRelatedModels,
@@ -35,6 +36,7 @@ import {
   mediaModelBlogSlugs,
   mediaModelFaq,
   mediaModelMeta,
+  type ModelLandingKey,
 } from "./model-seo";
 import type { BlogLink, ModelSeoContent } from "./model-seo-sections";
 import {
@@ -113,6 +115,29 @@ function blogLinks(
   return links;
 }
 
+const LANDING_PATHS: Record<ModelLandingKey, string> = {
+  uncensored: "/story/uncensored-ai",
+  abliterated: "/story/abliterated-ai-chat",
+};
+
+/** The landing page for an uncensored model's kind, as a read-more card. */
+function landingLink(
+  key: ModelLandingKey | null,
+  locale: CountryLanguage,
+): BlogLink[] {
+  if (key === null) {
+    return [];
+  }
+  const { t } = scopedTranslation.scopedT(locale);
+  return [
+    {
+      path: LANDING_PATHS[key],
+      title: t(`readMore.landings.${key}.title`),
+      excerpt: t(`readMore.landings.${key}.excerpt`),
+    },
+  ];
+}
+
 export interface ModelPageSeo {
   seo: ModelSeoContent;
   /** Service + BreadcrumbList JSON-LD. */
@@ -124,12 +149,16 @@ export function buildChatModelPageSeo(
   locale: CountryLanguage,
   availability: AgentEnvAvailability,
 ): ModelPageSeo {
+  const related = findRelatedModels(facts, availability);
   return {
     seo: {
       bestFor: bestForContent(facts, locale),
-      related: findRelatedModels(facts, availability),
-      faq: chatModelFaq(facts, locale),
-      blog: blogLinks(chatModelBlogSlugs(facts), locale),
+      related,
+      faq: chatModelFaq(facts, locale, related),
+      blog: [
+        ...landingLink(chatModelLanding(facts), locale),
+        ...blogLinks(chatModelBlogSlugs(facts), locale),
+      ],
     },
     structuredData: buildChatModelStructuredData(
       facts,

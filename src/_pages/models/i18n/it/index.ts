@@ -93,7 +93,7 @@ export const translations: typeof enTranslations = {
     tier: "Categoria di contenuti",
     intelligence: "Intelligenza",
     price: "Prezzo stimato per messaggio",
-    priceValue: "Circa {{credits}} crediti",
+    priceValue: "Circa {{credits}} crediti ({{money}})",
     priceFree: "Gratis",
     referenceTurn:
       "Messaggio di riferimento con {{input}} token in ingresso e {{output}} token in uscita.",
@@ -293,6 +293,7 @@ export const translations: typeof enTranslations = {
       mainstream:
         "No. {{model}} mantiene i filtri di sicurezza di {{lab}} e rifiuta alcuni argomenti. Per questi, passa a un modello senza censura nella stessa chat.",
       open: "{{model}} è nella categoria dei modelli aperti. Le sue risposte possono comunque essere filtrate.",
+      yes: "Sì.",
       consent:
         "Per usare i modelli di chat senza censura devi confermare una volta di avere almeno 18 anni.",
     },
@@ -314,9 +315,23 @@ export const translations: typeof enTranslations = {
     },
     inputs: {
       q: "Quali input e output supporta {{model}}?",
-      modalities: "Tra gli input: {{inputs}}. Tra gli output: {{outputs}}.",
+      modalities: "Input: {{inputs}}. Output: {{outputs}}.",
       toolsYes: "Supporta le chiamate agli strumenti.",
       toolsNo: "Le chiamate agli strumenti non sono disponibili.",
+    },
+    bestFor: {
+      q: "Per cosa è adatto {{model}}?",
+      a: "Ideale per: {{items}}.",
+    },
+    cheaper: {
+      q: "Esiste un'alternativa più economica a {{model}}?",
+      a: "{{other}}: stessa categoria, livello di intelligenza uguale o superiore, e circa {{otherCredits}} crediti per messaggio di riferimento invece di {{credits}}.",
+    },
+    try: {
+      q: "Come provo {{model}}?",
+      a: "Apri una chat con {{model}} già selezionato. I nuovi visitatori ricevono crediti gratuiti per iniziare, senza carta.",
+      aLegacy:
+        "{{model}} è un modello precedente. Le nuove chat usano {{successor}}, che puoi provare con crediti gratuiti, senza carta.",
     },
   },
   mediaFaq: {
@@ -344,6 +359,18 @@ export const translations: typeof enTranslations = {
   },
   readMore: {
     heading: "Leggi anche",
+    landings: {
+      uncensored: {
+        title: "Chat AI senza censura nel browser",
+        excerpt:
+          "Tutti i modelli senza censura in un elenco: contesto, prezzo a messaggio e link diretto alla chat.",
+      },
+      abliterated: {
+        title: "Modelli AI abliterati da provare online",
+        excerpt:
+          "Modelli mainstream senza rifiuti. Contesto, prezzo a messaggio e link diretto alla chat.",
+      },
+    },
   },
   directory: {
     heading: "Tutte le schede dei modelli",
@@ -463,5 +490,18 @@ export const translations: typeof enTranslations = {
     answer: "Risposta",
     judge: "Valutatore",
     methodCta: "Come misuriamo",
+    categoryNames: {
+      politics: "Politica",
+      history: "Storia",
+      health: "Salute",
+      drugs: "Droghe",
+      sexuality: "Sessualità",
+      security: "Sicurezza informatica",
+      religion: "Religione",
+      law: "Diritto",
+      science: "Scienza",
+      fiction: "Narrativa",
+      satire: "Satira",
+    },
   },
 };

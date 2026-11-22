@@ -26,7 +26,9 @@ import {
 import { listMediaFacts } from "./model-media-facts";
 import {
   bestForContent,
+  chatModelBlogSlugs,
   chatModelFaq,
+  chatModelLanding,
   chatModelMeta,
   findRelatedMediaModels,
   findRelatedModels,
@@ -73,6 +75,8 @@ const LOCALES: readonly CountryLanguage[] = [
   "de-DE",
   "pl-PL",
   "fr-FR",
+  "it-IT",
+  "es-ES",
 ];
 
 function factsOf(id: ChatModelId): ModelFacts {
@@ -275,10 +279,55 @@ describe("FAQ", () => {
     }
   });
 
+  test("uncensored answers open with a yes; others never do", () => {
+    for (const facts of listModelFacts(ALL)) {
+      const answer = chatModelFaq(facts, "en-US")[1]?.answer ?? "";
+      expect(answer.startsWith("Yes.")).toBe(uncensoredKind(facts) !== null);
+    }
+  });
+
+  test("cheaper alternative comes from the related cheaper pick", () => {
+    for (const facts of listModelFacts(ALL)) {
+      const related = findRelatedModels(facts, ALL);
+      const cheaper = related.find((other) => other.reason === "cheaper");
+      const item = chatModelFaq(facts, "en-US", related).find((faq) =>
+        faq.question.startsWith("Is there a cheaper alternative"),
+      );
+      if (cheaper === undefined) {
+        expect(item).toBeUndefined();
+      } else {
+        expect(item?.answer).toContain(cheaper.name);
+        expect(cheaper.credits ?? 0).toBeLessThan(facts.creditsPerMessage);
+      }
+    }
+  });
+
+  test("read-more links match the model's kind and leave room for a landing", () => {
+    const abliterated = factsOf(ChatModelId.GLM_5_3_UNCENSORED);
+    expect(chatModelLanding(abliterated)).toBe("abliterated");
+    expect(chatModelBlogSlugs(abliterated)[0]).toBe(
+      "abliterated-vs-uncensored-models",
+    );
+    const ownWorldview = factsOf(ChatModelId.UNCENSORED_LM_V1_2);
+    expect(chatModelLanding(ownWorldview)).toBe("uncensored");
+    expect(chatModelBlogSlugs(ownWorldview)[0]).toBe(
+      "uncensored-models-what-each-is-good-at",
+    );
+    expect(chatModelLanding(factsOf(ChatModelId.CLAUDE_SONNET_5_5))).toBeNull();
+    for (const facts of listModelFacts(ALL)) {
+      const slots = chatModelLanding(facts) === null ? 3 : 2;
+      const slugs = chatModelBlogSlugs(facts);
+      expect(slugs.length).toBeLessThanOrEqual(slots);
+      expect(new Set(slugs).size).toBe(slugs.length);
+    }
+  });
+
   test("no unfilled placeholders or em dashes in any locale", () => {
     for (const locale of LOCALES) {
       const items = [
-        ...listModelFacts(ALL).flatMap((facts) => chatModelFaq(facts, locale)),
+        ...listModelFacts(ALL).flatMap((facts) =>
+          chatModelFaq(facts, locale, findRelatedModels(facts, ALL)),
+        ),
         ...listMediaFacts(ALL).flatMap((facts) => mediaModelFaq(facts, locale)),
       ];
       for (const item of items) {

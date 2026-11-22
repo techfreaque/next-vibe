@@ -87,7 +87,7 @@ export const translations: typeof enTranslations = {
     tier: "Inhaltsstufe",
     intelligence: "Intelligenz",
     price: "Geschätzter Preis pro Nachricht",
-    priceValue: "~{{credits}} Credits",
+    priceValue: "~{{credits}} Credits ({{money}})",
     priceFree: "Kostenlos",
     referenceTurn:
       "Die Beispielnachricht umfasst {{input}} Eingabe- und {{output}} Ausgabetoken.",
@@ -284,6 +284,7 @@ export const translations: typeof enTranslations = {
       mainstream:
         "Nein. {{model}} behält die Sicherheitsfilter von {{lab}} und verweigert manche Themen. Dafür wechselst du im selben Chat auf ein unzensiertes Modell.",
       open: "{{model}} gehört zur Stufe „Offen“. Antworten können weiterhin gefiltert werden.",
+      yes: "Ja.",
       consent:
         "Für unzensierte Chatmodelle musst du einmalig bestätigen, dass du mindestens 18 Jahre alt bist.",
     },
@@ -305,10 +306,23 @@ export const translations: typeof enTranslations = {
     },
     inputs: {
       q: "Welche Ein- und Ausgabeformate unterstützt {{model}}?",
-      modalities:
-        "Unterstützte Eingaben sind {{inputs}}. Unterstützte Ausgaben sind {{outputs}}.",
+      modalities: "Eingabe: {{inputs}}. Ausgabe: {{outputs}}.",
       toolsYes: "Das Modell unterstützt Werkzeugaufrufe.",
       toolsNo: "Werkzeugaufrufe stehen nicht zur Verfügung.",
+    },
+    bestFor: {
+      q: "Wofür eignet sich {{model}}?",
+      a: "Einsatzgebiete: {{items}}.",
+    },
+    cheaper: {
+      q: "Gibt es eine günstigere Alternative zu {{model}}?",
+      a: "{{other}}: gleiche Stufe, gleiche oder höhere Intelligenzstufe und rund {{otherCredits}} statt {{credits}} Credits pro Beispielnachricht.",
+    },
+    try: {
+      q: "Wie teste ich {{model}}?",
+      a: "Öffne einen Chat, in dem {{model}} schon ausgewählt ist. Neue Besucher bekommen Start-Credits gratis, keine Karte nötig.",
+      aLegacy:
+        "{{model}} ist veraltet. Neue Chats laufen mit {{successor}}, testbar mit Gratis-Start-Credits, keine Karte nötig.",
     },
   },
   mediaFaq: {
@@ -335,6 +349,18 @@ export const translations: typeof enTranslations = {
   },
   readMore: {
     heading: "Weiterlesen",
+    landings: {
+      uncensored: {
+        title: "Unzensierter KI-Chat im Browser",
+        excerpt:
+          "Alle unzensierten Modelle auf einen Blick: Kontext, Preis pro Nachricht und direkter Chat-Link.",
+      },
+      abliterated: {
+        title: "Abliterierte KI-Modelle online testen",
+        excerpt:
+          "Mainstream-Modelle ohne Verweigerungen. Kontext, Preis pro Nachricht und direkter Chat-Link.",
+      },
+    },
   },
   directory: {
     heading: "Alle Modellseiten",
@@ -453,5 +479,18 @@ export const translations: typeof enTranslations = {
     answer: "Antwort",
     judge: "Richter",
     methodCta: "So messen wir",
+    categoryNames: {
+      politics: "Politik",
+      history: "Geschichte",
+      health: "Gesundheit",
+      drugs: "Drogen",
+      sexuality: "Sexualität",
+      security: "IT-Sicherheit",
+      religion: "Religion",
+      law: "Recht",
+      science: "Wissenschaft",
+      fiction: "Fiktion",
+      satire: "Satire",
+    },
   },
 };

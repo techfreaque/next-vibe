@@ -8,7 +8,11 @@ WORKDIR /app
 
 # Install Node.js for Next.js build compatibility. `apk upgrade` pulls the latest
 # security patches for the base packages too (e.g. CVE-2026-111497, Node2Shell, fixed in 22.23.4).
-RUN apk upgrade --no-cache && apk add --no-cache nodejs python3 make g++
+# icu-data-full: Alpine's nodejs links the system ICU, which ships English-only
+# data (icu-data-en) by default. Next renders pages under Node, so without it
+# every Intl.NumberFormat/DateTimeFormat call on de/pl/fr/it/es pages fell back
+# to the root locale ("PLN 6.18", "1,048,576 Token", "Nov 17, 2026").
+RUN apk upgrade --no-cache && apk add --no-cache nodejs icu-data-full python3 make g++
 
 # BEGIN_GENERATED_ENV_ARGS
 # Intentionally empty - see updateDockerfile in generator.ts for why.

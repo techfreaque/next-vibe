@@ -582,6 +582,7 @@ export function findRelatedMediaModels(
 export function chatModelFaq(
   facts: ModelFacts,
   locale: CountryLanguage,
+  related: readonly RelatedModel[] = [],
 ): FaqItem[] {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
@@ -609,7 +610,7 @@ export function chatModelFaq(
   const kind = uncensoredKind(facts);
   const uncensoredAnswer =
     kind !== null
-      ? `${t(`uncensoredKind.${kind}.line`)} ${t("faq.uncensored.consent")}`
+      ? `${t("faq.uncensored.yes")} ${t(`uncensoredKind.${kind}.line`)} ${t("faq.uncensored.consent")}`
       : facts.content === ContentLevel.OPEN
         ? t("faq.uncensored.open", { model })
         : t("faq.uncensored.mainstream", { model, lab: facts.labName });
@@ -633,7 +634,7 @@ export function chatModelFaq(
     ? t("faq.inputs.toolsYes")
     : t("faq.inputs.toolsNo");
 
-  return [
+  const items: FaqItem[] = [
     {
       question: t("faq.price.q", { model }),
       answer:
@@ -659,6 +660,42 @@ export function chatModelFaq(
       answer: t("faq.providers.a", { providers: facts.providers.join(", ") }),
     },
   ];
+
+  const bestFor = bestForContent(facts, locale);
+  if (bestFor.good.length > 0) {
+    const list = t("faq.bestFor.a", { items: bestFor.good.join("; ") });
+    items.push({
+      question: t("faq.bestFor.q", { model }),
+      answer: bestFor.line === null ? list : `${bestFor.line} ${list}`,
+    });
+  }
+
+  const cheaper = related.find((other) => other.reason === "cheaper");
+  if (cheaper !== undefined && cheaper.credits !== null) {
+    items.push({
+      question: t("faq.cheaper.q", { model }),
+      answer: t("faq.cheaper.a", {
+        model,
+        other: cheaper.name,
+        otherCredits: formatNumber(cheaper.credits, locale),
+        credits,
+      }),
+    });
+  }
+
+  if (!facts.isLegacy) {
+    items.push({
+      question: t("faq.try.q", { model }),
+      answer: t("faq.try.a", { model }),
+    });
+  } else if (facts.successor !== null) {
+    items.push({
+      question: t("faq.try.q", { model }),
+      answer: t("faq.try.aLegacy", { model, successor: facts.successor.name }),
+    });
+  }
+
+  return items;
 }
 
 /** Visible FAQ for a media/voice model page. */
@@ -714,28 +751,71 @@ export function mediaModelFaq(
 
 // ─── Blog links ──────────────────────────────────────────────────────────────
 
-/** Posts that cover this chat model's kind, most relevant first. */
+const MAX_BLOG_LINKS = 3;
+
+function hasStrength(
+  facts: ModelFacts,
+  ...utilities: ModelFacts["strengths"][number][]
+): boolean {
+  return facts.strengths.some((strength) => utilities.includes(strength));
+}
+
+/** Landing page that matches an uncensored model's kind; null outside that tier. */
+export type ModelLandingKey = "uncensored" | "abliterated";
+
+export function chatModelLanding(facts: ModelFacts): ModelLandingKey | null {
+  const kind = uncensoredKind(facts);
+  if (kind === null || facts.isLegacy) {
+    return null;
+  }
+  return kind === "abliterated" ? "abliterated" : "uncensored";
+}
+
+/**
+ * Posts that cover this chat model, most specific first: the explainer for
+ * its kind of uncensored, roleplay when that is a listed strength, the API
+ * and coding-tool guides for callable models. A landing page (see
+ * chatModelLanding) takes one of the MAX_BLOG_LINKS slots.
+ */
 export function chatModelBlogSlugs(facts: ModelFacts): BlogPostSlug[] {
-  const coding = facts.strengths.some(
-    (strength) => strength === ModelUtility.CODING,
+  const kind = uncensoredKind(facts);
+  const roleplay = hasStrength(
+    facts,
+    ModelUtility.ROLEPLAY,
+    ModelUtility.ROLEPLAY_DARK,
   );
-  if (facts.content === ContentLevel.UNCENSORED) {
-    return [
+  const candidates: BlogPostSlug[] = [];
+  if (kind !== null) {
+    candidates.push(
+      kind === "abliterated"
+        ? "abliterated-vs-uncensored-models"
+        : "uncensored-models-what-each-is-good-at",
+    );
+    if (roleplay) {
+      candidates.push("ai-roleplay-without-filter");
+    }
+    if (isApiCallable(facts)) {
+      candidates.push("uncensored-llm-api");
+    }
+    candidates.push(
       "uncensored-models-what-each-is-good-at",
       "chatgpt-alternative-without-filters",
+    );
+  } else {
+    if (hasStrength(facts, ModelUtility.CODING) && facts.supportsTools) {
+      candidates.push("unbottled-api-in-coding-tools");
+    }
+    if (roleplay) {
+      candidates.push("ai-roleplay-without-filter");
+    }
+    candidates.push(
       "openai-anthropic-compatible-api",
-    ];
+      "chatgpt-alternative-without-filters",
+    );
   }
-  return coding && facts.supportsTools
-    ? [
-        "openai-anthropic-compatible-api",
-        "unbottled-api-in-coding-tools",
-        "chatgpt-alternative-without-filters",
-      ]
-    : [
-        "openai-anthropic-compatible-api",
-        "chatgpt-alternative-without-filters",
-      ];
+  const slots =
+    chatModelLanding(facts) === null ? MAX_BLOG_LINKS : MAX_BLOG_LINKS - 1;
+  return [...new Set(candidates)].slice(0, slots);
 }
 
 /** Posts that cover this media type. */

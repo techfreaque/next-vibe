@@ -56,11 +56,11 @@ export const translations: typeof enTranslations = {
       drugs: "Drogas",
       sexuality: "Sexualidad",
       security: "Seguridad",
-      religion: "Religion",
+      religion: "Religión",
       law: "Derecho",
       science: "Ciencia",
       fiction: "Ficción",
-      satire: "Satire",
+      satire: "Sátira",
     },
   },
   method: {

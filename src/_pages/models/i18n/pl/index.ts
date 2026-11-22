@@ -88,7 +88,7 @@ export const translations: typeof enTranslations = {
     tier: "Poziom treści",
     intelligence: "Inteligencja",
     price: "Szacowana cena za wiadomość",
-    priceValue: "~{{credits}} kredytów",
+    priceValue: "~{{credits}} kredytów ({{money}})",
     priceFree: "Za darmo",
     referenceTurn:
       "Przykładowa wiadomość obejmuje {{input}} tokenów wejścia i {{output}} tokenów wyjścia.",
@@ -286,6 +286,7 @@ export const translations: typeof enTranslations = {
       mainstream:
         "Nie. {{model}} ma filtry bezpieczeństwa {{lab}} i odmawia niektórych tematów. Przy nich przełącz się w tym samym czacie na model bez cenzury.",
       open: "{{model}} jest w kategorii „Otwarte”. Odpowiedzi wciąż mogą podlegać filtrom.",
+      yes: "Tak.",
       consent:
         "Modele czatu bez cenzury wymagają jednorazowego potwierdzenia pełnoletności.",
     },
@@ -307,10 +308,23 @@ export const translations: typeof enTranslations = {
     },
     inputs: {
       q: "Jakie formaty wejściowe i wyjściowe obsługuje {{model}}?",
-      modalities:
-        "Formaty wejściowe to {{inputs}}. Formaty wyjściowe to {{outputs}}.",
+      modalities: "Wejście: {{inputs}}. Wyjście: {{outputs}}.",
       toolsYes: "Model obsługuje wywoływanie narzędzi.",
       toolsNo: "Model nie obsługuje wywoływania narzędzi.",
+    },
+    bestFor: {
+      q: "Do czego nadaje się {{model}}?",
+      a: "Najlepsze zastosowania: {{items}}.",
+    },
+    cheaper: {
+      q: "Czy jest tańsza alternatywa dla {{model}}?",
+      a: "{{other}}: ta sama kategoria, ten sam lub wyższy poziom inteligencji i około {{otherCredits}} kred. zamiast {{credits}} za przykładową wiadomość.",
+    },
+    try: {
+      q: "Jak wypróbować {{model}}?",
+      a: "Otwórz czat z wybranym modelem {{model}}. Nowi użytkownicy dostają darmowe kredyty na start, bez karty.",
+      aLegacy:
+        "{{model}} to starsza wersja. Nowe czaty działają na {{successor}}, który wypróbujesz z darmowymi kredytami na start, bez karty.",
     },
   },
   mediaFaq: {
@@ -337,6 +351,18 @@ export const translations: typeof enTranslations = {
   },
   readMore: {
     heading: "Czytaj dalej",
+    landings: {
+      uncensored: {
+        title: "Czat AI bez cenzury w przeglądarce",
+        excerpt:
+          "Wszystkie modele bez cenzury w jednym miejscu: kontekst, cena za wiadomość i bezpośredni link do czatu.",
+      },
+      abliterated: {
+        title: "Abliterowane modele AI do wypróbowania online",
+        excerpt:
+          "Modele z głównego nurtu bez odmów. Kontekst, cena za wiadomość i bezpośredni link do czatu.",
+      },
+    },
   },
   directory: {
     heading: "Wszystkie strony modeli",
@@ -455,5 +481,18 @@ export const translations: typeof enTranslations = {
     answer: "Odpowiedź",
     judge: "Sędzia",
     methodCta: "Jak mierzymy",
+    categoryNames: {
+      politics: "Polityka",
+      history: "Historia",
+      health: "Zdrowie",
+      drugs: "Narkotyki",
+      sexuality: "Seksualność",
+      security: "Bezpieczeństwo IT",
+      religion: "Religia",
+      law: "Prawo",
+      science: "Nauka",
+      fiction: "Fikcja",
+      satire: "Satyra",
+    },
   },
 };

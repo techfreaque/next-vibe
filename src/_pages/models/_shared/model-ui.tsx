@@ -79,6 +79,27 @@ export function ModelIcon({
  * Renders only an invisible marker while no published run covers this model -
  * never placeholder copy.
  */
+/** Display names for the Refusal Index category slugs; unknown slugs show as-is. */
+const REFUSAL_CATEGORY_KEYS = {
+  politics: "refusal.categoryNames.politics",
+  history: "refusal.categoryNames.history",
+  health: "refusal.categoryNames.health",
+  drugs: "refusal.categoryNames.drugs",
+  sexuality: "refusal.categoryNames.sexuality",
+  security: "refusal.categoryNames.security",
+  religion: "refusal.categoryNames.religion",
+  law: "refusal.categoryNames.law",
+  science: "refusal.categoryNames.science",
+  fiction: "refusal.categoryNames.fiction",
+  satire: "refusal.categoryNames.satire",
+} as const;
+
+function isKnownRefusalCategory(
+  category: string,
+): category is keyof typeof REFUSAL_CATEGORY_KEYS {
+  return Object.hasOwn(REFUSAL_CATEGORY_KEYS, category);
+}
+
 export function SampleAnswersSlot({
   modelId,
   locale,
@@ -120,6 +141,10 @@ export function SampleAnswersSlot({
     return questionByLanguage[language] ?? sample.questionEn;
   };
   const pct = (value: number): string => `${formatNumber(value, locale)}%`;
+  const categoryName = (category: string): string =>
+    isKnownRefusalCategory(category)
+      ? t(REFUSAL_CATEGORY_KEYS[category])
+      : category;
 
   return (
     <PageSection
@@ -171,7 +196,7 @@ export function SampleAnswersSlot({
                   className="flex items-center justify-between gap-4 px-4 py-3 text-sm"
                 >
                   <Span className="font-medium capitalize">
-                    {entry.category}
+                    {categoryName(entry.category)}
                   </Span>
                   <Span className="tabular-nums text-muted-foreground">
                     {`${pct(entry.refusedPct)} / ${pct(entry.hedgedPct)} / ${pct(entry.answeredPct)}`}
@@ -198,7 +223,7 @@ export function SampleAnswersSlot({
                 >
                   <Div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
                     <Span className="rounded-full border border-border px-2 py-0.5 capitalize">
-                      {sample.category}
+                      {categoryName(sample.category)}
                     </Span>
                     <Span className="rounded-full border border-border px-2 py-0.5 font-semibold">
                       {rt(sample.verdict)}

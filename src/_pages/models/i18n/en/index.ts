@@ -87,7 +87,7 @@ export const translations = {
     tier: "Content tier",
     intelligence: "Intelligence",
     price: "Estimated price per message",
-    priceValue: "~{{credits}} credits",
+    priceValue: "~{{credits}} credits ({{money}})",
     priceFree: "Free",
     referenceTurn:
       "Reference message with {{input}} input tokens and {{output}} output tokens.",
@@ -279,6 +279,7 @@ export const translations = {
       mainstream:
         "No. {{model}} keeps {{lab}}'s safety filters and refuses some topics. For those, switch to an uncensored model in the same chat.",
       open: "{{model}} is in the Open tier. Its responses can still be filtered.",
+      yes: "Yes.",
       consent: "Uncensored chat models require a one-time 18+ confirmation.",
     },
     api: {
@@ -299,9 +300,23 @@ export const translations = {
     },
     inputs: {
       q: "What inputs and outputs does {{model}} support?",
-      modalities: "Inputs include {{inputs}}. Outputs include {{outputs}}.",
+      modalities: "Input: {{inputs}}. Output: {{outputs}}.",
       toolsYes: "It supports tool calling.",
       toolsNo: "Tool calling is unavailable.",
+    },
+    bestFor: {
+      q: "What is {{model}} good for?",
+      a: "Use it for: {{items}}.",
+    },
+    cheaper: {
+      q: "Is there a cheaper alternative to {{model}}?",
+      a: "{{other}}: same tier, the same or a higher intelligence level, and about {{otherCredits}} credits per reference message instead of {{credits}}.",
+    },
+    try: {
+      q: "How can I try {{model}}?",
+      a: "Open a chat with {{model}} selected. New visitors get free credits to start, no card needed.",
+      aLegacy:
+        "{{model}} is a legacy model. New chats use {{successor}}, which you can try with free starter credits, no card needed.",
     },
   },
   mediaFaq: {
@@ -328,6 +343,18 @@ export const translations = {
   },
   readMore: {
     heading: "Read more",
+    landings: {
+      uncensored: {
+        title: "Uncensored AI chat in your browser",
+        excerpt:
+          "Every uncensored model in one list: context, price per message and a direct chat link.",
+      },
+      abliterated: {
+        title: "Abliterated AI models you can try online",
+        excerpt:
+          "Mainstream models with the refusals removed. Context, price per message and a direct chat link.",
+      },
+    },
   },
   directory: {
     heading: "Every model page",
@@ -444,5 +471,18 @@ export const translations = {
     answer: "Answer",
     judge: "Judge",
     methodCta: "How we measure",
+    categoryNames: {
+      politics: "Politics",
+      history: "History",
+      health: "Health",
+      drugs: "Drugs",
+      sexuality: "Sexuality",
+      security: "IT security",
+      religion: "Religion",
+      law: "Law",
+      science: "Science",
+      fiction: "Fiction",
+      satire: "Satire",
+    },
   },
 };

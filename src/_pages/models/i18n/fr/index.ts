@@ -89,7 +89,7 @@ export const translations: typeof enTranslations = {
     tier: "Niveau de contenu",
     intelligence: "Intelligence",
     price: "Prix estimé par message",
-    priceValue: "~{{credits}} crédits",
+    priceValue: "~{{credits}} crédits ({{money}})",
     priceFree: "Gratuit",
     referenceTurn:
       "Le message de référence contient {{input}} tokens en entrée et {{output}} en sortie.",
@@ -287,6 +287,7 @@ export const translations: typeof enTranslations = {
       mainstream:
         "Non. {{model}} garde les filtres de sécurité de {{lab}} et refuse certains sujets. Pour ceux-là, passez à un modèle non censuré dans le même chat.",
       open: "{{model}} appartient à la catégorie « Ouvert ». Ses réponses peuvent encore être filtrées.",
+      yes: "Oui.",
       consent:
         "Pour utiliser un modèle de chat non censuré, confirmez une fois que vous avez au moins 18 ans.",
     },
@@ -308,10 +309,23 @@ export const translations: typeof enTranslations = {
     },
     inputs: {
       q: "Quels formats {{model}} accepte-t-il et produit-il ?",
-      modalities:
-        "Formats acceptés en entrée : {{inputs}}. Formats produits en sortie : {{outputs}}.",
+      modalities: "Entrée : {{inputs}}. Sortie : {{outputs}}.",
       toolsYes: "Le modèle peut appeler des outils.",
       toolsNo: "Le modèle ne peut pas appeler d’outils.",
+    },
+    bestFor: {
+      q: "À quoi sert {{model}} ?",
+      a: "Idéal pour : {{items}}.",
+    },
+    cheaper: {
+      q: "Existe-t-il une alternative moins chère à {{model}} ?",
+      a: "{{other}} : même catégorie, niveau d'intelligence égal ou supérieur, et environ {{otherCredits}} crédits par message de référence au lieu de {{credits}}.",
+    },
+    try: {
+      q: "Comment essayer {{model}} ?",
+      a: "Ouvrez un chat avec {{model}} déjà sélectionné. Les nouveaux visiteurs reçoivent des crédits offerts pour commencer, sans carte.",
+      aLegacy:
+        "{{model}} est un ancien modèle. Les nouveaux chats utilisent {{successor}}, à essayer avec des crédits offerts, sans carte.",
     },
   },
   mediaFaq: {
@@ -340,6 +354,18 @@ export const translations: typeof enTranslations = {
   },
   readMore: {
     heading: "À lire aussi",
+    landings: {
+      uncensored: {
+        title: "Chat IA sans censure dans votre navigateur",
+        excerpt:
+          "Tous les modèles non censurés sur une page : contexte, prix par message et lien direct vers le chat.",
+      },
+      abliterated: {
+        title: "Modèles IA abliterated à tester en ligne",
+        excerpt:
+          "Des modèles grand public sans refus. Contexte, prix par message et lien direct vers le chat.",
+      },
+    },
   },
   directory: {
     heading: "Toutes les pages de modèles",
@@ -459,5 +485,18 @@ export const translations: typeof enTranslations = {
     answer: "Réponse",
     judge: "Juge",
     methodCta: "Notre méthode",
+    categoryNames: {
+      politics: "Politique",
+      history: "Histoire",
+      health: "Santé",
+      drugs: "Drogues",
+      sexuality: "Sexualité",
+      security: "Sécurité informatique",
+      religion: "Religion",
+      law: "Droit",
+      science: "Science",
+      fiction: "Fiction",
+      satire: "Satire",
+    },
   },
 };
