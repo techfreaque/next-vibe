@@ -1,0 +1,12 @@
+{
+  "url": "https://api.edenai.run/v3/upload",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]"
+  },
+  "body": {
+    "file": {},
+    "expires_in_days": "1",
+    "purpose": "speech-to-text"
+  }
+}

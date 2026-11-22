@@ -1,6 +1,6 @@
 /**
  * E2E: /subscription/buy → checkout. A guest sees the plans and is sent to
- * sign in; a signed-in customer picks yearly, chooses card, and the page
+ * sign in; a signed-in customer picks Starter yearly, chooses card, and the page
  * creates a Stripe checkout session and redirects to it. The payment step
  * itself is never reached: checkout.stripe.com is stubbed at the browser, and
  * the dev server only holds a Stripe test-mode key (sessions are test-mode,
@@ -17,10 +17,15 @@ import {
 import type { Page } from "playwright";
 import { describe, expect } from "vitest";
 
-import { scopedTranslation as purchaseScopedTranslation } from "@/credits/purchase/i18n";
 import checkoutEndpoints from "@/payment/checkout/definition";
 import { PaymentProvider } from "@/payment/enum";
-import { ProductIds, productsRepository } from "@/products/platform-products";
+import { scopedTranslation as productsScopedTranslation } from "@/products/i18n";
+import {
+  getPricingParams,
+  getSubscriptionTiers,
+  ProductIds,
+  SUBSCRIPTION_TIER_PRODUCT_IDS,
+} from "@/products/repository-client";
 
 import subscriptionCreateEndpoints from "./create/definition";
 import { BillingInterval, SubscriptionPlan } from "./enum";
@@ -32,24 +37,13 @@ const STRIPE_CHECKOUT = /^https:\/\/checkout\.stripe\.com\//;
 const STRIPE_STUB_HTML = "<!doctype html><title>stripe stub</title>";
 
 const { t } = scopedTranslation.scopedT(defaultLocale);
-const { t: tPurchase } = purchaseScopedTranslation.scopedT(defaultLocale);
+const { t: tProducts } = productsScopedTranslation.scopedT(defaultLocale);
+const tiers = getSubscriptionTiers(defaultLocale);
 
-function formatPrice(price: number, currency: string): string {
-  return new Intl.NumberFormat(defaultLocale, {
-    style: "currency",
-    currency,
-  }).format(price);
-}
-
-/** Both plan cards rendered and hydrated. */
 async function plansVisible(page: Page): Promise<void> {
   await page
-    .getByText(t("buy.subscription.title"), { exact: true })
-    .first()
-    .waitFor({ timeout: E2E_HYDRATION_TIMEOUT_MS / 2 });
-  await page
-    .getByText(tPurchase("post.pack.title"), { exact: true })
-    .first()
+    .getByTestId("plan-picker")
+    .getByRole("heading", { name: t("tiers.heading"), exact: true })
     .waitFor({ timeout: E2E_HYDRATION_TIMEOUT_MS / 2 });
 }
 
@@ -60,32 +54,32 @@ describe("E2E: subscription checkout", () => {
     const { page } = fixtures;
     await fixtures.gotoReady(BUY_PAGE, () => plansVisible(page));
 
-    const subscription = productsRepository.getProduct(
-      ProductIds.SUBSCRIPTION,
-      defaultLocale,
-    );
-    await page
-      .getByText(formatPrice(subscription.price, subscription.currency), {
-        exact: true,
-      })
-      .first()
-      .waitFor();
+    const picker = page.getByTestId("plan-picker");
+    expect(tiers.map((tier) => tier.productId)).toEqual([
+      ...SUBSCRIPTION_TIER_PRODUCT_IDS,
+    ]);
+    expect(await picker.getByTestId(/^plan-tier-/).count()).toBe(4);
+    for (const tier of tiers) {
+      const card = picker.getByTestId(`plan-tier-${tier.productId}`);
+      await card.getByText(tProducts(tier.name), { exact: true }).waitFor();
+      await card.getByText(tier.priceLabel, { exact: true }).waitFor();
+      await card.getByText(tier.creditsLabel, { exact: true }).waitFor();
+      await card.getByText(t("tiers.creditsPerMonth"), { exact: true }).waitFor();
+    }
+
+    const { packPrice, packCredits } = getPricingParams(defaultLocale);
     await page
       .getByText(
-        t("buy.subscription.features.credits", {
-          count: subscription.credits,
+        t("tiers.packsLocked.title", {
+          price: packPrice,
+          credits: packCredits,
         }),
+        { exact: true },
       )
-      .first()
       .waitFor();
 
-    // No checkout for guests: sign-in / sign-up instead of the subscribe button
-    expect(
-      await page
-        .getByRole("button", { name: t("buy.subscription.button") })
-        .count(),
-    ).toBe(0);
-    const signIn = page.getByRole("link", {
+    expect(await picker.getByTestId("plan-start").count()).toBe(0);
+    const signIn = picker.getByRole("link", {
       name: t("buy.login"),
       exact: true,
     });
@@ -94,7 +88,7 @@ describe("E2E: subscription checkout", () => {
       `/${defaultLocale}/user/login`,
     );
     expect(
-      await page
+      await picker
         .getByRole("link", { name: t("buy.signup"), exact: true })
         .getAttribute("href"),
     ).toBe(`/${defaultLocale}/user/signup`);
@@ -122,25 +116,34 @@ describe("E2E: subscription checkout", () => {
       );
 
       await fixtures.gotoReady(BUY_PAGE, () => plansVisible(page));
-      const subscribe = page.getByRole("button", {
-        name: t("buy.subscription.button"),
+      const starter = tiers.find(
+        (tier) => tier.productId === ProductIds.SUBSCRIPTION,
+      );
+      expect(starter?.yearlyPriceLabel).toBeTruthy();
+      if (!starter?.yearlyPriceLabel) {
+        return;
+      }
+
+      const picker = page.getByTestId("plan-picker");
+      const starterCard = picker.getByTestId(`plan-tier-${starter.productId}`);
+      await starterCard.click();
+      const subscribe = picker.getByRole("button", {
+        name: t("tiers.cta.start", { plan: tProducts(starter.name) }),
         exact: true,
       });
       await subscribe.waitFor();
+      expect(await starterCard.getAttribute("aria-pressed")).toBe("true");
 
-      const yearly = productsRepository.getProduct(
-        ProductIds.SUBSCRIPTION,
-        defaultLocale,
-        "year",
-      );
-      await page
-        .getByRole("button", { name: t("billing.yearly"), exact: true })
-        .click();
-      await page
-        .getByText(formatPrice(yearly.price, yearly.currency), { exact: true })
-        .first()
+      const yearly = picker.getByRole("button", {
+        name: t("billing.yearly"),
+        exact: true,
+      });
+      await yearly.click();
+      expect(await yearly.getAttribute("aria-pressed")).toBe("true");
+      await picker
+        .getByText(starter.yearlyPriceLabel, { exact: true })
         .waitFor();
-      await page.getByText(t("buy.subscription.perYear")).first().waitFor();
+      await picker.getByText(t("tiers.perYear"), { exact: true }).waitFor();
 
       await subscribe.click();
       const dialog = page.getByRole("dialog");

@@ -5,24 +5,62 @@ import { describe, expect } from "vitest";
 describe("Lead acquisition reports", () => {
   const e2e = useE2E("leads/growth/acquisition-report");
 
-  e2e.it("renders the lead filters and applies them to the live list", async ({ goto, loginAs, page }) => {
-    await loginAs(await resolveTestAdminUser());
-    await goto("/tools/leads-dashboard");
-    await page.getByRole("button", { name: /^All Leads/ }).click();
-    await page.getByText("Website User", { exact: true }).first().waitFor();
-    await page.getByLabel("Referrer domain", { exact: true }).fill("no-results.example.invalid");
-    const response = page.waitForResponse((result) =>
-      new URL(result.url()).pathname.endsWith("/leads/list") &&
-      new URL(result.url()).searchParams.toString().includes("no-results.example.invalid"),
-      { timeout: 10000 },
-    );
-    await page.getByRole("button", { name: "Apply filters", exact: true }).click();
-    expect((await response).ok()).toBe(true);
-    await page.getByText("No leads match your filters", { exact: true }).waitFor();
+  e2e.it(
+    "renders the lead filters and applies them to the live list",
+    async ({ goto, loginAs, page }) => {
+      await loginAs(await resolveTestAdminUser());
+      await goto("/tools/leads-dashboard");
+      const [initialList] = await Promise.all([
+        page.waitForResponse((result) =>
+          new URL(result.url()).pathname.endsWith("/leads/list"),
+        ),
+        page.getByRole("button", { name: /^All Leads/ }).click(),
+      ]);
+      expect(initialList.ok()).toBe(true);
+      await page
+        .getByText("Website User", { exact: true })
+        .filter({ visible: true })
+        .first()
+        .waitFor();
+      await page.getByText("More filters", { exact: true }).click();
 
-    await page.getByRole("button", { name: "Stats", exact: true }).click();
-    await page.getByText("Lead acquisition", { exact: true }).waitFor();
-    await page.getByRole("columnheader", { name: "First chats", exact: true }).waitFor();
-    await page.getByRole("columnheader", { name: "Revenue", exact: true }).waitFor();
-  });
+      const referrer = "no-results.example.invalid";
+      await page.getByLabel("Referrer", { exact: true }).fill(referrer);
+      const [response] = await Promise.all([
+        page.waitForResponse(
+          (result) => {
+            const url = new URL(result.url());
+            return (
+              url.pathname.endsWith("/leads/list") &&
+              url.searchParams.get("referrerHost") === referrer
+            );
+          },
+          { timeout: 10_000 },
+        ),
+        page.getByRole("button", { name: "Apply", exact: true }).click(),
+      ]);
+      expect(response.ok()).toBe(true);
+      await page
+        .getByText("No leads match your filters", { exact: true })
+        .waitFor();
+
+      await goto("/tools/leads-dashboard");
+      const [report] = await Promise.all([
+        page.waitForResponse((result) =>
+          new URL(result.url()).pathname.endsWith("/leads/analytics/acquisition"),
+        ),
+        page.getByRole("button", { name: /^Acquisition\b/ }).click(),
+      ]);
+      expect(report.ok()).toBe(true);
+      await page.waitForURL("**/tools/acquisition-report");
+      await page
+        .getByText("Acquisition", { exact: true })
+        .filter({ visible: true })
+        .waitFor();
+      await page.getByRole("button", { name: /^Chatted\b/ }).waitFor();
+      await page
+        .getByRole("columnheader", { name: "Revenue", exact: true })
+        .waitFor();
+    },
+  );
 });

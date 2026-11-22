@@ -1,0 +1,15 @@
+{
+  "url": "https://api.edenai.run/v3/universal-ai/async",
+  "method": "POST",
+  "headers": {
+    "Authorization": "[redacted]",
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "model": "audio/speech_to_text_async/openai",
+    "input": {
+      "file": "f3c6dc10-886f-45f9-8d35-63b537d61b36",
+      "language": "en"
+    }
+  }
+}
