@@ -22,6 +22,7 @@ import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
 import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
 import { validateLeadIdExists } from "next-vibe/identity/lead/middleware-ops";
 import type { UserRoleValue } from "next-vibe/identity/roles/enum";
+import { cookies } from "next-vibe/ui/lib/headers";
 
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
@@ -173,8 +174,6 @@ export class AuthRepository {
     }
 
     try {
-      const { cookies } = await import("next-vibe/ui/lib/headers");
-
       const cookieStore = await cookies();
       cookieStore.set({
         name: LEAD_ID_COOKIE_NAME,
@@ -236,7 +235,6 @@ export class AuthRepository {
     // For public users, check Bearer ####<leadId> suffix first (cross-origin callers),
     // then fall back to cookie (same-origin browser requests).
     // This prevents creating duplicate leads on every page load.
-    const { cookies } = await import("next-vibe/ui/lib/headers");
     const cookieStore = await cookies();
     const existingLeadId =
       headerLeadId ?? cookieStore.get(LEAD_ID_COOKIE_NAME)?.value;

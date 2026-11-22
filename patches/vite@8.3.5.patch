@@ -40,7 +40,7 @@ diff --git a/dist/node/chunks/node.js b/dist/node/chunks/node.js
 diff --git a/dist/node/module-runner.js b/dist/node/module-runner.js
 --- a/dist/node/module-runner.js
 +++ b/dist/node/module-runner.js
-@@ -1226,6 +1226,15 @@
+@@ -1226,12 +1226,29 @@
  				startOffset: this.evaluator.startOffset
  			}
  		]);
@@ -56,3 +56,18 @@ diff --git a/dist/node/module-runner.js b/dist/node/module-runner.js
  		if ("cache" in fetchedModule) {
  			if (!cachedModule || !cachedModule.meta) throw Error(`Module "${url}" was mistakenly invalidated during fetch phase.`);
  			return cachedModule;
+ 		}
+ 		let moduleId = "externalize" in fetchedModule ? fetchedModule.externalize : fetchedModule.id, moduleUrl = "url" in fetchedModule ? fetchedModule.url : url, module = this.evaluatedModules.ensureModule(moduleId, moduleUrl);
+-		return "invalidate" in fetchedModule && fetchedModule.invalidate && this.evaluatedModules.invalidateModule(module), fetchedModule.url = moduleUrl, fetchedModule.id = moduleId, module.meta = fetchedModule, module;
++		// Different import URLs can share one canonical transform. Keep its
++		// existing evaluation when the host sends the same cold transform twice.
++		if ("invalidate" in fetchedModule && fetchedModule.invalidate && !(
++			module.meta && "code" in module.meta && fetchedModule.code === module.meta.code
++		)) this.evaluatedModules.invalidateModule(module);
++		fetchedModule.url = moduleUrl;
++		fetchedModule.id = moduleId;
++		module.meta = fetchedModule;
++		return module;
+ 	}
+ 	async directRequest(url, mod, _callstack) {
+ 		let fetchResult = mod.meta, moduleId = fetchResult.id, callstack = [..._callstack, moduleId], request = async (dep, metadata) => {

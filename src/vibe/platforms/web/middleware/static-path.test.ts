@@ -8,9 +8,12 @@
 import { describe, expect, it } from "bun:test";
 import { NextRequest } from "next-vibe/ui/lib/request";
 
+import { AUTH_TOKEN_COOKIE_NAME, LEAD_ID_COOKIE_NAME } from "@/env/constants";
+
 import { coreEnv } from "../../../core/env";
 import { Environment } from "../../../env/env-util";
 import { middleware } from "./index";
+import { applyResponseIdentityCookies } from "./utils";
 
 const options = {
   supportedLocales: ["en-GLOBAL", "en-US", "de-DE", "pl-PL"] as const,
@@ -55,6 +58,22 @@ describe("middleware static-file shortcut", () => {
     const result = await statusFor("/src/moved-module.tsx?t=12");
     expect(result.status).toBe(
       coreEnv.NODE_ENV === Environment.DEVELOPMENT ? 404 : 307,
+    );
+  });
+});
+
+describe("middleware identity cookies", () => {
+  it("gives the current render the same new lead as the next browser request", () => {
+    const headers = new Headers({
+      cookie: `layout=wide; ${LEAD_ID_COOKIE_NAME}=old`,
+    });
+    applyResponseIdentityCookies(headers, [
+      `${LEAD_ID_COOKIE_NAME}=new; Path=/; HttpOnly`,
+      `${AUTH_TOKEN_COOKIE_NAME}=session; Path=/; HttpOnly`,
+      "layout=compact; Path=/",
+    ]);
+    expect(headers.get("cookie")).toBe(
+      `layout=wide; ${LEAD_ID_COOKIE_NAME}=new; ${AUTH_TOKEN_COOKIE_NAME}=session`,
     );
   });
 });

@@ -88,6 +88,7 @@ void mock.module("../../logger/db-persist", () => ({
 const originalFetch = globalThis.fetch;
 const sentHeaders: Array<Record<string, string>> = [];
 let fetchFailures = 0;
+let malformedError = false;
 
 describe("request id propagation", () => {
   beforeAll(() => {
@@ -107,7 +108,7 @@ describe("request id propagation", () => {
         }
         return Promise.resolve(
           new Response(
-            JSON.stringify({
+            JSON.stringify(malformedError ? { message: "HTTPError" } : {
               success: false,
               message: "boom",
               errorType: {
@@ -125,6 +126,31 @@ describe("request id propagation", () => {
 
   afterAll(() => {
     globalThis.fetch = originalFetch;
+  });
+
+  it("reports a proxy error envelope without handing a malformed error to callers", async () => {
+    const { callApi } = await import("./call-api");
+    const rows: LogRow[] = [];
+    malformedError = true;
+    try {
+      const result = await callApi<CreateApiEndpointAny>(
+        creditsDefinition.GET,
+        recordingLogger(rows),
+        {
+          isPublic: true,
+          leadId: "00000000-0000-4000-8000-000000000002",
+          roles: [],
+        },
+        "en-GLOBAL",
+        undefined,
+        undefined,
+      );
+      expect(result.success).toBe(false);
+      expect(result.errorType?.errorKey).toBe("errorTypes.http_error");
+      expect(rows.some((row) => row.level === "error" && row.message.startsWith("Endpoint call failed"))).toBe(true);
+    } finally {
+      malformedError = false;
+    }
   });
 
   it("client sends x-request-id and reports the failure with the same id", async () => {

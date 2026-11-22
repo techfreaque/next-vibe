@@ -2,8 +2,7 @@
 import { HeadContent } from "@tanstack/react-router";
 import type { JSX, ReactNode } from "react";
 
-import { coreClientEnv } from "../../../core/env-client";
-import { Environment } from "../../../env/env-util";
+import { Script } from "./script";
 
 export interface HeadProps {
   children: ReactNode;
@@ -12,19 +11,18 @@ export interface HeadProps {
 export function Head({ children }: HeadProps): JSX.Element {
   return (
     <head>
-      {coreClientEnv.NODE_ENV === Environment.DEVELOPMENT && (
+      {import.meta.env?.DEV && (
         <>
           {/* Synchronous placeholder so $RefreshReg$/$RefreshSig$ exist before
               any module scripts execute. Without this, the first page load after
               server start races: component modules can run before the async
               /@react-refresh import resolves, hitting "can't detect preamble". */}
-          <script
+          <Script
             dangerouslySetInnerHTML={{
               __html: `window.$RefreshReg$ = () => {};window.$RefreshSig$ = () => (type) => type;`,
             }}
-            suppressHydrationWarning
           />
-          <script
+          <Script
             type="module"
             dangerouslySetInnerHTML={{
               __html: [
@@ -35,7 +33,6 @@ export function Head({ children }: HeadProps): JSX.Element {
                 `window.$RefreshSig$ = () => (type) => type;`,
               ].join("\n"),
             }}
-            suppressHydrationWarning
           />
         </>
       )}

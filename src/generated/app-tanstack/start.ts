@@ -17,6 +17,7 @@ import { NextRequest } from "next/server";
 import { shouldUseColors } from "next-vibe/logger/colors";
 import { formatSinceStart } from "next-vibe/logger/uptime";
 import { serverFileLog } from "next-vibe/logger/file";
+import { applyResponseIdentityCookies } from "next-vibe/platforms/web/middleware/utils";
 import { preloadAllLazyWidgets } from "next-vibe/unified-ui/_shared/lazy-widget";
 
 // ANSI helpers (inline - avoid importing heavy logger chain at middleware level)
@@ -240,6 +241,8 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
       : []);
 
   if (setCookies.length > 0) {
+    // The loader and subsequent socket upgrade must use the same new lead.
+    applyResponseIdentityCookies(request.headers, setCookies);
     // Pass array so h3 appends each cookie (not overwrites)
     setResponseHeader("Set-Cookie", setCookies);
   }

@@ -1,5 +1,5 @@
 import type { JSX } from "react";
-import { createElement } from "react";
+import { createElement, useSyncExternalStore } from "react";
 
 interface ScriptProps {
   id?: string;
@@ -10,9 +10,11 @@ interface ScriptProps {
   children?: string;
 }
 
-/**
- * TanStack Start - renders a plain script tag via createElement to avoid lint rules.
- */
+const subscribe = (): (() => void) => () => undefined;
+const clientSnapshot = (): boolean => false;
+const serverSnapshot = (): boolean => true;
+
+/** Bootstrap scripts run from the HTML delivered before hydration. */
 export function Script({
   id,
   src,
@@ -20,6 +22,14 @@ export function Script({
   dangerouslySetInnerHTML,
   children,
 }: ScriptProps): JSX.Element | null {
+  const isInitialDocument = useSyncExternalStore(
+    subscribe,
+    clientSnapshot,
+    serverSnapshot,
+  );
+  if (!src && !isInitialDocument) {
+    return null;
+  }
   if (dangerouslySetInnerHTML) {
     return createElement("script", { id, type, dangerouslySetInnerHTML });
   }

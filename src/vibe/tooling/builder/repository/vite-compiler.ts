@@ -30,7 +30,10 @@ import type { EvaluatedModules } from "vite/module-runner";
 
 import { getSrcDir, ROOT_LAYOUT_DIR } from "@/env/paths";
 
-import { transformClientLocaleSource } from "../../../core/i18n/core/client-locale-loader.cjs";
+import {
+  transformClientLocaleSource,
+  transformDevSsrLocaleSource,
+} from "../../../core/i18n/core/client-locale-loader.cjs";
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -601,6 +604,7 @@ function invalidateWithImporters(
   graph: EnvironmentModuleGraph,
   startId: string,
   visited: Set<string>,
+  invalidated = new Set<EnvironmentModuleNode>(),
 ): boolean {
   if (visited.has(startId)) {
     return true;
@@ -613,10 +617,10 @@ function invalidateWithImporters(
   if (!mod) {
     return true;
   }
-  graph.invalidateModule(mod);
+  graph.invalidateModule(mod, invalidated);
   for (const importer of mod.importers) {
     if (importer.id) {
-      if (!invalidateWithImporters(graph, importer.id, visited)) {
+      if (!invalidateWithImporters(graph, importer.id, visited, invalidated)) {
         return false;
       }
     }
@@ -2083,6 +2087,18 @@ class ViteCompiler {
                 return undefined;
               }
               if (opts?.ssr) {
+                // These pages hydrate immediately and expose translation edits in
+                // every render. Native require caches those files outside Vite.
+                if (
+                  /\/src\/(?:_pages\/create|vibe\/agent\/media-studio\/history)\/i18n\/index\.ts$/.test(
+                    id.replaceAll("\\", "/"),
+                  )
+                ) {
+                  const rewritten = transformDevSsrLocaleSource(code);
+                  if (rewritten !== code && !rewritten.includes("require(")) {
+                    return { code: rewritten, map: null };
+                  }
+                }
                 const shim = `import { createRequire as __createRequire } from "node:module";\nconst require = __createRequire(${JSON.stringify(id)});\n`;
                 return { code: shim + code, map: null };
               }
@@ -2259,22 +2275,20 @@ class ViteCompiler {
               modules,
               server: viteServer,
             }) {
+              const sourceFile = changedFile.replaceAll("\\", "/");
+              if (
+                !sourceFile.includes("/src/") ||
+                sourceFile.endsWith(".css")
+              ) {
+                return;
+              }
               const srcModules = modules.filter((m) => m.id?.includes("/src/"));
-              if (srcModules.length === 0) {
-                return;
-              }
-              // Skip SSR work for CSS-only changes.
-              const nonCssModules = srcModules.filter(
-                (m) => m.id && !m.id.endsWith(".css"),
-              );
-              if (nonCssModules.length === 0) {
-                return;
-              }
-
-              const changedFiles = nonCssModules
+              const changedFiles = srcModules
                 .map((m) => m.id?.replace(/^.*\/src\//, "src/") ?? m.id)
                 .join(", ");
-              const hmrMsg = fmtVite(`HMR update: ${changedFiles}`);
+              const hmrMsg = fmtVite(
+                `HMR update: ${changedFiles || sourceFile.replace(/^.*\/src\//, "src/")}`,
+              );
               process.stdout.write(`${hmrMsg}\n`);
               serverFileLog(hmrMsg);
 
@@ -2319,7 +2333,9 @@ class ViteCompiler {
               if (ssrEnv) {
                 const ssrVisited = new Set<string>();
                 let scoped = true;
-                for (const mod of nonCssModules) {
+                for (const mod of ssrEnv.moduleGraph.getModulesByFile(
+                  sourceFile,
+                ) ?? []) {
                   if (mod.id) {
                     if (
                       !invalidateWithImporters(
@@ -2378,9 +2394,14 @@ class ViteCompiler {
                 // clear is equivalent and cheaper than walking the graph).
                 const nitroVisited = new Set<string>();
                 let nitroScoped = true;
-                for (const mod of nonCssModules) {
+                const changedModules =
+                  env.moduleGraph.getModulesByFile(sourceFile);
+                if (!changedModules?.size) {
+                  continue;
+                }
+                for (const mod of changedModules) {
                   if (mod.id) {
-                    nitroPendingFiles.add(mod.id);
+                    nitroPendingFiles.add(sourceFile);
                     if (
                       !invalidateWithImporters(
                         env.moduleGraph,

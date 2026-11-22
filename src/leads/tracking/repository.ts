@@ -33,6 +33,7 @@ import {
 import type { LeadsT } from "next-vibe/identity/lead/i18n";
 import { scopedTranslation } from "next-vibe/identity/lead/i18n";
 import { LeadsRepository } from "next-vibe/identity/lead/repository";
+import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
@@ -733,8 +734,7 @@ export class LeadTrackingRepository {
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      // Get leadId from user prop (JWT payload) - always present
-      // Fallback to data.leadId for backward compatibility (tracking links)
+      // Tracking links may designate a different lead for event attribution.
       let leadId: string | undefined = data.leadId || user.leadId;
 
       logger.debug("Handling lead engagement and relationship", {
@@ -747,14 +747,22 @@ export class LeadTrackingRepository {
       let leadCreated = false;
       let relationshipEstablished = false;
 
-      // Validate existing lead ID if provided
+      let convertedUserId: string | null | undefined;
       if (leadId) {
         const leadResult = await LeadsRepository.getLeadByIdInternal(
           leadId,
           logger,
           t,
         );
-        if (!leadResult.success) {
+        if (leadResult.success) {
+          convertedUserId = leadResult.data.lead.conversion.convertedUserId;
+        } else {
+          if (
+            leadResult.errorType.errorKey !==
+            ErrorResponseTypes.NOT_FOUND.errorKey
+          ) {
+            return leadResult;
+          }
           logger.debug("Provided lead ID not found, will create new lead", {
             invalidLeadId: leadId,
           });
@@ -796,21 +804,16 @@ export class LeadTrackingRepository {
 
       // Establish lead-user relationship if user is logged in
       // Check if relationship already exists before attempting conversion
-      const currentUserId =
-        data.userId || (user.isPublic ? undefined : user.id);
-      if (currentUserId && !user.isPublic) {
+      const isAdmin =
+        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+      const currentUserId = user.isPublic
+        ? undefined
+        : isAdmin
+          ? (data.userId ?? user.id)
+          : user.id;
+      if (currentUserId && (isAdmin || leadId === user.leadId)) {
         try {
-          // First check if lead is already converted to avoid unnecessary conversion attempts
-          const leadResult = await LeadsRepository.getLeadByIdInternal(
-            leadId,
-            logger,
-            t,
-          );
-
-          if (
-            leadResult.success &&
-            leadResult.data?.lead.conversion.convertedUserId === currentUserId
-          ) {
+          if (convertedUserId === currentUserId) {
             // Lead already converted to this user - skip conversion entirely
             relationshipEstablished = true;
             // No need to log - relationship already exists
@@ -820,12 +823,15 @@ export class LeadTrackingRepository {
               leadId,
               {
                 userId: currentUserId,
-                email: "", // Email will be fetched from user record during conversion
+                email: "",
               },
               logger,
               t,
             );
-            if (convertResult.success) {
+            if (
+              convertResult.success &&
+              convertResult.data.convertedUserId === currentUserId
+            ) {
               relationshipEstablished = true;
               logger.debug("Lead-user relationship established", {
                 leadId,

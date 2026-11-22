@@ -12,6 +12,7 @@ import type { z } from "zod";
 
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 
+import { AuthRepository } from "../../identity/auth/repository";
 import type { UserRoleValue } from "../../identity/roles/enum";
 import { filterUserPermissionRoles } from "../../identity/roles/enum";
 import type { EndpointLogger } from "../../logger/types";
@@ -274,7 +275,6 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     if (providedUser) {
       user = providedUser as InferJwtPayloadTypeFromRoles<T["allowedRoles"]>;
     } else {
-      const { AuthRepository } = await import("../../identity/auth/repository");
       const authUser = await AuthRepository.getAuthMinimalUser(
         endpoint.allowedRoles,
         { platform, locale, request },

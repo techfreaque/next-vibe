@@ -1,7 +1,6 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
@@ -344,11 +343,4 @@ function NewsletterBonus({
       </Button>
     </Div>
   );
-}
-
-/** True when a serialized stream error is a credit refusal (HTTP 402). */
-export function isOutOfCreditsErrorCode(
-  errorCode: number | undefined,
-): boolean {
-  return errorCode === ErrorResponseTypes.PAYMENT_REQUIRED.errorCode;
 }

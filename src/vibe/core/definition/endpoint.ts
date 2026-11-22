@@ -18,7 +18,7 @@ import type { WidgetData } from "../utils/json";
 export type { UnifiedField } from "../../unified-ui/_shared/configs";
 
 import type { CreateApiEndpointAny } from "./endpoint-base";
-import type { FieldUsage } from "./enums";
+import type { FieldUsage, WidgetType } from "./enums";
 
 // ============================================================================
 // SCHEMA TYPE PRESERVATION AND BACK-PROPAGATION SYSTEM
@@ -223,7 +223,11 @@ type _InferSchemaFromFieldImpl<F, Usage extends FieldUsage> =
           } extends infer TShape extends z.ZodRawShape
           ? keyof TShape extends never
             ? z.ZodNever // All children resolved to never (e.g., widget-only children like submit buttons)
-            : z.ZodObject<TShape>
+            : F extends { type: WidgetType.PAGINATION }
+              ? Usage extends FieldUsage.RequestData
+                ? z.ZodPrefault<z.ZodObject<TShape>>
+                : z.ZodObject<TShape>
+              : z.ZodObject<TShape>
           : z.ZodNever
         : z.ZodNever
       : // Handle ObjectUnionField - use string for pattern matching

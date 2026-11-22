@@ -17,7 +17,7 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
 import type { JSX } from "react";
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 
 import type definition from "./definition";
 
@@ -34,14 +34,17 @@ export function ReferralCodeCreateContainer({
   const form = useWidgetForm<typeof definition.POST>();
   const saved = useWidgetValue<typeof definition.POST>();
 
-  // A created code clears the form for the next one (adjust state during render)
-  const [handled, setHandled] = useState(saved);
-  if (saved !== handled) {
-    setHandled(saved);
+  // Reset the mounted controllers after the latest creation renders.
+  const handled = useRef(saved);
+  useEffect(() => {
+    if (saved === handled.current) {
+      return;
+    }
+    handled.current = saved;
     if (saved !== undefined && "successMessage" in saved) {
       form.reset({ fieldsGrid: { code: "", label: "" } });
     }
-  }
+  }, [form, saved]);
 
   return (
     <Div className="flex flex-col gap-4 rounded-xl border bg-card p-5 shadow-sm sm:p-6">

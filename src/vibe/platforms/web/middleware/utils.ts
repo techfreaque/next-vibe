@@ -4,6 +4,38 @@
  * Shared utilities for middleware functions
  */
 
+import { AUTH_TOKEN_COOKIE_NAME, LEAD_ID_COOKIE_NAME } from "@/env/constants";
+
+/** Make identities set by middleware visible to the render of this request. */
+export function applyResponseIdentityCookies(
+  requestHeaders: Headers,
+  setCookies: readonly string[],
+): void {
+  const replacements = new Map<string, string>();
+  for (const setCookie of setCookies) {
+    const pair = setCookie.split(";", 1)[0] ?? "";
+    const equals = pair.indexOf("=");
+    if (equals < 0) {
+      continue;
+    }
+    const name = pair.slice(0, equals);
+    if (name === LEAD_ID_COOKIE_NAME || name === AUTH_TOKEN_COOKIE_NAME) {
+      replacements.set(name, pair);
+    }
+  }
+  if (replacements.size === 0) {
+    return;
+  }
+  const remainingCookies = (requestHeaders.get("cookie") ?? "")
+    .split(";")
+    .map((pair) => pair.trim())
+    .filter((pair) => pair && !replacements.has(pair.split("=", 1)[0] ?? ""));
+  requestHeaders.set(
+    "cookie",
+    [...remainingCookies, ...replacements.values()].join("; "),
+  );
+}
+
 /**
  * Check if a path should be skipped by middleware
  * @param path The request path

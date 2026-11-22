@@ -5,7 +5,15 @@ import type {
   CountryLanguage,
   Languages,
 } from "next-vibe/core/i18n/core/config";
-import { getUniqueLanguages } from "next-vibe/core/i18n/core/language-utils";
+import {
+  availableCountries,
+  globalCountryInfo,
+} from "next-vibe/core/i18n/core/config";
+import {
+  getCountryFromLocale,
+  getLanguageFromLocale,
+  getUniqueLanguages,
+} from "next-vibe/core/i18n/core/language-utils";
 import { countryOptions } from "next-vibe/core/i18n/core/regions";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { Button } from "next-vibe/ui/components/button";
@@ -33,6 +41,7 @@ import { configScopedTranslation } from "@/env/i18n";
 
 interface CountrySelectorProps {
   isNavBar?: boolean;
+  locale: CountryLanguage;
   user: JwtPayloadType;
 }
 
@@ -41,17 +50,17 @@ const isValidTab = (value: string): value is "country" | "language" => {
   return value === "country" || value === "language";
 };
 
-const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
-  const {
-    countries,
-    currentCountry,
-    changeLocale,
-    language,
-    country,
-    setLanguage,
-    locale: currentLocale,
-  } = useTranslation();
-  const { t } = configScopedTranslation.scopedT(currentLocale);
+const CountrySelector: FC<CountrySelectorProps> = ({
+  isNavBar,
+  locale,
+  user,
+}) => {
+  const { changeLocale, setLanguage } = useTranslation();
+  const language = getLanguageFromLocale(locale);
+  const country = getCountryFromLocale(locale);
+  const currentCountry =
+    availableCountries.find((c) => c.code === country) ?? globalCountryInfo;
+  const { t } = configScopedTranslation.scopedT(locale);
   const countryNames = useMemo(
     () =>
       new Map(
@@ -74,6 +83,9 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
 
   const syncLocale = useCallback(
     (newLocale: CountryLanguage) => {
+      if (user.isPublic) {
+        return;
+      }
       // Fire-and-forget: sync the new locale to the backend via POST /me.
       // Non-fatal - locale will re-sync on next explicit profile update.
       // The /me definition is loaded on demand: this selector sits in the
@@ -121,7 +133,7 @@ const CountrySelector: FC<CountrySelectorProps> = ({ isNavBar, user }) => {
     [changeLocale, syncLocale, setIsOpen],
   );
 
-  const currentLanguageFlag = countries.find(
+  const currentLanguageFlag = availableCountries.find(
     (c) => c.language === language,
   )?.flag;
 

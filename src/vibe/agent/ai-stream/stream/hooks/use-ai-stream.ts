@@ -47,7 +47,6 @@ import { getChatModelById } from "../../models";
 import type { AiStreamPostRequestOutput } from "../definition";
 import definitions from "../definition";
 import { scopedTranslation } from "../i18n";
-import { isOutOfCreditsErrorCode } from "../widget/out-of-credits-card";
 import { getAudioQueue } from "./audio-queue";
 import { useAIStreamStore } from "./store";
 import { getUploadTooLargeMessage } from "./upload-limit";
@@ -242,7 +241,8 @@ export function useAIStream(): UseAIStreamReturn {
         // else (timeout, malformed response, server rejection) stays an error.
         const isBrowserNetworkLoss = isBrowserNetworkLossMessage(failMessage);
         // Credit refusal (402) is an expected outcome, shown as a card below.
-        const isCreditRefusal = isOutOfCreditsErrorCode(errorType.errorCode);
+        const isCreditRefusal =
+          errorType.errorCode === ErrorResponseTypes.PAYMENT_REQUIRED.errorCode;
         // Consent refusal (403 CONSENT_REQUIRED) is expected too: dialog below.
         const isConsentRefusal =
           errorType.errorKey === ErrorResponseTypes.CONSENT_REQUIRED.errorKey;

@@ -20,6 +20,7 @@ import {
   LeadChannelFilterOptions,
   LeadDeviceFilter,
   LeadDeviceFilterOptions,
+  LeadDimension,
   TrafficFilter,
   TrafficFilterOptions,
 } from "./enum";
@@ -296,3 +297,42 @@ export function pickSegmentFilters(
 export function hasSegmentFilters(filters: LeadSegmentFilters): boolean {
   return Object.keys(pickSegmentFilters(filters)).length > 0;
 }
+
+export type SegmentFilterKey = (typeof SEGMENT_KEYS)[number];
+
+export const SEGMENT_KEYS = [
+  "traffic",
+  "botFamily",
+  "channelType",
+  "device",
+  "channel",
+  "source",
+  "medium",
+  "campaign",
+  "referrerHost",
+  "landingPath",
+  "refCode",
+  "country",
+  "localeCountry",
+  "browser",
+  "os",
+  "ipPrefix",
+  "uaFingerprint",
+] as const;
+
+export const DIMENSION_LABEL = {
+  [LeadDimension.CHANNEL_TYPE]: "leadAnalytics.dimension.channelType",
+  [LeadDimension.CHANNEL]: "leadAnalytics.dimension.channel",
+  [LeadDimension.SOURCE]: "leadAnalytics.dimension.source",
+  [LeadDimension.MEDIUM]: "leadAnalytics.dimension.medium",
+  [LeadDimension.CAMPAIGN]: "leadAnalytics.dimension.campaign",
+  [LeadDimension.REFERRER_HOST]: "leadAnalytics.dimension.referrerHost",
+  [LeadDimension.LANDING_PATH]: "leadAnalytics.dimension.landingPath",
+  [LeadDimension.REF_CODE]: "leadAnalytics.dimension.refCode",
+  [LeadDimension.COUNTRY]: "leadAnalytics.dimension.country",
+  [LeadDimension.LOCALE_COUNTRY]: "leadAnalytics.dimension.localeCountry",
+  [LeadDimension.DEVICE]: "leadAnalytics.dimension.device",
+  [LeadDimension.BROWSER]: "leadAnalytics.dimension.browser",
+  [LeadDimension.OS]: "leadAnalytics.dimension.os",
+  [LeadDimension.BOT_FAMILY]: "leadAnalytics.dimension.botFamily",
+} as const;

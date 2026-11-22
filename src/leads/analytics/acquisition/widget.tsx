@@ -31,17 +31,20 @@ import { formatAnalyticsValue } from "next-vibe/unified-ui/analytics/format";
 import type { JSX } from "react";
 
 import { FunnelReach, LeadDimension, TrafficFilter } from "../enum";
-import type { LeadDrillFilters, LeadSegmentFilters } from "../filters";
+import {
+  DIMENSION_LABEL,
+  type LeadDrillFilters,
+  type LeadSegmentFilters,
+  SEGMENT_KEYS,
+  type SegmentFilterKey,
+} from "../filters";
 import {
   bucketDays,
-  DIMENSION_LABEL,
   dimensionFilter,
   DimensionTabs,
   dimensionValueLabel,
   noneRowHint,
-  SEGMENT_KEYS,
   segmentChips,
-  type SegmentFilterKey,
   SegmentFilterPanel,
   useLeadAnalyticsT,
   useLeadDrill,

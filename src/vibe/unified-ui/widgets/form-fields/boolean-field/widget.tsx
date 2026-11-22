@@ -86,7 +86,7 @@ export function BooleanFieldWidget<
                     <Checkbox
                       id={formField.name}
                       name={formField.name}
-                      checked={formField.value}
+                      checked={formField.value === true}
                       onCheckedChange={(checked) => formField.onChange(checked)}
                       disabled={isDisabled || field.disabled || field.readonly}
                       className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
@@ -139,7 +139,7 @@ export function BooleanFieldWidget<
                     <Switch
                       id={formField.name}
                       name={formField.name}
-                      checked={formField.value}
+                      checked={formField.value === true}
                       onCheckedChange={(checked) => formField.onChange(checked)}
                       disabled={isDisabled || field.disabled || field.readonly}
                       className="data-[state=checked]:bg-primary"

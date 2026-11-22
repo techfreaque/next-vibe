@@ -1076,7 +1076,7 @@ export function MeUpdateWidget({ field }: MeUpdateWidgetProps): JSX.Element {
       ? `/creator/${user.id}`
       : null;
   const profileHref = profilePath
-    ? `${envClient.NEXT_PUBLIC_APP_URL}${profilePath}`
+    ? new URL(profilePath, envClient.NEXT_PUBLIC_APP_URL).href
     : null;
 
   const iconClass = "h-4 w-4";

@@ -24,16 +24,19 @@ import {
 import type { JSX } from "react";
 
 import { FunnelReach, TrafficFilter } from "../enum";
-import type { LeadDrillFilters, LeadSegmentFilters } from "../filters";
 import {
   DIMENSION_LABEL,
+  type LeadDrillFilters,
+  type LeadSegmentFilters,
+  SEGMENT_KEYS,
+  type SegmentFilterKey,
+} from "../filters";
+import {
   dimensionFilter,
   DimensionTabs,
   dimensionValueLabel,
   noneRowHint,
-  SEGMENT_KEYS,
   segmentChips,
-  type SegmentFilterKey,
   SegmentFilterPanel,
   useLeadAnalyticsT,
   useLeadDrill,

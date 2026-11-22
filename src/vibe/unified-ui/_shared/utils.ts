@@ -157,6 +157,13 @@ export function extractSchemaDefaults<T>(
       return defaultValue as Partial<T>;
     }
 
+    if (schema instanceof z.ZodPrefault) {
+      const inner = schema.unwrap();
+      return inner instanceof z.ZodType
+        ? extractSchemaDefaults<T>(inner, logger, path, forFormInit)
+        : undefined;
+    }
+
     // Handle ZodObject - recursively extract from all shape properties
     if (schema instanceof z.ZodObject) {
       const shapeFnOrObj = getDefProperty<
@@ -815,7 +822,16 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
     // Create the object schema and let TypeScript infer the exact type
     // This preserves the specific field types instead of collapsing to ZodTypeAny
-    let objectSchema = z.object(shape);
+    const objectSchema = z.object(shape);
+
+    if (
+      targetUsage === FieldUsage.RequestData &&
+      "type" in typedField &&
+      typedField.type === WidgetType.PAGINATION
+    ) {
+      // Let the page and limit field defaults run when callers omit the group.
+      return objectSchema.prefault({}) as InferSchemaFromField<F, Usage>;
+    }
 
     // Apply optional modifier if specified in widget config
     if ("optional" in typedField && typedField.optional) {

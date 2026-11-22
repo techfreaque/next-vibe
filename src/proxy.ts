@@ -11,6 +11,7 @@ import { languageConfig, type languageDefaults } from "./vibe/core/i18n";
 import type { CountryLanguage } from "./vibe/core/i18n/core/config";
 // we have to use relative paths as vercel cant resolve import aliases from here
 import { middleware } from "./vibe/platforms/web/middleware";
+import { applyResponseIdentityCookies } from "./vibe/platforms/web/middleware/utils";
 
 const defaultLocale: `${typeof languageDefaults.language}-${typeof languageDefaults.country}` =
   "en-GLOBAL";
@@ -36,6 +37,10 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   if (response.headers.get("x-middleware-next") === "1") {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-pathname", request.nextUrl.pathname);
+    applyResponseIdentityCookies(
+      requestHeaders,
+      response.headers.getSetCookie(),
+    );
     const withPathname = NextResponseClass.next({
       request: { headers: requestHeaders },
     });

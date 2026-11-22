@@ -14,15 +14,18 @@
 
 import "server-only";
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { join } from "node:path";
 
-import { getApiDir } from "@/env/paths";
+import { getApiDir, getGeneratedDir } from "@/env/paths";
 
+import type { EndpointLogger } from "../../logger/types";
 import {
   findFilesRecursively,
   stripProjectRoot,
-  toImportUrl,
 } from "../generators/shared/utils";
+import { parseError } from "../utils/parse-error";
 import { isSetupFile, type SetupEntry, setupKeyFor } from "./types";
 
 const REQUIRED_EXPORTS = ["description", "install", "uninstall"] as const;
@@ -36,41 +39,37 @@ function hasRequiredExports(absPath: string): boolean {
   );
 }
 
-export async function loadSetupRegistry(): Promise<readonly SetupEntry[]> {
-  try {
+export async function loadSetupRegistry(
+  logger: EndpointLogger,
+): Promise<readonly SetupEntry[]> {
+  if (existsSync(join(getGeneratedDir(), "setup", "index.ts"))) {
     const mod = await import("@/generated/setup");
     return mod.SETUP_REGISTRY;
-  } catch {
-    // Generated index missing (fresh clone, pre-gen). Fall back to scan.
-    const files = findFilesRecursively(getApiDir(), isSetupFile)
-      .toSorted()
-      .filter(hasRequiredExports);
-
-    const entries: SetupEntry[] = [];
-    for (const absPath of files) {
-      try {
-        // toImportUrl, not the bare path: on Windows `import("C:/...")` is read
-        // as a bare specifier and throws, and the catch below would swallow it —
-        // leaving the bootstrap fallback silently returning zero setups there.
-        const mod = (await import(
-          /* webpackIgnore: true */ /* turbopackIgnore: true */ toImportUrl(
-            absPath,
-          )
-        )) as {
-          description: string;
-          install: SetupEntry["install"];
-          uninstall: SetupEntry["uninstall"];
-        };
-        entries.push({
-          key: setupKeyFor(stripProjectRoot(absPath)),
-          description: mod.description,
-          install: mod.install,
-          uninstall: mod.uninstall,
-        });
-      } catch {
-        // Skip modules that fail to import during bootstrap.
-      }
-    }
-    return entries;
   }
+
+  // Bootstrap discovery runs in Bun, which can load these filesystem TS
+  // modules before there is a generated import that a bundler can follow.
+  const loadDiscoveredSetup = createRequire(import.meta.url);
+  const files = findFilesRecursively(getApiDir(), isSetupFile).toSorted();
+  const entries: SetupEntry[] = [];
+  for (const absPath of files) {
+    try {
+      if (!hasRequiredExports(absPath)) {
+        continue;
+      }
+      const mod: Pick<SetupEntry, "description" | "install" | "uninstall"> =
+        loadDiscoveredSetup(absPath);
+      entries.push({
+        key: setupKeyFor(stripProjectRoot(absPath)),
+        description: mod.description,
+        install: mod.install,
+        uninstall: mod.uninstall,
+      });
+    } catch (error) {
+      logger.error("Could not load discovered setup", parseError(error), {
+        path: stripProjectRoot(absPath),
+      });
+    }
+  }
+  return entries;
 }

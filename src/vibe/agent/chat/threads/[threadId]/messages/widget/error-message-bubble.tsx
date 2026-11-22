@@ -4,7 +4,10 @@ import type { CreateApiEndpointAny } from "next-vibe/core/definition/endpoint-ba
 import type { DefaultFolderId } from "next-vibe/core/execution-context";
 import { useTranslation } from "next-vibe/core/i18n/core/client";
 import { scopedTranslation as vibeScopedTranslation } from "next-vibe/core/i18n/shared";
-import type { ErrorResponseType } from "next-vibe/core/route/response.schema";
+import {
+  type ErrorResponseType,
+  ErrorResponseTypes,
+} from "next-vibe/core/route/response.schema";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
@@ -31,10 +34,7 @@ import type { ContactRequest } from "@/contact/definition";
 import { useUser } from "@/user/private/me/hooks";
 
 import { StreamErrorType } from "../../../../../ai-stream/repository/core/constants";
-import {
-  isOutOfCreditsErrorCode,
-  OutOfCreditsCard,
-} from "../../../../../ai-stream/stream/widget/out-of-credits-card";
+import { OutOfCreditsCard } from "../../../../../ai-stream/stream/widget/out-of-credits-card";
 import type { ChatMessage } from "../../../../db";
 import { useModelSelectorState } from "../../../../model-selector-state";
 import { scopedTranslation } from "../i18n";
@@ -117,7 +117,8 @@ export function ErrorMessageBubble({
       // Plain-text error content - no structured error type to extract
     }
     // Credit refusal (402) is an expected outcome rendered as a top-up card
-    const isCreditRefusal = isOutOfCreditsErrorCode(structuredErrorCode);
+    const isCreditRefusal =
+      structuredErrorCode === ErrorResponseTypes.PAYMENT_REQUIRED.errorCode;
     (isCreditRefusal ? logger.warn : logger.error).bind(logger)(
       "Chat: Error message bubble shown to user",
       {
@@ -287,7 +288,10 @@ export function ErrorMessageBubble({
   }
 
   // Credit refusals (402) are not faults: offer the way forward instead of an error
-  if (isOutOfCreditsErrorCode(errorData?.errorType?.errorCode)) {
+  if (
+    errorData?.errorType?.errorCode ===
+    ErrorResponseTypes.PAYMENT_REQUIRED.errorCode
+  ) {
     return (
       <Div className={cn("flex items-start gap-3", group)}>
         <OutOfCreditsCard locale={locale} isGuest={user.isPublic} />

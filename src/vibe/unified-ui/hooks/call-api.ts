@@ -18,6 +18,7 @@ import { type CreateApiEndpointAny } from "../../core/definition/endpoint-base";
 import { Methods } from "../../core/definition/enums";
 import { coreClientEnv as envClient, platform } from "../../core/env-client";
 import type { CountryLanguage } from "../../core/i18n/core/config";
+import { errorResponseSchema } from "../../core/route/error-response.schema";
 import {
   type ErrorResponseType,
   ErrorResponseTypes,
@@ -719,21 +720,20 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
         errorType: ErrorResponseTypes.HTTP_ERROR,
       });
     }
-    const json = (await response.json()) as ResponseType<
-      TEndpoint["types"]["ResponseOutput"]
-    >;
+    const json: WidgetData = await response.json();
+    const parsedError = errorResponseSchema.safeParse(json);
 
     if (!response.ok) {
-      if (!json.success && json.message) {
+      if (parsedError.success) {
         if (
           platform.isBrowser &&
           !user.isPublic &&
           response.status === 403 &&
-          json.publicRoleDenial === true
+          parsedError.data.publicRoleDenial === true
         ) {
           refreshBrowserIdentity(logger);
         }
-        return json;
+        return parsedError.data;
       }
       return fail({
         message: hooksTranslation
@@ -743,16 +743,12 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
       });
     }
 
-    if (json.success) {
+    if (isJsonObject(json) && json.success === true) {
       // Content responses (text + image blocks, see createContentResponse)
       // have no schema'd fields — validation would strip them to {} and the
       // page would render nothing. Pass them through for ContentBlocksRenderer.
-      if (
-        typeof json.data === "object" &&
-        json.data !== null &&
-        "isContentResponse" in json.data
-      ) {
-        return json;
+      if (isJsonObject(json.data) && "isContentResponse" in json.data) {
+        return { success: true, data: json.data };
       }
       const validationResponse = validateData(
         json.data,
@@ -785,8 +781,8 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
       return { success: true, data: validationResponse.data };
     }
 
-    if (!json.success && "errorType" in json) {
-      return json;
+    if (parsedError.success) {
+      return parsedError.data;
     }
 
     return fail({

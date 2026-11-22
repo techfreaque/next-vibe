@@ -1147,12 +1147,32 @@ export class LeadsRepository {
       const result = await withTransaction<ResponseType<LeadResponseType>>(
         logger,
         async (tx) => {
+          if (options.userId) {
+            const [user] = await tx
+              .select({ id: users.id })
+              .from(users)
+              .where(eq(users.id, options.userId))
+              .limit(1)
+              .for("key share");
+            if (!user) {
+              logger.warn("Cannot convert lead for a missing user", {
+                leadId,
+                userId: options.userId,
+              });
+              return fail({
+                message: t("leadsErrors.leads.patch.error.not_found.title"),
+                errorType: ErrorResponseTypes.NOT_FOUND,
+              });
+            }
+          }
+
           // Find the lead
           const [existingLead] = await tx
             .select()
             .from(leads)
             .where(eq(leads.id, leadId))
-            .limit(1);
+            .limit(1)
+            .for("update");
 
           if (!existingLead) {
             return fail({
@@ -1343,113 +1363,127 @@ export class LeadsRepository {
         campaignId: data.campaignId,
       });
 
-      // First, check if the lead exists
-      const [lead] = await db
-        .select()
-        .from(leads)
-        .where(eq(leads.id, data.leadId))
-        .limit(1);
+      return await withTransaction<ResponseType<LeadEngagementResponseOutput>>(
+        logger,
+        async (tx) => {
+          // Lock the lead through the insert and counter updates.
+          const [lead] = await tx
+            .select({ id: leads.id })
+            .from(leads)
+            .where(eq(leads.id, data.leadId))
+            .limit(1)
+            .for("update");
 
-      if (!lead) {
-        logger.warn("[LeadEngagement] Lead not found - engagement dropped", {
-          leadId: data.leadId,
-          engagementType: data.engagementType,
-        });
-        return fail({
-          message: t("leadsErrors.leadsEngagement.post.error.validation.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
-      // Create the engagement record
-      const [engagement] = await db
-        .insert(leadEngagements)
-        .values({
-          leadId: data.leadId,
-          campaignId: data.campaignId || null,
-          engagementType: data.engagementType,
-          metadata: data.metadata || {},
-          ipAddress: data.ipAddress || null,
-          userAgent: data.userAgent || null,
-        })
-        .returning();
-
-      if (!engagement) {
-        logger.error(
-          "[LeadEngagement] Insert returned no row - engagement not recorded",
-          {
-            leadId: data.leadId,
-            engagementType: data.engagementType,
-            campaignId: data.campaignId,
-          },
-        );
-        return fail({
-          message: t("leadsErrors.leadsEngagement.post.error.server.title"),
-          errorType: ErrorResponseTypes.DATABASE_ERROR,
-        });
-      }
-
-      // Update lead engagement counters
-      const updateData: Record<string, Date | ReturnType<typeof sql>> = {
-        lastEngagementAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      if (data.engagementType === EngagementTypes.EMAIL_OPEN) {
-        updateData.emailsOpened = sql`${leads.emailsOpened} + 1`;
-      } else if (data.engagementType === EngagementTypes.EMAIL_CLICK) {
-        updateData.emailsClicked = sql`${leads.emailsClicked} + 1`;
-      }
-
-      await db.update(leads).set(updateData).where(eq(leads.id, data.leadId));
-
-      // Update campaign if provided
-      if (data.campaignId) {
-        const campaignUpdateData: Record<string, Date> = {
-          updatedAt: new Date(),
-        };
-
-        if (data.engagementType === EngagementTypes.EMAIL_OPEN) {
-          // Only update timestamp, keep status as SENT
-          campaignUpdateData.openedAt = new Date();
-        } else if (data.engagementType === EngagementTypes.EMAIL_CLICK) {
-          // Only update timestamp, keep status as SENT
-          campaignUpdateData.clickedAt = new Date();
-          // Also mark as opened if not already opened
-          const [campaign] = await db
-            .select({ openedAt: emailCampaigns.openedAt })
-            .from(emailCampaigns)
-            .where(eq(emailCampaigns.id, data.campaignId))
-            .limit(1);
-
-          if (campaign && !campaign.openedAt) {
-            campaignUpdateData.openedAt = new Date();
+          if (!lead) {
+            logger.warn(
+              "[LeadEngagement] Lead not found - engagement dropped",
+              {
+                leadId: data.leadId,
+                engagementType: data.engagementType,
+              },
+            );
+            return fail({
+              message: t(
+                "leadsErrors.leadsEngagement.post.error.validation.title",
+              ),
+              errorType: ErrorResponseTypes.NOT_FOUND,
+            });
           }
-        }
 
-        await db
-          .update(emailCampaigns)
-          .set(campaignUpdateData)
-          .where(eq(emailCampaigns.id, data.campaignId));
-      }
+          // Create the engagement record
+          const [engagement] = await tx
+            .insert(leadEngagements)
+            .values({
+              leadId: data.leadId,
+              campaignId: data.campaignId || null,
+              engagementType: data.engagementType,
+              metadata: data.metadata || {},
+              ipAddress: data.ipAddress || null,
+              userAgent: data.userAgent || null,
+            })
+            .returning();
 
-      logger.debug("Engagement recorded successfully", {
-        engagementId: engagement.id,
-        leadId: lead.id,
-        engagementType: data.engagementType,
-      });
+          if (!engagement) {
+            logger.error(
+              "[LeadEngagement] Insert returned no row - engagement not recorded",
+              {
+                leadId: data.leadId,
+                engagementType: data.engagementType,
+                campaignId: data.campaignId,
+              },
+            );
+            return fail({
+              message: t("leadsErrors.leadsEngagement.post.error.server.title"),
+              errorType: ErrorResponseTypes.DATABASE_ERROR,
+            });
+          }
 
-      return success<LeadEngagementResponseOutput>({
-        id: engagement.id,
-        responseEngagementType: engagement.engagementType,
-        responseCampaignId: engagement.campaignId || undefined,
-        responseMetadata: engagement.metadata || {},
-        timestamp: engagement.timestamp,
-        ipAddress: engagement.ipAddress || undefined,
-        userAgent: engagement.userAgent || undefined,
-        createdAt: engagement.timestamp,
-        responseLeadId: engagement.leadId,
-      });
+          // Update lead engagement counters
+          const updateData: Record<string, Date | ReturnType<typeof sql>> = {
+            lastEngagementAt: new Date(),
+            updatedAt: new Date(),
+          };
+
+          if (data.engagementType === EngagementTypes.EMAIL_OPEN) {
+            updateData.emailsOpened = sql`${leads.emailsOpened} + 1`;
+          } else if (data.engagementType === EngagementTypes.EMAIL_CLICK) {
+            updateData.emailsClicked = sql`${leads.emailsClicked} + 1`;
+          }
+
+          await tx
+            .update(leads)
+            .set(updateData)
+            .where(eq(leads.id, data.leadId));
+
+          // Update campaign if provided
+          if (data.campaignId) {
+            const campaignUpdateData: Record<string, Date> = {
+              updatedAt: new Date(),
+            };
+
+            if (data.engagementType === EngagementTypes.EMAIL_OPEN) {
+              // Only update timestamp, keep status as SENT
+              campaignUpdateData.openedAt = new Date();
+            } else if (data.engagementType === EngagementTypes.EMAIL_CLICK) {
+              // Only update timestamp, keep status as SENT
+              campaignUpdateData.clickedAt = new Date();
+              // Also mark as opened if not already opened
+              const [campaign] = await tx
+                .select({ openedAt: emailCampaigns.openedAt })
+                .from(emailCampaigns)
+                .where(eq(emailCampaigns.id, data.campaignId))
+                .limit(1);
+
+              if (campaign && !campaign.openedAt) {
+                campaignUpdateData.openedAt = new Date();
+              }
+            }
+
+            await tx
+              .update(emailCampaigns)
+              .set(campaignUpdateData)
+              .where(eq(emailCampaigns.id, data.campaignId));
+          }
+
+          logger.debug("Engagement recorded successfully", {
+            engagementId: engagement.id,
+            leadId: lead.id,
+            engagementType: data.engagementType,
+          });
+
+          return success<LeadEngagementResponseOutput>({
+            id: engagement.id,
+            responseEngagementType: engagement.engagementType,
+            responseCampaignId: engagement.campaignId || undefined,
+            responseMetadata: engagement.metadata || {},
+            timestamp: engagement.timestamp,
+            ipAddress: engagement.ipAddress || undefined,
+            userAgent: engagement.userAgent || undefined,
+            createdAt: engagement.timestamp,
+            responseLeadId: engagement.leadId,
+          });
+        },
+      );
     } catch (error) {
       logger.error("Error recording engagement", parseError(error));
       return fail({

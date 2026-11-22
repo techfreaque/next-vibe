@@ -8,6 +8,7 @@
 import { describe, expect, it } from "bun:test";
 import { z } from "zod";
 
+import creditHistoryDefinition from "@/credits/history/definition";
 import productUpdateDefinition from "@/products/catalog/[productId]/update/definition";
 
 import { filterUserPermissionRoles } from "../../identity/roles/enum";
@@ -25,6 +26,18 @@ const noopLogger: EndpointLogger = {
 };
 
 describe("extractSchemaDefaults", () => {
+  it("uses the default pagination when the request omits the group", () => {
+    const endpoint = creditHistoryDefinition.GET;
+    const parsed = endpoint.requestSchema.parse({});
+    expect(parsed.paginationInfo).toEqual({ page: 1, limit: 50 });
+    expect(
+      endpoint.requestSchema.parse({ paginationInfo: { page: 3 } })
+        .paginationInfo,
+    ).toEqual({ page: 3, limit: 50 });
+    expect(extractSchemaDefaults(endpoint.formSchema, noopLogger)).toMatchObject({
+      paginationInfo: { page: 1, limit: 50 },
+    });
+  });
   describe("ZodDefault handling", () => {
     it("extracts default value from a string field with default", () => {
       const schema = z.string().default("hello");

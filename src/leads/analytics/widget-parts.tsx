@@ -37,9 +37,11 @@ import {
 } from "./enum";
 import type { LeadDrillFilters, LeadSegmentFilters } from "./filters";
 import {
+  DIMENSION_LABEL,
   LEAD_SEGMENT_TEXT_KEYS,
   leadSegmentFields,
   pickSegmentFilters,
+  type SegmentFilterKey,
 } from "./filters";
 import { scopedTranslation } from "./i18n";
 
@@ -138,45 +140,6 @@ const CHIP_LABEL = {
   os: "leadAnalytics.filters.os.label",
   ipPrefix: "leadAnalytics.filters.ipPrefix.label",
   uaFingerprint: "leadAnalytics.filters.uaFingerprint.label",
-} as const;
-
-export type SegmentFilterKey = keyof typeof CHIP_LABEL;
-
-export const SEGMENT_KEYS = [
-  "traffic",
-  "botFamily",
-  "channelType",
-  "device",
-  "channel",
-  "source",
-  "medium",
-  "campaign",
-  "referrerHost",
-  "landingPath",
-  "refCode",
-  "country",
-  "localeCountry",
-  "browser",
-  "os",
-  "ipPrefix",
-  "uaFingerprint",
-] as const satisfies readonly SegmentFilterKey[];
-
-export const DIMENSION_LABEL = {
-  [LeadDimension.CHANNEL_TYPE]: "leadAnalytics.dimension.channelType",
-  [LeadDimension.CHANNEL]: "leadAnalytics.dimension.channel",
-  [LeadDimension.SOURCE]: "leadAnalytics.dimension.source",
-  [LeadDimension.MEDIUM]: "leadAnalytics.dimension.medium",
-  [LeadDimension.CAMPAIGN]: "leadAnalytics.dimension.campaign",
-  [LeadDimension.REFERRER_HOST]: "leadAnalytics.dimension.referrerHost",
-  [LeadDimension.LANDING_PATH]: "leadAnalytics.dimension.landingPath",
-  [LeadDimension.REF_CODE]: "leadAnalytics.dimension.refCode",
-  [LeadDimension.COUNTRY]: "leadAnalytics.dimension.country",
-  [LeadDimension.LOCALE_COUNTRY]: "leadAnalytics.dimension.localeCountry",
-  [LeadDimension.DEVICE]: "leadAnalytics.dimension.device",
-  [LeadDimension.BROWSER]: "leadAnalytics.dimension.browser",
-  [LeadDimension.OS]: "leadAnalytics.dimension.os",
-  [LeadDimension.BOT_FAMILY]: "leadAnalytics.dimension.botFamily",
 } as const;
 
 /** Removable chips for every active segment filter. */
@@ -365,7 +328,7 @@ export function CompactSelect<TValue extends string>({
 }
 
 /** Most useful dimensions first; every one is a single click. */
-export const DIMENSION_TABS = [
+const DIMENSION_TABS = [
   LeadDimension.CHANNEL,
   LeadDimension.CHANNEL_TYPE,
   LeadDimension.SOURCE,

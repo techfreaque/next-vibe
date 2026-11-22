@@ -25,13 +25,16 @@ import {
 import type { JSX } from "react";
 
 import { AbuseGroupBy } from "../enum";
-import type { LeadDrillFilters, LeadSegmentFilters } from "../filters";
+import {
+  type LeadDrillFilters,
+  type LeadSegmentFilters,
+  SEGMENT_KEYS,
+  type SegmentFilterKey,
+} from "../filters";
 import {
   CompactSelect,
   dimensionValueLabel,
-  SEGMENT_KEYS,
   segmentChips,
-  type SegmentFilterKey,
   SegmentFilterPanel,
   useLeadAnalyticsT,
   useLeadDrill,

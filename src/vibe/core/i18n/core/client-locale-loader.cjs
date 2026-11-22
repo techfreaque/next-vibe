@@ -59,6 +59,22 @@ function transformClientLocaleSource(source) {
   return `const __vibeI18nLang = ${LANGUAGE_EXPRESSION};\n${declarations.join("\n")}\n${rewritten}`;
 }
 
+/** Give Vite's SSR graph an import edge for a locale edited in development. */
+function transformDevSsrLocaleSource(source) {
+  const imports = [];
+  const rewritten = source.replace(
+    LAZY_LOCALE_PATTERN,
+    (...[, , specifier]) => {
+      const name = `__vibeSsrI18n_${imports.length}`;
+      imports.push(
+        `import { translations as ${name} } from ${JSON.stringify(specifier)};`,
+      );
+      return `() => ${name}`;
+    },
+  );
+  return imports.length ? `${imports.join("\n")}\n${rewritten}` : source;
+}
+
 /**
  * @this {{ cacheable?: (flag: boolean) => void }}
  * @param {string} source
@@ -73,3 +89,4 @@ function clientLocaleLoader(source) {
 
 module.exports = clientLocaleLoader;
 module.exports.transformClientLocaleSource = transformClientLocaleSource;
+module.exports.transformDevSsrLocaleSource = transformDevSsrLocaleSource;

@@ -35,7 +35,7 @@ export async function runSetups(
   phase: SetupPhase,
   logger: EndpointLogger,
 ): Promise<SetupRunResult[]> {
-  const registry = await loadSetupRegistry();
+  const registry = await loadSetupRegistry(logger);
   const results: SetupRunResult[] = [];
   for (const entry of registry) {
     // A setup reports failure by returning `failed`; the try/catch is only for

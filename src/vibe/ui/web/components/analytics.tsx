@@ -61,7 +61,7 @@ export type AnalyticsTone =
 /** Series color slot: 1-5 = --chart-N, or a semantic tone. */
 export type AnalyticsColor = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | AnalyticsTone;
 
-export const ANALYTICS_COLORS: Record<string, string> = {
+const ANALYTICS_COLORS: Record<string, string> = {
   "1": "hsl(var(--chart-1))",
   "2": "hsl(var(--chart-2))",
   "3": "hsl(var(--chart-3))",
@@ -77,7 +77,7 @@ export const ANALYTICS_COLORS: Record<string, string> = {
   muted: "hsl(var(--muted-foreground) / 0.55)",
 };
 
-export function analyticsColor(
+function analyticsColor(
   color: AnalyticsColor | undefined,
   index: number,
 ): string {

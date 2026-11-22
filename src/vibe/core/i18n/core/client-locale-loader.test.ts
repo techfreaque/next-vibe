@@ -4,7 +4,10 @@ import { dirname, join } from "node:path";
 import { Glob } from "bun";
 import { describe, expect, it } from "bun:test";
 
-import { transformClientLocaleSource } from "./client-locale-loader.cjs";
+import {
+  transformClientLocaleSource,
+  transformDevSsrLocaleSource,
+} from "./client-locale-loader.cjs";
 
 const SCOPE_GLOB = new Glob("src/**/en/index.ts");
 
@@ -44,6 +47,15 @@ describe("client-locale-loader", () => {
   it("leaves files without the lazy pattern untouched", () => {
     const source = 'export const a = require("./x").value;';
     expect(transformClientLocaleSource(source)).toBe(source);
+  });
+
+  it("makes edited locale sources dependencies of the dev SSR transform", () => {
+    const out = transformDevSsrLocaleSource(
+      'export const locales = { pl: () => require("./pl").translations };',
+    );
+    expect(out).toBe(
+      'import { translations as __vibeSsrI18n_0 } from "./pl";\nexport const locales = { pl: () => __vibeSsrI18n_0 };',
+    );
   });
 
   it("covers every scope in the repo (no non-English left in client bundles)", () => {
