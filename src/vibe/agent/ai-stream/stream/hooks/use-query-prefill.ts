@@ -35,7 +35,7 @@ import {
   resolveLinkedChatModel,
 } from "../../../chat/settings/link-model";
 import { useProviderAvailability } from "../../../env-availability-store";
-import { useArrivalStore } from "../widget/onboarding/arrival-store";
+import { useArrivalStore } from "../widget/selector/selector-onboarding/arrival-store";
 import { getDraftKey, saveDraft } from "./use-input-autosave";
 
 /** Query param carrying the prompt to pre-fill. */
@@ -87,7 +87,8 @@ export function useQueryPrefill({
   const { replaceState } = useSilentHistory();
   const logger = useLogger();
   const availability = useProviderAvailability();
-  const consumedRef = useRef(false);
+  /** The query string already consumed (a later link in the same mount is new). */
+  const consumedRef = useRef<string | null>(null);
 
   const prefill = searchParams.get(PREFILL_QUERY_PARAM);
   const linkedModel = searchParams.get(PREFILL_MODEL_PARAM);
@@ -100,7 +101,7 @@ export function useQueryPrefill({
 
   useLayoutEffect(() => {
     if (
-      consumedRef.current ||
+      consumedRef.current === search ||
       (prefill === null &&
         linkedModel === null &&
         linkedSkill === null &&
@@ -108,7 +109,7 @@ export function useQueryPrefill({
     ) {
       return;
     }
-    consumedRef.current = true;
+    consumedRef.current = search;
 
     if (isNewThread && prefill !== null) {
       const text = prefill.trim().slice(0, PREFILL_MAX_LENGTH);
@@ -134,11 +135,11 @@ export function useQueryPrefill({
       }
     }
 
-    if (
-      isNewThread &&
-      linkedSkill !== null &&
-      SKILL_PARAM_PATTERN.test(linkedSkill)
-    ) {
+    // Not gated on isNewThread: right after an in-app navigation from a skill
+    // page the navigation store can still hold the previous thread for a
+    // render, and dropping the skill here (while the URL is stripped below)
+    // left the old companion active. The arrival only switches the skill.
+    if (linkedSkill !== null && SKILL_PARAM_PATTERN.test(linkedSkill)) {
       setPendingSkillId(linkedSkill);
     }
 

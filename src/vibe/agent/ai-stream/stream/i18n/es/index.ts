@@ -631,85 +631,57 @@ export const translations: typeof enTranslations = {
     },
   },
   onboarding: {
-    progress: "Paso {{current}} de {{total}}",
-    skip: "Skip",
-    skipCompanion: "Subtítulos",
-    notNow: "Ahora no",
-    back: "Atrás",
-    saving: "Preparando...",
-    failed: "No pude salvar. Revise su conexión e intente de nuevo.",
-    retry: "Volver a intentar",
-    guestCredits: "Créditos gratis {{credits}}. No se necesita señalización.",
-    noProviderAvailable:
-      "No se configura ningún proveedor de AI. Agregue OPENROUTER_API_KEY o active el código Claude (CLAUDE_CODE_ENABLED =true) para continuar.",
-    companion: {
-      title: "Escoge a tu compañero.",
+    signin: {
+      title: "Guarda tu configuración",
+      subtitle: "Inicia sesión una vez. Todo lo que montes aquí va contigo.",
+      benefits: {
+        sync: {
+          title: "Sincronizado en todos tus dispositivos",
+          body: "Tu compañero, tus especialistas y tus chats en cada dispositivo que uses.",
+        },
+        keep: {
+          title: "Nunca pierdas tu trabajo",
+          body: "Como invitado, tu configuración solo vive en este navegador. Inicia sesión y se queda contigo.",
+        },
+        private: {
+          title: "Privado por defecto",
+          body: "Tú controlas tus datos y tu nivel de filtrado. Siempre.",
+        },
+      },
+      cta: "Inicia sesión o crea una cuenta",
+      continueAsGuest: "Seguir como invitado",
+      note: "Puedes iniciar sesión más tarde desde el menú cuando quieras.",
+    },
+    setup: {
+      title: "Configura tu IA",
       subtitle:
-        "Tu compañero responde a cada nuevo chat. Cambiar modelos en cualquier momento, sin censura incluido.",
-      missingTitle: "Tu configuración no tiene compañero.",
-      missingSubtitle:
-        "Un compañero responde a cada nuevo chat y conoce tus habilidades. Escoge uno, toma un segundo.",
-      arrivalTitle: "{{skill}} agregó. ¿Quién debería ser tu compañero?",
+        "Elige con quién hablas. Añade especialistas si quieres. Puedes cambiarlo todo después.",
+      arrivalTitle: "Empieza con {{skill}}",
       arrivalSubtitle:
-        "{{skill}} responde a esta charla. Tu compañero responde al resto.",
-      groupLabel: "Compañeros",
-      recommended: "Recomendado",
-      about: {
-        thea: "Cálido, sabio y honesto. Sabiduría antigua para los problemas modernos.",
-        hermes: "Directo y conducido. Estrategia, disciplina, sin excusas.",
-      },
-      voice: {
-        thea: "“La movilidad derrota el temor cada vez.”",
-        hermes: "“La motivación es el clima; la disciplina es el clima”.",
-      },
-      arrivalContinue: "Continuar",
-      continue: "Continuar con {{name}}",
-      start: "Empieza con {{name}}",
+        "{{skill}} responde en este chat. Tu compañero se encarga del resto.",
+      arrivalLabel: "Tu skill",
+      arrivalBadge: "Incluida",
+      companionLabel: "Tu compañero",
+      specialistsLabel: "Añadir especialistas",
+      optional: "opcional",
+      start: "Empezar a chatear",
+      saving: "Configurando...",
+      failed:
+        "No se pudo guardar tu configuración. Revisa tu conexión e inténtalo de nuevo.",
+      retry: "Reintentar",
+      noProviderAvailable:
+        "No hay ningún proveedor de IA configurado. Añade OPENROUTER_API_KEY o activa Claude Code (CLAUDE_CODE_ENABLED=true) para continuar.",
     },
-    consent: {
-      reason:
-        "{{skill}} se ejecuta en {{model}}, un modelo sin censura. Confirma una vez, luego chatea.",
-      label: "Confirmación de un solo 18+",
-      agreeStart: "Soy 18+, empieza a charlar",
-      agreeContinue: "Soy 18+, continuar",
-    },
-    goal: {
-      change: "Cambiar",
-      title: "¿Qué quieres hacer primero?",
-      subtitle:
-        "Añadimos las habilidades correctas y escribimos su primer aviso. Edita antes de enviarlo.",
-      groupLabel: "Primer objetivo",
-      adds: "Adds {{skills}}",
-      noSkills: "Sin habilidades extras, solo tu compañero",
-      adultsOnly: "18+",
-      promptLabel: "Su primer aviso",
-      start: "Empieza a chatear",
-      tiles: {
-        uncensored: {
-          title: "Sin censura",
-          body: "Pregunte qué otras IAs esquiva. Respuestas correctas, tú decides.",
-          prompt:
-            "¿Todas las drogas deben ser legales? Escoge un lado y defenderlo.",
-        },
-        media: {
-          title: "Imágenes, vídeo, música",
-          body: "Una frase, arte, clips o canciones fuera.",
-          prompt:
-            "Cree una imagen: un callejón de Tokio con luz de neón en la lluvia por la noche, cinematográfica, filmado en película de 35 mm.",
-        },
-        coding: {
-          title: "Programación",
-          body: "Escribe, depura y envía código.",
-          prompt:
-            "Escribe un script Python que renombra cada foto en una carpeta hasta la fecha que fue tomada.",
-        },
-        chat: {
-          title: "Sólo chatea.",
-          body: "Háblalo con {{companion}}. No hay nada que arreglar.",
-          prompt:
-            "Tengo una gran decisión de tomar y seguir adelante. Ayúdame a pensarlo.",
-        },
-      },
+    usecases: {
+      coding: "Código y tecnología",
+      research: "Investigación y análisis",
+      writing: "Escritura y edición",
+      business: "Negocios y estrategia",
+      creative: "Creatividad e historias",
+      learning: "Aprendizaje",
+      health: "Salud y carrera",
+      controversial: "Pensamiento libre",
+      roleplay: "Rol y personajes",
     },
   },
   input: {

@@ -76,7 +76,7 @@ async function openComposer({
 }: Pick<E2EFixtures, "page" | "goto" | "context">): Promise<Locator> {
   await context.addInitScript((key: string) => {
     localStorage.setItem(key, "true");
-  }, STORAGE_KEYS.COMPANION_ONBOARDING_DONE);
+  }, STORAGE_KEYS.SELECTOR_ONBOARDING_SHOWN);
   const composer = page.locator('[data-hydrated] textarea[name="prompt"]');
   // `goto` (unlike `open`) does not ride out a dev-server HMR reload (503 on
   // the client entry → never hydrates); retry the navigation a few times.

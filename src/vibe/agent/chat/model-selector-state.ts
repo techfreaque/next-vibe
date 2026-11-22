@@ -5,9 +5,10 @@ import { create } from "zustand";
 /**
  * Shared chat UI state:
  * - open state of the model/skill selector popover, so any part of the chat
- *   (empty state, input, error bubbles, skill cards) can open or close it
- * - whether the first-run onboarding dialog is up, so other one-time dialogs
- *   (18+ consent) wait for it instead of stacking on top
+ *   (empty state, input, error bubbles, skill cards, first-run onboarding)
+ *   can open or close it
+ * - whether the first-run setup inside the selector is up, so other one-time
+ *   dialogs (18+ consent) wait for it instead of stacking on top
  */
 interface ModelSelectorState {
   modelSelectorOpen: boolean;

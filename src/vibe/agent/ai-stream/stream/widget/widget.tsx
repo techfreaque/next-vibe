@@ -65,7 +65,7 @@ import { IncognitoStreamKeeper } from "../hooks/incognito-stream-keeper";
 import { SidebarWrapper } from "./chat-ui/sidebar/sidebar-wrapper";
 import { TopBar } from "./chat-ui/top-area/top-bar";
 import { ChatInputContainer } from "./input-container";
-import { CompanionOnboarding } from "./onboarding/companion-onboarding";
+import { SelectorOnboardingController } from "./selector/selector-onboarding/controller";
 import { ChatToolbar } from "./toolbar";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -424,10 +424,10 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
         </AlertDialog>
       </ErrorBoundary>
 
-      {/* First-run companion onboarding */}
+      {/* First-run setup: pops the model selector (incl. skill-page arrivals) */}
       {!isPublicFeed && !showSignInGate ? (
         <ErrorBoundary locale={locale}>
-          <CompanionOnboarding />
+          <SelectorOnboardingController />
         </ErrorBoundary>
       ) : null}
     </>

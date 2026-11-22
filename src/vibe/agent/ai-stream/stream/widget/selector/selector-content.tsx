@@ -19,9 +19,9 @@ import {
 import favoritesEndpoint from "../../../../skills/favorites/definition";
 import { useChatFavorites } from "../../../../skills/favorites/hooks/hooks";
 
-const SelectorCompanionSetup = lazy(() =>
-  import("../onboarding/selector-companion-setup").then((mod) => ({
-    default: mod.SelectorCompanionSetup,
+const SelectorOnboarding = lazy(() =>
+  import("./selector-onboarding").then((mod) => ({
+    default: mod.SelectorOnboarding,
   })),
 );
 
@@ -78,7 +78,7 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
   if (view === "onboarding") {
     return (
       <Suspense fallback={<LoadingSpinner t={t} />}>
-        <SelectorCompanionSetup
+        <SelectorOnboarding
           locale={locale}
           onDone={() => setView("favorites")}
         />

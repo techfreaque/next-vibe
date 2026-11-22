@@ -11,18 +11,15 @@ import { apiClient } from "next-vibe/unified-ui/hooks/store";
 
 import trackingEndpoints from "@/leads/tracking/definition";
 
-/** Funnel events of the first-run onboarding, one engagement row each. */
+/** Funnel events of the first-run selector onboarding, one engagement row each. */
 export type OnboardingEvent =
   | "shown"
-  | "companion_picked"
-  | "goal_picked"
-  | "skipped"
-  | "completed";
+  | "completed"
+  | "dismissed"
+  | "arrival_added";
 
-export type OnboardingStepName = "companion" | "goal";
-
-/** Which flow the visitor got: full (new), companion only, or skill arrival. */
-export type OnboardingMode = "full" | "companion" | "arrival";
+/** New visitor (no skill link) or arrival from a skill page (`?skill=`). */
+export type OnboardingMode = "full" | "arrival";
 
 // The server resolves the real lead from the cookie; this only types the call.
 const TRACKING_USER = {
@@ -41,9 +38,8 @@ export function trackOnboarding(
   event: OnboardingEvent,
   data: {
     mode: OnboardingMode;
-    step: OnboardingStepName;
     companionId?: string;
-    goal?: string;
+    specialists?: string;
     arrivalSkillId?: string;
   },
 ): void {
@@ -51,13 +47,12 @@ export function trackOnboarding(
   const endpoint = trackingEndpoints.POST.path.join("/");
   const customData: Record<string, string> = {
     mode: data.mode,
-    step: data.step,
   };
   if (data.companionId) {
     customData["companionId"] = data.companionId;
   }
-  if (data.goal) {
-    customData["goal"] = data.goal;
+  if (data.specialists) {
+    customData["specialists"] = data.specialists;
   }
   if (data.arrivalSkillId) {
     customData["arrivalSkillId"] = data.arrivalSkillId;
@@ -86,7 +81,6 @@ export function trackOnboarding(
         logger.warn("Onboarding tracking event not stored", {
           event,
           mode: data.mode,
-          step: data.step,
           endpoint,
           errorType: result.errorType.errorKey,
           errorCode: result.errorType.errorCode,
@@ -100,7 +94,6 @@ export function trackOnboarding(
       logger.warn("Onboarding tracking event threw", {
         event,
         mode: data.mode,
-        step: data.step,
         endpoint,
         durationMs: Date.now() - startedAt,
         error: parseError(error).message,

@@ -215,7 +215,7 @@ describe("E2E: model pages", () => {
     async ({ page, context, gotoReady }) => {
       await context.addInitScript((key: string) => {
         localStorage.setItem(key, "true");
-      }, STORAGE_KEYS.COMPANION_ONBOARDING_DONE);
+      }, STORAGE_KEYS.SELECTOR_ONBOARDING_SHOWN);
       const prompt = `prefill check ${Date.now()}`;
       const composer = page.locator('[data-hydrated] textarea[name="prompt"]');
       await gotoReady(
@@ -242,7 +242,7 @@ describe("E2E: model pages", () => {
     async ({ page, context, gotoReady }) => {
       await context.addInitScript((key: string) => {
         localStorage.setItem(key, "true");
-      }, STORAGE_KEYS.COMPANION_ONBOARDING_DONE);
+      }, STORAGE_KEYS.SELECTOR_ONBOARDING_SHOWN);
       const facts = getModelFacts(LINKED, availability);
       expect(facts).not.toBeNull();
       if (facts === null) {
@@ -269,7 +269,7 @@ describe("E2E: model pages", () => {
     async ({ page, context, gotoReady }) => {
       await context.addInitScript((key: string) => {
         localStorage.setItem(key, "true");
-      }, STORAGE_KEYS.COMPANION_ONBOARDING_DONE);
+      }, STORAGE_KEYS.SELECTOR_ONBOARDING_SHOWN);
       const trigger = selectorTrigger(page);
       const label = trigger.locator("span.truncate + span").first();
       await gotoReady("/threads/incognito/new", async () => {

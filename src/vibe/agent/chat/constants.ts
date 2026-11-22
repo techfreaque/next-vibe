@@ -33,8 +33,8 @@ export const STORAGE_KEYS = {
   FAVORITE_MODELS: "chat-favorite-models",
   RECENT_SELECTIONS: "chat-recent-selections",
   DEFAULT_BUDGET: "chat-default-budget",
-  /** First-run companion onboarding finished or skipped on this device. */
-  COMPANION_ONBOARDING_DONE: "chat-companion-onboarding-v1",
+  /** The first-run selector onboarding auto-opened once on this device. */
+  SELECTOR_ONBOARDING_SHOWN: "chat-selector-onboarding-v3",
   /** Last UUID skillId that a public user favorited - used for signup attribution */
   LAST_ATTRIBUTED_SKILL: "chat-last-attributed-skill",
 } as const;

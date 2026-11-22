@@ -276,7 +276,7 @@ export async function suppressOnboarding(
   await context.addInitScript((key) => {
     // eslint-disable-next-line restricted/no-browser-globals -- init script runs inside the browser page, not app code
     localStorage.setItem(key, "true");
-  }, STORAGE_KEYS.COMPANION_ONBOARDING_DONE);
+  }, STORAGE_KEYS.SELECTOR_ONBOARDING_SHOWN);
 }
 
 /** A root folder tab in the chat sidebar (Private, Shared, Public…). */

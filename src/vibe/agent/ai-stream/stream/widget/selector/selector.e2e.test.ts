@@ -1,6 +1,7 @@
 /**
  * E2E: the chat's "who am I talking to" flow, as a first-time guest sees it.
- * - first-run companion onboarding (and its skip path)
+ * - first-run setup inside the selector: pops up once, guests get the
+ *   sign-in step first, skill-page arrival (?skill=) shown on top and added
  * - favorites: every model row visible, active row marked, menus usable
  * - menus render ON TOP of the selector popover (z-index regression)
  * - Share & earn reachable from the favorites menu
@@ -15,11 +16,13 @@ import { isOnTop } from "next-vibe/tooling/testing/e2e/visibility";
 import type { Locator, Page } from "playwright";
 import { describe, expect } from "vitest";
 
+import { scopedTranslation as consentT } from "../../../../models/uncensored-consent/i18n";
 import { scopedTranslation as skillT } from "../../../../skills/[id]/i18n";
 import { scopedTranslation as favoritesT } from "../../../../skills/favorites/i18n";
 
 const { t: tFav } = favoritesT.scopedT(defaultLocale);
 const { t: tSkill } = skillT.scopedT(defaultLocale);
+const { t: tConsent } = consentT.scopedT(defaultLocale);
 
 const CHAT_PATH = "/threads/incognito/new";
 const PHONE = { width: 390, height: 844 };
@@ -41,17 +44,15 @@ async function openChat(
   });
 }
 
-/** Walks the first-run onboarding with defaults, then opens the selector. */
+/** The selector pops the first-run setup on its own; finish it with defaults. */
 async function completeSetup(page: Page): Promise<void> {
-  const onboarding = page.getByTestId("companion-onboarding");
-  await onboarding.waitFor();
-  // Step 1: Thea is preselected, one click continues
-  await onboarding.getByTestId("onboarding-continue").click();
-  // Step 2: "Just chat" is preselected
-  await onboarding.getByTestId("onboarding-goal-chat").waitFor();
-  await onboarding.getByTestId("onboarding-continue").click();
-  await onboarding.waitFor({ state: "detached" });
-  await selectorTrigger(page).click();
+  // Guests: sign-in step first, continue as guest
+  await page.getByTestId("selector-signin-continue").click();
+  const setup = page.getByTestId("selector-setup");
+  await setup.waitFor();
+  // Thea is preselected, specialists optional: one click is enough
+  await setup.getByTestId("selector-setup-start").click();
+  // The selector stays open on the new favorites list
   await page.locator("[data-favorite-row]").first().waitFor();
 }
 
@@ -102,23 +103,104 @@ describe("E2E: chat selector + empty state", () => {
   );
 
   e2e.it(
-    "first run: skipping the onboarding still leaves a companion",
+    "first run: guests get the sign-in step, closing it does not pop again",
     async ({ page, gotoReady }) => {
       await openChat(page, gotoReady);
-      const onboarding = page.getByTestId("companion-onboarding");
-      await onboarding.waitFor();
-      await onboarding.getByTestId("onboarding-skip").click();
-      await onboarding.waitFor({ state: "detached" });
+      const signin = page.getByTestId("selector-signin");
+      await signin.waitFor();
+      expect(
+        await signin.locator('a[href*="/user/signup?callbackUrl="]').count(),
+      ).toBe(1);
 
+      await page.keyboard.press("Escape");
+      await signin.waitFor({ state: "detached" });
+      await openChat(page, gotoReady);
+      // Shown once per device: a reload does not pop it again
+      expect(await signin.count()).toBe(0);
+    },
+  );
+
+  e2e.it(
+    "skill page arrival: the setup shows the skill and adds it",
+    async ({ page, gotoReady }) => {
+      await gotoReady(`${CHAT_PATH}?skill=4chan`, async () => {
+        await page.getByTestId("selector-signin").waitFor();
+      });
+      await page.getByTestId("selector-signin-continue").click();
+      await page.getByTestId("selector-setup-arrival").waitFor();
+      await page
+        .getByTestId("selector-setup")
+        .getByTestId("selector-setup-start")
+        .click();
+      // 4chan runs an uncensored model: the one-time 18+ dialog waits for the
+      // setup, then takes over (closing the selector)
+      await page
+        .getByRole("button", { name: tConsent("dialog.agree") })
+        .click();
+      // The arrival skill is the active one
+      await selectorTrigger(page).getByText("4chan").waitFor();
       await selectorTrigger(page).click();
-      // Rows are the companion's modes; the companion's name heads its group
+      // Companion + the arrival skill both landed in the favorites
       const companionGroup = page.locator(
         '[data-tour="favorites-companion-group"]',
       );
       await companionGroup.getByText("Thea", { exact: true }).waitFor();
       expect(
-        await companionGroup.locator("[data-favorite-row]").count(),
+        await page.locator('[data-favorite-row^="4chan"]').count(),
       ).toBeGreaterThan(0);
+    },
+  );
+
+  e2e.it(
+    "skill link while another companion is active switches to that skill, every time",
+    async ({ page, gotoReady }) => {
+      // Set up with Hermes as the companion (Hermes is the active one)
+      await openChat(page, gotoReady);
+      await page.getByTestId("selector-signin-continue").click();
+      const setup = page.getByTestId("selector-setup");
+      await setup.getByTestId("selector-setup-companion-hermes").click();
+      await setup.getByTestId("selector-setup-start").click();
+      await page.locator('[data-favorite-row^="hermes"]').first().waitFor();
+      await page.keyboard.press("Escape");
+      await selectorTrigger(page).getByText("Hermes").waitFor();
+
+      /** Back to Hermes through the selector, like a visitor would. */
+      const selectHermes = async (): Promise<void> => {
+        await selectorTrigger(page).click();
+        const row = page.locator('[data-favorite-row^="hermes"]').first();
+        await row.waitFor();
+        // The row's select button is the one with text (handle and menu are icons)
+        await row.getByRole("button").filter({ hasText: /\w/ }).first().click();
+        await selectorTrigger(page).getByText("Hermes").waitFor();
+        await page.keyboard.press("Escape");
+      };
+
+      // 1) New skill (not in favorites yet): added and active
+      await gotoReady(`${CHAT_PATH}?skill=4chan`, async () => {
+        await page
+          .getByRole("button", { name: tConsent("dialog.agree") })
+          .waitFor();
+      });
+      await page
+        .getByRole("button", { name: tConsent("dialog.agree") })
+        .click();
+      await selectorTrigger(page).getByText("4chan").waitFor();
+      expect(await page.getByTestId("selector-setup").count()).toBe(0);
+
+      // 2) Same skill again, now already in favorites: active again
+      await selectHermes();
+      await gotoReady(`${CHAT_PATH}?skill=4chan`, async () => {
+        await selectorTrigger(page).getByText("4chan").waitFor();
+      });
+
+      // 3) Another skill: active, Hermes stays in the favorites
+      await selectHermes();
+      await gotoReady(`${CHAT_PATH}?skill=philosopher`, async () => {
+        await selectorTrigger(page).getByText("Philosopher").waitFor();
+      });
+      // Hermes is still one tap away
+      await selectorTrigger(page).click();
+      await page.locator('[data-favorite-row^="hermes"]').first().waitFor();
     },
   );
 

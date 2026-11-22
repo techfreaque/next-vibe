@@ -110,7 +110,7 @@ async function becomeFreeGuest(
   // A returning-visitor nicety only: the tour overlay would swallow clicks
   await context.addInitScript((key: string) => {
     localStorage.setItem(key, "true");
-  }, STORAGE_KEYS.COMPANION_ONBOARDING_DONE);
+  }, STORAGE_KEYS.SELECTOR_ONBOARDING_SHOWN);
   return guest.leadId;
 }
 
@@ -304,13 +304,13 @@ describe("E2E: guest chat money path", () => {
         page.getByText(/\bpong\b/i).first(),
       );
 
-      // Switch in the composer: selector → companion setup → Uncensored
+      // Switch in the composer: selector → first-run setup → Uncensored
       await selectorTrigger(page).click();
+      // Guests pass the sign-in step first, then start with the defaults
+      await page.getByTestId("selector-signin-continue").click();
       await page
         .getByTestId("selector-setup")
-        .getByRole("button", {
-          name: t("onboarding.companion.start", { name: "Thea" }),
-        })
+        .getByTestId("selector-setup-start")
         .click();
       const uncensoredLabel = UNCENSORED_VARIANT
         ? tSkills(UNCENSORED_VARIANT.variantName)

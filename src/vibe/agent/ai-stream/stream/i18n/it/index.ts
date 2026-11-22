@@ -635,86 +635,57 @@ export const translations: typeof enTranslations = {
     },
   },
   onboarding: {
-    progress: "Passo {{current}} di {{total}}",
-    skip: "Salta.",
-    skipCompanion: "Salta la configurazione",
-    notNow: "Non ora",
-    back: "Indietro",
-    saving: "Prepararsi...",
-    failed: "Non ho potuto salvare. Controlla la connessione e riprova.",
-    retry: "Riprova",
-    guestCredits: "Crediti gratuiti {{credits}}. Non c'e' bisogno di firmare.",
-    noProviderAvailable:
-      "Nessun provider AI configurato. Aggiungere OPENROUTER_API_KEY o attivare il codice Claude (CLAUDE_CODE_ENABLED =true) per continuare.",
-    companion: {
-      title: "Scegli il tuo compagno",
+    signin: {
+      title: "Tieni la tua configurazione",
+      subtitle: "Accedi una volta. Tutto quello che crei qui ti segue.",
+      benefits: {
+        sync: {
+          title: "Sincronizzato su ogni dispositivo",
+          body: "Il tuo compagno, gli specialisti e le chat su ogni dispositivo che usi.",
+        },
+        keep: {
+          title: "Non perdi mai il tuo lavoro",
+          body: "Da ospite la configurazione vive solo in questo browser. Accedi e resta tua.",
+        },
+        private: {
+          title: "Privato per impostazione",
+          body: "Decidi tu sui tuoi dati e sul livello di filtro. Sempre.",
+        },
+      },
+      cta: "Accedi o crea un account",
+      continueAsGuest: "Continua come ospite",
+      note: "Puoi accedere più tardi dal menu, quando vuoi.",
+    },
+    setup: {
+      title: "Configura la tua IA",
       subtitle:
-        "Il tuo compagno risponde a ogni nuova chat. Interruttore modelli in qualsiasi momento, non censurato incluso.",
-      missingTitle: "La tua configurazione non ha nessun compagno",
-      missingSubtitle:
-        "Un compagno risponde a ogni nuova chat e conosce le tue abilità. Scegline uno, ci vuole un secondo.",
-      arrivalTitle:
-        "{{skill}} ha aggiunto. Chi dovrebbe essere il tuo compagno?",
+        "Scegli con chi parli. Aggiungi specialisti se vuoi. Puoi cambiare tutto dopo.",
+      arrivalTitle: "Inizia con {{skill}}",
       arrivalSubtitle:
-        "{{skill}} risponde a questa chat. Il tuo compagno risponde al resto.",
-      groupLabel: "Compagni",
-      recommended: "Consigliato",
-      about: {
-        thea: "Caldo, saggio e onesto. Saggezza antica per i problemi moderni.",
-        hermes: "Diretto e guidato. Strategia, disciplina, nessuna scusa.",
-      },
-      voice: {
-        thea: "“La mozione sconfina ogni volta il terrore.”",
-        hermes: "“La coltivazione è il tempo; la disciplina è il clima”.",
-      },
-      arrivalContinue: "Continua",
-      continue: "Continuare con {{name}}",
-      start: "Iniziare con {{name}}",
+        "{{skill}} risponde in questa chat. Il tuo compagno pensa al resto.",
+      arrivalLabel: "La tua skill",
+      arrivalBadge: "Inclusa",
+      companionLabel: "Il tuo compagno",
+      specialistsLabel: "Aggiungi specialisti",
+      optional: "facoltativo",
+      start: "Inizia a chattare",
+      saving: "Configurazione...",
+      failed:
+        "Impossibile salvare la configurazione. Controlla la connessione e riprova.",
+      retry: "Riprova",
+      noProviderAvailable:
+        "Nessun provider AI configurato. Aggiungi OPENROUTER_API_KEY o attiva Claude Code (CLAUDE_CODE_ENABLED=true) per continuare.",
     },
-    consent: {
-      reason:
-        "{{skill}} funziona su {{model}}, un modello non censurato. Confermare una volta, poi chattare.",
-      label: "Conferma di una volta 18+",
-      agreeStart: "Ho 18+, inizia a parlare",
-      agreeContinue: "Ho 18+, continua",
-    },
-    goal: {
-      change: "Cambia",
-      title: "Cosa vuoi fare prima?",
-      subtitle:
-        "Aggiungiamo le giuste competenze e scriviamo il tuo primo prompt. Modificalo prima di inviare.",
-      groupLabel: "Primo gol",
-      adds: "Aggiunge {{skills}}",
-      noSkills: "Niente abilità extra, solo il tuo compagno",
-      adultsOnly: "18+",
-      promptLabel: "Il tuo primo prompt",
-      start: "Iniziare a chattare",
-      tiles: {
-        uncensored: {
-          title: "Senza censura",
-          body: "Chiedi cosa fanno gli altri AI. Risponde dritto, decidi tu.",
-          prompt:
-            "Tutti i farmaci dovrebbero essere legali? Scegli un lato e difenderlo.",
-        },
-        media: {
-          title: "Immagini, video, musica",
-          body: "Una frase in, arte, clip o canzoni fuori.",
-          prompt:
-            "Creare un'immagine: un vicolo di Tokyo illuminato da neon nella pioggia di notte, cinematografico, girato sul film di 35mm.",
-        },
-        coding: {
-          title: "Programmazione",
-          body: "Scrivi, debug e codice nave.",
-          prompt:
-            "Scrivere uno script Python che rinomina ogni foto in una cartella alla data in cui è stato preso.",
-        },
-        chat: {
-          title: "Solo chiacchierare",
-          body: "Parla con {{companion}}. Non c'e' niente da incastrare.",
-          prompt:
-            "Ho una grande decisione da prendere e continuare a andare avanti e indietro. Aiutami a pensarci bene.",
-        },
-      },
+    usecases: {
+      coding: "Codice e tech",
+      research: "Ricerca e analisi",
+      writing: "Scrittura e revisione",
+      business: "Business e strategia",
+      creative: "Creatività e storie",
+      learning: "Studio",
+      health: "Salute e carriera",
+      controversial: "Pensiero libero",
+      roleplay: "Giochi di ruolo e personaggi",
     },
   },
   input: {
