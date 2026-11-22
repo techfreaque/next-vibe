@@ -14,6 +14,34 @@ export const translations = {
     },
   },
   posts: {
+    bestUncensoredLlm: {
+      title: "The best uncensored LLM. Picked by job, not by hype.",
+      category: "Model Guide",
+      excerpt:
+        "One winner each for reasoning, everyday chat, coding, dark fiction, contrary views and images. Plus GLM 5.3 Uncensored vs DeepSeek V4.1 Flash Uncensored, with live prices.",
+      readTime: "8 min read",
+    },
+    uncensoredWriter: {
+      title: "An uncensored AI writer. Your story, unsoftened.",
+      category: "Writing Guide",
+      excerpt:
+        "The models that write villains, violence and adult scenes straight, how many manuscript pages each one holds, and a scene-by-scene workflow for getting the book done.",
+      readTime: "8 min read",
+    },
+    unbiasedChatbot: {
+      title: "There is no unbiased AI chatbot. Ask several.",
+      category: "Guide",
+      excerpt:
+        "Why every model leans, how mainstream, abliterated and contrary models frame the same question, and a four-step method to hear every side in one chat.",
+      readTime: "7 min read",
+    },
+    noSignUp: {
+      title: "AI chat with no sign-up. No email. No phone number.",
+      category: "Guide",
+      excerpt:
+        "What you get without an account, the cheapest models to start with, and an honest list of what anonymous does and does not cover.",
+      readTime: "6 min read",
+    },
     noGpu: {
       title: "Uncensored LLM online. No GPU. No install.",
       category: "Model Guide",

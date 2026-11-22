@@ -1,12 +1,14 @@
 /**
- * Shared uncensored-model rows for the blog posts that list them (no GPU,
- * uncensored API, jailbreak alternative). Every value comes from the model
- * registry at render time: which uncensored models are live on this
- * instance, how each was made, context window, parameter count, tool support
- * and the reference price per message. Nothing about a model is typed in copy.
+ * Shared model rows for the blog posts that list models (no GPU, uncensored
+ * API, jailbreak alternative, writer, best LLM, no sign-up, unbiased). Every
+ * value comes from the model registry at render time: which models are live
+ * on this instance, tier, how an uncensored one was made, context window,
+ * parameter count, strengths, tool support and the reference price per
+ * message. Nothing about a model is typed in copy.
  */
 
 import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
+import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { isUncensoredContent } from "next-vibe/agent/models/uncensored-consent/constants";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
@@ -24,16 +26,22 @@ import {
 import type { JSX } from "react";
 
 import {
+  canonicalComparisonPath,
+  CONTENT_TIER_ORDER,
   formatTokenCount,
   getModelFacts,
   listModelFacts,
+  type ModelFacts,
   OWN_WORLDVIEW_UNCENSORED_MODEL_ID,
 } from "@/_pages/models/_shared/model-facts";
 import {
   chatHref,
   formatMoney,
+  formatNumber,
   isApiCallable,
   modelHref,
+  strengthList,
+  tierName,
   type UncensoredKind,
   uncensoredKind,
 } from "@/_pages/models/_shared/model-format";
@@ -45,16 +53,46 @@ export interface UncensoredRow {
   id: string;
   slug: string;
   name: string;
-  kind: UncensoredKind;
+  /** How an uncensored model was made; null outside the uncensored tier. */
+  kind: UncensoredKind | null;
+  /** Localized content tier name (mainstream, open, uncensored). */
+  tier: string;
   contextWindow: number;
+  /** Context window as printed pages of prose. */
+  contextPages: number;
   creditsPerMessage: number;
   /** Formatted money value of one reference message. */
   messagePrice: string;
   /** Billions, when the registry knows it. */
   parameterCount: number | null;
+  /** Registry strengths (ModelUtility values), registry order. */
+  strengths: string[];
+  /** Localized, comma-separated strengths. */
+  strengthText: string;
   supportsTools: boolean;
   apiCallable: boolean;
   chatHref: string;
+}
+
+function toRow(facts: ModelFacts, locale: CountryLanguage): UncensoredRow {
+  const { t: modelsT } = modelsScopedTranslation.scopedT(locale);
+  return {
+    id: facts.id,
+    slug: facts.slug,
+    name: facts.name.trim(),
+    kind: uncensoredKind(facts),
+    tier: tierName(facts.content, locale),
+    contextWindow: facts.contextWindow,
+    contextPages: facts.contextPages,
+    creditsPerMessage: facts.creditsPerMessage,
+    messagePrice: formatMoney(facts.creditsPerMessage, locale),
+    parameterCount: facts.parameterCount,
+    strengths: [...facts.strengths],
+    strengthText: strengthList(facts, modelsT),
+    supportsTools: facts.supportsTools,
+    apiCallable: isApiCallable(facts),
+    chatHref: chatHref(locale, facts),
+  };
 }
 
 /** Current uncensored chat models on this instance, cheapest first. */
@@ -69,24 +107,73 @@ export async function loadUncensoredRows(
         a.creditsPerMessage - b.creditsPerMessage ||
         a.name.localeCompare(b.name),
     )
-    .map((facts) => ({
-      id: facts.id,
-      slug: facts.slug,
-      name: facts.name.trim(),
-      kind: uncensoredKind(facts) ?? "unlisted",
-      contextWindow: facts.contextWindow,
-      creditsPerMessage: facts.creditsPerMessage,
-      messagePrice: formatMoney(facts.creditsPerMessage, locale),
-      parameterCount: facts.parameterCount,
-      supportsTools: facts.supportsTools,
-      apiCallable: isApiCallable(facts),
-      chatHref: chatHref(locale, facts),
-    }));
+    .map((facts) => toRow(facts, locale));
+}
+
+function liveFacts(
+  id: ChatModelId,
+  availability: AgentEnvAvailability,
+): ModelFacts | null {
+  const facts = getModelFacts(id, availability);
+  return facts === null || facts.isLegacy ? null : facts;
+}
+
+/** Rows for hand-picked models, in the given order, live and current only. */
+export async function loadModelRowsByIds(
+  ids: readonly ChatModelId[],
+  locale: CountryLanguage,
+): Promise<UncensoredRow[]> {
+  const availability = await getEnvAvailability();
+  return ids.flatMap((id) => {
+    const facts = liveFacts(id, availability);
+    return facts === null ? [] : [toRow(facts, locale)];
+  });
+}
+
+/**
+ * The cheapest current text chat models per content tier, `perTier` each,
+ * in the catalog's tier order (least filtered first).
+ */
+export async function loadCheapestRowsByTier(
+  locale: CountryLanguage,
+  perTier: number,
+): Promise<UncensoredRow[]> {
+  const availability = await getEnvAvailability();
+  const models = listModelFacts(availability).filter(
+    (facts) => !facts.isLegacy && facts.outputs.join() === "text",
+  );
+  return CONTENT_TIER_ORDER.flatMap((tier) =>
+    models
+      .filter((facts) => facts.content === tier)
+      .toSorted(
+        (a, b) =>
+          a.creditsPerMessage - b.creditsPerMessage ||
+          a.name.localeCompare(b.name),
+      )
+      .slice(0, perTier)
+      .map((facts) => toRow(facts, locale)),
+  );
+}
+
+/** The first row among `rows` whose id is in `ids` (preference order). */
+export function pickRow(
+  rows: readonly UncensoredRow[],
+  ids: readonly ChatModelId[],
+): UncensoredRow | undefined {
+  for (const id of ids) {
+    const row = rows.find((candidate) => candidate.id === id);
+    if (row !== undefined) {
+      return row;
+    }
+  }
+  return undefined;
 }
 
 export interface ComparePair {
   a: { slug: string; name: string };
   b: { slug: string; name: string };
+  /** Canonical locale-less compare path ("/models/compare/<a>/<b>"). */
+  path: string;
 }
 
 /** Compare-page pairs whose two sides are both live and current. */
@@ -95,15 +182,16 @@ export async function loadComparePairs(
 ): Promise<ComparePair[]> {
   const availability = await getEnvAvailability();
   return pairs.flatMap(([aId, bId]): ComparePair[] => {
-    const a = getModelFacts(aId, availability);
-    const b = getModelFacts(bId, availability);
-    if (a === null || b === null || a.isLegacy || b.isLegacy) {
+    const a = liveFacts(aId, availability);
+    const b = liveFacts(bId, availability);
+    if (a === null || b === null) {
       return [];
     }
     return [
       {
         a: { slug: a.slug, name: a.name.trim() },
         b: { slug: b.slug, name: b.name.trim() },
+        path: canonicalComparisonPath(a, b),
       },
     ];
   });
@@ -132,6 +220,8 @@ export type UncensoredColumn =
   | "memory"
   | "apiId"
   | "context"
+  | "pages"
+  | "strengths"
   | "tools"
   | "price"
   | "chat";
@@ -142,6 +232,8 @@ export interface UncensoredTableLabels {
   memory?: string;
   apiId?: string;
   context: string;
+  pages?: string;
+  strengths?: string;
   tools?: string;
   price: string;
   chat?: string;
@@ -153,6 +245,8 @@ export interface UncensoredTableLabels {
   unknown?: string;
   /** "{{q4}} GB / {{q8}} GB" style label for the memory cell. */
   memoryValue?: (q4: number, q8: number) => string;
+  /** "about {{count}} pages" style label for the pages cell. */
+  pagesValue?: (pages: string) => string;
   /** "{{count}}B" style label for the params cell. */
   paramsValue?: (billions: number) => string;
 }
@@ -196,6 +290,12 @@ export function UncensoredModelTable({
         return <InlineCode>{row.id}</InlineCode>;
       case "context":
         return <>{formatTokenCount(row.contextWindow)}</>;
+      case "pages": {
+        const pages = formatNumber(row.contextPages, locale);
+        return <>{labels.pagesValue?.(pages) ?? pages}</>;
+      }
+      case "strengths":
+        return <>{row.strengthText}</>;
       case "tools":
         return <>{row.supportsTools ? labels.yes : labels.no}</>;
       case "price":
@@ -239,7 +339,9 @@ export function UncensoredModelTable({
                     {row.name}
                   </Link>
                   <Span className="block text-xs text-muted-foreground">
-                    {modelsT(`uncensoredKind.${row.kind}.name`)}
+                    {row.kind === null
+                      ? row.tier
+                      : modelsT(`uncensoredKind.${row.kind}.name`)}
                   </Span>
                 </TableCell>
                 {columns.map((column) => (

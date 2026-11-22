@@ -16,6 +16,35 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    bestUncensoredLlm: {
+      title:
+        "Najlepszy nieocenzurowany LLM. Według zadania, nie według hype'u.",
+      category: "Przewodnik po modelach",
+      excerpt:
+        "Jeden zwycięzca na zadanie: rozumowanie, codzienny czat, kod, mroczna fikcja, przeciwne poglądy i obrazy. Do tego GLM 5.3 Uncensored kontra DeepSeek V4.1 Flash Uncensored, z cenami na żywo.",
+      readTime: "8 min czytania",
+    },
+    uncensoredWriter: {
+      title: "AI do pisania bez cenzury. Twoja historia, bez wygładzania.",
+      category: "Poradnik pisarski",
+      excerpt:
+        "Modele, które piszą złoczyńców, przemoc i sceny dla dorosłych wprost, ile stron rękopisu mieści każdy z nich i sposób pracy scena po scenie, dzięki któremu książka powstaje.",
+      readTime: "8 min czytania",
+    },
+    unbiasedChatbot: {
+      title: "Nie ma bezstronnego chatbota AI. Zapytaj kilka.",
+      category: "Poradnik",
+      excerpt:
+        "Dlaczego każdy model ma przechył, jak modele mainstreamowe, abliterowane i przekorne ujmują to samo pytanie i cztery kroki, by w jednym czacie usłyszeć każdą stronę.",
+      readTime: "7 min czytania",
+    },
+    noSignUp: {
+      title: "Czat AI bez rejestracji. Bez maila. Bez numeru telefonu.",
+      category: "Poradnik",
+      excerpt:
+        "Co dostajesz bez konta, od których modeli najtaniej zacząć i uczciwa lista tego, co anonimowość obejmuje, a czego nie.",
+      readTime: "6 min czytania",
+    },
     noGpu: {
       title: "Nieocenzurowany LLM online. Bez GPU. Bez instalacji.",
       category: "Przewodnik po modelach",

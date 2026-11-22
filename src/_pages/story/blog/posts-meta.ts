@@ -7,6 +7,10 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 
 export const BLOG_POST_DATES = {
+  "best-uncensored-llm": "2026-11-22",
+  "uncensored-ai-writer": "2026-11-22",
+  "unbiased-ai-chatbot": "2026-11-22",
+  "ai-chat-no-sign-up": "2026-11-22",
   "uncensored-llm-without-gpu": "2026-11-21",
   "uncensored-llm-api": "2026-11-21",
   "chatgpt-jailbreak-alternative": "2026-11-21",

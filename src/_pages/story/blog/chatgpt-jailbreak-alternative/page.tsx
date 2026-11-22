@@ -258,7 +258,7 @@ export function TanstackPage({
               {pairs.map((pair) => (
                 <CardLink
                   key={`${pair.a.slug}-${pair.b.slug}`}
-                  href={`/${locale}/models/compare/${pair.a.slug}/${pair.b.slug}`}
+                  href={`/${locale}${pair.path}`}
                   label={t("test.compareLink", {
                     a: pair.a.name,
                     b: pair.b.name,

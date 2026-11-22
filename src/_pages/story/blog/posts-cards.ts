@@ -13,6 +13,10 @@ import { type BlogPostSlug, formatPostDate } from "./posts-meta";
 
 /** i18n key under `posts.*` for each post, in display order. */
 const POST_CARD_KEYS = [
+  ["best-uncensored-llm", "bestUncensoredLlm"],
+  ["uncensored-ai-writer", "uncensoredWriter"],
+  ["unbiased-ai-chatbot", "unbiasedChatbot"],
+  ["ai-chat-no-sign-up", "noSignUp"],
   ["uncensored-llm-without-gpu", "noGpu"],
   ["uncensored-llm-api", "uncensoredApi"],
   ["chatgpt-jailbreak-alternative", "jailbreak"],

@@ -16,6 +16,35 @@ export const translations: typeof enTranslations = {
     },
   },
   posts: {
+    bestUncensoredLlm: {
+      title:
+        "Das beste unzensierte LLM. Nach Aufgabe gewählt, nicht nach Hype.",
+      category: "Modell-Guide",
+      excerpt:
+        "Ein Sieger je Aufgabe: Denken, Alltag, Code, dunkle Fiktion, Gegenpositionen und Bilder. Dazu GLM 5.3 Uncensored gegen DeepSeek V4.1 Flash Uncensored, mit Live-Preisen.",
+      readTime: "8 Min. Lesezeit",
+    },
+    uncensoredWriter: {
+      title: "Unzensierte KI zum Schreiben. Ihre Geschichte, ungeschönt.",
+      category: "Schreib-Guide",
+      excerpt:
+        "Die Modelle, die Schurken, Gewalt und Erwachsenenszenen geradeheraus schreiben, wie viele Manuskriptseiten jedes behält und ein Szene-für-Szene-Ablauf, mit dem das Buch fertig wird.",
+      readTime: "8 Min. Lesezeit",
+    },
+    unbiasedChatbot: {
+      title: "Einen neutralen KI-Chatbot gibt es nicht. Fragen Sie mehrere.",
+      category: "Ratgeber",
+      excerpt:
+        "Warum jedes Modell eine Schlagseite hat, wie Mainstream-, abliterierte und gegenläufige Modelle dieselbe Frage einordnen und vier Schritte, um in einem Chat jede Seite zu hören.",
+      readTime: "7 Min. Lesezeit",
+    },
+    noSignUp: {
+      title: "KI-Chat ohne Anmeldung. Ohne E-Mail. Ohne Handynummer.",
+      category: "Ratgeber",
+      excerpt:
+        "Was Sie ohne Konto bekommen, mit welchen Modellen Sie am günstigsten starten und eine ehrliche Liste, was anonym abdeckt und was nicht.",
+      readTime: "6 Min. Lesezeit",
+    },
     noGpu: {
       title: "Unzensiertes LLM online. Ohne GPU. Ohne Installation.",
       category: "Modell-Guide",
