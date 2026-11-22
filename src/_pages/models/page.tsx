@@ -87,7 +87,9 @@ export function TanstackPage(data: ModelsIndexPageData): JSX.Element {
     <>
       <JsonLd id="models-structured-data" data={data.structuredData} />
       <ModelsIndexClient
-        {...data}
+        locale={data.locale}
+        chatModelCount={data.chatModelCount}
+        mediaModelCounts={data.mediaModelCounts}
         directorySection={
           <>
             <ModelDirectory locale={data.locale} groups={data.directory} />

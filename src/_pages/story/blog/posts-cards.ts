@@ -71,24 +71,39 @@ export interface BlogPostCard {
   date: string;
 }
 
-/** Every blog post card for a locale, newest first. */
-export function listBlogPostCards(locale: CountryLanguage): BlogPostCard[] {
-  const { t } = scopedTranslation.scopedT(locale);
-  const params = { credits: FEEDBACK_REWARD_CREDITS };
-  return POST_CARD_KEYS.map(([slug, key]) => ({
+const postCardKeys = new Map<BlogPostSlug, (typeof POST_CARD_KEYS)[number][1]>(
+  POST_CARD_KEYS,
+);
+
+function postCard(
+  slug: BlogPostSlug,
+  key: (typeof POST_CARD_KEYS)[number][1],
+  locale: CountryLanguage,
+  t: ReturnType<typeof scopedTranslation.scopedT>["t"],
+): BlogPostCard {
+  return {
     slug,
     path: `/story/blog/${slug}`,
     title: t(`posts.${key}.title`),
     category: t(`posts.${key}.category`),
-    excerpt: t(`posts.${key}.excerpt`, params),
+    excerpt: t(`posts.${key}.excerpt`, { credits: FEEDBACK_REWARD_CREDITS }),
     readTime: t(`posts.${key}.readTime`),
     date: formatPostDate(slug, locale),
-  }));
+  };
+}
+
+/** Every blog post card for a locale, newest first. */
+export function listBlogPostCards(locale: CountryLanguage): BlogPostCard[] {
+  const { t } = scopedTranslation.scopedT(locale);
+  return POST_CARD_KEYS.map(([slug, key]) => postCard(slug, key, locale, t));
 }
 
 export function getBlogPostCard(
   slug: BlogPostSlug,
   locale: CountryLanguage,
 ): BlogPostCard | undefined {
-  return listBlogPostCards(locale).find((card) => card.slug === slug);
+  const key = postCardKeys.get(slug);
+  return key === undefined
+    ? undefined
+    : postCard(slug, key, locale, scopedTranslation.scopedT(locale).t);
 }

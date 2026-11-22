@@ -15,6 +15,8 @@ import { collectSitemapEntries } from "../../_root/sitemap.xml/build-sitemap";
 import { listCatalogEntries } from "./model-catalog-entries";
 import { findMediaFacts, listMediaFacts } from "./model-media-facts";
 import {
+  buildComparePickers,
+  buildPickerModels,
   OWN_WORLDVIEW_UNCENSORED_MODEL_ID,
   FEATURED_COMPARISON_PAIRS,
   findModelPageAlias,
@@ -23,6 +25,7 @@ import {
   isChatModelAvailable,
   isModelPageAlias,
   listModelFacts,
+  orderPickerModels,
   PUBLIC_CHAT_MODEL_IDS,
   suggestComparisons,
   toModelSlug,
@@ -113,6 +116,29 @@ describe("one public page per model", () => {
         false,
       );
     }
+  });
+});
+
+describe("compare picker payload", () => {
+  test("shares candidates while preserving the suggestions for each side", () => {
+    const left = getModelFacts(ChatModelId.CLAUDE_OPUS_5_5, PROD_LIKE);
+    const right = getModelFacts(ChatModelId.CLAUDE_SONNET_5_5, PROD_LIKE);
+    if (left === null || right === null) {
+      return expect.unreachable("expected two available models");
+    }
+    const { models, suggestedLeft, suggestedRight } = buildComparePickers(
+      left,
+      right,
+      PROD_LIKE,
+    );
+
+    expect(models).toHaveLength(listModelFacts(PROD_LIKE).length - 2);
+    expect(orderPickerModels(models, suggestedLeft)).toEqual(
+      buildPickerModels(right, PROD_LIKE, [left.id]),
+    );
+    expect(orderPickerModels(models, suggestedRight)).toEqual(
+      buildPickerModels(left, PROD_LIKE, [right.id]),
+    );
   });
 });
 
@@ -251,10 +277,15 @@ describe("models without a configured provider key are hidden", () => {
       unbottledSystem: false,
       unbottledForce: false,
     };
+    const available = getModelFacts(OWN_WORLDVIEW_UNCENSORED_MODEL_ID, PROD_LIKE);
+    expect(available).not.toBeNull();
     expect(listModelFacts(none)).toEqual([]);
     expect(getModelFacts(OWN_WORLDVIEW_UNCENSORED_MODEL_ID, none)).toBeNull();
-    expect(isChatModelAvailable(OWN_WORLDVIEW_UNCENSORED_MODEL_ID, PROD_LIKE)).toBe(
-      true,
+    expect(getModelFacts(OWN_WORLDVIEW_UNCENSORED_MODEL_ID, PROD_LIKE)).toEqual(
+      available,
     );
+    expect(
+      isChatModelAvailable(OWN_WORLDVIEW_UNCENSORED_MODEL_ID, PROD_LIKE),
+    ).toBe(true);
   });
 });

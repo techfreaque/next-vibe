@@ -21,10 +21,9 @@ import type {
   CompareVerdict,
 } from "../../../_shared/model-compare";
 import {
-  buildPickerModels,
+  buildComparePickers,
   canonicalComparisonPath,
   type ModelFacts,
-  type PickerModel,
 } from "../../../_shared/model-facts";
 import {
   buildComparePageSeo,
@@ -77,9 +76,7 @@ export interface ComparePageData {
   locale: CountryLanguage;
   left: ModelFacts;
   right: ModelFacts;
-  /** Replacement candidates for the left column (anchored on the right). */
-  leftPicker: PickerModel[];
-  rightPicker: PickerModel[];
+  pickers: ReturnType<typeof buildComparePickers>;
   verdict: CompareVerdict;
   moreLeft: CompareLink[];
   moreRight: CompareLink[];
@@ -103,8 +100,7 @@ export async function tanstackLoader({
     ...buildComparePageSeo(pair.left, pair.right, locale, availability),
     left: pair.left,
     right: pair.right,
-    leftPicker: buildPickerModels(pair.right, availability, [pair.left.id]),
-    rightPicker: buildPickerModels(pair.left, availability, [pair.right.id]),
+    pickers: buildComparePickers(pair.left, pair.right, availability),
   };
 }
 
@@ -114,7 +110,13 @@ export function TanstackPage(data: ComparePageData): JSX.Element {
       <JsonLd id="compare-structured-data" data={data.structuredData} />
       <ComparePageClient
         key={`${data.left.id}/${data.right.id}`}
-        {...data}
+        locale={data.locale}
+        left={data.left}
+        right={data.right}
+        pickers={data.pickers}
+        verdict={data.verdict}
+        moreLeft={data.moreLeft}
+        moreRight={data.moreRight}
         sections={
           <ModelSeoSections
             locale={data.locale}

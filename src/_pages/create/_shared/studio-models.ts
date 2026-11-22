@@ -17,17 +17,19 @@ import {
 import type { CreateKind } from "./create-kinds";
 import type { StudioModel } from "./studio-types";
 
-export async function studioModels(
+export async function studioModelLists(
   user: JwtPayloadType,
-  kind: CreateKind,
-): Promise<StudioModel[]> {
+  kinds: readonly CreateKind[],
+): Promise<Map<CreateKind, StudioModel[]>> {
   const availability = await getEnvAvailability();
-  const models = new Map<string, StudioModel>();
+  const modelsByKind = new Map<CreateKind, Map<string, StudioModel>>(
+    kinds.map((kind) => [kind, new Map()]),
+  );
   for (const entry of listUserMediaModels(user, availability)) {
-    if (
-      entry.modality !== (kind === "transcribe" ? "transcription" : kind) ||
-      models.has(entry.id)
-    ) {
+    const kind =
+      entry.modality === "transcription" ? "transcribe" : entry.modality;
+    const models = modelsByKind.get(kind);
+    if (models === undefined || models.has(entry.id)) {
       continue;
     }
     const isTokenPriced =
@@ -58,7 +60,19 @@ export async function studioModels(
         speech?.creditCostPerCharacter ?? stt?.creditCostPerSecond ?? 0,
     });
   }
-  return [...models.values()].toSorted(
-    (a, b) => a.rate - b.rate || a.name.localeCompare(b.name),
+  return new Map(
+    [...modelsByKind].map(([kind, models]) => [
+      kind,
+      [...models.values()].toSorted(
+        (a, b) => a.rate - b.rate || a.name.localeCompare(b.name),
+      ),
+    ]),
   );
+}
+
+export async function studioModels(
+  user: JwtPayloadType,
+  kind: CreateKind,
+): Promise<StudioModel[]> {
+  return (await studioModelLists(user, [kind])).get(kind) ?? [];
 }

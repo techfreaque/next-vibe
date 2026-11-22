@@ -1,5 +1,3 @@
-"use client";
-
 import { Div } from "next-vibe/ui/components/div";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { Link } from "next-vibe/ui/components/link";

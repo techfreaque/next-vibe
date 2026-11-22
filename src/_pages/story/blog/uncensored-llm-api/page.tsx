@@ -39,7 +39,6 @@ import { V1_MAX_OUTPUT_TOKENS } from "@/v1/shared/constants";
 
 import {
   ArticleBody,
-  ArticleCode,
   ArticleEnd,
   ArticleH3,
   ArticleHeader,
@@ -48,6 +47,7 @@ import {
   ArticleP,
   ArticleSection,
 } from "../../_shared/article";
+import { ArticleCode } from "../../_shared/article-code";
 import { Callout, CardLink, Cta } from "../../_shared/marketing";
 import { LINK_CLASS } from "../../compare/_shared/compare-ui";
 import {

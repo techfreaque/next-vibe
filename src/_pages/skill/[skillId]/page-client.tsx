@@ -1,12 +1,12 @@
-"use client";
-
 import { formatSkillId } from "next-vibe/agent/chat/slugify";
 import type { UncensoredModelMethod } from "next-vibe/agent/models/models";
 import type { SkillGetResponseOutput } from "next-vibe/agent/skills/[id]/definition";
 import type { ContentLevelValue } from "next-vibe/agent/skills/enum";
 import type { FavoriteCreateRequestOutput } from "next-vibe/agent/skills/favorites/create/definition";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ArrowLeft } from "next-vibe/ui/components/icons/ArrowLeft";
+import { DollarSign } from "next-vibe/ui/components/icons/DollarSign";
 import { JsonLd } from "next-vibe/ui/components/json-ld";
 import { Link } from "next-vibe/ui/components/link";
 import { P } from "next-vibe/ui/components/typography";
@@ -14,13 +14,10 @@ import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JSX } from "react";
 
+import { LeadCaptureIsland, SignedInActions } from "./action-islands";
 import { LaunchpadDesign } from "./design-launchpad";
 import { scopedTranslation } from "./i18n";
-import {
-  AddToSkillsAction,
-  LeadCaptureIsland,
-  ShareEarnAction,
-} from "./landing-actions";
+import { LANDING_ACTION_CLASS } from "./landing-action-style";
 import type { LandingView } from "./landing-parts";
 import type { SkillLandingPageData } from "./loader";
 import type { SkillMessagePrice } from "./message-price";
@@ -174,18 +171,26 @@ export function SkillLandingPage({
           {t("share.text", { name: view.plainName })}
         </P>
         <Div className="-ml-3.5 flex flex-wrap gap-2 sm:ml-0">
-          <ShareEarnAction
-            locale={locale}
-            user={user}
-            platform={platform}
-            skillId={skillId}
-            skillName={name}
-          />
-          {!user.isPublic && (
-            <AddToSkillsAction
-              locale={locale}
-              user={user}
-              data={favoriteDataFor(baseSkillId, skill, activeVariantId)}
+          {user.isPublic ? (
+            <Button
+              asChild
+              variant="ghost"
+              size="sm"
+              className={LANDING_ACTION_CLASS}
+            >
+              <Link href={`/${locale}/story/earn`}>
+                <DollarSign className="h-4 w-4" />
+                {t("actions.shareEarn")}
+              </Link>
+            </Button>
+          ) : (
+            <SignedInActions
+              share={{ locale, user, platform, skillId, skillName: name }}
+              add={{
+                locale,
+                user,
+                data: favoriteDataFor(baseSkillId, skill, activeVariantId),
+              }}
             />
           )}
         </Div>

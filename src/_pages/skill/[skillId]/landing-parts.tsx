@@ -1,5 +1,3 @@
-"use client";
-
 /**
  * Building blocks of the skill landing page. Every block reads
  * real skill data only: identity, description, versions with their model and

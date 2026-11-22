@@ -124,10 +124,16 @@ function isPublicDefinition(def: ModelDefinition): boolean {
   return def.providers.some((provider) => provider.adminOnly !== true);
 }
 
-function publicOptionsFor(id: ChatModelId): ChatModelOption[] {
-  return chatModelOptionsPool.filter(
-    (option) => option.id === id && option.adminOnly !== true,
-  );
+const publicOptionsById = new Map<ChatModelId, ChatModelOption[]>();
+for (const option of chatModelOptionsPool) {
+  if (option.adminOnly !== true) {
+    const options = publicOptionsById.get(option.id);
+    if (options === undefined) {
+      publicOptionsById.set(option.id, [option]);
+    } else {
+      options.push(option);
+    }
+  }
 }
 
 /** Configured public routes allowed by this instance's relay policy. */
@@ -135,7 +141,7 @@ function availableOptionsFor(
   id: ChatModelId,
   availability: AgentEnvAvailability,
 ): ChatModelOption[] {
-  return publicOptionsFor(id).filter(
+  return (publicOptionsById.get(id) ?? []).filter(
     (option) =>
       (!availability.unbottledForce ||
         option.apiProvider === ApiProvider.UNBOTTLED) &&
@@ -203,8 +209,10 @@ export const PUBLIC_CHAT_MODEL_IDS: readonly ChatModelId[] = Object.values(
   (id) =>
     !MODEL_PAGE_ALIASES.has(id) &&
     isPublicDefinition(chatModelDefinitions[id]) &&
-    publicOptionsFor(id).length > 0,
+    publicOptionsById.has(id),
 );
+
+const publicChatModelIds = new Set(PUBLIC_CHAT_MODEL_IDS);
 
 const idBySlug = new Map<string, ChatModelId>(
   PUBLIC_CHAT_MODEL_IDS.map((id) => [toModelSlug(id), id]),
@@ -228,7 +236,7 @@ function normalizeSegment(segment: string): string {
  */
 export function findModelPageAlias(segment: string): ChatModelId | null {
   const canonical = aliasBySlug.get(normalizeSegment(segment));
-  return canonical !== undefined && PUBLIC_CHAT_MODEL_IDS.includes(canonical)
+  return canonical !== undefined && publicChatModelIds.has(canonical)
     ? canonical
     : null;
 }
@@ -254,7 +262,7 @@ export function isChatModelAvailable(
   availability: AgentEnvAvailability,
 ): boolean {
   return (
-    PUBLIC_CHAT_MODEL_IDS.includes(id) &&
+    publicChatModelIds.has(id) &&
     availableOptionsFor(id, availability).length > 0
   );
 }
@@ -301,13 +309,10 @@ function perMillionCredits(usdPerMillion: number | undefined): number | null {
       );
 }
 
-export function getModelFacts(
+function buildModelFacts(
   id: ChatModelId,
   availability: AgentEnvAvailability,
 ): ModelFacts | null {
-  if (!PUBLIC_CHAT_MODEL_IDS.includes(id)) {
-    return null;
-  }
   const def = chatModelDefinitions[id];
   const options = availableOptionsFor(id, availability)
     .map((option) => ({
@@ -372,13 +377,53 @@ export function getModelFacts(
   };
 }
 
+// Keep one bounded snapshot of public facts. The live availability flags
+// select the snapshot, so connection changes take effect on the next lookup.
+let modelFactsSnapshot:
+  | { key: string; facts: Map<ChatModelId, ModelFacts | null> }
+  | undefined;
+
+function factsForFlags(
+  availability: AgentEnvAvailability,
+): Map<ChatModelId, ModelFacts | null> {
+  const key = JSON.stringify(availability);
+  if (modelFactsSnapshot?.key !== key) {
+    modelFactsSnapshot = { key, facts: new Map() };
+  }
+  return modelFactsSnapshot.facts;
+}
+
+function getCachedModelFacts(
+  id: ChatModelId,
+  availability: AgentEnvAvailability,
+  cached: Map<ChatModelId, ModelFacts | null>,
+): ModelFacts | null {
+  const existing = cached.get(id);
+  if (existing !== undefined) {
+    return existing;
+  }
+  const facts = buildModelFacts(id, availability);
+  cached.set(id, facts);
+  return facts;
+}
+
+export function getModelFacts(
+  id: ChatModelId,
+  availability: AgentEnvAvailability,
+): ModelFacts | null {
+  return publicChatModelIds.has(id)
+    ? getCachedModelFacts(id, availability, factsForFlags(availability))
+    : null;
+}
+
 /** Facts for every public model available on this instance, registry order. */
 export function listModelFacts(
   availability: AgentEnvAvailability,
 ): ModelFacts[] {
   const result: ModelFacts[] = [];
+  const cached = factsForFlags(availability);
   for (const id of PUBLIC_CHAT_MODEL_IDS) {
-    const facts = getModelFacts(id, availability);
+    const facts = getCachedModelFacts(id, availability, cached);
     if (facts !== null) {
       result.push(facts);
     }
@@ -577,6 +622,60 @@ export interface PickerModel extends ModelRef {
   suggested: boolean;
 }
 
+function pickerRow(facts: ModelFacts): PickerModel {
+  return {
+    id: facts.id,
+    slug: facts.slug,
+    name: facts.name,
+    labName: facts.labName,
+    content: facts.content,
+    suggested: false,
+  };
+}
+
+function pickerCandidates(
+  availability: AgentEnvAvailability,
+  excludedIds: readonly ChatModelId[],
+): PickerModel[] {
+  return listModelFacts(availability)
+    .filter((other) => !excludedIds.includes(other.id))
+    .map(pickerRow)
+    .toSorted((a, b) => a.name.localeCompare(b.name));
+}
+
+export function orderPickerModels(
+  models: readonly PickerModel[],
+  suggestedIds: readonly ChatModelId[],
+): PickerModel[] {
+  const suggested = suggestedIds.flatMap((id) => {
+    const model = models.find((candidate) => candidate.id === id);
+    return model === undefined ? [] : [{ ...model, suggested: true }];
+  });
+  const rest = models.filter((model) => !suggestedIds.includes(model.id));
+  return [...suggested, ...rest];
+}
+
+/** Both compare pickers offer the same candidates, with different suggestions. */
+export function buildComparePickers(
+  left: ModelFacts,
+  right: ModelFacts,
+  availability: AgentEnvAvailability,
+): {
+  models: PickerModel[];
+  suggestedLeft: ChatModelId[];
+  suggestedRight: ChatModelId[];
+} {
+  return {
+    models: pickerCandidates(availability, [left.id, right.id]),
+    suggestedLeft: suggestComparisons(right, availability, 5).map(
+      (pick) => pick.id,
+    ),
+    suggestedRight: suggestComparisons(left, availability, 5).map(
+      (pick) => pick.id,
+    ),
+  };
+}
+
 /**
  * Candidates for a "compare against" picker anchored on `anchor`: the
  * suggestComparisons picks first (same tier/outputs, closest price), then
@@ -591,24 +690,6 @@ export function buildPickerModels(
   const suggestedIds = suggestComparisons(anchor, availability, 5).map(
     (pick) => pick.id,
   );
-  const all = listModelFacts(availability).filter(
-    (other) => other.id !== anchor.id && !exclude.includes(other.id),
-  );
-  const toRow = (other: ModelFacts, suggested: boolean): PickerModel => ({
-    id: other.id,
-    slug: other.slug,
-    name: other.name,
-    labName: other.labName,
-    content: other.content,
-    suggested,
-  });
-  const top = suggestedIds
-    .map((id) => all.find((other) => other.id === id))
-    .filter((other): other is ModelFacts => other !== undefined)
-    .map((other) => toRow(other, true));
-  const rest = all
-    .filter((other) => !suggestedIds.includes(other.id))
-    .toSorted((a, b) => a.name.localeCompare(b.name))
-    .map((other) => toRow(other, false));
-  return [...top, ...rest];
+  const all = pickerCandidates(availability, [anchor.id, ...exclude]);
+  return orderPickerModels(all, suggestedIds);
 }

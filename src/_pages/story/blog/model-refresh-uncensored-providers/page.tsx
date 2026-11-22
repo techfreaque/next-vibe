@@ -34,7 +34,6 @@ import { configScopedTranslation } from "@/env/i18n";
 
 import {
   ArticleBody,
-  ArticleCode,
   ArticleEnd,
   ArticleH3,
   ArticleHeader,
@@ -42,6 +41,7 @@ import {
   ArticleP,
   ArticleSection,
 } from "../../_shared/article";
+import { ArticleCode } from "../../_shared/article-code";
 import {
   Callout,
   Cta,

@@ -30,7 +30,10 @@ import { ModelPicker } from "../_shared/model-picker";
 import { ModelIcon, SampleAnswersSlot, TierBadge } from "../_shared/model-ui";
 import { scopedTranslation } from "../i18n";
 import { MediaModelPageClient } from "./media-page-client";
-import type { ChatModelPageData, ModelPageData } from "./page";
+import type { ChatModelPageData, MediaModelPageData } from "./page";
+
+type ChatModelClientData = Omit<ChatModelPageData, "seo" | "structuredData">;
+type MediaModelClientData = Omit<MediaModelPageData, "seo" | "structuredData">;
 
 /**
  * `sections`: the server-rendered best for / similar models / FAQ / blog
@@ -39,7 +42,9 @@ import type { ChatModelPageData, ModelPageData } from "./page";
 export function ModelPageClient({
   sections,
   ...data
-}: ModelPageData & { sections: ReactNode }): JSX.Element {
+}: (ChatModelClientData | MediaModelClientData) & {
+  sections: ReactNode;
+}): JSX.Element {
   if (data.kind === "media") {
     return (
       <MediaModelPageClient
@@ -59,7 +64,7 @@ function ChatModelPage({
   pickerModels,
   refusal,
   sections,
-}: ChatModelPageData & { sections: ReactNode }): JSX.Element {
+}: ChatModelClientData & { sections: ReactNode }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const rows = buildFactRows(facts, locale).filter((row) => !row.missing);
   const statKeys = new Set(["price", "context", "inputs", "intelligence"]);

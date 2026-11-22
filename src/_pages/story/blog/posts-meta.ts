@@ -44,15 +44,26 @@ export const BLOG_POST_DATES = {
 
 export type BlogPostSlug = keyof typeof BLOG_POST_DATES;
 
+const postDateFormatters = new Map<
+  ReturnType<typeof getLanguageFromLocale>,
+  Intl.DateTimeFormat
+>();
+
 /** "4 May 2026" / "4. Mai 2026" / "4 maja 2026" - UTC so SSR and client agree. */
 export function formatPostDate(
   slug: BlogPostSlug,
   locale: CountryLanguage,
 ): string {
-  return new Intl.DateTimeFormat(getLanguageFromLocale(locale), {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(`${BLOG_POST_DATES[slug]}T00:00:00Z`));
+  const language = getLanguageFromLocale(locale);
+  let formatter = postDateFormatters.get(language);
+  if (formatter === undefined) {
+    formatter = new Intl.DateTimeFormat(language, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC",
+    });
+    postDateFormatters.set(language, formatter);
+  }
+  return formatter.format(new Date(`${BLOG_POST_DATES[slug]}T00:00:00Z`));
 }

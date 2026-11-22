@@ -1,5 +1,3 @@
-"use client";
-
 /**
  * Skill landing page ("Launchpad"): one screen, two halves. Left, who the
  * skill is in its own words. Right, a sticky start card: version switch
@@ -9,7 +7,6 @@
  * a compact start bar appears once the button has scrolled away.
  */
 
-import type { DivRefObject } from "next-vibe/ui/components/div";
 import { Div } from "next-vibe/ui/components/div";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
@@ -17,14 +14,7 @@ import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { H1, H2, P } from "next-vibe/ui/components/typography";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
-import {
-  type JSX,
-  type ReactNode,
-  type RefObject,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import type { JSX, ReactNode } from "react";
 
 import { CONTAINER, Cta, Eyebrow } from "../../story/_shared/marketing";
 import {
@@ -40,27 +30,9 @@ import {
   SkillAvatar,
   tierHint,
 } from "./landing-parts";
+import { MobileStartBar } from "./mobile-start-bar";
 
-/** True while the observed element is off screen (after hydration). */
-function useOffscreen(): {
-  ref: RefObject<DivRefObject | null>;
-  offscreen: boolean;
-} {
-  const ref = useRef<DivRefObject | null>(null);
-  const [offscreen, setOffscreen] = useState(false);
-  useEffect(() => {
-    const node = ref.current;
-    if (!(node instanceof Element)) {
-      return undefined;
-    }
-    const observer = new IntersectionObserver((entries) => {
-      setOffscreen(entries.every((entry) => !entry.isIntersecting));
-    });
-    observer.observe(node);
-    return (): void => observer.disconnect();
-  }, []);
-  return { ref, offscreen };
-}
+const MOBILE_START_ID = "skill-mobile-start";
 
 function Row({
   label,
@@ -102,7 +74,6 @@ export function LaunchpadDesign({
   const { t, name, active, variants, locale, isGuest } = view;
   const price = active?.chatMessagePrice ?? null;
   const startHref = view.chatHref(view.skillId);
-  const { ref, offscreen } = useOffscreen();
 
   const plain = view.plainName;
   const panel = (
@@ -234,7 +205,10 @@ export function LaunchpadDesign({
                 )}
               />
               <Attribution view={view} className="mt-4" />
-              <Div ref={ref} className="mt-6 flex flex-col gap-2 lg:hidden">
+              <Div
+                id={MOBILE_START_ID}
+                className="mt-6 flex flex-col gap-2 lg:hidden"
+              >
                 <Cta href={startHref} label={t("chatWith", { name: plain })} />
                 {price && (
                   <PriceText
@@ -305,14 +279,7 @@ export function LaunchpadDesign({
         </Div>
       </Div>
 
-      <Div
-        data-testid="skill-mobile-bar"
-        aria-hidden={!offscreen}
-        className={cn(
-          "fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-4 py-3 backdrop-blur transition-transform lg:hidden",
-          offscreen ? "translate-y-0" : "translate-y-full",
-        )}
-      >
+      <MobileStartBar targetId={MOBILE_START_ID}>
         <Div className="mx-auto flex max-w-6xl items-center gap-3">
           <SkillAvatar skill={view.skill} size="sm" />
           <Div className="min-w-0 flex-1">
@@ -329,7 +296,7 @@ export function LaunchpadDesign({
             className="h-11 w-auto px-5"
           />
         </Div>
-      </Div>
+      </MobileStartBar>
     </Div>
   );
 }

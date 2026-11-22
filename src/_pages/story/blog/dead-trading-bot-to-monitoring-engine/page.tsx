@@ -28,7 +28,6 @@ import { GITHUB_REPO_URL } from "@/env/constants";
 
 import {
   ArticleBody,
-  ArticleCode,
   ArticleEnd,
   ArticleH3,
   ArticleHeader,
@@ -37,6 +36,7 @@ import {
   ArticleQuote,
   ArticleSection,
 } from "../../_shared/article";
+import { ArticleCode } from "../../_shared/article-code";
 import { Callout, Cta } from "../../_shared/marketing";
 import { scopedTranslation } from "./i18n";
 

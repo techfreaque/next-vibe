@@ -22,7 +22,6 @@ import { Check } from "next-vibe/ui/components/icons/Check";
 import { DollarSign } from "next-vibe/ui/components/icons/DollarSign";
 import { Loader2 } from "next-vibe/ui/components/icons/Loader2";
 import { Plus } from "next-vibe/ui/components/icons/Plus";
-import { Link } from "next-vibe/ui/components/link";
 import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import type {
   EndpointFormValues,
@@ -39,6 +38,7 @@ import { useForm } from "react-hook-form";
 import { LeadCaptureForm } from "@/lead-magnet/capture/widget";
 
 import { scopedTranslation } from "./i18n";
+import { LANDING_ACTION_CLASS } from "./landing-action-style";
 
 type SkillGetEndpoint = typeof skillDefinitions.GET;
 
@@ -87,9 +87,6 @@ export function SkillIsland(props: IslandProps): JSX.Element {
   );
 }
 
-const SECONDARY_BTN =
-  "h-9 gap-1.5 rounded-full px-3.5 text-sm font-medium text-primary hover:bg-primary/10 hover:text-primary";
-
 export function ShareEarnAction({
   locale,
   user,
@@ -105,23 +102,12 @@ export function ShareEarnAction({
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const [open, setOpen] = useState(false);
-  if (user.isPublic) {
-    // Sharing needs an account (the link carries your referral code).
-    return (
-      <Button asChild variant="ghost" size="sm" className={SECONDARY_BTN}>
-        <Link href={`/${locale}/story/earn`}>
-          <DollarSign className="h-4 w-4" />
-          {t("actions.shareEarn")}
-        </Link>
-      </Button>
-    );
-  }
   return (
     <SkillIsland locale={locale} user={user} platform={platform}>
       <Button
         variant="ghost"
         size="sm"
-        className={SECONDARY_BTN}
+        className={LANDING_ACTION_CLASS}
         onClick={() => setOpen(true)}
       >
         <DollarSign className="h-4 w-4" />
@@ -172,7 +158,7 @@ export function AddToSkillsAction({
     <Button
       variant="ghost"
       size="sm"
-      className={SECONDARY_BTN}
+      className={LANDING_ACTION_CLASS}
       onClick={handleAdd}
       disabled={isLoading || state === "added"}
     >

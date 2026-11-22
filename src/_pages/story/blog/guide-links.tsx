@@ -15,7 +15,7 @@ import type { JSX } from "react";
 import { scopedTranslation as abliteratedScopedTranslation } from "../abliterated-ai-chat/i18n";
 import { scopedTranslation as uncensoredScopedTranslation } from "../uncensored-ai/i18n";
 import { scopedTranslation } from "./i18n";
-import { type BlogPostCard, listBlogPostCards } from "./posts-cards";
+import { type BlogPostCard, getBlogPostCard } from "./posts-cards";
 import type { BlogPostSlug } from "./posts-meta";
 import { relatedGuides, TOPIC_HUB_PATHS, type TopicHub } from "./topics";
 
@@ -24,9 +24,8 @@ export function guideCards(
   locale: CountryLanguage,
   slugs: readonly BlogPostSlug[],
 ): BlogPostCard[] {
-  const cards = listBlogPostCards(locale);
   return slugs.flatMap((slug) => {
-    const card = cards.find((candidate) => candidate.slug === slug);
+    const card = getBlogPostCard(slug, locale);
     return card === undefined ? [] : [card];
   });
 }

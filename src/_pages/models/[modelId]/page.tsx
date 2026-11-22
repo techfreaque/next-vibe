@@ -154,16 +154,17 @@ export async function tanstackLoader({
 }
 
 export function TanstackPage(data: ModelPageData): JSX.Element {
+  const { structuredData, seo, ...clientData } = data;
   return (
     <>
-      <JsonLd id="model-structured-data" data={data.structuredData} />
+      <JsonLd id="model-structured-data" data={structuredData} />
       <ModelPageClient
-        {...data}
+        {...clientData}
         sections={
           <ModelSeoSections
             locale={data.locale}
             model={data.facts.name}
-            content={data.seo}
+            content={seo}
           />
         }
       />

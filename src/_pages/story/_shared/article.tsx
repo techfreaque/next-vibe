@@ -14,7 +14,6 @@ import { Clock } from "next-vibe/ui/components/icons/Clock";
 import { JsonLd } from "next-vibe/ui/components/json-ld";
 import { Li } from "next-vibe/ui/components/li";
 import { Link } from "next-vibe/ui/components/link";
-import { CodeSnippet } from "next-vibe/ui/components/markdown";
 import { Section } from "next-vibe/ui/components/section";
 import { Span } from "next-vibe/ui/components/span";
 import { H1, H2, H3, P } from "next-vibe/ui/components/typography";
@@ -324,28 +323,6 @@ export function ArticleQuote({
       {cite !== undefined && (
         <Span className="mt-2 block text-sm text-muted-foreground">{cite}</Span>
       )}
-    </Div>
-  );
-}
-
-/** Syntax-highlighted code; scrolls horizontally inside its own box. */
-export function ArticleCode({
-  code,
-  language,
-  filename,
-}: {
-  code: string;
-  language: string;
-  filename?: string;
-}): JSX.Element {
-  return (
-    <Div className="min-w-0 max-w-full">
-      <CodeSnippet
-        code={code}
-        language={language}
-        filename={filename ?? language}
-        variant="file"
-      />
     </Div>
   );
 }

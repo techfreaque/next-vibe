@@ -12,7 +12,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import { Ul } from "next-vibe/ui/components/ul";
 import type { JSX, ReactNode } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   CardLink,
@@ -22,7 +22,11 @@ import {
   PageSection,
 } from "../../../../story/_shared/marketing";
 import type { CompareLink } from "../../../_shared/model-compare";
-import type { ModelFacts, PickerModel } from "../../../_shared/model-facts";
+import {
+  type ModelFacts,
+  orderPickerModels,
+  type PickerModel,
+} from "../../../_shared/model-facts";
 import {
   buildFactRows,
   chatHref,
@@ -191,15 +195,23 @@ export function ComparePageClient({
   locale,
   left: first,
   right: second,
-  leftPicker: firstPicker,
-  rightPicker: secondPicker,
+  pickers,
   verdict,
   moreLeft: firstMore,
   moreRight: secondMore,
   sections,
-}: ComparePageData & { sections: ReactNode }): JSX.Element {
+}: Omit<ComparePageData, "seo" | "structuredData"> & {
+  sections: ReactNode;
+}): JSX.Element {
   const [swapped, setSwapped] = useState(false);
   const [left, right] = swapped ? [second, first] : [first, second];
+  const [firstPicker, secondPicker] = useMemo(
+    () => [
+      orderPickerModels(pickers.models, pickers.suggestedLeft),
+      orderPickerModels(pickers.models, pickers.suggestedRight),
+    ],
+    [pickers],
+  );
   const [leftPicker, rightPicker] = swapped
     ? [secondPicker, firstPicker]
     : [firstPicker, secondPicker];

@@ -14,7 +14,7 @@ import { Platform } from "next-vibe/platforms/platforms";
 
 import { CREATE_KINDS, type CreateKind } from "./create-kinds";
 import { HUB_HISTORY_PAGE_SIZE } from "./studio-constants";
-import { studioModels } from "./studio-models";
+import { studioModelLists, studioModels } from "./studio-models";
 import type { StudioModel } from "./studio-types";
 
 export interface StudioPageData {
@@ -79,19 +79,18 @@ export async function studioData(
 export async function studioSummaries(
   user: JwtPayloadType,
 ): Promise<StudioKindSummary[]> {
-  return Promise.all(
-    CREATE_KINDS.map(async (kind) => {
-      const models = await studioModels(user, kind);
-      return {
-        kind,
-        count: models.length,
-        // Sorted by rate. Same pick as the tool page's default model, so the
-        // "from" price is what the page opens with.
-        cheapest:
-          models.find(
-            (m) => !m.requiresImage && !isUncensoredContent(m.content),
-          ) ?? models[0],
-      };
-    }),
-  );
+  const lists = await studioModelLists(user, CREATE_KINDS);
+  return CREATE_KINDS.map((kind) => {
+    const models = lists.get(kind) ?? [];
+    return {
+      kind,
+      count: models.length,
+      // Sorted by rate. Same pick as the tool page's default model, so the
+      // "from" price is what the page opens with.
+      cheapest:
+        models.find(
+          (m) => !m.requiresImage && !isUncensoredContent(m.content),
+        ) ?? models[0],
+    };
+  });
 }

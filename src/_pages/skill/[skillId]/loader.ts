@@ -44,6 +44,7 @@ import { Platform } from "next-vibe/platforms/platforms";
 import type { JsonLdNode } from "next-vibe/ui/components/json-ld";
 import { notFound } from "next-vibe/ui/lib/not-found";
 import { permanentRedirect } from "next-vibe/ui/lib/redirect";
+import { cache } from "react";
 
 import {
   buildBreadcrumbList,
@@ -114,21 +115,24 @@ async function indexableSkillPageId(
   );
 }
 
-async function resolveLandingSkill(
-  skillId: string,
-  locale: CountryLanguage,
-  logger: EndpointLogger,
-): Promise<{
+interface LandingSkill {
   user: JwtPayloadType;
   skill: SkillGetResponseOutput;
   baseSkillId: string;
   variantId: string | null;
   indexableId: string | null;
-}> {
+}
+
+// Share the visitor-scoped lookup between Next metadata and the page render.
+const resolveLandingSkill = cache(async function resolveLandingSkill(
+  skillId: string,
+  locale: CountryLanguage,
+): Promise<LandingSkill> {
   const { skillId: baseSkillId, variantId } = parseSkillId(skillId);
   if (!baseSkillId || (variantId === null && isSkillVariantId(skillId))) {
     notFound();
   }
+  const logger = createEndpointLogger(false, locale);
   const user = await getVisitor(locale, logger);
   if (!user) {
     logger.error("Failed to get identity on skill page");
@@ -162,7 +166,7 @@ async function resolveLandingSkill(
     variantId,
     indexableId: await indexableSkillPageId(baseSkillId, skill, logger),
   };
-}
+});
 
 export async function loadSkillPageMetadata({
   params,
@@ -171,9 +175,8 @@ export async function loadSkillPageMetadata({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const logger = createEndpointLogger(false, locale);
   const { skill, baseSkillId, variantId, indexableId } =
-    await resolveLandingSkill(skillId, locale, logger);
+    await resolveLandingSkill(skillId, locale);
   const { name, tagline, description } = skill;
   const displayName = name ?? "";
 
@@ -430,7 +433,7 @@ export async function loadSkillLandingPage({
   const logger = createEndpointLogger(false, locale);
 
   const { user, skill, baseSkillId, variantId, indexableId } =
-    await resolveLandingSkill(skillId, locale, logger);
+    await resolveLandingSkill(skillId, locale);
   const canonicalSkillId = formatSkillId(indexableId ?? baseSkillId, variantId);
   if (canonicalSkillId !== skillId) {
     const query = new URLSearchParams();

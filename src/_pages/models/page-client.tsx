@@ -39,7 +39,10 @@ export function ModelsIndexClient({
   chatModelCount,
   mediaModelCounts,
   directorySection,
-}: ModelsIndexPageData & {
+}: Pick<
+  ModelsIndexPageData,
+  "locale" | "chatModelCount" | "mediaModelCounts"
+> & {
   /** Server-rendered link list of every model page, below the catalog. */
   directorySection: ReactNode;
 }): JSX.Element {
