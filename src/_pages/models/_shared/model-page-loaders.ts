@@ -106,7 +106,7 @@ export function resolveComparePair(
     return null;
   }
   if (left.slug !== a || right.slug !== b) {
-    permanentRedirect(`/${locale}/models/compare/${left.slug}/${right.slug}`);
+    permanentRedirect(`/${locale}${canonicalComparisonPath(left, right)}`);
   }
   return { left, right };
 }

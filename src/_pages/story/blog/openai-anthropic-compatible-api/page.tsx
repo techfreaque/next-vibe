@@ -42,6 +42,7 @@ import type { JSX } from "react";
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
 import { buildDocsSnippets } from "@/_pages/docs/api/snippets";
 import { toModelSlug } from "@/_pages/models/_shared/model-facts";
+import { compareHref } from "@/_pages/models/_shared/model-format";
 import { listMediaFacts } from "@/_pages/models/_shared/model-media-facts";
 import { API_UNLOCK_PATH, getApiAccessPrices } from "@/api-keys/access";
 import {
@@ -530,7 +531,7 @@ export function TanstackPage({
             {COMPARE_PAIRS.map(([a, b]) => (
               <CardLink
                 key={`${a}-${b}`}
-                href={`/${locale}/models/compare/${toModelSlug(a)}/${toModelSlug(b)}`}
+                href={compareHref(locale, a, b)}
                 label={t("picks.compareLink", {
                   a: chatModelDefinitions[a].name,
                   b: chatModelDefinitions[b].name,

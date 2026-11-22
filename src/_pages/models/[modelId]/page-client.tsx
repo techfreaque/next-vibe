@@ -85,7 +85,7 @@ function ChatModelPage({
             <ModelPicker
               locale={locale}
               models={pickerModels}
-              hrefFor={(slug) => compareHref(locale, facts.slug, slug)}
+              hrefFor={(model) => compareHref(locale, facts.id, model.id)}
               label={t("model.compareCta")}
               icon={Scale}
               testId="model-compare-picker"
@@ -168,7 +168,7 @@ function ChatModelPage({
             {comparisons.map((other) => (
               <Link
                 key={other.id}
-                href={compareHref(locale, facts.slug, other.slug)}
+                href={compareHref(locale, facts.id, other.id)}
                 className="group flex min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-card p-4 font-medium shadow-xs transition-colors hover:border-primary/40"
               >
                 <Span className="min-w-0 [overflow-wrap:anywhere]">

@@ -425,9 +425,11 @@ export const FEATURED_COMPARISON_PAIRS: readonly (readonly [
 
 /** Pick one indexable URL for a pair while allowing either on-screen order. */
 export function canonicalComparisonPath(
-  left: ModelRef,
-  right: ModelRef,
+  leftModel: ChatModelId | ModelRef,
+  rightModel: ChatModelId | ModelRef,
 ): string {
+  const left = typeof leftModel === "string" ? toRef(leftModel) : leftModel;
+  const right = typeof rightModel === "string" ? toRef(rightModel) : rightModel;
   const featured = FEATURED_COMPARISON_PAIRS.find(
     ([a, b]) =>
       (a === left.id && b === right.id) || (a === right.id && b === left.id),

@@ -50,6 +50,7 @@ import {
   OWN_WORLDVIEW_UNCENSORED_MODEL_ID,
 } from "@/_pages/models/_shared/model-facts";
 import {
+  compareHref,
   formatMoney,
   priceFootnote,
   tierName,
@@ -491,7 +492,7 @@ export function TanstackPage({
             {pairs.map((pair) => (
               <CardLink
                 key={pair.uncensored.id}
-                href={`/${locale}/models/compare/${pair.base.slug}/${pair.uncensored.slug}`}
+                href={compareHref(locale, pair.base.id, pair.uncensored.id)}
                 label={t("pairs.compareLink", {
                   a: pair.base.name,
                   b: pair.uncensored.name,

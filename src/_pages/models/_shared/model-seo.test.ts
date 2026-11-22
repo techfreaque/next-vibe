@@ -319,6 +319,9 @@ describe("FAQ", () => {
       const slugs = chatModelBlogSlugs(facts);
       expect(slugs.length).toBeLessThanOrEqual(slots);
       expect(new Set(slugs).size).toBe(slugs.length);
+      expect(slugs.includes("best-uncensored-llm")).toBe(
+        facts.content === ContentLevel.UNCENSORED,
+      );
     }
   });
 

@@ -113,6 +113,7 @@ export function TanstackPage(data: ComparePageData): JSX.Element {
     <>
       <JsonLd id="compare-structured-data" data={data.structuredData} />
       <ComparePageClient
+        key={`${data.left.id}/${data.right.id}`}
         {...data}
         sections={
           <ModelSeoSections

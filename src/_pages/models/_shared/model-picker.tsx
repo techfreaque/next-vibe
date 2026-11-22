@@ -31,7 +31,7 @@ interface ModelPickerProps {
   locale: CountryLanguage;
   models: PickerModel[];
   /** Where picking a model goes. */
-  hrefFor: (slug: string) => string;
+  hrefFor: (model: PickerModel) => string;
   /** Trigger label. */
   label: string;
   icon?: IconComponent;
@@ -95,7 +95,7 @@ export function ModelPicker({
             key={model.id}
             model={model}
             locale={locale}
-            href={hrefFor(model.slug)}
+            href={hrefFor(model)}
           />
         ))}
       </Div>

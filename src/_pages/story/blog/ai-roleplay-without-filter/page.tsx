@@ -49,6 +49,7 @@ import type { JSX } from "react";
 
 import { buildFaqStructuredData } from "@/_pages/_components/faq-structured-data";
 import {
+  canonicalComparisonPath,
   formatTokenCount,
   getModelFacts,
 } from "@/_pages/models/_shared/model-facts";
@@ -264,7 +265,7 @@ export async function tanstackLoader({
     }
     return [
       {
-        path: `/models/compare/${factsA.slug}/${factsB.slug}`,
+        path: canonicalComparisonPath(factsA, factsB),
         a: factsA.name,
         b: factsB.name,
       },

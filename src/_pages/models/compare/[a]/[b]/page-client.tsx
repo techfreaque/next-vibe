@@ -1,6 +1,7 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { ArrowRight } from "next-vibe/ui/components/icons/ArrowRight";
 import { Check } from "next-vibe/ui/components/icons/Check";
@@ -11,6 +12,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { H3, P } from "next-vibe/ui/components/typography";
 import { Ul } from "next-vibe/ui/components/ul";
 import type { JSX, ReactNode } from "react";
+import { useState } from "react";
 
 import {
   CardLink,
@@ -44,7 +46,7 @@ function ModelHeader({
 }: {
   facts: ModelFacts;
   pickerModels: PickerModel[];
-  hrefFor: (slug: string) => string;
+  hrefFor: (model: PickerModel) => string;
   locale: CountryLanguage;
   t: ModelsT;
 }): JSX.Element {
@@ -187,15 +189,23 @@ function MoreList({
  */
 export function ComparePageClient({
   locale,
-  left,
-  right,
-  leftPicker,
-  rightPicker,
+  left: first,
+  right: second,
+  leftPicker: firstPicker,
+  rightPicker: secondPicker,
   verdict,
-  moreLeft,
-  moreRight,
+  moreLeft: firstMore,
+  moreRight: secondMore,
   sections,
 }: ComparePageData & { sections: ReactNode }): JSX.Element {
+  const [swapped, setSwapped] = useState(false);
+  const [left, right] = swapped ? [second, first] : [first, second];
+  const [leftPicker, rightPicker] = swapped
+    ? [secondPicker, firstPicker]
+    : [firstPicker, secondPicker];
+  const [moreLeft, moreRight] = swapped
+    ? [secondMore, firstMore]
+    : [firstMore, secondMore];
   const { t } = scopedTranslation.scopedT(locale);
   const leftRows = buildFactRows(left, locale);
   const rightRows = buildFactRows(right, locale);
@@ -208,13 +218,16 @@ export function ComparePageClient({
         title={t("compare.title", { a: left.name, b: right.name })}
         subtitle={t("compare.subtitle")}
         actions={
-          <Cta
-            href={compareHref(locale, right.slug, left.slug)}
-            label={t("compare.swap")}
-            icon={Repeat}
-            variant="secondary"
-            arrow={false}
-          />
+          <Button
+            type="button"
+            size="lg"
+            variant="outline"
+            className="h-12 w-full gap-2 bg-card px-6 text-base font-medium sm:w-auto"
+            onClick={() => setSwapped((value) => !value)}
+          >
+            <Repeat className="h-4 w-4" />
+            {t("compare.swap")}
+          </Button>
         }
       >
         <Div
@@ -251,14 +264,14 @@ export function ComparePageClient({
             <EdgeCard
               facts={left}
               other={right}
-              reasons={verdict.left}
+              reasons={swapped ? verdict.right : verdict.left}
               locale={locale}
               t={t}
             />
             <EdgeCard
               facts={right}
               other={left}
-              reasons={verdict.right}
+              reasons={swapped ? verdict.left : verdict.right}
               locale={locale}
               t={t}
             />
@@ -280,14 +293,14 @@ export function ComparePageClient({
               locale={locale}
               t={t}
               pickerModels={leftPicker}
-              hrefFor={(slug) => compareHref(locale, slug, right.slug)}
+              hrefFor={(model) => compareHref(locale, model.id, right.id)}
             />
             <ModelHeader
               facts={right}
               locale={locale}
               t={t}
               pickerModels={rightPicker}
-              hrefFor={(slug) => compareHref(locale, left.slug, slug)}
+              hrefFor={(model) => compareHref(locale, left.id, model.id)}
             />
           </Div>
           <Div className="divide-y divide-border">

@@ -806,8 +806,8 @@ export function chatModelLanding(facts: ModelFacts): ModelLandingKey | null {
 
 /**
  * Posts that cover this chat model, most specific first: the explainer for
- * its kind of uncensored, roleplay when that is a listed strength, the API
- * and coding-tool guides for callable models. A landing page (see
+ * its kind of uncensored and the best uncensored LLM guide, then roleplay,
+ * API and coding-tool guides where relevant. A landing page (see
  * chatModelLanding) takes one of the MAX_BLOG_LINKS slots.
  */
 export function chatModelBlogSlugs(facts: ModelFacts): BlogPostSlug[] {
@@ -823,6 +823,7 @@ export function chatModelBlogSlugs(facts: ModelFacts): BlogPostSlug[] {
       kind === "abliterated"
         ? "abliterated-vs-uncensored-models"
         : "uncensored-models-what-each-is-good-at",
+      "best-uncensored-llm",
     );
     if (roleplay) {
       candidates.push("ai-roleplay-without-filter");

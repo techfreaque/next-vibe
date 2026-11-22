@@ -15,6 +15,7 @@ import {
   getModelFacts,
   type ModelFacts,
 } from "./model-facts";
+import { compareHref } from "./model-format";
 import { compareMeta } from "./model-seo";
 import { buildCompareStructuredData } from "./model-structured-data";
 
@@ -154,6 +155,14 @@ describe("compare pages", () => {
       const other = factsBySlug(otherSlug ?? "");
       expect(canonicalComparisonPath(lm, other)).toBe(link.path);
     }
+  });
+
+  test("localized compare links use canonical order for either input order", () => {
+    const uncensored = ChatModelId.UNCENSORED_LM_V1_2;
+    const sonnet = ChatModelId.CLAUDE_SONNET_5_5;
+    const canonical = "/de-DE/models/compare/uncensored-lm-v1-2/claude-sonnet-5-5";
+    expect(compareHref("de-DE", sonnet, uncensored)).toBe(canonical);
+    expect(compareHref("de-DE", uncensored, sonnet)).toBe(canonical);
   });
 
   test("read-more links stay within three cards", () => {

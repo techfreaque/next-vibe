@@ -30,6 +30,7 @@ import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
 import { toModelSlug } from "@/_pages/models/_shared/model-facts";
+import { compareHref } from "@/_pages/models/_shared/model-format";
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
@@ -162,10 +163,7 @@ const GROUPS: readonly {
   { key: "fast", cards: ["glm53Flash", "gemma", "mimo"] },
 ];
 
-/**
- * Own-worldview vs refusal-stripped, then vs ChatGPT's model. Same URL
- * order as the sitemap (FEATURED_COMPARISON_PAIRS in model-facts).
- */
+/** Own-worldview vs refusal-stripped, then vs ChatGPT's model. */
 const COMPARE_PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED_ROLEPLAY],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.VENICE_UNCENSORED],
@@ -177,14 +175,6 @@ const COMPARE_PAIRS: readonly (readonly [ChatModelId, ChatModelId])[] = [
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.QWEN_3_6_PLUS_UNCENSORED],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_1_SOL],
 ];
-
-function compareHref(
-  locale: CountryLanguage,
-  a: ChatModelId,
-  b: ChatModelId,
-): string {
-  return `/${locale}/models/compare/${toModelSlug(a)}/${toModelSlug(b)}`;
-}
 
 function modelName(id: ChatModelId): string {
   return chatModelDefinitions[id].name;

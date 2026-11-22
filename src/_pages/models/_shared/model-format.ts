@@ -3,6 +3,7 @@
  * "use client") so page loaders and generateMetadata can call them too.
  */
 
+import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import { scopedTranslation as agentScopedTranslation } from "next-vibe/agent/i18n";
 import type { Modality } from "next-vibe/agent/models/enum";
 import { CHAT_MESSAGE_PRICE_REFERENCE } from "next-vibe/agent/models/models";
@@ -17,7 +18,11 @@ import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 import { getCreditUnitPrice } from "@/products/credit-money";
 
 import { scopedTranslation } from "../i18n";
-import type { ModelFacts, ModelRef } from "./model-facts";
+import {
+  canonicalComparisonPath,
+  type ModelFacts,
+  type ModelRef,
+} from "./model-facts";
 import type { MediaPrice } from "./model-media-facts";
 
 type ModelsT = ReturnType<typeof scopedTranslation.scopedT>["t"];
@@ -455,10 +460,10 @@ export function modelHref(locale: CountryLanguage, slug: string): string {
 
 export function compareHref(
   locale: CountryLanguage,
-  a: string,
-  b: string,
+  a: ChatModelId,
+  b: ChatModelId,
 ): string {
-  return `/${locale}/models/compare/${a}/${b}`;
+  return `/${locale}${canonicalComparisonPath(a, b)}`;
 }
 
 /**
