@@ -9,7 +9,6 @@
 import { Badge } from "next-vibe/ui/components/badge";
 import type { ButtonMouseEvent } from "next-vibe/ui/components/button";
 import { Button } from "next-vibe/ui/components/button";
-import { Dialog, DialogContent } from "next-vibe/ui/components/dialog";
 import { Div } from "next-vibe/ui/components/div";
 import {
   DropdownMenu,
@@ -88,6 +87,10 @@ import {
   useState,
 } from "react";
 
+import {
+  getLocaleLabel,
+  LocalePickerDialog,
+} from "@/_pages/_components/locale-picker";
 import { Logo } from "@/_pages/_components/logo";
 import { ThemeToggleDropdown } from "@/_pages/_components/theme-toggle";
 import {
@@ -114,7 +117,6 @@ import { endpointToUrlSegment } from "../core/core-utils/path";
 import type { NavigationStackEntry } from "../core/definition/endpoint";
 import type { CreateApiEndpointAny } from "../core/definition/endpoint-base";
 import { coreClientEnv } from "../core/env-client";
-import { useTranslation } from "../core/i18n/core/client";
 import { permissionsRegistry } from "../core/permissions/registry";
 import { parseError } from "../core/utils/parse-error";
 import { EXECUTE_TOOL_ALIAS } from "../execute-tool/constants";
@@ -769,7 +771,7 @@ export function HelpToolsWidget(): JSX.Element {
     ? setMobileSidebarCollapsed
     : setDesktopSidebarCollapsed;
 
-  const translationContext = useTranslation();
+  const localeLabel = getLocaleLabel(locale);
 
   // ── Active favorite tool config (cascade: favorite → skill → system defaults) ──
 
@@ -2995,11 +2997,12 @@ export function HelpToolsWidget(): JSX.Element {
     return (
       <>
         <Div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background">
-          <Dialog open={localeDialogOpen} onOpenChange={setLocaleDialogOpen}>
-            <DialogContent className="max-w-md">
-              <LocaleSelectorContent />
-            </DialogContent>
-          </Dialog>
+          <LocalePickerDialog
+            locale={locale}
+            user={user}
+            open={localeDialogOpen}
+            onOpenChange={setLocaleDialogOpen}
+          />
 
           <Div
             id="admin-tools-toolbar"
@@ -3043,10 +3046,8 @@ export function HelpToolsWidget(): JSX.Element {
                   <Div className="hidden md:block">
                     <DropdownMenuSub>
                       <DropdownMenuSubTrigger className="cursor-pointer">
-                        <Span className="mr-2">
-                          {translationContext.currentCountry.flag}
-                        </Span>
-                        <Span>{translationContext.currentCountry.name}</Span>
+                        <Span className="mr-2">{localeLabel.flag}</Span>
+                        <Span>{localeLabel.text}</Span>
                       </DropdownMenuSubTrigger>
                       <DropdownMenuSubContent>
                         <LocaleSelectorContent />
@@ -3061,10 +3062,8 @@ export function HelpToolsWidget(): JSX.Element {
                     }}
                   >
                     <Div className="flex items-center">
-                      <Span className="mr-2">
-                        {translationContext.currentCountry.flag}
-                      </Span>
-                      <Span>{translationContext.currentCountry.name}</Span>
+                      <Span className="mr-2">{localeLabel.flag}</Span>
+                      <Span>{localeLabel.text}</Span>
                     </Div>
                     <ChevronRight className="h-4 w-4 ml-auto" />
                   </DropdownMenuItem>

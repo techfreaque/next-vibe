@@ -1,6 +1,5 @@
 "use client";
 
-import { LocaleSelectorContent } from "next-vibe/agent/ai-stream/stream/widget/chat-ui/top-area/locale-selector-content";
 import chatSettingsDef from "next-vibe/agent/chat/settings/definition";
 import { useChatSettings } from "next-vibe/agent/chat/settings/hooks";
 import { useProviderAvailability } from "next-vibe/agent/env-availability-store";
@@ -25,7 +24,6 @@ import {
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
-import { Dialog, DialogContent } from "next-vibe/ui/components/dialog";
 import { Div } from "next-vibe/ui/components/div";
 import { Form } from "next-vibe/ui/components/form/form";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
@@ -111,6 +109,7 @@ import {
   useState,
 } from "react";
 
+import { LocalePickerDialog } from "@/_pages/_components/locale-picker";
 import {
   ProfileBio,
   ProfileSocialPills,
@@ -382,13 +381,14 @@ function ThemeSegmented(): JSX.Element {
 
 /**
  * Appearance group: theme + language. Web-only — scoped into its own component
- * so the theme/locale hooks never run on headless platforms. Language reuses the
- * shared LocaleSelectorContent (the same control the top-bar opens), so it
- * switches locale through the exact same mechanism.
+ * so the theme/locale hooks never run on headless platforms. Language opens the
+ * shared locale picker (modal on desktop, bottom sheet on phone), the same
+ * control as the navbar and the chat menu.
  */
 function AppearanceSection(): JSX.Element {
   const t = useWidgetTranslation<typeof meDefinition.POST>();
-  const { currentCountry } = useTranslation();
+  const { currentCountry, locale } = useTranslation();
+  const user = useWidgetUser();
   const [langOpen, setLangOpen] = useState(false);
 
   return (
@@ -415,11 +415,12 @@ function AppearanceSection(): JSX.Element {
           }}
         />
       </HubSection>
-      <Dialog open={langOpen} onOpenChange={setLangOpen}>
-        <DialogContent className="max-w-md">
-          <LocaleSelectorContent />
-        </DialogContent>
-      </Dialog>
+      <LocalePickerDialog
+        locale={locale}
+        user={user}
+        open={langOpen}
+        onOpenChange={setLangOpen}
+      />
     </>
   );
 }

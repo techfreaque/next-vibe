@@ -9,7 +9,6 @@
 "use client";
 
 import { platform } from "next-vibe/core/env-client";
-import { useTranslation } from "next-vibe/core/i18n/core/client";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   AlertDialog,
@@ -278,7 +277,6 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
   const widgetPlatform = useWidgetPlatform();
-  const { currentCountry } = useTranslation();
   const { initialPublicFeedData } = useChatBootContext();
 
   const currentRootFolderId = useChatNavigationStore(
@@ -362,7 +360,7 @@ export function AiStreamWidget(_props: CustomWidgetProps): JSX.Element {
       >
         {/* Top Bar */}
         <ErrorBoundary locale={locale}>
-          <TopBar currentCountry={currentCountry} locale={locale} />
+          <TopBar locale={locale} />
         </ErrorBoundary>
 
         {/* Sidebar + main content */}

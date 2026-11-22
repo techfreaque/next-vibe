@@ -5,7 +5,7 @@ import { Div } from "next-vibe/ui/components/div";
 import { Nav } from "next-vibe/ui/components/nav";
 import type { JSX } from "react";
 
-import CountrySelector from "../../../_components/country-selector";
+import { LocalePicker } from "../../../_components/locale-picker";
 import { Logo } from "../../../_components/logo";
 import { ThemeToggle } from "../../../_components/theme-toggle";
 import { AppEntryButton } from "./app-entry-button";
@@ -59,7 +59,7 @@ export function Navbar({
             <ThemeToggle locale={locale} />
           </Div>
 
-          <CountrySelector isNavBar locale={locale} user={user} />
+          <LocalePicker locale={locale} user={user} />
 
           {/* Auth buttons display logic */}
           {!hideUserMenu && (

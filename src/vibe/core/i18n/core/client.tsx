@@ -39,6 +39,8 @@ interface TranslationContextType {
   countries: readonly CountryInfo[];
   currentCountry: CountryInfo;
   changeLocale: (country: Countries, language?: Languages) => void;
+  /** Set language and region together, in one navigation, unconstrained. */
+  setLocale: (locale: CountryLanguage) => void;
 }
 
 // Default no-op handlers for context initialization
@@ -54,6 +56,10 @@ function defaultChangeLocale(): void {
   // No-op default - overridden by provider
 }
 
+function defaultSetLocale(): void {
+  // No-op default - overridden by provider
+}
+
 // Create context with default values
 const TranslationContext = createContext<TranslationContextType>({
   language: defaultLocaleConfig.language,
@@ -64,6 +70,7 @@ const TranslationContext = createContext<TranslationContextType>({
   countries: availableCountries,
   currentCountry: globalCountryInfo,
   changeLocale: defaultChangeLocale,
+  setLocale: defaultSetLocale,
 });
 
 // Translation provider props
@@ -183,6 +190,16 @@ export function TranslationProvider({
     navigateToLocale(newLocale);
   };
 
+  // Exact language + region pair, one storage write, one navigation
+  const setLocale = async (newLocale: CountryLanguage): Promise<void> => {
+    if (!mounted) {
+      return;
+    }
+    await storage.setItem(LOCALE_COOKIE_NAME, newLocale, logger);
+    await setCookie(LOCALE_COOKIE_NAME, newLocale, logger);
+    navigateToLocale(newLocale);
+  };
+
   // Simple mount effect - only save current locale if none exists
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -216,6 +233,7 @@ export function TranslationProvider({
         countries: availableCountries,
         currentCountry,
         changeLocale,
+        setLocale,
       }}
     >
       {children}

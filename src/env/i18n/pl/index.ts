@@ -49,10 +49,6 @@ export const translations: typeof enTranslations = {
     US: "America/New_York",
     GLOBAL: "UTC",
   },
-  selector: {
-    country: "Country",
-    language: "Language",
-  },
   error: {
     title: "Something went wrong",
     message: "An unexpected error occurred. Please refresh the page.",
@@ -61,11 +57,11 @@ export const translations: typeof enTranslations = {
   },
   countries: {
     ...regionalCountryNames("pl"),
-    global: "Global",
-    de: "Germany",
-    pl: "Poland",
-    fr: "France",
-    us: "United States",
+    global: "Globalnie",
+    de: "Niemcy",
+    pl: "Polska",
+    fr: "Francja",
+    us: "Stany Zjednoczone",
     it: "Włochy",
     es: "Hiszpania",
   },

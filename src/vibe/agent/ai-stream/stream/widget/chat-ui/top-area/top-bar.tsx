@@ -29,6 +29,10 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage"
 import type { JSX } from "react";
 import { useCallback, useState, useSyncExternalStore } from "react";
 
+import {
+  getLocaleLabel,
+  LocalePickerDialog,
+} from "@/_pages/_components/locale-picker";
 import { Logo } from "@/_pages/_components/logo";
 import { ThemeToggleDropdown } from "@/_pages/_components/theme-toggle";
 
@@ -55,11 +59,10 @@ function useIsMounted(): boolean {
 }
 
 interface TopBarProps {
-  currentCountry: { flag: string; name: string };
   locale: CountryLanguage;
 }
 
-export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
+export function TopBar({ locale }: TopBarProps): JSX.Element {
   const { pushState } = useSilentHistory();
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
   const currentRootFolderId = useChatNavigationStore(
@@ -120,16 +123,18 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
   const logger = useWidgetLogger();
   const platform = useWidgetPlatform();
   const consent = useUncensoredConsent(user, logger);
+  const localeLabel = getLocaleLabel(locale);
 
   // Prevent hydration mismatch by only rendering conditional UI after mount
 
   return (
     <>
-      <Dialog open={localeDialogOpen} onOpenChange={setLocaleDialogOpen}>
-        <DialogContent className="max-w-md">
-          <LocaleSelectorContent />
-        </DialogContent>
-      </Dialog>
+      <LocalePickerDialog
+        locale={locale}
+        user={user}
+        open={localeDialogOpen}
+        onOpenChange={setLocaleDialogOpen}
+      />
 
       {/* Uncensored-model consent: status + withdraw / unlock */}
       <Dialog open={consentDialogOpen} onOpenChange={setConsentDialogOpen}>
@@ -181,8 +186,8 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
             <Div className="hidden md:block">
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger className="cursor-pointer">
-                  <Span className="mr-2">{currentCountry.flag}</Span>
-                  <Span>{currentCountry.name}</Span>
+                  <Span className="mr-2">{localeLabel.flag}</Span>
+                  <Span>{localeLabel.text}</Span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                   <LocaleSelectorContent />
@@ -197,8 +202,8 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
               }}
             >
               <Div className="flex items-center">
-                <Span className="mr-2">{currentCountry.flag}</Span>
-                <Span>{currentCountry.name}</Span>
+                <Span className="mr-2">{localeLabel.flag}</Span>
+                <Span>{localeLabel.text}</Span>
               </Div>
               <ChevronRight className="h-4 w-4 ml-auto" />
             </DropdownMenuItem>

@@ -49,10 +49,6 @@ export const translations: typeof enTranslations = {
     US: "America/New_York",
     GLOBAL: "UTC",
   },
-  selector: {
-    country: "País",
-    language: "Idioma",
-  },
   error: {
     title: "Algo salió mal",
     message: "Ocurrió un error inesperado. Actualiza la página.",

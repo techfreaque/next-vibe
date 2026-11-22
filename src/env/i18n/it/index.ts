@@ -48,10 +48,6 @@ export const translations: typeof enTranslations = {
     US: "America/New_York",
     GLOBAL: "UTC",
   },
-  selector: {
-    country: "Paese",
-    language: "Lingua",
-  },
   error: {
     title: "Qualcosa è andato storto",
     message: "Si è verificato un errore imprevisto. Aggiorna la pagina.",
