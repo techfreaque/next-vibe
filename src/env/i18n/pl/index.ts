@@ -50,10 +50,11 @@ export const translations: typeof enTranslations = {
     GLOBAL: "UTC",
   },
   error: {
-    title: "Something went wrong",
-    message: "An unexpected error occurred. Please refresh the page.",
-    tryAgain: "Try Again",
-    description: "Please try again or contact support if the problem persists.",
+    title: "Coś poszło nie tak",
+    message: "Wystąpił nieoczekiwany błąd. Odśwież stronę.",
+    tryAgain: "Spróbuj ponownie",
+    description:
+      "Spróbuj jeszcze raz albo napisz do supportu, jeśli problem nie znika.",
   },
   countries: {
     ...regionalCountryNames("pl"),
@@ -66,10 +67,10 @@ export const translations: typeof enTranslations = {
     es: "Hiszpania",
   },
   languages: {
-    en: "English",
-    de: "German",
-    pl: "Polish",
-    fr: "French",
+    en: "Angielski",
+    de: "Niemiecki",
+    pl: "Polski",
+    fr: "Francuski",
     it: "Włoski",
     es: "Hiszpański",
   },
