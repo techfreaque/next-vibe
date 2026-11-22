@@ -4,7 +4,7 @@
  * Following interface + implementation pattern
  */
 
-import { and, desc, eq, gt, inArray, isNull, ne, or, sql } from "drizzle-orm";
+import { and, desc, eq, gt, inArray, isNull, sql } from "drizzle-orm";
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 
 import { getFullPath } from "../../core/core-utils/path";
@@ -27,8 +27,14 @@ import type { EndpointLogger } from "../../logger/types";
 import { Platform } from "../../platforms/platforms";
 import { isDrainRequested } from "../../platforms/web/drain";
 import { splitTaskArgs } from "../cron/arg-splitter";
-import { cronTasks as cronTasksTable, dbUserIdToOwner } from "../cron/db";
+import {
+  cronTaskExecutions,
+  type CronTaskRow,
+  cronTasks as cronTasksTable,
+  dbUserIdToOwner,
+} from "../cron/db";
 import { createTaskEmitters } from "../cron/emitter";
+import { isStuckTask } from "../cron/health-summary";
 import { CronTasksRepository } from "../cron/repository";
 import { resolveTaskOwnerUser } from "../cron/resolve-task-user";
 import { isCronTaskDue } from "../cron-formatter";
@@ -43,6 +49,7 @@ import {
   scopedTranslation,
   scopedTranslation as tasksScopedTranslation,
 } from "../i18n";
+import { TASK_WATCHDOG_SELF_ID } from "../watchdog/config";
 import { TaskIncidentType } from "../watchdog/enum";
 import { TaskGuard } from "../watchdog/guard";
 import { PhaseProfiler } from "../watchdog/phase-profiler";
@@ -85,6 +92,18 @@ function beginProfiledTaskPhase(
     endPhase();
     endProfile();
   };
+}
+
+function canClaimTask(task: CronTaskRow, now: Date): boolean {
+  // The sweep reaps other tasks. The pulse has to recover an abandoned sweep
+  // before another one can start.
+  return (
+    task.lastExecutionStatus !== CronTaskStatus.RUNNING ||
+    (task.id === TASK_WATCHDOG_SELF_ID &&
+      !RunningTaskRegistry.has(task.id) &&
+      // Both runners persist a start time when claiming a live run.
+      (task.runStartedAt === null || isStuckTask(task, now)))
+  );
 }
 
 export class PulseHealthRepository {
@@ -310,7 +329,7 @@ export class PulseHealthRepository {
         );
 
         // Discover which tasks are due
-        for (const dbTask of passTasks) {
+        for (let dbTask of passTasks) {
           if (seenTaskIds.has(dbTask.id)) {
             continue;
           }
@@ -346,7 +365,7 @@ export class PulseHealthRepository {
           }
 
           // Overlap prevention: skip if this task is still running from a previous pulse
-          if (dbTask.lastExecutionStatus === CronTaskStatus.RUNNING) {
+          if (!canClaimTask(dbTask, now)) {
             tasksSkipped.push(dbTask.displayName);
             logger.debug(
               `Pulse: skipping task "${dbTask.displayName}" - still running from previous pulse`,
@@ -369,34 +388,55 @@ export class PulseHealthRepository {
               .where(
                 and(
                   eq(cronTasksTable.id, dbTask.id),
-                  // NULL != 'running' is NULL in SQL (three-value logic) - must explicitly handle NULL
-                  or(
-                    isNull(cronTasksTable.lastExecutionStatus),
-                    ne(
-                      cronTasksTable.lastExecutionStatus,
-                      CronTaskStatus.RUNNING,
-                    ),
-                  ),
+                  eq(cronTasksTable.enabled, true),
                 ),
               )
               .for("update", { skipLocked: true })
               .limit(1);
 
-            if (!row) {
+            if (!row || !canClaimTask(row, now)) {
               return null;
+            }
+
+            const claimedAt = new Date();
+            const recovered =
+              row.lastExecutionStatus === CronTaskStatus.RUNNING;
+            if (recovered) {
+              const abandonedAt = row.runStartedAt ?? row.updatedAt;
+              await tx.insert(cronTaskExecutions).values({
+                taskId: row.id,
+                taskName: row.displayName,
+                executionId: crypto.randomUUID(),
+                status: CronTaskStatus.TIMEOUT,
+                priority: row.priority,
+                startedAt: abandonedAt,
+                completedAt: claimedAt,
+                config: row.taskInput,
+                error: failInline({
+                  message: "Watchdog run expired before completion",
+                  errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                }),
+                triggeredBy: "pulse",
+              });
             }
 
             await tx
               .update(cronTasksTable)
               .set({
                 lastExecutionStatus: CronTaskStatus.RUNNING,
-                runStartedAt: new Date(),
-                ...(dbTask.runOnce ? { enabled: false } : {}),
-                updatedAt: new Date(),
+                runStartedAt: claimedAt,
+                ...(row.runOnce ? { enabled: false } : {}),
+                ...(recovered
+                  ? {
+                      executionCount: sql`${cronTasksTable.executionCount} + 1`,
+                      errorCount: sql`${cronTasksTable.errorCount} + 1`,
+                    }
+                  : {}),
+                updatedAt: claimedAt,
               })
               .where(eq(cronTasksTable.id, dbTask.id));
 
-            return row;
+            return { row, claimedAt };
           });
 
           if (!claimed) {
@@ -406,6 +446,15 @@ export class PulseHealthRepository {
             );
             continue;
           }
+
+          dbTask = claimed.row;
+          // A late sweep cannot clear a newer pulse's watchdog claim.
+          const claimFilter = and(
+            eq(cronTasksTable.id, dbTask.id),
+            dbTask.id === TASK_WATCHDOG_SELF_ID
+              ? eq(cronTasksTable.runStartedAt, claimed.claimedAt)
+              : undefined,
+          );
 
           if (dbTask.runOnce) {
             logger.debug(
@@ -448,6 +497,18 @@ export class PulseHealthRepository {
                   : " (check VIBE_ADMIN_USER_EMAIL)"
               }`,
             );
+            await db
+              .update(cronTasksTable)
+              .set({
+                lastExecutedAt: claimed.claimedAt,
+                lastExecutionStatus: CronTaskStatus.FAILED,
+                runStartedAt: null,
+                consecutiveFailures: sql`${cronTasksTable.consecutiveFailures} + 1`,
+                executionCount: sql`${cronTasksTable.executionCount} + 1`,
+                errorCount: sql`${cronTasksTable.errorCount} + 1`,
+                updatedAt: new Date(),
+              })
+              .where(claimFilter);
             continue;
           }
 
@@ -512,7 +573,7 @@ export class PulseHealthRepository {
                 errorCount: sql`${cronTasksTable.errorCount} + 1`,
                 updatedAt: new Date(),
               })
-              .where(eq(cronTasksTable.id, dbTask.id));
+              .where(claimFilter);
             const { emitTaskList, emitTaskQueue } = createTaskEmitters(
               logger,
               cronUser,
@@ -730,7 +791,7 @@ export class PulseHealthRepository {
                   if (attempt === 0 && execResponse.success) {
                     firstExecutionId = execResponse.data.id;
                   }
-                  didLogHistory = true;
+                  didLogHistory ||= execResponse.success;
                 }
 
                 finalDurationMs += attemptDuration;
@@ -876,7 +937,7 @@ export class PulseHealthRepository {
                   ...(didLogHistory ? { lastHistoryLoggedAt: new Date() } : {}),
                   updatedAt: new Date(),
                 })
-                .where(eq(cronTasksTable.id, dbTask.id));
+                .where(claimFilter);
 
               // Emit task-updated (final status) to WS subscribers
               {
@@ -924,7 +985,7 @@ export class PulseHealthRepository {
                   consecutiveFailures: catchConsecutiveFailures,
                   updatedAt: new Date(),
                 })
-                .where(eq(cronTasksTable.id, dbTask.id));
+                .where(claimFilter);
 
               // Emit task-updated (FAILED) to WS subscribers
               {

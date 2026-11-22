@@ -3,6 +3,7 @@ import { afterAll, beforeAll, expect, mock, test } from "bun:test";
 import { drizzle } from "drizzle-orm/pglite";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { Platform } from "next-vibe/platforms/platforms";
 import { AnalyticsRange } from "next-vibe/unified-ui/analytics/enum";
 import { resolveAnalyticsWindow } from "next-vibe/unified-ui/analytics/window";
 
@@ -162,6 +163,61 @@ test("breakdowns use filter-ready keys and classify bot families", async () => {
     LeadDimension.SOURCE,
   );
   expect(noSource[0]?.metrics.leads).toBe(16);
+});
+
+test("acquisition renders the response dimension in CLI and MCP breakdown headers", async () => {
+  await import("next-vibe/platforms/cli/runtime/cli-widget-plugin");
+  const { CliResultFormatter } = await import(
+    "next-vibe/unified-ui/renderers/cli/response/result-formatter"
+  );
+  const { default: definition } = await import("./acquisition/definition");
+  const { AcquisitionReportRepository } = await import(
+    "./acquisition/repository"
+  );
+  const logger = createEndpointLogger(false, defaultLocale);
+  const { t } = definition.GET.scopedTranslation.scopedT(defaultLocale);
+  const window = {
+    range: AnalyticsRange.CUSTOM,
+    from: "2026-11-15",
+    to: "2026-11-21",
+  };
+
+  const defaultReport = await AcquisitionReportRepository.getReport(
+    definition.GET.requestSchema.parse(window),
+    t,
+    logger,
+  );
+  expect(defaultReport.success && defaultReport.data.dimensionUsed).toBe(
+    LeadDimension.CHANNEL,
+  );
+
+  const report = await AcquisitionReportRepository.getReport(
+    definition.GET.requestSchema.parse({
+      ...window,
+      dimension: LeadDimension.COUNTRY,
+    }),
+    t,
+    logger,
+  );
+  expect(report.success).toBe(true);
+  if (!report.success) {
+    return;
+  }
+  const data = definition.GET.responseSchema.parse(report.data);
+  expect(data.dimensionUsed).toBe(LeadDimension.COUNTRY);
+  expect(data.breakdown.map((row) => row.key)).toContain("BR");
+
+  for (const platform of [Platform.CLI, Platform.MCP]) {
+    const output = await CliResultFormatter.renderWithEndpoint(
+      data,
+      definition.GET,
+      defaultLocale,
+      logger,
+      { isPublic: true, leadId: id(1), roles: [] },
+      platform,
+    );
+    expect(output).toMatch(/Visitor country\s*\|?\s*Leads/);
+  }
 });
 
 test("abuse report flags the /24 burst and non-user free-credit burn", async () => {

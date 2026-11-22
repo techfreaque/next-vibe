@@ -6,6 +6,12 @@ import { describe, expect, it } from "bun:test";
 
 import { Command } from "commander";
 
+import creditsHistory from "@/credits/history/definition";
+import referrals from "@/subscription/admin/referrals/definition";
+
+import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
+import { defaultLocale } from "../../../core/i18n/core/config";
+import { createEndpointLogger } from "../../../logger/server";
 import { resolveInputPath } from "./input-path";
 import { CliInputParser } from "./parsing";
 
@@ -70,6 +76,38 @@ describe("CliInputParser.parseCliArgumentsSimple", () => {
       "--flag=true",
     ]);
     expect(parsed.namedArgs).toEqual({ count: 3, flag: true });
+  });
+});
+
+describe("CliInputParser.collectCliRequestData", () => {
+  const collect = (
+    rawTokens: string[],
+    endpoint: CreateApiEndpointAny = creditsHistory.GET,
+  ) =>
+    CliInputParser.collectCliRequestData(
+      endpoint,
+      { positionalArgs: [], namedArgs: {}, rawTokens, interactive: false },
+      createEndpointLogger(false, defaultLocale),
+    );
+
+  it("materializes the omitted pagination group from the endpoint defaults", async () => {
+    expect((await collect([])).data?.paginationInfo).toEqual({
+      page: 1,
+      limit: 50,
+    });
+    expect((await collect([], referrals.GET)).data?.paginationInfo).toEqual({
+      page: 1,
+      limit: 20,
+    });
+  });
+
+  it("preserves dotted and JSON pagination overrides", async () => {
+    const dotted = await collect(["--paginationInfo.page=3"]);
+    expect(
+      creditsHistory.GET.requestSchema.parse(dotted.data).paginationInfo,
+    ).toEqual({ page: 3, limit: 50 });
+    const json = await collect(['--paginationInfo={"page":4,"limit":10}']);
+    expect(json.data?.paginationInfo).toEqual({ page: 4, limit: 10 });
   });
 });
 

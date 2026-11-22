@@ -375,6 +375,7 @@ export class AcquisitionReportRepository {
         coverage(),
       ]);
       return success({
+        dimensionUsed: dimension,
         window: serializeWindow(win),
         kpis: core.kpis,
         trend: core.trend,

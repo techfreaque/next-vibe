@@ -81,7 +81,8 @@ export function AcquisitionReportWidget(): JSX.Element {
     ipPrefix: form.watch("ipPrefix"),
     uaFingerprint: form.watch("uaFingerprint"),
   };
-  const dimension = form.watch("dimension") ?? LeadDimension.CHANNEL;
+  const dimension =
+    form.watch("dimension") ?? value?.dimensionUsed ?? LeadDimension.CHANNEL;
 
   const submit = (): void => {
     onSubmit?.();
@@ -421,7 +422,7 @@ export function AcquisitionReportWidget(): JSX.Element {
           <BreakdownTable
             title={t("widget.breakdownTitle")}
             subtitle={t("widget.breakdownSubtitle")}
-            dimensionLabel={st(DIMENSION_LABEL[dimension])}
+            dimensionLabel={st(DIMENSION_LABEL[value.dimensionUsed])}
             columns={breakdownColumns}
             locale={locale}
             emptyLabel={t("widget.empty")}
@@ -433,7 +434,7 @@ export function AcquisitionReportWidget(): JSX.Element {
               onClick: () =>
                 drill({
                   ...filters,
-                  ...dimensionFilter(dimension, row.key),
+                  ...dimensionFilter(value.dimensionUsed, row.key),
                   ...inWindow,
                 }),
             }))}

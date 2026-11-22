@@ -5,7 +5,7 @@
 
 import { readFileSync } from "node:fs";
 
-import type { z } from "zod";
+import { z } from "zod";
 
 import { isEmptySchema } from "../../../core/core-utils/validation";
 import type { CreateApiEndpointAny } from "../../../core/definition/endpoint-base";
@@ -15,6 +15,7 @@ import { WidgetDataSchema } from "../../../core/utils/json";
 import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
 import { hasChildren } from "../../../unified-ui/_shared/type-guards";
+import { extractSchemaDefaults } from "../../../unified-ui/_shared/utils";
 import { SchemaUIHandler } from "../../../unified-ui/renderers/cli/response/schema-handler";
 import { resolveInputPath } from "./input-path";
 
@@ -528,6 +529,7 @@ export class CliInputParser {
       if (
         directType === "optional" ||
         directType === "default" ||
+        directType === "prefault" ||
         directType === "nullable"
       ) {
         // Unwrap to inner - check .def.innerType for v4
@@ -547,6 +549,7 @@ export class CliInputParser {
         if (
           defType === "optional" ||
           defType === "default" ||
+          defType === "prefault" ||
           defType === "nullable"
         ) {
           return this.resolveZodType(readZodObject(def, "innerType"));
@@ -841,6 +844,43 @@ export class CliInputParser {
     return Object.keys(data).length > 0 ? data : null;
   }
 
+  /** Populate omitted request groups from their declared defaults. */
+  private static applyRequestGroupDefaults(
+    data: Record<string, WidgetData>,
+    schema: z.ZodTypeAny | undefined,
+    logger: EndpointLogger,
+  ): void {
+    if (!(schema instanceof z.ZodObject)) {
+      return;
+    }
+
+    for (const [key, field] of Object.entries(schema.shape)) {
+      if (data[key] !== undefined) {
+        continue;
+      }
+      const group = field instanceof z.ZodPrefault ? field.unwrap() : field;
+      if (!(group instanceof z.ZodObject)) {
+        continue;
+      }
+
+      const defaults = extractSchemaDefaults<Record<string, WidgetData>>(
+        group,
+        logger,
+      );
+      if (field instanceof z.ZodPrefault) {
+        // Keep pre-parse input raw. The handler still owns coercion and validation.
+        const input = z
+          .record(z.string(), WidgetDataSchema)
+          .safeParse(field.def.defaultValue);
+        if (input.success) {
+          data[key] = { ...defaults, ...input.data };
+        }
+      } else if (defaults && Object.keys(defaults).length > 0) {
+        data[key] = defaults;
+      }
+    }
+  }
+
   /**
    * Collect input data using schema-driven UI
    */
@@ -939,9 +979,14 @@ export class CliInputParser {
         formData,
       );
     } else {
-      // No CLI data - let schema defaults apply (don't force CLI defaults)
       inputData.data = {};
     }
+
+    CliInputParser.applyRequestGroupDefaults(
+      inputData.data,
+      endpoint?.requestSchema,
+      logger,
+    );
 
     // Collect URL parameters if needed
     if (endpoint?.requestUrlPathParamsSchema && !urlPathParams) {

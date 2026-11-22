@@ -115793,6 +115793,68 @@
           },
           "schemaType": "primitive"
         },
+        "dimensionUsed": {
+          "type": "text",
+          "label": "Desglosar por",
+          "schema": {
+            "def": {
+              "type": "enum",
+              "entries": {
+                "CHANNEL_TYPE": "leadAnalytics.dimension.channelType",
+                "CHANNEL": "leadAnalytics.dimension.channel",
+                "SOURCE": "leadAnalytics.dimension.source",
+                "MEDIUM": "leadAnalytics.dimension.medium",
+                "CAMPAIGN": "leadAnalytics.dimension.campaign",
+                "REFERRER_HOST": "leadAnalytics.dimension.referrerHost",
+                "LANDING_PATH": "leadAnalytics.dimension.landingPath",
+                "REF_CODE": "leadAnalytics.dimension.refCode",
+                "COUNTRY": "leadAnalytics.dimension.country",
+                "LOCALE_COUNTRY": "leadAnalytics.dimension.localeCountry",
+                "DEVICE": "leadAnalytics.dimension.device",
+                "BROWSER": "leadAnalytics.dimension.browser",
+                "OS": "leadAnalytics.dimension.os",
+                "BOT_FAMILY": "leadAnalytics.dimension.botFamily"
+              }
+            },
+            "type": "enum",
+            "enum": {
+              "CHANNEL_TYPE": "leadAnalytics.dimension.channelType",
+              "CHANNEL": "leadAnalytics.dimension.channel",
+              "SOURCE": "leadAnalytics.dimension.source",
+              "MEDIUM": "leadAnalytics.dimension.medium",
+              "CAMPAIGN": "leadAnalytics.dimension.campaign",
+              "REFERRER_HOST": "leadAnalytics.dimension.referrerHost",
+              "LANDING_PATH": "leadAnalytics.dimension.landingPath",
+              "REF_CODE": "leadAnalytics.dimension.refCode",
+              "COUNTRY": "leadAnalytics.dimension.country",
+              "LOCALE_COUNTRY": "leadAnalytics.dimension.localeCountry",
+              "DEVICE": "leadAnalytics.dimension.device",
+              "BROWSER": "leadAnalytics.dimension.browser",
+              "OS": "leadAnalytics.dimension.os",
+              "BOT_FAMILY": "leadAnalytics.dimension.botFamily"
+            },
+            "options": [
+              "leadAnalytics.dimension.channelType",
+              "leadAnalytics.dimension.channel",
+              "leadAnalytics.dimension.source",
+              "leadAnalytics.dimension.medium",
+              "leadAnalytics.dimension.campaign",
+              "leadAnalytics.dimension.referrerHost",
+              "leadAnalytics.dimension.landingPath",
+              "leadAnalytics.dimension.refCode",
+              "leadAnalytics.dimension.country",
+              "leadAnalytics.dimension.localeCountry",
+              "leadAnalytics.dimension.device",
+              "leadAnalytics.dimension.browser",
+              "leadAnalytics.dimension.os",
+              "leadAnalytics.dimension.botFamily"
+            ]
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "window": {
           "type": "text",
           "label": "Periodo",

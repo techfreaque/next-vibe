@@ -6426,6 +6426,7 @@ export const endpointsMeta: EndpointMeta[] = [
       },
       responses: {
         default: {
+          dimensionUsed: "leadAnalytics.dimension.channel",
           window: {
             from: "2026-10-23",
             to: "2026-11-21",
@@ -6466,6 +6467,7 @@ export const endpointsMeta: EndpointMeta[] = [
           coverage: { visitsSince: "2026-11-07", journeysSince: "2026-08-29" },
         },
         bots: {
+          dimensionUsed: "leadAnalytics.dimension.botFamily",
           window: {
             from: "2026-10-23",
             to: "2026-11-21",
@@ -6493,8 +6495,8 @@ export const endpointsMeta: EndpointMeta[] = [
           },
           breakdown: [
             {
-              key: "direct",
-              metrics: { visits: 900, leads: 700, botShare: 0.4, signups: 20 },
+              key: "leadAnalytics.botFamily.automation",
+              metrics: { visits: 18, leads: 32, botShare: 1, signups: 0 },
             },
           ],
           agents: [

@@ -27,7 +27,12 @@ import {
 } from "next-vibe/unified-ui/analytics/schema";
 import { z } from "zod";
 
-import { LeadDimension, LeadDimensionOptions, TrafficFilter } from "../enum";
+import {
+  BotFamily,
+  LeadDimension,
+  LeadDimensionOptions,
+  TrafficFilter,
+} from "../enum";
 import { leadSegmentFields } from "../filters";
 import { ACQUISITION_REPORT_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
@@ -50,6 +55,7 @@ const kpis = z.object({
 
 const exampleKpi = { value: 120, previous: 100 };
 const exampleResponse = {
+  dimensionUsed: LeadDimension.CHANNEL,
   window: {
     from: "2026-10-23",
     to: "2026-11-21",
@@ -126,6 +132,11 @@ const { GET } = createEndpoint({
         options: LeadDimensionOptions,
         columns: 3,
         schema: z.enum(LeadDimension).optional(),
+      }),
+      dimensionUsed: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "leadAnalytics.dimension.label",
+        schema: z.enum(LeadDimension),
       }),
       window: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -218,7 +229,16 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: exampleResponse,
-      bots: exampleResponse,
+      bots: {
+        ...exampleResponse,
+        dimensionUsed: LeadDimension.BOT_FAMILY,
+        breakdown: [
+          {
+            key: BotFamily.AUTOMATION,
+            metrics: { visits: 18, leads: 32, botShare: 1, signups: 0 },
+          },
+        ],
+      },
     },
   },
 });
