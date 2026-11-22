@@ -57,7 +57,12 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
-import { db, rawPool, trackPendingDbWork } from "next-vibe/database";
+import {
+  db,
+  describeAppPoolCheckouts,
+  rawPool,
+  trackPendingDbWork,
+} from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import {
   leadLeadLinks,
@@ -2155,6 +2160,7 @@ export class CreditRepository {
     logger: EndpointLogger,
     t: CreditsT,
   ): Promise<ResponseType<CreditsGetResponseOutput>> {
+    let stage = "resolve-pool";
     try {
       // Side effects first: ensure wallets exist + monthly reset
       let poolResult: ResponseType<CreditPool>;
@@ -2177,10 +2183,17 @@ export class CreditRepository {
       }
 
       if (!poolResult.success) {
+        logger.info("Credit balance pool resolution failed", {
+          publicUser: user.isPublic,
+          errorKey: poolResult.errorType.errorKey,
+          poolWaiting: rawPool.waitingCount,
+          poolCheckouts: describeAppPoolCheckouts(),
+        });
         return poolResult;
       }
 
       // Monthly free credit reset + tier top-up (side effect)
+      stage = "ensure-free-credits";
       const { cap: freeAllowance, access } =
         await CreditRepository.ensurePoolFreeCredits(
           poolResult.data,
@@ -2190,6 +2203,7 @@ export class CreditRepository {
       const freeStatus = CreditRepository.toFreeStatus(access);
 
       if (user.isPublic && poolResult.data.poolType === "USER_POOL") {
+        stage = "read-linked-lead-balance";
         return success({
           ...(await CreditRepository.getLinkedLeadFreeBalance(
             poolResult.data,
@@ -2202,6 +2216,7 @@ export class CreditRepository {
       }
 
       // Atomic balance calc: expiry + aggregation in one PG call
+      stage = "read-pool-balance";
       const result = await getPoolBalance.call(
         {
           p_user_id: user.isPublic ? null : user.id,
@@ -2223,6 +2238,9 @@ export class CreditRepository {
       });
     } catch (error) {
       logger.error("Failed to get user balance", parseError(error), {
+        stage,
+        poolWaiting: rawPool.waitingCount,
+        poolCheckouts: describeAppPoolCheckouts(),
         userId: user.isPublic ? undefined : user.id,
         leadId: user.leadId,
       });

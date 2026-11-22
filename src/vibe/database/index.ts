@@ -14,6 +14,7 @@ import {
 } from "./client";
 import { pgDiagnosticQueryLogger } from "./pg-result-diagnostics";
 import {
+  describePgPoolCheckouts,
   LONG_RUNNING_POOL_KEY,
   processSharedPool,
   takeProcessSharedPool,
@@ -57,6 +58,12 @@ export let db: NodePgDatabase<Record<string, never>> = drizzle(pool as Pool, {
 });
 
 export let rawPool: RawPoolShim = pool as Pool;
+
+export function describeAppPoolCheckouts(): ReturnType<
+  typeof describePgPoolCheckouts
+> {
+  return pool ? describePgPoolCheckouts(pool) : undefined;
+}
 
 // In PGlite mode, after reopenPgliteAfterMigrations() the server restarts on
 // the new instance. The socket pool continues to work unchanged — no rebuild needed.

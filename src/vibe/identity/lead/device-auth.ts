@@ -22,7 +22,7 @@ import {
   success,
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
-import { db, rawPool } from "../../database";
+import { db, describeAppPoolCheckouts, rawPool } from "../../database";
 import type { EndpointLogger } from "../../logger/types";
 import { leadLeadLinks, leads, userLeadLinks } from "./db";
 import { LeadSource, LeadStatus } from "./enum";
@@ -146,6 +146,7 @@ export class LeadAuthRepository {
         poolIdle: rawPool.idleCount,
         poolWaiting: rawPool.waitingCount,
         poolEnding: rawPool.ending,
+        poolCheckouts: describeAppPoolCheckouts(),
         causeName: cause.name,
       });
       return null;

@@ -10,9 +10,9 @@ import {
   summarizePgResultDecodes,
 } from "./pg-result-diagnostics";
 import { startPgliteServer } from "./pglite-server";
-import { createStandardPool } from "./pool";
+import { createStandardPool, describePgPoolCheckouts } from "./pool";
 
-it("attributes a decoded result to its query and counts rows without recording values", async () => {
+it("attributes decoded results and pool checkouts without recording query values", async () => {
   const pg = new PGlite();
   await pg.exec(`
     CREATE TABLE cron_tasks (id int, metadata text);
@@ -52,6 +52,27 @@ it("attributes a decoded result to its query and counts rows without recording v
     expect(JSON.stringify(summary)).not.toContain("fixture-sql-literal");
     expect(JSON.stringify(summary)).not.toContain("fixture-row-value");
     expect(summarizePgResultDecodes(startedAt - 500, startedAt - 1)).toBeUndefined();
+
+    const client = await pool.connect();
+    try {
+      expect(describePgPoolCheckouts(pool)).toEqual([
+        { heldMs: expect.any(Number), query: null },
+      ]);
+      const reading = client.query(
+        "SELECT id FROM cron_tasks WHERE metadata = $1",
+        ["fixture-row-value"],
+      );
+      try {
+        expect(describePgPoolCheckouts(pool)).toEqual([
+          { heldMs: expect.any(Number), query: "SELECT cron_tasks" },
+        ]);
+      } finally {
+        await reading;
+      }
+    } finally {
+      client.release();
+    }
+    expect(describePgPoolCheckouts(pool)).toEqual([]);
   } finally {
     await pool.end();
     server.close();

@@ -32,6 +32,7 @@ describe("messageMetadataSchema", () => {
   it("parses valid metadata into specific types", () => {
     const result = messageMetadataSchema.parse({
       totalTokens: 42,
+      streamError: { key: "errorTypes.external_service_error", status: 502 },
       toolCall: {
         toolCallId: "call_1",
         toolName: "generate_image",
@@ -48,6 +49,7 @@ describe("messageMetadataSchema", () => {
       },
     });
     expect(result.totalTokens).toBe(42);
+    expect(result.streamError).toEqual({ key: "errorTypes.external_service_error", status: 502 });
     expect(result.toolCall?.toolName).toBe("generate_image");
     expect(result.generatedMedia?.type).toBe("image");
   });
@@ -55,12 +57,14 @@ describe("messageMetadataSchema", () => {
   it("drops fields with legacy/invalid shapes instead of failing", () => {
     const result = messageMetadataSchema.parse({
       totalTokens: "not-a-number",
+      streamError: { key: 3, status: "invalid" },
       toolCall: { legacy: "shape without toolCallId" },
       generatedMedia: { type: "hologram" },
       isStreaming: false,
       unknownLegacyKey: { deeply: ["nested", "junk"] },
     });
     expect(result.totalTokens).toBeUndefined();
+    expect(result.streamError).toBeUndefined();
     expect(result.toolCall).toBeUndefined();
     expect(result.generatedMedia).toBeUndefined();
     expect(result.isStreaming).toBe(false);

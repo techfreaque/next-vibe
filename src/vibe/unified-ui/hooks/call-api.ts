@@ -38,6 +38,7 @@ import type { EndpointLogger } from "../../logger/types";
 import { mintRequestId, withLogContext } from "../../logger/with-log-context";
 import { Platform } from "../../platforms/platforms";
 import {
+  readEdgeRequestTimingHeader,
   readEdgeTimingHeader,
   readProxyTimingHeader,
 } from "../../realtime/core/proxy-timing";
@@ -707,6 +708,7 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
         haUpstreamObserved: h.has("x-ha-upstream"),
         proxyTimingStage: readProxyTimingHeader(h.get("server-timing")),
         edgeTimingNode: readEdgeTimingHeader(h.get("server-timing")),
+        edgeRequestId: readEdgeRequestTimingHeader(h.get("server-timing")),
         contentLength: h.get("content-length"),
         hasVibeCors: h.has("access-control-allow-credentials"),
         bodyTitle: body.title,

@@ -1,5 +1,6 @@
 export const PROXY_TIMING_METRIC = "vibe-proxy";
 export const EDGE_TIMING_METRIC = "vibe-edge";
+export const EDGE_REQUEST_TIMING_METRIC = "vibe-edge-request";
 
 export type ProxyTimingStage =
   | "upstream-response"
@@ -38,6 +39,20 @@ export function readEdgeTimingHeader(
   header: string | null,
 ): "s1" | "s2" | null {
   return readEdgeTimingNode(readTimingDescription(header, EDGE_TIMING_METRIC));
+}
+
+export function readEdgeRequestId(value: string | undefined): string | null {
+  return value && /^[\da-f]{8}-(?:[\da-f]{4}-){3}[\da-f]{12}$/i.test(value)
+    ? value
+    : null;
+}
+
+export function readEdgeRequestTimingHeader(
+  header: string | null,
+): string | null {
+  return readEdgeRequestId(
+    readTimingDescription(header, EDGE_REQUEST_TIMING_METRIC),
+  );
 }
 
 function readTimingDescription(

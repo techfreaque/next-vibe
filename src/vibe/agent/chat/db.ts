@@ -203,6 +203,7 @@ export type MessageMetadata = {
   creditCost?: number;
   finishReason?: string;
   streamingTime?: number;
+  streamError?: { key: string; status: number };
 
   // Reasoning metadata (for ASSISTANT messages with reasoning)
   isReasoning?: boolean;

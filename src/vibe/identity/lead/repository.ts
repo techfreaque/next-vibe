@@ -30,7 +30,7 @@ import {
   success,
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
-import { db } from "../../database";
+import { db, describeAppPoolCheckouts, rawPool } from "../../database";
 import { withTransaction } from "../../database/utils/repository-helpers";
 import type { EndpointLogger } from "../../logger/types";
 import { users } from "../user/db";
@@ -1031,6 +1031,7 @@ export class LeadsRepository {
     logger: EndpointLogger,
     t: LeadsT,
   ): Promise<ResponseType<LeadDetailResponse>> {
+    let stage = "write-lead";
     try {
       logger.debug("Updating lead (internal)", {
         id,
@@ -1072,9 +1073,23 @@ export class LeadsRepository {
 
       logger.debug("Lead updated successfully (internal)", { id });
 
+      stage = "format-lead-response";
       return success(LeadsRepository.formatLeadDetailResponse(updatedLead));
     } catch (error) {
-      logger.error("Error updating lead (internal)", parseError(error));
+      const parsed = parseError(error);
+      const cause = parsed.cause instanceof Error ? parsed.cause : parsed;
+      logger.error("Error updating lead (internal)", parsed, {
+        stage,
+        fields: Object.keys(data).toSorted().join(","),
+        databaseCode:
+          "code" in cause &&
+          typeof cause.code === "string" &&
+          /^[0-9A-Z]{5}$/.test(cause.code)
+            ? cause.code
+            : null,
+        poolWaiting: rawPool.waitingCount,
+        poolCheckouts: describeAppPoolCheckouts(),
+      });
       return fail({
         message: t("leadsErrors.leads.patch.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

@@ -88,6 +88,7 @@ function queryId(sql: string): string {
 }
 
 function queryName(sql: string): string {
+  const isUploadListing = sql.includes("/* cortex-upload-listing */");
   const statement = sql
     .slice(0, QUERY_LABEL_SCAN_LIMIT)
     .replaceAll(
@@ -109,7 +110,11 @@ function queryName(sql: string): string {
       break;
     }
   }
-  return [operation, ...tables].join(" ");
+  return [
+    operation,
+    ...tables,
+    ...(isUploadListing ? ["cortex-upload-listing"] : []),
+  ].join(" ");
 }
 
 /** Capture the app call site when it is still present at Drizzle dispatch. */
@@ -154,6 +159,17 @@ export function getActivePgQuery(client: PoolClient): Query | null | undefined {
     return client._getActiveQuery.call(client);
   }
   return undefined;
+}
+
+/** Label the running statement using only its operation and known relations. */
+export function describeActivePgQuery(client: PoolClient): string | null {
+  const query = getActivePgQuery(client);
+  if (!query) {
+    return null;
+  }
+  return "text" in query && typeof query.text === "string"
+    ? queryName(query.text)
+    : "OTHER";
 }
 
 /** Observe wire decoding without replacing pg's handlers or accessing result values. */

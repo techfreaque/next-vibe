@@ -521,6 +521,7 @@ export class MessagesRepository {
     user: JwtPayloadType;
     errorType: string;
     errorDetails?: Record<string, string | number | boolean | null>;
+    streamError?: { key: string; status: number };
     sequenceId?: string | null;
     logger: EndpointLogger;
   }): Promise<void> {
@@ -537,6 +538,9 @@ export class MessagesRepository {
 
     if (params.errorDetails) {
       metadata.errorDetails = params.errorDetails;
+    }
+    if (params.streamError) {
+      metadata.streamError = params.streamError;
     }
 
     await db.insert(chatMessages).values({

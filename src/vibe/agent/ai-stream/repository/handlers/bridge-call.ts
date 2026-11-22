@@ -3,7 +3,7 @@
 import "server-only";
 
 import type { FilePart, ImagePart, LanguageModel } from "ai";
-import { generateText as aiGenerateText } from "ai";
+import { APICallError, generateText as aiGenerateText } from "ai";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
@@ -206,6 +206,28 @@ async function attemptBridgeModel(params: {
     logger,
     params.toolExecutionContext,
   );
+  const media =
+    contentPart.type === "file" ? contentPart.data : contentPart.image;
+  const mediaBytes =
+    media instanceof ArrayBuffer || ArrayBuffer.isView(media)
+      ? media.byteLength
+      : undefined;
+  const inputContext = {
+    bridgeType,
+    modality,
+    modelId: model.id,
+    apiProvider: model.apiProvider,
+    mediaType: contentPart.mediaType,
+    inputRepresentation:
+      media instanceof URL
+        ? "url"
+        : typeof media === "string"
+          ? "inline-text"
+          : mediaBytes === undefined
+            ? "structured"
+            : "binary",
+    bridgeInputSize: typeof media === "string" ? media.length : mediaBytes,
+  };
 
   // Bridge calls are auxiliary (a description, not the turn itself) and
   // upload large inline payloads (base64 video/audio) - a hung provider
@@ -231,23 +253,26 @@ async function attemptBridgeModel(params: {
       const refusal = detectVisionRefusal(output, result.finishReason);
       if (refusal) {
         logger.warn(`[GapFill] ${errorLabel} bridge refused`, {
+          ...inputContext,
           reason: refusal,
           finishReason: result.finishReason,
-          modality,
-          bridgeType,
-          modelId: model.id,
         });
         return { kind: "fail", reason: refusal };
       }
       return { kind: "ok", result, output };
     } catch (attemptErr) {
       const parsedAttemptErr = parseError(attemptErr);
+      const apiError = APICallError.isInstance(attemptErr) ? attemptErr : null;
+      const failureContext = {
+        ...inputContext,
+        upstreamStatus: apiError?.statusCode,
+        upstreamRetryable: apiError?.isRetryable,
+        error: parsedAttemptErr.message,
+      };
       // Parent stream cancelled -> stop immediately.
       if (abortSignal.aborted) {
         logger.warn(`[GapFill] ${errorLabel} bridge call aborted`, {
-          error: parsedAttemptErr.message,
-          modality,
-          bridgeType,
+          ...failureContext,
           aborted: true,
         });
         return { kind: "aborted" };
@@ -258,12 +283,7 @@ async function attemptBridgeModel(params: {
       if (isModerationError(parsedAttemptErr.message)) {
         logger.warn(
           `[GapFill] ${errorLabel} bridge refused by provider moderation`,
-          {
-            error: parsedAttemptErr.message,
-            modality,
-            bridgeType,
-            modelId: model.id,
-          },
+          failureContext,
         );
         return {
           kind: "fail",
@@ -272,20 +292,15 @@ async function attemptBridgeModel(params: {
       }
       if (attempt === 1) {
         logger.warn(`[GapFill] ${errorLabel} bridge call failed`, {
-          error: parsedAttemptErr.message,
+          ...failureContext,
           errorStack: parsedAttemptErr.stack,
-          modality,
-          bridgeType,
-          modelId: model.id,
         });
         return { kind: "fail", reason: parsedAttemptErr.message };
       }
       logger.warn(
         `[GapFill] ${errorLabel} bridge attempt failed - retrying once`,
         {
-          modality,
-          modelId: model.id,
-          error: parsedAttemptErr.message,
+          ...failureContext,
           errorStack: parsedAttemptErr.stack,
         },
       );

@@ -133,6 +133,8 @@ export function ErrorMessageBubble({
         errorCode: message.errorCode,
         structuredErrorCode,
         structuredErrorKey,
+        streamErrorKey: message.metadata?.streamError?.key,
+        streamErrorStatus: message.metadata?.streamError?.status,
         errorPayloadFormat: structuredErrorKey ? "structured" : "plain",
         localOnly: message.metadata?.isLocalOnly === true,
         errorText: errorText.slice(0, 300),
@@ -150,6 +152,8 @@ export function ErrorMessageBubble({
     message.errorType,
     message.errorCode,
     message.metadata?.isLocalOnly,
+    message.metadata?.streamError?.key,
+    message.metadata?.streamError?.status,
     message.content,
     rootFolderId,
   ]);

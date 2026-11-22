@@ -77,7 +77,7 @@ http://unbottled.ai, http://www.unbottled.ai {
 
 unbottled.ai {
 	# Mark responses that reached this edge, including errors generated here.
-	header +Server-Timing "vibe-edge;desc=\"s1\""
+	header +Server-Timing "vibe-edge;desc=\"s1\", vibe-edge-request;desc=\"{http.request.uuid}\""
 	# Keep a status and timestamp even when the client sees no response headers.
 	log unbottled_failures {
 		level ERROR
@@ -98,6 +98,9 @@ unbottled.ai {
 	log_append @app_api surface api
 	@realtime path /ws*
 	log_append @realtime surface websocket
+	log_append edge s1
+	log_append upstream {rp.upstream.host}
+	log_append upstream_header_wait_ms {rp.upstream.latency_ms}
 	tls {
 		issuer acme {
 			disable_tlsalpn_challenge

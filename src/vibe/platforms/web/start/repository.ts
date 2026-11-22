@@ -254,7 +254,14 @@ export class ServerStartRepository {
   private static taskRunnerStarted = false;
   /** Set once the in-process task runner is loaded; the lag monitor reads it. */
   private static runningTasksProbe:
-    | ((sinceMs: number) => { labels: string[]; timings: string })
+    | ((
+        startedAt: number,
+        endedAt: number,
+      ) => {
+        labels: string[];
+        timings: string;
+        overlaps: { label: string; overlapMs: number }[];
+      })
     | null = null;
   private static nextServerProcess: ChildProcess | null = null;
   private static wsServerHandle: WebProxyHandle | null = null;
@@ -777,9 +784,11 @@ export class ServerStartRepository {
       let worstStall: {
         ms: number;
         startedAt: number;
+        endedAt: number;
         scheduler: ReturnType<typeof threadSchedulerDelta>;
         runningTasks: string[];
         taskTimings: string;
+        taskOverlaps: { label: string; overlapMs: number }[];
         recentRequests: string;
         pgResultDecodes: ReturnType<typeof summarizePgResultDecodes>;
       } | null = null;
@@ -797,17 +806,20 @@ export class ServerStartRepository {
           // Running now, or finished up to 1 s before the stall began: the
           // probe runs only after the stall, when its cause may be done.
           const probed = ServerStartRepository.runningTasksProbe?.(
-            startedAt - 1000,
+            startedAt,
+            endedAt,
           );
           worstStall = {
             ms: stallMs,
             startedAt,
+            endedAt,
             scheduler: threadSchedulerDelta(
               previousSchedulerSample,
               lastSchedulerSample,
             ),
             runningTasks: probed?.labels ?? [],
             taskTimings: probed?.timings ?? "",
+            taskOverlaps: probed?.overlaps ?? [],
             recentRequests: summarizeRecentRequests(),
             pgResultDecodes: summarizePgResultDecodes(startedAt, endedAt),
           };
@@ -903,6 +915,10 @@ export class ServerStartRepository {
             stallStartedAt: stall
               ? new Date(stall.startedAt).toISOString()
               : undefined,
+            stallEndedAt: stall
+              ? new Date(stall.endedAt).toISOString()
+              : undefined,
+            stallTaskOverlaps: stall?.taskOverlaps,
             runningTasks: stall?.runningTasks.join(", ") || undefined,
             // Per run: start/end wall clock, to place it against stallStartedAt
             taskTimings: stall?.taskTimings || undefined,
@@ -1175,10 +1191,24 @@ export class ServerStartRepository {
       // a permanent task-runner (always "running"), so it names nothing; the
       // cron tasks it dispatches and async tool runs live in the registry.
       ServerStartRepository.runningTasksProbe = (
-        sinceMs: number,
-      ): { labels: string[]; timings: string } => {
-        const runs = RunningTaskRegistry.activeSince(sinceMs);
+        startedAt: number,
+        endedAt: number,
+      ): ReturnType<
+        NonNullable<typeof ServerStartRepository.runningTasksProbe>
+      > => {
+        const runs = RunningTaskRegistry.activeSince(startedAt - 1000);
         return {
+          overlaps: runs
+            .map((run) => ({
+              label: run.label,
+              overlapMs: Math.round(
+                Math.min(endedAt, run.endedAt ?? endedAt) -
+                  Math.max(startedAt, run.startedAt),
+              ),
+            }))
+            .filter((run) => run.overlapMs > 0)
+            .toSorted((a, b) => b.overlapMs - a.overlapMs)
+            .slice(0, 8),
           labels: [
             ...new Set([
               ...UnifiedTaskRunnerRepository.getRunningTasks("cron"),

@@ -24,6 +24,7 @@
  * channel's resync handlers refetch instead (`onChannelResync`).
  */
 
+import { getRawCookieString } from "next-vibe/ui/lib/cookies";
 import {
   addDocumentListener,
   addWindowListener,
@@ -32,7 +33,10 @@ import {
 import { getCurrentHost, getCurrentProtocol } from "next-vibe/ui/lib/location";
 import { isOnline } from "next-vibe/ui/lib/media";
 
+import { CSRF_TOKEN_COOKIE_NAME } from "@/env/constants";
+
 import type { CountryLanguage } from "../../core/i18n/core/config";
+import { navigationTimingEvidence } from "../../logger/resource-diagnostics";
 import type { EndpointLogger } from "../../logger/types";
 import { mintRequestId } from "../../logger/with-log-context";
 import type {
@@ -147,6 +151,7 @@ interface DropInfo {
   /** null = the socket never opened (handshake/upgrade failed) */
   connectedForMs: number | null;
   handshakeMs: number;
+  handshakeContext: ReturnType<typeof readHandshakeContext>;
   acknowledgedChannels: number;
   sinceLastFrameMs: number | null;
   msSinceVisibilityChange: number | null;
@@ -161,6 +166,8 @@ let dropReconnectCount = 0;
 let failedHandshakesDuringDrop = 0;
 let lastFailedHandshakeRequestId: string | null = null;
 let lastFailedHandshakeMs: number | null = null;
+let lastFailedHandshakeContext: ReturnType<typeof readHandshakeContext> | null =
+  null;
 let maxReconnectTimerOverrunMs = 0;
 let noticeableDownMs = 0;
 let noticeableSince: number | null = null;
@@ -168,6 +175,25 @@ let dropCheckTimer: ReturnType<typeof setInterval> | null = null;
 
 function isTabVisible(): boolean {
   return typeof window === "undefined" || getVisibilityState() === "visible";
+}
+
+function readHandshakeContext(): ReturnType<typeof navigationTimingEvidence> & {
+  csrfCookieReadable: boolean | null;
+} {
+  let csrfCookieReadable: boolean | null = null;
+  try {
+    csrfCookieReadable = getRawCookieString()
+      .split(";")
+      .some((cookie) =>
+        cookie.trimStart().startsWith(`${CSRF_TOKEN_COOKIE_NAME}=`),
+      );
+  } catch {
+    // A browser can prohibit document.cookie access for this frame.
+  }
+  return {
+    ...navigationTimingEvidence(),
+    csrfCookieReadable,
+  };
 }
 
 function currentNoticeableDownMs(): number {
@@ -205,6 +231,7 @@ function reportDrop(logger: EndpointLogger, recovered: boolean): void {
     failedHandshakesDuringDrop,
     lastFailedHandshakeRequestId,
     lastFailedHandshakeMs,
+    lastFailedHandshakeContext,
     maxReconnectTimerOverrunMs,
     reconnectPaused,
     recovered,
@@ -252,6 +279,7 @@ function handleOpen(logger: EndpointLogger): void {
         failedHandshakesDuringDrop,
         lastFailedHandshakeRequestId,
         lastFailedHandshakeMs,
+        lastFailedHandshakeContext,
         maxReconnectTimerOverrunMs,
         offlineMs: Date.now() - disconnectedAt,
         noticeableDownMs: currentNoticeableDownMs(),
@@ -270,6 +298,7 @@ function handleOpen(logger: EndpointLogger): void {
   failedHandshakesDuringDrop = 0;
   lastFailedHandshakeRequestId = null;
   lastFailedHandshakeMs = null;
+  lastFailedHandshakeContext = null;
   maxReconnectTimerOverrunMs = 0;
   noticeableDownMs = 0;
   noticeableSince = null;
@@ -418,6 +447,7 @@ function connect(logger: EndpointLogger): void {
 
   lastLogger = logger;
   const connectStartedAt = Date.now();
+  const handshakeContext = readHandshakeContext();
   const ws = new WebSocket(url);
   sharedWs = ws;
   if (pendingDrop !== null) {
@@ -472,6 +502,7 @@ function connect(logger: EndpointLogger): void {
       failedHandshakesDuringDrop++;
       lastFailedHandshakeRequestId = requestId;
       lastFailedHandshakeMs = closedAt - connectStartedAt;
+      lastFailedHandshakeContext = handshakeContext;
     }
     // Keep the first close of the episode. Recovery, the report timer, or
     // pagehide reports it once, even when several reconnects fail.
@@ -492,6 +523,7 @@ function connect(logger: EndpointLogger): void {
         connectedForMs:
           socketOpenedAt === null ? null : closedAt - socketOpenedAt,
         handshakeMs: (socketOpenedAt ?? closedAt) - connectStartedAt,
+        handshakeContext,
         acknowledgedChannels:
           socketOpenedAt === null
             ? 0
@@ -526,6 +558,7 @@ function connect(logger: EndpointLogger): void {
           failedHandshakesDuringDrop,
           lastFailedHandshakeRequestId,
           lastFailedHandshakeMs,
+          lastFailedHandshakeContext,
           maxReconnectTimerOverrunMs,
           hiddenAtClose: pendingDrop?.hiddenAtClose ?? null,
           channelCount: channels.size,

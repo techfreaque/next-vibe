@@ -87,6 +87,7 @@ const TRANSPORT_TRACE_ENDPOINTS = new Set([
   "leads/tracking",
   "vibe/agent/ai-stream/stream",
   "vibe/agent/skills/[id]",
+  "vibe/agent/skills/favorites/create",
 ]);
 
 /**
@@ -235,7 +236,10 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         endpoint.method !== Methods.GET &&
         isContentLengthTooLarge(contentLength)
       ) {
+        traceStage = "body-limit";
         logger.warn("Request body exceeds proxy limit", {
+          endpoint: endpointPath,
+          method: endpoint.method,
           contentLength,
           limit: MAX_REQUEST_BODY_BYTES,
           contentType: request.headers.get("content-type") ?? "(none)",

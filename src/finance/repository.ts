@@ -1799,6 +1799,9 @@ export class FinanceRepository {
     logger.error(`[Finance] ALERT ${c.type}: ${c.message}`, {
       subject: c.subject,
       delivery,
+      ...(c.type === FinanceAlertType.THIN_MARGIN
+        ? { marginFacts: c.metadata }
+        : {}),
     });
     return delivery;
   }

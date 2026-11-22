@@ -22,7 +22,7 @@ const TYPE_FOLDERS = [
 type TypeFolder = (typeof TYPE_FOLDERS)[number];
 
 function isTypeFolder(value: string): value is TypeFolder {
-  return TYPE_FOLDERS.includes(value as TypeFolder);
+  return TYPE_FOLDERS.some((folder) => folder === value);
 }
 
 /**
@@ -72,13 +72,11 @@ function slugify(value: string): string {
 }
 
 interface AttachmentRow {
-  id: string;
   /** Public download URL (may be empty for base64-embedded uploads) */
   url: string;
   filename: string;
   mimeType: string;
   size: number;
-  hasData: boolean;
   /** User's message text when they uploaded the file */
   messageText: string;
   threadId: string;
@@ -86,15 +84,47 @@ interface AttachmentRow {
   uploadedAt: Date;
 }
 
+interface AttachmentSummary {
+  url: string | null;
+  filename: string | null;
+  name: string | null;
+  mimeType: string | null;
+  type: string | null;
+  size: number | null;
+  hasData: boolean;
+}
+
+const MESSAGE_CONTEXT_LIMIT = 1000;
+
 /**
- * Load all attachments for a user across all threads.
- * Queries chatMessages metadata JSONB for attachments array.
+ * Load the attachment fields used by the virtual mount. Older uploads can
+ * store megabytes of base64 in `data`, which the mount only checks for presence.
  */
-async function loadUserAttachments(userId: string): Promise<AttachmentRow[]> {
+async function loadUserAttachments(
+  userId: string,
+  includeMessageContext = false,
+): Promise<AttachmentRow[]> {
   const rows = await db
     .select({
-      metadata: chatMessages.metadata,
-      content: chatMessages.content,
+      attachments: sql<AttachmentSummary[]>`(
+        /* cortex-upload-listing */ SELECT jsonb_agg(jsonb_build_object(
+          'url', entry->>'url',
+          'filename', entry->>'filename',
+          'name', entry->>'name',
+          'mimeType', entry->>'mimeType',
+          'type', entry->>'type',
+          'size', entry->'size',
+          'hasData', COALESCE(jsonb_typeof(entry->'data') = 'string'
+            AND entry->'data' <> '""'::jsonb, false)
+        ) ORDER BY ordinal)
+        FROM jsonb_array_elements(${chatMessages.metadata}->'attachments')
+          WITH ORDINALITY AS attachment(entry, ordinal)
+      )`,
+      messageContext: includeMessageContext
+        ? sql<
+            string | null
+          >`left(${chatMessages.content}, ${MESSAGE_CONTEXT_LIMIT})`
+        : sql<null>`NULL`,
       createdAt: chatMessages.createdAt,
       threadId: chatMessages.threadId,
       threadTitle: chatThreads.title,
@@ -115,42 +145,23 @@ async function loadUserAttachments(userId: string): Promise<AttachmentRow[]> {
   const attachments: AttachmentRow[] = [];
 
   for (const row of rows) {
-    const meta = row.metadata as {
-      attachments?: {
-        id?: string;
-        url?: string;
-        data?: string;
-        filename?: string;
-        name?: string;
-        mimeType?: string;
-        type?: string;
-        size?: number;
-      }[];
-    } | null;
-    if (!meta?.attachments) {
-      continue;
-    }
-
-    for (const att of meta.attachments) {
+    for (const att of row.attachments) {
       // Support both url-hosted and base64-embedded attachments
       const filename = att.filename ?? att.name ?? "";
       if (!filename) {
         continue;
       }
-      const hasData = Boolean(att.data);
       const url = att.url ?? "";
       // Skip attachments with neither URL nor data
-      if (!url && !hasData) {
+      if (!url && !att.hasData) {
         continue;
       }
       attachments.push({
-        id: att.id ?? filename,
         url,
         filename,
         mimeType: att.mimeType ?? att.type ?? "application/octet-stream",
         size: att.size ?? 0,
-        hasData,
-        messageText: typeof row.content === "string" ? row.content : "",
+        messageText: row.messageContext ?? "",
         threadId: row.threadId,
         threadTitle: row.threadTitle ?? "Untitled",
         uploadedAt: row.createdAt,
@@ -196,7 +207,7 @@ export async function readUploadPath(
   const threadId = threadIdMatch[1];
 
   // Load attachments for this thread
-  const allAttachments = await loadUserAttachments(userId);
+  const allAttachments = await loadUserAttachments(userId, true);
   const threadAttachments = allAttachments.filter(
     (a) =>
       a.threadId === threadId && getMimeTypeFolder(a.mimeType) === typeFolder,
@@ -245,7 +256,12 @@ export async function readUploadPath(
     `| Thread | ${attachment.threadTitle} |`,
     `| Uploaded | ${attachment.uploadedAt.toISOString().slice(0, 10)} |`,
     ...(attachment.messageText
-      ? ["", "## Message Context", "", attachment.messageText.slice(0, 1000)]
+      ? [
+          "",
+          "## Message Context",
+          "",
+          attachment.messageText.slice(0, MESSAGE_CONTEXT_LIMIT),
+        ]
       : []),
   ];
 

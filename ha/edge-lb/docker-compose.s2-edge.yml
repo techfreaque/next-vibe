@@ -35,8 +35,8 @@ services:
       - caddy_internal
     labels:
       caddy_internal_10: "https://unbottled.ai"
-      caddy_internal_10.header: '+Server-Timing "vibe-edge;desc=\"s2\""'
-      # Mirror S1's 5xx access log. Only status, timing, and fixed categories.
+      caddy_internal_10.header: '+Server-Timing "vibe-edge;desc=\"s2\", vibe-edge-request;desc=\"{http.request.uuid}\""'
+      # Mirror S1's 5xx access log with a response correlation ID and upstream timing.
       caddy_internal_10.log: "unbottled_failures"
       caddy_internal_10.log.level: "ERROR"
       caddy_internal_10.log.format: "filter"
@@ -52,6 +52,9 @@ services:
       caddy_internal_10.1_log_append: "@next_asset surface next-asset"
       caddy_internal_10.2_log_append: "@app_api surface api"
       caddy_internal_10.3_log_append: "@realtime surface websocket"
+      caddy_internal_10.4_log_append: "edge s2"
+      caddy_internal_10.5_log_append: "upstream {rp.upstream.host}"
+      caddy_internal_10.6_log_append: "upstream_header_wait_ms {rp.upstream.latency_ms}"
       caddy_internal_10.tls.issuer: "acme"
       caddy_internal_10.tls.issuer.disable_tlsalpn_challenge: ""
       # Deploy drain (scripts/ha-node-drain.sh edge-on s2 / swap): while

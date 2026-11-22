@@ -683,6 +683,12 @@ export function detectDayAnomalies(
     upstreamCostUsd: round2(facts.upstreamCostUsd),
     coverageMarginUsd,
     coverageMarginPct,
+    coverageUsd,
+    marginFloorPct: th.marginFloorPct,
+    coverageBasis:
+      margin.netRevenueUsd >= facts.internalBilledUsd
+        ? "net-sales"
+        : "credits-billed",
   };
 
   if (

@@ -160,6 +160,10 @@ export async function emitErrorMessage(
   const { threadId, errorType, error, parentId, sequenceId, user } = params;
   const errorMessageId = crypto.randomUUID();
   const serializedError = params.content ?? serializeError(error);
+  const streamError = {
+    key: error.errorType.errorKey,
+    status: error.errorType.errorCode,
+  };
   w.deps.logger.info("AI stream error bubble created", {
     errorMessageId,
     threadId,
@@ -189,6 +193,7 @@ export async function emitErrorMessage(
           sequenceId: sequenceId ?? null,
           authorId: user.id ?? null,
           errorType: errorType ?? null,
+          metadata: { streamError },
         }),
       ],
     },
@@ -217,6 +222,7 @@ export async function emitErrorMessage(
       threadId,
       content: serializedError,
       errorType,
+      streamError,
       parentId,
       user,
       sequenceId,

@@ -4,6 +4,7 @@ import { Pool, type PoolClient, type PoolConfig } from "pg";
 
 import { databaseEnv } from "./env";
 import {
+  describeActivePgQuery,
   getActivePgQuery,
   observePgResultDecoding,
 } from "./pg-result-diagnostics";
@@ -283,17 +284,45 @@ export function guardPool(p: Pool): Pool {
  */
 function guardStandardPool(p: Pool): Pool {
   guardPool(p);
+  globalThis.__vibePgCheckouts ??= new WeakMap();
+  const checkouts = new Map<PoolClient, number>();
+  globalThis.__vibePgCheckouts.set(p, checkouts);
   p.on("connect", (client) => {
     client.on("error", () => undefined);
   });
-  p.on("acquire", observePgResultDecoding);
+  p.on("acquire", (client) => {
+    checkouts.set(client, performance.now());
+    observePgResultDecoding(client);
+  });
   p.on("release", (err, client) => {
+    checkouts.delete(client);
     if (!err && getActivePgQuery(client)) {
       // Callback form: end() never rejects into an unhandled promise here.
       client.end(() => undefined);
     }
   });
+  p.on("remove", (client) => {
+    checkouts.delete(client);
+  });
   return p;
+}
+
+/** Oldest checked-out clients at a timeout, with no SQL text or parameters. */
+export function describePgPoolCheckouts(
+  p: Pool,
+): { heldMs: number; query: string | null }[] | undefined {
+  const checkouts = globalThis.__vibePgCheckouts?.get(p);
+  if (!checkouts) {
+    return undefined;
+  }
+  const now = performance.now();
+  return [...checkouts.entries()]
+    .toSorted(([, a], [, b]) => a - b)
+    .slice(0, 4)
+    .map(([client, acquiredAt]) => ({
+      heldMs: Math.round(now - acquiredAt),
+      query: describeActivePgQuery(client),
+    }));
 }
 
 // ─── Process-wide pool registry ──────────────────────────────────────────────
@@ -305,6 +334,7 @@ declare global {
    * own module instance; globalThis is the one thing they share.
    */
   var __vibePgPools: Map<string, Pool> | undefined;
+  var __vibePgCheckouts: WeakMap<Pool, Map<PoolClient, number>> | undefined;
 }
 
 export const APP_POOL_KEY = "app";

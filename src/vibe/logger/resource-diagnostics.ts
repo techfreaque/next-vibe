@@ -8,9 +8,11 @@
 import { getCurrentOrigin, getCurrentUrl } from "next-vibe/ui/lib/location";
 
 import {
+  EDGE_REQUEST_TIMING_METRIC,
   EDGE_TIMING_METRIC,
   PROXY_TIMING_METRIC,
   type ProxyTimingStage,
+  readEdgeRequestId,
   readEdgeTimingNode,
   readProxyTimingStage,
 } from "../realtime/core/proxy-timing";
@@ -52,14 +54,21 @@ interface ResourceTimingEvidence {
   responseStatus: number | null;
   transferSize: number | null;
   durationMs: number | null;
+  decodedBodySize: number | null;
+  responseWaitMs: number | null;
+  responseReadMs: number | null;
+  resourceStartedAtMs: number | null;
+  resourceReportedAtMs: number;
   resourceFailureKind: string;
   proxyTimingStage: ProxyTimingStage | null;
   edgeTimingNode: ReturnType<typeof readEdgeTimingNode>;
+  edgeRequestId: string | null;
 }
 
 /** Attribution of the page document when a child resource has no timing. */
 export function navigationTimingEvidence(): {
   documentEdgeTimingNode: ReturnType<typeof readEdgeTimingNode>;
+  documentEdgeRequestId: string | null;
   documentProxyTimingStage: ProxyTimingStage | null;
   documentNavigationType: string | null;
 } {
@@ -74,6 +83,7 @@ export function navigationTimingEvidence(): {
   ) {
     return {
       documentEdgeTimingNode: null,
+      documentEdgeRequestId: null,
       documentProxyTimingStage: null,
       documentNavigationType: null,
     };
@@ -82,6 +92,11 @@ export function navigationTimingEvidence(): {
     documentEdgeTimingNode: readEdgeTimingNode(
       entry.serverTiming?.find(({ name }) => name === EDGE_TIMING_METRIC)
         ?.description,
+    ),
+    documentEdgeRequestId: readEdgeRequestId(
+      entry.serverTiming?.find(
+        ({ name }) => name === EDGE_REQUEST_TIMING_METRIC,
+      )?.description,
     ),
     documentProxyTimingStage: readProxyTimingStage(
       entry.serverTiming?.find(({ name }) => name === PROXY_TIMING_METRIC)
@@ -114,6 +129,31 @@ export function classifyResourceFailure(
   return status === 0 ? "opaque-or-no-response" : "status-unavailable";
 }
 
+export function describeResourceResponse(
+  entry: Pick<
+    PerformanceResourceTiming,
+    "requestStart" | "responseStart" | "responseEnd" | "decodedBodySize"
+  >,
+): Pick<
+  ResourceTimingEvidence,
+  "decodedBodySize" | "responseWaitMs" | "responseReadMs"
+> {
+  const { requestStart, responseStart, responseEnd, decodedBodySize } = entry;
+  // Browsers can mask timing phases to zero, for example for cross-origin loads.
+  const hasResponseStart = responseStart > 0;
+  return {
+    decodedBodySize,
+    responseWaitMs:
+      hasResponseStart && requestStart > 0 && responseStart >= requestStart
+        ? Math.round(responseStart - requestStart)
+        : null,
+    responseReadMs:
+      hasResponseStart && responseEnd >= responseStart
+        ? Math.round(responseEnd - responseStart)
+        : null,
+  };
+}
+
 /** Resource Timing records evidence that the generic browser error event lacks. */
 export function resourceTiming(
   raw: string | null | undefined,
@@ -122,9 +162,15 @@ export function resourceTiming(
     responseStatus: null,
     transferSize: null,
     durationMs: null,
+    decodedBodySize: null,
+    responseWaitMs: null,
+    responseReadMs: null,
+    resourceStartedAtMs: null,
+    resourceReportedAtMs: Date.now(),
     resourceFailureKind: "no-resource-timing",
     proxyTimingStage: null,
     edgeTimingNode: null,
+    edgeRequestId: null,
   };
   if (!raw || typeof performance === "undefined") {
     return empty;
@@ -154,6 +200,9 @@ export function resourceTiming(
       responseStatus,
       transferSize: entry.transferSize,
       durationMs: Math.round(entry.duration),
+      ...describeResourceResponse(entry),
+      resourceStartedAtMs: Math.round(performance.timeOrigin + entry.startTime),
+      resourceReportedAtMs: empty.resourceReportedAtMs,
       resourceFailureKind: classifyResourceFailure(
         responseStatus,
         entry.decodedBodySize,
@@ -170,6 +219,13 @@ export function resourceTiming(
               ?.description,
           )
         : null,
+      edgeRequestId: sameOrigin
+        ? readEdgeRequestId(
+            entry.serverTiming?.find(
+              ({ name }) => name === EDGE_REQUEST_TIMING_METRIC,
+            )?.description,
+          )
+        : null,
     };
   } catch {
     return empty;
@@ -182,16 +238,12 @@ export function resourceTiming(
  * deploy (404) from a slow/blocked network (timeout, status 0) and a scanner
  * that blocks subresources (Google-Safety). Empty when not a chunk error.
  */
-export function chunkLoadDiagnostics(message: string | undefined): {
+export function chunkLoadDiagnostics(
+  message: string | undefined,
+): Partial<ResourceTimingEvidence> & {
   chunkId?: string | null;
   chunkUrl?: string | null;
   chunkFailKind?: string;
-  responseStatus?: number | null;
-  transferSize?: number | null;
-  durationMs?: number | null;
-  resourceFailureKind?: string;
-  proxyTimingStage?: ProxyTimingStage | null;
-  edgeTimingNode?: ReturnType<typeof readEdgeTimingNode>;
 } {
   const match =
     /Loading (?:CSS )?chunk (\S+) failed(?:\.?\s*\((\w+): ([^)\s]+)\))?/i.exec(

@@ -956,6 +956,11 @@ export class StreamLoop implements StreamLoopState {
       // timeouts) are outside our control and already shown to the user as an
       // error bubble - warn, so the error log stays for actual bugs.
       const transient = isTransientErrorText(errorText);
+      const promptImages = this.lastPromptMessages.flatMap((message) =>
+        message.role === "user" && Array.isArray(message.content)
+          ? message.content.filter((item) => item.type === "image")
+          : [],
+      );
       // Mid-stream error parts are NOT retried (the AI SDK's maxRetries only
       // covers the initial request) - the turn ends with an error bubble.
       // Record which upstream served it and how far the stream got so an
@@ -969,6 +974,11 @@ export class StreamLoop implements StreamLoopState {
         model,
         apiProvider: this.p.modelConfig.apiProvider,
         providerModel: this.p.modelConfig.providerModel,
+        offeredToolCount: Object.keys(this.p.tools ?? {}).length,
+        promptImageCount: promptImages.length,
+        promptImageUrlCount: promptImages.filter(
+          (item) => item.image instanceof URL,
+        ).length,
         threadId,
         transient,
         retried: false,
