@@ -8,16 +8,16 @@ Use Linux amd64, a writable volume owned by UID 1000, and a dedicated PostgreSQL
 
 Choose the exact tag from a successful **Publish self-hosted pod image** release workflow. The registry path is `ghcr.io/techfreaque/next-vibe-pod:<release-tag>`. The first public image and a PikaPods listing are pending.
 
-Applying the pod's file filters to the saved amd64 build `d3d36bbb41` retained 2,464 MiB of application files. The release workflow measures the complete image, including Bun, Node and Alpine, before publishing.
+A local amd64 build of `96469468b4` measured 2,260 MiB uncompressed for the complete image, including Bun, Node and Alpine. The production server image is 7.16 GB. The release workflow measures every image again before publishing. The image leaves out the bundled Claude Code CLI, so the Claude Code provider is unavailable in the pod.
 
-| Environment variable | Value |
-| --- | --- |
-| `DATABASE_URL` | PostgreSQL connection URI from the host. Preserve its TLS settings and URL-encode credentials. |
-| `NEXT_PUBLIC_APP_URL` | Public HTTPS origin, such as `https://tools.example.org`. For local verification use `http://localhost:3000`. |
-| `VIBE_ADMIN_USER_EMAIL` | Administrator email in lowercase. |
+| Environment variable       | Value                                                                                                             |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`             | PostgreSQL connection URI from the host. Preserve its TLS settings and URL-encode credentials.                    |
+| `NEXT_PUBLIC_APP_URL`      | Public HTTPS origin, such as `https://tools.example.org`. For local verification use `http://localhost:3000`.     |
+| `VIBE_ADMIN_USER_EMAIL`    | Administrator email in lowercase.                                                                                 |
 | `VIBE_ADMIN_USER_PASSWORD` | Unique administrator password, at least 12 characters. The production seed synchronizes this password on startup. |
-| `JWT_SECRET_KEY` | Persistent signing secret. Generate with `openssl rand -hex 32`. |
-| `CRON_SECRET` | Generate a second independent value with `openssl rand -hex 32`. |
+| `JWT_SECRET_KEY`           | Persistent signing secret. Generate with `openssl rand -hex 32`.                                                  |
+| `CRON_SECRET`              | Generate a second independent value with `openssl rand -hex 32`.                                                  |
 
 Enter these values in the host's environment settings. For Docker, put them in a private env file and run the following with the chosen release tag.
 
@@ -31,11 +31,13 @@ Forward HTTPS and WebSocket upgrades to port 3000. Visit the configured origin a
 
 ## Release and hosting plan
 
-Use an ephemeral Linux amd64 Actions runner labeled `pod-image-builder`, or set the repository variable `POD_IMAGE_RUNNER` to its label. Allow for the project's roughly 44 GB production build peak. The runner needs Docker, Chrome (`google-chrome`), Node, Python 3, jq, curl and OpenSSL. Pod operators only pull the resulting image.
+Use an ephemeral Linux amd64 Actions runner labeled `pod-image-builder`, or set the repository variable `POD_IMAGE_RUNNER` to its label. Allow at least 24 GB of memory: the build peaks near 18 GB. The runner needs Docker, Chrome or Chromium, Node, Python 3, curl and OpenSSL. Pod operators only pull the resulting image.
 
 1. Push a stable version tag of the form `vX.Y.Z` to GitHub. The pod workflow checks out that tag and builds a separate Linux amd64 image.
 2. CI measures the uncompressed image and enforces a limit of 3 GiB. It starts the image against stock PostgreSQL, checks guest rejection and administrator login, exercises the tool directory in headless Chrome, CLI and MCP, and recreates the pod to verify its files and session survive.
-3. CI pushes the tested image under the release tag and checks anonymous registry access. On the first publication, a package owner must set the GHCR package visibility to public and verify the tagged manifest anonymously. The image carries the commit SHA in its OCI revision label. [GitHub Container registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
+3. CI pushes the tested image under the release tag, moves `latest` when the tag is the highest stable release, and checks anonymous registry access. On the first publication, a package owner must set the GHCR package visibility to public and verify the tagged manifest anonymously. The image carries the commit SHA in its OCI revision label. [GitHub Container registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
 4. Once the tag is publicly pullable, submit the image reference, digest, measured size, volume, environment settings, and login procedure to the PikaPods feedback board. [PikaPods feedback board](https://feedback.pikapods.com/) · [App criteria](https://help.pikapods.com/faq/apps#adding-new-apps)
+
+To build and verify a commit locally, run `scripts/pikapods/release.sh --ref <commit-or-tag>`. It builds the committed tree with `git archive`, never uncommitted files, checks the size limit, runs `scripts/pikapods/smoke.sh` against a disposable PostgreSQL 16 container on a private network and a random loopback port, then removes every container, network, volume and image it created. `--push` publishes a `vX.Y.Z` tag and `latest` without CI. A `vX.Y.Z` tag push also starts the npm release workflow.
 
 For a provider-free functional check, use the [FlowStacks tool-directory example](flowstacks.md).

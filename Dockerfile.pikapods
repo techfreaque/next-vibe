@@ -7,8 +7,10 @@ COPY patches ./patches
 RUN bun install --frozen-lockfile --ignore-scripts
 COPY . .
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
-RUN --mount=type=cache,target=/app/.next-prod/cache \
-    NODE_OPTIONS=--max-old-space-size=16384 VIBE_BUILD_PLACEHOLDER_ENV=true \
+# Same memory bounds as the production Dockerfile: V8 old space plus the native
+# Tailwind/SWC (Rayon) and libuv pools, which the heap limit does not cover.
+RUN --mount=type=cache,target=/app/.next-prod/cache,id=next-vibe-pod-next-cache-v1,sharing=locked \
+    RAYON_NUM_THREADS=2 UV_THREADPOOL_SIZE=2 NODE_OPTIONS=--max-old-space-size=12288 VIBE_BUILD_PLACEHOLDER_ENV=true \
     bun src/vibe/platforms/cli/vibe-runtime.ts build --generate=false --package=false --migrate=false --seed=false --db-setup=false --webpack=true && \
     test -s .next-prod/BUILD_ID
 
@@ -19,13 +21,17 @@ ENV NODE_ENV=production VIBE_POD=true NEXT_PUBLIC_VIBE_MODE=cloud PORT=3000 \
     NEXT_TELEMETRY_DISABLED=1 CHAT_STORAGE_TYPE=filesystem CHAT_STORAGE_PATH=/data/chat \
     WS_PUBSUB_TYPE=local VIBE_DISABLE_PROXY=false
 # Bun's runtime resolves CLI endpoints, widgets and production seeds from source.
-# Keep their JS dependencies. Omit mobile SDKs, non-musl native binaries and build artifacts.
+# Keep their JS dependencies. Omit mobile SDKs, glibc native binaries, the bundled
+# Claude Code CLI (the claude-code provider needs a host login a pod never has)
+# and build artifacts.
 COPY --from=build --exclude=*.map --exclude=**/*.map \
     --exclude=**/*.d.ts --exclude=**/*.d.mts --exclude=**/*.d.cts \
     --exclude=react-native --exclude=react-native-* --exclude=@react-native --exclude=@react-native-async-storage \
     --exclude=hermes-compiler --exclude=expo --exclude=expo-* --exclude=@expo --exclude=metro --exclude=metro-* \
     --exclude=@typescript --exclude=@types --exclude=canvaskit-wasm --exclude=googleapis \
-    --exclude=@anthropic-ai/claude-agent-sdk-linux-x64 --exclude=@next/swc-linux-x64-gnu --exclude=lucide-react-native \
+    --exclude=@anthropic-ai/claude-agent-sdk-linux-x64 --exclude=@anthropic-ai/claude-agent-sdk-linux-x64-musl \
+    --exclude=*-linux-x64-gnu --exclude=@*/*-linux-x64-gnu --exclude=@img/sharp-linux-x64 \
+    --exclude=@img/sharp-libvips-linux-x64 --exclude=lucide-react-native --exclude=dts-buddy --exclude=@pulumi \
     /app/node_modules ./node_modules
 COPY --from=build --chown=bun:bun --exclude=cache --exclude=trace --exclude=trace-build --exclude=types \
     --exclude=diagnostics --exclude=**/*.nft.json /app/.next-prod ./.next-prod
