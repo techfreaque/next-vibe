@@ -34,8 +34,11 @@ import { scopedTranslation as authScopedTranslation } from "../../identity/auth/
 import { AuthClientRepository } from "../../identity/auth/repository-client";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import { CLIENT_LOG_PATH } from "../../logger/error-monitor/client-log/constants";
-import { navigationTimingEvidence } from "../../logger/resource-diagnostics";
-import type { EndpointLogger } from "../../logger/types";
+import {
+  navigationTimingEvidence,
+  resourceTiming,
+} from "../../logger/resource-diagnostics";
+import type { EndpointLogger, LoggerMetadata } from "../../logger/types";
 import { mintRequestId, withLogContext } from "../../logger/with-log-context";
 import { Platform } from "../../platforms/platforms";
 import {
@@ -218,6 +221,9 @@ interface CallDiagnostics {
   /** Sent as x-request-id; the server stamps it on its rows for this call. */
   requestId: string;
   retryOf?: string;
+  /** Kept in memory solely to find the browser timing for a failed fetch. */
+  fetchUrl?: string;
+  fetchStartedAt?: number;
   /**
    * What the client actually put on the wire (JSON chars / multipart parts),
    * so a server that saw an empty body is provably a transit loss.
@@ -263,7 +269,7 @@ function browserOnline(): boolean {
 function networkFailureContext(
   diag: CallDiagnostics,
   durationMs: number,
-): Record<string, string | number | boolean | null> {
+): Record<string, LoggerMetadata> {
   const visibilityAtFailure = currentVisibility();
   const online = browserOnline();
   const { documentEdgeRequestId, documentEdgeTimingNode } =
@@ -272,6 +278,9 @@ function networkFailureContext(
     documentEdgeRequestId,
     requestDocumentEdgeTimingNode: documentEdgeTimingNode,
     requestStartedAtMs: diag.startedAt,
+    fetchTimingCandidate: {
+      ...resourceTiming(diag.fetchUrl, diag.fetchStartedAt),
+    },
     visibilityAtStart: diag.visibilityAtStart ?? null,
     visibilityAtFailure,
     online,
@@ -655,6 +664,8 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
     }
 
     diag.phase = "fetch";
+    diag.fetchUrl = url;
+    diag.fetchStartedAt = Date.now();
     // oxlint-disable-next-line restricted/no-raw-fetch
     let response = await fetch(url, options);
     diag.status = response.status;
@@ -670,6 +681,7 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
       if (freshCsrfToken && freshCsrfToken !== sentCsrfToken) {
         headers[CSRF_TOKEN_HEADER_NAME] = freshCsrfToken;
         headers[CSRF_RETRY_HEADER_NAME] = "1";
+        diag.fetchStartedAt = Date.now();
         diag.csrfHeaderSent = true;
         // oxlint-disable-next-line restricted/no-raw-fetch
         response = await fetch(url, options);

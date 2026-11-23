@@ -5,6 +5,7 @@ import "server-only";
  * month) and resolve the visitor country of leads that have an IP but no
  * country yet, a bounded batch per run (small WAL bursts on the replica).
  */
+import { setImmediate as yieldToEventLoop } from "node:timers/promises";
 import { gunzipSync, gzipSync } from "node:zlib";
 
 import { sql } from "drizzle-orm";
@@ -158,18 +159,21 @@ export async function backfillLeadCountries(
   `);
   let backfilled = 0;
   if (rows.length > 0) {
-    const values = sql.join(
-      rows.map(
-        (row) => sql`(${row.id}::uuid, ${lookupCountry(table, row.ip)})`,
-      ),
-      sql`, `,
-    );
+    // Yield between groups of lookups so an hourly backfill can share the JS
+    // thread with requests. Bind the results once for a single atomic update.
+    const countries: { id: string; country: string }[] = [];
+    for (const row of rows) {
+      if (countries.length > 0 && countries.length % 100 === 0) {
+        await yieldToEventLoop();
+      }
+      countries.push({ id: row.id, country: lookupCountry(table, row.ip) });
+    }
     const { rows: changed } = await db.execute<
       QueryResultRow & { n: number }
     >(sql`
       WITH updated AS (
         UPDATE leads SET geo_country = v.country
-        FROM (VALUES ${values}) AS v(id, country)
+        FROM jsonb_to_recordset(${JSON.stringify(countries)}::jsonb) AS v(id uuid, country text)
         WHERE leads.id = v.id AND leads.geo_country IS NULL
         RETURNING 1
       ) SELECT count(*)::int AS n FROM updated

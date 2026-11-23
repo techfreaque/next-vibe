@@ -51,6 +51,8 @@ type FetchResult<T> =
       error: string;
       isTimeout?: boolean;
       upstreamStatus?: number;
+      proxyElapsedMs?: number;
+      deadlineFired?: boolean;
       failureStage?: "proxy-headers" | "proxy-body" | "proxy-status";
       /** The caller's input was unfetchable (bad URL, scraper answered 4xx). */
       isCallerError?: boolean;
@@ -385,6 +387,7 @@ class FetchUrlService {
     fetchImpl: typeof globalThis.fetch,
   ): Promise<FetchResult<ScrappeyResponse>> {
     const apiUrl = `${this.SCRAPPEY_API_URL}?key=${agentEnv.SCRAPPEY_API_KEY}`;
+    const proxyStartedAt = performance.now();
     let upstreamStatus: number | undefined;
 
     try {
@@ -441,6 +444,8 @@ class FetchUrlService {
       return {
         ok: false,
         error: `Failed to fetch from Scrappey: ${errorMessage}`,
+        proxyElapsedMs: Math.round(performance.now() - proxyStartedAt),
+        deadlineFired: signal.aborted,
         isTimeout,
         upstreamStatus,
         failureStage:
@@ -587,6 +592,8 @@ export class FetchUrlContentRepository {
           isTimeout: result.isTimeout ?? false,
           isCallerError: result.isCallerError ?? false,
           timeoutMs: fetchService.TIMEOUT,
+          proxyElapsedMs: result.proxyElapsedMs,
+          deadlineFired: result.deadlineFired,
           elapsedMs: Date.now() - startedAt,
           upstreamStatus: result.upstreamStatus,
           failureStage: result.failureStage,

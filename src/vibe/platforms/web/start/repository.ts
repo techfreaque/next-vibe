@@ -214,7 +214,10 @@ function describeStallProfile(
       sampledSpanMs?: number;
       phases?: string;
       streakMs?: number;
+      earliestStreakStartMs?: number | null;
+      latestStreakEndMs?: number | null;
       profileEvidence:
+        | "streak-outside-stall"
         | "matching-streak"
         | "short-streak"
         | "no-js-samples"
@@ -237,9 +240,14 @@ function describeStallProfile(
     profileEvidence:
       profile.totalSamples === 0
         ? "no-js-samples"
-        : profile.streakMs >= stallMs / 2
-          ? "matching-streak"
-          : "short-streak",
+        : (profile.latestStreakEndMs !== null &&
+              profile.latestStreakEndMs < stallStartedAt) ||
+            (profile.earliestStreakStartMs !== null &&
+              profile.earliestStreakStartMs > stallStartedAt + stallMs)
+          ? "streak-outside-stall"
+          : profile.streakMs >= stallMs / 2
+            ? "matching-streak"
+            : "short-streak",
     profileWindowStartedAt: new Date(profile.sessionStartedAt).toISOString(),
     profileWindowEndedAt: new Date(profile.sessionEndedAt).toISOString(),
     profiledHotFrames: profile.hotFrames || "(no app frames)",
@@ -251,6 +259,8 @@ function describeStallProfile(
     sampledSpanMs: profile.sampledSpanMs,
     phases: profile.phases || undefined,
     streakMs: profile.streakMs,
+    earliestStreakStartMs: profile.earliestStreakStartMs,
+    latestStreakEndMs: profile.latestStreakEndMs,
   };
 }
 

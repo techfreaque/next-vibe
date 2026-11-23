@@ -190,6 +190,19 @@ it("NanoGPT distinguishes text arrays from media in rejected requests", async ()
         }),
       }),
     );
+    await expect(generateText({
+      model: provider.chat("z-ai/glm-5.3-uncensored"),
+      experimental_download: async (urls) => urls.map(() => null),
+      messages: [{role: "user", content: [
+        {type: "image", image: new URL("https://example.test/image.png?private-fixture=1")},
+        {type: "image", image: new Uint8Array([1,2,3]), mediaType: "image/png"},
+      ]}],
+      maxRetries: 0,
+    })).rejects.toBeDefined();
+    expect(report).toHaveBeenLastCalledWith("[NanoGPT] API Error", expect.objectContaining({
+      imageTransportCounts: { remote: 1, inline: 1, other: 0 },
+    }));
+    expect(JSON.stringify(report.mock.calls)).not.toContain("private-fixture");
   } finally {
     report.mockRestore();
   }

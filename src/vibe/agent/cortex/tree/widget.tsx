@@ -78,7 +78,8 @@ export function CortexTreeWidget({
   const t = useWidgetTranslation<typeof definition.GET>();
   const isDisabled = useWidgetDisabled();
 
-  const presentMounts = value
+  const hasTree = typeof value?.tree === "string";
+  const presentMounts = hasTree
     ? MOUNT_BADGES.filter((m) => value.tree.includes(m.pathPrefix))
     : [];
 
@@ -113,7 +114,7 @@ export function CortexTreeWidget({
       )}
 
       {/* Response */}
-      {value && (
+      {hasTree && (
         <Div className="flex flex-col gap-3 px-4 pb-4">
           {/* Stats */}
           <Div className="flex items-center gap-2 flex-wrap">

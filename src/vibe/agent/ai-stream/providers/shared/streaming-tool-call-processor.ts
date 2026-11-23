@@ -173,7 +173,18 @@ export async function processStreamingResponseWithToolCalls(
       // the turn diagnosable (the loop reports it as an empty answer).
       const markup = accumulatedContent.slice(toolMarkupStart);
       const hasClosingTag = /<\/tool_calls?\s*>/.test(markup);
+      const firstBodyChar = /^<tool_calls>\s*(\S)/.exec(markup)?.[1];
       logger.warn(`[${providerName}] Tool-call markup did not parse`, {
+        markupBodyKind:
+          firstBodyChar === "["
+            ? "array"
+            : firstBodyChar === "{"
+              ? "object"
+              : firstBodyChar === "<"
+                ? "tag"
+                : "text-or-empty",
+        hasJsonNameField: /"name"\s*:/.test(markup),
+        hasJsonArgumentsField: /"arguments"\s*:/.test(markup),
         model,
         markupChars: markup.length,
         hasClosingTag,

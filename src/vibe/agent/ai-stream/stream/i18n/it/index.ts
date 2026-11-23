@@ -589,6 +589,8 @@ export const translations: typeof enTranslations = {
       "Il modello si è concluso senza scrivere una risposta. Hai pagato solo ciò che il fornitore ha addebitato, nessuna tassa di piattaforma. Prova di nuovo o scegli un altro modello.",
     contentFiltered:
       "Questa risposta è stata bloccata dal filtro dei contenuti del fornitore. Prova un modello diverso.",
+    imageTooLarge:
+      "L’immagine supera il limite di dimensioni del modello. Riducila e inviala di nuovo.",
     malformedToolCall:
       "Il modello ha inviato una chiamata a uno strumento non valida, quindi non è stata eseguita. Premi Continua e riproverà.",
     providerBusy:

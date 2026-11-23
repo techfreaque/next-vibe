@@ -195,6 +195,14 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
       ? {
           radixPopperOpen:
             querySelector("[data-radix-popper-content-wrapper]") !== null,
+          popperRole:
+            querySelector(
+              '[data-radix-popper-content-wrapper] :is([role="menu"],[role="listbox"],[role="dialog"],[role="tooltip"])',
+            )?.getAttribute("role") ?? null,
+          popperInsideScrollArea:
+            querySelector(
+              "[data-radix-scroll-area-viewport] [data-radix-popper-content-wrapper]",
+            ) !== null,
           radixScrollArea:
             querySelector("[data-radix-scroll-area-viewport]") !== null,
           activeElement: describeActiveElement(),

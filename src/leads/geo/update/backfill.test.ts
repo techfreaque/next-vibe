@@ -50,4 +50,17 @@ it("fills a healthy lead within the batch limit when newer rows have duplicate e
     backfilled: 0,
     unresolved: 2,
   });
+
+  await pg.exec(`
+    INSERT INTO leads (ip_address, created_at)
+    SELECT '198.51.100.77', now() FROM generate_series(1, 205)
+  `);
+  expect(await backfillLeadCountries(logger, 201)).toEqual({
+    backfilled: 201,
+    unresolved: 6,
+  });
+  expect(await backfillLeadCountries(logger, 201)).toEqual({
+    backfilled: 4,
+    unresolved: 2,
+  });
 });

@@ -39,7 +39,18 @@ const nanoGptRequestSchema = z.object({
     z.object({
       role: z.string(),
       content: z
-        .union([z.string(), z.array(z.object({ type: z.string() }))])
+        .union([
+          z.string(),
+          z.array(
+            z.object({
+              type: z.string(),
+              image_url: z
+                .object({ url: z.string() })
+                .optional()
+                .catch(undefined),
+            }),
+          ),
+        ])
         .nullish(),
     }),
   ),
@@ -61,6 +72,7 @@ async function describeRequestShape(
 ): Promise<{
   model: string | undefined;
   requestShape: Record<string, string | number | boolean> | null;
+  imageTransportCounts?: { remote: number; inline: number; other: number };
 }> {
   if (typeof body !== "string") {
     return { model: undefined, requestShape: null };
@@ -80,8 +92,17 @@ async function describeRequestShape(
     Array.isArray(content) ? [content] : [],
   );
   const parts = multipart.flat();
+  const images = parts.filter(({ type }) => type === "image_url");
+  const imageTransportCounts = { remote: 0, inline: 0, other: 0 };
+  for (const image of images) {
+    const url = image.image_url?.url ?? "";
+    if (/^https?:\/\//i.test(url)) {imageTransportCounts.remote++;}
+    else if (/^data:/i.test(url)) {imageTransportCounts.inline++;}
+    else {imageTransportCounts.other++;}
+  }
   return {
     model: request.model,
+    imageTransportCounts,
     requestShape: {
       chars: body.length,
       parsed: true,
@@ -94,7 +115,7 @@ async function describeRequestShape(
         (content) =>
           content.length > 0 && content.every(({ type }) => type === "text"),
       ).length,
-      images: parts.filter(({ type }) => type === "image_url").length,
+      images: images.length,
       audio: parts.filter(({ type }) => type === "input_audio").length,
       video: parts.filter(({ type }) => type === "video_url").length,
       files: parts.filter(({ type }) => type === "file").length,

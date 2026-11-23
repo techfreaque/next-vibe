@@ -35,6 +35,13 @@ export function providerErrorTranslationKey(
   if (!providerErrorText) {
     return null;
   }
+  if (
+    /\bimage exceeds (?:the )?(?:\d+(?:\.\d+)?\s*(?:Mi?B|Ki?B|bytes?|pixels?)|maximum (?:size|dimensions?))\b/i.test(
+      providerErrorText,
+    )
+  ) {
+    return "errors.imageTooLarge";
+  }
   if (MALFORMED_TOOL_CALL_PATTERN.test(providerErrorText)) {
     return "errors.malformedToolCall";
   }

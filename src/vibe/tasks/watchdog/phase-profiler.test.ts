@@ -43,6 +43,10 @@ describe("PhaseProfiler", () => {
     expect(profile?.streakMs).toBeGreaterThanOrEqual(150);
     expect(profile?.hotFrames).toContain("blockTheLoopForProfilerTest");
     expect(profile?.phases).toContain("cron-post:test");
+    expect(profile?.earliestStreakStartMs).toBeGreaterThanOrEqual(profile?.sessionStartedAt ?? 0);
+    expect(profile?.earliestStreakStartMs).toBeLessThanOrEqual(stallAt + 300);
+    expect(profile?.latestStreakEndMs).toBeGreaterThanOrEqual(stallAt);
+    expect(profile?.latestStreakEndMs).toBeLessThanOrEqual(profile?.sessionEndedAt ?? 0);
     expect(profile?.totalSamples).toBeGreaterThan(0);
     expect(profile?.windowSampleCount).toBeGreaterThanOrEqual(
       profile?.totalSamples ?? 0,

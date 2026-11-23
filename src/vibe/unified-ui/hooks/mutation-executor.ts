@@ -10,6 +10,10 @@ import type {
 import { ErrorResponseTypes, fail } from "../../core/route/response.schema";
 import { isErrorResponseType, parseError } from "../../core/utils/parse-error";
 import type { JwtPayloadType } from "../../identity/auth/types";
+import {
+  handleChunkLoadFailure,
+  isChunkLoadError,
+} from "../../logger/chunk-reload";
 import type { EndpointLogger } from "../../logger/types";
 import type { callApi as CallApiFn } from "./call-api";
 import { scopedTranslation as hooksTranslation } from "./i18n";
@@ -223,6 +227,23 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
       errorKey: errorResponse.errorType.errorKey,
       status: errorResponse.errorType.errorCode,
     });
+
+    if (
+      typeof window !== "undefined" &&
+      (phase === "load-client" || phase === "call-api") &&
+      isChunkLoadError(parsedError)
+    ) {
+      handleChunkLoadFailure(logger, {
+        source: "mutation-executor",
+        error: parsedError,
+        context: {
+          endpoint: endpoint.path.join("/"),
+          method: endpoint.method,
+          phase,
+          requestId: requestId ?? null,
+        },
+      });
+    }
 
     if (options.onError && phase !== "on-error") {
       await options.onError({

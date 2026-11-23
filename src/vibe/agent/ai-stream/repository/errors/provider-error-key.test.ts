@@ -8,6 +8,11 @@ import { describe, expect, it } from "vitest";
 import { providerErrorTranslationKey } from "./provider-error-key";
 
 describe("providerErrorTranslationKey", () => {
+  it("identifies the provider's per-image limit without treating a token limit as an image error", () => {
+    expect(providerErrorTranslationKey("image exceeds 10 MB maximum")).toBe("errors.imageTooLarge");
+    expect(providerErrorTranslationKey("Input exceeds 3000 tokens")).toBeNull();
+  });
+
   it("overloads and outages say retry or switch", () => {
     expect(
       providerErrorTranslationKey(

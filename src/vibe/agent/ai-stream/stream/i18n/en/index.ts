@@ -575,6 +575,8 @@ export const translations = {
       "The model ended without writing an answer. You paid only what the provider charged, no platform fee. Try again or pick another model.",
     contentFiltered:
       "This response was blocked by the provider's content filter. Try a different model.",
+    imageTooLarge:
+      "This image exceeds the model’s size limit. Send a smaller image and try again.",
     malformedToolCall:
       "The model sent a broken tool call, so it was not run. Press Continue and it will try again.",
     providerBusy:

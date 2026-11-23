@@ -6,7 +6,7 @@ import {
   observeChunkReloadOutcome,
   resetChunkReloadForTests,
 } from "./chunk-reload";
-import { chunkLoadDiagnostics, describeUrl } from "./resource-diagnostics";
+import { chunkLoadDiagnostics, describeUrl, resourceTiming } from "./resource-diagnostics";
 import type { EndpointLogger, LoggerMetadata } from "./types";
 
 interface LoggedCall {
@@ -158,6 +158,45 @@ describe("handleChunkLoadFailure", () => {
         `Loading chunk 123456 failed. (error: https://unbottled.ai${path}?dpl=sample#asset)`,
       ),
     ).toMatchObject({ chunkUrl: path });
+  });
+
+  it("keeps a failed API timing separate from earlier, concurrent or non-fetch resources", () => {
+    const original = Object.getOwnPropertyDescriptor(globalThis, "PerformanceResourceTiming");
+    class Sample {
+      readonly name = "https://unbottled.ai/api/example";
+      readonly entryType = "resource";
+      readonly duration = 125;
+      readonly nextHopProtocol = "h2";
+      readonly responseStatus = 504;
+      readonly workerStart = 1;
+      readonly deliveryType = "cache";
+      readonly transferSize = 0;
+      readonly decodedBodySize = 0;
+      readonly responseStart = 0;
+      readonly requestStart = 0;
+      readonly responseEnd = 130;
+      constructor(readonly startTime: number, readonly initiatorType: string) {}
+      toJSON(): string { return ""; }
+    }
+    Object.defineProperty(globalThis, "PerformanceResourceTiming", { configurable: true, value: Sample });
+    const entries = spyOn(performance, "getEntriesByName");
+    try {
+      const path = "/api/example";
+      const since = Math.floor(performance.timeOrigin + 50);
+      entries.mockReturnValue([new Sample(10, "fetch"), new Sample(60, "img")]);
+      expect(resourceTiming(path, since).responseStatus).toBeNull();
+      entries.mockReturnValue([new Sample(10, "fetch"), new Sample(60, "fetch")]);
+      expect(resourceTiming(path, since)).toMatchObject({
+        responseStatus: 504, nextHopProtocol: "h2", workerStartObserved: true,
+        resourceOrigin: "same-origin", deliveryType: "cache",
+      });
+      entries.mockReturnValue([new Sample(55, "fetch"), new Sample(60, "fetch")]);
+      expect(resourceTiming(path, since).responseStatus).toBeNull();
+    } finally {
+      entries.mockRestore();
+      if (original) Object.defineProperty(globalThis, "PerformanceResourceTiming", original);
+      else Reflect.deleteProperty(globalThis, "PerformanceResourceTiming");
+    }
   });
 
   it("reports each failed chunk and reloads only once when the failure recurs", async () => {

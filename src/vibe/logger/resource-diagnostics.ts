@@ -60,6 +60,10 @@ export function urlExtension(raw: string | null | undefined): string | null {
 interface ResourceTimingEvidence {
   responseStatus: number | null;
   transferSize: number | null;
+  resourceOrigin: "same-origin" | "cross-origin" | null;
+  nextHopProtocol: string | null;
+  deliveryType: string | null;
+  workerStartObserved: boolean | null;
   durationMs: number | null;
   decodedBodySize: number | null;
   responseWaitMs: number | null;
@@ -169,10 +173,15 @@ export function describeResourceResponse(
 /** Resource Timing records evidence that the generic browser error event lacks. */
 export function resourceTiming(
   raw: string | null | undefined,
+  fetchStartedAt?: number,
 ): ResourceTimingEvidence {
   const empty: ResourceTimingEvidence = {
     responseStatus: null,
     transferSize: null,
+    resourceOrigin: null,
+    nextHopProtocol: null,
+    deliveryType: null,
+    workerStartObserved: null,
     durationMs: null,
     decodedBodySize: null,
     responseWaitMs: null,
@@ -190,17 +199,27 @@ export function resourceTiming(
   }
   try {
     const resource = new URL(raw, getCurrentUrl());
+    const sameOrigin = resource.origin === getCurrentOrigin();
+    empty.resourceOrigin = sameOrigin ? "same-origin" : "cross-origin";
     const entries = performance.getEntriesByName(resource.href);
     // The page's own navigation entry is a PerformanceResourceTiming too: an
     // element whose src resolved to the page URL (src="") must not borrow the
     // document's status/size (prod: <img>/<audio> "200, 9199 bytes").
-    const entry = entries
-      .filter(
-        (candidate) =>
-          typeof PerformanceNavigationTiming === "undefined" ||
-          !(candidate instanceof PerformanceNavigationTiming),
-      )
-      .at(-1);
+    const candidates = entries.filter(
+      (candidate) =>
+        candidate.entryType === "resource" &&
+        (fetchStartedAt === undefined ||
+          (candidate instanceof PerformanceResourceTiming &&
+            candidate.initiatorType === "fetch" &&
+            Math.floor(performance.timeOrigin + candidate.startTime) >=
+              fetchStartedAt)),
+    );
+    // An earlier request for the same endpoint or concurrent fetches cannot
+    // identify this attempt. Leave its timing unavailable in that case.
+    const entry =
+      fetchStartedAt === undefined || candidates.length === 1
+        ? candidates.at(-1)
+        : undefined;
     if (!(entry instanceof PerformanceResourceTiming)) {
       return empty;
     }
@@ -208,9 +227,16 @@ export function resourceTiming(
       "responseStatus" in entry && typeof entry.responseStatus === "number"
         ? entry.responseStatus
         : null;
-    const sameOrigin = resource.origin === getCurrentOrigin();
     return {
       responseStatus,
+      resourceOrigin: empty.resourceOrigin,
+      nextHopProtocol: entry.nextHopProtocol || null,
+      deliveryType:
+        "deliveryType" in entry && typeof entry.deliveryType === "string"
+          ? entry.deliveryType || null
+          : null,
+      workerStartObserved:
+        typeof entry.workerStart === "number" ? entry.workerStart > 0 : null,
       transferSize: entry.transferSize,
       durationMs: Math.round(entry.duration),
       ...describeResourceResponse(entry),

@@ -68,6 +68,9 @@ export interface StallProfile {
   sessionEndedAt: number;
   /** Longest uninterrupted JS-busy stretch in the session */
   streakMs: number;
+  /** Bounds on the sampled streak's wall-clock position from the enclosing session. */
+  earliestStreakStartMs: number | null;
+  latestStreakEndMs: number | null;
   /** "label start..end" of every phase in the session ("" outside phases) */
   phases: string;
   /** Most sampled innermost app frames in the streak: "fn file:line xN" */
@@ -251,6 +254,21 @@ function summarize(
     sessionStartedAt: session.startedAt,
     sessionEndedAt: endedAt,
     streakMs,
+    // JSC timestamps use a separate monotonic clock. Time between samples
+    // places bounds on the streak even when the sampler was idle at either end.
+    earliestStreakStartMs:
+      end > start
+        ? session.startedAt +
+          Math.floor((traces[start].timestamp - traces[0].timestamp) * 1000)
+        : null,
+    latestStreakEndMs:
+      end > start
+        ? endedAt -
+          Math.floor(
+            (traces[traces.length - 1].timestamp - traces[end - 1].timestamp) *
+              1000,
+          )
+        : null,
     phases: session.phases
       .map(
         (phase) =>
@@ -358,6 +376,8 @@ function startSession(logger: EndpointLogger): ProfileSession {
           "[EventLoop] Stall profiled in a window with cron bookkeeping",
           {
             streakMs: stall.streakMs,
+            earliestStreakStartMs: stall.earliestStreakStartMs,
+            latestStreakEndMs: stall.latestStreakEndMs,
             profileWindowStartedAt: new Date(
               stall.sessionStartedAt,
             ).toISOString(),

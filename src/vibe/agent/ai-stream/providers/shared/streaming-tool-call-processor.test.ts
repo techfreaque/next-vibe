@@ -6,7 +6,7 @@
  * normal answer for good.
  */
 
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it, mock } from "bun:test";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { createEndpointLogger } from "next-vibe/logger/server";
 
@@ -141,6 +141,19 @@ describe("processStreamingResponseWithToolCalls", () => {
     expect(result.text).toBe("On it. ");
     expect(result.toolCalls).toEqual(["generate_image"]);
     expect(result.finishReason).toBe("tool_calls");
+  });
+
+  it("reports the shape of rejected markup without its arguments", async () => {
+    const warn = mock(() => undefined);
+    const response = await processStreamingResponseWithToolCalls(
+      upstream(['<tool_calls>{"name":"example","arguments":{"value":"private fixture"}}</tool_calls>'], "stop"),
+      { ...logger, warn }, "test", true,
+    );
+    await response.text();
+    expect(warn).toHaveBeenCalledWith("[test] Tool-call markup did not parse", expect.objectContaining({
+      markupBodyKind: "object", hasJsonNameField: true, hasJsonArgumentsField: true,
+    }));
+    expect(JSON.stringify(warn.mock.calls)).not.toContain("private fixture");
   });
 
   it("cuts a runaway tool-call block and stops reading upstream", async () => {

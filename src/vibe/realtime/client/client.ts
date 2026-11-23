@@ -108,6 +108,7 @@ const MAX_FAST_RECONNECT_ATTEMPTS = 6;
 
 // Shared connection state
 let sharedWs: WebSocket | null = null;
+let pendingHandshake: { requestId: string; startedAt: number } | null = null;
 let reconnectAttempts = 0;
 // Once fast retries run out, an active tab retries at a slower rate.
 let reconnectPaused = false;
@@ -239,6 +240,11 @@ function reportDrop(
     lastFailedHandshakeContext,
     maxReconnectTimerOverrunMs,
     reconnectPaused,
+    pendingHandshakeRequestId: pendingHandshake?.requestId ?? null,
+    pendingHandshakeMs: pendingHandshake
+      ? Date.now() - pendingHandshake.startedAt
+      : null,
+    retryScheduled: reconnectTimer !== null,
     recovered: dropReportTrigger === "reconnected",
     dropReportTrigger,
   });
@@ -458,6 +464,7 @@ function connect(logger: EndpointLogger): void {
   const handshakeContext = readHandshakeContext();
   const ws = new WebSocket(url);
   sharedWs = ws;
+  pendingHandshake = { requestId, startedAt: connectStartedAt };
   if (pendingDrop !== null) {
     dropReconnectCount++;
   }
@@ -498,6 +505,7 @@ function connect(logger: EndpointLogger): void {
       return; // replaced on purpose (identity change); the new socket owns state
     }
     sharedWs = null;
+    pendingHandshake = null;
     const closedAt = Date.now();
     const socketOpenedAt = openedAt;
     const socketLastFrameAt = lastFrameAt;
@@ -598,6 +606,7 @@ function connect(logger: EndpointLogger): void {
 
   ws.addEventListener("open", () => {
     if (sharedWs === ws) {
+      pendingHandshake = null;
       handleOpen(logger);
     }
   });
@@ -823,6 +832,7 @@ export function reconnectForIdentityChange(logger: EndpointLogger): void {
     return;
   }
   sharedWs = null;
+  pendingHandshake = null;
   openedAt = null;
   lastFrameAt = null;
   reconnectAttempts = 0;

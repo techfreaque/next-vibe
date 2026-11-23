@@ -1,4 +1,4 @@
-import { describe, expect, it, mock } from "bun:test";
+import { describe, expect, it, mock, spyOn } from "bun:test";
 
 import ledgerDefinition from "@/chart-of-accounts/ledger/[accountId]/definition";
 
@@ -97,4 +97,38 @@ it("reports an onError callback failure without invoking the callback twice", as
     expect.any(Error),
     expect.objectContaining({ phase: "on-error", status: 500 }),
   );
+});
+
+it("reports a caught browser chunk failure to recovery without replaying the mutation", async () => {
+  const chunk = new Error("Loading chunk 819812 failed.");
+  chunk.name = "ChunkLoadError";
+  const callApi = mock(() => Promise.reject(chunk));
+  void mock.module("./call-api", () => ({ callApi }));
+  const recovery = mock(() => true);
+  const chunkRecovery = await import("../../logger/chunk-reload");
+  const recover = spyOn(chunkRecovery, "handleChunkLoadFailure").mockImplementation(recovery);
+  const priorWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+  Object.defineProperty(globalThis, "window", { configurable: true, value: {} });
+  const error = mock(() => undefined);
+  try {
+    const result = await executeMutation({
+      endpoint: ledgerDefinition.GET,
+      locale: "en-GLOBAL",
+      logger: { error, warn: mock(), info: mock(), debug: mock(), vibe: mock(), isDebugEnabled: false },
+      requestData: { page: 1, pageSize: 20 },
+      pathParams: { accountId: "00000000-0000-4000-8000-0000000000aa" },
+      user: { isPublic: false, id: "00000000-0000-4000-8000-000000000001", leadId: "00000000-0000-4000-8000-000000000002", roles: [] },
+    });
+    expect(result.success).toBe(false);
+    expect(callApi).toHaveBeenCalledTimes(1);
+    expect(error).toHaveBeenCalled();
+    expect(recovery).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ source: "mutation-executor", error: chunk }));
+  } finally {
+    recover.mockRestore();
+    if (priorWindow) {
+      Object.defineProperty(globalThis, "window", priorWindow);
+    } else {
+      Reflect.deleteProperty(globalThis, "window");
+    }
+  }
 });
