@@ -1600,12 +1600,11 @@ class ViteCompiler {
       // Keys are import specifiers, values are paths relative to ROOT_DIR.
       const moduleAliases = fileConfig.viteOptions?.moduleAliases ?? {};
       const watchRoot = ROOT_DIR.replaceAll("\\", "/");
+      const nextBuildRootPrefix = `${watchRoot}/.next-`;
       const ignoredWatchRoots = [
         ".tmp",
         ".dist",
         ".next",
-        ".next-prod",
-        ".next-rebuild",
         ".tanstack",
         ".claude",
         ".git",
@@ -2540,6 +2539,8 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
               // Match the directory itself so chokidar never walks its children.
               const directoryPath = `${filePath}/`;
               return (
+                // NEXT_DIST_DIR can select a separate root, e.g. .next-perf.
+                filePath.startsWith(nextBuildRootPrefix) ||
                 ignoredWatchRoots.some((dir) =>
                   directoryPath.startsWith(dir),
                 ) ||

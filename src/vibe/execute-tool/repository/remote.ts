@@ -472,6 +472,7 @@ export class RemoteDispatch {
       (platform !== Platform.AI || isDirectHttpBlockingAi);
     if (token !== null && useInlineHttp) {
       const direct = await callToolDirect({
+        instanceId,
         remoteUrl: connInfo.remoteUrl,
         token,
         leadId: connInfo.leadId,

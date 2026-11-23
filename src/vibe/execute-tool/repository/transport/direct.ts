@@ -26,6 +26,7 @@ import type { RouteExecuteContext } from "../types";
  * by the direct-http WAIT/END_LOOP leg.
  */
 export async function callToolDirect(params: {
+  instanceId: string;
   remoteUrl: string;
   token: string;
   leadId: string;
@@ -36,8 +37,17 @@ export async function callToolDirect(params: {
   t: AiT;
   toolTimeoutMs?: number;
 }): Promise<ResponseType<RouteExecuteResponseOutput>> {
-  const { remoteUrl, token, leadId, toolName, input, locale, logger, t } =
-    params;
+  const {
+    instanceId,
+    remoteUrl,
+    token,
+    leadId,
+    toolName,
+    input,
+    locale,
+    logger,
+    t,
+  } = params;
   const url = `${remoteUrl}/api/${locale}/${executeDefinition.POST.path.join("/")}`;
   const timeoutMs =
     params.toolTimeoutMs === 0 ? 600_000 : (params.toolTimeoutMs ?? 90_000);
@@ -102,7 +112,7 @@ export async function callToolDirect(params: {
         if ((routerNotReady || preHandlerFailure) && attempt < maxAttempts) {
           logger.warn(
             "[RouteExecute] callToolDirect pre-handler failure — retrying",
-            { toolName, status: resp.status, attempt },
+            { toolName, instanceId, status: resp.status, attempt },
           );
           // The dev HTTP layer drops large bodies in bursts — an immediate
           // resend hits the same stressed socket pool and fails identically.
@@ -114,7 +124,9 @@ export async function callToolDirect(params: {
         }
         logger.warn("[RouteExecute] callToolDirect HTTP error", {
           toolName,
+          instanceId,
           status: resp.status,
+          attempt,
           remoteMessage,
         });
         return fail({
@@ -135,6 +147,7 @@ export async function callToolDirect(params: {
       // tells WHICH instance was unreachable.
       logger.warn("[RouteExecute] callToolDirect network error", {
         toolName,
+        instanceId,
         peer: remoteUrl,
         attempt,
         timedOut: err instanceof Error && err.name === "TimeoutError",
