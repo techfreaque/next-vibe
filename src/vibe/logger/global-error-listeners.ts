@@ -104,14 +104,14 @@ function handleWindowError(logger: EndpointLogger, event: Event): void {
     if (target instanceof HTMLElement) {
       const tag = target.tagName.toLowerCase();
       const src =
-        target instanceof HTMLScriptElement ||
-        target instanceof HTMLImageElement ||
-        target instanceof HTMLMediaElement ||
-        target instanceof HTMLIFrameElement
-          ? target.src
-          : target instanceof HTMLLinkElement
-            ? target.href
-            : null;
+        target instanceof HTMLImageElement || target instanceof HTMLMediaElement
+          ? target.currentSrc || target.src
+          : target instanceof HTMLScriptElement ||
+              target instanceof HTMLIFrameElement
+            ? target.src
+            : target instanceof HTMLLinkElement
+              ? target.href
+              : null;
       const resource = describeUrl(src);
       const details = {
         source: "window.error.resource",

@@ -138,6 +138,7 @@ export function createNanoGPT(
         status: response.status,
         statusText: response.statusText,
         body: upstreamError.summary,
+        upstreamResponseKind: upstreamError.isHtmlPage ? "edge-html" : "api",
         cfRay: upstreamError.cfRay,
         providerRequestId: response.headers.get("x-request-id"),
         retryAfter: response.headers.get("retry-after"),

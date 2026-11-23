@@ -44,6 +44,9 @@ describe("PhaseProfiler", () => {
     expect(profile?.hotFrames).toContain("blockTheLoopForProfilerTest");
     expect(profile?.phases).toContain("cron-post:test");
     expect(profile?.totalSamples).toBeGreaterThan(0);
+    expect(profile?.windowSampleCount).toBeGreaterThanOrEqual(
+      profile?.totalSamples ?? 0,
+    );
     expect(profile?.gcSamples).toBeLessThanOrEqual(profile?.totalSamples ?? 0);
     if (profile && profile.streakMs >= 200) {
       expect(warn).toHaveBeenCalledWith(

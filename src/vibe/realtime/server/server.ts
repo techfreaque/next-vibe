@@ -669,6 +669,7 @@ export function startWebSocketServer(
 
       pong(ws): void {
         ws.data.lastInboundAt = Date.now();
+        ws.data.lastPongAt = ws.data.lastInboundAt;
         ws.data.pongCount++;
       },
 

@@ -290,6 +290,7 @@ export interface WsConnectionData {
   lastInboundAt: number;
   /** Pongs received on this socket (0 = no ping was ever answered). */
   pongCount: number;
+  lastPongAt?: number;
   /**
    * Set only for reverse-ws connector sockets (local → cloud outbound WS).
    * Identifies which remoteConnections row opened this socket so the server

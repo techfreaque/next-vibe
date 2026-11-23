@@ -18,6 +18,10 @@ import {
 } from "../realtime/core/proxy-timing";
 import { sanitizeRoutePath } from "./client-context";
 
+// Match the public JS/CSS paths recorded in both Caddy edge logs.
+const NEXT_BUNDLE_PATH =
+  /^\/_next\/static\/chunks\/[A-Za-z0-9_./~-]+\.(?:js|css)$/;
+
 /** Path of a resource URL without query/hash (may carry signed tokens). */
 export function describeUrl(raw: string | null | undefined): string | null {
   if (!raw) {
@@ -30,6 +34,9 @@ export function describeUrl(raw: string | null | undefined): string | null {
       return raw.split(/[?#]/)[0]?.slice(0, 200) ?? null;
     }
     const sameOrigin = url.origin === getCurrentOrigin();
+    if (sameOrigin && NEXT_BUNDLE_PATH.test(url.pathname)) {
+      return url.pathname;
+    }
     return `${sameOrigin ? "" : url.origin}${sanitizeRoutePath(url.pathname)}`;
   } catch {
     return raw.slice(0, 200);
@@ -60,6 +67,11 @@ interface ResourceTimingEvidence {
   resourceStartedAtMs: number | null;
   resourceReportedAtMs: number;
   resourceFailureKind: string;
+  resourceTimingPhase:
+    | "unavailable"
+    | "no-request-start"
+    | "request"
+    | "response";
   proxyTimingStage: ProxyTimingStage | null;
   edgeTimingNode: ReturnType<typeof readEdgeTimingNode>;
   edgeRequestId: string | null;
@@ -158,7 +170,7 @@ export function describeResourceResponse(
 export function resourceTiming(
   raw: string | null | undefined,
 ): ResourceTimingEvidence {
-  const empty = {
+  const empty: ResourceTimingEvidence = {
     responseStatus: null,
     transferSize: null,
     durationMs: null,
@@ -168,6 +180,7 @@ export function resourceTiming(
     resourceStartedAtMs: null,
     resourceReportedAtMs: Date.now(),
     resourceFailureKind: "no-resource-timing",
+    resourceTimingPhase: "unavailable",
     proxyTimingStage: null,
     edgeTimingNode: null,
     edgeRequestId: null,
@@ -207,6 +220,12 @@ export function resourceTiming(
         responseStatus,
         entry.decodedBodySize,
       ),
+      resourceTimingPhase:
+        entry.responseStart > 0
+          ? "response"
+          : entry.requestStart > 0
+            ? "request"
+            : "no-request-start",
       proxyTimingStage: sameOrigin
         ? readProxyTimingStage(
             entry.serverTiming?.find(({ name }) => name === PROXY_TIMING_METRIC)

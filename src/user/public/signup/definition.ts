@@ -70,7 +70,7 @@ export const signupErrorTypes = {
 /**
  * POST /signup - User registration
  */
-const { POST } = createEndpoint({
+const { POST: signupPost } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["user", "public", "signup"],
@@ -386,6 +386,17 @@ const { POST } = createEndpoint({
     },
   },
 });
+
+const POST: typeof signupPost = {
+  ...signupPost,
+  formSchema: signupPost.formSchema.refine(
+    ({ password, confirmPassword }) => password === confirmPassword,
+    {
+      path: ["confirmPassword"],
+      message: "fields.confirmPassword.validation.mismatch",
+    },
+  ),
+};
 
 // Export types as required by migration guide
 export type SignupPostRequestInput = typeof POST.types.RequestInput;

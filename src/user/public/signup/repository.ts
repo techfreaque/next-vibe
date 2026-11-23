@@ -96,8 +96,9 @@ export class SignupRepository {
 
       // Validate password match
       if (password !== confirmPassword) {
-        logger.debug("Registration failed: Passwords do not match", {
-          email,
+        logger.warn("Signup password confirmation rejected", {
+          field: "confirmPassword",
+          confirmationIsPrefix: password.startsWith(confirmPassword),
         });
         return fail({
           message: t("fields.confirmPassword.validation.mismatch"),

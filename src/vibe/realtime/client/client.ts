@@ -166,6 +166,7 @@ let dropReconnectCount = 0;
 let failedHandshakesDuringDrop = 0;
 let lastFailedHandshakeRequestId: string | null = null;
 let lastFailedHandshakeMs: number | null = null;
+let lastFailedHandshakeCode: number | null = null;
 let lastFailedHandshakeContext: ReturnType<typeof readHandshakeContext> | null =
   null;
 let maxReconnectTimerOverrunMs = 0;
@@ -217,7 +218,10 @@ function stopDropCheck(): void {
   }
 }
 
-function reportDrop(logger: EndpointLogger, recovered: boolean): void {
+function reportDrop(
+  logger: EndpointLogger,
+  dropReportTrigger: "reconnected" | "deadline" | "pagehide",
+): void {
   if (disconnectedAt === null || dropReported) {
     return;
   }
@@ -231,10 +235,12 @@ function reportDrop(logger: EndpointLogger, recovered: boolean): void {
     failedHandshakesDuringDrop,
     lastFailedHandshakeRequestId,
     lastFailedHandshakeMs,
+    lastFailedHandshakeCode,
     lastFailedHandshakeContext,
     maxReconnectTimerOverrunMs,
     reconnectPaused,
-    recovered,
+    recovered: dropReportTrigger === "reconnected",
+    dropReportTrigger,
   });
 }
 
@@ -245,7 +251,7 @@ function startDropCheck(logger: EndpointLogger): void {
       return;
     }
     if (Date.now() - disconnectedAt >= DROP_REPORT_AFTER_MS) {
-      reportDrop(logger, false);
+      reportDrop(logger, "deadline");
     }
   }, DROP_CHECK_INTERVAL_MS);
 }
@@ -279,6 +285,7 @@ function handleOpen(logger: EndpointLogger): void {
         failedHandshakesDuringDrop,
         lastFailedHandshakeRequestId,
         lastFailedHandshakeMs,
+        lastFailedHandshakeCode,
         lastFailedHandshakeContext,
         maxReconnectTimerOverrunMs,
         offlineMs: Date.now() - disconnectedAt,
@@ -287,7 +294,7 @@ function handleOpen(logger: EndpointLogger): void {
         recovered: true,
       });
     } else {
-      reportDrop(logger, true);
+      reportDrop(logger, "reconnected");
     }
   }
   disconnectedAt = null;
@@ -298,6 +305,7 @@ function handleOpen(logger: EndpointLogger): void {
   failedHandshakesDuringDrop = 0;
   lastFailedHandshakeRequestId = null;
   lastFailedHandshakeMs = null;
+  lastFailedHandshakeCode = null;
   lastFailedHandshakeContext = null;
   maxReconnectTimerOverrunMs = 0;
   noticeableDownMs = 0;
@@ -502,6 +510,7 @@ function connect(logger: EndpointLogger): void {
       failedHandshakesDuringDrop++;
       lastFailedHandshakeRequestId = requestId;
       lastFailedHandshakeMs = closedAt - connectStartedAt;
+      lastFailedHandshakeCode = event.code;
       lastFailedHandshakeContext = handshakeContext;
     }
     // Keep the first close of the episode. Recovery, the report timer, or
@@ -558,6 +567,7 @@ function connect(logger: EndpointLogger): void {
           failedHandshakesDuringDrop,
           lastFailedHandshakeRequestId,
           lastFailedHandshakeMs,
+          lastFailedHandshakeCode,
           lastFailedHandshakeContext,
           maxReconnectTimerOverrunMs,
           hiddenAtClose: pendingDrop?.hiddenAtClose ?? null,
@@ -618,7 +628,7 @@ if (typeof document !== "undefined") {
     noticeableDownMs = currentNoticeableDownMs();
     noticeableSince = null;
     if (lastLogger) {
-      reportDrop(lastLogger, false);
+      reportDrop(lastLogger, "pagehide");
     }
   });
   addWindowListener("pageshow", () => {

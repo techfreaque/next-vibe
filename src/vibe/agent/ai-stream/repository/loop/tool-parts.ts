@@ -943,6 +943,7 @@ async function executeFallbackTool(
           errorCode: result.errorType.errorCode,
           causeKey: result.cause?.errorType.errorKey ?? null,
           argsShape: describeToolArgShape(args),
+          dispatchedArgsShape: describeToolArgShape(inputArgs),
           executeToolTargetShape:
             toolName === EXECUTE_TOOL_ALIAS
               ? describeToolArgShape(rawArgs["toolName"])

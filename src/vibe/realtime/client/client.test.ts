@@ -99,6 +99,7 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
           maxReconnectTimerOverrunMs: 0,
           offlineMs: 500,
           recovered: true,
+          dropReportTrigger: "reconnected",
         },
       },
     ]);
@@ -125,12 +126,14 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
           "requestId",
         ),
         lastFailedHandshakeMs: 0,
+        lastFailedHandshakeCode: 1006,
         msSinceVisibilityChange: 0,
         msSinceNetworkChange: 0,
         offlineMs: 20_000,
         hiddenAtClose: true,
         online: false,
         recovered: false,
+        dropReportTrigger: "deadline",
       },
     });
     TestSocket.sockets[3]?.open();
@@ -174,6 +177,18 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     expect(warnings.at(-1)).toMatchObject({
       message: "[WS Client] Reconnected after disconnect",
       context: { noticeableDownMs: 121_000, offlineMs: 181_000 },
+    });
+
+    TestSocket.sockets.at(-1)?.drop(1001, "going away");
+    fakeWindow.dispatchEvent(new Event("pagehide"));
+    expect(errors.at(-1)).toMatchObject({
+      message: "[WS Client] Connection lost",
+      context: {
+        code: 1001,
+        attempts: 0,
+        recovered: false,
+        dropReportTrigger: "pagehide",
+      },
     });
   } finally {
     jest.useRealTimers();

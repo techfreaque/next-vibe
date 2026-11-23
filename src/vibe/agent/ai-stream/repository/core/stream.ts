@@ -147,6 +147,8 @@ export class ToolExecutionContextImpl {
   creditBudgetCapped = false;
   /** stopWhen ended the tool loop: the wallet cannot pay another step. */
   creditBudgetStopped = false;
+  /** Input estimate for the refused step, when the budget ended the loop. */
+  creditBudgetNextInputTokens: number | null = null;
 
   /** Text of the last provider `error` stream part (already logged, classified
    *  transient/real, where it arrived). finalize uses it to avoid re-logging a

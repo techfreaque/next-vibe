@@ -210,6 +210,8 @@ function describeStallProfile(
       hotNative?: string;
       gcSamples?: number;
       totalSamples?: number;
+      windowSampleCount?: number;
+      sampledSpanMs?: number;
       phases?: string;
       streakMs?: number;
       profileEvidence:
@@ -245,6 +247,8 @@ function describeStallProfile(
     hotNative: profile.hotNative || undefined,
     gcSamples: profile.gcSamples,
     totalSamples: profile.totalSamples,
+    windowSampleCount: profile.windowSampleCount,
+    sampledSpanMs: profile.sampledSpanMs,
     phases: profile.phases || undefined,
     streakMs: profile.streakMs,
   };
@@ -409,7 +413,10 @@ export class ServerStartRepository {
       const stack = reason instanceof Error ? reason.stack : undefined;
       logger.error(
         "[Supervisor] Unhandled rejection in supervisor - continuing",
-        { error: message, stack },
+        {
+          error: message,
+          stack,
+        },
       );
     });
 
@@ -523,7 +530,9 @@ export class ServerStartRepository {
         if (orphans.length > 0) {
           logger.warn(
             "[Supervisor] Stopping processes orphaned by the crashed server",
-            { pids: orphans.join(",") },
+            {
+              pids: orphans.join(","),
+            },
           );
         }
 

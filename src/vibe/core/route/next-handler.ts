@@ -17,6 +17,7 @@ import {
   CSRF_REJECTED_HEADER_NAME,
   CSRF_RETRY_HEADER_NAME,
   CSRF_TOKEN_COOKIE_NAME,
+  CSRF_TOKEN_HEADER_NAME,
   LEAD_ID_COOKIE_NAME,
   REQUEST_ID_HEADER_NAME,
 } from "@/env/constants";
@@ -174,6 +175,8 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
       const csrfCheck = validateCsrf(request, endpoint.method);
       const csrfRetry = request.headers.get(CSRF_RETRY_HEADER_NAME) === "1";
       if (!csrfCheck.valid) {
+        const origin = request.headers.get("origin");
+        const parsedOrigin = origin === null ? null : URL.parse(origin);
         // Our own client always echoes the cookie, so a rejection means the
         // page could not read it (duplicate cookie, foreign frame/webview)
         // or the request was not ours: say which from the wire.
@@ -187,7 +190,16 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           ),
           secFetchSite: request.headers.get("sec-fetch-site"),
           secFetchMode: request.headers.get("sec-fetch-mode"),
-          hasOrigin: request.headers.get("origin") !== null,
+          hasOrigin: origin !== null,
+          originRelation:
+            origin === null
+              ? "missing"
+              : parsedOrigin === null
+                ? "opaque-or-invalid"
+                : parsedOrigin.origin === request.nextUrl.origin
+                  ? "same-origin"
+                  : "different-origin",
+          hasCsrfHeader: request.headers.has(CSRF_TOKEN_HEADER_NAME),
           hasRequestId: request.headers.get(REQUEST_ID_HEADER_NAME) !== null,
           hasLeadCookie: request.cookies.has(LEAD_ID_COOKIE_NAME),
           csrfRetry,

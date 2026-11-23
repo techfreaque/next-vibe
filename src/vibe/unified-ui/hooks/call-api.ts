@@ -34,6 +34,7 @@ import { scopedTranslation as authScopedTranslation } from "../../identity/auth/
 import { AuthClientRepository } from "../../identity/auth/repository-client";
 import type { JwtPayloadType } from "../../identity/auth/types";
 import { CLIENT_LOG_PATH } from "../../logger/error-monitor/client-log/constants";
+import { navigationTimingEvidence } from "../../logger/resource-diagnostics";
 import type { EndpointLogger } from "../../logger/types";
 import { mintRequestId, withLogContext } from "../../logger/with-log-context";
 import { Platform } from "../../platforms/platforms";
@@ -261,10 +262,15 @@ function browserOnline(): boolean {
 function networkFailureContext(
   diag: CallDiagnostics,
   durationMs: number,
-): Record<string, string | boolean | null> {
+): Record<string, string | number | boolean | null> {
   const visibilityAtFailure = currentVisibility();
   const online = browserOnline();
+  const { documentEdgeRequestId, documentEdgeTimingNode } =
+    navigationTimingEvidence();
   return {
+    documentEdgeRequestId,
+    requestDocumentEdgeTimingNode: documentEdgeTimingNode,
+    requestStartedAtMs: diag.startedAt,
     visibilityAtStart: diag.visibilityAtStart ?? null,
     visibilityAtFailure,
     online,

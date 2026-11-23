@@ -458,6 +458,8 @@ export async function complete(
         model,
         finishReason: finishReason ?? null,
         loopStopped: ctx.creditBudgetStopped,
+        budgetCutStage: ctx.creditBudgetStopped ? "next-step-input" : "output",
+        budgetNextInputTokens: ctx.creditBudgetNextInputTokens,
         outputCapped: ctx.creditBudgetCapped,
         isEmptyAnswer,
         errorKey: ErrorResponseTypes.PAYMENT_REQUIRED.errorKey,

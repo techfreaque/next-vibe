@@ -40,7 +40,7 @@ describe("WS keepalive", () => {
 
   it("reports Bun's inactivity close as idle-timeout with measurements", () => {
     const d = diagnoseWsClose(
-      socketData(125_000, 40_000, 3),
+      { ...socketData(125_000, 40_000, 3), lastPongAt: NOW - 45_000 },
       1006,
       "WebSocket timed out from inactivity",
       NOW,
@@ -54,6 +54,8 @@ describe("WS keepalive", () => {
       connectedForMs: 125_000,
       sinceLastInboundMs: 40_000,
       pongCount: 3,
+      lastPongAgeMs: 45_000,
+      idleTimeoutMs: WS_IDLE_TIMEOUT_SECONDS * 1000,
       inboundActivity: "answered-ping",
       channelCount: 2,
       isPublic: true,

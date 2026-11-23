@@ -78,6 +78,10 @@ export interface StallProfile {
   hotNative: string;
   gcSamples: number;
   totalSamples: number;
+  /** All JS samples, including those outside the longest uninterrupted streak. */
+  windowSampleCount: number;
+  /** First-to-last sample span. The start and end are on a monotonic clock. */
+  sampledSpanMs: number;
 }
 
 declare global {
@@ -262,6 +266,10 @@ function summarize(
     hotNative: topCounts(hotNative, 4),
     gcSamples,
     totalSamples: end - start,
+    windowSampleCount: traces.length,
+    sampledSpanMs: Math.round(
+      ((traces.at(-1)?.timestamp ?? 0) - (traces[0]?.timestamp ?? 0)) * 1000,
+    ),
   };
 }
 
@@ -360,6 +368,8 @@ function startSession(logger: EndpointLogger): ProfileSession {
             hotNative: stall.hotNative,
             gcSamples: stall.gcSamples,
             totalSamples: stall.totalSamples,
+            windowSampleCount: stall.windowSampleCount,
+            sampledSpanMs: stall.sampledSpanMs,
           },
         );
       }

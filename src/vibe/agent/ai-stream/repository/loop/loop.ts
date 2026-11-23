@@ -203,6 +203,7 @@ export class StreamLoop implements StreamLoopState {
       return false;
     }
     ctx.creditBudgetStopped = true;
+    ctx.creditBudgetNextInputTokens = nextInputTokens;
     logger.info("[AI Stream] Balance cannot pay another step - ending loop", {
       model: modelConfig.id,
       threadId: this.p.threadId,

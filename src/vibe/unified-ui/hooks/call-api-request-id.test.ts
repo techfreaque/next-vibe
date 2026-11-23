@@ -261,6 +261,8 @@ describe("request id propagation", () => {
           responseReceived: false,
           failurePhase: "fetch",
           networkFailureKind: "early-failure",
+          requestStartedAtMs: 1_795_407_002_300,
+          documentEdgeRequestId: null,
           retryOfRequestId: ids[0],
           requestId: ids[1],
         }),

@@ -6,6 +6,7 @@ import {
   observeChunkReloadOutcome,
   resetChunkReloadForTests,
 } from "./chunk-reload";
+import { chunkLoadDiagnostics, describeUrl } from "./resource-diagnostics";
 import type { EndpointLogger, LoggerMetadata } from "./types";
 
 interface LoggedCall {
@@ -141,6 +142,22 @@ describe("handleChunkLoadFailure", () => {
       ),
     ).toBe(true);
     expect(isChunkLoadError(new Error("boom"))).toBe(false);
+  });
+
+  it("keeps only the public same-origin bundle path for edge correlation", () => {
+    const path = "/_next/static/chunks/123456-a1b2c3d4e5f6abcd.js";
+    expect(describeUrl(path)).toBe(path);
+    expect(describeUrl(`https://cdn.example${path}`)).toBe(
+      "https://cdn.example/_next/static/chunks/:id",
+    );
+    expect(describeUrl("/account/reset/abcde12345abcde12345?key=sample")).toBe(
+      "/account/reset/:id",
+    );
+    expect(
+      chunkLoadDiagnostics(
+        `Loading chunk 123456 failed. (error: https://unbottled.ai${path}?dpl=sample#asset)`,
+      ),
+    ).toMatchObject({ chunkUrl: path });
   });
 
   it("reports each failed chunk and reloads only once when the failure recurs", async () => {

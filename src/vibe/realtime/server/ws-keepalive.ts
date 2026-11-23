@@ -50,6 +50,8 @@ export interface WsCloseDiagnosis {
     connectedForMs: number;
     sinceLastInboundMs: number;
     pongCount: number;
+    lastPongAgeMs: number | null;
+    idleTimeoutMs: number;
     inboundActivity: "answered-ping" | "application-traffic" | "silent";
     channelCount: number;
     isPublic: boolean;
@@ -88,6 +90,9 @@ export function diagnoseWsClose(
       connectedForMs: now - data.connectedAt,
       sinceLastInboundMs,
       pongCount: data.pongCount,
+      lastPongAgeMs:
+        data.lastPongAt === undefined ? null : now - data.lastPongAt,
+      idleTimeoutMs: WS_IDLE_TIMEOUT_SECONDS * 1000,
       inboundActivity:
         data.pongCount > 0
           ? "answered-ping"

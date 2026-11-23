@@ -150,6 +150,7 @@ export class RemoteDispatch {
         {
           toolName,
           instanceId,
+          toolNameWasNormalized: data.toolName !== toolName,
           platform,
           callbackMode: data.callbackMode ?? CallbackMode.WAIT,
         },
@@ -179,6 +180,12 @@ export class RemoteDispatch {
             toolName,
             instanceId,
             knownCount: connInfo.capabilities?.length ?? 0,
+            capabilitySnapshot:
+              connInfo.capabilities === null
+                ? "missing"
+                : connInfo.capabilities.length === 0
+                  ? "empty"
+                  : "tool-not-listed",
           },
         );
         return {

@@ -11,6 +11,7 @@
  * on messagesDefinition.GET), NOT from this hook.
  */
 
+import { MAX_UPLOAD_BYTES } from "next-vibe/core/route/body-limit";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
 import {
   isBrowserNetworkLossMessage,
@@ -157,6 +158,8 @@ export function useAIStream(): UseAIStreamReturn {
           errorMessageId,
           rootFolderId: data.rootFolderId,
           attachmentCount: data.attachments?.length ?? 0,
+          uploadLimitBytes: MAX_UPLOAD_BYTES,
+          audioUploadBytes: data.audioInput?.file?.size ?? 0,
           uploadBytes:
             (data.attachments?.reduce((sum, file) => sum + file.size, 0) ?? 0) +
             (data.audioInput?.file?.size ?? 0),

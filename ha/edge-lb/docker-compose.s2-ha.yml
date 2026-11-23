@@ -43,6 +43,12 @@ services:
       # s2app is capped (CONNECTION LIMIT 40, idle_session_timeout 5min).
       # Incident 2026-11-18: ha/README.md "Postgres connection leak".
       DATABASE_POOL_MAX: ${HA_DATABASE_POOL_MAX:-8}
+      # Bound fresh checkouts and queries on pooled sockets when the WG path
+      # degrades. Keep the read deadline 5 s above the server's statement
+      # deadline so a healthy link can return PostgreSQL's cancellation.
+      DATABASE_CONNECT_TIMEOUT_MS: ${HA_DATABASE_CONNECT_TIMEOUT_MS:-3000}
+      DATABASE_STATEMENT_TIMEOUT_MS: ${HA_DATABASE_STATEMENT_TIMEOUT_MS:-15000}
+      DATABASE_QUERY_TIMEOUT_MS: ${HA_DATABASE_QUERY_TIMEOUT_MS:-20000}
       WS_PUBSUB_TYPE: "redis"
       REDIS_URL: ${HA_REDIS_URL:-redis://10.88.0.1:6379}
       CHAT_STORAGE_TYPE: "s3"

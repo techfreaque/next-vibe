@@ -85,6 +85,10 @@ async function describeParentMiss(
   threadId: string,
   requestedParentId: string,
 ): Promise<{
+  parentLookup:
+    | "committed-after-first-read"
+    | "belongs-to-other-thread"
+    | "missing";
   parentInOtherThread: string | null;
   threadMessageCount: number;
   threadRootFolderId: string | null;
@@ -126,7 +130,13 @@ async function describeParentMiss(
         .limit(1),
     ]);
   return {
-    parentInOtherThread: elsewhere?.threadId ?? null,
+    parentLookup: !elsewhere
+      ? "missing"
+      : elsewhere.threadId === threadId
+        ? "committed-after-first-read"
+        : "belongs-to-other-thread",
+    parentInOtherThread:
+      elsewhere?.threadId === threadId ? null : (elsewhere?.threadId ?? null),
     threadMessageCount: countRow?.n ?? 0,
     threadRootFolderId: thread?.rootFolderId ?? null,
     threadStreamingState: thread?.streamingState ?? null,

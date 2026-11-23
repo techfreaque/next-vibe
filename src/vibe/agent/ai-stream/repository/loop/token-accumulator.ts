@@ -347,6 +347,13 @@ export class TokenAccumulator {
         fallbackUsd,
         // What the provider DID report, so the next missing cost is diagnosable.
         reportedUsage: upstream.reportedUsage,
+        upstreamCostEvidence:
+          upstream.reportedUsage === null
+            ? "usage-missing"
+            : typeof upstream.reportedUsage === "object" &&
+                "cost" in upstream.reportedUsage
+              ? "cost-invalid"
+              : "cost-field-missing",
         // No tokens at all = the step failed upstream before any usage (its
         // error part is logged separately); nothing is billed for it.
         emptyStep: step.inputTokens === 0 && step.outputTokens === 0,

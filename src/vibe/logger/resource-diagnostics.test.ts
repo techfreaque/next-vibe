@@ -39,6 +39,7 @@ describe("browser failure attribution", () => {
     expect(classifyResourceFailure(0, 0)).toBe("opaque-or-no-response");
     expect(classifyResourceFailure(null, 0)).toBe("status-unavailable");
     expect(resourceTiming(null).resourceFailureKind).toBe("no-resource-timing");
+    expect(resourceTiming(null).resourceTimingPhase).toBe("unavailable");
   });
 
   it("separates waiting for headers from reading a response body", () => {

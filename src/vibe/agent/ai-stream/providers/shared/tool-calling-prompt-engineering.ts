@@ -225,8 +225,10 @@ function tryParseToolCallsJson(
 
   // Fourth attempt: repair unescaped quotes / raw newlines inside strings and
   // close anything a truncated generation left open.
+  let repairedLength: number | null = null;
   try {
     const repaired = repairToolCallsJson(stripControlChars(raw.trim()));
+    repairedLength = repaired.length;
     const parsed = JSON.parse(repaired) as ParsedToolCall[];
     if (Array.isArray(parsed)) {
       logger.info("Parsed tool calls after structural repair");
@@ -238,6 +240,15 @@ function tryParseToolCallsJson(
     const position = Number(/position (\d+)/.exec(message)?.[1] ?? -1);
     logger.error("Failed to parse tool calls JSON", parsedError, {
       rawLength: raw.length,
+      repairedLength,
+      parserStage: "structural-repair",
+      parserFailureKind: /unterminated string/i.test(message)
+        ? "unterminated-string"
+        : /unexpected end|end of (data|input)/i.test(message)
+          ? "unexpected-end"
+          : /expected|unexpected/i.test(message)
+            ? "unexpected-token"
+            : "other",
       parserErrorOffset: position >= 0 ? position : null,
       startsWithArray: raw.trimStart().startsWith("["),
       endsWithArray: raw.trimEnd().endsWith("]"),
