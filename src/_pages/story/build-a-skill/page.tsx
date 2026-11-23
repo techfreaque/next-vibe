@@ -7,11 +7,12 @@ import { Info } from "next-vibe/ui/components/icons/Info";
 import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
 import { Sparkles } from "next-vibe/ui/components/icons/Sparkles";
 import { XCircle } from "next-vibe/ui/components/icons/XCircle";
-import { CodeSnippet } from "next-vibe/ui/components/markdown";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
 
+import { StaticCodeFile } from "@/_pages/_components/static-code";
+import { StaticCodeCopy } from "@/_pages/_components/static-code-copy";
 import { configScopedTranslation } from "@/env/i18n";
 
 import {
@@ -233,11 +234,11 @@ export function TanstackPage({ locale }: BuildASkillPageData): JSX.Element {
       <PageSection title={t("dev.title")} intro={t("dev.body")}>
         <Div className="max-w-3xl">
           <Div className="min-w-0 max-w-full">
-            <CodeSnippet
+            <StaticCodeFile
               code={SKILL_TS}
               language="typescript"
               filename="skill.ts"
-              variant="file"
+              header={<StaticCodeCopy code={SKILL_TS} />}
             />
           </Div>
           <Callout icon={Info} className="mt-4">

@@ -256,6 +256,17 @@ const nextConfig: NextConfig = {
           test: /[\\/]unified-ui[\\/]renderers[\\/](cli|mcp)[\\/](?!.*\.stub\.)/,
           loader: "null-loader",
         },
+        // Keep client-only endpoint render slots and callbacks out of Flight
+        // client entries. SSR and browser issuers need their real imports.
+        {
+          test: /[\\/]definition\.tsx?$/,
+          issuerLayer: "rsc",
+          enforce: "pre",
+          loader: path.join(
+            __dirname,
+            "src/vibe/core/route/rsc-definition-client-import-loader.cjs",
+          ),
+        },
       );
     }
     return config;

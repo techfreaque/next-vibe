@@ -343,9 +343,17 @@ export function fileStem(
 /** Resolve THIS instance's short name (atlas / hermes) for the fixture stem. */
 export async function resolveInstanceName(): Promise<string> {
   try {
-    const { RemoteConnectionRepository } =
-      await import("next-vibe/remote-connection/repository");
-    return slugify(RemoteConnectionRepository.deriveDefaultSelfInstanceId());
+    // The pure helper, not RemoteConnectionRepository: the repository drags
+    // the whole endpoint registry (and every widget) into each page whose
+    // server graph reaches this file, e.g. the public skill pages.
+    const { deriveDefaultSelfInstanceId } =
+      await import("next-vibe/remote-connection/instance-identity");
+    return slugify(
+      deriveDefaultSelfInstanceId(
+        coreEnv.NEXT_PUBLIC_APP_URL,
+        coreEnv.IS_PREVIEW_MODE,
+      ),
+    );
   } catch {
     return "atlas";
   }

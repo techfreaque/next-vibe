@@ -615,3 +615,99 @@ textarea {
 pre code .token.table {
   display: inline;
 }
+
+/* Night Owl tokens for server-highlighted code (`StaticCode`,
+   src/_pages/_components/static-code.tsx). Class-based instead of inline
+   styles: per-token `style` objects tripled the docs page's HTML + RSC
+   payload. Mirrors react-syntax-highlighter's nightOwl prism theme. */
+.vibe-static-code pre,
+.vibe-static-code code {
+  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  overflow-wrap: normal;
+  tab-size: 4;
+  hyphens: none;
+}
+.vibe-static-code pre {
+  color: white;
+  overflow: auto;
+}
+.vibe-static-code code {
+  color: #d6deeb;
+  line-height: 1.5;
+  font-size: 1em;
+}
+.vibe-static-code .token.comment,
+.vibe-static-code .token.prolog,
+.vibe-static-code .token.cdata {
+  color: rgb(99, 119, 119);
+  font-style: italic;
+}
+.vibe-static-code .token.punctuation {
+  color: rgb(199, 146, 234);
+}
+.vibe-static-code .namespace {
+  color: rgb(178, 204, 214);
+}
+.vibe-static-code .token.deleted {
+  color: rgba(239, 83, 80, 0.56);
+  font-style: italic;
+}
+.vibe-static-code .token.symbol,
+.vibe-static-code .token.property {
+  color: rgb(128, 203, 196);
+}
+.vibe-static-code .token.tag,
+.vibe-static-code .token.operator,
+.vibe-static-code .token.keyword {
+  color: rgb(127, 219, 202);
+}
+.vibe-static-code .token.boolean {
+  color: rgb(255, 88, 116);
+}
+.vibe-static-code .token.number {
+  color: rgb(247, 140, 108);
+}
+.vibe-static-code .token.constant,
+.vibe-static-code .token.function,
+.vibe-static-code .token.builtin,
+.vibe-static-code .token.char {
+  color: rgb(130, 170, 255);
+}
+.vibe-static-code .token.selector,
+.vibe-static-code .token.doctype {
+  color: rgb(199, 146, 234);
+  font-style: italic;
+}
+.vibe-static-code .token.attr-name,
+.vibe-static-code .token.inserted {
+  color: rgb(173, 219, 103);
+  font-style: italic;
+}
+.vibe-static-code .token.string,
+.vibe-static-code .token.url,
+.vibe-static-code .token.entity {
+  color: rgb(173, 219, 103);
+}
+.vibe-static-code .token.class-name,
+.vibe-static-code .token.atrule,
+.vibe-static-code .token.attr-value {
+  color: rgb(255, 203, 139);
+}
+.vibe-static-code .token.regex,
+.vibe-static-code .token.variable {
+  color: rgb(214, 222, 235);
+}
+.vibe-static-code .token.important {
+  color: rgb(214, 222, 235);
+  font-weight: bold;
+}
+.vibe-static-code .token.bold {
+  font-weight: bold;
+}
+.vibe-static-code .token.italic {
+  font-style: italic;
+}
