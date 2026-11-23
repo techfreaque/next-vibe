@@ -59,6 +59,15 @@ function transformClientLocaleSource(source) {
   return `const __vibeI18nLang = ${LANGUAGE_EXPRESSION};\n${declarations.join("\n")}\n${rewritten}`;
 }
 
+/** Apply the browser locale loader to Vite scope IDs, including HMR queries. */
+function transformViteClientLocaleSource(source, id) {
+  const path = id.replace(/\?.*$/, "");
+  const isScope = /[\\/](?:i18n|layout-i18n|i18n[\\/]shared)[\\/]index\.ts$/.test(
+    path,
+  );
+  return isScope ? transformClientLocaleSource(source) : source;
+}
+
 /** Give Vite's SSR graph an import edge for a locale edited in development. */
 function transformDevSsrLocaleSource(source) {
   const imports = [];
@@ -90,3 +99,4 @@ function clientLocaleLoader(source) {
 module.exports = clientLocaleLoader;
 module.exports.transformClientLocaleSource = transformClientLocaleSource;
 module.exports.transformDevSsrLocaleSource = transformDevSsrLocaleSource;
+module.exports.transformViteClientLocaleSource = transformViteClientLocaleSource;

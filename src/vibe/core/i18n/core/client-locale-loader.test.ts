@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 
 import { Glob } from "bun";
 import { describe, expect, it } from "bun:test";
@@ -7,6 +7,7 @@ import { describe, expect, it } from "bun:test";
 import {
   transformClientLocaleSource,
   transformDevSsrLocaleSource,
+  transformViteClientLocaleSource,
 } from "./client-locale-loader.cjs";
 
 const SCOPE_GLOB = new Glob("src/**/en/index.ts");
@@ -47,6 +48,24 @@ describe("client-locale-loader", () => {
   it("leaves files without the lazy pattern untouched", () => {
     const source = 'export const a = require("./x").value;';
     expect(transformClientLocaleSource(source)).toBe(source);
+  });
+
+  it.each([
+    "src/_pages/create/i18n/index.ts",
+    "src/_pages/layout-i18n/index.ts",
+    "src/vibe/core/i18n/shared/index.ts",
+  ])("keeps Vite locale loading lazy after an HMR request for %s", (file) => {
+    const id = resolve(file);
+    const source = readFileSync(id, "utf8");
+    const out = transformViteClientLocaleSource(source, id);
+
+    expect(out).not.toContain("require(");
+    for (const language of ["de", "pl", "fr", "it", "es"]) {
+      expect(out).toContain(
+        `__vibeI18nLang === "${language}" ? (await import("./${language}")).translations : undefined`,
+      );
+    }
+    expect(transformViteClientLocaleSource(source, `${id}?t=123`)).toBe(out);
   });
 
   it("makes edited locale sources dependencies of the dev SSR transform", () => {
