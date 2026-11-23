@@ -388,6 +388,7 @@ function SignupStepsSection({
     sendFailed: t("widget.sendFailed"),
     bounced: t("widget.bounced"),
     expired: t("widget.expired"),
+    reminded: t("widget.reminded"),
     confirmed: t("widget.confirmed"),
   };
   return (
@@ -434,7 +435,10 @@ function SignupStepsSection({
           label={label.expired}
           value={now("expired")}
           previous={prev("expired")}
-          hint={`${label.sendFailed}: ${now("sendFailed").toLocaleString(locale)}`}
+          hint={t("widget.expiredHint", {
+            failed: now("sendFailed").toLocaleString(locale),
+            reminded: now("reminded").toLocaleString(locale),
+          })}
           invertDelta
           locale={locale}
         />
@@ -462,6 +466,7 @@ function SignupStepsSection({
             { key: "emailSent", label: label.emailSent, secondary: true },
             { key: "bounced", label: label.bounced, secondary: true },
             { key: "expired", label: label.expired, secondary: true },
+            { key: "reminded", label: label.reminded, secondary: true },
             { key: "confirmed", label: label.confirmed },
             {
               key: "confirmRate",

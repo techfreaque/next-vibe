@@ -105,6 +105,7 @@ export const SIGNUP_STEPS = [
   "sendFailed",
   "bounced",
   "expired",
+  "reminded",
   "confirmed",
 ] as const;
 
@@ -116,6 +117,7 @@ const SIGNUP_STEP_OF_EVENT: Record<string, SignupStep> = {
   [SignupEventType.SEND_FAILED]: "sendFailed",
   [SignupEventType.BOUNCED]: "bounced",
   [SignupEventType.EXPIRED]: "expired",
+  [SignupEventType.REMINDER_SENT]: "reminded",
   [SignupEventType.CONFIRMED]: "confirmed",
 };
 
@@ -180,6 +182,7 @@ function emptySignupSteps(): Record<SignupStep, number> {
     sendFailed: 0,
     bounced: 0,
     expired: 0,
+    reminded: 0,
     confirmed: 0,
   };
 }

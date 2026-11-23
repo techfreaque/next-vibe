@@ -79,6 +79,8 @@ export const translations = {
     sendFailed: "Send failed",
     bounced: "Bounced",
     expired: "Expired",
+    expiredHint: "Send failed: {{failed}} · Reminded: {{reminded}}",
+    reminded: "Reminded",
     confirmed: "Confirmed",
     confirmRate: "Confirm rate",
     ofStarted: "{{count}} of {{total}} started",

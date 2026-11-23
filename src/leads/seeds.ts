@@ -29,6 +29,7 @@ import {
   type CampaignTypeValue,
 } from "../messenger/accounts/enum";
 import { MessageStatus } from "../messenger/messages/enum";
+import { WALL_META } from "./tracking/wall-meta";
 
 /**
  * Controls what gets seeded in the dev environment:
@@ -535,6 +536,14 @@ async function generateLeadEngagements(
           browser: ["chrome", "firefox", "safari", "edge"][
             Math.floor(Math.random() * 4)
           ],
+          // Conversion walls carry who hit them (funnel splits guests/accounts).
+          ...(engagementType === EngagementTypes.CREDIT_WALL ||
+          engagementType === EngagementTypes.CONSENT_DECLINED
+            ? {
+                [WALL_META.who]: Math.random() < 0.8 ? "guest" : "account",
+                [WALL_META.via]: "client",
+              }
+            : {}),
         },
         timestamp: getRandomPastDate(365),
         createdAt: getRandomPastDate(365),

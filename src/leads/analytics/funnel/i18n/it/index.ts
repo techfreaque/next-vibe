@@ -96,6 +96,8 @@ export const translations: typeof enTranslations = {
     sendFailed: "Invio non riuscito",
     bounced: "Respinta",
     expired: "Scadute",
+    expiredHint: "Invio non riuscito: {{failed}} · Sollecitate: {{reminded}}",
+    reminded: "Sollecitate",
     confirmed: "Confermate",
     confirmRate: "Tasso di conferma",
     ofStarted: "{{count}} su {{total}} iniziate",

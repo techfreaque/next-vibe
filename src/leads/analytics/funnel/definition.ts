@@ -52,6 +52,7 @@ const signupSteps = [
   { key: "sendFailed", value: 0 },
   { key: "bounced", value: 2 },
   { key: "expired", value: 11 },
+  { key: "reminded", value: 9 },
   { key: "confirmed", value: 38 },
 ];
 const wallSteps = [

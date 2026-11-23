@@ -370,14 +370,16 @@ async function seedProductionShape(): Promise<void> {
     -- 905: account with no lead at all (confirmation opened elsewhere).
     INSERT INTO users VALUES ('${id(905)}', '2026-10-04 12:00:00', false);
     -- Signup steps: backfill rows (failures only) before live tracking began
-    -- on Oct 3, then one live signup that confirmed.
+    -- on Oct 3, then one live signup that confirmed after its reminder.
     INSERT INTO pending_signups VALUES ('${id(701)}', '${id(108)}', '2026-10-05 09:00:00');
     INSERT INTO signup_events VALUES
       ('${id(107)}', '${id(702)}', 'events.started', '2026-10-01 08:00:00', 'backfill-started:${id(702)}'),
       ('${id(107)}', '${id(702)}', 'events.expired', '2026-10-01 09:00:00', 'expired:${id(702)}:1'),
       ('${id(108)}', '${id(703)}', 'events.started', '2026-10-05 08:01:00', NULL),
       ('${id(108)}', '${id(703)}', 'events.emailSent', '2026-10-05 08:01:01', NULL),
-      ('${id(108)}', '${id(703)}', 'events.confirmed', '2026-10-05 08:03:00', 'confirmed:${id(703)}');
+      ('${id(108)}', '${id(703)}', 'events.reminderSent', '2026-10-05 10:01:00', 'reminder:${id(703)}'),
+      ('${id(108)}', '${id(703)}', 'events.emailSent', '2026-10-05 10:01:01', NULL),
+      ('${id(108)}', '${id(703)}', 'events.confirmed', '2026-10-05 10:03:00', 'confirmed:${id(703)}');
     -- Conversion walls: one guest blocked twice (counts once), one account,
     -- one consent decline, and a website visit that is no wall.
     INSERT INTO lead_engagements VALUES
@@ -462,6 +464,9 @@ test("funnel counts people once and tracked signup steps only", async () => {
   expect(signup("started")).toBe(1);
   expect(signup("confirmed")).toBe(1);
   expect(signup("expired")).toBe(0);
+  // The reminder email is a second send to the same lead: counted once.
+  expect(signup("emailSent")).toBe(1);
+  expect(signup("reminded")).toBe(1);
   expect(result.data.signupTrackedSince).toBe("2026-10-05");
   expect(result.data.previousSignupSteps).toBeNull();
   const wall = (key: string): number | undefined =>

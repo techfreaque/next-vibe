@@ -97,6 +97,8 @@ export const translations: typeof enTranslations = {
     sendFailed: "Wysyłka nieudana",
     bounced: "Odbity",
     expired: "Wygasłe",
+    expiredHint: "Wysyłka nieudana: {{failed}} · Przypomniane: {{reminded}}",
+    reminded: "Przypomniane",
     confirmed: "Potwierdzone",
     confirmRate: "Wskaźnik potwierdzeń",
     ofStarted: "{{count}} z {{total}} rozpoczętych",
