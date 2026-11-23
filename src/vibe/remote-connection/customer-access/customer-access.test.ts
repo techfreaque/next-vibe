@@ -290,6 +290,17 @@ describe("Remote connections for customers", () => {
     });
     expect(listC.success && listC.data.access.canConnect).toBe(false);
 
+    const aDetail = await sendTestRequest({
+      endpoint: instanceDefinitions.GET,
+      urlPathParams: { instanceId: "a-box" },
+      user: userA,
+      toolExecutionContext: undefined,
+    });
+    expect(aDetail.success && aDetail.data.isConnected).toBe(true);
+    expect(aDetail.success && aDetail.data.remoteUrl).toBe(
+      "http://127.0.0.1:5432",
+    );
+
     const bPeek = await sendTestRequest({
       endpoint: instanceDefinitions.GET,
       urlPathParams: { instanceId: "a-box" },

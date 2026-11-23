@@ -7,7 +7,7 @@
  * route.transport.test.ts (requires hermes dev).
  *
  *   RC-GET1  — GET returns not-connected shape when no row exists
- *   RC-GET2  — GET is admin-only
+ *   RC-GET2  — GET returns not-connected status when a customer has no row
  *   RC-PAT1  — PATCH rejects non-admin attempt to set admin-only fields
  *   RC-PAT2  — PATCH with no fields returns updated=true
  *   RC-DEL1  — DELETE returns not-found for unknown instanceId
@@ -53,7 +53,7 @@ describe("Remote Connection [instanceId]", () => {
 
   // ── RC-GET2 ────────────────────────────────────────────────────────────────
 
-  it("RC-GET2: GET is rejected for non-admin users", async () => {
+  it("RC-GET2: GET returns not-connected status when a customer has no row", async () => {
     const result = await sendTestRequest({
       toolExecutionContext: undefined,
       endpoint: definitions.GET,
@@ -61,7 +61,14 @@ describe("Remote Connection [instanceId]", () => {
       user: customerUser,
     });
 
-    expect(result.success, "RC-GET2: customer must be rejected").toBe(false);
+    expect(result.success, "RC-GET2: customer can read connection status").toBe(
+      true,
+    );
+    if (!result.success) {
+      return;
+    }
+    expect(result.data.isConnected).toBe(false);
+    expect(result.data.remoteUrl).toBeNull();
   });
 
   // ── RC-PAT1 ────────────────────────────────────────────────────────────────
