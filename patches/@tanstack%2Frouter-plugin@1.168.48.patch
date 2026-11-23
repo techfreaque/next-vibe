@@ -86,7 +86,25 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	const localModuleLevelBindings = /* @__PURE__ */ new Set();
  	for (const node of ast.program.body) collectLocalBindingsFromStatement(node, localModuleLevelBindings);
  	localModuleLevelBindings.delete("Route");
-@@ -180,8 +179,7 @@
+@@ -110,10 +109,16 @@
+ 	}
+ 	if (!hasNonSplit && splitGroupsPresent.size < 2) return /* @__PURE__ */ new Set();
+ 	const declMap = buildDeclarationMap(ast);
+-	const depGraph = buildDependencyGraph(declMap, localModuleLevelBindings);
+ 	const allLocalBindings = new Set(localModuleLevelBindings);
+ 	allLocalBindings.add("Route");
+ 	const fullDepGraph = buildDependencyGraph(declMap, allLocalBindings);
++	// Keep Route edges for cycle detection without walking the declarations twice.
++	const depGraph = new Map(fullDepGraph);
++	depGraph.delete("Route");
++	for (const [name, dependencies] of depGraph) {
++		if (!dependencies.has("Route")) continue;
++		depGraph.set(name, new Set([...dependencies].filter((dependency) => dependency !== "Route")));
++	}
+ 	const refsByGroup = /* @__PURE__ */ new Map();
+ 	for (const prop of routeOptions.properties) {
+ 		if (!t.isObjectProperty(prop)) continue;
+@@ -180,8 +185,7 @@
  		return true;
  	});
  }
@@ -96,7 +114,25 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	const refIdents = findReferencedIdentifiers(ast);
  	const knownExportedIdents = /* @__PURE__ */ new Set();
  	function findIndexForSplitNode(str) {
-@@ -585,8 +583,7 @@
+@@ -286,7 +290,7 @@
+ 									const value = prop.value;
+ 									let shouldSplit = true;
+ 									if (t.isIdentifier(value)) {
+-										const existingImportPath = getImportSpecifierAndPathFromLocalName(programPath, value.name).path;
++										const existingImportPath = findImportSource(ast, value.name);
+ 										if (existingImportPath) removableImportPaths.add(existingImportPath);
+ 										const isExported = hasExport(ast, value);
+ 										if (isExported) knownExportedIdents.add(value.name);
+@@ -322,7 +326,7 @@
+ 									const value = prop.value;
+ 									let shouldSplit = true;
+ 									if (t.isIdentifier(value)) {
+-										const existingImportPath = getImportSpecifierAndPathFromLocalName(programPath, value.name).path;
++										const existingImportPath = findImportSource(ast, value.name);
+ 										if (existingImportPath) removableImportPaths.add(existingImportPath);
+ 										const isExported = hasExport(ast, value);
+ 										if (isExported) knownExportedIdents.add(value.name);
+@@ -585,8 +589,7 @@
  * This function should read get the options from by searching for the key `codeSplitGroupings`
  * on createFileRoute and return it's values if it exists, else return undefined
  */
@@ -106,3 +142,85 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	let codeSplitGroupings = void 0;
  	babel.traverse(ast, { Program: { enter(programPath) {
  		programPath.traverse({ CallExpression(path) {
+@@ -626,20 +629,13 @@
+ 		"For the best optimization, these items should either have their export statements removed, or be imported from another location that is not a route file."
+ 	].join("\n");
+ }
+-function getImportSpecifierAndPathFromLocalName(programPath, name) {
+-	let specifier = null;
+-	let path = null;
+-	programPath.traverse({ ImportDeclaration(importPath) {
+-		const found = importPath.node.specifiers.find((targetSpecifier) => targetSpecifier.local.name === name);
+-		if (found) {
+-			specifier = found;
+-			path = importPath.node.source.value;
+-		}
+-	} });
+-	return {
+-		specifier,
+-		path
+-	};
++function findImportSource(ast, name) {
++	let source = null;
++	// This lookup needs only node data. Avoid constructing Babel paths and scopes.
++	t.traverseFast(ast, (node) => {
++		if (t.isImportDeclaration(node) && node.specifiers.some((specifier) => specifier.local.name === name)) source = node.source.value;
++	});
++	return source;
+ }
+ function resolveIdentifier(path, node) {
+ 	if (t.isIdentifier(node)) {
+@@ -671,38 +667,22 @@
+ 	}
+ }
+ function hasExport(ast, node) {
+-	let found = false;
+-	babel.traverse(ast, {
+-		ExportNamedDeclaration(path) {
+-			if (path.node.declaration) {
+-				if (t.isVariableDeclaration(path.node.declaration)) path.node.declaration.declarations.forEach((decl) => {
+-					if (t.isVariableDeclarator(decl)) {
+-						if (t.isIdentifier(decl.id)) {
+-							if (decl.id.name === node.name) found = true;
+-						} else if (t.isObjectPattern(decl.id) || t.isArrayPattern(decl.id)) {
+-							if (collectIdentifiersFromPattern(decl.id).includes(node.name)) found = true;
+-						}
+-					}
+-				});
+-				if (t.isFunctionDeclaration(path.node.declaration)) {
+-					if (t.isIdentifier(path.node.declaration.id)) {
+-						if (path.node.declaration.id.name === node.name) found = true;
+-					}
+-				}
+-			}
+-		},
+-		ExportDefaultDeclaration(path) {
+-			if (t.isIdentifier(path.node.declaration)) {
+-				if (path.node.declaration.name === node.name) found = true;
+-			}
+-			if (t.isFunctionDeclaration(path.node.declaration)) {
+-				if (t.isIdentifier(path.node.declaration.id)) {
+-					if (path.node.declaration.id.name === node.name) found = true;
+-				}
+-			}
+-		}
++	return t.traverseFast(ast, (current) => {
++		let found = false;
++		if (t.isExportNamedDeclaration(current)) {
++			const { declaration } = current;
++			if (t.isVariableDeclaration(declaration)) {
++				found = declaration.declarations.some(({ id }) => t.isIdentifier(id) ? id.name === node.name : collectIdentifiersFromPattern(id).includes(node.name));
++			} else if (t.isFunctionDeclaration(declaration)) {
++				found = declaration.id?.name === node.name;
++			}
++		} else if (t.isExportDefaultDeclaration(current)) {
++			const { declaration } = current;
++			if (t.isIdentifier(declaration)) found = declaration.name === node.name;
++			else if (t.isFunctionDeclaration(declaration)) found = declaration.id?.name === node.name;
++		}
++		if (found) return t.traverseFast.stop;
+ 	});
+-	return found;
+ }
+ function removeExports(ast, node) {
+ 	let removed = false;

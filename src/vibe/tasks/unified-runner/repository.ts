@@ -51,6 +51,7 @@ export class UnifiedTaskRunnerRepository {
 
   private static runningTasks = new Map<string, TaskStatus>();
   private static runningProcesses = new Map<string, AbortController>();
+  private static taskRunnersSettled = Promise.resolve();
   static isRunning = false;
   private static errors: Array<{
     taskName: string;
@@ -183,6 +184,9 @@ export class UnifiedTaskRunnerRepository {
     logger: EndpointLogger,
     skipTanstack: boolean,
   ): ResponseType<void> {
+    if (signal.aborted) {
+      return success();
+    }
     try {
       // Store execution context
       UnifiedTaskRunnerRepository.systemLocale = systemLocale;
@@ -293,7 +297,7 @@ export class UnifiedTaskRunnerRepository {
 
           // Start the task runner
           await task.run({
-            signal: taskController.signal,
+            signal: AbortSignal.any([signal, taskController.signal]),
             logger: UnifiedTaskRunnerRepository.logger!,
             systemLocale: UnifiedTaskRunnerRepository.systemLocale!,
             userLocale: UnifiedTaskRunnerRepository.systemLocale!,
@@ -329,7 +333,9 @@ export class UnifiedTaskRunnerRepository {
       });
 
       // Don't await all promises - let them run in background
-      void Promise.allSettled(taskRunnerPromises)
+      UnifiedTaskRunnerRepository.taskRunnersSettled = Promise.allSettled(
+        taskRunnerPromises,
+      )
         .then(() => {
           UnifiedTaskRunnerRepository.logger!.debug(
             "All task runners have completed or failed",
@@ -375,6 +381,12 @@ export class UnifiedTaskRunnerRepository {
         },
       );
     }
+  }
+
+  /** Wait for runners to return after the owning process aborts their signal. */
+  static async waitForTaskRunners(): Promise<ResponseType<void>> {
+    await UnifiedTaskRunnerRepository.taskRunnersSettled;
+    return success();
   }
 
   /**

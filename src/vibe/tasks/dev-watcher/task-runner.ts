@@ -198,7 +198,9 @@ const startSmartFileWatcher = async (
       clearTimeout(debounceTimer);
     }
     debounceTimer = setTimeout(() => {
-      void runDirtyGenerators();
+      if (!signal.aborted) {
+        void runDirtyGenerators();
+      }
     }, DEBOUNCE_MS);
   };
 
@@ -215,6 +217,16 @@ const startSmartFileWatcher = async (
 
   const watchRoots = [apiWatchRoot, uiWatchRoot];
   const watchers: ReturnType<typeof fs.watch>[] = [];
+  const closeWatchers = (): void => {
+    for (const watcher of watchers) {
+      try {
+        watcher.close();
+      } catch (error) {
+        logger.debug("Error closing watcher:", { error: String(error) });
+      }
+    }
+    watchers.length = 0;
+  };
 
   for (const watchRoot of watchRoots) {
     try {
@@ -270,6 +282,14 @@ const startSmartFileWatcher = async (
   liveIndex.dirty.seeds = false;
   await runDirtyGenerators();
 
+  if (signal.aborted) {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+    closeWatchers();
+    return;
+  }
+
   // In non-continuous mode: only run once on startup, then listen for 'r' to re-run
   if (!tasksEnv.DEV_WATCHER_CONTINUOUS) {
     logger.debug(
@@ -277,14 +297,7 @@ const startSmartFileWatcher = async (
     );
 
     // Close all fs.watch watchers - we don't need them in one-shot mode
-    for (const watcher of watchers) {
-      try {
-        watcher.close();
-      } catch (error) {
-        logger.debug("Error closing watcher:", { error: String(error) });
-      }
-    }
-    watchers.length = 0;
+    closeWatchers();
 
     // Listen for 'r' keypress to trigger a full regeneration
     const onData = (chunk: Buffer): void => {
@@ -376,13 +389,7 @@ const startSmartFileWatcher = async (
           clearTimeout(debounceTimer);
         }
 
-        for (const watcher of watchers) {
-          try {
-            watcher.close();
-          } catch (error) {
-            logger.debug("Error closing watcher:", { error: String(error) });
-          }
-        }
+        closeWatchers();
 
         logger.debug("✅ File watchers stopped");
         finish();
@@ -419,24 +426,18 @@ const startPollingWatcher = async (
       logger.error("Polling watcher error", new Error(errorMsg));
     }
 
+    if (signal.aborted) {
+      break;
+    }
+
     await new Promise<void>((resolve) => {
-      let done = false;
       const finish = (): void => {
-        if (done) {
-          return;
-        }
-        done = true;
+        clearTimeout(timeout);
+        signal.removeEventListener("abort", finish);
         resolve();
       };
       const timeout = setTimeout(finish, WATCH_INTERVAL);
-      signal.addEventListener(
-        "abort",
-        () => {
-          clearTimeout(timeout);
-          finish();
-        },
-        { once: true },
-      );
+      signal.addEventListener("abort", finish, { once: true });
     });
   }
 

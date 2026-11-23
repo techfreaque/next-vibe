@@ -93,25 +93,19 @@ const pulseTaskRunner: TaskRunner<TasksTranslationKey> = {
         logger.error("Pulse runner error", new Error(errorMsg));
       }
 
+      if (signal.aborted) {
+        break;
+      }
+
       // Wait for next pulse or abort signal (non-blocking sleep, resolves exactly once)
       await new Promise<void>((resolve) => {
-        let done = false;
         const finish = (): void => {
-          if (done) {
-            return;
-          }
-          done = true;
+          clearTimeout(timeout);
+          signal.removeEventListener("abort", finish);
           resolve();
         };
         const timeout = setTimeout(finish, PULSE_INTERVAL);
-        signal.addEventListener(
-          "abort",
-          () => {
-            clearTimeout(timeout);
-            finish();
-          },
-          { once: true },
-        );
+        signal.addEventListener("abort", finish, { once: true });
       });
     }
 

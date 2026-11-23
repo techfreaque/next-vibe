@@ -3,6 +3,7 @@
  */
 
 import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { processManagesShutdown } from "../../../core/utils/process-shutdown";
 import { mcpSilentMode } from "../../../logger/debug";
 import { createEndpointLogger } from "../../../logger/server";
 import type { EndpointLogger } from "../../../logger/types";
@@ -403,6 +404,9 @@ class CliResourceManager {
    */
   private setupSignalHandlers(locale: CountryLanguage): void {
     const handleShutdown = async (): Promise<void> => {
+      if (processManagesShutdown()) {
+        return;
+      }
       // Abort any ongoing requests first
       if (this.abortController) {
         this.abortController.abort();

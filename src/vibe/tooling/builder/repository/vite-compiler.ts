@@ -2551,6 +2551,8 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
                 directoryPath.includes("/test-files/") ||
                 directoryPath.includes("/testing/") ||
                 directoryPath.includes("/fixtures/") ||
+                // Atomic source writes publish the actual file with a rename.
+                /\.tmp\.\d+\.[a-f\d]+$/.test(filePath) ||
                 filePath.endsWith(".test.ts") ||
                 filePath.endsWith(".test.tsx") ||
                 filePath.endsWith(".spec.ts") ||

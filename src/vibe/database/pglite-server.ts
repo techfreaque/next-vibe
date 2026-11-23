@@ -21,6 +21,7 @@ import { connect, createServer, type Server, type Socket } from "node:net";
 
 import type { PGlite } from "@electric-sql/pglite";
 
+import { processManagesShutdown } from "../core/utils/process-shutdown";
 import { databaseEnv } from "./env";
 
 // ─── Wire-protocol constants ──────────────────────────────────────────────────
@@ -924,17 +925,19 @@ export function servePgliteOn(
   return claimed.server;
 }
 
+function exitUnmanagedProcess(): void {
+  if (!processManagesShutdown()) {
+    process.exit(0);
+  }
+}
+
 function registerShutdownHandlers(): void {
   if (g.__pglite_cleanup_registered__) {
     return;
   }
   g.__pglite_cleanup_registered__ = true;
-  process.once("SIGINT", () => {
-    process.exit(0);
-  });
-  process.once("SIGTERM", () => {
-    process.exit(0);
-  });
+  process.once("SIGINT", exitUnmanagedProcess);
+  process.once("SIGTERM", exitUnmanagedProcess);
 }
 
 export function startPgliteServer(
@@ -955,15 +958,7 @@ export function startPgliteServer(
     handleConnection(pg, socket);
   });
 
-  if (!g.__pglite_cleanup_registered__) {
-    g.__pglite_cleanup_registered__ = true;
-    process.once("SIGINT", () => {
-      process.exit(0);
-    });
-    process.once("SIGTERM", () => {
-      process.exit(0);
-    });
-  }
+  registerShutdownHandlers();
 
   server.listen(opts.port, "127.0.0.1");
   setActiveServer(server);

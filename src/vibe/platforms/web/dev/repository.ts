@@ -17,6 +17,7 @@ import { existsSync, mkdirSync, readFileSync, writeSync } from "node:fs";
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { parseError } from "../../../core/utils/parse-error";
+import { claimProcessShutdown } from "../../../core/utils/process-shutdown";
 import { formatLogPrefix } from "../../../logger/create-logger";
 import { loggerEnv } from "../../../logger/env";
 import {
@@ -77,20 +78,48 @@ export class DevRepository {
   /** Active PID file — set by execute() to support vibe --hermes dev (HERMES_DEV_PID_FILE) */
   private static activePidFile: string = ATLAS_PID_FILE;
 
+  private static exitDuringSetup(): void {
+    process.exit(0);
+  }
+
   static async execute(
     data: DevRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<never> {
+    claimProcessShutdown();
+    // Exit promptly if a termination signal arrives during setup.
+    const earlyExitHandler = DevRepository.exitDuringSetup;
+    process.on("SIGINT", earlyExitHandler);
+    process.on("SIGTERM", earlyExitHandler);
+    process.on("SIGHUP", earlyExitHandler);
+
     // vibe --hermes dev uses IS_PREVIEW_MODE=true to signal it targets the preview DB
     const isLocalDev = coreEnv.IS_PREVIEW_MODE;
     DevRepository.activePidFile = isLocalDev
       ? HERMES_DEV_PID_FILE
       : ATLAS_PID_FILE;
 
+    // Let the previous owner finish writing its log before clearing the file.
+    const previousInstanceWarnings: Parameters<EndpointLogger["warn"]>[] = [];
+    killPreviousInstance(
+      DevRepository.activePidFile,
+      {
+        ...logger,
+        warn: (...args) => {
+          previousInstanceWarnings.push(args);
+        },
+      },
+      undefined,
+      false,
+    );
+
     // Truncate log files at session start (VIBE_LOG_PATH controls whether active)
     void truncateServerLog();
     void truncateClientLogs();
+    for (const args of previousInstanceWarnings) {
+      logger.warn(...args);
+    }
     // Guaranteed last-resort offline hint - process.on("exit") always fires, even on crash.
     // Skip if we're being replaced: the new instance already owns (or deleted) the PID file.
     process.on("exit", () => {
@@ -111,6 +140,7 @@ export class DevRepository {
         }
       }
       writeServerLogOfflineHint();
+      cleanupPidFile(pidFile);
     });
 
     // Capture native fd-2 writes (Bun internals, worker threads) into both the
@@ -234,17 +264,7 @@ export class DevRepository {
 
     DevRepository.logStartupInfo(port, logger, data);
 
-    // Kill any previous dev instance, then write our PID (including resolved port)
-    killPreviousInstance(DevRepository.activePidFile, logger, undefined, false);
     writePidFile(DevRepository.activePidFile, logger, [], port);
-
-    // Register early SIGINT/SIGTERM so Ctrl+C during setup exits immediately
-    const earlyExitHandler = (): void => {
-      cleanupPidFile(DevRepository.activePidFile);
-      process.exit(0);
-    };
-    process.on("SIGINT", earlyExitHandler);
-    process.on("SIGTERM", earlyExitHandler);
 
     // Catch unhandled errors so crashes (including in-process Vite/Nitro worker threads)
     // are always written to the log file, not just terminal stderr.
@@ -257,8 +277,6 @@ export class DevRepository {
         heapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
         rssMb: Math.round(mem.rss / 1024 / 1024),
       });
-      cleanupPidFile(DevRepository.activePidFile);
-      writeServerLogOfflineHint();
       process.exit(1);
     });
     process.on("unhandledRejection", (reason) => {
@@ -312,14 +330,13 @@ export class DevRepository {
       data.profile,
       data.framework === ServerFramework.TANSTACK,
       shutdownController,
-      () => {
-        void DevRepository.startTaskRunnerIfEnabled(
+      () =>
+        DevRepository.startTaskRunnerIfEnabled(
           data,
           locale,
           logger,
           shutdownController.signal,
-        );
-      },
+        ),
     );
   }
 
@@ -426,7 +443,7 @@ export class DevRepository {
     profile = false,
     tanstack = false,
     shutdownController?: AbortController,
-    onReady?: () => void,
+    startTaskRunner?: () => Promise<void>,
   ): Promise<never> {
     // A device node can exist even when this process has no terminal.
     // Only query stty when stdin is connected to one.
@@ -491,6 +508,7 @@ export class DevRepository {
       }
     };
 
+    let taskRunnerStartup: Promise<void> | undefined;
     let shutdownCalled = false;
     const shutdown = (code: number, message?: string): void => {
       if (shutdownCalled) {
@@ -498,63 +516,63 @@ export class DevRepository {
       }
       shutdownCalled = true;
       DevRepository.shuttingDown = true;
+      shutdownController?.abort();
       restoreTty();
       if (message) {
         process.stdout.write(`\n${message}\n`);
       }
-      // Signal task runners to stop cleanly
-      shutdownController?.abort();
       // Stop Bun WS server (may be undefined if still in Vite startup for TanStack mode)
       wsHandle?.stop();
       // Send SIGINT to Next.js so it does its own graceful cleanup (same signal as Ctrl+C).
       // The child may have already received SIGINT from the OS (same process group) - that's fine.
       const currentNext = nextController?.current();
-      if (currentNext && !currentNext.killed) {
+      let nextClosed: Promise<void> | undefined;
+      if (
+        currentNext &&
+        currentNext.exitCode === null &&
+        currentNext.signalCode === null
+      ) {
+        nextClosed = new Promise<void>((resolve) => {
+          currentNext.once("exit", () => resolve());
+        });
         currentNext.stdout?.unpipe();
         currentNext.stderr?.unpipe();
         currentNext.stdout?.destroy();
         currentNext.stderr?.destroy();
-        currentNext.kill("SIGINT");
+        if (!currentNext.killed) {
+          currentNext.kill("SIGINT");
+        }
       }
-      // Keep PID file alive until the process is about to exit so the next
-      // `vibe dev` can identify us as the owner of ports 3000/3100 and kill us.
-      // cleanupPidFile is called just before each process.exit() below.
-      if (viteClose) {
-        const timer = setTimeout(() => {
-          cleanupPidFile(DevRepository.activePidFile);
-          process.exit(code);
-        }, 2000);
-        void viteClose()
-          .catch(() => {
-            /* ignore vite close errors */
-          })
-          .finally(() => {
-            clearTimeout(timer);
-            cleanupPidFile(DevRepository.activePidFile);
-            process.exit(code);
+      // Keep the database alive while runners finish work already in progress.
+      // The exit handler records the stop and clears the PID.
+      const runnersStopped = taskRunnerStartup?.then(() =>
+        UnifiedTaskRunnerRepository.waitForTaskRunners(),
+      );
+      const viteClosed = viteClose?.().catch((error) => {
+        logger.error("Failed to close the Vite dev server", parseError(error));
+      });
+      const exitTimer = setTimeout(
+        () => {
+          logger.warn("Development server shutdown exceeded its grace period", {
+            activeTasks: UnifiedTaskRunnerRepository.getRunningTasks(),
           });
-      } else if (currentNext && !currentNext.killed) {
-        // Wait for Next.js to exit before we do — otherwise it becomes an orphan
-        // holding port 3100, causing "port already in use" on the next `vibe dev`.
-        const exitTimer = setTimeout(() => {
-          cleanupPidFile(DevRepository.activePidFile);
           process.exit(code);
-        }, 5000);
-        currentNext.once("exit", () => {
+        },
+        nextClosed ? 5000 : 2000,
+      );
+      void Promise.allSettled([viteClosed, nextClosed, runnersStopped]).then(
+        () => {
           clearTimeout(exitTimer);
-          cleanupPidFile(DevRepository.activePidFile);
-          setImmediate(() => process.exit(code));
-        });
-      } else {
-        cleanupPidFile(DevRepository.activePidFile);
-        setImmediate(() => process.exit(code));
-      }
+          process.exit(code);
+        },
+      );
     };
 
     // Replace early exit handler with full graceful shutdown handler
     if (earlyExitHandler) {
       process.off("SIGINT", earlyExitHandler);
       process.off("SIGTERM", earlyExitHandler);
+      process.off("SIGHUP", earlyExitHandler);
     }
     const SHUTDOWN_MESSAGES = [
       "👋 Peace out! The vibes have left the building",
@@ -575,6 +593,7 @@ export class DevRepository {
     };
     process.on("SIGINT", sigintHandler);
     process.on("SIGTERM", sigintHandler);
+    process.on("SIGHUP", sigintHandler);
 
     logger.debug(
       tanstack
@@ -679,7 +698,7 @@ export class DevRepository {
 
       // The first task pulse can publish events immediately. Wait until the
       // proxy has registered its local broadcast sink before starting it.
-      onReady?.();
+      taskRunnerStartup = startTaskRunner?.();
 
       // Keep the process alive - the Vite/Nitro server runs until SIGINT/SIGTERM
       // oxlint-disable-next-line no-empty-function -- intentional infinite wait; server runs until SIGINT/SIGTERM
@@ -703,7 +722,7 @@ export class DevRepository {
       logger,
     });
 
-    onReady?.();
+    taskRunnerStartup = startTaskRunner?.();
 
     // Keep the process alive indefinitely
     return await new Promise<never>(() => {
