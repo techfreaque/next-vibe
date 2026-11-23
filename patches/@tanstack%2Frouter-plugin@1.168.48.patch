@@ -1,7 +1,15 @@
 diff --git a/dist/esm/core/router-code-splitter-plugin.js b/dist/esm/core/router-code-splitter-plugin.js
 --- a/dist/esm/core/router-code-splitter-plugin.js
 +++ b/dist/esm/core/router-code-splitter-plugin.js
-@@ -12,6 +12,16 @@ import { decodeIdentifier, logDiff } from "@tanstack/router-utils";
+@@ -5,13 +5,23 @@
+ import { getFrameworkHmrCompilerPlugins } from "./code-splitter/plugins/framework-plugins.js";
+ import { createRouterPluginContext } from "./router-plugin-context.js";
+ import { fileURLToPath, pathToFileURL } from "node:url";
+-import { decodeIdentifier, logDiff } from "@tanstack/router-utils";
++import { decodeIdentifier, logDiff, parseAst } from "@tanstack/router-utils";
+ //#region src/core/router-code-splitter-plugin.ts
+ /**
+ * It is important to familiarize yourself with how the code-splitting works in this plugin.
  * https://github.com/TanStack/router/pull/3355
  */
  var CODE_SPLITTER_PLUGIN_NAME = "tanstack-router:code-splitter:compile-reference-file";
@@ -18,11 +26,83 @@ diff --git a/dist/esm/core/router-code-splitter-plugin.js b/dist/esm/core/router
  /**
  * JSX transformation plugins grouped by framework.
  * These plugins must come AFTER the TanStack Router plugin in the Vite config.
-@@ -67,6 +77,7 @@ function createRouterCodeSplitterPlugin(options = {}, routerPluginContext) {
+@@ -67,13 +77,16 @@
  		return userConfig.codeSplittingOptions?.splitBehavior;
  	};
  	const handleCompilingReferenceFile = (code, id, generatorNodeInfo) => {
 +		if (!isProduction && !addHmr && compilerPlugins.length === 0 && !userConfig.codeSplittingOptions?.deleteNodes?.length && !getShouldSplitFn() && vibeApiRouteShell.test(code)) return null;
  		if (debug) console.info("Compiling Route: ", id);
- 		const fromCode = detectCodeSplitGroupingsFromRoute({
+-		const fromCode = detectCodeSplitGroupingsFromRoute({
+-			code,
+-			filename: id
+-		});
+-		if (fromCode.groupings !== void 0) {
+-			const res = splitGroupingsSchema.safeParse(fromCode.groupings);
++		// Reuse the parsed route across grouping, binding, and reference passes in dev.
++		// A grouping key can only be present literally or through an escape.
++		const ast = isProduction ? void 0 : parseAst({ code, filename: id });
++		const fromCode = isProduction || /codeSplitGroupings|\\/.test(code)
++			? detectCodeSplitGroupingsFromRoute({ code, filename: id }, ast).groupings
++			: void 0;
++		if (fromCode !== void 0) {
++			const res = splitGroupingsSchema.safeParse(fromCode);
+ 			if (!res.success) {
+ 				const message = res.error.issues.map((e) => e.message).join(". ");
+ 				throw new Error(`The groupings for the route "${id}" are invalid.\n${message}`);
+@@ -87,12 +100,12 @@
+ 				throw new Error(`The groupings returned when using \`splitBehavior\` for the route "${id}" are invalid.\n${message}`);
+ 			}
+ 		}
+-		const splitGroupings = fromCode.groupings ?? pluginSplitBehavior ?? getGlobalCodeSplitGroupings();
++		const splitGroupings = fromCode ?? pluginSplitBehavior ?? getGlobalCodeSplitGroupings();
+ 		const sharedBindings = computeSharedBindings({
  			code,
+ 			filename: id,
+ 			codeSplitGroupings: splitGroupings
+-		});
++		}, ast);
+ 		if (sharedBindings.size > 0) sharedBindingsMap.set(id, sharedBindings);
+ 		else sharedBindingsMap.delete(id);
+ 		const compiledReferenceRoute = compileCodeSplitReferenceRoute({
+@@ -107,7 +120,7 @@
+ 			hmrRouteId: generatorNodeInfo.routeId,
+ 			sharedBindings: sharedBindings.size > 0 ? sharedBindings : void 0,
+ 			compilerPlugins
+-		});
++		}, ast);
+ 		if (compiledReferenceRoute === null) {
+ 			if (debug) console.info(`No changes made to route "${id}", skipping code-splitting.`);
+ 			return null;
+diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-splitter/compilers.js
+--- a/dist/esm/core/code-splitter/compilers.js
++++ b/dist/esm/core/code-splitter/compilers.js
+@@ -71,8 +71,7 @@
+ * AND at least one non-split property. Only locally-declared module-level
+ * bindings are candidates (not imports — bundlers dedupe those).
+ */
+-function computeSharedBindings(opts) {
+-	const ast = parseAst(opts);
++function computeSharedBindings(opts, ast = parseAst(opts)) {
+ 	const localModuleLevelBindings = /* @__PURE__ */ new Set();
+ 	for (const node of ast.program.body) collectLocalBindingsFromStatement(node, localModuleLevelBindings);
+ 	localModuleLevelBindings.delete("Route");
+@@ -180,8 +179,7 @@
+ 		return true;
+ 	});
+ }
+-function compileCodeSplitReferenceRoute(opts) {
+-	const ast = parseAst(opts);
++function compileCodeSplitReferenceRoute(opts, ast = parseAst(opts)) {
+ 	const refIdents = findReferencedIdentifiers(ast);
+ 	const knownExportedIdents = /* @__PURE__ */ new Set();
+ 	function findIndexForSplitNode(str) {
+@@ -585,8 +583,7 @@
+ * This function should read get the options from by searching for the key `codeSplitGroupings`
+ * on createFileRoute and return it's values if it exists, else return undefined
+ */
+-function detectCodeSplitGroupingsFromRoute(opts) {
+-	const ast = parseAst(opts);
++function detectCodeSplitGroupingsFromRoute(opts, ast = parseAst(opts)) {
+ 	let codeSplitGroupings = void 0;
+ 	babel.traverse(ast, { Program: { enter(programPath) {
+ 		programPath.traverse({ CallExpression(path) {

@@ -32,6 +32,7 @@ import { VibeMode } from "../../env/env-util";
 import { userLeadLinks } from "../../identity/lead/db";
 import { createEndpointLogger } from "../../logger/server";
 import type { EndpointLogger } from "../../logger/types";
+import { mintRequestId } from "../../logger/with-log-context";
 import {
   remoteConnections,
   StandardSyncCursorSchema,
@@ -277,12 +278,13 @@ class WsConnection {
     }
 
     const { remoteUrl, token, leadId } = this.config;
+    const requestId = mintRequestId();
 
     const wsBase = remoteUrl
       .replace(/^https:\/\//, "wss://")
       .replace(/^http:\/\//, "ws://")
       .replace(/\/$/, "");
-    const wsUrl = `${wsBase}/ws?token=${encodeURIComponent(token)}&leadId=${encodeURIComponent(leadId)}&connectorInstanceId=${encodeURIComponent(this.instanceId)}`;
+    const wsUrl = `${wsBase}/ws?token=${encodeURIComponent(token)}&leadId=${encodeURIComponent(leadId)}&connectorInstanceId=${encodeURIComponent(this.instanceId)}&requestId=${requestId}`;
 
     // Subscribe to the bridge endpoint's user-scoped channel on the peer —
     // the bridge transport is a regular scope:"user" event, so the peer's
@@ -310,6 +312,7 @@ class WsConnection {
     this.logger.debug("[WsConnection] Connecting", {
       instanceId: this.instanceId,
       remoteUrl,
+      requestId,
     });
 
     let ws: WebSocket;
@@ -318,6 +321,7 @@ class WsConnection {
     } catch (err) {
       this.logger.warn("[WsConnection] Failed to create WebSocket", {
         instanceId: this.instanceId,
+        requestId,
         error: err instanceof Error ? err.message : String(err),
       });
       this.scheduleReconnect();
@@ -334,7 +338,20 @@ class WsConnection {
     ws.addEventListener("message", (event: MessageEvent) => {
       this.onMessage(event);
     });
-    ws.addEventListener("close", () => {
+    ws.addEventListener("close", (event) => {
+      if (everOpened && event.code === 1006) {
+        this.logger.info(
+          "[WsConnection] Peer socket dropped without close frame",
+          {
+            instanceId: this.instanceId,
+            peer: remoteUrl,
+            requestId,
+            code: event.code,
+            reason: event.reason.slice(0, 200),
+            stopping: this.stopped,
+          },
+        );
+      }
       this.onClose(ws);
     });
     ws.addEventListener("error", (event) => {
@@ -351,6 +368,7 @@ class WsConnection {
       const errorDetails = {
         instanceId: this.instanceId,
         peer: remoteUrl,
+        requestId,
         error: message,
         duringHandshake: !everOpened,
         attempt: this.reconnectAttempt,

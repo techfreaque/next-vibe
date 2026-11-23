@@ -444,15 +444,14 @@ function scheduleReconnect(logger: EndpointLogger, delay: number): void {
 // like frame-parse failures always have a logger — never optional, never global.
 function connect(logger: EndpointLogger): void {
   if (
+    pageUnloading ||
+    typeof WebSocket === "undefined" ||
     sharedWs?.readyState === WebSocket.OPEN ||
     sharedWs?.readyState === WebSocket.CONNECTING
   ) {
     return;
   }
 
-  if (typeof WebSocket === "undefined") {
-    return;
-  }
   clearReconnectTimer();
 
   const protocol = getCurrentProtocol() === "https:" ? "wss:" : "ws:";
@@ -639,6 +638,14 @@ if (typeof document !== "undefined") {
     if (lastLogger) {
       reportDrop(lastLogger, "pagehide");
     }
+    // Close before the document is frozen or discarded. The next pageshow
+    // opens a fresh socket and replays gaps from the existing channel cursors.
+    const socket = sharedWs;
+    sharedWs = null;
+    pendingHandshake = null;
+    openedAt = null;
+    lastFrameAt = null;
+    socket?.close(1000, "pagehide");
   });
   addWindowListener("pageshow", () => {
     pageUnloading = false;
@@ -648,14 +655,14 @@ if (typeof document !== "undefined") {
   addDocumentListener("visibilitychange", () => {
     lastVisibilityChangeAt = Date.now();
     updateDropVisibility();
-    if (reconnectPaused) {
+    if (reconnectPaused || reconnectTimer === null) {
       resumeReconnect();
     }
   });
   addWindowListener("online", () => {
     lastNetworkChangeAt = Date.now();
     updateDropVisibility();
-    if (reconnectPaused) {
+    if (reconnectPaused || reconnectTimer === null) {
       resumeReconnect();
     }
   });

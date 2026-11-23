@@ -9,14 +9,20 @@ class TestSocket extends EventTarget {
   static readonly sockets: TestSocket[] = [];
 
   readyState = TestSocket.CONNECTING;
+  closeRequest: { code: number; reason: string } | null = null;
+  readonly sent: string[] = [];
 
   constructor(readonly url: string) {
     super();
     TestSocket.sockets.push(this);
   }
 
-  send(): void {
-    // The fixture only checks connection lifecycle reports.
+  send(frame: string): void {
+    this.sent.push(frame);
+  }
+
+  close(code: number, reason: string): void {
+    this.closeRequest = { code, reason };
   }
 
   open(): void {
@@ -77,7 +83,7 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     value: true,
   });
   try {
-    const { preWarmChannel } = await import("./client");
+    const { preWarmChannel, subscribeToChannel } = await import("./client");
     preWarmChannel("test", "en-US", logger);
     TestSocket.sockets[0]?.open();
     jest.advanceTimersByTime(250);
@@ -181,6 +187,51 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
       message: "[WS Client] Reconnected after disconnect",
       context: { noticeableDownMs: 121_000, offlineMs: 181_000 },
     });
+
+    const socketBeforePagehide = TestSocket.sockets.at(-1);
+    const socketCountBeforePagehide = TestSocket.sockets.length;
+    socketBeforePagehide?.dispatchEvent(
+      Object.assign(new Event("message"), {
+        data: JSON.stringify({
+          type: "subscribed",
+          channel: "test",
+          cursor: 42,
+          complete: true,
+        }),
+      }),
+    );
+    fakeWindow.dispatchEvent(new Event("pagehide"));
+    expect(socketBeforePagehide?.closeRequest).toEqual({
+      code: 1000,
+      reason: "pagehide",
+    });
+    subscribeToChannel(
+      "during-pagehide",
+      "__event__",
+      () => undefined,
+      "en-US",
+      logger,
+    )();
+    expect(TestSocket.sockets).toHaveLength(socketCountBeforePagehide);
+    fakeDocument.visibilityState = "hidden";
+    fakeWindow.dispatchEvent(new Event("pageshow"));
+    expect(TestSocket.sockets).toHaveLength(socketCountBeforePagehide);
+    fakeDocument.visibilityState = "visible";
+    fakeDocument.dispatchEvent(new Event("visibilitychange"));
+    expect(TestSocket.sockets).toHaveLength(socketCountBeforePagehide + 1);
+    const restoredSocket = TestSocket.sockets.at(-1);
+    restoredSocket?.open();
+    socketBeforePagehide?.drop(1000, "pagehide");
+    expect(restoredSocket?.sent).toContain(
+      JSON.stringify({
+        type: "subscribe",
+        channel: "test",
+        locale: "en-US",
+        replay: true,
+        since: 42,
+      }),
+    );
+    expect(errors).toHaveLength(4);
 
     TestSocket.sockets.at(-1)?.drop(1001, "going away");
     fakeWindow.dispatchEvent(new Event("pagehide"));
