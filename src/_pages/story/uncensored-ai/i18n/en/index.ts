@@ -3,6 +3,8 @@ export const translations = {
   metaTitle: "Uncensored AI chat without signup | {{appName}}",
   description:
     "Try an uncensored AI chatbot in your browser with free guest credits. Compare models by context window and estimated cost, or start chatting right away.",
+  keywords:
+    "uncensored AI, uncensored AI chat, unfiltered AI chat, AI without filters, ChatGPT without filters, uncensored chatbot, abliterated AI, AI without restrictions",
   intro:
     "Start an uncensored AI chat as a guest. Pick a model for your question or try the one with the lowest estimated cost per exchange.",
   tryModel: "Try {{model}}",
@@ -29,9 +31,25 @@ export const translations = {
       q: "What happens when I run out of guest credits?",
       a: "You can wait for the next month’s allowance or create a free account and verify your email. A verified account can get up to {{credits}} free credits per month. Any guest credits you’ve already spent that month count toward that total.",
     },
+    chatgpt: {
+      q: "Is there a ChatGPT without filters?",
+      a: "No. OpenAI’s GPT models keep their filters everywhere, here too. Jailbreak prompts only last until the next update. The reliable route is a different model: pick one from the uncensored tier and ask your question straight.",
+    },
+    kinds: {
+      q: "Abliterated or truly uncensored: what’s the difference?",
+      a: "Abliterated models are mainstream models with the refusals cut out. Same training, same worldview, they just answer. {{model}} is the truly uncensored kind: trained on books and documents banned from the mainstream internet, resulting in a model with contrary political opinions. Each model card shows which kind it is.",
+    },
     filters: {
       q: "What does unfiltered AI chat mean here?",
       a: "You choose a model from the uncensored tier. Mainstream models such as GPT keep their own filters. An uncensored model can still decline a request or give an incorrect answer.",
+    },
+    privacy: {
+      q: "Are my chats private?",
+      a: "Incognito chats stay in your browser, not on our servers. The AI provider receives each prompt to answer it. No third-party trackers, no ad pixels. With an account you can export your data as JSON or delete the account from Settings.",
+    },
+    legal: {
+      q: "Is uncensored AI legal?",
+      a: "Using a model that refuses less is not forbidden. What you do with the answers or publish falls under the same laws as any other text. Before your first uncensored model, you confirm once that you are 18 or older.",
     },
     local: {
       q: "Do I need a GPU to run these models?",
@@ -39,6 +57,7 @@ export const translations = {
     },
   },
   guides: "Compare models and platforms",
+  chatgptGuide: "ChatGPT without filters: the alternative",
   abliteratedChat: "Try an abliterated AI model in chat",
   compare: "Compare uncensored AI chat platforms",
   benchmark: "See which models answered the same benchmark questions",

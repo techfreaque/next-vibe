@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
     backToBlog: "Wróć do bloga",
     category: "Nowe modele",
     readTime: "5 min czytania",
-    title: "Najnowsze modele już są. Bez cenzury - na poważnie.",
+    title: "Najnowsze modele już są. Bez cenzury, na poważnie.",
     subtitle:
       "Każda duża rodzina modeli przeskoczyła o generację. Doszedł drugi dostawca modeli bez cenzury. I pierwszy raz możesz generować obrazy bez cenzury.",
   },

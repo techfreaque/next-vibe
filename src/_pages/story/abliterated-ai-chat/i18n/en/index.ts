@@ -3,6 +3,8 @@ export const translations = {
   metaTitle: "Abliterated AI Models You Can Try Online | {{appName}}",
   description:
     "Compare abliterated LLMs by context window and estimated cost. Try models in your browser and compare with the original where available.",
+  keywords:
+    "abliterated AI, abliterated LLM, abliterated models, uncensored LLM, AI model without refusals, abliteration, open-source AI without censorship",
   intro:
     "Test models modified to refuse fewer prompts. Pick one to open a browser chat with that model already selected.",
   models: "Available abliterated models",
@@ -27,6 +29,10 @@ export const translations = {
     meaning: {
       q: "What is an abliterated LLM?",
       a: "Abliteration modifies model weights to weaken patterns associated with refusals. The models listed here have a documented abliteration method in our catalog. You can open a browser chat with each available model.",
+    },
+    difference: {
+      q: "How is an abliterated model different from truly uncensored AI?",
+      a: "An abliterated model keeps its training and its worldview. It just stops dodging. {{model}} is built differently: trained on books and documents banned from the mainstream internet, resulting in a model with contrary political opinions.",
     },
     access: {
       q: "Can I try abliterated AI without an account?",

@@ -1,13 +1,15 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Modelli AI abliterati da provare online",
-  metaTitle: "Modelli AI abliterati da provare online | {{appName}}",
+  title: "Modelli AI abliterati: LLM senza censura da provare online",
+  metaTitle: "Modelli AI abliterati senza censura, online | {{appName}}",
   description:
-    "Confronta i modelli abliterati per finestra di contesto e costo stimato. Provali nel browser e confrontali con il modello di base, se disponibile.",
+    "Prova LLM abliterati, senza rifiuti, direttamente nel browser, senza GPU e senza registrazione. Confronta contesto e costi e mettili alla prova contro il modello originale.",
+  keywords:
+    "AI abliterata, modelli abliterati, LLM senza censura, modello AI senza filtri, abliterazione, IA open source senza censura",
   intro:
-    "Prova modelli modificati per rifiutare meno richieste. Scegline uno e apri una chat nel browser con quel modello già selezionato.",
-  models: "Modelli disponibili",
+    "Modelli mainstream a cui sono stati tolti i rifiuti. Scegline uno e la chat si apre con quel modello già selezionato.",
+  models: "Modelli abliterati senza censura",
   estimate:
     "Le stime si basano sul fornitore disponibile più economico per ciascun modello e su {{input}} token in ingresso e {{output}} in uscita. Il costo effettivo dipende dal fornitore e dalla durata della conversazione.",
   empty: "Al momento qui non sono disponibili modelli di chat abliterati.",
@@ -24,11 +26,15 @@ export const translations: typeof enTranslations = {
     compare:
       "Controlla se ciascun modello scrive la scena, ne cambia la premessa o rifiuta. Confronta quanto le risposte rispettano le tue indicazioni.",
   },
-  questions: "Domande frequenti",
+  questions: "AI abliterata: domande frequenti",
   faq: {
     meaning: {
       q: "Che cos’è un LLM abliterato?",
       a: "L’ablazione modifica i pesi del modello per indebolire i meccanismi legati ai rifiuti. Il nostro catalogo documenta l’uso di questa tecnica per i modelli elencati qui. Puoi provare ogni modello disponibile nel browser.",
+    },
+    difference: {
+      q: "Che differenza c’è tra un modello abliterato e un’IA davvero senza censura?",
+      a: "Un modello abliterato mantiene il suo addestramento e la sua visione del mondo: smette solo di eludere le domande. {{model}} è costruito in modo diverso: addestrato su libri e documenti banditi dall’internet mainstream, con il risultato di opinioni politiche controcorrente.",
     },
     access: {
       q: "Posso provare questi modelli senza un account?",

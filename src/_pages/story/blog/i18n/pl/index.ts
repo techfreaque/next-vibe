@@ -179,7 +179,7 @@ export const translations: typeof enTranslations = {
       readTime: "7 min czytania",
     },
     modelRefresh: {
-      title: "Najnowsze modele już są. Bez cenzury - na poważnie.",
+      title: "Najnowsze modele już są. Bez cenzury, na poważnie.",
       category: "Nowe modele",
       excerpt:
         "Claude 5.5, GPT-6, Gemini 4 Argon, Grok 4.7 i świeże modele otwarte. Do tego NanoGPT, większa oferta Venice i pierwsze modele graficzne bez cenzury.",

@@ -36,6 +36,7 @@ import {
 
 import { CardLink, Cta, PageHero, PageSection } from "../_shared/marketing";
 import { GuideCardGrid } from "../blog/guide-links";
+import { getBlogPostCard } from "../blog/posts-cards";
 import { HUB_GUIDES, TOPIC_HUB_PATHS } from "../blog/topics";
 import { COMPARE_HUB_PATH } from "../compare/_shared/platforms";
 import { scopedTranslation } from "./i18n";
@@ -110,7 +111,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     category: t("title"),
     image: MODELS_OG_IMAGE,
     imageAlt: t("title"),
-    keywords: [t("title")],
+    keywords: [t("keywords")],
   });
 }
 
@@ -123,6 +124,12 @@ export function TanstackPage({
   const { t: modelsT } = modelsScopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const firstModel = models[0];
+  // The "truly uncensored" example comes from the live catalog, never copy.
+  const worldviewModel = models.find((model) => model.kind === "ownWorldview");
+  const chatgptGuide = getBlogPostCard(
+    "chatgpt-alternative-without-filters",
+    locale,
+  );
   const faq = [
     {
       question: t("faq.access.q"),
@@ -131,14 +138,34 @@ export function TanstackPage({
       }),
     },
     {
+      question: t("faq.chatgpt.q"),
+      answer: t("faq.chatgpt.a"),
+    },
+    ...(worldviewModel !== undefined
+      ? [
+          {
+            question: t("faq.kinds.q"),
+            answer: t("faq.kinds.a", { model: worldviewModel.name }),
+          },
+        ]
+      : []),
+    {
+      question: t("faq.filters.q"),
+      answer: t("faq.filters.a"),
+    },
+    {
+      question: t("faq.privacy.q"),
+      answer: t("faq.privacy.a"),
+    },
+    {
+      question: t("faq.legal.q"),
+      answer: t("faq.legal.a"),
+    },
+    {
       question: t("faq.outOfCredits.q"),
       answer: t("faq.outOfCredits.a", {
         credits: formatNumber(FREE_CREDIT_SIGNED_IN_TOTAL, locale),
       }),
-    },
-    {
-      question: t("faq.filters.q"),
-      answer: t("faq.filters.a"),
     },
     {
       question: t("faq.local.q"),
@@ -283,6 +310,12 @@ export function TanstackPage({
       )}
       <PageSection title={t("guides")} narrow>
         <Div className="flex flex-col items-start gap-1">
+          {chatgptGuide !== undefined && (
+            <CardLink
+              href={`/${locale}${chatgptGuide.path}`}
+              label={t("chatgptGuide")}
+            />
+          )}
           <CardLink
             href={`/${locale}${TOPIC_HUB_PATHS.abliterated}`}
             label={t("abliteratedChat")}

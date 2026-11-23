@@ -1,13 +1,15 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Abliterierte KI-Modelle online testen",
-  metaTitle: "Abliterierte KI-Modelle online testen | {{appName}}",
+  title: "Abliterierte KI-Modelle: LLMs ohne Zensur online testen",
+  metaTitle: "Abliterierte KI-Modelle ohne Zensur online testen | {{appName}}",
   description:
-    "Vergleiche abliterierte LLMs nach Kontextfenster und geschätzten Kosten. Teste sie im Browser und vergleiche sie mit dem Basismodell, sofern verfügbar.",
+    "Abliterierte LLMs ohne Verweigerung direkt im Browser testen, ohne GPU und ohne Anmeldung. Kontextfenster und Kosten vergleichen, gegen das Originalmodell antreten lassen.",
+  keywords:
+    "abliterierte KI, abliterierte Modelle, LLM ohne Zensur, KI-Modell ohne Filter, unzensiertes LLM, Abliteration, Open-Source-KI ohne Zensur",
   intro:
-    "Teste Modelle, die so angepasst wurden, dass sie seltener Anfragen ablehnen. Wähle eins aus und öffne einen Browser-Chat mit genau diesem Modell.",
-  models: "Verfügbare abliterierte Modelle",
+    "Mainstream-Modelle, denen die Verweigerung herausgeschnitten wurde. Wähl eins aus und der Chat öffnet sich mit genau diesem Modell.",
+  models: "Abliterierte Modelle ohne Zensur",
   estimate:
     "Die Schätzung gilt für den günstigsten verfügbaren Anbieter pro Modell und rechnet mit {{input}} Eingabe- und {{output}} Ausgabetokens. Die tatsächlichen Kosten hängen vom Anbieter und von der Gesprächslänge ab.",
   empty: "Hier sind derzeit keine abliterierten Chatmodelle verfügbar.",
@@ -24,11 +26,15 @@ export const translations: typeof enTranslations = {
     compare:
       "Schreibt das Modell die Szene, ändert es die Ausgangslage oder lehnt es ab? Vergleiche, wie genau sich die Antworten an deine Vorgaben halten.",
   },
-  questions: "Häufige Fragen",
+  questions: "Abliterierte KI: häufige Fragen",
   faq: {
     meaning: {
       q: "Was ist ein abliteriertes LLM?",
       a: "Bei der Abliteration werden Modellgewichte verändert, um Muster abzuschwächen, die mit Ablehnungen zusammenhängen. Für die Modelle in dieser Liste ist das Verfahren in unserem Katalog dokumentiert. Jedes verfügbare Modell kannst du im Browser testen.",
+    },
+    difference: {
+      q: "Was unterscheidet abliterierte Modelle von echt unzensierter KI?",
+      a: "Ein abliteriertes Modell behält sein Training und sein Weltbild, es weicht nur nicht mehr aus. {{model}} ist anders gebaut: trainiert mit Büchern und Dokumenten, die aus dem Mainstream-Internet verbannt wurden. Das Ergebnis ist ein Modell mit politischen Gegenpositionen.",
     },
     access: {
       q: "Kann ich abliterierte KI ohne Konto testen?",

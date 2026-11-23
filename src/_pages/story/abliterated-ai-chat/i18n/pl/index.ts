@@ -1,13 +1,15 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Abliterowane modele AI do wypróbowania online",
-  metaTitle: "Abliterowane modele AI online | {{appName}}",
+  title: "Abliterowane modele AI: LLM bez cenzury do wypróbowania online",
+  metaTitle: "Abliterowane modele AI bez cenzury online | {{appName}}",
   description:
-    "Porównaj okna kontekstu i szacunkowe koszty abliterowanych LLM. Wypróbuj je w przeglądarce i porównaj z modelem bazowym, jeśli jest dostępny.",
+    "Wypróbuj abliterowane LLM bez odmów prosto w przeglądarce, bez GPU i bez rejestracji. Porównaj kontekst i koszty, zestaw je z modelem bazowym.",
+  keywords:
+    "abliterowana AI, abliterowane modele, LLM bez cenzury, model AI bez filtrów, nieocenzurowany LLM, abliteracja, AI open source bez cenzury",
   intro:
-    "Wypróbuj modele zmodyfikowane tak, by rzadziej odmawiały odpowiedzi. Wybierz jeden i otwórz czat w przeglądarce. Model będzie już ustawiony.",
-  models: "Dostępne modele abliterowane",
+    "Modele z głównego nurtu, z których wycięto odmowy. Wybierz jeden, a czat otworzy się od razu z tym modelem.",
+  models: "Abliterowane modele bez cenzury",
   estimate:
     "Szacunek opiera się na cenie najtańszego dostępnego dostawcy danego modelu i zakłada {{input}} tokenów wejściowych oraz {{output}} wyjściowych. Rzeczywisty koszt zależy od dostawcy i długości rozmowy.",
   empty: "Obecnie nie ma tu dostępnych modeli abliterowanych.",
@@ -24,11 +26,15 @@ export const translations: typeof enTranslations = {
     compare:
       "Sprawdź, czy każdy model pisze scenę, zmienia jej założenia czy odmawia. Porównaj, które odpowiedzi lepiej trzymają się Twoich wskazówek.",
   },
-  questions: "Częste pytania",
+  questions: "Abliterowana AI: częste pytania",
   faq: {
     meaning: {
       q: "Czym jest abliterowany LLM?",
       a: "Abliteracja zmienia wagi modelu, aby osłabić mechanizmy związane z odmowami. W naszym katalogu modele z tej listy mają udokumentowane użycie tej metody. Każdy dostępny model możesz wypróbować w przeglądarce.",
+    },
+    difference: {
+      q: "Czym abliterowany model różni się od AI naprawdę bez cenzury?",
+      a: "Model abliterowany zachowuje swój trening i światopogląd, po prostu przestaje unikać pytań. {{model}} jest zbudowany inaczej: trenowany na książkach i dokumentach zakazanych w mainstreamowym internecie. Efekt to model z przeciwnymi poglądami politycznymi.",
     },
     access: {
       q: "Czy mogę wypróbować model abliterowany bez konta?",

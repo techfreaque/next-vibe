@@ -46,6 +46,8 @@ interface ChatChoice extends ModelRef {
 interface PageData {
   locale: CountryLanguage;
   models: ChatChoice[];
+  /** Live model trained on its own corpus, the "truly uncensored" contrast. */
+  worldviewModel: string | null;
 }
 
 export async function tanstackLoader({ params }: Props): Promise<PageData> {
@@ -80,7 +82,14 @@ export async function tanstackLoader({ params }: Props): Promise<PageData> {
           : null,
       };
     });
-  return { locale, models };
+  const worldview = available.find(
+    (model) => model.uncensoredMethod === "ownWorldview",
+  );
+  return {
+    locale,
+    models,
+    worldviewModel: worldview ? worldview.name.trim() : null,
+  };
 }
 
 export async function generateMetadata({
@@ -96,16 +105,28 @@ export async function generateMetadata({
     category: t("title"),
     image: MODELS_OG_IMAGE,
     imageAlt: t("title"),
-    keywords: [t("title")],
+    keywords: [t("keywords")],
   });
 }
 
-export function TanstackPage({ locale, models }: PageData): JSX.Element {
+export function TanstackPage({
+  locale,
+  models,
+  worldviewModel,
+}: PageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: uncensoredT } = uncensoredScopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const faq = [
     { question: t("faq.meaning.q"), answer: t("faq.meaning.a") },
+    ...(worldviewModel !== null
+      ? [
+          {
+            question: t("faq.difference.q"),
+            answer: t("faq.difference.a", { model: worldviewModel }),
+          },
+        ]
+      : []),
     {
       question: t("faq.access.q"),
       answer: t("faq.access.a", {

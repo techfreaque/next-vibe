@@ -1,13 +1,15 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Modelos de IA abliterados para probar en línea",
-  metaTitle: "Modelos de IA abliterados en línea | {{appName}}",
+  title: "Modelos de IA abliterados: LLM sin censura para probar en línea",
+  metaTitle: "Modelos de IA abliterados sin censura, en línea | {{appName}}",
   description:
-    "Compara los LLM abliterados por ventana de contexto y costo estimado. Pruébalos en el navegador y compáralos con el modelo base si está disponible.",
+    "Prueba LLM abliterados, sin rechazos, directamente en el navegador, sin GPU y sin registro. Compara contexto y costo, y enfréntalos al modelo original.",
+  keywords:
+    "IA abliterada, modelos abliterados, LLM sin censura, modelo de IA sin filtros, ablación de rechazos, IA de código abierto sin censura",
   intro:
-    "Prueba modelos modificados para rechazar menos solicitudes. Elige uno y abre un chat en el navegador con ese modelo ya seleccionado.",
-  models: "Modelos abliterados disponibles",
+    "Modelos convencionales a los que se les quitaron los rechazos. Elige uno y el chat se abre con ese modelo ya seleccionado.",
+  models: "Modelos abliterados sin censura",
   estimate:
     "Cada estimación usa el proveedor disponible más económico para ese modelo y parte de {{input}} tokens de entrada y {{output}} de salida. El costo real depende del proveedor y de la longitud de la conversación.",
   empty: "Por ahora no hay modelos de chat abliterados disponibles aquí.",
@@ -24,11 +26,15 @@ export const translations: typeof enTranslations = {
     compare:
       "Fíjate si cada modelo escribe la escena, cambia la premisa o rechaza la solicitud. Compara qué tan bien sigue tus indicaciones.",
   },
-  questions: "Preguntas frecuentes",
+  questions: "IA abliterada: preguntas frecuentes",
   faq: {
     meaning: {
       q: "¿Qué es un LLM abliterado?",
       a: "La ablación modifica los pesos del modelo para debilitar los patrones asociados con los rechazos. Nuestro catálogo documenta el uso de esta técnica en los modelos de la lista. Puedes probar cada modelo disponible en el navegador.",
+    },
+    difference: {
+      q: "¿En qué se diferencia un modelo abliterado de una IA realmente sin censura?",
+      a: "Un modelo abliterado conserva su entrenamiento y su visión del mundo: solo deja de esquivar preguntas. {{model}} está hecho de otra forma: entrenado con libros y documentos prohibidos en el internet convencional. El resultado es un modelo con opiniones políticas contrarias.",
     },
     access: {
       q: "¿Puedo probar un modelo abliterado sin tener cuenta?",

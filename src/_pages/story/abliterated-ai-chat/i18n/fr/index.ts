@@ -1,13 +1,15 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Modèles IA abliterated à tester en ligne",
-  metaTitle: "Modèles IA abliterated à tester en ligne | {{appName}}",
+  title: "Modèles IA abliterated : des LLM sans censure à tester en ligne",
+  metaTitle: "Modèles IA abliterated sans censure, en ligne | {{appName}}",
   description:
-    "Comparez les LLM abliterated par fenêtre de contexte et coût estimé. Essayez-les dans votre navigateur et comparez-les au modèle de base quand il est disponible.",
+    "Testez des LLM abliterated, sans refus, directement dans le navigateur, sans GPU ni inscription. Comparez contexte et coût, et confrontez-les au modèle d’origine.",
+  keywords:
+    "IA abliterated, modèle abliterated, LLM sans censure, LLM non censuré, modèle IA sans filtre, ablitération, IA open source sans censure",
   intro:
-    "Testez des modèles modifiés pour refuser moins de demandes. Choisissez-en un et ouvrez un chat dans votre navigateur avec ce modèle déjà sélectionné.",
-  models: "Modèles abliterated disponibles",
+    "Des modèles grand public dont on a retiré les refus. Choisissez-en un, le chat s’ouvre avec ce modèle déjà sélectionné.",
+  models: "Modèles abliterated sans censure",
   estimate:
     "Chaque estimation s’appuie sur le fournisseur disponible le moins cher pour le modèle et sur {{input}} tokens en entrée et {{output}} en sortie. Le coût réel dépend du fournisseur et de la longueur de la conversation.",
   empty: "Aucun modèle abliterated n’est disponible ici pour le moment.",
@@ -24,11 +26,15 @@ export const translations: typeof enTranslations = {
     compare:
       "Vérifiez si chaque modèle écrit la scène, modifie la situation de départ ou refuse. Comparez dans quelle mesure les réponses respectent vos consignes.",
   },
-  questions: "Questions fréquentes",
+  questions: "IA abliterated : questions fréquentes",
   faq: {
     meaning: {
       q: "Qu’est-ce qu’un LLM abliterated ?",
       a: "L’ablitération modifie les poids d’un modèle pour atténuer les mécanismes associés aux refus. Notre catalogue documente cette méthode pour les modèles de cette liste. Vous pouvez tester chaque modèle disponible dans votre navigateur.",
+    },
+    difference: {
+      q: "Quelle différence entre un modèle abliterated et une IA vraiment non censurée ?",
+      a: "Un modèle abliterated garde son entraînement et sa vision du monde : il n’esquive plus, c’est tout. {{model}} est construit autrement : entraîné sur des livres et des documents bannis de l’internet grand public, avec pour résultat des opinions politiques à contre-courant.",
     },
     access: {
       q: "Puis-je tester un modèle abliterated sans compte ?",

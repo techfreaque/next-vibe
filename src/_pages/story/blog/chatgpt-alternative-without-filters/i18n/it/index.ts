@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     p2: "Su {{appName}} puoi scegliere tra {{modelCount}} modelli di chat in tre categorie. Tutti usano lo stesso saldo di crediti.",
   },
   exists: {
-    title: "C'è uno ChatGPT senza filtri?",
+    title: "Esiste un ChatGPT senza filtri?",
     p1: "ChatGPT applica le misure di sicurezza di OpenAI. Queste valgono anche quando scegli GPT su {{appName}}.",
     p2: "Per chattare con meno restrizioni, scegli un modello della categoria senza censura su {{appName}}. Puoi iniziare dal browser come ospite.",
   },
