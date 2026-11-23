@@ -32,6 +32,7 @@ export const translations = {
     errors: "Errors and rate limits",
     codingTools: "Coding tools",
     sdks: "SDK examples",
+    guides: "Guides",
     images: "Images",
     speech: "Text to speech",
     transcriptions: "Transcription",
@@ -428,6 +429,11 @@ export const translations = {
     images: "Images",
     speech: "Speech",
     transcription: "Transcription",
+  },
+  guides: {
+    title: "Guides",
+    intro:
+      "Longer walkthroughs: switching from OpenAI or OpenRouter, uncensored models over the API, and wiring your key into coding tools.",
   },
   cta: {
     title: "Build on every model.",

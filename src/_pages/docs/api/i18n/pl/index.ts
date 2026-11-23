@@ -34,6 +34,7 @@ export const translations: typeof enTranslations = {
     errors: "Błędy i limity",
     codingTools: "Narzędzia do kodowania",
     sdks: "Przykłady SDK",
+    guides: "Poradniki",
     images: "Obrazy",
     speech: "Zamiana tekstu na mowę",
     transcriptions: "Transkrypcja",
@@ -435,6 +436,11 @@ export const translations: typeof enTranslations = {
     images: "Obrazy",
     speech: "Mowa",
     transcription: "Transkrypcja",
+  },
+  guides: {
+    title: "Poradniki",
+    intro:
+      "Dłuższe przewodniki: przejście z OpenAI lub OpenRoutera, modele bez cenzury przez API i podpięcie klucza do narzędzi programistycznych.",
   },
   cta: {
     title: "Buduj na każdym modelu.",

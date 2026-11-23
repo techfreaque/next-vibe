@@ -13,6 +13,7 @@ import { createEndpointLogger } from "next-vibe/logger/server";
 import { Platform } from "next-vibe/platforms/platforms";
 import { Div } from "next-vibe/ui/components/div";
 import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
+import { JsonLd } from "next-vibe/ui/components/json-ld";
 import { Link } from "next-vibe/ui/components/link";
 import { Main } from "next-vibe/ui/components/main";
 import type { JSX } from "react";
@@ -20,8 +21,22 @@ import type { JSX } from "react";
 import { contactClientRepository } from "@/contact/repository-client";
 import { configScopedTranslation } from "@/env/i18n";
 
+import { buildBreadcrumbList } from "../_components/structured-data";
+import { BreadcrumbTrail } from "../story/_shared/breadcrumbs";
+import { GuideCardGrid } from "../story/blog/guide-links";
+import type { BlogPostSlug } from "../story/blog/posts-meta";
 import { scopedTranslation as pageT } from "./i18n";
 import HelpPageClient from "./page-client";
+
+/** The guides people ask about most, one per main question on this page. */
+const HELP_GUIDES: readonly BlogPostSlug[] = [
+  "best-uncensored-llm",
+  "abliterated-vs-uncensored-models",
+  "ai-chat-no-sign-up",
+  "uncensored-ai-image-generator",
+  "openai-anthropic-compatible-api",
+  "ai-roleplay-without-filter",
+];
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -111,13 +126,29 @@ export function TanstackPage({
   modelCount,
 }: HelpPageData): JSX.Element {
   const { t } = pageT.scopedT(locale);
+  const { t: configT } = configScopedTranslation.scopedT(locale);
 
   return (
     <Main className="min-h-screen bg-primary/5 bg-linear-to-b from-primary/5 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
-      <Div className="container max-w-6xl mx-auto pt-8 px-4">
+      <JsonLd
+        id="help-breadcrumbs"
+        data={{
+          "@context": "https://schema.org",
+          ...buildBreadcrumbList(locale, [
+            { name: t("breadcrumb"), path: "/help" },
+          ]),
+        }}
+      />
+      <Div className="container max-w-6xl mx-auto pt-8 px-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+        <BreadcrumbTrail
+          items={[
+            { name: configT("appName"), href: `/${locale}/story` },
+            { name: t("breadcrumb") },
+          ]}
+        />
         <Link
           href={`/${locale}/threads`}
-          className="inline-flex items-center text-sm text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary mb-8"
+          className="inline-flex min-h-11 items-center text-sm text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
           {t("nav.home")}
@@ -130,6 +161,7 @@ export function TanstackPage({
         userEmail={userEmail}
         supportEmail={supportEmail}
         modelCount={modelCount}
+        guides={<GuideCardGrid locale={locale} slugs={HELP_GUIDES} />}
       />
     </Main>
   );

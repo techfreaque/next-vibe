@@ -1240,14 +1240,18 @@ export class SkillsRepository {
     return SkillsRepository.listPublicDefaultSkills().map(({ id }) => id);
   }
 
-  static listPublicDefaultSkillPages(
-    locale: CountryLanguage,
-  ): { id: string; name: string; tagline: string }[] {
+  static listPublicDefaultSkillPages(locale: CountryLanguage): {
+    id: string;
+    name: string;
+    tagline: string;
+    category: typeof SkillCategoryValue;
+  }[] {
     const { t } = scopedTranslation.scopedT(locale);
     return SkillsRepository.listPublicDefaultSkills().map((skill) => ({
       id: skill.id,
       name: t(skill.name),
       tagline: t(skill.tagline),
+      category: skill.category,
     }));
   }
 
@@ -1261,7 +1265,13 @@ export class SkillsRepository {
     locale: CountryLanguage,
   ): Promise<
     ResponseType<
-      { id: string; name: string; tagline: string; updatedAt: Date }[]
+      {
+        id: string;
+        name: string;
+        tagline: string;
+        category: typeof SkillCategoryValue;
+        updatedAt: Date;
+      }[]
     >
   > {
     try {
@@ -1271,6 +1281,7 @@ export class SkillsRepository {
           slug: customSkills.slug,
           name: customSkills.name,
           tagline: customSkills.tagline,
+          category: customSkills.category,
           updatedAt: customSkills.updatedAt,
         })
         .from(customSkills)
@@ -1280,6 +1291,7 @@ export class SkillsRepository {
           id: row.slug || row.id,
           name: row.name,
           tagline: row.tagline,
+          category: row.category,
           updatedAt: row.updatedAt,
         })),
       );

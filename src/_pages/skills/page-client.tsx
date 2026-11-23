@@ -9,10 +9,14 @@ import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { Zap } from "next-vibe/ui/components/icons/Zap";
 import { Link } from "next-vibe/ui/components/link";
 import { Skeleton } from "next-vibe/ui/components/skeleton";
-import { H1, P } from "next-vibe/ui/components/typography";
+import { H1, H2, P } from "next-vibe/ui/components/typography";
 import type { JSX, ReactNode } from "react";
 import { lazy, Suspense } from "react";
 
+import {
+  BreadcrumbTrail,
+  type BreadcrumbTrailItem,
+} from "../story/_shared/breadcrumbs";
 import { scopedTranslation } from "./i18n";
 
 // Lazy-load the skills content to avoid circular dependency TDZ in SSR.
@@ -25,7 +29,11 @@ interface SkillsPageClientProps {
   user: JwtPayloadType;
   platform: Platform;
   initialData: SkillListResponseOutput | undefined;
+  breadcrumbs: readonly BreadcrumbTrailItem[];
+  /** Server-rendered category directory, shown above the interactive list. */
   directory: ReactNode;
+  /** Server-rendered hub links, FAQ and guides below the list. */
+  after: ReactNode;
 }
 
 /** Shown while the skills chunk loads - never a blank card. */
@@ -51,28 +59,41 @@ export function SkillsPageClient({
   user,
   platform,
   initialData,
+  breadcrumbs,
   directory,
+  after,
 }: SkillsPageClientProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <Div className="bg-background">
       <Div className="container max-w-4xl mx-auto py-6 px-4">
-        <Link
-          href={`/${locale}/threads/private/new`}
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
-        >
-          <ChevronLeft className="mr-1 h-4 w-4" />
-          {t("backToChat")}
-        </Link>
+        <Div className="mb-6 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+          <BreadcrumbTrail items={breadcrumbs} />
+          <Link
+            href={`/${locale}/threads/private/new`}
+            className="inline-flex min-h-11 items-center text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ChevronLeft className="mr-1 h-4 w-4" />
+            {t("backToChat")}
+          </Link>
+        </Div>
 
         <Div className="flex items-center gap-3 mb-2">
           <Zap className="h-6 w-6 text-primary" />
-          <H1 className="text-2xl font-bold">{t("title")}</H1>
+          <H1 className="text-3xl font-bold tracking-tight">{t("title")}</H1>
         </Div>
-        <P className="text-muted-foreground mb-6">{t("description")}</P>
+        <P className="text-muted-foreground mb-6 max-w-2xl">
+          {t("description")}
+        </P>
         {directory}
 
+        <H2 className="mb-1 border-none p-0 text-xl font-semibold tracking-tight">
+          {t("manage.title")}
+        </H2>
+        <P className="mt-0 mb-4 text-sm text-muted-foreground">
+          {t("manage.intro")}
+        </P>
         {/* overflow-clip (not hidden) keeps the sticky header inside working */}
         <Div className="rounded-xl border bg-card overflow-clip">
           <Suspense fallback={<SkillsSkeleton />}>
@@ -84,6 +105,7 @@ export function SkillsPageClient({
             />
           </Suspense>
         </Div>
+        {after}
       </Div>
     </Div>
   );

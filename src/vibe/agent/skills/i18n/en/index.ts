@@ -296,8 +296,8 @@ export const translations = {
           "Describe what makes this skill unique. What's their role? What can they help with? Be specific and detailed.",
         placeholder: "Describe your skill's purpose and capabilities",
         validation: {
-          minLength: "Description must be at least 10 skills",
-          maxLength: "Description must be less than 500 skills",
+          minLength: "Description must be at least 10 characters",
+          maxLength: "Description must be less than 500 characters",
         },
       },
       category: {
@@ -361,7 +361,7 @@ export const translations = {
           "Define your skill's behavior, personality, and expertise. This is the core instruction that shapes how the AI responds. Be detailed about tone, knowledge areas, and conversation style.",
         placeholder: "You are a helpful assistant who specializes in...",
         validation: {
-          minLength: "System prompt must be at least 10 skills",
+          minLength: "System prompt must be at least 10 characters",
           maxLength: "System prompt must be less than 5000 skills",
         },
       },
@@ -2964,7 +2964,7 @@ export const translations = {
       placeholder: "Enter a short tagline",
       validation: {
         minLength: "Tagline must be at least 2 skills",
-        maxLength: "Tagline must be less than 500 skills",
+        maxLength: "Tagline must be less than 500 characters",
       },
     },
     icon: {
@@ -2978,8 +2978,8 @@ export const translations = {
         "Describe what makes this skill unique. What's their role? What can they help with? Be specific and detailed.",
       placeholder: "Describe your skill's purpose and capabilities",
       validation: {
-        minLength: "Description must be at least 10 skills",
-        maxLength: "Description must be less than 500 skills",
+        minLength: "Description must be at least 10 characters",
+        maxLength: "Description must be less than 500 characters",
       },
     },
     category: {
@@ -3050,7 +3050,7 @@ export const translations = {
         "Define your skill's behavior, personality, and expertise. This is the core instruction that shapes how the AI responds. Be detailed about tone, knowledge areas, and conversation style.",
       placeholder: "You are a helpful assistant who specializes in...",
       validation: {
-        minLength: "System prompt must be at least 10 skills",
+        minLength: "System prompt must be at least 10 characters",
         maxLength: "System prompt must be less than 5000 skills",
       },
     },

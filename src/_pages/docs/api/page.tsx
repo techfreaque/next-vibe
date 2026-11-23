@@ -47,7 +47,10 @@ import {
   buildBreadcrumbList,
   pageUrl,
 } from "../../_components/structured-data";
+import { BreadcrumbTrail } from "../../story/_shared/breadcrumbs";
 import { Callout, Cta } from "../../story/_shared/marketing";
+import { GuideCardGrid } from "../../story/blog/guide-links";
+import type { BlogPostSlug } from "../../story/blog/posts-meta";
 import { type CodeTab, CodeTabs, CopyButton } from "./_components/code-tabs";
 import {
   autoCode,
@@ -86,6 +89,14 @@ export async function tanstackLoader({
 }
 
 export const revalidate = 3600;
+
+/** Developer guides that go deeper than the reference. */
+const API_GUIDES: readonly BlogPostSlug[] = [
+  "openai-anthropic-compatible-api",
+  "uncensored-llm-api",
+  "unbottled-api-in-coding-tools",
+  "openrouter-alternatives",
+];
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -340,6 +351,7 @@ export function TanstackPage({
       items: [
         { id: "coding-tools", label: t("nav.codingTools") },
         { id: "sdks", label: t("nav.sdks") },
+        { id: "guides", label: t("nav.guides") },
       ],
     },
   ];
@@ -369,6 +381,13 @@ export function TanstackPage({
       <Div className="border-b border-border bg-gradient-to-b from-primary/[0.06] to-transparent">
         <Div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-10 sm:px-6 md:pt-14 md:pb-12 lg:grid lg:grid-cols-[minmax(0,1fr)_26rem] lg:items-center lg:gap-12">
           <Div className="min-w-0">
+            <BreadcrumbTrail
+              className="mb-4"
+              items={[
+                { name: appName, href: `/${locale}/story` },
+                { name: t("hero.badge") },
+              ]}
+            />
             <Span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-xs">
               <BookOpen className="h-3.5 w-3.5 text-primary" />
               {t("hero.badge")}
@@ -1334,6 +1353,15 @@ export function TanstackPage({
                   {...copy}
                 />
               </SubBlock>
+            </DocSection>
+
+            {/* ── Guides ── */}
+            <DocSection
+              id="guides"
+              title={t("guides.title")}
+              intro={t("guides.intro")}
+            >
+              <GuideCardGrid locale={locale} slugs={API_GUIDES} />
             </DocSection>
           </Div>
         </Div>
