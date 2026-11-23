@@ -87,6 +87,7 @@ void mock.module("../../logger/db-persist", () => ({
 
 const originalFetch = globalThis.fetch;
 const sentHeaders: Array<Record<string, string>> = [];
+const queuedResponses: Response[] = [];
 let fetchFailures = 0;
 let malformedError = false;
 
@@ -105,6 +106,10 @@ describe("request id propagation", () => {
         if (fetchFailures > 0) {
           fetchFailures--;
           return Promise.reject(new TypeError("Failed to fetch"));
+        }
+        const queued = queuedResponses.shift();
+        if (queued) {
+          return Promise.resolve(queued);
         }
         return Promise.resolve(
           new Response(
@@ -173,6 +178,7 @@ describe("request id propagation", () => {
 
     const sent = sentHeaders.at(-1)?.[REQUEST_ID_HEADER_NAME];
     expect(typeof sent).toBe("string");
+    expect(sentHeaders.at(-1)?.["Accept"]).toBe("application/json, */*;q=0.1");
 
     const failure = rows.find((r) =>
       r.message.startsWith("Endpoint call failed"),
@@ -210,7 +216,7 @@ describe("request id propagation", () => {
     expect(a).not.toBe(b);
   });
 
-  it("logs the transport failure and retries a visible credit read once", async () => {
+  it("reports and retries interrupted reads and unstructured HTTP failures once", async () => {
     const documentDescriptor = Object.getOwnPropertyDescriptor(
       globalThis,
       "document",
@@ -267,9 +273,45 @@ describe("request id propagation", () => {
           requestId: ids[1],
         }),
       );
+
+      // A different GET receives a framework page instead of an endpoint
+      // response. Retry that read once and return the real endpoint's result.
+      const beforeLedger = sentHeaders.length;
+      queuedResponses.push(
+        new Response("<h1>Not Found</h1>", {
+          status: 404,
+          headers: { "content-type": "text/html" },
+        }),
+        Response.json(
+          {
+            success: false,
+            message: "Missing account",
+            errorType: { errorKey: "errorTypes.not_found", errorCode: 404 },
+          },
+          { status: 404 },
+        ),
+      );
+      const ledgerResult = await callApi(
+        ledgerDefinition.GET,
+        recordingLogger(rows),
+        {
+          isPublic: false,
+          id: "00000000-0000-4000-8000-000000000001",
+          leadId: "00000000-0000-4000-8000-000000000002",
+          roles: [],
+        },
+        "en-GLOBAL",
+        { page: 1, pageSize: 20 },
+        { accountId: "00000000-0000-0000-0000-0000000000aa" },
+      );
+      expect(ledgerResult.success).toBe(false);
+      expect(ledgerResult.errorType?.errorKey).toBe("errorTypes.not_found");
+      expect(sentHeaders.length - beforeLedger).toBe(2);
+      expect(rows.some((row) => row.message === "callApi: non-JSON response")).toBe(true);
     } finally {
       clock.mockRestore();
       fetchFailures = 0;
+      queuedResponses.length = 0;
       Object.defineProperty(
         globalThis,
         "document",

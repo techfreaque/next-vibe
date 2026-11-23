@@ -14,11 +14,15 @@ import {
 } from "@tanstack/react-start";
 import { setResponseHeader } from "@tanstack/react-start/server";
 import { NextRequest } from "next/server";
+import { parseError } from "next-vibe/core/utils/parse-error";
+import { sanitizeRoutePath } from "next-vibe/logger/client-context";
 import { shouldUseColors } from "next-vibe/logger/colors";
-import { formatSinceStart } from "next-vibe/logger/uptime";
 import { serverFileLog } from "next-vibe/logger/file";
+import { formatSinceStart } from "next-vibe/logger/uptime";
 import { applyResponseIdentityCookies } from "next-vibe/platforms/web/middleware/utils";
 import { preloadAllLazyWidgets } from "next-vibe/unified-ui/_shared/lazy-widget";
+
+import { REQUEST_ID_HEADER_NAME } from "@/env/constants";
 
 // ANSI helpers (inline - avoid importing heavy logger chain at middleware level)
 const C = {
@@ -270,16 +274,21 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
 // Log and rethrow. notFound()/redirect() are router control flow, not
 // failures — pass them through quietly.
 const fnErrorLogMiddleware = createMiddleware({ type: "function" }).server(
-  async ({ next }) => {
+  async ({ next, serverFnMeta }) => {
     try {
       return await next();
     } catch (error) {
       if (!isRedirect(error) && !isNotFound(error)) {
-        const text =
-          error instanceof Error
-            ? (error.stack ?? `${error.name}: ${error.message}`)
-            : JSON.stringify(error);
-        process.stderr.write(`[SSR loader error] ${text}\n`);
+        const cause = parseError(error);
+        const message = `[${formatSinceStart()}] [SSR loader error]`;
+        const details = {
+          file: serverFnMeta.filename,
+          function: serverFnMeta.name,
+          error: cause.message,
+          stack: cause.stack,
+        };
+        process.stderr.write(`${message} ${JSON.stringify(details)}\n`);
+        serverFileLog(message, details);
       }
       // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- middleware must rethrow so the router's error handling still runs
       throw error;
@@ -291,7 +300,36 @@ const csrfMiddleware = createCsrfMiddleware({
   filter: (ctx) => ctx.handlerType === "serverFn",
 });
 
+const requestErrorLogMiddleware = createMiddleware().server(
+  async ({ next, request }) => {
+    try {
+      return await next();
+    } catch (error) {
+      if (!request.signal.aborted && !isRedirect(error) && !isNotFound(error)) {
+        const url = new URL(request.url);
+        const requestId = request.headers.get(REQUEST_ID_HEADER_NAME);
+        const cause = parseError(error);
+        const details = {
+          method: request.method,
+          path: sanitizeRoutePath(url.pathname),
+          requestId:
+            requestId && /^[A-Za-z0-9_-]{8,64}$/.test(requestId)
+              ? requestId
+              : null,
+          error: cause.message,
+          stack: cause.stack,
+        };
+        const message = `[${formatSinceStart()}] [TanStack] Request failed before returning a response`;
+        process.stderr.write(`${message} ${JSON.stringify(details)}\n`);
+        serverFileLog(message, details);
+      }
+      // oxlint-disable-next-line restricted/restricted-syntax -- preserve TanStack's HTTP error and redirect handling
+      throw error;
+    }
+  },
+);
+
 export const startInstance = createStart(() => ({
-  requestMiddleware: [proxyMiddleware, csrfMiddleware],
+  requestMiddleware: [requestErrorLogMiddleware, proxyMiddleware, csrfMiddleware],
   functionMiddleware: [fnErrorLogMiddleware],
 }));

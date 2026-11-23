@@ -2,7 +2,7 @@
 // import "next-vibe/ui/tanstack/global-css";
 
 import { TanstackPage as RootLayout } from "@root-layout/layout";
-import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { createRootRoute, ErrorComponent, Outlet } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { viewportToHead } from "next-vibe/platforms/web/frameworks/tanstack-start/page-head";
@@ -40,6 +40,7 @@ export const Route = createRootRoute({
       { rel: "apple-touch-icon", href: "/images/apple-icon.png" },
     ],
   }),
+  errorComponent: ErrorComponent,
   shellComponent: function ShellComponent({ children }) {
     const layout = Route.useLoaderData()?.layout;
     if (layout) {

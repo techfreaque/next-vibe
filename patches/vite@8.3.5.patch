@@ -1,7 +1,29 @@
 diff --git a/dist/node/chunks/node.js b/dist/node/chunks/node.js
 --- a/dist/node/chunks/node.js
 +++ b/dist/node/chunks/node.js
-@@ -29110,7 +29110,8 @@
+@@ -12002,12 +12002,17 @@
+ 			});
+ 			paths = paths.filter((path) => {
+ 				if (path.startsWith(BANG)) {
+-					this._ignoredPaths.add(path.slice(1));
++					const ignoredPath = path.slice(1);
++					if (!this._ignoredPaths.has(ignoredPath)) {
++						this._ignoredPaths.add(ignoredPath);
++						this._userIgnored = void 0;
++					}
+ 					return false;
+ 				}
+-				this._ignoredPaths.delete(path);
+-				this._ignoredPaths.delete(path + SLASH_GLOBSTAR);
+-				this._userIgnored = void 0;
++				// Reuse the compiled ignore patterns when a watch is simply added.
++				const removedPath = this._ignoredPaths.delete(path);
++				const removedDescendants = this._ignoredPaths.delete(path + SLASH_GLOBSTAR);
++				if (removedPath || removedDescendants) this._userIgnored = void 0;
+ 				return true;
+ 			});
+ 			if (this.options.useFsEvents && this._fsEventsHandler) {
+@@ -29110,7 +29115,8 @@
  		root: config.root,
  		resolve: config.resolve,
  		assetsInclude: config.assetsInclude,
@@ -11,7 +33,7 @@ diff --git a/dist/node/chunks/node.js b/dist/node/chunks/node.js
  		optimizeDeps: {
  			include: optimizeDeps.include ? unique(optimizeDeps.include).sort() : void 0,
  			exclude: optimizeDeps.exclude ? unique(optimizeDeps.exclude).sort() : void 0,
-@@ -29729,7 +29730,7 @@
+@@ -29729,7 +29735,7 @@
  	async function resolve(environment, id, importer) {
  		let pluginContainer = pluginContainerMap.get(environment);
  		if (!pluginContainer) {
@@ -20,7 +42,7 @@ diff --git a/dist/node/chunks/node.js b/dist/node/chunks/node.js
  				root: config.root,
  				isProduction: config.isProduction,
  				isBuild: config.command === "build",
-@@ -29739,9 +29740,15 @@
+@@ -29739,9 +29745,15 @@
  				...options,
  				idOnly: true
  			}, environment.config, true)], void 0, false);
@@ -40,7 +62,7 @@ diff --git a/dist/node/chunks/node.js b/dist/node/chunks/node.js
 diff --git a/dist/node/module-runner.js b/dist/node/module-runner.js
 --- a/dist/node/module-runner.js
 +++ b/dist/node/module-runner.js
-@@ -1226,12 +1226,29 @@
+@@ -1226,12 +1226,30 @@
  				startOffset: this.evaluator.startOffset
  			}
  		]);
@@ -59,9 +81,10 @@ diff --git a/dist/node/module-runner.js b/dist/node/module-runner.js
  		}
  		let moduleId = "externalize" in fetchedModule ? fetchedModule.externalize : fetchedModule.id, moduleUrl = "url" in fetchedModule ? fetchedModule.url : url, module = this.evaluatedModules.ensureModule(moduleId, moduleUrl);
 -		return "invalidate" in fetchedModule && fetchedModule.invalidate && this.evaluatedModules.invalidateModule(module), fetchedModule.url = moduleUrl, fetchedModule.id = moduleId, module.meta = fetchedModule, module;
-+		// Different import URLs can share one canonical transform. Keep its
-+		// existing evaluation when the host sends the same cold transform twice.
++		// Two uncached URLs can resolve to one canonical transform concurrently.
++		// Keep that evaluation in flight. A later invalidation must still re-run it.
 +		if ("invalidate" in fetchedModule && fetchedModule.invalidate && !(
++			!cachedModule && module.promise && !module.evaluated &&
 +			module.meta && "code" in module.meta && fetchedModule.code === module.meta.code
 +		)) this.evaluatedModules.invalidateModule(module);
 +		fetchedModule.url = moduleUrl;

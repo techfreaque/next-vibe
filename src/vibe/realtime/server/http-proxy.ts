@@ -203,6 +203,24 @@ export async function handleHttpProxy(
         },
         (proxyRes) => {
           lastUpstreamOkAt = Date.now();
+          const status = proxyRes.statusCode ?? 200;
+          const responseContentType = proxyRes.headers["content-type"];
+          const unexpectedApiNotFound =
+            status === 404 &&
+            url.pathname.startsWith("/api/") &&
+            req.headers.get("accept")?.includes("application/json") &&
+            responseContentType?.includes("text/html");
+          if (status >= 500 || unexpectedApiNotFound) {
+            logger.error("[Proxy] Upstream returned an HTTP failure", {
+              requestId: retryRequestId ?? requestId,
+              path: sanitizeRoutePath(url.pathname),
+              method: req.method,
+              status,
+              contentType: responseContentType,
+              elapsedMs: lastUpstreamOkAt - proxyStartMs,
+              targetPort: nextPort,
+            });
+          }
           if (retryRequestId) {
             logger.info("[Proxy] Upstream answered after retry", {
               requestId: retryRequestId,
@@ -238,6 +256,18 @@ export async function handleHttpProxy(
             );
           }
 
+          if (
+            req.method === "HEAD" ||
+            status === 204 ||
+            status === 205 ||
+            status === 304
+          ) {
+            // Fetch responses with these statuses reject a non-null body.
+            proxyRes.resume();
+            settle(new Response(null, { status, headers: resHeaders }));
+            return;
+          }
+
           // Stream the raw (possibly compressed) body straight to the browser.
           // `downstreamClosed`: the browser cancelled the body (navigation,
           // closed tab, aborted fetch). Enqueueing after that throws
@@ -269,6 +299,7 @@ export async function handleHttpProxy(
                 // response with a 200 status (shows up client-side as a
                 // ChunkLoadError / failed resource with responseStatus 200).
                 logger.error("[Proxy] Upstream response failed mid-body", {
+                  requestId: retryRequestId ?? requestId,
                   path: url.pathname,
                   method: req.method,
                   status: proxyRes.statusCode,
@@ -295,7 +326,7 @@ export async function handleHttpProxy(
 
           settle(
             new Response(stream, {
-              status: proxyRes.statusCode ?? 200,
+              status,
               headers: resHeaders,
             }),
           );

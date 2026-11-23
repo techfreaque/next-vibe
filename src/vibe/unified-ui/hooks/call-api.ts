@@ -214,6 +214,7 @@ interface CallDiagnostics {
   thrown?: Error;
   /** The failure was already logged with full detail at its origin. */
   alreadyLogged?: boolean;
+  unexpectedHttpError?: boolean;
   /** Sent as x-request-id; the server stamps it on its rows for this call. */
   requestId: string;
   retryOf?: string;
@@ -485,16 +486,18 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     } catch {
       // Reporting must never turn a handled failure into a thrown one
     }
-    // A failed credit read can be retried without replaying a mutation.
-    // Report the failed attempt even when the next attempt succeeds.
+    // Query hooks return typed errors as data, so React Query does not retry
+    // them. Give interrupted reads and malformed framework errors one retry.
+    // The first attempt is reported whether the retry succeeds or fails.
+    const lostResponse =
+      diag.status === undefined &&
+      diag.phase === "fetch" &&
+      diag.thrown !== undefined &&
+      isBrowserNetworkLossMessage(diag.thrown.message);
     if (
       retryOf === undefined &&
       endpoint.method === Methods.GET &&
-      endpoint.path.join("/") === "credits" &&
-      diag.status === undefined &&
-      diag.phase === "fetch" &&
-      diag.thrown &&
-      isBrowserNetworkLossMessage(diag.thrown.message) &&
+      (lostResponse || diag.unexpectedHttpError) &&
       currentVisibility() === "visible" &&
       browserOnline()
     ) {
@@ -603,12 +606,15 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
 
   try {
     diag.phase = "prepare";
-    const headers: Record<string, string> =
-      postBody instanceof FormData
-        ? {}
-        : { "Content-Type": "application/json" };
-
-    headers[REQUEST_ID_HEADER_NAME] = diag.requestId;
+    const headers: Record<string, string> = {
+      // Keep the router's normal 404 when an API request reaches its page
+      // fallback. The endpoint response itself still needs to be JSON.
+      Accept: "application/json, */*;q=0.1",
+      [REQUEST_ID_HEADER_NAME]: diag.requestId,
+    };
+    if (!(postBody instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
 
     const sentCsrfToken = MUTATING_METHODS.has(endpoint.method)
       ? await getCsrfToken(logger)
@@ -673,6 +679,7 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
     diag.redirected = response.redirected;
     diag.via = response.headers.get("via");
     diag.phase = "response-body";
+    diag.unexpectedHttpError = !response.redirected && response.status >= 500;
     // A proxy/gateway error (502/503 "Service Unavailable") has a plain-text
     // body — report the HTTP status, not a JSON parse error.
     const isJsonBody = (response.headers.get("content-type") ?? "").includes(
@@ -709,8 +716,12 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
         hasVibeCors: h.has("access-control-allow-credentials"),
         bodyTitle: body.title,
         bodySnippet: body.snippet,
+        retryOfRequestId: diag.retryOf ?? null,
       });
       diag.alreadyLogged = true;
+      if (!response.redirected && response.status === 404) {
+        diag.unexpectedHttpError = true;
+      }
       return fail({
         message: hooksTranslation
           .scopedT(locale)
@@ -723,6 +734,7 @@ async function callApiInner<TEndpoint extends CreateApiEndpointAny>(
 
     if (!response.ok) {
       if (parsedError.success) {
+        diag.unexpectedHttpError = false;
         if (
           platform.isBrowser &&
           !user.isPublic &&

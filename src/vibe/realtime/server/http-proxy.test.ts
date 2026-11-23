@@ -21,14 +21,34 @@ let nextPort = 0;
 beforeAll(() => {
   upstream = Bun.serve({
     port: 0,
-    fetch: (req) =>
-      Response.json(
+    fetch: (req) => {
+      const path = new URL(req.url).pathname;
+      if (path === "/api/en-US/failing") {
+        return Response.json({ message: "framework failure" }, { status: 500 });
+      }
+      if (path === "/api/en-US/unmatched") {
+        return new Response("<h1>Not Found</h1>", {
+          status: 404,
+          headers: { "content-type": "text/html" },
+        });
+      }
+      if (path === "/api/en-US/missing-resource") {
+        return Response.json({ success: false }, { status: 404 });
+      }
+      if (path === "/api/en-US/preflight") {
+        return new Response(null, { status: 204 });
+      }
+      if (path === "/api/en-US/cached") {
+        return new Response(null, { status: 304, headers: { etag: '"fixture"' } });
+      }
+      return Response.json(
         {
           proto: req.headers.get("x-forwarded-proto"),
           host: req.headers.get("x-forwarded-host"),
         },
         { headers: { "server-timing": "fixture;dur=1" } },
-      ),
+      );
+    },
   });
   nextPort = upstream.port ?? 0;
 });
@@ -106,6 +126,66 @@ it("identifies Next asset responses while preserving upstream timing", async () 
   expect(timing).toContain("fixture;dur=1");
   expect(readProxyTimingHeader(timing)).toBe("upstream-response");
   await response.text();
+});
+
+it("correlates framework API failures and preserves the upstream responses", async () => {
+  const error = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+  const headers = {
+    accept: "application/json",
+    "x-request-id": "fixture-request-error",
+  };
+  const responses = await Promise.all(
+    ["failing", "unmatched", "missing-resource"].map((path) =>
+      handleHttpProxy(
+        new Request(`http://127.0.0.1:3000/api/en-US/${path}?token=fixture`, {
+          headers,
+        }),
+        { nextPort, logger: { ...logger, error }, isShuttingDown: () => false },
+      ),
+    ),
+  );
+  expect(responses.map((response) => response.status)).toEqual([500, 404, 404]);
+  expect(await Promise.all(responses.map((response) => response.text()))).toEqual([
+    '{"message":"framework failure"}',
+    "<h1>Not Found</h1>",
+    '{"success":false}',
+  ]);
+  expect(error).toHaveBeenCalledTimes(2);
+  expect(error).toHaveBeenCalledWith(
+    "[Proxy] Upstream returned an HTTP failure",
+    expect.objectContaining({
+      requestId: "fixture-request-error",
+      path: "/api/en-US/failing",
+      status: 500,
+    }),
+  );
+  expect(error).toHaveBeenCalledWith(
+    "[Proxy] Upstream returned an HTTP failure",
+    expect.objectContaining({
+      requestId: "fixture-request-error",
+      path: "/api/en-US/unmatched",
+      status: 404,
+    }),
+  );
+});
+
+it("forwards bodyless upstream responses", async () => {
+  const context = { nextPort, logger, isShuttingDown: () => false };
+  const preflight = await handleHttpProxy(
+    new Request("http://127.0.0.1:3000/api/en-US/preflight", {
+      method: "OPTIONS",
+    }),
+    context,
+  );
+  const cached = await handleHttpProxy(
+    new Request("http://127.0.0.1:3000/api/en-US/cached"),
+    context,
+  );
+  expect(preflight.status).toBe(204);
+  expect(preflight.body).toBeNull();
+  expect(cached.status).toBe(304);
+  expect(cached.body).toBeNull();
+  expect(cached.headers.get("etag")).toBe('"fixture"');
 });
 
 it("identifies and logs a synthetic 503 with the client request id", async () => {

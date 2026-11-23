@@ -7,6 +7,7 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  renameSync,
   statSync,
   watch,
   writeFileSync,
@@ -176,44 +177,31 @@ function patchNitroWorkerStaleReload(): void {
   }
 }
 
-/**
- * On a cold cache the nitro dev worker's entry import can take well over the
- * ~3s its fetch() is willing to wait, after which it THROWS
- * `Vite environment "nitro" is unavailable` — Bun renders that as a crash
- * dump with source context in the dev console, and the boot-time SSR primer
- * (which handles the 503 fine and retries) looks like it broke the server.
- * Two changes, applied idempotently before the worker file loads: wait
- * through three more backoff rounds (~25s total, covering a cold entry
- * import), and if the entry still is not there answer with a plain 503
- * Response instead of throwing — same status the caller saw before, none of
- * the noise. If upstream reshapes either line, its marker is absent and that
- * part is left untouched.
- */
-function patchNitroWorkerQuiet503(): void {
+/** Restore installs modified by the older dev worker patch. Nitro now waits
+ * for the entry and converts its thrown status to an HTTP response itself. */
+function restoreNitroWorkerEntryErrors(): void {
   try {
     const workerPath = join(
       dirname(resolvePackagePath("nitro/package.json")),
       "dist/runtime/internal/vite/dev-worker.mjs",
     );
-    let source = readFileSync(workerPath, "utf8");
-    const waitMarker =
-      "for (let i = 0; i < 5 && !(this.entry || this.entryError); i++) {";
-    const waitPatched =
-      "for (let i = 0; i < 8 && !(this.entry || this.entryError); i++) {";
-    if (source.includes(waitMarker)) {
-      source = source.replace(waitMarker, waitPatched);
-    }
-    // The placeholder is nitro's own source text, matched verbatim, and lands
-    // inside the patched file's template literal - not one of ours.
+    const source = readFileSync(workerPath, "utf8");
     const nameExpr = ["$", "{this.name}"].join("");
-    const throwMarker = `throw httpError(503, \`Vite environment "${nameExpr}" is unavailable\`);`;
-    const quietReturn = `return new Response(\`Vite environment "${nameExpr}" is unavailable\`, { status: 503, headers: { "content-type": "text/plain" } });`;
-    if (source.includes(throwMarker)) {
-      source = source.replace(throwMarker, quietReturn);
+    const message = `\`Vite environment "${nameExpr}" is unavailable\``;
+    const oldReturn = `return new Response(${message}, { status: 503, headers: { "content-type": "text/plain" } });`;
+    if (source.includes(oldReturn)) {
+      // Bun can hard-link installed dependencies into other checkouts.
+      const updatedPath = `${workerPath}.${process.pid}.next-vibe`;
+      writeFileSync(
+        updatedPath,
+        source.replace(oldReturn, `throw httpError(503, ${message});`),
+      );
+      renameSync(updatedPath, workerPath);
     }
-    writeFileSync(workerPath, source);
-  } catch {
-    // nitro not installed or not resolvable — nothing to patch.
+  } catch (error) {
+    process.stderr.write(
+      `[Nitro] Could not restore dev worker entry error handling: ${String(error)}\n`,
+    );
   }
 }
 
@@ -1588,7 +1576,7 @@ class ViteCompiler {
         patchBunSpawnForWindowsRunnerBug();
       }
       patchNitroWorkerStaleReload();
-      patchNitroWorkerQuiet503();
+      restoreNitroWorkerEntryErrors();
 
       const { createServer } = await import("vite");
       const tanstackStartPkg = "@tanstack/react-start/plugin/vite";
