@@ -21,9 +21,13 @@ import creditsDefinition from "@/credits/definition";
 import cortexDeleteDefinition from "@/vibe/agent/cortex/delete/definition";
 
 import type { CreateApiEndpointAny } from "../../core/definition/endpoint-base";
+import { rootlessToolExecutionContext } from "../../core/execution-context";
 import { defaultLocale } from "../../core/i18n/core/config";
+import { CallbackMode } from "../../execute-tool/constants";
+import { emitToolRequest } from "../../execute-tool/repository/transport/events";
 import type { JwtPrivatePayloadType } from "../../identity/auth/types";
 import { createEndpointLogger } from "../../logger/server";
+import { Platform } from "../../platforms/platforms";
 import { buildUserWsChannel } from "./channel";
 import { createEndpointEmitter } from "./emitter";
 import {
@@ -202,5 +206,36 @@ describe("createEndpointEmitter (v2 delivery)", () => {
     expect(payload.syncDomain).toBe("documents");
     expect(payload.envelope.eventName).toBe("node-deleted");
     expect(result.relayed).toBe(true);
+  });
+
+  it("addresses a remote tool request to the selected instance", async () => {
+    const relay = vi.fn();
+    registerRemoteRelay(relay);
+
+    await emitToolRequest({
+      callId: "targeted-call",
+      targetInstanceId: "hermes",
+      userId: user.id,
+      toolName: "tool-help",
+      input: {},
+      callbackMode: CallbackMode.WAIT,
+      callerPlatform: Platform.NEXT_API,
+      callerSkillId: null,
+      callerFavoriteId: null,
+      toolExecutionContext: rootlessToolExecutionContext(),
+      locale: defaultLocale,
+      logger: makeLogger(),
+      user,
+    });
+
+    expect(relay).toHaveBeenCalledTimes(1);
+    expect(relay).toHaveBeenCalledWith(
+      expect.objectContaining({
+        targetInstanceId: "hermes",
+        envelope: expect.objectContaining({
+          eventName: "tool-execute-request",
+        }),
+      }),
+    );
   });
 });

@@ -21,8 +21,15 @@ let nextPort = 0;
 beforeAll(() => {
   upstream = Bun.serve({
     port: 0,
-    fetch: (req) => {
+    fetch: async (req) => {
       const path = new URL(req.url).pathname;
+      if (path === "/api/en-US/upload") {
+        return Response.json({
+          length: req.headers.get("content-length"),
+          bytes: (await req.arrayBuffer()).byteLength,
+          requestId: req.headers.get("x-request-id"),
+        });
+      }
       if (path === "/api/en-US/failing") {
         return Response.json({ message: "framework failure" }, { status: 500 });
       }
@@ -225,4 +232,50 @@ describe("http proxy forwarded headers", () => {
       host: "localhost:3000",
     });
   });
+});
+
+it("frames a buffered request using its byte count and forwards a request id", async () => {
+  const body = JSON.stringify({ text: "ą".repeat(1024) });
+  const response = await handleHttpProxy(
+    new Request("http://127.0.0.1:3000/api/en-US/upload", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "transfer-encoding": "chunked",
+      },
+      body,
+    }),
+    { nextPort, logger, isShuttingDown: () => false },
+  );
+  const length = Buffer.byteLength(body);
+  expect(await response.json()).toEqual({
+    length: String(length),
+    bytes: length,
+    requestId: expect.stringMatching(/^[a-zA-Z0-9_-]{8,64}$/),
+  });
+});
+
+it("reports truncated buffered requests before opening the upstream connection", async () => {
+  const error = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+  const response = await handleHttpProxy(
+    new Request("http://127.0.0.1:3000/api/en-US/upload", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "content-length": "12",
+        "x-request-id": "fixture-short-upload",
+      },
+      body: "{}",
+    }),
+    { nextPort, logger: { ...logger, error }, isShuttingDown: () => false },
+  );
+  expect(response.status).toBe(400);
+  expect(error).toHaveBeenCalledWith(
+    "[Proxy] Request body length differs from Content-Length",
+    expect.objectContaining({
+      requestId: "fixture-short-upload",
+      advertisedLength: "12",
+      receivedBytes: 2,
+    }),
+  );
 });

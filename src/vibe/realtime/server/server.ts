@@ -835,8 +835,12 @@ export function startWebSocketServer(
           return;
         }
         wsClients.delete(ws as ServerWebSocket<WsConnectionData>);
-        if (ws.data.connectorInstanceId) {
-          connectorSockets.delete(ws.data.connectorInstanceId);
+        const { connectorInstanceId } = ws.data;
+        if (
+          connectorInstanceId &&
+          connectorSockets.get(connectorInstanceId) === ws
+        ) {
+          connectorSockets.delete(connectorInstanceId);
         }
         // Diagnose before unsubscribing (channelCount is part of the report).
         const diagnosis = shuttingDown

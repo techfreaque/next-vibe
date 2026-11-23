@@ -22,6 +22,7 @@ import {
   fail,
   success,
 } from "next-vibe/core/route/response.schema";
+import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { v4 as uuid } from "uuid";
 
@@ -706,8 +707,10 @@ export async function listMonitors(
         }
       }
     }
-  } catch {
-    logger.warn("[Desktop] kscreen-doctor not available, trying xrandr");
+  } catch (error) {
+    logger.warn("[Desktop] kscreen-doctor failed, trying xrandr", {
+      error: parseError(error).message,
+    });
   }
 
   // Fallback: xrandr --listmonitors
@@ -736,8 +739,10 @@ export async function listMonitors(
           });
         }
       }
-    } catch {
-      logger.warn("[Desktop] xrandr also not available for monitor listing");
+    } catch (error) {
+      logger.warn("[Desktop] xrandr failed to list monitors", {
+        error: parseError(error).message,
+      });
     }
   }
 

@@ -282,7 +282,7 @@ export class RemoteConnectionInstanceRepository {
     if (shouldSignalPeer) {
       try {
         const selfInstanceId =
-          RemoteConnectionRepository.deriveDefaultSelfInstanceId();
+          await RemoteConnectionRepository.getLocalInstanceId(user.id);
         const { runEndpointRemote } =
           await import("../../execute-tool/repository/run-endpoint-remote");
         const { CallbackMode } = await import("../../execute-tool/constants");
@@ -321,7 +321,7 @@ export class RemoteConnectionInstanceRepository {
                 definition,
                 input,
                 locale,
-                timeoutMs: 15_000,
+                timeoutMs: definition.timeoutMs,
               })
             ).response
           : await runEndpointRemote({
@@ -338,6 +338,14 @@ export class RemoteConnectionInstanceRepository {
           logger.warn("[PATCH] Failed to mirror settings to peer", {
             instanceId: targetInstanceId,
             error: result.message,
+            errorKey: result.errorType.errorKey,
+            transportMode: transportMode ?? row.transportMode,
+          });
+        } else if (result.data.updated !== true) {
+          logger.warn("[PATCH] Peer did not confirm mirrored settings", {
+            instanceId: targetInstanceId,
+            transportMode: transportMode ?? row.transportMode,
+            reconnectNow,
           });
         }
       } catch (err) {
@@ -358,12 +366,8 @@ export class RemoteConnectionInstanceRepository {
     // so its send leg rides the socket it holds). Keep it open when EITHER
     // post-patch leg is reverse-ws; only a fully direct-http pair closes it.
     // (cloud instances never open outbound sockets; openConnection no-ops there.)
-    // The settings PATCH above is already committed — the connector lifecycle
-    // below is BEST-EFFORT. A transient hiccup here (a slow transport-mode read,
-    // a connector module that throws under load, a failed WS open) must NEVER
-    // 500 the whole PATCH: the row is saved and the connector self-heals on its
-    // next acquire/pulse. Wrapping the entire block is the root fix for the
-    // intermittent "Handler timed out or threw" reconnect 500s under load.
+    // The settings are already committed. Log connector lifecycle failures
+    // with the instance label so operators can diagnose a failed reconnect.
     // Open / close / restart the outbound connector AS NEEDED — only when a
     // transport leg actually changed or the caller asked to reconnect. A
     // rename-only or scope-only PATCH leaves the socket untouched (no needless
@@ -409,16 +413,16 @@ export class RemoteConnectionInstanceRepository {
   ): Promise<ResponseType<RemoteConnectionByIdDeleteResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
 
-    // Fetch full record before deleting - need remoteUrl + token to notify cloud
+    // Claim the deleted record once so concurrent DELETEs cannot notify twice.
     const [row] = await db
-      .select()
-      .from(remoteConnections)
+      .delete(remoteConnections)
       .where(
         and(
           eq(remoteConnections.userId, user.id),
           eq(remoteConnections.instanceId, instanceId),
         ),
-      );
+      )
+      .returning();
 
     if (!row) {
       return fail({
@@ -426,15 +430,6 @@ export class RemoteConnectionInstanceRepository {
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
-
-    await db
-      .delete(remoteConnections)
-      .where(
-        and(
-          eq(remoteConnections.userId, user.id),
-          eq(remoteConnections.instanceId, instanceId),
-        ),
-      );
 
     ExecuteToolRouting.invalidateUnbottledCache();
 
@@ -491,12 +486,32 @@ export class RemoteConnectionInstanceRepository {
       // Bounded retries (background): a missed DELETE leaves an orphaned
       // reverse entry on the remote holding a token that no longer rotates.
       void (async (): Promise<void> => {
+        const selfInstanceId =
+          await RemoteConnectionRepository.getLocalInstanceId(user.id);
         const RETRY_DELAYS_MS = [0, 2000, 5000];
         for (const delayMs of RETRY_DELAYS_MS) {
           if (delayMs > 0) {
             await new Promise((resolve) => {
               setTimeout(resolve, delayMs);
             });
+          }
+          const [reconnected] = await db
+            .select({ id: remoteConnections.id })
+            .from(remoteConnections)
+            .where(
+              and(
+                eq(remoteConnections.userId, user.id),
+                eq(remoteConnections.instanceId, instanceId),
+                eq(remoteConnections.isActive, true),
+              ),
+            )
+            .limit(1);
+          if (reconnected) {
+            logger.debug("Peer disconnect superseded by reconnection", {
+              instanceId,
+              selfInstanceId,
+            });
+            return;
           }
           const { status, networkError } =
             await RemoteTransport.callEndpointDirect({
@@ -506,7 +521,7 @@ export class RemoteConnectionInstanceRepository {
                 leadId: row.leadId ?? undefined,
               },
               definition: definitions.DELETE,
-              urlPathParams: { instanceId },
+              urlPathParams: { instanceId: selfInstanceId },
               locale,
               timeoutMs: 10_000,
             });
@@ -527,6 +542,7 @@ export class RemoteConnectionInstanceRepository {
               "Remote disconnect rejected — remote record unusable anyway",
               {
                 instanceId,
+                selfInstanceId,
                 status,
               },
             );
@@ -541,7 +557,12 @@ export class RemoteConnectionInstanceRepository {
           "Remote disconnect failed after all retries — orphaned reverse entry remains on the remote until its token 401s",
           { instanceId },
         );
-      })();
+      })().catch((error: Error) => {
+        logger.error("Remote disconnect notification failed", {
+          instanceId,
+          error: error.message,
+        });
+      });
     }
 
     return success({ disconnected: true });

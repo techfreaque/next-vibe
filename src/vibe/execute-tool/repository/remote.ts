@@ -608,6 +608,7 @@ export class RemoteDispatch {
 
       await emitToolRequest({
         callId,
+        targetInstanceId: instanceId,
         userId: user.id,
         toolName,
         input: strippedInput,
@@ -676,6 +677,7 @@ export class RemoteDispatch {
 
     await emitToolRequest({
       callId,
+      targetInstanceId: instanceId,
       userId: user.id,
       toolName,
       input: strippedInput,
@@ -702,8 +704,9 @@ export class RemoteDispatch {
     // (WS hub + bridge). No separate in-memory PendingCalls waiter — that would
     // only ever fire same-process and never for the reverse-ws event-path. On
     // timeout the race yields null → wakeUp auto-upgrade below. Always unsubscribe.
-    const timeoutSignal = new Promise<PendingCallResult | null>((resolve) => {
-      setTimeout(() => resolve(null), inlineTimeoutMs);
+    let inlineTimer: ReturnType<typeof setTimeout> | undefined;
+    const timeoutSignal = new Promise<null>((resolve) => {
+      inlineTimer = setTimeout(() => resolve(null), inlineTimeoutMs);
     });
     const resultSignal: Promise<PendingCallResult> = resultSub.signal.then(
       (s) => ({ status: s.status, output: s.output }),
@@ -712,6 +715,7 @@ export class RemoteDispatch {
       resultSignal,
       timeoutSignal,
     ]);
+    clearTimeout(inlineTimer);
     resultSub.cancel();
 
     if (!inlineResult) {

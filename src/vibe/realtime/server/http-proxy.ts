@@ -20,6 +20,7 @@ import http from "node:http";
 
 import { REQUEST_ID_HEADER_NAME } from "@/env/constants";
 
+import { parseError } from "../../core/utils/parse-error";
 import { sanitizeRoutePath } from "../../logger/client-context";
 import type { EndpointLogger } from "../../logger/types";
 import { mintRequestId } from "../../logger/with-log-context";
@@ -103,7 +104,7 @@ export async function handleHttpProxy(
   const requestId =
     clientRequestId && /^[A-Za-z0-9_-]{8,64}$/.test(clientRequestId)
       ? clientRequestId
-      : undefined;
+      : mintRequestId();
 
   const clientIp =
     req.headers.get("x-forwarded-for") ??
@@ -113,6 +114,7 @@ export async function handleHttpProxy(
   req.headers.forEach((value, key) => {
     outHeaders[key] = value;
   });
+  outHeaders[REQUEST_ID_HEADER_NAME] = requestId;
   outHeaders["host"] = `127.0.0.1:${String(nextPort)}`;
   outHeaders["x-forwarded-for"] = clientIp;
   // Keep what an upstream TLS edge (Caddy) already set: this proxy only sees
@@ -148,9 +150,36 @@ export async function handleHttpProxy(
   if (!isIdempotent && shouldBufferBody && req.body) {
     try {
       bufferedBody = Buffer.from(await req.arrayBuffer());
-    } catch {
+    } catch (error) {
+      logger.error("[Proxy] Failed to read request body", {
+        requestId,
+        path: sanitizeRoutePath(url.pathname),
+        method: req.method,
+        contentLength: req.headers.get("content-length"),
+        clientDisconnected: req.signal.aborted,
+        error: parseError(error).message,
+        elapsedMs: Date.now() - proxyStartMs,
+      });
       return new Response("Request body read failed", { status: 400 });
     }
+    const advertisedLength = req.headers.get("content-length");
+    if (
+      advertisedLength !== null &&
+      Number(advertisedLength) !== bufferedBody.length
+    ) {
+      logger.error("[Proxy] Request body length differs from Content-Length", {
+        requestId,
+        path: sanitizeRoutePath(url.pathname),
+        method: req.method,
+        advertisedLength,
+        receivedBytes: bufferedBody.length,
+        clientDisconnected: req.signal.aborted,
+        elapsedMs: Date.now() - proxyStartMs,
+      });
+      return new Response("Request body read failed", { status: 400 });
+    }
+    delete outHeaders["transfer-encoding"];
+    outHeaders["content-length"] = String(bufferedBody.length);
   }
 
   for (let attempt = 0; attempt <= PROXY_RETRY_DELAYS.length; attempt++) {
@@ -172,7 +201,7 @@ export async function handleHttpProxy(
         timedOut = true;
         if (!isShuttingDown()) {
           logger.error("[Proxy] Upstream request timed out", {
-            requestId: retryRequestId ?? requestId ?? mintRequestId(),
+            requestId,
             path: sanitizeRoutePath(url.pathname),
             method: req.method,
             elapsedMs: Date.now() - proxyStartMs,
@@ -212,7 +241,7 @@ export async function handleHttpProxy(
             responseContentType?.includes("text/html");
           if (status >= 500 || unexpectedApiNotFound) {
             logger.error("[Proxy] Upstream returned an HTTP failure", {
-              requestId: retryRequestId ?? requestId,
+              requestId,
               path: sanitizeRoutePath(url.pathname),
               method: req.method,
               status,
@@ -299,7 +328,7 @@ export async function handleHttpProxy(
                 // response with a 200 status (shows up client-side as a
                 // ChunkLoadError / failed resource with responseStatus 200).
                 logger.error("[Proxy] Upstream response failed mid-body", {
-                  requestId: retryRequestId ?? requestId,
+                  requestId,
                   path: url.pathname,
                   method: req.method,
                   status: proxyRes.statusCode,
@@ -349,7 +378,7 @@ export async function handleHttpProxy(
           // down); that is reported separately so a real crash stays an
           // unambiguous signal. Both carry uptime.
           if (attempt === 0) {
-            retryRequestId = requestId ?? mintRequestId();
+            retryRequestId = requestId;
             if (lastUpstreamOkAt === 0) {
               logger.warn("[Proxy] Request arrived before Next.js was up", {
                 requestId: retryRequestId,
@@ -378,7 +407,7 @@ export async function handleHttpProxy(
           logger.warn(
             "[Proxy] Upstream unavailable for a non-retriable request",
             {
-              requestId: requestId ?? mintRequestId(),
+              requestId,
               path: sanitizeRoutePath(url.pathname),
               method: req.method,
               nextEverResponded: lastUpstreamOkAt !== 0,
@@ -398,7 +427,7 @@ export async function handleHttpProxy(
         }
         if (!shuttingDown) {
           logger.error("[Proxy] Server unreachable", {
-            requestId: retryRequestId ?? requestId,
+            requestId,
             errorCode: nodeErr.code ?? "UNKNOWN",
             error: err.message,
             path: url.pathname,

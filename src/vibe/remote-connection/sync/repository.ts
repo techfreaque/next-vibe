@@ -44,33 +44,26 @@ const syncCursorSchema = z.union([
  * explicit pull share this registry — a second caller skips instead of
  * running a duplicate exchange concurrently.
  */
-const inFlightSyncs = new Set<string>();
+const inFlightSyncs = new Map<string, symbol>();
 
-export function claimSyncSlot(key: string): boolean {
+export function claimSyncSlot(key: string): symbol | null {
   if (inFlightSyncs.has(key)) {
-    return false;
+    return null;
   }
-  inFlightSyncs.add(key);
-  return true;
+  const owner = Symbol(key);
+  inFlightSyncs.set(key, owner);
+  return owner;
 }
 
-export function releaseSyncSlot(key: string): void {
-  inFlightSyncs.delete(key);
+export function releaseSyncSlot(key: string, owner: symbol): void {
+  if (inFlightSyncs.get(key) === owner) {
+    inFlightSyncs.delete(key);
+  }
 }
 
 /** True while a sync exchange for this connection is in flight (test-settle probes). */
 export function isSyncSlotBusy(key: string): boolean {
   return inFlightSyncs.has(key);
-}
-
-/**
- * Force-clear a sync slot, e.g. when a connection is closed while a pull is in flight.
- * The abandoned in-flight pull will hit releaseSyncSlot() in its finally block — that's
- * a harmless no-op since the key won't be present. The new connection can now claim
- * the slot immediately without waiting for the abandoned pull to finish.
- */
-export function forceReleaseSyncSlot(key: string): void {
-  inFlightSyncs.delete(key);
 }
 
 export class TaskSyncRepository {

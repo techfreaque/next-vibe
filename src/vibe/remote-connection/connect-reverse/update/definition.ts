@@ -34,6 +34,7 @@ const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
   path: ["vibe", "remote-connection", "connect-reverse", "update"],
+  timeoutMs: 15_000,
   // Customers' instances mirror scope/rename changes here; transport fields
   // stay pinned for non-admins (see customer-access).
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,

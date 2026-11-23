@@ -4,9 +4,8 @@
  * Helpers for bootstrapping remote connections in integration tests.
  * Uses the real connect/disconnect HTTP endpoints for proper E2E setup.
  *
- * Two connection directions:
- *   atlas → hermes  (direct HTTP, transportMode='direct-http')
- *   hermes → atlas  (reverse WS, transportMode='reverse-ws')
+ * The baseline local connection uses HTTP in both directions. Reverse-WS
+ * suites change the direction they exercise after registration.
  *
  * `connectToHermes()` calls the local connect endpoint via HTTP, which:
  *   1. Logs into the prod server with email+password
@@ -85,8 +84,8 @@ export function readServerPort(pidFile: string): number | null {
 }
 
 /**
- * Returns true if a server is reachable: pid file exists with a PORT line
- * and a GET /api/en-US/system/runtime/server/health returns 200.
+ * Returns true when the PID file names a port and the public readiness probe
+ * succeeds.
  */
 export async function isServerRunning(
   url: string,
@@ -100,11 +99,11 @@ export async function isServerRunning(
     // is the one sanctioned raw fetch — it must hit the wire before any session
     // or connection exists, so it cannot go through the typed remote path.
     // oxlint-disable-next-line restricted/no-raw-fetch -- server-liveness probe
-    const resp = await fetch(`${url}/api/en-US/system/runtime/server/health`, {
+    const resp = await fetch(`${url}/robots.txt`, {
       signal: AbortSignal.timeout(3000),
+      redirect: "error",
     });
-    // Accept any response that isn't a network error — 401/403 still means server is up.
-    return resp.status < 500;
+    return resp.ok;
   } catch {
     return false;
   }
@@ -507,10 +506,9 @@ export async function connectToHermes(
       ? result.data["instanceId"]
       : HERMES_INSTANCE_ID;
 
-  // transportMode is normally set asynchronously by the remote ping when the
-  // reverse connection is registered on hermes. For tests we know hermes
-  // (localhost:3002) is directly reachable, so set it explicitly via the
-  // connection PATCH endpoint. Lock in relay settings: local client provides
+  // Registration probes Atlas from Hermes. Both servers are reachable from
+  // each other in this test setup, so make that explicit in the PATCH.
+  // Lock in relay settings: local client provides
   // system prompt + tools; remote runs the AI loop; threads mirrored on both sides.
   const connByIdDef = (
     await import("next-vibe/remote-connection/[instanceId]/definition")
@@ -520,6 +518,9 @@ export async function connectToHermes(
     endpoint: connByIdDef.PATCH,
     data: {
       transportMode: "direct-http",
+      // Both test servers are on this host. A cold Atlas health probe can
+      // time out and leave Hermes waiting on a tunnel that was never opened.
+      remoteTransportMode: "direct-http",
       ...(options?.loopLocation ? { loopLocation: options.loopLocation } : {}),
       // Placement mirrors LIVE via remote events (origin-aware, column-gated)
       // regardless of scope. The pull-sync domains are EXACTLY what the suite
@@ -815,60 +816,46 @@ export async function normalizeHermesSyncScope(): Promise<void> {
 }
 
 /**
- * Remove the atlas registration from the prod DB (hermes side).
+ * Remove Atlas registrations from the Hermes test server.
  */
 export async function unregisterDevFromHermes(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _prodUserId: string,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _remoteUrl: string = LOCAL_DEV_URL,
+  remoteUrl: string = LOCAL_DEV_URL,
 ): Promise<void> {
-  // Ask hermes (via its endpoints, routed through the connection) to list its
-  // connections and DELETE every atlas-named row. The DELETE endpoint closes the
-  // WS and releases the in-memory sync slot — a direct DB delete would skip that
-  // and leave a stuck sync slot ("pull-on-connect skipped - already in flight").
-  const { sendTestRequest } =
-    await import("next-vibe/tooling/testing/testing-suite/send-test-request");
-  const adminUser = await resolveDevUser(identityEnv.VIBE_ADMIN_USER_EMAIL);
-  if (!adminUser) {
-    return;
-  }
+  // Cleanup runs before a connection exists or after it was deleted locally.
+  // Log into Hermes and use its endpoints so connector cleanup still runs.
+  const token = await resolveProdAdminToken(remoteUrl);
+  const connection = { remoteUrl, token };
   const listDef = (await import("next-vibe/remote-connection/list/definition"))
     .default;
   const connByIdDef = (
     await import("next-vibe/remote-connection/[instanceId]/definition")
   ).default;
-  try {
-    const listResult = await sendTestRequest({
-      toolExecutionContext: rootlessToolExecutionContext(),
-      endpoint: listDef.GET,
-      data: {},
-      user: adminUser,
-      instanceId: HERMES_INSTANCE_ID,
-    });
-    const atlasRows = listResult.success
-      ? listResult.data.connections.filter((c) =>
-          c.instanceId.startsWith("atlas"),
-        )
-      : [{ instanceId: ATLAS_INSTANCE_ID }];
-    for (const row of atlasRows) {
-      await sendTestRequest({
-        toolExecutionContext: rootlessToolExecutionContext(),
-        endpoint: connByIdDef.DELETE,
-        urlPathParams: { instanceId: row.instanceId },
-        user: adminUser,
-        instanceId: HERMES_INSTANCE_ID,
-      });
+  const { response: listResult } = await RemoteTransport.callEndpointDirect({
+    connection,
+    definition: listDef.GET,
+    input: {},
+    locale: defaultLocale,
+  });
+  if (!listResult.success) {
+    // oxlint-disable-next-line restricted-syntax -- fail the fixture setup
+    throw new Error(`unregisterDevFromHermes: ${listResult.message}`);
+  }
+  for (const row of listResult.data.connections) {
+    if (!row.instanceId.startsWith(ATLAS_INSTANCE_ID)) {
+      continue;
     }
-  } catch {
-    // Best-effort: at minimum delete the canonical atlas row via the endpoint.
-    await sendTestRequest({
-      toolExecutionContext: rootlessToolExecutionContext(),
-      endpoint: connByIdDef.DELETE,
-      urlPathParams: { instanceId: ATLAS_INSTANCE_ID },
-      user: adminUser,
-      instanceId: HERMES_INSTANCE_ID,
+    const { response, status } = await RemoteTransport.callEndpointDirect({
+      connection,
+      definition: connByIdDef.DELETE,
+      urlPathParams: { instanceId: row.instanceId },
+      locale: defaultLocale,
     });
+    if (!response.success && status !== 404) {
+      // oxlint-disable-next-line restricted-syntax -- fail the fixture setup
+      throw new Error(`unregisterDevFromHermes: ${response.message}`);
+    }
   }
 }
 
@@ -889,12 +876,29 @@ export async function restoreHermesIdentity(
   remoteUrl: string = LOCAL_DEV_URL,
 ): Promise<void> {
   const token = await resolveProdAdminToken(remoteUrl);
+  const connection = { remoteUrl, token };
+  const selfIdDef = (
+    await import("next-vibe/remote-connection/self/instanceId/definition")
+  ).default;
+  const { response: identity } = await RemoteTransport.callEndpointDirect({
+    connection,
+    definition: selfIdDef.GET,
+    locale: defaultLocale,
+    timeoutMs: 15_000,
+  });
+  if (!identity.success) {
+    // oxlint-disable-next-line restricted-syntax -- intentional throw in test setup
+    throw new Error(`restoreHermesIdentity: ${identity.message}`);
+  }
+  if (identity.data.instanceId === HERMES_INSTANCE_ID) {
+    return;
+  }
   const selfRenameDef = (
     await import("next-vibe/remote-connection/self/rename/definition")
   ).default;
   const { response: resp, status: respStatus } =
     await RemoteTransport.callEndpointDirect({
-      connection: { remoteUrl, token },
+      connection,
       definition: selfRenameDef.PATCH,
       input: { newInstanceId: HERMES_INSTANCE_ID, propagate: false },
       locale: defaultLocale,

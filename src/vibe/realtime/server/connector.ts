@@ -112,6 +112,7 @@ class WsConnection {
   private stopped = false;
   private reconnectAttempt = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private releasePullSlot: (() => void) | null = null;
 
   /** Extra channel handlers registered by callers */
   private readonly channelHandlers = new Map<string, Set<ChannelHandler>>();
@@ -251,15 +252,7 @@ class WsConnection {
       this.ws = null;
     }
     this.clearConnectedAt();
-    // Force-release the sync slot so a replacement connection can claim it immediately.
-    // The in-flight pull (if any) will try releaseSyncSlot in its finally block — that's a no-op.
-    const syncSlotKey = `${this.config.userId}:${this.instanceId}`;
-    void import("../../remote-connection/sync/repository").then(
-      ({ forceReleaseSyncSlot }) => {
-        forceReleaseSyncSlot(syncSlotKey);
-        return undefined;
-      },
-    );
+    this.releasePullSlot?.();
   }
 
   /** wsConnectedAt must never survive a closed socket — health/UI read it. */
@@ -631,14 +624,20 @@ class WsConnection {
     // explicit trigger during connect) skips instead of duplicating the work.
     const { claimSyncSlot, releaseSyncSlot } =
       await import("../../remote-connection/sync/repository");
+    if (this.stopped) {
+      return;
+    }
     const syncSlotKey = `${this.config.userId}:${this.instanceId}`;
-    if (!claimSyncSlot(syncSlotKey)) {
+    const syncSlot = claimSyncSlot(syncSlotKey);
+    if (syncSlot === null) {
       this.logger.warn(
         "[WsConnection] pull-on-connect skipped - sync already in flight",
         { instanceId: this.instanceId },
       );
       return;
     }
+    const releasePullSlot = (): void => releaseSyncSlot(syncSlotKey, syncSlot);
+    this.releasePullSlot = releasePullSlot;
     try {
       const { applySyncPayloads, buildSyncPayloads } =
         await import("../../remote-connection/sync/provider");
@@ -723,12 +722,13 @@ class WsConnection {
       // storing this exact version — once per change, never per exchange.
       const sendCapabilities =
         conn.sentCapabilitiesVersion !== CAPABILITIES_VERSION;
+      const selfInstanceId = await ConnRepo.getLocalInstanceId(conn.userId);
 
       const body: Record<
         string,
         string | Record<string, SyncCursor> | Record<string, string>
       > = {
-        instanceId: ConnRepo.deriveDefaultSelfInstanceId(),
+        instanceId: selfInstanceId,
         syncCursors: localSyncCursors,
         // Version of the PEER's snapshot we hold — the peer returns its
         // capabilities only when its current version differs.
@@ -769,12 +769,11 @@ class WsConnection {
                   () => null,
                 );
         if (capFile) {
-          const localInstanceId = ConnRepo.deriveDefaultSelfInstanceId();
           const caps = zod
             .array(RemoteToolCapabilitySchema)
             .parse(capFile.default);
           body.capabilitiesJson = JSON.stringify(
-            caps.map((c) => ({ ...c, instanceId: localInstanceId })),
+            caps.map((c) => ({ ...c, instanceId: selfInstanceId })),
           );
         }
       }
@@ -783,6 +782,9 @@ class WsConnection {
       // no execute()/dispatch re-entry (this runs inside the connector itself).
       // ONE attempt: pull-on-connect either works or it doesn't. No retry loop —
       // a retry masks the real failure and stalls the run.
+      if (this.stopped) {
+        return;
+      }
       const {
         response: syncResult,
         status: syncStatus,
@@ -830,6 +832,9 @@ class WsConnection {
         });
         return;
       }
+      if (this.stopped) {
+        return;
+      }
 
       const data = syncResult.data;
       if (!data) {
@@ -849,6 +854,9 @@ class WsConnection {
           this.logger,
           conn.syncScope,
         );
+      }
+      if (this.stopped) {
+        return;
       }
 
       const caps = data.capabilities
@@ -914,7 +922,8 @@ class WsConnection {
         error: err instanceof Error ? err.message : String(err),
       });
     } finally {
-      releaseSyncSlot(syncSlotKey);
+      this.releasePullSlot = null;
+      releasePullSlot();
     }
   }
 }

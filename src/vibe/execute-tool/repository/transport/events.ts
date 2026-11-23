@@ -20,6 +20,7 @@ import type { RouteExecuteContext } from "../types";
  */
 export async function emitToolRequest(params: {
   callId: string;
+  targetInstanceId: string;
   userId: string;
   toolName: string;
   input: Record<string, WidgetData> | null;
@@ -43,11 +44,9 @@ export async function emitToolRequest(params: {
   // receiver rebuilds its own headless context around it. Spreading the full
   // ToolExecutionContext object would not match the string wire schema.
   const threadId = params.toolExecutionContext.threadId;
-  createEndpointEmitter(
-    executeDefinition.POST,
-    params.logger,
-    params.user,
-  )("tool-execute-request", {
+  createEndpointEmitter(executeDefinition.POST, params.logger, params.user, {
+    targetInstanceId: params.targetInstanceId,
+  })("tool-execute-request", {
     requestData: {
       toolName: params.toolName,
       input: params.input ?? {},
