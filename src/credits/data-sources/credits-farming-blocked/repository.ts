@@ -1,13 +1,13 @@
 /**
  * Credits Farming Blocked - Repository
  * Server-only. DB access.
- * Count of blocked free-credit farming attempts (anti_farming_events, all kinds)
+ * Count of blocked free-credit farming attempts (anti_farming_events, enforced rules)
  * per resolution bucket: subnet budget hits, duplicate and disposable emails.
  */
 
 import "server-only";
 
-import { and, count, gte, lte, sql } from "drizzle-orm";
+import { and, count, gte, lte, notInArray, sql } from "drizzle-orm";
 import {
   type ResponseType,
   success,
@@ -21,7 +21,7 @@ import type {
 import { resolutionBucketExpr } from "next-vibe/dataflow/shared/query-utils";
 import { fillGaps } from "next-vibe/dataflow/shared/range";
 
-import { antiFarmingEvents } from "../../anti-farming/db";
+import { antiFarmingEvents, shadowEventKinds } from "../../anti-farming/db";
 
 export class QueryCreditsFarmingBlockedRepository {
   static async queryCreditsFarmingBlocked(data: {
@@ -46,6 +46,7 @@ export class QueryCreditsFarmingBlockedRepository {
       .from(antiFarmingEvents)
       .where(
         and(
+          notInArray(antiFarmingEvents.kind, [...shadowEventKinds]),
           gte(antiFarmingEvents.createdAt, range.from),
           lte(antiFarmingEvents.createdAt, range.to),
         ),

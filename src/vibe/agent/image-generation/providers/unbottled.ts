@@ -68,6 +68,7 @@ export async function generateImageWithUnbottled(params: {
     creditCost,
     locale,
     logger,
+    modelId,
   );
   if (!balanceCheck.success) {
     return balanceCheck;

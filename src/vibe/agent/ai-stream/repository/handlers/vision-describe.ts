@@ -12,6 +12,10 @@
 import "server-only";
 
 import type { generateText } from "ai";
+import type {
+  ErrorResponseType,
+  ResponseType,
+} from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
@@ -27,7 +31,7 @@ export type VisionDescribeOutcome<TOption extends ModelOptionTokenBased> =
       result: VisionGenerateResult;
       text: string;
     }
-  | { ok: false; reason: string };
+  | { ok: false; reason: string; creditRefusal?: ErrorResponseType };
 
 export async function describeWithVisionFallback<
   TOption extends ModelOptionTokenBased,
@@ -35,6 +39,7 @@ export async function describeWithVisionFallback<
   model: TOption;
   /** Second-chance model after `failedId` refused/failed; null = none. */
   resolveFallback: (failedId: string) => TOption | null;
+  checkCredits?: (model: TOption) => Promise<ResponseType<number>>;
   run: (model: TOption) => Promise<VisionGenerateResult>;
   logger: EndpointLogger;
   /** Log prefix, e.g. "[DescribeImage]". */
@@ -46,6 +51,10 @@ export async function describeWithVisionFallback<
   let isFallback = false;
 
   while (current) {
+    const gate = await params.checkCredits?.(current);
+    if (gate && !gate.success) {
+      return { ok: false, reason: gate.message, creditRefusal: gate };
+    }
     let reason: string;
     try {
       const result = await run(current);

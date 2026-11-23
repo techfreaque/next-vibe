@@ -74,6 +74,7 @@ export async function generateVideoWithUnbottled(params: {
     creditCost,
     locale,
     logger,
+    modelId,
   );
   if (!balanceCheck.success) {
     return balanceCheck;

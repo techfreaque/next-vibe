@@ -19,6 +19,11 @@ import {
   browserEnvSchema,
 } from "../../browser/env";
 import {
+  protectionEnv,
+  protectionEnvExamples,
+  protectionEnvSchema,
+} from "../../credits/anti-farming/env";
+import {
   financeEnv,
   financeEnvExamples,
   financeEnvSchema,
@@ -158,6 +163,11 @@ export const envModules: Record<
     schema: browserEnvSchema,
     examples: browserEnvExamples,
   },
+  protection: {
+    env: protectionEnv,
+    schema: protectionEnvSchema,
+    examples: protectionEnvExamples,
+  },
   finance: {
     env: financeEnv,
     schema: financeEnvSchema,
@@ -256,6 +266,7 @@ export const envModules: Record<
 
 // Combined schema using merge
 export const envSchema = browserEnvSchema
+  .merge(protectionEnvSchema)
   .merge(financeEnvSchema)
   .merge(googleSheetsEnvSchema)
   .merge(leadsCampaignsEnvSchema)

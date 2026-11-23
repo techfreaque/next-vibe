@@ -136,6 +136,10 @@ function renderText(
     `${t("widget.kpi.total")}: ${totals.total} | ${t("widget.kpi.subnetAccountLimit")}: ${totals.subnetAccountLimit} | ${t("widget.kpi.subnetGuestLimit")}: ${totals.subnetGuestLimit} | ${t("widget.kpi.subnetSignupLimit")}: ${totals.subnetSignupLimit} | ${t("widget.kpi.duplicateEmail")}: ${totals.duplicateEmail} | ${t("widget.kpi.disposableEmail")}: ${totals.disposableEmail}`,
   );
 
+  if (totals.shadowHits) {
+    lines.push(t("widget.shadowHits", totals.shadowHits));
+  }
+
   const subnetSection = (title: string, rows: SubnetRow[]): void => {
     lines.push("");
     lines.push(title);
@@ -380,6 +384,9 @@ export function AntiFarmingReportWidget({
             })}
           </P>
 
+          {data.totals.shadowHits && (
+            <P>{t("widget.shadowHits", data.totals.shadowHits)}</P>
+          )}
           <MetricGrid columns={3}>
             <MetricCard
               label={t("widget.kpi.total")}

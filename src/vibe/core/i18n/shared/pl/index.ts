@@ -5,6 +5,10 @@ export const translations: typeof enTranslations = {
     auth_error: "Błąd uwierzytelniania",
     bad_request: "Nieprawidłowe żądanie",
     conflict: "Konflikt",
+    purchased_model_required:
+      "Ten model wymaga kupionych kredytów. Wybierz darmowy model lub doładuj konto.",
+    shared_allowance_reached:
+      "Wspólna pula darmowych kredytów jest wyczerpana. Doładuj konto lub poczekaj na odnowienie puli.",
     consent_required: "Wymagana zgoda",
     database_error: "Błąd bazy danych",
     email_error: "Błąd e-mail",

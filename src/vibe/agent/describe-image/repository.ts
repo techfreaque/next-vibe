@@ -21,6 +21,8 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { creditPolicyReason } from "@/credits/anti-farming/reason";
+import { protectedBalance } from "@/credits/anti-farming/spending";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 import { formatCreditAmount } from "@/products/credit-money";
@@ -134,6 +136,16 @@ export class DescribeImageRepository {
     try {
       const outcome = await describeWithVisionFallback({
         model: visionModel,
+        checkCredits: (model) =>
+          protectedBalance(
+            user.id,
+            user.leadId,
+            model.id,
+            balanceResult.data.total,
+            VISION_MINIMUM_BALANCE,
+            tCredits,
+            locale,
+          ),
         resolveFallback: (failedId) =>
           ModalityResolver.resolveImageVisionFallback(
             failedId,
@@ -181,6 +193,9 @@ export class DescribeImageRepository {
           }),
       });
       if (!outcome.ok) {
+        if (outcome.creditRefusal) {
+          return outcome.creditRefusal;
+        }
         return fail({
           message: t("post.errors.descriptionFailed", {
             error: outcome.reason,
@@ -223,6 +238,9 @@ export class DescribeImageRepository {
           upstreamCost,
         );
         if (!deductResult.success) {
+          if (creditPolicyReason(deductResult.errorType.errorKey)) {
+            return deductResult;
+          }
           logger.error("[DescribeImage] Failed to deduct credits", {
             creditCost,
           });

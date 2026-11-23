@@ -104,6 +104,13 @@ const { GET } = createEndpoint({
         label: "get.response.totals" as const,
         schema: z.object({
           total: z.coerce.number(),
+          shadowHits: z
+            .object({
+              crawler: z.coerce.number(),
+              cluster: z.coerce.number(),
+              model: z.coerce.number(),
+            })
+            .optional(),
           subnetAccountLimit: z.coerce.number(),
           subnetGuestLimit: z.coerce.number(),
           duplicateEmail: z.coerce.number(),

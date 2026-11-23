@@ -16,6 +16,8 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { Platform } from "next-vibe/platforms/platforms";
 
+import { creditPolicyReason } from "@/credits/anti-farming/reason";
+import { protectedBalance } from "@/credits/anti-farming/spending";
 import type { UsageAttribution } from "@/credits/db";
 import type { CreditsT } from "@/credits/i18n";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
@@ -96,6 +98,7 @@ export async function checkMediaBalance(
   creditCost: number,
   locale: CountryLanguage,
   logger: EndpointLogger,
+  model?: UsageAttribution["modelId"],
 ): Promise<ResponseType<{ tCredits: CreditsT }>> {
   const { t: tCredits } = creditsScopedTranslation.scopedT(locale);
 
@@ -113,6 +116,18 @@ export async function checkMediaBalance(
     });
   }
 
+  const eligible = await protectedBalance(
+    user.id,
+    user.leadId,
+    model,
+    balanceResult.data.total,
+    creditCost,
+    tCredits,
+    locale,
+  );
+  if (!eligible.success) {
+    return eligible;
+  }
   if (balanceResult.data.total < creditCost) {
     return fail({
       message: tCredits("errors.insufficientCredits", { cost: creditCost }),
@@ -185,6 +200,9 @@ export async function deductMediaCredits(
       errorKey: deductResult.errorType.errorKey,
       causeKey: deductResult.cause?.errorType.errorKey,
     });
+    if (creditPolicyReason(deductResult.errorType.errorKey)) {
+      return deductResult;
+    }
     // An empty wallet stays a 402 so every client shows its top-up path.
     const outOfCredits =
       deductResult.errorType.errorCode ===

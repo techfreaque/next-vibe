@@ -314,6 +314,7 @@ export class VideoGenerationRepository {
       creditCost,
       locale,
       logger,
+      videoModel.id,
     );
     if (!balanceCheck.success) {
       return balanceCheck;

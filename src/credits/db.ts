@@ -142,6 +142,10 @@ export interface UsageMetadata extends Partial<UsageUpstreamCost> {
    * pool wallet holds them, so walletId alone does not say who used them.
    */
   actorLeadId?: string;
+  /** Shared allowance keys and the simulated or enforced covered portion of this debit. */
+  clusterPrefix?: string | null;
+  clusterFingerprint?: string | null;
+  clusterCredits?: number;
   /** Guest spend from the signup IP before signup, counted once against the account */
   signupCarryover?: boolean;
   /** ISO time up to which guest spend at the IP was carried (the account's createdAt) */

@@ -5,6 +5,10 @@ export const translations: typeof enTranslations = {
     auth_error: "Erreur d'authentification",
     bad_request: "Requête incorrecte",
     conflict: "Conflit",
+    purchased_model_required:
+      "Ce modèle nécessite des crédits payants. Choisissez un modèle gratuit ou achetez des crédits.",
+    shared_allowance_reached:
+      "Les crédits gratuits partagés sont épuisés. Achetez des crédits ou attendez le renouvellement du quota.",
     consent_required: "Consentement requis",
     database_error: "Erreur de base de données",
     email_error: "Erreur d'e-mail",

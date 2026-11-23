@@ -22,8 +22,10 @@ import { LeadAuthRepository } from "next-vibe/identity/lead/device-auth";
 import { LeadSource, LeadStatus } from "next-vibe/identity/lead/enum";
 import { validateLeadIdExists } from "next-vibe/identity/lead/middleware-ops";
 import type { UserRoleValue } from "next-vibe/identity/roles/enum";
-import { cookies } from "next-vibe/ui/lib/headers";
+import { cookies, headers } from "next-vibe/ui/lib/headers";
 
+import { crawlerUserAgent } from "@/credits/anti-farming/crawler";
+import { protectionEnv } from "@/credits/anti-farming/env";
 import {
   AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS,
   AUTH_TOKEN_COOKIE_NAME,
@@ -259,6 +261,16 @@ export class AuthRepository {
           leadIdSource: headerLeadId ? "bearer-suffix" : "cookie",
         },
       );
+    }
+
+    // Anonymous document reads can pass middleware without an identity. Do
+    // not mint a replacement when the page resolves its public auth context.
+    if (
+      platform === Platform.NEXT_PAGE &&
+      protectionEnv.FREE_CRAWLER_MODE === "enforce" &&
+      crawlerUserAgent((await headers()).get("user-agent"))
+    ) {
+      return { leadId: null, shouldUpdateCookie: false };
     }
 
     // Deduplicate concurrent requests carrying the same stale cookie:

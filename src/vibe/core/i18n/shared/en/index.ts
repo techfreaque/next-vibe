@@ -3,6 +3,10 @@ export const translations = {
     auth_error: "Authentication error",
     bad_request: "Bad request",
     conflict: "Conflict",
+    purchased_model_required:
+      "This model requires purchased credits. Choose a free model or add credits.",
+    shared_allowance_reached:
+      "Your shared free allowance is used up. Add credits or wait for the next window.",
     consent_required: "Consent required",
     database_error: "Database error",
     email_error: "Email error",

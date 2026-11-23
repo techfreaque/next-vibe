@@ -55,6 +55,8 @@ export const translations = {
     },
   },
   widget: {
+    shadowHits:
+      "Shadow mode: {{crawler}} crawler requests, {{cluster}} cluster charges, {{model}} model charges.",
     refresh: "Refresh",
     loading: "Loading farming report...",
     windowLine:

@@ -18,12 +18,19 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const FreePoolClaimKindDB = ["account", "guest"] as const;
+export const shadowEventKinds = [
+  "shadow_crawler",
+  "shadow_cluster",
+  "shadow_model",
+] as const;
+
 export const AntiFarmingEventKindDB = [
   "subnet_account_limit",
   "subnet_guest_limit",
   "duplicate_email",
   "disposable_email",
   "subnet_signup_limit",
+  ...shadowEventKinds,
 ] as const;
 
 export const freePoolClaims = pgTable(

@@ -209,6 +209,10 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    purchasedModel:
+      "Ten model wymaga kupionych kredytów. Doładuj konto na {{path}} lub wybierz darmowy model.",
+    clusterLimit:
+      "Wspólna pula darmowych kredytów jest wyczerpana. Użyj kupionych kredytów lub poczekaj na odnowienie puli.",
     getBalanceFailed: "Nie udało się pobrać salda kredytów",
     getLeadBalanceFailed: "Nie udało się pobrać salda kredytów leada",
     getOrCreateLeadFailed: "Nie udało się pobrać lub utworzyć leada",

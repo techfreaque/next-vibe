@@ -20,8 +20,8 @@ import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   type ResponseType,
-  success,
   type StreamingResponse,
+  success,
 } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -39,10 +39,10 @@ import {
 } from "../shared/media";
 import {
   createMediaJob,
-  type V1MediaJobOutput,
   mediaJobObject,
   newMediaJobId,
   startMediaJob,
+  type V1MediaJobOutput,
 } from "../shared/media-jobs";
 import {
   type V1MediaJobParams,
@@ -169,7 +169,13 @@ export class V1VideosRepository {
     // Pre-flight on the listed price, so a short balance is a 402 now and
     // not a failed job later. The tool checks again and bills on success.
     const estimate = videoClipCredits(route, seconds, resolution);
-    const balance = await checkMediaBalance(gate.user, estimate, locale, logger);
+    const balance = await checkMediaBalance(
+      gate.user,
+      estimate,
+      locale,
+      logger,
+      model.id,
+    );
     if (!balance.success) {
       return openAiErrorResponse(v1ErrorFromToolFailure(balance));
     }

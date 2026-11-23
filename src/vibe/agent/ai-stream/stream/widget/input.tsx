@@ -704,6 +704,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
         <OutOfCreditsCard
           locale={locale}
           isGuest={user.isPublic}
+          reason={typeof creditRefusal === "string" ? creditRefusal : undefined}
           variant="composer"
           onDismiss={
             outOfCredits ? undefined : (): void => setCreditRefusal(false)

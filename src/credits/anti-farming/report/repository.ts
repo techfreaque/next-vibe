@@ -32,6 +32,7 @@ import {
   SIGNUP_GUEST_SPEND_LOOKBACK_HOURS,
   SIGNUPS_PER_SUBNET_PER_DAY,
 } from "../config";
+import { protectionEnv } from "../env";
 import type { AntiFarmingReportResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -126,6 +127,9 @@ export class AntiFarmingReportRepository {
         db.execute<
           QueryResultRow & {
             total: NumLike;
+            shadow_crawler: NumLike;
+            shadow_cluster: NumLike;
+            shadow_model: NumLike;
             subnet_account_limit: NumLike;
             subnet_guest_limit: NumLike;
             duplicate_email: NumLike;
@@ -134,7 +138,10 @@ export class AntiFarmingReportRepository {
           }
         >(sql`
           SELECT
-            count(*) AS total,
+            count(*) FILTER (WHERE kind NOT IN ('shadow_crawler','shadow_cluster','shadow_model')) AS total,
+            count(*) FILTER (WHERE kind = 'shadow_crawler') AS shadow_crawler,
+            count(*) FILTER (WHERE kind = 'shadow_cluster') AS shadow_cluster,
+            count(*) FILTER (WHERE kind = 'shadow_model') AS shadow_model,
             count(*) FILTER (WHERE kind = 'subnet_account_limit') AS subnet_account_limit,
             count(*) FILTER (WHERE kind = 'subnet_guest_limit') AS subnet_guest_limit,
             count(*) FILTER (WHERE kind = 'duplicate_email') AS duplicate_email,
@@ -182,6 +189,15 @@ export class AntiFarmingReportRepository {
 
       const t0 = totals.rows[0];
 
+      const showShadow =
+        protectionEnv.FREE_CRAWLER_MODE === "shadow" ||
+        protectionEnv.FREE_CLUSTER_MODE === "shadow" ||
+        protectionEnv.FREE_MODEL_MODE === "shadow" ||
+        num(t0?.shadow_crawler) +
+          num(t0?.shadow_cluster) +
+          num(t0?.shadow_model) >
+          0;
+
       return success({
         window: { days: data.days, from, month },
         thresholds: {
@@ -195,6 +211,13 @@ export class AntiFarmingReportRepository {
         },
         totals: {
           total: num(t0?.total),
+          ...(showShadow && {
+            shadowHits: {
+              crawler: num(t0?.shadow_crawler),
+              cluster: num(t0?.shadow_cluster),
+              model: num(t0?.shadow_model),
+            },
+          }),
           subnetAccountLimit: num(t0?.subnet_account_limit),
           subnetGuestLimit: num(t0?.subnet_guest_limit),
           duplicateEmail: num(t0?.duplicate_email),

@@ -8,7 +8,8 @@ import { and, eq, gt, isNull } from "drizzle-orm";
 import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 
-import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
+import { skipCrawlerLead } from "@/credits/anti-farming/crawler";
+import { AUTH_TOKEN_COOKIE_NAME, LEAD_ID_COOKIE_NAME } from "@/env/constants";
 import { clientIpFromHeaders, geoCountryForIp } from "@/leads/geo/lookup";
 import {
   extractTouch,
@@ -165,6 +166,15 @@ export async function createLeadId(
   locale: CountryLanguage,
 ): Promise<NextResponse> {
   const logger = createEndpointLogger(false, locale);
+
+  if (
+    (request.method === "GET" || request.method === "HEAD") &&
+    !request.cookies.get(AUTH_TOKEN_COOKIE_NAME)?.value &&
+    !request.headers.get("authorization") &&
+    (await skipCrawlerLead(request.headers.get("user-agent"), logger))
+  ) {
+    return NextResponseClass.next();
+  }
 
   const ipAddress = clientIpFromHeaders(request.headers);
   const clientInfo = {

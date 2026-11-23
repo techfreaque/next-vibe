@@ -37,6 +37,7 @@ import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type { NextRequest } from "next-vibe/ui/lib/request";
 
+import { skipCrawlerLead } from "@/credits/anti-farming/crawler";
 import { geoCountryForIp } from "@/leads/geo/lookup";
 import { emails } from "@/messenger/messages/db";
 import { ReferralRepository } from "@/referral/repository";
@@ -692,6 +693,15 @@ export class LeadTrackingRepository {
       // Create anonymous lead if leadId is missing or invalid
       // This should rarely happen since leadAuthService ensures leadId in JWT
       if (!leadId) {
+        if (
+          user.isPublic &&
+          (await skipCrawlerLead(clientInfo.userAgent, logger))
+        ) {
+          return fail({
+            message: t("tracking.errors.default"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
         const anonymousLeadResult = await this.createAnonymousLead(
           clientInfo,
           locale,

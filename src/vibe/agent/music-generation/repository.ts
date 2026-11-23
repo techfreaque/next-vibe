@@ -175,6 +175,7 @@ export class MusicGenerationRepository {
       creditCost,
       locale,
       logger,
+      audioModel.id,
     );
     if (!balanceCheck.success) {
       return balanceCheck;

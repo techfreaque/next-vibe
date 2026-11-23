@@ -60,6 +60,8 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    shadowHits:
+      "Simulazione: {{crawler}} richieste di crawler, {{cluster}} addebiti soggetti al limite condiviso, {{model}} addebiti soggetti al limite per modello.",
     refresh: "Aggiorna",
     loading: "Caricamento del rapporto sull'agricoltura...",
     windowLine:

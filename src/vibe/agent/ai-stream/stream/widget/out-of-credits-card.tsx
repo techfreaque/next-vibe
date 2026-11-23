@@ -1,6 +1,7 @@
 "use client";
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
+import { scopedTranslation as frameworkMessages } from "next-vibe/core/i18n/shared";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
 import { AlertCircle } from "next-vibe/ui/components/icons/AlertCircle";
@@ -21,8 +22,10 @@ import {
 import type { JSX } from "react";
 import { useState } from "react";
 
+import type { CreditPolicyReason } from "@/credits/anti-farming/reason";
 import { FreeCreditsStatus } from "@/credits/enum";
 import { useCreditsTotal, useFreeCreditsStatus } from "@/credits/hooks";
+import { scopedTranslation as creditMessages } from "@/credits/i18n";
 import { NewsletterCreditOffer } from "@/newsletter/credit-bonus/enum";
 import { useNewsletterCreditBonus } from "@/newsletter/credit-bonus/hooks";
 import { formatCreditAmount } from "@/products/credit-money";
@@ -38,6 +41,7 @@ interface OutOfCreditsCardProps {
   locale: CountryLanguage;
   /** Guests: sign up / log in. Members: top up, refill date, newsletter bonus. */
   isGuest: boolean;
+  reason?: CreditPolicyReason;
   /** Shows a close button (composer placement). */
   onDismiss?: () => void;
   /**
@@ -70,6 +74,7 @@ function nextFreeRefill(): Date {
 export function OutOfCreditsCard({
   locale,
   isGuest,
+  reason,
   onDismiss,
   variant = "card",
   className,
@@ -101,7 +106,17 @@ export function OutOfCreditsCard({
         </Button>
       )}
       <Div className={cn(onDismiss && "pr-8")}>
-        {isGuest ? (
+        {reason ? (
+          <Div className="flex flex-col items-start gap-2">
+            <P>{frameworkMessages.scopedT(locale).t(reason)}</P>
+            <Link
+              href={`/${locale}/subscription/buy`}
+              className="font-semibold text-primary underline"
+            >
+              {creditMessages.scopedT(locale).t("purchase.post.title")}
+            </Link>
+          </Div>
+        ) : isGuest ? (
           <GuestBody locale={locale} />
         ) : (
           <MemberBody locale={locale} />

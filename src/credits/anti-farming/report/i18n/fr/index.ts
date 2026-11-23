@@ -57,6 +57,8 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    shadowHits:
+      "Simulation : {{crawler}} requêtes de robots, {{cluster}} débits soumis au quota partagé, {{model}} débits soumis à la limite par modèle.",
     refresh: "Actualiser",
     loading: "Chargement du rapport de farming...",
     windowLine:

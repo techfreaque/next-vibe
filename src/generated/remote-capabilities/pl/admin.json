@@ -64104,6 +64104,47 @@
                   "type": "number",
                   "isFinite": true
                 },
+                "shadowHits": {
+                  "def": {
+                    "type": "optional",
+                    "innerType": {
+                      "def": {
+                        "type": "object",
+                        "shape": {
+                          "crawler": {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          },
+                          "cluster": {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          },
+                          "model": {
+                            "def": {
+                              "type": "number",
+                              "coerce": true,
+                              "checks": []
+                            },
+                            "type": "number",
+                            "isFinite": true
+                          }
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "optional"
+                },
                 "subnetAccountLimit": {
                   "def": {
                     "type": "number",

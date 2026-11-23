@@ -135,6 +135,10 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    purchasedModel:
+      "Este modelo requiere créditos de pago. Compra créditos en {{path}} o elige un modelo gratuito.",
+    clusterLimit:
+      "Se han agotado los créditos gratuitos compartidos. Usa créditos de pago o espera a que se renueve el saldo.",
     getBalanceFailed: "No pudimos cargar el saldo de créditos",
     getLeadBalanceFailed:
       "No pudimos cargar el saldo de créditos del prospecto",

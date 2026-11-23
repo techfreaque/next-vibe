@@ -60,6 +60,8 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    shadowHits:
+      "Simulación: {{crawler}} solicitudes de rastreadores, {{cluster}} cargos con límite compartido y {{model}} cargos con límite por modelo.",
     refresh: "Actualizar",
     loading: "Cargando informe de la agricultura...",
     windowLine:

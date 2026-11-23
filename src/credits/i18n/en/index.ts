@@ -130,6 +130,10 @@ export const translations = {
     },
   },
   errors: {
+    purchasedModel:
+      "This model requires purchased credits. Add credits at {{path}} or choose a free model.",
+    clusterLimit:
+      "The shared free allowance has been used. Use purchased credits or try again next window.",
     getBalanceFailed: "Failed to get credit balance",
     getLeadBalanceFailed: "Failed to get lead credit balance",
     getOrCreateLeadFailed: "Failed to get or create lead",

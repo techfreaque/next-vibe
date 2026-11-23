@@ -31,6 +31,7 @@ import type { JSX } from "react";
 import { useEffect, useState } from "react";
 
 import type { ContactRequest } from "@/contact/definition";
+import { creditPolicyReason } from "@/credits/anti-farming/reason";
 import { useUser } from "@/user/private/me/hooks";
 
 import { StreamErrorType } from "../../../../../ai-stream/repository/core/constants";
@@ -298,7 +299,11 @@ export function ErrorMessageBubble({
   ) {
     return (
       <Div className={cn("flex items-start gap-3", group)}>
-        <OutOfCreditsCard locale={locale} isGuest={user.isPublic} />
+        <OutOfCreditsCard
+          locale={locale}
+          isGuest={user.isPublic}
+          reason={creditPolicyReason(errorData.errorType.errorKey)}
+        />
       </Div>
     );
   }

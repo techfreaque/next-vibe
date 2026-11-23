@@ -96,6 +96,8 @@ import type {
 import { withTransaction } from "../vibe/database/utils/repository-helpers";
 import { createEndpointEmitter } from "../vibe/realtime/core/emitter";
 import { SIGNUP_GUEST_SPEND_LOOKBACK_HOURS } from "./anti-farming/config";
+import { protectionEnv } from "./anti-farming/env";
+import { recordAntiFarmingEvent } from "./anti-farming/events";
 import {
   type AccountFreeAccess as FreeCreditsAccess,
   claimGuestPool,
@@ -106,6 +108,12 @@ import {
   signupCarryoverGrantKey,
   signupGuestCarryover,
 } from "./anti-farming/quota";
+import { creditPolicyReason } from "./anti-farming/reason";
+import {
+  deductionClusterBudget,
+  purchasedPack,
+  restrictedModel,
+} from "./anti-farming/spending";
 import {
   creditPacks,
   type CreditTransactionMetadata,
@@ -2858,6 +2866,12 @@ export class CreditRepository {
       // and can wrongly block free users. (withTransaction does not retry, so a
       // single-pass accumulator is safe.)
       let freeCreditsDeducted = 0;
+      const limitedModel = restrictedModel(modelId);
+      const paidOnly =
+        limitedModel && protectionEnv.FREE_MODEL_MODE === "enforce";
+      let clusterShadowCredits = 0;
+      let modelShadowCredits = 0;
+      let clusterLimited = false;
       let availableForFullCharge = 0;
       const onInsufficientCredits = (): ResponseType<{ partial: boolean }> => {
         logger.warn("Insufficient credits for tool/endpoint", {
@@ -2868,14 +2882,31 @@ export class CreditRepository {
           rolledBack: true,
         });
         return fail({
-          message: t("errors.insufficientCredits", { cost: amount }),
-          errorType: ErrorResponseTypes.BAD_REQUEST,
+          message: paidOnly
+            ? t("errors.purchasedModel", {
+                path: `/${locale}/subscription/buy`,
+              })
+            : clusterLimited
+              ? t("errors.clusterLimit")
+              : t("errors.insufficientCredits", { cost: amount }),
+          errorType: paidOnly
+            ? ErrorResponseTypes.PURCHASED_MODEL_REQUIRED
+            : clusterLimited
+              ? ErrorResponseTypes.SHARED_ALLOWANCE_REACHED
+              : ErrorResponseTypes.BAD_REQUEST,
         });
       };
       const deductFromWallets = async (
         tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
       ): Promise<ResponseType<{ partial: boolean }>> => {
         let remaining = amount;
+        const cluster = await deductionClusterBudget(
+          identifier.userId,
+          currentLeadId,
+          tx,
+          logger,
+        );
+        let clusterRemaining = cluster?.remaining ?? Infinity;
 
         // Enforce pool limit: max `freeAllowance` free credits can be spent per period
         const now = new Date();
@@ -2942,6 +2973,16 @@ export class CreditRepository {
             freeCreditsAvailableInPool,
           );
 
+          if (cluster && freeCreditsToDeduct > clusterRemaining) {
+            clusterLimited = protectionEnv.FREE_CLUSTER_MODE === "enforce";
+            if (clusterLimited) {
+              freeCreditsToDeduct = clusterRemaining;
+            }
+          }
+          if (paidOnly) {
+            freeCreditsToDeduct = 0;
+          }
+
           for (const wallet of walletsForDeduction) {
             if (freeCreditsToDeduct <= 0) {
               break;
@@ -2987,6 +3028,15 @@ export class CreditRepository {
               deduction,
             )) {
               freeLeft -= part.amount;
+              const counted = Math.min(part.amount, clusterRemaining);
+              clusterRemaining -= counted;
+              if (cluster && protectionEnv.FREE_CLUSTER_MODE === "shadow") {
+                clusterShadowCredits +=
+                  Math.round((part.amount - counted) * 1_000_000) / 1_000_000;
+              }
+              if (limitedModel) {
+                modelShadowCredits += part.amount;
+              }
               // Both rows describe the same debit. Keep the reported cost
               // proportional to the credits attributed to each bucket.
               const costShare = part.amount / deduction;
@@ -3006,6 +3056,11 @@ export class CreditRepository {
                     ...upstreamCost,
                     upstreamCostUsd: upstreamCost.upstreamCostUsd * costShare,
                     fallbackCostUsd: upstreamCost.fallbackCostUsd * costShare,
+                  }),
+                  ...(cluster && {
+                    clusterPrefix: cluster.prefix,
+                    clusterFingerprint: cluster.fingerprint,
+                    clusterCredits: counted,
                   }),
                   freeCreditsUsed: part.amount,
                   packCreditsUsed: 0,
@@ -3038,6 +3093,13 @@ export class CreditRepository {
           for (const pack of expiringPacks) {
             if (remaining <= 0) {
               break;
+            }
+
+            if (limitedModel && !purchasedPack(pack)) {
+              if (paidOnly) {
+                continue;
+              }
+              modelShadowCredits += Math.min(pack.remaining, remaining);
             }
 
             const deduction = Math.min(pack.remaining, remaining);
@@ -3124,6 +3186,13 @@ export class CreditRepository {
               break;
             }
 
+            if (limitedModel && !purchasedPack(pack)) {
+              if (paidOnly) {
+                continue;
+              }
+              modelShadowCredits += Math.min(pack.remaining, remaining);
+            }
+
             const deduction = Math.min(pack.remaining, remaining);
 
             // Update wallet balance
@@ -3208,6 +3277,13 @@ export class CreditRepository {
               break;
             }
 
+            if (limitedModel && !purchasedPack(pack)) {
+              if (paidOnly) {
+                continue;
+              }
+              modelShadowCredits += Math.min(pack.remaining, remaining);
+            }
+
             const deduction = Math.min(pack.remaining, remaining);
 
             // Update wallet balance
@@ -3273,7 +3349,10 @@ export class CreditRepository {
         }
 
         if (remaining > 0) {
-          if (allowPartial) {
+          if (
+            allowPartial &&
+            !(amount === remaining && (paidOnly || clusterLimited))
+          ) {
             // For model/TTS/STT: deduct what we can, commit the transaction
             logger.info("Partial credit deduction (graceful)", {
               requested: amount,
@@ -3300,6 +3379,26 @@ export class CreditRepository {
 
       if (!result.success) {
         return result;
+      }
+
+      if (clusterShadowCredits > 0) {
+        logger.info("Shadow shared allowance hit", {
+          modelId,
+          feature,
+          credits: clusterShadowCredits,
+        });
+        await recordAntiFarmingEvent({ kind: "shadow_cluster" }, logger);
+      }
+      if (
+        modelShadowCredits > 0 &&
+        protectionEnv.FREE_MODEL_MODE === "shadow"
+      ) {
+        logger.info("Shadow free model restriction hit", {
+          modelId,
+          feature,
+          credits: modelShadowCredits,
+        });
+        await recordAntiFarmingEvent({ kind: "shadow_model" }, logger);
       }
 
       logger.debug("Credits deducted from pool", {
@@ -4411,6 +4510,9 @@ export class CreditRepository {
       );
 
       if (!result.success) {
+        if (creditPolicyReason(result.errorType.errorKey)) {
+          return result;
+        }
         logger.error(`Failed to deduct credits for ${feature}`, {
           ...identifier,
           cost,
@@ -4495,6 +4597,9 @@ export class CreditRepository {
       );
 
       if (!result.success) {
+        if (creditPolicyReason(result.errorType.errorKey)) {
+          return result;
+        }
         logger.warn("TTS credit deduction failed", {
           ...identifier,
           cost,
@@ -4575,6 +4680,9 @@ export class CreditRepository {
       );
 
       if (!result.success) {
+        if (creditPolicyReason(result.errorType.errorKey)) {
+          return result;
+        }
         logger.warn("STT credit deduction failed", {
           ...identifier,
           cost,
@@ -4667,6 +4775,9 @@ export class CreditRepository {
       );
 
       if (!result.success) {
+        if (creditPolicyReason(result.errorType.errorKey)) {
+          return result;
+        }
         // deductCredits has several silent fail paths (invalid amount, missing
         // identifier, pool/wallet lookup failures inside the transaction);
         // without the underlying reason this warning is not diagnosable.

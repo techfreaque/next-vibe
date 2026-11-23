@@ -33,6 +33,7 @@ import {
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { type JSX, type ReactNode, useEffect, useId, useState } from "react";
 
+import { creditPolicyReason } from "@/credits/anti-farming/reason";
 import {
   formatCreditAmount,
   formatCreditsAsMoney,
@@ -269,12 +270,15 @@ export function StudioForm({
         }))}
       />
       {children}
-      {outOfCredits && user.isPublic ? (
+      {outOfCredits &&
+      user.isPublic &&
+      !creditPolicyReason(response.errorType.errorKey) ? (
         <GuestCredits kind={kind} cost={cost} />
       ) : outOfCredits ? (
         <OutOfCreditsCard
           locale={locale}
-          isGuest={false}
+          isGuest={user.isPublic}
+          reason={creditPolicyReason(response.errorType.errorKey)}
           className="max-w-none"
         />
       ) : (

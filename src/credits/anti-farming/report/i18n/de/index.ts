@@ -57,6 +57,8 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    shadowHits:
+      "Testlauf: {{crawler}} Crawler-Anfragen, {{cluster}} Abbuchungen mit Gruppenlimit, {{model}} Abbuchungen mit Modelllimit.",
     refresh: "Aktualisieren",
     loading: "Farming-Bericht wird geladen...",
     windowLine:

@@ -57,6 +57,8 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    shadowHits:
+      "Symulacja: żądania robotów: {{crawler}}, obciążenia ze wspólnym limitem: {{cluster}}, obciążenia z limitem modelu: {{model}}.",
     refresh: "Odśwież",
     loading: "Ładowanie raportu farmingu...",
     windowLine:

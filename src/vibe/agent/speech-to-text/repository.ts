@@ -18,6 +18,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { protectedBalance } from "@/credits/anti-farming/spending";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 import { formatCreditAmount } from "@/products/credit-money";
@@ -398,6 +399,18 @@ export class SpeechToTextRepository {
       modelOption,
       SpeechToTextRepository.MINIMUM_BALANCE_SECONDS,
     );
+    const eligible = await protectedBalance(
+      user.id,
+      user.leadId,
+      modelOption.id,
+      balanceResult.data.total,
+      minimumCredits,
+      tCredits,
+      locale,
+    );
+    if (!eligible.success) {
+      return eligible;
+    }
     if (balanceResult.data.total < minimumCredits) {
       logger.warn("[STT] Insufficient credits", {
         balance: balanceResult.data.total,

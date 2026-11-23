@@ -23,8 +23,8 @@ import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
-  success,
   type StreamingResponse,
+  success,
 } from "next-vibe/core/route/response.schema";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -40,10 +40,10 @@ import {
 } from "../shared/media";
 import {
   createMediaJob,
-  type V1MediaJobOutput,
   mediaJobObject,
   newMediaJobId,
   startMediaJob,
+  type V1MediaJobOutput,
 } from "../shared/media-jobs";
 import {
   type V1MediaJobParams,
@@ -105,7 +105,13 @@ export class V1MusicRepository {
     }
     const duration = musicDurationFor(data.seconds);
     const estimate = calculateCreditCost(model, 0, 0);
-    const balance = await checkMediaBalance(gate.user, estimate, locale, logger);
+    const balance = await checkMediaBalance(
+      gate.user,
+      estimate,
+      locale,
+      logger,
+      model.id,
+    );
     if (!balance.success) {
       return openAiErrorResponse(v1ErrorFromToolFailure(balance));
     }

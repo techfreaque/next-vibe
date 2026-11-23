@@ -210,6 +210,10 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    purchasedModel:
+      "Für dieses Modell brauchst du gekaufte Credits. Lade unter {{path}} Credits auf oder wähle ein kostenloses Modell.",
+    clusterLimit:
+      "Das gemeinsame Gratisguthaben ist aufgebraucht. Nutze gekaufte Credits oder warte auf den nächsten Zeitraum.",
     getBalanceFailed: "Fehler beim Abrufen des Credit-Guthabens",
     getLeadBalanceFailed: "Fehler beim Abrufen des Lead-Credit-Guthabens",
     getOrCreateLeadFailed: "Fehler beim Abrufen oder Erstellen des Leads",

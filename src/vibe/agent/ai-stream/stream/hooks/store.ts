@@ -12,6 +12,8 @@
 
 import { create } from "zustand";
 
+import type { CreditPolicyReason } from "@/credits/anti-farming/reason";
+
 /**
  * AI Stream Lifecycle State - aborting + active incognito streams
  */
@@ -38,8 +40,8 @@ interface AIStreamState {
    * The last send was refused for lack of credits (402). The composer swaps
    * in a sign-up / top-up card until dismissed or the next send succeeds.
    */
-  creditRefusal: boolean;
-  setCreditRefusal: (value: boolean) => void;
+  creditRefusal: boolean | CreditPolicyReason;
+  setCreditRefusal: (value: boolean | CreditPolicyReason) => void;
 
   isAborting: (threadId: string) => boolean;
   setAborting: (threadId: string, value: boolean) => void;
@@ -61,7 +63,7 @@ export const useAIStreamStore = create<AIStreamState>((set, get) => ({
   incognitoStreams: new Set<string>(),
   creditRefusal: false,
 
-  setCreditRefusal: (value: boolean): void =>
+  setCreditRefusal: (value: boolean | CreditPolicyReason): void =>
     set((state) =>
       state.creditRefusal === value ? state : { creditRefusal: value },
     ),

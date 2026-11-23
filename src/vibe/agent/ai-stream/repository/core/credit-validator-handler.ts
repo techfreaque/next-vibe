@@ -9,6 +9,7 @@ import {
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { protectedBalance } from "@/credits/anti-farming/spending";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 import { creditValidator } from "@/credits/validator";
@@ -105,6 +106,19 @@ export class CreditValidatorHandler {
       });
     }
 
+    const eligible = await protectedBalance(
+      user.id,
+      effectiveLeadId,
+      modelInfo.id,
+      validationResult.data.balance,
+      modelCost,
+      creditsT,
+      locale,
+    );
+    if (!eligible.success) {
+      return eligible;
+    }
+
     if (!validationResult.data.canUseModel) {
       // debug: the caller reports the 402 (stream "Setup failed" warn, or the
       // pulse scheduler's one-time SKIPPED log for cron tasks).
@@ -153,7 +167,7 @@ export class CreditValidatorHandler {
       data: {
         effectiveLeadId,
         modelCost,
-        balance: validationResult.data.balance,
+        balance: eligible.data,
       },
     };
   }

@@ -30,6 +30,8 @@ import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { useCallback, useMemo } from "react";
 import { z } from "zod";
 
+import { creditPolicyReason } from "@/credits/anti-farming/reason";
+
 import { DefaultFolderId } from "../../../../core/execution-context";
 import messagesDefinitions from "../../../chat/threads/[threadId]/messages/definition";
 import {
@@ -304,7 +306,9 @@ export function useAIStream(): UseAIStreamReturn {
           if (activeThreadId) {
             discardOptimisticTurn(activeThreadId, data.rootFolderId, logger);
           }
-          useAIStreamStore.getState().setCreditRefusal(true);
+          useAIStreamStore
+            .getState()
+            .setCreditRefusal(creditPolicyReason(errorType.errorKey) ?? true);
           return false;
         }
         toast({

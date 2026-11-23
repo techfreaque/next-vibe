@@ -362,6 +362,7 @@ export class ImageGenerationRepository {
       creditCost,
       locale,
       logger,
+      imageModel.id,
     );
     if (!balanceCheck.success) {
       return balanceCheck;

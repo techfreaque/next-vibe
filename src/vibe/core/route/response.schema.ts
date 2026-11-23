@@ -384,6 +384,8 @@ type ErrorTypes =
   | "PAYMENT_ERROR"
   | "PARTIAL_FAILURE"
   | "PAYMENT_REQUIRED"
+  | "PURCHASED_MODEL_REQUIRED"
+  | "SHARED_ALLOWANCE_REACHED"
   | "CONSENT_REQUIRED"
   | "CONFLICT";
 
@@ -397,6 +399,14 @@ export type ErrorResponseTypesElements = {
 };
 
 export const ErrorResponseTypes: ErrorResponseTypesElements = {
+  PURCHASED_MODEL_REQUIRED: {
+    errorKey: "errorTypes.purchased_model_required",
+    errorCode: 402,
+  },
+  SHARED_ALLOWANCE_REACHED: {
+    errorKey: "errorTypes.shared_allowance_reached",
+    errorCode: 402,
+  },
   PAYMENT_REQUIRED: {
     errorKey: "errorTypes.payment_required",
     errorCode: 402,

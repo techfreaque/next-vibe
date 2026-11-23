@@ -24,6 +24,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { protectedBalance } from "@/credits/anti-farming/spending";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 import { creditValidator } from "@/credits/validator";
@@ -322,6 +323,25 @@ async function preflight(params: {
       ),
     };
   }
+  const eligible = await protectedBalance(
+    user.id,
+    user.leadId,
+    model.id,
+    validation.data.balance,
+    estimatedCost,
+    creditsT,
+    locale,
+  );
+  if (!eligible.success) {
+    return {
+      error: v1Error(
+        402,
+        eligible.message,
+        "insufficient_quota",
+        "free_credit_policy",
+      ),
+    };
+  }
   if (!validation.data.canUseModel) {
     return {
       error: v1Error(
@@ -354,7 +374,7 @@ async function preflight(params: {
       ),
     };
   }
-  return { balance: validation.data.balance };
+  return { balance: eligible.data };
 }
 
 async function bill(params: {

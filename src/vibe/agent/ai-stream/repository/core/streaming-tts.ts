@@ -14,6 +14,7 @@ import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { protectionEnv } from "@/credits/anti-farming/env";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 
@@ -32,7 +33,8 @@ import {
   parseEdenAiCost,
   parseEdenAiTtsProviderModel,
 } from "../../../models/eden-ai";
-import { ApiProvider } from "../../../models/models";
+import { ApiProvider, calculateTtsCreditCost } from "../../../models/models";
+import { checkMediaBalance } from "../../../shared/media-generation";
 import { parseElevenLabsProviderModel } from "../../../text-to-speech/elevenlabs";
 import {
   getBestTtsModel,
@@ -41,6 +43,7 @@ import {
   type VoiceModelSelection,
 } from "../../../text-to-speech/models";
 import { createFixtureFetch } from "../../testing/fetch-cache";
+import { serializeError } from "../errors/error-utils";
 
 /**
  * Minimum skills before emitting a TTS chunk
@@ -342,6 +345,12 @@ export class StreamingTTSHandler {
             this.logger,
             this.locale,
             creditsT,
+            protectionEnv.FREE_MODEL_MODE !== "off" && this.resolvedTtsModel
+              ? {
+                  modelId: this.resolvedTtsModel.id,
+                  apiProvider: this.resolvedTtsModel.apiProvider,
+                }
+              : undefined,
           );
 
           if (deductResult.success) {
@@ -372,6 +381,37 @@ export class StreamingTTSHandler {
         stack: error instanceof Error ? error.stack : undefined,
         chunkIndex: chunkIdx,
         textLength: cleanText.length,
+      });
+    }
+  }
+
+  private emitVoiceError(
+    message: string,
+    errorCode:
+      | typeof ErrorResponseTypes.EXTERNAL_SERVICE_ERROR.errorKey
+      | typeof ErrorResponseTypes.PAYMENT_REQUIRED.errorKey,
+  ): void {
+    if (this.wsEmit) {
+      this.wsEmit("error", {
+        urlPathParams: { threadId: this.threadId ?? "" },
+        responseData: {
+          messages: [
+            {
+              id: crypto.randomUUID(),
+              role: ChatMessageRole.ERROR,
+              content: message,
+              parentId: null,
+              sequenceId: null,
+              model: null,
+              skill: null,
+              metadata: null,
+              errorMessage: message,
+              errorCode,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            },
+          ],
+        },
       });
     }
   }
@@ -407,29 +447,10 @@ export class StreamingTTSHandler {
           selectionType: this.voiceModelSelection.selectionType,
           hint: "Configure OPENAI_API_KEY, ELEVENLABS_API_KEY, or EDEN_AI_API_KEY",
         });
-        if (this.wsEmit) {
-          this.wsEmit("error", {
-            urlPathParams: { threadId: this.threadId ?? "" },
-            responseData: {
-              messages: [
-                {
-                  id: crypto.randomUUID(),
-                  role: ChatMessageRole.ERROR,
-                  content: message,
-                  parentId: null,
-                  sequenceId: null,
-                  model: null,
-                  skill: null,
-                  metadata: null,
-                  errorMessage: message,
-                  errorCode: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR.errorKey,
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                },
-              ],
-            },
-          });
-        }
+        this.emitVoiceError(
+          message,
+          ErrorResponseTypes.EXTERNAL_SERVICE_ERROR.errorKey,
+        );
         // Disable TTS for this session to avoid per-chunk error spam
         this.isEnabled = false;
       }
@@ -440,6 +461,23 @@ export class StreamingTTSHandler {
       return null;
     }
 
+    if (
+      protectionEnv.FREE_MODEL_MODE === "enforce" ||
+      protectionEnv.FREE_CLUSTER_MODE === "enforce"
+    ) {
+      const gate = await checkMediaBalance(
+        this.user,
+        calculateTtsCreditCost(modelOption, text.length),
+        this.locale,
+        this.logger,
+        modelOption.id,
+      );
+      if (!gate.success) {
+        this.emitVoiceError(serializeError(gate), gate.errorType.errorKey);
+        this.isEnabled = false;
+        return null;
+      }
+    }
     this.logger.debug("[Streaming TTS] Generating TTS", {
       modelId: modelOption.id,
       apiProvider: modelOption.apiProvider,

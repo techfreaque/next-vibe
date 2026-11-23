@@ -133,6 +133,10 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    purchasedModel:
+      "Per questo modello servono crediti a pagamento. Acquistali su {{path}} o scegli un modello gratuito.",
+    clusterLimit:
+      "I crediti gratuiti condivisi sono esauriti. Usa crediti a pagamento o attendi il rinnovo della quota.",
     getBalanceFailed: "Impossibile caricare il saldo crediti",
     getLeadBalanceFailed: "Impossibile caricare il saldo crediti del lead",
     getOrCreateLeadFailed: "Impossibile trovare o creare il lead",
