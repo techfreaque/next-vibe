@@ -19,9 +19,7 @@ import { sttModelDefinitions } from "../../../speech-to-text/models";
 import { ApiProvider } from "../../models";
 import type { ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";
-import { scrapeWithBrowser } from "./browser-scraper";
-
-const PRICING_URL = "https://developers.openai.com/api/docs/pricing";
+import { fetchOpenAiPricingPage, OPENAI_PRICING_URL } from "./browser-scraper";
 
 /** Map page label → providerModel id */
 const LABEL_TO_MODEL: Record<string, string> = {
@@ -75,11 +73,7 @@ export class OpenAiSttPriceFetcher extends PriceFetcher {
     const updates: ProviderPriceResult["updates"] = [];
     const failures: ProviderPriceResult["failures"] = [];
 
-    const pageText = await scrapeWithBrowser(logger, {
-      url: PRICING_URL,
-      clickButtonTexts: ["All models"],
-      waitForText: "whisper",
-    });
+    const pageText = await fetchOpenAiPricingPage(logger);
 
     if (!pageText) {
       return {
@@ -88,7 +82,7 @@ export class OpenAiSttPriceFetcher extends PriceFetcher {
         modelsUpdated: 0,
         updates,
         failures,
-        error: `Could not render ${PRICING_URL}`,
+        error: `Could not render ${OPENAI_PRICING_URL}`,
         // Could not check: keep prior verified state instead of disabling.
         failedApiProviders: [ApiProvider.OPENAI_STT],
       };
@@ -109,7 +103,7 @@ export class OpenAiSttPriceFetcher extends PriceFetcher {
           failures.push({
             modelId: providerConfig.id,
             provider: ApiProvider.OPENAI_STT,
-            reason: `Model "${providerConfig.providerModel}" not found on pricing page - check ${PRICING_URL}`,
+            reason: `Model "${providerConfig.providerModel}" not found on pricing page - check ${OPENAI_PRICING_URL}`,
           });
           continue;
         }
@@ -120,7 +114,7 @@ export class OpenAiSttPriceFetcher extends PriceFetcher {
           provider: ApiProvider.OPENAI_STT,
           field: "creditCostPerSecond",
           value: this.usdToCredits(usdPerSec),
-          source: PRICING_URL,
+          source: OPENAI_PRICING_URL,
           providerModel: providerConfig.providerModel,
         });
       }

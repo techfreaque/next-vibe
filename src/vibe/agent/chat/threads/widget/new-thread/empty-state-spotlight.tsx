@@ -185,7 +185,7 @@ interface CompanionView {
 
 type SkillView = CompanionView | { kind: "none" } | { kind: "custom" };
 
-export interface CompanionOption {
+interface CompanionOption {
   id: string;
   name: string;
   tagline: string;
@@ -902,7 +902,7 @@ function LoadingPlaceholder(): JSX.Element {
  * guests and signed-in users alike), else the first companion with a mode
  * for politics. So a Hermes user sees "Switch to Hermes", never Thea.
  */
-export function pickSwitchCompanion(params: {
+function pickSwitchCompanion(params: {
   companions: CompanionOption[];
   /** Favorite skill ids (composites allowed), in the user's order. */
   favoriteSkillIds: string[];

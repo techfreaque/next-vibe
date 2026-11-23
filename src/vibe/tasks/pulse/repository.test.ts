@@ -1,6 +1,6 @@
 import { PGlite } from "@electric-sql/pglite";
 import { afterAll, beforeAll, expect, mock, test } from "bun:test";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/pglite";
 
 import { defaultLocale } from "../../core/i18n/core/config";
@@ -120,4 +120,96 @@ test("pulse leaves a live watchdog claim alone and completes a replacement for a
   expect(history[0]?.startedAt).toEqual(abandonedAt);
   expect(history[1]?.completedAt).toBeInstanceOf(Date);
   expect(history[1]?.result).toEqual({ checked: 0, cancelled: 0 });
+});
+
+test("seeding the replacement disables the legacy cleanup and keeps its history", async () => {
+  const retiredTaskId = "incognito-media-cleanup";
+  const replacementTaskId = "guest-media-cleanup";
+  const unrelatedTaskId = "custom-media-cleanup";
+  const schedule = "0 7 * * *";
+  const category = TaskCategory.MAINTENANCE;
+  const priority = CronTaskPriority.LOW;
+
+  await db.insert(cronTasks).values([
+    {
+      id: retiredTaskId,
+      shortId: retiredTaskId,
+      routeId: retiredTaskId,
+      displayName: retiredTaskId,
+      category,
+      priority,
+      schedule,
+      nextExecutionAt: new Date(),
+    },
+    {
+      id: replacementTaskId,
+      shortId: replacementTaskId,
+      routeId: replacementTaskId,
+      displayName: replacementTaskId,
+      category,
+      priority,
+      schedule,
+      enabled: false,
+    },
+    {
+      id: unrelatedTaskId,
+      shortId: unrelatedTaskId,
+      routeId: retiredTaskId,
+      displayName: unrelatedTaskId,
+      category,
+      priority,
+      schedule,
+      userId: admin.id,
+    },
+  ]);
+  await db.insert(cronTaskExecutions).values({
+    taskId: retiredTaskId,
+    taskName: retiredTaskId,
+    executionId: retiredTaskId,
+    startedAt: new Date(),
+    status: CronTaskStatus.COMPLETED,
+    priority,
+    config: {},
+  });
+  void mock.module("@/generated/tasks/index", () => ({
+    taskRegistry: {
+      cronTasks: [{
+        id: replacementTaskId,
+        name: "task.name",
+        definition: { aliases: [replacementTaskId] },
+        category,
+        schedule: "0 6 * * *",
+        enabled: true,
+        priority,
+      }],
+    },
+  }));
+
+  const { dev, prod } = await import("../seeds");
+  await dev(logger);
+  await prod(logger);
+
+  const tasks = await db.select({
+    id: cronTasks.id,
+    enabled: cronTasks.enabled,
+    nextExecutionAt: cronTasks.nextExecutionAt,
+    schedule: cronTasks.schedule,
+  }).from(cronTasks).where(inArray(cronTasks.id, [
+    retiredTaskId,
+    replacementTaskId,
+    unrelatedTaskId,
+  ]));
+  expect(tasks.find((task) => task.id === retiredTaskId)).toMatchObject({
+    enabled: false,
+    nextExecutionAt: null,
+  });
+  expect(tasks.find((task) => task.id === replacementTaskId)).toMatchObject({
+    enabled: false,
+    schedule,
+  });
+  expect(tasks.find((task) => task.id === unrelatedTaskId)?.enabled).toBe(true);
+  const history = await db.select({ taskId: cronTaskExecutions.taskId })
+    .from(cronTaskExecutions)
+    .where(eq(cronTaskExecutions.taskId, retiredTaskId));
+  expect(history).toEqual([{ taskId: retiredTaskId }]);
 });

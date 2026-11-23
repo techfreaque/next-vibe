@@ -24,9 +24,7 @@ import { ttsModelDefinitions } from "../../../text-to-speech/models";
 import { ApiProvider } from "../../models";
 import type { ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";
-import { scrapeWithBrowser } from "./browser-scraper";
-
-const PRICING_URL = "https://developers.openai.com/api/docs/pricing";
+import { fetchOpenAiPricingPage, OPENAI_PRICING_URL } from "./browser-scraper";
 
 /** Model every OpenAI TTS voice runs on (see header). */
 const RUNTIME_TTS_MODEL = "tts-1";
@@ -73,11 +71,7 @@ export class OpenAiTtsPriceFetcher extends PriceFetcher {
     const updates: ProviderPriceResult["updates"] = [];
     const failures: ProviderPriceResult["failures"] = [];
 
-    const pageText = await scrapeWithBrowser(logger, {
-      url: PRICING_URL,
-      clickButtonTexts: ["All models"],
-      waitForText: "tts-1",
-    });
+    const pageText = await fetchOpenAiPricingPage(logger);
 
     if (!pageText) {
       return {
@@ -86,7 +80,7 @@ export class OpenAiTtsPriceFetcher extends PriceFetcher {
         modelsUpdated: 0,
         updates,
         failures,
-        error: `Could not render ${PRICING_URL}`,
+        error: `Could not render ${OPENAI_PRICING_URL}`,
         // Could not check: keep prior verified state instead of disabling.
         failedApiProviders: [ApiProvider.OPENAI_TTS],
       };
@@ -107,7 +101,7 @@ export class OpenAiTtsPriceFetcher extends PriceFetcher {
           failures.push({
             modelId: providerConfig.id,
             provider: ApiProvider.OPENAI_TTS,
-            reason: `Model "${RUNTIME_TTS_MODEL}" (voice "${providerConfig.providerModel}") not found on pricing page - check ${PRICING_URL}`,
+            reason: `Model "${RUNTIME_TTS_MODEL}" (voice "${providerConfig.providerModel}") not found on pricing page - check ${OPENAI_PRICING_URL}`,
           });
           continue;
         }
@@ -118,7 +112,7 @@ export class OpenAiTtsPriceFetcher extends PriceFetcher {
           provider: ApiProvider.OPENAI_TTS,
           field: "creditCostPerCharacter",
           value: this.usdToCredits(usdPerChar),
-          source: PRICING_URL,
+          source: OPENAI_PRICING_URL,
           providerModel: providerConfig.providerModel,
         });
       }

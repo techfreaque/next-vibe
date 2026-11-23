@@ -15,6 +15,7 @@ describe("OpenRouter endpoint prices", () => {
     };
     const fetchMock = spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(Response.json({ data: [
+        { id, name: "Variable price", context_length: 1048576, pricing: { prompt: "-1", completion: "-1" } },
         { id, name: "GLM 5.2", context_length: 1048576, pricing: bulkPricing },
       ] }))
       .mockResolvedValueOnce(Response.json({ data: { endpoints: [
@@ -27,6 +28,7 @@ describe("OpenRouter endpoint prices", () => {
       const result = await new OpenRouterTokenPriceFetcher().fetch(
         createEndpointLogger(false, defaultLocale),
       );
+      expect(result.modelsFound).toBe(1);
       const prices = Object.fromEntries(result.updates
         .filter((row) => row.providerModel === id)
         .map((row) => [row.field, row.value]));

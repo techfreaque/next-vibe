@@ -7,7 +7,7 @@
 
 /* eslint-disable i18next/no-literal-string */
 
-import { sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
 import { getPreferredToolName } from "../core/core-utils/path";
 import type { WidgetData } from "../core/utils/json";
@@ -83,6 +83,30 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
           updatedAt: new Date(),
         },
       });
+  }
+
+  // The renamed cleanup endpoint has its own seeded task. Retire the old
+  // schedule while keeping its execution history and the replacement's settings.
+  const guestMediaCleanupId = "guest-media-cleanup";
+  if (taskRows.some((row) => row.id === guestMediaCleanupId)) {
+    const [retired] = await db
+      .update(cronTasks)
+      .set({ enabled: false, nextExecutionAt: null, updatedAt: new Date() })
+      .where(
+        and(
+          eq(cronTasks.id, "incognito-media-cleanup"),
+          eq(cronTasks.routeId, "incognito-media-cleanup"),
+          eq(cronTasks.enabled, true),
+          isNull(cronTasks.userId),
+        ),
+      )
+      .returning({ id: cronTasks.id });
+    if (retired) {
+      logger.info("Retired replaced system cron task", {
+        taskId: retired.id,
+        replacementTaskId: guestMediaCleanupId,
+      });
+    }
   }
 
   logger.debug(

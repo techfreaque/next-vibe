@@ -71,3 +71,32 @@ diff --git a/dist/node/module-runner.js b/dist/node/module-runner.js
  	}
  	async directRequest(url, mod, _callstack) {
  		let fetchResult = mod.meta, moduleId = fetchResult.id, callstack = [..._callstack, moduleId], request = async (dep, metadata) => {
+diff --git a/dist/client/client.mjs b/dist/client/client.mjs
+--- a/dist/client/client.mjs
++++ b/dist/client/client.mjs
+@@ -1070,14 +1070,21 @@
+ 				return new Promise((resolve) => {
+ 					const newLinkTag = el.cloneNode();
+ 					newLinkTag.href = new URL(browserUrl, el.href).href;
+-					const removeOldEl = () => {
++					newLinkTag.addEventListener("load", () => {
+ 						el.remove();
++						outdatedLinkTags.delete(newLinkTag);
+ 						console.debug(`[vite] css hot updated: ${searchUrl}`);
+ 						resolve();
+-					};
+-					newLinkTag.addEventListener("load", removeOldEl);
+-					newLinkTag.addEventListener("error", removeOldEl);
++					}, { once: true });
++					newLinkTag.addEventListener("error", () => {
++						// Keep the working stylesheet and make it eligible for the next update.
++						newLinkTag.remove();
++						outdatedLinkTags.delete(el);
++						console.error(`[vite] css hot update failed: ${newLinkTag.href}`);
++						resolve();
++					}, { once: true });
+ 					outdatedLinkTags.add(el);
++					outdatedLinkTags.add(newLinkTag);
+ 					el.after(newLinkTag);
+ 				});
+ 			}));

@@ -5,7 +5,7 @@
  * on every persisted row without splitting the error_logs fingerprint.
  */
 
-import { afterAll, beforeAll, describe, expect, it, mock } from "bun:test";
+import { afterAll, beforeAll, describe, expect, it, mock, spyOn } from "bun:test";
 import { hostname } from "node:os";
 
 import ledgerDefinition from "@/chart-of-accounts/ledger/[accountId]/definition";
@@ -227,6 +227,7 @@ describe("request id propagation", () => {
       configurable: true,
       value: true,
     });
+    const clock = spyOn(Date, "now").mockReturnValue(1_795_407_002_300);
     try {
       const { callApi } = await import("./call-api");
       const rows: LogRow[] = [];
@@ -259,11 +260,13 @@ describe("request id propagation", () => {
           errorCode: null,
           responseReceived: false,
           failurePhase: "fetch",
+          networkFailureKind: "early-failure",
           retryOfRequestId: ids[0],
           requestId: ids[1],
         }),
       );
     } finally {
+      clock.mockRestore();
       fetchFailures = 0;
       Object.defineProperty(
         globalThis,

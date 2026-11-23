@@ -279,17 +279,7 @@ function networkFailureContext(
   };
 }
 
-/**
- * Why a fetch threw before any response ("Failed to fetch" / "Load failed" /
- * "NetworkError"): the error text is the same for every cause.
- *  - page-hidden: the tab was hidden by the time it failed: the user navigated
- *    away or backgrounded the app, and the browser cancelled the request
- *  - offline: the browser reports no network
- *  - refused-instantly: failed within 100 ms: blocked by an extension or
- *    content blocker, or the connection was refused outright
- *  - connection-dropped: failed after waiting: reset/timeout between the
- *    browser and our edge (deploy restart, flaky mobile network)
- */
+/** Record what the browser observed before fetch returned a response. */
 function classifyNetworkFailure(
   durationMs: number,
   visibilityAtFailure: string | null,
@@ -302,9 +292,9 @@ function classifyNetworkFailure(
     return "offline";
   }
   if (durationMs < 100) {
-    return "refused-instantly";
+    return "early-failure";
   }
-  return "connection-dropped";
+  return "late-failure";
 }
 
 /** Size of a request body without reading files (multipart = sum of parts). */

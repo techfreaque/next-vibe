@@ -81,6 +81,12 @@ const modelSchema = z.object({
 });
 type OpenRouterModel = z.infer<typeof modelSchema>;
 
+const modelsSchema = z.object({
+  // Variable-priced aliases can carry negative sentinel prices. Skip invalid
+  // entries while decoding only the fields we use.
+  data: z.array(modelSchema.nullable().catch(null)),
+});
+
 const endpointsSchema = z.object({
   data: z.object({
     endpoints: z.array(
@@ -157,14 +163,8 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
           failedApiProviders: [ApiProvider.OPENROUTER],
         };
       }
-      // Variable-priced aliases can carry negative sentinel prices.
-      const data = z
-        .object({ data: z.array(z.json()) })
-        .parse(await response.json());
-      rawModels = data.data.flatMap((item) => {
-        const parsed = modelSchema.safeParse(item);
-        return parsed.success ? [parsed.data] : [];
-      });
+      const data = modelsSchema.parse(await response.json());
+      rawModels = data.data.filter((model) => model !== null);
       logger.debug("OpenRouter token API fetched", { count: rawModels.length });
     } catch (err) {
       return {
