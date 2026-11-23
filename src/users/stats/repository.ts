@@ -96,7 +96,7 @@ function cohortQuery(data: UserStatsRequestOutput): SQL {
       channel: sql<string | null>`${enriched.channel}`.as("channel"),
       refCode: sql<
         string | null
-      >`coalesce(${enriched.referralCode}, ${enriched.firstRefCode})`.as(
+      >`lower(coalesce(${enriched.referralCode}, ${enriched.firstRefCode}))`.as(
         "ref_code",
       ),
       locale: sql<string>`${enriched.locale}`.as("locale"),
@@ -343,7 +343,7 @@ export class UsersStatsRepository {
         db.execute<
           QueryResultRow & { key: string; signups: NumLike; paid: NumLike }
         >(sql`${cohort}
-          SELECT c.locale AS key, count(*) AS signups,
+          SELECT lower(c.locale) AS key, count(*) AS signups,
             count(*) FILTER (WHERE c.payments > 0) AS paid
           FROM cohort c WHERE ${cur("c.created_at")}
           GROUP BY 1 ORDER BY 2 DESC, 1 LIMIT ${BREAKDOWN_LIMIT}`),

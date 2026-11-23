@@ -69,6 +69,7 @@ export function HistoryPageClient({
               targetUserId: undefined,
               targetLeadId: undefined,
               target: undefined,
+              packId: undefined,
               typeFilter: undefined,
               from: undefined,
               to: undefined,

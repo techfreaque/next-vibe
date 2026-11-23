@@ -21,8 +21,9 @@ export const translations: typeof enTranslations = {
   fleet: {
     title: "Stan połączeń",
     subtitle:
-      "Każda instancja połączona z tym serwerem, wszyscy właściciele. Odczyt z zapisanego stanu. Bez pingowania.",
+      "Wszystkie połączenia tego serwera. Stan wynika z ostatniej zarejestrowanej aktywności.",
     kpi: {
+      attention: "Wymaga uwagi",
       total: "Połączenia",
       healthy: "Sprawne",
       unhealthy: "Z problemem",
@@ -45,7 +46,7 @@ export const translations: typeof enTranslations = {
       disconnectedAt: "Rozłączenie zapisane {{at}}",
       noToken: "Brak tokenu, wywołania nie przejdą uwierzytelnienia",
       neverSynced: "Nigdy nie zsynchronizowano, połączono {{at}}",
-      staleSync: "Od ostatniej synchronizacji minęło zbyt dużo czasu",
+      staleSync: "Zaległa synchronizacja. Ostatnia {{at}}",
       transportDrift:
         "Ostatnie wywołanie przez {{used}}, ustawione {{configured}}",
       transportMismatch: "Strony nie zgadzają się co do transportu",
@@ -141,6 +142,12 @@ export const translations: typeof enTranslations = {
     },
     never: "Nigdy",
     audit: {
+      unknownPeer: "Połączenie niedostępne",
+      allEvents: "Wszystkie zdarzenia",
+      eventsShown: "({{first}}–{{last}} z {{total}})",
+      previous: "Nowsze zdarzenia",
+      next: "Starsze zdarzenia",
+      peer: "Dziennik połączenia {{peer}}",
       title: "Dziennik audytu",
       subtitle: "Rejestracje, rozłączenia i odmowy na tym serwerze.",
       events: "Zdarzenia audytu",
@@ -151,7 +158,7 @@ export const translations: typeof enTranslations = {
       count: "Zdarzenia",
       recent: "Najnowsze zdarzenia",
       empty: "Brak zdarzeń audytu w tym okresie.",
-      openRecent: "Otwórz",
+      openRecent: "Otwórz dziennik",
     },
     action: {
       registered: "Zarejestrowano",
@@ -180,6 +187,14 @@ export const translations: typeof enTranslations = {
       activeOnly: {
         label: "Tylko aktywne",
         description: "Zwróć tylko aktywne połączenia",
+      },
+      auditOffset: {
+        label: "Przesunięcie dziennika",
+        description: "Liczba zdarzeń do pominięcia.",
+      },
+      auditConnection: {
+        label: "ID połączenia w dzienniku",
+        description: "Ogranicz dziennik do jednego połączenia.",
       },
       fleetStatus: {
         label: "Stan",

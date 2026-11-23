@@ -46,6 +46,7 @@ export const {
   Value: CreditTransactionTypeValue,
 } = createEnumOptions(scopedTranslation, {
   FREE_GRANT: "enums.transactionType.freeGrant",
+  FREE_RESET: "enums.transactionType.freeReset",
   PURCHASE: "enums.transactionType.purchase",
   SUBSCRIPTION: "enums.transactionType.subscription",
   USAGE: "enums.transactionType.usage",
@@ -90,6 +91,7 @@ export const CreditTypeIdentifierDB = [
 
 export const CreditTransactionTypeDB = [
   CreditTransactionType.FREE_GRANT,
+  CreditTransactionType.FREE_RESET,
   CreditTransactionType.PURCHASE,
   CreditTransactionType.SUBSCRIPTION,
   CreditTransactionType.USAGE,

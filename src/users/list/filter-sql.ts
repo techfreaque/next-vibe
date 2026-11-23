@@ -80,6 +80,9 @@ export type UserFilterInput = Partial<
     | "plan"
     | "roles"
     | "accountState"
+    | "requiredState"
+    | "accountLocale"
+    | "attributedRefCode"
     | "payer"
     | "subscription"
     | "lastActive"
@@ -90,6 +93,7 @@ export type UserFilterInput = Partial<
     | "paidFrom"
     | "paidTo"
     | "spentMin"
+    | "hasSpentCredits"
     | "creditsMin"
     | "creditsMax"
     | "source"
@@ -456,6 +460,17 @@ export function buildUserFilterConditions(
     );
   }
 
+  if (data.attributedRefCode) {
+    conditions.push(
+      sql`lower(coalesce(${e.referralCode}, ${e.firstRefCode})) = ${data.attributedRefCode.toLowerCase()}`,
+    );
+  }
+  if (data.accountLocale) {
+    conditions.push(
+      sql`lower(${e.locale}) = ${data.accountLocale.toLowerCase()}`,
+    );
+  }
+
   if (data.plan) {
     conditions.push(
       exists(
@@ -491,32 +506,22 @@ export function buildUserFilterConditions(
     );
   }
 
-  // Account state: ANY selected
-  const stateConditions: SQL[] = [];
-  for (const state of data.accountState ?? []) {
-    switch (state) {
-      case AccountStateFilter.ACTIVE:
-        stateConditions.push(
-          sql`(${e.isActive} = true and ${e.isBanned} = false)`,
-        );
-        break;
-      case AccountStateFilter.INACTIVE:
-        stateConditions.push(sql`${e.isActive} = false`);
-        break;
-      case AccountStateFilter.BANNED:
-        stateConditions.push(sql`${e.isBanned} = true`);
-        break;
-      case AccountStateFilter.VERIFIED:
-        stateConditions.push(sql`${e.emailVerified} = true`);
-        break;
-      case AccountStateFilter.UNVERIFIED:
-        stateConditions.push(sql`${e.emailVerified} = false`);
-        break;
-    }
-  }
-  const stateCondition = or(...stateConditions);
+  // Match any selected state and the additional state from a report drill.
+  const statePredicates = {
+    [AccountStateFilter.ACTIVE]: sql`(${e.isActive} = true and ${e.isBanned} = false)`,
+    [AccountStateFilter.INACTIVE]: sql`${e.isActive} = false`,
+    [AccountStateFilter.BANNED]: sql`${e.isBanned} = true`,
+    [AccountStateFilter.VERIFIED]: sql`${e.emailVerified} = true`,
+    [AccountStateFilter.UNVERIFIED]: sql`${e.emailVerified} = false`,
+  };
+  const stateCondition = or(
+    ...(data.accountState ?? []).map((state) => statePredicates[state]),
+  );
   if (stateCondition) {
     conditions.push(stateCondition);
+  }
+  if (data.requiredState) {
+    conditions.push(statePredicates[data.requiredState]);
   }
 
   // Paid vs free
@@ -581,6 +586,10 @@ export function buildUserFilterConditions(
   }
 
   // Signup window (both days inclusive)
+  if (data.hasSpentCredits) {
+    conditions.push(usageInWindowSql(e.id, undefined, undefined));
+  }
+
   if (data.signupFrom) {
     conditions.push(
       sql`${e.createdAt} >= ${utcSql(dayStart(data.signupFrom))}`,

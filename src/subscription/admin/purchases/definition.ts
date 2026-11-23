@@ -281,6 +281,8 @@ const { GET } = createEndpoint({
             schema: z.object({
               credits: z.number(),
               remaining: z.number(),
+              expiringPacks: z.number().optional(),
+              expiringCredits: z.number().optional(),
               paid: z.array(
                 z.object({
                   currency: z.enum(CurrenciesArr),

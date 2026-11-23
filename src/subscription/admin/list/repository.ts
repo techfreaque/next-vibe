@@ -81,20 +81,33 @@ const providerMap = {
   [ProviderAdminFilter.NOWPAYMENTS]: PaymentProvider.NOWPAYMENTS,
 };
 
-// Latest successful charge for a subscription (falls back to the customer's
-// latest subscription charge when the row has no provider link).
+const exactSubscription = sql<boolean>`coalesce(
+  ${paymentTransactions.metadata}->>'subscriptionId' = ${subscriptions.providerSubscriptionId},
+  false
+)`;
+
+// Older checkout rows omit the provider subscription reference. Require the
+// same plan and period before suggesting an inferred match for those rows.
 const lastPaymentSql = sql<{
   amount: string | number;
   currency: string;
   at: string;
+  estimated: boolean;
 } | null>`(
-            select json_build_object('amount', ${paymentTransactions.amount}, 'currency', ${paymentTransactions.currency}, 'at', ${paymentTransactions.createdAt})
+            select json_build_object('amount', ${paymentTransactions.amount}, 'currency', ${paymentTransactions.currency}, 'at', ${paymentTransactions.createdAt}, 'estimated', not ${exactSubscription})
             from ${paymentTransactions}
             where ${paymentTransactions.userId} = ${subscriptions.userId}
+              and ${paymentTransactions.provider} = ${subscriptions.provider}
               and ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED}
               and ${paymentTransactions.mode} = ${CheckoutMode.SUBSCRIPTION}
-            order by coalesce(${paymentTransactions.metadata}->>'subscriptionId' = ${subscriptions.providerSubscriptionId}, false) desc,
-              ${paymentTransactions.createdAt} desc
+              and (${exactSubscription} or (
+                ${paymentTransactions.metadata}->>'subscriptionId' is null
+                and regexp_replace(${paymentTransactions.metadata}->>'planId', '^app[.]api[.]subscription[.]', '') =
+                    regexp_replace(${subscriptions.planId}, '^app[.]api[.]subscription[.]', '')
+                and regexp_replace(${paymentTransactions.metadata}->>'billingInterval', '^app[.]api[.]subscription[.]', '') = ${subscriptions.billingInterval}
+                and abs(extract(epoch from (${paymentTransactions.createdAt} - (${subscriptions.currentPeriodStart} at time zone 'UTC')))) < 86400
+              ))
+            order by ${paymentTransactions.createdAt} desc, ${exactSubscription} desc, ${paymentTransactions.id} desc
             limit 1
           )`;
 
@@ -252,7 +265,7 @@ export class SubscriptionAdminListRepository {
           })
           .from(subscriptions)
           .leftJoin(users, eq(subscriptions.userId, users.id))
-          .where(and(baseClause, statusCondition ?? undefined))
+          .where(and(baseClause, statusCondition ?? undefined, focusCondition))
           .groupBy(SubscriptionAdminListRepository.planId)
           .orderBy(desc(count())),
       ]);
@@ -272,7 +285,7 @@ export class SubscriptionAdminListRepository {
         })
         .from(subscriptions)
         .leftJoin(users, eq(subscriptions.userId, users.id))
-        .where(baseClause);
+        .where(and(baseClause, planCondition));
       const now = Date.now();
       const mrrByCurrency = new Map<(typeof CurrenciesArr)[number], number>();
       let renewingSoon = 0;
@@ -385,7 +398,14 @@ export class SubscriptionAdminListRepository {
         .from(subscriptions)
         .leftJoin(users, eq(subscriptions.userId, users.id))
         .where(whereClause)
-        .orderBy(orderFn(orderColumn), desc(subscriptions.id))
+        .orderBy(
+          searchFilters?.focus === SubscriptionFocus.ENDING
+            ? sql`coalesce(${subscriptions.cancelAt}, ${subscriptions.currentPeriodEnd}) asc nulls last`
+            : searchFilters?.focus === SubscriptionFocus.RENEWING_SOON
+              ? asc(subscriptions.currentPeriodEnd)
+              : orderFn(orderColumn),
+          desc(subscriptions.id),
+        )
         .limit(limit)
         .offset(offset);
 
@@ -419,6 +439,7 @@ export class SubscriptionAdminListRepository {
             lastPaymentAt: row.lastPayment
               ? new Date(row.lastPayment.at)
               : null,
+            lastPaymentEstimated: row.lastPayment?.estimated ?? false,
           })),
           summary: {
             mrrUsd,

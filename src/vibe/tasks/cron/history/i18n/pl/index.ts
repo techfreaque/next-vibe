@@ -12,6 +12,13 @@ export const translations: typeof enTranslations = {
       "Nie udało się wczytać historii zadań (limit {{limit}}): {{error}}",
   },
 
+  enums: {
+    taskScope: {
+      enabled: "Tylko włączone zadania",
+      all: "Wszystkie zadania, w tym ukryte i wyłączone",
+    },
+  },
+
   get: {
     tags: {
       tasks: "Zadania",
@@ -21,6 +28,10 @@ export const translations: typeof enTranslations = {
     titleShort: "Historia zadań",
     description: "Wyświetl historyczne rekordy wykonań zadań cron",
     fields: {
+      taskScope: {
+        label: "Zakres zadań",
+        description: "Użyj zakresu raportu stanu zadań.",
+      },
       taskId: {
         label: "ID zadania",
         description: "Filtruj według konkretnego ID zadania",
@@ -180,6 +191,7 @@ export const translations: typeof enTranslations = {
       placeholder: "Szukaj zadań...",
     },
     filter: {
+      clearTaskScope: "Wyczyść zakres zadań",
       clear: "Wyczyść filtry",
       allTasks: "Wszystkie zadania",
       allPriorities: "Wszystkie priorytety",

@@ -21,8 +21,9 @@ export const translations: typeof enTranslations = {
   fleet: {
     title: "Stato delle connessioni",
     subtitle:
-      "Ogni istanza collegata a questo server, tutti i proprietari. Letto dallo stato salvato. Nessun ping.",
+      "Tutte le connessioni di questo server. Lo stato riflette l’ultima attività registrata.",
     kpi: {
+      attention: "Da verificare",
       total: "Connessioni",
       healthy: "Sane",
       unhealthy: "Con problemi",
@@ -45,7 +46,7 @@ export const translations: typeof enTranslations = {
       disconnectedAt: "Disconnessione registrata {{at}}",
       noToken: "Nessun token, le chiamate non si autenticano",
       neverSynced: "Mai sincronizzata, collegata {{at}}",
-      staleSync: "È passato troppo tempo dall’ultima sincronizzazione",
+      staleSync: "Sincronizzazione in ritardo. Ultima sincronizzazione {{at}}",
       transportDrift:
         "Ultima chiamata via {{used}}, configurato {{configured}}",
       transportMismatch: "I due lati non concordano sul trasporto",
@@ -141,6 +142,12 @@ export const translations: typeof enTranslations = {
     },
     never: "Mai",
     audit: {
+      unknownPeer: "Connessione non disponibile",
+      allEvents: "Tutti gli eventi",
+      eventsShown: "({{first}}–{{last}} di {{total}})",
+      previous: "Eventi più recenti",
+      next: "Eventi meno recenti",
+      peer: "Registro di {{peer}}",
       title: "Registro di audit",
       subtitle: "Registrazioni, disconnessioni e rifiuti su questo server.",
       events: "Eventi di audit",
@@ -151,7 +158,7 @@ export const translations: typeof enTranslations = {
       count: "Eventi",
       recent: "Ultimi eventi",
       empty: "Nessun evento di audit in questo periodo.",
-      openRecent: "Apri",
+      openRecent: "Apri registro",
     },
     action: {
       registered: "Registrata",
@@ -180,6 +187,14 @@ export const translations: typeof enTranslations = {
       activeOnly: {
         label: "Solo attivo",
         description: "Solo restituire connessioni attive",
+      },
+      auditOffset: {
+        label: "Offset del registro",
+        description: "Numero di eventi da saltare.",
+      },
+      auditConnection: {
+        label: "ID connessione per il registro",
+        description: "Filtra il registro per una sola connessione.",
       },
       fleetStatus: {
         label: "Stato",

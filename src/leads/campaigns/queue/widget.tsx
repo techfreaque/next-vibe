@@ -136,6 +136,11 @@ export function CampaignQueueWidget({ field }: CustomWidgetProps): JSX.Element {
           )
         }
       />
+      {items[0]?.matchedAt && (
+        <Span className="text-sm text-muted-foreground">
+          {t("widget.matchedEvents")}
+        </Span>
+      )}
       {interactive && (
         <Div className="flex min-w-0 flex-wrap items-center gap-2">
           <Select
@@ -238,17 +243,19 @@ export function CampaignQueueWidget({ field }: CustomWidgetProps): JSX.Element {
             const recipient =
               item.leadEmail || item.businessName || item.leadId;
             const schedule =
-              item.daysOverdue !== null && item.daysOverdue > 0
-                ? t("widget.overdueDays", { days: item.daysOverdue })
-                : item.nextScheduledAt
-                  ? t("widget.scheduledFor", {
-                      date: formatDate(
-                        new Date(item.nextScheduledAt),
-                        locale,
-                        "PPp",
-                      ),
-                    })
-                  : t("widget.noScheduledEmail");
+              item.matchedAt && delivery
+                ? `${t(delivery)} · ${formatDate(new Date(item.matchedAt), locale, "PPp")}`
+                : item.daysOverdue !== null && item.daysOverdue > 0
+                  ? t("widget.overdueDays", { days: item.daysOverdue })
+                  : item.nextScheduledAt
+                    ? t("widget.scheduledFor", {
+                        date: formatDate(
+                          new Date(item.nextScheduledAt),
+                          locale,
+                          "PPp",
+                        ),
+                      })
+                    : t("widget.noScheduledEmail");
             return (
               <ListItem
                 key={item.leadId}
@@ -265,21 +272,23 @@ export function CampaignQueueWidget({ field }: CustomWidgetProps): JSX.Element {
                     {item.businessName && item.businessName !== recipient && (
                       <Span className="break-words">{item.businessName}</Span>
                     )}
-                    {item.nextSubject && (
-                      <Span className="break-words">{item.nextSubject}</Span>
+                    {(item.matchedSubject ?? item.nextSubject) && (
+                      <Span className="break-words">
+                        {item.matchedSubject ?? item.nextSubject}
+                      </Span>
                     )}
                     <Span className="break-words">
                       {[
                         item.currentStage ? leadsT(item.currentStage) : "",
                         item.journeyVariant ? leadsT(item.journeyVariant) : "",
-                        item.emailsSent > 0
+                        !item.matchedAt && item.emailsSent > 0
                           ? t("widget.deliveryStats", {
                               sent: item.emailsSent,
                               opened: item.emailsOpened,
                               clicked: item.emailsClicked,
                             })
                           : "",
-                        item.startedAt
+                        !item.matchedAt && item.startedAt
                           ? t("widget.startedOn", {
                               date: formatDate(item.startedAt, locale, "PP"),
                             })

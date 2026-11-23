@@ -201,6 +201,7 @@ interface LedgerFilter {
   type?: typeof CreditTransactionTypeValue;
   from?: string;
   to?: string;
+  packId?: string;
 }
 
 interface GetOrCreateLeadByIpResult {
@@ -324,15 +325,6 @@ export class CreditRepository {
         .where(eq(creditWallets.userId, userId))
         .limit(1);
 
-      if (!userWallet) {
-        return success({
-          userWallet: null,
-          leadWallets: [],
-          poolId: userId,
-          poolType: "USER_POOL",
-        });
-      }
-
       const linkedLeadIds = await CreditRepository.findUserPoolLeadIds(userId);
 
       const leadWallets =
@@ -344,7 +336,7 @@ export class CreditRepository {
           : [];
 
       return success({
-        userWallet,
+        userWallet: userWallet ?? null,
         leadWallets,
         poolId: userId,
         poolType: "USER_POOL",
@@ -3481,8 +3473,12 @@ export class CreditRepository {
       const pool = readOnly
         ? poolResult.data
         : await CreditRepository.refetchPoolWallets(poolResult.data);
-      if (!pool.userWallet) {
-        return success({ transactions: [], totalCount: 0 });
+      if (!pool.userWallet && (!readOnly || pool.leadWallets.length === 0)) {
+        return success({
+          transactions: [],
+          totalCount: 0,
+          totals: { spent: 0, granted: 0 },
+        });
       }
 
       // This device = its lead wallet + the account's paid wallet.
@@ -3490,12 +3486,13 @@ export class CreditRepository {
       const currentLeadWallet = leadId
         ? pool.leadWallets.find((w) => w.leadId === leadId)
         : undefined;
+      const accountWallets = pool.userWallet ? [pool.userWallet.id] : [];
       const ownWalletIds = leadId
         ? [
-            pool.userWallet.id,
+            ...accountWallets,
             ...(currentLeadWallet ? [currentLeadWallet.id] : []),
           ]
-        : [pool.userWallet.id, ...pool.leadWallets.map((w) => w.id)];
+        : [...accountWallets, ...pool.leadWallets.map((w) => w.id)];
 
       return success(
         await CreditRepository.buildPoolHistory({
@@ -3507,7 +3504,7 @@ export class CreditRepository {
                 .map((w) => w.leadId)
                 .filter((id): id is string => id !== null),
           othersLabel: t("historyLabels.otherDevices"),
-          summaryBalance: pool.userWallet.balance,
+          summaryBalance: pool.userWallet?.balance ?? 0,
           cap,
           limit,
           offset,
@@ -3805,7 +3802,9 @@ export class CreditRepository {
       null,
     );
 
-    const isFiltered = Boolean(filter?.type || filter?.from || filter?.to);
+    const isFiltered = Boolean(
+      filter?.type || filter?.from || filter?.to || filter?.packId,
+    );
     const syntheticCount = isFiltered
       ? 0
       : (otherSpending > 0 ? 1 : 0) + (overCap > 0 ? 1 : 0);
@@ -3824,6 +3823,7 @@ export class CreditRepository {
           : undefined,
       ),
       filter?.type ? eq(creditTransactions.type, filter.type) : undefined,
+      filter?.packId ? eq(creditTransactions.packId, filter.packId) : undefined,
       filter?.from
         ? sql`${creditTransactions.createdAt} >= ${filter.from}::date`
         : undefined,
@@ -3871,7 +3871,9 @@ export class CreditRepository {
       ({ transaction, packSource, paymentId }) => {
         const isBonusGrant =
           transaction.type === CreditTransactionType.PURCHASE &&
-          (packSource === "bonus" || "bonusGrant" in transaction.metadata);
+          (packSource === "bonus" ||
+            packSource === "admin_grant" ||
+            "bonusGrant" in transaction.metadata);
         const grantLabel = isBonusGrant
           ? t("history.get.bonusGrant")
           : transaction.type === CreditTransactionType.FREE_GRANT
@@ -4183,7 +4185,12 @@ export class CreditRepository {
     // otherwise undefined means show all leads in the user's pool
     const effectiveLeadId = isAdmin ? data.targetLeadId : user.leadId;
     const ledgerFilter: LedgerFilter | undefined = isAdmin
-      ? { type: data.typeFilter, from: data.from, to: data.to }
+      ? {
+          type: data.typeFilter,
+          from: data.from,
+          to: data.to,
+          packId: data.packId,
+        }
       : undefined;
     const effectiveUserId =
       (isAdmin ? data.targetUserId : user.id) || undefined;

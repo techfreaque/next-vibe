@@ -119,7 +119,8 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
-    unmatched: "Paquetes pagados sin pago asociado: {{count}}",
+    expiringCredits: "{{credits}} créditos próximos a caducar",
+    unmatched: "Paquetes de compra o suscripción sin pago vinculado: {{count}}",
     kind: "Tipo",
     search: "Buscar",
     openPayment: "Abrir pago",
@@ -136,7 +137,7 @@ export const translations: typeof enTranslations = {
     creditsTotal: "Créditos emitidos",
     creditsTotalHint: "Suma de los paquetes",
     remainingTotal: "Créditos restantes",
-    remainingTotalHint: "Aún sin gastar",
+    remainingTotalHint: "Créditos sin usar de paquetes vigentes",
     paidTotal: "Pagado por estos paquetes",
     paidTotalHint:
       "Solo pagos vinculados. No incluye concesiones gratis ni paquetes sin pago asociado.",
@@ -171,6 +172,7 @@ export const translations: typeof enTranslations = {
   },
   enums: {
     remaining: {
+      expiringSoon: "Caduca en 7 días",
       left: "Quedan créditos",
       usedUp: "Agotados",
     },

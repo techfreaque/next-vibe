@@ -57,6 +57,8 @@ import {
   useWidgetTranslation,
   useWidgetValue,
 } from "next-vibe/unified-ui/_shared/use-widget-context";
+import { serializeNavigationData } from "next-vibe/unified-ui/hooks/use-url-nav-stack";
+import { BooleanFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/boolean-field/widget";
 import { DateFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/date-field/widget";
 import { MultiSelectFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/multiselect-field/widget";
 import { NumberFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/number-field/widget";
@@ -133,7 +135,7 @@ function middleTruncate(value: string, width: number): string {
 function isFreeBurner(user: UserListRow): boolean {
   return (
     !user.roles.includes(ADMIN_ROLE) &&
-    user.totalPaidUsd === 0 &&
+    user.paymentsCount === 0 &&
     user.creditsSpent >= FREE_BURN_MIN_CREDITS
   );
 }
@@ -340,9 +342,11 @@ function UserCell({
             />
           )}
         </Div>
-        <Span className="block text-xs text-muted-foreground break-all @3xl:truncate @3xl:max-w-[320px]">
-          {user.email}
-        </Span>
+        {displayName(user) !== user.email && (
+          <Span className="block break-all text-xs text-muted-foreground @3xl:max-w-[320px] @3xl:truncate">
+            {user.email}
+          </Span>
+        )}
       </Div>
     </Div>
   );
@@ -365,7 +369,7 @@ function QuickChip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "h-7 px-2.5 rounded-full text-xs font-medium border transition-colors",
+        "min-h-8 rounded-full border px-2.5 text-xs font-medium transition-colors",
         active
           ? "bg-primary text-primary-foreground border-primary hover:bg-primary/90"
           : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground",
@@ -513,9 +517,25 @@ export function UsersListContainer({
 
   const togglePayer = useCallback(
     (value: PayerValue): void => {
-      form.setValue("payer", payer === value ? undefined : value, {
-        shouldDirty: true,
-      });
+      const wasFreeBurn =
+        payer === PayerFilter.FREE &&
+        form.getValues("spentMin") === FREE_BURN_MIN_CREDITS;
+      form.setValue(
+        "payer",
+        payer === value && !wasFreeBurn ? undefined : value,
+        {
+          shouldDirty: true,
+        },
+      );
+      if (wasFreeBurn) {
+        form.setValue("spentMin", undefined, { shouldDirty: true });
+      }
+      if (payer !== value && value === PayerFilter.PAID) {
+        form.setValue("sortBy", UserListSortField.TOTAL_PAID, {
+          shouldDirty: true,
+        });
+        form.setValue("sortOrder", ListSortOrder.DESC, { shouldDirty: true });
+      }
       resetPageAndSubmit();
     },
     [form, payer, resetPageAndSubmit],
@@ -526,6 +546,12 @@ export function UsersListContainer({
       form.setValue("lastActive", lastActive === value ? undefined : value, {
         shouldDirty: true,
       });
+      if (lastActive !== value) {
+        form.setValue("sortBy", UserListSortField.LAST_ACTIVE, {
+          shouldDirty: true,
+        });
+        form.setValue("sortOrder", ListSortOrder.DESC, { shouldDirty: true });
+      }
       resetPageAndSubmit();
     },
     [form, lastActive, resetPageAndSubmit],
@@ -535,6 +561,9 @@ export function UsersListContainer({
     form.setValue("search", "", { shouldDirty: true });
     form.setValue("roles", [], { shouldDirty: true });
     form.setValue("accountState", [], { shouldDirty: true });
+    form.setValue("requiredState", undefined, { shouldDirty: true });
+    form.setValue("accountLocale", "", { shouldDirty: true });
+    form.setValue("attributedRefCode", "", { shouldDirty: true });
     form.setValue("payer", undefined, { shouldDirty: true });
     form.setValue("subscription", undefined, { shouldDirty: true });
     form.setValue("lastActive", undefined, { shouldDirty: true });
@@ -552,6 +581,7 @@ export function UsersListContainer({
     form.setValue("activeFrom", undefined, { shouldDirty: true });
     form.setValue("activeTo", undefined, { shouldDirty: true });
     form.setValue("spentMin", undefined, { shouldDirty: true });
+    form.setValue("hasSpentCredits", undefined, { shouldDirty: true });
     form.setValue("paidFrom", undefined, { shouldDirty: true });
     form.setValue("paidTo", undefined, { shouldDirty: true });
     resetPageAndSubmit();
@@ -574,10 +604,18 @@ export function UsersListContainer({
     if (pathname.endsWith(`/tools/${USERS_LIST_ALIAS}`)) {
       // Browser Back reconstructs this entry from its URL.
       const params = new URLSearchParams(getCurrentSearch());
-      params.delete("search");
-      params.delete("page");
-      params.set("arg.search", form.getValues("search") ?? "");
-      params.set("arg.page", String(form.getValues("page") ?? 1));
+      const values = form.getValues();
+      for (const key of Object.keys(values)) {
+        params.delete(key);
+        params.delete(`arg.${key}`);
+        params.delete(`arg.${key}[]`);
+        params.delete(`arg.${key}:bool`);
+      }
+      for (const [key, value] of Object.entries(
+        serializeNavigationData(values),
+      )) {
+        params.set(`arg.${key}`, value);
+      }
       history.replaceState(`${pathname}?${params.toString()}`);
     }
     openRelated(() => import("../view/definition").then((m) => m.GET), {
@@ -643,10 +681,8 @@ export function UsersListContainer({
     form.setValue("spentMin", on ? undefined : FREE_BURN_MIN_CREDITS, {
       shouldDirty: true,
     });
-    form.setValue("audience", on ? undefined : UsersAudience.HUMANS, {
-      shouldDirty: true,
-    });
     if (!on) {
+      form.setValue("audience", UsersAudience.HUMANS, { shouldDirty: true });
       form.setValue("sortBy", UserListSortField.CREDITS_SPENT, {
         shouldDirty: true,
       });
@@ -802,6 +838,17 @@ export function UsersListContainer({
       }),
     });
   }
+  if (form.watch("hasSpentCredits")) {
+    const label = t("get.fields.hasSpentCredits");
+    chips.push({
+      key: "hasSpentCredits",
+      label,
+      value: "",
+      clear: clearAnd(() =>
+        form.setValue("hasSpentCredits", undefined, { shouldDirty: true }),
+      ),
+    });
+  }
   const spentMin = form.watch("spentMin");
   if (spentMin !== undefined) {
     chips.push({
@@ -833,6 +880,28 @@ export function UsersListContainer({
         form.setValue("accountState", [], { shouldDirty: true }),
       ),
     });
+  }
+  const requiredState = form.watch("requiredState");
+  if (requiredState) {
+    chips.push({
+      key: "requiredState",
+      label: t("get.fields.requiredState.label"),
+      value: t(requiredState),
+      clear: clearAnd(() =>
+        form.setValue("requiredState", undefined, { shouldDirty: true }),
+      ),
+    });
+  }
+  for (const key of ["accountLocale", "attributedRefCode"] as const) {
+    const value = form.watch(key);
+    if (value) {
+      chips.push({
+        key,
+        label: t(`get.fields.${key}.label`),
+        value,
+        clear: clearAnd(() => form.setValue(key, "", { shouldDirty: true })),
+      });
+    }
   }
   const source = form.watch("source");
   if (source) {
@@ -940,6 +1009,74 @@ export function UsersListContainer({
         />
       </Div>
 
+      {!isPickerMode && (
+        <Div className="flex flex-col gap-2">
+          <Div className="flex flex-wrap items-center gap-1.5">
+            <QuickChip
+              label={t("widget.quick.humans")}
+              active={audience === UsersAudience.HUMANS}
+              onClick={toggleHumans}
+            />
+            <QuickChip
+              label={t("widget.quick.free")}
+              active={
+                payer === PayerFilter.FREE && spentMin !== FREE_BURN_MIN_CREDITS
+              }
+              onClick={() => togglePayer(PayerFilter.FREE)}
+            />
+            <QuickChip
+              label={t("widget.quick.freeBurn", {
+                min: formatNumber(FREE_BURN_MIN_CREDITS, locale),
+                count: formatNumber(summary?.freeBurnCount ?? 0, locale),
+              })}
+              active={
+                payer === PayerFilter.FREE &&
+                Number(form.watch("spentMin")) === FREE_BURN_MIN_CREDITS
+              }
+              onClick={toggleFreeBurn}
+            />
+            <QuickChip
+              label={t("widget.quick.banned", {
+                count: formatNumber(summary?.bannedCount ?? 0, locale),
+              })}
+              active={
+                accountState.length === 1 &&
+                accountState[0] === AccountStateFilter.BANNED
+              }
+              onClick={toggleBanned}
+            />
+          </Div>
+          <Div className="flex flex-wrap items-center gap-2">
+            <Span className="mr-auto text-xs text-muted-foreground">
+              {t("get.fields.sortBy.label")} {t(sortBy)}{" "}
+              {sortOrder === ListSortOrder.ASC ? "↑" : "↓"}
+            </Span>
+            {hasActiveFilters && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs underline underline-offset-2"
+                onClick={handleClearFilters}
+              >
+                {t("widget.actions.clearFilters")}
+              </Button>
+            )}
+            <Button
+              type="button"
+              variant={showFilters ? "secondary" : "outline"}
+              size="sm"
+              className="h-7 gap-1 text-xs"
+              onClick={() => setShowFilters((v) => !v)}
+              aria-expanded={showFilters}
+            >
+              <Filter className="h-3.5 w-3.5" />
+              {t("widget.actions.moreFilters")}
+            </Button>
+          </Div>
+        </Div>
+      )}
+
       {/* KPI strip for the current filter */}
       {!isPickerMode && summary && (
         <KpiGrid columns={5}>
@@ -947,11 +1084,6 @@ export function UsersListContainer({
             label={t("widget.kpi.matching")}
             value={summary.totalCount}
             locale={locale}
-            hint={t("widget.kpi.matchingHint", {
-              count: formatNumber(summary.signupsThisWeek, locale),
-              last: formatNumber(summary.signupsByWeek.at(-1) ?? 0, locale),
-            })}
-            sparkline={summary.signupsByWeek}
             onClick={handleViewStats}
           />
           <KpiTile
@@ -971,7 +1103,6 @@ export function UsersListContainer({
             onClick={() => togglePayer(PayerFilter.PAID)}
           />
           <KpiTile
-            className="hidden @md:flex"
             label={t("widget.kpi.verified")}
             value={
               summary.totalCount > 0
@@ -1007,91 +1138,6 @@ export function UsersListContainer({
         </KpiGrid>
       )}
 
-      {/* Quick filters */}
-      {!isPickerMode && (
-        <Div className="flex items-center gap-1.5 flex-wrap">
-          <QuickChip
-            label={t("widget.quick.humans")}
-            active={audience === UsersAudience.HUMANS}
-            onClick={toggleHumans}
-          />
-          <Span className="mx-1 h-4 w-px bg-border" />
-          <QuickChip
-            label={t("widget.quick.paying", {
-              count: formatNumber(summary?.payingCount ?? 0, locale),
-            })}
-            active={payer === PayerFilter.PAID}
-            onClick={() => togglePayer(PayerFilter.PAID)}
-          />
-          <QuickChip
-            label={t("widget.quick.free")}
-            active={payer === PayerFilter.FREE}
-            onClick={() => togglePayer(PayerFilter.FREE)}
-          />
-          <Span className="mx-1 h-4 w-px bg-border" />
-          <QuickChip
-            label={t("widget.quick.activeWeek")}
-            active={lastActive === LastActiveFilter.WEEK}
-            onClick={() => toggleLastActive(LastActiveFilter.WEEK)}
-          />
-          <QuickChip
-            label={t("widget.quick.dormant")}
-            active={lastActive === LastActiveFilter.DORMANT}
-            onClick={() => toggleLastActive(LastActiveFilter.DORMANT)}
-          />
-          <QuickChip
-            label={t("widget.quick.freeBurn", {
-              min: formatNumber(FREE_BURN_MIN_CREDITS, locale),
-              count: formatNumber(summary?.freeBurnCount ?? 0, locale),
-            })}
-            active={
-              payer === PayerFilter.FREE &&
-              Number(form.watch("spentMin")) === FREE_BURN_MIN_CREDITS
-            }
-            onClick={toggleFreeBurn}
-          />
-          <QuickChip
-            label={t("widget.quick.banned", {
-              count: formatNumber(summary?.bannedCount ?? 0, locale),
-            })}
-            active={
-              accountState.length === 1 &&
-              accountState[0] === AccountStateFilter.BANNED
-            }
-            onClick={toggleBanned}
-          />
-          <QuickChip
-            label={t("widget.quick.never")}
-            active={lastActive === LastActiveFilter.NEVER}
-            onClick={() => toggleLastActive(LastActiveFilter.NEVER)}
-          />
-          <Div className="ml-auto flex items-center gap-1">
-            {hasActiveFilters && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-7 text-xs underline underline-offset-2"
-                onClick={handleClearFilters}
-              >
-                {t("widget.actions.clearFilters")}
-              </Button>
-            )}
-            <Button
-              type="button"
-              variant={showFilters ? "secondary" : "outline"}
-              size="sm"
-              className="h-7 gap-1 text-xs"
-              onClick={() => setShowFilters((v) => !v)}
-              aria-expanded={showFilters}
-            >
-              <Filter className="h-3.5 w-3.5" />
-              {t("widget.actions.moreFilters")}
-            </Button>
-          </Div>
-        </Div>
-      )}
-
       {/* Active filters (drill-downs from reports land here) */}
       {!isPickerMode && chips.length > 0 && (
         <Div className="flex flex-wrap items-center gap-1.5">
@@ -1111,12 +1157,28 @@ export function UsersListContainer({
       {!isPickerMode && showFilters && (
         <Div className="grid grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-4 gap-3 rounded-lg border p-3">
           <SelectFieldWidget fieldName="audience" field={children.audience} />
+          <BooleanFieldWidget
+            fieldName="hasSpentCredits"
+            field={children.hasSpentCredits}
+          />
           <TextFieldWidget fieldName="channel" field={children.channel} />
           <SelectFieldWidget
             fieldName="channelType"
             field={children.channelType}
           />
           <TextFieldWidget fieldName="refCode" field={children.refCode} />
+          <TextFieldWidget
+            fieldName="attributedRefCode"
+            field={children.attributedRefCode}
+          />
+          <TextFieldWidget
+            fieldName="accountLocale"
+            field={children.accountLocale}
+          />
+          <SelectFieldWidget
+            fieldName="requiredState"
+            field={children.requiredState}
+          />
           <SelectFieldWidget fieldName="plan" field={children.plan} />
           <MultiSelectFieldWidget fieldName="roles" field={children.roles} />
           <MultiSelectFieldWidget
@@ -1176,7 +1238,9 @@ export function UsersListContainer({
         </Div>
       )}
 
-      <FormAlertWidget field={children.formAlert} />
+      <Div className="min-w-0 break-all">
+        <FormAlertWidget field={children.formAlert} />
+      </Div>
 
       {/* Table */}
       {!data ? (
@@ -1294,66 +1358,74 @@ export function UsersListContainer({
                 >
                   <TableCell className="whitespace-normal">
                     <Div className="flex flex-col items-start gap-2">
-                      <UserCell user={user} t={t} locale={locale} />
+                      <Div className="flex w-full items-start justify-between gap-2">
+                        <UserCell user={user} t={t} locale={locale} />
+                        {!isPickerMode && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-10 w-10 shrink-0 p-0 @3xl:hidden"
+                            aria-label={t("widget.actions.openUser", {
+                              email: user.email,
+                            })}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleRowClick(user);
+                            }}
+                          >
+                            <ChevronRight className="h-5 w-5" />
+                          </Button>
+                        )}
+                      </Div>
                       {!isPickerMode && (
-                        <Span className="block text-xs text-muted-foreground @3xl:hidden">
-                          {[
-                            t("widget.compact.joined", {
-                              date: formatDay(user.createdAt, locale),
-                            }),
-                            user.lastActiveAt
-                              ? t("widget.compact.active", {
-                                  when: formatRelative(
-                                    user.lastActiveAt,
-                                    locale,
-                                  ),
-                                })
-                              : t("widget.compact.neverActive"),
-                            user.totalPaidUsd > 0
-                              ? t("widget.compact.paid", {
-                                  amount: formatUsd(user.totalPaidUsd, locale),
-                                })
-                              : t("widget.compact.free"),
-                            user.plan
-                              ? subscriptionPlanLabel(user.plan, locale)
-                              : "",
-                            t("widget.compact.spent", {
-                              count: formatNumber(user.creditsSpent, locale),
-                            }),
-                            t("widget.spent30d", {
-                              count: formatNumber(user.creditsSpent30d, locale),
-                            }),
-                            sourceText(user, t),
-                          ]
-                            .filter(Boolean)
-                            .join(" · ")}
-                        </Span>
+                        <Div className="flex w-full flex-col gap-1.5 text-xs @3xl:hidden">
+                          <Div className="grid grid-cols-2 gap-x-2 gap-y-1 text-muted-foreground">
+                            <Span>{t("widget.columns.joined")}</Span>
+                            <Span className="text-right">
+                              {formatDay(user.createdAt, locale)}
+                            </Span>
+                            <Span>{t("widget.columns.lastActive")}</Span>
+                            <Span className="text-right">
+                              {user.lastActiveAt
+                                ? formatRelative(user.lastActiveAt, locale)
+                                : t("widget.never")}
+                            </Span>
+                            <Span>{t("widget.columns.paid")}</Span>
+                            <Span className="text-right">
+                              {user.paymentsCount > 0
+                                ? formatUsd(user.totalPaidUsd, locale)
+                                : t("widget.compact.free")}
+                            </Span>
+                            <Span>{t("widget.columns.spent")}</Span>
+                            <Span className="text-right tabular-nums">
+                              {formatNumber(user.creditsSpent, locale)}
+                            </Span>
+                          </Div>
+                          {sourceText(user, t) && (
+                            <Span className="break-words text-muted-foreground">
+                              {sourceText(user, t)}
+                            </Span>
+                          )}
+                        </Div>
                       )}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className={cn(
-                          "h-auto min-h-9 whitespace-normal",
-                          !isPickerMode && "hidden",
-                        )}
-                        aria-label={t(
-                          isPickerMode
-                            ? "widget.actions.selectUser"
-                            : "widget.actions.openUser",
-                          { email: user.email },
-                        )}
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          handleRowClick(user);
-                        }}
-                      >
-                        {t(
-                          isPickerMode
-                            ? "widget.actions.select"
-                            : "widget.actions.open",
-                        )}
-                      </Button>
+                      {isPickerMode && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-auto min-h-9 whitespace-normal"
+                          aria-label={t("widget.actions.selectUser", {
+                            email: user.email,
+                          })}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleRowClick(user);
+                          }}
+                        >
+                          {t("widget.actions.select")}
+                        </Button>
+                      )}
                     </Div>
                   </TableCell>
                   {!isPickerMode && (

@@ -22,6 +22,7 @@ import {
 } from "next-vibe/ui/components/analytics";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { Filter } from "next-vibe/ui/components/icons/Filter";
 import { Users } from "next-vibe/ui/components/icons/Users";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
@@ -96,7 +97,7 @@ function localeLabel(key: string, locale: CountryLanguage): string {
       type: "language",
     });
     const name = lang ? names.of(lang) : undefined;
-    return name ? `${name} (${country ?? ""})` : key;
+    return name && country ? `${name} (${country.toUpperCase()})` : key;
   } catch {
     return key;
   }
@@ -110,12 +111,14 @@ export function UsersStatsContainer({
   const { t: lt } = listScopedTranslation.scopedT(useWidgetLocale());
   const locale = useWidgetLocale();
   const platform = useWidgetPlatform();
+  const isTextPlatform = isCliPlatform(platform) || platform === Platform.MCP;
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const value = useWidgetValue<typeof definition.GET>();
   const { endpointMutations } = useWidgetContext();
   const navigate = useRelatedEntityNavigation();
   const [showFilters, setShowFilters] = useState(false);
+  const [showAccountActivity, setShowAccountActivity] = useState(false);
 
   const submit = (): void => {
     onSubmit?.();
@@ -290,6 +293,26 @@ export function UsersStatsContainer({
     </AnalyticsToolbar>
   );
 
+  const filters = showFilters && (
+    <Div className="grid grid-cols-1 gap-3 rounded-lg border p-3 @sm:grid-cols-2 @3xl:grid-cols-4">
+      <SelectFieldWidget fieldName="audience" field={children.audience} />
+      <TextFieldWidget fieldName="channel" field={children.channel} />
+      <SelectFieldWidget fieldName="channelType" field={children.channelType} />
+      <TextFieldWidget fieldName="refCode" field={children.refCode} />
+      <SelectFieldWidget fieldName="payer" field={children.payer} />
+      <SelectFieldWidget fieldName="plan" field={children.plan} />
+      <MultiSelectFieldWidget
+        fieldName="accountState"
+        field={children.accountState}
+      />
+    </Div>
+  );
+  const formAlert = (
+    <Div className="min-w-0 [overflow-wrap:anywhere]">
+      <FormAlertWidget field={children.formAlert} />
+    </Div>
+  );
+
   if (!value) {
     return (
       <WidgetShell className="min-w-0">
@@ -298,9 +321,20 @@ export function UsersStatsContainer({
           backButton={<NavigateButtonWidget field={children.backButton} />}
         />
         {toolbar}
-        <FormAlertWidget field={children.formAlert} />
-        {endpointMutations?.read?.isLoading !== false && (
+        {filters}
+        {endpointMutations?.read?.isLoading !== false ? (
           <LoadingBlock message={t("widget.loading")} />
+        ) : (
+          <>
+            <EmptyBlock
+              title={t("errors.server.title")}
+              action={{
+                label: t("analytics.chart.refresh"),
+                onClick: () => endpointMutations?.read?.refetch?.(),
+              }}
+            />
+            {formAlert}
+          </>
         )}
       </WidgetShell>
     );
@@ -327,7 +361,7 @@ export function UsersStatsContainer({
     paidTo: dayDate(value.window.to),
   };
   const bucketDrill = (key: string): ListDrill => ({
-    signupFrom: dayDate(key),
+    signupFrom: dayDate(key < value.window.from ? value.window.from : key),
     signupTo: bucketLastDay(key, bucket, value.window.to),
   });
 
@@ -345,7 +379,7 @@ export function UsersStatsContainer({
     signups: { label: t("widget.funnel.signups"), drill: signupWindow },
     verified: {
       label: t("widget.funnel.verified"),
-      drill: { ...signupWindow, accountState: [AccountStateFilter.VERIFIED] },
+      drill: { ...signupWindow, requiredState: AccountStateFilter.VERIFIED },
     },
     paid: {
       label: t("widget.funnel.paid"),
@@ -353,14 +387,24 @@ export function UsersStatsContainer({
     },
     active: {
       label: t("widget.funnel.active"),
-      drill: { ...signupWindow, spentMin: 0.01 },
+      drill: { ...signupWindow, hasSpentCredits: true },
     },
   };
 
   const kpiTiles = (
     <Div className="flex flex-col gap-2">
-      <Span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        {t("widget.groups.signups")}
+      {isTextPlatform ? (
+        <Pre>{`${t("widget.groups.signups")} (${lt(audience)})`}</Pre>
+      ) : (
+        <Div className="flex flex-wrap items-baseline justify-between gap-x-2">
+          <Span className="text-sm font-semibold">
+            {t("widget.groups.signups")}
+          </Span>
+          <Span className="text-xs text-muted-foreground">{lt(audience)}</Span>
+        </Div>
+      )}
+      <Span className="text-xs text-muted-foreground">
+        {t("widget.cohortNote")}
       </Span>
       <KpiGrid columns={4}>
         <KpiTile
@@ -374,114 +418,125 @@ export function UsersStatsContainer({
         />
         <KpiTile
           label={t("widget.kpi.verifiedRate")}
-          value={kpis.verifiedRate.value}
-          previous={kpis.verifiedRate.previous}
+          value={kpis.signups.value > 0 ? kpis.verifiedRate.value : null}
+          previous={kpis.signups.previous ? kpis.verifiedRate.previous : null}
+          deltaTone="neutral"
           format="percent"
           locale={locale}
           hint={t("widget.kpi.ofSignups", {
             count: totals.verified,
             total: kpis.signups.value,
           })}
-          onClick={() =>
-            openList({
-              ...signupWindow,
-              accountState: [AccountStateFilter.VERIFIED],
-            })
+          onClick={
+            totals.verified > 0
+              ? (): void =>
+                  openList({
+                    ...signupWindow,
+                    requiredState: AccountStateFilter.VERIFIED,
+                  })
+              : undefined
           }
         />
         <KpiTile
           label={t("widget.kpi.activatedRate")}
-          value={kpis.activatedRate.value}
-          previous={kpis.activatedRate.previous}
+          value={kpis.signups.value > 0 ? kpis.activatedRate.value : null}
+          previous={kpis.signups.previous ? kpis.activatedRate.previous : null}
+          deltaTone="neutral"
           format="percent"
           locale={locale}
           hint={t("widget.kpi.ofSignups", {
             count: totals.activated,
             total: kpis.signups.value,
           })}
-          onClick={() => openList({ ...signupWindow, spentMin: 0.01 })}
+          onClick={() => openList({ ...signupWindow, hasSpentCredits: true })}
         />
         <KpiTile
           label={t("widget.kpi.paidConversion")}
-          value={kpis.paidConversion.value}
-          previous={kpis.paidConversion.previous}
+          value={kpis.signups.value > 0 ? kpis.paidConversion.value : null}
+          previous={kpis.signups.previous ? kpis.paidConversion.previous : null}
+          deltaTone="neutral"
           format="percent"
           locale={locale}
           hint={t("widget.kpi.ofSignups", {
             count: totals.converted,
             total: kpis.signups.value,
           })}
-          onClick={() => openList({ ...signupWindow, payer: PayerFilter.PAID })}
-        />
-      </KpiGrid>
-      <Span className="mt-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        {t("widget.groups.accounts")}
-      </Span>
-      <KpiGrid columns={4}>
-        <KpiTile
-          label={t("widget.kpi.activeUsers")}
-          value={kpis.activeUsers.value}
-          previous={kpis.activeUsers.previous}
-          locale={locale}
-          sparkline={activeSeries}
-          hint={t("widget.kpi.activeHint")}
-          onClick={() =>
-            openList({ ...activeWindow, sortBy: UserListSortField.LAST_ACTIVE })
-          }
-        />
-        <KpiTile
-          label={t("widget.kpi.payingUsers")}
-          value={kpis.payingUsers.value}
-          previous={kpis.payingUsers.previous}
-          locale={locale}
-          hint={t("widget.kpi.payingHint")}
-          onClick={() =>
-            openList({ ...paidWindow, sortBy: UserListSortField.TOTAL_PAID })
-          }
-        />
-        <KpiTile
-          label={t("widget.kpi.revenuePeriod")}
-          value={kpis.revenueUsd.value}
-          previous={kpis.revenueUsd.previous}
-          format="currency"
-          currency="USD"
-          locale={locale}
-          tone="positive"
-          hint={t("widget.kpi.revenueHint")}
-          onClick={() =>
-            openList({
-              ...paidWindow,
-              sortBy: UserListSortField.TOTAL_PAID,
-              sortOrder: ListSortOrder.DESC,
-            })
-          }
-        />
-        <KpiTile
-          label={t("widget.kpi.revenuePerPayer")}
-          value={
-            kpis.payingUsers.value > 0
-              ? kpis.revenueUsd.value / kpis.payingUsers.value
-              : null
-          }
-          previous={
-            kpis.payingUsers.previous && kpis.revenueUsd.previous !== null
-              ? kpis.revenueUsd.previous / kpis.payingUsers.previous
-              : null
-          }
-          format="currency"
-          currency="USD"
-          locale={locale}
-          hint={t("widget.kpi.revenuePerPayerHint")}
-          onClick={() =>
-            openList({
-              ...paidWindow,
-              sortBy: UserListSortField.TOTAL_PAID,
-              sortOrder: ListSortOrder.DESC,
-            })
+          onClick={
+            totals.converted > 0
+              ? (): void =>
+                  openList({ ...signupWindow, payer: PayerFilter.PAID })
+              : undefined
           }
         />
       </KpiGrid>
     </Div>
+  );
+
+  const activityTiles = (
+    <KpiGrid columns={4}>
+      <KpiTile
+        label={t("widget.kpi.activeUsers")}
+        value={kpis.activeUsers.value}
+        previous={kpis.activeUsers.previous}
+        locale={locale}
+        sparkline={activeSeries}
+        hint={t("widget.kpi.activeHint")}
+        onClick={() =>
+          openList({ ...activeWindow, sortBy: UserListSortField.LAST_ACTIVE })
+        }
+      />
+      <KpiTile
+        label={t("widget.kpi.payingUsers")}
+        value={kpis.payingUsers.value}
+        previous={kpis.payingUsers.previous}
+        locale={locale}
+        hint={t("widget.kpi.payingHint")}
+        onClick={() =>
+          openList({ ...paidWindow, sortBy: UserListSortField.TOTAL_PAID })
+        }
+      />
+      <KpiTile
+        label={t("widget.kpi.revenuePeriod")}
+        value={kpis.revenueUsd.value}
+        previous={kpis.revenueUsd.previous}
+        format="currency"
+        currency="USD"
+        locale={locale}
+        tone="positive"
+        hint={t("widget.kpi.revenueHint")}
+        onClick={() =>
+          openList({
+            ...paidWindow,
+            sortBy: UserListSortField.TOTAL_PAID,
+            sortOrder: ListSortOrder.DESC,
+          })
+        }
+      />
+      <KpiTile
+        label={t("widget.kpi.revenuePerPayer")}
+        value={
+          kpis.payingUsers.value > 0
+            ? kpis.revenueUsd.value / kpis.payingUsers.value
+            : null
+        }
+        previous={
+          kpis.payingUsers.previous && kpis.revenueUsd.previous !== null
+            ? kpis.revenueUsd.previous / kpis.payingUsers.previous
+            : null
+        }
+        format="currency"
+        currency="USD"
+        locale={locale}
+        hint={t("widget.kpi.revenuePerPayerHint")}
+        onClick={() =>
+          openList({
+            ...paidWindow,
+            sortBy: UserListSortField.TOTAL_PAID,
+            sortOrder: ListSortOrder.DESC,
+          })
+        }
+      />
+    </KpiGrid>
   );
 
   const abuseTiles = (
@@ -501,7 +556,7 @@ export function UsersStatsContainer({
           onClick={() =>
             openList({
               ...signupWindow,
-              accountState: [AccountStateFilter.BANNED],
+              requiredState: AccountStateFilter.BANNED,
             })
           }
         />
@@ -567,12 +622,6 @@ export function UsersStatsContainer({
         color: i === 0 ? 1 : "positive",
       }))}
       locale={locale}
-      onBucketClick={(key) =>
-        openList({
-          activeFrom: dayDate(key),
-          activeTo: bucketLastDay(key, bucket, value.window.to),
-        })
-      }
       emptyLabel={t("widget.empty")}
     />
   );
@@ -600,7 +649,10 @@ export function UsersStatsContainer({
           share:
             kpis.signups.value > 0 ? step.value / kpis.signups.value : null,
         },
-        onClick: () => openList(funnelMeta[step.key]?.drill ?? signupWindow),
+        onClick:
+          step.value > 0
+            ? (): void => openList(funnelMeta[step.key]?.drill ?? signupWindow)
+            : undefined,
       }))}
       locale={locale}
     />
@@ -609,8 +661,8 @@ export function UsersStatsContainer({
   const attributionColumns = [
     { key: "signups", label: t("widget.columns.signups") },
     { key: "verified", label: t("widget.columns.verified"), secondary: true },
-    { key: "active", label: t("widget.columns.active") },
-    { key: "paid", label: t("widget.columns.paid") },
+    { key: "active", label: t("widget.columns.active"), secondary: true },
+    { key: "paid", label: t("widget.columns.paid"), secondary: true },
     {
       key: "conversion",
       label: t("widget.columns.conversion"),
@@ -618,10 +670,9 @@ export function UsersStatsContainer({
     },
     {
       key: "revenueUsd",
-      label: t("widget.columns.revenue"),
+      label: t("widget.columns.revenueWindow"),
       format: "currency" as const,
       currency: "USD",
-      secondary: true,
     },
   ];
 
@@ -659,7 +710,10 @@ export function UsersStatsContainer({
                 label: row.key,
                 values: row.metrics,
                 onClick: () =>
-                  openList({ ...signupWindow, refCode: row.key ?? undefined }),
+                  openList({
+                    ...signupWindow,
+                    attributedRefCode: row.key ?? undefined,
+                  }),
               },
             ]
           : [],
@@ -695,18 +749,19 @@ export function UsersStatsContainer({
                 ? subscriptionPlanLabel(row.key, locale)
                 : "-",
         values: row.metrics,
-        onClick: () =>
-          openList({
-            ...paidWindow,
-            ...(row.key === "__packs"
-              ? { subscription: SubscriptionFilter.NEVER }
-              : row.key === "__lapsed"
-                ? { subscription: SubscriptionFilter.HAD_ANY }
-                : {
-                    subscription: SubscriptionFilter.HAS_ACTIVE,
-                    plan: planFilter(row.key),
-                  }),
-          }),
+        onClick:
+          row.key === "__lapsed"
+            ? undefined
+            : () =>
+                openList({
+                  ...paidWindow,
+                  ...(row.key === "__packs"
+                    ? { subscription: SubscriptionFilter.NEVER }
+                    : {
+                        subscription: SubscriptionFilter.HAS_ACTIVE,
+                        plan: planFilter(row.key),
+                      }),
+                }),
       }))}
       locale={locale}
       emptyLabel={t("widget.noSubscribers")}
@@ -732,6 +787,10 @@ export function UsersStatsContainer({
         id: row.key ?? "none",
         label: row.key ? localeLabel(row.key, locale) : "-",
         values: row.metrics,
+        onClick: row.key
+          ? () =>
+              openList({ ...signupWindow, accountLocale: row.key ?? undefined })
+          : undefined,
       }))}
       locale={locale}
       emptyLabel={t("widget.empty")}
@@ -792,18 +851,17 @@ export function UsersStatsContainer({
   );
 
   // CLI / MCP: data components only (they render tables / compact text).
-  if (isCliPlatform(platform) || platform === Platform.MCP) {
+  if (isTextPlatform) {
     return (
       <Div className="flex flex-col gap-4">
         {toolbar}
         {kpiTiles}
+        <Pre>{t("widget.groups.accounts")}</Pre>
+        {activityTiles}
         {abuseTiles}
-        <Pre>
-          {t("widget.cliHint", {
-            from: value.window.from,
-            to: value.window.to,
-          })}
-        </Pre>
+        {chips.every((chip) => chip.key === "audience") && (
+          <Pre>{`vibe users-list --audience=${audience} --signupFrom=${value.window.from} --signupTo=${value.window.to}`}</Pre>
+        )}
         {signupChart}
         {funnelChart}
         {channelTable}
@@ -833,35 +891,69 @@ export function UsersStatsContainer({
         }
       />
       {toolbar}
-      {showFilters && (
-        <Div className="grid grid-cols-1 gap-3 rounded-lg border p-3 @sm:grid-cols-2 @3xl:grid-cols-4">
-          <SelectFieldWidget fieldName="audience" field={children.audience} />
-          <TextFieldWidget fieldName="channel" field={children.channel} />
-          <SelectFieldWidget
-            fieldName="channelType"
-            field={children.channelType}
-          />
-          <TextFieldWidget fieldName="refCode" field={children.refCode} />
-          <SelectFieldWidget fieldName="payer" field={children.payer} />
-          <SelectFieldWidget fieldName="plan" field={children.plan} />
-          <MultiSelectFieldWidget
-            fieldName="accountState"
-            field={children.accountState}
-          />
-        </Div>
-      )}
-      <FormAlertWidget field={children.formAlert} />
+      {filters}
+      {formAlert}
       {kpiTiles}
-      {signupChart}
-      {channelTable}
-      {refTable}
-      {abuseTiles}
-      {burnerTable}
-      {activityChart}
-      <Div className="grid grid-cols-1 gap-4 @4xl:grid-cols-2">
-        {planTable}
-        {localeTable}
+      <Div className="flex flex-wrap items-start gap-2">
+        {kpis.signups.value > totals.verified && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="self-start"
+            onClick={() =>
+              openList({
+                ...signupWindow,
+                requiredState: AccountStateFilter.UNVERIFIED,
+              })
+            }
+          >
+            {t("widget.reviewUnverified", {
+              count: kpis.signups.value - totals.verified,
+            })}
+          </Button>
+        )}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-auto min-h-9 self-start whitespace-normal"
+          aria-expanded={showAccountActivity}
+          onClick={() => setShowAccountActivity((shown) => !shown)}
+        >
+          {t("widget.activityToggle")}
+        </Button>
       </Div>
+      {showAccountActivity && (
+        <>
+          {activityTiles}
+          {activityChart}
+          {planTable}
+          {abuseTiles}
+          {burnerTable}
+        </>
+      )}
+      {kpis.signups.value > 0 ? (
+        <>
+          {signupChart}
+          {channelTable}
+          {refTable}
+          {localeTable}
+        </>
+      ) : (
+        <EmptyBlock
+          icon={<Users className="h-8 w-8" />}
+          title={t("widget.empty")}
+          action={
+            chips.length > 0
+              ? {
+                  label: t("analytics.chart.clearFilters"),
+                  onClick: clearFilters,
+                }
+              : undefined
+          }
+        />
+      )}
       <Span className="text-xs text-muted-foreground">
         {t("widget.definitions")}
       </Span>

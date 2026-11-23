@@ -52,7 +52,7 @@ export const translations: typeof enTranslations = {
       "Aucun résultat pour ces filtres. Retirez-en un pour élargir.",
     emptyAll: "Aucun paiement enregistré pour l'instant.",
     clearFilters: "Effacer les filtres",
-    transactionSearch: "E-mail, ID de transaction ou réf. de facture",
+    transactionSearch: "E-mail ou référence de paiement",
     webhookSearch:
       "Recherchez par type d’événement ou référence du prestataire.",
     processingDetail:
@@ -89,6 +89,7 @@ export const translations: typeof enTranslations = {
       setup: "Enregistrement de carte, sans paiement",
     },
     kind: {
+      subscription: "Tous les paiements d’abonnement",
       pack: "Pack de crédits",
       newSubscription: "Nouvel abonnement",
       renewal: "Renouvellement",

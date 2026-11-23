@@ -37,8 +37,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { creditPacks, creditWallets } from "@/credits/db";
 import { CreditPackType } from "@/credits/enum";
 import { paymentTransactions } from "@/payment/db";
-import { CheckoutMode, PaymentStatus } from "@/payment/enum";
-import { subscriptions } from "@/subscription/db";
+import { PaymentStatus } from "@/payment/enum";
 import { SubscriptionPlanDB } from "@/subscription/enum";
 
 import {
@@ -56,34 +55,22 @@ import { scopedTranslation } from "./i18n";
 
 type PurchasesResponse = NonNullable<PurchasesGetResponseOutput["response"]>;
 
-/**
- * Payment that bought a pack: matched by the pack's idempotency key, else the
- * same account's subscription charge within a day of a subscription pack.
- */
+/** Payment identified by the account and the pack's recorded reference. */
 const paymentSql = sql<{
   id: string;
   amount: string | number;
   currency: string;
-} | null>`coalesce(
-  (
-    select json_build_object('id', ${paymentTransactions.id}, 'amount', ${paymentTransactions.amount}, 'currency', ${paymentTransactions.currency})
+  planId: string | null;
+} | null>`(
+    select json_build_object('id', ${paymentTransactions.id}, 'amount', ${paymentTransactions.amount}, 'currency', ${paymentTransactions.currency},
+      'planId', regexp_replace(${paymentTransactions.metadata}->>'planId', '^app[.]api[.]subscription[.]', ''))
     from ${paymentTransactions}
-    where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED}
+    where ${paymentTransactions.userId} = ${creditWallets.userId}
+      and ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED}
       and (${paymentTransactions.providerSessionId} = ${creditPacks.metadata}->>'sessionId'
         or ${paymentTransactions.providerInvoiceId} = ${creditPacks.metadata}->>'sessionId')
+    order by ${paymentTransactions.createdAt} desc, ${paymentTransactions.id} desc
     limit 1
-  ),
-  (
-    select json_build_object('id', ${paymentTransactions.id}, 'amount', ${paymentTransactions.amount}, 'currency', ${paymentTransactions.currency})
-    from ${paymentTransactions}
-    where ${creditPacks.type} = ${CreditPackType.SUBSCRIPTION}
-      and ${paymentTransactions.userId} = ${creditWallets.userId}
-      and ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED}
-      and ${paymentTransactions.mode} = ${CheckoutMode.SUBSCRIPTION}
-      and abs(extract(epoch from (${paymentTransactions.createdAt} - ${creditPacks.createdAt}))) < 86400
-    order by abs(extract(epoch from (${paymentTransactions.createdAt} - ${creditPacks.createdAt})))
-    limit 1
-  )
 )`;
 
 const packTypeMap = {
@@ -102,7 +89,7 @@ const sourceMap = {
     "subscription_purchase",
     "subscription",
   ],
-  [CreditPackSourceAdminFilter.ADMIN_GRANT]: ["bonus"],
+  [CreditPackSourceAdminFilter.ADMIN_GRANT]: ["bonus", "admin_grant"],
   [CreditPackSourceAdminFilter.REFERRAL_EARNING]: ["referral_earning"],
 };
 
@@ -122,6 +109,13 @@ export class SubscriptionAdminPurchasesRepository {
       const sortOrder = data.sortingOptions?.sortOrder ?? SortOrder.DESC;
       const page = data.paginationInfo?.page ?? 1;
       const limit = data.paginationInfo?.limit ?? 20;
+      const now = Date.now();
+      const utcNow = new Date(now).toISOString();
+      const weekAhead = new Date(now + 7 * 24 * 60 * 60 * 1000).toISOString();
+      const unexpired = sql`(${creditPacks.expiresAt} is null or ${creditPacks.expiresAt} > ${utcNow}::timestamp)`;
+      const expiringSoon = sql`${creditPacks.remaining} > 0
+        and ${creditPacks.expiresAt} > ${utcNow}::timestamp
+        and ${creditPacks.expiresAt} <= ${weekAhead}::timestamp`;
 
       const conditions: SQL[] = [];
 
@@ -159,13 +153,6 @@ export class SubscriptionAdminPurchasesRepository {
         conditions.push(lte(creditPacks.createdAt, searchFilters.dateTo));
       }
 
-      if (searchFilters?.remaining === PackRemainingFilter.LEFT) {
-        conditions.push(sql`${creditPacks.remaining} > 0`);
-      }
-      if (searchFilters?.remaining === PackRemainingFilter.USED_UP) {
-        conditions.push(sql`${creditPacks.remaining} <= 0`);
-      }
-
       // Search on user email/name
       if (searchFilters?.search) {
         const searchTerm = `%${searchFilters.search}%`;
@@ -177,8 +164,17 @@ export class SubscriptionAdminPurchasesRepository {
         );
       }
 
-      const whereClause =
-        conditions.length > 0 ? and(...conditions) : undefined;
+      const scope = and(...conditions);
+      const whereClause = and(
+        scope,
+        searchFilters?.remaining === PackRemainingFilter.LEFT
+          ? sql`${creditPacks.remaining} > 0 and ${unexpired}`
+          : searchFilters?.remaining === PackRemainingFilter.USED_UP
+            ? sql`${creditPacks.remaining} <= 0`
+            : searchFilters?.remaining === PackRemainingFilter.EXPIRING_SOON
+              ? expiringSoon
+              : undefined,
+      );
 
       // Sort mapping
       const sortColumn = (():
@@ -227,17 +223,17 @@ export class SubscriptionAdminPurchasesRepository {
           expiresAt: creditPacks.expiresAt,
           createdAt: creditPacks.createdAt,
           payment: paymentSql,
-          planId: sql<string | null>`(
-            select ${subscriptions.planId} from ${subscriptions}
-            where ${subscriptions.userId} = ${users.id}
-            order by ${subscriptions.createdAt} desc limit 1
-          )`,
         })
         .from(creditPacks)
         .innerJoin(creditWallets, eq(creditPacks.walletId, creditWallets.id))
         .innerJoin(users, eq(creditWallets.userId, users.id))
         .where(whereClause)
-        .orderBy(orderDirection(sortColumn))
+        .orderBy(
+          searchFilters?.remaining === PackRemainingFilter.EXPIRING_SOON
+            ? asc(creditPacks.expiresAt)
+            : orderDirection(sortColumn),
+          desc(creditPacks.id),
+        )
         .limit(limit)
         .offset(offset);
 
@@ -258,23 +254,38 @@ export class SubscriptionAdminPurchasesRepository {
           CurrenciesArr.find((code) => code === row.payment?.currency) ?? null,
         planId:
           row.packType === CreditPackType.SUBSCRIPTION
-            ? (SubscriptionPlanDB.find((plan) => plan === row.planId) ?? null)
+            ? (SubscriptionPlanDB.find(
+                (plan) => plan === row.payment?.planId,
+              ) ?? null)
             : null,
       }));
 
       // Totals over every matching pack (not only this page)
-      const [totals, paidRows] = await Promise.all([
+      const [totals, expiring, paidRows] = await Promise.all([
         db
           .select({
             credits: sql<number>`coalesce(sum(${creditPacks.originalAmount}), 0)`,
-            remaining: sql<number>`coalesce(sum(${creditPacks.remaining}), 0)`,
+            remaining: sql<number>`coalesce(sum(${creditPacks.remaining}) filter (where ${unexpired}), 0)`,
           })
           .from(creditPacks)
           .innerJoin(creditWallets, eq(creditPacks.walletId, creditWallets.id))
           .innerJoin(users, eq(creditWallets.userId, users.id))
           .where(whereClause),
         db
-          .select({ payment: paymentSql, packType: creditPacks.type })
+          .select({
+            packs: count(),
+            credits: sql<number>`coalesce(sum(${creditPacks.remaining}), 0)`,
+          })
+          .from(creditPacks)
+          .innerJoin(creditWallets, eq(creditPacks.walletId, creditWallets.id))
+          .innerJoin(users, eq(creditWallets.userId, users.id))
+          .where(and(scope, expiringSoon)),
+        db
+          .select({
+            payment: paymentSql,
+            packType: creditPacks.type,
+            source: creditPacks.source,
+          })
           .from(creditPacks)
           .innerJoin(creditWallets, eq(creditPacks.walletId, creditWallets.id))
           .innerJoin(users, eq(creditWallets.userId, users.id))
@@ -283,10 +294,12 @@ export class SubscriptionAdminPurchasesRepository {
       const paidByCurrency = new Map<(typeof CurrenciesArr)[number], number>();
       const paidSubs = new Map<(typeof CurrenciesArr)[number], number>();
       const paidPacks = new Map<(typeof CurrenciesArr)[number], number>();
+      const matchedPayments = new Set<string>();
       let unmatchedPaidPacks = 0;
       for (const row of paidRows) {
         if (
           !row.payment &&
+          row.source !== "admin_grant" &&
           (row.packType === CreditPackType.SUBSCRIPTION ||
             row.packType === CreditPackType.PERMANENT)
         ) {
@@ -295,7 +308,8 @@ export class SubscriptionAdminPurchasesRepository {
         const currency = CurrenciesArr.find(
           (code) => code === row.payment?.currency,
         );
-        if (row.payment && currency) {
+        if (row.payment && currency && !matchedPayments.has(row.payment.id)) {
+          matchedPayments.add(row.payment.id);
           paidByCurrency.set(
             currency,
             (paidByCurrency.get(currency) ?? 0) + Number(row.payment.amount),
@@ -312,6 +326,8 @@ export class SubscriptionAdminPurchasesRepository {
         unmatchedPaidPacks,
         credits: Number(totals[0]?.credits ?? 0),
         remaining: Number(totals[0]?.remaining ?? 0),
+        expiringPacks: expiring[0]?.packs ?? 0,
+        expiringCredits: Number(expiring[0]?.credits ?? 0),
         paid: [...paidByCurrency.entries()].map(([currency, amount]) => ({
           currency,
           amount: Math.round(amount * 100) / 100,

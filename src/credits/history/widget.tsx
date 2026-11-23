@@ -33,6 +33,7 @@ import {
 import { PaginationWidget } from "next-vibe/unified-ui/widgets/containers/pagination/widget";
 import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-field/widget";
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
+import { useState } from "react";
 
 import {
   DayRangeInputs,
@@ -55,6 +56,7 @@ const typeVariants: Record<
   StatusPillVariant
 > = {
   [CreditTransactionType.FREE_GRANT]: "info",
+  [CreditTransactionType.FREE_RESET]: "warning",
   [CreditTransactionType.PURCHASE]: "success",
   [CreditTransactionType.SUBSCRIPTION]: "success",
   [CreditTransactionType.USAGE]: "muted",
@@ -71,19 +73,12 @@ const FILTER_TYPES = [
   CreditTransactionType.PURCHASE,
   CreditTransactionType.SUBSCRIPTION,
   CreditTransactionType.FREE_GRANT,
+  CreditTransactionType.FREE_RESET,
   CreditTransactionType.REFUND,
   CreditTransactionType.EXPIRY,
   CreditTransactionType.REFERRAL_EARNING,
   CreditTransactionType.REFERRAL_PAYOUT,
 ] as const;
-
-/**
- * Amount as shown, derived from the same 2-decimal rounding as the balance
- * column so every row adds up exactly (no one-cent drift between rows).
- */
-const shownAmount = (amount: number, balanceAfter: number): number =>
-  Math.round(balanceAfter * 100) / 100 -
-  Math.round((balanceAfter - amount) * 100) / 100;
 
 export function CreditHistoryContainer({
   field: { children },
@@ -104,6 +99,7 @@ export function CreditHistoryContainer({
   const onSubmit = useWidgetOnSubmit();
   const platform = useWidgetPlatform();
   const isText = isCliPlatform(platform) || platform === Platform.MCP;
+  const [showFilters, setShowFilters] = useState(false);
   const resolved = isAdmin ? value?.resolvedTarget : undefined;
   const targetUserId = isAdmin
     ? (form?.watch("targetUserId") ?? resolved?.userId ?? undefined)
@@ -116,6 +112,7 @@ export function CreditHistoryContainer({
   const canFilter =
     isAdmin && interactive && !responseOnly && Boolean(onSubmit);
   const typeFilter = isAdmin ? form?.watch("typeFilter") : undefined;
+  const packId = isAdmin ? form?.watch("packId") : undefined;
   const from = isAdmin ? form?.watch("from") : undefined;
   const to = isAdmin ? form?.watch("to") : undefined;
   const transactions = value?.transactions ?? [];
@@ -129,11 +126,6 @@ export function CreditHistoryContainer({
   const ledgerNumbers = new Intl.NumberFormat(lang, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  });
-  const ledgerSigned = new Intl.NumberFormat(lang, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-    signDisplay: "exceptZero",
   });
 
   const pageNumber = Number(form?.watch("paginationInfo.page")) || 1;
@@ -149,6 +141,7 @@ export function CreditHistoryContainer({
     form.setValue("targetLeadId", undefined, { shouldDirty: true });
     form.setValue("target", "", { shouldDirty: true });
     form.setValue("typeFilter", undefined, { shouldDirty: true });
+    form.setValue("packId", undefined, { shouldDirty: true });
     form.setValue("from", undefined, { shouldDirty: true });
     form.setValue("to", undefined, { shouldDirty: true });
     resubmit();
@@ -169,6 +162,17 @@ export function CreditHistoryContainer({
     resubmit();
   };
   const chips: FilterChip[] = [];
+  if (packId) {
+    chips.push({
+      key: "packId",
+      label: t("history.get.packId"),
+      value: packId.slice(0, 8),
+      onRemove: () => {
+        form.setValue("packId", undefined, { shouldDirty: true });
+        resubmit();
+      },
+    });
+  }
   if (typeFilter) {
     chips.push({
       key: "type",
@@ -243,7 +247,22 @@ export function CreditHistoryContainer({
           </Div>
         )}
         <FormAlertWidget field={{}} />
-        {value?.recent && value.recent.length > 0 && (
+        {isText && value?.recent && value.recent.length > 0 && (
+          <Div className="flex flex-col">
+            <Span>{t("history.get.recentTitle")}</Span>
+            {value.recent.map((entry) => (
+              <Span key={entry.id}>
+                {[
+                  formatUtc(entry.createdAt, locale),
+                  signedNumbers.format(entry.amount),
+                  entry.label,
+                  entry.email ?? entry.leadId ?? t("history.get.guestDevice"),
+                ].join(" · ")}
+              </Span>
+            ))}
+          </Div>
+        )}
+        {!isText && value?.recent && value.recent.length > 0 && (
           <Div className="flex min-w-0 flex-col gap-2">
             <Div className="flex flex-wrap items-baseline gap-x-2">
               <Span className="text-sm font-semibold">
@@ -280,7 +299,7 @@ export function CreditHistoryContainer({
                       entry.amount > 0 && "text-success",
                     )}
                   >
-                    {ledgerSigned.format(entry.amount)}
+                    {signedNumbers.format(entry.amount)}
                   </Span>
                   {canFilter && (
                     <Button
@@ -416,46 +435,6 @@ export function CreditHistoryContainer({
             )}
           </Div>
         )}
-        {canFilter && (
-          <Div className="flex min-w-0 flex-col gap-3">
-            <Div className="grid min-w-0 grid-cols-1 gap-3 @3xl:grid-cols-[minmax(0,1fr)_auto]">
-              <SegmentGroup
-                label={t("history.get.colType")}
-                value={typeFilter}
-                disabled={isFetching}
-                onSelect={setType}
-                options={[
-                  { value: undefined, label: t("history.get.allTypes") },
-                  ...FILTER_TYPES.map((option) => ({
-                    value: option,
-                    label: t(option),
-                  })),
-                ]}
-              />
-              <DayRangeInputs
-                fromLabel={t("history.get.from")}
-                toLabel={t("history.get.to")}
-                from={from}
-                to={to}
-                disabled={isFetching}
-                onChange={setDays}
-              />
-            </Div>
-            <FilterChips
-              title={t("history.get.filteredBy")}
-              chips={chips}
-              clearLabel={t("history.get.clearFilters")}
-              removeLabel={t("history.get.removeFilter")}
-              disabled={isFetching}
-              onClear={() => {
-                form.setValue("typeFilter", undefined, { shouldDirty: true });
-                form.setValue("from", undefined, { shouldDirty: true });
-                form.setValue("to", undefined, { shouldDirty: true });
-                resubmit();
-              }}
-            />
-          </Div>
-        )}
         {isText && value?.totals && (
           <Span>
             {[
@@ -518,14 +497,14 @@ export function CreditHistoryContainer({
             ].map((card) => (
               <Div
                 key={card.key}
-                className="flex min-w-0 flex-col gap-1 rounded-xl border bg-card p-4"
+                className="flex min-w-0 flex-col gap-1 rounded-xl border bg-card p-2.5 @md:p-4"
               >
                 <Span className="text-xs text-muted-foreground">
                   {card.label}
                 </Span>
                 <Span
                   className={cn(
-                    "text-2xl font-semibold tabular-nums",
+                    "text-lg font-semibold tabular-nums [overflow-wrap:anywhere] @md:text-2xl",
                     card.tone,
                   )}
                 >
@@ -548,6 +527,66 @@ export function CreditHistoryContainer({
           </Span>
         )}
         <FormAlertWidget field={{}} />
+        {canFilter && (
+          <Div className="flex min-w-0 flex-col gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              aria-expanded={showFilters}
+              className="self-start @3xl:hidden"
+              onClick={() => setShowFilters((shown) => !shown)}
+            >
+              {t(
+                showFilters
+                  ? "history.get.hideFilters"
+                  : "history.get.showFilters",
+              )}
+            </Button>
+            <Div
+              className={cn(
+                "min-w-0 grid-cols-1 gap-3 @3xl:grid @3xl:grid-cols-[minmax(0,1fr)_auto]",
+                showFilters ? "grid" : "hidden",
+              )}
+            >
+              <SegmentGroup
+                label={t("history.get.colType")}
+                value={typeFilter}
+                disabled={isFetching}
+                onSelect={setType}
+                options={[
+                  { value: undefined, label: t("history.get.allTypes") },
+                  ...FILTER_TYPES.map((option) => ({
+                    value: option,
+                    label: t(option),
+                  })),
+                ]}
+              />
+              <DayRangeInputs
+                fromLabel={t("history.get.from")}
+                toLabel={t("history.get.to")}
+                from={from}
+                to={to}
+                disabled={isFetching}
+                onChange={setDays}
+              />
+            </Div>
+            <FilterChips
+              title={t("history.get.filteredBy")}
+              chips={chips}
+              clearLabel={t("history.get.clearFilters")}
+              removeLabel={t("history.get.removeFilter")}
+              disabled={isFetching}
+              onClear={() => {
+                form.setValue("typeFilter", undefined, { shouldDirty: true });
+                form.setValue("packId", undefined, { shouldDirty: true });
+                form.setValue("from", undefined, { shouldDirty: true });
+                form.setValue("to", undefined, { shouldDirty: true });
+                resubmit();
+              }}
+            />
+          </Div>
+        )}
         {!value && !response && (
           <LoadingBlock message={t("history.get.loading")} />
         )}
@@ -571,10 +610,8 @@ export function CreditHistoryContainer({
                   formatUtc(transaction.createdAt, locale),
                   transaction.label ?? transaction.type ?? "",
                   ...(transaction.detail ? [transaction.detail] : []),
-                  ledgerSigned.format(
-                    shownAmount(transaction.amount, transaction.balanceAfter),
-                  ),
-                  `${t("history.get.colBalance")} ${ledgerNumbers.format(transaction.balanceAfter)}`,
+                  signedNumbers.format(transaction.amount),
+                  `${t("history.get.colBalance")} ${numbers.format(transaction.balanceAfter)}`,
                 ].join(" · ")}
               </Span>
             ))}
@@ -650,15 +687,13 @@ export function CreditHistoryContainer({
                           : "text-muted-foreground",
                     )}
                   >
-                    {ledgerSigned.format(
-                      shownAmount(transaction.amount, transaction.balanceAfter),
-                    )}
+                    {signedNumbers.format(transaction.amount)}
                   </Span>
                   <Span className="order-4 text-right text-xs tabular-nums text-muted-foreground @2xl:order-none @2xl:text-sm">
                     <Span className="@2xl:hidden">
                       {t("history.get.colBalance")}{" "}
                     </Span>
-                    {ledgerNumbers.format(transaction.balanceAfter)}
+                    {numbers.format(transaction.balanceAfter)}
                   </Span>
                 </Div>
               );

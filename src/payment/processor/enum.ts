@@ -31,6 +31,7 @@ export const {
   Value: ProcessorKindValue,
 } = createEnumOptions(scopedTranslation, {
   PACK: "enums.kind.pack",
+  SUBSCRIPTION: "enums.kind.subscription",
   NEW_SUBSCRIPTION: "enums.kind.newSubscription",
   RENEWAL: "enums.kind.renewal",
 });

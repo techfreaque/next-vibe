@@ -21,8 +21,9 @@ export const translations: typeof enTranslations = {
   fleet: {
     title: "Verbindungszustand",
     subtitle:
-      "Jede mit diesem Server verknüpfte Instanz, alle Besitzer. Aus gespeichertem Zustand gelesen. Kein Ping, kein Abruf.",
+      "Alle Verbindungen dieses Servers. Der Status basiert auf der zuletzt erfassten Aktivität.",
     kpi: {
+      attention: "Handlungsbedarf",
       total: "Verbindungen",
       healthy: "Gesund",
       unhealthy: "Gestört",
@@ -45,7 +46,7 @@ export const translations: typeof enTranslations = {
       disconnectedAt: "Trennung protokolliert {{at}}",
       noToken: "Kein Token gespeichert, Aufrufe scheitern an der Anmeldung",
       neverSynced: "Nie synchronisiert, verknüpft {{at}}",
-      staleSync: "Letzte Synchronisierung liegt zu lange zurück",
+      staleSync: "Synchronisierung überfällig. Zuletzt {{at}}",
       transportDrift:
         "Letzter Aufruf lief über {{used}}, eingestellt ist {{configured}}",
       transportMismatch: "Beide Seiten widersprechen sich beim Transport",
@@ -141,6 +142,12 @@ export const translations: typeof enTranslations = {
     },
     never: "Nie",
     audit: {
+      unknownPeer: "Verbindung nicht verfügbar",
+      allEvents: "Alle Protokollereignisse",
+      eventsShown: "({{first}}–{{last}} von {{total}})",
+      previous: "Neuere Ereignisse",
+      next: "Ältere Ereignisse",
+      peer: "Protokoll für {{peer}}",
       title: "Audit-Protokoll",
       subtitle:
         "Registrierungen, Trennungen und Ablehnungen auf diesem Server.",
@@ -152,7 +159,7 @@ export const translations: typeof enTranslations = {
       count: "Ereignisse",
       recent: "Neueste Ereignisse",
       empty: "Keine Audit-Ereignisse in diesem Zeitraum.",
-      openRecent: "Öffnen",
+      openRecent: "Protokoll öffnen",
     },
     action: {
       registered: "Registriert",
@@ -181,6 +188,14 @@ export const translations: typeof enTranslations = {
       activeOnly: {
         label: "Nur aktive",
         description: "Nur aktive Verbindungen zurückgeben",
+      },
+      auditOffset: {
+        label: "Protokoll-Offset",
+        description: "Anzahl der zu überspringenden Ereignisse.",
+      },
+      auditConnection: {
+        label: "Verbindungs-ID für das Protokoll",
+        description: "Protokoll auf eine Verbindung eingrenzen.",
       },
       fleetStatus: {
         label: "Zustand",

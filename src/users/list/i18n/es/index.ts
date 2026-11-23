@@ -8,6 +8,20 @@ export const translations: typeof enTranslations = {
     description:
       "Cada cuenta con lo que pagó, lo que pasa y cuando fue la última activa. Buscar, filtrar por ingresos, actividad, fecha de registro o fuente, ordenar por cualquier columna de dinero.",
     fields: {
+      hasSpentCredits: "Usó créditos",
+      requiredState: {
+        label: "Estado requerido",
+        description: "La cuenta debe cumplir también este estado",
+      },
+      accountLocale: {
+        label: "Idioma de la cuenta",
+        description: "Código de idioma exacto, por ejemplo es-ES",
+      },
+      attributedRefCode: {
+        label: "Código de referido atribuido",
+        description:
+          "Código de referido acreditado o, en su ausencia, el de la primera visita",
+      },
       search: {
         label: "Cuentas de búsqueda",
         description: "Correo electrónico, nombre o el inicio de un usuario ID",

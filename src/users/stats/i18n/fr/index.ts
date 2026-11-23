@@ -24,6 +24,10 @@ export const translations: typeof enTranslations = {
     freeBurners: "Plus gros consommateurs gratuits",
   },
   widget: {
+    cohortNote:
+      "Résultats à ce jour. Les comptes plus anciens ont eu plus de temps pour se confirmer, utiliser des crédits ou payer.",
+    activityToggle: "Activité des comptes",
+    reviewUnverified: "Vérifier les inscriptions non confirmées ({{count}})",
     planLapsed: "Abonnement expiré",
     planPacks: "Packs de crédits seuls",
     groups: {

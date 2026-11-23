@@ -18,6 +18,7 @@ export const {
   DUE_NOW: "enums.delivery.dueNow",
   OVERDUE: "enums.delivery.overdue",
   SCHEDULED: "enums.delivery.scheduled",
+  STUCK: "enums.delivery.stuck",
   FAILED: "enums.delivery.failed",
   SENT: "enums.delivery.sent",
   OPENED: "enums.delivery.opened",

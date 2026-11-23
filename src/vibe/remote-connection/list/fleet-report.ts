@@ -23,6 +23,7 @@ import {
 } from "../../unified-ui/analytics/window-sql";
 import { remoteConnectionAudit, RemoteConnectionAuditActionDB } from "../db";
 import { type FleetConnection, loadFleetHealth } from "../health-summary";
+import { FLEET_AUDIT_PAGE_SIZE } from "./constants";
 import type { RemoteConnectionsListResponseOutput } from "./definition";
 import { FleetStatusFilter, type FleetStatusFilterValue } from "./enum";
 
@@ -31,7 +32,6 @@ type FleetStatusValue = typeof FleetStatusFilterValue;
 type FleetReport = NonNullable<RemoteConnectionsListResponseOutput["fleet"]>;
 
 const FAILURE_ACTIONS = ["denied", "rate_limited"] as const;
-const RECENT_LIMIT = 12;
 const REASON_LIMIT = 12;
 
 function matchesFilter(
@@ -63,10 +63,23 @@ export async function buildFleetReport(params: {
   selfInstanceId: string;
   window: AnalyticsWindowInput;
   fleetStatus: FleetStatusValue | undefined;
+  auditConnection: string | undefined;
+  auditOffset: number | undefined;
 }): Promise<FleetReport> {
+  const fleet = await loadFleetHealth();
+  const peer = fleet.connections.find((c) => c.id === params.auditConnection);
+  const scopedAudit = peer
+    ? and(
+        eq(remoteConnectionAudit.userId, peer.userId),
+        eq(remoteConnectionAudit.instanceId, peer.instanceId),
+      )
+    : params.auditConnection
+      ? sql`false`
+      : undefined;
   const [floorRow] = await db
     .select({ first: min(remoteConnectionAudit.createdAt) })
-    .from(remoteConnectionAudit);
+    .from(remoteConnectionAudit)
+    .where(scopedAudit);
   const win = resolveAnalyticsWindow(
     params.window,
     new Date(),
@@ -75,75 +88,61 @@ export async function buildFleetReport(params: {
   const failureWhere = inArray(remoteConnectionAudit.action, [
     ...FAILURE_ACTIONS,
   ]);
+  const current = and(
+    inWindowSql(remoteConnectionAudit.createdAt, win),
+    scopedAudit,
+  );
+  const previous = and(
+    inPreviousWindowSql(remoteConnectionAudit.createdAt, win),
+    scopedAudit,
+  );
 
-  const [
-    fleet,
-    eventsNow,
-    eventsPrev,
-    failNow,
-    failPrev,
-    trendRows,
-    reasons,
-    recent,
-  ] = await Promise.all([
-    loadFleetHealth(),
-    db
-      .select({ n: count() })
-      .from(remoteConnectionAudit)
-      .where(inWindowSql(remoteConnectionAudit.createdAt, win)),
-    db
-      .select({ n: count() })
-      .from(remoteConnectionAudit)
-      .where(inPreviousWindowSql(remoteConnectionAudit.createdAt, win)),
-    db
-      .select({ n: count() })
-      .from(remoteConnectionAudit)
-      .where(
-        and(inWindowSql(remoteConnectionAudit.createdAt, win), failureWhere),
-      ),
-    db
-      .select({ n: count() })
-      .from(remoteConnectionAudit)
-      .where(
-        and(
-          inPreviousWindowSql(remoteConnectionAudit.createdAt, win),
-          failureWhere,
-        ),
-      ),
-    db
-      .select({
-        bucket: bucketSql(remoteConnectionAudit.createdAt, win.bucket),
-        action: remoteConnectionAudit.action,
-        value: count(),
-      })
-      .from(remoteConnectionAudit)
-      .where(inWindowSql(remoteConnectionAudit.createdAt, win))
-      .groupBy(sql`1`, remoteConnectionAudit.action),
-    db
-      .select({
-        key: sql<string>`${remoteConnectionAudit.action} || coalesce(':' || ${remoteConnectionAudit.reason}, '')`,
-        value: count(),
-      })
-      .from(remoteConnectionAudit)
-      .where(inWindowSql(remoteConnectionAudit.createdAt, win))
-      .groupBy(sql`1`)
-      .orderBy(desc(count()))
-      .limit(REASON_LIMIT),
-    db
-      .select({
-        id: remoteConnectionAudit.id,
-        createdAt: remoteConnectionAudit.createdAt,
-        action: remoteConnectionAudit.action,
-        reason: remoteConnectionAudit.reason,
-        instanceId: remoteConnectionAudit.instanceId,
-        ownerEmail: users.email,
-      })
-      .from(remoteConnectionAudit)
-      .innerJoin(users, eq(users.id, remoteConnectionAudit.userId))
-      .where(inWindowSql(remoteConnectionAudit.createdAt, win))
-      .orderBy(desc(remoteConnectionAudit.createdAt))
-      .limit(RECENT_LIMIT),
-  ]);
+  const [eventsNow, eventsPrev, failNow, failPrev, trendRows, reasons, recent] =
+    await Promise.all([
+      db.select({ n: count() }).from(remoteConnectionAudit).where(current),
+      db.select({ n: count() }).from(remoteConnectionAudit).where(previous),
+      db
+        .select({ n: count() })
+        .from(remoteConnectionAudit)
+        .where(and(current, failureWhere)),
+      db
+        .select({ n: count() })
+        .from(remoteConnectionAudit)
+        .where(and(previous, failureWhere)),
+      db
+        .select({
+          bucket: bucketSql(remoteConnectionAudit.createdAt, win.bucket),
+          action: remoteConnectionAudit.action,
+          value: count(),
+        })
+        .from(remoteConnectionAudit)
+        .where(current)
+        .groupBy(sql`1`, remoteConnectionAudit.action),
+      db
+        .select({
+          key: sql<string>`${remoteConnectionAudit.action} || coalesce(':' || ${remoteConnectionAudit.reason}, '')`,
+          value: count(),
+        })
+        .from(remoteConnectionAudit)
+        .where(current)
+        .groupBy(sql`1`)
+        .orderBy(desc(count()))
+        .limit(REASON_LIMIT),
+      db
+        .select({
+          id: remoteConnectionAudit.id,
+          createdAt: remoteConnectionAudit.createdAt,
+          action: remoteConnectionAudit.action,
+          reason: remoteConnectionAudit.reason,
+          instanceId: remoteConnectionAudit.instanceId,
+          ownerEmail: users.email,
+        })
+        .from(remoteConnectionAudit)
+        .innerJoin(users, eq(users.id, remoteConnectionAudit.userId))
+        .where(current)
+        .orderBy(desc(remoteConnectionAudit.createdAt))
+        .limit(FLEET_AUDIT_PAGE_SIZE),
+    ]);
 
   const all = fleet.connections;
   const tally = (status: FleetConnection["health"]["status"]): number =>
@@ -203,6 +202,8 @@ export async function buildFleetReport(params: {
           : null,
       })),
     audit: {
+      peer: peer?.instanceId ?? null,
+      offset: params.auditOffset ?? 0,
       events: {
         value: eventsNow[0]?.n ?? 0,
         previous: hasPrevious ? (eventsPrev[0]?.n ?? 0) : null,

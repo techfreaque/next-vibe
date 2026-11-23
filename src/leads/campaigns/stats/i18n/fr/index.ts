@@ -110,11 +110,14 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    noSends: "Aucun e-mail envoyé sur cette période.",
+    bounceProcessingOff:
+      "Le traitement des rebonds est désactivé. Le nombre peut être sous-estimé.",
     groups: {
       now: "En ce moment",
       period: "Sur la période choisie",
     },
-    stuck: "Jamais envoyé",
+    stuck: "Aucun envoi sur la période",
     title: "Performance des campagnes",
     loading: "Chargement des chiffres...",
     filters: "Filtres",
@@ -131,6 +134,16 @@ export const translations: typeof enTranslations = {
       statusChange: "Ignoré : le lead est passé à {{status}}",
     },
     engine: {
+      dryRun: "Mode simulation",
+      dryRunNote: "Le mode simulation n’envoie aucun e-mail réel.",
+      delayed: "Envoi retardé",
+      delayedNote: "Vérifiez l’état du cron et le planning d’envoi.",
+      waiting: "Premier lancement en attente",
+      waitingNote:
+        "Le planning est en place. Le premier lancement est encore en attente.",
+      details: "Détails de l’automatisation",
+      missingSummary: "Le service d’envoi n’a aucun planning.",
+      disabledSummary: "Le service d’envoi est désactivé.",
       starterOff:
         "campaign-starter est aussi coupé : aucun nouveau lead n'entre dans un parcours.",
       otherPath:
@@ -149,6 +162,9 @@ export const translations: typeof enTranslations = {
       noError: "Aucun message d'erreur enregistré.",
       openDue: "Voir {{count}} leads",
       state: {
+        dryRun: "Mode simulation",
+        delayed: "Envoi retardé",
+        waiting: "Premier lancement en attente",
         missing: "non planifié",
         disabled: "désactivé",
         failing: "en échec",

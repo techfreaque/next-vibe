@@ -50,7 +50,7 @@ export const translations = {
       "Nothing matches these filters. Remove one to widen the list.",
     emptyAll: "No payments recorded yet.",
     clearFilters: "Clear filters",
-    transactionSearch: "Email, transaction ID or invoice reference",
+    transactionSearch: "Email or processor reference",
     webhookSearch: "Search event type or provider event reference.",
     processingDetail:
       "The processing marker shows whether the application marked the event complete.",
@@ -86,6 +86,7 @@ export const translations = {
       setup: "Card setup, no charge",
     },
     kind: {
+      subscription: "All subscription payments",
       pack: "Credit pack",
       newSubscription: "New subscription",
       renewal: "Renewal",

@@ -12,6 +12,13 @@ export const translations: typeof enTranslations = {
       "Impossible de charger l'historique des tâches (limite {{limit}}) : {{error}}",
   },
 
+  enums: {
+    taskScope: {
+      enabled: "Tâches actives uniquement",
+      all: "Toutes les tâches, y compris masquées et désactivées",
+    },
+  },
+
   get: {
     tags: {
       tasks: "Tâches",
@@ -21,6 +28,10 @@ export const translations: typeof enTranslations = {
     titleShort: "Historique des tâches",
     description: "Consulter l'historique des exécutions des tâches cron",
     fields: {
+      taskScope: {
+        label: "Périmètre des tâches",
+        description: "Reprendre le périmètre du rapport de santé.",
+      },
       taskId: {
         label: "ID de la tâche",
         description: "Filtrer par ID de tâche",
@@ -182,6 +193,7 @@ export const translations: typeof enTranslations = {
       placeholder: "Rechercher des tâches...",
     },
     filter: {
+      clearTaskScope: "Effacer le périmètre",
       clear: "Effacer les filtres",
       allTasks: "Toutes les tâches",
       allPriorities: "Toutes les priorités",

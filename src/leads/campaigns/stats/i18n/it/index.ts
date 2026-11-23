@@ -110,11 +110,14 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    noSends: "Nessuna email inviata nel periodo.",
+    bounceProcessingOff:
+      "L’elaborazione dei rimbalzi è disattivata. Il conteggio può essere incompleto.",
     groups: {
       now: "Adesso",
       period: "Nel periodo scelto",
     },
-    stuck: "Mai inviata",
+    stuck: "Nessun invio nel periodo",
     title: "Prestazioni campagne",
     loading: "Caricamento numeri campagne...",
     filters: "Filtri",
@@ -130,6 +133,17 @@ export const translations: typeof enTranslations = {
       statusChange: "Saltata: il lead ora è {{status}}",
     },
     engine: {
+      dryRun: "Modalità di prova",
+      dryRunNote: "In modalità di prova non parte alcuna email reale.",
+      delayed: "Invio in ritardo",
+      delayedNote:
+        "Controlla lo stato di cron e la pianificazione degli invii.",
+      waiting: "In attesa della prima esecuzione",
+      waitingNote:
+        "L’invio è pianificato. La prima esecuzione è ancora in attesa.",
+      details: "Dettagli automazione",
+      missingSummary: "L’invio non è pianificato.",
+      disabledSummary: "Il servizio di invio è disattivato.",
       starterOff:
         "Anche campaign-starter è spento: nessun nuovo lead entra nei percorsi.",
       otherPath:
@@ -148,6 +162,9 @@ export const translations: typeof enTranslations = {
       noError: "Nessun messaggio di errore registrato.",
       openDue: "Mostra {{count}} lead",
       state: {
+        dryRun: "Modalità di prova",
+        delayed: "Invio in ritardo",
+        waiting: "In attesa della prima esecuzione",
         missing: "non pianificato",
         disabled: "disattivato",
         failing: "in errore",

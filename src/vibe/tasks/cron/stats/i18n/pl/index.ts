@@ -24,6 +24,7 @@ export const translations: typeof enTranslations = {
       disabled: "Wyłączone",
     },
     healthFilter: {
+      withFailures: "Zadania z błędami w okresie",
       all: "Wszystkie stany",
       attention: "Wymaga uwagi",
     },
@@ -124,6 +125,7 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    stabilityPeriod: "Ocena stabilności uwzględnia wybrany okres.",
     watchdogBanner:
       "Sam watchdog zadań jest w stanie: {{state}}. Oceny zawieszonych i spóźnionych zadań mogą być nieaktualne, dopóki znowu nie zadziała poprawnie.",
     inFlight: {
@@ -180,9 +182,9 @@ export const translations: typeof enTranslations = {
     },
     attention: {
       title: "Wymaga uwagi",
-      subtitle:
-        "Zadania z błędem, zawieszone, niestabilne i spóźnione. Napraw je najpierw.",
-      empty: "Nic z błędem, zawieszonego ani spóźnionego.",
+      subtitle: "Zadania do sprawdzenia",
+      empty:
+        "Brak zadań z błędem, zawieszonych, zaległych, niestabilnych lub wracających do normy.",
       lastError: "Ostatni błąd",
       noError: "Brak zapisanego komunikatu błędu",
       failedAgo: "{{status}} {{age}} temu",
@@ -205,6 +207,8 @@ export const translations: typeof enTranslations = {
       orphaned: "osierocone uruchomienie, zadanie wyłączone",
     },
     chart: {
+      showTrends: "Pokaż trendy",
+      hideTrends: "Ukryj trendy",
       runs: "Uruchomienia",
       runsSubtitle: "Kliknij słupek, aby zobaczyć uruchomienia z tego okresu",
       completed: "Udane",
@@ -254,6 +258,8 @@ export const translations: typeof enTranslations = {
       empty: "Brak zadań w tym stanie.",
     },
     filter: {
+      showParked: "Pokaż odłożone zadania",
+      hideParked: "Ukryj odłożone zadania",
       task: "Zadanie",
       state: "Stan",
       allTasks: "Wszystkie zadania",

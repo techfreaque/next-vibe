@@ -47,6 +47,7 @@ import type {
   CronHistoryRequestOutput,
   CronHistoryResponseOutput,
 } from "./definition";
+import { TaskHistoryScope } from "./enum";
 import type { CronHistoryT } from "./i18n";
 
 /**
@@ -90,7 +91,7 @@ export class CronHistoryRepository {
         // An explicit task drill-down (e.g. from Task Health) shows every run,
         // hidden system tasks included.
         baseConditions.push(eq(cronTaskExecutions.taskId, data.taskId));
-      } else {
+      } else if (!data.taskScope) {
         // Unscoped lists hide hidden tasks, UNLESS they failed (so errors are never silently hidden)
         baseConditions.push(
           or(
@@ -102,6 +103,10 @@ export class CronHistoryRepository {
             ]),
           ),
         );
+      }
+
+      if (data.taskScope === TaskHistoryScope.ENABLED) {
+        baseConditions.push(eq(cronTasks.enabled, true));
       }
 
       const taskName = data.taskName?.trim();

@@ -81,6 +81,7 @@ const STATUSES = [
 ] as const;
 const KINDS = [
   ProcessorKind.PACK,
+  ProcessorKind.SUBSCRIPTION,
   ProcessorKind.NEW_SUBSCRIPTION,
   ProcessorKind.RENEWAL,
 ] as const;
@@ -278,10 +279,14 @@ export function PaymentProcessorWidget({
     navigate(
       () =>
         import("@/users/view/definition").then((module) => module.default.GET),
-      { data: { userId: id } },
+      {
+        data: { userId: id },
+      },
     );
 
   const rows = data ? (isWebhooks ? data.webhooks : data.transactions) : [];
+  const statusCounts = data?.statusCounts ?? [];
+  const numbers = new Intl.NumberFormat(locale);
 
   return (
     <WidgetShell className="min-w-0">
@@ -291,6 +296,47 @@ export function PaymentProcessorWidget({
           isInteractive && <NavigateButtonWidget field={children.backButton} />
         }
       />
+      {data && !isWebhooks && statusCounts.length > 0 && (
+        <Div className="grid min-w-0 grid-cols-3 gap-2">
+          {[
+            {
+              status: undefined,
+              label: t("widget.all"),
+              count: statusCounts.reduce((sum, row) => sum + row.count, 0),
+            },
+            ...[PaymentStatus.FAILED, PaymentStatus.PENDING].map((item) => ({
+              status: item,
+              label: t(item),
+              count:
+                statusCounts.find((row) => row.status === item)?.count ?? 0,
+            })),
+          ].map((card) => (
+            <Button
+              key={card.label}
+              type="button"
+              variant={status === card.status ? "secondary" : "outline"}
+              aria-pressed={status === card.status}
+              disabled={!canFilter || isFetching}
+              onClick={() => setStatus(card.status)}
+              className="h-auto min-w-0 flex-col items-start gap-0.5 whitespace-normal px-2 py-2 text-start @md:px-4"
+            >
+              <Span className="text-xs font-medium [overflow-wrap:anywhere]">
+                {card.label}
+              </Span>
+              <Span
+                className={cn(
+                  "text-lg font-semibold tabular-nums",
+                  card.status === PaymentStatus.FAILED &&
+                    card.count > 0 &&
+                    "text-destructive",
+                )}
+              >
+                {numbers.format(card.count)}
+              </Span>
+            </Button>
+          ))}
+        </Div>
+      )}
       {canFilter && (
         <Div className="flex min-w-0 flex-col gap-3">
           <Div className="flex flex-wrap items-center gap-2">
@@ -461,7 +507,7 @@ export function PaymentProcessorWidget({
           />
         </Div>
       )}
-      {!data && response?.success === false && (
+      {response?.success === false && !isFetching && (
         <EmptyBlock
           className="rounded-xl border"
           title={t("errorTitles.server")}
@@ -479,67 +525,77 @@ export function PaymentProcessorWidget({
       {!data && response?.success !== false && (
         <LoadingBlock message={t("widget.loading")} />
       )}
-      {data && !isWebhooks && data.total > 0 && (
-        <Div className="grid min-w-0 grid-cols-2 gap-3 @3xl:grid-cols-4">
-          <Div className="flex min-w-0 flex-col gap-1 rounded-xl border bg-card p-4">
+      {data && !isWebhooks && !isText && data.total > 0 && (
+        <Div className="flex min-w-0 flex-col gap-2">
+          {status && (
             <Span className="text-xs text-muted-foreground">
-              {t("widget.matching")}
+              {t("widget.matching")} {numbers.format(data.total)}
             </Span>
-            <Span className="text-2xl font-semibold tabular-nums">
-              {new Intl.NumberFormat(locale).format(data.total)}
+          )}
+          {(!status ||
+            status === PaymentStatus.SUCCEEDED ||
+            status === PaymentStatus.REFUNDED) &&
+            data.totals.length > 0 && (
+              <Div className="flex min-w-0 flex-col gap-1.5 @md:flex-row @md:flex-wrap">
+                {data.totals.map((total) => (
+                  <Button
+                    key={total.currency}
+                    type="button"
+                    variant="outline"
+                    disabled={
+                      !canFilter || currency === total.currency || isFetching
+                    }
+                    className="flex h-auto min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 whitespace-normal px-3 py-2 text-start font-normal disabled:opacity-100 @md:flex-col @md:items-start"
+                    onClick={() => setCurrency(total.currency)}
+                  >
+                    <Span className="text-xs text-muted-foreground">
+                      {t("widget.collected", { currency: total.currency })}
+                    </Span>
+                    <Span className="text-sm font-semibold tabular-nums [overflow-wrap:anywhere]">
+                      {formatCurrency(total.gross, total.currency, locale)}
+                    </Span>
+                    {total.refundedAmount > 0 && (
+                      <Span className="text-xs text-muted-foreground">
+                        {t("widget.netLine", {
+                          refunded: formatCurrency(
+                            total.refundedAmount,
+                            total.currency,
+                            locale,
+                          ),
+                          net: formatCurrency(
+                            total.collected,
+                            total.currency,
+                            locale,
+                          ),
+                        })}
+                      </Span>
+                    )}
+                  </Button>
+                ))}
+              </Div>
+            )}
+        </Div>
+      )}
+      {data && !isWebhooks && isText && (
+        <Div className="flex flex-col">
+          <Span>
+            {t("widget.matching")} {numbers.format(data.total)}
+          </Span>
+          {data.totals.map((total) => (
+            <Span key={total.currency}>
+              {[
+                `${t("widget.collected", { currency: total.currency })} ${formatCurrency(total.gross, total.currency, locale)}`,
+                t("widget.netLine", {
+                  refunded: formatCurrency(
+                    total.refundedAmount,
+                    total.currency,
+                    locale,
+                  ),
+                  net: formatCurrency(total.collected, total.currency, locale),
+                }),
+              ].join(" · ")}
             </Span>
-            <Span className="text-xs text-muted-foreground">
-              {chips.length > 0
-                ? chips
-                    .map((chip) => `${chip.label}: ${chip.value}`)
-                    .join(" · ")
-                : t("widget.matchingHint")}
-            </Span>
-          </Div>
-          {(!status || status === PaymentStatus.SUCCEEDED) &&
-            data.totals.map((total) => (
-              <Button
-                key={total.currency}
-                type="button"
-                variant="ghost"
-                disabled={!canFilter || currency === total.currency}
-                className="flex h-auto min-w-0 flex-col items-start justify-start gap-1 rounded-xl border bg-card p-4 text-start font-normal disabled:opacity-100"
-                onClick={() => setCurrency(total.currency)}
-              >
-                <Span className="text-xs text-muted-foreground">
-                  {t("widget.collected", { currency: total.currency })}
-                </Span>
-                <Span
-                  className={cn(
-                    "text-2xl font-semibold tabular-nums",
-                    total.gross > 0 ? "text-success" : "text-muted-foreground",
-                  )}
-                >
-                  {formatCurrency(total.gross, total.currency, locale)}
-                </Span>
-                <Span className="whitespace-normal text-xs tabular-nums text-muted-foreground">
-                  {t("widget.netLine", {
-                    refunded: formatCurrency(
-                      total.refundedAmount,
-                      total.currency,
-                      locale,
-                    ),
-                    net: formatCurrency(
-                      total.collected,
-                      total.currency,
-                      locale,
-                    ),
-                  })}
-                </Span>
-                <Span className="whitespace-normal text-xs text-muted-foreground">
-                  {t("widget.collectedHint", {
-                    succeeded: total.succeeded,
-                    failed: total.failed,
-                    refunded: total.refunded,
-                  })}
-                </Span>
-              </Button>
-            ))}
+          ))}
         </Div>
       )}
       {data && rows.length === 0 && (
@@ -598,11 +654,6 @@ export function PaymentProcessorWidget({
                 </Span>
               ))}
         </Div>
-      )}
-      {data && !isText && !isWebhooks && data.transactions.length > 0 && (
-        <Span className="text-xs text-muted-foreground">
-          {t("widget.refundRule")}
-        </Span>
       )}
       {data && !isText && !isWebhooks && data.transactions.length > 0 && (
         <Div

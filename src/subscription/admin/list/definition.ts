@@ -89,7 +89,6 @@ const { GET } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "get.response.subscriptions.userId",
         hidden: true,
-        includeInCacheKey: true,
         schema: z.uuid().optional(),
       }),
 
@@ -320,6 +319,11 @@ const { GET } = createEndpoint({
                   fieldType: FieldDataType.DATETIME,
                   label: "get.response.subscriptions.lastPaymentAt",
                   schema: z.coerce.date().nullable(),
+                }),
+                lastPaymentEstimated: responseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  label: "widget.estimatedCharge",
+                  schema: z.boolean(),
                 }),
                 cancelAtPeriodEnd: responseField(scopedTranslation, {
                   type: WidgetType.BADGE,
@@ -565,6 +569,7 @@ const { GET } = createEndpoint({
               lastPaymentAmount: 20,
               lastPaymentCurrency: "EUR",
               lastPaymentAt: new Date("2026-10-19T09:30:00.000Z"),
+              lastPaymentEstimated: false,
               cancelAtPeriodEnd: false,
               canceledAt: null,
               cancellationReason: null,

@@ -108,6 +108,38 @@ export const userCohortFilterFields = {
 /** Every users-list filter (cohort filters + windows, bounds, roles). */
 export const userFilterFields = {
   ...userCohortFilterFields,
+  hasSpentCredits: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.BOOLEAN,
+    label: "get.fields.hasSpentCredits",
+    columns: 4,
+    schema: z.boolean().optional(),
+  }),
+  requiredState: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.SELECT,
+    label: "get.fields.requiredState.label",
+    description: "get.fields.requiredState.description",
+    options: AccountStateFilterOptions,
+    columns: 4,
+    schema: z.enum(AccountStateFilter).optional(),
+  }),
+  accountLocale: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.TEXT,
+    label: "get.fields.accountLocale.label",
+    description: "get.fields.accountLocale.description",
+    columns: 4,
+    schema: z.string().trim().max(20).optional(),
+  }),
+  attributedRefCode: requestField(scopedTranslation, {
+    type: WidgetType.FORM_FIELD,
+    fieldType: FieldDataType.TEXT,
+    label: "get.fields.attributedRefCode.label",
+    description: "get.fields.attributedRefCode.description",
+    columns: 4,
+    schema: z.string().trim().max(120).optional(),
+  }),
   roles: requestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,

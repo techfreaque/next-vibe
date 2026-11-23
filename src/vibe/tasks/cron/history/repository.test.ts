@@ -8,6 +8,7 @@ import { UserPermissionRole } from "../../../identity/roles/enum";
 import { createEndpointLogger } from "../../../logger/server";
 import { CronTaskPriority, CronTaskStatus } from "../../enum";
 import { GET } from "./definition";
+import { TaskHistoryScope } from "./enum";
 import { scopedTranslation } from "./i18n";
 
 const pg = new PGlite();
@@ -32,7 +33,7 @@ beforeAll(async () => {
   ({ CronHistoryRepository } = await import("./repository"));
   await pg.exec(`
     CREATE TABLE cron_tasks (
-      id text PRIMARY KEY, user_id uuid, hidden boolean DEFAULT false,
+      id text PRIMARY KEY, user_id uuid, hidden boolean DEFAULT false, enabled boolean DEFAULT true,
       display_name text NOT NULL, route_id text NOT NULL, priority text NOT NULL
     );
     CREATE TABLE cron_task_executions (
@@ -46,13 +47,20 @@ beforeAll(async () => {
   `);
   await pg.query(
     "INSERT INTO cron_tasks (id, user_id, display_name, route_id, priority) VALUES ($1, $2, $3, $4, $5)",
-    [
-      taskId,
-      ownerId,
-      "Audit preview",
-      "vibe.tasks.audit-preview",
-      CronTaskPriority.LOW,
-    ],
+    [taskId, ownerId, "Audit preview", "vibe.tasks.audit-preview", CronTaskPriority.LOW],
+  );
+  await pg.query(
+    `INSERT INTO cron_tasks (id, user_id, hidden, enabled, display_name, route_id, priority)
+     VALUES ('hidden-active', $1, true, true, 'Report scope active', 'scope-test', $2),
+      ('disabled-scope', $1, false, false, 'Report scope inactive', 'scope-test', $2)`,
+    [ownerId, CronTaskPriority.HIGH],
+  );
+  await pg.query(
+    `INSERT INTO cron_task_executions
+     (task_id, task_name, execution_id, started_at, status, priority, config)
+     VALUES ('hidden-active', 'scope-test', 'scope-enabled', $1, $2, $3, '{}'),
+            ('disabled-scope', 'scope-test', 'scope-disabled', $1, $2, $3, '{}')`,
+    [runTime, CronTaskStatus.COMPLETED, CronTaskPriority.HIGH],
   );
   await pg.query(
     "INSERT INTO cron_tasks (id, user_id, display_name, route_id, priority) VALUES ($1, $2, $3, $4, $5)",
@@ -102,9 +110,7 @@ it("counts the same owner-scoped runs matched by display name and execution prio
   expect(result.success && result.data.statusCounts.failed).toBe(1);
   expect(result.success && result.data.hasMore).toBe(true);
   expect(result.success && result.data.executions[0]?.taskId).toBe(taskId);
-  expect(result.success && result.data.executions[0]?.priority).toBe(
-    CronTaskPriority.HIGH,
-  );
+  expect(result.success && result.data.executions[0]?.priority).toBe(CronTaskPriority.HIGH);
 });
 
 it("keeps task identity in a filtered run view and does not reveal another owner's task", async () => {
@@ -133,4 +139,24 @@ it("keeps task identity in a filtered run view and does not reveal another owner
   );
   expect(other.success && other.data.totalCount).toBe(0);
   expect(other.success && other.data.selectedTask).toBeUndefined();
+});
+
+it("matches report scope, including hidden enabled tasks and optionally disabled ones", async () => {
+  const run = (
+    taskScope: (typeof TaskHistoryScope)[keyof typeof TaskHistoryScope],
+  ): ReturnType<typeof CronHistoryRepository.getTaskHistory> =>
+    CronHistoryRepository.getTaskHistory(
+      GET.requestSchema.parse({ taskName: "Report scope", taskScope }),
+      owner,
+      t,
+      logger,
+    );
+  const [enabled, all] = await Promise.all([
+    run(TaskHistoryScope.ENABLED),
+    run(TaskHistoryScope.ALL),
+  ]);
+  expect(enabled.success && enabled.data.executions.map((r) => r.taskId)).toEqual([
+    "hidden-active",
+  ]);
+  expect(all.success && all.data.totalCount).toBe(2);
 });

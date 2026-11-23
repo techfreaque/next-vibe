@@ -8,6 +8,19 @@ export const translations: typeof enTranslations = {
     description:
       "Każde konto: ile zapłaciło, ile wydaje i kiedy było ostatnio aktywne. Szukaj, filtruj po przychodzie, aktywności, dacie rejestracji lub źródle, sortuj po każdej kolumnie z pieniędzmi.",
     fields: {
+      hasSpentCredits: "Użyto kredytów",
+      requiredState: {
+        label: "Wymagany stan",
+        description: "Konto musi spełniać także ten warunek",
+      },
+      accountLocale: {
+        label: "Język konta",
+        description: "Dokładny kod języka konta, np. pl-PL",
+      },
+      attributedRefCode: {
+        label: "Przypisany kod polecenia",
+        description: "Kod z przypisanego polecenia lub z pierwszej wizyty",
+      },
       search: {
         label: "Szukaj kont",
         description: "E-mail, imię lub początek ID użytkownika",

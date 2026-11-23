@@ -640,7 +640,7 @@
               "innerType": {
                 "def": {
                   "type": "string",
-                  "format": "uuid",
+                  "format": "guid",
                   "check": "string_format",
                   "abort": false,
                   "pattern": {}
@@ -667,7 +667,7 @@
               "innerType": {
                 "def": {
                   "type": "string",
-                  "format": "uuid",
+                  "format": "guid",
                   "check": "string_format",
                   "abort": false,
                   "pattern": {}
@@ -709,6 +709,33 @@
           },
           "schemaType": "primitive"
         },
+        "packId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Credit pack",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "format": "guid",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "includeInCacheKey": true,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "typeFilter": {
           "type": "form_field",
           "fieldType": "select",
@@ -717,6 +744,10 @@
             {
               "value": "enums.transactionType.freeGrant",
               "label": "enums.transactionType.freeGrant"
+            },
+            {
+              "value": "enums.transactionType.freeReset",
+              "label": "enums.transactionType.freeReset"
             },
             {
               "value": "enums.transactionType.purchase",
@@ -764,6 +795,7 @@
                   "type": "enum",
                   "entries": {
                     "FREE_GRANT": "enums.transactionType.freeGrant",
+                    "FREE_RESET": "enums.transactionType.freeReset",
                     "PURCHASE": "enums.transactionType.purchase",
                     "SUBSCRIPTION": "enums.transactionType.subscription",
                     "USAGE": "enums.transactionType.usage",
@@ -778,6 +810,7 @@
                 "type": "enum",
                 "enum": {
                   "FREE_GRANT": "enums.transactionType.freeGrant",
+                  "FREE_RESET": "enums.transactionType.freeReset",
                   "PURCHASE": "enums.transactionType.purchase",
                   "SUBSCRIPTION": "enums.transactionType.subscription",
                   "USAGE": "enums.transactionType.usage",
@@ -790,6 +823,7 @@
                 },
                 "options": [
                   "enums.transactionType.freeGrant",
+                  "enums.transactionType.freeReset",
                   "enums.transactionType.purchase",
                   "enums.transactionType.subscription",
                   "enums.transactionType.usage",

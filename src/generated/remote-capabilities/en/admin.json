@@ -60684,7 +60684,7 @@
     "credits": 0
   },
   {
-    "toolName": "credits_admin-add_GET",
+    "toolName": "verify-credit-grant",
     "title": "Verify grant recipient",
     "titleShort": "Verify grant recipient",
     "description": "Find the account eligible to receive the bonus credits.",
@@ -60697,17 +60697,127 @@
         "targetUserId": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Recipient",
-          "description": "Choose a customer from the account directory.",
+          "label": "Account email or ID",
+          "description": "Enter the exact account email address or user ID.",
           "schema": {
             "def": {
-              "type": "string",
-              "format": "uuid",
-              "check": "string_format",
-              "abort": false,
-              "pattern": {}
+              "type": "pipe",
+              "in": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}]
+                },
+                "type": "string"
+              },
+              "out": {
+                "def": {
+                  "type": "union",
+                  "options": [
+                    {
+                      "def": {
+                        "type": "string",
+                        "format": "uuid",
+                        "check": "string_format",
+                        "abort": false,
+                        "pattern": {}
+                      },
+                      "type": "string"
+                    },
+                    {
+                      "def": {
+                        "type": "string",
+                        "format": "email",
+                        "check": "string_format",
+                        "abort": false,
+                        "pattern": {}
+                      },
+                      "type": "string"
+                    }
+                  ]
+                },
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string",
+                      "format": "uuid",
+                      "check": "string_format",
+                      "abort": false,
+                      "pattern": {}
+                    },
+                    "type": "string"
+                  },
+                  {
+                    "def": {
+                      "type": "string",
+                      "format": "email",
+                      "check": "string_format",
+                      "abort": false,
+                      "pattern": {}
+                    },
+                    "type": "string"
+                  }
+                ]
+              }
             },
-            "type": "string"
+            "type": "pipe",
+            "in": {
+              "def": {
+                "type": "string",
+                "checks": [{}]
+              },
+              "type": "string"
+            },
+            "out": {
+              "def": {
+                "type": "union",
+                "options": [
+                  {
+                    "def": {
+                      "type": "string",
+                      "format": "uuid",
+                      "check": "string_format",
+                      "abort": false,
+                      "pattern": {}
+                    },
+                    "type": "string"
+                  },
+                  {
+                    "def": {
+                      "type": "string",
+                      "format": "email",
+                      "check": "string_format",
+                      "abort": false,
+                      "pattern": {}
+                    },
+                    "type": "string"
+                  }
+                ]
+              },
+              "type": "union",
+              "options": [
+                {
+                  "def": {
+                    "type": "string",
+                    "format": "uuid",
+                    "check": "string_format",
+                    "abort": false,
+                    "pattern": {}
+                  },
+                  "type": "string"
+                },
+                {
+                  "def": {
+                    "type": "string",
+                    "format": "email",
+                    "check": "string_format",
+                    "abort": false,
+                    "pattern": {}
+                  },
+                  "type": "string"
+                }
+              ]
+            }
           },
           "includeInCacheKey": true,
           "usage": {
@@ -61486,10 +61596,11 @@
     "instanceId": "local",
     "category": "credits",
     "tags": ["admin"],
+    "aliases": ["verify-credit-grant"],
     "credits": 0
   },
   {
-    "toolName": "credits_admin-add_POST",
+    "toolName": "grant-credits",
     "title": "Add Credits",
     "titleShort": "Add Credits",
     "description": "Add credit packs to a user account (admin only)",
@@ -61587,6 +61698,30 @@
           },
           "schemaType": "primitive"
         },
+        "packId": {
+          "type": "text",
+          "label": "Credit pack",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "format": "uuid",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
         "message": {
           "type": "text",
           "label": "Result",
@@ -61635,6 +61770,7 @@
     "instanceId": "local",
     "category": "credits",
     "tags": ["admin"],
+    "aliases": ["grant-credits"],
     "credits": 0
   },
   {
@@ -85932,7 +86068,7 @@
               "innerType": {
                 "def": {
                   "type": "string",
-                  "format": "uuid",
+                  "format": "guid",
                   "check": "string_format",
                   "abort": false,
                   "pattern": {}
@@ -85959,7 +86095,7 @@
               "innerType": {
                 "def": {
                   "type": "string",
-                  "format": "uuid",
+                  "format": "guid",
                   "check": "string_format",
                   "abort": false,
                   "pattern": {}
@@ -86001,6 +86137,33 @@
           },
           "schemaType": "primitive"
         },
+        "packId": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Credit pack",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "format": "guid",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "includeInCacheKey": true,
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "typeFilter": {
           "type": "form_field",
           "fieldType": "select",
@@ -86009,6 +86172,10 @@
             {
               "value": "enums.transactionType.freeGrant",
               "label": "enums.transactionType.freeGrant"
+            },
+            {
+              "value": "enums.transactionType.freeReset",
+              "label": "enums.transactionType.freeReset"
             },
             {
               "value": "enums.transactionType.purchase",
@@ -86056,6 +86223,7 @@
                   "type": "enum",
                   "entries": {
                     "FREE_GRANT": "enums.transactionType.freeGrant",
+                    "FREE_RESET": "enums.transactionType.freeReset",
                     "PURCHASE": "enums.transactionType.purchase",
                     "SUBSCRIPTION": "enums.transactionType.subscription",
                     "USAGE": "enums.transactionType.usage",
@@ -86070,6 +86238,7 @@
                 "type": "enum",
                 "enum": {
                   "FREE_GRANT": "enums.transactionType.freeGrant",
+                  "FREE_RESET": "enums.transactionType.freeReset",
                   "PURCHASE": "enums.transactionType.purchase",
                   "SUBSCRIPTION": "enums.transactionType.subscription",
                   "USAGE": "enums.transactionType.usage",
@@ -86082,6 +86251,7 @@
                 },
                 "options": [
                   "enums.transactionType.freeGrant",
+                  "enums.transactionType.freeReset",
                   "enums.transactionType.purchase",
                   "enums.transactionType.subscription",
                   "enums.transactionType.usage",
@@ -127022,6 +127192,10 @@
               "label": "enums.delivery.scheduled"
             },
             {
+              "value": "enums.delivery.stuck",
+              "label": "enums.delivery.stuck"
+            },
+            {
               "value": "enums.delivery.failed",
               "label": "enums.delivery.failed"
             },
@@ -127057,6 +127231,7 @@
                     "DUE_NOW": "enums.delivery.dueNow",
                     "OVERDUE": "enums.delivery.overdue",
                     "SCHEDULED": "enums.delivery.scheduled",
+                    "STUCK": "enums.delivery.stuck",
                     "FAILED": "enums.delivery.failed",
                     "SENT": "enums.delivery.sent",
                     "OPENED": "enums.delivery.opened",
@@ -127070,6 +127245,7 @@
                   "DUE_NOW": "enums.delivery.dueNow",
                   "OVERDUE": "enums.delivery.overdue",
                   "SCHEDULED": "enums.delivery.scheduled",
+                  "STUCK": "enums.delivery.stuck",
                   "FAILED": "enums.delivery.failed",
                   "SENT": "enums.delivery.sent",
                   "OPENED": "enums.delivery.opened",
@@ -127081,6 +127257,7 @@
                   "enums.delivery.dueNow",
                   "enums.delivery.overdue",
                   "enums.delivery.scheduled",
+                  "enums.delivery.stuck",
                   "enums.delivery.failed",
                   "enums.delivery.sent",
                   "enums.delivery.opened",
@@ -128053,6 +128230,46 @@
                 },
                 "schemaType": "primitive"
               },
+              "matchedAt": {
+                "type": "text",
+                "label": "Most recent match",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
+              "matchedSubject": {
+                "type": "text",
+                "label": "Subject of matching email",
+                "schema": {
+                  "def": {
+                    "type": "nullable",
+                    "innerType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    }
+                  },
+                  "type": "nullable"
+                },
+                "usage": {
+                  "response": true
+                },
+                "schemaType": "primitive"
+              },
               "daysOverdue": {
                 "type": "text",
                 "label": "Days overdue",
@@ -128819,7 +129036,10 @@
                             "missing": "missing",
                             "disabled": "disabled",
                             "failing": "failing",
-                            "running": "running"
+                            "running": "running",
+                            "dryRun": "dryRun",
+                            "delayed": "delayed",
+                            "waiting": "waiting"
                           }
                         },
                         "type": "enum",
@@ -128827,9 +129047,20 @@
                           "missing": "missing",
                           "disabled": "disabled",
                           "failing": "failing",
-                          "running": "running"
+                          "running": "running",
+                          "dryRun": "dryRun",
+                          "delayed": "delayed",
+                          "waiting": "waiting"
                         },
-                        "options": ["missing", "disabled", "failing", "running"]
+                        "options": [
+                          "missing",
+                          "disabled",
+                          "failing",
+                          "running",
+                          "dryRun",
+                          "delayed",
+                          "waiting"
+                        ]
                       },
                       "schedule": {
                         "def": {
@@ -128911,7 +129142,10 @@
                                 "missing": "missing",
                                 "disabled": "disabled",
                                 "failing": "failing",
-                                "running": "running"
+                                "running": "running",
+                                "dryRun": "dryRun",
+                                "delayed": "delayed",
+                                "waiting": "waiting"
                               }
                             },
                             "type": "enum",
@@ -128919,13 +129153,19 @@
                               "missing": "missing",
                               "disabled": "disabled",
                               "failing": "failing",
-                              "running": "running"
+                              "running": "running",
+                              "dryRun": "dryRun",
+                              "delayed": "delayed",
+                              "waiting": "waiting"
                             },
                             "options": [
                               "missing",
                               "disabled",
                               "failing",
-                              "running"
+                              "running",
+                              "dryRun",
+                              "delayed",
+                              "waiting"
                             ]
                           },
                           "schedule": {
@@ -129007,7 +129247,10 @@
                               "missing": "missing",
                               "disabled": "disabled",
                               "failing": "failing",
-                              "running": "running"
+                              "running": "running",
+                              "dryRun": "dryRun",
+                              "delayed": "delayed",
+                              "waiting": "waiting"
                             }
                           },
                           "type": "enum",
@@ -129015,13 +129258,19 @@
                             "missing": "missing",
                             "disabled": "disabled",
                             "failing": "failing",
-                            "running": "running"
+                            "running": "running",
+                            "dryRun": "dryRun",
+                            "delayed": "delayed",
+                            "waiting": "waiting"
                           },
                           "options": [
                             "missing",
                             "disabled",
                             "failing",
-                            "running"
+                            "running",
+                            "dryRun",
+                            "delayed",
+                            "waiting"
                           ]
                         },
                         "schedule": {
@@ -246029,6 +246278,10 @@
               "label": "enums.kind.pack"
             },
             {
+              "value": "enums.kind.subscription",
+              "label": "enums.kind.subscription"
+            },
+            {
               "value": "enums.kind.newSubscription",
               "label": "enums.kind.newSubscription"
             },
@@ -246046,6 +246299,7 @@
                   "type": "enum",
                   "entries": {
                     "PACK": "enums.kind.pack",
+                    "SUBSCRIPTION": "enums.kind.subscription",
                     "NEW_SUBSCRIPTION": "enums.kind.newSubscription",
                     "RENEWAL": "enums.kind.renewal"
                   }
@@ -246053,11 +246307,13 @@
                 "type": "enum",
                 "enum": {
                   "PACK": "enums.kind.pack",
+                  "SUBSCRIPTION": "enums.kind.subscription",
                   "NEW_SUBSCRIPTION": "enums.kind.newSubscription",
                   "RENEWAL": "enums.kind.renewal"
                 },
                 "options": [
                   "enums.kind.pack",
+                  "enums.kind.subscription",
                   "enums.kind.newSubscription",
                   "enums.kind.renewal"
                 ]
@@ -246514,6 +246770,7 @@
                         "type": "enum",
                         "entries": {
                           "PACK": "enums.kind.pack",
+                          "SUBSCRIPTION": "enums.kind.subscription",
                           "NEW_SUBSCRIPTION": "enums.kind.newSubscription",
                           "RENEWAL": "enums.kind.renewal"
                         }
@@ -246521,11 +246778,13 @@
                       "type": "enum",
                       "enum": {
                         "PACK": "enums.kind.pack",
+                        "SUBSCRIPTION": "enums.kind.subscription",
                         "NEW_SUBSCRIPTION": "enums.kind.newSubscription",
                         "RENEWAL": "enums.kind.renewal"
                       },
                       "options": [
                         "enums.kind.pack",
+                        "enums.kind.subscription",
                         "enums.kind.newSubscription",
                         "enums.kind.renewal"
                       ]
@@ -247252,6 +247511,118 @@
           "usage": {
             "response": true
           }
+        },
+        "statusCounts": {
+          "type": "text",
+          "label": "Payment status",
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "status": {
+                          "def": {
+                            "type": "enum",
+                            "entries": {
+                              "PENDING": "enums.paymentStatus.pending",
+                              "PROCESSING": "enums.paymentStatus.processing",
+                              "SUCCEEDED": "enums.paymentStatus.succeeded",
+                              "FAILED": "enums.paymentStatus.failed",
+                              "CANCELED": "enums.paymentStatus.canceled",
+                              "REFUNDED": "enums.paymentStatus.refunded"
+                            }
+                          },
+                          "type": "enum",
+                          "enum": {
+                            "PENDING": "enums.paymentStatus.pending",
+                            "PROCESSING": "enums.paymentStatus.processing",
+                            "SUCCEEDED": "enums.paymentStatus.succeeded",
+                            "FAILED": "enums.paymentStatus.failed",
+                            "CANCELED": "enums.paymentStatus.canceled",
+                            "REFUNDED": "enums.paymentStatus.refunded"
+                          },
+                          "options": [
+                            "enums.paymentStatus.pending",
+                            "enums.paymentStatus.processing",
+                            "enums.paymentStatus.succeeded",
+                            "enums.paymentStatus.failed",
+                            "enums.paymentStatus.canceled",
+                            "enums.paymentStatus.refunded"
+                          ]
+                        },
+                        "count": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "status": {
+                        "def": {
+                          "type": "enum",
+                          "entries": {
+                            "PENDING": "enums.paymentStatus.pending",
+                            "PROCESSING": "enums.paymentStatus.processing",
+                            "SUCCEEDED": "enums.paymentStatus.succeeded",
+                            "FAILED": "enums.paymentStatus.failed",
+                            "CANCELED": "enums.paymentStatus.canceled",
+                            "REFUNDED": "enums.paymentStatus.refunded"
+                          }
+                        },
+                        "type": "enum",
+                        "enum": {
+                          "PENDING": "enums.paymentStatus.pending",
+                          "PROCESSING": "enums.paymentStatus.processing",
+                          "SUCCEEDED": "enums.paymentStatus.succeeded",
+                          "FAILED": "enums.paymentStatus.failed",
+                          "CANCELED": "enums.paymentStatus.canceled",
+                          "REFUNDED": "enums.paymentStatus.refunded"
+                        },
+                        "options": [
+                          "enums.paymentStatus.pending",
+                          "enums.paymentStatus.processing",
+                          "enums.paymentStatus.succeeded",
+                          "enums.paymentStatus.failed",
+                          "enums.paymentStatus.canceled",
+                          "enums.paymentStatus.refunded"
+                        ]
+                      },
+                      "count": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
         },
         "totals": {
           "type": "container",
@@ -274605,7 +274976,6 @@
           "fieldType": "text",
           "label": "Customer ID",
           "hidden": true,
-          "includeInCacheKey": true,
           "schema": {
             "def": {
               "type": "optional",
@@ -275794,6 +276164,20 @@
                     },
                     "schemaType": "primitive"
                   },
+                  "lastPaymentEstimated": {
+                    "type": "text",
+                    "label": "Charge inferred from plan and billing period",
+                    "schema": {
+                      "def": {
+                        "type": "boolean"
+                      },
+                      "type": "boolean"
+                    },
+                    "usage": {
+                      "response": true
+                    },
+                    "schemaType": "primitive"
+                  },
                   "cancelAtPeriodEnd": {
                     "type": "badge",
                     "text": "get.response.subscriptions.cancelAtPeriodEnd",
@@ -276676,6 +277060,10 @@
                 {
                   "value": "enums.remaining.usedUp",
                   "label": "enums.remaining.usedUp"
+                },
+                {
+                  "value": "enums.remaining.expiringSoon",
+                  "label": "enums.remaining.expiringSoon"
                 }
               ],
               "columns": 6,
@@ -276687,17 +277075,20 @@
                       "type": "enum",
                       "entries": {
                         "LEFT": "enums.remaining.left",
-                        "USED_UP": "enums.remaining.usedUp"
+                        "USED_UP": "enums.remaining.usedUp",
+                        "EXPIRING_SOON": "enums.remaining.expiringSoon"
                       }
                     },
                     "type": "enum",
                     "enum": {
                       "LEFT": "enums.remaining.left",
-                      "USED_UP": "enums.remaining.usedUp"
+                      "USED_UP": "enums.remaining.usedUp",
+                      "EXPIRING_SOON": "enums.remaining.expiringSoon"
                     },
                     "options": [
                       "enums.remaining.left",
-                      "enums.remaining.usedUp"
+                      "enums.remaining.usedUp",
+                      "enums.remaining.expiringSoon"
                     ]
                   }
                 },
@@ -277155,6 +277546,34 @@
                       },
                       "type": "number",
                       "isFinite": true
+                    },
+                    "expiringPacks": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      },
+                      "type": "optional"
+                    },
+                    "expiringCredits": {
+                      "def": {
+                        "type": "optional",
+                        "innerType": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      },
+                      "type": "optional"
                     },
                     "paid": {
                       "def": {
@@ -312295,6 +312714,142 @@
           },
           "schemaType": "primitive"
         },
+        "hasSpentCredits": {
+          "type": "form_field",
+          "fieldType": "boolean",
+          "label": "Used credits",
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "boolean"
+                },
+                "type": "boolean"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "requiredState": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Required state",
+          "description": "Also require this account state",
+          "options": [
+            {
+              "value": "enums.accountState.active",
+              "label": "enums.accountState.active"
+            },
+            {
+              "value": "enums.accountState.inactive",
+              "label": "enums.accountState.inactive"
+            },
+            {
+              "value": "enums.accountState.banned",
+              "label": "enums.accountState.banned"
+            },
+            {
+              "value": "enums.accountState.verified",
+              "label": "enums.accountState.verified"
+            },
+            {
+              "value": "enums.accountState.unverified",
+              "label": "enums.accountState.unverified"
+            }
+          ],
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "ACTIVE": "enums.accountState.active",
+                    "INACTIVE": "enums.accountState.inactive",
+                    "BANNED": "enums.accountState.banned",
+                    "VERIFIED": "enums.accountState.verified",
+                    "UNVERIFIED": "enums.accountState.unverified"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "ACTIVE": "enums.accountState.active",
+                  "INACTIVE": "enums.accountState.inactive",
+                  "BANNED": "enums.accountState.banned",
+                  "VERIFIED": "enums.accountState.verified",
+                  "UNVERIFIED": "enums.accountState.unverified"
+                },
+                "options": [
+                  "enums.accountState.active",
+                  "enums.accountState.inactive",
+                  "enums.accountState.banned",
+                  "enums.accountState.verified",
+                  "enums.accountState.unverified"
+                ]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "accountLocale": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Account locale",
+          "description": "Exact account locale, such as en-US",
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "attributedRefCode": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Attributed referral code",
+          "description": "Credited referral code, or first-visit code when no credit exists",
+          "columns": 4,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "checks": [{}, {}]
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "roles": {
           "type": "form_field",
           "fieldType": "multiselect",
@@ -314482,7 +315037,7 @@
                   "analytics.range.custom"
                 ]
               },
-              "defaultValue": "analytics.range.last30Days"
+              "defaultValue": "analytics.range.last7Days"
             },
             "type": "default"
           },
@@ -635092,6 +635647,72 @@
           },
           "schemaType": "primitive"
         },
+        "auditConnection": {
+          "type": "form_field",
+          "fieldType": "text",
+          "label": "Audit connection ID",
+          "description": "Limit audit events to one connection.",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "string",
+                  "format": "guid",
+                  "check": "string_format",
+                  "abort": false,
+                  "pattern": {}
+                },
+                "type": "string"
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
+        "auditOffset": {
+          "type": "form_field",
+          "fieldType": "number",
+          "label": "Audit offset",
+          "description": "Number of audit events to skip.",
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "number",
+                  "coerce": true,
+                  "checks": [
+                    {
+                      "def": {
+                        "type": "number",
+                        "check": "number_format",
+                        "abort": false,
+                        "format": "safeint"
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    },
+                    {},
+                    {}
+                  ]
+                },
+                "type": "number",
+                "isFinite": true
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "fleet": {
           "type": "text",
           "schema": {
@@ -636334,6 +636955,38 @@
                       "def": {
                         "type": "object",
                         "shape": {
+                          "peer": {
+                            "def": {
+                              "type": "optional",
+                              "innerType": {
+                                "def": {
+                                  "type": "nullable",
+                                  "innerType": {
+                                    "def": {
+                                      "type": "string"
+                                    },
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "nullable"
+                              }
+                            },
+                            "type": "optional"
+                          },
+                          "offset": {
+                            "def": {
+                              "type": "optional",
+                              "innerType": {
+                                "def": {
+                                  "type": "number",
+                                  "checks": []
+                                },
+                                "type": "number",
+                                "isFinite": true
+                              }
+                            },
+                            "type": "optional"
+                          },
                           "events": {
                             "def": {
                               "type": "object",
@@ -640763,6 +641416,48 @@
           },
           "schemaType": "primitive"
         },
+        "taskScope": {
+          "type": "form_field",
+          "fieldType": "select",
+          "label": "Task scope",
+          "description": "Match the scope of a task health report.",
+          "options": [
+            {
+              "value": "enums.taskScope.enabled",
+              "label": "enums.taskScope.enabled"
+            },
+            {
+              "value": "enums.taskScope.all",
+              "label": "enums.taskScope.all"
+            }
+          ],
+          "hidden": true,
+          "schema": {
+            "def": {
+              "type": "optional",
+              "innerType": {
+                "def": {
+                  "type": "enum",
+                  "entries": {
+                    "ENABLED": "enums.taskScope.enabled",
+                    "ALL": "enums.taskScope.all"
+                  }
+                },
+                "type": "enum",
+                "enum": {
+                  "ENABLED": "enums.taskScope.enabled",
+                  "ALL": "enums.taskScope.all"
+                },
+                "options": ["enums.taskScope.enabled", "enums.taskScope.all"]
+              }
+            },
+            "type": "optional"
+          },
+          "usage": {
+            "request": "data"
+          },
+          "schemaType": "primitive"
+        },
         "startDate": {
           "type": "form_field",
           "fieldType": "date",
@@ -643698,6 +644393,10 @@
               "label": "enums.healthFilter.attention"
             },
             {
+              "value": "enums.healthFilter.withFailures",
+              "label": "enums.healthFilter.withFailures"
+            },
+            {
               "value": "enums.taskHealth.stuck",
               "label": "enums.taskHealth.stuck"
             },
@@ -643748,6 +644447,7 @@
                   "entries": {
                     "ALL": "enums.healthFilter.all",
                     "ATTENTION": "enums.healthFilter.attention",
+                    "WITH_FAILURES": "enums.healthFilter.withFailures",
                     "STUCK": "enums.taskHealth.stuck",
                     "FAILING": "enums.taskHealth.failing",
                     "OVERDUE": "enums.taskHealth.overdue",
@@ -643764,6 +644464,7 @@
                 "enum": {
                   "ALL": "enums.healthFilter.all",
                   "ATTENTION": "enums.healthFilter.attention",
+                  "WITH_FAILURES": "enums.healthFilter.withFailures",
                   "STUCK": "enums.taskHealth.stuck",
                   "FAILING": "enums.taskHealth.failing",
                   "OVERDUE": "enums.taskHealth.overdue",
@@ -643778,6 +644479,7 @@
                 "options": [
                   "enums.healthFilter.all",
                   "enums.healthFilter.attention",
+                  "enums.healthFilter.withFailures",
                   "enums.taskHealth.stuck",
                   "enums.taskHealth.failing",
                   "enums.taskHealth.overdue",

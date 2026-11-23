@@ -52,7 +52,7 @@ export const translations: typeof enTranslations = {
       "Nic nie pasuje do tych filtrów. Usuń jeden, aby zobaczyć więcej.",
     emptyAll: "Brak zapisanych płatności.",
     clearFilters: "Wyczyść filtry",
-    transactionSearch: "E-mail, ID transakcji lub numer faktury",
+    transactionSearch: "E-mail lub identyfikator płatności",
     webhookSearch:
       "Szukaj według typu zdarzenia lub identyfikatora zdarzenia u operatora.",
     processingDetail:
@@ -89,6 +89,7 @@ export const translations: typeof enTranslations = {
       setup: "Zapis karty, bez płatności",
     },
     kind: {
+      subscription: "Wszystkie płatności za abonament",
       pack: "Pakiet kredytów",
       newSubscription: "Nowa subskrypcja",
       renewal: "Odnowienie",

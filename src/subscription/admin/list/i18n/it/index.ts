@@ -143,8 +143,8 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     focusLabel: "In arrivo",
-    mrrScope:
-      "Conta gli abbonamenti attivi e in prova in base all'ultimo addebito. Esclusi quelli in ritardo, in chiusura e mai addebitati.",
+    mrrScope: "Ultimi addebiti associati agli abbonamenti in rinnovo.",
+    estimatedCharge: "Addebito stimato da piano e periodo di fatturazione",
     search: "Cerca",
     endingChip: "In chiusura",
     fxNote: "a tassi fissi: {{rates}}",

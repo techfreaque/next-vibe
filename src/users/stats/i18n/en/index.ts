@@ -22,6 +22,10 @@ export const translations = {
     freeBurners: "Top free burners",
   },
   widget: {
+    cohortNote:
+      "Outcomes to date. Older signups had more time to verify, use credits or pay.",
+    activityToggle: "Account activity",
+    reviewUnverified: "Review {{count}} unverified signups",
     planLapsed: "Lapsed subscription",
     planPacks: "Credit packs only",
     groups: {

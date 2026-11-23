@@ -137,8 +137,8 @@ export const translations = {
   },
   widget: {
     focusLabel: "Upcoming",
-    mrrScope:
-      "Counts active and trialing subscriptions by their last charge. Past due, ending and never-charged ones are excluded.",
+    mrrScope: "Latest matched charges for subscriptions set to renew.",
+    estimatedCharge: "Charge inferred from plan and billing period",
     search: "Search",
     endingChip: "Ending",
     fxNote: "at static rates: {{rates}}",

@@ -25,6 +25,7 @@ export const translations: typeof enTranslations = {
       disabled: "Disattivata",
     },
     healthFilter: {
+      withFailures: "Attività con errori nel periodo",
       all: "Tutti gli stati",
       attention: "Da sistemare",
     },
@@ -125,6 +126,7 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    stabilityPeriod: "La stabilità si riferisce al periodo selezionato.",
     watchdogBanner:
       "Il watchdog delle attività è a sua volta {{state}}. I verdetti bloccata e in ritardo possono essere superati finché non torna a girare pulito.",
     inFlight: {
@@ -180,9 +182,9 @@ export const translations: typeof enTranslations = {
     },
     attention: {
       title: "Da sistemare",
-      subtitle:
-        "Attività in errore, bloccate, instabili e in ritardo. Sistemale per prime.",
-      empty: "Niente in errore, bloccato o in ritardo.",
+      subtitle: "Attività da verificare",
+      empty:
+        "Nessuna attività fallita, bloccata, in ritardo, instabile o in ripresa.",
       lastError: "Ultimo errore",
       noError: "Nessun messaggio di errore registrato",
       failedAgo: "{{status}} {{age}} fa",
@@ -205,6 +207,8 @@ export const translations: typeof enTranslations = {
       orphaned: "esecuzione orfana, attività disattivata",
     },
     chart: {
+      showTrends: "Mostra gli andamenti",
+      hideTrends: "Nascondi gli andamenti",
       runs: "Esecuzioni",
       runsSubtitle: "Clicca una barra per le esecuzioni di quel periodo",
       completed: "Riuscite",
@@ -254,6 +258,8 @@ export const translations: typeof enTranslations = {
       empty: "Nessuna attività in questo stato.",
     },
     filter: {
+      showParked: "Mostra le attività accantonate",
+      hideParked: "Nascondi le attività accantonate",
       task: "Attività",
       state: "Stato",
       allTasks: "Tutte le attività",

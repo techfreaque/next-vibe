@@ -24,6 +24,10 @@ export const translations: typeof enTranslations = {
     freeBurners: "Chi brucia più crediti gratis",
   },
   widget: {
+    cohortNote:
+      "Risultati a oggi. I conti più vecchi hanno avuto più tempo per verificarsi, usare crediti o pagare.",
+    activityToggle: "Attività dei conti",
+    reviewUnverified: "Controlla le registrazioni non confermate ({{count}})",
     planLapsed: "Abbonamento scaduto",
     planPacks: "Solo pacchetti crediti",
     groups: {

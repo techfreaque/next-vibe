@@ -45,6 +45,7 @@ export const {
 } = createEnumOptions(scopedTranslation, {
   ALL: "enums.healthFilter.all",
   ATTENTION: "enums.healthFilter.attention",
+  WITH_FAILURES: "enums.healthFilter.withFailures",
   STUCK: "enums.taskHealth.stuck",
   FAILING: "enums.taskHealth.failing",
   OVERDUE: "enums.taskHealth.overdue",
@@ -60,6 +61,7 @@ export const {
 export const TaskHealthFilterDB = [
   TaskHealthFilter.ALL,
   TaskHealthFilter.ATTENTION,
+  TaskHealthFilter.WITH_FAILURES,
   TaskHealthFilter.STUCK,
   TaskHealthFilter.FAILING,
   TaskHealthFilter.OVERDUE,

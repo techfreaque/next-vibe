@@ -25,6 +25,7 @@ import {
 import {
   AnalyticsGranularity,
   AnalyticsRange,
+  AnalyticsRangeOptions,
 } from "next-vibe/unified-ui/analytics/enum";
 import { analyticsWindowFields } from "next-vibe/unified-ui/analytics/fields";
 import {
@@ -83,6 +84,15 @@ const { GET } = createEndpoint({
       }),
 
       ...analyticsWindowFields,
+      range: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "analytics.range.label",
+        description: "analytics.range.description",
+        options: AnalyticsRangeOptions,
+        columns: 4,
+        schema: z.enum(AnalyticsRange).default(AnalyticsRange.LAST_7_DAYS),
+      }),
       ...userCohortFilterFields,
       // Reports count humans by default; the list counts everyone.
       audience: requestField(listScopedTranslation, {

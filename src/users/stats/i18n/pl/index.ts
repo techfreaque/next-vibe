@@ -24,6 +24,10 @@ export const translations: typeof enTranslations = {
     freeBurners: "Najwięksi darmowi spalacze",
   },
   widget: {
+    cohortNote:
+      "Stan na dziś. Starsze konta miały więcej czasu na potwierdzenie, użycie kredytów lub płatność.",
+    activityToggle: "Aktywność kont",
+    reviewUnverified: "Sprawdź niepotwierdzone rejestracje ({{count}})",
     planLapsed: "Wygasła subskrypcja",
     planPacks: "Tylko pakiety kredytów",
     groups: {

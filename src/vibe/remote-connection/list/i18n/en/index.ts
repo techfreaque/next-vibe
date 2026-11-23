@@ -19,8 +19,9 @@ export const translations = {
   fleet: {
     title: "Connection health",
     subtitle:
-      "Every instance linked to this server, all owners. Read from stored state. Nothing gets pinged.",
+      "All linked peers on this server. Health reflects the last recorded activity.",
     kpi: {
+      attention: "Needs attention",
       total: "Connections",
       healthy: "Healthy",
       unhealthy: "Unhealthy",
@@ -43,7 +44,7 @@ export const translations = {
       disconnectedAt: "Disconnect recorded {{at}}",
       noToken: "No token stored, calls cannot authenticate",
       neverSynced: "Never synced, linked {{at}}",
-      staleSync: "Last sync is overdue",
+      staleSync: "Sync overdue. Last synced {{at}}",
       transportDrift:
         "Configured {{configured}}, but the last call went over {{used}}",
       transportMismatch: "Both sides disagree on transport",
@@ -138,6 +139,12 @@ export const translations = {
     },
     never: "Never",
     audit: {
+      unknownPeer: "Connection unavailable",
+      allEvents: "All audit events",
+      eventsShown: "({{first}}–{{last}} of {{total}})",
+      previous: "Newer events",
+      next: "Older events",
+      peer: "Audit for {{peer}}",
       title: "Audit trail",
       subtitle: "Registrations, disconnects and denials on this server.",
       events: "Audit events",
@@ -148,7 +155,7 @@ export const translations = {
       count: "Events",
       recent: "Latest events",
       empty: "No audit events in this window.",
-      openRecent: "Open",
+      openRecent: "View audit",
     },
     action: {
       registered: "Registered",
@@ -177,6 +184,14 @@ export const translations = {
       activeOnly: {
         label: "Active only",
         description: "Only return active connections",
+      },
+      auditOffset: {
+        label: "Audit offset",
+        description: "Number of audit events to skip.",
+      },
+      auditConnection: {
+        label: "Audit connection ID",
+        description: "Limit audit events to one connection.",
       },
       fleetStatus: {
         label: "Health status",

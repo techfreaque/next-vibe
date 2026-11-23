@@ -108,6 +108,8 @@ const fleetSchema = z
       }),
     ),
     audit: z.object({
+      peer: z.string().nullable().optional(),
+      offset: z.number().optional(),
       events: kpiSchema,
       failures: kpiSchema,
       trend: timeSeriesSchema,
@@ -186,6 +188,22 @@ export const { GET } = createEndpoint({
         options: FleetStatusFilterOptions,
         hidden: true,
         schema: z.enum(FleetStatusFilter).optional(),
+      }),
+      auditConnection: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.auditConnection.label",
+        description: "get.fields.auditConnection.description",
+        hidden: true,
+        schema: z.guid().optional(),
+      }),
+      auditOffset: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "get.fields.auditOffset.label",
+        description: "get.fields.auditOffset.description",
+        hidden: true,
+        schema: z.coerce.number().int().min(0).max(2_147_483_647).optional(),
       }),
       fleet: responseField(scopedTranslation, {
         type: WidgetType.TEXT,

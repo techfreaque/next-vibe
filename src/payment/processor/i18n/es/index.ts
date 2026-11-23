@@ -51,7 +51,7 @@ export const translations: typeof enTranslations = {
       "Nada coincide con estos filtros. Quita uno para ampliar la lista.",
     emptyAll: "Aún no hay pagos registrados.",
     clearFilters: "Filtros claros",
-    transactionSearch: "E-mail, ID de transacción o ref. de factura",
+    transactionSearch: "Correo o referencia del pago",
     webhookSearch:
       "Buscar tipo de evento o referencia del evento del proveedor.",
     processingDetail:
@@ -88,6 +88,7 @@ export const translations: typeof enTranslations = {
       setup: "Registro de tarjeta, sin cobro",
     },
     kind: {
+      subscription: "Todos los pagos de suscripción",
       pack: "Paquete de créditos",
       newSubscription: "Nueva suscripción",
       renewal: "Renovación",

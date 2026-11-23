@@ -24,6 +24,7 @@ export const translations: typeof enTranslations = {
       disabled: "Deaktiviert",
     },
     healthFilter: {
+      withFailures: "Aufgaben mit Fehlern im Zeitraum",
       all: "Alle Zustände",
       attention: "Handlungsbedarf",
     },
@@ -124,6 +125,7 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    stabilityPeriod: "Die Stabilität bezieht sich auf den gewählten Zeitraum.",
     watchdogBanner:
       "Der Aufgaben-Watchdog selbst ist {{state}}. Urteile zu hängenden und überfälligen Aufgaben können veraltet sein, bis er wieder sauber läuft.",
     inFlight: {
@@ -179,9 +181,9 @@ export const translations: typeof enTranslations = {
     },
     attention: {
       title: "Handlungsbedarf",
-      subtitle:
-        "Fehlerhafte, hängende, instabile und überfällige Aufgaben. Diese zuerst beheben.",
-      empty: "Nichts fehlerhaft, hängend oder überfällig.",
+      subtitle: "Aufgaben zur Prüfung",
+      empty:
+        "Keine ausgefallenen, festhängenden, überfälligen, unzuverlässigen oder sich erholenden Aufgaben.",
       lastError: "Letzter Fehler",
       noError: "Keine Fehlermeldung gespeichert",
       failedAgo: "{{status}} vor {{age}}",
@@ -203,6 +205,8 @@ export const translations: typeof enTranslations = {
       orphaned: "verwaister Lauf, Aufgabe deaktiviert",
     },
     chart: {
+      showTrends: "Verläufe anzeigen",
+      hideTrends: "Verläufe ausblenden",
       runs: "Läufe",
       runsSubtitle: "Klick auf einen Balken zeigt die Läufe dieses Zeitraums",
       completed: "Erfolgreich",
@@ -251,6 +255,8 @@ export const translations: typeof enTranslations = {
       empty: "Keine Aufgabe in diesem Zustand.",
     },
     filter: {
+      showParked: "Zurückgestellte Aufgaben anzeigen",
+      hideParked: "Zurückgestellte Aufgaben ausblenden",
       task: "Aufgabe",
       state: "Zustand",
       allTasks: "Alle Aufgaben",

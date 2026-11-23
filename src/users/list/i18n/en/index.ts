@@ -6,6 +6,20 @@ export const translations = {
     description:
       "Every account with what it paid, what it spends and when it was last active. Search, filter by revenue, activity, signup date or source, sort by any money column.",
     fields: {
+      hasSpentCredits: "Used credits",
+      requiredState: {
+        label: "Required state",
+        description: "Also require this account state",
+      },
+      accountLocale: {
+        label: "Account locale",
+        description: "Exact account locale, such as en-US",
+      },
+      attributedRefCode: {
+        label: "Attributed referral code",
+        description:
+          "Credited referral code, or first-visit code when no credit exists",
+      },
       search: {
         label: "Search accounts",
         description: "Email, name, or the start of a user ID",

@@ -27,18 +27,26 @@ export function SegmentGroup<TValue extends string>({
   value,
   options,
   disabled,
+  wrap,
   onSelect,
 }: {
   label: string;
   value: TValue | undefined;
   options: readonly SegmentOption<TValue>[];
   disabled?: boolean;
+  wrap?: boolean;
   onSelect: (next: TValue | undefined) => void;
 }): JSX.Element {
   return (
     <Div className="flex min-w-0 flex-col gap-1">
       <Span className="text-xs font-medium text-muted-foreground">{label}</Span>
-      <Div className="flex min-w-0 flex-nowrap gap-1 overflow-x-auto pe-6 [mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)] @3xl:flex-wrap @3xl:pe-0 @3xl:[mask-image:none]">
+      <Div
+        className={
+          wrap
+            ? "flex min-w-0 flex-wrap gap-1"
+            : "flex min-w-0 flex-nowrap gap-1 overflow-x-auto pe-6 [mask-image:linear-gradient(to_right,black_calc(100%-2rem),transparent)] @3xl:flex-wrap @3xl:pe-0 @3xl:[mask-image:none]"
+        }
+      >
         {options.map((option) => (
           <Button
             key={option.value ?? "all"}

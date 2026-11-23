@@ -8,6 +8,20 @@ export const translations: typeof enTranslations = {
     description:
       "Jedes Konto mit Umsatz, Credit-Verbrauch und letzter Aktivität. Suchen, nach Umsatz, Aktivität, Anmeldedatum oder Herkunft filtern, nach jeder Geldspalte sortieren.",
     fields: {
+      hasSpentCredits: "Credits genutzt",
+      requiredState: {
+        label: "Erforderlicher Status",
+        description: "Das Konto muss auch diesen Status haben",
+      },
+      accountLocale: {
+        label: "Kontosprache",
+        description: "Exakte Sprachkennung, zum Beispiel de-DE",
+      },
+      attributedRefCode: {
+        label: "Zugeordneter Empfehlungscode",
+        description:
+          "Angerechneter Empfehlungscode, sonst der Code des ersten Besuchs",
+      },
       search: {
         label: "Konten suchen",
         description: "E-Mail, Name oder Anfang einer Nutzer-ID",

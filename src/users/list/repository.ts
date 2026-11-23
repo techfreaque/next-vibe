@@ -25,7 +25,6 @@ import { utcSql } from "next-vibe/unified-ui/analytics/window-sql";
 import { CreditTransactionType } from "@/credits/enum";
 import { notSignupCarryoverRaw } from "@/credits/usage-filter";
 
-import { adminUserSql } from "../audience-sql";
 import { roundMoney } from "../money-sql";
 import { FREE_BURN_MIN_CREDITS } from "./constants";
 import type {
@@ -143,7 +142,7 @@ export class UserListRepository {
             verifiedCount: sql<number>`count(*) filter (where ${enriched.emailVerified})::int`,
             activeMonthCount: sql<number>`count(*) filter (where ${enriched.lastActiveMs} >= ${monthAgoMs})::int`,
             bannedCount: sql<number>`count(*) filter (where ${enriched.isBanned})::int`,
-            freeBurnCount: sql<number>`count(*) filter (where ${enriched.paymentsCount} = 0 and ${enriched.creditsSpent} >= ${FREE_BURN_MIN_CREDITS} and not ${adminUserSql(enriched.id)})::int`,
+            freeBurnCount: sql<number>`count(*) filter (where ${enriched.paymentsCount} = 0 and ${enriched.creditsSpent} >= ${FREE_BURN_MIN_CREDITS} and ${enriched.isHuman})::int`,
             totalPaidUsd: sql<number>`coalesce(sum(${enriched.totalPaidUsd}), 0)::float8`,
             creditBalance: sql<number>`coalesce(sum(${enriched.creditBalance}), 0)::float8`,
             creditsSpent: sql<number>`coalesce(sum(${enriched.creditsSpent}), 0)::float8`,

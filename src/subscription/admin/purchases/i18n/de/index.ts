@@ -109,7 +109,9 @@ export const translations: typeof enTranslations = {
     success: { title: "Erfolg", description: "Käufe abgerufen" },
   },
   widget: {
-    unmatched: "Bezahlte Pakete ohne zugeordnete Zahlung: {{count}}",
+    expiringCredits: "{{credits}} Credits verfallen bald",
+    unmatched:
+      "Kauf- oder Abopakete ohne zugeordneten Zahlungsbeleg: {{count}}",
     kind: "Art",
     search: "Suchen",
     openPayment: "Zahlung öffnen",
@@ -126,7 +128,7 @@ export const translations: typeof enTranslations = {
     creditsTotal: "Ausgegebene Credits",
     creditsTotalHint: "Summe der Paketgrößen",
     remainingTotal: "Übrige Credits",
-    remainingTotalHint: "Noch nicht verbraucht",
+    remainingTotalHint: "Ungenutzte Credits in gültigen Paketen",
     paidTotal: "Bezahlt für diese Pakete",
     paidTotalHint:
       "Nur verknüpfte Zahlungen. Gratis-Gutschriften und Pakete ohne zugeordnete Zahlung zählen nicht.",
@@ -161,6 +163,7 @@ export const translations: typeof enTranslations = {
   },
   enums: {
     remaining: {
+      expiringSoon: "Läuft binnen 7 Tagen ab",
       left: "Credits übrig",
       usedUp: "Aufgebraucht",
     },

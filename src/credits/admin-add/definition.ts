@@ -77,6 +77,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["credits", "admin-add"],
+  aliases: ["verify-credit-grant"],
   title: "adminAdd.recipient.title",
   titleShort: "adminAdd.recipient.title",
   description: "adminAdd.recipient.description",
@@ -92,9 +93,12 @@ const { GET } = createEndpoint({
       targetUserId: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "adminAdd.post.targetUserId.label",
-        description: "adminAdd.post.targetUserId.description",
-        schema: z.uuid(),
+        label: "adminAdd.recipient.lookup",
+        description: "adminAdd.recipient.lookupDescription",
+        schema: z
+          .string()
+          .trim()
+          .pipe(z.union([z.uuid(), z.email()])),
         includeInCacheKey: true,
       }),
       id: responseField(scopedTranslation, {
@@ -191,6 +195,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["credits", "admin-add"],
+  aliases: ["grant-credits"],
   title: "adminAdd.post.title" as const,
   titleShort: "adminAdd.post.titleShort" as const,
   description: "adminAdd.post.description" as const,
@@ -240,6 +245,11 @@ const { POST } = createEndpoint({
       }),
       recipientId: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
+        schema: z.uuid().optional(),
+      }),
+      packId: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "history.get.packId",
         schema: z.uuid().optional(),
       }),
       message: responseField(scopedTranslation, {

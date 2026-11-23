@@ -132,8 +132,9 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     focusLabel: "Nadchodzące",
-    mrrScope:
-      "Liczy aktywne i próbne subskrypcje według ostatniej płatności. Bez zaległych, kończących się i bez żadnej płatności.",
+    mrrScope: "Ostatnie dopasowane płatności za odnawiane abonamenty.",
+    estimatedCharge:
+      "Płatność dopasowana według planu i okresu rozliczeniowego",
     search: "Szukaj",
     endingChip: "Kończy się",
     fxNote: "po stałych kursach: {{rates}}",

@@ -8,6 +8,19 @@ export const translations: typeof enTranslations = {
     description:
       "Chaque compte avec ce qu'il a payé, ce qu'il dépense et sa dernière activité. Recherchez, filtrez par revenu, activité, date d'inscription ou source, triez par n'importe quelle colonne financière.",
     fields: {
+      hasSpentCredits: "Crédits utilisés",
+      requiredState: {
+        label: "État requis",
+        description: "Le compte doit aussi avoir cet état",
+      },
+      accountLocale: {
+        label: "Langue du compte",
+        description: "Paramètre régional exact, par exemple fr-FR",
+      },
+      attributedRefCode: {
+        label: "Code de parrainage attribué",
+        description: "Code de parrainage crédité ou code de la première visite",
+      },
       search: {
         label: "Rechercher des comptes",
         description: "E-mail, nom ou début d'un ID utilisateur",

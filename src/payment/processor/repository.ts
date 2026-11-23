@@ -22,12 +22,13 @@ import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { paymentTransactions, paymentWebhooks } from "../db";
+import { paymentRefunds, paymentTransactions, paymentWebhooks } from "../db";
 import {
   CheckoutMode,
   PaymentProvider,
   type PaymentProviderValue,
   PaymentStatus,
+  RefundStatus,
 } from "../enum";
 import { canStartStripeRefund } from "../refund/eligibility";
 import type {
@@ -51,6 +52,8 @@ function kindCondition(kind: typeof ProcessorKindValue): SQL | undefined {
   switch (kind) {
     case ProcessorKind.PACK:
       return eq(paymentTransactions.mode, CheckoutMode.PAYMENT);
+    case ProcessorKind.SUBSCRIPTION:
+      return eq(paymentTransactions.mode, CheckoutMode.SUBSCRIPTION);
     case ProcessorKind.RENEWAL:
       return sql`${isRenewal}`;
     case ProcessorKind.NEW_SUBSCRIPTION:
@@ -152,10 +155,9 @@ export class PaymentProcessorRepository {
       limit,
     } = input;
     const match = `%${(query ?? "").replaceAll(/[\\%_]/g, (char) => `\\${char}`)}%`;
-    const where = and(
+    const scope = and(
       userId ? eq(paymentTransactions.userId, userId) : undefined,
       transactionId ? eq(paymentTransactions.id, transactionId) : undefined,
-      status ? eq(paymentTransactions.status, status) : undefined,
       provider ? eq(paymentTransactions.provider, provider) : undefined,
       kind ? kindCondition(kind) : undefined,
       currency ? eq(paymentTransactions.currency, currency) : undefined,
@@ -168,23 +170,44 @@ export class PaymentProcessorRepository {
             ilike(users.email, match),
             ilike(sql`${paymentTransactions.id}::text`, match),
             ilike(paymentTransactions.providerInvoiceId, match),
+            ilike(paymentTransactions.providerPaymentIntentId, match),
+            ilike(paymentTransactions.providerSessionId, match),
           )
         : undefined,
     );
-    const [counts, totals, rows] = await Promise.all([
+    const where = and(
+      scope,
+      status ? eq(paymentTransactions.status, status) : undefined,
+    );
+    const charged = sql`${paymentTransactions.status} in (${PaymentStatus.SUCCEEDED}, ${PaymentStatus.REFUNDED})`;
+    const refundAmount = sql`(
+      select sum(${paymentRefunds.amount}) from ${paymentRefunds}
+      where ${paymentRefunds.transactionId} = ${paymentTransactions.id}
+        and ${paymentRefunds.status} = ${RefundStatus.SUCCEEDED}
+    )`;
+    const [counts, statusCounts, totals, rows] = await Promise.all([
       db
         .select({ total: count() })
         .from(paymentTransactions)
         .innerJoin(users, eq(paymentTransactions.userId, users.id))
         .where(where),
       db
+        .select({ status: paymentTransactions.status, count: count() })
+        .from(paymentTransactions)
+        .innerJoin(users, eq(paymentTransactions.userId, users.id))
+        .where(scope)
+        .groupBy(paymentTransactions.status)
+        .orderBy(paymentTransactions.status),
+      db
         .select({
           currency: paymentTransactions.currency,
-          collected: sql<string>`coalesce(sum(${paymentTransactions.amount}) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED}), 0)`,
+          gross: sql<string>`coalesce(sum(${paymentTransactions.amount}) filter (where ${charged}), 0)`,
           succeeded: sql<number>`count(*) filter (where ${paymentTransactions.status} = ${PaymentStatus.SUCCEEDED})::int`,
           failed: sql<number>`count(*) filter (where ${paymentTransactions.status} = ${PaymentStatus.FAILED})::int`,
           refunded: sql<number>`count(*) filter (where ${paymentTransactions.status} = ${PaymentStatus.REFUNDED})::int`,
-          refundedAmount: sql<string>`coalesce(sum(${paymentTransactions.amount}) filter (where ${paymentTransactions.status} = ${PaymentStatus.REFUNDED}), 0)`,
+          refundedAmount: sql<string>`coalesce(sum(coalesce(${refundAmount},
+            case when ${paymentTransactions.status} = ${PaymentStatus.REFUNDED} then ${paymentTransactions.amount} else 0 end
+          )) filter (where ${charged}), 0)`,
         })
         .from(paymentTransactions)
         .innerJoin(users, eq(paymentTransactions.userId, users.id))
@@ -240,15 +263,15 @@ export class PaymentProcessorRepository {
         updatedAt: row.updatedAt,
       })),
       webhooks: [],
+      statusCounts,
       totals: totals.map((row) => ({
         currency: row.currency,
-        collected: Number(row.collected),
+        collected: Number(row.gross) - Number(row.refundedAmount),
         succeeded: Number(row.succeeded),
         failed: Number(row.failed),
         refunded: Number(row.refunded),
         refundedAmount: Number(row.refundedAmount),
-        // Gross = everything that was charged (later refunds included)
-        gross: Number(row.collected) + Number(row.refundedAmount),
+        gross: Number(row.gross),
       })),
       currentPage: page,
       pageCount: Math.ceil(total / limit),

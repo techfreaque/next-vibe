@@ -38,6 +38,7 @@ import { type JSX, useState } from "react";
 
 import { PaymentStatus } from "@/payment/enum";
 import { scopedTranslation as paymentTranslation } from "@/payment/i18n";
+import { ProcessorKind } from "@/payment/processor/enum";
 import {
   DayRangeInputs,
   type FilterChip,
@@ -176,6 +177,7 @@ export function SubscriptionListContainer({
     next: (typeof SubscriptionStatusAdminFilterValue)[],
   ): void => {
     form.setValue("searchFilters.status", next, { shouldDirty: true });
+    form.setValue("searchFilters.focus", undefined, { shouldDirty: true });
     changePage(1);
   };
   const setPlan = (next: typeof SubscriptionPlanValue | undefined): void => {
@@ -188,7 +190,9 @@ export function SubscriptionListContainer({
     form.setValue(
       "searchFilters.interval",
       next ?? BillingIntervalAdminFilter.ANY,
-      { shouldDirty: true },
+      {
+        shouldDirty: true,
+      },
     );
     changePage(1);
   };
@@ -220,6 +224,9 @@ export function SubscriptionListContainer({
   const focus = form.watch("searchFilters.focus");
   const setFocus = (next: typeof SubscriptionFocusValue | undefined): void => {
     form.setValue("searchFilters.focus", next, { shouldDirty: true });
+    if (next) {
+      form.setValue("searchFilters.status", undefined, { shouldDirty: true });
+    }
     changePage(1);
   };
   const clearAll = (): void => {
@@ -419,6 +426,99 @@ export function SubscriptionListContainer({
           isInteractive && <NavigateButtonWidget field={children.backButton} />
         }
       />
+      {data && !isText && (
+        <Div className="grid min-w-0 grid-cols-2 gap-3 @3xl:grid-cols-4">
+          <Div className="flex min-w-0 flex-col gap-1 rounded-xl border bg-card p-2.5 @md:p-4">
+            <Span className="text-xs text-muted-foreground">
+              {t("widget.mrr")}
+            </Span>
+            <Span className="text-xl font-semibold tabular-nums [overflow-wrap:anywhere]">
+              {formatCurrency(data.response.summary.mrrUsd, "USD", locale)}
+            </Span>
+            <Span className="text-xs text-muted-foreground [overflow-wrap:anywhere]">
+              {data.response.summary.mrr.length > 0
+                ? data.response.summary.mrr
+                    .map((row) =>
+                      formatCurrency(row.amount, row.currency, locale),
+                    )
+                    .join(" + ")
+                : t("widget.noCharge")}
+              {data.response.summary.fxRates.length > 0 &&
+                ` · ${t("widget.fxNote", {
+                  rates: data.response.summary.fxRates
+                    .map((rate) => `${rate.currency} ${rate.usdRate}`)
+                    .join(", "),
+                })}`}
+              {data.response.summary.noCharge > 0 &&
+                ` · ${t("widget.pastDueHint", { count: data.response.summary.noCharge })}`}
+            </Span>
+            <Span className="text-xs text-muted-foreground">
+              {t("widget.mrrScope")}
+            </Span>
+          </Div>
+          {[
+            {
+              key: "renewing",
+              label: t("widget.renewingSoon"),
+              value: data.response.summary.renewingSoon,
+              hint: t("widget.renewingSoonHint"),
+              tone: "text-foreground",
+              onClick: (): void => setFocus(SubscriptionFocus.RENEWING_SOON),
+            },
+            {
+              key: "ending",
+              label: t("widget.ending"),
+              value: data.response.summary.ending,
+              hint: t("widget.endingHint"),
+              tone: "text-warning",
+              onClick: (): void => setFocus(SubscriptionFocus.ENDING),
+            },
+            {
+              key: "pastDue",
+              label: t("widget.pastDue"),
+              value: data.response.summary.pastDue,
+              hint: t("widget.pastDueRetry"),
+              tone: "text-destructive",
+              onClick: (): void =>
+                setStatuses([SubscriptionStatusAdminFilter.PAST_DUE]),
+            },
+          ].map((card) => (
+            <Button
+              key={card.key}
+              type="button"
+              variant="ghost"
+              disabled={!canFilter || isFetching}
+              className="flex h-auto min-w-0 flex-col items-start justify-start gap-1 rounded-xl border bg-card p-2.5 @md:p-4 text-start font-normal disabled:opacity-100"
+              onClick={card.onClick}
+            >
+              <Span className="text-xs text-muted-foreground">
+                {card.label}
+              </Span>
+              <Span
+                className={cn(
+                  "text-xl font-semibold tabular-nums [overflow-wrap:anywhere]",
+                  card.value > 0 ? card.tone : "text-muted-foreground",
+                )}
+              >
+                {card.value}
+              </Span>
+              <Span className="whitespace-normal text-xs text-muted-foreground">
+                {card.hint}
+              </Span>
+            </Button>
+          ))}
+        </Div>
+      )}
+      {data && isText && (
+        <Span>
+          {[
+            `${t("widget.mrr")} ${formatCurrency(data.response.summary.mrrUsd, "USD", locale)}`,
+            `${t("widget.renewingSoon")} ${data.response.summary.renewingSoon}`,
+            `${t("widget.ending")} ${data.response.summary.ending}`,
+            `${t("widget.pastDue")} ${data.response.summary.pastDue}`,
+          ].join(" · ")}
+        </Span>
+      )}
       {canFilter && (
         <Div className="flex min-w-0 flex-col gap-3">
           {!onPick && (
@@ -434,7 +534,13 @@ export function SubscriptionListContainer({
                       import("@/payment/processor/definition").then(
                         (module) => module.default.GET,
                       ),
-                    { data: { userId, status: PaymentStatus.FAILED } },
+                    {
+                      data: {
+                        userId,
+                        status: PaymentStatus.FAILED,
+                        kind: ProcessorKind.SUBSCRIPTION,
+                      },
+                    },
                   )
                 }
               >
@@ -502,6 +608,7 @@ export function SubscriptionListContainer({
           {statusCounts.length > 0 && (
             <SegmentGroup
               label={t("get.status.label")}
+              wrap
               value={statuses.length === 1 ? statuses[0] : undefined}
               disabled={isFetching}
               onSelect={(next) => setStatuses(next ? [next] : [])}
@@ -588,7 +695,9 @@ export function SubscriptionListContainer({
                   form.setValue(
                     "sortingOptions.sortBy",
                     next ?? SubscriptionSortField.CREATED_AT,
-                    { shouldDirty: true },
+                    {
+                      shouldDirty: true,
+                    },
                   );
                   changePage(1);
                 }}
@@ -605,7 +714,9 @@ export function SubscriptionListContainer({
                   form.setValue(
                     "sortingOptions.sortOrder",
                     next ?? SortOrder.DESC,
-                    { shouldDirty: true },
+                    {
+                      shouldDirty: true,
+                    },
                   );
                   changePage(1);
                 }}
@@ -626,7 +737,7 @@ export function SubscriptionListContainer({
           />
         </Div>
       )}
-      {!data && response?.success === false && (
+      {response?.success === false && !isFetching && (
         <EmptyBlock
           className="rounded-xl border"
           title={t("get.errors.server.title")}
@@ -643,99 +754,6 @@ export function SubscriptionListContainer({
       )}
       {!data && response?.success !== false && (
         <LoadingBlock message={t("widget.loading")} />
-      )}
-      {data && !isText && (
-        <Div className="grid min-w-0 grid-cols-2 gap-3 @3xl:grid-cols-4">
-          <Div className="flex min-w-0 flex-col gap-1 rounded-xl border bg-card p-4">
-            <Span className="text-xs text-muted-foreground">
-              {t("widget.mrr")}
-            </Span>
-            <Span className="text-2xl font-semibold tabular-nums">
-              {formatCurrency(data.response.summary.mrrUsd, "USD", locale)}
-            </Span>
-            <Span className="text-xs text-muted-foreground [overflow-wrap:anywhere]">
-              {data.response.summary.mrr.length > 0
-                ? data.response.summary.mrr
-                    .map((row) =>
-                      formatCurrency(row.amount, row.currency, locale),
-                    )
-                    .join(" + ")
-                : t("widget.noCharge")}
-              {data.response.summary.fxRates.length > 0 &&
-                ` · ${t("widget.fxNote", {
-                  rates: data.response.summary.fxRates
-                    .map((rate) => `${rate.currency} ${rate.usdRate}`)
-                    .join(", "),
-                })}`}
-              {data.response.summary.noCharge > 0 &&
-                ` · ${t("widget.pastDueHint", { count: data.response.summary.noCharge })}`}
-            </Span>
-            <Span className="text-xs text-muted-foreground">
-              {t("widget.mrrScope")}
-            </Span>
-          </Div>
-          {[
-            {
-              key: "renewing",
-              label: t("widget.renewingSoon"),
-              value: data.response.summary.renewingSoon,
-              hint: t("widget.renewingSoonHint"),
-              tone: "text-foreground",
-              onClick: (): void => setFocus(SubscriptionFocus.RENEWING_SOON),
-            },
-            {
-              key: "ending",
-              label: t("widget.ending"),
-              value: data.response.summary.ending,
-              hint: t("widget.endingHint"),
-              tone: "text-warning",
-              onClick: (): void => setFocus(SubscriptionFocus.ENDING),
-            },
-            {
-              key: "pastDue",
-              label: t("widget.pastDue"),
-              value: data.response.summary.pastDue,
-              hint: t("widget.pastDueRetry"),
-              tone: "text-destructive",
-              onClick: (): void =>
-                setStatuses([SubscriptionStatusAdminFilter.PAST_DUE]),
-            },
-          ].map((card) => (
-            <Button
-              key={card.key}
-              type="button"
-              variant="ghost"
-              disabled={!canFilter}
-              className="flex h-auto min-w-0 flex-col items-start justify-start gap-1 rounded-xl border bg-card p-4 text-start font-normal disabled:opacity-100"
-              onClick={card.onClick}
-            >
-              <Span className="text-xs text-muted-foreground">
-                {card.label}
-              </Span>
-              <Span
-                className={cn(
-                  "text-2xl font-semibold tabular-nums",
-                  card.value > 0 ? card.tone : "text-muted-foreground",
-                )}
-              >
-                {card.value}
-              </Span>
-              <Span className="whitespace-normal text-xs text-muted-foreground">
-                {card.hint}
-              </Span>
-            </Button>
-          ))}
-        </Div>
-      )}
-      {data && isText && (
-        <Span>
-          {[
-            `${t("widget.mrr")} ${formatCurrency(data.response.summary.mrrUsd, "USD", locale)}`,
-            `${t("widget.renewingSoon")} ${data.response.summary.renewingSoon}`,
-            `${t("widget.ending")} ${data.response.summary.ending}`,
-            `${t("widget.pastDue")} ${data.response.summary.pastDue}`,
-          ].join(" · ")}
-        </Span>
       )}
       {data && subscriptions.length === 0 && (
         <EmptyBlock
@@ -772,6 +790,9 @@ export function SubscriptionListContainer({
                 subscription.userEmail,
                 `${tSubscription(subscription.planId)} ${tSubscription(subscription.billingInterval)}`,
                 priceLabel(subscription) ?? t("widget.noCharge"),
+                ...(subscription.lastPaymentEstimated
+                  ? [t("widget.estimatedCharge")]
+                  : []),
                 nextStep(subscription).text,
                 tPayment(subscription.provider),
                 subscription.id,
@@ -798,6 +819,9 @@ export function SubscriptionListContainer({
                 date: formatDate(subscription.createdAt, locale, "PP"),
               }),
             ];
+            if (subscription.lastPaymentEstimated) {
+              meta.push(t("widget.estimatedCharge"));
+            }
             if (subscription.lastPaymentAt) {
               meta.push(
                 t("widget.lastPaid", {

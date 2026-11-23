@@ -21,8 +21,9 @@ export const translations: typeof enTranslations = {
   fleet: {
     title: "État des connexions",
     subtitle:
-      "Chaque instance liée à ce serveur, tous propriétaires. Lu depuis l'état enregistré. Aucun ping.",
+      "Toutes les connexions de ce serveur. Le statut repose sur la dernière activité enregistrée.",
     kpi: {
+      attention: "À vérifier",
       total: "Connexions",
       healthy: "Saines",
       unhealthy: "En défaut",
@@ -45,7 +46,7 @@ export const translations: typeof enTranslations = {
       disconnectedAt: "Déconnexion enregistrée {{at}}",
       noToken: "Aucun jeton, les appels ne peuvent pas s'authentifier",
       neverSynced: "Jamais synchronisée, liée {{at}}",
-      staleSync: "La dernière synchronisation est trop ancienne",
+      staleSync: "Synchronisation en retard. Dernière synchronisation {{at}}",
       transportDrift:
         "Configuré {{configured}}, mais le dernier appel est passé par {{used}}",
       transportMismatch: "Les deux côtés divergent sur le transport",
@@ -140,6 +141,12 @@ export const translations: typeof enTranslations = {
     },
     never: "Jamais",
     audit: {
+      unknownPeer: "Connexion indisponible",
+      allEvents: "Tous les événements",
+      eventsShown: "({{first}}–{{last}} sur {{total}})",
+      previous: "Événements plus récents",
+      next: "Événements plus anciens",
+      peer: "Journal de {{peer}}",
       title: "Journal d'audit",
       subtitle: "Enregistrements, déconnexions et refus sur ce serveur.",
       events: "Événements d'audit",
@@ -150,7 +157,7 @@ export const translations: typeof enTranslations = {
       count: "Événements",
       recent: "Derniers événements",
       empty: "Aucun événement d'audit sur cette période.",
-      openRecent: "Ouvrir",
+      openRecent: "Voir le journal",
     },
     action: {
       registered: "Enregistrée",
@@ -179,6 +186,14 @@ export const translations: typeof enTranslations = {
       activeOnly: {
         label: "Actives uniquement",
         description: "Ne renvoyer que les connexions actives",
+      },
+      auditOffset: {
+        label: "Décalage du journal",
+        description: "Nombre d’événements à ignorer.",
+      },
+      auditConnection: {
+        label: "ID de connexion pour le journal",
+        description: "Filtrer le journal sur une connexion.",
       },
       fleetStatus: {
         label: "État",

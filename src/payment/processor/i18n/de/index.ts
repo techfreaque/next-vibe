@@ -51,7 +51,7 @@ export const translations: typeof enTranslations = {
       "Kein Treffer für diese Filter. Entferne einen, um mehr zu sehen.",
     emptyAll: "Noch keine Zahlungen erfasst.",
     clearFilters: "Filter zurücksetzen",
-    transactionSearch: "E-Mail, Transaktions-ID oder Rechnungsreferenz",
+    transactionSearch: "E-Mail oder Zahlungsreferenz",
     webhookSearch:
       "Suche nach Ereignistyp oder Ereignisreferenz des Anbieters.",
     processingDetail:
@@ -88,6 +88,7 @@ export const translations: typeof enTranslations = {
       setup: "Kartenhinterlegung, keine Zahlung",
     },
     kind: {
+      subscription: "Alle Abonnementzahlungen",
       pack: "Credit-Paket",
       newSubscription: "Neues Abo",
       renewal: "Verlängerung",

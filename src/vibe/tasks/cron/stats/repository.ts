@@ -510,18 +510,25 @@ export class CronStatsRepository {
         includeParked || taskId
           ? taskRows
           : taskRows.filter((row) => !isParkedTask(row, now));
-      const classified = visibleRows.map((row) => ({
-        row,
-        state: classifyTaskHealth(row, now, windowRuns(row.id)),
-      }));
       const failuresOf = (id: string): number => windowRuns(id).failed;
-      // Most urgent state first; inside a state, the most failures first.
-      classified.sort(
-        (a, b) =>
-          TASK_HEALTH_RANK[a.state] - TASK_HEALTH_RANK[b.state] ||
-          failuresOf(b.row.id) - failuresOf(a.row.id) ||
-          nameOf(a.row).localeCompare(nameOf(b.row)),
-      );
+      const classifyAndSort = (
+        rows: typeof taskRows,
+      ): Array<{
+        row: (typeof taskRows)[number];
+        state: typeof TaskHealthValue;
+      }> =>
+        rows
+          .map((row) => ({
+            row,
+            state: classifyTaskHealth(row, now, windowRuns(row.id)),
+          }))
+          .toSorted(
+            (a, b) =>
+              TASK_HEALTH_RANK[a.state] - TASK_HEALTH_RANK[b.state] ||
+              failuresOf(b.row.id) - failuresOf(a.row.id) ||
+              nameOf(a.row).localeCompare(nameOf(b.row)),
+          );
+      const classified = classifyAndSort(visibleRows);
 
       const summary = {
         total: visibleRows.length,
@@ -651,50 +658,56 @@ export class CronStatsRepository {
 
       // ── Task table (state filter, server-side) ──────────────────────────
       const filter = data.health ?? TaskHealthFilter.ALL;
-      const tasks: CronHealthTaskRow[] = classified
-        .filter(({ state }) => matchesFilter(state, filter))
-        .map(({ row, state }) => {
-          const s = statsByTask.get(row.id);
-          const inWindow = windowRuns(row.id);
-          const start = runStartOf(row);
-          return {
-            id: row.id,
-            displayName: nameOf(row),
-            state,
-            enabled: row.enabled,
-            oneOff: isOneOffTask(row),
-            blockedByRun:
-              row.enabled && row.lastExecutionStatus === CronTaskStatus.RUNNING,
-            orphanedRunSince: isOrphanedRun(row, now)
-              ? (start?.toISOString() ?? null)
-              : null,
-            schedule: row.schedule,
-            scheduleLabel: formatCronScheduleShort(
-              row.schedule,
-              row.timezone ?? "UTC",
-              locale,
-              logger,
-            ),
-            lastStatus: row.lastExecutionStatus,
-            lastRunAt: row.lastExecutedAt?.toISOString() ?? null,
-            // A running task cannot start its next run until this one ends.
-            nextRunAt:
-              row.lastExecutionStatus === CronTaskStatus.RUNNING
-                ? null
-                : (nextFire(row, now)?.toISOString() ?? null),
-            runs: Number(s?.runs ?? 0),
-            failures: inWindow.failed,
-            successRate: ratio(inWindow.completed, inWindow.failed),
-            p50DurationMs: num(s?.p50),
-            p95DurationMs: num(s?.p95),
-            runStartedAt: start?.toISOString() ?? null,
-            successTrend: successTrendOf(row.id),
-            durationTrend: withData(
-              buckets,
-              p95ByTaskBucket.get(row.id) ?? new Map<string, number | null>(),
-            ),
-          };
-        });
+      const tableRows =
+        filter === TaskHealthFilter.WITH_FAILURES
+          ? classifyAndSort(
+              taskRows.filter(
+                (r) => kpiTaskIds.has(r.id) && failuresOf(r.id) > 0,
+              ),
+            )
+          : classified.filter(({ state }) => matchesFilter(state, filter));
+      const tasks: CronHealthTaskRow[] = tableRows.map(({ row, state }) => {
+        const s = statsByTask.get(row.id);
+        const inWindow = windowRuns(row.id);
+        const start = runStartOf(row);
+        return {
+          id: row.id,
+          displayName: nameOf(row),
+          state,
+          enabled: row.enabled,
+          oneOff: isOneOffTask(row),
+          blockedByRun:
+            row.enabled && row.lastExecutionStatus === CronTaskStatus.RUNNING,
+          orphanedRunSince: isOrphanedRun(row, now)
+            ? (start?.toISOString() ?? null)
+            : null,
+          schedule: row.schedule,
+          scheduleLabel: formatCronScheduleShort(
+            row.schedule,
+            row.timezone ?? "UTC",
+            locale,
+            logger,
+          ),
+          lastStatus: row.lastExecutionStatus,
+          lastRunAt: row.lastExecutedAt?.toISOString() ?? null,
+          // A running task cannot start its next run until this one ends.
+          nextRunAt:
+            row.lastExecutionStatus === CronTaskStatus.RUNNING
+              ? null
+              : (nextFire(row, now)?.toISOString() ?? null),
+          runs: Number(s?.runs ?? 0),
+          failures: inWindow.failed,
+          successRate: ratio(inWindow.completed, inWindow.failed),
+          p50DurationMs: num(s?.p50),
+          p95DurationMs: num(s?.p95),
+          runStartedAt: start?.toISOString() ?? null,
+          successTrend: successTrendOf(row.id),
+          durationTrend: withData(
+            buckets,
+            p95ByTaskBucket.get(row.id) ?? new Map<string, number | null>(),
+          ),
+        };
+      });
 
       return success({
         generatedAt: now.toISOString(),

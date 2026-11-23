@@ -19,10 +19,7 @@ import { Span } from "next-vibe/ui/components/span";
 import { StatusPill } from "next-vibe/ui/components/status-pill";
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
-import {
-  RelatedEntitiesPanel,
-  useRelatedEntityNavigation,
-} from "next-vibe/unified-ui/_shared/related-entities";
+import { useRelatedEntityNavigation } from "next-vibe/unified-ui/_shared/related-entities";
 import {
   useWidgetDisabled,
   useWidgetForm,
@@ -41,7 +38,7 @@ import { TextFieldWidget } from "next-vibe/unified-ui/widgets/form-fields/text-f
 import { FormAlertWidget } from "next-vibe/unified-ui/widgets/interactive/form-alert/widget";
 import { NavigateButtonWidget } from "next-vibe/unified-ui/widgets/interactive/navigate-button/widget";
 import { SubmitButtonWidget } from "next-vibe/unified-ui/widgets/interactive/submit-button/widget";
-import { type JSX, useMemo } from "react";
+import { type JSX, useMemo, useState } from "react";
 
 import { scopedTranslation as subscriptionTranslation } from "@/subscription/i18n";
 
@@ -201,7 +198,9 @@ export function GrantRecipientContainer({
                         import("./definition").then(
                           (module) => module.default.POST,
                         ),
-                      { data: { targetUserId: value.id } },
+                      {
+                        data: { targetUserId: value.id },
+                      },
                     )
                   }
                 >
@@ -272,7 +271,15 @@ export function AdminAddCreditsContainer({
   const value = useWidgetValue<typeof definitions.POST>();
   const navigate = useRelatedEntityNavigation();
   const targetUserId = form?.watch("targetUserId");
+  const [showRecipientDetails, setShowRecipientDetails] = useState(false);
   const grantAmount = Number(form?.watch("amount")) || 0;
+  const validAmount =
+    Number.isInteger(grantAmount) &&
+    grantAmount > 0 &&
+    grantAmount <= 9_999_999_999;
+  const grantComplete = Boolean(
+    value?.message && value.recipientId === targetUserId,
+  );
   const { t: tSubscription } = subscriptionTranslation.scopedT(locale);
   const definitionsRead = useMemo(() => ({ GET: definitions.GET }), []);
   const options = useMemo(
@@ -293,41 +300,30 @@ export function AdminAddCreditsContainer({
       ? read.data
       : undefined;
 
+  const changeRecipient = (): void => {
+    setShowRecipientDetails(false);
+    form.resetField("amount");
+    form.setValue("targetUserId", "", { shouldDirty: true });
+  };
+
   return (
-    <WidgetShell className="gap-4">
-      {!responseOnly && (
+    <WidgetShell className="gap-3">
+      {!responseOnly && !grantComplete && (
         <>
           <WidgetHeader
             title={t("adminAdd.post.container.title")}
             backButton={<NavigateButtonWidget field={children.backButton} />}
           />
-          <Span className="text-sm text-muted-foreground">
-            {t("adminAdd.post.container.description")}
-          </Span>
-          {targetUserId && (
-            <Span className="text-sm font-medium">
-              {t("adminAdd.post.stepTwo")}
-            </Span>
-          )}
-          {targetUserId ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="self-start"
-              disabled={disabled || isSubmitting}
-              onClick={() => {
-                form.resetField("amount");
-                form.setValue("targetUserId", "", { shouldDirty: true });
-              }}
-            >
-              {t("adminAdd.recipient.change")}
-            </Button>
-          ) : (
-            <EntityPickerFieldWidget
-              field={children.targetUserId}
-              fieldName="targetUserId"
-            />
+          {!targetUserId && (
+            <>
+              <Span className="text-sm text-muted-foreground">
+                {t("adminAdd.post.container.description")}
+              </Span>
+              <EntityPickerFieldWidget
+                field={children.targetUserId}
+                fieldName="targetUserId"
+              />
+            </>
           )}
           {targetUserId &&
             !recipient &&
@@ -349,46 +345,117 @@ export function AdminAddCreditsContainer({
             ) : (
               <LoadingBlock message={t("adminAdd.recipient.loading")} />
             ))}
+          {targetUserId && !recipient && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="self-start"
+              disabled={disabled || isSubmitting}
+              onClick={changeRecipient}
+            >
+              {t("adminAdd.recipient.change")}
+            </Button>
+          )}
           {recipient && (
             <>
-              <RelatedEntitiesPanel
-                title={t("adminAdd.recipient.email")}
-                emptyTitle={t("adminAdd.recipient.loadFailed")}
-                items={[
-                  {
-                    id: recipient.id,
-                    title: recipient.email,
-                    subtitle: [
-                      ...(recipient.name ? [recipient.name] : []),
-                      t("adminAdd.recipient.balanceSplit", {
-                        total: numbers.format(
-                          recipient.balance + recipient.freeBalance,
-                        ),
-                        paid: numbers.format(recipient.balance),
-                        free: numbers.format(recipient.freeBalance),
-                      }),
-                      t("adminAdd.recipient.joinedLine", {
-                        date: formatDate(recipient.joinedAt, locale, "PP"),
-                      }),
-                      recipient.subscription
-                        ? `${tSubscription(recipient.subscription.planId)} · ${tSubscription(recipient.subscription.status)}`
-                        : t("adminAdd.recipient.noSubscription"),
-                      recipient.id,
-                    ].join(" · "),
-                    action: {
-                      label: t("adminAdd.recipient.openAccount"),
-                      onClick: () =>
+              <Div className="flex min-w-0 flex-col gap-3 rounded-xl border bg-card p-3 @md:p-4">
+                <Div className="flex min-w-0 flex-wrap items-center gap-2">
+                  <StatusPill
+                    status={t("adminAdd.recipient.verified")}
+                    variant="success"
+                  />
+                  <Span className="min-w-0 font-semibold [overflow-wrap:anywhere]">
+                    {recipient.email}
+                  </Span>
+                </Div>
+                <DetailField
+                  label={t("adminAdd.recipient.balance")}
+                  value={t("adminAdd.recipient.balanceSplit", {
+                    total: numbers.format(
+                      recipient.balance + recipient.freeBalance,
+                    ),
+                    paid: numbers.format(recipient.balance),
+                    free: numbers.format(recipient.freeBalance),
+                  })}
+                />
+                <Div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    className="h-auto whitespace-normal px-0"
+                    aria-expanded={showRecipientDetails}
+                    onClick={() => setShowRecipientDetails((shown) => !shown)}
+                  >
+                    {t("adminAdd.recipient.details")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    className="h-auto whitespace-normal px-0"
+                    disabled={disabled || isSubmitting}
+                    onClick={changeRecipient}
+                  >
+                    {t("adminAdd.recipient.change")}
+                  </Button>
+                </Div>
+                {showRecipientDetails && (
+                  <>
+                    <DetailGrid columns={2}>
+                      <DetailField
+                        label={t("adminAdd.recipient.subscription")}
+                        value={
+                          recipient.subscription
+                            ? `${tSubscription(recipient.subscription.planId)} · ${tSubscription(recipient.subscription.status)}`
+                            : t("adminAdd.recipient.noSubscription")
+                        }
+                      />
+                      <DetailField
+                        label={t("adminAdd.recipient.recentGrants")}
+                        value={
+                          recipient.recentGrants[0]
+                            ? t("adminAdd.recipient.grantLine", {
+                                count: numbers.format(
+                                  recipient.recentGrants[0].amount,
+                                ),
+                                date: formatDate(
+                                  recipient.recentGrants[0].createdAt,
+                                  locale,
+                                  "PP",
+                                ),
+                              })
+                            : t("adminAdd.recipient.noGrants")
+                        }
+                      />
+                      <DetailField
+                        label={t("adminAdd.recipient.accountId")}
+                        value={recipient.id}
+                        mono
+                        copyable
+                      />
+                    </DetailGrid>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="self-start"
+                      onClick={() =>
                         navigate(
                           () =>
                             import("@/users/view/definition").then(
                               (module) => module.default.GET,
                             ),
                           { data: { userId: recipient.id } },
-                        ),
-                    },
-                  },
-                ]}
-              />
+                        )
+                      }
+                    >
+                      {t("adminAdd.recipient.openAccount")}
+                    </Button>
+                  </>
+                )}
+              </Div>
               <FormField
                 control={form.control}
                 name="amount"
@@ -428,22 +495,24 @@ export function AdminAddCreditsContainer({
                 >
                   {t("adminAdd.post.testerPreset")}
                 </Button>
-                <Span className="text-sm tabular-nums text-muted-foreground">
-                  {t("adminAdd.post.preview", {
-                    before: numbers.format(
-                      recipient.balance + recipient.freeBalance,
-                    ),
-                    amount: numbers.format(grantAmount),
-                    after: numbers.format(
-                      recipient.balance + recipient.freeBalance + grantAmount,
-                    ),
-                  })}
-                </Span>
+                {validAmount && (
+                  <Span className="text-sm tabular-nums text-muted-foreground">
+                    {t("adminAdd.post.preview", {
+                      before: numbers.format(
+                        recipient.balance + recipient.freeBalance,
+                      ),
+                      amount: numbers.format(grantAmount),
+                      after: numbers.format(
+                        recipient.balance + recipient.freeBalance + grantAmount,
+                      ),
+                    })}
+                  </Span>
+                )}
               </Div>
               <Button
                 type="submit"
-                className="w-full"
-                disabled={disabled || isSubmitting || !(grantAmount > 0)}
+                className="w-full @md:w-auto @md:self-start"
+                disabled={disabled || isSubmitting || !validAmount}
               >
                 {isSubmitting
                   ? t("adminAdd.post.submitButton.loadingText")
@@ -454,10 +523,38 @@ export function AdminAddCreditsContainer({
         </>
       )}
       <FormAlertWidget field={{}} />
-      {value?.message &&
-        (responseOnly || value.recipientId === targetUserId) && (
+      {value?.message && (responseOnly || grantComplete) && (
+        <Div className="flex min-w-0 flex-col gap-3">
           <Alert variant="success">{value.message}</Alert>
-        )}
+          {!responseOnly && value.recipientId && (
+            <Div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                onClick={() =>
+                  navigate(
+                    () =>
+                      import("../history/definition").then(
+                        (module) => module.default.GET,
+                      ),
+                    {
+                      data: {
+                        targetUserId: value.recipientId,
+                        packId: value.packId,
+                        paginationInfo: { page: 1, limit: 20 },
+                      },
+                    },
+                  )
+                }
+              >
+                {t("adminAdd.recipient.openLedger")}
+              </Button>
+              <Button type="button" variant="outline" onClick={changeRecipient}>
+                {t("adminAdd.recipient.change")}
+              </Button>
+            </Div>
+          )}
+        </Div>
+      )}
     </WidgetShell>
   );
 }

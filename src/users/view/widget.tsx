@@ -267,7 +267,6 @@ export function UserViewContainer({
     navigate(adminAddDefs.default.POST, {
       data: { targetUserId: userId },
       renderInModal: true,
-      popNavigationOnSuccess: 1,
     });
   }, [navigate, userId]);
 

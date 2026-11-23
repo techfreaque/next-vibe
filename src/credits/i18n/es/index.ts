@@ -325,6 +325,9 @@ export const translations: typeof enTranslations = {
   },
   history: {
     get: {
+      packId: "Paquete de créditos",
+      showFilters: "Mostrar filtros",
+      hideFilters: "Ocultar filtros",
       guestGrantsHidden: "Concesiones gratis de invitados ocultas",
       recent: "Actividad reciente",
       payment: "Pago",
@@ -334,7 +337,7 @@ export const translations: typeof enTranslations = {
       kindLead: "Lead sin cuenta",
       openPayment: "Abrir pago",
       currentBalance: "Saldo actual",
-      currentBalanceHint: "{{paid}} pagados · {{free}} gratis",
+      currentBalanceHint: "{{paid}} en paquetes · {{free}} gratuitos",
       showingRange: "Del {{from}} al {{to}} de {{total}}",
       from: "Desde",
       to: "Hasta",
@@ -343,8 +346,8 @@ export const translations: typeof enTranslations = {
       filteredBy: "Filtrado por",
       clearFilters: "Quitar todos",
       removeFilter: "Quitar filtro",
-      spent: "Créditos gastados",
-      granted: "Créditos concedidos",
+      spent: "Créditos debitados",
+      granted: "Créditos abonados",
       entries: "Entradas",
       periodHint: "En el periodo filtrado",
       emptyFiltered: "Ninguna entrada coincide con estos filtros.",
@@ -572,10 +575,15 @@ export const translations: typeof enTranslations = {
   },
   adminAdd: {
     recipient: {
+      details: "Datos del destinatario",
+      lookup: "Correo o ID de la cuenta",
+      lookupDescription:
+        "Introduce el correo exacto de la cuenta o el ID de usuario.",
       renewsOn: "Se renueva el {{date}}",
       endsOn: "Termina el {{date}}",
       freeBalance: "Créditos gratis",
-      balanceSplit: "{{total}} en total · {{paid}} pagados · {{free}} gratis",
+      balanceSplit:
+        "{{total}} en total · {{paid}} en paquetes · {{free}} gratuitos",
       stepHint: "Paso 1: verifica el destinatario. Paso 2: elige la cantidad.",
       verified: "Destinatario verificado",
       kind: "Tipo de destinatario",

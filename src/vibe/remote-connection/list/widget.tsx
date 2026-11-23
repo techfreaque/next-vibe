@@ -836,6 +836,7 @@ function LocalView({
 // ─── Root container ───────────────────────────────────────────────────────────
 
 export function RemoteConnectionsListContainer(): JSX.Element {
+  const [auditOpen, setAuditOpen] = useState(false);
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const { push: navigate, pop, canGoBack } = useWidgetNavigation();
   const data = useWidgetValue<typeof endpoints.GET>();
@@ -870,6 +871,8 @@ export function RemoteConnectionsListContainer(): JSX.Element {
         fleet={fleet}
         isLoading={read?.isLoading ?? false}
         onRefresh={() => void read?.refetch()}
+        auditOpen={auditOpen}
+        setAuditOpen={setAuditOpen}
       />
     );
   }
@@ -916,6 +919,8 @@ export function RemoteConnectionsListContainer(): JSX.Element {
           fleet={fleet}
           isLoading={read?.isLoading ?? false}
           onRefresh={() => void read?.refetch()}
+          auditOpen={auditOpen}
+          setAuditOpen={setAuditOpen}
         />
       )}
       {data &&

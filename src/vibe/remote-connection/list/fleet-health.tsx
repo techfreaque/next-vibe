@@ -17,7 +17,7 @@ import {
 import { Badge } from "next-vibe/ui/components/badge";
 import { Button } from "next-vibe/ui/components/button";
 import { DetailField, DetailGrid } from "next-vibe/ui/components/detail-grid";
-import { Div } from "next-vibe/ui/components/div";
+import { Div, type DivRefObject } from "next-vibe/ui/components/div";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { Pre } from "next-vibe/ui/components/pre";
 import { Span } from "next-vibe/ui/components/span";
@@ -27,7 +27,7 @@ import {
 } from "next-vibe/ui/components/status-pill";
 import { P } from "next-vibe/ui/components/typography";
 import type { JSX } from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import { useRelatedEntityNavigation } from "../../unified-ui/_shared/related-entities";
@@ -42,6 +42,7 @@ import {
 } from "../../unified-ui/_shared/use-widget-context";
 import { formatPeriod } from "../../unified-ui/analytics/format";
 import type { ConnectionIssue } from "../health-types";
+import { FLEET_AUDIT_PAGE_SIZE } from "./constants";
 import type endpoints from "./definition";
 import type { RemoteConnectionsListResponseOutput } from "./definition";
 import { FleetStatusFilter, type FleetStatusFilterValue } from "./enum";
@@ -154,6 +155,11 @@ function issueText(
   if (issue === "neverSynced") {
     return t("fleet.issue.neverSynced", {
       at: relative(row.createdAt, locale, t),
+    });
+  }
+  if (issue === "staleSync") {
+    return t("fleet.issue.staleSync", {
+      at: relative(row.lastSyncedAt, locale, t),
     });
   }
   if (issue === "inactive" && row.lastDisconnectAt) {
@@ -387,6 +393,9 @@ function renderFleetText(
   locale: CountryLanguage,
 ): string {
   const lines: string[] = [];
+  if (fleet.audit.peer) {
+    return fleetAuditLines(fleet, t, locale).join("\n");
+  }
   const c = fleet.counts;
   lines.push(t("fleet.title").toUpperCase());
   lines.push(
@@ -465,8 +474,20 @@ function renderFleetText(
       }
     }
   }
+  lines.push("", ...fleetAuditLines(fleet, t, locale));
+  return lines.join("\n");
+}
+
+function fleetAuditLines(
+  fleet: Fleet,
+  t: FleetT,
+  locale: CountryLanguage,
+): string[] {
   const a = fleet.audit;
-  lines.push("");
+  const lines: string[] = [];
+  if (a.peer) {
+    lines.push(t("fleet.audit.peer", { peer: a.peer }));
+  }
   lines.push(
     t("fleet.cli.audit", {
       period: formatPeriod(fleet.window.from, fleet.window.to, locale),
@@ -474,15 +495,92 @@ function renderFleetText(
       failures: a.failures.value,
     }),
   );
-  for (const r of a.byReason) {
+  for (const event of a.recent) {
+    const subject = event.instanceId ? ` · ${event.instanceId}` : "";
     lines.push(
-      `  ${String(r.metrics.events ?? 0).padStart(4)}  ${reasonLabel(r.key, t)}`,
+      `  ${shortDate(event.createdAt, locale)} · ${actionLabel(event.action, t)}${subject}${event.reason ? ` · ${reasonText(event.reason)}` : ""}`,
     );
   }
-  return lines.join("\n");
+  return lines;
 }
 
 // ─── Web rows ─────────────────────────────────────────────────────────────────
+
+function ConnectionActions({
+  row,
+  t,
+  open,
+  onToggle,
+  onAudit,
+}: {
+  row: FleetRow;
+  t: FleetT;
+  open: boolean;
+  onToggle: () => void;
+  onAudit: () => void;
+}): JSX.Element {
+  const navigate = useRelatedEntityNavigation();
+  const buttonClass =
+    "min-h-10 whitespace-normal px-2 text-start text-xs @4xl:min-h-7";
+  return (
+    <Div className="flex min-w-0 flex-wrap gap-1">
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className={buttonClass}
+        onClick={onAudit}
+      >
+        {t("fleet.audit.openRecent")}
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className={buttonClass}
+        aria-expanded={open}
+        onClick={onToggle}
+      >
+        {t(open ? "fleet.detail.hideDetails" : "fleet.detail.showDetails")}
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        className={buttonClass}
+        onClick={() =>
+          navigate(
+            async () => (await import("@/users/view/definition")).default.GET,
+            {
+              data: { userId: row.ownerUserId },
+            },
+          )
+        }
+      >
+        {t("fleet.detail.openOwner")}
+      </Button>
+      {row.isMine && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className={buttonClass}
+          onClick={() =>
+            navigate(
+              async () =>
+                (await import("../[instanceId]/definition")).default.GET,
+              {
+                urlPathParams: { instanceId: row.instanceId },
+              },
+            )
+          }
+        >
+          {t("fleet.detail.openDetail")}
+        </Button>
+      )}
+    </Div>
+  );
+}
 
 function ConnectionHealthRow({
   row,
@@ -490,22 +588,22 @@ function ConnectionHealthRow({
   locale,
   localVersion,
   interactive,
+  onAudit,
 }: {
   row: FleetRow;
   t: FleetT;
   locale: CountryLanguage;
   localVersion: string;
   interactive: boolean;
+  onAudit: (id: string) => void;
 }): JSX.Element {
   const [open, setOpen] = useState(false);
-  const navigate = useRelatedEntityNavigation();
 
   // An open denial is already an issue; older ones are history (muted).
   const history = row.issues.includes("accessDenied")
     ? null
     : denialText(row, t, locale);
   const denial = history ? t("fleet.earlier", { text: history }) : null;
-  const flags = transportFlags(row);
 
   const chip = "px-1.5 py-0 text-[11px] font-normal";
 
@@ -556,134 +654,38 @@ function ConnectionHealthRow({
         </Div>
       )}
 
-      <Div className="grid min-w-0 grid-cols-1 gap-x-6 gap-y-1 text-xs @2xl:grid-cols-2">
-        <Span className="min-w-0 [overflow-wrap:anywhere]">
-          <Span className="text-muted-foreground">
-            {t("fleet.meta.owner")}{" "}
-          </Span>
-          {row.ownerEmail}
-          {row.pairedPeer
-            ? `${SEP}${t("fleet.otherEnd", { peer: row.pairedPeer.instanceId })}`
-            : ""}
-        </Span>
-        <Div className="grid min-w-0 grid-cols-3 gap-2 tabular-nums">
-          {(
-            [
-              [
-                "out",
-                t("fleet.meta.out"),
-                transportLabel(row.transportMode, t),
-                flags.out,
-              ],
-              [
-                "in",
-                t("fleet.meta.in"),
-                transportLabel(row.remoteTransportMode, t),
-                flags.in,
-              ],
-              [
-                "last",
-                t("fleet.meta.lastCall"),
-                row.lastTransportUsed
-                  ? transportLabel(row.lastTransportUsed, t)
-                  : t("fleet.meta.none"),
-                row.lastTransportUsed !== null && flags.lastCall,
-              ],
-            ] as const
-          ).map(([key, label, value, flagged]) => (
-            <Span key={key} className="flex min-w-0 flex-col leading-tight">
-              <Span className="truncate text-[11px] text-muted-foreground">
-                {label}
-              </Span>
-              <Span className={flagged ? seg(true) : "font-medium"}>
-                <FlagIcon on={flagged} />
-                {value}
-              </Span>
-            </Span>
-          ))}
-        </Div>
-        {trustParts(row, t).length > 0 ? (
-          <Div className="flex min-w-0 flex-wrap items-center gap-1">
-            <Span className="mr-0.5 text-muted-foreground">
-              {t("fleet.meta.trust")}
-            </Span>
-            {trustParts(row, t).map((part) => (
-              <Badge
-                key={part}
-                variant="secondary"
-                className={`${chip} font-medium text-info`}
-              >
-                {part}
-              </Badge>
-            ))}
-          </Div>
-        ) : (
-          <Span className="text-muted-foreground">
-            {t("fleet.trust.standard")}
-          </Span>
-        )}
-        <Div className="flex min-w-0 flex-wrap items-center gap-1">
-          <Span className="mr-0.5 text-muted-foreground">
-            {t("fleet.meta.capabilities")}
-          </Span>
-          {capabilityParts(row, t).map((part) => (
-            <Badge key={part} variant="outline" className={chip}>
+      <Span className="min-w-0 text-xs [overflow-wrap:anywhere]">
+        <Span className="text-muted-foreground">{t("fleet.meta.owner")} </Span>
+        {row.ownerEmail}
+        {row.pairedPeer &&
+          `${SEP}${t("fleet.otherEnd", { peer: row.pairedPeer.instanceId })}`}
+      </Span>
+      {trustParts(row, t).length > 0 && (
+        <Div className="flex flex-wrap gap-1">
+          {trustParts(row, t).map((part) => (
+            <Badge
+              key={part}
+              variant="secondary"
+              className={`${chip} font-medium text-info`}
+            >
               {part}
             </Badge>
           ))}
         </Div>
-      </Div>
+      )}
 
       {denial && (
         <Span className="text-xs text-muted-foreground">{denial}</Span>
       )}
 
       {interactive && (
-        <Div className="-ml-2 flex flex-wrap gap-1">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-6 px-2 text-xs"
-            onClick={() => setOpen((v) => !v)}
-          >
-            {open
-              ? t("fleet.detail.hideDetails")
-              : t("fleet.detail.showDetails")}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-6 px-2 text-xs"
-            onClick={() =>
-              navigate(
-                async () =>
-                  (await import("@/users/view/definition")).default.GET,
-                { data: { userId: row.ownerUserId } },
-              )
-            }
-          >
-            {t("fleet.detail.openOwner")}
-          </Button>
-          {row.isMine && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-6 px-2 text-xs"
-              onClick={() =>
-                navigate(
-                  async () =>
-                    (await import("../[instanceId]/definition")).default.GET,
-                  { urlPathParams: { instanceId: row.instanceId } },
-                )
-              }
-            >
-              {t("fleet.detail.openDetail")}
-            </Button>
-          )}
-        </Div>
+        <ConnectionActions
+          row={row}
+          t={t}
+          open={open}
+          onToggle={() => setOpen(!open)}
+          onAudit={() => onAudit(row.id)}
+        />
       )}
 
       {(open || !interactive) && (
@@ -854,15 +856,16 @@ function FleetTableRow({
   locale,
   localVersion,
   interactive,
+  onAudit,
 }: {
   row: FleetRow;
   t: FleetT;
   locale: CountryLanguage;
   localVersion: string;
   interactive: boolean;
+  onAudit: (id: string) => void;
 }): JSX.Element {
   const [open, setOpen] = useState(false);
-  const navigate = useRelatedEntityNavigation();
   const flags = transportFlags(row);
   const history = row.issues.includes("accessDenied")
     ? null
@@ -956,52 +959,15 @@ function FleetTableRow({
             </Span>
           )}
           {interactive && (
-            <Span className="ml-auto flex gap-1">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-xs"
-                onClick={() => setOpen((v) => !v)}
-              >
-                {open
-                  ? t("fleet.detail.hideDetails")
-                  : t("fleet.detail.showDetails")}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-xs"
-                onClick={() =>
-                  navigate(
-                    async () =>
-                      (await import("@/users/view/definition")).default.GET,
-                    { data: { userId: row.ownerUserId } },
-                  )
-                }
-              >
-                {t("fleet.detail.openOwner")}
-              </Button>
-              {row.isMine && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 px-2 text-xs"
-                  onClick={() =>
-                    navigate(
-                      async () =>
-                        (await import("../[instanceId]/definition")).default
-                          .GET,
-                      { urlPathParams: { instanceId: row.instanceId } },
-                    )
-                  }
-                >
-                  {t("fleet.detail.openDetail")}
-                </Button>
-              )}
-            </Span>
+            <Div className="ml-auto">
+              <ConnectionActions
+                row={row}
+                t={t}
+                open={open}
+                onToggle={() => setOpen(!open)}
+                onAudit={() => onAudit(row.id)}
+              />
+            </Div>
           )}
         </Div>
       )}
@@ -1023,10 +989,14 @@ export function FleetHealthReport({
   fleet,
   isLoading,
   onRefresh,
+  auditOpen,
+  setAuditOpen,
 }: {
   fleet: Fleet;
   isLoading: boolean;
   onRefresh: () => void;
+  auditOpen: boolean;
+  setAuditOpen: (open: boolean) => void;
 }): JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const locale = useWidgetLocale();
@@ -1035,6 +1005,8 @@ export function FleetHealthReport({
   const interactive = useWidgetIsInteractive() && !responseOnly;
   const form = useWidgetForm<typeof endpoints.GET>();
   const onSubmit = useWidgetOnSubmit();
+  const reportStart = useRef<DivRefObject>(null);
+  const auditConnection = form?.watch("auditConnection");
 
   if (isCliPlatform(platform) || platform === Platform.MCP) {
     return <Pre>{renderFleetText(fleet, t, locale)}</Pre>;
@@ -1048,38 +1020,48 @@ export function FleetHealthReport({
     form.setValue(
       "fleetStatus",
       value === FleetStatusFilter.ALL ? undefined : value,
-      { shouldDirty: true },
+      {
+        shouldDirty: true,
+      },
     );
     onSubmit?.();
   };
   const c = fleet.counts;
   const a = fleet.audit;
   const clickable = interactive && form !== undefined;
+  const showAudit = auditOpen || auditConnection !== undefined;
+  const offset = a.offset ?? 0;
+  const setAuditOffset = (next: number): void => {
+    form?.setValue("auditOffset", next || undefined, { shouldDirty: true });
+  };
+  const selectAudit = (id?: string): void => {
+    setAuditOpen(true);
+    if (id !== auditConnection) {
+      form?.setValue("auditConnection", id, { shouldDirty: true });
+      setAuditOffset(0);
+    }
+    reportStart.current?.scrollIntoView({ block: "start" });
+    reportStart.current?.focus?.();
+  };
+  const showConnections = (): void => {
+    setAuditOpen(false);
+    if (auditConnection !== undefined) {
+      form?.setValue("auditConnection", undefined, { shouldDirty: true });
+      setAuditOffset(0);
+    }
+  };
 
   return (
-    <Div className="@container flex min-w-0 flex-col gap-5 p-4">
-      <Div className="flex flex-col gap-1">
-        <Span className="text-base font-semibold">{t("fleet.title")}</Span>
-        <P className="m-0 text-xs text-muted-foreground">
-          {t("fleet.subtitle")}
-        </P>
-      </Div>
-
-      <KpiGrid columns={4}>
+    <Div
+      ref={reportStart}
+      tabIndex={-1}
+      aria-label={t("fleet.title")}
+      className="@container flex min-w-0 scroll-mt-4 flex-col gap-4"
+    >
+      <P className="m-0 text-xs text-muted-foreground">{t("fleet.subtitle")}</P>
+      <KpiGrid columns={2}>
         <KpiTile
-          label={t("fleet.kpi.total")}
-          value={c.total}
-          locale={locale}
-          hint={t("fleet.kpi.totalHint", {
-            active: c.active,
-            inactive: c.total - c.active,
-          })}
-          onClick={
-            clickable ? () => setFilter(FleetStatusFilter.ALL) : undefined
-          }
-        />
-        <KpiTile
-          label={t("fleet.kpi.unhealthy")}
+          label={t("fleet.kpi.attention")}
           value={c.unhealthy}
           locale={locale}
           tone={
@@ -1090,18 +1072,11 @@ export function FleetHealthReport({
             warning: c.warning,
           })}
           onClick={
-            clickable ? () => setFilter(FleetStatusFilter.UNHEALTHY) : undefined
-          }
-        />
-        <KpiTile
-          label={t("fleet.kpi.disconnected")}
-          value={c.disconnected}
-          locale={locale}
-          tone="muted"
-          hint={t("fleet.kpi.disconnectedHint")}
-          onClick={
             clickable
-              ? () => setFilter(FleetStatusFilter.DISCONNECTED)
+              ? () => {
+                  showConnections();
+                  setFilter(FleetStatusFilter.UNHEALTHY);
+                }
               : undefined
           }
         />
@@ -1112,237 +1087,325 @@ export function FleetHealthReport({
           tone="positive"
           hint={t("fleet.kpi.healthyHint")}
           onClick={
-            clickable ? () => setFilter(FleetStatusFilter.HEALTHY) : undefined
+            clickable
+              ? () => {
+                  showConnections();
+                  setFilter(FleetStatusFilter.HEALTHY);
+                }
+              : undefined
           }
         />
       </KpiGrid>
 
-      <Div className="flex min-w-0 flex-col gap-2">
-        <Div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <Span className="text-sm font-semibold">
-            {t("fleet.table.title")}
-          </Span>
-          <Span className="text-xs text-muted-foreground">
-            {t("fleet.table.subtitle")}
-          </Span>
-          <Span className="ml-auto text-xs tabular-nums text-muted-foreground">
-            {t("fleet.table.count", {
-              shown: fleet.rows.length,
-              total: c.total,
-            })}
-          </Span>
+      {clickable && (
+        <Div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant={!showAudit ? "secondary" : "outline"}
+            aria-pressed={!showAudit}
+            onClick={showConnections}
+          >
+            {t("fleet.table.title")} (
+            {new Intl.NumberFormat(locale).format(c.total)})
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={showAudit ? "secondary" : "outline"}
+            aria-pressed={showAudit}
+            onClick={() => setAuditOpen(true)}
+          >
+            {t("fleet.audit.title")}
+          </Button>
         </Div>
-        {clickable && (
-          <Div className="flex flex-wrap gap-1.5">
-            {(
-              [
-                [FleetStatusFilter.ALL, c.total],
-                [FleetStatusFilter.UNHEALTHY, c.unhealthy],
-                [FleetStatusFilter.CRITICAL, c.critical],
-                [FleetStatusFilter.WARNING, c.warning],
-                [FleetStatusFilter.DISCONNECTED, c.disconnected],
-                [FleetStatusFilter.HEALTHY, c.healthy],
-              ] as const
-            ).map(([value, n]) => {
-              const selected =
-                (activeFilter ?? FleetStatusFilter.ALL) === value;
-              return (
-                <Button
-                  key={value}
-                  type="button"
-                  aria-pressed={selected}
-                  variant={selected ? "secondary" : "ghost"}
-                  size="sm"
-                  className="h-7 gap-1.5 px-2.5 text-xs"
-                  onClick={() => setFilter(value)}
-                >
-                  {t(FILTER_LABEL[value])}
-                  <Span className="tabular-nums text-muted-foreground">
-                    {n}
-                  </Span>
-                </Button>
-              );
-            })}
+      )}
+      {!showAudit && (
+        <Div className="flex min-w-0 flex-col gap-2">
+          <Div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <Span className="text-xs text-muted-foreground">
+              {t("fleet.table.subtitle")}
+            </Span>
+            <Span className="ml-auto text-xs tabular-nums text-muted-foreground">
+              {t("fleet.table.count", {
+                shown: fleet.rows.length,
+                total: c.total,
+              })}
+            </Span>
           </Div>
-        )}
-        {fleet.rows.length === 0 ? (
-          <Div className="rounded-lg border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
-            {c.total === 0 ? t("fleet.table.emptyAll") : t("fleet.table.empty")}
-          </Div>
-        ) : (
-          <Div className="overflow-hidden rounded-lg border bg-card">
-            {/* Wide: one aligned line per connection. Narrow: cards. */}
-            <Div className="hidden @4xl:block">
-              <FleetTableHeader t={t} />
-              <Div className="flex flex-col divide-y">
+          {clickable && (
+            <Div className="flex flex-wrap gap-1.5">
+              {(
+                [
+                  [FleetStatusFilter.ALL, c.total],
+                  [FleetStatusFilter.UNHEALTHY, c.unhealthy],
+                  [FleetStatusFilter.CRITICAL, c.critical],
+                  [FleetStatusFilter.WARNING, c.warning],
+                  [FleetStatusFilter.DISCONNECTED, c.disconnected],
+                  [FleetStatusFilter.HEALTHY, c.healthy],
+                ] as const
+              ).map(([value, n]) => {
+                const selected =
+                  (activeFilter ?? FleetStatusFilter.ALL) === value;
+                return (
+                  <Button
+                    key={value}
+                    type="button"
+                    aria-pressed={selected}
+                    variant={selected ? "secondary" : "ghost"}
+                    size="sm"
+                    className="h-7 gap-1.5 px-2.5 text-xs"
+                    onClick={() => setFilter(value)}
+                  >
+                    {t(FILTER_LABEL[value])}
+                    <Span className="tabular-nums text-muted-foreground">
+                      {n}
+                    </Span>
+                  </Button>
+                );
+              })}
+            </Div>
+          )}
+          {fleet.rows.length === 0 ? (
+            <Div className="rounded-lg border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
+              {c.total === 0
+                ? t("fleet.table.emptyAll")
+                : t("fleet.table.empty")}
+            </Div>
+          ) : (
+            <Div className="overflow-hidden rounded-lg border bg-card">
+              {/* Wide: one aligned line per connection. Narrow: cards. */}
+              <Div className="hidden @4xl:block">
+                <FleetTableHeader t={t} />
+                <Div className="flex flex-col divide-y">
+                  {fleet.rows.map((row) => (
+                    <FleetTableRow
+                      key={row.id}
+                      row={row}
+                      t={t}
+                      locale={locale}
+                      localVersion={fleet.localCapabilitiesVersion}
+                      interactive={clickable}
+                      onAudit={selectAudit}
+                    />
+                  ))}
+                </Div>
+              </Div>
+              <Div className="flex min-w-0 flex-col divide-y @4xl:hidden">
                 {fleet.rows.map((row) => (
-                  <FleetTableRow
+                  <ConnectionHealthRow
                     key={row.id}
                     row={row}
                     t={t}
                     locale={locale}
                     localVersion={fleet.localCapabilitiesVersion}
-                    interactive={interactive}
+                    interactive={clickable}
+                    onAudit={selectAudit}
                   />
                 ))}
               </Div>
             </Div>
-            <Div className="flex min-w-0 flex-col divide-y @4xl:hidden">
-              {fleet.rows.map((row) => (
-                <ConnectionHealthRow
-                  key={row.id}
-                  row={row}
-                  t={t}
-                  locale={locale}
-                  localVersion={fleet.localCapabilitiesVersion}
-                  interactive={interactive}
-                />
-              ))}
-            </Div>
-          </Div>
-        )}
-      </Div>
-
-      <Div className="flex min-w-0 flex-col gap-3">
-        <Div className="flex flex-col gap-1">
-          <Span className="text-sm font-semibold">
-            {t("fleet.audit.title")}
-          </Span>
-          <P className="m-0 text-xs text-muted-foreground">
-            {t("fleet.audit.subtitle")}
-          </P>
+          )}
         </Div>
-        {form && (
-          <AnalyticsToolbar
-            locale={locale}
-            period={fleet.window}
-            isLoading={isLoading}
-            onRefresh={onRefresh}
-            value={{
-              range: form.watch("range"),
-              granularity: form.watch("granularity"),
-              from: form.watch("from"),
-              to: form.watch("to"),
-            }}
-            onChange={(patch) => {
-              if (patch.range !== undefined) {
-                form.setValue("range", patch.range, { shouldDirty: true });
-              }
-              if (patch.granularity !== undefined) {
-                form.setValue("granularity", patch.granularity, {
-                  shouldDirty: true,
-                });
-              }
-              if ("from" in patch) {
-                form.setValue("from", patch.from, { shouldDirty: true });
-              }
-              if ("to" in patch) {
-                form.setValue("to", patch.to, { shouldDirty: true });
-              }
-              onSubmit?.();
-            }}
-          />
-        )}
-        <KpiGrid columns={2}>
-          <KpiTile
-            label={t("fleet.audit.events")}
-            value={a.events.value}
-            locale={locale}
-            sparkline={a.trend.series.reduce<number[]>(
-              (sum, s) => s.values.map((v, i) => v + (sum[i] ?? 0)),
-              [],
-            )}
-          />
-          <KpiTile
-            label={t("fleet.audit.failures")}
-            value={a.failures.value}
-            previous={a.failures.previous}
-            locale={locale}
-            invertDelta
-            tone={a.failures.value > 0 ? "negative" : "default"}
-          />
-        </KpiGrid>
-        {a.events.value === 0 ? (
-          <Div className="rounded-lg border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
-            {t("fleet.audit.empty")}
-          </Div>
-        ) : (
-          <>
-            <TimeSeriesChart
-              title={t("fleet.audit.trend")}
-              buckets={a.trend.buckets}
-              bucket={fleet.window.bucket}
-              variant="stacked-bar"
-              locale={locale}
-              series={a.trend.series.map((s) => {
-                const match = AUDIT_ACTIONS.find((x) => x === s.key);
-                return {
-                  key: s.key,
-                  label: match ? actionLabel(match, t) : s.key,
-                  values: s.values,
-                  color:
-                    s.key === "denied"
-                      ? "negative"
-                      : s.key === "rate_limited"
-                        ? "warning"
-                        : s.key === "disconnected"
-                          ? "muted"
-                          : undefined,
-                };
-              })}
-            />
-            <BreakdownTable
-              title={t("fleet.audit.byReason")}
-              dimensionLabel={t("fleet.audit.reason")}
-              columns={[{ key: "events", label: t("fleet.audit.count") }]}
-              shareKey="events"
-              rows={a.byReason.map((r) => ({
-                id: r.key ?? "none",
-                label: reasonLabel(r.key, t),
-                values: r.metrics,
-              }))}
-              locale={locale}
-            />
-            <Div className="flex min-w-0 flex-col gap-1">
-              <Span className="text-xs font-semibold text-muted-foreground">
-                {t("fleet.audit.recent")}
+      )}
+      {(showAudit || !clickable) && (
+        <Div className="flex min-w-0 flex-col gap-3">
+          <Div className="flex flex-wrap items-start justify-between gap-2">
+            <Div className="flex flex-col gap-1">
+              <Span className="text-sm font-semibold">
+                {a.peer
+                  ? t("fleet.audit.peer", { peer: a.peer })
+                  : t(
+                      auditConnection
+                        ? "fleet.audit.unknownPeer"
+                        : "fleet.audit.title",
+                    )}
               </Span>
-              <Div className="flex min-w-0 flex-col divide-y rounded-lg border bg-card text-xs">
-                {a.recent.map((e) => (
-                  <Div
-                    key={e.id}
-                    className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5 px-3 py-2"
-                  >
-                    <Span className="w-28 shrink-0 tabular-nums text-muted-foreground">
-                      {relative(e.createdAt, locale, t)}
-                    </Span>
-                    <Span
-                      className={
-                        e.action === "denied" || e.action === "rate_limited"
-                          ? "font-medium text-destructive"
-                          : "font-medium"
+              <P className="m-0 text-xs text-muted-foreground">
+                {t("fleet.audit.subtitle")}
+              </P>
+            </Div>
+            {clickable && auditConnection && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => selectAudit()}
+              >
+                {t("fleet.audit.allEvents")}
+              </Button>
+            )}
+          </Div>
+          {form && (
+            <AnalyticsToolbar
+              locale={locale}
+              period={fleet.window}
+              isLoading={isLoading}
+              onRefresh={onRefresh}
+              value={{
+                range: form.watch("range"),
+                granularity: form.watch("granularity"),
+                from: form.watch("from"),
+                to: form.watch("to"),
+              }}
+              onChange={(patch) => {
+                setAuditOffset(0);
+                if (patch.range !== undefined) {
+                  form.setValue("range", patch.range, { shouldDirty: true });
+                }
+                if (patch.granularity !== undefined) {
+                  form.setValue("granularity", patch.granularity, {
+                    shouldDirty: true,
+                  });
+                }
+                if ("from" in patch) {
+                  form.setValue("from", patch.from, { shouldDirty: true });
+                }
+                if ("to" in patch) {
+                  form.setValue("to", patch.to, { shouldDirty: true });
+                }
+                onSubmit?.();
+              }}
+            />
+          )}
+          <KpiGrid columns={2}>
+            <KpiTile
+              label={t("fleet.audit.events")}
+              value={a.events.value}
+              locale={locale}
+              sparkline={a.trend.series.reduce<number[]>(
+                (sum, s) => s.values.map((v, i) => v + (sum[i] ?? 0)),
+                [],
+              )}
+            />
+            <KpiTile
+              label={t("fleet.audit.failures")}
+              value={a.failures.value}
+              previous={a.failures.previous}
+              locale={locale}
+              invertDelta
+              tone={a.failures.value > 0 ? "negative" : "default"}
+            />
+          </KpiGrid>
+          {a.events.value === 0 ? (
+            <Div className="rounded-lg border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
+              {t("fleet.audit.empty")}
+            </Div>
+          ) : (
+            <>
+              <Div className="flex min-w-0 flex-col gap-1">
+                <Span className="text-xs font-semibold text-muted-foreground">
+                  {t("fleet.audit.recent")}{" "}
+                  {t("fleet.audit.eventsShown", {
+                    first: Math.min(offset + 1, a.events.value),
+                    last: Math.min(offset + a.recent.length, a.events.value),
+                    total: a.events.value,
+                  })}
+                </Span>
+                <Div className="flex min-w-0 flex-col divide-y rounded-lg border bg-card text-xs">
+                  {a.recent.map((e) => (
+                    <Div
+                      key={e.id}
+                      className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5 px-3 py-2"
+                    >
+                      <Span className="tabular-nums text-muted-foreground @md:w-28 @md:shrink-0">
+                        {relative(e.createdAt, locale, t)}
+                      </Span>
+                      <Span
+                        className={
+                          e.action === "denied" || e.action === "rate_limited"
+                            ? "font-medium text-destructive"
+                            : "font-medium"
+                        }
+                      >
+                        {actionLabel(e.action, t)}
+                      </Span>
+                      {e.reason && (
+                        <Span className="text-muted-foreground">
+                          {reasonText(e.reason)}
+                        </Span>
+                      )}
+                      <Span className="min-w-0 truncate font-mono">
+                        {e.instanceId ?? ""}
+                      </Span>
+                      <Span className="min-w-0 text-muted-foreground [overflow-wrap:anywhere] @md:ml-auto">
+                        {e.ownerEmail}
+                      </Span>
+                    </Div>
+                  ))}
+                </Div>
+              </Div>
+              {clickable &&
+                (offset > 0 || a.events.value > FLEET_AUDIT_PAGE_SIZE) && (
+                  <Div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={isLoading || offset === 0}
+                      onClick={() =>
+                        setAuditOffset(
+                          Math.max(0, offset - FLEET_AUDIT_PAGE_SIZE),
+                        )
                       }
                     >
-                      {actionLabel(e.action, t)}
-                    </Span>
-                    {e.reason && (
-                      <Span className="text-muted-foreground">
-                        {reasonText(e.reason)}
-                      </Span>
-                    )}
-                    <Span className="min-w-0 truncate font-mono">
-                      {e.instanceId ?? ""}
-                    </Span>
-                    <Span className="ml-auto min-w-0 truncate text-muted-foreground">
-                      {e.ownerEmail}
-                    </Span>
+                      {t("fleet.audit.previous")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={
+                        isLoading ||
+                        offset + FLEET_AUDIT_PAGE_SIZE >= a.events.value
+                      }
+                      onClick={() =>
+                        setAuditOffset(offset + FLEET_AUDIT_PAGE_SIZE)
+                      }
+                    >
+                      {t("fleet.audit.next")}
+                    </Button>
                   </Div>
-                ))}
-              </Div>
-            </Div>
-          </>
-        )}
-      </Div>
+                )}
+              <TimeSeriesChart
+                title={t("fleet.audit.trend")}
+                buckets={a.trend.buckets}
+                bucket={fleet.window.bucket}
+                variant="stacked-bar"
+                locale={locale}
+                series={a.trend.series.map((s) => {
+                  const match = AUDIT_ACTIONS.find((x) => x === s.key);
+                  return {
+                    key: s.key,
+                    label: match ? actionLabel(match, t) : s.key,
+                    values: s.values,
+                    color:
+                      s.key === "denied"
+                        ? "negative"
+                        : s.key === "rate_limited"
+                          ? "warning"
+                          : s.key === "disconnected"
+                            ? "muted"
+                            : undefined,
+                  };
+                })}
+              />
+              <BreakdownTable
+                title={t("fleet.audit.byReason")}
+                dimensionLabel={t("fleet.audit.reason")}
+                columns={[{ key: "events", label: t("fleet.audit.count") }]}
+                shareKey="events"
+                rows={a.byReason.map((r) => ({
+                  id: r.key ?? "none",
+                  label: reasonLabel(r.key, t),
+                  values: r.metrics,
+                }))}
+                locale={locale}
+              />
+            </>
+          )}
+        </Div>
+      )}
     </Div>
   );
 }

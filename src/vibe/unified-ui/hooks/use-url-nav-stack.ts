@@ -24,34 +24,72 @@ import type { UseNavigationStackReturn } from "./use-navigation-stack";
 // urlPathParams and primitive data fields are written as plain search params.
 // On popstate the URL is read back and the single current entry is reconstructed.
 
+export function serializeNavigationData(
+  data: NavigationStackEntry["params"]["data"],
+): Record<string, string> {
+  const params: Record<string, string> = {};
+  for (const [key, value] of Object.entries(data ?? {})) {
+    if (value instanceof Date) {
+      if (Number.isFinite(value.getTime())) {
+        params[key] = value.toISOString();
+      }
+    } else if (typeof value === "boolean") {
+      params[`${key}:bool`] = String(value);
+    } else if (typeof value === "string" || typeof value === "number") {
+      params[key] = String(value);
+    } else if (
+      Array.isArray(value) &&
+      value.length > 0 &&
+      value.every((item) => typeof item === "string")
+    ) {
+      // Multi-selects use a distinct argument key, so literal search strings
+      // that look like JSON are still restored as strings.
+      params[`${key}[]`] = JSON.stringify(value);
+    }
+  }
+  return params;
+}
+
+export type NavigationArgument = string | string[] | boolean;
+
+export function deserializeNavigationData(
+  args: Record<string, string>,
+): Record<string, NavigationArgument> {
+  const data: Record<string, NavigationArgument> = {};
+  for (const [key, value] of Object.entries(args)) {
+    if (key.endsWith("[]")) {
+      try {
+        const parsed: string | string[] = JSON.parse(value);
+        if (
+          Array.isArray(parsed) &&
+          parsed.every((item) => typeof item === "string")
+        ) {
+          data[key.slice(0, -2)] = parsed;
+        }
+      } catch {
+        // Skip malformed multi-select values in manually edited URLs.
+      }
+    } else if (key.endsWith(":bool")) {
+      if (value === "true" || value === "false") {
+        data[key.slice(0, -5)] = value === "true";
+      }
+    } else {
+      data[key] = value;
+    }
+  }
+  return data;
+}
+
 function serializeEntry(entry: NavigationStackEntry): {
   alias: string;
   params: Record<string, string>;
 } {
   const alias = endpointToUrlSegment(entry.endpoint);
-  const params: Record<string, string> = {};
+  const params = serializeNavigationData(entry.params.data);
 
   if (entry.params.urlPathParams) {
     for (const [k, v] of Object.entries(entry.params.urlPathParams)) {
       if (v !== undefined && v !== null) {
-        params[k] = String(v);
-      }
-    }
-  }
-
-  if (entry.params.data) {
-    const dataRecord = entry.params.data as Record<
-      string,
-      string | number | boolean | null | undefined
-    >;
-    for (const [k, v] of Object.entries(dataRecord)) {
-      if (
-        v !== undefined &&
-        v !== null &&
-        (typeof v === "string" ||
-          typeof v === "number" ||
-          typeof v === "boolean")
-      ) {
         params[k] = String(v);
       }
     }
@@ -87,7 +125,10 @@ async function reconstructEntry(
     params: {
       urlPathParams:
         Object.keys(urlPathParams).length > 0 ? urlPathParams : undefined,
-      data: Object.keys(data).length > 0 ? data : undefined,
+      data:
+        Object.keys(data).length > 0
+          ? deserializeNavigationData(data)
+          : undefined,
     },
     timestamp: Date.now(),
   };

@@ -297,6 +297,13 @@ const { GET } = createEndpoint({
           },
         }),
       }),
+      statusCounts: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "search.status",
+        schema: z
+          .array(z.object({ status: z.enum(PaymentStatus), count: z.number() }))
+          .optional(),
+      }),
       totals: responseArrayField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "response.totals",

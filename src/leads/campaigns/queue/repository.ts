@@ -109,6 +109,13 @@ function drillConditions(data: CampaignQueueGetRequestOutput): SQL[] {
     case QueueDelivery.SCHEDULED:
       out.push(sql`${pending} AND ${emailCampaigns.scheduledAt} > ${nowUtc}`);
       break;
+    case QueueDelivery.STUCK:
+      out.push(sql`EXISTS (
+        SELECT 1 FROM email_send_log s
+        WHERE s.campaign_id = ${emailCampaigns.id} AND s.status = ${MessageStatus.PENDING}
+          AND s.claimed_at < ${nowUtc} - interval '1 hour'
+      )`);
+      break;
     case QueueDelivery.FAILED:
       out.push(
         eq(emailCampaigns.status, MessageStatus.FAILED),
@@ -153,6 +160,30 @@ function drillConditions(data: CampaignQueueGetRequestOutput): SQL[] {
   return out;
 }
 
+function matchedEvent(
+  delivery: CampaignQueueGetRequestOutput["delivery"],
+): SQL | null {
+  switch (delivery) {
+    case QueueDelivery.SENT:
+      return sql`${emailCampaigns.sentAt}`;
+    case QueueDelivery.OPENED:
+      return sql`${emailCampaigns.openedAt}`;
+    case QueueDelivery.CLICKED:
+      return sql`${emailCampaigns.clickedAt}`;
+    case QueueDelivery.UNSUBSCRIBED:
+      return sql`${emailCampaigns.unsubscribedAt}`;
+    case QueueDelivery.BOUNCED:
+      return sql`${emailCampaigns.bouncedAt}`;
+    case QueueDelivery.FAILED:
+      return sql`${emailCampaigns.updatedAt}`;
+    case QueueDelivery.STUCK:
+      return sql`(SELECT min(s.claimed_at) FROM email_send_log s
+        WHERE s.campaign_id = ${emailCampaigns.id} AND s.status = ${MessageStatus.PENDING})`;
+    default:
+      return null;
+  }
+}
+
 export class CampaignQueueRepository {
   static async getQueue(
     data: CampaignQueueGetRequestOutput,
@@ -182,6 +213,7 @@ export class CampaignQueueRepository {
         .from(emailCampaigns)
         .where(and(matchesCampaign, isPending));
       const drill = drillConditions(data);
+      const event = matchedEvent(data.delivery);
       const filter = and(
         data.leadId ? eq(leads.id, data.leadId) : undefined,
         drill.length > 0
@@ -206,6 +238,14 @@ export class CampaignQueueRepository {
           campaignType: emailCampaigns.campaignType,
           stage: emailCampaigns.stage,
           journeyVariant: emailCampaigns.journeyVariant,
+          matchedAt: sql<Date | null>`${event ?? sql`NULL`}`
+            .mapWith(emailCampaigns.sentAt)
+            .as("matched_at"),
+          matchedSubject: sql<
+            string | null
+          >`${event ? emailCampaigns.subject : sql`NULL`}`.as(
+            "matched_subject",
+          ),
           nextScheduledAt:
             sql<Date | null>`case when ${isPending} then ${emailCampaigns.scheduledAt} end`
               .mapWith(emailCampaigns.scheduledAt)
@@ -217,9 +257,11 @@ export class CampaignQueueRepository {
           ),
         })
         .from(emailCampaigns)
-        .where(matchesCampaign)
+        .where(and(matchesCampaign, ...drill))
         .orderBy(
-          sql`case when ${isPending} then ${emailCampaigns.scheduledAt} end asc nulls last`,
+          event
+            ? sql`${event} desc nulls last`
+            : sql`case when ${isPending} then ${emailCampaigns.scheduledAt} end asc nulls last`,
           desc(emailCampaigns.createdAt),
           asc(emailCampaigns.id),
         )
@@ -244,12 +286,16 @@ export class CampaignQueueRepository {
             deliveryVariant: nextDelivery.journeyVariant,
             nextScheduledAt: nextDelivery.nextScheduledAt,
             nextSubject: nextDelivery.nextSubject,
+            matchedAt: nextDelivery.matchedAt,
+            matchedSubject: nextDelivery.matchedSubject,
           })
           .from(leads)
           .leftJoinLateral(nextDelivery, sql`true`)
           .where(filter)
           .orderBy(
-            sql`${nextDelivery.nextScheduledAt} asc nulls last`,
+            event
+              ? sql`${nextDelivery.matchedAt} desc nulls last`
+              : sql`${nextDelivery.nextScheduledAt} asc nulls last`,
             asc(leads.campaignStartedAt),
             asc(leads.id),
           )
@@ -268,6 +314,7 @@ export class CampaignQueueRepository {
             deliveryStage,
             deliveryVariant,
             nextScheduledAt,
+            matchedAt,
             ...lead
           }) => ({
             ...lead,
@@ -275,6 +322,7 @@ export class CampaignQueueRepository {
             currentStage: deliveryStage ?? lead.currentStage ?? "",
             journeyVariant: deliveryVariant ?? lead.journeyVariant ?? "",
             nextScheduledAt: nextScheduledAt?.toISOString() ?? null,
+            matchedAt: matchedAt?.toISOString() ?? null,
             daysOverdue:
               nextScheduledAt && nextScheduledAt.getTime() < nowMs
                 ? Math.floor((nowMs - nextScheduledAt.getTime()) / 86_400_000)

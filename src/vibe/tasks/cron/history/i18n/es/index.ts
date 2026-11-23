@@ -12,6 +12,13 @@ export const translations: typeof enTranslations = {
       "No podía cargar el historial de tareas (limit {{limit}}): {{error}}",
   },
 
+  enums: {
+    taskScope: {
+      enabled: "Solo tareas activas",
+      all: "Todas las tareas, incluidas las ocultas y desactivadas",
+    },
+  },
+
   get: {
     tags: {
       tasks: "Tareas",
@@ -21,6 +28,10 @@ export const translations: typeof enTranslations = {
     titleShort: "Historia de la tarea",
     description: "Ver registros de ejecución históricos para tareas de cron",
     fields: {
+      taskScope: {
+        label: "Alcance de las tareas",
+        description: "Usa el mismo alcance que el informe de estado.",
+      },
       taskId: {
         label: "Task ID",
         description: "Filtro por tarea específica ID",
@@ -181,6 +192,7 @@ export const translations: typeof enTranslations = {
       placeholder: "Tareas de búsqueda...",
     },
     filter: {
+      clearTaskScope: "Quitar alcance",
       clear: "Filtros claros",
       allTasks: "Todas las tareas",
       allPriorities: "Todas las prioridades",

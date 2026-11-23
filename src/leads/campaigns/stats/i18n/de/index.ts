@@ -107,11 +107,14 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    noSends: "In diesem Zeitraum wurde keine E-Mail versendet.",
+    bounceProcessingOff:
+      "Die Bounce-Verarbeitung ist aus. Die Zahl kann zu niedrig sein.",
     groups: {
       now: "Jetzt",
       period: "Im gewählten Zeitraum",
     },
-    stuck: "Nie gesendet",
+    stuck: "Kein Versand im Zeitraum",
     title: "Kampagnen-Leistung",
     loading: "Kampagnenzahlen werden geladen...",
     filters: "Filter",
@@ -128,6 +131,15 @@ export const translations: typeof enTranslations = {
       statusChange: "Übersprungen: Lead ist jetzt {{status}}",
     },
     engine: {
+      dryRun: "Testmodus",
+      dryRunNote: "Im Testmodus werden keine echten E-Mails verschickt.",
+      delayed: "Versand verzögert",
+      delayedNote: "Cron-Status und Versandzeitplan prüfen.",
+      waiting: "Erster Lauf steht aus",
+      waitingNote: "Der Versand ist geplant. Der erste Lauf steht noch aus.",
+      details: "Automatisierungsdetails",
+      missingSummary: "Für den Versand fehlt ein Zeitplan.",
+      disabledSummary: "Der Versand ist deaktiviert.",
       starterOff:
         "Auch campaign-starter ist aus: keine neuen Leads starten eine Journey.",
       otherPath:
@@ -146,6 +158,9 @@ export const translations: typeof enTranslations = {
       noError: "Keine Fehlermeldung gespeichert.",
       openDue: "{{count}} Leads zeigen",
       state: {
+        dryRun: "Testmodus",
+        delayed: "Versand verzögert",
+        waiting: "Erster Lauf steht aus",
         missing: "nicht eingeplant",
         disabled: "deaktiviert",
         failing: "fehlerhaft",

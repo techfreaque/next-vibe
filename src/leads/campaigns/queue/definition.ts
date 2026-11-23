@@ -217,6 +217,16 @@ const { GET } = createEndpoint({
               label: "get.response.nextScheduledAt",
               schema: z.string().nullable(),
             }),
+            matchedAt: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.matchedAt",
+              schema: z.string().nullable(),
+            }),
+            matchedSubject: responseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              label: "get.response.matchedSubject",
+              schema: z.string().nullable(),
+            }),
             daysOverdue: responseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label: "get.response.daysOverdue",
@@ -330,6 +340,8 @@ const { GET } = createEndpoint({
             journeyVariant: EmailJourneyVariant.UNCENSORED_CONVERT,
             currentStage: EmailCampaignStage.FOLLOWUP_1,
             nextScheduledAt: "2024-01-18T10:00:00.000Z",
+            matchedAt: null,
+            matchedSubject: null,
             daysOverdue: null,
             nextSubject: "Harbor Studio follow-up",
             emailsSent: 5,

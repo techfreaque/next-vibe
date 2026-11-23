@@ -24,6 +24,10 @@ export const translations: typeof enTranslations = {
     freeBurners: "Top Gratis-Verbrenner",
   },
   widget: {
+    cohortNote:
+      "Stand heute. Ältere Konten hatten mehr Zeit für Bestätigung, Credit-Nutzung oder Zahlung.",
+    activityToggle: "Kontoaktivität",
+    reviewUnverified: "{{count}} unbestätigte Anmeldungen prüfen",
     planLapsed: "Abo abgelaufen",
     planPacks: "Nur Credit-Pakete",
     groups: {

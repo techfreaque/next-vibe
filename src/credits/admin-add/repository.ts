@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -22,6 +22,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 import { paymentTransactions } from "@/payment/db";
 import { CheckoutMode, PaymentStatus } from "@/payment/enum";
 import { subscriptions } from "@/subscription/db";
+import type { SubscriptionPlanValue } from "@/subscription/enum";
 
 import { creditPacks, creditWallets } from "../db";
 import { scopedTranslation } from "../i18n";
@@ -46,11 +47,13 @@ export class AdminAddCreditsRepository {
           email: users.email,
           name: users.privateName,
           joinedAt: users.createdAt,
-          leadId: userLeadLinks.leadId,
         })
         .from(users)
-        .leftJoin(userLeadLinks, eq(userLeadLinks.userId, users.id))
-        .where(eq(users.id, targetUserId))
+        .where(
+          targetUserId.includes("@")
+            ? eq(sql`lower(${users.email})`, targetUserId.toLowerCase())
+            : eq(users.id, targetUserId),
+        )
         .limit(1);
 
       if (!recipient) {
@@ -59,20 +62,17 @@ export class AdminAddCreditsRepository {
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
-      if (!recipient.leadId) {
-        return fail({
-          message: t("adminAdd.recipient.noLinkedDevice"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
       const [[subscription], [devices], recentGrants] = await Promise.all([
         db
           .select({
-            planId: subscriptions.planId,
+            planId: sql<typeof SubscriptionPlanValue>`
+              regexp_replace(${subscriptions.planId}, '^app[.]api[.]subscription[.]', '')
+            `,
             status: subscriptions.status,
             currentPeriodEnd: subscriptions.currentPeriodEnd,
             cancelAtPeriodEnd: subscriptions.cancelAtPeriodEnd,
+            provider: subscriptions.provider,
+            providerSubscriptionId: subscriptions.providerSubscriptionId,
           })
           .from(subscriptions)
           .where(eq(subscriptions.userId, recipient.id))
@@ -92,28 +92,32 @@ export class AdminAddCreditsRepository {
           .where(
             and(
               eq(creditWallets.userId, recipient.id),
-              eq(creditPacks.source, "bonus"),
+              inArray(creditPacks.source, ["bonus", "admin_grant"]),
             ),
           )
-          .orderBy(desc(creditPacks.createdAt))
+          .orderBy(desc(creditPacks.createdAt), desc(creditPacks.id))
           .limit(5),
       ]);
 
-      const [lastCharge] = await db
-        .select({
-          amount: paymentTransactions.amount,
-          currency: paymentTransactions.currency,
-        })
-        .from(paymentTransactions)
-        .where(
-          and(
-            eq(paymentTransactions.userId, recipient.id),
-            eq(paymentTransactions.status, PaymentStatus.SUCCEEDED),
-            eq(paymentTransactions.mode, CheckoutMode.SUBSCRIPTION),
-          ),
-        )
-        .orderBy(desc(paymentTransactions.createdAt))
-        .limit(1);
+      const [lastCharge] = subscription?.providerSubscriptionId
+        ? await db
+            .select({
+              amount: paymentTransactions.amount,
+              currency: paymentTransactions.currency,
+            })
+            .from(paymentTransactions)
+            .where(
+              and(
+                eq(paymentTransactions.userId, recipient.id),
+                eq(paymentTransactions.status, PaymentStatus.SUCCEEDED),
+                eq(paymentTransactions.mode, CheckoutMode.SUBSCRIPTION),
+                eq(paymentTransactions.provider, subscription.provider),
+                sql`${paymentTransactions.metadata}->>'subscriptionId' = ${subscription.providerSubscriptionId}`,
+              ),
+            )
+            .orderBy(desc(paymentTransactions.createdAt))
+            .limit(1)
+        : [];
 
       const pool = await CreditRepository.adminPoolBalance(
         recipient.id,
@@ -124,7 +128,9 @@ export class AdminAddCreditsRepository {
         freeBalance: pool.free,
         subscription: subscription
           ? {
-              ...subscription,
+              planId: subscription.planId,
+              status: subscription.status,
+              cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
               currentPeriodEnd: subscription.currentPeriodEnd ?? null,
               lastChargeAmount: lastCharge ? Number(lastCharge.amount) : null,
               lastChargeCurrency: lastCharge?.currency ?? null,
@@ -183,6 +189,7 @@ export class AdminAddCreditsRepository {
     }
     return success({
       recipientId: recipient.data.id,
+      packId: result.data.packId,
       message: t("repository.bonusCreditsAdded", { amount: data.amount }),
     });
   }

@@ -51,6 +51,9 @@ export const CAMPAIGN_TASK_STATES = [
   "disabled",
   "failing",
   "running",
+  "dryRun",
+  "delayed",
+  "waiting",
 ] as const;
 
 const automationSchema = z.object({

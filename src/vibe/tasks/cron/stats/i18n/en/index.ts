@@ -22,6 +22,7 @@ export const translations = {
       disabled: "Disabled",
     },
     healthFilter: {
+      withFailures: "Tasks that failed in period",
       all: "All states",
       attention: "Needs attention",
     },
@@ -122,6 +123,7 @@ export const translations = {
   },
 
   widget: {
+    stabilityPeriod: "Stability uses the selected date range.",
     watchdogBanner:
       "The task watchdog itself is {{state}}. Stuck and overdue verdicts may be stale until it runs clean again.",
     inFlight: {
@@ -177,8 +179,8 @@ export const translations = {
     },
     attention: {
       title: "Needs attention",
-      subtitle: "Failing, stuck, flaky and overdue tasks. Fix these first.",
-      empty: "Nothing failing, stuck or overdue.",
+      subtitle: "Tasks to investigate",
+      empty: "No failing, stuck, overdue, flaky or recovering tasks.",
       lastError: "Last error",
       noError: "No error message recorded",
       failedAgo: "{{status}} {{age}} ago",
@@ -200,6 +202,8 @@ export const translations = {
       orphaned: "orphaned run, task disabled",
     },
     chart: {
+      showTrends: "Show trends",
+      hideTrends: "Hide trends",
       runs: "Runs",
       runsSubtitle: "Click a bar for that period's runs",
       completed: "Completed",
@@ -248,6 +252,8 @@ export const translations = {
       empty: "No task in this state.",
     },
     filter: {
+      showParked: "Show parked tasks",
+      hideParked: "Hide parked tasks",
       task: "Task",
       state: "State",
       allTasks: "All tasks",

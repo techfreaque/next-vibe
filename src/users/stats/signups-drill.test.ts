@@ -73,12 +73,40 @@ describe("signups report drill-downs", () => {
     expect(
       await listTotal({
         ...signupWindow,
-        accountState: [AccountStateFilter.VERIFIED],
+        requiredState: AccountStateFilter.VERIFIED,
       }),
     ).toBe(totals.verified);
     expect(
-      await listTotal({ ...signupWindow, payer: PayerFilter.PAID }),
-    ).toBe(totals.converted);
+      await listTotal({
+        ...signupWindow,
+        requiredState: AccountStateFilter.UNVERIFIED,
+      }),
+    ).toBe(kpis.signups.value - totals.verified);
+    expect(
+      await listTotal({
+        ...signupWindow,
+        accountState: [AccountStateFilter.VERIFIED],
+        requiredState: AccountStateFilter.UNVERIFIED,
+      }),
+    ).toBe(0);
+    expect(await listTotal({ ...signupWindow, hasSpentCredits: true })).toBe(
+      totals.activated,
+    );
+    const ref = res.data.byRefCode[0];
+    if (ref?.key) {
+      expect(
+        await listTotal({ ...signupWindow, attributedRefCode: ref.key }),
+      ).toBe(ref.metrics.signups);
+    }
+    const locale = res.data.byLocale[0];
+    if (locale?.key) {
+      expect(
+        await listTotal({ ...signupWindow, accountLocale: locale.key }),
+      ).toBe(locale.metrics.signups);
+    }
+    expect(await listTotal({ ...signupWindow, payer: PayerFilter.PAID })).toBe(
+      totals.converted,
+    );
     expect(
       await listTotal({
         audience: UsersAudience.HUMANS,

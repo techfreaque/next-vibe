@@ -12,6 +12,13 @@ export const translations: typeof enTranslations = {
       "Aufgabenverlauf konnte nicht geladen werden (Limit {{limit}}): {{error}}",
   },
 
+  enums: {
+    taskScope: {
+      enabled: "Nur aktivierte Aufgaben",
+      all: "Alle Aufgaben, auch ausgeblendete und deaktivierte",
+    },
+  },
+
   get: {
     tags: {
       tasks: "Aufgaben",
@@ -22,6 +29,10 @@ export const translations: typeof enTranslations = {
     description:
       "Historische Ausführungsaufzeichnungen für Cron-Tasks anzeigen",
     fields: {
+      taskScope: {
+        label: "Aufgabenumfang",
+        description: "Übernimmt den Umfang des Aufgabenstatusberichts.",
+      },
       taskId: {
         label: "Task-ID",
         description: "Nach spezifischer Task-ID filtern",
@@ -183,6 +194,7 @@ export const translations: typeof enTranslations = {
       placeholder: "Aufgaben suchen...",
     },
     filter: {
+      clearTaskScope: "Aufgabenumfang zurücksetzen",
       clear: "Filter zurücksetzen",
       allTasks: "Alle Aufgaben",
       allPriorities: "Alle Prioritäten",

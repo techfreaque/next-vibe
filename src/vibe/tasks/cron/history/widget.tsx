@@ -68,7 +68,11 @@ const STATUS_FILTERS = [
   {
     label: "widget.filter.failed",
     count: "failed",
-    value: [CronTaskStatus.FAILED, CronTaskStatus.ERROR].join(","),
+    value: [
+      CronTaskStatus.FAILED,
+      CronTaskStatus.ERROR,
+      CronTaskStatus.TIMEOUT,
+    ].join(","),
   },
   {
     label: "widget.filter.timeout",
@@ -259,6 +263,7 @@ export function CronHistoryContainer({
 
   const taskId = form.watch("taskId") ?? "";
   const taskName = form.watch("taskName") ?? "";
+  const taskScope = form.watch("taskScope");
   const status = form.watch("status") ?? "";
   const priority = form.watch("priority") ?? "";
   const startDate = form.watch("startDate");
@@ -272,6 +277,7 @@ export function CronHistoryContainer({
   const hasFilters = !!(
     taskId ||
     taskName ||
+    taskScope ||
     status ||
     priority ||
     startDate ||
@@ -303,6 +309,7 @@ export function CronHistoryContainer({
   const clearFilters = (): void => {
     setOffset(0);
     form.setValue("taskName", "", { shouldDirty: true });
+    form.setValue("taskScope", undefined, { shouldDirty: true });
     form.setValue("priority", "", { shouldDirty: true });
     form.setValue("status", "", { shouldDirty: true });
     form.setValue("startDate", undefined, { shouldDirty: true });
@@ -372,6 +379,25 @@ export function CronHistoryContainer({
             <Activity className="size-4" />
             {t("widget.header.pulse")}
           </Button>
+        </Div>
+      )}
+
+      {taskScope && (
+        <Div className="flex flex-wrap items-center gap-2">
+          <Span className="text-sm text-muted-foreground">{t(taskScope)}</Span>
+          {isInteractive && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                form.setValue("taskScope", undefined, { shouldDirty: true });
+                setOffset(0);
+              }}
+            >
+              {t("widget.filter.clearTaskScope")}
+            </Button>
+          )}
         </Div>
       )}
 
@@ -475,12 +501,22 @@ export function CronHistoryContainer({
                 {t(filter.label)}
                 {data && !isLoading && !hasError && (
                   <Span className="text-xs tabular-nums">
-                    {data.statusCounts[filter.count].toLocaleString(locale)}
+                    {(
+                      data.statusCounts[filter.count] +
+                      (filter.count === "failed"
+                        ? data.statusCounts.timeout
+                        : 0)
+                    ).toLocaleString(locale)}
                   </Span>
                 )}
               </Button>
             ))}
-            {(taskName || status || priority || startDate || endDate) && (
+            {(taskName ||
+              taskScope ||
+              status ||
+              priority ||
+              startDate ||
+              endDate) && (
               <Button
                 type="button"
                 variant="ghost"

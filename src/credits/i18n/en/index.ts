@@ -310,6 +310,9 @@ export const translations = {
   },
   history: {
     get: {
+      packId: "Credit pack",
+      showFilters: "Show filters",
+      hideFilters: "Hide filters",
       guestGrantsHidden: "Guest free grants hidden",
       recent: "Recent activity",
       payment: "Payment",
@@ -319,7 +322,7 @@ export const translations = {
       kindLead: "Lead, no account",
       openPayment: "Open payment",
       currentBalance: "Current balance",
-      currentBalanceHint: "{{paid}} paid · {{free}} free",
+      currentBalanceHint: "{{paid}} in packs · {{free}} free",
       showingRange: "Showing {{from}} to {{to}} of {{total}}",
       from: "From",
       to: "To",
@@ -328,8 +331,8 @@ export const translations = {
       filteredBy: "Filtered by",
       clearFilters: "Clear all",
       removeFilter: "Remove filter",
-      spent: "Credits spent",
-      granted: "Credits granted",
+      spent: "Credits out",
+      granted: "Credits in",
       entries: "Entries",
       periodHint: "In the filtered period",
       emptyFiltered: "No entries match these filters.",
@@ -554,10 +557,13 @@ export const translations = {
   },
   adminAdd: {
     recipient: {
+      details: "Recipient details",
+      lookup: "Account email or ID",
+      lookupDescription: "Enter the exact account email address or user ID.",
       renewsOn: "Renews {{date}}",
       endsOn: "Ends {{date}}",
       freeBalance: "Free credits",
-      balanceSplit: "{{total}} total · {{paid}} paid · {{free}} free",
+      balanceSplit: "{{total}} total · {{paid}} in packs · {{free}} free",
       stepHint:
         "Step 1: verify who gets the credits. Step 2: choose the amount.",
       verified: "Verified recipient",

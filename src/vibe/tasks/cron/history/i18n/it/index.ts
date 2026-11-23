@@ -12,6 +12,13 @@ export const translations: typeof enTranslations = {
       "Non è possibile caricare la cronologia delle attività (limit {{limit}}): {{error}}",
   },
 
+  enums: {
+    taskScope: {
+      enabled: "Solo attività attive",
+      all: "Tutte le attività, incluse quelle nascoste e disattivate",
+    },
+  },
+
   get: {
     tags: {
       tasks: "Compiti",
@@ -22,6 +29,11 @@ export const translations: typeof enTranslations = {
     description:
       "Visualizza i record di esecuzione storici per le attività di cron",
     fields: {
+      taskScope: {
+        label: "Ambito delle attività",
+        description:
+          "Usa lo stesso ambito del report sullo stato delle attività.",
+      },
       taskId: {
         label: "Task ID",
         description: "Filtra per attività specifica ID",
@@ -186,6 +198,7 @@ export const translations: typeof enTranslations = {
       placeholder: "Compiti di ricerca...",
     },
     filter: {
+      clearTaskScope: "Azzera ambito",
       clear: "Cancella filtri",
       allTasks: "Tutte le attività",
       allPriorities: "Tutte le priorità",

@@ -85,6 +85,8 @@ export class RemoteConnectionListRepository {
                 to: data.to,
               },
               fleetStatus: data.fleetStatus,
+              auditConnection: data.auditConnection,
+              auditOffset: data.auditOffset,
             })
           : Promise.resolve(null),
       ]);

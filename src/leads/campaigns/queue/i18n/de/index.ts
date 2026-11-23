@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   description: "Leads, die aktuell in E-Mail-Kampagnen aktiv sind",
   enums: {
     delivery: {
+      stuck: "Hängende Versandaufträge",
       dueNow: "Jetzt fällig",
       overdue: "Überfällig 24 h+",
       scheduled: "Geplant",
@@ -101,6 +102,8 @@ export const translations: typeof enTranslations = {
       },
     },
     response: {
+      matchedAt: "Letztes passendes Ereignis",
+      matchedSubject: "Betreff der passenden E-Mail",
       daysOverdue: "Tage überfällig",
       nextSubject: "Geplanter Betreff",
       leadId: "Lead-ID",
@@ -150,6 +153,8 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    matchedEvents:
+      "Eine Zeile pro Lead. Jede Zeile zeigt das letzte passende Ereignis.",
     overdueDays: "Seit {{days}} Tagen überfällig, nie gesendet",
     titleWithCount: "Kampagnen-Queue ({{count}})",
     eventWindow: "E-Mail-Ereignisse {{from}} bis {{to}}",

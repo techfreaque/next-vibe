@@ -6,6 +6,7 @@
  *   RL3  — GET activeOnly=true returns only active connections
  *   RL4  — admins get the fleet report: counts add up, problems sort first
  *   RL5  — fleetStatus filter is applied server-side; counts stay unfiltered
+ *   RL6  — unknown connection audit scope never falls back to fleet-wide data
  */
 
 import "server-only";
@@ -39,10 +40,7 @@ describe("Remote Connection list", () => {
     if (!result.success) {
       return;
     }
-    expect(
-      Array.isArray(result.data.connections),
-      "RL1: connections must be an array",
-    ).toBe(true);
+    expect(Array.isArray(result.data.connections), "RL1: connections must be an array").toBe(true);
   });
 
   // ── RL2 ────────────────────────────────────────────────────────────────────
@@ -75,10 +73,7 @@ describe("Remote Connection list", () => {
     if (!result.success) {
       return;
     }
-    expect(
-      Array.isArray(result.data.connections),
-      "RL3: connections must be array",
-    ).toBe(true);
+    expect(Array.isArray(result.data.connections), "RL3: connections must be array").toBe(true);
   });
 
   // ── RL4 ────────────────────────────────────────────────────────────────────
@@ -95,7 +90,9 @@ describe("Remote Connection list", () => {
       return;
     }
     const { counts, rows } = result.data.fleet;
-    expect(counts.healthy + counts.warning + counts.critical + counts.disconnected).toBe(counts.total);
+    expect(counts.healthy + counts.warning + counts.critical + counts.disconnected).toBe(
+      counts.total,
+    );
     expect(counts.unhealthy).toBe(counts.warning + counts.critical);
     expect(rows.length).toBe(counts.total);
     const rank = { critical: 0, warning: 1, disconnected: 2, healthy: 3 };
@@ -131,5 +128,21 @@ describe("Remote Connection list", () => {
     for (const row of healthy.data.fleet.rows) {
       expect(row.status).toBe("healthy");
     }
+  });
+
+  it("RL6: an unknown audit connection returns no fleet-wide events", async () => {
+    const result = await sendTestRequest({
+      toolExecutionContext: undefined,
+      endpoint: endpoints.GET,
+      data: { auditConnection: "ffffffff-ffff-4fff-bfff-ffffffffffff" },
+    });
+
+    expect(result.success).toBe(true);
+    if (!result.success) {
+      return;
+    }
+    expect(result.data.fleet?.audit.peer).toBeNull();
+    expect(result.data.fleet?.audit.events.value).toBe(0);
+    expect(result.data.fleet?.audit.recent).toEqual([]);
   });
 });

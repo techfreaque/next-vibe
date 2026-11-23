@@ -109,7 +109,9 @@ export const translations: typeof enTranslations = {
     success: { title: "Sukces", description: "Zakupy pobrane" },
   },
   widget: {
-    unmatched: "Płatne pakiety bez dopasowanej płatności: {{count}}",
+    expiringCredits: "Wkrótce wygaśnie {{credits}} kredytów",
+    unmatched:
+      "Pakiety zakupowe lub abonamentowe bez powiązanej płatności: {{count}}",
     kind: "Rodzaj",
     search: "Szukaj",
     openPayment: "Otwórz płatność",
@@ -126,7 +128,7 @@ export const translations: typeof enTranslations = {
     creditsTotal: "Wydane kredyty",
     creditsTotalHint: "Suma rozmiarów pakietów",
     remainingTotal: "Pozostałe kredyty",
-    remainingTotalHint: "Jeszcze niewydane",
+    remainingTotalHint: "Niewykorzystane kredyty w ważnych pakietach",
     paidTotal: "Zapłacono za te pakiety",
     paidTotalHint:
       "Tylko powiązane płatności. Darmowe przydziały i pakiety bez dopasowanej płatności nie są liczone.",
@@ -161,6 +163,7 @@ export const translations: typeof enTranslations = {
   },
   enums: {
     remaining: {
+      expiringSoon: "Wygasa w ciągu 7 dni",
       left: "Zostały kredyty",
       usedUp: "Wykorzystane",
     },

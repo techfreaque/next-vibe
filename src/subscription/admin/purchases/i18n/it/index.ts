@@ -119,7 +119,9 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
-    unmatched: "Pacchetti pagati senza pagamento associato: {{count}}",
+    expiringCredits: "{{credits}} crediti in scadenza",
+    unmatched:
+      "Pacchetti di acquisto o abbonamento senza pagamento associato: {{count}}",
     kind: "Tipo",
     search: "Cerca",
     openPayment: "Apri pagamento",
@@ -136,7 +138,7 @@ export const translations: typeof enTranslations = {
     creditsTotal: "Crediti emessi",
     creditsTotalHint: "Somma dei pacchetti",
     remainingTotal: "Crediti rimasti",
-    remainingTotalHint: "Non ancora spesi",
+    remainingTotalHint: "Crediti inutilizzati nei pacchetti ancora validi",
     paidTotal: "Pagato per questi pacchetti",
     paidTotalHint:
       "Solo pagamenti collegati. Concessioni gratuite e pacchetti senza pagamento associato non sono inclusi.",
@@ -171,6 +173,7 @@ export const translations: typeof enTranslations = {
   },
   enums: {
     remaining: {
+      expiringSoon: "Scade entro 7 giorni",
       left: "Crediti rimasti",
       usedUp: "Esauriti",
     },

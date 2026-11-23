@@ -149,8 +149,8 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     focusLabel: "À venir",
-    mrrScope:
-      "Compte les abonnements actifs et en essai selon leur dernier prélèvement. Hors retards, fins prévues et jamais prélevés.",
+    mrrScope: "Derniers prélèvements associés aux abonnements renouvelables.",
+    estimatedCharge: "Prélèvement estimé à partir de l’offre et de la période",
     search: "Rechercher",
     endingChip: "Fin prévue",
     fxNote: "à taux fixes : {{rates}}",

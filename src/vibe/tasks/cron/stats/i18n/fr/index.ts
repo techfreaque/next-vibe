@@ -24,6 +24,7 @@ export const translations: typeof enTranslations = {
       disabled: "Désactivée",
     },
     healthFilter: {
+      withFailures: "Tâches en échec sur la période",
       all: "Tous les états",
       attention: "À traiter",
     },
@@ -124,6 +125,7 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    stabilityPeriod: "La stabilité dépend de la période sélectionnée.",
     watchdogBanner:
       "Le watchdog des tâches est lui-même {{state}}. Les verdicts bloqué et en retard peuvent être périmés jusqu'à ce qu'il tourne de nouveau proprement.",
     inFlight: {
@@ -179,9 +181,9 @@ export const translations: typeof enTranslations = {
     },
     attention: {
       title: "À traiter",
-      subtitle:
-        "Tâches en échec, bloquées, instables et en retard. À corriger en premier.",
-      empty: "Rien en échec, bloqué ou en retard.",
+      subtitle: "Tâches à examiner",
+      empty:
+        "Aucune tâche en échec, bloquée, en retard, instable ou en cours de rétablissement.",
       lastError: "Dernière erreur",
       noError: "Aucun message d'erreur enregistré",
       failedAgo: "{{status}} il y a {{age}}",
@@ -203,6 +205,8 @@ export const translations: typeof enTranslations = {
       orphaned: "exécution orpheline, tâche désactivée",
     },
     chart: {
+      showTrends: "Afficher les tendances",
+      hideTrends: "Masquer les tendances",
       runs: "Exécutions",
       runsSubtitle:
         "Cliquez sur une barre pour voir les exécutions de la période",
@@ -253,6 +257,8 @@ export const translations: typeof enTranslations = {
       empty: "Aucune tâche dans cet état.",
     },
     filter: {
+      showParked: "Afficher les tâches mises de côté",
+      hideParked: "Masquer les tâches mises de côté",
       task: "Tâche",
       state: "État",
       allTasks: "Toutes les tâches",

@@ -24,6 +24,7 @@ export const translations: typeof enTranslations = {
       disabled: "Desactivada",
     },
     healthFilter: {
+      withFailures: "Tareas con fallos en el periodo",
       all: "Todos los estados",
       attention: "Requiere atención",
     },
@@ -124,6 +125,7 @@ export const translations: typeof enTranslations = {
   },
 
   widget: {
+    stabilityPeriod: "La estabilidad se calcula en el periodo seleccionado.",
     watchdogBanner:
       "El propio watchdog de tareas está {{state}}. Los veredictos de atascada y atrasada pueden estar desfasados hasta que vuelva a ejecutarse bien.",
     inFlight: {
@@ -179,9 +181,9 @@ export const translations: typeof enTranslations = {
     },
     attention: {
       title: "Requiere atención",
-      subtitle:
-        "Tareas fallando, atascadas, inestables y atrasadas. Arréglalas primero.",
-      empty: "Nada fallando, atascado ni atrasado.",
+      subtitle: "Tareas que revisar",
+      empty:
+        "No hay tareas con fallos, bloqueadas, atrasadas, inestables ni en recuperación.",
       lastError: "Último error",
       noError: "Sin mensaje de error registrado",
       failedAgo: "{{status}} hace {{age}}",
@@ -204,6 +206,8 @@ export const translations: typeof enTranslations = {
       orphaned: "ejecución huérfana, tarea desactivada",
     },
     chart: {
+      showTrends: "Mostrar tendencias",
+      hideTrends: "Ocultar tendencias",
       runs: "Ejecuciones",
       runsSubtitle:
         "Haz clic en una barra para ver las ejecuciones de ese periodo",
@@ -254,6 +258,8 @@ export const translations: typeof enTranslations = {
       empty: "Ninguna tarea en este estado.",
     },
     filter: {
+      showParked: "Mostrar tareas apartadas",
+      hideParked: "Ocultar tareas apartadas",
       task: "Tarea",
       state: "Estado",
       allTasks: "Todas las tareas",

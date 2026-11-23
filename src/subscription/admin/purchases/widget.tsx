@@ -84,6 +84,7 @@ const sourceKeys = {
   subscription_purchase: "widget.source.subscription",
   subscription: "widget.source.subscription",
   bonus: "widget.source.bonus",
+  admin_grant: "widget.source.bonus",
   referral_earning: "widget.source.referral",
   dispute_won_restore: "widget.source.dispute",
 } as const;
@@ -113,6 +114,7 @@ export function PurchasesContainer({ field }: CustomWidgetProps): JSX.Element {
   const isText = isCliPlatform(platform) || platform === Platform.MCP;
   const data = useWidgetValue<typeof definition.GET>();
   const [renderedAt] = useState(() => Date.now());
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const isFetching = endpointMutations?.read?.isFetching ?? false;
   const canFilter = isInteractive && Boolean(onSubmit);
   const purchases = data?.response?.purchases ?? [];
@@ -143,7 +145,9 @@ export function PurchasesContainer({ field }: CustomWidgetProps): JSX.Element {
     form.setValue(
       "searchFilters.source",
       next ?? CreditPackSourceAdminFilter.ANY,
-      { shouldDirty: true },
+      {
+        shouldDirty: true,
+      },
     );
     changePage(1);
   };
@@ -231,7 +235,7 @@ export function PurchasesContainer({ field }: CustomWidgetProps): JSX.Element {
   }
 
   const numbers = new Intl.NumberFormat(locale.split("-")[0], {
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   });
   const typeLabel = (purchase: Purchase): string => {
     const key = CreditPackTypeDB.find((value) => value === purchase.packType);
@@ -252,7 +256,8 @@ export function PurchasesContainer({ field }: CustomWidgetProps): JSX.Element {
             locale,
           ),
         })
-      : purchase.packType === CreditPackType.BONUS ||
+      : purchase.source === "admin_grant" ||
+          purchase.packType === CreditPackType.BONUS ||
           purchase.packType === CreditPackType.EARNED
         ? t("widget.grantedFree")
         : t("widget.noLinkedPayment");
@@ -272,6 +277,12 @@ export function PurchasesContainer({ field }: CustomWidgetProps): JSX.Element {
             date: formatDate(purchase.expiresAt, locale, "PP"),
           })
       : t("widget.neverExpires");
+  const summary = data?.response?.summary;
+  const expiryCount = summary?.expiringPacks ?? 0;
+  const expiryCredits = summary?.expiringCredits ?? 0;
+  const expiryText = t("widget.expiringCredits", {
+    credits: numbers.format(expiryCredits),
+  });
 
   return (
     <WidgetShell className="min-w-0">
@@ -281,106 +292,45 @@ export function PurchasesContainer({ field }: CustomWidgetProps): JSX.Element {
           isInteractive && <NavigateButtonWidget field={children.backButton} />
         }
       />
-      {canFilter && (
-        <Div className="flex min-w-0 flex-col gap-3">
-          <Div className="flex min-w-0 flex-col gap-2 @md:flex-row @md:items-end">
-            <Div className="min-w-0 flex-1">
-              <TextFieldWidget
-                fieldName="searchFilters.search"
-                field={children.searchFilters.children.search}
-              />
-            </Div>
-            <Button
-              type="submit"
-              size="sm"
-              disabled={isFetching}
-              onClick={() =>
-                form.setValue("paginationInfo.page", 1, { shouldDirty: true })
-              }
-            >
-              {t("widget.search")}
-            </Button>
-          </Div>
-          <Div className="grid min-w-0 grid-cols-1 gap-x-6 gap-y-3 @3xl:grid-cols-2">
-            <SegmentGroup
-              label={t("widget.kind")}
-              value={
-                source === CreditPackSourceAdminFilter.ANY ? undefined : source
-              }
-              disabled={isFetching}
-              onSelect={setSource}
-              options={[
-                {
-                  value: undefined,
-                  label: t("enums.creditPackSourceFilter.any"),
-                },
-                ...SOURCES.map((option) => ({
-                  value: option,
-                  label: t(option),
-                })),
-              ]}
-            />
-          </Div>
-          <Div className="flex min-w-0 flex-wrap items-end gap-x-6 gap-y-3">
-            <SegmentGroup
-              label={t("get.hasRemaining.label")}
-              value={remaining}
-              disabled={isFetching}
-              onSelect={setRemaining}
-              options={[
-                {
-                  value: undefined,
-                  label: t("enums.creditPackTypeFilter.any"),
-                },
-                {
-                  value: PackRemainingFilter.LEFT,
-                  label: t(PackRemainingFilter.LEFT),
-                },
-                {
-                  value: PackRemainingFilter.USED_UP,
-                  label: t(PackRemainingFilter.USED_UP),
-                },
-              ]}
-            />
-            <DayRangeInputs
-              fromLabel={t("get.dateFrom.label")}
-              toLabel={t("get.dateTo.label")}
-              from={dayOf(dateFrom)}
-              to={dayOf(dateTo)}
-              disabled={isFetching}
-              onChange={setDays}
-            />
-          </Div>
-          <FilterChips
-            title={t("widget.activeFilters")}
-            chips={chips}
-            clearLabel={t("widget.clearFilters")}
-            removeLabel={t("widget.removeFilter")}
-            disabled={isFetching}
-            onClear={clearAll}
-          />
-        </Div>
-      )}
-      {!data && response?.success === false && (
-        <EmptyBlock
-          className="rounded-xl border"
-          title={t("get.errors.server.title")}
-          message={response.message}
-          action={
-            isInteractive
-              ? {
-                  label: t("widget.refresh"),
-                  onClick: () => void endpointMutations?.read?.refetch(),
-                }
-              : undefined
+      {summary && (
+        <Button
+          type="button"
+          variant={
+            remaining === PackRemainingFilter.EXPIRING_SOON
+              ? "secondary"
+              : "outline"
           }
-        />
+          aria-pressed={remaining === PackRemainingFilter.EXPIRING_SOON}
+          disabled={!canFilter || isFetching}
+          className="h-auto min-w-0 justify-start gap-3 whitespace-normal p-3 text-start"
+          onClick={() =>
+            setRemaining(
+              remaining === PackRemainingFilter.EXPIRING_SOON
+                ? undefined
+                : PackRemainingFilter.EXPIRING_SOON,
+            )
+          }
+        >
+          <Span
+            className={cn(
+              "text-xl font-semibold tabular-nums",
+              expiryCount > 0 && "text-warning",
+            )}
+          >
+            {numbers.format(expiryCount)}
+          </Span>
+          <Div className="flex min-w-0 flex-col gap-0.5">
+            <Span className="text-sm font-medium">
+              {t(PackRemainingFilter.EXPIRING_SOON)}
+            </Span>
+            <Span className="text-xs font-normal text-muted-foreground">
+              {expiryText}
+            </Span>
+          </Div>
+        </Button>
       )}
-      {!data && response?.success !== false && (
-        <LoadingBlock message={t("widget.loading")} />
-      )}
-      {data?.response && (pagination?.totalCount ?? 0) > 0 && (
-        <Div className="grid min-w-0 grid-cols-2 gap-3 @3xl:grid-cols-4">
+      {data?.response && !isText && (
+        <Div className="grid min-w-0 grid-cols-2 gap-2 @3xl:grid-cols-4">
           {[
             {
               key: "count",
@@ -409,50 +359,161 @@ export function PurchasesContainer({ field }: CustomWidgetProps): JSX.Element {
                       .map((row) =>
                         formatCurrency(row.amount, row.currency, locale),
                       )
-                      .join(" + ")
+                      .join(" · ")
                   : t("widget.noPaid"),
-              hint: [
-                t("widget.paidSubs", {
-                  amount:
-                    data.response.summary.paidSubscriptions
-                      .map((row) =>
-                        formatCurrency(row.amount, row.currency, locale),
-                      )
-                      .join(" + ") || "0",
-                }),
-                t("widget.paidPacks", {
-                  amount:
-                    data.response.summary.paidPacks
-                      .map((row) =>
-                        formatCurrency(row.amount, row.currency, locale),
-                      )
-                      .join(" + ") || "0",
-                }),
-                ...(data.response.summary.unmatchedPaidPacks > 0
-                  ? [
-                      t("widget.unmatched", {
-                        count: data.response.summary.unmatchedPaidPacks,
-                      }),
-                    ]
-                  : []),
-                t("widget.paidTotalHint"),
-              ].join(" · "),
+              hint:
+                data.response.summary.unmatchedPaidPacks > 0
+                  ? t("widget.unmatched", {
+                      count: data.response.summary.unmatchedPaidPacks,
+                    })
+                  : t("widget.paidTotalHint"),
             },
           ].map((card) => (
             <Div
               key={card.key}
-              className="flex min-w-0 flex-col gap-1 rounded-xl border bg-card p-4"
+              className="flex min-w-0 flex-col gap-1 rounded-xl border bg-card p-2.5 @md:p-4"
             >
               <Span className="text-xs text-muted-foreground">
                 {card.label}
               </Span>
-              <Span className="text-lg font-semibold tabular-nums [overflow-wrap:anywhere]">
+              <Span className="text-base font-semibold tabular-nums [overflow-wrap:anywhere] @md:text-lg">
                 {card.value}
               </Span>
               <Span className="text-xs text-muted-foreground">{card.hint}</Span>
             </Div>
           ))}
         </Div>
+      )}
+      {summary && isText && (
+        <Span>
+          {[
+            `${t("widget.packs")} ${numbers.format(pagination?.totalCount ?? 0)}`,
+            `${t("widget.remainingTotal")} ${numbers.format(summary.remaining)}`,
+            `${t(PackRemainingFilter.EXPIRING_SOON)} ${numbers.format(expiryCount)}`,
+            expiryText,
+          ].join(" · ")}
+        </Span>
+      )}
+      {canFilter && (
+        <Div className="flex min-w-0 flex-col gap-3">
+          <Div className="flex min-w-0 flex-col gap-2 @md:flex-row @md:items-end">
+            <Div className="min-w-0 flex-1">
+              <TextFieldWidget
+                fieldName="searchFilters.search"
+                field={children.searchFilters.children.search}
+              />
+            </Div>
+            <Button
+              type="submit"
+              size="sm"
+              disabled={isFetching}
+              onClick={() =>
+                form.setValue("paginationInfo.page", 1, { shouldDirty: true })
+              }
+            >
+              {t("widget.search")}
+            </Button>
+          </Div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            aria-expanded={filtersOpen}
+            className="self-start @3xl:hidden"
+            onClick={() => setFiltersOpen((open) => !open)}
+          >
+            {tCredits(
+              filtersOpen
+                ? "history.get.hideFilters"
+                : "history.get.showFilters",
+            )}
+          </Button>
+          <Div
+            className={cn(
+              "min-w-0 flex-col gap-3 @3xl:flex",
+              filtersOpen ? "flex" : "hidden",
+            )}
+          >
+            <SegmentGroup
+              label={t("widget.kind")}
+              value={
+                source === CreditPackSourceAdminFilter.ANY ? undefined : source
+              }
+              disabled={isFetching}
+              onSelect={setSource}
+              options={[
+                {
+                  value: undefined,
+                  label: t("enums.creditPackSourceFilter.any"),
+                },
+                ...SOURCES.map((option) => ({
+                  value: option,
+                  label: t(option),
+                })),
+              ]}
+            />
+            <Div className="flex min-w-0 flex-wrap items-end gap-x-6 gap-y-3">
+              <SegmentGroup
+                label={t("get.hasRemaining.label")}
+                value={remaining}
+                disabled={isFetching}
+                onSelect={setRemaining}
+                options={[
+                  {
+                    value: undefined,
+                    label: t("enums.creditPackTypeFilter.any"),
+                  },
+                  {
+                    value: PackRemainingFilter.LEFT,
+                    label: t(PackRemainingFilter.LEFT),
+                  },
+                  {
+                    value: PackRemainingFilter.USED_UP,
+                    label: t(PackRemainingFilter.USED_UP),
+                  },
+                  {
+                    value: PackRemainingFilter.EXPIRING_SOON,
+                    label: t(PackRemainingFilter.EXPIRING_SOON),
+                  },
+                ]}
+              />
+              <DayRangeInputs
+                fromLabel={t("get.dateFrom.label")}
+                toLabel={t("get.dateTo.label")}
+                from={dayOf(dateFrom)}
+                to={dayOf(dateTo)}
+                disabled={isFetching}
+                onChange={setDays}
+              />
+            </Div>
+          </Div>
+          <FilterChips
+            title={t("widget.activeFilters")}
+            chips={chips}
+            clearLabel={t("widget.clearFilters")}
+            removeLabel={t("widget.removeFilter")}
+            disabled={isFetching}
+            onClear={clearAll}
+          />
+        </Div>
+      )}
+      {response?.success === false && !isFetching && (
+        <EmptyBlock
+          className="rounded-xl border"
+          title={t("get.errors.server.title")}
+          message={response.message}
+          action={
+            isInteractive
+              ? {
+                  label: t("widget.refresh"),
+                  onClick: () => void endpointMutations?.read?.refetch(),
+                }
+              : undefined
+          }
+        />
+      )}
+      {!data && response?.success !== false && (
+        <LoadingBlock message={t("widget.loading")} />
       )}
       {data && purchases.length === 0 && (
         <EmptyBlock
@@ -512,7 +573,7 @@ export function PurchasesContainer({ field }: CustomWidgetProps): JSX.Element {
             return (
               <Div
                 key={purchase.id}
-                className="flex min-w-0 flex-col gap-2 px-3 py-2.5 @md:flex-row @md:items-center @md:gap-4 @md:px-4"
+                className="flex min-w-0 flex-col gap-2 px-3 py-2.5 @3xl:flex-row @3xl:items-center @3xl:gap-4 @md:px-4"
               >
                 <Div className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <Span className="min-w-0 text-sm font-medium [overflow-wrap:anywhere]">
@@ -539,13 +600,13 @@ export function PurchasesContainer({ field }: CustomWidgetProps): JSX.Element {
                     </Span>
                   )}
                 </Div>
-                <Div className="flex min-w-0 flex-wrap items-center gap-3 @md:flex-nowrap">
+                <Div className="flex min-w-0 flex-wrap items-center gap-2">
                   <StatusPill
                     className="shrink-0"
                     status={sourceLabel(purchase)}
                     variant={packVariants[purchase.packType] ?? "muted"}
                   />
-                  <Span className="w-28 whitespace-nowrap text-right text-sm font-semibold tabular-nums">
+                  <Span className="min-w-0 text-sm font-semibold tabular-nums @md:w-28 @md:text-right">
                     {paidLabel(purchase)}
                   </Span>
                   <Div className="flex w-36 flex-col gap-1">
@@ -586,6 +647,31 @@ export function PurchasesContainer({ field }: CustomWidgetProps): JSX.Element {
                       }
                     >
                       {t("widget.openPayment")}
+                    </Button>
+                  )}
+                  {isInteractive && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2 text-xs"
+                      onClick={() =>
+                        navigate(
+                          () =>
+                            import("@/credits/history/definition").then(
+                              (module) => module.default.GET,
+                            ),
+                          {
+                            data: {
+                              targetUserId: purchase.userId,
+                              packId: purchase.id,
+                              paginationInfo: { page: 1, limit: 20 },
+                            },
+                          },
+                        )
+                      }
+                    >
+                      {tCredits("history.get.openLedger")}
                     </Button>
                   )}
                   {isInteractive && (

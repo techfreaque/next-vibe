@@ -107,11 +107,14 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    noSends: "W tym okresie nie wysłano żadnej wiadomości.",
+    bounceProcessingOff:
+      "Obsługa zwrotów jest wyłączona. Liczba może być zaniżona.",
     groups: {
       now: "W tej chwili",
       period: "W wybranym okresie",
     },
-    stuck: "Nigdy nie wysłane",
+    stuck: "Brak wysyłek w okresie",
     title: "Skuteczność kampanii",
     loading: "Ładujemy liczby kampanii...",
     filters: "Filtry",
@@ -128,6 +131,16 @@ export const translations: typeof enTranslations = {
       statusChange: "Pominięto: lead ma teraz status {{status}}",
     },
     engine: {
+      dryRun: "Tryb próbny",
+      dryRunNote: "W trybie próbnym nie wysyłamy wiadomości.",
+      delayed: "Wysyłka opóźniona",
+      delayedNote: "Sprawdź stan zadań cron i harmonogram wysyłki.",
+      waiting: "Oczekiwanie na pierwsze uruchomienie",
+      waitingNote:
+        "Ustawiono harmonogram. Pierwsze uruchomienie jeszcze przed nami.",
+      details: "Szczegóły automatyzacji",
+      missingSummary: "Brak harmonogramu wysyłki.",
+      disabledSummary: "Moduł wysyłki jest wyłączony.",
       starterOff:
         "campaign-starter też jest wyłączony, więc nowe leady nie wchodzą do ścieżek.",
       otherPath:
@@ -146,6 +159,9 @@ export const translations: typeof enTranslations = {
       noError: "Brak zapisanego komunikatu błędu.",
       openDue: "Pokaż {{count}} leadów",
       state: {
+        dryRun: "Tryb próbny",
+        delayed: "Wysyłka opóźniona",
+        waiting: "Oczekiwanie na pierwsze uruchomienie",
         missing: "niezaplanowany",
         disabled: "wyłączony",
         failing: "z błędami",

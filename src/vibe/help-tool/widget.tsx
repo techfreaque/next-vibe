@@ -142,7 +142,12 @@ import { resolveEndpoint } from "../unified-ui/hooks/resolve-endpoint";
 import { apiClient } from "../unified-ui/hooks/store";
 import { useEndpoint } from "../unified-ui/hooks/use-endpoint";
 import type { NavigationOptions } from "../unified-ui/hooks/use-navigation-stack";
-import { useUrlNavStack } from "../unified-ui/hooks/use-url-nav-stack";
+import {
+  deserializeNavigationData,
+  type NavigationArgument,
+  serializeNavigationData,
+  useUrlNavStack,
+} from "../unified-ui/hooks/use-url-nav-stack";
 import { EndpointsPage } from "../unified-ui/renderers/web/EndpointsPage";
 import { Icon } from "../unified-ui/widgets/form-fields/icon-field/icon-component";
 import type { IconKey } from "../unified-ui/widgets/form-fields/icon-field/icons";
@@ -174,7 +179,7 @@ function splitToolInputs(
   args: Record<string, string>,
 ): {
   urlPathParams?: Record<string, string>;
-  data?: Record<string, string>;
+  data?: Record<string, NavigationArgument>;
 } {
   const pathParamKeys = new Set(
     endpoint.path
@@ -189,7 +194,10 @@ function splitToolInputs(
   return {
     urlPathParams:
       Object.keys(urlPathParams).length > 0 ? urlPathParams : undefined,
-    data: Object.keys(data).length > 0 ? data : undefined,
+    data:
+      Object.keys(data).length > 0
+        ? deserializeNavigationData(data)
+        : undefined,
   };
 }
 
@@ -1709,19 +1717,10 @@ export function HelpToolsWidget(): JSX.Element {
         if (!canOpenLocalEndpoint(endpointDef)) {
           return;
         }
-        const args: Record<string, string> = {};
-        for (const [key, value] of Object.entries({
+        const args = serializeNavigationData({
           ...options?.urlPathParams,
           ...options?.data,
-        })) {
-          if (
-            typeof value === "string" ||
-            typeof value === "number" ||
-            typeof value === "boolean"
-          ) {
-            args[key] = String(value);
-          }
-        }
+        });
         ++selectionRevision.current;
         const newPath = `/${locale}/${ADMIN_ENDPOINTS_PATH}/${endpointToUrlSegment(endpointDef)}`;
         setUnavailableSelection(false);

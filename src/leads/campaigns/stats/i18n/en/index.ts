@@ -105,11 +105,14 @@ export const translations = {
     },
   },
   widget: {
+    noSends: "No emails were sent in this period.",
+    bounceProcessingOff:
+      "Bounces may be undercounted. Bounce processing is off.",
     groups: {
       now: "Right now",
       period: "In the selected period",
     },
-    stuck: "Never sent",
+    stuck: "No sends in period",
     title: "Campaign performance",
     loading: "Loading campaign numbers...",
     filters: "Filters",
@@ -125,6 +128,16 @@ export const translations = {
       statusChange: "Skipped: lead became {{status}}",
     },
     engine: {
+      dryRun: "Dry run",
+      dryRunNote: "No live email leaves the queue in dry-run mode.",
+      delayed: "Dispatch delayed",
+      delayedNote: "Check cron health and the dispatcher schedule.",
+      waiting: "Waiting for first run",
+      waitingNote:
+        "The dispatcher has a schedule. Its first run is still pending.",
+      details: "Automation details",
+      missingSummary: "The dispatcher has no schedule.",
+      disabledSummary: "The dispatcher is disabled.",
       starterOff:
         "campaign-starter is off too, so no new leads enter journeys.",
       otherPath:
@@ -143,6 +156,9 @@ export const translations = {
       noError: "No error message recorded.",
       openDue: "Show {{count}} leads",
       state: {
+        dryRun: "Dry run",
+        delayed: "Dispatch delayed",
+        waiting: "Waiting for first run",
         missing: "not scheduled",
         disabled: "disabled",
         failing: "failing",

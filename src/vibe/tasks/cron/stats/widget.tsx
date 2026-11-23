@@ -14,7 +14,7 @@ import {
   TimeSeriesChart,
 } from "next-vibe/ui/components/analytics";
 import { Button } from "next-vibe/ui/components/button";
-import { Div } from "next-vibe/ui/components/div";
+import { Div, type DivRefObject } from "next-vibe/ui/components/div";
 import { Clock } from "next-vibe/ui/components/icons/Clock";
 import { List } from "next-vibe/ui/components/icons/List";
 import { LoadingBlock } from "next-vibe/ui/components/loading-block";
@@ -41,6 +41,7 @@ import {
 import { WidgetHeader } from "next-vibe/ui/components/widget-header";
 import { WidgetShell } from "next-vibe/ui/components/widget-shell";
 import type { JSX } from "react";
+import { useRef, useState } from "react";
 
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { isAgentPlatform, isCliPlatform } from "../../../platforms/platforms";
@@ -66,6 +67,7 @@ import { FormAlertWidget } from "../../../unified-ui/widgets/interactive/form-al
 import { NavigateButtonWidget } from "../../../unified-ui/widgets/interactive/navigate-button/widget";
 import { CronTaskStatus, type CronTaskStatusValue } from "../../enum";
 import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
+import { TaskHistoryScope } from "../history/enum";
 import type statsEndpoints from "./definition";
 import type {
   CronHealthAttentionTask,
@@ -389,19 +391,27 @@ interface HistoryDrill {
   status?: string;
   from?: string;
   to?: string;
+  useReportWindow?: boolean;
 }
 
 function useHistoryDrill(
   period: Report["window"] | undefined,
+  includeDisabled: boolean | undefined,
 ): (drill: HistoryDrill) => void {
   const navigate = useRelatedEntityNavigation();
   return (drill) => {
-    const from = drill.from ?? period?.from;
-    const to = drill.to ?? period?.to;
+    const historyPeriod = drill.useReportWindow === false ? undefined : period;
+    const from = drill.from ?? historyPeriod?.from;
+    const to = drill.to ?? historyPeriod?.to;
     navigate(async () => (await import("../history/definition")).default.GET, {
       data: {
         taskId: drill.taskId,
         status: drill.status,
+        taskScope: drill.taskId
+          ? undefined
+          : includeDisabled
+            ? TaskHistoryScope.ALL
+            : TaskHistoryScope.ENABLED,
         startDate: from ? new Date(`${from}T00:00:00.000Z`) : undefined,
         endDate: to ? new Date(`${to}T23:59:59.999Z`) : undefined,
       },
@@ -801,19 +811,13 @@ function AttentionPanel({
 }): JSX.Element {
   if (data.attention.length === 0) {
     return (
-      <Div className="flex items-center gap-2 rounded-lg border border-success/30 bg-success/5 px-3 py-2.5">
-        <StatusPill
-          status={TaskHealth.HEALTHY}
-          variant="success"
-          label={t("enums.taskHealth.healthy")}
-        />
-        <Span className="text-sm">
-          {t("widget.attention.empty")}{" "}
-          <Span className="text-muted-foreground">
-            {t("widget.allHealthy", {
-              count: data.summary.healthy,
-            })}
-          </Span>
+      <Div className="rounded-lg border px-3 py-2.5">
+        <Span className="text-sm text-muted-foreground">
+          {t(
+            data.summary.total === 0
+              ? "widget.table.empty"
+              : "widget.attention.empty",
+          )}
         </Span>
       </Div>
     );
@@ -821,10 +825,7 @@ function AttentionPanel({
   return (
     <Div className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-destructive/30">
       <Div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 border-b border-destructive/20 bg-destructive/5 px-3 py-2">
-        <Span className="text-sm font-semibold">
-          {t("widget.attention.title")} ({data.attention.length})
-        </Span>
-        <Span className="text-xs text-muted-foreground">
+        <Span className="text-sm font-medium">
           {t("widget.attention.subtitle")}
         </Span>
       </Div>
@@ -841,12 +842,12 @@ function AttentionPanel({
                   variant={HEALTH_VARIANT[task.state]}
                   label={t(task.state)}
                 />
-                <Span className="truncate text-sm font-medium">
+                <Span className="min-w-0 text-sm font-medium [overflow-wrap:anywhere]">
                   {task.displayName}
                 </Span>
                 {task.displayName !== task.id &&
                 !task.displayName.includes(`(${task.id})`) ? (
-                  <Span className="truncate font-mono text-xs text-muted-foreground">
+                  <Span className="min-w-0 font-mono text-xs text-muted-foreground [overflow-wrap:anywhere]">
                     {task.id}
                   </Span>
                 ) : null}
@@ -870,7 +871,7 @@ function AttentionPanel({
                 </Span>
               ) : null}
             </Div>
-            <Div className="flex shrink-0 gap-1.5">
+            <Div className="flex flex-wrap gap-1.5">
               {task.state === TaskHealth.FAILING ||
               task.state === TaskHealth.FLAKY ||
               task.state === TaskHealth.RECOVERING ? (
@@ -879,7 +880,11 @@ function AttentionPanel({
                   size="sm"
                   variant="outline"
                   onClick={(): void =>
-                    onOpen({ taskId: task.id, status: FAILED_STATUS_FILTER })
+                    onOpen({
+                      taskId: task.id,
+                      status: FAILED_STATUS_FILTER,
+                      useReportWindow: false,
+                    })
                   }
                 >
                   {t("widget.attention.openFailures")}
@@ -895,6 +900,7 @@ function AttentionPanel({
                       taskId: task.id,
                       status: CronTaskStatus.RUNNING,
                       from: task.runStartedAt?.slice(0, 10),
+                      useReportWindow: false,
                     })
                   }
                 >
@@ -905,7 +911,9 @@ function AttentionPanel({
                 type="button"
                 size="sm"
                 variant="ghost"
-                onClick={(): void => onOpen({ taskId: task.id })}
+                onClick={(): void =>
+                  onOpen({ taskId: task.id, useReportWindow: false })
+                }
               >
                 {t("widget.attention.openRuns")}
               </Button>
@@ -1025,15 +1033,88 @@ function LastRunCell({
   );
 }
 
-function TaskTable({
-  className,
+function TaskCards({
   tasks,
   t,
   locale,
   now,
   onOpen,
 }: {
-  className?: string;
+  tasks: readonly CronHealthTaskRow[];
+  t: CronStatsT;
+  locale: CountryLanguage;
+  now: number;
+  onOpen?: (taskId: string) => void;
+}): JSX.Element {
+  const count = new Intl.NumberFormat(locale);
+  return (
+    <Div className="flex flex-col divide-y @lg:hidden">
+      {tasks.map((task) => {
+        const schedule = taskSublabel(task, now, t, locale);
+        return (
+          <Div key={task.id} className="flex min-w-0 flex-col gap-2 px-3 py-3">
+            <Div className="flex flex-wrap items-center gap-2">
+              <Span className="min-w-0 text-sm font-semibold [overflow-wrap:anywhere]">
+                {task.displayName}
+              </Span>
+              {healthPill(task.state, t(task.state))}
+            </Div>
+            {schedule && (
+              <Span className="text-xs text-muted-foreground [overflow-wrap:anywhere]">
+                {schedule}
+              </Span>
+            )}
+            <Div className="grid grid-cols-3 gap-2 text-xs tabular-nums">
+              <Span className="flex flex-col gap-0.5">
+                <Span className="text-muted-foreground">
+                  {t("widget.table.runs")}
+                </Span>
+                {count.format(task.runs)}
+              </Span>
+              <Span className="flex flex-col gap-0.5">
+                <Span className="text-muted-foreground">
+                  {t("widget.table.failures")}
+                </Span>
+                {count.format(task.failures)}
+              </Span>
+              <Span className="flex flex-col gap-0.5">
+                <Span className="text-muted-foreground">
+                  {t("widget.table.successRate")}
+                </Span>
+                {formatPct(task.successRate, locale)}
+              </Span>
+            </Div>
+            <Span className="text-xs text-muted-foreground">
+              {t("widget.table.lastLine", {
+                last: compactLastRun(task, now, t, locale),
+                next: nextRunText(task, now, t, locale),
+              })}
+            </Span>
+            {onOpen && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="self-start"
+                onClick={(): void => onOpen(task.id)}
+              >
+                {t("widget.viewHistory")}
+              </Button>
+            )}
+          </Div>
+        );
+      })}
+    </Div>
+  );
+}
+
+function TaskTable({
+  tasks,
+  t,
+  locale,
+  now,
+  onOpen,
+}: {
   tasks: readonly CronHealthTaskRow[];
   t: CronStatsT;
   locale: CountryLanguage;
@@ -1041,14 +1122,12 @@ function TaskTable({
   onOpen?: (taskId: string) => void;
 }): JSX.Element {
   return (
-    <Div
-      className={cn(
-        "flex min-w-0 flex-col overflow-hidden rounded-lg border",
-        className,
-      )}
-    >
+    <Div className="flex min-w-0 flex-col overflow-hidden rounded-lg border">
       <Div className="flex flex-col gap-0.5 border-b px-3 py-2">
-        <Span className="text-sm font-semibold">{t("widget.table.title")}</Span>
+        <Span className="text-sm font-semibold" aria-live="polite">
+          {t("widget.table.title")} (
+          {new Intl.NumberFormat(locale).format(tasks.length)})
+        </Span>
         <Span className="text-xs text-muted-foreground">
           {t("widget.table.subtitle")}
         </Span>
@@ -1058,119 +1137,144 @@ function TaskTable({
           {t("widget.table.empty")}
         </Span>
       ) : (
-        <Table scrollLabel={t("widget.table.title")}>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t("widget.table.dimension")}</TableHead>
-              <TableHead className="hidden text-right @2xl:table-cell">
-                {t("widget.table.runs")}
-              </TableHead>
-              <TableHead className="hidden text-right @2xl:table-cell">
-                {t("widget.table.failures")}
-              </TableHead>
-              <TableHead className="text-right">
-                {t("widget.table.trendCol")}
-              </TableHead>
-              <TableHead className="hidden text-right @4xl:table-cell">
-                {t("widget.table.p50")}
-              </TableHead>
-              <TableHead className="hidden text-right @4xl:table-cell">
-                {t("widget.table.p95")}
-              </TableHead>
-              <TableHead className="hidden text-right @xl:table-cell">
-                {t("widget.table.lastRun")}
-              </TableHead>
-              <TableHead className="hidden text-right @3xl:table-cell">
-                {t("widget.table.nextRun")}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tasks.map((task) => {
-              const sub = taskSublabel(task, now, t, locale);
-              return (
-                <TableRow
-                  key={task.id}
-                  className={cn(
-                    onOpen && "cursor-pointer",
-                    task.state === TaskHealth.DISABLED &&
-                      "text-muted-foreground",
-                  )}
-                  onClick={onOpen ? (): void => onOpen(task.id) : undefined}
-                >
-                  <TableCell className="min-w-0">
-                    <Div className="flex min-w-0 items-start gap-2">
-                      {healthPill(task.state, t(task.state))}
-                      <Div className="flex min-w-0 flex-col">
-                        <Span className="break-words text-sm font-medium">
-                          {task.displayName}
-                        </Span>
-                        {sub ? (
-                          <Span className="break-words text-xs text-muted-foreground">
-                            {sub}
-                          </Span>
-                        ) : null}
-                        {task.orphanedRunSince ? null : (
-                          <Span className="text-xs text-muted-foreground @xl:hidden">
-                            {t("widget.table.lastLine", {
-                              last: compactLastRun(task, now, t, locale),
-                              next: nextRunText(task, now, t, locale),
-                            })}
-                            {task.failures > 0
-                              ? ` · ${t("widget.table.failedCount", { count: task.failures })}`
-                              : ""}
-                          </Span>
-                        )}
-                      </Div>
-                    </Div>
-                  </TableCell>
-                  <TableCell className="hidden text-right tabular-nums @2xl:table-cell">
-                    {new Intl.NumberFormat(locale).format(task.runs)}
-                  </TableCell>
-                  <TableCell
-                    className={cn(
-                      "hidden text-right tabular-nums @2xl:table-cell",
-                      task.failures > 0 &&
-                        task.state !== TaskHealth.DISABLED &&
-                        "text-destructive",
-                    )}
-                  >
-                    {new Intl.NumberFormat(locale).format(task.failures)}
-                  </TableCell>
-                  <TableCell>
-                    <SuccessTrendCell task={task} t={t} locale={locale} />
-                  </TableCell>
-                  <TableCell className="hidden whitespace-nowrap text-right tabular-nums @4xl:table-cell">
-                    {formatMs(task.p50DurationMs, locale)}
-                  </TableCell>
-                  <TableCell className="hidden whitespace-nowrap text-right tabular-nums @4xl:table-cell">
-                    <Span className="inline-flex items-center justify-end gap-1.5">
-                      {task.durationTrend.length > 1 ? (
-                        <Span
-                          aria-hidden
-                          className="font-mono text-[10px] leading-none tracking-tighter text-muted-foreground"
-                        >
-                          {sparkline(task.durationTrend, 10)}
-                        </Span>
-                      ) : null}
-                      {formatMs(task.p95DurationMs, locale)}
-                    </Span>
-                  </TableCell>
-                  <TableCell className="hidden @xl:table-cell">
-                    <LastRunCell task={task} now={now} t={t} locale={locale} />
-                  </TableCell>
-                  <TableCell className="hidden text-right text-xs tabular-nums @3xl:table-cell">
-                    {task.blockedByRun
-                      ? t("widget.table.blocked")
-                      : task.nextRunAt
-                        ? ageUntil(task.nextRunAt, now, locale)
-                        : t("widget.table.nextNone")}
-                  </TableCell>
+        <>
+          <TaskCards
+            tasks={tasks}
+            t={t}
+            locale={locale}
+            now={now}
+            onOpen={onOpen}
+          />
+          <Div className="hidden @lg:block">
+            <Table scrollLabel={t("widget.table.title")}>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t("widget.table.dimension")}</TableHead>
+                  <TableHead className="hidden text-right @2xl:table-cell">
+                    {t("widget.table.runs")}
+                  </TableHead>
+                  <TableHead className="hidden text-right @2xl:table-cell">
+                    {t("widget.table.failures")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("widget.table.trendCol")}
+                  </TableHead>
+                  <TableHead className="hidden text-right @4xl:table-cell">
+                    {t("widget.table.p50")}
+                  </TableHead>
+                  <TableHead className="hidden text-right @4xl:table-cell">
+                    {t("widget.table.p95")}
+                  </TableHead>
+                  <TableHead className="hidden text-right @xl:table-cell">
+                    {t("widget.table.lastRun")}
+                  </TableHead>
+                  <TableHead className="hidden text-right @3xl:table-cell">
+                    {t("widget.table.nextRun")}
+                  </TableHead>
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+              </TableHeader>
+              <TableBody>
+                {tasks.map((task) => {
+                  const sub = taskSublabel(task, now, t, locale);
+                  return (
+                    <TableRow
+                      key={task.id}
+                      className={cn(
+                        task.state === TaskHealth.DISABLED &&
+                          "text-muted-foreground",
+                      )}
+                    >
+                      <TableCell className="min-w-0">
+                        <Div className="flex min-w-0 items-start gap-2">
+                          {healthPill(task.state, t(task.state))}
+                          <Div className="flex min-w-0 flex-col">
+                            {onOpen ? (
+                              <Button
+                                type="button"
+                                variant="link"
+                                className="h-auto min-w-0 justify-start p-0 text-start whitespace-normal [overflow-wrap:anywhere]"
+                                onClick={(): void => onOpen(task.id)}
+                              >
+                                {task.displayName}
+                              </Button>
+                            ) : (
+                              <Span className="break-words text-sm font-medium">
+                                {task.displayName}
+                              </Span>
+                            )}
+                            {sub ? (
+                              <Span className="break-words text-xs text-muted-foreground">
+                                {sub}
+                              </Span>
+                            ) : null}
+                            {task.orphanedRunSince ? null : (
+                              <Span className="text-xs text-muted-foreground @xl:hidden">
+                                {t("widget.table.lastLine", {
+                                  last: compactLastRun(task, now, t, locale),
+                                  next: nextRunText(task, now, t, locale),
+                                })}
+                                {task.failures > 0
+                                  ? ` · ${t("widget.table.failedCount", { count: task.failures })}`
+                                  : ""}
+                              </Span>
+                            )}
+                          </Div>
+                        </Div>
+                      </TableCell>
+                      <TableCell className="hidden text-right tabular-nums @2xl:table-cell">
+                        {new Intl.NumberFormat(locale).format(task.runs)}
+                      </TableCell>
+                      <TableCell
+                        className={cn(
+                          "hidden text-right tabular-nums @2xl:table-cell",
+                          task.failures > 0 &&
+                            task.state !== TaskHealth.DISABLED &&
+                            "text-destructive",
+                        )}
+                      >
+                        {new Intl.NumberFormat(locale).format(task.failures)}
+                      </TableCell>
+                      <TableCell>
+                        <SuccessTrendCell task={task} t={t} locale={locale} />
+                      </TableCell>
+                      <TableCell className="hidden whitespace-nowrap text-right tabular-nums @4xl:table-cell">
+                        {formatMs(task.p50DurationMs, locale)}
+                      </TableCell>
+                      <TableCell className="hidden whitespace-nowrap text-right tabular-nums @4xl:table-cell">
+                        <Span className="inline-flex items-center justify-end gap-1.5">
+                          {task.durationTrend.length > 1 ? (
+                            <Span
+                              aria-hidden
+                              className="font-mono text-[10px] leading-none tracking-tighter text-muted-foreground"
+                            >
+                              {sparkline(task.durationTrend, 10)}
+                            </Span>
+                          ) : null}
+                          {formatMs(task.p95DurationMs, locale)}
+                        </Span>
+                      </TableCell>
+                      <TableCell className="hidden @xl:table-cell">
+                        <LastRunCell
+                          task={task}
+                          now={now}
+                          t={t}
+                          locale={locale}
+                        />
+                      </TableCell>
+                      <TableCell className="hidden text-right text-xs tabular-nums @3xl:table-cell">
+                        {task.blockedByRun
+                          ? t("widget.table.blocked")
+                          : task.nextRunAt
+                            ? ageUntil(task.nextRunAt, now, locale)
+                            : t("widget.table.nextNone")}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </Div>
+        </>
       )}
     </Div>
   );
@@ -1190,7 +1294,9 @@ export function CronStatsContainer({ field }: WidgetProps): JSX.Element {
   const read = useWidgetEndpointMutations()?.read;
   const response = useWidgetResponse();
   const navigate = useRelatedEntityNavigation();
-  const openHistory = useHistoryDrill(data?.window);
+  const taskTable = useRef<DivRefObject>(null);
+  const [showTrends, setShowTrends] = useState(false);
+  const openHistory = useHistoryDrill(data?.window, data?.disabledIncluded);
   const textMode = isCliPlatform(platform) || isAgentPlatform(platform);
 
   const taskId = form?.watch("taskId") ?? "";
@@ -1255,38 +1361,16 @@ export function CronStatsContainer({ field }: WidgetProps): JSX.Element {
   };
 
   const selectedTaskName = data.taskOptions.find((o) => o.id === taskId)?.name;
-  const filters = [
-    ...(taskId
-      ? [
-          {
-            key: "taskId",
-            label: t("widget.filter.task"),
-            value: selectedTaskName ?? taskId,
-            onRemove: (): void => setTask(""),
-          },
-        ]
-      : []),
-    ...(health !== TaskHealthFilter.ALL
-      ? [
-          {
-            key: "health",
-            label: t("widget.filter.state"),
-            value: t(health),
-            onRemove: (): void => setHealth(TaskHealthFilter.ALL),
-          },
-        ]
-      : []),
-    ...(includeParked
-      ? [
-          {
-            key: "includeParked",
-            label: t("widget.tile.parked"),
-            value: t("widget.tile.parkedShownHint"),
-            onRemove: (): void => setIncludeParked(false),
-          },
-        ]
-      : []),
-  ];
+  const filters = taskId
+    ? [
+        {
+          key: "taskId",
+          label: t("widget.filter.task"),
+          value: selectedTaskName ?? taskId,
+          onRemove: (): void => setTask(""),
+        },
+      ]
+    : [];
 
   const toolbar = (
     <AnalyticsToolbar
@@ -1319,8 +1403,6 @@ export function CronStatsContainer({ field }: WidgetProps): JSX.Element {
       filters={filters}
       onClearFilters={(): void => {
         setTask("");
-        setHealth(TaskHealthFilter.ALL);
-        setIncludeParked(false);
         setIncludeDisabled(false);
       }}
     >
@@ -1347,38 +1429,16 @@ export function CronStatsContainer({ field }: WidgetProps): JSX.Element {
               ))}
             </SelectContent>
           </Select>
-          <Select
-            value={health}
-            onValueChange={(value): void => {
-              const next = TaskHealthFilterOptions.find(
-                (o) => o.value === value,
-              );
-              if (next) {
-                setHealth(next.value);
-              }
-            }}
-          >
-            <SelectTrigger
-              className="h-7 w-auto min-w-0 max-w-44 text-xs"
-              aria-label={t("widget.filter.state")}
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {TaskHealthFilterOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {t(option.label)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </>
       ) : null}
     </AnalyticsToolbar>
   );
 
   const periodTiles = (
-    <KpiGrid columns={6}>
+    <KpiGrid
+      columns={6}
+      className="[&_.truncate]:whitespace-normal [&_.truncate]:break-words"
+    >
       <KpiTile
         label={t("widget.tile.runs")}
         value={k.runs.value}
@@ -1419,7 +1479,11 @@ export function CronStatsContainer({ field }: WidgetProps): JSX.Element {
         locale={locale}
         onClick={
           interactive
-            ? (): void => setHealth(TaskHealthFilter.ATTENTION)
+            ? (): void => {
+                setHealth(TaskHealthFilter.WITH_FAILURES);
+                taskTable.current?.scrollIntoView({ block: "start" });
+                taskTable.current?.focus?.();
+              }
             : undefined
         }
       />
@@ -1568,31 +1632,15 @@ export function CronStatsContainer({ field }: WidgetProps): JSX.Element {
   }
 
   const s = data.summary;
-  const stateTile = (
-    label: string,
-    value: number,
-    hint: string,
-    tone: "negative" | "warning" | "muted" | "positive" | "default",
-    filter: typeof TaskHealthFilterValue,
-  ): JSX.Element => (
-    <KpiTile
-      label={label}
-      value={value}
-      hint={hint}
-      tone={tone}
-      locale={locale}
-      onClick={interactive ? (): void => setHealth(filter) : undefined}
-    />
-  );
-
   return (
     <WidgetShell className="min-w-0 gap-4">
       <WidgetHeader
+        className="flex-wrap"
         title={t("widget.title")}
         backButton={<NavigateButtonWidget field={field.children.backButton} />}
         actions={
           interactive ? (
-            <Div className="flex gap-1">
+            <Div className="flex flex-wrap gap-1">
               <Button
                 type="button"
                 variant="ghost"
@@ -1621,7 +1669,7 @@ export function CronStatsContainer({ field }: WidgetProps): JSX.Element {
         }
       />
 
-      {toolbar}
+      <FormAlertWidget field={{}} />
       {data.watchdog ? (
         <Div
           role="alert"
@@ -1638,92 +1686,49 @@ export function CronStatsContainer({ field }: WidgetProps): JSX.Element {
       ) : null}
 
       <Div className="flex min-w-0 flex-col gap-2">
-        <SectionLabel>{t("widget.now")}</SectionLabel>
-        <KpiGrid columns={5}>
-          {stateTile(
-            t("widget.tile.failing"),
-            s.failing,
-            t("widget.tile.failingHint"),
-            s.failing > 0 ? "negative" : "default",
-            TaskHealthFilter.FAILING,
-          )}
-          {stateTile(
-            t("widget.tile.stuck"),
-            s.stuck,
-            s.orphanedRuns > 0
-              ? `${t("widget.tile.stuckHint")} · ${t("widget.tile.stuckDisabled", { count: s.orphanedRuns })}`
-              : t("widget.tile.stuckHint"),
-            s.stuck > 0 ? "negative" : "default",
-            TaskHealthFilter.STUCK,
-          )}
-          {stateTile(
-            t("widget.tile.flaky"),
-            s.flaky,
-            t("widget.tile.flakyHint"),
-            s.flaky > 0 ? "warning" : "default",
-            TaskHealthFilter.FLAKY,
-          )}
-          {stateTile(
-            t("widget.tile.recovering"),
-            s.recovering,
-            t("widget.tile.recoveringHint"),
-            "default",
-            TaskHealthFilter.RECOVERING,
-          )}
-          {stateTile(
-            t("widget.tile.overdue"),
-            s.overdue,
-            t("widget.tile.overdueHint"),
-            s.overdue > 0 ? "warning" : "default",
-            TaskHealthFilter.OVERDUE,
-          )}
-        </KpiGrid>
-        <KpiGrid columns={5}>
-          {stateTile(
-            t("widget.tile.healthy"),
-            s.healthy,
-            t("widget.tile.healthyHint", { total: s.enabled }),
-            "positive",
-            TaskHealthFilter.HEALTHY,
-          )}
-          {stateTile(
-            t("widget.tile.lowData"),
-            s.lowData,
-            t("widget.tile.lowDataHint"),
-            "default",
-            TaskHealthFilter.LOW_DATA,
-          )}
-          {stateTile(
-            t("widget.tile.neverRan"),
-            s.neverRan,
-            t("widget.tile.neverRanHint"),
-            "default",
-            TaskHealthFilter.NEVER_RAN,
-          )}
-          {stateTile(
-            t("widget.tile.disabled"),
-            s.disabled,
-            t("widget.tile.disabledHint"),
-            "muted",
-            TaskHealthFilter.DISABLED,
-          )}
+        <Div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <SectionLabel>{t("widget.now")}</SectionLabel>
+          <Span className="text-xs text-muted-foreground">
+            {t("widget.stabilityPeriod")}
+          </Span>
+        </Div>
+        <KpiGrid columns={2}>
           <KpiTile
-            label={t("widget.tile.parked")}
-            value={s.parked}
-            hint={
-              s.parkedShown
-                ? t("widget.tile.parkedShownHint")
-                : t("widget.tile.parkedHint")
+            label={t("widget.attention.title")}
+            value={data.attention.length}
+            tone={
+              s.stuck + s.failing > 0
+                ? "negative"
+                : data.attention.length > 0
+                  ? "warning"
+                  : "default"
             }
-            tone="muted"
             locale={locale}
-            onClick={
-              interactive
-                ? (): void => setIncludeParked(!includeParked)
-                : undefined
-            }
+          />
+          <KpiTile
+            label={t("widget.tile.healthy")}
+            value={s.healthy}
+            hint={t("widget.tile.healthyHint", { total: s.enabled })}
+            tone="positive"
+            locale={locale}
           />
         </KpiGrid>
+        <Div className="flex flex-wrap gap-x-3 gap-y-1">
+          {(
+            [
+              [TaskHealth.RUNNING, s.running],
+              [TaskHealth.LOW_DATA, s.lowData],
+              [TaskHealth.NEVER_RAN, s.neverRan],
+              [TaskHealth.DISABLED, s.disabled],
+            ] as const
+          )
+            .filter(([, count]) => count > 0)
+            .map(([state, count]) => (
+              <Span key={state} className="text-xs text-muted-foreground">
+                {t(state)} {new Intl.NumberFormat(locale).format(count)}
+              </Span>
+            ))}
+        </Div>
         <AttentionPanel
           data={data}
           t={t}
@@ -1733,42 +1738,106 @@ export function CronStatsContainer({ field }: WidgetProps): JSX.Element {
         />
       </Div>
 
-      <Div className="flex min-w-0 flex-col gap-4">
-        <Div className="order-2 flex min-w-0 flex-col gap-2 @3xl:order-1">
-          <Div className="flex flex-wrap items-center justify-between gap-2">
-            <SectionLabel>
-              {`${t("widget.inPeriod")} · ${
-                data.disabledIncluded
-                  ? t("widget.filter.scopeAll")
-                  : t("widget.filter.scopeEnabled")
-              }`}
-            </SectionLabel>
-            {interactive && !taskId ? (
+      <Div className="flex min-w-0 flex-col gap-3">
+        <Div className="flex flex-wrap items-center justify-between gap-2">
+          <SectionLabel>
+            {`${t("widget.inPeriod")} · ${t(data.disabledIncluded ? "widget.filter.scopeAll" : "widget.filter.scopeEnabled")}`}
+          </SectionLabel>
+          {interactive && !taskId ? (
+            <Button
+              type="button"
+              size="sm"
+              variant={includeDisabled ? "secondary" : "ghost"}
+              aria-pressed={includeDisabled}
+              onClick={(): void => setIncludeDisabled(!includeDisabled)}
+            >
+              {t("widget.filter.includeDisabled")}
+            </Button>
+          ) : null}
+        </Div>
+        {toolbar}
+        {periodTiles}
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="self-start"
+          aria-expanded={showTrends}
+          onClick={(): void => setShowTrends(!showTrends)}
+        >
+          {t(
+            showTrends ? "widget.chart.hideTrends" : "widget.chart.showTrends",
+          )}
+        </Button>
+        {showTrends && (
+          <>
+            {runsChart}
+            {byTaskChart}
+            <Div className="grid min-w-0 grid-cols-1 gap-3 @3xl:grid-cols-3">
+              {successChart}
+              {durationChart("p50")}
+              {durationChart("p95")}
+            </Div>
+          </>
+        )}
+        {taskId && (
+          <RecentRunsPanel data={data} t={t} locale={locale} now={now} />
+        )}
+      </Div>
+
+      <Div
+        ref={taskTable}
+        tabIndex={-1}
+        aria-label={t("widget.table.title")}
+        className="flex min-w-0 scroll-mt-4 flex-col gap-2"
+      >
+        {interactive && (
+          <Div className="flex flex-wrap items-center gap-2">
+            <Select
+              value={health}
+              onValueChange={(value): void => {
+                const next = TaskHealthFilterOptions.find(
+                  (o) => o.value === value,
+                );
+                if (next) {
+                  setHealth(next.value);
+                }
+              }}
+            >
+              <SelectTrigger
+                className="h-auto min-h-8 w-auto min-w-0 max-w-full text-xs [&>span]:line-clamp-none [&>span]:whitespace-normal"
+                aria-label={t("widget.filter.state")}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {TaskHealthFilterOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {t(option.label)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {interactive && s.parked > 0 && (
               <Button
                 type="button"
                 size="sm"
-                variant={includeDisabled ? "secondary" : "ghost"}
-                onClick={(): void => setIncludeDisabled(!includeDisabled)}
+                variant={includeParked ? "secondary" : "outline"}
+                className="self-start whitespace-normal text-start"
+                aria-pressed={includeParked}
+                onClick={(): void => setIncludeParked(!includeParked)}
               >
-                {t("widget.filter.includeDisabled")}
+                {t(
+                  includeParked
+                    ? "widget.filter.hideParked"
+                    : "widget.filter.showParked",
+                )}{" "}
+                ({new Intl.NumberFormat(locale).format(s.parked)})
               </Button>
-            ) : null}
+            )}
           </Div>
-          {periodTiles}
-          {runsChart}
-          {byTaskChart}
-          <Div className="grid min-w-0 grid-cols-1 gap-3 @3xl:grid-cols-3">
-            {successChart}
-            {durationChart("p50")}
-            {durationChart("p95")}
-          </Div>
-          {taskId ? (
-            <RecentRunsPanel data={data} t={t} locale={locale} now={now} />
-          ) : null}
-        </Div>
-
+        )}
         <TaskTable
-          className="order-1 @3xl:order-2"
           tasks={data.tasks}
           t={t}
           locale={locale}

@@ -64,7 +64,7 @@ const { GET } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "history.get.targetUserId.label" as const,
         hidden: true,
-        schema: z.uuid().optional(),
+        schema: z.guid().optional(),
         includeInCacheKey: true,
       }),
 
@@ -74,7 +74,7 @@ const { GET } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         label: "history.get.targetLeadId.label" as const,
         hidden: true,
-        schema: z.uuid().optional(),
+        schema: z.guid().optional(),
         includeInCacheKey: true,
       }),
 
@@ -91,6 +91,14 @@ const { GET } = createEndpoint({
       }),
 
       // === ADMIN: ledger filters (applied server-side for targeted views) ===
+      packId: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "history.get.packId",
+        hidden: true,
+        schema: z.guid().optional(),
+        includeInCacheKey: true,
+      }),
       typeFilter: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,

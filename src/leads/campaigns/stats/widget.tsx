@@ -33,6 +33,7 @@ import {
 } from "next-vibe/ui/components/analytics";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
+import { EmptyBlock } from "next-vibe/ui/components/empty-block";
 import { AlertTriangle } from "next-vibe/ui/components/icons/AlertTriangle";
 import { CheckCircle2 } from "next-vibe/ui/components/icons/CheckCircle2";
 import { Filter } from "next-vibe/ui/components/icons/Filter";
@@ -132,9 +133,72 @@ function taskStateVariant(
     case "failing":
       return "danger";
     case "disabled":
+    case "dryRun":
+    case "delayed":
+    case "waiting":
       return "warning";
     case "missing":
       return "muted";
+  }
+}
+
+function dispatcherStatus(
+  dispatcher: CampaignAutomation,
+  locale: CountryLanguage,
+  t: StatsT,
+): {
+  title: string;
+  detail: string;
+  tone: "warning" | "destructive" | "success";
+} {
+  switch (dispatcher.state) {
+    case "missing":
+      return {
+        title: t("widget.engine.offTitle"),
+        detail: t("widget.engine.missingSummary"),
+        tone: "warning",
+      };
+    case "disabled":
+      return {
+        title: t("widget.engine.offTitle"),
+        detail: t("widget.engine.disabledSummary"),
+        tone: "warning",
+      };
+    case "dryRun":
+      return {
+        title: t("widget.engine.dryRun"),
+        detail: t("widget.engine.dryRunNote"),
+        tone: "warning",
+      };
+    case "delayed":
+      return {
+        title: t("widget.engine.delayed"),
+        detail: t("widget.engine.delayedNote"),
+        tone: "warning",
+      };
+    case "waiting":
+      return {
+        title: t("widget.engine.waiting"),
+        detail: t("widget.engine.waitingNote"),
+        tone: "warning",
+      };
+    case "failing":
+      return {
+        title: t("widget.engine.failingTitle", {
+          count: dispatcher.consecutiveFailures,
+        }),
+        detail: dispatcher.lastError ?? t("widget.engine.noError"),
+        tone: "destructive",
+      };
+    case "running":
+      return {
+        title: t("widget.engine.onTitle"),
+        detail: t("widget.engine.on", {
+          last: formatWhen(dispatcher.lastRunAt, locale),
+          next: formatWhen(dispatcher.nextRunAt, locale),
+        }),
+        tone: "success",
+      };
   }
 }
 
@@ -161,61 +225,55 @@ function EngineStatus({
   onOpenQueue: () => void;
   onOpenDispatcher: () => void;
 }): React.JSX.Element {
+  const [showDetails, setShowDetails] = useState(false);
+  const { title, detail, tone } = dispatcherStatus(dispatcher, locale, t);
   const off = dispatcher.state === "missing" || dispatcher.state === "disabled";
-  const failing = dispatcher.state === "failing";
   return (
     <Alert
-      variant={off ? "warning" : failing ? "destructive" : "success"}
-      icon={off ? AlertTriangle : failing ? XCircle : CheckCircle2}
+      variant={tone}
+      icon={
+        tone === "success"
+          ? CheckCircle2
+          : tone === "destructive"
+            ? XCircle
+            : AlertTriangle
+      }
     >
-      <AlertTitle>
-        {off
-          ? t("widget.engine.offTitle")
-          : failing
-            ? t("widget.engine.failingTitle", {
-                count: dispatcher.consecutiveFailures,
-              })
-            : t("widget.engine.onTitle")}
-      </AlertTitle>
+      <AlertTitle>{title}</AlertTitle>
       <AlertDescription>
         <Div className="flex flex-col gap-2">
-          <Span>
-            {dispatcher.state === "missing"
-              ? t("widget.engine.missing", { count: dueNow })
-              : dispatcher.state === "disabled"
-                ? t("widget.engine.disabled", { count: dueNow })
-                : failing
-                  ? (dispatcher.lastError ?? t("widget.engine.noError"))
-                  : t("widget.engine.on", {
-                      last: formatWhen(dispatcher.lastRunAt, locale),
-                      next: formatWhen(dispatcher.nextRunAt, locale),
-                    })}
-          </Span>
-          <Span className="text-xs">
-            {lastSentAt
-              ? t("widget.engine.lastSend", {
-                  when: formatWhen(lastSentAt, locale),
-                  count: sent24h,
-                })
-              : t("widget.engine.neverSent")}
-            {off && sent24h > 0 ? ` ${t("widget.engine.otherPath")}` : ""}
-            {tasks.some(
-              (task) =>
-                task.id === "campaign-starter" &&
-                (task.state === "missing" || task.state === "disabled"),
-            )
-              ? ` ${t("widget.engine.starterOff")}`
-              : ""}
-          </Span>
-          <Div className="flex flex-wrap items-center gap-1.5">
-            {tasks.map((task) => (
-              <StatusPill
-                key={task.id}
-                status={task.state}
-                label={`${task.id}: ${t(`widget.engine.state.${task.state}`)}`}
-                variant={taskStateVariant(task.state)}
-              />
-            ))}
+          <Span className="[overflow-wrap:anywhere]">{detail}</Span>
+          {showDetails && (
+            <Div className="flex flex-col gap-2">
+              <Span className="text-xs">
+                {lastSentAt
+                  ? t("widget.engine.lastSend", {
+                      when: formatWhen(lastSentAt, locale),
+                      count: sent24h,
+                    })
+                  : t("widget.engine.neverSent")}
+                {off && sent24h > 0 ? ` ${t("widget.engine.otherPath")}` : ""}
+                {tasks.some(
+                  (task) =>
+                    task.id === "campaign-starter" &&
+                    (task.state === "missing" || task.state === "disabled"),
+                )
+                  ? ` ${t("widget.engine.starterOff")}`
+                  : ""}
+              </Span>
+              <Div className="flex flex-wrap items-center gap-1.5">
+                {tasks.map((task) => (
+                  <StatusPill
+                    key={task.id}
+                    status={task.state}
+                    label={`${task.id}: ${t(`widget.engine.state.${task.state}`)}`}
+                    variant={taskStateVariant(task.state)}
+                  />
+                ))}
+              </Div>
+            </Div>
+          )}
+          <Div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             {dueNow > 0 && (
               <Button
                 type="button"
@@ -235,6 +293,16 @@ function EngineStatus({
               onClick={onOpenDispatcher}
             >
               {t("widget.engine.openDispatcher")}
+            </Button>
+            <Button
+              type="button"
+              variant="link"
+              size="sm"
+              className="h-6 px-1 text-xs"
+              aria-expanded={showDetails}
+              onClick={() => setShowDetails((shown) => !shown)}
+            >
+              {t("widget.engine.details")}
             </Button>
           </Div>
         </Div>
@@ -365,6 +433,22 @@ export function CampaignStatsWidget({
     </AnalyticsToolbar>
   );
 
+  const filters = showFilters && (
+    <Div className="grid grid-cols-1 gap-3 rounded-lg border p-3 @sm:grid-cols-3">
+      <SelectFieldWidget
+        fieldName="journeyVariant"
+        field={children.journeyVariant}
+      />
+      <SelectFieldWidget fieldName="stage" field={children.stage} />
+      <TextFieldWidget fieldName="locale" field={children.locale} />
+    </Div>
+  );
+  const formAlert = (
+    <Div className="min-w-0 [overflow-wrap:anywhere]">
+      <FormAlertWidget field={children.formAlert} />
+    </Div>
+  );
+
   if (!value) {
     return (
       <WidgetShell className="min-w-0">
@@ -373,9 +457,20 @@ export function CampaignStatsWidget({
           backButton={<NavigateButtonWidget field={children.backButton} />}
         />
         {toolbar}
-        <FormAlertWidget field={children.formAlert} />
-        {endpointMutations?.read?.isLoading !== false && (
+        {filters}
+        {endpointMutations?.read?.isLoading !== false ? (
           <LoadingBlock message={t("widget.loading")} />
+        ) : (
+          <>
+            <EmptyBlock
+              title={t("get.errors.server.title")}
+              action={{
+                label: t("analytics.chart.refresh"),
+                onClick: () => endpointMutations?.read?.refetch?.(),
+              }}
+            />
+            {formAlert}
+          </>
         )}
       </WidgetShell>
     );
@@ -431,7 +526,7 @@ export function CampaignStatsWidget({
       />
       <KpiTile
         label={t("widget.queue.stuckDays")}
-        value={oldestDueDays}
+        value={queue.oldestDueAt ? oldestDueDays : null}
         locale={locale}
         tone={oldestDueDays > 1 ? "negative" : "muted"}
         hint={
@@ -441,7 +536,17 @@ export function CampaignStatsWidget({
               })
             : t("widget.queue.nothingDue")
         }
-        onClick={() => openQueue({ delivery: QueueDelivery.OVERDUE })}
+        onClick={
+          queue.oldestDueAt
+            ? (): void =>
+                openQueue({
+                  delivery:
+                    queue.overdue24h > 0
+                      ? QueueDelivery.OVERDUE
+                      : QueueDelivery.DUE_NOW,
+                })
+            : undefined
+        }
       />
       <KpiTile
         label={t("widget.queue.scheduled")}
@@ -463,7 +568,11 @@ export function CampaignStatsWidget({
         locale={locale}
         tone={queue.stuckClaims > 0 ? "negative" : "muted"}
         hint={t("widget.queue.stuckClaimsHint")}
-        onClick={() => openQueue({ delivery: QueueDelivery.FAILED })}
+        onClick={
+          queue.stuckClaims > 0
+            ? (): void => openQueue({ delivery: QueueDelivery.STUCK })
+            : undefined
+        }
       />
     </KpiGrid>
   );
@@ -482,8 +591,8 @@ export function CampaignStatsWidget({
       />
       <KpiTile
         label={t("widget.kpi.openRate")}
-        value={kpis.openRate.value}
-        previous={kpis.openRate.previous}
+        value={kpis.sent.value > 0 ? kpis.openRate.value : null}
+        previous={kpis.sent.previous ? kpis.openRate.previous : null}
         format="percent"
         locale={locale}
         hint={t("widget.kpi.ofSent", { count: totals.opened })}
@@ -493,8 +602,8 @@ export function CampaignStatsWidget({
       />
       <KpiTile
         label={t("widget.kpi.clickRate")}
-        value={kpis.clickRate.value}
-        previous={kpis.clickRate.previous}
+        value={kpis.sent.value > 0 ? kpis.clickRate.value : null}
+        previous={kpis.sent.previous ? kpis.clickRate.previous : null}
         format="percent"
         locale={locale}
         hint={t("widget.kpi.ofSent", { count: totals.clicked })}
@@ -508,9 +617,6 @@ export function CampaignStatsWidget({
         previous={kpis.unsubscribed.previous}
         locale={locale}
         invertDelta
-        hint={t("widget.kpi.ofSentRate", {
-          rate: formatRate(kpis.unsubscribed.value, kpis.sent.value, locale),
-        })}
         onClick={() =>
           openQueue({ ...sentWindow, delivery: QueueDelivery.UNSUBSCRIBED })
         }
@@ -527,12 +633,8 @@ export function CampaignStatsWidget({
               task.id === "bounce-processor" &&
               (task.state === "missing" || task.state === "disabled"),
           )
-            ? t("widget.kpi.bouncedOff", {
-                rate: formatRate(kpis.bounced.value, kpis.sent.value, locale),
-              })
-            : t("widget.kpi.ofSentRate", {
-                rate: formatRate(kpis.bounced.value, kpis.sent.value, locale),
-              })
+            ? t("widget.bounceProcessingOff")
+            : undefined
         }
         onClick={() =>
           openQueue({ ...sentWindow, delivery: QueueDelivery.BOUNCED })
@@ -574,7 +676,7 @@ export function CampaignStatsWidget({
       onBucketClick={(key) =>
         openQueue({
           delivery: QueueDelivery.SENT,
-          eventFrom: dayDate(key),
+          eventFrom: dayDate(key < value.window.from ? value.window.from : key),
           eventTo: bucketLastDay(key, bucket, value.window.to),
         })
       }
@@ -616,13 +718,28 @@ export function CampaignStatsWidget({
       onBucketClick={(key) =>
         openQueue({
           delivery: QueueDelivery.SENT,
-          eventFrom: dayDate(key),
+          eventFrom: dayDate(key < value.window.from ? value.window.from : key),
           eventTo: bucketLastDay(key, bucket, value.window.to),
         })
       }
       emptyLabel={emptyLabel}
     />
   );
+
+  const breakdownDrill = (metrics: BreakdownTableRow["values"]): QueueDrill => {
+    if ((metrics.due ?? 0) > 0) {
+      return { delivery: QueueDelivery.DUE_NOW };
+    }
+    const delivery =
+      (metrics.sent ?? 0) > 0
+        ? QueueDelivery.SENT
+        : (metrics.failed ?? 0) > 0
+          ? QueueDelivery.FAILED
+          : (metrics.bounced ?? 0) > 0
+            ? QueueDelivery.BOUNCED
+            : QueueDelivery.UNSUBSCRIBED;
+    return { ...sentWindow, delivery };
+  };
 
   const perfColumns = [
     { key: "sent", label: t("widget.columns.sent") },
@@ -671,7 +788,7 @@ export function CampaignStatsWidget({
           ) : undefined,
         onClick: () =>
           openQueue({
-            ...sentWindow,
+            ...breakdownDrill(row.metrics),
             journeyVariant: variantFilterOf(row.key),
           }),
       }))}
@@ -699,7 +816,10 @@ export function CampaignStatsWidget({
             />
           ) : undefined,
         onClick: () =>
-          openQueue({ ...sentWindow, stage: stageFilterOf(row.key) }),
+          openQueue({
+            ...breakdownDrill(row.metrics),
+            stage: stageFilterOf(row.key),
+          }),
       }))}
       locale={locale}
       emptyLabel={emptyLabel}
@@ -718,7 +838,10 @@ export function CampaignStatsWidget({
         label: row.key ?? "-",
         values: perfValues(row.metrics),
         onClick: () =>
-          openQueue({ ...sentWindow, locale: row.key ?? undefined }),
+          openQueue({
+            ...breakdownDrill(row.metrics),
+            locale: row.key ?? undefined,
+          }),
       }))}
       locale={locale}
       emptyLabel={emptyLabel}
@@ -736,8 +859,6 @@ export function CampaignStatsWidget({
         id: row.key ?? "none",
         label: errorLabel(row.key, t, locale),
         values: row.metrics,
-        onClick: () =>
-          openQueue({ ...sentWindow, delivery: QueueDelivery.FAILED }),
       }))}
       locale={locale}
       emptyLabel={t("widget.noErrors")}
@@ -745,17 +866,7 @@ export function CampaignStatsWidget({
   );
 
   if (isCliPlatform(platform) || platform === Platform.MCP) {
-    const engineLine =
-      engine.dispatcher.state === "missing"
-        ? t("widget.engine.missing", { count: queue.dueNow })
-        : engine.dispatcher.state === "disabled"
-          ? t("widget.engine.disabled", { count: queue.dueNow })
-          : engine.dispatcher.state === "failing"
-            ? `${t("widget.engine.failingTitle", { count: engine.dispatcher.consecutiveFailures })} ${engine.dispatcher.lastError ?? ""}`
-            : t("widget.engine.on", {
-                last: formatWhen(engine.dispatcher.lastRunAt, locale),
-                next: formatWhen(engine.dispatcher.nextRunAt, locale),
-              });
+    const status = dispatcherStatus(engine.dispatcher, locale, t);
     return (
       <Div className="flex flex-col gap-4">
         <Pre>
@@ -766,12 +877,7 @@ export function CampaignStatsWidget({
             .join(" | ")}
         </Pre>
         <Pre>
-          {sendingOff
-            ? `${t("widget.engine.offTitle")}. `
-            : engine.dispatcher.state === "failing"
-              ? `${t("widget.engine.failingTitle", { count: engine.dispatcher.consecutiveFailures })}. `
-              : `${t("widget.engine.onTitle")}. `}
-          {engineLine}{" "}
+          {status.title}. {status.detail}{" "}
           {queue.lastSentAt
             ? t("widget.engine.lastSend", {
                 when: formatWhen(queue.lastSentAt, locale),
@@ -837,29 +943,19 @@ export function CampaignStatsWidget({
       </Span>
       {queueTiles}
       {toolbar}
-      {showFilters && (
-        <Div className="grid grid-cols-1 gap-3 rounded-lg border p-3 @sm:grid-cols-3">
-          <SelectFieldWidget
-            fieldName="journeyVariant"
-            field={children.journeyVariant}
-          />
-          <SelectFieldWidget fieldName="stage" field={children.stage} />
-          <TextFieldWidget fieldName="locale" field={children.locale} />
-        </Div>
-      )}
-      <FormAlertWidget field={children.formAlert} />
-      {sendingOff && kpis.sent.value === 0 && (
-        <Span className="text-xs text-muted-foreground">
-          {t("widget.sentNoteOff")}
-        </Span>
-      )}
+      {filters}
+      {formAlert}
       <Span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
         {t("widget.groups.period")}
       </Span>
       {performanceTiles}
-      {trendChart}
+      {kpis.sent.value > 0 ? (
+        trendChart
+      ) : (
+        <EmptyBlock title={t("widget.noSends")} />
+      )}
       {problemChart}
-      {variantTrendChart}
+      {kpis.sent.value > 0 && variantTrendChart}
       {variantTable}
       {stageTable}
       {localeTable}
@@ -894,20 +990,6 @@ function errorLabel(
 }
 
 /** Rates are meaningless without sends: show a dash instead of 0%. */
-function formatRate(
-  part: number,
-  whole: number,
-  locale: CountryLanguage,
-): string {
-  if (whole <= 0) {
-    return "-";
-  }
-  return new Intl.NumberFormat(
-    locale.endsWith("-GLOBAL") ? locale.split("-")[0] : locale,
-    { style: "percent", maximumFractionDigits: 1 },
-  ).format(part / whole);
-}
-
 function perfValues(
   metrics: Readonly<Record<string, number>>,
 ): Record<string, number | null> {

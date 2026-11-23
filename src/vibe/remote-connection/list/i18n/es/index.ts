@@ -21,8 +21,9 @@ export const translations: typeof enTranslations = {
   fleet: {
     title: "Estado de las conexiones",
     subtitle:
-      "Cada instancia vinculada a este servidor, todos los dueños. Leído del estado guardado. Sin pings.",
+      "Todas las conexiones de este servidor. El estado refleja la última actividad registrada.",
     kpi: {
+      attention: "Requiere atención",
       total: "Conexiones",
       healthy: "Sanas",
       unhealthy: "Con fallos",
@@ -45,7 +46,7 @@ export const translations: typeof enTranslations = {
       disconnectedAt: "Desconexión registrada {{at}}",
       noToken: "Sin token, las llamadas no se autentican",
       neverSynced: "Nunca sincronizada, vinculada {{at}}",
-      staleSync: "Ha pasado demasiado tiempo desde la última sincronización",
+      staleSync: "Sincronización atrasada. Última sincronización {{at}}",
       transportDrift:
         "Configurado {{configured}}, pero la última llamada fue por {{used}}",
       transportMismatch: "Ambos lados discrepan en el transporte",
@@ -140,6 +141,12 @@ export const translations: typeof enTranslations = {
     },
     never: "Nunca",
     audit: {
+      unknownPeer: "Conexión no disponible",
+      allEvents: "Todos los eventos",
+      eventsShown: "({{first}}–{{last}} de {{total}})",
+      previous: "Eventos más recientes",
+      next: "Eventos más antiguos",
+      peer: "Registro de {{peer}}",
       title: "Registro de auditoría",
       subtitle: "Registros, desconexiones y rechazos en este servidor.",
       events: "Eventos de auditoría",
@@ -150,7 +157,7 @@ export const translations: typeof enTranslations = {
       count: "Eventos",
       recent: "Últimos eventos",
       empty: "Sin eventos de auditoría en este periodo.",
-      openRecent: "Abrir",
+      openRecent: "Ver registro",
     },
     action: {
       registered: "Registrada",
@@ -179,6 +186,14 @@ export const translations: typeof enTranslations = {
       activeOnly: {
         label: "Activo solamente",
         description: "Sólo devolver conexiones activas",
+      },
+      auditOffset: {
+        label: "Desplazamiento del registro",
+        description: "Número de eventos que se omiten.",
+      },
+      auditConnection: {
+        label: "ID de conexión para el registro",
+        description: "Limita el registro a una conexión.",
       },
       fleetStatus: {
         label: "Estado",

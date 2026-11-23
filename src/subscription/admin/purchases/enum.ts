@@ -10,4 +10,5 @@ export const {
 } = createEnumOptions(scopedTranslation, {
   LEFT: "enums.remaining.left",
   USED_UP: "enums.remaining.usedUp",
+  EXPIRING_SOON: "enums.remaining.expiringSoon",
 });

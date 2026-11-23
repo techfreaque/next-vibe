@@ -142,8 +142,8 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     focusLabel: "Próximos",
-    mrrScope:
-      "Cuenta suscripciones activas y de prueba según su último cobro. Excluye vencidas, que terminan y sin cobro.",
+    mrrScope: "Últimos cobros asociados a suscripciones que se renovarán.",
+    estimatedCharge: "Cobro estimado según el plan y el periodo de facturación",
     search: "Buscar",
     endingChip: "Termina",
     fxNote: "a tipos fijos: {{rates}}",

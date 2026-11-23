@@ -30,6 +30,7 @@ import {
   CronTaskStatusDB,
 } from "../../enum";
 import { CRON_HISTORY_ALIAS } from "./constants";
+import { TaskHistoryScope, TaskHistoryScopeOptions } from "./enum";
 import { scopedTranslation } from "./i18n";
 
 const CronHistoryContainer = lazyWidget(() =>
@@ -107,6 +108,15 @@ export const { GET } = createEndpoint({
         placeholder: "get.fields.priority.placeholder",
         columns: 6,
         schema: z.string().optional(),
+      }),
+      taskScope: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.fields.taskScope.label",
+        description: "get.fields.taskScope.description",
+        options: TaskHistoryScopeOptions,
+        hidden: true,
+        schema: z.enum(TaskHistoryScope).optional(),
       }),
       startDate: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

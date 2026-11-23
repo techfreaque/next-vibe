@@ -109,11 +109,14 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    noSends: "No se envió ningún correo en este período.",
+    bounceProcessingOff:
+      "El procesamiento de rebotes está desactivado. Es posible que falten rebotes.",
     groups: {
       now: "Ahora mismo",
       period: "En el periodo elegido",
     },
-    stuck: "Nunca enviado",
+    stuck: "Sin envíos en el período",
     title: "Rendimiento de campañas",
     loading: "Cargando cifras de campañas...",
     filters: "Filtros",
@@ -130,6 +133,16 @@ export const translations: typeof enTranslations = {
       statusChange: "Omitido: el lead ahora es {{status}}",
     },
     engine: {
+      dryRun: "Modo de prueba",
+      dryRunNote: "En modo de prueba no sale ningún correo real de la cola.",
+      delayed: "Envío retrasado",
+      delayedNote: "Revisa el estado de cron y la programación de envíos.",
+      waiting: "Primera ejecución pendiente",
+      waitingNote:
+        "El envío está programado. La primera ejecución sigue pendiente.",
+      details: "Detalles de automatización",
+      missingSummary: "El servicio de envío no tiene horario.",
+      disabledSummary: "El servicio de envío está desactivado.",
       starterOff:
         "campaign-starter también está apagado: ningún lead nuevo entra en los recorridos.",
       otherPath:
@@ -148,6 +161,9 @@ export const translations: typeof enTranslations = {
       noError: "Sin mensaje de error registrado.",
       openDue: "Ver {{count}} leads",
       state: {
+        dryRun: "Modo de prueba",
+        delayed: "Envío retrasado",
+        waiting: "Primera ejecución pendiente",
         missing: "sin programar",
         disabled: "desactivado",
         failing: "fallando",

@@ -10,6 +10,13 @@ export const translations = {
       "Could not load task history (limit {{limit}}): {{error}}",
   },
 
+  enums: {
+    taskScope: {
+      enabled: "Enabled tasks only",
+      all: "All tasks, including hidden and disabled",
+    },
+  },
+
   get: {
     tags: {
       tasks: "Tasks",
@@ -19,6 +26,10 @@ export const translations = {
     titleShort: "Task History",
     description: "View historical execution records for cron tasks",
     fields: {
+      taskScope: {
+        label: "Task scope",
+        description: "Match the scope of a task health report.",
+      },
       taskId: {
         label: "Task ID",
         description: "Filter by specific task ID",
@@ -178,6 +189,7 @@ export const translations = {
       placeholder: "Search tasks...",
     },
     filter: {
+      clearTaskScope: "Clear task scope",
       clear: "Clear filters",
       allTasks: "All tasks",
       allPriorities: "All priorities",

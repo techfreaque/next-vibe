@@ -3,6 +3,7 @@ export const translations = {
   description: "Leads currently active in email campaigns",
   enums: {
     delivery: {
+      stuck: "Stuck send claims",
       dueNow: "Due now",
       overdue: "Overdue 24h+",
       scheduled: "Scheduled",
@@ -98,6 +99,8 @@ export const translations = {
       },
     },
     response: {
+      matchedAt: "Most recent match",
+      matchedSubject: "Subject of matching email",
       daysOverdue: "Days overdue",
       nextSubject: "Scheduled subject",
       leadId: "Lead ID",
@@ -144,6 +147,8 @@ export const translations = {
     },
   },
   widget: {
+    matchedEvents:
+      "One row per lead. Each row shows the most recent matching event.",
     overdueDays: "Overdue by {{days}} days, never sent",
     titleWithCount: "Campaign queue ({{count}})",
     eventWindow: "Email events {{from}} to {{to}}",

@@ -132,8 +132,8 @@ export const translations: typeof enTranslations = {
   },
   widget: {
     focusLabel: "Anstehend",
-    mrrScope:
-      "Zählt aktive und Test-Abos nach ihrer letzten Abbuchung. Überfällige, endende und nie abgebuchte sind ausgenommen.",
+    mrrScope: "Letzte zugeordnete Zahlungen für Abos mit Verlängerung.",
+    estimatedCharge: "Zahlung anhand Tarif und Abrechnungszeitraum zugeordnet",
     search: "Suchen",
     endingChip: "Endet",
     fxNote: "zu festen Kursen: {{rates}}",

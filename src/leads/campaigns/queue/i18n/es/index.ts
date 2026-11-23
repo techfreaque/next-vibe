@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
   description: "Líderes actualmente activos en campañas de correo electrónico",
   enums: {
     delivery: {
+      stuck: "Envíos atascados",
       dueNow: "Pendientes ya",
       overdue: "Atrasados 24 h+",
       scheduled: "Programados",
@@ -101,6 +102,8 @@ export const translations: typeof enTranslations = {
       },
     },
     response: {
+      matchedAt: "Evento coincidente más reciente",
+      matchedSubject: "Asunto del correo coincidente",
       daysOverdue: "Días de retraso",
       nextSubject: "Tema programado",
       leadId: "ID del contacto",
@@ -147,6 +150,8 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    matchedEvents:
+      "Una fila por contacto, con el evento coincidente más reciente.",
     overdueDays: "Atrasado {{days}} días, nunca enviado",
     titleWithCount: "Cola de campañas ({{count}})",
     eventWindow: "Eventos de correo del {{from}} al {{to}}",

@@ -17,6 +17,7 @@
 import "server-only";
 
 import { inArray, type SQL, sql } from "drizzle-orm";
+import { coreEnv } from "next-vibe/core/env";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -25,10 +26,17 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { Environment } from "next-vibe/env/env-util";
 import { emailCampaigns } from "next-vibe/identity/lead/db";
 import { EmailCampaignStage, LeadStatus } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { cronTaskExecutions, cronTasks } from "next-vibe/tasks/cron/db";
+import {
+  isFailingTask,
+  isNeverRunTask,
+  isOverdueTask,
+  isStuckTask,
+} from "next-vibe/tasks/cron/health-summary";
 import { CronTaskStatus } from "next-vibe/tasks/enum";
 import {
   fillBuckets,
@@ -164,6 +172,7 @@ export class CampaignStatsRepository {
       .orderBy(sql`${cronTaskExecutions.startedAt} DESC`)
       .limit(CAMPAIGN_TASK_IDS.length * 3);
 
+    const now = new Date();
     return CAMPAIGN_TASK_IDS.map((id): CampaignAutomation => {
       const row = rows.find((r) => r.id === id);
       if (!row) {
@@ -178,13 +187,27 @@ export class CampaignStatsRepository {
         };
       }
       const failure = lastFailures.find((f) => f.taskId === id);
+      // Mirrors the dispatch configuration default when there is no stored override.
+      const dryRun =
+        id === CAMPAIGN_DISPATCHER_TASK_ID &&
+        (typeof row.taskInput.dryRun === "boolean"
+          ? row.taskInput.dryRun
+          : coreEnv.NODE_ENV !== Environment.PRODUCTION);
+      let state: CampaignAutomation["state"] = "running";
+      if (!row.enabled) {
+        state = "disabled";
+      } else if (dryRun) {
+        state = "dryRun";
+      } else if (isStuckTask(row, now) || isOverdueTask(row, now)) {
+        state = "delayed";
+      } else if (row.consecutiveFailures > 0 || isFailingTask(row)) {
+        state = "failing";
+      } else if (isNeverRunTask(row)) {
+        state = "waiting";
+      }
       return {
         id,
-        state: !row.enabled
-          ? "disabled"
-          : row.consecutiveFailures > 0
-            ? "failing"
-            : "running",
+        state,
         schedule: row.schedule,
         lastRunAt: iso(row.lastExecutedAt),
         nextRunAt: row.enabled ? iso(row.nextExecutionAt) : null,
@@ -271,7 +294,8 @@ export class CampaignStatsRepository {
             count(*) FILTER (WHERE ec.sent_at >= (now() AT TIME ZONE 'UTC') - interval '24 hours' AND ec.status <> ${failedStatus}) AS "sent24h",
             min(ec.scheduled_at) FILTER (WHERE ec.status = ${pendingStatus} AND ec.sent_at IS NULL AND ec.scheduled_at <= now() AT TIME ZONE 'UTC')::text AS "oldestDue",
             min(ec.scheduled_at) FILTER (WHERE ec.status = ${pendingStatus} AND ec.sent_at IS NULL AND ec.scheduled_at > now() AT TIME ZONE 'UTC')::text AS "nextScheduled",
-            (SELECT count(*) FROM email_send_log s WHERE s.status = ${pendingStatus} AND s.claimed_at < (now() AT TIME ZONE 'UTC') - interval '1 hour') AS stuck,
+            (SELECT count(*) FROM email_send_log s JOIN ec matching ON matching.id = s.campaign_id
+              WHERE s.status = ${pendingStatus} AND s.claimed_at < (now() AT TIME ZONE 'UTC') - interval '1 hour') AS stuck,
             (SELECT count(*) FROM leads WHERE status = ${LeadStatus.CAMPAIGN_RUNNING}) AS running
           FROM ec`),
 
@@ -358,7 +382,12 @@ export class CampaignStatsRepository {
               count(*) FILTER (WHERE ${realFailure} AND ${cur("ec.updated_at")}) AS failed,
               count(*) FILTER (WHERE ec.status = ${pendingStatus} AND ec.sent_at IS NULL AND ec.scheduled_at <= now() AT TIME ZONE 'UTC') AS due
             FROM ec GROUP BY 1
-            HAVING count(*) FILTER (WHERE (${sentRow} AND ${cur("ec.sent_at")}) OR (ec.status = ${pendingStatus} AND ec.sent_at IS NULL)) > 0
+            HAVING count(*) FILTER (WHERE
+              (${sentRow} AND ${cur("ec.sent_at")})
+              OR (ec.status = ${pendingStatus} AND ec.sent_at IS NULL AND ec.scheduled_at <= now() AT TIME ZONE 'UTC')
+              OR (${realFailure} AND ${cur("ec.updated_at")})
+              OR ${cur("ec.bounced_at")} OR ${cur("ec.unsubscribed_at")}
+            ) > 0
             ORDER BY ${
               dim === "stage"
                 ? sql`array_position(ARRAY[${sql.join(

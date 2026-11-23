@@ -114,7 +114,9 @@ export const translations = {
     success: { title: "Success", description: "Purchases retrieved" },
   },
   widget: {
-    unmatched: "Paid packs without a matched payment: {{count}}",
+    expiringCredits: "{{credits}} credits at risk of expiry",
+    unmatched:
+      "Purchase or subscription packs with no linked payment: {{count}}",
     kind: "Kind",
     search: "Search",
     openPayment: "Open payment",
@@ -131,7 +133,7 @@ export const translations = {
     creditsTotal: "Credits issued",
     creditsTotalHint: "Sum of pack sizes",
     remainingTotal: "Credits left",
-    remainingTotalHint: "Not yet spent",
+    remainingTotalHint: "Unused credits in unexpired packs",
     paidTotal: "Paid for these packs",
     paidTotalHint:
       "Linked processor payments only. Free grants and packs without a matched payment are not included.",
@@ -166,6 +168,7 @@ export const translations = {
   },
   enums: {
     remaining: {
+      expiringSoon: "Expiring in 7 days",
       left: "Credits left",
       usedUp: "Used up",
     },
