@@ -75,7 +75,11 @@ const Footer: React.FC<FooterProps> = ({
         {/* Newsletter capture on every non-home story page. The whole card
             drops for confirmed subscribers; pending shows "check your inbox". */}
         {!hideNewsletter && (
-          <NewsletterPromoGate user={user} initialStatus={newsletterStatus}>
+          <NewsletterPromoGate
+            locale={locale}
+            user={user}
+            initialStatus={newsletterStatus}
+          >
             <Div className="mb-10 flex flex-col gap-5 rounded-2xl border border-border bg-card p-6 md:mb-14 md:flex-row md:items-center md:justify-between md:gap-10 md:p-8">
               <Div className="flex flex-col gap-1.5 md:max-w-sm">
                 <H3 className="m-0 border-0 p-0 text-base font-semibold text-foreground">

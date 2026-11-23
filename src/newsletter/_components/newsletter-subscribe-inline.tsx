@@ -16,19 +16,12 @@ import { Input } from "next-vibe/ui/components/input";
 import { Link } from "next-vibe/ui/components/link";
 import { Skeleton } from "next-vibe/ui/components/skeleton";
 import { Span } from "next-vibe/ui/components/span";
-import { useLogger } from "next-vibe/ui/hooks/use-logger";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
-import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import type { JSX } from "react";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
-import {
-  refetchOwnNewsletterStatus,
-  useNewsletterManager,
-  useNewsletterPromo,
-} from "@/newsletter/hooks";
+import { useNewsletterEmail } from "@/newsletter/promo-state";
 import type { StatusGetResponseOutput } from "@/newsletter/status/definition";
-import subscribeEndpoints from "@/newsletter/subscribe/definition";
 import {
   FREE_CREDIT_ALLOWANCE,
   FREE_CREDIT_MAX_TOTAL,
@@ -36,20 +29,23 @@ import {
 } from "@/products/constants";
 
 import { scopedTranslation } from "./i18n";
+import {
+  useInlineNewsletterAddressStatus,
+  useInlineNewsletterPromo,
+  useInlineNewsletterSubscription,
+} from "./use-inline-newsletter";
 
 /**
  * Shared, self-contained, state-aware newsletter prompt.
  *
- * State comes from `useNewsletterPromo` (the visitor's OWN subscription), the
- * same source every other newsletter surface reads:
+ * Reads the visitor's own subscription from the shared newsletter cache:
  * - confirmed: renders nothing (or a compact "You're subscribed" notice when
  *   `showSubscribedNotice`, for places where the section must stay)
  * - pending: "Check your inbox to confirm" + resend, no form
  * - none: the subscribe form with tier-correct credit copy
  * - loading: a same-size skeleton, so nothing flashes or jumps
  *
- * Subscribing reuses `useNewsletterManager` (same endpoint as the dedicated
- * /story/newsletter page), so double opt-in is preserved.
+ * Subscribing uses the dedicated newsletter page's double opt-in endpoint.
  */
 interface NewsletterSubscribeInlineProps {
   locale: CountryLanguage;
@@ -80,17 +76,23 @@ export function NewsletterSubscribeInline({
   className,
 }: NewsletterSubscribeInlineProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const promo = useNewsletterPromo(user, initialStatus);
-
-  const {
+  const promo = useInlineNewsletterPromo(locale, user, initialStatus);
+  const manualEmail = useNewsletterEmail((state) => state.email);
+  const setManualEmail = useNewsletterEmail((state) => state.setEmail);
+  const [editing, setEditing] = useState(false);
+  const email = userEmail || manualEmail;
+  const isLoggedIn = !user.isPublic;
+  const { submit, isPending, result } = useInlineNewsletterSubscription(
+    locale,
+    user,
+    promo.refresh,
+  );
+  const isSubscribed = useInlineNewsletterAddressStatus(
+    locale,
+    user,
     email,
-    isLoggedIn,
-    isSubmitting,
-    isAnyOperationInProgress,
-    notification,
-    subscribe,
-    handleEmailChange,
-  } = useNewsletterManager(user, userEmail);
+    editing && promo.state === "none" && !isPending,
+  );
 
   const isCard = variant === "card";
 
@@ -111,7 +113,7 @@ export function NewsletterSubscribeInline({
     return (
       <NewsletterSubscribedNotice
         locale={locale}
-        isGuest={promo.isGuest}
+        isGuest={user.isPublic}
         className={className}
       />
     );
@@ -129,11 +131,11 @@ export function NewsletterSubscribeInline({
   }
 
   const notificationMessage =
-    notification?.type === "error"
+    result === "error"
       ? t("error")
-      : notification?.type === "success"
+      : result === "sent"
         ? t("success")
-        : notification?.type === "info"
+        : isSubscribed
           ? t("alreadyIn")
           : null;
 
@@ -156,7 +158,7 @@ export function NewsletterSubscribeInline({
           if (!email.includes("@")) {
             return;
           }
-          subscribe(email);
+          return submit(email);
         }}
         className="flex flex-col gap-2 sm:flex-row"
       >
@@ -168,9 +170,15 @@ export function NewsletterSubscribeInline({
           autoCorrect="off"
           spellCheck={false}
           value={email}
-          onChange={handleEmailChange}
+          onFocus={() => setEditing(true)}
+          onChange={(event) => {
+            if (user.isPublic) {
+              setEditing(true);
+              setManualEmail(event.target.value);
+            }
+          }}
           aria-label={t("emailPlaceholder")}
-          disabled={isAnyOperationInProgress || isLoggedIn}
+          disabled={isPending || isLoggedIn}
           name="email"
           id={`newsletter-email-inline-${variant}`}
         />
@@ -179,9 +187,9 @@ export function NewsletterSubscribeInline({
           size="default"
           className="h-11 gap-2 text-sm font-medium"
           aria-label={t("subscribe")}
-          disabled={isAnyOperationInProgress}
+          disabled={isPending}
         >
-          {isSubmitting ? (
+          {isPending ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <Send className="h-4 w-4" />
@@ -194,7 +202,7 @@ export function NewsletterSubscribeInline({
         <Div
           className={cn(
             "rounded-lg border px-3 py-2 text-xs",
-            notification?.type === "error"
+            result === "error"
               ? "border-destructive/30 bg-destructive/10 text-destructive"
               : "border-success/30 bg-success/10 text-success",
           )}
@@ -206,7 +214,7 @@ export function NewsletterSubscribeInline({
       {showBonus && (
         <Span className="inline-flex items-start gap-2 text-xs leading-snug text-muted-foreground">
           <Gift className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
-          {promo.isGuest ? (
+          {user.isPublic ? (
             <Span>
               {t("bonusGuest", {
                 freeCreditsSignedIn: FREE_CREDIT_SIGNED_IN_TOTAL,
@@ -254,22 +262,12 @@ export function NewsletterPendingNotice({
   className?: string;
 }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const logger = useLogger();
-  const mutation = useApiMutation(subscribeEndpoints.POST, logger, user);
-  const { mutateAsync } = mutation;
-  const [result, setResult] = useState<"sent" | "error" | null>(null);
-
-  const resend = useCallback(async (): Promise<void> => {
-    if (!email) {
-      return;
-    }
-    // mutateAsync resolves with the error response; show it inline
-    const response = await mutateAsync({ requestData: { email } });
-    setResult(response.success ? "sent" : "error");
-    if (response.success) {
-      await refetchOwnNewsletterStatus(logger);
-    }
-  }, [email, mutateAsync, logger]);
+  const promo = useInlineNewsletterPromo(locale, user);
+  const { submit, isPending, result } = useInlineNewsletterSubscription(
+    locale,
+    user,
+    promo.refresh,
+  );
 
   return (
     <Div
@@ -297,17 +295,15 @@ export function NewsletterPendingNotice({
             variant="link"
             size="sm"
             className="h-auto min-h-8 px-0 text-xs font-medium"
-            disabled={mutation.isPending || result === "sent"}
-            onClick={() => {
-              void resend();
-            }}
+            disabled={isPending || result === "sent"}
+            onClick={() => submit(email)}
           >
-            {mutation.isPending ? (
+            {isPending ? (
               <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
             ) : (
               <Send className="mr-1.5 h-3.5 w-3.5" />
             )}
-            {mutation.isPending ? t("pending.resending") : t("pending.resend")}
+            {isPending ? t("pending.resending") : t("pending.resend")}
           </Button>
           {result === "sent" && (
             <Span className="text-xs text-success">{t("pending.resent")}</Span>

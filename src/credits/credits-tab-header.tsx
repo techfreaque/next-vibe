@@ -29,6 +29,7 @@ import {
 } from "next-vibe/unified-ui/_shared/use-widget-context";
 import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import type { JSX } from "react";
+import { useContext } from "react";
 
 import { scopedTranslation as subscriptionScopedT } from "@/_pages/subscription/i18n";
 import {
@@ -46,6 +47,7 @@ import { useSubscription } from "@/subscription/hooks";
 import { getPlanOfferState } from "@/subscription/plan-offers";
 import { VerifyEmailCreditsPrompt } from "@/user/public/verify-email/credits-prompt";
 
+import { InitialCreditBalanceContext } from "./balance-context";
 import creditsDefinition from "./definition";
 import { FreeCreditsStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
@@ -75,6 +77,7 @@ export function CreditsTabHeader({
   const widgetUser = useWidgetUser();
   const navigation = useWidgetNavigation();
   const logger = useWidgetLogger();
+  const initialBalance = useContext(InitialCreditBalanceContext);
 
   const isAdmin =
     !widgetUser.isPublic && widgetUser.roles.includes(UserRole.ADMIN);
@@ -102,6 +105,7 @@ export function CreditsTabHeader({
     creditsDefinition,
     {
       read: {
+        initialData: initialBalance,
         queryOptions: {
           staleTime: 10_000,
           refetchOnWindowFocus: true,

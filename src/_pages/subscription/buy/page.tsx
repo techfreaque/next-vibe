@@ -3,8 +3,13 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import type { Platform } from "next-vibe/platforms/platforms";
 import type { JSX } from "react";
+
+import type { CreditsGetResponseOutput } from "@/credits/definition";
+import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
+import { CreditRepository } from "@/credits/repository";
 
 import { generateSubscriptionMetadata } from "../metadata";
 import { subscriptionLoader } from "../shared-loader";
@@ -25,6 +30,7 @@ export async function generateMetadata({
 export interface BuyPageData {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  initialCredits: CreditsGetResponseOutput | null;
   platform: Platform;
 }
 
@@ -34,23 +40,34 @@ export async function tanstackLoader({
 }: PageProps): Promise<BuyPageData> {
   const { locale } = await params;
   const query = await searchParams;
-  const {
-    locale: l,
-    user,
-    platform,
-  } = await subscriptionLoader({
+  const data = await subscriptionLoader({
     locale,
     searchParams: query,
   });
-  return { locale: l, user, platform };
+  const { t } = creditsScopedTranslation.scopedT(locale);
+  const balance = await CreditRepository.getCreditBalanceForUser(
+    data.user,
+    locale,
+    createEndpointLogger(false, locale),
+    t,
+  );
+  return { ...data, initialCredits: balance.success ? balance.data : null };
 }
 
 export function TanstackPage({
   locale,
   user,
+  initialCredits,
   platform,
 }: BuyPageData): JSX.Element {
-  return <BuyPageClient locale={locale} user={user} platform={platform} />;
+  return (
+    <BuyPageClient
+      locale={locale}
+      user={user}
+      initialCredits={initialCredits}
+      platform={platform}
+    />
+  );
 }
 
 export default async function BuyPage({

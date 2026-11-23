@@ -23,6 +23,13 @@ import { z } from "zod";
 
 import { useLayoutNewsletterStatus } from "./_components/newsletter-status-provider";
 import { scopedTranslation } from "./i18n";
+import {
+  NEWSLETTER_STATUS_QUERY_PREFIX,
+  type NewsletterPromoState,
+  OWN_NEWSLETTER_STATUS_QUERY_KEY,
+  toNewsletterPromoState,
+  useNewsletterEmail,
+} from "./promo-state";
 import type { StatusGetResponseOutput } from "./status/definition";
 import statusEndpoints from "./status/definition";
 import subscribeEndpoints from "./subscribe/definition";
@@ -34,18 +41,6 @@ const newsletterEmailSchema = z.email();
  * TYPED STATE KEYS
  ****************************/
 
-/**
- * Status queries use their own cache keys: the status endpoint's GET form
- * state is shared per endpoint, so the own-status query (no email) and
- * per-address checks would otherwise overwrite each other.
- */
-// eslint-disable-next-line i18next/no-literal-string
-const NEWSLETTER_STATUS_QUERY_PREFIX = "newsletter-status";
-// eslint-disable-next-line i18next/no-literal-string
-const OWN_NEWSLETTER_STATUS_QUERY_KEY = "newsletter-status-own";
-
-// eslint-disable-next-line i18next/no-literal-string
-const manualEmailKey = createCustomStateKey<string>("newsletter_manual_email");
 const showConfirmUnsubscribeKey = createCustomStateKey<boolean>(
   // eslint-disable-next-line i18next/no-literal-string
   "newsletter_show_confirm_unsubscribe",
@@ -96,25 +91,11 @@ export function useNewsletterStatus(
  * - pending: subscribed, confirm link not clicked. "Check your inbox" + resend.
  * - none: not subscribed. Show the form.
  */
-export type NewsletterPromoState = "loading" | "confirmed" | "pending" | "none";
-
 export interface NewsletterPromo {
   state: NewsletterPromoState;
   /** Address of the pending/confirmed subscription, or the account email */
   email: string | undefined;
   isGuest: boolean;
-}
-
-export function toNewsletterPromoState(
-  status: StatusGetResponseOutput | undefined,
-): NewsletterPromoState {
-  if (!status) {
-    return "loading";
-  }
-  if (!status.subscribed) {
-    return "none";
-  }
-  return status.confirmed ? "confirmed" : "pending";
 }
 
 /**
@@ -203,7 +184,8 @@ export function useNewsletterManager(
   const { t } = useMemo(() => scopedTranslation.scopedT(locale), [locale]);
 
   // Use typed custom state for newsletter-related state
-  const [manualEmail, setManualEmail] = useCustomState(manualEmailKey, "");
+  const manualEmail = useNewsletterEmail((state) => state.email);
+  const setManualEmail = useNewsletterEmail((state) => state.setEmail);
   const [showConfirmUnsubscribe, setShowConfirmUnsubscribe] = useCustomState(
     showConfirmUnsubscribeKey,
     false,

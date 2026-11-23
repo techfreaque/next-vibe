@@ -12,11 +12,14 @@ import { EndpointsPage } from "next-vibe/unified-ui/renderers/web/EndpointsPage"
 import type { JSX } from "react";
 import { useMemo } from "react";
 
+import { InitialCreditBalanceContext } from "@/credits/balance-context";
+import type { CreditsGetResponseOutput } from "@/credits/definition";
 import subscriptionCreateDefinition from "@/subscription/create/definition";
 
 interface Props {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  initialCredits: CreditsGetResponseOutput | null;
   platform: Platform;
 }
 
@@ -25,7 +28,12 @@ const PATH_TO_TAB: Record<string, string> = {
   "remote-connection/list": "remote",
 };
 
-export function BuyPageClient({ locale, user, platform }: Props): JSX.Element {
+export function BuyPageClient({
+  locale,
+  user,
+  initialCredits,
+  platform,
+}: Props): JSX.Element {
   const logger = useLogger();
   const router = useRouter();
 
@@ -52,15 +60,17 @@ export function BuyPageClient({ locale, user, platform }: Props): JSX.Element {
   );
 
   return (
-    <Container className="max-w-6xl px-0 py-4 sm:px-2 sm:py-8 lg:px-2">
-      <EndpointsPage
-        logger={logger}
-        endpoint={subscriptionCreateDefinition}
-        user={user}
-        locale={locale}
-        platform={platform}
-        navigationOverride={navigationOverride}
-      />
+    <Container className="min-h-[calc(100dvh-4rem)] max-w-6xl px-0 py-4 sm:px-2 sm:py-8 lg:px-2">
+      <InitialCreditBalanceContext.Provider value={initialCredits ?? undefined}>
+        <EndpointsPage
+          logger={logger}
+          endpoint={subscriptionCreateDefinition}
+          user={user}
+          locale={locale}
+          platform={platform}
+          navigationOverride={navigationOverride}
+        />
+      </InitialCreditBalanceContext.Provider>
     </Container>
   );
 }
