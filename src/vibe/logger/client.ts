@@ -13,6 +13,7 @@ import {
   CLIENT_LOG_OCCURRENCES_KEY,
 } from "./error-monitor/client-log/constants";
 import { serializeLogValue } from "./serialize";
+import { sanitizeLogString, sanitizeLogText } from "./telemetry-privacy";
 import type { EndpointLogger, LoggerMetadata } from "./types";
 
 /** Coerce any LoggerMetadata value to a schema-safe primitive */
@@ -46,7 +47,8 @@ function sanitizeMetadata(
 ): Record<string, string | number | boolean | null> {
   const out: Record<string, string | number | boolean | null> = {};
   for (const [k, v] of Object.entries(record)) {
-    out[k] = toPrimitive(v);
+    const value = toPrimitive(v);
+    out[k] = typeof value === "string" ? sanitizeLogString(k, value) : value;
   }
   return out;
 }
@@ -243,17 +245,20 @@ function reportToServer(
   tabId: string | undefined,
 ): void {
   lastLocale = locale;
+  const safeMessage = sanitizeLogText(message);
   const allMeta = error !== undefined ? [error, ...metadata] : metadata;
   const normalizedMeta = allMeta.map((m) =>
     m instanceof Error
       ? {
           error: m.message,
           errorName: m.name,
-          ...(m.stack ? { errorStack: m.stack.slice(0, 2000) } : {}),
+          ...(m.stack
+            ? { errorStack: sanitizeLogText(m.stack).slice(0, 2000) }
+            : {}),
         }
       : typeof m === "string" && m.length > 0
         ? // A bare string detail (logger.error("x", "detail")) used to be dropped
-          { detail: m.slice(0, 1000) }
+          { detail: sanitizeLogText(m).slice(0, 1000) }
         : m,
   );
   const metaPayload = normalizedMeta
@@ -266,7 +271,7 @@ function reportToServer(
     )
     .map(sanitizeMetadata);
 
-  const fingerprint = buildFingerprint(level, message, metaPayload);
+  const fingerprint = buildFingerprint(level, safeMessage, metaPayload);
   const existing = dedupEntries.get(fingerprint);
   if (existing) {
     existing.repeats++;
@@ -282,7 +287,7 @@ function reportToServer(
 
   const payload: ReportPayload = {
     level,
-    message,
+    message: safeMessage,
     metadata: metaPayload,
     locale,
   };

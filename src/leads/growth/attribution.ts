@@ -6,11 +6,15 @@
  * host (never the full URL), landing path (never the query string), ref code.
  */
 
+import {
+  sanitizeAttributionValue,
+  sanitizeTelemetryUrl,
+} from "next-vibe/core/utils/telemetry-url";
+
 import type { ChannelTypeValue } from "./enum";
 import { ChannelType } from "./enum";
 
 /** Max stored length for any single attribution value. */
-const MAX_VALUE_LENGTH = 100;
 const MAX_PATH_LENGTH = 200;
 const MAX_REF_LENGTH = 64;
 
@@ -70,7 +74,7 @@ function clean(value: string | null, maxLength: number): string | null {
 
 /** UTM source/medium are case-insensitive by convention - normalize to lowercase. */
 function cleanLower(value: string | null): string | null {
-  const cleaned = clean(value, MAX_VALUE_LENGTH);
+  const cleaned = sanitizeAttributionValue(value);
   return cleaned === null ? null : cleaned.toLowerCase();
 }
 
@@ -195,12 +199,12 @@ export function extractTouch(
   return {
     source: cleanLower(params.get("utm_source")),
     medium: cleanLower(params.get("utm_medium")),
-    campaign: clean(params.get("utm_campaign"), MAX_VALUE_LENGTH),
-    content: clean(params.get("utm_content"), MAX_VALUE_LENGTH),
-    term: clean(params.get("utm_term"), MAX_VALUE_LENGTH),
+    campaign: sanitizeAttributionValue(params.get("utm_campaign")),
+    content: sanitizeAttributionValue(params.get("utm_content")),
+    term: sanitizeAttributionValue(params.get("utm_term")),
     referrerHost,
-    landingPath: clean(path, MAX_PATH_LENGTH),
-    refCode: clean(params.get("ref"), MAX_REF_LENGTH),
+    landingPath: clean(sanitizeTelemetryUrl(path), MAX_PATH_LENGTH),
+    refCode: clean(sanitizeAttributionValue(params.get("ref")), MAX_REF_LENGTH),
     linkId: rawLinkId && UUID_PATTERN.test(rawLinkId) ? rawLinkId : null,
   };
 }

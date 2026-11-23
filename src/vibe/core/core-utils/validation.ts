@@ -1,6 +1,7 @@
 import type { ZodError, ZodIssue } from "zod";
 import { z } from "zod";
 
+import { sanitizeLogText } from "../../logger/telemetry-privacy";
 import type { EndpointLogger } from "../../logger/types";
 import type { Platform } from "../../platforms/platforms";
 import { isAgentPlatform, isCliPlatform } from "../../platforms/platforms";
@@ -66,13 +67,6 @@ export function validateData<TSchema extends z.ZodType>(
       const logValidationDetails = isQuietPlatform
         ? logger.debug.bind(logger)
         : logger.error.bind(logger);
-      let truncatedPayload: string | null = null;
-      try {
-        const raw = JSON.stringify(data);
-        truncatedPayload = raw.length > 500 ? `${raw.slice(0, 497)}...` : raw;
-      } catch {
-        // not serializable
-      }
       logValidationDetails("Validation error details", {
         endpoint: endpointPath,
         errorCount,
@@ -83,7 +77,6 @@ export function validateData<TSchema extends z.ZodType>(
           .slice(0, MAX_LOGGED_ISSUES)
           .map((e: ZodIssue) => summarizeIssueForLog(e)),
         formattedErrors,
-        payload: truncatedPayload,
       });
       // The CLI is the only surface with room for the example command and the
       // --interactive hint; every other surface gets the compact field list.
@@ -178,8 +171,9 @@ function summarizeIssueForLog(issue: ZodIssue): string {
   } else if (input === undefined) {
     received = "undefined";
   } else if (typeof input === "string") {
+    const safeInput = sanitizeLogText(input);
     received = JSON.stringify(
-      input.length > 80 ? `${input.slice(0, 77)}...` : input,
+      safeInput.length > 80 ? `${safeInput.slice(0, 77)}...` : safeInput,
     );
   } else if (
     input === null ||

@@ -5,6 +5,7 @@ import type { CountryLanguage } from "../../core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "../../core/i18n/core/language-utils";
 import { parseError } from "../../core/utils/parse-error";
 import { isPrivateAddress } from "../../core/utils/ssrf-guard";
+import { sanitizeTelemetryUrl } from "../../core/utils/telemetry-url";
 import { db } from "../../database";
 import { Environment } from "../../env/env-util";
 import type { EndpointLogger } from "../../logger/types";
@@ -113,7 +114,7 @@ export async function createAnonymousLead(
         userAgent: clientInfo.userAgent ?? null,
         ipAddress: clientInfo.ipAddress ?? null,
         ipKey: ipPoolKey(clientInfo.ipAddress),
-        referer: clientInfo.referer ?? null,
+        referer: sanitizeTelemetryUrl(clientInfo.referer, true),
         timestamp: new Date().toISOString(),
       },
     })

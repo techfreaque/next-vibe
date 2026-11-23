@@ -18,6 +18,7 @@ import {
   type NewErrorLog,
 } from "./error-monitor/db";
 import { serializeLogValue } from "./serialize";
+import { sanitizeLogText } from "./telemetry-privacy";
 import { type ErrorLogLevel, type LoggerMetadata } from "./types";
 
 /** Truncate a string to maxLen, appending "..." if truncated */
@@ -34,7 +35,7 @@ function truncate(str: string | undefined | null, maxLen: number): string {
 /** Extract a short stack trace (first few frames) */
 function extractStack(error: LoggerMetadata | undefined): string | undefined {
   if (error instanceof Error && error.stack) {
-    return truncate(error.stack, MAX_STACK_LENGTH);
+    return truncate(sanitizeLogText(error.stack), MAX_STACK_LENGTH);
   }
   return undefined;
 }
@@ -108,7 +109,7 @@ function extractMessage(
   } else if (typeof error === "string") {
     fullMessage = `${message}: ${error}`;
   }
-  return truncate(fullMessage, MAX_MESSAGE_LENGTH);
+  return truncate(sanitizeLogText(fullMessage), MAX_MESSAGE_LENGTH);
 }
 
 /**
@@ -433,7 +434,11 @@ function buildRow(
   const baseKey = fingerprintBaseKey(level, errorType, truncatedMessage);
   const { fingerprint, collapsed } = resolveFingerprint(
     baseKey,
-    computeFingerprint(baseKey, allMeta, options?.fingerprintIgnoreKeys),
+    computeFingerprint(
+      baseKey,
+      allMeta.map(serializeLogValue),
+      options?.fingerprintIgnoreKeys,
+    ),
   );
   if (error instanceof Error) {
     // Preserve the existing fingerprint so a recurrence can reopen the same row.
@@ -458,7 +463,7 @@ function buildRow(
     stackTrace:
       extractStack(error) ??
       (options?.stackTrace
-        ? truncate(options.stackTrace, MAX_STACK_LENGTH)
+        ? truncate(sanitizeLogText(options.stackTrace), MAX_STACK_LENGTH)
         : null),
     // jsonb would store nested Errors as `{}` - keep message/stack/cause.
     metadata: allMeta.map(serializeLogValue),

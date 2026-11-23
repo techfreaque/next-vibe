@@ -29,6 +29,7 @@ import {
 import { getCurrentPathname, reloadPage } from "next-vibe/ui/lib/location";
 import { getSessionItem, setSessionItem } from "next-vibe/ui/lib/storage";
 
+import { sanitizeTelemetryUrl } from "../core/utils/telemetry-url";
 import {
   readEdgeRequestId,
   readEdgeTimingNode,
@@ -209,7 +210,7 @@ export function observeChunkReloadOutcome(logger: EndpointLogger): void {
     previous.outcome !== null ||
     observedReloadAt === previous.at ||
     Date.now() - previous.at >= CHUNK_RELOAD_WINDOW_MS ||
-    previous.path !== getCurrentPathname() ||
+    previous.path !== sanitizeTelemetryUrl(getCurrentPathname()) ||
     !navigation ||
     !("type" in navigation) ||
     navigation.type !== "reload" ||
@@ -330,7 +331,10 @@ export function handleChunkLoadFailure(
   const record: ChunkReloadRecord = {
     at: now,
     source,
-    path: typeof window === "undefined" ? null : getCurrentPathname(),
+    path:
+      typeof window === "undefined"
+        ? null
+        : sanitizeTelemetryUrl(getCurrentPathname()),
     level,
     buildId,
     chunkId: diagnostics.chunkId ?? null,

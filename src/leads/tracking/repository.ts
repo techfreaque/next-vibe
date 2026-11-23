@@ -18,6 +18,10 @@ import {
   success,
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import {
+  sanitizeLeadUrlMetadata,
+  sanitizeTelemetryUrl,
+} from "next-vibe/core/utils/telemetry-url";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { leads } from "next-vibe/identity/lead/db";
@@ -112,7 +116,8 @@ export class LeadTrackingRepository {
     }
 
     const userAgent = request.headers.get("user-agent") || "";
-    const referer = request.headers.get("referer") || "";
+    const referer =
+      sanitizeTelemetryUrl(request.headers.get("referer"), true) ?? "";
     const ip =
       request.headers.get("x-forwarded-for") ||
       request.headers.get("x-real-ip") ||
@@ -153,13 +158,16 @@ export class LeadTrackingRepository {
         `Engagement: ${data.engagementType} for lead ${data.leadId}${data.campaignId ? ` campaign ${data.campaignId}` : ""}`,
       );
 
+      const metadata = data.metadata
+        ? sanitizeLeadUrlMetadata(data.metadata)
+        : undefined;
       const result = await LeadsRepository.recordEngagementInternal(
         {
           leadId: data.leadId,
           engagementType: data.engagementType,
           campaignId: data.campaignId,
           metadata: {
-            ...data.metadata,
+            ...metadata,
             ...clientInfo,
           },
         },
@@ -236,7 +244,7 @@ export class LeadTrackingRepository {
         responseLeadId: data.leadId,
         responseEngagementType: data.engagementType,
         responseCampaignId: data.campaignId,
-        responseMetadata: data.metadata,
+        responseMetadata: metadata,
         timestamp: engagementData.timestamp,
         ipAddress: clientInfo?.ipAddress,
         userAgent: clientInfo?.userAgent,
@@ -1056,7 +1064,7 @@ export class LeadTrackingRepository {
               currentLeadId,
               trackingLeadId,
               campaignId: campaignId,
-              url,
+              url: sanitizeTelemetryUrl(url),
             });
           }
         } catch (error) {

@@ -2,6 +2,7 @@
 
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { sanitizeTelemetryUrl } from "next-vibe/core/utils/telemetry-url";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
 import { EngagementTypes } from "next-vibe/identity/lead/enum";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
@@ -68,7 +69,7 @@ export function trackOnboarding(
           formType: "onboarding",
           formId: event,
           source: data.mode,
-          url: getCurrentUrl(),
+          url: sanitizeTelemetryUrl(getCurrentUrl(), true) ?? undefined,
           timestamp: new Date().toISOString(),
           customData,
         },

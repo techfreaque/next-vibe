@@ -26,9 +26,14 @@ describe("E2E: lead engagement tracking", () => {
   const e2e = useE2E("leads/tracking");
 
   e2e.it("a page visit records a website-visit engagement", async ({ goto, capture, cleanup }) => {
-    const call = await capture(trackingEndpoints.POST, () => goto("/story/newsletter"), 60_000);
+    const call = await capture(
+      trackingEndpoints.POST,
+      () => goto("/story/newsletter?token=synthetic&utm_source=smoke#synthetic"),
+      60_000,
+    );
     expect(call.requestBody).toMatchObject({
       engagementType: EngagementTypes.WEBSITE_VISIT,
+      metadata: { url: `/${E2E_LOCALE}/story/newsletter?utm_source=smoke` },
     });
     expect(call.response.success, JSON.stringify(call.response)).toBe(true);
     if (!call.response.success) return;
@@ -36,6 +41,13 @@ describe("E2E: lead engagement tracking", () => {
     cleanup(() => removeEngagement(id));
     expect(call.response.data.responseEngagementType).toBe(
       EngagementTypes.WEBSITE_VISIT,
+    );
+    const [engagement] = await db
+      .select({ metadata: leadEngagements.metadata })
+      .from(leadEngagements)
+      .where(eq(leadEngagements.id, id));
+    expect(engagement?.metadata["url"]).toBe(
+      `/${E2E_LOCALE}/story/newsletter?utm_source=smoke`,
     );
   });
 

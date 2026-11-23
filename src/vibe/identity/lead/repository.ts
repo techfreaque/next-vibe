@@ -30,6 +30,7 @@ import {
   success,
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
+import { sanitizeLeadUrlMetadata } from "../../core/utils/telemetry-url";
 import { db, describeAppPoolCheckouts, rawPool } from "../../database";
 import { withTransaction } from "../../database/utils/repository-helpers";
 import type { EndpointLogger } from "../../logger/types";
@@ -1059,10 +1060,13 @@ export class LeadsRepository {
 
       // Only include non-null values in the update
       Object.entries(data).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
+        if (key !== "metadata" && value !== null && value !== undefined) {
           updateData[key] = value;
         }
       });
+      if (data.metadata) {
+        updateData["metadata"] = sanitizeLeadUrlMetadata(data.metadata);
+      }
 
       const [updatedLead] = await db
         .update(leads)
@@ -1266,7 +1270,7 @@ export class LeadsRepository {
               updateData.email = options.email.toLowerCase().trim();
               updateData.status = getWebsiteUserStatus(existingLead.status);
               updateData.metadata = {
-                ...existingLead.metadata,
+                ...sanitizeLeadUrlMetadata(existingLead.metadata),
                 anonymous: false,
                 convertedAt: new Date().toISOString(),
                 originalEmail: existingLead.email,
@@ -1426,7 +1430,7 @@ export class LeadsRepository {
               leadId: data.leadId,
               campaignId: data.campaignId || null,
               engagementType: data.engagementType,
-              metadata: data.metadata || {},
+              metadata: sanitizeLeadUrlMetadata(data.metadata ?? {}),
               ipAddress: data.ipAddress || null,
               userAgent: data.userAgent || null,
             })

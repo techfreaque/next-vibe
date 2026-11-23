@@ -13,6 +13,8 @@ import { getCurrentPathname } from "next-vibe/ui/lib/location";
 import { getUserAgent, isOnline } from "next-vibe/ui/lib/media";
 import { getViewportLabel } from "next-vibe/ui/lib/screen";
 
+import { sanitizeTelemetryUrl } from "../core/utils/telemetry-url";
+
 /** A path segment that is an id or a secret (uuid, numeric id, long token). */
 function isIdLikeSegment(segment: string): boolean {
   if (/^\d+$/.test(segment)) {
@@ -35,7 +37,7 @@ function isIdLikeSegment(segment: string): boolean {
  * and never carry a reset-password token or similar secret from the URL.
  */
 export function sanitizeRoutePath(pathname: string): string {
-  return pathname
+  return (sanitizeTelemetryUrl(pathname) ?? "/")
     .split("/")
     .map((segment) => (isIdLikeSegment(segment) ? ":id" : segment))
     .join("/");

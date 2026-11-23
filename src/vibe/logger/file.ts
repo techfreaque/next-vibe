@@ -23,6 +23,8 @@ import {
 } from "node:fs";
 import { isAbsolute, join } from "node:path";
 
+import { serializeLogRecord } from "./serialize";
+import { sanitizeLogText } from "./telemetry-privacy";
 import type { LoggerMetadata } from "./types";
 
 // Read at call time (not module init) so loadEnvironment() can set vars first.
@@ -111,9 +113,9 @@ export function serverFileLog(
     if (!path) {
       return;
     }
-    const clean = stripAnsi(message);
+    const clean = sanitizeLogText(stripAnsi(message));
     const entry = data
-      ? `${clean}\n${JSON.stringify(data, null, 2)}\n`
+      ? `${clean}\n${JSON.stringify(serializeLogRecord(data), null, 2)}\n`
       : `${clean}\n`;
     appendFileSync(path, entry, "utf-8");
   } catch (error) {
@@ -190,9 +192,9 @@ export function clientFileLog(
     if (!path) {
       return;
     }
-    const clean = stripAnsi(message);
+    const clean = sanitizeLogText(stripAnsi(message));
     const logEntry = data
-      ? `${clean}\n${JSON.stringify(data, null, 2)}\n`
+      ? `${clean}\n${JSON.stringify(serializeLogRecord(data), null, 2)}\n`
       : `${clean}\n`;
     appendFileSync(path, logEntry, "utf-8");
   } catch (error) {

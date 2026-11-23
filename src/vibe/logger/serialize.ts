@@ -8,6 +8,7 @@
  * url, responseBody, ...), wherever they sit inside the metadata.
  */
 
+import { sanitizeLogString, sanitizeLogText } from "./telemetry-privacy";
 import type { LoggerMetadata } from "./types";
 
 const MAX_STRING_LENGTH = 2000;
@@ -39,7 +40,7 @@ function serializeError(
 ): { [key: string]: LoggerMetadata } {
   const out: { [key: string]: LoggerMetadata } = {
     name: error.name,
-    message: truncate(error.message, MAX_STRING_LENGTH),
+    message: truncate(sanitizeLogText(error.message), MAX_STRING_LENGTH),
   };
   // Provider/SDK errors carry their context as own enumerable fields
   // (statusCode, url, responseBody, data, code, errno, ...).
@@ -47,7 +48,7 @@ function serializeError(
     if (key in out || SKIPPED_ERROR_KEYS.has(key)) {
       continue;
     }
-    out[key] = toLogValue(value, seen, depth + 1);
+    out[key] = toLogValue(value, seen, depth + 1, key);
   }
   if (error instanceof AggregateError) {
     out["errors"] = toLogValue(error.errors, seen, depth + 1);
@@ -56,7 +57,7 @@ function serializeError(
     out["cause"] = toLogValue(error.cause, seen, depth + 1);
   }
   if (error.stack) {
-    out["stack"] = truncate(error.stack, MAX_STACK_LENGTH);
+    out["stack"] = truncate(sanitizeLogText(error.stack), MAX_STACK_LENGTH);
   }
   return out;
 }
@@ -66,12 +67,13 @@ function toLogValue(
   value: unknown,
   seen: WeakSet<WeakKey>,
   depth: number,
+  key = "",
 ): LoggerMetadata {
   if (value === null || value === undefined) {
     return value;
   }
   if (typeof value === "string") {
-    return truncate(value, MAX_STRING_LENGTH);
+    return truncate(sanitizeLogString(key, value), MAX_STRING_LENGTH);
   }
   if (typeof value === "number" || typeof value === "boolean") {
     return value;
@@ -100,7 +102,7 @@ function toLogValue(
   // `seen` tracks the current ancestor path only: shared (non-circular)
   // references serialize in full each time they appear.
   seen.add(value);
-  const result = serializeObject(value, seen, depth);
+  const result = serializeObject(value, seen, depth, key);
   seen.delete(value);
   return result;
 }
@@ -109,6 +111,7 @@ function serializeObject(
   value: WeakKey,
   seen: WeakSet<WeakKey>,
   depth: number,
+  field: string,
 ): LoggerMetadata {
   if (value instanceof Error) {
     return serializeError(value, seen, depth);
@@ -116,7 +119,7 @@ function serializeObject(
   if (Array.isArray(value)) {
     const items = value
       .slice(0, MAX_ARRAY_ITEMS)
-      .map((item) => toLogValue(item, seen, depth + 1));
+      .map((item) => toLogValue(item, seen, depth + 1, field));
     if (value.length > MAX_ARRAY_ITEMS) {
       items.push(`[+${value.length - MAX_ARRAY_ITEMS} more]`);
     }
@@ -125,18 +128,18 @@ function serializeObject(
   if (value instanceof Map) {
     const out: { [key: string]: LoggerMetadata } = {};
     for (const [key, entry] of value) {
-      out[String(key)] = toLogValue(entry, seen, depth + 1);
+      out[String(key)] = toLogValue(entry, seen, depth + 1, String(key));
     }
     return out;
   }
   if (value instanceof Set) {
     return [...value]
       .slice(0, MAX_ARRAY_ITEMS)
-      .map((item) => toLogValue(item, seen, depth + 1));
+      .map((item) => toLogValue(item, seen, depth + 1, field));
   }
   const out: { [key: string]: LoggerMetadata } = {};
   for (const [key, entry] of Object.entries(value)) {
-    out[key] = toLogValue(entry, seen, depth + 1);
+    out[key] = toLogValue(entry, seen, depth + 1, key);
   }
   return out;
 }
@@ -153,7 +156,7 @@ export function serializeLogRecord(record: { [key: string]: LoggerMetadata }): {
   const out: { [key: string]: LoggerMetadata } = {};
   const seen = new WeakSet<WeakKey>();
   for (const [key, value] of Object.entries(record)) {
-    out[key] = toLogValue(value, seen, 0);
+    out[key] = toLogValue(value, seen, 0, key);
   }
   return out;
 }

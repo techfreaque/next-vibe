@@ -152,7 +152,7 @@ export function validateHandlerRequestData<
       logUrl("URL validation failed", {
         endpoint: context.endpointPath,
         error: urlValidation.message,
-        urlParams: JSON.stringify(context.urlParameters),
+        urlParamKeys: Object.keys(context.urlParameters ?? {}),
       });
       return urlValidation;
     }

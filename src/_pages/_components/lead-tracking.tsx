@@ -4,6 +4,7 @@ import {
   isBrowserNetworkLossMessage,
   parseError,
 } from "next-vibe/core/utils/parse-error";
+import { sanitizeTelemetryUrl } from "next-vibe/core/utils/telemetry-url";
 import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
 import { EngagementTypes } from "next-vibe/identity/lead/enum";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
@@ -95,8 +96,8 @@ export function LeadTracking(): null {
     const requestData = {
       engagementType: EngagementTypes.WEBSITE_VISIT,
       metadata: {
-        url: getCurrentUrl(),
-        referrer: getReferrer(),
+        url: sanitizeTelemetryUrl(getCurrentUrl(), true) ?? undefined,
+        referrer: sanitizeTelemetryUrl(getReferrer(), true) ?? undefined,
         userAgent: getUserAgent(),
         timestamp: new Date().toISOString(),
       },

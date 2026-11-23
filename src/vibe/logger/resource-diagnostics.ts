@@ -7,6 +7,7 @@
 
 import { getCurrentOrigin, getCurrentUrl } from "next-vibe/ui/lib/location";
 
+import { sanitizeTelemetryUrl } from "../core/utils/telemetry-url";
 import {
   EDGE_REQUEST_TIMING_METRIC,
   EDGE_TIMING_METRIC,
@@ -29,9 +30,8 @@ export function describeUrl(raw: string | null | undefined): string | null {
   }
   try {
     const url = new URL(raw, getCurrentUrl());
-    // Non-http schemes (blob:, chrome-extension:, eval frames) have origin "null"
-    if (url.origin === "null") {
-      return raw.split(/[?#]/)[0]?.slice(0, 200) ?? null;
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return null;
     }
     const sameOrigin = url.origin === getCurrentOrigin();
     if (sameOrigin && NEXT_BUNDLE_PATH.test(url.pathname)) {
@@ -39,7 +39,7 @@ export function describeUrl(raw: string | null | undefined): string | null {
     }
     return `${sameOrigin ? "" : url.origin}${sanitizeRoutePath(url.pathname)}`;
   } catch {
-    return raw.slice(0, 200);
+    return null;
   }
 }
 
@@ -49,7 +49,8 @@ export function urlExtension(raw: string | null | undefined): string | null {
     return null;
   }
   try {
-    const last = new URL(raw, getCurrentUrl()).pathname.split("/").pop() ?? "";
+    const path = sanitizeTelemetryUrl(new URL(raw, getCurrentUrl()).href);
+    const last = path?.split("/").pop() ?? "";
     const dot = last.lastIndexOf(".");
     return dot > 0 ? last.slice(dot + 1).slice(0, 10) : null;
   } catch {

@@ -4,6 +4,7 @@ import { getDomEnvironmentHints } from "next-vibe/ui/lib/dom-mutation-guard";
 import { useEffect } from "react";
 
 import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { sanitizeTelemetryUrl } from "../../../core/utils/telemetry-url";
 import {
   handleChunkLoadFailure,
   isChunkLoadError,
@@ -47,7 +48,7 @@ export default function useErrorHandler(
       // engine, and removeChild/insertBefore NotFoundErrors are almost always
       // a page translator or extension rewriting React's DOM.
       userAgent: navigator.userAgent,
-      path: window.location.pathname,
+      path: sanitizeTelemetryUrl(window.location.pathname),
       pageTranslated: domHints.translatedClass,
       // Translators rewrite <html lang> to the target language even when the
       // translated-* class is already gone (translation toggled off / SPA nav).

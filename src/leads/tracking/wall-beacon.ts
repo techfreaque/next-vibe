@@ -9,6 +9,7 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import { sanitizeTelemetryUrl } from "next-vibe/core/utils/telemetry-url";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { EngagementTypes } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -38,7 +39,7 @@ export function sendWallBeacon(params: {
             ? EngagementTypes.CREDIT_WALL
             : EngagementTypes.CONSENT_DECLINED,
         metadata: {
-          url: getCurrentUrl(),
+          url: sanitizeTelemetryUrl(getCurrentUrl(), true) ?? undefined,
           customData: {
             model,
             who: user.isPublic ? "guest" : "account",

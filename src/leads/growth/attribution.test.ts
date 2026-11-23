@@ -45,19 +45,14 @@ describe("extractTouch", () => {
   });
 
   it("stores only the external referrer host, never the URL", () => {
-    expect(
-      touchFor("/", "https://www.reddit.com/r/LocalLLaMA/comments/abc?x=1")
-        .referrerHost,
-    ).toBe("reddit.com");
+    expect(touchFor("/", "https://www.reddit.com/r/LocalLLaMA/comments/abc?x=1").referrerHost).toBe(
+      "reddit.com",
+    );
   });
 
   it("ignores internal referrers", () => {
-    expect(touchFor("/", "https://unbottled.ai/en-US/threads").referrerHost).toBe(
-      null,
-    );
-    expect(
-      touchFor("/", "https://www.unbottled.ai/en-US").referrerHost,
-    ).toBe(null);
+    expect(touchFor("/", "https://unbottled.ai/en-US/threads").referrerHost).toBe(null);
+    expect(touchFor("/", "https://www.unbottled.ai/en-US").referrerHost).toBe(null);
   });
 
   it("accepts utm_id only when it is a UUID", () => {
@@ -77,9 +72,7 @@ describe("extractTouch", () => {
   });
 
   it("never stores an off-site /track destination path", () => {
-    const touch = touchFor(
-      `/en-US/track?url=${encodeURIComponent("https://evil.example/phish")}`,
-    );
+    const touch = touchFor(`/en-US/track?url=${encodeURIComponent("https://evil.example/phish")}`);
     expect(touch.landingPath).toBe("/en-US/track");
   });
 
@@ -88,6 +81,15 @@ describe("extractTouch", () => {
     const touch = touchFor(`/?utm_campaign=${long}&utm_source=%00red%0Ddit`);
     expect(touch.campaign?.length).toBe(100);
     expect(touch.source).toBe("reddit");
+  });
+
+  it("templates private landing URLs, including through the email tracker", () => {
+    const destination =
+      "/en-US/user/reset-password/private?token=private&utm_content=person%40example.test";
+    const touch = touchFor(`/en-US/track?url=${encodeURIComponent(destination)}&utm_source=mail`);
+    expect(touch.landingPath).toBe("/en-US/user/reset-password/:token");
+    expect(touch.source).toBe("mail");
+    expect(touch.content).toBeNull();
   });
 });
 
@@ -184,9 +186,7 @@ describe("link builder helpers", () => {
 
   it("routes referral-bound links through /track and round-trips", () => {
     const url = buildCampaignUrl(APP, { ...link, refCode: "FRIEND2024" });
-    expect(url.startsWith(`${APP}/track?ref=FRIEND2024&url=%2Fstory&`)).toBe(
-      true,
-    );
+    expect(url.startsWith(`${APP}/track?ref=FRIEND2024&url=%2Fstory&`)).toBe(true);
     const touch = extractTouch(new URL(url), undefined, OWN);
     expect(touch.landingPath).toBe("/story");
     expect(touch.refCode).toBe("FRIEND2024");
@@ -222,17 +222,31 @@ describe("isAcquisitionVisit", () => {
   it("counts referral arrivals without recounting internal redirects or signup navigation", () => {
     const track = new URL("/en-US/track?ref=PARTNER&url=%2Fen-US%2Fstory", APP);
     const external = "https://example.com/watch";
-    expect(isAcquisitionVisit(track, external, OWN, extractTouch(track, external, OWN), "cross-site")).toBe(true);
+    expect(
+      isAcquisitionVisit(track, external, OWN, extractTouch(track, external, OWN), "cross-site"),
+    ).toBe(true);
 
     const signup = new URL("/en-US/user/signup?ref=PARTNER", APP);
     const referer = track.toString();
-    expect(isAcquisitionVisit(signup, referer, OWN, extractTouch(signup, referer, OWN), "same-origin")).toBe(false);
+    expect(
+      isAcquisitionVisit(signup, referer, OWN, extractTouch(signup, referer, OWN), "same-origin"),
+    ).toBe(false);
 
     const secondCode = new URL("/en-US/story?ref=OTHER", APP);
-    expect(isAcquisitionVisit(secondCode, referer, OWN, extractTouch(secondCode, referer, OWN), "same-origin")).toBe(true);
+    expect(
+      isAcquisitionVisit(
+        secondCode,
+        referer,
+        OWN,
+        extractTouch(secondCode, referer, OWN),
+        "same-origin",
+      ),
+    ).toBe(true);
 
     const home = new URL("/en-US", APP);
-    expect(isAcquisitionVisit(home, referer, OWN, extractTouch(home, referer, OWN), "same-origin")).toBe(false);
+    expect(
+      isAcquisitionVisit(home, referer, OWN, extractTouch(home, referer, OWN), "same-origin"),
+    ).toBe(false);
     expect(isAcquisitionVisit(home, null, OWN, extractTouch(home, null, OWN), "none")).toBe(true);
   });
 });

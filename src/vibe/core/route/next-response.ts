@@ -16,6 +16,7 @@ import { validateData } from "../core-utils/validation";
 import type { CreateApiEndpointAny } from "../definition/endpoint-base";
 import type { CountryLanguage } from "../i18n/core/config";
 import { scopedTranslation as sharedScopedTranslation } from "../i18n/shared";
+import { sanitizeTelemetryUrl } from "../utils/telemetry-url";
 import { errorResponseSchema } from "./error-response.schema";
 import type { ErrorResponseType, ResponseType } from "./response.schema";
 import { ErrorResponseTypes, fail, success } from "./response.schema";
@@ -91,19 +92,6 @@ function userAgentFamily(userAgent: string | null): string {
     : family;
 }
 
-/** origin + pathname only - query strings can carry tokens. */
-function stripQuery(url: string | null): string | null {
-  if (!url) {
-    return null;
-  }
-  try {
-    const parsed = new URL(url);
-    return `${parsed.origin}${parsed.pathname}`;
-  } catch {
-    return url.split(/[?#]/)[0] ?? null;
-  }
-}
-
 /**
  * Request context for an API error log line: enough to find the caller (which
  * page fired it, logged in or not, which client) without secrets - no query
@@ -118,8 +106,8 @@ function describeRequestForLog(request: NextRequest): {
 } {
   return {
     method: request.method,
-    path: request.nextUrl.pathname,
-    referer: stripQuery(request.headers.get("referer")),
+    path: sanitizeTelemetryUrl(request.nextUrl.pathname) ?? "/",
+    referer: sanitizeTelemetryUrl(request.headers.get("referer")),
     auth: request.headers.get("authorization")
       ? "bearer"
       : request.cookies.get(AUTH_TOKEN_COOKIE_NAME)?.value

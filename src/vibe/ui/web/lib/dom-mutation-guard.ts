@@ -27,6 +27,8 @@
  * by LoggerProvider; events before that are buffered.
  */
 
+import { sanitizeTelemetryUrl } from "../../../core/utils/telemetry-url";
+
 export interface DomEnvironmentHints {
   [key: string]: string | number | boolean | null;
   /** `<html lang>` right now - translators rewrite it to the target language */
@@ -81,18 +83,6 @@ function safeCount(selector: string): number {
   }
 }
 
-function stripQuery(url: string): string | null {
-  if (!url) {
-    return null;
-  }
-  try {
-    const parsed = new URL(url);
-    return `${parsed.origin}${parsed.pathname}`;
-  } catch {
-    return url.split(/[?#]/)[0] ?? null;
-  }
-}
-
 /**
  * Snapshot of translator / extension evidence in the current document.
  * Safe to call anywhere on the client; returns empty hints without a DOM.
@@ -123,7 +113,7 @@ export function getDomEnvironmentHints(): DomEnvironmentHints {
       html.classList.contains("translated-rtl"),
     fontWrapperCount,
     extensionMarkers: markers.join(","),
-    referrer: stripQuery(document.referrer),
+    referrer: sanitizeTelemetryUrl(document.referrer),
   };
 }
 
@@ -213,7 +203,7 @@ function record(
       : null,
     targetExtensionMarkers: getMutationTargetMarkers(target),
     occurrence: occurrences,
-    path: window.location.pathname,
+    path: sanitizeTelemetryUrl(window.location.pathname) ?? "/",
     summary: false,
     operations: null,
   };
@@ -249,7 +239,7 @@ function armSummary(): void {
       targetActualParent: null,
       targetExtensionMarkers: null,
       occurrence: occurrences,
-      path: window.location.pathname,
+      path: sanitizeTelemetryUrl(window.location.pathname) ?? "/",
       summary: true,
       operations: [...laterOperations.entries()]
         .map(([kind, count]) => `${kind}=${count}`)

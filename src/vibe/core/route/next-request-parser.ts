@@ -10,6 +10,7 @@ import type { NextRequest } from "next-vibe/ui/lib/request";
 
 import type { EndpointLogger } from "../../logger/types";
 import { parseError } from "../utils/parse-error";
+import { sanitizeTelemetryUrl } from "../utils/telemetry-url";
 
 /**
  * Parsed JSON value type - recursive type for any JSON-compatible structure
@@ -497,7 +498,7 @@ export async function parseRequestBody(
           transferEncoding: request.headers.get("transfer-encoding") ?? null,
           via: request.headers.get("via") ?? null,
           method: request.method,
-          url: request.url,
+          path: sanitizeTelemetryUrl(request.url),
         });
       }
       return {};
@@ -529,7 +530,7 @@ export async function parseRequestBody(
       receivedCharacters,
       clientDisconnected: request.signal.aborted,
       method: request.method,
-      pathname: request.nextUrl.pathname,
+      pathname: sanitizeTelemetryUrl(request.nextUrl.pathname),
     });
     // If parsing fails, return empty object
     // genericHandler will handle validation errors
