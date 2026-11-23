@@ -1,42 +1,78 @@
+import { randomUUID } from "node:crypto";
+
+import { eq, inArray } from "drizzle-orm";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { ErrorResponseTypes } from "next-vibe/core/route/response.schema";
-import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
+import { db } from "next-vibe/database";
+import { pgliteReady } from "next-vibe/database/client";
+import type { JWTPublicPayloadType } from "next-vibe/identity/auth/types";
+import { leads } from "next-vibe/identity/lead/db";
+import { createAnonymousLead } from "next-vibe/identity/lead/middleware-ops";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
-import { resolveTestAdminUser } from "next-vibe/tooling/testing/testing-suite/resolve-test-user";
+import { createEndpointLogger } from "next-vibe/logger/server";
 import { sendTestRequest } from "next-vibe/tooling/testing/testing-suite/send-test-request";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "vitest";
 
+import { pendingSignups, signupMailAttempts } from "./db";
 import signupEndpoints from "./definition";
 import { setMxResolverForTests } from "./disposable-mx";
 import { scopedTranslation } from "./i18n";
 
 const endpoint = signupEndpoints.POST;
+const logger = createEndpointLogger(false, defaultLocale);
+const { t } = scopedTranslation.scopedT(defaultLocale);
 
 describe("POST /user/public/signup", () => {
-  let adminUser: JwtPrivatePayloadType;
+  let publicUser: JWTPublicPayloadType;
+  let mailScopes: string[] = [];
 
   beforeAll(async () => {
+    await pgliteReady;
     setMxResolverForTests(async () => ["mx.fixture.invalid"]);
-    adminUser = await resolveTestAdminUser();
   });
-
   afterAll(() => setMxResolverForTests(null));
 
-  const publicUser = () => ({
-    isPublic: true as const,
-    leadId: adminUser.leadId,
-    roles: [UserPermissionRole.PUBLIC],
+  beforeEach(async () => {
+    mailScopes = [];
+    const leadId = await createAnonymousLead(
+      { userAgent: randomUUID() },
+      defaultLocale,
+      logger,
+    );
+    publicUser = { isPublic: true, leadId, roles: [UserPermissionRole.PUBLIC] };
+    mailScopes.push(`lead:${leadId}`);
   });
 
-  const uniqueEmail = () =>
-    `test-signup-${Date.now()}-${Math.floor(Math.random() * 10000)}@example-test.invalid`;
+  afterEach(async () => {
+    if (mailScopes.length === 0) {
+      return;
+    }
+    await db.delete(leads).where(eq(leads.id, publicUser.leadId));
+    await db
+      .delete(signupMailAttempts)
+      .where(inArray(signupMailAttempts.scope, mailScopes));
+  });
 
-  it("starts a pending signup and returns the confirmation reference", async () => {
+  const uniqueEmail = (): string => {
+    const email = `test-signup-${randomUUID()}@example-test.invalid`;
+    mailScopes.push(`email:${email}`);
+    return email;
+  };
+
+  it("starts a pending signup with a trimmed one-character private name", async () => {
     const res = await sendTestRequest({
       toolExecutionContext: undefined,
       endpoint,
       data: {
-        privateName: "Test User",
+        privateName: " A ",
         publicName: "Tester",
         email: uniqueEmail(),
         password: "SecurePass123",
@@ -44,16 +80,24 @@ describe("POST /user/public/signup", () => {
         acceptTerms: true,
         subscribeToNewsletter: false,
       },
-      user: publicUser(),
+      user: publicUser,
     });
 
-    expect(res.success, `Signup failed: ${String(res.success === false && res.message)}`).toBe(
-      true,
-    );
-    if (!res.success) return;
+    expect(
+      res.success,
+      `Signup failed: ${String(res.success === false && res.message)}`,
+    ).toBe(true);
+    if (!res.success) {
+      return;
+    }
     expect(res.data.pendingId).toBeTypeOf("string");
     expect(res.data.message).toBeTypeOf("string");
     expect(res.data.message.length).toBeGreaterThan(0);
+    const [pending] = await db
+      .select({ privateName: pendingSignups.privateName })
+      .from(pendingSignups)
+      .where(eq(pendingSignups.id, res.data.pendingId));
+    expect(pending?.privateName).toBe("A");
   });
 
   it("throttles repeated confirmation mail to the same address", async () => {
@@ -71,7 +115,7 @@ describe("POST /user/public/signup", () => {
         acceptTerms: true,
         subscribeToNewsletter: false,
       },
-      user: publicUser(),
+      user: publicUser,
     });
 
     expect(
@@ -91,13 +135,17 @@ describe("POST /user/public/signup", () => {
         acceptTerms: true,
         subscribeToNewsletter: false,
       },
-      user: publicUser(),
+      user: publicUser,
     });
 
     expect(second.success).toBe(false);
-    if (second.success) return;
-    // Repository returns VALIDATION_ERROR for duplicate email (field-level error, not 409)
-    expect(second.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    if (second.success) {
+      return;
+    }
+    expect(second.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
+    expect(second.message).toBe(t("confirmation.cooldown"));
   });
 
   it("rejects weak password (too short) with VALIDATION_ERROR", async () => {
@@ -113,12 +161,16 @@ describe("POST /user/public/signup", () => {
         acceptTerms: true,
         subscribeToNewsletter: false,
       },
-      user: publicUser(),
+      user: publicUser,
     });
 
     expect(res.success).toBe(false);
-    if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
   it("rejects password without uppercase with VALIDATION_ERROR", async () => {
@@ -134,12 +186,16 @@ describe("POST /user/public/signup", () => {
         acceptTerms: true,
         subscribeToNewsletter: false,
       },
-      user: publicUser(),
+      user: publicUser,
     });
 
     expect(res.success).toBe(false);
-    if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
   it("rejects invalid email format with VALIDATION_ERROR", async () => {
@@ -155,12 +211,16 @@ describe("POST /user/public/signup", () => {
         acceptTerms: true,
         subscribeToNewsletter: false,
       },
-      user: publicUser(),
+      user: publicUser,
     });
 
     expect(res.success).toBe(false);
-    if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
   it("rejects if acceptTerms is false with VALIDATION_ERROR", async () => {
@@ -176,20 +236,24 @@ describe("POST /user/public/signup", () => {
         acceptTerms: false,
         subscribeToNewsletter: false,
       },
-      user: publicUser(),
+      user: publicUser,
     });
 
     expect(res.success).toBe(false);
-    if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
-  it("rejects privateName shorter than 2 chars with VALIDATION_ERROR", async () => {
+  it("rejects a whitespace-only private name with VALIDATION_ERROR", async () => {
     const res = await sendTestRequest({
       toolExecutionContext: undefined,
       endpoint,
       data: {
-        privateName: "A",
+        privateName: "   ",
         publicName: "Tester",
         email: uniqueEmail(),
         password: "SecurePass123",
@@ -197,12 +261,16 @@ describe("POST /user/public/signup", () => {
         acceptTerms: true,
         subscribeToNewsletter: false,
       },
-      user: publicUser(),
+      user: publicUser,
     });
 
     expect(res.success).toBe(false);
-    if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
+    );
   });
 
   it("email is stored lowercase even if submitted with uppercase", async () => {
@@ -221,7 +289,7 @@ describe("POST /user/public/signup", () => {
         acceptTerms: true,
         subscribeToNewsletter: false,
       },
-      user: publicUser(),
+      user: publicUser,
     });
 
     expect(
@@ -245,17 +313,19 @@ describe("POST /user/public/signup", () => {
         subscribeToNewsletter: false,
         referralCode: `NO-SUCH-CODE-${Date.now()}`,
       },
-      user: publicUser(),
+      user: publicUser,
     });
 
     expect(res.success).toBe(false);
-    if (res.success) return;
-    expect(res.errorType?.errorCode).toBe(ErrorResponseTypes.VALIDATION_ERROR.errorCode);
-    expect(res.message).toBe(
-      scopedTranslation.scopedT(defaultLocale).t("fields.referralCode.validation.invalid"),
+    if (res.success) {
+      return;
+    }
+    expect(res.errorType?.errorCode).toBe(
+      ErrorResponseTypes.VALIDATION_ERROR.errorCode,
     );
+    expect(res.message).toBe(t("fields.referralCode.validation.invalid"));
 
-    // Nothing was created — the same email still signs up cleanly
+    // Retry from the same lead and address with the rejected code cleared.
     const retry = await sendTestRequest({
       toolExecutionContext: undefined,
       endpoint,
@@ -268,7 +338,7 @@ describe("POST /user/public/signup", () => {
         acceptTerms: true,
         subscribeToNewsletter: false,
       },
-      user: publicUser(),
+      user: publicUser,
     });
     expect(
       retry.success,
