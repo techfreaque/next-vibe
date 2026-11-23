@@ -98,8 +98,9 @@ export interface RunStreamDeps {
 
 export type RunStreamParams = Omit<
   Parameters<typeof runTestStream>[0],
-  "toolExecutionContext"
+  "toolExecutionContext" | "user"
 > & {
+  user: JwtPrivatePayloadType;
   /** Set ONLY for tests that exercise tool error paths. */
   allowToolErrors?: boolean;
   /**
@@ -548,13 +549,14 @@ export function makeRunStream(deps: RunStreamDeps): RunStreamFn {
           ).toBe("waiting");
         }
 
-        // Delete stale cron tasks from previous test runs that are NOT for this thread.
+        // Delete the test user's stale cron tasks from earlier test threads.
         // Without this, executePulse picks up leftover resume-stream/remote tasks which
         // consume fetch-cache counter indices before the real revival, misaligning fixtures.
         await db
           .delete(cronTasks)
           .where(
             and(
+              eq(cronTasks.userId, params.user.id),
               like(cronTasks.routeId, "resume-stream%"),
               sql`(${cronTasks.taskInput}->>'threadId' IS NULL OR ${cronTasks.taskInput}->>'threadId' != ${tid})`,
             ),

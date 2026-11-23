@@ -540,13 +540,15 @@ export function describeStreamSuite(cfg: ModeConfig): void {
       nativeImageChatModelId = nativeImageFav.chatModelId;
       nativeImageGenModelId = nativeImageFav.imageGenModelId;
 
-      // No stale local tasks may exist when a suite starts: the system
-      // prompt lists pending tasks, the AI calls await-task on them, and
-      // that behavior gets baked into recorded fixtures.
+      // Stale tasks owned by the test user can leak into the system prompt
+      // and change which tasks the recorded assistant calls await-task on.
       await db
         .delete(cronTasks)
         .where(
-          sql`(${cronTasks.id} LIKE 'local-bg-%' OR ${cronTasks.id} LIKE 'local-wu-%' OR ${cronTasks.routeId} LIKE 'resume-stream%')`,
+          and(
+            eq(cronTasks.userId, testUser.id),
+            sql`(${cronTasks.id} LIKE 'local-bg-%' OR ${cronTasks.id} LIKE 'local-wu-%' OR ${cronTasks.routeId} LIKE 'resume-stream%')`,
+          ),
         );
 
       // A LOCAL suite (no cfg.setup) runs ZERO remote code — it never touches a

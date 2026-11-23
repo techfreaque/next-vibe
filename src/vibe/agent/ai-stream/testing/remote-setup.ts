@@ -475,7 +475,8 @@ export async function connectToHermes(
   await disconnectFromHermes(user.id);
   await restoreHermesIdentity(remoteUrl);
   await restoreAtlasIdentity();
-  await unregisterDevFromHermes(await resolveProdUserId(), remoteUrl);
+  const prodUserId = await resolveProdUserId();
+  await unregisterDevFromHermes(prodUserId, remoteUrl);
 
   // Connect via the real connect endpoint — exactly the user/UI flow: log into
   // hermes with email+password, register both sides, sync capabilities.
@@ -548,9 +549,9 @@ export async function connectToHermes(
   // sync completed: fail hard if capabilities or lastSyncedAt are not populated.
   // Capture hermes's current atlas-row lastSyncedAt BEFORE triggering — phase 2
   // must wait for it to ADVANCE past this value, not just be non-null.
-  const hermesBeforeTs = await resolveHermesAtlasLastSyncedAt();
+  const hermesBeforeTs = await resolveHermesAtlasLastSyncedAt(prodUserId);
   await triggerHermesReconnect();
-  await assertSyncCompleted(user.id, remoteUrl, hermesBeforeTs);
+  await assertSyncCompleted(user.id, remoteUrl, prodUserId, hermesBeforeTs);
 
   // Ensure capabilities are populated on the atlas hermes row.
   // Hermes skips resending capabilities when its sentCapabilitiesVersion already
@@ -571,14 +572,13 @@ export async function connectToHermes(
   if (!atlasRow?.capabilities) {
     // Force hermes to resend capabilities by clearing its sentCapabilitiesVersion
     const pdb = getProdDb();
-    const prodUserId = await resolveProdUserId();
     // The reverse entry (is_reverse_entry = true) is the row hermes uses for
     // pullOnConnect — it tracks sentCapabilitiesVersion for its push to atlas.
     await pdb.execute(
       sql`UPDATE remote_connections SET sent_capabilities_version = NULL WHERE user_id = ${prodUserId} AND instance_id = ${ATLAS_INSTANCE_ID}`,
     );
     // Trigger another sync so hermes resends capabilities
-    const beforeTs2 = await resolveHermesAtlasLastSyncedAt();
+    const beforeTs2 = await resolveHermesAtlasLastSyncedAt(prodUserId);
     await triggerHermesReconnect();
     // Wait for lastSyncedAt to advance past the first sync's timestamp
     const deadline2 = Date.now() + 60_000;
@@ -991,16 +991,18 @@ async function triggerHermesReconnect(): Promise<void> {
  * Read hermes's current last_synced_at for its atlas row.
  * Returns 0 if the row does not exist yet (first run).
  */
-async function resolveHermesAtlasLastSyncedAt(): Promise<number> {
-  const pdb = getProdDb();
-  const rows = await pdb.execute<{ last_synced_at: string | null }>(
-    sql`SELECT last_synced_at FROM remote_connections
-        WHERE instance_id = ${ATLAS_INSTANCE_ID}
-          AND is_reverse_entry = true
-        LIMIT 1`,
-  );
-  const ts = rows.rows[0]?.last_synced_at;
-  return ts ? new Date(ts).getTime() : 0;
+async function resolveHermesAtlasLastSyncedAt(userId: string): Promise<number> {
+  const [row] = await getProdDb()
+    .select({ lastSyncedAt: remoteConnections.lastSyncedAt })
+    .from(remoteConnections)
+    .where(
+      and(
+        eq(remoteConnections.userId, userId),
+        eq(remoteConnections.instanceId, ATLAS_INSTANCE_ID),
+        eq(remoteConnections.isReverseEntry, true),
+      ),
+    );
+  return row?.lastSyncedAt?.getTime() ?? 0;
 }
 
 /**
@@ -1013,6 +1015,7 @@ async function resolveHermesAtlasLastSyncedAt(): Promise<number> {
 async function assertSyncCompleted(
   userId: string,
   remoteUrl: string,
+  prodUserId: string,
   hermesBeforeTs = 0,
 ): Promise<void> {
   // 120s: allows up to one 15s 500-retry + a large sync (threads can take ~50s on first run).
@@ -1054,18 +1057,9 @@ async function assertSyncCompleted(
   // Phase 2: wait for hermes's own atlas-row lastSyncedAt to ADVANCE past hermesBeforeTs.
   // Hermes updates this row inside pullOnConnect, RIGHT BEFORE releaseSyncSlot().
   // Waiting for this guarantees the sync slot is free before the next reconnect.
-  const pdb = getProdDb();
   const phase2Deadline = Date.now() + 30_000;
   while (Date.now() < phase2Deadline) {
-    const rows = await pdb.execute<{ last_synced_at: string | null }>(
-      sql`SELECT last_synced_at FROM remote_connections
-          WHERE instance_id = ${ATLAS_INSTANCE_ID}
-            AND is_reverse_entry = true
-          LIMIT 1`,
-    );
-    const ts = rows.rows[0]?.last_synced_at
-      ? new Date(rows.rows[0].last_synced_at).getTime()
-      : 0;
+    const ts = await resolveHermesAtlasLastSyncedAt(prodUserId);
     if (ts > hermesBeforeTs) {
       // Grace window: releaseSyncSlot() runs immediately after the DB write
       // (in the finally block of pullOnConnect). 1s covers any executor
@@ -1155,12 +1149,13 @@ export async function triggerHermesPull(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _remoteUrl?: string,
 ): Promise<void> {
-  const beforeTs = await resolveHermesAtlasLastSyncedAt();
+  const prodUserId = await resolveProdUserId();
+  const beforeTs = await resolveHermesAtlasLastSyncedAt(prodUserId);
   await triggerHermesReconnect();
   // Wait for hermes to complete the pull (lastSyncedAt advances past beforeTs).
   const deadline = Date.now() + 30_000;
   while (Date.now() < deadline) {
-    const afterTs = await resolveHermesAtlasLastSyncedAt();
+    const afterTs = await resolveHermesAtlasLastSyncedAt(prodUserId);
     if (afterTs > beforeTs) {
       return;
     }

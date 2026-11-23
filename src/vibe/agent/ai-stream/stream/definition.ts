@@ -4,6 +4,7 @@
  */
 
 import type { JSONSchema7 } from "json-schema";
+import { iconSchema } from "next-vibe/core/definition/common.schema";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   EndpointErrorTypes,
@@ -502,6 +503,22 @@ const { POST } = createEndpoint({
               /** The CONNECTION's thread mirroring policy — 'off' keeps the
                *  executor's landing transient (no persisted copy). */
               threadMirrorMode: z.enum(["both", "off"]),
+              folderChain: z
+                .array(
+                  z.object({
+                    id: z.uuid(),
+                    name: z.string().min(1).max(255),
+                    icon: iconSchema.nullish(),
+                    color: z.string().nullish(),
+                  }),
+                )
+                .max(32)
+                .refine(
+                  (folders) =>
+                    new Set(folders.map(({ id }) => id)).size ===
+                    folders.length,
+                )
+                .optional(),
               confirmationOverrides: z
                 .array(
                   z.object({

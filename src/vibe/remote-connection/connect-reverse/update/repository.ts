@@ -127,9 +127,9 @@ export class ReverseConnectionUpdateRepository {
       if (isAdmin) {
         const { getWsConnection, closeConnection, restartConnection } =
           await import("../../../realtime/server/connector");
-        if (getWsConnection(localInstanceId)) {
+        if (getWsConnection(localInstanceId, user.id)) {
           closeConnection(localInstanceId);
-          await restartConnection(patch.instanceId);
+          await restartConnection(patch.instanceId, user.id);
         }
       }
     }
@@ -164,7 +164,7 @@ export class ReverseConnectionUpdateRepository {
     ) {
       const { restartConnection } =
         await import("../../../realtime/server/connector");
-      await restartConnection(effectiveInstanceId);
+      await restartConnection(effectiveInstanceId, user.id);
     }
 
     return success({ updated: true });

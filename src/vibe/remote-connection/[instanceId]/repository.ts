@@ -256,9 +256,8 @@ export class RemoteConnectionInstanceRepository {
     });
 
     // Mirror changed settings to the peer's reverse entry via the peer's real
-    // connect-reverse/update endpoint, over the single canonical remote-call
-    // (runInProcessTyped resolves the leg + auth). No magic WS control events —
-    // "do X on the peer" is always a definition-driven endpoint call.
+    // connect-reverse/update endpoint. The active transport carries ordinary
+    // settings updates. A transport change can bootstrap over the old leg.
     //   • syncScope          — keeps the sync serve-filter consistent both sides.
     //   • remoteTransportMode — our transportMode IS the peer's "how the remote
     //     reaches me"; the peer stores it and (re)opens/closes its connector.
@@ -289,34 +288,58 @@ export class RemoteConnectionInstanceRepository {
         const { CallbackMode } = await import("../../execute-tool/constants");
         const reverseUpdateDef =
           await import("../connect-reverse/update/definition");
-        await runEndpointRemote({
-          definition: reverseUpdateDef.default.PATCH,
-          instanceId: targetInstanceId,
-          callbackMode: CallbackMode.WAIT,
-          user,
-          locale,
-          logger,
-          platform,
-          input: {
-            instanceId: selfInstanceId,
-            // Mirror syncScope ONLY when the PATCH actually changed it — an
-            // absent scope must NOT be sent, or the peer's optional schema keeps
-            // it undefined (correct) while a sent `undefined` would round-trip.
-            // A transportMode-only PATCH leaves the peer's scope untouched.
-            ...(syncScope !== undefined ? { syncScope } : {}),
-            // Our transportMode IS the peer's "how the remote reaches me"
-            // (its remoteTransportMode). And if WE set remoteTransportMode
-            // directly (how the peer reaches us), that IS the peer's own
-            // transportMode — mirror it so both rows stay in lockstep.
-            ...(transportMode !== undefined
-              ? { remoteTransportMode: transportMode }
-              : {}),
-            ...(remoteTransportMode !== undefined
-              ? { transportMode: remoteTransportMode }
-              : {}),
-            ...(reconnectNow === true ? { reconnectNow: true } : {}),
-          },
-        });
+        const definition = reverseUpdateDef.default.PATCH;
+        const input = {
+          instanceId: selfInstanceId,
+          ...(syncScope !== undefined ? { syncScope } : {}),
+          // Each side records the other side's outbound transport as inbound.
+          ...(transportMode !== undefined
+            ? { remoteTransportMode: transportMode }
+            : {}),
+          ...(remoteTransportMode !== undefined
+            ? { transportMode: remoteTransportMode }
+            : {}),
+          ...(reconnectNow === true ? { reconnectNow: true } : {}),
+        };
+        // The previous HTTP leg bootstraps the new WS leg. Using the mode
+        // just saved above would wait on the subscription this PATCH opens.
+        const connection =
+          row.transportMode === "direct-http" && transportMode === "reverse-ws"
+            ? await RemoteConnectionRepository.getConnectionForInstance(
+                user.id,
+                targetInstanceId,
+              )
+            : null;
+        const result = connection?.token
+          ? (
+              await RemoteTransport.callEndpointDirect({
+                connection: {
+                  remoteUrl: connection.remoteUrl,
+                  token: connection.token,
+                  leadId: connection.leadId,
+                },
+                definition,
+                input,
+                locale,
+                timeoutMs: 15_000,
+              })
+            ).response
+          : await runEndpointRemote({
+              definition,
+              input,
+              instanceId: targetInstanceId,
+              callbackMode: CallbackMode.WAIT,
+              user,
+              locale,
+              logger,
+              platform,
+            });
+        if (!result.success) {
+          logger.warn("[PATCH] Failed to mirror settings to peer", {
+            instanceId: targetInstanceId,
+            error: result.message,
+          });
+        }
       } catch (err) {
         logger.warn(
           "[PATCH] Failed to mirror settings to peer — picked up on reconnect",
@@ -360,7 +383,7 @@ export class RemoteConnectionInstanceRepository {
       try {
         const { restartConnection } =
           await import("../../realtime/server/connector");
-        await restartConnection(targetInstanceId);
+        await restartConnection(targetInstanceId, user.id);
       } catch (connectorErr) {
         logger.error("[PATCH] connector lifecycle failed (settings saved)", {
           targetInstanceId,
@@ -743,7 +766,7 @@ export class RemoteConnectionInstanceRepository {
     // otherwise the open WS keeps authenticating with the rotated-out one.
     const { restartConnection } =
       await import("../../realtime/server/connector");
-    await restartConnection(instanceId);
+    await restartConnection(instanceId, user.id);
 
     logger.info("[REAUTH] Token refreshed and channel restarted", {
       userId: user.id,
@@ -819,9 +842,9 @@ export class RemoteConnectionInstanceRepository {
       try {
         const { getWsConnection, closeConnection, restartConnection } =
           await import("../../realtime/server/connector");
-        if (getWsConnection(instanceId)) {
+        if (getWsConnection(instanceId, user.id)) {
           closeConnection(instanceId);
-          await restartConnection(newInstanceId);
+          await restartConnection(newInstanceId, user.id);
         }
       } catch {
         /* non-fatal */

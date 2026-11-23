@@ -62,8 +62,9 @@ export class RemoteTransport {
       timeoutMs = 30_000,
     } = params;
     const fullUrl = apiPath ? `${remoteUrl}/api/${apiPath}` : remoteUrl;
+    const sendsBody = method !== Methods.GET && body !== undefined;
     const headers: Record<string, string> = {};
-    if (body !== undefined) {
+    if (sendsBody) {
       headers["Content-Type"] = "application/json";
       // Keepalive socket reuse corrupts multi-MB request bodies between Bun's
       // fetch and the peer's HTTP layer (stalls ~12s, "socket closed
@@ -85,11 +86,26 @@ export class RemoteTransport {
       headers["Cookie"] = `${LEAD_ID_COOKIE_NAME}=${leadId}`;
     }
     try {
+      const url = new URL(fullUrl);
+      if (method === Methods.GET && body) {
+        for (const [key, value] of Object.entries(body)) {
+          if (value === null || value === undefined) {
+            continue;
+          }
+          const encoded =
+            value instanceof Date
+              ? value.toISOString()
+              : typeof value === "object"
+                ? JSON.stringify(value)
+                : String(value);
+          url.searchParams.set(key, encoded);
+        }
+      }
       // oxlint-disable-next-line restricted/no-raw-fetch -- the ONE sanctioned remote raw-HTTP primitive; all other remote calls use runInProcessTyped
-      const response = await fetch(fullUrl, {
+      const response = await fetch(url, {
         method,
         headers,
-        body: body === undefined ? undefined : JSON.stringify(body),
+        body: sendsBody ? JSON.stringify(body) : undefined,
         redirect,
         signal: AbortSignal.timeout(timeoutMs),
       });

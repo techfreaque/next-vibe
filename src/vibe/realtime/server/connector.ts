@@ -138,6 +138,10 @@ class WsConnection {
     return this.config.remoteUrl;
   }
 
+  get userId(): string {
+    return this.config.userId;
+  }
+
   /** Subscribe to a channel on this connection. Returns cleanup fn. */
   subscribe(channel: string, handler: ChannelHandler): () => void {
     let handlers = this.channelHandlers.get(channel);
@@ -966,6 +970,7 @@ function isUndialableReverseEntry(row: {
  */
 async function loadRowByInstanceId(
   instanceId: string,
+  userId?: string,
 ): Promise<ConnectionConfig | "undialable" | null> {
   const [row] = await db
     .select()
@@ -974,6 +979,7 @@ async function loadRowByInstanceId(
       and(
         eq(remoteConnections.isActive, true),
         eq(remoteConnections.instanceId, instanceId),
+        userId === undefined ? undefined : eq(remoteConnections.userId, userId),
       ),
     )
     .limit(1);
@@ -1030,8 +1036,14 @@ function configNeedsSocket(config: ConnectionConfig): boolean {
 /**
  * Get a live WsConnection by instanceId. Returns null if not connected.
  */
-export function getWsConnection(instanceId: string): WsConnection | null {
-  return _connections.get(instanceId) ?? null;
+export function getWsConnection(
+  instanceId: string,
+  userId?: string,
+): WsConnection | null {
+  const connection = _connections.get(instanceId);
+  return connection && (userId === undefined || connection.userId === userId)
+    ? connection
+    : null;
 }
 
 /**
@@ -1219,9 +1231,16 @@ export async function syncConnectionNow(instanceId: string): Promise<void> {
  * live channel picks up new credentials immediately instead of reconnecting
  * forever with a stale token.
  */
-export async function restartConnection(instanceId: string): Promise<void> {
+export async function restartConnection(
+  instanceId: string,
+  userId?: string,
+): Promise<void> {
+  const existing = getWsConnection(instanceId);
+  if (existing && userId !== undefined && existing.userId !== userId) {
+    return;
+  }
   closeConnection(instanceId);
-  const config = await loadRowByInstanceId(instanceId);
+  const config = await loadRowByInstanceId(instanceId, userId);
   if (config === "undialable") {
     // Reported once by loadRowByInstanceId; the peer's own socket carries it.
     return;

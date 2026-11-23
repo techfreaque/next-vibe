@@ -35,6 +35,7 @@ import {
   chatThreads,
 } from "../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
+import type { SyncedFolderRow } from "../../../chat/threads/sync-provider";
 import { getEnvAvailability } from "../../../env-availability";
 import { ApiProvider, chargeForProviderCredits } from "../../../models/models";
 import { getChatModelForUser } from "../../models";
@@ -270,7 +271,10 @@ export async function runRelayBranch(
   // always transient regardless of the connection setting.
   const [mirrorRow] = userId
     ? await db
-        .select({ threadMirrorMode: remoteConnections.threadMirrorMode })
+        .select({
+          threadMirrorMode: remoteConnections.threadMirrorMode,
+          syncScope: remoteConnections.syncScope,
+        })
         .from(remoteConnections)
         .where(
           and(
@@ -464,14 +468,27 @@ export async function runRelayBranch(
   const selfInstanceId = userId
     ? await RemoteConnectionRepository.getLocalInstanceId(userId)
     : null;
+  // Keep the regular folder event for older receivers. Carry the same rows
+  // in the relay itself so placement does not depend on event arrival order.
+  let folderChain: SyncedFolderRow[] | undefined;
+  if (!user.isPublic && data.subFolderId) {
+    const { pushFolderChainToPeer } =
+      await import("../../../chat/threads/sync-provider");
+    folderChain = await pushFolderChainToPeer(
+      data.subFolderId,
+      user.id,
+      remoteTarget.instanceId,
+      logger,
+    ).catch(() => undefined);
+  }
   // Identity is NEVER on the wire: the receiver resolves the caller from the
   // connection the request rode in on (token auth / bridge remoteUserId).
-  // Placement is SAME-ID (folders sync as first-class items) — no chains.
   const relayExecutionContext = isRemoteFolderRelay
     ? {
         mode: "relay" as const,
         instanceId: selfInstanceId ?? "",
         threadMirrorMode,
+        folderChain: mirrorRow?.syncScope?.threads ? folderChain : undefined,
         confirmationOverrides: relayConfirmationOverrides,
       }
     : {
@@ -481,26 +498,6 @@ export async function runRelayBranch(
         tools: relayToolSchemas,
         confirmationOverrides: relayConfirmationOverrides,
       };
-
-  // Materialize the caller's folder chain on the RECEIVER before the relay so
-  // that when the receiver creates the mirror thread with `subFolderId`, the
-  // SAME-ID folder already exists and the copy lands in its proper subtree
-  // (REMOTE/<caller>/private/tests/<case>) instead of falling to the REMOTE
-  // root. The chain push is idempotent (same-id upserts) and targets exactly
-  // the relay peer. Best-effort; the post-relay pushThreadSync + pull-sync also
-  // converge, but doing it up-front removes the create-time placement race.
-  if (!user.isPublic && data.subFolderId) {
-    const { pushFolderChainToPeer } =
-      await import("../../../chat/threads/sync-provider");
-    await pushFolderChainToPeer(
-      data.subFolderId,
-      user.id,
-      remoteTarget.instanceId,
-      logger,
-    ).catch(() => {
-      // Best-effort: the post-relay pushThreadSync heals placement.
-    });
-  }
 
   const relayResult = await runEndpointRemote({
     definition: streamDefinition.POST,

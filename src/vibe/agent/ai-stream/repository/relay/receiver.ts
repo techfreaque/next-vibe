@@ -33,6 +33,7 @@ import type { ToolExecutionContext } from "../../../../core/execution-context";
 import { DefaultFolderId } from "../../../../core/execution-context";
 import { chatFolders, chatThreads } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
+import type { SyncedFolderRow } from "../../../chat/threads/sync-provider";
 import { getChatModelById } from "../../models";
 import type {
   AiStreamPostRequestOutput,
@@ -46,23 +47,26 @@ import { RELAY_RECEIVER_NO_PROVIDER_KEY } from "./constants";
  * Rebuild the caller's sub-chain (leaf `subFolderId` and its content ancestors)
  * under THIS instance's OWN PRIVATE root, preserving the SAME folder ids.
  *
- * The executor ran the loop, so its copy is a first-class PRIVATE thread here —
- * not a REMOTE mirror. The caller ships the leaf folder id; that leaf + its
- * ancestors were pushed to this instance (as a REMOTE-rooted mirror scaffold) by
- * the relay caller's folder-chain push. We take those SAME ids, drop the
- * instance-tab and the `private`/`background` scaffold segments (they only exist
- * to nest a REMOTE mirror), and re-root the remaining content chain (e.g.
- * tests/<case>) directly under PRIVATE. Returns the leaf folder id (now PRIVATE)
- * for the thread to land in, or null if nothing resolved.
+ * The relay carries the same folder ids in root-to-leaf order. Drop the
+ * `private` and `background` scaffold segments and re-root the content chain
+ * under PRIVATE. Older peers can supply the chain through folder sync.
  */
 async function materializeOwnPrivateChain(
   leafFolderId: string,
   userId: string,
+  relayChain:
+    | readonly Pick<SyncedFolderRow, "id" | "name" | "icon" | "color">[]
+    | undefined,
 ): Promise<string | null> {
-  // Walk the pushed chain leaf→root, collecting content rows (skip the reserved
-  // scaffold names and the REMOTE instance-tab folder whose parent is null).
-  const chain: Array<{ id: string; name: string }> = [];
-  let currentId: string | null = leafFolderId;
+  // Older callers only send the leaf id. Walk the mirrored rows for those
+  // requests, skipping the Remote-tab scaffold.
+  const chain =
+    relayChain?.at(-1)?.id === leafFolderId
+      ? relayChain.filter(
+          ({ name }) => name !== "private" && name !== "background",
+        )
+      : [];
+  let currentId: string | null = chain.length === 0 ? leafFolderId : null;
   for (let depth = 0; depth < 32 && currentId; depth++) {
     const [row]: Array<{
       id: string;
@@ -97,30 +101,34 @@ async function materializeOwnPrivateChain(
   }
   // Re-root the content chain directly under PRIVATE, SAME ids, root→leaf.
   let parentId: string | null = null;
-  let leafId: string | null = null;
   for (const seg of chain) {
-    await db
+    const [folder] = await db
       .insert(chatFolders)
       .values({
         id: seg.id,
         userId,
         rootFolderId: DefaultFolderId.PRIVATE,
         name: seg.name,
+        icon: seg.icon,
+        color: seg.color,
         parentId,
       })
       .onConflictDoUpdate({
         target: chatFolders.id,
+        setWhere: eq(chatFolders.userId, userId),
         set: {
           rootFolderId: DefaultFolderId.PRIVATE,
           parentId,
           updatedAt: new Date(),
         },
       })
-      .catch(() => undefined);
+      .returning({ id: chatFolders.id });
+    if (!folder) {
+      return null;
+    }
     parentId = seg.id;
-    leafId = seg.id;
   }
-  return leafId;
+  return parentId;
 }
 
 /**
@@ -430,6 +438,7 @@ export async function runWsProviderStream(params: {
         landingSubFolderId = await materializeOwnPrivateChain(
           data.subFolderId,
           loopUser.id,
+          ctx.mode === "relay" ? ctx.folderChain : undefined,
         );
       }
       // This is our OWN thread: origin must be NULL (a non-null origin marks a
@@ -442,7 +451,12 @@ export async function runWsProviderStream(params: {
             rootFolderId: DefaultFolderId.PRIVATE,
             folderId: landingSubFolderId,
           })
-          .where(eq(chatThreads.id, data.threadId))
+          .where(
+            and(
+              eq(chatThreads.id, data.threadId),
+              eq(chatThreads.userId, loopUser.id),
+            ),
+          )
           .catch(() => undefined);
       }
     }

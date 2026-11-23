@@ -94,7 +94,7 @@ export interface RemoteCallParams {
    */
   apiPath?: string;
   method: Methods;
-  /** JSON body for POST/DELETE. */
+  /** Request data. Serialized as query parameters for GET and JSON otherwise. */
   body?: Record<string, WidgetData>;
   /** Session token, if one exists yet (register / authenticated bootstrap). */
   token?: string;

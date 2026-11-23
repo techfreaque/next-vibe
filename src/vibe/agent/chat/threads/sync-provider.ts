@@ -628,7 +628,7 @@ export async function pushFolderChainToPeer(
   userId: string,
   targetInstanceId: string | undefined,
   logger: EndpointLogger,
-): Promise<void> {
+): Promise<SyncedFolderRow[]> {
   const chain: SyncedFolderRow[] = [];
   let currentId: string | null = folderId;
   let rootFolderId: string = DefaultFolderId.PRIVATE;
@@ -674,7 +674,7 @@ export async function pushFolderChainToPeer(
     currentId = row.parentId;
   }
   if (chain.length === 0) {
-    return;
+    return chain;
   }
   const [{ createFolderContentsEmitter }, folderContentsDefinitions] =
     await Promise.all([
@@ -722,7 +722,7 @@ export async function pushFolderChainToPeer(
         fanOut: true,
       },
     )("folder-created", { responseData: { items } });
-    return;
+    return chain;
   }
   // Point-to-point AWAITED path (relay pre-flight): push directly through the
   // bridge to exactly the relay peer and AWAIT it, so the folders are on the
@@ -755,6 +755,7 @@ export async function pushFolderChainToPeer(
       channel,
     },
   });
+  return chain;
 }
 
 export async function pushThreadSync(
