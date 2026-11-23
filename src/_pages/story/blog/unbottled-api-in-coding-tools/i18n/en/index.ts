@@ -1,6 +1,6 @@
 export const translations = {
   meta: {
-    title: "Codex CLI and Claude Code on every model - {{appName}} API",
+    title: "Codex CLI and Claude Code on every model: {{appName}} API",
     description:
       "Codex CLI, Claude Code, OpenCode, Continue, Aider and Cline on one {{appName}} key. Claude, GPT, DeepSeek, GLM and uncensored models. One base URL, one command per tool.",
     category: "Developer Guide",

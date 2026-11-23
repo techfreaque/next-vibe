@@ -2,12 +2,12 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Su AI entrega el trabajo a Claude Code - {{appName}}",
+    title: "Tu IA delega el trabajo en Claude Code: {{appName}}",
     description:
-      "La herramienta de codificación permite a su delegado AI cambios en código real en Claude Code o OpenCode - sin cabeza, o como sesión en vivo en una ventana de terminal real que informa cuando se hace. Ahora a través de los casos.",
+      "La herramienta coding-agent permite delegar cambios de código a Claude Code u OpenCode. El agente puede trabajar en segundo plano o en un terminal que puedes seguir en directo. Al terminar, envía el resultado. Ahora también entre instancias.",
     category: "Agente de programación",
     imageAlt:
-      "Agente de codificación interactivo - Claude Code en una ventana terminal",
+      "Agente de programación interactivo: Claude Code en un terminal",
     keywords:
       "agente de codificación, Claude Code, OpenCode, AI terminal, MCP completa-tarea, AI auto hospedado, next-vibe, {{appName}}",
   },
@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
     readTime: "5 min para leer",
     title: "Tu IA abre una terminal y le pasa el trabajo a Claude Code.",
     subtitle:
-      "Chat AIs habla de código. Los agentes de codificación lo cambian. La herramienta de codificación-agent conecta los dos - y en modo interactivo que ve que el trabajo sucede en una ventana terminal real.",
+      "Los chats de IA hablan de código. Los agentes de programación lo cambian. La herramienta coding-agent los conecta. En modo interactivo puedes seguir el trabajo en un terminal real.",
   },
   intro: {
     p1: "Pides a tu AI que arregle una prueba de fallo. Puede explicar la solución. No puede editar su repo, ejecutar la suite e iterate hasta verde. Claude Code y OpenCode pueden.",
@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
     interactive: {
       label: "Mira y dirige",
       title: "Interactivo",
-      body: "Abre una ventana terminal real con una sesión en vivo. Siga, responda a sus preguntas, redirección. No hay límite de tiempo - el resultado aterriza en su hilo cuando la sesión informa de nuevo.",
+      body: "Abre una ventana terminal real con una sesión en vivo. Siga, responda a sus preguntas, redirección. No hay límite de tiempo: el resultado aterriza en su hilo cuando la sesión informa de nuevo.",
     },
   },
   handBack: {
@@ -44,7 +44,7 @@ export const translations: typeof enTranslations = {
     step1Title: "Tu AI llama a la herramienta",
     step1Body: "Con el modo rápido e interactivo encendido.",
     step2Title: "Se crea una tarea rastreada",
-    step2Body: "El hilo espera esa tarea - no para el terminal.",
+    step2Body: "El hilo espera esa tarea: no para el terminal.",
     step3Title: "Se abre una ventana terminal",
     step3Body:
       "Terminal en macOS, su TERMINAL $ o el primer emulador encontrado en Linux, una consola PowerShell fresca en Windows.",
@@ -73,7 +73,7 @@ export const translations: typeof enTranslations = {
   tryIt: {
     title: "Pruébalo.",
     p1: "La herramienta es sólo para administración y vive en instancias auto-anfitrionas: se ejecuta un CLI de codificación con permisos completos dentro de la carpeta del proyecto. Necesita Claude Code o OpenCode instalado y firmado en esa máquina.",
-    p2: "Entonces pregunte en el chat - o llámalo directamente desde la terminal:",
+    p2: "Entonces pregunte en el chat o llámalo directamente desde la terminal:",
   },
   cta: {
     title: "Dale tus manos AI.",

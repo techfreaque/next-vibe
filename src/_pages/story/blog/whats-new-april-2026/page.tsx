@@ -225,7 +225,7 @@ export function TanstackPage({
           </Div>
           <Callout tone="neutral">
             <Span className="font-semibold">
-              {t("companions.variantsLabel")} —{" "}
+              {t("companions.variantsLabel")}:{" "}
             </Span>
             {t("companions.variantsBody")}
           </Callout>

@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
       "Browseridentität konnte nicht geladen werden. Bitte aktualisieren Sie die Seite.",
   },
   meta: {
-    title: "Registrieren - {{appName}}",
+    title: "Registrieren: {{appName}}",
     description:
       "Erstellen Sie Ihr {{appName}} Konto und beginnen Sie mit dem Aufbau erstaunlicher Anwendungen",
     category: "Authentifizierung",

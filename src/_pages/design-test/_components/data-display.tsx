@@ -63,25 +63,25 @@ export function DataDisplayPreview(): JSX.Element {
               <Title level={2}>Title Component (level 2)</Title>
               <Title level={3}>Title Component (level 3)</Title>
               <Separator className="my-2" />
-              <H1>Heading 1 - The largest heading</H1>
-              <H2 className="border-none pb-0">Heading 2 - Section heading</H2>
-              <H3>Heading 3 - Subsection heading</H3>
-              <H4>Heading 4 - Minor heading</H4>
+              <H1>Heading 1: The largest heading</H1>
+              <H2 className="border-none pb-0">Heading 2: Section heading</H2>
+              <H3>Heading 3: Subsection heading</H3>
+              <H4>Heading 4: Minor heading</H4>
               <Separator className="my-2" />
               <P>
-                Paragraph - Regular body text with{" "}
+                Paragraph: Regular body text with{" "}
                 <Span className="font-bold">bold text</Span>,{" "}
                 <Span className="italic">italic text</Span>, and{" "}
                 <Span className="underline">underlined text</Span>.
               </P>
               <Lead>
-                Lead - Stands out from regular paragraphs. Use for intros.
+                Lead: Stands out from regular paragraphs. Use for intros.
               </Lead>
-              <Large>Large - Bigger text for emphasis</Large>
-              <Small>Small - Fine print and secondary info</Small>
-              <Muted>Muted - De-emphasized helper text</Muted>
+              <Large>Large: Bigger text for emphasis</Large>
+              <Small>Small: Fine print and secondary info</Small>
+              <Muted>Muted: De-emphasized helper text</Muted>
               <BlockQuote>
-                BlockQuote - For quotations or callout text. The best way to
+                BlockQuote: For quotations or callout text. The best way to
                 predict the future is to create it.
               </BlockQuote>
               <P>

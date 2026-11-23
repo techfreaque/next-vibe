@@ -78,7 +78,7 @@ export const translations: typeof enTranslations = {
       pitch:
         "Text zu Bild oder Bearbeitung einer Vorlage. Fotorealistisch, Anime, Kunst, was immer du beschreibst.",
       title: "Bild erstellen",
-      metaTitle: "Unzensierter KI-Bildgenerator - {{appName}}",
+      metaTitle: "Unzensierter KI-Bildgenerator: {{appName}}",
       description: "Beschreibe dein Motiv und wähle den Bildausschnitt.",
       keywords: "unzensierter KI-Bildgenerator, KI-Kunst, Text zu Bild",
     },
@@ -88,7 +88,7 @@ export const translations: typeof enTranslations = {
       pitch:
         "Aus Text oder einem Startbild wird ein Clip. Länge, Format und Auflösung bestimmst du.",
       title: "Video erstellen",
-      metaTitle: "KI-Videogenerator - {{appName}}",
+      metaTitle: "KI-Videogenerator: {{appName}}",
       description:
         "Bring deine Szene in Bewegung, vom ersten bis zum letzten Bild.",
       keywords: "KI-Videogenerator, Text zu Video, Bild zu Video",
@@ -99,7 +99,7 @@ export const translations: typeof enTranslations = {
       pitch:
         "Ein kompletter Track aus einem Prompt: Stimmung, Genre, Instrumente, Länge.",
       title: "Musik komponieren",
-      metaTitle: "KI-Musikgenerator - {{appName}}",
+      metaTitle: "KI-Musikgenerator: {{appName}}",
       description: "Bestimme Stimmung, Instrumente und Länge deines Stücks.",
       keywords: "KI-Musikgenerator, Text zu Musik, KI-Song",
     },
@@ -109,7 +109,7 @@ export const translations: typeof enTranslations = {
       pitch:
         "Dein Skript, vorgelesen von natürlichen Stimmen in vielen Sprachen.",
       title: "Text vertonen",
-      metaTitle: "KI-Sprachausgabe - {{appName}}",
+      metaTitle: "KI-Sprachausgabe: {{appName}}",
       description: "Wähle die Stimme, die dein Skript vorlesen soll.",
       keywords: "Text zu Sprache, KI-Stimme, TTS",
     },
@@ -119,7 +119,7 @@ export const translations: typeof enTranslations = {
       pitch:
         "Aufnahme hochladen, sauberen Text zurückbekommen. Als Datei herunterladen.",
       title: "Aufnahme transkribieren",
-      metaTitle: "KI-Transkription - {{appName}}",
+      metaTitle: "KI-Transkription: {{appName}}",
       description:
         "Verwandle eine Aufnahme in ein Transkript zum Herunterladen.",
       keywords: "Sprache zu Text, KI-Transkription, Audio zu Text",

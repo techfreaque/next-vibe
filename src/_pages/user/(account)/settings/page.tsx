@@ -33,7 +33,7 @@ export async function generateMetadata({
   const { locale } = await params;
   const { t } = pageT.scopedT(locale);
   return {
-    title: `${t("title")} - ${configTranslations.appName}`,
+    title: `${t("title")}: ${configTranslations.appName}`,
     description: t("description"),
   };
 }

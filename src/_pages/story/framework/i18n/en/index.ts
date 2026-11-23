@@ -1,6 +1,6 @@
 export const translations = {
   meta: {
-    title: "next-vibe Framework - One Definition, Every Surface",
+    title: "next-vibe Framework: One Definition, Every Surface",
     description:
       "Open-source TypeScript framework. One definition.ts becomes a web UI, CLI command, MCP tool, native screen, AI tool and cron job. Plus an OpenAI and Anthropic compatible hosted API.",
     category: "Framework",

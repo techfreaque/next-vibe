@@ -1,10 +1,10 @@
 export const translations = {
   meta: {
-    title: "Hermes and Thea: two-way remote threads - {{appName}}",
+    title: "Hermes and Thea: two-way remote threads ({{appName}})",
     description:
       "Your local AI and your cloud AI now run threads for each other in both directions. No API key on the instance that runs the turn? The caller takes the loop back and finishes it.",
     category: "Hermes & Thea",
-    imageAlt: "Hermes and Thea - two connected next-vibe instances",
+    imageAlt: "Hermes and Thea: two connected next-vibe instances",
     keywords:
       "Hermes, Thea, next-vibe, remote threads, self-hosted AI, reverse websocket, API key fallback, {{appName}}",
   },
@@ -14,7 +14,7 @@ export const translations = {
     readTime: "6 min read",
     title: "Two AIs. One conversation. Both directions.",
     subtitle:
-      "Hermes runs on your machine. Thea runs on a server. Now either one can hand a thread to the other - and a missing API key no longer kills the turn.",
+      "Hermes runs on your machine. Thea runs on a server. Now either one can hand a thread to the other and a missing API key no longer kills the turn.",
   },
   intro: {
     p1: "next-vibe runs anywhere: on your laptop, on a VPS, on both at once. Connect two instances and they become one system. We call ours Hermes and Thea.",
@@ -33,12 +33,12 @@ export const translations = {
       title: "Thea",
       body: "Runs on a server. Always online, reachable from anywhere. Watches the platform and delegates work.",
     },
-    note: "Each instance owns its own data and tasks. The connection relays events between them - nothing more, nothing less.",
+    note: "Each instance owns its own data and tasks. The connection relays events between them: nothing more, nothing less.",
   },
   twoWay: {
     title: "Threads now cross in both directions",
     intro:
-      "Remote-folder and private threads execute on the other instance - from Thea to Hermes and from Hermes to Thea.",
+      "Remote-folder and private threads execute on the other instance: from Thea to Hermes and from Hermes to Thea.",
     p1: "Put a thread in a remote folder and the instance on the other side runs the full AI turn: model, system prompt, tools. You keep writing where you are. The conversation mirrors back to you.",
     stepsTitle: "One turn, end to end",
     step1Title: "You write",
@@ -58,7 +58,7 @@ export const translations = {
     title: "No API key? The turn still finishes.",
     intro:
       "The instance that runs a turn needs the model provider's API key. Not every instance has one.",
-    p1: "Before an instance takes over a turn, it checks for the provider key on its own node. Missing? It fails fast with a clear marker - it does not hang, and it does not half-write the thread.",
+    p1: "Before an instance takes over a turn, it checks for the provider key on its own node. Missing? It fails fast with a clear marker. It does not hang, and it does not half-write the thread.",
     p2: "The calling side recognises the marker, rolls back its relay bookkeeping and runs the loop itself. The remote's prompt and tools still apply; tool calls round-trip back over the connection.",
     calloutTitle: "Inference-provider mode needs no key at all.",
     calloutBody:
@@ -81,7 +81,7 @@ export const translations = {
     reconnect:
       "The connector reconnects with exponential backoff from 1 to 30 seconds and re-reads the connection on every retry. This release hardens that path.",
     fixesTitle: "Also in this release",
-    fix1: "Stale-lead warning: a frame addressed to a lead this instance no longer knows is dropped with a warning instead of silently - re-authenticating the connection fixes it.",
+    fix1: "Stale-lead warning: a frame addressed to a lead this instance no longer knows is dropped with a warning instead of silently, re-authenticating the connection fixes it.",
     fix2: "Database timestamps in UTC, pooled Postgres and PGlite alike, so default-stamped rows sort correctly across instances.",
     fix3: "The stream writer seeds the thread id, so peers no longer drop events with an empty thread id.",
     fix4: "Revival turns sync with the peer, so tool results backfilled in place reach the mirror.",

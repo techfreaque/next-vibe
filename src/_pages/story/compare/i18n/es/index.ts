@@ -429,7 +429,7 @@ export const translations: typeof enTranslations = {
       privacy:
         "Ollama dice que no ve sus indicaciones ni datos cuando se ejecuta localmente. La nube se puede apagar completamente.",
       apiShort: "",
-      api: "OpenAI - servidor compatible en localhost:11434, además de una nube API para sus modelos alojados.",
+      api: "OpenAI: servidor compatible en localhost:11434, además de una nube API para sus modelos alojados.",
       forWho:
         "Desarrolladores y usuarios técnicos con una máquina capaz, a menudo emparejados con un frontend de chat.",
       pro1: "Total privacidad y cero costo por mensaje.",
@@ -450,7 +450,7 @@ export const translations: typeof enTranslations = {
       privacy:
         "Los modelos locales funcionan en tu dispositivo. Sus servicios hospedados reclaman la retención de datos cero.",
       apiShort: "",
-      api: "OpenAI - servidor compatible en localhost:1234.",
+      api: "OpenAI: servidor compatible en localhost:1234.",
       forWho:
         "No desarrolladores que quieren modelos locales sin una línea de comandos, en un Mac con Apple Silicon, Windows o Linux.",
       pro1: "La manera más fácil de ejecutar modelos sin censura localmente.",

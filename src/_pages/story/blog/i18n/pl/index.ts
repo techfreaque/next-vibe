@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Dogłębne analizy architektury, decyzji i pomysłów stojących za next-vibe i {{appName}}.",
     meta: {
-      title: "Blog - next-vibe & {{appName}}",
+      title: "Blog: next-vibe & {{appName}}",
       description:
         "Głębokie nurkowania w inżynierię, decyzje architektoniczne i pomysły za next-vibe i {{appName}}.",
       category: "Blog",
@@ -197,21 +197,21 @@ export const translations: typeof enTranslations = {
       title: "Dwa AI. Jedna rozmowa. W obie strony.",
       category: "Hermes i Thea",
       excerpt:
-        "Hermes na Twoim komputerze, Thea na serwerze - teraz każde z nich przekazuje wątki drugiemu. A brak klucza API już nie zatrzymuje tury.",
+        "Hermes działa na Twoim komputerze, a Thea na serwerze. Teraz mogą przekazywać sobie wątki, a brak klucza API nie przerywa odpowiedzi.",
       readTime: "6 min czytania",
     },
     codingAgent: {
       title: "Twoje AI otwiera terminal i przekazuje robotę Claude Code.",
       category: "Agent kodujący",
       excerpt:
-        "Narzędzie coding-agent zleca prawdziwe zmiany w kodzie Claude Code albo OpenCode - w tle lub na żywo w oknie terminala, z automatycznym meldunkiem. Teraz także między instancjami.",
+        "Narzędzie coding-agent zleca zmiany w kodzie Claude Code albo OpenCode. Agent pracuje w tle lub na żywo w terminalu i sam odsyła wynik. Teraz także między instancjami.",
       readTime: "5 min czytania",
     },
     e2eTests: {
       title: "Robot kliknął każdy przycisk. Znalazł osiem luk bezpieczeństwa.",
       category: "Inżynieria",
       excerpt:
-        "Przestaliśmy testować kawałki, zaczęliśmy testować strony. Prawdziwa przeglądarka na każdym endpoincie klienta - i open redirect, SSRF oraz wycieki danych, które wyłapała.",
+        "Przenieśliśmy testy z pojedynczych elementów na całe strony. Prawdziwa przeglądarka sprawdziła wszystkie endpointy dostępne dla klientów. Wykryliśmy otwarte przekierowanie, SSRF i wycieki danych.",
       readTime: "7 min czytania",
     },
     whatsNewMay2026: {
@@ -225,14 +225,14 @@ export const translations: typeof enTranslations = {
       title: "unbottled wróciło. I jest teraz naprawdę dobre.",
       category: "Aktualizacja produktu",
       excerpt:
-        "Nowe modele, generowanie obrazów/wideo/muzyki i całkowicie przeprojektowany onboarding. Jeśli odszedłeś wcześnie - chcemy, żebyś spróbował jeszcze raz.",
+        "Nowe modele, generowanie obrazów, wideo i muzyki oraz zupełnie nowy start. Jeśli pierwsza wersja Cię zniechęciła, spróbuj jeszcze raz.",
       readTime: "5 min czytania",
     },
     oneCodebase: {
       title: "Jedna baza kodu. 13 platform. Zero kompromisów.",
       category: "Architektura",
       excerpt:
-        "Jedna definicja endpointu. Formularz web, polecenie CLI, narzędzie MCP, ekran natywny, zadanie cron - jednocześnie. Oto jak to działa.",
+        "Jedna definicja endpointu daje Ci od razu formularz webowy, polecenie CLI, narzędzie MCP, ekran natywny i zadanie cron. Zobacz, jak to działa.",
       readTime: "12 min czytania",
     },
     typeChecker: {
@@ -255,7 +255,7 @@ export const translations: typeof enTranslations = {
       title: "Jeden endpoint. Każda powierzchnia.",
       category: "Architektura",
       excerpt:
-        "Jeden plik definition.ts na funkcję. Renderuje się jako formularz web, polecenie CLI, narzędzie MCP, ekran natywny, zadanie cron - jednocześnie.",
+        "Jeden plik definition.ts na funkcję. Od razu masz formularz webowy, polecenie CLI, narzędzie MCP, ekran natywny i zadanie cron.",
       readTime: "5 min czytania",
     },
     referralBeginners: {
@@ -277,7 +277,7 @@ export const translations: typeof enTranslations = {
       title: "Zbudowałeś coś z AI. Teraz zarabiaj na dzieleniu się tym.",
       category: "Polecenia",
       excerpt:
-        "Twój link polecający to strumień przychodów, którego jeszcze nie uruchomiłeś. Posty na blogu, README, tutoriale - matematyka dla odbiorców technicznych.",
+        "Twój link polecający może na Ciebie zarabiać. Zobacz, jak wygląda to w liczbach, gdy udostępniasz go na blogu, w README lub w samouczku.",
       readTime: "5 min czytania",
     },
     skillSharingEconomy: {
@@ -292,7 +292,7 @@ export const translations: typeof enTranslations = {
         "10% bezpośrednio. +5%, gdy inni udostępniają Twój skill. Na zawsze.",
       category: "Polecenia",
       excerpt:
-        "Pełna mechanika programu poleceń i skilli - podział łańcucha, dokładne procenty na każdym poziomie, opcje wypłat i jak bonus za skill się nakłada.",
+        "Jak zarabiać na poleceniach i skillach? Sprawdź stawki na każdym poziomie, opcje wypłaty i zasady naliczania dodatkowego bonusu za skill.",
       readTime: "4 min czytania",
     },
   },

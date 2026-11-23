@@ -12,13 +12,13 @@ export const translations: typeof enTranslations = {
   cta: {
     title: "Mit an Bord?",
     subtitle:
-      "Tickets ab 5.000 $. Sag uns, wer du bist und was du unterstützen willst - wir antworten auf jede Nachricht.",
+      "Tickets ab 5.000 $. Sag uns, wer du bist und was du unterstützen willst. Wir antworten auf jede Nachricht.",
     button: "Kontakt aufnehmen",
   },
   meta: {
     title: "In {{appName}} investieren",
     description:
-      "Tickets ab 5.000 $. Die Open-Source-KI-Plattform auf next-vibe - {{modelCount}} Modelle, live im Betrieb, den Filter bestimmt der Nutzer.",
+      "Tickets ab 5.000 $. Die Open-Source-KI-Plattform auf next-vibe: {{modelCount}} Modelle, live im Betrieb, den Filter bestimmt der Nutzer.",
     category: "Investieren",
     imageAlt: "In {{appName}} investieren",
     keywords:

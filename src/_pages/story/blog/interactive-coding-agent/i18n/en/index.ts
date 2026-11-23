@@ -1,10 +1,10 @@
 export const translations = {
   meta: {
-    title: "Your AI hands the job to Claude Code - {{appName}}",
+    title: "Your AI hands the job to Claude Code: {{appName}}",
     description:
-      "The coding-agent tool lets your AI delegate real code changes to Claude Code or OpenCode - headless, or as a live session in a real terminal window that reports back when it's done. Now across instances.",
+      "The coding-agent tool lets your AI delegate real code changes to Claude Code or OpenCode: headless, or as a live session in a real terminal window that reports back when it's done. Now across instances.",
     category: "Coding Agent",
-    imageAlt: "Interactive coding agent - Claude Code in a terminal window",
+    imageAlt: "Interactive coding agent: Claude Code in a terminal window",
     keywords:
       "coding agent, Claude Code, OpenCode, AI terminal, MCP complete-task, self-hosted AI, next-vibe, {{appName}}",
   },
@@ -14,7 +14,7 @@ export const translations = {
     readTime: "5 min read",
     title: "Your AI opens a terminal and hands the job to Claude Code.",
     subtitle:
-      "Chat AIs talk about code. Coding agents change it. The coding-agent tool connects the two - and in interactive mode you watch the work happen in a real terminal window.",
+      "Chat AIs talk about code. Coding agents change it. The coding-agent tool connects the two and in interactive mode you watch the work happen in a real terminal window.",
   },
   intro: {
     p1: "You ask your AI to fix a failing test. It can explain the fix. It cannot edit your repo, run the suite and iterate until green. Claude Code and OpenCode can.",
@@ -31,7 +31,7 @@ export const translations = {
     interactive: {
       label: "Watch and steer",
       title: "Interactive",
-      body: "Opens a real terminal window with a live session. Follow along, answer its questions, redirect it. No time limit - the result lands in your thread when the session reports back.",
+      body: "Opens a real terminal window with a live session. Follow along, answer its questions, redirect it. No time limit. The result lands in your thread when the session reports back.",
     },
   },
   handBack: {
@@ -41,7 +41,7 @@ export const translations = {
     step1Title: "Your AI calls the tool",
     step1Body: "With your prompt and interactive mode switched on.",
     step2Title: "A tracked task is created",
-    step2Body: "The thread waits for that task - not for the terminal.",
+    step2Body: "The thread waits for that task, not for the terminal.",
     step3Title: "A terminal window opens",
     step3Body:
       "Terminal on macOS, your $TERMINAL or the first emulator found on Linux, a fresh PowerShell console on Windows.",
@@ -71,7 +71,7 @@ export const translations = {
   tryIt: {
     title: "Try it",
     p1: "The tool is admin-only and lives on self-hosted instances: it runs a coding CLI with full permissions inside your project folder. You need Claude Code or OpenCode installed and signed in on that machine.",
-    p2: "Then ask in chat - or call it straight from the terminal:",
+    p2: "Then ask in chat or call it straight from the terminal:",
   },
   cta: {
     title: "Give your AI hands.",

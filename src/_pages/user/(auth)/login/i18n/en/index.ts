@@ -1,6 +1,6 @@
 export const translations = {
   meta: {
-    title: "Login - {{appName}}",
+    title: "Login: {{appName}}",
     description: "Sign in to your {{appName}} account",
     category: "Authentication",
     imageAlt: "Login",

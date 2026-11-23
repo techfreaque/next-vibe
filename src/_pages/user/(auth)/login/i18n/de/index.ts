@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Anmelden - {{appName}}",
+    title: "Anmelden: {{appName}}",
     description: "Melden Sie sich in Ihrem {{appName}} Konto an",
     category: "Authentifizierung",
     imageAlt: "Anmelden",

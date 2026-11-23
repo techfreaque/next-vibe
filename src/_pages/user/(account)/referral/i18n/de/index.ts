@@ -23,8 +23,8 @@ export const translations: typeof enTranslations = {
     heroSub: "Wiederkehrend. Für immer.",
     chainTitle: "10 Abonnenten. Was du pro Monat verdienst.",
     chainSubtitle:
-      "Jede Ebene ist die Hälfte der darüberliegenden. Einmalig aufgebaut - zahlt für immer.",
-    whoLabel0: "Du - wer auch immer sie direkt empfohlen hat",
+      "Jede Ebene ist die Hälfte der darüberliegenden. Einmalig aufgebaut: zahlt für immer.",
+    whoLabel0: "Du: wer auch immer sie direkt empfohlen hat",
     whoLabel1: "Skill-Ersteller (falls anders) oder dein Empfehler",
     whoLabel2: "Der Empfehler des Empfehlers",
     whoLabel3: "Ebene 4",
@@ -37,7 +37,7 @@ export const translations: typeof enTranslations = {
   story: {
     title: "Wie die Kette wächst",
     subtitle:
-      "Dieselben 10 Abonnenten. Jede Ebene, die aktiviert wird, addiert sich - für immer.",
+      "Dieselben 10 Abonnenten. Jede Ebene, die aktiviert wird, addiert sich: für immer.",
     totalLabel: "Gesamt / Monat",
     addedLabel: "+{{amount}} von dieser Ebene",
     levelLabel: "Ebene {{n}} aktiv",
@@ -51,12 +51,12 @@ export const translations: typeof enTranslations = {
     noob: {
       label: "Einstieg",
       earning: "~{{story_noob_earning}}/Monat",
-      desc: "{{story_noob_users}} zahlende Abonnenten über deinen Empfehlungslink. {{directPct}} von jedem - passives Einkommen aus einem einzigen Post.",
+      desc: "{{story_noob_users}} zahlende Abonnenten über deinen Empfehlungslink. {{directPct}} von jedem: passives Einkommen aus einem einzigen Post.",
     },
     mid: {
       label: "Wachsendes Publikum",
       earning: "~{{story_mid_earning}}/Monat",
-      desc: "{{story_mid_users}} Abonnenten - Mix aus Empfehlungs- und Skill-Links. Manche ihrer Freunde haben auch angemeldet. Die Kette baut sich von selbst.",
+      desc: "{{story_mid_users}} Abonnenten: Mix aus Empfehlungs- und Skill-Links. Manche ihrer Freunde haben auch angemeldet. Die Kette baut sich von selbst.",
     },
     pro: {
       label: "Etablierter Creator",
@@ -74,13 +74,13 @@ export const translations: typeof enTranslations = {
     title: "So funktioniert's",
     step1Title: "Empfehlungscode erstellen",
     step1Body:
-      "Einzigartige Codes für verschiedene Zielgruppen - Freunde, Discord, ein Blog-Beitrag. Jeder separat getrackt.",
+      "Einzigartige Codes für verschiedene Zielgruppen: Freunde, Discord, ein Blog-Beitrag. Jeder separat getrackt.",
     step2Title: "Link teilen",
     step2Body:
       "Empfehlungslink → {{directPct}} pro Nutzer, für immer. Dein Skill, von anderen geteilt → {{skillBonusPct}} pro Nutzer. Zwei Quellen, null Mehraufwand.",
     step3Title: "Bezahlt werden",
     step3Body:
-      "Einnahmen werden {{holdDays}} Tage nach jeder Zahlung freigegeben - die Rückerstattungsfrist. Dann als Credits nutzen oder ab {{minPayout}} in BTC/USDC auszahlen.",
+      "Einnahmen werden {{holdDays}} Tage nach jeder Zahlung freigegeben, die Rückerstattungsfrist. Dann als Credits nutzen oder ab {{minPayout}} in BTC/USDC auszahlen.",
   },
 
   manage: {
@@ -92,10 +92,10 @@ export const translations: typeof enTranslations = {
   cta: {
     title: "Konto erstellen und anfangen zu verdienen",
     description:
-      "Empfehlungslink holen. {{directPct}} auf jede Zahlung - wiederkehrend, ohne Ablauf. Skill veröffentlichen und {{skillBonusPct}} verdienen, wenn andere ihn teilen.",
+      "Empfehlungslink holen. {{directPct}} auf jede Zahlung: wiederkehrend, ohne Ablauf. Skill veröffentlichen und {{skillBonusPct}} verdienen, wenn andere ihn teilen.",
     signUp: "Konto erstellen",
     logIn: "Anmelden",
-    pitch1: "{{directPct}} Empfehlungsprovision - wiederkehrend, kein Ablauf",
+    pitch1: "{{directPct}} Empfehlungsprovision: wiederkehrend, kein Ablauf",
     pitch2:
       "Skill veröffentlichen → {{skillBonusPct}} von jedem, den andere darüber bringen",
     pitch3:
@@ -114,13 +114,13 @@ export const translations: typeof enTranslations = {
   },
   audienceCallout: {
     title: "Zwei Wege zu verdienen",
-    newTitle: "Empfehlungslink - {{directPct}} pro Nutzer",
+    newTitle: "Empfehlungslink: {{directPct}} pro Nutzer",
     newBody:
       "Code teilen. Jeder, der sich anmeldet und zahlt, bringt dir {{directPct}} jeder Zahlung, jeden Monat, für immer. Einmal gepostet. Für immer verdient.",
     newCta: "Deinen Empfehlungslink holen",
-    proTitle: "Skill-Ersteller - {{skillBonusPct}} pro Nutzer",
+    proTitle: "Skill-Ersteller: {{skillBonusPct}} pro Nutzer",
     proBody:
-      "Skill bauen. Link teilen. Jeder, der sich über deinen eigenen Link anmeldet, zahlt dir {{directPct}}, wiederkehrend. Der Hebel: Teilt jemand anderes deinen Skill mit seinem Link, gehören dir als Skill-Autor trotzdem {{skillBonusPct}}. Die Plattform trackt Skill-Autorenschaft - passive Attribution ohne extra Aufwand.",
+      "Skill bauen. Link teilen. Jeder, der sich über deinen eigenen Link anmeldet, zahlt dir {{directPct}}, wiederkehrend. Der Hebel: Teilt jemand anderes deinen Skill mit seinem Link, gehören dir als Skill-Autor trotzdem {{skillBonusPct}}. Die Plattform trackt Skill-Autorenschaft: passive Attribution ohne extra Aufwand.",
     proCta: "Skill bauen",
   },
   discord: {

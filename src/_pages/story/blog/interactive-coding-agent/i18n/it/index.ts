@@ -2,12 +2,12 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Il tuo AI consegna il lavoro a Claude Code - {{appName}}",
+    title: "La tua IA delega il lavoro a Claude Code: {{appName}}",
     description:
-      "Lo strumento di codifica-agent consente al tuo AI di delegare modifiche di codice reale a Claude Code o OpenCode - headless, o come sessione live in una vera e propria finestra terminale che riporta quando è fatto. Ora, attraverso le istanze.",
+      "Con coding-agent, la tua IA può delegare modifiche al codice a Claude Code o OpenCode. L’agente lavora in background o in un terminale che puoi seguire dal vivo e ti invia il risultato. Ora funziona anche tra istanze.",
     category: "Agente di programmazione",
     imageAlt:
-      "Agente di codifica interattivo - Claude Code in una finestra terminale",
+      "Agente di programmazione interattivo: Claude Code in una finestra del terminale",
     keywords:
       "agente di codifica, Claude Code, OpenCode, AI terminal, MCP full-task, self-hosted AI, next-vibe, {{appName}}",
   },
@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
     readTime: "5 minuti di lettura",
     title: "La tua IA apre il terminale e passa il lavoro a Claude Code.",
     subtitle:
-      "Chatta le AI parlano di codice. Gli agenti di codifica lo cambiano. Lo strumento di codifica-agente collega i due - e in modalità interattiva si guarda il lavoro accadere in una vera finestra terminale.",
+      "Le chat di IA parlano di codice. Gli agenti di programmazione lo modificano. Coding-agent li mette in contatto. In modalità interattiva segui il lavoro in un terminale vero.",
   },
   intro: {
     p1: "Chiedete al vostro AI di risolvere un test inadeguato. Può spiegare la correzione. Non può modificare il tuo repo, eseguire la suite e iterare fino a verde. Claude Code e OpenCode può.",
@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
     interactive: {
       label: "Orologio e steer",
       title: "Interattivo interattivo",
-      body: "Apre una vera e propria finestra terminale con una sessione live. Seguire, rispondere alle sue domande, reindirizzarlo. Nessun limite di tempo - il risultato atterra nel thread quando la sessione riporta indietro.",
+      body: "Apre una vera e propria finestra terminale con una sessione live. Seguire, rispondere alle sue domande, reindirizzarlo. Nessun limite di tempo: il risultato atterra nel thread quando la sessione riporta indietro.",
     },
   },
   handBack: {
@@ -44,7 +44,7 @@ export const translations: typeof enTranslations = {
     step1Title: "Il tuo AI chiama lo strumento",
     step1Body: "Con la modalità rapida e interattiva attivata.",
     step2Title: "Viene creato un compito tracciato",
-    step2Body: "Il filo aspetta per quel compito - non per il terminale.",
+    step2Body: "Il filo aspetta per quel compito: non per il terminale.",
     step3Title: "Una finestra terminale si apre",
     step3Body:
       "Terminal su macOS, il tuo TERMINAL $ o il primo emulatore trovato su Linux, una nuova console PowerShell su Windows.",
@@ -74,7 +74,7 @@ export const translations: typeof enTranslations = {
   tryIt: {
     title: "Provalo.",
     p1: "Lo strumento è solo amministratore e vive su istanze self-hosted: gestisce un codifica CLI con autorizzazioni complete all'interno della cartella del progetto. È necessario che Claude Code o OpenCode sia installato e firmato su quella macchina.",
-    p2: "Poi chiedere in chat - o chiamarlo direttamente dal terminale:",
+    p2: "Poi chiedere in chat o chiamarlo direttamente dal terminale:",
   },
   cta: {
     title: "Da' le mani AI.",

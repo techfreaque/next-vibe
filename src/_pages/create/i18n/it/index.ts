@@ -79,7 +79,7 @@ export const translations: typeof enTranslations = {
       pitch:
         "Dal testo all'immagine, o il ritocco di un riferimento. Fotorealismo, anime, arte: qualsiasi cosa descrivi.",
       title: "Creare un'immagine",
-      metaTitle: "Generatore di immagini AI non censurato - {{appName}}",
+      metaTitle: "Generatore di immagini AI non censurato: {{appName}}",
       description: "Descrivi una scena e scegli la sua inquadratura.",
       keywords:
         "uncensored AI generatore di immagini, arte AI, testo a immagine",
@@ -90,7 +90,7 @@ export const translations: typeof enTranslations = {
       pitch:
         "Un testo o un primo fotogramma diventa una clip. Scegli durata, formato e risoluzione.",
       title: "Creare un video",
-      metaTitle: "Generatore di video AI - {{appName}}",
+      metaTitle: "Generatore di video AI: {{appName}}",
       description:
         "Impostare una scena in movimento, dal primo telaio all'ultimo.",
       keywords: "Generatore di video AI, testo in video, immagine a video",
@@ -101,7 +101,7 @@ export const translations: typeof enTranslations = {
       pitch:
         "Un brano completo da un prompt: atmosfera, genere, strumenti, durata.",
       title: "Fare musica",
-      metaTitle: "Generatore di musica AI - {{appName}}",
+      metaTitle: "Generatore di musica AI: {{appName}}",
       description:
         "Descrivi l'umore, gli strumenti e la lunghezza della tua traccia.",
       keywords: "Generatore di musica AI, testo alla musica, canzone AI",
@@ -111,7 +111,7 @@ export const translations: typeof enTranslations = {
       tab: "Voce",
       pitch: "Il tuo testo letto da voci naturali in molte lingue.",
       title: "Dare testo a voce",
-      metaTitle: "Testo AI al discorso - {{appName}}",
+      metaTitle: "Testo AI al discorso: {{appName}}",
       description: "Scegli una voce per leggere il tuo copione ad alta voce.",
       keywords: "testo a discorso, voce AI, TTS",
     },
@@ -121,7 +121,7 @@ export const translations: typeof enTranslations = {
       pitch:
         "Carica una registrazione e ottieni un testo pulito. Scaricalo come file.",
       title: "Trascrizione audio",
-      metaTitle: "Discorso AI al testo - {{appName}}",
+      metaTitle: "Discorso AI al testo: {{appName}}",
       description:
         "Trasformare una registrazione in una trascrizione che è possibile scaricare.",
       keywords: "discorso al testo, trascrizione AI, audio a testo",

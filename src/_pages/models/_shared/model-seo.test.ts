@@ -161,24 +161,23 @@ describe("uncensored kinds", () => {
   });
 
   test("uses only relay routes when the instance forces the relay", () => {
+    const modelId = ChatModelId.MIMO_V2_6_FLASH_ABLITERATED;
+    const relayProvider = apiProviderDisplayNames[ApiProvider.UNBOTTLED];
+    const directProvider = apiProviderDisplayNames[ApiProvider.NANO_GPT];
     const availability = {
       ...ALL,
       unbottledSystem: true,
-      unbottledForce: true,
     };
-    expect(
-      getModelFacts(ChatModelId.KIMI_K3_1_PRO_UNCENSORED, ALL),
-    ).not.toBeNull();
-    expect(
-      getModelFacts(ChatModelId.KIMI_K3_1_PRO_UNCENSORED, availability),
-    ).toBeNull();
-    const relayModel = getModelFacts(
-      ChatModelId.MIMO_V2_6_FLASH_ABLITERATED,
-      availability,
-    );
-    expect(relayModel?.providers).toEqual([
-      apiProviderDisplayNames[ApiProvider.UNBOTTLED],
-    ]);
+    expect(getModelFacts(modelId, ALL)?.providers).toEqual([directProvider]);
+    const mixed = getModelFacts(modelId, availability);
+    expect(mixed?.providers).toContain(directProvider);
+    expect(mixed?.providers).toContain(relayProvider);
+
+    const forced = getModelFacts(modelId, {
+      ...availability,
+      unbottledForce: true,
+    });
+    expect(forced?.providers).toEqual([relayProvider]);
   });
 });
 

@@ -357,7 +357,7 @@ function CliPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
                 {CLI_PARAM_NAME}
               </Span>
               <Span className="text-[#7fdbca]">{CLI_PARAM_TYPE}</Span>
-              <Span className="text-slate-600">{"\u2014"}</Span>
+              <Span className="text-slate-600">{":"}</Span>
               <Span className="text-slate-400">{nameLabel}</Span>
             </Div>
           </Div>
@@ -527,7 +527,7 @@ function CronPanel({ locale }: { locale: CountryLanguage }): JSX.Element {
           {t("home.architecture.panelDetails.cron.bodyPrefix")}{" "}
           <Span className="font-mono text-slate-300 bg-slate-800 px-1 py-0.5 rounded text-[11px]">
             createCronTask
-          </Span>{" "}
+          </Span>
           {t("home.architecture.panelDetails.cron.bodySuffix")}
         </P>
       </Div>

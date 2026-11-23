@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
       "Nie udało się załadować tożsamości przeglądarki. Proszę odświeżyć stronę.",
   },
   meta: {
-    title: "Zarejestruj się - {{appName}}",
+    title: "Zarejestruj się: {{appName}}",
     description:
       "Utwórz swoje konto {{appName}} i zacznij budować niesamowite aplikacje",
     category: "Uwierzytelnianie",

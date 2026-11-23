@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     category: "Modele AI",
     index: {
-      title: "{{count}} modeli czatu AI - ceny, kontekst, filtry | {{appName}}",
+      title: "{{count}} modeli czatu AI: ceny, kontekst, filtry | {{appName}}",
       description:
         "Wszystkie modele na {{appName}} na jednej liście: Claude, GPT, Gemini, Grok, DeepSeek, czat otwarty i bez cenzury, a do tego obraz, głos, muzyka i wideo. Prawdziwa cena za użycie, okno kontekstu, wejścia. Wybierz i działaj.",
       imageAlt: "Katalog modeli AI na {{appName}}",
@@ -110,8 +110,8 @@ export const translations: typeof enTranslations = {
     outputs: "Formaty wyjściowe",
     providers: "Dostępny przez",
     tools: "Narzędzia",
-    toolsYes: "Tak - wyszukiwanie, pamięć, kod i więcej",
-    toolsNo: "Nie - sam czat",
+    toolsYes: "Tak: wyszukiwanie, pamięć, kod i więcej",
+    toolsNo: "Nie: sam czat",
     status: "Status",
     statusCurrent: "Aktualny",
     statusLegacy: "Starsza wersja",
@@ -453,7 +453,7 @@ export const translations: typeof enTranslations = {
     samePrice: "Oba kosztują za wiadomość mniej więcej tyle samo.",
     biggerContext: "{{model}} mieści {{times}}× więcej kontekstu.",
     sameContext: "Oba mieszczą tyle samo kontekstu.",
-    modelPage: "{{model}} - szczegóły",
+    modelPage: "{{model}}: szczegóły",
     swap: "Zamień strony",
     cheaperFree: "{{model}} nie pobiera kredytów za wiadomość.",
     tierLine:

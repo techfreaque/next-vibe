@@ -2,10 +2,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Verdienen mit {{appName}} - wiederkehrende Empfehlungsprovision",
+    title: "Verdienen mit {{appName}}: wiederkehrende Empfehlungsprovision",
     category: "Verdienen",
     description:
-      "Empfiehl {{appName}} und erhalte {{directPct}} jeder Zahlung deiner Empfehlungen - wiederkehrend, solange sie zahlen. Veröffentliche einen Skill und erhalte {{skillBonusPct}} auf Nutzer, die andere darüber bringen.",
+      "Empfiehl {{appName}} und erhalte {{directPct}} jeder Zahlung deiner Empfehlungen: wiederkehrend, solange sie zahlen. Veröffentliche einen Skill und erhalte {{skillBonusPct}} auf Nutzer, die andere darüber bringen.",
     imageAlt: "Verdienen mit {{appName}}",
     keywords:
       "{{appName}}, Empfehlungsprogramm, Affiliate, wiederkehrende Provision, KI-Skills, passives Einkommen",
@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Verdienen",
     title: "Teile, was du nutzt. Kassiere jeden Monat.",
     subtitle:
-      "{{directPct}} jeder Zahlung der Leute, die du mitbringst - nicht einmalig, sondern jeden Monat, den sie zahlen. Veröffentlichst du einen Skill, bekommst du {{skillBonusPct}}, wann immer andere ihn teilen.",
+      "{{directPct}} jeder Zahlung der Leute, die du mitbringst: nicht einmalig, sondern jeden Monat, den sie zahlen. Veröffentlichst du einen Skill, bekommst du {{skillBonusPct}}, wann immer andere ihn teilen.",
     ctaPrimary: "Link holen",
     ctaSecondary: "Skill bauen",
   },
@@ -28,7 +28,7 @@ export const translations: typeof enTranslations = {
       body: "Kostenloses Konto anlegen, Empfehlungsseite öffnen. Dein persönlicher Link steht in Sekunden.",
     },
     step2: {
-      title: "Teilen - oder einen Skill teilen",
+      title: "Teilen oder einen Skill teilen",
       body: "Link in den Chat, ins README, unters Video. Oder einen Skill veröffentlichen: Sein Share-Link trägt deine Empfehlung automatisch mit.",
     },
     step3: {

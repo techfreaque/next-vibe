@@ -2,19 +2,19 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Buduj z next-vibe - {{appName}}",
+    title: "Buduj z next-vibe: {{appName}}",
     category: "Deweloperzy",
     description:
       "next-vibe zamienia każdy endpoint jednocześnie w formularz web, polecenie CLI, narzędzie MCP, ekran natywny i skill wywoływany przez AI. Zautomatyzuj wszystko, co człowiek może zrobić na komputerze.",
-    imageAlt: "Platforma deweloperska next-vibe - {{appName}}",
+    imageAlt: "Platforma deweloperska next-vibe: {{appName}}",
     keywords:
       "next-vibe, automatyzacja AI, platforma deweloperska, automatyzacja biznesu, integracja ERP, automatyzacja produkcji, {{appName}}",
-    ogTitle: "Buduj z next-vibe - {{appName}}",
+    ogTitle: "Buduj z next-vibe: {{appName}}",
     ogDescription:
-      "Jedna baza kodu. Każda powierzchnia. Automatyzuj linie produkcyjne, systemy ERP, przepływy pracy na pulpicie - wszystko, co człowiek robi na komputerze.",
-    twitterTitle: "Buduj z next-vibe - {{appName}}",
+      "Jedna baza kodu. Każda powierzchnia. Automatyzuj linie produkcyjne, systemy ERP, przepływy pracy na pulpicie: wszystko, co człowiek robi na komputerze.",
+    twitterTitle: "Buduj z next-vibe: {{appName}}",
     twitterDescription:
-      "Jedna baza kodu. Każda powierzchnia. Automatyzuj linie produkcyjne, systemy ERP, przepływy pracy na pulpicie - wszystko, co człowiek robi na komputerze.",
+      "Jedna baza kodu. Każda powierzchnia. Automatyzuj linie produkcyjne, systemy ERP, przepływy pracy na pulpicie: wszystko, co człowiek robi na komputerze.",
   },
 
   hero: {
@@ -37,7 +37,7 @@ export const translations: typeof enTranslations = {
       businessDevs: {
         title: "Deweloperzy biznesowi",
         description:
-          "Połącz ERP, CRM lub dowolny system wewnętrzny z przepływami AI. Dane wchodzą, decyzje wychodzą - bez kodu kleju.",
+          "Połącz ERP, CRM lub dowolny system wewnętrzny z przepływami AI. Dane wchodzą, decyzje wychodzą, bez kodu kleju.",
       },
       industrialDevs: {
         title: "Przemysłowi i embedded",
@@ -47,7 +47,7 @@ export const translations: typeof enTranslations = {
       enterpriseDevs: {
         title: "Zespoły enterprise",
         description:
-          "Zastąp pofragmentowane narzędzia jedną ujednoliconą platformą. Web UI, CLI, MCP, aplikacja natywna - ten sam endpoint, zero duplikacji.",
+          "Zastąp pofragmentowane narzędzia jedną ujednoliconą platformą. Web UI, CLI, MCP, aplikacja natywna: ten sam endpoint, zero duplikacji.",
       },
     },
   },
@@ -63,7 +63,7 @@ export const translations: typeof enTranslations = {
       desktopAutomation: {
         title: "Pełna automatyzacja pulpitu",
         description:
-          "next-vibe może przejąć cały pulpit włącznie z przeglądarką. Wypełnianie formularzy, scraping, nawigacja, operacje na plikach - raz zaskryptowane, działa wszędzie.",
+          "next-vibe może przejąć cały pulpit włącznie z przeglądarką. Wypełnianie formularzy, scraping, nawigacja, operacje na plikach: raz zaskryptowane, działa wszędzie.",
       },
       productionLine: {
         title: "Automatyzacja linii produkcyjnej",
@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       skillEconomy: {
         title: "Zarabiaj na tym, co budujesz",
         description:
-          "Zapakuj automatyzację jako skill. Udostępnij link. 10% od każdej płatności każdego użytkownika, który się przez niego zarejestruje - cyklicznie, dopóki płaci.",
+          "Zapakuj automatyzację jako skill. Udostępnij link. 10% od każdej płatności każdego użytkownika, który się przez niego zarejestruje: cyklicznie, dopóki płaci.",
       },
     },
   },
@@ -100,7 +100,7 @@ export const translations: typeof enTranslations = {
       ai: "Skill wywoływany przez AI",
     },
     description:
-      "Platforma jest wykrywana w czasie wykonania. Ten sam endpoint, który renderuje interfejs web dla człowieka, staje się narzędziem wywoływanym maszynowo dla agenta AI - bez dodatkowego kodu.",
+      "Platforma jest wykrywana w czasie wykonania. Ten sam endpoint, który renderuje interfejs web dla człowieka, staje się narzędziem wywoływanym maszynowo dla agenta AI, bez dodatkowego kodu.",
   },
 
   referral: {

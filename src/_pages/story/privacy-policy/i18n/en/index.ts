@@ -1,16 +1,16 @@
 export const translations = {
   meta: {
-    title: "Privacy Policy - {{appName}}",
+    title: "Privacy Policy: {{appName}}",
     category: "Legal",
     description:
       "Learn how {{appName}} protects your privacy and handles your data",
     imageAlt: "Privacy Policy",
     keywords:
       "privacy policy, data protection, user privacy, {{appName}} privacy",
-    ogTitle: "Privacy Policy - {{appName}}",
+    ogTitle: "Privacy Policy: {{appName}}",
     ogDescription:
       "Learn how {{appName}} protects your privacy and handles your data",
-    twitterTitle: "Privacy Policy - {{appName}}",
+    twitterTitle: "Privacy Policy: {{appName}}",
     twitterDescription:
       "Learn how {{appName}} protects your privacy and handles your data",
   },

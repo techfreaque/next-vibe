@@ -334,7 +334,7 @@ export const translations: typeof enTranslations = {
               "Berlin-Lisbonne dès 67 € : les offres week-end de Skyscanner",
             result1Snippet:
               "Ryanair samedi BER→LIS dès 67 € l'aller simple. Allers-retours dès 94 € au total. Bagage non inclus.",
-            result2Title: "BER–LIS ce week-end : comparatif de prix Kayak",
+            result2Title: "De BER à LIS ce week-end : comparatif de prix Kayak",
             result2Snippet:
               "Prix le plus bas : 71 € avec Vueling (1 escale, 4 h 20). Vols directs dès 112 € avec TAP. Alerte prix activée.",
             result3Title:
@@ -572,7 +572,7 @@ export const translations: typeof enTranslations = {
           headline: "N'importe quel endpoint, planifié. Un seul appel.",
           bodyPrefix: "Enveloppez n'importe quel endpoint existant avec",
           bodySuffix:
-            ", sans nouvelle logique ni worker séparé. La même définition et la même route que vous avez déjà écrites. Plannings, priorités et catégories sont des enums typés. Visibles dans le panneau d'admin, gérables via le CLI.",
+            ". La définition et la route existantes suffisent, sans ajouter de logique ni de worker. Les horaires, les priorités et les catégories sont des enums typés. Consultez-les dans le panneau d’administration et gérez-les en CLI.",
         },
         websocket: {
           headline:

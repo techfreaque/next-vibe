@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     },
   },
   meta: {
-    title: "404 - Seite nicht gefunden",
+    title: "404: Seite nicht gefunden",
     category: "Fehler",
     description: "Die gesuchte Seite existiert nicht",
     imageAlt: "404 Nicht gefunden",

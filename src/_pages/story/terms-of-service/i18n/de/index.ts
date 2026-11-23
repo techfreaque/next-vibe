@@ -2,17 +2,17 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Nutzungsbedingungen - {{appName}}",
+    title: "Nutzungsbedingungen: {{appName}}",
     category: "Rechtliches",
     description:
       "Lesen Sie die Nutzungsbedingungen für die Verwendung von {{appName}}",
     imageAlt: "Nutzungsbedingungen",
     keywords:
       "Nutzungsbedingungen, Allgemeine Geschäftsbedingungen, Benutzervereinbarung, {{appName}} Bedingungen",
-    ogTitle: "Nutzungsbedingungen - {{appName}}",
+    ogTitle: "Nutzungsbedingungen: {{appName}}",
     ogDescription:
       "Lesen Sie die Nutzungsbedingungen für die Verwendung von {{appName}}",
-    twitterTitle: "Nutzungsbedingungen - {{appName}}",
+    twitterTitle: "Nutzungsbedingungen: {{appName}}",
     twitterDescription:
       "Lesen Sie die Nutzungsbedingungen für die Verwendung von {{appName}}",
   },

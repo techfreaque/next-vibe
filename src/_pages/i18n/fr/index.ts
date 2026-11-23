@@ -108,7 +108,7 @@ export const translations: typeof enTranslations = {
   },
   meta: {
     home: {
-      title: "{{appName}} - Chat IA non censuré",
+      title: "{{appName}} : Chat IA non censuré",
       category: "Plateforme de chat IA",
       description:
         "Des conversations IA vraiment non censurées avec {{modelCount}} modèles. Pas de filtres, pas de restrictions. Juste une IA honnête.",
@@ -117,7 +117,7 @@ export const translations: typeof enTranslations = {
         "IA non censurée, chat IA, GPT-4, Claude, Gemini, modèles d'IA, sans filtre, IA honnête, conversations IA",
     },
     aboutUs: {
-      title: "À propos - {{appName}}",
+      title: "À propos : {{appName}}",
       category: "À propos",
       description:
         "Découvrez la mission de {{appName}} : des conversations IA sans censure",
@@ -131,7 +131,7 @@ export const translations: typeof enTranslations = {
       twitterDescription: "Notre mission : des conversations IA sans censure",
     },
     privacyPolicy: {
-      title: "Politique de confidentialité - {{appName}}",
+      title: "Politique de confidentialité : {{appName}}",
       category: "Mentions légales",
       description:
         "Découvrez comment {{appName}} protège votre vie privée et traite vos données",
@@ -140,7 +140,7 @@ export const translations: typeof enTranslations = {
         "politique de confidentialité, protection des données, vie privée, confidentialité {{appName}}",
     },
     termsOfService: {
-      title: "Conditions d'utilisation - {{appName}}",
+      title: "Conditions d'utilisation : {{appName}}",
       category: "Mentions légales",
       description:
         "Lisez les conditions générales d'utilisation de {{appName}}",
@@ -149,7 +149,7 @@ export const translations: typeof enTranslations = {
         "conditions d'utilisation, conditions générales, CGU, conditions {{appName}}",
     },
     imprint: {
-      title: "Mentions légales - {{appName}}",
+      title: "Mentions légales : {{appName}}",
       category: "Mentions légales",
       description:
         "Informations légales et coordonnées de la société {{appName}}",
@@ -158,7 +158,7 @@ export const translations: typeof enTranslations = {
         "mentions légales, informations légales, informations sur la société, {{appName}} mentions légales",
     },
     careers: {
-      title: "Carrières - {{appName}}",
+      title: "Carrières : {{appName}}",
       category: "Carrières",
       description:
         "Rejoignez notre équipe et construisez l'avenir de l'IA non censurée",
@@ -167,17 +167,17 @@ export const translations: typeof enTranslations = {
         "carrières, emplois, emplois IA, télétravail, carrières {{appName}}",
     },
     pricing: {
-      title: "Tarifs - {{appName}}",
+      title: "Tarifs : {{appName}}",
       category: "Tarifs",
       description:
         "Le chat IA pour tous les budgets. Commencez gratuitement : des crédits chaque mois, sans carte bancaire.",
       imageAlt: "Formules et tarifs",
       keywords:
         "tarifs, formules, abonnement, prix chat IA, tarifs {{appName}}",
-      ogTitle: "Formules et tarifs - {{appName}}",
+      ogTitle: "Formules et tarifs : {{appName}}",
       ogDescription:
         "Des tarifs simples et transparents pour un chat IA non censuré",
-      twitterTitle: "Tarifs - {{appName}}",
+      twitterTitle: "Tarifs : {{appName}}",
       twitterDescription:
         "Commencez gratuitement. Des crédits chaque mois, sans carte.",
     },
@@ -185,7 +185,7 @@ export const translations: typeof enTranslations = {
       category: "Facturation",
     },
     notFound: {
-      title: "404 - Page introuvable",
+      title: "404 : Page introuvable",
       category: "Erreur",
       description: "La page que vous cherchez n'existe pas",
       imageAlt: "404 Introuvable",
@@ -209,7 +209,7 @@ export const translations: typeof enTranslations = {
   },
   layout: {
     metadata: {
-      defaultTitle: "{{appName}} - Chat IA non censuré",
+      defaultTitle: "{{appName}} : Chat IA non censuré",
       category: "Plateforme de chat IA",
       description:
         "Des conversations IA vraiment non censurées avec {{modelCount}} modèles. Pas de filtres, pas de restrictions. Juste une IA honnête.",

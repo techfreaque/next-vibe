@@ -2,12 +2,12 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Un punto finale. - next-vibe",
+    title: "Un punto finale. (next-vibe)",
     description:
-      "Scrivi una definition.ts per funzione. Rende come forma web, comando CLI, strumento MCP, schermo nativo, lavoro cron - contemporaneamente. Niente duplicazioni. Tipi esecutivi.",
+      "Una definition.ts per funzione genera un modulo web, un comando CLI, uno strumento MCP, una schermata nativa e un job cron. Nessuna duplicazione. Tipi verificati.",
     category: "Architettura",
     imageAlt:
-      "next-vibe architettura di superficie unificata - un endpoint, ogni piattaforma",
+      "Architettura unificata di next-vibe: un endpoint su tutte le piattaforme",
     keywords:
       "next-vibe, TypeScript, superficie unificata, MCP, CLI, definition.ts, open source, framework SaaS",
   },
@@ -17,13 +17,13 @@ export const translations: typeof enTranslations = {
     readTime: "5 minuti di lettura",
     title: "Un endpoint per tutte le interfacce.",
     subtitle:
-      "Scrivere una definizione per funzione. Modulo Web, comando CLI, strumento MCP, schermo nativo, lavoro cron - tutto in una volta. Niente duplicazioni.",
+      "Una definizione per funzione genera subito un modulo web, un comando CLI, uno strumento MCP, una schermata nativa e un job cron. Nessuna duplicazione.",
   },
   intro: {
     paragraph1:
-      "Ogni funzione aveva bisogno di un modulo web, un comando CLI, uno strumento MCP per gli agenti AI, a volte uno schermo mobile. Stessa validazione di Zod, stesso i18n, stesso trattamento di errore - appena vestito in modo diverso. Così ho costruito next-vibe: un quadro in cui si scrive una definition.ts per caratteristica e rende come tutti loro simultaneamente.",
+      "Ogni funzione aveva bisogno di un modulo web, un comando CLI, uno strumento MCP per gli agenti AI, a volte uno schermo mobile. Stessa validazione di Zod, stesso i18n, stesso trattamento di errore: appena vestito in modo diverso. Così ho costruito next-vibe: un quadro in cui si scrive una definition.ts per caratteristica e rende come tutti loro simultaneamente.",
     paragraph2:
-      "Inoltre alimenta modelli {{appName}} - {{modelCount}} AI, censura controllata dall'utente. La stessa base di codice viene eseguita come app web Next.js, un server TanStack/Vite dev, un'app mobile React Native, un CLI, un server MCP, un sistema di cron e un bus eventi WebSocket. Definizione di un punto finale. Niente duplicazioni.",
+      "È anche alla base di {{appName}}, con {{modelCount}} modelli IA e filtri scelti dall’utente. Lo stesso codice gira come app web in Next.js, server di sviluppo TanStack/Vite, app mobile in React Native, CLI, server MCP, sistema cron e bus di eventi WebSocket. Una definizione di endpoint. Nessuna duplicazione.",
   },
   typeRules: {
     title: "I tipi devono allinearsi. Nessuna eccezione.",
@@ -66,9 +66,9 @@ export const translations: typeof enTranslations = {
     title: "Il motore del grafico accidentale",
     subtitle: "Un bot di trading che non può commerciare",
     description:
-      "Vibe Sense ha iniziato come bot di trading. Non ha mai eseguito gli ordini - ha solo guardato i prezzi e i segnali di fuoco. Quando l'ho abbandonata, l'architettura delle tubazioni è sopravvissuta: le fonti di dati si collegano agli indicatori, agli evaluatori di alimentazione degli indicatori, ai segnali di emissione dei segnali, alle azioni di attivazione dei segnali. Ogni nodo è un endpoint HTTP.",
+      "Vibe Sense ha iniziato come bot di trading. Non ha mai eseguito gli ordini: ha solo guardato i prezzi e i segnali di fuoco. Quando l'ho abbandonata, l'architettura delle tubazioni è sopravvissuta: le fonti di dati si collegano agli indicatori, agli evaluatori di alimentazione degli indicatori, ai segnali di emissione dei segnali, alle azioni di attivazione dei segnali. Ogni nodo è un endpoint HTTP.",
     quote:
-      "Ogni nodo nel grafico è solo un endpoint HTTP - è possibile frenare qualsiasi passo nella pipeline, testarlo in isolamento, o chiamarlo da un agente AI. Il motore grafico è un programmatore, non uno DSL.",
+      "Ogni nodo nel grafico è solo un endpoint HTTP: è possibile frenare qualsiasi passo nella pipeline, testarlo in isolamento, o chiamarlo da un agente AI. Il motore grafico è un programmatore, non uno DSL.",
     whyItMatters:
       "Poiché ogni nodo è un endpoint standard, sono testabili individualmente tramite CLI, accessibili agli agenti AI tramite MCP, e memorizzabili con la stessa infra di tutto il resto. Il motore grafico non inventa la propria lingua. Si pianificano gli endpoint.",
   },

@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Tiefgehende Einblicke in Architektur, Entscheidungen und die Ideen hinter next-vibe und {{appName}}.",
     meta: {
-      title: "Blog - next-vibe & {{appName}}",
+      title: "Blog: next-vibe & {{appName}}",
       description:
         "Engineering-Deep-Dives, Architekturentscheidungen und die Ideen hinter next-vibe und {{appName}}.",
       category: "Blog",
@@ -196,14 +196,14 @@ export const translations: typeof enTranslations = {
       title: "Zwei KIs. Ein Gespräch. Beide Richtungen.",
       category: "Hermes & Thea",
       excerpt:
-        "Hermes auf deinem Rechner, Thea auf dem Server - jetzt übergibt jede der beiden Threads an die andere. Und ein fehlender API-Key bremst keinen Turn mehr aus.",
+        "Hermes läuft auf deinem Rechner, Thea auf dem Server. Jetzt können beide einander Threads übergeben. Ein fehlender API-Key hält den Turn nicht mehr auf.",
       readTime: "6 Min. Lesezeit",
     },
     codingAgent: {
       title: "Deine KI öffnet ein Terminal und übergibt an Claude Code.",
       category: "Coding-Agent",
       excerpt:
-        "Das Coding-Agent-Tool delegiert echte Code-Änderungen an Claude Code oder OpenCode - im Hintergrund oder live im Terminalfenster, mit automatischer Rückmeldung. Jetzt auch instanzübergreifend.",
+        "Das Coding-Agent-Tool übergibt Code-Änderungen an Claude Code oder OpenCode. Du kannst im Hintergrund arbeiten lassen oder live im Terminal zusehen. Das Ergebnis kommt automatisch zurück, jetzt auch instanzübergreifend.",
       readTime: "5 Min. Lesezeit",
     },
     e2eTests: {
@@ -211,7 +211,7 @@ export const translations: typeof enTranslations = {
         "Ein Roboter hat jeden Button geklickt. Er fand acht Sicherheitslücken.",
       category: "Engineering",
       excerpt:
-        "Schluss mit Einzelteil-Tests - wir testen Seiten. Ein echter Browser auf jedem kundenrelevanten Endpoint, und der Open Redirect, die SSRF und die Datenlecks, die er fand.",
+        "Wir testen jetzt ganze Seiten im Browser. Auf den Endpoints, die Kunden nutzen, fanden wir eine offene Weiterleitung, SSRF und Datenlecks.",
       readTime: "7 Min. Lesezeit",
     },
     whatsNewMay2026: {
@@ -225,7 +225,7 @@ export const translations: typeof enTranslations = {
       title: "unbottled ist zurück. Und es ist jetzt wirklich gut.",
       category: "Produkt-Update",
       excerpt:
-        "Neue Modelle, Bild-/Video-/Musikgenerierung und ein komplett überarbeitetes Onboarding. Wenn du früh abgesprungen bist - wir wollen, dass du es nochmal probierst.",
+        "Neue Modelle, Generierung von Bildern, Videos und Musik und ein komplett überarbeiteter Einstieg. Wenn du früh abgesprungen bist, probier es noch einmal.",
       readTime: "5 Min. Lesezeit",
     },
     oneCodebase: {
@@ -253,7 +253,7 @@ export const translations: typeof enTranslations = {
       title: "Ein Endpoint. Jede Oberfläche.",
       category: "Architektur",
       excerpt:
-        "Eine definition.ts pro Feature. Es rendert als Webformular, CLI-Befehl, MCP-Tool, nativer Screen, Cron-Job - gleichzeitig.",
+        "Eine definition.ts pro Feature liefert gleichzeitig ein Webformular, einen CLI-Befehl, ein MCP-Tool, einen nativen Screen und einen Cron-Job.",
       readTime: "5 Min. Lesezeit",
     },
     referralBeginners: {
@@ -275,7 +275,7 @@ export const translations: typeof enTranslations = {
       title: "Du hast was mit KI gebaut. Jetzt verdien damit, es zu teilen.",
       category: "Empfehlungen",
       excerpt:
-        "Dein Empfehlungslink ist ein Einkommensstrom, den du noch nicht angezapft hast. Blog-Posts, READMEs, Tutorials - die Rechnung für technische Zielgruppen.",
+        "Mit deinem Empfehlungslink kannst du Geld verdienen. Hier erfährst du, wie sich das in Blogposts, READMEs und Tutorials rechnet.",
       readTime: "5 Min. Lesezeit",
     },
     skillSharingEconomy: {
@@ -289,7 +289,7 @@ export const translations: typeof enTranslations = {
       title: "10 % direkt. +5 %, wenn andere deinen Skill teilen. Für immer.",
       category: "Empfehlungen",
       excerpt:
-        "Die vollständige Mechanik des Empfehlungs- und Skill-Programms - Kettenaufschlüsselung, genaue Prozentsätze pro Ebene, Auszahlungsoptionen und wie der Skill-Bonus stapelt.",
+        "So funktionieren das Empfehlungs- und das Skill-Programm: alle Provisionen pro Stufe, die Auszahlungsoptionen und der zusätzliche Skill-Bonus.",
       readTime: "4 Min. Lesezeit",
     },
   },

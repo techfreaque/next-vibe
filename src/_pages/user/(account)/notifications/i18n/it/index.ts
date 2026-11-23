@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "Notifiche",
-  metaTitle: "Notifiche - {{appName}}",
+  metaTitle: "Notifiche: {{appName}}",
   description:
     "Compiti finiti, pagamenti di rinvio e notizie di conto. Prima e' il piu' nuovo.",
   unauthenticated: {

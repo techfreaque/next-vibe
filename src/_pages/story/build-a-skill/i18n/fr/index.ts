@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Créer une compétence - Une IA sur mesure pour tout",
+    title: "Créer une compétence : Une IA sur mesure pour tout",
     description:
       "Transformez n'importe quel workflow en compétence IA réutilisable. Passez par la page des compétences, ou demandez à Thea dans le chat. Aucun code requis.",
     category: "Skills",

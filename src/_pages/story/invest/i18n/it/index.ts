@@ -12,13 +12,13 @@ export const translations: typeof enTranslations = {
   cta: {
     title: "Vuoi entrare?",
     subtitle:
-      "Biglietti da $5.000. Dicci chi sei e cosa vuoi indietro - rispondiamo ad ogni messaggio.",
+      "Biglietti da $5.000. Dicci chi sei e cosa vuoi indietro: rispondiamo ad ogni messaggio.",
     button: "Entra in contatto",
   },
   meta: {
     title: "Investire in {{appName}}",
     description:
-      "Biglietti da $5.000. Indietro la piattaforma AI open source costruita sui modelli next-vibe - {{modelCount}}, in produzione e l'utente imposta il filtro.",
+      "Biglietti da $5.000. Indietro la piattaforma AI open source costruita sui modelli next-vibe: {{modelCount}}, in produzione e l'utente imposta il filtro.",
     category: "Investimenti",
     imageAlt: "Investire in {{appName}}",
     keywords:

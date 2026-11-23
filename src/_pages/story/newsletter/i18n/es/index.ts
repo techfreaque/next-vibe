@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
       benefit1: {
         title: "Nuevos modelos, primero",
         description:
-          "Cada modelo que añadimos - en lo que es bueno, en lo que cuesta, cuando elegirlo.",
+          "Cada modelo que añadimos: en lo que es bueno, en lo que cuesta, cuando elegirlo.",
       },
       benefit2: {
         title: "Características que se envían",
@@ -43,7 +43,7 @@ export const translations: typeof enTranslations = {
       benefit3: {
         title: "Pronóstico que funciona",
         description:
-          "Configuraciones y habilidades reales que obtienen resultados - copiarlos, recortarlos, enviar.",
+          "Configuraciones y habilidades reales que obtienen resultados: copiarlos, recortarlos, enviar.",
       },
       benefit4: {
         title: "Ofertas sólo de suscriptor",
@@ -54,7 +54,7 @@ export const translations: typeof enTranslations = {
     frequency: {
       title: "Mensual. Eso es.",
       description:
-        "Un correo electrónico por mes. Descríbete en cualquier momento - un clic, sin preguntas.",
+        "Un correo electrónico por mes. Descríbete en cualquier momento: un clic, sin preguntas.",
     },
   },
   subscription: {

@@ -22,8 +22,8 @@ export const translations = {
     heroSub: "Recurring. Forever.",
     chainTitle: "10 subscribers. What you earn per month.",
     chainSubtitle:
-      "Each level is half the one above. Built once at signup - pays forever.",
-    whoLabel0: "You - whoever referred them directly",
+      "Each level is half the one above. Built once at signup: pays forever.",
+    whoLabel0: "You: whoever referred them directly",
     whoLabel1: "Skill creator (if different) or your referrer",
     whoLabel2: "Their referrer's referrer",
     whoLabel3: "Level 4",
@@ -37,7 +37,7 @@ export const translations = {
   story: {
     title: "How the chain compounds",
     subtitle:
-      "Same 10 subscribers. Each level that activates adds to your total - forever.",
+      "Same 10 subscribers. Each level that activates adds to your total: forever.",
     totalLabel: "Total / mo",
     addedLabel: "+{{amount}} from this level",
     levelLabel: "Level {{n}} active",
@@ -50,12 +50,12 @@ export const translations = {
     noob: {
       label: "Getting started",
       earning: "~{{story_noob_earning}}/mo",
-      desc: "{{story_noob_users}} paying subscribers via your referral link. {{directPct}} each - passive income from one tweet or blog post.",
+      desc: "{{story_noob_users}} paying subscribers via your referral link. {{directPct}} each: passive income from one tweet or blog post.",
     },
     mid: {
       label: "Growing audience",
       earning: "~{{story_mid_earning}}/mo",
-      desc: "{{story_mid_users}} subscribers - mix of referral and skill links. Some of their friends also signed up. Chain is building itself.",
+      desc: "{{story_mid_users}} subscribers: mix of referral and skill links. Some of their friends also signed up. Chain is building itself.",
     },
     pro: {
       label: "Established creator",
@@ -73,13 +73,13 @@ export const translations = {
     title: "How it works",
     step1Title: "Create a referral code",
     step1Body:
-      "Make unique codes for different audiences - friends, Discord, a blog post. Each tracked separately.",
+      "Make unique codes for different audiences: friends, Discord, a blog post. Each tracked separately.",
     step2Title: "Share your link",
     step2Body:
       "Referral link → {{directPct}} per user, forever. Your skill shared by others → {{skillBonusPct}} per user. Two sources, zero extra work.",
     step3Title: "Get paid",
     step3Body:
-      "Earnings unlock {{holdDays}} days after each payment - the refund window. Then spend them as credits or withdraw to BTC/USDC from {{minPayout}}.",
+      "Earnings unlock {{holdDays}} days after each payment: the refund window. Then spend them as credits or withdraw to BTC/USDC from {{minPayout}}.",
   },
 
   manage: {
@@ -91,10 +91,10 @@ export const translations = {
   cta: {
     title: "Create an account to start earning",
     description:
-      "Get your referral link. {{directPct}} on every payment - recurring, no expiry. Publish a skill and earn {{skillBonusPct}} when others share it.",
+      "Get your referral link. {{directPct}} on every payment: recurring, no expiry. Publish a skill and earn {{skillBonusPct}} when others share it.",
     signUp: "Create account",
     logIn: "Log in",
-    pitch1: "{{directPct}} referral commission - recurring, no expiry",
+    pitch1: "{{directPct}} referral commission: recurring, no expiry",
     pitch2:
       "Publish a skill → {{skillBonusPct}} from every user others bring to it",
     pitch3:
@@ -113,13 +113,13 @@ export const translations = {
   },
   audienceCallout: {
     title: "Two ways to earn",
-    newTitle: "Referral link - {{directPct}} per user",
+    newTitle: "Referral link: {{directPct}} per user",
     newBody:
       "Share your code. Anyone who signs up and pays gives you {{directPct}} of every payment, every month, forever. Post it once. Earn forever.",
     newCta: "Get your referral link",
-    proTitle: "Skill creator - {{skillBonusPct}} per user",
+    proTitle: "Skill creator: {{skillBonusPct}} per user",
     proBody:
-      "Build a skill. Share its link. Everyone who signs up through your own link pays you {{directPct}}, recurring. The multiplier: when someone else shares your skill with their link, you still earn {{skillBonusPct}} as the skill author. The platform tracks skill authorship - passive attribution with no extra work.",
+      "Build a skill. Share its link. Everyone who signs up through your own link pays you {{directPct}}, recurring. The multiplier: when someone else shares your skill with their link, you still earn {{skillBonusPct}} as the skill author. The platform tracks skill authorship: passive attribution with no extra work.",
     proCta: "Build a skill",
   },
   discord: {

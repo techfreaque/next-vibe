@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "Un robot pulsó todos los botones. Encontró ocho fallos de seguridad.",
     description:
-      "Construimos un marco de prueba de extremo a extremo que conduce las páginas reales en un navegador real - y cubrió cada punto final orientado al cliente. Esto es lo que pilló.",
+      "Creamos un sistema de pruebas de extremo a extremo. Abrimos las páginas en un navegador real y probamos todos los endpoints que usan los clientes. Esto es lo que encontramos.",
     category: "Ingeniería",
     imageAlt:
       "Pruebas de extremo a extremo conduciendo {{appName}} en un navegador real",
@@ -19,10 +19,10 @@ export const translations: typeof enTranslations = {
     title:
       "Un robot pulsó todos los botones. Encontró ocho fallos de seguridad.",
     subtitle:
-      "Detuvimos las pruebas y empezamos las páginas de prueba. Navegador real, servidor real, clics reales - en cada punto final un cliente puede tocar.",
+      "Dejamos de probar piezas sueltas y empezamos a probar páginas completas. Un navegador real, un servidor real y clics reales en todos los endpoints que usan los clientes.",
   },
   intro: {
-    lead: "Nuestro código pasó cheques de tipo, lint y pruebas de unidad. Todavía envió bichos. No los exóticos - un formulario de reseteo que ignoró la contraseña de confirmación, enlaces de facturas que no fueron a ninguna parte, un pienso que mostró hilos borrados.",
+    lead: "Nuestro código pasó cheques de tipo, lint y pruebas de unidad. Todavía envió bichos. No los exóticos: un formulario de reseteo que ignoró la contraseña de confirmación, enlaces de facturas que no fueron a ninguna parte, un pienso que mostró hilos borrados.",
     p1: "Cada uno de ellos vivía en la brecha entre las piezas. La función estaba bien. La página alrededor no lo era. Así que construimos un marco de prueba que sólo se preocupa por una cosa: lo que un cliente realmente ve y envía.",
   },
   why: {
@@ -37,7 +37,7 @@ export const translations: typeof enTranslations = {
     api: {
       label: "Prueba API",
       title: "Chequea una solicitud",
-      body: "Muestra las respuestas del servidor. Nunca prueba que la página envía esa solicitud - o hace la respuesta.",
+      body: "Muestra las respuestas del servidor. Nunca prueba que la página envía esa solicitud o hace la respuesta.",
     },
     e2e: {
       label: "Fin a fin",
@@ -51,7 +51,7 @@ export const translations: typeof enTranslations = {
       "Playwright impulsado de la prueba de bun, construido sobre las definiciones de punto final de next-vibe. La definición ya conoce todos los campos, así que la prueba no necesita.",
     step1: {
       title: "Abrir la página real",
-      body: "La prueba abre la página del cliente - /user/login, /story/framework - no un problema de prueba. Espera hasta que React sea dueña de la forma antes de escribir.",
+      body: "La prueba abre una página real, como /user/login o /story/framework. Espera a que React tome el control del formulario antes de escribir.",
     },
     step2: {
       title: "Llenar con valores tipo",
@@ -63,7 +63,7 @@ export const translations: typeof enTranslations = {
     },
     step4: {
       title: "Recordad una vez, repetid para siempre",
-      body: "Los proveedores de pagos - AI modelos, imagen, música, vídeo - se registran por prueba en la primera carrera y se reproducen después. No hay factura sorpresa, carreras deterministas.",
+      body: "Cada prueba graba las llamadas a los proveedores de pago de IA, imagen, música y vídeo en la primera ejecución. Después reproduce esas grabaciones. Sin cargos inesperados y con resultados reproducibles.",
     },
     step5: {
       title: "Cobertura de los informes",
@@ -118,12 +118,12 @@ export const translations: typeof enTranslations = {
   broken: {
     title: "Y las cosas que acaban de romperse",
     intro:
-      "No es peligroso - simplemente fallando silenciosamente para la gente real:",
+      "Estos fallos pasaban desapercibidos y afectaban a usuarios reales:",
     items: {
       attachments:
         "URLs de archivos adjuntos de chat e informes de error del cliente devueltos 404.",
       permissions:
-        "Los permisos de raíz nunca fueron incubados - los clientes no pudieron publicar en Shared.",
+        "Los permisos de raíz nunca fueron incubados: los clientes no pudieron publicar en Shared.",
       embed: "El montura de widget embedido estaba muerto.",
       invoices:
         "Los enlaces de correo electrónico de facturación devueltos 404.",

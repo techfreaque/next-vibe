@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
   },
   meta: {
     passwordReset: {
-      title: "Zresetuj hasło - {{appName}}",
+      title: "Zresetuj hasło: {{appName}}",
       description: "Zresetuj hasło do swojego konta {{appName}}",
       category: "Uwierzytelnianie",
       imageAlt: "Resetowanie hasła",

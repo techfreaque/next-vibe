@@ -2,11 +2,11 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Lo nuevo: seis meses en una página - {{appName}}",
+    title: "Lo nuevo: seis meses en una página ({{appName}})",
     description:
       "Parar significa parar. La voz funciona en iPhone. Tu AI corre a través de tus máquinas. El auto hospedaje no necesita Docker. Y un robot de prueba cerró ocho agujeros de seguridad. Todo desde mayo.",
     category: "Actualización de productos",
-    imageAlt: "{{appName}} - Noviembre 2026 actualización del producto",
+    imageAlt: "{{appName}}: novedades de noviembre de 2026",
     keywords:
       "{{appName}}, actualización de productos, Hermes, Thea, PGlite, self-host, discurso a texto, E2E pruebas, seguridad",
   },
@@ -21,7 +21,7 @@ export const translations: typeof enTranslations = {
   },
   intro: {
     lead: "Nuestra última actualización fue en mayo. Desde entonces, derribamos la base de códigos a los sementales, la reconstruimos más plana y pasamos meses arreglando lo que la gente real golpeó en la producción.",
-    p1: "No hay lista de 200 puntos de bala. Esto es lo que realmente sentirás - agrupado por donde lo sientes.",
+    p1: "En lugar de una lista de 200 puntos, aquí tienes los cambios que notarás, agrupados según dónde los verás.",
   },
   chat: {
     title: "Chat que obedece",
@@ -29,7 +29,7 @@ export const translations: typeof enTranslations = {
       "Las pequeñas cosas que hicieron charlar se sienten lentas o obstinadas.",
     stop: {
       title: "Parar significa parar",
-      body: "Hit stop y tokens dejan de aparecer en ese instante - no esperando que el servidor desgarre. Parar ahora también llega a chats incógnitos y conectados, donde solía hacer nada.",
+      body: "Hit stop y tokens dejan de aparecer en ese instante: no esperando que el servidor desgarre. Parar ahora también llega a chats incógnitos y conectados, donde solía hacer nada.",
     },
     input: {
       title: "Tamaño de entrada a su modelo",
@@ -37,11 +37,11 @@ export const translations: typeof enTranslations = {
     },
     reasoning: {
       title: "Los modelos mantienen su tren de pensamiento",
-      body: "Los bloques de resonancia se envían de nuevo al modelo en el siguiente turno en lugar de ser despojado - por lo que los modelos de pensamiento construyen sobre lo que ya han trabajado.",
+      body: "Los bloques de resonancia se envían de nuevo al modelo en el siguiente turno en lugar de ser despojado: por lo que los modelos de pensamiento construyen sobre lo que ya han trabajado.",
     },
     queue: {
       title: "Escribe mientras funciona",
-      body: "Envíe mensajes mientras el AI es de media respuesta - que colan en orden. La herramienta larga funciona compacta su contexto medio corriente en lugar de golpear la pared.",
+      body: "Puedes enviar mensajes mientras la IA responde. Llegan por orden. Las herramientas que tardan en terminar compactan su contexto sobre la marcha para seguir funcionando.",
     },
   },
   voice: {
@@ -71,12 +71,12 @@ export const translations: typeof enTranslations = {
     },
     coding: {
       title: "Un agente de codificación que puedes ver",
-      body: "Thea puede iniciar un agente de codificación interactivo en su máquina - una ventana de consola real que se puede ver - rastreado como una tarea, con el resultado reportado atrás.",
+      body: "Thea puede iniciar un agente de codificación interactivo en su máquina: una ventana de consola real que se puede ver: rastreado como una tarea, con el resultado reportado atrás.",
       link: "Conoce al agente de codificación",
     },
     tools: {
       title: "Herramientas de arrastre",
-      body: "Mejor automatización del navegador con emulación de dispositivos, herramientas de escritorio en Windows y herramientas SSH para cada cliente - no sólo los administradores.",
+      body: "Mejor automatización del navegador con emulación de dispositivos, herramientas de escritorio en Windows y herramientas SSH para cada cliente: no sólo los administradores.",
     },
   },
   selfHost: {
@@ -93,7 +93,7 @@ export const translations: typeof enTranslations = {
     },
     native: {
       title: "No se requiere ningún compilador",
-      body: "El hashing de contraseña se movió a los binarios preconstruidos - no node-gyp, sin herramientas de construcción. El mismo algoritmo, los hashes existentes siguen siendo válidos.",
+      body: "El hashing de contraseña se movió a los binarios preconstruidos: no node-gyp, sin herramientas de construcción. El mismo algoritmo, los hashes existentes siguen siendo válidos.",
     },
     revive: {
       title: "Vuelve por su cuenta.",
@@ -102,7 +102,7 @@ export const translations: typeof enTranslations = {
   },
   security: {
     title: "Más seguro por defecto",
-    intro: "El trabajo de seguridad que nunca verás - cuál es el punto.",
+    intro: "El trabajo de seguridad que nunca verás: cuál es el punto.",
     e2e: {
       title: "Un robot prueba cada página",
       body: "60 suites de extremo a extremo ahora conducen las páginas reales en un navegador real. Encontraron y cerramos ocho agujeros de seguridad, desde una red abierta a los archivos privados grabados públicamente.",
@@ -120,7 +120,7 @@ export const translations: typeof enTranslations = {
   cta: {
     title: "Míralo por ti mismo.",
     subtitle:
-      "Cada cambio arriba es en vivo en {{appName}} hoy - y en el código de código de código abierto si usted ejecuta su propio.",
+      "Cada cambio arriba es en vivo en {{appName}} hoy y en el código de código de código abierto si usted ejecuta su propio.",
     chat: "Empieza a chatear",
     selfHost: "Auto hospedarlo",
   },

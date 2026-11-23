@@ -1,6 +1,6 @@
 export const translations = {
   meta: {
-    title: "Self-Host {{appName}} - Your Instance, Your Rules",
+    title: "Self-Host {{appName}}: Your Instance, Your Rules",
     description:
       "Run the full {{appName}} stack on your own machine. Four commands, then a setup wizard in the browser. Connect your {{appName}} account or bring your own keys.",
     category: "Self-Host",

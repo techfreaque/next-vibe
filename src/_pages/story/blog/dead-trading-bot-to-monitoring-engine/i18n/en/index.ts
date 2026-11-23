@@ -1,11 +1,11 @@
 export const translations = {
   meta: {
     title:
-      "My dead trading bot became a platform monitoring engine - next-vibe",
+      "My dead trading bot became a platform monitoring engine: next-vibe",
     description:
-      "I abandoned a trading bot years ago. Then I realized its architecture - DataSource, Indicator, Evaluator, Action - applies to any business. So I rebuilt it inside next-vibe. Every node is an endpoint.",
+      "I abandoned a trading bot years ago. Then I realized its DataSource, Indicator, Evaluator, and Action architecture could work in any business. So I rebuilt it inside next-vibe. Every node is an endpoint.",
     category: "Vibe Sense",
-    imageAlt: "Vibe Sense monitoring pipeline - next-vibe",
+    imageAlt: "Vibe Sense monitoring pipeline: next-vibe",
     keywords:
       "vibe sense, monitoring, trading bot, endpoints, EMA, pipeline, next-vibe, TypeScript",
     ogTitle: "My dead trading bot became a platform monitoring engine",
@@ -20,7 +20,7 @@ export const translations = {
     eyebrow: "Vibe Sense",
     title: "This is your platform watching itself.",
     subtitle:
-      "I abandoned a trading bot years ago. Its architecture became the most interesting part of next-vibe. Every node in the graph is an endpoint - callable from the CLI, discoverable by AI, wired into your platform.",
+      "I abandoned a trading bot years ago. Its architecture became the most interesting part of next-vibe. Every node in the graph is an endpoint: callable from the CLI, discoverable by AI, wired into your platform.",
     readTime: "14 min read",
   },
   origin: {
@@ -54,7 +54,7 @@ export const translations = {
   insight: {
     title: "Every business is a time series",
     intro:
-      "In a trading bot, the pieces are simple. A data source: price data, volume, whatever you're reading. An indicator: moving average, RSI, MACD - takes raw data, produces a derived signal. An evaluator: is the fast MA above the slow MA? Boolean condition. An action: when the evaluator fires, do something.",
+      "In a trading bot, the pieces are simple. A data source: price data, volume, whatever you're reading. An indicator: moving average, RSI, MACD, takes raw data, produces a derived signal. An evaluator: is the fast MA above the slow MA? Boolean condition. An action: when the evaluator fires, do something.",
     realization:
       "That structure doesn't describe trading. It describes any business process where you have data over time, conditions you care about, and actions you want to take when those conditions are met.",
     examples: {
@@ -76,7 +76,7 @@ export const translations = {
       revenueAnomaly: {
         label: "Revenue anomalies",
         description:
-          "Refund rate spikes above 20% in a day - Thea gets notified before you see it in a dashboard.",
+          "Refund rate spikes above 20% in a day: Thea gets notified before you see it in a dashboard.",
       },
     },
   },
@@ -92,12 +92,12 @@ export const translations = {
     indicator: {
       label: "Indicator",
       description:
-        "A pure, reusable computation endpoint - EMA, RSI, MACD, Bollinger Bands, clamp, delta, window average. No SQL. No domain knowledge. Call it on any data source.",
+        "A pure, reusable computation endpoint: EMA, RSI, MACD, Bollinger Bands, clamp, delta, window average. No SQL. No domain knowledge. Call it on any data source.",
     },
     evaluator: {
       label: "Evaluator",
       description:
-        "A threshold or condition. Takes a series and asks a question. Is this value below 0.7? Did this ratio exceed 20%? Outputs a signal - fired or not fired.",
+        "A threshold or condition. Takes a series and asks a question. Is this value below 0.7? Did this ratio exceed 20%? Outputs a signal: fired or not fired.",
     },
     action: {
       label: "Action",
@@ -121,7 +121,7 @@ export const translations = {
         "Every Vibe Sense node is a standard endpoint, defined with createEndpoint(), registered in the same endpoint registry as everything else on the platform.",
     },
     cliCaption:
-      "The same EMA endpoint that ran as a node in the lead funnel graph - same definition, same validation, same auth - callable standalone from the CLI.",
+      "Call the same EMA endpoint from the CLI on its own. It uses the same definition, validation, and auth as the node in the lead funnel graph.",
     insight:
       "The SAME endpoint that's a node in your lead funnel graph is also a standalone tool on 13 platforms.",
     keyLine: "The pipeline is just endpoints calling endpoints.",
@@ -136,7 +136,7 @@ export const translations = {
     examples: {
       alert: {
         label: "Alert",
-        description: "Call complete-task - Thea picks it up immediately.",
+        description: "Call complete-task: Thea picks it up immediately.",
       },
       campaign: {
         label: "Campaign",
@@ -162,7 +162,7 @@ export const translations = {
         created: {
           name: "leads.created",
           description:
-            "Queries leads by created_at. Sparse - hours with no new leads produce no data point.",
+            "Queries leads by created_at. Sparse: hours with no new leads produce no data point.",
         },
         converted: {
           name: "leads.converted",
@@ -200,7 +200,7 @@ export const translations = {
     column3: {
       label: "Column 3: Evaluators",
       description:
-        "Threshold conditions. Each outputs a signal - fired or not fired.",
+        "Threshold conditions. Each outputs a signal: fired or not fired.",
       nodes: {
         leadDrop: {
           name: "eval_lead_drop",
@@ -233,7 +233,7 @@ export const translations = {
     indicators: {
       label: "Indicators at analytics/indicators/",
       description:
-        "Pure computation - EMA, RSI, MACD, Bollinger Bands, clamp, delta, window average. No domain knowledge. Call them on any data source.",
+        "Pure computation: EMA, RSI, MACD, Bollinger Bands, clamp, delta, window average. No domain knowledge. Call them on any data source.",
     },
     registration:
       "At startup, the indicator registry auto-discovers both. Data source endpoints register as node definitions. Indicator endpoints register as node definitions. You add a new domain, you add data-sources/ endpoints, you export graphSeeds. They appear.",
@@ -245,7 +245,7 @@ export const translations = {
     versioning: {
       label: "Versioning",
       description:
-        "Graphs are versioned. When you edit a graph, you create a new version - never mutate the active one. The new version is a draft. You promote it explicitly. Rollback is trivial.",
+        "Graphs are versioned. When you edit a graph, you create a new version. Never mutate the active one. The new version is a draft. You promote it explicitly. Rollback is trivial.",
     },
     backtest: {
       label: "Backtest",
@@ -267,7 +267,7 @@ export const translations = {
       never: {
         label: "never",
         description:
-          "Always recomputed live from inputs. EMA outputs, ratios - no storage cost. Lookback auto-extended for warmup.",
+          "Always recomputed live from inputs. EMA outputs, ratios: no storage cost. Lookback auto-extended for warmup.",
       },
     },
   },
@@ -282,10 +282,10 @@ export const translations = {
           "Topological execution via graph walker. Multi-resolution support with automatic scale-up/down. Lookback-aware range extension.",
         versioning:
           "Versioning, backtest mode with full run history, signal persistence as audit trail.",
-        cli: "CLI access - vibe vibe-sense-ema, vibe vibe-sense-rsi, any indicator endpoint, callable standalone.",
-        mcp: "MCP registration - indicator endpoints show up in the tool list. Thea can call indicators directly.",
+        cli: "CLI access: vibe vibe-sense-ema, vibe vibe-sense-rsi, any indicator endpoint, callable standalone.",
+        mcp: "MCP registration: indicator endpoints show up in the tool list. Thea can call indicators directly.",
         seeds:
-          "Seed graphs: 29 graphs across 9 domains - leads, credits, users, subscriptions, referrals, newsletters, payments, messenger, AI chat, and system health. All run out of the box on vibe dev.",
+          "Seed graphs: 29 graphs across 9 domains, leads, credits, users, subscriptions, referrals, newsletters, payments, messenger, AI chat, and system health. All run out of the box on vibe dev.",
       },
     },
     coming: {
@@ -303,7 +303,7 @@ export const translations = {
   vision: {
     title: "What this actually is",
     paragraph1:
-      "Every business process that can be described as: given this data, when these conditions are met, do this - that's a Vibe Sense graph. Monitoring, yes. Alerting, yes. But also: automated lead qualification, revenue anomaly detection, credit economy balancing, marketing automation.",
+      "Every business process that can be described as: given this data, when these conditions are met, do this. That's a Vibe Sense graph. Monitoring, yes. Alerting, yes. But also: automated lead qualification, revenue anomaly detection, credit economy balancing, marketing automation.",
     paragraph2:
       "The trading bot had this architecture right. Indicators, evaluators, actions, backtest mode. The thing I got wrong was building it in isolation. In Octane, EMA was locked inside the pipeline. In next-vibe, EMA is a first-class endpoint.",
     keyLine:

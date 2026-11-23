@@ -21,18 +21,18 @@ export const translations: typeof enTranslations = {
   useCase: {
     title: "Gdzie deweloperzy naturalnie polecają",
     p1: "Już tworzysz treści, które prowadzą ludzi do narzędzi. Post na blogu o Twoim workflow. README, które wspomina AI. Tutorial na YouTube. Odpowiedź na Discordzie z rekomendacją platformy. To wszystko ma potencjał polecający, który większość deweloperów pozostawia niewykorzystanym.",
-    p2: "Wszędzie tam, gdzie naturalnie wspominasz {{appName}}, dodaj swój link polecający. Osoby, które klikną i zapiszą się, przynoszą Ci 10% każdej płatności - co miesiąc, wiecznie. Nie musisz zmieniać tego, co mówisz. Po prostu dodaj link.",
+    p2: "Wszędzie tam, gdzie naturalnie wspominasz {{appName}}, dodaj swój link polecający. Osoby, które klikną i zapiszą się, przynoszą Ci 10% każdej płatności: co miesiąc, wiecznie. Nie musisz zmieniać tego, co mówisz. Po prostu dodaj link.",
     examples: [
       'GitHub README: "Zbudowałem/am to z API {{appName}}. Spróbuj: [Twój link]"',
       'Stopka posta na blogu: "Narzędzia, których używam: ...{{appName}} do AI [link ref]"',
-      'Discord/Slack: "Używam {{appName}} - tu moje polecenie, jeśli chcesz dołączyć"',
+      "Discord/Slack: \"Używam {{appName}}, tu moje polecenie, jeśli chcesz dołączyć\"",
       'Opis YouTube: "Narzędzia AI użyte w tym filmie: {{appName}} [link polecający]"',
     ],
   },
   skillAngle: {
-    title: "Opublikuj skill - zarabiaj, gdy inni go udostępniają",
-    p1: "Każdy skill, który publikujesz, ma link do udostępnienia. Udostępniasz go sam/a - zarabiasz standardowe 10% bezpośrednio. Gdy inny członek udostępni go własnym linkiem, i tak dostajesz 5% każdej płatności tych użytkowników, na zawsze.",
-    p2: "To, czego większość nie zauważa: zarabiasz 5% jako autor skilla nawet gdy ktoś inny udostępnia Twój link. Użytkownik znajduje Twój skill w katalogu, wysyła link znajomemu - znajomy się rejestruje, a Ty dostajesz 5% jego płatności. Automatycznie. Platforma śledzi autorstwo skilla, nie to kto udostępnił link. Twój skill pracuje za Ciebie, nawet gdy aktywnie go nie promujesz.",
+    title: "Opublikuj skill: zarabiaj, gdy inni go udostępniają",
+    p1: "Każdy skill, który publikujesz, ma link do udostępnienia. Udostępniasz go sam/a. Zarabiasz standardowe 10% bezpośrednio. Gdy inny członek udostępni go własnym linkiem, i tak dostajesz 5% każdej płatności tych użytkowników, na zawsze.",
+    p2: "To, czego większość nie zauważa: zarabiasz 5% jako autor skilla nawet gdy ktoś inny udostępnia Twój link. Użytkownik znajduje Twój skill w katalogu, wysyła link znajomemu: znajomy się rejestruje, a Ty dostajesz 5% jego płatności. Automatycznie. Platforma śledzi autorstwo skilla, nie to kto udostępnił link. Twój skill pracuje za Ciebie, nawet gdy aktywnie go nie promujesz.",
     p3: "Wbuduj link do skilla w README na GitHubie. Opublikuj go na deweloperskim Discordzie. Każda osoba, która się przez niego zarejestruje, daje Ci 10%. Każda osoba, którą inni przyprowadzą do Twojego skilla, daje Ci 5%. Jeden skill, dwa źródła dochodu.",
   },
   math: {
@@ -70,11 +70,11 @@ export const translations: typeof enTranslations = {
     ],
     note: "Jeden power user z Twojego linku daje Ci {{powerEarn}}/mies. Tyle, co {{powerVsPlan}} subskrybentów planu razem. Deweloperzy już płacą za narzędzia AI. Konwertują szybko i rzadko rezygnują.",
     growthNote:
-      "Gdy {{appName}} dodaje modele i funkcje, ARPU rośnie. Polecenia, które robisz dziś, przynoszą Ci więcej w przyszłym roku - bez dodatkowej pracy.",
+      "Gdy {{appName}} dodaje modele i funkcje, ARPU rośnie. Polecenia, które robisz dziś, przynoszą Ci więcej w przyszłym roku, bez dodatkowej pracy.",
   },
   chain: {
-    title: "Łańcuch - co się dzieje, gdy Twoje polecenia polecają innych",
-    p1: "Gdy osoby, które poleciłeś/aś, polecają innych, Ty też zarabiasz z tych płatności - do 5 poziomów głębokości:",
+    title: "Łańcuch: co się dzieje, gdy Twoje polecenia polecają innych",
+    p1: "Kiedy polecone przez Ciebie osoby zaproszą kolejnych użytkowników, zarobisz część ich wpłat. Prowizje sięgają pięciu poziomów:",
     level0: "Ty → bezpośrednie polecenie: 10% każdej płatności, wiecznie",
     level1:
       "Ich polecenia (poziom 2): ~5% każdej płatności (połowa puli upline wynoszącą 10%)",
@@ -82,17 +82,17 @@ export const translations: typeof enTranslations = {
     level3: "Poziom 4: ~1,25% każdej płatności",
     level4: "Poziom 5: ~0,625% każdej płatności",
     total: "Maksymalna łączna wypłata dla wszystkich: ~20% jednej płatności",
-    p2: "Uczciwa uwaga: bonusy łańcucha szybko maleją. Prawdziwy dochód to 10% bezpośrednio + 5% skill. Jeśli budujesz publicznie i Twoje polecenia sami są deweloperami, łańcuch sumuje się - ale nie optymalizuj dla głębokości. Optymalizuj dla jakościowych bezpośrednich poleceń.",
+    p2: "Uczciwa uwaga: bonusy łańcucha szybko maleją. Prawdziwy dochód to 10% bezpośrednio + 5% skill. Jeśli budujesz publicznie i Twoje polecenia sami są deweloperami, łańcuch sumuje się, ale nie optymalizuj dla głębokości. Optymalizuj dla jakościowych bezpośrednich poleceń.",
   },
   crypto: {
-    title: "Wypłata w krypto - nie potrzeba konta bankowego",
+    title: "Wypłata w krypto: nie potrzeba konta bankowego",
     p1: "Wypłata w BTC lub USDC. Przetwarzanie w ciągu 48 godzin po zatwierdzeniu. Minimalna wypłata: {{minPayout}}. To około {{payoutPowerMonths}} miesiące z jednym power userem albo {{payoutPlanMonths}} miesięcy subskrypcji Startera.",
     p2: "Albo natychmiast zamień zarobki na kredyty platformy. Jeśli sam/a używasz {{appName}}, zarobki z poleceń kompensują Twoje własne koszty.",
   },
   close: {
     title: "Włącz strumień",
     p1: "Już budujesz, piszesz i mówisz o narzędziach AI. Dodanie linku polecającego nic Cię nie kosztuje i zajmuje pięć minut. Opublikuj też skill, a zarobisz także wtedy, gdy udostępnią go inni.",
-    p2: "Matematyka procentu składanego - cykliczne prowizje, rosnący ARPU, łańcuch deweloper-do-dewelopera - działa tym bardziej na Twoją korzyść, im więcej budujesz publicznie.",
+    p2: "Matematyka procentu składanego (cykliczne prowizje, rosnący ARPU, łańcuch deweloper-do-dewelopera) działa tym bardziej na Twoją korzyść, im więcej budujesz publicznie.",
     createCode: "Utwórz kod polecający",
     joinDiscord: "Dołącz do Discorda",
   },

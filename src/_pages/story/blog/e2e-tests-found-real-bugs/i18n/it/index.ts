@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Un robot ha premuto tutti i pulsanti. Ha trovato otto falle.",
     description:
-      "Abbiamo costruito un framework di test end-to-end che guida le pagine reali in un browser reale - e coperto ogni endpoint rivolto al cliente. Ecco cosa ha preso.",
+      "Abbiamo creato un framework di test end-to-end che apre le pagine in un browser vero e copre tutti gli endpoint usati dai clienti. Ecco cosa abbiamo trovato.",
     category: "Ingegneria",
     imageAlt: "Test end-to-end guida {{appName}} in un vero browser",
     keywords:
@@ -16,10 +16,10 @@ export const translations: typeof enTranslations = {
     readTime: "7 min lettura",
     title: "Un robot ha premuto tutti i pulsanti. Ha trovato otto falle.",
     subtitle:
-      "Abbiamo smesso di testare i pezzi e abbiamo iniziato a testare le pagine. Browser reale, server reale, clic reali - su ogni endpoint un cliente può toccare.",
+      "Siamo passati dai singoli componenti alle pagine intere. Un browser vero, un server vero e clic veri su tutti gli endpoint accessibili ai clienti.",
   },
   intro: {
-    lead: "Il nostro codice ha superato i controlli, lint e test unitari. Ha ancora spedito dei bug. Non quelli esotici - un modulo di reset che ignorava la password di conferma, i link di fattura che non sono andati da nessuna parte, un feed che ha mostrato fili cancellati.",
+    lead: "Il codice aveva superato il controllo dei tipi, il lint e i test unitari, eppure sono passati dei bug. Un modulo ignorava la conferma della password, i link alle fatture non funzionavano e il feed mostrava thread cancellati.",
     p1: "Ognuno di loro viveva nel vuoto tra i pezzi. La funzione era a posto. La pagina intorno a esso non era. Così abbiamo costruito un quadro di prova che si preoccupa solo di una cosa: ciò che un cliente realmente vede e invia.",
   },
   why: {
@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
     api: {
       label: "Test API",
       title: "Controlla una richiesta",
-      body: "Fornisce le risposte del server. Non prova mai la pagina invia quella richiesta - o rende la risposta.",
+      body: "Fornisce le risposte del server. Non prova mai la pagina invia quella richiesta o rende la risposta.",
     },
     e2e: {
       label: "Fine-to-end",
@@ -45,14 +45,14 @@ export const translations: typeof enTranslations = {
   how: {
     title: "Come funziona l'imbracatura",
     intro:
-      "Playwright guidato da bun test, costruito sulla parte superiore delle definizioni endpoint di next-vibe. La definizione conosce già ogni campo - quindi il test non ha bisogno di farlo.",
+      "Playwright guidato da bun test, costruito sulla parte superiore delle definizioni endpoint di next-vibe. La definizione conosce già ogni campo: quindi il test non ha bisogno di farlo.",
     step1: {
       title: "Aprire la pagina reale",
-      body: "Il test apre la pagina del cliente - /user/login, /story/framework - non un test stub. Attende fino a quando React possiede il modulo prima di digitare.",
+      body: "Il test apre una pagina reale, come /user/login o /story/framework. Aspetta che React prenda il controllo del modulo prima di digitare.",
     },
     step2: {
       title: "Riempire con valori digitati",
-      body: "Si passano i valori, non i selettori. I driver di campo leggono la definizione e operano il visibile UI - tipo, scelgono un'opzione dalla sua etichetta, allegano un file.",
+      body: "Si passano i valori, non i selettori. I driver di campo leggono la definizione e operano il visibile UI: tipo, scelgono un'opzione dalla sua etichetta, allegano un file.",
     },
     step3: {
       title: "Catturare la chiamata via il filo",
@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
     },
     step4: {
       title: "Registrare una volta, rigiocare per sempre",
-      body: "Fornitori a pagamento - modelli AI, immagine, musica, video - sono registrati per test sul primo run e riprodotto dopo. Niente bollette a sorpresa, corse deterministiche.",
+      body: "Alla prima esecuzione di ogni test registriamo le chiamate ai provider a pagamento di modelli IA, immagini, musica e video. Poi riproduciamo le chiamate registrate. Niente costi a sorpresa e risultati ripetibili.",
     },
     step5: {
       title: "Copertura dei report",
@@ -115,12 +115,12 @@ export const translations: typeof enTranslations = {
   broken: {
     title: "E le cose che sono state appena rotte",
     intro:
-      "Non pericoloso - solo tranquillamente fallendo per le persone reali:",
+      "Questi bug passavano inosservati e creavano problemi agli utenti:",
     items: {
       attachments:
         "Gli URL degli allegati di chat e i rapporti di errore del client sono stati resi 404.",
       permissions:
-        "I permessi di radice non sono mai stati recuperati - i clienti non potevano inviare in Shared.",
+        "I permessi di radice non sono mai stati recuperati: i clienti non potevano inviare in Shared.",
       embed: "Il widget di Mount incorporato era morto.",
       invoices: "I link email di fatturazione sono tornati 404.",
       models: "La pagina dei modelli era inutilizzabile.",

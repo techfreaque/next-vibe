@@ -2,17 +2,17 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Construire avec next-vibe - {{appName}}",
+    title: "Construire avec next-vibe : {{appName}}",
     category: "Développeurs",
     description:
       "next-vibe transforme chaque endpoint en formulaire web, commande CLI, outil MCP, écran natif et compétence appelable par une IA, tout à la fois. Automatisez tout ce qu'un humain peut faire sur un ordinateur.",
     imageAlt: "next-vibe, la plateforme pour développeurs de {{appName}}",
     keywords:
       "next-vibe, automatisation IA, plateforme développeurs, automatisation d'entreprise, intégration ERP, automatisation de production, {{appName}}",
-    ogTitle: "Construire avec next-vibe - {{appName}}",
+    ogTitle: "Construire avec next-vibe : {{appName}}",
     ogDescription:
       "Une seule base de code. Toutes les surfaces. Automatisez des lignes de production, des ERP, des workflows de bureau : tout ce qu'un humain peut faire sur un ordinateur.",
-    twitterTitle: "Construire avec next-vibe - {{appName}}",
+    twitterTitle: "Construire avec next-vibe : {{appName}}",
     twitterDescription:
       "Une seule base de code. Toutes les surfaces. Automatisez des lignes de production, des ERP, des workflows de bureau : tout ce qu'un humain peut faire sur un ordinateur.",
   },

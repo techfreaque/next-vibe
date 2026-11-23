@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Die unzensierten Modelle, eins nach dem anderen - {{appName}}",
+    title: "Die unzensierten Modelle, eins nach dem anderen: {{appName}}",
     description:
       "Jedes unzensierte KI-Modell auf unbottled.ai, Modell für Modell. Zwei Sorten: Mainstream-Modelle ohne Verweigerungen und UncensoredLM, trainiert mit verbannten Büchern und Dokumenten. Was jedes gut kann und wo es schwächelt.",
     category: "Modell-Guide",

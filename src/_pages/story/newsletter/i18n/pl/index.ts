@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Newsletter {{appName}}",
     title: "Jeden mail w miesiącu. Tylko konkrety.",
     description:
-      "Nowe modele, nowe funkcje, prompty, które działają - co miesiąc.",
+      "Nowe modele, nowe funkcje, prompty, które działają: co miesiąc.",
     subtitle: "Nowe modele, nowe funkcje, prompty, które działają.",
     heroDescription:
       "Nowe modele w dniu premiery, funkcje warte uwagi, ustawienia, które dają wyniki. Raz w miesiącu. Wypis jednym kliknięciem.",
@@ -34,7 +34,7 @@ export const translations: typeof enTranslations = {
       benefit1: {
         title: "Nowe modele jako pierwszy",
         description:
-          "Każdy nowy model - w czym jest dobry, ile kosztuje, kiedy go wybrać.",
+          "Każdy nowy model: w czym jest dobry, ile kosztuje, kiedy go wybrać.",
       },
       benefit2: {
         title: "Wdrożone funkcje",
@@ -44,7 +44,7 @@ export const translations: typeof enTranslations = {
       benefit3: {
         title: "Prompty, które działają",
         description:
-          "Prawdziwe ustawienia i skille, które dają wyniki - kopiuj, dopasuj, działaj.",
+          "Prawdziwe ustawienia i skille, które dają wyniki: kopiuj, dopasuj, działaj.",
       },
       benefit4: {
         title: "Oferty dla subskrybentów",
@@ -54,7 +54,7 @@ export const translations: typeof enTranslations = {
     frequency: {
       title: "Co miesiąc. Tyle.",
       description:
-        "Jeden mail w miesiącu. Wypis w każdej chwili - jedno kliknięcie, bez pytań.",
+        "Jeden mail w miesiącu. Wypis w każdej chwili: jedno kliknięcie, bez pytań.",
     },
   },
   subscription: {

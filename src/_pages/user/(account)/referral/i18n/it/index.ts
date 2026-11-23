@@ -26,8 +26,8 @@ export const translations: typeof enTranslations = {
     heroSub: "Ripresa. Per sempre.",
     chainTitle: "10 iscritti. Quello che guadagni al mese.",
     chainSubtitle:
-      "Ogni livello è la metà di quello sopra. Costruito una volta all'iscrizione - paga per sempre.",
-    whoLabel0: "Lei - chiunque li abbia indirizzati direttamente",
+      "Ogni livello è la metà di quello sopra. Costruito una volta all'iscrizione: paga per sempre.",
+    whoLabel0: "Lei: chiunque li abbia indirizzati direttamente",
     whoLabel1: "Creatore di abilità (se diverso) o il vostro referrer",
     whoLabel2: "Il referrer del loro referrer",
     whoLabel3: "Livello 4",
@@ -41,7 +41,7 @@ export const translations: typeof enTranslations = {
   story: {
     title: "Come si mescola la catena",
     subtitle:
-      "Stessi 10 abbonati. Ogni livello che si attiva aggiunge al totale - per sempre.",
+      "Stessi 10 abbonati. Ogni livello che si attiva aggiunge al totale: per sempre.",
     totalLabel: "Totale / mo",
     addedLabel: "+ {{amount}} da questo livello",
     levelLabel: "Livello {{n}} attivo",
@@ -55,12 +55,12 @@ export const translations: typeof enTranslations = {
     noob: {
       label: "Iniziare",
       earning: "~ {{story_noob_earning}} /mo",
-      desc: "{{story_noob_users}} paga gli abbonati tramite il link di riferimento. {{directPct}} ciascuno - reddito passivo da un tweet o post del blog.",
+      desc: "{{story_noob_users}} paga gli abbonati tramite il link di riferimento. {{directPct}} ciascuno: reddito passivo da un tweet o post del blog.",
     },
     mid: {
       label: "Crescere il pubblico",
       earning: "~ {{story_mid_earning}} /mo",
-      desc: "Abbonati {{story_mid_users}} - mix di link di riferimento e abilità. Alcuni dei loro amici si sono anche iscritti. La catena si sta costruendo.",
+      desc: "Abbonati {{story_mid_users}}: mix di link di riferimento e abilità. Alcuni dei loro amici si sono anche iscritti. La catena si sta costruendo.",
     },
     pro: {
       label: "Creatore creatore",
@@ -78,13 +78,13 @@ export const translations: typeof enTranslations = {
     title: "Come funziona",
     step1Title: "Crea un codice invito",
     step1Body:
-      "Codici unici per il pubblico diverso - gli amici, Discord, un post sul blog. Ogni tracciato separatamente.",
+      "Codici unici per il pubblico diverso: gli amici, Discord, un post sul blog. Ogni tracciato separatamente.",
     step2Title: "Condividi il tuo link",
     step2Body:
       "link di riferimento → {{directPct}} per utente, per sempre. La tua abilità condivisa da altri → {{skillBonusPct}} per utente. Due fonti, zero lavoro extra.",
     step3Title: "Pagamento",
     step3Body:
-      "Guadagni sbloccare {{holdDays}} giorni dopo ogni pagamento - la finestra di rimborso. Quindi spenderli come crediti o ritirarsi a BTC / USDC da {{minPayout}}.",
+      "Guadagni sbloccare {{holdDays}} giorni dopo ogni pagamento: la finestra di rimborso. Quindi spenderli come crediti o ritirarsi a BTC / USDC da {{minPayout}}.",
   },
 
   manage: {
@@ -96,11 +96,11 @@ export const translations: typeof enTranslations = {
   cta: {
     title: "Creare un account per iniziare a guadagnare",
     description:
-      "Ottieni il tuo link di riferimento. {{directPct}} su ogni pagamento - ricorrente, nessuna scadenza. Pubblicare una abilità e guadagnare {{skillBonusPct}} quando gli altri lo condividono.",
+      "Ottieni il tuo link di riferimento. {{directPct}} su ogni pagamento: ricorrente, nessuna scadenza. Pubblicare una abilità e guadagnare {{skillBonusPct}} quando gli altri lo condividono.",
     signUp: "Crea account",
     logIn: "Accedi",
     pitch1:
-      "Commissione di rinvio {{directPct}} - ricorrente, nessuna scadenza",
+      "Commissione di rinvio {{directPct}}: ricorrente, nessuna scadenza",
     pitch2:
       "Pubblica un'abilità → {{skillBonusPct}} da ogni utente che gli altri portano",
     pitch3:
@@ -119,13 +119,13 @@ export const translations: typeof enTranslations = {
   },
   audienceCallout: {
     title: "Due modi per guadagnare",
-    newTitle: "Referral link - {{directPct}} per utente",
+    newTitle: "Referral link: {{directPct}} per utente",
     newBody:
       "Condividi il tuo codice. Chiunque si iscrivono e paga ti dà {{directPct}} di ogni pagamento, ogni mese, per sempre. Mandalo una volta. Guadagnati per sempre.",
     newCta: "Ottieni il tuo link di riferimento",
-    proTitle: "Creatore di abilità - {{skillBonusPct}} per utente",
+    proTitle: "Creatore di abilità: {{skillBonusPct}} per utente",
     proBody:
-      "Costruire una abilità. Condividi il suo link. Tutti coloro che si registrano attraverso il proprio link vi paga {{directPct}}, ricorrente. Il moltiplicatore: quando qualcun altro condivide la vostra abilità con il loro link, si guadagna ancora {{skillBonusPct}} come l'autore di abilità. La piattaforma traccia abilità autore - attribuzione passiva senza lavoro extra.",
+      "Costruire una abilità. Condividi il suo link. Tutti coloro che si registrano attraverso il proprio link vi paga {{directPct}}, ricorrente. Il moltiplicatore: quando qualcun altro condivide la vostra abilità con il loro link, si guadagna ancora {{skillBonusPct}} come l'autore di abilità. La piattaforma traccia abilità autore: attribuzione passiva senza lavoro extra.",
     proCta: "Costruire una abilità",
   },
   discord: {

@@ -3,7 +3,7 @@ export const translations = {
   page: {
     eyebrow: "The {{appName}} newsletter",
     title: "One email a month. Only what changed.",
-    description: "New models, new features, prompts that work - monthly.",
+    description: "New models, new features, prompts that work: monthly.",
     subtitle: "New models, new features, prompts that work.",
     heroDescription:
       "New models the day they land, features worth knowing, setups that actually get results. Once a month. Unsubscribe in one click.",
@@ -29,7 +29,7 @@ export const translations = {
       benefit1: {
         title: "New models, first",
         description:
-          "Every model we add - what it's good at, what it costs, when to pick it.",
+          "Every model we add: what it's good at, what it costs, when to pick it.",
       },
       benefit2: {
         title: "Features that shipped",
@@ -38,7 +38,7 @@ export const translations = {
       benefit3: {
         title: "Prompts that work",
         description:
-          "Real setups and skills that get results - copy them, tweak them, ship.",
+          "Real setups and skills that get results: copy them, tweak them, ship.",
       },
       benefit4: {
         title: "Subscriber-only offers",
@@ -48,7 +48,7 @@ export const translations = {
     frequency: {
       title: "Monthly. That's it.",
       description:
-        "One email per month. Unsubscribe any time - one click, no questions.",
+        "One email per month. Unsubscribe any time: one click, no questions.",
     },
   },
   subscription: {

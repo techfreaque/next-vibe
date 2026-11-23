@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Ich bin Affiliate-Marketer. Was ist bei KI-Abos anders?",
     description:
-      "Für erfahrene Affiliate-Marketer: Warum KI-Abo-Empfehlungen langfristig besser laufen als die meisten Programme - und wie Skill-Bonus plus Upline-Kette das Rechenmodell verändern.",
+      "Für erfahrene Affiliate-Marketer: Warum KI-Abo-Empfehlungen langfristig besser laufen als die meisten Programme und wie Skill-Bonus plus Upline-Kette das Rechenmodell verändern.",
     category: "Empfehlungsprogramm",
     imageAlt:
       "Ein Diagramm, das wiederkehrendes Umsatzwachstum über Zeit zeigt",
@@ -21,14 +21,14 @@ export const translations: typeof enTranslations = {
   },
   recurringMath: {
     title: "Die Rechnung mit wiederkehrenden Einnahmen",
-    p1: "Die meisten Affiliate-Programme zahlen einmalig. E-Commerce: ein Anteil pro Kauf. Software-Trial: Pauschale beim Upgrade. {{appName}} zahlt 10 % jeder Abo-Zahlung - jeden Monat, für immer. Das verändert die Mathematik grundlegend.",
+    p1: "Die meisten Affiliate-Programme zahlen einmalig. E-Commerce: ein Anteil pro Kauf. Software-Trial: Pauschale beim Upgrade. {{appName}} zahlt 10 % jeder Abo-Zahlung: jeden Monat, für immer. Das verändert die Mathematik grundlegend.",
     p2: "Basis ist der Starter-Tarif für {{planPrice}}/Monat. Bei {{directPct}} Direktprovision sind das {{planEarn}}/Monat pro Empfehlung. Aber hier ändert sich die Rechnung:",
     powerUserTitle: "Der Power-User-Multiplikator",
     powerUserBody:
       "Entwickler und KI-Vielnutzer fahren Agenten, die API sowie Bild- und Videogenerierung zusätzlich zum Plan und kaufen Credit-Pakete nach. Ein Power User mit {{powerSpend}}/Monat bringt dir {{powerEarn}}/Monat, wiederkehrend. So viel wie {{powerVsPlan}} Plan-Empfehlungen auf einmal.",
     floorTitle: "ARPU wächst mit der Plattform",
     floorBody:
-      "Jedes Mal, wenn {{appName}} neue Modelle, Features oder Modalitäten hinzufügt, geben bestehende Abonnenten mehr aus. Empfehlungen von vor sechs Monaten sind heute mehr wert als damals - ohne zusätzliche Arbeit deinerseits.",
+      "Jedes Mal, wenn {{appName}} neue Modelle, Features oder Modalitäten hinzufügt, geben bestehende Abonnenten mehr aus. Empfehlungen von vor sechs Monaten sind heute mehr wert als damals, ohne zusätzliche Arbeit deinerseits.",
     tableHeaderProfile: "Nutzerprofil",
     tableHeaderSpend: "Monatliche Ausgaben",
     tableHeaderYouEarn: "Du verdienst/Monat",
@@ -48,9 +48,9 @@ export const translations: typeof enTranslations = {
   structure: {
     title: "Die vollständige Provisionsstruktur",
     p1: "Direkte Empfehlung: 10 % jeder Zahlung von Leuten, die du direkt empfiehlst. Das gehört dir immer, für immer, unabhängig von allem anderen.",
-    p2: "Skill-Bonus: Meldet sich jemand über den Link eines anderen Mitglieds zu einem Skill an, den du veröffentlicht hast, verdienst du 5 % auf dessen Zahlungen - zusätzlich zu den 10 % für dieses Mitglied. Skills sind teilbare KI-Setups, die jeder erstellen und veröffentlichen kann. Entscheidend für Affiliate-Profis: Du verdienst die 5 % als Skill-Autor, auch wenn jemand anderes deinen Skill-Link teilt. Ein Nutzer entdeckt deinen Skill im Verzeichnis und schickt ihn weiter - du wirst trotzdem gutgeschrieben. Die Plattform trackt Skill-Autorenschaft, nicht wer den Link verteilt hat. Passive Attribution, die du nicht aktiv managen musst.",
-    p3: "Mehrstufige Kette: Ein zusätzlicher 10 %-Pool wird über bis zu 5 Ebenen deiner Empfehlungskette verteilt, mit geometrischem Abfall - jede Ebene verdient halb so viel wie die darüber. Empfehlungen deiner Empfehlungen bringen dir ~5 %, deren Empfehlungen ~2,5 % usw. Maximale Gesamtausschüttung über alle Empfänger: ~20 % einer einzelnen Zahlung.",
-    p4: "Ehrliche Einschätzung: Die Ketten-Boni werden schnell klein. Die 10 % direkt + 5 % Skill sind das eigentliche Einkommen. Bau keine Strategie auf mehrstufige Tiefe - bau auf qualitativ hochwertige direkte Empfehlungen und publizierbare Skills.",
+    p2: "Skill-Bonus: Meldet sich jemand über den Link eines anderen Mitglieds zu einem Skill an, den du veröffentlicht hast, verdienst du 5 % auf dessen Zahlungen, zusätzlich zu den 10 % für dieses Mitglied. Skills sind teilbare KI-Setups, die jeder erstellen und veröffentlichen kann. Entscheidend für Affiliate-Profis: Du verdienst die 5 % als Skill-Autor, auch wenn jemand anderes deinen Skill-Link teilt. Ein Nutzer entdeckt deinen Skill im Verzeichnis und schickt ihn weiter. Du wirst trotzdem gutgeschrieben. Die Plattform trackt Skill-Autorenschaft, nicht wer den Link verteilt hat. Passive Attribution, die du nicht aktiv managen musst.",
+    p3: "Mehrstufige Kette: Ein zusätzlicher 10 %-Pool wird über bis zu 5 Ebenen deiner Empfehlungskette verteilt, mit geometrischem Abfall, jede Ebene verdient halb so viel wie die darüber. Empfehlungen deiner Empfehlungen bringen dir ~5 %, deren Empfehlungen ~2,5 % usw. Maximale Gesamtausschüttung über alle Empfänger: ~20 % einer einzelnen Zahlung.",
+    p4: "Ehrliche Einschätzung: Die Ketten-Boni werden schnell klein. Die 10 % direkt + 5 % Skill sind das eigentliche Einkommen. Bau keine Strategie auf mehrstufige Tiefe: bau auf qualitativ hochwertige direkte Empfehlungen und publizierbare Skills.",
   },
   audience: {
     title: "Wer konvertiert auf dieser Plattform",
@@ -72,7 +72,7 @@ export const translations: typeof enTranslations = {
   promotion: {
     title: "Ansätze, die konvertieren",
     angle1Title:
-      '"Ich hab 10 KI-Tools verglichen - das eine, das ich behalten hab"',
+      "\"Ich hab 10 KI-Tools verglichen, das eine, das ich behalten hab\"",
     angle1Body:
       "Vergleichs-Content ist der beste Affiliate-Treiber in dieser Kategorie. Heb Modellvielfalt, Preisgestaltung und Free-Speech-Positionierung gegenüber Single-Model-Tools hervor.",
     angle2Title: "Entwickler-Communities",
@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       "r/selfhosted, Privacy-Foren, Mastodon. Der Open-Source-Codebase und die Self-Hosting-Option kommen hier gut an. Diese Nutzer hassen geschlossene Plattformen.",
     angle4Title: "Tutorial-Content mit dem Tool",
     angle4Body:
-      '"Wie du KI für X nutzt" mit {{appName}} als konkretem Tool. Coding-Assistent, Schreiben, Recherche - spezifische Anwendungsfälle konvertieren besser als generische KI-Reviews.',
+      "\"Wie du KI für X nutzt\" mit {{appName}} als konkretem Tool. Coding-Assistent, Schreiben, Recherche: spezifische Anwendungsfälle konvertieren besser als generische KI-Reviews.",
   },
   payouts: {
     title: "Auszahlungsdetails",
@@ -93,7 +93,7 @@ export const translations: typeof enTranslations = {
   },
   close: {
     title: "Lohnt sich als Ergänzung",
-    p1: "Nicht das bestbezahlte Programm, das du je laufen lassen wirst. Aber wiederkehrende Provisionen in einer schnell wachsenden Kategorie, mit einem Power-User-Segment, das bereits ordentlich ausgibt - das ist eine andere Asset-Klasse als einmalige Affiliate-Auszahlungen.",
+    p1: "Nicht das bestbezahlte Programm, das du je laufen lassen wirst. Aber wiederkehrende Provisionen in einer schnell wachsenden Kategorie, mit einem Power-User-Segment, das bereits ordentlich ausgibt, das ist eine andere Asset-Klasse als einmalige Affiliate-Auszahlungen.",
     p2: "Wenn sich deine Zielgruppe mit einem der obigen Segmente überschneidet, ist ein Code und ein Post die Investition wert.",
     createCode: "Empfehlungscode erstellen",
     joinDiscord: "Discord beitreten",

@@ -2,13 +2,13 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Sobre nosotros - {{appName}}",
+    title: "Sobre nosotros: {{appName}}",
     category: "Acerca de",
     description:
       "Aprender acerca de la misión de {{appName}} para proporcionar conversaciones AI sin censura",
     imageAlt: "Acerca de {{appName}}",
     keywords: "sobre {{appName}}, AI sin censura, Misión AI, Valores AI",
-    ogTitle: "Acerca de {{appName}} - Plataforma AI sin censura",
+    ogTitle: "Acerca de {{appName}}: Plataforma AI sin censura",
     ogDescription:
       "Descubra nuestra misión de democratización del acceso a AI sin censura",
     twitterTitle: "Acerca de {{appName}}",

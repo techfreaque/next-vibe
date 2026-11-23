@@ -107,22 +107,22 @@ export const translations = {
   },
   meta: {
     home: {
-      title: "{{appName}} - Uncensored AI Chat",
+      title: "{{appName}}: Uncensored AI Chat",
       category: "AI Chat Platform",
       description:
         "Experience truly uncensored AI conversations with {{modelCount}} models. No filters, no restrictions, just honest AI.",
-      imageAlt: "{{appName}} - Uncensored AI Chat Platform",
+      imageAlt: "{{appName}}: Uncensored AI Chat Platform",
       keywords:
         "uncensored AI, AI chat, GPT-4, Claude, Gemini, AI models, no filters, honest AI, AI conversations",
     },
     aboutUs: {
-      title: "About Us - {{appName}}",
+      title: "About Us: {{appName}}",
       category: "About",
       description:
         "Learn about {{appName}}'s mission to provide uncensored AI conversations",
       imageAlt: "About {{appName}}",
       keywords: "about {{appName}}, uncensored AI, AI mission, AI values",
-      ogTitle: "About {{appName}} - Uncensored AI Platform",
+      ogTitle: "About {{appName}}: Uncensored AI Platform",
       ogDescription:
         "Discover our mission to democratize access to uncensored AI",
       twitterTitle: "About {{appName}}",
@@ -130,7 +130,7 @@ export const translations = {
         "Learn about our mission for uncensored AI conversations",
     },
     privacyPolicy: {
-      title: "Privacy Policy - {{appName}}",
+      title: "Privacy Policy: {{appName}}",
       category: "Legal",
       description:
         "Learn how {{appName}} protects your privacy and handles your data",
@@ -139,7 +139,7 @@ export const translations = {
         "privacy policy, data protection, user privacy, {{appName}} privacy",
     },
     termsOfService: {
-      title: "Terms of Service - {{appName}}",
+      title: "Terms of Service: {{appName}}",
       category: "Legal",
       description: "Read the terms and conditions for using {{appName}}",
       imageAlt: "Terms of Service",
@@ -147,37 +147,37 @@ export const translations = {
         "terms of service, terms and conditions, user agreement, {{appName}} terms",
     },
     imprint: {
-      title: "Legal Notice - {{appName}}",
+      title: "Legal Notice: {{appName}}",
       category: "Legal",
       description: "Legal information and company details for {{appName}}",
       imageAlt: "Legal Notice",
       keywords: "imprint, legal notice, company information, {{appName}} legal",
     },
     careers: {
-      title: "Careers - {{appName}}",
+      title: "Careers: {{appName}}",
       category: "Careers",
       description: "Join our team and help build the future of uncensored AI",
       imageAlt: "Careers at {{appName}}",
       keywords: "careers, jobs, AI jobs, remote work, {{appName}} careers",
     },
     pricing: {
-      title: "Pricing - {{appName}}",
+      title: "Pricing: {{appName}}",
       category: "Pricing",
       description:
         "AI chat for every budget. Start free: credits every month, no card needed.",
       imageAlt: "Pricing Plans",
       keywords:
         "pricing, plans, subscription, AI chat pricing, {{appName}} pricing",
-      ogTitle: "Pricing Plans - {{appName}}",
+      ogTitle: "Pricing Plans: {{appName}}",
       ogDescription: "Simple, transparent pricing for uncensored AI chat",
-      twitterTitle: "Pricing - {{appName}}",
+      twitterTitle: "Pricing: {{appName}}",
       twitterDescription: "Start free. Credits every month, no card.",
     },
     billing: {
       category: "Billing",
     },
     notFound: {
-      title: "404 - Page Not Found",
+      title: "404: Page Not Found",
       category: "Error",
       description: "The page you're looking for doesn't exist",
       imageAlt: "404 Not Found",
@@ -201,13 +201,13 @@ export const translations = {
   },
   layout: {
     metadata: {
-      defaultTitle: "{{appName}} - Uncensored AI Chat",
+      defaultTitle: "{{appName}}: Uncensored AI Chat",
       category: "AI Chat Platform",
       description:
         "Experience truly uncensored AI conversations with {{modelCount}} models. No filters, no restrictions, just honest AI.",
     },
     openGraph: {
-      imageAlt: "{{appName}} - Uncensored AI Chat Platform",
+      imageAlt: "{{appName}}: Uncensored AI Chat Platform",
     },
     structuredData: {
       organization: {

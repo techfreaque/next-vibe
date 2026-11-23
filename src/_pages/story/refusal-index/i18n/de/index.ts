@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
     category: "Verweigerungs-Index",
     description:
       "Dieselben Fragen an jedes KI-Modell, jede Woche kommen neue dazu. Wir messen, wer antwortet, wer abschwächt und wer ablehnt, und legen die Methode offen. Offene Daten auf {{appName}}.",
-    imageAlt: "Verweigerungs-Index - Ablehnungsraten von KI-Modellen",
+    imageAlt: "Verweigerungs-Index: Ablehnungsraten von KI-Modellen",
     keywords:
       "{{appName}}, Verweigerungs-Index, KI Ablehnungsrate, unzensierte KI, KI-Zensur Benchmark, Modellvergleich",
   },

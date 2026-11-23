@@ -109,29 +109,29 @@ export const translations: typeof enTranslations = {
   },
   meta: {
     home: {
-      title: "{{appName}} - Niecenzurowany czat AI",
+      title: "{{appName}}: Niecenzurowany czat AI",
       category: "Platforma czatu AI",
       description:
         "Doświadcz prawdziwie niecenzurowanych rozmów z AI z ponad {{modelCount}} modelami. Bez filtrów, bez ograniczeń, tylko szczera AI.",
-      imageAlt: "{{appName}} - Niecenzurowana platforma czatu AI",
+      imageAlt: "{{appName}}: Niecenzurowana platforma czatu AI",
       keywords:
         "niecenzurowana AI, czat AI, GPT-4, Claude, Gemini, modele AI, bez filtrów, szczera AI, rozmowy z AI",
     },
     aboutUs: {
-      title: "O nas - {{appName}}",
+      title: "O nas: {{appName}}",
       category: "O nas",
       description:
         "Poznaj misję {{appName}} dostarczania niecenzurowanych rozmów z AI",
       imageAlt: "O {{appName}}",
       keywords: "o {{appName}}, niecenzurowana AI, misja AI, wartości AI",
-      ogTitle: "O {{appName}} - Niecenzurowana platforma AI",
+      ogTitle: "O {{appName}}: Niecenzurowana platforma AI",
       ogDescription:
         "Odkryj naszą misję demokratyzacji dostępu do niecenzurowanej AI",
       twitterTitle: "O {{appName}}",
       twitterDescription: "Poznaj naszą misję niecenzurowanych rozmów z AI",
     },
     privacyPolicy: {
-      title: "Polityka prywatności - {{appName}}",
+      title: "Polityka prywatności: {{appName}}",
       category: "Prawne",
       description:
         "Dowiedz się, jak {{appName}} chroni Twoją prywatność i obsługuje Twoje dane",
@@ -140,7 +140,7 @@ export const translations: typeof enTranslations = {
         "polityka prywatności, ochrona danych, prywatność użytkownika, {{appName}} prywatność",
     },
     termsOfService: {
-      title: "Warunki korzystania - {{appName}}",
+      title: "Warunki korzystania: {{appName}}",
       category: "Prawne",
       description: "Przeczytaj warunki korzystania z {{appName}}",
       imageAlt: "Warunki korzystania",
@@ -148,7 +148,7 @@ export const translations: typeof enTranslations = {
         "warunki korzystania, warunki, umowa użytkownika, {{appName}} warunki",
     },
     imprint: {
-      title: "Informacje prawne - {{appName}}",
+      title: "Informacje prawne: {{appName}}",
       category: "Prawne",
       description: "Informacje prawne i szczegóły firmy dla {{appName}}",
       imageAlt: "Informacje prawne",
@@ -156,7 +156,7 @@ export const translations: typeof enTranslations = {
         "imprint, informacje prawne, informacje o firmie, {{appName}} prawne",
     },
     careers: {
-      title: "Kariera - {{appName}}",
+      title: "Kariera: {{appName}}",
       category: "Kariera",
       description:
         "Dołącz do naszego zespołu i pomóż budować przyszłość niecenzurowanej AI",
@@ -164,23 +164,23 @@ export const translations: typeof enTranslations = {
       keywords: "kariera, praca, praca AI, praca zdalna, {{appName}} kariera",
     },
     pricing: {
-      title: "Cennik - {{appName}}",
+      title: "Cennik: {{appName}}",
       category: "Cennik",
       description:
         "Czat AI na każdą kieszeń. Zacznij za darmo: kredyty co miesiąc, bez karty.",
       imageAlt: "Plany cenowe",
       keywords:
         "cennik, plany, subskrypcja, cennik czatu AI, {{appName}} cennik",
-      ogTitle: "Plany cenowe - {{appName}}",
+      ogTitle: "Plany cenowe: {{appName}}",
       ogDescription: "Prosty, przejrzysty cennik dla niecenzurowanego czatu AI",
-      twitterTitle: "Cennik - {{appName}}",
+      twitterTitle: "Cennik: {{appName}}",
       twitterDescription: "Zacznij za darmo. Kredyty co miesiąc, bez karty.",
     },
     billing: {
       category: "Rozliczenia",
     },
     notFound: {
-      title: "404 - Strona nie znaleziona",
+      title: "404: Strona nie znaleziona",
       category: "Błąd",
       description: "Strona, której szukasz, nie istnieje",
       imageAlt: "404 Nie znaleziono",
@@ -204,13 +204,13 @@ export const translations: typeof enTranslations = {
   },
   layout: {
     metadata: {
-      defaultTitle: "{{appName}} - Niecenzurowany czat AI",
+      defaultTitle: "{{appName}}: Niecenzurowany czat AI",
       category: "Platforma czatu AI",
       description:
         "Doświadcz prawdziwie niecenzurowanych rozmów z AI z ponad {{modelCount}} modelami. Bez filtrów, bez ograniczeń, tylko szczera AI.",
     },
     openGraph: {
-      imageAlt: "{{appName}} - Niecenzurowana platforma czatu AI",
+      imageAlt: "{{appName}}: Niecenzurowana platforma czatu AI",
     },
     structuredData: {
       organization: {

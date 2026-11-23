@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   title: "API-Schlüssel",
-  metaTitle: "API-Schlüssel - {{appName}}",
+  metaTitle: "API-Schlüssel: {{appName}}",
   description:
     "Ein Schlüssel, {{modelCount}} Modelle. OpenAI- und Anthropic-Format, abgerechnet über deine Credits.",
   unauthenticated: {

@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   title: "Cortex",
   backToChat: "Torna a Chat",
   description:
-    "La memoria persistente del tuo AI. File, documenti, thread, competenze - sfogliare, modificare, eliminare.",
+    "La memoria persistente del tuo AI. File, documenti, thread, competenze: sfogliare, modificare, eliminare.",
   openFullPage: "Aprire la pagina completa",
   signIn: {
     title: "Il tuo AI ricorda. Una volta che ti conosce.",

@@ -5,7 +5,7 @@ export const translations = {
   },
   meta: {
     passwordReset: {
-      title: "Reset Password - {{appName}}",
+      title: "Reset Password: {{appName}}",
       description: "Reset your {{appName}} account password",
       category: "Authentication",
       imageAlt: "Password Reset",

@@ -3,7 +3,7 @@ export const translations = {
     category: "AI Models",
     index: {
       title:
-        "{{count}} AI chat models - prices, context, filters | {{appName}}",
+        "{{count}} AI chat models: prices, context, filters | {{appName}}",
       description:
         "Every model on {{appName}} in one list: Claude, GPT, Gemini, Grok, DeepSeek, open and uncensored chat, plus image, voice, music and video. Real price per use, context window, inputs. Pick one, start now.",
       imageAlt: "AI model directory on {{appName}}",
@@ -109,8 +109,8 @@ export const translations = {
     outputs: "Output modalities",
     providers: "Served via",
     tools: "Tool use",
-    toolsYes: "Yes - search, memory, code and more",
-    toolsNo: "No - plain chat",
+    toolsYes: "Yes: search, memory, code and more",
+    toolsNo: "No: plain chat",
     status: "Status",
     statusCurrent: "Current",
     statusLegacy: "Legacy",

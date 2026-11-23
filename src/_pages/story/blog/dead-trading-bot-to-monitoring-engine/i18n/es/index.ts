@@ -5,9 +5,9 @@ export const translations: typeof enTranslations = {
     title:
       "Mi bot de trading abandonado se convirtió en un sistema de monitoreo | next-vibe",
     description:
-      "Abandoné un bot hace años. Luego me di cuenta de su arquitectura - DataSource, Indicador, Evaluador, Acción - se aplica a cualquier negocio. Así que lo reconstruí dentro de next-vibe. Cada nodo es un punto final.",
+      "Abandoné un bot de trading hace años. Después vi que su arquitectura (DataSource, indicador, evaluador y acción) servía para cualquier negocio. Así que lo reconstruí en next-vibe. Cada nodo es un endpoint.",
     category: "Vibe Sense",
-    imageAlt: "Vibe Sense monitoring pipeline - next-vibe",
+    imageAlt: "Flujo de monitorización de Vibe Sense en next-vibe",
     keywords:
       "vibe sense, monitoring, trading bot, endpoints, EMA, pipeline, next-vibe, TypeScript",
     ogTitle:
@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Vibe Sense",
     title: "Así monitorea la plataforma su propio estado.",
     subtitle:
-      "Abandoné un bot hace años. Su arquitectura se convirtió en la parte más interesante de next-vibe. Cada nodo en el gráfico es un punto final - llamada desde el CLI, descubierta por AI, conectado a su plataforma.",
+      "Abandoné un bot de trading hace años. Su arquitectura acabó siendo la parte más interesante de next-vibe. Cada nodo del grafo es un endpoint que puedes llamar desde la CLI, que la IA puede descubrir y que se integra en tu plataforma.",
     readTime: "14 min leer",
   },
   origin: {
@@ -57,7 +57,7 @@ export const translations: typeof enTranslations = {
   insight: {
     title: "Cada negocio es una serie de tiempo",
     intro:
-      "En un bot comercial, las piezas son simples. Una fuente de datos: datos de precios, volumen, lo que esté leyendo. Un indicador: promedio móvil, RSI, MACD - toma datos brutos, produce una señal derivada. Un evaluador: es el MA rápido sobre el MA lento? Confección booleana. Una acción: cuando el evaluador dispara, haz algo.",
+      "En un bot comercial, las piezas son simples. Una fuente de datos: datos de precios, volumen, lo que esté leyendo. Un indicador: promedio móvil, RSI, MACD, toma datos brutos, produce una señal derivada. Un evaluador: es el MA rápido sobre el MA lento? Confección booleana. Una acción: cuando el evaluador dispara, haz algo.",
     realization:
       "Esa estructura no describe el comercio. Describe cualquier proceso de negocio donde usted tiene datos a lo largo del tiempo, condiciones que le importan, y acciones que desea tomar cuando esas condiciones se cumplen.",
     examples: {
@@ -79,7 +79,7 @@ export const translations: typeof enTranslations = {
       revenueAnomaly: {
         label: "anomalías de ingresos",
         description:
-          "Tasa de reembolso aumenta por encima del 20% en un día - Thea se notifica antes de verlo en un panel.",
+          "Tasa de reembolso aumenta por encima del 20% en un día: Thea se notifica antes de verlo en un panel.",
       },
     },
   },
@@ -95,12 +95,12 @@ export const translations: typeof enTranslations = {
     indicator: {
       label: "Indicator",
       description:
-        "Un punto final de computación pura y reutilizable - EMA, RSI, MACD, Bandas Bollinger, pinza, delta, promedio de ventana. No SQL. No hay conocimiento de dominio. Llámalo en cualquier fuente de datos.",
+        "Un endpoint reutilizable de cálculo puro: EMA, RSI, MACD, bandas de Bollinger, recorte a un rango, delta y media móvil. Sin SQL ni conocimientos del negocio. Úsalo con cualquier fuente de datos.",
     },
     evaluator: {
       label: "Evaluator",
       description:
-        "Un umbral o una condición. Toma una serie y pregunta. ¿Este valor es inferior a 0,7? ¿Este ratio superó el 20%? Dicta una señal - disparada o no disparada.",
+        "Un umbral o una condición. Toma una serie y pregunta. ¿Este valor es inferior a 0,7? ¿Este ratio superó el 20%? Dicta una señal: disparada o no disparada.",
     },
     action: {
       label: "Action",
@@ -140,7 +140,7 @@ export const translations: typeof enTranslations = {
       alert: {
         label: "Alerta",
         description:
-          "Llame a la prueba completa - Thea lo recoge de inmediato.",
+          "Llame a la prueba completa: Thea lo recoge de inmediato.",
       },
       campaign: {
         label: "Campaña",
@@ -205,7 +205,7 @@ export const translations: typeof enTranslations = {
     column3: {
       label: "Columna 3: Evaluadores",
       description:
-        "Condiciones de transmisión. Cada salida de una señal - disparada o no disparada.",
+        "Condiciones de transmisión. Cada salida de una señal: disparada o no disparada.",
       nodes: {
         leadDrop: {
           name: "eval_lead_drop",
@@ -238,7 +238,7 @@ export const translations: typeof enTranslations = {
     indicators: {
       label: "Indicadores de análisis/indicadores/",
       description:
-        "Computación pura - EMA, RSI, MACD, Bandas de Bollinger, abrazadera, delta, promedio de ventana. No hay conocimiento de dominio. Llámalos a cualquier fuente de datos.",
+        "Computación pura: EMA, RSI, MACD, Bandas de Bollinger, abrazadera, delta, promedio de ventana. No hay conocimiento de dominio. Llámalos a cualquier fuente de datos.",
     },
     registration:
       "Al iniciarse, el registro de indicadores autodescubre ambos. Data source endpoints register as node definitions. Los puntos finales del indicador se registran como definiciones de nodos. Usted agrega un nuevo dominio, usted añade fuentes de datos/puntos finales, usted exporta graphSeeds. Aparecen.",
@@ -251,7 +251,7 @@ export const translations: typeof enTranslations = {
     versioning: {
       label: "Versión",
       description:
-        "Los Gráficos están versionados. Cuando editas un gráfico, creas una nueva versión - nunca mutas la activa. La nueva versión es un borrador. Usted lo promueve explícitamente. La vuelta es trivial.",
+        "Los Gráficos están versionados. Cuando editas un gráfico, creas una nueva versión. Nunca mutas la activa. La nueva versión es un borrador. Usted lo promueve explícitamente. La vuelta es trivial.",
     },
     backtest: {
       label: "Backtest",
@@ -273,7 +273,7 @@ export const translations: typeof enTranslations = {
       never: {
         label: "never",
         description:
-          "Siempre recomputado en vivo de entradas. Productos EMA, ratios - sin coste de almacenamiento. Lookback auto-extended para el calentamiento.",
+          "Siempre recomputado en vivo de entradas. Productos EMA, ratios, sin coste de almacenamiento. Lookback auto-extended para el calentamiento.",
       },
     },
   },
@@ -288,10 +288,10 @@ export const translations: typeof enTranslations = {
           "Ejecución topológica a través del caminante gráfico. Soporte multi-resolución con escala automática/down. Ampliación de gama de Lookback-aware.",
         versioning:
           "Versión, modo de retroceso con historia de ejecución completa, persistencia de señal como ruta de auditoría.",
-        cli: "Acceso CLI - vibe vibe-sense-ema, vibe vibe-sense-rsi, cualquier punto final de indicador, independiente.",
-        mcp: "Registro MCP - puntos finales indicador aparecen en la lista de herramientas. Thea puede llamar a los indicadores directamente.",
+        cli: "Acceso desde la CLI: ejecuta vibe vibe-sense-ema, vibe vibe-sense-rsi o cualquier otro endpoint de indicadores por separado.",
+        mcp: "Registro MCP: puntos finales indicador aparecen en la lista de herramientas. Thea puede llamar a los indicadores directamente.",
         seeds:
-          "Gráficos de semillas: 29 gráficos en 9 dominios - contactos, créditos, usuarios, suscripciones, referencias, boletines, pagos, mensajero, chat AI y salud del sistema. Todo se acaba de la caja en vibe dev.",
+          "Gráficos de semillas: 29 gráficos en 9 dominios, contactos, créditos, usuarios, suscripciones, referencias, boletines, pagos, mensajero, chat AI y salud del sistema. Todo se acaba de la caja en vibe dev.",
       },
     },
     coming: {
@@ -309,7 +309,7 @@ export const translations: typeof enTranslations = {
   vision: {
     title: "¿Qué es esto?",
     paragraph1:
-      "Cada proceso de negocio que se puede describir como: dados estos datos, cuando se cumplen estas condiciones, haga esto - es un gráfico Vibe Sense. Monitoreo, sí. Alertando, sí. Pero también: calificación de contacto automatizada, detección de anomalías de ingresos, equilibrio de la economía crediticia, automatización de marketing.",
+      "Cada proceso de negocio que se puede describir como: dados estos datos, cuando se cumplen estas condiciones, haga esto, es un gráfico Vibe Sense. Monitoreo, sí. Alertando, sí. Pero también: calificación de contacto automatizada, detección de anomalías de ingresos, equilibrio de la economía crediticia, automatización de marketing.",
     paragraph2:
       "El bot comercial tenía esta arquitectura derecha. Indicadores, evaluadores, acciones, modo de prueba. Lo que me equivoqué fue construirlo en aislamiento. En Octane, EMA estaba encerrado dentro del oleoducto. En next-vibe, EMA es un punto final de primera clase.",
     keyLine:

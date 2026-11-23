@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
     description:
       "Il vostro AI locale e il vostro cloud AI ora eseguire i filetti l'uno per l'altro in entrambe le direzioni. Nessuna chiave API sull'istanza che gira? Il chiamante riprende l'anello e lo termina.",
     category: "Hermes & Thea",
-    imageAlt: "Hermes e Thea - due istanze next-vibe collegate",
+    imageAlt: "Hermes e Thea: due istanze next-vibe collegate",
     keywords:
       "Hermes, Thea, next-vibe, thread remoti, AI auto-hosted, websocket inversa, API key fallback, {{appName}}",
   },
@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
     readTime: "6 minuti di lettura",
     title: "Due IA. Una conversazione. In entrambe le direzioni.",
     subtitle:
-      "Hermes funziona sulla tua macchina. Thea viene eseguito su un server. Ora uno può consegnare un filo all'altro - e una chiave API mancante non uccide più il turno.",
+      "Hermes gira sul tuo computer, Thea su un server. Ora possono passarsi le conversazioni in entrambe le direzioni. E una chiave API mancante non interrompe più la risposta.",
   },
   intro: {
     p1: "next-vibe gira sul portatile, su un VPS o su entrambi. Collega due istanze e lavorano insieme. Le nostre si chiamano Hermes e Thea.",
@@ -36,12 +36,12 @@ export const translations: typeof enTranslations = {
       title: "Thea",
       body: "Funziona su un server. Sempre online, raggiungibile da qualsiasi luogo. Orologi la piattaforma e delegati lavorano.",
     },
-    note: "Ogni istanza possiede i propri dati e compiti. Il collegamento relays eventi tra loro - niente di più, niente di meno.",
+    note: "Ogni istanza possiede i propri dati e compiti. Il collegamento relays eventi tra loro: niente di più, niente di meno.",
   },
   twoWay: {
     title: "I fili ora attraversano entrambe le direzioni",
     intro:
-      "La cartella remota e i filetti privati vengono eseguiti sull'altra istanza - da Thea a Hermes e da Hermes a Thea.",
+      "La cartella remota e i filetti privati vengono eseguiti sull'altra istanza: da Thea a Hermes e da Hermes a Thea.",
     p1: "Metta un thread in una cartella remota e l'istanza dall'altra parte esegue il giro completo AI: modello, prompt del sistema, strumenti. Continua a scrivere dove sei. La conversazione ti rispecchia.",
     stepsTitle: "Un giro, fine alla fine",
     step1Title: "Tu scrivi",
@@ -61,7 +61,7 @@ export const translations: typeof enTranslations = {
     title: "Nessuna chiave API? Il giro finisce ancora.",
     intro:
       "L'istanza che gestisce un turno ha bisogno della chiave API del fornitore di modello. Non tutti i casi ne hanno uno.",
-    p1: "Prima che un'istanza prenda il sopravvento, controlla la chiave del fornitore sul suo nodo. Mancato? Non riesce veloce con un marcatore chiaro - non appende, e non scrive metà del filo.",
+    p1: "Prima che un'istanza prenda il sopravvento, controlla la chiave del fornitore sul suo nodo. Mancato? Non riesce veloce con un marcatore chiaro: non appende, e non scrive metà del filo.",
     p2: "Il lato di chiamata riconosce il marcatore, riavvolge la sua libreria relè e corre il loop stesso. Il prompt e gli strumenti del telecomando sono ancora applicabili; lo strumento richiama il giro di andata indietro sulla connessione.",
     calloutTitle:
       "La modalità Inference-provider non ha bisogno di alcuna chiave.",
@@ -85,7 +85,7 @@ export const translations: typeof enTranslations = {
     reconnect:
       "Il connettore si ricollega con backoff esponenziale da 1 a 30 secondi e rilegge la connessione su ogni riprovazione. Questo rilascio indurisce quel percorso.",
     fixesTitle: "Anche in questo rilascio",
-    fix1: "Avvertenza di carico: una cornice indirizzata a un contatto questa istanza non sa più è calata con un avvertimento invece di silenziosamente - ri-autentico la connessione lo fissa.",
+    fix1: "Avvertenza di carico: una cornice indirizzata a un contatto questa istanza non sa più è calata con un avvertimento invece di silenziosamente, ri-autentico la connessione lo fissa.",
     fix2: "I timestamp del database in UTC, Postgres e PGlite in pool, così le righe predefinite vengono ordinate correttamente attraverso le istanze.",
     fix3: "Lo scrittore di flusso semi il filetto id, così i coetanei non cadono più eventi con un filetto vuoto id.",
     fix4: "Revival gira sincronizzazione con il peer, quindi i risultati dello strumento riempiti al posto raggiungono lo specchio.",

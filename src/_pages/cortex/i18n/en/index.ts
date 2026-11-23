@@ -2,7 +2,7 @@ export const translations = {
   title: "Cortex",
   backToChat: "Back to Chat",
   description:
-    "Your AI's persistent memory. Files, documents, threads, skills - browse, edit, delete.",
+    "Browse, edit, or delete your AI’s persistent files, documents, threads, and skills.",
   openFullPage: "Open full page",
   signIn: {
     title: "Your AI remembers. Once it knows you.",

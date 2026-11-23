@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
   description:
     "Fertige Spezialisten und Charaktere. Jeder Skill bringt eigene Anweisungen, ein eigenes Modell und eigene Tools mit. Einen wählen und loschatten oder selbst einen bauen.",
   meta: {
-    title: "KI-Skills - fertige Spezialisten und Charaktere | {{appName}}",
+    title: "KI-Skills: fertige Spezialisten und Charaktere | {{appName}}",
     description:
       "Coder, Autoren, Rechercheure, Begleiter und unzensierte Charaktere. Jeder Skill bringt eigenen Prompt, eigenes Modell und eigene Tools mit. Auswählen und loschatten oder eigenen Skill bauen und an jeder Nutzung verdienen.",
     category: "KI-Skills",

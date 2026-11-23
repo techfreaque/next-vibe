@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Un solo codice per 13 piattaforme.",
     category: "Architettura",
     description:
-      "Come il principio di superficie unificata trasforma tre file in un'app web, il comando CLI, lo strumento MCP, lo schermo nativo e il lavoro di cron - automaticamente.",
+      "Come il principio di superficie unificata trasforma tre file in un'app web, il comando CLI, lo strumento MCP, lo schermo nativo e il lavoro di cron automaticamente.",
     imageAlt: "Architettura di superficie unificata next-vibe",
     keywords:
       "next-vibe, superficie unificata, modello endpoint, MCP, CLI, TypeScript, SaaS framework, full-stack",
@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Il principio di superficie unificato",
     title: "Un solo codice per 13 piattaforme.",
     subtitle:
-      "Come tre file diventano un modulo web, comando CLI, strumento MCP, schermo nativo e lavoro automatizzato - contemporaneamente.",
+      "Come tre file diventano un modulo web, comando CLI, strumento MCP, schermo nativo e lavoro automatizzato contemporaneamente.",
     fileBarLabel: "definition.ts → web · cli · mcp · nativo · cron · 10 più",
     theaCardTitle: "Chi è Thea?",
     fileTreePath: "~/src/explain-to-my-boss/",
@@ -31,9 +31,9 @@ export const translations: typeof enTranslations = {
   intro: {
     hook: "5,802 file TypeScript. ~2,1 milioni di linee. Zero `any`. Errori di tipo runtime zero. Uno schema. Ripeto 374 volte.",
     para1:
-      "Questa è la base di codice dietro {{appName}} - e la struttura che la alimenta, next-vibe. La stessa architettura gestisce un'app web, un'app mobile, un CLI, un'interfaccia agente AI, un server MCP, un sistema di cron, un bus di eventi websocket e un motore live dataflow.",
+      "Questa è la base di codice dietro {{appName}} e la struttura che la alimenta, next-vibe. La stessa architettura gestisce un'app web, un'app mobile, un CLI, un'interfaccia agente AI, un server MCP, un sistema di cron, un bus di eventi websocket e un motore live dataflow.",
     para2:
-      "Il modello è chiamato superficie unificata. Ecco cos'è, come funziona, e perché - una volta che lo vedi - troverai difficile tornare indietro.",
+      "Il principio si chiama Unified Surface. Una volta visto come funziona, sarà difficile tornare indietro.",
   },
 
   fileTreeSection: {
@@ -63,7 +63,7 @@ export const translations: typeof enTranslations = {
       },
       reactUi: {
         label: "Reagisci UI",
-        description: "Auto-generato dalla definizione - no JSX scritto",
+        description: "Auto-generato dalla definizione: no JSX scritto",
       },
       cli: {
         label: "CLI",
@@ -112,7 +112,7 @@ export const translations: typeof enTranslations = {
       vibeBoard: {
         label: "Nodo Vibe Sense",
         description:
-          "Nodo in un grafico del flusso di dati dal vivo - stesso endpoint",
+          "Nodo in un grafico del flusso di dati dal vivo: stesso endpoint",
       },
     },
   },
@@ -123,7 +123,7 @@ export const translations: typeof enTranslations = {
   platformMarkersSection: {
     title: "L'accesso alla piattaforma è un array enum",
     para1:
-      "Non si scrivono strati di autorizzazione separati per ogni piattaforma. L'accesso alla piattaforma è dichiarato nella definizione stessa - un array enum che ogni piattaforma legge in nativo a runtime.",
+      "Non si scrivono strati di autorizzazione separati per ogni piattaforma. L'accesso alla piattaforma è dichiarato nella definizione stessa: un array enum che ogni piattaforma legge in nativo a runtime.",
     codeComment: "// Questo singolo array controlla dove appare la funzione",
     cliOff: "  CLI_OFF, // blocca lo CLI",
     mcpVisible: "  MCP_VISIBLE, // opta per l'elenco degli strumenti MCP",
@@ -141,16 +141,16 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Invece di spiegare il modello in modo astratto, lasciate che vi mostri come sembra in pratica.",
     theaIntro:
-      "Thea è l'amministratore AI per questa piattaforma. Esegue la produzione 24 ore su 24, 7 giorni su 7, operando attraverso gli stessi contratti di endpoint di ogni utente - stessa validazione, le stesse autorizzazioni, senza backdoor. E può delegare il lavoro a una macchina locale.",
+      "Thea è l'amministratore AI per questa piattaforma. Esegue la produzione 24 ore su 24, 7 giorni su 7, operando attraverso gli stessi contratti di endpoint di ogni utente: stessa validazione, le stesse autorizzazioni, senza backdoor. E può delegare il lavoro a una macchina locale.",
     demoStory:
-      "Ho chiesto a Thea di costruire un nuovo endpoint - spiega-to-my-boss - utilizzando Claude Code in esecuzione sul mio PC. Gli dia una decisione tecnica. Ti dà una giustificazione non tecnica che il tuo manager crederà davvero. Ogni sviluppatore ha bisogno di questo.",
+      "Ho chiesto a Thea di costruire un nuovo endpoint (spiega-to-my-boss) utilizzando Claude Code in esecuzione sul mio PC. Gli dia una decisione tecnica. Ti dà una giustificazione non tecnica che il tuo manager crederà davvero. Ogni sviluppatore ha bisogno di questo.",
 
     flow: {
       step1: {
         actor: "Tu sei",
         label: "Chiedi a Thea",
         description:
-          "Digitare l'attività nella chat - due campi di input, una risposta AI -generata, tutte le piattaforme, MCP_VISIBLE, React personalizzato e widget CLI.",
+          "Digitare l'attività nella chat: due campi di input, una risposta AI -generata, tutte le piattaforme, MCP_VISIBLE, React personalizzato e widget CLI.",
       },
       step2: {
         actor: "Thea",
@@ -194,25 +194,25 @@ export const translations: typeof enTranslations = {
     proofPara:
       "Una volta che Claude Code chiamato full-task, esistevano tre cose che non avevano cinque minuti prima:",
     proof1:
-      "Un widget React personalizzato - intestazione drammatica, gradiente animato sull'output AI, un punteggio di allineamento aziendale falso.",
+      "Un widget React personalizzato: intestazione drammatica, gradiente animato sull'output AI, un punteggio di allineamento aziendale falso.",
     proof2:
-      "Un widget CLI - banner ASCII, spinner mentre lo AI pensa, la linea stampata di giustificazione per riga in verde.",
+      "Un widget CLI: banner ASCII, spinner mentre lo AI pensa, la linea stampata di giustificazione per riga in verde.",
     proof3:
-      "Uno strumento MCP - spiega-to-my- boss_POST - perché MCP_VISIBLE era nella definizione. Claude Desktop ora può spiegare le vostre decisioni al vostro capo per conto vostro.",
+      "Uno strumento MCP (spiega-to-my- boss_POST) perché MCP_VISIBLE era nella definizione. Claude Desktop ora può spiegare le vostre decisioni al vostro capo per conto vostro.",
     proofClosing:
       "Una definizione. Cinque file totali. Tre UI completamente diversi. Il contratto di endpoint non e' cambiato. Solo lo strato di presentazione.",
   },
 
   underTheHoodSection: {
     title: "Sotto il cofano",
-    definitionTitle: "definition.ts - il contratto di vita",
+    definitionTitle: "definition.ts: il contratto di vita",
     definitionPara:
-      "La definizione non è un generatore di codice. E' un contratto vivente che ogni piattaforma legge in nativo a runtime. Cambialo - tutti gli aggiornamenti. Eliminare la cartella - nulla si rompe a valle. Non c'e' nessun codice generato da pulire.",
-    repositoryTitle: "repository.ts - nessun lancio, mai",
+      "La definizione non è un generatore di codice. E' un contratto vivente che ogni piattaforma legge in nativo a runtime. Cambialo: tutti gli aggiornamenti. Eliminare la cartella: nulla si rompe a valle. Non c'e' nessun codice generato da pulire.",
+    repositoryTitle: "repository.ts: nessun lancio, mai",
     repositoryPara:
-      "Le funzioni di repository non vengono mai lanciate. Errori si propagano come dati - digitati, espliciti e catturabili dal chiamante. Lo AI può ragionare sui percorsi di fallimento. Nessuna eccezione di sorpresa.",
+      "Le funzioni del repository restituiscono gli errori come dati tipizzati ed espliciti. Chi le chiama può gestirli e l’IA può ragionare sui casi di errore. Niente eccezioni a sorpresa.",
     repositoryCodeComment: "// Restituisce ResponseType <T> - non getta mai",
-    routeTitle: "route.ts - l'intero ponte",
+    routeTitle: "route.ts: l'intero ponte",
     routePara:
       "route.ts cablaggi la definizione al gestore. endpointsHandler si occupa di validazione, auth, registrazione e esposizione a tutte le 13 piattaforme. La vera logica aziendale è una linea.",
     statsTitle: "I numeri",
@@ -222,7 +222,7 @@ export const translations: typeof enTranslations = {
     statAnyDetail: "Costretto a tempo di costruzione, non convenzione",
     statLanguages: "Tre lingue",
     statLanguagesDetail:
-      'Compile-time check - t("typo.here") è un errore compilatore',
+      "Compile-time check: t(\"typo.here\") è un errore compilatore",
     statsClosing:
       "Non e' una convention. E' fatto rispettare al momento della costruzione.",
   },
@@ -233,7 +233,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Avanti.",
     title: "Vibe Sense: La pipeline è la piattaforma",
     description:
-      "Ogni nodo in un grafico Vibe Sense è un endpoint next-vibe regolare. Lo stesso createEndpoint (). La stessa struttura a 3 file. Un indicatore EMA è un punto finale. Un evaluatore di soglia è un punto finale. E perché è un endpoint - puoi chiamarlo dallo CLI, dallo AI, da qualsiasi luogo.",
+      "Ogni nodo in un grafico Vibe Sense è un endpoint next-vibe regolare. Lo stesso createEndpoint (). La stessa struttura a 3 file. Un indicatore EMA è un punto finale. Un evaluatore di soglia è un punto finale. E perché è un endpoint: puoi chiamarlo dallo CLI, dallo AI, da qualsiasi luogo.",
     calloutLine: "La pipeline è la piattaforma.",
     teaser:
       "Vibe Sense è solo... più endpoint. La stessa cosa, applicata ai dati delle serie temporali. Imbuti di contatto. Economia di credito. Crescita dell'utente. La tua piattaforma si guarda da sola.",
@@ -242,7 +242,7 @@ export const translations: typeof enTranslations = {
 
   closing: {
     title: "Definiscilo una volta. Esiste ovunque.",
-    para: "WordPress ha dato a tutti il potere di pubblicare. next-vibe ti dà la potenza di costruire piattaforme che lavorano su web, mobile, CLI, agenti AI e l'automazione - che guardano se stessi, la ragione circa i propri dati, e agire su ciò che trovano.",
+    para: "WordPress ha dato a tutti la possibilità di pubblicare. Con next-vibe puoi costruire piattaforme per web, mobile, CLI, agenti IA e automazione. Si monitorano da sole, ragionano sui propri dati e agiscono in base a ciò che trovano.",
     cta: "Star next-vibe su GitHub",
     frameworkCta: "Esplorare next-vibe",
   },

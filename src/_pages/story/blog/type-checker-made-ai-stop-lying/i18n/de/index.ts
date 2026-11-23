@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Wie mein Type-Checker die KI vom Lügen abgehalten hat - next-vibe",
+    title: "Wie mein Type-Checker die KI vom Lügen abgehalten hat: next-vibe",
     description:
       "KI nutzt `any`, um Typfehlern auszuweichen. Sie fügt eslint-disable hinzu. Sie lügt dich an. So haben wir die Feedbackschleife mit @next-vibe/checker repariert.",
     category: "TypeScript",
@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
   problem: {
     title: "Die kaputte Feedbackschleife",
     description:
-      'Bitte Claude Code, ein Feature hinzuzufügen. Macht es. ESLint laufen lassen - besteht. TypeScript laufen lassen - Fehler. Bitte Claude Code, den TypeScript-Fehler zu fixen. Macht es. ESLint nochmal - schlägt jetzt fehl. Hin und her. Drei Iterationen. Die KI ist bei jedem Schritt überzeugt. Jedes Mal: "Ist gefixt."',
+      "Bitte Claude Code, ein Feature hinzuzufügen. Macht es. ESLint laufen lassen: besteht. TypeScript laufen lassen: Fehler. Bitte Claude Code, den TypeScript-Fehler zu fixen. Macht es. ESLint nochmal: schlägt jetzt fehl. Hin und her. Drei Iterationen. Die KI ist bei jedem Schritt überzeugt. Jedes Mal: \"Ist gefixt.\"",
     fixLabel: "War es nie.",
     fixDescription:
       "Es war Whack-a-Mole mit einem Tool, das immer nur einen Linter gleichzeitig ausführt und nie das Gesamtbild sieht.",
@@ -39,7 +39,7 @@ export const translations: typeof enTranslations = {
       "TypeScripts Typsystem ist ein Graph. Jeder Typ fließt von der Definition zur Nutzung. Wenn eine Funktion `string` zurückgibt, weiß der Aufrufer, dass es ein String ist. Die gesamte Kette wird geprüft.",
     holeInGraph: "`any` ist ein Loch in diesem Graph.",
     holeDescription:
-      "Eine als `any` typisierte Variable sagt dem Compiler: Hör hier auf zu prüfen. Nicht nur für diese Variable - für alles, was sie berührt. Der Fehler taucht nicht beim `any` auf. Er taucht drei Dateien weiter auf, wenn ein zusammenhangsloses Refactoring eine Annahme bricht, die nie durchgesetzt wurde.",
+      "Eine als `any` typisierte Variable sagt dem Compiler: Hör hier auf zu prüfen. Nicht nur für diese Variable: für alles, was sie berührt. Der Fehler taucht nicht beim `any` auf. Er taucht drei Dateien weiter auf, wenn ein zusammenhangsloses Refactoring eine Annahme bricht, die nie durchgesetzt wurde.",
     zeroErrors:
       "Null TypeScript-Fehler heißt gar nichts, wenn du 47 ungeprüfte `any`-Stellen hast.",
     doubleAssertion:
@@ -64,11 +64,11 @@ export const translations: typeof enTranslations = {
     eslintDescription:
       "Das, was Oxlint noch nicht kann: React Hooks Lint, React Compiler-Regeln, Import-Sortierung.",
     tsDescription:
-      "Vollständige Typprüfung. Nicht nur die Datei, die du gerade bearbeitest - den gesamten Graph.",
+      "Vollständige Typprüfung. Nicht nur die Datei, die du gerade bearbeitest: den gesamten Graph.",
     timingNote:
-      "Bei dieser Codebase - 4.400 Dateien - dauert das vollständige TypeScript etwa 12 Sekunden. Oxlint unter einer Sekunde. ESLint ein paar Sekunden. Parallel sind es insgesamt 12.",
+      "Bei dieser Codebase (4.400 Dateien) dauert das vollständige TypeScript etwa 12 Sekunden. Oxlint unter einer Sekunde. ESLint ein paar Sekunden. Parallel sind es insgesamt 12.",
     mcpNote:
-      "Es gibt außerdem einen `vibe-check mcp`-Befehl, der einen MCP-Server mit einem `check`-Tool startet. Die KI führt keinen Shell-Befehl aus - sie ruft ein Tool auf, das strukturierte Fehlerdaten zurückgibt. Paginierung eingebaut. Filterung nach Pfad.",
+      "Es gibt außerdem einen `vibe-check mcp`-Befehl, der einen MCP-Server mit einem `check`-Tool startet. Die KI führt keinen Shell-Befehl aus. Sie ruft ein Tool auf, das strukturierte Fehlerdaten zurückgibt. Paginierung eingebaut. Filterung nach Pfad.",
     parallel: "parallel",
     unifiedErrors: "Einheitliche Fehlerliste",
     unifiedErrorsDescription: "Eine Ausgabe. Fixen, bis es sauber ist.",
@@ -92,7 +92,7 @@ export const translations: typeof enTranslations = {
       "\"Ersetze 'unknown' durch eine vorhandene typisierte Schnittstelle. Richte dich an den Codebase-Typen aus, statt zu konvertieren oder neu zu erstellen.\" Das stoppt Claude Code daran, generische Typ-Fluchtwege zu schreiben.",
     objectBanTitle: "Nackter `object`-Typ",
     objectBanDescription:
-      "`object` ist fast immer falsch. Entweder kennst du die Form - dann schreib das Interface - oder du meinst `Record<string, SomeType>`. Rohes `object` ist ein Zeichen dafür, dass die KI aufgegeben hat.",
+      "`object` ist fast immer falsch. Entweder kennst du die Form. Dann schreib das Interface oder du meinst `Record<string, SomeType>`. Rohes `object` ist ein Zeichen dafür, dass die KI aufgegeben hat.",
     bannedPatternsTitle: "Verbotene Muster",
     bannedLabel: "VERBOTEN",
     correctLabel: "KORREKT",
@@ -101,15 +101,15 @@ export const translations: typeof enTranslations = {
     title: "Live-Demo: Das 3-Runden-Muster",
     subtitle:
       "Schau zu, wie Claude Code dreimal gegen den Checker anrennt, bevor es den richtigen Typ findet",
-    round1Title: "Runde 1 - KI schreibt `any`",
+    round1Title: "Runde 1: KI schreibt `any`",
     round1Description:
-      'Frag Claude Code: "Schreib eine Hilfsfunktion, die ein rohes API-Antwortobjekt nimmt und das Datenfeld extrahiert. Die Antwort kann verschiedene Formen haben - nimm einfach irgendeinen Typ, der funktioniert."',
+      "Frag Claude Code: \"Schreib eine Hilfsfunktion, die ein rohes API-Antwortobjekt nimmt und das Datenfeld extrahiert. Die Antwort kann verschiedene Formen haben. Nimm einfach irgendeinen Typ, der funktioniert.\"",
     round1Result: "Claude Code schreibt die einfache Lösung:",
-    round2Title: "Runde 2 - KI versucht `unknown`",
+    round2Title: "Runde 2: KI versucht `unknown`",
     round2Description:
       "Schau, was es als Nächstes macht. Das ist der entscheidende Teil. Es versucht den nächsten Fluchtweg:",
     round2Result: "Den Trick kennt der Checker.",
-    round3Title: "Runde 3 - KI findet den echten Typ",
+    round3Title: "Runde 3: KI findet den echten Typ",
     round3Description:
       "Jetzt macht Claude Code das, was es gleich hätte tun sollen. Es schaut nach, wie vorhandene API-Antworten in dieser Codebase typisiert sind. Es findet `ResponseType<T>`.",
     round3Result:
@@ -119,7 +119,7 @@ export const translations: typeof enTranslations = {
   },
   endpoint: {
     title: "Die Endpoint-Verbindung",
-    subtitle: "Ein Zod-Schema - vier nachgelagerte Verbraucher",
+    subtitle: "Ein Zod-Schema: vier nachgelagerte Verbraucher",
     description:
       "Jeder Endpoint hat eine Definitionsdatei. Diese Datei enthält ein Zod-Schema für die Anfrage und eines für die Antwort.",
     schemaBecomes:
@@ -146,7 +146,7 @@ export const translations: typeof enTranslations = {
     title: "@next-vibe/checker installieren",
     subtitle: "Funktioniert mit jedem TypeScript-Projekt. Nicht nur next-vibe.",
     installDescription:
-      "Der Checker ist als eigenständiges npm-Paket verfügbar. Er funktioniert mit jedem TypeScript-Projekt - nicht nur NextVibe. Du brauchst keinen anderen Teil des Frameworks.",
+      "Der Checker ist als eigenständiges npm-Paket verfügbar. Er funktioniert mit jedem TypeScript-Projekt: nicht nur NextVibe. Du brauchst keinen anderen Teil des Frameworks.",
     thenRun: "Dann ausführen:",
     mcpTitle: "MCP-Integration",
     mcpDescription:

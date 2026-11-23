@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "{{appName}} selbst hosten - Deine Instanz, Deine Regeln",
+    title: "{{appName}} selbst hosten: Deine Instanz, Deine Regeln",
     description:
       "Der komplette {{appName}}-Stack auf deinem eigenen Rechner. Vier Befehle, danach ein Einrichtungsassistent im Browser. Mit deinem {{appName}}-Konto oder eigenen Schlüsseln.",
     category: "Self-Host",

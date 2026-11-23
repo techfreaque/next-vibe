@@ -4,7 +4,7 @@ export const translations = {
     subtitle:
       "How {{appName}} and next-vibe got built. The architecture decisions, the dead ends, the things that turned out to matter.",
     meta: {
-      title: "Build Log - next-vibe & {{appName}}",
+      title: "Build Log: next-vibe & {{appName}}",
       description:
         "Engineering deep dives into the decisions behind next-vibe and {{appName}}. Unified surfaces, TypeScript enforcement, Vibe Sense, and the story of building both.",
       category: "Blog",
@@ -189,21 +189,21 @@ export const translations = {
       title: "Two AIs. One conversation. Both directions.",
       category: "Hermes & Thea",
       excerpt:
-        "Hermes on your machine, Thea on a server - now either one can hand a thread to the other. And a missing API key no longer kills the turn.",
+        "Hermes runs on your machine, Thea on a server. Either can now hand a thread to the other, and a missing API key no longer kills the turn.",
       readTime: "6 min read",
     },
     codingAgent: {
       title: "Your AI opens a terminal and hands the job to Claude Code.",
       category: "Coding Agent",
       excerpt:
-        "The coding-agent tool delegates real code changes to Claude Code or OpenCode - headless, or live in a real terminal window that reports back when it's done. Now across instances.",
+        "The coding-agent tool delegates real code changes to Claude Code or OpenCode. Run it headless or follow the work in a live terminal that reports back when it’s done. Now across instances.",
       readTime: "5 min read",
     },
     e2eTests: {
       title: "A robot clicked every button. It found eight security holes.",
       category: "Engineering",
       excerpt:
-        "We stopped testing pieces and started testing pages. A real browser on every customer-facing endpoint - and the open redirect, SSRF and data leaks it caught.",
+        "We stopped testing pieces and started testing pages. We ran a real browser through every customer-facing endpoint and caught an open redirect, SSRF, and data leaks.",
       readTime: "7 min read",
     },
     whatsNewMay2026: {
@@ -224,7 +224,7 @@ export const translations = {
       title: "One codebase. 13 platforms. Zero compromises.",
       category: "Architecture",
       excerpt:
-        "One endpoint definition. Web form, CLI command, MCP tool, native screen, cron job - simultaneously. Here's how it works.",
+        "One endpoint definition gives you a web form, CLI command, MCP tool, native screen, and cron job all at once. Here’s how it works.",
       readTime: "12 min read",
     },
     typeChecker: {
@@ -245,7 +245,7 @@ export const translations = {
       title: "One endpoint. Every surface.",
       category: "Architecture",
       excerpt:
-        "Write one definition.ts per feature. It renders as a web form, CLI command, MCP tool, native screen, cron job - simultaneously.",
+        "Write one definition.ts per feature and get a web form, CLI command, MCP tool, native screen, and cron job all at once.",
       readTime: "5 min read",
     },
     referralBeginners: {
@@ -268,7 +268,7 @@ export const translations = {
       title: "You built something with AI. Now earn from sharing it.",
       category: "Referrals",
       excerpt:
-        "Your referral link is a revenue stream you haven't turned on yet. Blog posts, READMEs, tutorials - the math for technical audiences.",
+        "Your referral link can earn you money. Here’s how the numbers work when you share it in blog posts, READMEs, and tutorials.",
       readTime: "5 min read",
     },
     skillSharingEconomy: {
@@ -282,7 +282,7 @@ export const translations = {
       title: "10% direct. +5% when others share your skill. Recurring forever.",
       category: "Referrals",
       excerpt:
-        "The full mechanics of the referral and skills earn program - chain breakdown, exact percentages per level, payout options, and how the skill bonus stacks.",
+        "How referrals and skills earn you money: what each level of the chain pays, how to cash out, and how the skill bonus stacks.",
       readTime: "4 min read",
     },
   },

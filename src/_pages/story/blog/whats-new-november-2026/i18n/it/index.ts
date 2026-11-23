@@ -2,11 +2,11 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Cosa c'è di nuovo: sei mesi in una pagina - {{appName}}",
+    title: "Cosa c'è di nuovo: sei mesi in una pagina ({{appName}})",
     description:
       "Fermati significa fermarti. La voce funziona su iPhone. Il tuo AI scorre attraverso le tue macchine. L'auto-hosting non ha bisogno di Docker. E un robot di prova ha chiuso otto buchi di sicurezza. Tutto da maggio.",
     category: "Aggiornamento del prodotto",
-    imageAlt: "{{appName}} - Novembre 2026 aggiornamento prodotto",
+    imageAlt: "{{appName}}: aggiornamento di novembre 2026",
     keywords:
       "{{appName}}, aggiornamento prodotto, Hermes, Thea, PGlite, self-host, discorso al testo, test E2E, sicurezza",
   },
@@ -21,7 +21,7 @@ export const translations: typeof enTranslations = {
   },
   intro: {
     lead: "Il nostro ultimo aggiornamento è stato a maggio. Da allora abbiamo strappato la base di codice fino alle borchie, l'abbiamo ricostruita più lusinghiera, e abbiamo trascorso mesi a fissare ciò che le persone reali hanno colpito in produzione.",
-    p1: "Nessun elenco fluff di 200 punti. Ecco ciò che ti sentirai in realtà - raggruppato da dove lo senti.",
+    p1: "Lasciamo da parte gli elenchi da 200 voci. Ecco i cambiamenti che noterai, divisi per area.",
   },
   chat: {
     title: "Chatta che obbedisce",
@@ -29,7 +29,7 @@ export const translations: typeof enTranslations = {
       "Le piccole cose che hanno fatto chiacchierare si sentono lenti o testardi.",
     stop: {
       title: "Stop significa stop",
-      body: "Colpire stop e tokens smettere di apparire in quel momento - non aspettare che il server si abbatte. Stop ora raggiunge anche chat incognito e log-out, dove usava fare nulla.",
+      body: "Colpire stop e tokens smettere di apparire in quel momento: non aspettare che il server si abbatte. Stop ora raggiunge anche chat incognito e log-out, dove usava fare nulla.",
     },
     input: {
       title: "Input misura per il tuo modello",
@@ -37,11 +37,11 @@ export const translations: typeof enTranslations = {
     },
     reasoning: {
       title: "I modelli tengono il loro treno di pensiero",
-      body: "I blocchi di ragionamento vengono rimandati al modello sul turno successivo invece di essere spogliati - così i modelli di pensiero si basano su quello che hanno già funzionato.",
+      body: "I blocchi di ragionamento vengono rimandati al modello sul turno successivo invece di essere spogliati. Così i modelli di pensiero si basano su quello che hanno già funzionato.",
     },
     queue: {
       title: "Digitare mentre funziona",
-      body: "Invia messaggi mentre AI è mid-answer - si in coda in ordine. Lo strumento lungo funziona compatto il loro contesto mid-stream invece di colpire la parete.",
+      body: "Invia messaggi mentre AI è mid-answer: si in coda in ordine. Lo strumento lungo funziona compatto il loro contesto mid-stream invece di colpire la parete.",
     },
   },
   voice: {
@@ -71,12 +71,12 @@ export const translations: typeof enTranslations = {
     },
     coding: {
       title: "Un agente di codifica è possibile guardare",
-      body: "Thea può avviare un agente di codifica interattivo sulla tua macchina - una vera finestra della console che puoi vedere - tracciato come un'attività, con il risultato riportato indietro.",
+      body: "Thea può avviare un agente di codifica interattivo sulla tua macchina: una vera finestra della console che puoi vedere: tracciato come un'attività, con il risultato riportato indietro.",
       link: "Incontra l'agente di codifica",
     },
     tools: {
       title: "Strumenti più nitidi",
-      body: "Migliore automazione del browser con l'emulazione del dispositivo, strumenti desktop su Windows e strumenti SSH per ogni cliente - non solo amministratori.",
+      body: "Migliore automazione del browser con l'emulazione del dispositivo, strumenti desktop su Windows e strumenti SSH per ogni cliente: non solo amministratori.",
     },
   },
   selfHost: {
@@ -93,7 +93,7 @@ export const translations: typeof enTranslations = {
     },
     native: {
       title: "Nessun compilatore richiesto",
-      body: "Password hashing si è spostato in binari precostruiti - node-gyp, senza strumenti di costruzione. Stesso algoritmo, hashes esistenti ancora valida.",
+      body: "Password hashing si è spostato in binari precostruiti: node-gyp, senza strumenti di costruzione. Stesso algoritmo, hashes esistenti ancora valida.",
     },
     revive: {
       title: "Torna da solo",
@@ -102,7 +102,7 @@ export const translations: typeof enTranslations = {
   },
   security: {
     title: "Sicuro per impostazione predefinita",
-    intro: "Lavoro di sicurezza che non vedrai mai - che è il punto.",
+    intro: "I miglioramenti alla sicurezza fanno il loro lavoro in silenzio.",
     e2e: {
       title: "Un robot testa ogni pagina",
       body: "60 end-to-end suite ora guidare le pagine reali in un browser reale. Hanno trovato e abbiamo chiuso otto buchi di sicurezza, da un redirect aperto a file privati memorizzati pubblicamente.",
@@ -120,7 +120,7 @@ export const translations: typeof enTranslations = {
   cta: {
     title: "Guardalo da solo.",
     subtitle:
-      "Ogni cambiamento sopra è live su {{appName}} oggi - e nel codice open-source se si esegue il proprio.",
+      "Ogni cambiamento sopra è live su {{appName}} oggi e nel codice open-source se si esegue il proprio.",
     chat: "Iniziare a chattare",
     selfHost: "Te lo garantisco.",
   },

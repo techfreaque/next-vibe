@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
       "Impossible de charger l'identité du navigateur. Veuillez actualiser la page.",
   },
   meta: {
-    title: "Inscription - {{appName}}",
+    title: "Inscription : {{appName}}",
     description:
       "Créez votre compte {{appName}} et commencez à construire des applications remarquables",
     category: "Authentification",

@@ -43,7 +43,7 @@ export const translations: typeof enTranslations = {
     auth: "Auth trabaja dos maneras, en cada punto final. Authorization: Bearer sk-unb-... para clientes OpenAI y para Claude Code con ANTHROPIC_AUTH_TOKEN. x-api-key: sk-unb-... para los SDKs Anthropic. Las claves comienzan con sk-unb-, se muestran una vez y se almacenan sólo como un hash. Creelas bajo Configuración > Claves de API, hasta 20 teclas activas por cuenta.",
     baseUrlLabel: "Base URL",
     baseUrlNote:
-      "Para OpenAI SDKs y OpenAI - herramientas de estilo. El lugar es parte del camino. Sólo establece el lenguaje de los mensajes de error, y cualquier local soportado trabaja, pero tiene que estar allí.",
+      "Para OpenAI SDKs y OpenAI: herramientas de estilo. El lugar es parte del camino. Sólo establece el lenguaje de los mensajes de error, y cualquier local soportado trabaja, pero tiene que estar allí.",
     anthropicBaseUrlLabel: "Anthropic base URL",
     anthropicBaseUrlNote:
       "Para los SDKs Anthropic y Claude Code. Mismo URL sin /v1: ellos anexan /v1/messages ellos mismos.",

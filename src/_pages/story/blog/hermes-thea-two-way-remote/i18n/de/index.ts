@@ -2,11 +2,11 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Hermes und Thea: Remote-Threads in beide Richtungen - {{appName}}",
+    title: "Hermes und Thea: Remote-Threads in beide Richtungen ({{appName}})",
     description:
-      "Deine lokale KI und deine Cloud-KI führen jetzt Threads füreinander aus - in beide Richtungen. Fehlt der Instanz, die den Turn übernimmt, der API-Key, holt sich der Aufrufer die Schleife zurück und bringt sie zu Ende.",
+      "Deine lokale KI und deine Cloud-KI führen jetzt Threads füreinander aus: in beide Richtungen. Fehlt der Instanz, die den Turn übernimmt, der API-Key, holt sich der Aufrufer die Schleife zurück und bringt sie zu Ende.",
     category: "Hermes & Thea",
-    imageAlt: "Hermes und Thea - zwei verbundene next-vibe-Instanzen",
+    imageAlt: "Hermes und Thea: zwei verbundene next-vibe-Instanzen",
     keywords:
       "Hermes, Thea, next-vibe, Remote-Threads, selbst gehostete KI, Reverse-WebSocket, API-Key-Fallback, {{appName}}",
   },
@@ -16,7 +16,7 @@ export const translations: typeof enTranslations = {
     readTime: "6 Min. Lesezeit",
     title: "Zwei KIs. Ein Gespräch. Beide Richtungen.",
     subtitle:
-      "Hermes läuft auf deinem Rechner. Thea läuft auf einem Server. Jetzt kann jede der beiden einen Thread an die andere übergeben - und ein fehlender API-Key bremst keinen Turn mehr aus.",
+      "Hermes läuft auf deinem Rechner. Thea läuft auf einem Server. Jetzt kann jede der beiden einen Thread an die andere übergeben und ein fehlender API-Key bremst keinen Turn mehr aus.",
   },
   intro: {
     p1: "next-vibe läuft überall: auf dem Laptop, auf einem VPS, auf beidem gleichzeitig. Verbinde zwei Instanzen, und sie werden zu einem System. Unsere heißen Hermes und Thea.",
@@ -35,19 +35,19 @@ export const translations: typeof enTranslations = {
       title: "Thea",
       body: "Läuft auf einem Server. Immer online, von überall erreichbar. Überwacht die Plattform und delegiert Arbeit.",
     },
-    note: "Jede Instanz verwaltet ihre eigenen Daten und Tasks. Die Verbindung leitet Events weiter - nicht mehr und nicht weniger.",
+    note: "Jede Instanz verwaltet ihre eigenen Daten und Tasks. Die Verbindung leitet Events weiter: nicht mehr und nicht weniger.",
   },
   twoWay: {
     title: "Threads wechseln jetzt in beide Richtungen",
     intro:
-      "Remote-Ordner und private Threads laufen auf der jeweils anderen Instanz - von Thea zu Hermes und von Hermes zu Thea.",
+      "Remote-Ordner und private Threads laufen auf der jeweils anderen Instanz: von Thea zu Hermes und von Hermes zu Thea.",
     p1: "Leg einen Thread in einen Remote-Ordner, und die Instanz auf der anderen Seite übernimmt den kompletten KI-Turn: Modell, Systemprompt, Tools. Du schreibst weiter, wo du bist. Das Gespräch wird zu dir zurückgespiegelt.",
     stepsTitle: "Ein Turn, von Anfang bis Ende",
     step1Title: "Du schreibst",
     step1Body: "Eine Nachricht in einem Remote-Thread auf Hermes.",
     step2Title: "Die Verbindung leitet sie weiter",
     step2Body:
-      "Über einen dauerhaften WebSocket - oder per direktem HTTP-Aufruf, wenn die Gegenseite öffentlich erreichbar ist.",
+      "Über einen dauerhaften WebSocket oder per direktem HTTP-Aufruf, wenn die Gegenseite öffentlich erreichbar ist.",
     step3Title: "Thea führt die Schleife aus",
     step3Body: "Mit ihrem Modell, ihrem Prompt, ihren Tools.",
     step4Title: "Tools laufen dort, wo sie zu Hause sind",
@@ -61,7 +61,7 @@ export const translations: typeof enTranslations = {
     title: "Kein API-Key? Der Turn läuft trotzdem durch.",
     intro:
       "Die Instanz, die einen Turn ausführt, braucht den API-Key des Modellanbieters. Nicht jede Instanz hat einen.",
-    p1: "Bevor eine Instanz einen Turn übernimmt, prüft sie den Provider-Key auf ihrem eigenen Knoten. Fehlt er, bricht sie sofort mit einer eindeutigen Markierung ab - kein Hängen, kein halb geschriebener Thread.",
+    p1: "Bevor eine Instanz einen Turn übernimmt, prüft sie den Provider-Key auf ihrem eigenen Knoten. Fehlt er, bricht sie sofort mit einer eindeutigen Markierung ab: kein Hängen, kein halb geschriebener Thread.",
     p2: "Die aufrufende Seite erkennt die Markierung, macht ihre Relay-Buchführung rückgängig und führt die Schleife selbst aus. Prompt und Tools der Gegenseite gelten weiter; Tool-Aufrufe laufen über die Verbindung hin und zurück.",
     calloutTitle: "Der Inference-Provider-Modus braucht überhaupt keinen Key.",
     calloutBody:
@@ -85,8 +85,8 @@ export const translations: typeof enTranslations = {
     reconnect:
       "Der Connector verbindet sich mit exponentiellem Backoff von 1 bis 30 Sekunden neu und liest die Verbindung bei jedem Versuch frisch ein. Dieses Release härtet genau diesen Pfad.",
     fixesTitle: "Außerdem in diesem Release",
-    fix1: "Warnung bei veraltetem Lead: Ein Frame an einen Lead, den diese Instanz nicht mehr kennt, wird mit Warnung verworfen statt stillschweigend - eine erneute Authentifizierung der Verbindung behebt es.",
-    fix2: "Datenbank-Zeitstempel in UTC, für Postgres-Pool und PGlite gleichermaßen - damit Zeilen mit Standard-Zeitstempel instanzübergreifend richtig sortiert werden.",
+    fix1: "Warnung bei veraltetem Lead: Ein Frame an einen Lead, den diese Instanz nicht mehr kennt, wird mit Warnung verworfen statt stillschweigend, eine erneute Authentifizierung der Verbindung behebt es.",
+    fix2: "Datenbank-Zeitstempel in UTC, für Postgres-Pool und PGlite gleichermaßen, damit Zeilen mit Standard-Zeitstempel instanzübergreifend richtig sortiert werden.",
     fix3: "Der Stream-Writer setzt die Thread-ID von Anfang an, sodass Gegenstellen keine Events mit leerer Thread-ID mehr verwerfen.",
     fix4: "Revival-Turns synchronisieren mit der Gegenseite, damit nachträglich eingefügte Tool-Ergebnisse auch im Spiegel ankommen.",
     codeCaption: "Die Markierung, die ein Empfänger ohne Key zurückschickt:",

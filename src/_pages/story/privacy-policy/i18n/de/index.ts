@@ -2,17 +2,17 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Datenschutzrichtlinie - {{appName}}",
+    title: "Datenschutzrichtlinie: {{appName}}",
     category: "Rechtliches",
     description:
       "Erfahren Sie, wie {{appName}} Ihre Privatsphäre schützt und mit Ihren Daten umgeht",
     imageAlt: "Datenschutzrichtlinie",
     keywords:
       "Datenschutzrichtlinie, Datenschutz, Benutzerdatenschutz, {{appName}} Datenschutz",
-    ogTitle: "Datenschutzrichtlinie - {{appName}}",
+    ogTitle: "Datenschutzrichtlinie: {{appName}}",
     ogDescription:
       "Erfahren Sie, wie {{appName}} Ihre Privatsphäre schützt und mit Ihren Daten umgeht",
-    twitterTitle: "Datenschutzrichtlinie - {{appName}}",
+    twitterTitle: "Datenschutzrichtlinie: {{appName}}",
     twitterDescription:
       "Erfahren Sie, wie {{appName}} Ihre Privatsphäre schützt und mit Ihren Daten umgeht",
   },

@@ -345,7 +345,7 @@ export const translations: typeof enTranslations = {
     costFree: "Gratuit",
     costCredits: "{{count}} crédit/msg",
     costCreditsPlural: "{{count}} crédits/msg",
-    tooltip: "{{provider}} - {{name}} ({{cost}})",
+    tooltip: "{{provider}}: {{name}} ({{cost}})",
     // New hybrid mode translations
     whatDoYouNeed: "De quoi avez-vous besoin ?",
     tuneIt: "Ajuster",

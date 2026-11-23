@@ -78,7 +78,7 @@ export const translations: typeof enTranslations = {
       pitch:
         "Du texte à l'image, ou la retouche d'une référence. Photoréaliste, anime, art : tout ce que vous décrivez.",
       title: "Créer une image",
-      metaTitle: "Générateur d'images IA sans censure - {{appName}}",
+      metaTitle: "Générateur d'images IA sans censure : {{appName}}",
       description: "Décrivez une scène et choisissez votre cadrage.",
       keywords: "générateur d'images IA sans censure, art IA, texte vers image",
     },
@@ -88,7 +88,7 @@ export const translations: typeof enTranslations = {
       pitch:
         "Un texte ou une première image devient un clip. Vous choisissez durée, format et résolution.",
       title: "Créer une vidéo",
-      metaTitle: "Générateur de vidéos IA - {{appName}}",
+      metaTitle: "Générateur de vidéos IA : {{appName}}",
       description: "Animez votre scène, de la première à la dernière image.",
       keywords: "générateur de vidéos IA, texte vers vidéo, image vers vidéo",
     },
@@ -98,7 +98,7 @@ export const translations: typeof enTranslations = {
       pitch:
         "Un morceau complet à partir d'un prompt : ambiance, genre, instruments, durée.",
       title: "Composer un morceau",
-      metaTitle: "Générateur de musique IA - {{appName}}",
+      metaTitle: "Générateur de musique IA : {{appName}}",
       description:
         "Choisissez l’ambiance, les instruments et la durée de votre morceau.",
       keywords: "générateur de musique IA, texte vers musique, chanson IA",
@@ -109,7 +109,7 @@ export const translations: typeof enTranslations = {
       pitch:
         "Votre texte lu par des voix naturelles, dans de nombreuses langues.",
       title: "Donner voix à un texte",
-      metaTitle: "Synthèse vocale IA - {{appName}}",
+      metaTitle: "Synthèse vocale IA : {{appName}}",
       description: "Choisissez la voix qui lira votre texte à haute voix.",
       keywords: "synthèse vocale, voix IA, TTS",
     },
@@ -119,7 +119,7 @@ export const translations: typeof enTranslations = {
       pitch:
         "Envoyez un enregistrement, récupérez un texte propre. Téléchargez-le en fichier.",
       title: "Transcrire un enregistrement",
-      metaTitle: "Transcription IA - {{appName}}",
+      metaTitle: "Transcription IA : {{appName}}",
       description: "Transformez un enregistrement en texte à télécharger.",
       keywords: "transcription audio, transcription IA, audio vers texte",
     },

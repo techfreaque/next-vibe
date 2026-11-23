@@ -2,11 +2,11 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    defaultTitle: "unbottled.ai - Chat non censurata AI",
+    defaultTitle: "unbottled.ai: Chat non censurata AI",
     category: "AI piattaforma di chat",
     description:
       "Sperimenta conversazioni AI veramente non censurate con modelli {{modelCount}}. Nessun filtro, nessuna restrizione, solo onesto AI.",
-    imageAlt: "unbottled.ai - Piattaforma di Chat non censurata AI",
+    imageAlt: "unbottled.ai: Piattaforma di Chat non censurata AI",
     keywords:
       "uncensored AI, AI chat, GPT-4, Claude, Gemini, AI modelli, senza filtri, onesto AI, conversazioni AI",
   },

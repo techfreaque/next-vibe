@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Auto-héberger {{appName}} - Votre instance, vos règles",
+    title: "Auto-héberger {{appName}} : Votre instance, vos règles",
     description:
       "Toute la pile {{appName}} sur votre machine. Quatre commandes, puis un assistant de configuration dans le navigateur. Connectez votre compte {{appName}} ou vos propres clés.",
     category: "Auto-hébergement",

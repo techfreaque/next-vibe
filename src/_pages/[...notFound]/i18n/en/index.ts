@@ -22,7 +22,7 @@ export const translations = {
     },
   },
   meta: {
-    title: "404 - Page Not Found",
+    title: "404: Page Not Found",
     category: "Error",
     description: "The page you're looking for doesn't exist",
     imageAlt: "404 Not Found",

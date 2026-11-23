@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "A robot clicked every button. It found eight security holes.",
     description:
-      "We built an end-to-end test framework that drives the real pages in a real browser - and covered every customer-facing endpoint. Here is what it caught.",
+      "We built an end-to-end test framework that drives the real pages in a real browser and covered every customer-facing endpoint. Here is what it caught.",
     category: "Engineering",
     imageAlt: "End-to-end tests driving {{appName}} in a real browser",
     keywords:
@@ -14,10 +14,10 @@ export const translations = {
     readTime: "7 min read",
     title: "A robot clicked every button. It found eight security holes.",
     subtitle:
-      "We stopped testing pieces and started testing pages. Real browser, real server, real clicks - on every endpoint a customer can touch.",
+      "We stopped testing pieces and started testing pages. Real browser, real server, real clicks: on every endpoint a customer can touch.",
   },
   intro: {
-    lead: "Our code passed type checks, lint and unit tests. It still shipped bugs. Not exotic ones - a reset form that ignored the confirmation password, invoice links that went nowhere, a feed that showed deleted threads.",
+    lead: "Our code passed type checks, lint and unit tests. It still shipped bugs. Not exotic ones: a reset form that ignored the confirmation password, invoice links that went nowhere, a feed that showed deleted threads.",
     p1: "Every one of those lived in the gap between the pieces. The function was fine. The page around it was not. So we built a test framework that only cares about one thing: what a customer actually sees and sends.",
   },
   why: {
@@ -32,7 +32,7 @@ export const translations = {
     api: {
       label: "API test",
       title: "Checks one request",
-      body: "Proves the server answers. Never proves the page sends that request - or renders the reply.",
+      body: "Proves the server answers. Never proves the page sends that request or renders the reply.",
     },
     e2e: {
       label: "End-to-end",
@@ -43,14 +43,14 @@ export const translations = {
   how: {
     title: "How the harness works",
     intro:
-      "Playwright driven from bun test, built on top of next-vibe's endpoint definitions. The definition already knows every field - so the test doesn't need to.",
+      "Playwright driven from bun test, built on top of next-vibe's endpoint definitions. The definition already knows every field: so the test doesn't need to.",
     step1: {
       title: "Open the real page",
-      body: "The test opens the customer page - /user/login, /story/framework - not a test stub. It waits until React owns the form before typing.",
+      body: "The test opens a real customer page such as /user/login or /story/framework. React takes control of the form before the test starts typing.",
     },
     step2: {
       title: "Fill with typed values",
-      body: "You pass values, not selectors. Field drivers read the definition and operate the visible UI - type, pick an option by its label, attach a file.",
+      body: "You pass values, not selectors. Field drivers read the definition and operate the visible UI: type, pick an option by its label, attach a file.",
     },
     step3: {
       title: "Capture the call off the wire",
@@ -58,7 +58,7 @@ export const translations = {
     },
     step4: {
       title: "Record once, replay forever",
-      body: "Paid providers - AI models, image, music, video - are recorded per test on the first run and replayed after. No surprise bill, deterministic runs.",
+      body: "Each test records calls to paid AI, image, music, and video providers on its first run and replays them afterward. No surprise bill, deterministic runs.",
     },
     step5: {
       title: "Report coverage",
@@ -112,12 +112,12 @@ export const translations = {
   },
   broken: {
     title: "And the things that were just broken",
-    intro: "Not dangerous - just quietly failing for real people:",
+    intro: "These bugs quietly broke things for real users:",
     items: {
       attachments:
         "Chat attachment URLs and client error reports returned 404.",
       permissions:
-        "Root permissions were never fetched - customers couldn't post in Shared.",
+        "Root permissions were never fetched: customers couldn't post in Shared.",
       embed: "The embed widget mount was dead.",
       invoices: "Invoice email links returned 404.",
       models: "The models page was unusable.",

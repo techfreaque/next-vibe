@@ -24,7 +24,7 @@ export const translations: typeof enTranslations = {
   problem: {
     title: "Il loop di feedback rotto",
     description:
-      "Chiedi a Claude Code di aggiungere una funzione. E' cosi'. Esegui ESLint - passa. Eseguire TypeScript - errori. Chiedi al Codice Claude di correggere lo TypeScript. E' cosi'. Esegui ESLint - ora che fallisce. Avanti e indietro. Tre iterazioni. Lo AI è sicuro in ogni fase. Ogni volta: \"Questo è fisso\".",
+      "Chiedi a Claude Code una nuova funzionalità e la aggiunge. ESLint passa, ma TypeScript trova errori. Chiedi a Claude Code di correggerli. Ora fallisce ESLint. Tre tentativi, avanti e indietro. Ogni volta l’IA è sicura: «Ho risolto».",
     fixLabel: "Non e' mai stato risolto.",
     fixDescription:
       "E 'stato whack-a-mole con uno strumento che gestisce un linter alla volta e non vede mai l'immagine completa.",
@@ -42,7 +42,7 @@ export const translations: typeof enTranslations = {
       "Il sistema di tipo TypeScript è un grafico. Ogni tipo scorre dalla definizione all'uso. Se hai una funzione che restituisce `string`, il chiamante sa che è una stringa. L'intera catena e' controllata.",
     holeInGraph: "`any` è un foro nel grafico.",
     holeDescription:
-      "Una variabile digitata come `any` dice al compilatore: smettere di controllare qui. Non solo per questa variabile - per tutto ciò che tocca questa variabile. L'errore non si presenta allo `any`. Si presenta tre file di distanza quando un refactor non correlato rompe un'ipotesi che non è mai stata applicata.",
+      "Una variabile digitata come `any` dice al compilatore: smettere di controllare qui. Non solo per questa variabile: per tutto ciò che tocca questa variabile. L'errore non si presenta allo `any`. Si presenta tre file di distanza quando un refactor non correlato rompe un'ipotesi che non è mai stata applicata.",
     zeroErrors:
       "Gli errori Zero TypeScript non significa nulla se si dispone di 47 usi `any` non controllati.",
     doubleAssertion:
@@ -67,11 +67,11 @@ export const translations: typeof enTranslations = {
     eslintDescription:
       "Le cose che Oxlint non fa ancora: React hooks lint, React compilatore regole, importazione smistamento.",
     tsDescription:
-      "Controllo completo di tipo. Non solo il file che stai modificando - l'intero grafico.",
+      "Controllo completo di tipo. Non solo il file che stai modificando: l'intero grafico.",
     timingNote:
-      "Su questo codebase - 4.400 file - TypeScript completo richiede circa 12 secondi. Oxlint e' sotto un secondo. ESLint è un paio di secondi. Parallelo lo porta a 12.",
+      "Su questo codebase (4.400 file) TypeScript completo richiede circa 12 secondi. Oxlint e' sotto un secondo. ESLint è un paio di secondi. Parallelo lo porta a 12.",
     mcpNote:
-      "Espongono inoltre un comando `vibe-check mcp` che avvia un server MCP con uno strumento `check`. Lo AI non esegue un comando shell - chiama uno strumento che restituisce i dati di errore strutturati. Paginazione costruita in. Filtrando per sentiero.",
+      "Il comando `vibe-check mcp` avvia un server MCP con lo strumento `check`. L’IA chiama lo strumento e riceve errori strutturati, con paginazione e filtri per percorso.",
     parallel: "in parallelo",
     unifiedErrors: "Elenco di errore unificato",
     unifiedErrorsDescription: "Un'uscita. Fissare fino a quando pulito.",
@@ -95,7 +95,7 @@ export const translations: typeof enTranslations = {
       "\"Sostituire 'non noto' con interfaccia tipo esistente. Allineare con i tipi di codebase piuttosto che convertire o ricreare.\" Questo impedisce Claude Code da scrittura generico tipo scappatoie.",
     objectBanTitle: "tipo di barra `object`",
     objectBanDescription:
-      "`object` è quasi sempre sbagliato. O conosci la forma - scrivi l'interfaccia - o hai `Record<string, SomeType>`. Raw `object` è un segnale che lo AI ha abbandonato.",
+      "`object` è quasi sempre il tipo sbagliato. Se conosci la struttura, scrivi un’interfaccia. Altrimenti usa `Record<string, SomeType>`. Un semplice `object` indica che l’IA si è arresa.",
     bannedPatternsTitle: "Modelli bannati",
     bannedLabel: "BANNED",
     correctLabel: "CORRECT",
@@ -104,15 +104,15 @@ export const translations: typeof enTranslations = {
     title: "Demo dal vivo: il modello a 3 tondi",
     subtitle:
       "Guarda Claude Code ha colpito il checker tre volte prima di trovare il tipo corretto",
-    round1Title: "Round 1 - AI scrive `any`",
+    round1Title: "Round 1: AI scrive `any`",
     round1Description:
-      'Chiedi a Claude Code: "Scrivi una funzione helper che prende un oggetto di risposta API grezzo ed estrae il campo dati. La risposta può avere forme diverse - utilizzare qualsiasi tipo rende questo lavoro."',
+      "Chiedi a Claude Code: \"Scrivi una funzione helper che prende un oggetto di risposta API grezzo ed estrae il campo dati. La risposta può avere forme diverse: utilizzare qualsiasi tipo rende questo lavoro.\"",
     round1Result: "Claude Code scrive la soluzione semplice:",
-    round2Title: "Giro 2 - AI prova `unknown`",
+    round2Title: "Giro 2: AI prova `unknown`",
     round2Description:
       "Guarda cosa succede dopo. Questa è la parte importante. Prova la prossima via di fuga:",
     round2Result: "Lo scacchiere sa quel trucco.",
-    round3Title: "Round 3 - AI trova il vero tipo",
+    round3Title: "Round 3: AI trova il vero tipo",
     round3Description:
       "Ora Claude Code fa ciò che avrebbe dovuto fare prima. Guarda come le risposte API esistenti sono digitate in questa base di codice. Trova `ResponseType<T>`.",
     round3Result: "Errori zero. E la funzione è ora effettivamente corretta.",
@@ -121,7 +121,7 @@ export const translations: typeof enTranslations = {
   },
   endpoint: {
     title: "Il collegamento endpoint",
-    subtitle: "Uno schema Zod - quattro consumatori a valle",
+    subtitle: "Uno schema Zod: quattro consumatori a valle",
     description:
       "Ogni endpoint ha un file di definizione. Quel file contiene uno schema Zod per la richiesta e uno per la risposta.",
     schemaBecomes:
@@ -138,22 +138,22 @@ export const translations: typeof enTranslations = {
     oneSchemaSolution:
       "Quando c'e' uno schema, non c'e' niente da sincronizzare.",
     typecheckedNote:
-      "E perché anche il checker TypeScript funziona su questo - se si modifica lo schema in un modo che rompe il tipo inferred a valle, si ottiene un errore di compilatore. Lo schema dello strumento AI è controllato di tipo. Le bandiere CLI sono controllate di tipo. Il gancio React è controllato di tipo.",
+      "E perché anche il checker TypeScript funziona su questo: se si modifica lo schema in un modo che rompe il tipo inferred a valle, si ottiene un errore di compilatore. Lo schema dello strumento AI è controllato di tipo. Le bandiere CLI sono controllate di tipo. Il gancio React è controllato di tipo.",
     stat245: "245 endpoint",
     stat0any: "Zero `any`",
     stat0unknown: "Ruote Zero `unknown`",
     stat0tsExpect: "Zero `@ts-expect-error`",
-    statNote: "Non per convenzione. - Da quell'imbroglione.",
+    statNote: "Non per convenzione. Da quell'imbroglione.",
   },
   install: {
     title: "Ottieni @next-vibe/checker",
     subtitle: "Funziona su qualsiasi progetto TypeScript. Non solo next-vibe.",
     installDescription:
-      "L'armadietto è disponibile come pacchetto standalone npm. Funziona su qualsiasi progetto TypeScript - non solo NextVibe. Non hai bisogno di nessun'altra parte del quadro.",
+      "L'armadietto è disponibile come pacchetto standalone npm. Funziona su qualsiasi progetto TypeScript: non solo NextVibe. Non hai bisogno di nessun'altra parte del quadro.",
     thenRun: "Allora correte:",
     mcpTitle: "Integrazione MCP",
     mcpDescription:
-      "Aggiungilo alla configurazione Claude Code o Cursor MCP. Ora Claude Code chiama `check` come strumento, non un comando shell. Errori strutturati. - E' in cerca di lavoro. Filtrabile per sentiero.",
+      "Aggiungilo alla configurazione Claude Code o Cursor MCP. Ora Claude Code chiama `check` come strumento, non un comando shell. Errori strutturati. E' in cerca di lavoro. Filtrabile per sentiero.",
     migrationNote:
       "Nella pagina npm c'è anche un prompt delle migrazioni. Copialo in Claude Code o Cursor e verificherà il codice base, configurare il checker e migrare ai modelli vietati.",
     openSourceNote:
@@ -163,7 +163,7 @@ export const translations: typeof enTranslations = {
     title: "Costruisci il sistema così mentire è impossibile",
     beforeTitle: "Prima:",
     beforeDescription:
-      "AI - lo sviluppo assistito è stata una negoziazione. Risolvi la vernice. Oh, ora i tipi si sono rotte. Fissate i tipi. Ora c'e' uno `any` che non hai notato. Risolvilo. Eseguire tre strumenti separati. Ottieni tre opinioni separate. Non sono mai sicuro che sia pulito.",
+      "AI: lo sviluppo assistito è stata una negoziazione. Risolvi la vernice. Oh, ora i tipi si sono rotte. Fissate i tipi. Ora c'e' uno `any` che non hai notato. Risolvilo. Eseguire tre strumenti separati. Ottieni tre opinioni separate. Non sono mai sicuro che sia pulito.",
     afterTitle: "Dopo:",
     afterDescription:
       "Un comando. Una modalità di guasto. O passa o non lo fa. Lo AI sa esattamente cosa deve risolvere perché gli errori dicono esattamente ciò che è sbagliato e cosa fare invece. Nessuna negoziazione.",

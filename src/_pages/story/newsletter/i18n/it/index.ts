@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "La newsletter di {{appName}}",
     title: "Una e-mail al mese. Solo quello che è cambiato.",
     description:
-      "Nuovi modelli, nuove funzionalità, suggerimenti che funzionano - mensile.",
+      "Nuovi modelli, nuove funzionalità, suggerimenti che funzionano: mensile.",
     subtitle: "Nuovi modelli, nuove funzionalità, richieste che funzionano.",
     heroDescription:
       "Nuovi modelli il giorno in cui atterrano, caratteristiche che vale la pena conoscere, configurazioni che effettivamente ottenere risultati. Una volta al mese. Cancellare l'iscrizione in un clic.",
@@ -33,7 +33,7 @@ export const translations: typeof enTranslations = {
       benefit1: {
         title: "Nuovi modelli, primi",
         description:
-          "Ogni modello che aggiungiamo - cosa è buono a, che cosa costa, quando sceglierlo.",
+          "Ogni modello che aggiungiamo: cosa è buono a, che cosa costa, quando sceglierlo.",
       },
       benefit2: {
         title: "Caratteristiche che hanno spedito",
@@ -42,7 +42,7 @@ export const translations: typeof enTranslations = {
       benefit3: {
         title: "Prompti che funzionano",
         description:
-          "Reali configurazioni e competenze che ottengono risultati - copiare, tweak, nave.",
+          "Reali configurazioni e competenze che ottengono risultati: copiare, tweak, nave.",
       },
       benefit4: {
         title: "Offerte solo per gli iscritti",
@@ -52,7 +52,7 @@ export const translations: typeof enTranslations = {
     frequency: {
       title: "Mensile. Ecco.",
       description:
-        "Una e-mail al mese. Cancellare ogni volta - un clic, nessuna domanda.",
+        "Una e-mail al mese. Cancellare ogni volta: un clic, nessuna domanda.",
     },
   },
   subscription: {

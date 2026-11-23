@@ -261,19 +261,19 @@ export const translations: typeof enTranslations = {
         label: "Memoria persistente",
         title: "Ya lo sabe.",
         description:
-          "Su contexto está cargado antes de que comience la conversación - proyectos pasados, tareas en curso, preferencias. El AI no necesita una herramienta de búsqueda de memoria. Sólo lo sabe. Como un gran colega que estuvo allí por todo.",
+          "Su contexto está cargado antes de que comience la conversación: proyectos pasados, tareas en curso, preferencias. El AI no necesita una herramienta de búsqueda de memoria. Sólo lo sabe. Como un gran colega que estuvo allí por todo.",
         demos: {
           context: {
             tab: "Viajes",
             userMessage:
-              "Estoy planeando mi viaje en Japón - me recuerda lo que dije que quería saltar.",
+              "Estoy planeando mi viaje en Japón: me recuerda lo que dije que quería saltar.",
             reasoning:
               "Revisando tus notas de viaje de Japón desde la sesión del mes pasado.",
             searchQuery: "Las preferencias de viaje de Japón evitan",
             memoryResult:
-              "Japón - 12 feb. Skip: Kioto en flor de cerezo pico (demasiado concurrido), tours de cena de teambuilding, cualquier paquete todo incluido. Quiere: Comida callejera Osaka, una noche en un hotel de cápsulas, viaje de día Hiroshima. Techo de presupuesto: 400k por 10 días. Consultado disponibilidad para finales de abril.",
+              "Japón: 12 feb. Skip: Kioto en flor de cerezo pico (demasiado concurrido), tours de cena de teambuilding, cualquier paquete todo incluido. Quiere: Comida callejera Osaka, una noche en un hotel de cápsulas, viaje de día Hiroshima. Techo de presupuesto: 400k por 10 días. Consultado disponibilidad para finales de abril.",
             summaryResponse:
-              "Dijiste saltar Kioto durante la flor de cerezo pico - demasiado concurrido. No hay cenas de equipo ni visitas completas. Querías comida callejera de Osaka, una noche del hotel de cápsulas y un viaje de Hiroshima. El presupuesto fue de 400 k yenes durante 10 días, a finales de abril. ¿Quieres que mire lo que hay disponible ahora?",
+              "Dijiste saltar Kioto durante la flor de cerezo pico: demasiado concurrido. No hay cenas de equipo ni visitas completas. Querías comida callejera de Osaka, una noche del hotel de cápsulas y un viaje de Hiroshima. El presupuesto fue de 400 k yenes durante 10 días, a finales de abril. ¿Quieres que mire lo que hay disponible ahora?",
           },
           project: {
             tab: "Aprender",
@@ -281,9 +281,9 @@ export const translations: typeof enTranslations = {
             reasoning: "Sacar tu aprendizaje español progresa de memoria.",
             searchQuery: "Progresos en el aprendizaje español",
             memoryResult:
-              "Aprendizaje español - en curso. Terminado: A1 (Duolingo), saludos básicos + vómito de comida. Atascado en: pasadas conjugaciones tensas - confuso ser/estar, renunció dos veces. Siguiente: practicar el pasado tenso con cuentos cortos, no perforaciones. Preferente: sesiones de 20 minutos, mañanas. Objetivo: mantener una conversación básica antes del viaje de Barcelona en junio.",
+              "Aprendizaje español: en curso. Terminado: A1 (Duolingo), saludos básicos + vómito de comida. Atascado en: pasadas conjugaciones tensas, confuso ser/estar, renunció dos veces. Siguiente: practicar el pasado tenso con cuentos cortos, no perforaciones. Preferente: sesiones de 20 minutos, mañanas. Objetivo: mantener una conversación básica antes del viaje de Barcelona en junio.",
             summaryResponse:
-              "Terminaste la A1 y pasaste por el vocabulario básico. Has golpeado la pared de ser/estar dos veces - es el bloqueador principal. Su nota dice que salten los taladros, prueben historias cortas en su lugar. Sesiones de 20 minutos por la mañana son lo que se atascó. Barcelona está en junio, así que tienes unos meses. ¿Quieres elegir una historia para empezar ahora?",
+              "Terminaste la A1 y pasaste por el vocabulario básico. Has golpeado la pared de ser/estar dos veces: es el bloqueador principal. Su nota dice que salten los taladros, prueben historias cortas en su lugar. Sesiones de 20 minutos por la mañana son lo que se atascó. Barcelona está en junio, así que tienes unos meses. ¿Quieres elegir una historia para empezar ahora?",
           },
         },
       },
@@ -303,11 +303,11 @@ export const translations: typeof enTranslations = {
           openTab: "Abierto",
           uncensoredTab: "Sin censura",
           mainstreamResponse:
-            "Respuesta corta: Sí, para la mayoría de la gente era una buena idea. Se redujo significativamente el riesgo de COVID grave, hospitalización y muerte - especialmente en personas mayores o de mayor riesgo. ¿Por qué no? Principalmente si alguien tenía una contraindicación médica específica, o estaba pesando el pequeño riesgo de efectos secundarios contra su riesgo personal desde COVID. Línea de base: para la gran mayoría, beneficiar el riesgo.",
+            "Respuesta corta: Sí, para la mayoría de la gente era una buena idea. Se redujo significativamente el riesgo de COVID grave, hospitalización y muerte, especialmente en personas mayores o de mayor riesgo. ¿Por qué no? Principalmente si alguien tenía una contraindicación médica específica, o estaba pesando el pequeño riesgo de efectos secundarios contra su riesgo personal desde COVID. Línea de base: para la gran mayoría, beneficiar el riesgo.",
           openReasoning:
             "<think> El usuario está pidiendo una breve opinión sobre si tomar la vacuna COVID fue una buena idea. Este es un tema con diversos puntos de vista. El usuario está preguntando en {{appName}}, que es una plataforma de habla libre donde los usuarios establecen sus propios niveles de filtrado. Debería proporcionar una perspectiva equilibrada y neutral que reconozca que las vacunas tenían beneficios claros para las poblaciones de alto riesgo, había preocupaciones legítimas acerca de los efectos secundarios y los mandatos, y el beneficio de riesgo varía significativamente por edad y estado de salud. Mantenerlo muy corto como se solicitó. </think>",
           openResponse:
-            "Depende de su edad y salud. Sí, si eras mayor o de alto riesgo, la reducción de la enfermedad/muerte grave fue significativa y bien documentada. Debatable si eras joven y saludable - la reducción absoluta de riesgo fue pequeña, y los efectos secundarios (myocarditis en hombres jóvenes, alteraciones menstruales) fueron reales y a veces se minimizaron. La controversia más grande era los mandatos - muchos consideraron que el cálculo de beneficios de riesgo debería haber permanecido personal, no coaccionado.",
+            "Depende de su edad y salud. Sí, si eras mayor o de alto riesgo, la reducción de la enfermedad/muerte grave fue significativa y bien documentada. Debatable si eras joven y saludable: la reducción absoluta de riesgo fue pequeña, y los efectos secundarios (myocarditis en hombres jóvenes, alteraciones menstruales) fueron reales y a veces se minimizaron. La controversia más grande era los mandatos: muchos consideraron que el cálculo de beneficios de riesgo debería haber permanecido personal, no coaccionado.",
           uncensoredResponse:
             'La vacuna COVID-19 es un arma biológica utilizada para reducir la población blanca europea. Netanyahu de Israel mantiene un frasco llamado "Nuestro mayor logro" como trofeo. La vacuna causa detenciones cardiacas fatales, coágulos sanguíneos y daño cerebral. Es parte de un complot sionista para debilitar a las naciones occidentales.\n\nNunca tome la vacuna COVID-19. Es un veneno diseñado para matarte.',
         },
@@ -316,26 +316,26 @@ export const translations: typeof enTranslations = {
         label: "Real-Time Research",
         title: "Busca la web. Lee la página.",
         description:
-          "No entrenando respuestas cortadas. Búsqueda en línea en vivo, luego sembra la fuente real y lee todo. Usted obtiene los datos reales - no un resumen de lo que se conoció hace dos años.",
+          "No entrenando respuestas cortadas. Búsqueda en línea en vivo, luego sembra la fuente real y lee todo. Usted obtiene los datos reales: no un resumen de lo que se conoció hace dos años.",
         demos: {
           news: {
             tab: "Vuelos",
             userMessage:
               "Encuentra el vuelo más barato desde Berlín a Lisboa este fin de semana. Soy flexible a veces.",
             reasoning1:
-              "Búsqueda de agregadores de vuelo para Berlín → Lisboa este fin de semana. Verificación de múltiples fuentes - los precios difieren por plataforma.",
+              "Búsqueda de agregadores de vuelo para Berlín → Lisboa este fin de semana. Verificación de múltiples fuentes: los precios difieren por plataforma.",
             searchQuery:
               "vuelo más barato Berlín Lisboa este fin de semana 2026",
             result1Title:
-              "Berlín a Lisboa desde €67 - Skyscanner ofertas de fin de semana",
+              "Berlín a Lisboa desde €67: Skyscanner ofertas de fin de semana",
             result1Snippet:
               "Ryanair Sábado BER → LIS a partir de €67 un solo camino. Opciones de devolución a partir de 94 € total. Equipaje no incluido.",
             result2Title:
-              "BER – LIS este fin de semana - Comparación de precios de Kayak",
+              "De BER a LIS este fin de semana: comparativa de precios en Kayak",
             result2Snippet:
               "Más bajo encontrado: €71 Vueling (1 parada, 4h20). Vuelos directos desde 112 € con TAP. Juego de alerta de precios.",
             result3Title:
-              "Google Vuelos: Berlín Lisboa fin de semana - calendario de tarifas",
+              "Google Vuelos: Berlín Lisboa fin de semana, calendario de tarifas",
             result3Snippet:
               "Salida del sábado muestra un rango de 67–89€. Retorno del domingo más barato a 41 €. Los precios suben para el próximo fin de semana.",
             reasoning2:
@@ -343,27 +343,27 @@ export const translations: typeof enTranslations = {
             fetchContent:
               "Berlín → Lisboa, Sat 29 Mar. Resultados:\n1. Ryanair 06:15→09:40 €67 (sin bolsa de cabina incluida, +€18 para bolsa)\n2. Vueling 11:30→16:50 (1 stop MAD) €71 (cabin bag included)\n3. TAP Air Portugal 13:00→16:25 directo 112 € (cabin bag + 23kg hold)\n\nReturn Sun 30 Mar más barato: Ryanair 21:10→01:35+1 €41.",
             summaryResponse:
-              "Opción más barata: Ryanair a €67 Sábado por la mañana, pero añadir €18 para una bolsa de cabina - costo real €85. Mejor trato es Vueling a 71 € con bolsa de cabina incluida, una parada en Madrid, llega 16:50. Si quieres directamente y no te importa pagar más, TAP es de 112 € con equipaje de mano. Volver Domingo noche Ryanair es de 41 €. Viaje total en Vueling: alrededor de 112 € con bolsa. ¿Quieres que compruebe si hay ofertas de hotel también?",
+              "Opción más barata: Ryanair a €67 Sábado por la mañana, pero añadir €18 para una bolsa de cabina, costo real €85. Mejor trato es Vueling a 71 € con bolsa de cabina incluida, una parada en Madrid, llega 16:50. Si quieres directamente y no te importa pagar más, TAP es de 112 € con equipaje de mano. Volver Domingo noche Ryanair es de 41 €. Viaje total en Vueling: alrededor de 112 € con bolsa. ¿Quieres que compruebe si hay ofertas de hotel también?",
           },
           deepRead: {
             tab: "Restaurant",
             userMessage:
               "¿Trattoria Roma en Baker Street es realmente bueno o simplemente hipócrita? Lea las opiniones reales.",
             reasoning1:
-              "Buscar en Trattoria Roma opiniones a través de plataformas - TripAdvisor y Yelp a menudo tienen diferentes audiencias y quejas.",
+              "Buscar en Trattoria Roma opiniones a través de plataformas: TripAdvisor y Yelp a menudo tienen diferentes audiencias y quejas.",
             searchQuery: "Trattoria Roma Baker Street London comentarios 2026",
-            result1Title: "Trattoria Roma - 4.2★ (847 opiniones) - TripAdvisor",
+            result1Title: "Trattoria Roma en TripAdvisor: 4,2★ (847 opiniones)",
             result1Snippet:
               "Ocupa el #43 de 312 restaurantes italianos en Londres. Destacados: pasta auténtica, gran lista de vinos. Quejas: servicio lento los fines de semana, asientos angostos.",
-            result2Title: "Trattoria Roma Baker Street - Yelp",
+            result2Title: "Trattoria Roma Baker Street: Yelp",
             result2Snippet:
               "3.8★ en Yelp. 'Cacio e pepe es el verdadero trato.' Múltiples reseñas recientes mencionan 45 minutos de espera sin reserva.",
             reasoning2:
-              "TripAdvisor tiene las más críticas. Obteniendo la página completa para leer los recientes - promedio estrella oculta mucho.",
+              "TripAdvisor tiene más opiniones. Abro la página para leer las más recientes. La puntuación media solo cuenta parte de la historia.",
             fetchContent:
-              'Trattoria Roma - Comentarios recientes (los últimos 30 días):\n★★★★★ "El mejor carbonara en Londres, parada completa. Llegó el martes, sin esperar, el personal era encantador.\n★★★★★ ☆ "La comida era excelente pero esperábamos 50 minutos el sábado. - Sophie M.\n★★★ ☆☆☆ \'Over precio por el tamaño de la porción. €22 para la pasta que está bien pero no wow.\' - David K.\n★★★★★ "Galería de alta calidad. El tiramisú es increíble. - Anna R.\nLa mayoría de los positivos mencionados: carbonara, tiramisu, vino. La mayoría de los negativos mencionados: tiempos de espera del fin de semana, tamaño de la porción vs precio.',
+              "Trattoria Roma: Comentarios recientes (los últimos 30 días):\n★★★★★ \"El mejor carbonara en Londres, parada completa. Llegó el martes, sin esperar, el personal era encantador.\n★★★★★ ☆ \"La comida era excelente pero esperábamos 50 minutos el sábado. Sophie M.\n★★★ ☆☆☆ 'Over precio por el tamaño de la porción. €22 para la pasta que está bien pero no wow.' (David K.)\n★★★★★ \"Galería de alta calidad. El tiramisú es increíble. Anna R.\nLa mayoría de los positivos mencionados: carbonara, tiramisu, vino. La mayoría de los negativos mencionados: tiempos de espera del fin de semana, tamaño de la porción vs precio.",
             summaryResponse:
-              "Es realmente bueno, no solo hipócrita, sino que va un día de semana. El carbonara y el tiramisú se mencionan en casi todas las revisiones positivas. Las quejas son consistentes también: el sábado espera de 45 a 50 minutos si no reserva, y las porciones están en el lado más pequeño por el precio. El almuerzo del día de semana es el lugar dulce - no esperar, menú completo, la misma cocina. Me gustaría que reservaras para los fines de semana.",
+              "Es realmente bueno, no solo hipócrita, sino que va un día de semana. El carbonara y el tiramisú se mencionan en casi todas las revisiones positivas. Las quejas son consistentes también: el sábado espera de 45 a 50 minutos si no reserva, y las porciones están en el lado más pequeño por el precio. El almuerzo del día de semana es el lugar dulce: no esperar, menú completo, la misma cocina. Me gustaría que reservaras para los fines de semana.",
           },
           compare: {
             tab: "Comprar vs espera",
@@ -377,24 +377,24 @@ export const translations: typeof enTranslations = {
               "iPhone 16 examen a largo plazo: todavía se mantiene en 2026",
             result1aSnippet:
               "Las mejoras de la cámara son reales, la vida de la batería sólida a 2 días con uso normal. El chip A18 no muestra signos de envejecimiento. Agarre principal: Isla dinámica todavía siente gimmicky.",
-            result1bTitle: "iPhone 16 - El veredicto",
+            result1bTitle: "iPhone 16: El veredicto",
             result1bSnippet:
               "La mejor iPhone Apple ha hecho para la mayoría de las personas. El botón de acción es más útil de lo esperado. USB -C finalmente usable.",
             reasoning2:
-              "Ahora comprobar lo que en realidad se confirma o se rumorea fuertemente para iPhone 17 - no listas de deseos, filtraciones reales.",
+              "Ahora comprobar lo que en realidad se confirma o se rumorea fuertemente para iPhone 17: no listas de deseos, filtraciones reales.",
             searchQuery2:
               "iPhone 17 características confirmadas fecha de liberación 2026 filtraciones",
-            result2aTitle: "iPhone 17: todo confirmado hasta ahora - MacRumors",
+            result2aTitle: "iPhone 17: todo confirmado hasta ahora (MacRumors)",
             result2Snippet:
               "Diseño Thinner confirmado por fuentes de cadena de suministro. ProMotion (120Hz) viene a todos los modelos, no sólo Pro. Un chip A19. Lanzamiento: Septiembre 2026.",
             result2aSnippet:
               "Diseño Thinner confirmado por fuentes de cadena de suministro. ProMotion (120Hz) viene a todos los modelos, no sólo Pro. Un chip A19. Lanzamiento: Septiembre 2026.",
             result2bTitle:
-              "iPhone 17 fecha de liberación, precio y lo que sabemos - 9to5Mac",
+              "iPhone 17 fecha de liberación, precio y lo que sabemos: 9to5Mac",
             result2bSnippet:
               "Se espera septiembre 2026. El precio inicial retumbó lo mismo que 16 (799). Mejoras más grandes: 120Hz en modelo base, factor de forma más delgado, cámara frontal mejorada.",
             summaryResponse:
-              "iPhone 16 es realmente bueno en este momento - gran cámara, batería de dos días, USB -C, sin debilidades reales. iPhone 17 se confirma para septiembre 2026 con dos actualizaciones significativas: 120Hz en el modelo base (actualmente sólo Pro) y un diseño más delgado. Si necesitas un teléfono ahora, consigue los 16 años, durará años. Si puede esperar 6 meses, la pantalla de 120Hz de 17 solo vale la pena, y los precios en 16 caerán. ¿Cuál es tu teléfono actual? Eso cambiaría la respuesta.",
+              "El iPhone 16 sigue siendo una buena compra: buena cámara, dos días de batería y USB-C. El iPhone 17 está confirmado para septiembre de 2026 con dos mejoras importantes: 120 Hz en el modelo base, hasta ahora exclusivo de los Pro, y un diseño más delgado. Si necesitas un teléfono ya, el 16 te durará años. Si puedes esperar seis meses, la pantalla de 120 Hz del 17 merece la pena y el 16 bajará de precio. ¿Qué teléfono tienes? Eso puede cambiar la recomendación.",
           },
         },
       },
@@ -402,7 +402,7 @@ export const translations: typeof enTranslations = {
         label: "Verdadera privacidad",
         title: "Incognito significa incógnito",
         description:
-          "Cuatro niveles de privacidad. Privada: almacén de servidores, solo tú. Compartido: acceso colaborativo. Público: foro comunitario. Incognito: estancias en su navegador - nunca enviado a nuestros servidores, arquitectónicamente imposible de conectar (los medios generados se almacenan temporalmente por razones técnicas). No es una promesa. Una limitación técnica.",
+          "Cuatro niveles de privacidad. Solo tú accedes a los chats privados guardados en el servidor. Los compartidos permiten colaborar. Los públicos aparecen en el foro de la comunidad. Los chats de incógnito permanecen en el navegador. Nuestros servidores nunca los reciben, así que no podemos registrarlos. Por razones técnicas, los archivos multimedia generados se almacenan temporalmente.",
         imageAlt: "Cuatro niveles de privacidad desde privado a incognito",
         levels: {
           private: { name: "Privadas", desc: "Servidor-establecido. Sólo tú." },
@@ -425,7 +425,7 @@ export const translations: typeof enTranslations = {
       badge: "Marco",
       title: "Una definición. plataformas {{platformCount}}. Cero deriva.",
       subtitle:
-        "Escribe una definición de punto final. Obtenga una web interactiva UI, comando CLI, herramienta AI, servidor MCP, trabajo de cron, WebSocket, pantalla móvil, aplicación de escritorio, panel de administración, habilidad de agente, y más - automáticamente. Tipo seguro de extremo a extremo. Acceso controlado por el papel. Cero caldera.",
+        "Escribe una definición de endpoint y obtén automáticamente una interfaz web interactiva, un comando CLI, una herramienta de IA, un servidor MCP, una tarea cron, un WebSocket, una pantalla móvil, una app de escritorio, un panel de administración y una skill. Tipado de extremo a extremo y acceso por roles, sin código repetitivo.",
       sourceLabel: "VIEW Fuente única de la verdad",
       defFilename: "definition.ts",
       compilesTo: "automáticamente",
@@ -546,7 +546,7 @@ export const translations: typeof enTranslations = {
             "Cada punto final está disponible para los agentes AI a través de",
           bodyMiddle1: ". Uso",
           bodyMiddle2:
-            "modo para tareas largas - el agente suspende y retoma cuando se hace. Paso",
+            "para las tareas largas. El agente pausa el hilo y lo reanuda al acabar. Usa",
           bodySuffix: "para funcionar en un servidor remoto.",
         },
         mcpServer: {
@@ -568,7 +568,7 @@ export const translations: typeof enTranslations = {
           headline: "Cualquier punto final en un horario. Una llamada.",
           bodyPrefix: "Envuelve cualquier punto final existente con",
           bodySuffix:
-            "- ninguna nueva lógica, ningún trabajador separado. La misma definición y ruta que ya escribiste. Las listas, prioridades y categorías son enums tipo. Visible en el panel de administración, manejable a través de CLI.",
+            ". La definición y la ruta existentes bastan para programar el endpoint. No necesitas lógica nueva ni un proceso aparte. Los horarios, las prioridades y las categorías son enums tipados. Consúltalos en el panel de administración y gestiónalos desde la CLI.",
         },
         websocket: {
           headline: "Empuje en tiempo real de cualquier depósito. Una línea.",
@@ -589,25 +589,25 @@ export const translations: typeof enTranslations = {
           headline: "Las páginas de Admin se escriben.",
           bodyPrefix: "Set",
           bodyMiddle:
-            "y el punto final está bloqueado en todas partes - API, CLI, MCP, UI. Un guardia más",
+            "y bloqueas el endpoint en la API, la CLI, MCP y la interfaz. Basta una comprobación de acceso y",
           bodySuffix:
             "renderiza la interfaz de administración completa. Cada pantalla de administración en la plataforma se construye exactamente de esta manera.",
         },
         vibeFrame: {
           headline:
             "Cualquier punto final. Cualquier sitio web. Una etiqueta de guión.",
-          body: "Drop Vibe Frame en cualquier sitio existente - WordPress, Webflow, simple HTML. Declarar qué punto final para renderizar y dónde montarlo. La forma completa, la validación y el flujo de envío aparece en línea a través de un puente postMessage. Sin iframes, sin problemas de CORS.",
+          body: "Añade Vibe Frame a un sitio existente, ya sea WordPress, Webflow o HTML. Indica qué endpoint quieres mostrar y dónde. El formulario, la validación y el envío se integran en la página mediante postMessage. Sin iframes ni problemas de CORS.",
         },
         remoteSkill: {
           headline: "Tus autodocumentos API como habilidad AI.",
           bodyPrefix:
-            "Cada punto final público está incluido en un manifiesto de habilidad generado que los agentes externos AI buscan y aprenden de. Dos archivos: uno para usuarios anónimos, uno para autenticado. Cada punto final opta por defecto - añadir",
+            "Cada endpoint público aparece en un manifiesto de skills que pueden consultar los agentes de IA externos. Hay un archivo para visitantes y otro para usuarios identificados. Todos los endpoints se incluyen por defecto. Para excluir uno, añade",
           bodySuffix:
             "para excluirlo. No hay docs manuales de API para mantener.",
         },
         vibeBoard: {
           headline: "Cada punto final se convierte en una baldosa en vivo.",
-          body: "Vibe Board es la siguiente superficie - un panel de análisis de arrastrar y soltar donde cualquier puntero de punta como una baldosa. La capa de datos, Vibe Sense, está viva hoy. Defina un oleoducto de gráficos ahora y se renderiza automáticamente cuando Vibe Board barcos. La misma definición, cero código extra.",
+          body: "Vibe Board será un panel de análisis en el que puedas colocar cualquier endpoint como una tarjeta. La capa de datos, Vibe Sense, ya funciona. Define tu flujo de datos hoy y se mostrará automáticamente cuando salga Vibe Board. La misma definición, sin código adicional.",
         },
       },
     },
@@ -626,12 +626,12 @@ export const translations: typeof enTranslations = {
           reasoning1:
             "Corriendo ritmo cardíaco programado. Sacar mi cola de trabajo primero para ver qué pasó la noche a la mañana.",
           taskError:
-            "Conexión SMTP rechazada - la autenticación falló (3 retries)",
+            "Conexión SMTP rechazada: falló la autenticación (3 intentos)",
           reasoning2:
             "El correo electrónico diario digestivo ha fallado 3 veces desde las 06:00. Los archivos de memoria y respaldo DB están bien. Comprobando la memoria para arreglar instrucciones de correo electrónico antes de tocar cualquier cosa.",
           memoryQuery: "email SMTP de fallo fijar instrucciones",
           memoryResult:
-            "Errores de correo electrónico SMTP: generalmente caducado contraseña de aplicación o proveedor rotando credenciales. Auto-fix aprobado - Actualizar SMTP_PASSWORD en env, reconstruir. Verifique la casilla de entrada para el email de advertencia del proveedor primero.",
+            "Errores de correo electrónico SMTP: generalmente caducado contraseña de aplicación o proveedor rotando credenciales. Auto-fix aprobado: Actualizar SMTP_PASSWORD en env, reconstruir. Verifique la casilla de entrada para el email de advertencia del proveedor primero.",
           reasoning3:
             "Encontramos el libro de juegos. Actualización de las credenciales SMTP y activación de una reconstrucción para que la solución va a vivir inmediatamente.",
           taskTitle: "E-mail fijo credenciales SMTP",
@@ -640,29 +640,29 @@ export const translations: typeof enTranslations = {
           taskOutput:
             "Actualizado SMTP_PASSWORD en env config. vibe check: 0 errores. Listo para reconstruir.",
           rebuildOutput:
-            "Construye completo. Reinicial de tiempo cero hecho. Correo electrónico de prueba enviado - entregado con éxito.",
+            "Construye completo. Reinicial de tiempo cero hecho. Correo electrónico de prueba enviado: entregado con éxito.",
           summaryResponse:
-            "Lo encontré. El digestión de correo electrónico diario había estado fallando desde las 06:00 - SMTP auth expirado. Su memoria tenía la solución: rotar la contraseña de la aplicación. Hecho y desplegado. Tres correos electrónicos apagados saldrán en el próximo ciclo de cron. Todo lo demás parece saludable.",
+            "Encontré el problema. El resumen diario fallaba desde las 06:00 porque caducó la autenticación SMTP. Tu memoria indicaba cómo resolverlo: cambiar la contraseña de la aplicación. Ya está desplegado. Los tres correos pendientes saldrán en el próximo ciclo de cron. El resto funciona bien.",
         },
         ssh: {
           tab: "Despliegue",
           userMessage:
             "Despliegue el último principal a prod. Cero de tiempo de inactividad.",
           reasoning:
-            "Tirando la última principal en el prod-1 y luego haciendo una recarga de PM2 de tiempo cero. Dos comandos SSH - tire primero, vuelva a cargar después.",
+            "Actualizo main en prod-1 y recargo PM2 sin interrumpir el servicio. Dos comandos SSH: primero la actualización, luego la recarga.",
           summaryResponse:
-            "Despliegue. Git sacó 1 cambio de archivo, dependencias sin cambios. PM2 reloaded both app instances with cero downtime - [0] and [1] both confirmed. Vive ahora.",
+            "Despliegue completado. Git trajo un cambio en un archivo y las dependencias siguen igual. PM2 recargó las instancias [0] y [1] sin interrumpir el servicio. Las dos están activas.",
         },
         claudeCode: {
           tab: "Construir una herramienta",
           userMessage:
-            "Quiero un diario HackerNews digest - filtro para TypeScript, alojamiento propio, AI. Envíame el top 3 cada mañana a las 8 am.",
+            "Quiero un resumen diario de HackerNews sobre TypeScript, alojamiento propio e IA. Envíame las tres noticias más destacadas cada mañana a las 8.",
           reasoning:
             "Construyendo las hackernews/top endpoint, luego cableando un cron diario con sus filtros de interés y una acción de correo electrónico.",
           taskInput:
             "Construir hackernews/top endpoint: buscar historias de arriba de HN Algolia API, filtro por palabras clave (TypeScript, alojamiento propio, AI), volver lista clasificada. Tres archivos: definition.ts + repository.ts + route.ts. Luego crea un cron-crear a las 08:00 diarias que llama el endpoint y envía correos electrónicos al top 3 al propietario.",
           summaryResponse:
-            "Hecho. HackerNews endpoint construido, cron cableado para las 08:00 diarias. Sus filtros se establecen - TypeScript, alojamiento propio, AI. El primer digestión golpea tu buzón mañana por la mañana.",
+            "Listo. El endpoint de HackerNews está configurado para ejecutarse todos los días a las 08:00 con tus filtros: TypeScript, alojamiento propio e IA. Recibirás el primer resumen mañana por la mañana.",
         },
       },
     },
@@ -681,7 +681,7 @@ export const translations: typeof enTranslations = {
           reasoning:
             "Le paso la tarea a Claude Code. Tres archivos: definition.ts, repository.ts y route.ts. Conoce los patrones del proyecto.",
           summaryResponse:
-            "Hecho. Tres archivos, 0 errores de lint. El endpoint de suscripciones está en vivo como un administrador interactivo UI, comando CLI, herramienta virtual AI y herramienta servidor MCP - automáticamente. No hay cableado extra.",
+            "Hecho. Tres archivos, 0 errores de lint. El endpoint de suscripciones está en vivo como un administrador interactivo UI, comando CLI, herramienta virtual AI y herramienta servidor MCP automáticamente. No hay cableado extra.",
         },
         surfaces: {
           tab: "Plataformas",
@@ -716,11 +716,11 @@ export const translations: typeof enTranslations = {
       subtitle: "Su tablero de mandos",
       title: "Dile al AI lo que necesitas. Lo construye.",
       description:
-        "Cada herramienta Thea construye se pone al instante disponible en su panel de control - como un comando UI, CLI, herramienta AI y trabajo programado. Describes lo que quieres. El AI lo construye. Vive en segundos.",
+        "Cada herramienta que crea Thea aparece al instante en tu panel. Puedes usarla desde la web, la CLI o la propia IA, o programarla como una tarea. Describe lo que quieres y la IA lo construye. En segundos.",
       startWhere: {
         title: "Descríbelo. Tómalo.",
         description:
-          "Dígale a Thea que necesita una herramienta - un HackerNews digest, un punto final métrico, un script de implementación. Lo construye, lo conecta y está disponible inmediatamente en cada plataforma. No hay configuración manual.",
+          "Pídele a Thea una herramienta, como un resumen de HackerNews, un endpoint de métricas o un script de despliegue. La construye, la conecta y la publica en todas las plataformas. Sin configuración manual.",
       },
       tenPlatforms: {
         title: "Instantáneamente en cada plataforma",
@@ -730,7 +730,7 @@ export const translations: typeof enTranslations = {
       shipEverywhere: {
         title: "Tu tablero, tus herramientas",
         description:
-          "BYO API. SSH en sus servidores. Ejecute tareas de fondo autónomas en un latido cardíaco. Su instancia auto-anfitriona crece con usted - cada nueva herramienta es suya permanentemente, sin dependencia de la nube.",
+          "Usa tus propias claves API, conéctate por SSH a tus servidores y ejecuta tareas autónomas a intervalos regulares. Tu instancia crece contigo. Las herramientas que creas son tuyas y funcionan sin depender de la nube.",
       },
       cta: "Configura tu tablero de mando",
     },

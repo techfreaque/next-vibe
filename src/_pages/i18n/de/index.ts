@@ -108,22 +108,22 @@ export const translations: typeof enTranslations = {
   },
   meta: {
     home: {
-      title: "{{appName}} - Unzensierter KI-Chat",
+      title: "{{appName}}: Unzensierter KI-Chat",
       category: "KI-Chat-Plattform",
       description:
         "Erleben Sie wirklich unzensierte KI-Gespräche mit über {{modelCount}} Modellen. Keine Filter, keine Einschränkungen, nur ehrliche KI.",
-      imageAlt: "{{appName}} - Unzensierte KI-Chat-Plattform",
+      imageAlt: "{{appName}}: Unzensierte KI-Chat-Plattform",
       keywords:
         "unzensierte KI, KI-Chat, GPT-4, Claude, Gemini, KI-Modelle, keine Filter, ehrliche KI, KI-Gespräche",
     },
     aboutUs: {
-      title: "Über uns - {{appName}}",
+      title: "Über uns: {{appName}}",
       category: "Über uns",
       description:
         "Erfahren Sie mehr über die Mission von {{appName}}, unzensierte KI-Gespräche bereitzustellen",
       imageAlt: "Über {{appName}}",
       keywords: "über {{appName}}, unzensierte KI, KI-Mission, KI-Werte",
-      ogTitle: "Über {{appName}} - Unzensierte KI-Plattform",
+      ogTitle: "Über {{appName}}: Unzensierte KI-Plattform",
       ogDescription:
         "Entdecken Sie unsere Mission, den Zugang zu unzensierter KI zu demokratisieren",
       twitterTitle: "Über {{appName}}",
@@ -131,7 +131,7 @@ export const translations: typeof enTranslations = {
         "Erfahren Sie mehr über unsere Mission für unzensierte KI-Gespräche",
     },
     privacyPolicy: {
-      title: "Datenschutzerklärung - {{appName}}",
+      title: "Datenschutzerklärung: {{appName}}",
       category: "Rechtliches",
       description:
         "Erfahren Sie, wie {{appName}} Ihre Privatsphäre schützt und Ihre Daten verarbeitet",
@@ -140,7 +140,7 @@ export const translations: typeof enTranslations = {
         "datenschutzerklärung, datenschutz, benutzerprivatsphäre, {{appName}} datenschutz",
     },
     termsOfService: {
-      title: "Nutzungsbedingungen - {{appName}}",
+      title: "Nutzungsbedingungen: {{appName}}",
       category: "Rechtliches",
       description:
         "Lesen Sie die Geschäftsbedingungen für die Nutzung von {{appName}}",
@@ -149,7 +149,7 @@ export const translations: typeof enTranslations = {
         "nutzungsbedingungen, geschäftsbedingungen, benutzervereinbarung, {{appName}} bedingungen",
     },
     imprint: {
-      title: "Impressum - {{appName}}",
+      title: "Impressum: {{appName}}",
       category: "Rechtliches",
       description:
         "Rechtliche Informationen und Unternehmensdetails für {{appName}}",
@@ -158,7 +158,7 @@ export const translations: typeof enTranslations = {
         "impressum, rechtliche hinweise, unternehmensinformationen, {{appName}} rechtliches",
     },
     careers: {
-      title: "Karriere - {{appName}}",
+      title: "Karriere: {{appName}}",
       category: "Karriere",
       description:
         "Werden Sie Teil unseres Teams und helfen Sie, die Zukunft der unzensierten KI zu gestalten",
@@ -166,22 +166,22 @@ export const translations: typeof enTranslations = {
       keywords: "karriere, jobs, KI-Jobs, remote-arbeit, {{appName}} karriere",
     },
     pricing: {
-      title: "Preise - {{appName}}",
+      title: "Preise: {{appName}}",
       category: "Preise",
       description:
         "KI-Chat für jedes Budget. Kostenlos starten: jeden Monat Credits, ohne Karte.",
       imageAlt: "Preispläne",
       keywords: "preise, pläne, abonnement, KI-chat-preise, {{appName}} preise",
-      ogTitle: "Preispläne - {{appName}}",
+      ogTitle: "Preispläne: {{appName}}",
       ogDescription: "Einfache, transparente Preise für unzensierten KI-Chat",
-      twitterTitle: "Preise - {{appName}}",
+      twitterTitle: "Preise: {{appName}}",
       twitterDescription: "Kostenlos starten. Jeden Monat Credits, ohne Karte.",
     },
     billing: {
       category: "Abrechnung",
     },
     notFound: {
-      title: "404 - Seite nicht gefunden",
+      title: "404: Seite nicht gefunden",
       category: "Fehler",
       description: "Die gesuchte Seite existiert nicht",
       imageAlt: "404 Nicht gefunden",
@@ -205,13 +205,13 @@ export const translations: typeof enTranslations = {
   },
   layout: {
     metadata: {
-      defaultTitle: "{{appName}} - Unzensierter KI-Chat",
+      defaultTitle: "{{appName}}: Unzensierter KI-Chat",
       category: "KI-Chat-Plattform",
       description:
         "Erleben Sie wirklich unzensierte KI-Gespräche mit über {{modelCount}} Modellen. Keine Filter, keine Einschränkungen, nur ehrliche KI.",
     },
     openGraph: {
-      imageAlt: "{{appName}} - Unzensierte KI-Chat-Plattform",
+      imageAlt: "{{appName}}: Unzensierte KI-Chat-Plattform",
     },
     structuredData: {
       organization: {

@@ -4,10 +4,10 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Un punto final. Cada superficie. next-vibe",
     description:
-      "Escribe una definition.ts por función. Representa como forma web, comando CLI, herramienta MCP, pantalla nativa, trabajo de cron - simultáneamente. Sin duplicación. Tipos aplicados.",
+      "Escribe una definition.ts por función. Obtén a la vez un formulario web, un comando CLI, una herramienta MCP, una pantalla nativa y una tarea cron. Sin duplicación y con tipos verificados.",
     category: "Arquitectura",
     imageAlt:
-      "next-vibe arquitectura de superficie unificada - un punto final, cada plataforma",
+      "Arquitectura unificada de next-vibe: un endpoint en todas las plataformas",
     keywords:
       "next-vibe, TypeScript, superficie unificada, MCP, CLI, definition.ts, código abierto, marco SaaS",
   },
@@ -17,13 +17,13 @@ export const translations: typeof enTranslations = {
     readTime: "5 min para leer",
     title: "Un endpoint para todas las interfaces.",
     subtitle:
-      "Escribe una definición por función. Forma web, comando CLI, herramienta MCP, pantalla nativa, trabajo de cron - todo a la vez. Sin duplicación.",
+      "Una definición por función genera a la vez un formulario web, un comando CLI, una herramienta MCP, una pantalla nativa y una tarea cron. Sin duplicación.",
   },
   intro: {
     paragraph1:
-      "Cada característica necesitaba un formulario web, un comando CLI, una herramienta MCP para los agentes AI, a veces una pantalla móvil. La misma validación de Zod, el mismo i18n, el mismo manejo de errores - simplemente vestida de manera diferente. Así que construí next-vibe: un marco donde escribes una definition.ts por característica y se hace como todos ellos simultáneamente.",
+      "Cada característica necesitaba un formulario web, un comando CLI, una herramienta MCP para los agentes AI, a veces una pantalla móvil. La misma validación de Zod, el mismo i18n, el mismo manejo de errores: simplemente vestida de manera diferente. Así que construí next-vibe: un marco donde escribes una definition.ts por característica y se hace como todos ellos simultáneamente.",
     paragraph2:
-      "También potencia los modelos {{appName}} - {{modelCount}} AI, censura controlada por el usuario. La misma base de código funciona como una aplicación web Next.js, un servidor TanStack/Vite dev, una aplicación móvil React Native, un CLI, un servidor MCP, un sistema cron y un autobús de eventos WebSocket. Una definición de punto final. Sin duplicación.",
+      "También es la base de {{appName}}, con {{modelCount}} modelos de IA y filtros que el usuario decide. El mismo código funciona como app web en Next.js, servidor de desarrollo TanStack/Vite, app móvil en React Native, CLI, servidor MCP, sistema cron y bus de eventos WebSocket. Una definición de endpoint. Sin duplicación.",
   },
   typeRules: {
     title: "Los tipos deben alinearse. Sin excepciones.",
@@ -66,9 +66,9 @@ export const translations: typeof enTranslations = {
     title: "El motor gráfico accidental",
     subtitle: "Un bot comercial que no puede cambiar",
     description:
-      "Vibe Sense comenzó como un bot comercial. Nunca ejecutó órdenes - sólo miraba precios y disparaba señales. Cuando lo abandoné, la arquitectura del oleoducto sobrevivió: las fuentes de datos se conectan a indicadores, los evaluadores de alimentación, los evaluadores emiten señales, las señales desencadenan acciones. Cada nodo es un punto final HTTP.",
+      "Vibe Sense empezó como un bot de trading. Nunca ejecutó órdenes: solo observaba precios y emitía señales. Cuando lo abandoné, conservé el flujo de datos. Las fuentes alimentan los indicadores, los indicadores alimentan los evaluadores y las señales de los evaluadores activan acciones. Cada nodo es un endpoint HTTP.",
     quote:
-      "Cada nodo en el gráfico es sólo un punto final HTTP - se puede frenar cualquier paso en el oleoducto, probarlo en aislamiento, o llamarlo de un agente AI. El motor gráfico es un programador, no un DSL.",
+      "Cada nodo del grafo es un endpoint HTTP. Puedes consultar cualquier paso con curl, probarlo por separado o llamarlo desde un agente de IA. El motor del grafo funciona como planificador.",
     whyItMatters:
       "Debido a que cada nodo es un punto final estándar, se pueden probar individualmente a través de CLI, accesible a los agentes AI vía MCP, y cachéable con el mismo infra que todo lo demás. El motor gráfico no inventa su propio lenguaje. Planifica puntos finales.",
   },

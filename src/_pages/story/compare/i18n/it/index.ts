@@ -241,7 +241,7 @@ export const translations: typeof enTranslations = {
       privacy:
         "OpenRouter dice che non memorizza i suggerimenti o le risposte a meno che non si opta dentro. I metadati sono sempre memorizzati. Le politiche di registrazione del fornitore variano.",
       apiShort: "",
-      api: "OpenAI - compatibile API. Questo è il prodotto.",
+      api: "OpenAI: compatibile API. Questo è il prodotto.",
       forWho:
         "Sviluppatori che vogliono una chiave API per molti modelli con il failback del fornitore.",
       pro1: "Catalogo enorme a prezzi di listino, senza abbonamento.",
@@ -432,7 +432,7 @@ export const translations: typeof enTranslations = {
       privacy:
         "Ollama dice che non vede i vostri suggerimenti o dati quando si esegue localmente. Il cloud può essere spento completamente.",
       apiShort: "",
-      api: "OpenAI - server compatibile su localhost:11434, più un cloud API per i suoi modelli ospitati.",
+      api: "OpenAI: server compatibile su localhost:11434, più un cloud API per i suoi modelli ospitati.",
       forWho:
         "Sviluppatori e utenti tecnici con una macchina capace, spesso abbinato a un frontend di chat.",
       pro1: "Totale privacy e zero costo per messaggio.",
@@ -453,7 +453,7 @@ export const translations: typeof enTranslations = {
       privacy:
         "Modelli locali funzionano sul tuo dispositivo. I suoi servizi ospitati rivendicano zero conservazione dei dati.",
       apiShort: "",
-      api: "OpenAI - server compatibile su localhost:1234.",
+      api: "OpenAI: server compatibile su localhost:1234.",
       forWho:
         "Non sviluppatori che vogliono modelli locali senza una riga di comando, su un Mac con Apple Silicon, Windows o Linux.",
       pro1: "Il modo più semplice per eseguire modelli non censurati localmente.",

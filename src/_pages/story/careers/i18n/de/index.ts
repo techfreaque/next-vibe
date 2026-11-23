@@ -2,19 +2,19 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Mit next-vibe bauen - {{appName}}",
+    title: "Mit next-vibe bauen: {{appName}}",
     category: "Entwickler",
     description:
       "next-vibe macht aus jedem Endpoint gleichzeitig ein Webformular, einen CLI-Befehl, ein MCP-Tool, einen nativen Screen und ein KI-aufrufbares Skill. Automatisiere alles, was ein Mensch am Computer tun kann.",
-    imageAlt: "next-vibe Entwicklerplattform - {{appName}}",
+    imageAlt: "next-vibe Entwicklerplattform: {{appName}}",
     keywords:
       "next-vibe, KI-Automatisierung, Entwicklerplattform, Geschäftsautomatisierung, ERP-Integration, Produktionsautomatisierung, {{appName}}",
-    ogTitle: "Mit next-vibe bauen - {{appName}}",
+    ogTitle: "Mit next-vibe bauen: {{appName}}",
     ogDescription:
-      "Eine Codebase. Jede Oberfläche. Produktionslinien, ERP-Systeme, Desktop-Workflows automatisieren - alles, was ein Mensch am Computer erledigt.",
-    twitterTitle: "Mit next-vibe bauen - {{appName}}",
+      "Eine Codebase. Jede Oberfläche. Produktionslinien, ERP-Systeme, Desktop-Workflows automatisieren: alles, was ein Mensch am Computer erledigt.",
+    twitterTitle: "Mit next-vibe bauen: {{appName}}",
     twitterDescription:
-      "Eine Codebase. Jede Oberfläche. Produktionslinien, ERP-Systeme, Desktop-Workflows automatisieren - alles, was ein Mensch am Computer erledigt.",
+      "Eine Codebase. Jede Oberfläche. Produktionslinien, ERP-Systeme, Desktop-Workflows automatisieren: alles, was ein Mensch am Computer erledigt.",
   },
 
   hero: {
@@ -37,7 +37,7 @@ export const translations: typeof enTranslations = {
       businessDevs: {
         title: "Business-Entwickler",
         description:
-          "ERP, CRM oder beliebige interne Systeme mit KI-Workflows verbinden. Daten rein, Entscheidungen raus - kein Klebe-Code.",
+          "ERP, CRM oder beliebige interne Systeme mit KI-Workflows verbinden. Daten rein, Entscheidungen raus: kein Klebe-Code.",
       },
       industrialDevs: {
         title: "Industrie & Embedded",
@@ -47,7 +47,7 @@ export const translations: typeof enTranslations = {
       enterpriseDevs: {
         title: "Enterprise-Teams",
         description:
-          "Fragmentiertes Tooling durch eine einheitliche Plattform ersetzen. Web-UI, CLI, MCP, Native App - selber Endpoint, null Duplizierung.",
+          "Fragmentiertes Tooling durch eine einheitliche Plattform ersetzen. Web-UI, CLI, MCP, Native App: selber Endpoint, null Duplizierung.",
       },
     },
   },
@@ -63,7 +63,7 @@ export const translations: typeof enTranslations = {
       desktopAutomation: {
         title: "Vollständige Desktop-Automatisierung",
         description:
-          "next-vibe kann den gesamten Desktop übernehmen, einschließlich Browser. Formulare ausfüllen, scrapen, navigieren, Dateioperationen - einmal geskriptet, läuft überall.",
+          "next-vibe kann den gesamten Desktop übernehmen, einschließlich Browser. Formulare ausfüllen, scrapen, navigieren, Dateioperationen: einmal geskriptet, läuft überall.",
       },
       productionLine: {
         title: "Produktionslinien-Automatisierung",
@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       skillEconomy: {
         title: "Verkaufe, was du baust",
         description:
-          "Automatisierung als Skill verpacken. Link teilen. 10% von jeder Zahlung jedes Users, der sich darüber anmeldet - wiederkehrend, solange er zahlt.",
+          "Automatisierung als Skill verpacken. Link teilen. 10% von jeder Zahlung jedes Users, der sich darüber anmeldet: wiederkehrend, solange er zahlt.",
       },
     },
   },
@@ -101,7 +101,7 @@ export const translations: typeof enTranslations = {
       ai: "KI-aufrufbarer Skill",
     },
     description:
-      "Plattform wird zur Laufzeit erkannt. Derselbe Endpoint, der für einen Menschen eine Web-UI rendert, wird für einen KI-Agenten zum maschinell aufrufbaren Tool - kein zusätzlicher Code.",
+      "Plattform wird zur Laufzeit erkannt. Derselbe Endpoint, der für einen Menschen eine Web-UI rendert, wird für einen KI-Agenten zum maschinell aufrufbaren Tool: kein zusätzlicher Code.",
   },
 
   referral: {

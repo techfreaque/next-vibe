@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "Ein Roboter hat jeden Button geklickt. Er fand acht Sicherheitslücken.",
     description:
-      "Wir haben ein End-to-End-Testframework gebaut, das die echten Seiten in einem echten Browser bedient - und jeden kundenrelevanten Endpoint abgedeckt. Das hat es gefunden.",
+      "Wir haben ein End-to-End-Testframework gebaut, das die echten Seiten in einem echten Browser bedient und jeden kundenrelevanten Endpoint abgedeckt. Das hat es gefunden.",
     category: "Engineering",
     imageAlt: "End-to-End-Tests steuern {{appName}} in einem echten Browser",
     keywords:
@@ -18,10 +18,10 @@ export const translations: typeof enTranslations = {
     title:
       "Ein Roboter hat jeden Button geklickt. Er fand acht Sicherheitslücken.",
     subtitle:
-      "Schluss mit Einzelteil-Tests. Wir testen jetzt Seiten. Echter Browser, echter Server, echte Klicks - auf jedem Endpoint, den Kunden berühren.",
+      "Schluss mit Einzelteil-Tests. Wir testen jetzt Seiten. Echter Browser, echter Server, echte Klicks: auf jedem Endpoint, den Kunden berühren.",
   },
   intro: {
-    lead: "Unser Code bestand Typprüfung, Linter und Unit-Tests. Und hatte trotzdem Bugs. Keine exotischen - ein Reset-Formular, das das Bestätigungspasswort ignorierte, Rechnungslinks ins Leere, ein Feed mit gelöschten Threads.",
+    lead: "Unser Code bestand Typprüfung, Linter und Unit-Tests. Und hatte trotzdem Bugs. Keine exotischen: ein Reset-Formular, das das Bestätigungspasswort ignorierte, Rechnungslinks ins Leere, ein Feed mit gelöschten Threads.",
     p1: "Jeder davon steckte in der Lücke zwischen den Teilen. Die Funktion war korrekt. Die Seite drumherum nicht. Also haben wir ein Testframework gebaut, das sich nur für eins interessiert: was ein Kunde wirklich sieht und abschickt.",
   },
   why: {
@@ -36,7 +36,7 @@ export const translations: typeof enTranslations = {
     api: {
       label: "API-Test",
       title: "Prüft einen Request",
-      body: "Beweist, dass der Server antwortet. Nie, dass die Seite diesen Request auch schickt - oder die Antwort anzeigt.",
+      body: "Beweist, dass der Server antwortet. Nie, dass die Seite diesen Request auch schickt oder die Antwort anzeigt.",
     },
     e2e: {
       label: "End-to-End",
@@ -47,14 +47,14 @@ export const translations: typeof enTranslations = {
   how: {
     title: "So funktioniert der Harness",
     intro:
-      "Playwright, gesteuert aus bun test, aufgesetzt auf die Endpoint-Definitionen von next-vibe. Die Definition kennt bereits jedes Feld - der Test muss es nicht.",
+      "Playwright, gesteuert aus bun test, aufgesetzt auf die Endpoint-Definitionen von next-vibe. Die Definition kennt bereits jedes Feld, der Test muss es nicht.",
     step1: {
       title: "Echte Seite öffnen",
-      body: "Der Test öffnet die Kundenseite - /user/login, /story/framework - keinen Test-Stub. Getippt wird erst, wenn React das Formular übernommen hat.",
+      body: "Der Test öffnet die Kundenseite (/user/login, /story/framework) keinen Test-Stub. Getippt wird erst, wenn React das Formular übernommen hat.",
     },
     step2: {
       title: "Mit typisierten Werten ausfüllen",
-      body: "Du übergibst Werte, keine Selektoren. Field-Driver lesen die Definition und bedienen die sichtbare UI - tippen, Option per Label wählen, Datei anhängen.",
+      body: "Du übergibst Werte, keine Selektoren. Field-Driver lesen die Definition und bedienen die sichtbare UI: tippen, Option per Label wählen, Datei anhängen.",
     },
     step3: {
       title: "Request vom Netzwerk abgreifen",
@@ -62,7 +62,7 @@ export const translations: typeof enTranslations = {
     },
     step4: {
       title: "Einmal aufnehmen, immer abspielen",
-      body: "Bezahlte Anbieter - KI-Modelle, Bild, Musik, Video - werden pro Test beim ersten Lauf aufgezeichnet und danach abgespielt. Keine Überraschungsrechnung, deterministische Läufe.",
+      body: "Beim ersten Lauf jedes Tests zeichnen wir die Aufrufe an kostenpflichtige Anbieter für KI, Bilder, Musik und Videos auf. Danach spielen wir sie wieder ab. Das hält die Tests reproduzierbar und vermeidet unerwartete Kosten.",
     },
     step5: {
       title: "Abdeckung messen",
@@ -116,11 +116,11 @@ export const translations: typeof enTranslations = {
   },
   broken: {
     title: "Und was einfach kaputt war",
-    intro: "Nicht gefährlich - aber für echte Menschen still kaputt:",
+    intro: "Nicht gefährlich, aber für echte Menschen still kaputt:",
     items: {
       attachments: "Chat-Anhang-URLs und Client-Fehlerberichte lieferten 404.",
       permissions:
-        "Root-Berechtigungen wurden nie geladen - Kunden konnten in Shared nichts posten.",
+        "Root-Berechtigungen wurden nie geladen: Kunden konnten in Shared nichts posten.",
       embed: "Das Einbettungs-Widget startete nicht.",
       invoices: "Links in Rechnungs-Mails lieferten 404.",
       models: "Die Modellseite war unbenutzbar.",

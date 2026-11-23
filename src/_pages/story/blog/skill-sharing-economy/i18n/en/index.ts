@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Build a skill. Share the link. Earn every month.",
     description:
-      "{{appName}} skills are pre-configured AI setups you craft once and share anywhere. The share link positions you in the referral chain - earning 10% of every payment that user ever makes, plus 5% when others share your skill.",
+      "{{appName}} skills are pre-configured AI setups you craft once and share anywhere. The share link positions you in the referral chain: earning 10% of every payment that user ever makes, plus 5% when others share your skill.",
     category: "Skill Economy",
     imageAlt:
       "A person crafting AI skills and earning recurring income by sharing them",
@@ -21,8 +21,8 @@ export const translations = {
   },
   whatAreSkills: {
     title: "What are skills on {{appName}}?",
-    p1: "A skill is a complete AI setup - system prompt, companion persona, model selection per modality, voice, image generation settings - configured once and reusable anywhere. Think of it as a recipe: you figure out the right ingredients once, then anyone can use it.",
-    p2: "The platform has {{modelCount}} models: mainstream, open-source, uncensored. Each skill configures which model to use for conversation, which for vision, which for image generation, which voice to speak with. Most users will never need to touch those settings - they just use the skill. You, as the creator, figure it out once.",
+    p1: "A skill bundles the system prompt, companion persona, model choices for each modality, voice, and image settings into a reusable AI setup. Think of it as a recipe: you figure out the right ingredients once, then anyone can use it.",
+    p2: "The platform has {{modelCount}} models: mainstream, open-source, uncensored. Each skill configures which model to use for conversation, which for vision, which for image generation, which voice to speak with. Most users will never need to touch those settings. They just use the skill. You, as the creator, figure it out once.",
     p3: "Skills are free to create. No paid subscription required. No coding. If you can describe what you want an AI to do, you can build a skill.",
     buildTitle: "Three ways to build a skill",
     build1Title: "Manually on the skill page",
@@ -30,31 +30,31 @@ export const translations = {
       "Full control. Configure every setting directly. Good if you know exactly what you want.",
     build2Title: "Ask Thea or Hermes in conversation",
     build2Body:
-      "Describe what you're trying to build. Brainstorm with them - let them draft the system prompt, push back on your ideas, iterate. Best way to build something nuanced. They know the platform.",
+      "Describe what you're trying to build. Brainstorm with them: let them draft the system prompt, push back on your ideas, iterate. Best way to build something nuanced. They know the platform.",
     build3Title: "For developers: generate a skill.ts",
     build3Body:
-      "Ask your agent to create a skill file. It outputs a skill.ts following the same structure as the built-in companion skills - ready to commit and use immediately.",
+      "Ask your agent to create a skill file. It outputs a skill.ts following the same structure as the built-in companion skills: ready to commit and use immediately.",
   },
   shareLink: {
-    title: "The share link mechanic - how you actually earn",
+    title: "The share link mechanic: how you actually earn",
     p1: "When you hit Share & Earn on any skill, you get a URL that does two things at once:",
     bullet1:
-      "Shows visitors the skill - what it does, how it's configured, what kind of AI it is",
+      "Shows visitors the skill: what it does, how it's configured, what kind of AI it is",
     bullet2:
-      "Positions you in the referral chain - anyone who signs up through this link is attributed to you",
-    p2: "Here's what that attribution means in practice: when someone signs up through your skill link, you are their direct referrer. You earn 10% of every payment they ever make, forever. And when another member shares your skill with their own link, you still earn 5% as the skill creator - on users you never touched.",
-    p3: "This is not a one-time reward. It's not a signup bonus. Every subscription renewal, every top-up, every purchase - you earn 10% of it. You did the work once.",
+      "Positions you in the referral chain: anyone who signs up through this link is attributed to you",
+    p2: "Here's what that attribution means in practice: when someone signs up through your skill link, you are their direct referrer. You earn 10% of every payment they ever make, forever. And when another member shares your skill with their own link, you still earn 5% as the skill creator: on users you never touched.",
+    p3: "This is not a one-time reward. It's not a signup bonus. Every subscription renewal, every top-up, every purchase. You earn 10% of it. You did the work once.",
     p4: "The URL looks like: {{appName}}/track?ref=YOUR_CODE&url=/en/skill/SKILL_ID",
   },
   examples: {
-    title: "Skills that people actually share - and earn from",
+    title: "Skills that people actually share and earn from",
     p1: "The most successful skills solve a specific, recurring problem that's hard to explain without showing. Here are patterns that work:",
     example1Title: "The specialist companion",
     example1Body:
-      "A med student builds a skill that talks to you like a senior clinical colleague - cases, differentials, reasoning under pressure. Shared in med school forums. Every signup from that community pays monthly.",
+      "A med student builds a skill that talks to you like a senior clinical colleague: cases, differentials, reasoning under pressure. Shared in med school forums. Every signup from that community pays monthly.",
     example2Title: "The knowledge seller's real product",
     example2Body:
-      "Coaches, consultants, course creators - they've been selling PDFs and Zoom calls. A well-crafted skill with their actual expertise earns recurring income without the overhead. This is better than a course.",
+      "Coaches, consultants, course creators. They've been selling PDFs and Zoom calls. A well-crafted skill with their actual expertise earns recurring income without the overhead. This is better than a course.",
     example3Title: "The uncensored option",
     example3Body:
       "Skills using uncensored models for creative writing, roleplay, or debate. Shared in communities where mainstream AI censorship is a constant, daily frustration. High signup intent.",
@@ -80,17 +80,17 @@ export const translations = {
     row4Profile: "Power user: Starter + {{powerPacks}} packs",
     row4Spend: "{{powerSpend}}/mo",
     row4Earn: "{{powerEarn}}/mo",
-    p2: "The skill is the hook. The link is the revenue. You earn whether someone uses your skill daily or switches to something else - the referral attribution stays with you regardless.",
+    p2: "The skill is the hook. The link is the revenue. You earn whether someone uses your skill daily or switches to something else: the referral attribution stays with you regardless.",
     p3: "Share a skill in five places. Some percentage click through. Some percentage sign up. Those signups pay you 10% every month. Share another skill next month. Your earnings grow without proportionally more work.",
   },
   chain: {
     title: "You also earn when your users refer others",
-    p1: "When users you referred go on to refer others, you earn a share of those payments too - up to 5 levels deep, each level halving:",
+    p1: "When users you referred go on to refer others, you earn a share of those payments too: up to 5 levels deep, each level halving:",
     level1: "Level 2 (your referrals' referrals): ~5% of every payment",
     level2: "Level 3: ~2.5% of every payment",
     level3: "Level 4: ~1.25% of every payment",
     level4: "Level 5: ~0.625% of every payment",
-    p2: "Honest note: the chain bonuses get small fast. The 10% you earn from direct skill referrals is where almost all your income comes from. Treat chain earnings as a bonus - don't optimize for depth, optimize for quality shares.",
+    p2: "Honest note: the chain bonuses get small fast. The 10% you earn from direct skill referrals is where almost all your income comes from. Treat chain earnings as a bonus: don't optimize for depth, optimize for quality shares.",
   },
   howTo: {
     title: "5 minutes to your first share link",
@@ -102,10 +102,10 @@ export const translations = {
       "Click on the skill to see its details page. This is where you'll find the Share & Earn button.",
     step3Title: "Generate your share link",
     step3Body:
-      "Click Share & Earn. If you have a referral code, select it. If not, create one in three seconds. Your link carries your referral code and the skill ID - attribution is tracked automatically.",
+      "Click Share & Earn. If you have a referral code, select it. If not, create one in three seconds. Your link carries your referral code and the skill ID: attribution is tracked automatically.",
     step4Title: "Share where it matters",
     step4Body:
-      "Post it in communities where people would actually use the skill - Discord servers, subreddits, forum threads, blog posts, Slack channels. Specific beats broad.",
+      "Post it in communities where people would actually use the skill: Discord servers, subreddits, forum threads, blog posts, Slack channels. Specific beats broad.",
     step5Title: "Watch the dashboard",
     step5Body:
       "Your referral dashboard shows visitors, signups, and earnings in real time. Every new signup through your link is 10% recurring revenue.",

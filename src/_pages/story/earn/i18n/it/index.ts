@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title: "Guadagna con {{appName}}: commissioni ricorrenti sugli inviti",
     category: "Earn",
     description:
-      "Condividere {{appName}} e guadagnare {{directPct}} di ogni pagamento che i vostri referrals fanno - ricorrenti, per tutto il tempo che pagano. Pubblicare una abilità e guadagnare {{skillBonusPct}} sugli utenti altri portare a esso.",
+      "Condividere {{appName}} e guadagnare {{directPct}} di ogni pagamento che i vostri referrals fanno: ricorrenti, per tutto il tempo che pagano. Pubblicare una abilità e guadagnare {{skillBonusPct}} sugli utenti altri portare a esso.",
     imageAlt: "Guadagna con {{appName}}",
     keywords:
       "{{appName}}, programma di riferimento, affiliazione, commissione ricorrente, AI competenze, reddito passivo",
@@ -28,7 +28,7 @@ export const translations: typeof enTranslations = {
       body: "Crea un account gratuito e apri la pagina di riferimento. Il tuo link personale è pronto in pochi secondi.",
     },
     step2: {
-      title: "Condividilo - o condividi un'abilità",
+      title: "Condividilo o condividi un'abilità",
       body: "Getta il link in una chat, un README, un video. O pubblicare un'abilità: il suo link di condivisione porta automaticamente il tuo referral.",
     },
     step3: {

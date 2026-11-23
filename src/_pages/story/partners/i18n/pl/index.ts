@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   meta: {
     title:
-      "Program partnerski {{appName}} - {{directPct}} co miesiąc, bez limitu",
+      "Program partnerski {{appName}}: {{directPct}} co miesiąc, bez limitu",
     category: "Partnerzy",
     description:
       "Twórcy, newslettery i katalogi: {{directPct}} od każdego zakupu osób, które przyprowadzisz do {{appName}}. Cyklicznie, bez limitu, z pomiarem dla każdego linku. Wypłata w kredytach albo BTC/USDC.",

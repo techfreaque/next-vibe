@@ -1,10 +1,10 @@
 export const translations = {
   meta: {
-    defaultTitle: "unbottled.ai - Uncensored AI Chat",
+    defaultTitle: "unbottled.ai: Uncensored AI Chat",
     category: "AI Chat Platform",
     description:
       "Experience truly uncensored AI conversations with {{modelCount}} models. No filters, no restrictions, just honest AI.",
-    imageAlt: "unbottled.ai - Uncensored AI Chat Platform",
+    imageAlt: "unbottled.ai: Uncensored AI Chat Platform",
     keywords:
       "uncensored AI, AI chat, GPT-4, Claude, Gemini, AI models, no filters, honest AI, AI conversations",
   },

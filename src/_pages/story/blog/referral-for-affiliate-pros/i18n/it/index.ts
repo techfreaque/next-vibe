@@ -28,7 +28,7 @@ export const translations: typeof enTranslations = {
       "Gli sviluppatori e gli utenti AI -heavy gestiscono agenti, API e generazione di immagini o video in cima al piano, e acquistano pacchetti di credito come vanno. Un utente di potenza {{powerSpend}} /mese ti guadagna {{powerEarn}} /mese ricorrente. Sono i referral del piano {{powerVsPlan}} in uno.",
     floorTitle: "ARPU cresce mentre la piattaforma cresce",
     floorBody:
-      "Ogni volta che {{appName}} aggiunge modelli, capacità o modalità di generazione, gli abbonati esistenti spendono di più. I referral che hai fatto sei mesi fa valgono più di oggi che quando li hai fatti - senza alcun lavoro extra da te.",
+      "Ogni volta che {{appName}} aggiunge modelli, capacità o modalità di generazione, gli abbonati esistenti spendono di più. I referral che hai fatto sei mesi fa valgono più di oggi che quando li hai fatti, senza alcun lavoro extra da te.",
     tableHeaderProfile: "Profilo utente",
     tableHeaderSpend: "Spesa mensile",
     tableHeaderYouEarn: "Si guadagnano/mo",
@@ -48,9 +48,9 @@ export const translations: typeof enTranslations = {
   structure: {
     title: "La struttura della commissione completa",
     p1: "Referral diretto: 10% di ogni pagamento da parte delle persone che si riferiscono direttamente. Questo è il vostro sempre, per la vita, indipendentemente da qualsiasi altra cosa.",
-    p2: "Bonus di abilità: se qualcuno si iscrive attraverso il link di un altro membro a una abilità che hai pubblicato, si guadagna 5% sui loro pagamenti - in cima al 10% che il membro guadagna. Le abilità sono preset AI condivisibili che chiunque può creare e pubblicare. Dettaglio critico per i professionisti della filiale: si guadagna il 5% come autrice di abilità anche quando qualcun altro condivide il tuo link di abilità. Un utente scopre la tua abilità nella directory e lo condivide - si ottiene ancora accreditato. L'autorevolezza di abilità è tracciata dalla piattaforma, non da chi ha distribuito il link. Questo crea attribuzione passiva che non devi gestire attivamente.",
-    p3: "Catena multilivello: un ulteriore piscina del 10% è distribuito su 5 livelli della vostra catena di riferimento, con decadimento geometrico - ogni livello guadagna la metà di quello sopra. I rinvii diretti dei vostri referral vi guadagnano il ~5%, i loro referrals ~ 2,5%, e così via. Pagamento totale massimo su tutti i guadagni: ~20% di qualsiasi pagamento singolo.",
-    p4: "Onesto rivelazione: i bonus catena ottenere piccolo veloce. Il 10% diretto + 5% di abilità è dove il reddito reale è. Non costruire una strategia intorno alla profondità multi-livello - costruirla intorno a riferimenti diretti di qualità e competenze pubblicabili.",
+    p2: "Bonus di abilità: se qualcuno si iscrive attraverso il link di un altro membro a una abilità che hai pubblicato, si guadagna 5% sui loro pagamenti, in cima al 10% che il membro guadagna. Le abilità sono preset AI condivisibili che chiunque può creare e pubblicare. Dettaglio critico per i professionisti della filiale: si guadagna il 5% come autrice di abilità anche quando qualcun altro condivide il tuo link di abilità. Un utente scopre la tua abilità nella directory e lo condivide: si ottiene ancora accreditato. L'autorevolezza di abilità è tracciata dalla piattaforma, non da chi ha distribuito il link. Questo crea attribuzione passiva che non devi gestire attivamente.",
+    p3: "Catena multilivello: un ulteriore piscina del 10% è distribuito su 5 livelli della vostra catena di riferimento, con decadimento geometrico, ogni livello guadagna la metà di quello sopra. I rinvii diretti dei vostri referral vi guadagnano il ~5%, i loro referrals ~ 2,5%, e così via. Pagamento totale massimo su tutti i guadagni: ~20% di qualsiasi pagamento singolo.",
+    p4: "Onesto rivelazione: i bonus catena ottenere piccolo veloce. Il 10% diretto + 5% di abilità è dove il reddito reale è. Non costruire una strategia intorno alla profondità multi-livello: costruirla intorno a riferimenti diretti di qualità e competenze pubblicabili.",
   },
   audience: {
     title: "Chi si converte per questa piattaforma",
@@ -72,7 +72,7 @@ export const translations: typeof enTranslations = {
   promotion: {
     title: "Angoli che convertono",
     angle1Title:
-      '"Ho confrontato 10 strumenti AI - ecco quello che ho effettivamente tenuto"',
+      "\"Ho confrontato 10 strumenti AI: ecco quello che ho effettivamente tenuto\"",
     angle1Body:
       "Il contenuto di confronto è il miglior driver di affiliazione per questa categoria. Condurre con varietà modello, prezzi e il posizionamento libero-speech vs mono-model strumenti.",
     angle2Title: "Comunità di sviluppo",
@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       "r/selfhosted, forum sulla privacy, Mastodon. La base di codice open-source e l'opzione self-hosting atterrare bene. Questi utenti odiano piattaforme chiuse.",
     angle4Title: "Contenuto tutorial con lo strumento",
     angle4Body:
-      '"Come utilizzare AI per X" con {{appName}} come strumento specifico. Assistente di codifica, scrittura, ricerca - casi di uso specifico convertono meglio delle recensioni generiche AI.',
+      "\"Come utilizzare AI per X\" con {{appName}} come strumento specifico. Assistente di codifica, scrittura, ricerca: casi di uso specifico convertono meglio delle recensioni generiche AI.",
   },
   payouts: {
     title: "Meccanica di pagamento",
@@ -93,7 +93,7 @@ export const translations: typeof enTranslations = {
   },
   close: {
     title: "Vale la pena aggiungere al tuo stack",
-    p1: "Non e' il programma piu' pagato che farai. Ma le commissioni ricorrenti in una categoria in rapida crescita, con un segmento di power-user che già spende pesantemente e le tendenze in su - questo è una classe di attività diversa da una volta i pagamenti di affiliazione.",
+    p1: "Non e' il programma piu' pagato che farai. Ma le commissioni ricorrenti in una categoria in rapida crescita, con un segmento di power-user che già spende pesantemente e le tendenze in su. Questo è una classe di attività diversa da una volta i pagamenti di affiliazione.",
     p2: "Se il tuo pubblico si sovrappone con uno qualsiasi dei suddetti, vale un codice e un post.",
     createCode: "Crea il tuo codice invito",
     joinDiscord: "Iscriviti alla Discord",

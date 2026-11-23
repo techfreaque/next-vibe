@@ -10,13 +10,13 @@ export const translations = {
   cta: {
     title: "Want in?",
     subtitle:
-      "Tickets from $5,000. Tell us who you are and what you want to back - we answer every message.",
+      "Tickets from $5,000. Tell us who you are and what you want to back. We answer every message.",
     button: "Get in touch",
   },
   meta: {
     title: "Invest in {{appName}}",
     description:
-      "Tickets from $5,000. Back the open-source AI platform built on next-vibe - {{modelCount}} models, in production, and the user sets the filter.",
+      "Tickets from $5,000. Back the open-source AI platform built on next-vibe: {{modelCount}} models, in production, and the user sets the filter.",
     category: "Invest",
     imageAlt: "Invest in {{appName}}",
     keywords:

@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "À propos - {{appName}}",
+    title: "À propos : {{appName}}",
     category: "À propos",
     description:
       "Découvrez la mission de {{appName}} : des conversations IA sans censure",

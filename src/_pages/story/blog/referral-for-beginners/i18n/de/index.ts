@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Zwei Wege zum Verdienen. Du musst dich nicht entscheiden.",
     description:
-      "Ein verständlicher Leitfaden zum {{appName}}-Empfehlungsprogramm. Link teilen, 10 % verdienen. Skill bauen, 5 % passiv kassieren - auch wenn andere ihn teilen. Keine Vorkenntnisse nötig.",
+      "Ein verständlicher Leitfaden zum {{appName}}-Empfehlungsprogramm. Link teilen, 10 % verdienen. Skill bauen, 5 % passiv kassieren, auch wenn andere ihn teilen. Keine Vorkenntnisse nötig.",
     category: "Empfehlungsprogramm",
     imageAlt: "Eine Person teilt einen Link und verdient passiv Geld",
     keywords:
@@ -23,10 +23,10 @@ export const translations: typeof enTranslations = {
   intro: {
     title: "Fangen wir von vorne an",
     p1: "Es gibt zwei Wege, bei {{appName}} zu verdienen. Du kannst einen oder beide nutzen. Keiner erfordert Vorkenntnisse.",
-    p2: "Der erste Weg: Link teilen. Wenn sich jemand darüber anmeldet, verdienst du 10 % jeder Zahlung, die er je macht - nicht nur im ersten Monat, sondern jeden Monat, solange er abonniert ist. Der zweite Weg: einen Skill bauen. Ein Skill ist ein individuelles KI-Setup, das du konfigurierst und veröffentlichst. Meldet sich jemand über den Link zu deinem Skill an, verdienst du dauerhaft zusätzlich 5 % auf seine Zahlungen. Das Entscheidende: Diese 5 % gehören dir als Autor des Skills, auch wenn jemand anderes deinen Skill teilt. Einmal bauen - dauerhaft verdienen.",
+    p2: "Der erste Weg: Link teilen. Wenn sich jemand darüber anmeldet, verdienst du 10 % jeder Zahlung, die er je macht, nicht nur im ersten Monat, sondern jeden Monat, solange er abonniert ist. Der zweite Weg: einen Skill bauen. Ein Skill ist ein individuelles KI-Setup, das du konfigurierst und veröffentlichst. Meldet sich jemand über den Link zu deinem Skill an, verdienst du dauerhaft zusätzlich 5 % auf seine Zahlungen. Das Entscheidende: Diese 5 % gehören dir als Autor des Skills, auch wenn jemand anderes deinen Skill teilt. Einmal bauen: dauerhaft verdienen.",
   },
   different: {
-    title: "Einmalig vs. wiederkehrend - warum es wichtig ist",
+    title: "Einmalig vs. wiederkehrend: warum es wichtig ist",
     p1: "Die meisten Empfehlungsprogramme zahlen einmalig. {{appName}} zahlt für immer. So sieht das in der Praxis aus:",
     tableHeaderType: "Art",
     tableHeaderYouEarn: "Du verdienst",
@@ -40,24 +40,24 @@ export const translations: typeof enTranslations = {
     row3Type: "{{appName}}-Empfehlung",
     row3Earn: "10 % des Abonnements",
     row3When: "Jeden Monat, für immer",
-    p2: "Im Januar empfohlen, im Dezember noch abonniert - du hast zwölfmal verdient. Die Arbeit hast du einmal gemacht.",
+    p2: "Im Januar empfohlen, im Dezember noch abonniert. Du hast zwölfmal verdient. Die Arbeit hast du einmal gemacht.",
   },
   skillAngle: {
-    title: "Der Skill-Weg - passives Einkommen, das du einmal baust",
-    p1: "Ein Skill ist eine individuelle KI-Persona: Name, Persönlichkeit, System-Prompt. Veröffentlichen. Fertig. Jeder kann ihn finden und nutzen - meldet sich jemand über den Link eines anderen Mitglieds zu deinem Skill an, verdienst du 5 % seiner Zahlungen, für immer. Dein eigener Skill-Link bringt die vollen 10 % direkt.",
-    p2: "Was Einsteiger meist übersehen: Die 5 % sind an dich als Autor gebunden, nicht daran, wer den Link geteilt hat. Entdeckt jemand deinen Skill im Verzeichnis und schickt ihn weiter - meldet sich der Freund an - wirst du trotzdem gutgeschrieben. Die Plattform trackt die Skill-Autorenschaft, nicht wer ihn verbreitet hat. Dein Skill arbeitet für dich, auch wenn du gerade nichts tust.",
+    title: "Der Skill-Weg: passives Einkommen, das du einmal baust",
+    p1: "Ein Skill ist eine individuelle KI-Persona: Name, Persönlichkeit, System-Prompt. Veröffentlichen. Fertig. Jeder kann ihn finden und nutzen: meldet sich jemand über den Link eines anderen Mitglieds zu deinem Skill an, verdienst du 5 % seiner Zahlungen, für immer. Dein eigener Skill-Link bringt die vollen 10 % direkt.",
+    p2: "Die 5 % gehören dir als Autor. Wenn jemand deinen Skill im Verzeichnis findet, ihn mit einem Freund teilt und der Freund sich anmeldet, bekommst du deinen Anteil. Dein Skill verdient für dich, auch wenn du ihn gerade nicht bewirbst.",
     p3: "Skills sind kostenlos zu erstellen. Kein bezahltes Abo nötig. Fang einfach an: ein Skill für dein Hobby, deinen Job, deine Muttersprache. Veröffentlichen, Link teilen, fertig. Jede Anmeldung über deinen eigenen Link bringt dir 10 %, für immer. Jede Anmeldung, die andere zu deinem Skill bringen, bringt dir 5 %.",
   },
   multilevel: {
-    title: "Es gibt auch eine Kette - so funktioniert sie",
+    title: "Es gibt auch eine Kette: so funktioniert sie",
     p1: "Das klingt kompliziert, ist es aber nicht. Wenn Leute, die du empfohlen hast, selbst andere empfehlen, verdienst du auch einen kleinen Anteil von deren Zahlungen:",
     explanation:
-      "Du empfiehlst Alice. Alice abonniert - du verdienst 10 % ihrer Zahlungen, für immer. Alice empfiehlt Bob. Bob abonniert - du verdienst ~5 % von Bobs Zahlungen (Hälfte von 10 %, weil er eine Ebene tiefer ist). Bob empfiehlt Carol - du verdienst ~2,5 % von Carols Zahlungen. Und so weiter, bis zu 5 Ebenen tief. Jede Ebene bringt dir die Hälfte der darüberliegenden.",
-    p2: "In der Praxis: Die direkten 10 % von Leuten, die du selbst empfiehlst, machen fast dein gesamtes Einkommen aus. Die Ketten-Boni sind real, aber klein. Nicht darauf verlassen - als Bonus behandeln.",
+      "Du empfiehlst Alice. Alice abonniert. Du verdienst 10 % ihrer Zahlungen, für immer. Alice empfiehlt Bob. Bob abonniert. Du verdienst ~5 % von Bobs Zahlungen (Hälfte von 10 %, weil er eine Ebene tiefer ist). Bob empfiehlt Carol. Du verdienst ~2,5 % von Carols Zahlungen. Und so weiter, bis zu 5 Ebenen tief. Jede Ebene bringt dir die Hälfte der darüberliegenden.",
+    p2: "In der Praxis: Die direkten 10 % von Leuten, die du selbst empfiehlst, machen fast dein gesamtes Einkommen aus. Die Ketten-Boni sind real, aber klein. Nicht darauf verlassen: als Bonus behandeln.",
     p3: "Du musst die Kette nicht verstehen, um anzufangen. Link erstellen, teilen, 10 % von allen kassieren, die sich anmelden.",
   },
   expectations: {
-    title: "Realistische Erwartungen - kein Hype",
+    title: "Realistische Erwartungen: kein Hype",
     p1: "Hier die ehrliche Rechnung:",
     scenario1Label: "Starter-Abonnent",
     scenario1Spend: "{{planPrice}}/Monat Plan",
@@ -77,8 +77,8 @@ export const translations: typeof enTranslations = {
       "Kein bezahltes Abo nötig. Das Empfehlungsprogramm steht allen offen.",
     step2Title: "Zur Empfehlungsseite gehen",
     step2Link: "Öffne die Empfehlungsseite.",
-    step2Suffix: " Code erstellen - alles, was du dir gut merken kannst.",
-    step3Title: "Link teilen - oder einen Skill veröffentlichen",
+    step2Suffix: " Code erstellen: alles, was du dir gut merken kannst.",
+    step3Title: "Link teilen oder einen Skill veröffentlichen",
     step3Body:
       "Empfehlungslink: überall posten, wo du natürlich über KI-Tools sprichst. Skill-Link: erst einen einfachen Skill bauen, dann den Link teilen. Beides funktioniert. Beides verdient.",
     step4Title: "Dashboard checken",
@@ -87,8 +87,8 @@ export const translations: typeof enTranslations = {
   },
   close: {
     title: "Das ist wirklich alles",
-    p1: "Du brauchst keinen Blog. Keine Follower. Du musst die Mehrebenen-Struktur nicht verstehen. Du musst einfach Leuten von etwas erzählen, das du selbst nutzt - und optional einen einfachen Skill bauen, der für sich selbst verdient.",
-    p2: "Wenn du tiefer einsteigen willst - Provisionsstruktur verstehen, beste Promotion-Wege finden oder Fragen stellen - ist unser Discord der richtige Ort.",
+    p1: "Du brauchst keinen Blog. Keine Follower. Du musst die Mehrebenen-Struktur nicht verstehen. Du musst einfach Leuten von etwas erzählen, das du selbst nutzt und optional einen einfachen Skill bauen, der für sich selbst verdient.",
+    p2: "Auf Discord kannst du dir die Provisionen genauer ansehen, bessere Wege zum Teilen finden oder andere Mitglieder nach ihren Erfahrungen fragen.",
     createCode: "Empfehlungscode holen",
     joinDiscord: "Discord beitreten",
   },

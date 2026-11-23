@@ -1,6 +1,6 @@
 export const translations = {
   title: "Notifications",
-  metaTitle: "Notifications - {{appName}}",
+  metaTitle: "Notifications: {{appName}}",
   description:
     "Finished tasks, referral payouts and account news. Newest first.",
   unauthenticated: {

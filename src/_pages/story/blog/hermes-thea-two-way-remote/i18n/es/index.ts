@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
     description:
       "Su AI local y su AI nube ahora ejecutan hilos para el otro en ambas direcciones. ¿No hay llave API en la instancia que ejecute el turno? El callador se lleva el bucle y lo termina.",
     category: "Hermes & Thea",
-    imageAlt: "Hermes y Thea - dos instancias next-vibe conectadas",
+    imageAlt: "Hermes y Thea: dos instancias next-vibe conectadas",
     keywords:
       "Hermes, Thea, next-vibe, hilos remotos, AI auto hospedado, Websocket inverso, retroceso de tecla API, {{appName}}",
   },
@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
     readTime: "6 min leer",
     title: "Dos IA. Una conversación. En ambos sentidos.",
     subtitle:
-      "Hermes funciona en tu máquina. Thea se ejecuta en un servidor. Ahora bien, uno puede entregar un hilo al otro - y una tecla API que falta ya no mata el turno.",
+      "Hermes gira en tu equipo. Thea, en un servidor. Ahora cualquiera de los dos puede pasarle una conversación al otro, y una clave API ausente ya no interrumpe la respuesta.",
   },
   intro: {
     p1: "next-vibe funciona en tu portátil, en un VPS o en ambos a la vez. Conecta dos instancias y trabajarán juntas. Las nuestras se llaman Hermes y Thea.",
@@ -36,12 +36,12 @@ export const translations: typeof enTranslations = {
       title: "Thea",
       body: "Corre en un servidor. Siempre en línea, accesible desde cualquier lugar. Mira la plataforma y los delegados trabajan.",
     },
-    note: "Cada instancia posee sus propios datos y tareas. La conexión retransmite eventos entre ellos - nada más, nada menos.",
+    note: "Cada instancia posee sus propios datos y tareas. La conexión retransmite eventos entre ellos: nada más, nada menos.",
   },
   twoWay: {
     title: "Los hilos ahora se cruzan en ambas direcciones",
     intro:
-      "Los hilos privados y de telecarpeta se ejecutan en la otra instancia - desde Thea a Hermes y desde Hermes a Thea.",
+      "Los hilos privados y de telecarpeta se ejecutan en la otra instancia: desde Thea a Hermes y desde Hermes a Thea.",
     p1: "Ponga un hilo en una carpeta remota y la instancia en el otro lado corre el giro AI completo: modelo, sistema de impulso, herramientas. Sigue escribiendo dónde estás. La conversación retrocede a ti.",
     stepsTitle: "Un giro, final a fin",
     step1Title: "Escribes.",
@@ -61,7 +61,7 @@ export const translations: typeof enTranslations = {
     title: "¿No hay llave API? El turno aún termina.",
     intro:
       "El caso que funciona un turno necesita la clave API del proveedor modelo. No todos los casos tienen uno.",
-    p1: "Antes de que una instancia tome un giro, comprueba la clave del proveedor en su propio nodo. ¿Perdiendo? Falla rápido con un marcador claro - no se cuelga, y no escribe la mitad del hilo.",
+    p1: "Antes de que una instancia tome un giro, comprueba la clave del proveedor en su propio nodo. ¿Perdiendo? Falla rápido con un marcador claro: no se cuelga, y no escribe la mitad del hilo.",
     p2: "El lado de llamada reconoce el marcador, revuelve su relé de contabilidad y corre el bucle en sí mismo. El impulso y las herramientas del control remoto siguen siendo aplicables; herramienta llama ida y vuelta sobre la conexión.",
     calloutTitle:
       "El modo de proveedor de información no necesita ninguna llave.",
@@ -86,7 +86,7 @@ export const translations: typeof enTranslations = {
     reconnect:
       "El conector vuelve a conectarse con el retroceso exponencial de 1 a 30 segundos y relee la conexión en cada reingreso. Esta liberación endurece ese camino.",
     fixesTitle: "También en esta versión",
-    fix1: "Advertencia de la hoja de cálculo: un marco dirigido a una pista que ya no sabe este caso se deja caer con una advertencia en lugar de silencio - re-authenticar la conexión lo fija.",
+    fix1: "Advertencia de la hoja de cálculo: un marco dirigido a una pista que ya no sabe este caso se deja caer con una advertencia en lugar de silencio, re-authenticar la conexión lo fija.",
     fix2: "Los horarios de bases de datos en UTC, Postgres con piscina y PGlite por igual, por lo que filas con muestreo predeterminado se clasifican correctamente a través de los casos.",
     fix3: "El escritor de corriente sembra el hilo id, por lo que los pares ya no abandonan eventos con un hilo vacío id.",
     fix4: "Revival se convierte en sincronización con el par, por lo que los resultados de la herramienta en su lugar alcanzan el espejo.",

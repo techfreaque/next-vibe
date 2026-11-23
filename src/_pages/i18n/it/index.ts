@@ -108,22 +108,22 @@ export const translations: typeof enTranslations = {
   },
   meta: {
     home: {
-      title: "{{appName}} - Chat non censurata AI",
+      title: "{{appName}}: Chat non censurata AI",
       category: "AI piattaforma di chat",
       description:
         "Sperimenta conversazioni AI veramente non censurate con modelli {{modelCount}}. Nessun filtro, nessuna restrizione, solo onesto AI.",
-      imageAlt: "{{appName}} - Piattaforma di Chat non censurata AI",
+      imageAlt: "{{appName}}: Piattaforma di Chat non censurata AI",
       keywords:
         "uncensored AI, AI chat, GPT-4, Claude, Gemini, AI modelli, senza filtri, onesto AI, conversazioni AI",
     },
     aboutUs: {
-      title: "Informazioni su di noi - {{appName}}",
+      title: "Informazioni su di noi: {{appName}}",
       category: "Chi siamo",
       description:
         "Scopri la missione di {{appName}} per fornire conversazioni AI non censurate",
       imageAlt: "Informazioni su {{appName}}",
       keywords: "circa {{appName}}, non censurato AI, missione AI, valori AI",
-      ogTitle: "Informazioni su {{appName}} - Piattaforma AI non censurata",
+      ogTitle: "Informazioni su {{appName}}: Piattaforma AI non censurata",
       ogDescription:
         "Scopri la nostra missione per democratizzare l'accesso a AI non censurato",
       twitterTitle: "Informazioni su {{appName}}",
@@ -131,7 +131,7 @@ export const translations: typeof enTranslations = {
         "Scopri la nostra missione per conversazioni AI non censurate",
     },
     privacyPolicy: {
-      title: "Informativa sulla privacy - {{appName}}",
+      title: "Informativa sulla privacy: {{appName}}",
       category: "Legale",
       description:
         "Scopri come {{appName}} protegge la tua privacy e gestisce i tuoi dati",
@@ -140,7 +140,7 @@ export const translations: typeof enTranslations = {
         "privacy policy, protezione dei dati, privacy degli utenti, {{appName}} privacy",
     },
     termsOfService: {
-      title: "Termini di servizio - {{appName}}",
+      title: "Termini di servizio: {{appName}}",
       category: "Legale",
       description:
         "Leggi i termini e le condizioni per l'utilizzo di {{appName}}",
@@ -149,7 +149,7 @@ export const translations: typeof enTranslations = {
         "termini di servizio, termini e condizioni, accordo utente, termini {{appName}}",
     },
     imprint: {
-      title: "Avviso legale - {{appName}}",
+      title: "Avviso legale: {{appName}}",
       category: "Legale",
       description: "Informazioni legali e dettagli aziendali per {{appName}}",
       imageAlt: "Avviso legale",
@@ -157,7 +157,7 @@ export const translations: typeof enTranslations = {
         "impronta, comunicazione legale, informazioni aziendali, {{appName}} legale",
     },
     careers: {
-      title: "Carriere - {{appName}}",
+      title: "Carriere: {{appName}}",
       category: "Carriere",
       description:
         "Unisciti al nostro team e aiuta a costruire il futuro di AI non censurato",
@@ -166,26 +166,26 @@ export const translations: typeof enTranslations = {
         "carriere, lavori, AI lavori, lavoro remoto, {{appName}} carriere",
     },
     pricing: {
-      title: "Prezzi - {{appName}}",
+      title: "Prezzi: {{appName}}",
       category: "Prezzo",
       description:
         "chat AI per ogni budget. Iniziare gratuitamente: crediti ogni mese, nessuna carta necessaria.",
       imageAlt: "Piani di prezzi",
       keywords:
         "prezzi, piani, abbonamento, AI chat pricing, {{appName}} pricing",
-      ogTitle: "Piani di Prezzi - {{appName}}",
+      ogTitle: "Piani di Prezzi: {{appName}}",
       ogDescription: "Prezzi semplici e trasparenti per chat AI non censurata",
-      twitterTitle: "Prezzi - {{appName}}",
+      twitterTitle: "Prezzi: {{appName}}",
       twitterDescription: "Inizia gratis. Crediti ogni mese, niente carta.",
     },
     billing: {
       category: "Fatturazione",
     },
     notFound: {
-      title: "404 - Pagina non trovata",
+      title: "404: Pagina non trovata",
       category: "Errore",
       description: "La pagina che stai cercando non esiste",
-      imageAlt: "404 - Errore non trovato",
+      imageAlt: "404: Errore non trovato",
       keywords: "404, non trovato, errore",
     },
   },
@@ -206,13 +206,13 @@ export const translations: typeof enTranslations = {
   },
   layout: {
     metadata: {
-      defaultTitle: "{{appName}} - Chat non censurata AI",
+      defaultTitle: "{{appName}}: Chat non censurata AI",
       category: "AI piattaforma di chat",
       description:
         "Sperimenta conversazioni AI veramente non censurate con modelli {{modelCount}}. Nessun filtro, nessuna restrizione, solo onesto AI.",
     },
     openGraph: {
-      imageAlt: "{{appName}} - Piattaforma di Chat non censurata AI",
+      imageAlt: "{{appName}}: Piattaforma di Chat non censurata AI",
     },
     structuredData: {
       organization: {

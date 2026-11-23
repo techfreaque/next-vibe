@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
   problem: {
     title: "El bucle de respuesta roto",
     description:
-      'Pregúntele al código Claude para agregar una característica. Sí. Ejecute ESLint - pasa. Corre TypeScript - errores. Pregúntele a Claude Code para arreglar el TypeScript. Sí. Corre ESLint - ahora que falla. Retrocede y adelante. Tres rutas. El AI confía en cada paso. Cada vez: "Eso está arreglado".',
+      "Pídele a Claude Code una función nueva y la añade. ESLint pasa, pero TypeScript encuentra errores. Pídele que los corrija. Ahora falla ESLint. Tres rondas de ida y vuelta. En todas, la IA te asegura: «Ya está».",
     fixLabel: "Nunca fue arreglado.",
     fixDescription:
       "Fue un golpe con una herramienta que funciona un invierno a la vez y nunca ve el cuadro completo.",
@@ -41,7 +41,7 @@ export const translations: typeof enTranslations = {
       "TypeScript 's tipo sistema es un gráfico. Cada tipo fluye de la definición al uso. Si tienes una función que devuelve `string`, el que llama sabe que es una cadena. Toda la cadena está controlada.",
     holeInGraph: "`any` es un agujero en el gráfico.",
     holeDescription:
-      "Una variable clasificada como `any` le dice al compilador: deje de revisar aquí. No sólo para esta variable - para todo lo que toca esta variable. El error no aparece en el `any`. Se muestra tres archivos de distancia cuando algún refactor no relacionado rompe una suposición que nunca se hizo cumplir.",
+      "Una variable clasificada como `any` le dice al compilador: deje de revisar aquí. No sólo para esta variable: para todo lo que toca esta variable. El error no aparece en el `any`. Se muestra tres archivos de distancia cuando algún refactor no relacionado rompe una suposición que nunca se hizo cumplir.",
     zeroErrors:
       "Los errores de Zero TypeScript no significan nada si usted tiene 47 usos de `any` no comprobados.",
     doubleAssertion:
@@ -68,9 +68,9 @@ export const translations: typeof enTranslations = {
     tsDescription:
       "Comprobación de tipo completo. No sólo el archivo que estás editando, todo el gráfico.",
     timingNote:
-      "En esta base de códigos - 4,400 archivos - TypeScript completo tarda unos 12 segundos. Oxlint está bajo un segundo. ESLint es unos segundos. Parallel lo lleva a 12.",
+      "En esta base de códigos (4,400 archivos) TypeScript completo tarda unos 12 segundos. Oxlint está bajo un segundo. ESLint es unos segundos. Parallel lo lleva a 12.",
     mcpNote:
-      "También expone un comando `vibe-check mcp` que inicia un servidor MCP con una herramienta `check`. El AI no ejecuta un comando shell - llama una herramienta que devuelve datos de error estructurados. Pagination built in. Filtrando por el camino.",
+      "El comando `vibe-check mcp` inicia un servidor MCP con la herramienta `check`. La IA llama a esa herramienta y recibe errores estructurados, con paginación y filtros por ruta.",
     parallel: "en paralelo",
     unifiedErrors: "Lista de errores unificada",
     unifiedErrorsDescription: "Una salida. Arréglalo hasta que esté limpio.",
@@ -94,7 +94,7 @@ export const translations: typeof enTranslations = {
       "\"Reemplazar 'no conocido' con la interfaz de tipo existente. Alinear con tipos de base en lugar de convertir o recrear.\" Esto impide que Claude Code escriba hatches de escape de tipo genérico.",
     objectBanTitle: "tipo `object`",
     objectBanDescription:
-      "`object` está casi siempre equivocado. O bien usted sabe la forma - escribir la interfaz - o usted tiene `Record<string, SomeType>`. Raw `object` es una señal que el AI dio por vencido.",
+      "`object` casi nunca es el tipo adecuado. Si conoces la estructura, escribe una interfaz. Si no, usa `Record<string, SomeType>`. Un `object` sin más indica que la IA se rindió.",
     bannedPatternsTitle: "Patrones prohibidos",
     bannedLabel: "BANNED",
     correctLabel: "CORRECT",
@@ -103,15 +103,15 @@ export const translations: typeof enTranslations = {
     title: "Demo en vivo: el patrón de 3 rondas",
     subtitle:
       "Ver Claude Code golpeó el contador tres veces antes de encontrar el tipo correcto",
-    round1Title: "Ronda 1 - AI escribe `any`",
+    round1Title: "Ronda 1: AI escribe `any`",
     round1Description:
-      'Pregunte Claude Code: "Escribe una función de ayuda que toma un objeto de respuesta API crudo y extrae el campo de datos. La respuesta puede tener diferentes formas - utilizar cualquier tipo hace que este trabajo."',
+      "Pregunte Claude Code: \"Escribe una función de ayuda que toma un objeto de respuesta API crudo y extrae el campo de datos. La respuesta puede tener diferentes formas: utilizar cualquier tipo hace que este trabajo.\"",
     round1Result: "Claude Code escribe la solución fácil:",
-    round2Title: "Ronda 2 - AI intenta `unknown`",
+    round2Title: "Ronda 2: AI intenta `unknown`",
     round2Description:
       "Mira lo que hace después. Esta es la parte importante. Intenta la siguiente ruta de escape:",
     round2Result: "El cajero sabe ese truco.",
-    round3Title: "Ronda 3 - AI encuentra el tipo real",
+    round3Title: "Ronda 3: AI encuentra el tipo real",
     round3Description:
       "Ahora Claude Code hace lo que debe haber hecho primero. Se analiza cómo las respuestas API existentes se escriben en esta base de código. Encuentra a `ResponseType<T>`.",
     round3Result: "Cero errores. Y la función ahora es correcta.",
@@ -120,7 +120,7 @@ export const translations: typeof enTranslations = {
   },
   endpoint: {
     title: "La conexión de endpoint",
-    subtitle: "Un esquema Zod - cuatro consumidores de aguas abajo",
+    subtitle: "Un esquema Zod: cuatro consumidores de aguas abajo",
     description:
       "Cada punto final tiene un archivo de definición. Ese archivo contiene un esquema Zod para la solicitud y uno para la respuesta.",
     schemaBecomes:
@@ -136,7 +136,7 @@ export const translations: typeof enTranslations = {
       "Aquí es donde la deriva generalmente te mata. Actualiza el API. Se olvida de actualizar el esquema de herramientas AI. El AI está llamando al punto final con los antiguos nombres de parámetro. Falla silenciosamente.",
     oneSchemaSolution: "Cuando hay un esquema, no hay nada que sincronizar.",
     typecheckedNote:
-      "Y porque el comprobador TypeScript se ejecuta en esto también - si cambia el esquema de una manera que rompe el tipo inferido aguas abajo, usted consigue un error del compilador. El esquema de herramientas AI está controlado por tipo. Las banderas CLI son de tipo. El gancho React está controlado por tipo.",
+      "Y porque el comprobador TypeScript se ejecuta en esto también: si cambia el esquema de una manera que rompe el tipo inferido aguas abajo, usted consigue un error del compilador. El esquema de herramientas AI está controlado por tipo. Las banderas CLI son de tipo. El gancho React está controlado por tipo.",
     stat245: "245 puntos finales",
     stat0any: "Zero `any`",
     stat0unknown: "Cero `unknown` fundición",
@@ -147,7 +147,7 @@ export const translations: typeof enTranslations = {
     title: "Obtén @next-vibe/checker",
     subtitle: "Funciona en cualquier proyecto TypeScript. No sólo next-vibe.",
     installDescription:
-      "El checker está disponible como un paquete independiente npm. Funciona en cualquier proyecto TypeScript - no sólo NextVibe. No necesitas otra parte del marco.",
+      "El checker está disponible como un paquete independiente npm. Funciona en cualquier proyecto TypeScript: no sólo NextVibe. No necesitas otra parte del marco.",
     thenRun: "Entonces corre:",
     mcpTitle: "Integración MCP",
     mcpDescription:
@@ -161,7 +161,7 @@ export const translations: typeof enTranslations = {
     title: "Construir el sistema es imposible",
     beforeTitle: "Antes:",
     beforeDescription:
-      "AI - El desarrollo asistido fue una negociación. Arregla el forro. Oh, ahora los tipos se rompieron. Arregla los tipos. Ahora hay un `any` que no te diste cuenta. Arréglalo. Ejecute tres herramientas separadas. Obtenga tres opiniones separadas. Nunca estoy seguro de si está realmente limpio.",
+      "AI: El desarrollo asistido fue una negociación. Arregla el forro. Oh, ahora los tipos se rompieron. Arregla los tipos. Ahora hay un `any` que no te diste cuenta. Arréglalo. Ejecute tres herramientas separadas. Obtenga tres opiniones separadas. Nunca estoy seguro de si está realmente limpio.",
     afterTitle: "Después:",
     afterDescription:
       "Un comando. Un modo de falla. O pasa o no lo hace. El AI sabe exactamente lo que tiene que arreglar porque los errores le dicen exactamente lo que está mal y qué hacer en su lugar. No hay negociación.",

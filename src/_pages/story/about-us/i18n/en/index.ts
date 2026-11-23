@@ -1,12 +1,12 @@
 export const translations = {
   meta: {
-    title: "About Us - {{appName}}",
+    title: "About Us: {{appName}}",
     category: "About",
     description:
       "Learn about {{appName}}'s mission to provide uncensored AI conversations",
     imageAlt: "About {{appName}}",
     keywords: "about {{appName}}, uncensored AI, AI mission, AI values",
-    ogTitle: "About {{appName}} - Uncensored AI Platform",
+    ogTitle: "About {{appName}}: Uncensored AI Platform",
     ogDescription:
       "Discover our mission to democratize access to uncensored AI",
     twitterTitle: "About {{appName}}",
@@ -17,7 +17,7 @@ export const translations = {
     eyebrow: "About {{appName}}",
     title: "AI that answers to you.",
     subtitle:
-      "{{modelCount}} models. {{skillCount}} skills. ~{{toolCount}} tools. SSH, email, browser automation, scheduled tasks. Run it free on {{appName}} - or self-host your own.",
+      "{{modelCount}} models. {{skillCount}} skills. ~{{toolCount}} tools. SSH, email, browser automation, scheduled tasks. Run it free on {{appName}} or self-host your own.",
     ctaPrimary: "Start chatting",
     ctaSecondary: "Read the build log",
   },
@@ -48,39 +48,39 @@ export const translations = {
     integrity: {
       title: "Private by default",
       description:
-        "Incognito mode keeps conversations on your device (generated media is stored temporarily for technical reasons). Your data stays yours - not a product we sell.",
+        "Incognito mode keeps conversations on your device (generated media is stored temporarily for technical reasons). Your data stays yours, not a product we sell.",
     },
     collaboration: {
       title: "Built in public",
       description:
-        "Roadmap, architecture decisions and dead ends - all on the blog. Your feedback ships as features.",
+        "Roadmap, architecture decisions and dead ends: all on the blog. Your feedback ships as features.",
     },
   },
   mission: {
     title: "Your AI. Your rules.",
     subtitle: "Democratizing Access to Uncensored AI",
     description:
-      "Every big AI provider filters what you can ask - and you never see the rules. We think adults can decide for themselves. So {{appName}} puts every model and every filter level in one place, and hands you the switch.",
+      "Every big AI provider filters what you can ask and you never see the rules. We think adults can decide for themselves. So {{appName}} puts every model and every filter level in one place, and hands you the switch.",
     vision: {
       title: "The vision",
       description:
-        "One home for every serious AI model - mainstream, open and uncensored - where you decide what's off-limits.",
+        "One home for every serious AI model, from mainstream to open and uncensored. You decide what’s off-limits.",
     },
     approach: {
       title: "The approach",
       description:
-        "Ship the best models fast, wrap them in real tools - search, memory, automation - and keep privacy the default, not an upsell.",
+        "Ship the best models fast with tools for search, memory, and automation. Keep privacy the default.",
     },
     commitment: {
       title: "The commitment",
       description:
-        "Transparent pricing. No dark patterns. A platform you can leave any time - by self-hosting the exact same code.",
+        "Transparent pricing. No dark patterns. A platform you can leave any time: by self-hosting the exact same code.",
     },
   },
   contact: {
     title: "Questions? Talk to us.",
     description:
-      "Feedback, partnerships, press, bugs - a human reads every message.",
+      "Feedback, partnerships, press, bugs: a human reads every message.",
     cta: "Contact us",
     selfHost: "Self-host it",
   },

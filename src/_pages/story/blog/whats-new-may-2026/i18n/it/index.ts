@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     description:
       "Memoria persistente, riflessione notturna, esecuzione di sfondo. Più immagine-immagine-immagine, video, generazione musicale. E i crediti {{credits}}. un mese intero libero. per dirci che cosa è rotto.",
     category: "Aggiornamento del prodotto",
-    imageAlt: "unbottled.ai - Aggiornamento prodotto maggio 2026",
+    imageAlt: "unbottled.ai: Aggiornamento prodotto maggio 2026",
     keywords:
       "unbottled ai, Cortex AI, Dreamer AI, Autopilot AI, generazione di immagini, generazione video, generazione musicale, free speech AI",
   },
@@ -24,7 +24,7 @@ export const translations: typeof enTranslations = {
 
   honest: {
     title: "Abbiamo spedito degli insetti. Poi li abbiamo sistemati.",
-    p1: "Se ti sei iscritto un po' indietro e le cose non hanno funzionato bene - avevi ragione. Le prime costruzioni avevano problemi reali. Ne abbiamo schiacciati molti, migliorata la stabilità in modo significativo, e siamo vicini a uno stato in cui tutto funziona come dovrebbe. Non ancora. ma vicino.",
+    p1: "Se ti sei iscritto un po' indietro e le cose non hanno funzionato bene, avevi ragione. Le prime costruzioni avevano problemi reali. Ne abbiamo schiacciati molti, migliorata la stabilità in modo significativo, e siamo vicini a uno stato in cui tutto funziona come dovrebbe. Non ancora. ma vicino.",
     p2: 'Non abbiamo fatto i documenti. Abbiamo costruito il monitoraggio degli errori di livello della piattaforma che cattura i bug prima che gli utenti li segnalano. Thea osserva la salute del sistema continuamente e gli orari si fissano automaticamente. Il divario tra "broke" e "fisso" si riduce ad ogni rilascio.',
   },
 
@@ -80,7 +80,7 @@ export const translations: typeof enTranslations = {
 
   mission: {
     title: "Quello che stiamo costruendo verso",
-    p1: "Discorso gratuito AI. Opinioni reali. Modelli non censurati. Le voci a monte principale e non a monte hanno entrambi spazio qui. Non siamo qui per sanitizzare il vostro pensiero - siamo qui per espanderlo.",
+    p1: "Discorso gratuito AI. Opinioni reali. Modelli non censurati. Le voci a monte principale e non a monte hanno entrambi spazio qui. Non siamo qui per sanitizzare il vostro pensiero: siamo qui per espanderlo.",
     p2: "Il tuo compagno AI. Non una macchina del si'. Un buon amico che è onesto con te, ti sfida, e in realtà ti aiuta a diventare migliore. ai tuoi obiettivi, alle tue relazioni, al tuo lavoro, alla tua vita.",
     p3: "Il Cortex inizia con domande sulle aree che riguardano: carriera, salute, finanze, relazioni, scopo, obiettivi. Riempire quelli dentro non è solo la configurazione. è riflessione. E la riflessione è dove inizia la crescita.",
     p4: "Non ti diremo che sei perfetta come te. Non ci crediamo. Neanche tu, probabilmente. Ma noi crediamo che si può arrivare là. ovunque 'c'è per voi.",

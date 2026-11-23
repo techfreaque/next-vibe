@@ -1,9 +1,9 @@
 export const translations = {
   meta: {
-    title: "Earn with {{appName}} - recurring referral income",
+    title: "Earn with {{appName}}: recurring referral income",
     category: "Earn",
     description:
-      "Share {{appName}} and earn {{directPct}} of every payment your referrals make - recurring, for as long as they pay. Publish a skill and earn {{skillBonusPct}} on users others bring to it.",
+      "Share {{appName}} and earn {{directPct}} of every payment your referrals make: recurring, for as long as they pay. Publish a skill and earn {{skillBonusPct}} on users others bring to it.",
     imageAlt: "Earn with {{appName}}",
     keywords:
       "{{appName}}, referral program, affiliate, recurring commission, AI skills, passive income",
@@ -12,7 +12,7 @@ export const translations = {
     eyebrow: "Earn",
     title: "Share what you use. Get paid every month.",
     subtitle:
-      "{{directPct}} of every payment from people you bring in - not once, every month they pay. Publish a skill and earn {{skillBonusPct}} every time someone else shares it.",
+      "{{directPct}} of every payment from people you bring in, not once, every month they pay. Publish a skill and earn {{skillBonusPct}} every time someone else shares it.",
     ctaPrimary: "Get your link",
     ctaSecondary: "Build a skill",
   },
@@ -26,7 +26,7 @@ export const translations = {
       body: "Create a free account and open the referral page. Your personal link is ready in seconds.",
     },
     step2: {
-      title: "Share it - or share a skill",
+      title: "Share it or share a skill",
       body: "Drop the link in a chat, a README, a video. Or publish a skill: its share link carries your referral automatically.",
     },
     step3: {

@@ -1,13 +1,13 @@
 export const translations = {
   meta: {
-    title: "Legal Notice - {{appName}}",
+    title: "Legal Notice: {{appName}}",
     category: "Legal",
     description: "Legal notice and provider details for {{appName}}",
     imageAlt: "Legal Notice",
     keywords: "imprint, legal notice, provider information, {{appName}} legal",
-    ogTitle: "Legal Notice - {{appName}}",
+    ogTitle: "Legal Notice: {{appName}}",
     ogDescription: "Legal notice and provider details for {{appName}}",
-    twitterTitle: "Legal Notice - {{appName}}",
+    twitterTitle: "Legal Notice: {{appName}}",
     twitterDescription: "Legal notice and provider details for {{appName}}",
   },
   printAriaLabel: "Print imprint",

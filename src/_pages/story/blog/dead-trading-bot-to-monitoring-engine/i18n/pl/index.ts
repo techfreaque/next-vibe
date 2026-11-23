@@ -3,11 +3,11 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   meta: {
     title:
-      "Mój martwy bot tradingowy stał się silnikiem monitorowania platformy - next-vibe",
+      "Mój martwy bot tradingowy stał się silnikiem monitorowania platformy: next-vibe",
     description:
-      "Lata temu porzuciłem bota tradingowego. Potem zdałem sobie sprawę, że jego architektura - DataSource, Indicator, Evaluator, Action - ma zastosowanie w każdym biznesie. Więc przebudowałem go wewnątrz next-vibe.",
+      "Lata temu porzuciłem bota tradingowego. Potem zdałem sobie sprawę, że jego architektura (DataSource, Indicator, Evaluator, Action) ma zastosowanie w każdym biznesie. Więc przebudowałem go wewnątrz next-vibe.",
     category: "Vibe Sense",
-    imageAlt: "Pipeline monitorowania Vibe Sense - next-vibe",
+    imageAlt: "Pipeline monitorowania Vibe Sense: next-vibe",
     keywords:
       "vibe sense, monitoring, bot tradingowy, endpointy, EMA, pipeline, next-vibe, TypeScript",
     ogTitle:
@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Vibe Sense",
     title: "To twoja platforma obserwująca samą siebie.",
     subtitle:
-      "Lata temu porzuciłem bota tradingowego. Jego architektura stała się najciekawszą częścią next-vibe. Każdy węzeł w grafie jest endpointem - wywoływalnym z CLI, wykrywalnym przez AI, wbudowanym w twoją platformę.",
+      "Lata temu porzuciłem bota tradingowego. Jego architektura stała się najciekawszą częścią next-vibe. Każdy węzeł w grafie jest endpointem: wywoływalnym z CLI, wykrywalnym przez AI, wbudowanym w twoją platformę.",
     readTime: "14 min czytania",
   },
   origin: {
@@ -57,7 +57,7 @@ export const translations: typeof enTranslations = {
   insight: {
     title: "Każdy biznes jest szeregiem czasowym",
     intro:
-      "W bocie tradingowym części są proste. Źródło danych: dane cenowe, wolumen, cokolwiek czytasz. Wskaźnik: średnia krocząca, RSI, MACD - przyjmuje surowe dane, produkuje pochodny sygnał. Ewaluator: czy szybka MA jest ponad wolną MA? Warunek logiczny. Akcja: kiedy ewaluator strzela, zrób coś.",
+      "W bocie tradingowym części są proste. Źródło danych: dane cenowe, wolumen, cokolwiek czytasz. Wskaźnik: średnia krocząca, RSI, MACD, przyjmuje surowe dane, produkuje pochodny sygnał. Ewaluator: czy szybka MA jest ponad wolną MA? Warunek logiczny. Akcja: kiedy ewaluator strzela, zrób coś.",
     realization:
       "Ta struktura nie opisuje tradingu. Opisuje każdy proces biznesowy, w którym masz dane w czasie, warunki które cię interesują, i akcje, które chcesz podjąć, gdy te warunki są spełnione.",
     examples: {
@@ -79,7 +79,7 @@ export const translations: typeof enTranslations = {
       revenueAnomaly: {
         label: "Anomalie przychodów",
         description:
-          "Wskaźnik zwrotów przekracza 20% w ciągu dnia - Thea jest powiadamiana przed zobaczeniem tego w dashboardzie.",
+          "Wskaźnik zwrotów przekracza 20% w ciągu dnia: Thea jest powiadamiana przed zobaczeniem tego w dashboardzie.",
       },
     },
   },
@@ -95,12 +95,12 @@ export const translations: typeof enTranslations = {
     indicator: {
       label: "Indicator",
       description:
-        "Czysty, wielokrotnego użytku endpoint obliczeniowy - EMA, RSI, MACD, Wstęgi Bollingera, clamp, delta, średnia okienna. Brak SQL. Brak wiedzy domenowej. Działa na dowolnym źródle danych.",
+        "Czysty, wielokrotnego użytku endpoint obliczeniowy: EMA, RSI, MACD, Wstęgi Bollingera, clamp, delta, średnia okienna. Brak SQL. Brak wiedzy domenowej. Działa na dowolnym źródle danych.",
     },
     evaluator: {
       label: "Evaluator",
       description:
-        "Próg lub warunek. Przyjmuje serię i zadaje pytanie. Czy ta wartość jest poniżej 0,7? Czy ten stosunek przekroczył 20%? Zwraca sygnał - wystrzelony lub nie.",
+        "Próg lub warunek. Przyjmuje serię i zadaje pytanie. Czy ta wartość jest poniżej 0,7? Czy ten stosunek przekroczył 20%? Zwraca sygnał: wystrzelony lub nie.",
     },
     action: {
       label: "Action",
@@ -124,7 +124,7 @@ export const translations: typeof enTranslations = {
         "Każdy węzeł Vibe Sense to standardowy endpoint, zdefiniowany za pomocą createEndpoint(), zarejestrowany w tym samym rejestrze endpointów co wszystko inne na platformie.",
     },
     cliCaption:
-      "Ten sam endpoint EMA, który działał jako węzeł w grafie lejka leadów - ta sama definicja, ta sama walidacja, ta sama autoryzacja - wywoływalny samodzielnie z CLI.",
+      "Ten sam endpoint EMA, który działał jako węzeł w grafie lejka leadów (ta sama definicja, ta sama walidacja, ta sama autoryzacja) wywoływalny samodzielnie z CLI.",
     insight:
       "TEN SAM endpoint, który jest węzłem w grafie lejka leadów, jest też samodzielnym narzędziem na 13 platformach.",
     keyLine: "Pipeline to tylko endpointy wywołujące endpointy.",
@@ -139,7 +139,7 @@ export const translations: typeof enTranslations = {
     examples: {
       alert: {
         label: "Alert",
-        description: "Wywołaj complete-task - Thea odbiera to natychmiast.",
+        description: "Wywołaj complete-task: Thea odbiera to natychmiast.",
       },
       campaign: {
         label: "Kampania",
@@ -165,7 +165,7 @@ export const translations: typeof enTranslations = {
         created: {
           name: "leads.created",
           description:
-            "Zapytanie o leady według created_at. Sparse - godziny bez nowych leadów nie produkują punktu danych.",
+            "Zapytanie o leady według created_at. Sparse: godziny bez nowych leadów nie produkują punktu danych.",
         },
         converted: {
           name: "leads.converted",
@@ -203,7 +203,7 @@ export const translations: typeof enTranslations = {
     column3: {
       label: "Kolumna 3: Ewaluatory",
       description:
-        "Warunki progowe. Każdy zwraca sygnał - wystrzelony lub nie.",
+        "Warunki progowe. Każdy zwraca sygnał: wystrzelony lub nie.",
       nodes: {
         leadDrop: {
           name: "eval_lead_drop",
@@ -236,7 +236,7 @@ export const translations: typeof enTranslations = {
     indicators: {
       label: "Wskaźniki pod analytics/indicators/",
       description:
-        "Czyste obliczenia - EMA, RSI, MACD, Wstęgi Bollingera, clamp, delta, średnia okienna. Brak wiedzy domenowej. Działa na dowolnym źródle danych.",
+        "Czyste obliczenia: EMA, RSI, MACD, Wstęgi Bollingera, clamp, delta, średnia okienna. Brak wiedzy domenowej. Działa na dowolnym źródle danych.",
     },
     registration:
       "Przy starcie rejestr wskaźników automatycznie odkrywa oba. Endpointy źródeł danych rejestrują się jako definicje węzłów. Dodajesz nową domenę, dodajesz endpointy data-sources/, eksportujesz graphSeeds. Pojawiają się.",
@@ -249,7 +249,7 @@ export const translations: typeof enTranslations = {
     versioning: {
       label: "Wersjonowanie",
       description:
-        "Grafy są wersjonowane. Gdy edytujesz graf, tworzysz nową wersję - nigdy nie mutuj aktywnej. Nowa wersja jest wersją roboczą. Promujesz ją jawnie. Rollback jest trywialny.",
+        "Grafy są wersjonowane. Gdy edytujesz graf, tworzysz nową wersję. Nigdy nie mutuj aktywnej. Nowa wersja jest wersją roboczą. Promujesz ją jawnie. Rollback jest trywialny.",
     },
     backtest: {
       label: "Backtest",
@@ -271,7 +271,7 @@ export const translations: typeof enTranslations = {
       never: {
         label: "never",
         description:
-          "Zawsze obliczane na żywo z danych wejściowych. Wyjścia EMA, wskaźniki - brak kosztów przechowywania. Lookback automatycznie rozszerzone dla rozgrzewki.",
+          "Zawsze obliczane na żywo z danych wejściowych. Wyjścia EMA, wskaźniki: brak kosztów przechowywania. Lookback automatycznie rozszerzone dla rozgrzewki.",
       },
     },
   },
@@ -286,10 +286,10 @@ export const translations: typeof enTranslations = {
           "Topologiczne wykonanie przez graph walker. Obsługa wielu rozdzielczości z automatycznym skalowaniem. Rozszerzenie zakresu uwzględniające lookback.",
         versioning:
           "Wersjonowanie, tryb backtest z pełną historią uruchomień, trwałość sygnałów jako ślad audytu.",
-        cli: "Dostęp CLI - vibe vibe-sense-ema, vibe vibe-sense-rsi, dowolny endpoint wskaźnika, wywoływalny samodzielnie.",
-        mcp: "Rejestracja MCP - endpointy wskaźników pojawiają się na liście narzędzi. Thea może bezpośrednio wywoływać wskaźniki.",
+        cli: "Dostęp CLI: vibe vibe-sense-ema, vibe vibe-sense-rsi, dowolny endpoint wskaźnika, wywoływalny samodzielnie.",
+        mcp: "Rejestracja MCP: endpointy wskaźników pojawiają się na liście narzędzi. Thea może bezpośrednio wywoływać wskaźniki.",
         seeds:
-          "Grafy seed: 29 grafów w 9 domenach - leady, kredyty, użytkownicy, subskrypcje, polecenia, newslettery, płatności, messenger, czat AI i zdrowie systemu. Wszystkie działają od razu na vibe dev.",
+          "Grafy seed: 29 grafów w 9 domenach, leady, kredyty, użytkownicy, subskrypcje, polecenia, newslettery, płatności, messenger, czat AI i zdrowie systemu. Wszystkie działają od razu na vibe dev.",
       },
     },
     coming: {
@@ -307,7 +307,7 @@ export const translations: typeof enTranslations = {
   vision: {
     title: "Czym to naprawdę jest",
     paragraph1:
-      "Każdy proces biznesowy, który można opisać jako: mając te dane, gdy te warunki są spełnione, zrób to - to jest graf Vibe Sense. Monitoring, tak. Alertowanie, tak. Ale też: automatyczna kwalifikacja leadów, wykrywanie anomalii przychodów, równoważenie ekonomii kredytów, automatyzacja marketingu.",
+      "Każdy proces biznesowy, który można opisać jako: mając te dane, gdy te warunki są spełnione, zrób to. To jest graf Vibe Sense. Monitoring, tak. Alertowanie, tak. Ale też: automatyczna kwalifikacja leadów, wykrywanie anomalii przychodów, równoważenie ekonomii kredytów, automatyzacja marketingu.",
     paragraph2:
       "Bot tradingowy miał tę architekturę właściwą. Wskaźniki, ewaluatory, akcje, tryb backtest. To, co zrobiłem źle, to zbudowanie go w izolacji. W Octane EMA było zamknięte w pipeline. W next-vibe EMA jest endpointem pierwszej klasy.",
     keyLine:

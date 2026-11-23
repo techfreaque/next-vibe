@@ -4,12 +4,12 @@ export const translations: typeof enTranslations = {
   title: "Kortex",
   backToChat: "Zurück zum Chat",
   description:
-    "Das Langzeitgedächtnis deiner KI. Dateien, Dokumente, Threads, Skills - durchsuchen, bearbeiten, löschen.",
+    "Das Langzeitgedächtnis deiner KI. Dateien, Dokumente, Threads, Skills: durchsuchen, bearbeiten, löschen.",
   openFullPage: "Vollständige Seite öffnen",
   signIn: {
     title: "Deine KI vergisst nichts. Sobald sie dich kennt.",
     description:
-      "Kortex ist das Gedächtnis deiner KI über alle Chats hinweg. Melde dich an, um zu sehen, was sie weiß – und es zu steuern.",
+      "Kortex ist das Gedächtnis deiner KI über alle Chats hinweg. Melde dich an, um zu sehen, was sie weiß und es zu steuern.",
     logIn: "Anmelden",
     signUp: "Kostenloses Konto erstellen",
   },

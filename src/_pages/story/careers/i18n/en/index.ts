@@ -1,18 +1,18 @@
 export const translations = {
   meta: {
-    title: "Build with next-vibe - {{appName}}",
+    title: "Build with next-vibe: {{appName}}",
     category: "Developers",
     description:
-      "next-vibe turns any endpoint into a web form, CLI command, MCP tool, native screen, and AI-callable skill - simultaneously. Automate anything a human can do on a computer.",
-    imageAlt: "next-vibe developer platform - {{appName}}",
+      "next-vibe turns any endpoint into a web form, CLI command, MCP tool, native screen, and AI-callable skill simultaneously. Automate anything a human can do on a computer.",
+    imageAlt: "next-vibe developer platform: {{appName}}",
     keywords:
       "next-vibe, AI automation, developer platform, business automation, ERP integration, production automation, {{appName}}",
-    ogTitle: "Build with next-vibe - {{appName}}",
+    ogTitle: "Build with next-vibe: {{appName}}",
     ogDescription:
-      "One codebase. Every surface. Automate production lines, ERP systems, desktop workflows - anything a human can do on a computer.",
-    twitterTitle: "Build with next-vibe - {{appName}}",
+      "One codebase. Every surface. Automate production lines, ERP systems, desktop workflows: anything a human can do on a computer.",
+    twitterTitle: "Build with next-vibe: {{appName}}",
     twitterDescription:
-      "One codebase. Every surface. Automate production lines, ERP systems, desktop workflows - anything a human can do on a computer.",
+      "One codebase. Every surface. Automate production lines, ERP systems, desktop workflows: anything a human can do on a computer.",
   },
 
   hero: {
@@ -35,7 +35,7 @@ export const translations = {
       businessDevs: {
         title: "Business developers",
         description:
-          "Connect your ERP, CRM, or any internal system to AI workflows. Pass data in, get decisions out - no glue code.",
+          "Connect your ERP, CRM, or any internal system to AI workflows. Pass data in, get decisions out: no glue code.",
       },
       industrialDevs: {
         title: "Industrial & embedded",
@@ -45,7 +45,7 @@ export const translations = {
       enterpriseDevs: {
         title: "Enterprise teams",
         description:
-          "Replace fragmented tooling with one unified platform. Web UI, CLI, MCP, native app - same endpoint, zero duplication.",
+          "Replace fragmented tooling with one unified platform. Web UI, CLI, MCP, native app: same endpoint, zero duplication.",
       },
     },
   },
@@ -61,7 +61,7 @@ export const translations = {
       desktopAutomation: {
         title: "Full desktop automation",
         description:
-          "next-vibe can take over the entire desktop including a browser. Form fills, scraping, navigation, file operations - scripted once, runs anywhere.",
+          "next-vibe can take over the entire desktop including a browser. Form fills, scraping, navigation, file operations: scripted once, runs anywhere.",
       },
       productionLine: {
         title: "Production line automation",
@@ -81,7 +81,7 @@ export const translations = {
       skillEconomy: {
         title: "Sell what you build",
         description:
-          "Wrap your automation as a skill. Share the link. Earn 10% of every payment from each user who signs up through it - recurring, for as long as they pay.",
+          "Wrap your automation as a skill. Share the link. Earn 10% of every payment from each user who signs up through it: recurring, for as long as they pay.",
       },
     },
   },
@@ -99,7 +99,7 @@ export const translations = {
       ai: "AI-callable skill",
     },
     description:
-      "Platform is detected at runtime. The same endpoint that renders a web UI for a human becomes a machine-callable tool for an AI agent - no extra code.",
+      "Platform is detected at runtime. The same endpoint that renders a web UI for a human becomes a machine-callable tool for an AI agent: no extra code.",
   },
 
   referral: {

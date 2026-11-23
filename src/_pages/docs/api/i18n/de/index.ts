@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "{{appName}} API-Doku - OpenAI- und Anthropic-kompatibel",
+    title: "{{appName}} API-Doku: OpenAI- und Anthropic-kompatibel",
     description:
       "Eine Base-URL, {{modelCount}} Chatmodelle. OpenAI Chat Completions und Responses API, Anthropic Messages API, Streaming, Tool-Aufrufe. Dazu Bilder, Sprachausgabe, Transkription, Video und Musik im OpenAI-Format. Codex CLI und Claude Code verbinden sich direkt. Bezahlt wird in Credits.",
     category: "API",

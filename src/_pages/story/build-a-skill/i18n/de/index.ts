@@ -1,7 +1,7 @@
 import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Skill bauen - Eigene KI für alles",
+    title: "Skill bauen: Eigene KI für alles",
     description:
       "Jeden Workflow in einen wiederverwendbaren KI-Skill verwandeln. Skill-Seite nutzen oder Thea im Chat fragen. Kein Code nötig.",
     category: "Skills",
@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
     title: "Skill bauen.",
     titleLine2: "KI besitzen.",
     subtitle:
-      "Persona, Modell, Tools, Stimme - einmal konfiguriert, für immer deins. Für alles bauen. Teilen. Verdienen.",
+      "Persona, Modell, Tools, Stimme: einmal konfiguriert, für immer deins. Für alles bauen. Teilen. Verdienen.",
     ctaPrimary: "Skill erstellen",
     ctaSecondary: "Thea oder Hermes fragen",
   },
@@ -26,7 +26,7 @@ export const translations: typeof enTranslations = {
       "Identität und Anweisungen. 200–500 Wörter. Fühlt sich wie eine Person an, nicht wie ein FAQ.",
     item1Label: "Modellauswahl",
     item1Body:
-      "Nach Intelligenz, Content-Level und Preis filtern - oder ein Modell fest pinnen.",
+      "Nach Intelligenz, Content-Level und Preis filtern oder ein Modell fest pinnen.",
     item2Label: "Tools",
     item2Body:
       "Exakte Whitelist: Suche, Bildgenerierung, Memory, Code, Musik, Video.",
@@ -39,7 +39,7 @@ export const translations: typeof enTranslations = {
     way1Badge: "Skill-Seite",
     way1Title: "Erstellen-Button in der Skill-Liste",
     way1Body:
-      "Skill-Seite öffnen oder Modell-Selector in einem Chat-Thread klicken. Erstellen drücken. Formular ausfüllen - Name, System Prompt, Modell, Tools. Fertig.",
+      "Skill-Seite öffnen oder Modell-Selector in einem Chat-Thread klicken. Erstellen drücken. Formular ausfüllen: Name, System Prompt, Modell, Tools. Fertig.",
     way1Detail:
       "Kein Wizard, keine Extra-Schritte. Das Formular ist die gesamte Config.",
     way1Cta: "Skills öffnen",
@@ -48,13 +48,13 @@ export const translations: typeof enTranslations = {
     way2Body:
       'Thread öffnen: "Bau mir einen klinischen Reasoning-Skill für Medizinstudenten." Der Skill-Creator-Subagent stellt ein paar Fragen, schreibt den Prompt, wählt das Modell, konfiguriert Tools, erstellt das Skill, pinnt es in die Sidebar.',
     way2Detail:
-      "Thea delegiert an den Skill Creator - Subagent mit skill-create, favorite-create, tool-help. Beschreiben, er baut.",
+      "Thea delegiert an den Skill Creator: Subagent mit skill-create, favorite-create, tool-help. Beschreiben, er baut.",
     way2Cta: "Chat öffnen",
   },
   prompt: {
     title: "System Prompt, der funktioniert",
     subtitle:
-      "Das Herzstück. Ein guter fühlt sich wie eine Person an - kein Policy-Dokument.",
+      "Das Herzstück. Ein guter fühlt sich wie eine Person an: kein Policy-Dokument.",
     dos: "Was funktioniert",
     donts: "Was es tötet",
     do0Title: "Mit Identität beginnen",
@@ -72,12 +72,12 @@ export const translations: typeof enTranslations = {
       "Das Modell liest den vollen Prompt bei jedem Turn. Kürzer gewinnt.",
     dont0Title: "AGB-artige Regellisten",
     dont0Body:
-      '"Sei immer hilfreich, sei nie unhöflich" - jede KI bekommt das. Reines Rauschen.',
+      "\"Sei immer hilfreich, sei nie unhöflich\" (jede KI bekommt das. Reines Rauschen.)",
     dont1Title: '"Sei immer hilfreich"',
     dont1Body: "Das Modell weiß es bereits. Weglassen.",
     dont2Title: "Widersprüchliche Einschränkungen",
     dont2Body:
-      '"Sei kreativ, aber bleib immer beim Thema" - das Modell sichert ewig ab. Eines wählen.',
+      "\"Sei kreativ, aber bleib immer beim Thema\" (das Modell sichert ewig ab. Eines wählen.)",
     dont3Title: "Lange Fähigkeitslisten",
     dont3Body:
       "Das Modell weiß, was es kann. Die Docs nicht im Prompt wiederholen.",
@@ -107,12 +107,12 @@ export const translations: typeof enTranslations = {
     item5Name: "Der Experte, den man sich nicht leisten kann",
     item5Category: "Spezialist",
     item5Desc:
-      "Berater, Anwalt, Finanzberater - destilliert in ein Skill. 400 €/Std.-Wissen, kostenlos.",
+      "Berater, Anwalt, Finanzberater: destilliert in ein Skill. 400 €/Std.-Wissen, kostenlos.",
   },
   dev: {
     title: "Für Entwickler: skill.ts",
-    body: "Next-vibe lokal? Den Agenten bitten, eine Skill-Datei zu generieren. Gleiche Struktur wie jedes eingebaute Skill - compile-ready, commit-ready.",
-    note: "Der Agent kennt das vollständige Schema. Beschreiben, was gebraucht wird - er generiert, registriert, sofort live.",
+    body: "Next-vibe lokal? Den Agenten bitten, eine Skill-Datei zu generieren. Gleiche Struktur wie jedes eingebaute Skill: compile-ready, commit-ready.",
+    note: "Der Agent kennt das vollständige Schema. Beschreiben, was gebraucht wird. Er generiert, registriert, sofort live.",
   },
   cta: {
     title: "Deinen bauen.",

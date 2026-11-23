@@ -392,7 +392,7 @@ function DisplayOnlySection(): JSX.Element {
               typically used for supplementary information. It automatically
               truncates after two lines with an ellipsis for compact display.
             </P>
-            <Span className="text-muted-foreground">&mdash;</Span>
+            <Span className="text-muted-foreground">No description</Span>
           </Div>
         </WidgetCard>
 
@@ -630,7 +630,7 @@ function DisplayOnlySection(): JSX.Element {
             <Span className="italic text-muted-foreground">
               Muted italic text
             </Span>
-            <Span className="text-muted-foreground">&mdash;</Span>
+            <Span className="text-muted-foreground">No value</Span>
           </Div>
         </WidgetCard>
 
@@ -975,7 +975,7 @@ function FormFieldsSection(): JSX.Element {
             <Label>Report Period</Label>
             <Div className="flex items-center gap-2">
               <Input type="date" defaultValue="2026-04-01" className="flex-1" />
-              <Span className="text-muted-foreground">&mdash;</Span>
+              <Span className="text-muted-foreground">to</Span>
               <Input type="date" defaultValue="2026-04-11" className="flex-1" />
             </Div>
           </Div>
@@ -1003,7 +1003,7 @@ function FormFieldsSection(): JSX.Element {
             <Label>Business Hours</Label>
             <Div className="flex items-center gap-2">
               <Input type="time" defaultValue="09:00" className="flex-1" />
-              <Span className="text-muted-foreground">&mdash;</Span>
+              <Span className="text-muted-foreground">to</Span>
               <Input type="time" defaultValue="17:00" className="flex-1" />
             </Div>
           </Div>
@@ -1091,10 +1091,10 @@ function FormFieldsSection(): JSX.Element {
                 <SelectValue placeholder="Select currency" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="eur">EUR - Euro</SelectItem>
-                <SelectItem value="usd">USD - US Dollar</SelectItem>
-                <SelectItem value="gbp">GBP - British Pound</SelectItem>
-                <SelectItem value="pln">PLN - Polish Zloty</SelectItem>
+                <SelectItem value="eur">EUR: Euro</SelectItem>
+                <SelectItem value="usd">USD: US Dollar</SelectItem>
+                <SelectItem value="gbp">GBP: British Pound</SelectItem>
+                <SelectItem value="pln">PLN: Polish Zloty</SelectItem>
               </SelectContent>
             </Select>
           </Div>

@@ -141,7 +141,7 @@ export const translations: typeof enTranslations = {
         badge: "Dostępne dla wszystkich",
         title: "Subskrypcja miesięczna",
         description:
-          "{{subPrice}}/miesiąc - {{subCredits}} kredytów miesięcznie ze wszystkimi {{modelCount}} modelami AI",
+          "{{subPrice}}/miesiąc: {{subCredits}} kredytów miesięcznie ze wszystkimi {{modelCount}} modelami AI",
         perMonth: "/miesiąc",
         perYear: "/rok",
         yearlyEquivalent:
@@ -217,7 +217,7 @@ export const translations: typeof enTranslations = {
       allocate: {
         title: "Przydziel kredyty",
         description:
-          "Dodaj kredyty do dowolnego konta użytkownika. Kredyty działają jako limit wydatków - kontrolują, ile użycia AI jest dozwolone.",
+          "Dodaj kredyty do dowolnego konta użytkownika. Kredyty działają jako limit wydatków: kontrolują, ile użycia AI jest dozwolone.",
         howItWorks: {
           title: "Jak działają limity kredytów",
           freePool: {
@@ -228,7 +228,7 @@ export const translations: typeof enTranslations = {
           bonus: {
             title: "Kredyty bonusowe (na użytkownika)",
             description:
-              "Kredyty bonusowe są stałe - nigdy nie wygasają i sumują się z kredytami z puli.",
+              "Kredyty bonusowe są stałe. Nigdy nie wygasają i sumują się z kredytami z puli.",
           },
           apiKeys: {
             title: "Usuń wszystkie limity",

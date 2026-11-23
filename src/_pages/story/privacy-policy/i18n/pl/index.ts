@@ -2,17 +2,17 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Polityka prywatności - {{appName}}",
+    title: "Polityka prywatności: {{appName}}",
     category: "Prawne",
     description:
       "Dowiedz się, jak {{appName}} chroni Twoją prywatność i przetwarza Twoje dane",
     imageAlt: "Polityka prywatności",
     keywords:
       "polityka prywatności, ochrona danych, prywatność użytkownika, {{appName}} prywatność",
-    ogTitle: "Polityka prywatności - {{appName}}",
+    ogTitle: "Polityka prywatności: {{appName}}",
     ogDescription:
       "Dowiedz się, jak {{appName}} chroni Twoją prywatność i przetwarza Twoje dane",
-    twitterTitle: "Polityka prywatności - {{appName}}",
+    twitterTitle: "Polityka prywatności: {{appName}}",
     twitterDescription:
       "Dowiedz się, jak {{appName}} chroni Twoją prywatność i przetwarza Twoje dane",
   },

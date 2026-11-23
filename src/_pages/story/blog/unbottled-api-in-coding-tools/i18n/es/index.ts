@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Codex CLI y Claude Code en cada modelo - {{appName}} API",
+    title: "Codex CLI y Claude Code en cada modelo: {{appName}} API",
     description:
       "Codex CLI, Claude Code, OpenCode, Continue, Aider y Cline en una tecla {{appName}}. Claude, GPT, DeepSeek, GLM y modelos sin censura. Una base URL, un comando por herramienta.",
     category: "Guía para Desarrolladores",
@@ -44,7 +44,7 @@ export const translations: typeof enTranslations = {
       "Camino más rápido: justo después de crear una llave, la página de teclas API muestra cada bloque debajo con su llave ya llenada. Escoge tu herramienta, copia, corre.",
     baseUrlLabel: "Base URL",
     baseUrlNote:
-      "Para OpenAI - herramientas de estilo: Codex, OpenCode, Continue, Aider, Cline. El lugar en el camino sólo cambia el lenguaje de los mensajes de error.",
+      "Para OpenAI: herramientas de estilo: Codex, OpenCode, Continue, Aider, Cline. El lugar en el camino sólo cambia el lenguaje de los mensajes de error.",
     anthropicBaseUrlLabel: "Anthropic base URL",
     anthropicBaseUrlNote:
       "Para Claude Code y los SDK Anthropic. Mismo URL sin /v1: añaden /v1/messages ellos mismos.",

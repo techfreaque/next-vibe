@@ -18,7 +18,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "El Principio de Superficie Unificada",
     title: "Un solo código para 13 plataformas.",
     subtitle:
-      "Cómo tres archivos se convierten en un formulario web, comando CLI, herramienta MCP, pantalla nativa y trabajo automatizado - simultáneamente.",
+      "Cómo tres archivos se convierten en un formulario web, comando CLI, herramienta MCP, pantalla nativa y trabajo automatizado simultáneamente.",
     fileBarLabel: "definition.ts → web · cli · mcp · nativo · cron · 10 más",
     theaCardTitle: "¿Quién es Thea?",
     fileTreePath: "~/src/explain-to-my-boss/",
@@ -31,9 +31,9 @@ export const translations: typeof enTranslations = {
   intro: {
     hook: "5,802 archivos TypeScript. ~2.1 millones de líneas. Cero `any`. Cero errores de tipo de tiempo de ejecución. Un patrón. Repetido 374 veces.",
     para1:
-      "Esa es la base de código detrás de {{appName}} - y el marco que lo potencia, next-vibe. La misma arquitectura ejecuta una aplicación web, una aplicación móvil, un CLI, una interfaz de agente AI, un servidor MCP, un sistema cron, un bus de eventos websocket y un motor de flujo de datos en vivo.",
+      "Esa es la base de código detrás de {{appName}} y el marco que lo potencia, next-vibe. La misma arquitectura ejecuta una aplicación web, una aplicación móvil, un CLI, una interfaz de agente AI, un servidor MCP, un sistema cron, un bus de eventos websocket y un motor de flujo de datos en vivo.",
     para2:
-      "El patrón se llama la superficie unificada. Esto es lo que es, cómo funciona, y por qué - una vez que lo veas - te resultará difícil regresar.",
+      "El patrón se llama la superficie unificada. Esto es lo que es, cómo funciona, y por qué (una vez que lo veas) te resultará difícil regresar.",
   },
 
   fileTreeSection: {
@@ -63,7 +63,7 @@ export const translations: typeof enTranslations = {
       },
       reactUi: {
         label: "Reactúa UI",
-        description: "Autogenerado de la definición - no JSX escrito",
+        description: "Autogenerado de la definición: no JSX escrito",
       },
       cli: {
         label: "CLI",
@@ -115,7 +115,7 @@ export const translations: typeof enTranslations = {
       vibeBoard: {
         label: "Nodo de Vibe Sense",
         description:
-          "Nodo en un gráfico de flujo de datos en vivo - mismo punto final",
+          "Nodo en un gráfico de flujo de datos en vivo: mismo punto final",
       },
     },
   },
@@ -126,7 +126,7 @@ export const translations: typeof enTranslations = {
   platformMarkersSection: {
     title: "El acceso a la plataforma es un array de enum",
     para1:
-      "No escribes capas de permiso separadas para cada plataforma. El acceso a la plataforma se declara en la definición misma - una matriz de enum que cada plataforma lee nativamente a tiempo de ejecución.",
+      "No escribes capas de permiso separadas para cada plataforma. El acceso a la plataforma se declara en la definición misma: una matriz de enum que cada plataforma lee nativamente a tiempo de ejecución.",
     codeComment: "// Este único array controla donde aparece la función",
     cliOff: "  CLI_OFF, // bloquea el CLI",
     mcpVisible: "  MCP_VISIBLE, // opta por la lista de herramientas MCP",
@@ -144,16 +144,16 @@ export const translations: typeof enTranslations = {
     subtitle:
       "En lugar de explicar el patrón abstractamente, déjeme mostrarle lo que parece en la práctica.",
     theaIntro:
-      "Thea es el administrador de AI para esta plataforma. Se ejecuta en producción 24/7, operando a través de los mismos contratos de endpoint exactamente como cada usuario - la misma validación, los mismos permisos, sin backdoor. Y puede delegar el trabajo a una máquina local.",
+      "Thea es el administrador de AI para esta plataforma. Se ejecuta en producción 24/7, operando a través de los mismos contratos de endpoint exactamente como cada usuario, la misma validación, los mismos permisos, sin backdoor. Y puede delegar el trabajo a una máquina local.",
     demoStory:
-      "Le pedí a Thea que construyera un nuevo endpoint - explic-to-my-boss - usando Claude Code corriendo en mi PC. Le das una decisión técnica. Te da una justificación no técnica que tu manager realmente creerá. Todo desarrollador ha necesitado esto.",
+      "Le pedí a Thea que construyera un nuevo endpoint (explic-to-my-boss) usando Claude Code corriendo en mi PC. Le das una decisión técnica. Te da una justificación no técnica que tu manager realmente creerá. Todo desarrollador ha necesitado esto.",
 
     flow: {
       step1: {
         actor: "Tú.",
         label: "Pregunte a Thea",
         description:
-          "Escriba la tarea en el chat - dos campos de entrada, una respuesta AI -generada, todas las plataformas, MCP_VISIBLE, widgets personalizados React y CLI.",
+          "Escriba la tarea en el chat: dos campos de entrada, una respuesta AI -generada, todas las plataformas, MCP_VISIBLE, widgets personalizados React y CLI.",
       },
       step2: {
         actor: "Thea",
@@ -197,26 +197,26 @@ export const translations: typeof enTranslations = {
     proofPara:
       'Una vez que Claude Code llamó "tarea completa", existían tres cosas que no eran cinco minutos antes:',
     proof1:
-      "Un widget personalizado React - dirección dramática, gradiente animado en la salida AI, una puntuación de alineación corporativa falsa.",
+      "Un widget personalizado React: dirección dramática, gradiente animado en la salida AI, una puntuación de alineación corporativa falsa.",
     proof2:
-      "Un widget CLI - banner ASCII, spinner mientras que el AI piensa, la línea de justificación impresa por línea en verde.",
+      "Un widget CLI: banner ASCII, spinner mientras que el AI piensa, la línea de justificación impresa por línea en verde.",
     proof3:
-      "Una herramienta MCP - explica-a-my- boss_POST - porque MCP_VISIBLE estaba en la definición. Claude Desktop ahora puede explicar sus decisiones a su jefe en su nombre.",
+      "Una herramienta MCP (explica-a-my- boss_POST) porque MCP_VISIBLE estaba en la definición. Claude Desktop ahora puede explicar sus decisiones a su jefe en su nombre.",
     proofClosing:
       "Una definición. Cinco archivos totales. Tres UIs completamente diferentes. El contrato de endpoint no cambió. Sólo la capa de presentación lo hizo.",
   },
 
   underTheHoodSection: {
     title: "Bajo la capucha",
-    definitionTitle: "definition.ts - el contrato de vida",
+    definitionTitle: "definition.ts: el contrato de vida",
     definitionPara:
-      "La definición no es un generador de código. Es un contrato de vida que cada plataforma lee nativamente a tiempo de ejecución. Cámbialo - todas las actualizaciones. Eliminar la carpeta - nada se rompe río abajo. No hay código generado para limpiar.",
-    repositoryTitle: "repository.ts - sin lanzamiento, nunca",
+      "La definición no es un generador de código. Es un contrato de vida que cada plataforma lee nativamente a tiempo de ejecución. Cámbialo: todas las actualizaciones. Eliminar la carpeta: nada se rompe río abajo. No hay código generado para limpiar.",
+    repositoryTitle: "repository.ts: sin lanzamiento, nunca",
     repositoryPara:
-      "Las funciones del repositorio nunca lanzan. Los errores se propagan como datos - escritos, explícitos y capturables por el callador. El AI puede razonar sobre los caminos de falla. No hay excepciones sorpresa.",
+      "Las funciones del repositorio devuelven los errores como datos tipados y explícitos. Quien llama puede gestionarlos y la IA puede razonar sobre los fallos. Sin excepciones inesperadas.",
     repositoryCodeComment:
       "// Devoluciones RespuestaTipo asignadoT confidencial - nunca lanza",
-    routeTitle: "route.ts - todo el puente",
+    routeTitle: "route.ts: todo el puente",
     routePara:
       "route.ts conecta la definición al manejador. endpointsHandler se encarga de validación, auth, logging y exposición a las 13 plataformas. La lógica de negocio real es una línea.",
     statsTitle: "Los números",
@@ -226,7 +226,7 @@ export const translations: typeof enTranslations = {
     statAnyDetail: "Forzada en tiempo de construcción, no convención",
     statLanguages: "Tres idiomas",
     statLanguagesDetail:
-      'Compile-time comprobado - t("typo.here") es un error compilador',
+      "Compile-time comprobado: t(\"typo.here\") es un error compilador",
     statsClosing:
       "Eso no es una convención. Se aplica a tiempo de construcción.",
   },
@@ -237,7 +237,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Siguiente",
     title: "Vibe Sense: El oleoducto es la plataforma",
     description:
-      "Cada nodo en un gráfico Vibe Sense es un punto final next-vibe regular. El mismo createEndpoint (). La misma estructura de 3 ficheros. Un indicador EMA es un punto final. Un evaluador de umbrales es un punto final. Y porque es un punto final - se puede llamar desde el CLI, desde el AI, desde cualquier lugar.",
+      "Cada nodo en un gráfico Vibe Sense es un punto final next-vibe regular. El mismo createEndpoint (). La misma estructura de 3 ficheros. Un indicador EMA es un punto final. Un evaluador de umbrales es un punto final. Y porque es un punto final: se puede llamar desde el CLI, desde el AI, desde cualquier lugar.",
     calloutLine: "El oleoducto es la plataforma.",
     teaser:
       "Vibe Sense añade endpoints para series temporales. Embudos de prospectos, uso de créditos y crecimiento de usuarios. Tu plataforma se monitorea sola.",
@@ -246,7 +246,7 @@ export const translations: typeof enTranslations = {
 
   closing: {
     title: "Definelo una vez. Existe en todas partes.",
-    para: "WordPress le dio a todos el poder de publicar. next-vibe le da el poder de construir plataformas que funcionan en web, móvil, CLI, agentes AI, y automatización - que se observan ellos mismos, razón sobre sus propios datos, y actuar en lo que encuentran.",
+    para: "WordPress puso la publicación al alcance de todos. Con next-vibe puedes construir plataformas para web, móvil, CLI, agentes de IA y automatización. Pueden supervisarse, razonar sobre sus propios datos y actuar según lo que observen.",
     cta: "Star next-vibe en GitHub",
     frameworkCta: "Explora next-vibe",
   },

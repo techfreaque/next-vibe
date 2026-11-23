@@ -2,19 +2,19 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Construir con next-vibe - {{appName}}",
+    title: "Construir con next-vibe: {{appName}}",
     category: "Desarrolladores",
     description:
-      "next-vibe convierte cualquier punto final en un formulario web, comando CLI, herramienta MCP, pantalla nativa, y AI - habilidad nominal - simultáneamente. Automatizar cualquier cosa que un humano pueda hacer en una computadora.",
-    imageAlt: "next-vibe plataforma de desarrolladores - {{appName}}",
+      "next-vibe convierte cualquier punto final en un formulario web, comando CLI, herramienta MCP, pantalla nativa, y AI: habilidad nominal simultáneamente. Automatizar cualquier cosa que un humano pueda hacer en una computadora.",
+    imageAlt: "next-vibe plataforma de desarrolladores: {{appName}}",
     keywords:
       "next-vibe, automatización AI, plataforma de desarrolladores, automatización de negocios, integración ERP, automatización de producción, {{appName}}",
-    ogTitle: "Construir con next-vibe - {{appName}}",
+    ogTitle: "Construir con next-vibe: {{appName}}",
     ogDescription:
-      "Una base de código. Cada superficie. Automatizar líneas de producción, sistemas ERP, flujos de trabajo de escritorio - cualquier cosa que un humano puede hacer en un ordenador.",
-    twitterTitle: "Construir con next-vibe - {{appName}}",
+      "Una base de código. Cada superficie. Automatizar líneas de producción, sistemas ERP, flujos de trabajo de escritorio: cualquier cosa que un humano puede hacer en un ordenador.",
+    twitterTitle: "Construir con next-vibe: {{appName}}",
     twitterDescription:
-      "Una base de código. Cada superficie. Automatizar líneas de producción, sistemas ERP, flujos de trabajo de escritorio - cualquier cosa que un humano puede hacer en un ordenador.",
+      "Una base de código. Cada superficie. Automatizar líneas de producción, sistemas ERP, flujos de trabajo de escritorio: cualquier cosa que un humano puede hacer en un ordenador.",
   },
 
   hero: {
@@ -32,12 +32,12 @@ export const translations: typeof enTranslations = {
       freelancers: {
         title: "Freelancers &quot; agencies",
         description:
-          "Entregar AI - herramientas propulsadas a los clientes sin construir backends separados, CLIs y UIs. Una base de código, cada superficie.",
+          "Entregar AI: herramientas propulsadas a los clientes sin construir backends separados, CLIs y UIs. Una base de código, cada superficie.",
       },
       businessDevs: {
         title: "Desarrolladores empresariales",
         description:
-          "Conecta tu ERP, CRM, o cualquier sistema interno a los flujos de trabajo AI. Pase los datos, tome decisiones - sin código de pegamento.",
+          "Conecta tu ERP, CRM, o cualquier sistema interno a los flujos de trabajo AI. Pase los datos, tome decisiones, sin código de pegamento.",
       },
       industrialDevs: {
         title: "Industriales e incrustados",
@@ -47,7 +47,7 @@ export const translations: typeof enTranslations = {
       enterpriseDevs: {
         title: "Equipos institucionales",
         description:
-          "Sustitúyase la herramienta fragmentada con una plataforma unificada. Web UI, CLI, MCP, aplicación nativa - mismo punto final, cero duplicación.",
+          "Sustitúyase la herramienta fragmentada con una plataforma unificada. Web UI, CLI, MCP, aplicación nativa: mismo punto final, cero duplicación.",
       },
     },
   },
@@ -63,7 +63,7 @@ export const translations: typeof enTranslations = {
       desktopAutomation: {
         title: "Automatización completa de escritorio",
         description:
-          "next-vibe puede apoderarse de todo el escritorio incluyendo un navegador. Forma llena, raspado, navegación, operaciones de archivos - scripted once, se ejecuta en cualquier lugar.",
+          "next-vibe puede apoderarse de todo el escritorio incluyendo un navegador. Forma llena, raspado, navegación, operaciones de archivos: scripted once, se ejecuta en cualquier lugar.",
       },
       productionLine: {
         title: "Automatización de la línea de producción",
@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       skillEconomy: {
         title: "Vender lo que construyes",
         description:
-          "Envuelve tu automatización como una habilidad. Comparta el enlace. Ganar el 10% de cada pago de cada usuario que se registra a través de él - recurrente, por el tiempo que pagan.",
+          "Envuelve tu automatización como una habilidad. Comparta el enlace. Ganar el 10% de cada pago de cada usuario que se registra a través de él: recurrente, por el tiempo que pagan.",
       },
     },
   },
@@ -98,10 +98,10 @@ export const translations: typeof enTranslations = {
       mcp: "herramienta MCP",
       native: "Pantalla nativa",
       cron: "Cron job",
-      ai: "AI - habilidad nominal",
+      ai: "AI: habilidad nominal",
     },
     description:
-      "La plataforma se detecta a tiempo de ejecución. El mismo punto final que hace un UI web para un humano se convierte en una herramienta de máquina-callable para un agente AI - sin código extra.",
+      "La plataforma se detecta a tiempo de ejecución. El mismo punto final que hace un UI web para un humano se convierte en una herramienta de máquina-callable para un agente AI, sin código extra.",
   },
 
   referral: {

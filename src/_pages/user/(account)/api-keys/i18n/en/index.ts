@@ -1,6 +1,6 @@
 export const translations = {
   title: "API keys",
-  metaTitle: "API keys - {{appName}}",
+  metaTitle: "API keys: {{appName}}",
   description:
     "One key, {{modelCount}} models. OpenAI and Anthropic formats, billed from your credits.",
   unauthenticated: {

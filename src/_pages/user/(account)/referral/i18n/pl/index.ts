@@ -24,8 +24,8 @@ export const translations: typeof enTranslations = {
     heroSub: "Cyklicznie. Wiecznie.",
     chainTitle: "10 subskrybentów. Co zarabiasz miesięcznie.",
     chainSubtitle:
-      "Każdy poziom to połowa wyższego. Zbudowany raz przy rejestracji - płaci wiecznie.",
-    whoLabel0: "Ty - ktokolwiek polecił ich bezpośrednio",
+      "Każdy poziom to połowa wyższego. Zbudowany raz przy rejestracji: płaci wiecznie.",
+    whoLabel0: "Ty: ktokolwiek polecił ich bezpośrednio",
     whoLabel1: "Twórca skilla (jeśli inny) lub Twój polecający",
     whoLabel2: "Polecający ich polecającego",
     whoLabel3: "Poziom 4",
@@ -38,7 +38,7 @@ export const translations: typeof enTranslations = {
   story: {
     title: "Jak łańcuch się mnoży",
     subtitle:
-      "Te same 10 subskrybentów. Każdy aktywowany poziom dodaje się do sumy - wiecznie.",
+      "Te same 10 subskrybentów. Każdy aktywowany poziom dodaje się do sumy: wiecznie.",
     totalLabel: "Łącznie / mies.",
     addedLabel: "+{{amount}} z tego poziomu",
     levelLabel: "Poziom {{n}} aktywny",
@@ -53,12 +53,12 @@ export const translations: typeof enTranslations = {
     noob: {
       label: "Pierwsze kroki",
       earning: "~{{story_noob_earning}}/mies.",
-      desc: "{{story_noob_users}} płacących subskrybentów przez Twój link polecający. {{directPct}} od każdego - pasywny dochód z jednego posta.",
+      desc: "{{story_noob_users}} płacących subskrybentów przez Twój link polecający. {{directPct}} od każdego: pasywny dochód z jednego posta.",
     },
     mid: {
       label: "Rosnąca publiczność",
       earning: "~{{story_mid_earning}}/mies.",
-      desc: "{{story_mid_users}} subskrybentów - mix linków polecających i do skillu. Część ich znajomych też się zarejestrowała. Łańcuch buduje się sam.",
+      desc: "{{story_mid_users}} subskrybentów: mix linków polecających i do skillu. Część ich znajomych też się zarejestrowała. Łańcuch buduje się sam.",
     },
     pro: {
       label: "Uznany twórca",
@@ -76,13 +76,13 @@ export const translations: typeof enTranslations = {
     title: "Jak to działa",
     step1Title: "Utwórz kod polecający",
     step1Body:
-      "Twórz unikalne kody dla różnych odbiorców - znajomych, Discorda, posta na blogu. Każdy śledzony osobno.",
+      "Twórz unikalne kody dla różnych odbiorców: znajomych, Discorda, posta na blogu. Każdy śledzony osobno.",
     step2Title: "Udostępnij link",
     step2Body:
       "Link polecający → {{directPct}} na użytkownika, wiecznie. Twój skill udostępniany przez innych → {{skillBonusPct}} na użytkownika. Dwa źródła, zero dodatkowej pracy.",
     step3Title: "Odbierz wypłatę",
     step3Body:
-      "Zarobki odblokowują się {{holdDays}} dni po każdej płatności - to okres na zwroty. Potem wydaj je jako kredyty albo wypłać w BTC/USDC od {{minPayout}}.",
+      "Zarobki odblokowują się {{holdDays}} dni po każdej płatności: to okres na zwroty. Potem wydaj je jako kredyty albo wypłać w BTC/USDC od {{minPayout}}.",
   },
 
   manage: {
@@ -94,11 +94,11 @@ export const translations: typeof enTranslations = {
   cta: {
     title: "Utwórz konto i zacznij zarabiać",
     description:
-      "Zdobądź link polecający. Zarabiaj {{directPct}} od każdej płatności - cyklicznie, bez daty ważności. Opublikuj skill i zarabiaj {{skillBonusPct}}, gdy inni go udostępniają.",
+      "Zdobądź link polecający. Zarabiaj {{directPct}} od każdej płatności: cyklicznie, bez daty ważności. Opublikuj skill i zarabiaj {{skillBonusPct}}, gdy inni go udostępniają.",
     signUp: "Utwórz konto",
     logIn: "Zaloguj się",
     pitch1:
-      "{{directPct}} prowizji polecającej - cyklicznie, bez daty ważności",
+      "{{directPct}} prowizji polecającej: cyklicznie, bez daty ważności",
     pitch2:
       "Opublikuj skill → {{skillBonusPct}} od każdego, kogo inni do niego przyprowadzą",
     pitch3:
@@ -117,13 +117,13 @@ export const translations: typeof enTranslations = {
   },
   audienceCallout: {
     title: "Dwa sposoby zarabiania",
-    newTitle: "Link polecający - {{directPct}} na użytkownika",
+    newTitle: "Link polecający: {{directPct}} na użytkownika",
     newBody:
       "Udostępnij kod. Każdy, kto się przez niego zarejestruje i płaci, daje Ci {{directPct}} każdej płatności, co miesiąc, wiecznie. Wrzucasz raz. Zarabiasz zawsze.",
     newCta: "Zdobądź swój link polecający",
-    proTitle: "Twórca skilla - {{skillBonusPct}} na użytkownika",
+    proTitle: "Twórca skilla: {{skillBonusPct}} na użytkownika",
     proBody:
-      "Zbuduj skill. Udostępnij link. Każdy, kto wejdzie przez Twój własny link, płaci Ci {{directPct}}, cyklicznie. Dźwignia: gdy ktoś inny udostępni Twój skill swoim linkiem, jako autor i tak dostajesz {{skillBonusPct}}. Platforma śledzi autorstwo skilla - pasywna atrybucja bez dodatkowego wysiłku.",
+      "Zbuduj skill. Udostępnij link. Każdy, kto wejdzie przez Twój własny link, płaci Ci {{directPct}}, cyklicznie. Dźwignia: gdy ktoś inny udostępni Twój skill swoim linkiem, jako autor i tak dostajesz {{skillBonusPct}}. Platforma śledzi autorstwo skilla: pasywna atrybucja bez dodatkowego wysiłku.",
     proCta: "Zbuduj skill",
   },
   discord: {

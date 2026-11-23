@@ -2,11 +2,11 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Was ist neu: sechs Monate auf einer Seite - {{appName}}",
+    title: "Was ist neu: sechs Monate auf einer Seite ({{appName}})",
     description:
       "Stopp heißt Stopp. Spracheingabe läuft auf dem iPhone. Deine KI arbeitet über deine Rechner hinweg. Selbst hosten ohne Docker. Und ein Test-Roboter hat acht Sicherheitslücken geschlossen. Alles seit Mai.",
     category: "Produkt-Update",
-    imageAlt: "{{appName}} - Produkt-Update November 2026",
+    imageAlt: "{{appName}}: Produkt-Update November 2026",
     keywords:
       "{{appName}}, Produkt-Update, Hermes, Thea, PGlite, Self-Hosting, Spracherkennung, E2E-Tests, Sicherheit",
   },
@@ -20,26 +20,26 @@ export const translations: typeof enTranslations = {
   },
   intro: {
     lead: "Unser letztes Update kam im Mai. Seitdem haben wir die Codebasis bis aufs Fundament zerlegt, flacher neu aufgebaut und monatelang behoben, worüber echte Nutzer im Betrieb gestolpert sind.",
-    p1: "Keine Liste mit 200 Stichpunkten. Hier steht, was du wirklich merkst - sortiert danach, wo du es merkst.",
+    p1: "Keine Liste mit 200 Stichpunkten. Hier steht, was du wirklich merkst: sortiert danach, wo du es merkst.",
   },
   chat: {
     title: "Ein Chat, der gehorcht",
     intro: "Die kleinen Dinge, die den Chat langsam oder stur wirken ließen.",
     stop: {
       title: "Stopp heißt Stopp",
-      body: "Ein Klick auf Stopp und es erscheinen sofort keine Tokens mehr - kein Warten, bis der Server aufgeräumt hat. Stopp greift jetzt auch in Inkognito- und Gast-Chats, wo es vorher gar nichts tat.",
+      body: "Ein Klick auf Stopp und es erscheinen sofort keine Tokens mehr: kein Warten, bis der Server aufgeräumt hat. Stopp greift jetzt auch in Inkognito- und Gast-Chats, wo es vorher gar nichts tat.",
     },
     input: {
       title: "Eingabe passend zum Modell",
-      body: "Das Eingabefeld weiß, wie viel Platz das gewählte Modell in diesem Thread noch hat - statt einem starren Limit für alle Modelle.",
+      body: "Das Eingabefeld weiß, wie viel Platz das gewählte Modell in diesem Thread noch hat, statt einem starren Limit für alle Modelle.",
     },
     reasoning: {
       title: "Modelle behalten den Faden",
-      body: "Reasoning-Blöcke gehen in der nächsten Runde zurück ans Modell, statt gelöscht zu werden - Denkmodelle bauen auf dem auf, was sie schon erarbeitet haben.",
+      body: "Reasoning-Blöcke gehen in der nächsten Runde zurück ans Modell, statt gelöscht zu werden: Denkmodelle bauen auf dem auf, was sie schon erarbeitet haben.",
     },
     queue: {
       title: "Schreiben, während sie arbeitet",
-      body: "Schick Nachrichten, während die KI noch antwortet - sie reihen sich der Reihe nach ein. Lange Tool-Läufe verdichten ihren Kontext unterwegs, statt an die Wand zu fahren.",
+      body: "Schick Nachrichten, während die KI noch antwortet. Sie reihen sich der Reihe nach ein. Lange Tool-Läufe verdichten ihren Kontext unterwegs, statt an die Wand zu fahren.",
     },
   },
   voice: {
@@ -51,7 +51,7 @@ export const translations: typeof enTranslations = {
     },
     long: {
       title: "Nimm so lange auf, wie du willst",
-      body: "Aufnahmen werden in Stücke geteilt - das Diktat ist nicht mehr durch einen einzelnen Upload begrenzt.",
+      body: "Aufnahmen werden in Stücke geteilt, das Diktat ist nicht mehr durch einen einzelnen Upload begrenzt.",
     },
     windows: {
       title: "Windows repariert",
@@ -64,17 +64,17 @@ export const translations: typeof enTranslations = {
       "Thea läuft in der Cloud. Hermes läuft auf deinem Computer. Jetzt arbeiten sie wirklich zusammen.",
     twoWay: {
       title: "Remote-Threads in beide Richtungen",
-      body: "Gib einen Thread von der Cloud an deinen Rechner ab oder zurück - in beide Richtungen. Hat die andere Seite keinen API-Key, springt deine Seite ein und führt ihn lokal aus.",
+      body: "Gib einen Thread von der Cloud an deinen Rechner ab oder zurück: in beide Richtungen. Hat die andere Seite keinen API-Key, springt deine Seite ein und führt ihn lokal aus.",
       link: "So sprechen Hermes und Thea",
     },
     coding: {
       title: "Ein Coding-Agent zum Zuschauen",
-      body: "Thea kann auf deinem Rechner einen interaktiven Coding-Agenten starten - ein echtes Konsolenfenster, das du siehst - als Task verfolgt, mit Ergebnis-Rückmeldung.",
+      body: "Thea kann auf deinem Rechner einen interaktiven Coding-Agenten starten (ein echtes Konsolenfenster, das du siehst) als Task verfolgt, mit Ergebnis-Rückmeldung.",
       link: "Lern den Coding-Agenten kennen",
     },
     tools: {
       title: "Schärfere Werkzeuge",
-      body: "Bessere Browser-Automatisierung mit Geräte-Emulation, Desktop-Tools unter Windows und SSH-Tools für alle Kunden - nicht nur für Admins.",
+      body: "Bessere Browser-Automatisierung mit Geräte-Emulation, Desktop-Tools unter Windows und SSH-Tools für alle Kunden: nicht nur für Admins.",
     },
   },
   selfHost: {
@@ -90,7 +90,7 @@ export const translations: typeof enTranslations = {
     },
     native: {
       title: "Kein Compiler nötig",
-      body: "Passwort-Hashing nutzt jetzt vorkompilierte Binaries - kein node-gyp, keine Build-Tools. Gleicher Algorithmus, bestehende Hashes bleiben gültig.",
+      body: "Passwort-Hashing nutzt jetzt vorkompilierte Binaries: kein node-gyp, keine Build-Tools. Gleicher Algorithmus, bestehende Hashes bleiben gültig.",
     },
     revive: {
       title: "Steht von selbst wieder auf",
@@ -99,10 +99,10 @@ export const translations: typeof enTranslations = {
   },
   security: {
     title: "Sicher ab Werk",
-    intro: "Sicherheitsarbeit, die du nie siehst - genau darum geht es.",
+    intro: "Sicherheitsarbeit, die du nie siehst: genau darum geht es.",
     e2e: {
       title: "Ein Roboter testet jede Seite",
-      body: "60 End-to-End-Suites bedienen jetzt die echten Seiten in einem echten Browser. Sie fanden acht Sicherheitslücken, die wir geschlossen haben - vom Open Redirect bis zu öffentlich gecachten privaten Dateien.",
+      body: "60 End-to-End-Suites bedienen jetzt die echten Seiten in einem echten Browser. Sie fanden acht Sicherheitslücken, die wir geschlossen haben: vom Open Redirect bis zu öffentlich gecachten privaten Dateien.",
       link: "Lies, was er gefunden hat",
     },
     patches: {
@@ -117,7 +117,7 @@ export const translations: typeof enTranslations = {
   cta: {
     title: "Überzeug dich selbst.",
     subtitle:
-      "Alles oben ist heute live auf {{appName}} - und im Open-Source-Code, wenn du selbst hostest.",
+      "Alles oben ist heute live auf {{appName}} und im Open-Source-Code, wenn du selbst hostest.",
     chat: "Jetzt chatten",
     selfHost: "Selbst hosten",
   },

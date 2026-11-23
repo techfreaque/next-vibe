@@ -128,15 +128,15 @@ export const translations = {
       enabledLabel: "allowed",
       totalLabel: "total",
       activeTooltip:
-        "Pinned tools are always in context - the AI sees them every turn",
+        "Pinned tools are always in context. The AI sees them every turn",
       enabledTooltip:
         "Allowed tools can be called on demand when help is enabled",
       legendActive: "Always in context (pinned)",
       legendConfirm: "Asks before running",
-      activeOn: "Pinned - always in context. Click to unpin",
-      activeOff: "Not pinned - AI can still call on demand. Click to pin",
-      confirmOn: "Asks for confirmation - click to disable",
-      confirmOff: "Runs automatically - click to require confirmation",
+      activeOn: "Pinned: always in context. Click to unpin",
+      activeOff: "Not pinned: AI can still call on demand. Click to pin",
+      confirmOn: "Asks for confirmation. Click to disable",
+      confirmOff: "Runs automatically. Click to require confirmation",
     },
   },
 
@@ -341,7 +341,7 @@ export const translations = {
     costFree: "Free",
     costCredits: "{{count}} credit/msg",
     costCreditsPlural: "{{count}} credits/msg",
-    tooltip: "{{provider}} - {{name}} ({{cost}})",
+    tooltip: "{{provider}}: {{name}} ({{cost}})",
     // New hybrid mode translations
     whatDoYouNeed: "What do you need?",
     tuneIt: "Tune it",
@@ -766,7 +766,7 @@ export const translations = {
     welcome: {
       title: "Think of us as your AI team.",
       line1:
-        "A companion for everyday conversation. Specialists for coding, research, writing - you pick one when the task calls for it.",
+        "A companion for everyday conversation. Pick a specialist when the task calls for coding, research, or writing.",
       line2: "Same chat. You switch when it matters. Takes seconds.",
       line3: "Let's get you set up in under a minute.",
       continue: "Get Started",
@@ -777,7 +777,7 @@ export const translations = {
       line1:
         "Your settings, companion, and chat history are saved locally on this device only.",
       line2:
-        "Sign in to keep everything synced across devices - and make sure you never lose your setup.",
+        "Sign in to keep everything synced across devices and keep your setup safe.",
       signIn: "Sign In / Create Account",
       continueAnyway: "Continue as Guest",
       note: "You can sign in later from the menu at any time.",
@@ -797,11 +797,11 @@ export const translations = {
         },
         brilliant: {
           label: "Brilliant",
-          desc: "Best quality - great for complex questions, writing, and analysis",
+          desc: "Best quality: great for complex questions, writing, and analysis",
         },
         max: {
           label: "Max",
-          desc: "Highest reasoning, no compromises - for when it really matters",
+          desc: "Our strongest reasoning for the questions that matter most.",
         },
       },
     },
@@ -812,7 +812,7 @@ export const translations = {
         "We'll add the right specialists to your AI's toolkit automatically.",
       saving: "Setting up...",
       start: "Start Chatting",
-      skip: "Skip - I'll set it up later",
+      skip: "Skip: I'll set it up later",
       coding: {
         label: "Coding & Tech",
         hint: "Vibe Coder, Coder",
@@ -959,7 +959,7 @@ export const translations = {
       publicExplanation:
         "The Public Forum is an open space where people and AI talk freely. You decide what you read. We only remove what breaks the law or our terms. Share ideas, challenge perspectives, join uncensored discussions.",
       incognitoExplanation:
-        "Incognito mode keeps your conversations completely private and local. Your chats are stored only in your browser and never sent to our servers (generated media is stored temporarily for technical reasons) - not even tied to your account.",
+        "Incognito conversations stay in your browser. They never reach our servers or get tied to your account. We store generated media temporarily for technical reasons.",
       requiresAccount:
         "To access {{folderName}}, you need to create an account or sign in.",
       loginButton: "Login",
@@ -1256,71 +1256,71 @@ export const translations = {
       kimiK2Free:
         "Kimi K2 Instruct is a large-scale Mixture-of-Experts (MoE) language model developed by Moonshot AI.",
       kimiK2:
-        "Kimi K2 - advanced Mixture-of-Experts (MoE) model by Moonshot AI with large context window",
+        "Kimi K2: advanced Mixture-of-Experts (MoE) model by Moonshot AI with large context window",
       kimiK2Thinking:
-        "Kimi K2 Thinking - reasoning-focused variant with enhanced analytical capabilities",
-      deepseekV31Free: "Powerful 671B parameter model - completely free!",
+        "Kimi K2 Thinking: reasoning-focused variant with enhanced analytical capabilities",
+      deepseekV31Free: "Powerful 671B parameter model: completely free!",
       deepseekV31: "Powerful 671B parameter model with advanced capabilities",
       qwen3235bFree:
         "Mixture-of-experts (MoE) model developed by Qwen, supports seamless switching between modes.",
       deepseekR1Distill: "Distilled reasoning model with strong performance",
       deepseekR1: "Advanced reasoning model with deep thinking capabilities",
       qwen257b: "Efficient 7B parameter model",
-      grok4: "X-AI Grok 4 - premium model",
+      grok4: "X-AI Grok 4: premium model",
       grok4Fast:
         "Grok 4 Fast is xAI's latest multimodal model with SOTA cost-efficiency and a 2M token context window. It comes in two flavors: non-reasoning and reasoning.",
-      glm5: "GLM-5 - Z.AI's flagship open-source model for complex systems design and long-horizon agent workflows, rivaling leading closed-source models",
-      glm46: "GLM 4.6 - efficient 7B parameter model with large context window",
+      glm5: "GLM-5: Z.AI's flagship open-source model for complex systems design and long-horizon agent workflows, rivaling leading closed-source models",
+      glm46: "GLM 4.6: efficient 7B parameter model with large context window",
       glm47:
-        "GLM 4.7 - improved 7B model with enhanced reasoning and coding abilities",
+        "GLM 4.7: improved 7B model with enhanced reasoning and coding abilities",
       glm47Flash:
-        "GLM 4.7 Flash - ultra-fast variant optimized for quick responses",
+        "GLM 4.7 Flash: ultra-fast variant optimized for quick responses",
       glm45Air:
-        "GLM 4.5 AIR - ultra-fast lightweight model with large context window",
+        "GLM 4.5 AIR: ultra-fast lightweight model with large context window",
       glm45v:
-        "GLM 4.5v - vision-capable multimodal model with large context window",
+        "GLM 4.5v: vision-capable multimodal model with large context window",
       kimiK2_6:
-        "Kimi K2.6 - Long-horizon coding, UI/UX generation, and multi-agent orchestration with swarm architecture",
+        "Kimi K2.6: Long-horizon coding, UI/UX generation, and multi-agent orchestration with swarm architecture",
       uncensoredLmV11:
-        "Uncensored language model without content filtering - premium model",
+        "Uncensored language model without content filtering: premium model",
       freedomgptLiberty:
-        "FreedomGPT Liberty - Uncensored AI model focused on free expression and creative content",
+        "FreedomGPT Liberty: Uncensored AI model focused on free expression and creative content",
       gabAiArya:
-        "Gab AI Arya - Uncensored conversational AI model with free expression and creative capabilities",
+        "Gab AI Arya: Uncensored conversational AI model with free expression and creative capabilities",
       gpt52Pro:
-        "GPT 5.2 Pro - advanced reasoning model with enhanced capabilities for complex tasks",
+        "GPT 5.2 Pro: advanced reasoning model with enhanced capabilities for complex tasks",
       gpt52:
-        "GPT 5.2 - latest generation model with improved performance and efficiency",
+        "GPT 5.2: latest generation model with improved performance and efficiency",
       gpt52_chat:
-        "GPT 5.2 Chat - conversational variant optimized for dialogue and interactions",
+        "GPT 5.2 Chat: conversational variant optimized for dialogue and interactions",
       veniceUncensored:
-        "Venice Uncensored - Uncensored AI model for unrestricted conversations",
+        "Venice Uncensored: Uncensored AI model for unrestricted conversations",
       dolphinLlama3_70B:
-        "Dolphin Llama 3 70B - Uncensored large language model based on Llama 3",
+        "Dolphin Llama 3 70B: Uncensored large language model based on Llama 3",
       dolphin3_0_r1_mistral_24b:
-        "Dolphin 3.0 R1 Mistral 24B - Uncensored large language model based on Mistral",
+        "Dolphin 3.0 R1 Mistral 24B: Uncensored large language model based on Mistral",
       claudeOpus45:
-        "Claude Opus 4.5 - Most powerful Claude model with exceptional reasoning and creative capabilities",
+        "Claude Opus 4.5: Most powerful Claude model with exceptional reasoning and creative capabilities",
       claudeOpus46:
-        "Claude Opus 4.6 - Powerful Claude model with exceptional reasoning and creative capabilities",
+        "Claude Opus 4.6: Powerful Claude model with exceptional reasoning and creative capabilities",
       claudeOpus47:
-        "Claude Opus 4.7 - Previous-generation Opus model. Succeeded by 4.8.",
+        "Claude Opus 4.7: Previous-generation Opus model. Succeeded by 4.8.",
       claudeOpus48:
-        "Claude Opus 4.8 - Anthropic's most capable generally available Opus model. Built for long-horizon agentic work, complex coding, and multi-step reasoning across very long outputs. 1M-token context. Supports text, image, and file inputs.",
+        "Claude Opus 4.8: Anthropic's most capable generally available Opus model. Built for long-horizon agentic work, complex coding, and multi-step reasoning across very long outputs. 1M-token context. Supports text, image, and file inputs.",
       claudeSonnet46:
-        "Claude Sonnet 4.6 - Anthropic's most capable Sonnet-class model with frontier performance across coding, agents, and professional work",
+        "Claude Sonnet 4.6: Anthropic's most capable Sonnet-class model with frontier performance across coding, agents, and professional work",
       gemini3Pro:
-        "Google Gemini 3 Pro - Advanced multimodal AI model with large context window and powerful reasoning capabilities",
+        "Google Gemini 3 Pro: Advanced multimodal AI model with large context window and powerful reasoning capabilities",
       gemini35Flash:
-        "Gemini 3.5 Flash - Near-Pro coding and reasoning at Flash cost. Handles text, images, video, audio, and PDFs. Parallel agentic loops built-in. Thinking levels from minimal to high for precise cost/performance control.",
+        "Gemini 3.5 Flash: Near-Pro coding and reasoning at Flash cost. Handles text, images, video, audio, and PDFs. Parallel agentic loops built-in. Thinking levels from minimal to high for precise cost/performance control.",
       gemini3Flash:
-        "Google Gemini 3 Flash - Fast, efficient multimodal AI model optimized for quick responses",
+        "Google Gemini 3 Flash: Fast, efficient multimodal AI model optimized for quick responses",
       deepseekV32:
-        "DeepSeek V3.2 - High-performance reasoning model with advanced coding capabilities",
+        "DeepSeek V3.2: High-performance reasoning model with advanced coding capabilities",
       deepseekV4Pro:
-        "DeepSeek V4 Pro - 1.6T parameter MoE powerhouse with 1M context. Built for full-codebase analysis, complex reasoning, and multi-step agent workflows.",
+        "DeepSeek V4 Pro: 1.6T parameter MoE powerhouse with 1M context. Built for full-codebase analysis, complex reasoning, and multi-step agent workflows.",
       deepseekV4Flash:
-        "DeepSeek V4 Flash - 284B MoE at near-zero cost. 1M context, fast inference, strong coding. The efficient choice for high-throughput workloads.",
+        "DeepSeek V4 Flash: 284B MoE at near-zero cost. 1M context, fast inference, strong coding. The efficient choice for high-throughput workloads.",
     },
   },
   tones: {
@@ -1395,7 +1395,7 @@ export const translations = {
       description: "Choose a model and skill to generate an AI response",
       confirmLabel: "Generate",
       inputPlaceholder:
-        "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
+        "Enter a prompt for the AI. Leave it empty to let the AI generate its own response.",
     },
   },
   debugView: {
@@ -1417,7 +1417,7 @@ export const translations = {
       description: "Choose a model and skill to generate an AI response",
       confirmLabel: "Generate",
       inputPlaceholder:
-        "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
+        "Enter a prompt for the AI. Leave it empty to let the AI generate its own response.",
     },
   },
   suggestedPrompts: {
@@ -1673,7 +1673,7 @@ export const translations = {
       description: "Choose a model and skill to generate an AI response",
       confirmLabel: "Generate",
       inputPlaceholder:
-        "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
+        "Enter a prompt for the AI. Leave it empty to let the AI generate its own response.",
     },
     actions: {
       vote: "Vote",
@@ -1738,7 +1738,7 @@ export const translations = {
       description: "Choose a model and skill to generate an AI response",
       confirmLabel: "Generate",
       inputPlaceholder:
-        "Enter a prompt for the AI (optional - leave empty to let AI generate its own response)",
+        "Enter a prompt for the AI. Leave it empty to let the AI generate its own response.",
     },
     actions: {
       loadingAudio: "Loading audio...",
@@ -1914,8 +1914,8 @@ export const translations = {
       description:
         "Click the microphone to start recording. When done, choose what to do:",
       options: {
-        transcribe: "Transcribe to text - converts speech to editable text",
-        sendAudio: "Send as voice - AI hears your actual voice",
+        transcribe: "Transcribe to text: converts speech to editable text",
+        sendAudio: "Send as voice: AI hears your actual voice",
         pauseResume: "Pause/resume recording anytime",
       },
     },
@@ -1929,7 +1929,7 @@ export const translations = {
       title: "You're Ready!",
       description:
         "You now have access to mainstream AND uncensored AI models, multiple privacy modes, and complete control over your data. Break free from AI censorship. Start chatting!",
-      help: "Need help? Ask any model - they're here to assist.",
+      help: "Need help? Ask any model. They're here to assist.",
     },
     authUnlocked: {
       unlocked: "Folder Unlocked!",

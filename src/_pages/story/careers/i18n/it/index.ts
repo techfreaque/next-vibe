@@ -2,19 +2,19 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Costruisci con next-vibe - {{appName}}",
+    title: "Costruisci con next-vibe: {{appName}}",
     category: "Sviluppatori",
     description:
-      "next-vibe trasforma qualsiasi endpoint in una forma web, il comando CLI, lo strumento MCP, lo schermo nativo, e AI -callable skill - simultaneamente. Automatizzare tutto ciò che un umano può fare su un computer.",
-    imageAlt: "Piattaforma di sviluppo next-vibe - {{appName}}",
+      "next-vibe trasforma qualsiasi endpoint in una forma web, il comando CLI, lo strumento MCP, lo schermo nativo, e AI -callable skill simultaneamente. Automatizzare tutto ciò che un umano può fare su un computer.",
+    imageAlt: "Piattaforma di sviluppo next-vibe: {{appName}}",
     keywords:
       "next-vibe, automazione AI, piattaforma di sviluppo, automazione aziendale, integrazione ERP, automazione di produzione, {{appName}}",
-    ogTitle: "Costruisci con next-vibe - {{appName}}",
+    ogTitle: "Costruisci con next-vibe: {{appName}}",
     ogDescription:
-      "Una base di codice. Ogni superficie. Automatizzare linee di produzione, sistemi ERP, flussi di lavoro desktop - tutto ciò che un umano può fare su un computer.",
-    twitterTitle: "Costruisci con next-vibe - {{appName}}",
+      "Una base di codice. Ogni superficie. Automatizzare linee di produzione, sistemi ERP, flussi di lavoro desktop: tutto ciò che un umano può fare su un computer.",
+    twitterTitle: "Costruisci con next-vibe: {{appName}}",
     twitterDescription:
-      "Una base di codice. Ogni superficie. Automatizzare linee di produzione, sistemi ERP, flussi di lavoro desktop - tutto ciò che un umano può fare su un computer.",
+      "Una base di codice. Ogni superficie. Automatizzare linee di produzione, sistemi ERP, flussi di lavoro desktop: tutto ciò che un umano può fare su un computer.",
   },
 
   hero: {
@@ -37,7 +37,7 @@ export const translations: typeof enTranslations = {
       businessDevs: {
         title: "Sviluppatori di affari",
         description:
-          "Collegare i flussi di lavoro ERP, CRM o qualsiasi sistema interno ai flussi di lavoro AI. Passare i dati dentro, prendere decisioni fuori - nessun codice colla.",
+          "Collegare i flussi di lavoro ERP, CRM o qualsiasi sistema interno ai flussi di lavoro AI. Passare i dati dentro, prendere decisioni fuori: nessun codice colla.",
       },
       industrialDevs: {
         title: "Industriale e incorporato",
@@ -47,7 +47,7 @@ export const translations: typeof enTranslations = {
       enterpriseDevs: {
         title: "Squadre di Enterprise",
         description:
-          "Sostituire utensili frammentati con una piattaforma unificata. Web UI, CLI, MCP, app nativa - stesso endpoint, zero duplicazione.",
+          "Sostituire utensili frammentati con una piattaforma unificata. Web UI, CLI, MCP, app nativa: stesso endpoint, zero duplicazione.",
       },
     },
   },
@@ -63,7 +63,7 @@ export const translations: typeof enTranslations = {
       desktopAutomation: {
         title: "Automazione desktop completa",
         description:
-          "next-vibe può prendere il controllo dell'intero desktop, compreso un browser. Compila il modulo, raschiatura, navigazione, operazioni di file - scripted una volta, viene eseguito ovunque.",
+          "next-vibe può prendere il controllo dell'intero desktop, compreso un browser. Compila il modulo, raschiatura, navigazione, operazioni di file: scripted una volta, viene eseguito ovunque.",
       },
       productionLine: {
         title: "Automazione della linea di produzione",
@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       skillEconomy: {
         title: "Vendere ciò che si costruisce",
         description:
-          "Avvolgi la tua automazione come un'abilità. Condividi il link. Guadagnare il 10% di ogni pagamento da ogni utente che si registra attraverso di esso - ricorrente, per tutto il tempo che pagano.",
+          "Avvolgi la tua automazione come un'abilità. Condividi il link. Guadagnare il 10% di ogni pagamento da ogni utente che si registra attraverso di esso: ricorrente, per tutto il tempo che pagano.",
       },
     },
   },
@@ -98,10 +98,10 @@ export const translations: typeof enTranslations = {
       mcp: "Strumento MCP",
       native: "Schermo nativo",
       cron: "Lavoro Cron",
-      ai: "AI - abilità incallabile",
+      ai: "AI: abilità incallabile",
     },
     description:
-      "La piattaforma viene rilevata a tempo di esecuzione. Lo stesso endpoint che rende un web UI per un essere umano diventa uno strumento selezionabile in macchina per un agente AI - nessun codice aggiuntivo.",
+      "La piattaforma viene rilevata a tempo di esecuzione. Lo stesso endpoint che rende un web UI per un essere umano diventa uno strumento selezionabile in macchina per un agente AI: nessun codice aggiuntivo.",
   },
 
   referral: {

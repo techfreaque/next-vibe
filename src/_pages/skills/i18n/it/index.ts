@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
   description:
     "Specialisti e personaggi pronti all'uso. Ogni skill ha istruzioni, modello e strumenti propri. Scegline una e inizia a chattare, oppure creane una tua.",
   meta: {
-    title: "Skill AI - specialisti e personaggi pronti all'uso | {{appName}}",
+    title: "Skill AI: specialisti e personaggi pronti all'uso | {{appName}}",
     description:
       "Programmatori, scrittori, ricercatori, compagni e personaggi senza censura. Ogni skill porta il suo prompt, il suo modello e i suoi strumenti. Scegline una e chatta, oppure crea la tua e guadagna quando altri la usano.",
     category: "Skill AI",

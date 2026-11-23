@@ -6,7 +6,7 @@ export const translations: typeof enTranslations = {
     description:
       "Memoria persistente, reflexión nocturna, ejecución de fondo. Más imagen a imagen, vídeo, generación de música. Y los créditos {{credits}}, un mes completo libre,  por decirnos lo que está roto.",
     category: "Actualización de productos",
-    imageAlt: "unbottled.ai - May 2026 actualización del producto",
+    imageAlt: "unbottled.ai: novedades de mayo de 2026",
     keywords:
       "unbottled ai, Cortex AI memoria, Dreamer AI reflejo, Autopilot AI, generación de imágenes, generación de vídeo, generación de música, discurso gratis AI",
   },
@@ -102,7 +102,7 @@ export const translations: typeof enTranslations = {
     p1: "La aplicación es significativamente diferente de lo que era. Si te fuiste temprano, y sabemos que mucha gente lo hizo,  vale otra oportunidad.",
     p2: "Abra un chat y pídale a su AI que le muestre el Cortex, genere una imagen o establezca su Dreamer. Sabe qué hacer.",
     cta: "Open {{appName}}",
-    signature: "- Max, el equipo unbottled.ai",
+    signature: "Max, el equipo unbottled.ai",
   },
 
   cta: {

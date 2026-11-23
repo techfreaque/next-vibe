@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Stwórz skill. Udostępnij link. Zarabiaj co miesiąc.",
     description:
-      "Skille na {{appName}} to wstępnie skonfigurowane ustawienia AI, które tworzysz raz i udostępniasz wszędzie. Link do udostępnienia pozycjonuje Cię w łańcuchu poleceń - 10% od każdej płatności, jaką ten użytkownik kiedykolwiek wykona, plus 5%, gdy inni udostępniają Twój skill.",
+      "Skille na {{appName}} to wstępnie skonfigurowane ustawienia AI, które tworzysz raz i udostępniasz wszędzie. Link do udostępnienia pozycjonuje Cię w łańcuchu poleceń: 10% od każdej płatności, jaką ten użytkownik kiedykolwiek wykona, plus 5%, gdy inni udostępniają Twój skill.",
     category: "Ekonomia Skilli",
     imageAlt: "Osoba tworząca skille AI i zarabiająca cyklicznie co miesiąc",
     keywords:
@@ -18,12 +18,12 @@ export const translations: typeof enTranslations = {
     subtitle:
       "Skonfiguruj ustawienie AI raz. Udostępnij wszędzie. Zarabiaj 10% cyklicznie od każdej płatności osób, które się przez to zarejestrują, wiecznie.",
     quote:
-      '"Zbudowałem/am skill klinicznego rozumowania dla studentów medycyny. Trzy miesiące później opłaca mój własny abonament - i jeszcze zostaje."',
+      "\"Zbudowałem/am skill klinicznego rozumowania dla studentów medycyny. Trzy miesiące później opłaca mój własny abonament i jeszcze zostaje.\"",
   },
   whatAreSkills: {
     title: "Czym są skille na {{appName}}?",
-    p1: "Skill to kompletne ustawienie AI - prompt systemowy, persona towarzysza, wybór modelu dla każdej modalności, głos, ustawienia generowania obrazów - skonfigurowane raz i wielokrotnego użytku wszędzie. Pomyśl o tym jak o przepisie: raz wymyślasz właściwe składniki, potem każdy może z niego skorzystać.",
-    p2: "Platforma ma {{modelCount}} modeli: mainstream, open source, niecenzurowane. Każdy skill konfiguruje, który model używać do rozmów, który do wizji, który do generowania obrazów, jakim głosem mówić. Większość użytkowników nigdy nie musi dotykać tych ustawień - po prostu korzysta ze skilla. Ty jako twórca robisz to raz.",
+    p1: "Skill to kompletne ustawienie AI (prompt systemowy, persona towarzysza, wybór modelu dla każdej modalności, głos, ustawienia generowania obrazów) skonfigurowane raz i wielokrotnego użytku wszędzie. Pomyśl o tym jak o przepisie: raz wymyślasz właściwe składniki, potem każdy może z niego skorzystać.",
+    p2: "Platforma ma {{modelCount}} modeli: mainstream, open source, niecenzurowane. Każdy skill konfiguruje, który model używać do rozmów, który do wizji, który do generowania obrazów, jakim głosem mówić. Większość użytkowników nigdy nie musi dotykać tych ustawień: po prostu korzysta ze skilla. Ty jako twórca robisz to raz.",
     p3: "Tworzenie skilli jest bezpłatne. Nie potrzeba płatnej subskrypcji. Bez kodowania. Jeśli możesz opisać, co AI ma robić, możesz zbudować skill.",
     buildTitle: "Trzy sposoby budowania skilla",
     build1Title: "Ręcznie na stronie skilla",
@@ -31,32 +31,32 @@ export const translations: typeof enTranslations = {
       "Pełna kontrola. Konfiguruj każde ustawienie bezpośrednio. Dobre, gdy dokładnie wiesz, czego chcesz.",
     build2Title: "Poproś Theę lub Hermesa w rozmowie",
     build2Body:
-      "Opisz, co próbujesz zbudować. Burza mózgów z nimi - niech nakreślą prompt systemowy, kwestionują Twoje pomysły, iterują. Najlepszy sposób na coś niuansowego. Znają platformę.",
+      "Opisz, co próbujesz zbudować. Burza mózgów z nimi: niech nakreślą prompt systemowy, kwestionują Twoje pomysły, iterują. Najlepszy sposób na coś niuansowego. Znają platformę.",
     build3Title: "Dla deweloperów: wygeneruj skill.ts",
     build3Body:
-      "Poproś agenta o stworzenie pliku skill. Generuje skill.ts zgodnie z tą samą strukturą co wbudowane skille towarzyszące - gotowe do zatwierdzenia i natychmiastowego użycia.",
+      "Poproś agenta o stworzenie pliku skill. Generuje skill.ts zgodnie z tą samą strukturą co wbudowane skille towarzyszące: gotowe do zatwierdzenia i natychmiastowego użycia.",
   },
   shareLink: {
-    title: "Mechanizm linku do udostępnienia - jak faktycznie zarabiasz",
+    title: "Mechanizm linku do udostępnienia: jak faktycznie zarabiasz",
     p1: "Gdy klikniesz Udostępnij i zarabiaj przy dowolnym skilla, dostajesz URL, który robi dwie rzeczy naraz:",
     bullet1:
-      "Pokazuje odwiedzającym skill - co robi, jak jest skonfigurowany, jakim rodzajem AI jest",
+      "Pokazuje odwiedzającym skill: co robi, jak jest skonfigurowany, jakim rodzajem AI jest",
     bullet2:
-      "Pozycjonuje Cię w łańcuchu poleceń - każdy, kto rejestruje się przez ten link, jest przypisany do Ciebie",
-    p2: "Oto co ta atrybucja oznacza w praktyce: gdy ktoś rejestruje się przez Twój link do skilla, jesteś jego bezpośrednim polecającym. Zarabiasz 10% każdej płatności, jaką kiedykolwiek wykona - na zawsze. A gdy inny członek udostępni Twój skill własnym linkiem, jako twórca skilla i tak dostajesz 5% - od ludzi, do których nigdy nie dotarłeś/aś.",
-    p3: "To nie jest jednorazowa nagroda. To nie jest bonus za rejestrację. Każde odnowienie subskrypcji, każde doładowanie, każdy zakup - zarabiasz 10% z tego. Pracę wykonałeś/aś raz.",
+      "Pozycjonuje Cię w łańcuchu poleceń: każdy, kto rejestruje się przez ten link, jest przypisany do Ciebie",
+    p2: "Oto co ta atrybucja oznacza w praktyce: gdy ktoś rejestruje się przez Twój link do skilla, jesteś jego bezpośrednim polecającym. Zarabiasz 10% każdej płatności, jaką kiedykolwiek wykona: na zawsze. A gdy inny członek udostępni Twój skill własnym linkiem, jako twórca skilla i tak dostajesz 5%: od ludzi, do których nigdy nie dotarłeś/aś.",
+    p3: "To nie jest jednorazowa nagroda. To nie jest bonus za rejestrację. Każde odnowienie subskrypcji, każde doładowanie, każdy zakup. Zarabiasz 10% z tego. Pracę wykonałeś/aś raz.",
     p4: "URL wygląda tak: {{appName}}/track?ref=TWOJ_KOD&url=/pl/skill/SKILL_ID",
   },
   examples: {
     title:
-      "Skille, które ludzie faktycznie udostępniają - i na których zarabiają",
+      "Skille, które ludzie faktycznie udostępniają i na których zarabiają",
     p1: "Najskuteczniejsze skille rozwiązują konkretny, powtarzający się problem, który trudno wyjaśnić bez pokazania. Oto wzorce, które działają:",
     example1Title: "Towarzysz-specjalista",
     example1Body:
-      "Student medycyny buduje skill, który mówi jak doświadczony kliniczny kolega - przypadki, diagnozy różnicowe, rozumowanie pod presją. Udostępniany na forach medycznych. Każda rejestracja z tej społeczności płaci miesięcznie.",
+      "Student medycyny buduje skill, który mówi jak doświadczony kliniczny kolega: przypadki, diagnozy różnicowe, rozumowanie pod presją. Udostępniany na forach medycznych. Każda rejestracja z tej społeczności płaci miesięcznie.",
     example2Title: "Prawdziwy produkt sprzedawcy wiedzy",
     example2Body:
-      "Coachowie, konsultanci, twórcy kursów - sprzedawali PDFy i rozmowy przez Zoom. Dobrze zbudowany skill z ich prawdziwą ekspertyzą zarabia cyklicznie bez nakładów. To lepsze niż kurs.",
+      "Coachowie, konsultanci, twórcy kursów: sprzedawali PDFy i rozmowy przez Zoom. Dobrze zbudowany skill z ich prawdziwą ekspertyzą zarabia cyklicznie bez nakładów. To lepsze niż kurs.",
     example3Title: "Niecenzurowana opcja",
     example3Body:
       "Skille używające niecenzurowanych modeli do kreatywnego pisania, odgrywania ról lub debat. Udostępniane w społecznościach, gdzie cenzura AI jest codzienną frustracją. Wysoka intencja rejestracji.",
@@ -82,17 +82,17 @@ export const translations: typeof enTranslations = {
     row4Profile: "Power user: Starter + {{powerPacks}} pakietów",
     row4Spend: "{{powerSpend}}/mies.",
     row4Earn: "{{powerEarn}}/mies.",
-    p2: "Skill jest przynętą. Link jest przychodem. Zarabiasz niezależnie czy ktoś korzysta z Twojego skilla codziennie czy po rejestracji przejdzie na coś innego - atrybucja polecenia zostaje przy Tobie.",
+    p2: "Skill jest przynętą. Link jest przychodem. Zarabiasz niezależnie czy ktoś korzysta z Twojego skilla codziennie czy po rejestracji przejdzie na coś innego: atrybucja polecenia zostaje przy Tobie.",
     p3: "Udostępnij skill w pięciu miejscach. Pewien procent kliknie. Pewien procent się zarejestruje. Te rejestracje płacą Ci 10% co miesiąc. W następnym miesiącu udostępnij kolejny skill. Zarobki rosną bez proporcjonalnie więcej pracy.",
   },
   chain: {
     title: "Zarabiasz też gdy Twoi użytkownicy polecają innych",
-    p1: "Gdy użytkownicy, których poleciłeś/aś, sami polecają innych, Ty też zarabiasz z tych płatności - do 5 poziomów głębokości, każdy poziom o połowę mniejszy:",
+    p1: "Gdy użytkownicy, których poleciłeś/aś, sami polecają innych, Ty też zarabiasz z tych płatności: do 5 poziomów głębokości, każdy poziom o połowę mniejszy:",
     level1: "Poziom 2 (polecenia Twoich poleceń): ~5% każdej płatności",
     level2: "Poziom 3: ~2,5% każdej płatności",
     level3: "Poziom 4: ~1,25% każdej płatności",
     level4: "Poziom 5: ~0,625% każdej płatności",
-    p2: "Uczciwa uwaga: bonusy łańcucha szybko maleją. 10% od bezpośrednich poleceń przez skill to niemal cały Twój dochód. Traktuj zarobki z łańcucha jako bonus - nie optymalizuj dla głębokości, optymalizuj dla jakościowych udostępnień.",
+    p2: "Uczciwa uwaga: bonusy łańcucha szybko maleją. 10% od bezpośrednich poleceń przez skill to niemal cały Twój dochód. Traktuj zarobki z łańcucha jako bonus: nie optymalizuj dla głębokości, optymalizuj dla jakościowych udostępnień.",
   },
   howTo: {
     title: "5 minut do pierwszego linku do udostępnienia",
@@ -104,10 +104,10 @@ export const translations: typeof enTranslations = {
       "Kliknij na skill, żeby zobaczyć stronę szczegółów. Tutaj znajdziesz przycisk Udostępnij i zarabiaj.",
     step3Title: "Wygeneruj link do udostępnienia",
     step3Body:
-      "Kliknij Udostępnij i zarabiaj. Jeśli masz kod polecający, wybierz go. Jeśli nie, utwórz go w trzy sekundy. Twój link niesie Twój kod polecający i ID skilla - atrybucja śledzi się sama.",
+      "Kliknij Udostępnij i zarabiaj. Jeśli masz kod polecający, wybierz go. Jeśli nie, utwórz go w trzy sekundy. Twój link niesie Twój kod polecający i ID skilla: atrybucja śledzi się sama.",
     step4Title: "Udostępnij tam gdzie to ma znaczenie",
     step4Body:
-      "Opublikuj w społecznościach, gdzie ludzie faktycznie skorzystaliby ze skilla - serwery Discord, subreddity, wątki na forach, posty na blogu, kanały Slack. Konkretnie bije szeroko.",
+      "Opublikuj w społecznościach, gdzie ludzie faktycznie skorzystaliby ze skilla: serwery Discord, subreddity, wątki na forach, posty na blogu, kanały Slack. Konkretnie bije szeroko.",
     step5Title: "Obserwuj panel",
     step5Body:
       "Twój panel poleceń pokazuje odwiedzających, rejestracje i zarobki w czasie rzeczywistym. Każda nowa rejestracja przez Twój link to 10% cyklicznego dochodu.",

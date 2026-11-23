@@ -27,7 +27,7 @@ export const translations = {
       "Developers and AI-heavy users run agents, the API and image or video generation on top of the plan, and buy credit packs as they go. A {{powerSpend}}/month power user earns you {{powerEarn}}/month recurring. That's {{powerVsPlan}} plan referrals in one.",
     floorTitle: "ARPU grows as the platform grows",
     floorBody:
-      "Every time {{appName}} adds models, capabilities, or generation modalities, existing subscribers spend more. Referrals you made six months ago are worth more today than when you made them - without any extra work from you.",
+      "Every time {{appName}} adds models, capabilities, or generation modalities, existing subscribers spend more. Referrals you made six months ago are worth more today than when you made them, without any extra work from you.",
     tableHeaderProfile: "User profile",
     tableHeaderSpend: "Monthly spend",
     tableHeaderYouEarn: "You earn/mo",
@@ -47,9 +47,9 @@ export const translations = {
   structure: {
     title: "The full commission structure",
     p1: "Direct referral: 10% of every payment from people you refer directly. This is yours always, for life, regardless of anything else.",
-    p2: "Skill bonus: if someone signs up through another member's link to a skill you published, you earn 5% on their payments - on top of the 10% that member earns. Skills are shareable AI presets anyone can create and publish. Critical detail for affiliate pros: you earn the 5% as the skill author even when someone else shares your skill link. A user discovers your skill in the directory and shares it - you still get credited. Skill authorship is tracked by the platform, not by who distributed the link. This creates passive attribution you don't have to actively manage.",
-    p3: "Multi-level chain: an additional 10% pool is distributed across up to 5 levels of your referral chain, with geometric decay - each level earns half of the one above it. Your direct referrals' referrals earn you ~5%, their referrals ~2.5%, and so on. Maximum total payout across all earners: ~20% of any single payment.",
-    p4: "Honest disclosure: the chain bonuses get small fast. The 10% direct + 5% skill is where the real income is. Don't build a strategy around multi-level depth - build it around quality direct referrals and publishable skills.",
+    p2: "Skill bonus: if someone signs up through another member's link to a skill you published, you earn 5% on their payments, on top of the 10% that member earns. Skills are shareable AI presets anyone can create and publish. Critical detail for affiliate pros: you earn the 5% as the skill author even when someone else shares your skill link. A user discovers your skill in the directory and shares it. You still get credited. Skill authorship is tracked by the platform, not by who distributed the link. This creates passive attribution you don't have to actively manage.",
+    p3: "Multi-level chain: an additional 10% pool is distributed across up to 5 levels of your referral chain, with geometric decay, each level earns half of the one above it. Your direct referrals' referrals earn you ~5%, their referrals ~2.5%, and so on. Maximum total payout across all earners: ~20% of any single payment.",
+    p4: "Honest disclosure: the chain bonuses get small fast. The 10% direct + 5% skill is where the real income is. Don't build a strategy around multi-level depth. Build it around quality direct referrals and publishable skills.",
   },
   audience: {
     title: "Who converts for this platform",
@@ -70,7 +70,7 @@ export const translations = {
   },
   promotion: {
     title: "Angles that convert",
-    angle1Title: '"I compared 10 AI tools - here\'s the one I actually kept"',
+    angle1Title: "\"I compared 10 AI tools: here's the one I actually kept\"",
     angle1Body:
       "Comparison content is the best affiliate driver for this category. Lead with model variety, pricing, and the free-speech positioning vs single-model tools.",
     angle2Title: "Developer communities",
@@ -81,7 +81,7 @@ export const translations = {
       "r/selfhosted, privacy forums, Mastodon. The open-source codebase and self-hosting option land well. These users hate closed platforms.",
     angle4Title: "Tutorial content with the tool",
     angle4Body:
-      '"How to use AI for X" with {{appName}} as the specific tool. Coding assistant, writing, research - specific use cases convert better than generic AI reviews.',
+      "\"How to use AI for X\" with {{appName}} as the specific tool. Coding assistant, writing, research: specific use cases convert better than generic AI reviews.",
   },
   payouts: {
     title: "Payout mechanics",
@@ -91,7 +91,7 @@ export const translations = {
   },
   close: {
     title: "Worth adding to your stack",
-    p1: "Not the highest-paying program you'll run. But recurring commissions in a fast-growing category, with a power-user segment that already spends heavily and trends up - that's a different asset class than one-time affiliate payouts.",
+    p1: "Not the highest-paying program you'll run. But recurring commissions in a fast-growing category, with a power-user segment that already spends heavily and trends up. That's a different asset class than one-time affiliate payouts.",
     p2: "If your audience overlaps with any of the above, it's worth a code and a post.",
     createCode: "Create your referral code",
     joinDiscord: "Join the Discord",

@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Framework next-vibe - Jedna definicja, każda powierzchnia",
+    title: "Framework next-vibe: Jedna definicja, każda powierzchnia",
     description:
       "Framework open source w TypeScripcie. Jeden definition.ts staje się interfejsem web, poleceniem CLI, narzędziem MCP, ekranem natywnym, narzędziem AI i zadaniem cron. Do tego API zgodne z OpenAI i Anthropic.",
     category: "Framework",

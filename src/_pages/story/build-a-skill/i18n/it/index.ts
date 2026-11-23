@@ -27,7 +27,7 @@ export const translations: typeof enTranslations = {
       "Identità e istruzioni. 200–500 parole. Si sente come una persona, non un FAQ.",
     item1Label: "Selezione del modello",
     item1Body:
-      "Filtra per intelligenza, livello di contenuto e prezzo - o pin un modello specifico.",
+      "Filtra per intelligenza, livello di contenuto e prezzo o pin un modello specifico.",
     item2Label: "Strumenti",
     item2Body:
       "Lista bianca esatta: ricerca, immagine gen, memoria, codice, musica, video.",
@@ -40,7 +40,7 @@ export const translations: typeof enTranslations = {
     way1Badge: "Pagina delle competenze",
     way1Title: "Creare pulsante nella lista delle competenze",
     way1Body:
-      "Aprire la pagina delle competenze o il selettore modello all'interno di qualsiasi thread di chat. Hit Create. Compila il modulo - nome, prompt del sistema, modello, strumenti. Fatto.",
+      "Aprire la pagina delle competenze o il selettore modello all'interno di qualsiasi thread di chat. Hit Create. Compila il modulo: nome, prompt del sistema, modello, strumenti. Fatto.",
     way1Detail:
       "Niente mago, niente passi extra. Il modulo è la configurazione completa.",
     way1Cta: "Abilità aperte",
@@ -49,7 +49,7 @@ export const translations: typeof enTranslations = {
     way2Body:
       'Aprire un filo e dire: "Compilami una abilità di ragionamento clinico per studenti di medicina." Il sub-agente Skill Creator pone alcune domande, elabora il prompt, sceglie il modello, configura gli strumenti, crea l\'abilità, lo spilla alla barra laterale.',
     way2Detail:
-      "Thea delegati al Creatore di Abilità - un sub-agente dotato di abilità-creare, favorito-creare, strumento-aiuto. Descrivi, si costruisce.",
+      "Thea delegati al Creatore di Abilità: un sub-agente dotato di abilità-creare, favorito-creare, strumento-aiuto. Descrivi, si costruisce.",
     way2Cta: "Apri chat",
   },
   prompt: {
@@ -70,12 +70,12 @@ export const translations: typeof enTranslations = {
     do4Body: "Il modello legge il prompt completo ogni volta. Vince più breve.",
     dont0Title: "Elenchi delle regole di stile ToS",
     dont0Body:
-      '"Sempre essere utile, mai essere scortese" - ogni AI ottiene questo. Un rumore puro.',
+      "\"Sempre essere utile, mai essere scortese\" (ogni AI ottiene questo. Un rumore puro.)",
     dont1Title: '"Sempre essere utile"',
     dont1Body: "Il modello lo sa già. Salta.",
     dont2Title: "Limiti di contrasto",
     dont2Body:
-      '"Sii creativo ma sempre rimanere sull\'argomento" - il modello siepi per sempre. Scegline uno.',
+      "\"Sii creativo ma sempre rimanere sull'argomento\" (il modello siepi per sempre. Scegline uno.)",
     dont3Title: "Liste di capacità lunghe",
     dont3Body: "Il modello sa cosa può fare. Non ripetere i documenti.",
   },
@@ -104,12 +104,12 @@ export const translations: typeof enTranslations = {
     item5Name: "L'esperto che non si può afford",
     item5Category: "Specialista",
     item5Desc:
-      "Consulente, avvocato, consulente finanziario - distillato in un'abilità. $400/hr conoscenza, zero costo.",
+      "Consulente, avvocato, consulente finanziario: distillato in un'abilità. $400/hr conoscenza, zero costo.",
   },
   dev: {
     title: "Per chi sviluppa: skill.ts",
-    body: "Eseguire next-vibe localmente? Chiedi al tuo agente di generare un file di abilità. Stessa struttura di ogni abilità incorporata - compila-pronta, pronto commit.",
-    note: "L'agente sa tutto. Descrivi ciò che vuoi - genera il file, registra l'abilità, è dal vivo.",
+    body: "Eseguire next-vibe localmente? Chiedi al tuo agente di generare un file di abilità. Stessa struttura di ogni abilità incorporata: compila-pronta, pronto commit.",
+    note: "L'agente sa tutto. Descrivi ciò che vuoi: genera il file, registra l'abilità, è dal vivo.",
   },
   cta: {
     title: "Costruisci il tuo.",

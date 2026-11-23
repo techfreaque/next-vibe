@@ -2,15 +2,15 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Stopka redakcyjna - {{appName}}",
+    title: "Stopka redakcyjna: {{appName}}",
     category: "Prawne",
     description: "Nota prawna i dane usługodawcy {{appName}}",
     imageAlt: "Stopka redakcyjna",
     keywords:
       "stopka redakcyjna, nota prawna, informacje o usługodawcy, {{appName}} prawne",
-    ogTitle: "Stopka redakcyjna - {{appName}}",
+    ogTitle: "Stopka redakcyjna: {{appName}}",
     ogDescription: "Nota prawna i dane usługodawcy {{appName}}",
-    twitterTitle: "Stopka redakcyjna - {{appName}}",
+    twitterTitle: "Stopka redakcyjna: {{appName}}",
     twitterDescription: "Nota prawna i dane usługodawcy {{appName}}",
   },
   printAriaLabel: "Drukuj stopkę",

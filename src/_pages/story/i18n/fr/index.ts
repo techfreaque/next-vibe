@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "{{appName}} - Chat IA non censuré",
+    title: "{{appName}} : Chat IA non censuré",
     category: "Plateforme de chat IA",
     description:
       "Des conversations IA vraiment non censurées avec {{modelCount}} modèles. Pas de filtres, pas de restrictions. Juste une IA honnête.",

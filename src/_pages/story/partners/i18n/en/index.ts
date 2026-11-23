@@ -1,6 +1,6 @@
 export const translations = {
   meta: {
-    title: "{{appName}} Partner Program - {{directPct}} recurring, no cap",
+    title: "{{appName}} Partner Program: {{directPct}} recurring, no cap",
     category: "Partners",
     description:
       "Creators, newsletters and directories: earn {{directPct}} of every purchase from the people you send to {{appName}}. Recurring, no cap, tracked per link. Paid in credits or BTC/USDC.",

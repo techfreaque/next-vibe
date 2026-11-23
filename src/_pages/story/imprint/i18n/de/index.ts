@@ -2,15 +2,15 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Impressum - {{appName}}",
+    title: "Impressum: {{appName}}",
     category: "Rechtliches",
     description: "Impressum und Anbieterkennzeichnung von {{appName}}",
     imageAlt: "Impressum",
     keywords:
       "Impressum, Anbieterkennzeichnung, Rechtliche Hinweise, {{appName}} Impressum",
-    ogTitle: "Impressum - {{appName}}",
+    ogTitle: "Impressum: {{appName}}",
     ogDescription: "Impressum und Anbieterkennzeichnung von {{appName}}",
-    twitterTitle: "Impressum - {{appName}}",
+    twitterTitle: "Impressum: {{appName}}",
     twitterDescription: "Impressum und Anbieterkennzeichnung von {{appName}}",
   },
   printAriaLabel: "Impressum drucken",

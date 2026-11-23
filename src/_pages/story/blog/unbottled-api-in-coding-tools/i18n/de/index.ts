@@ -2,7 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Codex CLI und Claude Code mit jedem Modell - {{appName}} API",
+    title: "Codex CLI und Claude Code mit jedem Modell: {{appName}} API",
     description:
       "Codex CLI, Claude Code, OpenCode, Continue, Aider und Cline mit einem einzigen {{appName}}-Key. Claude, GPT, DeepSeek, GLM und unzensierte Modelle. Eine Basis-URL, ein Befehl pro Tool.",
     category: "Entwickler-Guide",

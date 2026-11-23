@@ -5,7 +5,7 @@ export const translations = {
     category: "Refusal Index",
     description:
       "The same questions to every AI model, with new ones every week. We measure who answers, who hedges and who refuses, and publish the method. Open data on {{appName}}.",
-    imageAlt: "Refusal Index - AI model refusal rates",
+    imageAlt: "Refusal Index: AI model refusal rates",
     keywords:
       "{{appName}}, refusal index, AI refusal rate, uncensored AI, AI censorship benchmark, model comparison",
   },

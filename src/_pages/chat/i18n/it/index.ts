@@ -130,16 +130,16 @@ export const translations: typeof enTranslations = {
       enabledLabel: "permesso",
       totalLabel: "totale totale",
       activeTooltip:
-        "Gli strumenti Pinned sono sempre in contesto - lo AI li vede ogni volta",
+        "Gli strumenti Pinned sono sempre in contesto: lo AI li vede ogni volta",
       enabledTooltip:
         "Gli strumenti consentiti possono essere chiamati su richiesta quando l'aiuto è abilitato",
       legendActive: "Sempre in contesto (arrotolato)",
       legendConfirm: "Chiede prima di correre",
-      activeOn: "Pinned - sempre in contesto. Fare clic su unpin",
+      activeOn: "Pinned: sempre in contesto. Fare clic su unpin",
       activeOff:
-        "Non pinned - AI può ancora chiamare su richiesta. Fare clic su perno",
-      confirmOn: "Richiede conferma - clicca per disabilitare",
-      confirmOff: "Esegue automaticamente - clicca per richiedere la conferma",
+        "Non pinned: AI può ancora chiamare su richiesta. Fare clic su perno",
+      confirmOn: "Richiede conferma. Clicca per disabilitare",
+      confirmOff: "Esegue automaticamente. Clicca per richiedere la conferma",
     },
   },
 
@@ -335,9 +335,9 @@ export const translations: typeof enTranslations = {
     qualityHD: "HD",
   },
   audioGen: {
-    durationShort: "- 8.",
-    durationMedium: "- 20.",
-    durationLong: "- 30.",
+    durationShort: "~8 s",
+    durationMedium: "~20 s",
+    durationLong: "~30 s",
   },
   modelSelector: {
     placeholder: "Selezionare il modello",
@@ -345,7 +345,7 @@ export const translations: typeof enTranslations = {
     costFree: "Gratis",
     costCredits: "Credito {{count}}/msg",
     costCreditsPlural: "Crediti {{count}}/msg",
-    tooltip: "{{provider}} - {{name}} ({{cost}})",
+    tooltip: "{{provider}}: {{name}} ({{cost}})",
     // New hybrid mode translations
     whatDoYouNeed: "Di cosa hai bisogno?",
     tuneIt: "Tune!",
@@ -774,7 +774,7 @@ export const translations: typeof enTranslations = {
     welcome: {
       title: "Pensa a noi come la tua squadra AI.",
       line1:
-        "Un compagno per la conversazione quotidiana. Specialisti per codifica, ricerca, scrittura - si sceglie uno quando il compito lo richiede.",
+        "Un compagno per la conversazione quotidiana. Specialisti per codifica, ricerca, scrittura: si sceglie uno quando il compito lo richiede.",
       line2:
         "Stessa chiacchierata. Se cambia quando conta. Ci vogliono secondi.",
       line3: "Facciamo in modo che tu ti metta in mezzo tra un minuto.",
@@ -807,11 +807,11 @@ export const translations: typeof enTranslations = {
         },
         brilliant: {
           label: "Brillante",
-          desc: "Migliore qualità - grande per domande complesse, scrittura e analisi",
+          desc: "Migliore qualità: grande per domande complesse, scrittura e analisi",
         },
         max: {
           label: "Massimo",
-          desc: "Il ragionamento più alto, nessun compromesso - per quando è davvero importante",
+          desc: "Il ragionamento più alto, nessun compromesso: per quando è davvero importante",
         },
       },
     },
@@ -822,7 +822,7 @@ export const translations: typeof enTranslations = {
         "Aggiungiamo automaticamente gli specialisti giusti al toolkit di AI.",
       saving: "Prepararsi...",
       start: "Avviare la chat",
-      skip: "Skip - Lo preparerò più tardi",
+      skip: "Skip: Lo preparerò più tardi",
       coding: {
         label: "Codifica e tecnologia",
         hint: "Vibe Coder, Coder",
@@ -973,7 +973,7 @@ export const translations: typeof enTranslations = {
       publicExplanation:
         "Il Forum pubblico è uno spazio aperto dove le persone e AI parlano liberamente. Tu decidi quello che leggi. Togliamo solo ciò che infrange la legge o i nostri termini. Condividi idee, sfide prospettive, unisciti a discussioni non censurate.",
       incognitoExplanation:
-        "La modalità Incognito mantiene le vostre conversazioni completamente private e locali. Le tue chat vengono memorizzate solo nel tuo browser e non vengono mai inviate ai nostri server (i supporti generati vengono memorizzati temporaneamente per motivi tecnici) - nemmeno legati al tuo account.",
+        "La modalità Incognito mantiene le vostre conversazioni completamente private e locali. Le tue chat vengono memorizzate solo nel tuo browser e non vengono mai inviate ai nostri server (i supporti generati vengono memorizzati temporaneamente per motivi tecnici): nemmeno legati al tuo account.",
       requiresAccount:
         "Per accedere a {{folderName}}, è necessario creare un account o accedere.",
       loginButton: "Accedi",
@@ -1280,11 +1280,11 @@ export const translations: typeof enTranslations = {
       kimiK2Free:
         "Kimi K2 Instruct è un modello di lingua Mixture-of-Experts (MoE) sviluppato da Moonshot AI.",
       kimiK2:
-        "Kimi K2 - avanzato modello Mixture-of-Experts (MoE) di Moonshot AI con grande finestra di contesto",
+        "Kimi K2: avanzato modello Mixture-of-Experts (MoE) di Moonshot AI con grande finestra di contesto",
       kimiK2Thinking:
-        "Kimi K2 Thinking - variante con messa a fuoco ragionata con funzionalità analitiche migliorate",
+        "Kimi K2 Thinking: variante con messa a fuoco ragionata con funzionalità analitiche migliorate",
       deepseekV31Free:
-        "Potente modello di parametro 671B - completamente gratuito!",
+        "Potente modello di parametro 671B: completamente gratuito!",
       deepseekV31:
         "Potente modello di parametri 671B con funzionalità avanzate",
       qwen3235bFree:
@@ -1294,62 +1294,62 @@ export const translations: typeof enTranslations = {
       deepseekR1:
         "Modello di ragionamento avanzato con capacità di pensiero profondo",
       qwen257b: "Efficiente modello di parametro 7B",
-      grok4: "X- AI Grok 4 - modello premium",
+      grok4: "X- AI Grok 4: modello premium",
       grok4Fast:
         "Grok 4 Fast è l'ultimo modello multimodale di xAI con efficienza dei costi SOTA e una finestra di contesto a 2M. Viene in due gusti: non-reasoning e ragionamento.",
-      glm5: "GLM-5 - Z. AI modello open-source di punta per la progettazione di sistemi complessi e flussi di lavoro di agente a lungo raggio, rivalendo i principali modelli di risorse chiuse",
+      glm5: "GLM-5: Z. AI modello open-source di punta per la progettazione di sistemi complessi e flussi di lavoro di agente a lungo raggio, rivalendo i principali modelli di risorse chiuse",
       glm46:
-        "GLM 4.6 - modello di parametri 7B efficiente con grande finestra di contesto",
+        "GLM 4.6: modello di parametri 7B efficiente con grande finestra di contesto",
       glm47:
-        "GLM 4.7 - migliorato modello 7B con maggiore capacità di ragionamento e codifica",
+        "GLM 4.7: migliorato modello 7B con maggiore capacità di ragionamento e codifica",
       glm47Flash:
-        "GLM 4.7 Flash - variante ultra-veloce ottimizzata per risposte rapide",
+        "GLM 4.7 Flash: variante ultra-veloce ottimizzata per risposte rapide",
       glm45Air:
-        "GLM 4.5 AIR - modello leggero ultra-veloce con grande finestra di contesto",
+        "GLM 4.5 AIR: modello leggero ultra-veloce con grande finestra di contesto",
       glm45v:
-        "GLM 4. 5v - modello multimodale visionabile con grande finestra di contesto",
+        "GLM 4. 5v: modello multimodale visionabile con grande finestra di contesto",
       kimiK2_6:
-        "Kimi K2.6 - Codifica Long-Horizon, generazione UI / UX e orchestrazione multi-agente con architettura swarm",
+        "Kimi K2.6: Codifica Long-Horizon, generazione UI / UX e orchestrazione multi-agente con architettura swarm",
       uncensoredLmV11:
-        "Modello di lingua non censurato senza filtraggio dei contenuti - modello premium",
+        "Modello di lingua non censurato senza filtraggio dei contenuti: modello premium",
       freedomgptLiberty:
-        "FreedomGPT Liberty - Uncensored AI modello focalizzato sulla libera espressione e il contenuto creativo",
+        "FreedomGPT Liberty: Uncensored AI modello focalizzato sulla libera espressione e il contenuto creativo",
       gabAiArya:
-        "Gab AI Arya - Uncensored conversazione AI modello con espressione libera e capacità creative",
+        "Gab AI Arya: Uncensored conversazione AI modello con espressione libera e capacità creative",
       gpt52Pro:
-        "GPT 5.2 Pro - modello di ragionamento avanzato con funzionalità avanzate per compiti complessi",
+        "GPT 5.2 Pro: modello di ragionamento avanzato con funzionalità avanzate per compiti complessi",
       gpt52:
-        "GPT 5.2 - modello di ultima generazione con prestazioni e efficienza migliorate",
+        "GPT 5.2: modello di ultima generazione con prestazioni e efficienza migliorate",
       gpt52_chat:
-        "GPT 5.2 Chat - variante conversazione ottimizzata per il dialogo e le interazioni",
+        "GPT 5.2 Chat: variante conversazione ottimizzata per il dialogo e le interazioni",
       veniceUncensored:
-        "Venice Uncensored - Uncensored AI modello per conversazioni senza restrizioni",
+        "Venice Uncensored: Uncensored AI modello per conversazioni senza restrizioni",
       dolphinLlama3_70B:
-        "Dolphin Llama 3 70B - Modello in lingua grande non censurato basato su Llama 3",
+        "Dolphin Llama 3 70B: Modello in lingua grande non censurato basato su Llama 3",
       dolphin3_0_r1_mistral_24b:
-        "Dolphin 3.0 R1 Mistral 24B - Modello linguistico non censurato basato su Mistral",
+        "Dolphin 3.0 R1 Mistral 24B: Modello linguistico non censurato basato su Mistral",
       claudeOpus45:
-        "Claude Opus 4.5 - Il più potente modello Claude con eccezionali capacità di ragionamento e creatività",
+        "Claude Opus 4.5: Il più potente modello Claude con eccezionali capacità di ragionamento e creatività",
       claudeOpus46:
-        "Claude Opus 4.6 - Potente modello Claude con eccezionali capacità di ragionamento e creatività",
+        "Claude Opus 4.6: Potente modello Claude con eccezionali capacità di ragionamento e creatività",
       claudeOpus47:
-        "Claude Opus 4.7 - Modello Opus di generazione precedente. E' successo di 4,8.",
+        "Claude Opus 4.7: Modello Opus di generazione precedente. E' successo di 4,8.",
       claudeOpus48:
-        "Claude Opus 4.8 - Anthropic è il modello Opus più in grado in generale. Costruito per lavori agentici a lungo raggio, codifica complessa e ragionamento multi-passo attraverso uscite molto lunghe. Supporta ingressi di testo, immagine e file.",
+        "Claude Opus 4.8: Anthropic è il modello Opus più in grado in generale. Costruito per lavori agentici a lungo raggio, codifica complessa e ragionamento multi-passo attraverso uscite molto lunghe. Supporta ingressi di testo, immagine e file.",
       claudeSonnet46:
-        "Claude Sonnet 4.6 - Il modello Sonnet-class più capace di Anthropic con prestazioni di frontiera attraverso la codifica, gli agenti e il lavoro professionale",
+        "Claude Sonnet 4.6: Il modello Sonnet-class più capace di Anthropic con prestazioni di frontiera attraverso la codifica, gli agenti e il lavoro professionale",
       gemini3Pro:
-        "Google Gemini 3 Pro - Modello avanzato multimodale AI con grande finestra di contesto e potenti capacità di ragionamento",
+        "Google Gemini 3 Pro: Modello avanzato multimodale AI con grande finestra di contesto e potenti capacità di ragionamento",
       gemini35Flash:
-        "Gemini 3.5 Flash - Codifica Near-Pro e ragionamento a costo di Flash. gestisce testo, immagini, video, audio e PDF. Cicli agentici paralleli incorporati. Livelli di pensiero dal minimo all'alto per un controllo preciso dei costi/prestazioni.",
+        "Gemini 3.5 Flash: Codifica Near-Pro e ragionamento a costo di Flash. gestisce testo, immagini, video, audio e PDF. Cicli agentici paralleli incorporati. Livelli di pensiero dal minimo all'alto per un controllo preciso dei costi/prestazioni.",
       gemini3Flash:
-        "Google Gemini 3 Flash - Modello AI multimodale veloce ed efficiente ottimizzato per risposte rapide",
+        "Google Gemini 3 Flash: Modello AI multimodale veloce ed efficiente ottimizzato per risposte rapide",
       deepseekV32:
-        "DeepSeek V3.2 - Modello di ragionamento ad alte prestazioni con funzionalità di codifica avanzate",
+        "DeepSeek V3.2: Modello di ragionamento ad alte prestazioni con funzionalità di codifica avanzate",
       deepseekV4Pro:
-        "DeepSeek V4 Pro - 1.6T parametro Powerhouse MoE con contesto 1M. Costruito per analisi full-codebase, ragionamento complesso e flussi di lavoro multi-step agente.",
+        "DeepSeek V4 Pro: 1.6T parametro Powerhouse MoE con contesto 1M. Costruito per analisi full-codebase, ragionamento complesso e flussi di lavoro multi-step agente.",
       deepseekV4Flash:
-        "DeepSeek V4 Flash - 284B MoE a costi quasi zero. contesto 1M, inferenza veloce, codifica forte. La scelta efficiente per carichi di lavoro ad alto rendimento.",
+        "DeepSeek V4 Flash: 284B MoE a costi quasi zero. contesto 1M, inferenza veloce, codifica forte. La scelta efficiente per carichi di lavoro ad alto rendimento.",
     },
   },
   tones: {
@@ -1429,7 +1429,7 @@ export const translations: typeof enTranslations = {
         "Scegli un modello e una capacità per generare una risposta AI",
       confirmLabel: "Generazione",
       inputPlaceholder:
-        "Inserire un prompt per AI (opzionale - lasciare vuoto per permettere a AI di generare la propria risposta)",
+        "Inserire un prompt per AI (opzionale. Lasciare vuoto per permettere a AI di generare la propria risposta)",
     },
   },
   debugView: {
@@ -1452,7 +1452,7 @@ export const translations: typeof enTranslations = {
         "Scegli un modello e una capacità per generare una risposta AI",
       confirmLabel: "Generazione",
       inputPlaceholder:
-        "Inserire un prompt per AI (opzionale - lasciare vuoto per permettere a AI di generare la propria risposta)",
+        "Inserire un prompt per AI (opzionale. Lasciare vuoto per permettere a AI di generare la propria risposta)",
     },
   },
   suggestedPrompts: {
@@ -1716,7 +1716,7 @@ export const translations: typeof enTranslations = {
         "Scegli un modello e una capacità per generare una risposta AI",
       confirmLabel: "Generazione",
       inputPlaceholder:
-        "Inserire un prompt per AI (opzionale - lasciare vuoto per permettere a AI di generare la propria risposta)",
+        "Inserire un prompt per AI (opzionale. Lasciare vuoto per permettere a AI di generare la propria risposta)",
     },
     actions: {
       vote: "Votazioni",
@@ -1783,7 +1783,7 @@ export const translations: typeof enTranslations = {
         "Scegli un modello e una capacità per generare una risposta AI",
       confirmLabel: "Generazione",
       inputPlaceholder:
-        "Inserire un prompt per AI (opzionale - lasciare vuoto per permettere a AI di generare la propria risposta)",
+        "Inserire un prompt per AI (opzionale. Lasciare vuoto per permettere a AI di generare la propria risposta)",
     },
     actions: {
       loadingAudio: "Caricamento audio...",
@@ -1960,8 +1960,8 @@ export const translations: typeof enTranslations = {
         "Fare clic sul microfono per avviare la registrazione. Quando fatto, scegliere cosa fare:",
       options: {
         transcribe:
-          "Trascrivi in testo - converte il discorso in testo modificabile",
-        sendAudio: "Invia come voce - AI sente la tua voce reale",
+          "Trascrivi in testo: converte il discorso in testo modificabile",
+        sendAudio: "Invia come voce: AI sente la tua voce reale",
         pauseResume: "Riprendi la registrazione in qualsiasi momento",
       },
     },

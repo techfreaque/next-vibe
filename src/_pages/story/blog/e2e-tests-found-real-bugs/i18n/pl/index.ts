@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Robot kliknął każdy przycisk. Znalazł osiem luk bezpieczeństwa.",
     description:
-      "Zbudowaliśmy framework testów end-to-end, który obsługuje prawdziwe strony w prawdziwej przeglądarce - i pokryliśmy każdy endpoint, z którego korzystają klienci. Oto co wyłapał.",
+      "Zbudowaliśmy framework testów end-to-end, który obsługuje prawdziwe strony w prawdziwej przeglądarce i pokryliśmy każdy endpoint, z którego korzystają klienci. Oto co wyłapał.",
     category: "Inżynieria",
     imageAlt:
       "Testy end-to-end sterujące {{appName}} w prawdziwej przeglądarce",
@@ -17,11 +17,11 @@ export const translations: typeof enTranslations = {
     readTime: "7 min czytania",
     title: "Robot kliknął każdy przycisk. Znalazł osiem luk bezpieczeństwa.",
     subtitle:
-      "Przestaliśmy testować kawałki, zaczęliśmy testować strony. Prawdziwa przeglądarka, prawdziwy serwer, prawdziwe kliknięcia - na każdym endpoincie, którego dotyka klient.",
+      "Przestaliśmy testować kawałki, zaczęliśmy testować strony. Prawdziwa przeglądarka, prawdziwy serwer, prawdziwe kliknięcia: na każdym endpoincie, którego dotyka klient.",
   },
   intro: {
-    lead: "Nasz kod przechodził sprawdzanie typów, lintera i testy jednostkowe. A mimo to wypuszczał bugi. Nie egzotyczne - formularz resetu, który ignorował potwierdzenie hasła, linki do faktur prowadzące donikąd, feed pokazujący usunięte wątki.",
-    p1: "Każdy z nich siedział w szczelinie między kawałkami. Funkcja była dobra. Strona wokół niej - nie. Dlatego zbudowaliśmy framework testowy, który obchodzi tylko jedno: co klient naprawdę widzi i wysyła.",
+    lead: "Nasz kod przechodził sprawdzanie typów, lintera i testy jednostkowe. A mimo to wypuszczał bugi. Nie egzotyczne: formularz resetu, który ignorował potwierdzenie hasła, linki do faktur prowadzące donikąd, feed pokazujący usunięte wątki.",
+    p1: "Każdy z nich siedział w szczelinie między kawałkami. Funkcja była dobra. Strona wokół niej: nie. Dlatego zbudowaliśmy framework testowy, który obchodzi tylko jedno: co klient naprawdę widzi i wysyła.",
   },
   why: {
     title: "Po co testować prawdziwą stronę?",
@@ -35,7 +35,7 @@ export const translations: typeof enTranslations = {
     api: {
       label: "Test API",
       title: "Sprawdza jedno żądanie",
-      body: "Dowodzi, że serwer odpowiada. Nigdy - że strona to żądanie wysyła albo pokazuje odpowiedź.",
+      body: "Dowodzi, że serwer odpowiada. Nigdy: że strona to żądanie wysyła albo pokazuje odpowiedź.",
     },
     e2e: {
       label: "End-to-end",
@@ -46,14 +46,14 @@ export const translations: typeof enTranslations = {
   how: {
     title: "Jak działa harness",
     intro:
-      "Playwright sterowany z bun test, zbudowany na definicjach endpointów next-vibe. Definicja zna każde pole - test nie musi.",
+      "Playwright sterowany z bun test, zbudowany na definicjach endpointów next-vibe. Definicja zna każde pole: test nie musi.",
     step1: {
       title: "Otwórz prawdziwą stronę",
-      body: "Test otwiera stronę klienta - /user/login, /story/framework - a nie atrapę. Pisze dopiero wtedy, gdy React przejmie formularz.",
+      body: "Test otwiera prawdziwą stronę, np. /user/login lub /story/framework. Zaczyna wpisywać dane dopiero po przejęciu formularza przez Reacta.",
     },
     step2: {
       title: "Wypełnij typowanymi wartościami",
-      body: "Podajesz wartości, nie selektory. Sterowniki pól czytają definicję i obsługują widoczne UI - piszą, wybierają opcję po etykiecie, dołączają plik.",
+      body: "Podajesz wartości, nie selektory. Sterowniki pól czytają definicję i obsługują widoczne UI: piszą, wybierają opcję po etykiecie, dołączają plik.",
     },
     step3: {
       title: "Złap żądanie z sieci",
@@ -61,7 +61,7 @@ export const translations: typeof enTranslations = {
     },
     step4: {
       title: "Nagraj raz, odtwarzaj zawsze",
-      body: "Płatni dostawcy - modele AI, obraz, muzyka, wideo - są nagrywani per test przy pierwszym uruchomieniu i potem odtwarzani. Zero niespodzianek na rachunku, powtarzalne wyniki.",
+      body: "Przy pierwszym uruchomieniu test zapisuje wywołania płatnych usług AI, grafiki, muzyki i wideo. W kolejnych uruchomieniach je odtwarza. Dzięki temu wynik się powtarza, a rachunek nie zaskakuje.",
     },
     step5: {
       title: "Raport pokrycia",
@@ -115,12 +115,12 @@ export const translations: typeof enTranslations = {
   },
   broken: {
     title: "I to, co było po prostu zepsute",
-    intro: "Nic groźnego - ale po cichu psuło życie prawdziwym ludziom:",
+    intro: "Nic groźnego, ale po cichu psuło życie prawdziwym ludziom:",
     items: {
       attachments:
         "Adresy załączników w czacie i raporty błędów klienta zwracały 404.",
       permissions:
-        "Uprawnienia root nigdy się nie wczytywały - klienci nie mogli pisać w Shared.",
+        "Uprawnienia root nigdy się nie wczytywały: klienci nie mogli pisać w Shared.",
       embed: "Widget do osadzania nie startował.",
       invoices: "Linki w mailach z fakturami zwracały 404.",
       models: "Strona modeli była bezużyteczna.",
@@ -136,7 +136,7 @@ export const translations: typeof enTranslations = {
   closing: {
     title: "Co to znaczy dla Ciebie",
     p1: "Każda strona, przez którą się rejestrujesz, logujesz, płacisz, czatujesz, generujesz czy zapisujesz, ma teraz test, który otwiera ją w prawdziwej przeglądarce i robi to, co Ty. Gdy coś zmieniamy, robot przechodzi tę drogę, zanim Ty to zrobisz.",
-    p2: "Framework jest częścią next-vibe. Budujesz na nim - Twoje endpointy dostają ten sam harness za darmo.",
+    p2: "Framework jest częścią next-vibe. Budujesz na nim: Twoje endpointy dostają ten sam harness za darmo.",
   },
   cta: {
     title: "Przeczytaj harness. Użyj go we własnym kodzie.",

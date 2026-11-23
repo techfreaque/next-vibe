@@ -2,10 +2,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Zarabiaj z {{appName}} - cykliczna prowizja z poleceń",
+    title: "Zarabiaj z {{appName}}: cykliczna prowizja z poleceń",
     category: "Zarabiaj",
     description:
-      "Polecaj {{appName}} i dostawaj {{directPct}} każdej płatności osób, które przyprowadzisz - co miesiąc, dopóki płacą. Opublikuj skill i dostawaj {{skillBonusPct}} od osób, które inni do niego przyprowadzą.",
+      "Polecaj {{appName}} i dostawaj {{directPct}} każdej płatności osób, które przyprowadzisz: co miesiąc, dopóki płacą. Opublikuj skill i dostawaj {{skillBonusPct}} od osób, które inni do niego przyprowadzą.",
     imageAlt: "Zarabiaj z {{appName}}",
     keywords:
       "{{appName}}, program poleceń, afiliacja, prowizja cykliczna, skille AI, dochód pasywny",
@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Zarabiaj",
     title: "Polecaj to, czego używasz. Zarabiaj co miesiąc.",
     subtitle:
-      "{{directPct}} każdej płatności osób, które przyprowadzisz - nie raz, tylko co miesiąc, dopóki płacą. Opublikujesz skill - masz {{skillBonusPct}} za każdym razem, gdy ktoś inny go udostępni.",
+      "{{directPct}} każdej płatności osób, które przyprowadzisz: nie raz, tylko co miesiąc, dopóki płacą. Opublikujesz skill. Masz {{skillBonusPct}} za każdym razem, gdy ktoś inny go udostępni.",
     ctaPrimary: "Odbierz swój link",
     ctaSecondary: "Zbuduj skill",
   },
@@ -28,7 +28,7 @@ export const translations: typeof enTranslations = {
       body: "Załóż darmowe konto i otwórz stronę poleceń. Twój osobisty link jest gotowy w kilka sekund.",
     },
     step2: {
-      title: "Udostępnij go - albo skill",
+      title: "Udostępnij go albo skill",
       body: "Wrzuć link na czat, do README, pod film. Albo opublikuj skill: jego link do udostępniania automatycznie niesie Twoje polecenie.",
     },
     step3: {

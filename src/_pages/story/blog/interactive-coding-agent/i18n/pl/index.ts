@@ -2,11 +2,11 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Twoje AI przekazuje robotę Claude Code - {{appName}}",
+    title: "Twoje AI przekazuje robotę Claude Code: {{appName}}",
     description:
-      "Narzędzie coding-agent pozwala Twojemu AI zlecać prawdziwe zmiany w kodzie Claude Code albo OpenCode - w tle lub jako sesję na żywo w prawdziwym oknie terminala, która sama melduje wynik. Teraz także między instancjami.",
+      "Narzędzie coding-agent pozwala Twojemu AI zlecać prawdziwe zmiany w kodzie Claude Code albo OpenCode: w tle lub jako sesję na żywo w prawdziwym oknie terminala, która sama melduje wynik. Teraz także między instancjami.",
     category: "Agent kodujący",
-    imageAlt: "Interaktywny agent kodujący - Claude Code w oknie terminala",
+    imageAlt: "Interaktywny agent kodujący: Claude Code w oknie terminala",
     keywords:
       "agent kodujący, Claude Code, OpenCode, terminal AI, MCP complete-task, self-hosted AI, next-vibe, {{appName}}",
   },
@@ -16,15 +16,15 @@ export const translations: typeof enTranslations = {
     readTime: "5 min czytania",
     title: "Twoje AI otwiera terminal i przekazuje robotę Claude Code.",
     subtitle:
-      "Czatowe AI mówią o kodzie. Agenci kodujący go zmieniają. Narzędzie coding-agent łączy jedno z drugim - a w trybie interaktywnym widzisz pracę na żywo w prawdziwym oknie terminala.",
+      "Czatowe AI mówią o kodzie. Agenci kodujący go zmieniają. Narzędzie coding-agent łączy jedno z drugim: a w trybie interaktywnym widzisz pracę na żywo w prawdziwym oknie terminala.",
   },
   intro: {
     p1: "Prosisz AI o naprawę padającego testu. Wyjaśni Ci poprawkę. Ale nie zedytuje repo, nie odpali testów i nie będzie poprawiać, aż wszystko się zazieleni. Claude Code i OpenCode to potrafią.",
-    p2: "Narzędzie coding-agent przekazuje zadanie jednemu z nich - na maszynie, na której leży kod - i przynosi wynik z powrotem do Twojej rozmowy.",
+    p2: "Narzędzie coding-agent przekazuje zadanie jednemu z nich (na maszynie, na której leży kod) i przynosi wynik z powrotem do Twojej rozmowy.",
   },
   modes: {
     title: "Dwa tryby",
-    intro: "Zleć i odbierz - albo patrz i steruj.",
+    intro: "Zleć i odbierz albo patrz i steruj.",
     batch: {
       label: "Domyślny",
       title: "Batch",
@@ -33,7 +33,7 @@ export const translations: typeof enTranslations = {
     interactive: {
       label: "Patrz i steruj",
       title: "Interaktywny",
-      body: "Otwiera prawdziwe okno terminala z sesją na żywo. Śledź postęp, odpowiadaj na pytania, zmieniaj kurs. Bez limitu czasu - wynik trafia do wątku, gdy sesja się zamelduje.",
+      body: "Otwiera prawdziwe okno terminala z sesją na żywo. Śledź postęp, odpowiadaj na pytania, zmieniaj kurs. Bez limitu czasu: wynik trafia do wątku, gdy sesja się zamelduje.",
     },
   },
   handBack: {
@@ -43,7 +43,7 @@ export const translations: typeof enTranslations = {
     step1Title: "Twoje AI wywołuje narzędzie",
     step1Body: "Z Twoim promptem i włączonym trybem interaktywnym.",
     step2Title: "Powstaje śledzone zadanie",
-    step2Body: "Wątek czeka na to zadanie - nie na terminal.",
+    step2Body: "Wątek czeka na to zadanie: nie na terminal.",
     step3Title: "Otwiera się okno terminala",
     step3Body:
       "Terminal na macOS, Twój $TERMINAL albo pierwszy znaleziony emulator na Linuksie, świeża konsola PowerShell na Windowsie.",
@@ -73,7 +73,7 @@ export const translations: typeof enTranslations = {
   tryIt: {
     title: "Wypróbuj",
     p1: "Narzędzie jest tylko dla adminów i działa na instancjach self-hosted: uruchamia CLI do kodowania z pełnymi uprawnieniami w folderze projektu. Na tej maszynie musisz mieć zainstalowane i zalogowane Claude Code albo OpenCode.",
-    p2: "Potem po prostu poproś na czacie - albo wywołaj prosto z terminala:",
+    p2: "Potem po prostu poproś na czacie albo wywołaj prosto z terminala:",
   },
   cta: {
     title: "Daj swojemu AI ręce.",

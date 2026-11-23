@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Jestem marketerem afiliacyjnym. Co różni subskrypcje AI?",
     description:
-      "Dla doświadczonych marketerów afiliacyjnych: dlaczego polecenia subskrypcji AI mają lepszą długoterminową ekonomię - i jak bonus za skill plus łańcuch upline zmieniają rachunki.",
+      "Dla doświadczonych marketerów afiliacyjnych: dlaczego polecenia subskrypcji AI mają lepszą długoterminową ekonomię i jak bonus za skill plus łańcuch upline zmieniają rachunki.",
     category: "Program polecający",
     imageAlt: "Wykres pokazujący wzrost cyklicznych przychodów w czasie",
     keywords:
@@ -20,14 +20,14 @@ export const translations: typeof enTranslations = {
   },
   recurringMath: {
     title: "Matematyka cyklicznych przychodów",
-    p1: "Większość programów afiliacyjnych płaci raz. E-commerce: jeden procent od sprzedaży. Test oprogramowania: stała opłata przy ulepszeniu. {{appName}} płaci 10% każdej płatności subskrypcyjnej - co miesiąc, wiecznie. To fundamentalnie zmienia matematykę.",
+    p1: "Większość programów afiliacyjnych płaci raz. E-commerce: jeden procent od sprzedaży. Test oprogramowania: stała opłata przy ulepszeniu. {{appName}} płaci 10% każdej płatności subskrypcyjnej: co miesiąc, wiecznie. To fundamentalnie zmienia matematykę.",
     p2: "Punkt wyjścia to Starter za {{planPrice}}/mies. Przy {{directPct}} bezpośrednio to {{planEarn}}/mies. za polecenie. Nieekscytujące. Ale tu zmienia się matematyka:",
     powerUserTitle: "Mnożnik power userów",
     powerUserBody:
       "Deweloperzy i intensywni użytkownicy AI korzystają z agentów, API oraz generowania obrazów i wideo ponad plan i dokupują pakiety kredytów. Power user wydający {{powerSpend}}/mies. daje Ci {{powerEarn}}/mies. cyklicznie. Tyle, co {{powerVsPlan}} poleceń planu naraz.",
     floorTitle: "ARPU rośnie wraz z platformą",
     floorBody:
-      "Za każdym razem, gdy {{appName}} dodaje modele, funkcje lub modalności, istniejący subskrybenci wydają więcej. Polecenia sprzed sześciu miesięcy są dziś warte więcej niż wtedy - bez żadnej dodatkowej pracy z Twojej strony.",
+      "Za każdym razem, gdy {{appName}} dodaje modele, funkcje lub modalności, istniejący subskrybenci wydają więcej. Polecenia sprzed sześciu miesięcy są dziś warte więcej niż wtedy, bez żadnej dodatkowej pracy z Twojej strony.",
     tableHeaderProfile: "Profil użytkownika",
     tableHeaderSpend: "Miesięczne wydatki",
     tableHeaderYouEarn: "Zarabiasz/mies.",
@@ -47,9 +47,9 @@ export const translations: typeof enTranslations = {
   structure: {
     title: "Pełna struktura prowizji",
     p1: "Bezpośrednie polecenie: 10% każdej płatności od osób, które polecasz bezpośrednio. To zawsze Twoje, wiecznie, niezależnie od wszystkiego innego.",
-    p2: "Bonus za skill: jeśli ktoś zarejestruje się przez link innego członka do skilla, który opublikowałeś/aś, zarabiasz 5% od jego płatności - niezależnie od 10% dla tego członka. Skille to konfigurowalne ustawienia AI, które każdy może tworzyć i publikować. Kluczowy szczegół dla affiliate profesjonalistów: zarabiasz 5% jako autor skilla, nawet gdy ktoś inny udostępnia Twój link. Użytkownik odkrywa Twój skill w katalogu i przekazuje go dalej - i tak zostaniesz zaliczony. Platforma śledzi autorstwo skilla, nie kto dystrybuował link. Pasywna atrybucja, którą nie musisz aktywnie zarządzać.",
-    p3: "Łańcuch wielopoziomowy: dodatkowa 10% pula jest rozdzielana na do 5 poziomów łańcucha poleceń, z geometrycznym spadkiem - każdy poziom zarabia połowę poziomu powyżej. Polecenia Twoich poleceń przynoszą Ci ~5%, ich polecenia ~2,5% itd. Maksymalna łączna wypłata dla wszystkich: ~20% jednej płatności.",
-    p4: "Uczciwe wyjaśnienie: bonusy łańcucha szybko maleją. Prawdziwy dochód to 10% bezpośrednio + 5% skill. Nie buduj strategii wokół głębokości wielopoziomowej - buduj ją wokół jakościowych bezpośrednich poleceń i wartościowych skillów.",
+    p2: "Bonus za skill: jeśli ktoś zarejestruje się przez link innego członka do skilla, który opublikowałeś/aś, zarabiasz 5% od jego płatności, niezależnie od 10% dla tego członka. Skille to konfigurowalne ustawienia AI, które każdy może tworzyć i publikować. Kluczowy szczegół dla affiliate profesjonalistów: zarabiasz 5% jako autor skilla, nawet gdy ktoś inny udostępnia Twój link. Użytkownik odkrywa Twój skill w katalogu i przekazuje go dalej i tak zostaniesz zaliczony. Platforma śledzi autorstwo skilla, nie kto dystrybuował link. Pasywna atrybucja, którą nie musisz aktywnie zarządzać.",
+    p3: "Łańcuch wielopoziomowy: dodatkowa 10% pula jest rozdzielana na do 5 poziomów łańcucha poleceń, z geometrycznym spadkiem, każdy poziom zarabia połowę poziomu powyżej. Polecenia Twoich poleceń przynoszą Ci ~5%, ich polecenia ~2,5% itd. Maksymalna łączna wypłata dla wszystkich: ~20% jednej płatności.",
+    p4: "Uczciwe wyjaśnienie: bonusy łańcucha szybko maleją. Prawdziwy dochód to 10% bezpośrednio + 5% skill. Nie buduj strategii wokół głębokości wielopoziomowej: buduj ją wokół jakościowych bezpośrednich poleceń i wartościowych skillów.",
   },
   audience: {
     title: "Kto konwertuje na tej platformie",
@@ -71,7 +71,7 @@ export const translations: typeof enTranslations = {
   promotion: {
     title: "Kąty które konwertują",
     angle1Title:
-      '"Porównałem/am 10 narzędzi AI - to jedno, które zostawiłem/am"',
+      "\"Porównałem/am 10 narzędzi AI: to jedno, które zostawiłem/am\"",
     angle1Body:
       "Treści porównawcze to najlepszy driver afiliacyjny w tej kategorii. Postaw na różnorodność modeli, ceny i pozycjonowanie wolności słowa vs. narzędzia z jednym modelem.",
     angle2Title: "Społeczności deweloperów",
@@ -82,7 +82,7 @@ export const translations: typeof enTranslations = {
       "r/selfhosted, fora privacy, Mastodon. Open source i opcja self-hostingu trafiają tu dobrze. Ci użytkownicy nienawidzą zamkniętych platform.",
     angle4Title: "Treści tutorialowe z narzędziem",
     angle4Body:
-      '"Jak używać AI do X" z {{appName}} jako konkretnym narzędziem. Asystent kodowania, pisanie, badania - konkretne przypadki użycia konwertują lepiej niż generyczne recenzje AI.',
+      "\"Jak używać AI do X\" z {{appName}} jako konkretnym narzędziem. Asystent kodowania, pisanie, badania: konkretne przypadki użycia konwertują lepiej niż generyczne recenzje AI.",
   },
   payouts: {
     title: "Mechanizm wypłat",
@@ -92,7 +92,7 @@ export const translations: typeof enTranslations = {
   },
   close: {
     title: "Warte dodania do portfolio",
-    p1: "Nie jest to najwyżej płacący program, który będziesz prowadzić. Ale cykliczne prowizje w szybko rosnącej kategorii, z segmentem power userów, który już wydaje dużo i rośnie - to inna klasa aktywów niż jednorazowe wypłaty afiliacyjne.",
+    p1: "Nie jest to najwyżej płacący program, który będziesz prowadzić. Ale cykliczne prowizje w szybko rosnącej kategorii, z segmentem power userów, który już wydaje dużo i rośnie: to inna klasa aktywów niż jednorazowe wypłaty afiliacyjne.",
     p2: "Jeśli Twoi odbiorcy pokrywają się z którymkolwiek z powyższych segmentów, jeden kod i post są warte wysiłku.",
     createCode: "Utwórz kod polecający",
     joinDiscord: "Dołącz do Discorda",

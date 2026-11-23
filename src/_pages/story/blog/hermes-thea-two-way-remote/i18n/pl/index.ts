@@ -2,11 +2,11 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "Hermes i Thea: zdalne wątki w obie strony - {{appName}}",
+    title: "Hermes i Thea: zdalne wątki w obie strony ({{appName}})",
     description:
-      "Twoje lokalne AI i Twoje AI w chmurze prowadzą teraz wątki za siebie nawzajem - w obie strony. Instancja przejmująca turę nie ma klucza API? Wywołujący odbiera pętlę i sam ją kończy.",
+      "Twoje lokalne AI i Twoje AI w chmurze prowadzą teraz wątki za siebie nawzajem: w obie strony. Instancja przejmująca turę nie ma klucza API? Wywołujący odbiera pętlę i sam ją kończy.",
     category: "Hermes i Thea",
-    imageAlt: "Hermes i Thea - dwie połączone instancje next-vibe",
+    imageAlt: "Hermes i Thea: dwie połączone instancje next-vibe",
     keywords:
       "Hermes, Thea, next-vibe, zdalne wątki, self-hosted AI, reverse websocket, fallback klucza API, {{appName}}",
   },
@@ -16,7 +16,7 @@ export const translations: typeof enTranslations = {
     readTime: "6 min czytania",
     title: "Dwa AI. Jedna rozmowa. W obie strony.",
     subtitle:
-      "Hermes działa na Twoim komputerze. Thea działa na serwerze. Teraz każde z nich może przekazać wątek drugiemu - a brak klucza API już nie zatrzymuje tury.",
+      "Hermes działa na Twoim komputerze. Thea działa na serwerze. Teraz każde z nich może przekazać wątek drugiemu: a brak klucza API już nie zatrzymuje tury.",
   },
   intro: {
     p1: "next-vibe działa wszędzie: na laptopie, na VPS-ie, na obu naraz. Połącz dwie instancje, a staną się jednym systemem. Nasze nazywają się Hermes i Thea.",
@@ -35,12 +35,12 @@ export const translations: typeof enTranslations = {
       title: "Thea",
       body: "Działa na serwerze. Zawsze online, dostępna z każdego miejsca. Pilnuje platformy i rozdziela pracę.",
     },
-    note: "Każda instancja zarządza własnymi danymi i zadaniami. Połączenie przekazuje zdarzenia między nimi - nic więcej, nic mniej.",
+    note: "Każda instancja zarządza własnymi danymi i zadaniami. Połączenie przekazuje zdarzenia między nimi: nic więcej, nic mniej.",
   },
   twoWay: {
     title: "Wątki płyną teraz w obie strony",
     intro:
-      "Zdalne foldery i prywatne wątki wykonują się na drugiej instancji - od Thei do Hermesa i od Hermesa do Thei.",
+      "Zdalne foldery i prywatne wątki wykonują się na drugiej instancji: od Thei do Hermesa i od Hermesa do Thei.",
     p1: "Wrzuć wątek do zdalnego folderu, a instancja po drugiej stronie przeprowadzi całą turę AI: model, prompt systemowy, narzędzia. Ty piszesz dalej tam, gdzie jesteś. Rozmowa wraca do Ciebie jako lustro.",
     stepsTitle: "Jedna tura od początku do końca",
     step1Title: "Piszesz",
@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
     title: "Brak klucza API? Tura i tak się kończy.",
     intro:
       "Instancja, która prowadzi turę, potrzebuje klucza API dostawcy modelu. Nie każda instancja go ma.",
-    p1: "Zanim instancja przejmie turę, sprawdza klucz dostawcy na własnym węźle. Brakuje go? Od razu zwraca błąd z wyraźnym znacznikiem - bez wieszania się i bez połowicznie zapisanego wątku.",
+    p1: "Zanim instancja przejmie turę, sprawdza klucz dostawcy na własnym węźle. Brakuje go? Od razu zwraca błąd z wyraźnym znacznikiem, bez wieszania się i bez połowicznie zapisanego wątku.",
     p2: "Strona wywołująca rozpoznaje znacznik, cofa swoje zapisy przekazania i sama prowadzi pętlę. Prompt i narzędzia drugiej strony nadal obowiązują; wywołania narzędzi wędrują tam i z powrotem przez połączenie.",
     calloutTitle: "Tryb inference-provider w ogóle nie potrzebuje klucza.",
     calloutBody:
@@ -84,8 +84,8 @@ export const translations: typeof enTranslations = {
     reconnect:
       "Konektor łączy się ponownie z wykładniczym odstępem od 1 do 30 sekund i przy każdej próbie na nowo czyta dane połączenia. To wydanie wzmacnia właśnie tę ścieżkę.",
     fixesTitle: "Też w tym wydaniu",
-    fix1: "Ostrzeżenie o nieaktualnym leadzie: ramka zaadresowana do leada, którego ta instancja już nie zna, jest odrzucana z ostrzeżeniem, a nie po cichu - ponowne uwierzytelnienie połączenia rozwiązuje problem.",
-    fix2: "Znaczniki czasu w bazie w UTC, zarówno w puli Postgresa, jak i w PGlite - wiersze z domyślnym czasem sortują się poprawnie między instancjami.",
+    fix1: "Ostrzeżenie o nieaktualnym leadzie: ramka zaadresowana do leada, którego ta instancja już nie zna, jest odrzucana z ostrzeżeniem, a nie po cichu, ponowne uwierzytelnienie połączenia rozwiązuje problem.",
+    fix2: "Znaczniki czasu w bazie w UTC, zarówno w puli Postgresa, jak i w PGlite: wiersze z domyślnym czasem sortują się poprawnie między instancjami.",
     fix3: "Zapis strumienia od razu ustawia ID wątku, więc druga strona nie odrzuca już zdarzeń z pustym ID.",
     fix4: "Tury wznowienia synchronizują się z drugą stroną, więc wyniki narzędzi uzupełniane na miejscu trafiają też do lustra.",
     codeCaption: "Znacznik, który odsyła odbiorca bez klucza:",

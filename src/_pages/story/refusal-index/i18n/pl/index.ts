@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
     category: "Indeks odmów",
     description:
       "Te same pytania do każdego modelu AI, co tydzień nowe. Mierzymy, kto odpowiada, kto łagodzi, a kto odmawia, i pokazujemy metodę. Otwarte dane na {{appName}}.",
-    imageAlt: "Indeks odmów - wskaźniki odmów modeli AI",
+    imageAlt: "Indeks odmów: wskaźniki odmów modeli AI",
     keywords:
       "{{appName}}, indeks odmów, wskaźnik odmów AI, AI bez cenzury, benchmark cenzury AI, porównanie modeli",
   },

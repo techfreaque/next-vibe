@@ -5,7 +5,7 @@ export const translations = {
   description:
     "Ready-made specialists and characters. Each skill sets its own instructions, model and tools. Pick one and start chatting, or build your own.",
   meta: {
-    title: "AI skills - ready-made specialists and characters | {{appName}}",
+    title: "AI skills: ready-made specialists and characters | {{appName}}",
     description:
       "Coders, writers, researchers, companions and uncensored characters. Each skill brings its own prompt, model and tools. Pick one and chat, or build your own and earn when others use it.",
     category: "AI Skills",

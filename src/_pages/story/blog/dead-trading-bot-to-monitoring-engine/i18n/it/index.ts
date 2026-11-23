@@ -5,9 +5,9 @@ export const translations: typeof enTranslations = {
     title:
       "Il mio bot di trading abbandonato è diventato un sistema di monitoraggio | next-vibe",
     description:
-      "Ho abbandonato un robot commerciale anni fa. Poi ho realizzato la sua architettura - DataSource, Indicatore, Valutazione, Azione - si applica a qualsiasi attività. Così l'ho ricostruito dentro next-vibe. Ogni nodo e' un punto finale.",
+      "Anni fa ho abbandonato un bot di trading. Poi ho capito che la sua architettura (DataSource, indicatore, valutatore e azione) si poteva applicare a qualsiasi attività. L’ho ricostruita in next-vibe. Ogni nodo è un endpoint.",
     category: "Vibe Sense",
-    imageAlt: "Condotto di monitoraggio Vibe Sense - next-vibe",
+    imageAlt: "Flusso di monitoraggio di Vibe Sense in next-vibe",
     keywords:
       "senso dell'atmosfera, monitoraggio, trading bot, endpoints, EMA, pipeline, next-vibe, TypeScript",
     ogTitle:
@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     eyebrow: "Vibe Sense",
     title: "Così la piattaforma monitora il proprio stato.",
     subtitle:
-      "Ho abbandonato un robot commerciale anni fa. La sua architettura è diventata la parte più interessante di next-vibe. Ogni nodo nel grafico è un endpoint - chiamabile dallo CLI, scoperto da AI, cablato nella vostra piattaforma.",
+      "Ho abbandonato un robot commerciale anni fa. La sua architettura è diventata la parte più interessante di next-vibe. Ogni nodo nel grafico è un endpoint: chiamabile dallo CLI, scoperto da AI, cablato nella vostra piattaforma.",
     readTime: "14 min lettura",
   },
   origin: {
@@ -57,7 +57,7 @@ export const translations: typeof enTranslations = {
   insight: {
     title: "Ogni azienda è una serie di tempo",
     intro:
-      "In un bot di trading, i pezzi sono semplici. Una fonte di dati: i dati dei prezzi, il volume, qualsiasi cosa stiate leggendo. Un indicatore: media mobile, RSI, MACD - prende dati grezzi, produce un segnale derivato. Un evaluator: il rapido MA è sopra il lento MA? Condizione booleana. Un'azione: quando l'evaluatore spara, fai qualcosa.",
+      "In un bot di trading, i pezzi sono semplici. Una fonte di dati: i dati dei prezzi, il volume, qualsiasi cosa stiate leggendo. Un indicatore: media mobile, RSI, MACD, prende dati grezzi, produce un segnale derivato. Un evaluator: il rapido MA è sopra il lento MA? Condizione booleana. Un'azione: quando l'evaluatore spara, fai qualcosa.",
     realization:
       "Quella struttura non descrive il trading. Descrive qualsiasi processo di business in cui si dispone di dati nel tempo, condizioni a cui si interessa, e le azioni che si desidera intraprendere quando tali condizioni sono soddisfatte.",
     examples: {
@@ -79,7 +79,7 @@ export const translations: typeof enTranslations = {
       revenueAnomaly: {
         label: "Anomalie del reddito",
         description:
-          "Rimborso punte di tasso superiore al 20% in un giorno - Thea viene notificato prima di vederlo in una dashboard.",
+          "Rimborso punte di tasso superiore al 20% in un giorno: Thea viene notificato prima di vederlo in una dashboard.",
       },
     },
   },
@@ -95,12 +95,12 @@ export const translations: typeof enTranslations = {
     indicator: {
       label: "Indicator",
       description:
-        "Un endpoint di calcolo puro e riutilizzabile - EMA, RSI, MACD, Bollinger Bands, morsetto, delta, media della finestra. No SQL. Nessuna conoscenza del dominio. Chiamalo su qualsiasi fonte di dati.",
+        "Un endpoint di calcolo puro e riutilizzabile: EMA, RSI, MACD, Bollinger Bands, morsetto, delta, media della finestra. No SQL. Nessuna conoscenza del dominio. Chiamalo su qualsiasi fonte di dati.",
     },
     evaluator: {
       label: "Evaluator",
       description:
-        "Una soglia o una condizione. Prende una serie e fa una domanda. Questo valore è inferiore a 0,7? Questo rapporto ha superato il 20%? Emette un segnale - licenziato o non licenziato.",
+        "Una soglia o una condizione. Prende una serie e fa una domanda. Questo valore è inferiore a 0,7? Questo rapporto ha superato il 20%? Emette un segnale: licenziato o non licenziato.",
     },
     action: {
       label: "Action",
@@ -123,7 +123,7 @@ export const translations: typeof enTranslations = {
         "Ogni nodo Vibe Sense è un endpoint standard, definito con createEndpoint (), registrato nello stesso registro di fine anno come tutto il resto della piattaforma.",
     },
     cliCaption:
-      "Lo stesso endpoint EMA che ha funzionato come un nodo nel grafico dell'imbuto di contatto - stessa definizione, stessa validazione, stesso auth - chiamabile standalone dallo CLI.",
+      "Puoi chiamare da CLI lo stesso endpoint EMA che usi come nodo nel grafo del funnel. La definizione, la validazione e l’autenticazione restano identiche.",
     insight:
       "L'endpoint SAME che è un nodo nel grafico deimbuti di contatto è anche uno strumento standalone su 13 piattaforme.",
     keyLine: "La pipeline è solo endpoints che chiamano endpoints.",
@@ -139,7 +139,7 @@ export const translations: typeof enTranslations = {
       alert: {
         label: "Avviso",
         description:
-          "Chiamare il full-task - Thea lo raccoglie immediatamente.",
+          "Chiamare il full-task: Thea lo raccoglie immediatamente.",
       },
       campaign: {
         label: "Campagna",
@@ -203,7 +203,7 @@ export const translations: typeof enTranslations = {
     column3: {
       label: "Colonna 3: Valutazione",
       description:
-        "Condizioni di soglia. Ogni uscita di un segnale - sparato o non licenziato.",
+        "Condizioni di soglia. Ogni uscita di un segnale: sparato o non licenziato.",
       nodes: {
         leadDrop: {
           name: "eval_lead_drop",
@@ -236,7 +236,7 @@ export const translations: typeof enTranslations = {
     indicators: {
       label: "Indicatori analitici/indicatori/",
       description:
-        "Calcolo puro - EMA, RSI, MACD, Bollinger Bands, morsetto, delta, media finestra. Nessuna conoscenza del dominio. Chiamali su qualsiasi fonte di dati.",
+        "Calcolo puro: EMA, RSI, MACD, Bollinger Bands, morsetto, delta, media finestra. Nessuna conoscenza del dominio. Chiamali su qualsiasi fonte di dati.",
     },
     registration:
       "All'avvio, l'indicatore di registro auto-scopri entrambi. I endpoint della fonte di dati registrano come definizioni dei nodi. Indicatore endpoints registro come nodo definizioni. Aggiungete un nuovo dominio, aggiungete risorse/ endpoint dei dati, esportate graphSeeds. Appaiono.",
@@ -249,7 +249,7 @@ export const translations: typeof enTranslations = {
     versioning: {
       label: "Versione",
       description:
-        "I grafici sono stati versioneti. Quando si modifica un grafico, si crea una nuova versione - mai mutare quella attiva. La nuova versione è una bozza. Lo promuovi in modo esplicito. Rollback e' banale.",
+        "I grafici sono stati versioneti. Quando si modifica un grafico, si crea una nuova versione: mai mutare quella attiva. La nuova versione è una bozza. Lo promuovi in modo esplicito. Rollback e' banale.",
     },
     backtest: {
       label: "Backtest",
@@ -271,7 +271,7 @@ export const translations: typeof enTranslations = {
       never: {
         label: "never",
         description:
-          "Sempre ricomputato dal vivo da input. Uscite EMA, rapporti - nessun costo di archiviazione. Lookback auto-extended per il riscaldamento.",
+          "Sempre ricomputato dal vivo da input. Uscite EMA, rapporti: nessun costo di archiviazione. Lookback auto-extended per il riscaldamento.",
       },
     },
   },
@@ -286,8 +286,8 @@ export const translations: typeof enTranslations = {
           "Esecuzione topologica tramite grafo walker. Supporto multi-risoluzione con scale-up/down automatico. Estensione della gamma Lookback-aware.",
         versioning:
           "Versione, modalità di backtest con la storia a piena esecuzione, persistenza del segnale come percorso di audit.",
-        cli: "Accesso CLI - vibrazione vibe-sense-ema, vibrazione-sense-rsi, qualsiasi punto finale indicatore, callable standalone.",
-        mcp: "Registrazione MCP - gli endpoint degli indicatori appaiono nella lista degli strumenti. Thea può chiamare gli indicatori direttamente.",
+        cli: "Accesso da CLI: esegui vibe vibe-sense-ema, vibe vibe-sense-rsi o qualsiasi altro endpoint indicatore in autonomia.",
+        mcp: "Registrazione MCP: gli endpoint degli indicatori appaiono nella lista degli strumenti. Thea può chiamare gli indicatori direttamente.",
         seeds:
           "29 grafi pronti all’uso in 9 ambiti: lead, crediti, utenti, abbonamenti, inviti, newsletter, pagamenti, messaggistica, chat IA e stato del sistema. Funzionano tutti subito con vibe dev.",
       },
@@ -307,7 +307,7 @@ export const translations: typeof enTranslations = {
   vision: {
     title: "Che cosa questo in realtà",
     paragraph1:
-      "Ogni processo di business che può essere descritto come: dato questi dati, quando queste condizioni sono soddisfatte, fare questo - questo è un grafico Vibe Sense. Monitoraggio, si'. Alerting, si'. Ma anche: qualifica di contatto automatizzata, rilevamento di anomalia di ricavi, bilanciamento dell'economia di credito, automazione di marketing.",
+      "Ogni processo di business che può essere descritto come: dato questi dati, quando queste condizioni sono soddisfatte, fare questo. Questo è un grafico Vibe Sense. Monitoraggio, si'. Alerting, si'. Ma anche: qualifica di contatto automatizzata, rilevamento di anomalia di ricavi, bilanciamento dell'economia di credito, automazione di marketing.",
     paragraph2:
       "Il bot di trading aveva ragione su questa architettura. Indicatori, valutatori, azioni, modalità di backtest. La cosa che ho sbagliato era costruirla in isolamento. A Octane, EMA è stato bloccato all'interno della pipeline. In next-vibe, EMA è un endpoint di prima classe.",
     keyLine:

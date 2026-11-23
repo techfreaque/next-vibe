@@ -25,10 +25,10 @@ export const translations: typeof enTranslations = {
     p2: "La base de referencia es el plan {{planPrice}} /mes Starter. En {{directPct}}, es {{planEarn}} /mes por remisión. Pero esto es lo que mueve el número:",
     powerUserTitle: "El multiplicador del usuario de energía",
     powerUserBody:
-      "Desarrolladores y AI - usuarios inteligentes dirigen agentes, el API y la generación de imágenes o vídeos en la parte superior del plan, y compra paquetes de crédito a medida que van. Un usuario de energía {{powerSpend}} /mes te gana {{powerEarn}} /mes recurrente. Eso es referencias del plan {{powerVsPlan}} en uno.",
+      "Desarrolladores y AI: usuarios inteligentes dirigen agentes, el API y la generación de imágenes o vídeos en la parte superior del plan, y compra paquetes de crédito a medida que van. Un usuario de energía {{powerSpend}} /mes te gana {{powerEarn}} /mes recurrente. Eso es referencias del plan {{powerVsPlan}} en uno.",
     floorTitle: "ARPU crece a medida que crece la plataforma",
     floorBody:
-      "Cada vez que {{appName}} añade modelos, capacidades o modalidades de generación, los suscriptores existentes gastan más. Las referencias que hiciste hace seis meses valen más hoy que cuando las hiciste - sin ningún trabajo extra de ti.",
+      "Cada vez que {{appName}} añade modelos, capacidades o modalidades de generación, los suscriptores existentes gastan más. Las referencias que hiciste hace seis meses valen más hoy que cuando las hiciste, sin ningún trabajo extra de ti.",
     tableHeaderProfile: "Perfil de usuario",
     tableHeaderSpend: "Gasto mensual",
     tableHeaderYouEarn: "Ganas/mo",
@@ -48,9 +48,9 @@ export const translations: typeof enTranslations = {
   structure: {
     title: "La estructura completa de la comisión",
     p1: "Referencia directa: 10% de cada pago de personas que se refieren directamente. Esto es tuyo siempre, para la vida, sin importar nada más.",
-    p2: "Bono de habilidad: si alguien se registra a través del enlace de otro miembro con una habilidad que publicaste, ganas 5% en sus pagos - en la parte superior del 10% que el miembro gana. Las habilidades son preajustes AI compartidos que cualquiera puede crear y publicar. Detalle crítico para los pros del afiliado: usted gana el 5% como el autor de la habilidad incluso cuando alguien más comparte su vínculo de habilidad. Un usuario descubre tu habilidad en el directorio y lo comparte - todavía te acreditan. La autoría de la habilidad es rastreada por la plataforma, no por quién distribuyó el enlace. Esto crea una atribución pasiva que no tienes que manejar activamente.",
-    p3: "Cadena multinivel: un 10% adicional se distribuye en hasta 5 niveles de su cadena de referencia, con decadencia geométrica - cada nivel gana la mitad de la anterior. Las referencias de sus referencias directas te ganan un ~5%, sus referencias ~2,5%, etc. Pago total máximo en todos los ganaderos: ~20% de cualquier pago único.",
-    p4: "La revelación más honesta: los bonos de cadena se vuelven pequeños rápidos. El 10% de habilidad directa + 5% es donde el ingreso real es. No construya una estrategia en torno a la profundidad multinivel - construirla alrededor de las referencias directas de calidad y habilidades publicables.",
+    p2: "Bono de habilidad: si alguien se registra a través del enlace de otro miembro con una habilidad que publicaste, ganas 5% en sus pagos, en la parte superior del 10% que el miembro gana. Las habilidades son preajustes AI compartidos que cualquiera puede crear y publicar. Detalle crítico para los pros del afiliado: usted gana el 5% como el autor de la habilidad incluso cuando alguien más comparte su vínculo de habilidad. Un usuario descubre tu habilidad en el directorio y lo comparte: todavía te acreditan. La autoría de la habilidad es rastreada por la plataforma, no por quién distribuyó el enlace. Esto crea una atribución pasiva que no tienes que manejar activamente.",
+    p3: "Cadena multinivel: un 10% adicional se distribuye en hasta 5 niveles de su cadena de referencia, con decadencia geométrica, cada nivel gana la mitad de la anterior. Las referencias de sus referencias directas te ganan un ~5%, sus referencias ~2,5%, etc. Pago total máximo en todos los ganaderos: ~20% de cualquier pago único.",
+    p4: "La revelación más honesta: los bonos de cadena se vuelven pequeños rápidos. El 10% de habilidad directa + 5% es donde el ingreso real es. No construya una estrategia en torno a la profundidad multinivel: construirla alrededor de las referencias directas de calidad y habilidades publicables.",
   },
   audience: {
     title: "Quien se convierte para esta plataforma",
@@ -72,7 +72,7 @@ export const translations: typeof enTranslations = {
   promotion: {
     title: "Angles que convierten",
     angle1Title:
-      '"Comparé 10 herramientas AI - aquí está la que guardé en realidad"',
+      "\"Comparé 10 herramientas AI: aquí está la que guardé en realidad\"",
     angle1Body:
       "Comparación de contenidos es el mejor afiliado para esta categoría. Líder con variedad modelo, precios y el posicionamiento de voz libre vs herramientas de un solo modelo.",
     angle2Title: "Comunidades de desarrollo",
@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       "r/selfhosted, privacy forums, Mastodon. La base de código abierta y la opción de alojamiento propio aterrizan bien. Estos usuarios odian las plataformas cerradas.",
     angle4Title: "Contenido tutorial con la herramienta",
     angle4Body:
-      '"Cómo utilizar AI para X" con {{appName}} como herramienta específica. Asistente de codificación, escritura, investigación - casos de uso específico convierten mejor que los exámenes genéricos de AI.',
+      "\"Cómo utilizar AI para X\" con {{appName}} como herramienta específica. Asistente de codificación, escritura, investigación: casos de uso específico convierten mejor que los exámenes genéricos de AI.",
   },
   payouts: {
     title: "Mecánicas de pago",
@@ -93,7 +93,7 @@ export const translations: typeof enTranslations = {
   },
   close: {
     title: "Worth añadir a tu pila",
-    p1: "No es el programa de pago más alto que ejecutarás. Pero las comisiones recurrentes en una categoría de crecimiento rápido, con un segmento de usuarios de energía que ya gastan pesadamente y tendencias - que es una clase de activos diferente a los pagos de afiliados de una sola vez.",
+    p1: "No es el programa de pago más alto que ejecutarás. Pero las comisiones recurrentes en una categoría de crecimiento rápido, con un segmento de usuarios de energía que ya gastan pesadamente y tendencias: que es una clase de activos diferente a los pagos de afiliados de una sola vez.",
     p2: "Si tu audiencia se superpone con cualquiera de los anteriores, vale la pena un código y un post.",
     createCode: "Crea tu código de referido",
     joinDiscord: "Únete al Discord",

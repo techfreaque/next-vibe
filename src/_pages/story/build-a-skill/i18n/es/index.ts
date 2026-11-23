@@ -28,7 +28,7 @@ export const translations: typeof enTranslations = {
       "Identidad e instrucciones. 200–500 palabras. Se siente como una persona, no un FAQ.",
     item1Label: "Selección modelo",
     item1Body:
-      "Filtrar por inteligencia, nivel de contenido y precio - o marcar un modelo específico.",
+      "Filtrar por inteligencia, nivel de contenido y precio o marcar un modelo específico.",
     item2Label: "Herramientas",
     item2Body:
       "Exact whitelist: búsqueda, gen de imagen, memoria, código, música, vídeo.",
@@ -41,7 +41,7 @@ export const translations: typeof enTranslations = {
     way1Badge: "Página de habilidades",
     way1Title: "Crear botón en la lista de habilidades",
     way1Body:
-      "Abra la página de habilidades o el selector de modelos dentro de cualquier hilo de chat. Hit Create. Rellene el formulario - nombre, sistema rápido, modelo, herramientas. Hecho.",
+      "Abra la página de habilidades o el selector de modelos dentro de cualquier hilo de chat. Hit Create. Rellene el formulario: nombre, sistema rápido, modelo, herramientas. Hecho.",
     way1Detail:
       "Sin mago, sin pasos adicionales. La forma es el config completo.",
     way1Cta: "Destrezas abiertas",
@@ -50,7 +50,7 @@ export const translations: typeof enTranslations = {
     way2Body:
       'Abre un hilo y di: "Construyeme una habilidad de razonamiento clínico para los estudiantes de medicina".El subagente Skill Creator hace algunas preguntas, redacta el impulso, elige el modelo, configura herramientas, crea la habilidad, lo clava a tu barra lateral.',
     way2Detail:
-      "Los delegados de Thea al Creador de la habilidad - un subagente equipado con creación de habilidades, generador favorito, ayuda de herramientas. Tú describiste, construye.",
+      "Los delegados de Thea al Creador de la habilidad: un subagente equipado con creación de habilidades, generador favorito, ayuda de herramientas. Tú describiste, construye.",
     way2Cta: "Chat abierto",
   },
   prompt: {
@@ -72,12 +72,12 @@ export const translations: typeof enTranslations = {
     do4Body: "El modelo lee el impulso completo cada vuelta. Ganas más cortas.",
     dont0Title: "Listas de reglas de estilo ToS",
     dont0Body:
-      '"Siempre ser útil, nunca ser grosero" - cada AI consigue esto. Estruendo puro.',
+      "\"Siempre ser útil, nunca ser grosero\" (cada AI consigue esto. Estruendo puro.)",
     dont1Title: '"Siempre ser útil"',
     dont1Body: "El modelo ya lo sabe. Olvídalo.",
     dont2Title: "Limitaciones contradictorias",
     dont2Body:
-      '"Sé creativo, pero siempre mantente en el tema" - el modelo se erige para siempre. Escoge uno.',
+      "\"Sé creativo, pero siempre mantente en el tema\" (el modelo se erige para siempre. Escoge uno.)",
     dont3Title: "Listas de capacidad largas",
     dont3Body: "El modelo sabe lo que puede hacer. No repitas los doctores.",
   },
@@ -106,12 +106,12 @@ export const translations: typeof enTranslations = {
     item5Name: "El experto que no puedes pagar",
     item5Category: "Especialista",
     item5Desc:
-      "Consultor, abogado, asesor financiero - destilado en una habilidad. $400/hr conocimiento, cero costo.",
+      "Consultor, abogado, asesor financiero: destilado en una habilidad. $400/hr conocimiento, cero costo.",
   },
   dev: {
     title: "Para desarrollo: skill.ts",
-    body: "¿Corriendo next-vibe localmente? Pídale a su agente que genere un archivo de habilidad. La misma estructura que todas las habilidades incorporadas - compilado, listo para cometer.",
-    note: "El agente conoce el esquema completo. Describe lo que quieres - genera el archivo, registra la habilidad, es en vivo.",
+    body: "¿Corriendo next-vibe localmente? Pídale a su agente que genere un archivo de habilidad. La misma estructura que todas las habilidades incorporadas: compilado, listo para cometer.",
+    note: "El agente conoce el esquema completo. Describe lo que quieres: genera el archivo, registra la habilidad, es en vivo.",
   },
   cta: {
     title: "Construye el tuyo.",
