@@ -1,7 +1,8 @@
 /**
  * One-off maintenance for the production primary. Run after both app nodes
  * use the sanitizer. The count uses a read-only connection and prints counts
- * only. Drain S2 before applying and watch replica/WireGuard health.
+ * only. Drain S2 before applying 50,000 or more affected rows. Watch
+ * replica and WireGuard health during every apply.
  *
  * In the deployed S1 container, with the existing DATABASE_URL:
  *   TELEMETRY_CLEANUP_DATABASE_URL="$DATABASE_URL" bun src/leads/tracking/scrub-stored-urls.ts --count
@@ -9,6 +10,8 @@
  *
  * Apply also counts first. Each batch commits independently. Rerun --count
  * to verify zero remaining and rerun --apply if a concurrent write was skipped.
+ * If an inconsistent unique email index is blocking updates, pass
+ * --exclude-duplicate-leads=<expected row count> in both modes.
  */
 import { Client } from "pg";
 
@@ -56,6 +59,20 @@ interface CleanupDatabase {
     statement: string,
     args?: (string | number | null)[],
   ): Promise<{ rows: Row[] }>;
+}
+
+export async function findDuplicateLeadIds(
+  db: CleanupDatabase,
+): Promise<ReadonlySet<string>> {
+  // SYSTEM (100) visits every heap page and avoids the suspect email index.
+  const { rows } = await db.query<{ id: string }>(
+    `SELECT id FROM (
+       SELECT id, count(*) OVER (PARTITION BY lower(btrim(email))) AS copies
+       FROM leads TABLESAMPLE SYSTEM (100)
+       WHERE email IS NOT NULL
+     ) AS lead_heap WHERE copies > 1`,
+  );
+  return new Set(rows.map(({ id }) => id));
 }
 
 const TARGETS: readonly Target[] = [
@@ -152,8 +169,14 @@ async function scanTarget(
   target: Target,
   apply: boolean,
   pauseMs: number,
-): Promise<{ table: Target["table"]; affected: number; updated: number }> {
-  const result = { table: target.table, affected: 0, updated: 0 };
+  excludedLeadIds: ReadonlySet<string>,
+): Promise<{
+  table: Target["table"];
+  affected: number;
+  updated: number;
+  skipped: number;
+}> {
+  const result = { table: target.table, affected: 0, updated: 0, skipped: 0 };
   const cursor: { id: string | null; done: boolean } = {
     id: null,
     done: false,
@@ -169,6 +192,14 @@ async function scanTarget(
         );
         const patches = rows.flatMap((row) => {
           const patch = patchRow(target, row);
+          if (
+            patch &&
+            target.table === "leads" &&
+            excludedLeadIds.has(row.id)
+          ) {
+            result.skipped += 1;
+            return [];
+          }
           return patch ? [patch] : [];
         });
         result.affected += patches.length;
@@ -197,10 +228,11 @@ export async function scrubStoredTelemetryUrls(
   db: CleanupDatabase,
   apply: boolean,
   pauseMs = BATCH_PAUSE_MS,
+  excludedLeadIds: ReadonlySet<string> = new Set(),
 ): Promise<Awaited<ReturnType<typeof scanTarget>>[]> {
   const results: Awaited<ReturnType<typeof scanTarget>>[] = [];
   for (const target of TARGETS) {
-    results.push(await scanTarget(db, target, apply, pauseMs));
+    results.push(await scanTarget(db, target, apply, pauseMs, excludedLeadIds));
   }
   return results;
 }
@@ -210,16 +242,20 @@ function report(phase: string, rows: Record<string, string | number>[]): void {
 }
 
 async function main(): Promise<number> {
-  const [mode, ...rest] = Bun.argv.slice(2);
+  const [mode, option, ...rest] = Bun.argv.slice(2);
+  const expectedDuplicates = option?.match(
+    /^--exclude-duplicate-leads=([1-9]\d*)$/,
+  )?.[1];
   const connectionString = process.env["TELEMETRY_CLEANUP_DATABASE_URL"];
   if (
     (mode !== "--count" && mode !== "--apply") ||
+    (option !== undefined && expectedDuplicates === undefined) ||
     rest.length > 0 ||
     !connectionString ||
     !/^postgres(?:ql)?:\/\//i.test(connectionString)
   ) {
     process.stderr.write(
-      "Set TELEMETRY_CLEANUP_DATABASE_URL to a PostgreSQL connection and pass --count or --apply.\n",
+      "Set TELEMETRY_CLEANUP_DATABASE_URL to a PostgreSQL connection and pass --count or --apply, optionally with --exclude-duplicate-leads=<expected row count>.\n",
     );
     return 1;
   }
@@ -240,19 +276,52 @@ async function main(): Promise<number> {
         return 1;
       }
     }
-    const counts = await scrubStoredTelemetryUrls(db, false);
+    const excludedLeadIds = expectedDuplicates
+      ? await findDuplicateLeadIds(db)
+      : new Set<string>();
+    if (
+      expectedDuplicates &&
+      excludedLeadIds.size !== Number(expectedDuplicates)
+    ) {
+      process.stderr.write(
+        `Expected ${expectedDuplicates} duplicate lead rows; found ${excludedLeadIds.size}. No changes made.\n`,
+      );
+      return 1;
+    }
+    const counts = await scrubStoredTelemetryUrls(
+      db,
+      false,
+      BATCH_PAUSE_MS,
+      excludedLeadIds,
+    );
     report(
       "count",
-      counts.map(({ table, affected }) => ({ table, affected })),
+      counts.map(({ table, affected, skipped }) => ({
+        table,
+        affected,
+        skipped,
+      })),
     );
     if (mode === "--count") {
       return 0;
     }
-    report("apply", await scrubStoredTelemetryUrls(db, true));
-    const remaining = await scrubStoredTelemetryUrls(db, false);
+    report(
+      "apply",
+      await scrubStoredTelemetryUrls(db, true, BATCH_PAUSE_MS, excludedLeadIds),
+    );
+    const remaining = await scrubStoredTelemetryUrls(
+      db,
+      false,
+      BATCH_PAUSE_MS,
+      excludedLeadIds,
+    );
     report(
       "verify",
-      remaining.map(({ table, affected }) => ({ table, remaining: affected })),
+      remaining.map(({ table, affected, skipped }) => ({
+        table,
+        remaining: affected,
+        skipped,
+      })),
     );
     return remaining.some(({ affected }) => affected > 0) ? 1 : 0;
   } catch {
