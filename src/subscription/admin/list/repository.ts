@@ -37,6 +37,7 @@ import { CheckoutMode, PaymentProvider, PaymentStatus } from "@/payment/enum";
 import { subscriptions } from "@/subscription/db";
 import {
   BillingInterval,
+  type SubscriptionPlanValue,
   SubscriptionStatus,
   type SubscriptionStatusValue,
 } from "@/subscription/enum";
@@ -100,6 +101,11 @@ const lastPaymentSql = sql<{
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export class SubscriptionAdminListRepository {
+  // Older rows still carry the translation namespace in the stored plan ID.
+  private static readonly planId = sql<typeof SubscriptionPlanValue>`
+    regexp_replace(${subscriptions.planId}, '^app[.]api[.]subscription[.]', '')
+  `;
+
   /**
    * Convert status filter values to DB conditions
    */
@@ -160,7 +166,7 @@ export class SubscriptionAdminListRepository {
 
       // Plan filter (kept apart: the plan counts ignore it)
       const planCondition = searchFilters?.plan
-        ? eq(subscriptions.planId, searchFilters.plan)
+        ? eq(SubscriptionAdminListRepository.planId, searchFilters.plan)
         : undefined;
 
       // Summary-card drill: renewing within 7 days / set to end
@@ -240,11 +246,14 @@ export class SubscriptionAdminListRepository {
           .groupBy(subscriptions.status)
           .orderBy(desc(count())),
         db
-          .select({ plan: subscriptions.planId, count: count() })
+          .select({
+            plan: SubscriptionAdminListRepository.planId,
+            count: count(),
+          })
           .from(subscriptions)
           .leftJoin(users, eq(subscriptions.userId, users.id))
           .where(and(baseClause, statusCondition ?? undefined))
-          .groupBy(subscriptions.planId)
+          .groupBy(SubscriptionAdminListRepository.planId)
           .orderBy(desc(count())),
       ]);
 
@@ -356,7 +365,7 @@ export class SubscriptionAdminListRepository {
           userId: subscriptions.userId,
           userEmail: users.email,
           userName: users.privateName,
-          planId: subscriptions.planId,
+          planId: SubscriptionAdminListRepository.planId,
           billingInterval: subscriptions.billingInterval,
           status: subscriptions.status,
           createdAt: subscriptions.createdAt,

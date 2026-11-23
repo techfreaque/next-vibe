@@ -7,7 +7,7 @@
 
 import "server-only";
 
-import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
   ErrorResponseTypes,
   fail,
@@ -42,22 +42,13 @@ export interface MoneyOverview {
   trend: TimeSeries;
 }
 
-function scale(value: Kpi, share: Kpi): Kpi {
-  return {
-    value: Math.round(value.value * share.value * 100) / 100,
-    previous:
-      value.previous === null || share.previous === null
-        ? null
-        : Math.round(value.previous * share.previous * 100) / 100,
-  };
-}
-
 export async function getMoneyOverview(
   win: AnalyticsWindow,
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<ResponseType<MoneyOverview>> {
   try {
-    const [revenue, usage] = await Promise.all([
+    const [revenue, { report: usage, guestSpendUsd }] = await Promise.all([
       RevenueReportRepository.build(win, {
         kind: RevenueKind.ALL,
         includeInternal: false,
@@ -84,7 +75,7 @@ export async function getMoneyOverview(
         payingCustomers: revenue.kpis.payingCustomers,
         activeSubscriptions: revenue.kpis.activeSubscriptions,
         creditSpendUsd: usage.kpis.spendUsd,
-        guestSpendUsd: scale(usage.kpis.spendUsd, usage.kpis.guestShare),
+        guestSpendUsd,
         upstreamCostUsd: usage.kpis.upstreamCostUsd,
         costedSpendUsd: usage.kpis.costedSpendUsd,
         marginUsd: usage.kpis.marginUsd,
@@ -102,7 +93,7 @@ export async function getMoneyOverview(
     logger.error("Failed to build money overview", parseError(error));
     return fail({
       message: scopedTranslation
-        .scopedT(defaultLocale)
+        .scopedT(locale)
         .t("get.errors.server.description"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });

@@ -781,6 +781,8 @@ export class ServerStartRepository {
       const stallCaptureMs = EL_LAG_WARN_MS - STALL_TICK_MS;
       let lastSchedulerSample = readThreadSchedulerSample();
       let lastTickAt = performance.now();
+      let maxTickerDelayMs = 0;
+      let tickerSamples = 0;
       let worstStall: {
         ms: number;
         startedAt: number;
@@ -796,6 +798,8 @@ export class ServerStartRepository {
         const now = performance.now();
         const stallMs = now - lastTickAt - STALL_TICK_MS;
         lastTickAt = now;
+        maxTickerDelayMs = Math.max(maxTickerDelayMs, stallMs);
+        tickerSamples++;
         const previousSchedulerSample = lastSchedulerSample;
         if (previousSchedulerSample) {
           lastSchedulerSample = readThreadSchedulerSample();
@@ -877,6 +881,15 @@ export class ServerStartRepository {
           lastHeapMb = heapMb;
           const stall = worstStall;
           worstStall = null;
+          const tickerEvidence = {
+            tickerSamples,
+            maxTickerDelayMs: Math.round(maxTickerDelayMs),
+            tickerCaptureThresholdMs: stallCaptureMs,
+            lagWindowStartedAt: new Date(windowStartedAt).toISOString(),
+            lagWindowEndedAt: new Date(windowEndedAt).toISOString(),
+          };
+          tickerSamples = 0;
+          maxTickerDelayMs = 0;
           if (stall) {
             await PhaseProfiler.flush(stall.startedAt);
           }
@@ -899,6 +912,7 @@ export class ServerStartRepository {
           // Shared context for every lag level: when, how big the heap was
           // (a full GC on a large heap is one candidate), what ran.
           const lagContext = {
+            ...tickerEvidence,
             heapMb,
             prevHeapMb,
             rssMb: Math.round(mem.rss / 1024 / 1024),

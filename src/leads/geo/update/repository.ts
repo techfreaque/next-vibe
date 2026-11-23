@@ -17,7 +17,7 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
-import type { QueryResultRow } from "pg";
+import { DatabaseError, type QueryResultRow } from "pg";
 
 import { buildGeoTable, encodeGeoTable, lookupCountry } from "../compact";
 import { geoIpDatabases } from "../db";
@@ -188,6 +188,7 @@ export class GeoUpdateRepository {
     logger: EndpointLogger,
     t: GeoT,
   ): Promise<ResponseType<GeoUpdatePostResponseOutput>> {
+    let stage = "readRelease";
     try {
       const stored = await storedRelease();
       let release = stored;
@@ -206,6 +207,7 @@ export class GeoUpdateRepository {
           }
           const file = await download(version, logger);
           if (file) {
+            stage = "storeRelease";
             release = await storeGeoRelease(version, file);
             status = GeoUpdateStatus.UPDATED;
             logger.info("Geo IP table updated", { ...release });
@@ -219,6 +221,7 @@ export class GeoUpdateRepository {
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
+      stage = "backfillLeadCountries";
       const backfill = await backfillLeadCountries(logger);
       return success({
         status,
@@ -228,7 +231,20 @@ export class GeoUpdateRepository {
         ...backfill,
       });
     } catch (error) {
-      logger.error("Geo IP update failed", parseError(error));
+      const parsed = parseError(error);
+      const cause = parsed.cause instanceof Error ? parsed.cause : parsed;
+      logger.error("Geo IP update failed", {
+        stage,
+        errorName: parsed.name,
+        databaseCode: cause instanceof DatabaseError ? cause.code : undefined,
+        constraint:
+          cause instanceof DatabaseError ? cause.constraint : undefined,
+        // A failed bulk insert/update message can include the entire SQL payload.
+        detail:
+          cause instanceof DatabaseError || "query" in parsed
+            ? undefined
+            : cause.message.slice(0, 200),
+      });
       return fail({
         message: t("update.post.errors.server.description"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

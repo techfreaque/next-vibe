@@ -307,12 +307,20 @@ export async function complete(
     // classified transient (warn) vs real (error). Only a finishReason=error
     // with NO error part is unexplained - that one stays an error.
     const providerErrorText = state.p.ctx.lastProviderErrorText;
+    const rawFinishReason = await Promise.resolve(
+      streamResult.rawFinishReason,
+    ).catch(() => null);
     (providerErrorText === null ? logger.error : logger.warn).bind(logger)(
       "[AI Stream] Provider returned finishReason=error",
       {
         model,
         threadId,
         providerError: providerErrorText,
+        providerNativeFinishReason:
+          rawFinishReason && /^[A-Za-z0-9_.-]{1,80}$/.test(rawFinishReason)
+            ? rawFinishReason
+            : null,
+        providerErrorPartReceived: providerErrorText !== null,
         providerFailureKey: providerErrorTranslationKey(providerErrorText),
         apiProvider: modelConfig.apiProvider,
         providerModel: modelConfig.providerModel,

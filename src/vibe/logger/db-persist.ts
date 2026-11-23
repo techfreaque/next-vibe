@@ -59,6 +59,44 @@ function extractErrorType(
   return undefined;
 }
 
+/** Bounded machine-readable evidence from top-level exceptions and their causes. */
+function errorDiagnostics(error: Error): LoggerMetadata[] {
+  const chain: LoggerMetadata[] = [];
+  let current: Error | undefined = error;
+  while (current && chain.length < 4) {
+    const status =
+      "statusCode" in current
+        ? current.statusCode
+        : "status" in current
+          ? current.status
+          : undefined;
+    chain.push({
+      name: current.constructor.name,
+      code:
+        "code" in current &&
+        typeof current.code === "string" &&
+        /^(?:[A-Z][A-Z0-9_]{1,39}|[0-9A-Z]{5})$/.test(current.code)
+          ? current.code
+          : undefined,
+      status:
+        typeof status === "number" &&
+        Number.isInteger(status) &&
+        status >= 100 &&
+        status <= 599
+          ? status
+          : undefined,
+      constraint:
+        "constraint" in current &&
+        typeof current.constraint === "string" &&
+        /^[a-z_][a-z0-9_]{0,62}$/.test(current.constraint)
+          ? current.constraint
+          : undefined,
+    });
+    current = current.cause instanceof Error ? current.cause : undefined;
+  }
+  return chain;
+}
+
 /** Extract error message from various error shapes */
 function extractMessage(
   message: string,
@@ -376,7 +414,7 @@ function buildRow(
 
   // Collect all metadata: include the error object itself when it's a plain
   // object (not an Error instance) so structured context isn't lost.
-  // Error instances are captured via stackTrace/message - no need to duplicate.
+  // Exception diagnostics are attached separately after fingerprinting.
   const allMeta: LoggerMetadata[] = [{ locale }];
   if (
     error !== null &&
@@ -397,6 +435,10 @@ function buildRow(
     baseKey,
     computeFingerprint(baseKey, allMeta, options?.fingerprintIgnoreKeys),
   );
+  if (error instanceof Error) {
+    // Preserve the existing fingerprint so a recurrence can reopen the same row.
+    allMeta.push({ errorCauses: errorDiagnostics(error) });
+  }
   if (collapsed) {
     allMeta.push({
       fingerprintCollapsed: `metadata varied on more than ${String(MAX_VARIANTS)} occurrences within ${String(VARIANT_WINDOW_MS / 60_000)} min; further variants are counted on this row (latest sample kept)`,

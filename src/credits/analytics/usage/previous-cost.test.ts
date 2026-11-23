@@ -65,7 +65,7 @@ afterAll(async () => {
 
 test("previous period without cost data has no cost comparison", async () => {
   const { CreditUsageReportRepository } = await import("./repository");
-  const report = await CreditUsageReportRepository.build(win, {
+  const { report } = await CreditUsageReportRepository.build(win, {
     actor: UsageActor.ALL,
     creditKind: UsageCreditKind.ALL,
     includeInternal: false,
@@ -81,6 +81,29 @@ test("previous period without cost data has no cost comparison", async () => {
   expect(report.kpis.marginUsd.value).toBe(1);
   // Coverage of the previous period really was 0%.
   expect(report.kpis.costCoverage.previous).toBe(0);
+});
+
+test("guest spend rounds the ledger total once, independently of the guest share", async () => {
+  await pg.exec(`
+    INSERT INTO credit_wallets VALUES ('${id(2)}', '${id(12)}', NULL);
+    INSERT INTO credit_transactions (wallet_id, type, amount, metadata, funding_type, created_at) VALUES
+      ('${id(1)}', '${CreditTransactionType.USAGE}', -10000.6, '{}', '${CreditFundingType.FREE_ALLOWANCE}', '2026-11-25 01:00:00'),
+      ('${id(2)}', '${CreditTransactionType.USAGE}', -9999.4, '{}', '${CreditFundingType.FREE_ALLOWANCE}', '2026-11-25 01:00:00');
+  `);
+  const { CreditUsageReportRepository } = await import("./repository");
+  const day = resolveAnalyticsWindow({
+    range: AnalyticsRange.CUSTOM,
+    from: "2026-11-25",
+    to: "2026-11-25",
+  });
+  const { report, guestSpendUsd } = await CreditUsageReportRepository.build(day, {
+    actor: UsageActor.ALL,
+    creditKind: UsageCreditKind.ALL,
+    includeInternal: false,
+  });
+  expect(report.kpis.spendUsd.value).toBe(200);
+  expect(report.kpis.guestShare.value).toBe(0.5);
+  expect(guestSpendUsd.value).toBe(100.01);
 });
 
 test("legacy localized labels and the new id are one feature row, labeled in the viewer's locale", async () => {

@@ -30,6 +30,10 @@ import { getCurrentPathname, reloadPage } from "next-vibe/ui/lib/location";
 import { getSessionItem, setSessionItem } from "next-vibe/ui/lib/storage";
 
 import {
+  readEdgeRequestId,
+  readEdgeTimingNode,
+} from "../realtime/core/proxy-timing";
+import {
   chunkLoadDiagnostics,
   navigationTimingEvidence,
 } from "./resource-diagnostics";
@@ -64,6 +68,9 @@ interface ChunkReloadRecord {
   chunkUrl: string | null;
   failKind: string | null;
   responseStatus: number | null;
+  edgeRequestId: string | null;
+  edgeTimingNode: ReturnType<typeof readEdgeTimingNode>;
+  resourceStartedAtMs: number | null;
   outcome: "started" | "failed" | null;
 }
 
@@ -114,6 +121,13 @@ function readRecord(logger: EndpointLogger): ChunkReloadRecord | null {
       responseStatus:
         typeof parsed.responseStatus === "number"
           ? parsed.responseStatus
+          : null,
+      edgeRequestId: readEdgeRequestId(parsed.edgeRequestId ?? undefined),
+      edgeTimingNode: readEdgeTimingNode(parsed.edgeTimingNode ?? undefined),
+      resourceStartedAtMs:
+        typeof parsed.resourceStartedAtMs === "number" &&
+        Number.isFinite(parsed.resourceStartedAtMs)
+          ? parsed.resourceStartedAtMs
           : null,
       outcome:
         parsed.outcome === "started" || parsed.outcome === "failed"
@@ -216,6 +230,9 @@ export function observeChunkReloadOutcome(logger: EndpointLogger): void {
         chunkUrl: previous.chunkUrl,
         chunkFailKind: previous.failKind,
         responseStatus: previous.responseStatus,
+        firstEdgeRequestId: previous.edgeRequestId,
+        firstEdgeTimingNode: previous.edgeTimingNode,
+        firstResourceStartedAtMs: previous.resourceStartedAtMs,
         chunkReloadAt: previous.at,
         buildIdBefore: previous.buildId,
         buildIdAfter: currentBuildId(),
@@ -294,6 +311,9 @@ export function handleChunkLoadFailure(
       firstChunkUrl: previous.chunkUrl,
       firstFailKind: previous.failKind,
       firstResponseStatus: previous.responseStatus,
+      firstEdgeRequestId: previous.edgeRequestId,
+      firstEdgeTimingNode: previous.edgeTimingNode,
+      firstResourceStartedAtMs: previous.resourceStartedAtMs,
       buildIdBefore: previous.buildId,
       buildIdAfter: buildId,
       recoveredByReload: false,
@@ -317,6 +337,9 @@ export function handleChunkLoadFailure(
     chunkUrl: diagnostics.chunkUrl ?? null,
     failKind: diagnostics.chunkFailKind ?? null,
     responseStatus: diagnostics.responseStatus ?? null,
+    edgeRequestId: diagnostics.edgeRequestId ?? null,
+    edgeTimingNode: diagnostics.edgeTimingNode ?? null,
+    resourceStartedAtMs: diagnostics.resourceStartedAtMs ?? null,
     outcome: null,
   };
   const serialized = JSON.stringify(record);

@@ -94,7 +94,7 @@ export class BusinessOverviewRepository {
           logger,
         ),
         section("referral", () => getReferralOverview(win, logger), logger),
-        section("money", () => getMoneyOverview(win, logger), logger),
+        section("money", () => getMoneyOverview(win, logger, locale), logger),
         section("ops", () => getOpsOverview(win, logger), logger),
       ]);
 

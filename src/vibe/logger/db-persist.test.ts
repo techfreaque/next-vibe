@@ -6,10 +6,13 @@
 
 import { beforeAll, describe, expect, it, mock } from "bun:test";
 
+import type { LoggerMetadata } from "./types";
+
 interface UpsertedRow {
   fingerprint: string;
   occurrences: number;
   message: string;
+  metadata: LoggerMetadata[];
 }
 
 const upserts: UpsertedRow[] = [];
@@ -25,6 +28,9 @@ void mock.module("../database", () => ({
       }),
     }),
   },
+}));
+void mock.module("./error-monitor/daily", () => ({
+  recordErrorLogDaily: (): Promise<void> => Promise.resolve(),
 }));
 
 let persistErrorLog: typeof import("./db-persist").persistErrorLog;
@@ -91,6 +97,37 @@ describe("persistErrorLog", () => {
     await settle(50);
     expect(occurrencesFor("distinct a")).toBe(1);
     expect(occurrencesFor("distinct b")).toBe(1);
+  });
+
+  it("retains bounded cause diagnostics without storing response bodies or changing the fingerprint", async () => {
+    const privateBody = "private upstream response";
+    const cause = Object.assign(new TypeError("request failed"), {
+      code: "ETIMEDOUT",
+      statusCode: 504,
+      responseBody: privateBody,
+    });
+    persistErrorLog(
+      "error",
+      "wrapped upstream error",
+      new Error("request failed", { cause }),
+      [],
+      "en-GLOBAL",
+    );
+    persistErrorLog(
+      "error",
+      "wrapped upstream error",
+      new Error("request failed"),
+      [],
+      "en-GLOBAL",
+    );
+    await settle(1300);
+    const rows = upserts.filter((r) =>
+      r.message.startsWith("wrapped upstream error"),
+    );
+    expect(new Set(rows.map((r) => r.fingerprint)).size).toBe(1);
+    expect(rows.some((r) => JSON.stringify(r.metadata).includes('"code":"ETIMEDOUT"'))).toBe(true);
+    expect(rows.some((r) => JSON.stringify(r.metadata).includes('"status":504'))).toBe(true);
+    expect(rows.some((r) => JSON.stringify(r.metadata).includes(privateBody))).toBe(false);
   });
 
   it("puts one error class on one row when only ids and numbers vary", async () => {

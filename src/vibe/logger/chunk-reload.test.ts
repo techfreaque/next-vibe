@@ -172,6 +172,19 @@ describe("handleChunkLoadFailure", () => {
     ]);
     await waitForReload();
     expect(reloads).toBe(1);
+    const record: { at: number } = JSON.parse(
+      session.getItem("vibe-chunk-reload") ?? "{}",
+    );
+    const originalRequestId = "eb3a8c4c-de39-4d30-baad-fa32f10d555e";
+    session.setItem(
+      "vibe-chunk-reload",
+      JSON.stringify({
+        ...record,
+        edgeRequestId: originalRequestId,
+        edgeTimingNode: "s1",
+        resourceStartedAtMs: 1_795_390_000_000,
+      }),
+    );
 
     // The reloaded page fails again: reported, no second reload
     resetChunkReloadForTests();
@@ -187,6 +200,9 @@ describe("handleChunkLoadFailure", () => {
       source: "after",
       firstSource: "test",
       firstChunkId: "4521",
+      firstEdgeRequestId: originalRequestId,
+      firstEdgeTimingNode: "s1",
+      firstResourceStartedAtMs: 1_795_390_000_000,
       chunkId: "4521",
       chunkFailKind: "error",
       buildIdBefore: "old-build",

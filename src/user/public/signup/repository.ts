@@ -334,9 +334,23 @@ export class SignupRepository {
           ),
         );
       if (!row) {
+        // Check only existence so diagnostics distinguish a stale signup from
+        // a browser whose lead changed. Preserve the same public response.
+        const existing = await db
+          .select({ id: pendingSignups.id })
+          .from(pendingSignups)
+          .where(eq(pendingSignups.id, data.pendingId))
+          .limit(1)
+          .catch(() => null);
         logger.warn("Signup confirmation has no pending signup for this lead", {
           resend: Boolean(data.resend),
           changeEmail: Boolean(data.newEmail),
+          pendingLookup:
+            existing === null
+              ? "diagnostic-unavailable"
+              : existing.length > 0
+                ? "different-lead"
+                : "missing-pending-row",
         });
         return fail({
           message: t("confirmation.expired"),

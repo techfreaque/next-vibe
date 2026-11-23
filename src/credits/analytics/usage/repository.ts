@@ -333,7 +333,7 @@ export class CreditUsageReportRepository {
         provider: data.provider || undefined,
         includeInternal: data.includeInternal,
       };
-      const report = await CreditUsageReportRepository.build(win, filters);
+      const { report } = await CreditUsageReportRepository.build(win, filters);
       // Feature ids -> labels in the viewer's locale (display time).
       const featureIds = [
         ...report.byFeature.map((row) => row.key),
@@ -419,7 +419,10 @@ export class CreditUsageReportRepository {
   static async build(
     win: AnalyticsWindow,
     filters: CreditUsageFilters,
-  ): Promise<Omit<CreditUsageReportResponseOutput, "featureLabels">> {
+  ): Promise<{
+    report: Omit<CreditUsageReportResponseOutput, "featureLabels">;
+    guestSpendUsd: Kpi;
+  }> {
     const cte = creditUsageCte(win.from, win.to, filters);
     const bucket = bucketSql(sql.raw("at"), win.bucket);
 
@@ -579,7 +582,7 @@ export class CreditUsageReportRepository {
     const curMargin = marginUsd(cur);
     const prevMargin = prevCost ? marginUsd(prevCost) : null;
 
-    return {
+    const report: Omit<CreditUsageReportResponseOutput, "featureLabels"> = {
       window: serializeWindow(win),
       appliedFilters: {
         actor: filters.actor,
@@ -717,6 +720,13 @@ export class CreditUsageReportRepository {
           lastActivity: r.last,
         };
       }),
+    };
+    return {
+      report,
+      guestSpendUsd: kpi(
+        cur.guestCredits * CREDIT_VALUE_USD,
+        prev ? prev.guestCredits * CREDIT_VALUE_USD : null,
+      ),
     };
   }
 }

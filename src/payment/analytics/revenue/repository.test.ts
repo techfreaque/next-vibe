@@ -84,7 +84,7 @@ describe("revenue report", () => {
 
   it("money overview matches the two reports", async () => {
     const win = resolveAnalyticsWindow({ range: AnalyticsRange.LAST_30_DAYS });
-    const overview = await getMoneyOverview(win, logger);
+    const overview = await getMoneyOverview(win, logger, defaultLocale);
     expect(overview.success).toBe(true);
     if (!overview.success) {
       return;

@@ -237,6 +237,13 @@ export async function getToolsFromRemoteInstance(
     logger.error("Failed to get tools from remote", {
       instanceId,
       userId: user.id,
+      platform,
+      snapshotLookup: !mayDiscloseSnapshot
+        ? "role-filtered"
+        : !conn
+          ? "no-connection"
+          : "connection-without-snapshot",
+      requestedRoleView: Boolean(data.viewAsRole),
     });
     return success({
       tools: [],
