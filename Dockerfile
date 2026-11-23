@@ -50,7 +50,9 @@ COPY . .
 # See runtime-env-placeholders.ts / server/server/start/runtime-env-patch.ts.
 # Keep the webpack cache between solves. Bound V8 old space and the native
 # Tailwind/SWC worker pools separately; the heap limit does not cover them.
-RUN --mount=type=cache,target=/app/.next-prod/cache,id=next-vibe-next-cache-v2,sharing=locked \
+# Start with compact route-handler keys from the patched Next loader.
+# The v2 cache retains past copies of the route table in its server index.
+RUN --mount=type=cache,target=/app/.next-prod/cache,id=next-vibe-next-cache-v3,sharing=locked \
     RAYON_NUM_THREADS=2 UV_THREADPOOL_SIZE=2 NODE_OPTIONS=--max-old-space-size=12288 VIBE_BUILD_PLACEHOLDER_ENV=true bun src/vibe/platforms/cli/vibe-runtime.ts build --migrate=false --seed=false --db-setup=false --webpack=true && \
     test -f .next-prod/BUILD_ID || (echo "ERROR: .next-prod/BUILD_ID missing - Next.js build failed" && exit 1)
 

@@ -1,0 +1,30 @@
+diff --git a/dist/build/entries.js b/dist/build/entries.js
+--- a/dist/build/entries.js
++++ b/dist/build/entries.js
+@@ -248,6 +248,11 @@ function getAppLoader() {
+     return process.env.BUILTIN_APP_LOADER ? `builtin:next-app-loader` : 'next-app-loader';
+ }
+ function getAppEntry(opts) {
++    // The JS loader returns route handlers before building a page's segment tree.
++    // Keep unrelated page paths out of the handler's webpack request and cache key.
++    if (!process.env.BUILTIN_APP_LOADER && (0, _isapprouteroute.isAppRouteRoute)(opts.name)) {
++        opts = { ...opts, allNormalizedAppPaths: [] };
++    }
+     if (process.env.NEXT_RSPACK && process.env.BUILTIN_APP_LOADER) {
+         ;
+         opts.projectRoot = (0, _path.normalize)((0, _path.join)(__dirname, '../../..'));
+diff --git a/dist/esm/build/entries.js b/dist/esm/build/entries.js
+--- a/dist/esm/build/entries.js
++++ b/dist/esm/build/entries.js
+@@ -159,6 +159,11 @@ function getAppLoader() {
+     return process.env.BUILTIN_APP_LOADER ? `builtin:next-app-loader` : 'next-app-loader';
+ }
+ export function getAppEntry(opts) {
++    // The JS loader returns route handlers before building a page's segment tree.
++    // Keep unrelated page paths out of the handler's webpack request and cache key.
++    if (!process.env.BUILTIN_APP_LOADER && isAppRouteRoute(opts.name)) {
++        opts = { ...opts, allNormalizedAppPaths: [] };
++    }
+     if (process.env.NEXT_RSPACK && process.env.BUILTIN_APP_LOADER) {
+         ;
+         opts.projectRoot = normalize(join(__dirname, '../../..'));
