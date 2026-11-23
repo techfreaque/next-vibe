@@ -72,7 +72,7 @@ export interface StallProfile {
   phases: string;
   /** Most sampled innermost app frames in the streak: "fn file:line xN" */
   hotFrames: string;
-  /** Most sampled app call chains (innermost first) in the streak */
+  /** Most sampled app call chains, including the caller outside the innermost dependency */
   hotStacks: string;
   /** Most sampled innermost frames incl. native / builtin ones (GC, JSON, regex) */
   hotNative: string;
@@ -145,6 +145,16 @@ function isAppFrame(frame: SamplingProfileStackFrame): boolean {
   return frame.flags === 0 && Boolean(frame.sourceURL);
 }
 
+function dependencyFamily(sourceURL = ""): string | undefined {
+  const marker = "/node_modules/";
+  const start = sourceURL.lastIndexOf(marker);
+  if (start >= 0) {
+    // Scoped packages like @babel/traverse and @babel/types share a caller stack.
+    return sourceURL.slice(start + marker.length).split("/", 1)[0];
+  }
+  return undefined;
+}
+
 function topCounts(counts: Map<string, number>, limit: number): string {
   return [...counts.entries()]
     .toSorted((a, b) => b[1] - a[1])
@@ -213,14 +223,22 @@ function summarize(
       }
     }
     const appFrames = frames.filter(isAppFrame);
-    if (appFrames.length > 0) {
-      bump(hotFrames, frameKey(appFrames[0]));
+    const [innermost] = appFrames;
+    if (innermost) {
+      bump(hotFrames, frameKey(innermost));
+      const head = appFrames.slice(0, 5);
+      const family = dependencyFamily(innermost.sourceURL);
+      const caller = family
+        ? appFrames.find(
+            (frame) => dependencyFamily(frame.sourceURL) !== family,
+          )
+        : undefined;
+      const stack = head.map((frame) => frameKey(frame)).join(" < ");
       bump(
         hotStacks,
-        appFrames
-          .slice(0, 5)
-          .map((frame) => frameKey(frame))
-          .join(" < "),
+        caller && !head.includes(caller)
+          ? `${stack} < … < ${frameKey(caller)}`
+          : stack,
       );
     }
   }

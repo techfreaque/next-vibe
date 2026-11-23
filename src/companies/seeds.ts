@@ -10,9 +10,8 @@ import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { companies, companyMembers } from "./db";
+import { DEMO_COMPANY_NAME } from "./demo-company";
 import { CompanyMemberRole, CompanyType } from "./enum";
-
-const DEMO_COMPANY_NAME = "Demo Company";
 
 /**
  * Development seed — creates a demo company and makes the admin user its owner
@@ -38,6 +37,7 @@ export async function dev(
     .select({ id: companies.id })
     .from(companies)
     .where(eq(companies.name, DEMO_COMPANY_NAME))
+    .orderBy(companies.createdAt, companies.id)
     .limit(1);
 
   let companyId: string;

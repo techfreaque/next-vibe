@@ -1101,7 +1101,7 @@ export class AiStreamRepository {
         userKind: user.isPublic ? "public" : "user",
         isCron: Boolean(cronTaskId),
       });
-      await emitSetupError({ setupResult, data, user, logger });
+      await emitSetupError({ setupResult, data, user, logger, cronTaskId });
       return setupResult;
     }
 

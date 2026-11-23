@@ -75,6 +75,7 @@ class ErrorRouter {
     /** True only for authenticated users whose thread row may already exist. */
     persist: boolean;
     logger: EndpointLogger;
+    cronTaskId?: string;
   }): Promise<void> {
     const {
       threadId,
@@ -95,6 +96,7 @@ class ErrorRouter {
       stage: params.stage,
       rootFolderId,
       willPersist: persist,
+      ...(params.cronTaskId ? { cronTaskId: params.cronTaskId } : {}),
     });
     try {
       if (persist) {
@@ -165,8 +167,9 @@ export async function emitSetupError(params: {
   data: AiStreamPostRequestOutput;
   user: JwtPayloadType;
   logger: EndpointLogger;
+  cronTaskId?: string;
 }): Promise<void> {
-  const { setupResult, data, user, logger } = params;
+  const { setupResult, data, user, logger, cronTaskId } = params;
   const threadId = data.threadId;
   if (!(threadId && !user.isPublic && "id" in user)) {
     return;
@@ -193,6 +196,7 @@ export async function emitSetupError(params: {
     user,
     persist: !isIncognito && !isCreditError,
     logger,
+    cronTaskId,
   });
 }
 

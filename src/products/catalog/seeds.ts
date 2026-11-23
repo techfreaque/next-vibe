@@ -1,23 +1,23 @@
 /**
  * Products Catalog Seeds
  * Seeds demo product categories and catalog products for the demo company.
- * Idempotent: skips existing records by name+ownerUserId.
+ * Idempotent: skips existing records by company, owner, and name.
  */
 
 import { and, eq } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
-import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { companies, companyMembers } from "../../companies/db";
+import { companies } from "../../companies/db";
+import { DEMO_COMPANY_NAME } from "../../companies/demo-company";
 import { catalogProducts, productCategories } from "../db";
 import { ProductType } from "../enum";
 
 export const priority = 30; // After companies (80) and users (100)
 
 /**
- * Development seed — creates demo categories and products for the first admin user's company
+ * Development seed for the company created by the companies seed.
  */
 export async function dev(
   logger: EndpointLogger,
@@ -25,55 +25,21 @@ export async function dev(
 ): Promise<void> {
   void locale;
 
-  const firstUserRow = (
-    await db
-      .select({ id: users.id, email: users.email })
-      .from(users)
-      .orderBy(users.createdAt)
-      .limit(1)
-  )[0];
-
-  if (!firstUserRow) {
-    logger.warn("No users found — skipping products catalog seed");
-    return;
-  }
-
-  const adminUser = firstUserRow;
-
-  // Find the demo company for this user
-  const memberRows = await db
-    .select({ companyId: companyMembers.companyId })
-    .from(companyMembers)
-    .where(
-      and(
-        eq(companyMembers.userId, adminUser.id),
-        eq(companyMembers.isActive, true),
-      ),
-    )
+  const [demoCompany] = await db
+    .select({ companyId: companies.id, ownerUserId: companies.ownerUserId })
+    .from(companies)
+    .where(eq(companies.name, DEMO_COMPANY_NAME))
+    .orderBy(companies.createdAt, companies.id)
     .limit(1);
 
-  let companyId: string | null = null;
-
-  if (memberRows.length > 0) {
-    companyId = memberRows[0].companyId;
-  } else {
-    const ownedCompanies = await db
-      .select({ id: companies.id })
-      .from(companies)
-      .where(eq(companies.ownerUserId, adminUser.id))
-      .limit(1);
-
-    if (ownedCompanies.length > 0) {
-      companyId = ownedCompanies[0].id;
-    }
-  }
-
-  if (!companyId) {
-    logger.warn(
-      "No company found for admin user — skipping products catalog seed",
-    );
+  if (!demoCompany) {
+    logger.warn("Products catalog seed requires the demo company", {
+      companyName: DEMO_COMPANY_NAME,
+    });
     return;
   }
+
+  const { companyId, ownerUserId } = demoCompany;
 
   // ---- Seed product categories ----
   const categoryDefs = [
@@ -90,7 +56,8 @@ export async function dev(
       .from(productCategories)
       .where(
         and(
-          eq(productCategories.ownerUserId, adminUser.id),
+          eq(productCategories.companyId, companyId),
+          eq(productCategories.ownerUserId, ownerUserId),
           eq(productCategories.name, cat.name),
         ),
       )
@@ -105,7 +72,7 @@ export async function dev(
     const [inserted] = await db
       .insert(productCategories)
       .values({
-        ownerUserId: adminUser.id,
+        ownerUserId,
         companyId,
         name: cat.name,
         isActive: true,
@@ -157,7 +124,8 @@ export async function dev(
       .from(catalogProducts)
       .where(
         and(
-          eq(catalogProducts.ownerUserId, adminUser.id),
+          eq(catalogProducts.companyId, companyId),
+          eq(catalogProducts.ownerUserId, ownerUserId),
           eq(catalogProducts.name, productDef.name),
         ),
       )
@@ -171,7 +139,7 @@ export async function dev(
     const categoryId = categoryIds[productDef.categoryName];
 
     await db.insert(catalogProducts).values({
-      ownerUserId: adminUser.id,
+      ownerUserId,
       companyId,
       categoryId,
       name: productDef.name,
