@@ -778,6 +778,48 @@ export const translations: typeof enTranslations = {
     error: "Nie udało się otworzyć płatności. Spróbuj ponownie.",
   },
   tiers: {
+    examples: {
+      heading: "Co dają {{credits}} kredytów miesięcznie",
+      subheading:
+        "Liczba wiadomości miesięcznie z kilkoma popularnymi modelami.",
+      perMessage: "ok. {{credits}} kredytów za wiadomość",
+      messages: "ok. {{amount}} wiadomości",
+      note: "Szacunek dla typowej wiadomości: {{input}} tokenów na wejściu (dotychczasowa rozmowa) i {{output}} na wyjściu. Krótkie rozmowy kosztują mniej, długie rozmowy i pliki więcej.",
+    },
+    faq: {
+      heading: "Pytania przed zakupem",
+      credit: {
+        question: "Ile jest wart kredyt?",
+        answer:
+          "Jeden kredyt to {{unitPrice}}. Lekkie modele kosztują mniej niż kredyt za wiadomość, najlepsze kilka. Przykłady powyżej liczą prawdziwe ceny modeli.",
+      },
+      unused: {
+        question: "Co z niewykorzystanymi kredytami?",
+        answer:
+          "Kredyty z planu działają w Twoim miesiącu rozliczeniowym i odnawiają się przy przedłużeniu. Pakiety kredytów nigdy nie wygasają.",
+      },
+      cancel: {
+        question: "Czy mogę zrezygnować?",
+        answer:
+          "Tak, w każdej chwili, właśnie tutaj. Plan i kredyty zostają do końca opłaconego okresu.",
+      },
+      free: {
+        question: "Co zostaje za darmo?",
+        answer:
+          "Goście dostają {{freeCreditsGuest}} kredytów miesięcznie. Darmowe konto dostaje {{freeCreditsSignedIn}}, a z potwierdzonym newsletterem {{freeCreditsMax}}. Bez karty.",
+      },
+      api: {
+        question: "Czy plan odblokowuje API?",
+        answer:
+          "Tak. Każdy plan i każdy pakiet kredytów odblokowuje klucze API dla klientów zgodnych z OpenAI i Anthropic. Darmowe kredyty nie.",
+      },
+      pay: {
+        question: "Jak mogę zapłacić?",
+        answer:
+          "Kartą lub PayPalem przez Stripe albo kryptowalutą przez NOWPayments.",
+      },
+      more: "Więcej odpowiedzi w centrum pomocy",
+    },
     heading: "Wybierz plan",
     subheading:
       "Świeże kredyty co miesiąc i dostęp do {{modelCount}} modeli AI. Anulujesz kiedy chcesz.",

@@ -788,6 +788,46 @@ export const translations: typeof enTranslations = {
     error: "Le paiement ne s'est pas ouvert. Réessayez.",
   },
   tiers: {
+    examples: {
+      heading: "Ce que {{credits}} crédits par mois vous offrent",
+      subheading: "Messages par mois avec quelques modèles populaires.",
+      perMessage: "env. {{credits}} crédits par message",
+      messages: "env. {{amount}} messages",
+      note: "Estimation pour un message typique : {{input}} tokens en entrée (votre conversation jusqu’ici) et {{output}} en sortie. Les conversations courtes coûtent moins, les longues et les fichiers coûtent plus.",
+    },
+    faq: {
+      heading: "Questions avant de payer",
+      credit: {
+        question: "Combien vaut un crédit ?",
+        answer:
+          "Un crédit vaut {{unitPrice}}. Les modèles légers coûtent moins d’un crédit par message, les meilleurs quelques crédits. Les exemples ci-dessus utilisent les vrais prix des modèles.",
+      },
+      unused: {
+        question: "Que deviennent les crédits non utilisés ?",
+        answer:
+          "Les crédits de la formule couvrent votre mois de facturation et se rechargent au renouvellement. Les packs de crédits n’expirent jamais.",
+      },
+      cancel: {
+        question: "Puis-je résilier ?",
+        answer:
+          "Oui, à tout moment, ici même. Vous gardez votre formule et ses crédits jusqu’à la fin de la période payée.",
+      },
+      free: {
+        question: "Qu’est-ce qui reste gratuit ?",
+        answer:
+          "Les visiteurs reçoivent {{freeCreditsGuest}} crédits par mois. Un compte gratuit en reçoit {{freeCreditsSignedIn}}, et {{freeCreditsMax}} avec un abonnement confirmé à la newsletter. Sans carte.",
+      },
+      api: {
+        question: "Une formule débloque-t-elle l’API ?",
+        answer:
+          "Oui. Toute formule ou tout pack de crédits débloque les clés API pour les clients compatibles OpenAI et Anthropic. Les crédits gratuits, non.",
+      },
+      pay: {
+        question: "Comment payer ?",
+        answer: "Par carte ou PayPal via Stripe, ou en crypto via NOWPayments.",
+      },
+      more: "Plus de réponses dans le centre d’aide",
+    },
     heading: "Choisissez votre formule",
     subheading:
       "Des crédits neufs chaque mois pour les {{modelCount}} modèles. Sans engagement.",

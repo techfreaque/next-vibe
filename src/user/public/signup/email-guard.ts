@@ -5,15 +5,17 @@
 
 import "server-only";
 
-import { and, eq, not, type SQL, sql } from "drizzle-orm";
+import { and, type AnyColumn, eq, not, type SQL, sql } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import { users } from "next-vibe/identity/user/db";
 
 import { normalizeEmailForUniqueness } from "./email-identity";
 
-/** SQL twin of normalizeEmailForUniqueness over users.email */
-export function normalizedEmailSql(): SQL<string> {
-  const e = sql`lower(btrim(${users.email}))`;
+/** SQL twin of normalizeEmailForUniqueness over users.email (or another email column) */
+export function normalizedEmailSql(
+  column: AnyColumn = users.email,
+): SQL<string> {
+  const e = sql`lower(btrim(${column}))`;
   const local = sql`split_part(split_part(${e}, '@', 1), '+', 1)`;
   const domain = sql`substr(${e}, strpos(${e}, '@') + 1)`;
   return sql<string>`(CASE

@@ -17,6 +17,7 @@ export const {
   BOUNCED: "events.bounced",
   EXPIRED: "events.expired",
   CONFIRMED: "events.confirmed",
+  REMINDER_SENT: "events.reminderSent",
 });
 
 export const SignupEventTypeDB = [
@@ -26,4 +27,5 @@ export const SignupEventTypeDB = [
   SignupEventType.BOUNCED,
   SignupEventType.EXPIRED,
   SignupEventType.CONFIRMED,
+  SignupEventType.REMINDER_SENT,
 ] as const;

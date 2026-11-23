@@ -51,6 +51,8 @@ import type { SignupT } from "./i18n";
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 export const CONFIRMATION_TTL = 30 * MINUTE;
+/** A reminder link stays valid longer: it is read later, from the inbox. */
+export const REMINDER_CONFIRMATION_TTL = 24 * HOUR;
 const MAX_SENDS = 5;
 const MAX_GUESSES = 5;
 type PendingInput = Omit<
@@ -93,6 +95,7 @@ export async function issueSignupChallenge(
   logger: EndpointLogger,
   t: SignupT,
   deliver = sendSignupChallenge,
+  ttlMs = CONFIRMATION_TTL,
 ): Promise<ResponseType<PendingSignup>> {
   const addressKey = `email:${normalizeEmailForUniqueness(input.email)}`;
   const network = ipPoolKey(ip);
@@ -158,7 +161,7 @@ export async function issueSignupChallenge(
       codeHash: codeDigest(tokenHash, code),
       tokenHash,
       attempts: 0,
-      expiresAt: new Date(now.getTime() + CONFIRMATION_TTL),
+      expiresAt: new Date(now.getTime() + ttlMs),
       sentAt: now,
       bounced: false,
       bounceReason: null,

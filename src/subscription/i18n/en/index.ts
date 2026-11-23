@@ -775,6 +775,46 @@ export const translations = {
     error: "Checkout didn't open. Try again.",
   },
   tiers: {
+    examples: {
+      heading: "What {{credits}} credits a month buy",
+      subheading: "Messages per month with a few popular models.",
+      perMessage: "about {{credits}} credits per message",
+      messages: "about {{amount}} messages",
+      note: "Estimated for a typical message: {{input}} tokens in (your chat so far) and {{output}} out. Short chats cost less, long chats and files cost more.",
+    },
+    faq: {
+      heading: "Questions before you pay",
+      credit: {
+        question: "What is a credit worth?",
+        answer:
+          "One credit is {{unitPrice}}. Light models cost less than a credit per message, top models a few. The examples above use the real model prices.",
+      },
+      unused: {
+        question: "What happens to unused credits?",
+        answer:
+          "Plan credits cover your billing month and refill at renewal. Credit packs never expire.",
+      },
+      cancel: {
+        question: "Can I cancel?",
+        answer:
+          "Yes, anytime, right here. You keep your plan and its credits until the period you paid for ends.",
+      },
+      free: {
+        question: "What stays free?",
+        answer:
+          "Guests get {{freeCreditsGuest}} credits a month. A free account gets {{freeCreditsSignedIn}}, and {{freeCreditsMax}} with a confirmed newsletter subscription. No card needed.",
+      },
+      api: {
+        question: "Does a plan unlock the API?",
+        answer:
+          "Yes. Any plan or credit pack unlocks API keys for OpenAI and Anthropic compatible clients. Free credits don’t.",
+      },
+      pay: {
+        question: "How can I pay?",
+        answer: "Card or PayPal through Stripe, or crypto through NOWPayments.",
+      },
+      more: "More answers in the help center",
+    },
     heading: "Pick your plan",
     subheading:
       "Fresh credits every month for all {{modelCount}} models. Cancel anytime.",

@@ -790,6 +790,47 @@ export const translations: typeof enTranslations = {
     error: "No pudimos abrir la página de pago. Vuelve a intentarlo.",
   },
   tiers: {
+    examples: {
+      heading: "Lo que te dan {{credits}} créditos al mes",
+      subheading: "Mensajes al mes con algunos modelos populares.",
+      perMessage: "unos {{credits}} créditos por mensaje",
+      messages: "unos {{amount}} mensajes",
+      note: "Estimado para un mensaje típico: {{input}} tokens de entrada (tu chat hasta ahora) y {{output}} de salida. Los chats cortos cuestan menos, los largos y los archivos cuestan más.",
+    },
+    faq: {
+      heading: "Preguntas antes de pagar",
+      credit: {
+        question: "¿Cuánto vale un crédito?",
+        answer:
+          "Un crédito vale {{unitPrice}}. Los modelos ligeros cuestan menos de un crédito por mensaje, los mejores unos pocos. Los ejemplos de arriba usan los precios reales de los modelos.",
+      },
+      unused: {
+        question: "¿Qué pasa con los créditos que no uso?",
+        answer:
+          "Los créditos del plan cubren tu mes de facturación y se recargan al renovar. Los paquetes de créditos nunca caducan.",
+      },
+      cancel: {
+        question: "¿Puedo cancelar?",
+        answer:
+          "Sí, cuando quieras, aquí mismo. Conservas tu plan y sus créditos hasta que termine el periodo pagado.",
+      },
+      free: {
+        question: "¿Qué sigue siendo gratis?",
+        answer:
+          "Los invitados reciben {{freeCreditsGuest}} créditos al mes. Una cuenta gratuita recibe {{freeCreditsSignedIn}}, y {{freeCreditsMax}} con la suscripción al boletín confirmada. Sin tarjeta.",
+      },
+      api: {
+        question: "¿Un plan desbloquea la API?",
+        answer:
+          "Sí. Cualquier plan o paquete de créditos desbloquea claves API para clientes compatibles con OpenAI y Anthropic. Los créditos gratis no.",
+      },
+      pay: {
+        question: "¿Cómo puedo pagar?",
+        answer:
+          "Con tarjeta o PayPal a través de Stripe, o con cripto a través de NOWPayments.",
+      },
+      more: "Más respuestas en el centro de ayuda",
+    },
     heading: "Elige tu plan",
     subheading:
       "Nuevos créditos cada mes para los {{modelCount}} modelos. Cancela cuando quieras.",

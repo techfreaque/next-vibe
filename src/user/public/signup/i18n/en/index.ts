@@ -16,6 +16,14 @@ export const translations = {
     bounced: "Confirmation email bounced",
     expired: "Confirmation expired",
     confirmed: "Email confirmed",
+    reminderSent: "Reminder sent",
+  },
+  reminder: {
+    subject: "Your unbottled.ai account is one click away",
+    hint: "You started signing up but never confirmed your email. Confirm now and get {{credits}} free credits every month. This code and the button below work for 24 hours and replace the ones from the first email.",
+    button: "Confirm and sign in",
+    ignore:
+      "Didn’t sign up? Ignore this email. Without a click, no account is created.",
   },
   confirmation: {
     bouncedTitle: "We couldn’t deliver your confirmation email",

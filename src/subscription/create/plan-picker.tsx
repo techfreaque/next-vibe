@@ -61,6 +61,7 @@ import {
 } from "../plan-offers";
 import updateDefinitions from "../update/definition";
 import { refreshAfterTierChange } from "../update/refresh";
+import { CreditExamples } from "./credit-examples";
 
 export type PlanInterval =
   | typeof BillingInterval.MONTHLY
@@ -270,6 +271,12 @@ export function PlanPicker({
           />
         </Div>
       </Div>
+
+      <CreditExamples
+        locale={locale}
+        monthlyCredits={tier.credits}
+        creditsLabel={tier.creditsLabel}
+      />
 
       {state.mode === "topUp" && !state.canSwitchTier && (
         <Div className="flex items-start gap-2 px-1 text-sm text-muted-foreground">

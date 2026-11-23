@@ -802,6 +802,47 @@ export const translations: typeof enTranslations = {
     error: "Checkout ließ sich nicht öffnen. Bitte erneut versuchen.",
   },
   tiers: {
+    examples: {
+      heading: "Was {{credits}} Credits im Monat bringen",
+      subheading: "Nachrichten pro Monat mit ein paar beliebten Modellen.",
+      perMessage: "ca. {{credits}} Credits pro Nachricht",
+      messages: "ca. {{amount}} Nachrichten",
+      note: "Geschätzt für eine typische Nachricht: {{input}} Tokens rein (dein bisheriger Chat) und {{output}} raus. Kurze Chats kosten weniger, lange Chats und Dateien mehr.",
+    },
+    faq: {
+      heading: "Fragen vor dem Kauf",
+      credit: {
+        question: "Was ist ein Credit wert?",
+        answer:
+          "Ein Credit kostet {{unitPrice}}. Leichte Modelle brauchen weniger als einen Credit pro Nachricht, Top-Modelle ein paar. Die Beispiele oben rechnen mit den echten Modellpreisen.",
+      },
+      unused: {
+        question: "Was passiert mit ungenutzten Credits?",
+        answer:
+          "Plan-Credits gelten für deinen Abrechnungsmonat und werden bei der Verlängerung neu aufgefüllt. Credit-Pakete verfallen nie.",
+      },
+      cancel: {
+        question: "Kann ich kündigen?",
+        answer:
+          "Ja, jederzeit, direkt hier. Plan und Credits bleiben dir bis zum Ende des bezahlten Zeitraums.",
+      },
+      free: {
+        question: "Was bleibt kostenlos?",
+        answer:
+          "Gäste bekommen {{freeCreditsGuest}} Credits im Monat. Ein kostenloses Konto bekommt {{freeCreditsSignedIn}}, mit bestätigtem Newsletter {{freeCreditsMax}}. Ohne Karte.",
+      },
+      api: {
+        question: "Schaltet ein Plan die API frei?",
+        answer:
+          "Ja. Jeder Plan und jedes Credit-Paket schaltet API-Schlüssel für OpenAI- und Anthropic-kompatible Clients frei. Gratis-Credits nicht.",
+      },
+      pay: {
+        question: "Wie kann ich bezahlen?",
+        answer:
+          "Mit Karte oder PayPal über Stripe oder mit Krypto über NOWPayments.",
+      },
+      more: "Mehr Antworten im Hilfe-Center",
+    },
     heading: "Wähl deinen Plan",
     subheading:
       "Jeden Monat frische Credits für alle {{modelCount}} Modelle. Jederzeit kündbar.",

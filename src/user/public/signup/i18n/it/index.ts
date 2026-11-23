@@ -19,6 +19,14 @@ export const translations: typeof enTranslations = {
     bounced: "Email di conferma respinta",
     expired: "Conferma scaduta",
     confirmed: "Email confermata",
+    reminderSent: "Promemoria inviato",
+  },
+  reminder: {
+    subject: "Il tuo account unbottled.ai è a un clic",
+    hint: "Hai iniziato la registrazione ma non hai mai confermato la tua email. Conferma ora e ricevi {{credits}} crediti gratuiti ogni mese. Il codice e il pulsante qui sotto valgono 24 ore e sostituiscono quelli della prima email.",
+    button: "Conferma e accedi",
+    ignore:
+      "Non ti sei registrato tu? Ignora questa email. Senza un clic non viene creato nessun account.",
   },
   confirmation: {
     bouncedTitle: "Non siamo riusciti a consegnare l’email di conferma",

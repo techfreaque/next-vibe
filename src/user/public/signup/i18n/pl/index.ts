@@ -18,6 +18,14 @@ export const translations: typeof enTranslations = {
     bounced: "E-mail potwierdzający odbity",
     expired: "Potwierdzenie wygasło",
     confirmed: "E-mail potwierdzony",
+    reminderSent: "Wysłano przypomnienie",
+  },
+  reminder: {
+    subject: "Twoje konto unbottled.ai czeka na jedno kliknięcie",
+    hint: "Rejestracja jest prawie gotowa, brakuje tylko potwierdzenia adresu e-mail. Potwierdź teraz i odbieraj {{credits}} darmowych kredytów co miesiąc. Kod i przycisk poniżej działają przez 24 godziny i zastępują te z pierwszej wiadomości.",
+    button: "Potwierdź i zaloguj się",
+    ignore:
+      "To nie Ty? Zignoruj tę wiadomość. Bez kliknięcia konto nie powstanie.",
   },
   confirmation: {
     bouncedTitle: "Nie udało się dostarczyć wiadomości",

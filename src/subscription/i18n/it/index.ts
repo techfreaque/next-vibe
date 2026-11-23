@@ -797,6 +797,47 @@ export const translations: typeof enTranslations = {
     error: "Impossibile aprire la pagina di pagamento. Riprova.",
   },
   tiers: {
+    examples: {
+      heading: "Cosa ottieni con {{credits}} crediti al mese",
+      subheading: "Messaggi al mese con alcuni modelli popolari.",
+      perMessage: "circa {{credits}} crediti a messaggio",
+      messages: "circa {{amount}} messaggi",
+      note: "Stima per un messaggio tipico: {{input}} token in ingresso (la chat fin qui) e {{output}} in uscita. Le chat brevi costano meno, quelle lunghe e i file di più.",
+    },
+    faq: {
+      heading: "Domande prima di pagare",
+      credit: {
+        question: "Quanto vale un credito?",
+        answer:
+          "Un credito vale {{unitPrice}}. I modelli leggeri costano meno di un credito a messaggio, i migliori qualche credito. Gli esempi qui sopra usano i prezzi reali dei modelli.",
+      },
+      unused: {
+        question: "Che fine fanno i crediti non usati?",
+        answer:
+          "I crediti del piano coprono il tuo mese di fatturazione e si ricaricano al rinnovo. I pacchetti di crediti non scadono mai.",
+      },
+      cancel: {
+        question: "Posso disdire?",
+        answer:
+          "Sì, quando vuoi, proprio qui. Tieni il piano e i suoi crediti fino alla fine del periodo pagato.",
+      },
+      free: {
+        question: "Cosa resta gratis?",
+        answer:
+          "Gli ospiti ricevono {{freeCreditsGuest}} crediti al mese. Un account gratuito ne riceve {{freeCreditsSignedIn}}, e {{freeCreditsMax}} con l’iscrizione alla newsletter confermata. Senza carta.",
+      },
+      api: {
+        question: "Un piano sblocca l’API?",
+        answer:
+          "Sì. Qualsiasi piano o pacchetto di crediti sblocca le chiavi API per i client compatibili con OpenAI e Anthropic. I crediti gratuiti no.",
+      },
+      pay: {
+        question: "Come posso pagare?",
+        answer:
+          "Con carta o PayPal tramite Stripe, oppure in cripto tramite NOWPayments.",
+      },
+      more: "Altre risposte nel centro assistenza",
+    },
     heading: "Scegli il tuo piano",
     subheading:
       "Nuovi crediti ogni mese per tutti i {{modelCount}} modelli. Disdici quando vuoi.",

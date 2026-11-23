@@ -76,6 +76,7 @@ import { useSubscription } from "../hooks";
 import { getPlanOfferState } from "../plan-offers";
 import type definition from "./definition";
 import { type PlanInterval, PlanPicker } from "./plan-picker";
+import { PricingFaq } from "./pricing-faq";
 
 const MIN_QTY = 1;
 // Crypto minimum is ~$25 of credits (5 packs).
@@ -805,6 +806,7 @@ export function SubscriptionCreateContainer(): JSX.Element {
           </Div>
         </>
       )}
+      <PricingFaq locale={locale} />
     </WidgetShell>
   );
 }

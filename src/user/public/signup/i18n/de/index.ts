@@ -18,6 +18,14 @@ export const translations: typeof enTranslations = {
     bounced: "Bestätigungsmail unzustellbar",
     expired: "Bestätigung abgelaufen",
     confirmed: "E-Mail bestätigt",
+    reminderSent: "Erinnerung gesendet",
+  },
+  reminder: {
+    subject: "Dein unbottled.ai Konto ist einen Klick entfernt",
+    hint: "Du hast die Registrierung begonnen, deine E-Mail aber nie bestätigt. Bestätige jetzt und erhalte jeden Monat {{credits}} Gratis-Credits. Code und Button gelten 24 Stunden und ersetzen die aus der ersten Mail.",
+    button: "Bestätigen und anmelden",
+    ignore:
+      "Du hast dich nicht registriert? Dann ignoriere diese Mail. Ohne Klick wird kein Konto angelegt.",
   },
   confirmation: {
     bouncedTitle: "Die Bestätigungsmail kam nicht an",
