@@ -16,9 +16,11 @@ export const translations: typeof enTranslations = {
       title: "{{model}}: precio, API y contexto de {{context}} | {{appName}}",
       titleShort: "{{model}}: precio, API y contexto de {{context}}",
       titleMin: "{{model}}: precio y API",
-      titleUncensored: "{{model}}: IA sin censura, precio y API | {{appName}}",
-      titleUncensoredShort: "{{model}}: IA sin censura, precio y API",
-      titleUncensoredMin: "{{model}} sin censura: precio y API",
+      titleUncensored:
+        "{{model}}: chat de IA sin censura online, precio y API | {{appName}}",
+      titleUncensoredShort:
+        "{{model}}: chat de IA sin censura online, precio y API",
+      titleUncensoredMin: "{{model}}: chat de IA sin censura",
       titleLegacy:
         "{{model}}: precio y contexto (modelo anterior) | {{appName}}",
       titleLegacyShort: "{{model}}: precio y contexto (modelo anterior)",
@@ -27,9 +29,9 @@ export const translations: typeof enTranslations = {
       descriptionFlat:
         "{{model}} de {{lab}}: unos {{credits}} créditos ({{money}}) por mensaje, contexto de {{context}}, categoría {{tier}}. Empieza con créditos gratis.",
       descriptionUncensored:
-        "{{model}} es un modelo de la categoría sin censura. {{input}} de entrada y {{output}} de salida por millón de tokens. Contexto de {{context}}. Chat o API con una única confirmación de mayoría de edad.",
+        "Chatea con {{model}} online o úsalo por API. {{input}} de entrada y {{output}} de salida por millón de tokens, contexto de {{context}}. Créditos gratis para invitados y una sola confirmación de edad.",
       descriptionUncensoredFlat:
-        "{{model}} es un modelo de la categoría sin censura. Unos {{credits}} créditos ({{money}}) por mensaje. Contexto de {{context}}. Chat o API con una única confirmación de mayoría de edad.",
+        "Chatea con {{model}} online o úsalo por API. Unos {{credits}} créditos ({{money}}) por mensaje, contexto de {{context}}. Créditos gratis para invitados y una sola confirmación de edad.",
       descriptionLegacy:
         "{{model}} de {{lab}} es un modelo anterior, reemplazado por {{successor}}. Contexto de {{context}} y unos {{credits}} créditos por mensaje. Especificaciones, precio y modelo sucesor.",
       descriptionLegacyNoSuccessor:

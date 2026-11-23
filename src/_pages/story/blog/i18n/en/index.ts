@@ -91,6 +91,13 @@ export const translations = {
         "Why DAN and every prompt after it fails, what a jailbreak really costs you, and the uncensored models that answer without one. With a side-by-side test.",
       readTime: "7 min read",
     },
+    noFilterGptAlternatives: {
+      title: "NoFilterGPT alternatives. More models, same freedom.",
+      category: "Comparison",
+      excerpt:
+        "Venice, uncensored.ai, FreedomGPT, NanoGPT, Gab AI, LM Studio and us, checked on their own pricing, privacy and filter pages. Pick the model, not just the filter.",
+      readTime: "8 min read",
+    },
     veniceAlternatives: {
       title: "Venice AI alternatives. Private, uncensored, checked.",
       category: "Comparison",

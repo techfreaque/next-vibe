@@ -93,6 +93,13 @@ export const translations: typeof enTranslations = {
         "Por qué DAN y todos los prompts posteriores fallan, lo que de verdad te cuesta un jailbreak y qué modelos sin censura responden sin él. Con una prueba lado a lado.",
       readTime: "7 min de lectura",
     },
+    noFilterGptAlternatives: {
+      title: "Alternativas a NoFilterGPT. Más modelos, la misma libertad.",
+      category: "Comparativa",
+      excerpt:
+        "Venice, uncensored.ai, FreedomGPT, NanoGPT, Gab AI, LM Studio y nosotros, comparados según sus propias páginas de precios, privacidad y filtros. Elige el modelo, no solo el filtro.",
+      readTime: "8 min de lectura",
+    },
     veniceAlternatives: {
       title: "Alternativas a Venice AI. Privadas, sin censura, comprobadas.",
       category: "Comparativa",

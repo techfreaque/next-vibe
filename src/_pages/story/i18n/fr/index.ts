@@ -2,13 +2,14 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title: "{{appName}} : Chat IA non censuré",
+    title:
+      "Chat IA sans censure : {{modelCount}} modèles, essai gratuit | {{appName}}",
     category: "Plateforme de chat IA",
     description:
-      "Des conversations IA vraiment non censurées avec {{modelCount}} modèles. Pas de filtres, pas de restrictions. Juste une IA honnête.",
+      "{{modelCount}} modèles d'IA dans un seul chat, dont {{uncensoredCount}} non censurés ou abliterated. Dans le navigateur, jusqu'à {{credits}} crédits offerts aux invités. Sans inscription. Le filtre, c'est vous.",
     imageAlt: "{{appName}}, la plateforme de chat IA non censurée",
     keywords:
-      "IA non censurée, chat IA, GPT-4, Claude, Gemini, modèles d'IA, sans filtre, IA honnête, conversations IA",
+      "IA sans censure, IA non censurée, chat IA sans filtre, modèles abliterated, chatbot IA, modèles d'IA",
   },
   common: {
     error: {

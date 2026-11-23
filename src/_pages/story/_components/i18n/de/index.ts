@@ -742,7 +742,8 @@ export const translations: typeof enTranslations = {
     platform: {
       title: "Plattform",
       features: "Funktionen",
-      featuresUncensoredAi: "Unzensierte KI",
+      featuresUncensoredAi: "Unzensierter KI-Chat",
+      featuresAbliterated: "Abliterierte KI-Modelle",
       featuresSelfHosted: "Selbstgehosteter Agent",
       featuresApiDocs: "API-Doku",
       featuresOpenSource: "Open-Source-Framework",
@@ -763,6 +764,7 @@ export const translations: typeof enTranslations = {
       aboutUs: "Über uns",
       careers: "Karriere",
       blog: "Blog",
+      compare: "Plattformen im Vergleich",
       imprint: "Impressum",
       privacyPolicy: "Datenschutz",
       termsOfService: "Nutzungsbedingungen",

@@ -735,7 +735,8 @@ export const translations = {
     platform: {
       title: "Platform",
       features: "Features",
-      featuresUncensoredAi: "Uncensored AI",
+      featuresUncensoredAi: "Uncensored AI chat",
+      featuresAbliterated: "Abliterated AI chat",
       featuresSelfHosted: "Self-Hosted Agent",
       featuresApiDocs: "API docs",
       featuresOpenSource: "Open Source Framework",
@@ -756,6 +757,7 @@ export const translations = {
       aboutUs: "About Us",
       careers: "Careers",
       blog: "Blog",
+      compare: "Compare platforms",
       imprint: "Legal Notice",
       privacyPolicy: "Privacy Policy",
       termsOfService: "Terms of Service",

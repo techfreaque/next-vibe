@@ -17,9 +17,10 @@ export const translations: typeof enTranslations = {
       titleShort: "{{model}}: prezzo, API e contesto di {{context}}",
       titleMin: "{{model}}: prezzo e API",
       titleUncensored:
-        "{{model}}: IA senza censura, prezzo e API | {{appName}}",
-      titleUncensoredShort: "{{model}}: IA senza censura, prezzo e API",
-      titleUncensoredMin: "{{model}} senza censura: prezzo e API",
+        "{{model}}: chat IA senza censura online, prezzo e API | {{appName}}",
+      titleUncensoredShort:
+        "{{model}}: chat IA senza censura online, prezzo e API",
+      titleUncensoredMin: "{{model}}: chat IA senza censura",
       titleLegacy:
         "{{model}}: prezzo e contesto (modello precedente) | {{appName}}",
       titleLegacyShort: "{{model}}: prezzo e contesto (modello precedente)",
@@ -28,9 +29,9 @@ export const translations: typeof enTranslations = {
       descriptionFlat:
         "{{model}} di {{lab}}: circa {{credits}} crediti ({{money}}) a messaggio, contesto di {{context}}, categoria {{tier}}. Inizia con crediti gratuiti.",
       descriptionUncensored:
-        "{{model}} è nella categoria senza censura. {{input}} in ingresso e {{output}} in uscita per milione di token, contesto di {{context}}. In chat o via API, con una sola conferma dei 18 anni.",
+        "Chatta con {{model}} online o usalo via API. {{input}} in ingresso e {{output}} in uscita per milione di token, contesto di {{context}}. Crediti gratuiti per gli ospiti, una sola conferma dei 18 anni.",
       descriptionUncensoredFlat:
-        "{{model}} è nella categoria senza censura. Circa {{credits}} crediti ({{money}}) a messaggio, contesto di {{context}}. In chat o via API, con una sola conferma dei 18 anni.",
+        "Chatta con {{model}} online o usalo via API. Circa {{credits}} crediti ({{money}}) a messaggio, contesto di {{context}}. Crediti gratuiti per gli ospiti, una sola conferma dei 18 anni.",
       descriptionLegacy:
         "{{model}} di {{lab}} è un modello precedente, ora sostituito da {{successor}}. Contesto di {{context}}, circa {{credits}} crediti a messaggio. Specifiche, prezzo e modello successivo.",
       descriptionLegacyNoSuccessor:

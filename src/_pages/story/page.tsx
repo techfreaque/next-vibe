@@ -20,6 +20,7 @@ import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
+import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
 import { HomeClient } from "./_components/home-client";
 import { scopedTranslation } from "./i18n";
@@ -40,15 +41,19 @@ export async function generateMetadata({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
-  const modelCount = getAvailableChatModelCount(
-    false,
-    await getEnvAvailability(),
-  );
+  const availability = await getEnvAvailability();
+  const modelCount = getAvailableChatModelCount(false, availability);
+  const { uncensored: uncensoredCount } =
+    getAvailableChatModelCountsByContentLevel(false, availability);
   return metadataGenerator(locale, {
     path: "story",
-    title: t("meta.title", { appName }),
+    title: t("meta.title", { appName, modelCount }),
     category: t("meta.category"),
-    description: t("meta.description", { modelCount }),
+    description: t("meta.description", {
+      modelCount,
+      uncensoredCount,
+      credits: FREE_CREDIT_ALLOWANCE.guest,
+    }),
     image: `${envClient.NEXT_PUBLIC_APP_URL}/images/home-hero.jpg`,
     imageAlt: t("meta.imageAlt", { appName }),
     keywords: [t("meta.keywords")],

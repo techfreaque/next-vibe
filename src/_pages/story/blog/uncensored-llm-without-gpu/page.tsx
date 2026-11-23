@@ -51,11 +51,10 @@ import { scopedTranslation as compareScopedTranslation } from "../../compare/i18
 import {
   type ComparePair,
   findOwnWorldviewRow,
-  loadComparePairs,
-  loadUncensoredRows,
   UncensoredModelTable,
   type UncensoredRow,
 } from "../uncensored-rows";
+import { loadComparePairs, loadUncensoredRows } from "../uncensored-rows-data";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;

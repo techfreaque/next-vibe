@@ -14,9 +14,10 @@ export const translations = {
       title: "{{model}} price, API & {{context}} context | {{appName}}",
       titleShort: "{{model}} price, API & {{context}} context",
       titleMin: "{{model}} price & API",
-      titleUncensored: "{{model}}: uncensored AI, price & API | {{appName}}",
-      titleUncensoredShort: "{{model}}: uncensored AI, price & API",
-      titleUncensoredMin: "{{model}} uncensored AI pricing",
+      titleUncensored:
+        "{{model}}: uncensored AI chat online, price & API | {{appName}}",
+      titleUncensoredShort: "{{model}}: uncensored AI chat online, price & API",
+      titleUncensoredMin: "{{model}}: uncensored AI chat",
       titleLegacy: "{{model}} price & context (legacy) | {{appName}}",
       titleLegacyShort: "{{model}} price & context (legacy)",
       description:
@@ -24,9 +25,9 @@ export const translations = {
       descriptionFlat:
         "{{model}} by {{lab}}: ~{{credits}} credits ({{money}}) per message, {{context}} context, {{tier}} tier. Free credits to start.",
       descriptionUncensored:
-        "{{model}} is an uncensored-tier model. {{input}} input, {{output}} output per 1M tokens, {{context}} context. Chat or API, one-time 18+ check.",
+        "Chat with {{model}} online, no install, or call it via API. {{input}} input, {{output}} output per 1M tokens, {{context}} context. Free guest credits, one-time 18+ check.",
       descriptionUncensoredFlat:
-        "{{model}} is an uncensored-tier model. ~{{credits}} credits ({{money}}) per message, {{context}} context. Chat or API, one-time 18+ check.",
+        "Chat with {{model}} online, no install, or call it via API. ~{{credits}} credits ({{money}}) per message, {{context}} context. Free guest credits, one-time 18+ check.",
       descriptionLegacy:
         "{{model}} by {{lab}} is a legacy model, replaced by {{successor}}. {{context}} context, ~{{credits}} credits per message. Specs, price and successor.",
       descriptionLegacyNoSuccessor:

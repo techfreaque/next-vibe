@@ -15,9 +15,10 @@ export const translations: typeof enTranslations = {
       title: "{{model}}: cena, API i kontekst {{context}} | {{appName}}",
       titleShort: "{{model}}: cena, API i kontekst {{context}}",
       titleMin: "{{model}}: cena i API",
-      titleUncensored: "{{model}}: AI bez cenzury, cena i API | {{appName}}",
-      titleUncensoredShort: "{{model}}: AI bez cenzury, cena i API",
-      titleUncensoredMin: "{{model}} bez cenzury: cena i API",
+      titleUncensored:
+        "{{model}}: czat AI bez cenzury online, cena i API | {{appName}}",
+      titleUncensoredShort: "{{model}}: czat AI bez cenzury online, cena i API",
+      titleUncensoredMin: "{{model}}: czat AI bez cenzury",
       titleLegacy: "{{model}}: cena i kontekst (starsza wersja) | {{appName}}",
       titleLegacyShort: "{{model}}: cena i kontekst (starsza wersja)",
       description:
@@ -25,9 +26,9 @@ export const translations: typeof enTranslations = {
       descriptionFlat:
         "{{model}} od {{lab}}: ~{{credits}} kredytów ({{money}}) za wiadomość, kontekst {{context}}, poziom {{tier}}. Darmowe kredyty na start.",
       descriptionUncensored:
-        "{{model}} należy do kategorii bez cenzury. {{input}} wejście, {{output}} wyjście za 1M tokenów, kontekst {{context}}. Czat lub API, 18+.",
+        "Rozmawiaj z {{model}} online albo przez API. {{input}} wejście, {{output}} wyjście za 1M tokenów, kontekst {{context}}. Darmowe kredyty dla gości, jednorazowe potwierdzenie 18+.",
       descriptionUncensoredFlat:
-        "{{model}} należy do kategorii bez cenzury. ~{{credits}} kredytów ({{money}}) za wiadomość, kontekst {{context}}. Czat lub API, 18+.",
+        "Rozmawiaj z {{model}} online albo przez API. ~{{credits}} kredytów ({{money}}) za wiadomość, kontekst {{context}}. Darmowe kredyty dla gości, jednorazowe potwierdzenie 18+.",
       descriptionLegacy:
         "{{model}} od {{lab}} to starsza wersja, zastąpiona przez {{successor}}. Kontekst {{context}}, ~{{credits}} kredytów za wiadomość. Dane, cena i następca.",
       descriptionLegacyNoSuccessor:

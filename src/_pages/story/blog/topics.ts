@@ -22,6 +22,7 @@ export type BlogTopic = (typeof BLOG_TOPICS)[number];
 
 /** Section of each post on the blog index. Exhaustive: a new post needs one. */
 export const POST_TOPICS: Record<BlogPostSlug, BlogTopic> = {
+  "nofiltergpt-alternatives": "uncensored",
   "deepseek-uncensored": "uncensored",
   "grok-alternative": "uncensored",
   "claude-without-filters": "uncensored",
@@ -86,6 +87,7 @@ export const HUB_GUIDES: Record<TopicHub, readonly BlogPostSlug[]> = {
     "ai-roleplay-without-filter",
     "character-ai-alternatives",
     "venice-ai-alternatives",
+    "nofiltergpt-alternatives",
     "ai-chat-no-sign-up",
     "uncensored-llm-without-gpu",
     "uncensored-llm-api",
@@ -111,6 +113,14 @@ interface RelatedGuideSet {
 
 /** Curated hub + siblings. Posts not listed fall back to their topic. */
 const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
+  "nofiltergpt-alternatives": {
+    hub: "uncensored",
+    related: [
+      "chatgpt-alternative-without-filters",
+      "venice-ai-alternatives",
+      "best-uncensored-llm",
+    ],
+  },
   "deepseek-uncensored": {
     hub: "abliterated",
     related: [
@@ -203,8 +213,8 @@ const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
     hub: "uncensored",
     related: [
       "character-ai-alternatives",
+      "nofiltergpt-alternatives",
       "chatgpt-alternative-without-filters",
-      "best-uncensored-llm",
     ],
   },
   "character-ai-alternatives": {
@@ -235,7 +245,7 @@ const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
     hub: "uncensored",
     related: [
       "chatgpt-jailbreak-alternative",
-      "grok-alternative",
+      "nofiltergpt-alternatives",
       "venice-ai-alternatives",
     ],
   },

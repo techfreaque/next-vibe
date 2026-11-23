@@ -16,9 +16,11 @@ export const translations: typeof enTranslations = {
       title: "{{model}} : prix, API et contexte {{context}} | {{appName}}",
       titleShort: "{{model}} : prix, API et contexte {{context}}",
       titleMin: "{{model}} : prix et API",
-      titleUncensored: "{{model}} : IA non censurée, prix et API | {{appName}}",
-      titleUncensoredShort: "{{model}} : IA non censurée, prix et API",
-      titleUncensoredMin: "{{model}} non censuré : prix et API",
+      titleUncensored:
+        "{{model}} : chat IA non censuré en ligne, prix et API | {{appName}}",
+      titleUncensoredShort:
+        "{{model}} : chat IA non censuré en ligne, prix et API",
+      titleUncensoredMin: "{{model}} : chat IA non censuré",
       titleLegacy: "{{model}} : prix et contexte (ancien) | {{appName}}",
       titleLegacyShort: "{{model}} : prix et contexte (ancien)",
       description:
@@ -26,9 +28,9 @@ export const translations: typeof enTranslations = {
       descriptionFlat:
         "{{model}} par {{lab}} : ~{{credits}} crédits ({{money}}) par message, contexte de {{context}}, niveau {{tier}}. Crédits offerts pour commencer.",
       descriptionUncensored:
-        "{{model}} appartient à la catégorie non censurée. {{input}} en entrée, {{output}} en sortie par million de tokens, contexte {{context}}. Chat ou API, accès 18+.",
+        "Discutez avec {{model}} en ligne ou via l'API. {{input}} en entrée, {{output}} en sortie par million de tokens, contexte {{context}}. Crédits offerts aux invités, accès 18+.",
       descriptionUncensoredFlat:
-        "{{model}} appartient à la catégorie non censurée. ~{{credits}} crédits ({{money}}) par message, contexte {{context}}. Chat ou API, accès 18+.",
+        "Discutez avec {{model}} en ligne ou via l'API. ~{{credits}} crédits ({{money}}) par message, contexte {{context}}. Crédits offerts aux invités, accès 18+.",
       descriptionLegacy:
         "{{model}} par {{lab}} est un ancien modèle, remplacé par {{successor}}. Contexte {{context}}, ~{{credits}} crédits par message. Specs, prix et successeur.",
       descriptionLegacyNoSuccessor:

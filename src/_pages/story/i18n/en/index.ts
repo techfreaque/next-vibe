@@ -1,12 +1,13 @@
 export const translations = {
   meta: {
-    title: "{{appName}}: Uncensored AI Chat",
+    title:
+      "Uncensored AI Chat: {{modelCount}} Models, Free to Try | {{appName}}",
     category: "AI Chat Platform",
     description:
-      "Experience truly uncensored AI conversations with {{modelCount}} models. No filters, no restrictions, just honest AI.",
+      "{{modelCount}} AI models in one chat, {{uncensoredCount}} of them uncensored or abliterated. Start in your browser with up to {{credits}} free guest credits. No signup. You set the filter.",
     imageAlt: "{{appName}}: Uncensored AI Chat Platform",
     keywords:
-      "uncensored AI, AI chat, GPT-4, Claude, Gemini, AI models, no filters, honest AI, AI conversations",
+      "uncensored AI, uncensored AI chat, unfiltered AI chat, abliterated AI, AI without filters, uncensored chatbot, AI models",
   },
   common: {
     error: {

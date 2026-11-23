@@ -201,6 +201,7 @@ import { Route as LocaleStoryBlogGrokAlternativeIndexRouteImport } from './route
 import { Route as LocaleStoryBlogHermesTheaTwoWayRemoteIndexRouteImport } from './routes/$locale.story.blog.hermes-thea-two-way-remote.index'
 import { Route as LocaleStoryBlogInteractiveCodingAgentIndexRouteImport } from './routes/$locale.story.blog.interactive-coding-agent.index'
 import { Route as LocaleStoryBlogModelRefreshUncensoredProvidersIndexRouteImport } from './routes/$locale.story.blog.model-refresh-uncensored-providers.index'
+import { Route as LocaleStoryBlogNofiltergptAlternativesIndexRouteImport } from './routes/$locale.story.blog.nofiltergpt-alternatives.index'
 import { Route as LocaleStoryBlogOneCodebase13PlatformsIndexRouteImport } from './routes/$locale.story.blog.one-codebase-13-platforms.index'
 import { Route as LocaleStoryBlogOneEndpointEverySurfaceIndexRouteImport } from './routes/$locale.story.blog.one-endpoint-every-surface.index'
 import { Route as LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRouteImport } from './routes/$locale.story.blog.openai-anthropic-compatible-api.index'
@@ -1810,6 +1811,12 @@ const LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute =
   LocaleStoryBlogModelRefreshUncensoredProvidersIndexRouteImport.update({
     id: '/blog/model-refresh-uncensored-providers/',
     path: '/blog/model-refresh-uncensored-providers/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogNofiltergptAlternativesIndexRoute =
+  LocaleStoryBlogNofiltergptAlternativesIndexRouteImport.update({
+    id: '/blog/nofiltergpt-alternatives/',
+    path: '/blog/nofiltergpt-alternatives/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogOneCodebase13PlatformsIndexRoute =
@@ -5591,6 +5598,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/hermes-thea-two-way-remote/': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
   '/$locale/story/blog/interactive-coding-agent/': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
   '/$locale/story/blog/model-refresh-uncensored-providers/': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
+  '/$locale/story/blog/nofiltergpt-alternatives/': typeof LocaleStoryBlogNofiltergptAlternativesIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms/': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface/': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   '/$locale/story/blog/openai-anthropic-compatible-api/': typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
@@ -6329,6 +6337,7 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/hermes-thea-two-way-remote': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
   '/$locale/story/blog/interactive-coding-agent': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
   '/$locale/story/blog/model-refresh-uncensored-providers': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
+  '/$locale/story/blog/nofiltergpt-alternatives': typeof LocaleStoryBlogNofiltergptAlternativesIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   '/$locale/story/blog/openai-anthropic-compatible-api': typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
@@ -7076,6 +7085,7 @@ export interface FileRoutesById {
   '/$locale/story/blog/hermes-thea-two-way-remote/': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
   '/$locale/story/blog/interactive-coding-agent/': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
   '/$locale/story/blog/model-refresh-uncensored-providers/': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
+  '/$locale/story/blog/nofiltergpt-alternatives/': typeof LocaleStoryBlogNofiltergptAlternativesIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms/': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   '/$locale/story/blog/one-endpoint-every-surface/': typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   '/$locale/story/blog/openai-anthropic-compatible-api/': typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
@@ -7823,6 +7833,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/hermes-thea-two-way-remote/'
     | '/$locale/story/blog/interactive-coding-agent/'
     | '/$locale/story/blog/model-refresh-uncensored-providers/'
+    | '/$locale/story/blog/nofiltergpt-alternatives/'
     | '/$locale/story/blog/one-codebase-13-platforms/'
     | '/$locale/story/blog/one-endpoint-every-surface/'
     | '/$locale/story/blog/openai-anthropic-compatible-api/'
@@ -8561,6 +8572,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/hermes-thea-two-way-remote'
     | '/$locale/story/blog/interactive-coding-agent'
     | '/$locale/story/blog/model-refresh-uncensored-providers'
+    | '/$locale/story/blog/nofiltergpt-alternatives'
     | '/$locale/story/blog/one-codebase-13-platforms'
     | '/$locale/story/blog/one-endpoint-every-surface'
     | '/$locale/story/blog/openai-anthropic-compatible-api'
@@ -9307,6 +9319,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/hermes-thea-two-way-remote/'
     | '/$locale/story/blog/interactive-coding-agent/'
     | '/$locale/story/blog/model-refresh-uncensored-providers/'
+    | '/$locale/story/blog/nofiltergpt-alternatives/'
     | '/$locale/story/blog/one-codebase-13-platforms/'
     | '/$locale/story/blog/one-endpoint-every-surface/'
     | '/$locale/story/blog/openai-anthropic-compatible-api/'
@@ -11398,6 +11411,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/model-refresh-uncensored-providers'
       fullPath: '/$locale/story/blog/model-refresh-uncensored-providers/'
       preLoaderRoute: typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/nofiltergpt-alternatives/': {
+      id: '/$locale/story/blog/nofiltergpt-alternatives/'
+      path: '/blog/nofiltergpt-alternatives'
+      fullPath: '/$locale/story/blog/nofiltergpt-alternatives/'
+      preLoaderRoute: typeof LocaleStoryBlogNofiltergptAlternativesIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/one-codebase-13-platforms/': {
@@ -15356,6 +15376,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute: typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
   LocaleStoryBlogInteractiveCodingAgentIndexRoute: typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
   LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute: typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
+  LocaleStoryBlogNofiltergptAlternativesIndexRoute: typeof LocaleStoryBlogNofiltergptAlternativesIndexRoute
   LocaleStoryBlogOneCodebase13PlatformsIndexRoute: typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
   LocaleStoryBlogOneEndpointEverySurfaceIndexRoute: typeof LocaleStoryBlogOneEndpointEverySurfaceIndexRoute
   LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute: typeof LocaleStoryBlogOpenaiAnthropicCompatibleApiIndexRoute
@@ -15441,6 +15462,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogInteractiveCodingAgentIndexRoute,
   LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute:
     LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute,
+  LocaleStoryBlogNofiltergptAlternativesIndexRoute:
+    LocaleStoryBlogNofiltergptAlternativesIndexRoute,
   LocaleStoryBlogOneCodebase13PlatformsIndexRoute:
     LocaleStoryBlogOneCodebase13PlatformsIndexRoute,
   LocaleStoryBlogOneEndpointEverySurfaceIndexRoute:

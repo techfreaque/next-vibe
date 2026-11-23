@@ -5,11 +5,13 @@ import { Div } from "next-vibe/ui/components/div";
 import { Footer as FooterContainer } from "next-vibe/ui/components/footer";
 import { BookOpen } from "next-vibe/ui/components/icons/BookOpen";
 import { Bot } from "next-vibe/ui/components/icons/Bot";
+import { Brain } from "next-vibe/ui/components/icons/Brain";
 import { Briefcase } from "next-vibe/ui/components/icons/Briefcase";
 import { Code } from "next-vibe/ui/components/icons/Code";
 import { Folder } from "next-vibe/ui/components/icons/Folder";
 import { Info } from "next-vibe/ui/components/icons/Info";
 import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
+import { Scale } from "next-vibe/ui/components/icons/Scale";
 import { Server } from "next-vibe/ui/components/icons/Server";
 import { Shield } from "next-vibe/ui/components/icons/Shield";
 import { SiGithub } from "next-vibe/ui/components/icons/SiGithub";
@@ -120,11 +122,20 @@ const Footer: React.FC<FooterProps> = ({
             <Ul className="flex flex-col gap-3 text-sm text-muted-foreground">
               <Li>
                 <Link
-                  href={`/${locale}/story#how-it-works`}
+                  href={`/${locale}/story/uncensored-ai`}
                   className="hover:text-foreground transition-colors flex items-center gap-2"
                 >
                   <Sparkles className="h-4 w-4" />
                   {t("footer.platform.featuresUncensoredAi")}
+                </Link>
+              </Li>
+              <Li>
+                <Link
+                  href={`/${locale}/story/abliterated-ai-chat`}
+                  className="hover:text-foreground transition-colors flex items-center gap-2"
+                >
+                  <Brain className="h-4 w-4" />
+                  {t("footer.platform.featuresAbliterated")}
                 </Link>
               </Li>
               <Li>
@@ -277,6 +288,15 @@ const Footer: React.FC<FooterProps> = ({
                 >
                   <BookOpen className="h-4 w-4" />
                   {t("footer.company.blog")}
+                </Link>
+              </Li>
+              <Li>
+                <Link
+                  href={`/${locale}/story/compare/uncensored-ai-platforms`}
+                  className="hover:text-foreground transition-colors flex items-center gap-2"
+                >
+                  <Scale className="h-4 w-4" />
+                  {t("footer.company.compare")}
                 </Link>
               </Li>
             </Ul>

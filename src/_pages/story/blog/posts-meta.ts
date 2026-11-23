@@ -7,6 +7,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 
 export const BLOG_POST_DATES = {
+  "nofiltergpt-alternatives": "2026-11-23",
   "deepseek-uncensored": "2026-11-22",
   "grok-alternative": "2026-11-22",
   "claude-without-filters": "2026-11-22",

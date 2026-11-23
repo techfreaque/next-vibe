@@ -15,9 +15,11 @@ export const translations: typeof enTranslations = {
       title: "{{model}}: Preis, API & {{context}} Kontext | {{appName}}",
       titleShort: "{{model}}: Preis, API & {{context}} Kontext",
       titleMin: "{{model}}: Preis & API",
-      titleUncensored: "{{model}}: unzensierte KI, Preis & API | {{appName}}",
-      titleUncensoredShort: "{{model}}: unzensierte KI, Preis & API",
-      titleUncensoredMin: "{{model}} unzensiert: Preis & API",
+      titleUncensored:
+        "{{model}}: unzensierter KI-Chat online, Preis & API | {{appName}}",
+      titleUncensoredShort:
+        "{{model}}: unzensierter KI-Chat online, Preis & API",
+      titleUncensoredMin: "{{model}}: unzensierter KI-Chat",
       titleLegacy: "{{model}}: Preis & Kontext (veraltet) | {{appName}}",
       titleLegacyShort: "{{model}}: Preis & Kontext (veraltet)",
       description:
@@ -25,9 +27,9 @@ export const translations: typeof enTranslations = {
       descriptionFlat:
         "{{model}} von {{lab}}: ~{{credits}} Credits ({{money}}) pro Nachricht, {{context}} Kontext, Stufe {{tier}}. Gratis-Credits zum Start.",
       descriptionUncensored:
-        "{{model}} gehört zur unzensierten Stufe. {{input}} Input, {{output}} Output pro 1M Token, {{context}} Kontext. Chat oder API, einmaliger 18+-Check.",
+        "{{model}} im Browser chatten oder per API nutzen. {{input}} Input, {{output}} Output pro 1M Token, {{context}} Kontext. Gratis-Credits für Gäste, einmaliger 18+-Check.",
       descriptionUncensoredFlat:
-        "{{model}} gehört zur unzensierten Stufe. ~{{credits}} Credits ({{money}}) pro Nachricht, {{context}} Kontext. Chat oder API, einmaliger 18+-Check.",
+        "{{model}} im Browser chatten oder per API nutzen. ~{{credits}} Credits ({{money}}) pro Nachricht, {{context}} Kontext. Gratis-Credits für Gäste, einmaliger 18+-Check.",
       descriptionLegacy:
         "{{model}} von {{lab}} ist veraltet, Nachfolger: {{successor}}. {{context}} Kontext, ~{{credits}} Credits pro Nachricht. Daten, Preis und Nachfolger.",
       descriptionLegacyNoSuccessor:

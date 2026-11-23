@@ -59,10 +59,10 @@ import {
 import { scopedTranslation as compareScopedTranslation } from "../../compare/i18n";
 import {
   findOwnWorldviewRow,
-  loadUncensoredRows,
   UncensoredModelTable,
   type UncensoredRow,
 } from "../uncensored-rows";
+import { loadUncensoredRows } from "../uncensored-rows-data";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;

@@ -44,11 +44,8 @@ import {
 } from "../../_shared/marketing";
 import { LINK_CLASS } from "../../compare/_shared/compare-ui";
 import type { UsParams } from "../../compare/_shared/us-facts";
-import {
-  loadCheapestRowsByTier,
-  UncensoredModelTable,
-  type UncensoredRow,
-} from "../uncensored-rows";
+import { UncensoredModelTable, type UncensoredRow } from "../uncensored-rows";
+import { loadCheapestRowsByTier } from "../uncensored-rows-data";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;

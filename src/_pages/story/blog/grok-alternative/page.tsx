@@ -50,12 +50,11 @@ import {
 import type { UsParams } from "../../compare/_shared/us-facts";
 import {
   type ComparePair,
-  loadComparePairs,
-  loadModelRowsByIds,
   pickRow,
   UncensoredModelTable,
   type UncensoredRow,
 } from "../uncensored-rows";
+import { loadComparePairs, loadModelRowsByIds } from "../uncensored-rows-data";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;

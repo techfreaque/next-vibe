@@ -62,11 +62,8 @@ import {
 } from "../../compare/_shared/platforms";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import { scopedTranslation as compareScopedTranslation } from "../../compare/i18n";
-import {
-  loadUncensoredRows,
-  UncensoredModelTable,
-  type UncensoredRow,
-} from "../uncensored-rows";
+import { UncensoredModelTable, type UncensoredRow } from "../uncensored-rows";
+import { loadUncensoredRows } from "../uncensored-rows-data";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
