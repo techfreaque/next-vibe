@@ -20,7 +20,6 @@ import type { Subprocess, SyncSubprocess } from "bun";
 import type { OutputBundle, OutputOptions, RolldownOptions } from "rolldown";
 import {
   type BuildOptions,
-  type EnvironmentModuleGraph,
   type EnvironmentModuleNode,
   type InlineConfig,
   isRunnableDevEnvironment,
@@ -585,32 +584,22 @@ function serverOnlyTracePlugin(
 // Typical definition/repository edits have closures in the hundreds.
 const SSR_EVICT_LIMIT = 2000;
 
-// Walk the importer graph recursively and collect every module that transitively
-// depends on the changed file. Returns false if the visited set exceeds SSR_EVICT_LIMIT
-// (caller should fall back to full clear).
-function invalidateWithImporters(
-  graph: EnvironmentModuleGraph,
-  startId: string,
+// Collect the runtime eviction scope separately from Vite's transform
+// invalidation. Importers can reuse their soft-invalidated transforms.
+function collectImporterIds(
+  mod: EnvironmentModuleNode,
   visited: Set<string>,
-  invalidated = new Set<EnvironmentModuleNode>(),
 ): boolean {
-  if (visited.has(startId)) {
+  if (!mod.id || visited.has(mod.id)) {
     return true;
   }
   if (visited.size >= SSR_EVICT_LIMIT) {
     return false;
   }
-  visited.add(startId);
-  const mod = graph.getModuleById(startId);
-  if (!mod) {
-    return true;
-  }
-  graph.invalidateModule(mod, invalidated);
+  visited.add(mod.id);
   for (const importer of mod.importers) {
-    if (importer.id) {
-      if (!invalidateWithImporters(graph, importer.id, visited, invalidated)) {
-        return false;
-      }
+    if (!collectImporterIds(importer, visited)) {
+      return false;
     }
   }
   return true;
@@ -1675,23 +1664,6 @@ class ViteCompiler {
         },
       };
 
-      // Coalesces bursts of edits into ONE nitro reload instead of one per
-      // edit. Nitro's dev worker reload() clears its ENTIRE module cache and
-      // re-imports the server entry fresh over HTTP from this Vite server; a
-      // second edit landing while that re-import is still in flight
-      // invalidates the very modules the in-flight import is mid-fetching,
-      // so the fetch gets a genuine 404 that nitro renders as the app's
-      // not-found page. See `ssr-clear-on-hmr`'s handleHotUpdate below.
-      let nitroFullReloadTimer: ReturnType<typeof setTimeout> | undefined;
-      // Files changed since the last nitro reload signal fired. Each entry is
-      // sent to the worker as a `full-reload` with `triggeredBy` set, so the
-      // worker's scoped `invalidateFile(file)` path runs (drop only that file
-      // and its importers) instead of a full `evaluatedModules.clear()`. A
-      // structural change (a file whose closure exceeds SSR_EVICT_LIMIT, or an
-      // added/removed module) sets `nitroReloadAll` to force the full clear.
-      const nitroPendingFiles = new Set<string>();
-      let nitroReloadAll = false;
-
       // The nitro dev worker is a separate Bun child process whose srvx
       // listener is a raw `Bun.serve` without an idleTimeout — Bun aborts any
       // response that streams no bytes for 10s, which the first cold-cache
@@ -1791,17 +1763,16 @@ class ViteCompiler {
                       if (!file.endsWith("/widget.tsx")) {
                         return;
                       }
-                      // Invalidate the changed widget in the SSR module graph, then
-                      // full-clear evaluatedModules (surgical per-module eviction
-                      // causes TDZ errors — see ssr-clear-on-hmr comment).
+                      // This fallback watcher operates outside Vite's change
+                      // hook, so the in-process runner needs host invalidation too.
                       const ssrEnv = srv.environments?.["ssr"];
                       if (ssrEnv && isRunnableDevEnvironment(ssrEnv)) {
+                        const graph = ssrEnv.moduleGraph;
+                        graph.onFileChange(file);
                         const ssrVisited = new Set<string>();
-                        const scoped = invalidateWithImporters(
-                          ssrEnv.moduleGraph,
-                          file,
-                          ssrVisited,
-                        );
+                        const scoped = [
+                          ...(graph.getModulesByFile(file) ?? []),
+                        ].every((mod) => collectImporterIds(mod, ssrVisited));
                         if (scoped) {
                           evictSsrModules(
                             ssrEnv.runner.evaluatedModules,
@@ -2257,178 +2228,84 @@ class ViteCompiler {
                 },
               } as never);
             },
-            handleHotUpdate({
-              file: changedFile,
-              modules,
-              server: viteServer,
-            }) {
-              const sourceFile = changedFile.replaceAll("\\", "/");
-              if (
-                !sourceFile.includes("/src/") ||
-                sourceFile.endsWith(".css")
-              ) {
-                return;
-              }
-              const srcModules = modules.filter((m) => m.id?.includes("/src/"));
-              const changedFiles = srcModules
-                .map((m) => m.id?.replace(/^.*\/src\//, "src/") ?? m.id)
-                .join(", ");
-              const hmrMsg = fmtVite(
-                `HMR update: ${changedFiles || sourceFile.replace(/^.*\/src\//, "src/")}`,
-              );
-              process.stdout.write(`${hmrMsg}\n`);
-              serverFileLog(hmrMsg);
-
-              // Predict client full reloads: if any importer path from a
-              // changed module escapes to a graph root without an accept
-              // boundary, Vite broadcasts full-reload to EVERY open tab —
-              // regardless of what page they show. Log the escaping chain so
-              // "why did my page reload" is answerable from the dev log.
-              const clientModules =
-                viteServer.environments["client"]?.moduleGraph.getModulesByFile(
-                  changedFile,
-                );
-              const clientVisited = new Set<EnvironmentModuleNode>();
-              for (const mod of clientModules ?? []) {
-                const escapePath = findFullReloadPath(mod, clientVisited);
-                if (escapePath) {
-                  const reloadMsg = fmtVite(
-                    `full-reload likely — unaccepted chain: ${escapePath.join(" → ")}`,
-                  );
-                  process.stdout.write(`${reloadMsg}\n`);
-                  serverFileLog(reloadMsg);
-                  break;
+            hotUpdate: {
+              order: "post",
+              handler({ file, modules, type }) {
+                const sourceFile = file.replaceAll("\\", "/");
+                if (
+                  !sourceFile.includes("/src/") ||
+                  sourceFile.endsWith(".css")
+                ) {
+                  return;
                 }
-              }
-
-              // SSR: invalidate the changed modules in the module graph (marks
-              // them stale for Vite's dependency tracking), then always do a
-              // full evaluatedModules.clear().
-              //
-              // Surgical per-module eviction from evaluatedModules causes TDZ
-              // errors: an importer that was NOT evicted still holds a reference
-              // to the old namespace object of the evicted module. When the
-              // evicted module re-executes, its top-level bindings (the Vite
-              // __vite_ssr_import_N__ consts) are in TDZ until the module
-              // completes — but the still-alive importer tries to call into
-              // them before that. Full clear avoids this by forcing all SSR
-              // modules to re-evaluate together on the next request.
-              //
-              // Client invalidation is intentionally NOT done here — Vite's own
-              // HMR propagation handles it automatically from the `modules` list.
-              const ssrEnv = viteServer.environments?.["ssr"];
-              if (ssrEnv) {
-                const ssrVisited = new Set<string>();
-                let scoped = true;
-                for (const mod of ssrEnv.moduleGraph.getModulesByFile(
-                  sourceFile,
-                ) ?? []) {
-                  if (mod.id) {
-                    if (
-                      !invalidateWithImporters(
-                        ssrEnv.moduleGraph,
-                        mod.id,
-                        ssrVisited,
-                      )
-                    ) {
-                      scoped = false;
-                      break;
-                    }
-                  }
-                }
-                if (isRunnableDevEnvironment(ssrEnv)) {
-                  if (scoped) {
-                    evictSsrModules(ssrEnv.runner.evaluatedModules, ssrVisited);
-                  } else {
-                    ssrEnv.runner.evaluatedModules.clear();
-                  }
-                }
-              }
-              // The nitro dev worker — the process that actually SSRs the
-              // site — keeps its own module cache in ANOTHER PROCESS. Without
-              // eviction it serves the pre-edit HTML for every page loaded
-              // after a save: the client hydrates new-against-old (hydration
-              // mismatch in the console) and a reload shortly after an edit
-              // shows stale content. Invalidate the graph and tell the WORKER
-              // (its hot channel does not reach any browser tab) to drop its
-              // runner cache — it re-imports fresh on the next request.
-              for (const [envName, env] of Object.entries(
-                viteServer.environments ?? {},
-              )) {
-                if (envName === "client" || envName === "ssr" || !env) {
-                  continue;
-                }
-                if (isRunnableDevEnvironment(env)) {
-                  env.runner.evaluatedModules.clear();
-                  continue;
-                }
-                // Scoped nitro invalidation. The nitro dev worker is the
-                // process that SSRs real page loads (and the reload-AFTER-edit
-                // the user feels). Its reload() takes a scoped path when the
-                // `full-reload` message carries `triggeredBy`: it drops only
-                // that file and its importers (`invalidateFile`) and keeps the
-                // rest of the evaluated graph warm, so the next page render
-                // re-evaluates a small closure instead of the whole app cold
-                // (a bare `full-reload` with no `triggeredBy` makes the worker
-                // `evaluatedModules.clear()` everything — the slow path that
-                // turned every edit into a 25-96s cold reload).
-                //
-                // Mirror that scoping on the host graph: invalidate only the
-                // changed modules' importer closure (bounded by
-                // SSR_EVICT_LIMIT) so stale transforms aren't re-served, and
-                // fall back to a full clear + bare full-reload only when the
-                // closure is too large (an edit to a project-wide hub, where a
-                // clear is equivalent and cheaper than walking the graph).
-                const nitroVisited = new Set<string>();
-                let nitroScoped = true;
-                const changedModules =
+                const displayFile = sourceFile.replace(/^.*\/src\//, "src/");
+                const env = this.environment;
+                const fileModules =
                   env.moduleGraph.getModulesByFile(sourceFile);
-                if (!changedModules?.size) {
-                  continue;
-                }
-                for (const mod of changedModules) {
-                  if (mod.id) {
-                    nitroPendingFiles.add(sourceFile);
-                    if (
-                      !invalidateWithImporters(
-                        env.moduleGraph,
-                        mod.id,
-                        nitroVisited,
-                      )
-                    ) {
-                      nitroScoped = false;
+                if (env.config.consumer === "client") {
+                  const changedFiles = modules
+                    .flatMap((mod) =>
+                      mod.id?.includes("/src/")
+                        ? [mod.id.replace(/^.*\/src\//, "src/")]
+                        : [],
+                    )
+                    .join(", ");
+                  const message = fmtVite(
+                    `HMR update: ${changedFiles || displayFile}`,
+                  );
+                  process.stdout.write(`${message}\n`);
+                  serverFileLog(message);
+
+                  const visited = new Set<EnvironmentModuleNode>();
+                  for (const mod of fileModules ?? []) {
+                    const escapePath = findFullReloadPath(mod, visited);
+                    if (escapePath) {
+                      const reloadMsg = fmtVite(
+                        `full-reload likely, unaccepted chain: ${escapePath.join(" → ")}`,
+                      );
+                      process.stdout.write(`${reloadMsg}\n`);
+                      serverFileLog(reloadMsg);
                       break;
                     }
                   }
+                  return;
                 }
-                if (!nitroScoped) {
-                  nitroReloadAll = true;
-                  env.moduleGraph.invalidateAll();
+                if (!fileModules?.size) {
+                  return;
                 }
-                if (nitroFullReloadTimer) {
-                  clearTimeout(nitroFullReloadTimer);
+
+                // Vite invalidates changes before the update hook. Structural
+                // events bypass that step, so invalidate their transforms here.
+                if (type !== "update") {
+                  env.moduleGraph.onFileChange(sourceFile);
                 }
-                nitroFullReloadTimer = setTimeout(() => {
-                  nitroFullReloadTimer = undefined;
-                  if (nitroReloadAll || nitroPendingFiles.size === 0) {
-                    nitroReloadAll = false;
-                    nitroPendingFiles.clear();
-                    env.hot.send({ type: "full-reload" });
-                    serverFileLog(
-                      `[ssr-evict] ${envName}: fetchable, sent full-reload (full clear)`,
-                    );
-                    return;
+                const visited = new Set<string>();
+                const scoped = [...fileModules].every((mod) =>
+                  collectImporterIds(mod, visited),
+                );
+                if (isRunnableDevEnvironment(env)) {
+                  const evaluated = env.runner.evaluatedModules;
+                  if (scoped) {
+                    evictSsrModules(evaluated, visited);
+                  } else {
+                    evaluated.clear();
                   }
-                  const files = [...nitroPendingFiles];
-                  nitroPendingFiles.clear();
-                  for (const file of files) {
-                    env.hot.send({ type: "full-reload", triggeredBy: file });
-                  }
-                  serverFileLog(
-                    `[ssr-evict] ${envName}: fetchable, sent scoped reload for ${files.length} file(s)`,
-                  );
-                }, 150);
-              }
+                  return;
+                }
+
+                // Nitro can own the environment named "ssr". The worker's
+                // runner cache needs its own eviction even when the client
+                // accepts the edit. Nitro serializes and coalesces reloads.
+                env.hot.send(
+                  scoped
+                    ? { type: "full-reload", triggeredBy: sourceFile }
+                    : { type: "full-reload" },
+                );
+                const reloadMessage = scoped
+                  ? `sent scoped reload for ${displayFile}`
+                  : "sent full reload";
+                serverFileLog(`[ssr-evict] ${env.name}: ${reloadMessage}`);
+              },
             },
           } as Plugin,
           // Nitro's ctx._initialized guard prevents re-initialization when Vite
