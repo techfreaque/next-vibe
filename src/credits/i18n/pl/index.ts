@@ -690,7 +690,7 @@ export const translations: typeof enTranslations = {
   email: {
     creditPack: {
       user: {
-        subject: "Twój pakiet kredytów jest gotowy - {{appName}}",
+        subject: "Twój pakiet kredytów w {{appName}} jest gotowy",
         title: "Kredyty zostały dodane do Twojego konta",
         previewText: "{{credits}} kredytów zostało dodanych do Twojego konta",
         greeting: "Cześć {{privateName}},",
@@ -700,7 +700,7 @@ export const translations: typeof enTranslations = {
       },
       admin: {
         subject:
-          "[{{appName}}] Zakupiono pakiet kredytów - {{credits}} kredytów",
+          "[{{appName}}] Zakupiono pakiet kredytów: {{credits}} kredytów",
         title: "Zakup pakietu kredytów",
         preview: "Użytkownik zakupił pakiet kredytów",
         body: "Użytkownik zakupił pakiet kredytów.",

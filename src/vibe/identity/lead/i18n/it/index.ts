@@ -5198,10 +5198,12 @@ export const translations: typeof enTranslations = {
   enums: {
     engagementTypes: {
       emailOpen: "E-mail aperta",
-      emailClick: "Email Cliccato",
+      emailClick: "E-mail cliccata",
       websiteVisit: "Visita del sito web",
       formSubmit: "Sottomissione del modulo",
-      leadAttribution: "Attribuzione del piombo",
+      leadAttribution: "Attribuzione del lead",
+      creditWall: "Crediti esauriti",
+      consentDeclined: "Consenso 18+ rifiutato",
     },
     leadStatus: {
       new: "Nuovo",

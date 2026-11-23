@@ -28,6 +28,10 @@ export const translations: typeof enTranslations = {
       previousSignupSteps: "Pasos de registro en el periodo anterior",
       signupSegments: "Pasos de registro por segmento",
       signupTrackedSince: "Pasos de registro registrados desde",
+      wallSteps: "Barreras de conversión en el periodo",
+      previousWallSteps: "Barreras de conversión en el periodo anterior",
+      wallSegments: "Barreras de conversión por segmento",
+      wallTrackedSince: "Barreras de conversión medidas desde",
     },
     errors: {
       unauthorized: {
@@ -70,6 +74,19 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    wallTitle: "Barreras de conversión",
+    wallSubtitle:
+      "Personas frenadas en una barrera, con la fecha en que ocurrió. Cada una cuenta una vez por barrera.",
+    wallTrackedHint: "Medido desde el {{date}}: antes no se registraban.",
+    creditWallGuests: "Invitados sin créditos",
+    creditWallAccounts: "Cuentas sin créditos",
+    consentDeclined: "Consentimiento +18 rechazado",
+    creditWallHint: "Envío rechazado, se mostró la tarjeta sin créditos",
+    consentDeclinedHint: "Cerró el diálogo sin aceptar",
+    wallSegmentsTitle: "Barreras por segmento",
+    wallSegmentsSubtitle:
+      "Las mismas barreras divididas por la dimensión elegida.",
+    wallEmpty: "Nadie chocó con una barrera en este periodo.",
     signupTitle: "Confirmación de registro",
     signupSubtitle:
       "Prospectos por paso, fechados cuando ocurrió el paso. La caída muestra dónde se pierden los registros.",

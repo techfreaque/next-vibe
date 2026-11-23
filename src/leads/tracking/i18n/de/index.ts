@@ -274,6 +274,8 @@ export const translations: typeof enTranslations = {
       websiteVisit: "Website-Besuch",
       formSubmit: "Formular abgeschickt",
       leadAttribution: "Lead-Zuordnung",
+      creditWall: "Credits aufgebraucht",
+      consentDeclined: "18+-Bestätigung abgelehnt",
     },
     emailCampaignStage: {
       notStarted: "Nicht gestartet",

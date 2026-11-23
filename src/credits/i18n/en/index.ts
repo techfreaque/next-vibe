@@ -684,7 +684,7 @@ export const translations = {
   email: {
     creditPack: {
       user: {
-        subject: "Your credit pack is ready - {{appName}}",
+        subject: "Your {{appName}} credit pack is ready",
         title: "Credits added to your account",
         previewText: "{{credits}} credits have been added to your account",
         greeting: "Hi {{privateName}},",
@@ -693,7 +693,7 @@ export const translations = {
         signoff: "Thank you for your purchase!\n\nThe {{appName}} Team",
       },
       admin: {
-        subject: "[{{appName}}] Credit pack purchased - {{credits}} credits",
+        subject: "[{{appName}}] Credit pack purchased: {{credits}} credits",
         title: "Credit Pack Purchase",
         preview: "A user purchased a credit pack",
         body: "A user has purchased a credit pack.",

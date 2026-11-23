@@ -2536,10 +2536,10 @@ export const translations: typeof enTranslations = {
           description:
             "Nuestros términos y condiciones respetan tu libertad y tu privacidad.",
           termsLink: "términos",
-          conditionsLink: "condiciones",
-          descriptionPrefix: "Nuestra",
-          descriptionAnd: "y",
-          descriptionSuffix: "respeta tu libertad y privacidad.",
+          conditionsLink: "política de privacidad",
+          descriptionPrefix: "Nuestros",
+          descriptionAnd: "y nuestra",
+          descriptionSuffix: "respetan tu libertad.",
           validation: {
             required: "Para continuar, acepta los términos y condiciones",
           },

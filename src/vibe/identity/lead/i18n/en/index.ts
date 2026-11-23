@@ -5043,6 +5043,8 @@ export const translations = {
       websiteVisit: "Website Visit",
       formSubmit: "Form Submission",
       leadAttribution: "Lead Attribution",
+      creditWall: "Out of credits",
+      consentDeclined: "18+ consent declined",
     },
     leadStatus: {
       new: "New",

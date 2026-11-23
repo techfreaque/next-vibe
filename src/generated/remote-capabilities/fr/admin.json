@@ -103663,7 +103663,9 @@
                               "EMAIL_CLICK": "enums.engagementTypes.emailClick",
                               "WEBSITE_VISIT": "enums.engagementTypes.websiteVisit",
                               "FORM_SUBMIT": "enums.engagementTypes.formSubmit",
-                              "LEAD_ATTRIBUTION": "enums.engagementTypes.leadAttribution"
+                              "LEAD_ATTRIBUTION": "enums.engagementTypes.leadAttribution",
+                              "CREDIT_WALL": "enums.engagementTypes.creditWall",
+                              "CONSENT_DECLINED": "enums.engagementTypes.consentDeclined"
                             }
                           },
                           "type": "enum",
@@ -103672,14 +103674,18 @@
                             "EMAIL_CLICK": "enums.engagementTypes.emailClick",
                             "WEBSITE_VISIT": "enums.engagementTypes.websiteVisit",
                             "FORM_SUBMIT": "enums.engagementTypes.formSubmit",
-                            "LEAD_ATTRIBUTION": "enums.engagementTypes.leadAttribution"
+                            "LEAD_ATTRIBUTION": "enums.engagementTypes.leadAttribution",
+                            "CREDIT_WALL": "enums.engagementTypes.creditWall",
+                            "CONSENT_DECLINED": "enums.engagementTypes.consentDeclined"
                           },
                           "options": [
                             "enums.engagementTypes.emailOpen",
                             "enums.engagementTypes.emailClick",
                             "enums.engagementTypes.websiteVisit",
                             "enums.engagementTypes.formSubmit",
-                            "enums.engagementTypes.leadAttribution"
+                            "enums.engagementTypes.leadAttribution",
+                            "enums.engagementTypes.creditWall",
+                            "enums.engagementTypes.consentDeclined"
                           ]
                         }
                       },
@@ -118873,6 +118879,270 @@
         "signupTrackedSince": {
           "type": "text",
           "label": "Étapes d'inscription suivies depuis",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "wallSteps": {
+          "type": "text",
+          "label": "Blocages de conversion sur la période",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "key": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "value": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "key": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  "value": {
+                    "def": {
+                      "type": "number",
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  }
+                }
+              },
+              "type": "object"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "previousWallSteps": {
+          "type": "text",
+          "label": "Blocages de conversion sur la période précédente",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "key": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "value": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "key": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "value": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "wallSegments": {
+          "type": "text",
+          "label": "Blocages de conversion par segment",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "key": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
+                    },
+                    "metrics": {
+                      "def": {
+                        "type": "record",
+                        "keyType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "valueType": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      },
+                      "type": "record",
+                      "keyType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "valueType": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "key": {
+                    "def": {
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    },
+                    "type": "nullable"
+                  },
+                  "metrics": {
+                    "def": {
+                      "type": "record",
+                      "keyType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "valueType": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    },
+                    "type": "record",
+                    "keyType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "valueType": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  }
+                }
+              },
+              "type": "object"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "wallTrackedSince": {
+          "type": "text",
+          "label": "Blocages de conversion suivis depuis",
           "schema": {
             "def": {
               "type": "nullable",

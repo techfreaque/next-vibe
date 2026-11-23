@@ -49,7 +49,9 @@ describe("credit pack price", () => {
   test("pricing params show the Polish pack as 19 zł", () => {
     expect(getPricingParams("pl-PL").packPrice).toBe("19 zł");
     expect(getPricingParams("en-US").packPrice).toBe("$5");
-    expect(getPricingParams("de-DE").packPrice).toBe("€5");
+    expect(getPricingParams("de-DE").packPrice).toBe("5 €");
     expect(getPricingParams("fr-FR").packPrice).toBe("5 €");
+    expect(getPricingParams("es-ES").packPrice).toBe("5 €");
+    expect(getPricingParams("it-IT").packPrice).toBe("5 €");
   });
 });

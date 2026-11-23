@@ -5143,6 +5143,8 @@ export const translations: typeof enTranslations = {
       websiteVisit: "Visite du site",
       formSubmit: "Envoi de formulaire",
       leadAttribution: "Attribution du lead",
+      creditWall: "Crédits épuisés",
+      consentDeclined: "Consentement 18+ refusé",
     },
     leadStatus: {
       new: "Nouveau",

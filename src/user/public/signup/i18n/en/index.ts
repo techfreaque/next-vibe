@@ -19,7 +19,7 @@ export const translations = {
     reminderSent: "Reminder sent",
   },
   reminder: {
-    subject: "Your unbottled.ai account is one click away",
+    subject: "Your {{appName}} account is one click away",
     hint: "You started signing up but never confirmed your email. Confirm now and get {{credits}} free credits every month. This code and the button below work for 24 hours and replace the ones from the first email.",
     button: "Confirm and sign in",
     ignore:
@@ -221,12 +221,12 @@ export const translations = {
     },
     acceptTerms: {
       label: "I accept the terms",
-      description: "Our terms and conditions respect your freedom and privacy.",
+      description: "Our terms and privacy policy respect your freedom.",
       termsLink: "terms",
-      conditionsLink: "conditions",
+      conditionsLink: "privacy policy",
       descriptionPrefix: "Our",
       descriptionAnd: "and",
-      descriptionSuffix: "respect your freedom and privacy.",
+      descriptionSuffix: "respect your freedom.",
       validation: {
         required: "You must accept the terms and conditions to continue",
       },
@@ -251,7 +251,7 @@ export const translations = {
         "Your signup supports the creator of this skill with a +5% bonus on your subscriptions.",
       selectorTitle: "Support a Creator",
       selectorDescription:
-        "You added skills by independent creators to your favorites. Pick one to support - they get +5% from your subscriptions. You can change this anytime.",
+        "You added skills by independent creators to your favorites. Pick one to support: they get +5% of your subscriptions. You can change this anytime.",
       selectorNone: "None (skip)",
     },
     localFavorites: {
@@ -470,7 +470,7 @@ export const translations = {
   },
   admin_notification: {
     title: "New User Signup",
-    subject: "New User Signup - {{privateName}}",
+    subject: "New user signup: {{privateName}}",
     preview: "New user {{privateName}} has signed up",
     message: "A new user has signed up for {{appName}}",
     privateName: "Private Name",

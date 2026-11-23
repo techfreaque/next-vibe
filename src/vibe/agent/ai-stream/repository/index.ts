@@ -835,16 +835,18 @@ export class AiStreamRepository {
     const { userId, leadId, ipAddress } =
       AiStreamRepository.extractUserIdentifiers(user, request, awaitResult);
 
-    // Growth funnel: a person's first sent chat message (write-once per journey).
     // Agent-driven turns (sub-agents, revival, relay, headless, awaited) are not people.
-    if (
-      data.operation === "send" &&
-      data.role === ChatMessageRole.USER &&
+    const isPersonTurn =
       !awaitResult &&
       !isRevival &&
       !relayReceiver &&
       !headlessIntake &&
-      !subAgentDepth
+      !subAgentDepth;
+    // Growth funnel: a person's first sent chat message (write-once per journey).
+    if (
+      data.operation === "send" &&
+      data.role === ChatMessageRole.USER &&
+      isPersonTurn
     ) {
       void (async (): Promise<void> => {
         const { GrowthJourneyRepository } =
@@ -1101,6 +1103,24 @@ export class AiStreamRepository {
         userKind: user.isPublic ? "public" : "user",
         isCron: Boolean(cronTaskId),
       });
+      // Conversion wall (admin funnel): a person was refused for credits.
+      // The client's own guard reports the refusals it catches before
+      // sending; this is the rest (stale balance). Fire-and-forget.
+      if (
+        isPersonTurn &&
+        !cronTaskId &&
+        setupResult.errorType.errorKey ===
+          ErrorResponseTypes.PAYMENT_REQUIRED.errorKey
+      ) {
+        void (async (): Promise<void> => {
+          const { recordServerCreditWall } =
+            await import("@/leads/tracking/wall-events");
+          await recordServerCreditWall(
+            { leadId, isPublic: user.isPublic, model: data.model },
+            logger,
+          );
+        })();
+      }
       await emitSetupError({ setupResult, data, user, logger, cronTaskId });
       return setupResult;
     }

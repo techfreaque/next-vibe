@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
       fields: {
         planId: {
           label: "Plan de suscripción",
-          description: "Seleccione el plan de suscripción",
+          description: "Elige el plan",
           placeholder: "Elige un plan",
         },
         billingInterval: {
@@ -38,7 +38,7 @@ export const translations: typeof enTranslations = {
         metadata: {
           label: "Metadatos",
           description: "Metadatos adicionales de la sesión de pago",
-          placeholder: "Ingrese metadatos como JSON",
+          placeholder: "Introduce metadatos en JSON",
         },
       },
     },
@@ -220,14 +220,14 @@ export const translations: typeof enTranslations = {
     description: "Recuperar los datos de suscripción actuales",
     form: {
       title: "Detalles de la suscripción",
-      description: "Vea su información de suscripción actual",
+      description: "Consulta los datos de tu suscripción actual",
     },
   },
 
   // POST endpoint
   post: {
     title: "Crear suscripción",
-    titleShort: "Crear sesión",
+    titleShort: "Suscribirse",
     description: "Crear una nueva suscripción",
     form: {
       title: "Creación de suscripciones",
@@ -236,17 +236,15 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Entrada inválida",
-        description:
-          "Por favor, compruebe sus datos de suscripción e inténtelo de nuevo",
+        description: "Revisa los datos de tu suscripción y vuelve a intentarlo",
       },
       network: {
         title: "Error de conexión",
-        description:
-          "Incapaz de conectarse. Por favor, compruebe su conexión a Internet",
+        description: "Sin conexión. Revisa tu conexión a Internet",
       },
       unauthorized: {
         title: "Inicia sesión para continuar",
-        description: "Por favor, inicie sesión para crear una suscripción",
+        description: "Inicia sesión para suscribirte",
       },
       forbidden: {
         title: "Acceso denegado",
@@ -254,82 +252,77 @@ export const translations: typeof enTranslations = {
       },
       notFound: {
         title: "Plan no encontrado",
-        description:
-          "El plan de suscripción que seleccionó no pudo ser encontrado",
+        description: "No encontramos el plan que elegiste",
       },
       server: {
-        title: "Algo que estaba mal.",
-        description:
-          "No podíamos crear tu suscripción. Por favor, inténtelo de nuevo.",
+        title: "Algo salió mal",
+        description: "No pudimos crear tu suscripción. Vuelve a intentarlo.",
       },
       unknown: {
         title: "Error inesperado",
-        description: "Algo inesperado sucedió. Por favor, inténtelo de nuevo.",
+        description: "Algo salió mal. Vuelve a intentarlo.",
       },
       unsavedChanges: {
         title: "Cambios sin guardar",
-        description: "Tienes cambios que no han sido salvados",
+        description: "Tienes cambios sin guardar",
       },
       conflict: {
-        title: "Existencias de suscripción",
+        title: "Ya tienes una suscripción",
         description: "Ya tienes una suscripción activa",
       },
     },
     success: {
       title: "Suscripción activada",
-      description: "Su suscripción se ha activado con éxito",
+      description: "Tu suscripción está activa",
     },
   },
 
   // PUT endpoint
   put: {
     title: "Actualizar suscripción",
-    titleShort: "Actualizar Sub",
+    titleShort: "Cambiar plan",
     description: "Actualizar la suscripción existente",
     form: {
       title: "Actualización de la suscripción",
-      description:
-        "Actualice su plan de suscripción o intervalo de facturación",
+      description: "Cambia tu plan o la frecuencia de facturación",
     },
     errors: {
       validation: {
         title: "Actualización inválida",
-        description: "Por favor, compruebe sus cambios e inténtelo de nuevo",
+        description: "Revisa tus cambios y vuelve a intentarlo",
       },
       network: {
         title: "Error de conexión",
-        description:
-          "Incapaz de salvar tus cambios. Por favor, inténtelo de nuevo.",
+        description: "No pudimos guardar tus cambios. Vuelve a intentarlo.",
       },
       unauthorized: {
         title: "Inicia sesión para continuar",
-        description: "Inicie sesión para actualizar su suscripción",
+        description: "Inicia sesión para cambiar tu suscripción",
       },
       forbidden: {
         title: "Acceso denegado",
-        description: "No tiene permiso para actualizar esta suscripción",
+        description: "No tienes permiso para cambiar esta suscripción",
       },
       notFound: {
-        title: "Suscripción No encontrada",
-        description: "No pudimos encontrar su suscripción para actualizar",
+        title: "Suscripción no encontrada",
+        description: "No encontramos tu suscripción",
       },
       server: {
-        title: "Actualización Fallada",
-        description:
-          "No podíamos salvar tus cambios. Por favor, inténtelo de nuevo.",
+        title: "No se pudo actualizar",
+        description: "No pudimos guardar tus cambios. Vuelve a intentarlo.",
       },
       unknown: {
         title: "Error inesperado",
-        description: "Algo inesperado sucedió. Por favor, inténtelo de nuevo.",
+        description: "Algo salió mal. Vuelve a intentarlo.",
       },
       unsavedChanges: {
         title: "Cambios sin guardar",
-        description: "Tienes cambios que no han sido salvados",
+        description: "Tienes cambios sin guardar",
       },
       conflict: {
-        title: "Actualización de conflictos",
+        title: "Conflicto al actualizar",
         description:
-          "Tu suscripción ha cambiado. Por favor, refresca y prueba de nuevo",
+          "Tu suscripción cambió mientras tanto. Recarga la página y vuelve a intentarlo",
       },
     },
     submit: {
@@ -337,62 +330,59 @@ export const translations: typeof enTranslations = {
       loading: "Actualizando...",
     },
     success: {
-      title: "Subscripción Actualizada",
-      description: "Su suscripción ha sido actualizada con éxito",
+      title: "Suscripción actualizada",
+      description: "Tu suscripción está actualizada",
     },
   },
 
   // DELETE endpoint
   delete: {
     title: "Cancelar suscripción",
-    titleShort: "Cancelar Sub",
+    titleShort: "Cancelar",
     description: "Cancela tu suscripción",
     warning:
       "Si cancelas, tu acceso termina al final del período de facturación.",
     form: {
       title: "Cancelación de la suscripción",
-      description: "Cancele su suscripción con ajustes opcionales",
+      description: "Cancela tu suscripción, con ajustes opcionales",
     },
     errors: {
       validation: {
         title: "Solicitud inválida",
-        description:
-          "Por favor, compruebe sus datos de cancelación e inténtelo de nuevo",
+        description: "Revisa los datos de la cancelación y vuelve a intentarlo",
       },
       network: {
         title: "Error de conexión",
-        description:
-          "Incapaz de procesar la cancelación. Por favor, inténtelo de nuevo.",
+        description: "No pudimos procesar la cancelación. Vuelve a intentarlo.",
       },
       unauthorized: {
         title: "Inicia sesión para continuar",
-        description: "Inicie sesión para cancelar su suscripción",
+        description: "Inicia sesión para cancelar tu suscripción",
       },
       forbidden: {
         title: "Acceso denegado",
         description: "No tienes permiso para cancelar esta suscripción",
       },
       notFound: {
-        title: "Suscripción No encontrada",
-        description: "No pudimos encontrar su suscripción para cancelar",
+        title: "Suscripción no encontrada",
+        description: "No encontramos tu suscripción",
       },
       server: {
         title: "Cancelación fallida",
-        description:
-          "No podíamos cancelar tu suscripción. Por favor, inténtelo de nuevo.",
+        description: "No pudimos cancelar tu suscripción. Vuelve a intentarlo.",
       },
       unknown: {
         title: "Error inesperado",
-        description: "Algo inesperado sucedió. Por favor, inténtelo de nuevo.",
+        description: "Algo salió mal. Vuelve a intentarlo.",
       },
       unsavedChanges: {
         title: "Cambios sin guardar",
-        description: "Tienes cambios que no han sido salvados",
+        description: "Tienes cambios sin guardar",
       },
       conflict: {
         title: "Conflicto de cancelación",
         description:
-          "Su estado de suscripción ha cambiado. Por favor, refresca y prueba de nuevo",
+          "El estado de tu suscripción cambió. Recarga la página y vuelve a intentarlo",
       },
     },
     submit: {
@@ -401,7 +391,7 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Suscripción cancelada",
-      description: "Su suscripción ha sido cancelada con éxito",
+      description: "Tu suscripción está cancelada",
     },
   },
 
@@ -410,8 +400,8 @@ export const translations: typeof enTranslations = {
     fields: {
       planId: {
         label: "Plan de suscripción",
-        description: "Seleccione su plan de suscripción",
-        placeholder: "Elija el plan",
+        description: "Elige tu plan",
+        placeholder: "Elige un plan",
       },
       billingInterval: {
         label: "Frecuencia de facturación",
@@ -420,20 +410,20 @@ export const translations: typeof enTranslations = {
       },
       provider: {
         label: "Proveedor de pagos",
-        description: "Seleccione su proveedor de pago",
+        description: "Elige cómo pagar",
       },
       catalogProductId: {
-        label: "Catálogo Producto",
+        label: "Producto del catálogo",
         description: "Enlace a un producto de catálogo para esta suscripción",
       },
       cancelAtPeriodEnd: {
         label: "Cancelar al final del período",
-        description: "Cancelación de suscripción al final del período actual",
+        description: "Cancela la suscripción al final del período actual",
       },
       reason: {
-        label: "Razón de cancelación",
-        description: "Por favor, proporcione una razón para la cancelación",
-        placeholder: "Ingrese la razón de cancelación",
+        label: "Motivo de la cancelación",
+        description: "Cuéntanos por qué cancelas",
+        placeholder: "Escribe el motivo",
       },
     },
   },
@@ -441,19 +431,19 @@ export const translations: typeof enTranslations = {
   // Response fields
   response: {
     checkoutUrl: "URL de la página de pago",
-    sessionId: "Período de sesiones ID",
+    sessionId: "ID de sesión",
     hasSubscription: "Suscripción",
     id: "Suscripción ID",
     userId: "Usuario ID",
     status: "Estado de la suscripción",
-    planId: "Plan ID",
+    planId: "ID del plan",
     billingInterval: "Frecuencia de facturación",
-    currentPeriodStart: "Período actual Inicio",
+    currentPeriodStart: "Inicio del período actual",
     currentPeriodEnd: "Período actual",
     cancelAtPeriodEnd: "Cancelar al final del período",
     cancelAt: "Cancelar",
     canceledAt: "Cancelado",
-    endedAt: "Ended At",
+    endedAt: "Finalizada el",
     trialStart: "Fecha de inicio del juicio",
     trialEnd: "Fecha final del juicio",
     success: "Operación con éxito",
@@ -529,14 +519,14 @@ export const translations: typeof enTranslations = {
       title: "Conflicto",
       description: "Hay un conflicto entre los datos",
     },
-    sync_failed: "Failed to sync subscription with database",
+    sync_failed: "No se pudo sincronizar la suscripción con la base de datos",
     database_error: "Error de la base de datos ocurrido: {{error}}",
     create_crashed: "La creación de suscripción falló",
     cancel_failed: "Fallado para cancelar la suscripción: {{error}}",
     user_not_found: "Usuario no encontrado",
-    stripe_customer_creation_failed: "Failed to create Stripe customer",
+    stripe_customer_creation_failed: "No se pudo crear el cliente de Stripe",
     not_implemented_on_native:
-      "{{method}} no se implementa en plataforma nativa. Por favor, utilice la versión web para esta operación.",
+      "{{method}} aún no está disponible en la app. Usa la versión web.",
     no_provider_id: "No proveedor de pago ID encontrado",
   },
 
@@ -616,8 +606,8 @@ export const translations: typeof enTranslations = {
       user_name: "Nombre del usuario",
       user_email: "Correo electrónico",
       plan: "Plan",
-      status: "Situación",
-      contact_user: "Contacto Usuario",
+      status: "Estado",
+      contact_user: "Contactar al usuario",
       footer: "Notificación automática de {{appName}}",
     },
   },
@@ -649,7 +639,7 @@ export const translations: typeof enTranslations = {
       },
     },
     adminNotification: {
-      name: "Admin Subscription Notification",
+      name: "Aviso de suscripción para admins",
       description:
         "La notificación interna enviada a los administradores cuando un usuario se suscribe",
       category: "admin",
@@ -689,11 +679,11 @@ export const translations: typeof enTranslations = {
   title: "Tu suscripción",
   description: "Gestiona tu suscripción y facturación",
   notAvailable: "N/A",
-  canceledOn: "Cancelado",
-  endedOn: "Ended On",
+  canceledOn: "Cancelada el",
+  endedOn: "Finalizó el",
   billingInterval: "Frecuencia de facturación",
-  currentPeriodStart: "Período actual Inicio",
-  endsOn: "Finales en",
+  currentPeriodStart: "Inicio del período actual",
+  endsOn: "Termina el",
   nextBillingDate: "Próxima fecha de facturación",
   cancellation: {
     title: "Cancelación programada",
@@ -884,8 +874,9 @@ export const translations: typeof enTranslations = {
   },
   buy: {
     provider: {
-      stripe: "Cuenta PayPal, tarjeta o billetera digital",
-      stripeDescription: "Tarjeta, PayPal, Apple Pay, Google Pay via Stripe",
+      stripe: "Tarjeta, PayPal y billeteras digitales",
+      stripeDescription:
+        "Tarjeta, PayPal, Apple Pay y Google Pay a través de Stripe",
       nowpayments: "Criptomonedas (NowPayments)",
       nowpaymentsDescription:
         "Paga con Bitcoin, Ethereum y otras criptomonedas",
@@ -904,15 +895,15 @@ export const translations: typeof enTranslations = {
     },
     buyCredits: {
       title: "Comprar créditos",
-      description: "Compra créditos adicionales para su cuenta",
+      description: "Compra créditos adicionales para tu cuenta",
     },
     history: {
       title: "Historial de facturación",
-      description: "Vea su historial de facturación y transacción",
+      description: "Consulta tu historial de facturación y transacciones",
     },
     overview: {
       title: "Resumen de la suscripción",
-      description: "Ver su estado de suscripción y detalles",
+      description: "Consulta el estado y los detalles de tu suscripción",
     },
   },
 };

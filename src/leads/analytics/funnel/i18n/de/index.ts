@@ -28,6 +28,10 @@ export const translations: typeof enTranslations = {
       previousSignupSteps: "Registrierungsschritte im Vorzeitraum",
       signupSegments: "Registrierungsschritte pro Segment",
       signupTrackedSince: "Registrierungsschritte erfasst seit",
+      wallSteps: "Conversion-Hürden im Zeitraum",
+      previousWallSteps: "Conversion-Hürden im Vorzeitraum",
+      wallSegments: "Conversion-Hürden pro Segment",
+      wallTrackedSince: "Conversion-Hürden erfasst seit",
     },
     errors: {
       unauthorized: {
@@ -70,6 +74,20 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    wallTitle: "Conversion-Hürden",
+    wallSubtitle:
+      "Wer an einer Hürde abgewiesen wurde, datiert auf den Zeitpunkt. Jede Person zählt einmal pro Hürde.",
+    wallTrackedHint:
+      "Erfasst seit {{date}}: frühere Hürden wurden nicht gespeichert.",
+    creditWallGuests: "Gäste ohne Credits",
+    creditWallAccounts: "Konten ohne Credits",
+    consentDeclined: "18+-Bestätigung abgelehnt",
+    creditWallHint: "Nachricht abgewiesen, Credits-leer-Karte gezeigt",
+    consentDeclinedHint: "Dialog ohne Zustimmung geschlossen",
+    wallSegmentsTitle: "Hürden pro Segment",
+    wallSegmentsSubtitle:
+      "Dieselben Hürden, aufgeteilt nach der gewählten Dimension.",
+    wallEmpty: "In diesem Zeitraum ist niemand an einer Hürde gescheitert.",
     signupTitle: "Registrierungsbestätigung",
     signupSubtitle:
       "Leads pro Schritt, datiert auf den Schritt. Der Abfall zeigt, wo Registrierungen scheitern.",

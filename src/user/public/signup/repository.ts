@@ -294,14 +294,26 @@ export class SignupRepository {
   ): Promise<ResponseType<SignupPatchResponseOutput>> {
     try {
       if (data.token || data.code) {
-        const claim = await consumeSignupChallenge(data, user.leadId, t);
+        const claim = await consumeSignupChallenge(
+          data,
+          user.leadId,
+          t,
+          logger,
+        );
         if (!claim.success) {
-          logger.warn("Signup confirmation challenge rejected", {
-            challengeType: data.token ? "link" : "code",
-            hasPendingId: Boolean(data.pendingId),
-            errorKey: claim.errorType.errorKey,
-            status: claim.errorType.errorCode,
-          });
+          // Invalid proofs are logged with their reason at the decision
+          // point; this covers the rest (subnet limit, taken email).
+          if (
+            claim.errorType.errorKey !==
+            ErrorResponseTypes.INVALID_TOKEN_ERROR.errorKey
+          ) {
+            logger.warn("Signup confirmation refused", {
+              challengeType: data.token ? "link" : "code",
+              hasPendingId: Boolean(data.pendingId),
+              errorKey: claim.errorType.errorKey,
+              status: claim.errorType.errorCode,
+            });
+          }
           return claim;
         }
         return await SignupRepository.finishSignup(

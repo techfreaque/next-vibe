@@ -17,6 +17,10 @@ export const {
   WEBSITE_VISIT: "enums.engagementTypes.websiteVisit",
   FORM_SUBMIT: "enums.engagementTypes.formSubmit",
   LEAD_ATTRIBUTION: "enums.engagementTypes.leadAttribution",
+  /** A chat send was refused for missing credits (out-of-credits card) */
+  CREDIT_WALL: "enums.engagementTypes.creditWall",
+  /** The 18+ consent dialog for an uncensored model was closed without agreeing */
+  CONSENT_DECLINED: "enums.engagementTypes.consentDeclined",
 });
 
 /**
@@ -559,6 +563,8 @@ export const EngagementTypesDB = [
   EngagementTypes.WEBSITE_VISIT,
   EngagementTypes.FORM_SUBMIT,
   EngagementTypes.LEAD_ATTRIBUTION,
+  EngagementTypes.CREDIT_WALL,
+  EngagementTypes.CONSENT_DECLINED,
 ] as const;
 
 export const LeadStatusDB = [

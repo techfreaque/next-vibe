@@ -330,6 +330,7 @@ function SignupFields({ field }: CustomWidgetProps): React.JSX.Element {
                 <Div className="flex items-start gap-3">
                   <FormControl>
                     <Checkbox
+                      ref={formField.ref}
                       id={formField.name}
                       name={formField.name}
                       checked={formField.value === true}
@@ -398,11 +399,12 @@ function SignupFields({ field }: CustomWidgetProps): React.JSX.Element {
                 <Div className="flex items-start gap-3">
                   <FormControl>
                     <Checkbox
+                      ref={formField.ref}
                       id={formField.name}
                       name={formField.name}
                       checked={formField.value as boolean}
                       onCheckedChange={(checked) => formField.onChange(checked)}
-                      className="mt-0.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                      className="mt-0.5 aria-[invalid=true]:border-destructive data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     />
                   </FormControl>
                   <Label

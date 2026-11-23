@@ -4,61 +4,61 @@ export const translations: typeof enTranslations = {
   category: "Benutzer",
 
   title: "Passwort-Reset bestätigen",
-  description: "Bestätigen Sie Ihr Passwort-Reset mit einem neuen Passwort",
+  description: "Schließ das Zurücksetzen mit einem neuen Passwort ab",
   tag: "Passwort-Reset",
   email: {
     title: "Passwort erfolgreich zurückgesetzt",
-    subject: "Passwort erfolgreich zurückgesetzt - {{appName}}",
+    subject: "Dein {{appName}} Passwort ist zurückgesetzt",
     previewText:
-      "Ihr {{appName}}-Passwort wurde zurückgesetzt. Melden Sie sich an und chatten Sie mit {{modelCount}} KI-Modellen.",
+      "Dein {{appName}} Passwort ist zurückgesetzt. Melde dich an und chatte mit {{modelCount}} KI-Modellen.",
     greeting: "Hey {{name}},",
     successMessage:
-      "Ihr Passwort wurde zurückgesetzt. Alles erledigt - melden Sie sich an und machen Sie dort weiter, wo Sie aufgehört haben.",
+      "Dein Passwort ist zurückgesetzt. Melde dich an und mach da weiter, wo du aufgehört hast.",
     loginButton: "Bei {{appName}} anmelden",
     promoText: "{{modelCount}} KI-Modelle. Keine Filter. Keine Lektionen.",
     securityWarning:
-      "Passwort nicht zurückgesetzt? Kontaktieren Sie sofort den Support - Ihr Konto könnte gefährdet sein.",
+      "Das warst nicht du? Schreib sofort dem Support. Dein Konto könnte gefährdet sein.",
   },
   groups: {
     verification: {
       title: "Verifizierung",
-      description: "Verifizieren Sie Ihre Passwort-Reset-Anfrage",
+      description: "Bestätige deine Anfrage zum Zurücksetzen",
     },
     newPassword: {
       title: "Neues Passwort",
-      description: "Setzen Sie Ihr neues Passwort",
+      description: "Leg dein neues Passwort fest",
     },
   },
   fields: {
     token: {
       label: "Reset-Token",
-      description: "Der Passwort-Reset-Token aus Ihrer E-Mail",
+      description: "Der Reset-Token aus deiner E-Mail",
       placeholder: "Reset-Token eingeben",
-      help: "Überprüfen Sie Ihre E-Mail für den Passwort-Reset-Token und geben Sie ihn hier ein",
+      help: "Schau in deine E-Mail und gib den Reset-Token hier ein",
       validation: {
         required: "Reset-Token ist erforderlich",
       },
     },
     email: {
       label: "E-Mail-Adresse",
-      description: "Ihre E-Mail-Adresse",
+      description: "Deine E-Mail-Adresse",
       placeholder: "E-Mail-Adresse eingeben",
       validation: {
-        invalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+        invalid: "Gib eine gültige E-Mail-Adresse ein",
       },
     },
     password: {
       label: "Neues Passwort",
-      description: "Ihr neues Passwort",
+      description: "Dein neues Passwort",
       placeholder: "Neues Passwort eingeben",
-      help: "Wählen Sie ein starkes Passwort mit mindestens 8 Zeichen, einschließlich Buchstaben, Zahlen und Symbolen",
+      help: "Wähl ein starkes Passwort mit mindestens 8 Zeichen, aus Buchstaben, Zahlen und Symbolen",
       validation: {
         minLength: "Passwort muss mindestens 8 Zeichen lang sein",
       },
     },
     confirmPassword: {
       label: "Passwort bestätigen",
-      description: "Bestätigen Sie Ihr neues Passwort",
+      description: "Bestätige dein neues Passwort",
       placeholder: "Neues Passwort bestätigen",
       validation: {
         minLength: "Passwort muss mindestens 8 Zeichen lang sein",
@@ -78,11 +78,11 @@ export const translations: typeof enTranslations = {
       description: "Antwortnachricht",
     },
     securityTip:
-      "Erwägen Sie die Aktivierung der Zwei-Faktor-Authentifizierung für bessere Sicherheit",
+      "Aktivier die Zwei-Faktor-Authentifizierung für mehr Sicherheit",
     nextSteps: [
-      "Melden Sie sich mit Ihrem neuen Passwort an",
-      "Aktualisieren Sie gespeicherte Passwörter in Ihrem Browser",
-      "Erwägen Sie die Aktivierung von 2FA für zusätzliche Sicherheit",
+      "Melde dich mit deinem neuen Passwort an",
+      "Aktualisier gespeicherte Passwörter in deinem Browser",
+      "Aktivier 2FA für zusätzliche Sicherheit",
     ],
   },
   errors: {
@@ -90,8 +90,7 @@ export const translations: typeof enTranslations = {
     no_email: "Kein Konto mit dieser E-Mail-Adresse gefunden",
     validation: {
       title: "Validierungsfehler",
-      description:
-        "Bitte überprüfen Sie Ihre Eingabe und versuchen Sie es erneut",
+      description: "Prüf deine Eingabe und versuch es noch mal",
       passwordsDoNotMatch: "Passwörter stimmen nicht überein",
     },
     unauthorized: {
@@ -112,7 +111,7 @@ export const translations: typeof enTranslations = {
     },
     forbidden: {
       title: "Zugriff verweigert",
-      description: "Sie haben keine Berechtigung für diese Aktion",
+      description: "Du hast keine Berechtigung für diese Aktion",
     },
     notFound: {
       title: "Nicht gefunden",
@@ -124,15 +123,14 @@ export const translations: typeof enTranslations = {
     },
     conflict: {
       title: "Konflikt",
-      description:
-        "Beim Verarbeiten Ihrer Anfrage ist ein Konflikt aufgetreten",
+      description: "Bei deiner Anfrage ist ein Konflikt aufgetreten",
     },
   },
   success: {
     title: "Passwort-Reset erfolgreich",
-    description: "Ihr Passwort wurde erfolgreich zurückgesetzt",
+    description: "Dein Passwort ist zurückgesetzt",
     message: "Passwort wurde erfolgreich zurückgesetzt",
-    password_reset: "Ihr Passwort wurde erfolgreich zurückgesetzt",
+    password_reset: "Dein Passwort ist zurückgesetzt",
   },
   actions: {
     requestNewLink: "Neuen Reset-Link anfordern",

@@ -11569,7 +11569,7 @@
   {
     "toolName": "subscription-cancel",
     "title": "Cancelar suscripción",
-    "titleShort": "Cancelar Sub",
+    "titleShort": "Cancelar",
     "description": "Cancela tu suscripción",
     "fields": {
       "usage": {
@@ -11581,7 +11581,7 @@
           "type": "form_field",
           "fieldType": "boolean",
           "label": "Cancelar al final del período",
-          "description": "Cancelación de suscripción al final del período actual",
+          "description": "Cancela la suscripción al final del período actual",
           "schema": {
             "def": {
               "type": "default",
@@ -11603,8 +11603,8 @@
         "reason": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Razón de cancelación",
-          "description": "Por favor, proporcione una razón para la cancelación",
+          "label": "Motivo de la cancelación",
+          "description": "Cuéntanos por qué cancelas",
           "schema": {
             "def": {
               "type": "optional",
@@ -11665,7 +11665,7 @@
   {
     "toolName": "subscription_create_POST",
     "title": "Crear suscripción",
-    "titleShort": "Crear sesión",
+    "titleShort": "Suscribirse",
     "description": "Crear una nueva suscripción",
     "fields": {
       "usage": {
@@ -11677,7 +11677,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Plan de suscripción",
-          "description": "Seleccione su plan de suscripción",
+          "description": "Elige tu plan",
           "options": [
             {
               "value": "enums.plan.subscription",
@@ -11778,7 +11778,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Proveedor de pagos",
-          "description": "Seleccione su proveedor de pago",
+          "description": "Elige cómo pagar",
           "options": [
             {
               "value": "enums.paymentProvider.stripe",
@@ -11824,7 +11824,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Catálogo Producto",
+          "label": "Producto del catálogo",
           "description": "Enlace a un producto de catálogo para esta suscripción",
           "hidden": true,
           "schema": {
@@ -11883,7 +11883,7 @@
         },
         "sessionId": {
           "type": "text",
-          "label": "Período de sesiones ID",
+          "label": "ID de sesión",
           "schema": {
             "def": {
               "type": "string"
@@ -12054,7 +12054,7 @@
         },
         "plan": {
           "type": "text",
-          "label": "Plan ID",
+          "label": "ID del plan",
           "schema": {
             "def": {
               "type": "optional",
@@ -12171,7 +12171,7 @@
         },
         "currentPeriodStart": {
           "type": "text",
-          "label": "Período actual Inicio",
+          "label": "Inicio del período actual",
           "schema": {
             "def": {
               "type": "optional",
@@ -12503,7 +12503,7 @@
         },
         "endedAt": {
           "type": "text",
-          "label": "Ended At",
+          "label": "Finalizada el",
           "schema": {
             "def": {
               "type": "optional",
@@ -12859,7 +12859,7 @@
   {
     "toolName": "subscription-update",
     "title": "Actualizar suscripción",
-    "titleShort": "Actualizar Sub",
+    "titleShort": "Cambiar plan",
     "description": "Actualizar la suscripción existente",
     "fields": {
       "usage": {
@@ -12871,7 +12871,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Plan de suscripción",
-          "description": "Seleccione su plan de suscripción",
+          "description": "Elige tu plan",
           "options": [
             {
               "value": "enums.plan.subscription",
@@ -13020,7 +13020,7 @@
         },
         "currentPeriodStart": {
           "type": "text",
-          "label": "Período actual Inicio",
+          "label": "Inicio del período actual",
           "schema": {
             "def": {
               "type": "pipe",

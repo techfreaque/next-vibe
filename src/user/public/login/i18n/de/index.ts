@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
     fields: {
       email: {
         label: "E-Mail-Adresse",
-        description: "Geben Sie Ihre E-Mail-Adresse ein",
+        description: "Gib deine E-Mail-Adresse ein",
         placeholder: "ihre@email.com",
       },
       allowPasswordAuth: {
@@ -201,14 +201,14 @@ export const translations: typeof enTranslations = {
     messages: {
       successMessage: "Login-Optionen erfolgreich abgerufen",
       passwordAuthDescription:
-        "Melden Sie sich mit Ihrer E-Mail-Adresse und Ihrem Passwort an",
+        "Melde dich mit deiner E-Mail-Adresse und deinem Passwort an",
       socialAuthDescription:
-        "Social Login ist noch nicht verfügbar. Melden Sie sich mit E-Mail und Passwort an.",
+        "Social Login gibt es noch nicht. Melde dich mit E-Mail und Passwort an.",
       continueWithProvider: "Weiter mit {{provider}}",
       twoFactorRequired: "Erhöhte Sicherheit: 2FA erforderlich",
       standardSecurity: "Standard-Sicherheitsanforderungen",
-      tryPasswordFirst: "Versuchen Sie zuerst die Passwort-Anmeldung",
-      useSocialLogin: "Verwenden Sie Social-Login",
+      tryPasswordFirst: "Probier zuerst die Anmeldung mit Passwort",
+      useSocialLogin: "Mit Social Login anmelden",
       socialLoginFaster: "Social-Login ist schneller für neue Benutzer",
     },
   },
@@ -263,7 +263,7 @@ export const translations: typeof enTranslations = {
   groups: {
     credentials: {
       title: "Anmeldedaten",
-      description: "Geben Sie Ihre Anmeldeinformationen ein",
+      description: "Gib deine Zugangsdaten ein",
     },
     options: {
       title: "Anmeldeoptionen",
@@ -313,12 +313,11 @@ export const translations: typeof enTranslations = {
   errors: {
     title: "Anmeldefehler",
     account_suspended:
-      "Konto gesperrt. Halten Sie das für einen Fehler, schreiben Sie dem Support.",
+      "Konto gesperrt. Hältst du das für einen Fehler, schreib dem Support.",
     account_locked:
       "Zu viele Fehlversuche. 15 Minuten warten oder Passwort zurücksetzen. Noch kein Konto? Registrieren.",
     accountLocked: "Konto ist gesperrt",
-    accountLockedDescription:
-      "Ihr Konto wurde gesperrt. Bitte kontaktieren Sie den Support.",
+    accountLockedDescription: "Dein Konto wurde gesperrt. Schreib dem Support.",
     pendingEmail: "Bestätige zuerst deine E-Mail-Adresse, um dich anzumelden.",
     resendPending: "Bestätigungsmail erneut senden",
     invalid_credentials:
@@ -333,7 +332,7 @@ export const translations: typeof enTranslations = {
       "Authentifizierungs-Token konnte nicht gespeichert werden",
     validation: {
       title: "Validierung fehlgeschlagen",
-      description: "Bitte überprüfen Sie Ihre Eingabe",
+      description: "Prüf deine Eingabe",
     },
     unauthorized: {
       title: "Anmeldung fehlgeschlagen",

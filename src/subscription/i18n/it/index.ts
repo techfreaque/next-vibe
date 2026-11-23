@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
       fields: {
         planId: {
           label: "Piano di abbonamento",
-          description: "Selezionare il piano di abbonamento",
+          description: "Scegli il tuo piano",
           placeholder: "Scegli un piano",
         },
         billingInterval: {
@@ -215,7 +215,7 @@ export const translations: typeof enTranslations = {
 
   // GET endpoint
   get: {
-    title: "Ottenere Abbonamento",
+    title: "Abbonamento",
     titleShort: "Il mio abbonamento",
     description: "Recuperare i dettagli dell'abbonamento corrente",
     form: {
@@ -227,27 +227,26 @@ export const translations: typeof enTranslations = {
 
   // POST endpoint
   post: {
-    title: "Crea Abbonamento",
-    titleShort: "Crea sessione",
+    title: "Crea abbonamento",
+    titleShort: "Abbonati",
     description: "Creare un nuovo abbonamento",
     form: {
-      title: "Creazione di sottoscrizione",
+      title: "Creazione dell'abbonamento",
       description: "Creare un nuovo abbonamento con il piano selezionato",
     },
     errors: {
       validation: {
         title: "Input non valido",
-        description:
-          "Si prega di controllare i dettagli dell'abbonamento e riprovare",
+        description: "Controlla i dati dell'abbonamento e riprova",
       },
       network: {
         title: "Errore di connessione",
         description:
-          "Incapace di connettersi. Si prega di controllare la connessione internet",
+          "Connessione assente. Controlla la tua connessione a Internet",
       },
       unauthorized: {
         title: "Accedi per continuare",
-        description: "Iscriviti per creare un abbonamento",
+        description: "Accedi per abbonarti",
       },
       forbidden: {
         title: "Accesso negato",
@@ -258,34 +257,32 @@ export const translations: typeof enTranslations = {
         description: "Il piano di abbonamento selezionato non è stato trovato",
       },
       server: {
-        title: "Qualcosa di strano",
-        description:
-          "Non siamo riusciti a creare il tuo abbonamento. Per favore prova di nuovo.",
+        title: "Qualcosa è andato storto",
+        description: "Non siamo riusciti a creare il tuo abbonamento. Riprova.",
       },
       unknown: {
-        title: "Errore inaspettato",
-        description:
-          "E' successo qualcosa di inaspettato. Per favore prova di nuovo.",
+        title: "Errore imprevisto",
+        description: "Qualcosa è andato storto. Riprova.",
       },
       unsavedChanges: {
         title: "Modifiche non salvate",
-        description: "Hai dei cambiamenti che non sono stati salvati",
+        description: "Hai modifiche non salvate",
       },
       conflict: {
-        title: "Abbonamento Esisti",
+        title: "Abbonamento già attivo",
         description: "Hai già un abbonamento attivo",
       },
     },
     success: {
       title: "Abbonamento attivato",
-      description: "L'abbonamento è stato attivato con successo",
+      description: "Il tuo abbonamento è attivo",
     },
   },
 
   // PUT endpoint
   put: {
     title: "Aggiorna l’abbonamento",
-    titleShort: "Aggiornamento Sub",
+    titleShort: "Cambia piano",
     description: "Aggiornare l'abbonamento esistente",
     form: {
       title: "Aggiornamento dell'abbonamento",
@@ -295,44 +292,40 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Aggiornamento non valido",
-        description: "Si prega di controllare le modifiche e riprovare",
+        description: "Controlla le modifiche e riprova",
       },
       network: {
         title: "Errore di connessione",
-        description:
-          "Incapace di salvare le modifiche. Per favore prova di nuovo.",
+        description: "Non siamo riusciti a salvare le modifiche. Riprova.",
       },
       unauthorized: {
         title: "Accedi per continuare",
-        description: "Iscriviti per aggiornare il tuo abbonamento",
+        description: "Accedi per modificare il tuo abbonamento",
       },
       forbidden: {
         title: "Accesso negato",
         description: "Non hai il permesso di aggiornare questo abbonamento",
       },
       notFound: {
-        title: "Abbonamento Non trovato",
-        description:
-          "Non siamo riusciti a trovare il tuo abbonamento per aggiornare",
+        title: "Abbonamento non trovato",
+        description: "Non troviamo il tuo abbonamento",
       },
       server: {
-        title: "Aggiornamento non corretto",
-        description:
-          "Non siamo riusciti a salvare i tuoi cambiamenti. Per favore prova di nuovo.",
+        title: "Aggiornamento non riuscito",
+        description: "Non siamo riusciti a salvare le modifiche. Riprova.",
       },
       unknown: {
-        title: "Errore inaspettato",
-        description:
-          "E' successo qualcosa di inaspettato. Per favore prova di nuovo.",
+        title: "Errore imprevisto",
+        description: "Qualcosa è andato storto. Riprova.",
       },
       unsavedChanges: {
         title: "Modifiche non salvate",
-        description: "Hai dei cambiamenti che non sono stati salvati",
+        description: "Hai modifiche non salvate",
       },
       conflict: {
-        title: "Aggiornamento Conflict",
+        title: "Conflitto di aggiornamento",
         description:
-          "Il tuo abbonamento è cambiato. Si prega di rinfrescare e riprovare",
+          "Il tuo abbonamento è cambiato nel frattempo. Ricarica la pagina e riprova",
       },
     },
     submit: {
@@ -340,73 +333,70 @@ export const translations: typeof enTranslations = {
       loading: "Aggiornamento...",
     },
     success: {
-      title: "Abbonamento Aggiornato",
-      description: "Il tuo abbonamento è stato aggiornato con successo",
+      title: "Abbonamento aggiornato",
+      description: "Il tuo abbonamento è aggiornato",
     },
   },
 
   // DELETE endpoint
   delete: {
     title: "Disdici l’abbonamento",
-    titleShort: "Annullare la richiesta",
-    description: "Cancella il tuo abbonamento",
+    titleShort: "Disdici",
+    description: "Disdici il tuo abbonamento",
     warning:
       "Se disdici, l’accesso termina alla fine del periodo di fatturazione.",
     form: {
-      title: "Abbonamento Cancellazione",
-      description: "Cancella l'abbonamento con impostazioni facoltative",
+      title: "Disdetta dell'abbonamento",
+      description: "Disdici l'abbonamento, con impostazioni facoltative",
     },
     errors: {
       validation: {
         title: "Richiesta non valida",
-        description:
-          "Si prega di controllare i dati di cancellazione e riprovare",
+        description: "Controlla i dati della disdetta e riprova",
       },
       network: {
         title: "Errore di connessione",
-        description:
-          "Incapace di elaborare la cancellazione. Per favore prova di nuovo.",
+        description: "Non siamo riusciti a elaborare la disdetta. Riprova.",
       },
       unauthorized: {
         title: "Accedi per continuare",
-        description: "Iscriviti per annullare l'abbonamento",
+        description: "Accedi per disdire l'abbonamento",
       },
       forbidden: {
         title: "Accesso negato",
-        description: "Non hai il permesso di cancellare questo abbonamento",
+        description: "Non hai il permesso di disdire questo abbonamento",
       },
       notFound: {
-        title: "Abbonamento Non trovato",
+        title: "Abbonamento non trovato",
         description:
           "Non siamo riusciti a trovare il tuo abbonamento per cancellare",
       },
       server: {
         title: "Cancellazione non riuscita",
         description:
-          "Non potevamo cancellare il tuo abbonamento. Per favore prova di nuovo.",
+          "Non siamo riusciti a disdire il tuo abbonamento. Riprova.",
       },
       unknown: {
-        title: "Errore inaspettato",
-        description:
-          "E' successo qualcosa di inaspettato. Per favore prova di nuovo.",
+        title: "Errore imprevisto",
+        description: "Qualcosa è andato storto. Riprova.",
       },
       unsavedChanges: {
         title: "Modifiche non salvate",
-        description: "Hai dei cambiamenti che non sono stati salvati",
+        description: "Hai modifiche non salvate",
       },
       conflict: {
-        title: "Cancellazione Conflitto",
+        title: "Conflitto nella disdetta",
         description:
-          "Il tuo stato di abbonamento è cambiato. Si prega di rinfrescare e riprovare",
+          "Lo stato del tuo abbonamento è cambiato. Ricarica la pagina e riprova",
       },
     },
     submit: {
       label: "Disdici l’abbonamento",
-      loading: "Cancellazione...",
+      loading: "Disdetta in corso…",
     },
     success: {
       title: "Abbonamento disdetto",
-      description: "L'abbonamento è stato cancellato con successo",
+      description: "Il tuo abbonamento è disdetto",
     },
   },
 
@@ -415,7 +405,7 @@ export const translations: typeof enTranslations = {
     fields: {
       planId: {
         label: "Piano di abbonamento",
-        description: "Selezionare il piano di abbonamento",
+        description: "Scegli il tuo piano",
         placeholder: "Scegli il piano",
       },
       billingInterval: {
@@ -425,20 +415,20 @@ export const translations: typeof enTranslations = {
       },
       provider: {
         label: "Servizio di pagamento",
-        description: "Seleziona il tuo fornitore di pagamento",
+        description: "Scegli come pagare",
       },
       catalogProductId: {
-        label: "Catalogo Prodotto",
+        label: "Prodotto del catalogo",
         description: "Link a un prodotto di catalogo per questo abbonamento",
       },
       cancelAtPeriodEnd: {
         label: "Disdici a fine periodo",
-        description: "Annullare l'abbonamento alla fine del periodo corrente",
+        description: "Disdici l'abbonamento alla fine del periodo in corso",
       },
       reason: {
-        label: "Motivo di cancellazione",
-        description: "Si prega di fornire un motivo per la cancellazione",
-        placeholder: "Inserisci il motivo di cancellazione",
+        label: "Motivo della disdetta",
+        description: "Dicci perché disdici",
+        placeholder: "Scrivi il motivo",
       },
     },
   },
@@ -453,7 +443,7 @@ export const translations: typeof enTranslations = {
     status: "Stato di abbonamento",
     planId: "Piano ID",
     billingInterval: "Frequenza di fatturazione",
-    currentPeriodStart: "Periodo attuale Inizio",
+    currentPeriodStart: "Inizio del periodo attuale",
     currentPeriodEnd: "Periodo attuale Fine",
     cancelAtPeriodEnd: "Disdici a fine periodo",
     cancelAt: "Annullare",
@@ -543,7 +533,7 @@ export const translations: typeof enTranslations = {
     stripe_customer_creation_failed:
       "Non è riuscito a creare il cliente Stripe",
     not_implemented_on_native:
-      "{{method}} non è implementato sulla piattaforma nativa. Si prega di utilizzare la versione web per questa operazione.",
+      "{{method}} non è ancora disponibile nell'app. Usa la versione web.",
     no_provider_id: "Nessun fornitore di pagamento ID trovato",
   },
 
@@ -568,12 +558,12 @@ export const translations: typeof enTranslations = {
   status: {
     incomplete: "Incompleto",
     incomplete_expired: "Scadenza incompleta",
-    trialing: "Trialing",
+    trialing: "In prova",
     active: "Attivo",
     pastDue: "Passato",
     canceled: "Annullamento",
     unpaid: "Non pagato",
-    paused: "Paused",
+    paused: "In pausa",
   },
 
   // Email translations
@@ -589,7 +579,7 @@ export const translations: typeof enTranslations = {
         "Il tuo abbonamento a {{appName}} è attivo. Ogni mese hai {{subscriptionCredits}} crediti da usare con tutti i modelli. Nessun limite giornaliero, nessun filtro sui contenuti, nessuna spiegazione da dare.",
       models: {
         title: "{{modelCount}} modelli, 3 categorie",
-        mainstream: "Convenzionale",
+        mainstream: "Mainstream",
         open: "Open source",
         uncensored: "Senza censura",
       },
@@ -696,11 +686,11 @@ export const translations: typeof enTranslations = {
   title: "Il tuo abbonamento",
   description: "Gestisci l’abbonamento e la fatturazione",
   notAvailable: "N/A",
-  canceledOn: "Annullato",
-  endedOn: "Fine su",
+  canceledOn: "Disdetto il",
+  endedOn: "Terminato il",
   billingInterval: "Frequenza di fatturazione",
-  currentPeriodStart: "Periodo attuale Inizio",
-  endsOn: "Fines On",
+  currentPeriodStart: "Inizio del periodo attuale",
+  endsOn: "Termina il",
   nextBillingDate: "Prossima data di fatturazione",
   cancellation: {
     title: "Disdetta programmata",
@@ -742,12 +732,12 @@ export const translations: typeof enTranslations = {
     status: {
       incomplete: "Incompleto",
       incompleteExpired: "Scadenza incompleta",
-      trialing: "Trialing",
+      trialing: "In prova",
       active: "Attivo",
       pastDue: "Passato",
       canceled: "Annullamento",
       unpaid: "Non pagato",
-      paused: "Paused",
+      paused: "In pausa",
       canceling: "In disdetta",
     },
     billing: {
@@ -892,7 +882,7 @@ export const translations: typeof enTranslations = {
   buy: {
     provider: {
       stripe: "Carta, PayPal e wallet",
-      stripeDescription: "Carta, PayPal, Apple Pay, Google Pay via Stripe",
+      stripeDescription: "Carta, PayPal, Apple Pay e Google Pay tramite Stripe",
       nowpayments: "Criptovalute (NowPayments)",
       nowpaymentsDescription: "Paga con Bitcoin, Ethereum e altre criptovalute",
       cryptoMonthlyDisabled:

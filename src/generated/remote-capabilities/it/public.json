@@ -3173,7 +3173,7 @@
   },
   {
     "toolName": "subscription_GET",
-    "title": "Ottenere Abbonamento",
+    "title": "Abbonamento",
     "titleShort": "Il mio abbonamento",
     "description": "Recuperare i dettagli dell'abbonamento corrente",
     "fields": {
@@ -3338,7 +3338,7 @@
         },
         "currentPeriodStart": {
           "type": "text",
-          "label": "Periodo attuale Inizio",
+          "label": "Inizio del periodo attuale",
           "schema": {
             "def": {
               "type": "optional",

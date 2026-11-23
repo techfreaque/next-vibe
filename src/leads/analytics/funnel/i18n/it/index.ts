@@ -28,6 +28,10 @@ export const translations: typeof enTranslations = {
       previousSignupSteps: "Passaggi di registrazione nel periodo precedente",
       signupSegments: "Passaggi di registrazione per segmento",
       signupTrackedSince: "Passaggi di iscrizione tracciati dal",
+      wallSteps: "Blocchi di conversione nel periodo",
+      previousWallSteps: "Blocchi di conversione nel periodo precedente",
+      wallSegments: "Blocchi di conversione per segmento",
+      wallTrackedSince: "Blocchi di conversione tracciati dal",
     },
     errors: {
       unauthorized: {
@@ -70,6 +74,18 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    wallTitle: "Blocchi di conversione",
+    wallSubtitle:
+      "Persone fermate da un blocco, datate al momento in cui è successo. Ognuna conta una volta per blocco.",
+    wallTrackedHint: "Tracciati dal {{date}}: prima non venivano registrati.",
+    creditWallGuests: "Ospiti senza crediti",
+    creditWallAccounts: "Account senza crediti",
+    consentDeclined: "Consenso 18+ rifiutato",
+    creditWallHint: "Invio rifiutato, mostrata la scheda crediti esauriti",
+    consentDeclinedHint: "Finestra del consenso chiusa senza accettare",
+    wallSegmentsTitle: "Blocchi per segmento",
+    wallSegmentsSubtitle: "Gli stessi blocchi divisi per la dimensione scelta.",
+    wallEmpty: "Nessuno ha incontrato un blocco in questo periodo.",
     signupTitle: "Conferma della registrazione",
     signupSubtitle:
       "Lead per passaggio, datati al momento del passaggio. Il calo mostra dove si perdono le registrazioni.",

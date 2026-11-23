@@ -105,8 +105,7 @@ export const translations: typeof enTranslations = {
     },
     whatsNew: {
       subject: "Co się zmieniło, kiedy cię nie było",
-      preview:
-        "{{modelCount}} modeli, wideo i muzyka w czacie, do tego francuski.",
+      preview: "{{modelCount}} modeli, wideo i muzyka w czacie, sześć języków.",
       intro: "Od twojego ostatniego czatu minął ponad tydzień. Oto co nowego.",
       modelsTitle: "{{modelCount}} modeli czatu",
       modelsBody:
@@ -114,9 +113,9 @@ export const translations: typeof enTranslations = {
       mediaTitle: "Obrazy, wideo i muzyka",
       mediaBody:
         "Wpisujesz prompt w czacie, dostajesz obraz, krótki klip albo utwór.",
-      languagesTitle: "Teraz także po francusku",
+      languagesTitle: "Sześć języków",
       languagesBody:
-        "Cała aplikacja działa po polsku, angielsku, niemiecku i francusku.",
+        "Cała aplikacja działa po polsku, angielsku, niemiecku, francusku, hiszpańsku i włosku.",
       body: "Twoje wątki są dokładnie tam, gdzie były.",
       cta: "Zobacz wszystkie modele",
       ps: "P.S. Znasz kogoś, komu by się przydało? Z twojego linku polecającego dostajesz {{referralPercent}}% wszystkiego, co ta osoba wyda, co miesiąc.",

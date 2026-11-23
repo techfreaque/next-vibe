@@ -4,6 +4,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { afterAll, expect, it, mock } from "bun:test";
 import { drizzle } from "drizzle-orm/pglite";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
+import { createEndpointLogger } from "next-vibe/logger/server";
 
 import type { PendingSignup } from "./db";
 import { scopedTranslation } from "./i18n";
@@ -73,7 +74,12 @@ it("claims an unowned visitor lead and creates a distinct lead when another sign
         createHash("sha256").update(token).digest("hex"),
       ],
     );
-    const claimed = await consumeSignupChallenge({ token }, randomUUID(), t);
+    const claimed = await consumeSignupChallenge(
+      { token },
+      randomUUID(),
+      t,
+      createEndpointLogger(false, defaultLocale),
+    );
     if (!claimed.success) {
       return expect.unreachable(claimed.message);
     }
@@ -122,4 +128,113 @@ it("claims an unowned visitor lead and creates a distinct lead when another sign
   expect((await pg.query("SELECT user_id FROM growth_journeys")).rows).toEqual([
     { user_id: first.userId },
   ]);
+});
+
+it("logs why a confirmation proof was refused, never what was sent", async () => {
+  // Runs after the test above: the tables exist.
+  const { consumeSignupChallenge, SignupChallengeRejectReason } = await import(
+    "./pending"
+  );
+  const { t } = scopedTranslation.scopedT(defaultLocale);
+  const logger = createEndpointLogger(false, defaultLocale);
+  const warnings: Array<Record<string, string | boolean>> = [];
+  logger.warn = (message, ...rest): void => {
+    const [context] = rest;
+    if (
+      message === "Signup confirmation challenge rejected" &&
+      context &&
+      typeof context === "object" &&
+      !Array.isArray(context) &&
+      !(context instanceof Error)
+    ) {
+      const flat: Record<string, string | boolean> = {};
+      for (const [key, value] of Object.entries(context)) {
+        if (typeof value === "string" || typeof value === "boolean") {
+          flat[key] = value;
+        }
+      }
+      warnings.push(flat);
+    }
+  };
+  const leadId = randomUUID();
+  await pg.query("INSERT INTO leads (id) VALUES ($1)", [leadId]);
+  const sha = (value: string): string =>
+    createHash("sha256").update(value).digest("hex");
+  const insert = async (params: {
+    token: string;
+    expiresIn: string;
+    attempts: number;
+  }): Promise<string> => {
+    const { rows } = await pg.query<{ id: string }>(
+      `INSERT INTO pending_signups
+        (lead_id, email, password_hash, locale, signup_ip, token_hash, code_hash, attempts, expires_at)
+       VALUES ($1, 'reason@example.test', 'fixture', $2, '127.0.0.1', $3, $4, $5, now() + $6::interval)
+       RETURNING id`,
+      [
+        leadId,
+        defaultLocale,
+        sha(params.token),
+        sha("not-the-code"),
+        params.attempts,
+        params.expiresIn,
+      ],
+    );
+    return rows[0]?.id ?? "";
+  };
+  const refuse = async (proof: {
+    token?: string;
+    pendingId?: string;
+    code?: string;
+  }): Promise<string> => {
+    const result = await consumeSignupChallenge(proof, leadId, t, logger);
+    expect(result.success).toBe(false);
+    if (result.success) {
+      return "";
+    }
+    // Same answer for the person whatever the reason.
+    expect(result.message).toBe(t("confirmation.invalid"));
+    return String(warnings.at(-1)?.reason ?? "");
+  };
+
+  expect(await refuse({ token: randomUUID() })).toBe(
+    SignupChallengeRejectReason.MISSING,
+  );
+  const expiredToken = randomUUID();
+  await insert({ token: expiredToken, expiresIn: "-1 minute", attempts: 0 });
+  expect(await refuse({ token: expiredToken })).toBe(
+    SignupChallengeRejectReason.EXPIRED,
+  );
+  const exhausted = await insert({
+    token: randomUUID(),
+    expiresIn: "10 minutes",
+    attempts: 5,
+  });
+  expect(await refuse({ pendingId: exhausted, code: "123456" })).toBe(
+    SignupChallengeRejectReason.EXHAUSTED,
+  );
+  const guessed = await insert({
+    token: randomUUID(),
+    expiresIn: "10 minutes",
+    attempts: 0,
+  });
+  expect(await refuse({ pendingId: guessed, code: "123456" })).toBe(
+    SignupChallengeRejectReason.MISMATCH,
+  );
+  expect(
+    (
+      await pg.query<{ attempts: number }>(
+        "SELECT attempts FROM pending_signups WHERE id = $1",
+        [guessed],
+      )
+    ).rows[0]?.attempts,
+  ).toBe(1);
+
+  expect(warnings).toHaveLength(4);
+  for (const warning of warnings) {
+    expect(Object.keys(warning).toSorted()).toEqual([
+      "challengeType",
+      "hasPendingId",
+      "reason",
+    ]);
+  }
 });

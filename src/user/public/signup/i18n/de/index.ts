@@ -21,7 +21,7 @@ export const translations: typeof enTranslations = {
     reminderSent: "Erinnerung gesendet",
   },
   reminder: {
-    subject: "Dein unbottled.ai Konto ist einen Klick entfernt",
+    subject: "Dein {{appName}}-Konto ist einen Klick entfernt",
     hint: "Du hast die Registrierung begonnen, deine E-Mail aber nie bestätigt. Bestätige jetzt und erhalte jeden Monat {{credits}} Gratis-Credits. Code und Button gelten 24 Stunden und ersetzen die aus der ersten Mail.",
     button: "Bestätigen und anmelden",
     ignore:
@@ -255,7 +255,7 @@ export const translations: typeof enTranslations = {
         "Deine Registrierung bringt dem Ersteller dieses Skills +5% auf deine Abonnements.",
       selectorTitle: "Creator unterstützen",
       selectorDescription:
-        "Du hast Skills von unabhängigen Creators in deine Favoriten aufgenommen. Wähle einen zum Unterstützen - er erhält +5% aus deinen Abonnements. Du kannst das jederzeit ändern.",
+        "Du hast Skills von unabhängigen Creators in deine Favoriten aufgenommen. Wähle einen, den du unterstützen willst: Er bekommt +5% aus deinen Abonnements. Du kannst das jederzeit ändern.",
       selectorNone: "Keinen (überspringen)",
     },
     localFavorites: {
@@ -274,8 +274,7 @@ export const translations: typeof enTranslations = {
     title: "Anmeldefehler",
     validation: {
       title: "Validierungsfehler",
-      description:
-        "Bitte überprüfen Sie Ihre Eingaben und versuchen Sie es erneut",
+      description: "Prüf deine Eingaben und versuch es noch mal",
     },
     unauthorized: {
       title: "Nicht autorisiert",
@@ -293,17 +292,17 @@ export const translations: typeof enTranslations = {
       title: "Kontokonflikt",
       description: "Ein Konto mit dieser E-Mail existiert bereits",
       detail:
-        "Für diese E-Mail-Adresse besteht bereits ein Konto. Melden Sie sich stattdessen an.",
+        "Für diese E-Mail-Adresse gibt es schon ein Konto. Melde dich einfach an.",
     },
     disposableEmail: {
       title: "Dauerhafte E-Mail erforderlich",
       detail:
-        "Wegwerf-Postfächer sind ausgeschlossen. Nutzen Sie eine dauerhafte E-Mail-Adresse.",
+        "Wegwerf-Postfächer gehen nicht. Nutz eine E-Mail-Adresse, die bleibt.",
     },
     subnetSignupLimit: {
-      title: "Zu viele Registrierungen aus Ihrem Netzwerk",
+      title: "Zu viele Registrierungen aus deinem Netzwerk",
       detail:
-        "Aus Ihrem Netzwerk wurden heute bereits zu viele Konten angelegt. Versuchen Sie es morgen erneut oder melden Sie sich mit einem bestehenden Konto an.",
+        "Aus deinem Netzwerk wurden heute schon zu viele Konten angelegt. Versuch es morgen noch mal oder melde dich mit einem bestehenden Konto an.",
     },
     userNotFound: "Kein Konto für {{email}} gefunden",
     forbidden: {
@@ -320,7 +319,7 @@ export const translations: typeof enTranslations = {
     },
     unsaved: {
       title: "Nicht gespeicherte Änderungen",
-      description: "Sie haben nicht gespeicherte Änderungen",
+      description: "Du hast nicht gespeicherte Änderungen",
     },
     autoLoginFailed:
       "Konto erstellt, aber die automatische Anmeldung ist fehlgeschlagen. Melde dich mit deinem neuen Passwort an.",
@@ -331,8 +330,7 @@ export const translations: typeof enTranslations = {
   },
   emailCheck: {
     title: "E-Mail-Verfügbarkeitsprüfung",
-    description:
-      "Prüfen Sie, ob die E-Mail für die Registrierung verfügbar ist",
+    description: "Prüft, ob die E-Mail für die Registrierung frei ist",
     tag: "E-Mail-Prüfung",
     fields: {
       email: {
@@ -353,7 +351,7 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Ungültige E-Mail",
-        description: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+        description: "Gib eine gültige E-Mail-Adresse ein",
       },
       internal: {
         title: "Prüfung von {{email}} fehlgeschlagen: {{error}}",
@@ -369,7 +367,7 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Zugriff verweigert",
-        description: "Sie haben keine Berechtigung, diese E-Mail zu prüfen",
+        description: "Du hast keine Berechtigung, diese E-Mail zu prüfen",
       },
       network: {
         title: "Netzwerkfehler",
@@ -385,7 +383,7 @@ export const translations: typeof enTranslations = {
       },
       unsaved: {
         title: "Ungespeicherte Änderungen",
-        description: "Sie haben ungespeicherte Änderungen",
+        description: "Du hast ungespeicherte Änderungen",
       },
     },
     success: {
@@ -443,7 +441,7 @@ export const translations: typeof enTranslations = {
       },
       unsaved: {
         title: "Ungespeicherte Änderungen",
-        description: "Sie haben ungespeicherte Änderungen",
+        description: "Du hast ungespeicherte Änderungen",
       },
     },
     success: {
@@ -482,7 +480,7 @@ export const translations: typeof enTranslations = {
   },
   admin_notification: {
     title: "Neue Benutzeranmeldung",
-    subject: "Neue Benutzeranmeldung - {{privateName}}",
+    subject: "Neue Benutzeranmeldung: {{privateName}}",
     preview: "Neuer Benutzer {{privateName}} hat sich angemeldet",
     message: "Ein neuer Benutzer hat sich bei {{appName}} angemeldet",
     privateName: "Privater Name",

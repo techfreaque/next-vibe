@@ -21,7 +21,7 @@ export const translations: typeof enTranslations = {
     reminderSent: "Wysłano przypomnienie",
   },
   reminder: {
-    subject: "Twoje konto unbottled.ai czeka na jedno kliknięcie",
+    subject: "Twoje konto {{appName}} czeka na jedno kliknięcie",
     hint: "Rejestracja jest prawie gotowa, brakuje tylko potwierdzenia adresu e-mail. Potwierdź teraz i odbieraj {{credits}} darmowych kredytów co miesiąc. Kod i przycisk poniżej działają przez 24 godziny i zastępują te z pierwszej wiadomości.",
     button: "Potwierdź i zaloguj się",
     ignore:
@@ -214,7 +214,7 @@ export const translations: typeof enTranslations = {
       label: "Akceptuję regulamin",
       description: "Nasz regulamin szanuje Twoją wolność i prywatność.",
       termsLink: "regulamin",
-      conditionsLink: "politykę prywatności",
+      conditionsLink: "polityka prywatności",
       descriptionPrefix: "Nasz",
       descriptionAnd: "i",
       descriptionSuffix: "szanują Twoją wolność i prywatność.",
@@ -241,7 +241,7 @@ export const translations: typeof enTranslations = {
       subscriptionBonus:
         "+{{credits}} kredytów bonusowych z pierwszą subskrypcją.",
       descriptionPrefilled:
-        "Twoj znajomy dostanie nagrodę, gdy założysz konto.",
+        "Twój znajomy dostanie nagrodę, gdy założysz konto.",
       validation: {
         invalid:
           "Ten kod polecający nie istnieje lub jest już nieaktywny. Popraw go albo wyczyść pole.",
@@ -253,7 +253,7 @@ export const translations: typeof enTranslations = {
         "Twoja rejestracja daje twórcy tego skilla +5% z Twoich subskrypcji.",
       selectorTitle: "Wesprzyj twórcę",
       selectorDescription:
-        "Masz w ulubionych skille od niezależnych twórców. Wybierz jednego do wsparcia - dostanie +5% z Twoich subskrypcji. Możesz to zmienić w każdej chwili.",
+        "Masz w ulubionych skille od niezależnych twórców. Wybierz, kogo chcesz wesprzeć: dostanie +5% z Twoich subskrypcji. Możesz to zmienić w każdej chwili.",
       selectorNone: "Żaden (pomiń)",
     },
     localFavorites: {
@@ -286,10 +286,9 @@ export const translations: typeof enTranslations = {
       description: "Wystąpił nieoczekiwany błąd",
     },
     conflict: {
-      title: "Konflikt konta",
+      title: "Konto już istnieje",
       description: "Konto z tym adresem e-mail już istnieje",
-      detail:
-        "Konto z tym adresem e-mail już istnieje. Zaloguj się zamiast tego.",
+      detail: "Konto z tym adresem e-mail już istnieje. Po prostu się zaloguj.",
     },
     disposableEmail: {
       title: "Wymagany stały adres e-mail",
@@ -476,7 +475,7 @@ export const translations: typeof enTranslations = {
   },
   admin_notification: {
     title: "Nowa rejestracja użytkownika",
-    subject: "Nowa rejestracja użytkownika - {{privateName}}",
+    subject: "Nowa rejestracja użytkownika: {{privateName}}",
     preview: "Nowy użytkownik {{privateName}} się zarejestrował",
     message: "Nowy użytkownik zarejestrował się w {{appName}}",
     privateName: "Nazwa Prywatna",
@@ -519,11 +518,11 @@ export const translations: typeof enTranslations = {
     free: {
       title: "Co dostajesz za darmo, na zawsze:",
       credits:
-        "{{freeCreditsSignedIn}} darmowych kredytów co miesiąc, +{{freeCreditsNewsletterBonus}} z newsletterem. Bez karty",
+        "{{freeCreditsSignedIn}} darmowych kredytów co miesiąc, +{{freeCreditsNewsletterBonus}} z newsletterem. Bez karty.",
       allModels: "Dostęp do wszystkich {{modelCount}} modeli AI",
       uncensored:
         "Niecenzurowane modele, które naprawdę odpowiadają na pytania",
-      chatModes: "Tryby czatu: Prywatny, Incognito, Współdzielony i Publiczny",
+      chatModes: "Czaty prywatne, incognito, współdzielone i publiczne",
       noCard: "Karta kredytowa nie jest wymagana. Nigdy.",
     },
     verify: {

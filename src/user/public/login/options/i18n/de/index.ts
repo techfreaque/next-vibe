@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
   fields: {
     email: {
       label: "E-Mail-Adresse",
-      description: "Geben Sie Ihre E-Mail-Adresse ein",
+      description: "Gib deine E-Mail-Adresse ein",
       placeholder: "ihre@email.com",
     },
     allowPasswordAuth: {
@@ -195,13 +195,13 @@ export const translations: typeof enTranslations = {
   messages: {
     successMessage: "Login-Optionen erfolgreich abgerufen",
     passwordAuthDescription:
-      "Melden Sie sich mit Ihrer E-Mail-Adresse und Ihrem Passwort an",
-    socialAuthDescription: "Melden Sie sich mit Ihren Social-Media-Konten an",
+      "Melde dich mit deiner E-Mail-Adresse und deinem Passwort an",
+    socialAuthDescription: "Melde dich mit deinem Social-Media-Konto an",
     continueWithProvider: "Weiter mit {{provider}}",
     twoFactorRequired: "Erhöhte Sicherheit: 2FA erforderlich",
     standardSecurity: "Standard-Sicherheitsanforderungen",
-    tryPasswordFirst: "Versuchen Sie zuerst die Passwort-Anmeldung",
-    useSocialLogin: "Verwenden Sie Social-Login",
+    tryPasswordFirst: "Probier zuerst die Anmeldung mit Passwort",
+    useSocialLogin: "Mit Social Login anmelden",
     socialLoginFaster: "Social-Login ist schneller für neue Benutzer",
   },
 };

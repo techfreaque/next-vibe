@@ -28,6 +28,10 @@ export const translations: typeof enTranslations = {
       previousSignupSteps: "Étapes d'inscription sur la période précédente",
       signupSegments: "Étapes d'inscription par segment",
       signupTrackedSince: "Étapes d'inscription suivies depuis",
+      wallSteps: "Blocages de conversion sur la période",
+      previousWallSteps: "Blocages de conversion sur la période précédente",
+      wallSegments: "Blocages de conversion par segment",
+      wallTrackedSince: "Blocages de conversion suivis depuis",
     },
     errors: {
       unauthorized: {
@@ -70,6 +74,20 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    wallTitle: "Blocages de conversion",
+    wallSubtitle:
+      "Personnes arrêtées par un blocage, datées au moment où c'est arrivé. Chacune compte une fois par blocage.",
+    wallTrackedHint:
+      "Suivi depuis le {{date}} : les blocages antérieurs n'ont pas été enregistrés.",
+    creditWallGuests: "Invités sans crédits",
+    creditWallAccounts: "Comptes sans crédits",
+    consentDeclined: "Consentement 18+ refusé",
+    creditWallHint: "Envoi refusé, carte crédits épuisés affichée",
+    consentDeclinedHint: "Fenêtre de consentement fermée sans accepter",
+    wallSegmentsTitle: "Blocages par segment",
+    wallSegmentsSubtitle:
+      "Les mêmes blocages, répartis selon la dimension choisie.",
+    wallEmpty: "Personne n'a été bloqué sur cette période.",
     signupTitle: "Confirmation d'inscription",
     signupSubtitle:
       "Leads par étape, datés au moment de l'étape. La chute montre où les inscriptions se perdent.",

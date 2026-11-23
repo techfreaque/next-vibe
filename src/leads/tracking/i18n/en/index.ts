@@ -271,6 +271,8 @@ export const translations = {
       websiteVisit: "Website Visit",
       formSubmit: "Form Submit",
       leadAttribution: "Lead Attribution",
+      creditWall: "Out of credits",
+      consentDeclined: "18+ consent declined",
     },
     emailCampaignStage: {
       notStarted: "Not Started",

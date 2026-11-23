@@ -11569,8 +11569,8 @@
   {
     "toolName": "subscription-cancel",
     "title": "Disdici l’abbonamento",
-    "titleShort": "Annullare la richiesta",
-    "description": "Cancella il tuo abbonamento",
+    "titleShort": "Disdici",
+    "description": "Disdici il tuo abbonamento",
     "fields": {
       "usage": {
         "request": "data",
@@ -11581,7 +11581,7 @@
           "type": "form_field",
           "fieldType": "boolean",
           "label": "Disdici a fine periodo",
-          "description": "Annullare l'abbonamento alla fine del periodo corrente",
+          "description": "Disdici l'abbonamento alla fine del periodo in corso",
           "schema": {
             "def": {
               "type": "default",
@@ -11603,8 +11603,8 @@
         "reason": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Motivo di cancellazione",
-          "description": "Si prega di fornire un motivo per la cancellazione",
+          "label": "Motivo della disdetta",
+          "description": "Dicci perché disdici",
           "schema": {
             "def": {
               "type": "optional",
@@ -11664,8 +11664,8 @@
   },
   {
     "toolName": "subscription_create_POST",
-    "title": "Crea Abbonamento",
-    "titleShort": "Crea sessione",
+    "title": "Crea abbonamento",
+    "titleShort": "Abbonati",
     "description": "Creare un nuovo abbonamento",
     "fields": {
       "usage": {
@@ -11677,7 +11677,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Piano di abbonamento",
-          "description": "Selezionare il piano di abbonamento",
+          "description": "Scegli il tuo piano",
           "options": [
             {
               "value": "enums.plan.subscription",
@@ -11778,7 +11778,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Servizio di pagamento",
-          "description": "Seleziona il tuo fornitore di pagamento",
+          "description": "Scegli come pagare",
           "options": [
             {
               "value": "enums.paymentProvider.stripe",
@@ -11824,7 +11824,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Catalogo Prodotto",
+          "label": "Prodotto del catalogo",
           "description": "Link a un prodotto di catalogo per questo abbonamento",
           "hidden": true,
           "schema": {
@@ -12006,7 +12006,7 @@
   },
   {
     "toolName": "subscription_GET",
-    "title": "Ottenere Abbonamento",
+    "title": "Abbonamento",
     "titleShort": "Il mio abbonamento",
     "description": "Recuperare i dettagli dell'abbonamento corrente",
     "fields": {
@@ -12171,7 +12171,7 @@
         },
         "currentPeriodStart": {
           "type": "text",
-          "label": "Periodo attuale Inizio",
+          "label": "Inizio del periodo attuale",
           "schema": {
             "def": {
               "type": "optional",
@@ -12859,7 +12859,7 @@
   {
     "toolName": "subscription-update",
     "title": "Aggiorna l’abbonamento",
-    "titleShort": "Aggiornamento Sub",
+    "titleShort": "Cambia piano",
     "description": "Aggiornare l'abbonamento esistente",
     "fields": {
       "usage": {
@@ -12871,7 +12871,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Piano di abbonamento",
-          "description": "Selezionare il piano di abbonamento",
+          "description": "Scegli il tuo piano",
           "options": [
             {
               "value": "enums.plan.subscription",
@@ -13020,7 +13020,7 @@
         },
         "currentPeriodStart": {
           "type": "text",
-          "label": "Periodo attuale Inizio",
+          "label": "Inizio del periodo attuale",
           "schema": {
             "def": {
               "type": "pipe",

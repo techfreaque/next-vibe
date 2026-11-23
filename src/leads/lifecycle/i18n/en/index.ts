@@ -102,7 +102,7 @@ export const translations = {
     },
     whatsNew: {
       subject: "What changed while you were away",
-      preview: "{{modelCount}} models, video and music in chat, and French.",
+      preview: "{{modelCount}} models, video and music in chat, six languages.",
       intro: "Your last chat was over a week ago. Here is what's new.",
       modelsTitle: "{{modelCount}} chat models",
       modelsBody:
@@ -110,9 +110,9 @@ export const translations = {
       mediaTitle: "Images, video and music",
       mediaBody:
         "Type a prompt in the chat. Get back a picture, a short clip or a track.",
-      languagesTitle: "Now in French",
+      languagesTitle: "Six languages",
       languagesBody:
-        "The whole app runs in English, German, Polish and French.",
+        "The whole app runs in English, German, Polish, French, Spanish and Italian.",
       body: "Your threads are right where you left them.",
       cta: "Browse all models",
       ps: "P.S. Know someone who'd use this? Your referral link pays you {{referralPercent}}% of everything they spend, every month.",

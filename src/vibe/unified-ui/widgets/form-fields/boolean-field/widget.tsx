@@ -84,6 +84,7 @@ export function BooleanFieldWidget<
                 <Div className="flex items-center space-x-3">
                   <FormControl>
                     <Checkbox
+                      ref={formField.ref}
                       id={formField.name}
                       name={formField.name}
                       checked={formField.value === true}

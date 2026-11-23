@@ -68,98 +68,100 @@ export const translations: typeof enTranslations = {
     },
   },
   emails: {
-    greeting: "Ciao.",
+    greeting: "Ciao,",
     greetingNamed: "Ciao {{name}},",
-    signoff: "Massimo",
+    signoff: "Max",
     signature: "unbottled.ai",
-    senderName: "Max da unbottled.ai",
-    unsubscribeText: "Cancellazione:",
+    senderName: "Max di unbottled.ai",
+    unsubscribeText: "Annulla l'iscrizione:",
     firstChatPrompts: {
-      subject: "Tre primi messaggi, pronti a incollare",
+      subject: "Tre primi messaggi, pronti da incollare",
       preview:
-        "Un'immagine non censurata, una mainstream, una sola immagine. Scegline uno, fallo.",
+        "Uno senza censura, uno mainstream, un'immagine. Scegline uno e invia.",
       intro:
-        "Il tuo account è pronto e la chat è ancora vuota. Qui ci sono tre messaggi per iniziare. Ricevuto, incollalo, manda.",
-      uncensoredTitle: "Chiedere senza la lezione",
+        "Il tuo account è pronto e la chat è ancora vuota. Ecco tre messaggi per iniziare. Copiane uno, incollalo, invia.",
+      uncensoredTitle: "Chiedi senza prediche",
       uncensoredPrompt:
-        '"Scrivi una storia del crimine oscuro dove vince il cattivo. Niente lieto fine, niente morale." Scegli uno dei modelli non censurati {{uncensoredCount}}. Si conferma una volta che hai 18 anni o più.',
-      mainstreamTitle: "Metta i grandi nomi fianco a fianco",
+        '"Scrivi un noir in cui vince il cattivo. Niente lieto fine, niente morale." Scegli uno dei {{uncensoredCount}} modelli senza censura. Confermi una volta sola di avere almeno 18 anni.',
+      mainstreamTitle: "Metti a confronto i big",
       mainstreamPrompt:
-        '"Plan un weekend economico a Lisbona. Dove mangiare, cosa saltare." Chiedi prima a GPT. Quindi passare a Claude o Gemini nello stesso thread e confrontare.',
-      mediaTitle: "Fai un'immagine, un video o una canzone",
+        '"Organizza un weekend low cost a Lisbona. Dove mangiare, cosa saltare." Chiedi prima a GPT. Poi passa a Claude o Gemini nello stesso thread e confronta.',
+      mediaTitle: "Crea un'immagine, un video o una canzone",
       mediaPrompt:
-        '"Una volpe in una sciarpa rossa su una strada di Tokyo nevosa di notte, fotografia di film." Un prompt, un\'immagine. Brevi video e musica funzionano allo stesso modo.',
-      body: "Il tuo account gratuito ottiene crediti {{freeCreditsSignedIn}} ogni mese, {{freeCreditsMax}} con la newsletter su. Niente carta.",
+        '"Una volpe con una sciarpa rossa in una strada innevata di Tokyo, di notte, foto su pellicola." Un prompt, un\'immagine. Video brevi e musica funzionano allo stesso modo.',
+      body: "Il tuo account gratuito riceve {{freeCreditsSignedIn}} crediti ogni mese, {{freeCreditsMax}} con la newsletter attiva. Nessuna carta.",
       cta: "Invia il tuo primo messaggio",
-      ps: "P.S. Non so da dove cominciare? Rispondi a questa email. Abbiamo letto le risposte.",
+      ps: "P.S. Non sai da dove partire? Rispondi a questa email. Leggiamo le risposte.",
     },
     outOfCredits: {
-      subject: "I crediti gratuiti di questo mese vengono utilizzati",
+      subject: "I crediti gratuiti di questo mese sono finiti",
       preview:
-        "Tornano al primo. O continuate, i piani da {{subscriptionPrice}} al mese.",
+        "Tornano il giorno 1. Oppure continua subito, piani da {{subscriptionPrice}} al mese.",
       intro:
-        "Hai usato tutti i crediti gratuiti di questo mese. Tornano al primo. Non vuoi aspettare? Scegli un piano. Prezzi allineati.",
-      starterTitle: "Starter: {{subscriptionPrice}} /mese",
+        "Hai usato tutti i crediti gratuiti di questo mese. Tornano il giorno 1. Non vuoi aspettare? Scegli un piano. Prezzi chiari.",
+      starterTitle: "Starter: {{subscriptionPrice}}/mese",
       starterBody:
-        "{{subscriptionCredits}} si accredita ogni mese. Cancellare in qualsiasi momento. Si adatta se si chat più giorni.",
-      moreTitle: "Ne hai bisogno? Tre piani più grandi",
+        "{{subscriptionCredits}} crediti ogni mese. Disdici quando vuoi. Perfetto se chatti quasi ogni giorno.",
+      moreTitle: "Ti serve di più? Tre piani più grandi",
       moreBody:
-        "Inoltre: crediti {{plusCredits}} per {{plusPrice}}. Pro: {{proCredits}} per {{proPrice}}. Ultra: {{ultraCredits}} per {{ultraPrice}}. Ogni piano può aggiungere pacchetti top-up che non scadono mai.",
+        "Plus: {{plusCredits}} crediti a {{plusPrice}}. Pro: {{proCredits}} a {{proPrice}}. Ultra: {{ultraCredits}} a {{ultraPrice}}. Ogni piano può aggiungere pacchetti di ricarica che non scadono mai.",
       body: "Paga con carta, PayPal o crypto. Stessi modelli, stesse impostazioni del filtro.",
-      cta: "Ottieni crediti {{subscriptionCredits}} per {{subscriptionPrice}}",
-      ps: "P.S. Aspettare la prima è bene anche. I tuoi fili rimangono dove sono.",
+      cta: "{{subscriptionCredits}} crediti a {{subscriptionPrice}}",
+      ps: "P.S. Aspettare il giorno 1 va benissimo. I tuoi thread restano dove sono.",
     },
     whatsNew: {
       subject: "Cosa è cambiato mentre eri via",
-      preview: "Modelli {{modelCount}}, video e musica in chat, e francese.",
+      preview: "{{modelCount}} modelli, video e musica in chat, sei lingue.",
       intro:
-        "La tua ultima chiacchierata e' stata piu' di una settimana fa. Ecco cosa c'e' di nuovo.",
-      modelsTitle: "Modelli di chat {{modelCount}}",
+        "La tua ultima chat risale a più di una settimana fa. Ecco le novità.",
+      modelsTitle: "{{modelCount}} modelli di chat",
       modelsBody:
-        "{{mainstreamCount}} mainstream, {{openCount}} aperto, {{uncensoredCount}} non censurato. Passare tra loro metà del tempo.",
+        "{{mainstreamCount}} mainstream, {{openCount}} open, {{uncensoredCount}} senza censura. Passa dall'uno all'altro nello stesso thread.",
       mediaTitle: "Immagini, video e musica",
       mediaBody:
-        "Digitare un prompt nella chat. Torna indietro una foto, un corto clip o una traccia.",
-      languagesTitle: "Ora in francese",
-      languagesBody: "L'intera app è in inglese, tedesco, polacco e francese.",
-      body: "I tuoi fili sono proprio dove li hai lasciati.",
-      cta: "Sfoglia tutti i modelli",
-      ps: "P.S. Conosci qualcuno che lo userebbe? Il tuo link di riferimento ti paga {{referralPercent}} % di tutto ciò che spendono, ogni mese.",
+        "Scrivi un prompt in chat. Ricevi un'immagine, una clip breve o un brano.",
+      languagesTitle: "Sei lingue",
+      languagesBody:
+        "Tutta l'app è disponibile in italiano, inglese, tedesco, polacco, francese e spagnolo.",
+      body: "I tuoi thread sono esattamente dove li hai lasciati.",
+      cta: "Scopri tutti i modelli",
+      ps: "P.S. Conosci qualcuno a cui servirebbe? Il tuo link referral ti paga il {{referralPercent}}% di tutto ciò che spende, ogni mese.",
     },
     winBack: {
-      subject: "Un'ultima email da noi",
-      preview: "Il tuo account, thread e crediti gratuiti sono ancora qui.",
+      subject: "Un'ultima email da parte nostra",
+      preview: "Il tuo account, i thread e i crediti gratuiti sono ancora qui.",
       intro:
-        "La tua ultima chiacchierata e' stata piu' di un mese fa. Questa e' l'ultima nudge che ci viene da noi.",
-      body: "Il tuo account, i tuoi thread e i tuoi crediti gratuiti mensili sono ancora lì. Più modelli che l'ultima volta, e il filtro è ancora tuo da impostare.",
-      cta: "Ritirata dove ti sei lasciato",
-      ps: "P.S. Cosa ti ha fatto scendere? Colpisci la risposta e dicci. Leggiamo ogni risposta.",
+        "La tua ultima chat risale a più di un mese fa. Questo è l'ultimo promemoria che ti mandiamo.",
+      body: "Il tuo account, i tuoi thread e i crediti gratuiti mensili sono ancora lì. Ci sono più modelli dell'ultima volta, e il filtro lo decidi sempre tu.",
+      cta: "Riprendi da dove avevi lasciato",
+      ps: "P.S. Cosa ti ha frenato? Rispondi e diccelo. Leggiamo ogni risposta.",
     },
     inviteSignup: {
-      subject: "Hai letto la newsletter. Ora utilizzare l'app.",
+      subject: "Leggi la newsletter. Ora prova l'app.",
       preview:
-        "Conto gratuito, fino a crediti {{freeCreditsMax}} al mese. Niente carta.",
+        "Account gratuito, fino a {{freeCreditsMax}} crediti al mese. Nessuna carta.",
       intro:
-        "Hai la nostra newsletter. L'applicazione è a un passo di distanza: modelli {{modelCount}}, e si imposta il filtro.",
-      guestTitle: "Nessun conto: Crediti {{freeCreditsGuest}} al mese",
-      guestBody: "Abbastanza da testare alcuni modelli.",
-      accountTitle: "Conto gratuito: Crediti {{freeCreditsSignedIn}} al mese",
-      accountBody: "I filetti salvati, su ogni dispositivo.",
+        "Ricevi la nostra newsletter. L'app è a un passo: {{modelCount}} modelli, e il filtro lo decidi tu.",
+      guestTitle: "Senza account: {{freeCreditsGuest}} crediti al mese",
+      guestBody: "Abbastanza per provare qualche modello.",
+      accountTitle: "Account gratuito: {{freeCreditsSignedIn}} crediti al mese",
+      accountBody: "I tuoi thread salvati, su ogni dispositivo.",
       newsletterTitle:
-        "Account + newsletter: Crediti {{freeCreditsMax}} al mese",
-      newsletterBody: "Tenere la newsletter sul tuo account e il bonus è tuo.",
-      body: "Niente carta. Accendere i crediti gratuiti una volta confermata la tua email.",
+        "Account + newsletter: {{freeCreditsMax}} crediti al mese",
+      newsletterBody:
+        "Tieni attiva la newsletter nel tuo account e il bonus è tuo.",
+      body: "Nessuna carta. I crediti gratuiti si attivano appena confermi la tua email.",
       cta: "Crea il mio account gratuito",
     },
     inviteReminder: {
       subject: "Ultimo promemoria: il tuo account gratuito",
       preview:
-        "{{freeCreditsMax}} accredita un mese invece di {{freeCreditsGuest}}. Niente carta.",
+        "{{freeCreditsMax}} crediti al mese invece di {{freeCreditsGuest}}. Nessuna carta.",
       intro:
-        "Ultimo promemoria. Un account gratuito con la newsletter riceve crediti {{freeCreditsMax}} ogni mese. Senza uno: {{freeCreditsGuest}}.",
-      body: "Ci vuole un minuto. Niente carta.",
+        "Ultimo promemoria. Un account gratuito con la newsletter attiva riceve {{freeCreditsMax}} crediti ogni mese. Senza account: {{freeCreditsGuest}}.",
+      body: "Ci vuole un minuto. Nessuna carta.",
       cta: "Crea il mio account gratuito",
-      ps: "P.S. Non ci sono più promemoria dopo questo. La newsletter continua a venire come al solito.",
+      ps: "P.S. Dopo questo, niente più promemoria. La newsletter continua ad arrivare come sempre.",
     },
   },
   emailTemplates: {
@@ -216,7 +218,7 @@ export const translations: typeof enTranslations = {
         },
       },
       response: {
-        paused: "Paused",
+        paused: "In pausa",
         enrolled: "Iscritta",
         sent: "Inviato",
         exited: "Esercizio",
@@ -266,7 +268,7 @@ export const translations: typeof enTranslations = {
         },
       },
       response: {
-        paused: "Paused",
+        paused: "In pausa",
         minHoursBetweenEmails: "Min ore tra e-mail",
         maxSendsPerRun: "E-mail max per corsa",
         autoEnrollWindowDays: "Finestra di iscrizione automatica (giorni)",
@@ -328,7 +330,7 @@ export const translations: typeof enTranslations = {
       description:
         "Viaggi, iscrizioni, invii e conversioni. Uccidi il commutatore e il backfill.",
       response: {
-        paused: "Paused",
+        paused: "In pausa",
         minHoursBetweenEmails: "Min ore tra e-mail",
         maxSendsPerRun: "E-mail max per corsa",
         autoEnrollWindowDays: "Finestra di iscrizione automatica (giorni)",
@@ -354,9 +356,9 @@ export const translations: typeof enTranslations = {
   widget: {
     title: "Viaggi nel ciclo di vita",
     refresh: "Aggiorna",
-    pausedTitle: "Paused",
+    pausedTitle: "In pausa",
     pausedBody: "Nulla è iscritto o inviato.",
-    liveTitle: "Live",
+    liveTitle: "Attivo",
     liveBody: "Due e-mail escono su ogni corsa.",
     pause: "Pausa tutto.",
     resume: "Riprendi l'invio",

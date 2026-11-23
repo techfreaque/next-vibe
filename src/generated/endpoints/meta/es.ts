@@ -2995,7 +2995,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Agregar créditos",
     titleShort: "Agregar créditos",
     description:
-      "Agregue paquetes de crédito a una cuenta de usuario (sólo administrador)",
+      "Añade paquetes de créditos a una cuenta de usuario (solo admins)",
     icon: "coins",
     category: "credits",
     subCategory: "Management",
@@ -6617,6 +6617,23 @@ export const endpointsMeta: EndpointMeta[] = [
               },
             },
           ],
+          wallSteps: [
+            { key: "creditWallGuests", value: 120 },
+            { key: "creditWallAccounts", value: 16 },
+            { key: "consentDeclined", value: 9 },
+          ],
+          previousWallSteps: null,
+          wallTrackedSince: "2026-11-24",
+          wallSegments: [
+            {
+              key: "direct",
+              metrics: {
+                creditWallGuests: 40,
+                creditWallAccounts: 5,
+                consentDeclined: 3,
+              },
+            },
+          ],
         },
         byRefCode: {
           window: {
@@ -6684,6 +6701,23 @@ export const endpointsMeta: EndpointMeta[] = [
                 emailSent: 30,
                 confirmed: 24,
                 confirmRate: 0.8,
+              },
+            },
+          ],
+          wallSteps: [
+            { key: "creditWallGuests", value: 120 },
+            { key: "creditWallAccounts", value: 16 },
+            { key: "consentDeclined", value: 9 },
+          ],
+          previousWallSteps: null,
+          wallTrackedSince: "2026-11-24",
+          wallSegments: [
+            {
+              key: "direct",
+              metrics: {
+                creditWallGuests: 40,
+                creditWallAccounts: 5,
+                consentDeclined: 3,
               },
             },
           ],
@@ -8797,14 +8831,14 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["leads", "lifecycle", "backfill"],
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
-    title: "Lifecycle Backfill",
+    title: "Relleno retroactivo del ciclo de vida",
     titleShort: "Relleno",
     description:
       "Previsualizar, luego inscribir los contactos existentes elegibles en el viaje correcto. Empieza en el paso 0, se extiende por una ventana de envío.",
     icon: "users",
     category: "newsletter",
     subCategory: "emailCampaignsJourneys",
-    tags: ["Lifecycle"],
+    tags: ["Ciclo de vida"],
     examples: {
       inputs: { default: { dryRun: true, spreadHours: 72 } },
       responses: {
@@ -8837,13 +8871,13 @@ export const endpointsMeta: EndpointMeta[] = [
     allowedRoles: ["enums.userRole.admin"],
     aliases: [],
     title: "Viajes de ciclo de vida",
-    titleShort: "Lifecycle",
+    titleShort: "Ciclo de vida",
     description:
       "Viajes, inscripciones, envíos y conversiones. Matar el interruptor y el relleno.",
     icon: "git-branch",
     category: "newsletter",
     subCategory: "emailCampaignsJourneys",
-    tags: ["Lifecycle"],
+    tags: ["Ciclo de vida"],
     examples: {
       responses: {
         default: {
@@ -8884,7 +8918,7 @@ export const endpointsMeta: EndpointMeta[] = [
     icon: "send",
     category: "newsletter",
     subCategory: "emailCampaignsJourneys",
-    tags: ["Lifecycle"],
+    tags: ["Ciclo de vida"],
     examples: {
       inputs: { default: { dryRun: false } },
       responses: {
@@ -8912,7 +8946,7 @@ export const endpointsMeta: EndpointMeta[] = [
     icon: "settings",
     category: "newsletter",
     subCategory: "emailCampaignsJourneys",
-    tags: ["Lifecycle"],
+    tags: ["Ciclo de vida"],
     examples: {
       inputs: { default: { paused: true } },
       responses: {
@@ -16968,7 +17002,7 @@ export const endpointsMeta: EndpointMeta[] = [
     ],
     aliases: ["cancel-subscription"],
     title: "Cancelar suscripción",
-    titleShort: "Cancelar Sub",
+    titleShort: "Cancelar",
     description: "Cancela tu suscripción",
     icon: "package-x",
     category: "payments",
@@ -17071,7 +17105,7 @@ export const endpointsMeta: EndpointMeta[] = [
     ],
     aliases: [],
     title: "Crear suscripción",
-    titleShort: "Crear sesión",
+    titleShort: "Suscribirse",
     description: "Crear una nueva suscripción",
     icon: "package-plus",
     category: "payments",
@@ -17351,7 +17385,7 @@ export const endpointsMeta: EndpointMeta[] = [
     ],
     aliases: ["update-subscription"],
     title: "Actualizar suscripción",
-    titleShort: "Actualizar Sub",
+    titleShort: "Cambiar plan",
     description: "Actualizar la suscripción existente",
     icon: "package-check",
     category: "payments",
@@ -18570,10 +18604,10 @@ export const endpointsMeta: EndpointMeta[] = [
     path: ["user", "public", "login"],
     allowedRoles: ["enums.userRole.public", "enums.userRole.aiToolOff"],
     aliases: [],
-    title: "Bienvenido.",
+    title: "Hola de nuevo",
     titleShort: "Iniciar sesión",
     description:
-      "Acceda a modelos AI sin censura y su historia de conversación.",
+      "Accede a modelos de IA sin censura y a tu historial de chats.",
     icon: "log-in",
     category: "account",
     subCategory: "",
@@ -18868,7 +18902,7 @@ export const endpointsMeta: EndpointMeta[] = [
     allowedRoles: ["enums.userRole.public", "enums.userRole.aiToolOff"],
     aliases: [],
     title: "Registro de Usuarios",
-    titleShort: "Sign Up",
+    titleShort: "Registrarse",
     description: "Punto final de registro del usuario",
     icon: "user-plus",
     category: "account",
@@ -18940,7 +18974,7 @@ export const endpointsMeta: EndpointMeta[] = [
     title: "Verifica tu correo",
     titleShort: "Verificar correo",
     description:
-      "Confirme su dirección de correo electrónico con el enlace que le enviamos. Llame sin señal para reenviar el enlace.",
+      "Confirma tu correo con el enlace que te enviamos. Llama sin token para reenviar el enlace.",
     icon: "mail",
     category: "account",
     subCategory: "",

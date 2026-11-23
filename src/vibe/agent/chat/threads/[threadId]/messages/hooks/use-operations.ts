@@ -7,6 +7,8 @@
 import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { parseError } from "next-vibe/core/utils/parse-error";
+import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { EndpointLogger } from "next-vibe/logger/types";
 import { toast } from "next-vibe/ui/hooks/use-toast";
 import {
   useWidgetLocale,
@@ -18,6 +20,7 @@ import { useApiMutation } from "next-vibe/unified-ui/hooks/use-api-mutation";
 import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useCredits } from "@/credits/hooks";
+import { sendWallBeacon } from "@/leads/tracking/wall-beacon";
 import { formatCreditAmount } from "@/products/credit-money";
 
 import type { ChatModelId } from "../../../../../ai-stream/models";
@@ -136,15 +139,22 @@ function toastNoModel(t: AiStreamT): void {
 /**
  * Block a turn the balance cannot cover (cost estimated at default turn size)
  * and tell the customer why. Returns true when the turn may proceed.
+ * A block is reported as a credit wall for the admin funnel.
  */
 function passesCreditGuard(
   t: AiStreamT,
   creditsTotal: number,
   modelId: ChatModelId,
-  isGuest: boolean,
+  user: JwtPayloadType,
   locale: CountryLanguage,
+  logger: EndpointLogger,
 ): boolean {
+  const isGuest = user.isPublic;
+  const reportWall = (): void => {
+    sendWallBeacon({ wall: "credits", model: modelId, user, locale, logger });
+  };
   if (creditsTotal <= 0) {
+    reportWall();
     toast({
       // Guests can't top up — point them at a free account instead
       title: isGuest
@@ -166,6 +176,7 @@ function passesCreditGuard(
       DEFAULT_OUTPUT_TOKENS,
     );
     if (creditsTotal < modelCost) {
+      reportWall();
       toast({
         title: t("input.insufficientCredits.title", {
           cost: formatCreditAmount(modelCost, locale),
@@ -263,8 +274,9 @@ export function useMessageOperations(
           t,
           creditsTotal,
           d.settings.selectedModel,
-          user.isPublic,
+          user,
           locale,
+          logger,
         )
       ) {
         return { success: false, createdThreadId: null };
@@ -320,8 +332,9 @@ export function useMessageOperations(
           t,
           creditsTotal,
           d.settings.selectedModel,
-          user.isPublic,
+          user,
           locale,
+          logger,
         )
       ) {
         return;

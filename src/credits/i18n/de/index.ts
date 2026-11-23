@@ -21,8 +21,7 @@ export const translations: typeof enTranslations = {
       },
       provider: {
         label: "Zahlungsmethode wählen",
-        description:
-          "Wählen Sie, wie Sie für Ihr Credit-Paket bezahlen möchten",
+        description: "Wähl aus, wie du dein Credit-Paket bezahlen willst",
         placeholder: "Zahlungsanbieter auswählen",
       },
       checkoutUrl: {
@@ -52,11 +51,11 @@ export const translations: typeof enTranslations = {
         },
         unauthorized: {
           title: "Nicht autorisiert",
-          description: "Sie müssen angemeldet sein, um Credits zu kaufen",
+          description: "Melde dich an, um Credits zu kaufen",
         },
         forbidden: {
           title: "Verboten",
-          description: "Sie haben keine Berechtigung, Credits zu kaufen",
+          description: "Du hast keine Berechtigung, Credits zu kaufen",
         },
         notFound: {
           title: "Nicht gefunden",
@@ -80,8 +79,7 @@ export const translations: typeof enTranslations = {
         },
         noActiveSubscription: {
           title: "Aktives Abonnement erforderlich",
-          description:
-            "Sie müssen ein aktives Abonnement haben, um Credit-Pakete zu kaufen",
+          description: "Credit-Pakete gibt es nur mit aktivem Abo",
         },
       },
     },
@@ -138,7 +136,7 @@ export const translations: typeof enTranslations = {
     },
     packType: {
       subscription: "Abonnement",
-      permanent: "Permanent",
+      permanent: "Dauerhaft",
       bonus: "Bonus",
       earned: "Verdient",
     },
@@ -220,9 +218,9 @@ export const translations: typeof enTranslations = {
     addCreditsFailed: "Fehler beim Hinzufügen von Credits",
     deductCreditsFailed: "Fehler beim Abziehen von Credits",
     insufficientCredits:
-      "Unzureichende Credits. Sie benötigen {{cost}} Credits, um diese Funktion zu nutzen.",
+      "Nicht genug Credits. Für diese Funktion brauchst du {{cost}} Credits.",
     deductionFailed:
-      "Fehler beim Abziehen von {{cost}} Credits. Bitte versuchen Sie es erneut.",
+      "{{cost}} Credits konnten nicht abgebucht werden. Versuch es noch mal.",
     getTransactionsFailed: "Fehler beim Abrufen der Credit-Transaktionen",
     invalidIdentifier: "Ungültige Benutzer- oder Lead-Kennung",
     userNotFound: "Benutzer nicht gefunden",
@@ -240,7 +238,7 @@ export const translations: typeof enTranslations = {
     oldestLeadNotFound: "Ältester Lead im Cluster nicht gefunden",
     transactionFailed: "Fehler beim Erstellen des Transaktionsdatensatzes",
     not_implemented_on_native:
-      "{{method}} ist auf der nativen Plattform nicht implementiert. Bitte verwenden Sie die Web-Version für diesen Vorgang.",
+      "{{method}} gibt es in der App noch nicht. Nutz dafür die Web-Version.",
     expireCreditsFailed: "Fehler beim Ablaufen von Credits",
     invalidAmount: "Credit-Betrag muss eine positive Zahl sein",
     walletNotFound: "Wallet nicht gefunden",
@@ -260,7 +258,7 @@ export const translations: typeof enTranslations = {
     description: "Aktuelles Credit-Guthaben mit Aufschlüsselung abrufen",
     response: {
       title: "Credit-Guthaben",
-      description: "Ihr aktuelles Credit-Guthaben und Aufschlüsselung",
+      description: "Dein aktuelles Credit-Guthaben im Detail",
     },
     balance: {
       subscribe: "Pläne ansehen",
@@ -314,7 +312,7 @@ export const translations: typeof enTranslations = {
       spending: {
         title: "Eigene verdiente Credits",
         adminDescription:
-          "Ihre persönlichen Empfehlungsverdienste (nicht instanzweit)",
+          "Deine persönlichen Empfehlungsverdienste (nicht instanzweit)",
       },
     },
     total: {
@@ -358,12 +356,11 @@ export const translations: typeof enTranslations = {
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description:
-          "Sie müssen angemeldet sein, um Ihr Credit-Guthaben anzuzeigen",
+        description: "Melde dich an, um dein Credit-Guthaben zu sehen",
       },
       forbidden: {
         title: "Verboten",
-        description: "Sie haben keine Berechtigung für diese Ressource",
+        description: "Du hast keine Berechtigung für diese Ressource",
       },
       notFound: {
         title: "Nicht gefunden",
@@ -379,12 +376,11 @@ export const translations: typeof enTranslations = {
       },
       noActiveSubscription: {
         title: "Aktives Abonnement erforderlich",
-        description:
-          "Sie müssen ein aktives Abonnement haben, um Credit-Packs zu kaufen",
+        description: "Credit-Pakete gibt es nur mit aktivem Abo",
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
-        description: "Sie haben nicht gespeicherte Änderungen",
+        description: "Du hast nicht gespeicherte Änderungen",
       },
       conflict: {
         title: "Konflikt",
@@ -392,8 +388,7 @@ export const translations: typeof enTranslations = {
       },
       no_active_subscription: {
         title: "Aktives Abonnement erforderlich",
-        description:
-          "Sie müssen ein aktives Abonnement haben, um Credit-Packs zu kaufen",
+        description: "Credit-Pakete gibt es nur mit aktivem Abo",
       },
     },
   },
@@ -463,7 +458,7 @@ export const translations: typeof enTranslations = {
       description: "Paginierten Credit-Transaktionsverlauf abrufen",
       container: {
         title: "Credit-Verlauf",
-        description: "Ihren Credit-Transaktionsverlauf anzeigen",
+        description: "Deinen Credit-Verlauf ansehen",
       },
       emptyState: "Noch keine Transaktionen",
       balance: "Guthaben danach: {{count}}",
@@ -537,12 +532,11 @@ export const translations: typeof enTranslations = {
         },
         unauthorized: {
           title: "Nicht autorisiert",
-          description:
-            "Sie müssen angemeldet sein, um Ihren Credit-Verlauf anzuzeigen",
+          description: "Melde dich an, um deinen Credit-Verlauf zu sehen",
         },
         forbidden: {
           title: "Verboten",
-          description: "Sie haben keine Berechtigung für diese Ressource",
+          description: "Du hast keine Berechtigung für diese Ressource",
         },
         notFound: {
           title: "Nicht gefunden",
@@ -558,7 +552,7 @@ export const translations: typeof enTranslations = {
         },
         unsavedChanges: {
           title: "Nicht gespeicherte Änderungen",
-          description: "Sie haben nicht gespeicherte Änderungen",
+          description: "Du hast nicht gespeicherte Änderungen",
         },
         conflict: {
           title: "Konflikt",
@@ -685,7 +679,7 @@ export const translations: typeof enTranslations = {
         },
         unsavedChanges: {
           title: "Nicht gespeicherte Änderungen",
-          description: "Sie haben nicht gespeicherte Änderungen",
+          description: "Du hast nicht gespeicherte Änderungen",
         },
         conflict: {
           title: "Konflikt",
@@ -697,16 +691,16 @@ export const translations: typeof enTranslations = {
   email: {
     creditPack: {
       user: {
-        subject: "Ihr Guthaben-Paket ist bereit - {{appName}}",
-        title: "Credits wurden Ihrem Konto hinzugefügt",
-        previewText: "{{credits}} Credits wurden Ihrem Konto hinzugefügt",
+        subject: "Dein {{appName}} Credit-Paket ist da",
+        title: "Deine Credits sind da",
+        previewText: "{{credits}} Credits sind jetzt auf deinem Konto",
         greeting: "Hallo {{privateName}},",
-        body: "Ihr Kauf eines Guthaben-Pakets war erfolgreich. {{credits}} permanente Credits wurden Ihrem Konto hinzugefügt und sind einsatzbereit.",
+        body: "Dein Credit-Paket ist gebucht. {{credits}} Credits liegen jetzt auf deinem Konto, verfallen nie und sind sofort einsatzbereit.",
         cta: "Credits jetzt nutzen",
-        signoff: "Vielen Dank für Ihren Kauf!\n\nDas {{appName}}-Team",
+        signoff: "Danke für deinen Kauf!\n\nDas {{appName}}-Team",
       },
       admin: {
-        subject: "[{{appName}}] Guthaben-Paket gekauft - {{credits}} Credits",
+        subject: "[{{appName}}] Guthaben-Paket gekauft: {{credits}} Credits",
         title: "Guthaben-Paket-Kauf",
         preview: "Ein Benutzer hat ein Guthaben-Paket gekauft",
         body: "Ein Benutzer hat ein Guthaben-Paket gekauft.",

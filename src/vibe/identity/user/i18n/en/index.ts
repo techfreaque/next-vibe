@@ -2447,10 +2447,10 @@ export const translations = {
           description:
             "Our terms and conditions respect your freedom and privacy.",
           termsLink: "terms",
-          conditionsLink: "conditions",
+          conditionsLink: "privacy policy",
           descriptionPrefix: "Our",
           descriptionAnd: "and",
-          descriptionSuffix: "respect your freedom and privacy.",
+          descriptionSuffix: "respect your freedom.",
           validation: {
             required: "You must accept the terms and conditions to continue",
           },

@@ -26,6 +26,10 @@ export const translations = {
       previousSignupSteps: "Signup steps in the previous period",
       signupSegments: "Signup steps per segment",
       signupTrackedSince: "Signup steps tracked since",
+      wallSteps: "Conversion walls in the period",
+      previousWallSteps: "Conversion walls in the previous period",
+      wallSegments: "Conversion walls per segment",
+      wallTrackedSince: "Conversion walls tracked since",
     },
     errors: {
       unauthorized: { title: "Unauthorized", description: "Log in as admin." },
@@ -53,6 +57,18 @@ export const translations = {
     },
   },
   widget: {
+    wallTitle: "Conversion walls",
+    wallSubtitle:
+      "People refused at a wall, dated when it happened. Each counts once per wall.",
+    wallTrackedHint: "Tracked since {{date}}: earlier walls were not recorded.",
+    creditWallGuests: "Guests out of credits",
+    creditWallAccounts: "Accounts out of credits",
+    consentDeclined: "18+ consent declined",
+    creditWallHint: "Send refused, out-of-credits card shown",
+    consentDeclinedHint: "Closed the consent dialog without agreeing",
+    wallSegmentsTitle: "Walls per segment",
+    wallSegmentsSubtitle: "Same walls split by the selected dimension.",
+    wallEmpty: "Nobody hit a wall in this period.",
     signupTitle: "Signup confirmation",
     signupSubtitle:
       "Leads per step, dated when the step happened. Drop-off shows where signups die.",

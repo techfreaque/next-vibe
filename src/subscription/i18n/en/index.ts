@@ -595,7 +595,7 @@ export const translations = {
     },
     admin_notification: {
       title: "New Subscription",
-      subject: "New Subscription - {{planName}}",
+      subject: "New subscription: {{planName}}",
       preview: "New subscription: {{userName}} subscribed to {{planName}}",
       message: "A new user has subscribed to {{appName}}.",
       details: "Subscription Details",

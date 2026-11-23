@@ -5093,6 +5093,8 @@ export const translations: typeof enTranslations = {
       websiteVisit: "Wizyta na stronie",
       formSubmit: "Wysłanie formularza",
       leadAttribution: "Atrybucja leadu",
+      creditWall: "Brak kredytów",
+      consentDeclined: "Odmowa zgody 18+",
     },
     leadStatus: {
       new: "Nowy",

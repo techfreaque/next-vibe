@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     reminderSent: "Recordatorio enviado",
   },
   reminder: {
-    subject: "Tu cuenta de unbottled.ai está a un clic",
+    subject: "Tu cuenta de {{appName}} está a un clic",
     hint: "Empezaste a registrarte pero nunca confirmaste tu correo. Confirma ahora y recibe {{credits}} créditos gratis cada mes. El código y el botón de abajo valen 24 horas y sustituyen a los del primer correo.",
     button: "Confirmar e iniciar sesión",
     ignore:
@@ -89,7 +89,7 @@ export const translations: typeof enTranslations = {
         },
         lowercase: {
           icon: "✗",
-          text: "Por lo menos una carta inferior",
+          text: "Al menos una letra minúscula",
         },
         number: {
           icon: "✗",
@@ -97,7 +97,7 @@ export const translations: typeof enTranslations = {
         },
         special: {
           icon: "!",
-          text: "Carácter especial (opcional, mejora la fuerza)",
+          text: "Carácter especial (opcional, la hace más segura)",
         },
       },
     },
@@ -105,7 +105,7 @@ export const translations: typeof enTranslations = {
       title: "_components",
       description: "_ punto final de los componentes",
       form: {
-        title: "_components Configuration",
+        title: "Configuración de _components",
         description: "Configurar los parámetros _components",
       },
       response: {
@@ -153,12 +153,12 @@ export const translations: typeof enTranslations = {
     },
   },
   title: "Registro de Usuarios",
-  titleShort: "Sign Up",
+  titleShort: "Registrarse",
   description: "Punto final de registro del usuario",
   tag: "Autenticación",
   form: {
-    title: "Cree su cuenta",
-    description: "Cada modelo. Tus reglas. Libre para empezar.",
+    title: "Crea tu cuenta",
+    description: "Todos los modelos. Tus reglas. Gratis para empezar.",
   },
   actions: {
     submit: "Enviar código de confirmación",
@@ -167,41 +167,38 @@ export const translations: typeof enTranslations = {
   fields: {
     privateName: {
       label: "Nombre privado",
-      description: "Lo que el AI te llama. Nunca se lo mostré a nadie más.",
-      placeholder: "Por ejemplo. Alex",
+      description: "Cómo te llama la IA. Nadie más lo ve.",
+      placeholder: "p. ej. Alex",
       validation: {
-        required: "Nombre privado es obligatorio",
-        minLength: "El nombre debe ser por lo menos 2 caracteres",
-        maxLength: "El nombre debe ser inferior a 100 caracteres",
+        required: "El nombre privado es obligatorio",
+        minLength: "El nombre debe tener al menos 2 caracteres",
+        maxLength: "El nombre debe tener menos de 100 caracteres",
       },
     },
     publicName: {
       label: "Nombre público",
-      description: "Espectáculo en chats compartidos y foros.",
-      placeholder: "e.g. alex_builds",
+      description: "Se muestra en chats compartidos y foros.",
+      placeholder: "p. ej. alex_crea",
       validation: {
-        required: "Nombre de la pantalla es necesario",
-        minLength:
-          "El nombre de la pantalla debe ser por lo menos 2 caracteres",
-        maxLength:
-          "El nombre de la pantalla debe ser inferior a 100 caracteres",
+        required: "El nombre público es obligatorio",
+        minLength: "El nombre público debe tener al menos 2 caracteres",
+        maxLength: "El nombre público debe tener menos de 100 caracteres",
       },
     },
     email: {
       label: "Correo electrónico",
-      description: "Para acceder solo. Nunca compartido.",
-      placeholder: "you@example.com",
-      help: "Este será su email de inicio de sesión y el método de contacto primario",
+      description: "Solo para iniciar sesión. Nunca se comparte.",
+      placeholder: "tu@ejemplo.com",
+      help: "Será tu correo para iniciar sesión y tu contacto principal",
       validation: {
-        required: "El correo electrónico es necesario",
-        invalid:
-          "Por favor, introduzca una dirección de correo electrónico válida",
+        required: "El correo es obligatorio",
+        invalid: "Introduce un correo válido",
       },
     },
     password: {
       label: "Contraseña",
       description:
-        "8+ caracteres con superior, inferior y número. Guárdelo con seguridad: está llegando el cifrado de extremo a extremo, y un reinicio limpiará su historia.",
+        "8+ caracteres con mayúscula, minúscula y un número. Guárdala bien: llega el cifrado de extremo a extremo, y entonces un restablecimiento borrará tu historial.",
       placeholder: "Crea una contraseña",
       validation: {
         required: "Se requiere contraseña",
@@ -232,12 +229,12 @@ export const translations: typeof enTranslations = {
     acceptTerms: {
       label: "Acepto los términos y condiciones",
       description:
-        "Nuestros términos y condiciones respetan tu libertad y tu privacidad.",
+        "Nuestros términos y nuestra política de privacidad respetan tu libertad.",
       termsLink: "términos",
-      conditionsLink: "condiciones",
+      conditionsLink: "política de privacidad",
       descriptionPrefix: "Nuestros",
-      descriptionAnd: "y",
-      descriptionSuffix: "respetan tu libertad y tu privacidad.",
+      descriptionAnd: "y nuestra",
+      descriptionSuffix: "respetan tu libertad.",
       validation: {
         required: "Para continuar, acepta los términos y condiciones",
       },
@@ -278,7 +275,7 @@ export const translations: typeof enTranslations = {
     title: "Error de registro",
     validation: {
       title: "Error de validación",
-      description: "Por favor, compruebe su entrada e inténtelo de nuevo",
+      description: "Revisa tus datos y vuelve a intentarlo",
     },
     unauthorized: {
       title: "Se requiere autenticación",
@@ -293,7 +290,7 @@ export const translations: typeof enTranslations = {
       description: "Ocurrió un error inesperado",
     },
     conflict: {
-      title: "Conflicto contable",
+      title: "La cuenta ya existe",
       description: "Ya existe una cuenta con este correo",
       detail: "Ya existe una cuenta con este correo. Inicia sesión.",
     },
@@ -327,27 +324,26 @@ export const translations: typeof enTranslations = {
     autoLoginFailed:
       "Tu cuenta está lista, pero el inicio de sesión automático falló. Inicia sesión con tu nueva contraseña.",
     internal: {
-      title: "Suscripción falló para {{email}} : {{error}}",
+      title: "Falló el registro de {{email}}: {{error}}",
       description: "Se produjo un error interno",
     },
   },
   emailCheck: {
-    title: "Email Check",
-    description:
-      "Compruebe si el correo electrónico está disponible para el registro",
+    title: "Comprobación de correo",
+    description: "Comprueba si el correo está disponible para registrarse",
     tag: "Correo electrónico",
     fields: {
       email: {
         label: "Dirección de correo electrónico",
         description: "Correo electrónico para comprobar",
-        placeholder: "Introduzca la dirección de correo electrónico",
+        placeholder: "Introduce tu correo",
         validation: {
           invalid: "Formato de correo electrónico inválido",
         },
       },
     },
     response: {
-      title: "Email Check Response",
+      title: "Resultado de la comprobación del correo",
       description:
         "Resultado de comprobación de disponibilidad de correo electrónico",
       available: "Correo electrónico disponible",
@@ -356,8 +352,7 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Correo electrónico inválido",
-        description:
-          "Por favor, introduzca una dirección de correo electrónico válida",
+        description: "Introduce un correo válido",
       },
       internal: {
         title: "No se pudo comprobar {{email}} : {{error}}",
@@ -374,8 +369,7 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Acceso denegado",
-        description:
-          "Usted no tiene permiso para comprobar este correo electrónico",
+        description: "No tienes permiso para comprobar este correo",
       },
       network: {
         title: "Error de red",
@@ -403,8 +397,8 @@ export const translations: typeof enTranslations = {
     },
   },
   post: {
-    title: "Signup",
-    description: "Punto final de inscripción",
+    title: "Registro",
+    description: "Endpoint de registro",
     form: {
       title: "Configuración de registro",
       description: "Configurar parámetros de registro",
@@ -412,9 +406,9 @@ export const translations: typeof enTranslations = {
     response: {
       title: "Respuesta",
       description: "Datos de respuesta de registro",
-      success: "Signup Successful",
-      message: "Mensaje de Estado",
-      userId: "Usuario ID",
+      success: "Registro completado",
+      message: "Mensaje de estado",
+      userId: "ID de usuario",
       nextSteps: "Siguientes pasos",
     },
     errors: {
@@ -458,31 +452,31 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Operación completada",
       description: "La operación se completó correctamente",
-      processing: "Procesamiento de registro con éxito",
+      processing: "Registro procesado correctamente",
     },
   },
   response: {
     title: "Respuesta",
     description: "Datos de respuesta de registro",
-    success: "Signup Successful",
-    message: "Mensaje de Estado",
+    success: "Registro completado",
+    message: "Mensaje de estado",
     user: {
-      id: "Usuario ID",
+      id: "ID de usuario",
       email: "Dirección de correo electrónico",
       firstName: "Nombre",
       lastName: "Apellido",
       privateName: "Nombre privado",
       publicName: "Nombre público",
-      imageUrl: "Imagen de perfil URL",
+      imageUrl: "URL de la imagen de perfil",
       verificationRequired: "Verificación requerida",
     },
     verificationInfo: {
       title: "Verificación de correo electrónico",
       description:
         "Detalles sobre el proceso de verificación de correo electrónico",
-      emailSent: "Email Sent",
-      expiresAt: "Gastos de verificación en",
-      checkSpamFolder: "Carpeta de Spam",
+      emailSent: "Correo enviado",
+      expiresAt: "La verificación vence el",
+      checkSpamFolder: "Revisa también la carpeta de spam",
     },
     nextSteps: "Siguientes pasos",
   },
@@ -505,16 +499,16 @@ export const translations: typeof enTranslations = {
     user_details: "Detalles del usuario",
     basic_information: "Información básica",
     signup_type: "Tipo de registro",
-    direct_signup: "Firma directa",
+    direct_signup: "Registro directo",
     newsletter: "Boletín",
     subscribed: "Suscrito",
     not_subscribed: "No está suscrito",
     signup_details: "Detalles de la inscripción",
     signup_date: "Fecha de inscripción",
-    user_id: "Usuario ID",
+    user_id: "ID de usuario",
     recommended_next_steps: "Próximos pasos recomendados",
     direct_recommendation: "Revisar perfil de usuario y configuración de pago",
-    contact_user: "Contacto Usuario",
+    contact_user: "Contactar al usuario",
     footer: "Notificación automática de {{appName}}",
   },
   email: {
@@ -555,7 +549,7 @@ export const translations: typeof enTranslations = {
   },
   emailTemplates: {
     welcome: {
-      name: "Signup Welcome Email",
+      name: "Correo de bienvenida tras el registro",
       description:
         "Correo electrónico de bienvenida enviado a los usuarios después del registro exitoso",
       category: "Autenticación",
@@ -565,7 +559,7 @@ export const translations: typeof enTranslations = {
           description: "Nombre privado del usuario",
         },
         userId: {
-          label: "Usuario ID",
+          label: "ID de usuario",
           description: "El identificador único del usuario",
         },
         leadId: {
@@ -575,10 +569,10 @@ export const translations: typeof enTranslations = {
       },
     },
     adminSignup: {
-      name: "Nombre de la firma de Admin Email",
+      name: "Aviso de registro para admins",
       description:
         "Correo electrónico enviado a los administradores cuando un nuevo usuario se registra",
-      category: "Administration",
+      category: "Administración",
       preview: {
         privateName: {
           label: "Nombre privado",
@@ -590,7 +584,7 @@ export const translations: typeof enTranslations = {
           label: "Dirección de correo electrónico",
         },
         userId: {
-          label: "Usuario ID",
+          label: "ID de usuario",
         },
         subscribeToNewsletter: {
           label: "Suscripción",

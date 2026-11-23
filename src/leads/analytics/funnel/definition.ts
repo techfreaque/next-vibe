@@ -1,6 +1,8 @@
 /**
  * Funnel report (GET): leads created in the period and how far they got
- * (human, first chat, signup, email confirmed, paid), overall and per segment.
+ * (human, first chat, signup, email confirmed, paid), overall and per segment,
+ * plus the signup confirmation steps and the conversion walls (out of
+ * credits, 18+ consent declined).
  */
 
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
@@ -52,6 +54,11 @@ const signupSteps = [
   { key: "expired", value: 11 },
   { key: "confirmed", value: 38 },
 ];
+const wallSteps = [
+  { key: "creditWallGuests", value: 120 },
+  { key: "creditWallAccounts", value: 16 },
+  { key: "consentDeclined", value: 9 },
+];
 const exampleResponse = {
   window: {
     from: "2026-10-23",
@@ -81,6 +88,19 @@ const exampleResponse = {
     {
       key: "direct",
       metrics: { started: 30, emailSent: 30, confirmed: 24, confirmRate: 0.8 },
+    },
+  ],
+  wallSteps,
+  previousWallSteps: null,
+  wallTrackedSince: "2026-11-24",
+  wallSegments: [
+    {
+      key: "direct",
+      metrics: {
+        creditWallGuests: 40,
+        creditWallAccounts: 5,
+        consentDeclined: 3,
+      },
     },
   ],
 };
@@ -174,6 +194,26 @@ const { GET } = createEndpoint({
       signupTrackedSince: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "get.response.signupTrackedSince",
+        schema: z.string().nullable(),
+      }),
+      wallSteps: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.wallSteps",
+        schema: funnelSchema,
+      }),
+      previousWallSteps: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.previousWallSteps",
+        schema: funnelSchema.nullable(),
+      }),
+      wallSegments: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.wallSegments",
+        schema: breakdownSchema,
+      }),
+      wallTrackedSince: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.wallTrackedSince",
         schema: z.string().nullable(),
       }),
     },

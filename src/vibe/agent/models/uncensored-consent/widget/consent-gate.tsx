@@ -15,6 +15,8 @@ import {
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { sendWallBeacon } from "@/leads/tracking/wall-beacon";
+
 import { type ChatModelId, getChatModelById } from "../../../ai-stream/models";
 import { useModelSelectorState } from "../../../chat/model-selector-state";
 import { isUncensoredContent } from "../constants";
@@ -54,6 +56,15 @@ export function UncensoredConsentGate({
     (gate.open || selectionNeedsConsent) && consent.consented !== true;
 
   const dismiss = (): void => {
+    // Closed without agreeing: a consent decline for the admin funnel.
+    sendWallBeacon({
+      wall: "consent",
+      model: model?.id ?? gate.modelName ?? "",
+      user,
+      locale,
+      logger,
+      prompt: gate.open ? gate.prompt : "select",
+    });
     setError(null);
     setDismissedFor(model?.id ?? null);
     gate.close();

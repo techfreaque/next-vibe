@@ -222,7 +222,7 @@ export const translations: typeof enTranslations = {
       placeholder: "Inserisci la tua email",
       validation: {
         required: "E-mail è richiesta",
-        invalid: "Si prega di inserire un indirizzo email valido",
+        invalid: "Inserisci un indirizzo email valido",
       },
     },
     password: {
@@ -288,7 +288,7 @@ export const translations: typeof enTranslations = {
     user: {
       title: "Dettagli utente",
       description: "Registrato nelle informazioni dell'utente",
-      id: "Utente ID",
+      id: "ID utente",
       email: "Indirizzo email",
       firstName: "Nome",
       lastName: "Ultimo nome",
@@ -321,16 +321,16 @@ export const translations: typeof enTranslations = {
     resendPending: "Invia di nuovo l’email di conferma",
     invalid_credentials:
       "Email o password errata. Non hai ancora un account? Registrati.",
-    two_factor_required: "Richiesta di autenticazione a due fattori",
+    two_factor_required: "Serve l’autenticazione a due fattori",
     invalid_two_factor_code: "Codice di autenticazione non valido",
     auth_error: "Autenticazione non riuscita per {{email}}: {{error}}",
     user_not_found: "Nessun utente trovato per {{userId}}",
     session_creation_failed:
       "Non è possibile creare una sessione per {{userId}}: {{error}}",
-    token_save_failed: "Non riuscito a salvare il token di autenticazione",
+    token_save_failed: "Impossibile salvare il token di autenticazione",
     validation: {
       title: "Convalida non riuscita",
-      description: "Si prega di controllare il vostro input",
+      description: "Controlla i dati inseriti",
     },
     unauthorized: {
       title: "Accesso non riuscito",
@@ -372,7 +372,7 @@ export const translations: typeof enTranslations = {
   },
   token: {
     save: {
-      failed: "Non riuscito a salvare il token di autenticazione",
+      failed: "Impossibile salvare il token di autenticazione",
       success: "Token di autenticazione salvato con successo",
     },
   },

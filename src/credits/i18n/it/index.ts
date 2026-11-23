@@ -62,7 +62,7 @@ export const translations: typeof enTranslations = {
     },
     packType: {
       subscription: "Abbonamento",
-      permanent: "Permanent",
+      permanent: "Permanente",
       bonus: "Bonus",
       earned: "Guarnizione",
     },
@@ -108,7 +108,7 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Errore del server",
-          description: "Non scadere crediti",
+          description: "Impossibile far scadere i crediti",
         },
         unknown: {
           title: "Errore sconosciuto",
@@ -122,14 +122,14 @@ export const translations: typeof enTranslations = {
     },
     task: {
       description: "Scade i crediti di abbonamento vecchi al giorno",
-      error: "Non scadere crediti",
+      error: "Impossibile far scadere i crediti",
     },
   },
   cleanup: {
     task: {
       description:
         "Rimuove ogni settimana i portafogli dei lead non più collegati",
-      error: "Non riuscito a ripulire i portafogli orfani",
+      error: "Impossibile ripulire i portafogli orfani",
     },
   },
   errors: {
@@ -141,40 +141,39 @@ export const translations: typeof enTranslations = {
     getLeadBalanceFailed: "Impossibile caricare il saldo crediti del lead",
     getOrCreateLeadFailed: "Impossibile trovare o creare il lead",
     addCreditsFailed: "Non è stato possibile aggiungere crediti",
-    deductCreditsFailed: "Non è riuscito a dedurre i crediti",
+    deductCreditsFailed: "Impossibile scalare i crediti",
     insufficientCredits:
-      "Crediti insufficienti. È necessario che i crediti {{cost}} utilizzino questa funzione.",
-    deductionFailed:
-      "Non ha detratto i crediti {{cost}}. Per favore, riprovate.",
-    getTransactionsFailed: "Non riuscita a ottenere transazioni di credito",
+      "Crediti insufficienti. Per questa funzione servono {{cost}} crediti.",
+    deductionFailed: "Impossibile scalare {{cost}} crediti. Riprova.",
+    getTransactionsFailed: "Impossibile caricare i movimenti dei crediti",
     invalidIdentifier: "ID utente o lead non valido",
     userNotFound: "Utente non trovato",
-    noLeadFound: "Nessun vantaggio trovato per l'utente",
+    noLeadFound: "Nessun lead trovato per l'utente",
     getCreditIdentifierFailed:
-      "Non è riuscito a ottenere l'identificatore di credito",
+      "Impossibile ottenere l'identificativo dei crediti",
     noCreditSource: "Nessuna fonte di credito disponibile",
-    stripeCustomerFailed: "Non è riuscito a creare il cliente Stripe",
+    stripeCustomerFailed: "Impossibile creare il cliente Stripe",
     checkoutFailed: "Impossibile creare la sessione di pagamento",
     mergeFailed: "Impossibile unire i crediti dei lead",
     mergeLeadWalletsFailed:
       "Impossibile trasferire i crediti dei lead all’account utente",
     cleanupOrphanedFailed:
       "Impossibile rimuovere i portafogli dei lead non più collegati",
-    monthlyResetFailed: "Non risistemato crediti mensili",
-    noLeadsToMerge: "Nessun indizio fornito a fondersi",
+    monthlyResetFailed: "Impossibile azzerare i crediti mensili",
+    noLeadsToMerge: "Nessun lead da unire",
     oldestLeadNotFound: "Impossibile trovare il lead più vecchio del gruppo",
-    transactionFailed: "Non è riuscito a creare record di transazione",
+    transactionFailed: "Impossibile registrare la transazione",
     not_implemented_on_native:
-      "{{method}} non è implementato sulla piattaforma nativa. Si prega di utilizzare la versione web per questa operazione.",
-    expireCreditsFailed: "Non scadere crediti",
+      "{{method}} non è ancora disponibile nell'app. Usa la versione web.",
+    expireCreditsFailed: "Impossibile far scadere i crediti",
     invalidAmount: "L'importo del credito deve essere un numero positivo",
     walletNotFound: "Portafoglio non trovato",
-    walletCreationFailed: "Non è riuscito a creare il portafoglio",
-    addEarnedCreditsFailed: "Non è riuscito a aggiungere crediti guadagnati",
+    walletCreationFailed: "Impossibile creare il portafoglio",
+    addEarnedCreditsFailed: "Impossibile aggiungere i crediti guadagnati",
     getEarnedBalanceFailed:
       "Impossibile caricare il saldo dei crediti guadagnati",
     insufficientEarnedCredits: "Crediti insufficienti per questa operazione",
-    deductEarnedCreditsFailed: "Non riuscito a dedurre crediti guadagnati",
+    deductEarnedCreditsFailed: "Impossibile scalare i crediti guadagnati",
     getReferralTransactionsFailed:
       "Non è possibile ottenere transazioni di rinvio",
   },

@@ -13,6 +13,8 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { leadEngagements } from "next-vibe/identity/lead/db";
+import { EngagementTypes } from "next-vibe/identity/lead/enum";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import type {
   BreakdownRow,
@@ -32,6 +34,7 @@ import {
 } from "next-vibe/unified-ui/analytics/window-sql";
 import type { QueryResultRow } from "pg";
 
+import { WALL_META } from "@/leads/tracking/wall-meta";
 import { pendingSignups, signupEvents } from "@/user/public/signup/db";
 import { SignupEventType } from "@/user/public/signup/event-type";
 import { expiryDedupeKeySql } from "@/user/public/signup/events";
@@ -181,6 +184,62 @@ function emptySignupSteps(): Record<SignupStep, number> {
   };
 }
 
+/**
+ * Conversion walls (lead_engagements), distinct leads per wall: a chat send
+ * refused for credits (guest or account) and the 18+ consent dialog closed
+ * without agreeing. Dated when it happened, like the signup steps.
+ */
+export const WALL_STEPS = [
+  "creditWallGuests",
+  "creditWallAccounts",
+  "consentDeclined",
+] as const;
+
+type WallStep = (typeof WALL_STEPS)[number];
+
+const WALL_TYPES = sql`(${EngagementTypes.CREDIT_WALL}, ${EngagementTypes.CONSENT_DECLINED})`;
+
+/** First recorded wall (null = nothing tracked yet). */
+async function wallTrackingSince(): Promise<Date | null> {
+  const { rows } = await db.execute<QueryResultRow & { since: string | null }>(
+    sql`SELECT min(e.created_at)::text AS since FROM ${leadEngagements} e
+      WHERE e.engagement_type IN ${WALL_TYPES}`,
+  );
+  const since = rows[0]?.since;
+  return since ? new Date(`${since.replace(" ", "T")}Z`) : null;
+}
+
+/** `WITH wev AS (...), swev AS (...)`: wall events of leads in the segment. */
+function wallEventsCte(win: AnalyticsWindow, filters: LeadSegmentFilters): SQL {
+  const start = utcSql(win.previousFrom ?? win.from);
+  const end = utcSql(win.to);
+  return sql`wev AS (
+    SELECT e.lead_id,
+      CASE
+        WHEN e.engagement_type = ${EngagementTypes.CONSENT_DECLINED} THEN 'consentDeclined'
+        WHEN e.metadata->>${WALL_META.who} = 'account' THEN 'creditWallAccounts'
+        ELSE 'creditWallGuests'
+      END AS wall,
+      e.created_at AS occurred_at
+    FROM ${leadEngagements} e
+    WHERE e.engagement_type IN ${WALL_TYPES}
+      AND e.created_at >= ${start} AND e.created_at < ${end}
+  ),
+  swev AS (
+    SELECT wev.*, f.* FROM wev
+    JOIN (${leadFactsSql(sql`l.id IN (SELECT lead_id FROM wev)`)}) f ON f.id = wev.lead_id
+    WHERE ${andAll(segmentConditions(filters))}
+  )`;
+}
+
+function emptyWallSteps(): Record<WallStep, number> {
+  return { creditWallGuests: 0, creditWallAccounts: 0, consentDeclined: 0 };
+}
+
+function isWallStep(value: string): value is WallStep {
+  return (WALL_STEPS as readonly string[]).includes(value);
+}
+
 function cohortCte(win: AnalyticsWindow, filters: LeadSegmentFilters): SQL {
   const start = win.previousFrom ?? win.from;
   return sql`seg AS (
@@ -278,6 +337,64 @@ export class FunnelReportRepository {
           (a, b) =>
             (b.metrics.started ?? 0) - (a.metrics.started ?? 0) ||
             (b.metrics.confirmed ?? 0) - (a.metrics.confirmed ?? 0),
+        )
+        .slice(0, 50);
+
+      const wallCte = wallEventsCte(win, data);
+      const wallNowSql = inWindowSql(sql`occurred_at`, win);
+      const wallPrevSql = inPreviousWindowSql(sql`occurred_at`, win);
+      const [wallSince, wallPeriods, wallSegmentRows] = await Promise.all([
+        wallTrackingSince(),
+        db.execute<
+          QueryResultRow & { current: boolean; wall: string; leads: number }
+        >(sql`
+          WITH ${wallCte}
+          SELECT (${wallNowSql}) AS current, wall, count(DISTINCT lead_id)::int AS leads
+          FROM swev WHERE (${wallNowSql}) OR (${wallPrevSql}) GROUP BY 1, 2
+        `),
+        db.execute<
+          QueryResultRow & { key: string | null; wall: string; leads: number }
+        >(sql`
+          WITH ${wallCte}
+          SELECT f.key, f.wall, count(DISTINCT f.lead_id)::int AS leads
+          FROM (SELECT ${dimensionColumn(dimension)} AS key, f.wall, f.lead_id, f.occurred_at FROM swev f) f
+          WHERE ${inWindowSql(sql`f.occurred_at`, win)}
+          GROUP BY 1, 2
+        `),
+      ]);
+      const wallTotals = (current: boolean): Record<WallStep, number> => {
+        const totals = emptyWallSteps();
+        for (const row of wallPeriods.rows) {
+          if (isWallStep(row.wall) && row.current === current) {
+            totals[row.wall] = row.leads;
+          }
+        }
+        return totals;
+      };
+      const wallNow = wallTotals(true);
+      const wallPrev =
+        win.previousFrom &&
+        wallSince &&
+        wallSince.getTime() <= win.previousFrom.getTime()
+          ? wallTotals(false)
+          : null;
+      const wallByKey = new Map<string | null, Record<WallStep, number>>();
+      for (const row of wallSegmentRows.rows) {
+        if (!isWallStep(row.wall)) {
+          continue;
+        }
+        const entry = wallByKey.get(row.key) ?? emptyWallSteps();
+        entry[row.wall] = row.leads;
+        wallByKey.set(row.key, entry);
+      }
+      const wallSegments: BreakdownRow[] = [...wallByKey.entries()]
+        .map(([key, steps]) => ({ key, metrics: { ...steps } }))
+        .toSorted(
+          (a, b) =>
+            (b.metrics.creditWallGuests ?? 0) +
+            (b.metrics.creditWallAccounts ?? 0) -
+            ((a.metrics.creditWallGuests ?? 0) +
+              (a.metrics.creditWallAccounts ?? 0)),
         )
         .slice(0, 50);
 
@@ -385,6 +502,12 @@ export class FunnelReportRepository {
           : null,
         signupTrackedSince: trackedSince ? toDayKey(trackedSince) : null,
         signupSegments,
+        wallSteps: WALL_STEPS.map((key) => ({ key, value: wallNow[key] })),
+        previousWallSteps: wallPrev
+          ? WALL_STEPS.map((key) => ({ key, value: wallPrev[key] }))
+          : null,
+        wallTrackedSince: wallSince ? toDayKey(wallSince) : null,
+        wallSegments,
       });
     } catch (error) {
       logger.error("Funnel report failed", parseError(error));

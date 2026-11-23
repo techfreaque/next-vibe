@@ -21,7 +21,7 @@ export const translations: typeof enTranslations = {
     reminderSent: "Rappel envoyé",
   },
   reminder: {
-    subject: "Votre compte unbottled.ai est à un clic",
+    subject: "Votre compte {{appName}} est à un clic",
     hint: "Vous avez commencé votre inscription sans confirmer votre adresse. Confirmez maintenant et recevez {{credits}} crédits gratuits chaque mois. Ce code et le bouton ci-dessous restent valables 24 heures et remplacent ceux du premier e-mail.",
     button: "Confirmer et se connecter",
     ignore:
@@ -486,7 +486,7 @@ export const translations: typeof enTranslations = {
   },
   admin_notification: {
     title: "Nouvelle inscription",
-    subject: "Nouvelle inscription - {{privateName}}",
+    subject: "Nouvelle inscription : {{privateName}}",
     preview: "Le nouvel utilisateur {{privateName}} s'est inscrit",
     message: "Un nouvel utilisateur s'est inscrit sur {{appName}}",
     privateName: "Nom privé",
@@ -529,7 +529,7 @@ export const translations: typeof enTranslations = {
     free: {
       title: "Ce que vous obtenez gratuitement, pour toujours :",
       credits:
-        "{{freeCreditsSignedIn}} crédits gratuits chaque mois, +{{freeCreditsNewsletterBonus}} avec la newsletter. Sans carte bancaire",
+        "{{freeCreditsSignedIn}} crédits gratuits chaque mois, +{{freeCreditsNewsletterBonus}} avec la newsletter. Sans carte bancaire.",
       allModels: "Accès aux {{modelCount}} modèles d'IA",
       uncensored:
         "Des modèles non censurés qui répondent vraiment à vos questions",

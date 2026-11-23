@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
   fields: {
     email: {
       label: "Dirección de correo electrónico",
-      description: "Introduzca su dirección de correo electrónico",
+      description: "Introduce tu correo",
       placeholder: "your@email.com",
     },
     allowPasswordAuth: {

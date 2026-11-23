@@ -15,18 +15,18 @@ export const translations: typeof enTranslations = {
     tts: "Texto a texto",
     stt: "Discurso a texto",
     search: "Buscar",
-    sttHotkey: "Speech-to-Text (Hotkey)",
+    sttHotkey: "Voz a texto (atajo de teclado)",
   },
   enums: {
     freeStatus: {
       active: "Créditos gratuitos activos",
       verifyEmail:
-        "Verifique su correo electrónico para desbloquear los créditos de la cuenta",
+        "Confirma tu correo para desbloquear los créditos de tu cuenta",
       subnetLimit: "Créditos gratuitos para esta red",
     },
     creditType: {
-      userSubscription: "Créditos de suscripción al usuario",
-      leadFree: "Lead Free Tier Credits",
+      userSubscription: "Créditos de suscripción",
+      leadFree: "Créditos gratuitos de lead",
     },
     creditFeature: {
       textToSpeech: "Texto a voz",
@@ -39,7 +39,7 @@ export const translations: typeof enTranslations = {
     transactionType: {
       purchase: "Compra",
       subscription: "Suscripción",
-      usage: "Usage",
+      usage: "Uso",
       expiry: "Gastos",
       freeTier: "Plan gratuito",
       monthlyReset: "Renovación mensual",
@@ -63,8 +63,8 @@ export const translations: typeof enTranslations = {
     },
     packType: {
       subscription: "Suscripción",
-      permanent: "Permanent",
-      bonus: "Bonus",
+      permanent: "Permanente",
+      bonus: "Bonificación",
       earned: "Ganado",
     },
   },
@@ -110,7 +110,7 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Error del servidor",
-          description: "Fallado para expirar los créditos",
+          description: "No se pudieron caducar los créditos",
         },
         unknown: {
           title: "Error desconocido",
@@ -124,14 +124,14 @@ export const translations: typeof enTranslations = {
     },
     task: {
       description: "Expires antiguos créditos de suscripción diario",
-      error: "Fallado para expirar los créditos",
+      error: "No se pudieron caducar los créditos",
     },
   },
   cleanup: {
     task: {
       description:
         "Elimina cada semana las billeteras de prospectos sin vincular",
-      error: "Failed to cleanup huérfanos billeteras",
+      error: "No se pudieron limpiar las billeteras huérfanas",
     },
   },
   errors: {
@@ -143,43 +143,44 @@ export const translations: typeof enTranslations = {
     getLeadBalanceFailed:
       "No pudimos cargar el saldo de créditos del prospecto",
     getOrCreateLeadFailed: "No pudimos encontrar ni crear el prospecto",
-    addCreditsFailed: "Fallado para añadir créditos",
-    deductCreditsFailed: "Fallado para deducir créditos",
+    addCreditsFailed: "No se pudieron añadir los créditos",
+    deductCreditsFailed: "No se pudieron descontar los créditos",
     insufficientCredits:
-      "Créditos insuficientes. Necesita créditos {{cost}} para usar esta función.",
+      "No tienes suficientes créditos. Esta función necesita {{cost}} créditos.",
     deductionFailed:
-      "No deducir créditos {{cost}}. Por favor, inténtalo de nuevo.",
-    getTransactionsFailed: "Fallado para obtener transacciones de crédito",
+      "No pudimos descontar {{cost}} créditos. Vuelve a intentarlo.",
+    getTransactionsFailed: "No pudimos cargar los movimientos de créditos",
     invalidIdentifier: "ID de usuario o prospecto no válido",
     userNotFound: "Usuario no encontrado",
-    noLeadFound: "No se ha encontrado ninguna pista para el usuario",
-    getCreditIdentifierFailed: "Failed to get credit identifier",
+    noLeadFound: "No se encontró ningún prospecto para el usuario",
+    getCreditIdentifierFailed:
+      "No se pudo obtener el identificador de créditos",
     noCreditSource: "No hay fuente de crédito disponible",
-    stripeCustomerFailed: "Failed to create Stripe customer",
+    stripeCustomerFailed: "No se pudo crear el cliente de Stripe",
     checkoutFailed: "No se pudo crear la sesión de pago",
     mergeFailed: "No pudimos combinar los créditos de los prospectos",
     mergeLeadWalletsFailed:
       "No pudimos transferir los créditos de los prospectos a la cuenta del usuario",
     cleanupOrphanedFailed:
       "No pudimos limpiar las billeteras de prospectos sin vincular",
-    monthlyResetFailed: "Fallado para reasentar créditos mensuales",
-    noLeadsToMerge: "No hay pistas proporcionadas para fusionarse",
+    monthlyResetFailed: "No se pudieron restablecer los créditos mensuales",
+    noLeadsToMerge: "No se indicaron prospectos para combinar",
     oldestLeadNotFound:
       "No pudimos encontrar al prospecto más antiguo del grupo",
-    transactionFailed: "Fallado para crear un registro de transacciones",
+    transactionFailed: "No se pudo registrar la transacción",
     not_implemented_on_native:
-      "{{method}} no se implementa en plataforma nativa. Por favor, utilice la versión web para esta operación.",
-    expireCreditsFailed: "Fallado para expirar los créditos",
+      "{{method}} aún no está disponible en la app. Usa la versión web.",
+    expireCreditsFailed: "No se pudieron caducar los créditos",
     invalidAmount: "La cantidad de crédito debe ser un número positivo",
-    walletNotFound: "Wallet no encontrado",
-    walletCreationFailed: "Failed para crear la cartera",
-    addEarnedCreditsFailed: "Fallado para añadir créditos ganados",
+    walletNotFound: "Billetera no encontrada",
+    walletCreationFailed: "No se pudo crear la billetera",
+    addEarnedCreditsFailed: "No se pudieron añadir los créditos ganados",
     getEarnedBalanceFailed: "No pudimos cargar el saldo de créditos ganados",
     insufficientEarnedCredits:
       "Créditos insuficientes obtenidos para esta operación",
-    deductEarnedCreditsFailed: "Fallado para deducir los créditos ganados",
+    deductEarnedCreditsFailed: "No se pudieron descontar los créditos ganados",
     getReferralTransactionsFailed:
-      "Fallado para obtener transacciones de remisión",
+      "No pudimos cargar los movimientos de referidos",
   },
   get: {
     title: "Consultar saldo de créditos",
@@ -291,7 +292,7 @@ export const translations: typeof enTranslations = {
       },
       forbidden: {
         title: "Acceso denegado",
-        description: "Usted no tiene permiso para acceder a este recurso",
+        description: "No tienes permiso para acceder a este recurso",
       },
       notFound: {
         title: "No encontrado",
@@ -399,7 +400,7 @@ export const translations: typeof enTranslations = {
         description: "Máximo de movimientos que se mostrarán (1-100)",
       },
       offset: {
-        label: "Offset",
+        label: "Desplazamiento",
         description: "Número de movimientos que se omiten al paginar",
       },
       targetUserId: {
@@ -467,7 +468,7 @@ export const translations: typeof enTranslations = {
         },
         forbidden: {
           title: "Acceso denegado",
-          description: "Usted no tiene permiso para acceder a este recurso",
+          description: "No tienes permiso para acceder a este recurso",
         },
         notFound: {
           title: "No encontrado",
@@ -543,7 +544,7 @@ export const translations: typeof enTranslations = {
         },
         forbidden: {
           title: "Acceso denegado",
-          description: "Usted no tiene permiso para comprar créditos",
+          description: "No tienes permiso para comprar créditos",
         },
         notFound: {
           title: "No encontrado",
@@ -624,13 +625,13 @@ export const translations: typeof enTranslations = {
       title: "Agregar créditos",
       titleShort: "Agregar créditos",
       description:
-        "Agregue paquetes de crédito a una cuenta de usuario (sólo administrador)",
+        "Añade paquetes de créditos a una cuenta de usuario (solo admins)",
       tag: "admin",
       container: {
         title: "Conceder créditos extra",
         description:
-          "Elija un destinatario e ingrese la cantidad exacta para otorgar a su cartera.",
-        selfTitle: "Añadir créditos a su cuenta",
+          "Elige un destinatario e introduce la cantidad exacta que quieres añadir a su billetera.",
+        selfTitle: "Añadir créditos a tu cuenta",
         selfDescription: "Concédete créditos extras",
       },
       targetUserId: {
@@ -685,7 +686,7 @@ export const translations: typeof enTranslations = {
         },
         server: {
           title: "Error del servidor",
-          description: "Fallado para añadir créditos",
+          description: "No se pudieron añadir los créditos",
         },
         unknown: {
           title: "Error desconocido",

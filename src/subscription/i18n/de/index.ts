@@ -32,7 +32,7 @@ export const translations: typeof enTranslations = {
         },
         provider: {
           label: "Zahlungsanbieter",
-          description: "Wählen Sie, wie Sie bezahlen möchten",
+          description: "Wähl aus, wie du bezahlen willst",
           placeholder: "Zahlungsanbieter auswählen",
         },
         metadata: {
@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
-        description: "Sie haben nicht gespeicherte Änderungen",
+        description: "Du hast nicht gespeicherte Änderungen",
       },
       conflict: {
         title: "Konflikt",
@@ -112,7 +112,7 @@ export const translations: typeof enTranslations = {
       errors: {
         alreadySubscribed: {
           title: "Bereits abonniert",
-          description: "Sie haben bereits ein aktives Abonnement",
+          description: "Du hast schon ein aktives Abo",
         },
         validation: {
           title: "Validierungsfehler",
@@ -148,7 +148,7 @@ export const translations: typeof enTranslations = {
         },
         unsavedChanges: {
           title: "Nicht gespeicherte Änderungen",
-          description: "Sie haben nicht gespeicherte Änderungen",
+          description: "Du hast nicht gespeicherte Änderungen",
         },
         conflict: {
           title: "Konflikt",
@@ -220,7 +220,7 @@ export const translations: typeof enTranslations = {
     description: "Aktuelle Abonnement-Details abrufen",
     form: {
       title: "Abonnement-Details",
-      description: "Ihre aktuellen Abonnement-Informationen anzeigen",
+      description: "Deine aktuellen Abo-Infos ansehen",
     },
   },
 
@@ -236,22 +236,19 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "Ungültige Eingabe",
-        description:
-          "Bitte überprüfen Sie Ihre Abonnementdetails und versuchen Sie es erneut",
+        description: "Prüf deine Abo-Angaben und versuch es noch mal",
       },
       network: {
         title: "Verbindungsfehler",
-        description:
-          "Keine Verbindung möglich. Bitte überprüfen Sie Ihre Internetverbindung",
+        description: "Keine Verbindung. Prüf deine Internetverbindung",
       },
       unauthorized: {
         title: "Anmeldung erforderlich",
-        description: "Bitte melden Sie sich an, um ein Abonnement zu erstellen",
+        description: "Melde dich an, um ein Abo abzuschließen",
       },
       forbidden: {
         title: "Zugriff verweigert",
-        description:
-          "Sie haben keine Berechtigung, ein Abonnement zu erstellen",
+        description: "Du hast keine Berechtigung, ein Abo abzuschließen",
       },
       notFound: {
         title: "Plan nicht gefunden",
@@ -261,25 +258,24 @@ export const translations: typeof enTranslations = {
       server: {
         title: "Ein Fehler ist aufgetreten",
         description:
-          "Ihr Abonnement konnte nicht erstellt werden. Bitte versuchen Sie es erneut",
+          "Dein Abo konnte nicht angelegt werden. Versuch es noch mal",
       },
       unknown: {
         title: "Unerwarteter Fehler",
-        description:
-          "Etwas Unerwartetes ist passiert. Bitte versuchen Sie es erneut",
+        description: "Etwas ist schiefgelaufen. Versuch es noch mal",
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
-        description: "Sie haben Änderungen, die noch nicht gespeichert wurden",
+        description: "Du hast Änderungen, die noch nicht gespeichert sind",
       },
       conflict: {
         title: "Abonnement existiert bereits",
-        description: "Sie haben bereits ein aktives Abonnement",
+        description: "Du hast schon ein aktives Abo",
       },
     },
     success: {
       title: "Abonnement erstellt",
-      description: "Ihr Abonnement wurde erfolgreich aktiviert",
+      description: "Dein Abo ist aktiv",
     },
   },
 
@@ -290,52 +286,47 @@ export const translations: typeof enTranslations = {
     description: "Vorhandenes Abonnement aktualisieren",
     form: {
       title: "Abonnement-Update",
-      description:
-        "Ihren Abonnement-Plan oder das Abrechnungsintervall aktualisieren",
+      description: "Plan oder Abrechnungsintervall deines Abos ändern",
     },
     errors: {
       validation: {
         title: "Ungültige Aktualisierung",
-        description:
-          "Bitte überprüfen Sie Ihre Änderungen und versuchen Sie es erneut",
+        description: "Prüf deine Änderungen und versuch es noch mal",
       },
       network: {
         title: "Verbindungsfehler",
         description:
-          "Ihre Änderungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut",
+          "Deine Änderungen konnten nicht gespeichert werden. Versuch es noch mal",
       },
       unauthorized: {
         title: "Anmeldung erforderlich",
-        description:
-          "Bitte melden Sie sich an, um Ihr Abonnement zu aktualisieren",
+        description: "Melde dich an, um dein Abo zu ändern",
       },
       forbidden: {
         title: "Zugriff verweigert",
-        description:
-          "Sie haben keine Berechtigung, dieses Abonnement zu aktualisieren",
+        description: "Du hast keine Berechtigung, dieses Abo zu ändern",
       },
       notFound: {
         title: "Abonnement nicht gefunden",
-        description: "Wir konnten Ihr Abonnement nicht finden",
+        description: "Wir finden dein Abo nicht",
       },
       server: {
         title: "Aktualisierung fehlgeschlagen",
         description:
-          "Ihre Änderungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut",
+          "Deine Änderungen konnten nicht gespeichert werden. Versuch es noch mal",
       },
       unknown: {
         title: "Unerwarteter Fehler",
-        description:
-          "Etwas Unerwartetes ist passiert. Bitte versuchen Sie es erneut",
+        description: "Etwas ist schiefgelaufen. Versuch es noch mal",
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
-        description: "Sie haben Änderungen, die noch nicht gespeichert wurden",
+        description: "Du hast Änderungen, die noch nicht gespeichert sind",
       },
       conflict: {
         title: "Aktualisierungskonflikt",
         description:
-          "Ihr Abonnement hat sich geändert. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut",
+          "Dein Abo hat sich inzwischen geändert. Lad die Seite neu und versuch es noch mal",
       },
     },
     submit: {
@@ -344,7 +335,7 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Abonnement aktualisiert",
-      description: "Ihr Abonnement wurde erfolgreich aktualisiert",
+      description: "Dein Abo ist aktualisiert",
     },
   },
 
@@ -352,55 +343,51 @@ export const translations: typeof enTranslations = {
   delete: {
     title: "Abonnement kündigen",
     titleShort: "Abo kündigen",
-    description: "Ihr Abonnement kündigen",
+    description: "Dein Abo kündigen",
     warning:
-      "Das Kündigen Ihres Abonnements beendet Ihren Zugang am Ende des Abrechnungszeitraums.",
+      "Kündigst du, bleibt dein Zugang bis zum Ende des Abrechnungszeitraums bestehen und endet dann.",
     form: {
       title: "Abonnement-Kündigung",
-      description: "Ihr Abonnement mit optionalen Einstellungen kündigen",
+      description: "Dein Abo kündigen, mit optionalen Einstellungen",
     },
     errors: {
       validation: {
         title: "Ungültige Anfrage",
-        description:
-          "Bitte überprüfen Sie Ihre Kündigungsdetails und versuchen Sie es erneut",
+        description: "Prüf deine Angaben zur Kündigung und versuch es noch mal",
       },
       network: {
         title: "Verbindungsfehler",
-        description:
-          "Die Kündigung konnte nicht verarbeitet werden. Bitte versuchen Sie es erneut",
+        description: "Die Kündigung ging nicht durch. Versuch es noch mal",
       },
       unauthorized: {
         title: "Anmeldung erforderlich",
-        description: "Bitte melden Sie sich an, um Ihr Abonnement zu kündigen",
+        description: "Melde dich an, um dein Abo zu kündigen",
       },
       forbidden: {
         title: "Zugriff verweigert",
-        description:
-          "Sie haben keine Berechtigung, dieses Abonnement zu kündigen",
+        description: "Du hast keine Berechtigung, dieses Abo zu kündigen",
       },
       notFound: {
         title: "Abonnement nicht gefunden",
-        description: "Wir konnten Ihr Abonnement nicht finden",
+        description: "Wir finden dein Abo nicht",
       },
       server: {
         title: "Kündigung fehlgeschlagen",
         description:
-          "Ihr Abonnement konnte nicht gekündigt werden. Bitte versuchen Sie es erneut",
+          "Dein Abo konnte nicht gekündigt werden. Versuch es noch mal",
       },
       unknown: {
         title: "Unerwarteter Fehler",
-        description:
-          "Etwas Unerwartetes ist passiert. Bitte versuchen Sie es erneut",
+        description: "Etwas ist schiefgelaufen. Versuch es noch mal",
       },
       unsavedChanges: {
         title: "Nicht gespeicherte Änderungen",
-        description: "Sie haben Änderungen, die noch nicht gespeichert wurden",
+        description: "Du hast Änderungen, die noch nicht gespeichert sind",
       },
       conflict: {
         title: "Kündigungskonflikt",
         description:
-          "Ihr Abonnementstatus hat sich geändert. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut",
+          "Der Status deines Abos hat sich geändert. Lad die Seite neu und versuch es noch mal",
       },
     },
     submit: {
@@ -409,7 +396,7 @@ export const translations: typeof enTranslations = {
     },
     success: {
       title: "Abonnement gekündigt",
-      description: "Ihr Abonnement wurde erfolgreich gekündigt",
+      description: "Dein Abo ist gekündigt",
     },
   },
 
@@ -418,7 +405,7 @@ export const translations: typeof enTranslations = {
     fields: {
       planId: {
         label: "Abonnement-Plan",
-        description: "Wählen Sie Ihren Abonnement-Plan",
+        description: "Wähl deinen Plan",
         placeholder: "Plan wählen",
       },
       billingInterval: {
@@ -428,7 +415,7 @@ export const translations: typeof enTranslations = {
       },
       provider: {
         label: "Zahlungsanbieter",
-        description: "Wählen Sie Ihren Zahlungsanbieter",
+        description: "Wähl deinen Zahlungsanbieter",
       },
       catalogProductId: {
         label: "Katalogprodukt",
@@ -440,7 +427,7 @@ export const translations: typeof enTranslations = {
       },
       reason: {
         label: "Kündigungsgrund",
-        description: "Bitte geben Sie einen Grund für die Kündigung an",
+        description: "Sag uns, warum du kündigst",
         placeholder: "Kündigungsgrund eingeben",
       },
     },
@@ -530,16 +517,15 @@ export const translations: typeof enTranslations = {
     },
     unsavedChanges: {
       title: "Nicht gespeicherte Änderungen",
-      description: "Sie haben nicht gespeicherte Änderungen",
+      description: "Du hast nicht gespeicherte Änderungen",
     },
     conflict: {
       title: "Konflikt",
       description: "Datenkonflikt aufgetreten",
     },
-    use_checkout_flow:
-      "Bitte verwenden Sie den Checkout-Ablauf, um Abonnements zu kaufen",
+    use_checkout_flow: "Abos kaufst du über den Checkout",
     use_checkout_flow_description:
-      "Die direkte Erstellung von Abonnements ist nicht erlaubt. Bitte nutzen Sie den Checkout-Prozess.",
+      "Abos lassen sich nicht direkt anlegen. Nutz den Checkout.",
     sync_failed:
       "Synchronisierung des Abonnements mit Datenbank fehlgeschlagen",
     database_error: "Datenbankfehler aufgetreten: {{error}}",
@@ -549,7 +535,7 @@ export const translations: typeof enTranslations = {
     stripe_customer_creation_failed:
       "Stripe-Kunde konnte nicht erstellt werden",
     not_implemented_on_native:
-      "{{method}} ist auf der nativen Plattform nicht implementiert. Bitte verwenden Sie die Web-Version für diesen Vorgang.",
+      "{{method}} gibt es in der App noch nicht. Nutz dafür die Web-Version.",
     no_provider_id: "Keine Zahlungsanbieter-ID gefunden",
   },
 
@@ -622,7 +608,7 @@ export const translations: typeof enTranslations = {
     },
     admin_notification: {
       title: "Neues Abonnement",
-      subject: "Neues Abonnement - {{planName}}",
+      subject: "Neues Abonnement: {{planName}}",
       preview: "Neues Abo: {{userName}} hat {{planName}} abonniert",
       message: "Ein neuer Nutzer hat {{appName}} abonniert.",
       details: "Abonnement-Details",
@@ -697,8 +683,8 @@ export const translations: typeof enTranslations = {
   },
 
   // Widget display keys
-  title: "Ihr Abonnement",
-  description: "Verwalten Sie Ihr Abonnement und Ihre Abrechnung",
+  title: "Dein Abo",
+  description: "Abo und Abrechnung verwalten",
   notAvailable: "N/A",
   canceledOn: "Gekündigt am",
   endedOn: "Beendet am",
@@ -709,30 +695,29 @@ export const translations: typeof enTranslations = {
   cancellation: {
     title: "Abonnementkündigung geplant",
     description:
-      "Ihr Abonnement wird am {{date}} gekündigt. Bis dahin haben Sie weiterhin Zugriff.",
+      "Dein Abo endet am {{date}}. Bis dahin hast du vollen Zugriff.",
   },
   canceled: {
     title: "Abonnement beendet",
     description:
-      "Ihr Abonnement wurde beendet. Erneuern Sie es, um wieder Zugriff auf alle Funktionen zu erhalten.",
+      "Dein Abo ist beendet. Schließ es neu ab, um wieder alles nutzen zu können.",
   },
   noSubscription: {
     title: "Noch kein Abo",
     description:
-      "Hol dir monatliche Credits und Zugriff auf alle Modelle - mit einem Abo.",
+      "Ein Abo bringt dir monatliche Credits und Zugriff auf alle Modelle.",
     cta: "Pläne ansehen",
   },
   manage: {
     nowpayments: {
-      info: "Bitte kontaktieren Sie den Support, um Ihr NowPayments-Abonnement zu verwalten.",
+      info: "Dein NowPayments-Abo verwaltest du über den Support. Schreib uns einfach.",
       button: "Abonnement verwalten",
     },
     stripe: {
       button: "Abonnement verwalten",
     },
     portal: {
-      error:
-        "Kundenportal konnte nicht geöffnet werden. Bitte versuchen Sie es erneut.",
+      error: "Das Kundenportal ließ sich nicht öffnen. Versuch es noch mal.",
     },
   },
 
@@ -911,19 +896,19 @@ export const translations: typeof enTranslations = {
   meta: {
     subscription: {
       title: "Abonnement",
-      description: "Verwalten Sie Ihr Abonnement und Ihre Abrechnung",
+      description: "Abo und Abrechnung verwalten",
     },
     buyCredits: {
       title: "Credits kaufen",
-      description: "Zusätzliche Credits für Ihr Konto erwerben",
+      description: "Zusätzliche Credits für dein Konto kaufen",
     },
     history: {
       title: "Abrechnungshistorie",
-      description: "Ihre Abrechnungs- und Transaktionshistorie anzeigen",
+      description: "Deine Abrechnungen und Transaktionen ansehen",
     },
     overview: {
       title: "Abonnementübersicht",
-      description: "Ihren Abonnementstatus und Details anzeigen",
+      description: "Status und Details deines Abos ansehen",
     },
   },
 };

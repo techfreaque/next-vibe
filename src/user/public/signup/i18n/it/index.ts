@@ -22,7 +22,7 @@ export const translations: typeof enTranslations = {
     reminderSent: "Promemoria inviato",
   },
   reminder: {
-    subject: "Il tuo account unbottled.ai è a un clic",
+    subject: "Il tuo account {{appName}} è a un clic",
     hint: "Hai iniziato la registrazione ma non hai mai confermato la tua email. Conferma ora e ricevi {{credits}} crediti gratuiti ogni mese. Il codice e il pulsante qui sotto valgono 24 ore e sostituiscono quelli della prima email.",
     button: "Conferma e accedi",
     ignore:
@@ -62,7 +62,7 @@ export const translations: typeof enTranslations = {
     newsletter:
       "Con la conferma attivi anche l’iscrizione alla newsletter che hai richiesto.",
     link: "Conferma la mia email",
-    pendingId: "Referenza della firma",
+    pendingId: "Riferimento della registrazione",
     token: "Email conferma link token",
     callback: "Percorso di ritorno",
     suggestion: "Intendevi {{email}}?",
@@ -159,51 +159,50 @@ export const translations: typeof enTranslations = {
   tag: "Autenticazione",
   form: {
     title: "Crea il tuo account",
-    description: "Ogni modello. Le tue regole. Libero di iniziare.",
+    description: "Tutti i modelli. Le tue regole. Inizi gratis.",
   },
   actions: {
     submit: "Invia il codice di conferma",
-    submitting: "Invio del codice...",
+    submitting: "Invio del codice…",
   },
   fields: {
     privateName: {
       label: "Nome privato",
-      description: "Quello che ti chiama lo AI. Mai mostrato a nessun altro.",
-      placeholder: "ad es. Alex:",
+      description: "Come ti chiama l'IA. Non lo vede nessun altro.",
+      placeholder: "es. Alex",
       validation: {
-        required: "Il nome privato è richiesto",
-        minLength: "Il nome deve essere almeno 2 caratteri",
-        maxLength: "Il nome deve essere inferiore a 100 caratteri",
+        required: "Il nome privato è obbligatorio",
+        minLength: "Il nome deve avere almeno 2 caratteri",
+        maxLength: "Il nome deve avere meno di 100 caratteri",
       },
     },
     publicName: {
       label: "Nome pubblico",
-      description: "Mostrato in chat e forum condivisi.",
-      placeholder: "ad esempio alex_builds",
+      description: "Visibile nelle chat condivise e nei forum.",
+      placeholder: "es. alex_crea",
       validation: {
-        required: "Il nome dell'esposizione è richiesto",
-        minLength: "Il nome dell'esposizione deve essere almeno 2 caratteri",
-        maxLength:
-          "Il nome dell'esposizione deve essere inferiore a 100 caratteri",
+        required: "Il nome pubblico è obbligatorio",
+        minLength: "Il nome pubblico deve avere almeno 2 caratteri",
+        maxLength: "Il nome pubblico deve avere meno di 100 caratteri",
       },
     },
     email: {
       label: "Email",
-      description: "Solo per il login. Mai condiviso.",
-      placeholder: "you@example.com",
-      help: "Questo sarà il vostro email di login e metodo di contatto primario",
+      description: "Solo per l'accesso. Mai condivisa.",
+      placeholder: "tu@esempio.it",
+      help: "Sarà la tua email di accesso e il tuo contatto principale",
       validation: {
-        required: "E-mail è richiesta",
-        invalid: "Si prega di inserire un indirizzo email valido",
+        required: "L'email è obbligatoria",
+        invalid: "Inserisci un indirizzo email valido",
       },
     },
     password: {
       label: "Password",
       description:
-        "8+ caratteri con superiore, inferiore e un numero. Conservare al sicuro: la crittografia end-to-end sta arrivando, e un reset sarà poi cancellare la tua storia.",
+        "Almeno 8 caratteri, con maiuscola, minuscola e un numero. Conservala bene: sta arrivando la crittografia end-to-end, e da quel momento un reset cancellerà la tua cronologia.",
       placeholder: "Crea una password",
       validation: {
-        required: "La password è richiesta",
+        required: "La password è obbligatoria",
         minLength: "La password deve avere almeno 8 caratteri",
         complexity:
           "La password deve contenere maiuscole, minuscole e un numero",
@@ -224,19 +223,19 @@ export const translations: typeof enTranslations = {
         "Conferma il tuo indirizzo per attivare il bonus mensile della newsletter.",
       checkboxLabel:
         "Iscriviti alla newsletter e ricevi +{{credits}} crediti gratis ogni mese",
-      hint: "Nuovi modelli e novità ogni poche settimane. Puoi disiscriverti quando vuoi.",
+      hint: "Nuovi modelli e novità ogni qualche settimana. Puoi disiscriverti quando vuoi.",
       tooltip:
         "Conferma la tua email per ricevere {{credits}} crediti extra ogni mese, {{total}} in tutto, finché resti iscritto.",
     },
     acceptTerms: {
       label: "Accetto i termini e le condizioni",
       description:
-        "I nostri termini e condizioni rispettano la tua libertà e la tua privacy.",
+        "I nostri termini e la nostra informativa sulla privacy rispettano la tua libertà.",
       termsLink: "termini",
-      conditionsLink: "condizioni",
+      conditionsLink: "informativa sulla privacy",
       descriptionPrefix: "I nostri",
-      descriptionAnd: "e",
-      descriptionSuffix: "rispettano la tua libertà e la tua privacy.",
+      descriptionAnd: "e la nostra",
+      descriptionSuffix: "rispettano la tua libertà.",
       validation: {
         required: "Per continuare, accetta i termini e le condizioni",
       },
@@ -277,7 +276,7 @@ export const translations: typeof enTranslations = {
     title: "Errore di registrazione",
     validation: {
       title: "Errore di convalida",
-      description: "Si prega di controllare il vostro input e riprovare",
+      description: "Controlla i dati inseriti e riprova",
     },
     unauthorized: {
       title: "Autenticazione richiesta",
@@ -292,7 +291,7 @@ export const translations: typeof enTranslations = {
       description: "Si è verificato un errore imprevisto",
     },
     conflict: {
-      title: "Conflitto dell'account",
+      title: "Account già esistente",
       description: "Esiste già un account con questa email",
       detail: "Esiste già un account con questa email. Accedi.",
     },
@@ -326,7 +325,7 @@ export const translations: typeof enTranslations = {
     autoLoginFailed:
       "L’account è stato creato, ma l’accesso automatico non è riuscito. Accedi con la nuova password.",
     internal: {
-      title: "Iscrizione non riuscita per {{email}}: {{error}}",
+      title: "Registrazione non riuscita per {{email}}: {{error}}",
       description: "Si è verificato un errore interno",
     },
   },
@@ -353,7 +352,7 @@ export const translations: typeof enTranslations = {
     errors: {
       validation: {
         title: "E-mail non valida",
-        description: "Si prega di inserire un indirizzo email valido",
+        description: "Inserisci un indirizzo email valido",
       },
       internal: {
         title: "Non poteva controllare {{email}}: {{error}}",
@@ -404,10 +403,10 @@ export const translations: typeof enTranslations = {
     response: {
       title: "Risposta",
       description: "Dati di risposta all'iscrizione",
-      success: "Registrazione Successo",
+      success: "Registrazione completata",
       message: "Messaggio di stato",
-      userId: "Utente ID",
-      nextSteps: "Prossimo passo",
+      userId: "ID utente",
+      nextSteps: "Prossimi passi",
     },
     errors: {
       unauthorized: {
@@ -456,33 +455,33 @@ export const translations: typeof enTranslations = {
   response: {
     title: "Risposta",
     description: "Dati di risposta all'iscrizione",
-    success: "Registrazione Successo",
+    success: "Registrazione completata",
     message: "Messaggio di stato",
     user: {
-      id: "Utente ID",
+      id: "ID utente",
       email: "Indirizzo email",
       firstName: "Nome",
-      lastName: "Ultimo nome",
+      lastName: "Cognome",
       privateName: "Nome privato",
       publicName: "Nome pubblico",
-      imageUrl: "Immagine del profilo URL",
+      imageUrl: "URL dell'immagine del profilo",
       verificationRequired: "Verifica richiesta",
     },
     verificationInfo: {
-      title: "Verifica Email",
+      title: "Verifica email",
       description: "Dettagli sul processo di verifica e-mail",
-      emailSent: "Invia un'email",
-      expiresAt: "Escursione di verifica",
-      checkSpamFolder: "Controllare la cartella Spam",
+      emailSent: "Email inviata",
+      expiresAt: "Verifica valida fino al",
+      checkSpamFolder: "Controlla anche la cartella spam",
     },
-    nextSteps: "Prossimo passo",
+    nextSteps: "Prossimi passi",
   },
   success: {
     title: "Controlla la posta",
     description: "Inserisci il codice ricevuto via email.",
   },
   admin_notification: {
-    title: "Nuova acquisizione utente",
+    title: "Nuova registrazione",
     subject: "Nuova registrazione di {{privateName}}",
     preview: "{{privateName}} si è appena registrato",
     message: "C’è un nuovo utente su {{appName}}",
@@ -499,10 +498,10 @@ export const translations: typeof enTranslations = {
     direct_signup: "Registrazione diretta",
     newsletter: "Newsletter",
     subscribed: "Iscritto",
-    not_subscribed: "Non sottoscritto",
+    not_subscribed: "Non iscritto",
     signup_details: "Dettagli di iscrizione",
     signup_date: "Data di iscrizione",
-    user_id: "Utente ID",
+    user_id: "ID utente",
     recommended_next_steps: "Prossimo passo consigliato",
     direct_recommendation:
       "Verifica profilo utente e configurazione di pagamento",
@@ -519,7 +518,7 @@ export const translations: typeof enTranslations = {
       "Benvenuto su {{appName}}. Tutto quello che apprezzi di ChatGPT, più modelli open source e senza filtri sui contenuti. Un solo account, tutto nello stesso posto.",
     models: {
       title: "{{modelCount}} modelli in 3 categorie",
-      mainstream: "Convenzionale",
+      mainstream: "Mainstream",
       open: "Open source",
       uncensored: "Senza censura",
     },
@@ -557,7 +556,7 @@ export const translations: typeof enTranslations = {
           description: "Il nome privato dell'utente",
         },
         userId: {
-          label: "Utente ID",
+          label: "ID utente",
           description: "L'identificatore unico dell'utente",
         },
         leadId: {
@@ -582,7 +581,7 @@ export const translations: typeof enTranslations = {
           label: "Indirizzo email",
         },
         userId: {
-          label: "Utente ID",
+          label: "ID utente",
         },
         subscribeToNewsletter: {
           label: "Abbonamento Newsletter",

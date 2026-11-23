@@ -611,7 +611,8 @@ function currencySymbol(c: string): string {
 
 /**
  * "$5", "€8", "19 zł": the złoty sign follows the amount, and so does the
- * euro sign on French pages ("8 €").
+ * euro sign on German, French, Italian and Spanish pages ("8 €"), the way
+ * those readers write prices (and how Intl formats the same amounts).
  */
 function formatPriceLabel(
   price: number,
@@ -620,7 +621,9 @@ function formatPriceLabel(
 ): string {
   const symbolAfter =
     currency === "PLN" ||
-    (currency === "EUR" && locale !== undefined && /^(fr|it|es)-/.test(locale));
+    (currency === "EUR" &&
+      locale !== undefined &&
+      /^(de|fr|it|es)-/.test(locale));
   return symbolAfter
     ? `${price} ${currencySymbol(currency)}`
     : `${currencySymbol(currency)}${price}`;

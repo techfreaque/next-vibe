@@ -28,6 +28,10 @@ export const translations: typeof enTranslations = {
       previousSignupSteps: "Kroki rejestracji w poprzednim okresie",
       signupSegments: "Kroki rejestracji według segmentu",
       signupTrackedSince: "Kroki rejestracji śledzone od",
+      wallSteps: "Bariery konwersji w okresie",
+      previousWallSteps: "Bariery konwersji w poprzednim okresie",
+      wallSegments: "Bariery konwersji wg segmentu",
+      wallTrackedSince: "Bariery konwersji mierzone od",
     },
     errors: {
       unauthorized: {
@@ -70,6 +74,19 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    wallTitle: "Bariery konwersji",
+    wallSubtitle:
+      "Osoby zatrzymane na barierze, z datą zdarzenia. Każda liczy się raz na barierę.",
+    wallTrackedHint:
+      "Mierzone od {{date}}: wcześniejsze bariery nie były zapisywane.",
+    creditWallGuests: "Goście bez kredytów",
+    creditWallAccounts: "Konta bez kredytów",
+    consentDeclined: "Odmowa zgody 18+",
+    creditWallHint: "Wysyłka odrzucona, pokazano kartę braku kredytów",
+    consentDeclinedHint: "Zamknięto okno zgody bez akceptacji",
+    wallSegmentsTitle: "Bariery wg segmentu",
+    wallSegmentsSubtitle: "Te same bariery w podziale na wybrany wymiar.",
+    wallEmpty: "W tym okresie nikt nie trafił na barierę.",
     signupTitle: "Potwierdzenie rejestracji",
     signupSubtitle:
       "Leady na krok, datowane momentem kroku. Spadek pokazuje, gdzie rejestracje odpadają.",

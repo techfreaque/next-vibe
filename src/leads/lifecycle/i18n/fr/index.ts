@@ -106,7 +106,7 @@ export const translations: typeof enTranslations = {
     whatsNew: {
       subject: "Ce qui a changé pendant votre absence",
       preview:
-        "{{modelCount}} modèles, vidéo et musique dans le chat, et le français.",
+        "{{modelCount}} modèles, vidéo et musique dans le chat, six langues.",
       intro:
         "Votre dernière discussion date de plus d'une semaine. Voici les nouveautés.",
       modelsTitle: "{{modelCount}} modèles de chat",
@@ -115,9 +115,9 @@ export const translations: typeof enTranslations = {
       mediaTitle: "Images, vidéos et musique",
       mediaBody:
         "Un prompt dans le chat, et vous récupérez une image, un clip court ou un morceau.",
-      languagesTitle: "Maintenant en français",
+      languagesTitle: "Six langues",
       languagesBody:
-        "Toute l'application existe en français, anglais, allemand et polonais.",
+        "Toute l'application fonctionne en français, anglais, allemand, polonais, espagnol et italien.",
       body: "Vos fils de discussion sont restés là où vous les avez laissés.",
       cta: "Voir tous les modèles",
       ps: "P.-S. Vous connaissez quelqu'un que ça intéresserait ? Votre lien de parrainage vous rapporte {{referralPercent}} % de tout ce que cette personne dépense, chaque mois.",

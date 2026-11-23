@@ -2,9 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Usuarios",
-  title: "Bienvenido.",
+  title: "Hola de nuevo",
   titleShort: "Iniciar sesión",
-  description: "Acceda a modelos AI sin censura y su historia de conversación.",
+  description: "Accede a modelos de IA sin censura y a tu historial de chats.",
   tag: "Autenticación",
   options: {
     category: "Usuarios",
@@ -19,7 +19,7 @@ export const translations: typeof enTranslations = {
     fields: {
       email: {
         label: "Dirección de correo electrónico",
-        description: "Introduzca su dirección de correo electrónico",
+        description: "Introduce tu correo",
         placeholder: "your@email.com",
       },
       allowPasswordAuth: {
@@ -222,16 +222,14 @@ export const translations: typeof enTranslations = {
       placeholder: "Ingresa tu correo",
       validation: {
         required: "El correo electrónico es necesario",
-        invalid:
-          "Por favor, introduzca una dirección de correo electrónico válida",
+        invalid: "Introduce un correo válido",
       },
     },
     password: {
       label: "Su contraseña",
-      description:
-        "Introduzca la contraseña que establezca durante el registro.",
-      placeholder: "Introduzca su contraseña",
-      help: "Introduzca su contraseña de cuenta",
+      description: "Introduce la contraseña que elegiste al registrarte.",
+      placeholder: "Introduce tu contraseña",
+      help: "Introduce la contraseña de tu cuenta",
       validation: {
         required: "Se requiere contraseña",
         minLength: "La contraseña debe tener al menos 8 caracteres de largo",
@@ -249,10 +247,9 @@ export const translations: typeof enTranslations = {
   },
   twoFactorStep: {
     title: "Verificación de dos pasos",
-    helper:
-      "Introduzca el código de 6 dígitos de su aplicación de autenticador.",
+    helper: "Introduce el código de 6 dígitos de tu app de autenticación.",
     recoveryHelper:
-      "Introduzca uno de sus códigos de recuperación. Cada uno trabaja una vez.",
+      "Introduce uno de tus códigos de recuperación. Cada uno sirve una sola vez.",
     codeLabel: "Código de autenticación",
     recoveryLabel: "Código de recuperación",
     recoveryPlaceholder: "XXXXX-XXXXX",
@@ -265,7 +262,7 @@ export const translations: typeof enTranslations = {
   groups: {
     credentials: {
       title: "Login Credenciales",
-      description: "Introduzca su información de inicio de sesión",
+      description: "Introduce tus datos de acceso",
     },
     options: {
       title: "Opciones de acceso",
@@ -301,7 +298,7 @@ export const translations: typeof enTranslations = {
       imageUrl: "Imagen del perfil",
     },
     sessionInfo: {
-      title: "Sesión de información",
+      title: "Información de la sesión",
       description: "Detalles de la sesión de usuario",
       expiresAt: "Vencimiento de la sesión",
       rememberMeActive: "Estado de la opción para mantener la sesión",
@@ -313,7 +310,7 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
-    title: "Iniciar sesión Error",
+    title: "Error al iniciar sesión",
     account_suspended:
       "Cuenta suspendida. Si crees que hay un error, contacta a soporte.",
     account_locked:
@@ -325,22 +322,22 @@ export const translations: typeof enTranslations = {
     invalid_credentials:
       "Correo o contraseña incorrectos. ¿Todavía no tienes una cuenta? Regístrate.",
     two_factor_required: "Se requiere autenticación de dos factores",
-    invalid_two_factor_code: "Código de autenticación inválida",
-    auth_error: "Autenticación falló para {{email}} : {{error}}",
+    invalid_two_factor_code: "Código de autenticación no válido",
+    auth_error: "Falló la autenticación de {{email}}: {{error}}",
     user_not_found: "No se ha encontrado ningún usuario para {{userId}}",
     session_creation_failed:
-      "No podía crear una sesión para {{userId}} : {{error}}",
-    token_save_failed: "Fallado para salvar el token de autenticación",
+      "No se pudo crear la sesión de {{userId}}: {{error}}",
+    token_save_failed: "No se pudo guardar el token de autenticación",
     validation: {
       title: "Validación fallida",
-      description: "Por favor, compruebe su entrada",
+      description: "Revisa los datos introducidos",
     },
     unauthorized: {
       title: "No pudimos iniciar sesión",
-      description: "Credenciales inválidos",
+      description: "Credenciales no válidas",
     },
     unknown: {
-      title: "Iniciar sesión Error",
+      title: "Error al iniciar sesión",
       description: "Se produjo un error durante la sesión",
     },
     network: {
@@ -375,7 +372,7 @@ export const translations: typeof enTranslations = {
   },
   token: {
     save: {
-      failed: "Fallado para salvar el token de autenticación",
+      failed: "No se pudo guardar el token de autenticación",
       success: "Authentication token guardado con éxito",
     },
   },

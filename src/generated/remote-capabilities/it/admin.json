@@ -103657,7 +103657,9 @@
                               "EMAIL_CLICK": "enums.engagementTypes.emailClick",
                               "WEBSITE_VISIT": "enums.engagementTypes.websiteVisit",
                               "FORM_SUBMIT": "enums.engagementTypes.formSubmit",
-                              "LEAD_ATTRIBUTION": "enums.engagementTypes.leadAttribution"
+                              "LEAD_ATTRIBUTION": "enums.engagementTypes.leadAttribution",
+                              "CREDIT_WALL": "enums.engagementTypes.creditWall",
+                              "CONSENT_DECLINED": "enums.engagementTypes.consentDeclined"
                             }
                           },
                           "type": "enum",
@@ -103666,14 +103668,18 @@
                             "EMAIL_CLICK": "enums.engagementTypes.emailClick",
                             "WEBSITE_VISIT": "enums.engagementTypes.websiteVisit",
                             "FORM_SUBMIT": "enums.engagementTypes.formSubmit",
-                            "LEAD_ATTRIBUTION": "enums.engagementTypes.leadAttribution"
+                            "LEAD_ATTRIBUTION": "enums.engagementTypes.leadAttribution",
+                            "CREDIT_WALL": "enums.engagementTypes.creditWall",
+                            "CONSENT_DECLINED": "enums.engagementTypes.consentDeclined"
                           },
                           "options": [
                             "enums.engagementTypes.emailOpen",
                             "enums.engagementTypes.emailClick",
                             "enums.engagementTypes.websiteVisit",
                             "enums.engagementTypes.formSubmit",
-                            "enums.engagementTypes.leadAttribution"
+                            "enums.engagementTypes.leadAttribution",
+                            "enums.engagementTypes.creditWall",
+                            "enums.engagementTypes.consentDeclined"
                           ]
                         }
                       },
@@ -118867,6 +118873,270 @@
         "signupTrackedSince": {
           "type": "text",
           "label": "Passaggi di iscrizione tracciati dal",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "string"
+                },
+                "type": "string"
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "wallSteps": {
+          "type": "text",
+          "label": "Blocchi di conversione nel periodo",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "key": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "value": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "key": {
+                    "def": {
+                      "type": "string"
+                    },
+                    "type": "string"
+                  },
+                  "value": {
+                    "def": {
+                      "type": "number",
+                      "checks": []
+                    },
+                    "type": "number",
+                    "isFinite": true
+                  }
+                }
+              },
+              "type": "object"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "previousWallSteps": {
+          "type": "text",
+          "label": "Blocchi di conversione nel periodo precedente",
+          "schema": {
+            "def": {
+              "type": "nullable",
+              "innerType": {
+                "def": {
+                  "type": "array",
+                  "element": {
+                    "def": {
+                      "type": "object",
+                      "shape": {
+                        "key": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "value": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "array",
+                "element": {
+                  "def": {
+                    "type": "object",
+                    "shape": {
+                      "key": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "value": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "type": "nullable"
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "wallSegments": {
+          "type": "text",
+          "label": "Blocchi di conversione per segmento",
+          "schema": {
+            "def": {
+              "type": "array",
+              "element": {
+                "def": {
+                  "type": "object",
+                  "shape": {
+                    "key": {
+                      "def": {
+                        "type": "nullable",
+                        "innerType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        }
+                      },
+                      "type": "nullable"
+                    },
+                    "metrics": {
+                      "def": {
+                        "type": "record",
+                        "keyType": {
+                          "def": {
+                            "type": "string"
+                          },
+                          "type": "string"
+                        },
+                        "valueType": {
+                          "def": {
+                            "type": "number",
+                            "checks": []
+                          },
+                          "type": "number",
+                          "isFinite": true
+                        }
+                      },
+                      "type": "record",
+                      "keyType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "valueType": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    }
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "array",
+            "element": {
+              "def": {
+                "type": "object",
+                "shape": {
+                  "key": {
+                    "def": {
+                      "type": "nullable",
+                      "innerType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      }
+                    },
+                    "type": "nullable"
+                  },
+                  "metrics": {
+                    "def": {
+                      "type": "record",
+                      "keyType": {
+                        "def": {
+                          "type": "string"
+                        },
+                        "type": "string"
+                      },
+                      "valueType": {
+                        "def": {
+                          "type": "number",
+                          "checks": []
+                        },
+                        "type": "number",
+                        "isFinite": true
+                      }
+                    },
+                    "type": "record",
+                    "keyType": {
+                      "def": {
+                        "type": "string"
+                      },
+                      "type": "string"
+                    },
+                    "valueType": {
+                      "def": {
+                        "type": "number",
+                        "checks": []
+                      },
+                      "type": "number",
+                      "isFinite": true
+                    }
+                  }
+                }
+              },
+              "type": "object"
+            }
+          },
+          "usage": {
+            "response": true
+          },
+          "schemaType": "primitive"
+        },
+        "wallTrackedSince": {
+          "type": "text",
+          "label": "Blocchi di conversione tracciati dal",
           "schema": {
             "def": {
               "type": "nullable",
@@ -162592,7 +162862,7 @@
       "children": {
         "paused": {
           "type": "text",
-          "label": "Paused",
+          "label": "In pausa",
           "schema": {
             "def": {
               "type": "boolean"
@@ -163074,7 +163344,7 @@
         },
         "currentPaused": {
           "type": "text",
-          "label": "Paused",
+          "label": "In pausa",
           "schema": {
             "def": {
               "type": "boolean"
@@ -280650,8 +280920,8 @@
   {
     "toolName": "subscription-cancel",
     "title": "Disdici l’abbonamento",
-    "titleShort": "Annullare la richiesta",
-    "description": "Cancella il tuo abbonamento",
+    "titleShort": "Disdici",
+    "description": "Disdici il tuo abbonamento",
     "fields": {
       "usage": {
         "request": "data",
@@ -280662,7 +280932,7 @@
           "type": "form_field",
           "fieldType": "boolean",
           "label": "Disdici a fine periodo",
-          "description": "Annullare l'abbonamento alla fine del periodo corrente",
+          "description": "Disdici l'abbonamento alla fine del periodo in corso",
           "schema": {
             "def": {
               "type": "default",
@@ -280684,8 +280954,8 @@
         "reason": {
           "type": "form_field",
           "fieldType": "text",
-          "label": "Motivo di cancellazione",
-          "description": "Si prega di fornire un motivo per la cancellazione",
+          "label": "Motivo della disdetta",
+          "description": "Dicci perché disdici",
           "schema": {
             "def": {
               "type": "optional",
@@ -282698,8 +282968,8 @@
   },
   {
     "toolName": "subscription_create_POST",
-    "title": "Crea Abbonamento",
-    "titleShort": "Crea sessione",
+    "title": "Crea abbonamento",
+    "titleShort": "Abbonati",
     "description": "Creare un nuovo abbonamento",
     "fields": {
       "usage": {
@@ -282711,7 +282981,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Piano di abbonamento",
-          "description": "Selezionare il piano di abbonamento",
+          "description": "Scegli il tuo piano",
           "options": [
             {
               "value": "enums.plan.subscription",
@@ -282812,7 +283082,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Servizio di pagamento",
-          "description": "Seleziona il tuo fornitore di pagamento",
+          "description": "Scegli come pagare",
           "options": [
             {
               "value": "enums.paymentProvider.stripe",
@@ -282858,7 +283128,7 @@
           "type": "form_field",
           "fieldType": "entity_picker",
           "labelField": "name",
-          "label": "Catalogo Prodotto",
+          "label": "Prodotto del catalogo",
           "description": "Link a un prodotto di catalogo per questo abbonamento",
           "hidden": true,
           "schema": {
@@ -289664,7 +289934,7 @@
   },
   {
     "toolName": "subscription_GET",
-    "title": "Ottenere Abbonamento",
+    "title": "Abbonamento",
     "titleShort": "Il mio abbonamento",
     "description": "Recuperare i dettagli dell'abbonamento corrente",
     "fields": {
@@ -289829,7 +290099,7 @@
         },
         "currentPeriodStart": {
           "type": "text",
-          "label": "Periodo attuale Inizio",
+          "label": "Inizio del periodo attuale",
           "schema": {
             "def": {
               "type": "optional",
@@ -290517,7 +290787,7 @@
   {
     "toolName": "subscription-update",
     "title": "Aggiorna l’abbonamento",
-    "titleShort": "Aggiornamento Sub",
+    "titleShort": "Cambia piano",
     "description": "Aggiornare l'abbonamento esistente",
     "fields": {
       "usage": {
@@ -290529,7 +290799,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Piano di abbonamento",
-          "description": "Selezionare il piano di abbonamento",
+          "description": "Scegli il tuo piano",
           "options": [
             {
               "value": "enums.plan.subscription",
@@ -290678,7 +290948,7 @@
         },
         "currentPeriodStart": {
           "type": "text",
-          "label": "Periodo attuale Inizio",
+          "label": "Inizio del periodo attuale",
           "schema": {
             "def": {
               "type": "pipe",

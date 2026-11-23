@@ -56,6 +56,7 @@ beforeAll(async () => {
     CREATE TABLE user_roles (user_id uuid, role text);
     CREATE TABLE signup_events (lead_id uuid, pending_id uuid, type text, occurred_at timestamp, dedupe_key text);
     CREATE TABLE pending_signups (id uuid PRIMARY KEY, lead_id uuid, expires_at timestamp);
+    CREATE TABLE lead_engagements (lead_id uuid, engagement_type text, metadata jsonb, created_at timestamp);
   `);
   const day = "2026-11-19 10:00:00";
   // 1: human via google, signed up + verified + paid
@@ -377,6 +378,14 @@ async function seedProductionShape(): Promise<void> {
       ('${id(108)}', '${id(703)}', 'events.started', '2026-10-05 08:01:00', NULL),
       ('${id(108)}', '${id(703)}', 'events.emailSent', '2026-10-05 08:01:01', NULL),
       ('${id(108)}', '${id(703)}', 'events.confirmed', '2026-10-05 08:03:00', 'confirmed:${id(703)}');
+    -- Conversion walls: one guest blocked twice (counts once), one account,
+    -- one consent decline, and a website visit that is no wall.
+    INSERT INTO lead_engagements VALUES
+      ('${id(105)}', 'enums.engagementTypes.creditWall', '{"custom_who":"guest","custom_via":"client"}', '2026-10-03 11:00:00'),
+      ('${id(105)}', 'enums.engagementTypes.creditWall', '{"custom_who":"guest","custom_via":"server"}', '2026-10-03 11:05:00'),
+      ('${id(101)}', 'enums.engagementTypes.creditWall', '{"custom_who":"account"}', '2026-10-04 11:00:00'),
+      ('${id(106)}', 'enums.engagementTypes.consentDeclined', '{"custom_who":"guest","custom_prompt":"send"}', '2026-10-04 12:00:00'),
+      ('${id(106)}', 'enums.engagementTypes.websiteVisit', '{}', '2026-10-04 12:00:00');
   `);
 }
 
@@ -455,4 +464,11 @@ test("funnel counts people once and tracked signup steps only", async () => {
   expect(signup("expired")).toBe(0);
   expect(result.data.signupTrackedSince).toBe("2026-10-05");
   expect(result.data.previousSignupSteps).toBeNull();
+  const wall = (key: string): number | undefined =>
+    result.data.wallSteps.find((entry) => entry.key === key)?.value;
+  expect(wall("creditWallGuests")).toBe(1);
+  expect(wall("creditWallAccounts")).toBe(1);
+  expect(wall("consentDeclined")).toBe(1);
+  expect(result.data.wallTrackedSince).toBe("2026-10-03");
+  expect(result.data.previousWallSteps).toBeNull();
 });

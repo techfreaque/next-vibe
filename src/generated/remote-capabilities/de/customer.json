@@ -11570,7 +11570,7 @@
     "toolName": "subscription-cancel",
     "title": "Abonnement kündigen",
     "titleShort": "Abo kündigen",
-    "description": "Ihr Abonnement kündigen",
+    "description": "Dein Abo kündigen",
     "fields": {
       "usage": {
         "request": "data",
@@ -11604,7 +11604,7 @@
           "type": "form_field",
           "fieldType": "text",
           "label": "Kündigungsgrund",
-          "description": "Bitte geben Sie einen Grund für die Kündigung an",
+          "description": "Sag uns, warum du kündigst",
           "schema": {
             "def": {
               "type": "optional",
@@ -11677,7 +11677,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Abonnement-Plan",
-          "description": "Wählen Sie Ihren Abonnement-Plan",
+          "description": "Wähl deinen Plan",
           "options": [
             {
               "value": "enums.plan.subscription",
@@ -11778,7 +11778,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Zahlungsanbieter",
-          "description": "Wählen Sie Ihren Zahlungsanbieter",
+          "description": "Wähl deinen Zahlungsanbieter",
           "options": [
             {
               "value": "enums.paymentProvider.stripe",
@@ -12871,7 +12871,7 @@
           "type": "form_field",
           "fieldType": "select",
           "label": "Abonnement-Plan",
-          "description": "Wählen Sie Ihren Abonnement-Plan",
+          "description": "Wähl deinen Plan",
           "options": [
             {
               "value": "enums.plan.subscription",

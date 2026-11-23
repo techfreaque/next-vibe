@@ -599,7 +599,7 @@ export const translations: typeof enTranslations = {
     },
     admin_notification: {
       title: "Nowa subskrypcja",
-      subject: "Nowa subskrypcja - {{planName}}",
+      subject: "Nowa subskrypcja: {{planName}}",
       preview: "Nowa subskrypcja: {{userName}} zasubskrybował {{planName}}",
       message: "Nowy użytkownik zasubskrybował {{appName}}.",
       details: "Szczegóły subskrypcji",
@@ -757,7 +757,7 @@ export const translations: typeof enTranslations = {
     },
     plan: {
       title: "{{credits}} kredytów / mies.",
-      note: "{{plan}}. Anulujesz kiedy chcesz.",
+      note: "{{plan}}. Anulujesz, kiedy chcesz.",
       perMonth: "/mies.",
       aria: "Włącz {{plan}}: {{credits}} kredytów co miesiąc za {{price}}",
     },
@@ -822,7 +822,7 @@ export const translations: typeof enTranslations = {
     },
     heading: "Wybierz plan",
     subheading:
-      "Świeże kredyty co miesiąc i dostęp do {{modelCount}} modeli AI. Anulujesz kiedy chcesz.",
+      "Świeże kredyty co miesiąc i dostęp do {{modelCount}} modeli AI. Anulujesz, kiedy chcesz.",
     changeHeading: "Zmień plan",
     changeSubheading: "Masz plan {{plan}}: {{credits}} kredytów miesięcznie.",
     recommended: "Polecany",
@@ -833,7 +833,7 @@ export const translations: typeof enTranslations = {
     yearlyEquivalent: "{{monthlyPrice}} / mies. przy płatności rocznej",
     picked: "{{plan}}: {{credits}} kredytów co miesiąc",
     pickedNote:
-      "Dostęp do {{modelCount}} modeli AI. Kredyty odnawiane co miesiąc. Anulujesz kiedy chcesz.",
+      "Dostęp do {{modelCount}} modeli AI. Kredyty odnawiane co miesiąc. Anulujesz, kiedy chcesz.",
     cta: {
       start: "Włącz {{plan}}",
       upgrade: "Przejdź na {{plan}}",

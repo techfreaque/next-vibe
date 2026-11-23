@@ -3221,7 +3221,7 @@
         },
         "plan": {
           "type": "text",
-          "label": "Plan ID",
+          "label": "ID del plan",
           "schema": {
             "def": {
               "type": "optional",
@@ -3338,7 +3338,7 @@
         },
         "currentPeriodStart": {
           "type": "text",
-          "label": "Período actual Inicio",
+          "label": "Inicio del período actual",
           "schema": {
             "def": {
               "type": "optional",
@@ -3670,7 +3670,7 @@
         },
         "endedAt": {
           "type": "text",
-          "label": "Ended At",
+          "label": "Finalizada el",
           "schema": {
             "def": {
               "type": "optional",

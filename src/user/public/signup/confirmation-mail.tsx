@@ -6,6 +6,7 @@ import { coreEnv } from "next-vibe/core/env";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { configScopedTranslation } from "@/env/i18n";
 import { EmailTemplate } from "@/messenger/providers/email/smtp-client/components/template.email";
 import { createTrackingContext } from "@/messenger/providers/email/smtp-client/components/tracking_context.email";
 import { EmailSendingRepository } from "@/messenger/providers/email/smtp-client/email-sending/repository";
@@ -48,12 +49,13 @@ export async function sendSignupReminder(
   logger: EndpointLogger,
 ): Promise<string | null> {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: globalT } = configScopedTranslation.scopedT(locale);
   return deliverChallenge(
     pending,
     challenge,
     locale,
     logger,
-    t("reminder.subject"),
+    t("reminder.subject", { appName: globalT("appName") }),
     t("reminder.hint", { credits: FREE_CREDIT_SIGNED_IN_TOTAL }),
     t("reminder.ignore"),
     t("reminder.button"),

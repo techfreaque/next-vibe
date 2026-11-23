@@ -246,16 +246,45 @@ export async function issueSignupChallenge(
 
 /** Consume the challenge and create the account, role and owned lead together.
  * Invalid guesses commit their attempt count. */
+/**
+ * Why a confirmation proof was refused. Server-side diagnostics only: the
+ * person always gets the same "invalid or expired" answer.
+ * - missing: no pending signup matches the link / id (consumed, never
+ *   existed, or claimed by a racing request)
+ * - expired: the pending signup exists but its code / link timed out
+ * - exhausted: too many wrong codes
+ * - mismatch: wrong code (counts as a guess)
+ */
+export const SignupChallengeRejectReason = {
+  MISSING: "missing",
+  EXPIRED: "expired",
+  EXHAUSTED: "exhausted",
+  MISMATCH: "mismatch",
+} as const;
+
+export type SignupChallengeRejectReasonValue =
+  (typeof SignupChallengeRejectReason)[keyof typeof SignupChallengeRejectReason];
+
 export async function consumeSignupChallenge(
   proof: { token?: string; pendingId?: string; code?: string },
   leadId: string,
   t: SignupT,
+  logger: EndpointLogger,
 ): Promise<ResponseType<{ pending: PendingSignup; userId: string }>> {
-  const invalid = (): ErrorResponseType =>
-    fail({
+  const invalid = (
+    reason: SignupChallengeRejectReasonValue,
+  ): ErrorResponseType => {
+    // No email, code or token: only what tells the cases apart.
+    logger.warn("Signup confirmation challenge rejected", {
+      reason,
+      challengeType: proof.token ? "link" : "code",
+      hasPendingId: Boolean(proof.pendingId),
+    });
+    return fail({
       message: t("confirmation.invalid"),
       errorType: ErrorResponseTypes.INVALID_TOKEN_ERROR,
     });
+  };
   const match = proof.token
     ? eq(pendingSignups.tokenHash, digest(proof.token))
     : proof.pendingId && proof.code
@@ -265,7 +294,7 @@ export async function consumeSignupChallenge(
         )
       : null;
   if (!match) {
-    return invalid();
+    return invalid(SignupChallengeRejectReason.MISSING);
   }
   const claim = async (
     tx: Pick<typeof db, "select" | "update" | "execute">,
@@ -275,12 +304,18 @@ export async function consumeSignupChallenge(
       .from(pendingSignups)
       .where(match)
       .for("update");
-    if (!row || row.expiresAt.getTime() <= Date.now()) {
-      return invalid();
+    if (!row) {
+      return invalid(SignupChallengeRejectReason.MISSING);
+    }
+    if (row.expiresAt.getTime() <= Date.now()) {
+      return invalid(SignupChallengeRejectReason.EXPIRED);
     }
     if (!proof.token) {
-      if (!proof.code || row.attempts >= MAX_GUESSES) {
-        return invalid();
+      if (!proof.code) {
+        return invalid(SignupChallengeRejectReason.MISSING);
+      }
+      if (row.attempts >= MAX_GUESSES) {
+        return invalid(SignupChallengeRejectReason.EXHAUSTED);
       }
       if (
         !timingSafeEqual(
@@ -298,7 +333,7 @@ export async function consumeSignupChallenge(
               lt(pendingSignups.attempts, MAX_GUESSES),
             ),
           );
-        return invalid();
+        return invalid(SignupChallengeRejectReason.MISMATCH);
       }
     }
     const subnet = ipSubnetKey(row.signupIp);
@@ -380,7 +415,7 @@ export async function consumeSignupChallenge(
     const [link] = claimed.rows;
     return link
       ? success({ pending: { ...row, leadId: link.lead_id }, userId })
-      : invalid();
+      : invalid(SignupChallengeRejectReason.MISSING);
   };
   return isPglite ? claim(db) : db.transaction(claim);
 }

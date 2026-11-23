@@ -1,7 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  tag: "Lifecycle",
+  tag: "Ciclo de vida",
   enums: {
     journey: {
       firstChat: "Inscribirse, nunca charlar",
@@ -12,22 +12,22 @@ export const translations: typeof enTranslations = {
     },
     enrollmentStatus: {
       active: "Activa",
-      completed: "Completado",
-      exited: "Exited",
+      completed: "Completada",
+      exited: "Salida",
     },
     exitReason: {
-      goalMet: "Objetivo conocido",
+      goalMet: "Objetivo cumplido",
       unsubscribed: "Suscripción cancelada",
-      suppressed: "Suppressed",
+      suppressed: "Bloqueado",
       ineligible: "Ya no es elegible",
-      sendFailed: "Enviar falló",
+      sendFailed: "Envío fallido",
     },
     sendStatus: {
       pending: "Pendiente",
-      sent: "Sent",
+      sent: "Enviado",
     },
     template: {
-      firstChatPrompts: "Primer chat: tres avisos",
+      firstChatPrompts: "Primer chat: tres mensajes de inicio",
       outOfCredits: "Créditos: planes",
       whatsNew: "¿Qué hay de nuevo?",
       winBack: "Win-back: último correo electrónico",
@@ -65,98 +65,99 @@ export const translations: typeof enTranslations = {
     },
   },
   emails: {
-    greeting: "Hola.",
+    greeting: "Hola:",
     greetingNamed: "Hola, {{name}}:",
-    signoff: "Máximo",
+    signoff: "Max",
     signature: "unbottled.ai",
     senderName: "Max de unbottled.ai",
-    unsubscribeText: "Suscribe:",
+    unsubscribeText: "Darse de baja:",
     firstChatPrompts: {
       subject: "Tres primeros mensajes, listos para pegar",
       preview:
-        "Una imagen sin censura, una corriente principal. Escoge uno, manda.",
+        "Uno sin censura, uno mainstream, una imagen. Elige uno y envía.",
       intro:
-        "Su cuenta está lista y el chat todavía está vacío. Aquí hay tres mensajes para empezar. Copia uno, pegalo, envía.",
-      uncensoredTitle: "Pregunta sin la conferencia",
+        "Tu cuenta está lista y el chat sigue vacío. Aquí tienes tres mensajes para empezar. Copia uno, pégalo, envía.",
+      uncensoredTitle: "Pregunta sin sermones",
       uncensoredPrompt:
-        '"Escribe una historia de crimen oscuro donde gana el villano. Sin final feliz, sin moral." Escoge uno de los modelos sin censura {{uncensoredCount}}. Usted confirma una vez que usted tiene 18 años o más.',
-      mainstreamTitle: "Pongan los nombres de lado a lado",
+        '"Escribe una novela negra donde gana el villano. Sin final feliz, sin moraleja." Elige uno de los {{uncensoredCount}} modelos sin censura. Confirmas una sola vez que tienes 18 años o más.',
+      mainstreamTitle: "Compara a los grandes",
       mainstreamPrompt:
-        '"Planea un fin de semana barato en Lisboa. Donde comer, qué saltar." Pregúntele a GPT primero. Luego, cambie a Claude o Gemini en el mismo hilo y compare.',
-      mediaTitle: "Hacer una imagen, un vídeo o una canción",
+        '"Planea un fin de semana barato en Lisboa. Dónde comer, qué evitar." Pregúntale primero a GPT. Luego cambia a Claude o Gemini en el mismo hilo y compara.',
+      mediaTitle: "Crea una imagen, un vídeo o una canción",
       mediaPrompt:
-        '"Un zorro en una bufanda roja en una calle de Tokio nevada por la noche, foto de cine." Un impulso, una imagen. Los videos cortos y la música funcionan de la misma manera.',
-      body: "Su cuenta gratuita recibe créditos {{freeCreditsSignedIn}} cada mes, {{freeCreditsMax}} con el boletín informativo. Sin tarjeta.",
-      cta: "Envia tu primer mensaje",
-      ps: "P.S. ¿No está seguro de dónde empezar? Responder a este correo electrónico. Leímos respuestas.",
+        '"Un zorro con bufanda roja en una calle nevada de Tokio, de noche, foto analógica." Un prompt, una imagen. Los vídeos cortos y la música funcionan igual.',
+      body: "Tu cuenta gratuita recibe {{freeCreditsSignedIn}} créditos cada mes, {{freeCreditsMax}} con el boletín activado. Sin tarjeta.",
+      cta: "Envía tu primer mensaje",
+      ps: "P. D.: ¿No sabes por dónde empezar? Responde a este correo. Leemos las respuestas.",
     },
     outOfCredits: {
-      subject: "Los créditos gratis de este mes se utilizan",
+      subject: "Se acabaron tus créditos gratis de este mes",
       preview:
-        "Vuelven en la primera. O seguir adelante, planes de {{subscriptionPrice}} al mes.",
+        "Vuelven el día 1. O sigue ya, con planes desde {{subscriptionPrice}} al mes.",
       intro:
-        "Usaste todos los créditos gratis de este mes. Vuelven en la primera. ¿No quieres esperar? Escoge un plan. Precios bajos.",
-      starterTitle: "Inicio: {{subscriptionPrice}} /mes",
+        "Has gastado todos los créditos gratis de este mes. Vuelven el día 1. ¿No quieres esperar? Elige un plan. Precios claros.",
+      starterTitle: "Starter: {{subscriptionPrice}}/mes",
       starterBody:
-        "{{subscriptionCredits}} acredita cada mes. Cancela en cualquier momento. Es compatible con si hablas la mayoría de los días.",
+        "{{subscriptionCredits}} créditos cada mes. Cancela cuando quieras. Ideal si chateas casi a diario.",
       moreTitle: "¿Necesitas más? Tres planes más grandes",
       moreBody:
-        "Además: créditos {{plusCredits}} para {{plusPrice}}. Pro: {{proCredits}} para {{proPrice}}. Ultra: {{ultraCredits}} para {{ultraPrice}}. Cada plan puede añadir paquetes de arriba arriba arriba que nunca caducan.",
-      body: "Paga por tarjeta, PayPal o cripto. Los mismos modelos, la misma configuración de filtros.",
-      cta: "Obtener créditos {{subscriptionCredits}} para {{subscriptionPrice}}",
-      ps: "P.S. Esperar la primera también está bien. Tus hilos se quedan donde están.",
+        "Plus: {{plusCredits}} créditos por {{plusPrice}}. Pro: {{proCredits}} por {{proPrice}}. Ultra: {{ultraCredits}} por {{ultraPrice}}. Cualquier plan admite paquetes de recarga que nunca caducan.",
+      body: "Paga con tarjeta, PayPal o cripto. Los mismos modelos, los mismos ajustes de filtro.",
+      cta: "{{subscriptionCredits}} créditos por {{subscriptionPrice}}",
+      ps: "P. D.: Esperar al día 1 también vale. Tus hilos siguen donde están.",
     },
     whatsNew: {
-      subject: "¿Qué cambió mientras estabas fuera?",
-      preview: "Modelos {{modelCount}}, video y música en chat, y francés.",
-      intro: "Tu última charla fue hace una semana. Esto es lo nuevo.",
-      modelsTitle: "Modelos de chat {{modelCount}}",
+      subject: "Lo que ha cambiado mientras no estabas",
+      preview:
+        "{{modelCount}} modelos, vídeo y música en el chat, seis idiomas.",
+      intro: "Tu último chat fue hace más de una semana. Esto es lo nuevo.",
+      modelsTitle: "{{modelCount}} modelos de chat",
       modelsBody:
-        "{{mainstreamCount}} mainstream, {{openCount}} open, {{uncensoredCount}} sin censura. Intercambia entre ellos.",
+        "{{mainstreamCount}} mainstream, {{openCount}} abiertos, {{uncensoredCount}} sin censura. Cambia entre ellos en mitad del hilo.",
       mediaTitle: "Imágenes, vídeo y música",
       mediaBody:
-        "Escribe un aviso en el chat. Retrocede una foto, un corto clip o una pista.",
-      languagesTitle: "Ahora en francés",
+        "Escribe un prompt en el chat. Recibes una imagen, un clip corto o una canción.",
+      languagesTitle: "Seis idiomas",
       languagesBody:
-        "Toda la aplicación se ejecuta en inglés, alemán, polaco y francés.",
-      body: "Tus hilos están justo donde los dejaste.",
-      cta: "Examine todos los modelos",
-      ps: "P.S. ¿Conoces a alguien que usaría esto? Su enlace de referencia le paga {{referralPercent}} % de todo lo que gastan, cada mes.",
+        "Toda la app funciona en español, inglés, alemán, polaco, francés e italiano.",
+      body: "Tus hilos siguen justo donde los dejaste.",
+      cta: "Ver todos los modelos",
+      ps: "P. D.: ¿Conoces a alguien a quien le serviría? Tu enlace de referido te paga el {{referralPercent}}% de todo lo que gaste, cada mes.",
     },
     winBack: {
-      subject: "Un último correo electrónico de nosotros",
-      preview: "Su cuenta, hilos y créditos gratis todavía están aquí.",
+      subject: "Un último correo de nuestra parte",
+      preview: "Tu cuenta, tus hilos y tus créditos gratis siguen aquí.",
       intro:
-        "Tu última charla fue hace un mes. Este es el último lodo que obtienes de nosotros.",
-      body: "Su cuenta, sus hilos y sus créditos gratis mensuales están todos todavía allí. Más modelos que la última vez, y el filtro sigue siendo suyo para establecer.",
-      cta: "Recógete donde te fuiste",
-      ps: "P.S. ¿Qué te ha quitado? Responde y dinos. Leímos todas las respuestas.",
+        "Tu último chat fue hace más de un mes. Este es el último recordatorio que te mandamos.",
+      body: "Tu cuenta, tus hilos y tus créditos gratis mensuales siguen ahí. Hay más modelos que la última vez, y el filtro lo sigues decidiendo tú.",
+      cta: "Sigue donde lo dejaste",
+      ps: "P. D.: ¿Qué te frenó? Responde y cuéntanoslo. Leemos todas las respuestas.",
     },
     inviteSignup: {
-      subject: "Leíste el boletín. Ahora usa la aplicación.",
+      subject: "Lees el boletín. Ahora prueba la app.",
       preview:
-        "Cuenta gratuita, hasta créditos {{freeCreditsMax}} al mes. Sin tarjeta.",
+        "Cuenta gratuita, hasta {{freeCreditsMax}} créditos al mes. Sin tarjeta.",
       intro:
-        "Recibe nuestro boletín. La aplicación está a un paso de distancia: los modelos {{modelCount}}, y usted establece el filtro.",
-      guestTitle: "Sin cuenta: créditos {{freeCreditsGuest}} al mes",
-      guestBody: "Suficiente para probar algunos modelos.",
-      accountTitle: "Cuenta gratuita: créditos {{freeCreditsSignedIn}} al mes",
-      accountBody: "Tus hilos guardados, en cada dispositivo.",
-      newsletterTitle:
-        "Cuenta + newsletter: créditos {{freeCreditsMax}} al mes",
-      newsletterBody: "Mantenga el boletín en su cuenta y el bono es suyo.",
-      body: "Sin tarjeta. Los créditos gratuitos se activan una vez que confirme su correo electrónico.",
+        "Recibes nuestro boletín. La app está a un paso: {{modelCount}} modelos, y el filtro lo decides tú.",
+      guestTitle: "Sin cuenta: {{freeCreditsGuest}} créditos al mes",
+      guestBody: "Suficiente para probar unos cuantos modelos.",
+      accountTitle: "Cuenta gratuita: {{freeCreditsSignedIn}} créditos al mes",
+      accountBody: "Tus hilos guardados, en todos tus dispositivos.",
+      newsletterTitle: "Cuenta + boletín: {{freeCreditsMax}} créditos al mes",
+      newsletterBody:
+        "Mantén el boletín activado en tu cuenta y el extra es tuyo.",
+      body: "Sin tarjeta. Los créditos gratis se activan en cuanto confirmas tu correo.",
       cta: "Crear mi cuenta gratuita",
     },
     inviteReminder: {
       subject: "Último recordatorio: tu cuenta gratuita",
       preview:
-        "{{freeCreditsMax}} acredita un mes en lugar de {{freeCreditsGuest}}. Sin tarjeta.",
+        "{{freeCreditsMax}} créditos al mes en lugar de {{freeCreditsGuest}}. Sin tarjeta.",
       intro:
-        "Último recordatorio. Una cuenta gratuita con el boletín de noticias recibe créditos {{freeCreditsMax}} cada mes. Sin uno: {{freeCreditsGuest}}.",
-      body: "Toma un minuto. Sin tarjeta.",
+        "Último recordatorio. Una cuenta gratuita con el boletín activado recibe {{freeCreditsMax}} créditos cada mes. Sin cuenta: {{freeCreditsGuest}}.",
+      body: "Te lleva un minuto. Sin tarjeta.",
       cta: "Crear mi cuenta gratuita",
-      ps: "P.S. No más recordatorios después de éste. El boletín sigue viniendo como siempre.",
+      ps: "P. D.: No habrá más recordatorios después de este. El boletín sigue llegando como siempre.",
     },
   },
   emailTemplates: {
@@ -173,7 +174,7 @@ export const translations: typeof enTranslations = {
         "48 h después de la inscripción, cuenta verificada, no hay chat todavía. Tres impulsos concretos.",
     },
     outOfCredits: {
-      name: "Lifecycle: out of credits",
+      name: "Ciclo de vida: sin créditos",
       description:
         "Créditos gratis para el mes utilizado, nunca pagados. Precios del plan.",
     },
@@ -183,11 +184,11 @@ export const translations: typeof enTranslations = {
         "7 días sin charla. Modelos, medios de comunicación, idiomas.",
     },
     winBack: {
-      name: "Lifecycle: win-back",
+      name: "Ciclo de vida: recuperación",
       description: "30 días sin charla. Último correo electrónico de viaje.",
     },
     inviteSignup: {
-      name: "Lifecycle: newsletter invite",
+      name: "Ciclo de vida: invitación al boletín",
       description:
         "Suscriptor de newsletter confirmado sin cuenta, 48 h después de confirmar.",
     },
@@ -217,10 +218,10 @@ export const translations: typeof enTranslations = {
       response: {
         paused: "Pausa",
         enrolled: "Inscritos",
-        sent: "Sent",
-        exited: "Exited",
+        sent: "Enviados",
+        exited: "Salidos",
         deferred: "Diferido",
-        failed: "Failed",
+        failed: "Fallidos",
       },
       success: {
         title: "Ciclo de vida terminado",
@@ -244,7 +245,7 @@ export const translations: typeof enTranslations = {
           description: "En = nada se inscribe o envía",
         },
         minHoursBetweenEmails: {
-          label: "Min hours between emails",
+          label: "Horas mínimas entre correos",
           description:
             "Cap de frecuencia por contacto, a través del ciclo de vida y campañas",
         },
@@ -265,7 +266,7 @@ export const translations: typeof enTranslations = {
       },
       response: {
         paused: "Pausa",
-        minHoursBetweenEmails: "Min hours between emails",
+        minHoursBetweenEmails: "Horas mínimas entre correos",
         maxSendsPerRun: "Correos electrónicos máximos por carrera",
         autoEnrollWindowDays: "Ventana de auto-enrollo (días)",
         requireUserMarketingConsent:
@@ -279,7 +280,7 @@ export const translations: typeof enTranslations = {
   },
   backfill: {
     post: {
-      title: "Lifecycle Backfill",
+      title: "Relleno retroactivo del ciclo de vida",
       titleShort: "Relleno",
       description:
         "Previsualizar, luego inscribir los contactos existentes elegibles en el viaje correcto. Empieza en el paso 0, se extiende por una ventana de envío.",
@@ -302,7 +303,7 @@ export const translations: typeof enTranslations = {
         dryRunResult: "Simulación",
         segments: "Segmentos",
         journey: "Viaje",
-        eligible: "Eligible",
+        eligible: "Elegibles",
         alreadyEnrolled: "Ya estoy matriculado.",
         enrolled: "Inscritos",
         autoEligible: "Correspondencia programada se inscribirá",
@@ -323,12 +324,12 @@ export const translations: typeof enTranslations = {
   overview: {
     get: {
       title: "Viajes de ciclo de vida",
-      titleShort: "Lifecycle",
+      titleShort: "Ciclo de vida",
       description:
         "Viajes, inscripciones, envíos y conversiones. Matar el interruptor y el relleno.",
       response: {
         paused: "Pausa",
-        minHoursBetweenEmails: "Min hours between emails",
+        minHoursBetweenEmails: "Horas mínimas entre correos",
         maxSendsPerRun: "Correos electrónicos máximos por carrera",
         autoEnrollWindowDays: "Ventana de auto-enrollo (días)",
         requireUserMarketingConsent:
@@ -338,11 +339,11 @@ export const translations: typeof enTranslations = {
         enrolled: "Inscritos",
         active: "Activa",
         completed: "Completado",
-        exited: "Exited",
+        exited: "Salidos",
         converted: "Conversión",
         unsubscribed: "Suscripción cancelada",
-        sent: "Sent",
-        sent24h: "Sent (24h)",
+        sent: "Enviados",
+        sent24h: "Enviados (24 h)",
         attributedPaid: "Pagado después de la inscripción",
       },
       success: {
@@ -369,10 +370,10 @@ export const translations: typeof enTranslations = {
     stepsLine: "Pasos {{steps}}",
     enrolled: "Inscritos",
     active: "Activa",
-    sent: "Sent",
-    sent24h: "Sent (24h)",
+    sent: "Enviados",
+    sent24h: "Enviados (24 h)",
     converted: "Conversión",
     paid: "Pagado después",
-    unsubscribed: "Unsub",
+    unsubscribed: "Bajas",
   },
 };

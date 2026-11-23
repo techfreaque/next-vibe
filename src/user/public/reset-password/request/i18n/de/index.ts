@@ -8,7 +8,7 @@ export const translations: typeof enTranslations = {
   ui: {
     title: "Passwort zurücksetzen",
     subtitle:
-      "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Link zum Zurücksetzen",
+      "Gib deine E-Mail-Adresse ein und wir schicken dir einen Link zum Zurücksetzen",
     sendResetLink: "Reset-Link senden",
     alreadyHaveAccount: "Bereits ein Konto? Anmelden",
   },
@@ -16,16 +16,16 @@ export const translations: typeof enTranslations = {
     submitting: "Senden...",
   },
   email: {
-    title: "Ihr {{appName}}-Passwort zurücksetzen",
-    subject: "Anfrage zur Passwortzurücksetzung - {{appName}}",
+    title: "Dein {{appName}} Passwort zurücksetzen",
+    subject: "Setz dein {{appName}} Passwort zurück",
     previewText:
-      "Ihr {{appName}}-Passwort zurücksetzen - Link gültig für {{hours}} Stunden.",
+      "Setz dein {{appName}} Passwort zurück. Der Link gilt {{hours}} Stunden.",
     greeting: "Hey {{name}},",
     requestInfo:
-      "Jemand hat eine Passwortzurücksetzung für Ihr {{appName}}-Konto angefordert. Falls Sie das waren, klicken Sie auf den Button unten.",
+      "Jemand will das Passwort für dein {{appName}} Konto zurücksetzen. Warst du das, klick auf den Button unten.",
     buttonText: "Mein Passwort zurücksetzen",
     expirationInfo:
-      "Link läuft in {{hours}} Stunden ab. Falls Sie dies nicht angefordert haben, ignorieren Sie diese E-Mail - Ihr Passwort bleibt unverändert.",
+      "Der Link läuft in {{hours}} Stunden ab. Warst du das nicht, ignorier diese E-Mail. Dein Passwort bleibt, wie es ist.",
     signoff: "Das {{appName}} Team",
     promoText: "{{modelCount}} KI-Modelle. Keine Filter. Keine Lektionen.",
   },
@@ -33,17 +33,17 @@ export const translations: typeof enTranslations = {
     emailInput: {
       title: "E-Mail-Eingabe",
       description:
-        "Geben Sie Ihre E-Mail-Adresse ein, um Reset-Anweisungen zu erhalten",
+        "Gib deine E-Mail-Adresse ein, dann schicken wir dir die Anleitung",
     },
   },
   fields: {
     email: {
       label: "E-Mail-Adresse",
-      description: "Geben Sie Ihre E-Mail-Adresse ein",
+      description: "Gib deine E-Mail-Adresse ein",
       placeholder: "ihre@email.de",
-      help: "Geben Sie die mit Ihrem Konto verknüpfte E-Mail-Adresse ein",
+      help: "Gib die E-Mail-Adresse deines Kontos ein",
       validation: {
-        invalid: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+        invalid: "Gib eine gültige E-Mail-Adresse ein",
       },
     },
   },
@@ -58,9 +58,9 @@ export const translations: typeof enTranslations = {
       expiresAt: "4 Stunden ab jetzt",
     },
     nextSteps: {
-      checkEmail: "Überprüfen Sie Ihren E-Mail-Eingang und Spam-Ordner",
-      clickLink: "Klicken Sie auf den Reset-Link in der E-Mail",
-      createPassword: "Erstellen Sie ein neues sicheres Passwort",
+      checkEmail: "Schau in dein Postfach und in den Spam-Ordner",
+      clickLink: "Klick auf den Reset-Link in der E-Mail",
+      createPassword: "Leg ein neues, sicheres Passwort fest",
     },
   },
   errors: {

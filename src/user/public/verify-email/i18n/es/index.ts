@@ -5,17 +5,17 @@ export const translations: typeof enTranslations = {
   title: "Verifica tu correo",
   titleShort: "Verificar correo",
   description:
-    "Confirme su dirección de correo electrónico con el enlace que le enviamos. Llame sin señal para reenviar el enlace.",
+    "Confirma tu correo con el enlace que te enviamos. Llama sin token para reenviar el enlace.",
   tag: "check-email",
   token: {
     label: "Token de verificación",
     description:
-      "Desde el enlace en su correo electrónico de verificación. Deja vacío para reenviar el correo electrónico.",
-    placeholder: "Token desde el correo electrónico",
+      "Viene en el enlace de tu correo de verificación. Déjalo vacío para reenviar el correo.",
+    placeholder: "Token del correo",
   },
   response: {
     verified: "Verificado",
-    message: "Situación",
+    message: "Estado",
     email: "Correo electrónico",
     emailChanged: "Correo electrónico cambiado",
   },
@@ -23,7 +23,7 @@ export const translations: typeof enTranslations = {
     heroTitle: "Confirma tu correo",
     heroDescription: "Verifica tu dirección con un clic.",
     confirmButton: "Verificar mi correo",
-    confirming: "Verificante...",
+    confirming: "Verificando…",
     doneTitle: "Correo verificado",
     doneDescription: "Tu dirección está confirmada. Ya puedes continuar.",
     resend: "Enviarme otro enlace",

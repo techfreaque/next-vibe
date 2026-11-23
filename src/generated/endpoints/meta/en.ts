@@ -6591,6 +6591,23 @@ export const endpointsMeta: EndpointMeta[] = [
               },
             },
           ],
+          wallSteps: [
+            { key: "creditWallGuests", value: 120 },
+            { key: "creditWallAccounts", value: 16 },
+            { key: "consentDeclined", value: 9 },
+          ],
+          previousWallSteps: null,
+          wallTrackedSince: "2026-11-24",
+          wallSegments: [
+            {
+              key: "direct",
+              metrics: {
+                creditWallGuests: 40,
+                creditWallAccounts: 5,
+                consentDeclined: 3,
+              },
+            },
+          ],
         },
         byRefCode: {
           window: {
@@ -6658,6 +6675,23 @@ export const endpointsMeta: EndpointMeta[] = [
                 emailSent: 30,
                 confirmed: 24,
                 confirmRate: 0.8,
+              },
+            },
+          ],
+          wallSteps: [
+            { key: "creditWallGuests", value: 120 },
+            { key: "creditWallAccounts", value: 16 },
+            { key: "consentDeclined", value: 9 },
+          ],
+          previousWallSteps: null,
+          wallTrackedSince: "2026-11-24",
+          wallSegments: [
+            {
+              key: "direct",
+              metrics: {
+                creditWallGuests: 40,
+                creditWallAccounts: 5,
+                consentDeclined: 3,
               },
             },
           ],

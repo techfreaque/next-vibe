@@ -298,6 +298,14 @@ export function FunnelReportWidget(): JSX.Element {
         locale={locale}
       />
 
+      <WallStepsSection
+        value={value}
+        usedDimension={usedDimension}
+        t={t}
+        st={st}
+        locale={locale}
+      />
+
       <Div className="flex min-w-0 flex-col gap-2">
         <DimensionTabs
           value={usedDimension}
@@ -469,6 +477,87 @@ function SignupStepsSection({
           }))}
         />
       </Div>
+    </SectionGroup>
+  );
+}
+
+/** Conversion walls: out of credits (guest / account), 18+ consent declined. */
+function WallStepsSection({
+  value,
+  usedDimension,
+  t,
+  st,
+  locale,
+}: {
+  value: FunnelValue;
+  usedDimension: FunnelValue["dimensionUsed"];
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  st: ReturnType<typeof useLeadAnalyticsT>;
+  locale: ReturnType<typeof useWidgetLocale>;
+}): JSX.Element {
+  const now = (key: string): number => step(value.wallSteps, key) ?? 0;
+  const prev = (key: string): number | null =>
+    step(value.previousWallSteps, key);
+  const label: Record<string, string> = {
+    creditWallGuests: t("widget.creditWallGuests"),
+    creditWallAccounts: t("widget.creditWallAccounts"),
+    consentDeclined: t("widget.consentDeclined"),
+  };
+  return (
+    <SectionGroup
+      title={t("widget.wallTitle")}
+      subtitle={
+        value.wallTrackedSince && value.wallTrackedSince > value.window.from
+          ? t("widget.wallTrackedHint", { date: value.wallTrackedSince })
+          : t("widget.wallSubtitle")
+      }
+    >
+      <KpiGrid columns={3}>
+        <KpiTile
+          label={label.creditWallGuests}
+          value={now("creditWallGuests")}
+          previous={prev("creditWallGuests")}
+          hint={t("widget.creditWallHint")}
+          invertDelta
+          locale={locale}
+        />
+        <KpiTile
+          label={label.creditWallAccounts}
+          value={now("creditWallAccounts")}
+          previous={prev("creditWallAccounts")}
+          hint={t("widget.creditWallHint")}
+          invertDelta
+          locale={locale}
+        />
+        <KpiTile
+          label={label.consentDeclined}
+          value={now("consentDeclined")}
+          previous={prev("consentDeclined")}
+          hint={t("widget.consentDeclinedHint")}
+          invertDelta
+          locale={locale}
+        />
+      </KpiGrid>
+      <BreakdownTable
+        title={t("widget.wallSegmentsTitle")}
+        subtitle={t("widget.wallSegmentsSubtitle")}
+        dimensionLabel={st(DIMENSION_LABEL[usedDimension])}
+        locale={locale}
+        shareKey="creditWallGuests"
+        limit={10}
+        emptyLabel={t("widget.wallEmpty")}
+        columns={[
+          { key: "creditWallGuests", label: label.creditWallGuests },
+          { key: "creditWallAccounts", label: label.creditWallAccounts },
+          { key: "consentDeclined", label: label.consentDeclined },
+        ]}
+        rows={value.wallSegments.map((row) => ({
+          id: row.key ?? "(none)",
+          label: dimensionValueLabel(row.key, st),
+          sublabel: noneRowHint(row.key, st),
+          values: row.metrics,
+        }))}
+      />
     </SectionGroup>
   );
 }

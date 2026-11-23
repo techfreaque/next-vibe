@@ -8,6 +8,11 @@ import type { StyleType } from "../utils/style-type";
 import type { DivMouseEvent } from "./div";
 import { CheckIcon } from "./icons/CheckIcon";
 
+/** What a form library needs to focus the checkbox on a validation error. */
+export interface CheckboxRefObject {
+  focus: () => void;
+}
+
 export type CheckboxRootProps = {
   checked?: boolean;
   defaultChecked?: boolean;
@@ -19,6 +24,8 @@ export type CheckboxRootProps = {
   children?: React.ReactNode;
   id?: string;
   onClick?: (e: DivMouseEvent) => void;
+  /** Pass react-hook-form's field.ref so an invalid field gets focus. */
+  ref?: React.RefCallback<CheckboxRefObject>;
 } & StyleType;
 
 export type CheckboxIndicatorProps = {
