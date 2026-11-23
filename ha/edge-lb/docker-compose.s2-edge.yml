@@ -56,9 +56,10 @@ services:
       caddy_internal_10.4_log_append: "edge s2"
       caddy_internal_10.5_log_append: "upstream {rp.upstream.host}"
       caddy_internal_10.6_log_append: "upstream_header_wait_ms {rp.upstream.latency_ms}"
-      caddy_internal_10.7_log_append: "<edge_request_id {http.request.uuid}"
+      # Caddy 2.9 on S2 treats a leading < as part of the JSON field name.
+      caddy_internal_10.7_log_append: "edge_request_id {http.request.uuid}"
       caddy_internal_10.8_log_append: "upstream_duration_ms {rp.upstream.duration_ms}"
-      caddy_internal_10.9_log_append: "@next_bundle <asset_path {http.request.uri.path}"
+      caddy_internal_10.9_log_append: "@next_bundle asset_path {http.request.orig_uri.path}"
       caddy_internal_10.tls.issuer: "acme"
       caddy_internal_10.tls.issuer.disable_tlsalpn_challenge: ""
       # Deploy drain (scripts/ha-node-drain.sh edge-on s2 / swap): while

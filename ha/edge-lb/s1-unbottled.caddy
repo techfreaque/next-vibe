@@ -95,13 +95,13 @@ unbottled.ai {
 	@next_asset path /_next/*
 	log_append @next_asset surface next-asset
 	@next_bundle path_regexp ^/_next/static/chunks/[a-zA-Z0-9_./~-]+\.(js|css)$
-	log_append @next_bundle <asset_path {http.request.uri.path}
+	log_append @next_bundle asset_path {http.request.orig_uri.path}
 	@app_api path /api/*
 	log_append @app_api surface api
 	@realtime path /ws*
 	log_append @realtime surface websocket
 	log_append edge s1
-	log_append <edge_request_id {http.request.uuid}
+	log_append edge_request_id {http.request.uuid}
 	log_append upstream {rp.upstream.host}
 	log_append upstream_header_wait_ms {rp.upstream.latency_ms}
 	log_append upstream_duration_ms {rp.upstream.duration_ms}
