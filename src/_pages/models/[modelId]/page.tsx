@@ -40,7 +40,6 @@ import {
   type ModelSeoContent,
   ModelSeoSections,
 } from "../_shared/model-seo-sections";
-import { MODELS_OG_IMAGE } from "../constants";
 import { scopedTranslation } from "../i18n";
 import { ModelPageClient } from "./page-client";
 
@@ -74,7 +73,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: mediaMeta.title,
       category: t("meta.category"),
       description: mediaMeta.description,
-      image: MODELS_OG_IMAGE,
       imageAlt: t("meta.media.imageAlt", mediaVars),
       keywords: [t("meta.media.keywords", mediaVars)],
     });
@@ -90,7 +88,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: meta.title,
     category: t("meta.category"),
     description: meta.description,
-    image: MODELS_OG_IMAGE,
     imageAlt: t("meta.model.imageAlt", vars),
     keywords: [t("meta.model.keywords", vars)],
   });

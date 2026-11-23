@@ -473,13 +473,13 @@ function UnbottledContent({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <H1 className="text-4xl md:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tighter text-white leading-[0.9] mb-4">
+        <H2 className="text-4xl md:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tighter text-white leading-[0.9] mb-4 border-0">
           {t("home.splitHero.unbottled.titleLine1")}
           <Br />
           <Span className="text-transparent bg-clip-text bg-linear-to-br from-violet-400 to-fuchsia-400">
             {t("home.splitHero.unbottled.titleLine2")}
           </Span>
-        </H1>
+        </H2>
       </MotionDiv>
 
       <MotionDiv

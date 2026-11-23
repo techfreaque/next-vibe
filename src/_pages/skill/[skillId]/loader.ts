@@ -48,7 +48,9 @@ import { cache } from "react";
 
 import {
   buildBreadcrumbList,
+  organizationId,
   pageUrl,
+  websiteId,
 } from "@/_pages/_components/structured-data";
 import { configScopedTranslation } from "@/env/i18n";
 import { linkDeepLinkAttribution } from "@/referral/deep-link-attribution";
@@ -452,8 +454,6 @@ export async function loadSkillLandingPage({
     );
   }
 
-  const { t: configT } = configScopedTranslation.scopedT(locale);
-  const appName = configT("appName");
   const [layout, availability] = await Promise.all([
     siteLayoutLoader({ params: Promise.resolve({ locale }) }),
     getEnvAvailability(),
@@ -583,8 +583,6 @@ export async function loadSkillLandingPage({
         ? buildStructuredData(locale, indexableId, skillData.name, {
             description: skillData.description ?? skillData.tagline ?? "",
             skillsLabel: t("breadcrumb.skills"),
-            modelName: activeVariant?.chatModelName ?? null,
-            appName,
           })
         : null,
   };
@@ -597,8 +595,6 @@ function buildStructuredData(
   info: {
     description: string;
     skillsLabel: string;
-    modelName: string | null;
-    appName: string;
   },
 ): JsonLdNode {
   const path = `/skill/${encodeURIComponent(skillId)}`;
@@ -617,14 +613,17 @@ function buildStructuredData(
         name,
         description: info.description,
         inLanguage: hreflangFor(locale),
-        isPartOf: { "@type": "WebSite", name: info.appName },
-        about: {
-          "@type": "SoftwareApplication",
+        isPartOf: { "@id": websiteId(locale) },
+        // A skill is a persona + prompt that runs on the platform, not an
+        // installable app. CreativeWork, not SoftwareApplication: Google's
+        // Software App rich result demands ratings we do not have.
+        mainEntity: {
+          "@type": "CreativeWork",
+          "@id": `${url}#skill`,
           name,
-          applicationCategory: "ChatApplication",
-          operatingSystem: "Web",
           description: info.description,
-          ...(info.modelName ? { softwareRequirements: info.modelName } : {}),
+          inLanguage: hreflangFor(locale),
+          publisher: { "@id": organizationId(locale) },
         },
       },
     ],

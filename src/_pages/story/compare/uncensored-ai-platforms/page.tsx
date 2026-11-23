@@ -122,8 +122,6 @@ export const generateMetadata = async ({
     title: t("hub.meta.title", meta),
     category: t("hub.meta.category"),
     description: t("hub.meta.description", meta),
-    image:
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070",
     imageAlt: t("hub.meta.imageAlt", meta),
     keywords: [t("hub.meta.keywords", meta)],
   });

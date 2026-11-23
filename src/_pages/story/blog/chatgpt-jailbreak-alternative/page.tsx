@@ -119,8 +119,6 @@ export const generateMetadata = async ({
     title: t("meta.title", { appName }),
     category: t("meta.category"),
     description: t("meta.description", { appName }),
-    image:
-      "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?q=80&w=2070",
     imageAlt: t("meta.imageAlt", { appName }),
     keywords: [t("meta.keywords", { appName })],
   });

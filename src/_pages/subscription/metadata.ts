@@ -18,9 +18,6 @@ import { getPricingParams } from "@/products/repository-client";
 
 import { scopedTranslation } from "./i18n";
 
-const SUBSCRIPTION_OG_IMAGE =
-  "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070";
-
 export type SubscriptionMetaPage = "overview" | "buyCredits" | "history";
 
 const PAGE_PATHS: Record<SubscriptionMetaPage, string> = {
@@ -52,7 +49,6 @@ export async function generateSubscriptionMetadata(
     title: t(`meta.${page}.title`, values),
     description: t(`meta.${page}.description`, values),
     category: t("meta.category"),
-    image: SUBSCRIPTION_OG_IMAGE,
     imageAlt: t("meta.imageAlt", { appName }),
     keywords: [t("meta.keywords", { appName })],
     // Balances and history are per-user; only the pricing overview is indexable.

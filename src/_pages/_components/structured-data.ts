@@ -3,6 +3,9 @@
  * next-vibe-ui. Every price, count and date comes from its source of truth
  * (products, free-credit constants, model registry, blog registry), never from
  * copy. No ratings or reviews: we have none to show, so none are claimed.
+ * That is also why the product is a Service, not a SoftwareApplication /
+ * WebApplication: Google's Software App rich result requires aggregateRating
+ * or review, so an app node without them is reported as an invalid item.
  */
 
 import {
@@ -56,6 +59,43 @@ export function organizationId(locale: CountryLanguage): string {
   return `${siteBase(locale)}/#organization`;
 }
 
+/** @id of the site WebSite node (root layout graph), for isPartOf references. */
+export function websiteId(locale: CountryLanguage): string {
+  return `${siteBase(locale)}/#website`;
+}
+
+/** Default share image (public/og-image.jpg), real size 1200x630. */
+export function defaultImage(locale: CountryLanguage): JsonLdNode {
+  return {
+    "@type": "ImageObject",
+    url: `${siteBase(locale)}/og-image.jpg`,
+    width: 1200,
+    height: 630,
+  };
+}
+
+/**
+ * Self-contained Organization node for author/publisher fields. Google's
+ * Article validator wants author.name and publisher.name inline; the shared
+ * @id keeps it the same entity as the site graph's Organization.
+ */
+export function organizationNode(locale: CountryLanguage): JsonLdNode {
+  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const base = siteBase(locale);
+  return {
+    "@type": "Organization",
+    "@id": organizationId(locale),
+    name: configT("group.name"),
+    url: base,
+    logo: {
+      "@type": "ImageObject",
+      url: `${base}/logo.png`,
+      width: 512,
+      height: 512,
+    },
+  };
+}
+
 function buildOrganization(locale: CountryLanguage): JsonLdNode {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
@@ -65,9 +105,18 @@ function buildOrganization(locale: CountryLanguage): JsonLdNode {
     "@id": organizationId(locale),
     name: configT("group.name"),
     url: base,
-    logo: `${base}/logo.png`,
+    logo: {
+      "@type": "ImageObject",
+      url: `${base}/logo.png`,
+      width: 512,
+      height: 512,
+    },
     email: configT("emails.support"),
-    sameAs: [configT("social.twitterUrl"), configT("social.discordInvite")],
+    sameAs: [
+      configT("social.twitterUrl"),
+      configT("social.discordInvite"),
+      GITHUB_REPO_URL,
+    ],
     contactPoint: {
       "@type": "ContactPoint",
       email: configT("emails.support"),
@@ -189,7 +238,8 @@ export function buildPlanOffers(
 
 /**
  * Site-wide graph for the root layout: who runs the site (Organization), the
- * site itself (WebSite) and the product (WebApplication with real offers).
+ * site itself (WebSite), the product (Service with real offers) and the open
+ * source code it runs on (SoftwareSourceCode).
  */
 export function buildSiteStructuredData({
   locale,
@@ -222,25 +272,25 @@ export function buildSiteStructuredData({
         publisher: { "@id": organizationId(locale) },
       },
       {
-        "@type": "WebApplication",
+        "@type": "Service",
         "@id": `${base}/#app`,
         name: appName,
         url: pageUrl(locale, "/story"),
         description,
-        applicationCategory: "UtilitiesApplication",
-        applicationSubCategory: t("meta.category"),
-        operatingSystem: "Web",
-        inLanguage: SITE_LANGUAGES,
-        isAccessibleForFree: true,
-        image: `${base}/og-image.jpg`,
-        publisher: { "@id": organizationId(locale) },
+        serviceType: t("meta.category"),
+        availableLanguage: SITE_LANGUAGES,
+        image: defaultImage(locale),
+        provider: { "@id": organizationId(locale) },
         offers: buildPlanOffers(locale, modelCount),
-        isBasedOn: {
-          "@type": "SoftwareSourceCode",
-          codeRepository: GITHUB_REPO_URL,
-          programmingLanguage: "TypeScript",
-          license: LICENSE_URLS,
-        },
+      },
+      {
+        "@type": "SoftwareSourceCode",
+        "@id": `${base}/#source`,
+        name: appName,
+        codeRepository: GITHUB_REPO_URL,
+        programmingLanguage: "TypeScript",
+        license: LICENSE_URLS,
+        author: { "@id": organizationId(locale) },
       },
     ],
   };
@@ -265,7 +315,7 @@ export function buildPricingStructuredData({
     name: t("structuredData.pricing.name", { appName }),
     description: t("structuredData.pricing.description", { modelCount }),
     url,
-    image: `${siteBase(locale)}/og-image.jpg`,
+    image: defaultImage(locale),
     provider: { "@id": organizationId(locale) },
     serviceType: t("meta.category"),
     offers: buildPlanOffers(locale, modelCount),
@@ -287,6 +337,7 @@ export function buildBlogPostStructuredData({
   const { t: blogT } = blogScopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const url = pageUrl(locale, card.path);
+  const author = organizationNode(locale);
   const published = BLOG_POST_DATES[slug];
   return {
     "@context": SCHEMA_CONTEXT,
@@ -302,16 +353,10 @@ export function buildBlogPostStructuredData({
         inLanguage: getLanguageFromLocale(locale),
         url,
         mainEntityOfPage: url,
-        author: { "@id": organizationId(locale) },
-        publisher: {
-          "@type": "Organization",
-          "@id": organizationId(locale),
-          name: configT("group.name"),
-          logo: {
-            "@type": "ImageObject",
-            url: `${siteBase(locale)}/logo.png`,
-          },
-        },
+        image: defaultImage(locale),
+        author,
+        publisher: author,
+        isPartOf: { "@id": websiteId(locale) },
       },
       {
         "@type": "BreadcrumbList",

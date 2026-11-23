@@ -19,7 +19,8 @@ interface GenerateMetadataOptions {
   category: TranslatedKeyType;
   /** Localized copy or the actual description from user-authored content. */
   description: string;
-  image: string;
+  /** Absolute 1200x630 share image. Defaults to the site's /og-image.jpg. */
+  image?: string;
   imageAlt: TranslatedKeyType;
   keywords: TranslatedKeyType[];
   additionalMetadata?: Partial<Metadata>;
@@ -38,6 +39,8 @@ export function metadataGenerator(
   const groupName = configT("group.name");
   const twitterHandle = configT("social.twitterHandle");
   const baseUrl = configT("websiteUrl");
+  // The width/height below are only true for 1200x630 images.
+  const image = options.image ?? `${baseUrl.replace(/\/+$/, "")}/og-image.jpg`;
 
   const {
     path,
@@ -98,7 +101,7 @@ export function metadataGenerator(
       locale: hreflangFor(canonicalSeoLocale(locale)).replace("-", "_"),
       images: [
         {
-          url: options.image,
+          url: image,
           width: 1200,
           height: 630,
           alt: options.imageAlt,
@@ -114,7 +117,7 @@ export function metadataGenerator(
       description: options.description,
       site: twitterHandle,
       creator: twitterHandle,
-      images: [options.image],
+      images: [image],
     };
   }
 

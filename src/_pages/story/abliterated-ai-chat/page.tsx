@@ -21,7 +21,6 @@ import {
   formatNumber,
   modelHref,
 } from "@/_pages/models/_shared/model-format";
-import { MODELS_OG_IMAGE } from "@/_pages/models/constants";
 import { configScopedTranslation } from "@/env/i18n";
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
@@ -103,7 +102,6 @@ export async function generateMetadata({
     title: t("metaTitle", { appName: configT("appName") }),
     description: t("description"),
     category: t("title"),
-    image: MODELS_OG_IMAGE,
     imageAlt: t("title"),
     keywords: [t("keywords")],
   });

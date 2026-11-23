@@ -78,7 +78,9 @@ export const translations: typeof enTranslations = {
       pitch:
         "De texto a imagen, o retoca una referencia. Fotorrealista, anime, arte: lo que describas.",
       title: "Crear una imagen",
-      metaTitle: "Generador de imagen AI sin censura: {{appName}}",
+      metaTitle: "Generador de imágenes con IA sin censura: {{appName}}",
+      metaDescription:
+        "Crea imágenes a partir de texto o edita una foto de referencia. Modelos convencionales y sin censura lado a lado, del fotorrealismo al anime. Pagas por resultado.",
       description: "Describir una escena y elegir su encuadre.",
       keywords: "generador de imagen AI sin censura, arte AI, texto a imagen",
     },
@@ -88,7 +90,9 @@ export const translations: typeof enTranslations = {
       pitch:
         "Un texto o un primer fotograma se convierte en un clip. Tú eliges duración, formato y resolución.",
       title: "Crear un vídeo",
-      metaTitle: "Generador de vídeo AI: {{appName}}",
+      metaTitle: "Generador de vídeo con IA: {{appName}}",
+      metaDescription:
+        "Convierte un prompt o un primer fotograma en un vídeo. Elige duración, formato y resolución con los mejores modelos de vídeo. Pagas por resultado.",
       description:
         "Ponga una escena en movimiento, desde el primer marco hasta el último.",
       keywords: "Generador de vídeo AI, texto a vídeo, imagen a vídeo",
@@ -99,7 +103,9 @@ export const translations: typeof enTranslations = {
       pitch:
         "Una pista completa a partir de un prompt: ambiente, género, instrumentos, duración.",
       title: "Haz música",
-      metaTitle: "Generador de música AI: {{appName}}",
+      metaTitle: "Generador de música con IA: {{appName}}",
+      metaDescription:
+        "Un tema completo a partir de un prompt: ambiente, género, instrumentos y duración. Varios modelos musicales en un solo estudio. Pagas por resultado.",
       description:
         "Describir el estado de ánimo, los instrumentos y la longitud de su pista.",
       keywords: "Generador de música AI, texto a música, canción AI",
@@ -109,7 +115,9 @@ export const translations: typeof enTranslations = {
       tab: "Voz",
       pitch: "Tu texto leído por voces naturales en muchos idiomas.",
       title: "Dale un mensaje a la voz.",
-      metaTitle: "AI texto al discurso: {{appName}}",
+      metaTitle: "Texto a voz con IA: {{appName}}",
+      metaDescription:
+        "Pega un texto, elige una voz y descarga el audio. Voces de IA naturales en muchos idiomas, de varios proveedores. Pagas por resultado.",
       description: "Escoge una voz para leer tu guión en voz alta.",
       keywords: "texto a discurso, voz AI, TTS",
     },
@@ -119,7 +127,9 @@ export const translations: typeof enTranslations = {
       pitch:
         "Sube una grabación y recibe texto limpio. Descárgalo como archivo.",
       title: "Transcribe audio",
-      metaTitle: "Discurso de AI al texto: {{appName}}",
+      metaTitle: "Voz a texto con IA: {{appName}}",
+      metaDescription:
+        "Sube una grabación y recibe un texto limpio listo para descargar. Modelos de transcripción precisos en muchos idiomas. Pagas por resultado.",
       description:
         "Convierta una grabación en una transcripción que puede descargar.",
       keywords: "texto, transcripción AI, audio a texto",

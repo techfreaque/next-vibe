@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "{{appName}} API Docs: OpenAI y Anthropic compatibles",
     description:
-      "Una base URL, modelos de chat {{modelCount}}. OpenAI concluidas y respuestas de chat API, API Anthropic Messages, streaming, llamada de herramienta. Más imágenes, discurso, transcripción, vídeo y música en formato OpenAI. Codex CLI y Claude Code se conectan directamente. Paga en créditos.",
+      "Una sola URL base, {{modelCount}} modelos de chat. Compatible con OpenAI y Anthropic, con streaming y llamadas a herramientas. Además imágenes, voz, vídeo y música. Pagas en créditos.",
     category: "API",
     imageAlt: "{{appName}} OpenAI-compatible API docs",
     keywords:

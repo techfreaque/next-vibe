@@ -2,8 +2,7 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   meta: {
-    title:
-      "Grok-Alternativen: weniger Filter als Grok, gleicher Chat | {{appName}}",
+    title: "Grok-Alternativen: weniger Filter, gleicher Chat | {{appName}}",
     description:
       "Ist Grok unzensiert? Nicht ganz. Wie ungefiltert Grok wirklich ist, die besten Grok-Alternativen nach Einsatzzweck und wie du Grok neben abliterierten Modellen in einem Chat nutzt. Live-Preise.",
     category: "Vergleich",

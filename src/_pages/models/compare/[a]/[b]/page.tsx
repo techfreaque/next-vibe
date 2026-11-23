@@ -34,7 +34,6 @@ import {
   type ModelSeoContent,
   ModelSeoSections,
 } from "../../../_shared/model-seo-sections";
-import { MODELS_OG_IMAGE } from "../../../constants";
 import { scopedTranslation } from "../../../i18n";
 import { ComparePageClient } from "./page-client";
 
@@ -66,7 +65,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: meta.title,
     category: t("meta.category"),
     description: meta.description,
-    image: MODELS_OG_IMAGE,
     imageAlt: t("meta.compare.imageAlt", vars),
     keywords: [t("meta.compare.keywords", vars)],
   });

@@ -26,7 +26,6 @@ import {
   type UncensoredKind,
   uncensoredKind,
 } from "@/_pages/models/_shared/model-format";
-import { MODELS_OG_IMAGE } from "@/_pages/models/constants";
 import { scopedTranslation as modelsScopedTranslation } from "@/_pages/models/i18n";
 import { configScopedTranslation } from "@/env/i18n";
 import {
@@ -109,7 +108,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: t("metaTitle", { appName: configT("appName") }),
     description: t("description"),
     category: t("title"),
-    image: MODELS_OG_IMAGE,
     imageAlt: t("title"),
     keywords: [t("keywords")],
   });

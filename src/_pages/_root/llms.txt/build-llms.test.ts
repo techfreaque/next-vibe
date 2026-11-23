@@ -111,6 +111,10 @@ describe("JSON-LD", () => {
       expect(json).toContain('"@type":"BlogPosting"');
       expect(json).toContain('"@type":"BreadcrumbList"');
       expect(json).toContain(`"datePublished":"${BLOG_POST_DATES[slug]}"`);
+      // Google Article fields: image with real size, author/publisher by name.
+      expect(json).toContain('"image":{"@type":"ImageObject"');
+      expect(json).toContain('"width":1200,"height":630');
+      expect(json).toMatch(/"author":\{"@type":"Organization","@id":"[^"]+","name":"[^"]+"/);
     }
   });
 
@@ -126,6 +130,9 @@ describe("JSON-LD", () => {
     expect(json).not.toContain("aggregateRating");
     expect(json).not.toContain("review");
     expect(json).not.toContain('"@type":"Product"');
+    // Software App rich results require ratings, which we do not claim.
+    expect(json).not.toContain('"@type":"WebApplication"');
+    expect(json).not.toContain('"@type":"SoftwareApplication"');
     expect(json).not.toContain("shippingDetails");
     expect(json).not.toContain("hasMerchantReturnPolicy");
     expect(json).not.toContain("{{");

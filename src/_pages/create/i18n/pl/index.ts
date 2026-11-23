@@ -78,6 +78,8 @@ export const translations: typeof enTranslations = {
         "Tekst na obraz albo edycja zdjęcia. Fotorealizm, anime, sztuka, cokolwiek opiszesz.",
       title: "Stwórz obraz",
       metaTitle: "Generator obrazów AI bez cenzury: {{appName}}",
+      metaDescription:
+        "Twórz obrazy z tekstu albo edytuj zdjęcie referencyjne. Modele mainstreamowe i bez cenzury obok siebie, od fotorealizmu po anime. Płacisz za wynik.",
       description: "Opisz scenę i wybierz kadr.",
       keywords: "generator obrazów AI bez cenzury, grafika AI, tekst na obraz",
     },
@@ -88,6 +90,8 @@ export const translations: typeof enTranslations = {
         "Z tekstu lub pierwszej klatki powstaje klip. Ty wybierasz długość, proporcje i rozdzielczość.",
       title: "Stwórz wideo",
       metaTitle: "Generator wideo AI: {{appName}}",
+      metaDescription:
+        "Zamień prompt albo pierwszą klatkę w klip wideo. Sam wybierasz długość, proporcje i rozdzielczość w czołowych modelach wideo. Płacisz za wynik.",
       description: "Wpraw scenę w ruch, od pierwszej do ostatniej klatki.",
       keywords: "generator wideo AI, tekst na wideo, obraz na wideo",
     },
@@ -98,6 +102,8 @@ export const translations: typeof enTranslations = {
         "Cały utwór z jednego promptu: nastrój, gatunek, instrumenty, długość.",
       title: "Skomponuj muzykę",
       metaTitle: "Generator muzyki AI: {{appName}}",
+      metaDescription:
+        "Cały utwór z jednego promptu: nastrój, gatunek, instrumenty i długość. Kilka modeli muzycznych w jednym studiu. Płacisz za wynik.",
       description: "Dobierz nastrój, instrumenty i długość utworu.",
       keywords: "generator muzyki AI, tekst na muzykę, piosenka AI",
     },
@@ -107,6 +113,8 @@ export const translations: typeof enTranslations = {
       pitch: "Twój tekst czytany naturalnymi głosami w wielu językach.",
       title: "Nadaj tekstowi głos",
       metaTitle: "Zamiana tekstu na mowę AI: {{appName}}",
+      metaDescription:
+        "Wklej tekst, wybierz głos, pobierz nagranie. Naturalne głosy AI w wielu językach od kilku dostawców. Płacisz za wynik.",
       description: "Wybierz głos, który przeczyta Twój tekst.",
       keywords: "tekst na mowę, głos AI, TTS",
     },
@@ -116,6 +124,8 @@ export const translations: typeof enTranslations = {
       pitch: "Wgraj nagranie, odbierz czysty tekst. Pobierz go jako plik.",
       title: "Przepisz nagranie",
       metaTitle: "Transkrypcja AI: {{appName}}",
+      metaDescription:
+        "Wgraj nagranie i odbierz czysty tekst gotowy do pobrania. Dokładne modele zamiany mowy na tekst w wielu językach. Płacisz za wynik.",
       description: "Zamień nagranie w tekst gotowy do pobrania.",
       keywords: "mowa na tekst, transkrypcja AI, audio na tekst",
     },

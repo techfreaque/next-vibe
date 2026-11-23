@@ -39,8 +39,6 @@ export async function buildVersusMetadata(
     title: t(`versus.${versus}.meta.title`, stats),
     category: t("common.category"),
     description: t(`versus.${versus}.meta.description`, stats),
-    image:
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070",
     imageAlt: t("common.versusImageAlt", stats),
     keywords: [t(`versus.${versus}.meta.keywords`, stats)],
   });

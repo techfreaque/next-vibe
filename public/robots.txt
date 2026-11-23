@@ -4,8 +4,11 @@ Allow: /
 Disallow: /api/
 Disallow: /*/api/
 Disallow: /*/threads/
+Disallow: /*/threads$
 Disallow: /*/tools/
+Disallow: /*/tools$
 Disallow: /*/user/
+Disallow: /*/user$
 
 Sitemap: https://unbottled.ai/sitemap.xml
 

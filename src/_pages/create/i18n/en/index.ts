@@ -76,6 +76,8 @@ export const translations = {
         "Text to image, or edit a reference. Photoreal, anime, art, anything you describe.",
       title: "Create an image",
       metaTitle: "Uncensored AI image generator: {{appName}}",
+      metaDescription:
+        "Generate images from text or edit a reference photo. Mainstream and uncensored models side by side, photoreal to anime. Pay per result.",
       description: "Describe a scene and choose its framing.",
       keywords: "uncensored AI image generator, AI art, text to image",
     },
@@ -86,6 +88,8 @@ export const translations = {
         "Text or a first frame to a clip. Pick length, ratio and resolution.",
       title: "Create a video",
       metaTitle: "AI video generator: {{appName}}",
+      metaDescription:
+        "Turn a prompt or a first frame into a video clip. Pick length, aspect ratio and resolution across leading video models. Pay per result.",
       description: "Set a scene in motion, from the first frame to the last.",
       keywords: "AI video generator, text to video, image to video",
     },
@@ -95,6 +99,8 @@ export const translations = {
       pitch: "A full track from a prompt: mood, genre, instruments, length.",
       title: "Make music",
       metaTitle: "AI music generator: {{appName}}",
+      metaDescription:
+        "Generate a full track from a prompt: mood, genre, instruments and length. Several music models in one studio. Pay per result.",
       description: "Describe the mood, instruments and length of your track.",
       keywords: "AI music generator, text to music, AI song",
     },
@@ -104,6 +110,8 @@ export const translations = {
       pitch: "Your script, read aloud by natural voices in many languages.",
       title: "Give text a voice",
       metaTitle: "AI text to speech: {{appName}}",
+      metaDescription:
+        "Paste a script, pick a voice, download the audio. Natural AI voices in many languages from several providers. Pay per result.",
       description: "Pick a voice to read your script aloud.",
       keywords: "text to speech, AI voice, TTS",
     },
@@ -113,6 +121,8 @@ export const translations = {
       pitch: "Upload a recording, get clean text back. Download it as a file.",
       title: "Transcribe audio",
       metaTitle: "AI speech to text: {{appName}}",
+      metaDescription:
+        "Upload a recording and get clean text back as a downloadable file. Accurate speech to text models in many languages. Pay per result.",
       description: "Turn a recording into a transcript you can download.",
       keywords: "speech to text, AI transcription, audio to text",
     },

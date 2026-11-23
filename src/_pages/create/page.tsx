@@ -5,8 +5,6 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import type { JSX } from "react";
 
-import { MODELS_OG_IMAGE } from "@/_pages/models/constants";
-
 import {
   studioData,
   type StudioKindSummary,
@@ -28,7 +26,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: t("hub.metaTitle"),
     description: t("hub.metaDescription"),
     category: t("meta.category"),
-    image: MODELS_OG_IMAGE,
     imageAlt: t("studio"),
     keywords: [t("hub.keywords")],
   });

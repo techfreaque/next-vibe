@@ -79,6 +79,8 @@ export const translations: typeof enTranslations = {
         "Du texte à l'image, ou la retouche d'une référence. Photoréaliste, anime, art : tout ce que vous décrivez.",
       title: "Créer une image",
       metaTitle: "Générateur d'images IA sans censure : {{appName}}",
+      metaDescription:
+        "Créez des images à partir d'un texte ou retouchez une photo. Modèles grand public et sans censure côte à côte, du photoréaliste à l'anime. Paiement au résultat.",
       description: "Décrivez une scène et choisissez votre cadrage.",
       keywords: "générateur d'images IA sans censure, art IA, texte vers image",
     },
@@ -89,6 +91,8 @@ export const translations: typeof enTranslations = {
         "Un texte ou une première image devient un clip. Vous choisissez durée, format et résolution.",
       title: "Créer une vidéo",
       metaTitle: "Générateur de vidéos IA : {{appName}}",
+      metaDescription:
+        "Transformez un prompt ou une première image en clip vidéo. Durée, format et résolution au choix, avec les meilleurs modèles vidéo. Paiement au résultat.",
       description: "Animez votre scène, de la première à la dernière image.",
       keywords: "générateur de vidéos IA, texte vers vidéo, image vers vidéo",
     },
@@ -99,6 +103,8 @@ export const translations: typeof enTranslations = {
         "Un morceau complet à partir d'un prompt : ambiance, genre, instruments, durée.",
       title: "Composer un morceau",
       metaTitle: "Générateur de musique IA : {{appName}}",
+      metaDescription:
+        "Un morceau complet à partir d'un prompt : ambiance, genre, instruments et durée. Plusieurs modèles musicaux dans un seul studio. Paiement au résultat.",
       description:
         "Choisissez l’ambiance, les instruments et la durée de votre morceau.",
       keywords: "générateur de musique IA, texte vers musique, chanson IA",
@@ -110,6 +116,8 @@ export const translations: typeof enTranslations = {
         "Votre texte lu par des voix naturelles, dans de nombreuses langues.",
       title: "Donner voix à un texte",
       metaTitle: "Synthèse vocale IA : {{appName}}",
+      metaDescription:
+        "Collez un texte, choisissez une voix, téléchargez l'audio. Des voix IA naturelles dans de nombreuses langues. Paiement au résultat.",
       description: "Choisissez la voix qui lira votre texte à haute voix.",
       keywords: "synthèse vocale, voix IA, TTS",
     },
@@ -120,6 +128,8 @@ export const translations: typeof enTranslations = {
         "Envoyez un enregistrement, récupérez un texte propre. Téléchargez-le en fichier.",
       title: "Transcrire un enregistrement",
       metaTitle: "Transcription IA : {{appName}}",
+      metaDescription:
+        "Importez un enregistrement et récupérez un texte propre à télécharger. Des modèles de transcription précis dans de nombreuses langues. Paiement au résultat.",
       description: "Transformez un enregistrement en texte à télécharger.",
       keywords: "transcription audio, transcription IA, audio vers texte",
     },

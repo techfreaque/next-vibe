@@ -79,6 +79,8 @@ export const translations: typeof enTranslations = {
         "Text zu Bild oder Bearbeitung einer Vorlage. Fotorealistisch, Anime, Kunst, was immer du beschreibst.",
       title: "Bild erstellen",
       metaTitle: "Unzensierter KI-Bildgenerator: {{appName}}",
+      metaDescription:
+        "Bilder aus Text erzeugen oder ein Referenzfoto bearbeiten. Mainstream- und unzensierte Modelle nebeneinander, von fotoreal bis Anime. Bezahlt wird pro Ergebnis.",
       description: "Beschreibe dein Motiv und wähle den Bildausschnitt.",
       keywords: "unzensierter KI-Bildgenerator, KI-Kunst, Text zu Bild",
     },
@@ -89,6 +91,8 @@ export const translations: typeof enTranslations = {
         "Aus Text oder einem Startbild wird ein Clip. Länge, Format und Auflösung bestimmst du.",
       title: "Video erstellen",
       metaTitle: "KI-Videogenerator: {{appName}}",
+      metaDescription:
+        "Aus einem Prompt oder einem Startbild wird ein Videoclip. Länge, Seitenverhältnis und Auflösung wählst du selbst. Bezahlt wird pro Ergebnis.",
       description:
         "Bring deine Szene in Bewegung, vom ersten bis zum letzten Bild.",
       keywords: "KI-Videogenerator, Text zu Video, Bild zu Video",
@@ -100,6 +104,8 @@ export const translations: typeof enTranslations = {
         "Ein kompletter Track aus einem Prompt: Stimmung, Genre, Instrumente, Länge.",
       title: "Musik komponieren",
       metaTitle: "KI-Musikgenerator: {{appName}}",
+      metaDescription:
+        "Ein kompletter Track aus einem Prompt: Stimmung, Genre, Instrumente und Länge. Mehrere Musikmodelle in einem Studio. Bezahlt wird pro Ergebnis.",
       description: "Bestimme Stimmung, Instrumente und Länge deines Stücks.",
       keywords: "KI-Musikgenerator, Text zu Musik, KI-Song",
     },
@@ -110,6 +116,8 @@ export const translations: typeof enTranslations = {
         "Dein Skript, vorgelesen von natürlichen Stimmen in vielen Sprachen.",
       title: "Text vertonen",
       metaTitle: "KI-Sprachausgabe: {{appName}}",
+      metaDescription:
+        "Skript einfügen, Stimme wählen, Audio herunterladen. Natürliche KI-Stimmen in vielen Sprachen von mehreren Anbietern. Bezahlt wird pro Ergebnis.",
       description: "Wähle die Stimme, die dein Skript vorlesen soll.",
       keywords: "Text zu Sprache, KI-Stimme, TTS",
     },
@@ -120,6 +128,8 @@ export const translations: typeof enTranslations = {
         "Aufnahme hochladen, sauberen Text zurückbekommen. Als Datei herunterladen.",
       title: "Aufnahme transkribieren",
       metaTitle: "KI-Transkription: {{appName}}",
+      metaDescription:
+        "Aufnahme hochladen, sauberen Text als Datei zurückbekommen. Präzise Spracherkennung in vielen Sprachen. Bezahlt wird pro Ergebnis.",
       description:
         "Verwandle eine Aufnahme in ein Transkript zum Herunterladen.",
       keywords: "Sprache zu Text, KI-Transkription, Audio zu Text",

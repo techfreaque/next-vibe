@@ -24,7 +24,12 @@ import type { JSX } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
-import { organizationId, pageUrl } from "../../../_components/structured-data";
+import {
+  defaultImage,
+  organizationNode,
+  pageUrl,
+  websiteId,
+} from "../../../_components/structured-data";
 import { ArticleList, ArticleScroll } from "../../_shared/article";
 import { CardLink, CONTAINER } from "../../_shared/marketing";
 import { scopedTranslation } from "../i18n";
@@ -440,7 +445,6 @@ export function buildCompareArticle({
   headline: string;
   description: string;
 }): JsonLdNode {
-  const { t: configT } = configScopedTranslation.scopedT(locale);
   const url = pageUrl(locale, path);
   return {
     "@type": "Article",
@@ -452,11 +456,9 @@ export function buildCompareArticle({
     inLanguage: getLanguageFromLocale(locale),
     url,
     mainEntityOfPage: url,
-    author: { "@id": organizationId(locale) },
-    publisher: {
-      "@type": "Organization",
-      "@id": organizationId(locale),
-      name: configT("group.name"),
-    },
+    image: defaultImage(locale),
+    author: organizationNode(locale),
+    publisher: organizationNode(locale),
+    isPartOf: { "@id": websiteId(locale) },
   };
 }

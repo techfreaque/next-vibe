@@ -12,7 +12,6 @@ import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX } from "react";
 
-import { MODELS_OG_IMAGE } from "@/_pages/models/constants";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { type CreateKind, isCreateKind } from "../_shared/create-kinds";
@@ -40,8 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     path: `create/${kind}`,
     title: t(`kinds.${kind}.metaTitle`, { appName }),
     category: t("meta.category"),
-    description: t(`kinds.${kind}.description`),
-    image: MODELS_OG_IMAGE,
+    description: t(`kinds.${kind}.metaDescription`),
     imageAlt: t("meta.imageAlt", {
       appName,
       title: t(`kinds.${kind}.title`),

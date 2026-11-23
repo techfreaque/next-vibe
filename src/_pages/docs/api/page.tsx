@@ -45,7 +45,10 @@ import {
 
 import {
   buildBreadcrumbList,
+  defaultImage,
+  organizationNode,
   pageUrl,
+  websiteId,
 } from "../../_components/structured-data";
 import { BreadcrumbTrail } from "../../story/_shared/breadcrumbs";
 import { Callout, Cta } from "../../story/_shared/marketing";
@@ -369,10 +372,16 @@ export function TanstackPage({
             ]),
             {
               "@type": "TechArticle",
+              "@id": `${pageUrl(locale, "/docs/api")}#article`,
               headline: `${t("hero.title")} ${t("hero.titleHighlight")}`,
               description: t("meta.description", { appName, modelCount }),
+              url: pageUrl(locale, "/docs/api"),
               mainEntityOfPage: pageUrl(locale, "/docs/api"),
               inLanguage: hreflangFor(locale),
+              image: defaultImage(locale),
+              author: organizationNode(locale),
+              publisher: organizationNode(locale),
+              isPartOf: { "@id": websiteId(locale) },
             },
           ],
         }}

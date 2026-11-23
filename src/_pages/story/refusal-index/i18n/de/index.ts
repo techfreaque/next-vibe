@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   meta: {
     title:
-      "Verweigerungs-Index: Welche KI antwortet, schwächt ab oder lehnt ab | {{appName}}",
+      "Verweigerungs-Index: Welche KI antwortet, welche blockt? | {{appName}}",
     category: "Verweigerungs-Index",
     description:
       "Dieselben Fragen an jedes KI-Modell, jede Woche kommen neue dazu. Wir messen, wer antwortet, wer abschwächt und wer ablehnt, und legen die Methode offen. Offene Daten auf {{appName}}.",

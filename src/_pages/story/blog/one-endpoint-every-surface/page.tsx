@@ -41,8 +41,6 @@ export const generateMetadata = async ({
     title: t("meta.title"),
     category: t("meta.category"),
     description: t("meta.description"),
-    image:
-      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070",
     imageAlt: t("meta.imageAlt"),
     keywords: [t("meta.keywords")],
   });

@@ -102,8 +102,6 @@ export const generateMetadata = async ({
       modelCount,
       mediaModelCount,
     }),
-    image:
-      "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=2070",
     imageAlt: t("meta.imageAlt", { appName }),
     keywords: [t("meta.keywords", { appName })],
   });

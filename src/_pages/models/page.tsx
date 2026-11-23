@@ -24,7 +24,6 @@ import {
   type DirectoryGroup,
   ModelDirectory,
 } from "./_shared/model-directory";
-import { MODELS_OG_IMAGE } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { ModelsIndexClient } from "./page-client";
 
@@ -45,7 +44,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: t("meta.index.title", { appName, count }),
     category: t("meta.category"),
     description: t("meta.index.description", { appName }),
-    image: MODELS_OG_IMAGE,
     imageAlt: t("meta.index.imageAlt", { appName }),
     keywords: [t("meta.index.keywords", { appName })],
   });

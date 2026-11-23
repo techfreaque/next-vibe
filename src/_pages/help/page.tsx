@@ -61,8 +61,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: t("meta.contact.title", { appName }),
     description: t("meta.contact.description", { appName }),
     category: t("meta.contact.category"),
-    image:
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&h=630&auto=format&fit=crop",
     imageAlt: t("meta.contact.imageAlt", { appName }),
     keywords: [t("meta.contact.keywords", { appName })],
     additionalMetadata: {

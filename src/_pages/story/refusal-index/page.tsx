@@ -18,6 +18,7 @@ import { configScopedTranslation } from "@/env/i18n";
 
 import {
   buildBreadcrumbList,
+  organizationNode,
   pageUrl,
 } from "../../_components/structured-data";
 import { scopedTranslation } from "./i18n";
@@ -76,12 +77,15 @@ export function TanstackPage(data: RefusalIndexPageData): JSX.Element {
               ? [
                   {
                     "@type": "Dataset",
+                    "@id": `${pageUrl(locale, path)}#dataset`,
                     name: t("hero.eyebrow"),
                     description: t("meta.description", {
                       appName: configT("appName"),
                     }),
                     url: pageUrl(locale, path),
                     inLanguage: hreflangFor(locale),
+                    creator: organizationNode(locale),
+                    isAccessibleForFree: true,
                     ...(leaderboard.runFinishedAt
                       ? { dateModified: leaderboard.runFinishedAt }
                       : {}),
