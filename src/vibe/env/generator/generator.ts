@@ -824,9 +824,8 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
    * none of these at build time. NEXT_PUBLIC_* values are patched into the
    * compiled bundle at container start (runtime-env-placeholders.ts /
    * server/server/start/runtime-env-patch.ts), and every other field already
-   * has a working default (env.ts / env-client.ts). Passing build args would
-   * only risk baking secrets into image layers for no benefit - see
-   * `vibe image-push`, which builds with zero --build-arg flags.
+   * has a working default (env.ts / env-client.ts). Keep app configuration
+   * out of build args. The public image revision is declared separately.
    */
   private static async updateDockerfile(dockerfilePath: string): Promise<void> {
     const { readFileSync } = await import("node:fs");

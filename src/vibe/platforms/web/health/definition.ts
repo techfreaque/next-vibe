@@ -21,7 +21,7 @@ import {
   responseArrayField,
   responseField,
 } from "../../../unified-ui/_shared/utils-i18n";
-import { HEALTH_ALIAS } from "./constants";
+import { HEALTH_ALIAS, healthRevisionSchema } from "./constants";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -99,6 +99,12 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         label: "get.response.uptime.title",
         schema: z.coerce.number(),
+      }),
+
+      revision: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "get.response.revision.title",
+        schema: healthRevisionSchema.optional(),
       }),
 
       environment: objectField(scopedTranslation, {

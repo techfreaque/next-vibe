@@ -56,6 +56,10 @@ RUN --mount=type=cache,target=/app/.next-prod/cache,id=next-vibe-next-cache-v3,s
     RAYON_NUM_THREADS=2 UV_THREADPOOL_SIZE=2 NODE_OPTIONS=--max-old-space-size=12288 VIBE_BUILD_PLACEHOLDER_ENV=true bun src/vibe/platforms/cli/vibe-runtime.ts build --migrate=false --seed=false --db-setup=false --webpack=true && \
     test -f .next-prod/BUILD_ID || (echo "ERROR: .next-prod/BUILD_ID missing - Next.js build failed" && exit 1)
 
+# Recorded after compilation so revision metadata can be read at runtime.
+ARG VIBE_IMAGE_REVISION
+RUN printf '%s\n' "$VIBE_IMAGE_REVISION" > .vibe-image-revision
+
 
 # Port 3000: HTTP + WebSocket (proxy mode, default).
 # Port 4000: WebSocket sidecar (opt-in via VIBE_DISABLE_PROXY=true).

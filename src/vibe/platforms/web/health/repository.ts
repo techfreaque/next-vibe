@@ -3,6 +3,7 @@
  * Provides comprehensive health monitoring and status checks
  */
 
+import { readFile } from "node:fs/promises";
 import { loadavg } from "node:os";
 import { performance } from "node:perf_hooks";
 
@@ -17,6 +18,7 @@ import { parseError } from "../../../core/utils/parse-error";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../../database/utils/i18n";
 import type { EndpointLogger } from "../../../logger/types";
 import { getCurrentEnvironmentInfo } from "../environment";
+import { healthRevisionSchema } from "./constants";
 import type {
   HealthCheckRequestOutput,
   HealthCheckResponseOutput,
@@ -122,10 +124,18 @@ export class HealthCheckRepository {
       const overallStatus =
         HealthCheckRepository.determineOverallStatus(checks);
 
+      const imageRevision = await readFile(
+        ".vibe-image-revision",
+        "utf8",
+      ).catch(() => undefined);
+      const revision = healthRevisionSchema.safeParse(
+        imageRevision?.trim(),
+      ).data;
       const response: HealthCheckResponseOutput = {
         status: overallStatus,
         timestamp: new Date(),
         uptime: Date.now() - HealthCheckRepository.startTime,
+        revision,
         environment: {
           name: envInfo.environment,
           nodeEnv: envInfo.nodeEnv,

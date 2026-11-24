@@ -41,6 +41,9 @@ export const translations = {
         title: "Uptime",
         description: "Server uptime in seconds",
       },
+      revision: {
+        title: "Build Commit",
+      },
       environment: {
         title: "Environment",
         description: "Server environment information",

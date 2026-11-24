@@ -43,6 +43,9 @@ export const translations: typeof enTranslations = {
         title: "Betriebszeit",
         description: "Server-Betriebszeit in Sekunden",
       },
+      revision: {
+        title: "Build-Commit",
+      },
       environment: {
         title: "Umgebung",
         description: "Server-Umgebungsinformationen",

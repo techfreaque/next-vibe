@@ -43,6 +43,9 @@ export const translations: typeof enTranslations = {
         title: "Uptime",
         description: "Temps de fonctionnement du serveur en secondes",
       },
+      revision: {
+        title: "Commit de compilation",
+      },
       environment: {
         title: "Environnement",
         description: "Informations sur l'environnement du serveur",

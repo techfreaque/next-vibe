@@ -34,6 +34,7 @@ import {
 } from "../../core/route/response.schema";
 import { parseError } from "../../core/utils/parse-error";
 import type { EndpointLogger } from "../../logger/types";
+import { dockerBuildArgs } from "./build-args";
 import { ImagePushCleanup } from "./cleanup";
 import type { RemoteNode } from "./cleanup-selection";
 import { IMAGE_BUILD_BUILDER } from "./constants";
@@ -171,14 +172,14 @@ export class ImagePushRepository {
       ),
       IMAGE_BUILD_BUILDER,
       String(imagePushEnv.DOCKER_BUILD_MEMORY_GB),
-      "--platform",
-      data.platform,
-      "--network=host",
-      "-f",
-      join(contextDir, "Dockerfile"),
-      ...refs.flatMap((ref) => ["-t", ref]),
-      transferTarget || !data.push ? "--load" : "--push",
-      contextDir,
+      ...dockerBuildArgs({
+        contextDir,
+        platform: data.platform,
+        refs,
+        pushToRegistry: data.push && !transferTarget,
+        revision: sha,
+        created: new Date(),
+      }),
     ];
 
     const buildResult = spawnSync("bash", args, {
