@@ -54,6 +54,11 @@ export interface StorageAdapter {
    */
   deleteFile(fileId: string, threadId?: string): Promise<void>;
 
+  /** Strict, idempotent deletes for the guest media cleanup transaction. */
+  deleteFileContent(file: FileMetadata, signal?: AbortSignal): Promise<void>;
+  deleteFileMetadata(file: FileMetadata): Promise<void>;
+  writeFileMetadata(file: FileMetadata): Promise<void>;
+
   /**
    * Get a file's public URL
    */
@@ -84,13 +89,16 @@ export interface StorageAdapter {
    * List all file metadata entries within a given threadId namespace.
    * Used for cleanup tasks that need to enumerate files without knowing their IDs.
    */
-  listFilesByThread(threadId: string): Promise<FileMetadata[]>;
+  listFilesByThread(
+    threadId: string,
+    options?: { strict?: boolean; signal?: AbortSignal },
+  ): Promise<FileMetadata[]>;
 
   /**
    * List every threadId namespace that holds files (stored threads, incognito
    * threads, standalone tool namespaces, caches). Used by storage cleanup jobs.
    */
-  listThreadIds(): Promise<string[]>;
+  listThreadIds(signal?: AbortSignal): Promise<string[]>;
 }
 
 let storageInstance: StorageAdapter | null = null;

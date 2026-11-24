@@ -14,10 +14,6 @@ export const translations: typeof enTranslations = {
       description: "Uruchom lub sprawdź czyszczenie",
     },
     fields: {
-      retentionDays: {
-        label: "Przechowywanie (dni)",
-        description: "Usuń media gości starsze niż ta liczba dni",
-      },
       batchSize: {
         label: "Maks. usunięć",
         description:
@@ -34,6 +30,8 @@ export const translations: typeof enTranslations = {
       namespacesScanned: "Sprawdzone przestrzenie",
       storedThreadNamespaces: "Pominięte zapisane wątki",
       filesScanned: "Sprawdzone pliki",
+      eligibleFiles: "Pliki do usunięcia",
+      eligibleBytes: "Bajty do usunięcia",
       filesDeleted: "Usunięte pliki",
       bytesDeleted: "Usunięte bajty",
       skippedTooNew: "Zachowane: w okresie przechowywania",
@@ -42,6 +40,8 @@ export const translations: typeof enTranslations = {
       skippedAccountLead: "Zachowane: lead powiązany z kontem",
       deferred: "Przeniesione na kolejny przebieg",
       failed: "Nieudane",
+      rowsDeleted: "Usunięte wpisy Studia",
+      scanComplete: "Skanowanie zakończone",
       executionTimeMs: "Czas wykonania (ms)",
     },
     success: {
@@ -50,6 +50,8 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    scheduledOnly:
+      "Pliki usuwa wyłącznie zaplanowane zadanie w środowisku produkcyjnym.",
     failed: "Czyszczenie mediów gości nie powiodło się: {{error}}",
     server: {
       title: "Błąd czyszczenia",

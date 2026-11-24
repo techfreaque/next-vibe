@@ -9,6 +9,7 @@ import {
   ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
+  S3ServiceException,
 } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 
@@ -135,15 +136,7 @@ export class S3StorageAdapter implements StorageAdapter {
       messageId: metadata.messageId,
     };
 
-    const metadataKey = `chat-attachments/${metadata.threadId}/.metadata/${fileId}.json`;
-    const metadataCommand = new PutObjectCommand({
-      Bucket: this.bucket,
-      Key: metadataKey,
-      Body: JSON.stringify(fileMetadata, null, 2),
-      ContentType: "application/json",
-    });
-
-    await this.client.send(metadataCommand);
+    await this.writeFileMetadata(fileMetadata);
 
     // Generate URL
     const url = this.publicUrlBase
@@ -210,6 +203,40 @@ export class S3StorageAdapter implements StorageAdapter {
     }
 
     return buildStorageFileUrl(metadata.threadId, metadata.filename);
+  }
+
+  async deleteFileContent(
+    file: FileMetadata,
+    signal?: AbortSignal,
+  ): Promise<void> {
+    await this.client.send(
+      new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: `chat-attachments/${file.threadId}/${file.filename}`,
+      }),
+      { abortSignal: signal },
+    );
+  }
+
+  async deleteFileMetadata(file: FileMetadata): Promise<void> {
+    await this.client.send(
+      new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: `chat-attachments/${file.threadId}/.metadata/${file.id}.json`,
+      }),
+      { abortSignal: AbortSignal.timeout(10_000) },
+    );
+  }
+
+  async writeFileMetadata(file: FileMetadata): Promise<void> {
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: `chat-attachments/${file.threadId}/.metadata/${file.id}.json`,
+        Body: JSON.stringify(file, null, 2),
+        ContentType: "application/json",
+      }),
+    );
   }
 
   async getFileMetadata(
@@ -319,7 +346,10 @@ export class S3StorageAdapter implements StorageAdapter {
     }
   }
 
-  async listFilesByThread(threadId: string): Promise<FileMetadata[]> {
+  async listFilesByThread(
+    threadId: string,
+    options?: { strict?: boolean; signal?: AbortSignal },
+  ): Promise<FileMetadata[]> {
     if (agentEnv.CHAT_STORAGE_TYPE !== "s3") {
       return [];
     }
@@ -328,39 +358,41 @@ export class S3StorageAdapter implements StorageAdapter {
     const results: FileMetadata[] = [];
 
     try {
-      const { keys } = await this.listAllKeys(prefix);
+      const { keys } = await this.listAllKeys(
+        prefix,
+        undefined,
+        options?.signal,
+      );
 
       for (const key of keys) {
         if (!key.endsWith(".json")) {
           continue;
         }
-        const metadata = await this.readMetadataObject(key);
+        const metadata = await this.readMetadataObject(key, options);
         if (metadata) {
           results.push(metadata);
         }
       }
-    } catch {
+    } catch (error) {
+      if (options?.strict) {
+        return Promise.reject(error);
+      }
       // Bucket/prefix doesn't exist - return empty
     }
 
     return results;
   }
 
-  async listThreadIds(): Promise<string[]> {
+  async listThreadIds(signal?: AbortSignal): Promise<string[]> {
     if (agentEnv.CHAT_STORAGE_TYPE !== "s3") {
       return [];
     }
 
     const root = "chat-attachments/";
-    try {
-      const { prefixes } = await this.listAllKeys(root, "/");
-      return prefixes
-        .map((prefix) => prefix.slice(root.length).replace(/\/$/, ""))
-        .filter((threadId) => threadId.length > 0);
-    } catch {
-      // Bucket/prefix doesn't exist - return empty
-      return [];
-    }
+    const { prefixes } = await this.listAllKeys(root, "/", signal);
+    return prefixes
+      .map((prefix) => prefix.slice(root.length).replace(/\/$/, ""))
+      .filter((threadId) => threadId.length > 0);
   }
 
   /**
@@ -370,6 +402,7 @@ export class S3StorageAdapter implements StorageAdapter {
   private async listAllKeys(
     prefix: string,
     delimiter?: string,
+    signal?: AbortSignal,
   ): Promise<{ keys: string[]; prefixes: string[] }> {
     const keys: string[] = [];
     const prefixes: string[] = [];
@@ -383,6 +416,7 @@ export class S3StorageAdapter implements StorageAdapter {
           Delimiter: delimiter,
           ContinuationToken: continuationToken,
         }),
+        { abortSignal: signal },
       );
       for (const obj of response.Contents ?? []) {
         if (obj.Key) {
@@ -402,10 +436,14 @@ export class S3StorageAdapter implements StorageAdapter {
     return { keys, prefixes };
   }
 
-  private async readMetadataObject(key: string): Promise<FileMetadata | null> {
+  private async readMetadataObject(
+    key: string,
+    options?: { strict?: boolean; signal?: AbortSignal },
+  ): Promise<FileMetadata | null> {
     try {
       const result = await this.client.send(
         new GetObjectCommand({ Bucket: this.bucket, Key: key }),
+        { abortSignal: options?.signal },
       );
       const body = await result.Body?.transformToString();
       if (!body) {
@@ -415,7 +453,13 @@ export class S3StorageAdapter implements StorageAdapter {
       // Convert uploadedAt string back to Date
       metadata.uploadedAt = new Date(metadata.uploadedAt);
       return metadata;
-    } catch {
+    } catch (error) {
+      if (
+        options?.strict &&
+        !(error instanceof S3ServiceException && error.name === "NoSuchKey")
+      ) {
+        return Promise.reject(error);
+      }
       // Missing or unreadable metadata object
       return null;
     }

@@ -6,6 +6,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
+import { parseError } from "next-vibe/core/utils/parse-error";
 import { v4 as uuidv4 } from "uuid";
 
 import { agentEnv } from "../../env";
@@ -53,10 +54,6 @@ export class LocalStorageAdapter implements StorageAdapter {
     const threadDir = path.join(agentEnv.CHAT_STORAGE_PATH, metadata.threadId);
     await fs.mkdir(threadDir, { recursive: true });
 
-    // Create metadata directory
-    const metadataDir = path.join(threadDir, ".metadata");
-    await fs.mkdir(metadataDir, { recursive: true });
-
     const filePath = path.join(threadDir, storedFilename);
 
     let buffer: Buffer;
@@ -89,8 +86,7 @@ export class LocalStorageAdapter implements StorageAdapter {
       messageId: metadata.messageId,
     };
 
-    const metadataPath = path.join(metadataDir, `${fileId}.json`);
-    await fs.writeFile(metadataPath, JSON.stringify(fileMetadata, null, 2));
+    await this.writeFileMetadata(fileMetadata);
 
     const url = buildStorageFileUrl(metadata.threadId, storedFilename);
 
@@ -171,6 +167,49 @@ export class LocalStorageAdapter implements StorageAdapter {
     } catch {
       return null;
     }
+  }
+
+  async deleteFileContent(file: FileMetadata): Promise<void> {
+    if (agentEnv.CHAT_STORAGE_TYPE === "filesystem") {
+      await this.unlinkIfPresent(
+        path.join(agentEnv.CHAT_STORAGE_PATH, file.threadId, file.filename),
+      );
+    }
+  }
+
+  async deleteFileMetadata(file: FileMetadata): Promise<void> {
+    if (agentEnv.CHAT_STORAGE_TYPE !== "filesystem") {
+      return;
+    }
+    const threadDir = path.join(agentEnv.CHAT_STORAGE_PATH, file.threadId);
+    const metadataDir = path.join(threadDir, ".metadata");
+    await this.unlinkIfPresent(path.join(metadataDir, `${file.id}.json`));
+    // A concurrent write can leave either directory nonempty.
+    await fs.rmdir(metadataDir).catch(() => undefined);
+    await fs.rmdir(threadDir).catch(() => undefined);
+  }
+
+  async writeFileMetadata(file: FileMetadata): Promise<void> {
+    if (agentEnv.CHAT_STORAGE_TYPE === "filesystem") {
+      const metadataDir = path.join(
+        agentEnv.CHAT_STORAGE_PATH,
+        file.threadId,
+        ".metadata",
+      );
+      await fs.mkdir(metadataDir, { recursive: true });
+      await fs.writeFile(
+        path.join(metadataDir, `${file.id}.json`),
+        JSON.stringify(file, null, 2),
+      );
+    }
+  }
+
+  private async unlinkIfPresent(filePath: string): Promise<void> {
+    await fs
+      .unlink(filePath)
+      .catch((error: NodeJS.ErrnoException) =>
+        error.code === "ENOENT" ? undefined : Promise.reject(error),
+      );
   }
 
   async getFileUrl(fileId: string): Promise<string> {
@@ -281,7 +320,10 @@ export class LocalStorageAdapter implements StorageAdapter {
     }
   }
 
-  async listFilesByThread(threadId: string): Promise<FileMetadata[]> {
+  async listFilesByThread(
+    threadId: string,
+    options?: { strict?: boolean; signal?: AbortSignal },
+  ): Promise<FileMetadata[]> {
     if (agentEnv.CHAT_STORAGE_TYPE !== "filesystem") {
       return [];
     }
@@ -301,15 +343,24 @@ export class LocalStorageAdapter implements StorageAdapter {
           continue;
         }
         try {
-          const raw = await fs.readFile(path.join(metadataDir, file), "utf-8");
+          const raw = await fs.readFile(path.join(metadataDir, file), {
+            encoding: "utf-8",
+            signal: options?.signal,
+          });
           const metadata = JSON.parse(raw) as FileMetadata;
           metadata.uploadedAt = new Date(metadata.uploadedAt);
           results.push(metadata);
-        } catch {
+        } catch (error) {
+          if (options?.strict && !this.isMissing(parseError(error))) {
+            return Promise.reject(error);
+          }
           // Skip unreadable metadata files
         }
       }
-    } catch {
+    } catch (error) {
+      if (options?.strict && !this.isMissing(parseError(error))) {
+        return Promise.reject(error);
+      }
       // Directory doesn't exist - return empty
     }
 
@@ -328,9 +379,16 @@ export class LocalStorageAdapter implements StorageAdapter {
       return entries
         .filter((entry) => entry.isDirectory())
         .map((entry) => entry.name);
-    } catch {
+    } catch (error) {
+      if (!this.isMissing(parseError(error))) {
+        return Promise.reject(error);
+      }
       // Base path doesn't exist yet
       return [];
     }
+  }
+
+  private isMissing(error: Error): boolean {
+    return "code" in error && error.code === "ENOENT";
   }
 }

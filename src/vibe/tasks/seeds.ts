@@ -88,7 +88,23 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
   // The renamed cleanup endpoint has its own seeded task. Retire the old
   // schedule while keeping its execution history and the replacement's settings.
   const guestMediaCleanupId = "guest-media-cleanup";
-  if (taskRows.some((row) => row.id === guestMediaCleanupId)) {
+  const guestMediaCleanup = taskRows.find(
+    (row) => row.id === guestMediaCleanupId,
+  );
+  if (guestMediaCleanup) {
+    // Existing dev/preview rows predate the production-only registration.
+    if (!guestMediaCleanup.enabled) {
+      await db
+        .update(cronTasks)
+        .set({ enabled: false, nextExecutionAt: null, updatedAt: new Date() })
+        .where(
+          and(
+            eq(cronTasks.id, guestMediaCleanupId),
+            eq(cronTasks.enabled, true),
+            isNull(cronTasks.userId),
+          ),
+        );
+    }
     const [retired] = await db
       .update(cronTasks)
       .set({ enabled: false, nextExecutionAt: null, updatedAt: new Date() })

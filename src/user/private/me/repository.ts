@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, eq, inArray, or } from "drizzle-orm";
+import { and, eq, inArray, or, sql } from "drizzle-orm";
 import { DEFAULT_CHAT_MODEL_SELECTION } from "next-vibe/agent/ai-stream/constants";
 import { getBestChatModel } from "next-vibe/agent/ai-stream/models";
 import { formatSkillId } from "next-vibe/agent/chat/slugify";
@@ -653,6 +653,13 @@ export class UserProfileRepository {
       // 2. All DB work in ONE transaction: either the account is fully gone
       //    or nothing changed.
       await withTransaction(logger, async (tx) => {
+        // Prevent a concurrent conversion from adding a link before deletion.
+        await tx
+          .select({ id: users.id })
+          .from(users)
+          .where(eq(users.id, userId))
+          .for("update");
+
         // Erase PII from every lead tied to this person (linked devices, the
         // converted lead, any lead carrying their email). Rows stay as
         // anonymous aggregates; the unique email is freed.
@@ -661,10 +668,11 @@ export class UserProfileRepository {
           .from(userLeadLinks)
           .where(eq(userLeadLinks.userId, userId));
         const linkedLeadIds = linkedLeadRows.map((r) => r.leadId);
-        const leadConditions = [eq(leads.convertedUserId, userId)];
+        const linkedConditions = [eq(leads.convertedUserId, userId)];
         if (linkedLeadIds.length > 0) {
-          leadConditions.push(inArray(leads.id, linkedLeadIds));
+          linkedConditions.push(inArray(leads.id, linkedLeadIds));
         }
+        const leadConditions = [...linkedConditions];
         if (userEmail) {
           leadConditions.push(eq(leads.email, userEmail));
         }
@@ -679,7 +687,12 @@ export class UserProfileRepository {
             ipAddress: null,
             userAgent: null,
             notes: null,
-            metadata: {},
+            // Preserve only confirmed account history after links cascade.
+            metadata: sql`CASE
+              WHEN ${or(...linkedConditions)} OR ${leads.metadata} @> '{"hadAccount":true}'::jsonb
+              THEN '{"hadAccount":true}'::jsonb
+              ELSE '{}'::jsonb
+            END`,
             convertedUserId: null,
             updatedAt: new Date(),
           })

@@ -6,18 +6,17 @@
 import { describe, expect, it } from "bun:test";
 
 import type { FileMetadata } from "../index";
-import { GUEST_MEDIA_RETENTION_DAYS } from "./constants";
 import {
   classifyGuestMedia,
   collectLeadIds,
   GuestMediaVerdict,
+  guestMediaCutoff,
   isUuidCandidate,
   selectGuestMediaForDeletion,
 } from "./selection";
 
-const DAY_MS = 24 * 60 * 60 * 1000;
 const NOW = new Date("2026-11-13T06:00:00.000Z");
-const CUTOFF = new Date(NOW.getTime() - GUEST_MEDIA_RETENTION_DAYS * DAY_MS);
+const CUTOFF = guestMediaCutoff(NOW);
 const OLD = new Date(CUTOFF.getTime() - 60_000);
 const FRESH = new Date(CUTOFF.getTime() + 60_000);
 
@@ -52,16 +51,25 @@ function classify(f: FileMetadata): string {
 }
 
 describe("retention", () => {
-  it("defaults to 120 days (4 months)", () => {
-    expect(GUEST_MEDIA_RETENTION_DAYS).toBe(120);
+  it("uses four calendar months and clamps dates at the end of the month", () => {
+    expect(CUTOFF.toISOString()).toBe("2026-07-13T06:00:00.000Z");
+    expect(guestMediaCutoff(new Date("2026-12-31T06:00:00Z")).toISOString()).toBe(
+      "2026-08-31T06:00:00.000Z",
+    );
+    expect(guestMediaCutoff(new Date("2026-07-31T06:00:00Z")).toISOString()).toBe(
+      "2026-03-31T06:00:00.000Z",
+    );
+    expect(guestMediaCutoff(new Date("2026-10-31T06:00:00Z")).toISOString()).toBe(
+      "2026-06-30T06:00:00.000Z",
+    );
   });
 
-  it("keeps a guest file that is 119 days old and deletes one 121 days old", () => {
+  it("applies the calendar cutoff even when four months exceed 120 days", () => {
     expect(
       classify(
         file({
           leadId: GUEST_LEAD,
-          uploadedAt: new Date(NOW.getTime() - 119 * DAY_MS),
+          uploadedAt: new Date("2026-07-14T06:00:00.000Z"),
         }),
       ),
     ).toBe(GuestMediaVerdict.TOO_NEW);
@@ -69,7 +77,7 @@ describe("retention", () => {
       classify(
         file({
           leadId: GUEST_LEAD,
-          uploadedAt: new Date(NOW.getTime() - 121 * DAY_MS),
+          uploadedAt: new Date("2026-07-12T06:00:00.000Z"),
         }),
       ),
     ).toBe(GuestMediaVerdict.DELETE);
@@ -78,21 +86,15 @@ describe("retention", () => {
 
 describe("classifyGuestMedia", () => {
   it("deletes expired guest media outside saved threads", () => {
-    expect(classify(file({ leadId: GUEST_LEAD }))).toBe(
-      GuestMediaVerdict.DELETE,
-    );
+    expect(classify(file({ leadId: GUEST_LEAD }))).toBe(GuestMediaVerdict.DELETE);
   });
 
   it("matches guest leads case-insensitively", () => {
-    expect(classify(file({ leadId: GUEST_LEAD.toUpperCase() }))).toBe(
-      GuestMediaVerdict.DELETE,
-    );
+    expect(classify(file({ leadId: GUEST_LEAD.toUpperCase() }))).toBe(GuestMediaVerdict.DELETE);
   });
 
   it("keeps files of a lead that is linked to a user account", () => {
-    expect(classify(file({ leadId: ACCOUNT_LEAD }))).toBe(
-      GuestMediaVerdict.ACCOUNT_LEAD,
-    );
+    expect(classify(file({ leadId: ACCOUNT_LEAD }))).toBe(GuestMediaVerdict.ACCOUNT_LEAD);
   });
 
   it("keeps account-owned files even with a guest leadId", () => {
@@ -102,23 +104,19 @@ describe("classifyGuestMedia", () => {
   });
 
   it("keeps files with no owner (legacy, screenshots, url cache)", () => {
-    expect(classify(file({ threadId: "url-fetch-cache" }))).toBe(
-      GuestMediaVerdict.UNOWNED,
-    );
+    expect(classify(file({ threadId: "url-fetch-cache" }))).toBe(GuestMediaVerdict.UNOWNED);
   });
 
   it("keeps guest files inside a saved thread", () => {
-    expect(
-      classify(file({ leadId: GUEST_LEAD, threadId: STORED_THREAD })),
-    ).toBe(GuestMediaVerdict.STORED_THREAD);
+    expect(classify(file({ leadId: GUEST_LEAD, threadId: STORED_THREAD }))).toBe(
+      GuestMediaVerdict.STORED_THREAD,
+    );
   });
 
   it("matches saved threads case-insensitively", () => {
-    expect(
-      classify(
-        file({ leadId: GUEST_LEAD, threadId: STORED_THREAD.toUpperCase() }),
-      ),
-    ).toBe(GuestMediaVerdict.STORED_THREAD);
+    expect(classify(file({ leadId: GUEST_LEAD, threadId: STORED_THREAD.toUpperCase() }))).toBe(
+      GuestMediaVerdict.STORED_THREAD,
+    );
   });
 
   it("keeps files inside the retention window and exactly at the cutoff", () => {
@@ -131,11 +129,9 @@ describe("classifyGuestMedia", () => {
   });
 
   it("treats an unparseable upload date as too new", () => {
-    expect(
-      classify(
-        file({ leadId: GUEST_LEAD, uploadedAt: new Date("not a date") }),
-      ),
-    ).toBe(GuestMediaVerdict.TOO_NEW);
+    expect(classify(file({ leadId: GUEST_LEAD, uploadedAt: new Date("not a date") }))).toBe(
+      GuestMediaVerdict.TOO_NEW,
+    );
   });
 });
 
@@ -161,10 +157,7 @@ describe("selectGuestMediaForDeletion", () => {
       limit: 2,
     });
 
-    expect(selection.toDelete.map((f) => f.id)).toEqual([
-      deletable[0]?.id,
-      deletable[1]?.id,
-    ]);
+    expect(selection.toDelete.map((f) => f.id)).toEqual([deletable[0]?.id, deletable[1]?.id]);
     expect(selection.deferred).toBe(1);
     expect(selection.skipped).toEqual({
       tooNew: 1,

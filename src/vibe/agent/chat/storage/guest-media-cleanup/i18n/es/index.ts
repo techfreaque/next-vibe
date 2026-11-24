@@ -14,11 +14,6 @@ export const translations: typeof enTranslations = {
       description: "Ejecutar o prever la limpieza",
     },
     fields: {
-      retentionDays: {
-        label: "Retención (días)",
-        description:
-          "Eliminar los medios de interés más antiguos que estos muchos días",
-      },
       batchSize: {
         label: "Supresiones máximas",
         description:
@@ -35,6 +30,8 @@ export const translations: typeof enTranslations = {
       namespacesScanned: "Espacios de nombre escaneados",
       storedThreadNamespaces: "Hilos guardados saltados",
       filesScanned: "Archivos escaneados",
+      eligibleFiles: "Archivos que se pueden borrar",
+      eligibleBytes: "Bytes que se pueden borrar",
       filesDeleted: "Archivos borrados",
       bytesDeleted: "Bytes eliminados",
       skippedTooNew: "Kept: retención interna",
@@ -43,6 +40,8 @@ export const translations: typeof enTranslations = {
       skippedAccountLead: "Kept: plomo vinculado a una cuenta",
       deferred: "Diferido a la próxima carrera",
       failed: "Failed",
+      rowsDeleted: "Registros de Studio eliminados",
+      scanComplete: "Análisis completo",
       executionTimeMs: "Hora de ejecución (ms)",
     },
     success: {
@@ -51,6 +50,8 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    scheduledOnly:
+      "Solo la tarea programada de producción puede borrar estos archivos.",
     failed: "La limpieza de los medios de interés no fue posible: {{error}}",
     server: {
       title: "Error de limpieza",

@@ -21,10 +21,7 @@ import {
 } from "next-vibe/unified-ui/_shared/utils-i18n";
 import { z } from "zod";
 
-import {
-  GUEST_MEDIA_BATCH_SIZE,
-  GUEST_MEDIA_RETENTION_DAYS,
-} from "./constants";
+import { GUEST_MEDIA_BATCH_SIZE } from "./constants";
 import { scopedTranslation } from "./i18n";
 
 const serverError = {
@@ -45,6 +42,8 @@ const { POST } = createEndpoint({
   icon: "trash",
   tags: ["tags.maintenance"],
   allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
+  // The cron runner owns the deadline and sends its cancellation signal.
+  timeoutMs: 0,
 
   fields: objectField(scopedTranslation, {
     type: WidgetType.CONTAINER,
@@ -54,19 +53,6 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      retentionDays: requestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.NUMBER,
-        label: "post.fields.retentionDays.label",
-        description: "post.fields.retentionDays.description",
-        columns: 4,
-        schema: z.coerce
-          .number()
-          .int()
-          .min(1)
-          .max(3650)
-          .default(GUEST_MEDIA_RETENTION_DAYS),
-      }),
       batchSize: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
@@ -77,7 +63,7 @@ const { POST } = createEndpoint({
           .number()
           .int()
           .min(1)
-          .max(10000)
+          .max(GUEST_MEDIA_BATCH_SIZE)
           .default(GUEST_MEDIA_BATCH_SIZE),
       }),
       dryRun: requestField(scopedTranslation, {
@@ -86,7 +72,7 @@ const { POST } = createEndpoint({
         label: "post.fields.dryRun.label",
         description: "post.fields.dryRun.description",
         columns: 4,
-        schema: z.boolean().default(false),
+        schema: z.boolean().default(true),
       }),
 
       cutoff: responseField(scopedTranslation, {
@@ -113,6 +99,18 @@ const { POST } = createEndpoint({
         columns: 4,
         schema: z.number(),
       }),
+      eligibleFiles: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.eligibleFiles",
+        columns: 4,
+        schema: z.number(),
+      }),
+      eligibleBytes: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.eligibleBytes",
+        columns: 4,
+        schema: z.number(),
+      }),
       filesDeleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.response.filesDeleted",
@@ -122,6 +120,12 @@ const { POST } = createEndpoint({
       bytesDeleted: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.response.bytesDeleted",
+        columns: 4,
+        schema: z.number(),
+      }),
+      rowsDeleted: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.rowsDeleted",
         columns: 4,
         schema: z.number(),
       }),
@@ -161,6 +165,12 @@ const { POST } = createEndpoint({
         columns: 4,
         schema: z.number(),
       }),
+      scanComplete: responseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        label: "post.response.scanComplete",
+        columns: 4,
+        schema: z.boolean(),
+      }),
       executionTimeMs: responseField(scopedTranslation, {
         type: WidgetType.TEXT,
         label: "post.response.executionTimeMs",
@@ -190,7 +200,6 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        retentionDays: GUEST_MEDIA_RETENTION_DAYS,
         batchSize: GUEST_MEDIA_BATCH_SIZE,
         dryRun: true,
       },
@@ -201,14 +210,18 @@ const { POST } = createEndpoint({
         namespacesScanned: 50,
         storedThreadNamespaces: 30,
         filesScanned: 40,
-        filesDeleted: 12,
-        bytesDeleted: 8_400_000,
+        eligibleFiles: 7,
+        eligibleBytes: 8_400_000,
+        filesDeleted: 0,
+        bytesDeleted: 0,
+        rowsDeleted: 0,
         skippedTooNew: 6,
         skippedUserOwned: 0,
         skippedUnowned: 22,
         skippedAccountLead: 5,
         deferred: 0,
         failed: 0,
+        scanComplete: true,
         executionTimeMs: 140,
       },
     },

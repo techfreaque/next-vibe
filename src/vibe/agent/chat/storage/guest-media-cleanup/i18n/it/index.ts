@@ -14,11 +14,6 @@ export const translations: typeof enTranslations = {
       description: "Correre o visualizzare in anteprima la pulizia",
     },
     fields: {
-      retentionDays: {
-        label: "Ritenzione (giorni)",
-        description:
-          "Eliminare i supporti ospiti più vecchi di questo molti giorni",
-      },
       batchSize: {
         label: "Max delezioni",
         description:
@@ -35,6 +30,8 @@ export const translations: typeof enTranslations = {
       namespacesScanned: "Spazi di nome scansionati",
       storedThreadNamespaces: "Filetti salvati saltati",
       filesScanned: "File scansionati",
+      eligibleFiles: "File da eliminare",
+      eligibleBytes: "Byte da eliminare",
       filesDeleted: "File cancellati",
       bytesDeleted: "Bytes cancellato",
       skippedTooNew: "Kept: ritenzione interna",
@@ -43,6 +40,8 @@ export const translations: typeof enTranslations = {
       skippedAccountLead: "Kept: piombo collegato a un account",
       deferred: "Deferito alla prossima corsa",
       failed: "Sfigato",
+      rowsDeleted: "Record di Studio eliminati",
+      scanComplete: "Scansione completata",
       executionTimeMs: "Tempo di esecuzione (ms)",
     },
     success: {
@@ -51,6 +50,8 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    scheduledOnly:
+      "Solo il processo pianificato in produzione può eliminare questi file.",
     failed: "La pulizia dei media degli ospiti non è riuscita: {{error}}",
     server: {
       title: "Errore di pulizia",

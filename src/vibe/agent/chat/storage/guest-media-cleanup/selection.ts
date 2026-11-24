@@ -11,7 +11,7 @@
  * - its namespace is not a stored thread (no `chat_threads` row)
  * - it is older than the cutoff (an unparseable date counts as too new)
  * - its lead is a confirmed guest: the lead row exists and was never linked
- *   to a user account (no `convertedUserId`, no `user_lead_links` row)
+ *   to a user account (see account-links.ts)
  * Files with neither owner (legacy uploads, browser/desktop screenshots, the
  * URL cache) are never touched here.
  */
@@ -36,6 +36,18 @@ const UUID_PATTERN =
 /** Only uuid values can match a uuid column (`chat_threads.id`, `leads.id`). */
 export function isUuidCandidate(value: string): boolean {
   return UUID_PATTERN.test(value);
+}
+
+/** Four UTC calendar months, clamped to the last day of the target month. */
+export function guestMediaCutoff(now: Date): Date {
+  const cutoff = new Date(now);
+  const day = cutoff.getUTCDate();
+  cutoff.setUTCDate(1);
+  cutoff.setUTCMonth(cutoff.getUTCMonth() - 4);
+  const endOfMonth = new Date(cutoff);
+  endOfMonth.setUTCMonth(endOfMonth.getUTCMonth() + 1, 0);
+  cutoff.setUTCDate(Math.min(day, endOfMonth.getUTCDate()));
+  return cutoff;
 }
 
 /**

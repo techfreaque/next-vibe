@@ -14,11 +14,6 @@ export const translations: typeof enTranslations = {
       description: "Lancer ou prévisualiser le nettoyage",
     },
     fields: {
-      retentionDays: {
-        label: "Conservation (jours)",
-        description:
-          "Supprimer les médias invités plus anciens que ce nombre de jours",
-      },
       batchSize: {
         label: "Suppressions max.",
         description:
@@ -35,6 +30,8 @@ export const translations: typeof enTranslations = {
       namespacesScanned: "Espaces de noms analysés",
       storedThreadNamespaces: "Fils enregistrés ignorés",
       filesScanned: "Fichiers analysés",
+      eligibleFiles: "Fichiers à supprimer",
+      eligibleBytes: "Octets à supprimer",
       filesDeleted: "Fichiers supprimés",
       bytesDeleted: "Octets supprimés",
       skippedTooNew: "Conservés : dans la durée de conservation",
@@ -43,6 +40,8 @@ export const translations: typeof enTranslations = {
       skippedAccountLead: "Conservés : lead lié à un compte",
       deferred: "Reportés à la prochaine exécution",
       failed: "Échecs",
+      rowsDeleted: "Entrées Studio supprimées",
+      scanComplete: "Analyse terminée",
       executionTimeMs: "Temps d'exécution (ms)",
     },
     success: {
@@ -51,6 +50,8 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    scheduledOnly:
+      "Seule la tâche planifiée de production peut supprimer ces fichiers.",
     failed: "Échec du nettoyage des médias invités : {{error}}",
     server: {
       title: "Erreur de nettoyage",

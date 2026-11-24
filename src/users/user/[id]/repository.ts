@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { and, count, eq, isNull, lt, sum } from "drizzle-orm";
+import { and, count, eq, inArray, isNull, lt, or, sql, sum } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { ResponseType } from "next-vibe/core/route/response.schema";
 import {
@@ -435,6 +435,24 @@ export class UserByIdRepository {
         }
 
         await tx.delete(userRoleRows).where(eq(userRoleRows.userId, target.id));
+        // Keep account history for leads whose user link will cascade away.
+        await tx
+          .update(leads)
+          .set({
+            metadata: sql`${leads.metadata} || '{"hadAccount":true}'::jsonb`,
+          })
+          .where(
+            or(
+              eq(leads.convertedUserId, target.id),
+              inArray(
+                leads.id,
+                tx
+                  .select({ id: userLeadLinks.leadId })
+                  .from(userLeadLinks)
+                  .where(eq(userLeadLinks.userId, target.id)),
+              ),
+            ),
+          );
         await tx
           .update(leads)
           .set({ convertedUserId: null })

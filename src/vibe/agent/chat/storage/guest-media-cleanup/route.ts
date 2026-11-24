@@ -15,7 +15,21 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger, locale }) =>
-      GuestMediaCleanupRepository.cleanup(data, logger, locale),
+    handler: ({
+      data,
+      cronTaskId,
+      platform,
+      toolExecutionContext,
+      logger,
+      locale,
+    }) =>
+      GuestMediaCleanupRepository.cleanup(
+        data,
+        platform,
+        cronTaskId,
+        toolExecutionContext.abortSignal,
+        logger,
+        locale,
+      ),
   },
 });

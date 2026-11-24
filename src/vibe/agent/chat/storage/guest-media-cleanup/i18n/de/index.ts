@@ -14,10 +14,6 @@ export const translations: typeof enTranslations = {
       description: "Bereinigung ausführen oder testen",
     },
     fields: {
-      retentionDays: {
-        label: "Aufbewahrung (Tage)",
-        description: "Gastmedien löschen, die älter sind als diese Frist",
-      },
       batchSize: {
         label: "Max. Löschungen",
         description:
@@ -33,6 +29,8 @@ export const translations: typeof enTranslations = {
       namespacesScanned: "Namensräume geprüft",
       storedThreadNamespaces: "Gespeicherte Threads übersprungen",
       filesScanned: "Dateien geprüft",
+      eligibleFiles: "Dateien zur Löschung",
+      eligibleBytes: "Bytes zur Löschung",
       filesDeleted: "Dateien gelöscht",
       bytesDeleted: "Bytes gelöscht",
       skippedTooNew: "Behalten: innerhalb der Frist",
@@ -41,6 +39,8 @@ export const translations: typeof enTranslations = {
       skippedAccountLead: "Behalten: Lead mit Konto verknüpft",
       deferred: "Auf nächsten Lauf verschoben",
       failed: "Fehlgeschlagen",
+      rowsDeleted: "Gelöschte Studio-Einträge",
+      scanComplete: "Prüfung abgeschlossen",
       executionTimeMs: "Laufzeit (ms)",
     },
     success: {
@@ -49,6 +49,8 @@ export const translations: typeof enTranslations = {
     },
   },
   errors: {
+    scheduledOnly:
+      "Nur der geplante Gastmedien-Job in der Produktionsumgebung darf Dateien löschen.",
     failed: "Gastmedien-Bereinigung fehlgeschlagen: {{error}}",
     server: {
       title: "Bereinigungsfehler",
