@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "ChatGPT senza filtri: l’alternativa senza censura | {{appName}}",
     description:
-      "Cerchi ChatGPT senza filtri? Scopri quali protezioni mantiene GPT, confronta i modelli aperti e senza censura e prova un altro chatbot senza registrarti.",
+      "Confronta le alternative a ChatGPT con meno rifiuti, tra cui {{appName}}, Venice, NanoGPT e app locali. Scopri modelli, limiti e opzioni di privacy.",
     category: "Guida",
     imageAlt: "{{appName}}: un'alternativa ChatGPT senza filtri",
     keywords:
@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
     backToBlog: "Torna al blog",
     category: "Guida",
     readTime: "7 min di lettura",
-    title: "ChatGPT senza filtri: un’alternativa con modelli senza censura",
+    title: "Alternative a ChatGPT con meno rifiuti",
     subtitle:
       "Confronta i modelli più diffusi, aperti e senza censura su {{appName}}. Scopri cosa cambia nella chat quando passi a un altro modello e quanto costa ciascuna opzione.",
   },

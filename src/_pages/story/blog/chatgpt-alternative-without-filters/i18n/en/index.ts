@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "ChatGPT Alternative Without Filters | {{appName}}",
     description:
-      "Looking for ChatGPT without filters? See which safeguards GPT keeps, compare open and uncensored models, and try a different chatbot without an account.",
+      "Compare ChatGPT alternatives with fewer refusals, including {{appName}}, Venice, NanoGPT and local apps. See which models, limits and privacy options you get.",
     category: "Guide",
     imageAlt: "{{appName}}: a ChatGPT alternative without filters",
     keywords:
@@ -12,7 +12,7 @@ export const translations = {
     backToBlog: "Back to Blog",
     category: "Guide",
     readTime: "7 min read",
-    title: "A ChatGPT alternative with uncensored models",
+    title: "ChatGPT alternatives with fewer refusals",
     subtitle:
       "Compare mainstream, open and uncensored AI models on {{appName}}. See how switching models affects your chat and what each option costs.",
   },

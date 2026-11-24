@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "ChatGPT ohne Filter: die unzensierte Alternative | {{appName}}",
     description:
-      "Du suchst ChatGPT ohne Filter? Erfahre, welche Schutzmechanismen GPT behält, vergleiche offene und unzensierte Modelle und teste einen anderen Chatbot ohne Konto.",
+      "ChatGPT-Alternativen mit weniger Ablehnungen vergleichen: {{appName}}, Venice, NanoGPT und lokale Apps. Mit Modellen, Limits und Datenschutzoptionen.",
     category: "Ratgeber",
     imageAlt: "{{appName}}: ChatGPT-Alternative ohne Filter",
     keywords:
@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
     backToBlog: "Zurück zum Blog",
     category: "Ratgeber",
     readTime: "7 Min. Lesezeit",
-    title: "ChatGPT ohne Filter: eine Alternative mit unzensierten Modellen",
+    title: "ChatGPT-Alternativen mit weniger Ablehnungen",
     subtitle:
       "Vergleiche auf {{appName}} Mainstream-Modelle, offene Modelle und unzensierte KI. Erfahre, was ein Modellwechsel im Chat ändert und was die Modelle kosten.",
   },

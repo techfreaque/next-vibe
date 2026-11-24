@@ -57,6 +57,11 @@ import {
 } from "../../_shared/article";
 import { Callout, CardLink, Cta } from "../../_shared/marketing";
 import { CompareInlineLinks } from "../../compare/_shared/compare-ui";
+import {
+  AlternativesComparison,
+  alternativesFaq,
+  AlternativesLinks,
+} from "../_alternatives/comparison";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -79,7 +84,7 @@ export const generateMetadata = async ({
     path: `story/blog/${SLUG}`,
     title: t("meta.title", { appName }),
     category: t("meta.category"),
-    description: t("meta.description"),
+    description: t("meta.description", { appName }),
     imageAlt: t("meta.imageAlt", { appName }),
     keywords: [t("meta.keywords", { appName })],
   });
@@ -266,10 +271,13 @@ export function TanstackPage({
     packCredits,
   };
   const uncensoredChatHref = `/${locale}${UNCENSORED_CHAT_PATH}`;
-  const faq = FAQ_KEYS.map((key) => ({
-    question: t(`faq.${key}.q`, { appName }),
-    answer: t(`faq.${key}.a`, { ...prices, appName }),
-  }));
+  const faq = [
+    ...FAQ_KEYS.map((key) => ({
+      question: t(`faq.${key}.q`, { appName }),
+      answer: t(`faq.${key}.a`, { ...prices, appName }),
+    })),
+    alternativesFaq(SLUG, locale, appName),
+  ];
 
   return (
     <Div className="min-h-screen bg-background">
@@ -287,6 +295,12 @@ export function TanstackPage({
           <ArticleLead>{t("intro.lead", { appName })}</ArticleLead>
           <ArticleP>{t("intro.p2", { appName, modelCount })}</ArticleP>
         </Div>
+
+        <AlternativesComparison
+          locale={locale}
+          slug={SLUG}
+          us={{ ...prices, appName }}
+        />
 
         <ArticleSection title={t("exists.title")}>
           <ArticleP>{t("exists.p1", { appName })}</ArticleP>
@@ -403,7 +417,7 @@ export function TanstackPage({
           />
         </ArticleSection>
 
-        <ArticleSection title={t("faq.title")}>
+        <ArticleSection id="faq" title={t("faq.title")}>
           <JsonLd id="faq-structured-data" data={buildFaqStructuredData(faq)} />
           {faq.map(({ question, answer }) => (
             <Div key={question} className="flex flex-col gap-2">
@@ -422,6 +436,7 @@ export function TanstackPage({
             />
             <CompareInlineLinks
               locale={locale}
+              includeHub={false}
               versus={["venice", "freedomGpt", "uncensoredAi"]}
             />
           </Div>
@@ -436,6 +451,8 @@ export function TanstackPage({
             {t("partners.link")}
           </Link>
         </Callout>
+
+        <AlternativesLinks locale={locale} exclude={SLUG} />
 
         <ArticleEnd
           post={{ slug: SLUG, locale }}
