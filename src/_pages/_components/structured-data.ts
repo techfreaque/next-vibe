@@ -34,6 +34,7 @@ import { scopedTranslation } from "../layout-i18n";
 import { scopedTranslation as blogScopedTranslation } from "../story/blog/i18n";
 import { getBlogPostCard } from "../story/blog/posts-cards";
 import { BLOG_POST_DATES, type BlogPostSlug } from "../story/blog/posts-meta";
+import { type BreadcrumbEntry, withHomeBreadcrumb } from "./breadcrumbs";
 
 const SCHEMA_CONTEXT = "https://schema.org";
 const IN_STOCK = "https://schema.org/InStock";
@@ -334,8 +335,6 @@ export function buildBlogPostStructuredData({
   if (card === undefined) {
     return null;
   }
-  const { t: blogT } = blogScopedTranslation.scopedT(locale);
-  const { t: configT } = configScopedTranslation.scopedT(locale);
   const url = pageUrl(locale, card.path);
   const author = organizationNode(locale);
   const published = BLOG_POST_DATES[slug];
@@ -358,43 +357,27 @@ export function buildBlogPostStructuredData({
         publisher: author,
         isPartOf: { "@id": websiteId(locale) },
       },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          {
-            "@type": "ListItem",
-            position: 1,
-            name: configT("appName"),
-            item: pageUrl(locale, "/story"),
-          },
-          {
-            "@type": "ListItem",
-            position: 2,
-            name: blogT("page.title"),
-            item: pageUrl(locale, "/story/blog"),
-          },
-          {
-            "@type": "ListItem",
-            position: 3,
-            name: card.title,
-            item: url,
-          },
-        ],
-      },
+      buildBreadcrumbList(
+        locale,
+        blogPostBreadcrumbs(locale, { name: card.title, path: card.path }),
+      ),
     ],
   };
 }
 
-export interface Breadcrumb {
-  name: string;
-  /** Locale-less path, e.g. "/models". */
-  path: string;
+/** The shared section and leaf shown in a blog post's trails. */
+export function blogPostBreadcrumbs(
+  locale: CountryLanguage,
+  post: BreadcrumbEntry,
+): BreadcrumbEntry[] {
+  const { t } = blogScopedTranslation.scopedT(locale);
+  return [{ name: t("page.title"), path: "/story/blog" }, post];
 }
 
 /** Ordered public links shown by a directory or index page. */
 export function buildItemList(
   locale: CountryLanguage,
-  entries: readonly Breadcrumb[],
+  entries: readonly BreadcrumbEntry[],
 ): JsonLdNode {
   return {
     "@type": "ItemList",
@@ -407,22 +390,14 @@ export function buildItemList(
   };
 }
 
-/**
- * BreadcrumbList for a page under Home ({appName} → /story). `crumbs` lists
- * the levels below Home, the current page last.
- */
+/** `crumbs` lists the levels below the locale root, with the current page last. */
 export function buildBreadcrumbList(
   locale: CountryLanguage,
-  crumbs: readonly Breadcrumb[],
+  crumbs: readonly BreadcrumbEntry[],
 ): JsonLdNode {
-  const { t: configT } = configScopedTranslation.scopedT(locale);
-  const items: Breadcrumb[] = [
-    { name: configT("appName"), path: "/story" },
-    ...crumbs,
-  ];
   return {
     "@type": "BreadcrumbList",
-    itemListElement: items.map((crumb, index) => ({
+    itemListElement: withHomeBreadcrumb(locale, crumbs).map((crumb, index) => ({
       "@type": "ListItem",
       position: index + 1,
       name: crumb.name,

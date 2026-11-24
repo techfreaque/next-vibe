@@ -16,6 +16,7 @@ import { getCreditUnitPrice } from "@/products/credit-money";
 import { getSubscriptionTiers } from "@/products/repository-client";
 
 import { buildFaqStructuredData } from "../../_components/faq-structured-data";
+import { buildBreadcrumbList } from "../../_components/structured-data";
 import {
   getModelFacts,
   listModelFacts,
@@ -392,6 +393,35 @@ describe("FAQ", () => {
 });
 
 describe("structured data", () => {
+  test("breadcrumbs start at the localized home and end at the current page", () => {
+    const cases: readonly [CountryLanguage, string, string][] = [
+      ["en-US", "Home", "AI models"],
+      ["de-DE", "Startseite", "KI-Modelle"],
+      ["pl-PL", "Strona główna", "Modele AI"],
+      ["fr-FR", "Accueil", "Modèles d'IA"],
+      ["it-IT", "Home", "Modelli IA"],
+      ["es-ES", "Inicio", "Modelos de IA"],
+      ["es-MX", "Inicio", "Modelos de IA"],
+    ];
+    for (const [locale, home, section] of cases) {
+      const root = `https://unbottled.ai/${locale}`;
+      expect(
+        buildBreadcrumbList(locale, [{ name: section, path: "/models" }]),
+      ).toEqual({
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: home, item: root },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: section,
+            item: `${root}/models`,
+          },
+        ],
+      });
+    }
+  });
+
   test("chat models carry a Service with a per-locale offer and breadcrumbs", () => {
     const facts = factsOf(ChatModelId.CLAUDE_SONNET_5_5);
     for (const locale of LOCALES) {
@@ -413,6 +443,12 @@ describe("structured data", () => {
       expect(service.offers.hasMerchantReturnPolicy).toBeUndefined();
       expect(breadcrumbs["@type"]).toBe("BreadcrumbList");
       expect(breadcrumbs.itemListElement).toHaveLength(3);
+      expect(breadcrumbs.itemListElement[2]).toEqual({
+        "@type": "ListItem",
+        position: 3,
+        name: facts.name,
+        item: `https://unbottled.ai/${locale}/models/${facts.slug}`,
+      });
     }
   });
 

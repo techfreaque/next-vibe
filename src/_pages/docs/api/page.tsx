@@ -50,7 +50,10 @@ import {
   pageUrl,
   websiteId,
 } from "../../_components/structured-data";
-import { BreadcrumbTrail } from "../../story/_shared/breadcrumbs";
+import {
+  BreadcrumbTrail,
+  buildBreadcrumbTrail,
+} from "../../story/_shared/breadcrumbs";
 import { Callout, Cta } from "../../story/_shared/marketing";
 import { GuideCardGrid } from "../../story/blog/guide-links";
 import type { BlogPostSlug } from "../../story/blog/posts-meta";
@@ -299,6 +302,7 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const crumbs = [{ name: t("hero.badge"), path: "/docs/api" }];
   const { t: toolT } = apiKeysScopedTranslation.scopedT(locale);
   const snippets = buildDocsSnippets(baseUrl);
   const toolSnippets = buildCodingToolSnippets({ baseUrl });
@@ -367,9 +371,7 @@ export function TanstackPage({
         data={{
           "@context": "https://schema.org",
           "@graph": [
-            buildBreadcrumbList(locale, [
-              { name: t("hero.badge"), path: "/docs/api" },
-            ]),
+            buildBreadcrumbList(locale, crumbs),
             {
               "@type": "TechArticle",
               "@id": `${pageUrl(locale, "/docs/api")}#article`,
@@ -392,10 +394,7 @@ export function TanstackPage({
           <Div className="min-w-0">
             <BreadcrumbTrail
               className="mb-4"
-              items={[
-                { name: appName, href: `/${locale}/story` },
-                { name: t("hero.badge") },
-              ]}
+              items={buildBreadcrumbTrail(locale, crumbs)}
             />
             <Span className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-xs">
               <BookOpen className="h-3.5 w-3.5 text-primary" />

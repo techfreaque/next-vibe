@@ -24,6 +24,7 @@ import {
 import { configScopedTranslation } from "@/env/i18n";
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
+import { buildBreadcrumbTrail } from "../_shared/breadcrumbs";
 import { CardLink, Cta, PageHero, PageSection } from "../_shared/marketing";
 import { GuideCardGrid } from "../blog/guide-links";
 import { HUB_GUIDES, TOPIC_HUB_PATHS } from "../blog/topics";
@@ -114,7 +115,10 @@ export function TanstackPage({
 }: PageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: uncensoredT } = uncensoredScopedTranslation.scopedT(locale);
-  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const crumbs = [
+    { name: uncensoredT("breadcrumb"), path: TOPIC_HUB_PATHS.uncensored },
+    { name: t("breadcrumb"), path: TOPIC_HUB_PATHS.abliterated },
+  ];
   const faq = [
     { question: t("faq.meaning.q"), answer: t("faq.meaning.a") },
     ...(worldviewModel !== null
@@ -140,24 +144,11 @@ export function TanstackPage({
         id="abliterated-chat-breadcrumbs"
         data={{
           "@context": "https://schema.org",
-          ...buildBreadcrumbList(locale, [
-            {
-              name: uncensoredT("breadcrumb"),
-              path: TOPIC_HUB_PATHS.uncensored,
-            },
-            { name: t("breadcrumb"), path: TOPIC_HUB_PATHS.abliterated },
-          ]),
+          ...buildBreadcrumbList(locale, crumbs),
         }}
       />
       <PageHero
-        breadcrumbs={[
-          { name: configT("appName"), href: `/${locale}/story` },
-          {
-            name: uncensoredT("breadcrumb"),
-            href: `/${locale}${TOPIC_HUB_PATHS.uncensored}`,
-          },
-          { name: t("breadcrumb") },
-        ]}
+        breadcrumbs={buildBreadcrumbTrail(locale, crumbs)}
         title={t("title")}
         subtitle={t("intro")}
       />

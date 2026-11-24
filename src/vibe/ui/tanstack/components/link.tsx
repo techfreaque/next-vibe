@@ -10,6 +10,7 @@ export interface LinkProps {
   className?: string;
   download?: string | boolean;
   title?: string;
+  exactActiveMatch?: boolean;
 }
 
 /**
@@ -23,6 +24,7 @@ export function Link({
   rel,
   onClick,
   title,
+  exactActiveMatch,
 }: LinkProps): JSX.Element {
   return (
     <TanstackLink
@@ -32,6 +34,9 @@ export function Link({
       rel={rel}
       {...(onClick ? { onClick } : {})}
       title={title}
+      activeOptions={
+        exactActiveMatch === undefined ? undefined : { exact: exactActiveMatch }
+      }
     >
       {children}
     </TanstackLink>

@@ -22,7 +22,10 @@ import { contactClientRepository } from "@/contact/repository-client";
 import { configScopedTranslation } from "@/env/i18n";
 
 import { buildBreadcrumbList } from "../_components/structured-data";
-import { BreadcrumbTrail } from "../story/_shared/breadcrumbs";
+import {
+  BreadcrumbTrail,
+  buildBreadcrumbTrail,
+} from "../story/_shared/breadcrumbs";
 import { GuideCardGrid } from "../story/blog/guide-links";
 import type { BlogPostSlug } from "../story/blog/posts-meta";
 import { scopedTranslation as pageT } from "./i18n";
@@ -124,7 +127,7 @@ export function TanstackPage({
   modelCount,
 }: HelpPageData): JSX.Element {
   const { t } = pageT.scopedT(locale);
-  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const crumbs = [{ name: t("breadcrumb"), path: "/help" }];
 
   return (
     <Main className="min-h-screen bg-primary/5 bg-linear-to-b from-primary/5 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900">
@@ -132,18 +135,11 @@ export function TanstackPage({
         id="help-breadcrumbs"
         data={{
           "@context": "https://schema.org",
-          ...buildBreadcrumbList(locale, [
-            { name: t("breadcrumb"), path: "/help" },
-          ]),
+          ...buildBreadcrumbList(locale, crumbs),
         }}
       />
       <Div className="container max-w-6xl mx-auto pt-8 px-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
-        <BreadcrumbTrail
-          items={[
-            { name: configT("appName"), href: `/${locale}/story` },
-            { name: t("breadcrumb") },
-          ]}
-        />
+        <BreadcrumbTrail items={buildBreadcrumbTrail(locale, crumbs)} />
         <Link
           href={`/${locale}/threads`}
           className="inline-flex min-h-11 items-center text-sm text-gray-600 hover:text-primary dark:text-gray-400 dark:hover:text-primary"

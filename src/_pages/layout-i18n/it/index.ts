@@ -1,6 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  breadcrumbs: { home: "Home" },
   meta: {
     defaultTitle: "unbottled.ai: Chat non censurata AI",
     category: "AI piattaforma di chat",

@@ -33,6 +33,7 @@ import {
   FREE_CREDIT_SIGNED_IN_TOTAL,
 } from "@/products/constants";
 
+import { buildBreadcrumbTrail } from "../_shared/breadcrumbs";
 import { CardLink, Cta, PageHero, PageSection } from "../_shared/marketing";
 import { GuideCardGrid } from "../blog/guide-links";
 import { getBlogPostCard } from "../blog/posts-cards";
@@ -120,7 +121,7 @@ export function TanstackPage({
 }: PageData): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const { t: modelsT } = modelsScopedTranslation.scopedT(locale);
-  const { t: configT } = configScopedTranslation.scopedT(locale);
+  const crumbs = [{ name: t("breadcrumb"), path: TOPIC_HUB_PATHS.uncensored }];
   const firstModel = models[0];
   // The "truly uncensored" example comes from the live catalog, never copy.
   const worldviewModel = models.find((model) => model.kind === "ownWorldview");
@@ -177,16 +178,11 @@ export function TanstackPage({
         id="uncensored-chat-breadcrumbs"
         data={{
           "@context": "https://schema.org",
-          ...buildBreadcrumbList(locale, [
-            { name: t("breadcrumb"), path: TOPIC_HUB_PATHS.uncensored },
-          ]),
+          ...buildBreadcrumbList(locale, crumbs),
         }}
       />
       <PageHero
-        breadcrumbs={[
-          { name: configT("appName"), href: `/${locale}/story` },
-          { name: t("breadcrumb") },
-        ]}
+        breadcrumbs={buildBreadcrumbTrail(locale, crumbs)}
         title={t("title")}
         subtitle={t("intro")}
         actions={

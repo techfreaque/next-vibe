@@ -21,14 +21,18 @@ import { Ul } from "next-vibe/ui/components/ul";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX, ReactNode } from "react";
 
-import { configScopedTranslation } from "@/env/i18n";
-
-import { buildBlogPostStructuredData } from "../../_components/structured-data";
+import {
+  blogPostBreadcrumbs,
+  buildBlogPostStructuredData,
+} from "../../_components/structured-data";
 import { RelatedGuides } from "../blog/guide-links";
-import { scopedTranslation as blogScopedTranslation } from "../blog/i18n";
 import { getBlogPostCard } from "../blog/posts-cards";
 import { type BlogPostSlug, formatPostDate } from "../blog/posts-meta";
-import { BreadcrumbTrail } from "./breadcrumbs";
+import {
+  BreadcrumbTrail,
+  type BreadcrumbTrailItem,
+  buildBreadcrumbTrail,
+} from "./breadcrumbs";
 import { CtaRow } from "./marketing";
 
 /** Reading column: 16px gutters on phones, 3xl measure on desktop. */
@@ -100,28 +104,21 @@ export function ArticleHeader({
   );
 }
 
-/**
- * Visible trail matching the post's BreadcrumbList JSON-LD:
- * {appName} → blog → post.
- */
 function postBreadcrumbs({
   slug,
   locale,
 }: {
   slug: BlogPostSlug;
   locale: CountryLanguage;
-}): { name: string; href?: string }[] | null {
+}): BreadcrumbTrailItem[] | null {
   const card = getBlogPostCard(slug, locale);
   if (card === undefined) {
     return null;
   }
-  const { t: configT } = configScopedTranslation.scopedT(locale);
-  const { t: blogT } = blogScopedTranslation.scopedT(locale);
-  return [
-    { name: configT("appName"), href: `/${locale}/story` },
-    { name: blogT("page.title"), href: `/${locale}/story/blog` },
-    { name: card.title },
-  ];
+  return buildBreadcrumbTrail(
+    locale,
+    blogPostBreadcrumbs(locale, { name: card.title, path: card.path }),
+  );
 }
 
 export function ArticleMeta({

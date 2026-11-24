@@ -41,6 +41,7 @@ import {
   buildBreadcrumbList,
   buildItemList,
 } from "../_components/structured-data";
+import { buildBreadcrumbTrail } from "../story/_shared/breadcrumbs";
 import { GuideCardGrid } from "../story/blog/guide-links";
 import type { BlogPostSlug } from "../story/blog/posts-meta";
 import { TOPIC_HUB_PATHS } from "../story/blog/topics";
@@ -217,6 +218,7 @@ export function TanstackPage(data: SkillsPageData): JSX.Element {
   const { t: skillT } = skillTranslations.scopedT(locale);
   const { t: configT } = configScopedTranslation.scopedT(locale);
   const appName = configT("appName");
+  const crumbs = [{ name: t("breadcrumb"), path: "/skills" }];
 
   const groups: DirectoryGroup[] = CATEGORY_ORDER.map((category) => ({
     anchor: categorySlug(category),
@@ -263,9 +265,7 @@ export function TanstackPage(data: SkillsPageData): JSX.Element {
         data={{
           "@context": "https://schema.org",
           "@graph": [
-            buildBreadcrumbList(locale, [
-              { name: t("breadcrumb"), path: "/skills" },
-            ]),
+            buildBreadcrumbList(locale, crumbs),
             buildItemList(
               locale,
               groups.flatMap(({ entries }) => entries),
@@ -276,10 +276,7 @@ export function TanstackPage(data: SkillsPageData): JSX.Element {
       <JsonLd id="skills-faq" data={buildFaqStructuredData(faq)} />
       <SkillsPageClient
         {...data}
-        breadcrumbs={[
-          { name: appName, href: `/${locale}/story` },
-          { name: t("breadcrumb") },
-        ]}
+        breadcrumbs={buildBreadcrumbTrail(locale, crumbs)}
         directory={
           <Div id="skill-directory" className="mb-10 flex flex-col gap-8">
             <Nav>

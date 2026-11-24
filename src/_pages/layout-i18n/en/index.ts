@@ -1,4 +1,5 @@
 export const translations = {
+  breadcrumbs: { home: "Home" },
   meta: {
     defaultTitle: "unbottled.ai: Uncensored AI Chat",
     category: "AI Chat Platform",

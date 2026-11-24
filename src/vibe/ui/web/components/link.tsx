@@ -13,6 +13,8 @@ export interface LinkProps<RouteType extends string> {
   className?: string;
   download?: string | boolean;
   title?: string;
+  /** Match the full path when the router marks active links. */
+  exactActiveMatch?: boolean;
 }
 
 /**
