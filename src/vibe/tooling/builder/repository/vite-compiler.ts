@@ -1536,7 +1536,13 @@ class ViteCompiler {
     /** The proxy is already pointing at this port during an in-process restart. */
     fixedPort = false,
   ): Promise<
-    | { success: true; url: string; port: number; close: () => Promise<void> }
+    | {
+        success: true;
+        url: string;
+        port: number;
+        reportReady: () => void;
+        close: () => Promise<void>;
+      }
     | { success: false; message: string }
   > {
     try {
@@ -2356,7 +2362,9 @@ class ViteCompiler {
                   closeRef,
                   true,
                 );
-                if (!result.success) {
+                if (result.success) {
+                  result.reportReady();
+                } else {
                   process.stderr.write(
                     `\n❌ TanStack restart failed: ${result.message ?? "unknown error"}\n`,
                   );
@@ -2566,6 +2574,8 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
                 directoryPath.includes("/fixtures/") ||
                 // Atomic source writes publish the actual file with a rename.
                 /\.tmp\.\d+\.[a-f\d]+$/.test(filePath) ||
+                // GNU sed uses an extensionless scratch file beside the locale source.
+                /\/i18n\/[^/]+\/sed[a-zA-Z0-9]{6}$/.test(filePath) ||
                 filePath.endsWith(".test.ts") ||
                 filePath.endsWith(".test.tsx") ||
                 filePath.endsWith(".spec.ts") ||
@@ -2808,41 +2818,41 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
       const url = `http://localhost:${resolvedPort}`;
       const publicUrl = publicPort ? `http://localhost:${publicPort}` : url;
 
-      // Pretty startup banner matching Next.js style
-      const networkUrl = ((): string | undefined => {
-        try {
-          for (const ifaces of Object.values(networkInterfaces())) {
-            for (const iface of ifaces ?? []) {
-              if (iface.family === "IPv4" && !iface.internal) {
-                return `http://${iface.address}:${publicPort ?? resolvedPort}`;
+      const reportReady = (): void => {
+        const networkUrl = ((): string | undefined => {
+          try {
+            for (const ifaces of Object.values(networkInterfaces())) {
+              for (const iface of ifaces ?? []) {
+                if (iface.family === "IPv4" && !iface.internal) {
+                  return `http://${iface.address}:${publicPort ?? resolvedPort}`;
+                }
               }
             }
+          } catch {
+            /* ignore */
           }
-        } catch {
-          /* ignore */
-        }
-        return undefined;
-      })();
-      const uptime = process.uptime().toFixed(3);
-      const lines = [
-        `⚡ TanStack Start (Vite + Nitro)`,
-        `   - Local:    ${publicUrl}`,
-        publicPort !== undefined && resolvedPort !== port
-          ? `   - Internal: ${url}`
-          : undefined,
-        networkUrl ? `   - Network:  ${networkUrl}` : undefined,
-        `   ✓ Ready`,
-      ].filter(Boolean) as string[];
-      const indent = " ".repeat(`[${uptime}s] `.length);
-      const formatted = lines
-        .map((line, i) =>
-          i === 0
-            ? `[${uptime}s] ${maybeColorize(line, semantic.nextjs)}`
-            : `${indent}${maybeColorize(line, semantic.nextjs)}`,
-        )
-        .join("\n");
-      process.stdout.write(`${formatted}\n`);
-      serverFileLog(formatted);
+          return undefined;
+        })();
+        const uptime = process.uptime().toFixed(3);
+        const lines = [
+          "⚡ TanStack Start (Vite + Nitro)",
+          `   - Local:    ${publicUrl}`,
+          publicPort !== undefined && resolvedPort !== port
+            ? `   - Internal: ${url}`
+            : undefined,
+          networkUrl ? `   - Network:  ${networkUrl}` : undefined,
+          "   ✓ Ready",
+        ].filter((line) => line !== undefined);
+        const indent = " ".repeat(`[${uptime}s] `.length);
+        const formatted = lines
+          .map((line, index) => {
+            const prefix = index === 0 ? `[${uptime}s] ` : indent;
+            return `${prefix}${maybeColorize(line, semantic.nextjs)}`;
+          })
+          .join("\n");
+        process.stdout.write(`${formatted}\n`);
+        serverFileLog(formatted);
+      };
 
       // Prime the SSR module graph in the background. server.warmup only
       // pre-TRANSFORMS files — module EVALUATION still happens lazily, so the
@@ -2940,6 +2950,7 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
         success: true,
         url,
         port: resolvedPort,
+        reportReady,
         close: closeFn,
       };
     } catch (error) {

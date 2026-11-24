@@ -50,6 +50,7 @@ import {
 } from "../pid";
 import { patchPublicUrlPort } from "../public-url";
 import type { DevRequestOutput } from "./definition";
+import { acquireDevStartupLock } from "./startup-lock";
 
 /**
  * Dev Repository
@@ -100,30 +101,63 @@ export class DevRepository {
       ? HERMES_DEV_PID_FILE
       : ATLAS_PID_FILE;
 
-    // Let the previous owner finish writing its log before clearing the file.
-    const previousInstanceWarnings: Parameters<EndpointLogger["warn"]>[] = [];
-    killPreviousInstance(
-      DevRepository.activePidFile,
-      {
-        ...logger,
-        warn: (...args) => {
-          previousInstanceWarnings.push(args);
-        },
-      },
-      undefined,
-      false,
-    );
+    // Derive port: explicit --port > LOCAL_BASE_PORT for Hermes dev > NEXT_PUBLIC_APP_URL port > default 3000
+    const port =
+      data.port ??
+      (isLocalDev ? LOCAL_BASE_PORT : undefined) ??
+      DevRepository.portFromUrl(coreEnv.NEXT_PUBLIC_APP_URL) ??
+      3000;
+    const pidFile = DevRepository.activePidFile;
+    const startupLock = acquireDevStartupLock(pidFile);
+    if (!startupLock.acquired) {
+      if ("ownerPid" in startupLock) {
+        logger.warn("Another development launch is claiming the session", {
+          pidFile,
+          ownerPid: startupLock.ownerPid,
+          port,
+        });
+      } else {
+        logger.error(
+          "Could not claim the development session",
+          startupLock.error,
+          { pidFile, port },
+        );
+      }
+      process.exit(1);
+    }
 
-    // Truncate log files at session start (VIBE_LOG_PATH controls whether active)
-    void truncateServerLog();
-    void truncateClientLogs();
-    for (const args of previousInstanceWarnings) {
-      logger.warn(...args);
+    try {
+      // Let the previous owner finish writing its log before clearing the file.
+      const previousInstanceWarnings: Parameters<EndpointLogger["warn"]>[] = [];
+      killPreviousInstance(
+        pidFile,
+        {
+          ...logger,
+          warn: (...args) => {
+            previousInstanceWarnings.push(args);
+          },
+        },
+        undefined,
+        false,
+      );
+      truncateServerLog();
+      truncateClientLogs();
+      for (const args of previousInstanceWarnings) {
+        logger.warn(...args);
+      }
+      // Publish the new owner before terminal setup or any other asynchronous work.
+      writePidFile(pidFile, logger, [], port);
+    } finally {
+      const error = startupLock.release();
+      if (error) {
+        logger.error("Could not release the development startup lock", error, {
+          pidFile,
+        });
+      }
     }
     // Guaranteed last-resort offline hint - process.on("exit") always fires, even on crash.
     // Skip if we're being replaced: the new instance already owns (or deleted) the PID file.
     process.on("exit", () => {
-      const pidFile = DevRepository.activePidFile;
       if (pidFile) {
         try {
           if (!existsSync(pidFile)) {
@@ -251,20 +285,11 @@ export class DevRepository {
       }
     }
 
-    // Derive port: explicit --port > LOCAL_BASE_PORT for Hermes dev > NEXT_PUBLIC_APP_URL port > default 3000
-    const port =
-      data.port ??
-      (isLocalDev ? LOCAL_BASE_PORT : undefined) ??
-      DevRepository.portFromUrl(coreEnv.NEXT_PUBLIC_APP_URL) ??
-      3000;
-
     // Patch NEXT_PUBLIC_APP_URL to reflect the actual port.
     // This ensures runtime env reads (and all child processes) see the correct URL.
     patchPublicUrlPort(port, { setIfMissing: true });
 
     DevRepository.logStartupInfo(port, logger, data);
-
-    writePidFile(DevRepository.activePidFile, logger, [], port);
 
     // Catch unhandled errors so crashes (including in-process Vite/Nitro worker threads)
     // are always written to the log file, not just terminal stderr.
@@ -595,11 +620,10 @@ export class DevRepository {
     process.on("SIGTERM", sigintHandler);
     process.on("SIGHUP", sigintHandler);
 
-    logger.debug(
-      tanstack
-        ? `⚡ TanStack/Vite dev server available at http://localhost:${port}`
-        : `⚡ Next.js dev server available at http://localhost:${port}`,
-    );
+    logger.debug("Starting development listener", {
+      framework: tanstack ? "TanStack/Vite" : "Next.js",
+      port,
+    });
     if (profile) {
       // eslint-disable-next-line i18next/no-literal-string
       process.stdout.write(`
@@ -688,6 +712,7 @@ export class DevRepository {
           logger.error(
             `Could not start the development proxy on port ${String(wsPort)}`,
             parseError(error),
+            { internalPort: tanstackHandle.port },
           );
           shutdown(1);
           return new Promise<never>(() => {
@@ -695,6 +720,8 @@ export class DevRepository {
           });
         }
       }
+
+      tanstackHandle.reportReady();
 
       // The first task pulse can publish events immediately. Wait until the
       // proxy has registered its local broadcast sink before starting it.
