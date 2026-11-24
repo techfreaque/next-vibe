@@ -529,8 +529,14 @@ function handleConnection(pg: PGlite, socket: Socket): void {
             break;
           }
         } else {
-          if (!(await processFrontend())) {
+          // Yield only for a database batch. If a partial frame yields before
+          // clearing busy, the rest can arrive while no pump will pick it up.
+          const next = processFrontend();
+          if (next === false) {
             break;
+          }
+          if (next !== true) {
+            await next;
           }
         }
       }
@@ -580,7 +586,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
     return true;
   }
 
-  async function processFrontend(): Promise<boolean> {
+  function processFrontend(): boolean | Promise<void> {
     if (recvBuf.length < 5) {
       return false;
     }
@@ -605,7 +611,7 @@ function handleConnection(pg: PGlite, socket: Socket): void {
     if (msgType === MSG_SIMPLE_QUERY || msgType === MSG_SYNC) {
       const toFlush = batchBuf;
       batchBuf = Buffer.alloc(0);
-      await flushBatch(toFlush, msgType);
+      return flushBatch(toFlush, msgType);
     }
     return true;
   }

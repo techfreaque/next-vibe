@@ -6,30 +6,30 @@
  * and every first chat-settings save with a toggle on returned 500.
  */
 
+import { connect, type Server, type Socket } from "node:net";
+
 import { PGlite } from "@electric-sql/pglite";
 import { Client } from "pg";
+import { serialize } from "pg-protocol";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { startPgliteServer } from "./pglite-server";
 
-describe("pglite-server INSERT…RETURNING", () => {
+describe("pglite-server", () => {
   let pg: PGlite;
   let client: Client;
+  let server: Server;
   let port: number;
-  let close: () => void;
 
   beforeAll(async () => {
     pg = new PGlite();
     await pg.exec(
       "CREATE TABLE t (id serial PRIMARY KEY, b jsonb, s jsonb, a jsonb, o jsonb, n jsonb, flag boolean)",
     );
-    const server = startPgliteServer(pg, { port: 0 });
+    server = startPgliteServer(pg, { port: 0 });
     await new Promise<void>((resolve) => {
       server.once("listening", () => resolve());
     });
-    close = (): void => {
-      server.close();
-    };
     const address = server.address();
     port = address && typeof address === "object" ? address.port : 0;
     client = new Client({ host: "127.0.0.1", port, user: "postgres" });
@@ -38,7 +38,7 @@ describe("pglite-server INSERT…RETURNING", () => {
 
   afterAll(async () => {
     await client.end();
-    close();
+    server.close();
     await pg.close();
   });
 
@@ -96,5 +96,36 @@ describe("pglite-server INSERT…RETURNING", () => {
     }
     const result = await client.query("SELECT id FROM t WHERE flag = false");
     expect(result.rows).toEqual([]);
+  });
+
+  it("flushes an extended query when a partial frame is completed in the same turn", async () => {
+    const accepted = new Promise<Socket>((resolve) => {
+      server.once("connection", resolve);
+    });
+    const peer = connect(port, "127.0.0.1");
+    try {
+      const startup = new Promise<Buffer>((resolve) => {
+        peer.once("data", resolve);
+      });
+      peer.write(serialize.startup({ user: "postgres", database: "postgres" }));
+      const wire = await accepted;
+      await startup;
+      const reply = new Promise<Buffer>((resolve) => {
+        peer.once("data", resolve);
+      });
+      const batch = Buffer.concat([
+        serialize.parse({ text: "SELECT $1::int AS value" }),
+        serialize.bind({ values: ["73"] }),
+        serialize.describe({ type: "P" }),
+        serialize.execute({}),
+        serialize.sync(),
+      ]);
+      wire.emit("data", batch.subarray(0, 2));
+      wire.emit("data", batch.subarray(2));
+      const result = await Promise.race([reply, Bun.sleep(500)]);
+      expect(result instanceof Buffer && result.includes("73")).toBe(true);
+    } finally {
+      peer.destroy();
+    }
   });
 });

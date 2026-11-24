@@ -35,3 +35,16 @@ diff --git a/dist/esm/vite/start-manifest-plugin/plugin.js b/dist/esm/vite/start
            scripts: [{ attrs: { type: 'module', async: true, src: '${clientEntry}' } }],
          },
        },
+diff --git a/dist/esm/vite/import-protection-plugin/plugin.js b/dist/esm/vite/import-protection-plugin/plugin.js
+--- a/dist/esm/vite/import-protection-plugin/plugin.js
++++ b/dist/esm/vite/import-protection-plugin/plugin.js
+@@ -947,7 +947,8 @@
+ 			}
+ 		},
+ 		load: {
+-			filter: { id: new RegExp(getResolvedVirtualModuleMatchers().map(escapeRegExp).join("|")) },
++			// The load handler only accepts resolved virtual IDs at the start of the string.
++			filter: { id: new RegExp(`^(?:${getResolvedVirtualModuleMatchers().map(escapeRegExp).join("|")})`) },
+ 			handler(id) {
+ 				if (IMPORT_PROTECTION_DEBUG) {
+ 					if (matchesDebugFilter(id)) debugLog("load:handler", {

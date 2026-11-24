@@ -59,6 +59,37 @@ diff --git a/dist/node/chunks/node.js b/dist/node/chunks/node.js
  	}
  	const aliasOnlyPluginContainerMap = /* @__PURE__ */ new Map();
  	async function resolveAlias(environment, id, importer) {
+@@ -33637,17 +33649,11 @@
+ }
+ function patternToIdFilter(pattern, cwd) {
+ 	if (pattern instanceof RegExp) return (id) => {
+-		const normalizedId = slash(id);
+-		const result = pattern.test(normalizedId);
++		const result = pattern.test(id);
+ 		pattern.lastIndex = 0;
+ 		return result;
+ 	};
+-	const glob = getMatcherString(pattern, cwd);
+-	const matcher = pm(glob, { dot: true });
+-	return (id) => {
+-		const normalizedId = slash(id);
+-		return matcher(normalizedId);
+-	};
++	return pm(getMatcherString(pattern, cwd), { dot: true });
+ }
+ function patternToCodeFilter(pattern) {
+ 	if (pattern instanceof RegExp) return (code) => {
+@@ -33678,7 +33684,9 @@
+ 	const { exclude, include } = normalizeFilter(filter);
+ 	const excludeFilter = exclude?.map((p) => patternToIdFilter(p, cwd));
+ 	const includeFilter = include?.map((p) => patternToIdFilter(p, cwd));
+-	return createFilter(excludeFilter, includeFilter);
++	const matches = createFilter(excludeFilter, includeFilter);
++	// Normalize once for every ID, including filters with several patterns.
++	return matches && ((id) => matches(id.includes("\\") ? slash(id) : id));
+ }
+ function createCodeFilter(filter) {
+ 	if (!filter) return;
 diff --git a/dist/node/module-runner.js b/dist/node/module-runner.js
 --- a/dist/node/module-runner.js
 +++ b/dist/node/module-runner.js

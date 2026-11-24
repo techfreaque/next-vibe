@@ -9,7 +9,8 @@
  */
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import { db } from "next-vibe/database";
+import { db, isPglite } from "next-vibe/database";
+import { isTransientConnectError } from "next-vibe/database/pool";
 import { formatDatabase } from "next-vibe/logger/formatters";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
@@ -21,14 +22,9 @@ export const priority = 50;
 // ---- Seed runner: seeds tax rates for all existing companies ----
 
 /**
- * Dev seed — seeds default tax rates for all existing companies.
- * This ensures the demo company created by the companies seed gets rates.
+ * Seed rates for all existing companies, including the seeded demo company.
  */
-export async function dev(
-  logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<void> {
-  void locale;
+async function seedCompanyTaxRates(logger: EndpointLogger): Promise<void> {
   const allCompanies = await db
     .select({ id: companies.id, country: companies.country })
     .from(companies);
@@ -51,9 +47,39 @@ export async function dev(
   );
 }
 
+export async function dev(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
+  void locale;
+  try {
+    await seedCompanyTaxRates(logger);
+  } catch (error) {
+    const cause =
+      error instanceof Error && error.cause instanceof Error
+        ? error.cause
+        : error;
+    if (
+      !isPglite ||
+      !(cause instanceof Error) ||
+      !isTransientConnectError(cause)
+    ) {
+      return Promise.reject(error);
+    }
+    // A disconnected connection can lose the reply to a committed insert.
+    // Every insert here ignores conflicts on the company's existing rate codes.
+    logger.error(
+      "PGlite connection lost while seeding tax rates. Retrying once.",
+      cause,
+    );
+    await seedCompanyTaxRates(logger);
+  }
+}
+
 export async function prod(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<void> {
-  return dev(logger, locale);
+  void locale;
+  await seedCompanyTaxRates(logger);
 }

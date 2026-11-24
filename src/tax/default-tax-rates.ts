@@ -8,7 +8,6 @@
  * seedDefaultTaxRates at runtime — it must import from here, not from seeds.
  */
 
-import { and, eq } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
@@ -114,34 +113,26 @@ export async function seedDefaultTaxRates(
 ): Promise<void> {
   const rates = DEFAULT_TAX_RATES[country];
 
-  for (const rate of rates) {
-    const [existing] = await db
-      .select({ id: taxRates.id })
-      .from(taxRates)
-      .where(
-        and(eq(taxRates.companyId, companyId), eq(taxRates.code, rate.code)),
-      )
-      .limit(1);
+  const result = await db
+    .insert(taxRates)
+    .values(
+      rates.map((rate) => ({
+        companyId,
+        name: rate.name,
+        code: rate.code,
+        type: rate.type,
+        rate: rate.rate,
+        country,
+        isDefault: rate.isDefault,
+        isActive: true,
+        isCompound: false,
+      })),
+    )
+    .onConflictDoNothing({ target: [taxRates.companyId, taxRates.code] });
 
-    if (existing) {
-      logger.debug(
-        `Tax rate already exists: ${rate.code} for company ${companyId} — skipping`,
-      );
-      continue;
-    }
-
-    await db.insert(taxRates).values({
-      companyId,
-      name: rate.name,
-      code: rate.code,
-      type: rate.type,
-      rate: rate.rate,
-      country,
-      isDefault: rate.isDefault,
-      isActive: true,
-      isCompound: false,
-    });
-
-    logger.debug(`Seeded tax rate: ${rate.code} for company ${companyId}`);
-  }
+  logger.debug("Seeded default tax rates", {
+    companyId,
+    inserted: result.rowCount,
+    requested: rates.length,
+  });
 }
