@@ -1,8 +1,14 @@
 "use client";
 
+import { commercialUseTermsHref } from "next-vibe/agent/models/commercial-use/enum";
+import {
+  CommercialUseBadge,
+  commercialUseText,
+} from "next-vibe/agent/models/commercial-use/widget/commercial-use-label";
 import { scopedTranslation as skillsScopedTranslation } from "next-vibe/agent/skills/labels/i18n";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Div } from "next-vibe/ui/components/div";
+import { Link } from "next-vibe/ui/components/link";
 import { Span } from "next-vibe/ui/components/span";
 import { P } from "next-vibe/ui/components/typography";
 import type { JSX, ReactNode } from "react";
@@ -33,6 +39,8 @@ interface MediaFactRow {
   label: string;
   value: string;
   hint: string | null;
+  /** Optional link under the hint (commercial use row). */
+  link?: { href: string; label: string };
 }
 
 export function MediaModelPageClient({
@@ -55,6 +63,10 @@ export function MediaModelPageClient({
       ? t("media.useCta", { model: facts.name })
       : t("media.generateCta", { model: facts.name });
   const href = createPageHref(locale, facts);
+  const commercial =
+    facts.commercialUse === null
+      ? null
+      : commercialUseText(facts.commercialUse, locale);
 
   const rows: MediaFactRow[] = [
     { key: "type", label: t("facts.type"), value: typeLabel, hint: null },
@@ -107,6 +119,20 @@ export function MediaModelPageClient({
       value: facts.providers.join(", "),
       hint: null,
     },
+    ...(commercial === null
+      ? []
+      : [
+          {
+            key: "commercial-use",
+            label: commercial.label,
+            value: commercial.status,
+            hint: `${commercial.reason} ${commercial.check}`,
+            link: {
+              href: commercialUseTermsHref(locale),
+              label: commercial.termsLink,
+            },
+          },
+        ]),
     {
       key: "status",
       label: t("facts.status"),
@@ -129,6 +155,11 @@ export function MediaModelPageClient({
         <Div className="mt-6 flex flex-wrap items-center gap-3">
           <ModelIcon facts={facts} size="sm" />
           <TierBadge content={facts.content} locale={locale} />
+          <CommercialUseBadge
+            info={facts.commercialUse ?? undefined}
+            locale={locale}
+            className="h-6 px-2.5 text-xs"
+          />
         </Div>
       </PageHero>
 
@@ -154,6 +185,14 @@ export function MediaModelPageClient({
                   <Span className="mt-0.5 block text-sm text-muted-foreground">
                     {row.hint}
                   </Span>
+                )}
+                {row.link && (
+                  <Link
+                    href={row.link.href}
+                    className="mt-1 inline-block text-sm font-medium text-primary underline-offset-4 hover:underline"
+                  >
+                    {row.link.label}
+                  </Link>
                 )}
               </Div>
             </Div>

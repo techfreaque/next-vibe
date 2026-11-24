@@ -7,6 +7,7 @@
 
 import type { AgentEnvAvailability } from "next-vibe/agent/env-availability";
 import type { AgentTranslationKey } from "next-vibe/agent/i18n";
+import type { CommercialUseInfo } from "next-vibe/agent/models/commercial-use/enum";
 import { type Modality, ModelUtility } from "next-vibe/agent/models/enum";
 import {
   type AnyModelId,
@@ -105,6 +106,8 @@ export interface MediaModelFacts {
   /** Public API providers serving this model (display names, cheapest first). */
   providers: string[];
   isLegacy: boolean;
+  /** Commercial use of outputs per license + provider terms; null when not researched. */
+  commercialUse: CommercialUseInfo | null;
   /** Price of one reference use; null when the registry has no sellable price. */
   price: MediaPrice | null;
 }
@@ -148,6 +151,7 @@ function buildAll(availability: AgentEnvAvailability): MediaModelFacts[] {
           ),
         ],
         isLegacy: def.utilities.includes(ModelUtility.LEGACY),
+        commercialUse: def.commercialUse ?? null,
         price: mediaPrice(type, first),
       });
     }

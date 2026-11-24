@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
   onThisPage: "Sur cette page",
   printButton: "Imprimer",
   title: "Conditions d'utilisation",
-  lastUpdated: "Dernière mise à jour : novembre 2026",
+  lastUpdated: "Dernière mise à jour : 24 novembre 2026",
   bindingVersionNotice:
     "Cette traduction est fournie à titre informatif. Seule la version allemande de ce document fait foi.",
   introduction:
@@ -134,6 +134,15 @@ export const translations: typeof enTranslations = {
           item4: "Tenter de pirater ou de compromettre la plateforme",
         },
       },
+    },
+    aiOutput: {
+      title: "Contenus générés par l'IA",
+      ownership:
+        "Nous ne revendiquons aucun droit de propriété sur les textes, images, vidéos, sons ou autres contenus que vous générez sur {{appName}}. Les droits qui existent sur ces contenus vous appartiennent.",
+      licenses:
+        "Les contenus sont produits par des modèles tiers. En plus des présentes conditions, la licence de chaque modèle et les conditions de son fournisseur s'appliquent. Certains modèles n'autorisent qu'un usage non commercial ou limitent certains usages. Nous signalons ces modèles dans l'application.",
+      copyright:
+        "Les contenus générés par l'IA peuvent ne pas être protégés par le droit d'auteur et peuvent ressembler à des œuvres existantes ou à des contenus générés pour d'autres utilisateurs. Il vous appartient de vérifier la licence du modèle utilisé avant d'en exploiter les contenus, en particulier à des fins commerciales.",
     },
     intellectualProperty: {
       title: "Propriété intellectuelle",

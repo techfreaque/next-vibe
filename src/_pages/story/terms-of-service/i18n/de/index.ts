@@ -20,7 +20,7 @@ export const translations: typeof enTranslations = {
   onThisPage: "Auf dieser Seite",
   printButton: "Drucken",
   title: "Nutzungsbedingungen",
-  lastUpdated: "Zuletzt aktualisiert: November 2026",
+  lastUpdated: "Zuletzt aktualisiert: 24. November 2026",
   bindingVersionNotice:
     "Diese Übersetzung dient nur der Information. Rechtsverbindlich ist die deutsche Fassung dieses Dokuments.",
   introduction:
@@ -133,6 +133,15 @@ export const translations: typeof enTranslations = {
           item4: "Die Plattform zu hacken oder zu kompromittieren",
         },
       },
+    },
+    aiOutput: {
+      title: "KI-generierte Ausgaben",
+      ownership:
+        "Wir beanspruchen keine Rechte an Texten, Bildern, Videos, Audio oder sonstigen Ausgaben, die Sie mit {{appName}} erzeugen. Soweit an diesen Ausgaben Rechte bestehen, stehen sie Ihnen zu.",
+      licenses:
+        "Ausgaben werden von Modellen Dritter erzeugt. Zusätzlich zu diesen Bedingungen gelten die Lizenz des jeweiligen Modells und die Bedingungen seines Anbieters. Einige Modelle erlauben nur eine nichtkommerzielle Nutzung oder schränken bestimmte Nutzungen ein. Diese Modelle kennzeichnen wir in der App.",
+      copyright:
+        "KI-Ausgaben sind möglicherweise nicht urheberrechtlich geschützt und können bestehenden Werken oder Ausgaben anderer Nutzer ähneln. Sie sind dafür verantwortlich, vor der Verwendung einer Ausgabe die Lizenz des genutzten Modells zu prüfen, insbesondere bei kommerzieller Nutzung.",
     },
     intellectualProperty: {
       title: "Geistiges Eigentum",

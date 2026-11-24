@@ -2,6 +2,9 @@
 
 import { OutOfCreditsCard } from "next-vibe/agent/ai-stream/stream/widget/out-of-credits-card";
 import { toStudioSettings } from "next-vibe/agent/media-studio/settings";
+import { needsCommercialUseNotice } from "next-vibe/agent/models/commercial-use/enum";
+import { scopedTranslation as commercialUseScopedTranslation } from "next-vibe/agent/models/commercial-use/i18n";
+import { CommercialUseNotice } from "next-vibe/agent/models/commercial-use/widget/commercial-use-label";
 import { isUncensoredContent } from "next-vibe/agent/models/uncensored-consent/constants";
 import { useUncensoredConsent } from "next-vibe/agent/models/uncensored-consent/hooks";
 import { UncensoredConsentDialog } from "next-vibe/agent/models/uncensored-consent/widget/consent-dialog";
@@ -55,7 +58,7 @@ export function StudioSelect<T extends string>({
 }: {
   label: string;
   value: T | undefined;
-  options: { value: T; label: string; price?: string }[];
+  options: { value: T; label: string; price?: string; note?: string }[];
   onChange: (value: T) => void;
 }): JSX.Element | null {
   const id = useId();
@@ -90,7 +93,9 @@ export function StudioSelect<T extends string>({
         >
           {options.map((item) => (
             <SelectItem key={item.value} value={item.value}>
-              {item.price ? `${item.label} · ${item.price}` : item.label}
+              {[item.label, item.price, item.note]
+                .filter((part) => part)
+                .join(" · ")}
             </SelectItem>
           ))}
         </SelectContent>
@@ -247,6 +252,7 @@ export function StudioForm({
     refusedCost !== undefined &&
     cost >= refusedCost;
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: commercialT } = commercialUseScopedTranslation.scopedT(locale);
   const submit = useWidgetOnSubmit();
   const consent = useUncensoredConsent(user, logger);
   const [open, setOpen] = useState(false);
@@ -267,7 +273,15 @@ export function StudioForm({
           price: t(`units.${item.isTokenPriced ? "tokenImage" : kind}`, {
             amount: formatCreditAmount(item.rate, locale),
           }),
+          note: needsCommercialUseNotice(item.commercialUse)
+            ? commercialT(item.commercialUse.status)
+            : undefined,
         }))}
+      />
+      <CommercialUseNotice
+        info={model?.commercialUse}
+        locale={locale}
+        className="-mt-3"
       />
       {children}
       {outOfCredits &&

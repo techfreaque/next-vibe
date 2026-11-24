@@ -40,6 +40,7 @@ import type {
   VideoGenModelId,
   VideoGenModelOption,
 } from "../video-generation/models";
+import type { CommercialUseInfo } from "./commercial-use/enum";
 import { type Modality, ModelUtility, type ModelUtilityValue } from "./enum";
 import { roundUpPrice } from "./model-prices/providers/base";
 import { activeTokenRates, type TokenTariff } from "./token-tariffs";
@@ -349,6 +350,8 @@ export interface ModelDefinition {
   outputs: Modality[];
   /** Optional voice metadata for TTS models */
   voiceMeta?: TtsVoiceMeta;
+  /** Commercial use of outputs (media models). Descriptive, never a gate. */
+  commercialUse?: CommercialUseInfo;
   /**
    * Set to false by the price updater when no price can be fetched.
    * Disabled models are excluded from option indexes unless enabledWithoutPrice is true.
@@ -411,6 +414,8 @@ export interface ModelOptionBase extends CreditCostInput {
   outputs: Modality[];
   /** Optional voice metadata for TTS models */
   voiceMeta?: TtsVoiceMeta;
+  /** Commercial use of outputs (media models). Descriptive, never a gate. */
+  commercialUse?: CommercialUseInfo;
 }
 export interface ModelOptionTokenBased extends ModelOptionBase {
   longContextPricing?: LongContextPricing;

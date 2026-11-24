@@ -15,7 +15,7 @@ export const translations = {
   onThisPage: "On this page",
   printButton: "Print",
   title: "Terms of Service",
-  lastUpdated: "Last updated: November 2026",
+  lastUpdated: "Last updated: 24 November 2026",
   bindingVersionNotice:
     "Translation provided for convenience. The German version of this document is the legally binding one.",
   introduction:
@@ -128,6 +128,15 @@ export const translations = {
           item4: "Attempt to hack or compromise the platform",
         },
       },
+    },
+    aiOutput: {
+      title: "AI-Generated Output",
+      ownership:
+        "We claim no ownership of the text, images, video, audio or other output you generate on {{appName}}. Whatever rights exist in that output belong to you.",
+      licenses:
+        "Output is produced by third-party models. Each model's own license and its provider's terms apply in addition to these terms. Some models permit only non-commercial use or limit certain uses. We mark these models in the app.",
+      copyright:
+        "AI output may not be protected by copyright and may resemble existing works or output generated for other users. You are responsible for checking the license of the model you use before you use its output, in particular for commercial purposes.",
     },
     intellectualProperty: {
       title: "Intellectual Property",

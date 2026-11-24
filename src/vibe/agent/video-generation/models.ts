@@ -2,6 +2,10 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { z } from "zod";
 
 import type { AgentEnvAvailability } from "../env-availability";
+import {
+  commercialUse,
+  CommercialUseReason,
+} from "../models/commercial-use/enum";
 import { type Modality, ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -81,6 +85,7 @@ export const videoGenModelDefinitions: Record<
 > = {
   [VideoGenModelId.WAN_2_7_T2V]: {
     name: "Wan 2.7 T2V",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "alibaba",
     description: "chat.models.descriptions.modelsLabWan27T2V",
     parameterCount: undefined,
@@ -143,6 +148,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.WAN_2_6_I2V]: {
     name: "Wan 2.6 I2V",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "alibaba",
     description: "chat.models.descriptions.modelsLabWan26I2V",
     parameterCount: undefined,
@@ -191,6 +197,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.WAN_2_6_I2V_FLASH]: {
     name: "Wan 2.6 I2V Flash",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "alibaba",
     description: "chat.models.descriptions.modelsLabWan26I2VFlash",
     parameterCount: undefined,
@@ -237,6 +244,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.SEEDANCE_1_5_PRO]: {
     name: "Seedance 1.5 Pro",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "byteplus",
     description: "chat.models.descriptions.modelsLabSeedance15Pro",
     parameterCount: undefined,
@@ -281,6 +289,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.OMNIHUMAN_1_5]: {
     name: "Omnihuman 1.5",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "byteplus",
     description: "chat.models.descriptions.modelsLabOmnihuman15",
     parameterCount: undefined,
@@ -317,6 +326,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.VEO_3_1]: {
     name: "Veo 3.1",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "google",
     description: "chat.models.descriptions.modelsLabVeo31",
     parameterCount: undefined,
@@ -391,6 +401,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.VEO_3_1_FAST]: {
     name: "Veo 3.1 Fast",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "google",
     description: "chat.models.descriptions.modelsLabVeo31Fast",
     parameterCount: undefined,
@@ -474,6 +485,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.KLING_V2_5_TURBO_I2V]: {
     name: "Kling V2.5 Turbo I2V",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "klingai",
     description: "chat.models.descriptions.modelsLabKlingV25TurboI2V",
     parameterCount: undefined,
@@ -516,6 +528,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.KLING_V2_5_TURBO_T2V]: {
     name: "Kling V2.5 Turbo T2V",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "klingai",
     description: "chat.models.descriptions.modelsLabKlingV25TurboT2V",
     parameterCount: undefined,
@@ -559,6 +572,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.KLING_V2_1_MASTER_T2V]: {
     name: "Kling V2.1 Master T2V",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "klingai",
     description: "chat.models.descriptions.modelsLabKlingV21MasterT2V",
     parameterCount: undefined,
@@ -600,6 +614,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.KLING_V2_1_MASTER_I2V]: {
     name: "Kling V2.1 Master I2V",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "klingai",
     description: "chat.models.descriptions.modelsLabKlingV21MasterI2V",
     parameterCount: undefined,
@@ -642,6 +657,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.KLING_3_0_T2V]: {
     name: "Kling 3.0 T2V",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "klingai",
     description: "chat.models.descriptions.modelsLabKling30T2V",
     parameterCount: undefined,
@@ -701,6 +717,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.LTX_2_PRO_T2V]: {
     name: "LTX 2 PRO T2V",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "ltx",
     description: "chat.models.descriptions.modelsLabLtx2ProT2V",
     parameterCount: undefined,
@@ -744,6 +761,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.LTX_2_3_PRO_I2V]: {
     name: "LTX 2.3 Pro I2V",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "ltx",
     description: "chat.models.descriptions.modelsLabLtx23ProI2V",
     parameterCount: undefined,
@@ -788,6 +806,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.HAILUO_2_3_T2V]: {
     name: "Hailuo 2.3 T2V",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "minimax",
     description: "chat.models.descriptions.modelsLabHailuo23T2V",
     parameterCount: undefined,
@@ -848,6 +867,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.HAILUO_2_3_I2V]: {
     name: "Hailuo 2.3 I2V",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "minimax",
     description: "chat.models.descriptions.modelsLabHailuo23I2V",
     parameterCount: undefined,
@@ -890,6 +910,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.HAILUO_2_3_FAST_I2V]: {
     name: "Hailuo 2.3 Fast I2V",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "minimax",
     description: "chat.models.descriptions.modelsLabHailuo23FastI2V",
     parameterCount: undefined,
@@ -932,6 +953,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.SORA_2]: {
     name: "Sora 2",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "openAI",
     description: "chat.models.descriptions.modelsLabSora2",
     parameterCount: undefined,
@@ -978,6 +1000,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.SORA_2_PRO]: {
     name: "Sora 2 Pro",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "openAI",
     description: "chat.models.descriptions.modelsLabSora2Pro",
     parameterCount: undefined,
@@ -1025,6 +1048,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.GEN4_ALEPH]: {
     name: "Gen4 Aleph",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "runway",
     description: "chat.models.descriptions.modelsLabGen4Aleph",
     parameterCount: undefined,
@@ -1081,6 +1105,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.LIPSYNC_2]: {
     name: "Lipsync 2",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "sync",
     description: "chat.models.descriptions.modelsLabLipsync2",
     parameterCount: undefined,
@@ -1117,6 +1142,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.GROK_T2V]: {
     name: "Grok T2V",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "xai",
     description: "chat.models.descriptions.modelsLabGrokT2V",
     parameterCount: undefined,
@@ -1261,6 +1287,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.GROK_I2V]: {
     name: "Grok I2V",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "xai",
     description: "chat.models.descriptions.modelsLabGrokI2V",
     parameterCount: undefined,
@@ -1312,6 +1339,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.KLING_V3_STD_T2V]: {
     name: "Kling 3.0 Std",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "klingai",
     description: "chat.models.descriptions.klingV30Std",
     parameterCount: undefined,
@@ -1361,6 +1389,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.KLING_VIDEO_O1]: {
     name: "Kling Video O1",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "klingai",
     description: "chat.models.descriptions.klingVideoO1",
     parameterCount: undefined,
@@ -1396,6 +1425,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.VEO_3_1_LITE]: {
     name: "Veo 3.1 Lite",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "google",
     description: "chat.models.descriptions.veo31Lite",
     parameterCount: undefined,
@@ -1451,6 +1481,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.SEEDANCE_2]: {
     name: "Seedance 2.0",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "byteDanceSeed",
     description: "chat.models.descriptions.seedance2",
     parameterCount: undefined,
@@ -1604,6 +1635,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.SEEDANCE_2_FAST]: {
     name: "Seedance 2.0 Fast",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "byteDanceSeed",
     description: "chat.models.descriptions.seedance2Fast",
     parameterCount: undefined,
@@ -1723,6 +1755,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.HAPPYHORSE_1_1]: {
     name: "HappyHorse 1.1",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "alibaba",
     description: "chat.models.descriptions.happyhorse11",
     parameterCount: undefined,
@@ -1844,6 +1877,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.HAPPYHORSE_1_0]: {
     name: "HappyHorse 1.0",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "alibaba",
     description: "chat.models.descriptions.happyhorse10",
     parameterCount: undefined,
@@ -1965,6 +1999,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.HAILUO_3]: {
     name: "Hailuo 3",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "miniMax",
     description: "chat.models.descriptions.hailuo3",
     parameterCount: undefined,
@@ -2036,6 +2071,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.SEEDANCE_2_5]: {
     name: "Seedance 2.5",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "byteDanceSeed",
     description: "chat.models.descriptions.seedance25",
     parameterCount: undefined,
@@ -2168,6 +2204,7 @@ export const videoGenModelDefinitions: Record<
   [VideoGenModelId.FLUX_3_VIDEO]: {
     enabled: false, // auto-disabled: price not verified
     name: "Flux 3 Video",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "blackForestLabs",
     description: "chat.models.descriptions.flux3Video",
     parameterCount: undefined,
@@ -2256,6 +2293,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.GROK_IMAGINE_VIDEO_1_5]: {
     name: "Grok Imagine Video 1.5",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "xAI",
     description: "chat.models.descriptions.grokImagineVideo15",
     parameterCount: undefined,
@@ -2353,6 +2391,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.GEMINI_OMNI_1_2_FLASH]: {
     name: "Gemini Omni 1.2 Flash",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "google",
     description: "chat.models.descriptions.geminiOmni12Flash",
     parameterCount: undefined,
@@ -2420,6 +2459,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.GROK_IMAGINE_VIDEO_1_5_LITE]: {
     name: "Grok Imagine Video 1.5 Lite",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "xAI",
     description: "chat.models.descriptions.grokImagineVideo15Lite",
     parameterCount: undefined,
@@ -2481,6 +2521,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.WAN_3_0]: {
     name: "Wan 3.0",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "alibaba",
     description: "chat.models.descriptions.wan30",
     parameterCount: undefined,
@@ -2545,6 +2586,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.SEEDANCE_2_MINI]: {
     name: "Seedance 2.0 Mini",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "byteDanceSeed",
     description: "chat.models.descriptions.seedance2Mini",
     parameterCount: undefined,
@@ -2623,6 +2665,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.SEEDANCE_2_5_FLASH]: {
     name: "Seedance 2.5 Flash",
+    commercialUse: commercialUse.unclear(CommercialUseReason.HOST_PERSONAL_USE),
     by: "byteDanceSeed",
     description: "chat.models.descriptions.seedance25Flash",
     parameterCount: undefined,
@@ -2693,6 +2736,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.HAILUO_3_MAX]: {
     name: "Hailuo 3 Max",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "miniMax",
     description: "chat.models.descriptions.hailuo3Max",
     parameterCount: undefined,
@@ -2743,6 +2787,7 @@ export const videoGenModelDefinitions: Record<
 
   [VideoGenModelId.RUNWAY_GEN_4_5]: {
     name: "Runway Gen-4.5",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "runway",
     description: "chat.models.descriptions.runwayGen45",
     parameterCount: undefined,
@@ -2810,6 +2855,7 @@ function buildVideoGenOption(
     inputs: videoRouteInputs(def, provider),
     outputs: def.outputs,
     voiceMeta: def.voiceMeta,
+    commercialUse: def.commercialUse,
     creditCostPerSecond: p.creditCostPerSecond,
     defaultDurationSeconds: p.defaultDurationSeconds,
     supportedDurations: p.supportedDurations,

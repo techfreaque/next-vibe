@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
   onThisPage: "Na tej stronie",
   printButton: "Drukuj",
   title: "Warunki korzystania z usługi",
-  lastUpdated: "Ostatnia aktualizacja: listopad 2026",
+  lastUpdated: "Ostatnia aktualizacja: 24 listopada 2026",
   bindingVersionNotice:
     "Tłumaczenie ma charakter wyłącznie informacyjny. Wiążąca prawnie jest niemiecka wersja tego dokumentu.",
   introduction:
@@ -130,6 +130,15 @@ export const translations: typeof enTranslations = {
           item4: "Próbować hakować lub kompromitować platformę",
         },
       },
+    },
+    aiOutput: {
+      title: "Treści generowane przez AI",
+      ownership:
+        "Nie rościmy sobie praw do tekstów, obrazów, wideo, dźwięku ani innych treści, które generujesz w {{appName}}. Wszelkie prawa, jakie istnieją do tych treści, należą do Ciebie.",
+      licenses:
+        "Treści tworzą modele podmiotów trzecich. Oprócz niniejszego regulaminu obowiązują licencja danego modelu i warunki jego dostawcy. Niektóre modele dopuszczają tylko użytek niekomercyjny albo ograniczają niektóre zastosowania. Takie modele oznaczamy w aplikacji.",
+      copyright:
+        "Treści wygenerowane przez AI mogą nie podlegać ochronie prawa autorskiego i mogą przypominać istniejące utwory lub treści wygenerowane dla innych użytkowników. Przed wykorzystaniem treści, zwłaszcza w celach komercyjnych, odpowiadasz za sprawdzenie licencji używanego modelu.",
     },
     intellectualProperty: {
       title: "Własność intelektualna",

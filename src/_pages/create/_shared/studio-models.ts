@@ -4,8 +4,14 @@ import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import {
   getImageGenModelById,
   ImageGenModelId,
+  imageGenModelOptions,
 } from "next-vibe/agent/image-generation/models";
+import type { CommercialUseInfo } from "next-vibe/agent/models/commercial-use/enum";
 import { getModelPrice } from "next-vibe/agent/models/models";
+import { musicGenModelOptions } from "next-vibe/agent/music-generation/models";
+import { sttModelOptions } from "next-vibe/agent/speech-to-text/models";
+import { ttsModelOptions } from "next-vibe/agent/text-to-speech/models";
+import { videoGenModelOptions } from "next-vibe/agent/video-generation/models";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 
 import {
@@ -16,6 +22,27 @@ import {
 
 import type { CreateKind } from "./create-kinds";
 import type { StudioModel } from "./studio-types";
+
+let commercialUseById: Map<string, CommercialUseInfo> | undefined;
+
+/** Commercial-use status by model id, from the media model definitions. */
+function commercialUseFor(id: string): CommercialUseInfo | undefined {
+  if (commercialUseById === undefined) {
+    commercialUseById = new Map();
+    for (const option of [
+      ...imageGenModelOptions,
+      ...videoGenModelOptions,
+      ...musicGenModelOptions,
+      ...ttsModelOptions,
+      ...sttModelOptions,
+    ]) {
+      if (option.commercialUse && !commercialUseById.has(option.id)) {
+        commercialUseById.set(option.id, option.commercialUse);
+      }
+    }
+  }
+  return commercialUseById.get(id);
+}
 
 export async function studioModelLists(
   user: JwtPayloadType,
@@ -58,6 +85,7 @@ export async function studioModelLists(
         entry.inputs.includes("image") && !entry.inputs.includes("text"),
       providerRate:
         speech?.creditCostPerCharacter ?? stt?.creditCostPerSecond ?? 0,
+      commercialUse: commercialUseFor(entry.id),
     });
   }
   return new Map(

@@ -3,6 +3,10 @@ import { z } from "zod";
 
 import { ChatModelId, chatModelOptionsIndex } from "../ai-stream/models";
 import type { AgentEnvAvailability } from "../env-availability";
+import {
+  commercialUse,
+  CommercialUseReason,
+} from "../models/commercial-use/enum";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -107,6 +111,7 @@ export const imageGenModelDefinitions: Record<
 > = {
   [ImageGenModelId.FLUX_PRO]: {
     name: "Flux Pro 1.1",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "blackForestLabs",
     description: "chat.models.descriptions.fluxPro",
     parameterCount: undefined,
@@ -147,6 +152,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.FLUX_2_MAX]: {
     name: "FLUX.2 Max",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "blackForestLabs",
     description: "chat.models.descriptions.flux2Max",
     parameterCount: undefined,
@@ -198,6 +204,7 @@ export const imageGenModelDefinitions: Record<
   [ImageGenModelId.FLUX_2_KLEIN_4B]: {
     enabled: false, // auto-disabled: price not verified
     name: "FLUX.2 Klein 4B",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
     by: "blackForestLabs",
     description: "chat.models.descriptions.flux2Klein4b",
     parameterCount: 4,
@@ -239,6 +246,9 @@ export const imageGenModelDefinitions: Record<
   [ImageGenModelId.RIVERFLOW_V2_PRO]: {
     enabled: false, // auto-disabled: price not verified
     name: "Riverflow V2 Pro",
+    commercialUse: commercialUse.restricted(
+      CommercialUseReason.SEPARATE_LICENSE,
+    ),
     by: "sourceful",
     description: "chat.models.descriptions.riverflowV2Pro",
     parameterCount: undefined,
@@ -284,6 +294,9 @@ export const imageGenModelDefinitions: Record<
   [ImageGenModelId.RIVERFLOW_V2_FAST]: {
     enabled: false, // auto-disabled: price not verified
     name: "Riverflow V2 Fast",
+    commercialUse: commercialUse.restricted(
+      CommercialUseReason.SEPARATE_LICENSE,
+    ),
     by: "sourceful",
     description: "chat.models.descriptions.riverflowV2Fast",
     parameterCount: undefined,
@@ -325,6 +338,9 @@ export const imageGenModelDefinitions: Record<
   [ImageGenModelId.RIVERFLOW_V2_MAX_PREVIEW]: {
     enabled: false, // auto-disabled: price not verified
     name: "Riverflow V2 Max Preview",
+    commercialUse: commercialUse.restricted(
+      CommercialUseReason.SEPARATE_LICENSE,
+    ),
     by: "sourceful",
     description: "chat.models.descriptions.riverflowV2MaxPreview",
     parameterCount: undefined,
@@ -368,6 +384,9 @@ export const imageGenModelDefinitions: Record<
   [ImageGenModelId.RIVERFLOW_V2_STANDARD_PREVIEW]: {
     enabled: false, // auto-disabled: price not verified
     name: "Riverflow V2 Standard Preview",
+    commercialUse: commercialUse.restricted(
+      CommercialUseReason.SEPARATE_LICENSE,
+    ),
     by: "sourceful",
     description: "chat.models.descriptions.riverflowV2StandardPreview",
     parameterCount: undefined,
@@ -410,6 +429,9 @@ export const imageGenModelDefinitions: Record<
   [ImageGenModelId.RIVERFLOW_V2_FAST_PREVIEW]: {
     enabled: false, // auto-disabled: price not verified
     name: "Riverflow V2 Fast Preview",
+    commercialUse: commercialUse.restricted(
+      CommercialUseReason.SEPARATE_LICENSE,
+    ),
     by: "sourceful",
     description: "chat.models.descriptions.riverflowV2FastPreview",
     parameterCount: undefined,
@@ -448,6 +470,7 @@ export const imageGenModelDefinitions: Record<
   [ImageGenModelId.FLUX_2_FLEX]: {
     enabled: false, // auto-disabled: price not verified
     name: "FLUX.2 Flex",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "blackForestLabs",
     description: "chat.models.descriptions.flux2Flex",
     parameterCount: undefined,
@@ -488,6 +511,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.FLUX_2_PRO]: {
     name: "FLUX.2 Pro",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "blackForestLabs",
     description: "chat.models.descriptions.flux2Pro",
     parameterCount: undefined,
@@ -536,6 +560,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.SEEDREAM_4_5]: {
     name: "Seedream 4.5",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "byteDanceSeed",
     description: "chat.models.descriptions.seedream45",
     parameterCount: undefined,
@@ -595,6 +620,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.GEN4_T2I_TURBO]: {
     name: "Gen4 T2I Turbo",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "runway",
     description: "chat.models.descriptions.modelsLabGen4T2ITurbo",
     parameterCount: undefined,
@@ -638,6 +664,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.GEN4_IMAGE]: {
     name: "Gen4 Image",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "runway",
     description: "chat.models.descriptions.modelsLabGen4Image",
     parameterCount: undefined,
@@ -696,6 +723,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.WAN_2_7_T2I]: {
     name: "Wan 2.7 T2I",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "alibaba",
     description: "chat.models.descriptions.modelsLabWan27T2I",
     parameterCount: undefined,
@@ -732,6 +760,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.GROK_T2I]: {
     name: "Grok Imagine T2I",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "xAI",
     description: "chat.models.descriptions.modelsLabGrokT2I",
     parameterCount: undefined,
@@ -777,6 +806,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.Z_IMAGE_BASE]: {
     name: "Z Image Base",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
     by: "modelsLab",
     description: "chat.models.descriptions.modelsLabZImageBase",
     parameterCount: undefined,
@@ -813,6 +843,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.Z_IMAGE_TURBO]: {
     name: "Z Image Turbo",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
     by: "modelsLab",
     description: "chat.models.descriptions.modelsLabZImageTurbo",
     parameterCount: undefined,
@@ -849,6 +880,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.FLUX_PRO_1_1_ULTRA]: {
     name: "Flux Pro 1.1 Ultra",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "blackForestLabs",
     description: "chat.models.descriptions.modelsLabFluxPro11Ultra",
     parameterCount: undefined,
@@ -889,6 +921,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.IMAGEN_4_ULTRA]: {
     name: "Imagen 4 Ultra",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "google",
     description: "chat.models.descriptions.modelsLabImagen4Ultra",
     parameterCount: undefined,
@@ -935,6 +968,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.IMAGEN_4]: {
     name: "Imagen 4",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "google",
     description: "chat.models.descriptions.modelsLabImagen4",
     parameterCount: undefined,
@@ -981,6 +1015,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.IMAGEN_4_FAST]: {
     name: "Imagen 4 Fast",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "google",
     description: "chat.models.descriptions.modelsLabImagen4Fast",
     parameterCount: undefined,
@@ -1022,6 +1057,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.QWEN_T2I]: {
     name: "Qwen T2I",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
     by: "alibaba",
     description: "chat.models.descriptions.modelsLabQwenT2I",
     parameterCount: undefined,
@@ -1061,6 +1097,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.REALTIME_T2I]: {
     name: "Realtime T2I",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "modelsLab",
     description: "chat.models.descriptions.modelsLabRealtimeT2I",
     parameterCount: undefined,
@@ -1101,6 +1138,7 @@ export const imageGenModelDefinitions: Record<
 
   [ImageGenModelId.GROK_IMAGINE_IMAGE_2]: {
     name: "Grok Imagine Image 2.0",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "xAI",
     description: "chat.models.descriptions.grokImagineImage2",
     parameterCount: undefined,
@@ -1138,6 +1176,7 @@ export const imageGenModelDefinitions: Record<
 
   [ImageGenModelId.QWEN_IMAGE_3]: {
     name: "Qwen Image 3",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
     by: "alibaba",
     description: "chat.models.descriptions.qwenImage3",
     parameterCount: undefined,
@@ -1175,6 +1214,7 @@ export const imageGenModelDefinitions: Record<
 
   [ImageGenModelId.QWEN_IMAGE_3_PRO]: {
     name: "Qwen Image 3 Pro",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
     by: "alibaba",
     description: "chat.models.descriptions.qwenImage3Pro",
     parameterCount: undefined,
@@ -1214,6 +1254,7 @@ export const imageGenModelDefinitions: Record<
 
   [ImageGenModelId.SEEDREAM_5_5]: {
     name: "Seedream 5.5",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "byteDanceSeed",
     description: "chat.models.descriptions.seedream55",
     parameterCount: undefined,
@@ -1243,6 +1284,7 @@ export const imageGenModelDefinitions: Record<
 
   [ImageGenModelId.FLUX_3_IMAGE]: {
     name: "FLUX.3",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "blackForestLabs",
     description: "chat.models.descriptions.flux3Image",
     parameterCount: undefined,
@@ -1276,6 +1318,7 @@ export const imageGenModelDefinitions: Record<
 
   [ImageGenModelId.FLUX_3_KLEIN]: {
     name: "FLUX.3 Klein",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "blackForestLabs",
     description: "chat.models.descriptions.flux3Klein",
     parameterCount: undefined,
@@ -1308,6 +1351,7 @@ export const imageGenModelDefinitions: Record<
     // price, so keep it enabled with the probed estimate below.
     enabledWithoutPrice: true,
     name: "GPT Image 2.6 Flare",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "openAI",
     description: "chat.models.descriptions.gptImage26Flare",
     parameterCount: undefined,
@@ -1346,6 +1390,7 @@ export const imageGenModelDefinitions: Record<
     // price, so keep it enabled with the probed estimate below.
     enabledWithoutPrice: true,
     name: "GPT Image 2.6 Sunburst",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "openAI",
     description: "chat.models.descriptions.gptImage26Sunburst",
     parameterCount: undefined,
@@ -1383,6 +1428,7 @@ export const imageGenModelDefinitions: Record<
 
   [ImageGenModelId.RECRAFT_V4_1]: {
     name: "Recraft V4.1",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "recraft",
     description: "chat.models.descriptions.recraftV41",
     parameterCount: undefined,
@@ -1412,6 +1458,7 @@ export const imageGenModelDefinitions: Record<
 
   [ImageGenModelId.RECRAFT_V4_1_PRO]: {
     name: "Recraft V4.1 Pro",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "recraft",
     description: "chat.models.descriptions.recraftV41Pro",
     parameterCount: undefined,
@@ -1445,6 +1492,7 @@ export const imageGenModelDefinitions: Record<
 
   [ImageGenModelId.RECRAFT_V4_1_FLASH]: {
     name: "Recraft V4.1 Flash",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "recraft",
     description: "chat.models.descriptions.recraftV41Flash",
     parameterCount: undefined,
@@ -1474,6 +1522,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.MAI_IMAGE_2_7]: {
     name: "MAI Image 2.7",
+    commercialUse: commercialUse.unclear(CommercialUseReason.VENDOR_APPROVAL),
     by: "microsoft",
     description: "chat.models.descriptions.maiImage27",
     parameterCount: undefined,
@@ -1500,6 +1549,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.MAI_IMAGE_2_7_FLASH]: {
     name: "MAI Image 2.7 Flash",
+    commercialUse: commercialUse.unclear(CommercialUseReason.VENDOR_APPROVAL),
     by: "microsoft",
     description: "chat.models.descriptions.maiImage27Flash",
     parameterCount: undefined,
@@ -1526,6 +1576,9 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.LUSTIFY_V8]: {
     name: "Lustify v8",
+    commercialUse: commercialUse.restricted(
+      CommercialUseReason.COMMUNITY_LICENSE,
+    ),
     by: "veniceAI",
     description: "chat.models.descriptions.veniceLustifyV8",
     parameterCount: undefined,
@@ -1558,6 +1611,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.CHROMA]: {
     name: "Chroma",
+    commercialUse: commercialUse.unclear(CommercialUseReason.HOST_PERSONAL_USE),
     by: "veniceAI",
     description: "chat.models.descriptions.veniceChroma",
     parameterCount: undefined,
@@ -1590,6 +1644,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.QWEN_EDIT]: {
     name: "Qwen Edit Uncensored",
+    commercialUse: commercialUse.unclear(CommercialUseReason.HOST_PERSONAL_USE),
     by: "veniceAI",
     description: "chat.models.descriptions.veniceQwenEdit",
     parameterCount: undefined,
@@ -1622,6 +1677,7 @@ export const imageGenModelDefinitions: Record<
   },
   [ImageGenModelId.FIRERED_IMAGE_EDIT]: {
     name: "FireRed Image Edit",
+    commercialUse: commercialUse.unclear(CommercialUseReason.HOST_PERSONAL_USE),
     by: "veniceAI",
     description: "chat.models.descriptions.veniceFireredImageEdit",
     parameterCount: undefined,
@@ -1692,6 +1748,9 @@ function chatModelToImageGenOption(
         inputs: chat.inputs,
         outputs: chat.outputs,
         voiceMeta: chat.voiceMeta,
+        commercialUse: commercialUse.allowed(
+          CommercialUseReason.PROVIDER_TERMS,
+        ),
         creditCostPerImage: provider.creditCostPerImage,
         supportedSizes: provider.supportedSizes,
         supportedQualities: provider.supportedQualities,
@@ -1720,6 +1779,9 @@ function chatModelToImageGenOption(
         inputs: chat.inputs,
         outputs: chat.outputs,
         voiceMeta: chat.voiceMeta,
+        commercialUse: commercialUse.allowed(
+          CommercialUseReason.PROVIDER_TERMS,
+        ),
         creditCost: provider.creditCost,
         inputTokenCost: provider.inputTokenCost,
         outputTokenCost: provider.outputTokenCost,
@@ -1886,6 +1948,7 @@ function buildImageGenOption(
     inputs: def.inputs,
     outputs: def.outputs,
     voiceMeta: def.voiceMeta,
+    commercialUse: def.commercialUse,
   } as const;
   if (provider.creditCostPerImage !== undefined) {
     const p = provider satisfies ModelProviderConfigImageBased;

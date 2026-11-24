@@ -5,6 +5,10 @@ import { z } from "zod";
 import { CREDIT_VALUE_USD } from "@/products/repository-client";
 
 import type { AgentEnvAvailability } from "../env-availability";
+import {
+  commercialUse,
+  CommercialUseReason,
+} from "../models/commercial-use/enum";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -62,6 +66,7 @@ export enum TtsModelId {
 export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   [TtsModelId.OPENAI_ALLOY]: {
     name: "Alloy",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "openAI",
     description: "textToSpeech.models.descriptions.openaiAlloy",
     contextWindow: 0,
@@ -102,6 +107,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.OPENAI_NOVA]: {
     name: "Nova",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "openAI",
     description: "textToSpeech.models.descriptions.openaiNova",
     contextWindow: 0,
@@ -142,6 +148,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.OPENAI_ONYX]: {
     name: "Onyx",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "openAI",
     description: "textToSpeech.models.descriptions.openaiOnyx",
     contextWindow: 0,
@@ -182,6 +189,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.OPENAI_ECHO]: {
     name: "Echo",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "openAI",
     description: "textToSpeech.models.descriptions.openaiEcho",
     contextWindow: 0,
@@ -216,6 +224,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.OPENAI_SHIMMER]: {
     name: "Shimmer",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "openAI",
     description: "textToSpeech.models.descriptions.openaiShimmer",
     contextWindow: 0,
@@ -250,6 +259,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.OPENAI_FABLE]: {
     name: "Fable",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "openAI",
     description: "textToSpeech.models.descriptions.openaiFable",
     contextWindow: 0,
@@ -284,6 +294,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.ELEVENLABS_RACHEL]: {
     name: "Rachel",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "elevenlabs",
     description: "textToSpeech.models.descriptions.elevenlabsRachel",
     contextWindow: 0,
@@ -318,6 +329,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.ELEVENLABS_JOSH]: {
     name: "Josh",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "elevenlabs",
     description: "textToSpeech.models.descriptions.elevenlabsJosh",
     contextWindow: 0,
@@ -352,6 +364,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.ELEVENLABS_BELLA]: {
     name: "Bella",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "elevenlabs",
     description: "textToSpeech.models.descriptions.elevenlabsBella",
     contextWindow: 0,
@@ -386,6 +399,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.ELEVENLABS_ADAM]: {
     name: "Adam",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "elevenlabs",
     description: "textToSpeech.models.descriptions.elevenlabsAdam",
     contextWindow: 0,
@@ -420,6 +434,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.ELEVENLABS_RACHEL_TURBO]: {
     name: "Rachel (Turbo)",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "elevenlabs",
     description: "textToSpeech.models.descriptions.elevenlabsRachelTurbo",
     contextWindow: 0,
@@ -454,6 +469,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.ELEVENLABS_JOSH_TURBO]: {
     name: "Josh (Turbo)",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "elevenlabs",
     description: "textToSpeech.models.descriptions.elevenlabsJoshTurbo",
     contextWindow: 0,
@@ -488,6 +504,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.ELEVENLABS_BELLA_TURBO]: {
     name: "Bella (Turbo)",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "elevenlabs",
     description: "textToSpeech.models.descriptions.elevenlabsBellaTurbo",
     contextWindow: 0,
@@ -522,6 +539,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.ELEVENLABS_ADAM_TURBO]: {
     name: "Adam (Turbo)",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "elevenlabs",
     description: "textToSpeech.models.descriptions.elevenlabsAdamTurbo",
     contextWindow: 0,
@@ -556,6 +574,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.KOKORO_BELLA]: {
     name: "Bella (Kokoro)",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroBella",
     contextWindow: 0,
@@ -590,6 +609,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.KOKORO_SARAH]: {
     name: "Sarah (Kokoro)",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroSarah",
     contextWindow: 0,
@@ -624,6 +644,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.KOKORO_NICOLE]: {
     name: "Nicole (Kokoro)",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroNicole",
     contextWindow: 0,
@@ -658,6 +679,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.KOKORO_ADAM]: {
     name: "Adam (Kokoro)",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroAdam",
     contextWindow: 0,
@@ -692,6 +714,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.KOKORO_MICHAEL]: {
     name: "Michael (Kokoro)",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroMichael",
     contextWindow: 0,
@@ -726,6 +749,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.KOKORO_EMMA]: {
     name: "Emma (Kokoro)",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroEmma",
     contextWindow: 0,
@@ -760,6 +784,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.KOKORO_GEORGE]: {
     name: "George (Kokoro)",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
     by: "hexgrad",
     description: "textToSpeech.models.descriptions.kokoroGeorge",
     contextWindow: 0,
@@ -794,6 +819,9 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.VOXTRAL_PAUL]: {
     name: "Paul (Voxtral Mini)",
+    commercialUse: commercialUse.restricted(
+      CommercialUseReason.NON_COMMERCIAL_LICENSE,
+    ),
     by: "mistralAI",
     description: "textToSpeech.models.descriptions.voxtralPaul",
     contextWindow: 0,
@@ -822,6 +850,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.INWORLD_MINI_ASHLEY]: {
     name: "Ashley (Inworld)",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "inworld",
     description: "textToSpeech.models.descriptions.inworldAshley",
     contextWindow: 0,
@@ -856,6 +885,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.INWORLD_MINI_CRAIG]: {
     name: "Craig (Inworld)",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "inworld",
     description: "textToSpeech.models.descriptions.inworldCraig",
     contextWindow: 0,
@@ -890,6 +920,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.XAI_EVE]: {
     name: "Eve (xAI)",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "xai",
     description: "textToSpeech.models.descriptions.xaiEve",
     contextWindow: 0,
@@ -924,6 +955,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.GEMINI_ZEPHYR]: {
     name: "Zephyr (Gemini)",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "google",
     description: "textToSpeech.models.descriptions.geminiZephyr",
     contextWindow: 0,
@@ -958,6 +990,7 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
   },
   [TtsModelId.GEMINI_PUCK]: {
     name: "Puck (Gemini)",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "google",
     description: "textToSpeech.models.descriptions.geminiPuck",
     contextWindow: 0,
@@ -1026,6 +1059,7 @@ function buildTtsModelOptions(): TtsModelOption[] {
           inputs: def.inputs,
           outputs: def.outputs,
           voiceMeta: def.voiceMeta,
+          commercialUse: def.commercialUse,
           creditCostPerCharacter: provider.creditCostPerCharacter,
         });
       }

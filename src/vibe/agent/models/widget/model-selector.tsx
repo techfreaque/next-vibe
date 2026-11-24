@@ -100,6 +100,7 @@ import {
   videoGenModelOptions,
 } from "../../video-generation/models";
 import { type AnyModelOptionWithVision } from "../all-models";
+import { CommercialUseBadge } from "../commercial-use/widget/commercial-use-label";
 import type { Modality, ModelRole } from "../enum";
 import { ModelUtility } from "../enum";
 import { scopedTranslation } from "../i18n";
@@ -427,6 +428,7 @@ export function ModelCard({
               {t("selector.bestForFilter")}
             </Badge>
           )}
+          <CommercialUseBadge info={model.commercialUse} locale={locale} />
         </Div>
         <Span className="text-[11px] text-muted-foreground">
           {modelProviders[model.provider]?.name ?? model.provider}

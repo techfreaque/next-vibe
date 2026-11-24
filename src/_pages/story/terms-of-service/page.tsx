@@ -215,6 +215,17 @@ export function TanstackPage({
           ),
         },
         {
+          id: "ai-output",
+          title: t("sections.aiOutput.title"),
+          content: (
+            <>
+              <LegalP>{t("sections.aiOutput.ownership", { appName })}</LegalP>
+              <LegalP>{t("sections.aiOutput.licenses")}</LegalP>
+              <LegalP>{t("sections.aiOutput.copyright")}</LegalP>
+            </>
+          ),
+        },
+        {
           id: "intellectual-property",
           title: t("sections.intellectualProperty.title"),
           content: (

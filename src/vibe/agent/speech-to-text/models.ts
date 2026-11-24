@@ -4,6 +4,10 @@ import { z } from "zod";
 import { CREDIT_VALUE_USD } from "@/products/repository-client";
 
 import type { AgentEnvAvailability } from "../env-availability";
+import {
+  commercialUse,
+  CommercialUseReason,
+} from "../models/commercial-use/enum";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -40,6 +44,7 @@ export enum SttModelId {
 export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
   [SttModelId.OPENAI_WHISPER]: {
     name: "Whisper",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "openAI",
     description: "speechToText.models.descriptions.openaiWhisper",
     contextWindow: 0,
@@ -79,6 +84,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
   },
   [SttModelId.DEEPGRAM_NOVA_2]: {
     name: "Nova-2",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "deepgram",
     description: "speechToText.models.descriptions.deepgramNova2",
     contextWindow: 0,
@@ -112,6 +118,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
   },
   [SttModelId.WHISPER_LARGE_V3]: {
     name: "Whisper Large V3",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "openAI",
     description: "speechToText.models.descriptions.whisperLargeV3",
     contextWindow: 0,
@@ -145,6 +152,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
   },
   [SttModelId.VOXTRAL_SMALL_TRANSCRIBE]: {
     name: "Voxtral Small Transcribe",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "mistralAI",
     description: "speechToText.models.descriptions.voxtralSmall",
     contextWindow: 0,
@@ -172,6 +180,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
   },
   [SttModelId.VOXTRAL_MINI_TRANSCRIBE]: {
     name: "Voxtral Mini Transcribe",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "mistralAI",
     description: "speechToText.models.descriptions.voxtralMini",
     contextWindow: 0,
@@ -205,6 +214,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
   },
   [SttModelId.NEMOTRON_ASR]: {
     name: "Nemotron ASR",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "nvidia",
     description: "speechToText.models.descriptions.nemotronAsr",
     contextWindow: 0,
@@ -238,6 +248,7 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
   },
   [SttModelId.GPT4O_MINI_TRANSCRIBE]: {
     name: "GPT-4o Mini Transcribe",
+    commercialUse: commercialUse.allowed(CommercialUseReason.PROVIDER_TERMS),
     by: "openAI",
     description: "speechToText.models.descriptions.gpt4oMiniTranscribe",
     contextWindow: 0,
@@ -298,6 +309,7 @@ function buildSttOption(
     inputs: def.inputs,
     outputs: def.outputs,
     voiceMeta: def.voiceMeta,
+    commercialUse: def.commercialUse,
     creditCostPerSecond: provider.creditCostPerSecond,
   };
 }

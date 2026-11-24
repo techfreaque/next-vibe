@@ -17,7 +17,7 @@ export const translations: typeof enTranslations = {
   onThisPage: "In questa pagina",
   printButton: "Stampa",
   title: "Condizioni di servizio",
-  lastUpdated: "Ultimo aggiornamento: novembre 2026",
+  lastUpdated: "Ultimo aggiornamento: 24 novembre 2026",
   bindingVersionNotice:
     "Questa traduzione è fornita a titolo informativo. Fa fede la versione in lingua tedesca.",
   introduction:
@@ -131,6 +131,15 @@ export const translations: typeof enTranslations = {
             "Tentare di accedere alla piattaforma senza autorizzazione o comprometterla",
         },
       },
+    },
+    aiOutput: {
+      title: "Contenuti generati dall'IA",
+      ownership:
+        "Non rivendichiamo alcuna titolarità su testi, immagini, video, audio o altri contenuti che generi su {{appName}}. Gli eventuali diritti su tali contenuti spettano a te.",
+      licenses:
+        "I contenuti sono prodotti da modelli di terze parti. Oltre a questi termini si applicano la licenza di ciascun modello e le condizioni del relativo fornitore. Alcuni modelli consentono solo l'uso non commerciale o limitano determinati usi. Questi modelli sono contrassegnati nell'app.",
+      copyright:
+        "I contenuti generati dall'IA potrebbero non essere protetti dal diritto d'autore e potrebbero somigliare a opere esistenti o a contenuti generati per altri utenti. Sei responsabile di verificare la licenza del modello che utilizzi prima di usarne i contenuti, in particolare per scopi commerciali.",
     },
     intellectualProperty: {
       title: "Proprietà intellettuale",

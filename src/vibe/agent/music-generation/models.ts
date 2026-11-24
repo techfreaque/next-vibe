@@ -2,6 +2,10 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { z } from "zod";
 
 import type { AgentEnvAvailability } from "../env-availability";
+import {
+  commercialUse,
+  CommercialUseReason,
+} from "../models/commercial-use/enum";
 import { ModelUtility } from "../models/enum";
 import {
   ApiProvider,
@@ -51,6 +55,9 @@ export const musicGenModelDefinitions: Record<
 > = {
   [MusicGenModelId.MUSICGEN_STEREO]: {
     name: "MusicGen Stereo",
+    commercialUse: commercialUse.restricted(
+      CommercialUseReason.NON_COMMERCIAL_LICENSE,
+    ),
     by: "meta",
     description: "chat.models.descriptions.musicgenStereo",
     parameterCount: undefined,
@@ -92,6 +99,7 @@ export const musicGenModelDefinitions: Record<
 
   [MusicGenModelId.MUSIC_GEN]: {
     name: "ModelsLab Music Gen",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "modelsLab",
     description: "chat.models.descriptions.modelsLabMusicGen",
     parameterCount: undefined,
@@ -132,6 +140,7 @@ export const musicGenModelDefinitions: Record<
   [MusicGenModelId.CASSETTE_MUSIC]: {
     enabled: false, // auto-disabled: price not verified
     name: "CassetteAI Music",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "cassetteAi",
     description: "chat.models.descriptions.cassetteMusic",
     parameterCount: undefined,
@@ -173,6 +182,7 @@ export const musicGenModelDefinitions: Record<
 
   [MusicGenModelId.ELEVENLABS_MUSIC]: {
     name: "ElevenLabs Music",
+    commercialUse: commercialUse.restricted(CommercialUseReason.USE_LIMITS),
     by: "elevenlabs",
     description: "chat.models.descriptions.modelsLabElevenlabsMusic",
     parameterCount: undefined,
@@ -214,6 +224,7 @@ export const musicGenModelDefinitions: Record<
 
   [MusicGenModelId.SONAUTO_SONG]: {
     name: "Sonauto Song",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "sonauto",
     description: "chat.models.descriptions.modelsLabSonautoSong",
     parameterCount: undefined,
@@ -255,6 +266,7 @@ export const musicGenModelDefinitions: Record<
 
   [MusicGenModelId.LYRIA_3]: {
     name: "Lyria 3",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "google",
     description: "chat.models.descriptions.modelsLabLyria3",
     parameterCount: undefined,
@@ -292,6 +304,7 @@ export const musicGenModelDefinitions: Record<
 
   [MusicGenModelId.LYRIA_3_PRO_PREVIEW]: {
     name: "Lyria 3 Pro Preview",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "google",
     description: "chat.models.descriptions.lyria3ProPreview",
     parameterCount: undefined,
@@ -329,6 +342,7 @@ export const musicGenModelDefinitions: Record<
 
   [MusicGenModelId.LYRIA_3_CLIP_PREVIEW]: {
     name: "Lyria 3 Clip Preview",
+    commercialUse: commercialUse.unclear(CommercialUseReason.TERMS_UNCONFIRMED),
     by: "google",
     description: "chat.models.descriptions.lyria3ClipPreview",
     parameterCount: undefined,
@@ -399,6 +413,7 @@ function buildMusicGenOption(
     inputs: def.inputs,
     outputs: def.outputs,
     voiceMeta: def.voiceMeta,
+    commercialUse: def.commercialUse,
     creditCostPerClip: p.creditCostPerClip,
     defaultDurationSeconds: p.defaultDurationSeconds,
     supportedDurations: p.supportedDurations,
