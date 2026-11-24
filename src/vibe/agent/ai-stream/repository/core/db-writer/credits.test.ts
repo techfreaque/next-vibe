@@ -20,6 +20,8 @@ import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
 import { CreditRepository } from "@/credits/repository";
 
 import { createMessagesEmitter } from "../../../../chat/threads/[threadId]/messages/emitter";
+import { ApiProvider } from "../../../../models/models";
+import { ChatModelId } from "../../../models";
 import { MessageDbWriter } from "../message-db-writer";
 import { deductAndEmitCredits } from "./credits";
 
@@ -49,7 +51,9 @@ function makeWriter(): MessageDbWriter {
 }
 
 const deductionFailed = fail({
-  message: "credits.errors.deductCreditsFailed",
+  message: creditsScopedTranslation.scopedT(defaultLocale).t(
+    "errors.deductCreditsFailed",
+  ),
   errorType: ErrorResponseTypes.INTERNAL_ERROR,
 });
 
@@ -119,5 +123,25 @@ describe("deductAndEmitCredits — fail closed", () => {
     });
     expect(spy).not.toHaveBeenCalled();
     expect(writer.billingFailed).toBe(false);
+  });
+
+  it("passes the serving API to model billing", async () => {
+    const spy = vi
+      .spyOn(CreditRepository, "deductCreditsForModelUsage")
+      .mockResolvedValue(success({}));
+    const model = ChatModelId.GLM_5_3_UNCENSORED;
+
+    await deductAndEmitCredits(makeWriter(), {
+      user,
+      amount: 2,
+      feature: model,
+      type: "model",
+      model,
+      apiProvider: ApiProvider.NANO_GPT,
+    });
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.calls[0]?.[1]).toBe(2);
+    expect(spy.mock.calls[0]?.[7]).toBe(ApiProvider.NANO_GPT);
   });
 });

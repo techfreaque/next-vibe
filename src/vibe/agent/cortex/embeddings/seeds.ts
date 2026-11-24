@@ -46,6 +46,7 @@ async function setStoredModel(model: string): Promise<void> {
  * (no user credit deduction). Otherwise only missing embeddings are filled.
  */
 function runBackfill(logger: EndpointLogger): void {
+  const startedAt = performance.now();
   void import("./service").then(({ EMBEDDING_MODEL }) =>
     getStoredModel()
       .then((stored) => {
@@ -66,14 +67,15 @@ function runBackfill(logger: EndpointLogger): void {
               backfillMessageEmbeddings(modelChanged),
             ]).then(([nodes, messages]) => {
               const total = nodes.processed + messages.processed;
-              if (total > 0 || modelChanged) {
-                logger.info(
-                  formatDatabase(
-                    `Embeddings: ${total} indexed${modelChanged ? " (model changed)" : ""}`,
-                    "🔍",
-                  ),
-                );
-              }
+              const elapsedMs = Math.round(performance.now() - startedAt);
+              logger.info(
+                formatDatabase(
+                  `Embeddings: ${total} indexed in ${elapsedMs} ms${modelChanged ? " (model changed)" : ""}. ` +
+                    `Nodes ${nodes.processed} indexed, ${nodes.failed} failed, ${nodes.skipped} skipped. ` +
+                    `Messages ${messages.processed} indexed, ${messages.failed} failed, ${messages.skipped} skipped.`,
+                  "🔍",
+                ),
+              );
               return setStoredModel(EMBEDDING_MODEL);
             }),
         );

@@ -435,6 +435,7 @@ async function runBridgeCall(params: {
         feature: `${creditFeaturePrefix}:${usedModel.id}`,
         type: "model",
         model: usedModel.id,
+        apiProvider: usedModel.apiProvider,
       });
     }
 

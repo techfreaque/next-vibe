@@ -3,7 +3,7 @@
  * Drizzle ORM schema definitions for lead management system
  */
 
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   index,
@@ -50,86 +50,104 @@ import {
  * Leads Table
  * Stores potential customers and their information
  */
-export const leads = pgTable("leads", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  email: text("email").unique(),
-  businessName: text("business_name").notNull(),
-  contactName: text("contact_name"),
-  phone: text("phone"),
-  website: text("website"),
+export const leads = pgTable(
+  "leads",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    email: text("email").unique(),
+    businessName: text("business_name").notNull(),
+    contactName: text("contact_name"),
+    phone: text("phone"),
+    website: text("website"),
 
-  // Location and language
-  country: text("country", { enum: CountriesArr }).notNull(),
-  language: text("language", { enum: LanguagesArr }).notNull(),
+    // Location and language
+    country: text("country", { enum: CountriesArr }).notNull(),
+    language: text("language", { enum: LanguagesArr }).notNull(),
 
-  // IP tracking for free tier credits
-  ipAddress: text("ip_address"),
+    // IP tracking for free tier credits
+    ipAddress: text("ip_address"),
 
-  // Visitor country (ISO 3166-1 alpha-2) resolved offline from the client IP
-  // (leads/geo). "ZZ" = reserved/unknown range, null = not resolved yet.
-  // `country` above is the chosen locale's region, not where the visitor is.
-  geoCountry: text("geo_country"),
+    // Visitor country (ISO 3166-1 alpha-2) resolved offline from the client IP
+    // (leads/geo). "ZZ" = reserved/unknown range, null = not resolved yet.
+    // `country` above is the chosen locale's region, not where the visitor is.
+    geoCountry: text("geo_country"),
 
-  // Device / browser identity (latest, from user agent parsing)
-  userAgent: text("user_agent"),
-  deviceType: text("device_type", { enum: DeviceTypeDB }),
-  browser: text("browser"),
-  os: text("os"),
+    // Device / browser identity (latest, from user agent parsing)
+    userAgent: text("user_agent"),
+    deviceType: text("device_type", { enum: DeviceTypeDB }),
+    browser: text("browser"),
+    os: text("os"),
 
-  // Referral tracking (first-touch, immutable)
-  referralCode: text("referral_code"),
+    // Referral tracking (first-touch, immutable)
+    referralCode: text("referral_code"),
 
-  // Skill attribution - the skill that brought this lead to the platform (last-write-wins before signup)
-  // Stored as plain text (UUID or built-in skill id), no FK since built-in skills have no DB row
-  skillId: text("skill_id"),
+    // Skill attribution - the skill that brought this lead to the platform (last-write-wins before signup)
+    // Stored as plain text (UUID or built-in skill id), no FK since built-in skills have no DB row
+    skillId: text("skill_id"),
 
-  // Lead qualification
-  status: text("status", { enum: LeadStatusDB })
-    .notNull()
-    .default(LeadStatus.NEW),
-  source: text("source", { enum: LeadSourceDB }).notNull(),
-  notes: text("notes"),
+    // Lead qualification
+    status: text("status", { enum: LeadStatusDB })
+      .notNull()
+      .default(LeadStatus.NEW),
+    source: text("source", { enum: LeadSourceDB }).notNull(),
+    notes: text("notes"),
 
-  // Uncensored-model consent for guests (copied to the user on signup/login).
-  // null = never agreed (or withdrawn). Version = consent text version agreed to.
-  uncensoredConsentAt: timestamp("uncensored_consent_at"),
-  uncensoredConsentVersion: integer("uncensored_consent_version"),
+    // Uncensored-model consent for guests (copied to the user on signup/login).
+    // null = never agreed (or withdrawn). Version = consent text version agreed to.
+    uncensoredConsentAt: timestamp("uncensored_consent_at"),
+    uncensoredConsentVersion: integer("uncensored_consent_version"),
 
-  convertedUserId: uuid("converted_user_id").references(() => users.id),
-  convertedAt: timestamp("converted_at"),
+    convertedUserId: uuid("converted_user_id").references(() => users.id),
+    convertedAt: timestamp("converted_at"),
 
-  // Event timestamps for statistics tracking
-  signedUpAt: timestamp("signed_up_at"),
-  subscriptionConfirmedAt: timestamp("subscription_confirmed_at"),
-  bouncedAt: timestamp("bounced_at"), // When lead email bounced
-  invalidAt: timestamp("invalid_at"), // When lead was marked as invalid
+    // Event timestamps for statistics tracking
+    signedUpAt: timestamp("signed_up_at"),
+    subscriptionConfirmedAt: timestamp("subscription_confirmed_at"),
+    bouncedAt: timestamp("bounced_at"), // When lead email bounced
+    invalidAt: timestamp("invalid_at"), // When lead was marked as invalid
 
-  // Email campaign tracking
-  currentCampaignStage: text("current_campaign_stage", {
-    enum: EmailCampaignStageDB,
-  }).default(EmailCampaignStage.NOT_STARTED),
-  emailJourneyVariant: text("email_journey_variant", {
-    enum: EmailJourneyVariantDB,
-  }),
-  campaignStartedAt: timestamp("campaign_started_at"),
-  emailsSent: integer("emails_sent").notNull().default(0),
-  lastEmailSentAt: timestamp("last_email_sent_at"),
-  unsubscribedAt: timestamp("unsubscribed_at"),
+    // Email campaign tracking
+    currentCampaignStage: text("current_campaign_stage", {
+      enum: EmailCampaignStageDB,
+    }).default(EmailCampaignStage.NOT_STARTED),
+    emailJourneyVariant: text("email_journey_variant", {
+      enum: EmailJourneyVariantDB,
+    }),
+    campaignStartedAt: timestamp("campaign_started_at"),
+    emailsSent: integer("emails_sent").notNull().default(0),
+    lastEmailSentAt: timestamp("last_email_sent_at"),
+    unsubscribedAt: timestamp("unsubscribed_at"),
 
-  // Engagement metrics
-  emailsOpened: integer("emails_opened").notNull().default(0),
-  emailsClicked: integer("emails_clicked").notNull().default(0),
-  lastEngagementAt: timestamp("last_engagement_at"),
+    // Engagement metrics
+    emailsOpened: integer("emails_opened").notNull().default(0),
+    emailsClicked: integer("emails_clicked").notNull().default(0),
+    lastEngagementAt: timestamp("last_engagement_at"),
 
-  // Metadata
-  metadata: jsonb("metadata")
-    .$type<Record<string, string | number | boolean | null>>()
-    .notNull()
-    .default({}),
+    // Metadata
+    metadata: jsonb("metadata")
+      .$type<Record<string, string | number | boolean | null>>()
+      .notNull()
+      .default({}),
 
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    // The guest pool searches both the normalized key and legacy exact IPs.
+    index("idx_leads_guest_ip_key")
+      .on(
+        sql`(${table.metadata}->>'ipKey')`,
+        sql`GREATEST(${table.createdAt}, ${table.updatedAt})`,
+      )
+      .where(sql`${table.email} IS NULL AND ${table.convertedUserId} IS NULL`),
+    index("idx_leads_guest_ip_address")
+      .on(
+        sql`(${table.metadata}->>'ipAddress')`,
+        sql`GREATEST(${table.createdAt}, ${table.updatedAt})`,
+      )
+      .where(sql`${table.email} IS NULL AND ${table.convertedUserId} IS NULL`),
+  ],
+);
 
 /**
  * Email Campaigns Table

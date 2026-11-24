@@ -1,0 +1,2 @@
+CREATE INDEX "idx_leads_guest_ip_key" ON "leads" USING btree (("metadata"->>'ipKey'),GREATEST("created_at", "updated_at")) WHERE "leads"."email" IS NULL AND "leads"."converted_user_id" IS NULL;--> statement-breakpoint
+CREATE INDEX "idx_leads_guest_ip_address" ON "leads" USING btree (("metadata"->>'ipAddress'),GREATEST("created_at", "updated_at")) WHERE "leads"."email" IS NULL AND "leads"."converted_user_id" IS NULL;

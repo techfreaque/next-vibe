@@ -146,6 +146,7 @@ export async function billCompletedSteps(
     type: "model",
     model,
     upstreamCost,
+    apiProvider: modelConfig.apiProvider,
   });
 }
 
@@ -166,6 +167,7 @@ export async function runAbortHandler(
     isIncognito: state.p.isIncognito,
     userId: state.p.userId,
     model: state.p.model,
+    apiProvider: state.p.modelConfig.apiProvider,
     systemPrompt: state.p.systemPrompt,
     trailingSystemMessage: state.p.trailingSystemMessage,
     messages: state.p.messages,
@@ -621,6 +623,7 @@ export async function complete(
     type: "model",
     model,
     upstreamCost,
+    apiProvider: modelConfig.apiProvider,
   });
 
   // Flush ALL pending throttled writes BEFORE signaling idle. Anyone who

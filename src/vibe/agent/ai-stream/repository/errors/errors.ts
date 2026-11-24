@@ -22,6 +22,7 @@ import { chatMessages } from "../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
 import { createMessagesEmitter } from "../../../chat/threads/[threadId]/messages/emitter";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
+import type { ApiProvider } from "../../../models/models";
 import { type ChatModelId, getChatModelById } from "../../models";
 import type { AiStreamPostRequestOutput } from "../../stream/definition";
 import type { AiStreamT, AiStreamTranslationKey } from "../../stream/i18n";
@@ -336,6 +337,7 @@ export class AbortErrorHandler {
     isIncognito: boolean;
     userId: string | undefined;
     model: ChatModelId;
+    apiProvider: ApiProvider;
     systemPrompt?: string;
     trailingSystemMessage?: string;
     messages?: ModelMessage[];
@@ -351,6 +353,7 @@ export class AbortErrorHandler {
       isIncognito,
       userId,
       model,
+      apiProvider,
       systemPrompt,
       trailingSystemMessage,
       messages,
@@ -549,6 +552,7 @@ export class AbortErrorHandler {
               feature: `model:${model}`,
               type: "model",
               model,
+              apiProvider,
             });
 
             logger.debug("[AI Stream] Deducted and emitted model credits", {
