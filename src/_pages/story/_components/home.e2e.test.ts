@@ -11,6 +11,7 @@ import { useE2E } from "next-vibe/tooling/testing/e2e/harness";
 import type { Locator, Page } from "playwright";
 import { describe, expect } from "vitest";
 
+import { SITE_FOOTER_ID } from "../constants";
 import { scopedTranslation } from "./i18n";
 
 const { t } = scopedTranslation.scopedT(defaultLocale);
@@ -57,12 +58,7 @@ function visibleText(page: Page, text: string): Locator {
   return page.getByText(text, { exact: false }).filter({ visible: true }).first();
 }
 
-/**
- * True when the element ends up rendered visibly (not stuck at opacity 0 by
- * an animation). Hero entry animations start at opacity 0 and only run once
- * the client hydrates, which takes several seconds on the dev server, so poll
- * instead of sampling once.
- */
+/** Wait for the selected tab’s scroll-triggered content to become visible. */
 async function isVisiblyRendered(page: Page, text: string): Promise<boolean> {
   const el = visibleText(page, text);
   await el.scrollIntoViewIfNeeded();
@@ -99,12 +95,33 @@ function primaryCta(page: Page): Locator {
 describe("E2E: story home", () => {
   const e2e = useE2E("story/home");
 
+  e2e.it("paints the mobile headline before hydration", async ({ page, goto }) => {
+    await page.setViewportSize(PHONE);
+    await page.route("**/*", (route) =>
+      route.request().resourceType() === "script"
+        ? route.abort()
+        : route.continue(),
+    );
+    await goto("/story");
+
+    expect(
+      await heroHeading(page).evaluate((node) =>
+        node.checkVisibility({ checkOpacity: true }),
+      ),
+    ).toBe(true);
+  });
+
   e2e.it(
     "tells the whole story and every section is visible",
     async ({ page, gotoReady }) => {
       await page.setViewportSize(DESKTOP);
       await gotoReady("/story", async () => {
         await heroHeading(page).waitFor();
+        // The heading is visible before React attaches the click handlers.
+        await page
+          .locator(`#${SITE_FOOTER_ID} [data-hydrated]`)
+          .first()
+          .waitFor({ state: "attached" });
       });
 
       expect(await isVisiblyRendered(page, t("home.splitHero.header"))).toBe(

@@ -11,7 +11,6 @@ import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
 import { Server } from "next-vibe/ui/components/icons/Server";
 import { TrendingUp } from "next-vibe/ui/components/icons/TrendingUp";
 import { Link } from "next-vibe/ui/components/link";
-import { MotionDiv } from "next-vibe/ui/components/motion";
 import { Span } from "next-vibe/ui/components/span";
 import { H1, H2, P } from "next-vibe/ui/components/typography";
 import { getElementById } from "next-vibe/ui/lib/dom";
@@ -200,46 +199,26 @@ export function SplitHero({
       <Div className="w-full bg-[#080010] px-6 py-14 md:py-20">
         <Div className="max-w-2xl mx-auto text-center">
           {/* Badge */}
-          <MotionDiv
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
-            className="inline-flex items-center gap-2 px-3 py-1 mb-8 rounded-full border border-white/10 bg-white/5 text-white/40 text-xs font-medium tracking-wide"
-          >
+          <Div className="inline-flex items-center gap-2 px-3 py-1 mb-8 rounded-full border border-white/10 bg-white/5 text-white/40 text-xs font-medium tracking-wide">
             {t("home.splitHero.badge")}
-          </MotionDiv>
+          </Div>
 
           {/* Header */}
-          <MotionDiv
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="mb-4"
-          >
+          <Div className="mb-4">
             <H1 className="text-2xl md:text-4xl font-black text-white tracking-tighter leading-tight">
               {t("home.splitHero.header")}
             </H1>
-          </MotionDiv>
+          </Div>
 
           {/* Subheader - 3 punchy values */}
-          <MotionDiv
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="mb-10"
-          >
+          <Div className="mb-10">
             <P className="text-sm md:text-base text-white/50 font-medium">
               {t("home.splitHero.subheader")}
             </P>
-          </MotionDiv>
+          </Div>
 
           {/* 4 chips - color-coded to panels below */}
-          <MotionDiv
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mb-3"
-          >
+          <Div className="mb-3">
             <Div className="text-xs font-bold text-white/30 uppercase tracking-widest mb-4">
               {t("home.splitHero.introGuide")}
             </Div>
@@ -262,15 +241,10 @@ export function SplitHero({
                 </Div>
               ))}
             </Div>
-          </MotionDiv>
+          </Div>
 
           {/* Footer - small team + bug report */}
-          <MotionDiv
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.35 }}
-            className="mt-10"
-          >
+          <Div className="mt-10">
             <Span className="text-xs text-white/25">
               {t("home.splitHero.introHelp")}{" "}
             </Span>
@@ -280,7 +254,7 @@ export function SplitHero({
             >
               {t("home.splitHero.introHelpCta")}
             </Link>
-          </MotionDiv>
+          </Div>
         </Div>
       </Div>
       {/* Mobile: flex-col with dividers interleaved */}
@@ -458,21 +432,12 @@ function UnbottledContent({
   }
   return (
     <PanelInner>
-      <MotionDiv
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-        className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-xs font-medium uppercase tracking-wider"
-      >
+      <Div className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-xs font-medium uppercase tracking-wider">
         <MessageSquare className="w-3 h-3" />
         {t("home.splitHero.unbottled.badge")}
-      </MotionDiv>
+      </Div>
 
-      <MotionDiv
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
+      <Div>
         <H2 className="text-4xl md:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tighter text-white leading-[0.9] mb-4 border-0">
           {t("home.splitHero.unbottled.titleLine1")}
           <Br />
@@ -480,26 +445,17 @@ function UnbottledContent({
             {t("home.splitHero.unbottled.titleLine2")}
           </Span>
         </H2>
-      </MotionDiv>
+      </Div>
 
-      <MotionDiv
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
+      <Div>
         <P className="text-violet-200/60 text-sm md:text-sm lg:text-base leading-relaxed mb-6">
           {t("home.splitHero.unbottled.subtitle", {
             modelCount: String(totalModelCount),
           })}
         </P>
-      </MotionDiv>
+      </Div>
 
-      <MotionDiv
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="flex flex-wrap justify-center gap-3 w-full"
-      >
+      <Div className="flex flex-wrap justify-center gap-3 w-full">
         <Button
           size="lg"
           className="bg-violet-600 hover:bg-violet-500 text-white border-0 font-semibold shadow-lg shadow-violet-900/40"
@@ -519,7 +475,7 @@ function UnbottledContent({
         >
           {t("home.splitHero.unbottled.ctaExplore")}
         </Button>
-      </MotionDiv>
+      </Div>
     </PanelInner>
   );
 }
@@ -542,21 +498,12 @@ function PersonalContent({
   }
   return (
     <PanelInner>
-      <MotionDiv
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-xs font-medium uppercase tracking-wider"
-      >
+      <Div className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 text-xs font-medium uppercase tracking-wider">
         <Server className="w-3 h-3" />
         {t("home.splitHero.personal.badge")}
-      </MotionDiv>
+      </Div>
 
-      <MotionDiv
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25 }}
-      >
+      <Div>
         <H2 className="text-4xl md:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tighter text-white leading-[0.9] mb-4 border-0">
           {t("home.splitHero.personal.titleLine1")}
           <Br />
@@ -564,24 +511,15 @@ function PersonalContent({
             {t("home.splitHero.personal.titleLine2")}
           </Span>
         </H2>
-      </MotionDiv>
+      </Div>
 
-      <MotionDiv
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
-      >
+      <Div>
         <P className="text-emerald-200/60 text-sm md:text-sm lg:text-base leading-relaxed mb-6">
           {t("home.splitHero.personal.subtitle", { appName })}
         </P>
-      </MotionDiv>
+      </Div>
 
-      <MotionDiv
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.55 }}
-        className="flex flex-wrap justify-center gap-3 w-full"
-      >
+      <Div className="flex flex-wrap justify-center gap-3 w-full">
         <Button
           size="lg"
           className="bg-emerald-600 hover:bg-emerald-500 text-white border-0 font-semibold shadow-lg shadow-emerald-900/40"
@@ -601,7 +539,7 @@ function PersonalContent({
         >
           {t("home.splitHero.personal.ctaGithub")}
         </Button>
-      </MotionDiv>
+      </Div>
     </PanelInner>
   );
 }
@@ -627,21 +565,12 @@ function NextVibeContent({
   }
   return (
     <PanelInner>
-      <MotionDiv
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25 }}
-        className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 text-xs font-medium uppercase tracking-wider"
-      >
+      <Div className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 text-xs font-medium uppercase tracking-wider">
         <Code className="w-3 h-3" />
         {t("home.splitHero.nextvibe.badge")}
-      </MotionDiv>
+      </Div>
 
-      <MotionDiv
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
+      <Div>
         <H2 className="text-4xl md:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tighter text-white leading-[0.9] mb-4 border-0">
           {t("home.splitHero.nextvibe.titleLine1")}
           <Br />
@@ -649,24 +578,15 @@ function NextVibeContent({
             {t("home.splitHero.nextvibe.titleLine2")}
           </Span>
         </H2>
-      </MotionDiv>
+      </Div>
 
-      <MotionDiv
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-      >
+      <Div>
         <P className="text-cyan-200/60 text-sm md:text-sm lg:text-base leading-relaxed mb-6">
           {t("home.splitHero.nextvibe.subtitle")}
         </P>
-      </MotionDiv>
+      </Div>
 
-      <MotionDiv
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="flex flex-wrap justify-center gap-3 w-full"
-      >
+      <Div className="flex flex-wrap justify-center gap-3 w-full">
         <Button
           size="lg"
           className="bg-cyan-600 hover:bg-cyan-500 text-white border-0 font-semibold shadow-lg shadow-cyan-900/40"
@@ -686,7 +606,7 @@ function NextVibeContent({
         >
           {t("home.splitHero.nextvibe.ctaExplore")}
         </Button>
-      </MotionDiv>
+      </Div>
     </PanelInner>
   );
 }
@@ -708,21 +628,12 @@ function ReferralContent({
   }
   return (
     <PanelInner>
-      <MotionDiv
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-rose-500/30 bg-rose-500/10 text-rose-300 text-xs font-medium uppercase tracking-wider"
-      >
+      <Div className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 rounded-full border border-rose-500/30 bg-rose-500/10 text-rose-300 text-xs font-medium uppercase tracking-wider">
         <TrendingUp className="w-3 h-3" />
         {t("home.splitHero.referral.badge")}
-      </MotionDiv>
+      </Div>
 
-      <MotionDiv
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
-      >
+      <Div>
         <H2 className="text-4xl md:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tighter text-white leading-[0.9] mb-4 border-0">
           {t("home.splitHero.referral.titleLine1")}
           {t("home.splitHero.referral.titleLine2") ? (
@@ -734,24 +645,15 @@ function ReferralContent({
             </>
           ) : null}
         </H2>
-      </MotionDiv>
+      </Div>
 
-      <MotionDiv
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.45 }}
-      >
+      <Div>
         <P className="text-rose-200/60 text-sm md:text-sm lg:text-base leading-relaxed mb-6">
           {t("home.splitHero.referral.subtitle")}
         </P>
-      </MotionDiv>
+      </Div>
 
-      <MotionDiv
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.65 }}
-        className="flex flex-wrap justify-center gap-3 w-full"
-      >
+      <Div className="flex flex-wrap justify-center gap-3 w-full">
         <Button
           size="lg"
           className="bg-rose-600 hover:bg-rose-500 text-white border-0 font-semibold shadow-lg shadow-rose-900/40"
@@ -771,7 +673,7 @@ function ReferralContent({
         >
           {t("home.splitHero.referral.ctaExplore")}
         </Button>
-      </MotionDiv>
+      </Div>
     </PanelInner>
   );
 }

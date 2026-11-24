@@ -3,20 +3,28 @@ import type { ModelCountsByContentLevel } from "next-vibe/agent/models/all-model
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
-import { AnimatePresence } from "next-vibe/ui/components/motion";
 import { Span } from "next-vibe/ui/components/span";
 import { cn } from "next-vibe/unified-ui/_shared/cn";
 import type { JSX } from "react";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 
 import { configScopedTranslation } from "@/env/i18n";
 
 import { scopedTranslation } from "./i18n";
 import type { ActiveSide } from "./split-hero";
-import { TabNextVibe } from "./tab-nextvibe";
-import { TabPersonal } from "./tab-personal";
-import { TabReferral } from "./tab-referral";
-import { TabUnbottled } from "./tab-unbottled";
+
+const TabNextVibe = lazy(async () => ({
+  default: (await import("./tab-nextvibe")).TabNextVibe,
+}));
+const TabPersonal = lazy(async () => ({
+  default: (await import("./tab-personal")).TabPersonal,
+}));
+const TabReferral = lazy(async () => ({
+  default: (await import("./tab-referral")).TabReferral,
+}));
+const TabUnbottled = lazy(async () => ({
+  default: (await import("./tab-unbottled")).TabUnbottled,
+}));
 
 type TabId = "unbottled" | "personal" | "nextvibe" | "referral";
 
@@ -231,7 +239,7 @@ export function UniverseContent({
         </Div>
       )}
 
-      <AnimatePresence mode="wait">
+      <Suspense fallback={null}>
         {current === "unbottled" && (
           <TabUnbottled
             locale={locale}
@@ -255,7 +263,7 @@ export function UniverseContent({
         {current === "referral" && (
           <TabReferral locale={locale} hasUser={hasUser} />
         )}
-      </AnimatePresence>
+      </Suspense>
     </Div>
   );
 }
