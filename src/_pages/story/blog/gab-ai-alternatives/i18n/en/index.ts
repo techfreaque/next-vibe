@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "Gab AI Alternatives: Uncensored AI Chats Compared (2026)",
     description:
-      "Gab AI alternatives checked on their own pages: uncensored.ai, Venice, FreedomGPT, NanoGPT, OpenRouter, LM Studio and {{appName}}. Adult content, privacy.",
+      "Compare Gab AI and Arya with {{appName}}, Grok, Perplexity, Venice and local AI. Check which options suit political research, private chat or creative work.",
     category: "Comparison",
     imageAlt: "Gab AI alternatives, compared side by side",
     keywords:
@@ -12,7 +12,7 @@ export const translations = {
     backToBlog: "Back to Blog",
     category: "Comparison",
     readTime: "9 min read",
-    title: "Gab AI alternatives. Free speech without the fine print.",
+    title: "Gab AI alternatives for research, chat and media",
     subtitle:
       "{{count}} alternatives and {{appName}}, compared on what their own terms, pricing and privacy pages say.",
   },
@@ -71,8 +71,6 @@ export const translations = {
   },
   table: {
     title: "All of them, side by side",
-    intro:
-      "Scroll sideways on mobile. Competitor facts checked {{date}} on their own pages. {{appName}} facts read live from our config.",
   },
   us: {
     title: "{{appName}}: several worldviews, one chat",

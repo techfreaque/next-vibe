@@ -4,7 +4,7 @@ export const translations: typeof enTranslations = {
   meta: {
     title: "Alternatywy dla Gab AI: czaty AI bez cenzury w porównaniu (2026)",
     description:
-      "Alternatywy dla Gab AI sprawdzone u źródła: uncensored.ai, Venice, FreedomGPT, NanoGPT, OpenRouter, LM Studio i {{appName}}. Treści 18+, prywatność.",
+      "Porównaj Gab AI i Aryę z {{appName}}, Grokiem, Perplexity, Venice i modelami lokalnymi. Wybierz narzędzie do polityki, prywatnego czatu lub twórczości.",
     category: "Porównanie",
     imageAlt: "Alternatywy dla Gab AI porównane obok siebie",
     keywords:
@@ -14,7 +14,7 @@ export const translations: typeof enTranslations = {
     backToBlog: "Wróć do bloga",
     category: "Porównanie",
     readTime: "9 min czytania",
-    title: "Alternatywy dla Gab AI. Wolność słowa bez drobnego druku.",
+    title: "Alternatywy dla Gab AI do wyszukiwania źródeł, czatu i multimediów",
     subtitle:
       "{{count}} alternatyw i {{appName}}, porównanych na podstawie ich własnych regulaminów, cenników i polityk prywatności.",
   },
@@ -73,8 +73,6 @@ export const translations: typeof enTranslations = {
   },
   table: {
     title: "Wszystkie obok siebie",
-    intro:
-      "Na telefonie przewiń w bok. Dane konkurencji sprawdzone {{date}} na ich własnych stronach. Dane {{appName}} czytane na żywo z naszej konfiguracji.",
   },
   us: {
     title: "{{appName}}: kilka światopoglądów, jeden czat",
