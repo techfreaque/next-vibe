@@ -1,4 +1,4 @@
-import { createRouter } from "@tanstack/react-router";
+import { createRouter, ErrorComponent } from "@tanstack/react-router";
 import {
   type CountryLanguage,
   CountryLanguageValues,
@@ -18,6 +18,7 @@ export function getRouter(): ReturnType<typeof createRouter> {
     defaultPreload: false,
     scrollRestoration: true,
     defaultNotFoundComponent: () => null,
+    defaultErrorComponent: ErrorComponent,
     // During initial hydration, code-split route components suspend briefly
     // while their lazy chunk loads. Without a pending component, the Suspense
     // boundary shows nothing (blank flash). Setting a 0ms pending delay and
@@ -29,7 +30,8 @@ export function getRouter(): ReturnType<typeof createRouter> {
     // error page — server-side that produced completely SILENT 500s (nothing
     // in the dev log). Surface them; on the client React logs them anyway.
     defaultOnCatch: (caught, errorInfo): void => {
-      const error = caught instanceof Error ? caught : new Error(String(caught));
+      const error =
+        caught instanceof Error ? caught : new Error(String(caught));
       if (typeof window === "undefined") {
         process.stderr.write(
           `[SSR route error] ${error.stack || String(error)}\n`,

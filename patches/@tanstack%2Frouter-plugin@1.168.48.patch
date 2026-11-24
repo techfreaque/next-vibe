@@ -169,7 +169,17 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  					});
  					addRouteHmr(insertionPath, routeOptions);
  				}
-@@ -585,8 +601,7 @@
+@@ -375,6 +391,9 @@
+ 				programPath.pushContainer("body", t.exportNamedDeclaration(null, reExportSpecifiers, t.stringLiteral(sharedModuleUrl)));
+ 			}
+ 		}
++		// The scoped passes above have already visited the route. The outer
++		// traversal only owns this Program visitor.
++		programPath.skip();
+ 	} } });
+ 	if (!modified) return null;
+ 	deadCodeElimination(ast, refIdents);
+@@ -585,8 +604,7 @@
  * This function should read get the options from by searching for the key `codeSplitGroupings`
  * on createFileRoute and return it's values if it exists, else return undefined
  */
@@ -179,7 +189,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	let codeSplitGroupings = void 0;
  	babel.traverse(ast, { Program: { enter(programPath) {
  		programPath.traverse({ CallExpression(path) {
-@@ -626,20 +641,13 @@
+@@ -626,20 +644,13 @@
  		"For the best optimization, these items should either have their export statements removed, or be imported from another location that is not a route file."
  	].join("\n");
  }
@@ -207,7 +217,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  }
  function resolveIdentifier(path, node) {
  	if (t.isIdentifier(node)) {
-@@ -671,38 +679,22 @@
+@@ -671,38 +682,22 @@
  	}
  }
  function hasExport(ast, node) {

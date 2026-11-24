@@ -19,6 +19,7 @@ import { sanitizeRoutePath } from "next-vibe/logger/client-context";
 import { shouldUseColors } from "next-vibe/logger/colors";
 import { serverFileLog } from "next-vibe/logger/file";
 import { formatSinceStart } from "next-vibe/logger/uptime";
+import { fetchServerFunction } from "next-vibe/platforms/web/frameworks/tanstack-start/server-function-fetch";
 import {
   DEGRADED_PUBLIC_DOCUMENT_HEADER,
   forwardDegradedPublicDocument,
@@ -341,6 +342,11 @@ const requestErrorLogMiddleware = createMiddleware().server(
 );
 
 export const startInstance = createStart(() => ({
-  requestMiddleware: [requestErrorLogMiddleware, proxyMiddleware, csrfMiddleware],
+  requestMiddleware: [
+    requestErrorLogMiddleware,
+    proxyMiddleware,
+    csrfMiddleware,
+  ],
   functionMiddleware: [fnErrorLogMiddleware],
+  serverFns: { fetch: fetchServerFunction },
 }));
