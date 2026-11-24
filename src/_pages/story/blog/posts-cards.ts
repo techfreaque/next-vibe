@@ -13,6 +13,7 @@ import { type BlogPostSlug, formatPostDate } from "./posts-meta";
 
 /** i18n key under `posts.*` for each post, in display order. */
 const POST_CARD_KEYS = [
+  ["janitor-ai-alternatives", "janitorAiAlternatives"],
   ["free-uncensored-ai", "freeUncensoredAi"],
   ["freedomgpt-alternatives", "freedomGptAlternatives"],
   ["gab-ai-alternatives", "gabAiAlternatives"],

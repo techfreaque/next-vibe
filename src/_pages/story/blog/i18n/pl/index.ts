@@ -102,6 +102,14 @@ export const translations: typeof enTranslations = {
         "Co naprawdę dają kredyty FreedomGPT, co przyznaje jego własne FAQ i sześć alternatyw od Venice po Ollamę, sprawdzonych na ich własnych stronach.",
       readTime: "9 min czytania",
     },
+    janitorAiAlternatives: {
+      title:
+        "Alternatywy dla Janitor AI do odgrywania ról. Postacie, pamięć i ceny",
+      category: "Porównanie",
+      excerpt:
+        "Jedenaście miejsc do pisania, gdy Janitor AI nie działa, gubi wątek albo dopisuje kwestie twojej postaci. Porównaj darmowe czaty, pamięć świata i ceny.",
+      readTime: "5 min czytania",
+    },
     gabAiAlternatives: {
       title: "Alternatywy dla Gab AI. Wolność słowa bez drobnego druku.",
       category: "Porównanie",

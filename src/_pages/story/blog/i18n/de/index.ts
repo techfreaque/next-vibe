@@ -102,6 +102,14 @@ export const translations: typeof enTranslations = {
         "Was die Credits von FreedomGPT wirklich bringen, was die eigene FAQ zugibt, und sechs Alternativen von Venice bis Ollama, geprüft auf ihren eigenen Seiten.",
       readTime: "9 Min. Lesezeit",
     },
+    janitorAiAlternatives: {
+      title:
+        "Alternativen zu Janitor AI für Rollenspiele: Figuren, Gedächtnis und Preise",
+      category: "Vergleich",
+      excerpt:
+        "Elf Alternativen für alle, deren Bot den Faden verliert oder ungefragt ihre Rolle übernimmt. Mit Preisen für Charakterchats, Lorebücher und KI-Begleiter.",
+      readTime: "5 Minuten Lesezeit",
+    },
     gabAiAlternatives: {
       title: "Gab AI Alternativen. Meinungsfreiheit ohne Kleingedrucktes.",
       category: "Vergleich",

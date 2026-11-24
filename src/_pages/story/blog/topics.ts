@@ -22,6 +22,7 @@ export type BlogTopic = (typeof BLOG_TOPICS)[number];
 
 /** Section of each post on the blog index. Exhaustive: a new post needs one. */
 export const POST_TOPICS: Record<BlogPostSlug, BlogTopic> = {
+  "janitor-ai-alternatives": "uncensored",
   "free-uncensored-ai": "uncensored",
   "freedomgpt-alternatives": "uncensored",
   "gab-ai-alternatives": "uncensored",
@@ -88,6 +89,7 @@ export const HUB_GUIDES: Record<TopicHub, readonly BlogPostSlug[]> = {
     "unbiased-ai-chatbot",
     "uncensored-ai-writer",
     "ai-roleplay-without-filter",
+    "janitor-ai-alternatives",
     "character-ai-alternatives",
     "venice-ai-alternatives",
     "nofiltergpt-alternatives",
@@ -245,6 +247,14 @@ const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
       "freedomgpt-alternatives",
       "nofiltergpt-alternatives",
       "character-ai-alternatives",
+    ],
+  },
+  "janitor-ai-alternatives": {
+    hub: "uncensored",
+    related: [
+      "character-ai-alternatives",
+      "ai-roleplay-without-filter",
+      "venice-ai-alternatives",
     ],
   },
   "character-ai-alternatives": {

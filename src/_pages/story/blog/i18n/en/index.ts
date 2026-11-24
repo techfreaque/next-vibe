@@ -98,6 +98,14 @@ export const translations = {
         "What FreedomGPT's credits really buy, what its own FAQ admits, and six alternatives from Venice to Ollama, checked on their own pages.",
       readTime: "9 min read",
     },
+    janitorAiAlternatives: {
+      title:
+        "Janitor AI alternatives for roleplay: characters, memory and prices",
+      category: "Comparison",
+      excerpt:
+        "Eleven ways to keep writing when Janitor AI goes down, loses the plot or speaks for your character. Compare free chat, lorebooks, model choice and companion plans.",
+      readTime: "5 min read",
+    },
     gabAiAlternatives: {
       title: "Gab AI alternatives. Free speech without the fine print.",
       category: "Comparison",

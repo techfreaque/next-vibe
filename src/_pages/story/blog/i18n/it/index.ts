@@ -100,6 +100,14 @@ export const translations: typeof enTranslations = {
         "Cosa comprano davvero i crediti di FreedomGPT, cosa ammette la sua FAQ e sei alternative da Venice a Ollama, verificate sulle loro pagine.",
       readTime: "9 min di lettura",
     },
+    janitorAiAlternatives: {
+      title:
+        "Alternative a Janitor AI per il gioco di ruolo: personaggi, memoria e prezzi",
+      category: "Confronto",
+      excerpt:
+        "Undici modi per continuare a scrivere quando Janitor AI è irraggiungibile, perde il filo o parla al posto tuo. Confronta chat gratuite, schede personaggio e abbonamenti.",
+      readTime: "5 minuti di lettura",
+    },
     gabAiAlternatives: {
       title: "Alternative a Gab AI. Libertà di parola senza clausole nascoste.",
       category: "Confronto",

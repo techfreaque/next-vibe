@@ -203,6 +203,7 @@ import { Route as LocaleStoryBlogGabAiAlternativesIndexRouteImport } from './rou
 import { Route as LocaleStoryBlogGrokAlternativeIndexRouteImport } from './routes/$locale.story.blog.grok-alternative.index'
 import { Route as LocaleStoryBlogHermesTheaTwoWayRemoteIndexRouteImport } from './routes/$locale.story.blog.hermes-thea-two-way-remote.index'
 import { Route as LocaleStoryBlogInteractiveCodingAgentIndexRouteImport } from './routes/$locale.story.blog.interactive-coding-agent.index'
+import { Route as LocaleStoryBlogJanitorAiAlternativesIndexRouteImport } from './routes/$locale.story.blog.janitor-ai-alternatives.index'
 import { Route as LocaleStoryBlogModelRefreshUncensoredProvidersIndexRouteImport } from './routes/$locale.story.blog.model-refresh-uncensored-providers.index'
 import { Route as LocaleStoryBlogNofiltergptAlternativesIndexRouteImport } from './routes/$locale.story.blog.nofiltergpt-alternatives.index'
 import { Route as LocaleStoryBlogOneCodebase13PlatformsIndexRouteImport } from './routes/$locale.story.blog.one-codebase-13-platforms.index'
@@ -1829,6 +1830,12 @@ const LocaleStoryBlogInteractiveCodingAgentIndexRoute =
   LocaleStoryBlogInteractiveCodingAgentIndexRouteImport.update({
     id: '/blog/interactive-coding-agent/',
     path: '/blog/interactive-coding-agent/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogJanitorAiAlternativesIndexRoute =
+  LocaleStoryBlogJanitorAiAlternativesIndexRouteImport.update({
+    id: '/blog/janitor-ai-alternatives/',
+    path: '/blog/janitor-ai-alternatives/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute =
@@ -5642,6 +5649,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/grok-alternative/': typeof LocaleStoryBlogGrokAlternativeIndexRoute
   '/$locale/story/blog/hermes-thea-two-way-remote/': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
   '/$locale/story/blog/interactive-coding-agent/': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
+  '/$locale/story/blog/janitor-ai-alternatives/': typeof LocaleStoryBlogJanitorAiAlternativesIndexRoute
   '/$locale/story/blog/model-refresh-uncensored-providers/': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   '/$locale/story/blog/nofiltergpt-alternatives/': typeof LocaleStoryBlogNofiltergptAlternativesIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms/': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
@@ -6387,6 +6395,7 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/grok-alternative': typeof LocaleStoryBlogGrokAlternativeIndexRoute
   '/$locale/story/blog/hermes-thea-two-way-remote': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
   '/$locale/story/blog/interactive-coding-agent': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
+  '/$locale/story/blog/janitor-ai-alternatives': typeof LocaleStoryBlogJanitorAiAlternativesIndexRoute
   '/$locale/story/blog/model-refresh-uncensored-providers': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   '/$locale/story/blog/nofiltergpt-alternatives': typeof LocaleStoryBlogNofiltergptAlternativesIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
@@ -7141,6 +7150,7 @@ export interface FileRoutesById {
   '/$locale/story/blog/grok-alternative/': typeof LocaleStoryBlogGrokAlternativeIndexRoute
   '/$locale/story/blog/hermes-thea-two-way-remote/': typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
   '/$locale/story/blog/interactive-coding-agent/': typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
+  '/$locale/story/blog/janitor-ai-alternatives/': typeof LocaleStoryBlogJanitorAiAlternativesIndexRoute
   '/$locale/story/blog/model-refresh-uncensored-providers/': typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   '/$locale/story/blog/nofiltergpt-alternatives/': typeof LocaleStoryBlogNofiltergptAlternativesIndexRoute
   '/$locale/story/blog/one-codebase-13-platforms/': typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
@@ -7895,6 +7905,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/grok-alternative/'
     | '/$locale/story/blog/hermes-thea-two-way-remote/'
     | '/$locale/story/blog/interactive-coding-agent/'
+    | '/$locale/story/blog/janitor-ai-alternatives/'
     | '/$locale/story/blog/model-refresh-uncensored-providers/'
     | '/$locale/story/blog/nofiltergpt-alternatives/'
     | '/$locale/story/blog/one-codebase-13-platforms/'
@@ -8640,6 +8651,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/grok-alternative'
     | '/$locale/story/blog/hermes-thea-two-way-remote'
     | '/$locale/story/blog/interactive-coding-agent'
+    | '/$locale/story/blog/janitor-ai-alternatives'
     | '/$locale/story/blog/model-refresh-uncensored-providers'
     | '/$locale/story/blog/nofiltergpt-alternatives'
     | '/$locale/story/blog/one-codebase-13-platforms'
@@ -9393,6 +9405,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/grok-alternative/'
     | '/$locale/story/blog/hermes-thea-two-way-remote/'
     | '/$locale/story/blog/interactive-coding-agent/'
+    | '/$locale/story/blog/janitor-ai-alternatives/'
     | '/$locale/story/blog/model-refresh-uncensored-providers/'
     | '/$locale/story/blog/nofiltergpt-alternatives/'
     | '/$locale/story/blog/one-codebase-13-platforms/'
@@ -11503,6 +11516,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/interactive-coding-agent'
       fullPath: '/$locale/story/blog/interactive-coding-agent/'
       preLoaderRoute: typeof LocaleStoryBlogInteractiveCodingAgentIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/janitor-ai-alternatives/': {
+      id: '/$locale/story/blog/janitor-ai-alternatives/'
+      path: '/blog/janitor-ai-alternatives'
+      fullPath: '/$locale/story/blog/janitor-ai-alternatives/'
+      preLoaderRoute: typeof LocaleStoryBlogJanitorAiAlternativesIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/model-refresh-uncensored-providers/': {
@@ -15498,6 +15518,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogGrokAlternativeIndexRoute: typeof LocaleStoryBlogGrokAlternativeIndexRoute
   LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute: typeof LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute
   LocaleStoryBlogInteractiveCodingAgentIndexRoute: typeof LocaleStoryBlogInteractiveCodingAgentIndexRoute
+  LocaleStoryBlogJanitorAiAlternativesIndexRoute: typeof LocaleStoryBlogJanitorAiAlternativesIndexRoute
   LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute: typeof LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute
   LocaleStoryBlogNofiltergptAlternativesIndexRoute: typeof LocaleStoryBlogNofiltergptAlternativesIndexRoute
   LocaleStoryBlogOneCodebase13PlatformsIndexRoute: typeof LocaleStoryBlogOneCodebase13PlatformsIndexRoute
@@ -15592,6 +15613,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogHermesTheaTwoWayRemoteIndexRoute,
   LocaleStoryBlogInteractiveCodingAgentIndexRoute:
     LocaleStoryBlogInteractiveCodingAgentIndexRoute,
+  LocaleStoryBlogJanitorAiAlternativesIndexRoute:
+    LocaleStoryBlogJanitorAiAlternativesIndexRoute,
   LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute:
     LocaleStoryBlogModelRefreshUncensoredProvidersIndexRoute,
   LocaleStoryBlogNofiltergptAlternativesIndexRoute:
