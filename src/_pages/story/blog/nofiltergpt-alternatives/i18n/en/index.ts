@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "NoFilterGPT Alternatives: Uncensored AI Chats Compared (2026)",
     description:
-      "NoFilterGPT alternatives checked on their own pages: Venice, uncensored.ai, FreedomGPT, NanoGPT, Gab AI, LM Studio and {{appName}}. Models, filter, privacy, price, API.",
+      "Compare NoFilterGPT with Venice, Unrestricted.chat, {{appName}} and local AI like Ollama. Check model choice, free limits, privacy and API access.",
     category: "Comparison",
     imageAlt: "NoFilterGPT alternatives, compared side by side",
     keywords:
@@ -12,7 +12,7 @@ export const translations = {
     backToBlog: "Back to Blog",
     category: "Comparison",
     readTime: "8 min read",
-    title: "NoFilterGPT alternatives. More models, same freedom.",
+    title: "NoFilterGPT alternatives with more model choice",
     subtitle:
       "{{count}} alternatives and {{appName}}, compared on what their own pricing, privacy and filter pages say.",
   },
@@ -51,8 +51,6 @@ export const translations = {
   },
   table: {
     title: "All of them, side by side",
-    intro:
-      "Scroll sideways on mobile. Competitor facts checked {{date}} on their own pages. {{appName}} facts read live from our config.",
   },
   us: {
     title: "{{appName}}: every kind of model in one chat",

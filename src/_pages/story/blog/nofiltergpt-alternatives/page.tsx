@@ -43,12 +43,9 @@ import { Callout, CardLink, Cta } from "../../_shared/marketing";
 import {
   allPlansText,
   CompareInlineLinks,
-  CompareTable,
   formatCompareDate,
   freeText,
   LINK_CLASS,
-  platformRow,
-  usRow,
 } from "../../compare/_shared/compare-ui";
 import {
   COMPARE_CHECKED_DATE,
@@ -59,6 +56,12 @@ import {
 } from "../../compare/_shared/platforms";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import { scopedTranslation as compareScopedTranslation } from "../../compare/i18n";
+import {
+  AlternativesComparison,
+  alternativesFaq,
+  AlternativesLinks,
+  alternativesTotal,
+} from "../_alternatives/comparison";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -66,12 +69,12 @@ export const revalidate = 3600;
 const SLUG = "nofiltergpt-alternatives";
 
 /** Day the NoFilterGPT facts in this post were read on its own pages. */
-const NOFILTERGPT_CHECKED_DATE = "2026-11-23";
+const NOFILTERGPT_CHECKED_DATE = "2026-11-24";
 
 /** NoFilterGPT's own pages the facts in this post come from. */
 const NOFILTERGPT_SOURCES = {
   home: "https://nofiltergpt.com/",
-  privacy: "https://nofiltergpt.com/privacy",
+  privacy: "https://nofiltergpt.com/privacy/",
 } as const;
 
 /** NoFilterGPT's paid plan, USD per month, from its home page. */
@@ -151,15 +154,14 @@ export function TanstackPage({
     count: ALTERNATIVES.length,
     proPrice,
   };
-  const rows = [
-    usRow(locale, compareT, us),
-    ...ALTERNATIVES.map((key) => platformRow(PLATFORMS[key], locale, compareT)),
+  const faq = [
+    ...FAQ_KEYS.map((key) => ({
+      key,
+      question: t(`faq.${key}.q`, stats),
+      answer: t(`faq.${key}.a`, stats),
+    })),
+    alternativesFaq(SLUG, locale, us.appName),
   ];
-  const faq = FAQ_KEYS.map((key) => ({
-    key,
-    question: t(`faq.${key}.q`, stats),
-    answer: t(`faq.${key}.a`, stats),
-  }));
 
   return (
     <Div className="min-h-screen bg-background">
@@ -169,7 +171,10 @@ export function TanstackPage({
         readTime={t("hero.readTime")}
         post={{ slug: SLUG, locale }}
         title={t("hero.title")}
-        subtitle={t("hero.subtitle", stats)}
+        subtitle={t("hero.subtitle", {
+          ...stats,
+          count: alternativesTotal(SLUG, ALTERNATIVES),
+        })}
       />
 
       <ArticleBody>
@@ -229,13 +234,13 @@ export function TanstackPage({
           />
         </ArticleSection>
 
-        <ArticleSection
-          id="table"
+        <AlternativesComparison
+          locale={locale}
+          slug={SLUG}
+          us={us}
+          platforms={ALTERNATIVES}
           title={t("table.title")}
-          intro={t("table.intro", stats)}
-        >
-          <CompareTable rows={rows} locale={locale} />
-        </ArticleSection>
+        />
 
         <ArticleSection
           id="us"
@@ -396,10 +401,13 @@ export function TanstackPage({
             />
             <CompareInlineLinks
               locale={locale}
+              includeHub={false}
               versus={["venice", "uncensoredAi", "freedomGpt", "nanoGpt"]}
             />
           </Div>
         </ArticleSection>
+
+        <AlternativesLinks locale={locale} exclude={SLUG} />
 
         <ArticleEnd
           post={{ slug: SLUG, locale }}
