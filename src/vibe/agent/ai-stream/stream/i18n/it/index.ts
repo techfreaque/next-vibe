@@ -695,6 +695,11 @@ export const translations: typeof enTranslations = {
     imagePlaceholder: "Descrivi un'immagine per generare...",
     audioPlaceholder: "Descrivere audio o musica per generare...",
     noPermission: "Non hai il permesso di postare qui",
+    signInToPost: {
+      title: "Account gratuito per scrivere",
+      description:
+        "Le discussioni pubbliche le legge chiunque. Per aprirne una o rispondere serve un account gratuito, e poi torni subito qui.",
+    },
     noCredits: {
       title: "Crediti esauriti",
       addCredits: "Aggiungi crediti",
@@ -738,7 +743,7 @@ export const translations: typeof enTranslations = {
       description:
         "Con un account gratuito hai {{signedIn}} crediti al mese, {{max}} con la newsletter. Dopo la registrazione torni subito qui.",
       signUp: "Iscriviti gratis",
-      haveAccount: "Hai un conto?",
+      haveAccount: "Hai già un account?",
       logIn: "Accedi",
     },
     member: {

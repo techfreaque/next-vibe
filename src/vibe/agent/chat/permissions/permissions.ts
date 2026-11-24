@@ -26,9 +26,9 @@
 
 import "server-only";
 
-import type { DefaultFolderId } from "next-vibe/core/execution-context";
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
-import type { JwtPayloadType } from "next-vibe/identity/auth/types";
+import type { JwtPayloadType, JWTPublicPayloadType } from "next-vibe/identity/auth/types";
 import {
   type UserPermissionRoleValue,
   UserRole,
@@ -217,7 +217,15 @@ export async function hasRolePermission(
     return effectiveRoles.includes(UserRole.PUBLIC);
   }
 
-  // Authenticated users - check their roles
+  // Authenticated users hold CUSTOMER implicitly, exactly as the endpoint auth
+  // layer grants it (AuthRepository.getUserRolesInternal). A signed-in account
+  // without a stored customer row (older/admin-created accounts) must not see
+  // less than a guest.
+  if (user.id && effectiveRoles.includes(UserRole.CUSTOMER)) {
+    return true;
+  }
+
+  // Authenticated users - check their stored roles (ADMIN, MODERATOR, ...)
   if (user.id) {
     const userRoles = await UserRolesRepository.getUserRoles(
       user.id,
@@ -627,6 +635,19 @@ export async function canEditThread(
   return await hasRolePermission(user, effectiveRoles, logger, locale);
 }
 
+// Guest replies can only target their own lead-owned Background threads.
+export function canGuestPostInThread(
+  user: JWTPublicPayloadType,
+  thread: Pick<ChatThread, "rootFolderId" | "userId" | "leadId">,
+): boolean {
+  return (
+    thread.rootFolderId === DefaultFolderId.BACKGROUND &&
+    thread.userId === null &&
+    thread.leadId !== null &&
+    thread.leadId === user.leadId
+  );
+}
+
 /**
  * Check if user can post messages in a thread
  * Uses rolesPost with inheritance from parent folder
@@ -642,10 +663,13 @@ export async function canPostInThread(
   locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
-  const userId = user.id;
+  if (user.isPublic) {
+    return canGuestPostInThread(user, thread);
+  }
 
+  const userId = user.id;
   // Owner can always post
-  if (userId && isOwner(userId, thread.userId)) {
+  if (isOwner(userId, thread.userId)) {
     return true;
   }
 

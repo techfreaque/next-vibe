@@ -8,6 +8,8 @@ import "server-only";
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import {
+  ErrorResponseTypes,
+  fail,
   type ResponseType,
   success,
 } from "next-vibe/core/route/response.schema";
@@ -23,6 +25,7 @@ import {
   chatThreads,
 } from "../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
+import { canGuestPostInThread } from "../../../chat/permissions/permissions";
 import { parseSkillId } from "../../../chat/slugify";
 import { createMessagesEmitter } from "../../../chat/threads/[threadId]/messages/emitter";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
@@ -50,11 +53,12 @@ export async function runAutoQueueBranch(params: {
   data: AiStreamPostRequestOutput;
   user: JwtPayloadType;
   userId: string | undefined;
+  t: AiStreamT;
   logger: EndpointLogger;
   /** TEST-ONLY browser E2E fixture scope (see CreateAiStreamParams). */
   fixtureScopeId: string | undefined;
 }): Promise<ResponseType<AiStreamPostResponseOutput> | null> {
-  const { data, user, userId, logger } = params;
+  const { data, user, userId, t, logger } = params;
 
   // Fast reject the non-queue shape before the DB read.
   if (
@@ -72,7 +76,12 @@ export async function runAutoQueueBranch(params: {
   // truth (was the in-process StreamRegistry.isActive, which only saw this
   // process's streams). Only queue when a stream is actually running for the thread.
   const [threadRow] = await db
-    .select({ streamingState: chatThreads.streamingState })
+    .select({
+      streamingState: chatThreads.streamingState,
+      rootFolderId: chatThreads.rootFolderId,
+      userId: chatThreads.userId,
+      leadId: chatThreads.leadId,
+    })
     .from(chatThreads)
     .where(eq(chatThreads.id, data.threadId))
     .limit(1);
@@ -81,6 +90,17 @@ export async function runAutoQueueBranch(params: {
     threadRow?.streamingState === ThreadStreamingState.WAITING;
   if (!isStreaming) {
     return null;
+  }
+
+  // Queued messages bypass normal stream setup, including the reply gate.
+  if (user.isPublic && !canGuestPostInThread(user, threadRow)) {
+    logger.warn("[AI Stream] Guest denied queued reply", {
+      threadId: data.threadId,
+    });
+    return fail({
+      message: t("route.errors.threadPostForbidden"),
+      errorType: ErrorResponseTypes.FORBIDDEN,
+    });
   }
 
   const authorName = userId

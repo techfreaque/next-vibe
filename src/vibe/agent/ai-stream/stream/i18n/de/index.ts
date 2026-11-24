@@ -677,6 +677,11 @@ export const translations: typeof enTranslations = {
     imagePlaceholder: "Beschreibe ein zu generierendes Bild...",
     audioPlaceholder: "Beschreibe Audio oder Musik zum Generieren...",
     noPermission: "Du hast keine Berechtigung, hier zu posten",
+    signInToPost: {
+      title: "Zum Posten ein Gratis-Konto",
+      description:
+        "Öffentliche Threads liest jeder. Eigene starten und antworten geht mit einem kostenlosen Konto. Danach landest du direkt wieder hier.",
+    },
     noCredits: {
       title: "Keine Credits mehr",
       addCredits: "Credits aufladen",

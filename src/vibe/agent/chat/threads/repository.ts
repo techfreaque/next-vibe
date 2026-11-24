@@ -33,6 +33,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import { leads } from "next-vibe/identity/lead/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
+import { DEFAULT_FOLDER_CONFIGS } from "../config";
 import { type ChatFolder, chatFolders, chatThreads } from "../db";
 import { ThreadStatus, ThreadStreamingState } from "../enum";
 import { scopedTranslation as chatScopedTranslation } from "../i18n";
@@ -73,7 +74,8 @@ export class ThreadsRepository {
     const { threadId, isIncognito, userId, user, logger, locale } = params;
     const { t } = scopedTranslation.scopedT(locale);
 
-    if (!isIncognito && userId) {
+    // Check guest replies against the stored thread and its ownership too.
+    if (!isIncognito) {
       const [existing] = await db
         .select()
         .from(chatThreads)
@@ -107,7 +109,8 @@ export class ThreadsRepository {
       );
 
       if (!hasPermission) {
-        logger.error("User does not have permission to post in thread", {
+        // Correct denial returned as FORBIDDEN - warn, not error.
+        logger.warn("User does not have permission to post in thread", {
           threadId,
           userId,
           threadUserId: existing.userId,
@@ -314,7 +317,10 @@ export class ThreadsRepository {
         });
       }
 
-      if (rootFolderId === DefaultFolderId.PUBLIC) {
+      if (
+        rootFolderId === DefaultFolderId.PUBLIC ||
+        (user.isPublic && rootFolderId !== DefaultFolderId.BACKGROUND)
+      ) {
         const hasPermission = await hasRolePermission(
           user,
           rootConfig.rolesCreateThread,
@@ -361,12 +367,11 @@ export class ThreadsRepository {
         rootFolderId,
         subFolderId,
       });
-      const hasPermission = await canCreateThreadInFolder(
-        user,
-        folder,
-        logger,
-        locale,
-      );
+      const hasPermission =
+        (!user.isPublic ||
+          (rootFolderId === DefaultFolderId.BACKGROUND &&
+            folder.rootFolderId === rootFolderId)) &&
+        (await canCreateThreadInFolder(user, folder, logger, locale));
 
       logger.debug("Permission check result", {
         hasPermission,
@@ -395,7 +400,7 @@ export class ThreadsRepository {
       }
     }
 
-    let resolvedLeadId: string | null = leadId ?? null;
+    let resolvedLeadId = (user.isPublic ? user.leadId : leadId) ?? null;
     if (resolvedLeadId) {
       const [leadExists] = await db
         .select({ id: leads.id })
@@ -814,8 +819,7 @@ export class ThreadsRepository {
 
         folder = folderResult;
       } else if (data.rootFolderId === DefaultFolderId.PUBLIC) {
-        // Creating thread in PUBLIC root - need to check ADMIN permission
-        // Create a virtual folder object for permission check
+        // Use the same Public root roles as stream intake.
         folder = {
           id: "public-root",
           userId: null, // Root folders have no owner
@@ -831,7 +835,7 @@ export class ThreadsRepository {
           pinned: false,
           rolesView: [],
           rolesManage: [],
-          rolesCreateThread: [],
+          rolesCreateThread: [...DEFAULT_FOLDER_CONFIGS.public.rolesCreateThread],
           rolesPost: [],
           rolesModerate: [],
           rolesAdmin: [],

@@ -1032,6 +1032,7 @@ export class AiStreamRepository {
       data,
       user,
       userId,
+      t: aiStreamT,
       logger,
       fixtureScopeId,
     });

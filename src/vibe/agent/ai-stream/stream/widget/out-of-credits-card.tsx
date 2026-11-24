@@ -156,8 +156,37 @@ function CardHead({
 /** Account first: what a free account gives, sign up, back to this chat. */
 function GuestBody({ locale }: { locale: CountryLanguage }): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
-  const pathname = usePathname();
   const pricing = getPricingParams(locale);
+  return (
+    <GuestAuthBody
+      signupTestId="out-of-credits-signup"
+      locale={locale}
+      title={t("outOfCredits.guest.title")}
+      description={t("outOfCredits.guest.description", {
+        signedIn: pricing.freeCreditsSignedIn,
+        max: pricing.freeCreditsMax,
+      })}
+    />
+  );
+}
+
+/**
+ * Guest head + sign up (primary) / log in (secondary). Both return to the
+ * current page after auth.
+ */
+function GuestAuthBody({
+  locale,
+  title,
+  description,
+  signupTestId,
+}: {
+  locale: CountryLanguage;
+  title: string;
+  description: string;
+  signupTestId?: string;
+}): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  const pathname = usePathname();
   // Signup and login both return to this exact chat.
   const callback = `callbackUrl=${encodeURIComponent(pathname)}`;
 
@@ -165,17 +194,14 @@ function GuestBody({ locale }: { locale: CountryLanguage }): JSX.Element {
     <Div className="flex flex-col gap-3 @2xl/ooc:flex-row @2xl/ooc:items-center @2xl/ooc:gap-6">
       <CardHead
         icon={<Gift className="h-4 w-4" />}
-        title={t("outOfCredits.guest.title")}
-        description={t("outOfCredits.guest.description", {
-          signedIn: pricing.freeCreditsSignedIn,
-          max: pricing.freeCreditsMax,
-        })}
+        title={title}
+        description={description}
       />
       <Div className="flex flex-shrink-0 flex-col gap-2 @md/ooc:ml-11 @md/ooc:flex-row @md/ooc:flex-wrap @md/ooc:items-center @md/ooc:gap-x-4 @md/ooc:gap-y-2 @2xl/ooc:ml-0">
         <Button asChild size="sm" className="w-full @md/ooc:w-auto">
           <Link
+            data-testid={signupTestId}
             href={`/${locale}/user/signup?${callback}`}
-            data-testid="out-of-credits-signup"
           >
             <Gift className="mr-1.5 h-4 w-4" />
             {t("outOfCredits.guest.signUp")}
@@ -191,6 +217,33 @@ function GuestBody({ locale }: { locale: CountryLanguage }): JSX.Element {
           </Link>
         </P>
       </Div>
+    </Div>
+  );
+}
+
+/**
+ * Guest in a folder only signed-in users may post in (Public): the way to an
+ * account instead of a bare "no permission" line. Same chrome as the
+ * out-of-credits card in the composer.
+ */
+export function SignInToPostCard({
+  locale,
+  className,
+}: {
+  locale: CountryLanguage;
+  className?: string;
+}): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  return (
+    <Div
+      data-testid="sign-in-to-post-card"
+      className={cn("@container/ooc relative w-full px-1 pb-3 pt-1", className)}
+    >
+      <GuestAuthBody
+        locale={locale}
+        title={t("input.signInToPost.title")}
+        description={t("input.signInToPost.description")}
+      />
     </Div>
   );
 }

@@ -676,6 +676,11 @@ export const translations = {
     imagePlaceholder: "Describe an image to generate...",
     audioPlaceholder: "Describe audio or music to generate...",
     noPermission: "You don't have permission to post here",
+    signInToPost: {
+      title: "Free account to post",
+      description:
+        "Anyone can read the public threads. Starting one or replying takes a free account, and you land right back here.",
+    },
     noCredits: {
       title: "No credits left",
       addCredits: "Add credits",

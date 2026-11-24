@@ -18,16 +18,19 @@ import {
   deleteE2EUser,
   rootFolderTab,
   seedThread,
+  signInAs,
   suppressOnboarding,
 } from "../testing/e2e-seed";
 import publicFeedEndpoints, { FeedSortMode } from "./definition";
 import { scopedTranslation } from "./i18n";
+import { scopedTranslation as aiStreamScopedTranslation } from "../../ai-stream/stream/i18n";
 
 const endpoint = publicFeedEndpoints.GET;
 
 describe("E2E: community feed", () => {
   const e2e = useE2E("agent/chat/public-feed");
   const { t } = scopedTranslation.scopedT(defaultLocale);
+  const { t: tStream } = aiStreamScopedTranslation.scopedT(defaultLocale);
 
   e2e.it("an anonymous visitor opens the feed, re-sorts it and finds a thread by search", async (fixtures) => {
     const { capture, page, context, uniqueEmail, cleanup } = fixtures;
@@ -81,5 +84,39 @@ describe("E2E: community feed", () => {
     const nothing = await capture(endpoint, () => searchBox.fill(`${stamp}-no-such-thread`));
     expect(nothing.response.success).toBe(true);
     await page.getByText(t("get.feed.emptySearch"), { exact: true }).waitFor();
+  });
+
+  e2e.it("in a public thread a guest gets the sign-up card, a signed-in user gets the textarea", async (fixtures) => {
+    const { page, context, uniqueEmail, cleanup } = fixtures;
+    const author = await createE2EUser(uniqueEmail("feed-thread-author"));
+    cleanup(() => deleteE2EUser(author));
+    const threadId = await seedThread(author, {
+      rootFolderId: DefaultFolderId.PUBLIC,
+      title: `E2E feed${Date.now()} reply target`,
+      published: true,
+    });
+    const threadPath = `/threads/${DefaultFolderId.PUBLIC}/${threadId}`;
+    await suppressOnboarding(context);
+
+    // Guest: reading is open, replying needs an account
+    await fixtures.gotoReady(threadPath, chatReady(page));
+    const card = page.getByTestId("sign-in-to-post-card");
+    await card.waitFor();
+    expect(await page.getByText(tStream("input.noPermission")).count()).toBe(0);
+    const signUpHref = await card
+      .getByRole("link", { name: tStream("outOfCredits.guest.signUp") })
+      .getAttribute("href");
+    // Sign up returns to this thread
+    expect(signUpHref).toContain(
+      `callbackUrl=${encodeURIComponent(`/${defaultLocale}${threadPath}`)}`,
+    );
+
+    // Signed in (customer): the composer textarea, no sign-up card
+    const account = await createE2EUser(uniqueEmail("feed-poster"));
+    cleanup(() => deleteE2EUser(account));
+    await signInAs(fixtures, account);
+    await fixtures.gotoReady(threadPath, chatReady(page));
+    await page.locator("textarea").first().waitFor();
+    expect(await card.count()).toBe(0);
   });
 });

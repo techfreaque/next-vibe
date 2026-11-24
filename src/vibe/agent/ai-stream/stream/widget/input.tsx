@@ -4,6 +4,7 @@
  * Chat Input Component
  * Main input area for sending messages with voice support
  */
+import { DefaultFolderId } from "next-vibe/core/execution-context";
 import { endpoints as cronIdEndpoints } from "next-vibe/tasks/cron/[id]/definition";
 import { Button } from "next-vibe/ui/components/button";
 import { Div } from "next-vibe/ui/components/div";
@@ -112,7 +113,7 @@ import { useVoiceRecording } from "../hooks/use-voice-recording";
 import { useVoiceRuntimeState } from "../hooks/voice-mode/store";
 import { scopedTranslation as aiStreamScopedTranslation } from "../i18n";
 import { TOUR_DATA_ATTRS } from "./chat-ui/data-attrs";
-import { OutOfCreditsCard } from "./out-of-credits-card";
+import { OutOfCreditsCard, SignInToPostCard } from "./out-of-credits-card";
 import { Selector } from "./selector";
 import { ToolsButton } from "./tools-button";
 import { useInputHandlers } from "./use-input-handlers";
@@ -470,6 +471,14 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   // keep the textarea with the "insufficient credits" notice.
   const outOfCredits =
     canPost && (noCredits || (user.isPublic && insufficientCredits));
+  // Guest in Public: reading is open, posting needs an account. The sign-up
+  // card replaces the textarea instead of a bare "no permission" line.
+  const guestNeedsAccount =
+    !canPost &&
+    user.isPublic &&
+    currentRootFolderId === DefaultFolderId.PUBLIC &&
+    !rootPermissionsPending &&
+    !subFolderPermissionsPending;
 
   // Model-type-aware UI
   // Chat stream pipeline only handles chat models; image/audio go through separate endpoints.
@@ -681,7 +690,10 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
     !voice.isRecording && !voice.isProcessing && !showStopButton;
   // No empty, disabled textarea under the out-of-credits card
   const showTextarea =
-    !voice.isRecording && !voice.isProcessing && !outOfCredits;
+    !voice.isRecording &&
+    !voice.isProcessing &&
+    !outOfCredits &&
+    !guestNeedsAccount;
 
   return (
     <Form
@@ -711,6 +723,10 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
           }
           className="mb-2 @sm:mb-3"
         />
+      )}
+
+      {guestNeedsAccount && (
+        <SignInToPostCard locale={locale} className="mb-2 @sm:mb-3" />
       )}
 
       {/* One-time 18+ consent for uncensored models (selection or held send) */}

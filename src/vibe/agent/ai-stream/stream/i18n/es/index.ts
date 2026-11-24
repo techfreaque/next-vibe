@@ -691,6 +691,11 @@ export const translations: typeof enTranslations = {
     imagePlaceholder: "Describir una imagen para generar...",
     audioPlaceholder: "Describir audio o música para generar...",
     noPermission: "No tienes permiso para publicar aquí.",
+    signInToPost: {
+      title: "Cuenta gratis para publicar",
+      description:
+        "Los hilos públicos los lee cualquiera. Para abrir uno o responder necesitas una cuenta gratis, y vuelves justo aquí.",
+    },
     noCredits: {
       title: "No quedan créditos",
       addCredits: "Agregar créditos",

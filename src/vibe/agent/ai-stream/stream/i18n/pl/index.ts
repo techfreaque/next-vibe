@@ -669,6 +669,11 @@ export const translations: typeof enTranslations = {
     imagePlaceholder: "Opisz obraz do wygenerowania...",
     audioPlaceholder: "Opisz dźwięk lub muzykę do wygenerowania...",
     noPermission: "Nie masz uprawnień do publikowania tutaj",
+    signInToPost: {
+      title: "Darmowe konto, żeby pisać",
+      description:
+        "Publiczne wątki czyta każdy. Żeby założyć własny albo odpowiedzieć, wystarczy darmowe konto. Potem wracasz prosto tutaj.",
+    },
     noCredits: {
       title: "Skończyły się kredyty",
       addCredits: "Doładuj kredyty",
