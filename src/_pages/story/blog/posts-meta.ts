@@ -8,6 +8,7 @@ import { getLanguageFromLocale } from "next-vibe/core/i18n/core/language-utils";
 
 export const BLOG_POST_DATES = {
   "poe-alternatives": "2026-11-24",
+  "typingmind-alternatives": "2026-11-24",
   "janitor-ai-alternatives": "2026-11-24",
   "free-uncensored-ai": "2026-11-24",
   "freedomgpt-alternatives": "2026-11-24",

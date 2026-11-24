@@ -21,6 +21,13 @@ export const translations = {
         "Compare Poe alternatives for one hosted balance, per-use billing or your own keys. See current prices, trade-offs and where unbottled.ai fits.",
       readTime: "7 min read",
     },
+    typingMindAlternatives: {
+      title: "8 TypingMind alternatives for your AI chat setup",
+      category: "Comparison",
+      excerpt:
+        "Compare TypingMind alternatives for your own API keys, local models or hosted chat. See license costs, model billing and where unbottled.ai fits.",
+      readTime: "7 min read",
+    },
     deepseekUncensored: {
       title: "DeepSeek uncensored. What actually removes the filter.",
       category: "Model Guide",

@@ -216,6 +216,7 @@ import { Route as LocaleStoryBlogReferralForBeginnersIndexRouteImport } from './
 import { Route as LocaleStoryBlogReferralForDevelopersIndexRouteImport } from './routes/$locale.story.blog.referral-for-developers.index'
 import { Route as LocaleStoryBlogSkillSharingEconomyIndexRouteImport } from './routes/$locale.story.blog.skill-sharing-economy.index'
 import { Route as LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRouteImport } from './routes/$locale.story.blog.type-checker-made-ai-stop-lying.index'
+import { Route as LocaleStoryBlogTypingmindAlternativesIndexRouteImport } from './routes/$locale.story.blog.typingmind-alternatives.index'
 import { Route as LocaleStoryBlogUnbiasedAiChatbotIndexRouteImport } from './routes/$locale.story.blog.unbiased-ai-chatbot.index'
 import { Route as LocaleStoryBlogUnbottledApiInCodingToolsIndexRouteImport } from './routes/$locale.story.blog.unbottled-api-in-coding-tools.index'
 import { Route as LocaleStoryBlogUncensoredAiImageGeneratorIndexRouteImport } from './routes/$locale.story.blog.uncensored-ai-image-generator.index'
@@ -1909,6 +1910,12 @@ const LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute =
   LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRouteImport.update({
     id: '/blog/type-checker-made-ai-stop-lying/',
     path: '/blog/type-checker-made-ai-stop-lying/',
+    getParentRoute: () => LocaleStoryRoute,
+  } as any)
+const LocaleStoryBlogTypingmindAlternativesIndexRoute =
+  LocaleStoryBlogTypingmindAlternativesIndexRouteImport.update({
+    id: '/blog/typingmind-alternatives/',
+    path: '/blog/typingmind-alternatives/',
     getParentRoute: () => LocaleStoryRoute,
   } as any)
 const LocaleStoryBlogUnbiasedAiChatbotIndexRoute =
@@ -5669,6 +5676,7 @@ export interface FileRoutesByFullPath {
   '/$locale/story/blog/referral-for-developers/': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
   '/$locale/story/blog/skill-sharing-economy/': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying/': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
+  '/$locale/story/blog/typingmind-alternatives/': typeof LocaleStoryBlogTypingmindAlternativesIndexRoute
   '/$locale/story/blog/unbiased-ai-chatbot/': typeof LocaleStoryBlogUnbiasedAiChatbotIndexRoute
   '/$locale/story/blog/unbottled-api-in-coding-tools/': typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
   '/$locale/story/blog/uncensored-ai-image-generator/': typeof LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute
@@ -6416,6 +6424,7 @@ export interface FileRoutesByTo {
   '/$locale/story/blog/referral-for-developers': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
   '/$locale/story/blog/skill-sharing-economy': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
+  '/$locale/story/blog/typingmind-alternatives': typeof LocaleStoryBlogTypingmindAlternativesIndexRoute
   '/$locale/story/blog/unbiased-ai-chatbot': typeof LocaleStoryBlogUnbiasedAiChatbotIndexRoute
   '/$locale/story/blog/unbottled-api-in-coding-tools': typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
   '/$locale/story/blog/uncensored-ai-image-generator': typeof LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute
@@ -7172,6 +7181,7 @@ export interface FileRoutesById {
   '/$locale/story/blog/referral-for-developers/': typeof LocaleStoryBlogReferralForDevelopersIndexRoute
   '/$locale/story/blog/skill-sharing-economy/': typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   '/$locale/story/blog/type-checker-made-ai-stop-lying/': typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
+  '/$locale/story/blog/typingmind-alternatives/': typeof LocaleStoryBlogTypingmindAlternativesIndexRoute
   '/$locale/story/blog/unbiased-ai-chatbot/': typeof LocaleStoryBlogUnbiasedAiChatbotIndexRoute
   '/$locale/story/blog/unbottled-api-in-coding-tools/': typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
   '/$locale/story/blog/uncensored-ai-image-generator/': typeof LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute
@@ -7928,6 +7938,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/referral-for-developers/'
     | '/$locale/story/blog/skill-sharing-economy/'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying/'
+    | '/$locale/story/blog/typingmind-alternatives/'
     | '/$locale/story/blog/unbiased-ai-chatbot/'
     | '/$locale/story/blog/unbottled-api-in-coding-tools/'
     | '/$locale/story/blog/uncensored-ai-image-generator/'
@@ -8675,6 +8686,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/referral-for-developers'
     | '/$locale/story/blog/skill-sharing-economy'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying'
+    | '/$locale/story/blog/typingmind-alternatives'
     | '/$locale/story/blog/unbiased-ai-chatbot'
     | '/$locale/story/blog/unbottled-api-in-coding-tools'
     | '/$locale/story/blog/uncensored-ai-image-generator'
@@ -9430,6 +9442,7 @@ export interface FileRouteTypes {
     | '/$locale/story/blog/referral-for-developers/'
     | '/$locale/story/blog/skill-sharing-economy/'
     | '/$locale/story/blog/type-checker-made-ai-stop-lying/'
+    | '/$locale/story/blog/typingmind-alternatives/'
     | '/$locale/story/blog/unbiased-ai-chatbot/'
     | '/$locale/story/blog/unbottled-api-in-coding-tools/'
     | '/$locale/story/blog/uncensored-ai-image-generator/'
@@ -11620,6 +11633,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/type-checker-made-ai-stop-lying'
       fullPath: '/$locale/story/blog/type-checker-made-ai-stop-lying/'
       preLoaderRoute: typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRouteImport
+      parentRoute: typeof LocaleStoryRoute
+    }
+    '/$locale/story/blog/typingmind-alternatives/': {
+      id: '/$locale/story/blog/typingmind-alternatives/'
+      path: '/blog/typingmind-alternatives'
+      fullPath: '/$locale/story/blog/typingmind-alternatives/'
+      preLoaderRoute: typeof LocaleStoryBlogTypingmindAlternativesIndexRouteImport
       parentRoute: typeof LocaleStoryRoute
     }
     '/$locale/story/blog/unbiased-ai-chatbot/': {
@@ -15551,6 +15571,7 @@ interface LocaleStoryRouteChildren {
   LocaleStoryBlogReferralForDevelopersIndexRoute: typeof LocaleStoryBlogReferralForDevelopersIndexRoute
   LocaleStoryBlogSkillSharingEconomyIndexRoute: typeof LocaleStoryBlogSkillSharingEconomyIndexRoute
   LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute: typeof LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute
+  LocaleStoryBlogTypingmindAlternativesIndexRoute: typeof LocaleStoryBlogTypingmindAlternativesIndexRoute
   LocaleStoryBlogUnbiasedAiChatbotIndexRoute: typeof LocaleStoryBlogUnbiasedAiChatbotIndexRoute
   LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute: typeof LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute
   LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute: typeof LocaleStoryBlogUncensoredAiImageGeneratorIndexRoute
@@ -15660,6 +15681,8 @@ const LocaleStoryRouteChildren: LocaleStoryRouteChildren = {
     LocaleStoryBlogSkillSharingEconomyIndexRoute,
   LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute:
     LocaleStoryBlogTypeCheckerMadeAiStopLyingIndexRoute,
+  LocaleStoryBlogTypingmindAlternativesIndexRoute:
+    LocaleStoryBlogTypingmindAlternativesIndexRoute,
   LocaleStoryBlogUnbiasedAiChatbotIndexRoute:
     LocaleStoryBlogUnbiasedAiChatbotIndexRoute,
   LocaleStoryBlogUnbottledApiInCodingToolsIndexRoute:

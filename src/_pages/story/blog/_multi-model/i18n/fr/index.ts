@@ -226,5 +226,54 @@ export const translations: typeof enTranslations = {
         },
       },
     },
+    typingMind: {
+      metaTitle: "8 alternatives à TypingMind comparées (2026)",
+      description:
+        "Comparez des alternatives à TypingMind pour vos clés API, des modèles locaux ou un chat hébergé. Coût des licences, facturation des modèles et {{appName}}.",
+      keywords:
+        "alternatives à TypingMind, TypingMind ou LibreChat, TypingMind ou Open WebUI, clés API personnelles, {{appName}}",
+      title: "8 alternatives à TypingMind pour discuter avec l’IA",
+      subtitle:
+        "Gardez vos clés et installez votre propre interface, ou lancez directement un chat hébergé. Huit options comparées, dont {{appName}}.",
+      lead: "TypingMind met les fournisseurs que vous payez dans une interface soignée. Si vous cherchez surtout une fenêtre de chat, additionnez la licence, l’usage des modèles et l’éventuel supplément pour la synchronisation. Une interface gratuite ou un chat hébergé peut mieux répondre à ce besoin.",
+      overview: "Ce que couvre la licence TypingMind",
+      tradeoff:
+        "TypingMind vous laisse payer directement chaque fournisseur. Premium peut afficher plusieurs réponses indépendantes. {{appName}} regroupe les modèles dans un catalogue hébergé et débite des crédits au tarif du modèle. Un client comme TypingMind est plus adapté pour dépenser un solde déjà ouvert chez un fournisseur.",
+      switch: {
+        firstLink: "Alternatives gratuites à auto-héberger",
+        secondLink: "Coûts hors licence TypingMind",
+        first:
+          "Sur r/selfhosted, une personne trouvait TypingMind trop cher et cherchait une interface à installer pour garder son accès OpenAI. Après avoir essayé Open WebUI, elle a indiqué que l’outil lui convenait.",
+        second:
+          "Sur r/TypingMind, une personne se demandait quels frais s’ajoutaient à la licence à vie. Les réponses ont évoqué la consommation API et le stockage facultatif dans le cloud. Pour les conditions actuelles, reportez-vous à la grille tarifaire.",
+      },
+      criteria: {
+        cost: "Calculez le coût sur un an avec la licence, les modèles, le stockage et le serveur éventuel. Un forfait hébergé se budgète plus facilement. La facturation à l’usage peut convenir aux périodes d’utilisation irrégulières.",
+        workflow:
+          "Pour garder vos clés ou utiliser un modèle local, regardez LibreChat et Open WebUI. Si vous utilisez des contextes séparés par modèle ou des dossiers de projet, testez ces fonctions avant de transférer vos données.",
+      },
+      faq: {
+        best: {
+          q: "Quelle est la meilleure alternative à TypingMind ?",
+          a: "LibreChat convient à l’auto-hébergement avec plusieurs fournisseurs. Open WebUI se prête aux modèles locaux, OpenRouter Chat à la comparaison de modèles, et {{appName}} au chat hébergé avec modèles généralistes et sans censure, sans clé API.",
+        },
+        free: {
+          q: "Existe-t-il une alternative gratuite à TypingMind ?",
+          a: "LibreChat et Open WebUI sont gratuits à auto-héberger dans le cadre de leurs licences. Le serveur et l’usage des modèles payants sont à votre charge. {{appName}} donne {{guestCredits}} crédits par mois sans compte.",
+        },
+        billing: {
+          q: "La licence TypingMind inclut-elle l’usage de l’API ?",
+          a: "Non. L’achat de la licence est unique et chaque fournisseur facture ses modèles. En local, vous payez votre matériel et l’électricité. ChatGPT Plus est un abonnement distinct qui ne couvre pas l’usage général de l’API OpenAI.",
+        },
+        privacy: {
+          q: "Un historique local signifie-t-il que le modèle fonctionne hors ligne ?",
+          a: "Non. TypingMind peut garder l’historique sur votre appareil et envoyer la requête au fournisseur en ligne. Avec un modèle entièrement local dans Open WebUI, l’historique et le calcul peuvent rester sur votre matériel.",
+        },
+        switching: {
+          q: "Puis-je passer de TypingMind à Poe ou OpenRouter Chat ?",
+          a: "Oui. Poe gère l’accès aux modèles avec les points de son forfait. OpenRouter Chat débite un solde pour les modèles payants et peut interroger plusieurs modèles à la fois. Sauvegardez vos échanges importants et vérifiez les formats d’import du service choisi.",
+        },
+      },
+    },
   },
 };

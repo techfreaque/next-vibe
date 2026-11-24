@@ -23,6 +23,7 @@ export type BlogTopic = (typeof BLOG_TOPICS)[number];
 /** Section of each post on the blog index. Exhaustive: a new post needs one. */
 export const POST_TOPICS: Record<BlogPostSlug, BlogTopic> = {
   "poe-alternatives": "developers",
+  "typingmind-alternatives": "developers",
   "janitor-ai-alternatives": "uncensored",
   "free-uncensored-ai": "uncensored",
   "freedomgpt-alternatives": "uncensored",
@@ -125,8 +126,17 @@ const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
   "poe-alternatives": {
     hub: null,
     related: [
+      "typingmind-alternatives",
       "openrouter-alternatives",
       "venice-ai-alternatives",
+    ],
+  },
+  "typingmind-alternatives": {
+    hub: null,
+    related: [
+      "poe-alternatives",
+      "openrouter-alternatives",
+      "openai-anthropic-compatible-api",
     ],
   },
   "free-uncensored-ai": {

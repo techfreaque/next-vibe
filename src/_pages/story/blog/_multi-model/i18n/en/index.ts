@@ -222,5 +222,54 @@ export const translations = {
         },
       },
     },
+    typingMind: {
+      metaTitle: "8 TypingMind alternatives compared (2026)",
+      description:
+        "Compare TypingMind alternatives for your own API keys, local models or hosted chat. See license costs, model billing and where {{appName}} fits.",
+      keywords:
+        "TypingMind alternatives, TypingMind vs LibreChat, TypingMind vs Open WebUI, bring your own API key, {{appName}}",
+      title: "8 TypingMind alternatives for your AI chat setup",
+      subtitle:
+        "Keep your provider keys and run your own interface, or get straight to a hosted model. Eight options compared, including {{appName}}.",
+      lead: "TypingMind makes sense when you want one polished interface for the providers you pay. If you mainly want a chat window, ask what the license, model usage and any sync upgrade add up to. The answer may point to a free interface or to a hosted chat that manages the models for you.",
+      overview: "What the TypingMind license buys",
+      tradeoff:
+        "TypingMind gives you direct provider billing and Premium can show several independent replies at once. {{appName}} gives you one hosted catalog and charges at the selected model’s credit rate. Pick a client like TypingMind if you already have provider credits you want to spend directly.",
+      switch: {
+        firstLink: "Free self-hosted alternatives to TypingMind",
+        secondLink: "Costs beyond the TypingMind license",
+        first:
+          "In r/selfhosted, a user said TypingMind cost more than they wanted to pay. They looked for a self-hosted interface for their OpenAI access, tried Open WebUI and reported that it fit.",
+        second:
+          "In r/TypingMind, a prospective buyer asked what they would pay beyond the lifetime license. Replies discussed API usage and optional cloud storage. Use the current pricing page for the terms and amounts, since the discussion reflects individual setups.",
+      },
+      criteria: {
+        cost: "Compare the total over a year, including license, model usage, storage and any server you need. A hosted plan is simpler to budget, while usage charges can suit occasional work.",
+        workflow:
+          "If your own keys or a local model are essential, shortlist LibreChat and Open WebUI. If you need separate context per model or project folders, check those workflows before moving.",
+      },
+      faq: {
+        best: {
+          q: "What is the best TypingMind alternative?",
+          a: "LibreChat is a strong fit for self-hosting a multi-provider client. Pick Open WebUI for local models, OpenRouter Chat for comparing hosted models, or {{appName}} if you want hosted chat with mainstream and uncensored choices and no key setup.",
+        },
+        free: {
+          q: "Is there a free TypingMind alternative?",
+          a: "LibreChat and Open WebUI are free to self-host under their licenses. Your server and any paid model usage are separate. {{appName}} gives guests {{guestCredits}} free credits per month without an account.",
+        },
+        billing: {
+          q: "Does a TypingMind license include API usage?",
+          a: "No. You pay the license once, then pay your model providers at their rates. With a local model, the running costs are your hardware and electricity. ChatGPT Plus is a separate subscription and does not cover general OpenAI API usage.",
+        },
+        privacy: {
+          q: "Is local chat history the same as offline inference?",
+          a: "No. TypingMind can save history on your device while sending prompts straight to an online provider. Open WebUI with a fully local model is an option if you need both the history and the inference to stay on your hardware.",
+        },
+        switching: {
+          q: "Can I switch from TypingMind to Poe or OpenRouter Chat?",
+          a: "Yes. Poe manages model access with subscription points. OpenRouter Chat bills paid models against a balance and can run the same prompt on several models. Save any important chat history before moving, and check the destination’s import formats.",
+        },
+      },
+    },
   },
 };

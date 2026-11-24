@@ -225,5 +225,54 @@ export const translations: typeof enTranslations = {
         },
       },
     },
+    typingMind: {
+      metaTitle: "8 alternatyw dla TypingMind. Porównanie na 2026 rok",
+      description:
+        "Alternatywy dla TypingMind z własnymi kluczami, lokalnymi modelami lub czatem w chmurze. Porównaj koszty licencji i modeli oraz ofertę {{appName}}.",
+      keywords:
+        "alternatywy dla TypingMind, TypingMind czy LibreChat, TypingMind czy Open WebUI, własny klucz API, {{appName}}",
+      title: "8 alternatyw dla TypingMind do czatu z AI",
+      subtitle:
+        "Zachowaj klucze dostawców i uruchom własny interfejs albo od razu otwórz czat w chmurze. Porównujemy osiem opcji, w tym {{appName}}.",
+      lead: "TypingMind porządkuje dostęp do usług, za które już płacisz. Jeśli potrzebujesz głównie okna czatu, zsumuj koszt licencji, użycia modeli i ewentualnej synchronizacji. Możliwe, że wystarczy Ci darmowa aplikacja albo czat, który zarządza dostępem za Ciebie.",
+      overview: "Co obejmuje licencja TypingMind",
+      tradeoff:
+        "W TypingMind płacisz bezpośrednio dostawcom. Premium pokazuje kilka niezależnych odpowiedzi naraz. {{appName}} daje jeden katalog modeli w chmurze i pobiera kredyty według stawki wybranego modelu. Wybierz klienta takiego jak TypingMind, jeśli chcesz wykorzystać saldo u dostawcy.",
+      switch: {
+        firstLink: "Bezpłatny interfejs na własny serwer",
+        secondLink: "Koszty poza licencją TypingMind",
+        first:
+          "Na r/selfhosted użytkownik szukał tańszego interfejsu na własny serwer, żeby połączyć się z OpenAI. Wypróbował Open WebUI i napisał, że spełnia jego potrzeby.",
+        second:
+          "Na r/TypingMind osoba rozważająca zakup zapytała o opłaty poza licencją dożywotnią. W odpowiedziach pojawiły się koszty API i opcjonalnej przestrzeni w chmurze. Aktualne warunki znajdziesz na stronie cenowej.",
+      },
+      criteria: {
+        cost: "Policz koszt roku, razem z licencją, użyciem modeli, przestrzenią i serwerem. Abonament łatwiej zaplanować. Przy sporadycznym użyciu może pasować rozliczanie pojedynczych zapytań.",
+        workflow:
+          "Jeśli potrzebujesz własnych kluczy lub lokalnego modelu, zacznij od LibreChat i Open WebUI. Jeśli zależy Ci na osobnym kontekście dla każdego modelu albo folderach projektów, przetestuj te funkcje przed przeprowadzką.",
+      },
+      faq: {
+        best: {
+          q: "Jaka jest najlepsza alternatywa dla TypingMind?",
+          a: "LibreChat sprawdza się do samodzielnego hostingu i wielu dostawców. Rozważ Open WebUI dla lokalnych modeli, OpenRouter Chat do zestawiania odpowiedzi albo {{appName}}, jeśli wolisz gotowy czat z modelami popularnymi i bez cenzury, bez własnego klucza.",
+        },
+        free: {
+          q: "Czy istnieje darmowa alternatywa dla TypingMind?",
+          a: "LibreChat i Open WebUI możesz uruchamiać bez opłaty za oprogramowanie, zgodnie z ich licencjami. Oddzielnie rozliczasz serwer i płatne modele. {{appName}} daje co miesiąc {{guestCredits}} darmowych kredytów bez konta.",
+        },
+        billing: {
+          q: "Czy licencja TypingMind pokrywa użycie API?",
+          a: "Nie. Licencję kupujesz raz, a za użycie płacisz dostawcom modeli. Przy modelu lokalnym koszty to sprzęt i prąd. ChatGPT Plus to osobna subskrypcja, która nie obejmuje ogólnego użycia API OpenAI.",
+        },
+        privacy: {
+          q: "Czy lokalna historia oznacza, że model działa offline?",
+          a: "Nie. TypingMind może zapisywać historię na urządzeniu i wysyłać pytania do dostawcy w sieci. Jeśli chcesz trzymać historię i przetwarzanie na swoim sprzęcie, rozważ Open WebUI z lokalnym modelem.",
+        },
+        switching: {
+          q: "Czy mogę zmienić TypingMind na Poe albo OpenRouter Chat?",
+          a: "Tak. W Poe płacisz punktami z planu. OpenRouter Chat pobiera środki z salda i może zadać to samo pytanie kilku modelom. Wcześniej zapisz ważne rozmowy i sprawdź formaty importu nowej usługi.",
+        },
+      },
+    },
   },
 };

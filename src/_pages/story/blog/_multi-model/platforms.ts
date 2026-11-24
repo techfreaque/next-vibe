@@ -7,6 +7,7 @@ export const CHECKED_DATE = "2026-11-24";
 
 export const POST_SLUGS = {
   poe: "poe-alternatives",
+  typingMind: "typingmind-alternatives",
 } as const;
 
 export type Subject = keyof typeof POST_SLUGS;
@@ -20,6 +21,15 @@ export const ALTERNATIVES = {
     "chatGpt",
     "libreChat",
     "openWebUi",
+  ],
+  typingMind: [
+    "libreChat",
+    "openWebUi",
+    "openRouter",
+    "poe",
+    "nanoGpt",
+    "venice",
+    "chatGpt",
   ],
 } as const;
 
@@ -147,6 +157,10 @@ export const DISCUSSIONS = {
   poe: [
     "https://www.reddit.com/r/PoeAI/comments/1xdauis/so_did_anyone_get_the_email/",
     "https://www.reddit.com/r/PoeAI/comments/1t1h9d6/best_replacement_for_poe/",
+  ],
+  typingMind: [
+    "https://www.reddit.com/r/selfhosted/comments/1m7az19/any_free_alternative_to_typingmind/",
+    "https://www.reddit.com/r/TypingMind/comments/1in489p/has_typingmind_hidden_costs_how_has_you/",
   ],
 } as const;
 

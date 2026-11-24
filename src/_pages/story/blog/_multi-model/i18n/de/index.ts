@@ -224,5 +224,54 @@ export const translations: typeof enTranslations = {
         },
       },
     },
+    typingMind: {
+      metaTitle: "8 Alternativen zu TypingMind im Vergleich (2026)",
+      description:
+        "TypingMind-Alternativen für eigene API-Schlüssel, lokale Modelle oder gehosteten Chat. Lizenzkosten, Modellabrechnung und {{appName}} im Vergleich.",
+      keywords:
+        "TypingMind Alternativen, TypingMind vs LibreChat, TypingMind vs Open WebUI, eigene API-Schlüssel, {{appName}}",
+      title: "8 Alternativen zu TypingMind für deinen KI-Chat",
+      subtitle:
+        "Nutze deine eigenen API-Schlüssel weiter oder steige direkt in einen gehosteten Chat ein. Acht Alternativen im Vergleich, darunter {{appName}}.",
+      lead: "TypingMind bündelt die KI-Anbieter, bei denen du ohnehin zahlst, in einer ausgereiften Oberfläche. Wenn du vor allem chatten willst, rechne Lizenz, Modelle und eventuell erweiterten Cloudspeicher zusammen. Eine kostenlose Oberfläche oder ein gehosteter Chat kann dann besser passen.",
+      overview: "Was die TypingMind-Lizenz abdeckt",
+      tradeoff:
+        "Bei TypingMind zahlst du direkt beim Modellanbieter. Premium zeigt mehrere unabhängige Antworten zugleich. {{appName}} bündelt gehostete Modelle und rechnet in Credits zum Modelltarif ab. Ein Client wie TypingMind lohnt sich, wenn du bestehendes Anbieterguthaben direkt nutzen willst.",
+      switch: {
+        firstLink: "Kostenlose Alternativen zum Selbsthosten",
+        secondLink: "Zusatzkosten zur TypingMind-Lizenz",
+        first:
+          "Bei r/selfhosted fand ein Nutzer TypingMind zu teuer und suchte eine selbst gehostete Oberfläche für seinen OpenAI-Zugang. Nach dem Test schrieb er, dass Open WebUI zu seinen Anforderungen passt.",
+        second:
+          "Bei r/TypingMind wollte eine Person vor dem Kauf wissen, was zusätzlich zur Dauerlizenz anfällt. In den Antworten ging es um Modell-APIs und optionalen Cloudspeicher. Für die aktuellen Konditionen zählt die Preisseite.",
+      },
+      criteria: {
+        cost: "Vergleiche die Gesamtkosten für ein Jahr, einschließlich Lizenz, Modellen, Speicher und Server. Ein gehosteter Tarif lässt sich leichter einplanen. Bei gelegentlicher Nutzung kann Einzelabrechnung besser passen.",
+        workflow:
+          "Wenn eigene Schlüssel oder lokale Modelle Pflicht sind, sieh dir LibreChat und Open WebUI an. Teste vor dem Wechsel auch getrennten Kontext pro Modell oder Projektordner, falls du diese Funktionen brauchst.",
+      },
+      faq: {
+        best: {
+          q: "Was ist die beste Alternative zu TypingMind?",
+          a: "LibreChat passt als selbst gehostete Oberfläche für mehrere Anbieter. Open WebUI eignet sich für lokale Modelle, OpenRouter Chat für direkte Modellvergleiche. {{appName}} bietet gehostete Mainstream- und unzensierte Modelle ohne eigene Schlüssel.",
+        },
+        free: {
+          q: "Gibt es eine kostenlose Alternative zu TypingMind?",
+          a: "LibreChat und Open WebUI kannst du unter ihren Lizenzen kostenlos selbst hosten. Server und kostenpflichtige Modellnutzung gehen extra. {{appName}} gibt Gästen monatlich {{guestCredits}} Gratiscredits ohne Konto.",
+        },
+        billing: {
+          q: "Deckt die TypingMind-Lizenz die API-Nutzung ab?",
+          a: "Nein. Die Lizenz kaufst du einmalig, die Modellanbieter berechnen deine Nutzung separat. Bei lokalen Modellen zahlst du für Hardware und Strom. ChatGPT Plus ist ein separates Abo und enthält keine allgemeine OpenAI-API-Nutzung.",
+        },
+        privacy: {
+          q: "Bedeutet lokaler Verlauf auch lokale Berechnung?",
+          a: "Nein. TypingMind kann den Verlauf auf deinem Gerät speichern und Eingaben direkt an einen Online-Anbieter senden. Open WebUI mit lokalem Modell ist eine Option, wenn auch die Berechnung auf deiner Hardware bleiben soll.",
+        },
+        switching: {
+          q: "Kann ich von TypingMind zu Poe oder OpenRouter Chat wechseln?",
+          a: "Ja. Poe bündelt den Modellzugang über Tarifpunkte. OpenRouter Chat rechnet kostenpflichtige Modelle gegen Guthaben ab und kann mehrere Modelle auf dieselbe Eingabe ansetzen. Sichere wichtige Chats zuerst und prüfe die Importformate des neuen Dienstes.",
+        },
+      },
+    },
   },
 };

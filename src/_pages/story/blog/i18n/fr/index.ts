@@ -23,6 +23,13 @@ export const translations: typeof enTranslations = {
         "Comparez les alternatives à Poe avec solde commun, paiement à l’usage ou clés API personnelles. Tarifs, limites et place de unbottled.ai.",
       readTime: "7 min de lecture",
     },
+    typingMindAlternatives: {
+      title: "8 alternatives à TypingMind pour discuter avec l’IA",
+      category: "Comparatif",
+      excerpt:
+        "Comparez des alternatives à TypingMind pour vos clés API, des modèles locaux ou un chat hébergé. Coût des licences, facturation des modèles et unbottled.ai.",
+      readTime: "7 min de lecture",
+    },
     deepseekUncensored: {
       title: "DeepSeek non censuré. Ce qui enlève vraiment le filtre.",
       category: "Guide des modèles",

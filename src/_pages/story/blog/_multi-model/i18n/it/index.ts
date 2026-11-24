@@ -225,5 +225,54 @@ export const translations: typeof enTranslations = {
         },
       },
     },
+    typingMind: {
+      metaTitle: "8 alternative a TypingMind a confronto (2026)",
+      description:
+        "Confronta le alternative a TypingMind per chiavi API proprie, modelli locali o chat online. Costi delle licenze, tariffe dei modelli e {{appName}}.",
+      keywords:
+        "alternative a TypingMind, TypingMind o LibreChat, TypingMind o Open WebUI, chiave API propria, {{appName}}",
+      title: "8 alternative a TypingMind per chattare con l’IA",
+      subtitle:
+        "Mantieni le tue chiavi e installa un’interfaccia oppure apri una chat online. Otto opzioni a confronto, tra cui {{appName}}.",
+      lead: "TypingMind riunisce in un’interfaccia curata i fornitori che già paghi. Se ti serve soprattutto una finestra di chat, somma licenza, consumo dei modelli ed eventuali costi di sincronizzazione. Potrebbe bastare un’interfaccia gratuita o convenirti una chat online con accesso gestito.",
+      overview: "Cosa include la licenza TypingMind",
+      tradeoff:
+        "TypingMind ti lascia pagare direttamente i fornitori. Premium mostra più risposte indipendenti in parallelo. {{appName}} offre un solo catalogo e scala crediti al prezzo del modello. Un client come TypingMind è adatto a chi vuole usare un saldo già disponibile presso un fornitore.",
+      switch: {
+        firstLink: "Alternative gratuite da installare",
+        secondLink: "Costi oltre la licenza TypingMind",
+        first:
+          "Su r/selfhosted, un utente trovava TypingMind troppo caro e cercava un’interfaccia da installare per il proprio accesso OpenAI. Ha provato Open WebUI e ha scritto che rispondeva alle sue esigenze.",
+        second:
+          "Su r/TypingMind, una persona interessata alla licenza a vita ha chiesto quali costi restassero da pagare. Le risposte hanno menzionato l’uso delle API e lo spazio facoltativo in cloud. Consulta la pagina dei prezzi per le condizioni attuali.",
+      },
+      criteria: {
+        cost: "Calcola il totale annuo tra licenza, modelli, spazio ed eventuale server. Una quota fissa è più facile da mettere a budget. Se usi la chat di rado, pagare a consumo può avere senso.",
+        workflow:
+          "Se vuoi tenere le chiavi o usare un modello locale, valuta LibreChat e Open WebUI. Se ti servono contesti separati per modello o cartelle di progetto, provali prima di migrare.",
+      },
+      faq: {
+        best: {
+          q: "Qual è la migliore alternativa a TypingMind?",
+          a: "LibreChat è un’opzione da installare per usare più fornitori. Open WebUI è adatto ai modelli locali, OpenRouter Chat al confronto tra modelli e {{appName}} alla chat online con modelli diffusi e senza censura, senza configurare chiavi.",
+        },
+        free: {
+          q: "C’è un’alternativa gratuita a TypingMind?",
+          a: "Puoi installare LibreChat e Open WebUI gratuitamente nei termini delle rispettive licenze. Server e consumo dei modelli a pagamento sono a parte. {{appName}} offre {{guestCredits}} crediti al mese senza account.",
+        },
+        billing: {
+          q: "La licenza TypingMind include l’uso delle API?",
+          a: "No. Compri la licenza una volta e paghi i fornitori a consumo. In locale, i costi sono hardware ed elettricità. ChatGPT Plus è un abbonamento separato e non copre l’uso generale delle API OpenAI.",
+        },
+        privacy: {
+          q: "Con la cronologia locale il modello funziona offline?",
+          a: "No. TypingMind può salvare la cronologia sul dispositivo e inviare il prompt al fornitore online. Con Open WebUI e un modello interamente locale, cronologia ed elaborazione possono restare sul tuo hardware.",
+        },
+        switching: {
+          q: "Posso passare da TypingMind a Poe o OpenRouter Chat?",
+          a: "Sì. Poe gestisce l’accesso ai modelli con i punti del piano. OpenRouter Chat scala i costi dal saldo e può inviare la stessa richiesta a più modelli. Salva le chat importanti e verifica i formati di importazione prima di cambiare.",
+        },
+      },
+    },
   },
 };

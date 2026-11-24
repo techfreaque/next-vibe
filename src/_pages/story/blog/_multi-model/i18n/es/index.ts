@@ -224,5 +224,54 @@ export const translations: typeof enTranslations = {
         },
       },
     },
+    typingMind: {
+      metaTitle: "8 alternativas a TypingMind comparadas (2026)",
+      description:
+        "Compara alternativas a TypingMind para tus claves API, modelos locales o chat alojado. Costos de licencias, tarifas de modelos y qué ofrece {{appName}}.",
+      keywords:
+        "alternativas a TypingMind, TypingMind o LibreChat, TypingMind o Open WebUI, clave API propia, {{appName}}",
+      title: "8 alternativas a TypingMind para tu chat con IA",
+      subtitle:
+        "Conserva tus claves e instala tu interfaz, o entra directamente a un chat alojado. Ocho opciones comparadas, incluida {{appName}}.",
+      lead: "TypingMind reúne en una interfaz cuidada a los proveedores que ya pagas. Si principalmente buscas una ventana de chat, suma el precio de la licencia, el uso de modelos y la sincronización si la necesitas. Puede convenirte una interfaz gratuita o un chat alojado que gestione los modelos.",
+      overview: "Qué incluye la licencia de TypingMind",
+      tradeoff:
+        "Con TypingMind pagas directamente a los proveedores. Premium muestra varias respuestas independientes a la vez. {{appName}} reúne modelos alojados y descuenta créditos según la tarifa del modelo. Una interfaz como TypingMind encaja si quieres gastar saldo que ya tienes con un proveedor.",
+      switch: {
+        firstLink: "Alternativas gratuitas para instalar",
+        secondLink: "Costos aparte de la licencia de TypingMind",
+        first:
+          "En r/selfhosted, un usuario buscaba una interfaz más económica para seguir usando el acceso de OpenAI en su propio servidor. Probó Open WebUI y contó que le daba lo que buscaba.",
+        second:
+          "En r/TypingMind, una persona interesada en la licencia de por vida preguntó qué costos quedaban. Las respuestas mencionaron uso de API y almacenamiento opcional en la nube. Consulta la página de precios para ver las condiciones actuales.",
+      },
+      criteria: {
+        cost: "Calcula el total de un año con la licencia, el uso de modelos, el almacenamiento y el posible servidor. Una cuota fija es más fácil de presupuestar. El pago por uso puede encajar si chateas de vez en cuando.",
+        workflow:
+          "Si necesitas tus claves o un modelo local, revisa LibreChat y Open WebUI. Si usas un contexto por modelo o carpetas de proyectos, prueba esas funciones antes de migrar.",
+      },
+      faq: {
+        best: {
+          q: "¿Cuál es la mejor alternativa a TypingMind?",
+          a: "LibreChat encaja si quieres instalar una interfaz para varios proveedores. Open WebUI sirve para modelos locales, OpenRouter Chat para comparar respuestas y {{appName}} para un chat alojado con modelos convencionales y sin censura, sin configurar claves.",
+        },
+        free: {
+          q: "¿Hay una alternativa gratuita a TypingMind?",
+          a: "Puedes instalar LibreChat y Open WebUI gratis según sus licencias. El servidor y los modelos de pago se cobran aparte. {{appName}} ofrece {{guestCredits}} créditos gratuitos al mes sin cuenta.",
+        },
+        billing: {
+          q: "¿La licencia de TypingMind incluye el uso de la API?",
+          a: "No. Compras la licencia una vez y cada proveedor cobra por el uso de sus modelos. En local pagas el equipo y la electricidad. ChatGPT Plus es una suscripción separada y no cubre el uso general de la API de OpenAI.",
+        },
+        privacy: {
+          q: "¿Guardar el historial en local significa que el modelo funciona sin conexión?",
+          a: "No. TypingMind puede guardar el historial en tu equipo y enviar la solicitud al proveedor en línea. Con Open WebUI y un modelo totalmente local, tanto el historial como el procesamiento pueden quedarse en tu equipo.",
+        },
+        switching: {
+          q: "¿Puedo cambiar de TypingMind a Poe o a OpenRouter Chat?",
+          a: "Sí. Poe gestiona el acceso a modelos con los puntos de su plan. OpenRouter Chat cobra los modelos de pago de un saldo y permite consultar a varios modelos a la vez. Guarda los chats importantes y revisa los formatos de importación antes de cambiar.",
+        },
+      },
+    },
   },
 };
