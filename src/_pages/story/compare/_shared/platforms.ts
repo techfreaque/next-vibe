@@ -17,6 +17,8 @@ import type { UpstreamProvider } from "./us-facts";
 export const COMPARE_CHECKED_DATE = "2026-11-17";
 /** Day the comparison pages first shipped. */
 export const COMPARE_PUBLISHED_DATE = "2026-11-17";
+/** Latest re-check of any single platform (newest `checkedDate` below). */
+export const COMPARE_LATEST_CHECK_DATE = "2026-11-24";
 
 export const COMPARE_BASE_PATH = "/story/compare";
 export const COMPARE_HUB_PATH = `${COMPARE_BASE_PATH}/uncensored-ai-platforms`;
@@ -102,6 +104,8 @@ export interface PlatformData {
   /** Set when we serve this platform's models through its API. */
   upstream: UpstreamProvider | null;
   sources: readonly PlatformSource[];
+  /** Set when this platform was re-verified after COMPARE_CHECKED_DATE. */
+  checkedDate?: string;
 }
 
 /**
@@ -155,6 +159,11 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "no", video: "no", voice: "yes" },
     upstream: ApiProvider.UNCENSORED_AI,
+    // Re-checked 2026-11-24: pricing (3 free responses a day, Pro $9.99/month
+    // or $99.99/year locked for life), API page ($0.05 per inference,
+    // UncensoredAI v1.2, 32,768 context), privacy policy (not used for
+    // training, Parasail AI processes messages).
+    checkedDate: "2026-11-24",
     sources: [
       { kind: "pricing", url: "https://uncensored.ai/pricing" },
       { kind: "api", url: "https://uncensored.ai/api" },
@@ -197,6 +206,10 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "partial", video: "partial", voice: "partial" },
     upstream: ApiProvider.OPENROUTER,
+    // Re-checked 2026-11-24: pricing page (5.5% fee, 50/1,000 free requests
+    // a day), data-collection guide, terms (18+, CSAM screening) and the
+    // public models API (474 models, 15 free, 142 moderated).
+    checkedDate: "2026-11-24",
     sources: [
       { kind: "pricing", url: "https://openrouter.ai/pricing" },
       {
@@ -249,9 +262,13 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "yes", video: "yes", voice: "yes" },
     upstream: ApiProvider.GAB_AI,
-    // Model count (214, "214 models. One account.") re-read on its home page
-    // on 2026-11-24; plans, terms, privacy and API rule re-checked the same
-    // day and unchanged. Everything else as of COMPARE_CHECKED_DATE.
+    // Re-checked 2026-11-24: home page ("214 models. One account."),
+    // pricing (Plus $20/month or $200/year, Plus Premium $999/year, packs
+    // from $10 for 700 credits, 250 signup credits), API page (Plus or Plus
+    // Premium required), terms (18+, no sexually explicit content, automated
+    // scanning) and privacy policy (last updated 2026-11-09: content used to
+    // improve models, provider requests "not anonymous").
+    checkedDate: "2026-11-24",
     sources: [
       { kind: "home", url: "https://gab.ai/" },
       { kind: "pricing", url: "https://gab.ai/pricing" },
@@ -515,6 +532,9 @@ export const VERSUS_KEYS = [
   "janitorAi",
   "nanoGpt",
   "freedomGpt",
+  "gabAi",
+  "uncensoredAi",
+  "openRouter",
 ] as const satisfies readonly PlatformKey[];
 
 export type VersusKey = (typeof VERSUS_KEYS)[number];
@@ -525,7 +545,27 @@ export const VERSUS_SLUGS: Record<VersusKey, string> = {
   janitorAi: "unbottled-vs-janitor-ai",
   nanoGpt: "unbottled-vs-nanogpt",
   freedomGpt: "unbottled-vs-freedomgpt",
+  gabAi: "unbottled-vs-gab-ai",
+  uncensoredAi: "unbottled-vs-uncensored-ai",
+  openRouter: "unbottled-vs-openrouter",
 };
+
+/** Day each versus page first shipped (Article datePublished). */
+export const VERSUS_PUBLISHED_DATES: Record<VersusKey, string> = {
+  venice: COMPARE_PUBLISHED_DATE,
+  characterAi: COMPARE_PUBLISHED_DATE,
+  janitorAi: COMPARE_PUBLISHED_DATE,
+  nanoGpt: COMPARE_PUBLISHED_DATE,
+  freedomGpt: COMPARE_PUBLISHED_DATE,
+  gabAi: "2026-11-24",
+  uncensoredAi: "2026-11-24",
+  openRouter: "2026-11-24",
+};
+
+/** Day this platform's facts were last verified on its own pages. */
+export function platformCheckedDate(key: PlatformKey): string {
+  return PLATFORMS[key].checkedDate ?? COMPARE_CHECKED_DATE;
+}
 
 export function versusPath(key: VersusKey): string {
   return `${COMPARE_BASE_PATH}/${VERSUS_SLUGS[key]}`;
@@ -535,7 +575,13 @@ export function isVersusKey(key: PlatformKey): key is VersusKey {
   return VERSUS_KEYS.some((versus) => versus === key);
 }
 
-/** Every comparison page path (sitemap, llms.txt). */
-export function listComparePaths(): string[] {
-  return [COMPARE_HUB_PATH, ...VERSUS_KEYS.map(versusPath)];
+/** Every comparison page with the day its facts were last verified (sitemap). */
+export function listCompareEntries(): { path: string; lastmod: string }[] {
+  return [
+    { path: COMPARE_HUB_PATH, lastmod: COMPARE_LATEST_CHECK_DATE },
+    ...VERSUS_KEYS.map((key) => ({
+      path: versusPath(key),
+      lastmod: platformCheckedDate(key),
+    })),
+  ];
 }

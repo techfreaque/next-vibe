@@ -26,10 +26,7 @@ import {
 } from "../../models/_shared/model-facts";
 import { listMediaFacts } from "../../models/_shared/model-media-facts";
 import { BLOG_POST_DATES } from "../../story/blog/posts-meta";
-import {
-  COMPARE_CHECKED_DATE,
-  listComparePaths,
-} from "../../story/compare/_shared/platforms";
+import { listCompareEntries } from "../../story/compare/_shared/platforms";
 
 /** Public marketing pages (locale-less paths). */
 export const SITEMAP_STATIC_PATHS: readonly string[] = [
@@ -98,9 +95,7 @@ export function collectSitemapEntries(
     entries.push({ path: `/story/blog/${slug}`, lastmod: date });
   }
 
-  for (const path of listComparePaths()) {
-    entries.push({ path, lastmod: COMPARE_CHECKED_DATE });
-  }
+  entries.push(...listCompareEntries());
 
   const seenSkills = new Set<string>();
   for (const skill of skillPages) {

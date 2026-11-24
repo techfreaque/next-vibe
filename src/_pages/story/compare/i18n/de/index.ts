@@ -119,6 +119,11 @@ export const translations: typeof enTranslations = {
       modelsLink: "Alle Modelle auf {{appName}} mit Live-Preisen",
       pricingLink: "Tarife und Credit-Pakete",
       privacyLink: "Unsere Datenschutzerklärung",
+      modelTitle: "{{model}} auf {{appName}}",
+      modelIntro:
+        "Das hauseigene Modell von {{name}} läuft in unserer Auswahl. Seine Seite zeigt den Live-Preis pro Nachricht, das Kontextfenster und die API-ID.",
+      modelPageLink: "{{model}}: Preis, Kontext und API",
+      modelCompareLink: "{{model}} vs {{other}}: der direkte Vergleich",
       moreTitle: "Weitere Vergleiche",
       ctaSubtitle:
         "{{guestCredits}} Gratis-Credits pro Monat. Kein Konto, keine Karte. Mainstream, offen oder unzensiert: Du wechselst pro Nachricht.",
@@ -155,11 +160,11 @@ export const translations: typeof enTranslations = {
   links: {
     hub: "Die besten unzensierten KI-Plattformen: ehrlicher Vergleich",
     hubDesc:
-      "Venice, NanoGPT, Janitor AI, Character.AI, FreedomGPT, lokale Modelle und mehr: Preise, Filter, Datenschutz und API, mit Quellen",
+      "Venice, NanoGPT, Gab AI, uncensored.ai, OpenRouter, Janitor AI, Character.AI, FreedomGPT, lokale Modelle und mehr: Preise, Filter, Datenschutz und API, mit Quellen",
     versus: "{{appName}} vs {{name}}",
     sectionTitle: "Unzensierte KI-Plattformen im Vergleich",
     sectionIntro:
-      "Venice, NanoGPT, Janitor AI, Character.AI, FreedomGPT und mehr: Preise, Filter und Datenschutz, direkt von ihren eigenen Seiten.",
+      "Venice, NanoGPT, Gab AI, uncensored.ai, OpenRouter, Janitor AI, Character.AI, FreedomGPT und mehr: Preise, Filter und Datenschutz, direkt von ihren eigenen Seiten.",
   },
   platforms: {
     venice: {
@@ -188,7 +193,7 @@ export const translations: typeof enTranslations = {
       pricingNote:
         "Gratis: 3 Antworten pro Tag. Pro-Preise gelten lebenslang. Karte, Cash App, Apple Pay und Bitcoin. API-Credits gibt es separat für $0.05 pro Aufruf.",
       models:
-        "Ein Modell: UncensoredAI v1.2, 32K Kontext. Basismodell und Trainingsdaten nennen die öffentlichen Seiten nicht.",
+        "Ein Modell: UncensoredAI v1.2, 32K Kontext, trainiert auf Büchern und Dokumenten, die aus dem Mainstream-Internet verbannt wurden. Seine politischen Ansichten laufen dem Mainstream zuwider.",
       filterShort: "Kein Filter beschrieben, 18+ in den AGB",
       filter:
         "Bezeichnet sich als uneingeschränkte KI-Plattform. Die AGB verlangen ein Mindestalter von 18 und verbieten Inhalte, die anderen schaden, sie belästigen oder gefährden sollen.",
@@ -202,7 +207,7 @@ export const translations: typeof enTranslations = {
       pro1: "Günstigster Bezahltarif in dieser Liste, Preis lebenslang fixiert.",
       pro2: "Kein Training mit deinen Daten, laut Datenschutzerklärung.",
       con1: "Ein Modell, 32K Kontext, keine Bild-, Video- oder Musikgenerierung.",
-      con2: "Stark ideologisch geprägte Seite rund um das Modell: Archive und Landingpages zu Verschwörungsthemen.",
+      con2: "Gratis gibt es nur 3 Antworten pro Tag. Sprachmodus, Ordner und Archive setzen Pro voraus.",
     },
     nanoGpt: {
       what: "Web-App und API mit Abrechnung nach Nutzung für Text-, Bild-, Video- und Audiomodelle. Kein Abo nötig, optionaler Tarif für offene Modelle.",
@@ -230,7 +235,7 @@ export const translations: typeof enTranslations = {
       pricingNote:
         "Kein Abo. Listenpreise der Anbieter plus 5,5 % Gebühr auf Credit-Käufe. Gratis-Modelle: 50 Anfragen pro Tag, 1.000, sobald du Credits für $10 gekauft hast.",
       models:
-        "474 Modelle, 17 gratis. Unzensierte Optionen sind rar: Venice Uncensored (Dolphin Mistral 24B, gehostet von Venice) und Rollenspiel-Fine-Tunes wie Hermes 4 und Magnum. 143 Routen sind als moderiert markiert.",
+        "474 Modelle, 15 gratis. Unzensierte Optionen sind rar: Venice Uncensored (Dolphin Mistral 24B, gehostet von Venice) und Rollenspiel-Fine-Tunes wie Hermes 4 und Magnum. 142 Modelle sind als moderiert markiert.",
       filterShort: "Anbieterregeln gelten, viele Routen moderiert",
       filter:
         "Die AGB verlangen 18+. OpenRouter prüft Eingaben auf bekanntes CSAM. Jeder Anbieter behält die Kontrolle über sein Modell, und moderierte Routen lehnen nach der Richtlinie des Herstellers ab.",
@@ -277,7 +282,7 @@ export const translations: typeof enTranslations = {
         "Die AGB verlangen 18+ und verbieten obszöne, sexuell explizite oder pornografische Inhalte. Automatisierte Systeme können Inhalte auf Regelverstöße prüfen. Frei bei Politik, nicht bei Erwachseneninhalten.",
       privacyShort: "Chats gespeichert, zur Modellverbesserung genutzt",
       privacy:
-        "Gab sieht deine Prompts und Antworten, speichert den Verlauf auf eigenen Servern und nutzt Inhalte zur Verbesserung seiner Modelle. Deine Identität bleibt laut Gab vor externen Modellanbietern verborgen.",
+        "Gab speichert deine Prompts, Antworten und den Verlauf auf eigenen Servern und nennt die Verbesserung seiner Modelle als Zweck. Anfragen erreichen die Modellanbieter über Gabs eigene Konten; laut Richtlinie macht das eine Anfrage nicht anonym.",
       apiShort: "",
       api: "OpenAI- und Anthropic-kompatible API. Setzt einen Plus-Tarif voraus.",
       forWho:
@@ -594,7 +599,7 @@ export const translations: typeof enTranslations = {
     versus: {
       title: "Direkte Vergleiche",
       intro:
-        "Die fünf Plattformen, mit denen man uns am häufigsten vergleicht, jede auf einer eigenen Seite mit Stärken, Schwächen und einer klaren Empfehlung.",
+        "Die {{versusCount}} Plattformen, mit denen man uns am häufigsten vergleicht, jede auf einer eigenen Seite mit Stärken, Schwächen und einer klaren Empfehlung.",
     },
     method: {
       title: "So haben wir verglichen",
@@ -638,6 +643,18 @@ export const translations: typeof enTranslations = {
       characterAi: {
         q: "Gibt es Character.AI ohne Filter?",
         a: "Nicht von Character.AI selbst: Pornografische Inhalte werden laut Anbieter nie unterstützt. Alternativen mit Rollenspiel für Erwachsene: Janitor AI (Limitless-Bots), CrushOn (Unfiltered-Schalter), Kindroid, SillyTavern mit einem unzensierten Modell oder {{appName}} mit unzensierten Rollenspiel-Modellen.",
+      },
+      gabAi: {
+        q: "Ist Gab AI unzensiert?",
+        a: "Bei Politik, Kultur und Glauben ja: Genau dafür ist das eigene Modell Arya gebaut. Bei Erwachseneninhalten nein: Die AGB verbieten sexuell explizite Inhalte. {{appName}} bietet Arya ebenfalls an, neben unzensierten Modellen, die Erwachsenen-Fiction erlauben.",
+      },
+      uncensoredAi: {
+        q: "Was unterscheidet uncensored.ai von anderer unzensierter KI?",
+        a: "Die meisten unzensierten KIs sind Mainstream-Modelle, denen die Verweigerungen herausgeschnitten wurden. Das Modell von uncensored.ai ist auf Büchern und Dokumenten trainiert, die aus dem Mainstream-Internet verbannt wurden, und vertritt deshalb politische Ansichten gegen den Mainstream. Auf {{appName}} läuft es als {{ownModel}}.",
+      },
+      openRouter: {
+        q: "Hat OpenRouter unzensierte Modelle?",
+        a: "Wenige: Venice Uncensored und Rollenspiel-Fine-Tunes wie Hermes 4 und Magnum. 142 der 474 Modelle sind als moderiert markiert. Wer mehr unzensierte Auswahl in einer API will, findet bei NanoGPT, Venice und {{appName}} deutlich mehr.",
       },
       local: {
         q: "Kann ich eine unzensierte KI auf meinem eigenen Rechner betreiben?",
@@ -1044,6 +1061,237 @@ export const translations: typeof enTranslations = {
         },
       },
       cta: { title: "Teste Liberty gegen jedes andere unzensierte Modell" },
+    },
+    gabAi: {
+      meta: {
+        title: "Gab AI Alternative: {{appName}} vs Gab AI (2026)",
+        description:
+          "{{appName}} vs Gab AI: Arya, 214 Modelle, das Verbot sexueller Inhalte, Datenschutz, Credits und API im Vergleich. Wir kaufen bei Gab ein, also sagen wir, wo wer gewinnt.",
+        keywords:
+          "Gab AI Alternative, Gab AI Erfahrungen, Gab AI Preise, Gab AI deutsch, Arya KI, konservative KI, KI ohne Zensur, unzensierte KI, Gab AI alternative, Gab AI vs, Gab AI review, Gab AI pricing, Gab AI Plus, Arya AI, Gab Arya, is Gab AI uncensored, Gab AI NSFW, Gab AI API, conservative AI chatbot, right-wing AI, uncensored AI chat, {{appName}} vs Gab AI",
+      },
+      hero: {
+        title: "{{appName}} vs Gab AI",
+        subtitle:
+          "Zwei Multi-Modell-Apps, die Politik nicht zensieren. Eine verbietet zusätzlich Erwachseneninhalte. Preise, Regeln, Datenschutz und API im direkten Vergleich.",
+        readTime: "7 Min. Lesezeit",
+      },
+      intro: {
+        lead: "Gab AI hat Arya für alle gebaut, die genug von Chatbots haben, die sie über Politik, Kultur und Glauben belehren. Wir bieten Arya ebenfalls an, über Gabs eigene API. Die eigentliche Frage ist also nicht, wer unzensiert ist. Sondern welche Regeln du rund um das Modell willst.",
+        p2: "Fakten zu Gab AI von Startseite, Preisseite, API-Seite, AGB und Datenschutzerklärung, geprüft am {{date}}. Unsere live aus unserer Konfiguration.",
+      },
+      relation:
+        "Wir sind Kunde von Gab AI: {{gabAiExamples}} läuft auf {{appName}} über Gabs eigene API. Gleiches Modell, andere App, andere Regeln drumherum.",
+      verdict:
+        "Nimm Gab AI, wenn du Arya mit Gabs Agentenmodus, Desktop-Apps und einem Katalog von 214 Modellen unter einer konservativen Marke willst und nie Erwachseneninhalte brauchst. Nimm {{appName}}, wenn du Arya neben {{ownModel}} und abliterierten GLM- und DeepSeek-Builds in einem Chat willst, Erwachsenen-Fiction auf den unzensierten Modellen, die sie erlauben, und Chats, die in deinem Browser bleiben können.",
+      themPros: {
+        a: "214 Modelle in einem Konto, dazu Arya, das eigene Modell für Politik, Kultur und Glauben.",
+        b: "Agentenmodus (Work), Live-Sprache, Bild, Video und Musik, Apps für Mac, Windows, iPhone und Android.",
+        c: "Gekaufte Credit-Pakete werden übertragen und verfallen nicht.",
+      },
+      themCons: {
+        a: "Die AGB verbieten obszöne, sexuell explizite oder pornografische Inhalte, und automatisierte Systeme können deine Inhalte prüfen.",
+        b: "Prompts, Antworten und Verlauf liegen auf Gabs Servern, und die Verbesserung der eigenen Modelle ist ein genannter Zweck.",
+        c: "Gratis heißt: einmalig 250 Credits nach E-Mail-Bestätigung. Die API setzt Plus oder Plus Premium voraus.",
+      },
+      usPros: {
+        a: "{{uncensored}} unzensierte Modelle von mehreren Anbietern, Arya inklusive, in einer Modellauswahl.",
+        b: "Kein pauschales Verbot von Erwachseneninhalten: Eine einmalige 18+-Bestätigung schaltet jedes unzensierte Modell frei.",
+        c: "{{guestCredits}} Gratis-Credits pro Monat ohne Konto. Inkognito-Chats bleiben in deinem Browser.",
+      },
+      usCons: {
+        a: "Kein Agentenmodus und keine Desktop-App wie Gabs Work.",
+        b: "Kleinerer Katalog: {{modelCount}} Chatmodelle gegen Gabs 214.",
+        c: "Unser Aufschlag von {{markup}} % gilt auch für Arya.",
+      },
+      chooseThem: {
+        a: "du Arya mit Gabs Agentenmodus und Desktop-Apps willst.",
+        b: "du Gabs Werte teilst und ein KI-Unternehmen abseits von Big Tech unterstützen willst.",
+        c: "du nie Erwachsenen-Fiction schreibst und den größten Katalog auf einer Rechnung willst.",
+      },
+      chooseUs: {
+        a: "du Arya im selben Thread mit {{ownModel}} und abliterierten Modellen vergleichen willst.",
+        b: "du Erwachsenen- oder Dark-Fiction schreibst und Modelle brauchst, die sie erlauben.",
+        c: "du ohne Konto starten willst und Inkognito-Chats in deinem Browser behalten willst.",
+      },
+      both: "Arya steht in unserer Auswahl. Du kannst also dieselbe Frage an Arya, {{ownModel}} und ein abliteriertes Modell stellen und die Antworten selbst beurteilen, ohne ein zweites Abo.",
+      switch: {
+        title: "Umstieg von Gab AI",
+        body: "Wähl Arya in unserer Modellauswahl und mach weiter. Dann schick denselben Prompt an {{ownModel}}: Beide weichen Politik nicht aus, aber sie wurden unterschiedlich gebaut, und das merkst du an den Antworten. Alten Kontext fügst du bei Bedarf in die erste Nachricht ein.",
+      },
+      faq: {
+        q1: {
+          q: "Ist Gab AI wirklich unzensiert?",
+          a: "Bei Politik, Kultur und Glauben ja: Dafür ist Arya gebaut. Bei sexuellen Inhalten nein. Gabs AGB verbieten obszöne, sexuell explizite oder pornografische Inhalte und sagen, dass automatisierte Systeme deine Inhalte auf Regelverstöße prüfen können.",
+        },
+        q2: {
+          q: "Was kostet Gab AI?",
+          a: "Gratis-Konten bekommen 250 Credits nach E-Mail-Bestätigung. Plus kostet $20 pro Monat oder $200 pro Jahr mit 2.000 Credits pro Monat. Plus Premium kostet $999 pro Jahr mit 12.000 Credits. Credit-Pakete beginnen bei $10 für 700 Credits.",
+        },
+        q3: {
+          q: "Kann ich Arya auf {{appName}} nutzen?",
+          a: "Ja. Arya läuft über Gabs API und steht in unserer Auswahl neben {{ownModel}} und den anderen unzensierten Modellen. Für Aryas Antworten gelten weiterhin Gabs eigene Inhaltsregeln.",
+        },
+        q4: {
+          q: "Speichert Gab AI meine Chats?",
+          a: "Ja. Laut Datenschutzerklärung speichert Gab deine Prompts, Antworten und den Gesprächsverlauf, nennt die Verbesserung seiner Modelle als Zweck und weist darauf hin, dass die Weiterleitung an Modellanbieter Anfragen nicht anonym macht. Auf {{appName}} bleiben Inkognito-Chats in deinem Browser.",
+        },
+      },
+      cta: { title: "Teste Arya gegen jedes andere unzensierte Modell" },
+    },
+    uncensoredAi: {
+      meta: {
+        title: "uncensored.ai Alternative: {{appName}} vs uncensored.ai",
+        description:
+          "{{appName}} vs uncensored.ai: dasselbe UncensoredLM-Modell, eine andere App. Gratis-Limits, Pro-Preis, API, Datenschutz und Medien im Vergleich, mit Quellen.",
+        keywords:
+          "uncensored.ai Alternative, uncensored.ai Erfahrungen, uncensored.ai Preise, uncensored.ai kostenlos, uncensored.ai deutsch, unzensierte KI, KI ohne Zensur, uncensored.ai alternative, uncensored.ai vs, uncensored.ai review, uncensored.ai pricing, uncensored.ai Pro, UncensoredLM, UncensoredAI v1.2, uncensored.ai API, is uncensored.ai free, uncensored AI chat, {{appName}} vs uncensored.ai",
+      },
+      hero: {
+        title: "{{appName}} vs uncensored.ai",
+        subtitle:
+          "Ein Modell mit eigenem Weltbild, zwei Wege, es zu nutzen. Gratis-Limits, Preis, API und was sonst noch dazugehört.",
+        readTime: "6 Min. Lesezeit",
+      },
+      intro: {
+        lead: "uncensored.ai baut das eigenständigste unzensierte Modell, das wir kennen: {{ownModel}}, trainiert auf Büchern und Dokumenten, die aus dem Mainstream-Internet verbannt wurden, mit politischen Ansichten gegen den Mainstream. Wir nutzen es über die eigene API von uncensored.ai. Diese Seite beantwortet also eine Frage: Nutzt du es besser auf uncensored.ai oder hier?",
+        p2: "Fakten zu uncensored.ai von Preisseite, API-Seite, Über-uns-Seite und Datenschutzerklärung, geprüft am {{date}}. Unsere live aus unserer Konfiguration.",
+      },
+      relation:
+        "Wir sind Kunde von uncensored.ai: {{uncensoredAiExamples}} läuft auf {{appName}} über die API von uncensored.ai. Gleiches Modell, unser Chat, unsere Abrechnung.",
+      verdict:
+        "Nimm uncensored.ai, wenn du unbegrenzte Chats mit diesem einen Modell zum festen Pro-Preis willst, lebenslang fixiert, plus Forum und Sprachmodus. Nimm {{appName}}, wenn du {{ownModel}} neben {{modelCount}} anderen Modellen willst, damit ein Thread seine Sicht gegen Claude, GPT oder ein abliteriertes Modell prüfen kann, mit Bildern, Video und Musik auf demselben Guthaben.",
+      themPros: {
+        a: "Fester Preis: Pro kostet $9.99 pro Monat oder $99.99 pro Jahr, lebenslang fixiert, solange du abonniert bleibst.",
+        b: "Unbegrenzte Chats mit dem Modell zu diesem Preis, dazu Sprachmodus, Ordner und Archive.",
+        c: "Laut Datenschutzerklärung werden deine Daten nicht zum Training oder zur Verbesserung von KI-Modellen genutzt.",
+      },
+      themCons: {
+        a: "Gratis gibt es 3 Antworten pro Tag.",
+        b: "Ein Modell, 32.768 Tokens Kontext, keine Bild-, Video- oder Musikgenerierung.",
+        c: "API-Aufrufe kosten je $0.05 und werden getrennt von Pro gekauft.",
+      },
+      usPros: {
+        a: "{{ownModel}} plus {{modelCount}} weitere Modelle in einem Chat: Vergleich seine Antwort im selben Thread mit Mainstream- und abliterierten Modellen.",
+        b: "{{guestCredits}} Gratis-Credits pro Monat ohne Konto, {{freeCredits}} mit Konto.",
+        c: "Bilder, Video, Musik und Sprache auf demselben Guthaben, und die gesamte Plattform ist Open Source.",
+      },
+      usCons: {
+        a: "Abrechnung nach Credits statt Flatrate: Wer dieses eine Modell täglich intensiv nutzt, zahlt hier mehr.",
+        b: "Kein Community-Forum und keine Archive rund um das Modell.",
+        c: "Unser Aufschlag von {{markup}} % gilt auch für das Modell von uncensored.ai.",
+      },
+      chooseThem: {
+        a: "dieses eine Modell alles ist, was du brauchst, und du es jeden Tag nutzt.",
+        b: "du einen lebenslang fixierten Preis willst.",
+        c: "du das Forum und den Sprachmodus willst.",
+      },
+      chooseUs: {
+        a: "du seine Sicht mit Mainstream- und abliterierten Modellen vergleichen willst.",
+        b: "du es nur ab und zu nutzt und kein weiteres Abo willst.",
+        c: "du auch Bilder, Video oder Musik brauchst.",
+      },
+      both: "Viele nutzen beides: uncensored.ai für unbegrenzte tägliche Chats mit dem Modell, {{appName}}, wenn sie seine Antwort im selben Thread neben die eines anderen Modells stellen wollen.",
+      switch: {
+        title: "Umstieg von uncensored.ai",
+        body: "Wähl {{ownModel}} in unserer Modellauswahl und starte einen Inkognito-Chat. Keine Migration nötig. Alten Kontext fügst du bei Bedarf in die erste Nachricht ein. Dann stell dieselbe Frage einem abliterierten Modell und sieh, wo die beiden auseinandergehen.",
+      },
+      faq: {
+        q1: {
+          q: "Ist {{appName}} dasselbe wie uncensored.ai?",
+          a: "Nein. Wir sind eine eigenständige Open-Source-Plattform. Wir nutzen das Modell von uncensored.ai über dessen API, neben Modellen von Venice, NanoGPT, FreedomGPT, Gab AI, OpenRouter und den großen Laboren.",
+        },
+        q2: {
+          q: "Ist uncensored.ai kostenlos?",
+          a: "Es gibt einen Gratis-Tarif mit 3 Antworten pro Tag. Pro kostet $9.99 pro Monat oder $99.99 pro Jahr und hebt das Limit auf. Auf {{appName}} funktionieren {{guestCredits}} Gratis-Credits pro Monat ohne Konto.",
+        },
+        q3: {
+          q: "Was macht das Modell von uncensored.ai anders?",
+          a: "Die meisten unzensierten Modelle sind Mainstream-Modelle, denen die Verweigerungen herausgeschnitten wurden: gleiches Training, gleiches Weltbild. {{ownModel}} ist auf Büchern und Dokumenten trainiert, die aus dem Mainstream-Internet verbannt wurden, und vertritt deshalb politische Ansichten gegen den Mainstream.",
+        },
+        q4: {
+          q: "Hat uncensored.ai eine API?",
+          a: "Ja: eine OpenAI-kompatible API für $0.05 pro Inferenz, Credits werden separat gekauft. Auf {{appName}} ist dasselbe Modell über unsere OpenAI- und Anthropic-kompatible API abrufbar, nach jedem Tarif oder Credit-Kauf.",
+        },
+      },
+      cta: { title: "Stell seine Sicht neben jedes andere Modell" },
+    },
+    openRouter: {
+      meta: {
+        title: "OpenRouter Alternative für Chat: {{appName}} vs OpenRouter",
+        description:
+          "{{appName}} vs OpenRouter: fertige Chat-App gegen Entwickler-API-Router. Unzensierte Modelle, Gebühren, Datenschutz und API im Vergleich, mit Quellen.",
+        keywords:
+          "OpenRouter Alternative, OpenRouter Erfahrungen, OpenRouter Preise, OpenRouter Gebühren, OpenRouter unzensiert, OpenRouter deutsch, unzensierte KI API, OpenRouter alternative, OpenRouter vs, OpenRouter review, OpenRouter pricing, OpenRouter fees, OpenRouter uncensored, OpenRouter uncensored models, OpenRouter chat app, OpenRouter free models, OpenAI compatible API, uncensored LLM API, {{appName}} vs OpenRouter",
+      },
+      hero: {
+        title: "{{appName}} vs OpenRouter",
+        subtitle:
+          "Ein Entwickler-Router mit 474 Modellen gegen eine Chat-App mit eingebauten unzensierten Modellen. Gebühren, Filter, Datenschutz und API.",
+        readTime: "6 Min. Lesezeit",
+      },
+      intro: {
+        lead: "OpenRouter ist die Standardantwort für einen API-Schlüssel und Hunderte Modelle. Wir nutzen es selbst. Aber es ist ein Router für Entwickler, keine Chat-App, und das unzensierte Angebot ist dünn. Wenn du eine OpenRouter-Alternative zum Chatten suchst, ist das der ehrliche Vergleich.",
+        p2: "Fakten zu OpenRouter von Preisseite, Leitfaden zur Datenerfassung, AGB und öffentlicher Modellliste, geprüft am {{date}}. Unsere live aus unserer Konfiguration.",
+      },
+      relation:
+        "Wir sind Kunde von OpenRouter: {{openRouterModels}} unserer Modelle laufen über die API von OpenRouter, darunter {{openRouterExamples}}. Wir ergänzen den Chat, die Medien und die unzensierten Anbieter, die OpenRouter nicht führt.",
+      verdict:
+        "Nimm OpenRouter, wenn du als Entwickler einen Schlüssel für 474 Modelle zu Anbieterpreisen mit Fallback-Routing willst und deine eigene Oberfläche mitbringst. Nimm {{appName}}, wenn du einen fertigen Chat mit {{uncensored}} unzensierten Modellen willst, darunter {{ownModel}} und abliterierte Builds, die OpenRouter nicht listet, plus Bilder, Video und Musik und eine API, wenn du sie brauchst.",
+      themPros: {
+        a: "474 Modelle in der öffentlichen Modellliste, zu Anbieterpreisen.",
+        b: "Kein Abo. Gratis-Modelle mit 50 Anfragen pro Tag, 1.000, sobald du Credits für $10 gekauft hast.",
+        c: "Prompt-Protokollierung und Nutzung deiner Daten sind beide Opt-in.",
+      },
+      themCons: {
+        a: "5,5 % Gebühr auf Credit-Käufe im Standardtarif.",
+        b: "Wenige unzensierte Modelle: Venice Uncensored plus Rollenspiel-Fine-Tunes wie Hermes 4 und Magnum. 142 der 474 Modelle sind als moderiert markiert.",
+        c: "Kein Fokus auf Endnutzer-Chat: Die Oberfläche bringst du selbst mit.",
+      },
+      usPros: {
+        a: "Ein fertiger Chat im Browser: kein Schlüssel, keine Einrichtung, {{guestCredits}} Gratis-Credits pro Monat ohne Konto.",
+        b: "{{uncensored}} unzensierte Modelle von Venice, NanoGPT, uncensored.ai, FreedomGPT und Gab AI, freigeschaltet mit einer einmaligen 18+-Bestätigung.",
+        c: "OpenAI- und Anthropic-kompatible API für Chat, Bilder, Video und Sprache auf demselben Guthaben.",
+      },
+      usCons: {
+        a: "Kleinerer Katalog: {{modelCount}} Chatmodelle gegen 474 bei OpenRouter.",
+        b: "Unser Aufschlag von {{markup}} % auf die Anbieterkosten liegt über der Gebühr von 5,5 % bei OpenRouter.",
+        c: "In erster Linie als Chat gebaut: weniger Routing-Optionen als ein reiner Router.",
+      },
+      chooseThem: {
+        a: "du eine App baust und einen Schlüssel für Hunderte Modelle willst.",
+        b: "du Anbieter-Fallback und Routing-Optionen brauchst.",
+        c: "jeder Cent pro Token zählt und du deine eigene Oberfläche hast.",
+      },
+      chooseUs: {
+        a: "du chatten statt bauen willst: Seite öffnen und lostippen.",
+        b: "du unzensierte Modelle willst, die OpenRouter nicht listet, etwa {{ownModel}}.",
+        c: "du Chat, Bilder, Video und Musik auf einem Guthaben willst, mit einer API obendrauf.",
+      },
+      both: "Beides zu nutzen ist normal: OpenRouter in deinem Code, {{appName}} als Chat, in dem du unzensierte Modelle nebeneinander testest, bevor du eines einbindest.",
+      switch: {
+        title: "Umstieg von OpenRouter",
+        body: "Als Chat-App: Starte einen Inkognito-Chat und wähl ein Modell, kein Schlüssel nötig. Im Code: Unsere API ist OpenAI-kompatibel. Du änderst also Base-URL und Schlüssel und prüfst die Modell-ID auf der jeweiligen Modellseite.",
+      },
+      faq: {
+        q1: {
+          q: "Gibt es eine OpenRouter-Alternative mit unzensierten Modellen?",
+          a: "Ja. {{appName}} führt {{uncensored}} unzensierte Modelle von Venice, NanoGPT, uncensored.ai, FreedomGPT und Gab AI in einem Chat und einer API. NanoGPT und Venice verkaufen unzensierte Modelle ebenfalls per API. OpenRouter selbst listet nur wenige.",
+        },
+        q2: {
+          q: "Erlaubt OpenRouter NSFW-Inhalte?",
+          a: "Die AGB verlangen 18+, und OpenRouter prüft Eingaben auf bekanntes CSAM. Jeder Anbieter behält seine eigenen Regeln, und 142 der 474 Modelle in der Liste sind als moderiert markiert. Ob eine Anfrage durchgeht, hängt also von Modell und Anbieter ab.",
+        },
+        q3: {
+          q: "Was kostet OpenRouter?",
+          a: "Listenpreise der Anbieter pro Token, plus 5,5 % Gebühr auf Credit-Käufe im Standardtarif. Es gibt kein Abo. Gratis-Modelle erlauben 50 Anfragen pro Tag, 1.000, sobald du Credits für $10 gekauft hast.",
+        },
+        q4: {
+          q: "Kann ich meinen OpenRouter-Code mit {{appName}} nutzen?",
+          a: "Ja, wenn er das OpenAI-Format nutzt: Richte ihn mit deinem {{appName}}-Schlüssel auf unsere Base-URL und verwende unsere Modell-IDs. Die API wird nach jedem Tarif (ab {{apiSubPrice}} pro Monat) oder einem Credit-Kauf freigeschaltet.",
+        },
+      },
+      cta: { title: "Chatte mit den Modellen, die OpenRouter nicht führt" },
     },
   },
 };

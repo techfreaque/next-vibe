@@ -46,6 +46,7 @@ import { ArticleCode } from "../../_shared/article-code";
 import { Callout, CardLink, Cta } from "../../_shared/marketing";
 import {
   allPlansText,
+  CompareInlineLinks,
   CompareTable,
   formatCompareDate,
   freeText,
@@ -415,6 +416,10 @@ export function TanstackPage({
             <CardLink
               href={`/${locale}/${API_KEYS_PAGE_PATH}`}
               label={t("faq.keysLink")}
+            />
+            <CompareInlineLinks
+              locale={locale}
+              versus={["openRouter", "nanoGpt", "venice"]}
             />
           </Div>
         </ArticleSection>

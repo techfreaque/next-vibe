@@ -439,11 +439,15 @@ export function buildCompareArticle({
   path,
   headline,
   description,
+  datePublished = COMPARE_PUBLISHED_DATE,
+  dateModified = COMPARE_CHECKED_DATE,
 }: {
   locale: CountryLanguage;
   path: string;
   headline: string;
   description: string;
+  datePublished?: string;
+  dateModified?: string;
 }): JsonLdNode {
   const url = pageUrl(locale, path);
   return {
@@ -451,8 +455,8 @@ export function buildCompareArticle({
     "@id": `${url}#article`,
     headline,
     description,
-    datePublished: COMPARE_PUBLISHED_DATE,
-    dateModified: COMPARE_CHECKED_DATE,
+    datePublished,
+    dateModified,
     inLanguage: getLanguageFromLocale(locale),
     url,
     mainEntityOfPage: url,

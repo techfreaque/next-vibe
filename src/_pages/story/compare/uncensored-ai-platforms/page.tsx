@@ -57,9 +57,12 @@ import {
   ABLITERATION_SOURCES,
   COMPARE_CHECKED_DATE,
   COMPARE_HUB_PATH,
+  COMPARE_LATEST_CHECK_DATE,
   isVersusKey,
   PLATFORM_KEYS,
+  platformCheckedDate,
   PLATFORMS,
+  VERSUS_KEYS,
   versusPath,
 } from "../_shared/platforms";
 import {
@@ -94,6 +97,9 @@ const FAQ_KEYS = [
   "difference",
   "veniceVs",
   "characterAi",
+  "gabAi",
+  "uncensoredAi",
+  "openRouter",
   "local",
   "legal",
 ] as const;
@@ -135,7 +141,12 @@ export function TanstackPage({
   const { t } = scopedTranslation.scopedT(locale);
   const { t: chatT } = uncensoredChatTranslation.scopedT(locale);
   const checked = formatCompareDate(COMPARE_CHECKED_DATE, locale);
-  const stats = { ...params, count: PLATFORM_KEYS.length, date: checked };
+  const stats = {
+    ...params,
+    count: PLATFORM_KEYS.length,
+    versusCount: VERSUS_KEYS.length,
+    date: checked,
+  };
   const back = {
     href: `/${locale}/story/blog`,
     label: t("common.backToBlog"),
@@ -155,6 +166,7 @@ export function TanstackPage({
         path: COMPARE_HUB_PATH,
         headline: title,
         description,
+        dateModified: COMPARE_LATEST_CHECK_DATE,
       }),
       buildBreadcrumbList(locale, [
         { name: t("common.breadcrumb"), path: COMPARE_HUB_PATH },
@@ -190,7 +202,9 @@ export function TanstackPage({
         back={back}
         category={t("hub.hero.category")}
         readTime={t("hub.hero.readTime")}
-        date={t("common.updated", { date: checked })}
+        date={t("common.updated", {
+          date: formatCompareDate(COMPARE_LATEST_CHECK_DATE, locale),
+        })}
         title={title}
         subtitle={t("hub.hero.subtitle", stats)}
       />
@@ -356,7 +370,9 @@ export function TanstackPage({
                   />
                 )}
                 <Span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {t("hub.platforms.sources", { date: checked })}
+                  {t("hub.platforms.sources", {
+                    date: formatCompareDate(platformCheckedDate(key), locale),
+                  })}
                 </Span>
                 <SourceList
                   name={platform.name}

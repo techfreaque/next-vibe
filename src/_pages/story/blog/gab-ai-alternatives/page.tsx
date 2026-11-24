@@ -472,7 +472,7 @@ export function TanstackPage({
             />
             <CompareInlineLinks
               locale={locale}
-              versus={["freedomGpt", "venice", "nanoGpt"]}
+              versus={["gabAi", "freedomGpt", "venice", "nanoGpt"]}
             />
           </Div>
         </ArticleSection>

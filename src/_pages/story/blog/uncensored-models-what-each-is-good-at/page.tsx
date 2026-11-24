@@ -374,7 +374,7 @@ export function TanstackPage({
             ))}
             <CompareInlineLinks
               locale={locale}
-              versus={["venice", "nanoGpt"]}
+              versus={["venice", "nanoGpt", "uncensoredAi"]}
             />
           </Div>
         </ArticleSection>

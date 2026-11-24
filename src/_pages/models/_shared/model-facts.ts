@@ -462,6 +462,10 @@ export const FEATURED_COMPARISON_PAIRS: readonly (readonly [
     ChatModelId.UNCENSORED_LM_V1_2,
     ChatModelId.VENICE_DEEPSEEK_V4_1_FLASH_UNCENSORED,
   ],
+  // Own worldview vs the other platforms' own uncensored models (linked
+  // from the Gab AI and FreedomGPT versus pages).
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GAB_AI_ARYA],
+  [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.FREEDOMGPT_LIBERTY],
   // Own worldview vs the mainstream and open flagships.
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.GPT_6_2_SOL],
   [ChatModelId.UNCENSORED_LM_V1_2, ChatModelId.CLAUDE_SONNET_5_5],

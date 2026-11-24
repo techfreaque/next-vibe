@@ -52,18 +52,28 @@ import {
   SourceList,
 } from "./compare-ui";
 import {
-  COMPARE_CHECKED_DATE,
   COMPARE_HUB_PATH,
+  platformCheckedDate,
   PLATFORMS,
+  VERSUS_PUBLISHED_DATES,
   type VersusKey,
   versusPath,
 } from "./platforms";
 import type { UsParams } from "./us-facts";
 
+/** The platform's own model as served on our side (see versus-loader.ts). */
+export interface VersusFeaturedModel {
+  name: string;
+  slug: string;
+  /** Canonical head-to-head against our comparison model, if live. */
+  compare: { name: string; path: string } | null;
+}
+
 export interface VersusPageData {
   locale: CountryLanguage;
   versus: VersusKey;
   params: UsParams;
+  featured: VersusFeaturedModel | null;
 }
 
 const ROW_KEYS = [
@@ -97,12 +107,12 @@ export function pageParams(data: VersusPageData): UsParams {
   return {
     ...data.params,
     name: PLATFORMS[data.versus].name,
-    date: formatCompareDate(COMPARE_CHECKED_DATE, data.locale),
+    date: formatCompareDate(platformCheckedDate(data.versus), data.locale),
   };
 }
 
 export function VersusPage(data: VersusPageData): JSX.Element {
-  const { locale, versus } = data;
+  const { locale, versus, featured } = data;
   const { t } = scopedTranslation.scopedT(locale);
   const platform = PLATFORMS[versus];
   const stats = pageParams(data);
@@ -150,6 +160,8 @@ export function VersusPage(data: VersusPageData): JSX.Element {
         path,
         headline: title,
         description: t(`versus.${versus}.meta.description`, stats),
+        datePublished: VERSUS_PUBLISHED_DATES[versus],
+        dateModified: platformCheckedDate(versus),
       }),
       buildBreadcrumbList(locale, [
         { name: t("common.breadcrumb"), path: COMPARE_HUB_PATH },
@@ -261,6 +273,38 @@ export function VersusPage(data: VersusPageData): JSX.Element {
             {t(`versus.${versus}.both`, stats)}
           </Callout>
         </ArticleSection>
+
+        {featured !== null && (
+          <ArticleSection
+            id="model"
+            title={t("common.versus.modelTitle", {
+              ...stats,
+              model: featured.name,
+            })}
+            intro={t("common.versus.modelIntro", {
+              ...stats,
+              model: featured.name,
+            })}
+          >
+            <Div className="flex flex-col">
+              <CardLink
+                href={`/${locale}/models/${featured.slug}`}
+                label={t("common.versus.modelPageLink", {
+                  model: featured.name,
+                })}
+              />
+              {featured.compare !== null && (
+                <CardLink
+                  href={`/${locale}${featured.compare.path}`}
+                  label={t("common.versus.modelCompareLink", {
+                    model: featured.name,
+                    other: featured.compare.name,
+                  })}
+                />
+              )}
+            </Div>
+          </ArticleSection>
+        )}
 
         <ArticleSection
           id="switch"
