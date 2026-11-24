@@ -43,7 +43,12 @@ export const translations = {
       placeholder: "Select items...",
       noResultsFound: "No results found",
     },
+    command: {
+      title: "Command palette",
+      description: "Search for an action and select it to run it.",
+    },
     iconPicker: {
+      description: "Search or browse by category to choose an icon.",
       selectIcon: "Select icon",
       title: "Choose an Icon",
       searchPlaceholder: "Search icons...",

@@ -4,12 +4,14 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogTitle,
 } from "next-vibe/ui/components/dialog";
 import { Div } from "next-vibe/ui/components/div";
 import {
   Drawer,
   DrawerContent,
+  DrawerDescription,
   DrawerTitle,
 } from "next-vibe/ui/components/drawer";
 import type { JSX } from "react";
@@ -41,6 +43,7 @@ export function LocalePicker({ locale, user }: LocalePickerProps): JSX.Element {
       open={open}
       onOpenChange={setOpen}
       title={t("title")}
+      description={t("description")}
       desktopClassName="w-[600px] h-[min(70vh,520px)]"
       phoneClassName="h-[88dvh]"
       trigger={flagTrigger({
@@ -92,6 +95,9 @@ export function LocalePickerDialog({
           <DrawerTitle className="px-4 pb-1 pt-3 text-base">
             {t("title")}
           </DrawerTitle>
+          <DrawerDescription className="sr-only">
+            {t("description")}
+          </DrawerDescription>
           <Div className="flex min-h-0 flex-1 flex-col">{panel}</Div>
         </DrawerContent>
       </Drawer>
@@ -103,6 +109,9 @@ export function LocalePickerDialog({
         <DialogTitle className="border-b border-border px-5 py-4 text-base">
           {t("title")}
         </DialogTitle>
+        <DialogDescription className="sr-only">
+          {t("description")}
+        </DialogDescription>
         <Div className="flex min-h-0 flex-1 flex-col">{panel}</Div>
       </DialogContent>
     </Dialog>

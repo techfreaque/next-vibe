@@ -16,7 +16,13 @@ import {
 } from "../../../unified-ui/widgets/form-fields/icon-field/icons";
 import { scopedTranslation } from "../i18n";
 import { Button } from "./button";
-import { Dialog, DialogContent, DialogTrigger } from "./dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "./dialog";
 import { Div } from "./div";
 import { Input } from "./input";
 import { Span } from "./span";
@@ -112,9 +118,12 @@ export function IconPicker({
         <Div className="flex-1 overflow-y-auto overflow-x-hidden flex flex-col">
           {/* Header with search */}
           <Div className="flex flex-col gap-3 p-4 border-b bg-card shrink-0">
-            <Span className="font-semibold text-sm">
+            <DialogTitle className="text-sm font-semibold leading-5 tracking-normal">
               {t("ui.iconPicker.title")}
-            </Span>
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              {t("ui.iconPicker.description")}
+            </DialogDescription>
             <Input
               placeholder={t("ui.iconPicker.searchPlaceholder")}
               value={searchQuery}

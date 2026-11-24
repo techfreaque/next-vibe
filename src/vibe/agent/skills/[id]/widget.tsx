@@ -13,6 +13,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "next-vibe/ui/components/dialog";
@@ -875,6 +876,9 @@ export function SkillViewContainer({
                     )}
                   </Button>
                 </DialogTitle>
+                <DialogDescription className="sr-only">
+                  {t("get.systemPrompt.view")}
+                </DialogDescription>
               </DialogHeader>
               <Div className="mt-2">
                 <MarkdownWidget

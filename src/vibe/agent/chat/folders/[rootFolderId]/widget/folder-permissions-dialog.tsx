@@ -6,6 +6,7 @@ import { type EndpointLogger } from "next-vibe/logger/types";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "next-vibe/ui/components/dialog";
@@ -15,6 +16,7 @@ import type { JSX } from "react";
 import { useMemo } from "react";
 
 import folderPermissionsDefinitions from "../../subfolders/[subFolderId]/permissions/definition";
+import { scopedTranslation as permissionsTranslation } from "../../subfolders/[subFolderId]/permissions/i18n";
 import { scopedTranslation } from "../i18n";
 
 interface FolderPermissionsDialogProps {
@@ -37,6 +39,7 @@ export function FolderPermissionsDialog({
   logger,
 }: FolderPermissionsDialogProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: tPermissions } = permissionsTranslation.scopedT(locale);
   const platform = useWidgetPlatform();
 
   const endpointOptions = useMemo(
@@ -64,6 +67,9 @@ export function FolderPermissionsDialog({
           <DialogTitle>
             {t("widget.permissions.folderTitle")} ({folderName})
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            {tPermissions("get.container.description")}
+          </DialogDescription>
         </DialogHeader>
 
         <EndpointsPage

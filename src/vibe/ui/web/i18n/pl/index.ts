@@ -45,7 +45,12 @@ export const translations: typeof enTranslations = {
       placeholder: "Wybierz elementy...",
       noResultsFound: "Nie znaleziono wyników",
     },
+    command: {
+      title: "Paleta poleceń",
+      description: "Wyszukaj polecenie i wybierz je, aby je wykonać.",
+    },
     iconPicker: {
+      description: "Wyszukaj ikonę lub wybierz ją z jednej z kategorii.",
       selectIcon: "Wybierz ikonę",
       title: "Wybierz ikonę",
       searchPlaceholder: "Szukaj ikon...",

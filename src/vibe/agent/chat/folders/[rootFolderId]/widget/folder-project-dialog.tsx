@@ -6,6 +6,7 @@ import { type EndpointLogger } from "next-vibe/logger/types";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "next-vibe/ui/components/dialog";
@@ -15,6 +16,7 @@ import type { JSX } from "react";
 import { useMemo } from "react";
 
 import folderProjectDefinitions from "../../subfolders/[subFolderId]/project/definition";
+import { scopedTranslation as projectTranslation } from "../../subfolders/[subFolderId]/project/i18n";
 import { scopedTranslation } from "../i18n";
 
 interface FolderProjectDialogProps {
@@ -37,6 +39,7 @@ export function FolderProjectDialog({
   logger,
 }: FolderProjectDialogProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
+  const { t: tProject } = projectTranslation.scopedT(locale);
   const platform = useWidgetPlatform();
 
   const endpointOptions = useMemo(
@@ -64,6 +67,9 @@ export function FolderProjectDialog({
           <DialogTitle>
             {t("widget.project.dialogTitle")} ({folderName})
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            {tProject("get.description")}
+          </DialogDescription>
         </DialogHeader>
 
         <EndpointsPage

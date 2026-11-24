@@ -28,6 +28,7 @@ import { Button } from "next-vibe/ui/components/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "next-vibe/ui/components/dialog";
@@ -88,12 +89,14 @@ import { buildFolderUrl } from "@/_pages/chat/lib/utils/navigation";
 import { isDefaultFolderId } from "../../config";
 import { NEW_MESSAGE_ID, ThreadStreamingState } from "../../enum";
 import createFolderDefinition from "../../folders/[rootFolderId]/create/definition";
+import { scopedTranslation as createFolderTranslation } from "../../folders/[rootFolderId]/create/i18n";
 import type { FolderListResponseOutput } from "../../folders/[rootFolderId]/definition";
 import foldersDefinition from "../../folders/[rootFolderId]/definition";
 import { scopedTranslation as foldersScopedTranslation } from "../../folders/[rootFolderId]/i18n";
 import { FolderPermissionsDialog } from "../../folders/[rootFolderId]/widget/folder-permissions-dialog";
 import { FolderProjectDialog } from "../../folders/[rootFolderId]/widget/folder-project-dialog";
 import renameDefinitions from "../../folders/subfolders/[subFolderId]/rename/definition";
+import { scopedTranslation as renameFolderTranslation } from "../../folders/subfolders/[subFolderId]/rename/i18n";
 import { useChatBootContext } from "../../hooks/context";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
 import {
@@ -1651,6 +1654,9 @@ function FolderRow({
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
             <DialogTitle>{t("widget.renameFolder.title")}</DialogTitle>
+            <DialogDescription className="sr-only">
+              {renameFolderTranslation.scopedT(locale).t("patch.description")}
+            </DialogDescription>
           </DialogHeader>
           <EndpointsPage
             logger={logger}
@@ -1688,6 +1694,9 @@ function FolderRow({
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
             <DialogTitle>{t("widget.folderList.newSubfolder")}</DialogTitle>
+            <DialogDescription className="sr-only">
+              {createFolderTranslation.scopedT(locale).t("description")}
+            </DialogDescription>
           </DialogHeader>
           <EndpointsPage
             logger={logger}

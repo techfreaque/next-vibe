@@ -2,7 +2,12 @@
 
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { Button } from "next-vibe/ui/components/button";
-import { Dialog, DialogContent } from "next-vibe/ui/components/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "next-vibe/ui/components/dialog";
 import { Div } from "next-vibe/ui/components/div";
 import {
   DropdownMenu,
@@ -139,6 +144,12 @@ export function TopBar({ locale }: TopBarProps): JSX.Element {
       {/* Uncensored-model consent: status + withdraw / unlock */}
       <Dialog open={consentDialogOpen} onOpenChange={setConsentDialogOpen}>
         <DialogContent className="max-h-[90dvh] w-[calc(100vw-1.5rem)] max-w-md overflow-y-auto rounded-2xl p-3 pt-9 sm:p-4 sm:pt-9">
+          <DialogTitle className="sr-only">
+            {tConsent("widget.title")}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {tConsent("get.success.description")}
+          </DialogDescription>
           {consentDialogOpen ? (
             <EndpointsPage
               endpoint={uncensoredConsentEndpoints}

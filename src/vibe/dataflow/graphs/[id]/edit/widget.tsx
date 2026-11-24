@@ -46,6 +46,7 @@ import { Card } from "next-vibe/ui/components/card";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -2870,9 +2871,9 @@ function EditFormInner({
           <DialogHeader>
             <DialogTitle>{t("widget.confirmBackTitle")}</DialogTitle>
           </DialogHeader>
-          <P className="text-sm text-muted-foreground">
+          <DialogDescription>
             {t("widget.confirmBackDescription")}
-          </P>
+          </DialogDescription>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmBackOpen(false)}>
               {t("widget.confirmBackStay")}

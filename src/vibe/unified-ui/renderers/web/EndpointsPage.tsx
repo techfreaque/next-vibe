@@ -5,7 +5,12 @@
 
 "use client";
 
-import { Dialog, DialogContent } from "next-vibe/ui/components/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "next-vibe/ui/components/dialog";
 import { Div } from "next-vibe/ui/components/div";
 import {
   Select,
@@ -892,6 +897,8 @@ EndpointsPage.displayName = "EndpointsPage";
  */
 function StackEntryRenderer({
   entry,
+  locale,
+  platform,
   isModal,
   isVisible,
   className,
@@ -901,6 +908,8 @@ function StackEntryRenderer({
   finalNavigation,
 }: {
   entry: NavigationStackEntry;
+  locale: CountryLanguage;
+  platform: Platform;
   isModal: boolean;
   isVisible: boolean;
   className?: string;
@@ -926,6 +935,9 @@ function StackEntryRenderer({
     );
   }
 
+  const { endpoint } = entry;
+  const { t } = endpoint.scopedTranslation.scopedT(locale);
+
   return (
     <Dialog
       open={modalIsOpen}
@@ -944,6 +956,14 @@ function StackEntryRenderer({
           selector popover covers it, and a select opened inside the modal
           covers the modal */}
       <DialogContent className="sm:max-w-[600px] max-w-[90vw] max-h-[min(80dvh,calc(100dvh-80px))] overflow-y-auto">
+        {!isCliPlatform(platform) && (
+          <>
+            <DialogTitle className="sr-only">{t(endpoint.title)}</DialogTitle>
+            <DialogDescription className="sr-only">
+              {t(endpoint.description)}
+            </DialogDescription>
+          </>
+        )}
         {children}
       </DialogContent>
     </Dialog>
@@ -1218,6 +1238,8 @@ function StackEntryLayer({
       <PickerProvider onSelect={pickerCallbackWithPop}>
         <StackEntryRenderer
           entry={entry}
+          locale={locale}
+          platform={platform}
           isModal={isModal}
           isVisible={isVisible}
           className={className}
@@ -1253,6 +1275,8 @@ function StackEntryLayer({
       <PickerProvider onSelect={pickerCallbackWithPop}>
         <StackEntryRenderer
           entry={entry}
+          locale={locale}
+          platform={platform}
           isModal={isModal}
           isVisible={isVisible}
           className={className}
@@ -1289,6 +1313,8 @@ function StackEntryLayer({
       <PickerProvider onSelect={pickerCallbackWithPop}>
         <StackEntryRenderer
           entry={entry}
+          locale={locale}
+          platform={platform}
           isModal={isModal}
           isVisible={isVisible}
           className={className}
@@ -1334,6 +1360,8 @@ function StackEntryLayer({
       <PickerProvider onSelect={pickerCallbackWithPop}>
         <StackEntryRenderer
           entry={entry}
+          locale={locale}
+          platform={platform}
           isModal={isModal}
           isVisible={isVisible}
           className={className}
@@ -1371,6 +1399,8 @@ function StackEntryLayer({
       <PickerProvider onSelect={pickerCallbackWithPop}>
         <StackEntryRenderer
           entry={entry}
+          locale={locale}
+          platform={platform}
           isModal={isModal}
           isVisible={isVisible}
           className={className}
@@ -1429,6 +1459,8 @@ function StackEntryLayer({
     return (
       <StackEntryRenderer
         entry={entry}
+        locale={locale}
+        platform={platform}
         isModal={isModal}
         isVisible={isVisible}
         className={className}

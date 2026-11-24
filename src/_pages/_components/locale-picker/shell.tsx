@@ -4,6 +4,7 @@ import { Div } from "next-vibe/ui/components/div";
 import {
   Drawer,
   DrawerContent,
+  DrawerDescription,
   DrawerTitle,
   DrawerTrigger,
 } from "next-vibe/ui/components/drawer";
@@ -56,6 +57,7 @@ interface PickerSurfaceProps {
   onOpenChange: (open: boolean) => void;
   trigger: ReactNode;
   title: string;
+  description: string;
   /** Desktop popover width/padding classes. */
   desktopClassName?: string;
   /** Phone sheet height classes. */
@@ -69,6 +71,7 @@ export function PickerSurface({
   onOpenChange,
   trigger,
   title,
+  description,
   desktopClassName,
   phoneClassName,
   children,
@@ -86,6 +89,9 @@ export function PickerSurface({
           className={cn("flex max-h-[88dvh] flex-col", phoneClassName)}
         >
           <DrawerTitle className="sr-only">{title}</DrawerTitle>
+          <DrawerDescription className="sr-only">
+            {description}
+          </DrawerDescription>
           <Div className="flex min-h-0 flex-1 flex-col">{children}</Div>
         </DrawerContent>
       </Drawer>

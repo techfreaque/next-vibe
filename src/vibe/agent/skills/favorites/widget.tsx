@@ -31,6 +31,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
+  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -590,6 +591,7 @@ const VariantRow = React.memo(function VariantRow({
               open={confirmOpen}
               onOpenChange={setConfirmOpen}
               title={t("get.deleteVariant")}
+              description={t("id.delete.container.description")}
               actionLabel={t("get.deleteVariantAction")}
               cancelLabel={t("get.deleteGroup.cancel")}
               onConfirm={() => void removeFavorites([item.id], deps)}
@@ -831,6 +833,7 @@ const SortableGroup = React.memo(function SortableGroup({
                       })
                     : t("get.deleteVariant")
                 }
+                description={t("id.delete.container.description")}
                 actionLabel={
                   isMulti
                     ? t("get.deleteGroup.action")
@@ -927,6 +930,7 @@ function ConfirmRemoveDialog({
   open,
   onOpenChange,
   title,
+  description,
   actionLabel,
   cancelLabel,
   onConfirm,
@@ -934,6 +938,7 @@ function ConfirmRemoveDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
+  description: string;
   actionLabel: string;
   cancelLabel: string;
   onConfirm: () => void;
@@ -943,6 +948,9 @@ function ConfirmRemoveDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription className="sr-only">
+            {description}
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{cancelLabel}</AlertDialogCancel>

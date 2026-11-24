@@ -11,6 +11,7 @@ import { Button } from "next-vibe/ui/components/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "next-vibe/ui/components/dialog";
@@ -53,6 +54,7 @@ import { useChatBootContext } from "../../../hooks/context";
 import { useChatNavigationStore } from "../../../hooks/use-chat-navigation-store";
 import { ThreadsList } from "../../../threads/widget/widget";
 import createFolderDefinition from "../create/definition";
+import { scopedTranslation as createFolderTranslation } from "../create/i18n";
 import type definition from "../definition";
 import { scopedTranslation } from "../i18n";
 import { FolderAccessModal } from "./folder-access-modal";
@@ -613,6 +615,9 @@ export function FoldersListContainer(): React.JSX.Element {
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
             <DialogTitle>{t("widget.newFolder.title")}</DialogTitle>
+            <DialogDescription className="sr-only">
+              {createFolderTranslation.scopedT(locale).t("description")}
+            </DialogDescription>
           </DialogHeader>
           <EndpointsPage
             logger={logger}

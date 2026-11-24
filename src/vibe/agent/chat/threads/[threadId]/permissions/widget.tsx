@@ -6,6 +6,7 @@ import { type EndpointLogger } from "next-vibe/logger/types";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "next-vibe/ui/components/dialog";
@@ -69,6 +70,9 @@ export function ThreadPermissionsDialog({
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader className="shrink-0">
           <DialogTitle>{t("dialog.title", { threadTitle })}</DialogTitle>
+          <DialogDescription className="sr-only">
+            {t("get.container.description")}
+          </DialogDescription>
         </DialogHeader>
 
         <EndpointsPage
