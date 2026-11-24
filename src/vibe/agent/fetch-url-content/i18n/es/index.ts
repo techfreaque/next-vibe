@@ -116,7 +116,8 @@ export const translations: typeof enTranslations = {
         description: "Se produjo un error al limpiar el caché URL",
       },
     },
-    name: "URL Cache Cleanup",
-    description: "Limpieza semanal de los archivos de caché para embrague URL",
+    name: "Limpieza de la caché de URL",
+    description:
+      "Elimina cada semana los archivos obsoletos de la caché de URL.",
   },
 };

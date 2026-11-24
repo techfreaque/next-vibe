@@ -38,7 +38,7 @@ export const translations: typeof enTranslations = {
   },
   sweep: {
     post: {
-      title: "Task Watchdog Sweep",
+      title: "Controllo delle attività bloccate",
       titleShort: "Occhiali da polso",
       description:
         "Trova bloccato, looping e compiti di sfondo orfano, li ferma con una ragione registrata e apre un incidente. Scappa ogni minuto.",
@@ -57,7 +57,7 @@ export const translations: typeof enTranslations = {
     },
     task: {
       description:
-        "Interrompe le attività che corrono troppo a lungo, loop o perso il loro processo. Ogni fermata apre un incidente.",
+        "Interrompe le attività che durano troppo, entrano in un ciclo o perdono il processo. Registra un incidente per ogni attività interrotta.",
     },
   },
   health: {

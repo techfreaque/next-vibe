@@ -46,6 +46,7 @@ import {
 import type { NotificationTarget } from "../../unified-runner/types";
 import { cronTasks, dbUserIdToOwner } from "../db";
 import { CronTasksRepository } from "../repository";
+import { translateTaskFields } from "../task-names";
 import { CRON_LIST_PAGE_SIZE } from "./constants";
 import type {
   CronTaskCreateRequestOutput,
@@ -64,35 +65,6 @@ export class CronTasksListRepository {
    * Database error message pattern for unique constraint violations
    */
   private static readonly UNIQUE_CONSTRAINT_ERROR = "unique constraint";
-
-  /**
-   * Translate task displayName and description using the endpoint's scoped translation.
-   * System tasks store scoped translation keys (e.g. "taskSync.name") as displayName/description.
-   * Falls back to the raw DB value if the endpoint can't be resolved or translation fails.
-   */
-  private static async translateTaskFields(
-    task: CronTaskResponseType,
-    locale: CountryLanguage,
-  ): Promise<CronTaskResponseType> {
-    const endpoint = await getEndpoint(task.routeId);
-    if (!endpoint) {
-      return task;
-    }
-
-    const { t } = endpoint.scopedTranslation.scopedT(locale);
-    const translatedName = t(task.displayName);
-    const translatedDesc = task.description ? t(task.description) : null;
-
-    return {
-      ...task,
-      displayName:
-        translatedName !== task.displayName ? translatedName : task.displayName,
-      description:
-        translatedDesc && translatedDesc !== task.description
-          ? translatedDesc
-          : task.description,
-    };
-  }
 
   /**
    * Format task response with DB fields
@@ -445,7 +417,7 @@ export class CronTasksListRepository {
             logger,
           );
           formatted.lastExecutionError = summaries.get(task.id) ?? null;
-          return CronTasksListRepository.translateTaskFields(formatted, locale);
+          return translateTaskFields(formatted, task.userId, locale);
         }),
       );
 
@@ -611,10 +583,7 @@ export class CronTasksListRepository {
         logger,
       );
       const response: CronTaskCreateResponseOutput = {
-        task: await CronTasksListRepository.translateTaskFields(
-          formatted,
-          locale,
-        ),
+        task: await translateTaskFields(formatted, createdTask.userId, locale),
       };
 
       logger.vibe("🚀 Successfully created cron task");

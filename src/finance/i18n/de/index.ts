@@ -145,6 +145,8 @@ export const translations: typeof enTranslations = {
     description:
       "Lesender Abruf echter Umsätze (Stripe, NOWPayments) und echter Anbieter-Guthaben. Berechnet die Tagesmarge und schlägt Alarm. Bewegt kein Geld.",
     task: {
+      balancesName: "Abgleich der Anbieter-Guthaben",
+      revenueName: "Umsatzabgleich",
       balances:
         "Stündlich: Guthaben aller Anbieter lesen, Ausgaben messen, Abflüsse und Spitzen melden.",
       revenue:

@@ -38,7 +38,7 @@ export const translations: typeof enTranslations = {
   },
   sweep: {
     post: {
-      title: "Task-Wächter Durchlauf",
+      title: "Aufgabenüberwachung",
       titleShort: "Wächter-Durchlauf",
       description:
         "Findet hängende, kreisende und verwaiste Hintergrund-Tasks, stoppt sie mit protokolliertem Grund und eröffnet einen Vorfall. Läuft jede Minute.",
@@ -56,7 +56,7 @@ export const translations: typeof enTranslations = {
     },
     task: {
       description:
-        "Stoppt Tasks, die zu lange laufen, kreisen oder ihren Prozess verloren haben. Jeder Stopp eröffnet einen Vorfall.",
+        "Stoppt Aufgaben, die zu lange laufen, in einer Schleife hängen oder deren Prozess beendet wurde. Erfasst jeden Stopp als Vorfall.",
     },
   },
   health: {

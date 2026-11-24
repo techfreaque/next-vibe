@@ -217,7 +217,7 @@ export const translations: typeof enTranslations = {
       },
       task: {
         description:
-          "Zamienia zarobki z poleceń starsze niż okres na zwroty w kredyty",
+          "Po upływie terminu na zwrot zamienia zarobki z poleceń na kredyty.",
       },
     },
     list: {

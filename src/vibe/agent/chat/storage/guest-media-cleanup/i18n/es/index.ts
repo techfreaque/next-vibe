@@ -58,7 +58,7 @@ export const translations: typeof enTranslations = {
     },
   },
   task: {
-    name: "Guest Media Cleanup",
+    name: "Limpieza de archivos de invitados",
     description:
       "Eliminación diaria de los medios de invitados expirados de chats incognito y de herramientas independientes",
   },

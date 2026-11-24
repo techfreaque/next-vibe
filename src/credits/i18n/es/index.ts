@@ -83,7 +83,7 @@ export const translations: typeof enTranslations = {
   },
   expire: {
     post: {
-      title: "Créditos de los gastos",
+      title: "Vencimiento de créditos",
       titleShort: "Créditos de los gastos",
       description:
         "Expire créditos de suscripción antiguos (llamados por cron)",
@@ -123,7 +123,8 @@ export const translations: typeof enTranslations = {
       },
     },
     task: {
-      description: "Expires antiguos créditos de suscripción diario",
+      description:
+        "Caduca a diario los créditos antiguos de las suscripciones.",
       error: "No se pudieron caducar los créditos",
     },
   },

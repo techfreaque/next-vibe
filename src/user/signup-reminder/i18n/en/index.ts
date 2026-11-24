@@ -56,7 +56,7 @@ export const translations = {
     },
   },
   task: {
-    name: "signup-reminder",
+    name: "Signup Reminder",
     description:
       "Every 30 minutes: one reminder to signups still unconfirmed 2 hours after their last email",
   },

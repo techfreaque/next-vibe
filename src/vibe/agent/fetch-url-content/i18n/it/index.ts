@@ -119,7 +119,8 @@ export const translations: typeof enTranslations = {
           "Si è verificato un errore durante la pulizia della cache URL",
       },
     },
-    name: "URL Pulizie di Cache",
-    description: "Pulizia settimanale dei file di cache fetch stale URL",
+    name: "Pulizia della cache degli URL",
+    description:
+      "Elimina ogni settimana i file obsoleti dalla cache degli URL.",
   },
 };

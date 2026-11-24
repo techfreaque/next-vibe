@@ -94,14 +94,14 @@ test("pulse leaves a live watchdog claim alone and completes a replacement for a
   });
 
   const live = await pulse();
-  expect(live.success && live.data.summary.tasksSkipped).toEqual(["Watchdog"]);
+  expect(live.success && live.data.summary.tasksSkipped).toEqual([TASK_WATCHDOG_SELF_ID]);
   expect(sweep).not.toHaveBeenCalled();
 
   const abandonedAt = new Date(liveStart.getTime() - 20 * 60_000);
   await db.update(cronTasks).set({ runStartedAt: null, updatedAt: abandonedAt }).where(taskFilter);
 
   const recovered = await pulse();
-  expect(recovered.success && recovered.data.summary.tasksSucceeded).toEqual(["Watchdog"]);
+  expect(recovered.success && recovered.data.summary.tasksSucceeded).toEqual([TASK_WATCHDOG_SELF_ID]);
   expect(sweep).toHaveBeenCalledTimes(1);
 
   const [task] = await db.select().from(cronTasks).where(taskFilter);
@@ -117,9 +117,43 @@ test("pulse leaves a live watchdog claim alone and completes a replacement for a
     CronTaskStatus.TIMEOUT,
     CronTaskStatus.COMPLETED,
   ]);
+  expect(history.map((run) => run.taskName)).toEqual([
+    TASK_WATCHDOG_SWEEP_ALIAS,
+    TASK_WATCHDOG_SWEEP_ALIAS,
+  ]);
   expect(history[0]?.startedAt).toEqual(abandonedAt);
   expect(history[1]?.completedAt).toBeInstanceOf(Date);
   expect(history[1]?.result).toEqual({ checked: 0, cancelled: 0 });
+});
+
+test("pulse history localizes task ids and handles shared legacy keys", async () => {
+  const { loadPulseTaskNames } = await import("./i18n-utils");
+  const sessionId = "pulse-history-session-cleanup";
+  const signupId = "pulse-history-signup-reminder";
+  await db.insert(cronTasks).values(
+    [
+      { id: sessionId, routeId: "user_session-cleanup_POST" },
+      { id: signupId, routeId: "user_signup-reminder_POST" },
+    ].map((task) => ({
+      ...task,
+      shortId: task.id,
+      displayName: "task.name",
+      schedule: "0 7 * * *",
+      category: TaskCategory.MAINTENANCE,
+      priority: CronTaskPriority.LOW,
+    })),
+  );
+
+  const unavailableName = "Nazwa zadania niedostępna";
+  const names = await loadPulseTaskNames(
+    [sessionId, signupId, "task.name", "Custom task"],
+    "pl-PL",
+    unavailableName,
+  );
+  expect(names.get(sessionId)).toBe("Czyszczenie sesji");
+  expect(names.get(signupId)).toBe("Przypomnienie o rejestracji");
+  expect(names.get("task.name")).toBe(unavailableName);
+  expect(names.get("Custom task")).toBeUndefined();
 });
 
 test("seeding the replacement disables the legacy cleanup and keeps its history", async () => {

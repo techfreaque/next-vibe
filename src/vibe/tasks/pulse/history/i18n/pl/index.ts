@@ -98,6 +98,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    taskNameUnavailable: "Nazwa zadania niedostępna",
     title: "Historia Pulse",
     empty: "Nie znaleziono wykonań Pulse",
     details: "Szczegóły",

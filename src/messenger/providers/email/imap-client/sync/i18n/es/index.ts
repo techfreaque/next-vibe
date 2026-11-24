@@ -3,7 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   category: "Cliente IMAP",
 
-  title: "IMAP Sync",
+  title: "Sincronización IMAP",
   titleShort: "IMAP Sync",
   description: "Servicio de sincronización IMAP",
   container: {

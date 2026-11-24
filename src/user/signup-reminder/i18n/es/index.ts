@@ -58,7 +58,7 @@ export const translations: typeof enTranslations = {
     },
   },
   task: {
-    name: "signup-reminder",
+    name: "Recordatorio de registro",
     description:
       "Cada 30 minutos: un recordatorio a los registros aún sin confirmar 2 horas después del último correo",
   },

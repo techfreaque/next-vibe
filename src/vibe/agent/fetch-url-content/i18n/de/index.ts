@@ -114,7 +114,7 @@ export const translations: typeof enTranslations = {
           "Beim Bereinigen des URL-Caches ist ein Fehler aufgetreten",
       },
     },
-    name: "URL-Cache Bereinigung",
+    name: "URL-Cache-Bereinigung",
     description: "Wöchentliche Bereinigung veralteter URL-Cache-Dateien",
   },
 };

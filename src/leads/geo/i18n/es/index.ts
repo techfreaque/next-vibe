@@ -60,7 +60,7 @@ export const translations: typeof enTranslations = {
     },
     task: {
       description:
-        "Actualización mensual de países DB-IP y completado horario del país de los prospectos",
+        "Actualiza cada mes los países de DB-IP y completa cada hora el país de los prospectos que aún no lo tienen.",
     },
   },
   enums: {

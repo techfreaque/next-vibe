@@ -14,6 +14,7 @@ import {
 } from "../../../core/route/response.schema";
 import { parseError } from "../../../core/utils/parse-error";
 import type { EndpointLogger } from "../../../logger/types";
+import { loadPulseTaskNames } from "../i18n-utils";
 import { PulseHealthRepository } from "../repository";
 import type {
   PulseExecuteRequestOutput,
@@ -60,16 +61,20 @@ export class PulseExecuteRepository {
       }
 
       const { summary, isDryRun } = result.data;
+      const names = await loadPulseTaskNames(
+        [...summary.tasksSucceeded, ...summary.tasksFailed],
+        systemLocale,
+      );
 
       // Build per-task results from the summary arrays
       const results: PulseExecuteResponseOutput["results"] = [
-        ...summary.tasksSucceeded.map((taskName) => ({
-          taskName,
+        ...summary.tasksSucceeded.map((id) => ({
+          taskName: names.get(id) ?? id,
           success: true,
           duration: 0,
         })),
-        ...summary.tasksFailed.map((taskName) => ({
-          taskName,
+        ...summary.tasksFailed.map((id) => ({
+          taskName: names.get(id) ?? id,
           success: false,
           duration: 0,
         })),

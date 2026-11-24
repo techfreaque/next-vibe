@@ -57,7 +57,7 @@ export const translations: typeof enTranslations = {
     },
   },
   task: {
-    name: "verify-email-reminder",
+    name: "Przypomnienie o potwierdzeniu adresu e-mail",
     description:
       "Co godzinę: jedno przypomnienie dla kont niepotwierdzonych 24 godziny po rejestracji",
   },

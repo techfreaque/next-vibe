@@ -100,8 +100,8 @@ export const translations: typeof enTranslations = {
     models: "Modelli",
   },
   updateAllModelPrices: {
-    name: "Aggiorna tutti i prezzi del modello",
+    name: "Aggiorna tutti i prezzi dei modelli",
     description:
-      "Tariffe live prezzi per tutti i modelli da ogni fornitore API e aggiornamenti model.ts",
+      "Recupera i prezzi correnti di tutti i modelli dalle API dei fornitori e aggiorna models.ts.",
   },
 };

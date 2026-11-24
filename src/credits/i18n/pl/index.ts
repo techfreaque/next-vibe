@@ -158,7 +158,7 @@ export const translations: typeof enTranslations = {
   },
   expire: {
     post: {
-      title: "Wygaś kredyty",
+      title: "Wygaszanie kredytów",
       titleShort: "Wygaś kredyty",
       description:
         "Wygasza stare kredyty subskrypcyjne (wywoływane przez cron)",
@@ -198,7 +198,7 @@ export const translations: typeof enTranslations = {
       },
     },
     task: {
-      description: "Wygasa stare kredyty subskrypcyjne codziennie",
+      description: "Codziennie wygasza stare kredyty z subskrypcji.",
       error: "Nie udało się wygasić kredytów",
     },
   },

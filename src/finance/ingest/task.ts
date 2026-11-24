@@ -27,7 +27,7 @@ import { tools } from "./route";
 
 const financeBalancesTask = createCronTask(definitions.POST, tools.POST, {
   id: "finance-balances-hourly",
-  name: "ingest.title",
+  name: "ingest.task.balancesName",
   description: "ingest.task.balances",
   schedule: CRON_SCHEDULES.EVERY_HOUR,
   category: TaskCategory.MONITORING,
@@ -42,7 +42,7 @@ const financeBalancesTask = createCronTask(definitions.POST, tools.POST, {
 
 const financeRevenueTask = createCronTask(definitions.POST, tools.POST, {
   id: "finance-revenue-daily",
-  name: "ingest.title",
+  name: "ingest.task.revenueName",
   description: "ingest.task.revenue",
   schedule: CRON_SCHEDULES.DAILY_6AM,
   category: TaskCategory.MONITORING,

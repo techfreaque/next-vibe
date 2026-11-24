@@ -5,10 +5,10 @@ export const translations: typeof enTranslations = {
   tag: "IP Match Link",
   task: {
     description:
-      "Escane anónimos que comparten la misma dirección IP y los vinculan como la misma persona",
+      "Vincula los prospectos anónimos que comparten una dirección IP como una sola persona.",
   },
   post: {
-    title: "IP Match Link",
+    title: "Vinculación de prospectos por IP",
     titleShort: "IP Linking",
     description:
       "Enlace de cables anónimos que comparten la misma dirección IP",

@@ -237,8 +237,9 @@ export const translations: typeof enTranslations = {
     notifyAlways: "Informare sempre",
   },
   dbHealthCheck: {
-    name: "db-health-check",
-    description: "Verifica la salute della connessione di database ogni minuto",
+    name: "Controllo dello stato del database",
+    description:
+      "Controlla ogni minuto lo stato della connessione al database.",
   },
   pulseRunner: {
     name: "pulse-runner",
@@ -526,9 +527,9 @@ export const translations: typeof enTranslations = {
       },
     },
     cleanup: {
-      name: "error-logs-cleanup",
+      name: "Pulizia del registro degli errori",
       description:
-        "I registri di errore Prunes sono superiori a 6 mesi e le righe totali dei tappi a 100K",
+        "Elimina i registri degli errori con più di sei mesi e conserva al massimo 100.000 voci.",
       post: {
         title: "Ripulire i registri di errore",
         titleShort: "Ripulire il registro",

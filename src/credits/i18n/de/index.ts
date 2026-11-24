@@ -197,7 +197,7 @@ export const translations: typeof enTranslations = {
       },
     },
     task: {
-      description: "Läuft alte Abonnement-Credits täglich ab",
+      description: "Lässt täglich alte Abonnement-Credits verfallen.",
       error: "Fehler beim Ablaufen von Credits",
     },
   },

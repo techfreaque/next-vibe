@@ -144,10 +144,12 @@ export const translations: typeof enTranslations = {
     description:
       "Sollevamento di ricavi reali (Stripe, NOWPayments) e bilancia dei fornitori reali. Computa il margine giornaliero e solleva gli avvisi. Non ci sono soldi.",
     task: {
+      balancesName: "Sincronizzazione dei saldi dei fornitori",
+      revenueName: "Sincronizzazione dei ricavi",
       balances:
-        "Ore: leggere ogni saldo del fornitore, misurare la spesa, sgomberi di bandiera e punte.",
+        "Ogni ora rileva i saldi dei fornitori e le spese, segnalando cali anomali e picchi di consumo.",
       revenue:
-        "Quotidiano: tirare Stripe e NOWPayments entrate, roll up margine, rimborsi di bandiera, dispute e margine sottile.",
+        "Ogni giorno acquisisce i ricavi da Stripe e NOWPayments, calcola il margine e segnala rimborsi, contestazioni e margini bassi.",
     },
     fields: {
       scope: {

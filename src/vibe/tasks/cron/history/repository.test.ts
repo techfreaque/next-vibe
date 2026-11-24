@@ -104,6 +104,7 @@ it("counts the same owner-scoped runs matched by display name and execution prio
     owner,
     t,
     logger,
+    defaultLocale,
   );
   expect(result.success && result.data.totalCount).toBe(2);
   expect(result.success && result.data.statusCounts.all).toBe(2);
@@ -122,6 +123,7 @@ it("keeps task identity in a filtered run view and does not reveal another owner
     owner,
     t,
     logger,
+    defaultLocale,
   );
   expect(selected.success && selected.data.selectedTask).toEqual({
     id: taskId,
@@ -136,6 +138,7 @@ it("keeps task identity in a filtered run view and does not reveal another owner
     owner,
     t,
     logger,
+    defaultLocale,
   );
   expect(other.success && other.data.totalCount).toBe(0);
   expect(other.success && other.data.selectedTask).toBeUndefined();
@@ -150,6 +153,7 @@ it("matches report scope, including hidden enabled tasks and optionally disabled
       owner,
       t,
       logger,
+      defaultLocale,
     );
   const [enabled, all] = await Promise.all([
     run(TaskHistoryScope.ENABLED),
@@ -159,4 +163,46 @@ it("matches report scope, including hidden enabled tasks and optionally disabled
     "hidden-active",
   ]);
   expect(all.success && all.data.totalCount).toBe(2);
+});
+
+it("localizes an older run and its selected task in each viewer's locale", async () => {
+  const systemTaskId = "session-cleanup";
+  const routeId = "user_session-cleanup_POST";
+  await pg.query(
+    "INSERT INTO cron_tasks (id, display_name, route_id, priority) VALUES ($1, 'task.name', $2, $3)",
+    [systemTaskId, routeId, CronTaskPriority.LOW],
+  );
+  await pg.query(
+    `INSERT INTO cron_task_executions
+     (task_id, task_name, execution_id, started_at, status, priority, config)
+     VALUES ($1, 'task.name', 'old-session-cleanup-run', $2, $3, $4, '{}')`,
+    [systemTaskId, runTime, CronTaskStatus.COMPLETED, CronTaskPriority.LOW],
+  );
+
+  const admin: JwtPrivatePayloadType = {
+    ...owner,
+    roles: [UserPermissionRole.ADMIN],
+  };
+  for (const [locale, displayName] of [
+    ["en-US", "Session Cleanup"],
+    ["de-DE", "Sitzungsbereinigung"],
+    ["pl-PL", "Czyszczenie sesji"],
+    ["es-ES", "Limpieza de sesiones"],
+    ["fr-FR", "Nettoyage des sessions"],
+    ["it-IT", "Pulizia delle sessioni"],
+  ] as const) {
+    const result = await CronHistoryRepository.getTaskHistory(
+      GET.requestSchema.parse({ taskId: systemTaskId }),
+      admin,
+      scopedTranslation.scopedT(locale).t,
+      logger,
+      locale,
+    );
+    expect(result.success && result.data.selectedTask?.name).toBe(displayName);
+    expect(result.success && result.data.executions[0]).toMatchObject({
+      taskId: systemTaskId,
+      taskName: routeId,
+      taskDisplayName: displayName,
+    });
+  }
 });

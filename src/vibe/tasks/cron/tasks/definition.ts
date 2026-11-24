@@ -209,7 +209,7 @@ const { GET } = createEndpoint({
         label: "get.fields.limit.label",
         description: "get.fields.limit.description",
         columns: 3,
-        schema: z.string().optional(),
+        schema: z.union([z.string(), z.number().transform(String)]).optional(),
       }),
       offset: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -217,7 +217,7 @@ const { GET } = createEndpoint({
         label: "get.fields.offset.label",
         description: "get.fields.offset.description",
         columns: 3,
-        schema: z.string().optional(),
+        schema: z.union([z.string(), z.number().transform(String)]).optional(),
       }),
 
       // Response fields

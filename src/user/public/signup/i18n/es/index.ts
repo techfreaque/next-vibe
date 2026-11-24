@@ -2,9 +2,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   bounceSync: {
-    title: "Fallos de entrega de registro sincronizado",
+    title: "Detección de correos de registro no entregados",
     description:
-      "Compruebe la bandeja de entrada del sistema para correos electrónicos de confirmación de registro fallidos.",
+      "Busca en el buzón del sistema avisos de que un correo de confirmación de registro no se pudo entregar.",
     marked: "Actualización de las firmas",
     result: "Suscripciones actualizadas: {{count}}",
     productionOnly:

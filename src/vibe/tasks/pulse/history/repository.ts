@@ -6,6 +6,7 @@ import "server-only";
 
 import { and, avg, count, desc, eq, gte, lte, sql } from "drizzle-orm";
 
+import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -17,6 +18,7 @@ import { db } from "../../../database";
 import type { EndpointLogger } from "../../../logger/types";
 import { PulseExecutionStatus } from "../../enum";
 import { pulseExecutions } from "../db";
+import { loadPulseTaskNames } from "../i18n-utils";
 import type {
   PulseHistoryRequestOutput,
   PulseHistoryResponseOutput,
@@ -28,6 +30,7 @@ export class PulseHistoryRepository {
     data: PulseHistoryRequestOutput,
     logger: EndpointLogger,
     t: PulseHistoryT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<PulseHistoryResponseOutput>> {
     try {
       const limit =
@@ -93,6 +96,20 @@ export class PulseHistoryRepository {
             )
           : 0;
 
+      const names = await loadPulseTaskNames(
+        rows.flatMap((row) => [
+          ...row.tasksDue,
+          ...row.tasksExecuted,
+          ...row.tasksSucceeded,
+          ...row.tasksFailed,
+          ...row.tasksSkipped,
+        ]),
+        locale,
+        t("widget.taskNameUnavailable"),
+      );
+      const nameOf = (reference: string): string =>
+        names.get(reference) ?? reference;
+
       const executions: PulseHistoryResponseOutput["executions"] = rows.map(
         (r) => ({
           id: r.id,
@@ -103,11 +120,11 @@ export class PulseHistoryRepository {
           completedAt: r.completedAt?.toISOString() ?? null,
           durationMs: r.durationMs,
           totalTasksDiscovered: r.totalTasksDiscovered,
-          tasksDue: (r.tasksDue as string[]) ?? [],
-          tasksExecuted: (r.tasksExecuted as string[]) ?? [],
-          tasksSucceeded: (r.tasksSucceeded as string[]) ?? [],
-          tasksFailed: (r.tasksFailed as string[]) ?? [],
-          tasksSkipped: (r.tasksSkipped as string[]) ?? [],
+          tasksDue: r.tasksDue.map(nameOf),
+          tasksExecuted: r.tasksExecuted.map(nameOf),
+          tasksSucceeded: r.tasksSucceeded.map(nameOf),
+          tasksFailed: r.tasksFailed.map(nameOf),
+          tasksSkipped: r.tasksSkipped.map(nameOf),
           totalExecutionTimeMs: r.totalExecutionTimeMs,
           environment: r.environment,
           triggeredBy: r.triggeredBy,

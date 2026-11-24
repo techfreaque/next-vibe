@@ -3,10 +3,10 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   tag: "Newsletter",
   post: {
-    title: "Lama della Newsletter",
+    title: "Invio della newsletter",
     titleShort: "Blast",
     description:
-      "Invia una newsletter unica per confermare solo gli opt-in. Gli spettacoli a secco per ogni locale. Invia subito una mail a questa newsletter, nient'altro.",
+      "Invia una newsletter una tantum solo a chi ha confermato l’iscrizione. La simulazione mostra il numero di destinatari per lingua. L’opzione di invio la spedisce subito.",
     container: {
       title: "Scomparto della newsletter",
       description: "Solo gli opt-in confermati. Conte, coda, manda.",

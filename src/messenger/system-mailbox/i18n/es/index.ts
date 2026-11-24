@@ -150,7 +150,7 @@ export const translations: typeof enTranslations = {
   },
 
   report: {
-    title: "Daily Status Report",
+    title: "Informe diario de estado",
     titleShort: "Informe diario",
     description:
       "Componga el último informe de plataforma-24h y envíelo por correo desde el buzón de plataforma",

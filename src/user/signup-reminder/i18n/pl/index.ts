@@ -59,7 +59,7 @@ export const translations: typeof enTranslations = {
     },
   },
   task: {
-    name: "signup-reminder",
+    name: "Przypomnienie o rejestracji",
     description:
       "Co 30 minut: jedno przypomnienie dla rejestracji niepotwierdzonych 2 godziny po ostatnim e-mailu",
   },

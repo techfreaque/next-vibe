@@ -58,7 +58,7 @@ export const translations: typeof enTranslations = {
     },
   },
   task: {
-    name: "signup-reminder",
+    name: "Rappel d’inscription",
     description:
       "Toutes les 30 minutes : un rappel aux inscriptions encore non confirmées 2 heures après le dernier e-mail",
   },

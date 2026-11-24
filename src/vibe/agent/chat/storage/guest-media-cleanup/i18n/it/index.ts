@@ -58,8 +58,8 @@ export const translations: typeof enTranslations = {
     },
   },
   task: {
-    name: "Pulizia dei media degli ospiti",
+    name: "Pulizia dei file degli ospiti",
     description:
-      "Rimozione giornaliera dei supporti ospiti scaduti da chat incognito e funzioni di strumento standalone",
+      "Elimina ogni giorno i file scaduti degli ospiti dalle chat in incognito e dalle esecuzioni autonome degli strumenti.",
   },
 };

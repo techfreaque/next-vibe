@@ -91,9 +91,9 @@ export const translations: typeof enTranslations = {
   },
 
   task: {
-    name: "Catálogo modelo Scan",
+    name: "Revisión del catálogo de modelos",
     description:
-      "Cada 5 días: lista de modelos de proveedores de difusores y precios contra nuestro catálogo, almacenar y enviar el informe.",
+      "Cada 5 días compara los modelos y precios de los proveedores con el catálogo, guarda el informe y lo envía por correo.",
   },
 
   errors: {

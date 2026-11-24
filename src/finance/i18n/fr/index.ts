@@ -146,6 +146,8 @@ export const translations: typeof enTranslations = {
     description:
       "Lecture seule du chiffre d'affaires réel (Stripe, NOWPayments) et des soldes réels des fournisseurs. Calcule la marge journalière et déclenche des alertes. Ne déplace aucun argent.",
     task: {
+      balancesName: "Synchronisation des soldes fournisseurs",
+      revenueName: "Synchronisation des revenus",
       balances:
         "Toutes les heures : lit chaque solde fournisseur, mesure les dépenses, signale les baisses anormales et les pics.",
       revenue:

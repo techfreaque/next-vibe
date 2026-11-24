@@ -65,7 +65,7 @@ export const translations: typeof enTranslations = {
     },
   },
   task: {
-    name: "user-session-cleanup",
+    name: "Pulizia delle sessioni",
     description:
       "Pulire le sessioni utente scadute per mantenere la sicurezza del sistema",
     purpose:

@@ -28,6 +28,7 @@ import { cronTasks, dbUserIdToOwner } from "../cron/db";
 import { createTaskEmitters } from "../cron/emitter";
 import { CronTasksRepository } from "../cron/repository";
 import { resolveTaskOwnerUser } from "../cron/resolve-task-user";
+import { translateTaskName } from "../cron/task-names";
 import { CronTaskStatus, type CronTaskStatusValue } from "../enum";
 import { scopedTranslation as tasksScopedTranslation } from "../i18n";
 import type {
@@ -304,7 +305,7 @@ export class TaskExecuteRepository {
         const execResponse = await CronTasksRepository.createExecution(
           {
             taskId: task.id,
-            taskName: task.displayName,
+            taskName: task.routeId,
             executionId: crypto.randomUUID(),
             status: attemptStatus,
             priority: task.priority,
@@ -394,7 +395,7 @@ export class TaskExecuteRepository {
     return success<TaskExecuteResponseOutput>({
       success: true,
       taskId: task.id,
-      taskName: task.displayName,
+      taskName: await translateTaskName(task, locale),
       executedAt: startedAt,
       duration: finalDurationMs,
       status: finalStatus,

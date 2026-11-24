@@ -23,10 +23,9 @@ import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import { getEndpoint } from "@/generated/endpoints/endpoint";
-
 import { StreamControl } from "../../agent/ai-stream/repository/core/stream-control";
 import { cronTaskExecutions, type CronTaskRow, cronTasks } from "../cron/db";
+import { translateTaskNames } from "../cron/task-names";
 import { CronTaskStatus, type CronTaskStatusValue } from "../enum";
 import { scopedTranslation as tasksScopedTranslation } from "../i18n";
 import type { BudgetCapsGetResponseOutput } from "./budget-caps/definition";
@@ -126,7 +125,7 @@ export class TaskWatchdogRepository {
       try {
         await db.insert(cronTaskExecutions).values({
           taskId: row.id,
-          taskName: row.displayName,
+          taskName: row.routeId,
           executionId: crypto.randomUUID(),
           status: params.status,
           priority: row.priority,
@@ -152,7 +151,7 @@ export class TaskWatchdogRepository {
       await TaskGuard.recordIncident(
         {
           taskId: row.id,
-          taskName: row.displayName,
+          taskName: row.routeId,
           type: params.incident.type,
           reason: params.reason,
           metadata: {
@@ -168,7 +167,7 @@ export class TaskWatchdogRepository {
 
     logger.warn("[TaskWatchdog] Task stopped", {
       taskId: row.id,
-      taskName: row.displayName,
+      taskName: row.routeId,
       status: params.status,
       reason: params.reason,
       hadLocalRun,
@@ -323,7 +322,7 @@ export class TaskWatchdogRepository {
       await TaskGuard.recordIncident(
         {
           taskId: task.id,
-          taskName: task.displayName,
+          taskName: task.routeId,
           type: TaskIncidentType.LOOP,
           reason: `Failed ${loop.count} runs in a row with the same error - task disabled: ${loop.message}`,
           metadata: { runs: loop.count, routeId: task.routeId, disabled: true },
@@ -441,36 +440,6 @@ export class TaskWatchdogRepository {
 
   // ─── Health ───────────────────────────────────────────────────────────────
 
-  /**
-   * System tasks store scoped translation keys as their display name
-   * ("updateAllModelPrices.name"): resolve each through its own endpoint's
-   * scope, fall back to the raw value.
-   */
-  private static async translateNames(
-    items: ReadonlyArray<{ taskId: string; name: string }>,
-    locale: CountryLanguage,
-  ): Promise<Map<string, string>> {
-    const out = new Map<string, string>();
-    const ids = [...new Set(items.map((i) => i.taskId))];
-    if (ids.length === 0) {
-      return out;
-    }
-    const routes = await db
-      .select({ id: cronTasks.id, routeId: cronTasks.routeId })
-      .from(cronTasks)
-      .where(inArray(cronTasks.id, ids));
-    const routeById = new Map(routes.map((r) => [r.id, r.routeId]));
-    for (const item of items) {
-      const routeId = routeById.get(item.taskId);
-      const endpoint = routeId ? await getEndpoint(routeId) : null;
-      const translated = endpoint
-        ? endpoint.scopedTranslation.scopedT(locale).t(item.name)
-        : item.name;
-      out.set(`${item.taskId}\u0000${item.name}`, translated);
-    }
-    return out;
-  }
-
   static async health(
     locale: CountryLanguage,
     t: WatchdogT,
@@ -498,7 +467,6 @@ export class TaskWatchdogRepository {
           .select({
             id: cronTaskExecutions.id,
             taskId: cronTaskExecutions.taskId,
-            name: cronTaskExecutions.taskName,
             status: cronTaskExecutions.status,
             completedAt: cronTaskExecutions.completedAt,
             startedAt: cronTaskExecutions.startedAt,
@@ -527,17 +495,28 @@ export class TaskWatchdogRepository {
         TaskGuard.loadCaps(),
       ]);
 
-      const { t: tasksT } = tasksScopedTranslation.scopedT(locale);
-      const names = await TaskWatchdogRepository.translateNames(
-        [
-          ...runningRows.map((r) => ({ taskId: r.id, name: r.displayName })),
-          ...failures.map((f) => ({ taskId: f.taskId, name: f.name })),
-          ...incidents.map((i) => ({ taskId: i.taskId, name: i.taskName })),
-        ],
+      const historyTaskIds = [
+        ...new Set([
+          ...failures.map((f) => f.taskId),
+          ...incidents.map((i) => i.taskId),
+        ]),
+      ];
+      const historyTasks = historyTaskIds.length
+        ? await db
+            .select({
+              id: cronTasks.id,
+              routeId: cronTasks.routeId,
+              displayName: cronTasks.displayName,
+              userId: cronTasks.userId,
+            })
+            .from(cronTasks)
+            .where(inArray(cronTasks.id, historyTaskIds))
+        : [];
+      const names = await translateTaskNames(
+        [...runningRows, ...historyTasks],
         locale,
       );
-      const nameOf = (taskId: string, name: string): string =>
-        names.get(`${taskId}\u0000${name}`) ?? name;
+      const { t: tasksT } = tasksScopedTranslation.scopedT(locale);
 
       const dayCap =
         caps.find(
@@ -555,7 +534,7 @@ export class TaskWatchdogRepository {
           );
           return {
             id: r.id,
-            name: nameOf(r.id, r.displayName),
+            name: names.get(r.id) ?? r.displayName,
             routeId: r.routeId,
             goal: goalTag
               ? goalTag.slice(TASK_WATCHDOG_CONFIG.goalTagPrefix.length)
@@ -571,7 +550,7 @@ export class TaskWatchdogRepository {
         failures: failures.map((f) => ({
           id: f.id,
           taskId: f.taskId,
-          name: nameOf(f.taskId, f.name),
+          name: names.get(f.taskId) ?? f.taskId,
           status: tasksT(f.status),
           finishedAt: (f.completedAt ?? f.startedAt).toISOString(),
           durationMs: f.durationMs,
@@ -580,7 +559,7 @@ export class TaskWatchdogRepository {
         incidents: incidents.map((i) => ({
           id: i.id,
           taskId: i.taskId,
-          taskName: nameOf(i.taskId, i.taskName),
+          taskName: names.get(i.taskId) ?? i.taskId,
           type: i.type,
           reason: i.reason,
           createdAt: i.createdAt.toISOString(),

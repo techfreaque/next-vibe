@@ -202,10 +202,10 @@ export const translations: typeof enTranslations = {
   },
   run: {
     post: {
-      title: "Esegui i viaggi del ciclo di vita",
+      title: "Campagne email automatizzate",
       titleShort: "Ciclo di vita",
       description:
-        "Iscrive i contatti appena idonei e invia le email di viaggio. Non fa niente mentre l'interruttore di eliminazione è acceso.",
+        "Iscrive i nuovi contatti idonei e invia le email programmate. L’arresto di emergenza sospende entrambe le operazioni.",
       container: {
         title: "Ciclo di vita",
         description:

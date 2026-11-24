@@ -82,7 +82,7 @@ export const translations: typeof enTranslations = {
   },
   expire: {
     post: {
-      title: "Crediti scaduti",
+      title: "Scadenza dei crediti",
       titleShort: "Crediti scaduti",
       description: "Crediti abbonamenti vecchi (chiamati da cron)",
       tag: "scadenza",
@@ -121,7 +121,8 @@ export const translations: typeof enTranslations = {
       },
     },
     task: {
-      description: "Scade i crediti di abbonamento vecchi al giorno",
+      description:
+        "Fa scadere ogni giorno i crediti residui dei periodi di abbonamento precedenti.",
       error: "Impossibile far scadere i crediti",
     },
   },

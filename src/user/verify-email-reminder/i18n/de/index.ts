@@ -57,7 +57,7 @@ export const translations: typeof enTranslations = {
     },
   },
   task: {
-    name: "verify-email-reminder",
+    name: "Erinnerung an die E-Mail-Bestätigung",
     description:
       "Stündlich: eine Erinnerung an Konten, die 24 Stunden nach der Registrierung noch unbestätigt sind",
   },

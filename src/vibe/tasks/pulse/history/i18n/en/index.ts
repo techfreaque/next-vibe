@@ -97,6 +97,7 @@ export const translations = {
     },
   },
   widget: {
+    taskNameUnavailable: "Task name unavailable",
     title: "Pulse History",
     empty: "No pulse executions found",
     details: "Details",

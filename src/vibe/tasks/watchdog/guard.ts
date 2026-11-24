@@ -256,7 +256,6 @@ export class TaskGuard {
     try {
       const [task] = await db
         .select({
-          displayName: cronTasks.displayName,
           routeId: cronTasks.routeId,
           tags: cronTasks.tags,
           timeout: cronTasks.timeout,
@@ -265,7 +264,7 @@ export class TaskGuard {
         .from(cronTasks)
         .where(eq(cronTasks.id, taskId))
         .limit(1);
-      const taskName = task?.displayName ?? taskId;
+      const taskName = task?.routeId ?? taskId;
       const goal = task ? goalFromTags(task.tags) : null;
       const since = task?.runStartedAt ?? utcDayStart(now);
 

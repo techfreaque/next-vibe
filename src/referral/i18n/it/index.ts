@@ -200,7 +200,7 @@ export const translations: typeof enTranslations = {
   earnings: {
     confirm: {
       post: {
-        title: "Confermare le orecchie di rinvio",
+        title: "Conferma delle commissioni da referral",
         titleShort: "Confermare i guadagni",
         description:
           "Sblocca i guadagni di riferimento la cui finestra di rimborso è passata. Corri ogni giorno.",
@@ -219,7 +219,7 @@ export const translations: typeof enTranslations = {
       },
       task: {
         description:
-          "Trasforma i guadagni di riferimento più vecchi della finestra di rimborso in crediti guadagnati",
+          "Converte le commissioni da referral in crediti allo scadere del periodo di rimborso.",
       },
     },
     list: {

@@ -1,44 +1,60 @@
-/**
- * Utility helpers that need i18n but cannot live in i18n/index.ts
- * (the boilerplate lint rule only allows the two standard exports there).
- */
+import "server-only";
+
+import { inArray, or } from "drizzle-orm";
 
 import type { CountryLanguage } from "../../core/i18n/core/config";
-import type { TasksTranslationKey } from "../i18n";
-import { scopedTranslation } from "../i18n";
+import { db } from "../../database";
+import { cronTasks } from "../cron/db";
+import { translateTaskNames } from "../cron/task-names";
 
-/**
- * Resolve a task display name that may be a scoped translation key or a plain string.
- * Used in seeds and logging where the value comes from DB/registry as a plain string.
- * Falls back to the input unchanged if not a known key.
- */
-export function resolveTaskDisplayName(
-  nameOrKey: string,
+/** Pulse history originally stored display names and scoped keys without task ids. */
+export async function loadPulseTaskNames(
+  references: readonly string[],
   locale: CountryLanguage,
-): string {
-  const { t } = scopedTranslation.scopedT(locale);
-  return t(nameOrKey as TasksTranslationKey);
-}
+  unavailableName?: string,
+): Promise<Map<string, string>> {
+  const values = [...new Set(references)];
+  if (values.length === 0) {
+    return new Map();
+  }
+  const byId = inArray(cronTasks.id, values);
+  const tasks = await db
+    .select({
+      id: cronTasks.id,
+      routeId: cronTasks.routeId,
+      displayName: cronTasks.displayName,
+      userId: cronTasks.userId,
+    })
+    .from(cronTasks)
+    .where(
+      unavailableName ? or(byId, inArray(cronTasks.displayName, values)) : byId,
+    );
+  const names = await translateTaskNames(tasks, locale);
+  if (unavailableName === undefined) {
+    return names;
+  }
 
-/**
- * Like resolveTaskDisplayName, but also tries the task endpoint's own scope:
- * system tasks store the endpoint-scoped key (e.g. "start.cron.name"), which
- * the tasks scope cannot resolve, so logs showed the raw key.
- */
-export async function resolveTaskDisplayNameForRoute(
-  nameOrKey: string,
-  routeId: string,
-  locale: CountryLanguage,
-): Promise<string> {
-  const viaTasksScope = resolveTaskDisplayName(nameOrKey, locale);
-  if (viaTasksScope !== nameOrKey) {
-    return viaTasksScope;
+  const legacy = new Map<string, Set<string>>();
+  for (const task of tasks) {
+    const name = names.get(task.id) ?? task.displayName;
+    const labels = legacy.get(task.displayName) ?? new Set<string>();
+    labels.add(name);
+    legacy.set(task.displayName, labels);
   }
-  const { getEndpoint } = await import("@/generated/endpoints/endpoint");
-  const endpoint = await getEndpoint(routeId);
-  if (!endpoint) {
-    return nameOrKey;
+
+  for (const value of values) {
+    if (names.has(value)) {
+      continue;
+    }
+    const labels = [...(legacy.get(value) ?? [])];
+    if (labels.length === 1) {
+      names.set(value, labels[0]);
+    } else if (
+      labels.length > 1 ||
+      /^[A-Za-z][\w]*(?:\.[A-Za-z][\w]*)+$/.test(value)
+    ) {
+      names.set(value, unavailableName);
+    }
   }
-  const { t } = endpoint.scopedTranslation.scopedT(locale);
-  return t(nameOrKey);
+  return names;
 }

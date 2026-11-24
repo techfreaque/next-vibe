@@ -8,8 +8,6 @@ import "server-only";
 
 import { and, count, eq, ilike, inArray, isNull, or } from "drizzle-orm";
 
-import { getEndpoint } from "@/generated/endpoints/endpoint";
-
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
@@ -32,6 +30,7 @@ import {
 } from "../../enum";
 import { cronTasks, dbUserIdToOwner } from "../db";
 import { CronTasksRepository } from "../repository";
+import { translateTaskFields } from "../task-names";
 import type {
   CronQueueListRequestOutput,
   CronQueueListResponseOutput,
@@ -92,33 +91,6 @@ export class CronQueueRepository {
       owner: dbUserIdToOwner(task.userId),
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
-    };
-  }
-
-  /**
-   * Translate displayName/description from scoped keys if the endpoint has translations.
-   */
-  private static async translateQueueTask(
-    task: CronQueueTask,
-    locale: CountryLanguage,
-  ): Promise<CronQueueTask> {
-    const endpoint = await getEndpoint(task.routeId);
-    if (!endpoint) {
-      return task;
-    }
-
-    const { t } = endpoint.scopedTranslation.scopedT(locale);
-    const translatedName = t(task.displayName);
-    const translatedDesc = task.description ? t(task.description) : null;
-
-    return {
-      ...task,
-      displayName:
-        translatedName !== task.displayName ? translatedName : task.displayName,
-      description:
-        translatedDesc && translatedDesc !== task.description
-          ? translatedDesc
-          : task.description,
     };
   }
 
@@ -214,7 +186,7 @@ export class CronQueueRepository {
         rows.map(async (row) => {
           const task = CronQueueRepository.formatQueueTask(row, logger);
           task.lastExecutionError = summaries.get(row.id) ?? null;
-          return CronQueueRepository.translateQueueTask(task, locale);
+          return translateTaskFields(task, row.userId, locale);
         }),
       );
 

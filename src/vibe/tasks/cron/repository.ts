@@ -8,8 +8,6 @@ import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
 import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
 import type { z } from "zod";
 
-import { getEndpoint } from "@/generated/endpoints/endpoint";
-
 import type { CountryLanguage } from "../../core/i18n/core/config";
 import type { ResponseType } from "../../core/route/response.schema";
 import {
@@ -40,6 +38,7 @@ import type {
 import { cronTaskExecutions, cronTasks, dbUserIdToOwner } from "./db";
 import { createTaskEmitters } from "./emitter";
 import type { CronTaskRecentExecution } from "./history/definition";
+import { translateTaskFields } from "./task-names";
 import type {
   CronTaskItem,
   CronTaskResponseType as CronTaskResponse,
@@ -49,35 +48,6 @@ import type {
  * Implementation of Cron Tasks Repository
  */
 export class CronTasksRepository {
-  /**
-   * Translate task displayName and description using the endpoint's scoped translation.
-   * System tasks store scoped translation keys (e.g. "taskSync.name") as displayName/description.
-   * Falls back to the raw DB value if the endpoint can't be resolved or translation fails.
-   */
-  static async translateTaskFields(
-    task: CronTaskResponse,
-    locale: CountryLanguage,
-  ): Promise<CronTaskResponse> {
-    const endpoint = await getEndpoint(task.routeId);
-    if (!endpoint) {
-      return task;
-    }
-
-    const { t } = endpoint.scopedTranslation.scopedT(locale);
-    const translatedName = t(task.displayName);
-    const translatedDesc = task.description ? t(task.description) : null;
-
-    return {
-      ...task,
-      displayName:
-        translatedName !== task.displayName ? translatedName : task.displayName,
-      description:
-        translatedDesc && translatedDesc !== task.description
-          ? translatedDesc
-          : task.description,
-    };
-  }
-
   /**
    * Fetch the last execution's error/result summary for a batch of tasks.
    * Returns a Map<taskId, errorOrSummary>.
@@ -225,7 +195,7 @@ export class CronTasksRepository {
       ]);
       serialized.lastExecutionError = summaries.get(task.id) ?? null;
       return success({
-        task: await CronTasksRepository.translateTaskFields(serialized, locale),
+        task: await translateTaskFields(serialized, task.userId, locale),
       });
     } catch (error) {
       const parsedError = parseError(error);
@@ -278,13 +248,33 @@ export class CronTasksRepository {
         });
       }
 
-      // Resolve shortId → canonical id so the WHERE clause uses the primary key.
+      // Resolve the canonical id and keep stored keys when an edit form sends
+      // back the labels it was prefilled with.
       const [resolved] = await db
-        .select({ id: cronTasks.id })
+        .select({
+          id: cronTasks.id,
+          routeId: cronTasks.routeId,
+          userId: cronTasks.userId,
+          displayName: cronTasks.displayName,
+          description: cronTasks.description,
+        })
         .from(cronTasks)
         .where(or(eq(cronTasks.id, id), eq(cronTasks.shortId, id)))
         .limit(1);
       const canonicalId = resolved?.id ?? id;
+      const changes = { ...updates };
+      if (
+        resolved?.userId === null &&
+        (updates.displayName !== undefined || updates.description !== undefined)
+      ) {
+        const localized = await translateTaskFields(resolved, null, locale);
+        if (updates.displayName === localized.displayName) {
+          changes.displayName = undefined;
+        }
+        if (updates.description === localized.description) {
+          changes.description = undefined;
+        }
+      }
 
       // Build the WHERE clause:
       // - system calls (user=null): match only on id
@@ -297,7 +287,7 @@ export class CronTasksRepository {
 
       const [task] = await db
         .update(cronTasks)
-        .set({ ...updates, updatedAt: new Date() })
+        .set({ ...changes, updatedAt: new Date() })
         .where(whereClause)
         .returning();
 
@@ -382,7 +372,7 @@ export class CronTasksRepository {
       }
 
       return success({
-        task: await CronTasksRepository.translateTaskFields(serialized, locale),
+        task: await translateTaskFields(serialized, task.userId, locale),
         success: true,
       });
     } catch (error) {

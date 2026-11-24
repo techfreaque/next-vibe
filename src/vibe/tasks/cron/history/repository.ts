@@ -19,10 +19,7 @@ import {
   sql,
 } from "drizzle-orm";
 
-import {
-  type CountryLanguage,
-  defaultLocale,
-} from "../../../core/i18n/core/config";
+import type { CountryLanguage } from "../../../core/i18n/core/config";
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
   ErrorResponseTypes,
@@ -59,7 +56,7 @@ export class CronHistoryRepository {
     user: JwtPayloadType,
     t: CronHistoryT,
     logger: EndpointLogger,
-    locale: CountryLanguage = defaultLocale,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CronHistoryResponseOutput>> {
     const limit = data.limit || CRON_HISTORY_PAGE_SIZE;
 
@@ -159,9 +156,9 @@ export class CronHistoryRepository {
         .select({
           id: cronTaskExecutions.id,
           taskId: cronTaskExecutions.taskId,
-          taskName: cronTaskExecutions.taskName,
           taskDisplayName: cronTasks.displayName,
           taskRouteId: cronTasks.routeId,
+          taskUserId: cronTasks.userId,
           status: cronTaskExecutions.status,
           priority: cronTaskExecutions.priority,
           startedAt: cronTaskExecutions.startedAt,
@@ -189,7 +186,8 @@ export class CronHistoryRepository {
           ? await db
               .select({
                 id: cronTasks.id,
-                name: cronTasks.displayName,
+                displayName: cronTasks.displayName,
+                userId: cronTasks.userId,
                 routeId: cronTasks.routeId,
               })
               .from(cronTasks)
@@ -266,19 +264,12 @@ export class CronHistoryRepository {
                     id: exec.taskId,
                     routeId: exec.taskRouteId,
                     displayName: exec.taskDisplayName,
+                    userId: exec.taskUserId,
                   },
                 ]
               : [],
           ),
-          ...(selectedTask
-            ? [
-                {
-                  id: selectedTask.id,
-                  routeId: selectedTask.routeId,
-                  displayName: selectedTask.name,
-                },
-              ]
-            : []),
+          ...(selectedTask ? [selectedTask] : []),
         ],
         locale,
       );
@@ -289,7 +280,7 @@ export class CronHistoryRepository {
           const execution: CronHistoryExecution = {
             id: exec.id,
             taskId: exec.taskId,
-            taskName: exec.taskName,
+            taskName: exec.taskRouteId ?? exec.taskId,
             taskDisplayName: names.get(exec.taskId) ?? undefined,
             status: exec.status,
             priority: exec.priority,
@@ -315,7 +306,7 @@ export class CronHistoryRepository {
         selectedTask: selectedTask
           ? {
               id: selectedTask.id,
-              name: names.get(selectedTask.id) ?? selectedTask.name,
+              name: names.get(selectedTask.id) ?? selectedTask.displayName,
             }
           : undefined,
         totalCount,

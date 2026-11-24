@@ -7,7 +7,7 @@ export const translations: typeof enTranslations = {
       "Anonyme Leads mit gleicher IP-Adresse scannen und als dieselbe Person verknüpfen",
   },
   post: {
-    title: "IP-Übereinstimmungsverknüpfung",
+    title: "Leads per IP-Adresse verknüpfen",
     titleShort: "IP-Verknüpfung",
     description: "Anonyme Leads mit gleicher IP-Adresse verknüpfen",
     container: {

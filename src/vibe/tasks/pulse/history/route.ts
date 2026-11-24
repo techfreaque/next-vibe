@@ -10,7 +10,7 @@ import { PulseHistoryRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ data, logger, t }) =>
-      PulseHistoryRepository.getHistory(data, logger, t),
+    handler: ({ data, locale, logger, t }) =>
+      PulseHistoryRepository.getHistory(data, logger, t, locale),
   },
 });

@@ -4,12 +4,14 @@ export const translations: typeof enTranslations = {
   category: "Vibe Sense",
   tags: { vibeSense: "vibe-sense" },
   cleanup: {
-    name: "Vibe Sense Cleanup",
-    description: "Prunes datapoints antiguos y expira caché de instantánea",
+    name: "Limpieza de Vibe Sense",
+    description:
+      "Elimina los datos antiguos y las instantáneas caducadas de la caché.",
   },
   graphRunner: {
-    name: "Vibe Sense Graph Runner",
-    description: "Ejecuta todos los gráficos de tuberías que están atrasados",
+    name: "Ejecución de grafos de Vibe Sense",
+    description:
+      "Ejecuta los grafos de procesamiento programados mediante cron.",
   },
   post: {
     title: "Vibe Sense Cleanup",

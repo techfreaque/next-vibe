@@ -336,10 +336,10 @@ export const translations: typeof enTranslations = {
       error: "Notiziario annullare l'iscrizione errore di sincronizzazione",
       tag: "Newsletter Sync",
       post: {
-        title: "Notiziario Cancellare Sync",
+        title: "Sincronizzazione delle disiscrizioni alla newsletter",
         titleShort: "Sincronizzazione di un soggetto",
         description:
-          "Sincronizza gli stati di contatto per la cancellazione della newsletter",
+          "Aggiorna lo stato dei contatti che si sono disiscritti dalla newsletter.",
         container: {
           title: "Dissubscribe Configurazione Sync",
           description: "Configurare i parametri di sincronizzazione",

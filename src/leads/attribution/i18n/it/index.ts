@@ -5,10 +5,10 @@ export const translations: typeof enTranslations = {
   tag: "Collegamento di corrispondenza IP",
   task: {
     description:
-      "Scansione anonima porta a condividere lo stesso indirizzo IP e a collegarli alla stessa persona",
+      "Associa i lead anonimi con lo stesso indirizzo IP a una sola persona.",
   },
   post: {
-    title: "Collegamento di corrispondenza IP",
+    title: "Associazione dei lead per indirizzo IP",
     titleShort: "Collegamento IP",
     description: "Link anonimo porta che condividono lo stesso indirizzo IP",
     container: {

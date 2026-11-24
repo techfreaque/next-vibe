@@ -195,10 +195,10 @@ export const translations: typeof enTranslations = {
   },
   run: {
     post: {
-      title: "Uruchom journeys lifecycle",
+      title: "Automatyczne kampanie e-mail",
       titleShort: "Uruchom lifecycle",
       description:
-        "Zapisz nowo kwalifikujące się kontakty i wyślij zaległe maile journey. Nic nie robi, gdy wyłącznik awaryjny jest włączony.",
+        "Dodaje kontakty spełniające warunki do kampanii i wysyła zaplanowane wiadomości. Wyłącznik awaryjny wstrzymuje oba działania.",
       container: {
         title: "Uruchom lifecycle",
         description:

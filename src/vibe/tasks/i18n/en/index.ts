@@ -226,7 +226,7 @@ export const translations = {
     notifyAlways: "Notify Always",
   },
   dbHealthCheck: {
-    name: "db-health-check",
+    name: "Database Health Check",
     description: "Verifies database connection health every minute",
   },
   pulseRunner: {
@@ -507,7 +507,7 @@ export const translations = {
       },
     },
     cleanup: {
-      name: "error-logs-cleanup",
+      name: "Error Log Cleanup",
       description:
         "Prunes error logs older than 6 months and caps total rows at 100K",
       post: {

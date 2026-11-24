@@ -58,7 +58,7 @@ export const translations: typeof enTranslations = {
     },
   },
   task: {
-    name: "Stale Run Reaper",
+    name: "Cierre de ejecuciones bloqueadas",
     description:
       "Cada 5 minutos: libera los hilos de chat dejados por un proceso que murió a mitad de respuesta",
   },

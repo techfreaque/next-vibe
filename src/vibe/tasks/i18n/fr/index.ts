@@ -237,7 +237,7 @@ export const translations: typeof enTranslations = {
     notifyAlways: "Toujours notifier",
   },
   dbHealthCheck: {
-    name: "db-health-check",
+    name: "Vérification de l’état de la base de données",
     description:
       "Vérifie l'état de la connexion à la base de données chaque minute",
   },
@@ -527,7 +527,7 @@ export const translations: typeof enTranslations = {
       },
     },
     cleanup: {
-      name: "error-logs-cleanup",
+      name: "Nettoyage du journal d’erreurs",
       description:
         "Supprime les journaux d'erreurs de plus de 6 mois et plafonne le total à 100 000 lignes",
       post: {

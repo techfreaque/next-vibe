@@ -102,6 +102,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    taskNameUnavailable: "Nom de la tâche indisponible",
     title: "Historique du pulse",
     empty: "Aucune exécution du pulse trouvée",
     details: "Détails",

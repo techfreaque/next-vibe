@@ -59,7 +59,7 @@ export const translations: typeof enTranslations = {
     },
   },
   task: {
-    name: "verify-email-reminder",
+    name: "Rappel de confirmation de l’adresse e-mail",
     description:
       "Toutes les heures : un rappel aux comptes toujours non vérifiés 24 heures après l'inscription",
   },

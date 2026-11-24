@@ -145,10 +145,12 @@ export const translations: typeof enTranslations = {
     description:
       "Sólo lectura de ingresos reales (Stripe, NOWPayments) y saldos de proveedores reales. Computa el margen diario y eleva alertas. No mueve dinero.",
     task: {
+      balancesName: "Sincronización de saldos de proveedores",
+      revenueName: "Sincronización de ingresos",
       balances:
-        "Hora: leer cada balance del proveedor, gastar la medida, drenajes de bandera y picos.",
+        "Cada hora consulta los saldos de los proveedores, mide el gasto y señala caídas de saldo y picos de consumo.",
       revenue:
-        "Diariamente: tire de los ingresos Stripe y NOWPayments, balancear el margen, reembolsos de bandera, disputas y margen delgado.",
+        "Cada día consulta los ingresos de Stripe y NOWPayments, calcula el margen y señala reembolsos, disputas y márgenes bajos.",
     },
     fields: {
       scope: {

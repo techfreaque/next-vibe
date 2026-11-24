@@ -8,9 +8,9 @@ export const translations: typeof enTranslations = {
     description: "Usuwa stare punkty danych i wygasza pamięć podręczną",
   },
   graphRunner: {
-    name: "Vibe Sense Graph Runner",
+    name: "Uruchamianie grafów Vibe Sense",
     description:
-      "Wykonuje wszystkie zaplanowane grafy pipeline, które są wymagalne",
+      "Uruchamia grafy przetwarzania danych zgodnie z harmonogramem cron.",
   },
   post: {
     title: "Czyszczenie Vibe Sense",

@@ -38,7 +38,7 @@ export const translations: typeof enTranslations = {
   },
   sweep: {
     post: {
-      title: "Przegląd strażnika zadań",
+      title: "Nadzór nad zadaniami",
       titleShort: "Przegląd strażnika",
       description:
         "Wyszukuje zawieszone, zapętlone i osierocone zadania w tle, zatrzymuje je z zapisanym powodem i otwiera incydent. Działa co minutę.",
@@ -56,7 +56,7 @@ export const translations: typeof enTranslations = {
     },
     task: {
       description:
-        "Zatrzymuje zadania, które trwają za długo, zapętlają się lub straciły proces. Każde zatrzymanie otwiera incydent.",
+        "Zatrzymuje zadania, które trwają za długo, wpadły w pętlę lub utraciły swój proces. Każde zatrzymanie zapisuje jako incydent.",
     },
   },
   health: {

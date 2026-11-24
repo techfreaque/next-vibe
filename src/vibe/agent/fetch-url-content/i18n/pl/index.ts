@@ -113,7 +113,8 @@ export const translations: typeof enTranslations = {
         description: "Wystąpił błąd podczas czyszczenia cache URL",
       },
     },
-    name: "Czyszczenie Cache URL",
-    description: "Tygodniowe czyszczenie starych plików cache URL",
+    name: "Czyszczenie pamięci podręcznej adresów URL",
+    description:
+      "Co tydzień usuwa nieaktualne pliki z pamięci podręcznej adresów URL.",
   },
 };

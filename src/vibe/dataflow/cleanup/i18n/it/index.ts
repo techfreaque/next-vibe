@@ -4,13 +4,13 @@ export const translations: typeof enTranslations = {
   category: "Vibe Sense",
   tags: { vibeSense: "vibe-sense" },
   cleanup: {
-    name: "Detergente di Vibe",
-    description: "Prunes vecchi datapoint e scade la cache snapshot",
+    name: "Pulizia di Vibe Sense",
+    description:
+      "Elimina i dati meno recenti e le istantanee scadute dalla cache.",
   },
   graphRunner: {
-    name: "Vibe Sense Graph Runner",
-    description:
-      "Esegui tutti i grafi di pipeline cron-triggered che sono dovuti",
+    name: "Esecuzione dei grafi di Vibe Sense",
+    description: "Esegue i grafi di elaborazione pianificati con cron.",
   },
   post: {
     title: "Detergente di Vibe",

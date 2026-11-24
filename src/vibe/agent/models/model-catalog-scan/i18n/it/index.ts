@@ -91,9 +91,9 @@ export const translations: typeof enTranslations = {
   },
 
   task: {
-    name: "Scansione del catalogo del modello",
+    name: "Verifica del catalogo dei modelli",
     description:
-      "Ogni 5 giorni: liste e prezzi del modello del fornitore di diff e del nostro catalogo, memorizzare e spedire il rapporto.",
+      "Ogni 5 giorni confronta modelli e prezzi dei fornitori con il catalogo, salva il rapporto e lo invia per email.",
   },
 
   errors: {

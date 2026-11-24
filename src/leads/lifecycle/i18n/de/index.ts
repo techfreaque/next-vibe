@@ -196,10 +196,10 @@ export const translations: typeof enTranslations = {
   },
   run: {
     post: {
-      title: "Lifecycle-Journeys ausführen",
+      title: "Automatisierte E-Mail-Strecken ausführen",
       titleShort: "Lifecycle ausführen",
       description:
-        "Neu berechtigte Kontakte aufnehmen und fällige Journey-Mails senden. Tut nichts, solange der Notausschalter aktiv ist.",
+        "Nimmt neu berechtigte Kontakte in die E-Mail-Strecken auf und sendet fällige Nachrichten. Der Notausschalter pausiert beides.",
       container: {
         title: "Lifecycle ausführen",
         description:

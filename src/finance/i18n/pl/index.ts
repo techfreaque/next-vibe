@@ -145,6 +145,8 @@ export const translations: typeof enTranslations = {
     description:
       "Tylko do odczytu: prawdziwy przychód (Stripe, NOWPayments) i prawdziwe salda dostawców. Liczy dzienną marżę i wywołuje alerty. Nie rusza pieniędzy.",
     task: {
+      balancesName: "Synchronizacja sald dostawców",
+      revenueName: "Synchronizacja przychodów",
       balances:
         "Co godzinę: odczyt sald dostawców, pomiar wydatków, wykrywanie wycieków i skoków.",
       revenue:

@@ -101,6 +101,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    taskNameUnavailable: "Nombre de tarea no disponible",
     title: "Historia del pulso",
     empty: "No se encontraron ejecuciones de pulso",
     details: "Detalles",

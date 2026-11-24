@@ -59,8 +59,8 @@ export const translations: typeof enTranslations = {
     },
   },
   task: {
-    name: "Reapertore di corsa Stale",
+    name: "Sblocco delle esecuzioni interrotte",
     description:
-      "Ogni 5 minuti: libera filetti di chat lasciati in streaming da un processo che è morto mid-answer",
+      "Ogni 5 minuti sblocca le conversazioni rimaste in streaming dopo l’interruzione del processo che stava rispondendo.",
   },
 };

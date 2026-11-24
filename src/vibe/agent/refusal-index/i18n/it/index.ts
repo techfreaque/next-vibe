@@ -255,9 +255,9 @@ export const translations: typeof enTranslations = {
     submit: "Inizio",
     submitting: "Cominciare...",
     cron: {
-      name: "Indice Refusal (settimanale)",
+      name: "Indice dei rifiuti (settimanale)",
       description:
-        "Settimanale: 10 nuove domande, poi ogni risposta mancante, nuovi modelli inclusi. Disabilitato per impostazione predefinita.",
+        "Ogni settimana aggiunge 10 domande e raccoglie le risposte mancanti, incluse quelle dei nuovi modelli. È disattivato per impostazione predefinita.",
     },
     fields: {
       models: {

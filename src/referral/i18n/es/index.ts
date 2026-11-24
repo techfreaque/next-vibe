@@ -200,7 +200,7 @@ export const translations: typeof enTranslations = {
   earnings: {
     confirm: {
       post: {
-        title: "Confirmación de los anillos de referencia",
+        title: "Confirmación de comisiones por referidos",
         titleShort: "Confirme los Ganancias",
         description:
           "Desbloquear los ingresos de referencia cuya ventana de reembolso ha pasado. Corre diariamente.",
@@ -220,7 +220,7 @@ export const translations: typeof enTranslations = {
       },
       task: {
         description:
-          "Convierte los ingresos de remisión mayores que la ventana de reembolso en créditos ganados",
+          "Convierte las comisiones por referidos en créditos cuando vence el plazo de reembolso.",
       },
     },
     list: {

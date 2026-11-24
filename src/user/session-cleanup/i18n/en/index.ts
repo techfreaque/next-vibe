@@ -62,7 +62,7 @@ export const translations = {
     },
   },
   task: {
-    name: "user-session-cleanup",
+    name: "Session Cleanup",
     description: "Clean up expired user sessions to maintain system security",
     purpose: "Removes expired sessions to maintain security and performance",
     impact:

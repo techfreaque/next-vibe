@@ -235,8 +235,8 @@ export const translations: typeof enTranslations = {
     notifyAlways: "Immer benachrichtigen",
   },
   dbHealthCheck: {
-    name: "db-health-check",
-    description: "Überprüft die Datenbankverbindungsgesundheit jede Minute",
+    name: "Datenbankprüfung",
+    description: "Prüft jede Minute die Verbindung zur Datenbank.",
   },
   pulseRunner: {
     name: "pulse-runner",
@@ -517,7 +517,7 @@ export const translations: typeof enTranslations = {
       },
     },
     cleanup: {
-      name: "error-logs-cleanup",
+      name: "Bereinigung der Fehlerprotokolle",
       description:
         "Bereinigt Fehlerprotokolle älter als 6 Monate und begrenzt auf 100K Einträge",
       post: {

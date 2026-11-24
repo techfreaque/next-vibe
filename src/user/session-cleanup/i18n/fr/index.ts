@@ -65,7 +65,7 @@ export const translations: typeof enTranslations = {
     },
   },
   task: {
-    name: "user-session-cleanup",
+    name: "Nettoyage des sessions",
     description:
       "Supprime les sessions utilisateur expirées pour préserver la sécurité du système",
     purpose:

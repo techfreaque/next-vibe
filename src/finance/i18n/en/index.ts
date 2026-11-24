@@ -138,6 +138,8 @@ export const translations = {
     description:
       "Read-only pull of real revenue (Stripe, NOWPayments) and real provider balances. Computes daily margin and raises alerts. Moves no money.",
     task: {
+      balancesName: "Provider Balance Sync",
+      revenueName: "Revenue Sync",
       balances:
         "Hourly: read every provider balance, measure spend, flag drains and spikes.",
       revenue:

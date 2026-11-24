@@ -55,7 +55,7 @@ export const translations = {
     },
   },
   task: {
-    name: "verify-email-reminder",
+    name: "Email Verification Reminder",
     description:
       "Hourly: one reminder to accounts still unverified 24 hours after signup",
   },

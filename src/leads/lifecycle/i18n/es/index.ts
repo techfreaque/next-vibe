@@ -200,10 +200,10 @@ export const translations: typeof enTranslations = {
   },
   run: {
     post: {
-      title: "Ejecutar Viajes de ciclo de vida",
+      title: "Campañas automatizadas por correo",
       titleShort: "Ejecutar ciclo de vida",
       description:
-        "Inscribir contactos recién elegibles y enviar correos electrónicos de viaje debido. No hace nada mientras el interruptor de la muerte está encendido.",
+        "Incorpora a los contactos que cumplen los requisitos y envía los correos programados. El interruptor de emergencia detiene ambas acciones.",
       container: {
         title: "Ejecutar ciclo de vida",
         description:

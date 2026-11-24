@@ -254,9 +254,9 @@ export const translations: typeof enTranslations = {
     submit: "Comienzo",
     submitting: "Comenzando...",
     cron: {
-      name: "Índice de referencia (semana)",
+      name: "Índice de negativas (semanal)",
       description:
-        "Semanal: 10 nuevas preguntas, luego cada respuesta faltante, nuevos modelos incluidos. Discapacitados por defecto.",
+        "Cada semana añade 10 preguntas y recopila las respuestas pendientes, incluidas las de los modelos nuevos. Está desactivado por defecto.",
     },
     fields: {
       models: {

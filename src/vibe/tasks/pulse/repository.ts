@@ -37,6 +37,7 @@ import { createTaskEmitters } from "../cron/emitter";
 import { isStuckTask } from "../cron/health-summary";
 import { CronTasksRepository } from "../cron/repository";
 import { resolveTaskOwnerUser } from "../cron/resolve-task-user";
+import { translateTaskName } from "../cron/task-names";
 import { isCronTaskDue } from "../cron-formatter";
 import {
   CronTaskStatus,
@@ -66,7 +67,6 @@ import type {
   PulseHealth,
 } from "./db";
 import { pulseExecutions, pulseHealth } from "./db";
-import { resolveTaskDisplayNameForRoute } from "./i18n-utils";
 import type { PulseStatusResponseOutput } from "./status/definition";
 
 /**
@@ -338,7 +338,7 @@ export class PulseHealthRepository {
           // specific targetInstance = only on that named instance
           const taskTarget = dbTask.targetInstance ?? null;
           if (taskTarget !== null && taskTarget !== instanceId) {
-            tasksSkipped.push(dbTask.displayName);
+            tasksSkipped.push(dbTask.id);
             continue;
           }
 
@@ -353,27 +353,27 @@ export class PulseHealthRepository {
               dbTask.runOnce ? dbTask.createdAt : null,
             );
           if (!isDue) {
-            tasksSkipped.push(dbTask.displayName);
+            tasksSkipped.push(dbTask.id);
             continue;
           }
 
           // Deploy drain / shutdown: claim nothing new. The task stays due
           // (lastExecutedAt unchanged), so the next node up runs it.
           if (drainRequested) {
-            tasksSkipped.push(dbTask.displayName);
+            tasksSkipped.push(dbTask.id);
             continue;
           }
 
           // Overlap prevention: skip if this task is still running from a previous pulse
           if (!canClaimTask(dbTask, now)) {
-            tasksSkipped.push(dbTask.displayName);
+            tasksSkipped.push(dbTask.id);
             logger.debug(
               `Pulse: skipping task "${dbTask.displayName}" - still running from previous pulse`,
             );
             continue;
           }
 
-          tasksDue.push(dbTask.displayName);
+          tasksDue.push(dbTask.id);
 
           if (options.dryRun) {
             continue;
@@ -405,7 +405,7 @@ export class PulseHealthRepository {
               const abandonedAt = row.runStartedAt ?? row.updatedAt;
               await tx.insert(cronTaskExecutions).values({
                 taskId: row.id,
-                taskName: row.displayName,
+                taskName: row.routeId,
                 executionId: crypto.randomUUID(),
                 status: CronTaskStatus.TIMEOUT,
                 priority: row.priority,
@@ -440,7 +440,7 @@ export class PulseHealthRepository {
           });
 
           if (!claimed) {
-            tasksSkipped.push(dbTask.displayName);
+            tasksSkipped.push(dbTask.id);
             logger.debug(
               `Pulse: skipping task "${dbTask.displayName}" - claimed by another instance`,
             );
@@ -462,7 +462,7 @@ export class PulseHealthRepository {
             );
           }
 
-          tasksExecuted.push(dbTask.displayName);
+          tasksExecuted.push(dbTask.id);
           logger.debug(
             `Pulse executing task: ${dbTask.displayName} (routeId: ${dbTask.routeId})`,
           );
@@ -488,7 +488,7 @@ export class PulseHealthRepository {
 
           if (!taskUserContext) {
             endTaskPhase();
-            tasksFailed.push(dbTask.displayName);
+            tasksFailed.push(dbTask.id);
             const failedOwner = dbUserIdToOwner(dbTask.userId);
             logger.error(
               `Pulse: failed to resolve user context for task "${dbTask.displayName}"${
@@ -514,11 +514,7 @@ export class PulseHealthRepository {
 
           const { user: cronUser, locale: userLocale } = taskUserContext;
           const { t: tTask } = scopedTranslation.scopedT(userLocale);
-          const resolvedTaskName = await resolveTaskDisplayNameForRoute(
-            dbTask.displayName,
-            dbTask.routeId,
-            userLocale,
-          );
+          const resolvedTaskName = await translateTaskName(dbTask, userLocale);
           const startedAt = new Date();
 
           // Emit task-updated (RUNNING) to WS subscribers
@@ -551,7 +547,7 @@ export class PulseHealthRepository {
 
           if (!path || !handler) {
             endTaskPhase();
-            tasksFailed.push(dbTask.displayName);
+            tasksFailed.push(dbTask.id);
             logger.error(
               `Pulse: ${!path ? "unknown routeId" : "no handler"} "${dbTask.routeId}" for task "${dbTask.displayName}"`,
               { taskId: dbTask.id, resolvedPath: path ?? "none" },
@@ -767,7 +763,7 @@ export class PulseHealthRepository {
                     await CronTasksRepository.createExecution(
                       {
                         taskId: dbTask.id,
-                        taskName: dbTask.displayName,
+                        taskName: dbTask.routeId,
                         executionId: crypto.randomUUID(),
                         status: attemptStatus,
                         priority: dbTask.priority,
@@ -874,7 +870,7 @@ export class PulseHealthRepository {
                   await TaskGuard.recordIncident(
                     {
                       taskId: dbTask.id,
-                      taskName: resolvedTaskName,
+                      taskName: dbTask.routeId,
                       type: TaskIncidentType.TIMEOUT,
                       reason: `Run exceeded its ${timeoutMs}ms timeout and was aborted`,
                       metadata: { timeoutMs, attempt: attempt + 1 },
@@ -885,7 +881,7 @@ export class PulseHealthRepository {
                   await TaskGuard.recordIncident(
                     {
                       taskId: dbTask.id,
-                      taskName: resolvedTaskName,
+                      taskName: dbTask.routeId,
                       type: TaskIncidentType.TRANSIENT_RETRY_EXHAUSTED,
                       reason: `Transient failure persisted through ${attempt + 1} attempts: ${logMessage ?? ""}`,
                       metadata: { attempts: attempt + 1 },
@@ -897,11 +893,11 @@ export class PulseHealthRepository {
               }
 
               if (taskSucceeded) {
-                tasksSucceeded.push(dbTask.displayName);
+                tasksSucceeded.push(dbTask.id);
               } else if (skippedForCredits) {
-                tasksSkipped.push(dbTask.displayName);
+                tasksSkipped.push(dbTask.id);
               } else {
-                tasksFailed.push(dbTask.displayName);
+                tasksFailed.push(dbTask.id);
               }
 
               // Update task stats (once, after all attempts). A credit skip
@@ -970,7 +966,7 @@ export class PulseHealthRepository {
                 `Pulse: unexpected error for task "${dbTask.displayName}"`,
                 parseError(unexpectedError),
               );
-              tasksFailed.push(dbTask.displayName);
+              tasksFailed.push(dbTask.id);
               const catchConsecutiveFailures =
                 (dbTask.consecutiveFailures ?? 0) + 1;
 

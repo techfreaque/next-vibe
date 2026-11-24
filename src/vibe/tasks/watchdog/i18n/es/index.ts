@@ -38,7 +38,7 @@ export const translations: typeof enTranslations = {
   },
   sweep: {
     post: {
-      title: "Task Watchdog Sweep",
+      title: "Revisión de tareas bloqueadas",
       titleShort: "Mirador Sweep",
       description:
         "Encuentra tareas de fondo atascadas, azotadas y huérfanas, las detiene con una razón grabada y abre un incidente. Corre cada minuto.",
@@ -56,7 +56,7 @@ export const translations: typeof enTranslations = {
     },
     task: {
       description:
-        "Detiene tareas que se ejecutan demasiado tiempo, bucle o pierden su proceso. Cada parada abre un incidente.",
+        "Detiene las tareas que tardan demasiado, entran en bucle o pierden su proceso. Registra un incidente por cada tarea detenida.",
     },
   },
   health: {

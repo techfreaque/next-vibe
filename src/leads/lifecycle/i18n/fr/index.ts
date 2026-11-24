@@ -198,10 +198,10 @@ export const translations: typeof enTranslations = {
   },
   run: {
     post: {
-      title: "Exécuter les parcours de cycle de vie",
+      title: "Campagnes e-mail automatisées",
       titleShort: "Exécuter le cycle de vie",
       description:
-        "Inscrit les contacts nouvellement éligibles et envoie les e-mails de parcours dus. Ne fait rien tant que le coupe-circuit est activé.",
+        "Inscrit les nouveaux contacts éligibles et envoie les e-mails programmés. L’arrêt d’urgence suspend ces deux actions.",
       container: {
         title: "Exécuter le cycle de vie",
         description:

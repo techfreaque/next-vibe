@@ -55,11 +55,17 @@ export const pulseExecutions = pgTable("pulse_executions", {
 
   // Pulse execution data
   totalTasksDiscovered: integer("total_tasks_discovered").notNull().default(0),
-  tasksDue: jsonb("tasks_due").notNull().default([]),
-  tasksExecuted: jsonb("tasks_executed").notNull().default([]),
-  tasksSucceeded: jsonb("tasks_succeeded").notNull().default([]),
-  tasksFailed: jsonb("tasks_failed").notNull().default([]),
-  tasksSkipped: jsonb("tasks_skipped").notNull().default([]),
+  tasksDue: jsonb("tasks_due").$type<string[]>().notNull().default([]),
+  tasksExecuted: jsonb("tasks_executed")
+    .$type<string[]>()
+    .notNull()
+    .default([]),
+  tasksSucceeded: jsonb("tasks_succeeded")
+    .$type<string[]>()
+    .notNull()
+    .default([]),
+  tasksFailed: jsonb("tasks_failed").$type<string[]>().notNull().default([]),
+  tasksSkipped: jsonb("tasks_skipped").$type<string[]>().notNull().default([]),
   totalExecutionTimeMs: integer("total_execution_time_ms"),
 
   // Results and errors

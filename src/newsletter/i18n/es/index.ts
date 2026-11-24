@@ -336,7 +336,7 @@ export const translations: typeof enTranslations = {
       error: "Boletín de error de suscripción",
       tag: "Newsletter Sync",
       post: {
-        title: "Newsletter Unsubscribe Sync",
+        title: "Sincronización de bajas del boletín",
         titleShort: "Unsub Sync",
         description:
           "Sincroniza el estado de los prospectos que cancelan su suscripción al boletín",

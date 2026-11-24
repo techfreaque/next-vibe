@@ -102,6 +102,7 @@ export const translations: typeof enTranslations = {
     },
   },
   widget: {
+    taskNameUnavailable: "Nome attività non disponibile",
     title: "Storia del polso",
     empty: "Nessuna esecuzione del polso trovata",
     details: "Dettagli",
