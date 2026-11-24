@@ -21,6 +21,7 @@ import pathDefinitions from "../../../chat/threads/[threadId]/messages/path/defi
 import threadsDefinition from "../../../chat/threads/definition";
 import type { FavoriteConfig } from "../../../skills/favorites/db";
 import type { ChatModelId } from "../../models";
+import { getAudioQueue } from "./audio-queue";
 import type { StartStreamFn } from "./shared";
 import { createAndSendUserMessage } from "./shared";
 
@@ -91,6 +92,9 @@ export async function sendMessage(
   } = deps;
   const { content } = params;
   let sendStage = "prepare-thread";
+  if (settings.ttsAutoplay) {
+    getAudioQueue(logger).primeForGesture();
+  }
 
   logger.debug("Send message operation", {
     content: content.slice(0, 50),

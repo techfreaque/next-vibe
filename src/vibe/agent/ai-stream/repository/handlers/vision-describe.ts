@@ -37,6 +37,7 @@ export async function describeWithVisionFallback<
   TOption extends ModelOptionTokenBased,
 >(params: {
   model: TOption;
+  mediaSource: "inline-upload" | "storage-file" | "remote-url";
   /** Second-chance model after `failedId` refused/failed; null = none. */
   resolveFallback: (failedId: string) => TOption | null;
   checkCredits?: (model: TOption) => Promise<ResponseType<number>>;
@@ -45,7 +46,7 @@ export async function describeWithVisionFallback<
   /** Log prefix, e.g. "[DescribeImage]". */
   logTag: string;
 }): Promise<VisionDescribeOutcome<TOption>> {
-  const { model, resolveFallback, run, logger, logTag } = params;
+  const { model, mediaSource, resolveFallback, run, logger, logTag } = params;
   const reasons: string[] = [];
   let current: TOption | null = model;
   let isFallback = false;
@@ -72,6 +73,7 @@ export async function describeWithVisionFallback<
       reason = refusal;
       logger.warn(`${logTag} Vision model refused`, {
         modelId: current.id,
+        mediaSource,
         finishReason: result.finishReason,
         reason,
       });
@@ -81,7 +83,12 @@ export async function describeWithVisionFallback<
         isModerationError(reason)
           ? `${logTag} Vision model refused by provider moderation`
           : `${logTag} Vision model failed`,
-        { modelId: current.id, error: reason },
+        {
+          modelId: current.id,
+          visionAttempt: { apiProvider: current.apiProvider, isFallback },
+          mediaSource,
+          error: reason,
+        },
       );
     }
     reasons.push(`${current.id}: ${reason}`);
@@ -93,6 +100,7 @@ export async function describeWithVisionFallback<
     if (current) {
       logger.warn(`${logTag} Retrying with fallback vision model`, {
         failedModelId: model.id,
+        mediaSource,
         fallbackModelId: current.id,
       });
     }
@@ -101,6 +109,7 @@ export async function describeWithVisionFallback<
   const reason = reasons.join("; ");
   logger.error(`${logTag} No vision model produced a description`, {
     reason,
+    mediaSource,
   });
   return { ok: false, reason };
 }

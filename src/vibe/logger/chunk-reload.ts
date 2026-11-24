@@ -49,12 +49,14 @@ const CHUNK_RELOAD_DELAY_MS = 800;
 
 /** One reload per page, including when several chunks fail before it starts. */
 let pendingReloadAt: number | null = null;
+let reloadRequestedAt: number | null = null;
 let failedAfterReloadAt: number | null = null;
 let observedReloadAt: number | null = null;
 
 /** Test hook: forget the reload scheduled on this page. */
 export function resetChunkReloadForTests(): void {
   pendingReloadAt = null;
+  reloadRequestedAt = null;
   failedAfterReloadAt = null;
   observedReloadAt = null;
 }
@@ -289,6 +291,8 @@ export function handleChunkLoadFailure(
     logChunk(logger, level, "[chunk] Load failed while a reload is pending", {
       ...details,
       chunkReloadAt: pendingReloadAt,
+      reloadRequestedAt,
+      reloadTimerElapsedMs: (reloadRequestedAt ?? Date.now()) - pendingReloadAt,
       buildIdBefore: buildId,
       buildIdAfter: null,
       recoveredByReload: null,
@@ -373,6 +377,7 @@ export function handleChunkLoadFailure(
     recoveredByReload: null,
   });
   setTimeout(() => {
+    reloadRequestedAt = Date.now();
     reloadPage();
   }, CHUNK_RELOAD_DELAY_MS);
   return true;

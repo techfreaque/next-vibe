@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, mock, test } from "bun:test";
 import type { generateText } from "ai";
 import { createEndpointLogger } from "next-vibe/logger/server";
 
@@ -25,6 +25,7 @@ describe("describeWithVisionFallback", () => {
     const calls: string[] = [];
     const outcome = await describeWithVisionFallback<ImageVisionModelOption>({
       model: primary!,
+      mediaSource: "remote-url",
       resolveFallback: () => fallback!,
       run: async (model) => {
         calls.push(model.id);
@@ -43,8 +44,10 @@ describe("describeWithVisionFallback", () => {
   });
 
   test("a moderation error falls back; both failing returns the reasons", async () => {
+    const warn = mock(logger.warn);
     const outcome = await describeWithVisionFallback<ImageVisionModelOption>({
       model: primary!,
+      mediaSource: "remote-url",
       resolveFallback: () => fallback!,
       run: async (model) => {
         if (model.id === primary!.id) {
@@ -52,9 +55,16 @@ describe("describeWithVisionFallback", () => {
         }
         return fakeResult("", "content-filter");
       },
-      logger,
+      logger: { ...logger, warn },
       logTag: "[Test]",
     });
+    expect(warn).toHaveBeenCalledWith(
+      "[Test] Vision model refused by provider moderation",
+      expect.objectContaining({
+        mediaSource: "remote-url",
+        visionAttempt: { apiProvider: primary!.apiProvider, isFallback: false },
+      }),
+    );
     expect(outcome.ok).toBe(false);
     if (!outcome.ok) {
       expect(outcome.reason).toContain("PROHIBITED_CONTENT");
@@ -65,6 +75,7 @@ describe("describeWithVisionFallback", () => {
   test("no fallback available returns the primary reason", async () => {
     const outcome = await describeWithVisionFallback<ImageVisionModelOption>({
       model: primary!,
+      mediaSource: "remote-url",
       resolveFallback: () => null,
       run: async () => fakeResult("", "stop"),
       logger,

@@ -9,6 +9,10 @@
  *    1 ABORTED, 2 NETWORK, 3 DECODE, 4 SRC_NOT_SUPPORTED.
  */
 
+/** 10 ms of silence, played inside the click to unlock the shared player. */
+export const SILENT_WAV_DATA_URI =
+  "data:audio/wav;base64,UklGRnQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==";
+
 export type AudioFailureKind =
   | "autoplay-policy"
   | "interrupted"

@@ -46,6 +46,17 @@ export function readProcMeminfo(): {
   }
 }
 
+/** Linux reports resident memory independently of Bun's heap sampler. */
+function readProcessRssMb(): number | null {
+  try {
+    const status = readFileSync("/proc/self/status", "utf-8");
+    const kb = /^VmRSS:\s+(\d+) kB$/m.exec(status)?.[1];
+    return kb ? Math.round(Number(kb) / 1024) : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Disk usage of /app (or /) in percent, same formula as `df -P`
  * (used / (used + available to non-root), rounded up). Async statfs, no
@@ -127,7 +138,10 @@ export class DbHealthRepository {
       }
     })();
     const heapUsedMb = nodeMem ? Math.round(nodeMem.heapUsed / 1024 / 1024) : 0;
-    const rssMb = nodeMem ? Math.round(nodeMem.rss / 1024 / 1024) : 0;
+    const procRssMb = nodeMem ? null : readProcessRssMb();
+    const rssMb = nodeMem
+      ? Math.round(nodeMem.rss / 1024 / 1024)
+      : (procRssMb ?? 0);
 
     const procMem = readProcMeminfo();
     const memoryUsedPct = procMem
@@ -196,6 +210,12 @@ export class DbHealthRepository {
         dbResponseMs,
         memoryUsedPct,
         processMemoryAvailable: nodeMem !== null,
+        rssSource: nodeMem
+          ? "runtime"
+          : procRssMb !== null
+            ? "procfs"
+            : "unavailable",
+        rssMb,
         hostMemorySource: procMem ? "procfs" : "node-os",
         diskUsedPct,
         uptimeHours,

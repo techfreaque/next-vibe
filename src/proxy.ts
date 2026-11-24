@@ -11,6 +11,10 @@ import { languageConfig, type languageDefaults } from "./vibe/core/i18n";
 import type { CountryLanguage } from "./vibe/core/i18n/core/config";
 // we have to use relative paths as vercel cant resolve import aliases from here
 import { middleware } from "./vibe/platforms/web/middleware";
+import {
+  forwardDegradedPublicDocument,
+  markDegradedPublicDocument,
+} from "./vibe/platforms/web/middleware/public-document";
 import { applyResponseIdentityCookies } from "./vibe/platforms/web/middleware/utils";
 
 const defaultLocale: `${typeof languageDefaults.language}-${typeof languageDefaults.country}` =
@@ -36,6 +40,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
   // components can read the current pathname without URL hacks.
   if (response.headers.get("x-middleware-next") === "1") {
     const requestHeaders = new Headers(request.headers);
+    const degraded = forwardDegradedPublicDocument(requestHeaders, response);
     requestHeaders.set("x-pathname", request.nextUrl.pathname);
     applyResponseIdentityCookies(
       requestHeaders,
@@ -62,6 +67,9 @@ export async function proxy(request: NextRequest): Promise<NextResponse> {
         withPathname.headers.set(key, value);
       }
     });
+    if (degraded) {
+      markDegradedPublicDocument(withPathname);
+    }
     return withPathname;
   }
 

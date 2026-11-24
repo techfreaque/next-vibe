@@ -630,13 +630,14 @@ export function startWebSocketServer(
         const connectorInstanceId =
           url.searchParams.get("connectorInstanceId") ?? undefined;
 
+        const connectedAt = Date.now();
         const upgraded = bunServer.upgrade(req, {
           data: {
             user,
             socketAuthSource,
             channels: new Set(channel ? [channel] : []),
-            connectedAt: Date.now(),
-            lastInboundAt: Date.now(),
+            connectedAt,
+            lastInboundAt: connectedAt,
             pongCount: 0,
             connectorInstanceId,
             requestId,
@@ -670,6 +671,7 @@ export function startWebSocketServer(
       pong(ws): void {
         ws.data.lastInboundAt = Date.now();
         ws.data.lastPongAt = ws.data.lastInboundAt;
+        ws.data.lastInboundFrame = "pong";
         ws.data.pongCount++;
       },
 
@@ -732,6 +734,7 @@ export function startWebSocketServer(
           const rawStr =
             typeof raw === "string" ? raw : new TextDecoder().decode(raw);
           const msg = parseWsClientMessage(rawStr);
+          ws.data.lastInboundFrame = msg?.type ?? "malformed";
           if (!msg) {
             logger.warn("[WS] Ignored malformed client message", {
               rawPreview: rawStr.slice(0, 200),

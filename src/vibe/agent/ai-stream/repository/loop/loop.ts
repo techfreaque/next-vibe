@@ -72,7 +72,11 @@ import {
 } from "./finalize";
 import { DEFAULT_TEMPERATURE, isThreadRenameCall } from "./helpers";
 import { extractMediaPrompt, onFilePart } from "./media-parts";
-import { isContextOverflowText, summarizePromptSize } from "./prompt-size";
+import {
+  isContextOverflowText,
+  summarizePromptSize,
+  summarizePromptToolHistory,
+} from "./prompt-size";
 import type {
   AssistantPrepResult,
   StreamLoopParams,
@@ -968,6 +972,7 @@ export class StreamLoop implements StreamLoopState {
       // idle-timeout / outage is attributable to the provider at a glance.
       const errorMeta = {
         error: errorText,
+        promptToolHistory: summarizePromptToolHistory(this.lastPromptMessages),
         upstreamStatus: APICallError.isInstance(rawError)
           ? rawError.statusCode
           : undefined,

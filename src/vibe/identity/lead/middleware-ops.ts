@@ -7,8 +7,14 @@ import { parseError } from "../../core/utils/parse-error";
 import { isPrivateAddress } from "../../core/utils/ssrf-guard";
 import { sanitizeTelemetryUrl } from "../../core/utils/telemetry-url";
 import { db } from "../../database";
+import { pool } from "../../database/client";
+import { databaseFailureDiagnostics } from "../../database/error-diagnostics";
 import { Environment } from "../../env/env-util";
 import type { EndpointLogger } from "../../logger/types";
+import {
+  withLeadDatabaseDeadline,
+  withLeadLookupDeadline,
+} from "./database-deadline";
 import { leadLeadLinks, leads, userLeadLinks } from "./db";
 import { LeadSource, LeadStatus } from "./enum";
 import {
@@ -29,26 +35,60 @@ interface ClientInfo {
 /**
  * Does `leadId` exist? `null` = the lookup itself failed (DB timeout/blip):
  * unknown, NOT missing — callers must not treat it as a dead identity.
+ * Callers supplying a deadline receive the original database error on failure.
  */
+export function validateLeadIdExists(
+  leadId: string,
+  deadlineMs: number,
+): Promise<boolean>;
+export function validateLeadIdExists(
+  leadId: string,
+  deadlineMs?: number,
+): Promise<boolean | null>;
 export async function validateLeadIdExists(
   leadId: string,
+  deadlineMs?: number,
 ): Promise<boolean | null> {
-  try {
-    const [lead] = await db
+  const lookup = async (
+    connection: Pick<typeof db, "select">,
+  ): Promise<boolean> => {
+    const [lead] = await connection
       .select({ id: leads.id })
       .from(leads)
       .where(eq(leads.id, leadId))
       .limit(1);
     return !!lead;
+  };
+  if (deadlineMs !== undefined) {
+    return withLeadLookupDeadline(pool, deadlineMs, lookup);
+  }
+  try {
+    return await lookup(db);
   } catch {
     return null;
   }
 }
 
-export async function createAnonymousLead(
+export function createAnonymousLead(
   clientInfo: ClientInfo,
   locale: CountryLanguage,
   logger: EndpointLogger,
+  deadlineMs?: number,
+): Promise<string> {
+  if (deadlineMs === undefined) {
+    return provisionAnonymousLead(db, clientInfo, locale, logger, false);
+  }
+  return withLeadDatabaseDeadline(pool, deadlineMs, (connection) =>
+    provisionAnonymousLead(connection, clientInfo, locale, logger, true),
+  );
+}
+
+async function provisionAnonymousLead(
+  connection: typeof db,
+  clientInfo: ClientInfo,
+  locale: CountryLanguage,
+  logger: EndpointLogger,
+  transactional: boolean,
 ): Promise<string> {
   const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
 
@@ -71,8 +111,8 @@ export async function createAnonymousLead(
     );
   }
 
-  const [existingLead] = await db
-    .select()
+  const [existingLead] = await connection
+    .select({ id: leads.id })
     .from(leads)
     .where(and(...conditions))
     .limit(1);
@@ -89,7 +129,7 @@ export async function createAnonymousLead(
     ? parseLeadUserAgent(clientInfo.userAgent)
     : null;
 
-  const [newLead] = await db
+  const [newLead] = await connection
     .insert(leads)
     .values({
       email: null,
@@ -118,14 +158,20 @@ export async function createAnonymousLead(
         timestamp: new Date().toISOString(),
       },
     })
-    .returning();
+    .returning({ id: leads.id });
 
   logger.debug(`Created anonymous lead ${newLead.id}`);
 
   // Credit wallet is created lazily on first balance check — no eager init needed here.
 
   if (clientInfo.ipAddress) {
-    await linkLeadsByIp(newLead.id, clientInfo.ipAddress, logger);
+    await linkLeadsByIp(
+      connection,
+      newLead.id,
+      clientInfo.ipAddress,
+      logger,
+      transactional,
+    );
   }
 
   return newLead.id;
@@ -158,10 +204,14 @@ export function isServerSideIp(
  * request header or user agent would let anyone opt out of guest pooling).
  */
 async function linkLeadsByIp(
+  connection: typeof db,
   newLeadId: string,
   ipAddress: string,
   logger: EndpointLogger,
+  transactional: boolean,
 ): Promise<void> {
+  const startedAt = performance.now();
+  let matches = 0;
   try {
     const ipKey = ipPoolKey(ipAddress);
     if (!ipKey || isServerSideIp(ipAddress)) {
@@ -171,7 +221,7 @@ async function linkLeadsByIp(
       Date.now() - GUEST_IP_POOL_WINDOW_HOURS * 60 * 60 * 1000,
     );
 
-    const sameIpLeads = await db
+    const sameIpLeads = await connection
       .select({ id: leads.id })
       .from(leads)
       .where(
@@ -190,11 +240,12 @@ async function linkLeadsByIp(
       )
       .limit(20);
 
-    if (sameIpLeads.length === 0) {
+    matches = sameIpLeads.length;
+    if (matches === 0) {
       return;
     }
 
-    await db
+    await connection
       .insert(leadLeadLinks)
       .values(
         sameIpLeads.map((existing) => ({
@@ -210,6 +261,16 @@ async function linkLeadsByIp(
       linkedCount: sameIpLeads.length,
     });
   } catch (error) {
-    logger.error("Failed to link leads by IP", parseError(error).message);
+    logger.error("Failed to link leads by IP", {
+      ...databaseFailureDiagnostics(
+        error instanceof Error ? error : parseError(error),
+      ),
+      stage: matches ? "insertLinks" : "findGuests",
+      matches,
+      elapsedMs: Math.round(performance.now() - startedAt),
+    });
+    if (transactional) {
+      return Promise.reject(error);
+    }
   }
 }

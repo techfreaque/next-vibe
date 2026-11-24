@@ -352,6 +352,7 @@ interface DayComputation {
   upstreamCostUsd: number | null;
   /** Usage-priced part of upstream cost (no flat plan fees): what per-use alerts judge. */
   variableCostUsd: number | null;
+  variableSpendByProvider: Record<string, number>;
   internalBilledUsd: number;
   coverage: typeof CostCoverageValue;
 }
@@ -1180,6 +1181,7 @@ export class FinanceRepository {
           trailingAvgCancellations: trailingCancel,
           processorFeesUsd: comp.revenue.feesUsd,
           upstreamCostUsd: comp.variableCostUsd ?? 0,
+          variableSpendByProvider: comp.variableSpendByProvider,
           internalBilledUsd: comp.internalBilledUsd,
         },
         thresholds,
@@ -1385,6 +1387,7 @@ export class FinanceRepository {
       revenue,
       upstreamCostUsd,
       variableCostUsd: coverage === CostCoverage.NONE ? null : variableCost,
+      variableSpendByProvider: input.perProvider,
       internalBilledUsd,
       coverage,
     };

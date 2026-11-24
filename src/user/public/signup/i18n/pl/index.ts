@@ -28,6 +28,8 @@ export const translations: typeof enTranslations = {
       "To nie Ty? Zignoruj tę wiadomość. Bez kliknięcia konto nie powstanie.",
   },
   confirmation: {
+    linkSent:
+      "Nowa wiadomość z potwierdzeniem jest już w drodze. Otwórz link w wiadomości, aby się zalogować.",
     bouncedTitle: "Nie udało się dostarczyć wiadomości",
     changeAddress: "Zmień adres e-mail",
     description: "Dokończ rejestrację kodem lub linkiem z wiadomości e-mail.",

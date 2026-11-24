@@ -121,6 +121,9 @@ export class NewsletterStatusRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<StatusGetResponseOutput> {
+    if (user.isPublic && !user.leadId) {
+      return { ...NOT_SUBSCRIBED };
+    }
     const leadIds: string[] = [user.leadId];
     let accountEmail: string | undefined;
 

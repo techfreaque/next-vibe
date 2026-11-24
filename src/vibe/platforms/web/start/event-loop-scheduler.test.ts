@@ -19,6 +19,13 @@ describe("describeSchedulerEvidence", () => {
     ).toBe("main-thread-runnable-wait");
   });
 
+  it("excludes the scheduled 50 ms from CPU attribution and identifies off-CPU time", () => {
+    expect(describeSchedulerEvidence({ stallThreadCpuMs: 78, stallRunQueueMs: 35 }, 84, 50))
+      .toBe("no-dominant-scheduler-counter");
+    expect(describeSchedulerEvidence({ stallThreadCpuMs: 418, stallRunQueueMs: 6 }, 917, 50))
+      .toBe("outside-cpu-and-runnable-wait");
+  });
+
   it("keeps ambiguous or unavailable scheduler evidence explicit", () => {
     expect(describeSchedulerEvidence({ stallThreadCpuMs: 12 }, 200)).toBe(
       "no-dominant-scheduler-counter",

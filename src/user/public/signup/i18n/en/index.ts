@@ -26,6 +26,8 @@ export const translations = {
       "Didn’t sign up? Ignore this email. Without a click, no account is created.",
   },
   confirmation: {
+    linkSent:
+      "We sent a new confirmation email. Open it and follow the link to sign in.",
     bouncedTitle: "We couldn’t deliver your confirmation email",
     changeAddress: "Change email address",
     description: "Finish signup with the code or link from your email.",

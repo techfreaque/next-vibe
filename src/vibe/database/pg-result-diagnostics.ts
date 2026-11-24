@@ -68,6 +68,13 @@ interface DecodeBatch {
 interface PgDecodeState {
   queries: Map<string, QueryIdentity>;
   batches: DecodeBatch[];
+  largeDispatches?: {
+    at: number;
+    queryName: string;
+    caller: string | null;
+    sqlChars: number;
+    parameterCount: number;
+  }[];
 }
 
 const observedClients = new WeakSet<PoolClient>();
@@ -119,36 +126,64 @@ function queryName(sql: string): string {
 
 /** Capture the app call site when it is still present at Drizzle dispatch. */
 export const pgDiagnosticQueryLogger = {
-  logQuery(sql: string): void {
+  logQuery(sql: string, parameters?: { readonly length: number }): void {
     const state = globalThis.__vibePgDecodeDiagnostics;
     if (!state) {
       return;
     }
     const id = queryId(sql);
-    if (state.queries.has(id)) {
-      return;
+    let identity = state.queries.get(id);
+    if (!identity) {
+      // Only repo-relative source locations survive. SQL and bind values never
+      // enter the diagnostic catalog, even for unparameterized statements.
+      const caller = new Error().stack
+        ?.match(/(?:^|[/\s(])(src\/[a-z0-9_./[\]-]+\.tsx?:\d+:\d+)/gi)
+        ?.map((match) => match.slice(match.indexOf("src/")))
+        .find(
+          (frame) =>
+            !frame.startsWith("src/vibe/database/pg-result-diagnostics.ts:"),
+        );
+      identity = {
+        queryName: queryName(sql),
+        caller: caller ?? null,
+      };
+      state.queries.set(id, identity);
+      if (state.queries.size > QUERY_LIMIT) {
+        const oldest = state.queries.keys().next().value;
+        if (oldest !== undefined) {
+          state.queries.delete(oldest);
+        }
+      }
     }
-    // Only repo-relative source locations survive. SQL and bind values never
-    // enter the diagnostic catalog, even for unparameterized statements.
-    const caller = new Error().stack
-      ?.match(/(?:^|[/\s(])(src\/[a-z0-9_./[\]-]+\.tsx?:\d+:\d+)/gi)
-      ?.map((match) => match.slice(match.indexOf("src/")))
-      .find(
-        (frame) =>
-          !frame.startsWith("src/vibe/database/pg-result-diagnostics.ts:"),
-      );
-    state.queries.set(id, {
-      queryName: queryName(sql),
-      caller: caller ?? null,
-    });
-    if (state.queries.size > QUERY_LIMIT) {
-      const oldest = state.queries.keys().next().value;
-      if (oldest !== undefined) {
-        state.queries.delete(oldest);
+
+    // Drizzle dispatch follows SQL compilation and precedes pg's bind encoding.
+    // Keep large dispatches even when their write returns no rows to decode.
+    const parameterCount = parameters?.length ?? 0;
+    if (parameterCount >= 128 || sql.length >= QUERY_LABEL_SCAN_LIMIT) {
+      const dispatches = (state.largeDispatches ??= []);
+      dispatches.push({
+        at: Date.now(),
+        ...identity,
+        sqlChars: sql.length,
+        parameterCount,
+      });
+      if (dispatches.length > DECODE_LIMIT) {
+        dispatches.shift();
       }
     }
   },
 };
+
+/** Dispatches inside the measured interval. Timing alone does not attribute CPU. */
+export function largePgDispatchesDuring(
+  startedAt: number,
+  endedAt: number,
+): LoggerMetadata[] | undefined {
+  const matches = globalThis.__vibePgDecodeDiagnostics?.largeDispatches?.filter(
+    ({ at }) => at >= startedAt && at <= endedAt,
+  );
+  return matches?.length ? matches.slice(-4) : undefined;
+}
 
 /** The pinned pg driver exposes the running query to its own wire handlers. */
 export function getActivePgQuery(client: PoolClient): Query | null | undefined {

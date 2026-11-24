@@ -153,11 +153,11 @@ export const translations: typeof enTranslations = {
   repository: {
     capUpdated: "Tappo giornaliero impostato su crediti {{capAmount}}",
     capExceeded:
-      "Limite giornaliero di livello libero raggiunto. Ti preghiamo di iscriverti o riprovare domani.",
+      "La quota gratuita rimasta per oggi non basta per questa richiesta. Riprova domani o usa crediti a pagamento.",
     leadCapExceeded:
-      "Hai colpito il limite libero di oggi. Iscriviti o aggiungi la tua email per più crediti.",
+      "Questa richiesta supera il tuo limite gratuito di oggi. Riprova domani o usa crediti a pagamento.",
     capUnavailable:
-      "Il livello libero è temporaneamente non disponibile. Si prega di iscriversi per continuare.",
+      "I crediti gratuiti sono temporaneamente indisponibili. Riprova più tardi.",
     getCapFailed:
       "Non riuscita a recuperare la configurazione del cappuccio free-tier",
     updateCapFailed:

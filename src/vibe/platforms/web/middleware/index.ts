@@ -15,14 +15,17 @@ import {
 import { repairMangledStorageUrl } from "../../../agent/chat/storage/storage-url";
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
+import { parseError } from "../../../core/utils/parse-error";
 import { Environment } from "../../../env/env-util";
+import { GUEST_LEAD_DB_BUDGET_MS } from "../../../identity/lead/database-deadline";
 import {
   checkLeadId,
   createLeadId,
   getLeadIdFromRequest,
   isLeadIdValid,
+  leadFailureResponse,
   LeadIdCheckResult,
-  recordAttributionTouch,
+  recordAttributionWithinBudget,
   redeemExchangeToken,
   updateLeadLocale,
   UUID_REGEX,
@@ -229,7 +232,24 @@ export async function middleware(
   }
 
   // Step 4: Handle leadId tracking
-  const leadIdCheck = await checkLeadId(request);
+  const deadlineMs = performance.now() + GUEST_LEAD_DB_BUDGET_MS;
+  const lookupFailure = (error: Error): NextResponse => {
+    const response = leadFailureResponse(
+      request,
+      createEndpointLogger(false, locale),
+      error,
+      deadlineMs,
+      "lookup",
+    );
+    addCorsHeaders(request, response, path);
+    return response;
+  };
+  let leadIdCheck: LeadIdCheckResult;
+  try {
+    leadIdCheck = await checkLeadId(request, deadlineMs);
+  } catch (error) {
+    return lookupFailure(error instanceof Error ? error : parseError(error));
+  }
 
   if (leadIdCheck === LeadIdCheckResult.SKIP) {
     const res = NextResponseClass.next();
@@ -287,7 +307,11 @@ export async function middleware(
       // (cross-origin remote-connect clients have no cookie). Create one on
       // the fly and pass through - do NOT redirect (that would drop the body).
       if (path.includes("/user/public/login")) {
-        const newLead = await createLeadId(request, locale);
+        const newLead = await createLeadId(request, locale, deadlineMs);
+        if (!newLead.ok) {
+          addCorsHeaders(request, newLead, path);
+          return newLead;
+        }
         const newLeadId = newLead.cookies.get(LEAD_ID_COOKIE_NAME)?.value;
         const loginResp = NextResponseClass.next();
         if (newLeadId) {
@@ -344,11 +368,17 @@ export async function middleware(
     // This allows email links (e.g. unsubscribe) to restore the lead session
     // without creating a new lead. The leadId must be a valid UUID that exists in DB.
     const urlLeadId = request.nextUrl.searchParams.get("id");
-    if (
-      urlLeadId &&
-      UUID_REGEX.test(urlLeadId) &&
-      (await isLeadIdValid(urlLeadId))
-    ) {
+    let restoreUrlLead = false;
+    if (urlLeadId && UUID_REGEX.test(urlLeadId)) {
+      try {
+        restoreUrlLead = await isLeadIdValid(urlLeadId, deadlineMs);
+      } catch (error) {
+        return lookupFailure(
+          error instanceof Error ? error : parseError(error),
+        );
+      }
+    }
+    if (urlLeadId && restoreUrlLead) {
       const urlLeadResp = NextResponseClass.next();
       urlLeadResp.cookies.set({
         name: LEAD_ID_COOKIE_NAME,
@@ -363,10 +393,11 @@ export async function middleware(
       });
       stampCsrfCookie(request, urlLeadResp);
       addCorsHeaders(request, urlLeadResp, path);
-      await recordAttributionTouch(
+      await recordAttributionWithinBudget(
         request,
         urlLeadId,
         createEndpointLogger(false, locale),
+        deadlineMs,
       );
       return urlLeadResp;
     }
@@ -374,17 +405,18 @@ export async function middleware(
     // For page routes (including /frame/ without valid et), create a new leadId.
     // Frame routes: redirect is OK here because the iframe will reload with the
     // cookie set - browser follows the redirect transparently.
-    const leadIdResp = await createLeadId(request, locale);
+    const leadIdResp = await createLeadId(request, locale, deadlineMs);
     addCorsHeaders(request, leadIdResp, path);
     return leadIdResp;
   }
 
   const touchLeadId = getLeadIdFromRequest(request);
   if (touchLeadId) {
-    await recordAttributionTouch(
+    await recordAttributionWithinBudget(
       request,
       touchLeadId,
       createEndpointLogger(false, locale),
+      deadlineMs,
     );
   }
 

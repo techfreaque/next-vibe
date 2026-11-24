@@ -15,6 +15,7 @@ import {
   describeAudioElement,
   describeAudioSource,
   isOwnTeardownAbort,
+  SILENT_WAV_DATA_URI,
 } from "../../../text-to-speech/audio-diagnostics";
 
 /** How many seconds before the current chunk ends to start preloading the next */
@@ -41,6 +42,8 @@ export class AudioQueueManager {
   private queue: QueuedAudio[] = [];
   private isPlaying = false;
   private currentAudio: HTMLAudioElement | null = null;
+  /** An element played during the gesture can play later chunks on iOS Safari. */
+  private gesturePlayer: HTMLAudioElement | null = null;
   /** Pre-loaded audio elements ready for instant playback */
   private preloadedAudio: Map<number, HTMLAudioElement> = new Map();
   /** Next expected chunk index for ordered playback */
@@ -62,6 +65,27 @@ export class AudioQueueManager {
 
   constructor(logger: EndpointLogger) {
     this.logger = logger;
+  }
+
+  primeForGesture(): void {
+    if (
+      this.gesturePlayer ||
+      typeof Audio === "undefined" ||
+      getUserActivation().isActive === false
+    ) {
+      return;
+    }
+    const audio = new Audio(SILENT_WAV_DATA_URI);
+    this.gesturePlayer = audio;
+    this.releasePreloads();
+    void audio.play().catch((error: Error) => {
+      if (this.gesturePlayer === audio && audio.src === SILENT_WAV_DATA_URI) {
+        this.gesturePlayer = null;
+      }
+      this.logger.debug("[TTS-PLAY] Player prime rejected", {
+        errorName: error.name,
+      });
+    });
   }
 
   /**
@@ -103,7 +127,9 @@ export class AudioQueueManager {
     this.queue.sort((a, b) => a.chunkIndex - b.chunkIndex);
 
     // Start preloading this audio immediately
-    void this.preloadAudio(audioData, chunkIndex);
+    if (!this.gesturePlayer) {
+      void this.preloadAudio(audioData, chunkIndex);
+    }
 
     void this.processQueue(logger);
   }
@@ -343,7 +369,10 @@ export class AudioQueueManager {
       // Check if we have a preloaded audio element
       let audio = this.preloadedAudio.get(chunkIndex);
 
-      if (audio) {
+      if (this.gesturePlayer) {
+        audio = this.gesturePlayer;
+        audio.src = audioData;
+      } else if (audio) {
         // Use preloaded audio - it's ready to play immediately
         this.preloadedAudio.delete(chunkIndex);
       } else {
@@ -356,7 +385,9 @@ export class AudioQueueManager {
       this.currentAudio = audio;
 
       // Schedule look-ahead prefetch of the next chunk
-      this.schedulePrefetch(audio, chunkIndex);
+      if (audio !== this.gesturePlayer) {
+        this.schedulePrefetch(audio, chunkIndex);
+      }
 
       /** Set only by stop() (via currentPlaybackCancel) when we tear this playback down on purpose */
       let cancelled = false;
@@ -367,12 +398,16 @@ export class AudioQueueManager {
         audio.removeEventListener("canplaythrough", onCanPlay);
         this.clearPrefetchTimer();
         this.currentAudio = null;
+        this.currentAudioCleanup?.();
         this.currentAudioCleanup = null;
         this.currentPlaybackCancel = null;
       };
 
       const onEnded = (): void => {
         detach();
+        if (audio === this.gesturePlayer) {
+          releaseAudio(audio);
+        }
         resolve();
       };
 
@@ -410,6 +445,7 @@ export class AudioQueueManager {
             chunkIndex,
             failureKind: classifyPlayRejection(e),
             stoppedByUs: cancelled,
+            gesturePrimedElement: audio === this.gesturePlayer,
             // Autoplay rejections: was there a user gesture at all, and is it
             // still transient-active? iOS needs play() inside the gesture;
             // streamed chunks start later (fix: one element unlocked on the

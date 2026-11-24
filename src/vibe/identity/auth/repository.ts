@@ -40,6 +40,7 @@ import { throwErrorResponse } from "../../core/route/error-response-error";
 import type { ResponseType } from "../../core/route/response.schema";
 import type { EndpointLogger } from "../../logger/types";
 import { isCliPlatform, Platform } from "../../platforms/platforms";
+import { isDegradedPublicDocument } from "../../platforms/web/middleware/public-document.server";
 import { V1_API_PATH_REGEX } from "../../platforms/web/middleware/utils";
 import {
   filterUserPermissionRoles,
@@ -1240,6 +1241,23 @@ export class AuthRepository {
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<InferUserType<TRoles>> {
+    // Only middleware can mark an anonymous document after a failed guest
+    // lookup or insert. Do not authenticate, revalidate a stale cookie, or
+    // create another lead when its page loaders resolve the public context.
+    if (
+      context.platform === Platform.NEXT_PAGE &&
+      (await isDegradedPublicDocument())
+    ) {
+      if (roles.includes(UserRole.PUBLIC)) {
+        return AuthRepository.createPublicUser<TRoles>("");
+      }
+      const { t } = scopedTranslation.scopedT(context.locale);
+      return throwErrorResponse(
+        t("errors.publicUserNotAllowed"),
+        ErrorResponseTypes.UNAUTHORIZED,
+      );
+    }
+
     // Extract leadId suffix from Bearer header once - used in all fallback paths.
     const rawBearer = context.request?.headers.get("authorization")?.slice(7);
     const bearerLeadId = AuthRepository.extractBearerLeadId(rawBearer);

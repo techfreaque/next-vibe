@@ -133,6 +133,11 @@ export class DescribeVideoRepository {
     try {
       const outcome = await describeWithVisionFallback({
         model: visionModel,
+        mediaSource: inlineFile
+          ? data.fileUrl.startsWith("data:")
+            ? "inline-upload"
+            : "storage-file"
+          : "remote-url",
         checkCredits: (model) =>
           protectedBalance(
             user.id,

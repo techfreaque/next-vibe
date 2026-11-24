@@ -1,5 +1,6 @@
 import "server-only";
 
+import { isDegradedPublicDocument } from "../platforms/web/middleware/public-document.server";
 import { agentPublicFlags } from "./env";
 
 export interface AgentEnvAvailability {
@@ -191,6 +192,9 @@ export function buildMissingKeyMessage(
  * this value passed down from the page into AgentAvailabilityProvider.
  */
 export async function getEnvAvailability(): Promise<AgentEnvAvailability> {
+  if (await isDegradedPublicDocument()) {
+    return envAvailability;
+  }
   try {
     // Lean module on purpose — see inference-state.ts. Never route this
     // through remote-connection/routing: the root layout calls it on every

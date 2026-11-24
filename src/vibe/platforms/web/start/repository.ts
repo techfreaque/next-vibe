@@ -37,6 +37,7 @@ import { databaseEnv, usesPglite } from "../../../database/env";
 import { readProcMeminfo } from "../../../database/health/repository";
 import {
   enablePgResultDiagnostics,
+  largePgDispatchesDuring,
   summarizePgResultDecodes,
 } from "../../../database/pg-result-diagnostics";
 import { scopedTranslation as dockerOperationsScopedTranslation } from "../../../database/utils/docker-operations/i18n";
@@ -942,8 +943,15 @@ export class ServerStartRepository {
             // Main-thread CPU and runnable wait between the delayed ticker's
             // callbacks. Process CPU below covers all threads over five seconds.
             ...stall?.scheduler,
+            schedulerSampleIntervalMs: stall
+              ? Math.round(stall.ms + STALL_TICK_MS)
+              : undefined,
             schedulerEvidence: stall
-              ? describeSchedulerEvidence(stall.scheduler, stall.ms)
+              ? describeSchedulerEvidence(
+                  stall.scheduler,
+                  stall.ms,
+                  STALL_TICK_MS,
+                )
               : "no-timer-sample",
             stallStartedAt: stall
               ? new Date(stall.startedAt).toISOString()
@@ -956,6 +964,9 @@ export class ServerStartRepository {
             // Per run: start/end wall clock, to place it against stallStartedAt
             taskTimings: stall?.taskTimings || undefined,
             recentRequests: stall?.recentRequests,
+            largePgDispatches: stall
+              ? largePgDispatchesDuring(stall.startedAt, stall.endedAt)
+              : undefined,
             pgResultDecodes,
             pgResultDecodeWindow: pgResultDecodes
               ? stall

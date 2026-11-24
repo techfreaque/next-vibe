@@ -22,6 +22,9 @@ import { sanitizeRoutePath } from "./client-context";
 // Match the public JS/CSS paths recorded in both Caddy edge logs.
 const NEXT_BUNDLE_PATH =
   /^\/_next\/static\/chunks\/[A-Za-z0-9_./~-]+\.(?:js|css)$/;
+// Resource error events have no request ID. A tab can retain an entry for
+// the same script long after its first successful load.
+const RECENT_RESOURCE_END_MS = 60_000;
 
 /** Path of a resource URL without query/hash (may carry signed tokens). */
 export function describeUrl(raw: string | null | undefined): string | null {
@@ -34,7 +37,11 @@ export function describeUrl(raw: string | null | undefined): string | null {
       return null;
     }
     const sameOrigin = url.origin === getCurrentOrigin();
-    if (sameOrigin && NEXT_BUNDLE_PATH.test(url.pathname)) {
+    if (
+      sameOrigin &&
+      (NEXT_BUNDLE_PATH.test(url.pathname) ||
+        url.pathname === "/images/unbottled-icon-white.png")
+    ) {
       return url.pathname;
     }
     return `${sameOrigin ? "" : url.origin}${sanitizeRoutePath(url.pathname)}`;
@@ -71,6 +78,9 @@ interface ResourceTimingEvidence {
   responseReadMs: number | null;
   resourceStartedAtMs: number | null;
   resourceReportedAtMs: number;
+  resourceTimingCandidateCount: number | null;
+  resourceTimingAgeMs: number | null;
+  resourceTimingInitiator: string | null;
   resourceFailureKind: string;
   resourceTimingPhase:
     | "unavailable"
@@ -189,6 +199,9 @@ export function resourceTiming(
     responseReadMs: null,
     resourceStartedAtMs: null,
     resourceReportedAtMs: Date.now(),
+    resourceTimingCandidateCount: null,
+    resourceTimingAgeMs: null,
+    resourceTimingInitiator: null,
     resourceFailureKind: "no-resource-timing",
     resourceTimingPhase: "unavailable",
     proxyTimingStage: null,
@@ -221,8 +234,20 @@ export function resourceTiming(
       fetchStartedAt === undefined || candidates.length === 1
         ? candidates.at(-1)
         : undefined;
+    empty.resourceTimingCandidateCount = candidates.length;
     if (!(entry instanceof PerformanceResourceTiming)) {
       return empty;
+    }
+    empty.resourceTimingInitiator = entry.initiatorType || null;
+    empty.resourceTimingAgeMs = Math.max(
+      0,
+      Math.round(performance.now() - (entry.startTime + entry.duration)),
+    );
+    if (
+      fetchStartedAt === undefined &&
+      empty.resourceTimingAgeMs > RECENT_RESOURCE_END_MS
+    ) {
+      return { ...empty, resourceFailureKind: "only-earlier-resource-timing" };
     }
     const responseStatus =
       "responseStatus" in entry && typeof entry.responseStatus === "number"
@@ -230,6 +255,9 @@ export function resourceTiming(
         : null;
     return {
       responseStatus,
+      resourceTimingCandidateCount: empty.resourceTimingCandidateCount,
+      resourceTimingAgeMs: empty.resourceTimingAgeMs,
+      resourceTimingInitiator: empty.resourceTimingInitiator,
       resourceOrigin: empty.resourceOrigin,
       nextHopProtocol: entry.nextHopProtocol || null,
       deliveryType:

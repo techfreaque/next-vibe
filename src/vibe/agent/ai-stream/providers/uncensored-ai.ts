@@ -12,6 +12,7 @@ import "server-only";
 
 import { OpenAICompatibleChatLanguageModel } from "@ai-sdk/openai-compatible";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
 import { agentEnv } from "../../env";
 import { logProviderRequest } from "./shared/debug-file-logger";
@@ -32,6 +33,46 @@ import {
  */
 // eslint-disable-next-line i18next/no-literal-string
 const USE_NATIVE_TOOLS = false;
+
+const providerErrorEnvelope = z.object({
+  error: z.object({
+    type: z.literal("invalid_request_error"),
+    message: z.string(),
+  }),
+});
+const upstreamConcurrencyError = z.object({
+  error: z.object({
+    code: z.union([z.literal(429), z.literal("429")]),
+    type: z.literal("rate_limit_exceeded"),
+    message: z.string().regex(/^concurrent request limit reached\b/i),
+  }),
+});
+
+/** This proxy wraps its upstream admission refusal in an HTTP 400. */
+async function isWrappedConcurrencyRefusal(
+  response: Response,
+): Promise<boolean> {
+  if (response.status !== 400) {
+    return false;
+  }
+  try {
+    const envelope = providerErrorEnvelope.safeParse(
+      await response.clone().json(),
+    );
+    if (!envelope.success) {
+      return false;
+    }
+    const upstream = /^[^:\n]{1,80}: 429 - (\{[\s\S]*\})$/.exec(
+      envelope.data.error.message,
+    )?.[1];
+    return (
+      upstream !== undefined &&
+      upstreamConcurrencyError.safeParse(JSON.parse(upstream)).success
+    );
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Create an Uncensored AI provider compatible with AI SDK V2
@@ -128,6 +169,23 @@ export function createUncensoredAI(
     const response = await fetchImpl(input, modifiedInit);
 
     if (!response.ok) {
+      if (await isWrappedConcurrencyRefusal(response)) {
+        logger.warn(
+          "[UncensoredAI] Upstream concurrency limit rejected request",
+          {
+            proxyStatus: response.status,
+            upstreamStatus: 429,
+            hasRetryAfter:
+              response.headers.has("retry-after") ||
+              response.headers.has("retry-after-ms"),
+          },
+        );
+        return new Response(response.body, {
+          status: 429,
+          statusText: "Too Many Requests",
+          headers: response.headers,
+        });
+      }
       return response;
     }
 

@@ -14,6 +14,7 @@ import { RefusalPublicRepository } from "next-vibe/agent/refusal-index/repositor
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { isDegradedPublicDocument } from "next-vibe/platforms/web/middleware/public-document.server";
 import { JsonLd, type JsonLdNode } from "next-vibe/ui/components/json-ld";
 import { notFound } from "next-vibe/ui/lib/not-found";
 import type { JSX } from "react";
@@ -131,17 +132,19 @@ export async function tanstackLoader({
     };
   }
   const logger = createEndpointLogger(false, locale);
-  const stats = await RefusalPublicRepository.modelStats(
-    { modelId: facts.id },
-    logger,
-    locale,
-  );
+  const stats = (await isDegradedPublicDocument())
+    ? null
+    : await RefusalPublicRepository.modelStats(
+        { modelId: facts.id },
+        logger,
+        locale,
+      );
   return {
     kind: "chat",
     locale,
     facts,
     pickerModels: buildPickerModels(facts, availability),
-    refusal: stats.success ? stats.data : null,
+    refusal: stats?.success ? stats.data : null,
     ...buildChatModelPageSeo(facts, locale, availability),
   };
 }

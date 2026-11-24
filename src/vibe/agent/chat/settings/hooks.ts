@@ -14,6 +14,7 @@ import { useEndpoint } from "next-vibe/unified-ui/hooks/use-endpoint";
 import { useCallback, useMemo } from "react";
 
 import type { ChatModelId } from "../../ai-stream/models";
+import { getAudioQueue } from "../../ai-stream/stream/hooks/audio-queue";
 import type { ViewModeValue } from "../enum";
 import type {
   ChatSettingsGetResponseOutput,
@@ -132,9 +133,12 @@ export function useChatSettings(
 
   const setTTSAutoplay = useCallback(
     (autoplay: boolean) => {
+      if (autoplay) {
+        getAudioQueue(logger).primeForGesture();
+      }
       void updateSettings({ ttsAutoplay: autoplay });
     },
-    [updateSettings],
+    [logger, updateSettings],
   );
 
   const setViewMode = useCallback(

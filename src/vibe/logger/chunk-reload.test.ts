@@ -147,6 +147,10 @@ describe("handleChunkLoadFailure", () => {
   it("keeps only the public same-origin bundle path for edge correlation", () => {
     const path = "/_next/static/chunks/123456-a1b2c3d4e5f6abcd.js";
     expect(describeUrl(path)).toBe(path);
+    expect(describeUrl("/images/unbottled-icon-white.png?src=private")).toBe(
+      "/images/unbottled-icon-white.png",
+    );
+    expect(describeUrl("/images/abcde12345abcde12345.png")).toBe("/images/:id");
     expect(describeUrl(`https://cdn.example${path}`)).toBe(
       "https://cdn.example/_next/static/chunks/:id",
     );
@@ -180,9 +184,23 @@ describe("handleChunkLoadFailure", () => {
     }
     Object.defineProperty(globalThis, "PerformanceResourceTiming", { configurable: true, value: Sample });
     const entries = spyOn(performance, "getEntriesByName");
+    const now = spyOn(performance, "now").mockReturnValue(46 * 60_000);
     try {
       const path = "/api/example";
       const since = Math.floor(performance.timeOrigin + 50);
+      entries.mockReturnValue([new Sample(60, "script")]);
+      expect(resourceTiming(path)).toMatchObject({
+        responseStatus: null,
+        resourceFailureKind: "only-earlier-resource-timing",
+        resourceTimingInitiator: "script",
+        resourceTimingAgeMs: 46 * 60_000 - 185,
+        resourceTimingCandidateCount: 1,
+      });
+      entries.mockReturnValue([new Sample(46 * 60_000 - 200, "script")]);
+      expect(resourceTiming(path)).toMatchObject({
+        responseStatus: 504,
+        resourceTimingAgeMs: 75,
+      });
       entries.mockReturnValue([new Sample(10, "fetch"), new Sample(60, "img")]);
       expect(resourceTiming(path, since).responseStatus).toBeNull();
       entries.mockReturnValue([new Sample(10, "fetch"), new Sample(60, "fetch")]);
@@ -193,6 +211,7 @@ describe("handleChunkLoadFailure", () => {
       entries.mockReturnValue([new Sample(55, "fetch"), new Sample(60, "fetch")]);
       expect(resourceTiming(path, since).responseStatus).toBeNull();
     } finally {
+      now.mockRestore();
       entries.mockRestore();
       if (original) Object.defineProperty(globalThis, "PerformanceResourceTiming", original);
       else Reflect.deleteProperty(globalThis, "PerformanceResourceTiming");
@@ -223,11 +242,18 @@ describe("handleChunkLoadFailure", () => {
       },
       {
         level: "error",
-        context: { chunkId: "4522", recoveredByReload: null },
+        context: { chunkId: "4522", recoveredByReload: null, reloadRequestedAt: null },
       },
     ]);
     await waitForReload();
     expect(reloads).toBe(1);
+    // The old document can still receive a failure after location.reload().
+    handleChunkLoadFailure(logger, { source: "test", error: chunkError("4523") });
+    expect(calls[2]?.context).toMatchObject({
+      reloadRequestedAt: expect.any(Number),
+      reloadTimerElapsedMs: expect.any(Number),
+      recoveredByReload: null,
+    });
     const record: { at: number } = JSON.parse(
       session.getItem("vibe-chunk-reload") ?? "{}",
     );
@@ -248,11 +274,11 @@ describe("handleChunkLoadFailure", () => {
     expect(
       handleChunkLoadFailure(logger, { source: "after", error: chunkError() }),
     ).toBe(false);
-    expect(calls).toHaveLength(3);
-    expect(calls[2]?.message).toBe(
+    expect(calls).toHaveLength(4);
+    expect(calls[3]?.message).toBe(
       "[chunk] Load still failing after an automatic reload",
     );
-    expect(calls[2]?.context).toMatchObject({
+    expect(calls[3]?.context).toMatchObject({
       source: "after",
       firstSource: "test",
       firstChunkId: "4521",

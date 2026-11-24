@@ -195,7 +195,7 @@ export class LoginRepository {
         );
         return fail({
           message: issued.success
-            ? pendingStatus(issued.data, signupT).message
+            ? pendingStatus(issued.data, signupT, "link").message
             : issued.message,
           errorType: ErrorResponseTypes.CONFLICT,
         });

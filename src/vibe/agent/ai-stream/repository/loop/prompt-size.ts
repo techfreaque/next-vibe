@@ -17,6 +17,54 @@ export function isContextOverflowText(errorText: string): boolean {
   return CONTEXT_OVERFLOW_PATTERN.test(errorText);
 }
 
+/** Count missing, unmatched and reused call IDs in the exact prompt sent for a failed step. */
+export function summarizePromptToolHistory(messages: readonly ModelMessage[]): {
+  calls: number;
+  results: number;
+  unanswered: number;
+  unmatchedResults: number;
+  reusedCallIds: number;
+} {
+  const seen = new Set<string>();
+  const outstanding = new Map<string, number>();
+  const counts = {
+    calls: 0,
+    results: 0,
+    unanswered: 0,
+    unmatchedResults: 0,
+    reusedCallIds: 0,
+  };
+  for (const message of messages) {
+    if (typeof message.content === "string") {
+      continue;
+    }
+    for (const part of message.content) {
+      if (part.type === "tool-call") {
+        counts.calls++;
+        counts.unanswered++;
+        if (seen.has(part.toolCallId)) {
+          counts.reusedCallIds++;
+        }
+        seen.add(part.toolCallId);
+        outstanding.set(
+          part.toolCallId,
+          (outstanding.get(part.toolCallId) ?? 0) + 1,
+        );
+      } else if (part.type === "tool-result") {
+        counts.results++;
+        const pending = outstanding.get(part.toolCallId) ?? 0;
+        if (pending > 0) {
+          counts.unanswered--;
+          outstanding.set(part.toolCallId, pending - 1);
+        } else {
+          counts.unmatchedResults++;
+        }
+      }
+    }
+  }
+  return counts;
+}
+
 /** Characters a part costs once serialized for the provider. */
 function partChars<T>(part: T): number {
   return JSON.stringify(part)?.length ?? 0;

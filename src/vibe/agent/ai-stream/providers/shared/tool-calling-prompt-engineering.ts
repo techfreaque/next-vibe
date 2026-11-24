@@ -6,11 +6,7 @@
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
-import {
-  CORTEX_DELETE_ALIAS,
-  CORTEX_EDIT_ALIAS,
-  CORTEX_WRITE_ALIAS,
-} from "../../../cortex/constants";
+import { CORTEX_WRITE_ALIAS } from "../../../cortex/constants";
 import { FETCH_URL_ALIAS } from "../../../fetch-url-content/constants";
 import FETCH_URL_DEFINITION from "../../../fetch-url-content/definition";
 import { WEB_SEARCH_ALIAS } from "../../../web-search/constants";
@@ -73,14 +69,31 @@ export function generateToolSystemPrompt(tools: OpenAITool[]): string {
     })
     .join("\n\n");
 
-  // Use actual examples from endpoint definitions
-  const searchExample = SEARCH_DEFINITION.GET.examples.requests.default;
-  const fetchExample = FETCH_URL_DEFINITION.GET.examples.requests.default;
-  const cortexWriteExample = {
-    path: "/memories/note.md",
-    content: "User prefers dark mode.",
-  };
-
+  const offered = new Set(tools.map((tool) => tool.function.name));
+  const examples = [
+    {
+      name: WEB_SEARCH_ALIAS,
+      arguments: SEARCH_DEFINITION.GET.examples.requests.default,
+    },
+    {
+      name: FETCH_URL_ALIAS,
+      arguments: FETCH_URL_DEFINITION.GET.examples.requests.default,
+    },
+    {
+      name: CORTEX_WRITE_ALIAS,
+      arguments: {
+        path: "/memories/note.md",
+        content: "User prefers dark mode.",
+        callbackMode: "endLoop",
+      },
+    },
+  ]
+    .filter((example) => offered.has(example.name))
+    .map(
+      (example) =>
+        `\nExample: <tool_calls>${JSON.stringify([example])}</tool_calls>`,
+    )
+    .join("");
   return `You have access to the following tools (use EXACT names: ${toolNames}):
 
 ${toolDescriptions}
@@ -104,16 +117,7 @@ MULTI-STEP WORKFLOW:
 - You may call the same tool again with DIFFERENT arguments (e.g. a refined search query, a different URL). Do NOT repeat the exact same call.
 - When your task requires multiple steps (search → read → summarize), work through each step. Call tools as needed, then write your final answer once you have all the information.
 
-STOP LOOP - callbackMode endLoop:
-When a tool call needs no follow-up response (e.g. saving a memory), add "callbackMode": "endLoop" to the arguments. The system stops after that tool completes.
-- Use for: ${CORTEX_WRITE_ALIAS}, ${CORTEX_EDIT_ALIAS}, ${CORTEX_DELETE_ALIAS}
-- Example: {"name": "${CORTEX_WRITE_ALIAS}", "arguments": {"path": "/memories/note.md", "content": "...", "callbackMode": "endLoop"}}
-
-EXAMPLES:
-- Search: <tool_calls>[{"name": "${WEB_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
-- Multiple: <tool_calls>[{"name": "${WEB_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}, {"name": "${FETCH_URL_ALIAS}", "arguments": ${JSON.stringify(fetchExample)}}]</tool_calls>
-- With text: Let me search for that.\n<tool_calls>[{"name": "${WEB_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
-- With endLoop: I'll remember that.\n<tool_calls>[{"name": "${CORTEX_WRITE_ALIAS}", "arguments": ${JSON.stringify({ ...cortexWriteExample, callbackMode: "endLoop" })}}]</tool_calls>`;
+Use only the listed tool names and their declared parameters. When the selected tool accepts callbackMode, use "endLoop" for a call that needs no follow-up response.${examples}`;
 }
 
 /**

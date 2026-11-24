@@ -4,12 +4,16 @@
  * This middleware ensures that every visitor has a leadId cookie set.
  */
 
-import { and, eq, gt, isNull } from "drizzle-orm";
+import { and, DrizzleQueryError, eq, gt, isNull } from "drizzle-orm";
 import type { NextRequest, NextResponse } from "next-vibe/ui/lib/request";
 import { NextResponse as NextResponseClass } from "next-vibe/ui/lib/request";
 
 import { skipCrawlerLead } from "@/credits/anti-farming/crawler";
-import { AUTH_TOKEN_COOKIE_NAME, LEAD_ID_COOKIE_NAME } from "@/env/constants";
+import {
+  AUTH_TOKEN_COOKIE_NAME,
+  LEAD_ID_COOKIE_NAME,
+  REQUEST_ID_HEADER_NAME,
+} from "@/env/constants";
 import { clientIpFromHeaders, geoCountryForIp } from "@/leads/geo/lookup";
 import {
   extractTouch,
@@ -20,12 +24,19 @@ import {
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "../../../core/i18n/core/language-utils";
+import { parseError } from "../../../core/utils/parse-error";
 import { db } from "../../../database";
+import { databaseFailureDiagnostics } from "../../../database/error-diagnostics";
 import { Environment } from "../../../env/env-util";
 import { createEndpointLogger } from "../../../logger/server";
 import type { EndpointLogger } from "../../../logger/types";
 import { frameExchangeTokens } from "../../../platforms/vibe-frame/db";
+import {
+  canRenderWithoutLead,
+  markDegradedPublicDocument,
+} from "../../../platforms/web/middleware/public-document";
 import { shouldSkipPath } from "../../../platforms/web/middleware/utils";
+import { GUEST_LEAD_DB_BUDGET_MS } from "../../lead/database-deadline";
 import { leads } from "../../lead/db";
 import {
   createAnonymousLead,
@@ -56,8 +67,11 @@ export function getLeadIdFromRequest(request: NextRequest): string | undefined {
  * @param leadId The leadId to check
  * @returns true only if the leadId is confirmed to exist (a failed lookup is false)
  */
-export async function isLeadIdValid(leadId: string): Promise<boolean> {
-  return (await validateLeadIdExists(leadId)) === true;
+export async function isLeadIdValid(
+  leadId: string,
+  deadlineMs?: number,
+): Promise<boolean> {
+  return (await validateLeadIdExists(leadId, deadlineMs)) === true;
 }
 
 /**
@@ -67,6 +81,7 @@ export async function isLeadIdValid(leadId: string): Promise<boolean> {
  */
 export async function checkLeadId(
   request: NextRequest,
+  deadlineMs?: number,
 ): Promise<LeadIdCheckResult> {
   const path = request.nextUrl.pathname;
 
@@ -92,7 +107,7 @@ export async function checkLeadId(
   // failed lookup (DB slow/blip) used to count as missing, so API calls got
   // 401 invalid_identity and page loads minted a NEW lead over the cookie —
   // the visitor silently lost their guest credits, packs and chats.
-  const exists = await validateLeadIdExists(existingLeadId);
+  const exists = await validateLeadIdExists(existingLeadId, deadlineMs);
   if (exists === false) {
     return LeadIdCheckResult.INVALID;
   }
@@ -155,6 +170,96 @@ export async function redeemExchangeToken(
   }
 }
 
+/** Bound ancillary work that can wait for a cold geo cache or telemetry.
+ * Provisioning uses a cancellable transaction with the same absolute deadline. */
+async function withinGuestBudget<T>(
+  work: Promise<T>,
+  deadlineMs: number,
+): Promise<T> {
+  const timeout = Promise.withResolvers<never>();
+  const timer = setTimeout(
+    () => timeout.reject(new Error("Guest lead database deadline exceeded")),
+    Math.max(0, deadlineMs - performance.now()),
+  );
+  try {
+    return await Promise.race([work, timeout.promise]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export function leadFailureResponse(
+  request: NextRequest,
+  logger: EndpointLogger,
+  error: Error,
+  deadlineMs: number,
+  operation: "create" | "lookup",
+): NextResponse {
+  const details = databaseFailureDiagnostics(error);
+  const renderPublic = !!details.driverFailure && canRenderWithoutLead(request);
+  const status = renderPublic ? 200 : details.driverFailure ? 503 : 500;
+  const requestId = request.headers.get(REQUEST_ID_HEADER_NAME);
+  logger.error(
+    operation === "create"
+      ? "Anonymous lead creation failed in middleware"
+      : "Anonymous lead lookup failed in middleware",
+    {
+      ...details,
+      stage:
+        error instanceof DrizzleQueryError
+          ? /^insert\b/i.test(error.query)
+            ? "insert"
+            : /^select\b/i.test(error.query)
+              ? "lookup"
+              : "other-query"
+          : operation,
+      requestId:
+        requestId && UUID_REGEX.test(requestId) ? requestId : undefined,
+      elapsedMs: Math.round(
+        performance.now() - deadlineMs + GUEST_LEAD_DB_BUDGET_MS,
+      ),
+      method: request.method,
+      status,
+      renderWithoutLead: renderPublic,
+    },
+  );
+  if (renderPublic) {
+    const response = NextResponseClass.next();
+    response.headers.set("Cache-Control", "private, no-store");
+    markDegradedPublicDocument(response);
+    return response;
+  }
+  return new NextResponseClass(
+    status === 503 ? "Service Unavailable" : "Internal Server Error",
+    {
+      status,
+      headers: {
+        "Cache-Control": "no-store",
+        ...(status === 503 ? { "Retry-After": "5" } : {}),
+      },
+    },
+  );
+}
+
+export async function recordAttributionWithinBudget(
+  request: NextRequest,
+  leadId: string,
+  logger: EndpointLogger,
+  deadlineMs: number,
+): Promise<void> {
+  try {
+    await withinGuestBudget(
+      recordAttributionTouch(request, leadId, logger),
+      deadlineMs,
+    );
+  } catch (error) {
+    logger.error(
+      "Guest attribution failed in middleware",
+      databaseFailureDiagnostics(parseError(error)),
+    );
+  }
+}
+
 /**
  * Create a new leadId and set the cookie
  * @param request The incoming request
@@ -164,40 +269,60 @@ export async function redeemExchangeToken(
 export async function createLeadId(
   request: NextRequest,
   locale: CountryLanguage,
+  deadlineMs = performance.now() + GUEST_LEAD_DB_BUDGET_MS,
 ): Promise<NextResponse> {
   const logger = createEndpointLogger(false, locale);
 
-  if (
+  const anonymousRead =
     (request.method === "GET" || request.method === "HEAD") &&
     !request.cookies.get(AUTH_TOKEN_COOKIE_NAME)?.value &&
-    !request.headers.get("authorization") &&
-    (await skipCrawlerLead(request.headers.get("user-agent"), logger))
-  ) {
-    return NextResponseClass.next();
-  }
+    !request.headers.has("authorization");
 
-  const ipAddress = clientIpFromHeaders(request.headers);
-  const clientInfo = {
-    userAgent: request.headers.get("user-agent") || undefined,
-    referer: request.headers.get("referer") || undefined,
-    ipAddress,
-    geoCountry: await geoCountryForIp(ipAddress, logger),
-  };
+  let leadId: string;
+  try {
+    if (
+      anonymousRead &&
+      (await withinGuestBudget(
+        skipCrawlerLead(request.headers.get("user-agent"), logger),
+        deadlineMs,
+      ))
+    ) {
+      return NextResponseClass.next();
+    }
 
-  const leadId = await createAnonymousLead(clientInfo, locale, logger);
-
-  if (leadId) {
-    await recordAttributionTouch(request, leadId, logger);
+    const ipAddress = clientIpFromHeaders(request.headers);
+    const clientInfo = {
+      userAgent: request.headers.get("user-agent") || undefined,
+      referer: request.headers.get("referer") || undefined,
+      ipAddress,
+      geoCountry: await withinGuestBudget(
+        geoCountryForIp(ipAddress, logger),
+        deadlineMs,
+      ),
+    };
+    // The insert itself uses a bounded transaction, so a timed-out checkout
+    // cannot later create an identity after we have returned the document.
+    leadId = await createAnonymousLead(clientInfo, locale, logger, deadlineMs);
+  } catch (error) {
+    return leadFailureResponse(
+      request,
+      logger,
+      error instanceof Error ? error : parseError(error),
+      deadlineMs,
+      "create",
+    );
   }
 
   if (!leadId) {
-    logger.error("Failed to create leadId in middleware");
-    // Delete any stale/empty cookie so the next request retries from scratch
-    // rather than seeing a persistent empty lead_id that middleware can't fix.
-    const errResp = NextResponseClass.next();
-    errResp.cookies.delete(LEAD_ID_COOKIE_NAME);
-    return errResp;
+    return leadFailureResponse(
+      request,
+      logger,
+      new Error("Guest provisioning returned no identity"),
+      deadlineMs,
+      "create",
+    );
   }
+  await recordAttributionWithinBudget(request, leadId, logger, deadlineMs);
 
   const response = NextResponseClass.next();
 

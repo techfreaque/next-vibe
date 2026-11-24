@@ -21,6 +21,7 @@ import { scopedTranslation as chatScopedTranslation } from "../chat/i18n";
 import {
   classifyPlayRejection,
   describeAudioElement,
+  SILENT_WAV_DATA_URI,
 } from "./audio-diagnostics";
 import { chunkTextForTTS } from "./chunking";
 import { DEFAULT_TTS_VOICE_ID } from "./constants";
@@ -31,10 +32,6 @@ import { getTtsRefs, resetTtsRefs, useTtsStore } from "./tts-store";
 /** One retry for a browser-level network failure, after a short pause. */
 const TTS_MAX_ATTEMPTS = 2;
 const TTS_RETRY_DELAY_MS = 1500;
-
-/** 10 ms of silence, played inside the click to unlock the shared player. */
-const SILENT_WAV_DATA_URI =
-  "data:audio/wav;base64,UklGRnQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==";
 
 interface ChunkFetchResult {
   /** Audio data URL for the chunk; null on failure or cancel. */
@@ -214,7 +211,9 @@ export function useTTSAudio({
             if (isNetworkLoss && attempt < TTS_MAX_ATTEMPTS && online) {
               logger.debug(
                 `TTS: Network loss on chunk ${chunkIndex + 1}, retrying once`,
-                { elapsedMs: Date.now() - startedAt },
+                {
+                  elapsedMs: Date.now() - startedAt,
+                },
               );
               setTimeout(() => {
                 // Cancelled (stop/cancelLoading reset the refs) meanwhile
@@ -418,6 +417,11 @@ export function useTTSAudio({
           return undefined;
         })
         .catch((err: Error | null) => {
+          const currentRefs = getTtsRefs(messageId);
+          const playbackReplaced =
+            currentRefs !== refs ||
+            currentRefs.player !== audio ||
+            audio.src !== audioUrl;
           const errMsg = err instanceof Error ? err.message : String(err);
           // Browser autoplay policy blocks audio outside user gesture — expected when
           // autoplay is enabled and user hasn't interacted recently.
@@ -430,6 +434,8 @@ export function useTTSAudio({
               {
                 ...describeAudioElement(audio),
                 error: errMsg,
+                playbackReplaced,
+                playerPaused: audio.paused,
                 failureKind: classifyPlayRejection(err),
                 errorName: err instanceof Error ? err.name : null,
                 chunkIndex: nextIndex,
@@ -442,6 +448,8 @@ export function useTTSAudio({
             logger.error(`TTS: Failed to play chunk ${nextIndex + 1}`, {
               ...describeAudioElement(audio),
               error: errMsg,
+              playbackReplaced,
+              playerPaused: audio.paused,
               failureKind: classifyPlayRejection(err),
               errorName: err instanceof Error ? err.name : null,
               chunkIndex: nextIndex,
@@ -455,6 +463,9 @@ export function useTTSAudio({
           audio.removeEventListener("error", onAudioError);
           audio.removeEventListener("loadedmetadata", onLoadedMetadata);
 
+          if (playbackReplaced) {
+            return;
+          }
           setStore(messageId, {
             error: t("hooks.tts.failed-to-play"),
             isPlaying: false,

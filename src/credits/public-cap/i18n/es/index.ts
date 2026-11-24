@@ -153,11 +153,11 @@ export const translations: typeof enTranslations = {
   repository: {
     capUpdated: "Juego de tapas diarias a créditos {{capAmount}}",
     capExceeded:
-      "Límite diario de nivel libre alcanzado. Por favor, ingrese o vuelva a intentarlo mañana.",
+      "La cuota gratuita de hoy no alcanza para esta solicitud. Vuelve a intentarlo mañana o usa créditos de pago.",
     leadCapExceeded:
-      "Usted golpeó el límite libre de hoy. Regístrese o agregue su correo electrónico para más créditos.",
+      "Esta solicitud supera tu límite gratuito de hoy. Vuelve a intentarlo mañana o usa créditos de pago.",
     capUnavailable:
-      "El tier libre es temporalmente indisponible. Por favor, inscríbete para continuar.",
+      "Los créditos gratuitos no están disponibles en este momento. Inténtalo de nuevo más tarde.",
     getCapFailed: "Failed to retrieve free-tier cap settings",
     updateCapFailed: "Failed to update free-tier cap",
     incrementFailed: "Failed to record free-tier spend",

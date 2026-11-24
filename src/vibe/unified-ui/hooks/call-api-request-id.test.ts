@@ -269,6 +269,7 @@ describe("request id propagation", () => {
           networkFailureKind: "early-failure",
           requestStartedAtMs: 1_795_407_002_300,
           documentEdgeRequestId: null,
+          previousTransportFailureRequestId: ids[0],
           retryOfRequestId: ids[0],
           requestId: ids[1],
         }),

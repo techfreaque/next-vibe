@@ -19,6 +19,10 @@ import { sanitizeRoutePath } from "next-vibe/logger/client-context";
 import { shouldUseColors } from "next-vibe/logger/colors";
 import { serverFileLog } from "next-vibe/logger/file";
 import { formatSinceStart } from "next-vibe/logger/uptime";
+import {
+  DEGRADED_PUBLIC_DOCUMENT_HEADER,
+  forwardDegradedPublicDocument,
+} from "next-vibe/platforms/web/middleware/public-document";
 import { applyResponseIdentityCookies } from "next-vibe/platforms/web/middleware/utils";
 import { preloadAllLazyWidgets } from "next-vibe/unified-ui/_shared/lazy-widget";
 
@@ -168,6 +172,9 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
     /* non-Bun runtime or srvx API change — the Bun.serve idleTimeout patch
        in vite-compiler still provides the server-wide default */
   }
+  if (request.headers.has(DEGRADED_PUBLIC_DOCUMENT_HEADER)) {
+    request.headers.delete(DEGRADED_PUBLIC_DOCUMENT_HEADER);
+  }
   // Preload all lazy widgets before the first SSR render. By the time this
   // middleware runs, all route modules that call lazyWidget() have been
   // evaluated and registered their factories. Awaiting here ensures the first
@@ -234,6 +241,10 @@ const proxyMiddleware = createMiddleware().server(async ({ next, request }) => {
     const total = Date.now() - requestStart;
     logRequest(request.method, path, proxyResponse.status, total, 0);
     return proxyResponse;
+  }
+
+  if (forwardDegradedPublicDocument(request.headers, proxyResponse)) {
+    setResponseHeader("Cache-Control", "private, no-store");
   }
 
   // Forward Set-Cookie headers from the proxy response onto the TanStack

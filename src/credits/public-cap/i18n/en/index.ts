@@ -148,11 +148,11 @@ export const translations = {
   repository: {
     capUpdated: "Daily cap set to {{capAmount}} credits",
     capExceeded:
-      "Free tier daily limit reached. Please sign up or try again tomorrow.",
+      "Today's free allowance can't cover this request. Try again tomorrow or use paid credits.",
     leadCapExceeded:
-      "You hit today's free limit. Sign up or add your email for more credits.",
+      "This request exceeds your free limit for today. Try again tomorrow or use paid credits.",
     capUnavailable:
-      "Free tier is temporarily unavailable. Please sign up to continue.",
+      "Free credits are temporarily unavailable. Try again later.",
     getCapFailed: "Failed to retrieve free-tier cap configuration",
     updateCapFailed: "Failed to update free-tier cap",
     incrementFailed: "Failed to record free-tier spend",

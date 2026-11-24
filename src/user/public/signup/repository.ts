@@ -15,6 +15,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { databaseFailureDiagnostics } from "next-vibe/database/error-diagnostics";
 import { hashPassword } from "next-vibe/identity/auth/password";
 import { AuthRepository } from "next-vibe/identity/auth/repository";
 import type {
@@ -82,6 +83,8 @@ export class SignupRepository {
     deliver = sendSignupChallenge,
     checkDomain = signupDomainStatus,
   ): Promise<ResponseType<SignupPostResponseOutput>> {
+    const startedAt = performance.now();
+    let stage = "validateAddress";
     try {
       // Extract fields from flat structure
       const email = data.email;
@@ -122,6 +125,7 @@ export class SignupRepository {
       // or clear it. Silently dropping it would cost their referrer the credit.
       const trimmedReferralCode = referralCode?.trim();
       if (trimmedReferralCode) {
+        stage = "validateReferral";
         const { ReferralRepository } =
           await import("../../../referral/repository");
         const codeCheck = await ReferralRepository.validateReferralCode(
@@ -142,6 +146,7 @@ export class SignupRepository {
       }
 
       // Per-subnet signup rate limit (scripted account farms on one network)
+      stage = "checkSubnetLimit";
       const limitedSubnet = await signupSubnetLimitHit(
         SignupRepository.requestIp(request),
       );
@@ -164,12 +169,15 @@ export class SignupRepository {
         });
       }
 
+      stage = "hashPassword";
+      const passwordHash = await hashPassword(password);
+      stage = "issueChallenge";
       const issued = await issueSignupChallenge(
         {
           email,
           privateName,
           publicName,
-          passwordHash: await hashPassword(password),
+          passwordHash,
           subscribeToNewsletter,
           referralCode: trimmedReferralCode,
           leadId: user.leadId,
@@ -194,7 +202,11 @@ export class SignupRepository {
       });
     } catch (error) {
       logger.error("Pending signup failed", {
-        errorType: parseError(error).name,
+        ...databaseFailureDiagnostics(
+          error instanceof Error ? error : parseError(error),
+        ),
+        stage,
+        elapsedMs: Math.round(performance.now() - startedAt),
       });
       return fail({
         message: t("errors.server.title"),

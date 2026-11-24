@@ -57,17 +57,28 @@ export function threadSchedulerDelta(
 export function describeSchedulerEvidence(
   scheduler: ReturnType<typeof threadSchedulerDelta>,
   stallMs: number,
+  scheduledTickMs = 0,
 ): string {
   if (!scheduler) {
     return "no-scheduler-sample";
   }
   const cpuMs = scheduler.stallThreadCpuMs;
   const waitMs = scheduler.stallRunQueueMs ?? 0;
-  if (cpuMs >= stallMs / 2 && cpuMs > waitMs) {
+  // Kernel counters cover the scheduled interval as well as its delay. Only
+  // attribute a majority if it survives excluding the ordinary tick period.
+  if (cpuMs - scheduledTickMs >= stallMs / 2 && cpuMs > waitMs) {
     return "main-thread-cpu";
   }
-  if (waitMs >= stallMs / 2 && waitMs > cpuMs) {
+  if (waitMs - scheduledTickMs >= stallMs / 2 && waitMs > cpuMs) {
     return "main-thread-runnable-wait";
+  }
+  // Even if the entire scheduled interval was idle, at least this much
+  // of the delay elapsed off CPU and outside the measured runnable wait.
+  if (
+    scheduler.stallRunQueueMs !== undefined &&
+    stallMs - cpuMs - waitMs > stallMs / 2
+  ) {
+    return "outside-cpu-and-runnable-wait";
   }
   return "no-dominant-scheduler-counter";
 }

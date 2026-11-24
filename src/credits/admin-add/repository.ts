@@ -15,6 +15,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import { parseError } from "next-vibe/core/utils/parse-error";
 import { db } from "next-vibe/database";
+import { databaseFailureDiagnostics } from "next-vibe/database/error-diagnostics";
 import { userLeadLinks } from "next-vibe/identity/lead/db";
 import { users } from "next-vibe/identity/user/db";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -40,6 +41,8 @@ export class AdminAddCreditsRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<GrantRecipientGetResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
+    const lookupBy = targetUserId.includes("@") ? "email" : "id";
+    let stage = "recipient-account";
     try {
       const [recipient] = await db
         .select({
@@ -50,18 +53,20 @@ export class AdminAddCreditsRepository {
         })
         .from(users)
         .where(
-          targetUserId.includes("@")
+          lookupBy === "email"
             ? eq(sql`lower(${users.email})`, targetUserId.toLowerCase())
             : eq(users.id, targetUserId),
         )
         .limit(1);
 
       if (!recipient) {
+        logger.warn("Credit grant recipient account not found", { lookupBy });
         return fail({
           message: t("adminAdd.post.errors.notFound.description"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
+      stage = "subscription-devices-grants";
       const [[subscription], [devices], recentGrants] = await Promise.all([
         db
           .select({
@@ -99,6 +104,7 @@ export class AdminAddCreditsRepository {
           .limit(5),
       ]);
 
+      stage = "last-subscription-charge";
       const [lastCharge] = subscription?.providerSubscriptionId
         ? await db
             .select({
@@ -119,6 +125,7 @@ export class AdminAddCreditsRepository {
             .limit(1)
         : [];
 
+      stage = "pool-balance";
       const pool = await CreditRepository.adminPoolBalance(
         recipient.id,
         undefined,
@@ -148,13 +155,13 @@ export class AdminAddCreditsRepository {
         joinedAt: recipient.joinedAt,
       });
     } catch (error) {
-      logger.error(
-        "Failed to verify credit grant recipient",
-        parseError(error),
-        {
-          targetUserId,
-        },
-      );
+      logger.error("Failed to verify credit grant recipient", {
+        lookupBy,
+        stage,
+        ...databaseFailureDiagnostics(
+          error instanceof Error ? error : parseError(error),
+        ),
+      });
       return fail({
         message: t("adminAdd.recipient.loadFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

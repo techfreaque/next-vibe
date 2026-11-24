@@ -153,11 +153,11 @@ export const translations: typeof enTranslations = {
   repository: {
     capUpdated: "Dzienny limit ustawiony na {{capAmount}} kredytów",
     capExceeded:
-      "Osiągnięto dzienny limit darmowych kredytów. Zarejestruj się lub spróbuj ponownie jutro.",
+      "Na to zapytanie nie wystarczy już darmowych kredytów z dzisiejszej puli. Spróbuj jutro lub skorzystaj z płatnych kredytów.",
     leadCapExceeded:
-      "Dzisiejszy darmowy limit wyczerpany. Zarejestruj się lub podaj e-mail, a dostaniesz więcej kredytów.",
+      "To zapytanie przekracza Twój dzisiejszy bezpłatny limit. Spróbuj jutro lub skorzystaj z płatnych kredytów.",
     capUnavailable:
-      "Darmowy plan jest chwilowo niedostępny. Zarejestruj się, by kontynuować.",
+      "Darmowe kredyty są chwilowo niedostępne. Spróbuj ponownie później.",
     getCapFailed: "Nie udało się pobrać konfiguracji limitu darmowych kredytów",
     updateCapFailed: "Nie udało się zaktualizować limitu darmowych kredytów",
     incrementFailed: "Nie udało się zarejestrować wydatków darmowych kredytów",

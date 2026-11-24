@@ -28,6 +28,8 @@ export const translations: typeof enTranslations = {
       "Du hast dich nicht registriert? Dann ignoriere diese Mail. Ohne Klick wird kein Konto angelegt.",
   },
   confirmation: {
+    linkSent:
+      "Die neue Bestätigungsmail ist unterwegs. Öffne den Link darin, um dich anzumelden.",
     bouncedTitle: "Die Bestätigungsmail kam nicht an",
     changeAddress: "E-Mail-Adresse ändern",
     description:

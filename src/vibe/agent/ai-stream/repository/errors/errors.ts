@@ -640,6 +640,12 @@ export class AbortErrorHandler {
               threadId,
               model,
               maxDurationSeconds: streamAbort.maxDurationSeconds,
+              timeoutProgress: {
+                firstPartReceived: ctx.streamStartTime !== null,
+                completedSteps: ctx.tokenStepCount,
+                pendingTools: ctx.pendingToolMessages.size,
+                hadAnswerText: ctx.turnHasAnswerText,
+              },
               partialContentLength: ctx.currentAssistantContent.length,
             });
           }

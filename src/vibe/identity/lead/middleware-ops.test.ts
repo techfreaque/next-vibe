@@ -14,7 +14,12 @@ import { createEndpointLogger } from "../../logger/server";
 import { leadLeadLinks, leads } from "./db";
 import { LeadSource, LeadStatus } from "./enum";
 import { IP_LINK_EXEMPT_METADATA_KEY, ipPoolKey } from "./ip-key";
-import { createAnonymousLead, isServerSideIp } from "./middleware-ops";
+import { GUEST_LEAD_DB_BUDGET_MS } from "./database-deadline";
+import {
+  createAnonymousLead,
+  isServerSideIp,
+  validateLeadIdExists,
+} from "./middleware-ops";
 
 const logger = createEndpointLogger(false, defaultLocale);
 const createdLeadIds: string[] = [];
@@ -57,10 +62,7 @@ async function linkedIds(leadId: string): Promise<string[]> {
     .select()
     .from(leadLeadLinks)
     .where(
-      or(
-        eq(leadLeadLinks.leadId1, leadId),
-        eq(leadLeadLinks.leadId2, leadId),
-      ),
+      or(eq(leadLeadLinks.leadId1, leadId), eq(leadLeadLinks.leadId2, leadId)),
     );
   return rows.map((r) => (r.leadId1 === leadId ? r.leadId2 : r.leadId1));
 }
@@ -70,6 +72,7 @@ async function visit(ip: string): Promise<string> {
     { ipAddress: ip, userAgent: `ip-link-visit-${String(Math.random())}` },
     defaultLocale,
     logger,
+    performance.now() + GUEST_LEAD_DB_BUDGET_MS,
   );
   createdLeadIds.push(leadId);
   return leadId;
@@ -110,6 +113,15 @@ describe("linkLeadsByIp", () => {
     const guest = await insertGuestLead(ip, {});
 
     const newcomer = await visit(ip);
+    expect(
+      await validateLeadIdExists(
+        newcomer,
+        performance.now() + GUEST_LEAD_DB_BUDGET_MS,
+      ),
+    ).toBe(true);
+    await expect(
+      validateLeadIdExists(newcomer, performance.now() - 1),
+    ).rejects.toThrow("Guest lead database deadline exceeded");
     const links = await linkedIds(newcomer);
 
     expect(links).toContain(guest);

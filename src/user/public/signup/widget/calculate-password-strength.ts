@@ -61,7 +61,7 @@ export function calculatePasswordStrength(
   }
 
   // Character type checks
-  if (hasUppercase) {
+  if (hasUppercase && hasLowercase) {
     strength += 1;
   }
   if (hasNumber) {

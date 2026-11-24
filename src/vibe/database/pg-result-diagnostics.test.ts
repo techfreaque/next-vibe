@@ -6,6 +6,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 
 import {
   enablePgResultDiagnostics,
+  largePgDispatchesDuring,
   pgDiagnosticQueryLogger,
   summarizePgResultDecodes,
 } from "./pg-result-diagnostics";
@@ -78,4 +79,22 @@ it("attributes decoded results and pool checkouts without recording query values
     server.close();
     await pg.close();
   }
+});
+
+it("identifies large statement dispatches inside the timer interval without SQL or values", () => {
+  enablePgResultDiagnostics();
+  const start = Date.now();
+  const statement = "UPDATE leads SET metadata = 'fixture-private-value'";
+  pgDiagnosticQueryLogger.logQuery(statement, { length: 2 });
+  pgDiagnosticQueryLogger.logQuery(statement, { length: 350 });
+  const dispatches = largePgDispatchesDuring(start, Date.now());
+  expect(dispatches).toEqual([
+    expect.objectContaining({
+      queryName: "UPDATE leads",
+      parameterCount: 350,
+      sqlChars: statement.length,
+    }),
+  ]);
+  expect(JSON.stringify(dispatches)).not.toContain("fixture-private-value");
+  expect(largePgDispatchesDuring(start - 1, start - 1)).toBeUndefined();
 });

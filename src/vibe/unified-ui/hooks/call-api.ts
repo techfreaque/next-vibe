@@ -265,11 +265,22 @@ function browserOnline(): boolean {
   }
 }
 
+// Browser-local correlation for simultaneous failed requests on one page.
+let previousTransportFailure:
+  | { requestId: string; reportedAt: number }
+  | undefined;
+
 /** Context for a fetch that threw (no HTTP response at all). */
 function networkFailureContext(
   diag: CallDiagnostics,
   durationMs: number,
 ): Record<string, LoggerMetadata> {
+  const reportedAt = Date.now();
+  const previous = previousTransportFailure;
+  const sincePrevious = previous ? reportedAt - previous.reportedAt : -1;
+  if (typeof document !== "undefined") {
+    previousTransportFailure = { requestId: diag.requestId, reportedAt };
+  }
   const visibilityAtFailure = currentVisibility();
   const online = browserOnline();
   const { documentEdgeRequestId, documentEdgeTimingNode } =
@@ -278,6 +289,12 @@ function networkFailureContext(
     documentEdgeRequestId,
     requestDocumentEdgeTimingNode: documentEdgeTimingNode,
     requestStartedAtMs: diag.startedAt,
+    previousTransportFailureRequestId:
+      typeof document !== "undefined" &&
+      sincePrevious >= 0 &&
+      sincePrevious <= 2000
+        ? previous?.requestId
+        : undefined,
     fetchTimingCandidate: {
       ...resourceTiming(diag.fetchUrl, diag.fetchStartedAt),
     },

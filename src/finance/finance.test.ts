@@ -510,6 +510,18 @@ describe("detectDayAnomalies", () => {
       FinanceAlertType.BILLING_GAP,
     ]);
     expect(types({ upstreamCostUsd: 100, internalBilledUsd: 100 })).toEqual([]);
+    const [thin] = detectDayAnomalies(
+      {
+        ...quiet,
+        upstreamCostUsd: 170,
+        variableSpendByProvider: { secondary: 40, primary: 130 },
+      },
+      DEFAULT_THRESHOLDS,
+    );
+    expect(thin?.metadata).toMatchObject({
+      largestVariableCostProvider: "primary",
+      largestVariableCostUsd: 130,
+    });
   });
   it("flags refund, dispute, cancellation spikes and the billing gap", () => {
     expect(types({ refundsUsd: 40 })).toContain(FinanceAlertType.REFUND_SPIKE);

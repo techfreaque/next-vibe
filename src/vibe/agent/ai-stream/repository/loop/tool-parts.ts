@@ -942,6 +942,10 @@ async function executeFallbackTool(
           errorKey: result.errorType.errorKey,
           errorCode: result.errorType.errorCode,
           causeKey: result.cause?.errorType.errorKey ?? null,
+          fallbackToolOffer: {
+            included: Object.hasOwn(state.p.tools ?? {}, toolName),
+            count: Object.keys(state.p.tools ?? {}).length,
+          },
           argsShape: describeToolArgShape(args),
           dispatchedArgsShape: describeToolArgShape(inputArgs),
           executeToolTargetShape:

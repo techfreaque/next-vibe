@@ -73,6 +73,7 @@ function codeDigest(tokenHash: string, code: string): string {
 export function pendingStatus(
   row: PendingSignup,
   t: SignupT,
+  sentAction: "code" | "link" = "code",
 ): SignupPatchResponseOutput & { message: ReturnType<SignupT> } {
   return {
     address: row.email,
@@ -82,7 +83,9 @@ export function pendingStatus(
       ? t(row.bounceReason ?? SignupBounceReason.OTHER, { email: row.email })
       : row.deliveryFailed
         ? t("confirmation.sendFailed", { email: row.email })
-        : t("confirmation.sent", { email: row.email }),
+        : sentAction === "link"
+          ? t("confirmation.linkSent")
+          : t("confirmation.sent", { email: row.email }),
   };
 }
 
@@ -141,19 +144,33 @@ export async function issueSignupChallenge(
       keys.map((key) => sql`${key}::text`),
       sql`, `,
     );
-    const reserved = await tx.execute<{ id: string }>(sql`
+    const reservation = await tx.execute<{
+      reserved: boolean;
+      limits: string[];
+    }>(sql`
       WITH scopes(scope) AS (SELECT unnest(ARRAY[${scopes}])),
       limited AS (
-        SELECT scope FROM ${signupMailAttempts} JOIN scopes USING (scope)
+        SELECT CASE
+          WHEN count(*) >= ${MAX_SENDS} THEN split_part(scope, ':', 1) || '-hourly'
+          ELSE 'email-cooldown'
+        END AS reason FROM ${signupMailAttempts} JOIN scopes USING (scope)
         WHERE sent_at >= ${cutoff.toISOString()}::timestamp
         GROUP BY scope
         HAVING count(*) >= ${MAX_SENDS}
           OR (scope = ${addressKey} AND max(sent_at) >= ${new Date(now.getTime() - MINUTE).toISOString()}::timestamp)
+      ), reserved AS (
+        INSERT INTO ${signupMailAttempts} (scope, sent_at)
+        SELECT scope, ${now.toISOString()}::timestamp FROM scopes
+        WHERE NOT EXISTS (SELECT 1 FROM limited) RETURNING id
       )
-      INSERT INTO ${signupMailAttempts} (scope, sent_at)
-      SELECT scope, ${now.toISOString()}::timestamp FROM scopes
-      WHERE NOT EXISTS (SELECT 1 FROM limited) RETURNING id`);
-    if (!reserved.rows.length) {
+      SELECT EXISTS(SELECT 1 FROM reserved) AS reserved,
+        ARRAY(SELECT reason FROM limited ORDER BY reason) AS limits`);
+    const decision = reservation.rows[0];
+    if (!decision?.reserved) {
+      logger.warn("Signup confirmation send rate limited", {
+        limits: decision?.limits,
+        replacingChallenge: previous !== null,
+      });
       return limited();
     }
     const fields = {

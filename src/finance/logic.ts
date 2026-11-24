@@ -647,6 +647,7 @@ export function detectProviderAnomalies(input: {
 }
 
 export interface DayFacts {
+  variableSpendByProvider?: Record<string, number>;
   day: string;
   grossRevenueUsd: number;
   refundsUsd: number;
@@ -725,13 +726,20 @@ export function detectDayAnomalies(
     coverageUsd >= th.minRevenueUsd &&
     coverageMarginPct < th.marginFloorPct
   ) {
+    const largestSpend = Object.entries(
+      facts.variableSpendByProvider ?? {},
+    ).toSorted(([, left], [, right]) => right - left)[0];
     out.push({
       type: FinanceAlertType.THIN_MARGIN,
       severity: AlertSeverity.WARNING,
       subject: facts.day,
       dedupKey: `${FinanceAlertType.THIN_MARGIN}:${facts.day}`,
       message: `Thin margin on ${facts.day}: ${coverageMarginPct.toFixed(1)}% (floor ${th.marginFloorPct}%). Credits billed ${money(facts.internalBilledUsd)}, net sales ${money(margin.netRevenueUsd)}, upstream cost ${money(facts.upstreamCostUsd)}.`,
-      metadata: base,
+      metadata: {
+        ...base,
+        largestVariableCostProvider: largestSpend?.[0] ?? null,
+        largestVariableCostUsd: largestSpend?.[1] ?? null,
+      },
     });
   }
 

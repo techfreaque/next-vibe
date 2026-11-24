@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 
 import { PGlite } from "@electric-sql/pglite";
-import { afterAll, expect, it, mock } from "bun:test";
+import { afterAll, expect, it, mock, spyOn } from "bun:test";
 import { drizzle } from "drizzle-orm/pglite";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { createEndpointLogger } from "next-vibe/logger/server";
@@ -40,8 +40,11 @@ it("claims an unowned visitor lead and creates a distinct lead when another sign
     CREATE TABLE chat_threads (lead_id uuid REFERENCES leads, user_id uuid REFERENCES users);
     CREATE TABLE chat_folders (lead_id uuid REFERENCES leads, user_id uuid REFERENCES users);
     CREATE TABLE signup_events (
-      lead_id uuid REFERENCES leads, pending_id uuid, type text, occurred_at timestamp,
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(), lead_id uuid REFERENCES leads, pending_id uuid, type text, occurred_at timestamp,
       dedupe_key text UNIQUE
+    );
+    CREATE TABLE signup_mail_attempts (
+      id uuid PRIMARY KEY DEFAULT gen_random_uuid(), scope text NOT NULL, sent_at timestamp NOT NULL
     );
     CREATE TABLE pending_signups (
       id uuid PRIMARY KEY DEFAULT gen_random_uuid(), lead_id uuid REFERENCES leads, email text,
@@ -52,7 +55,7 @@ it("claims an unowned visitor lead and creates a distinct lead when another sign
       bounced bool, bounce_reason text
     );
   `);
-  const { consumeSignupChallenge } = await import("./pending");
+  const { consumeSignupChallenge, pendingStatus } = await import("./pending");
   const { t } = scopedTranslation.scopedT(defaultLocale);
   const shared = randomUUID();
   await pg.query("INSERT INTO leads (id) VALUES ($1)", [shared]);
@@ -64,8 +67,8 @@ it("claims an unowned visitor lead and creates a distinct lead when another sign
     await pg.query(
       `
       INSERT INTO pending_signups
-        (lead_id, email, password_hash, locale, signup_ip, token_hash, expires_at)
-      VALUES ($1, $2, 'fixture', $3, '127.0.0.1', $4, now() + interval '1 minute')
+        (lead_id, email, password_hash, locale, signup_ip, token_hash, sent_at, expires_at)
+      VALUES ($1, $2, 'fixture', $3, '127.0.0.1', $4, now(), now() + interval '1 minute')
     `,
       [
         shared,
@@ -87,6 +90,16 @@ it("claims an unowned visitor lead and creates a distinct lead when another sign
   };
 
   const first = await confirm("first@example.test");
+  expect(pendingStatus(first.pending, t, "link").message).toBe(
+    t("confirmation.linkSent"),
+  );
+  expect(pendingStatus(first.pending, t).message).toBe(
+    t("confirmation.sent", { email: first.pending.email }),
+  );
+  expect(
+    pendingStatus({ ...first.pending, deliveryFailed: true }, t, "link")
+      .message,
+  ).toBe(t("confirmation.sendFailed", { email: first.pending.email }));
   expect(first.pending.leadId).toBe(shared);
   await pg.query("INSERT INTO growth_journeys VALUES ($1, $2)", [
     shared,
@@ -132,9 +145,8 @@ it("claims an unowned visitor lead and creates a distinct lead when another sign
 
 it("logs why a confirmation proof was refused, never what was sent", async () => {
   // Runs after the test above: the tables exist.
-  const { consumeSignupChallenge, SignupChallengeRejectReason } = await import(
-    "./pending"
-  );
+  const { consumeSignupChallenge, SignupChallengeRejectReason } =
+    await import("./pending");
   const { t } = scopedTranslation.scopedT(defaultLocale);
   const logger = createEndpointLogger(false, defaultLocale);
   const warnings: Array<Record<string, string | boolean>> = [];
@@ -237,4 +249,60 @@ it("logs why a confirmation proof was refused, never what was sent", async () =>
       "reason",
     ]);
   }
+});
+
+it("distinguishes resend cooldown from hourly budgets without consuming more sends", async () => {
+  const { issueSignupChallenge } = await import("./pending");
+  const leadId = randomUUID();
+  await pg.query("INSERT INTO leads (id) VALUES ($1)", [leadId]);
+  const input = {
+    leadId,
+    email: "fixture@example.invalid",
+    passwordHash: "fixture",
+    privateName: "Fixture",
+    publicName: "Fixture",
+    subscribeToNewsletter: false,
+    locale: defaultLocale,
+  };
+  const logger = createEndpointLogger(false, defaultLocale);
+  const warn = spyOn(logger, "warn").mockImplementation(() => {});
+  const deliver = mock(async () => "fixture");
+  const issue = () =>
+    issueSignupChallenge(
+      input,
+      null,
+      null,
+      logger,
+      scopedTranslation.scopedT(defaultLocale).t,
+      deliver,
+    );
+  expect((await issue()).success).toBe(true);
+  expect((await issue()).success).toBe(false);
+  expect(warn).toHaveBeenLastCalledWith(
+    "Signup confirmation send rate limited",
+    {
+      limits: ["email-cooldown"],
+      replacingChallenge: false,
+    },
+  );
+  await pg.query(
+    "INSERT INTO signup_mail_attempts (scope, sent_at) SELECT $1, now() FROM generate_series(1, 4)",
+    [`lead:${leadId}`],
+  );
+  expect((await issue()).success).toBe(false);
+  expect(warn).toHaveBeenLastCalledWith(
+    "Signup confirmation send rate limited",
+    {
+      limits: ["email-cooldown", "lead-hourly"],
+      replacingChallenge: false,
+    },
+  );
+  expect(deliver).toHaveBeenCalledTimes(1);
+  expect(
+    (
+      await pg.query<{ count: number }>(
+        "SELECT count(*)::int AS count FROM signup_mail_attempts",
+      )
+    ).rows[0]?.count,
+  ).toBe(6);
 });

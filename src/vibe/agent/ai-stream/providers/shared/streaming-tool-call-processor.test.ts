@@ -16,6 +16,8 @@ import {
   processStreamingResponseWithToolCalls,
 } from "./streaming-tool-call-processor";
 
+import { generateToolSystemPrompt } from "./tool-calling-prompt-engineering";
+
 const logger = createEndpointLogger(false, defaultLocale);
 
 interface ParsedChunk {
@@ -95,6 +97,19 @@ async function run(response: Response): Promise<{
   return { text, toolCalls, finishReason };
 }
 
+describe("generateToolSystemPrompt", () => {
+  it("includes examples only for tools offered to this model", () => {
+    const promptFor = (name: string): string =>
+      generateToolSystemPrompt([{ type: "function", function: { name } }]);
+    const limited = promptFor("execute-tool");
+    expect(limited).toContain("execute-tool");
+    expect(limited).not.toContain("cortex-write");
+    expect(limited).not.toContain("web-search");
+    expect(limited).not.toContain("fetch-url-content");
+    expect(promptFor("cortex-write")).toContain('{"name":"cortex-write","arguments":');
+  });
+});
+
 describe("forwardableEnd", () => {
   it("holds back a partial tag that may still grow", () => {
     expect(forwardableEnd("Hello <to", 0)).toEqual({
@@ -151,6 +166,7 @@ describe("processStreamingResponseWithToolCalls", () => {
     );
     await response.text();
     expect(warn).toHaveBeenCalledWith("[test] Tool-call markup did not parse", expect.objectContaining({
+      markupBoundary: { endsWithArray: false, endsWithObject: true, endsWithCodeFence: false },
       markupBodyKind: "object", hasJsonNameField: true, hasJsonArgumentsField: true,
     }));
     expect(JSON.stringify(warn.mock.calls)).not.toContain("private fixture");

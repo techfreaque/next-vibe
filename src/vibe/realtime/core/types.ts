@@ -288,6 +288,7 @@ export interface WsConnectionData {
    * which separates "client stopped answering pings" from a cut mid-traffic.
    */
   lastInboundAt: number;
+  lastInboundFrame?: WsClientMessage["type"] | "pong" | "malformed";
   /** Pongs received on this socket (0 = no ping was ever answered). */
   pongCount: number;
   lastPongAt?: number;

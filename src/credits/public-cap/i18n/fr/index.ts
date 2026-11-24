@@ -152,11 +152,11 @@ export const translations: typeof enTranslations = {
   repository: {
     capUpdated: "Plafond quotidien fixé à {{capAmount}} crédits",
     capExceeded:
-      "Limite quotidienne gratuite atteinte. Inscrivez-vous ou réessayez demain.",
+      "Le quota gratuit restant aujourd’hui ne suffit pas pour cette demande. Réessayez demain ou utilisez des crédits payants.",
     leadCapExceeded:
-      "Vous avez atteint la limite gratuite du jour. Inscrivez-vous ou ajoutez votre e-mail pour plus de crédits.",
+      "Cette demande dépasse votre quota gratuit du jour. Réessayez demain ou utilisez des crédits payants.",
     capUnavailable:
-      "La formule gratuite est temporairement indisponible. Inscrivez-vous pour continuer.",
+      "Les crédits gratuits sont temporairement indisponibles. Réessayez plus tard.",
     getCapFailed: "Impossible de récupérer la configuration du plafond gratuit",
     updateCapFailed: "Impossible de mettre à jour le plafond gratuit",
     incrementFailed: "Impossible d'enregistrer la dépense gratuite",

@@ -1,14 +1,13 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it, spyOn } from "bun:test";
 
 import { defaultLocale } from "../../core/i18n/core/config";
 import { createEndpointLogger } from "../../logger/server";
+import { scopedTranslation } from "../../tasks/i18n";
 import { DbHealthRepository } from "./repository";
 
 const logger = createEndpointLogger(false, defaultLocale);
 
-const t = ((key: string): string => key) as Parameters<
-  typeof DbHealthRepository.check
->[0];
+const { t } = scopedTranslation.scopedT(defaultLocale);
 
 describe("DbHealthRepository.check DB latency", () => {
   it("slow-but-alive DB succeeds with a warning", async () => {
@@ -31,9 +30,9 @@ describe("DbHealthRepository.check DB latency", () => {
       expect(res.success).toBe(true);
       if (res.success) {
         expect(res.data.dbResponseMs).toBe(3000);
-        expect(res.data.warnings.some((w) => w.includes("DB response slow"))).toBe(
-          true,
-        );
+        expect(
+          res.data.warnings.some((w) => w.includes("DB response slow")),
+        ).toBe(true);
       }
     } finally {
       Date.now = realNow;
@@ -46,4 +45,32 @@ describe("DbHealthRepository.check DB latency", () => {
     });
     expect(res.success).toBe(false);
   });
+
+  it.skipIf(process.platform !== "linux")(
+    "retains the warning and recovers RSS when the runtime memory sampler fails",
+    async () => {
+      const unavailable = Object.assign(
+        (): never => expect.unreachable("Failed to get memory usage"),
+        { rss: process.memoryUsage.rss },
+      );
+      const memory = spyOn(process, "memoryUsage").mockImplementation(
+        unavailable,
+      );
+      try {
+        const res = await DbHealthRepository.check(t, logger, async () => {});
+        expect(res.success).toBe(true);
+        if (res.success) {
+          expect(
+            res.data.warnings.some((warning) =>
+              warning.startsWith("Process memory unavailable:"),
+            ),
+          ).toBe(true);
+          expect(res.data.rssMb).toBeGreaterThan(0);
+          expect(res.data.heapUsedMb).toBe(0);
+        }
+      } finally {
+        memory.mockRestore();
+      }
+    },
+  );
 });

@@ -11,6 +11,7 @@ import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import { metadataGenerator } from "next-vibe/core/i18n/core/metadata";
 import { hreflangFor } from "next-vibe/core/i18n/core/seo-locales";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import { isDegradedPublicDocument } from "next-vibe/platforms/web/middleware/public-document.server";
 import { JsonLd } from "next-vibe/ui/components/json-ld";
 import type { JSX } from "react";
 
@@ -55,6 +56,9 @@ export async function tanstackLoader({
   params,
 }: Props): Promise<RefusalIndexPageData> {
   const { locale } = await params;
+  if (await isDegradedPublicDocument()) {
+    return { locale, leaderboard: null };
+  }
   const logger = createEndpointLogger(false, locale);
   const result = await RefusalPublicRepository.leaderboard(logger, locale);
   return { locale, leaderboard: result.success ? result.data : null };

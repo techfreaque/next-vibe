@@ -20,6 +20,7 @@ import {
 } from "next-vibe/core/route/response.schema";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import TurndownService from "turndown";
+import { z } from "zod";
 
 import { createFixtureFetch } from "../ai-stream/testing/fetch-cache";
 import { getStorageAdapter } from "../chat/storage/index";
@@ -44,6 +45,19 @@ interface ScrappeyResponse {
   solution: { response: string; currentUrl: string; statusCode: number };
   timeElapsed: number;
 }
+// Extract status evidence even when the HTTP status and body disagree.
+const proxyStatusSchema = z.object({
+  status: z
+    .enum(["success", "error", "failed", "failure"])
+    .optional()
+    .catch(undefined),
+  solution: z
+    .object({
+      statusCode: z.number().int().min(100).max(599).optional(),
+      verified: z.boolean().optional(),
+    })
+    .optional(),
+});
 type FetchResult<T> =
   | { ok: true; data: T }
   | {
@@ -52,6 +66,9 @@ type FetchResult<T> =
       isTimeout?: boolean;
       upstreamStatus?: number;
       proxyElapsedMs?: number;
+      proxyBodyStatus?: string;
+      targetStatusCode?: number;
+      solutionVerified?: boolean;
       deadlineFired?: boolean;
       failureStage?: "proxy-headers" | "proxy-body" | "proxy-status";
       /** The caller's input was unfetchable (bad URL, scraper answered 4xx). */
@@ -408,15 +425,26 @@ class FetchUrlService {
         // Scrappey's body names the reason (blocked, login wall, proxy
         // failure); the status line alone ("500 Internal Server Error") left
         // every failed fetch undiagnosable.
-        const detail = (await response.text().catch(() => ""))
-          .replaceAll(/\s+/g, " ")
-          .trim()
-          .slice(0, 300);
+        const raw = await response.text().catch(() => "");
+        let statusEvidence: z.infer<typeof proxyStatusSchema> | undefined;
+        if (raw.length <= 64_000 && raw.trimStart().startsWith("{")) {
+          try {
+            statusEvidence = proxyStatusSchema.safeParse(JSON.parse(raw)).data;
+          } catch {
+            // The upstream can return malformed JSON or truncate its error page.
+          }
+        }
+        const detail = raw.replaceAll(/\s+/g, " ").trim().slice(0, 300);
         return {
           ok: false,
           // eslint-disable-next-line i18next/no-literal-string
           error: `Scrappey API error: ${response.status} ${response.statusText}${detail ? ` - ${detail}` : ""}`,
           upstreamStatus: response.status,
+          proxyElapsedMs: Math.round(performance.now() - proxyStartedAt),
+          deadlineFired: signal.aborted,
+          proxyBodyStatus: statusEvidence?.status,
+          targetStatusCode: statusEvidence?.solution?.statusCode,
+          solutionVerified: statusEvidence?.solution?.verified,
           failureStage: "proxy-status",
           // Scrappey's status is about OUR API call, not the target page (a
           // page 404 comes back as 200 + solution.statusCode). Only a rejected
@@ -593,6 +621,9 @@ export class FetchUrlContentRepository {
           isCallerError: result.isCallerError ?? false,
           timeoutMs: fetchService.TIMEOUT,
           proxyElapsedMs: result.proxyElapsedMs,
+          proxyBodyStatus: result.proxyBodyStatus,
+          targetStatusCode: result.targetStatusCode,
+          solutionVerified: result.solutionVerified,
           deadlineFired: result.deadlineFired,
           elapsedMs: Date.now() - startedAt,
           upstreamStatus: result.upstreamStatus,

@@ -151,11 +151,11 @@ export const translations: typeof enTranslations = {
   repository: {
     capUpdated: "Tageslimit auf {{capAmount}} Credits gesetzt",
     capExceeded:
-      "Tägliches Gratis-Limit erreicht. Bitte registrieren Sie sich oder versuchen Sie es morgen erneut.",
+      "Das heutige Gratiskontingent reicht für diese Anfrage nicht aus. Versuch es morgen erneut oder nutze bezahlte Credits.",
     leadCapExceeded:
-      "Dein Gratis-Limit für heute ist erreicht. Registriere dich oder gib deine E-Mail an – dann gibt es mehr Credits.",
+      "Diese Anfrage überschreitet dein heutiges Gratislimit. Versuch es morgen erneut oder nutze bezahlte Credits.",
     capUnavailable:
-      "Das Gratis-Kontingent ist gerade nicht verfügbar. Registriere dich, um weiterzumachen.",
+      "Gratis-Credits sind gerade nicht verfügbar. Versuch es später erneut.",
     getCapFailed: "Gratis-Limit-Konfiguration konnte nicht abgerufen werden",
     updateCapFailed: "Gratis-Limit konnte nicht aktualisiert werden",
     incrementFailed: "Gratis-Ausgaben konnten nicht erfasst werden",
