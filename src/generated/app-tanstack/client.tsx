@@ -6,14 +6,9 @@ import type { AnyRouter } from "@tanstack/react-router";
 import { Await, RouterProvider } from "@tanstack/react-router";
 import { hydrateStart } from "@tanstack/react-start/client";
 import { TSR_DEFERRED_PROMISE } from "@tanstack/router-core";
-import {
-  type CountryLanguage,
-  CountryLanguageValues,
-  defaultLocale,
-} from "next-vibe/core/i18n/core/config";
+import { getPageLocale } from "next-vibe/logger/browser-startup-error";
 import { createClientLogger } from "next-vibe/logger/client";
 import { reportRenderError } from "next-vibe/logger/report-render-error";
-import { getCurrentPathname } from "next-vibe/ui/lib/location";
 import { preloadAllLazyWidgets } from "next-vibe/unified-ui/_shared/lazy-widget";
 import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
@@ -81,11 +76,3 @@ hydrateStart()
       error: err instanceof Error ? err : new Error(String(err)),
     });
   });
-
-function getPageLocale(): CountryLanguage {
-  const segment = getCurrentPathname().split("/")[1] ?? "";
-  return (
-    Object.values(CountryLanguageValues).find((value) => value === segment) ??
-    defaultLocale
-  );
-}

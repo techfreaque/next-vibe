@@ -1,4 +1,4 @@
-import { afterEach, expect, it, mock, type Mock, spyOn } from "bun:test";
+import { afterEach, expect, it, type Mock, mock, spyOn } from "bun:test";
 import { DrizzleQueryError } from "drizzle-orm";
 import { NextRequest } from "next-vibe/ui/lib/request";
 
@@ -54,6 +54,17 @@ it("limits public fallback to anonymous read-only documents and keeps real DB er
   const report = captureErrors();
   const create = spyOn(leadOps, "createAnonymousLead");
   for (const [path, method, cookie, operation, reason, status] of [
+    ["/en-US", "GET", "", "insert", "Query read timeout", 200],
+    ["/en-US/", "HEAD", "", "insert", "Query read timeout", 200],
+    ["/en-US?ref=fixture", "GET", "", "insert", "Query read timeout", 503],
+    [
+      "/en-US",
+      "GET",
+      `${AUTH_TOKEN_COOKIE_NAME}=session`,
+      "insert",
+      "Query read timeout",
+      503,
+    ],
     ["/en-US/story", "GET", "", "insert", "Query read timeout", 200],
     [
       "/en-US/story/blog/uncensored-llm-api",
@@ -180,8 +191,10 @@ it("forwards only the proxy's decision and preserves an unverified guest cookie"
 });
 
 it("bounds a cold geo lookup before the insert starts", async () => {
-  captureErrors();
-  spyOn(geo, "geoCountryForIp").mockReturnValue(new Promise(() => undefined));
+  const report = captureErrors();
+  spyOn(geo, "geoCountryForIp").mockReturnValue(
+    Promise.withResolvers<null>().promise,
+  );
   const create = spyOn(leadOps, "createAnonymousLead");
   const start = performance.now();
   const response = await createLeadId(
@@ -192,6 +205,10 @@ it("bounds a cold geo lookup before the insert starts", async () => {
   expect(response.status).toBe(200);
   expect(performance.now() - start).toBeLessThan(500);
   expect(create).not.toHaveBeenCalled();
+  expect(report).toHaveBeenLastCalledWith(
+    "Anonymous lead creation failed in middleware",
+    expect.objectContaining({ stage: "geo", requestId }),
+  );
 });
 
 it("serves Chrome 131 crawler documents before guest provisioning", async () => {
@@ -211,7 +228,9 @@ it("serves Chrome 131 crawler documents before guest provisioning", async () => 
     "/pl-PL/skill/uncensored",
     "/es-ES/story/blog/example",
   ]) {
-    const incoming = new NextRequest(`https://example.test${path}`, { headers });
+    const incoming = new NextRequest(`https://example.test${path}`, {
+      headers,
+    });
     const response = await proxy(incoming);
     expect(response.status).toBe(200);
     expect(response.headers.has("set-cookie")).toBe(false);

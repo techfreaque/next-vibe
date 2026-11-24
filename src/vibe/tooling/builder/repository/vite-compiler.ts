@@ -31,8 +31,8 @@ import type { EvaluatedModules } from "vite/module-runner";
 import { getSrcDir, ROOT_LAYOUT_DIR } from "@/env/paths";
 
 import {
-  transformDevSsrLocaleSource,
   transformViteClientLocaleSource,
+  transformViteDevSsrLocaleSource,
 } from "../../../core/i18n/core/client-locale-loader.cjs";
 import type { ResponseType } from "../../../core/route/response.schema";
 import {
@@ -1727,6 +1727,43 @@ class ViteCompiler {
           }),
           react(),
           nitro(),
+          {
+            name: "tanstack-dev-client-entry-recovery",
+            apply: "serve",
+            transform: {
+              filter: {
+                id: /virtual:tanstack-start-dev-client-entry(?:\?.*)?$/,
+              },
+              handler(code, id): { code: string; map: null } | undefined {
+                if (
+                  id.split("?", 1)[0] !==
+                  "\0virtual:tanstack-start-dev-client-entry"
+                ) {
+                  return;
+                }
+                // The virtual module sets up React Refresh before importing
+                // the entry. A rejected entry graph never runs client.tsx.
+                const entryImport = /\n(await import\("[^\n]+"\));?\s*$/;
+                if (!entryImport.test(code)) {
+                  return;
+                }
+                return {
+                  code: code.replace(
+                    entryImport,
+                    `\ntry { $1; } catch (error) {
+  try {
+    const { reportDevClientEntryError } = await import("next-vibe/logger/browser-startup-error");
+    reportDevClientEntryError(error instanceof Error ? error : new Error(String(error)));
+  } catch (reportError) {
+    console.error("[client] dev entry failed and recovery was unavailable:", error, reportError);
+  }
+}`,
+                  ),
+                  map: null,
+                };
+              },
+            },
+          } satisfies PluginOption,
           // Shim for TanStack Start virtual modules that aren't provided in dev mode.
           // "tanstack-start-injected-head-scripts:v" is imported by the server env at runtime
           // (router-manifest.js). TanStack's own dev plugin provides it only when its
@@ -2070,15 +2107,9 @@ class ViteCompiler {
               if (opts?.ssr) {
                 // These pages hydrate immediately and expose translation edits in
                 // every render. Native require caches those files outside Vite.
-                if (
-                  /\/src\/(?:_pages\/create|vibe\/agent\/media-studio\/history)\/i18n\/index\.ts$/.test(
-                    id.replaceAll("\\", "/"),
-                  )
-                ) {
-                  const rewritten = transformDevSsrLocaleSource(code);
-                  if (rewritten !== code && !rewritten.includes("require(")) {
-                    return { code: rewritten, map: null };
-                  }
+                const rewritten = transformViteDevSsrLocaleSource(code, id);
+                if (rewritten !== code && !rewritten.includes("require(")) {
+                  return { code: rewritten, map: null };
                 }
                 const shim = `import { createRequire as __createRequire } from "node:module";\nconst require = __createRequire(${JSON.stringify(id)});\n`;
                 return { code: shim + code, map: null };

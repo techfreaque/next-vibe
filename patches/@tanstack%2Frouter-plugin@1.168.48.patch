@@ -69,7 +69,7 @@ diff --git a/dist/esm/core/router-code-splitter-plugin.js b/dist/esm/core/router
  			sharedBindings: sharedBindings.size > 0 ? sharedBindings : void 0,
  			compilerPlugins
 -		});
-+		}, ast, !isProduction && !addHmr && compilerPlugins.length === 0 && sharedBindings.size === 0);
++		}, ast, !isProduction && !userConfig.codeSplittingOptions?.compilerPlugins?.length && sharedBindings.size === 0);
  		if (compiledReferenceRoute === null) {
  			if (debug) console.info(`No changes made to route "${id}", skipping code-splitting.`);
  			return null;
@@ -132,7 +132,16 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  			createRouteFn = path.node.callee.name;
  			function babelHandleReference(routeOptions) {
  				const hasImportedOrDefinedIdentifier = (name) => {
-@@ -280,13 +292,14 @@
+@@ -217,6 +229,8 @@
+ 				};
+ 				const addRouteHmr = (insertionPath, routeOptions) => {
+ 					if (!opts.addHmr || hmrAdded) return;
++					// Refresh before the HMR hooks read program bindings.
++					refreshScope();
+ 					opts.compilerPlugins?.forEach((plugin) => {
+ 						if ((plugin.onAddHmr?.({
+ 							programPath,
+@@ -280,13 +294,14 @@
  								const codeSplitGroup = [...new Set(opts.codeSplitGroupings[codeSplitGroupingByKey])];
  								if (!SPLIT_NODES_CONFIG.has(key)) return;
  								if (t.isBooleanLiteral(prop.value) || t.isNullLiteral(prop.value) || t.isIdentifier(prop.value) && prop.value.name === "undefined") return;
@@ -148,7 +157,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  										if (existingImportPath) removableImportPaths.add(existingImportPath);
  										const isExported = hasExport(ast, value);
  										if (isExported) knownExportedIdents.add(value.name);
-@@ -322,7 +335,7 @@
+@@ -322,7 +337,7 @@
  									const value = prop.value;
  									let shouldSplit = true;
  									if (t.isIdentifier(value)) {
@@ -157,19 +166,19 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  										if (existingImportPath) removableImportPaths.add(existingImportPath);
  										const isExported = hasExport(ast, value);
  										if (isExported) knownExportedIdents.add(value.name);
-@@ -337,7 +350,10 @@
+@@ -337,7 +352,10 @@
  								}
  							}
  						}
 -						programPath.scope.crawl();
-+						// The dev server's last split can leave this to the DCE pass,
++						// In dev, the last split can leave this to the DCE pass,
 +						// which rebuilds scope before inspecting any bindings.
 +						if (deferScopeCrawl) scopeNeedsCrawl = true;
 +						else programPath.scope.crawl();
  					});
  					addRouteHmr(insertionPath, routeOptions);
  				}
-@@ -375,6 +391,9 @@
+@@ -375,6 +393,9 @@
  				programPath.pushContainer("body", t.exportNamedDeclaration(null, reExportSpecifiers, t.stringLiteral(sharedModuleUrl)));
  			}
  		}
@@ -179,7 +188,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	} } });
  	if (!modified) return null;
  	deadCodeElimination(ast, refIdents);
-@@ -585,8 +604,7 @@
+@@ -585,8 +606,7 @@
  * This function should read get the options from by searching for the key `codeSplitGroupings`
  * on createFileRoute and return it's values if it exists, else return undefined
  */
@@ -189,7 +198,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	let codeSplitGroupings = void 0;
  	babel.traverse(ast, { Program: { enter(programPath) {
  		programPath.traverse({ CallExpression(path) {
-@@ -626,20 +644,13 @@
+@@ -626,20 +646,13 @@
  		"For the best optimization, these items should either have their export statements removed, or be imported from another location that is not a route file."
  	].join("\n");
  }
@@ -217,7 +226,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  }
  function resolveIdentifier(path, node) {
  	if (t.isIdentifier(node)) {
-@@ -671,38 +682,22 @@
+@@ -671,38 +684,22 @@
  	}
  }
  function hasExport(ast, node) {
@@ -271,3 +280,65 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  }
  function removeExports(ast, node) {
  	let removed = false;
+diff --git a/dist/esm/core/hmr/vite-adapter.js b/dist/esm/core/hmr/vite-adapter.js
+--- a/dist/esm/core/hmr/vite-adapter.js
++++ b/dist/esm/core/hmr/vite-adapter.js
+@@ -1,5 +1,6 @@
+ import { getHandleRouteUpdateCode } from "./handle-route-update.js";
+ import * as template from "@babel/template";
++import * as t from "@babel/types";
+ //#region src/core/hmr/vite-adapter.ts
+ /**
+ * Emits HMR accept code for Vite / native ESM HMR: `import.meta.hot.accept`
+@@ -9,15 +10,20 @@
+ * plugins handle component body patching via their own accept boundaries — but
+ * we take it for API symmetry with `createWebpackHmrStatement`.
+ */
++// A dev server reuses the same HMR body for its routes. Parse it once
++// for each option set and substitute a new route expression into each AST.
++const hmrTemplates = new Map();
+ function createViteHmrStatement(stableRouteOptionKeys, opts = {}) {
+-	const handleRouteUpdateCode = getHandleRouteUpdateCode(stableRouteOptionKeys);
+-	const routeIdFallback = typeof opts.routeId === "string" ? JSON.stringify(opts.routeId) : "Route.id";
+-	return [template.statement(`
++	const key = JSON.stringify(stableRouteOptionKeys);
++	let buildHmr = hmrTemplates.get(key);
++	if (!buildHmr) {
++		const handleRouteUpdateCode = getHandleRouteUpdateCode(stableRouteOptionKeys);
++		buildHmr = template.statement(`
+ if (import.meta.hot) {
+   const hot = import.meta.hot
+   const hotData = hot.data ??= {}
+   const handleRouteUpdate = ${handleRouteUpdateCode}
+-  const initialRouteId = ${routeIdFallback} ?? hotData['tsr-route-id']
++  const initialRouteId = %%routeIdFallback%% ?? hotData['tsr-route-id']
+   if (initialRouteId) {
+     hotData['tsr-route-id'] = initialRouteId
+   }
+@@ -31,7 +37,7 @@
+   }
+   hot.accept((newModule) => {
+     if (Route && newModule && newModule.Route) {
+-      const routeId = hotData['tsr-route-id'] ?? ${routeIdFallback}
++      const routeId = hotData['tsr-route-id'] ?? %%routeIdFallback%%
+       if (routeId) {
+         hotData['tsr-route-id'] = routeId
+       }
+@@ -43,7 +49,16 @@
+     }
+     })
+ }
+-`, { syntacticPlaceholders: true })()];
++`, { syntacticPlaceholders: true });
++		hmrTemplates.set(key, buildHmr);
++	}
++	const routeIdFallback = typeof opts.routeId === "string"
++		? t.stringLiteral(opts.routeId)
++		: t.memberExpression(t.identifier("Route"), t.identifier("id"));
++	if (t.isStringLiteral(routeIdFallback)) {
++		routeIdFallback.extra = { raw: JSON.stringify(routeIdFallback.value), rawValue: routeIdFallback.value };
++	}
++	return [buildHmr({ routeIdFallback })];
+ }
+ //#endregion
+ export { createViteHmrStatement };

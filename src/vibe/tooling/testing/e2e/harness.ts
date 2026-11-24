@@ -440,7 +440,11 @@ export function useE2E(
             const dir = join(E2E_ARTIFACTS_DIR, slug(suite), slug(name));
             mkdirSync(dir, { recursive: true });
             await page
-              .screenshot({ path: join(dir, "screenshot.png"), fullPage: true })
+              .screenshot({
+                path: join(dir, "screenshot.png"),
+                fullPage: true,
+                caret: "initial",
+              })
               .catch(() => undefined);
             await context.tracing
               .stop({ path: join(dir, "trace.zip") })

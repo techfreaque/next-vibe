@@ -196,12 +196,15 @@ function leadlessPublicDocument(): NextResponse {
   return response;
 }
 
+type LeadCreationStage = "crawler-policy" | "geo" | "provision";
+
 export function leadFailureResponse(
   request: NextRequest,
   logger: EndpointLogger,
   error: Error,
   deadlineMs: number,
   operation: "create" | "lookup",
+  creationStage?: LeadCreationStage,
 ): NextResponse {
   const details = databaseFailureDiagnostics(error);
   const renderPublic = !!details.driverFailure && canRenderWithoutLead(request);
@@ -220,7 +223,7 @@ export function leadFailureResponse(
             : /^select\b/i.test(error.query)
               ? "lookup"
               : "other-query"
-          : operation,
+          : (creationStage ?? operation),
       requestId:
         requestId && UUID_REGEX.test(requestId) ? requestId : undefined,
       elapsedMs: Math.round(
@@ -292,6 +295,7 @@ export async function createLeadId(
     !request.headers.has("authorization");
 
   let leadId: string;
+  let stage: LeadCreationStage = "crawler-policy";
   try {
     if (
       anonymousRead &&
@@ -303,6 +307,7 @@ export async function createLeadId(
       return NextResponseClass.next();
     }
 
+    stage = "geo";
     const ipAddress = clientIpFromHeaders(request.headers);
     const clientInfo = {
       userAgent: request.headers.get("user-agent") || undefined,
@@ -315,6 +320,7 @@ export async function createLeadId(
     };
     // The insert itself uses a bounded transaction, so a timed-out checkout
     // cannot later create an identity after we have returned the document.
+    stage = "provision";
     leadId = await createAnonymousLead(clientInfo, locale, logger, deadlineMs);
   } catch (error) {
     return leadFailureResponse(
@@ -323,6 +329,7 @@ export async function createLeadId(
       error instanceof Error ? error : parseError(error),
       deadlineMs,
       "create",
+      stage,
     );
   }
 
@@ -333,6 +340,7 @@ export async function createLeadId(
       new Error("Guest provisioning returned no identity"),
       deadlineMs,
       "create",
+      stage,
     );
   }
   await recordAttributionWithinBudget(request, leadId, logger, deadlineMs);

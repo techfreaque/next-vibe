@@ -5,6 +5,7 @@ import { AUTH_TOKEN_COOKIE_NAME } from "@/env/constants";
 export const DEGRADED_PUBLIC_DOCUMENT_HEADER = "x-vibe-leadless-document";
 
 const markedResponses = new WeakSet<Response>();
+const localeIndexPath = /^\/[a-z]{2}-[A-Z]+\/?$/;
 
 /** Public pages whose loaders can render without a visitor identity. */
 const publicPages = new Set([
@@ -32,6 +33,11 @@ export function isPublicDocumentPath(
   path: string,
   includeSkillPages = true,
 ): boolean {
+  // The locale index only chooses a destination. Identity can be established
+  // there when the anonymous entry request could not provision a lead.
+  if (localeIndexPath.test(path)) {
+    return true;
+  }
   const route = path.match(/^\/[a-z]{2}-[A-Z]+\/(.+?)\/?$/)?.[1] ?? "";
   return (
     publicPages.has(route) ||
@@ -49,6 +55,10 @@ export function canRenderWithoutLead(
   return (
     (request.method === "GET" || request.method === "HEAD") &&
     isPublicDocumentPath(request.nextUrl.pathname, includeSkillPages) &&
+    // The locale index's redirect drops query parameters. Let a failed
+    // provisioning attempt surface when the request carries attribution.
+    (!localeIndexPath.test(request.nextUrl.pathname) ||
+      !request.nextUrl.search) &&
     !request.headers.has("authorization") &&
     !request.headers.has("next-action") &&
     !request.cookies.has(AUTH_TOKEN_COOKIE_NAME) &&

@@ -8,6 +8,7 @@ import {
   transformClientLocaleSource,
   transformDevSsrLocaleSource,
   transformViteClientLocaleSource,
+  transformViteDevSsrLocaleSource,
 } from "./client-locale-loader.cjs";
 
 const SCOPE_GLOB = new Glob("src/**/en/index.ts");
@@ -75,6 +76,24 @@ describe("client-locale-loader", () => {
     expect(out).toBe(
       'import { translations as __vibeSsrI18n_0 } from "./pl";\nexport const locales = { pl: () => __vibeSsrI18n_0 };',
     );
+  });
+
+  it.each([
+    "src/user/public/signup/i18n/index.ts",
+    "src/vibe/agent/ai-stream/stream/i18n/index.ts",
+  ])("keeps SSR up to date with locale edits in %s", (file) => {
+    const id = resolve(file);
+    const source = readFileSync(id, "utf8");
+    const out = transformViteDevSsrLocaleSource(source, id);
+    expect(out).toContain('from "./de"');
+    expect(out).not.toContain("require(");
+    expect(transformViteDevSsrLocaleSource(source, `${id}?t=123`)).toBe(out);
+    expect(
+      transformViteDevSsrLocaleSource(
+        source,
+        "/repo/src/unrelated/i18n/index.ts",
+      ),
+    ).toBe(source);
   });
 
   it("covers every scope in the repo (no non-English left in client bundles)", () => {

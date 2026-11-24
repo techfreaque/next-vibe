@@ -84,6 +84,14 @@ function transformDevSsrLocaleSource(source) {
   return imports.length ? `${imports.join("\n")}\n${rewritten}` : source;
 }
 
+/** Eager dev SSR imports for pages that need live locale edits at hydration. */
+function transformViteDevSsrLocaleSource(source, id) {
+  const path = id.replaceAll("\\", "/").replace(/\?.*$/, "");
+  const isLiveScope =
+    /\/src\/(?:_pages\/create|user\/public\/signup|vibe\/agent\/(?:ai-stream\/stream|media-studio\/history))\/i18n\/index\.ts$/.test(path);
+  return isLiveScope ? transformDevSsrLocaleSource(source) : source;
+}
+
 /**
  * @this {{ cacheable?: (flag: boolean) => void }}
  * @param {string} source
@@ -100,3 +108,4 @@ module.exports = clientLocaleLoader;
 module.exports.transformClientLocaleSource = transformClientLocaleSource;
 module.exports.transformDevSsrLocaleSource = transformDevSsrLocaleSource;
 module.exports.transformViteClientLocaleSource = transformViteClientLocaleSource;
+module.exports.transformViteDevSsrLocaleSource = transformViteDevSsrLocaleSource;
