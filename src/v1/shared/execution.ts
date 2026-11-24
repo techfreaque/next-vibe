@@ -13,6 +13,7 @@ import "server-only";
 import type { ModelMessage, ProviderMetadata } from "ai";
 import type { ChatModelOption } from "next-vibe/agent/ai-stream/models";
 import { computeOutputCap } from "next-vibe/agent/ai-stream/repository/core/output-cost-cap";
+import { summarizePromptToolHistory } from "next-vibe/agent/ai-stream/repository/loop/prompt-size";
 import { TokenAccumulator } from "next-vibe/agent/ai-stream/repository/loop/token-accumulator";
 import { getEnvAvailability } from "next-vibe/agent/env-availability";
 import { calculateCreditCost } from "next-vibe/agent/models/models";
@@ -424,6 +425,7 @@ async function bill(params: {
     creditsT,
     locale,
     upstreamCost,
+    model.apiProvider,
   );
   if (!deducted.success) {
     logger.error(
@@ -552,6 +554,7 @@ export function runV1Stream(
       let providerMetadata: ProviderMetadata | undefined;
       let finishReason: OpenAiFinishReason = "stop";
       let failed: string | undefined;
+      let failureSource: "error-event" | "exception" | undefined;
       send(encoder.start());
       try {
         for await (const event of runner.stream(run)) {
@@ -563,6 +566,7 @@ export function runV1Stream(
           }
           if (event.type === "error") {
             failed = event.message;
+            failureSource = "error-event";
             continue;
           }
           if (event.type === "text" || event.type === "reasoning") {
@@ -576,6 +580,7 @@ export function runV1Stream(
         }
       } catch (error) {
         failed = parseError(error).message;
+        failureSource = "exception";
       }
       clearInterval(heartbeat);
       // Bill what ran - even on provider error or client abort.
@@ -583,6 +588,16 @@ export function runV1Stream(
       if (failed !== undefined) {
         call.logger.error(`[${call.logTag}] Stream failed`, {
           model: call.model.id,
+          streamFailureEvidence: {
+            apiProvider: run.model.apiProvider,
+            providerModel: run.model.providerModel,
+            promptToolHistory: summarizePromptToolHistory(run.messages),
+            offeredToolCount: run.tools?.length ?? 0,
+            outputChars,
+            usageReported: usage !== undefined,
+            aborted: abort.signal.aborted,
+            failureSource,
+          },
           error: failed,
         });
         send(encoder.fail(failed, totals));

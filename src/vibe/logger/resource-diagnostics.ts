@@ -22,6 +22,9 @@ import { sanitizeRoutePath } from "./client-context";
 // Match the public JS/CSS paths recorded in both Caddy edge logs.
 const NEXT_BUNDLE_PATH =
   /^\/_next\/static\/chunks\/[A-Za-z0-9_./~-]+\.(?:js|css)$/;
+// Keep the same shipped badge names that the edge can record on a 5xx.
+const PUBLIC_BADGE_PATH =
+  /^\/images\/badges\/(?:(?:dang|postmake|toolpilot)-(?:dark|light)\.png|(?:aitoolscapital|bestekitools)-(?:dark|light)\.svg|opensourcealternatives\.svg|whatsthebigdata\.jpg)$/;
 // Resource error events have no request ID. A tab can retain an entry for
 // the same script long after its first successful load.
 const RECENT_RESOURCE_END_MS = 60_000;
@@ -40,6 +43,7 @@ export function describeUrl(raw: string | null | undefined): string | null {
     if (
       sameOrigin &&
       (NEXT_BUNDLE_PATH.test(url.pathname) ||
+        PUBLIC_BADGE_PATH.test(url.pathname) ||
         url.pathname === "/images/unbottled-icon-white.png")
     ) {
       return url.pathname;
@@ -80,6 +84,10 @@ interface ResourceTimingEvidence {
   resourceReportedAtMs: number;
   resourceTimingCandidateCount: number | null;
   resourceTimingAgeMs: number | null;
+  nearbyAssetResponses?: number;
+  nearbyAssetHttpErrors?: number;
+  nearbyAssetZeroStatus?: number;
+  nearbyAssetEdgeTransfers?: number;
   resourceTimingInitiator: string | null;
   resourceFailureKind: string;
   resourceTimingPhase:
@@ -90,6 +98,57 @@ interface ResourceTimingEvidence {
   proxyTimingStage: ProxyTimingStage | null;
   edgeTimingNode: ReturnType<typeof readEdgeTimingNode>;
   edgeRequestId: string | null;
+}
+
+/** Compare a failed asset to other assets that finished around the same time.
+ * Only counts leave the browser. A cached response can retain Server-Timing,
+ * so a successful edge transfer also needs a positive transfer size.
+ */
+function nearbyAssetEvidence(
+  failed: PerformanceResourceTiming,
+  origin: string,
+): Pick<
+  ResourceTimingEvidence,
+  | "nearbyAssetResponses"
+  | "nearbyAssetHttpErrors"
+  | "nearbyAssetZeroStatus"
+  | "nearbyAssetEdgeTransfers"
+> {
+  const counts = {
+    nearbyAssetResponses: 0,
+    nearbyAssetHttpErrors: 0,
+    nearbyAssetZeroStatus: 0,
+    nearbyAssetEdgeTransfers: 0,
+  };
+  for (const entry of performance.getEntriesByType("resource")) {
+    if (
+      !(entry instanceof PerformanceResourceTiming) ||
+      entry.name === failed.name ||
+      !entry.name.startsWith(`${origin}/`) ||
+      Math.abs(entry.responseEnd - failed.responseEnd) > 10_000 ||
+      !["img", "link", "css", "script"].includes(entry.initiatorType) ||
+      typeof entry.responseStatus !== "number"
+    ) {
+      continue;
+    }
+    if (entry.responseStatus >= 200 && entry.responseStatus < 400) {
+      counts.nearbyAssetResponses++;
+      if (
+        entry.transferSize > 0 &&
+        entry.serverTiming?.some(
+          ({ name, description }) =>
+            name === EDGE_TIMING_METRIC && readEdgeTimingNode(description),
+        )
+      ) {
+        counts.nearbyAssetEdgeTransfers++;
+      }
+    } else if (entry.responseStatus >= 400) {
+      counts.nearbyAssetHttpErrors++;
+    } else if (entry.responseStatus === 0) {
+      counts.nearbyAssetZeroStatus++;
+    }
+  }
+  return counts;
 }
 
 /** Attribution of the page document when a child resource has no timing. */
@@ -255,6 +314,9 @@ export function resourceTiming(
         : null;
     return {
       responseStatus,
+      ...(sameOrigin && fetchStartedAt === undefined
+        ? nearbyAssetEvidence(entry, resource.origin)
+        : {}),
       resourceTimingCandidateCount: empty.resourceTimingCandidateCount,
       resourceTimingAgeMs: empty.resourceTimingAgeMs,
       resourceTimingInitiator: empty.resourceTimingInitiator,

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 
 import {
+  cpuPressureWindow,
   describeSchedulerEvidence,
   readThreadSchedulerSample,
   threadSchedulerDelta,
@@ -72,5 +73,22 @@ describe("threadSchedulerDelta", () => {
       const delta = threadSchedulerDelta(before, readThreadSchedulerSample());
       expect(delta?.stallThreadCpuMs).toBeGreaterThan(0);
     }
+  });
+});
+
+describe("cpuPressureWindow", () => {
+  it("reports host and cgroup contention over the lag window in milliseconds", () => {
+    expect(
+      cpuPressureWindow({ host: 1000, cgroup: 0 }, { host: 281400, cgroup: 0 }),
+    ).toEqual({ hostSomeMs: 280, cgroupSomeMs: 0 });
+  });
+
+  it("keeps missing and reset counters distinct from measured zero pressure", () => {
+    expect(cpuPressureWindow(undefined, { host: 100 })).toBeUndefined();
+    expect(cpuPressureWindow({ cgroup: 2000 }, { cgroup: 0 })).toBeUndefined();
+    expect(cpuPressureWindow({ host: 0 }, { host: 23000 })).toEqual({
+      hostSomeMs: 23,
+      cgroupSomeMs: undefined,
+    });
   });
 });

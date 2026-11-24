@@ -87,7 +87,9 @@ import type {
   ServerStartResponseOutput,
 } from "./definition";
 import {
+  cpuPressureWindow,
   describeSchedulerEvidence,
+  readCpuPressureSample,
   readThreadSchedulerSample,
   threadSchedulerDelta,
 } from "./event-loop-scheduler";
@@ -870,6 +872,7 @@ export class ServerStartRepository {
       // committed (heap growth / GC), major faults = pages read back from
       // disk, fs ops = sync file IO, involuntary switches = CPU contention.
       let lastRusage = process.resourceUsage();
+      let lastCpuPressure = readCpuPressureSample();
       let lagWindowStartedAt = Date.now();
       const logLagWindow = async (): Promise<void> => {
         try {
@@ -893,6 +896,12 @@ export class ServerStartRepository {
               lastRusage.involuntaryContextSwitches,
           };
           lastRusage = rusage;
+          const cpuPressure = readCpuPressureSample();
+          const windowCpuPressure = cpuPressureWindow(
+            lastCpuPressure,
+            cpuPressure,
+          );
+          lastCpuPressure = cpuPressure;
 
           const uptime2 = Math.floor(process.uptime());
           const mem = process.memoryUsage();
@@ -933,6 +942,7 @@ export class ServerStartRepository {
           // (a full GC on a large heap is one candidate), what ran.
           const lagContext = {
             ...tickerEvidence,
+            windowCpuPressure,
             heapMb,
             prevHeapMb,
             rssMb: Math.round(mem.rss / 1024 / 1024),

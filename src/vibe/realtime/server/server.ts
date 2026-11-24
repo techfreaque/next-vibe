@@ -568,6 +568,13 @@ export function startWebSocketServer(
             ? suppliedRequestId
             : undefined;
 
+        const retryStartedAt =
+          requestId && url.searchParams.get("retry") === "1"
+            ? Date.now()
+            : undefined;
+        if (retryStartedAt !== undefined) {
+          logger.info("[WS] Reconnect handshake reached server", { requestId });
+        }
         const auth = await authenticateWsRequest(req, logger);
 
         if (!auth) {
@@ -645,7 +652,18 @@ export function startWebSocketServer(
         });
 
         if (!upgraded) {
+          logger.warn("[WS] Authenticated upgrade failed", {
+            requestId,
+            status: 426,
+            clientAborted: req.signal.aborted,
+          });
           return new Response("WebSocket upgrade failed", { status: 426 });
+        }
+        if (retryStartedAt !== undefined) {
+          logger.info("[WS] Reconnect handshake upgraded", {
+            requestId,
+            elapsedMs: Date.now() - retryStartedAt,
+          });
         }
 
         // Unreachable after successful upgrade

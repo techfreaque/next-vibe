@@ -118,6 +118,7 @@ export class StreamLoop implements StreamLoopState {
   /** Messages of the most recent model request (initial, then each
    *  prepareStep result) - sized in the log on a context-length overflow. */
   private lastPromptMessages: readonly ModelMessage[] = [];
+  private lastPromptStep = 0;
 
   /** Credits left for the next step: turn-start balance minus what this turn
    *  already spent (tools + compacting are deducted as they run; model steps
@@ -417,6 +418,7 @@ export class StreamLoop implements StreamLoopState {
             }> => {
               const prepared = await this.prepareStep(stepMessages, stepNumber);
               const sent = prepared.messages ?? stepMessages;
+              this.lastPromptStep = stepNumber;
               this.lastPromptMessages = sent;
               const maxOutputTokens = this.stepOutputCap(sent, stepNumber);
               return maxOutputTokens !== undefined
@@ -973,6 +975,11 @@ export class StreamLoop implements StreamLoopState {
       const errorMeta = {
         error: errorText,
         promptToolHistory: summarizePromptToolHistory(this.lastPromptMessages),
+        promptStep: this.lastPromptStep,
+        initialPromptToolHistory:
+          this.lastPromptStep > 0
+            ? summarizePromptToolHistory(this.p.messages)
+            : undefined,
         upstreamStatus: APICallError.isInstance(rawError)
           ? rawError.statusCode
           : undefined,

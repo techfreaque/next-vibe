@@ -60,6 +60,16 @@ afterAll(async () => {
   await pg.close();
 });
 
+it("counts only arrays across owned messages, including legacy inline uploads", async () => {
+  await pg.query(
+    "INSERT INTO chat_messages (thread_id, metadata) VALUES ($1, '{}'), ($1, '{\"attachments\":null}'), ($1, '{\"attachments\":[]}')",
+    [threadId],
+  );
+  const { getUploadCounts } = await import("./uploads");
+  expect((await getUploadCounts(owner)).total).toBe(3);
+  expect((await getUploadCounts(otherUser)).total).toBe(0);
+});
+
 it("lists legacy and hosted uploads using attachment summaries", async () => {
   const { listUploadPath, readUploadPath } = await import("./uploads");
   const path = `/uploads/documents/sample-thread-${threadId}`;

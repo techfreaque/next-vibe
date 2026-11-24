@@ -4740,6 +4740,7 @@ export class CreditRepository {
     locale: CountryLanguage,
     /** Real upstream cost behind this charge (OpenRouter), for reconciliation. */
     upstreamCost?: UsageUpstreamCost,
+    apiProvider?: UsageAttribution["apiProvider"],
   ): Promise<ResponseType<DeductForModelResult>> {
     if (cost <= 0) {
       logger.debug("Skipping credit deduction - zero or negative cost", {
@@ -4779,6 +4780,7 @@ export class CreditRepository {
         locale,
         true, // Allow partial deduction for model usage
         upstreamCost,
+        apiProvider,
       );
 
       if (!result.success) {

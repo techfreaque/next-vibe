@@ -151,6 +151,12 @@ describe("handleChunkLoadFailure", () => {
       "/images/unbottled-icon-white.png",
     );
     expect(describeUrl("/images/abcde12345abcde12345.png")).toBe("/images/:id");
+    expect(describeUrl("/images/badges/opensourcealternatives.svg?private=1")).toBe(
+      "/images/badges/opensourcealternatives.svg",
+    );
+    expect(describeUrl("/images/badges/abcde12345abcde12345.svg")).toBe(
+      "/images/badges/:id",
+    );
     expect(describeUrl(`https://cdn.example${path}`)).toBe(
       "https://cdn.example/_next/static/chunks/:id",
     );
@@ -213,6 +219,57 @@ describe("handleChunkLoadFailure", () => {
     } finally {
       now.mockRestore();
       entries.mockRestore();
+      if (original) Object.defineProperty(globalThis, "PerformanceResourceTiming", original);
+      else Reflect.deleteProperty(globalThis, "PerformanceResourceTiming");
+    }
+  });
+
+  it("counts nearby asset results without borrowing other origins or cached edge evidence", () => {
+    const original = Object.getOwnPropertyDescriptor(globalThis, "PerformanceResourceTiming");
+    class Sample {
+      readonly entryType = "resource";
+      readonly duration = 80;
+      readonly startTime = 20_000;
+      readonly decodedBodySize = 0;
+      readonly serverTiming = [{ name: "vibe-edge", description: "s1" }];
+      constructor(
+        readonly name: string,
+        readonly responseStatus: number,
+        readonly transferSize: number,
+        readonly responseEnd = 20_080,
+        readonly initiatorType = "script",
+      ) {}
+      toJSON(): string { return ""; }
+    }
+    const site = "https://unbottled.ai";
+    const failed = new Sample(`${site}/example.js`, 504, 0);
+    Object.defineProperty(globalThis, "PerformanceResourceTiming", {
+      configurable: true,
+      value: Sample,
+    });
+    const byName = spyOn(performance, "getEntriesByName").mockReturnValue([failed]);
+    const byType = spyOn(performance, "getEntriesByType").mockReturnValue([
+      failed,
+      new Sample(`${site}/a.js`, 200, 100),
+      new Sample(`${site}/cached.js`, 200, 0),
+      new Sample(`${site}/b.js`, 504, 0),
+      new Sample(`${site}/logo.png`, 0, 0, 20_100, "img"),
+      new Sample(`${site}/earlier.js`, 504, 0, 100),
+      new Sample("https://elsewhere.invalid/b.js", 504, 0),
+      new Sample(`${site}/api/private`, 500, 0, 20_100, "fetch"),
+    ]);
+    const now = spyOn(performance, "now").mockReturnValue(20_100);
+    try {
+      expect(resourceTiming(failed.name)).toMatchObject({
+        nearbyAssetResponses: 2,
+        nearbyAssetHttpErrors: 1,
+        nearbyAssetZeroStatus: 1,
+        nearbyAssetEdgeTransfers: 1,
+      });
+    } finally {
+      now.mockRestore();
+      byType.mockRestore();
+      byName.mockRestore();
       if (original) Object.defineProperty(globalThis, "PerformanceResourceTiming", original);
       else Reflect.deleteProperty(globalThis, "PerformanceResourceTiming");
     }

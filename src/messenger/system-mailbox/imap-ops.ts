@@ -46,6 +46,7 @@ export function describeImapFailure(
   status: string | undefined;
   responseCode: string | undefined;
   source: string | undefined;
+  socketCodes?: string[];
 } {
   const escapedPassword = config.password.replace(/[\\"]/g, "\\$&");
   const redact = (text: string): string =>
@@ -55,11 +56,27 @@ export function describeImapFailure(
           .replaceAll(config.password, "[redacted]")
       : text;
 
+  // A dual-stack connect can reject with an empty AggregateError.message.
+  // Keep the socket codes without collecting any remote addresses.
+  const failures = error instanceof AggregateError ? error.errors : [error];
+  const socketCodes = new Set<string>();
+  for (const failure of failures) {
+    if (
+      failure instanceof Error &&
+      "code" in failure &&
+      typeof failure.code === "string" &&
+      /^(?:E[A-Z0-9_]{2,35}|ERR_[A-Z0-9_]{2,32})$/.test(failure.code)
+    ) {
+      socketCodes.add(redact(failure.code));
+    }
+  }
+
   return {
     host: config.host,
     port: config.port,
     tls: config.secure,
-    responseText: redact(error.message),
+    responseText: redact(error.message || error.name),
+    ...(socketCodes.size ? { socketCodes: [...socketCodes] } : {}),
     status:
       "type" in error && typeof error.type === "string"
         ? redact(error.type)

@@ -223,8 +223,12 @@ export function useAIStream(): UseAIStreamReturn {
         messageHistoryLength: data.messageHistory?.length ?? 0,
       });
 
+      const attempt: { requestId?: string } = {};
       const result = await streamMutation.mutateAsync({
         requestData: data,
+        onRequestId: (id) => {
+          attempt.requestId = id;
+        },
       });
       if (!result.success) {
         if (threadId) {
@@ -282,6 +286,7 @@ export function useAIStream(): UseAIStreamReturn {
           ? logger.warn
           : logger.error
         ).bind(logger)(label, {
+          requestId: attempt.requestId,
           message: failMessage,
           errorKey: errorType.errorKey,
           errorCode: errorType.errorCode,

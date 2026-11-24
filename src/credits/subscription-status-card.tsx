@@ -278,6 +278,7 @@ export function SubscriptionStatusCard({
         {!isCanceled && (
           <Div className="mt-6 pt-4 border-t">
             <Button
+              type="button"
               onClick={handleManageSubscription}
               variant="outline"
               className="w-full"

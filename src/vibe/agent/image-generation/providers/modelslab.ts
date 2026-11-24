@@ -14,6 +14,7 @@ import type { EndpointLogger } from "next-vibe/logger/types";
 
 import { agentEnv } from "../../env";
 import { pollDelay } from "../../shared/poll-delay";
+import { modelsLabImageDimensions } from "../aspect-ratio";
 import { scopedTranslation } from "../i18n";
 
 interface ModelsLabImageResponse {
@@ -82,6 +83,7 @@ export async function generateImageWithModelsLab(params: {
         num_inference_steps: 30,
         samples: 1,
         ...(aspectRatio ? { aspect_ratio: aspectRatio } : {}),
+        ...modelsLabImageDimensions(aspectRatio),
         ...(inputMediaUrl ? { init_image: inputMediaUrl } : {}),
       }),
       signal,

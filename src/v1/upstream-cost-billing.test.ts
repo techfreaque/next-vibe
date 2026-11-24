@@ -176,6 +176,7 @@ async function call(
 interface UsageRow {
   id: string;
   amount: number;
+  apiProvider: string | undefined;
   upstreamCostUsd: number | undefined;
   billingBasis: string | undefined;
   upstreamProvider: string | null | undefined;
@@ -204,6 +205,8 @@ async function usageRows(user: JwtPrivatePayloadType): Promise<UsageRow[]> {
   return rows.map((row) => ({
     id: row.id,
     amount: row.amount,
+    apiProvider:
+      "apiProvider" in row.metadata ? row.metadata.apiProvider : undefined,
     upstreamCostUsd:
       "upstreamCostUsd" in row.metadata ? row.metadata.upstreamCostUsd : undefined,
     billingBasis:
@@ -305,6 +308,7 @@ describe("/v1 bills OpenRouter models at real upstream cost", () => {
       expect(charged(rows)).toBe(expected);
       expect(rows.length).toBeGreaterThan(0);
       for (const row of rows) {
+        expect(row.apiProvider).toBe(model.apiProvider);
         expect(row.upstreamCostUsd).toBe(UPSTREAM_USD);
         expect(row.billingBasis).toBe("upstream_cost");
         expect(row.upstreamProvider).toBe("Parasail");
@@ -337,6 +341,7 @@ describe("/v1 bills OpenRouter models at real upstream cost", () => {
       const rows = await newUsageRows(payer.user, snapshot);
       expect(charged(rows)).toBe(tokenPrice);
       for (const row of rows) {
+        expect(row.apiProvider).toBe(model.apiProvider);
         expect(row.upstreamCostUsd).toBeUndefined();
       }
     });

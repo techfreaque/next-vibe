@@ -6,7 +6,7 @@ import "server-only";
  * Each file renders as markdown with a download link + metadata frontmatter.
  * Organized by MIME type: images/, documents/, audio/, video/, other/
  */
-import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "next-vibe/database";
 
 import { chatMessages, chatThreads } from "../../chat/db";
@@ -134,9 +134,8 @@ async function loadUserAttachments(
     .where(
       and(
         eq(chatThreads.userId, userId),
-        isNotNull(chatMessages.metadata),
-        sql`${chatMessages.metadata}->'attachments' IS NOT NULL`,
-        sql`jsonb_array_length((${chatMessages.metadata}->'attachments')::jsonb) > 0`,
+        sql`jsonb_typeof(${chatMessages.metadata}->'attachments') = 'array'`,
+        sql`${chatMessages.metadata}->'attachments' <> '[]'::jsonb`,
       ),
     )
     .orderBy(desc(chatMessages.createdAt))
@@ -376,18 +375,17 @@ export async function getUploadCounts(
   // is left empty rather than paying the full-row scan to bucket by MIME.
   const [row] = await db
     .select({
-      total: sql<number>`COALESCE(SUM(jsonb_array_length((${chatMessages.metadata}->'attachments')::jsonb)), 0)`,
+      total: sql<number>`/* cortex-upload-count */ COALESCE(SUM(CASE WHEN jsonb_typeof(attachments) = 'array'
+        THEN jsonb_array_length(attachments) END), 0)`,
     })
     .from(chatMessages)
     .innerJoin(chatThreads, eq(chatMessages.threadId, chatThreads.id))
-    .where(
-      and(
-        eq(chatThreads.userId, userId),
-        isNotNull(chatMessages.metadata),
-        sql`${chatMessages.metadata}->'attachments' IS NOT NULL`,
-        sql`jsonb_array_length((${chatMessages.metadata}->'attachments')::jsonb) > 0`,
-      ),
-    );
+    // Keep extraction behind a subquery boundary. Legacy metadata is TOASTed
+    // and unpacking it repeatedly can exhaust the statement deadline.
+    .crossJoinLateral(
+      sql`(SELECT ${chatMessages.metadata}->'attachments' AS attachments OFFSET 0) AS upload`,
+    )
+    .where(eq(chatThreads.userId, userId));
 
   return { total: Number(row?.total ?? 0), byType: {} };
 }

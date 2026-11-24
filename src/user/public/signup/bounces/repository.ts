@@ -290,17 +290,13 @@ export async function syncSignupBounces(
     }
     const now = Date.now();
     let marked = 0;
-    let lastConnectionFailure:
-      | ReturnType<typeof describeImapFailure>
-      | undefined;
+    const connectionFailures: ReturnType<typeof describeImapFailure>[] = [];
     const scanned = await visitDeliveryReports(
       mailbox.configs,
       (config, error) => {
-        lastConnectionFailure = describeImapFailure(config, error);
-        logger.debug(
-          "Signup bounce sync could not connect to IMAP",
-          lastConnectionFailure,
-        );
+        const failure = describeImapFailure(config, error);
+        connectionFailures.push(failure);
+        logger.debug("Signup bounce sync could not connect to IMAP", failure);
       },
       new Date(now - LOOKBACK),
       async ({ uid, raw, receivedAt }) => {
@@ -330,7 +326,7 @@ export async function syncSignupBounces(
     if (!scanned) {
       logger.error(
         "Signup bounce sync could not connect to any configured mailbox",
-        lastConnectionFailure,
+        { configuredMailboxes: mailbox.configs.length, connectionFailures },
       );
       return fail({
         message: t("bounceSync.mailboxUnavailable"),

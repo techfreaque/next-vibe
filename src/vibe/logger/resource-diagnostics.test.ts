@@ -20,6 +20,9 @@ describe("browser failure attribution", () => {
     expect(identifyBrowserAutomation("facebookexternalhit/1.1")).toBe(
       "meta-crawler",
     );
+    expect(identifyBrowserAutomation("Mozilla/5.0 meta-webindexer/1.1")).toBe(
+      "meta-crawler",
+    );
     expect(identifyBrowserAutomation("Google-Safety")).toBe(
       "google-safety-scanner",
     );

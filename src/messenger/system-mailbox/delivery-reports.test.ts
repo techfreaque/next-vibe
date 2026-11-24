@@ -56,6 +56,27 @@ mock.module("@/messenger/providers/email/imap-client/safe-imap", () => ({
     new FixtureImap(password),
 }));
 
+it("identifies socket failures when an IMAP aggregate has no message", async () => {
+  const { describeImapFailure } = await import("./imap-ops");
+  const failure = new AggregateError([
+    Object.assign(new Error("connect 192.0.2.1"), { code: "ECONNREFUSED" }),
+    Object.assign(new Error("connect 2001:db8::1"), { code: "ENETUNREACH" }),
+  ]);
+  const details = describeImapFailure(
+    {
+      host: "mail.example.test",
+      port: 993,
+      secure: true,
+      username: "sender@example.test",
+      password: "fixture-password",
+    },
+    failure,
+  );
+  expect(details.responseText).toBe("AggregateError");
+  expect(details.socketCodes).toEqual(["ECONNREFUSED", "ENETUNREACH"]);
+  expect(JSON.stringify(details)).not.toContain("connect ");
+});
+
 it("closes a rejected IMAP login and scans once using the next configuration", async () => {
   const { visitDeliveryReports } = await import("./imap-ops");
   const mailbox = {

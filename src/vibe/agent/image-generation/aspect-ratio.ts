@@ -2,7 +2,7 @@
  * Aspect ratio handling for image generation (pure, server + client safe).
  *
  * The AI asks for a ratio ("16:9"). Every provider gets the closest ratio it
- * can actually produce: ratio-native providers (OpenRouter, ModelsLab) get the
+ * can actually produce: ratio-native providers (OpenRouter) get the
  * ratio itself (snapped to the model's supported list when the model has
  * one), size-based providers (Venice, OpenAI, fal, Replicate) get the nearest
  * size preset. The tool result then reports the real pixel size of the file,
@@ -42,6 +42,23 @@ export function parseAspectRatio(ratio: string): number | null {
 /** Distance of two ratios on a log scale (2:1 and 1:2 are equally far from 1:1). */
 function ratioDistance(a: number, b: number): number {
   return Math.abs(Math.log(a) - Math.log(b));
+}
+
+/** ModelsLab v6 image requests accept 256–1024 pixels in multiples of eight. */
+export function modelsLabImageDimensions(
+  aspectRatio: string | undefined,
+): { width: number; height: number } | undefined {
+  const ratio = aspectRatio ? parseAspectRatio(aspectRatio) : null;
+  if (ratio === null) {
+    return undefined;
+  }
+  const shortSide = Math.max(
+    256,
+    Math.round(128 * Math.min(ratio, 1 / ratio)) * 8,
+  );
+  return ratio >= 1
+    ? { width: 1024, height: shortSide }
+    : { width: shortSide, height: 1024 };
 }
 
 /**

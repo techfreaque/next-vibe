@@ -85,6 +85,12 @@ export class SubscriptionCheckoutRepository {
           logger.warn("User already has active subscription", {
             userId: user.id,
             subscriptionId: existingSubscription.data.id,
+            currentPlan: existingSubscription.data.plan,
+            currentInterval: existingSubscription.data.billingInterval,
+            currentProvider: existingSubscription.data.provider,
+            requestedPlan: data.planId,
+            requestedInterval: data.billingInterval,
+            requestedProvider: data.provider,
           });
           return fail({
             message: t("post.errors.alreadySubscribed.detail", {

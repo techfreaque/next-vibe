@@ -93,6 +93,8 @@ it("reports quick reconnects and times out hidden, offline drops", async () => {
     jest.advanceTimersByTime(500);
     TestSocket.sockets[1]?.open();
     const firstSocketUrl = TestSocket.sockets[0]?.url ?? "";
+    expect(new URL(firstSocketUrl).searchParams.has("retry")).toBe(false);
+    expect(new URL(TestSocket.sockets[1]?.url ?? "").searchParams.get("retry")).toBe("1");
     expect(errors).toMatchObject([
       {
         message: "[WS Client] Connection lost",

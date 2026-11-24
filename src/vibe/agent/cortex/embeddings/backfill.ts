@@ -6,7 +6,7 @@ import "server-only";
  * Step 2: Find all cortex_nodes with NULL embeddings and generate them in batches.
  * Rate-limited to avoid API throttling.
  */
-import { and, eq, isNotNull, isNull, notInArray, sql } from "drizzle-orm";
+import { and, asc, eq, gt, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { makeHeadlessContext } from "next-vibe/core/execution-context";
 import { db, getLongRunningDb } from "next-vibe/database";
 
@@ -269,7 +269,7 @@ export async function materializeAllVirtualMounts(): Promise<number> {
 /**
  * Backfill embeddings for all cortex file nodes that have NULL embedding.
  * When force=true, clears all existing embeddings first (use after format change).
- * Tracks failed/skipped node IDs to avoid infinite re-processing.
+ * Scans by primary key so each eligible node is visited once per run.
  * Returns the number of nodes processed.
  */
 export async function backfillEmbeddings(force = false): Promise<{
@@ -297,22 +297,10 @@ export async function backfillEmbeddings(force = false): Promise<{
   let skipped = 0;
   let batchCount = 0;
 
-  // Track IDs that failed or were skipped so we don't re-fetch them
-  const excludeIds: string[] = [];
+  let lastId: string | undefined;
 
   while (batchCount < MAX_BATCHES) {
     batchCount++;
-
-    // Fetch next batch of nodes without embeddings, excluding already-failed ones
-    const whereConditions = [
-      eq(cortexNodes.nodeType, CortexNodeType.FILE),
-      eq(cortexNodes.isDeleted, false),
-      isNull(cortexNodes.embedding),
-    ];
-
-    if (excludeIds.length > 0) {
-      whereConditions.push(notInArray(cortexNodes.id, excludeIds));
-    }
 
     const batch = await db
       .select({
@@ -322,7 +310,15 @@ export async function backfillEmbeddings(force = false): Promise<{
         content: cortexNodes.content,
       })
       .from(cortexNodes)
-      .where(and(...whereConditions))
+      .where(
+        and(
+          eq(cortexNodes.nodeType, CortexNodeType.FILE),
+          eq(cortexNodes.isDeleted, false),
+          isNull(cortexNodes.embedding),
+          lastId ? gt(cortexNodes.id, lastId) : undefined,
+        ),
+      )
+      .orderBy(asc(cortexNodes.id))
       .limit(BATCH_SIZE);
 
     if (batch.length === 0) {
@@ -330,6 +326,7 @@ export async function backfillEmbeddings(force = false): Promise<{
     }
 
     for (const node of batch) {
+      lastId = node.id;
       // Embed content only - path is for filtering/display, not semantic match.
       // Native paths keep content in the column; virtual mounts store NULL
       // content, so re-derive it live from the source table at embed time.
@@ -341,7 +338,6 @@ export async function backfillEmbeddings(force = false): Promise<{
 
       if (textToEmbed.trim().length === 0) {
         skipped++;
-        excludeIds.push(node.id);
         continue;
       }
 
@@ -355,7 +351,6 @@ export async function backfillEmbeddings(force = false): Promise<{
 
       if (!embedding) {
         failed++;
-        excludeIds.push(node.id);
         continue;
       }
 
@@ -392,7 +387,6 @@ export async function backfillMessageEmbeddings(force = false): Promise<{
   const { ChatMessageRole } = await import("../../chat/enum");
   const { buildMessageEmbedText } = await import("./message-embed");
   const { createHash } = await import("node:crypto");
-  const { or, notInArray: notInArrayMsg } = await import("drizzle-orm");
 
   if (force) {
     await db
@@ -405,22 +399,10 @@ export async function backfillMessageEmbeddings(force = false): Promise<{
   let failed = 0;
   let skipped = 0;
   let batchCount = 0;
-  const excludeIds: string[] = [];
+  let lastId: string | undefined;
 
   while (batchCount < MAX_BATCHES) {
     batchCount++;
-
-    const whereConditions = [
-      isNull(chatMessages.embedding),
-      or(
-        eq(chatMessages.role, ChatMessageRole.USER),
-        eq(chatMessages.role, ChatMessageRole.ASSISTANT),
-      ),
-    ];
-
-    if (excludeIds.length > 0) {
-      whereConditions.push(notInArrayMsg(chatMessages.id, excludeIds));
-    }
 
     const batch = await db
       .select({
@@ -431,7 +413,17 @@ export async function backfillMessageEmbeddings(force = false): Promise<{
         embeddingHash: chatMessages.embeddingHash,
       })
       .from(chatMessages)
-      .where(and(...whereConditions))
+      .where(
+        and(
+          isNull(chatMessages.embedding),
+          or(
+            eq(chatMessages.role, ChatMessageRole.USER),
+            eq(chatMessages.role, ChatMessageRole.ASSISTANT),
+          ),
+          lastId ? gt(chatMessages.id, lastId) : undefined,
+        ),
+      )
+      .orderBy(asc(chatMessages.id))
       .limit(BATCH_SIZE);
 
     if (batch.length === 0) {
@@ -439,10 +431,10 @@ export async function backfillMessageEmbeddings(force = false): Promise<{
     }
 
     for (const msg of batch) {
+      lastId = msg.id;
       const text = buildMessageEmbedText(msg);
       if (!text) {
         skipped++;
-        excludeIds.push(msg.id);
         continue;
       }
 
@@ -453,7 +445,6 @@ export async function backfillMessageEmbeddings(force = false): Promise<{
 
       if (msg.embeddingHash === hash) {
         skipped++;
-        excludeIds.push(msg.id);
         continue;
       }
 
@@ -464,7 +455,6 @@ export async function backfillMessageEmbeddings(force = false): Promise<{
 
       if (!embedding) {
         failed++;
-        excludeIds.push(msg.id);
         continue;
       }
 

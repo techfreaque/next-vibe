@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 import {
   aspectRatioToImageSize,
   describeAspectRatio,
+  modelsLabImageDimensions,
   parseAspectRatio,
   snapAspectRatio,
 } from "./aspect-ratio";
@@ -47,5 +48,11 @@ describe("image aspect ratios", () => {
     expect(describeAspectRatio(1792, 1024)).toBe("7:4");
     expect(describeAspectRatio(1024, 1792)).toBe("4:7");
     expect(describeAspectRatio(1000, 300)).toBe("10:3");
+  });
+
+  it("sends portrait and landscape pixel dimensions within ModelsLab's bounds", () => {
+    expect(modelsLabImageDimensions("2:3")).toEqual({ width: 680, height: 1024 });
+    expect(modelsLabImageDimensions("16:9")).toEqual({ width: 1024, height: 576 });
+    expect(modelsLabImageDimensions(undefined)).toBeUndefined();
   });
 });

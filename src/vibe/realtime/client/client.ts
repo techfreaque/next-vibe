@@ -456,7 +456,8 @@ function connect(logger: EndpointLogger): void {
 
   const protocol = getCurrentProtocol() === "https:" ? "wss:" : "ws:";
   const requestId = mintRequestId();
-  const url = `${protocol}//${getCurrentHost()}/ws?requestId=${requestId}`;
+  const retry = pendingDrop === null ? "" : "&retry=1";
+  const url = `${protocol}//${getCurrentHost()}/ws?requestId=${requestId}${retry}`;
 
   lastLogger = logger;
   const connectStartedAt = Date.now();

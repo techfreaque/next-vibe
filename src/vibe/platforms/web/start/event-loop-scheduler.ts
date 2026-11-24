@@ -82,3 +82,51 @@ export function describeSchedulerEvidence(
   }
   return "no-dominant-scheduler-counter";
 }
+
+function readCpuPressureTotal(path: string): number | undefined {
+  try {
+    const total = /^some [^\n]*\btotal=(\d+)/m.exec(
+      readFileSync(path, "utf8"),
+    )?.[1];
+    if (total !== undefined && Number.isSafeInteger(Number(total))) {
+      return Number(total);
+    }
+  } catch {
+    // PSI is optional on older kernels and isolated hosts.
+  }
+  return undefined;
+}
+
+export function readCpuPressureSample():
+  | {
+      host?: number;
+      cgroup?: number;
+    }
+  | undefined {
+  if (process.platform !== "linux") {
+    return undefined;
+  }
+  const host = readCpuPressureTotal("/proc/pressure/cpu");
+  const cgroup = readCpuPressureTotal("/sys/fs/cgroup/cpu.pressure");
+  return host === undefined && cgroup === undefined
+    ? undefined
+    : { host, cgroup };
+}
+
+function pressureDeltaMs(before?: number, after?: number): number | undefined {
+  return before !== undefined && after !== undefined && after >= before
+    ? Math.round((after - before) / 1_000)
+    : undefined;
+}
+
+/** Time in the five-second lag window with at least one runnable task waiting. */
+export function cpuPressureWindow(
+  before: ReturnType<typeof readCpuPressureSample>,
+  after: ReturnType<typeof readCpuPressureSample>,
+): { hostSomeMs?: number; cgroupSomeMs?: number } | undefined {
+  const hostSomeMs = pressureDeltaMs(before?.host, after?.host);
+  const cgroupSomeMs = pressureDeltaMs(before?.cgroup, after?.cgroup);
+  return hostSomeMs === undefined && cgroupSomeMs === undefined
+    ? undefined
+    : { hostSomeMs, cgroupSomeMs };
+}

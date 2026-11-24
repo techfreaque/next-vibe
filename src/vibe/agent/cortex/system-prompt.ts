@@ -132,6 +132,7 @@ export const cortexFragment: SystemPromptFragment = {
       return renderCortexFragment({ unavailableNote });
     }
 
+    const startedAt = Date.now();
     try {
       const { getVirtualMountCounts } = await import("./mounts/resolver");
       const currentThreadId = params.threadId;
@@ -264,9 +265,22 @@ export const cortexFragment: SystemPromptFragment = {
 
       return renderCortexFragment(data);
     } catch (error) {
+      const { databaseFailureDiagnostics } =
+        await import("next-vibe/database/error-diagnostics");
+      const { DrizzleQueryError } = await import("drizzle-orm");
+      const failedQuery = error instanceof DrizzleQueryError;
+      const parsed = error instanceof Error ? error : parseError(error);
       logger.error("Failed to load Cortex data for system prompt", {
         userId,
-        error: error instanceof Error ? error.message : String(error),
+        elapsedMs: Date.now() - startedAt,
+        ...(failedQuery
+          ? {
+              queryStage: error.query.includes("/* cortex-upload-count */")
+                ? "upload-count"
+                : "other-query",
+              ...databaseFailureDiagnostics(error),
+            }
+          : { error: parsed.message, errorType: parsed.name }),
       });
       return null;
     }

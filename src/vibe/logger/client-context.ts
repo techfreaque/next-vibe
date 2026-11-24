@@ -63,7 +63,7 @@ export function getClientRoute(): string | null {
 /** Attribute automated traffic for diagnostics only. */
 export function identifyBrowserAutomation(userAgent: string): string | null {
   if (
-    /meta-externalagent|meta-externalfetcher|facebookexternalhit/i.test(
+    /meta-externalagent|meta-externalfetcher|meta-webindexer|facebookexternalhit/i.test(
       userAgent,
     )
   ) {
