@@ -114,6 +114,10 @@ export const translations: typeof enTranslations = {
   },
   models: {
     descriptions: {
+      qwen3Ryan:
+        "Ryan legge ad alta voce in 10 lingue, tra cui il tedesco, con il modello vocale aperto Qwen3.",
+      orpheusTara:
+        "Tara legge in inglese con un ritmo espressivo ed effetti vocali.",
       openaiAlloy:
         "Lega OpenAI - Voce bilanciata e neutrale per contenuti professionali",
       openaiNova:

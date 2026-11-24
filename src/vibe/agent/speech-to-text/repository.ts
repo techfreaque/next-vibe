@@ -17,6 +17,7 @@ import {
 import { parseError } from "next-vibe/core/utils/parse-error";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
+import { z } from "zod";
 
 import { protectedBalance } from "@/credits/anti-farming/spending";
 import { scopedTranslation as creditsScopedTranslation } from "@/credits/i18n";
@@ -150,6 +151,28 @@ export class SpeechToTextRepository {
   /** Pre-flight: the balance must cover this many seconds at the model's rate */
   private static readonly MINIMUM_BALANCE_SECONDS = 5;
 
+  private static readonly compatibleTranscriptSchema = z.object({
+    text: z.string().optional(),
+    duration: z.number().optional(),
+    segments: z
+      .array(
+        z.object({
+          avg_logprob: z.number().optional(),
+          start: z.number().optional(),
+          end: z.number().optional(),
+          text: z.string().optional(),
+        }),
+      )
+      .optional(),
+    usage: z
+      .object({
+        cost: z.number().optional(),
+        currency: z.string().optional(),
+        seconds: z.number().optional(),
+      })
+      .optional(),
+  });
+
   /**
    * Transcribe one chunk using the resolved provider
    */
@@ -189,10 +212,11 @@ export class SpeechToTextRepository {
           logger,
           t,
           fetchImpl,
-          "openAi",
+          "openAiStt",
           task,
         );
       case ApiProvider.NANO_GPT:
+      case ApiProvider.OPENROUTER:
         return SpeechToTextRepository.transcribeWithOpenAI(
           file,
           modelOption.providerModel,
@@ -200,7 +224,9 @@ export class SpeechToTextRepository {
           logger,
           t,
           fetchImpl,
-          "nanoGPT",
+          modelOption.apiProvider === ApiProvider.OPENROUTER
+            ? "openRouter"
+            : "nanoGPT",
         );
       case ApiProvider.EDEN_AI_STT:
         return SpeechToTextRepository.transcribeWithEdenAI(
@@ -628,26 +654,19 @@ export class SpeechToTextRepository {
     logger: EndpointLogger,
     t: SpeechToTextT,
     fetchImpl: typeof globalThis.fetch,
-    target: "openAi" | "nanoGPT" = "openAi",
+    target: "openAiStt" | "nanoGPT" | "openRouter",
     task: SttCallOptions["task"] = "transcribe",
   ): Promise<ResponseType<SttChunkResult>> {
-    // NanoGPT exposes an OpenAI-compatible /audio/transcriptions endpoint
-    const apiKey =
-      target === "nanoGPT"
-        ? agentEnv.NANO_GPT_API_KEY
-        : agentEnv.OPENAI_API_KEY;
-    const endpoint =
-      target === "nanoGPT"
-        ? "https://api.nano-gpt.com/api/v1/audio/transcriptions"
-        : task === "translate"
-          ? "https://api.openai.com/v1/audio/translations"
-          : "https://api.openai.com/v1/audio/transcriptions";
+    const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS[target];
+    const apiKey = agentEnv[envKey];
+    const baseUrl = {
+      nanoGPT: "https://api.nano-gpt.com/api/v1",
+      openAiStt: "https://api.openai.com/v1",
+      openRouter: "https://openrouter.ai/api/v1",
+    }[target];
+    const endpoint = `${baseUrl}/audio/${task === "translate" ? "translations" : "transcriptions"}`;
     if (!apiKey) {
-      const { envKey, url, label } =
-        target === "nanoGPT"
-          ? PROVIDER_SETUP_INSTRUCTIONS.nanoGPT
-          : PROVIDER_SETUP_INSTRUCTIONS.openAiStt;
-      logger.error("[STT] OpenAI API key not configured");
+      logger.error("[STT] API key not configured", { target });
       return fail({
         message: t("post.errors.notConfigured", { label, envKey, url }),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
@@ -676,13 +695,14 @@ export class SpeechToTextRepository {
     if (task !== "translate") {
       formData.append("language", language);
     }
-    // NanoGPT models differ in supported formats; plain json works for all
+    // Plain JSON works across gateway models whose timing support varies.
     formData.append(
       "response_format",
-      target === "nanoGPT" ? "json" : "verbose_json",
+      target === "openAiStt" ? "verbose_json" : "json",
     );
 
-    logger.debug("[STT] Calling OpenAI Whisper API", {
+    logger.debug("[STT] Calling transcription API", {
+      target,
       model: providerModel,
       language,
       originalMime: file.type,
@@ -703,7 +723,8 @@ export class SpeechToTextRepository {
 
     if (!response.ok) {
       const errorText = await response.text();
-      logger.error("[STT] OpenAI Whisper API error", {
+      logger.error("[STT] Transcription API error", {
+        target,
         status: response.status,
         error: errorText,
         normalizedMime,
@@ -716,21 +737,21 @@ export class SpeechToTextRepository {
       });
     }
 
-    const data = (await response.json()) as {
-      text?: string;
-      duration?: number;
-      segments?: Array<{
-        avg_logprob?: number;
-        start?: number;
-        end?: number;
-        text?: string;
-      }>;
-      /** NanoGPT only: what the call cost us, e.g. { cost: 0.001, currency: "USD" } */
-      usage?: { cost?: number; currency?: string };
-    };
+    const parsed = SpeechToTextRepository.compatibleTranscriptSchema.safeParse(
+      await response.json(),
+    );
+    if (!parsed.success) {
+      return fail({
+        message: t("post.errors.transcriptionFailed", {
+          error: parsed.error.message,
+        }),
+        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+      });
+    }
+    const data = parsed.data;
 
     const text = data.text ?? "";
-    const duration = data.duration ?? 0;
+    const duration = data.duration ?? data.usage?.seconds ?? 0;
     // OpenAI doesn't return a confidence score directly, approximate from log prob
     const confidence =
       data.segments && data.segments.length > 0

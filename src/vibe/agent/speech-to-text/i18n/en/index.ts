@@ -246,6 +246,12 @@ export const translations = {
   },
   models: {
     descriptions: {
+      qwen3Asr:
+        "Transcribe speech in 30 languages and 22 Chinese dialects with Qwen3 ASR.",
+      parakeetV3:
+        "Transcribe 25 European languages with automatic language detection and punctuation.",
+      nemotron35Transcribe:
+        "Transcribe up to an hour of audio in 40 languages with NVIDIA Nemotron.",
       openaiWhisper:
         "OpenAI Whisper - State-of-the-art speech recognition for 99 languages",
       deepgramNova2:

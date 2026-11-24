@@ -58,6 +58,7 @@ import { NanoGptPriceFetcher } from "./providers/nano-gpt";
 import { OpenAiImagePriceFetcher } from "./providers/openai-images";
 import { OpenAiSttPriceFetcher } from "./providers/openai-stt";
 import { OpenAiTtsPriceFetcher } from "./providers/openai-tts";
+import { OpenRouterAudioPriceFetcher } from "./providers/openrouter-audio";
 import { OpenRouterImagePriceFetcher } from "./providers/openrouter-image";
 import { OpenRouterTokenPriceFetcher } from "./providers/openrouter-token";
 import { OpenRouterVideoPriceFetcher } from "./providers/openrouter-video";
@@ -71,6 +72,7 @@ export type { PriceFetcher, ProviderPriceResult };
 /** Fetchers that run on every platform */
 const BASE_FETCHERS: PriceFetcher[] = [
   new OpenRouterTokenPriceFetcher(),
+  new OpenRouterAudioPriceFetcher(),
   new OpenRouterImagePriceFetcher(),
   new OpenRouterVideoPriceFetcher(),
   new ReplicatePriceFetcher(),

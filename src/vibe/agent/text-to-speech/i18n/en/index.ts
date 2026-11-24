@@ -111,6 +111,9 @@ export const translations = {
   },
   models: {
     descriptions: {
+      qwen3Ryan:
+        "Ryan reads aloud in 10 languages, including German, with the open Qwen3 voice model.",
+      orpheusTara: "Tara reads English with expressive pacing and vocal cues.",
       openaiAlloy:
         "OpenAI Alloy - Balanced, neutral voice for professional content",
       openaiNova:

@@ -113,6 +113,10 @@ export const translations: typeof enTranslations = {
   },
   models: {
     descriptions: {
+      qwen3Ryan:
+        "Ryan lee en voz alta en 10 idiomas, incluido el alemán, con el modelo de voz abierto Qwen3.",
+      orpheusTara:
+        "Tara lee en inglés con una entonación expresiva y efectos de voz.",
       openaiAlloy:
         "Aleación OpenAI - Voz equilibrada y neutral para el contenido profesional",
       openaiNova:

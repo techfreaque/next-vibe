@@ -117,6 +117,10 @@ export const translations: typeof enTranslations = {
   },
   models: {
     descriptions: {
+      qwen3Ryan:
+        "Ryan liest mit dem offenen Qwen3-Sprachmodell in zehn Sprachen vor, darunter Deutsch.",
+      orpheusTara:
+        "Tara liest englische Texte mit ausdrucksvoller Betonung und stimmlichen Effekten.",
       openaiAlloy:
         "OpenAI Alloy - Ausgewogene, neutrale Stimme für professionelle Inhalte",
       openaiNova:

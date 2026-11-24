@@ -252,6 +252,12 @@ export const translations: typeof enTranslations = {
   },
   models: {
     descriptions: {
+      qwen3Asr:
+        "Qwen3 ASR transkribiert 30 Sprachen und 22 chinesische Dialekte.",
+      parakeetV3:
+        "Transkribiere 25 europäische Sprachen mit automatischer Spracherkennung und Zeichensetzung.",
+      nemotron35Transcribe:
+        "NVIDIA Nemotron transkribiert bis zu eine Stunde Audio in 40 Sprachen.",
       openaiWhisper:
         "OpenAI Whisper - Spracherkennung auf Spitzenniveau für 99 Sprachen",
       deepgramNova2:

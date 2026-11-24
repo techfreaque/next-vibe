@@ -39,6 +39,9 @@ export enum SttModelId {
   VOXTRAL_MINI_TRANSCRIBE = "voxtral-mini-transcribe",
   NEMOTRON_ASR = "nemotron-asr",
   GPT4O_MINI_TRANSCRIBE = "gpt4o-mini-transcribe",
+  QWEN3_ASR_0_6B = "qwen3-asr-0.6b",
+  PARAKEET_TDT_V3 = "parakeet-tdt-v3",
+  NEMOTRON_3_5_TRANSCRIBE = "nemotron-3.5-transcribe",
 }
 
 export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
@@ -280,6 +283,91 @@ export const sttModelDefinitions: Record<SttModelId, ModelDefinition> = {
       },
     ],
   },
+  [SttModelId.QWEN3_ASR_0_6B]: {
+    name: "Qwen3 ASR 0.6B",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
+    by: "alibaba",
+    description: "speechToText.models.descriptions.qwen3Asr",
+    contextWindow: 0,
+    parameterCount: 0.6,
+    icon: "mic",
+    inputs: ["audio"],
+    outputs: ["text"],
+    utilities: [ModelUtility.STT],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.QUICK,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: SttModelId.QWEN3_ASR_0_6B,
+        apiProvider: ApiProvider.NANO_GPT,
+        providerModel: "qwen/qwen3-asr-0.6b",
+        creditCostPerSecond: 0.000333, // updated: 2026-11-24 from nano-gpt.com/api/v1/audio-models ($0.0001998/min)
+        roundUpAudioSeconds: true,
+      },
+    ],
+  },
+  [SttModelId.PARAKEET_TDT_V3]: {
+    name: "Parakeet TDT v3",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
+    by: "nvidia",
+    description: "speechToText.models.descriptions.parakeetV3",
+    contextWindow: 0,
+    parameterCount: 0.6,
+    icon: "mic",
+    inputs: ["audio"],
+    outputs: ["text"],
+    utilities: [ModelUtility.STT],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: SttModelId.PARAKEET_TDT_V3,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "nvidia/parakeet-tdt-0.6b-v3",
+        creditCostPerSecond: 0.0025, // updated: 2026-11-24 from openrouter-audio-api (up to $0.0015/min)
+      },
+    ],
+  },
+  [SttModelId.NEMOTRON_3_5_TRANSCRIBE]: {
+    name: "Nemotron 3.5 Transcribe",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
+    by: "nvidia",
+    description: "speechToText.models.descriptions.nemotron35Transcribe",
+    contextWindow: 0,
+    parameterCount: 30,
+    icon: "mic",
+    inputs: ["audio"],
+    outputs: ["text"],
+    utilities: [ModelUtility.STT],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: SttModelId.NEMOTRON_3_5_TRANSCRIBE,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "nvidia/nemotron-3.5-transcribe",
+        creditCostPerSecond: 0.00333, // updated: 2026-11-24 from openrouter-audio-api (up to $0.001998/min)
+      },
+    ],
+  },
 };
 
 export type SttModelOption = ModelOptionSttBased & { id: SttModelId };
@@ -311,6 +399,7 @@ function buildSttOption(
     voiceMeta: def.voiceMeta,
     commercialUse: def.commercialUse,
     creditCostPerSecond: provider.creditCostPerSecond,
+    roundUpAudioSeconds: provider.roundUpAudioSeconds,
   };
 }
 
@@ -356,7 +445,10 @@ export interface SttChunkUsage {
  * the standard markup and the media round-up once.
  */
 export function calculateSttCharge(
-  option: Pick<ModelOptionSttBased, "creditCostPerSecond">,
+  option: Pick<
+    ModelOptionSttBased,
+    "creditCostPerSecond" | "roundUpAudioSeconds"
+  >,
   chunks: readonly SttChunkUsage[],
 ): { credits: number; providerCostChunks: number; minimumChunks: number } {
   let providerCredits = 0;
@@ -367,7 +459,10 @@ export function calculateSttCharge(
       providerCredits += chunk.providerCostUsd / CREDIT_VALUE_USD;
       providerCostChunks++;
     } else if (chunk.duration > 0) {
-      providerCredits += chunk.duration * option.creditCostPerSecond;
+      const audioSeconds = option.roundUpAudioSeconds
+        ? Math.ceil(chunk.duration)
+        : chunk.duration;
+      providerCredits += audioSeconds * option.creditCostPerSecond;
     } else {
       providerCredits += option.creditCostPerSecond;
       minimumChunks++;

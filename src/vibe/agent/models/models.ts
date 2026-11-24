@@ -291,6 +291,7 @@ export interface ModelProviderConfigSttBased {
   apiProvider: ApiProvider;
   providerModel: string;
   creditCostPerSecond: number;
+  roundUpAudioSeconds?: boolean;
   adminOnly?: boolean;
   creditCost?: never;
   inputTokenCost?: never;
@@ -561,6 +562,7 @@ export interface ModelOptionTtsBased extends ModelOptionBase {
 export interface ModelOptionSttBased extends ModelOptionBase {
   id: SttModelId;
   creditCostPerSecond: number;
+  roundUpAudioSeconds?: boolean;
   defaultDurationSeconds?: never;
   creditCost?: never;
   inputTokenCost?: never;
@@ -715,6 +717,11 @@ export const modelProviders: Record<string, ModelProvider> = {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
     name: "Deepgram",
     icon: "mic",
+  },
+  canopyLabs: {
+    // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
+    name: "Canopy Labs",
+    icon: "volume-2",
   },
   hexgrad: {
     // eslint-disable-next-line i18next/no-literal-string -- Provider name is technical identifier
@@ -920,11 +927,15 @@ export function calculateTtsCreditCost(
  * Single source for billing, pre-flight checks and price hints.
  */
 export function calculateSttCreditCost(
-  option: Pick<ModelOptionSttBased, "creditCostPerSecond">,
+  option: Pick<
+    ModelOptionSttBased,
+    "creditCostPerSecond" | "roundUpAudioSeconds"
+  >,
   seconds: number,
 ): number {
   return chargeForProviderCredits(
-    option.creditCostPerSecond * Math.max(0, seconds),
+    option.creditCostPerSecond *
+      Math.max(0, option.roundUpAudioSeconds ? Math.ceil(seconds) : seconds),
   );
 }
 

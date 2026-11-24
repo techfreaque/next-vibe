@@ -2477,6 +2477,12 @@ export const translations = {
           "Transcribe recorded speech with Mistral’s Voxtral Small.",
         voxtralMini:
           "Voxtral Mini Transcribe - Mistral transcription with diarization and segment timestamps, up to 10 minutes.",
+        qwen3Asr:
+          "Transcribe speech in 30 languages and 22 Chinese dialects with Qwen3 ASR.",
+        parakeetV3:
+          "Transcribe 25 European languages with automatic language detection and punctuation.",
+        nemotron35Transcribe:
+          "Transcribe up to an hour of audio in 40 languages with NVIDIA Nemotron.",
         nemotronAsr:
           "Nemotron ASR - NVIDIA open multilingual speech recognition, 40 locales, low latency.",
         gpt4oMiniTranscribe:
@@ -2612,6 +2618,10 @@ export const translations = {
           "ElevenLabs Adam Turbo - Same voice on v4 Turbo. Half the price, near-instant replies.",
         kokoroBella:
           "Kokoro Bella - Open-weight 82M model, warm American female voice. No content filter.",
+        qwen3Ryan:
+          "Ryan reads aloud in 10 languages, including German, with the open Qwen3 voice model.",
+        orpheusTara:
+          "Tara reads English with expressive pacing and vocal cues.",
         kokoroSarah:
           "Kokoro Sarah - Open-weight 82M model, clear American female voice. No content filter.",
         kokoroNicole:

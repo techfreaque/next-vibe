@@ -2458,6 +2458,12 @@ export const translations: typeof enTranslations = {
           "Voxtral Small firmy Mistral zamienia nagraną mowę na tekst.",
         voxtralMini:
           "Voxtral Mini Transcribe - transkrypcja Mistral z rozdzielaniem mówców i znacznikami czasu, do 10 minut.",
+        qwen3Asr:
+          "Qwen3 ASR transkrybuje mowę w 30 językach i 22 chińskich dialektach.",
+        parakeetV3:
+          "Transkrybuj mowę w 25 językach europejskich z automatycznym rozpoznawaniem języka i interpunkcją.",
+        nemotron35Transcribe:
+          "NVIDIA Nemotron transkrybuje nagrania do godziny w 40 językach.",
         nemotronAsr:
           "Nemotron ASR - otwarte wielojęzyczne rozpoznawanie mowy NVIDIA, 40 wariantów językowych, niskie opóźnienie.",
         gpt4oMiniTranscribe:
@@ -2585,6 +2591,10 @@ export const translations: typeof enTranslations = {
         elevenlabsAdamTurbo: "ElevenLabs Adam Turbo",
         kokoroBella:
           "Kokoro Bella - Otwarty model 82M, ciepły amerykański głos kobiecy. Bez filtra treści.",
+        qwen3Ryan:
+          "Ryan czyta na głos w 10 językach, w tym po niemiecku, za pomocą otwartego modelu Qwen3.",
+        orpheusTara:
+          "Tara czyta po angielsku z wyrazistą intonacją i efektami głosowymi.",
         kokoroSarah:
           "Kokoro Sarah - Otwarty model 82M, wyraźny amerykański głos kobiecy. Bez filtra treści.",
         kokoroNicole:

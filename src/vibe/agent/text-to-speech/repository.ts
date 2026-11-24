@@ -62,6 +62,7 @@ export const TTS_FORMATS_BY_PROVIDER: Partial<
 > = {
   [ApiProvider.OPENAI_TTS]: TTS_OUTPUT_FORMATS,
   [ApiProvider.NANO_GPT]: TTS_OUTPUT_FORMATS,
+  [ApiProvider.OPENROUTER]: ["mp3", "pcm"],
   [ApiProvider.ELEVENLABS]: ["mp3", "opus", "pcm"],
   [ApiProvider.EDEN_AI_TTS]: ["mp3"],
 };
@@ -202,19 +203,21 @@ export class TextToSpeechRepository {
   }
 
   /**
-   * Convert text to speech via NanoGPT (OpenAI-compatible /audio/speech).
-   * providerModel = "<nanoModelId>:<voice>" (e.g. "Kokoro-82m:af_bella").
+   * Convert text to speech through an OpenAI-compatible gateway.
+   * providerModel = "<modelId>:<voice>".
    */
-  private static async callNanoGptTTS(
+  private static async callGatewayTTS(
     text: string,
     providerModel: string,
     logger: EndpointLogger,
     t: TextToSpeechT,
     fetchImpl: typeof globalThis.fetch,
     output: TtsOutputOptions,
+    target: "nanoGPT" | "openRouter",
   ): Promise<ResponseType<string>> {
-    if (!agentEnv.NANO_GPT_API_KEY) {
-      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.nanoGPT;
+    const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS[target];
+    const apiKey = agentEnv[envKey];
+    if (!apiKey) {
       return fail({
         message: t("post.errors.notConfigured", { label, envKey, url }),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -225,15 +228,17 @@ export class TextToSpeechRepository {
     const model = sep === -1 ? providerModel : providerModel.slice(0, sep);
     const voice = sep === -1 ? undefined : providerModel.slice(sep + 1);
 
-    logger.debug("[TTS] Calling NanoGPT TTS API", { model, voice });
+    logger.debug("[TTS] Calling gateway speech API", { target, model, voice });
 
     const response = await fetchImpl(
-      "https://api.nano-gpt.com/api/v1/audio/speech",
+      target === "openRouter"
+        ? "https://openrouter.ai/api/v1/audio/speech"
+        : "https://api.nano-gpt.com/api/v1/audio/speech",
       {
         method: "POST",
         headers: {
           // eslint-disable-next-line i18next/no-literal-string
-          Authorization: `Bearer ${agentEnv.NANO_GPT_API_KEY}`,
+          Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -241,14 +246,15 @@ export class TextToSpeechRepository {
           input: text,
           voice,
           response_format: output.format,
-          speed: output.speed,
+          speed: target === "nanoGPT" ? output.speed : undefined,
         }),
       },
     );
 
     if (!response.ok) {
       const errorText = await response.text();
-      logger.error("[TTS] NanoGPT TTS API error", {
+      logger.error("[TTS] Gateway speech API error", {
+        target,
         status: response.status,
         error: errorText,
         model,
@@ -265,7 +271,9 @@ export class TextToSpeechRepository {
     }
 
     const audioBuffer = await response.arrayBuffer();
-    const contentType = response.headers.get("content-type") || "audio/mpeg";
+    const contentType =
+      response.headers.get("content-type") ||
+      (output.format === "pcm" ? "audio/pcm" : "audio/mpeg");
     const base64Audio = Buffer.from(audioBuffer).toString("base64");
     // eslint-disable-next-line i18next/no-literal-string
     return success(`data:${contentType};base64,${base64Audio}`);
@@ -627,13 +635,17 @@ export class TextToSpeechRepository {
         }
 
         case ApiProvider.NANO_GPT:
-          audioResult = await TextToSpeechRepository.callNanoGptTTS(
+        case ApiProvider.OPENROUTER:
+          audioResult = await TextToSpeechRepository.callGatewayTTS(
             data.text,
             modelOption.providerModel,
             logger,
             t,
             fetchImpl,
             output,
+            modelOption.apiProvider === ApiProvider.OPENROUTER
+              ? "openRouter"
+              : "nanoGPT",
           );
           break;
 

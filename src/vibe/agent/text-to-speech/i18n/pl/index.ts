@@ -112,6 +112,10 @@ export const translations: typeof enTranslations = {
   },
   models: {
     descriptions: {
+      qwen3Ryan:
+        "Ryan czyta na głos w 10 językach, w tym po niemiecku, za pomocą otwartego modelu Qwen3.",
+      orpheusTara:
+        "Tara czyta po angielsku z wyrazistą intonacją i efektami głosowymi.",
       openaiAlloy:
         "OpenAI Alloy - Zrównoważony, neutralny głos do profesjonalnych treści",
       openaiNova: "OpenAI Nova - Ciepły, przyjazny głos, idealny do rozmów",

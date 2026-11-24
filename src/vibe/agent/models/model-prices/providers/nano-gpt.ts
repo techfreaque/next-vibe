@@ -89,6 +89,8 @@ const audioModelSchema = z.object({
       per_thousand_chars: z.number().nullish(),
       per_minute: z.number().nullish(),
       per_second: z.number().nullish(),
+      billing_increment_seconds: z.number().optional(),
+      rounding: z.string().optional(),
     })
     .nullish(),
   supported_parameters: z
@@ -104,6 +106,11 @@ type NanoGptAudioModel = z.infer<typeof audioModelSchema>;
  */
 const TTS_PRICING_KEYS = new Set(["currency", "per_thousand_chars"]);
 const STT_PRICING_KEYS = new Set(["currency", "per_minute", "per_second"]);
+const STT_WHOLE_SECOND_PRICING_KEYS = new Set([
+  ...STT_PRICING_KEYS,
+  "billing_increment_seconds",
+  "rounding",
+]);
 
 type CatalogFetch =
   | { ok: true; items: Map<string, CatalogItem> }
@@ -412,7 +419,17 @@ export class NanoGptPriceFetcher extends PriceFetcher {
           continue;
         }
         const { model } = found;
-        const unsupported = unsupportedPricing(model, STT_PRICING_KEYS);
+        const billsWholeSeconds =
+          model.pricing?.billing_increment_seconds === 1 &&
+          model.pricing.rounding === "ceil";
+        const unsupported = unsupportedPricing(
+          model,
+          billsWholeSeconds &&
+            "roundUpAudioSeconds" in providerConfig &&
+            providerConfig.roundUpAudioSeconds
+            ? STT_WHOLE_SECOND_PRICING_KEYS
+            : STT_PRICING_KEYS,
+        );
         const usdPerSecond = sttUsdPerSecond(model);
         if (unsupported || usdPerSecond === undefined || usdPerSecond <= 0) {
           fail(unsupported ?? "no per_minute/per_second price");

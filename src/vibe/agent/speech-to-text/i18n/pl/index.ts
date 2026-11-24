@@ -250,6 +250,12 @@ export const translations: typeof enTranslations = {
   },
   models: {
     descriptions: {
+      qwen3Asr:
+        "Qwen3 ASR transkrybuje mowę w 30 językach i 22 chińskich dialektach.",
+      parakeetV3:
+        "Transkrybuj mowę w 25 językach europejskich z automatycznym rozpoznawaniem języka i interpunkcją.",
+      nemotron35Transcribe:
+        "NVIDIA Nemotron transkrybuje nagrania do godziny w 40 językach.",
       openaiWhisper:
         "OpenAI Whisper - Najwyższej klasy rozpoznawanie mowy w 99 językach",
       deepgramNova2:

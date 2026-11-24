@@ -61,6 +61,8 @@ export enum TtsModelId {
   XAI_EVE = "xai-eve",
   GEMINI_ZEPHYR = "gemini-zephyr",
   GEMINI_PUCK = "gemini-puck",
+  QWEN3_TTS_RYAN = "qwen3-tts-ryan",
+  ORPHEUS_TARA = "orpheus-tara",
 }
 
 export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
@@ -1020,6 +1022,64 @@ export const ttsModelDefinitions: Record<TtsModelId, ModelDefinition> = {
         apiProvider: ApiProvider.UNBOTTLED,
         providerModel: "gemini-puck",
         creditCostPerCharacter: 0.0039, // updated: 2026-11-09 from unbottled.ai
+      },
+    ],
+  },
+  [TtsModelId.QWEN3_TTS_RYAN]: {
+    name: "Ryan (Qwen3 TTS)",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
+    by: "alibaba",
+    description: "textToSpeech.models.descriptions.qwen3Ryan",
+    contextWindow: 0,
+    parameterCount: 1.7,
+    icon: "volume-2",
+    inputs: ["text"],
+    outputs: ["audio"],
+    voiceMeta: { gender: "male" },
+    utilities: [ModelUtility.TTS],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: TtsModelId.QWEN3_TTS_RYAN,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "qwen/qwen3-tts-1.7b:ryan",
+        creditCostPerCharacter: 0.002, // updated: 2026-11-24 from openrouter-audio-api ($20/1M chars)
+      },
+    ],
+  },
+  [TtsModelId.ORPHEUS_TARA]: {
+    name: "Tara (Orpheus)",
+    commercialUse: commercialUse.allowed(CommercialUseReason.OPEN_LICENSE),
+    by: "canopyLabs",
+    description: "textToSpeech.models.descriptions.orpheusTara",
+    contextWindow: 0,
+    parameterCount: 3,
+    icon: "volume-2",
+    inputs: ["text"],
+    outputs: ["audio"],
+    voiceMeta: { gender: "female", language: "en", style: "expressive" },
+    utilities: [ModelUtility.TTS],
+    supportsTools: false,
+    intelligence: IntelligenceLevel.SMART,
+    content: ContentLevel.OPEN,
+    features: {
+      ...defaultFeatures,
+      streaming: false,
+      toolCalling: false,
+    },
+    providers: [
+      {
+        id: TtsModelId.ORPHEUS_TARA,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "canopylabs/orpheus-3b-0.1-ft:tara",
+        creditCostPerCharacter: 0.0015, // updated: 2026-11-24 from openrouter-audio-api (up to $15/1M chars)
       },
     ],
   },

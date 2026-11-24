@@ -328,6 +328,8 @@ export const translations: typeof enTranslations = {
     XAI_EVE: "Eve (xAI)",
     GEMINI_ZEPHYR: "Zephyr (Gemini)",
     GEMINI_PUCK: "Puck (Gemini)",
+    QWEN3_TTS_RYAN: "Ryan (Qwen3 TTS)",
+    ORPHEUS_TARA: "Tara (Orpheus)",
     FLUX_PRO: "FLUX Pro",
     FLUX_2_MAX: "FLUX 2 Max",
     FLUX_2_KLEIN_4B: "FLUX 2 Klein 4B",
