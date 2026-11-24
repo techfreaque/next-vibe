@@ -59,7 +59,7 @@ diff --git a/dist/node/chunks/node.js b/dist/node/chunks/node.js
  	}
  	const aliasOnlyPluginContainerMap = /* @__PURE__ */ new Map();
  	async function resolveAlias(environment, id, importer) {
-@@ -33637,17 +33649,11 @@
+@@ -33637,31 +33649,30 @@
  }
  function patternToIdFilter(pattern, cwd) {
  	if (pattern instanceof RegExp) return (id) => {
@@ -79,7 +79,31 @@ diff --git a/dist/node/chunks/node.js b/dist/node/chunks/node.js
  }
  function patternToCodeFilter(pattern) {
  	if (pattern instanceof RegExp) return (code) => {
-@@ -33678,7 +33684,9 @@
+ 		const result = pattern.test(code);
+ 		pattern.lastIndex = 0;
+ 		return result;
+ 	};
+ 	return (code) => code.includes(pattern);
+ }
+ function createFilter(exclude, include) {
+ 	if (!exclude && !include) return;
+-	return (input) => {
+-		if (exclude?.some((filter) => filter(input))) return false;
+-		if (include?.some((filter) => filter(input))) return true;
+-		return !(include && include.length > 0);
+-	};
++	// Single-pattern hooks can skip the array walk on every module load.
++	if (!exclude?.length && include?.length === 1) return include[0];
++	if (!include?.length && exclude?.length === 1) return (input) => !exclude[0](input);
++	const excluded = exclude ?? [];
++	const included = include ?? [];
++	return (input) => {
++		for (const filter of excluded) if (filter(input)) return false;
++		for (const filter of included) if (filter(input)) return true;
++		return included.length === 0;
++	};
+ }
+@@ -33678,7 +33689,9 @@
  	const { exclude, include } = normalizeFilter(filter);
  	const excludeFilter = exclude?.map((p) => patternToIdFilter(p, cwd));
  	const includeFilter = include?.map((p) => patternToIdFilter(p, cwd));

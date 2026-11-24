@@ -48,3 +48,44 @@ diff --git a/dist/esm/vite/import-protection-plugin/plugin.js b/dist/esm/vite/im
  			handler(id) {
  				if (IMPORT_PROTECTION_DEBUG) {
  					if (matchesDebugFilter(id)) debugLog("load:handler", {
+diff --git a/dist/esm/start-compiler/handleCreateServerFn.js b/dist/esm/start-compiler/handleCreateServerFn.js
+--- a/dist/esm/start-compiler/handleCreateServerFn.js
++++ b/dist/esm/start-compiler/handleCreateServerFn.js
+@@ -14,9 +14,6 @@
+   import.meta.webpackHot.accept(() => {})
+ }
+ `, { placeholderPattern: false });
+-var serverRpcTemplate = babel.template.expression(`createServerRpc(%%serverFnMeta%%, %%fn%%)`);
+-var clientRpcTemplate = babel.template.expression(`createClientRpc(%%functionId%%)`);
+-var ssrRpcManifestTemplate = babel.template.expression(`createSsrRpc(%%functionId%%)`);
+ var RuntimeCodeCache = /* @__PURE__ */ new Map();
+ function getCachedRuntimeCode(framework, type) {
+ 	let cache = RuntimeCodeCache.get(framework);
+@@ -61,23 +58,18 @@
+ }
+ /**
+ * Generates the RPC stub expression for provider files.
+-* Uses pre-compiled template for performance.
+ */
+ function generateProviderRpcStub(serverFnMeta, fn) {
+-	return serverRpcTemplate({
+-		serverFnMeta,
+-		fn
+-	});
++	// Build the wrapper without a Babel template clone and placeholder traversal.
++	return t.callExpression(t.identifier("createServerRpc"), [serverFnMeta, fn]);
+ }
+ /**
+ * Generates the RPC stub expression for caller files.
+-* Uses pre-compiled templates for performance.
+ * Note: Client and SSR callers only receive the functionId string, not the full metadata.
+ */
+ function generateCallerRpcStub(functionId, envConfig) {
+-	const functionIdLiteral = t.stringLiteral(functionId);
+-	if (envConfig.runtimeCodeType === "client") return clientRpcTemplate({ functionId: functionIdLiteral });
+-	return ssrRpcManifestTemplate({ functionId: functionIdLiteral });
++	const rpc = envConfig.runtimeCodeType === "client" ? "createClientRpc" : "createSsrRpc";
++	return t.callExpression(t.identifier(rpc), [t.stringLiteral(functionId)]);
+ }
+ /**
+ * Handles createServerFn transformations for a batch of candidates.
