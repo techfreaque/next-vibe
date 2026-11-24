@@ -76,6 +76,7 @@ class ErrorRouter {
     persist: boolean;
     logger: EndpointLogger;
     cronTaskId?: string;
+    cronCreditReason?: string;
   }): Promise<void> {
     const {
       threadId,
@@ -97,6 +98,9 @@ class ErrorRouter {
       rootFolderId,
       willPersist: persist,
       ...(params.cronTaskId ? { cronTaskId: params.cronTaskId } : {}),
+      ...(params.cronCreditReason
+        ? { creditRefusalReason: params.cronCreditReason }
+        : {}),
     });
     try {
       if (persist) {
@@ -177,11 +181,12 @@ export async function emitSetupError(params: {
   const isIncognito = data.rootFolderId === "incognito";
   // Credit errors (FORBIDDEN / PAYMENT_REQUIRED) must never be stored in DB —
   // they are transient validation failures, not persistent thread state.
+  const isPaymentRequired =
+    setupResult.errorType?.errorCode ===
+    ErrorResponseTypes.PAYMENT_REQUIRED.errorCode;
   const isCreditError =
-    setupResult.errorType?.errorCode ===
-      ErrorResponseTypes.FORBIDDEN.errorCode ||
-    setupResult.errorType?.errorCode ===
-      ErrorResponseTypes.PAYMENT_REQUIRED.errorCode;
+    isPaymentRequired ||
+    setupResult.errorType?.errorCode === ErrorResponseTypes.FORBIDDEN.errorCode;
   await ErrorRouter.route({
     threadId,
     stage: "setup",
@@ -197,6 +202,8 @@ export async function emitSetupError(params: {
     persist: !isIncognito && !isCreditError,
     logger,
     cronTaskId,
+    cronCreditReason:
+      cronTaskId && isPaymentRequired ? setupResult.message : undefined,
   });
 }
 

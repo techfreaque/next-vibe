@@ -27,6 +27,7 @@ export interface ServerLogContext {
  */
 export const SERVER_LOG_FINGERPRINT_IGNORE_KEYS: ReadonlySet<string> = new Set([
   "requestId",
+  "remoteRequestId",
   "node",
   // Per-occurrence measurements and snapshots. Each value is unique, so in
   // the fingerprint they turned every "[EventLoop] Elevated lag" and every

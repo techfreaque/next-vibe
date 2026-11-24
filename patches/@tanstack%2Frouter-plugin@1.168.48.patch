@@ -69,7 +69,7 @@ diff --git a/dist/esm/core/router-code-splitter-plugin.js b/dist/esm/core/router
  			sharedBindings: sharedBindings.size > 0 ? sharedBindings : void 0,
  			compilerPlugins
 -		});
-+		}, ast);
++		}, ast, !isProduction && !addHmr && compilerPlugins.length === 0 && sharedBindings.size === 0);
  		if (compiledReferenceRoute === null) {
  			if (debug) console.info(`No changes made to route "${id}", skipping code-splitting.`);
  			return null;
@@ -110,11 +110,36 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  }
 -function compileCodeSplitReferenceRoute(opts) {
 -	const ast = parseAst(opts);
-+function compileCodeSplitReferenceRoute(opts, ast = parseAst(opts)) {
++function compileCodeSplitReferenceRoute(opts, ast = parseAst(opts), deferScopeCrawl = false) {
  	const refIdents = findReferencedIdentifiers(ast);
  	const knownExportedIdents = /* @__PURE__ */ new Set();
  	function findIndexForSplitNode(str) {
-@@ -286,7 +290,7 @@
+@@ -207,9 +211,17 @@
+ 		* `import '../shared/imported'`
+ 		*/
+ 		const removableImportPaths = /* @__PURE__ */ new Set([]);
++		let scopeNeedsCrawl = false;
++		const refreshScope = () => {
++			if (scopeNeedsCrawl) {
++				programPath.scope.crawl();
++				scopeNeedsCrawl = false;
++			}
++		};
+ 		programPath.traverse({ CallExpression: (path) => {
+ 			if (!t.isIdentifier(path.node.callee)) return;
+ 			if (!allCreateRouteFns.includes(path.node.callee.name)) return;
++			refreshScope();
+ 			createRouteFn = path.node.callee.name;
+ 			function babelHandleReference(routeOptions) {
+ 				const hasImportedOrDefinedIdentifier = (name) => {
+@@ -280,13 +292,14 @@
+ 								const codeSplitGroup = [...new Set(opts.codeSplitGroupings[codeSplitGroupingByKey])];
+ 								if (!SPLIT_NODES_CONFIG.has(key)) return;
+ 								if (t.isBooleanLiteral(prop.value) || t.isNullLiteral(prop.value) || t.isIdentifier(prop.value) && prop.value.name === "undefined") return;
++								refreshScope();
+ 								const splitNodeMeta = SPLIT_NODES_CONFIG.get(key);
+ 								const splitUrl = addSplitSearchParamToFilename(opts.filename, codeSplitGroup);
+ 								if (splitNodeMeta.splitStrategy === "lazyRouteComponent") {
  									const value = prop.value;
  									let shouldSplit = true;
  									if (t.isIdentifier(value)) {
@@ -123,7 +148,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  										if (existingImportPath) removableImportPaths.add(existingImportPath);
  										const isExported = hasExport(ast, value);
  										if (isExported) knownExportedIdents.add(value.name);
-@@ -322,7 +326,7 @@
+@@ -322,7 +335,7 @@
  									const value = prop.value;
  									let shouldSplit = true;
  									if (t.isIdentifier(value)) {
@@ -132,7 +157,19 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  										if (existingImportPath) removableImportPaths.add(existingImportPath);
  										const isExported = hasExport(ast, value);
  										if (isExported) knownExportedIdents.add(value.name);
-@@ -585,8 +589,7 @@
+@@ -337,7 +350,10 @@
+ 								}
+ 							}
+ 						}
+-						programPath.scope.crawl();
++						// The dev server's last split can leave this to the DCE pass,
++						// which rebuilds scope before inspecting any bindings.
++						if (deferScopeCrawl) scopeNeedsCrawl = true;
++						else programPath.scope.crawl();
+ 					});
+ 					addRouteHmr(insertionPath, routeOptions);
+ 				}
+@@ -585,8 +601,7 @@
  * This function should read get the options from by searching for the key `codeSplitGroupings`
  * on createFileRoute and return it's values if it exists, else return undefined
  */
@@ -142,7 +179,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  	let codeSplitGroupings = void 0;
  	babel.traverse(ast, { Program: { enter(programPath) {
  		programPath.traverse({ CallExpression(path) {
-@@ -626,20 +629,13 @@
+@@ -626,20 +641,13 @@
  		"For the best optimization, these items should either have their export statements removed, or be imported from another location that is not a route file."
  	].join("\n");
  }
@@ -170,7 +207,7 @@ diff --git a/dist/esm/core/code-splitter/compilers.js b/dist/esm/core/code-split
  }
  function resolveIdentifier(path, node) {
  	if (t.isIdentifier(node)) {
-@@ -671,38 +667,22 @@
+@@ -671,38 +679,22 @@
  	}
  }
  function hasExport(ast, node) {

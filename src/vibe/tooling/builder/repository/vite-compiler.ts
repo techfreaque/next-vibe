@@ -636,7 +636,13 @@ export function findFullReloadPath(
     return null;
   }
   visited.add(mod);
-  const shortName = (mod.id ?? mod.url).replace(/^.*\/src\//, "src/");
+  // Vite prefixes virtual module IDs with a NUL. Escape it in the log so
+  // tools still recognize the capture as text.
+  const root = `${ROOT_DIR.replaceAll("\\", "/")}/`;
+  const name = (mod.id ?? mod.url)
+    .replaceAll("\\", "/")
+    .replaceAll("\0", "\\0");
+  const shortName = name.startsWith(root) ? name.slice(root.length) : name;
   if (mod.importers.size === 0 && !mod.acceptedHmrExports) {
     return [shortName];
   }

@@ -69,12 +69,13 @@ const pulseTaskRunner: TaskRunner<TasksTranslationKey> = {
           const summary = pulseResult.data.summary;
           const successCount = summary.tasksSucceeded.length;
           const failureCount = summary.tasksFailed.length;
+          const skippedCount = summary.tasksSkipped.length;
           const duration = summary.totalExecutionTimeMs;
 
           if (coreEnv.NODE_ENV !== "production") {
             logger.info(
               formatTask(
-                `Pulse #${pulseCount}: ${successCount} tasks succeeded, ${failureCount} tasks failed in ${formatDuration(duration)}`,
+                `Pulse #${pulseCount}: ${successCount} tasks succeeded, ${failureCount} tasks failed, ${skippedCount} tasks skipped in ${formatDuration(duration)}`,
                 "💓",
               ),
             );

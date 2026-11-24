@@ -5,7 +5,10 @@
  */
 import "server-only";
 
-import { BEARER_LEAD_ID_SEPARATOR } from "@/env/constants";
+import {
+  BEARER_LEAD_ID_SEPARATOR,
+  REQUEST_ID_HEADER_NAME,
+} from "@/env/constants";
 
 import type {
   ErrorResponseType,
@@ -14,6 +17,7 @@ import type {
 import { ErrorResponseTypes, fail } from "../../../core/route/response.schema";
 import type { WidgetData } from "../../../core/utils/json";
 import { parseError } from "../../../core/utils/parse-error";
+import { mintRequestId } from "../../../logger/with-log-context";
 import type { AiT } from "../../../platforms/ai/i18n";
 import type { RouteExecuteResponseOutput } from "../../definition";
 import executeDefinition from "../../definition";
@@ -57,6 +61,7 @@ export async function callToolDirect(params: {
   // side-effect free. ONLY that exact marker is retried; handler errors never.
   const maxAttempts = 3;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const remoteRequestId = mintRequestId();
     try {
       // This IS the direct-http dispatch primitive that runInProcessTyped/execute()
       // sits on top of — it POSTs the tool to the peer's execute-tool endpoint and
@@ -68,6 +73,7 @@ export async function callToolDirect(params: {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}${BEARER_LEAD_ID_SEPARATOR}${leadId}`,
+          [REQUEST_ID_HEADER_NAME]: remoteRequestId,
           // Keepalive socket reuse corrupts multi-MB bodies between Bun's
           // fetch and the peer's HTTP layer (measured: 3/6 uploads of a 5MB
           // JSON body stall ~12s and die with "socket closed unexpectedly";
@@ -112,7 +118,13 @@ export async function callToolDirect(params: {
         if ((routerNotReady || preHandlerFailure) && attempt < maxAttempts) {
           logger.warn(
             "[RouteExecute] callToolDirect pre-handler failure — retrying",
-            { toolName, instanceId, status: resp.status, attempt },
+            {
+              toolName,
+              instanceId,
+              remoteRequestId,
+              status: resp.status,
+              attempt,
+            },
           );
           // The dev HTTP layer drops large bodies in bursts — an immediate
           // resend hits the same stressed socket pool and fails identically.
@@ -125,6 +137,7 @@ export async function callToolDirect(params: {
         logger.warn("[RouteExecute] callToolDirect HTTP error", {
           toolName,
           instanceId,
+          remoteRequestId,
           status: resp.status,
           attempt,
           remoteMessage,
@@ -148,6 +161,7 @@ export async function callToolDirect(params: {
       logger.warn("[RouteExecute] callToolDirect network error", {
         toolName,
         instanceId,
+        remoteRequestId,
         peer: remoteUrl,
         attempt,
         timedOut: err instanceof Error && err.name === "TimeoutError",
