@@ -1,4 +1,4 @@
-import { expect, it, spyOn } from "bun:test";
+import { expect, it, mock, spyOn } from "bun:test";
 import { applyPatch, parsePatch } from "diff";
 import { mkdirSync, mkdtempSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
@@ -8,9 +8,11 @@ import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import type { JwtPrivatePayloadType } from "next-vibe/identity/auth/types";
 import { UserPermissionRole } from "next-vibe/identity/roles/enum";
 import { createEndpointLogger } from "next-vibe/logger/server";
+import type { LoggerMetadata } from "next-vibe/logger/types";
 import { CliInputParser } from "next-vibe/platforms/cli/runtime/parsing";
 import { Platform } from "next-vibe/platforms/platforms";
 
+import { agentEnv } from "../../env";
 import { ApiProvider } from "../models";
 import definition from "./definition";
 import { ModelPricesRepository } from "./repository";
@@ -58,9 +60,75 @@ const user: JwtPrivatePayloadType = {
   roles: [UserPermissionRole.ADMIN],
 };
 
+it("reports a skipped comparison on a keyless instance without contacting providers", async () => {
+  const previousEnv = { ...agentEnv };
+  const fetchPrices = spyOn(
+    ModelPricesRepository,
+    "fetchProviderPrices",
+  ).mockResolvedValue([]);
+  const info = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+  const logger = { ...createEndpointLogger(false, defaultLocale), info };
+
+  try {
+    Object.assign(agentEnv, {
+      OPENROUTER_API_KEY: "",
+      REPLICATE_API_TOKEN: undefined,
+      OPENAI_API_KEY: undefined,
+      FAL_AI_API_KEY: undefined,
+      ELEVENLABS_API_KEY: undefined,
+      DEEPGRAM_API_KEY: undefined,
+      EDEN_AI_API_KEY: undefined,
+      MODELSLAB_API_KEY: undefined,
+      UNCENSORED_AI_API_KEY: undefined,
+      FREEDOMGPT_API_KEY: undefined,
+      GAB_AI_API_KEY: undefined,
+      VENICE_AI_API_KEY: undefined,
+      NANO_GPT_API_KEY: undefined,
+    });
+    const task = tasks.find((candidate) => candidate.type === "cron");
+    expect(task).toBeDefined();
+    if (!task) {
+      return;
+    }
+    const result = await task.route({
+      data: { write: false },
+      urlPathParams: {},
+      user,
+      locale: defaultLocale,
+      logger,
+      platform: Platform.CRON,
+      toolExecutionContext: rootlessToolExecutionContext(),
+    });
+    expect(result).toEqual({
+      success: true,
+      data: {
+        summary: {
+          totalProviders: 0,
+          totalModels: 0,
+          modelsUpdated: 0,
+          fileUpdated: false,
+          statusMessage: "Price comparison skipped. Provider API keys are not configured.",
+        },
+        diff: "",
+        providerResults: [],
+        updates: [],
+        failures: [],
+      },
+    });
+    expect(fetchPrices).not.toHaveBeenCalled();
+    expect(info).toHaveBeenCalledWith(
+      "Model price comparison skipped (provider API keys not configured)",
+    );
+  } finally {
+    Object.assign(agentEnv, previousEnv);
+    fetchPrices.mockRestore();
+  }
+});
+
 it("reports the scheduled diff and writes that same diff only with the CLI flag", async () => {
   const originalCwd = process.cwd();
   const originalArgv = process.argv;
+  const originalOpenRouterKey = agentEnv.OPENROUTER_API_KEY;
   const scratchRoot = join(originalCwd, ".tmp");
   const discarded = join(scratchRoot, "todelete", "model-price-refresh-tests");
   mkdirSync(discarded, { recursive: true });
@@ -127,6 +195,7 @@ it("reports the scheduled diff and writes that same diff only with the CLI flag"
     );
 
   try {
+    agentEnv.OPENROUTER_API_KEY = "test-key";
     for (const [path, contents] of Object.entries(sourceFiles)) {
       const absolutePath = join(agentDir, path);
       mkdirSync(dirname(absolutePath), { recursive: true });
@@ -195,6 +264,7 @@ it("reports the scheduled diff and writes that same diff only with the CLI flag"
     }
     expect(readSource()).toEqual(patched);
   } finally {
+    agentEnv.OPENROUTER_API_KEY = originalOpenRouterKey;
     process.argv = originalArgv;
     process.chdir(originalCwd);
     prices.mockRestore();

@@ -26,6 +26,7 @@ import { getSrcDir } from "@/env/paths";
 import { generateMediaGenInlineEnumContent } from "../../ai-stream/model-enums-generator/media-gen-enum-generator";
 import { generateVisionEnumFileContent } from "../../ai-stream/model-enums-generator/vision-enum-generator";
 import { chatModelDefinitions, ChatModelId } from "../../ai-stream/models";
+import { agentEnv } from "../../env";
 import { imageGenModelDefinitions } from "../../image-generation/models";
 import { musicGenModelDefinitions } from "../../music-generation/models";
 import { sttModelDefinitions } from "../../speech-to-text/models";
@@ -857,6 +858,40 @@ export class ModelPricesRepository {
     t: ModelPricesT,
   ): Promise<ResponseType<ModelPricesGetResponseOutput>> {
     try {
+      const hasPricingProvider = [
+        agentEnv.OPENROUTER_API_KEY,
+        agentEnv.REPLICATE_API_TOKEN,
+        agentEnv.OPENAI_API_KEY,
+        agentEnv.FAL_AI_API_KEY,
+        agentEnv.ELEVENLABS_API_KEY,
+        agentEnv.DEEPGRAM_API_KEY,
+        agentEnv.EDEN_AI_API_KEY,
+        agentEnv.MODELSLAB_API_KEY,
+        agentEnv.UNCENSORED_AI_API_KEY,
+        agentEnv.FREEDOMGPT_API_KEY,
+        agentEnv.GAB_AI_API_KEY,
+        agentEnv.VENICE_AI_API_KEY,
+        agentEnv.NANO_GPT_API_KEY,
+      ].some((key) => key?.trim());
+      if (!hasPricingProvider) {
+        logger.info(
+          "Model price comparison skipped (provider API keys not configured)",
+        );
+        return success({
+          summary: {
+            totalProviders: 0,
+            totalModels: 0,
+            modelsUpdated: 0,
+            fileUpdated: false,
+            statusMessage: t("get.response.summary.notConfigured"),
+          },
+          diff: "",
+          providerResults: [],
+          updates: [],
+          failures: [],
+        });
+      }
+
       // A CLI platform can also be forwarded over the network. Require the
       // explicit flag in the process that would write to its own checkout.
       const cliArgs = process.argv.slice(2);

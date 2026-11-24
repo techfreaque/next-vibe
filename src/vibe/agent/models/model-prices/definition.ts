@@ -90,6 +90,12 @@ const { GET } = createEndpoint({
             columns: 3,
             schema: z.boolean(),
           }),
+          statusMessage: responseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            label: "get.response.summary.status",
+            columns: 12,
+            schema: z.string().optional(),
+          }),
         },
       }),
 

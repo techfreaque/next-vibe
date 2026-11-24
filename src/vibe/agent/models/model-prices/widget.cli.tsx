@@ -105,6 +105,9 @@ export function ModelPricesWidget({ field }: CliWidgetProps): JSX.Element {
     if (!value) {
       return "";
     }
+    if (value.summary.statusMessage) {
+      return value.summary.statusMessage;
+    }
     return isMcp ? renderMcp(value) : renderCli(value);
   }, [field.value, isMcp]);
 

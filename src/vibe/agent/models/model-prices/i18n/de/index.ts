@@ -14,6 +14,9 @@ export const translations: typeof enTranslations = {
     response: {
       diff: "Quelldatei-Diff",
       summary: {
+        status: "Status",
+        notConfigured:
+          "Für den Preisvergleich ist ein API-Schlüssel eines Anbieters erforderlich.",
         title: "Aktualisierungsübersicht",
         totalProviders: "Ausgeführte Anbieter",
         totalModels: "Modelle gesamt",

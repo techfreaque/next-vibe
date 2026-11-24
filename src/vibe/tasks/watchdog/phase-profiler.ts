@@ -21,6 +21,8 @@ import "server-only";
 import type * as BunJscModule from "bun:jsc";
 import type { SamplingProfile, SamplingProfileStackFrame } from "bun:jsc";
 
+import { coreEnv } from "../../core/env";
+import { Environment } from "../../env/env-util";
 import type { EndpointLogger } from "../../logger/types";
 
 /** Keep sampling this long after the last phase ended (stall shows up after). */
@@ -39,6 +41,8 @@ const SAMPLE_INTERVAL_US = 1000;
 const STREAK_GAP_S = 0.005;
 /** Log a profiled cron phase stall as its own row from this long. */
 const STALL_REPORT_MS = 200;
+/** Dev startup and lazy imports can cause short streaks. Dump only high lag. */
+const DEV_STALL_REPORT_MS = 500;
 /** Completed sampling windows kept for the lag row, including idle ones. */
 const RECENT_RING_SIZE = 10;
 /** The lag row waits at most this long for the covering session's summary. */
@@ -399,7 +403,11 @@ function startSession(logger: EndpointLogger): ProfileSession {
       if (ring.length > RECENT_RING_SIZE) {
         ring.splice(0, ring.length - RECENT_RING_SIZE);
       }
-      if (session.phases.length > 0 && stall.streakMs >= STALL_REPORT_MS) {
+      const reportThresholdMs =
+        coreEnv.NODE_ENV === Environment.DEVELOPMENT
+          ? DEV_STALL_REPORT_MS
+          : STALL_REPORT_MS;
+      if (session.phases.length > 0 && stall.streakMs >= reportThresholdMs) {
         // Static message: the fingerprint groups on it; details in metadata.
         logger.warn(
           "[EventLoop] Stall profiled in a window with cron bookkeeping",

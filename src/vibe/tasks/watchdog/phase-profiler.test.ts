@@ -5,7 +5,9 @@
 
 import { describe, expect, it, mock } from "bun:test";
 
+import { coreEnv } from "../../core/env";
 import { defaultLocale } from "../../core/i18n/core/config";
+import { Environment } from "../../env/env-util";
 import { createEndpointLogger } from "../../logger/server";
 import type { LoggerMetadata } from "../../logger/types";
 import { PhaseProfiler } from "./phase-profiler";
@@ -52,7 +54,11 @@ describe("PhaseProfiler", () => {
       profile?.totalSamples ?? 0,
     );
     expect(profile?.gcSamples).toBeLessThanOrEqual(profile?.totalSamples ?? 0);
-    if (profile && profile.streakMs >= 200) {
+    if (
+      coreEnv.NODE_ENV !== Environment.DEVELOPMENT &&
+      profile &&
+      profile.streakMs >= 200
+    ) {
       expect(warn).toHaveBeenCalledWith(
         "[EventLoop] Stall profiled in a window with cron bookkeeping",
         expect.objectContaining({
@@ -79,6 +85,33 @@ describe("PhaseProfiler", () => {
     expect(profile).toBeDefined();
     expect(profile?.streakMs).toBeLessThan(200);
     expect(warn).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { busyMs: 300, logsStall: false },
+    { busyMs: 900, logsStall: true },
+  ])("uses the high lag threshold for dev profile dumps ($busyMs ms busy)", async ({
+    busyMs,
+    logsStall,
+  }) => {
+    const previousEnv = coreEnv.NODE_ENV;
+    coreEnv.NODE_ENV = Environment.DEVELOPMENT;
+    const warn = mock((_message: string, ..._metadata: LoggerMetadata[]) => {});
+    const logger = { ...createEndpointLogger(false, defaultLocale), warn };
+    try {
+      const end = PhaseProfiler.hold("cron-post:dev", logger);
+      await Bun.sleep(50);
+      end();
+      const stallAt = Date.now();
+      blockTheLoopForProfilerTest(busyMs);
+      await PhaseProfiler.flush(stallAt);
+
+      const profile = PhaseProfiler.profileCovering(stallAt);
+      expect(profile?.hotFrames).toContain("blockTheLoopForProfilerTest");
+      expect(warn).toHaveBeenCalledTimes(logsStall ? 1 : 0);
+    } finally {
+      coreEnv.NODE_ENV = previousEnv;
+    }
   });
 
   it("names a stall outside any phase in continuous mode", async () => {

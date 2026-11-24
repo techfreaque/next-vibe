@@ -24,6 +24,10 @@ export function ModelPricesWidget(): JSX.Element {
 
   const { summary, providerResults, failures, updates } = value;
 
+  if (summary.statusMessage) {
+    return <Div className="p-4">{summary.statusMessage}</Div>;
+  }
+
   return (
     <Div className="space-y-6 p-4">
       {/* Summary */}

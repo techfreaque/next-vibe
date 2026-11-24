@@ -15,6 +15,9 @@ export const translations: typeof enTranslations = {
     response: {
       diff: "Diferencias en los archivos fuente",
       summary: {
+        status: "Estado",
+        notConfigured:
+          "Se omitió la comparación de precios. No hay claves de API de proveedores configuradas.",
         title: "Resumen",
         totalProviders: "Proveedores Corren",
         totalModels: "Modelos totales",

@@ -13,6 +13,9 @@ export const translations = {
     response: {
       diff: "Source diff",
       summary: {
+        status: "Status",
+        notConfigured:
+          "Price comparison skipped. Provider API keys are not configured.",
         title: "Update Summary",
         totalProviders: "Providers Run",
         totalModels: "Total Models",
