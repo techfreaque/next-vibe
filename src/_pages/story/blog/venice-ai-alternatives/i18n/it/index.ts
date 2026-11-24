@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "Alternative a Venice AI: private, senza censura, a confronto (2026)",
     description:
-      "Le alternative a Venice AI confrontate sulle loro pagine di prezzi, privacy e filtri: NanoGPT, uncensored.ai, FreedomGPT, Gab AI, OpenRouter, LM Studio e {{appName}}. Modelli, API, piani gratuiti e per chi va bene cosa.",
+      "Confronta Venice AI con {{appName}}, Maple, Proton Lumo, Duck.ai, NanoGPT e app locali. Scopri dove vengono elaborate le richieste, quali modelli rifiutano meno e cosa costa di più.",
     category: "Confronto",
     imageAlt: "Le alternative a Venice AI a confronto",
     keywords:
@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
     backToBlog: "Torna al blog",
     category: "Confronto",
     readTime: "9 min di lettura",
-    title: "Alternative a Venice AI. Private, senza censura, verificate.",
+    title: "Alternative a Venice AI per chat riservate",
     subtitle:
       "{{count}} alternative e {{appName}}, confrontate su quello che dicono le loro pagine di prezzi, privacy e filtri. Verificato il {{date}}.",
   },
@@ -38,8 +38,6 @@ export const translations: typeof enTranslations = {
   },
   table: {
     title: "Tutte fianco a fianco",
-    intro:
-      "Su mobile scorri di lato. Dati dei concorrenti verificati il {{date}} sulle loro pagine. Dati di {{appName}} letti in tempo reale dalla nostra configurazione. Venice chiude la tabella come riferimento.",
   },
   us: {
     title: "{{appName}}: una chat, ogni tipo di modello",
