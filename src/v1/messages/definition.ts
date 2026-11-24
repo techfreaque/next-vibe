@@ -7,6 +7,7 @@
  * (JSON or SSE); the declared response is nominal.
  */
 
+import { cacheControlSchema } from "next-vibe/agent/ai-stream/providers/shared/prompt-cache";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   FieldDataType,
@@ -65,6 +66,13 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true } as const,
     children: {
+      cache_control: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "promptCache.label",
+        description: "promptCache.description",
+        schema: cacheControlSchema.optional(),
+      }),
       model: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,

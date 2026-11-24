@@ -1,4 +1,9 @@
 export const translations = {
+  promptCache: {
+    label: "Prompt cache",
+    description:
+      "Cache the shared prompt prefix and optionally set its lifetime.",
+  },
   category: "AI",
 
   tags: {

@@ -1130,6 +1130,29 @@ export function TanstackPage({
               />
               <Prose>{t("models.note")}</Prose>
               <SubBlock
+                title={t("models.rates.title")}
+                body={t("models.rates.unit")}
+              >
+                <DocTable
+                  head={[
+                    t("chat.paramsColumns.field"),
+                    t("chat.paramsColumns.description"),
+                  ]}
+                  rows={[
+                    ["input", t("models.rates.input")],
+                    ["output", t("models.rates.output")],
+                    ["cache_read", t("models.rates.read")],
+                    ["cache_write", t("models.rates.write")],
+                    ["cache_write_1h", t("models.rates.hour")],
+                  ].map(([field, description]) => ({
+                    key: field,
+                    term: `${field}_credits_per_million_tokens`,
+                    text: description,
+                  }))}
+                />
+                <Prose>{t("models.rates.tiers")}</Prose>
+              </SubBlock>
+              <SubBlock
                 title={t("models.media.title")}
                 body={t("models.media.body")}
               >

@@ -131,7 +131,13 @@ export interface UsageAttribution {
   apiProvider: ApiProvider | ToolChargeAttribution["apiProvider"];
 }
 
-export interface UsageMetadata extends Partial<UsageUpstreamCost> {
+export interface UsageCacheTokens {
+  cachedInputTokens: number;
+  cacheWriteTokens: number;
+}
+
+export interface UsageMetadata
+  extends Partial<UsageUpstreamCost>, Partial<UsageCacheTokens> {
   cost: number;
   apiProvider?: UsageAttribution["apiProvider"];
   messageId?: string;

@@ -12,8 +12,9 @@ import { generateText, streamText } from "ai";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { createEndpointLogger } from "next-vibe/logger/server";
 
-import { readStepUpstreamCost } from "../../repository/loop/token-accumulator";
+import { readCacheUsage, readStepUpstreamCost } from "../../repository/loop/token-accumulator";
 import { createNanoGPT } from "../nano-gpt";
+import { cacheOptions, type CacheControl } from "./prompt-cache";
 import { createVeniceAI } from "../venice-ai";
 import { readNanoGptCostUsd, readVeniceCostUsd } from "./upstream-cost";
 
@@ -23,6 +24,8 @@ const NANO_USAGE = {
   prompt_tokens: 14,
   completion_tokens: 14,
   total_tokens: 28,
+  prompt_cache_hit_tokens: 6,
+  prompt_tokens_details: { cache_write_tokens: 2 },
   cost: 0.000014,
   currency: "USD",
 };
@@ -110,6 +113,7 @@ describe("NanoGPT chat model surfaces the real cost", () => {
       model: provider.chat("z-ai/glm-5.3-flash-uncensored"),
       prompt: "Say hi",
     });
+    expect(readCacheUsage(result.usage)).toMatchObject({ cachedInputTokens: 6, cacheWriteTokens: 2 });
     expect(readStepUpstreamCost(result.providerMetadata).costUsd).toBe(
       0.000014,
     );
@@ -144,6 +148,7 @@ describe("NanoGPT chat model surfaces the real cost", () => {
       prompt: "Say hi",
     });
     expect(await result.text).toBe("Hi");
+    expect(readCacheUsage(await result.usage)).toMatchObject({ cachedInputTokens: 6, cacheWriteTokens: 2 });
     expect(readStepUpstreamCost(await result.providerMetadata).costUsd).toBe(
       0.0000188,
     );
@@ -209,6 +214,23 @@ it("NanoGPT distinguishes text arrays from media in rejected requests", async ()
 });
 
 describe("Venice chat model surfaces the real cost", () => {
+  it("passes explicit system and user cache breakpoints through the Venice adapter", async () => {
+    const control: CacheControl = {type:"ephemeral", ttl:"5m"};
+    const messages = [
+      {role:"system" as const, content:"system prefix", ...cacheOptions(control)},
+      {role:"user" as const, content:[{type:"text" as const, text:"user prefix", ...cacheOptions(control)}, {type:"text" as const, text:"suffix"}]},
+    ];
+    let sent = "";
+    const provider = createVeniceAI(logger, fakeFetch(body => {
+      sent = body;
+      return json({id:"cache", object:"chat.completion", created:1, model:"test", choices:[{index:0,message:{role:"assistant",content:"ok"},finish_reason:"stop"}]});
+    }), {messages,tools:new Map()});
+    await generateText({model:provider.chat("test"),messages, allowSystemInMessages:true});
+    expect(JSON.parse(sent)).toMatchObject({messages:[
+      {role:"system", content:[{text:"system prefix",cache_control:control}]},
+      {role:"user", content:[{text:"user prefix",cache_control:control},{text:"suffix"}]},
+    ]});
+  });
   it("non-streaming", async () => {
     const provider = createVeniceAI(
       logger,
@@ -229,6 +251,7 @@ describe("Venice chat model surfaces the real cost", () => {
             prompt_tokens: 1574,
             completion_tokens: 10,
             total_tokens: 1584,
+            prompt_tokens_details: { cached_tokens: 1000, cache_creation_input_tokens: 200 },
           },
           cost: { usd: 0.0003238, diem: 0 },
         }),
@@ -239,6 +262,7 @@ describe("Venice chat model surfaces the real cost", () => {
       prompt: "Say hi",
     });
     expect(result.text).toBe("Hello!");
+    expect(readCacheUsage(result.usage)).toMatchObject({ cachedInputTokens: 1000, cacheWriteTokens: 200 });
     expect(readStepUpstreamCost(result.providerMetadata).costUsd).toBe(
       0.0003238,
     );
@@ -273,6 +297,7 @@ describe("Venice chat model surfaces the real cost", () => {
               prompt_tokens: 559,
               completion_tokens: 10,
               total_tokens: 569,
+              prompt_tokens_details: { cached_tokens: 150, cache_creation_input_tokens: 10 },
             },
             cost: { usd: 0.0001208, diem: 0 },
           },
@@ -284,6 +309,7 @@ describe("Venice chat model surfaces the real cost", () => {
       prompt: "Say hi",
     });
     expect(await result.text).toBe("Hello");
+    expect(readCacheUsage(await result.usage)).toMatchObject({ cachedInputTokens: 150, cacheWriteTokens: 10 });
     expect(readStepUpstreamCost(await result.providerMetadata).costUsd).toBe(
       0.0001208,
     );

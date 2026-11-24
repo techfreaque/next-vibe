@@ -43,6 +43,7 @@ import {
 } from "../../../video-generation/models";
 import type { ModelDefinition, ModelProviderConfig } from "../../models";
 import { ApiProvider } from "../../models";
+import { tokenTariffs } from "../../token-tariffs";
 import type { ProviderEntryOperation, ProviderPriceResult } from "./base";
 import { PriceFetcher, roundUpPrice } from "./base";
 
@@ -129,6 +130,37 @@ function buildOp(
     primary.cacheWriteTokenCost !== undefined
   ) {
     op.cacheWriteTokenCost = markup(primary.cacheWriteTokenCost);
+  }
+  if (
+    "cacheWrite1hTokenCost" in primary &&
+    primary.cacheWrite1hTokenCost !== undefined
+  ) {
+    op.cacheWrite1hTokenCost = markup(primary.cacheWrite1hTokenCost);
+  }
+  if (typeof primary.inputTokenCost === "number") {
+    op.pricingTiers = tokenTariffs(primary).map((tier) => ({
+      ...tier,
+      inputTokenCost:
+        tier.inputTokenCost === undefined
+          ? undefined
+          : markup(tier.inputTokenCost),
+      outputTokenCost:
+        tier.outputTokenCost === undefined
+          ? undefined
+          : markup(tier.outputTokenCost),
+      cacheReadTokenCost:
+        tier.cacheReadTokenCost === undefined
+          ? undefined
+          : markup(tier.cacheReadTokenCost),
+      cacheWriteTokenCost:
+        tier.cacheWriteTokenCost === undefined
+          ? undefined
+          : markup(tier.cacheWriteTokenCost),
+      cacheWrite1hTokenCost:
+        tier.cacheWrite1hTokenCost === undefined
+          ? undefined
+          : markup(tier.cacheWrite1hTokenCost),
+    }));
   }
   if (
     "imageOutputTokenCost" in primary &&

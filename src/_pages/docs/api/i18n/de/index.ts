@@ -138,6 +138,17 @@ export const translations: typeof enTranslations = {
       "`GET /v1/models` listet die Modelle, die dein Schlüssel jetzt aufrufen kann, mit Kontextgröße, Tool-Unterstützung und Credit-Preisen pro Million Token. Die id nutzt du als model-Feld.",
     note: "Die Liste hängt von deinem Konto ab. Unbekannte oder nicht verfügbare IDs liefern 404 `model_not_found`. Einzige Zuordnung: Auf `/v1/messages` landen die Claude-IDs, die Claude Code standardmäßig schickt, beim neuesten Claude derselben Familie.",
     browse: "Alle Modelle mit Preisen und Filtern ansehen",
+    rates: {
+      tiers:
+        "Enthält pricing.tiers Einträge, gelten die Credit-Felder der passenden Stufe. min_prompt_tokens schließt den Grenzwert ein. utc_start und utc_end sind UTC-Uhrzeiten im Format HHMM. Der Beginn ist eingeschlossen, das Ende ausgeschlossen.",
+      title: "Tokenpreise für den Chat",
+      unit: "Alle Angaben im Feld pricing sind Kundenpreise in Credits pro Million Token für die Basis-Kontextstufe, inklusive Aufschlag. Keines dieser Felder enthält US-Dollar. null bedeutet, dass kein eigener Tarif angegeben ist.",
+      input: "Eingabetoken ohne Cache.",
+      output: "Erzeugte Ausgabetoken für Text.",
+      read: "Aus dem Prompt-Cache gelesene Eingabetoken.",
+      write: "Mit Standardlaufzeit in den Cache geschriebene Eingabetoken.",
+      hour: "Mit einer Stunde Laufzeit in den Cache geschriebene Eingabetoken.",
+    },
     media: {
       title: "Medienmodelle in derselben Liste",
       body: "Bild-, Video-, Musik-, Stimm- und Transkriptionsmodelle stehen in derselben Liste. Jeder Eintrag sagt, was das Modell kann und wo es aufgerufen wird.",
@@ -222,12 +233,12 @@ export const translations: typeof enTranslations = {
       "Die API zieht von denselben Credits wie die Chat-App, abgerechnet nach denselben Regeln. Ein Guthaben, eine Rechnung.",
     points: {
       price:
-        "Kosten = Eingabe- plus Ausgabe-Token zum Credit-Preis des Modells, pro Million Token gelistet in `GET /v1/models`. Ausnahme sind OpenRouter-Modelle: Du zahlst, was der Anbieter für den Aufruf tatsächlich berechnet hat, plus unseren Aufschlag. Ihr gelisteter Preis ist eine Schätzung. Im Chat gilt dieselbe Abrechnung.",
+        "Für die Schätzung jede Tokenmenge mit ihrem Tarif pro Million verrechnen. Jedes Eingabetoken zählt einmal, entweder ohne Cache, als Lesezugriff oder als Schreibzugriff.",
       usage:
         "Jede Antwort nennt `usage.credits_charged`. Dein Guthaben findest du in der App unter Credits.",
       preflight:
         "Vor jedem Aufruf prüfen wir dein Guthaben gegen eine Worst-Case-Schätzung. Reicht es nicht: HTTP 402 `insufficient_credits`, nichts läuft, nichts wird berechnet.",
-      real: "Nach dem Aufruf zahlst du die echte Nutzung, nicht die Schätzung: die gemeldete Token-Zahl, bei OpenRouter-Modellen die echten Anbieterkosten. Meldet ein Anbieter keine Kosten, gilt der gelistete Preis.",
+      real: "Meldet der Anbieter Kosten, berechnen wir diese zuzüglich Aufschlag. Sonst gelten die jeweiligen Tokentarife. Den gerundeten Endbetrag enthält usage.credits_charged.",
       media:
         "Medienaufrufe rechnen genauso ab: echte Anbieterkosten plus unser Aufschlag, wo der Anbieter sie meldet, sonst der gelistete Modellpreis. Bilder pro Bild, Sprachausgabe pro Zeichen, Transkription pro Audiosekunde, Video sobald der Clip fertig ist, Musik pro Clip.",
       topup:

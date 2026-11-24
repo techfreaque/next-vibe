@@ -5,9 +5,11 @@
  * types are skipped, so a new Claude Code field never breaks a session.
  */
 
+import { cacheControlSchema } from "next-vibe/agent/ai-stream/providers/shared/prompt-cache";
 import { z } from "zod";
 
 export const anthropicTextBlockSchema = z.object({
+  cache_control: cacheControlSchema.optional(),
   type: z.literal("text"),
   text: z.string(),
 });
@@ -28,11 +30,13 @@ const textSourceSchema = z.object({
 const otherSourceSchema = z.object({ type: z.string() });
 
 export const anthropicImageBlockSchema = z.object({
+  cache_control: cacheControlSchema.optional(),
   type: z.literal("image"),
   source: z.union([base64SourceSchema, urlSourceSchema, otherSourceSchema]),
 });
 
 const documentBlockSchema = z.object({
+  cache_control: cacheControlSchema.optional(),
   type: z.literal("document"),
   source: z.union([
     base64SourceSchema,
@@ -52,6 +56,7 @@ const toolReferenceBlockSchema = z.object({
 });
 
 const toolUseBlockSchema = z.object({
+  cache_control: cacheControlSchema.optional(),
   type: z.literal("tool_use"),
   id: z.string().min(1),
   name: z.string().min(1),
@@ -59,6 +64,7 @@ const toolUseBlockSchema = z.object({
 });
 
 const toolResultBlockSchema = z.object({
+  cache_control: cacheControlSchema.optional(),
   type: z.literal("tool_result"),
   tool_use_id: z.string().min(1),
   content: z
@@ -116,6 +122,7 @@ export const anthropicSystemSchema = z.union([
 
 /** Client tool ({name, input_schema}); type is absent or "custom". */
 const clientToolSchema = z.object({
+  cache_control: cacheControlSchema.optional(),
   type: z.string().nullable().optional(),
   name: z.string().min(1).max(128),
   description: z.string().nullable().optional(),

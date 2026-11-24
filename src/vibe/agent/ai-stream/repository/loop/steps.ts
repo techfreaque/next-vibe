@@ -10,6 +10,7 @@ import type { JSONValue, ModelMessage, ProviderMetadata } from "ai";
 
 import { ThreadStreamingState } from "../../../chat/enum";
 import {
+  ApiProvider,
   calculateCreditCost,
   upstreamCostToCredits,
 } from "../../../models/models";
@@ -31,6 +32,7 @@ import type { StreamLoopState } from "./state";
 import {
   billsUpstreamCost,
   producedImageFile,
+  readCacheUsage,
   readImageOutputTokens,
   readStepUpstreamCost,
   TokenAccumulator,
@@ -653,12 +655,13 @@ export function onStepFinish(
   }
   const inputTokens = stepResult.usage.inputTokens ?? 0;
   const outputTokens = stepResult.usage.outputTokens ?? 0;
-  const cachedInputTokens =
-    stepResult.usage.cachedInputTokens ??
-    stepResult.usage.inputTokenDetails?.cacheReadTokens ??
-    0;
-  const cacheWriteTokens =
-    stepResult.usage.inputTokenDetails?.cacheWriteTokens ?? 0;
+  const { cachedInputTokens, cacheWriteTokens, hourWriteTokens } =
+    readCacheUsage(
+      stepResult.usage,
+      stepResult.providerMetadata,
+      modelConfig.providerModel.startsWith("anthropic/") ||
+        modelConfig.apiProvider === ApiProvider.CLAUDE_CODE,
+    );
   const totalTokens = stepResult.usage.totalTokens ?? 0;
 
   // Track full prompt size for mid-stream compacting threshold.
@@ -673,10 +676,13 @@ export function onStepFinish(
     producedImageFile(stepResult.files),
   );
   const stepTokens = {
+    requestStartedAt: ctx.stepPricingStartedAt,
+    promptCountKnown: (stepResult.usage.inputTokens ?? 0) > 0,
     inputTokens,
     outputTokens,
     cachedInputTokens,
     cacheWriteTokens,
+    hourWriteTokens,
     imageOutputTokens,
   };
   TokenAccumulator.accumulate(state.p.ctx, stepTokens);
@@ -712,6 +718,9 @@ export function onStepFinish(
             cachedInputTokens,
             cacheWriteTokens,
             imageOutputTokens,
+            hourWriteTokens,
+            stepTokens.requestStartedAt,
+            stepTokens.promptCountKnown,
           );
     ctx.dbWriter.emitTokensUpdated({
       messageId: stepAssistantMessageId,

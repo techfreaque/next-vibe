@@ -5,6 +5,7 @@
  */
 
 import type { ModelMessage } from "ai";
+import { cacheOptions } from "next-vibe/agent/ai-stream/providers/shared/prompt-cache";
 
 import type {
   V1ContentEvent,
@@ -95,6 +96,7 @@ export function convertAnthropicTools(
         name: spec.name,
         description: spec.description ?? undefined,
         parameters: spec.input_schema,
+        cacheControl: spec.cache_control,
       });
     }
   }
@@ -119,17 +121,33 @@ export function convertAnthropicToolChoice(
   return "auto";
 }
 
-function systemText(system: AnthropicSystem | null | undefined): string {
+function appendSystem(
+  out: ModelMessage[],
+  system: AnthropicSystem | null | undefined,
+): number {
   if (!system) {
-    return "";
+    return 0;
   }
   if (typeof system === "string") {
-    return system;
+    pushSystemText(out, system);
+    return system.length;
   }
-  return system
-    .map((block) => ("text" in block ? block.text : ""))
-    .filter(Boolean)
-    .join("\n\n");
+  let chars = 0;
+  let texts: string[] = [];
+  for (const block of system) {
+    if ("text" in block && block.text) {
+      texts.push(block.text);
+      if (block.cache_control) {
+        const text = texts.join("\n\n");
+        pushSystemText(out, text, block.cache_control);
+        chars += text.length;
+        texts = [];
+      }
+    }
+  }
+  const tail = texts.join("\n\n");
+  pushSystemText(out, tail);
+  return chars + tail.length;
 }
 
 function imageUrlOf(block: AnthropicContentBlock): string | undefined {
@@ -173,9 +191,7 @@ export function convertAnthropicMessages(
   let chars = JSON.stringify(data.tools ?? []).length;
   let images = 0;
 
-  const system = systemText(data.system);
-  chars += system.length;
-  pushSystemText(out, system);
+  chars += appendSystem(out, data.system);
 
   for (const [index, message] of data.messages.entries()) {
     const blocks: AnthropicContentBlock[] =
@@ -184,12 +200,7 @@ export function convertAnthropicMessages(
         : message.content;
 
     if (message.role === "system") {
-      const text = blocks
-        .map((block) => ("text" in block ? block.text : ""))
-        .filter(Boolean)
-        .join("\n\n");
-      chars += text.length;
-      pushSystemText(out, text);
+      chars += appendSystem(out, blocks);
       continue;
     }
 
@@ -221,7 +232,12 @@ export function convertAnthropicMessages(
           part = reasoningPart("", { anthropic: { redactedData: block.data } });
         }
         if (part) {
-          pushAssistantPart(out, part);
+          pushAssistantPart(out, {
+            ...part,
+            ...cacheOptions(
+              "cache_control" in block ? block.cache_control : undefined,
+            ),
+          });
         }
       }
       continue;
@@ -260,6 +276,7 @@ export function convertAnthropicMessages(
         toolCallId: id,
         toolName: toolNames.get(id) ?? "tool",
         output: toolOutput(pieces, block.is_error === true),
+        ...cacheOptions(block.cache_control),
       });
     }
 
@@ -268,7 +285,11 @@ export function convertAnthropicMessages(
       if (block.type === "text" && "text" in block) {
         chars += block.text.length;
         if (block.text) {
-          userParts.push({ type: "text", text: block.text });
+          userParts.push({
+            type: "text",
+            text: block.text,
+            ...cacheOptions(block.cache_control),
+          });
         }
       } else if (block.type === "image") {
         const url = imageUrlOf(block);
@@ -277,12 +298,18 @@ export function convertAnthropicMessages(
           return { ok: false, param: `messages[${index}].content` };
         }
         images += 1;
-        userParts.push(image);
+        userParts.push({
+          ...image,
+          ...cacheOptions(
+            "cache_control" in block ? block.cache_control : undefined,
+          ),
+        });
       } else if (block.type === "document" && "source" in block) {
         const source = block.source;
         if ("data" in source && "media_type" in source) {
           images += 1;
           userParts.push({
+            ...cacheOptions(block.cache_control),
             type: "file",
             data: { type: "data", data: source.data },
             mediaType: source.media_type,
@@ -291,6 +318,7 @@ export function convertAnthropicMessages(
         } else if ("data" in source) {
           chars += source.data.length;
           userParts.push({
+            ...cacheOptions(block.cache_control),
             type: "text",
             text: block.title
               ? `${block.title}\n\n${source.data}`
@@ -298,6 +326,7 @@ export function convertAnthropicMessages(
           });
         } else if ("url" in source && URL.canParse(source.url)) {
           userParts.push({
+            ...cacheOptions(block.cache_control),
             type: "file",
             data: { type: "url", url: new URL(source.url) },
             mediaType: "application/pdf",
@@ -350,9 +379,14 @@ export function stopReasonFor(
 
 export function anthropicUsage(totals: V1Totals): AnthropicJson {
   return {
-    input_tokens: Math.max(0, totals.inputTokens - totals.cachedInputTokens),
+    input_tokens: Math.max(
+      0,
+      totals.inputTokens -
+        totals.cachedInputTokens -
+        (totals.cacheWriteTokens ?? 0),
+    ),
     output_tokens: totals.outputTokens,
-    cache_creation_input_tokens: 0,
+    cache_creation_input_tokens: totals.cacheWriteTokens ?? 0,
     cache_read_input_tokens: totals.cachedInputTokens,
     credits_charged: totals.credits,
   };

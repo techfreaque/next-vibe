@@ -46,6 +46,7 @@ import type {
   ProviderPriceResult,
   SettingsUpdate,
 } from "./providers/base";
+import { tariffLiteral } from "./providers/base";
 import { DeepgramPriceFetcher } from "./providers/deepgram";
 import { EdenAiPriceFetcher } from "./providers/eden-ai";
 import { ElevenLabsPriceFetcher } from "./providers/elevenlabs";
@@ -206,48 +207,40 @@ function applyCacheCostUpdate(
 ): { content: string; changed: boolean } {
   const comment = buildUpdateComment(source);
 
-  // Try to update existing field first
-  const updateRegex = new RegExp(
-    `(providerModel:\\s*"${escapedProviderModel}"[^}]*?)(${field}:\\s*[\\d.]+[,]?(?:\\s*//[^\n]*)?)`,
+  // Match only fields at the provider's indentation. Nested tariffs have
+  // identical field names and may precede the base cache rates.
+  const routes = new RegExp(
+    `^( *)providerModel: *"${escapedProviderModel}",[^\\n]*\\n((?:\\1[^\\n]*\\n)*)`,
+    "gm",
   );
-  if (updateRegex.test(content)) {
-    let changed = false;
-    const updated = content.replace(
-      updateRegex,
-      (fullMatch: string, prefix: string, priceLine: string) => {
-        void fullMatch;
-        // Skip if value matches and line already has a valid update comment
-        if (isAlreadyUpToDate(priceLine, field, newValue)) {
-          return prefix + priceLine;
-        }
-        const newLine = replaceValueAndComment(
-          priceLine,
-          field,
-          newValue,
-          comment,
-        );
-        if (newLine !== priceLine) {
-          changed = true;
-        }
-        return prefix + newLine;
-      },
+  let changed = false;
+  const updated = content.replace(routes, (route: string, indent: string) => {
+    const fieldLine = new RegExp(`^${indent}${field}: [^\\n]*`, "m");
+    const line = route.match(fieldLine)?.[0];
+    if (line !== undefined) {
+      if (isAlreadyUpToDate(line, field, newValue)) {
+        return route;
+      }
+      changed = true;
+      return route.replace(
+        fieldLine,
+        replaceValueAndComment(line, field, newValue, comment),
+      );
+    }
+    const anchor = new RegExp(
+      `^(${indent}${insertAfterField}: [^\\n]*)\\n`,
+      "m",
     );
-    return { content: updated, changed };
-  }
-
-  // Insert after insertAfterField (value may be numeric or an identifier like calculateCreditCost)
-  const insertRegex = new RegExp(
-    `(providerModel:\\s*"${escapedProviderModel}"[^}]*?${insertAfterField}:\\s*[\\w.]+[,]?(?:\\s*//[^\n]*)?)(\\n)`,
-  );
-  if (insertRegex.test(content)) {
-    const updated = content.replace(
-      insertRegex,
-      `$1\n        ${field}: ${newValue}, ${comment}$2`,
+    if (!anchor.test(route)) {
+      return route;
+    }
+    changed = true;
+    return route.replace(
+      anchor,
+      `$1\n${indent}${field}: ${newValue}, ${comment}\n`,
     );
-    return { content: updated, changed: true };
-  }
-
-  return { content, changed: false };
+  });
+  return { content: updated, changed };
 }
 
 /**
@@ -263,7 +256,27 @@ function applySettingsUpdate(
 
   // Scope all matching to within the single provider block containing this providerModel.
   // Find the block: from `providerModel: "..."` to the next `      },` (6-space closing brace).
-  const pmIdx = content.indexOf(`providerModel: "${update.providerModel}"`);
+  const scopeStart = update.enumKey
+    ? content.indexOf(`[ChatModelId.${update.enumKey}]: {`)
+    : 0;
+  if (scopeStart < 0) {
+    return { content, changed: false };
+  }
+  const scopeEnd = update.enumKey
+    ? content.indexOf("\n  },", scopeStart)
+    : content.length;
+  const scope = content.slice(scopeStart, scopeEnd);
+  const providerKey =
+    update.apiProvider &&
+    Object.entries(ApiProvider).find(
+      ([, value]) => value === update.apiProvider,
+    )?.[0];
+  const providerLine = providerKey
+    ? `apiProvider: ApiProvider.${providerKey},\n        `
+    : "";
+  const marker = `providerModel: "${update.providerModel}"`;
+  const match = scope.indexOf(providerLine + marker);
+  const pmIdx = match < 0 ? -1 : scopeStart + match + providerLine.length;
   if (pmIdx === -1) {
     return { content, changed: false };
   }
@@ -308,7 +321,7 @@ function applySettingsUpdate(
 
   // Field doesn't exist — insert after the cost field within the block
   const costRegex = new RegExp(
-    `((?:creditCostPerSecond|creditCostPerImage|creditCostPerClip):\\s*[\\d.]+[,]?(?:\\s*//[^\n]*)?)(\\n)`,
+    `((?:outputTokenCost|creditCostPerSecond|creditCostPerImage|creditCostPerClip):\\s*[\\d.]+[,]?(?:\\s*//[^\n]*)?)(\\n)`,
   );
   if (costRegex.test(blockContent)) {
     const newBlock = blockContent.replace(
@@ -479,6 +492,16 @@ function buildUnbottledEntrySource(
   if (typeof op.cacheWriteTokenCost === "number") {
     lines.push(
       `        cacheWriteTokenCost: ${op.cacheWriteTokenCost}, ${comment}`,
+    );
+  }
+  if (typeof op.cacheWrite1hTokenCost === "number") {
+    lines.push(
+      `        cacheWrite1hTokenCost: ${op.cacheWrite1hTokenCost}, ${comment}`,
+    );
+  }
+  if (op.pricingTiers?.length) {
+    lines.push(
+      `        pricingTiers: ${tariffLiteral(op.pricingTiers)}, ${comment}`,
     );
   }
   if (typeof op.imageOutputTokenCost === "number") {
@@ -1010,13 +1033,15 @@ export class ModelPricesRepository {
           update.field === "outputTokenCost" ||
           update.field === "cacheReadTokenCost" ||
           update.field === "cacheWriteTokenCost" ||
+          update.field === "cacheWrite1hTokenCost" ||
           update.field === "imageOutputTokenCost"
         ) {
           const insertAfterMap: Record<string, string> = {
             inputTokenCost: "creditCost",
             outputTokenCost: "inputTokenCost",
             cacheReadTokenCost: "outputTokenCost",
-            cacheWriteTokenCost: "cacheReadTokenCost",
+            cacheWriteTokenCost: "outputTokenCost",
+            cacheWrite1hTokenCost: "outputTokenCost",
             imageOutputTokenCost: "outputTokenCost",
           };
           const insertAfter = insertAfterMap[update.field] ?? "outputTokenCost";
@@ -1281,6 +1306,7 @@ export class ModelPricesRepository {
               u.field !== "contextWindow" &&
               u.field !== "cacheReadTokenCost" &&
               u.field !== "cacheWriteTokenCost" &&
+              u.field !== "cacheWrite1hTokenCost" &&
               u.field !== "imageOutputTokenCost",
           )
           .map((u) => u.modelId),

@@ -8,7 +8,11 @@ import "server-only";
 
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 
-import type { UsageAttribution, UsageUpstreamCost } from "@/credits/db";
+import type {
+  UsageAttribution,
+  UsageCacheTokens,
+  UsageUpstreamCost,
+} from "@/credits/db";
 
 import type { ChatModelId } from "../../../models";
 import type {
@@ -32,6 +36,7 @@ export type DeductAndEmitCreditsParams =
         | AudioVisionModelId;
       /** Real upstream cost behind this charge, stored on the ledger rows. */
       upstreamCost?: UsageUpstreamCost;
+      tokenUsage?: UsageCacheTokens;
       apiProvider?: UsageAttribution["apiProvider"];
     }
   | {
@@ -112,6 +117,7 @@ export async function deductAndEmitCredits(
           w.deps.locale,
           params.upstreamCost,
           params.apiProvider,
+          params.tokenUsage,
         )
       : CreditRepository.deductCreditsForFeature(
           params.user,

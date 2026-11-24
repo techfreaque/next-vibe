@@ -229,6 +229,8 @@ describe("fact sheets and trial links", () => {
     const facts = factsOf(ChatModelId.CLAUDE_SONNET_5_5);
     const rows = buildFactRows(facts, "en-US");
     expect(facts.providers[0]).toBe(facts.priceProvider);
+    expect(chatPlanPricing(facts, "en-US")?.footnote).toContain("Cached input costs");
+    expect(chatModelFaq(facts, "en-US")[0]?.answer).toContain("Cache writes cost");
     expect(rows.find((row) => row.key === "price")?.hint).toContain(
       facts.priceProvider,
     );

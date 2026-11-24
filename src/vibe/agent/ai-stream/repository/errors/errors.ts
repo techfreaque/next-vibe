@@ -22,8 +22,7 @@ import { chatMessages } from "../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../chat/enum";
 import { createMessagesEmitter } from "../../../chat/threads/[threadId]/messages/emitter";
 import { MessagesRepository } from "../../../chat/threads/[threadId]/messages/repository";
-import type { ApiProvider } from "../../../models/models";
-import { type ChatModelId, getChatModelById } from "../../models";
+import type { ChatModelId, ChatModelOption } from "../../models";
 import type { AiStreamPostRequestOutput } from "../../stream/definition";
 import type { AiStreamT, AiStreamTranslationKey } from "../../stream/i18n";
 import {
@@ -337,7 +336,7 @@ export class AbortErrorHandler {
     isIncognito: boolean;
     userId: string | undefined;
     model: ChatModelId;
-    apiProvider: ApiProvider;
+    modelConfig: ChatModelOption;
     systemPrompt?: string;
     trailingSystemMessage?: string;
     messages?: ModelMessage[];
@@ -353,7 +352,7 @@ export class AbortErrorHandler {
       isIncognito,
       userId,
       model,
-      apiProvider,
+      modelConfig,
       systemPrompt,
       trailingSystemMessage,
       messages,
@@ -439,26 +438,25 @@ export class AbortErrorHandler {
 
           // Delivered images are priced at the image token rate: the text
           // estimate above never sees them.
-          const modelInfo = getChatModelById(model);
-          const stepEstimate = modelInfo
-            ? estimateCutOffStepCost(
-                modelInfo,
-                tokenEstimate.promptTokens,
-                tokenEstimate.completionTokens,
-                cutOffImageCount,
-              )
-            : null;
-          const modelCreditCost = stepEstimate?.credits ?? 0;
-          const completionTokens =
-            stepEstimate?.completionTokens ?? tokenEstimate.completionTokens;
-          const imageOutputTokens = stepEstimate?.imageOutputTokens ?? 0;
+          const stepEstimate = estimateCutOffStepCost(
+            modelConfig,
+            tokenEstimate.promptTokens,
+            tokenEstimate.completionTokens,
+            cutOffImageCount,
+            ctx.stepPricingStartedAt,
+          );
+          const {
+            credits: modelCreditCost,
+            completionTokens,
+            imageOutputTokens,
+          } = stepEstimate;
           const totalTokens = tokenEstimate.promptTokens + completionTokens;
 
           totalCredits += modelCreditCost;
 
           // A cut-off step never reports the provider's real cost: actual-cost
           // models fall back to the listed token price for it.
-          if (modelInfo && billsUpstreamCost(modelInfo)) {
+          if (billsUpstreamCost(modelConfig)) {
             logger.warn(
               "[AI Stream] Upstream cost missing for cut-off step - billing estimated token price",
               {
@@ -466,8 +464,8 @@ export class AbortErrorHandler {
                 // Why the step was cut off (user stop, client gone, timeout)
                 abortReason: streamAbort?.reason ?? error.name,
                 messageId: partialMessageId,
-                apiProvider: modelInfo.apiProvider,
-                providerModel: modelInfo.providerModel,
+                apiProvider: modelConfig.apiProvider,
+                providerModel: modelConfig.providerModel,
                 promptTokens: tokenEstimate.promptTokens,
                 completionTokens,
                 imageCount: cutOffImageCount,
@@ -552,7 +550,7 @@ export class AbortErrorHandler {
               feature: `model:${model}`,
               type: "model",
               model,
-              apiProvider,
+              apiProvider: modelConfig.apiProvider,
             });
 
             logger.debug("[AI Stream] Deducted and emitted model credits", {

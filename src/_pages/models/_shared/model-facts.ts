@@ -30,19 +30,19 @@ import {
   isApiProviderAvailable,
   type ModelDefinition,
   modelProviders,
+  providerUsdToCredits,
   type UncensoredModelMethod,
 } from "next-vibe/agent/models/models";
+import {
+  type TokenTariff,
+  tokenTariffs,
+} from "next-vibe/agent/models/token-tariffs";
 import {
   ContentLevel,
   type ContentLevelValue,
   type IntelligenceLevelValue,
 } from "next-vibe/agent/skills/enum";
 import type { IconKey } from "next-vibe/unified-ui/widgets/form-fields/icon-field/icons";
-
-import {
-  CREDIT_VALUE_USD,
-  STANDARD_MARKUP_PERCENTAGE,
-} from "@/products/constants";
 
 /** Rough tokens per printed page of prose (~500 words). */
 const TOKENS_PER_PAGE = 650;
@@ -83,11 +83,13 @@ export interface ModelFacts extends ModelRef {
    * Credits per 1M tokens on the provider behind creditsPerMessage, markup
    * included. Null for fixed-price routes (no per-token price exists).
    */
+  pricingTiers: readonly TokenTariff[];
   tokenPrice: {
     inputCredits: number;
     outputCredits: number;
     cacheReadCredits: number | null;
     cacheWriteCredits: number | null;
+    cacheWrite1hCredits: number | null;
     imageOutputCredits: number | null;
   } | null;
   /** Parameter count in billions, when the registry knows it. */
@@ -304,9 +306,7 @@ function perMillionCredits(usdPerMillion: number | undefined): number | null;
 function perMillionCredits(usdPerMillion: number | undefined): number | null {
   return usdPerMillion === undefined
     ? null
-    : roundCredits(
-        (usdPerMillion * (1 + STANDARD_MARKUP_PERCENTAGE)) / CREDIT_VALUE_USD,
-      );
+    : providerUsdToCredits(usdPerMillion);
 }
 
 function buildModelFacts(
@@ -336,6 +336,9 @@ function buildModelFacts(
           outputCredits: perMillionCredits(cheapest.outputTokenCost),
           cacheReadCredits: perMillionCredits(cheapest.cacheReadTokenCost),
           cacheWriteCredits: perMillionCredits(cheapest.cacheWriteTokenCost),
+          cacheWrite1hCredits: perMillionCredits(
+            cheapest.cacheWrite1hTokenCost,
+          ),
           imageOutputCredits: perMillionCredits(cheapest.imageOutputTokenCost),
         }
       : null;
@@ -367,6 +370,7 @@ function buildModelFacts(
     supportsTools: def.supportsTools,
     creditsPerMessage,
     tokenPrice,
+    pricingTiers: tokenTariffs(cheapest),
     parameterCount: def.parameterCount ?? null,
     strengths: def.utilities.filter((utility) =>
       STRENGTH_UTILITIES.has(utility),

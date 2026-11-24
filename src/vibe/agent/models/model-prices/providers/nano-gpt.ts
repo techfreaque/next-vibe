@@ -20,6 +20,7 @@ import { sttModelDefinitions } from "../../../speech-to-text/models";
 import { ttsModelDefinitions } from "../../../text-to-speech/models";
 import type { Modality } from "../../enum";
 import { ApiProvider } from "../../models";
+import type { TokenTariff } from "../../token-tariffs";
 import type { PriceFailure, PriceUpdate, ProviderPriceResult } from "./base";
 import { PriceFetcher } from "./base";
 import {
@@ -48,6 +49,29 @@ const chatModelSchema = z.object({
       cacheReadInputPer1kTokens: z.number().nullish(),
       /** USD per 1K cache-write input tokens */
       cacheWriteInputPer1kTokens: z.number().nullish(),
+      cacheWriteInputPer1kTokens1h: z.number().nullish(),
+      firstContextThresholdTokens: z.number().nonnegative().nullish(),
+      highContextThresholdTokens: z.number().nonnegative().nullish(),
+      inputPer1kTokensAboveFirstThreshold: z.number().nonnegative().nullish(),
+      outputPer1kTokensAboveFirstThreshold: z.number().nonnegative().nullish(),
+      cacheReadInputPer1kTokensAboveFirstThreshold: z
+        .number()
+        .nonnegative()
+        .nullish(),
+      cacheWriteInputPer1kTokensAboveFirstThreshold: z
+        .number()
+        .nonnegative()
+        .nullish(),
+      cacheWriteInputPer1kTokens1hAboveFirstThreshold: z
+        .number()
+        .nonnegative()
+        .nullish(),
+      inputPer1kTokensAbove200k: z.number().nonnegative().nullish(),
+      outputPer1kTokensAbove200k: z.number().nonnegative().nullish(),
+      cacheReadInputPer1kTokensAbove200k: z.number().nonnegative().nullish(),
+      cacheWriteInputPer1kTokensAbove200k: z.number().nonnegative().nullish(),
+      cacheWriteInputPer1kTokens1hAbove200k: z.number().nonnegative().nullish(),
+
       unit: z.string().nullish(),
     })
     .nullish(),
@@ -116,6 +140,43 @@ function perThousandToPerMillion(
   return value === undefined || value === null ? undefined : value * 1000;
 }
 
+function readNanoTariffs(
+  pricing: NonNullable<NanoGptChatModel["pricing"]>,
+): TokenTariff[] {
+  const tiers: TokenTariff[] = [];
+  for (const [threshold, suffix] of [
+    [pricing.firstContextThresholdTokens, "AboveFirstThreshold"],
+    [pricing.highContextThresholdTokens, "Above200k"],
+  ] as const) {
+    const input = perThousandToPerMillion(pricing[`inputPer1kTokens${suffix}`]);
+    const output = perThousandToPerMillion(
+      pricing[`outputPer1kTokens${suffix}`],
+    );
+    if (
+      typeof threshold !== "number" ||
+      input === undefined ||
+      output === undefined
+    ) {
+      continue;
+    }
+    tiers.push({
+      minPromptTokens: threshold + 1,
+      inputTokenCost: input,
+      outputTokenCost: output,
+      cacheReadTokenCost: perThousandToPerMillion(
+        pricing[`cacheReadInputPer1kTokens${suffix}`],
+      ),
+      cacheWriteTokenCost: perThousandToPerMillion(
+        pricing[`cacheWriteInputPer1kTokens${suffix}`],
+      ),
+      cacheWrite1hTokenCost: perThousandToPerMillion(
+        pricing[`cacheWriteInputPer1kTokens1h${suffix}`],
+      ),
+    });
+  }
+  return tiers;
+}
+
 function toTokenEntry(model: NanoGptChatModel): TokenPriceEntry | undefined {
   const pricing = model.pricing;
   if (
@@ -135,9 +196,11 @@ function toTokenEntry(model: NanoGptChatModel): TokenPriceEntry | undefined {
     : ["text"];
   return {
     input: pricing.prompt,
+    pricingTiers: readNanoTariffs(pricing),
     output: pricing.completion,
     cacheRead: perThousandToPerMillion(pricing.cacheReadInputPer1kTokens),
     cacheWrite: perThousandToPerMillion(pricing.cacheWriteInputPer1kTokens),
+    cacheWrite1h: perThousandToPerMillion(pricing.cacheWriteInputPer1kTokens1h),
     contextWindow: model.context_length ?? undefined,
     inputs,
     outputs: ["text"],
@@ -201,6 +264,7 @@ export class NanoGptPriceFetcher extends PriceFetcher {
     const failures: PriceFailure[] = [];
     let modelsFound = 0;
 
+    let settingsUpdates: ProviderPriceResult["settingsUpdates"] = [];
     let modalityUpdates: ProviderPriceResult["modalityUpdates"] = [];
     if (chatCatalog.ok) {
       modelsFound += chatCatalog.items.size;
@@ -220,6 +284,7 @@ export class NanoGptPriceFetcher extends PriceFetcher {
       updates.push(...chat.updates);
       failures.push(...chat.failures);
       modalityUpdates = chat.modalityUpdates;
+      settingsUpdates = chat.settingsUpdates;
     } else {
       errors.push(chatCatalog.error);
     }
@@ -245,6 +310,7 @@ export class NanoGptPriceFetcher extends PriceFetcher {
       ).length,
       updates,
       modalityUpdates,
+      settingsUpdates,
       failures,
       ...(errors.length > 0
         ? {

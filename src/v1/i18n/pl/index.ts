@@ -7,6 +7,11 @@ export const translations: typeof enTranslations = {
     api: "API zgodne z OpenAI",
   },
 
+  promptCache: {
+    label: "Pamięć podręczna promptu",
+    description:
+      "Zapisz wspólny początek promptu w pamięci podręcznej i wybierz czas przechowywania.",
+  },
   openai: {
     missingKey:
       "Brak klucza API. Wyślij go jako 'Authorization: Bearer <klucz>' albo 'x-api-key: <klucz>'. Utwórz klucz w Ustawienia > Klucze API.",

@@ -7,6 +7,7 @@
 import {
   chatModelDefinitions,
   ChatModelId,
+  chatModelOptionsIndex,
 } from "next-vibe/agent/ai-stream/models";
 import { ImageGenModelId } from "next-vibe/agent/image-generation/models";
 import { MusicGenModelId } from "next-vibe/agent/music-generation/models";
@@ -17,6 +18,7 @@ import {
   API_KEY_PLACEHOLDER,
   toAnthropicBaseUrl,
 } from "@/api-keys/coding-tools";
+import { chatTokenPricing } from "@/v1/shared/chat-pricing";
 
 /** Must be callable via GET /v1/models, or every example 404s. */
 export const DOCS_EXAMPLE_MODEL = ChatModelId.KIMI_K3_1_PRO;
@@ -104,10 +106,7 @@ export function buildDocsSnippets(baseUrl: string): DocsSnippets {
       "supports_tools": true,
       "input_modalities": ["text"],
       "output_modalities": ["text"],
-      "pricing": {
-        "input_credits_per_million_tokens": 8,
-        "output_credits_per_million_tokens": 32
-      }
+      "pricing": ${JSON.stringify(chatTokenPricing(chatModelOptionsIndex[DOCS_EXAMPLE_MODEL]), null, 2).replaceAll("\n", "\n      ")}
     }
   ]
 }`,
@@ -135,6 +134,7 @@ export function buildDocsSnippets(baseUrl: string): DocsSnippets {
   ],
   "usage": {
     "prompt_tokens": 31,
+    "prompt_tokens_details": {"cached_tokens": 16, "cache_write_tokens": 0},
     "completion_tokens": 9,
     "total_tokens": 40,
     "credits_charged": 0.1

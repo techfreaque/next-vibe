@@ -12,6 +12,8 @@ import "server-only";
 
 import type { JSONValue } from "ai";
 
+import type { ClientPromptCache } from "../shared/prompt-cache";
+
 export interface JsonRecord {
   [key: string]: JSONValue;
 }
@@ -57,4 +59,118 @@ export function withIgnoredProvider(
   }
   provider["ignore"] = ignore;
   return { ...body, provider };
+}
+
+/** Both SDK adapters flatten assistant text and omit function-tool cache markers. */
+export function applyClientCache(
+  body: JsonRecord,
+  cache: ClientPromptCache,
+): void {
+  if (cache.control) {
+    body.cache_control = cache.control;
+  }
+  if (Array.isArray(body.tools)) {
+    for (const entry of body.tools) {
+      if (
+        isJsonRecord(entry) &&
+        isJsonRecord(entry.function) &&
+        typeof entry.function.name === "string"
+      ) {
+        const control = cache.tools.get(entry.function.name);
+        if (control) {
+          entry.cache_control = control;
+        }
+      }
+    }
+  }
+  if (!Array.isArray(body.messages)) {
+    return;
+  }
+  const system = cache.messages.filter((message) => message.role === "system");
+  const users = cache.messages.filter((message) => message.role === "user");
+  let systemIndex = 0;
+  let userIndex = 0;
+  for (const message of body.messages) {
+    if (!isJsonRecord(message)) {
+      continue;
+    }
+    const original =
+      message.role === "system" || message.role === "developer"
+        ? system[systemIndex++]
+        : message.role === "user"
+          ? users[userIndex++]
+          : undefined;
+    if (!original) {
+      continue;
+    }
+    const parts = original.content;
+    const messageControl = original.providerOptions?.openrouter?.cacheControl;
+    if (typeof message.content === "string") {
+      const control =
+        messageControl ||
+        (Array.isArray(parts) && parts.length === 1
+          ? parts[0]?.providerOptions?.openrouter?.cacheControl
+          : undefined);
+      if (control) {
+        message.content = [
+          { type: "text", text: message.content, cache_control: control },
+        ];
+        delete message.cache_control;
+      }
+    } else if (Array.isArray(message.content) && Array.isArray(parts)) {
+      for (const [index, wire] of message.content.entries()) {
+        const control = parts[index]?.providerOptions?.openrouter?.cacheControl;
+        if (isJsonRecord(wire) && control) {
+          wire.cache_control = control;
+        }
+      }
+    }
+  }
+  const assistants = cache.messages.filter(
+    (message) => message.role === "assistant",
+  );
+  let index = 0;
+  for (const message of body.messages) {
+    if (!isJsonRecord(message) || message.role !== "assistant") {
+      continue;
+    }
+    const parts = assistants[index++]?.content;
+    if (!Array.isArray(parts)) {
+      continue;
+    }
+    const textParts = parts.filter((part) => part.type === "text");
+    if (
+      textParts.some(
+        (part) => part.providerOptions?.openrouter?.cacheControl,
+      ) &&
+      message.content === textParts.map((part) => part.text).join("")
+    ) {
+      message.content = textParts.map((part) => {
+        const control = part.providerOptions?.openrouter?.cacheControl;
+        return {
+          type: "text",
+          text: part.text,
+          ...(control ? { cache_control: control } : {}),
+        };
+      });
+    }
+    if (Array.isArray(message.tool_calls)) {
+      for (const call of message.tool_calls) {
+        if (isJsonRecord(call)) {
+          const part = parts.find(
+            (candidate) =>
+              candidate.type === "tool-call" &&
+              candidate.toolCallId === call.id,
+          );
+          const control =
+            part?.type === "tool-call"
+              ? part.providerOptions?.openrouter?.cacheControl
+              : undefined;
+          if (control) {
+            call.cache_control = control;
+          }
+        }
+      }
+    }
+  }
 }

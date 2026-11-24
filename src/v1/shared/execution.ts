@@ -89,6 +89,7 @@ export async function resolveV1Model(
 }
 
 export interface V1CallInput {
+  cacheControl?: InferenceRequest["cacheControl"];
   payer: JwtPrivatePayloadType;
   model: ChatModelOption;
   messages: ModelMessage[];
@@ -118,6 +119,7 @@ export interface V1Totals {
   inputTokens: number;
   outputTokens: number;
   cachedInputTokens: number;
+  cacheWriteTokens?: number;
   reasoningTokens: number;
   credits: number;
 }
@@ -256,6 +258,7 @@ export async function prepareV1Call(
       : requestedMaxOutputTokens;
 
   const inference: InferenceRequest = {
+    cacheControl: input.cacheControl,
     model,
     messages: input.messages,
     temperature: input.temperature,
@@ -268,6 +271,7 @@ export async function prepareV1Call(
     logger,
     toolExecutionContext: input.toolExecutionContext,
   };
+  const requestStartedAt = Date.now();
   const estimatedInputTokens = input.estimatedInputTokens;
   return {
     ok: true,
@@ -284,6 +288,7 @@ export async function prepareV1Call(
           usage,
           providerMetadata,
           estimatedInputTokens,
+          requestStartedAt,
           outputChars,
           locale,
           logger,
@@ -379,6 +384,7 @@ async function preflight(params: {
 }
 
 async function bill(params: {
+  requestStartedAt: number;
   user: JwtPrivatePayloadType;
   model: ChatModelOption;
   usage: InferenceUsage | undefined;
@@ -394,6 +400,7 @@ async function bill(params: {
   const outputTokens =
     usage?.outputTokens ?? Math.ceil(params.outputChars / CHARS_PER_TOKEN);
   const cachedInputTokens = usage?.cachedInputTokens ?? 0;
+  const cacheWriteTokens = usage?.cacheWriteTokens ?? 0;
   // Same rule as chat turns: OpenRouter per-token models bill the call's
   // real upstream cost x markup; a call without a reported cost (stream cut,
   // provider omitted it) falls back to the listed token price with a warning.
@@ -403,7 +410,11 @@ async function bill(params: {
       inputTokens,
       outputTokens,
       cachedInputTokens,
-      cacheWriteTokens: 0,
+      cacheWriteTokens,
+      hourWriteTokens: usage?.hourWriteTokens,
+      requestStartedAt: params.requestStartedAt,
+      promptCountKnown:
+        usage?.inputTokens !== undefined && usage.inputTokens > 0,
       imageOutputTokens: usage?.imageOutputTokens ?? 0,
     },
     params.providerMetadata,
@@ -426,6 +437,7 @@ async function bill(params: {
     locale,
     upstreamCost,
     model.apiProvider,
+    { cachedInputTokens, cacheWriteTokens },
   );
   if (!deducted.success) {
     logger.error(
@@ -441,6 +453,7 @@ async function bill(params: {
     inputTokens,
     outputTokens,
     cachedInputTokens,
+    cacheWriteTokens,
     reasoningTokens: usage?.reasoningTokens ?? 0,
     credits: cost,
   };

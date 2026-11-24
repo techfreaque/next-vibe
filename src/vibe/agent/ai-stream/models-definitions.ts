@@ -419,6 +419,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.625, // updated: 2026-11-07 from venice-api
         outputTokenCost: 3.75, // updated: 2026-11-07 from venice-api
+        pricingTiers: [
+          {
+            minPromptTokens: 256001,
+            inputTokenCost: 2.5,
+            outputTokenCost: 7.5,
+            cacheReadTokenCost: 0.0625,
+            cacheWriteTokenCost: 0.78,
+          },
+        ], // updated: 2026-11-24 from venice-api
         cacheReadTokenCost: 0.0625, // updated: 2026-11-07 from venice-api
         cacheWriteTokenCost: 0.78, // updated: 2026-11-07 from venice-api
       },
@@ -429,6 +438,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.8125, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 4.875, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 256001,
+            inputTokenCost: 3.25,
+            outputTokenCost: 9.75,
+            cacheReadTokenCost: 0.0813,
+            cacheWriteTokenCost: 1.014,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.0813, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 1.014, // updated: 2026-11-09 from unbottled.ai
       },
@@ -717,6 +735,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 5, // updated: 2026-03-31 from openrouter-api
         cacheReadTokenCost: 0.1, // updated: 2026-03-31 from openrouter-api
         cacheWriteTokenCost: 1.25, // updated: 2026-03-31 from openrouter-api
+        cacheWrite1hTokenCost: 2, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_HAIKU_4_5,
@@ -727,6 +746,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
         cacheReadTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
+        cacheWrite1hTokenCost: 2.6, // updated: 2026-11-24 from unbottled.ai
       },
     ],
 
@@ -766,6 +786,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 25, // updated: 2026-03-31 from openrouter-api
         cacheReadTokenCost: 0.5, // updated: 2026-03-31 from openrouter-api
         cacheWriteTokenCost: 6.25, // updated: 2026-03-31 from openrouter-api
+        cacheWrite1hTokenCost: 10, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_OPUS_4_5,
@@ -776,6 +797,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 32.5, // updated: 2026-11-09 from unbottled.ai
         cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 8.125, // updated: 2026-11-09 from unbottled.ai
+        cacheWrite1hTokenCost: 13, // updated: 2026-11-24 from unbottled.ai
       },
     ],
 
@@ -815,6 +837,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 25, // updated: 2026-03-31 from openrouter-api
         cacheReadTokenCost: 0.5, // updated: 2026-03-31 from openrouter-api
         cacheWriteTokenCost: 6.25, // updated: 2026-03-31 from openrouter-api
+        cacheWrite1hTokenCost: 10, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_OPUS_4_6,
@@ -825,6 +848,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 32.5, // updated: 2026-11-09 from unbottled.ai
         cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 8.125, // updated: 2026-11-09 from unbottled.ai
+        cacheWrite1hTokenCost: 13, // updated: 2026-11-24 from unbottled.ai
       },
     ],
 
@@ -864,6 +888,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 25, // updated: 2026-07-02 from openrouter-api
         cacheReadTokenCost: 0.5, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 6.25, // updated: 2026-11-07 from openrouter-api
+        cacheWrite1hTokenCost: 10, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_OPUS_4_7,
@@ -874,6 +899,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 32.5, // updated: 2026-11-09 from unbottled.ai
         cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 8.125, // updated: 2026-11-09 from unbottled.ai
+        cacheWrite1hTokenCost: 13, // updated: 2026-11-24 from unbottled.ai
       },
     ],
 
@@ -911,8 +937,19 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 3, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 15, // updated: 2026-03-31 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 6,
+            outputTokenCost: 22.5,
+            cacheReadTokenCost: 0.6,
+            cacheWriteTokenCost: 7.5,
+            cacheWrite1hTokenCost: 12,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.3, // updated: 2026-07-02 from openrouter-api
         cacheWriteTokenCost: 3.75, // updated: 2026-07-02 from openrouter-api
+        cacheWrite1hTokenCost: 6, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_SONNET_4_5,
@@ -921,8 +958,19 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 3.9, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 19.5, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 7.8,
+            outputTokenCost: 29.25,
+            cacheReadTokenCost: 0.78,
+            cacheWriteTokenCost: 9.75,
+            cacheWrite1hTokenCost: 15.6,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.39, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 4.875, // updated: 2026-11-09 from unbottled.ai
+        cacheWrite1hTokenCost: 7.8, // updated: 2026-11-24 from unbottled.ai
       },
     ],
 
@@ -962,6 +1010,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 15, // updated: 2026-03-31 from openrouter-api
         cacheReadTokenCost: 0.3, // updated: 2026-03-31 from openrouter-api
         cacheWriteTokenCost: 3.75, // updated: 2026-03-31 from openrouter-api
+        cacheWrite1hTokenCost: 6, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_SONNET_4_6,
@@ -972,6 +1021,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 19.5, // updated: 2026-11-09 from unbottled.ai
         cacheReadTokenCost: 0.39, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 4.875, // updated: 2026-11-09 from unbottled.ai
+        cacheWrite1hTokenCost: 7.8, // updated: 2026-11-24 from unbottled.ai
       },
     ],
 
@@ -1010,6 +1060,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.25, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 2.5, // updated: 2026-11-07 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 2.5,
+            outputTokenCost: 5,
+            cacheReadTokenCost: 0.4,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.2, // updated: 2026-11-07 from openrouter-api
       },
       {
@@ -1019,6 +1077,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 3.25,
+            outputTokenCost: 6.5,
+            cacheReadTokenCost: 0.52,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
       },
     ],
@@ -1056,6 +1122,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.25, // updated: 2026-11-13 from openrouter-api
         outputTokenCost: 2.5, // updated: 2026-11-13 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 2.5,
+            outputTokenCost: 5,
+            cacheReadTokenCost: 0.4,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.2, // updated: 2026-11-13 from openrouter-api
       },
       {
@@ -1065,6 +1139,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 3.25,
+            outputTokenCost: 6.5,
+            cacheReadTokenCost: 0.52,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.065, // updated: 2026-11-09 from unbottled.ai
       },
     ],
@@ -1095,6 +1177,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.25, // updated: 2026-05-03 from openrouter-api
         outputTokenCost: 2.5, // updated: 2026-05-03 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 2.5,
+            outputTokenCost: 5,
+            cacheReadTokenCost: 0.4,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.2, // updated: 2026-11-15 from openrouter-api
       },
       {
@@ -1104,6 +1194,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 3.25,
+            outputTokenCost: 6.5,
+            cacheReadTokenCost: 0.52,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
+        cacheReadTokenCost: 0.26, // updated: 2026-11-24 from unbottled.ai
       },
     ],
 
@@ -1139,6 +1238,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.25, // updated: 2026-07-02 from openrouter-api
         outputTokenCost: 2.5, // updated: 2026-07-02 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 2.5,
+            outputTokenCost: 5,
+            cacheReadTokenCost: 0.4,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.2, // updated: 2026-11-07 from openrouter-api
       },
       {
@@ -1148,6 +1255,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 3.25,
+            outputTokenCost: 6.5,
+            cacheReadTokenCost: 0.52,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
       },
     ],
@@ -1222,6 +1337,13 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 30, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 180, // updated: 2026-03-31 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 60,
+            outputTokenCost: 270,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.GPT_5_4_PRO,
@@ -1230,6 +1352,13 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 39, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 234, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 78,
+            outputTokenCost: 351,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
       },
     ],
 
@@ -1485,6 +1614,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 5, // updated: 2026-07-02 from openrouter-api
         outputTokenCost: 30, // updated: 2026-07-02 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 10,
+            outputTokenCost: 45,
+            cacheReadTokenCost: 1,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.5, // updated: 2026-11-07 from openrouter-api
       },
       {
@@ -1494,6 +1631,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 39, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 13,
+            outputTokenCost: 58.5,
+            cacheReadTokenCost: 1.3,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
       },
     ],
@@ -1532,6 +1677,13 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 30, // updated: 2026-07-02 from openrouter-api
         outputTokenCost: 180, // updated: 2026-07-02 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 60,
+            outputTokenCost: 270,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.GPT_5_5_PRO,
@@ -1540,6 +1692,13 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 39, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 234, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 78,
+            outputTokenCost: 351,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
       },
     ],
 
@@ -1577,6 +1736,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2.5, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 15, // updated: 2026-03-31 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 5,
+            outputTokenCost: 22.5,
+            cacheReadTokenCost: 0.5,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.25, // updated: 2026-07-02 from openrouter-api
       },
       {
@@ -1586,6 +1753,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 19.5, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 6.5,
+            outputTokenCost: 29.25,
+            cacheReadTokenCost: 0.65,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.325, // updated: 2026-11-09 from unbottled.ai
       },
     ],
@@ -2663,6 +2838,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.25, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 10, // updated: 2026-03-31 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 2.5,
+            outputTokenCost: 15,
+            cacheReadTokenCost: 0.25,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.13, // updated: 2026-03-31 from openrouter-api
         cacheWriteTokenCost: 0.38, // updated: 2026-03-31 from openrouter-api
       },
@@ -2673,6 +2856,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 3.25,
+            outputTokenCost: 19.5,
+            cacheReadTokenCost: 0.325,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.169, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 0.494, // updated: 2026-11-09 from unbottled.ai
       },
@@ -2704,6 +2895,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2, // updated: 2026-03-31 from openrouter-api
         outputTokenCost: 12, // updated: 2026-03-31 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 4,
+            outputTokenCost: 18,
+            cacheReadTokenCost: 0.4,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.2, // updated: 2026-03-31 from openrouter-api
         cacheWriteTokenCost: 0.38, // updated: 2026-03-31 from openrouter-api
       },
@@ -2714,6 +2913,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 15.6, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 5.2,
+            outputTokenCost: 23.4,
+            cacheReadTokenCost: 0.52,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 0.494, // updated: 2026-11-09 from unbottled.ai
       },
@@ -3266,6 +3473,19 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.1,
         outputTokenCost: 0.5,
+        pricingTiers: [
+          {
+            minPromptTokens: 100001,
+            inputTokenCost: 0.5,
+            outputTokenCost: 2.5,
+            cacheReadTokenCost: 0.05,
+            cacheWriteTokenCost: 0.625,
+            cacheWrite1hTokenCost: 1,
+          },
+        ], // updated: 2026-11-24 from Anthropic
+        cacheReadTokenCost: 0.01, // updated: 2026-11-24 from Anthropic
+        cacheWriteTokenCost: 0.125, // updated: 2026-11-24 from Anthropic
+        cacheWrite1hTokenCost: 0.2, // updated: 2026-11-24 from Anthropic
         adminOnly: true,
       },
       {
@@ -3275,6 +3495,19 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 100001,
+            inputTokenCost: 0.65,
+            outputTokenCost: 3.25,
+            cacheReadTokenCost: 0.065,
+            cacheWriteTokenCost: 0.8125,
+            cacheWrite1hTokenCost: 1.3,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
+        cacheReadTokenCost: 0.013, // updated: 2026-11-24 from unbottled.ai
+        cacheWriteTokenCost: 0.1625, // updated: 2026-11-24 from unbottled.ai
+        cacheWrite1hTokenCost: 0.26, // updated: 2026-11-24 from unbottled.ai
       },
     ],
     utilities: [
@@ -3308,6 +3541,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2,
         outputTokenCost: 10,
+        cacheReadTokenCost: 0.1, // updated: 2026-11-24 from Anthropic
+        cacheWriteTokenCost: 2.5, // updated: 2026-11-24 from Anthropic
+        cacheWrite1hTokenCost: 4, // updated: 2026-11-24 from Anthropic
         adminOnly: true,
       },
       {
@@ -3317,6 +3553,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.13, // updated: 2026-11-24 from unbottled.ai
+        cacheWriteTokenCost: 3.25, // updated: 2026-11-24 from unbottled.ai
+        cacheWrite1hTokenCost: 5.2, // updated: 2026-11-24 from unbottled.ai
       },
     ],
     utilities: [
@@ -3351,6 +3590,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 4,
         outputTokenCost: 20,
+        cacheReadTokenCost: 0.2, // updated: 2026-11-24 from Anthropic
+        cacheWriteTokenCost: 5, // updated: 2026-11-24 from Anthropic
+        cacheWrite1hTokenCost: 8, // updated: 2026-11-24 from Anthropic
         adminOnly: true,
       },
       {
@@ -3360,6 +3602,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 5.2, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 26, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.26, // updated: 2026-11-24 from unbottled.ai
+        cacheWriteTokenCost: 6.5, // updated: 2026-11-24 from unbottled.ai
+        cacheWrite1hTokenCost: 10.4, // updated: 2026-11-24 from unbottled.ai
       },
     ],
     utilities: [
@@ -3394,6 +3639,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 10,
         outputTokenCost: 50,
+        cacheReadTokenCost: 0.25, // updated: 2026-11-24 from Anthropic
+        cacheWriteTokenCost: 12.5, // updated: 2026-11-24 from Anthropic
+        cacheWrite1hTokenCost: 20, // updated: 2026-11-24 from Anthropic
         adminOnly: true,
       },
       {
@@ -3403,6 +3651,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 65, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.325, // updated: 2026-11-24 from unbottled.ai
+        cacheWriteTokenCost: 16.25, // updated: 2026-11-24 from unbottled.ai
+        cacheWrite1hTokenCost: 26, // updated: 2026-11-24 from unbottled.ai
       },
     ],
     utilities: [
@@ -3665,6 +3916,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 25, // updated: 2026-08-16 from openrouter-api
         cacheReadTokenCost: 0.5, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 6.25, // updated: 2026-11-07 from openrouter-api
+        cacheWrite1hTokenCost: 10, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_OPUS_4_8,
@@ -3675,6 +3927,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 32.5, // updated: 2026-11-09 from unbottled.ai
         cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 8.125, // updated: 2026-11-09 from unbottled.ai
+        cacheWrite1hTokenCost: 13, // updated: 2026-11-24 from unbottled.ai
       },
     ],
     utilities: [
@@ -3711,6 +3964,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 10, // updated: 2026-08-16 from openrouter-api
         cacheReadTokenCost: 0.2, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 2.5, // updated: 2026-11-07 from openrouter-api
+        cacheWrite1hTokenCost: 4, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_SONNET_5,
@@ -3721,6 +3975,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
         cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
+        cacheWrite1hTokenCost: 5.2, // updated: 2026-11-24 from unbottled.ai
       },
     ],
     utilities: [
@@ -3757,6 +4012,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 25, // updated: 2026-08-16 from openrouter-api
         cacheReadTokenCost: 0.5, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 6.25, // updated: 2026-11-07 from openrouter-api
+        cacheWrite1hTokenCost: 10, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_OPUS_5,
@@ -3767,6 +4023,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 32.5, // updated: 2026-11-09 from unbottled.ai
         cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 8.125, // updated: 2026-11-09 from unbottled.ai
+        cacheWrite1hTokenCost: 13, // updated: 2026-11-24 from unbottled.ai
       },
     ],
     utilities: [
@@ -3850,6 +4107,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 50, // updated: 2026-08-16 from openrouter-api
         cacheReadTokenCost: 1, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 12.5, // updated: 2026-11-07 from openrouter-api
+        cacheWrite1hTokenCost: 20, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_FABLE_5,
@@ -3860,6 +4118,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 65, // updated: 2026-11-09 from unbottled.ai
         cacheReadTokenCost: 1.3, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 16.25, // updated: 2026-11-09 from unbottled.ai
+        cacheWrite1hTokenCost: 26, // updated: 2026-11-24 from unbottled.ai
       },
     ],
     utilities: [
@@ -3893,6 +4152,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2, // updated: 2026-08-16 from openrouter-api
         outputTokenCost: 6, // updated: 2026-08-16 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 4,
+            outputTokenCost: 12,
+            cacheReadTokenCost: 0.6,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.3, // updated: 2026-11-07 from openrouter-api
       },
       {
@@ -3902,6 +4169,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 7.8, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 5.2,
+            outputTokenCost: 15.6,
+            cacheReadTokenCost: 0.78,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.39, // updated: 2026-11-09 from unbottled.ai
       },
     ],
@@ -3935,6 +4210,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2, // updated: 2026-08-16 from openrouter-api
         outputTokenCost: 6, // updated: 2026-08-16 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 4,
+            outputTokenCost: 12,
+            cacheReadTokenCost: 1,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.5, // updated: 2026-11-07 from openrouter-api
       },
       {
@@ -3944,6 +4227,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 7.8, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 5.2,
+            outputTokenCost: 15.6,
+            cacheReadTokenCost: 1.3,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
       },
     ],
@@ -3977,6 +4268,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.2, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 1.2, // updated: 2026-11-07 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 0.4,
+            outputTokenCost: 1.8,
+            cacheReadTokenCost: 0.04,
+            cacheWriteTokenCost: 0.5,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.02, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 0.25, // updated: 2026-11-07 from openrouter-api
       },
@@ -3987,6 +4287,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 1.56, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 0.52,
+            outputTokenCost: 2.34,
+            cacheReadTokenCost: 0.052,
+            cacheWriteTokenCost: 0.65,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.026, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 0.325, // updated: 2026-11-09 from unbottled.ai
       },
@@ -4016,6 +4325,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.2, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 1.2, // updated: 2026-11-07 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 0.4,
+            outputTokenCost: 1.8,
+            cacheReadTokenCost: 0.04,
+            cacheWriteTokenCost: 0.5,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.02, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 0.25, // updated: 2026-11-07 from openrouter-api
       },
@@ -4026,6 +4344,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 1.56, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 0.52,
+            outputTokenCost: 2.34,
+            cacheReadTokenCost: 0.052,
+            cacheWriteTokenCost: 0.65,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.026, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 0.325, // updated: 2026-11-09 from unbottled.ai
       },
@@ -4060,6 +4387,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 12, // updated: 2026-11-07 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 4,
+            outputTokenCost: 18,
+            cacheReadTokenCost: 0.4,
+            cacheWriteTokenCost: 5,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.2, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 2.5, // updated: 2026-11-07 from openrouter-api
       },
@@ -4070,6 +4406,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 15.6, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 5.2,
+            outputTokenCost: 23.4,
+            cacheReadTokenCost: 0.52,
+            cacheWriteTokenCost: 6.5,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
       },
@@ -4105,6 +4450,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 12, // updated: 2026-11-07 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 4,
+            outputTokenCost: 18,
+            cacheReadTokenCost: 0.4,
+            cacheWriteTokenCost: 5,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.2, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 2.5, // updated: 2026-11-07 from openrouter-api
       },
@@ -4115,6 +4469,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 15.6, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 5.2,
+            outputTokenCost: 23.4,
+            cacheReadTokenCost: 0.52,
+            cacheWriteTokenCost: 6.5,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.26, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
       },
@@ -4150,6 +4513,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 4, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 20, // updated: 2026-11-07 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 8,
+            outputTokenCost: 30,
+            cacheReadTokenCost: 0.8,
+            cacheWriteTokenCost: 10,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.4, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 5, // updated: 2026-11-07 from openrouter-api
       },
@@ -4160,6 +4532,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 5.2, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 26, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 10.4,
+            outputTokenCost: 39,
+            cacheReadTokenCost: 1.04,
+            cacheWriteTokenCost: 13,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.52, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
       },
@@ -4196,6 +4577,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 4, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 20, // updated: 2026-11-07 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 8,
+            outputTokenCost: 30,
+            cacheReadTokenCost: 0.8,
+            cacheWriteTokenCost: 10,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.4, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 5, // updated: 2026-11-07 from openrouter-api
       },
@@ -4206,6 +4596,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 5.2, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 26, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 10.4,
+            outputTokenCost: 39,
+            cacheReadTokenCost: 1.04,
+            cacheWriteTokenCost: 13,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.52, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
       },
@@ -4498,6 +4897,22 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.03, // updated: 2026-08-16 from openrouter-api
         outputTokenCost: 0.13, // updated: 2026-08-16 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 32000,
+            inputTokenCost: 0.1,
+            outputTokenCost: 0.4,
+            cacheReadTokenCost: 0.02,
+            cacheWriteTokenCost: 0.125,
+          },
+          {
+            minPromptTokens: 256000,
+            inputTokenCost: 0.2,
+            outputTokenCost: 0.8,
+            cacheReadTokenCost: 0.04,
+            cacheWriteTokenCost: 0.25,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.01, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 0.04, // updated: 2026-11-07 from openrouter-api
       },
@@ -4508,6 +4923,22 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.039, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 0.169, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 32000,
+            inputTokenCost: 0.13,
+            outputTokenCost: 0.52,
+            cacheReadTokenCost: 0.026,
+            cacheWriteTokenCost: 0.1625,
+          },
+          {
+            minPromptTokens: 256000,
+            inputTokenCost: 0.26,
+            outputTokenCost: 1.04,
+            cacheReadTokenCost: 0.052,
+            cacheWriteTokenCost: 0.325,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.013, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 0.052, // updated: 2026-11-09 from unbottled.ai
       },
@@ -4628,6 +5059,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.3965, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 0.7917, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.1248, // updated: 2026-11-24 from unbottled.ai
       },
     ],
     utilities: [
@@ -4742,6 +5174,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 4,
         outputTokenCost: 20,
+        cacheReadTokenCost: 0.2, // updated: 2026-11-24 from Anthropic
+        cacheWriteTokenCost: 5, // updated: 2026-11-24 from Anthropic
+        cacheWrite1hTokenCost: 8, // updated: 2026-11-24 from Anthropic
         adminOnly: true,
       },
       {
@@ -4753,6 +5188,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 20, // updated: 2026-11-07 from openrouter-api
         cacheReadTokenCost: 0.2, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 5, // updated: 2026-11-07 from openrouter-api
+        cacheWrite1hTokenCost: 8, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_OPUS_5_5,
@@ -4761,6 +5197,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 5.2, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 26, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.26, // updated: 2026-11-24 from unbottled.ai
+        cacheWriteTokenCost: 6.5, // updated: 2026-11-24 from unbottled.ai
+        cacheWrite1hTokenCost: 10.4, // updated: 2026-11-24 from unbottled.ai
       },
     ],
     utilities: [
@@ -4794,6 +5233,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2,
         outputTokenCost: 10,
+        cacheReadTokenCost: 0.1, // updated: 2026-11-24 from Anthropic
+        cacheWriteTokenCost: 2.5, // updated: 2026-11-24 from Anthropic
+        cacheWrite1hTokenCost: 4, // updated: 2026-11-24 from Anthropic
         adminOnly: true,
       },
       {
@@ -4805,6 +5247,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 10, // updated: 2026-11-07 from openrouter-api
         cacheReadTokenCost: 0.1, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 2.5, // updated: 2026-11-07 from openrouter-api
+        cacheWrite1hTokenCost: 4, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_SONNET_5_5,
@@ -4813,6 +5256,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.13, // updated: 2026-11-24 from unbottled.ai
+        cacheWriteTokenCost: 3.25, // updated: 2026-11-24 from unbottled.ai
+        cacheWrite1hTokenCost: 5.2, // updated: 2026-11-24 from unbottled.ai
       },
     ],
     utilities: [
@@ -4846,6 +5292,19 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.1,
         outputTokenCost: 0.5,
+        pricingTiers: [
+          {
+            minPromptTokens: 100001,
+            inputTokenCost: 0.5,
+            outputTokenCost: 2.5,
+            cacheReadTokenCost: 0.05,
+            cacheWriteTokenCost: 0.625,
+            cacheWrite1hTokenCost: 1,
+          },
+        ], // updated: 2026-11-24 from Anthropic
+        cacheReadTokenCost: 0.01, // updated: 2026-11-24 from Anthropic
+        cacheWriteTokenCost: 0.125, // updated: 2026-11-24 from Anthropic
+        cacheWrite1hTokenCost: 0.2, // updated: 2026-11-24 from Anthropic
         adminOnly: true,
       },
       {
@@ -4855,8 +5314,19 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.1, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 0.5, // updated: 2026-11-07 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 100000,
+            inputTokenCost: 0.5,
+            outputTokenCost: 2.5,
+            cacheReadTokenCost: 0.05,
+            cacheWriteTokenCost: 0.625,
+            cacheWrite1hTokenCost: 1,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.01, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 0.13, // updated: 2026-11-07 from openrouter-api
+        cacheWrite1hTokenCost: 0.2, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_HAIKU_5_5,
@@ -4865,6 +5335,19 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 100001,
+            inputTokenCost: 0.65,
+            outputTokenCost: 3.25,
+            cacheReadTokenCost: 0.065,
+            cacheWriteTokenCost: 0.8125,
+            cacheWrite1hTokenCost: 1.3,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
+        cacheReadTokenCost: 0.013, // updated: 2026-11-24 from unbottled.ai
+        cacheWriteTokenCost: 0.1625, // updated: 2026-11-24 from unbottled.ai
+        cacheWrite1hTokenCost: 0.26, // updated: 2026-11-24 from unbottled.ai
       },
     ],
     utilities: [
@@ -4899,6 +5382,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 50, // updated: 2026-11-07 from openrouter-api
         cacheReadTokenCost: 0.25, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 12.5, // updated: 2026-11-07 from openrouter-api
+        cacheWrite1hTokenCost: 20, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_FABLE_5_1,
@@ -4909,6 +5393,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 65, // updated: 2026-11-09 from unbottled.ai
         cacheReadTokenCost: 0.325, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 16.25, // updated: 2026-11-09 from unbottled.ai
+        cacheWrite1hTokenCost: 26, // updated: 2026-11-24 from unbottled.ai
       },
     ],
     utilities: [
@@ -4941,6 +5426,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 8,
         outputTokenCost: 40,
+        cacheReadTokenCost: 0.2, // updated: 2026-11-24 from Anthropic
+        cacheWriteTokenCost: 10, // updated: 2026-11-24 from Anthropic
+        cacheWrite1hTokenCost: 16, // updated: 2026-11-24 from Anthropic
         adminOnly: true,
       },
       {
@@ -4952,6 +5440,7 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         outputTokenCost: 40, // updated: 2026-11-09 from openrouter-api
         cacheReadTokenCost: 0.2, // updated: 2026-11-09 from openrouter-api
         cacheWriteTokenCost: 10, // updated: 2026-11-09 from openrouter-api
+        cacheWrite1hTokenCost: 16, // updated: 2026-11-24 from openrouter-api
       },
       {
         id: ChatModelId.CLAUDE_FABLE_5_2,
@@ -4960,6 +5449,9 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 10.4, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 52, // updated: 2026-11-09 from unbottled.ai
+        cacheReadTokenCost: 0.26, // updated: 2026-11-24 from unbottled.ai
+        cacheWriteTokenCost: 13, // updated: 2026-11-24 from unbottled.ai
+        cacheWrite1hTokenCost: 20.8, // updated: 2026-11-24 from unbottled.ai
       },
     ],
     utilities: [
@@ -4992,6 +5484,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 10, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 50, // updated: 2026-11-07 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 20,
+            outputTokenCost: 75,
+            cacheReadTokenCost: 2,
+            cacheWriteTokenCost: 25,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 1, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 12.5, // updated: 2026-11-07 from openrouter-api
       },
@@ -5002,6 +5503,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 65, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 26,
+            outputTokenCost: 97.5,
+            cacheReadTokenCost: 2.6,
+            cacheWriteTokenCost: 32.5,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 1.3, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 16.25, // updated: 2026-11-09 from unbottled.ai
       },
@@ -5038,6 +5548,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 10, // updated: 2026-11-07 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 4,
+            outputTokenCost: 15,
+            cacheReadTokenCost: 0.2,
+            cacheWriteTokenCost: 5,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.1, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 2.5, // updated: 2026-11-07 from openrouter-api
       },
@@ -5048,6 +5567,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 13, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 5.2,
+            outputTokenCost: 19.5,
+            cacheReadTokenCost: 0.26,
+            cacheWriteTokenCost: 6.5,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 3.25, // updated: 2026-11-09 from unbottled.ai
       },
@@ -5084,6 +5612,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 5, // updated: 2026-11-07 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 2,
+            outputTokenCost: 7.5,
+            cacheReadTokenCost: 0.1,
+            cacheWriteTokenCost: 2.5,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.05, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 1.25, // updated: 2026-11-07 from openrouter-api
       },
@@ -5094,6 +5631,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.3, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 6.5, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 2.6,
+            outputTokenCost: 9.75,
+            cacheReadTokenCost: 0.13,
+            cacheWriteTokenCost: 3.25,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.065, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 1.625, // updated: 2026-11-09 from unbottled.ai
       },
@@ -5128,6 +5674,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.1, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 0.5, // updated: 2026-11-07 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 0.2,
+            outputTokenCost: 0.75,
+            cacheReadTokenCost: 0.02,
+            cacheWriteTokenCost: 0.25,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.01, // updated: 2026-11-07 from openrouter-api
         cacheWriteTokenCost: 0.13, // updated: 2026-11-07 from openrouter-api
       },
@@ -5138,6 +5693,15 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.13, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 272000,
+            inputTokenCost: 0.26,
+            outputTokenCost: 0.975,
+            cacheReadTokenCost: 0.026,
+            cacheWriteTokenCost: 0.325,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.013, // updated: 2026-11-09 from unbottled.ai
         cacheWriteTokenCost: 0.169, // updated: 2026-11-09 from unbottled.ai
       },
@@ -5254,6 +5818,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2, // updated: 2026-11-07 from openrouter-api
         outputTokenCost: 6, // updated: 2026-11-07 from openrouter-api
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 4,
+            outputTokenCost: 12,
+            cacheReadTokenCost: 1,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.5, // updated: 2026-11-07 from openrouter-api
       },
       {
@@ -5263,6 +5835,14 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2.6, // updated: 2026-11-09 from unbottled.ai
         outputTokenCost: 7.8, // updated: 2026-11-09 from unbottled.ai
+        pricingTiers: [
+          {
+            minPromptTokens: 200000,
+            inputTokenCost: 5.2,
+            outputTokenCost: 15.6,
+            cacheReadTokenCost: 1.3,
+          },
+        ], // updated: 2026-11-24 from unbottled.ai
         cacheReadTokenCost: 0.65, // updated: 2026-11-09 from unbottled.ai
       },
     ],
@@ -5784,6 +6364,22 @@ export const chatModelDefinitions: Record<ChatModelId, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.08, // updated: 2026-11-13 from openrouter-api
         outputTokenCost: 0.3, // updated: 2026-11-13 from openrouter-api
+        pricingTiers: [
+          {
+            utcStart: 1500,
+            utcEnd: 100,
+            inputTokenCost: 0.075,
+            outputTokenCost: 0.3,
+            cacheReadTokenCost: 0.0075,
+          },
+          {
+            utcStart: 100,
+            utcEnd: 1500,
+            inputTokenCost: 0.15,
+            outputTokenCost: 0.6,
+            cacheReadTokenCost: 0.015,
+          },
+        ], // updated: 2026-11-24 from openrouter-api
         cacheReadTokenCost: 0.01, // updated: 2026-11-13 from openrouter-api
       },
     ],

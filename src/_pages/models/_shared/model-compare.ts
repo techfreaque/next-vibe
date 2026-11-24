@@ -34,6 +34,7 @@ import {
   suggestComparisons,
 } from "./model-facts";
 import {
+  cachePriceText,
   formatMoney,
   formatNumber,
   isApiCallable,
@@ -322,12 +323,17 @@ function priceRates(
         model: name,
         provider: facts.priceProvider,
       })
-    : t("compareFaq.cheaper.rates", {
-        model: name,
-        provider: facts.priceProvider,
-        input: formatMoney(facts.tokenPrice.inputCredits, locale),
-        output: formatMoney(facts.tokenPrice.outputCredits, locale),
-      });
+    : [
+        t("compareFaq.cheaper.rates", {
+          model: name,
+          provider: facts.priceProvider,
+          input: formatMoney(facts.tokenPrice.inputCredits, locale),
+          output: formatMoney(facts.tokenPrice.outputCredits, locale),
+        }),
+        cachePriceText(facts, locale, t),
+      ]
+        .filter(Boolean)
+        .join(" ");
 }
 
 function cheaperAnswer(

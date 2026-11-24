@@ -101,9 +101,11 @@ function buildChatOption(
       outputTokenCost: provider.outputTokenCost,
       cacheReadTokenCost: provider.cacheReadTokenCost,
       cacheWriteTokenCost: provider.cacheWriteTokenCost,
+      cacheWrite1hTokenCost: provider.cacheWrite1hTokenCost,
       imageOutputTokenCost: provider.imageOutputTokenCost,
       maxInputTokenCost: provider.maxInputTokenCost,
       longContextPricing: provider.longContextPricing,
+      pricingTiers: provider.pricingTiers,
     } satisfies ModelOptionTokenBased & { id: ChatModelId };
   }
   return null;

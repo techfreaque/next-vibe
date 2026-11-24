@@ -9,7 +9,7 @@ import { eq, sql } from "drizzle-orm";
 import { db } from "next-vibe/database";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 
-import type { UsageUpstreamCost } from "@/credits/db";
+import type { UsageCacheTokens, UsageUpstreamCost } from "@/credits/db";
 
 import { chatMessages } from "../../../../chat/db";
 import { ChatMessageRole, ThreadStreamingState } from "../../../../chat/enum";
@@ -189,6 +189,7 @@ export async function emitCompactingDone(
     outputTokens: number;
     totalTokens: number;
     uncachedInputTokens: number;
+    tokenUsage?: UsageCacheTokens;
     model: ChatModelId;
     messagesToCompact: Array<{ createdAt: Date; id: string }>;
     user: JwtPayloadType;
@@ -224,6 +225,7 @@ export async function emitCompactingDone(
         metadata: {
           isCompacting: true,
           isStreaming: false,
+          ...params.tokenUsage,
           compactedMessageCount: messagesToCompact.length,
           promptTokens: inputTokens,
           completionTokens: outputTokens,
@@ -253,7 +255,8 @@ export async function emitCompactingDone(
             promptTokens: inputTokens,
             completionTokens: outputTokens,
             totalTokens,
-            cachedInputTokens: 0,
+            cachedInputTokens: params.tokenUsage?.cachedInputTokens ?? 0,
+            cacheWriteTokens: params.tokenUsage?.cacheWriteTokens,
             timeToFirstToken: undefined,
             creditCost,
             finishReason: "stop",
@@ -270,6 +273,7 @@ export async function emitCompactingDone(
     feature: `compacting-${model}`,
     type: "model",
     model,
+    tokenUsage: params.tokenUsage,
     upstreamCost,
   });
 

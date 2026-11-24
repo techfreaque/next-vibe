@@ -189,6 +189,7 @@ export class ToolExecutionContextImpl {
 
   // Timing: requestStartTime set just before AI model call; streamStartTime set on first token
   requestStartTime: number | null = null;
+  stepPricingStartedAt?: number;
   streamStartTime: number | null = null;
 
   /**

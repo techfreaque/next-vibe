@@ -5,7 +5,10 @@
 
 import type { ChatModelId } from "next-vibe/agent/ai-stream/models";
 import type { Modality } from "next-vibe/agent/models/enum";
-import { CHAT_MESSAGE_PRICE_REFERENCE } from "next-vibe/agent/models/models";
+import {
+  CHAT_MESSAGE_PRICE_REFERENCE,
+  providerUsdToCredits,
+} from "next-vibe/agent/models/models";
 import {
   ContentLevel,
   type ContentLevelValue,
@@ -209,8 +212,10 @@ export type FactKey =
   | "strengths"
   | "price"
   | "tokenPrice"
+  | "conditionalPrice"
   | "cacheReadPrice"
   | "cacheWritePrice"
+  | "cacheWrite1hPrice"
   | "imageOutputPrice"
   | "context"
   | "parameters"
@@ -234,9 +239,83 @@ export interface FactRow {
   missing: boolean;
 }
 
+const utcTime = (hhmm: number): string =>
+  `${String(Math.floor(hhmm / 100)).padStart(2, "0")}:${String(hhmm % 100).padStart(2, "0")}`;
+
+export function tierPriceText(
+  facts: ModelFacts,
+  locale: CountryLanguage,
+  t: ModelsT,
+): string {
+  return facts.pricingTiers
+    .map((tier) => {
+      const prices = [
+        [tier.inputTokenCost, "facts.tierInput"],
+        [tier.outputTokenCost, "facts.tierOutput"],
+        [tier.cacheReadTokenCost, "facts.tierRead"],
+        [tier.cacheWriteTokenCost, "facts.tierWrite"],
+        [tier.cacheWrite1hTokenCost, "facts.tierHour"],
+      ] as const;
+      const rates = prices
+        .flatMap(([usd, key]) =>
+          usd === undefined
+            ? []
+            : [
+                t(key, {
+                  price: formatMoney(providerUsdToCredits(usd), locale),
+                }),
+              ],
+        )
+        .join(", ");
+      return "minPromptTokens" in tier
+        ? t("facts.tierAt", {
+            tokens: formatNumber(tier.minPromptTokens, locale),
+            rates,
+          })
+        : t("facts.tierUtc", {
+            start: utcTime(tier.utcStart),
+            end: utcTime(tier.utcEnd),
+            rates,
+          });
+    })
+    .join(" ");
+}
+
+export function cachePriceText(
+  facts: ModelFacts,
+  locale: CountryLanguage,
+  t: ModelsT,
+): string {
+  const price = facts.tokenPrice;
+  if (!price) {
+    return "";
+  }
+  return [
+    price.cacheReadCredits === null
+      ? ""
+      : t("facts.cacheReadSentence", {
+          price: formatMoney(price.cacheReadCredits, locale),
+        }),
+    price.cacheWriteCredits === null
+      ? ""
+      : t("facts.cacheWriteSentence", {
+          price: formatMoney(price.cacheWriteCredits, locale),
+        }),
+    price.cacheWrite1hCredits === null
+      ? ""
+      : t("facts.cacheWrite1hSentence", {
+          price: formatMoney(price.cacheWrite1hCredits, locale),
+        }),
+    tierPriceText(facts, locale, t),
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
 const EXTRA_TOKEN_RATES = [
   { key: "cacheReadPrice", rate: "cacheReadCredits" },
   { key: "cacheWritePrice", rate: "cacheWriteCredits" },
+  { key: "cacheWrite1hPrice", rate: "cacheWrite1hCredits" },
   { key: "imageOutputPrice", rate: "imageOutputCredits" },
 ] as const;
 
@@ -345,6 +424,13 @@ export function buildFactRows(
           }),
           missing: false,
         },
+    {
+      key: "conditionalPrice",
+      label: t("facts.conditionalPrice"),
+      value: tierPriceText(facts, locale, t) || t("facts.notListed"),
+      hint: null,
+      missing: facts.pricingTiers.length === 0,
+    },
     ...EXTRA_TOKEN_RATES.map(({ key, rate }): FactRow => {
       const credits = facts.tokenPrice?.[rate] ?? null;
       return {

@@ -136,6 +136,17 @@ export const translations = {
       "`GET /v1/models` lists the models your key can call right now, with context size, tool support and credit prices per million tokens. Use the id as the model field in requests.",
     note: "The list depends on your account. Unknown or unavailable ids return 404 `model_not_found`. The one mapping: on `/v1/messages`, Claude ids that Claude Code sends by default go to our newest Claude of the same family.",
     browse: "Browse every model with prices and filters",
+    rates: {
+      tiers:
+        "When pricing.tiers is present, use the same credit fields in the matching tier. min_prompt_tokens includes the threshold. utc_start and utc_end are UTC times in HHMM format, including the start and excluding the end.",
+      title: "Chat token prices",
+      unit: "The pricing extension lists customer credits per million tokens at the base context tier, including markup. No field in this object is denominated in USD. A null value means no separate rate is listed.",
+      input: "Uncached input.",
+      output: "Generated text output.",
+      read: "Input read from the prompt cache.",
+      write: "Input written to the prompt cache at the default lifetime.",
+      hour: "Input written with a one-hour cache lifetime.",
+    },
     media: {
       title: "Media models in the same list",
       body: "Image, video, music, voice and transcription models sit in the same list. Each entry says what it does and where to call it.",
@@ -218,12 +229,12 @@ export const translations = {
       "The API draws from the same credits as the chat app, billed by the same rules. One balance, one bill.",
     points: {
       price:
-        "Cost = input tokens plus output tokens at the model's credit price, listed per million tokens in `GET /v1/models`. OpenRouter models are the exception: you pay what the provider really charged for the call, plus our markup. Their listed price is an estimate. Chat bills them the same way.",
+        "For a listed-price estimate, multiply each token count by its credit rate per million. Count each input token once as uncached, read or written.",
       usage:
         "Every response reports `usage.credits_charged`. Your balance is in the app under Credits.",
       preflight:
         "Before a call runs we check your balance against a worst-case estimate. Not enough: HTTP 402 `insufficient_credits`, nothing runs, nothing is charged.",
-      real: "After the call you pay real usage, not the estimate: the token count the provider reports, or the provider's real cost for OpenRouter models. If a provider reports no cost, the call falls back to the listed price.",
+      real: "When the provider reports a charge, billing uses that charge plus markup. Otherwise it uses the applicable token rates. The final rounded charge is in usage.credits_charged.",
       media:
         "Media calls bill the same way: the provider's real cost plus our markup where the provider reports it, the listed per-model price otherwise. Images bill per image, speech per character, transcription per second of audio, video when the clip is ready, music per clip.",
       topup:

@@ -12,6 +12,9 @@ describe("OpenRouter endpoint prices", () => {
       prompt: "0.000000007",
       completion: "0.0000068",
       input_cache_read: "0.000000006",
+      input_cache_write: null,
+      input_cache_write_1h: "0.00000015",
+      overrides: [{min_prompt_tokens: 32000, prompt: "0.0000001", completion: "0.0000004", input_cache_read: "0.00000002", input_cache_write: "0.000000125"}],
     };
     const fetchMock = spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(Response.json({ data: [
@@ -32,10 +35,12 @@ describe("OpenRouter endpoint prices", () => {
       const prices = Object.fromEntries(result.updates
         .filter((row) => row.providerModel === id)
         .map((row) => [row.field, row.value]));
+      expect(result.settingsUpdates?.[0]?.tsLiteral).toContain("cacheWriteTokenCost: 0.125");
       expect(prices).toEqual({
         inputTokenCost: 0.007,
         outputTokenCost: 6.8,
         cacheReadTokenCost: 0.006,
+        cacheWrite1hTokenCost: 0.15,
       });
     } finally {
       fetchMock.mockRestore();

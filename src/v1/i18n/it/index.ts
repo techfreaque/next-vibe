@@ -7,6 +7,11 @@ export const translations: typeof enTranslations = {
     api: "OpenAI - compatibile API",
   },
 
+  promptCache: {
+    label: "Cache del prompt",
+    description:
+      "Salva nella cache la parte iniziale condivisa del prompt e scegli per quanto tempo conservarla.",
+  },
   openai: {
     missingKey:
       "Manca la chiave API. Invialo come 'Autorizzazione: Cuscinetto <key>' o 'x-api-chiave: <key> '. Creare una chiave in Impostazioni > API chiavi.",

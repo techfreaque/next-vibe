@@ -14,6 +14,7 @@ import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { V1T } from "../i18n";
+import { chatTokenPricing } from "../shared/chat-pricing";
 import { gateApiKeyRequest } from "../shared/gate";
 import {
   listUserMediaModels,
@@ -77,10 +78,7 @@ export class V1ModelsRepository {
           supports_tools: m.supportsTools,
           input_modalities: m.inputs,
           output_modalities: m.outputs,
-          pricing: {
-            input_credits_per_million_tokens: m.inputTokenCost ?? null,
-            output_credits_per_million_tokens: m.outputTokenCost ?? null,
-          },
+          pricing: chatTokenPricing(m),
         })),
         ...media.map((m) => ({
           id: m.id,

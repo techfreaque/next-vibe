@@ -30,6 +30,17 @@ const models = {
   [ChatModelId.GPT_5_3_CODEX]: {
     inputs: ["text"],
     outputs: ["text"],
+    providers: [
+      {
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.3-codex",
+        inputTokenCost: 1.5,
+        outputTokenCost: 10,
+        pricingTiers: [
+          { minPromptTokens: 500, inputTokenCost: 3, cacheWriteTokenCost: 7 },
+        ],
+      },
+    ],
   },
 };
 `,
@@ -153,8 +164,18 @@ it("reports the scheduled diff and writes that same diff only with the CLI flag"
           modelId: "gpt-53-codex",
           name: "GPT-5.3 Codex",
           provider: ApiProvider.OPENROUTER,
+          providerModel: "openai/gpt-5.3-codex",
           field: "inputTokenCost",
-          value: 1.5,
+          value: 1.75,
+          source: "saved-catalog",
+        },
+        {
+          modelId: "gpt-53-codex",
+          name: "GPT-5.3 Codex",
+          provider: ApiProvider.OPENROUTER,
+          providerModel: "openai/gpt-5.3-codex",
+          field: "cacheWriteTokenCost",
+          value: 2.5,
           source: "saved-catalog",
         },
       ],
@@ -248,6 +269,7 @@ it("reports the scheduled diff and writes that same diff only with the CLI flag"
     }
     const { diff } = definition.GET.responseSchema.parse(scheduled.data);
     expect(diff).toContain("+      creditCostPerImage: 25,");
+    expect(diff).toContain("+        cacheWriteTokenCost: 2.5,");
     expect(diff).toContain('+  GPT_5_3_CODEX = "gpt-53-codex",');
     expect(definition.GET.responseSchema.parse(written.data).diff).toEqual(diff);
 

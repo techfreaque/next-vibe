@@ -333,6 +333,7 @@ export class StreamLoop implements StreamLoopState {
 
     // Record the time the request is sent to the model - used for true TTFT calculation
     ctx.requestStartTime = Date.now();
+    ctx.stepPricingStartedAt = ctx.requestStartTime;
 
     // Some models (e.g. gpt-5-image via OpenRouter) reject the temperature
     // parameter. Only send it when the model explicitly supports it.
@@ -417,6 +418,7 @@ export class StreamLoop implements StreamLoopState {
               maxOutputTokens?: number;
             }> => {
               const prepared = await this.prepareStep(stepMessages, stepNumber);
+              ctx.stepPricingStartedAt = Date.now();
               const sent = prepared.messages ?? stepMessages;
               this.lastPromptStep = stepNumber;
               this.lastPromptMessages = sent;

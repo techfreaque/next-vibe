@@ -19,8 +19,13 @@ import { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
 import type { EndpointLogger } from "next-vibe/logger/types";
 
 import type { ApiProvider } from "../../../models/models";
+import { applyClientCache, type JsonRecord } from "../openrouter/routing";
 import { logProviderRequest } from "./debug-file-logger";
-import { processStreamingResponseWithToolCalls } from "./streaming-tool-call-processor";
+import type { ClientPromptCache } from "./prompt-cache";
+import {
+  type OpenAIResponse,
+  processStreamingResponseWithToolCalls,
+} from "./streaming-tool-call-processor";
 import {
   convertDeveloperToSystemMessages,
   convertToolMessagesToUserMessages,
@@ -53,6 +58,7 @@ export interface OpenAIRequestBody {
 }
 
 export interface PromptEngineeredProviderConfig {
+  clientCache?: ClientPromptCache;
   /** Human-readable label used in error/log messages (e.g. "Venice.ai"). */
   label: string;
   /** Provider slug passed to OpenAIChatLanguageModel + the AI SDK. */
@@ -170,6 +176,18 @@ class UpstreamCostChatModel extends OpenAIChatLanguageModel {
   }
 }
 
+/** Venice names writes differently. The OpenAI SDK only retains cache_write_tokens. */
+function normalizeVeniceWrites(body: OpenAIResponse): void {
+  const details = body.usage?.prompt_tokens_details;
+  if (
+    details &&
+    details.cache_write_tokens === undefined &&
+    typeof details.cache_creation_input_tokens === "number"
+  ) {
+    details.cache_write_tokens = details.cache_creation_input_tokens;
+  }
+}
+
 /**
  * Create an OpenAI-compatible provider that emulates tool calling via prompt
  * engineering. Returns the `{ chat }` shape the ProviderFactory expects.
@@ -193,7 +211,12 @@ export function createPromptEngineeredProvider(
       );
     }
 
-    const parsedBody = JSON.parse(init.body as string) as OpenAIRequestBody;
+    const parsedBody: OpenAIRequestBody & JsonRecord = JSON.parse(
+      String(init.body),
+    );
+    if (config.clientCache) {
+      applyClientCache(parsedBody, config.clientCache);
+    }
     // Strip tools/tool_choice — these models don't support native tool calling.
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { tools, tool_choice, messages, ...restBody } = parsedBody;
@@ -202,7 +225,11 @@ export function createPromptEngineeredProvider(
     let modifiedMessages = convertDeveloperToSystemMessages(messages);
     modifiedMessages = convertToolMessagesToUserMessages(modifiedMessages);
     if (tools && tools.length > 0) {
-      modifiedMessages = injectToolInstructions(modifiedMessages, tools);
+      modifiedMessages = injectToolInstructions(
+        modifiedMessages,
+        tools,
+        config.clientCache?.tools,
+      );
     }
 
     const requestBody = {
@@ -243,6 +270,7 @@ export function createPromptEngineeredProvider(
       // Non-streaming: pass the JSON body through unchanged.
       const jsonResponse = await response.json();
       if (costCapture) {
+        normalizeVeniceWrites(jsonResponse);
         costCapture.costUsd = readVeniceCostUsd(jsonResponse);
       }
       return new Response(JSON.stringify(jsonResponse), {
@@ -259,6 +287,7 @@ export function createPromptEngineeredProvider(
       config.waitForUsage,
       costCapture
         ? (chunk): void => {
+            normalizeVeniceWrites(chunk);
             costCapture.costUsd =
               readVeniceCostUsd(chunk) ?? costCapture.costUsd;
           }

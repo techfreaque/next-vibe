@@ -33,6 +33,11 @@ describe("worst-case input price", () => {
     expect(worstCaseInputTokenCost(model)).toBe(kimi.inputTokenCost);
   });
 
+  it("covers a full one-hour cache write on Claude routes", () => {
+    const model = getChatModelById(ChatModelId.CLAUDE_SONNET_5_5);
+    expect(worstCaseInputTokenCost(model)).toBeGreaterThanOrEqual((model.inputTokenCost ?? 0) * 2);
+  });
+
   it("1M input tokens at $4.50/M = 585 credits with the 30% markup", () => {
     expect(worstCaseInputCredits(kimi, 1_000_000)).toBe(585);
     expect(worstCaseInputCredits(kimi, 0)).toBe(0);

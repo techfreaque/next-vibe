@@ -86,6 +86,7 @@ export class V1MessagesRepository {
     const prepared = await prepareV1Call({
       payer,
       model: resolved.model,
+      cacheControl: data.cache_control,
       messages: converted.messages,
       estimatedInputTokens: converted.estimatedInputTokens,
       tools: convertAnthropicTools(

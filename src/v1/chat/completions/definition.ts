@@ -5,6 +5,7 @@
  * response is nominal.
  */
 
+import { cacheControlSchema } from "next-vibe/agent/ai-stream/providers/shared/prompt-cache";
 import { createEndpoint } from "next-vibe/core/definition/create-i18n";
 import {
   FieldDataType,
@@ -25,20 +26,27 @@ import { V1_CHAT_COMPLETIONS_ALIAS } from "../../shared/constants";
 import { V1_ERROR_TYPES } from "../../shared/error-types";
 
 const contentPartSchema = z.union([
-  z.object({ type: z.literal("text"), text: z.string() }),
+  z.object({
+    type: z.literal("text"),
+    text: z.string(),
+    cache_control: cacheControlSchema.optional(),
+  }),
   z.object({
     type: z.literal("image_url"),
+    cache_control: cacheControlSchema.optional(),
     image_url: z.union([z.string(), z.object({ url: z.string() })]),
   }),
 ]);
 
 const toolCallSchema = z.object({
+  cache_control: cacheControlSchema.optional(),
   id: z.string().min(1),
   type: z.literal("function"),
   function: z.object({ name: z.string().min(1), arguments: z.string() }),
 });
 
 export const openAiMessageSchema = z.object({
+  cache_control: cacheControlSchema.optional(),
   role: z.enum(["system", "developer", "user", "assistant", "tool"]),
   content: z
     .union([z.string(), z.array(contentPartSchema)])
@@ -53,6 +61,7 @@ export const openAiMessageSchema = z.object({
 
 /** OpenAI function tool: { type: "function", function: { name, description, parameters } } */
 export const openAiToolSchema = z.object({
+  cache_control: cacheControlSchema.optional(),
   type: z.literal("function"),
   function: z.object({
     name: z
@@ -111,6 +120,13 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true } as const,
     children: {
+      cache_control: requestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "promptCache.label",
+        description: "promptCache.description",
+        schema: cacheControlSchema.optional(),
+      }),
       model: requestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,

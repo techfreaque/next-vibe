@@ -22,6 +22,7 @@ import {
 import {
   estimateCutOffStepCost,
   producedImageFile,
+  readCacheUsage,
   readImageOutputTokens,
   readStepUpstreamCost,
   TokenAccumulator,
@@ -61,7 +62,7 @@ function freshCounters(): TokenCounters {
 
 /** Same prices, served by a provider that returns no reliable real cost. */
 function unreportedCostModel(): ChatModelOption {
-  return { ...pricedModel(), apiProvider: ApiProvider.CLAUDE_CODE };
+  return { ...pricedModel(), apiProvider: ApiProvider.UNBOTTLED };
 }
 
 /** Same prices, served by NanoGPT / Venice (real cost via provider metadata). */
@@ -233,11 +234,44 @@ describe("GPT-6.2 Sol long-context fallback pricing", () => {
   it("switches the entire step to the higher tariff at 272,000 input tokens", () => {
     const model = getChatModelById(ChatModelId.GPT_6_2_SOL);
     expect(calculateTokenCostUsd(model, 271999, 100, 1000, 100)).toBeCloseTo(
-      (270999 * 2 + 1000 * 0.1 + 100 * 2.5 + 100 * 10) / 1_000_000, 12,
+      (270899 * 2 + 1000 * 0.1 + 100 * 2.5 + 100 * 10) / 1_000_000, 12,
     );
     expect(calculateTokenCostUsd(model, 272000, 100, 1000, 100)).toBeCloseTo(
-      (271000 * 4 + 1000 * 0.2 + 100 * 5 + 100 * 15) / 1_000_000, 12,
+      (270900 * 4 + 1000 * 0.2 + 100 * 5 + 100 * 15) / 1_000_000, 12,
     );
+  });
+});
+
+describe("provider cache accounting", () => {
+  it("keeps disjoint read, write and ordinary input counts", () => {
+    for (const raw of [
+      { prompt_tokens_details: { cached_tokens: 300, cache_write_tokens: 200 } },
+      { cache_read_input_tokens: 300, cache_creation_input_tokens: 200 },
+    ]) {
+      expect(readCacheUsage({ raw })).toMatchObject({ cachedInputTokens: 300, cacheWriteTokens: 200 });
+    }
+    for (const raw of [
+      { prompt_tokens_details: { cached_tokens: 300 } },
+      { prompt_cache_hit_tokens: 300, prompt_cache_miss_tokens: 700 },
+      { cachedContentTokenCount: 300 },
+    ]) {
+      expect(readCacheUsage({ raw, inputTokenDetails: { cacheReadTokens: 0 } })).toMatchObject({ cachedInputTokens: 300, cacheWriteTokens: 0 });
+    }
+    const model = { ...pricedModel(), cacheWriteTokenCost: 2.5 };
+    expect(calculateTokenCostUsd(model, 1000, 0, 300, 200)).toBeCloseTo((500 * 2 + 300 * 0.1 + 200 * 2.5) / 1e6, 12);
+    expect(calculateTokenCostUsd({ ...model, cacheReadTokenCost: 0, cacheWriteTokenCost: 0 }, 1000, 0, 300, 700)).toBe(0);
+    expect(calculateTokenCostUsd(pricedModel(), 1000, 0, 300, 200)).toBeCloseTo((700 * 2 + 300 * 0.1) / 1e6, 12);
+  });
+
+  it("uses the reported duration split and the requested duration when only total writes arrive", () => {
+    expect(readCacheUsage({raw: {cache_creation_input_tokens: 200, cache_creation: {ephemeral_1h_input_tokens: 75}}}, undefined, true).hourWriteTokens).toBe(75);
+    expect(readCacheUsage({inputTokenDetails: {cacheWriteTokens: 200}}, undefined, true).hourWriteTokens).toBe(200);
+    expect(calculateTokenCostUsd({ ...pricedModel(), cacheWriteTokenCost: 2.5 }, 200, 0, 0, 200, 0, 75)).toBeCloseTo((125 * 2.5 + 75 * 4) / 1e6, 12);
+  });
+
+  it("uses the provider cost floor and applies a cache discount only once", () => {
+    expect(readStepUpstreamCost({openrouter: {usage: {cost: 0.03, cache_discount: 0.1, costDetails: {upstreamInferenceCost: 0.04}}}}).costUsd).toBe(0.04);
+    expect(readStepUpstreamCost({openrouter: {usage: {cost: 0.03, cache_discount: 0.1}}}).costUsd).toBe(0.03);
   });
 });
 

@@ -98,6 +98,21 @@ export const translations: typeof enTranslations = {
     referenceImageTurn:
       "Przykładowa wiadomość obejmuje {{input}} tokenów wejścia, {{output}} tokenów tekstu na wyjściu i jeden wygenerowany obraz.",
     priceProvider: "Podane stawki dotyczą dostawcy {{provider}}.",
+    conditionalPrice: "Stawki warunkowe za milion tokenów",
+    tierAt: "Od {{tokens}} tokenów wejściowych: {{rates}}.",
+    tierUtc: "Od {{start}} do {{end}} UTC: {{rates}}.",
+    tierInput: "wejście {{price}}",
+    tierOutput: "wyjście {{price}}",
+    tierRead: "odczyt z pamięci {{price}}",
+    tierWrite: "zapis w pamięci {{price}}",
+    tierHour: "zapis na godzinę {{price}}",
+    cacheReadSentence:
+      "Odczyt miliona tokenów z pamięci podręcznej kosztuje {{price}}.",
+    cacheWrite1hPrice: "Zapis na godzinę za 1 mln tokenów",
+    cacheWrite1hSentence:
+      "Zapis miliona tokenów na godzinę kosztuje {{price}}.",
+    cacheWriteSentence:
+      "Zapis miliona tokenów w pamięci podręcznej kosztuje {{price}}.",
     cacheReadPrice: "Odczyt z pamięci podręcznej za 1 mln tokenów",
     cacheWritePrice: "Zapis do pamięci podręcznej za 1 mln tokenów",
     imageOutputPrice: "Generowanie obrazu za 1 mln tokenów",
@@ -419,6 +434,9 @@ export const translations: typeof enTranslations = {
   },
   jsonLd: {
     perMessage: "przykładowa wiadomość",
+    perCacheReadTokens: "tokeny odczytane z pamięci podręcznej",
+    perCacheWrite1hTokens: "tokeny zapisane na godzinę",
+    perCacheWriteTokens: "tokeny zapisane w pamięci podręcznej",
     perInputTokens: "tokeny wejściowe",
     perOutputTokens: "tokeny wyjściowe",
   },

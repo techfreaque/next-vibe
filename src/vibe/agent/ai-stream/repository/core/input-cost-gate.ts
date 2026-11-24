@@ -16,6 +16,7 @@ import type { ModelMessage } from "ai";
 import type { CoreTool } from "next-vibe/platforms/ai/tools-loader";
 
 import { upstreamCostToCredits } from "../../../models/models";
+import { activeTokenRates } from "../../../models/token-tariffs";
 import type { ChatModelOption } from "../../models";
 import { estimateInputTokens } from "./token-estimator";
 
@@ -47,11 +48,21 @@ export function estimatePreflightInputTokens(params: {
  * endpoint the router may pick (maxInputTokenCost), else the listed price.
  * null for flat-priced models (no token pricing: the flat check covers them).
  */
-export function worstCaseInputTokenCost(model: ChatModelOption): number | null {
+export function worstCaseInputTokenCost(
+  model: ChatModelOption,
+  inputTokens = 0,
+): number | null {
   if (typeof model.inputTokenCost !== "number") {
     return null;
   }
-  return Math.max(model.inputTokenCost, model.maxInputTokenCost ?? 0);
+  const rates = activeTokenRates(model, inputTokens);
+  const input = rates.inputTokenCost ?? model.inputTokenCost;
+  return Math.max(
+    input,
+    model.maxInputTokenCost ?? 0,
+    rates.cacheWriteTokenCost ?? 0,
+    rates.cacheWrite1hTokenCost ?? 0,
+  );
 }
 
 /** Credits (with platform markup) for `inputTokens` at the worst-case price */
@@ -59,7 +70,7 @@ export function worstCaseInputCredits(
   model: ChatModelOption,
   inputTokens: number,
 ): number {
-  const perMillion = worstCaseInputTokenCost(model);
+  const perMillion = worstCaseInputTokenCost(model, inputTokens);
   if (perMillion === null || inputTokens <= 0) {
     return 0;
   }

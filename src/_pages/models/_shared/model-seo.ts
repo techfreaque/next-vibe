@@ -39,6 +39,7 @@ import {
   type ModelFacts,
 } from "./model-facts";
 import {
+  cachePriceText,
   chatHref,
   compareHref,
   formatMoney,
@@ -676,7 +677,13 @@ export function chatPlanPricing(
     }),
     usesLabel: t("plans.messages"),
     rows: planRows(facts.creditsPerMessage, locale),
-    footnote: `${referenceTurnText(facts, locale, t)} ${t("plans.footnote")}`,
+    footnote: [
+      referenceTurnText(facts, locale, t),
+      cachePriceText(facts, locale, t),
+      t("plans.footnote"),
+    ]
+      .filter(Boolean)
+      .join(" "),
     cta: {
       href: chatHref(locale, facts),
       label: t("model.chatCta", { model: facts.name }),
@@ -903,7 +910,13 @@ export function chatModelFaq(
       answer:
         facts.tokenPrice === null || facts.creditsPerMessage === 0
           ? priceAnswer
-          : `${priceAnswer} ${referenceTurnText(facts, locale, t)}`,
+          : [
+              priceAnswer,
+              cachePriceText(facts, locale, t),
+              referenceTurnText(facts, locale, t),
+            ]
+              .filter(Boolean)
+              .join(" "),
     },
     {
       question: t("faq.uncensored.q", { model }),

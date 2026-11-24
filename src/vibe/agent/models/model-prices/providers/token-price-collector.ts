@@ -10,8 +10,14 @@ import "server-only";
 import { chatModelDefinitions, ChatModelId } from "../../../ai-stream/models";
 import type { Modality } from "../../enum";
 import type { ApiProvider } from "../../models";
-import type { ModalityUpdate, PriceFailure, PriceUpdate } from "./base";
-import { roundUpPrice } from "./base";
+import type { TokenTariff } from "../../token-tariffs";
+import type {
+  ModalityUpdate,
+  PriceFailure,
+  PriceUpdate,
+  SettingsUpdate,
+} from "./base";
+import { roundUpPrice, tariffLiteral } from "./base";
 
 export interface TokenPriceEntry {
   /** USD per 1M input tokens */
@@ -20,6 +26,8 @@ export interface TokenPriceEntry {
   output: number;
   cacheRead?: number;
   cacheWrite?: number;
+  cacheWrite1h?: number;
+  pricingTiers?: readonly TokenTariff[];
   /** Context window we can bill at a flat rate (already capped by the caller) */
   contextWindow?: number;
   inputs: Modality[];
@@ -28,6 +36,7 @@ export interface TokenPriceEntry {
 
 export interface TokenPriceCollection {
   updates: PriceUpdate[];
+  settingsUpdates: SettingsUpdate[];
   modalityUpdates: ModalityUpdate[];
   failures: PriceFailure[];
 }
@@ -45,6 +54,7 @@ export function collectTokenPriceUpdates(params: {
 }): TokenPriceCollection {
   const { apiProvider, source, label, lookup } = params;
   const updates: PriceUpdate[] = [];
+  const settingsUpdates: SettingsUpdate[] = [];
   const modalityUpdates: ModalityUpdate[] = [];
   const failures: PriceFailure[] = [];
 
@@ -78,25 +88,36 @@ export function collectTokenPriceUpdates(params: {
         { ...base, field: "inputTokenCost", value: roundUsd(entry.input) },
         { ...base, field: "outputTokenCost", value: roundUsd(entry.output) },
       );
-      if (entry.cacheRead !== undefined) {
-        updates.push({
-          ...base,
-          field: "cacheReadTokenCost",
-          value: roundUsd(entry.cacheRead),
-        });
-      }
-      if (entry.cacheWrite !== undefined) {
-        updates.push({
-          ...base,
-          field: "cacheWriteTokenCost",
-          value: roundUsd(entry.cacheWrite),
-        });
+      for (const [field, rate] of [
+        ["cacheReadTokenCost", entry.cacheRead],
+        ["cacheWriteTokenCost", entry.cacheWrite],
+        ["cacheWrite1hTokenCost", entry.cacheWrite1h],
+      ] as const) {
+        if (rate !== undefined) {
+          updates.push({ ...base, field, value: roundUsd(rate) });
+        }
       }
 
       const enumKey = Object.entries(ChatModelId).find(
         // oxlint-disable-next-line no-unused-vars
         ([_, value]) => value === providerConfig.id,
       )?.[0];
+      if (
+        enumKey &&
+        entry.pricingTiers &&
+        typeof providerConfig.inputTokenCost === "number" &&
+        tariffLiteral(entry.pricingTiers) !==
+          tariffLiteral(providerConfig.pricingTiers ?? [])
+      ) {
+        settingsUpdates.push({
+          enumKey,
+          apiProvider,
+          providerModel: providerConfig.providerModel,
+          field: "pricingTiers",
+          source,
+          tsLiteral: tariffLiteral(entry.pricingTiers),
+        });
+      }
       // Context window + modality are model-level facts: only the primary
       // (first-listed) provider writes them, so two fetchers never fight.
       if (!enumKey || def.providers[0]?.apiProvider !== apiProvider) {
@@ -125,5 +146,5 @@ export function collectTokenPriceUpdates(params: {
     }
   }
 
-  return { updates, modalityUpdates, failures };
+  return { updates, modalityUpdates, settingsUpdates, failures };
 }

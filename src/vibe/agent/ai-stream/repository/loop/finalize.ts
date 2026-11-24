@@ -9,7 +9,10 @@ import type { JSONValue, streamText as aiStreamText } from "ai";
 import { ErrorResponseTypes, fail } from "next-vibe/core/route/response.schema";
 
 import { repairMangledStorageUrlsInText } from "../../../chat/storage/storage-url";
-import { creditsWithoutPlatformMarkup } from "../../../models/models";
+import {
+  ApiProvider,
+  creditsWithoutPlatformMarkup,
+} from "../../../models/models";
 import { StreamErrorType } from "../core/constants";
 import { clearStreamingState } from "../core/stream";
 import { providerErrorTranslationKey } from "../errors/provider-error-key";
@@ -17,6 +20,7 @@ import { endLoopNeedsAnswerStep } from "./helpers";
 import type { StreamLoopState } from "./state";
 import {
   producedImageFile,
+  readCacheUsage,
   readImageOutputTokens,
   readStepUpstreamCost,
   TokenAccumulator,
@@ -145,6 +149,10 @@ export async function billCompletedSteps(
     feature: model,
     type: "model",
     model,
+    tokenUsage: {
+      cachedInputTokens: steps.cachedInputTokens,
+      cacheWriteTokens: steps.cacheWriteTokens,
+    },
     upstreamCost,
     apiProvider: modelConfig.apiProvider,
   });
@@ -167,7 +175,7 @@ export async function runAbortHandler(
     isIncognito: state.p.isIncognito,
     userId: state.p.userId,
     model: state.p.model,
-    apiProvider: state.p.modelConfig.apiProvider,
+    modelConfig: state.p.modelConfig,
     systemPrompt: state.p.systemPrompt,
     trailingSystemMessage: state.p.trailingSystemMessage,
     messages: state.p.messages,
@@ -192,15 +200,20 @@ export async function complete(
   // For reasoning tokens we still read from the SDK's aggregate (output-only, not re-sent).
   const reasoningTokens = usageData.outputTokenDetails?.reasoningTokens ?? 0;
 
-  // providerMeta cacheWriteTokens fallback for claude-code provider.
-  const providerCacheWriteTokens =
-    (providerMeta?.["claude-code"] as { cacheWriteTokens?: number } | undefined)
-      ?.cacheWriteTokens ?? 0;
-
+  const {
+    cachedInputTokens,
+    cacheWriteTokens: providerCacheWriteTokens,
+    hourWriteTokens,
+  } = readCacheUsage(
+    usageData,
+    providerMeta,
+    modelConfig.providerModel.startsWith("anthropic/") ||
+      modelConfig.apiProvider === ApiProvider.CLAUDE_CODE,
+  );
   const sdkTotals = {
     inputTokens: usageData.inputTokens ?? 0,
     outputTokens: usageData.outputTokens ?? 0,
-    cachedInputTokens: usageData.inputTokenDetails?.cacheReadTokens ?? 0,
+    cachedInputTokens,
     imageOutputTokens: readImageOutputTokens(
       usageData,
       producedImageFile(generatedFiles),
@@ -214,7 +227,10 @@ export async function complete(
       modelConfig,
       {
         ...sdkTotals,
+        requestStartedAt: state.p.ctx.stepPricingStartedAt,
+        promptCountKnown: (usageData.inputTokens ?? 0) > 0,
         cacheWriteTokens: providerCacheWriteTokens,
+        hourWriteTokens,
       },
       readStepUpstreamCost(providerMeta),
       logger,
@@ -622,6 +638,10 @@ export async function complete(
     feature: model,
     type: "model",
     model,
+    tokenUsage: {
+      cachedInputTokens: finalCachedInputTokens,
+      cacheWriteTokens: finalCacheWriteTokens,
+    },
     upstreamCost,
     apiProvider: modelConfig.apiProvider,
   });

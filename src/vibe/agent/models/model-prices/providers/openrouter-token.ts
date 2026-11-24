@@ -17,8 +17,9 @@ import {
 } from "../../../image-generation/models";
 import type { Modality } from "../../enum";
 import { ApiProvider } from "../../models";
+import { type TokenTariff, tokenTariffs } from "../../token-tariffs";
 import type { ModalityUpdate, ProviderPriceResult } from "./base";
-import { PriceFetcher, roundUpPrice } from "./base";
+import { PriceFetcher, roundUpPrice, tariffLiteral } from "./base";
 
 /** Canonical ordering for modalities: text first, then image, video, audio */
 const MODALITY_ORDER: Record<Modality, number> = {
@@ -59,13 +60,58 @@ const priceString = z
       Number(value) >= 0,
   );
 
-const pricingSchema = z.object({
+const tokenRatesSchema = z.object({
   prompt: priceString,
   completion: priceString,
-  input_cache_read: priceString.optional(),
-  input_cache_write: priceString.optional(),
+  input_cache_read: priceString.nullish(),
+  input_cache_write: priceString.nullish(),
+  input_cache_write_1h: priceString.nullish(),
   image_output: priceString.optional(),
 });
+
+const tierSchema = tokenRatesSchema.extend({
+  min_prompt_tokens: z.number().int().nonnegative().optional(),
+  utc_start: z.number().int().optional(),
+  utc_end: z.number().int().optional(),
+});
+const pricingSchema = tokenRatesSchema.extend({
+  overrides: z.array(tierSchema).nullish(),
+});
+
+const perMillion = (value: string): number =>
+  roundUpPrice(Number(value) * 1_000_000, 5);
+
+function readTariffs(
+  quotes: readonly z.infer<typeof tierSchema>[],
+): TokenTariff[] {
+  return quotes.flatMap((quote): TokenTariff[] => {
+    const condition =
+      quote.min_prompt_tokens !== undefined
+        ? { minPromptTokens: quote.min_prompt_tokens }
+        : quote.utc_start !== undefined && quote.utc_end !== undefined
+          ? { utcStart: quote.utc_start, utcEnd: quote.utc_end }
+          : undefined;
+    if (!condition) {
+      return [];
+    }
+    return [
+      {
+        ...condition,
+        inputTokenCost: perMillion(quote.prompt),
+        outputTokenCost: perMillion(quote.completion),
+        ...(typeof quote.input_cache_read === "string"
+          ? { cacheReadTokenCost: perMillion(quote.input_cache_read) }
+          : {}),
+        ...(typeof quote.input_cache_write === "string"
+          ? { cacheWriteTokenCost: perMillion(quote.input_cache_write) }
+          : {}),
+        ...(typeof quote.input_cache_write_1h === "string"
+          ? { cacheWrite1hTokenCost: perMillion(quote.input_cache_write_1h) }
+          : {}),
+      },
+    ];
+  });
+}
 
 const modelSchema = z.object({
   id: z.string(),
@@ -144,6 +190,8 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
   async fetch(logger: EndpointLogger): Promise<ProviderPriceResult> {
     const updates: ProviderPriceResult["updates"] = [];
     const modalityUpdates: ModalityUpdate[] = [];
+    const settingsUpdates: NonNullable<ProviderPriceResult["settingsUpdates"]> =
+      [];
     const failures: ProviderPriceResult["failures"] = [];
 
     let rawModels: OpenRouterModel[] = [];
@@ -236,12 +284,6 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
           parseFloat(pricing.completion) * 1_000_000,
           5,
         );
-        const cacheReadTokenCost = pricing.input_cache_read
-          ? roundUpPrice(parseFloat(pricing.input_cache_read) * 1_000_000, 5)
-          : undefined;
-        const cacheWriteTokenCost = pricing.input_cache_write
-          ? roundUpPrice(parseFloat(pricing.input_cache_write) * 1_000_000, 5)
-          : undefined;
         const imageOutputTokenCost = pricing.image_output
           ? roundUpPrice(parseFloat(pricing.image_output) * 1_000_000, 5)
           : undefined;
@@ -258,6 +300,21 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
           );
         const enumKey = enumEntry?.[0];
 
+        const tiers = readTariffs(pricing.overrides ?? []);
+        if (
+          enumKey &&
+          typeof providerConfig.inputTokenCost === "number" &&
+          tariffLiteral(tiers) !== tariffLiteral(tokenTariffs(providerConfig))
+        ) {
+          settingsUpdates.push({
+            enumKey,
+            apiProvider: ApiProvider.OPENROUTER,
+            providerModel: raw.id,
+            field: "pricingTiers",
+            tsLiteral: tariffLiteral(tiers),
+            source: "openrouter-api",
+          });
+        }
         if (enumKey) {
           updates.push({
             modelId: providerConfig.id,
@@ -291,27 +348,22 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
           },
         );
 
-        if (cacheReadTokenCost !== undefined) {
-          updates.push({
-            modelId: providerConfig.id,
-            name: def.name,
-            provider: ApiProvider.OPENROUTER,
-            field: "cacheReadTokenCost",
-            value: cacheReadTokenCost,
-            source: "openrouter-api",
-            providerModel: providerConfig.providerModel,
-          });
-        }
-        if (cacheWriteTokenCost !== undefined) {
-          updates.push({
-            modelId: providerConfig.id,
-            name: def.name,
-            provider: ApiProvider.OPENROUTER,
-            field: "cacheWriteTokenCost",
-            value: cacheWriteTokenCost,
-            source: "openrouter-api",
-            providerModel: providerConfig.providerModel,
-          });
+        for (const [field, quote] of [
+          ["cacheReadTokenCost", pricing.input_cache_read],
+          ["cacheWriteTokenCost", pricing.input_cache_write],
+          ["cacheWrite1hTokenCost", pricing.input_cache_write_1h],
+        ] as const) {
+          if (typeof quote === "string") {
+            updates.push({
+              modelId: providerConfig.id,
+              name: def.name,
+              provider: ApiProvider.OPENROUTER,
+              field,
+              value: roundUpPrice(Number(quote) * 1_000_000, 5),
+              source: "openrouter-api",
+              providerModel: providerConfig.providerModel,
+            });
+          }
         }
         // Image tokens bill far above the text completion rate: without this
         // the token fallback priced a generated image 4-20x too low.
@@ -360,6 +412,7 @@ export class OpenRouterTokenPriceFetcher extends PriceFetcher {
       modelsUpdated: updates.filter((u) => u.field === "inputTokenCost").length,
       updates,
       modalityUpdates,
+      settingsUpdates,
       failures,
     };
   }

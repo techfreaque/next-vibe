@@ -24,7 +24,9 @@ import { z } from "zod";
 
 import { agentEnv } from "../../env";
 import { ApiProvider } from "../../models/models";
+import { applyClientCache, isJsonRecord } from "./openrouter/routing";
 import { logProviderRequest } from "./shared/debug-file-logger";
+import type { ClientPromptCache } from "./shared/prompt-cache";
 import { nanoGptCostExtractor } from "./shared/upstream-cost";
 import {
   summarizeUpstreamError,
@@ -96,9 +98,13 @@ async function describeRequestShape(
   const imageTransportCounts = { remote: 0, inline: 0, other: 0 };
   for (const image of images) {
     const url = image.image_url?.url ?? "";
-    if (/^https?:\/\//i.test(url)) {imageTransportCounts.remote++;}
-    else if (/^data:/i.test(url)) {imageTransportCounts.inline++;}
-    else {imageTransportCounts.other++;}
+    if (/^https?:\/\//i.test(url)) {
+      imageTransportCounts.remote++;
+    } else if (/^data:/i.test(url)) {
+      imageTransportCounts.inline++;
+    } else {
+      imageTransportCounts.other++;
+    }
   }
   return {
     model: request.model,
@@ -137,6 +143,7 @@ export function createNanoGPT(
   // Explicit fetch — the fixture engine binds record/replay per execution
   // chain (createFixtureFetch); plain live fetch otherwise. Never global.
   fetchImpl: typeof globalThis.fetch,
+  clientCache?: ClientPromptCache,
 ): {
   chat: (modelId: string) => OpenAICompatibleChatLanguageModel;
 } {
@@ -144,6 +151,13 @@ export function createNanoGPT(
     input: RequestInfo | URL,
     init?: RequestInit,
   ): Promise<Response> => {
+    if (clientCache && typeof init?.body === "string") {
+      const parsed = await safeParseJSON({ text: init.body, schema: z.json() });
+      if (parsed.success && isJsonRecord(parsed.value)) {
+        applyClientCache(parsed.value, clientCache);
+        init = { ...init, body: JSON.stringify(parsed.value) };
+      }
+    }
     if (typeof init?.body === "string") {
       logProviderRequest("nano-gpt", init.body);
     }

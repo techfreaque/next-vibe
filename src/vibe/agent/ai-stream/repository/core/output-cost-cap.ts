@@ -20,6 +20,7 @@ import {
 } from "@/products/constants";
 
 import { ModelUtility } from "../../../models/enum";
+import { activeTokenRates } from "../../../models/token-tariffs";
 import type { ChatModelOption } from "../../models";
 import { worstCaseInputCredits } from "./input-cost-gate";
 
@@ -50,6 +51,7 @@ export function minAffordableOutputTokens(model: ChatModelOption): number {
  */
 export function worstCaseOutputTokenCost(
   model: ChatModelOption,
+  promptTokens?: number,
 ): number | null {
   if (typeof model.outputTokenCost !== "number") {
     return null;
@@ -58,15 +60,20 @@ export function worstCaseOutputTokenCost(
     model.outputs.includes("image") && "imageOutputTokenCost" in model
       ? (model.imageOutputTokenCost ?? 0)
       : 0;
-  return Math.max(model.outputTokenCost, imageRate);
+  return Math.max(
+    activeTokenRates(model, promptTokens).outputTokenCost ??
+      model.outputTokenCost,
+    imageRate,
+  );
 }
 
 /** Credits (with platform markup) that `outputTokens` cost at worst case */
 export function worstCaseOutputCredits(
   model: ChatModelOption,
   outputTokens: number,
+  promptTokens?: number,
 ): number {
-  const perMillion = worstCaseOutputTokenCost(model);
+  const perMillion = worstCaseOutputTokenCost(model, promptTokens);
   if (perMillion === null || perMillion <= 0 || outputTokens <= 0) {
     return 0;
   }
@@ -80,8 +87,9 @@ export function worstCaseOutputCredits(
 export function affordableOutputTokens(
   model: ChatModelOption,
   credits: number,
+  promptTokens?: number,
 ): number {
-  const perMillion = worstCaseOutputTokenCost(model);
+  const perMillion = worstCaseOutputTokenCost(model, promptTokens);
   if (perMillion === null || perMillion <= 0) {
     return Number.POSITIVE_INFINITY;
   }
@@ -113,7 +121,7 @@ export function computeOutputCap(params: {
   inputTokens: number;
 }): OutputCap {
   const { model, modelCost, remainingCredits, inputTokens } = params;
-  const outputPrice = worstCaseOutputTokenCost(model);
+  const outputPrice = worstCaseOutputTokenCost(model, inputTokens);
   if (modelCost === 0 || outputPrice === null || outputPrice <= 0) {
     return { kind: "uncapped" };
   }
@@ -121,6 +129,7 @@ export function computeOutputCap(params: {
   const affordable = affordableOutputTokens(
     model,
     remainingCredits - inputCredits,
+    inputTokens,
   );
   // The model can never write more than the context window leaves.
   const maxPossibleOutput = Math.max(0, model.contextWindow - inputTokens);
@@ -133,7 +142,9 @@ export function computeOutputCap(params: {
       kind: "unaffordable",
       requiredCredits:
         Math.ceil(
-          (inputCredits + worstCaseOutputCredits(model, minOutput)) * 10,
+          (inputCredits +
+            worstCaseOutputCredits(model, minOutput, inputTokens)) *
+            10,
         ) / 10,
     };
   }

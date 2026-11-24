@@ -139,6 +139,17 @@ export const translations: typeof enTranslations = {
       "`GET /v1/models` liste les modèles que votre clé peut appeler maintenant, avec la taille du contexte, la prise en charge des outils et le prix en crédits par million de tokens. Utilisez l'id comme champ model dans vos requêtes.",
     note: "La liste dépend de votre compte. Les ids inconnus ou indisponibles renvoient 404 `model_not_found`. Une seule correspondance : sur `/v1/messages`, les ids Claude que Claude Code envoie par défaut pointent vers notre Claude le plus récent de la même famille.",
     browse: "Parcourir tous les modèles avec prix et filtres",
+    rates: {
+      tiers:
+        "Si pricing.tiers est présent, utilisez les tarifs en crédits du palier applicable. Le seuil min_prompt_tokens est inclus. utc_start et utc_end indiquent les heures UTC au format HHMM, début inclus et fin exclue.",
+      title: "Tarifs des tokens de chat",
+      unit: "Le champ pricing indique les tarifs client en crédits par million de tokens au premier palier de contexte, marge comprise. Aucun montant de cet objet n’est en dollars. La valeur null indique qu’aucun tarif distinct n’est publié.",
+      input: "Tokens d’entrée hors cache.",
+      output: "Tokens de texte générés.",
+      read: "Tokens d’entrée lus dans le cache.",
+      write: "Tokens écrits en cache pour la durée par défaut.",
+      hour: "Tokens écrits en cache pour une heure.",
+    },
     media: {
       title: "Les modèles média dans la même liste",
       body: "Modèles d'image, de vidéo, de musique, de voix et de transcription figurent dans la même liste. Chaque entrée dit ce que fait le modèle et où l'appeler.",
@@ -223,12 +234,12 @@ export const translations: typeof enTranslations = {
       "L'API puise dans les mêmes crédits que l'app de chat, facturés selon les mêmes règles. Un seul solde, une seule facture.",
     points: {
       price:
-        "Coût = tokens d'entrée plus tokens de sortie au prix en crédits du modèle, indiqué par million de tokens dans `GET /v1/models`. Exception : les modèles OpenRouter. Vous payez ce que le fournisseur a réellement facturé pour l'appel, plus notre marge. Leur prix affiché est une estimation. Le chat les facture de la même manière.",
+        "Pour estimer le coût, appliquez à chaque catégorie de tokens son tarif par million. Comptez chaque token d’entrée une seule fois, hors cache, en lecture ou en écriture.",
       usage:
         "Chaque réponse indique `usage.credits_charged`. Votre solde se trouve dans l'app, sous Crédits.",
       preflight:
         "Avant chaque appel, nous comparons votre solde à une estimation du pire cas. Solde insuffisant : HTTP 402 `insufficient_credits`, rien ne tourne, rien n'est facturé.",
-      real: "Après l'appel, vous payez l'usage réel, pas l'estimation : le nombre de tokens annoncé par le fournisseur, ou le coût réel du fournisseur pour les modèles OpenRouter. Si un fournisseur n'indique aucun coût, l'appel est facturé au prix affiché.",
+      real: "Si le fournisseur communique le coût de l’appel, nous y ajoutons notre marge. Sinon, les tarifs par token s’appliquent. Le montant final arrondi figure dans usage.credits_charged.",
       media:
         "Les appels média se facturent de la même façon : le coût réel du fournisseur plus notre marge quand il le communique, sinon le prix listé du modèle. Images à l'unité, voix au caractère, transcription à la seconde d'audio, vidéo une fois le clip prêt, musique au clip.",
       topup:

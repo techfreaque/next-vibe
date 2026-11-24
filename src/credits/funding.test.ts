@@ -165,6 +165,15 @@ it("records the service on a generic tool charge", async () => {
   }
   const { user } = created.data;
   try {
+    // Service attribution should be independent of the shared daily free cap.
+    const pack = await CreditRepository.addUserCredits(
+      user.id,
+      1,
+      "permanent",
+      logger,
+      creditsT,
+    );
+    expect(pack.success).toBe(true);
     const endpoint = fetchUrlDefinitions.GET;
     const handler = createGenericHandler<CreateApiEndpointAny>({
       endpoint,

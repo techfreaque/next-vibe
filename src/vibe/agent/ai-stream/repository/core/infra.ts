@@ -23,11 +23,13 @@ import {
   GARBLED_REPLACE_HEADER,
 } from "../../providers/openrouter/garbled-guard";
 import {
+  applyClientCache,
   applyPriceRouting,
   isChatCompletionBody,
   isJsonRecord,
 } from "../../providers/openrouter/routing";
 import { logProviderRequest } from "../../providers/shared/debug-file-logger";
+import type { ClientPromptCache } from "../../providers/shared/prompt-cache";
 import { createUncensoredAI } from "../../providers/uncensored-ai";
 import { createVeniceAI } from "../../providers/venice-ai";
 import { createFixtureFetch } from "../../testing/fetch-cache";
@@ -42,6 +44,8 @@ export class ProviderFactory {
      * bound ONCE here into the provider's fetch. Absent = plain live fetch.
      */
     toolExecutionContext: ToolExecutionContext,
+    /** API clients control their own cache boundaries. The SDK omits tool markers. */
+    clientCache?: ClientPromptCache,
   ): ReturnType<
     | typeof createOpenRouter
     | typeof createUncensoredAI
@@ -66,10 +70,10 @@ export class ProviderFactory {
         return createGabAI(logger, fetchImpl);
 
       case ApiProvider.VENICE_AI:
-        return createVeniceAI(logger, fetchImpl);
+        return createVeniceAI(logger, fetchImpl, clientCache);
 
       case ApiProvider.NANO_GPT:
-        return createNanoGPT(logger, fetchImpl);
+        return createNanoGPT(logger, fetchImpl, clientCache);
 
       default: {
         // Custom fetch wrapper that normalizes request body for stable caching
@@ -88,6 +92,7 @@ export class ProviderFactory {
               parsed &&
               typeof parsed === "object" &&
               !Array.isArray(parsed) &&
+              !clientCache &&
               "tools" in parsed &&
               Array.isArray(parsed.tools) &&
               parsed.tools.length > 0
@@ -110,6 +115,7 @@ export class ProviderFactory {
               parsed &&
               typeof parsed === "object" &&
               !Array.isArray(parsed) &&
+              !clientCache &&
               "messages" in parsed &&
               Array.isArray(parsed.messages) &&
               parsed.messages.length > 0
@@ -155,6 +161,9 @@ export class ProviderFactory {
 
             // 3. Chat completions: route by price + garbled-output guard.
             if (isJsonRecord(parsed) && isChatCompletionBody(parsed)) {
+              if (clientCache) {
+                applyClientCache(parsed, clientCache);
+              }
               applyPriceRouting(parsed);
               logProviderRequest(
                 "openrouter",

@@ -18,13 +18,11 @@ import {
   calculateCreditCost,
   calculateTokenCostUsd,
   DEFAULT_ESTIMATED_IMAGE_OUTPUT_TOKENS,
+  listedCostToCredits,
+  type ModelOptionTokenBased,
   upstreamCostToCredits,
 } from "../../../models/models";
 import type { ChatModelOption } from "../../models";
-import type {
-  ImageVisionModelOption,
-  VideoVisionModelOption,
-} from "../../vision-models";
 import type { ToolExecutionContextImpl } from "../core/stream";
 
 /** The per-step token counters these ops read and write on the stream context. */
@@ -51,6 +49,9 @@ export interface StepTokens {
   outputTokens: number;
   cachedInputTokens: number;
   cacheWriteTokens: number;
+  hourWriteTokens?: number;
+  requestStartedAt?: number;
+  promptCountKnown?: boolean;
   /** IMAGE part of outputTokens (image-output models). Billed at the model's
    *  imageOutputTokenCost in the token-price fallback. Absent = 0. */
   imageOutputTokens?: number;
@@ -86,13 +87,11 @@ const UPSTREAM_COST_PROVIDERS: ReadonlySet<ApiProvider> = new Set([
   ApiProvider.OPENROUTER,
   ApiProvider.NANO_GPT,
   ApiProvider.VENICE_AI,
+  ApiProvider.CLAUDE_CODE,
 ]);
 
 /** Model shapes the actual-cost rules bill (chat + vision bridge models). */
-export type UpstreamBilledModel =
-  | ChatModelOption
-  | ImageVisionModelOption
-  | VideoVisionModelOption;
+export type UpstreamBilledModel = ChatModelOption | ModelOptionTokenBased;
 
 /**
  * Models billed by the provider's REAL per-step cost x markup instead of the
@@ -138,6 +137,54 @@ export function readImageOutputTokens(
   return producedImage ? outputTokens : 0;
 }
 
+const count = (value: JSONValue | undefined): number | undefined =>
+  typeof value === "number" && Number.isSafeInteger(value) && value >= 0
+    ? value
+    : undefined;
+
+/** Cache splits can be absent in SDK mappings even when present on the wire. */
+export function readCacheUsage(
+  usage: {
+    inputTokenDetails?: { cacheReadTokens?: number; cacheWriteTokens?: number };
+    cachedInputTokens?: number;
+    raw?: JSONValue;
+  },
+  providerMetadata?: ProviderMetadata,
+  hourCacheRequested = false,
+): {
+  cachedInputTokens: number;
+  cacheWriteTokens: number;
+  hourWriteTokens: number;
+} {
+  const raw = isJsonRecord(usage.raw) ? usage.raw : {};
+  const details = isJsonRecord(raw.prompt_tokens_details)
+    ? raw.prompt_tokens_details
+    : {};
+  const cacheWriteTokens =
+    count(details.cache_write_tokens) ??
+    count(raw.cache_creation_input_tokens) ??
+    count(providerMetadata?.["claude-code"]?.cacheWriteTokens) ??
+    usage.inputTokenDetails?.cacheWriteTokens ??
+    0;
+  const breakdown = isJsonRecord(raw.cache_creation) ? raw.cache_creation : {};
+  const hourWriteTokens =
+    count(breakdown.ephemeral_1h_input_tokens) ??
+    count(providerMetadata?.["claude-code"]?.hourWriteTokens) ??
+    (hourCacheRequested ? cacheWriteTokens : 0);
+  return {
+    cachedInputTokens:
+      count(details.cached_tokens) ??
+      count(raw.cache_read_input_tokens) ??
+      count(raw.prompt_cache_hit_tokens) ??
+      count(raw.cachedContentTokenCount) ??
+      usage.inputTokenDetails?.cacheReadTokens ??
+      usage.cachedInputTokens ??
+      0,
+    cacheWriteTokens,
+    hourWriteTokens,
+  };
+}
+
 function isJsonRecord(
   value: JSONValue | undefined,
 ): value is { readonly [key: string]: JSONValue | undefined } {
@@ -174,6 +221,7 @@ export function estimateCutOffStepCost(
   promptTokens: number,
   textCompletionTokens: number,
   imageCount: number,
+  requestStartedAt?: number,
 ): CutOffStepEstimate {
   const imageOutputTokens =
     Math.max(0, imageCount) *
@@ -189,6 +237,9 @@ export function estimateCutOffStepCost(
       0,
       0,
       imageOutputTokens,
+      0,
+      requestStartedAt,
+      false,
     ),
     completionTokens,
     imageOutputTokens,
@@ -213,20 +264,18 @@ export function readStepUpstreamCost(
       : null;
   const usage = entry?.usage;
   const reportedUsage = usage ?? null;
-  if (
-    usage === null ||
-    usage === undefined ||
-    typeof usage !== "object" ||
-    !("cost" in usage)
-  ) {
+  if (!isJsonRecord(usage)) {
     return { costUsd: null, provider, reportedUsage };
   }
-  const cost = usage.cost;
+  const upstream = isJsonRecord(usage.costDetails)
+    ? usage.costDetails.upstreamInferenceCost
+    : undefined;
+  const costs = [usage.cost, upstream].filter(
+    (value): value is number =>
+      typeof value === "number" && Number.isFinite(value) && value >= 0,
+  );
   return {
-    costUsd:
-      typeof cost === "number" && Number.isFinite(cost) && cost >= 0
-        ? cost
-        : null,
+    costUsd: costs.length ? Math.max(...costs) : null,
     provider,
     reportedUsage,
   };
@@ -315,10 +364,15 @@ export class TokenAccumulator {
     upstream: StepUpstreamCost,
     logger: EndpointLogger,
   ): void {
-    if (!billsUpstreamCost(modelConfig)) {
+    const usesInvoice = billsUpstreamCost(modelConfig);
+    if (
+      !usesInvoice &&
+      !modelConfig.pricingTiers?.length &&
+      !modelConfig.longContextPricing
+    ) {
       return;
     }
-    if (upstream.costUsd !== null) {
+    if (usesInvoice && upstream.costUsd !== null) {
       ctx.upstreamCostUsd += upstream.costUsd;
       ctx.upstreamCostSteps += 1;
       if (upstream.provider) {
@@ -333,9 +387,15 @@ export class TokenAccumulator {
       step.cachedInputTokens,
       step.cacheWriteTokens,
       step.imageOutputTokens ?? 0,
+      step.hourWriteTokens ?? 0,
+      step.requestStartedAt,
+      step.promptCountKnown,
     );
     ctx.upstreamFallbackCostUsd += fallbackUsd;
     ctx.upstreamCostMissingSteps += 1;
+    if (!usesInvoice) {
+      return;
+    }
     logger.warn(
       "[AI Stream] Upstream cost missing for step - billing listed token price",
       {
@@ -386,6 +446,13 @@ export class TokenAccumulator {
         },
       };
     }
+    if (ctx.upstreamCostMissingSteps > 0) {
+      // Tier thresholds and one-hour writes belong to individual calls.
+      return {
+        credits: listedCostToCredits(ctx.upstreamFallbackCostUsd),
+        upstreamCost: undefined,
+      };
+    }
     return {
       credits: calculateCreditCost(
         modelConfig,
@@ -394,6 +461,9 @@ export class TokenAccumulator {
         tokens.cachedInputTokens,
         tokens.cacheWriteTokens,
         tokens.imageOutputTokens ?? 0,
+        tokens.hourWriteTokens ?? 0,
+        tokens.requestStartedAt,
+        tokens.promptCountKnown,
       ),
       upstreamCost: undefined,
     };

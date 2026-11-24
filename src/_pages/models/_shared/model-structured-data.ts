@@ -16,6 +16,7 @@ import {
 } from "../../_components/structured-data";
 import { scopedTranslation } from "../i18n";
 import type { ModelFacts } from "./model-facts";
+import { tierPriceText } from "./model-format";
 import type { MediaModelFacts } from "./model-media-facts";
 
 const SCHEMA_CONTEXT = "https://schema.org";
@@ -132,6 +133,36 @@ function chatModelService(
         t("jsonLd.perOutputTokens"),
       ),
     );
+    if (facts.tokenPrice.cacheReadCredits !== null) {
+      specs.push(
+        unitPrice(
+          locale,
+          facts.tokenPrice.cacheReadCredits,
+          TOKENS_PER_PRICE_UNIT,
+          t("jsonLd.perCacheReadTokens"),
+        ),
+      );
+    }
+    if (facts.tokenPrice.cacheWrite1hCredits !== null) {
+      specs.push(
+        unitPrice(
+          locale,
+          facts.tokenPrice.cacheWrite1hCredits,
+          TOKENS_PER_PRICE_UNIT,
+          t("jsonLd.perCacheWrite1hTokens"),
+        ),
+      );
+    }
+    if (facts.tokenPrice.cacheWriteCredits !== null) {
+      specs.push(
+        unitPrice(
+          locale,
+          facts.tokenPrice.cacheWriteCredits,
+          TOKENS_PER_PRICE_UNIT,
+          t("jsonLd.perCacheWriteTokens"),
+        ),
+      );
+    }
   }
   return serviceNode(locale, {
     path,
@@ -139,12 +170,17 @@ function chatModelService(
     description,
     labName: facts.labName,
     category: t("catalog.types.text"),
-    offer: modelOffer(
-      locale,
-      pageUrl(locale, path),
-      facts.creditsPerMessage,
-      specs,
-    ),
+    offer: {
+      ...modelOffer(
+        locale,
+        pageUrl(locale, path),
+        facts.creditsPerMessage,
+        specs,
+      ),
+      ...(facts.pricingTiers.length
+        ? { description: tierPriceText(facts, locale, t) }
+        : {}),
+    },
   });
 }
 

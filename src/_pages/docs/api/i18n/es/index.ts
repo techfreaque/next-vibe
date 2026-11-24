@@ -139,6 +139,17 @@ export const translations: typeof enTranslations = {
       "`GET /v1/models` enumera los modelos que tu clave puede llamar ahora mismo, con tamaño de contexto, soporte de herramientas y precios de crédito por millón de fichas. Use el id como el campo modelo en las solicitudes.",
     note: "La lista depende de su cuenta. Los ids desconocidos o no disponibles devuelven 404 `model_not_found`. La única asignación: en `/v1/messages`, Claude ids que Claude Code envía por defecto ir a nuestro nuevo Claude de la misma familia.",
     browse: "Examine todos los modelos con precios y filtros",
+    rates: {
+      tiers:
+        "Si aparece pricing.tiers, usa los precios en créditos del tramo correspondiente. El umbral min_prompt_tokens está incluido. utc_start y utc_end son horas UTC en formato HHMM, con el inicio incluido y el fin excluido.",
+      title: "Precios de los tokens de chat",
+      unit: "El campo pricing muestra los precios para el cliente en créditos por millón de tokens para el tramo básico de contexto, con el margen incluido. Ningún campo de este objeto se expresa en dólares. El valor null indica que no hay una tarifa específica publicada.",
+      input: "Tokens de entrada sin caché.",
+      output: "Tokens de texto generados.",
+      read: "Tokens de entrada leídos de la caché.",
+      write: "Tokens escritos en la caché durante el plazo predeterminado.",
+      hour: "Tokens escritos en la caché durante una hora.",
+    },
     media: {
       title: "Modelos de medios en la misma lista",
       body: "Los modelos de imagen, vídeo, música, voz y transcripción se encuentran en la misma lista. Cada entrada dice lo que hace y dónde llamarlo.",
@@ -222,12 +233,12 @@ export const translations: typeof enTranslations = {
       "La API usa los mismos créditos que la aplicación de chat y aplica las mismas tarifas. Un solo saldo, una sola factura.",
     points: {
       price:
-        "Costo = fichas de entrada más fichas de salida al precio de crédito del modelo, lista por millón de fichas en `GET /v1/models`. Los modelos OpenRouter son la excepción: usted paga lo que el proveedor realmente cobraba por la llamada, además de nuestra marcación. Su precio listado es una estimación. Chat les factura de la misma manera.",
+        "Para estimar el coste, aplica a cada grupo de tokens su tarifa por millón. Cuenta cada token de entrada una sola vez, como entrada sin caché, lectura o escritura.",
       usage:
         "Cada respuesta reporta `usage.credits_charged`. Su saldo está en la aplicación bajo Créditos.",
       preflight:
         "Antes de ejecutar una llamada, comprobamos si tu saldo cubre el costo máximo estimado. Si no alcanza, devolvemos HTTP 402 con `insufficient_credits`. La llamada no se ejecuta y no se cobra nada.",
-      real: "Después de la llamada usted paga el uso real, no la estimación: la ficha cuenta los informes del proveedor, o el costo real del proveedor para los modelos OpenRouter. Si un proveedor no reporta ningún costo, la llamada se remonta al precio indicado.",
+      real: "Si el proveedor comunica el coste, aplicamos nuestro margen a ese importe. En caso contrario, se usan las tarifas por token correspondientes. El cargo final redondeado figura en usage.credits_charged.",
       media:
         "Los medios de comunicación llaman la factura de la misma manera: el costo real del proveedor más nuestra marcación donde el proveedor lo reporta, el precio por modelo enumerado de otra manera. Imágenes factura por imagen, discurso por personaje, transcripción por segundo de audio, vídeo cuando el clip está listo, música por clip.",
       topup:

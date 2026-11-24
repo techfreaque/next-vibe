@@ -104,6 +104,10 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
     content: LanguageModelV2Content[];
     finishReason: LanguageModelV2FinishReason;
     usage: LanguageModelV2Usage;
+    providerMetadata?: Extract<
+      LanguageModelV2StreamPart,
+      { type: "finish" }
+    >["providerMetadata"];
     warnings: LanguageModelV2CallWarning[];
   }> {
     const streamResult = await this.doStream(options);
@@ -114,6 +118,10 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
       totalTokens: 0,
     };
     let finishReason: LanguageModelV2FinishReason = "other";
+    let providerMetadata: Extract<
+      LanguageModelV2StreamPart,
+      { type: "finish" }
+    >["providerMetadata"];
     let currentText = "";
 
     const reader = streamResult.stream.getReader();
@@ -125,6 +133,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
           currentText += part.delta;
         } else if (part.type === "finish") {
           usage = part.usage;
+          providerMetadata = part.providerMetadata;
           finishReason = part.finishReason;
         }
         readResult = await reader.read();
@@ -141,6 +150,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
       content: contentParts,
       finishReason,
       usage,
+      providerMetadata,
       warnings: [],
     };
   }
@@ -315,9 +325,35 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
               );
 
               let totalInputTokens = 0;
+              let reportedCostUsd: number | undefined;
               let totalOutputTokens = 0;
               let totalCachedTokens = 0;
               let totalCacheWriteTokens = 0;
+              let hourWriteTokens = 0;
+              const finalUsage = (): LanguageModelV2Usage => {
+                const inputTokens =
+                  totalInputTokens + totalCachedTokens + totalCacheWriteTokens;
+                return {
+                  inputTokens,
+                  outputTokens: totalOutputTokens,
+                  totalTokens: inputTokens + totalOutputTokens,
+                  cachedInputTokens: totalCachedTokens,
+                };
+              };
+              const cacheMetadata = (): NonNullable<
+                Extract<
+                  LanguageModelV2StreamPart,
+                  { type: "finish" }
+                >["providerMetadata"]
+              > => ({
+                "claude-code": {
+                  cacheWriteTokens: totalCacheWriteTokens,
+                  hourWriteTokens,
+                  ...(reportedCostUsd !== undefined && reportedCostUsd > 0
+                    ? { usage: { cost: reportedCostUsd } }
+                    : {}),
+                },
+              });
               let finishReason: LanguageModelV2FinishReason = "other";
               let textBlockId = 0;
               let hasStartedText = false;
@@ -426,14 +462,13 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
                       if (msg.usage) {
                         totalInputTokens += msg.usage.input_tokens;
                         totalOutputTokens += msg.usage.output_tokens;
-                        const extUsage = msg.usage as typeof msg.usage & {
-                          cache_read_input_tokens?: number;
-                          cache_creation_input_tokens?: number;
-                        };
                         totalCachedTokens +=
-                          extUsage.cache_read_input_tokens ?? 0;
+                          msg.usage.cache_read_input_tokens ?? 0;
                         totalCacheWriteTokens +=
-                          extUsage.cache_creation_input_tokens ?? 0;
+                          msg.usage.cache_creation_input_tokens ?? 0;
+                        hourWriteTokens +=
+                          msg.usage.cache_creation?.ephemeral_1h_input_tokens ??
+                          0;
                       }
                       finishReason =
                         msg.stop_reason === "tool_use" ? "tool-calls" : "stop";
@@ -450,8 +485,12 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
                     }
 
                     case "result": {
+                      reportedCostUsd = message.total_cost_usd;
                       // Final result - override totals
                       if (message.usage) {
+                        hourWriteTokens =
+                          message.usage.cache_creation
+                            ?.ephemeral_1h_input_tokens ?? hourWriteTokens;
                         totalInputTokens = message.usage.input_tokens;
                         totalOutputTokens = message.usage.output_tokens;
                         totalCachedTokens =
@@ -474,16 +513,9 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
                 // since LanguageModelV2Usage doesn't have inputTokenDetails
                 controller.enqueue({
                   type: "finish",
-                  usage: {
-                    inputTokens: totalInputTokens,
-                    outputTokens: totalOutputTokens,
-                    totalTokens: totalInputTokens + totalOutputTokens,
-                    cachedInputTokens: totalCachedTokens,
-                  },
+                  usage: finalUsage(),
                   finishReason,
-                  providerMetadata: {
-                    "claude-code": { cacheWriteTokens: totalCacheWriteTokens },
-                  },
+                  providerMetadata: cacheMetadata(),
                 });
               } catch (error) {
                 if (
@@ -494,18 +526,9 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
                   // Normal abort
                   controller.enqueue({
                     type: "finish",
-                    usage: {
-                      inputTokens: totalInputTokens,
-                      outputTokens: totalOutputTokens,
-                      totalTokens: totalInputTokens + totalOutputTokens,
-                      cachedInputTokens: totalCachedTokens,
-                    },
+                    usage: finalUsage(),
                     finishReason: "other",
-                    providerMetadata: {
-                      "claude-code": {
-                        cacheWriteTokens: totalCacheWriteTokens,
-                      },
-                    },
+                    providerMetadata: cacheMetadata(),
                   });
                 } else {
                   logger.error("[AnthropicAgent] Stream error", {

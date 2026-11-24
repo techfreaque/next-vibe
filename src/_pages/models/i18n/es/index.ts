@@ -103,6 +103,21 @@ export const translations: typeof enTranslations = {
     referenceImageTurn:
       "Mensaje de referencia con {{input}} tokens de entrada, {{output}} tokens de texto de salida y una imagen generada.",
     priceProvider: "Tarifas de {{provider}}.",
+    conditionalPrice: "Tarifas por tramo y millón de tokens",
+    tierAt: "A partir de {{tokens}} tokens de entrada: {{rates}}.",
+    tierUtc: "De {{start}} a {{end}} UTC: {{rates}}.",
+    tierInput: "entrada {{price}}",
+    tierOutput: "salida {{price}}",
+    tierRead: "lectura de caché {{price}}",
+    tierWrite: "escritura en caché {{price}}",
+    tierHour: "escritura de una hora {{price}}",
+    cacheReadSentence:
+      "La entrada en caché cuesta {{price}} por millón de tokens.",
+    cacheWrite1hPrice: "Escritura en caché de una hora por millón de tokens",
+    cacheWrite1hSentence:
+      "Escribir en caché durante una hora cuesta {{price}} por millón de tokens.",
+    cacheWriteSentence:
+      "Escribir en la caché cuesta {{price}} por millón de tokens.",
     cacheReadPrice: "Entrada en caché por millón de tokens",
     cacheWritePrice: "Escrituras en caché por millón de tokens",
     imageOutputPrice: "Salida de imágenes por millón de tokens",
@@ -427,6 +442,9 @@ export const translations: typeof enTranslations = {
   },
   jsonLd: {
     perMessage: "mensaje de referencia",
+    perCacheReadTokens: "tokens de entrada en caché",
+    perCacheWrite1hTokens: "tokens escritos en caché durante una hora",
+    perCacheWriteTokens: "tokens escritos en caché",
     perInputTokens: "tokens de entrada",
     perOutputTokens: "tokens de salida",
   },

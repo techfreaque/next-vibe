@@ -122,6 +122,7 @@ import {
   creditWallets,
   type PurchaseMetadata,
   type UsageAttribution,
+  type UsageCacheTokens,
   type UsageMetadata,
   type UsageUpstreamCost,
 } from "./db";
@@ -2705,6 +2706,7 @@ export class CreditRepository {
     allowPartial = false, //  allow deducting less than requested
     upstreamCost?: UsageUpstreamCost,
     apiProvider?: UsageAttribution["apiProvider"],
+    tokenUsage?: UsageCacheTokens,
   ): Promise<ResponseType<DeductCreditsResult>> {
     // Round amount to 6 decimal places to avoid floating point precision artifacts
     const roundedAmount = Math.round(amount * 1_000_000) / 1_000_000;
@@ -2892,6 +2894,29 @@ export class CreditRepository {
         tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
       ): Promise<ResponseType<{ partial: boolean }>> => {
         let remaining = amount;
+        // One provider call can debit several wallets, packs and free buckets.
+        // Attribute its indivisible cache counts once, inside the same transaction.
+        let pendingTokens = tokenUsage;
+        const invoiceRows: string[] = [];
+        const insertUsage = async (
+          row: Omit<typeof creditTransactions.$inferInsert, "metadata"> & {
+            metadata: UsageMetadata;
+          },
+        ): Promise<void> => {
+          const insert = tx.insert(creditTransactions).values({
+            ...row,
+            metadata: { ...row.metadata, ...upstreamCost, ...pendingTokens },
+          });
+          pendingTokens = undefined;
+          if (upstreamCost) {
+            const [inserted] = await insert.returning({
+              id: creditTransactions.id,
+            });
+            invoiceRows.push(inserted.id);
+          } else {
+            await insert;
+          }
+        };
         const cluster = await deductionClusterBudget(
           identifier.userId,
           currentLeadId,
@@ -3029,10 +3054,7 @@ export class CreditRepository {
               if (limitedModel) {
                 modelShadowCredits += part.amount;
               }
-              // Both rows describe the same debit. Keep the reported cost
-              // proportional to the credits attributed to each bucket.
-              const costShare = part.amount / deduction;
-              await tx.insert(creditTransactions).values({
+              await insertUsage({
                 walletId: lockedWallet.id,
                 amount: -part.amount,
                 balanceAfter: freeLeft + paidBalance,
@@ -3044,11 +3066,6 @@ export class CreditRepository {
                 freePeriodId: lockedWallet.freePeriodId,
                 metadata: {
                   ...usageMetadata,
-                  ...(upstreamCost && {
-                    ...upstreamCost,
-                    upstreamCostUsd: upstreamCost.upstreamCostUsd * costShare,
-                    fallbackCostUsd: upstreamCost.fallbackCostUsd * costShare,
-                  }),
                   ...(cluster && {
                     clusterPrefix: cluster.prefix,
                     clusterFingerprint: cluster.fingerprint,
@@ -3118,7 +3135,7 @@ export class CreditRepository {
               .where(eq(creditWallets.id, pack.walletId));
 
             // Record transaction before modifying/deleting pack (FK constraint)
-            await tx.insert(creditTransactions).values({
+            await insertUsage({
               walletId: pack.walletId,
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
@@ -3135,7 +3152,6 @@ export class CreditRepository {
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
                 ...usageMetadata,
-                ...upstreamCost,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
               },
@@ -3209,7 +3225,7 @@ export class CreditRepository {
               .where(eq(creditWallets.id, pack.walletId));
 
             // Record transaction before modifying/deleting pack (FK constraint)
-            await tx.insert(creditTransactions).values({
+            await insertUsage({
               walletId: pack.walletId,
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
@@ -3226,7 +3242,6 @@ export class CreditRepository {
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
                 ...usageMetadata,
-                ...upstreamCost,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
               },
@@ -3300,7 +3315,7 @@ export class CreditRepository {
               .where(eq(creditWallets.id, pack.walletId));
 
             // Record transaction before modifying/deleting pack (FK constraint)
-            await tx.insert(creditTransactions).values({
+            await insertUsage({
               walletId: pack.walletId,
               amount: -deduction,
               balanceAfter: updatedWallet?.balance || 0,
@@ -3317,7 +3332,6 @@ export class CreditRepository {
               freePeriodId: walletInfo?.freePeriodId || null,
               metadata: {
                 ...usageMetadata,
-                ...upstreamCost,
                 freeCreditsUsed: 0,
                 packCreditsUsed: deduction,
               },
@@ -3338,6 +3352,22 @@ export class CreditRepository {
 
             remaining -= deduction;
           }
+        }
+
+        if (upstreamCost && invoiceRows.length > 1) {
+          // Prorate the one invoice over the actual collected amount. This
+          // also conserves the invoice on a partially funded call.
+          const collected = amount - remaining;
+          const share = sql`(-${creditTransactions.amount} / ${collected}::numeric)`;
+          await tx
+            .update(creditTransactions)
+            .set({
+              metadata: sql`${creditTransactions.metadata} || jsonb_build_object(
+              'upstreamCostUsd', ${upstreamCost.upstreamCostUsd}::numeric * ${share},
+              'fallbackCostUsd', ${upstreamCost.fallbackCostUsd}::numeric * ${share}
+            )`,
+            })
+            .where(inArray(creditTransactions.id, invoiceRows));
         }
 
         if (remaining > 0) {
@@ -4741,6 +4771,7 @@ export class CreditRepository {
     /** Real upstream cost behind this charge (OpenRouter), for reconciliation. */
     upstreamCost?: UsageUpstreamCost,
     apiProvider?: UsageAttribution["apiProvider"],
+    tokenUsage?: UsageCacheTokens,
   ): Promise<ResponseType<DeductForModelResult>> {
     if (cost <= 0) {
       logger.debug("Skipping credit deduction - zero or negative cost", {
@@ -4781,6 +4812,7 @@ export class CreditRepository {
         true, // Allow partial deduction for model usage
         upstreamCost,
         apiProvider,
+        tokenUsage,
       );
 
       if (!result.success) {

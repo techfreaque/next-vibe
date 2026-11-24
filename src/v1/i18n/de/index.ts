@@ -7,6 +7,11 @@ export const translations: typeof enTranslations = {
     api: "OpenAI-kompatible API",
   },
 
+  promptCache: {
+    label: "Prompt-Cache",
+    description:
+      "Gemeinsamen Prompt-Anfang zwischenspeichern und bei Bedarf die Speicherdauer festlegen.",
+  },
   openai: {
     missingKey:
       "API-Schlüssel fehlt. Sende ihn als 'Authorization: Bearer <Schlüssel>' oder 'x-api-key: <Schlüssel>'. Erstelle einen unter Einstellungen > API-Schlüssel.",

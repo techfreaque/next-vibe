@@ -23,13 +23,17 @@ import {
   type ToolSet,
 } from "ai";
 import type { ChatModelOption } from "next-vibe/agent/ai-stream/models";
+import type { CacheControl } from "next-vibe/agent/ai-stream/providers/shared/prompt-cache";
 import { ProviderFactory } from "next-vibe/agent/ai-stream/repository/core/infra";
 import {
   type InlineThinkEvent,
   InlineThinkSplitter,
   splitInlineThink,
 } from "next-vibe/agent/ai-stream/repository/core/inline-think-splitter";
-import { readImageOutputTokens } from "next-vibe/agent/ai-stream/repository/loop/token-accumulator";
+import {
+  readCacheUsage,
+  readImageOutputTokens,
+} from "next-vibe/agent/ai-stream/repository/loop/token-accumulator";
 import { createFixtureDownload } from "next-vibe/agent/shared/fixture-download";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import type { EndpointLogger } from "next-vibe/logger/types";
@@ -38,6 +42,7 @@ import type { z } from "zod";
 /** A client-defined function tool: the model may call it, the CLIENT runs it. */
 export interface InferenceTool {
   name: string;
+  cacheControl?: CacheControl;
   description: string | undefined;
   /** JSON Schema of the arguments; undefined = no arguments. */
   parameters: Record<string, JsonValue> | undefined;
@@ -57,6 +62,7 @@ export interface InferenceToolCall {
 }
 
 export interface InferenceRequest {
+  cacheControl?: CacheControl;
   model: ChatModelOption;
   messages: ModelMessage[];
   temperature: number | undefined;
@@ -74,6 +80,8 @@ export interface InferenceUsage {
   inputTokens: number;
   outputTokens: number;
   cachedInputTokens: number;
+  cacheWriteTokens?: number;
+  hourWriteTokens?: number;
   /** Part of outputTokens spent on reasoning (0 when unknown). */
   reasoningTokens: number;
   /** Part of outputTokens that are IMAGE tokens (absent = 0). */
@@ -150,22 +158,60 @@ function mapFinishReason(reason: string): OpenAiFinishReason {
 interface RawUsage {
   inputTokens: number | undefined;
   outputTokens: number | undefined;
-  inputTokenDetails?: { cacheReadTokens?: number | undefined } | undefined;
+  inputTokenDetails?:
+    | { cacheReadTokens?: number; cacheWriteTokens?: number }
+    | undefined;
   outputTokenDetails?: { reasoningTokens?: number | undefined } | undefined;
   raw?: JSONValue;
 }
 
-function mapUsage(usage: RawUsage): InferenceUsage | undefined {
+function mapUsage(
+  usage: RawUsage,
+  metadata?: ProviderMetadata,
+  hourCacheRequested = false,
+): InferenceUsage | undefined {
   if (usage.inputTokens === undefined && usage.outputTokens === undefined) {
     return undefined;
   }
   return {
     inputTokens: usage.inputTokens ?? 0,
     outputTokens: usage.outputTokens ?? 0,
-    cachedInputTokens: usage.inputTokenDetails?.cacheReadTokens ?? 0,
+    ...readCacheUsage(usage, metadata, hourCacheRequested),
     reasoningTokens: usage.outputTokenDetails?.reasoningTokens ?? 0,
     imageOutputTokens: readImageOutputTokens(usage, false),
   };
+}
+
+const isHour = (options: ModelMessage["providerOptions"]): boolean => {
+  const control = options?.openrouter?.cacheControl;
+  return (
+    typeof control === "object" &&
+    control !== null &&
+    "ttl" in control &&
+    control.ttl === "1h"
+  );
+};
+
+/** Only Anthropic models use the 1h / 5m write tariff distinction. */
+function requestsHourCache(request: InferenceRequest): boolean {
+  if (
+    request.model.cacheWrite1hTokenCost === undefined &&
+    !request.model.providerModel.startsWith("anthropic/")
+  ) {
+    return false;
+  }
+  return (
+    request.cacheControl?.ttl === "1h" ||
+    request.tools?.some((spec) => spec.cacheControl?.ttl === "1h") === true ||
+    request.messages.some(
+      (message) =>
+        isHour(message.providerOptions) ||
+        (Array.isArray(message.content) &&
+          message.content.some(
+            (part) => "providerOptions" in part && isHour(part.providerOptions),
+          )),
+    )
+  );
 }
 
 /** Merges per-delta provider metadata of one reasoning block (later wins per key). */
@@ -218,6 +264,7 @@ function buildCall(request: InferenceRequest): {
   model: LanguageModel;
   messages: ModelMessage[];
   allowSystemInMessages: true;
+  providerOptions?: ProviderMetadata;
   experimental_download: ReturnType<typeof createFixtureDownload>;
   abortSignal: AbortSignal | undefined;
   tools?: ToolSet;
@@ -231,6 +278,15 @@ function buildCall(request: InferenceRequest): {
     request.model,
     request.logger,
     request.toolExecutionContext,
+    {
+      control: request.cacheControl,
+      messages: request.messages,
+      tools: new Map(
+        request.tools?.flatMap((spec) =>
+          spec.cacheControl ? [[spec.name, spec.cacheControl] as const] : [],
+        ),
+      ),
+    },
   );
   const supportsTemperature =
     request.model.features.supportsTemperature !== false;
@@ -321,7 +377,11 @@ export const aiSdkRunner: InferenceRunner = {
       })),
       parts,
       finishReason: mapFinishReason(result.finishReason),
-      usage: mapUsage(result.usage),
+      usage: mapUsage(
+        result.usage,
+        result.providerMetadata,
+        requestsHourCache(request),
+      ),
       providerMetadata: result.providerMetadata,
     };
   },
@@ -335,6 +395,7 @@ export const aiSdkRunner: InferenceRunner = {
     // Client tools have no execute, so a call is one step: its finish-step
     // metadata holds the real upstream cost billed for the call.
     let stepMetadata: ProviderMetadata | undefined;
+    let stepUsage: InferenceUsage | undefined;
     // Inline <think>…</think> in text deltas is reasoning, not answer text.
     const inlineThink = new InlineThinkSplitter();
     for await (const part of result.fullStream) {
@@ -399,11 +460,18 @@ export const aiSdkRunner: InferenceRunner = {
         return;
       } else if (part.type === "finish-step") {
         stepMetadata = part.providerMetadata ?? stepMetadata;
+        stepUsage = mapUsage(
+          part.usage,
+          stepMetadata,
+          requestsHourCache(request),
+        );
       } else if (part.type === "finish") {
         yield {
           type: "finish",
           finishReason: mapFinishReason(part.finishReason),
-          usage: mapUsage(part.totalUsage),
+          usage:
+            stepUsage ??
+            mapUsage(part.totalUsage, stepMetadata, requestsHourCache(request)),
           providerMetadata: stepMetadata,
         };
       }

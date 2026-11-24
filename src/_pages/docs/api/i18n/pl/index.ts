@@ -138,6 +138,17 @@ export const translations: typeof enTranslations = {
       "`GET /v1/models` zwraca modele, które twój klucz może teraz wywołać, z rozmiarem kontekstu, obsługą narzędzi i ceną w kredytach za milion tokenów. Użyj id jako pola model w zapytaniach.",
     note: "Lista zależy od twojego konta. Nieznane lub niedostępne id zwracają 404 `model_not_found`. Jedyne mapowanie: na `/v1/messages` ID Claude, które Claude Code wysyła domyślnie, trafiają do naszego najnowszego Claude z tej samej rodziny.",
     browse: "Przeglądaj wszystkie modele z cenami i filtrami",
+    rates: {
+      tiers:
+        "Jeśli odpowiedź zawiera pricing.tiers, użyj stawek w kredytach z właściwego progu. min_prompt_tokens obejmuje wartość graniczną. utc_start i utc_end to czas UTC w formacie HHMM. Przedział obejmuje początek i wyklucza koniec.",
+      title: "Ceny tokenów czatu",
+      unit: "Pole pricing podaje ceny dla klienta w kredytach za milion tokenów przy podstawowej długości kontekstu, z uwzględnieniem marży. Żadne pole nie zawiera kwot w USD. null oznacza brak osobnej stawki.",
+      input: "Tokeny wejściowe poza pamięcią podręczną.",
+      output: "Tokeny wygenerowanego tekstu.",
+      read: "Tokeny wejściowe odczytane z pamięci podręcznej.",
+      write: "Tokeny zapisane w pamięci podręcznej na domyślny czas.",
+      hour: "Tokeny zapisane w pamięci podręcznej na godzinę.",
+    },
     media: {
       title: "Modele multimedialne na tej samej liście",
       body: "Modele obrazów, wideo, muzyki, głosu i transkrypcji są na tej samej liście. Każdy wpis mówi, co model robi i gdzie go wywołać.",
@@ -223,12 +234,12 @@ export const translations: typeof enTranslations = {
       "API czerpie z tych samych kredytów co czat i rozlicza się według tych samych zasad. Jedno saldo, jeden rachunek.",
     points: {
       price:
-        "Koszt = tokeny wejściowe plus wyjściowe po cenie modelu w kredytach, podanej za milion tokenów w `GET /v1/models`. Wyjątek to modele OpenRouter: płacisz tyle, ile dostawca naprawdę policzył za wywołanie, plus naszą marżę. Ich cena na liście to szacunek. Czat rozlicza je tak samo.",
+        "Aby oszacować koszt, pomnóż liczbę tokenów każdego rodzaju przez stawkę za milion. Każdy token wejściowy policz raz, jako zwykły token, odczyt lub zapis.",
       usage:
         "Każda odpowiedź zawiera `usage.credits_charged`. Saldo znajdziesz w aplikacji w zakładce Kredyty.",
       preflight:
         "Przed wywołaniem porównujemy saldo z oszacowaniem na najgorszy przypadek. Za mało: HTTP 402 `insufficient_credits`, nic się nie wykonuje, nic nie jest pobierane.",
-      real: "Po wywołaniu płacisz za rzeczywiste zużycie, nie za oszacowanie: liczbę tokenów zgłoszoną przez dostawcę, a przy modelach OpenRouter jego prawdziwy koszt. Gdy dostawca nie poda kosztu, obowiązuje cena z listy.",
+      real: "Jeśli dostawca poda koszt, doliczamy do niego marżę. W pozostałych przypadkach stosujemy odpowiednie stawki za tokeny. Zaokrągloną opłatę znajdziesz w usage.credits_charged.",
       media:
         "Wywołania multimedialne rozliczają się tak samo: realny koszt dostawcy plus nasza marża, gdy dostawca go podaje, w innym wypadku cena z listy. Obrazy za sztukę, mowa za znaki, transkrypcja za sekundę nagrania, wideo gdy klip jest gotowy, muzyka za klip.",
       topup:

@@ -7,9 +7,10 @@
  * spend); keys, auth, model resolution and the credit ledger are real.
  */
 
+import { z } from "zod";
 import type { ProviderMetadata } from "ai";
 import { and, eq, inArray } from "drizzle-orm";
-import { billsUpstreamCost } from "next-vibe/agent/ai-stream/repository/loop/token-accumulator";
+import { billsUpstreamCost, TokenAccumulator } from "next-vibe/agent/ai-stream/repository/loop/token-accumulator";
 import {
   createE2ECreditUser,
   type E2ECreditUser,
@@ -20,7 +21,7 @@ import {
   upstreamCostToCredits,
 } from "next-vibe/agent/models/models";
 import { isUncensoredContent } from "next-vibe/agent/models/uncensored-consent/constants";
-import type { ChatModelOption } from "next-vibe/agent/ai-stream/models";
+import { chatModelOptionsPool, type ChatModelOption } from "next-vibe/agent/ai-stream/models";
 import { rootlessToolExecutionContext } from "next-vibe/core/execution-context";
 import { defaultLocale } from "next-vibe/core/i18n/core/config";
 import { db } from "next-vibe/database";
@@ -43,6 +44,8 @@ import { CreditRepository } from "@/credits/repository";
 import { V1ChatCompletionsRepository } from "./chat/completions/repository";
 import { scopedTranslation } from "./i18n";
 import { V1MessagesRepository } from "./messages/repository";
+import { V1ModelsRepository } from "./models/repository";
+import { chatTokenPricing } from "./shared/chat-pricing";
 import { V1ResponsesRepository } from "./responses/repository";
 import type { InferenceRunner, InferenceUsage } from "./shared/inference";
 import { listUserCallableModels } from "./shared/models";
@@ -55,6 +58,7 @@ const USAGE: InferenceUsage = {
   inputTokens: 20_000,
   outputTokens: 2_000,
   cachedInputTokens: 5_000,
+  cacheWriteTokens: 2_000,
   reasoningTokens: 0,
 };
 /** Real upstream cost of one call: an endpoint far pricier than the list price. */
@@ -65,7 +69,7 @@ function openRouterMeta(cost: number): ProviderMetadata {
 }
 
 /** A text runner whose calls report `meta` (undefined = no real cost). */
-function runnerWith(meta: ProviderMetadata | undefined): InferenceRunner {
+function runnerWith(meta: ProviderMetadata | undefined, usage: InferenceUsage = USAGE): InferenceRunner {
   return {
     generate: () =>
       Promise.resolve({
@@ -73,7 +77,7 @@ function runnerWith(meta: ProviderMetadata | undefined): InferenceRunner {
         toolCalls: [],
         parts: [{ type: "text", text: "Hello there" }],
         finishReason: "stop",
-        usage: USAGE,
+        usage,
         providerMetadata: meta,
       }),
     async *stream() {
@@ -82,7 +86,7 @@ function runnerWith(meta: ProviderMetadata | undefined): InferenceRunner {
       yield {
         type: "finish",
         finishReason: "stop",
-        usage: USAGE,
+        usage,
         providerMetadata: meta,
       };
     },
@@ -176,6 +180,8 @@ async function call(
 interface UsageRow {
   id: string;
   amount: number;
+  cachedInputTokens: number;
+  cacheWriteTokens: number;
   apiProvider: string | undefined;
   upstreamCostUsd: number | undefined;
   billingBasis: string | undefined;
@@ -205,6 +211,8 @@ async function usageRows(user: JwtPrivatePayloadType): Promise<UsageRow[]> {
   return rows.map((row) => ({
     id: row.id,
     amount: row.amount,
+    cachedInputTokens: ("cachedInputTokens" in row.metadata ? row.metadata.cachedInputTokens : 0) ?? 0,
+    cacheWriteTokens: ("cacheWriteTokens" in row.metadata ? row.metadata.cacheWriteTokens : 0) ?? 0,
     apiProvider:
       "apiProvider" in row.metadata ? row.metadata.apiProvider : undefined,
     upstreamCostUsd:
@@ -272,6 +280,93 @@ describe("/v1 bills OpenRouter models at real upstream cost", () => {
     expect(key).not.toBe("");
   });
 
+  it("GET /v1/models quotes the same customer credits as billing for each model family", async () => {
+    const request = new Request("http://localhost/api/en-US/v1/models", {
+      headers: { Authorization: `Bearer ${key}`, "anthropic-version": "2023-06-01" },
+    });
+    const { response } = await V1ModelsRepository.list(await authed(request), request, defaultLocale, t, logger);
+    expect(response.status).toBe(200);
+    const price = z.number().nullable();
+    const baseRates = z.object({
+      input_credits_per_million_tokens: price,
+      output_credits_per_million_tokens: price,
+      cache_read_credits_per_million_tokens: price,
+      cache_write_credits_per_million_tokens: price,
+      cache_write_1h_credits_per_million_tokens: price,
+    });
+    const pricing = baseRates.extend({
+      tiers: z.array(baseRates.extend({min_prompt_tokens: z.number().optional(), utc_start: z.number().optional(), utc_end: z.number().optional()})).optional(),
+    });
+    const catalog = z.object({ data: z.array(z.object({ id: z.string(), pricing })) }).parse(await response.json());
+    const served = listUserCallableModels(payer.user, await getEnvAvailability());
+    expect(catalog.data.map(row => row.id).sort()).toEqual(served.map(row => row.id).sort());
+
+    function verify(option: ChatModelOption, listing: z.infer<typeof pricing>): void {
+      const requestStartedAt = Date.UTC(2026, 10, 24, 12);
+      const rates = listing.tiers?.find(tier =>
+        tier.utc_start !== undefined && tier.utc_end !== undefined &&
+        (tier.utc_start < tier.utc_end ? tier.utc_start <= 1200 && 1200 < tier.utc_end : 1200 >= tier.utc_start || 1200 < tier.utc_end)
+      ) ?? listing;
+      const input = rates.input_credits_per_million_tokens;
+      const output = rates.output_credits_per_million_tokens;
+      if (typeof option.creditCost === "number") {
+        expect([input, output]).toEqual([null, null]);
+        return;
+      }
+      expect(input).toBeTypeOf("number");
+      expect(output).toBeTypeOf("number");
+      if (input === null || output === null) {
+        return;
+      }
+      const read = rates.cache_read_credits_per_million_tokens ?? input;
+      const write = rates.cache_write_credits_per_million_tokens ?? input;
+      const hour = rates.cache_write_1h_credits_per_million_tokens;
+      const hourTokens = hour === null ? 0 : 431;
+      const tokens = { requestStartedAt, inputTokens: 12345, outputTokens: 2345, cachedInputTokens: 3123, cacheWriteTokens: 1823, hourWriteTokens: hourTokens };
+      const unrounded = ((tokens.inputTokens - tokens.cachedInputTokens - tokens.cacheWriteTokens) * input +
+        tokens.cachedInputTokens * read + (tokens.cacheWriteTokens - hourTokens) * write +
+        hourTokens * (hour ?? write) + tokens.outputTokens * output) / 1_000_000;
+      const expected = Math.ceil(unrounded * 100 - 1e-9) / 100;
+      const bill = TokenAccumulator.chargeSingleCall(option, tokens, undefined, logger);
+      expect(bill.credits, `${option.id}/${option.apiProvider}`).toBe(expected);
+    }
+
+    const options = new Map(served.map(option => [String(option.id), option]));
+    for (const row of catalog.data) {
+      const option = options.get(row.id);
+      expect(option).toBeDefined();
+      if (option) {
+        verify(option, row.pricing);
+      }
+    }
+    // Real key, synthetic completions, real ledger: exercise an inexpensive
+    // representative from each callable author family with a mixed prompt.
+    for (const family of ["openAI", "anthropic", "deepSeek", "google"]) {
+      const option = served.filter(candidate => candidate.provider === family &&
+        !isUncensoredContent(candidate.content) && typeof candidate.inputTokenCost === "number")
+        .toSorted((a,b) => (a.inputTokenCost ?? 0) - (b.inputTokenCost ?? 0))[0];
+      expect(option, family).toBeDefined();
+      const rates = catalog.data.find(row => row.id === option?.id)?.pricing;
+      if (!option || !rates || rates.input_credits_per_million_tokens === null || rates.output_credits_per_million_tokens === null) {
+        continue;
+      }
+      const mixed = {inputTokens: 1200, outputTokens: 340, cachedInputTokens: 500, cacheWriteTokens: 300, reasoningTokens: 0};
+      const input = rates.input_credits_per_million_tokens;
+      const expected = Math.ceil(((400 * input + 500 * (rates.cache_read_credits_per_million_tokens ?? input) +
+        300 * (rates.cache_write_credits_per_million_tokens ?? input) + 340 * rates.output_credits_per_million_tokens) / 1e6) * 100 - 1e-9) / 100;
+      const before = await usageRows(payer.user);
+      const completion = await call("chat", key, option.id, false, runnerWith(undefined, mixed));
+      expect(completion.status, family).toBe(200);
+      const result = z.object({usage:z.object({credits_charged:z.number()})}).parse(await completion.json());
+      expect(result.usage.credits_charged, family).toBe(expected);
+      expect(charged(await newUsageRows(payer.user,before)), family).toBe(expected);
+    }
+    // Exercise provider variants even when Atlas has no key for their route.
+    for (const option of chatModelOptionsPool) {
+      verify(option, chatTokenPricing(option));
+    }
+  });
+
   const cases: Array<{ format: Format; stream: boolean }> = [
     { format: "chat", stream: false },
     { format: "chat", stream: true },
@@ -294,6 +389,7 @@ describe("/v1 bills OpenRouter models at real upstream cost", () => {
         USAGE.inputTokens,
         USAGE.outputTokens,
         USAGE.cachedInputTokens,
+        USAGE.cacheWriteTokens,
       );
       expect(expected).not.toBe(tokenPrice);
 
@@ -303,13 +399,19 @@ describe("/v1 bills OpenRouter models at real upstream cost", () => {
       expect(res.status).toBe(200);
       const text = await res.text();
       expect(text).toContain(`${expected}`);
+      if (format === "chat") {
+        expect(text).toContain('"cached_tokens":5000');
+        expect(text).toContain('"cache_write_tokens":2000');
+      }
 
       const rows = await newUsageRows(payer.user, snapshot);
       expect(charged(rows)).toBe(expected);
+      expect(rows.reduce((total, row) => total + row.cachedInputTokens, 0)).toBe(5000);
+      expect(rows.reduce((total, row) => total + row.cacheWriteTokens, 0)).toBe(2000);
       expect(rows.length).toBeGreaterThan(0);
+      expect(rows.reduce((sum, row) => sum + (row.upstreamCostUsd ?? 0), 0)).toBeCloseTo(UPSTREAM_USD, 12);
       for (const row of rows) {
         expect(row.apiProvider).toBe(model.apiProvider);
-        expect(row.upstreamCostUsd).toBe(UPSTREAM_USD);
         expect(row.billingBasis).toBe("upstream_cost");
         expect(row.upstreamProvider).toBe("Parasail");
       }
@@ -326,6 +428,7 @@ describe("/v1 bills OpenRouter models at real upstream cost", () => {
         USAGE.inputTokens,
         USAGE.outputTokens,
         USAGE.cachedInputTokens,
+        USAGE.cacheWriteTokens,
       );
       const warn = vi.spyOn(logger, "warn");
       const snapshot = await usageRows(payer.user);

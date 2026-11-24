@@ -11,6 +11,10 @@ import type {
   ToolContent,
   UserContent,
 } from "ai";
+import {
+  type CacheControl,
+  cacheOptions,
+} from "next-vibe/agent/ai-stream/providers/shared/prompt-cache";
 import { z } from "zod";
 
 import type { JsonValue, ReasoningReplay } from "./inference";
@@ -90,15 +94,19 @@ export function pushUserParts(out: ModelMessage[], parts: UserPart[]): void {
  * conversation starts, so instructions that arrive mid-conversation (Codex
  * developer messages after a model switch) go in as a user turn.
  */
-export function pushSystemText(out: ModelMessage[], text: string): void {
+export function pushSystemText(
+  out: ModelMessage[],
+  text: string,
+  control?: CacheControl,
+): void {
   if (text === "") {
     return;
   }
   if (out.every((m) => m.role === "system")) {
-    out.push({ role: "system", content: text });
+    out.push({ role: "system", content: text, ...cacheOptions(control) });
     return;
   }
-  pushUserParts(out, [{ type: "text", text }]);
+  pushUserParts(out, [{ type: "text", text, ...cacheOptions(control) }]);
 }
 
 export function reasoningPart(

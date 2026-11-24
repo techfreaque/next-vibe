@@ -17,6 +17,7 @@ import {
   createPromptEngineeredProvider,
   type JSONValue,
 } from "./shared/openai-compatible-provider";
+import type { ClientPromptCache } from "./shared/prompt-cache";
 
 /**
  * Create a Venice.ai provider compatible with AI SDK V2
@@ -26,11 +27,13 @@ export function createVeniceAI(
   // Explicit fetch — the fixture engine binds record/replay per execution
   // chain (createFixtureFetch); plain live fetch otherwise. Never global.
   fetchImpl: typeof globalThis.fetch,
+  clientCache?: ClientPromptCache,
 ): {
   chat: (modelId: string) => OpenAIChatLanguageModel;
 } {
   return createPromptEngineeredProvider(logger, fetchImpl, {
     label: "Venice.ai",
+    clientCache,
     provider: ApiProvider.VENICE_AI,
     apiKey: agentEnv.VENICE_AI_API_KEY,
     logTag: "venice-ai",

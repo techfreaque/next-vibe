@@ -14,7 +14,6 @@ import { fetchStorageFileAsBase64 } from "../../../chat/storage/url-utils";
 import type { AgentEnvAvailability } from "../../../env-availability";
 import type { Modality } from "../../../models/enum";
 import type { ModelOptionTokenBased } from "../../../models/models";
-import { calculateCreditCost } from "../../../models/models";
 import type { ChatModelId } from "../../models";
 import type {
   AudioVisionModelId,
@@ -29,6 +28,7 @@ import {
   type MessageVariant,
   ModalityResolver,
 } from "../core/modality-resolver";
+import { readCacheUsage, TokenAccumulator } from "../loop/token-accumulator";
 import { detectVisionRefusal, isModerationError } from "./vision-refusal";
 
 const BRIDGE_PROMPTS = {
@@ -170,6 +170,7 @@ type BridgeModelOption = ModelOptionTokenBased & { id: BridgeModelId };
 type BridgeAttemptOutcome =
   | {
       kind: "ok";
+      requestStartedAt: number;
       result: Awaited<ReturnType<typeof aiGenerateText>>;
       output: string;
     }
@@ -236,6 +237,7 @@ async function attemptBridgeModel(params: {
   const BRIDGE_ATTEMPT_TIMEOUT_MS = 150_000;
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
+      const requestStartedAt = Date.now();
       const result = await aiGenerateText({
         model: provider.chat(model.providerModel) as LanguageModel,
         abortSignal: AbortSignal.any([
@@ -259,7 +261,7 @@ async function attemptBridgeModel(params: {
         });
         return { kind: "fail", reason: refusal };
       }
-      return { kind: "ok", result, output };
+      return { kind: "ok", result, output, requestStartedAt };
     } catch (attemptErr) {
       const parsedAttemptErr = parseError(attemptErr);
       const apiError = APICallError.isInstance(attemptErr) ? attemptErr : null;
@@ -402,12 +404,25 @@ async function runBridgeCall(params: {
       usedModel = fallback;
     }
 
-    const { result, output } = outcome;
-    const creditCost = calculateCreditCost(
-      usedModel,
-      result.usage.inputTokens ?? 0,
-      result.usage.outputTokens ?? 0,
+    const { result, output, requestStartedAt } = outcome;
+    const cache = readCacheUsage(
+      result.usage,
+      result.providerMetadata,
+      usedModel.providerModel.startsWith("anthropic/"),
     );
+    const { credits: creditCost, upstreamCost } =
+      TokenAccumulator.chargeSingleCall(
+        usedModel,
+        {
+          inputTokens: result.usage.inputTokens ?? 0,
+          outputTokens: result.usage.outputTokens ?? 0,
+          ...cache,
+          requestStartedAt,
+          promptCountKnown: (result.usage.inputTokens ?? 0) > 0,
+        },
+        result.providerMetadata,
+        logger,
+      );
 
     if (chatMessageId) {
       const variant: MessageVariant = {
@@ -436,6 +451,11 @@ async function runBridgeCall(params: {
         type: "model",
         model: usedModel.id,
         apiProvider: usedModel.apiProvider,
+        upstreamCost,
+        tokenUsage: {
+          cachedInputTokens: cache.cachedInputTokens,
+          cacheWriteTokens: cache.cacheWriteTokens,
+        },
       });
     }
 

@@ -11,6 +11,7 @@ import { FETCH_URL_ALIAS } from "../../../fetch-url-content/constants";
 import FETCH_URL_DEFINITION from "../../../fetch-url-content/definition";
 import { WEB_SEARCH_ALIAS } from "../../../web-search/constants";
 import SEARCH_DEFINITION from "../../../web-search/definition";
+import type { CacheControl } from "./prompt-cache";
 
 /**
  * OpenAI API Types
@@ -26,7 +27,15 @@ type JSONValue =
 
 export interface OpenAIMessage {
   role: string;
-  content: string | null;
+  content:
+    | string
+    | Array<{
+        type: string;
+        text?: string;
+        cache_control?: CacheControl;
+        [key: string]: JSONValue | undefined;
+      }>
+    | null;
   tool_calls?: OpenAIToolCall[];
   tool_call_id?: string;
   name?: string;
@@ -377,7 +386,15 @@ export function convertToolMessagesToUserMessages(
 
       return {
         role: "assistant",
-        content: `${content}\n<tool_calls>\n${toolCallsJson}\n</tool_calls>`,
+        content: Array.isArray(content)
+          ? [
+              ...content,
+              {
+                type: "text",
+                text: `\n<tool_calls>\n${toolCallsJson}\n</tool_calls>`,
+              },
+            ]
+          : `${content}\n<tool_calls>\n${toolCallsJson}\n</tool_calls>`,
       };
     }
 
@@ -387,7 +404,12 @@ export function convertToolMessagesToUserMessages(
 
       return {
         role: "user",
-        content: `[Tool Result for ${toolCallId}]\n${result}`,
+        content: Array.isArray(result)
+          ? [
+              { type: "text", text: `[Tool Result for ${toolCallId}]\n` },
+              ...result,
+            ]
+          : `[Tool Result for ${toolCallId}]\n${result}`,
       };
     }
 
@@ -401,8 +423,33 @@ export function convertToolMessagesToUserMessages(
 export function injectToolInstructions(
   messages: OpenAIMessage[],
   tools: OpenAITool[],
+  cacheTools?: ReadonlyMap<string, CacheControl>,
 ): OpenAIMessage[] {
   const toolSystemPrompt = generateToolSystemPrompt(tools);
+  // These models receive tool definitions as text. Preserve a client breakpoint
+  // on the last marked definition inside that synthetic system message.
+  const marked = tools.filter((tool) => cacheTools?.has(tool.function.name));
+  const toolParts: Exclude<OpenAIMessage["content"], string | null> = [];
+  let cursor = 0;
+  for (const tool of marked) {
+    const start = toolSystemPrompt.indexOf(`- ${tool.function.name}: `, cursor);
+    if (start < 0) {
+      continue;
+    }
+    const params = JSON.stringify(tool.function.parameters || {}, null, 2);
+    const paramStart = toolSystemPrompt.indexOf(`Parameters: ${params}`, start);
+    if (paramStart < 0) {
+      continue;
+    }
+    const end = paramStart + "Parameters: ".length + params.length;
+    toolParts.push({
+      type: "text",
+      text: toolSystemPrompt.slice(cursor, end),
+      cache_control: cacheTools?.get(tool.function.name),
+    });
+    cursor = end;
+  }
+  toolParts.push({ type: "text", text: toolSystemPrompt.slice(cursor) });
   const firstSystemIdx = messages.findIndex((msg) => msg.role === "system");
 
   if (firstSystemIdx !== -1) {
@@ -413,7 +460,16 @@ export function injectToolInstructions(
     const updatedMessages = [...messages];
     updatedMessages[firstSystemIdx] = {
       ...messages[firstSystemIdx],
-      content: `${contentStr}\n\n${toolSystemPrompt}`,
+      content:
+        Array.isArray(existingContent) || marked.length
+          ? [
+              ...(Array.isArray(existingContent)
+                ? existingContent
+                : [{ type: "text", text: contentStr }]),
+              { type: "text", text: "\n\n" },
+              ...toolParts,
+            ]
+          : `${contentStr}\n\n${toolSystemPrompt}`,
     };
     return updatedMessages;
   }
@@ -422,7 +478,7 @@ export function injectToolInstructions(
   return [
     {
       role: "system",
-      content: toolSystemPrompt,
+      content: marked.length ? toolParts : toolSystemPrompt,
     },
     ...messages,
   ];

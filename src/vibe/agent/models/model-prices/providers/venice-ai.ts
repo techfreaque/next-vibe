@@ -47,8 +47,16 @@ interface VeniceModel {
       output?: VeniceUsdPrice;
       cache_input?: VeniceUsdPrice;
       cache_write?: VeniceUsdPrice;
+      cache_write_1h?: VeniceUsdPrice;
       /** Higher tier billed past context_token_threshold */
-      extended?: { context_token_threshold?: number };
+      extended?: {
+        context_token_threshold?: number;
+        input?: VeniceUsdPrice;
+        output?: VeniceUsdPrice;
+        cache_input?: VeniceUsdPrice;
+        cache_write?: VeniceUsdPrice;
+        cache_write_1h?: VeniceUsdPrice;
+      };
       /** Image models: flat USD per generation */
       generation?: VeniceUsdPrice;
       inpaint?: VeniceUsdPrice;
@@ -80,6 +88,22 @@ function toEntry(model: VeniceModel): TokenPriceEntry | undefined {
     output,
     cacheRead: pricing?.cache_input?.usd,
     cacheWrite: pricing?.cache_write?.usd,
+    cacheWrite1h: pricing?.cache_write_1h?.usd,
+    pricingTiers:
+      threshold !== undefined &&
+      pricing?.extended?.input?.usd !== undefined &&
+      pricing.extended.output?.usd !== undefined
+        ? [
+            {
+              minPromptTokens: threshold + 1,
+              inputTokenCost: pricing.extended.input.usd,
+              outputTokenCost: pricing.extended.output.usd,
+              cacheReadTokenCost: pricing.extended.cache_input?.usd,
+              cacheWriteTokenCost: pricing.extended.cache_write?.usd,
+              cacheWrite1hTokenCost: pricing.extended.cache_write_1h?.usd,
+            },
+          ]
+        : [],
     contextWindow,
     inputs,
     outputs: ["text"],
@@ -128,15 +152,16 @@ export class VenicePriceFetcher extends PriceFetcher {
     }
 
     const byId = new Map(models.map((m) => [m.id, m]));
-    const { updates, modalityUpdates, failures } = collectTokenPriceUpdates({
-      apiProvider: ApiProvider.VENICE_AI,
-      source: "venice-api",
-      label: "Venice.ai",
-      lookup: (providerModel) => {
-        const model = byId.get(providerModel);
-        return model ? toEntry(model) : undefined;
-      },
-    });
+    const { updates, modalityUpdates, settingsUpdates, failures } =
+      collectTokenPriceUpdates({
+        apiProvider: ApiProvider.VENICE_AI,
+        source: "venice-api",
+        label: "Venice.ai",
+        lookup: (providerModel) => {
+          const model = byId.get(providerModel);
+          return model ? toEntry(model) : undefined;
+        },
+      });
 
     const imageModels = await this.fetchImageModels(logger);
     const imageById = new Map(imageModels.map((m) => [m.id, m]));
@@ -176,7 +201,6 @@ export class VenicePriceFetcher extends PriceFetcher {
       }
     }
 
-    const settingsUpdates: SettingsUpdate[] = [];
     await this.collectVideoPrices(updates, settingsUpdates, failures);
 
     return {

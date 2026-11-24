@@ -18,7 +18,7 @@ import {
   InlineThinkSplitter,
 } from "../core/inline-think-splitter";
 import type { ToolExecutionContextImpl } from "../core/stream";
-import { TokenAccumulator } from "../loop/token-accumulator";
+import { readCacheUsage, TokenAccumulator } from "../loop/token-accumulator";
 
 /**
  * Hard cap for the compacting LLM call. Summarization of a large thread
@@ -121,6 +121,7 @@ export async function runCompactingLLM(params: {
   let finishHandled = false;
 
   try {
+    const requestStartedAt = Date.now();
     const streamResult = await streamText({
       model: providerModel,
       // Do NOT pass system prompt or tools - compacting is a pure summarization
@@ -161,8 +162,13 @@ export async function runCompactingLLM(params: {
         const inputTokens = usageData.inputTokens ?? 0;
         const outputTokens = usageData.outputTokens ?? 0;
         const totalTokens = usageData.totalTokens ?? 0;
-        const cachedInputTokens =
-          usageData.inputTokenDetails?.cacheReadTokens ?? 0;
+        const metadata = await streamResult.providerMetadata;
+        const { cachedInputTokens, cacheWriteTokens, hourWriteTokens } =
+          readCacheUsage(
+            usageData,
+            metadata,
+            modelConfig.providerModel.startsWith("anthropic/"),
+          );
         const uncachedInputTokens = inputTokens - cachedInputTokens;
 
         // Empty summary is worse than no compacting — it would erase context.
@@ -188,10 +194,12 @@ export async function runCompactingLLM(params: {
               inputTokens,
               outputTokens,
               cachedInputTokens,
-              cacheWriteTokens:
-                usageData.inputTokenDetails?.cacheWriteTokens ?? 0,
+              cacheWriteTokens,
+              hourWriteTokens,
+              requestStartedAt,
+              promptCountKnown: inputTokens > 0,
             },
-            await streamResult.providerMetadata,
+            metadata,
             params.logger,
           );
 
@@ -204,6 +212,7 @@ export async function runCompactingLLM(params: {
           outputTokens,
           totalTokens,
           uncachedInputTokens,
+          tokenUsage: { cachedInputTokens, cacheWriteTokens },
           model,
           messagesToCompact,
           user,

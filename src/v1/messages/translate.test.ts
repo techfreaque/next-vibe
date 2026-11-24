@@ -26,6 +26,7 @@ const totals: V1Totals = {
   inputTokens: 1_000,
   outputTokens: 50,
   cachedInputTokens: 400,
+  cacheWriteTokens: 100,
   reasoningTokens: 0,
   credits: 0.02,
 };
@@ -267,6 +268,22 @@ describe("convertAnthropicMessages", () => {
   });
 });
 
+describe("cache boundaries", () => {
+  it("keeps separate cached system and user blocks and the selected tool", () => {
+    const control = { type: "ephemeral", ttl: "1h" } as const;
+    const out = convertAnthropicMessages({
+      system: [{type: "text", text: "shared", cache_control: control}, {type: "text", text: "private"}],
+      messages: [{ role: "user", content: [{ type: "text", text: "prefix", cache_control: control }, { type: "text", text: "suffix" }] }],
+    });
+    expect(out).toMatchObject({ ok: true, messages: [
+      { role: "system", content: "shared", providerOptions: { openrouter: { cacheControl: control } } },
+      { role: "system", content: "private" },
+      { role: "user", content: [{ text: "prefix", providerOptions: { openrouter: { cacheControl: control } } }, { text: "suffix" }] },
+    ] });
+    expect(convertAnthropicTools([{name: "search", input_schema: {}, cache_control: control}])[0]?.cacheControl).toEqual(control);
+  });
+});
+
 describe("tools", () => {
   it("keeps client tools, skips server tools, maps tool_choice", () => {
     const tools = convertAnthropicTools([
@@ -405,7 +422,8 @@ describe("anthropicStreamEncoder", () => {
     expect(events.at(-2)).toMatchObject({
       delta: { stop_reason: "tool_use", stop_sequence: null },
       usage: {
-        input_tokens: 600,
+        input_tokens: 500,
+        cache_creation_input_tokens: 100,
         cache_read_input_tokens: 400,
         output_tokens: 50,
       },

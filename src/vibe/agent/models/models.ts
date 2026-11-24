@@ -42,6 +42,7 @@ import type {
 } from "../video-generation/models";
 import { type Modality, ModelUtility, type ModelUtilityValue } from "./enum";
 import { roundUpPrice } from "./model-prices/providers/base";
+import { activeTokenRates, type TokenTariff } from "./token-tariffs";
 
 // ============================================
 // CORE TYPES AND INTERFACES
@@ -138,10 +139,12 @@ interface LongContextPricing {
   outputTokenCost: number;
   cacheReadTokenCost: number;
   cacheWriteTokenCost: number;
+  cacheWrite1hTokenCost?: number;
 }
 
 export interface ModelProviderConfigTokenBased {
   longContextPricing?: LongContextPricing;
+  pricingTiers?: readonly TokenTariff[];
   id: ChatModelId | ImageGenModelId | VideoGenModelId | MusicGenModelId;
   apiProvider: ApiProvider;
   providerModel: string;
@@ -150,6 +153,7 @@ export interface ModelProviderConfigTokenBased {
   outputTokenCost: number;
   cacheReadTokenCost?: number;
   cacheWriteTokenCost?: number;
+  cacheWrite1hTokenCost?: number;
   /** USD per 1M IMAGE output tokens (image-output chat models). Unset = outputTokenCost. */
   imageOutputTokenCost?: number;
   /**
@@ -410,6 +414,7 @@ export interface ModelOptionBase extends CreditCostInput {
 }
 export interface ModelOptionTokenBased extends ModelOptionBase {
   longContextPricing?: LongContextPricing;
+  pricingTiers?: readonly TokenTariff[];
   creditCost: typeof calculateCreditCost;
   inputTokenCost: number;
   /**
@@ -422,6 +427,7 @@ export interface ModelOptionTokenBased extends ModelOptionBase {
   outputTokenCost: number;
   cacheReadTokenCost?: number;
   cacheWriteTokenCost?: number;
+  cacheWrite1hTokenCost?: number;
   /** USD per 1M IMAGE output tokens (image-output chat models). Unset = outputTokenCost. */
   imageOutputTokenCost?: number;
   /** Estimated IMAGE output tokens per generated image, for price display on
@@ -925,8 +931,10 @@ export function calculateSttCreditCost(
  * Pricing fields shared by provider configs and resolved model options.
  * A structural type keeps provider configs independent of option builders.
  */
-interface CreditCostInput extends Pick<ModelOptionBase, "apiProvider"> {
+interface CreditCostInput {
+  apiProvider: ApiProvider;
   longContextPricing?: LongContextPricing;
+  pricingTiers?: readonly TokenTariff[];
   creditCostPerImage?: number;
   creditCostPerClip?: number;
   creditCostPerSecond?: number;
@@ -937,6 +945,7 @@ interface CreditCostInput extends Pick<ModelOptionBase, "apiProvider"> {
   outputTokenCost?: number;
   cacheReadTokenCost?: number;
   cacheWriteTokenCost?: number;
+  cacheWrite1hTokenCost?: number;
   imageOutputTokenCost?: number;
   estimatedImageOutputTokens?: number;
 }
@@ -952,10 +961,12 @@ export function calculateTokenCostUsd(
   modelOption: Pick<
     CreditCostInput,
     | "longContextPricing"
+    | "pricingTiers"
     | "inputTokenCost"
     | "outputTokenCost"
     | "cacheReadTokenCost"
     | "cacheWriteTokenCost"
+    | "cacheWrite1hTokenCost"
     | "imageOutputTokenCost"
   >,
   actualInputTokens: number,
@@ -963,23 +974,33 @@ export function calculateTokenCostUsd(
   cachedInputTokens = 0,
   cacheWriteTokens = 0,
   imageOutputTokens = 0,
+  hourWriteTokens = 0,
+  requestStartedAt?: number,
+  promptCountKnown = true,
 ): number {
-  const tier = modelOption.longContextPricing;
-  const rates =
-    tier && actualInputTokens >= tier.minPromptTokens ? tier : modelOption;
+  const rates = activeTokenRates(
+    modelOption,
+    promptCountKnown ? actualInputTokens : undefined,
+    requestStartedAt,
+  );
   const inputTokenCost = rates.inputTokenCost ?? 0;
   const outputTokenCost = rates.outputTokenCost ?? 0;
   const uncachedInputTokens = Math.max(
     0,
-    actualInputTokens - cachedInputTokens,
+    actualInputTokens - cachedInputTokens - cacheWriteTokens,
   );
   const uncachedInputCost = (inputTokenCost / 1_000_000) * uncachedInputTokens;
   const cachedInputCost =
     ((rates.cacheReadTokenCost ?? inputTokenCost) / 1_000_000) *
     cachedInputTokens;
+  const writeRate = rates.cacheWriteTokenCost ?? inputTokenCost;
+  const extendedWrites = Math.min(cacheWriteTokens, hourWriteTokens);
+  // Anthropic's one-hour writes cost twice the base input tariff.
   const cacheWriteCost =
-    ((rates.cacheWriteTokenCost ?? inputTokenCost) / 1_000_000) *
-    cacheWriteTokens;
+    (writeRate * (cacheWriteTokens - extendedWrites) +
+      (rates.cacheWrite1hTokenCost ?? Math.max(writeRate, inputTokenCost * 2)) *
+        extendedWrites) /
+    1_000_000;
   const imageTokens = Math.min(
     Math.max(0, imageOutputTokens),
     Math.max(0, actualOutputTokens),
@@ -1001,11 +1022,10 @@ export function upstreamCostToCredits(costUsd: number): number {
   if (!(costUsd > 0)) {
     return 0;
   }
-  const credits =
-    (costUsd / CREDIT_VALUE_USD) * (1 + STANDARD_MARKUP_PERCENTAGE);
+  const credits = providerUsdToCredits(costUsd);
   const rounded = Math.ceil(credits * 10 - 1e-9) / 10;
-  // Snap float noise (0.30000000000000004) back onto the 0.1 grid.
-  return Math.round(rounded * 10) / 10;
+  // Every positive provider charge reaches the ledger.
+  return Math.max(0.1, Math.round(rounded * 10) / 10);
 }
 
 /**
@@ -1030,6 +1050,9 @@ export function calculateCreditCost(
   cachedInputTokens = 0,
   cacheWriteTokens = 0,
   imageOutputTokens = 0,
+  hourWriteTokens = 0,
+  requestStartedAt?: number,
+  promptCountKnown = true,
 ): number {
   if (modelOption.creditCostPerImage !== undefined) {
     return roundMediaCost(
@@ -1068,24 +1091,32 @@ export function calculateCreditCost(
     );
   }
 
-  const credits =
-    (calculateTokenCostUsd(
+  return listedCostToCredits(
+    calculateTokenCostUsd(
       modelOption,
       actualInputTokens,
       actualOutputTokens,
       cachedInputTokens,
       cacheWriteTokens,
       imageOutputTokens,
-    ) /
-      CREDIT_VALUE_USD) *
-    (1 + STANDARD_MARKUP_PERCENTAGE);
-  // Round UP to the 0.01-credit billing granularity: rounding to nearest let
-  // tiny turns round down to 0 — deducted nothing, wrote no ledger
-  // transaction, i.e. free usage. Zero stays zero (no tokens, no charge).
-  // The 1e-9 epsilon keeps float noise on an exact boundary (0.2 computed as
-  // 0.20000000000000004) from ceiling up a full hundredth.
-  const rounded = Math.ceil(credits * 100 - 1e-9) / 100;
-  return rounded % 1 === 0 ? Math.round(rounded) : rounded;
+      hourWriteTokens,
+      requestStartedAt,
+      promptCountKnown,
+    ),
+  );
+}
+
+/** Unrounded customer credits. Round once after summing all token categories. */
+export function providerUsdToCredits(usd: number): number {
+  return (usd / CREDIT_VALUE_USD) * (1 + STANDARD_MARKUP_PERCENTAGE);
+}
+
+/** Token tariffs and charges use the same USD conversion and hundredth-credit ceiling. */
+export function listedCostToCredits(costUsd: number): number {
+  const credits = providerUsdToCredits(costUsd);
+  return credits > 0
+    ? Math.max(0.01, Math.ceil(credits * 100 - 1e-9) / 100)
+    : 0;
 }
 
 // Default features for models without specific features

@@ -9,10 +9,12 @@
 
 import "server-only";
 
-import type { AssistantContent, ModelMessage } from "ai";
+import type { AssistantContent, ModelMessage, TextPart, UserContent } from "ai";
+import { cacheOptions } from "next-vibe/agent/ai-stream/providers/shared/prompt-cache";
 import type { ToolExecutionContext } from "next-vibe/core/execution-context";
 import type { CountryLanguage } from "next-vibe/core/i18n/core/config";
 import type { StreamingResponse } from "next-vibe/core/route/response.schema";
+import type { WidgetData } from "next-vibe/core/utils/json";
 import type { JwtPayloadType } from "next-vibe/identity/auth/types";
 import type { EndpointLogger } from "next-vibe/logger/types";
 import { z } from "zod";
@@ -26,6 +28,7 @@ import {
   runV1Stream,
   TOKENS_PER_IMAGE,
   type V1StreamEncoder,
+  type V1Totals,
 } from "../../shared/execution";
 import { gateApiKeyRequest } from "../../shared/gate";
 import {
@@ -90,6 +93,7 @@ function convertMessages(messages: OpenAiMessage[], t: V1T): Converted {
   for (const [index, msg] of messages.entries()) {
     const param = `messages[${index}]`;
     const content = msg.content ?? "";
+    const options = cacheOptions(msg.cache_control);
     if (msg.role === "tool") {
       if (!msg.tool_call_id) {
         return {
@@ -107,6 +111,11 @@ function convertMessages(messages: OpenAiMessage[], t: V1T): Converted {
         role: "tool",
         content: [
           {
+            ...cacheOptions(
+              (Array.isArray(content)
+                ? content.at(-1)?.cache_control
+                : undefined) ?? msg.cache_control,
+            ),
             type: "tool-result",
             toolCallId: msg.tool_call_id,
             toolName: toolNames.get(msg.tool_call_id) ?? msg.name ?? "tool",
@@ -119,16 +128,18 @@ function convertMessages(messages: OpenAiMessage[], t: V1T): Converted {
     if (msg.role === "user") {
       if (typeof content === "string") {
         chars += content.length;
-        out.push({ role: "user", content });
+        out.push({ role: "user", content, ...options });
         continue;
       }
-      const parts: Array<
-        { type: "text"; text: string } | { type: "image"; image: URL | string }
-      > = [];
+      const parts: Exclude<UserContent, string> = [];
       for (const part of content) {
         if (part.type === "text") {
           chars += part.text.length;
-          parts.push({ type: "text", text: part.text });
+          parts.push({
+            type: "text",
+            text: part.text,
+            ...cacheOptions(part.cache_control),
+          });
           continue;
         }
         const url =
@@ -137,27 +148,41 @@ function convertMessages(messages: OpenAiMessage[], t: V1T): Converted {
             : part.image_url.url;
         images += 1;
         if (url.startsWith("data:")) {
-          parts.push({ type: "image", image: url });
+          parts.push({
+            type: "image",
+            ...cacheOptions(part.cache_control),
+            image: url,
+          });
         } else if (URL.canParse(url) && /^https?:/.test(url)) {
-          parts.push({ type: "image", image: new URL(url) });
+          parts.push({
+            type: "image",
+            ...cacheOptions(part.cache_control),
+            image: new URL(url),
+          });
         } else {
           return { ok: false, message: t("openai.badImageUrl"), param };
         }
       }
-      out.push({ role: "user", content: parts });
+      out.push({ role: "user", content: parts, ...options });
       continue;
     }
-    const text =
+    const textParts: TextPart[] =
       typeof content === "string"
-        ? content
-        : content.map((p) => (p.type === "text" ? p.text : "")).join("");
+        ? [{ type: "text" as const, text: content }]
+        : content
+            .filter((part) => part.type === "text")
+            .map((part) => ({
+              type: part.type,
+              text: part.text,
+              ...cacheOptions(part.cache_control),
+            }));
+    const text = textParts.map((part) => part.text).join("");
     chars += text.length;
     if (msg.role === "assistant") {
       if (msg.tool_calls && msg.tool_calls.length > 0) {
-        const parts: Exclude<AssistantContent, string> = [];
-        if (text) {
-          parts.push({ type: "text", text });
-        }
+        const parts: Exclude<AssistantContent, string> = textParts.filter(
+          (part) => part.text,
+        );
         for (const call of msg.tool_calls) {
           const input = parseArguments(call.function.arguments);
           if (input === undefined) {
@@ -173,18 +198,41 @@ function convertMessages(messages: OpenAiMessage[], t: V1T): Converted {
           toolNames.set(call.id, call.function.name);
           parts.push({
             type: "tool-call",
+            ...cacheOptions(call.cache_control),
             toolCallId: call.id,
             toolName: call.function.name,
             input,
           });
         }
-        out.push({ role: "assistant", content: parts });
+        out.push({ role: "assistant", content: parts, ...options });
       } else {
-        out.push({ role: "assistant", content: text });
+        out.push({
+          role: "assistant",
+          content: typeof content === "string" ? text : textParts,
+          ...options,
+        });
       }
       continue;
     }
-    out.push({ role: "system", content: text });
+    if (Array.isArray(content) && content.some((part) => part.cache_control)) {
+      let prefix = "";
+      for (const part of textParts) {
+        prefix += part.text;
+        if (part.providerOptions) {
+          out.push({
+            role: "system",
+            content: prefix,
+            providerOptions: part.providerOptions,
+          });
+          prefix = "";
+        }
+      }
+      if (prefix) {
+        out.push({ role: "system", content: prefix, ...options });
+      }
+    } else {
+      out.push({ role: "system", content: text, ...options });
+    }
   }
   return {
     ok: true,
@@ -259,10 +307,12 @@ export class V1ChatCompletionsRepository {
       name: spec.function.name,
       description: spec.function.description,
       parameters: spec.function.parameters,
+      cacheControl: spec.cache_control,
     }));
     const prepared = await prepareV1Call({
       payer,
       model: resolved.model,
+      cacheControl: data.cache_control,
       messages: converted.messages,
       estimatedInputTokens:
         converted.estimatedInputTokens +
@@ -331,14 +381,22 @@ export class V1ChatCompletionsRepository {
           finish_reason: hasToolCalls ? "tool_calls" : result.finishReason,
         },
       ],
-      usage: {
-        prompt_tokens: totals.inputTokens,
-        completion_tokens: totals.outputTokens,
-        total_tokens: totals.inputTokens + totals.outputTokens,
-        credits_charged: totals.credits,
-      },
+      usage: completionUsage(totals),
     });
   }
+}
+
+function completionUsage(totals: V1Totals): WidgetData {
+  return {
+    prompt_tokens: totals.inputTokens,
+    prompt_tokens_details: {
+      cached_tokens: totals.cachedInputTokens,
+      cache_write_tokens: totals.cacheWriteTokens ?? 0,
+    },
+    completion_tokens: totals.outputTokens,
+    total_tokens: totals.inputTokens + totals.outputTokens,
+    credits_charged: totals.credits,
+  };
 }
 
 /** OpenAI chat.completion.chunk SSE. Tool calls are addressed by position. */
@@ -421,12 +479,7 @@ function chatCompletionEncoder(
           created,
           model: modelId,
           choices: [],
-          usage: {
-            prompt_tokens: totals.inputTokens,
-            completion_tokens: totals.outputTokens,
-            total_tokens: totals.inputTokens + totals.outputTokens,
-            credits_charged: totals.credits,
-          },
+          usage: completionUsage(totals),
         })}\n\n`;
       }
       return `${out}data: [DONE]\n\n`;

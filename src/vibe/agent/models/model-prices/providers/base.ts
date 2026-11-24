@@ -9,6 +9,7 @@ import { CREDIT_VALUE_USD } from "@/products/constants";
 
 import type { Modality } from "../../enum";
 import type { ApiProvider } from "../../models";
+import type { TokenTariff } from "../../token-tariffs";
 
 export interface ModalityUpdate {
   modelId: string;
@@ -35,6 +36,7 @@ export interface PriceUpdate {
     | "outputTokenCost"
     | "cacheReadTokenCost"
     | "cacheWriteTokenCost"
+    | "cacheWrite1hTokenCost"
     | "imageOutputTokenCost"
     | "contextWindow";
   value: number;
@@ -45,6 +47,22 @@ export interface PriceUpdate {
   enumKey?: string;
 }
 
+/** Stable, readable registry literal used by both refresh paths. */
+export function tariffLiteral(tiers: readonly TokenTariff[]): string {
+  if (!tiers.length) {
+    return "[]";
+  }
+  const entries = tiers.map((tier) => {
+    const fields = Object.entries(tier).filter(
+      ([, value]) => value !== undefined,
+    );
+    return `          {\n${fields
+      .map(([key, value]) => `            ${key}: ${value},`)
+      .join("\n")}\n          },`;
+  });
+  return `[\n${entries.join("\n")}\n        ]`;
+}
+
 export interface PriceFailure {
   modelId: string;
   provider: ApiProvider;
@@ -53,6 +71,9 @@ export interface PriceFailure {
 
 /** Update for array/object settings fields on provider configs (e.g. supportedDurations, pricingByResolution) */
 export interface SettingsUpdate {
+  /** Disambiguates routes sharing a vendor model id. */
+  enumKey?: string;
+  apiProvider?: ApiProvider;
   /** The providerModel string to locate the block in models.ts */
   providerModel: string;
   /** Field name to insert/update (e.g. "supportedDurations", "pricingByResolution") */
@@ -87,6 +108,8 @@ export interface ProviderEntryOperation {
   outputTokenCost?: number;
   cacheReadTokenCost?: number;
   cacheWriteTokenCost?: number;
+  cacheWrite1hTokenCost?: number;
+  pricingTiers?: readonly TokenTariff[];
   imageOutputTokenCost?: number;
   creditCostPerImage?: number;
   creditCostPerClip?: number;
@@ -137,7 +160,11 @@ export interface ProviderPriceResult {
  */
 export function roundUpPrice(value: number, decimals: number): number {
   const factor = 10 ** decimals;
-  return Math.ceil(value * factor - 1e-6) / factor;
+  if (value === 0) {
+    return 0;
+  }
+  const rounded = Math.ceil(value * factor - 1e-6);
+  return (value > 0 ? Math.max(1, rounded) : rounded) / factor;
 }
 
 export abstract class PriceFetcher {
