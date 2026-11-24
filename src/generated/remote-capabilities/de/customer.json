@@ -71224,7 +71224,9 @@
                                                   "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                   "XAI_EVE": "xai-eve",
                                                   "GEMINI_ZEPHYR": "gemini-zephyr",
-                                                  "GEMINI_PUCK": "gemini-puck"
+                                                  "GEMINI_PUCK": "gemini-puck",
+                                                  "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                                  "ORPHEUS_TARA": "orpheus-tara"
                                                 }
                                               },
                                               "type": "enum",
@@ -71255,7 +71257,9 @@
                                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                 "XAI_EVE": "xai-eve",
                                                 "GEMINI_ZEPHYR": "gemini-zephyr",
-                                                "GEMINI_PUCK": "gemini-puck"
+                                                "GEMINI_PUCK": "gemini-puck",
+                                                "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                                "ORPHEUS_TARA": "orpheus-tara"
                                               },
                                               "options": [
                                                 "openai-alloy",
@@ -71284,7 +71288,9 @@
                                                 "inworld-mini-craig",
                                                 "xai-eve",
                                                 "gemini-zephyr",
-                                                "gemini-puck"
+                                                "gemini-puck",
+                                                "qwen3-tts-ryan",
+                                                "orpheus-tara"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -71973,7 +71979,9 @@
                                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                 "XAI_EVE": "xai-eve",
                                                 "GEMINI_ZEPHYR": "gemini-zephyr",
-                                                "GEMINI_PUCK": "gemini-puck"
+                                                "GEMINI_PUCK": "gemini-puck",
+                                                "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                                "ORPHEUS_TARA": "orpheus-tara"
                                               }
                                             },
                                             "type": "enum",
@@ -72004,7 +72012,9 @@
                                               "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                               "XAI_EVE": "xai-eve",
                                               "GEMINI_ZEPHYR": "gemini-zephyr",
-                                              "GEMINI_PUCK": "gemini-puck"
+                                              "GEMINI_PUCK": "gemini-puck",
+                                              "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                              "ORPHEUS_TARA": "orpheus-tara"
                                             },
                                             "options": [
                                               "openai-alloy",
@@ -72033,7 +72043,9 @@
                                               "inworld-mini-craig",
                                               "xai-eve",
                                               "gemini-zephyr",
-                                              "gemini-puck"
+                                              "gemini-puck",
+                                              "qwen3-tts-ryan",
+                                              "orpheus-tara"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -72720,7 +72732,10 @@
                                                   "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                   "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                   "NEMOTRON_ASR": "nemotron-asr",
-                                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                                  "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                                  "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                                  "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                                 }
                                               },
                                               "type": "enum",
@@ -72731,7 +72746,10 @@
                                                 "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                 "NEMOTRON_ASR": "nemotron-asr",
-                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                                "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                                "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                                "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                               },
                                               "options": [
                                                 "openai-whisper",
@@ -72740,7 +72758,10 @@
                                                 "voxtral-small-transcribe",
                                                 "voxtral-mini-transcribe",
                                                 "nemotron-asr",
-                                                "gpt4o-mini-transcribe"
+                                                "gpt4o-mini-transcribe",
+                                                "qwen3-asr-0.6b",
+                                                "parakeet-tdt-v3",
+                                                "nemotron-3.5-transcribe"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -73409,7 +73430,10 @@
                                                 "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                 "NEMOTRON_ASR": "nemotron-asr",
-                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                                "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                                "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                                "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                               }
                                             },
                                             "type": "enum",
@@ -73420,7 +73444,10 @@
                                               "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                               "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                               "NEMOTRON_ASR": "nemotron-asr",
-                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                              "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                              "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                              "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                             },
                                             "options": [
                                               "openai-whisper",
@@ -73429,7 +73456,10 @@
                                               "voxtral-small-transcribe",
                                               "voxtral-mini-transcribe",
                                               "nemotron-asr",
-                                              "gpt4o-mini-transcribe"
+                                              "gpt4o-mini-transcribe",
+                                              "qwen3-asr-0.6b",
+                                              "parakeet-tdt-v3",
+                                              "nemotron-3.5-transcribe"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -89494,7 +89524,9 @@
                                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                 "XAI_EVE": "xai-eve",
                                                 "GEMINI_ZEPHYR": "gemini-zephyr",
-                                                "GEMINI_PUCK": "gemini-puck"
+                                                "GEMINI_PUCK": "gemini-puck",
+                                                "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                                "ORPHEUS_TARA": "orpheus-tara"
                                               }
                                             },
                                             "type": "enum",
@@ -89525,7 +89557,9 @@
                                               "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                               "XAI_EVE": "xai-eve",
                                               "GEMINI_ZEPHYR": "gemini-zephyr",
-                                              "GEMINI_PUCK": "gemini-puck"
+                                              "GEMINI_PUCK": "gemini-puck",
+                                              "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                              "ORPHEUS_TARA": "orpheus-tara"
                                             },
                                             "options": [
                                               "openai-alloy",
@@ -89554,7 +89588,9 @@
                                               "inworld-mini-craig",
                                               "xai-eve",
                                               "gemini-zephyr",
-                                              "gemini-puck"
+                                              "gemini-puck",
+                                              "qwen3-tts-ryan",
+                                              "orpheus-tara"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -90243,7 +90279,9 @@
                                               "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                               "XAI_EVE": "xai-eve",
                                               "GEMINI_ZEPHYR": "gemini-zephyr",
-                                              "GEMINI_PUCK": "gemini-puck"
+                                              "GEMINI_PUCK": "gemini-puck",
+                                              "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                              "ORPHEUS_TARA": "orpheus-tara"
                                             }
                                           },
                                           "type": "enum",
@@ -90274,7 +90312,9 @@
                                             "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                             "XAI_EVE": "xai-eve",
                                             "GEMINI_ZEPHYR": "gemini-zephyr",
-                                            "GEMINI_PUCK": "gemini-puck"
+                                            "GEMINI_PUCK": "gemini-puck",
+                                            "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                            "ORPHEUS_TARA": "orpheus-tara"
                                           },
                                           "options": [
                                             "openai-alloy",
@@ -90303,7 +90343,9 @@
                                             "inworld-mini-craig",
                                             "xai-eve",
                                             "gemini-zephyr",
-                                            "gemini-puck"
+                                            "gemini-puck",
+                                            "qwen3-tts-ryan",
+                                            "orpheus-tara"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -90990,7 +91032,10 @@
                                                 "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                 "NEMOTRON_ASR": "nemotron-asr",
-                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                                "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                                "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                                "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                               }
                                             },
                                             "type": "enum",
@@ -91001,7 +91046,10 @@
                                               "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                               "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                               "NEMOTRON_ASR": "nemotron-asr",
-                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                              "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                              "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                              "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                             },
                                             "options": [
                                               "openai-whisper",
@@ -91010,7 +91058,10 @@
                                               "voxtral-small-transcribe",
                                               "voxtral-mini-transcribe",
                                               "nemotron-asr",
-                                              "gpt4o-mini-transcribe"
+                                              "gpt4o-mini-transcribe",
+                                              "qwen3-asr-0.6b",
+                                              "parakeet-tdt-v3",
+                                              "nemotron-3.5-transcribe"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -91679,7 +91730,10 @@
                                               "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                               "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                               "NEMOTRON_ASR": "nemotron-asr",
-                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                              "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                              "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                              "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                             }
                                           },
                                           "type": "enum",
@@ -91690,7 +91744,10 @@
                                             "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                             "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                             "NEMOTRON_ASR": "nemotron-asr",
-                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                            "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                            "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                            "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                           },
                                           "options": [
                                             "openai-whisper",
@@ -91699,7 +91756,10 @@
                                             "voxtral-small-transcribe",
                                             "voxtral-mini-transcribe",
                                             "nemotron-asr",
-                                            "gpt4o-mini-transcribe"
+                                            "gpt4o-mini-transcribe",
+                                            "qwen3-asr-0.6b",
+                                            "parakeet-tdt-v3",
+                                            "nemotron-3.5-transcribe"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -104901,7 +104961,9 @@
                                                   "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                   "XAI_EVE": "xai-eve",
                                                   "GEMINI_ZEPHYR": "gemini-zephyr",
-                                                  "GEMINI_PUCK": "gemini-puck"
+                                                  "GEMINI_PUCK": "gemini-puck",
+                                                  "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                                  "ORPHEUS_TARA": "orpheus-tara"
                                                 }
                                               },
                                               "type": "enum",
@@ -104932,7 +104994,9 @@
                                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                 "XAI_EVE": "xai-eve",
                                                 "GEMINI_ZEPHYR": "gemini-zephyr",
-                                                "GEMINI_PUCK": "gemini-puck"
+                                                "GEMINI_PUCK": "gemini-puck",
+                                                "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                                "ORPHEUS_TARA": "orpheus-tara"
                                               },
                                               "options": [
                                                 "openai-alloy",
@@ -104961,7 +105025,9 @@
                                                 "inworld-mini-craig",
                                                 "xai-eve",
                                                 "gemini-zephyr",
-                                                "gemini-puck"
+                                                "gemini-puck",
+                                                "qwen3-tts-ryan",
+                                                "orpheus-tara"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -105650,7 +105716,9 @@
                                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                 "XAI_EVE": "xai-eve",
                                                 "GEMINI_ZEPHYR": "gemini-zephyr",
-                                                "GEMINI_PUCK": "gemini-puck"
+                                                "GEMINI_PUCK": "gemini-puck",
+                                                "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                                "ORPHEUS_TARA": "orpheus-tara"
                                               }
                                             },
                                             "type": "enum",
@@ -105681,7 +105749,9 @@
                                               "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                               "XAI_EVE": "xai-eve",
                                               "GEMINI_ZEPHYR": "gemini-zephyr",
-                                              "GEMINI_PUCK": "gemini-puck"
+                                              "GEMINI_PUCK": "gemini-puck",
+                                              "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                              "ORPHEUS_TARA": "orpheus-tara"
                                             },
                                             "options": [
                                               "openai-alloy",
@@ -105710,7 +105780,9 @@
                                               "inworld-mini-craig",
                                               "xai-eve",
                                               "gemini-zephyr",
-                                              "gemini-puck"
+                                              "gemini-puck",
+                                              "qwen3-tts-ryan",
+                                              "orpheus-tara"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -106391,7 +106463,10 @@
                                                   "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                   "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                   "NEMOTRON_ASR": "nemotron-asr",
-                                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                                  "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                                  "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                                  "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                                 }
                                               },
                                               "type": "enum",
@@ -106402,7 +106477,10 @@
                                                 "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                 "NEMOTRON_ASR": "nemotron-asr",
-                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                                "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                                "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                                "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                               },
                                               "options": [
                                                 "openai-whisper",
@@ -106411,7 +106489,10 @@
                                                 "voxtral-small-transcribe",
                                                 "voxtral-mini-transcribe",
                                                 "nemotron-asr",
-                                                "gpt4o-mini-transcribe"
+                                                "gpt4o-mini-transcribe",
+                                                "qwen3-asr-0.6b",
+                                                "parakeet-tdt-v3",
+                                                "nemotron-3.5-transcribe"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -107080,7 +107161,10 @@
                                                 "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                 "NEMOTRON_ASR": "nemotron-asr",
-                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                                "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                                "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                                "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                               }
                                             },
                                             "type": "enum",
@@ -107091,7 +107175,10 @@
                                               "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                               "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                               "NEMOTRON_ASR": "nemotron-asr",
-                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                              "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                              "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                              "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                             },
                                             "options": [
                                               "openai-whisper",
@@ -107100,7 +107187,10 @@
                                               "voxtral-small-transcribe",
                                               "voxtral-mini-transcribe",
                                               "nemotron-asr",
-                                              "gpt4o-mini-transcribe"
+                                              "gpt4o-mini-transcribe",
+                                              "qwen3-asr-0.6b",
+                                              "parakeet-tdt-v3",
+                                              "nemotron-3.5-transcribe"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -119608,7 +119698,9 @@
                                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                 "XAI_EVE": "xai-eve",
                                                 "GEMINI_ZEPHYR": "gemini-zephyr",
-                                                "GEMINI_PUCK": "gemini-puck"
+                                                "GEMINI_PUCK": "gemini-puck",
+                                                "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                                "ORPHEUS_TARA": "orpheus-tara"
                                               }
                                             },
                                             "type": "enum",
@@ -119639,7 +119731,9 @@
                                               "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                               "XAI_EVE": "xai-eve",
                                               "GEMINI_ZEPHYR": "gemini-zephyr",
-                                              "GEMINI_PUCK": "gemini-puck"
+                                              "GEMINI_PUCK": "gemini-puck",
+                                              "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                              "ORPHEUS_TARA": "orpheus-tara"
                                             },
                                             "options": [
                                               "openai-alloy",
@@ -119668,7 +119762,9 @@
                                               "inworld-mini-craig",
                                               "xai-eve",
                                               "gemini-zephyr",
-                                              "gemini-puck"
+                                              "gemini-puck",
+                                              "qwen3-tts-ryan",
+                                              "orpheus-tara"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -120357,7 +120453,9 @@
                                               "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                               "XAI_EVE": "xai-eve",
                                               "GEMINI_ZEPHYR": "gemini-zephyr",
-                                              "GEMINI_PUCK": "gemini-puck"
+                                              "GEMINI_PUCK": "gemini-puck",
+                                              "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                              "ORPHEUS_TARA": "orpheus-tara"
                                             }
                                           },
                                           "type": "enum",
@@ -120388,7 +120486,9 @@
                                             "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                             "XAI_EVE": "xai-eve",
                                             "GEMINI_ZEPHYR": "gemini-zephyr",
-                                            "GEMINI_PUCK": "gemini-puck"
+                                            "GEMINI_PUCK": "gemini-puck",
+                                            "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                            "ORPHEUS_TARA": "orpheus-tara"
                                           },
                                           "options": [
                                             "openai-alloy",
@@ -120417,7 +120517,9 @@
                                             "inworld-mini-craig",
                                             "xai-eve",
                                             "gemini-zephyr",
-                                            "gemini-puck"
+                                            "gemini-puck",
+                                            "qwen3-tts-ryan",
+                                            "orpheus-tara"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -121098,7 +121200,10 @@
                                                 "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                 "NEMOTRON_ASR": "nemotron-asr",
-                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                                "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                                "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                                "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                               }
                                             },
                                             "type": "enum",
@@ -121109,7 +121214,10 @@
                                               "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                               "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                               "NEMOTRON_ASR": "nemotron-asr",
-                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                              "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                              "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                              "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                             },
                                             "options": [
                                               "openai-whisper",
@@ -121118,7 +121226,10 @@
                                               "voxtral-small-transcribe",
                                               "voxtral-mini-transcribe",
                                               "nemotron-asr",
-                                              "gpt4o-mini-transcribe"
+                                              "gpt4o-mini-transcribe",
+                                              "qwen3-asr-0.6b",
+                                              "parakeet-tdt-v3",
+                                              "nemotron-3.5-transcribe"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -121787,7 +121898,10 @@
                                               "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                               "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                               "NEMOTRON_ASR": "nemotron-asr",
-                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                              "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                              "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                              "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                             }
                                           },
                                           "type": "enum",
@@ -121798,7 +121912,10 @@
                                             "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                             "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                             "NEMOTRON_ASR": "nemotron-asr",
-                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                            "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                            "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                            "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                           },
                                           "options": [
                                             "openai-whisper",
@@ -121807,7 +121924,10 @@
                                             "voxtral-small-transcribe",
                                             "voxtral-mini-transcribe",
                                             "nemotron-asr",
-                                            "gpt4o-mini-transcribe"
+                                            "gpt4o-mini-transcribe",
+                                            "qwen3-asr-0.6b",
+                                            "parakeet-tdt-v3",
+                                            "nemotron-3.5-transcribe"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -129036,7 +129156,9 @@
                                     "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                     "XAI_EVE": "xai-eve",
                                     "GEMINI_ZEPHYR": "gemini-zephyr",
-                                    "GEMINI_PUCK": "gemini-puck"
+                                    "GEMINI_PUCK": "gemini-puck",
+                                    "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                    "ORPHEUS_TARA": "orpheus-tara"
                                   }
                                 },
                                 "type": "enum",
@@ -129067,7 +129189,9 @@
                                   "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                   "XAI_EVE": "xai-eve",
                                   "GEMINI_ZEPHYR": "gemini-zephyr",
-                                  "GEMINI_PUCK": "gemini-puck"
+                                  "GEMINI_PUCK": "gemini-puck",
+                                  "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                  "ORPHEUS_TARA": "orpheus-tara"
                                 },
                                 "options": [
                                   "openai-alloy",
@@ -129096,7 +129220,9 @@
                                   "inworld-mini-craig",
                                   "xai-eve",
                                   "gemini-zephyr",
-                                  "gemini-puck"
+                                  "gemini-puck",
+                                  "qwen3-tts-ryan",
+                                  "orpheus-tara"
                                 ]
                               },
                               "intelligenceRange": {
@@ -129781,7 +129907,9 @@
                                   "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                   "XAI_EVE": "xai-eve",
                                   "GEMINI_ZEPHYR": "gemini-zephyr",
-                                  "GEMINI_PUCK": "gemini-puck"
+                                  "GEMINI_PUCK": "gemini-puck",
+                                  "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                  "ORPHEUS_TARA": "orpheus-tara"
                                 }
                               },
                               "type": "enum",
@@ -129812,7 +129940,9 @@
                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                 "XAI_EVE": "xai-eve",
                                 "GEMINI_ZEPHYR": "gemini-zephyr",
-                                "GEMINI_PUCK": "gemini-puck"
+                                "GEMINI_PUCK": "gemini-puck",
+                                "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                "ORPHEUS_TARA": "orpheus-tara"
                               },
                               "options": [
                                 "openai-alloy",
@@ -129841,7 +129971,9 @@
                                 "inworld-mini-craig",
                                 "xai-eve",
                                 "gemini-zephyr",
-                                "gemini-puck"
+                                "gemini-puck",
+                                "qwen3-tts-ryan",
+                                "orpheus-tara"
                               ]
                             },
                             "intelligenceRange": {
@@ -130533,7 +130665,10 @@
                                     "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                     "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                     "NEMOTRON_ASR": "nemotron-asr",
-                                    "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                    "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                    "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                    "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                    "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                   }
                                 },
                                 "type": "enum",
@@ -130544,7 +130679,10 @@
                                   "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                   "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                   "NEMOTRON_ASR": "nemotron-asr",
-                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                  "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                  "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                  "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                 },
                                 "options": [
                                   "openai-whisper",
@@ -130553,7 +130691,10 @@
                                   "voxtral-small-transcribe",
                                   "voxtral-mini-transcribe",
                                   "nemotron-asr",
-                                  "gpt4o-mini-transcribe"
+                                  "gpt4o-mini-transcribe",
+                                  "qwen3-asr-0.6b",
+                                  "parakeet-tdt-v3",
+                                  "nemotron-3.5-transcribe"
                                 ]
                               },
                               "intelligenceRange": {
@@ -131218,7 +131359,10 @@
                                   "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                   "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                   "NEMOTRON_ASR": "nemotron-asr",
-                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                  "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                  "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                  "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                 }
                               },
                               "type": "enum",
@@ -131229,7 +131373,10 @@
                                 "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                 "NEMOTRON_ASR": "nemotron-asr",
-                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                               },
                               "options": [
                                 "openai-whisper",
@@ -131238,7 +131385,10 @@
                                 "voxtral-small-transcribe",
                                 "voxtral-mini-transcribe",
                                 "nemotron-asr",
-                                "gpt4o-mini-transcribe"
+                                "gpt4o-mini-transcribe",
+                                "qwen3-asr-0.6b",
+                                "parakeet-tdt-v3",
+                                "nemotron-3.5-transcribe"
                               ]
                             },
                             "intelligenceRange": {
@@ -148438,7 +148588,9 @@
                                                   "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                   "XAI_EVE": "xai-eve",
                                                   "GEMINI_ZEPHYR": "gemini-zephyr",
-                                                  "GEMINI_PUCK": "gemini-puck"
+                                                  "GEMINI_PUCK": "gemini-puck",
+                                                  "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                                  "ORPHEUS_TARA": "orpheus-tara"
                                                 }
                                               },
                                               "type": "enum",
@@ -148469,7 +148621,9 @@
                                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                 "XAI_EVE": "xai-eve",
                                                 "GEMINI_ZEPHYR": "gemini-zephyr",
-                                                "GEMINI_PUCK": "gemini-puck"
+                                                "GEMINI_PUCK": "gemini-puck",
+                                                "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                                "ORPHEUS_TARA": "orpheus-tara"
                                               },
                                               "options": [
                                                 "openai-alloy",
@@ -148498,7 +148652,9 @@
                                                 "inworld-mini-craig",
                                                 "xai-eve",
                                                 "gemini-zephyr",
-                                                "gemini-puck"
+                                                "gemini-puck",
+                                                "qwen3-tts-ryan",
+                                                "orpheus-tara"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -149187,7 +149343,9 @@
                                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                 "XAI_EVE": "xai-eve",
                                                 "GEMINI_ZEPHYR": "gemini-zephyr",
-                                                "GEMINI_PUCK": "gemini-puck"
+                                                "GEMINI_PUCK": "gemini-puck",
+                                                "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                                "ORPHEUS_TARA": "orpheus-tara"
                                               }
                                             },
                                             "type": "enum",
@@ -149218,7 +149376,9 @@
                                               "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                               "XAI_EVE": "xai-eve",
                                               "GEMINI_ZEPHYR": "gemini-zephyr",
-                                              "GEMINI_PUCK": "gemini-puck"
+                                              "GEMINI_PUCK": "gemini-puck",
+                                              "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                              "ORPHEUS_TARA": "orpheus-tara"
                                             },
                                             "options": [
                                               "openai-alloy",
@@ -149247,7 +149407,9 @@
                                               "inworld-mini-craig",
                                               "xai-eve",
                                               "gemini-zephyr",
-                                              "gemini-puck"
+                                              "gemini-puck",
+                                              "qwen3-tts-ryan",
+                                              "orpheus-tara"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -149928,7 +150090,10 @@
                                                   "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                   "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                   "NEMOTRON_ASR": "nemotron-asr",
-                                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                                  "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                                  "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                                  "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                                 }
                                               },
                                               "type": "enum",
@@ -149939,7 +150104,10 @@
                                                 "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                 "NEMOTRON_ASR": "nemotron-asr",
-                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                                "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                                "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                                "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                               },
                                               "options": [
                                                 "openai-whisper",
@@ -149948,7 +150116,10 @@
                                                 "voxtral-small-transcribe",
                                                 "voxtral-mini-transcribe",
                                                 "nemotron-asr",
-                                                "gpt4o-mini-transcribe"
+                                                "gpt4o-mini-transcribe",
+                                                "qwen3-asr-0.6b",
+                                                "parakeet-tdt-v3",
+                                                "nemotron-3.5-transcribe"
                                               ]
                                             },
                                             "intelligenceRange": {
@@ -150617,7 +150788,10 @@
                                                 "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                 "NEMOTRON_ASR": "nemotron-asr",
-                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                                "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                                "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                                "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                               }
                                             },
                                             "type": "enum",
@@ -150628,7 +150802,10 @@
                                               "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                               "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                               "NEMOTRON_ASR": "nemotron-asr",
-                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                              "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                              "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                              "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                             },
                                             "options": [
                                               "openai-whisper",
@@ -150637,7 +150814,10 @@
                                               "voxtral-small-transcribe",
                                               "voxtral-mini-transcribe",
                                               "nemotron-asr",
-                                              "gpt4o-mini-transcribe"
+                                              "gpt4o-mini-transcribe",
+                                              "qwen3-asr-0.6b",
+                                              "parakeet-tdt-v3",
+                                              "nemotron-3.5-transcribe"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -163145,7 +163325,9 @@
                                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                                 "XAI_EVE": "xai-eve",
                                                 "GEMINI_ZEPHYR": "gemini-zephyr",
-                                                "GEMINI_PUCK": "gemini-puck"
+                                                "GEMINI_PUCK": "gemini-puck",
+                                                "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                                "ORPHEUS_TARA": "orpheus-tara"
                                               }
                                             },
                                             "type": "enum",
@@ -163176,7 +163358,9 @@
                                               "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                               "XAI_EVE": "xai-eve",
                                               "GEMINI_ZEPHYR": "gemini-zephyr",
-                                              "GEMINI_PUCK": "gemini-puck"
+                                              "GEMINI_PUCK": "gemini-puck",
+                                              "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                              "ORPHEUS_TARA": "orpheus-tara"
                                             },
                                             "options": [
                                               "openai-alloy",
@@ -163205,7 +163389,9 @@
                                               "inworld-mini-craig",
                                               "xai-eve",
                                               "gemini-zephyr",
-                                              "gemini-puck"
+                                              "gemini-puck",
+                                              "qwen3-tts-ryan",
+                                              "orpheus-tara"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -163894,7 +164080,9 @@
                                               "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                               "XAI_EVE": "xai-eve",
                                               "GEMINI_ZEPHYR": "gemini-zephyr",
-                                              "GEMINI_PUCK": "gemini-puck"
+                                              "GEMINI_PUCK": "gemini-puck",
+                                              "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                              "ORPHEUS_TARA": "orpheus-tara"
                                             }
                                           },
                                           "type": "enum",
@@ -163925,7 +164113,9 @@
                                             "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                             "XAI_EVE": "xai-eve",
                                             "GEMINI_ZEPHYR": "gemini-zephyr",
-                                            "GEMINI_PUCK": "gemini-puck"
+                                            "GEMINI_PUCK": "gemini-puck",
+                                            "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                            "ORPHEUS_TARA": "orpheus-tara"
                                           },
                                           "options": [
                                             "openai-alloy",
@@ -163954,7 +164144,9 @@
                                             "inworld-mini-craig",
                                             "xai-eve",
                                             "gemini-zephyr",
-                                            "gemini-puck"
+                                            "gemini-puck",
+                                            "qwen3-tts-ryan",
+                                            "orpheus-tara"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -164635,7 +164827,10 @@
                                                 "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                                 "NEMOTRON_ASR": "nemotron-asr",
-                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                                "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                                "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                                "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                               }
                                             },
                                             "type": "enum",
@@ -164646,7 +164841,10 @@
                                               "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                               "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                               "NEMOTRON_ASR": "nemotron-asr",
-                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                              "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                              "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                              "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                             },
                                             "options": [
                                               "openai-whisper",
@@ -164655,7 +164853,10 @@
                                               "voxtral-small-transcribe",
                                               "voxtral-mini-transcribe",
                                               "nemotron-asr",
-                                              "gpt4o-mini-transcribe"
+                                              "gpt4o-mini-transcribe",
+                                              "qwen3-asr-0.6b",
+                                              "parakeet-tdt-v3",
+                                              "nemotron-3.5-transcribe"
                                             ]
                                           },
                                           "intelligenceRange": {
@@ -165324,7 +165525,10 @@
                                               "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                               "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                               "NEMOTRON_ASR": "nemotron-asr",
-                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                              "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                              "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                              "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                              "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                             }
                                           },
                                           "type": "enum",
@@ -165335,7 +165539,10 @@
                                             "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                             "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                             "NEMOTRON_ASR": "nemotron-asr",
-                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                            "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                            "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                            "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                           },
                                           "options": [
                                             "openai-whisper",
@@ -165344,7 +165551,10 @@
                                             "voxtral-small-transcribe",
                                             "voxtral-mini-transcribe",
                                             "nemotron-asr",
-                                            "gpt4o-mini-transcribe"
+                                            "gpt4o-mini-transcribe",
+                                            "qwen3-asr-0.6b",
+                                            "parakeet-tdt-v3",
+                                            "nemotron-3.5-transcribe"
                                           ]
                                         },
                                         "intelligenceRange": {
@@ -171593,7 +171803,7 @@
           "variant": "muted",
           "label": "Wähle aus {{count}} Modellen mit präziser Steuerung von Intelligenz, Geschwindigkeit und Kosten",
           "contentParams": {
-            "count": 261
+            "count": 266
           },
           "usage": {
             "response": true
@@ -178008,7 +178218,9 @@
                                             "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                             "XAI_EVE": "xai-eve",
                                             "GEMINI_ZEPHYR": "gemini-zephyr",
-                                            "GEMINI_PUCK": "gemini-puck"
+                                            "GEMINI_PUCK": "gemini-puck",
+                                            "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                            "ORPHEUS_TARA": "orpheus-tara"
                                           }
                                         },
                                         "type": "enum",
@@ -178039,7 +178251,9 @@
                                           "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                           "XAI_EVE": "xai-eve",
                                           "GEMINI_ZEPHYR": "gemini-zephyr",
-                                          "GEMINI_PUCK": "gemini-puck"
+                                          "GEMINI_PUCK": "gemini-puck",
+                                          "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                          "ORPHEUS_TARA": "orpheus-tara"
                                         },
                                         "options": [
                                           "openai-alloy",
@@ -178068,7 +178282,9 @@
                                           "inworld-mini-craig",
                                           "xai-eve",
                                           "gemini-zephyr",
-                                          "gemini-puck"
+                                          "gemini-puck",
+                                          "qwen3-tts-ryan",
+                                          "orpheus-tara"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -178755,7 +178971,9 @@
                                           "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                           "XAI_EVE": "xai-eve",
                                           "GEMINI_ZEPHYR": "gemini-zephyr",
-                                          "GEMINI_PUCK": "gemini-puck"
+                                          "GEMINI_PUCK": "gemini-puck",
+                                          "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                          "ORPHEUS_TARA": "orpheus-tara"
                                         }
                                       },
                                       "type": "enum",
@@ -178786,7 +179004,9 @@
                                         "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                         "XAI_EVE": "xai-eve",
                                         "GEMINI_ZEPHYR": "gemini-zephyr",
-                                        "GEMINI_PUCK": "gemini-puck"
+                                        "GEMINI_PUCK": "gemini-puck",
+                                        "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                        "ORPHEUS_TARA": "orpheus-tara"
                                       },
                                       "options": [
                                         "openai-alloy",
@@ -178815,7 +179035,9 @@
                                         "inworld-mini-craig",
                                         "xai-eve",
                                         "gemini-zephyr",
-                                        "gemini-puck"
+                                        "gemini-puck",
+                                        "qwen3-tts-ryan",
+                                        "orpheus-tara"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -179507,7 +179729,10 @@
                                             "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                             "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                             "NEMOTRON_ASR": "nemotron-asr",
-                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                            "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                            "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                            "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                           }
                                         },
                                         "type": "enum",
@@ -179518,7 +179743,10 @@
                                           "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                           "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                           "NEMOTRON_ASR": "nemotron-asr",
-                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                          "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                          "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                          "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                         },
                                         "options": [
                                           "openai-whisper",
@@ -179527,7 +179755,10 @@
                                           "voxtral-small-transcribe",
                                           "voxtral-mini-transcribe",
                                           "nemotron-asr",
-                                          "gpt4o-mini-transcribe"
+                                          "gpt4o-mini-transcribe",
+                                          "qwen3-asr-0.6b",
+                                          "parakeet-tdt-v3",
+                                          "nemotron-3.5-transcribe"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -180194,7 +180425,10 @@
                                           "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                           "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                           "NEMOTRON_ASR": "nemotron-asr",
-                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                          "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                          "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                          "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                         }
                                       },
                                       "type": "enum",
@@ -180205,7 +180439,10 @@
                                         "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                         "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                         "NEMOTRON_ASR": "nemotron-asr",
-                                        "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                        "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                        "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                        "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                        "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                       },
                                       "options": [
                                         "openai-whisper",
@@ -180214,7 +180451,10 @@
                                         "voxtral-small-transcribe",
                                         "voxtral-mini-transcribe",
                                         "nemotron-asr",
-                                        "gpt4o-mini-transcribe"
+                                        "gpt4o-mini-transcribe",
+                                        "qwen3-asr-0.6b",
+                                        "parakeet-tdt-v3",
+                                        "nemotron-3.5-transcribe"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -193287,7 +193527,9 @@
                                             "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                             "XAI_EVE": "xai-eve",
                                             "GEMINI_ZEPHYR": "gemini-zephyr",
-                                            "GEMINI_PUCK": "gemini-puck"
+                                            "GEMINI_PUCK": "gemini-puck",
+                                            "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                            "ORPHEUS_TARA": "orpheus-tara"
                                           }
                                         },
                                         "type": "enum",
@@ -193318,7 +193560,9 @@
                                           "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                           "XAI_EVE": "xai-eve",
                                           "GEMINI_ZEPHYR": "gemini-zephyr",
-                                          "GEMINI_PUCK": "gemini-puck"
+                                          "GEMINI_PUCK": "gemini-puck",
+                                          "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                          "ORPHEUS_TARA": "orpheus-tara"
                                         },
                                         "options": [
                                           "openai-alloy",
@@ -193347,7 +193591,9 @@
                                           "inworld-mini-craig",
                                           "xai-eve",
                                           "gemini-zephyr",
-                                          "gemini-puck"
+                                          "gemini-puck",
+                                          "qwen3-tts-ryan",
+                                          "orpheus-tara"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -194034,7 +194280,9 @@
                                           "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                           "XAI_EVE": "xai-eve",
                                           "GEMINI_ZEPHYR": "gemini-zephyr",
-                                          "GEMINI_PUCK": "gemini-puck"
+                                          "GEMINI_PUCK": "gemini-puck",
+                                          "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                          "ORPHEUS_TARA": "orpheus-tara"
                                         }
                                       },
                                       "type": "enum",
@@ -194065,7 +194313,9 @@
                                         "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                         "XAI_EVE": "xai-eve",
                                         "GEMINI_ZEPHYR": "gemini-zephyr",
-                                        "GEMINI_PUCK": "gemini-puck"
+                                        "GEMINI_PUCK": "gemini-puck",
+                                        "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                        "ORPHEUS_TARA": "orpheus-tara"
                                       },
                                       "options": [
                                         "openai-alloy",
@@ -194094,7 +194344,9 @@
                                         "inworld-mini-craig",
                                         "xai-eve",
                                         "gemini-zephyr",
-                                        "gemini-puck"
+                                        "gemini-puck",
+                                        "qwen3-tts-ryan",
+                                        "orpheus-tara"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -194775,7 +195027,10 @@
                                             "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                             "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                             "NEMOTRON_ASR": "nemotron-asr",
-                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                            "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                            "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                            "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                           }
                                         },
                                         "type": "enum",
@@ -194786,7 +195041,10 @@
                                           "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                           "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                           "NEMOTRON_ASR": "nemotron-asr",
-                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                          "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                          "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                          "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                         },
                                         "options": [
                                           "openai-whisper",
@@ -194795,7 +195053,10 @@
                                           "voxtral-small-transcribe",
                                           "voxtral-mini-transcribe",
                                           "nemotron-asr",
-                                          "gpt4o-mini-transcribe"
+                                          "gpt4o-mini-transcribe",
+                                          "qwen3-asr-0.6b",
+                                          "parakeet-tdt-v3",
+                                          "nemotron-3.5-transcribe"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -195462,7 +195723,10 @@
                                           "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                           "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                           "NEMOTRON_ASR": "nemotron-asr",
-                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                          "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                          "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                          "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                         }
                                       },
                                       "type": "enum",
@@ -195473,7 +195737,10 @@
                                         "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                         "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                         "NEMOTRON_ASR": "nemotron-asr",
-                                        "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                        "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                        "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                        "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                        "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                       },
                                       "options": [
                                         "openai-whisper",
@@ -195482,7 +195749,10 @@
                                         "voxtral-small-transcribe",
                                         "voxtral-mini-transcribe",
                                         "nemotron-asr",
-                                        "gpt4o-mini-transcribe"
+                                        "gpt4o-mini-transcribe",
+                                        "qwen3-asr-0.6b",
+                                        "parakeet-tdt-v3",
+                                        "nemotron-3.5-transcribe"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -208281,7 +208551,9 @@
                                             "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                             "XAI_EVE": "xai-eve",
                                             "GEMINI_ZEPHYR": "gemini-zephyr",
-                                            "GEMINI_PUCK": "gemini-puck"
+                                            "GEMINI_PUCK": "gemini-puck",
+                                            "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                            "ORPHEUS_TARA": "orpheus-tara"
                                           }
                                         },
                                         "type": "enum",
@@ -208312,7 +208584,9 @@
                                           "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                           "XAI_EVE": "xai-eve",
                                           "GEMINI_ZEPHYR": "gemini-zephyr",
-                                          "GEMINI_PUCK": "gemini-puck"
+                                          "GEMINI_PUCK": "gemini-puck",
+                                          "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                          "ORPHEUS_TARA": "orpheus-tara"
                                         },
                                         "options": [
                                           "openai-alloy",
@@ -208341,7 +208615,9 @@
                                           "inworld-mini-craig",
                                           "xai-eve",
                                           "gemini-zephyr",
-                                          "gemini-puck"
+                                          "gemini-puck",
+                                          "qwen3-tts-ryan",
+                                          "orpheus-tara"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -209028,7 +209304,9 @@
                                           "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                           "XAI_EVE": "xai-eve",
                                           "GEMINI_ZEPHYR": "gemini-zephyr",
-                                          "GEMINI_PUCK": "gemini-puck"
+                                          "GEMINI_PUCK": "gemini-puck",
+                                          "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                          "ORPHEUS_TARA": "orpheus-tara"
                                         }
                                       },
                                       "type": "enum",
@@ -209059,7 +209337,9 @@
                                         "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                         "XAI_EVE": "xai-eve",
                                         "GEMINI_ZEPHYR": "gemini-zephyr",
-                                        "GEMINI_PUCK": "gemini-puck"
+                                        "GEMINI_PUCK": "gemini-puck",
+                                        "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                        "ORPHEUS_TARA": "orpheus-tara"
                                       },
                                       "options": [
                                         "openai-alloy",
@@ -209088,7 +209368,9 @@
                                         "inworld-mini-craig",
                                         "xai-eve",
                                         "gemini-zephyr",
-                                        "gemini-puck"
+                                        "gemini-puck",
+                                        "qwen3-tts-ryan",
+                                        "orpheus-tara"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -209769,7 +210051,10 @@
                                             "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                             "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                             "NEMOTRON_ASR": "nemotron-asr",
-                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                            "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                            "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                            "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                            "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                           }
                                         },
                                         "type": "enum",
@@ -209780,7 +210065,10 @@
                                           "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                           "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                           "NEMOTRON_ASR": "nemotron-asr",
-                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                          "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                          "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                          "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                         },
                                         "options": [
                                           "openai-whisper",
@@ -209789,7 +210077,10 @@
                                           "voxtral-small-transcribe",
                                           "voxtral-mini-transcribe",
                                           "nemotron-asr",
-                                          "gpt4o-mini-transcribe"
+                                          "gpt4o-mini-transcribe",
+                                          "qwen3-asr-0.6b",
+                                          "parakeet-tdt-v3",
+                                          "nemotron-3.5-transcribe"
                                         ]
                                       },
                                       "intelligenceRange": {
@@ -210456,7 +210747,10 @@
                                           "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                           "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                           "NEMOTRON_ASR": "nemotron-asr",
-                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                          "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                          "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                          "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                          "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                         }
                                       },
                                       "type": "enum",
@@ -210467,7 +210761,10 @@
                                         "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                         "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                         "NEMOTRON_ASR": "nemotron-asr",
-                                        "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                        "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                        "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                        "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                        "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                       },
                                       "options": [
                                         "openai-whisper",
@@ -210476,7 +210773,10 @@
                                         "voxtral-small-transcribe",
                                         "voxtral-mini-transcribe",
                                         "nemotron-asr",
-                                        "gpt4o-mini-transcribe"
+                                        "gpt4o-mini-transcribe",
+                                        "qwen3-asr-0.6b",
+                                        "parakeet-tdt-v3",
+                                        "nemotron-3.5-transcribe"
                                       ]
                                     },
                                     "intelligenceRange": {
@@ -228390,7 +228690,9 @@
                                     "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                     "XAI_EVE": "xai-eve",
                                     "GEMINI_ZEPHYR": "gemini-zephyr",
-                                    "GEMINI_PUCK": "gemini-puck"
+                                    "GEMINI_PUCK": "gemini-puck",
+                                    "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                    "ORPHEUS_TARA": "orpheus-tara"
                                   }
                                 },
                                 "type": "enum",
@@ -228421,7 +228723,9 @@
                                   "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                   "XAI_EVE": "xai-eve",
                                   "GEMINI_ZEPHYR": "gemini-zephyr",
-                                  "GEMINI_PUCK": "gemini-puck"
+                                  "GEMINI_PUCK": "gemini-puck",
+                                  "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                  "ORPHEUS_TARA": "orpheus-tara"
                                 },
                                 "options": [
                                   "openai-alloy",
@@ -228450,7 +228754,9 @@
                                   "inworld-mini-craig",
                                   "xai-eve",
                                   "gemini-zephyr",
-                                  "gemini-puck"
+                                  "gemini-puck",
+                                  "qwen3-tts-ryan",
+                                  "orpheus-tara"
                                 ]
                               },
                               "intelligenceRange": {
@@ -229135,7 +229441,9 @@
                                   "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                   "XAI_EVE": "xai-eve",
                                   "GEMINI_ZEPHYR": "gemini-zephyr",
-                                  "GEMINI_PUCK": "gemini-puck"
+                                  "GEMINI_PUCK": "gemini-puck",
+                                  "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                  "ORPHEUS_TARA": "orpheus-tara"
                                 }
                               },
                               "type": "enum",
@@ -229166,7 +229474,9 @@
                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                 "XAI_EVE": "xai-eve",
                                 "GEMINI_ZEPHYR": "gemini-zephyr",
-                                "GEMINI_PUCK": "gemini-puck"
+                                "GEMINI_PUCK": "gemini-puck",
+                                "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                "ORPHEUS_TARA": "orpheus-tara"
                               },
                               "options": [
                                 "openai-alloy",
@@ -229195,7 +229505,9 @@
                                 "inworld-mini-craig",
                                 "xai-eve",
                                 "gemini-zephyr",
-                                "gemini-puck"
+                                "gemini-puck",
+                                "qwen3-tts-ryan",
+                                "orpheus-tara"
                               ]
                             },
                             "intelligenceRange": {
@@ -229880,7 +230192,10 @@
                                     "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                     "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                     "NEMOTRON_ASR": "nemotron-asr",
-                                    "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                    "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                    "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                    "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                    "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                   }
                                 },
                                 "type": "enum",
@@ -229891,7 +230206,10 @@
                                   "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                   "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                   "NEMOTRON_ASR": "nemotron-asr",
-                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                  "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                  "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                  "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                 },
                                 "options": [
                                   "openai-whisper",
@@ -229900,7 +230218,10 @@
                                   "voxtral-small-transcribe",
                                   "voxtral-mini-transcribe",
                                   "nemotron-asr",
-                                  "gpt4o-mini-transcribe"
+                                  "gpt4o-mini-transcribe",
+                                  "qwen3-asr-0.6b",
+                                  "parakeet-tdt-v3",
+                                  "nemotron-3.5-transcribe"
                                 ]
                               },
                               "intelligenceRange": {
@@ -230565,7 +230886,10 @@
                                   "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                   "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                   "NEMOTRON_ASR": "nemotron-asr",
-                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                  "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                  "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                  "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                 }
                               },
                               "type": "enum",
@@ -230576,7 +230900,10 @@
                                 "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                 "NEMOTRON_ASR": "nemotron-asr",
-                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                               },
                               "options": [
                                 "openai-whisper",
@@ -230585,7 +230912,10 @@
                                 "voxtral-small-transcribe",
                                 "voxtral-mini-transcribe",
                                 "nemotron-asr",
-                                "gpt4o-mini-transcribe"
+                                "gpt4o-mini-transcribe",
+                                "qwen3-asr-0.6b",
+                                "parakeet-tdt-v3",
+                                "nemotron-3.5-transcribe"
                               ]
                             },
                             "intelligenceRange": {
@@ -250722,7 +251052,9 @@
                                     "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                     "XAI_EVE": "xai-eve",
                                     "GEMINI_ZEPHYR": "gemini-zephyr",
-                                    "GEMINI_PUCK": "gemini-puck"
+                                    "GEMINI_PUCK": "gemini-puck",
+                                    "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                    "ORPHEUS_TARA": "orpheus-tara"
                                   }
                                 },
                                 "type": "enum",
@@ -250753,7 +251085,9 @@
                                   "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                   "XAI_EVE": "xai-eve",
                                   "GEMINI_ZEPHYR": "gemini-zephyr",
-                                  "GEMINI_PUCK": "gemini-puck"
+                                  "GEMINI_PUCK": "gemini-puck",
+                                  "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                  "ORPHEUS_TARA": "orpheus-tara"
                                 },
                                 "options": [
                                   "openai-alloy",
@@ -250782,7 +251116,9 @@
                                   "inworld-mini-craig",
                                   "xai-eve",
                                   "gemini-zephyr",
-                                  "gemini-puck"
+                                  "gemini-puck",
+                                  "qwen3-tts-ryan",
+                                  "orpheus-tara"
                                 ]
                               },
                               "intelligenceRange": {
@@ -251467,7 +251803,9 @@
                                   "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                   "XAI_EVE": "xai-eve",
                                   "GEMINI_ZEPHYR": "gemini-zephyr",
-                                  "GEMINI_PUCK": "gemini-puck"
+                                  "GEMINI_PUCK": "gemini-puck",
+                                  "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                  "ORPHEUS_TARA": "orpheus-tara"
                                 }
                               },
                               "type": "enum",
@@ -251498,7 +251836,9 @@
                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                 "XAI_EVE": "xai-eve",
                                 "GEMINI_ZEPHYR": "gemini-zephyr",
-                                "GEMINI_PUCK": "gemini-puck"
+                                "GEMINI_PUCK": "gemini-puck",
+                                "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                "ORPHEUS_TARA": "orpheus-tara"
                               },
                               "options": [
                                 "openai-alloy",
@@ -251527,7 +251867,9 @@
                                 "inworld-mini-craig",
                                 "xai-eve",
                                 "gemini-zephyr",
-                                "gemini-puck"
+                                "gemini-puck",
+                                "qwen3-tts-ryan",
+                                "orpheus-tara"
                               ]
                             },
                             "intelligenceRange": {
@@ -252215,7 +252557,10 @@
                                     "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                     "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                     "NEMOTRON_ASR": "nemotron-asr",
-                                    "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                    "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                    "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                    "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                    "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                   }
                                 },
                                 "type": "enum",
@@ -252226,7 +252571,10 @@
                                   "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                   "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                   "NEMOTRON_ASR": "nemotron-asr",
-                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                  "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                  "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                  "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                 },
                                 "options": [
                                   "openai-whisper",
@@ -252235,7 +252583,10 @@
                                   "voxtral-small-transcribe",
                                   "voxtral-mini-transcribe",
                                   "nemotron-asr",
-                                  "gpt4o-mini-transcribe"
+                                  "gpt4o-mini-transcribe",
+                                  "qwen3-asr-0.6b",
+                                  "parakeet-tdt-v3",
+                                  "nemotron-3.5-transcribe"
                                 ]
                               },
                               "intelligenceRange": {
@@ -252900,7 +253251,10 @@
                                   "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                   "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                   "NEMOTRON_ASR": "nemotron-asr",
-                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                  "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                  "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                  "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                 }
                               },
                               "type": "enum",
@@ -252911,7 +253265,10 @@
                                 "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                 "NEMOTRON_ASR": "nemotron-asr",
-                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                               },
                               "options": [
                                 "openai-whisper",
@@ -252920,7 +253277,10 @@
                                 "voxtral-small-transcribe",
                                 "voxtral-mini-transcribe",
                                 "nemotron-asr",
-                                "gpt4o-mini-transcribe"
+                                "gpt4o-mini-transcribe",
+                                "qwen3-asr-0.6b",
+                                "parakeet-tdt-v3",
+                                "nemotron-3.5-transcribe"
                               ]
                             },
                             "intelligenceRange": {
@@ -268412,7 +268772,9 @@
                                     "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                     "XAI_EVE": "xai-eve",
                                     "GEMINI_ZEPHYR": "gemini-zephyr",
-                                    "GEMINI_PUCK": "gemini-puck"
+                                    "GEMINI_PUCK": "gemini-puck",
+                                    "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                    "ORPHEUS_TARA": "orpheus-tara"
                                   }
                                 },
                                 "type": "enum",
@@ -268443,7 +268805,9 @@
                                   "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                   "XAI_EVE": "xai-eve",
                                   "GEMINI_ZEPHYR": "gemini-zephyr",
-                                  "GEMINI_PUCK": "gemini-puck"
+                                  "GEMINI_PUCK": "gemini-puck",
+                                  "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                  "ORPHEUS_TARA": "orpheus-tara"
                                 },
                                 "options": [
                                   "openai-alloy",
@@ -268472,7 +268836,9 @@
                                   "inworld-mini-craig",
                                   "xai-eve",
                                   "gemini-zephyr",
-                                  "gemini-puck"
+                                  "gemini-puck",
+                                  "qwen3-tts-ryan",
+                                  "orpheus-tara"
                                 ]
                               },
                               "intelligenceRange": {
@@ -269157,7 +269523,9 @@
                                   "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                   "XAI_EVE": "xai-eve",
                                   "GEMINI_ZEPHYR": "gemini-zephyr",
-                                  "GEMINI_PUCK": "gemini-puck"
+                                  "GEMINI_PUCK": "gemini-puck",
+                                  "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                  "ORPHEUS_TARA": "orpheus-tara"
                                 }
                               },
                               "type": "enum",
@@ -269188,7 +269556,9 @@
                                 "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                                 "XAI_EVE": "xai-eve",
                                 "GEMINI_ZEPHYR": "gemini-zephyr",
-                                "GEMINI_PUCK": "gemini-puck"
+                                "GEMINI_PUCK": "gemini-puck",
+                                "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                                "ORPHEUS_TARA": "orpheus-tara"
                               },
                               "options": [
                                 "openai-alloy",
@@ -269217,7 +269587,9 @@
                                 "inworld-mini-craig",
                                 "xai-eve",
                                 "gemini-zephyr",
-                                "gemini-puck"
+                                "gemini-puck",
+                                "qwen3-tts-ryan",
+                                "orpheus-tara"
                               ]
                             },
                             "intelligenceRange": {
@@ -269905,7 +270277,10 @@
                                     "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                     "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                     "NEMOTRON_ASR": "nemotron-asr",
-                                    "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                    "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                    "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                    "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                    "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                   }
                                 },
                                 "type": "enum",
@@ -269916,7 +270291,10 @@
                                   "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                   "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                   "NEMOTRON_ASR": "nemotron-asr",
-                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                  "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                  "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                  "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                 },
                                 "options": [
                                   "openai-whisper",
@@ -269925,7 +270303,10 @@
                                   "voxtral-small-transcribe",
                                   "voxtral-mini-transcribe",
                                   "nemotron-asr",
-                                  "gpt4o-mini-transcribe"
+                                  "gpt4o-mini-transcribe",
+                                  "qwen3-asr-0.6b",
+                                  "parakeet-tdt-v3",
+                                  "nemotron-3.5-transcribe"
                                 ]
                               },
                               "intelligenceRange": {
@@ -270590,7 +270971,10 @@
                                   "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                   "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                   "NEMOTRON_ASR": "nemotron-asr",
-                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                  "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                  "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                  "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                  "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                                 }
                               },
                               "type": "enum",
@@ -270601,7 +270985,10 @@
                                 "VOXTRAL_SMALL_TRANSCRIBE": "voxtral-small-transcribe",
                                 "VOXTRAL_MINI_TRANSCRIBE": "voxtral-mini-transcribe",
                                 "NEMOTRON_ASR": "nemotron-asr",
-                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe"
+                                "GPT4O_MINI_TRANSCRIBE": "gpt4o-mini-transcribe",
+                                "QWEN3_ASR_0_6B": "qwen3-asr-0.6b",
+                                "PARAKEET_TDT_V3": "parakeet-tdt-v3",
+                                "NEMOTRON_3_5_TRANSCRIBE": "nemotron-3.5-transcribe"
                               },
                               "options": [
                                 "openai-whisper",
@@ -270610,7 +270997,10 @@
                                 "voxtral-small-transcribe",
                                 "voxtral-mini-transcribe",
                                 "nemotron-asr",
-                                "gpt4o-mini-transcribe"
+                                "gpt4o-mini-transcribe",
+                                "qwen3-asr-0.6b",
+                                "parakeet-tdt-v3",
+                                "nemotron-3.5-transcribe"
                               ]
                             },
                             "intelligenceRange": {
@@ -283780,7 +284170,9 @@
                           "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                           "XAI_EVE": "xai-eve",
                           "GEMINI_ZEPHYR": "gemini-zephyr",
-                          "GEMINI_PUCK": "gemini-puck"
+                          "GEMINI_PUCK": "gemini-puck",
+                          "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                          "ORPHEUS_TARA": "orpheus-tara"
                         }
                       },
                       "type": "enum",
@@ -283811,7 +284203,9 @@
                         "INWORLD_MINI_CRAIG": "inworld-mini-craig",
                         "XAI_EVE": "xai-eve",
                         "GEMINI_ZEPHYR": "gemini-zephyr",
-                        "GEMINI_PUCK": "gemini-puck"
+                        "GEMINI_PUCK": "gemini-puck",
+                        "QWEN3_TTS_RYAN": "qwen3-tts-ryan",
+                        "ORPHEUS_TARA": "orpheus-tara"
                       },
                       "options": [
                         "openai-alloy",
@@ -283840,7 +284234,9 @@
                         "inworld-mini-craig",
                         "xai-eve",
                         "gemini-zephyr",
-                        "gemini-puck"
+                        "gemini-puck",
+                        "qwen3-tts-ryan",
+                        "orpheus-tara"
                       ]
                     }
                   },
