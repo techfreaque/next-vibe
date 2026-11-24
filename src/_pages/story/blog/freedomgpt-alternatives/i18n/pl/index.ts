@@ -5,7 +5,7 @@ export const translations: typeof enTranslations = {
     title:
       "Alternatywy dla FreedomGPT: aplikacje AI bez cenzury w porównaniu (2026)",
     description:
-      "Alternatywy dla FreedomGPT sprawdzone u źródła: Venice, NanoGPT, uncensored.ai, Gab AI, LM Studio, Ollama i {{appName}}. Cena, prywatność, offline.",
+      "Zestaw FreedomGPT z {{appName}}, Venice i Poe w chmurze oraz z LM Studio, Ollama i Jan offline. Sprawdź ceny, filtry i prywatność.",
     category: "Porównanie",
     imageAlt: "Alternatywy dla FreedomGPT porównane obok siebie",
     keywords:
@@ -15,7 +15,7 @@ export const translations: typeof enTranslations = {
     backToBlog: "Wróć do bloga",
     category: "Porównanie",
     readTime: "9 min czytania",
-    title: "Alternatywy dla FreedomGPT. Ten sam pomysł, mniej haczyków.",
+    title: "Alternatywy dla FreedomGPT w chmurze i offline",
     subtitle:
       "{{count}} alternatyw i {{appName}}, porównanych na podstawie ich własnych stron z cennikiem, prywatnością i zasadami filtrowania.",
   },
@@ -73,8 +73,6 @@ export const translations: typeof enTranslations = {
   },
   table: {
     title: "Wszystkie obok siebie",
-    intro:
-      "Na telefonie przewiń w bok. Dane konkurencji sprawdzone {{date}} na ich własnych stronach. Dane {{appName}} czytane na żywo z naszej konfiguracji.",
   },
   us: {
     title: "{{appName}}: modele bez cenzury z nazwą i ceną",

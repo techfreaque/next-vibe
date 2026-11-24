@@ -2,7 +2,7 @@ export const translations = {
   meta: {
     title: "FreedomGPT Alternatives: Uncensored AI Apps Compared (2026)",
     description:
-      "FreedomGPT alternatives checked on their own pages: Venice, NanoGPT, uncensored.ai, Gab AI, LM Studio, Ollama and {{appName}}. Price, privacy, offline.",
+      "Compare FreedomGPT with {{appName}}, Venice and Poe for hosted chat, or LM Studio, Ollama and Jan for offline models. See prices, filters and privacy.",
     category: "Comparison",
     imageAlt: "FreedomGPT alternatives, compared side by side",
     keywords:
@@ -12,7 +12,7 @@ export const translations = {
     backToBlog: "Back to Blog",
     category: "Comparison",
     readTime: "9 min read",
-    title: "FreedomGPT alternatives. Same idea, fewer catches.",
+    title: "FreedomGPT alternatives for hosted and offline AI",
     subtitle:
       "{{count}} alternatives and {{appName}}, compared on what their own pricing, privacy and filter pages say.",
   },
@@ -70,8 +70,6 @@ export const translations = {
   },
   table: {
     title: "All of them, side by side",
-    intro:
-      "Scroll sideways on mobile. Competitor facts checked {{date}} on their own pages. {{appName}} facts read live from our config.",
   },
   us: {
     title: "{{appName}}: the uncensored models, named and priced",

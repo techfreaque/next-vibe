@@ -45,12 +45,9 @@ import { Callout, CardLink, Cta } from "../../_shared/marketing";
 import {
   allPlansText,
   CompareInlineLinks,
-  CompareTable,
   formatCompareDate,
   freeText,
   LINK_CLASS,
-  platformRow,
-  usRow,
 } from "../../compare/_shared/compare-ui";
 import {
   COMPARE_CHECKED_DATE,
@@ -61,6 +58,12 @@ import {
 } from "../../compare/_shared/platforms";
 import type { UsParams } from "../../compare/_shared/us-facts";
 import { scopedTranslation as compareScopedTranslation } from "../../compare/i18n";
+import {
+  AlternativesComparison,
+  alternativesFaq,
+  AlternativesLinks,
+  alternativesTotal,
+} from "../_alternatives/comparison";
 import { scopedTranslation } from "./i18n";
 
 export const revalidate = 3600;
@@ -182,19 +185,19 @@ export function TanstackPage({
     ),
   };
   const servesLiberty = Number(us.freedomGptModels) > 0;
-  const rows = [
-    usRow(locale, compareT, us),
-    platformRow(PLATFORMS.freedomGpt, locale, compareT),
-    ...ALTERNATIVES.map((key) => platformRow(PLATFORMS[key], locale, compareT)),
+  const faq = [
+    ...FAQ_KEYS.map((key) => ({
+      key,
+      question: t(`faq.${key}.q`, stats),
+      answer: t(
+        key === "liberty" && !servesLiberty
+          ? "faq.liberty.aOff"
+          : `faq.${key}.a`,
+        stats,
+      ),
+    })),
+    alternativesFaq(SLUG, locale, us.appName),
   ];
-  const faq = FAQ_KEYS.map((key) => ({
-    key,
-    question: t(`faq.${key}.q`, stats),
-    answer: t(
-      key === "liberty" && !servesLiberty ? "faq.liberty.aOff" : `faq.${key}.a`,
-      stats,
-    ),
-  }));
 
   return (
     <Div className="min-h-screen bg-background">
@@ -204,13 +207,21 @@ export function TanstackPage({
         readTime={t("hero.readTime")}
         post={{ slug: SLUG, locale }}
         title={t("hero.title")}
-        subtitle={t("hero.subtitle", stats)}
+        subtitle={t("hero.subtitle", {
+          ...stats,
+          count: alternativesTotal(SLUG, ALTERNATIVES),
+        })}
       />
 
       <ArticleBody>
         <Div className="flex flex-col gap-5">
           <ArticleLead>{t("intro.lead")}</ArticleLead>
-          <ArticleP>{t("intro.p2", stats)}</ArticleP>
+          <ArticleP>
+            {t("intro.p2", {
+              ...stats,
+              count: alternativesTotal(SLUG, ALTERNATIVES),
+            })}
+          </ArticleP>
           {servesLiberty && <ArticleP>{t("intro.relation", stats)}</ArticleP>}
         </Div>
 
@@ -284,13 +295,13 @@ export function TanstackPage({
           />
         </ArticleSection>
 
-        <ArticleSection
-          id="table"
+        <AlternativesComparison
+          locale={locale}
+          slug={SLUG}
+          us={us}
+          platforms={ALTERNATIVES}
           title={t("table.title")}
-          intro={t("table.intro", stats)}
-        >
-          <CompareTable rows={rows} locale={locale} />
-        </ArticleSection>
+        />
 
         <ArticleSection
           id="us"
@@ -465,10 +476,13 @@ export function TanstackPage({
             />
             <CompareInlineLinks
               locale={locale}
+              includeHub={false}
               versus={["freedomGpt", "gabAi", "venice", "nanoGpt"]}
             />
           </Div>
         </ArticleSection>
+
+        <AlternativesLinks locale={locale} exclude={SLUG} />
 
         <ArticleEnd
           post={{ slug: SLUG, locale }}
