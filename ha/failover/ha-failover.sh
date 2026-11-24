@@ -452,13 +452,33 @@ app_probe() {
 APP_DB_URL_FILE="${HA_APP_DB_URL_FILE:-$APP_DIR/.ha-database-url}"
 APP_DB_PROBE_BYTES="${HA_APP_DB_PROBE_BYTES:-16000}"
 app_db_query_ok() {
-  local url n
+  local url n deadline="${HA_APP_DB_PROBE_TIMEOUT:-10}"
   url="$(head -1 "$APP_DB_URL_FILE" 2>/dev/null)"; url="${url%%\?*}"
   [ -n "$url" ] || return 1
-  n="$(printf '%s' "$url" | timeout "${HA_APP_DB_PROBE_TIMEOUT:-10}" docker exec -i -e PGCONNECT_TIMEOUT=4 \
+  # Bound psql inside the container as well: timing out the Docker CLI alone
+  # does not terminate a client blocked reading from the WireGuard socket.
+  n="$(printf '%s' "$url" | timeout -k 2 "$deadline" docker exec -i -e PGCONNECT_TIMEOUT=4 \
     -e PGOPTIONS="-c statement_timeout=4000" "$LOCAL_PG" sh -c \
-    "psql \"\$(cat)\" -XAtq -v ON_ERROR_STOP=1 -c \"select repeat('x', $APP_DB_PROBE_BYTES)\" | wc -c" 2>/dev/null)"
+    'timeout -k 2 "$1" psql "$(cat)" -XAtq -v ON_ERROR_STOP=1 -c "select repeat(chr(120), $2)" | wc -c' \
+    sh "$deadline" "$APP_DB_PROBE_BYTES" 2>/dev/null)"
   [ "${n:-0}" -eq $((APP_DB_PROBE_BYTES + 1)) ] 2>/dev/null
+}
+
+# Sample the standby's actual DB path even while the fixed-lead HTTP probe
+# passes. A large row uses several WireGuard packets. Record transitions for
+# comparison with app read timeouts without feeding the result into failover.
+sample_app_db_path() {
+  local start elapsed result previous
+  start=$(date +%s%3N)
+  if app_db_query_ok; then result=ok; else result=failed; fi
+  elapsed=$(( $(date +%s%3N) - start ))
+  previous=$(cat "$STATE_DIR/app-db-sample.state" 2>/dev/null || true)
+  [ "$previous" != "$result" ] || return 0
+  printf '%s\n' "$result" > "$STATE_DIR/app-db-sample.state.tmp" &&
+    mv "$STATE_DIR/app-db-sample.state.tmp" "$STATE_DIR/app-db-sample.state"
+  if [ "$result" = failed ] || [ "$previous" = failed ]; then
+    log "standby app DB path sample: result=$result elapsed_ms=$elapsed bytes=$APP_DB_PROBE_BYTES"
+  fi
 }
 
 app_db_ok() {
@@ -615,8 +635,18 @@ $(printf '%s\n' "$rows" | sed 's/^/  /')"
 }
 
 cmd_watch() {
+  local sample_after=0 sample_pid=""
   log "watchdog start: role=$(role) auto=$AUTO interval=${INTERVAL}s failover_after=${FAILOVER_AFTER}s app_heal=$APP_HEAL"
   while :; do
+    if [ "$NODE" = s2 ] && [ "$SECONDS" -ge "$sample_after" ]; then
+      sample_after=$((SECONDS + 60))
+      if [ "$(role)" = standby ] && [ -n "$LOCAL_PG" ] && [ -s "$APP_DB_URL_FILE" ] &&
+        { [ -z "$sample_pid" ] || ! kill -0 "$sample_pid" 2>/dev/null; }; then
+        # A slow read must never delay fencing, witness checks, or app recovery.
+        sample_app_db_path &
+        sample_pid=$!
+      fi
+    fi
     wg_path_check
     if [ "$NODE" = "s2" ]; then watch_s2; else watch_s1; fi
     pg_conn_check

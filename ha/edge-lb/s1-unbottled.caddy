@@ -96,6 +96,9 @@ unbottled.ai {
 	log_append @next_asset surface next-asset
 	@next_bundle path_regexp ^/_next/static/chunks/[a-zA-Z0-9_./~-]+\.(js|css)$
 	log_append @next_bundle asset_path {http.request.orig_uri.path}
+	# Record only the public directory badges shipped with the application.
+	@public_badge path_regexp ^/images/badges/((dang|postmake|toolpilot)-(dark|light)\.png|(aitoolscapital|bestekitools)-(dark|light)\.svg|opensourcealternatives\.svg|whatsthebigdata\.jpg)$
+	log_append @public_badge asset_path {http.request.orig_uri.path}
 	@app_api path /api/*
 	log_append @app_api surface api
 	@realtime path /ws*

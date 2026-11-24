@@ -47,6 +47,7 @@ services:
       caddy_internal_10.@meta_crawler.header_regexp: "User-Agent (?i)facebookexternalhit|meta-externalagent|meta-externalfetcher"
       caddy_internal_10.@next_asset.path: "/_next/*"
       caddy_internal_10.@next_bundle.path_regexp: '^/_next/static/chunks/[a-zA-Z0-9_./~-]+\.(js|css)$'
+      caddy_internal_10.@public_badge.path_regexp: '^/images/badges/((dang|postmake|toolpilot)-(dark|light)\.png|(aitoolscapital|bestekitools)-(dark|light)\.svg|opensourcealternatives\.svg|whatsthebigdata\.jpg)$'
       caddy_internal_10.@app_api.path: "/api/*"
       caddy_internal_10.@realtime.path: "/ws*"
       caddy_internal_10.0_log_append: "@meta_crawler automation meta-crawler"
@@ -60,6 +61,7 @@ services:
       caddy_internal_10.7_log_append: "edge_request_id {http.request.uuid}"
       caddy_internal_10.8_log_append: "upstream_duration_ms {rp.upstream.duration_ms}"
       caddy_internal_10.9_log_append: "@next_bundle asset_path {http.request.orig_uri.path}"
+      caddy_internal_10.10_log_append: "@public_badge asset_path {http.request.orig_uri.path}"
       caddy_internal_10.tls.issuer: "acme"
       caddy_internal_10.tls.issuer.disable_tlsalpn_challenge: ""
       # Deploy drain (scripts/ha-node-drain.sh edge-on s2 / swap): while
