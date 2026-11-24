@@ -306,6 +306,7 @@
     "vite@8.3.5": "patches/vite@8.3.5.patch",
     "@tanstack/start-plugin-core@1.171.55": "patches/@tanstack%2Fstart-plugin-core@1.171.55.patch",
     "@tailwindcss/vite@4.3.4": "patches/@tailwindcss%2Fvite@4.3.4.patch",
+    "chrome-devtools-mcp@1.12.0": "patches/chrome-devtools-mcp@1.12.0.patch",
     "next-themes@0.4.6": "patches/next-themes@0.4.6.patch",
   },
   "overrides": {

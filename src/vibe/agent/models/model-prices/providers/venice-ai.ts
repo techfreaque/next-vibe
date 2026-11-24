@@ -2,7 +2,7 @@
  * Venice.ai token price fetcher.
  * Public, keyless model lists:
  * GET https://api.venice.ai/api/v1/models?type=text  (per-1M-token USD)
- * GET https://api.venice.ai/api/v1/models?type=image (USD per generation)
+ * GET https://api.venice.ai/api/v1/models?type=all (USD per generation or edit)
  * POST https://api.venice.ai/api/v1/video/quote (USD per clip; the video
  *   list carries no prices, so each Venice video route is quoted per
  *   resolution at its longest clip and divided back to $/s)
@@ -29,7 +29,7 @@ import {
 } from "./token-price-collector";
 
 const MODELS_API_URL = "https://api.venice.ai/api/v1/models?type=text";
-const IMAGE_MODELS_API_URL = "https://api.venice.ai/api/v1/models?type=image";
+const ALL_MODELS_API_URL = "https://api.venice.ai/api/v1/models?type=all";
 const VIDEO_QUOTE_API_URL = "https://api.venice.ai/api/v1/video/quote";
 
 interface VeniceUsdPrice {
@@ -38,6 +38,7 @@ interface VeniceUsdPrice {
 
 interface VeniceModel {
   id: string;
+  type?: string;
   model_spec?: {
     availableContextTokens?: number;
     constraints?: { defaultResolution?: string };
@@ -50,6 +51,7 @@ interface VeniceModel {
       extended?: { context_token_threshold?: number };
       /** Image models: flat USD per generation */
       generation?: VeniceUsdPrice;
+      inpaint?: VeniceUsdPrice;
       resolutions?: Record<string, VeniceUsdPrice>;
     };
     capabilities?: { supportsVision?: boolean };
@@ -150,6 +152,7 @@ export class VenicePriceFetcher extends PriceFetcher {
         const resolution = spec?.constraints?.defaultResolution;
         const usd =
           spec?.pricing?.generation?.usd ??
+          spec?.pricing?.inpaint?.usd ??
           (resolution
             ? spec?.pricing?.resolutions?.[resolution]?.usd
             : undefined);
@@ -157,7 +160,7 @@ export class VenicePriceFetcher extends PriceFetcher {
           failures.push({
             modelId: providerConfig.id,
             provider: ApiProvider.VENICE_AI,
-            reason: `No flat generation price in Venice.ai API (${providerConfig.providerModel})`,
+            reason: `No flat generation or edit price in Venice.ai API (${providerConfig.providerModel})`,
           });
           continue;
         }
@@ -300,7 +303,7 @@ export class VenicePriceFetcher extends PriceFetcher {
   ): Promise<VeniceModel[]> {
     try {
       // oxlint-disable-next-line restricted/no-raw-fetch -- external API
-      const response = await fetch(IMAGE_MODELS_API_URL, {
+      const response = await fetch(ALL_MODELS_API_URL, {
         headers: { Accept: "application/json" },
       });
       if (!response.ok) {
@@ -310,7 +313,9 @@ export class VenicePriceFetcher extends PriceFetcher {
         return [];
       }
       const data = (await response.json()) as { data?: VeniceModel[] };
-      return data.data ?? [];
+      return (data.data ?? []).filter(
+        (model) => model.type === "image" || model.type === "inpaint",
+      );
     } catch (err) {
       logger.warn("Venice.ai image models API failed", {
         error: parseError(err).message,

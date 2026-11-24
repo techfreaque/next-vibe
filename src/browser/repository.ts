@@ -1462,12 +1462,19 @@ export class BrowserRepository {
           });
         }
 
-        // Select our active page before running the tool (establishes context).
+        // Chrome can stall viewport capture after resizing a background tab.
+        // Give the screenshot target a foreground surface before capturing.
         await sendRaw(mcp, {
           jsonrpc: "2.0",
           id: mcp.nextId++,
           method: "tools/call",
-          params: { name: "select_page", arguments: { pageId: s.mcpPageId } },
+          params: {
+            name: "select_page",
+            arguments: {
+              pageId: s.mcpPageId,
+              ...(mcpToolName === "take_screenshot" && { bringToFront: true }),
+            },
+          },
         });
 
         // For select_page, inject the session's active page ID when the caller

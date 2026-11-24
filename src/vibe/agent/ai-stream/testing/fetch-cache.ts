@@ -74,20 +74,16 @@ export const HTTP_CACHE_DIR = join(
   "http-cache",
 );
 
-/**
- * The ONE fixture switch.
- *
- * `true`  → REPLAY-ONLY: the engine NEVER hits a live API. ANY path that would
- *           otherwise go live throws — a cache miss (ordinal OR content-addressed)
- *           AND the "no fixture prefix for this thread" escape hatches. No
- *           exemptions, no matter the fixture context: if a call would reach a
- *           real API and not a cached file, it fails loudly.
- * `false` → RECORD: a miss (or unrecorded thread) falls through to a live fetch
- *           and records the file.
- *
- * Flip to `false` for a recording pass, back to `true` to enforce replay.
- */
-export const FIXTURE_STRICT = false;
+/** Set VIBE_FIXTURE_REPLAY_ONLY=1 for a test process, or =e2e for browser tests on a shared dev server. */
+export function isFixtureReplayOnly(threadId: string | undefined): boolean {
+  if (!fixturesEnabled()) {
+    return false;
+  }
+  const mode = process.env["VIBE_FIXTURE_REPLAY_ONLY"];
+  return (
+    mode === "1" || (mode === "e2e" && threadId?.startsWith("e2e:") === true)
+  );
+}
 
 // ── Context ────────────────────────────────────────────────────────────────────
 
@@ -738,7 +734,7 @@ function isPassthroughUrl(url: string): boolean {
  * the thread has no fixture prefix, this is not a fixture run → live fetch.
  */
 async function engineFetch(
-  streamThreadId: string,
+  streamThreadId: string | undefined,
   input: RequestInfo | URL,
   init: RequestInit | undefined,
   logger: EndpointLogger,
@@ -750,6 +746,7 @@ async function engineFetch(
   pinnedOrdinal: number | undefined,
   /** In-context spawning thread for a sub-stream (lineage walk first hop). */
   contextParentThreadId: string | undefined,
+  fixtureScopeId: string | undefined,
 ): Promise<Response> {
   // oxlint-disable-next-line restricted/restricted-syntax -- the record/replay engine's live leg
   const originalFetch = fetch;
@@ -770,8 +767,14 @@ async function engineFetch(
   // child) thus records into + shares the counter of its run's root folder. No
   // ancestor is a fixture run → not a fixture run → live fetch.
   const threadId =
-    (await resolveFixtureRootThreadId(streamThreadId, contextParentThreadId)) ??
-    streamThreadId;
+    fixtureScopeId ??
+    (streamThreadId &&
+      ((await resolveFixtureRootThreadId(
+        streamThreadId,
+        contextParentThreadId,
+      )) ??
+        streamThreadId));
+  const replayOnly = isFixtureReplayOnly(threadId);
 
   let bodyStr = "";
   if (init?.body) {
@@ -825,16 +828,19 @@ async function engineFetch(
     // oxlint-disable-next-line restricted-syntax -- intentional throw: STRICT forbids any live fetch
     throw new Error(
       // eslint-disable-next-line i18next/no-literal-string
-      `[FetchCache STRICT] live fetch blocked (no fixture prefix for thread ${threadId}) for ${init?.method ?? "GET"} ${url}`,
+      `[FetchCache STRICT] live fetch blocked (no fixture prefix for thread ${threadId ?? "none"}) for ${init?.method ?? "GET"} ${redactUrl(url)}`,
     );
   };
+  if (!threadId) {
+    return strictNoLive();
+  }
 
   let prefix: string;
   let ordinalStem: string;
   if (isContentAddressed) {
     const p = await readFixturePrefix(threadId);
     if (!p) {
-      if (FIXTURE_STRICT) {
+      if (replayOnly) {
         strictNoLive();
       }
       return originalFetch(input, init);
@@ -859,7 +865,7 @@ async function engineFetch(
   } else if (pinnedOrdinal !== undefined) {
     const p = await readFixturePrefix(threadId);
     if (!p) {
-      if (FIXTURE_STRICT) {
+      if (replayOnly) {
         strictNoLive();
       }
       return originalFetch(input, init);
@@ -871,7 +877,7 @@ async function engineFetch(
   } else {
     const fx = await readAndBumpFixture(threadId);
     if (!fx) {
-      if (FIXTURE_STRICT) {
+      if (replayOnly) {
         strictNoLive();
       }
       return originalFetch(input, init);
@@ -913,17 +919,11 @@ async function engineFetch(
     });
 
     // ── Cache miss ────────────────────────────────────────────────────────────
-    // REPLAY-ONLY (FIXTURE_STRICT): a miss on ANY external call — AI model,
-    // media-gen bridge (pinned-ordinal) OR embedding (content-addressed) —
-    // throws. There are NO exemptions: an unrecorded or drifted call site MUST
-    // fail loudly instead of silently going live and burning wall-clock. This
-    // holds on BOTH instances (atlas + hermes) since each runs this same engine.
-    // Recording passes (FIXTURE_STRICT=false) fall through and record every miss.
-    if (FIXTURE_STRICT) {
+    if (replayOnly) {
       // oxlint-disable-next-line restricted-syntax -- intentional throw to fail test on uncached fetch
       throw new Error(
         // eslint-disable-next-line i18next/no-literal-string
-        `[FetchCache STRICT] cache miss for ${init?.method ?? "GET"} ${url}\n  context: ${dir}\n  expected: ${stem}-res.json`,
+        `[FetchCache STRICT] cache miss for ${init?.method ?? "GET"} ${redactUrl(url)}\n  context: ${dir}\n  expected: ${stem}-res.json`,
       );
     }
 
@@ -1120,8 +1120,7 @@ function fixturesEnabled(): boolean {
  * Every AI/media/embedding/TTS/STT call site already has the ToolExecutionContext
  * (or one) and passes it here; the engine uses `toolExecutionContext` as the
  * fixture scope, reading the thread's prefix + bumping its ordinal from the DB
- * per fetch. In prod (or with no context/threadId) this is the plain live
- * fetch — zero overhead.
+ * per fetch. Outside fixture-enabled environments this is the plain live fetch.
  */
 export function createFixtureFetch(
   toolExecutionContext: ToolExecutionContext | undefined,
@@ -1129,10 +1128,13 @@ export function createFixtureFetch(
 ): typeof globalThis.fetch {
   // An explicit E2E fixture scope wins over the thread (browser requests to
   // standalone tools have no thread; streams inside an E2E run share its scope).
-  const threadId =
-    toolExecutionContext?.fixtureScopeId ?? toolExecutionContext?.threadId;
-  if (!threadId || !fixturesEnabled()) {
-    // oxlint-disable-next-line restricted/restricted-syntax -- live fetch outside dev/test or with no thread scope
+  const fixtureScopeId = toolExecutionContext?.fixtureScopeId;
+  const threadId = toolExecutionContext?.threadId;
+  if (
+    !fixturesEnabled() ||
+    (!fixtureScopeId && !threadId && !isFixtureReplayOnly(undefined))
+  ) {
+    // oxlint-disable-next-line restricted/restricted-syntax -- live fetch outside dev/test or for an unscoped recording run
     return fetch;
   }
   // A parallel-fan-out caller (gap-fill) binds a per-call context carrying a
@@ -1153,6 +1155,7 @@ export function createFixtureFetch(
         logger,
         pinnedOrdinal,
         contextParentThreadId,
+        fixtureScopeId,
       ),
     // preconnect is a Bun-only DNS/TLS warmup — irrelevant in record/replay.
     // Use a no-op stub: fetch.preconnect is lost when Next.js patches globalThis.fetch.

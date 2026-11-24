@@ -1248,7 +1248,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "image",
-    inputs: ["text", "image"], // updated: 2026-11-13 from openrouter-api
+    inputs: ["text", "image"], // Black Forest Labs and OpenRouter support reference images.
     outputs: ["image"], // updated: 2026-11-13 from openrouter-api
     providers: [
       {
@@ -1281,7 +1281,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "image",
-    inputs: ["text", "image"], // updated: 2026-11-13 from openrouter-api
+    inputs: ["text", "image"], // Black Forest Labs and OpenRouter support reference images.
     outputs: ["image"], // updated: 2026-11-13 from openrouter-api
     providers: [
       {
@@ -1595,7 +1595,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "image",
-    inputs: ["text", "image"], // updated: 2026-11-11 from venice-api (image edit)
+    inputs: ["text", "image"], // Venice API lists this as an inpaint model.
     outputs: ["image"], // updated: 2026-11-11 from venice-api
     providers: [
       {
@@ -1627,7 +1627,7 @@ export const imageGenModelDefinitions: Record<
     parameterCount: undefined,
     contextWindow: 0,
     icon: "image",
-    inputs: ["text", "image"], // updated: 2026-11-11 from venice-api (image edit)
+    inputs: ["text", "image"], // Venice API lists this as an inpaint model.
     outputs: ["image"], // updated: 2026-11-11 from venice-api
     providers: [
       {

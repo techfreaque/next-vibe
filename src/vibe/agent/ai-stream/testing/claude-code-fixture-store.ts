@@ -15,7 +15,7 @@
  *     ReadableStream of the recorded LanguageModelV2StreamPart events.
  *   - Thread has a fixture prefix + no fixture     → real Agent SDK call, parts
  *     collected and written on stream end (unless STRICT).
- *   - Thread has no fixture prefix                 → producer runs directly.
+ *   - Thread has no fixture prefix                 → producer runs directly unless STRICT.
  *
  * Fixture file (same folder + stem as HTTP fixtures, distinct `parts` type):
  *   src/generated/ai-fixtures/http-cache/{prefix}/{NNNN}-{instance}-{model}-res.json
@@ -31,7 +31,7 @@ import type { ToolExecutionContext } from "../../../core/execution-context";
 import {
   cacheDir,
   fileStem,
-  FIXTURE_STRICT,
+  isFixtureReplayOnly,
   readAndBumpFixture,
   resolveInstanceName,
   slugify,
@@ -50,7 +50,7 @@ interface PartsFixtureFile {
 /**
  * Wrap a real stream-producing function with fixture replay, routed through the
  * SAME ordinal engine as the HTTP fetch cache. Without a fixture prefix on the
- * stream's thread the producer runs directly.
+ * stream's thread the producer runs directly unless replay-only mode is on.
  */
 export async function withClaudeCodeFixture(
   toolExecutionContext: ToolExecutionContext | undefined,
@@ -59,10 +59,19 @@ export async function withClaudeCodeFixture(
 ): Promise<ReadableStream<LanguageModelV2StreamPart>> {
   const threadId =
     toolExecutionContext?.fixtureScopeId ?? toolExecutionContext?.threadId;
+  const replayOnly = isFixtureReplayOnly(threadId);
   // No thread → not a fixture run. Read prefix + bump the run's single ordinal
-  // in one round-trip (same counter the HTTP engine bumps). No prefix → live.
+  // in one round-trip (same counter the HTTP engine bumps).
   const fx = threadId ? await readAndBumpFixture(threadId) : null;
   if (!fx) {
+    if (replayOnly) {
+      return Promise.reject(
+        new Error(
+          // eslint-disable-next-line i18next/no-literal-string
+          `[ClaudeCodeFixture STRICT] No fixture prefix for ${modelId} (thread: ${threadId ?? "none"})`,
+        ),
+      );
+    }
     return producer();
   }
 
@@ -76,7 +85,7 @@ export async function withClaudeCodeFixture(
     return replayFixture(fixture.parts);
   }
 
-  if (FIXTURE_STRICT) {
+  if (replayOnly) {
     // oxlint-disable-next-line restricted-syntax -- intentional throw to fail test on uncached agent call
     throw new Error(
       // eslint-disable-next-line i18next/no-literal-string

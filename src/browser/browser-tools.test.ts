@@ -1441,6 +1441,7 @@ describe("Browser Tools", () => {
           testUser,
         );
         expect(applied.success, `emulate: ${applied.error ?? ""}`).toBe(true);
+        expect(applied.data.success, extractText(applied.data)).toBe(true);
         // A user agent override applies from the next navigation.
         await run(
           navigatePageEndpoints.POST,
@@ -1471,6 +1472,7 @@ describe("Browser Tools", () => {
           testUser,
         );
         expect(mobile.success, `mobile: ${mobile.error ?? ""}`).toBe(true);
+        expect(mobile.data.success, extractText(mobile.data)).toBe(true);
         let touch = "";
         for (let attempt = 0; attempt < 20; attempt += 1) {
           touch = await readState(
@@ -1493,6 +1495,7 @@ describe("Browser Tools", () => {
           testUser,
         );
         expect(cleared.success, `clear: ${cleared.error ?? ""}`).toBe(true);
+        expect(cleared.data.success, extractText(cleared.data)).toBe(true);
         await run(
           navigatePageEndpoints.POST,
           { type: "reload", instanceId: SID },

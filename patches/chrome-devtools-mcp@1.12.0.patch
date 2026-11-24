@@ -1,0 +1,12 @@
+diff --git a/build/src/third_party/index.js b/build/src/third_party/index.js
+--- a/build/src/third_party/index.js
++++ b/build/src/third_party/index.js
+@@ -58380,6 +58380,8 @@
+                 downloadThroughput: this.#emulatedNetworkConditions.download,
+             });
+             await client.send('Network.emulateNetworkConditionsByRule', {
++                // Chrome 148 requires offline at the command level.
++                offline: this.#emulatedNetworkConditions.offline,
+                 matchedNetworkConditions: [
+                     {
+                         urlPattern: '',

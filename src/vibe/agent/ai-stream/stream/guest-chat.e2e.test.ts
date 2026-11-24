@@ -26,6 +26,7 @@ import { CreditRepository } from "@/credits/repository";
 import { LEAD_ID_COOKIE_NAME } from "@/env/constants";
 import { FREE_CREDIT_ALLOWANCE } from "@/products/constants";
 
+import { STORAGE_KEYS } from "../../chat/constants";
 import { formatSkillId } from "../../chat/slugify";
 import { scopedTranslation as threadsWidgetScopedTranslation } from "../../chat/threads/widget/i18n";
 import { scopedTranslation as consentScopedTranslation } from "../../models/uncensored-consent/i18n";
@@ -41,7 +42,6 @@ import {
 import { createE2EFreeGuest } from "../testing/e2e-credit-user";
 import streamEndpoints from "./definition";
 import { scopedTranslation } from "./i18n";
-import { STORAGE_KEYS } from "../../chat/constants";
 
 const endpoint = streamEndpoints.POST;
 /** Where a guest lands: /threads redirects a visitor to a fresh incognito chat. */
@@ -156,29 +156,6 @@ async function leadConsented(leadId: string): Promise<boolean> {
   return status.success && status.data.consented;
 }
 
-/**
- * What the sidebar's credits bar says on hover ("20 credits"). The tooltip
- * stays open while hovered and re-renders live, so polling it is cheap.
- */
-async function sidebarBalanceText(page: Page): Promise<string> {
-  await page
-    .getByText(tThreads("components.credits.label"), { exact: true })
-    .first()
-    .hover();
-  const tooltip = page.getByRole("tooltip").first();
-  await tooltip.waitFor({ state: "visible" });
-  return (await tooltip.innerText()).trim();
-}
-
-/** The sidebar's rendering of a balance (two decimals, floored). */
-function balanceLabel(total: number): string {
-  return total === 1
-    ? tThreads("components.credits.credit", { count: 1 })
-    : tThreads("components.credits.credits", {
-        count: `${Math.floor(total * 100) / 100}`,
-      });
-}
-
 /** Type + send from the composer, returning the stream call it made. */
 async function sendFromComposer(
   page: Page,
@@ -214,13 +191,19 @@ describe("E2E: guest chat money path", () => {
       // A first-time guest starts on the full guest allowance — and sees it
       const startBalance = await leadBalance(leadId);
       expect(startBalance).toBe(FREE_CREDIT_ALLOWANCE.guest);
+      const creditsBar = page
+        .getByText(tThreads("components.credits.label"), { exact: true })
+        .locator("..")
+        .getByRole("progressbar");
 
       const { composer, call } = await sendThroughDevRestart(
         baseUrl,
         async () => {
           const input = await openGuestChat(page, gotoReady);
-          expect(await sidebarBalanceText(page)).toBe(
-            balanceLabel(startBalance),
+          await creditsBar.waitFor({ state: "visible" });
+          await until(
+            "sidebar shows the full allowance",
+            async () => (await creditsBar.getAttribute("aria-valuenow")) === "100",
           );
           const sent = await sendFromComposer(
             page,
@@ -257,9 +240,12 @@ describe("E2E: guest chat money path", () => {
         return endBalance < startBalance;
       });
       expect(endBalance).toBeGreaterThan(0);
+      const remainingPercent = Math.min(endBalance / startBalance, 1) * 100;
       await until(
-        "sidebar shows the new balance",
-        async () => (await sidebarBalanceText(page)) === balanceLabel(endBalance),
+        "sidebar shows the remaining allowance",
+        async () =>
+          Number(await creditsBar.getAttribute("aria-valuenow")) ===
+          remainingPercent,
       );
     },
     TEST_TIMEOUT_MS,

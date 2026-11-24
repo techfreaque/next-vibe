@@ -14,12 +14,9 @@ import videoGenerationEndpoints from "./definition";
 import { VideoGenModelId } from "./models";
 
 const endpoint = videoGenerationEndpoints.POST;
-/**
- * Cheapest OpenRouter video per clip: Wan 2.7 at its 2s minimum
- * (10 credits/s → ~20 credits). Others bottom out at 3–4s.
- */
-const CHEAP_MODEL = VideoGenModelId.WAN_2_7_T2V;
-const SHORTEST_SECONDS = 2;
+/** Five seconds is supported by both Wan 2.7 routes. */
+const VIDEO_MODEL = VideoGenModelId.WAN_2_7_T2V;
+const VIDEO_SECONDS = 5;
 const PROMPT = "A red ball rolling across a white floor";
 
 describe("E2E: video generation", () => {
@@ -30,12 +27,12 @@ describe("E2E: video generation", () => {
     cleanup(buyer.remove);
     await loginAs(buyer.user);
 
-    const form = await open(endpoint, { query: { model: CHEAP_MODEL } });
+    const form = await open(endpoint, { query: { model: VIDEO_MODEL } });
     await form.fill({ prompt: PROMPT });
-    // Duration presets are model-driven; the shortest is labelled "~2s"
+    // Select a duration supported by both routes.
     await form.root
       .getByRole("button")
-      .filter({ hasText: `~${String(SHORTEST_SECONDS)}s` })
+      .filter({ hasText: `~${String(VIDEO_SECONDS)}s` })
       .first()
       .click();
 
@@ -43,8 +40,8 @@ describe("E2E: video generation", () => {
     const result = await submitAndAwaitResponse(form, 420_000);
     expect(result.requestBody).toMatchObject({
       prompt: PROMPT,
-      model: CHEAP_MODEL,
-      duration: SHORTEST_SECONDS,
+      model: VIDEO_MODEL,
+      duration: VIDEO_SECONDS,
     });
     expect(result.response.success, JSON.stringify(result.response).slice(0, 500)).toBe(true);
     if (!result.response.success) return;
@@ -78,7 +75,7 @@ describe("E2E: video generation", () => {
     cleanup(buyer.remove);
     await loginAs(buyer.user);
 
-    const form = await open(endpoint, { query: { model: CHEAP_MODEL } });
+    const form = await open(endpoint, { query: { model: VIDEO_MODEL } });
     const result = await form.submit();
     expect(result.sent).toBe(false);
     if (result.sent) return;

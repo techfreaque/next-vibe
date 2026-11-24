@@ -1117,6 +1117,8 @@ export class ModelPricesRepository {
       }
 
       // For non-chat models: apply deterministic modalities based on role.
+      // Image generation keeps its declared modalities when the provider supplies
+      // no update. Some routes also accept reference images for editing.
       // Video inputs are NOT a role constant: image-to-video models take a
       // reference image. They derive from provider route data (OpenRouter
       // supported_frame_images, ModelsLab init_image → supportedFrameImages),
@@ -1125,7 +1127,6 @@ export class ModelPricesRepository {
         string,
         { inputs: Modality[]; outputs: Modality[] } | undefined
       > = {
-        "image-gen": { inputs: ["text"], outputs: ["image"] },
         "music-gen": { inputs: ["text"], outputs: ["audio"] },
         "video-gen": { inputs: ["text"], outputs: ["video"] },
         tts: { inputs: ["text"], outputs: ["audio"] },
@@ -1188,7 +1189,7 @@ export class ModelPricesRepository {
       const modelIdsWithModalityVerified = new Set(
         allModalityUpdates.map((u) => u.modelId),
       );
-      // Non-chat models always have deterministic modalities
+      // Non-chat models have declared or deterministic modalities.
       for (const defs of Object.values(allNonChatDefs)) {
         for (const modelId of Object.keys(defs)) {
           modelIdsWithModalityVerified.add(modelId);
