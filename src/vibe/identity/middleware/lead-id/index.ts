@@ -20,7 +20,10 @@ import {
   isAcquisitionVisit,
   isLikelyBot,
 } from "@/leads/growth/attribution";
-import { matchesChrome131CrawlerHeaders } from "@/leads/growth/chrome-131-crawler";
+import {
+  CHROME_131_CRAWLER_UA,
+  matchesChrome131CrawlerHeaders,
+} from "@/leads/growth/chrome-131-crawler";
 
 import { coreEnv } from "../../../core/env";
 import type { CountryLanguage } from "../../../core/i18n/core/config";
@@ -34,6 +37,7 @@ import type { EndpointLogger } from "../../../logger/types";
 import { frameExchangeTokens } from "../../../platforms/vibe-frame/db";
 import {
   canRenderWithoutLead,
+  isPublicDocumentPath,
   markDegradedPublicDocument,
 } from "../../../platforms/web/middleware/public-document";
 import { shouldSkipPath } from "../../../platforms/web/middleware/utils";
@@ -46,6 +50,24 @@ import {
 
 export const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Temporary production sample. Remove after identifying why these leads are created.
+let chrome131HeaderSamplesRemaining = 12;
+// Only record names used by the bypass. Arbitrary header names are user input.
+const CHROME_131_SAMPLE_HEADER_NAMES = [
+  "accept",
+  "authorization",
+  "cookie",
+  "next-action",
+  "referer",
+  "rsc",
+  "sec-ch-ua",
+  "sec-fetch-dest",
+  "sec-fetch-mode",
+  "sec-fetch-site",
+  "sec-fetch-user",
+  "user-agent",
+];
 
 enum LeadIdCheckResult {
   VALID = "valid",
@@ -334,6 +356,19 @@ export async function createLeadId(
       deadlineMs,
       "create",
     );
+  }
+  if (
+    chrome131HeaderSamplesRemaining > 0 &&
+    coreEnv.NODE_ENV === Environment.PRODUCTION &&
+    !coreEnv.IS_PREVIEW_MODE &&
+    request.headers.get("user-agent") === CHROME_131_CRAWLER_UA &&
+    isPublicDocumentPath(request.nextUrl.pathname)
+  ) {
+    chrome131HeaderSamplesRemaining -= 1;
+    const names = CHROME_131_SAMPLE_HEADER_NAMES.filter((name) =>
+      request.headers.has(name),
+    );
+    logger.info(`[crawler-131-header-sample] ${names.join(",")}`);
   }
   await recordAttributionWithinBudget(request, leadId, logger, deadlineMs);
 
