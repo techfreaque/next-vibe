@@ -3,13 +3,12 @@ export const CHROME_131_CRAWLER_UA =
 export const CHROME_131_CRAWLER_REFERRER_HOST = "google.com";
 export const CHROME_131_CRAWLER_REFERRER_PATH = "/";
 
-/** Real Chrome sends Fetch Metadata on HTTPS cross-site document navigation. */
+/** The crawler's only Fetch Metadata header is Sec-Fetch-Site. Chrome sends mode and destination too. */
 export function matchesChrome131CrawlerHeaders(headers: Headers): boolean {
   if (
     headers.get("user-agent") !== CHROME_131_CRAWLER_UA ||
     !headers.get("accept")?.includes("text/html") ||
     headers.has("cookie") ||
-    headers.has("sec-fetch-site") ||
     headers.has("sec-fetch-mode") ||
     headers.has("sec-fetch-dest") ||
     headers.has("sec-fetch-user") ||

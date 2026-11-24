@@ -203,6 +203,7 @@ it("serves Chrome 131 crawler documents before guest provisioning", async () => 
     "user-agent": CHROME_131_CRAWLER_UA,
     accept: "text/html",
     referer: "https://www.google.com/",
+    "sec-fetch-site": "cross-site",
   };
   for (const path of [
     "/fr-FR/models/example",
@@ -220,11 +221,23 @@ it("serves Chrome 131 crawler documents before guest provisioning", async () => 
   expect(create).not.toHaveBeenCalled();
 
   for (const [path, extraHeaders] of [
-    ["/en-US/models/example", { "sec-fetch-site": "cross-site" }],
+    [
+      "/en-US/models/example",
+      {
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-dest": "document",
+        "sec-fetch-user": "?1",
+        "sec-ch-ua": '"Chromium";v="131"',
+      },
+    ],
+    ["/en-US/models/example", { "sec-fetch-mode": "navigate" }],
+    ["/en-US/models/example", { "sec-fetch-dest": "document" }],
+    ["/en-US/models/example", { "sec-fetch-user": "?1" }],
     ["/en-US/models/example", { "sec-ch-ua": '"Chromium";v="131"' }],
     ["/en-US/models/example", { referer: "https://www.google.com/search" }],
     ["/en-US/models/example", { referer: "https://google.com.example.test/" }],
     ["/en-US/models/example", { cookie: `${AUTH_TOKEN_COOKIE_NAME}=session` }],
+    ["/en-US/models/example", { cookie: "theme=dark" }],
     ["/en-US/models/example?ref=partner", {}],
     ["/en-US/user/signup", {}],
   ] as const) {
@@ -233,5 +246,5 @@ it("serves Chrome 131 crawler documents before guest provisioning", async () => 
     });
     expect((await proxy(incoming)).status).toBe(500);
   }
-  expect(create).toHaveBeenCalledTimes(7);
+  expect(create).toHaveBeenCalledTimes(11);
 });
