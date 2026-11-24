@@ -266,11 +266,11 @@ export const translations = {
       con2: "The open-source desktop app has not been updated since June 2024.",
     },
     gabAi: {
-      what: "Multi-model AI platform from Gab with 200+ models, its own model Arya, an agent mode, image, video and music generation and desktop apps. Openly right-wing Christian positioning.",
+      what: "Multi-model AI platform from Gab with 214 models, its own model Arya, an agent mode, image, video and music generation and desktop apps. Openly right-wing Christian positioning.",
       pricingNote:
         "Free: 250 credits after email verification. One-time credit packs from $10 for 700 credits, never expire.",
       models:
-        "About 200 models from 31 providers: GPT, Claude, Gemini, DeepSeek, Qwen, Kimi and more. Arya is Gab's own model, built around Christian values and conservative principles.",
+        "214 models on one account: GPT, Claude, Gemini, DeepSeek, Qwen, Kimi and more. Arya is Gab's own model, built around Christian values and conservative principles.",
       filterShort: "Uncensored on speech, bans sexual content",
       filter:
         "Terms require 18+ and ban obscene, sexually explicit or pornographic content. Automated systems may scan content for compliance. Free on politics, not on adult content.",

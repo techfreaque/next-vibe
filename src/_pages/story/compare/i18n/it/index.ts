@@ -271,11 +271,11 @@ export const translations: typeof enTranslations = {
       con2: "L'applicazione desktop open-source non è stata aggiornata dal giugno 2024.",
     },
     gabAi: {
-      what: "Piattaforma AI multi-model da Gab con 200+ modelli, il proprio modello Arya, una modalità agente, immagine, generazione di video e musica e applicazioni desktop. Posizione cristiana apertamente di destra.",
+      what: "Piattaforma AI multi-model da Gab con 214 modelli, il proprio modello Arya, una modalità agente, immagine, generazione di video e musica e applicazioni desktop. Posizione cristiana apertamente di destra.",
       pricingNote:
         "Gratis: 250 crediti dopo la verifica e-mail. Le confezioni di credito una volta da $10 per 700 crediti, non scadono mai.",
       models:
-        "Circa 200 modelli da 31 fornitori: GPT, Claude, Gemini, DeepSeek, Qwen, Kimi e altro ancora. Arya è il modello di Gab, costruito intorno ai valori cristiani e principi conservatori.",
+        "214 modelli in un solo account: GPT, Claude, Gemini, DeepSeek, Qwen, Kimi e altro ancora. Arya è il modello di Gab, costruito intorno ai valori cristiani e principi conservatori.",
       filterShort:
         "Libertà di espressione, con restrizioni sui contenuti sessuali",
       filter:

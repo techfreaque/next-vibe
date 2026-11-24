@@ -268,11 +268,11 @@ export const translations: typeof enTranslations = {
       con2: "Aplikacja desktopowa open source nie była aktualizowana od czerwca 2024.",
     },
     gabAi: {
-      what: "Platforma AI z wieloma modelami od Gab: ponad 200 modeli, własny model Arya, tryb agenta, generowanie obrazów, wideo i muzyki oraz aplikacje desktopowe. Otwarcie prawicowe, chrześcijańskie pozycjonowanie.",
+      what: "Platforma AI z wieloma modelami od Gab: 214 modeli, własny model Arya, tryb agenta, generowanie obrazów, wideo i muzyki oraz aplikacje desktopowe. Otwarcie prawicowe, chrześcijańskie pozycjonowanie.",
       pricingNote:
         "Za darmo: 250 kredytów po weryfikacji e-maila. Jednorazowe pakiety kredytów od 10 USD za 700 kredytów, nigdy nie wygasają.",
       models:
-        "Około 200 modeli od 31 dostawców: GPT, Claude, Gemini, DeepSeek, Qwen, Kimi i inne. Arya to własny model Gab, zbudowany wokół wartości chrześcijańskich i zasad konserwatywnych.",
+        "214 modeli na jednym koncie: GPT, Claude, Gemini, DeepSeek, Qwen, Kimi i inne. Arya to własny model Gab, zbudowany wokół wartości chrześcijańskich i zasad konserwatywnych.",
       filterShort: "Bez cenzury w poglądach, zakaz treści seksualnych",
       filter:
         "Regulamin wymaga 18+ i zakazuje treści obscenicznych, seksualnie dosłownych i pornograficznych. Automatyczne systemy mogą skanować treści pod kątem zgodności. Swoboda w polityce, nie w treściach dla dorosłych.",

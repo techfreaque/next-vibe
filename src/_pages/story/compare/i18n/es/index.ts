@@ -268,11 +268,11 @@ export const translations: typeof enTranslations = {
       con2: "La aplicación de escritorio de código abierto no se ha actualizado desde junio de 2024.",
     },
     gabAi: {
-      what: "Plataforma AI multimodelo de Gab con 200 modelos, su propio modelo Arya, un modo agente, imagen, vídeo y generación de música y aplicaciones de escritorio. La posición cristiana de derecha abierta.",
+      what: "Plataforma AI multimodelo de Gab con 214 modelos, su propio modelo Arya, un modo agente, imagen, vídeo y generación de música y aplicaciones de escritorio. La posición cristiana de derecha abierta.",
       pricingNote:
         "Gratis: 250 créditos después de la verificación por correo electrónico. Paquetes de crédito de 10 dólares por 700 créditos, nunca caducan.",
       models:
-        "Unos 200 modelos de 31 proveedores: GPT, Claude, Gemini, DeepSeek, Qwen, Kimi y más. Arya es el propio modelo de Gab, construido alrededor de los valores cristianos y principios conservadores.",
+        "214 modelos en una sola cuenta: GPT, Claude, Gemini, DeepSeek, Qwen, Kimi y más. Arya es el propio modelo de Gab, construido alrededor de los valores cristianos y principios conservadores.",
       filterShort:
         "Libertad de expresión, con restricciones al contenido sexual",
       filter:

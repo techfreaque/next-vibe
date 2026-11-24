@@ -268,11 +268,11 @@ export const translations: typeof enTranslations = {
       con2: "L'appli de bureau open source n'a pas été mise à jour depuis juin 2024.",
     },
     gabAi: {
-      what: "Plateforme d'IA multi-modèles de Gab : plus de 200 modèles, son propre modèle Arya, un mode agent, génération d'images, de vidéo et de musique, applis de bureau. Positionnement ouvertement chrétien et de droite.",
+      what: "Plateforme d'IA multi-modèles de Gab : 214 modèles, son propre modèle Arya, un mode agent, génération d'images, de vidéo et de musique, applis de bureau. Positionnement ouvertement chrétien et de droite.",
       pricingNote:
         "Gratuit : 250 crédits après vérification de l'e-mail. Packs de crédits en paiement unique dès 10 $ pour 700 crédits, sans expiration.",
       models:
-        "Environ 200 modèles de 31 fournisseurs : GPT, Claude, Gemini, DeepSeek, Qwen, Kimi et d'autres. Arya est le modèle maison de Gab, construit autour des valeurs chrétiennes et de principes conservateurs.",
+        "214 modèles sur un seul compte : GPT, Claude, Gemini, DeepSeek, Qwen, Kimi et d'autres. Arya est le modèle maison de Gab, construit autour des valeurs chrétiennes et de principes conservateurs.",
       filterShort: "Libre sur la parole, interdit le contenu sexuel",
       filter:
         "Les conditions exigent d'avoir 18 ans ou plus et interdisent les contenus obscènes, sexuellement explicites ou pornographiques. Des systèmes automatisés peuvent analyser les contenus pour vérifier leur conformité. Libre sur la politique, pas sur les contenus pour adultes.",

@@ -95,6 +95,20 @@ export const translations: typeof enTranslations = {
         "Warum DAN und jeder Prompt danach scheitert, was ein Jailbreak Sie wirklich kostet und welche unzensierten Modelle ohne antworten. Mit direktem Vergleichstest.",
       readTime: "7 Min. Lesezeit",
     },
+    freedomGptAlternatives: {
+      title: "FreedomGPT Alternativen. Gleiche Idee, weniger Haken.",
+      category: "Vergleich",
+      excerpt:
+        "Was die Credits von FreedomGPT wirklich bringen, was die eigene FAQ zugibt, und sechs Alternativen von Venice bis Ollama, geprüft auf ihren eigenen Seiten.",
+      readTime: "9 Min. Lesezeit",
+    },
+    gabAiAlternatives: {
+      title: "Gab AI Alternativen. Meinungsfreiheit ohne Kleingedrucktes.",
+      category: "Vergleich",
+      excerpt:
+        "Gab AI ist frei bei Politik, streng bei Erwachseneninhalten und speichert deine Chats. Sechs Alternativen, geprüft an ihren Bedingungen, Preisen und Datenschutzseiten.",
+      readTime: "9 Min. Lesezeit",
+    },
     noFilterGptAlternatives: {
       title: "NoFilterGPT Alternativen. Mehr Modelle, gleiche Freiheit.",
       category: "Vergleich",

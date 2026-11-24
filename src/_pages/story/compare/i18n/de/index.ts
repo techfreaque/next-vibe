@@ -267,11 +267,11 @@ export const translations: typeof enTranslations = {
       con2: "Die Open-Source-Desktop-App wurde seit Juni 2024 nicht aktualisiert.",
     },
     gabAi: {
-      what: "Multi-Modell-KI-Plattform von Gab mit über 200 Modellen, dem eigenen Modell Arya, einem Agentenmodus, Bild-, Video- und Musikgenerierung und Desktop-Apps. Offen rechts-christlich positioniert.",
+      what: "Multi-Modell-KI-Plattform von Gab mit 214 Modellen, dem eigenen Modell Arya, einem Agentenmodus, Bild-, Video- und Musikgenerierung und Desktop-Apps. Offen rechts-christlich positioniert.",
       pricingNote:
         "Gratis: 250 Credits nach E-Mail-Bestätigung. Einmalige Credit-Pakete ab $10 für 700 Credits, verfallen nie.",
       models:
-        "Rund 200 Modelle von 31 Anbietern: GPT, Claude, Gemini, DeepSeek, Qwen, Kimi und mehr. Arya ist Gabs eigenes Modell, gebaut auf christlichen Werten und konservativen Prinzipien.",
+        "214 Modelle in einem Konto: GPT, Claude, Gemini, DeepSeek, Qwen, Kimi und mehr. Arya ist Gabs eigenes Modell, gebaut auf christlichen Werten und konservativen Prinzipien.",
       filterShort: "Unzensiert bei Meinungen, verbietet sexuelle Inhalte",
       filter:
         "Die AGB verlangen 18+ und verbieten obszöne, sexuell explizite oder pornografische Inhalte. Automatisierte Systeme können Inhalte auf Regelverstöße prüfen. Frei bei Politik, nicht bei Erwachseneninhalten.",

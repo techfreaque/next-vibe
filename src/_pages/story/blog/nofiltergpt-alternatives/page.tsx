@@ -366,7 +366,11 @@ export function TanstackPage({
           intro={t("privacy.intro")}
         >
           <ArticleList
-            items={[t("privacy.nfg"), t("privacy.us"), t("privacy.transit")]}
+            items={[
+              t("privacy.nfg"),
+              t("privacy.us", stats),
+              t("privacy.transit"),
+            ]}
           />
           <Callout icon={EyeOff} tone="neutral">
             {t("privacy.callout")}

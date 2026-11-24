@@ -22,6 +22,8 @@ export type BlogTopic = (typeof BLOG_TOPICS)[number];
 
 /** Section of each post on the blog index. Exhaustive: a new post needs one. */
 export const POST_TOPICS: Record<BlogPostSlug, BlogTopic> = {
+  "freedomgpt-alternatives": "uncensored",
+  "gab-ai-alternatives": "uncensored",
   "nofiltergpt-alternatives": "uncensored",
   "deepseek-uncensored": "uncensored",
   "grok-alternative": "uncensored",
@@ -88,6 +90,8 @@ export const HUB_GUIDES: Record<TopicHub, readonly BlogPostSlug[]> = {
     "character-ai-alternatives",
     "venice-ai-alternatives",
     "nofiltergpt-alternatives",
+    "freedomgpt-alternatives",
+    "gab-ai-alternatives",
     "ai-chat-no-sign-up",
     "uncensored-llm-without-gpu",
     "uncensored-llm-api",
@@ -113,12 +117,28 @@ interface RelatedGuideSet {
 
 /** Curated hub + siblings. Posts not listed fall back to their topic. */
 const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
+  "freedomgpt-alternatives": {
+    hub: "uncensored",
+    related: [
+      "nofiltergpt-alternatives",
+      "venice-ai-alternatives",
+      "uncensored-llm-without-gpu",
+    ],
+  },
+  "gab-ai-alternatives": {
+    hub: "uncensored",
+    related: [
+      "unbiased-ai-chatbot",
+      "freedomgpt-alternatives",
+      "uncensored-ai-writer",
+    ],
+  },
   "nofiltergpt-alternatives": {
     hub: "uncensored",
     related: [
-      "chatgpt-alternative-without-filters",
+      "freedomgpt-alternatives",
       "venice-ai-alternatives",
-      "best-uncensored-llm",
+      "chatgpt-alternative-without-filters",
     ],
   },
   "deepseek-uncensored": {
@@ -172,9 +192,9 @@ const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
   "unbiased-ai-chatbot": {
     hub: "uncensored",
     related: [
+      "gab-ai-alternatives",
       "abliterated-vs-uncensored-models",
       "best-uncensored-llm",
-      "chatgpt-alternative-without-filters",
     ],
   },
   "ai-chat-no-sign-up": {
@@ -212,9 +232,9 @@ const CURATED_RELATED: Partial<Record<BlogPostSlug, RelatedGuideSet>> = {
   "venice-ai-alternatives": {
     hub: "uncensored",
     related: [
-      "character-ai-alternatives",
+      "freedomgpt-alternatives",
       "nofiltergpt-alternatives",
-      "chatgpt-alternative-without-filters",
+      "character-ai-alternatives",
     ],
   },
   "character-ai-alternatives": {

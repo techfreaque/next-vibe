@@ -249,6 +249,9 @@ export const PLATFORMS: Record<PlatformKey, PlatformData> = {
     selfHost: false,
     media: { image: "yes", video: "yes", voice: "yes" },
     upstream: ApiProvider.GAB_AI,
+    // Model count (214, "214 models. One account.") re-read on its home page
+    // on 2026-11-24; plans, terms, privacy and API rule re-checked the same
+    // day and unchanged. Everything else as of COMPARE_CHECKED_DATE.
     sources: [
       { kind: "home", url: "https://gab.ai/" },
       { kind: "pricing", url: "https://gab.ai/pricing" },
