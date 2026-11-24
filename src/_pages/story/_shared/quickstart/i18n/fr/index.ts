@@ -35,6 +35,7 @@ export const translations: typeof enTranslations = {
     dev: "Démarrer. Base de données, migrations et données de départ se font toutes seules.",
     fallback:
       "Le shell ne trouve pas vibe ? Ouvrez un nouveau terminal ou lancez bun run dev.",
+    port: "Le port 3000 est déjà utilisé ? Démarrez sur un autre : vibe dev --port=4000, puis ouvrez localhost:4000.",
     postgres:
       "Par défaut : Postgres embarqué (PGlite), sans Docker. Envie d'un vrai Postgres ? Changez DATABASE_URL dans les paramètres ; vibe dev le lance dans Docker au prochain démarrage.",
   },

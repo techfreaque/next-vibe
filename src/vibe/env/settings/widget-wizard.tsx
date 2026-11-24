@@ -14,10 +14,12 @@ import { ChevronLeft } from "next-vibe/ui/components/icons/ChevronLeft";
 import { ChevronRight } from "next-vibe/ui/components/icons/ChevronRight";
 import { Cloud } from "next-vibe/ui/components/icons/Cloud";
 import { LogIn } from "next-vibe/ui/components/icons/LogIn";
+import { MessageSquare } from "next-vibe/ui/components/icons/MessageSquare";
 import { RefreshCw } from "next-vibe/ui/components/icons/RefreshCw";
 import { ShieldPlus } from "next-vibe/ui/components/icons/ShieldPlus";
 import type { InputChangeEvent } from "next-vibe/ui/components/input";
 import { Input } from "next-vibe/ui/components/input";
+import { Link } from "next-vibe/ui/components/link";
 import {
   Select,
   SelectContent,
@@ -49,6 +51,11 @@ import {
 } from "../../unified-ui/_shared/use-widget-context";
 import { useApiMutation } from "../../unified-ui/hooks/use-api-mutation";
 import { useEndpoint } from "../../unified-ui/hooks/use-endpoint";
+import {
+  WIZARD_DISMISSED_STORAGE_KEY,
+  WIZARD_PROGRESS_DONE,
+  WIZARD_PROGRESS_STORAGE_KEY,
+} from "./constants";
 import type endpoints from "./definition";
 import type { SystemSettingsGetResponseOutput } from "./definition";
 import settingsEndpoints from "./definition";
@@ -136,7 +143,7 @@ function StepIndicator({
 
 function EncryptionCallout({ t }: { t: (k: string) => string }): JSX.Element {
   return (
-    <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-success/10 border border-success/30 text-xs text-success-foreground mb-2">
+    <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-success/10 border border-success/30 text-xs text-success mb-2">
       <ShieldPlus className="h-3.5 w-3.5 shrink-0 mt-0.5" />
       <Span>{t("wizard.encryptionNote")}</Span>
     </Div>
@@ -204,12 +211,12 @@ function ClaudeCodeField({
         {t("wizard.ai.claudeCodeDescription")}
       </Span>
       {isDetected ? (
-        <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-success/10 border border-success/30 text-xs text-success-foreground">
+        <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-success/10 border border-success/30 text-xs text-success">
           <Check className="h-3.5 w-3.5 shrink-0 mt-0.5" />
           <Span>{t("wizard.ai.claudeDetected")}</Span>
         </Div>
       ) : (
-        <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-warning/10 border border-warning/30 text-xs text-warning-foreground">
+        <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-warning/10 border border-warning/30 text-xs text-warning">
           <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
           <Div className="flex flex-col gap-1">
             <Span className="font-medium">
@@ -331,14 +338,22 @@ function UnbottledLoginField({
         <Span className="text-sm font-medium">
           {t("wizard.ai.unbottledTitle")}
         </Span>
+        <Span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">
+          {t("wizard.ai.recommended")}
+        </Span>
       </Div>
       <Span className="text-xs text-muted-foreground">
         {t("wizard.ai.unbottledDescription")}
       </Span>
+      {!isConnected && !isConfiguredButUnhealthy && (
+        <Span className="text-xs text-muted-foreground">
+          {t("wizard.ai.unbottledNoAccount")}
+        </Span>
+      )}
 
       {isConnected ? (
         <Div className="flex flex-col gap-2">
-          <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-success/10 border border-success/30 text-xs text-success-foreground">
+          <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-success/10 border border-success/30 text-xs text-success">
             <Check className="h-3.5 w-3.5 shrink-0 mt-0.5" />
             <Span>
               {t("wizard.ai.unbottledConnected", { url: connectedUrl })}
@@ -355,7 +370,7 @@ function UnbottledLoginField({
         </Div>
       ) : isConfiguredButUnhealthy ? (
         <Div className="flex flex-col gap-2">
-          <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-warning/10 border border-warning/30 text-xs text-warning-foreground">
+          <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-warning/10 border border-warning/30 text-xs text-warning">
             <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
             <Span>{t("wizard.ai.unbottledDisconnected")}</Span>
           </Div>
@@ -472,12 +487,14 @@ function WizardField({
   editedValue,
   onEdit,
   onGenerate,
+  hideRequired = false,
   t,
 }: {
   setting: Setting;
   editedValue: string | undefined;
   onEdit: (key: string, value: string) => void;
   onGenerate?: (key: string) => Promise<void>;
+  hideRequired?: boolean;
   t: (k: string) => string;
 }): JSX.Element {
   if (setting.key === "CLAUDE_CODE_ENABLED") {
@@ -495,7 +512,7 @@ function WizardField({
             <ShieldPlus className="h-3 w-3 text-success shrink-0" />
           )}
           <Span className="text-sm font-medium">{setting.key}</Span>
-          {setting.onboardingRequired && (
+          {setting.onboardingRequired && !hideRequired && (
             <Span className="text-[10px] px-1 py-0.5 rounded bg-warning/10 text-warning">
               {t("widget.required")}
             </Span>
@@ -582,6 +599,7 @@ function DoneScreen({
   onGoToSettings: () => void;
   t: (k: string) => string;
 }): JSX.Element {
+  const locale = useWidgetLocale();
   return (
     <Div className="flex flex-col items-center gap-4 py-8 text-center">
       <Div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center">
@@ -593,10 +611,18 @@ function DoneScreen({
           {t("wizard.doneSubtitle")}
         </Span>
       </Div>
-      <Button onClick={onGoToSettings}>
-        <ChevronRight className="h-4 w-4 mr-1.5" />
-        {t("wizard.goToSettings")}
-      </Button>
+      <Div className="flex flex-wrap items-center justify-center gap-2">
+        <Button asChild>
+          <Link href={`/${locale}/threads/private/new`}>
+            <MessageSquare className="h-4 w-4 mr-1.5" />
+            {t("wizard.startChatting")}
+          </Link>
+        </Button>
+        <Button variant="outline" onClick={onGoToSettings}>
+          <ChevronRight className="h-4 w-4 mr-1.5" />
+          {t("wizard.goToSettings")}
+        </Button>
+      </Div>
     </Div>
   );
 }
@@ -621,10 +647,12 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
   const [currentStep, setCurrentStep] = useState(0);
   const [edits, setEdits] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
   const totalSteps = wizardSteps.length;
   const activeWizardStep = wizardSteps[currentStep];
+  const isAiStep = activeWizardStep?.group === "ai";
   const stepFields = (activeWizardStep?.fields ?? [])
     .map((key) => settingsMap.get(key))
     .filter((s): s is Setting => s !== undefined);
@@ -664,9 +692,9 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
     [user, logger, locale, handleEdit],
   );
 
-  const saveCurrentStep = useCallback(async (): Promise<void> => {
+  const saveCurrentStep = useCallback(async (): Promise<boolean> => {
     if (!user) {
-      return;
+      return false;
     }
     const stepKeys = activeWizardStep?.fields ?? [];
     const toSave: Record<string, string> = {};
@@ -676,14 +704,15 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
       }
     }
     if (Object.keys(toSave).length === 0) {
-      return;
+      return true;
     }
 
     setSaving(true);
+    setSaveError(null);
     try {
       const { apiClient } = await import("../../unified-ui/hooks/store");
       const endpointsDef = await import("./definition");
-      await apiClient.mutate(
+      const result = await apiClient.mutate(
         endpointsDef.PATCH,
         logger,
         user,
@@ -692,34 +721,81 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
         undefined,
         locale,
       );
+      if (!result.success) {
+        // Never advance past a step that did not save: the user would leave
+        // the wizard believing their admin login was set.
+        setSaveError(result.message);
+        return false;
+      }
       endpointMutations?.read?.refetch?.();
+      return true;
     } finally {
       setSaving(false);
     }
   }, [activeWizardStep, edits, user, logger, locale, endpointMutations]);
 
-  const handleNext = useCallback(async (): Promise<void> => {
-    await saveCurrentStep();
+  // Remember progress before anything restarts the dev server: a saved step
+  // rewrites .env, Vite restarts and reloads the page a moment later.
+  const advance = useCallback(async (): Promise<void> => {
     if (currentStep < totalSteps - 1) {
-      setCurrentStep((s) => s + 1);
+      const nextStep = currentStep + 1;
+      setCurrentStep(nextStep);
+      await storage.setItem(
+        WIZARD_PROGRESS_STORAGE_KEY,
+        String(nextStep),
+        logger,
+      );
     } else {
       setDone(true);
-      await storage.setItem("vibe-wizard-dismissed", "1", logger);
+      await storage.setItem(
+        WIZARD_PROGRESS_STORAGE_KEY,
+        WIZARD_PROGRESS_DONE,
+        logger,
+      );
+      await storage.setItem(WIZARD_DISMISSED_STORAGE_KEY, "1", logger);
     }
-  }, [saveCurrentStep, currentStep, totalSteps, logger]);
+  }, [currentStep, totalSteps, logger]);
+
+  // Resume after the reload that follows a saved step.
+  useEffect(() => {
+    void (async (): Promise<void> => {
+      const progress = await storage.getItem(
+        WIZARD_PROGRESS_STORAGE_KEY,
+        logger,
+      );
+      if (progress === WIZARD_PROGRESS_DONE) {
+        setDone(true);
+        return;
+      }
+      const step = progress === null ? Number.NaN : Number(progress);
+      if (Number.isInteger(step) && step > 0 && step < totalSteps) {
+        setCurrentStep(step);
+      }
+    })();
+  }, [logger, totalSteps]);
+
+  const closeWizard = useCallback(async (): Promise<void> => {
+    await storage.removeItem(WIZARD_PROGRESS_STORAGE_KEY, logger);
+    onDone();
+  }, [logger, onDone]);
+
+  const handleNext = useCallback(async (): Promise<void> => {
+    const saved = await saveCurrentStep();
+    if (!saved) {
+      return;
+    }
+    await advance();
+  }, [saveCurrentStep, advance]);
 
   const handleBack = useCallback((): void => {
+    setSaveError(null);
     setCurrentStep((s) => Math.max(0, s - 1));
   }, []);
 
   const handleSkip = useCallback(async (): Promise<void> => {
-    if (currentStep < totalSteps - 1) {
-      setCurrentStep((s) => s + 1);
-    } else {
-      setDone(true);
-      await storage.setItem("vibe-wizard-dismissed", "1", logger);
-    }
-  }, [currentStep, totalSteps, logger]);
+    setSaveError(null);
+    await advance();
+  }, [advance]);
 
   // Pre-fill auto-generated keys that are already configured
   useEffect(() => {
@@ -738,7 +814,14 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
   }, [wizardSteps, settingsMap, edits]);
 
   if (done) {
-    return <DoneScreen onGoToSettings={onDone} t={t} />;
+    return (
+      <DoneScreen
+        onGoToSettings={(): void => {
+          void closeWizard();
+        }}
+        t={t}
+      />
+    );
   }
 
   return (
@@ -770,13 +853,27 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
             size="sm"
             className="text-xs h-7"
             onClick={async (): Promise<void> => {
-              await storage.setItem("vibe-wizard-dismissed", "1", logger);
-              onDone();
+              await storage.setItem(WIZARD_DISMISSED_STORAGE_KEY, "1", logger);
+              await closeWizard();
             }}
           >
             {t("wizard.viewAllSettings")}
           </Button>
         </Div>
+
+        {/* System inference provider: a remote connection, not an env var.
+            First in the AI step because it is the recommended path: one
+            unbottled.ai login unlocks every model, no provider keys. */}
+        {isAiStep && <UnbottledLoginField t={t} />}
+        {isAiStep && (
+          <Div className="flex items-center gap-3 my-4">
+            <Div className="h-px flex-1 bg-border" />
+            <Span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {t("wizard.ai.orDivider")}
+            </Span>
+            <Div className="h-px flex-1 bg-border" />
+          </Div>
+        )}
 
         {stepFields.map((setting) => (
           <WizardField
@@ -787,14 +884,18 @@ export function SettingsWizard({ data, onDone }: WizardProps): JSX.Element {
             onGenerate={
               isAutoGenerated(setting.key) ? handleGenerate : undefined
             }
+            // Any one AI provider is enough: no single key is required here.
+            hideRequired={isAiStep}
             t={t}
           />
         ))}
 
-        {/* System inference provider — a remote connection, not an env var.
-            Surfaced in the AI onboarding step so users can connect unbottled.ai
-            (or any instance) as their inference provider. */}
-        {activeWizardStep?.group === "ai" && <UnbottledLoginField t={t} />}
+        {saveError && (
+          <Div className="flex items-start gap-2 px-3 py-2 rounded-md bg-destructive/10 border border-destructive/30 text-xs text-destructive">
+            <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+            <Span>{saveError}</Span>
+          </Div>
+        )}
       </Div>
 
       <Div className="flex items-center justify-between px-6 py-4 border-t mt-2">

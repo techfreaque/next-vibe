@@ -502,7 +502,11 @@ export class SystemSettingsRepository {
     let schema: any = fieldSchema;
     while (schema) {
       if (schema._def?.defaultValue !== undefined) {
-        const defaultVal = schema._def.defaultValue();
+        // Zod 4 stores the default as a plain value (a getter), Zod 3 as a
+        // function. Calling the Zod 4 value threw and broke every wizard save.
+        const rawDefault = schema._def.defaultValue;
+        const defaultVal =
+          typeof rawDefault === "function" ? rawDefault() : rawDefault;
         return defaultVal !== undefined ? String(defaultVal) : undefined;
       }
       // Unwrap ZodOptional, ZodNullable, ZodTransform inner types

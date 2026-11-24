@@ -34,6 +34,7 @@ export const translations: typeof enTranslations = {
     dev: "Uruchom. Baza, migracje i dane startowe robią się same.",
     fallback:
       "Powłoka nie zna polecenia vibe? Otwórz nowy terminal albo uruchom bun run dev.",
+    port: "Port 3000 jest zajęty? Uruchom na innym: vibe dev --port=4000 i otwórz localhost:4000.",
     postgres:
       "Domyślnie: wbudowany Postgres (PGlite), bez Dockera. Wolisz pełnego Postgresa? Zmień DATABASE_URL w ustawieniach; vibe dev uruchomi go w Dockerze przy następnym starcie.",
   },

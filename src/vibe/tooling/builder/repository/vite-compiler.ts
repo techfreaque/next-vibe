@@ -2325,6 +2325,13 @@ class ViteCompiler {
             name: "nitro-restart-fix",
             configureServer(srv) {
               srv.restart = async (): Promise<void> => {
+                // The .env write that triggers this restart is usually still
+                // answering its own request (settings PATCH from the setup
+                // wizard). Closing at once kills that response and the
+                // wizard reports a failed save that actually succeeded.
+                await new Promise<void>((_resolve) => {
+                  setTimeout(_resolve, 1000);
+                });
                 const address = srv.httpServer?.address();
                 const boundPort =
                   address && typeof address !== "string" ? address.port : port;
@@ -2734,7 +2741,31 @@ if (typeof import.meta.hot !== 'undefined' && import.meta.hot) {
       });
 
       try {
-        await server.listen(port);
+        const httpServer = server.httpServer;
+        if (fixedPort && port !== undefined && httpServer) {
+          // In-process restart (.env saved from the setup wizard or settings):
+          // bind directly. Vite's listen() first probes the port on 0.0.0.0
+          // and :: with a throwaway net.Server. A client that connects to that
+          // probe during the restart window (an open tab, the Nitro worker)
+          // keeps its close() pending forever, the restart never finishes and
+          // the proxy answers 503 until `vibe dev` is rerun. The proxy already
+          // targets this exact port, so there is nothing to probe.
+          await new Promise<void>((_resolve, _reject) => {
+            const onError = (error: Error): void => {
+              httpServer.off("listening", onListening);
+              _reject(error);
+            };
+            const onListening = (): void => {
+              httpServer.off("error", onError);
+              _resolve();
+            };
+            httpServer.once("error", onError);
+            httpServer.once("listening", onListening);
+            httpServer.listen(port, "127.0.0.1");
+          });
+        } else {
+          await server.listen(port);
+        }
       } catch (error) {
         await server.close().catch(() => undefined);
         return { success: false, message: parseError(error).message };

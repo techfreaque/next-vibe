@@ -12,7 +12,7 @@ One folder per feature. `definition.ts` defines the contract, `route.ts` wires i
 
 > **The spiritual successor to WordPress - for the AI era.** Fork it, own it, build your platform. No vendor lock-in. No black box. You own every line.
 
-> **Linux only (for now).** Mac and Windows aren't officially supported yet. Getting it running on either is probably a few Claude Code or Codex prompts away - we just don't have a Mac. PRs and issues welcome.
+> **Linux gets the most testing.** macOS and Windows use the same three commands and the self-host page lists the per-OS prerequisites, but they see less testing. Issues and PRs welcome.
 
 > **Interactive CLI broken since v3.2.0.** `vibe -i` / `--interactive` is temporarily disabled. The trade-off was intentional: the entire codebase now runs on CLI and web through the same renderer layer. `next-vibe-ui` has a CLI equivalent of every component - same props, same types, shadcn-derived for web, Ink-based for terminal. Interactive mode returns once the unified renderer is fully stable.
 
@@ -22,24 +22,30 @@ One folder per feature. `definition.ts` defines the contract, `route.ts` wires i
 
 ## Getting Started
 
+You need git and [Bun](https://bun.sh) 1.3 or newer. No Docker, no Postgres install: the default database is embedded Postgres (PGlite).
+
 ```bash
 git clone https://github.com/techfreaque/next-vibe
 cd next-vibe
-bun install
+bun i        # also puts the vibe command on your PATH
+vibe dev     # database, migrations and seed data run on their own
 ```
 
-Three commands, three situations:
+`vibe: command not found`? Open a new terminal, or run `bun run dev`. Port 3000 in use? `vibe dev --port=4000`.
+
+Everything else happens in the browser:
+
+1. Open [localhost:3000](http://localhost:3000) and click **Log In**.
+2. In the **Dev Quick Login** box, pick the **ADMIN** account. The setup wizard opens.
+3. Set your admin email and password. Security keys are already generated.
+4. Choose your AI: sign in with your [unbottled.ai](https://unbottled.ai) account (every model, no keys), or use Claude Code (`claude login`, detected on its own) or an [OpenRouter key](https://openrouter.ai/keys). Finish, start chatting.
+
+Production:
 
 ```bash
-vibe dev                  # local development (Docker DB, migrations, seeds, hot reload)
-vibe build && vibe start  # production, first time
-vibe rebuild              # production, zero-downtime update after changes
+vibe build && vibe start  # first time
+vibe rebuild              # zero-downtime update after changes
 ```
-
-Open the app → **Login as Admin** (no password in dev) → the setup wizard walks you through AI provider config and admin credentials.
-
-**Claude Code** _(recommended - no API key)_: `claude login`, then pick any `(claude-code)` model in the model selector.
-**OpenRouter** _(every OpenRouter model, pay per use)_: paste your key from [openrouter.ai/keys](https://openrouter.ai/keys).
 
 ### Deploy
 
@@ -305,7 +311,7 @@ Free speech AI. 197 models. Users choose their own content filtering level.
 
 ```bash
 # Dev & production
-vibe dev                    # dev server + Docker DB (add -r to reset)
+vibe dev                    # dev server + embedded DB (add -r to reset, --port=N)
 vibe build                  # build for production
 vibe start                  # start production + cron tasks
 vibe rebuild                # check + rebuild + hot-restart (zero downtime)

@@ -32,6 +32,7 @@ export const translations = {
     dev: "Start. Database, migrations and seed data run on their own.",
     fallback:
       "Shell says vibe: command not found? Open a new terminal, or run bun run dev.",
+    port: "Port 3000 already in use? Start on another one: vibe dev --port=4000, then open localhost:4000.",
     postgres:
       "Default: embedded Postgres (PGlite), no Docker. Want full Postgres? Change DATABASE_URL in the settings; vibe dev starts it in Docker on the next run.",
   },

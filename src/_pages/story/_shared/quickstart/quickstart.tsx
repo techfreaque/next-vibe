@@ -133,6 +133,7 @@ export function Quickstart({
               copyAllLabel={t("terminal.copyAll")}
             />
             <Note>{t("terminal.fallback")}</Note>
+            <Note>{t("terminal.port")}</Note>
             <Div className="mt-4 flex gap-3 rounded-xl border border-border bg-muted/50 p-4">
               <Database className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
               <P className="text-sm leading-relaxed text-muted-foreground [overflow-wrap:anywhere]">

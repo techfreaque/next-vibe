@@ -35,6 +35,7 @@ export const translations: typeof enTranslations = {
     dev: "Inicia. La base de datos, las migraciones y los datos iniciales se configuran automáticamente.",
     fallback:
       "¿La terminal dice «vibe: command not found»? Abre una terminal nueva o ejecuta bun run dev.",
+    port: "¿El puerto 3000 ya está en uso? Arranca en otro: vibe dev --port=4000 y abre localhost:4000.",
     postgres:
       "De forma predeterminada, usas Postgres integrado (PGlite) sin Docker. Para usar Postgres completo, configura DATABASE_URL. En el siguiente arranque, vibe dev lo ejecuta en Docker.",
   },

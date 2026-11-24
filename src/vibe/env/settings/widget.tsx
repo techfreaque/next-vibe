@@ -49,6 +49,10 @@ import {
   useWidgetValue,
 } from "../../unified-ui/_shared/use-widget-context";
 import { EndpointsPage } from "../../unified-ui/renderers/web/EndpointsPage";
+import {
+  WIZARD_DISMISSED_STORAGE_KEY,
+  WIZARD_PROGRESS_STORAGE_KEY,
+} from "./constants";
 import type endpoints from "./definition";
 import exportEnvEndpoints from "./export-env/definition";
 
@@ -395,13 +399,23 @@ export function SystemSettingsWidget(): JSX.Element {
     }
     void (async (): Promise<void> => {
       const dismissed = !!(await storage.getItem(
-        "vibe-wizard-dismissed",
+        WIZARD_DISMISSED_STORAGE_KEY,
+        logger,
+      ));
+      // A saved wizard step restarts the dev server and reloads the page.
+      // Reopen the wizard where the user was, even though the step just
+      // fixed the onboarding issue that opened it.
+      const inProgress = !!(await storage.getItem(
+        WIZARD_PROGRESS_STORAGE_KEY,
         logger,
       ));
       const hasDefaultPassword = value.onboardingIssues?.some((issue) =>
         issue.toLowerCase().includes("default"),
       );
-      if (value.needsOnboarding && (!dismissed || hasDefaultPassword)) {
+      if (
+        inProgress ||
+        (value.needsOnboarding && (!dismissed || hasDefaultPassword))
+      ) {
         setShowWizard(true);
       }
     })();
@@ -498,10 +512,13 @@ export function SystemSettingsWidget(): JSX.Element {
             size="sm"
             onClick={(): void => {
               if (showWizard) {
-                void storage.setItem("vibe-wizard-dismissed", "1", logger);
+                void storage.setItem(WIZARD_DISMISSED_STORAGE_KEY, "1", logger);
+                void storage.removeItem(WIZARD_PROGRESS_STORAGE_KEY, logger);
                 setShowWizard(false);
                 setShowExport(false);
               } else {
+                // Restarting the wizard starts from step one.
+                void storage.removeItem(WIZARD_PROGRESS_STORAGE_KEY, logger);
                 setShowWizard(true);
                 setShowExport(false);
               }
